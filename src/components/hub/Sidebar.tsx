@@ -20,16 +20,8 @@ export function Sidebar({ profile }: SidebarProps) {
   const semestresDisponibles: SemestreNum[] = [1, 2, 3, 4, 5, 6];
 
   const uacDelSemestre = UAC_BASE.filter(
-    (uac) => uac.semestre === semestreActual && uac.recursoCodigo !== undefined
+    (uac) => uac.semestre === semestreActual
   );
-  const uacArea =
-    semestreActual >= 3 && profile.area_eleccion
-      ? UAC_BASE.filter(
-          (uac) =>
-            uac.semestre === semestreActual &&
-            uac.areaCodigo !== undefined
-        )
-      : [];
 
   async function handleLogout() {
     try {
@@ -105,32 +97,10 @@ export function Sidebar({ profile }: SidebarProps) {
             </ul>
           </div>
 
-          {/* UAC del Área de Conocimiento (sem >= 3) */}
-          {uacArea.length > 0 && (
-            <div>
-              <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
-                Área de Conocimiento
-              </p>
-              <ul className="space-y-0.5">
-                {uacArea.map((uac) => (
-                  <li key={uac.codigo}>
-                    <Link
-                      href={`/hub/uac/${uac.codigo}`}
-                      className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700"
-                    >
-                      <span>🔭</span>
-                      <span className="truncate">{uac.nombre}</span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Recursos Socioemocionales */}
+          {/* Ámbitos de Formación Socioemocional */}
           <div>
             <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
-              Recursos Socioemocionales
+              Formación Socioemocional
             </p>
             <ul className="space-y-0.5">
               {RECURSOS_SOCIOEMOCIONALES.map((rse) => (

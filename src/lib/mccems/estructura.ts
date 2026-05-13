@@ -35,82 +35,88 @@ export const COMPONENTES_CURRICULARES: ComponenteCurricularStatic[] = [
   },
 ];
 
+// Ámbitos de Formación Socioemocional — MCCEMS vigente (4 ámbitos, no 3)
+// Fuente: dgb.sep.gob.mx/marco-curricular
 export const RECURSOS_SOCIOEMOCIONALES: RecursoSocioemocionalStatic[] = [
   {
-    codigo: "RSE-RS",
-    nombre: "Responsabilidad Social",
-    descripcion: "Fomenta el compromiso cívico, la participación comunitaria y el sentido de responsabilidad ante los problemas sociales.",
+    codigo: "RSE-AFD",
+    nombre: "Actividades físicas y deportivas",
+    descripcion: "Promueve el desarrollo físico, la salud y el trabajo en equipo a través del deporte y la actividad física regular.",
     orden: 1,
   },
   {
-    codigo: "RSE-CFC",
-    nombre: "Cuidado Físico Corporal",
-    descripcion: "Promueve hábitos saludables, actividad física y bienestar corporal para una vida plena.",
+    codigo: "RSE-AAC",
+    nombre: "Actividades artísticas y culturales",
+    descripcion: "Fomenta la expresión creativa, la identidad cultural y la apreciación estética mediante las artes y la cultura.",
     orden: 2,
   },
   {
-    codigo: "RSE-BEA",
-    nombre: "Bienestar Emocional Afectivo",
-    descripcion: "Desarrolla habilidades socioemocionales para el autoconocimiento, la autorregulación y las relaciones interpersonales.",
+    codigo: "RSE-IESG",
+    nombre: "Educación integral en sexualidad y género",
+    descripcion: "Desarrolla una comprensión crítica y respetuosa de la sexualidad, el género y las relaciones interpersonales.",
     orden: 3,
+  },
+  {
+    codigo: "RSE-ESP",
+    nombre: "Educación para la salud y práctica ciudadana",
+    descripcion: "Promueve hábitos de vida saludable y la participación responsable en la vida democrática y comunitaria.",
+    orden: 4,
   },
 ];
 
+// UAC del Currículum Fundamental — Acuerdo 09/08/23 (Gen 2023-2026 / 2024-2027)
+// Compatible con Modelo Educativo 2025 (Gen 2025-2028) donde todos los RSC son CF
+// Fuente: dgb.sep.gob.mx/programas-de-estudio | Validado 2026-05-12
 export const UAC_BASE: UACStatic[] = [
-  // Lengua y Comunicación (semestres 1-6)
-  { codigo: "LC-I", nombre: "Lengua y Comunicación I", semestre: 1, componenteCodigo: "CF", recursoCodigo: "RSC-LC", orden: 1, totalProgresionesEsperadas: 10 },
-  { codigo: "LC-II", nombre: "Lengua y Comunicación II", semestre: 2, componenteCodigo: "CF", recursoCodigo: "RSC-LC", orden: 1, totalProgresionesEsperadas: 10 },
+  // ── Lengua y Comunicación (sems 1-6) ───────────────────────────────────────
+  { codigo: "LC-I",   nombre: "Lengua y Comunicación I",   semestre: 1, componenteCodigo: "CF", recursoCodigo: "RSC-LC", orden: 1, totalProgresionesEsperadas: 10 },
+  { codigo: "LC-II",  nombre: "Lengua y Comunicación II",  semestre: 2, componenteCodigo: "CF", recursoCodigo: "RSC-LC", orden: 1, totalProgresionesEsperadas: 10 },
   { codigo: "LC-III", nombre: "Lengua y Comunicación III", semestre: 3, componenteCodigo: "CF", recursoCodigo: "RSC-LC", orden: 1, totalProgresionesEsperadas: 10 },
-  { codigo: "LC-IV", nombre: "Lengua y Comunicación IV", semestre: 4, componenteCodigo: "CF", recursoCodigo: "RSC-LC", orden: 1, totalProgresionesEsperadas: 10 },
-  { codigo: "LC-V", nombre: "Lengua y Comunicación V", semestre: 5, componenteCodigo: "CF", recursoCodigo: "RSC-LC", orden: 1, totalProgresionesEsperadas: 10 },
-  { codigo: "LC-VI", nombre: "Lengua y Comunicación VI", semestre: 6, componenteCodigo: "CF", recursoCodigo: "RSC-LC", orden: 1, totalProgresionesEsperadas: 10 },
+  { codigo: "LC-IV",  nombre: "Lengua y Comunicación IV",  semestre: 4, componenteCodigo: "CF", recursoCodigo: "RSC-LC", orden: 1, totalProgresionesEsperadas: 10 },
+  { codigo: "LC-V",   nombre: "Lengua y Comunicación V",   semestre: 5, componenteCodigo: "CF", recursoCodigo: "RSC-LC", orden: 1, totalProgresionesEsperadas: 10 },
+  { codigo: "LC-VI",  nombre: "Lengua y Comunicación VI",  semestre: 6, componenteCodigo: "CF", recursoCodigo: "RSC-LC", orden: 1, totalProgresionesEsperadas: 10 },
 
-  // Pensamiento Matemático (semestres 1-6)
-  { codigo: "PM-I", nombre: "Pensamiento Matemático I", semestre: 1, componenteCodigo: "CF", recursoCodigo: "RSC-PM", orden: 2, totalProgresionesEsperadas: 10 },
-  { codigo: "PM-II", nombre: "Pensamiento Matemático II", semestre: 2, componenteCodigo: "CF", recursoCodigo: "RSC-PM", orden: 2, totalProgresionesEsperadas: 10 },
+  // ── Pensamiento Matemático (sems 1-6) ──────────────────────────────────────
+  { codigo: "PM-I",   nombre: "Pensamiento Matemático I",   semestre: 1, componenteCodigo: "CF", recursoCodigo: "RSC-PM", orden: 2, totalProgresionesEsperadas: 10 },
+  { codigo: "PM-II",  nombre: "Pensamiento Matemático II",  semestre: 2, componenteCodigo: "CF", recursoCodigo: "RSC-PM", orden: 2, totalProgresionesEsperadas: 10 },
   { codigo: "PM-III", nombre: "Pensamiento Matemático III", semestre: 3, componenteCodigo: "CF", recursoCodigo: "RSC-PM", orden: 2, totalProgresionesEsperadas: 10 },
-  { codigo: "PM-IV", nombre: "Pensamiento Matemático IV", semestre: 4, componenteCodigo: "CF", recursoCodigo: "RSC-PM", orden: 2, totalProgresionesEsperadas: 10 },
-  { codigo: "PM-V", nombre: "Pensamiento Matemático V", semestre: 5, componenteCodigo: "CF", recursoCodigo: "RSC-PM", orden: 2, totalProgresionesEsperadas: 10 },
-  { codigo: "PM-VI", nombre: "Pensamiento Matemático VI", semestre: 6, componenteCodigo: "CF", recursoCodigo: "RSC-PM", orden: 2, totalProgresionesEsperadas: 10 },
+  { codigo: "PM-IV",  nombre: "Pensamiento Matemático IV",  semestre: 4, componenteCodigo: "CF", recursoCodigo: "RSC-PM", orden: 2, totalProgresionesEsperadas: 10 },
+  { codigo: "PM-V",   nombre: "Pensamiento Matemático V",   semestre: 5, componenteCodigo: "CF", recursoCodigo: "RSC-PM", orden: 2, totalProgresionesEsperadas: 10 },
+  { codigo: "PM-VI",  nombre: "Pensamiento Matemático VI",  semestre: 6, componenteCodigo: "CF", recursoCodigo: "RSC-PM", orden: 2, totalProgresionesEsperadas: 10 },
 
-  // Conciencia Histórica (semestres 1-3)
-  { codigo: "CH-I", nombre: "Conciencia Histórica I", semestre: 1, componenteCodigo: "CF", recursoCodigo: "RSC-CH", orden: 3, totalProgresionesEsperadas: 10 },
-  { codigo: "CH-II", nombre: "Conciencia Histórica II", semestre: 2, componenteCodigo: "CF", recursoCodigo: "RSC-CH", orden: 3, totalProgresionesEsperadas: 10 },
-  { codigo: "CH-III", nombre: "Conciencia Histórica III", semestre: 3, componenteCodigo: "CF", recursoCodigo: "RSC-CH", orden: 3, totalProgresionesEsperadas: 10 },
+  // ── Inglés (sems 1-4) ──────────────────────────────────────────────────────
+  { codigo: "IN-I",   nombre: "Inglés I",   semestre: 1, componenteCodigo: "CF", recursoCodigo: "RSC-IN", orden: 3, totalProgresionesEsperadas: 12 },
+  { codigo: "IN-II",  nombre: "Inglés II",  semestre: 2, componenteCodigo: "CF", recursoCodigo: "RSC-IN", orden: 3, totalProgresionesEsperadas: 12 },
+  { codigo: "IN-III", nombre: "Inglés III", semestre: 3, componenteCodigo: "CF", recursoCodigo: "RSC-IN", orden: 3, totalProgresionesEsperadas: 12 },
+  { codigo: "IN-IV",  nombre: "Inglés IV",  semestre: 4, componenteCodigo: "CF", recursoCodigo: "RSC-IN", orden: 3, totalProgresionesEsperadas: 12 },
 
-  // Cultura Digital (semestres 1-2)
-  { codigo: "CD-I", nombre: "Cultura Digital I", semestre: 1, componenteCodigo: "CF", recursoCodigo: "RSC-CD", orden: 4, totalProgresionesEsperadas: 8 },
-  { codigo: "CD-II", nombre: "Cultura Digital II", semestre: 2, componenteCodigo: "CF", recursoCodigo: "RSC-CD", orden: 4, totalProgresionesEsperadas: 8 },
+  // ── Cultura Digital (sems 1, 2, 6) ─────────────────────────────────────────
+  { codigo: "CD-I",   nombre: "Cultura Digital I",   semestre: 1, componenteCodigo: "CF", recursoCodigo: "RSC-CD", orden: 4, totalProgresionesEsperadas: 8 },
+  { codigo: "CD-II",  nombre: "Cultura Digital II",  semestre: 2, componenteCodigo: "CF", recursoCodigo: "RSC-CD", orden: 4, totalProgresionesEsperadas: 8 },
+  { codigo: "CD-III", nombre: "Cultura Digital III", semestre: 6, componenteCodigo: "CF", recursoCodigo: "RSC-CD", orden: 4, totalProgresionesEsperadas: 8 },
 
-  // Inglés (semestres 1-4)
-  { codigo: "IN-I", nombre: "Inglés I", semestre: 1, componenteCodigo: "CF", recursoCodigo: "RSC-IN", orden: 5, totalProgresionesEsperadas: 12 },
-  { codigo: "IN-II", nombre: "Inglés II", semestre: 2, componenteCodigo: "CF", recursoCodigo: "RSC-IN", orden: 5, totalProgresionesEsperadas: 12 },
-  { codigo: "IN-III", nombre: "Inglés III", semestre: 3, componenteCodigo: "CF", recursoCodigo: "RSC-IN", orden: 5, totalProgresionesEsperadas: 12 },
-  { codigo: "IN-IV", nombre: "Inglés IV", semestre: 4, componenteCodigo: "CF", recursoCodigo: "RSC-IN", orden: 5, totalProgresionesEsperadas: 12 },
+  // ── Conciencia Histórica (sems 4-6, NO sems 1-3) ───────────────────────────
+  { codigo: "CH-I",   nombre: "Conciencia Histórica I",   semestre: 4, componenteCodigo: "CF", recursoCodigo: "RSC-CH", orden: 5, totalProgresionesEsperadas: 10 },
+  { codigo: "CH-II",  nombre: "Conciencia Histórica II",  semestre: 5, componenteCodigo: "CF", recursoCodigo: "RSC-CH", orden: 5, totalProgresionesEsperadas: 10 },
+  { codigo: "CH-III", nombre: "Conciencia Histórica III", semestre: 6, componenteCodigo: "CF", recursoCodigo: "RSC-CH", orden: 5, totalProgresionesEsperadas: 10 },
 
-  // Ciencias Sociales (semestres 3-6)
-  { codigo: "CS-HIS-I", nombre: "Historia I", semestre: 3, componenteCodigo: "CFE", areaCodigo: "AC-CS", orden: 1, totalProgresionesEsperadas: 10 },
-  { codigo: "CS-HIS-II", nombre: "Historia II", semestre: 4, componenteCodigo: "CFE", areaCodigo: "AC-CS", orden: 1, totalProgresionesEsperadas: 10 },
-  { codigo: "CS-ECO-I", nombre: "Economía I", semestre: 5, componenteCodigo: "CFE", areaCodigo: "AC-CS", orden: 2, totalProgresionesEsperadas: 10 },
-  { codigo: "CS-ECO-II", nombre: "Economía II (Política Económica)", semestre: 6, componenteCodigo: "CFE", areaCodigo: "AC-CS", orden: 2, totalProgresionesEsperadas: 10 },
-  { codigo: "CS-SOC", nombre: "Sociología", semestre: 5, componenteCodigo: "CFE", areaCodigo: "AC-CS", orden: 3, totalProgresionesEsperadas: 10 },
-  { codigo: "CS-ADM", nombre: "Administración", semestre: 6, componenteCodigo: "CFE", areaCodigo: "AC-CS", orden: 4, totalProgresionesEsperadas: 10 },
+  // ── Ciencias Sociales (sems 1, 2, 4) ───────────────────────────────────────
+  { codigo: "CS-I",   nombre: "Ciencias Sociales I",   semestre: 1, componenteCodigo: "CF", recursoCodigo: "RSC-CS", orden: 6, totalProgresionesEsperadas: 10 },
+  { codigo: "CS-II",  nombre: "Ciencias Sociales II",  semestre: 2, componenteCodigo: "CF", recursoCodigo: "RSC-CS", orden: 6, totalProgresionesEsperadas: 10 },
+  { codigo: "CS-III", nombre: "Ciencias Sociales III", semestre: 4, componenteCodigo: "CF", recursoCodigo: "RSC-CS", orden: 6, totalProgresionesEsperadas: 10 },
 
-  // Ciencias Naturales (semestres 3-6)
-  { codigo: "CNT-BIO-I", nombre: "Biología I", semestre: 3, componenteCodigo: "CFE", areaCodigo: "AC-CNT", orden: 1, totalProgresionesEsperadas: 12 },
-  { codigo: "CNT-BIO-II", nombre: "Biología II", semestre: 4, componenteCodigo: "CFE", areaCodigo: "AC-CNT", orden: 1, totalProgresionesEsperadas: 12 },
-  { codigo: "CNT-QUI-I", nombre: "Química I", semestre: 3, componenteCodigo: "CFE", areaCodigo: "AC-CNT", orden: 2, totalProgresionesEsperadas: 12 },
-  { codigo: "CNT-QUI-II", nombre: "Química II", semestre: 4, componenteCodigo: "CFE", areaCodigo: "AC-CNT", orden: 2, totalProgresionesEsperadas: 12 },
-  { codigo: "CNT-FIS-I", nombre: "Física I", semestre: 5, componenteCodigo: "CFE", areaCodigo: "AC-CNT", orden: 3, totalProgresionesEsperadas: 12 },
-  { codigo: "CNT-FIS-II", nombre: "Física II", semestre: 6, componenteCodigo: "CFE", areaCodigo: "AC-CNT", orden: 3, totalProgresionesEsperadas: 12 },
-  { codigo: "CNT-MATE", nombre: "Matemáticas Aplicadas", semestre: 5, componenteCodigo: "CFE", areaCodigo: "AC-CNT", orden: 4, totalProgresionesEsperadas: 10 },
-  { codigo: "CNT-TC-I", nombre: "Taller de Ciencias I", semestre: 5, componenteCodigo: "CFE", areaCodigo: "AC-CNT", orden: 5, totalProgresionesEsperadas: 8 },
-  { codigo: "CNT-TC-II", nombre: "Taller de Ciencias II", semestre: 6, componenteCodigo: "CFE", areaCodigo: "AC-CNT", orden: 5, totalProgresionesEsperadas: 8 },
+  // ── Humanidades (sems 1-3) ──────────────────────────────────────────────────
+  { codigo: "HUM-I",   nombre: "Humanidades I",   semestre: 1, componenteCodigo: "CF", recursoCodigo: "RSC-HUM", orden: 7, totalProgresionesEsperadas: 10 },
+  { codigo: "HUM-II",  nombre: "Humanidades II",  semestre: 2, componenteCodigo: "CF", recursoCodigo: "RSC-HUM", orden: 7, totalProgresionesEsperadas: 10 },
+  { codigo: "HUM-III", nombre: "Humanidades III", semestre: 3, componenteCodigo: "CF", recursoCodigo: "RSC-HUM", orden: 7, totalProgresionesEsperadas: 10 },
 
-  // Humanidades (semestres 3-6)
-  { codigo: "HUM-PLT", nombre: "Pensamiento Literario", semestre: 3, componenteCodigo: "CFE", areaCodigo: "AC-HUM", orden: 1, totalProgresionesEsperadas: 10 },
-  { codigo: "HUM-FIL", nombre: "Filosofía", semestre: 4, componenteCodigo: "CFE", areaCodigo: "AC-HUM", orden: 2, totalProgresionesEsperadas: 10 },
-  { codigo: "HUM-EST", nombre: "Estética", semestre: 5, componenteCodigo: "CFE", areaCodigo: "AC-HUM", orden: 3, totalProgresionesEsperadas: 10 },
+  // ── CNEYT — títulos temáticos por semestre (sems 1-6) ──────────────────────
+  { codigo: "CNEYT-I",   nombre: "La materia y sus interacciones",        semestre: 1, componenteCodigo: "CF", recursoCodigo: "RSC-CNEYT", orden: 8, totalProgresionesEsperadas: 10 },
+  { codigo: "CNEYT-II",  nombre: "Conservación de la energía",            semestre: 2, componenteCodigo: "CF", recursoCodigo: "RSC-CNEYT", orden: 8, totalProgresionesEsperadas: 10 },
+  { codigo: "CNEYT-III", nombre: "Ecosistemas, interacciones y energía",  semestre: 3, componenteCodigo: "CF", recursoCodigo: "RSC-CNEYT", orden: 8, totalProgresionesEsperadas: 10 },
+  { codigo: "CNEYT-IV",  nombre: "Reacciones químicas",                  semestre: 4, componenteCodigo: "CF", recursoCodigo: "RSC-CNEYT", orden: 8, totalProgresionesEsperadas: 10 },
+  { codigo: "CNEYT-V",   nombre: "La energía en procesos de vida diaria", semestre: 5, componenteCodigo: "CF", recursoCodigo: "RSC-CNEYT", orden: 8, totalProgresionesEsperadas: 10 },
+  { codigo: "CNEYT-VI",  nombre: "Organismos y evolución biológica",      semestre: 6, componenteCodigo: "CF", recursoCodigo: "RSC-CNEYT", orden: 8, totalProgresionesEsperadas: 10 },
 ];
 
 export function getUACPorSemestre(semestre: number): UACStatic[] {

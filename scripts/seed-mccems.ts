@@ -125,6 +125,7 @@ async function seedUAC(
 }
 
 async function seedProgresiones(sb: SB, uacMap: Map<string, string>) {
+  // es_placeholder defaults to true (DB column DEFAULT true — see migration 02)
   const rows: Array<{
     codigo: string;
     uac_id: string;

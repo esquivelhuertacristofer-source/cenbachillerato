@@ -4,7 +4,6 @@ import { getUser } from "@/lib/supabase-helpers";
 import { getProgresionesDeUAC } from "@/lib/queries/uac";
 import { getUACPorCodigo } from "@/lib/mccems/estructura";
 import { RECURSOS_SOCIOCOGNITIVOS } from "@/lib/mccems/recursos-sociocognitivos";
-import { AREAS_CONOCIMIENTO } from "@/lib/mccems/areas-conocimiento";
 import type { Metadata } from "next";
 
 type Props = {
@@ -31,9 +30,6 @@ export default async function UACPage({ params }: Props) {
   const recurso = uac.recursoCodigo
     ? RECURSOS_SOCIOCOGNITIVOS.find((r) => r.codigo === uac.recursoCodigo)
     : undefined;
-  const area = uac.areaCodigo
-    ? AREAS_CONOCIMIENTO.find((a) => a.codigo === uac.areaCodigo)
-    : undefined;
 
   const progresiones = await getProgresionesDeUAC(codigo);
 
@@ -56,18 +52,13 @@ export default async function UACPage({ params }: Props) {
       <div className="rounded-xl border border-gray-200 bg-white p-6">
         <div className="flex items-start gap-4">
           <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-indigo-100 text-2xl">
-            {recurso?.icono ?? area?.icono ?? "📚"}
+            {recurso?.icono ?? "📚"}
           </div>
           <div>
             <div className="flex flex-wrap gap-2">
               {recurso && (
                 <span className="rounded-full bg-indigo-100 px-3 py-0.5 text-xs font-medium text-indigo-700">
-                  Recurso Sociocognitivo
-                </span>
-              )}
-              {area && (
-                <span className="rounded-full bg-purple-100 px-3 py-0.5 text-xs font-medium text-purple-700">
-                  Área de Conocimiento
+                  {recurso.nombre}
                 </span>
               )}
               <span className="rounded-full bg-gray-100 px-3 py-0.5 text-xs text-gray-600">

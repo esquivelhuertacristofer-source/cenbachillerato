@@ -81,13 +81,7 @@ export default async function HubPage() {
                 }
                 totalProgresiones={uac.totalProgresionesEsperadas}
                 semestre={semestreActual}
-                tipo={
-                  uac.recursoCodigo
-                    ? "sociocognitivo"
-                    : uac.areaCodigo
-                    ? "area"
-                    : "socioemocional"
-                }
+                tipo="sociocognitivo"
               />
             );
           })}
@@ -97,9 +91,9 @@ export default async function HubPage() {
       {/* Recursos Socioemocionales */}
       <div>
         <h2 className="mb-4 text-lg font-semibold text-gray-900">
-          Recursos Socioemocionales (Transversales)
+          Ámbitos de Formación Socioemocional
         </h2>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {RECURSOS_SOCIOEMOCIONALES.map((rse) => (
             <div
               key={rse.codigo}

@@ -27,10 +27,10 @@ export function EstructuraMCCEMS() {
             Recursos Sociocognitivos
           </h3>
           <p className="mt-1 text-sm text-gray-500">
-            Transversales • Semestres 1-6 • Obligatorios para todos los subsistemas
+            8 Recursos Sociocognitivos • Currículum Fundamental obligatorio • Acuerdo 09/08/23
           </p>
 
-          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {RECURSOS_SOCIOCOGNITIVOS.map((recurso) => (
               <div
                 key={recurso.codigo}
@@ -72,7 +72,7 @@ export function EstructuraMCCEMS() {
             Áreas de Conocimiento
           </h3>
           <p className="mt-1 text-sm text-gray-500">
-            Semestres 3-6 • El alumno elige UNA área según su vocación e institución
+            Semestres 5-6 • El alumno elige 5 UAC de un catálogo de ~20 opciones según su vocación
           </p>
 
           <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-3">
@@ -103,7 +103,7 @@ export function EstructuraMCCEMS() {
             Transversales • Todos los semestres • Desarrollo integral del alumno
           </p>
 
-          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {RECURSOS_SOCIOEMOCIONALES.map((recurso) => (
               <div
                 key={recurso.codigo}
@@ -144,9 +144,9 @@ export function EstructuraMCCEMS() {
                       {r.nombre.split(" ")[0]} {r.nombre.split(" ")[1] ?? ""}
                     </span>
                   ))}
-                  {sem >= 3 && (
+                  {sem >= 5 && (
                     <span className="rounded-lg bg-purple-50 px-2 py-1 text-center text-xs text-purple-700">
-                      Área de Conocimiento
+                      CFE Electivos
                     </span>
                   )}
                   <span className="rounded-lg bg-green-50 px-2 py-1 text-center text-xs text-green-700">
