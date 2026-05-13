@@ -4,13 +4,16 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build --webpack",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint src/",
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "pages:build": "npx @opennextjs/cloudflare build",
+    "pages:dev": "npx @opennextjs/cloudflare preview",
+    "pages:deploy": "npx @opennextjs/cloudflare deploy"
   },
   "dependencies": {
     "@sentry/nextjs": "^10.53.1",
@@ -22,6 +25,7 @@
     "zustand": "^5.0.13"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "^1.19.9",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -38,6 +42,7 @@
     "jest-svg-transformer": "^1.0.0",
     "tailwindcss": "^4",
     "ts-jest": "^29.4.9",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^4.90.1"
   }
 }

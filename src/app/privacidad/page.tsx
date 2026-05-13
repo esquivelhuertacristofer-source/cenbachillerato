@@ -37,7 +37,7 @@ export default function PrivacidadPage() {
             <section>
               <h2 className="text-xl font-semibold text-gray-900">I. Identidad del Responsable</h2>
               <p className="mt-3">
-                CEN — Campaña Educativa Nacional (en adelante "CEN" o "el Responsable") es responsable
+                CEN — Campaña Educativa Nacional (en adelante &quot;CEN&quot; o &quot;el Responsable&quot;) es responsable
                 del tratamiento de sus datos personales, en términos de la Ley Federal de Protección
                 de Datos Personales en Posesión de los Particulares (LFPDPPP) y su Reglamento.
               </p>

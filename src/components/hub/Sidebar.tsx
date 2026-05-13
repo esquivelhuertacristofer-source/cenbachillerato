@@ -5,10 +5,7 @@ import { useRouter } from "next/navigation";
 import { SemestreSelector } from "./SemestreSelector";
 import type { Profile } from "@/types/domain.types";
 import type { SemestreNum } from "@/types/domain.types";
-import {
-  RECURSOS_SOCIOCOGNITIVOS,
-  getRecursosSociocognitivosPorSemestre,
-} from "@/lib/mccems/recursos-sociocognitivos";
+import { RECURSOS_SOCIOCOGNITIVOS } from "@/lib/mccems/recursos-sociocognitivos";
 import { UAC_BASE } from "@/lib/mccems/estructura";
 import { RECURSOS_SOCIOEMOCIONALES } from "@/lib/mccems/estructura";
 import { getSupabaseBrowser } from "@/lib/supabase-browser";
@@ -22,7 +19,6 @@ export function Sidebar({ profile }: SidebarProps) {
   const semestreActual = (profile.semestre ?? 1) as SemestreNum;
   const semestresDisponibles: SemestreNum[] = [1, 2, 3, 4, 5, 6];
 
-  const recursosDelSemestre = getRecursosSociocognitivosPorSemestre(semestreActual);
   const uacDelSemestre = UAC_BASE.filter(
     (uac) => uac.semestre === semestreActual && uac.recursoCodigo !== undefined
   );
