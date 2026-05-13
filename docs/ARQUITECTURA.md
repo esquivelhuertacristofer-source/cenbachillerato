@@ -24,6 +24,15 @@ Usar React Server Components siempre que sea posible. Agregar `"use client"` sol
 - **Server**: `getSupabaseServer()` en `src/lib/supabase-helpers.ts` — instancia por request
 - **Admin**: `getSupabaseAdmin()` en `src/lib/supabase-admin.ts` — service role, solo server-side
 
+`getUser()` y `getProfile()` están wrapeados con `React.cache()` para deduplicar queries auth dentro del mismo request tree (layout + page comparten el resultado).
+
+### 3b. Security headers
+Configurados en `next.config.ts` para todas las rutas:
+- `X-Frame-Options: DENY` — anti-clickjacking
+- `X-Content-Type-Options: nosniff` — anti-MIME sniffing
+- `Referrer-Policy: strict-origin-when-cross-origin`
+- `Permissions-Policy: camera=(), microphone=(), geolocation=()`
+
 ### 3. Async params en Next.js 16
 Los `params` y `searchParams` en páginas/layouts son `Promise`. Siempre usar `await`:
 ```tsx
@@ -96,7 +105,7 @@ npm run pages:deploy  → npx @opennextjs/cloudflare deploy  (wrangler deploy)
 ```toml
 name = "cen-bachillerato"
 main = ".open-next/worker.js"
-compatibility_date = "2025-05-12"
+compatibility_date = "2026-05-12"
 compatibility_flags = ["nodejs_compat"]
 
 [assets]

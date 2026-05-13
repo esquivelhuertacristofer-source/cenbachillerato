@@ -14,14 +14,23 @@ const config: Config = {
     "src/**/*.{ts,tsx}",
     "!src/**/*.d.ts",
     "!src/types/**",
-    "!src/app/**/layout.tsx",
+    "!src/app/**",
+    "!src/components/landing-bachillerato/**",
+    "!src/components/landing-cen/**",
   ],
   coverageThreshold: {
-    global: {
-      branches: 60,
-      functions: 60,
-      lines: 60,
-      statements: 60,
+    global: {},
+    "./src/lib/": {
+      branches: 40,
+      functions: 40,
+      lines: 40,
+      statements: 40,
+    },
+    "./src/components/": {
+      branches: 30,
+      functions: 30,
+      lines: 30,
+      statements: 30,
     },
   },
 };

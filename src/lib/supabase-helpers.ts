@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import type { Database } from "@/types/database.types";
@@ -46,7 +47,8 @@ export async function getSession() {
   }
 }
 
-export async function getUser() {
+// cache() deduplicates calls with the same args within a single React render request
+export const getUser = cache(async function getUser() {
   const supabase = await getSupabaseServer();
   try {
     const { data, error } = await supabase.auth.getUser();
@@ -56,9 +58,11 @@ export async function getUser() {
     console.error("[supabase-helpers] getUser error:", error);
     return null;
   }
-}
+});
 
-export async function getProfile(userId: string): Promise<Profile | null> {
+export const getProfile = cache(async function getProfile(
+  userId: string
+): Promise<Profile | null> {
   const supabase = await getSupabaseServer();
   try {
     const { data, error } = await supabase
@@ -72,4 +76,4 @@ export async function getProfile(userId: string): Promise<Profile | null> {
     console.error("[supabase-helpers] getProfile error:", error);
     return null;
   }
-}
+});

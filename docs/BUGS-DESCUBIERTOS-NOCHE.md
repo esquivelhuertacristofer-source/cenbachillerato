@@ -54,8 +54,8 @@
 **Síntoma:** Las 402 progresiones sembradas son todos placeholders, pero no hay forma de distinguirlas de progresiones reales en la DB.
 **Causa:** El schema `progresiones` no tiene columna `es_placeholder`. El pedido original lo requería.
 **Impacto:** Cuando se agregue contenido real, no habrá forma de filtrar "mostrar solo reales" sin un criterio frágil como `descripcion IS NULL`.
-**Fix pendiente:** Migración SQL: `ALTER TABLE progresiones ADD COLUMN es_placeholder boolean DEFAULT true;` + actualizar seed + actualizar queries que renderizan progresiones.
-**Status:** 🔴 Pendiente — acción requerida en la próxima sesión antes de agregar contenido real.
+**Fix aplicado:** `supabase/migrations/02_realinear_mccems_oficial.sql` — `ALTER TABLE public.progresiones ADD COLUMN IF NOT EXISTS es_placeholder boolean NOT NULL DEFAULT true`. Las 342 progresiones actuales tienen `es_placeholder = true`. El seed script lo documenta en comentario.
+**Status:** ✅ Resuelto en migración 02 (2026-05-12).
 
 ---
 
@@ -63,8 +63,8 @@
 **Síntoma:** No es un bug visible, pero sí un problema de performance. El `hub/layout.tsx` llama `getUser() + getProfile()`. La `hub/page.tsx` llama `getUser() + getProfile()` de nuevo.
 **Causa:** React Server Components no comparten estado entre layout y page sin un mecanismo explícito (como RSC cache o `cache()` de React).
 **Impacto:** 2 queries de auth por cada request al hub (4 si se cuenta la page). En Cloudflare Workers con latencia de red a Supabase, esto suma.
-**Fix posible:** Usar `cache()` de React para deduplicar. La función `getProfile()` wrapeada con `cache()` devuelve el mismo objeto en el mismo request.
-**Status:** 🟡 P1 — optimización, no bloqueante.
+**Fix aplicado:** `getUser` y `getProfile` en `src/lib/supabase-helpers.ts` wrapeados con `React.cache()`. Las llamadas duplicadas con los mismos argumentos dentro del mismo request tree son deduplicadas automáticamente por React.
+**Status:** ✅ Resuelto (2026-05-12).
 
 ---
 
