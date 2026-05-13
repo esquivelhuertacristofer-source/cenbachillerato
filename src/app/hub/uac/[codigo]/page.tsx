@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { getUser } from "@/lib/supabase-helpers";
-import { ProgresionPlaceholder } from "@/components/hub/ProgresionPlaceholder";
+import { getProgresionesDeUAC } from "@/lib/queries/uac";
 import { getUACPorCodigo } from "@/lib/mccems/estructura";
 import { RECURSOS_SOCIOCOGNITIVOS } from "@/lib/mccems/recursos-sociocognitivos";
 import { AREAS_CONOCIMIENTO } from "@/lib/mccems/areas-conocimiento";
@@ -35,13 +35,7 @@ export default async function UACPage({ params }: Props) {
     ? AREAS_CONOCIMIENTO.find((a) => a.codigo === uac.areaCodigo)
     : undefined;
 
-  const progresiones = Array.from(
-    { length: uac.totalProgresionesEsperadas },
-    (_, i) => ({
-      numero: i + 1,
-      titulo: `Progresión ${i + 1} — ${uac.nombre}`,
-    })
-  );
+  const progresiones = await getProgresionesDeUAC(codigo);
 
   return (
     <div className="space-y-6">
@@ -51,10 +45,7 @@ export default async function UACPage({ params }: Props) {
           Mi Hub
         </Link>
         <span>/</span>
-        <Link
-          href={`/hub/semestre/${uac.semestre}`}
-          className="hover:text-gray-600"
-        >
+        <Link href={`/hub/semestre/${uac.semestre}`} className="hover:text-gray-600">
           Semestre {uac.semestre}
         </Link>
         <span>/</span>
@@ -85,7 +76,9 @@ export default async function UACPage({ params }: Props) {
             </div>
             <h1 className="mt-2 text-2xl font-bold text-gray-900">{uac.nombre}</h1>
             <p className="mt-1 text-sm text-gray-500">
-              {uac.totalProgresionesEsperadas} progresiones de aprendizaje
+              {progresiones.length > 0
+                ? `${progresiones.length} progresiones de aprendizaje`
+                : `${uac.totalProgresionesEsperadas} progresiones esperadas — contenido en preparación`}
             </p>
           </div>
         </div>
@@ -97,20 +90,38 @@ export default async function UACPage({ params }: Props) {
           Progresiones de Aprendizaje
         </h2>
 
-        <div className="space-y-3">
-          {progresiones.map((prog) => (
-            <Link
-              key={prog.numero}
-              href={`/hub/uac/${codigo}/progresion/${prog.numero}`}
-            >
-              <ProgresionPlaceholder
-                numero={prog.numero}
-                titulo={prog.titulo}
-                uacNombre={uac.nombre}
-              />
-            </Link>
-          ))}
-        </div>
+        {progresiones.length === 0 ? (
+          <div className="rounded-xl border-2 border-dashed border-gray-200 bg-white p-10 text-center">
+            <span className="text-4xl">🏗️</span>
+            <p className="mt-4 font-medium text-gray-700">Contenido en preparación</p>
+            <p className="mt-1 text-sm text-gray-400">
+              Las progresiones de esta UAC se publicarán próximamente.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {progresiones.map((prog) => (
+              <Link
+                key={prog.id}
+                href={`/hub/uac/${codigo}/progresion/${prog.numero}`}
+                className="block"
+              >
+                <div className="flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-4 hover:border-indigo-300 hover:bg-indigo-50 transition-colors">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-700">
+                    {prog.numero}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-gray-900 truncate">{prog.titulo}</p>
+                    {prog.descripcion && (
+                      <p className="mt-0.5 text-sm text-gray-500 truncate">{prog.descripcion}</p>
+                    )}
+                  </div>
+                  <span className="shrink-0 text-gray-300">›</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

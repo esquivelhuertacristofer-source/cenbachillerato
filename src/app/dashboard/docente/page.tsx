@@ -1,18 +1,12 @@
 import { redirect } from "next/navigation";
 import { getUser, getProfile } from "@/lib/supabase-helpers";
+import { getMetricasDocente } from "@/lib/queries/docente";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Dashboard Docente — CEN Bachillerato",
 };
-
-const METRIC_CARDS = [
-  { label: "Alumnos activos", valor: "—", icono: "👥", color: "text-blue-600" },
-  { label: "Grupos asignados", valor: "—", icono: "🏫", color: "text-purple-600" },
-  { label: "UAC en curso", valor: "—", icono: "📚", color: "text-green-600" },
-  { label: "Promedio de avance", valor: "—", icono: "📊", color: "text-amber-600" },
-];
 
 export default async function DocenteDashboardPage() {
   const user = await getUser();
@@ -25,6 +19,14 @@ export default async function DocenteDashboardPage() {
   if (profile.role === "admin" || profile.role === "super_admin") redirect("/admin/escuelas");
 
   const nombre = profile.full_name?.split(" ")[0] ?? "Docente";
+  const metricas = await getMetricasDocente(user.id);
+
+  const metricCards = [
+    { label: "Alumnos activos", valor: String(metricas.totalAlumnos), icono: "👥", color: "text-blue-600" },
+    { label: "Grupos asignados", valor: String(metricas.totalGrupos), icono: "🏫", color: "text-purple-600" },
+    { label: "Semestres en curso", valor: String(metricas.uacEnCurso), icono: "📚", color: "text-green-600" },
+    { label: "Promedio de avance", valor: "—", icono: "📊", color: "text-amber-600" },
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -46,7 +48,7 @@ export default async function DocenteDashboardPage() {
       <main className="mx-auto max-w-7xl px-6 py-8">
         {/* Métricas */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {METRIC_CARDS.map((metric) => (
+          {metricCards.map((metric) => (
             <Card key={metric.label}>
               <CardContent className="flex items-center gap-4">
                 <span className="text-3xl">{metric.icono}</span>
@@ -59,27 +61,46 @@ export default async function DocenteDashboardPage() {
           ))}
         </div>
 
-        {/* Placeholder — Tabla de alumnos */}
+        {/* Tabla de grupos */}
         <div className="mt-8">
           <Card>
             <CardHeader>
-              <CardTitle>Alumnos recientes</CardTitle>
+              <CardTitle>Mis grupos</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-col items-center py-12 text-center">
-                <span className="text-4xl">📋</span>
-                <p className="mt-4 text-gray-500">
-                  Próximamente: lista de alumnos con progreso por UAC.
-                </p>
-                <p className="mt-1 text-sm text-gray-400">
-                  Las métricas se activarán cuando haya contenido y actividades publicadas.
-                </p>
-              </div>
+              {metricas.grupos.length === 0 ? (
+                <div className="flex flex-col items-center py-12 text-center">
+                  <span className="text-4xl">📋</span>
+                  <p className="mt-4 text-gray-500">Sin grupos asignados.</p>
+                  <p className="mt-1 text-sm text-gray-400">
+                    El administrador debe asignarte a un grupo para ver alumnos aquí.
+                  </p>
+                </div>
+              ) : (
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-100 text-left text-gray-500">
+                      <th className="pb-3 font-medium">Grupo</th>
+                      <th className="pb-3 font-medium">Semestre</th>
+                      <th className="pb-3 font-medium text-right">Alumnos</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {metricas.grupos.map((g) => (
+                      <tr key={g.id} className="py-2">
+                        <td className="py-3 font-medium text-gray-900">{g.nombre}</td>
+                        <td className="py-3 text-gray-600">{g.semestre}°</td>
+                        <td className="py-3 text-right font-semibold text-gray-900">{g.total_alumnos}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
             </CardContent>
           </Card>
         </div>
 
-        {/* Placeholder — Accesos rápidos */}
+        {/* Accesos rápidos */}
         <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-3">
           <Card hoverable>
             <CardHeader>
