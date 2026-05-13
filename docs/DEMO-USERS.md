@@ -2,6 +2,10 @@
 
 Credenciales para entorno de desarrollo/demo. Todos los usuarios están en Supabase proyecto `xmcfuwdanlciqdxqtslv`.
 
+**Para recrear:** `npx tsx scripts/create-demo-users.ts` (idempotente)
+
+---
+
 ## Escuela y grupo demo
 
 | Campo | Valor |
@@ -12,34 +16,91 @@ Credenciales para entorno de desarrollo/demo. Todos los usuarios están en Supab
 | Nombre grupo | Grupo 1A Demo |
 | Semestre | 1 |
 
-## Credenciales
+---
 
-| Email | Role | Nombre | Password |
-|-------|------|--------|----------|
-| admin@cenbachillerato-demo.com | admin | Admin Demo | Demo2026! |
-| docente@cenbachillerato-demo.com | teacher | Docente Demo | Demo2026! |
-| alumno1@cenbachillerato-demo.com | student | Alumno Uno | Demo2026! |
-| alumno2@cenbachillerato-demo.com | student | Alumno Dos | Demo2026! |
-| alumno3@cenbachillerato-demo.com | student | Alumno Tres | Demo2026! |
-| alumno4@cenbachillerato-demo.com | student | Alumno Cuatro | Demo2026! |
-| alumno5@cenbachillerato-demo.com | student | Alumno Cinco | Demo2026! |
-| alumno6@cenbachillerato-demo.com | student | Alumno Seis | Demo2026! |
-| alumno7@cenbachillerato-demo.com | student | Alumno Siete | Demo2026! |
-| alumno8@cenbachillerato-demo.com | student | Alumno Ocho | Demo2026! |
-| alumno9@cenbachillerato-demo.com | student | Alumno Nueve | Demo2026! |
-| alumno10@cenbachillerato-demo.com | student | Alumno Diez | Demo2026! |
+## Credenciales y experiencia por rol
 
-## Recrear usuarios
+### 👤 Admin
 
-```bash
-npx tsx scripts/create-demo-users.ts
-```
+| Campo | Valor |
+|-------|-------|
+| Email | admin@cenbachillerato-demo.com |
+| Password | Demo2026! |
+| Rol | admin |
+| Nombre | Admin Demo |
 
-El script es idempotente: re-ejecutar muestra `YA EXISTÍA` sin duplicar datos.
+**Cómo loguearse:** Ir a `/log-in` → ingresar credenciales → aceptar aviso de privacidad → click "Acceder"
+
+**Qué se ve después del login:**
+- Redirección automática a `/admin/escuelas`
+- Header: "Panel de Administración — CEN Bachillerato" con nav Escuelas / Grupos / Usuarios
+- `/admin/escuelas`: tabla con 1 escuela (Escuela Demo CEN Bachillerato, CCT=DEMO-001, subsistema=particular)
+- `/admin/grupos`: tabla con 1 grupo (Grupo 1A Demo, semestre 1°, docente=Docente Demo)
+- `/admin/usuarios`: resumen 10 alumnos / 1 docente / 1 admin + tabla completa de 12 usuarios con badges de rol
+
+---
+
+### 👤 Docente
+
+| Campo | Valor |
+|-------|-------|
+| Email | docente@cenbachillerato-demo.com |
+| Password | Demo2026! |
+| Rol | teacher |
+| Nombre | Docente Demo |
+
+**Cómo loguearse:** `/log-in` → credenciales → checkbox → "Acceder"
+
+**Qué se ve después del login:**
+- Redirección a `/dashboard/docente`
+- Header: "Dashboard Docente — Bienvenido, Docente"
+- 4 tarjetas de métricas:
+  - 👥 **10** Alumnos activos
+  - 🏫 **1** Grupos asignados
+  - 📚 **1** Semestres en curso
+  - 📊 **—** Promedio de avance (sin actividades aún)
+- Tabla "Mis grupos": Grupo 1A Demo — 1° — 10 alumnos
+- 3 cards de accesos rápidos (Alta de alumnos, Reportes SEP, Gestión de grupos — todos "próximamente")
+
+---
+
+### 👤 Alumnos (10 cuentas)
+
+| Email | Password | Nombre | Semestre |
+|-------|----------|--------|---------|
+| alumno1@cenbachillerato-demo.com | Demo2026! | Alumno Uno | 1 |
+| alumno2@cenbachillerato-demo.com | Demo2026! | Alumno Dos | 1 |
+| alumno3@cenbachillerato-demo.com | Demo2026! | Alumno Tres | 1 |
+| alumno4@cenbachillerato-demo.com | Demo2026! | Alumno Cuatro | 1 |
+| alumno5@cenbachillerato-demo.com | Demo2026! | Alumno Cinco | 1 |
+| alumno6@cenbachillerato-demo.com | Demo2026! | Alumno Seis | 1 |
+| alumno7@cenbachillerato-demo.com | Demo2026! | Alumno Siete | 1 |
+| alumno8@cenbachillerato-demo.com | Demo2026! | Alumno Ocho | 1 |
+| alumno9@cenbachillerato-demo.com | Demo2026! | Alumno Nueve | 1 |
+| alumno10@cenbachillerato-demo.com | Demo2026! | Alumno Diez | 1 |
+
+**Cómo loguearse:** `/log-in` → credenciales → checkbox → "Acceder"
+
+**Qué se ve después del login:**
+- Redirección a `/hub`
+- Layout con sidebar izquierdo + contenido principal
+- **Sidebar:** Avatar con inicial del nombre, "Semestre 1", lista de 5 UAC del semestre, logout button
+- **Hub principal:**
+  - "Hola, Alumno 👋 — Semestre 1"
+  - Banner azul: "Contenido pedagógico en desarrollo"
+  - Grid de 5 UAC: Lengua y Comunicación I, Pensamiento Matemático I, Conciencia Histórica I, Cultura Digital I, Inglés I
+  - Sección: 3 Recursos Socioemocionales (Responsabilidad Social, Cuidado Físico Corporal, Bienestar Emocional Afectivo)
+- **Al hacer click en una UAC** (e.g., `/hub/uac/LC-I`):
+  - Breadcrumb: Mi Hub / Semestre 1 / Lengua y Comunicación I
+  - Header UAC con icono 📝, badge "Recurso Sociocognitivo", "10 progresiones de aprendizaje"
+  - Lista de 10 progresiones (placeholder: "Progresión 1 — Lengua y Comunicación I", etc.)
+  - Cada progresión es clickeable → `/hub/uac/LC-I/progresion/1`
+
+---
 
 ## Notas
 
-- Todos los alumnos están asignados a Grupo 1A Demo (semestre 1).
-- El docente está asignado como `id_docente` en ese grupo.
-- Los emails usan el dominio `@cenbachillerato-demo.com` (no real) para evitar colisiones con cuentas reales.
-- **No compartir estas credenciales fuera del equipo de desarrollo.**
+- Ninguno de los alumnos tiene `area_eleccion` asignada (se necesita en semestres 3-6)
+- El dominio `@cenbachillerato-demo.com` no es real — solo para demo
+- **No compartir estas credenciales fuera del equipo de desarrollo**
+- Password cumple: 8+ chars, mayúscula, número, especial (!@#$%^&*)
