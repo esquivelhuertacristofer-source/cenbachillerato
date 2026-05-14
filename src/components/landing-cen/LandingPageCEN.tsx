@@ -111,85 +111,115 @@ export default function LandingPageCEN() {
       <div className="cen-content">
         <main className="main-scroll">
 
-          {/* ── NAV ── */}
-          <nav className="nav">
-            <Link href="/" className="brand">
-              <div className="logo-mark"><span>C</span></div>
-              <div className="brand-text">
-                <span className="b1">CEN</span>
-                <span className="b2">Campaña Educativa Nacional</span>
+          {/* ── HERO OMK ── */}
+          <div id="inicio" className="hero-omk">
+            <nav className="nav">
+              <Link href="/" className="brand">
+                <div className="logo-mark"><span>C</span></div>
+                <div className="brand-text">
+                  <span className="b1">CEN</span>
+                  <span className="b2">Campaña Educativa Nacional</span>
+                </div>
+              </Link>
+              <div className="nav-links">
+                <a href="#inicio" className="active">Inicio</a>
+                <a href="#productos">Productos</a>
+                <a href="#instituciones">Instituciones</a>
+                <a href="#por-que-cen">Por qué CEN</a>
               </div>
-            </Link>
-            <div className="nav-links">
-              <a href="#inicio" className="active">Inicio</a>
-              <a href="#productos">Productos</a>
-              <a href="#instituciones">Instituciones</a>
-              <a href="#por-que-cen">Por qué CEN</a>
-            </div>
-            <div className="nav-right">
-              <Link href="/bachillerato" className="nav-btn-primary">CEN Bachillerato</Link>
-            </div>
-          </nav>
-
-          {/* ── HERO ── */}
-          <div id="inicio" className="hero-wrap">
-            <header className="hero">
-              <div className="hero-bg">
-                <svg width="100%" height="100%" viewBox="0 0 1000 1000" fill="none" preserveAspectRatio="none">
-                  <path d="M0 200C200 100 400 300 600 200C800 100 1000 200 1000 200V1000H0V200Z" fill="white" fillOpacity="0.03" />
-                </svg>
+              <div className="nav-right">
+                <Link href="/bachillerato" className="nav-btn-primary">CEN Bachillerato</Link>
               </div>
+            </nav>
 
-              <div className="hero-left">
-                <div className="hero-badge">Campaña Educativa Nacional</div>
-                <h1 className="hero-title">
-                  Una sola<br />
-                  <span className="accent">plataforma</span><br />
-                  <span className="underlined">para todos.</span>
+            <div className="hero-omk-body">
+              <div className="hero-omk-left">
+                <div className="hero-omk-badge">
+                  <div className="hero-omk-badge-icons">
+                    <div className="hero-omk-badge-icon"><i className="fas fa-graduation-cap"></i></div>
+                    <div className="hero-omk-badge-icon"><i className="fas fa-school"></i></div>
+                    <div className="hero-omk-badge-icon"><i className="fas fa-book-open"></i></div>
+                  </div>
+                  <span className="hero-omk-badge-text">Compatible con +7 subsistemas educativos</span>
+                </div>
+
+                <h1 className="hero-omk-title">
+                  La Plataforma<br />
+                  Educativa para<br />
+                  Todo México
                 </h1>
-                <p className="hero-sub">
-                  Acceda al ecosistema integral de educación CEN: bachillerato, educación financiera, laboratorios
-                  virtuales y más. Diseñado para escuelas, docentes y estudiantes.
+
+                <p className="hero-omk-sub">
+                  Bachillerato, educación financiera y laboratorios virtuales. Un ecosistema digital
+                  para estudiantes, docentes y directivos de todos los subsistemas de México.
                 </p>
-                <div className="hero-cta-row">
-                  <a href="#productos" className="btn-cta">
+
+                <div className="hero-omk-ctas">
+                  <a href="#productos" className="hero-omk-btn">
                     Conocer productos <i className="fas fa-chevron-down"></i>
                   </a>
-                  <Link href="/bachillerato" className="btn-cta-demo">
+                  <Link href="/bachillerato" className="hero-omk-link">
                     CEN Bachillerato <i className="fas fa-arrow-right"></i>
                   </Link>
                 </div>
-              </div>
 
-              <div className="hero-right">
-                <div className="hero-circle"></div>
-                <div className="hero-circle-solid"></div>
-
-                <div className="floater f1">
-                  <div className="ic-wrap"><i className="fas fa-graduation-cap"></i></div>
-                  <div>
-                    <div className="lbl">CEN Bachillerato</div>
-                    <div className="val">34 UAC · MCCEMS</div>
-                  </div>
-                </div>
-
-                <div className="floater f2">
-                  <div className="ic-wrap"><i className="fas fa-coins"></i></div>
-                  <div>
-                    <div className="lbl">Educación Financiera</div>
-                    <div className="val">364 Actividades</div>
-                  </div>
-                </div>
-
-                <div className="floater f3">
-                  <div className="ic-wrap"><i className="fas fa-flask"></i></div>
-                  <div>
-                    <div className="lbl">CEN Labs</div>
-                    <div className="val">40 Simuladores</div>
+                <div className="hero-omk-partners">
+                  <div className="hero-omk-partners-label">Subsistemas educativos</div>
+                  <div className="hero-omk-partners-row">
+                    <span className="hero-omk-partner-tag">DGB</span>
+                    <span className="hero-omk-partner-tag">DGETI</span>
+                    <span className="hero-omk-partner-tag">CONALEP</span>
+                    <span className="hero-omk-partner-tag">COBACH</span>
                   </div>
                 </div>
               </div>
-            </header>
+
+              <div className="hero-omk-right">
+                <div className="hero-omk-panel"></div>
+                <div className="hero-omk-photo">
+                  <i className="fas fa-user-graduate"></i>
+                  <span>Fotografía del estudiante</span>
+                </div>
+
+                <div className="hero-omk-card omk-c1">
+                  <div className="omk-card-avatars">
+                    <div className="omk-card-avatar"><i className="fas fa-user-graduate"></i></div>
+                    <div className="omk-card-avatar"><i className="fas fa-chalkboard-teacher"></i></div>
+                    <div className="omk-card-avatar"><i className="fas fa-user"></i></div>
+                    <div className="omk-card-avatar"><i className="fas fa-user-circle"></i></div>
+                  </div>
+                  <div className="omk-card-label">CEN Bachillerato</div>
+                  <div className="omk-card-val">34 UAC</div>
+                  <div className="omk-card-sub">MCCEMS · 6 Semestres</div>
+                </div>
+
+                <div className="hero-omk-card omk-c2">
+                  <div className="omk-card-label">CEN Labs</div>
+                  <div className="omk-card-val">40 Sim.</div>
+                  <div className="omk-card-sub">Ciencias y matemáticas</div>
+                </div>
+
+                <div className="hero-omk-pill omk-p3">
+                  <div className="omk-pill-icon"><i className="fas fa-landmark"></i></div>
+                  <span className="omk-pill-text">Alineado al MCCEMS</span>
+                </div>
+
+                <div className="hero-omk-pill omk-p4">
+                  <div className="omk-pill-icon"><i className="fas fa-school"></i></div>
+                  <span className="omk-pill-text">Multi-tenant</span>
+                </div>
+
+                <div className="hero-omk-pill omk-p5">
+                  <div className="omk-pill-icon"><i className="fas fa-coins"></i></div>
+                  <span className="omk-pill-text">364 Act. Financiera</span>
+                </div>
+
+                <div className="hero-omk-pill omk-p6">
+                  <div className="omk-pill-icon"><i className="fas fa-flask"></i></div>
+                  <span className="omk-pill-text">CEN Labs · 40 Sim.</span>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* ── SUBSISTEMAS MARQUEE ── */}
