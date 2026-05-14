@@ -46,10 +46,10 @@ export function Caracteristicas() {
     <section className="bg-white px-4 py-20 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <div className="text-center">
-          <h2 className="text-3xl font-black tracking-tight text-cen-navy sm:text-4xl">
+          <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
             Características de la plataforma
           </h2>
-          <p className="mt-4 text-lg text-ink-60">
+          <p className="mt-4 text-lg text-gray-600">
             Diseñada para el contexto real de la educación pública mexicana
           </p>
         </div>
@@ -58,8 +58,8 @@ export function Caracteristicas() {
           {CARACTERISTICAS.map((c) => (
             <div key={c.titulo} className="text-center sm:text-left">
               <div className="text-3xl">{c.icono}</div>
-              <h3 className="mt-3 font-bold text-cen-navy">{c.titulo}</h3>
-              <p className="mt-2 text-sm text-ink-60">{c.descripcion}</p>
+              <h3 className="mt-3 font-semibold text-gray-900">{c.titulo}</h3>
+              <p className="mt-2 text-sm text-gray-500">{c.descripcion}</p>
             </div>
           ))}
         </div>
@@ -67,7 +67,7 @@ export function Caracteristicas() {
         <div className="mt-16 text-center">
           <a
             href="/log-in"
-            className="inline-flex items-center gap-2 rounded-2xl bg-cen-navy px-8 py-4 text-base font-bold uppercase tracking-widest text-white shadow-[0_10px_25px_rgba(11,37,69,0.15)] hover:bg-cen-blue hover:-translate-y-1 transition-all duration-300"
+            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-8 py-4 text-lg font-semibold text-white hover:bg-indigo-700"
           >
             Acceder a la plataforma
             <span aria-hidden="true">→</span>

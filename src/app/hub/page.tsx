@@ -30,24 +30,24 @@ export default async function HubPage() {
     <div className="space-y-8">
       {/* Saludo */}
       <div>
-        <h1 className="text-2xl font-black tracking-tight text-cen-navy">
-          Hola, {nombre}
+        <h1 className="text-2xl font-bold text-gray-900">
+          Hola, {nombre} 👋
         </h1>
-        <p className="mt-1 text-sm text-ink-60">
+        <p className="mt-1 text-gray-500">
           Semestre {semestreActual}
           {profile.area_eleccion ? ` · ${profile.area_eleccion}` : ""}
         </p>
       </div>
 
       {/* Banner de próximo contenido */}
-      <div className="rounded-2xl border border-cen-blue-soft bg-cen-cool p-5">
+      <div className="rounded-xl border border-indigo-100 bg-indigo-50 p-5">
         <div className="flex items-start gap-4">
           <span className="text-2xl">🏗️</span>
           <div>
-            <h2 className="font-bold text-cen-navy">
+            <h2 className="font-semibold text-indigo-900">
               Contenido pedagógico en desarrollo
             </h2>
-            <p className="mt-1 text-sm text-ink-60">
+            <p className="mt-1 text-sm text-indigo-700">
               La estructura curricular MCCEMS está cargada. Las actividades y
               progresiones de aprendizaje se publicarán próximamente. Por ahora
               puedes explorar la organización por semestre y UAC.
@@ -58,7 +58,7 @@ export default async function HubPage() {
 
       {/* UAC del semestre actual */}
       <div>
-        <h2 className="mb-6 text-lg font-black uppercase tracking-tight text-cen-navy">
+        <h2 className="mb-4 text-lg font-semibold text-gray-900">
           Tus UAC — Semestre {semestreActual}
         </h2>
 
@@ -90,18 +90,18 @@ export default async function HubPage() {
 
       {/* Recursos Socioemocionales */}
       <div>
-        <h2 className="mb-4 text-lg font-black uppercase tracking-tight text-cen-navy">
+        <h2 className="mb-4 text-lg font-semibold text-gray-900">
           Ámbitos de Formación Socioemocional
         </h2>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {RECURSOS_SOCIOEMOCIONALES.map((rse) => (
             <div
               key={rse.codigo}
-              className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4"
+              className="rounded-xl border border-green-100 bg-green-50 p-4"
             >
-              <p className="font-bold text-emerald-900">{rse.nombre}</p>
-              <p className="mt-1 text-xs text-emerald-700">{rse.descripcion}</p>
-              <span className="mt-2 inline-block rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-[0.15em] text-emerald-600">
+              <p className="font-medium text-green-900">{rse.nombre}</p>
+              <p className="mt-1 text-xs text-green-700">{rse.descripcion}</p>
+              <span className="mt-2 inline-block rounded-full bg-green-100 px-2.5 py-0.5 text-xs text-green-600">
                 Transversal
               </span>
             </div>

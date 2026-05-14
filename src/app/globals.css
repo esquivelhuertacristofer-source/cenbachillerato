@@ -1,100 +1,26 @@
 @import "tailwindcss";
 
-/* ─── Design Tokens ─────────────────────────────────────────── */
 :root {
-  --cen-navy:       #0B2545;
-  --cen-navy-2:     #0E2D56;
-  --cen-blue:       #1E40AF;
-  --cen-blue-soft:  #DBEAFE;
-  --cen-sky:        #7DD3FC;
-  --cen-sky-soft:   #E0F2FE;
-  --cen-cool:       #EFF6FF;
-  --cen-bg:         #F8FAFC;
-
-  --ink:    #0B2545;
-  --ink-80: rgba(11, 37, 69, 0.85);
-  --ink-60: rgba(11, 37, 69, 0.72);
-  --ink-40: rgba(11, 37, 69, 0.50);
-  --ink-10: rgba(11, 37, 69, 0.12);
-
-  --input-bg:         #F8FAFC;
-  --input-border:     #E2E8F0;
-  --text-muted:       #64748B;
-  --text-placeholder: #94A3B8;
-
-  --cen-navy-dark: #071A35;
+  --background: #ffffff;
+  --foreground: #171717;
 }
 
-/* ─── Tailwind v4 tokens ─────────────────────────────────────── */
 @theme inline {
-  --color-cen-navy:      var(--cen-navy);
-  --color-cen-navy-2:    var(--cen-navy-2);
-  --color-cen-blue:      var(--cen-blue);
-  --color-cen-blue-soft: var(--cen-blue-soft);
-  --color-cen-sky:       var(--cen-sky);
-  --color-cen-sky-soft:  var(--cen-sky-soft);
-  --color-cen-cool:      var(--cen-cool);
-  --color-cen-bg:        var(--cen-bg);
-  --color-ink:           var(--ink);
-  --color-ink-80:        var(--ink-80);
-  --color-ink-60:        var(--ink-60);
-  --color-ink-40:        var(--ink-40);
-  --color-ink-10:        var(--ink-10);
-
-  --font-sans: var(--font-epilogue), ui-sans-serif, system-ui, sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
 }
 
-/* ─── Custom animation utilities ─────────────────────────────── */
-@layer utilities {
-  .animate-float      { animation: float 6s ease-in-out infinite; }
-  .animate-marquee    { animation: marquee 20s linear infinite; }
-  .animate-gradient   { animation: gradient 4s linear infinite; }
-  .animate-shine      { animation: shine 1.5s ease-in-out infinite; }
-  .animate-twinkle    { animation: twinkle 4s infinite; }
-  .animate-spin-slow  { animation: spin 60s linear infinite; }
-  .animate-slide-down { animation: slideDown 0.3s ease-out; }
-}
-
-/* ─── Keyframes ──────────────────────────────────────────────── */
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-20px); }
-}
-
-@keyframes marquee {
-  0%   { transform: translateX(0%); }
-  100% { transform: translateX(-50%); }
-}
-
-@keyframes gradient {
-  0%   { background-position: 0% center; }
-  100% { background-position: -200% center; }
-}
-
-@keyframes shine {
-  0%   { transform: translateX(-200%) skewX(-15deg); }
-  60%  { transform: translateX(200%) skewX(-15deg); }
-  100% { transform: translateX(200%) skewX(-15deg); }
-}
-
-@keyframes twinkle {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: 0.3; transform: scale(0.8); }
-}
-
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ─── Base ───────────────────────────────────────────────────── */
-html {
-  scroll-behavior: smooth;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
 }
 
 body {
-  background-color: var(--cen-bg);
-  color: var(--ink);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
 }

@@ -49,6 +49,7 @@ export default function LoginPage() {
         return;
       }
 
+      // Registrar consentimiento
       try {
         await supabase.from("user_consents").insert([
           { user_id: data.user.id, document_type: "privacy", document_version: "1.0" },
@@ -58,6 +59,7 @@ export default function LoginPage() {
         // El consentimiento puede estar ya registrado — no bloqueamos el login
       }
 
+      // Obtener role del profile para redirigir
       const { data: profile } = await supabase
         .from("profiles")
         .select("role")
@@ -82,111 +84,22 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen">
-      {/* ── Left panel: branding (hidden on mobile) ─────────── */}
-      <div className="relative hidden flex-1 overflow-hidden lg:flex lg:flex-col lg:justify-center lg:px-12">
-        {/* Gradient background */}
-        <div
-          className="absolute inset-0 bg-gradient-to-br from-cen-navy to-[#071A35]"
-          aria-hidden="true"
-        />
-
-        {/* Dot-grid overlay */}
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.04]"
-          aria-hidden="true"
-          style={{
-            backgroundImage:
-              "radial-gradient(rgba(255,255,255,0.8) 1px, transparent 1px)",
-            backgroundSize: "24px 24px",
-          }}
-        />
-
-        {/* Floating logo mark */}
-        <div className="relative z-10 animate-float">
-          <div className="flex h-20 w-20 items-center justify-center rounded-[1.5rem] bg-white/10 backdrop-blur-sm border border-white/20">
-            <span className="text-4xl font-black text-white">C</span>
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="relative z-10 mt-8 max-w-sm">
-          <h2
-            className="text-3xl font-black uppercase tracking-tight"
-            style={{
-              background:
-                "linear-gradient(90deg, #7DD3FC 0%, #1E40AF 40%, #7DD3FC 80%)",
-              backgroundSize: "200% auto",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-              animation: "gradient 4s linear infinite",
-            }}
-          >
-            Accede a tu plataforma
-          </h2>
-          <p className="mt-4 text-sm font-medium leading-relaxed text-white/60">
-            CEN Bachillerato — Marco Curricular Común de la Educación Media Superior
-          </p>
-
-          {/* Quick stats */}
-          <div className="mt-8 flex flex-wrap gap-2">
-            {["34 UAC", "342 Progresiones", "6 Semestres"].map((stat) => (
-              <span
-                key={stat}
-                className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-cen-sky/80"
-              >
-                {stat}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* Decorative twinkle dots */}
-        {[
-          { top: "15%", right: "20%", size: "6px" },
-          { top: "35%", right: "8%", size: "4px" },
-          { top: "65%", right: "15%", size: "5px" },
-          { top: "80%", right: "30%", size: "3px" },
-        ].map((dot, i) => (
-          <div
-            key={i}
-            aria-hidden="true"
-            className="pointer-events-none absolute animate-twinkle rounded-full bg-cen-sky/40"
-            style={{
-              top: dot.top,
-              right: dot.right,
-              width: dot.size,
-              height: dot.size,
-              animationDelay: `${i * 0.8}s`,
-            }}
-          />
-        ))}
-      </div>
-
-      {/* ── Right panel: form ────────────────────────────────── */}
-      <div className="flex flex-1 flex-col justify-center bg-white px-6 py-12 sm:px-10 lg:max-w-[480px]">
-        {/* Mobile logo */}
-        <div className="mb-10 lg:hidden">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-cen-navy">
-              <span className="text-sm font-black text-white">C</span>
-            </div>
-            <span className="text-sm font-black uppercase tracking-[0.25em] text-cen-navy">
-              CEN
-            </span>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4">
+      <div className="w-full max-w-md">
+        {/* Logo */}
+        <div className="mb-8 text-center">
+          <Link href="/" className="inline-block">
+            <span className="text-3xl font-bold text-indigo-700">CEN</span>
           </Link>
+          <p className="mt-2 text-sm text-gray-500">Campaña Educativa Nacional</p>
         </div>
 
-        <div className="mx-auto w-full max-w-sm">
-          <h1 className="text-2xl font-black uppercase tracking-tight text-cen-navy">
+        <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
+          <h1 className="mb-6 text-xl font-bold text-gray-900">
             Iniciar sesión
           </h1>
-          <p className="mt-1 text-sm text-ink-60">
-            Campaña Educativa Nacional — Bachillerato
-          </p>
 
-          <form onSubmit={handleSubmit} noValidate className="mt-8 space-y-5">
+          <form onSubmit={handleSubmit} noValidate className="space-y-5">
             <Input
               label="Correo electrónico"
               type="email"
@@ -207,21 +120,21 @@ export default function LoginPage() {
               placeholder="••••••••"
             />
 
-            <div className="flex items-start gap-3 pt-1">
+            <div className="flex items-start gap-3">
               <input
                 id="consentimiento"
                 type="checkbox"
                 checked={consentimiento}
                 onChange={(e) => setConsentimiento(e.target.checked)}
-                className="mt-0.5 h-4 w-4 rounded border-[#E2E8F0] accent-cen-blue"
+                className="mt-0.5 h-4 w-4 rounded border-gray-300 text-indigo-600"
                 required
               />
-              <label htmlFor="consentimiento" className="text-xs leading-relaxed text-ink-60">
+              <label htmlFor="consentimiento" className="text-sm text-gray-600">
                 He leído y acepto el{" "}
                 <Link
                   href="/privacidad"
                   target="_blank"
-                  className="font-bold text-cen-blue underline"
+                  className="text-indigo-600 underline"
                 >
                   Aviso de Privacidad
                 </Link>{" "}
@@ -229,7 +142,7 @@ export default function LoginPage() {
                 <Link
                   href="/terminos"
                   target="_blank"
-                  className="font-bold text-cen-blue underline"
+                  className="text-indigo-600 underline"
                 >
                   Términos de Uso
                 </Link>
@@ -239,7 +152,7 @@ export default function LoginPage() {
 
             {error && (
               <div
-                className="animate-slide-down rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700"
+                className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700"
                 role="alert"
               >
                 {error}
@@ -254,16 +167,16 @@ export default function LoginPage() {
               disabled={!email || !password}
               className="w-full"
             >
-              {loading ? "Validando acceso..." : "Acceder"}
+              Acceder
             </Button>
           </form>
-
-          <p className="mt-8 text-center text-[10px] leading-relaxed text-ink-40">
-            Plataforma protegida conforme a la LFPDPPP.
-            <br />
-            Si tienes problemas para acceder, contacta al administrador de tu institución.
-          </p>
         </div>
+
+        <p className="mt-6 text-center text-xs text-gray-400">
+          Plataforma protegida conforme a la LFPDPPP.
+          <br />
+          Si tienes problemas para acceder, contacta al administrador de tu institución.
+        </p>
       </div>
     </div>
   );
