@@ -127,7 +127,7 @@ export default function LandingPageCEN() {
               <a href="#por-que-cen">Por qué CEN</a>
             </div>
             <div className="nav-right">
-              <Link href="/log-in" className="nav-btn-primary">Iniciar Sesión</Link>
+              <Link href="/bachillerato" className="nav-btn-primary">CEN Bachillerato</Link>
             </div>
           </nav>
 
@@ -152,12 +152,12 @@ export default function LandingPageCEN() {
                   virtuales y más. Diseñado para escuelas, docentes y estudiantes.
                 </p>
                 <div className="hero-cta-row">
-                  <Link href="/log-in" className="btn-cta">
-                    Ingresar a la plataforma <i className="fas fa-arrow-right"></i>
-                  </Link>
-                  <a href="#productos" className="btn-cta-demo">
+                  <a href="#productos" className="btn-cta">
                     Conocer productos <i className="fas fa-chevron-down"></i>
                   </a>
+                  <Link href="/bachillerato" className="btn-cta-demo">
+                    CEN Bachillerato <i className="fas fa-arrow-right"></i>
+                  </Link>
                 </div>
               </div>
 
@@ -325,8 +325,8 @@ export default function LandingPageCEN() {
                 Acceso institucional disponible para escuelas y subsistemas educativos de todo el sistema mexicano.
               </p>
               <div className="cta-actions">
-                <Link href="/log-in" className="btn-cta">
-                  Ingresar a la plataforma <i className="fas fa-arrow-right"></i>
+                <Link href="/bachillerato" className="btn-cta">
+                  Explorar CEN Bachillerato <i className="fas fa-arrow-right"></i>
                 </Link>
               </div>
             </div>
