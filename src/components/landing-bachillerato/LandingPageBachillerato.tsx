@@ -1,14 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import '../landing-cen/LandingCEN.css';
-
-const SUBSISTEMAS = [
-  'DGB', 'DGETI', 'DGETAyCM', 'CONALEP', 'COBACH', 'CECYT', 'CCH', 'ENP',
-  'Bachilleratos con RVOE', 'Bachilleratos universitarios estatales',
-  'Escuelas particulares SEP', 'Bachilleratos estatales',
-];
 
 const CURRICULUM_CARDS = [
   {
@@ -134,83 +128,82 @@ export default function LandingPageBachillerato() {
             </div>
           </nav>
 
-          {/* ── HERO ── */}
-          <div id="inicio" className="hero-wrap">
-            <header className="hero">
-              <div className="hero-bg">
-                <svg width="100%" height="100%" viewBox="0 0 1000 1000" fill="none" preserveAspectRatio="none">
-                  <path d="M0 200C200 100 400 300 600 200C800 100 1000 200 1000 200V1000H0V200Z" fill="white" fillOpacity="0.03" />
-                </svg>
-              </div>
-
-              <div className="hero-left">
-                <div className="hero-badge">Producto CEN</div>
-                <h1 className="hero-title">
-                  CEN<br />
-                  <span className="accent">Bachillerato</span>
+          {/* ── HERO ZS ── */}
+          <div id="inicio" className="hero-zs">
+            <div className="hero-zs-body">
+              <div className="hero-zs-left">
+                <p className="hero-zs-eyebrow">Tu Plataforma de Bachillerato · Producto CEN</p>
+                <h1 className="hero-zs-title">
+                  Aprende, Avanza<br />y Certifica con<br /><span className="accent">CEN Bachillerato</span>
                 </h1>
-                <p className="hero-sub">
-                  Plataforma educativa institucional alineada al Marco Curricular Común de la Educación Media
-                  Superior (MCCEMS). Diseñada para estudiantes, docentes y administradores de bachillerato
-                  general, tecnológico y técnico-bachiller.
+                <p className="hero-zs-sub">
+                  Plataforma educativa institucional alineada al MCCEMS. 34 UAC, 8 Recursos Sociocognitivos
+                  y 4 Ámbitos de Formación Socioemocional para bachillerato general, tecnológico y técnico-bachiller.
                 </p>
-                <div className="hero-cta-row">
-                  <Link href="/log-in" className="btn-cta">
-                    Ingresar a la plataforma <i className="fas fa-arrow-right"></i>
-                  </Link>
-                  <a href="#curriculo" className="btn-cta-demo">
-                    Conocer estructura curricular <i className="fas fa-chevron-down"></i>
-                  </a>
-                </div>
-              </div>
-
-              <div className="hero-right">
-                <div className="hero-circle"></div>
-                <div className="hero-circle-solid"></div>
-
-                <div className="floater f1">
-                  <div className="ic-wrap"><i className="fas fa-book-open"></i></div>
-                  <div>
-                    <div className="lbl">Currículum Fundamental</div>
-                    <div className="val">34 UAC · 6 Semestres</div>
+                <Link href="/log-in" className="hero-zs-cta">
+                  Ingresar a la plataforma <i className="fas fa-arrow-right"></i>
+                </Link>
+                <div className="hero-zs-review">
+                  <div className="hero-zs-avatars">
+                    <div className="hero-zs-avatar"><i className="fas fa-user-graduate"></i></div>
+                    <div className="hero-zs-avatar"><i className="fas fa-chalkboard-teacher"></i></div>
+                    <div className="hero-zs-avatar"><i className="fas fa-school"></i></div>
                   </div>
-                </div>
-
-                <div className="floater f2">
-                  <div className="ic-wrap"><i className="fas fa-layer-group"></i></div>
-                  <div>
-                    <div className="lbl">Recursos Sociocognitivos</div>
-                    <div className="val">8 RSC Transversales</div>
-                  </div>
-                </div>
-
-                <div className="floater f3">
-                  <div className="ic-wrap"><i className="fas fa-users"></i></div>
-                  <div>
-                    <div className="lbl">Ámbitos Socioemocionales</div>
-                    <div className="val">4 Ámbitos de Formación</div>
+                  <div className="hero-zs-review-divider"></div>
+                  <div className="hero-zs-review-text">
+                    <div className="rv-title">Subsistemas compatibles</div>
+                    <div className="rv-sub">DGB · DGETI · CONALEP · COBACH y más</div>
                   </div>
                 </div>
               </div>
-            </header>
-          </div>
 
-          {/* ── SUBSISTEMAS MARQUEE ── */}
-          <div className="allies">
-            <div className="allies-eyebrow">Subsistemas educativos compatibles</div>
-            <h2>Para todos los bachilleratos del <em>sistema mexicano</em></h2>
-            <div className="allies-divider"></div>
-            <div className="marquee">
-              <div className="marquee-track">
-                {[...SUBSISTEMAS, ...SUBSISTEMAS].map((s, i) => (
-                  <React.Fragment key={i}>
-                    <span className="ally-name">{s}</span>
-                    <span className="ally-dot"></span>
-                  </React.Fragment>
-                ))}
+              <div className="hero-zs-right">
+                <div className="hero-zs-photo">
+                  <i className="fas fa-user-graduate"></i>
+                  <span>Fotografía del estudiante</span>
+                </div>
+                <div className="hero-zs-card hzs-c1">
+                  <div className="hzs-card-icon"><i className="fas fa-book-open"></i></div>
+                  <div className="hzs-card-value">34 UAC</div>
+                  <div className="hzs-card-label">Currículum Fundamental</div>
+                </div>
+                <div className="hero-zs-card hzs-c2">
+                  <div className="hzs-card-icon"><i className="fas fa-layer-group"></i></div>
+                  <div className="hzs-card-value">8 RSC</div>
+                  <div className="hzs-card-label">Recursos Sociocognitivos</div>
+                </div>
+                <div className="hero-zs-card hzs-c3">
+                  <div className="hzs-card-icon"><i className="fas fa-chart-line"></i></div>
+                  <div className="hzs-card-value">342</div>
+                  <div className="hzs-card-label">Progresiones de aprendizaje</div>
+                </div>
               </div>
             </div>
           </div>
+
+          {/* ── FEATURES BAND ── */}
+          <section className="features-band">
+            <div className="feat-card">
+              <div className="feat-icon"><i className="fas fa-th-large"></i></div>
+              <h3>Hub estudiantil</h3>
+              <p>Vista semestral, progreso por UAC y acceso a todas las progresiones del currículum.</p>
+            </div>
+            <div className="feat-card featured">
+              <div className="feat-icon"><i className="fas fa-landmark"></i></div>
+              <h3>Alineado al MCCEMS</h3>
+              <p>Acuerdo 09/08/23 y Modelo Educativo 2025. Marco oficial de la SEP para bachillerato.</p>
+            </div>
+            <div className="feat-card">
+              <div className="feat-icon"><i className="fas fa-chart-bar"></i></div>
+              <h3>Dashboard docente</h3>
+              <p>Métricas por grupo, alumno y UAC en tiempo real. Reportes exportables al instante.</p>
+            </div>
+            <div className="feat-card">
+              <div className="feat-icon"><i className="fas fa-school"></i></div>
+              <h3>Gestión institucional</h3>
+              <p>Multi-tenant con aislamiento total por Row Level Security. Una o múltiples escuelas.</p>
+            </div>
+          </section>
 
           {/* ── ESTRUCTURA CURRICULAR MCCEMS ── */}
           <section id="curriculo" className="section">
