@@ -133,6 +133,60 @@ directory = ".open-next/assets"
 `@opennextjs/cloudflare` muestra warning en Windows sin WSL. El build pasa, pero para
 desarrollo local con simulación de Workers, correr `npm run pages:dev` desde WSL o en CI.
 
+## Sistema de Diseño
+
+### Tokens de color (globals.css / Tailwind v4)
+
+| Token Tailwind | Hex | Uso |
+|---------------|-----|-----|
+| `cen-navy` | `#0B2545` | Color principal — texto, botones primarios, navbar, fondo side panel |
+| `cen-navy-2` | `#0E2D56` | Hover/variación del navy |
+| `cen-blue` | `#1E40AF` | Acento primario — CTAs hover, links, focus rings |
+| `cen-blue-soft` | `#DBEAFE` | Fondos de badges, pills azules |
+| `cen-sky` | `#7DD3FC` | Acento secundario — destellos, ilustraciones, texto sobre fondo oscuro |
+| `cen-sky-soft` | `#E0F2FE` | Fondos suaves |
+| `cen-cool` | `#EFF6FF` | Fondos de hover, secciones alternadas |
+| `cen-bg` | `#F8FAFC` | Fondo global de la app |
+| `ink` | `#0B2545` | Texto principal (= cen-navy) |
+| `ink-80/60/40/10` | rgba(11,37,69,0.X) | Escala de opacidad del texto |
+
+### Tipografía
+
+- **Font principal:** `Epilogue` (Google Fonts) — pesos 400, 500, 700, 800, 900
+- Importado via `next/font/google` en `src/app/layout.tsx` (CSS variable `--font-epilogue`)
+
+### Componentes UI (`src/components/ui/`)
+
+| Componente | Descripción |
+|------------|-------------|
+| `Button` | Variantes: primary, secondary, ghost, danger. Shine effect animado en primary |
+| `Card` | `hoverable` prop — sombra en hover. Subcomponentes: CardHeader, CardTitle, CardContent |
+| `Input` | Labels uppercase + tracking. Focus ring sky-blue. Group-focus-within label coloreado |
+| `Select` | Mismo estilo que Input |
+| `Badge` | Variantes: default, primary, success, warning, error, muted |
+| `Alert` | Variantes: info, success, warning, error. `animate-slide-down` |
+| `Avatar` | Initials fallback + img src |
+| `Skeleton` | `lines` prop para múltiples líneas |
+| `MagneticButton` | Wrapper con efecto magnético de cursor |
+| `ProgressRing` | SVG circular de progreso — usado en UACCard |
+
+### Componentes Hub
+
+- `UACCard` — Client component con 3D tilt + mouse aura flare (igual que PillarCard de Financiera)
+- `SemestreSelector` — Tabs 1-6 con estados activo/disponible/bloqueado
+
+### Animaciones
+
+Definidas en `globals.css` como `@layer utilities` y `@keyframes`:
+- `animate-float` — 6s ease-in-out infinite (elementos flotantes)
+- `animate-marquee` — 20s linear infinite (banda de logos)
+- `animate-gradient` — 4s linear infinite (texto degradado animado)
+- `animate-shine` — 1.5s ease-in-out infinite (brillo en botones)
+- `animate-twinkle` — 4s infinite (partículas decorativas)
+- `animate-slide-down` — 0.3s ease-out (alerts, errores)
+
+---
+
 ## Anti-patrones prohibidos
 
 - ❌ `ignoreBuildErrors: true` en tsconfig

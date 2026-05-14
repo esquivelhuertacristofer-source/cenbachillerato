@@ -11,13 +11,20 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantStyles: Record<Variant, string> = {
   primary:
-    "bg-indigo-600 text-white hover:bg-indigo-700 focus-visible:outline-indigo-600 disabled:bg-indigo-300",
+    "relative overflow-hidden bg-cen-navy text-white " +
+    "hover:bg-cen-blue hover:-translate-y-1 " +
+    "shadow-[0_10px_25px_rgba(11,37,69,0.15)] hover:shadow-[0_15px_35px_rgba(11,37,69,0.25)] " +
+    "focus-visible:outline-cen-navy disabled:bg-cen-navy/40 disabled:shadow-none",
   secondary:
-    "bg-white text-indigo-600 border border-indigo-600 hover:bg-indigo-50 focus-visible:outline-indigo-600",
+    "bg-white text-cen-navy border-2 border-cen-navy " +
+    "hover:bg-cen-cool " +
+    "focus-visible:outline-cen-navy",
   ghost:
-    "bg-transparent text-gray-700 hover:bg-gray-100 focus-visible:outline-gray-500",
+    "bg-transparent text-ink hover:bg-ink-10 " +
+    "focus-visible:outline-gray-500",
   danger:
-    "bg-red-600 text-white hover:bg-red-700 focus-visible:outline-red-600 disabled:bg-red-300",
+    "bg-red-600 text-white hover:bg-red-700 " +
+    "focus-visible:outline-red-600 disabled:bg-red-300",
 };
 
 const sizeStyles: Record<Size, string> = {
@@ -40,14 +47,20 @@ export function Button({
       {...props}
       disabled={disabled || loading}
       className={[
-        "inline-flex items-center justify-center gap-2 rounded-lg font-medium",
+        "inline-flex items-center justify-center gap-2 rounded-2xl font-bold uppercase tracking-widest",
         "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
-        "transition-colors duration-150 disabled:cursor-not-allowed",
+        "transition-all duration-300 disabled:cursor-not-allowed disabled:translate-y-0",
         variantStyles[variant],
         sizeStyles[size],
         className,
       ].join(" ")}
     >
+      {variant === "primary" && (
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 h-full w-1/2 animate-shine bg-gradient-to-r from-transparent via-white/20 to-transparent"
+        />
+      )}
       {loading && (
         <svg
           className="h-4 w-4 animate-spin"

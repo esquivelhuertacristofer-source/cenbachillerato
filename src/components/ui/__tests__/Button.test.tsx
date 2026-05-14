@@ -5,13 +5,13 @@ import { Button } from "../Button";
 describe("Button", () => {
   test("renderiza el texto hijo", () => {
     render(<Button>Guardar</Button>);
-    expect(screen.getByRole("button", { name: "Guardar" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /guardar/i })).toBeInTheDocument();
   });
 
-  test("variante primary aplica clases de indigo por defecto", () => {
+  test("variante primary usa bg-cen-navy por defecto", () => {
     render(<Button>ok</Button>);
     const btn = screen.getByRole("button");
-    expect(btn.className).toContain("bg-indigo-600");
+    expect(btn.className).toContain("bg-cen-navy");
   });
 
   test("variante danger aplica clases de red", () => {
@@ -20,10 +20,10 @@ describe("Button", () => {
     expect(btn.className).toContain("bg-red-600");
   });
 
-  test("variante secondary aplica clases de borde", () => {
+  test("variante secondary aplica borde cen-navy", () => {
     render(<Button variant="secondary">Cancelar</Button>);
     const btn = screen.getByRole("button");
-    expect(btn.className).toContain("border-indigo-600");
+    expect(btn.className).toContain("border-cen-navy");
   });
 
   test("variante ghost aplica bg-transparent", () => {
@@ -56,7 +56,8 @@ describe("Button", () => {
 
   test("loading=false no muestra spinner", () => {
     render(<Button>Sin carga</Button>);
-    expect(screen.getByRole("button").querySelector("svg")).toBeNull();
+    const svgs = screen.getByRole("button").querySelectorAll("svg");
+    expect(svgs.length).toBe(0);
   });
 
   test("disabled=true deshabilita el botón", () => {

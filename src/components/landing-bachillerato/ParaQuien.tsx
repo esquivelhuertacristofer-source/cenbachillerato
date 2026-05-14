@@ -13,16 +13,13 @@ const SUBSISTEMAS = [
 
 export function ParaQuien() {
   return (
-    <section
-      id="para-quien"
-      className="bg-slate-50 px-4 py-20 sm:px-6 lg:px-8"
-    >
+    <section id="para-quien" className="bg-cen-bg px-4 py-20 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
+          <h2 className="text-3xl font-black tracking-tight text-cen-navy sm:text-4xl">
             Para quién es CEN Bachillerato
           </h2>
-          <p className="mt-4 text-lg text-gray-600">
+          <p className="mt-4 text-lg text-ink-60">
             Compatible con todos los subsistemas que operan bajo el MCCEMS
           </p>
         </div>
@@ -31,22 +28,24 @@ export function ParaQuien() {
           {SUBSISTEMAS.map((sub) => (
             <div
               key={sub.codigo}
-              className="flex items-start gap-4 rounded-xl bg-white p-5 shadow-sm"
+              className="flex items-start gap-4 rounded-2xl border border-ink-10 bg-white p-5 shadow-sm"
             >
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-cen-navy text-[10px] font-black text-white">
                 {sub.codigo.substring(0, 3)}
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900">{sub.nombre}</h3>
-                <p className="mt-1 text-sm text-gray-500">{sub.descripcion}</p>
+                <h3 className="font-bold text-cen-navy">{sub.nombre}</h3>
+                <p className="mt-1 text-sm text-ink-60">{sub.descripcion}</p>
               </div>
             </div>
           ))}
         </div>
 
-        <div className="mt-12 rounded-2xl bg-indigo-600 p-8 text-center text-white">
-          <h3 className="text-2xl font-bold">Multi-tenant desde el primer día</h3>
-          <p className="mt-3 text-indigo-100">
+        <div className="mt-12 rounded-[2.5rem] bg-gradient-to-br from-cen-navy to-cen-blue p-8 text-center text-white">
+          <h3 className="text-2xl font-black uppercase tracking-tight">
+            Multi-tenant desde el primer día
+          </h3>
+          <p className="mt-3 text-white/70">
             Cada escuela opera en su propio espacio aislado. Los datos de una institución
             nunca son visibles para otra. Compatible con CCT, RVOE y estructuras
             orgánicas de cualquier subsistema.

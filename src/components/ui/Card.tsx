@@ -14,9 +14,9 @@ export function Card({
     <div
       {...props}
       className={[
-        "rounded-xl border border-gray-200 bg-white p-6 shadow-sm",
+        "rounded-2xl border border-ink-10 bg-white p-6 shadow-sm",
         hoverable &&
-          "cursor-pointer transition-shadow duration-150 hover:shadow-md",
+          "cursor-pointer transition-shadow duration-300 hover:shadow-md hover:shadow-[0_40px_80px_rgba(11,37,69,0.08)]",
         className,
       ]
         .filter(Boolean)
@@ -31,9 +31,7 @@ export function CardHeader({
   children,
   className = "",
 }: HTMLAttributes<HTMLDivElement>) {
-  return (
-    <div className={`mb-4 ${className}`}>{children}</div>
-  );
+  return <div className={`mb-4 ${className}`}>{children}</div>;
 }
 
 export function CardTitle({
@@ -41,7 +39,7 @@ export function CardTitle({
   className = "",
 }: HTMLAttributes<HTMLHeadingElement>) {
   return (
-    <h3 className={`text-lg font-semibold text-gray-900 ${className}`}>
+    <h3 className={`text-lg font-semibold text-ink ${className}`}>
       {children}
     </h3>
   );

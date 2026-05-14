@@ -28,7 +28,6 @@ describe("SemestreSelector", () => {
     render(
       <SemestreSelector semestreActual={1} semestresDisponibles={[1, 2]} />
     );
-    // Semestres 3-6 no disponibles → span, no link
     const links = screen.getAllByRole("link");
     const linkTexts = links.map((l) => l.textContent);
     expect(linkTexts).toContain("1");
@@ -55,20 +54,20 @@ describe("SemestreSelector", () => {
     expect(link2).toHaveAttribute("href", "/hub/semestre/2");
   });
 
-  test("semestreActual tiene clase bg-indigo-600", () => {
+  test("semestreActual tiene clase bg-cen-navy", () => {
     render(
       <SemestreSelector semestreActual={2} semestresDisponibles={[1, 2, 3]} />
     );
     const link2 = screen.getAllByRole("link").find((l) => l.textContent === "2");
-    expect(link2?.className).toContain("bg-indigo-600");
+    expect(link2?.className).toContain("bg-cen-navy");
   });
 
-  test("semestres disponibles no activos NO tienen clase bg-indigo-600", () => {
+  test("semestres disponibles no activos NO tienen clase bg-cen-navy", () => {
     render(
       <SemestreSelector semestreActual={2} semestresDisponibles={[1, 2, 3]} />
     );
     const link1 = screen.getAllByRole("link").find((l) => l.textContent === "1");
-    expect(link1?.className).not.toContain("bg-indigo-600");
+    expect(link1?.className).not.toContain("bg-cen-navy");
   });
 
   test("pathname activo también marca el semestre como activo", () => {
@@ -77,7 +76,7 @@ describe("SemestreSelector", () => {
       <SemestreSelector semestreActual={1} semestresDisponibles={[1, 2, 3]} />
     );
     const link3 = screen.getAllByRole("link").find((l) => l.textContent === "3");
-    expect(link3?.className).toContain("bg-indigo-600");
+    expect(link3?.className).toContain("bg-cen-navy");
   });
 
   test("semestres no disponibles tienen title informativo", () => {
