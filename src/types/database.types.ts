@@ -272,6 +272,11 @@ export interface Database {
           categoria: string | null;
           subcategoria: string | null;
           created_at: string;
+          es_placeholder: boolean;
+          descripcion_extendida: string | null;
+          ejes_articuladores: string[] | null;
+          transversalidades: string[] | null;
+          tiempo_estimado_horas: number | null;
         };
         Insert: {
           id?: string;
@@ -284,6 +289,11 @@ export interface Database {
           categoria?: string | null;
           subcategoria?: string | null;
           created_at?: string;
+          es_placeholder?: boolean;
+          descripcion_extendida?: string | null;
+          ejes_articuladores?: string[] | null;
+          transversalidades?: string[] | null;
+          tiempo_estimado_horas?: number | null;
         };
         Update: Partial<Database["public"]["Tables"]["progresiones"]["Insert"]>;
         Relationships: [
@@ -310,6 +320,7 @@ export interface Database {
           escuela_owner_id: string | null;
           created_at: string;
           updated_at: string;
+          tipo_codigo: string | null;
         };
         Insert: {
           id?: string;
@@ -324,6 +335,7 @@ export interface Database {
           escuela_owner_id?: string | null;
           created_at?: string;
           updated_at?: string;
+          tipo_codigo?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["actividades"]["Insert"]>;
         Relationships: [];
