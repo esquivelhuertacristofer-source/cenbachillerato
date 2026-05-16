@@ -85,7 +85,7 @@ export const UAC_BASE: UACStatic[] = [
   { codigo: "PM-VI",  nombre: "Pensamiento Matemático VI",  semestre: 6, componenteCodigo: "CF", recursoCodigo: "RSC-PM", orden: 2, totalProgresionesEsperadas: 10 },
 
   // ── Inglés (sems 1-4) ──────────────────────────────────────────────────────
-  { codigo: "IN-I",   nombre: "Inglés I",   semestre: 1, componenteCodigo: "CF", recursoCodigo: "RSC-IN", orden: 3, totalProgresionesEsperadas: 12 },
+  { codigo: "IN-I",   nombre: "Inglés I",   semestre: 1, componenteCodigo: "CF", recursoCodigo: "RSC-IN", orden: 3, totalProgresionesEsperadas: 8 },
   { codigo: "IN-II",  nombre: "Inglés II",  semestre: 2, componenteCodigo: "CF", recursoCodigo: "RSC-IN", orden: 3, totalProgresionesEsperadas: 12 },
   { codigo: "IN-III", nombre: "Inglés III", semestre: 3, componenteCodigo: "CF", recursoCodigo: "RSC-IN", orden: 3, totalProgresionesEsperadas: 12 },
   { codigo: "IN-IV",  nombre: "Inglés IV",  semestre: 4, componenteCodigo: "CF", recursoCodigo: "RSC-IN", orden: 3, totalProgresionesEsperadas: 12 },
@@ -101,12 +101,12 @@ export const UAC_BASE: UACStatic[] = [
   { codigo: "CH-III", nombre: "Conciencia Histórica III", semestre: 6, componenteCodigo: "CF", recursoCodigo: "RSC-CH", orden: 5, totalProgresionesEsperadas: 10 },
 
   // ── Ciencias Sociales (sems 1, 2, 4) ───────────────────────────────────────
-  { codigo: "CS-I",   nombre: "Ciencias Sociales I",   semestre: 1, componenteCodigo: "CF", recursoCodigo: "RSC-CS", orden: 6, totalProgresionesEsperadas: 10 },
+  { codigo: "CS-I",   nombre: "Ciencias Sociales I",   semestre: 1, componenteCodigo: "CF", recursoCodigo: "RSC-CS", orden: 6, totalProgresionesEsperadas: 8 },
   { codigo: "CS-II",  nombre: "Ciencias Sociales II",  semestre: 2, componenteCodigo: "CF", recursoCodigo: "RSC-CS", orden: 6, totalProgresionesEsperadas: 10 },
   { codigo: "CS-III", nombre: "Ciencias Sociales III", semestre: 4, componenteCodigo: "CF", recursoCodigo: "RSC-CS", orden: 6, totalProgresionesEsperadas: 10 },
 
   // ── Humanidades (sems 1-3) ──────────────────────────────────────────────────
-  { codigo: "HUM-I",   nombre: "Humanidades I",   semestre: 1, componenteCodigo: "CF", recursoCodigo: "RSC-HUM", orden: 7, totalProgresionesEsperadas: 10 },
+  { codigo: "HUM-I",   nombre: "Humanidades I",   semestre: 1, componenteCodigo: "CF", recursoCodigo: "RSC-HUM", orden: 7, totalProgresionesEsperadas: 8 },
   { codigo: "HUM-II",  nombre: "Humanidades II",  semestre: 2, componenteCodigo: "CF", recursoCodigo: "RSC-HUM", orden: 7, totalProgresionesEsperadas: 10 },
   { codigo: "HUM-III", nombre: "Humanidades III", semestre: 3, componenteCodigo: "CF", recursoCodigo: "RSC-HUM", orden: 7, totalProgresionesEsperadas: 10 },
 
