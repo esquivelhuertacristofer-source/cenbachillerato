@@ -1,0 +1,12 @@
+export { LecturaActivity } from './LecturaActivity';
+export { QuizMultipleOpcionActivity } from './QuizMultipleOpcionActivity';
+export { QuizVerdaderoFalsoActivity } from './QuizVerdaderoFalsoActivity';
+export { FillBlanksActivity } from './FillBlanksActivity';
+export { EjercicioMatematicoActivity } from './EjercicioMatematicoActivity';
+export { ReflexionEscritaActivity } from './ReflexionEscritaActivity';
+export { VideoConPreguntasActivity } from './VideoConPreguntasActivity';
+export { InfografiaActivity } from './InfografiaActivity';
+export { DebateEstructuradoActivity } from './DebateEstructuradoActivity';
+export { SimulacionActivity } from './SimulacionActivity';
+export { GlosarioInteractivoActivity } from './GlosarioInteractivoActivity';
+export { AutoevaluacionActivity } from './AutoevaluacionActivity';
