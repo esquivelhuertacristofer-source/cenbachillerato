@@ -1,0 +1,8 @@
+[2026-05-17] INICIO MIGRACIÓN — Modelo Educativo 2025
+[2026-05-17] Baseline: 143 tests pasando, 14 suites
+[2026-05-17] Estado inicial: 34 UAC, 334 progresiones esperadas (código), marco Acuerdo 09/08/23
+[2026-05-17] FASE 1 INICIADA — backup y plan de migración
+[2026-05-17] FASE 1 — docs/migracion-2025/backup-estructura-pre-migracion.json creado (derivado de código)
+[2026-05-17] FASE 1 — docs/migracion-2025/backup-query.sql creado (para backup live de Supabase)
+[2026-05-17] FASE 1 — docs/migracion-2025/PLAN-MIGRACION.md creado
+[2026-05-17] FASE 1 COMPLETADA — 3 archivos creados, 0 cambios de código
