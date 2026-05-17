@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import '../landing-cen/LandingCEN.css';
+import './LandingBachillerato.css';
 
 const CURRICULUM_CARDS = [
   {
@@ -96,6 +97,7 @@ export default function LandingPageBachillerato() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
@@ -104,14 +106,14 @@ export default function LandingPageBachillerato() {
   }
 
   return (
-    <div className="landing-cen">
+    <div className="landing-cen landing-bach">
       <div className="cen-content">
         <main className="main-scroll">
 
           {/* ── NAV ── */}
           <nav className="nav">
             <Link href="/" className="brand">
-              <div className="logo-mark"><span>C</span></div>
+              <div className="logo-mark"><img src="/Logo%20Cen.png" alt="CEN" style={{ width: 28, height: 28, objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.92 }} /></div>
               <div className="brand-text">
                 <span className="b1">CEN</span>
                 <span className="b2">Bachillerato</span>
@@ -128,80 +130,142 @@ export default function LandingPageBachillerato() {
             </div>
           </nav>
 
-          {/* ── HERO ZS ── */}
-          <div id="inicio" className="hero-zs">
-            <div className="hero-zs-body">
-              <div className="hero-zs-left">
-                <p className="hero-zs-eyebrow">Tu Plataforma de Bachillerato · Producto CEN</p>
-                <h1 className="hero-zs-title">
-                  Aprende, Avanza<br />y Certifica con<br /><span className="accent">CEN Bachillerato</span>
-                </h1>
-                <p className="hero-zs-sub">
-                  Plataforma educativa institucional alineada al MCCEMS. 34 UAC, 8 Recursos Sociocognitivos
-                  y 4 Ámbitos de Formación Socioemocional para bachillerato general, tecnológico y técnico-bachiller.
+          {/* ── HERO BACHILLERATO ── */}
+          <div id="inicio" className="hero-bach">
+            <div className="hero-bach-grid-bg" aria-hidden="true" />
+            <div className="hero-bach-orb" aria-hidden="true" />
+
+            <div className="hero-bach-body">
+              {/* LEFT: content */}
+              <div className="hero-bach-left">
+                <p className="hero-bach-eyebrow">
+                  <i className="fas fa-certificate"></i>
+                  CEN Bachillerato · MCCEMS Acuerdo 09/08/23
                 </p>
-                <Link href="/log-in" className="hero-zs-cta">
-                  Ingresar a la plataforma <i className="fas fa-arrow-right"></i>
-                </Link>
-                <div className="hero-zs-review">
-                  <div className="hero-zs-avatars">
-                    <div className="hero-zs-avatar"><i className="fas fa-user-graduate"></i></div>
-                    <div className="hero-zs-avatar"><i className="fas fa-chalkboard-teacher"></i></div>
-                    <div className="hero-zs-avatar"><i className="fas fa-school"></i></div>
+                <h1 className="hero-bach-title">
+                  Domina tu<br />bachillerato.<br />
+                  <span className="hero-bach-accent">Progresión a progresión.</span>
+                </h1>
+                <p className="hero-bach-sub">
+                  Plataforma educativa oficial alineada al MCCEMS. 34 UAC, 8 Recursos Sociocognitivos
+                  y 4 Ámbitos de Formación Socioemocional para todos los subsistemas de bachillerato.
+                </p>
+                <div className="hero-bach-actions">
+                  <Link href="/log-in" className="hero-bach-cta">
+                    Ingresar a la plataforma <i className="fas fa-arrow-right"></i>
+                  </Link>
+                  <a href="#curriculo" className="hero-bach-cta-secondary">
+                    Ver currículo <i className="fas fa-chevron-down"></i>
+                  </a>
+                </div>
+
+                {/* Stats row */}
+                <div className="hero-bach-stats">
+                  <div className="hero-bach-stat">
+                    <span className="hbs-val">34</span>
+                    <span className="hbs-lbl">UAC</span>
                   </div>
-                  <div className="hero-zs-review-divider"></div>
-                  <div className="hero-zs-review-text">
-                    <div className="rv-title">Subsistemas compatibles</div>
-                    <div className="rv-sub">DGB · DGETI · CONALEP · COBACH y más</div>
+                  <div className="hero-bach-stat-divider" />
+                  <div className="hero-bach-stat">
+                    <span className="hbs-val">8</span>
+                    <span className="hbs-lbl">RSC</span>
                   </div>
+                  <div className="hero-bach-stat-divider" />
+                  <div className="hero-bach-stat">
+                    <span className="hbs-val">6</span>
+                    <span className="hbs-lbl">Semestres</span>
+                  </div>
+                  <div className="hero-bach-stat-divider" />
+                  <div className="hero-bach-stat">
+                    <span className="hbs-val">4</span>
+                    <span className="hbs-lbl">Ámbitos</span>
+                  </div>
+                </div>
+
+                {/* Subsistemas chips */}
+                <div className="hero-bach-chips">
+                  {['DGB', 'DGETI', 'CONALEP', 'COBACH', 'DGETAyCM', '+ más'].map(s => (
+                    <span key={s} className="hero-bach-chip">{s}</span>
+                  ))}
                 </div>
               </div>
 
-              <div className="hero-zs-right">
-                <div className="hero-zs-photo">
-                  <i className="fas fa-user-graduate"></i>
-                  <span>Fotografía del estudiante</span>
+              {/* RIGHT: image grid */}
+              <div className="hero-bach-right">
+                <div className="hero-bach-img-grid">
+                  <div className="hbig-top">
+                    <div className="hbig-img hbig-portrait">
+                      <i className="fas fa-user-graduate"></i>
+                      <span>Foto estudiante</span>
+                    </div>
+                    <div className="hbig-img hbig-square">
+                      <i className="fas fa-chalkboard-teacher"></i>
+                      <span>Foto docente</span>
+                    </div>
+                  </div>
+                  <div className="hbig-img hbig-wide">
+                    <i className="fas fa-school"></i>
+                    <span>Foto plantel / salón</span>
+                  </div>
                 </div>
-                <div className="hero-zs-card hzs-c1">
-                  <div className="hzs-card-icon"><i className="fas fa-book-open"></i></div>
-                  <div className="hzs-card-value">34 UAC</div>
-                  <div className="hzs-card-label">Currículum Fundamental</div>
+
+                {/* Floating badges */}
+                <div className="hero-bach-badge hero-bach-badge--tl">
+                  <i className="fas fa-check-circle"></i>
+                  <div>
+                    <div className="hbb-val">MCCEMS 2023</div>
+                    <div className="hbb-lbl">Acuerdo 09/08/23</div>
+                  </div>
                 </div>
-                <div className="hero-zs-card hzs-c2">
-                  <div className="hzs-card-icon"><i className="fas fa-layer-group"></i></div>
-                  <div className="hzs-card-value">8 RSC</div>
-                  <div className="hzs-card-label">Recursos Sociocognitivos</div>
-                </div>
-                <div className="hero-zs-card hzs-c3">
-                  <div className="hzs-card-icon"><i className="fas fa-chart-line"></i></div>
-                  <div className="hzs-card-value">342</div>
-                  <div className="hzs-card-label">Progresiones de aprendizaje</div>
+                <div className="hero-bach-badge hero-bach-badge--br">
+                  <i className="fas fa-chart-line"></i>
+                  <div>
+                    <div className="hbb-val">334 progresiones</div>
+                    <div className="hbb-lbl">de aprendizaje</div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* ── FEATURES BAND ── */}
-          <section className="features-band">
-            <div className="feat-card">
-              <div className="feat-icon"><i className="fas fa-th-large"></i></div>
-              <h3>Hub estudiantil</h3>
-              <p>Vista semestral, progreso por UAC y acceso a todas las progresiones del currículum.</p>
+          {/* ── MEDIA + FEATURES (reemplaza features-band) ── */}
+          <section className="bach-media">
+            <div className="bach-media-photo-col">
+              <div className="bach-media-img">
+                <i className="fas fa-school"></i>
+                <span>Foto plantel educativo</span>
+              </div>
+              <div className="bach-media-img-badge">
+                <i className="fas fa-shield-alt"></i>
+                Seguridad PKCE · LFPDPPP
+              </div>
             </div>
-            <div className="feat-card featured">
-              <div className="feat-icon"><i className="fas fa-landmark"></i></div>
-              <h3>Alineado al MCCEMS</h3>
-              <p>Acuerdo 09/08/23 y Modelo Educativo 2025. Marco oficial de la SEP para bachillerato.</p>
-            </div>
-            <div className="feat-card">
-              <div className="feat-icon"><i className="fas fa-chart-bar"></i></div>
-              <h3>Dashboard docente</h3>
-              <p>Métricas por grupo, alumno y UAC en tiempo real. Reportes exportables al instante.</p>
-            </div>
-            <div className="feat-card">
-              <div className="feat-icon"><i className="fas fa-school"></i></div>
-              <h3>Gestión institucional</h3>
-              <p>Multi-tenant con aislamiento total por Row Level Security. Una o múltiples escuelas.</p>
+            <div className="bach-media-content-col">
+              <span className="bach-media-eyebrow">
+                <i className="fas fa-layer-group"></i>
+                Plataforma integral
+              </span>
+              <h2 className="bach-media-title">
+                Todo lo que necesita<br />su <em>institución</em> desde el día uno
+              </h2>
+              <ul className="bach-media-features">
+                {[
+                  { icon: 'fa-th-large', title: 'Hub estudiantil por semestre', desc: 'Vista personalizada de UAC, progreso por progresión y acceso a todo el currículo oficial.' },
+                  { icon: 'fa-chart-line', title: 'Dashboard docente en tiempo real', desc: 'Métricas por grupo, alumno y UAC. Detecta quién necesita apoyo antes del examen.' },
+                  { icon: 'fa-school', title: 'Gestión multi-escuela', desc: 'Arquitectura multi-tenant con Row Level Security. Una o múltiples instituciones.' },
+                  { icon: 'fa-file-alt', title: 'Alineación MCCEMS 100%', desc: 'Acuerdo 09/08/23 y Modelo Educativo 2025. Marco oficial SEP implementado al detalle.' },
+                ].map((f) => (
+                  <li key={f.title} className="bach-feature-item">
+                    <div className="bach-feature-icon">
+                      <i className={`fas ${f.icon}`}></i>
+                    </div>
+                    <div>
+                      <div className="bach-feature-title">{f.title}</div>
+                      <div className="bach-feature-desc">{f.desc}</div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
             </div>
           </section>
 
@@ -383,7 +447,7 @@ export default function LandingPageBachillerato() {
           {/* ── FOOTER ── */}
           <footer className="footer">
             <div className="footer-brand">
-              <div className="logo-mark" style={{ marginBottom: '20px' }}><span>C</span></div>
+              <div className="logo-mark" style={{ marginBottom: '20px' }}><img src="/Logo%20Cen.png" alt="CEN" style={{ width: 28, height: 28, objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.92 }} /></div>
               <h4>CEN Bachillerato<br />Campaña Educativa Nacional</h4>
               <div className="fc-block">
                 <div className="fc-label">Correo electrónico</div>
