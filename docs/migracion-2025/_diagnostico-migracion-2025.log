@@ -28,3 +28,14 @@
 [2026-05-17] FASE 4 — seed-cneyti.ts: 8 propósitos oficiales CNEYT-I (es_placeholder=false); reemplaza 10 placeholders
 [2026-05-17] FASE 4 — Tests: 150 pasando, 0 fallos; tsc --noEmit sin errores
 [2026-05-17] FASE 4 COMPLETADA — 7 UAC del Semestre 1 con propósitos oficiales 2025
+[2026-05-17] FASE 5 INICIADA — documentación post-migración
+[2026-05-17] FASE 5 — REPORTE-EJECUTIVO.md actualizado: 342→334 corregido; D-001/D-002/D-003/D-005 marcadas RESUELTAS; D-004 pendiente decisión; sección 11 agregada
+[2026-05-17] FASE 5 — docs/migracion-2025/MIGRACION-COMPLETADA.md creado
+[2026-05-17] FASE 5 COMPLETADA
+[2026-05-17] FASE 6 INICIADA — validación final y push
+[2026-05-17] FASE 6 — npm run lint: 33 issues pre-existentes en supabase-browser.test.ts; 0 issues en archivos de migración
+[2026-05-17] FASE 6 — npm test: 150 pasando, 0 fallos
+[2026-05-17] FASE 6 — npm run pages:build: SUCCESS (OpenNext build complete)
+[2026-05-17] FASE 6 — git push origin main: 8 commits pusheados (a918a25..040379c)
+[2026-05-17] FASE 6 COMPLETADA
+[2026-05-17] MIGRACIÓN AL MODELO EDUCATIVO 2025 — COMPLETADA ✅
