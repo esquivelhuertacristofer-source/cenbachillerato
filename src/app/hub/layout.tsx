@@ -19,9 +19,9 @@ export default async function HubLayout({
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50">
+    <div data-hub-layout="" style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: '#F8FAFC' }}>
       <Sidebar profile={profile} />
-      <main className="flex-1 overflow-y-auto p-6">{children}</main>
+      <main data-hub-main="" style={{ flex: 1, overflowY: 'auto', padding: 32 }}>{children}</main>
     </div>
   );
 }

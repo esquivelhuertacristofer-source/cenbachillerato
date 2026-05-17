@@ -27,42 +27,53 @@ export default async function HubPage() {
   const nombre = profile.full_name?.split(" ")[0] ?? "Alumno";
 
   return (
-    <div className="space-y-8">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 32, maxWidth: 1100 }}>
+
       {/* Saludo */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">
-          Hola, {nombre} 👋
+        <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#1E40AF', marginBottom: 8 }}>
+          <i className="fa-solid fa-circle" style={{ fontSize: 8, color: '#10b981', marginRight: 6 }} />
+          Sesión activa
+        </div>
+        <h1 style={{ fontSize: 26, fontWeight: 900, color: '#0B2545', letterSpacing: '-0.03em', margin: '0 0 4px' }}>
+          Hola, {nombre}
         </h1>
-        <p className="mt-1 text-gray-500">
+        <p style={{ fontSize: 14, color: 'rgba(11,37,69,0.55)', margin: 0 }}>
           Semestre {semestreActual}
           {profile.area_eleccion ? ` · ${profile.area_eleccion}` : ""}
         </p>
       </div>
 
       {/* Banner de próximo contenido */}
-      <div className="rounded-xl border border-indigo-100 bg-indigo-50 p-5">
-        <div className="flex items-start gap-4">
-          <span className="text-2xl">🏗️</span>
-          <div>
-            <h2 className="font-semibold text-indigo-900">
-              Contenido pedagógico en desarrollo
-            </h2>
-            <p className="mt-1 text-sm text-indigo-700">
-              La estructura curricular MCCEMS está cargada. Las actividades y
-              progresiones de aprendizaje se publicarán próximamente. Por ahora
-              puedes explorar la organización por semestre y UAC.
-            </p>
-          </div>
+      <div style={{
+        borderRadius: 16,
+        border: '1px solid rgba(30,64,175,0.15)',
+        background: '#EFF6FF',
+        padding: '20px 24px',
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: 16,
+      }}>
+        <i className="fa-solid fa-hammer" style={{ fontSize: 22, color: '#1E40AF', marginTop: 2, flexShrink: 0 }} />
+        <div>
+          <h2 style={{ fontSize: 15, fontWeight: 800, color: '#0B2545', margin: '0 0 4px' }}>
+            Contenido pedagógico en desarrollo
+          </h2>
+          <p style={{ fontSize: 13, color: 'rgba(11,37,69,0.65)', margin: 0, lineHeight: 1.6 }}>
+            La estructura curricular MCCEMS está cargada. Las actividades y
+            progresiones de aprendizaje se publicarán próximamente. Por ahora
+            puedes explorar la organización por semestre y UAC.
+          </p>
         </div>
       </div>
 
       {/* UAC del semestre actual */}
       <div>
-        <h2 className="mb-4 text-lg font-semibold text-gray-900">
+        <h2 style={{ fontSize: 18, fontWeight: 800, color: '#0B2545', letterSpacing: '-0.02em', marginBottom: 16 }}>
           Tus UAC — Semestre {semestreActual}
         </h2>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16 }}>
           {uacDelSemestre.map((uac) => {
             const recurso = uac.recursoCodigo
               ? RECURSOS_SOCIOCOGNITIVOS.find((r) => r.codigo === uac.recursoCodigo)
@@ -90,18 +101,36 @@ export default async function HubPage() {
 
       {/* Recursos Socioemocionales */}
       <div>
-        <h2 className="mb-4 text-lg font-semibold text-gray-900">
+        <h2 style={{ fontSize: 18, fontWeight: 800, color: '#0B2545', letterSpacing: '-0.02em', marginBottom: 16 }}>
           Ámbitos de Formación Socioemocional
         </h2>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 12 }}>
           {RECURSOS_SOCIOEMOCIONALES.map((rse) => (
             <div
               key={rse.codigo}
-              className="rounded-xl border border-green-100 bg-green-50 p-4"
+              style={{
+                borderRadius: 14,
+                border: '1px solid rgba(11,37,69,0.10)',
+                background: '#fff',
+                padding: '16px 20px',
+              }}
             >
-              <p className="font-medium text-green-900">{rse.nombre}</p>
-              <p className="mt-1 text-xs text-green-700">{rse.descripcion}</p>
-              <span className="mt-2 inline-block rounded-full bg-green-100 px-2.5 py-0.5 text-xs text-green-600">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                <i className="fa-solid fa-seedling" style={{ fontSize: 14, color: '#1E40AF' }} />
+                <p style={{ fontSize: 13, fontWeight: 700, color: '#0B2545', margin: 0 }}>{rse.nombre}</p>
+              </div>
+              <p style={{ fontSize: 12, color: 'rgba(11,37,69,0.55)', margin: '0 0 10px', lineHeight: 1.5 }}>
+                {rse.descripcion}
+              </p>
+              <span style={{
+                display: 'inline-block',
+                borderRadius: 999,
+                background: 'rgba(11,37,69,0.07)',
+                padding: '2px 10px',
+                fontSize: 11,
+                fontWeight: 600,
+                color: 'rgba(11,37,69,0.50)',
+              }}>
                 Transversal
               </span>
             </div>

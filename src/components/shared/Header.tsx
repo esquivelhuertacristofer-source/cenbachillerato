@@ -9,7 +9,7 @@ export function Header({ variant = "cen" }: HeaderProps) {
     <header className="sticky top-0 z-40 border-b border-gray-200 bg-white/95 backdrop-blur-sm">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-2">
-          <span className="text-xl font-bold text-indigo-700">CEN</span>
+          <span className="text-xl font-bold text-[#0B2545]">CEN</span>
           {variant === "bachillerato" && (
             <span className="hidden text-sm font-medium text-gray-500 sm:block">
               Bachillerato
@@ -22,13 +22,13 @@ export function Header({ variant = "cen" }: HeaderProps) {
             <>
               <Link
                 href="/bachillerato#estructura"
-                className="text-sm text-gray-600 hover:text-indigo-700"
+                className="text-sm text-gray-600 hover:text-[#1E40AF]"
               >
                 Estructura MCCEMS
               </Link>
               <Link
                 href="/bachillerato#para-quien"
-                className="text-sm text-gray-600 hover:text-indigo-700"
+                className="text-sm text-gray-600 hover:text-[#1E40AF]"
               >
                 Para quién
               </Link>
@@ -36,7 +36,7 @@ export function Header({ variant = "cen" }: HeaderProps) {
           ) : (
             <Link
               href="/#productos"
-              className="text-sm text-gray-600 hover:text-indigo-700"
+              className="text-sm text-gray-600 hover:text-[#1E40AF]"
             >
               Productos
             </Link>
@@ -45,7 +45,7 @@ export function Header({ variant = "cen" }: HeaderProps) {
 
         <Link
           href="/log-in"
-          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+          className="rounded-lg bg-[#0B2545] px-4 py-2 text-sm font-medium text-white hover:bg-[#1E40AF]"
         >
           Acceder
         </Link>

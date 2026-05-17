@@ -18,10 +18,18 @@ export function SemestreSelector({
 
   return (
     <div>
-      <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
+      <p style={{
+        padding: '0 12px',
+        marginBottom: 8,
+        fontSize: 10,
+        fontWeight: 700,
+        textTransform: 'uppercase',
+        letterSpacing: '0.12em',
+        color: 'rgba(125,211,252,0.55)',
+      }}>
         Semestre
       </p>
-      <div className="flex flex-wrap gap-1 px-3">
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, padding: '0 12px' }}>
         {semestres.map((s) => {
           const disponible = semestresDisponibles.includes(s);
           const activo = s === semestreActual || pathname.includes(`/semestre/${s}`);
@@ -30,7 +38,14 @@ export function SemestreSelector({
             return (
               <span
                 key={s}
-                className="flex h-8 w-8 cursor-not-allowed items-center justify-center rounded-lg text-sm text-gray-300"
+                style={{
+                  width: 32, height: 32,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  borderRadius: 8,
+                  fontSize: 13,
+                  color: 'rgba(255,255,255,0.20)',
+                  cursor: 'not-allowed',
+                }}
                 title={`Semestre ${s} — no disponible`}
               >
                 {s}
@@ -42,12 +57,17 @@ export function SemestreSelector({
             <Link
               key={s}
               href={`/hub/semestre/${s}`}
-              className={[
-                "flex h-8 w-8 items-center justify-center rounded-lg text-sm font-medium transition-colors",
-                activo
-                  ? "bg-indigo-600 text-white"
-                  : "text-gray-600 hover:bg-gray-100",
-              ].join(" ")}
+              style={{
+                width: 32, height: 32,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                borderRadius: 8,
+                fontSize: 13,
+                fontWeight: activo ? 700 : 500,
+                textDecoration: 'none',
+                color: activo ? '#7DD3FC' : 'rgba(255,255,255,0.55)',
+                background: activo ? 'rgba(125,211,252,0.15)' : 'transparent',
+                transition: 'all 0.15s ease',
+              }}
             >
               {s}
             </Link>

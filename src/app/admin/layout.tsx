@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getUser, getProfile } from "@/lib/supabase-helpers";
+import { AdminHeader } from "@/components/dashboard/AdminHeader";
 
 export default async function AdminLayout({
   children,
@@ -15,5 +16,10 @@ export default async function AdminLayout({
   if (profile.role === "student") redirect("/hub");
   if (profile.role === "teacher") redirect("/dashboard/docente");
 
-  return <>{children}</>;
+  return (
+    <div style={{ minHeight: '100vh', background: '#F8FAFC' }}>
+      <AdminHeader />
+      {children}
+    </div>
+  );
 }

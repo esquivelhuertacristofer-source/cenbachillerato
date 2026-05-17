@@ -12,11 +12,11 @@ const ROLE_LABELS: Record<string, string> = {
   super_admin: "Super Admin",
 };
 
-const ROLE_COLORS: Record<string, string> = {
-  student: "bg-blue-50 text-blue-700",
-  teacher: "bg-green-50 text-green-700",
-  admin: "bg-amber-50 text-amber-700",
-  super_admin: "bg-red-50 text-red-700",
+const ROLE_STYLES: Record<string, { background: string; color: string }> = {
+  student: { background: '#DBEAFE', color: '#1E40AF' },
+  teacher: { background: 'rgba(125,211,252,0.18)', color: '#0B2545' },
+  admin: { background: 'rgba(11,37,69,0.10)', color: '#0B2545' },
+  super_admin: { background: '#0B2545', color: '#7DD3FC' },
 };
 
 export default async function UsuariosAdminPage() {
@@ -33,86 +33,112 @@ export default async function UsuariosAdminPage() {
     admin: usuarios?.filter((u) => u.role === "admin" || u.role === "super_admin").length ?? 0,
   };
 
+  const summaryCards = [
+    { label: 'Alumnos', value: totales.student, icon: 'fa-solid fa-graduation-cap' },
+    { label: 'Docentes', value: totales.teacher, icon: 'fa-solid fa-chalkboard-user' },
+    { label: 'Admins', value: totales.admin, icon: 'fa-solid fa-shield-halved' },
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="border-b border-gray-200 bg-white px-6 py-4">
-        <div className="mx-auto flex max-w-7xl items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">Panel de Administración</h1>
-            <p className="text-sm text-gray-500">CEN Bachillerato</p>
-          </div>
-          <nav className="flex items-center gap-4 text-sm">
-            <a href="/admin/escuelas" className="text-gray-600 hover:text-indigo-700">Escuelas</a>
-            <a href="/admin/grupos" className="text-gray-600 hover:text-indigo-700">Grupos</a>
-            <a href="/admin/usuarios" className="font-medium text-indigo-700">Usuarios</a>
-          </nav>
-        </div>
-      </header>
+    <main style={{ maxWidth: 1280, margin: '0 auto', padding: '40px 24px 64px' }}>
 
-      <main className="mx-auto max-w-7xl px-6 py-8">
-        {/* Resumen por rol */}
-        <div className="mb-6 grid grid-cols-3 gap-4">
-          <div className="rounded-xl border border-gray-200 bg-white p-4 text-center">
-            <p className="text-2xl font-bold text-blue-600">{totales.student}</p>
-            <p className="mt-1 text-sm text-gray-500">Alumnos</p>
-          </div>
-          <div className="rounded-xl border border-gray-200 bg-white p-4 text-center">
-            <p className="text-2xl font-bold text-green-600">{totales.teacher}</p>
-            <p className="mt-1 text-sm text-gray-500">Docentes</p>
-          </div>
-          <div className="rounded-xl border border-gray-200 bg-white p-4 text-center">
-            <p className="text-2xl font-bold text-amber-600">{totales.admin}</p>
-            <p className="mt-1 text-sm text-gray-500">Admins</p>
-          </div>
+      <div style={{ marginBottom: 32 }}>
+        <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#1E40AF', marginBottom: 8 }}>
+          Admin · Usuarios
         </div>
+        <h1 style={{ fontSize: 26, fontWeight: 900, color: '#0B2545', letterSpacing: '-0.03em', margin: 0 }}>
+          Usuarios
+          <span style={{
+            display: 'inline-flex',
+            marginLeft: 12,
+            borderRadius: 999,
+            background: 'rgba(11,37,69,0.08)',
+            padding: '2px 12px',
+            fontSize: 15,
+            fontWeight: 600,
+            color: 'rgba(11,37,69,0.50)',
+            verticalAlign: 'middle',
+          }}>
+            {usuarios?.length ?? 0}
+          </span>
+        </h1>
+      </div>
 
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-900">
-            Todos los usuarios{" "}
-            <span className="ml-2 rounded-full bg-gray-100 px-3 py-0.5 text-base font-normal text-gray-500">
-              {usuarios?.length ?? 0}
-            </span>
-          </h2>
-        </div>
-
-        {!usuarios || usuarios.length === 0 ? (
-          <div className="flex flex-col items-center rounded-2xl border-2 border-dashed border-gray-200 bg-white py-20 text-center">
-            <span className="text-5xl">👤</span>
-            <h3 className="mt-4 text-lg font-semibold text-gray-900">Sin usuarios</h3>
+      {/* Resumen por rol */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 32 }}>
+        {summaryCards.map((card) => (
+          <div key={card.label} style={{
+            background: '#0B2545',
+            border: '1px solid rgba(255,255,255,0.09)',
+            borderRadius: 20,
+            padding: '24px 28px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 12,
+          }}>
+            <i className={card.icon} style={{ fontSize: 20, color: '#7DD3FC' }} />
+            <div>
+              <div style={{ fontSize: 32, fontWeight: 900, color: '#fff', letterSpacing: '-0.03em', lineHeight: 1 }}>
+                {card.value}
+              </div>
+              <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.60)', marginTop: 4 }}>
+                {card.label}
+              </div>
+            </div>
           </div>
-        ) : (
-          <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50">
-                <tr className="text-left text-gray-500">
-                  <th className="px-6 py-3 font-medium">Nombre</th>
-                  <th className="px-6 py-3 font-medium">Email</th>
-                  <th className="px-6 py-3 font-medium">Rol</th>
-                  <th className="px-6 py-3 font-medium">Semestre</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {usuarios.map((u) => (
-                  <tr key={u.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 font-medium text-gray-900">
+        ))}
+      </div>
+
+      {!usuarios || usuarios.length === 0 ? (
+        <div style={{
+          display: 'flex', flexDirection: 'column', alignItems: 'center',
+          borderRadius: 24, border: '2px dashed rgba(11,37,69,0.14)',
+          background: '#fff', padding: '80px 32px', textAlign: 'center',
+        }}>
+          <i className="fa-solid fa-user" style={{ fontSize: 44, color: 'rgba(11,37,69,0.14)', marginBottom: 20 }} />
+          <h3 style={{ fontSize: 18, fontWeight: 800, color: '#0B2545', margin: 0 }}>Sin usuarios</h3>
+        </div>
+      ) : (
+        <div style={{ overflow: 'hidden', borderRadius: 20, border: '1px solid rgba(11,37,69,0.10)', background: '#fff' }}>
+          <table style={{ width: '100%', fontSize: 14, borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ background: '#F8FAFC', borderBottom: '1px solid rgba(11,37,69,0.08)' }}>
+                <th style={{ padding: '12px 24px', textAlign: 'left', fontWeight: 700, fontSize: 11, color: 'rgba(11,37,69,0.50)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Nombre</th>
+                <th style={{ padding: '12px 24px', textAlign: 'left', fontWeight: 700, fontSize: 11, color: 'rgba(11,37,69,0.50)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Email</th>
+                <th style={{ padding: '12px 24px', textAlign: 'left', fontWeight: 700, fontSize: 11, color: 'rgba(11,37,69,0.50)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Rol</th>
+                <th style={{ padding: '12px 24px', textAlign: 'left', fontWeight: 700, fontSize: 11, color: 'rgba(11,37,69,0.50)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Semestre</th>
+              </tr>
+            </thead>
+            <tbody>
+              {usuarios.map((u) => {
+                const roleStyle = ROLE_STYLES[u.role] ?? { background: 'rgba(11,37,69,0.07)', color: '#0B2545' };
+                return (
+                  <tr key={u.id} style={{ borderBottom: '1px solid rgba(11,37,69,0.06)' }}>
+                    <td style={{ padding: '14px 24px', fontWeight: 600, color: '#0B2545' }}>
                       {u.full_name ?? "—"}
                     </td>
-                    <td className="px-6 py-4 text-gray-500">{u.email}</td>
-                    <td className="px-6 py-4">
-                      <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${ROLE_COLORS[u.role] ?? "bg-gray-100 text-gray-600"}`}>
+                    <td style={{ padding: '14px 24px', color: 'rgba(11,37,69,0.60)', fontSize: 13 }}>{u.email}</td>
+                    <td style={{ padding: '14px 24px' }}>
+                      <span style={{
+                        borderRadius: 999,
+                        padding: '3px 10px',
+                        fontSize: 11,
+                        fontWeight: 700,
+                        ...roleStyle,
+                      }}>
                         {ROLE_LABELS[u.role] ?? u.role}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-gray-500">
+                    <td style={{ padding: '14px 24px', color: 'rgba(11,37,69,0.60)' }}>
                       {u.semestre ? `${u.semestre}°` : "—"}
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </main>
-    </div>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </main>
   );
 }

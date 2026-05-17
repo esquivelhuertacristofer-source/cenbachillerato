@@ -26,29 +26,42 @@ export default async function SemestrePage({ params }: Props) {
   const uacSemestre = UAC_BASE.filter((uac) => uac.semestre === semestre);
 
   return (
-    <div className="space-y-8">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 28, maxWidth: 1100 }}>
+
       <div>
-        <nav className="mb-2 flex items-center gap-2 text-sm text-gray-400">
-          <a href="/hub" className="hover:text-gray-600">Mi Hub</a>
-          <span>/</span>
-          <span className="text-gray-700">Semestre {semestre}</span>
+        <nav style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'rgba(11,37,69,0.45)', marginBottom: 12 }}>
+          <a href="/hub" style={{ color: 'rgba(11,37,69,0.45)', textDecoration: 'none' }}>Mi Hub</a>
+          <i className="fa-solid fa-chevron-right" style={{ fontSize: 9 }} />
+          <span style={{ color: '#0B2545', fontWeight: 600 }}>Semestre {semestre}</span>
         </nav>
-        <h1 className="text-2xl font-bold text-gray-900">Semestre {semestre}</h1>
-        <p className="mt-1 text-gray-500">
+        <h1 style={{ fontSize: 26, fontWeight: 900, color: '#0B2545', letterSpacing: '-0.03em', margin: '0 0 4px' }}>
+          Semestre {semestre}
+        </h1>
+        <p style={{ fontSize: 14, color: 'rgba(11,37,69,0.55)', margin: 0 }}>
           Unidades de Aprendizaje Curricular — Currículum Fundamental
         </p>
       </div>
 
-      {/* UAC del semestre */}
       {uacSemestre.length > 0 && (
         <section>
-          <div className="mb-2 inline-block rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700">
-            Currículum Fundamental
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+            <span style={{
+              borderRadius: 999,
+              background: '#DBEAFE',
+              padding: '4px 14px',
+              fontSize: 11,
+              fontWeight: 700,
+              color: '#1E40AF',
+              letterSpacing: '0.04em',
+              textTransform: 'uppercase',
+            }}>
+              Currículum Fundamental
+            </span>
+            <h2 style={{ fontSize: 16, fontWeight: 700, color: '#0B2545', margin: 0 }}>
+              Recursos Sociocognitivos
+            </h2>
           </div>
-          <h2 className="text-lg font-semibold text-gray-900">
-            Recursos Sociocognitivos
-          </h2>
-          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16 }}>
             {uacSemestre.map((uac) => {
               const recurso = RECURSOS_SOCIOCOGNITIVOS.find(
                 (r) => r.codigo === uac.recursoCodigo

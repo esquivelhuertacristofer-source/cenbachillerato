@@ -33,29 +33,54 @@ export function Sidebar({ profile }: SidebarProps) {
     }
   }
 
+  const initials = (profile.full_name ?? profile.email).charAt(0).toUpperCase();
+
   return (
-    <aside className="flex h-full w-64 flex-col border-r border-gray-200 bg-white">
+    <aside style={{
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100%',
+      width: 256,
+      background: '#0B2545',
+      borderRight: '1px solid rgba(255,255,255,0.07)',
+      flexShrink: 0,
+    }}>
       {/* Logo */}
-      <div className="flex items-center gap-2 border-b border-gray-200 px-4 py-4">
-        <Link href="/hub" className="flex items-center gap-2">
-          <span className="text-lg font-bold text-indigo-700">CEN</span>
-          <span className="text-sm text-gray-500">Bachillerato</span>
+      <div style={{ padding: '16px 16px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+        <Link href="/hub" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+          <img
+            src="/Logo%20Cen.png"
+            alt="CEN"
+            style={{ width: 30, height: 30, objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.92 }}
+          />
+          <div>
+            <div style={{ color: '#fff', fontWeight: 700, fontSize: 14, lineHeight: 1.2 }}>CEN Bachillerato</div>
+            <div style={{ color: 'rgba(125,211,252,0.65)', fontSize: 11, fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+              Hub Alumno
+            </div>
+          </div>
         </Link>
       </div>
 
       {/* Perfil del alumno */}
-      <div className="border-b border-gray-100 px-4 py-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-sm font-semibold text-indigo-700">
-            {(profile.full_name ?? profile.email)
-              .charAt(0)
-              .toUpperCase()}
+      <div style={{ padding: '16px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{
+            width: 36, height: 36,
+            borderRadius: '50%',
+            background: 'rgba(125,211,252,0.15)',
+            border: '1.5px solid rgba(125,211,252,0.35)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 14, fontWeight: 700, color: '#7DD3FC',
+            flexShrink: 0,
+          }}>
+            {initials}
           </div>
-          <div className="min-w-0">
-            <p className="truncate text-sm font-medium text-gray-900">
+          <div style={{ minWidth: 0 }}>
+            <p style={{ fontSize: 13, fontWeight: 600, color: '#fff', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {profile.full_name ?? "Alumno"}
             </p>
-            <p className="truncate text-xs text-gray-500">
+            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.50)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               Semestre {semestreActual}
               {profile.area_eleccion && ` · ${profile.area_eleccion}`}
             </p>
@@ -64,8 +89,8 @@ export function Sidebar({ profile }: SidebarProps) {
       </div>
 
       {/* Navegación scrollable */}
-      <nav className="flex-1 overflow-y-auto py-4">
-        <div className="space-y-6">
+      <nav style={{ flex: 1, overflowY: 'auto', padding: '16px 0' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
           {/* Selector de semestre */}
           <SemestreSelector
             semestreActual={semestreActual}
@@ -74,10 +99,18 @@ export function Sidebar({ profile }: SidebarProps) {
 
           {/* Recursos Sociocognitivos del semestre */}
           <div>
-            <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
+            <p style={{
+              padding: '0 12px',
+              marginBottom: 6,
+              fontSize: 10,
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.12em',
+              color: 'rgba(125,211,252,0.55)',
+            }}>
               Recursos Sociocognitivos
             </p>
-            <ul className="space-y-0.5">
+            <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
               {uacDelSemestre.map((uac) => {
                 const recurso = RECURSOS_SOCIOCOGNITIVOS.find(
                   (r) => r.codigo === uac.recursoCodigo
@@ -86,10 +119,20 @@ export function Sidebar({ profile }: SidebarProps) {
                   <li key={uac.codigo}>
                     <Link
                       href={`/hub/uac/${uac.codigo}`}
-                      className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        padding: '7px 12px',
+                        margin: '1px 8px',
+                        borderRadius: 8,
+                        fontSize: 13,
+                        color: 'rgba(255,255,255,0.75)',
+                        textDecoration: 'none',
+                      }}
                     >
-                      <span>{recurso?.icono ?? "📚"}</span>
-                      <span className="truncate">{uac.nombre}</span>
+                      <span style={{ fontSize: 15, lineHeight: 1 }}>{recurso?.icono ?? "📚"}</span>
+                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{uac.nombre}</span>
                     </Link>
                   </li>
                 );
@@ -99,15 +142,32 @@ export function Sidebar({ profile }: SidebarProps) {
 
           {/* Ámbitos de Formación Socioemocional */}
           <div>
-            <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
+            <p style={{
+              padding: '0 12px',
+              marginBottom: 6,
+              fontSize: 10,
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.12em',
+              color: 'rgba(125,211,252,0.55)',
+            }}>
               Formación Socioemocional
             </p>
-            <ul className="space-y-0.5">
+            <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
               {RECURSOS_SOCIOEMOCIONALES.map((rse) => (
                 <li key={rse.codigo}>
-                  <span className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-500">
-                    <span>🌱</span>
-                    <span className="truncate text-xs">{rse.nombre}</span>
+                  <span style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    padding: '7px 12px',
+                    margin: '1px 8px',
+                    borderRadius: 8,
+                    fontSize: 12,
+                    color: 'rgba(255,255,255,0.40)',
+                  }}>
+                    <i className="fa-solid fa-seedling" style={{ fontSize: 12, width: 15, flexShrink: 0 }} />
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{rse.nombre}</span>
                   </span>
                 </li>
               ))}
@@ -117,12 +177,25 @@ export function Sidebar({ profile }: SidebarProps) {
       </nav>
 
       {/* Footer del sidebar */}
-      <div className="border-t border-gray-200 p-4">
+      <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', padding: '12px 8px' }}>
         <button
           onClick={handleLogout}
-          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-500 hover:bg-red-50 hover:text-red-600"
+          style={{
+            display: 'flex',
+            width: '100%',
+            alignItems: 'center',
+            gap: 8,
+            padding: '8px 12px',
+            borderRadius: 8,
+            fontSize: 13,
+            color: 'rgba(255,255,255,0.45)',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            textAlign: 'left',
+          }}
         >
-          <span>→</span>
+          <i className="fa-solid fa-arrow-right-from-bracket" style={{ fontSize: 13 }} />
           <span>Cerrar sesión</span>
         </button>
       </div>

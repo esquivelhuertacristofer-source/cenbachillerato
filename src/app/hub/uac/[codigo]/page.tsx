@@ -34,80 +34,141 @@ export default async function UACPage({ params }: Props) {
   const progresiones = await getProgresionesDeUAC(codigo);
 
   return (
-    <div className="space-y-6">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 860 }}>
+
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-sm text-gray-400">
-        <Link href="/hub" className="hover:text-gray-600">
-          Mi Hub
-        </Link>
-        <span>/</span>
-        <Link href={`/hub/semestre/${uac.semestre}`} className="hover:text-gray-600">
+      <nav style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'rgba(11,37,69,0.45)' }}>
+        <Link href="/hub" style={{ color: 'rgba(11,37,69,0.45)', textDecoration: 'none' }}>Mi Hub</Link>
+        <i className="fa-solid fa-chevron-right" style={{ fontSize: 9 }} />
+        <Link href={`/hub/semestre/${uac.semestre}`} style={{ color: 'rgba(11,37,69,0.45)', textDecoration: 'none' }}>
           Semestre {uac.semestre}
         </Link>
-        <span>/</span>
-        <span className="text-gray-700">{uac.nombre}</span>
+        <i className="fa-solid fa-chevron-right" style={{ fontSize: 9 }} />
+        <span style={{ color: '#0B2545', fontWeight: 600 }}>{uac.nombre}</span>
       </nav>
 
       {/* Header UAC */}
-      <div className="rounded-xl border border-gray-200 bg-white p-6">
-        <div className="flex items-start gap-4">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-indigo-100 text-2xl">
-            {recurso?.icono ?? "📚"}
-          </div>
-          <div>
-            <div className="flex flex-wrap gap-2">
-              {recurso && (
-                <span className="rounded-full bg-indigo-100 px-3 py-0.5 text-xs font-medium text-indigo-700">
-                  {recurso.nombre}
-                </span>
-              )}
-              <span className="rounded-full bg-gray-100 px-3 py-0.5 text-xs text-gray-600">
-                Semestre {uac.semestre}
+      <div style={{
+        borderRadius: 20,
+        border: '1px solid rgba(11,37,69,0.10)',
+        background: '#fff',
+        padding: 28,
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: 20,
+      }}>
+        <div style={{
+          width: 56, height: 56,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          borderRadius: 16,
+          background: '#DBEAFE',
+          fontSize: 26,
+          flexShrink: 0,
+        }}>
+          {recurso?.icono ?? "📚"}
+        </div>
+        <div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
+            {recurso && (
+              <span style={{
+                borderRadius: 999,
+                background: '#DBEAFE',
+                padding: '3px 12px',
+                fontSize: 11,
+                fontWeight: 700,
+                color: '#1E40AF',
+                letterSpacing: '0.04em',
+              }}>
+                {recurso.nombre}
               </span>
-            </div>
-            <h1 className="mt-2 text-2xl font-bold text-gray-900">{uac.nombre}</h1>
-            <p className="mt-1 text-sm text-gray-500">
-              {progresiones.length > 0
-                ? `${progresiones.length} progresiones de aprendizaje`
-                : `${uac.totalProgresionesEsperadas} progresiones esperadas — contenido en preparación`}
-            </p>
+            )}
+            <span style={{
+              borderRadius: 999,
+              background: 'rgba(11,37,69,0.07)',
+              padding: '3px 12px',
+              fontSize: 11,
+              fontWeight: 600,
+              color: 'rgba(11,37,69,0.50)',
+            }}>
+              Semestre {uac.semestre}
+            </span>
           </div>
+          <h1 style={{ fontSize: 22, fontWeight: 900, color: '#0B2545', letterSpacing: '-0.02em', margin: '0 0 6px' }}>
+            {uac.nombre}
+          </h1>
+          <p style={{ fontSize: 13, color: 'rgba(11,37,69,0.55)', margin: 0 }}>
+            {progresiones.length > 0
+              ? `${progresiones.length} progresiones de aprendizaje`
+              : `${uac.totalProgresionesEsperadas} progresiones esperadas — contenido en preparación`}
+          </p>
         </div>
       </div>
 
       {/* Lista de progresiones */}
       <div>
-        <h2 className="mb-4 text-lg font-semibold text-gray-900">
+        <h2 style={{ fontSize: 17, fontWeight: 800, color: '#0B2545', letterSpacing: '-0.02em', marginBottom: 14 }}>
           Progresiones de Aprendizaje
         </h2>
 
         {progresiones.length === 0 ? (
-          <div className="rounded-xl border-2 border-dashed border-gray-200 bg-white p-10 text-center">
-            <span className="text-4xl">🏗️</span>
-            <p className="mt-4 font-medium text-gray-700">Contenido en preparación</p>
-            <p className="mt-1 text-sm text-gray-400">
+          <div style={{
+            borderRadius: 20,
+            border: '2px dashed rgba(11,37,69,0.14)',
+            background: '#fff',
+            padding: '48px 32px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            textAlign: 'center',
+          }}>
+            <i className="fa-solid fa-hammer" style={{ fontSize: 36, color: 'rgba(11,37,69,0.14)', marginBottom: 16 }} />
+            <p style={{ fontSize: 15, fontWeight: 700, color: '#0B2545', margin: '0 0 4px' }}>Contenido en preparación</p>
+            <p style={{ fontSize: 13, color: 'rgba(11,37,69,0.50)', margin: 0 }}>
               Las progresiones de esta UAC se publicarán próximamente.
             </p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {progresiones.map((prog) => (
               <Link
                 key={prog.id}
                 href={`/hub/uac/${codigo}/progresion/${prog.numero}`}
-                className="block"
+                style={{ textDecoration: 'none', display: 'block' }}
               >
-                <div className="flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-4 hover:border-indigo-300 hover:bg-indigo-50 transition-colors">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-700">
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 16,
+                  borderRadius: 14,
+                  border: '1px solid rgba(11,37,69,0.10)',
+                  background: '#fff',
+                  padding: 16,
+                  transition: 'border-color 0.2s ease, background 0.2s ease',
+                  cursor: 'pointer',
+                }}>
+                  <div style={{
+                    width: 36, height: 36,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    borderRadius: '50%',
+                    background: '#DBEAFE',
+                    fontSize: 13,
+                    fontWeight: 800,
+                    color: '#1E40AF',
+                    flexShrink: 0,
+                  }}>
                     {prog.numero}
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium text-gray-900 truncate">{prog.titulo}</p>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ fontSize: 14, fontWeight: 600, color: '#0B2545', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {prog.titulo}
+                    </p>
                     {prog.descripcion && (
-                      <p className="mt-0.5 text-sm text-gray-500 truncate">{prog.descripcion}</p>
+                      <p style={{ fontSize: 12, color: 'rgba(11,37,69,0.50)', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {prog.descripcion}
+                      </p>
                     )}
                   </div>
-                  <span className="shrink-0 text-gray-300">›</span>
+                  <i className="fa-solid fa-chevron-right" style={{ fontSize: 12, color: 'rgba(11,37,69,0.25)', flexShrink: 0 }} />
                 </div>
               </Link>
             ))}

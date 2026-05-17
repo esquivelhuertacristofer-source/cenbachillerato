@@ -120,12 +120,7 @@ export default function LoginPage() {
           {/* Logo */}
           <div className="relative z-10">
             <Link href="/" className="inline-flex items-center gap-4 group" style={{ textDecoration: 'none' }}>
-              <div
-                className="flex items-center justify-center rounded-xl shadow-lg group-hover:scale-105 transition-transform"
-                style={{ width: 48, height: 48, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.15)' }}
-              >
-                <span style={{ color: '#fff', fontWeight: 900, fontSize: 22, lineHeight: 1 }}>C</span>
-              </div>
+              <img src="/Logo%20Cen.png" alt="CEN" style={{ width: 44, height: 44, objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.92 }} />
               <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
                 <span style={{ color: '#fff', fontWeight: 900, fontSize: 18, letterSpacing: '-0.02em' }}>CEN</span>
                 <span style={{ color: 'rgba(255,255,255,0.5)', fontWeight: 700, fontSize: 9, letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: 2 }}>BACHILLERATO</span>
@@ -217,12 +212,7 @@ export default function LoginPage() {
             {/* Logo mobile */}
             <div className="lg:hidden mb-12 flex justify-center">
               <Link href="/" className="inline-flex items-center gap-3" style={{ textDecoration: 'none' }}>
-                <div
-                  className="flex items-center justify-center rounded-xl shadow-lg"
-                  style={{ width: 48, height: 48, background: '#0B2545' }}
-                >
-                  <span style={{ color: '#fff', fontWeight: 900, fontSize: 22 }}>C</span>
-                </div>
+                <img src="/Logo%20Cen.png" alt="CEN" style={{ width: 40, height: 40, objectFit: 'contain' }} />
                 <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
                   <span style={{ color: '#0B2545', fontWeight: 900, fontSize: 18, letterSpacing: '-0.02em' }}>CEN</span>
                   <span style={{ color: 'rgba(11,37,69,0.5)', fontWeight: 700, fontSize: 9, letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: 2 }}>BACHILLERATO</span>

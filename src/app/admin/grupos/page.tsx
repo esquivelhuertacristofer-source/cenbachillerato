@@ -18,71 +18,87 @@ export default async function GruposAdminPage() {
   const docenteMap = new Map(docentes?.map((d) => [d.id, d.full_name ?? d.email]) ?? []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="border-b border-gray-200 bg-white px-6 py-4">
-        <div className="mx-auto flex max-w-7xl items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">Panel de Administración</h1>
-            <p className="text-sm text-gray-500">CEN Bachillerato</p>
-          </div>
-          <nav className="flex items-center gap-4 text-sm">
-            <a href="/admin/escuelas" className="text-gray-600 hover:text-indigo-700">Escuelas</a>
-            <a href="/admin/grupos" className="font-medium text-indigo-700">Grupos</a>
-            <a href="/admin/usuarios" className="text-gray-600 hover:text-indigo-700">Usuarios</a>
-          </nav>
-        </div>
-      </header>
+    <main style={{ maxWidth: 1280, margin: '0 auto', padding: '40px 24px 64px' }}>
 
-      <main className="mx-auto max-w-7xl px-6 py-8">
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-900">
-            Grupos{" "}
-            <span className="ml-2 rounded-full bg-gray-100 px-3 py-0.5 text-base font-normal text-gray-500">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 }}>
+        <div>
+          <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#1E40AF', marginBottom: 8 }}>
+            Admin · Grupos
+          </div>
+          <h1 style={{ fontSize: 26, fontWeight: 900, color: '#0B2545', letterSpacing: '-0.03em', margin: 0 }}>
+            Grupos
+            <span style={{
+              display: 'inline-flex',
+              marginLeft: 12,
+              borderRadius: 999,
+              background: 'rgba(11,37,69,0.08)',
+              padding: '2px 12px',
+              fontSize: 15,
+              fontWeight: 600,
+              color: 'rgba(11,37,69,0.50)',
+              verticalAlign: 'middle',
+            }}>
               {grupos?.length ?? 0}
             </span>
-          </h2>
-          <button className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">
-            + Agregar grupo
-          </button>
+          </h1>
         </div>
+        <button style={{
+          borderRadius: 999,
+          background: '#0B2545',
+          padding: '10px 22px',
+          fontSize: 13,
+          fontWeight: 700,
+          color: '#fff',
+          border: 'none',
+          cursor: 'pointer',
+        }}>
+          <i className="fa-solid fa-plus" style={{ marginRight: 8 }} />
+          Agregar grupo
+        </button>
+      </div>
 
-        {!grupos || grupos.length === 0 ? (
-          <div className="flex flex-col items-center rounded-2xl border-2 border-dashed border-gray-200 bg-white py-20 text-center">
-            <span className="text-5xl">🗂️</span>
-            <h3 className="mt-4 text-lg font-semibold text-gray-900">Sin grupos registrados</h3>
-            <p className="mt-2 text-gray-500">
-              Crea el primer grupo para comenzar a asignar alumnos y docentes.
-            </p>
-          </div>
-        ) : (
-          <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50">
-                <tr className="text-left text-gray-500">
-                  <th className="px-6 py-3 font-medium">Grupo</th>
-                  <th className="px-6 py-3 font-medium">Semestre</th>
-                  <th className="px-6 py-3 font-medium">Escuela</th>
-                  <th className="px-6 py-3 font-medium">Docente</th>
+      {!grupos || grupos.length === 0 ? (
+        <div style={{
+          display: 'flex', flexDirection: 'column', alignItems: 'center',
+          borderRadius: 24, border: '2px dashed rgba(11,37,69,0.14)',
+          background: '#fff', padding: '80px 32px', textAlign: 'center',
+        }}>
+          <i className="fa-solid fa-layer-group" style={{ fontSize: 44, color: 'rgba(11,37,69,0.14)', marginBottom: 20 }} />
+          <h3 style={{ fontSize: 18, fontWeight: 800, color: '#0B2545', margin: '0 0 8px' }}>Sin grupos registrados</h3>
+          <p style={{ fontSize: 14, color: 'rgba(11,37,69,0.55)', margin: 0 }}>
+            Crea el primer grupo para comenzar a asignar alumnos y docentes.
+          </p>
+        </div>
+      ) : (
+        <div style={{ overflow: 'hidden', borderRadius: 20, border: '1px solid rgba(11,37,69,0.10)', background: '#fff' }}>
+          <table style={{ width: '100%', fontSize: 14, borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ background: '#F8FAFC', borderBottom: '1px solid rgba(11,37,69,0.08)' }}>
+                <th style={{ padding: '12px 24px', textAlign: 'left', fontWeight: 700, fontSize: 11, color: 'rgba(11,37,69,0.50)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Grupo</th>
+                <th style={{ padding: '12px 24px', textAlign: 'left', fontWeight: 700, fontSize: 11, color: 'rgba(11,37,69,0.50)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Semestre</th>
+                <th style={{ padding: '12px 24px', textAlign: 'left', fontWeight: 700, fontSize: 11, color: 'rgba(11,37,69,0.50)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Escuela</th>
+                <th style={{ padding: '12px 24px', textAlign: 'left', fontWeight: 700, fontSize: 11, color: 'rgba(11,37,69,0.50)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Docente</th>
+              </tr>
+            </thead>
+            <tbody>
+              {grupos.map((g) => (
+                <tr key={g.id} style={{ borderBottom: '1px solid rgba(11,37,69,0.06)' }}>
+                  <td style={{ padding: '14px 24px', fontWeight: 600, color: '#0B2545' }}>{g.nombre}</td>
+                  <td style={{ padding: '14px 24px', color: 'rgba(11,37,69,0.65)' }}>{g.semestre}°</td>
+                  <td style={{ padding: '14px 24px', color: 'rgba(11,37,69,0.60)' }}>
+                    {escuelaMap.get(g.escuela_id) ?? "—"}
+                  </td>
+                  <td style={{ padding: '14px 24px', color: 'rgba(11,37,69,0.60)' }}>
+                    {g.id_docente ? (docenteMap.get(g.id_docente) ?? "Docente sin perfil") : (
+                      <span style={{ color: 'rgba(11,37,69,0.35)', fontStyle: 'italic' }}>Sin asignar</span>
+                    )}
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {grupos.map((g) => (
-                  <tr key={g.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 font-medium text-gray-900">{g.nombre}</td>
-                    <td className="px-6 py-4 text-gray-600">{g.semestre}°</td>
-                    <td className="px-6 py-4 text-gray-500">
-                      {escuelaMap.get(g.escuela_id) ?? "—"}
-                    </td>
-                    <td className="px-6 py-4 text-gray-500">
-                      {g.id_docente ? (docenteMap.get(g.id_docente) ?? "Docente sin perfil") : "Sin asignar"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </main>
-    </div>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </main>
   );
 }

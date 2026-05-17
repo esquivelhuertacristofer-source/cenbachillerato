@@ -1,0 +1,812 @@
+/* ============================================================
+   LandingBachillerato.css — CEN Bachillerato landing
+   Paleta teal: dark #0B3832 · mid #0D9488 · accent #5EEAD4 · bg #F0FDFA
+   Todos los overrides van bajo .landing-bach para aislamiento.
+   ============================================================ */
+
+/* ──────────────────────────────────────────────────────────
+   1. LOGO-MARK + NAV — overrides teal sobre navy de LandingCEN.css
+   ────────────────────────────────────────────────────────── */
+.landing-bach .logo-mark {
+  background: rgba(94, 234, 212, 0.12);
+  border: 1px solid rgba(94, 234, 212, 0.22);
+}
+.landing-bach .nav {
+  background: rgba(11, 56, 50, 0.92);
+  border-bottom-color: rgba(94, 234, 212, 0.08);
+}
+.landing-bach .nav--scrolled {
+  background: rgba(11, 56, 50, 0.98);
+  border-bottom-color: rgba(94, 234, 212, 0.14);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+.landing-bach .nav-links {
+  background: rgba(94, 234, 212, 0.08);
+  border: 1px solid rgba(94, 234, 212, 0.14);
+}
+.landing-bach .nav-links a { color: rgba(255, 255, 255, 0.65); }
+.landing-bach .nav-links a.active,
+.landing-bach .nav-links a:hover { color: #5EEAD4; }
+.landing-bach .brand-text .b1 { color: #fff; }
+.landing-bach .brand-text .b2 { color: rgba(94, 234, 212, 0.7); }
+.landing-bach .nav-btn-primary {
+  background: #0D9488;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(13, 148, 136, 0.3);
+}
+.landing-bach .nav-btn-primary:hover { background: #0F766E; }
+
+/* ──────────────────────────────────────────────────────────
+   2. HERO BACHILLERATO — nuevo layout, distinto al de CEN
+   ────────────────────────────────────────────────────────── */
+.hero-bach {
+  background: linear-gradient(140deg, #0B3832 0%, #0C4840 55%, #083530 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 120px clamp(24px, 6vw, 96px) 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-bach-grid-bg {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at 1px 1px, rgba(94, 234, 212, 0.055) 1px, transparent 1px);
+  background-size: 36px 36px;
+  pointer-events: none;
+}
+
+.hero-bach-orb {
+  position: absolute;
+  width: 700px;
+  height: 700px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(13, 148, 136, 0.2), transparent 70%);
+  top: -200px;
+  right: -100px;
+  filter: blur(80px);
+  pointer-events: none;
+}
+
+.hero-bach-body {
+  max-width: 1280px;
+  margin: 0 auto;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 72px;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-bach-left {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.hero-bach-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: #5EEAD4;
+  padding: 7px 16px;
+  border: 1px solid rgba(94, 234, 212, 0.25);
+  border-radius: 999px;
+  background: rgba(94, 234, 212, 0.08);
+  width: fit-content;
+}
+
+.hero-bach-title {
+  font-size: clamp(44px, 5.5vw, 80px);
+  font-weight: 900;
+  color: #fff;
+  line-height: 0.96;
+  letter-spacing: -0.04em;
+  margin: 0;
+}
+
+.hero-bach-accent { color: #5EEAD4; }
+
+.hero-bach-sub {
+  font-size: clamp(16px, 1.4vw, 18px);
+  color: rgba(255, 255, 255, 0.62);
+  line-height: 1.65;
+  margin: 0;
+  max-width: 520px;
+}
+
+.hero-bach-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.hero-bach-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #5EEAD4;
+  color: #0B3832;
+  font-size: 16px;
+  font-weight: 800;
+  padding: 16px 32px;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: background 0.25s, transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 8px 28px rgba(94, 234, 212, 0.35);
+}
+.hero-bach-cta:hover {
+  background: #99F6E4;
+  transform: translateY(-2px);
+  box-shadow: 0 14px 40px rgba(94, 234, 212, 0.45);
+}
+
+.hero-bach-cta-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  padding: 15px 24px;
+  transition: color 0.2s, border-color 0.2s;
+}
+.hero-bach-cta-secondary:hover {
+  color: #5EEAD4;
+  border-color: rgba(94, 234, 212, 0.4);
+}
+
+.hero-bach-stats {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.hero-bach-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.hbs-val {
+  font-size: 28px;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.hbs-lbl {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(94, 234, 212, 0.7);
+}
+
+.hero-bach-stat-divider {
+  width: 1px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.hero-bach-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hero-bach-chip {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.52);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  padding: 5px 12px;
+}
+
+/* RIGHT: image grid */
+.hero-bach-right { position: relative; }
+
+.hero-bach-img-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hbig-top {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  gap: 12px;
+}
+
+.hbig-img {
+  background: rgba(94, 234, 212, 0.06);
+  border: 1px solid rgba(94, 234, 212, 0.16);
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: rgba(94, 234, 212, 0.38);
+  font-size: 12px;
+  font-weight: 600;
+  overflow: hidden;
+  position: relative;
+  transition: border-color 0.25s;
+}
+.hbig-img:hover { border-color: rgba(94, 234, 212, 0.3); }
+.hbig-img i { font-size: 38px; color: rgba(94, 234, 212, 0.28); }
+.hbig-portrait { aspect-ratio: 3/4; }
+.hbig-square   { aspect-ratio: 4/3; }
+.hbig-wide     { aspect-ratio: 21/9; }
+
+/* Floating info badges */
+.hero-bach-badge {
+  position: absolute;
+  background: rgba(11, 56, 50, 0.88);
+  border: 1px solid rgba(94, 234, 212, 0.22);
+  border-radius: 14px;
+  padding: 11px 14px;
+  backdrop-filter: blur(16px);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3);
+  z-index: 5;
+}
+.hero-bach-badge i { font-size: 17px; color: #5EEAD4; }
+.hero-bach-badge--tl { top: -14px; left: -18px; }
+.hero-bach-badge--br { bottom: -14px; right: -18px; }
+.hbb-val { font-size: 12px; font-weight: 800; color: #fff; line-height: 1.2; }
+.hbb-lbl { font-size: 10px; font-weight: 600; color: rgba(255, 255, 255, 0.4); }
+
+/* ──────────────────────────────────────────────────────────
+   3. BACH MEDIA SECTION — imagen + features (reemplaza features-band)
+   ────────────────────────────────────────────────────────── */
+.bach-media {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 500px;
+}
+
+.bach-media-photo-col {
+  position: relative;
+  background: linear-gradient(160deg, #0B3832 0%, #0C4840 100%);
+  overflow: hidden;
+  min-height: 400px;
+}
+
+.bach-media-img {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: rgba(94, 234, 212, 0.35);
+  font-size: 13px;
+  font-weight: 600;
+}
+.bach-media-img i { font-size: 76px; color: rgba(94, 234, 212, 0.18); }
+
+.bach-media-img-badge {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(94, 234, 212, 0.18);
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(94, 234, 212, 0.82);
+  backdrop-filter: blur(12px);
+}
+
+.bach-media-content-col {
+  padding: clamp(48px, 6vw, 80px) clamp(32px, 5vw, 64px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 28px;
+  background: #fff;
+}
+
+.bach-media-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: #0D9488;
+}
+
+.bach-media-title {
+  font-size: clamp(28px, 3vw, 44px);
+  font-weight: 900;
+  color: #0B3832;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  margin: 0;
+}
+.bach-media-title em { font-style: normal; color: #0D9488; }
+
+.bach-media-features {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.bach-feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.bach-feature-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: rgba(13, 148, 136, 0.09);
+  color: #0D9488;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.bach-feature-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #0B3832;
+  letter-spacing: -0.01em;
+  margin-bottom: 3px;
+}
+
+.bach-feature-desc {
+  font-size: 13px;
+  color: rgba(11, 56, 50, 0.55);
+  line-height: 1.55;
+}
+
+/* ──────────────────────────────────────────────────────────
+   4. SECCIÓN SHELL — estructura + teal
+   ────────────────────────────────────────────────────────── */
+.landing-bach .section {
+  padding: 104px clamp(24px, 6vw, 96px);
+  background: #F0FDFA;
+}
+
+.landing-bach .section-head {
+  max-width: 1280px;
+  margin: 0 auto 64px;
+}
+.landing-bach .section-head.center { text-align: center; }
+
+.landing-bach .sh-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: #0D9488;
+  margin-bottom: 20px;
+}
+
+.landing-bach .section-head h2 {
+  font-size: clamp(36px, 4.5vw, 60px);
+  font-weight: 900;
+  color: #0B3832;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  margin: 0 0 20px;
+}
+.landing-bach .section-head h2 em { font-style: normal; color: #0D9488; }
+
+.landing-bach .sh-sub {
+  font-size: 18px;
+  color: rgba(11, 56, 50, 0.62);
+  line-height: 1.65;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ──────────────────────────────────────────────────────────
+   5. TIERS — currículum cards (4 componentes)
+   ────────────────────────────────────────────────────────── */
+.landing-bach .tiers {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.landing-bach .tier {
+  background: #0B3832;
+  border: 1px solid rgba(94, 234, 212, 0.12);
+  border-radius: 24px;
+  padding: 36px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+}
+.landing-bach .tier::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(94, 234, 212, 0.07), transparent 70%);
+  pointer-events: none;
+}
+.landing-bach .tier:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.25);
+  border-color: rgba(94, 234, 212, 0.28);
+}
+.landing-bach .tier-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+.landing-bach .tag {
+  font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em;
+  color: rgba(94, 234, 212, 0.7); background: rgba(94, 234, 212, 0.09);
+  border: 1px solid rgba(94, 234, 212, 0.18); border-radius: 999px; padding: 4px 10px;
+}
+.landing-bach .tier h3 {
+  font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.03em; line-height: 1.15; margin: 0;
+}
+.landing-bach .tier-blurb {
+  font-size: 14px; color: rgba(255, 255, 255, 0.52); line-height: 1.65; margin: 0; flex: 1;
+}
+.landing-bach .read-more-btn { margin-top: auto; }
+.landing-bach .read-more-pill {
+  display: inline-flex; align-items: center;
+  font-size: 10.5px; font-weight: 700; color: #5EEAD4;
+  background: rgba(94, 234, 212, 0.09); border: 1px solid rgba(94, 234, 212, 0.2);
+  border-radius: 999px; padding: 6px 14px;
+}
+
+/* ──────────────────────────────────────────────────────────
+   6. EDITORIAL SECTION — RSC
+   ────────────────────────────────────────────────────────── */
+.landing-bach .editorial-section {
+  padding: 104px clamp(24px, 6vw, 96px);
+  background: linear-gradient(180deg, #fff 0%, #F0FDFA 100%);
+}
+
+.landing-bach .editorial-head {
+  max-width: 1280px;
+  margin: 0 auto 56px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.landing-bach .editorial-eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em;
+  color: #0D9488; margin-bottom: 16px;
+}
+.landing-bach .pip { width: 7px; height: 7px; border-radius: 50%; background: #5EEAD4; display: inline-block; }
+
+.landing-bach .editorial-head h2 {
+  font-size: clamp(32px, 3.5vw, 52px); font-weight: 900; color: #0B3832;
+  letter-spacing: -0.04em; line-height: 1.05; margin: 0;
+}
+.landing-bach .editorial-head h2 em { font-style: normal; color: #0D9488; }
+
+.landing-bach .editorial-stats { display: flex; gap: 40px; align-items: flex-end; flex-shrink: 0; }
+.landing-bach .editorial-stat .v {
+  font-size: 48px; font-weight: 900; color: #0B3832; letter-spacing: -0.05em; line-height: 1;
+}
+.landing-bach .editorial-stat .l {
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em;
+  color: rgba(11, 56, 50, 0.42); margin-top: 4px;
+}
+
+/* ──────────────────────────────────────────────────────────
+   7. CONTENT GRIDS
+   ────────────────────────────────────────────────────────── */
+.landing-bach .content-grid-4 {
+  max-width: 1280px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+}
+.landing-bach .content-grid-2 {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;
+}
+.landing-bach .content-grid {
+  max-width: 1280px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+}
+
+/* ──────────────────────────────────────────────────────────
+   8. PCARDS — light + navy variants
+   ────────────────────────────────────────────────────────── */
+.landing-bach .pcard {
+  background: #fff;
+  border: 1px solid rgba(11, 56, 50, 0.08);
+  border-radius: 24px;
+  padding: 28px 24px;
+  display: flex; flex-direction: column; gap: 10px;
+  transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+  position: relative; overflow: hidden;
+}
+.landing-bach .pcard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(11, 56, 50, 0.10);
+  border-color: rgba(13, 148, 136, 0.2);
+}
+.landing-bach .pcard.navy {
+  background: #0B3832; border-color: rgba(94, 234, 212, 0.12);
+}
+.landing-bach .pcard.navy .pc-title { color: #fff; }
+.landing-bach .pcard.navy .pc-meta,
+.landing-bach .pcard.navy .pc-desc { color: rgba(255, 255, 255, 0.5); }
+.landing-bach .pcard.navy .pc-tag { color: #5EEAD4; background: rgba(94,234,212,0.1); border-color: rgba(94,234,212,0.18); }
+.landing-bach .pcard.navy .vc-icon { color: #5EEAD4; background: rgba(94, 234, 212, 0.1); }
+.landing-bach .pcard.navy:hover { border-color: rgba(94, 234, 212, 0.28); }
+
+.landing-bach .pc-top { display: flex; gap: 8px; }
+.landing-bach .pc-tag {
+  display: inline-flex; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em;
+  color: #0D9488; background: rgba(13,148,136,0.07); border: 1px solid rgba(13,148,136,0.15);
+  border-radius: 999px; padding: 4px 10px;
+}
+.landing-bach .pc-code {
+  font-size: 36px; font-weight: 900; color: rgba(11,56,50,0.1);
+  letter-spacing: -0.05em; line-height: 1; margin-bottom: 4px;
+}
+.landing-bach .pcard.navy .pc-code { color: rgba(94, 234, 212, 0.13); }
+.landing-bach .pc-title {
+  font-size: 17px; font-weight: 800; color: #0B3832; letter-spacing: -0.02em; line-height: 1.25;
+}
+.landing-bach .pc-meta {
+  font-size: 12px; font-weight: 600; color: rgba(11,56,50,0.42);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+.landing-bach .pc-desc { font-size: 14px; color: rgba(11,56,50,0.58); line-height: 1.65; }
+.landing-bach .vc-icon {
+  width: 44px; height: 44px; border-radius: 14px;
+  background: rgba(13,148,136,0.08); color: #0D9488;
+  display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 4px;
+}
+
+/* ──────────────────────────────────────────────────────────
+   9. ALT SECTION — ámbitos socioemocionales (fondo teal oscuro)
+   ────────────────────────────────────────────────────────── */
+.landing-bach .alt-section {
+  padding: 104px clamp(24px, 6vw, 96px);
+  background: #0B3832;
+  position: relative; overflow: hidden;
+}
+.landing-bach .alt-section::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle at 1px 1px, rgba(94,234,212,0.04) 1px, transparent 1px);
+  background-size: 32px 32px; pointer-events: none;
+}
+.landing-bach .alt-section .section-head h2 { color: #fff; }
+.landing-bach .alt-section .sh-eyebrow { color: #5EEAD4; }
+.landing-bach .alt-section .sh-sub { color: rgba(255, 255, 255, 0.55); }
+.landing-bach .alt-section .pcard {
+  background: rgba(255,255,255,0.05); border-color: rgba(94,234,212,0.12);
+}
+.landing-bach .alt-section .pcard:hover { border-color: rgba(94,234,212,0.28); background: rgba(255,255,255,0.08); }
+.landing-bach .alt-section .pc-title { color: #fff; }
+.landing-bach .alt-section .pc-desc { color: rgba(255,255,255,0.55); }
+.landing-bach .alt-section .vc-icon { background: rgba(94,234,212,0.12); color: #5EEAD4; }
+
+/* ──────────────────────────────────────────────────────────
+   10. SUBSISTEMAS SECTION
+   ────────────────────────────────────────────────────────── */
+.landing-bach .subsistemas-section {
+  padding: 80px clamp(24px, 6vw, 96px);
+  background: #F0FDFA;
+  border-top: 1px solid rgba(11, 56, 50, 0.06);
+}
+.landing-bach .subsistemas-grid {
+  max-width: 1000px; margin: 0 auto;
+  display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+}
+.landing-bach .subsistema-pill {
+  display: inline-flex; align-items: center;
+  font-size: 13px; font-weight: 600; color: #0B3832;
+  background: #fff; border: 1px solid rgba(11,56,50,0.12);
+  border-radius: 999px; padding: 10px 20px;
+  transition: border-color 0.2s, background 0.2s;
+}
+.landing-bach .subsistema-pill:hover { border-color: #0D9488; background: #F0FDFA; }
+
+/* ──────────────────────────────────────────────────────────
+   11. LIVE-BAND — estadísticas grandes
+   ────────────────────────────────────────────────────────── */
+.landing-bach .live-band {
+  background: #0B3832;
+  padding: 104px clamp(24px, 6vw, 96px);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+  position: relative; overflow: hidden;
+}
+.landing-bach .live-band::before {
+  content: ''; position: absolute; inset: 0;
+  background-image: radial-gradient(circle at 1px 1px, rgba(94,234,212,0.04) 1px, transparent 1px);
+  background-size: 32px 32px; pointer-events: none;
+}
+.landing-bach .lb-eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em;
+  color: #5EEAD4; margin-bottom: 24px;
+}
+.landing-bach .pulse {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
+  animation: pulse-live-bach 2s infinite;
+  display: inline-block;
+}
+@keyframes pulse-live-bach {
+  0%   { box-shadow: 0 0 0 0 rgba(16,185,129,0.5); }
+  70%  { box-shadow: 0 0 0 8px rgba(16,185,129,0); }
+  100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+}
+.landing-bach .live-band h2 {
+  font-size: clamp(36px, 4.5vw, 60px); font-weight: 900; color: #fff;
+  letter-spacing: -0.04em; line-height: 1.05; margin: 0 0 20px;
+}
+.landing-bach .live-band h2 em { font-style: normal; color: #5EEAD4; }
+.landing-bach .live-band > div > p {
+  font-size: 17px; color: rgba(255,255,255,0.52); line-height: 1.65; margin: 0 0 48px; max-width: 480px;
+}
+.landing-bach .live-stats { display: flex; gap: 40px; flex-wrap: wrap; }
+.landing-bach .live-stat h4 {
+  font-size: clamp(36px, 4.5vw, 60px); font-weight: 900; color: #fff;
+  letter-spacing: -0.05em; line-height: 1; margin: 0 0 4px;
+}
+.landing-bach .live-stat .lbl {
+  font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.48);
+  text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;
+}
+.landing-bach .live-stat .sub { font-size: 11px; color: rgba(94,234,212,0.6); font-weight: 600; }
+.landing-bach .live-stat .sub i { margin-right: 5px; }
+.landing-bach .live-band-visual { display: flex; align-items: center; justify-content: center; }
+.landing-bach .visual-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 340px;
+}
+.landing-bach .visual-badge {
+  aspect-ratio: 1;
+  background: rgba(94,234,212,0.07); border: 1px solid rgba(94,234,212,0.15);
+  border-radius: 20px; display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 900; color: #5EEAD4; letter-spacing: -0.03em;
+}
+
+/* ──────────────────────────────────────────────────────────
+   12. CTA BAND — llamada a la acción
+   ────────────────────────────────────────────────────────── */
+.landing-bach .cta-band {
+  background: linear-gradient(135deg, #0D9488 0%, #0B3832 100%);
+  padding: 80px clamp(24px, 6vw, 96px);
+  text-align: center;
+  position: relative; overflow: hidden;
+}
+.landing-bach .cta-band::before {
+  content: ''; position: absolute; inset: 0;
+  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 28px 28px; pointer-events: none;
+}
+.landing-bach .cta-band h3 {
+  font-size: clamp(32px, 4vw, 56px); font-weight: 900; color: #fff;
+  letter-spacing: -0.04em; line-height: 1.05; margin: 0 0 20px; position: relative;
+}
+.landing-bach .cta-band h3 em { font-style: normal; color: #5EEAD4; }
+.landing-bach .cta-band > div > p {
+  font-size: 17px; color: rgba(255,255,255,0.6); line-height: 1.6;
+  max-width: 480px; margin: 0 auto 40px; position: relative;
+}
+.landing-bach .cta-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; position: relative; }
+.landing-bach .btn-cta {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: #5EEAD4; color: #0B3832; font-size: 16px; font-weight: 800;
+  padding: 16px 32px; border-radius: 999px; text-decoration: none;
+  transition: background 0.25s, transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 8px 24px rgba(94,234,212,0.35);
+}
+.landing-bach .btn-cta:hover { background: #99F6E4; transform: translateY(-2px); box-shadow: 0 12px 36px rgba(94,234,212,0.45); }
+.landing-bach .btn-cta-outline {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: transparent; color: rgba(255,255,255,0.82);
+  font-size: 16px; font-weight: 700; padding: 16px 32px;
+  border-radius: 999px; border: 2px solid rgba(255,255,255,0.25); text-decoration: none;
+  transition: border-color 0.25s, color 0.25s, background 0.25s, transform 0.2s;
+}
+.landing-bach .btn-cta-outline:hover {
+  border-color: #5EEAD4; color: #5EEAD4; background: rgba(94,234,212,0.06); transform: translateY(-2px);
+}
+
+/* ──────────────────────────────────────────────────────────
+   13. FOOTER — teal override
+   ────────────────────────────────────────────────────────── */
+.landing-bach .footer {
+  background: #082F2B;
+}
+.landing-bach .footer-brand h4 { color: #fff; }
+.landing-bach .fc-label { color: rgba(94,234,212,0.5); }
+.landing-bach .fc-value { color: rgba(255,255,255,0.65); }
+.landing-bach .footer-links a { color: rgba(255,255,255,0.5); }
+.landing-bach .footer-links a:hover { color: #5EEAD4; }
+.landing-bach .footer-bottom {
+  border-top-color: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.38);
+}
+.landing-bach .fb-legal a { color: rgba(255,255,255,0.42); }
+.landing-bach .fb-legal a:hover { color: #5EEAD4; }
+.landing-bach .footer-copyright-text { color: rgba(255,255,255,0.22); }
+.landing-bach .footer-contact .fc-value a { color: rgba(255,255,255,0.55); }
+
+/* ──────────────────────────────────────────────────────────
+   14. RESPONSIVE
+   ────────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .hero-bach-body { grid-template-columns: 1fr; gap: 48px; }
+  .hero-bach-right { display: none; }
+  .bach-media { grid-template-columns: 1fr; }
+  .bach-media-photo-col { min-height: 280px; }
+  .landing-bach .tiers { grid-template-columns: repeat(2, 1fr); }
+  .landing-bach .content-grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .landing-bach .live-band { grid-template-columns: 1fr; gap: 48px; }
+  .landing-bach .live-band-visual { display: none; }
+}
+
+@media (max-width: 768px) {
+  .hero-bach { padding: 100px 24px 60px; }
+  .hero-bach-title { font-size: clamp(38px, 9vw, 60px); }
+  .hero-bach-actions { flex-direction: column; align-items: flex-start; }
+  .bach-media-content-col { padding: 44px 24px; }
+  .landing-bach .section { padding: 64px 24px; }
+  .landing-bach .editorial-section { padding: 64px 24px; }
+  .landing-bach .alt-section { padding: 64px 24px; }
+  .landing-bach .subsistemas-section { padding: 60px 24px; }
+  .landing-bach .live-band { padding: 64px 24px; }
+  .landing-bach .cta-band { padding: 60px 24px; }
+  .landing-bach .tiers { grid-template-columns: 1fr; }
+  .landing-bach .content-grid-4,
+  .landing-bach .content-grid-2,
+  .landing-bach .content-grid { grid-template-columns: 1fr; }
+  .landing-bach .editorial-head { flex-direction: column; align-items: flex-start; gap: 24px; }
+  .landing-bach .live-stats { gap: 24px; }
+}

@@ -13,73 +13,87 @@ export default async function EscuelasPage() {
     .order("nombre");
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="border-b border-gray-200 bg-white px-6 py-4">
-        <div className="mx-auto flex max-w-7xl items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">Panel de Administración</h1>
-            <p className="text-sm text-gray-500">CEN Bachillerato</p>
-          </div>
-          <nav className="flex items-center gap-4 text-sm">
-            <a href="/admin/escuelas" className="font-medium text-indigo-700">Escuelas</a>
-            <a href="/admin/grupos" className="text-gray-600 hover:text-indigo-700">Grupos</a>
-            <a href="/admin/usuarios" className="text-gray-600 hover:text-indigo-700">Usuarios</a>
-          </nav>
-        </div>
-      </header>
+    <main style={{ maxWidth: 1280, margin: '0 auto', padding: '40px 24px 64px' }}>
 
-      <main className="mx-auto max-w-7xl px-6 py-8">
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-900">
-            Escuelas{" "}
-            <span className="ml-2 rounded-full bg-gray-100 px-3 py-0.5 text-base font-normal text-gray-500">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 }}>
+        <div>
+          <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#1E40AF', marginBottom: 8 }}>
+            Admin · Escuelas
+          </div>
+          <h1 style={{ fontSize: 26, fontWeight: 900, color: '#0B2545', letterSpacing: '-0.03em', margin: 0 }}>
+            Escuelas
+            <span style={{
+              display: 'inline-flex',
+              marginLeft: 12,
+              borderRadius: 999,
+              background: 'rgba(11,37,69,0.08)',
+              padding: '2px 12px',
+              fontSize: 15,
+              fontWeight: 600,
+              color: 'rgba(11,37,69,0.50)',
+              verticalAlign: 'middle',
+            }}>
               {escuelas?.length ?? 0}
             </span>
-          </h2>
-          <button className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">
-            + Agregar escuela
-          </button>
+          </h1>
         </div>
+        <button style={{
+          borderRadius: 999,
+          background: '#0B2545',
+          padding: '10px 22px',
+          fontSize: 13,
+          fontWeight: 700,
+          color: '#fff',
+          border: 'none',
+          cursor: 'pointer',
+        }}>
+          <i className="fa-solid fa-plus" style={{ marginRight: 8 }} />
+          Agregar escuela
+        </button>
+      </div>
 
-        {!escuelas || escuelas.length === 0 ? (
-          <div className="flex flex-col items-center rounded-2xl border-2 border-dashed border-gray-200 bg-white py-20 text-center">
-            <span className="text-5xl">🏫</span>
-            <h3 className="mt-4 text-lg font-semibold text-gray-900">Sin escuelas registradas</h3>
-            <p className="mt-2 text-gray-500">
-              Agrega la primera institución para comenzar a configurar la plataforma.
-            </p>
-          </div>
-        ) : (
-          <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50">
-                <tr className="text-left text-gray-500">
-                  <th className="px-6 py-3 font-medium">Nombre</th>
-                  <th className="px-6 py-3 font-medium">CCT</th>
-                  <th className="px-6 py-3 font-medium">Subsistema</th>
-                  <th className="px-6 py-3 font-medium">Estado</th>
-                  <th className="px-6 py-3 font-medium">Municipio</th>
+      {!escuelas || escuelas.length === 0 ? (
+        <div style={{
+          display: 'flex', flexDirection: 'column', alignItems: 'center',
+          borderRadius: 24, border: '2px dashed rgba(11,37,69,0.14)',
+          background: '#fff', padding: '80px 32px', textAlign: 'center',
+        }}>
+          <i className="fa-solid fa-school" style={{ fontSize: 44, color: 'rgba(11,37,69,0.14)', marginBottom: 20 }} />
+          <h3 style={{ fontSize: 18, fontWeight: 800, color: '#0B2545', margin: '0 0 8px' }}>Sin escuelas registradas</h3>
+          <p style={{ fontSize: 14, color: 'rgba(11,37,69,0.55)', margin: 0 }}>
+            Agrega la primera institución para comenzar a configurar la plataforma.
+          </p>
+        </div>
+      ) : (
+        <div style={{ overflow: 'hidden', borderRadius: 20, border: '1px solid rgba(11,37,69,0.10)', background: '#fff' }}>
+          <table style={{ width: '100%', fontSize: 14, borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ background: '#F8FAFC', borderBottom: '1px solid rgba(11,37,69,0.08)' }}>
+                <th style={{ padding: '12px 24px', textAlign: 'left', fontWeight: 700, fontSize: 11, color: 'rgba(11,37,69,0.50)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Nombre</th>
+                <th style={{ padding: '12px 24px', textAlign: 'left', fontWeight: 700, fontSize: 11, color: 'rgba(11,37,69,0.50)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>CCT</th>
+                <th style={{ padding: '12px 24px', textAlign: 'left', fontWeight: 700, fontSize: 11, color: 'rgba(11,37,69,0.50)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Subsistema</th>
+                <th style={{ padding: '12px 24px', textAlign: 'left', fontWeight: 700, fontSize: 11, color: 'rgba(11,37,69,0.50)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Estado</th>
+                <th style={{ padding: '12px 24px', textAlign: 'left', fontWeight: 700, fontSize: 11, color: 'rgba(11,37,69,0.50)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Municipio</th>
+              </tr>
+            </thead>
+            <tbody>
+              {escuelas.map((esc) => (
+                <tr key={esc.id} style={{ borderBottom: '1px solid rgba(11,37,69,0.06)' }}>
+                  <td style={{ padding: '14px 24px', fontWeight: 600, color: '#0B2545' }}>{esc.nombre}</td>
+                  <td style={{ padding: '14px 24px', fontFamily: 'monospace', fontSize: 12, color: 'rgba(11,37,69,0.50)' }}>{esc.cct ?? "—"}</td>
+                  <td style={{ padding: '14px 24px' }}>
+                    <span style={{ borderRadius: 999, background: '#DBEAFE', padding: '3px 10px', fontSize: 11, fontWeight: 700, color: '#1E40AF' }}>
+                      {esc.subsistema ?? "—"}
+                    </span>
+                  </td>
+                  <td style={{ padding: '14px 24px', color: 'rgba(11,37,69,0.60)' }}>{esc.estado ?? "—"}</td>
+                  <td style={{ padding: '14px 24px', color: 'rgba(11,37,69,0.60)' }}>{esc.municipio ?? "—"}</td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {escuelas.map((esc) => (
-                  <tr key={esc.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 font-medium text-gray-900">{esc.nombre}</td>
-                    <td className="px-6 py-4 font-mono text-xs text-gray-500">{esc.cct ?? "—"}</td>
-                    <td className="px-6 py-4">
-                      <span className="rounded-full bg-blue-50 px-2.5 py-0.5 text-xs text-blue-700">
-                        {esc.subsistema ?? "—"}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-gray-500">{esc.estado ?? "—"}</td>
-                    <td className="px-6 py-4 text-gray-500">{esc.municipio ?? "—"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </main>
-    </div>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </main>
   );
 }

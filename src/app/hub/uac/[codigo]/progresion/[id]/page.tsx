@@ -31,53 +31,93 @@ export default async function ProgresionPage({ params }: Props) {
   if (isNaN(num) || num < 1 || num > uac.totalProgresionesEsperadas) notFound();
 
   return (
-    <div className="space-y-6">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 860 }}>
+
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-sm text-gray-400">
-        <Link href="/hub" className="hover:text-gray-600">Mi Hub</Link>
-        <span>/</span>
-        <Link href={`/hub/semestre/${uac.semestre}`} className="hover:text-gray-600">
+      <nav style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'rgba(11,37,69,0.45)' }}>
+        <Link href="/hub" style={{ color: 'rgba(11,37,69,0.45)', textDecoration: 'none' }}>Mi Hub</Link>
+        <i className="fa-solid fa-chevron-right" style={{ fontSize: 9 }} />
+        <Link href={`/hub/semestre/${uac.semestre}`} style={{ color: 'rgba(11,37,69,0.45)', textDecoration: 'none' }}>
           Semestre {uac.semestre}
         </Link>
-        <span>/</span>
-        <Link href={`/hub/uac/${codigo}`} className="hover:text-gray-600">
+        <i className="fa-solid fa-chevron-right" style={{ fontSize: 9 }} />
+        <Link href={`/hub/uac/${codigo}`} style={{ color: 'rgba(11,37,69,0.45)', textDecoration: 'none' }}>
           {uac.nombre}
         </Link>
-        <span>/</span>
-        <span className="text-gray-700">Progresión {num}</span>
+        <i className="fa-solid fa-chevron-right" style={{ fontSize: 9 }} />
+        <span style={{ color: '#0B2545', fontWeight: 600 }}>Progresión {num}</span>
       </nav>
 
       {/* Placeholder de actividades */}
-      <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-white py-24 text-center">
-        <div className="text-5xl">🏗️</div>
-        <h1 className="mt-6 text-xl font-bold text-gray-900">
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 24,
+        border: '2px dashed rgba(11,37,69,0.14)',
+        background: '#fff',
+        padding: '80px 32px',
+        textAlign: 'center',
+      }}>
+        <i className="fa-solid fa-hammer" style={{ fontSize: 44, color: 'rgba(11,37,69,0.14)', marginBottom: 24 }} />
+        <h1 style={{ fontSize: 22, fontWeight: 900, color: '#0B2545', letterSpacing: '-0.02em', margin: '0 0 12px' }}>
           Progresión {num} · {uac.nombre}
         </h1>
-        <p className="mt-3 max-w-md text-gray-500">
+        <p style={{ fontSize: 14, color: 'rgba(11,37,69,0.55)', maxWidth: 480, lineHeight: 1.65, margin: '0 0 28px' }}>
           Las actividades pedagógicas para esta progresión están en desarrollo.
           Próximamente encontrarás aquí contenido alineado al programa oficial del MCCEMS.
         </p>
 
-        <div className="mt-8 flex items-center gap-3">
-          <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-4 py-2 text-sm font-medium text-amber-700">
-            <span className="h-2 w-2 rounded-full bg-amber-400" />
-            Próximamente
-          </span>
-        </div>
+        <span style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 6,
+          borderRadius: 999,
+          background: '#FFF7ED',
+          border: '1px solid rgba(251,146,60,0.25)',
+          padding: '6px 18px',
+          fontSize: 13,
+          fontWeight: 700,
+          color: '#C2410C',
+          marginBottom: 32,
+        }}>
+          <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#FB923C', display: 'inline-block' }} />
+          Próximamente
+        </span>
 
-        <div className="mt-10 flex gap-4">
+        <div style={{ display: 'flex', gap: 12 }}>
           <Link
             href={`/hub/uac/${codigo}`}
-            className="rounded-lg border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            style={{
+              borderRadius: 999,
+              border: '1px solid rgba(11,37,69,0.15)',
+              padding: '10px 22px',
+              fontSize: 13,
+              fontWeight: 700,
+              color: '#0B2545',
+              textDecoration: 'none',
+              background: '#fff',
+            }}
           >
-            ← Volver a {uac.nombre}
+            <i className="fa-solid fa-arrow-left" style={{ marginRight: 6 }} />
+            Volver a {uac.nombre}
           </Link>
           {num < uac.totalProgresionesEsperadas && (
             <Link
               href={`/hub/uac/${codigo}/progresion/${num + 1}`}
-              className="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-indigo-700"
+              style={{
+                borderRadius: 999,
+                background: '#0B2545',
+                padding: '10px 22px',
+                fontSize: 13,
+                fontWeight: 700,
+                color: '#fff',
+                textDecoration: 'none',
+              }}
             >
-              Siguiente progresión →
+              Siguiente progresión
+              <i className="fa-solid fa-arrow-right" style={{ marginLeft: 6 }} />
             </Link>
           )}
         </div>

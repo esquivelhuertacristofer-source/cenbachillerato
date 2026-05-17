@@ -8,10 +8,10 @@ describe("Button", () => {
     expect(screen.getByRole("button", { name: "Guardar" })).toBeInTheDocument();
   });
 
-  test("variante primary aplica clases de indigo por defecto", () => {
+  test("variante primary aplica clases de navy CEN por defecto", () => {
     render(<Button>ok</Button>);
     const btn = screen.getByRole("button");
-    expect(btn.className).toContain("bg-indigo-600");
+    expect(btn.className).toContain("bg-[#0B2545]");
   });
 
   test("variante danger aplica clases de red", () => {
@@ -20,10 +20,10 @@ describe("Button", () => {
     expect(btn.className).toContain("bg-red-600");
   });
 
-  test("variante secondary aplica clases de borde", () => {
+  test("variante secondary aplica clases de borde navy CEN", () => {
     render(<Button variant="secondary">Cancelar</Button>);
     const btn = screen.getByRole("button");
-    expect(btn.className).toContain("border-indigo-600");
+    expect(btn.className).toContain("border-[#0B2545]");
   });
 
   test("variante ghost aplica bg-transparent", () => {

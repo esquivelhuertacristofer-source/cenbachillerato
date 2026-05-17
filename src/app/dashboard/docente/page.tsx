@@ -1,12 +1,18 @@
 import { redirect } from "next/navigation";
 import { getUser, getProfile } from "@/lib/supabase-helpers";
 import { getMetricasDocente } from "@/lib/queries/docente";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Dashboard Docente — CEN Bachillerato",
 };
+
+const METRIC_ICONS = [
+  { fa: "fa-solid fa-users", color: "#7DD3FC" },
+  { fa: "fa-solid fa-school", color: "#7DD3FC" },
+  { fa: "fa-solid fa-book-open", color: "#7DD3FC" },
+  { fa: "fa-solid fa-chart-bar", color: "#7DD3FC" },
+];
 
 export default async function DocenteDashboardPage() {
   const user = await getUser();
@@ -22,120 +28,117 @@ export default async function DocenteDashboardPage() {
   const metricas = await getMetricasDocente(user.id);
 
   const metricCards = [
-    { label: "Alumnos activos", valor: String(metricas.totalAlumnos), icono: "👥", color: "text-blue-600" },
-    { label: "Grupos asignados", valor: String(metricas.totalGrupos), icono: "🏫", color: "text-purple-600" },
-    { label: "Semestres en curso", valor: String(metricas.uacEnCurso), icono: "📚", color: "text-green-600" },
-    { label: "Promedio de avance", valor: "—", icono: "📊", color: "text-amber-600" },
+    { label: "Alumnos activos", valor: String(metricas.totalAlumnos) },
+    { label: "Grupos asignados", valor: String(metricas.totalGrupos) },
+    { label: "Semestres en curso", valor: String(metricas.uacEnCurso) },
+    { label: "Promedio de avance", valor: "—" },
+  ];
+
+  const quickCards = [
+    { icon: "fa-solid fa-file-import", title: "Alta de alumnos", desc: "Carga masiva por Excel/CSV. Próximamente disponible." },
+    { icon: "fa-solid fa-clipboard-list", title: "Reportes SEP", desc: "Generación de reportes en formato institucional. Próximamente." },
+    { icon: "fa-solid fa-layer-group", title: "Gestión de grupos", desc: "Crear y gestionar grupos por semestre y UAC. Próximamente." },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="border-b border-gray-200 bg-white px-6 py-4">
-        <div className="mx-auto flex max-w-7xl items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">Dashboard Docente</h1>
-            <p className="text-sm text-gray-500">Bienvenido, {nombre}</p>
+    <main style={{ maxWidth: 1280, margin: '0 auto', padding: '40px 24px 64px' }}>
+
+      {/* Welcome */}
+      <div style={{ marginBottom: 36 }}>
+        <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#1E40AF', marginBottom: 8 }}>
+          <i className="fa-solid fa-circle" style={{ fontSize: 8, color: '#10b981', marginRight: 6 }} />
+          Sesión activa
+        </div>
+        <h1 style={{ fontSize: 28, fontWeight: 900, color: '#0B2545', letterSpacing: '-0.03em', margin: 0 }}>
+          Bienvenido, {nombre}
+        </h1>
+        <p style={{ fontSize: 15, color: 'rgba(11,37,69,0.60)', marginTop: 6 }}>
+          Aquí tienes un resumen de tu actividad docente.
+        </p>
+      </div>
+
+      {/* Metric cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16, marginBottom: 32 }}>
+        {metricCards.map((metric, i) => (
+          <div key={metric.label} style={{
+            background: '#0B2545',
+            border: '1px solid rgba(255,255,255,0.09)',
+            borderRadius: 20,
+            padding: '24px 28px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 12,
+          }}>
+            <i className={METRIC_ICONS[i]?.fa} style={{ fontSize: 22, color: METRIC_ICONS[i]?.color }} />
+            <div>
+              <div style={{ fontSize: 32, fontWeight: 900, color: '#fff', letterSpacing: '-0.03em', lineHeight: 1 }}>
+                {metric.valor}
+              </div>
+              <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.60)', marginTop: 4 }}>
+                {metric.label}
+              </div>
+            </div>
           </div>
-          <nav className="flex items-center gap-4 text-sm">
-            <a href="/dashboard/docente/alumnos" className="text-gray-600 hover:text-indigo-700">Alumnos</a>
-            <a href="/dashboard/docente/metricas" className="text-gray-600 hover:text-indigo-700">Métricas</a>
-            <a href="/dashboard/docente/reportes" className="text-gray-600 hover:text-indigo-700">Reportes</a>
-          </nav>
-        </div>
-      </header>
+        ))}
+      </div>
 
-      <main className="mx-auto max-w-7xl px-6 py-8">
-        {/* Métricas */}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {metricCards.map((metric) => (
-            <Card key={metric.label}>
-              <CardContent className="flex items-center gap-4">
-                <span className="text-3xl">{metric.icono}</span>
-                <div>
-                  <p className={`text-2xl font-bold ${metric.color}`}>{metric.valor}</p>
-                  <p className="text-sm text-gray-500">{metric.label}</p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+      {/* Grupos table */}
+      <div style={{ background: '#fff', border: '1px solid rgba(11,37,69,0.10)', borderRadius: 20, padding: 32, marginBottom: 24 }}>
+        <h2 style={{ fontSize: 18, fontWeight: 800, color: '#0B2545', letterSpacing: '-0.02em', marginBottom: 20 }}>
+          <i className="fa-solid fa-users-rectangle" style={{ color: '#1E40AF', marginRight: 10 }} />
+          Mis grupos
+        </h2>
+        {metricas.grupos.length === 0 ? (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '48px 0', textAlign: 'center' }}>
+            <i className="fa-regular fa-clipboard" style={{ fontSize: 40, color: 'rgba(11,37,69,0.18)', marginBottom: 16 }} />
+            <p style={{ fontSize: 16, fontWeight: 600, color: '#0B2545' }}>Sin grupos asignados</p>
+            <p style={{ fontSize: 14, color: 'rgba(11,37,69,0.55)', marginTop: 4 }}>
+              El administrador debe asignarte a un grupo para ver alumnos aquí.
+            </p>
+          </div>
+        ) : (
+          <table style={{ width: '100%', fontSize: 14, borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ borderBottom: '2px solid rgba(11,37,69,0.08)' }}>
+                <th style={{ padding: '0 0 12px', textAlign: 'left', fontWeight: 700, color: 'rgba(11,37,69,0.55)', letterSpacing: '0.06em', textTransform: 'uppercase', fontSize: 11 }}>Grupo</th>
+                <th style={{ padding: '0 0 12px', textAlign: 'left', fontWeight: 700, color: 'rgba(11,37,69,0.55)', letterSpacing: '0.06em', textTransform: 'uppercase', fontSize: 11 }}>Semestre</th>
+                <th style={{ padding: '0 0 12px', textAlign: 'right', fontWeight: 700, color: 'rgba(11,37,69,0.55)', letterSpacing: '0.06em', textTransform: 'uppercase', fontSize: 11 }}>Alumnos</th>
+              </tr>
+            </thead>
+            <tbody>
+              {metricas.grupos.map((g) => (
+                <tr key={g.id} style={{ borderBottom: '1px solid rgba(11,37,69,0.06)' }}>
+                  <td style={{ padding: '14px 0', fontWeight: 600, color: '#0B2545' }}>{g.nombre}</td>
+                  <td style={{ padding: '14px 0', color: 'rgba(11,37,69,0.65)' }}>{g.semestre}°</td>
+                  <td style={{ padding: '14px 0', textAlign: 'right', fontWeight: 700, color: '#1E40AF' }}>{g.total_alumnos}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
 
-        {/* Tabla de grupos */}
-        <div className="mt-8">
-          <Card>
-            <CardHeader>
-              <CardTitle>Mis grupos</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {metricas.grupos.length === 0 ? (
-                <div className="flex flex-col items-center py-12 text-center">
-                  <span className="text-4xl">📋</span>
-                  <p className="mt-4 text-gray-500">Sin grupos asignados.</p>
-                  <p className="mt-1 text-sm text-gray-400">
-                    El administrador debe asignarte a un grupo para ver alumnos aquí.
-                  </p>
-                </div>
-              ) : (
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-gray-100 text-left text-gray-500">
-                      <th className="pb-3 font-medium">Grupo</th>
-                      <th className="pb-3 font-medium">Semestre</th>
-                      <th className="pb-3 font-medium text-right">Alumnos</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-50">
-                    {metricas.grupos.map((g) => (
-                      <tr key={g.id} className="py-2">
-                        <td className="py-3 font-medium text-gray-900">{g.nombre}</td>
-                        <td className="py-3 text-gray-600">{g.semestre}°</td>
-                        <td className="py-3 text-right font-semibold text-gray-900">{g.total_alumnos}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Accesos rápidos */}
-        <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-3">
-          <Card hoverable>
-            <CardHeader>
-              <CardTitle>📥 Alta de alumnos</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-500">
-                Carga masiva por Excel/CSV. Próximamente disponible.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card hoverable>
-            <CardHeader>
-              <CardTitle>📊 Reportes SEP</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-500">
-                Generación de reportes en formato institucional. Próximamente.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card hoverable>
-            <CardHeader>
-              <CardTitle>🗂️ Gestión de grupos</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-500">
-                Crear y gestionar grupos por semestre y UAC. Próximamente.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </main>
-    </div>
+      {/* Quick access */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 16 }}>
+        {quickCards.map((card) => (
+          <div key={card.title} style={{
+            background: '#fff',
+            border: '1px solid rgba(11,37,69,0.10)',
+            borderRadius: 20,
+            padding: 28,
+            cursor: 'pointer',
+            transition: 'box-shadow 0.2s ease, border-color 0.2s ease',
+          }}>
+            <i className={card.icon} style={{ fontSize: 20, color: '#1E40AF', marginBottom: 12, display: 'block' }} />
+            <div style={{ fontSize: 15, fontWeight: 800, color: '#0B2545', marginBottom: 8, letterSpacing: '-0.01em' }}>
+              {card.title}
+            </div>
+            <p style={{ fontSize: 13, color: 'rgba(11,37,69,0.55)', lineHeight: 1.6, margin: 0 }}>
+              {card.desc}
+            </p>
+          </div>
+        ))}
+      </div>
+    </main>
   );
 }

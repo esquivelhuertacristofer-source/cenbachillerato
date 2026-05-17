@@ -56,8 +56,9 @@ describe("UACCard", () => {
     expect(link).toHaveAttribute("href", "/hub/uac/PM-II");
   });
 
-  test("muestra 'Ver contenido →'", () => {
+  test("muestra texto 'Ver contenido'", () => {
     render(<UACCard {...defaultProps} />);
-    expect(screen.getByText("Ver contenido →")).toBeInTheDocument();
+    // El icono → ahora es un <i> FA separado; buscamos por regex para ser flexible
+    expect(screen.getByText(/Ver contenido/i)).toBeInTheDocument();
   });
 });

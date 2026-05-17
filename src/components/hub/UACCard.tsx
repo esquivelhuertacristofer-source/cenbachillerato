@@ -26,32 +26,63 @@ export function UACCard({
   };
 
   return (
-    <Link href={`/hub/uac/${codigo}`}>
-      <div className="group flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:border-indigo-200 hover:shadow-md">
-        <div className="flex items-start justify-between">
-          <div
-            className={`flex h-11 w-11 items-center justify-center rounded-xl text-xl ${colorClass}`}
-          >
+    <Link href={`/hub/uac/${codigo}`} style={{ textDecoration: 'none', display: 'block' }}>
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 12,
+        borderRadius: 16,
+        border: '1px solid rgba(11,37,69,0.10)',
+        background: '#fff',
+        padding: 20,
+        boxShadow: '0 2px 8px rgba(11,37,69,0.06)',
+        transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+        cursor: 'pointer',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+          <div style={{
+            width: 44, height: 44,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            borderRadius: 12,
+            background: '#DBEAFE',
+            fontSize: 20,
+            flexShrink: 0,
+          }}>
             {icono}
           </div>
-          <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs text-gray-500">
+          <span style={{
+            borderRadius: 999,
+            background: 'rgba(11,37,69,0.07)',
+            padding: '3px 10px',
+            fontSize: 11,
+            fontWeight: 600,
+            color: 'rgba(11,37,69,0.55)',
+          }}>
             Sem. {semestre}
           </span>
         </div>
 
         <div>
-          <p className="text-xs font-medium text-indigo-600">{tipoBadge[tipo]}</p>
-          <h3 className="mt-1 font-semibold text-gray-900 group-hover:text-indigo-700">
+          <p style={{ fontSize: 11, fontWeight: 700, color: '#1E40AF', margin: '0 0 4px', letterSpacing: '0.04em' }}>
+            {tipoBadge[tipo]}
+          </p>
+          <h3 style={{ fontSize: 14, fontWeight: 700, color: '#0B2545', margin: 0, lineHeight: 1.4 }}>
             {nombre}
           </h3>
         </div>
 
-        <div className="flex items-center justify-between border-t border-gray-100 pt-3">
-          <span className="text-xs text-gray-500">
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          borderTop: '1px solid rgba(11,37,69,0.07)',
+          paddingTop: 12,
+        }}>
+          <span style={{ fontSize: 12, color: 'rgba(11,37,69,0.50)' }}>
             {totalProgresiones} progresiones
           </span>
-          <span className="text-xs font-medium text-indigo-600 group-hover:underline">
-            Ver contenido →
+          <span style={{ fontSize: 12, fontWeight: 700, color: '#1E40AF' }}>
+            Ver contenido <i className="fa-solid fa-arrow-right" style={{ fontSize: 10 }} />
           </span>
         </div>
       </div>

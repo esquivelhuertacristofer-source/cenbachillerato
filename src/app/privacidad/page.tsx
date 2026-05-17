@@ -9,9 +9,12 @@ export const metadata: Metadata = {
 export default function PrivacidadPage() {
   return (
     <>
-      <header className="border-b border-gray-200 bg-white px-4 py-4">
-        <div className="mx-auto max-w-4xl">
-          <Link href="/" className="text-xl font-bold text-indigo-700">CEN</Link>
+      <header style={{ borderBottom: '1px solid rgba(11,37,69,0.10)', background: '#0B2545', padding: '14px 24px' }}>
+        <div style={{ maxWidth: 896, margin: '0 auto' }}>
+          <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+            <img src="/Logo%20Cen.png" alt="CEN" style={{ width: 28, height: 28, objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.92 }} />
+            <span style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>CEN Bachillerato</span>
+          </Link>
         </div>
       </header>
 
@@ -85,7 +88,7 @@ export default function PrivacidadPage() {
                 tratamiento de sus datos personales. Para ejercerlos, envíe una solicitud a:
               </p>
               <p className="mt-2 font-medium">
-                <a href="mailto:privacidad@cen.edu.mx" className="text-indigo-600 underline">
+                <a href="mailto:privacidad@cen.edu.mx" style={{ color: '#1E40AF', textDecoration: 'underline' }}>
                   privacidad@cen.edu.mx
                 </a>
               </p>
