@@ -13,3 +13,18 @@
 [2026-05-17] FASE 2 — uac.test.ts: HUM-I → PFH-I en test de getUACIdPorCodigo
 [2026-05-17] FASE 2 — Tests: 150 pasando (143 previos + 7 nuevos), 0 fallos
 [2026-05-17] FASE 2 COMPLETADA
+[2026-05-17] FASE 3 INICIADA — generar SQL de migracion DB
+[2026-05-17] FASE 3 — supabase/migrations/04_alineacion_modelo_2025.sql creado
+[2026-05-17] FASE 3 — Script ejecutado en Supabase por usuario: SUCCESS. No rows returned.
+[2026-05-17] FASE 3 — DB confirmada: 32 UAC, RSC-PFH activo, IN-V creado, HUM→PFH renombrado, placeholders excedentes eliminados
+[2026-05-17] FASE 3 COMPLETADA
+[2026-05-17] FASE 4 INICIADA — re-seed Semestre 1 con propósitos formativos oficiales
+[2026-05-17] FASE 4 — seed-lci.ts: 8 propósitos oficiales LC-I (es_placeholder=false)
+[2026-05-17] FASE 4 — seed-pmi.ts: 7 propósitos oficiales PM-I (es_placeholder=false); reemplaza 10 placeholders
+[2026-05-17] FASE 4 — seed-ini.ts: 8 propósitos oficiales IN-I (es_placeholder=false); enfoque PSL MCCEMS 2025
+[2026-05-17] FASE 4 — seed-cdi.ts: 8 propósitos oficiales CD-I (es_placeholder=false); TICCAD 2025
+[2026-05-17] FASE 4 — seed-csi.ts: 4 propósitos oficiales CS-I (es_placeholder=false); reemplaza 8 placeholders
+[2026-05-17] FASE 4 — seed-pfhi.ts: 5 propósitos oficiales PFH-I (es_placeholder=false); archivo nuevo; seed-humi.ts eliminado
+[2026-05-17] FASE 4 — seed-cneyti.ts: 8 propósitos oficiales CNEYT-I (es_placeholder=false); reemplaza 10 placeholders
+[2026-05-17] FASE 4 — Tests: 150 pasando, 0 fallos; tsc --noEmit sin errores
+[2026-05-17] FASE 4 COMPLETADA — 7 UAC del Semestre 1 con propósitos oficiales 2025
