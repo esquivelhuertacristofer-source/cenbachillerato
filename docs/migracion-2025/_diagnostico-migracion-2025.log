@@ -6,3 +6,10 @@
 [2026-05-17] FASE 1 — docs/migracion-2025/backup-query.sql creado (para backup live de Supabase)
 [2026-05-17] FASE 1 — docs/migracion-2025/PLAN-MIGRACION.md creado
 [2026-05-17] FASE 1 COMPLETADA — 3 archivos creados, 0 cambios de código
+[2026-05-17] FASE 2 INICIADA — actualizar estructura curricular en código
+[2026-05-17] FASE 2 — estructura.ts: LC-IV/V/VI eliminadas; IN-V agregada (sem5); HUM-I/II/III → PFH-I/II/III; totalProgresionesEsperadas ajustados a oficial (32 UAC, 207 propósitos)
+[2026-05-17] FASE 2 — recursos-sociocognitivos.ts: RSC-HUM → RSC-PFH; RSC-IN semestres [1,2,3,4] → [1,2,3,4,5]
+[2026-05-17] FASE 2 — validate-mccems-structure.test.ts: EXPECTED arrays actualizados; totales 34→32 y 334→207; +7 tests nuevos de validación 2025
+[2026-05-17] FASE 2 — uac.test.ts: HUM-I → PFH-I en test de getUACIdPorCodigo
+[2026-05-17] FASE 2 — Tests: 150 pasando (143 previos + 7 nuevos), 0 fallos
+[2026-05-17] FASE 2 COMPLETADA

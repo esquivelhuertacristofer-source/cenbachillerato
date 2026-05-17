@@ -5,21 +5,26 @@ import {
 } from "../../src/lib/mccems/estructura";
 import { RECURSOS_SOCIOCOGNITIVOS } from "../../src/lib/mccems/recursos-sociocognitivos";
 
-// Official MCCEMS structure per DGB (validated 2026-05-12)
-// Source: dgb.sep.gob.mx/programas-de-estudio
+// Official MCCEMS 2025 structure
+// Source: docs/programas-oficiales/extraidos/ (Modelo Educativo 2025)
 
-const EXPECTED_UAC_SEM1 = ["LC-I", "PM-I", "IN-I", "CD-I", "CS-I", "HUM-I", "CNEYT-I"];
-const EXPECTED_UAC_SEM2 = ["LC-II", "PM-II", "IN-II", "CD-II", "CS-II", "HUM-II", "CNEYT-II"];
-const EXPECTED_UAC_SEM3 = ["LC-III", "PM-III", "IN-III", "HUM-III", "CNEYT-III"];
-const EXPECTED_UAC_SEM4 = ["LC-IV", "PM-IV", "IN-IV", "CH-I", "CS-III", "CNEYT-IV"];
-const EXPECTED_UAC_SEM5 = ["LC-V", "PM-V", "CH-II", "CNEYT-V"];
-const EXPECTED_UAC_SEM6 = ["LC-VI", "PM-VI", "CH-III", "CD-III", "CNEYT-VI"];
+const EXPECTED_UAC_SEM1 = ["LC-I", "PM-I", "IN-I", "CD-I", "CS-I", "PFH-I", "CNEYT-I"];
+const EXPECTED_UAC_SEM2 = ["LC-II", "PM-II", "IN-II", "CD-II", "CS-II", "PFH-II", "CNEYT-II"];
+const EXPECTED_UAC_SEM3 = ["LC-III", "PM-III", "IN-III", "PFH-III", "CNEYT-III"];
+const EXPECTED_UAC_SEM4 = ["PM-IV", "IN-IV", "CH-I", "CS-III", "CNEYT-IV"];
+const EXPECTED_UAC_SEM5 = ["PM-V", "IN-V", "CH-II", "CNEYT-V"];
+const EXPECTED_UAC_SEM6 = ["PM-VI", "CH-III", "CD-III", "CNEYT-VI"];
 
 const INVALID_CODES = [
+  // Estructura 2023 eliminada
+  "LC-IV", "LC-V", "LC-VI",
+  // Códigos del seed incorrecto anterior
   "CS-HIS-I", "CS-HIS-II", "CS-ECO-I", "CS-ECO-II", "CS-SOC", "CS-ADM",
   "CNT-BIO-I", "CNT-BIO-II", "CNT-QUI-I", "CNT-QUI-II",
   "CNT-FIS-I", "CNT-FIS-II", "CNT-MATE", "CNT-TC-I", "CNT-TC-II",
   "HUM-PLT", "HUM-FIL", "HUM-EST",
+  // Código obsoleto 2023
+  "HUM-I", "HUM-II", "HUM-III",
 ];
 
 function getUACBySemestre(sem: number) {
@@ -66,7 +71,7 @@ describe("MCCEMS Structure Validation — UAC por semestre", () => {
     }
   });
 
-  test("Semestre 5 contiene CH-II y CNEYT-V", () => {
+  test("Semestre 5 contiene IN-V, CH-II y CNEYT-V", () => {
     const codigos = getUACBySemestre(5);
     for (const expected of EXPECTED_UAC_SEM5) {
       expect(codigos).toContain(expected);
@@ -82,7 +87,7 @@ describe("MCCEMS Structure Validation — UAC por semestre", () => {
 });
 
 describe("MCCEMS Structure Validation — Códigos inválidos eliminados", () => {
-  test("No existen UAC con códigos del seed incorrecto anterior", () => {
+  test("No existen UAC con códigos obsoletos (2023) ni del seed incorrecto anterior", () => {
     const allCodigos = UAC_BASE.map((u) => u.codigo);
     for (const invalid of INVALID_CODES) {
       expect(allCodigos).not.toContain(invalid);
@@ -97,6 +102,34 @@ describe("MCCEMS Structure Validation — Códigos inválidos eliminados", () =>
       expect(codigos).not.toContain(`CH-II`);
       expect(codigos).not.toContain(`CH-III`);
     }
+  });
+
+  test("Lengua y Comunicación NO tiene UAC en semestres 4, 5, 6", () => {
+    const badSems = [4, 5, 6];
+    for (const sem of badSems) {
+      const codigos = getUACBySemestre(sem);
+      expect(codigos).not.toContain("LC-IV");
+      expect(codigos).not.toContain("LC-V");
+      expect(codigos).not.toContain("LC-VI");
+    }
+  });
+
+  test("Pensamiento Filosófico y Humanidades usa código PFH, no HUM", () => {
+    const allCodigos = UAC_BASE.map((u) => u.codigo);
+    expect(allCodigos).toContain("PFH-I");
+    expect(allCodigos).toContain("PFH-II");
+    expect(allCodigos).toContain("PFH-III");
+    expect(allCodigos).not.toContain("HUM-I");
+    expect(allCodigos).not.toContain("HUM-II");
+    expect(allCodigos).not.toContain("HUM-III");
+  });
+
+  test("Inglés tiene 5 UAC incluyendo IN-V en semestre 5", () => {
+    const ingles = UAC_BASE.filter((u) => u.recursoCodigo === "RSC-IN");
+    expect(ingles).toHaveLength(5);
+    expect(ingles.map((u) => u.codigo)).toContain("IN-V");
+    const inv = ingles.find((u) => u.codigo === "IN-V");
+    expect(inv?.semestre).toBe(5);
   });
 });
 
@@ -122,7 +155,7 @@ describe("MCCEMS Structure Validation — Recursos Sociocognitivos", () => {
     expect(RECURSOS_SOCIOCOGNITIVOS).toHaveLength(8);
   });
 
-  test("Los 8 RSC tienen los códigos correctos", () => {
+  test("Los 8 RSC tienen los códigos correctos (Modelo 2025)", () => {
     const codigos = RECURSOS_SOCIOCOGNITIVOS.map((r) => r.codigo);
     expect(codigos).toContain("RSC-LC");
     expect(codigos).toContain("RSC-PM");
@@ -130,8 +163,13 @@ describe("MCCEMS Structure Validation — Recursos Sociocognitivos", () => {
     expect(codigos).toContain("RSC-CD");
     expect(codigos).toContain("RSC-CH");
     expect(codigos).toContain("RSC-CS");
-    expect(codigos).toContain("RSC-HUM");
+    expect(codigos).toContain("RSC-PFH");
     expect(codigos).toContain("RSC-CNEYT");
+  });
+
+  test("RSC-HUM obsoleto NO existe (renombrado a RSC-PFH)", () => {
+    const codigos = RECURSOS_SOCIOCOGNITIVOS.map((r) => r.codigo);
+    expect(codigos).not.toContain("RSC-HUM");
   });
 
   test("RSC-CH tiene semestres [4, 5, 6] (no [1, 2, 3])", () => {
@@ -142,6 +180,16 @@ describe("MCCEMS Structure Validation — Recursos Sociocognitivos", () => {
   test("RSC-CD aparece en semestre 6 (Cultura Digital III)", () => {
     const cd = RECURSOS_SOCIOCOGNITIVOS.find((r) => r.codigo === "RSC-CD");
     expect(cd?.semestres).toContain(6);
+  });
+
+  test("RSC-IN aparece en semestres 1-5 (Inglés I a Inglés V)", () => {
+    const ing = RECURSOS_SOCIOCOGNITIVOS.find((r) => r.codigo === "RSC-IN");
+    expect(ing?.semestres).toEqual([1, 2, 3, 4, 5]);
+  });
+
+  test("RSC-PFH tiene nombre oficial completo", () => {
+    const pfh = RECURSOS_SOCIOCOGNITIVOS.find((r) => r.codigo === "RSC-PFH");
+    expect(pfh?.nombre).toBe("Pensamiento Filosófico y Humanidades");
   });
 });
 
@@ -180,14 +228,14 @@ describe("MCCEMS Structure Validation — Componentes curriculares", () => {
   });
 });
 
-describe("MCCEMS Structure Validation — Totales y conteo", () => {
-  test("Total de UAC es 34 (CF únicamente)", () => {
-    expect(UAC_BASE).toHaveLength(34);
+describe("MCCEMS Structure Validation — Totales y conteo (Modelo Educativo 2025)", () => {
+  test("Total de UAC es 32 (CF únicamente, Modelo 2025)", () => {
+    expect(UAC_BASE).toHaveLength(32);
   });
 
-  test("Total de progresiones esperadas es 342", () => {
+  test("Total de propósitos formativos esperados es 207 (oficial 2025)", () => {
     const total = UAC_BASE.reduce((sum, u) => sum + u.totalProgresionesEsperadas, 0);
-    expect(total).toBe(342);
+    expect(total).toBe(207);
   });
 
   test("Cada recursoCodigo existe en RECURSOS_SOCIOCOGNITIVOS", () => {
@@ -197,5 +245,20 @@ describe("MCCEMS Structure Validation — Totales y conteo", () => {
         expect(rscCodigos).toContain(uac.recursoCodigo);
       }
     }
+  });
+
+  test("Distribución por área es correcta según oficial 2025", () => {
+    const byRSC = (codigo: string) =>
+      UAC_BASE.filter((u) => u.recursoCodigo === codigo)
+              .reduce((sum, u) => sum + u.totalProgresionesEsperadas, 0);
+
+    expect(byRSC("RSC-LC")).toBe(23);    // 8+8+7
+    expect(byRSC("RSC-PM")).toBe(42);    // 7+6+6+7+8+8
+    expect(byRSC("RSC-IN")).toBe(40);    // 8×5
+    expect(byRSC("RSC-CD")).toBe(17);    // 8+5+4
+    expect(byRSC("RSC-CH")).toBe(12);    // 4×3
+    expect(byRSC("RSC-CS")).toBe(11);    // 4+4+3
+    expect(byRSC("RSC-PFH")).toBe(14);   // 5+5+4
+    expect(byRSC("RSC-CNEYT")).toBe(48); // 8×6
   });
 });

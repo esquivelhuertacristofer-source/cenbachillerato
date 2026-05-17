@@ -32,7 +32,7 @@ export const RECURSOS_SOCIOCOGNITIVOS: RecursoSociocognitivoStatic[] = [
     colorText: "text-red-600",
     icono: "🌐",
     orden: 3,
-    semestres: [1, 2, 3, 4],
+    semestres: [1, 2, 3, 4, 5],
   },
   {
     codigo: "RSC-CD",
@@ -68,8 +68,8 @@ export const RECURSOS_SOCIOCOGNITIVOS: RecursoSociocognitivoStatic[] = [
     semestres: [1, 2, 4],
   },
   {
-    codigo: "RSC-HUM",
-    nombre: "Humanidades",
+    codigo: "RSC-PFH",
+    nombre: "Pensamiento Filosófico y Humanidades",
     descripcion:
       "Fomenta la reflexión filosófica, literaria y estética para el pensamiento crítico y la sensibilidad cultural.",
     color: "bg-violet-600",

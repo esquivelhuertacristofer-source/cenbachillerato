@@ -114,7 +114,7 @@ describe("getUACIdPorCodigo", () => {
     const chain = makeChain({ data: { id: "uuid-abc" }, error: null });
     mockGetSupabaseServer.mockResolvedValue(makeSb(() => chain));
 
-    const result = await getUACIdPorCodigo("HUM-I");
+    const result = await getUACIdPorCodigo("PFH-I");
 
     expect(result).toBe("uuid-abc");
   });
