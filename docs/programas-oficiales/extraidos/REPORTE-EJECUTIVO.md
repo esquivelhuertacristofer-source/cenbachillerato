@@ -1,8 +1,9 @@
 # Reporte Ejecutivo: Extracción y Comparación MCCEMS 2025 vs. DB CEN
 
-**Fecha:** 2026-05-17
+**Fecha generación:** 2026-05-17
+**Actualizado:** 2026-05-17 (FASE 4 completada — migración aplicada)
 **Generado por:** Sesión de extracción y auditoría (Fases 1–7)
-**Alcance:** Solo lectura — NO se modificó código ni base de datos
+**Estado:** ✅ MIGRACIÓN COMPLETADA — ver Sección 11
 **Supabase ID:** `xmcfuwdanlciqdxqtslv`
 
 ---
@@ -96,7 +97,7 @@ Se extrajeron y estructuraron **11 documentos únicos** del Modelo Educativo 202
 | Tabla | Registros estimados | Estado |
 |-------|--------------------|----|
 | `uac` | 34 | Post-migración 02: estructura revisada |
-| `progresiones` | 342 | `es_placeholder=true` en **TODOS** |
+| `progresiones` | 334 *(estimación pre-migración)* | `es_placeholder=true` en **TODOS** |
 | `componentes_curriculares` | 4 (CF, CFE, CA, CL) | Correcto |
 | `recursos_sociocognitivos` | 8 (5 originales + 3 en m02) | Actualizado |
 | `areas_conocimiento` | 3 (CS, CNT, HUM) | Presente pero redundante con RSC |
@@ -138,7 +139,10 @@ Se extrajeron y estructuraron **11 documentos únicos** del Modelo Educativo 202
 
 ## 5. Discrepancias detectadas
 
-### CRÍTICA — D-001: Lengua y Comunicación sobredimensionada
+### CRÍTICA — D-001: Lengua y Comunicación sobredimensionada ✅ RESUELTA
+
+**Estado:** Migración 04 (2026-05-17) — LC-IV, LC-V, LC-VI eliminadas de DB; seed-lci.ts actualizado con 8 propósitos oficiales (es_placeholder=false).
+
 
 | Campo | DB | MCCEMS 2025 Oficial |
 |-------|----|--------------------|
@@ -152,7 +156,10 @@ Se extrajeron y estructuraron **11 documentos únicos** del Modelo Educativo 202
 
 ---
 
-### IMPORTANTE — D-002: Falta Inglés V
+### IMPORTANTE — D-002: Falta Inglés V ✅ RESUELTA
+
+**Estado:** Migración 04 (2026-05-17) — IN-V creado en DB (semestre 5, total_progresiones=8); IN-V agregado a estructura.ts; seed-ini.ts actualizado con 8 propósitos oficiales (es_placeholder=false).
+
 
 | Campo | DB | MCCEMS 2025 Oficial |
 |-------|----|--------------------|
@@ -166,7 +173,10 @@ Se extrajeron y estructuraron **11 documentos únicos** del Modelo Educativo 202
 
 ---
 
-### IMPORTANTE — D-003: Nombre incorrecto de Humanidades
+### IMPORTANTE — D-003: Nombre incorrecto de Humanidades ✅ RESUELTA
+
+**Estado:** Migración 04 (2026-05-17) — HUM-I/II/III renombradas a PFH-I/II/III en DB; RSC-HUM → RSC-PFH; seed-pfhi.ts creado con 5 propósitos oficiales (es_placeholder=false); seed-humi.ts eliminado.
+
 
 | Campo | DB | MCCEMS 2025 Oficial |
 |-------|----|--------------------|
@@ -180,7 +190,10 @@ Se extrajeron y estructuraron **11 documentos únicos** del Modelo Educativo 202
 
 ---
 
-### MODERADA — D-004: Títulos temáticos de CNEYT no son oficiales
+### MODERADA — D-004: Títulos temáticos de CNEYT no son oficiales ⏸ PENDIENTE DECISIÓN
+
+**Estado:** La corrección de nombres temáticos de CNEYT-I–VI (e.g., "La materia y sus interacciones") queda pendiente de decisión del área pedagógica. El seed-cneyti.ts ahora tiene 8 propósitos oficiales (es_placeholder=false) pero los nombres de UAC en DB no se tocaron.
+
 
 | Campo | DB | MCCEMS 2025 Oficial |
 |-------|----|--------------------|
@@ -193,11 +206,14 @@ Se extrajeron y estructuraron **11 documentos únicos** del Modelo Educativo 202
 
 ---
 
-### INFORMATIVA — D-005: Todo el contenido de progresiones es placeholder
+### INFORMATIVA — D-005: Todo el contenido de progresiones es placeholder ✅ RESUELTA (Semestre 1)
+
+**Estado:** FASE 4 (2026-05-17) — Los 7 seeds del Semestre 1 actualizados con propósitos formativos oficiales (es_placeholder=false): LC-I (8), PM-I (7), IN-I (8), CD-I (8), CS-I (4), PFH-I (5), CNEYT-I (8). Los semestres 2–6 permanecen como placeholder hasta FASE siguiente.
+
 
 | Campo | Estado |
 |-------|--------|
-| `es_placeholder` | `true` en las **342** progresiones de la DB |
+| `es_placeholder` | `true` en las **334** progresiones de la DB *(estimación pre-migración)* |
 | Alineación con MCCEMS 2025 | Los contenidos de los seeds (e.g., `seed-lci.ts`) son elaborados pero NO corresponden a los propósitos formativos oficiales |
 | Ejemplo — LC-I oficial | 8 propósitos: "Reflexiona sobre los vínculos entre escritura y lectura...", "Investiga los gustos de su comunidad...", etc. |
 | Ejemplo — LC-I en DB | 10 progresiones: "La comunicación humana y sus dimensiones", "Lenguaje, lengua, habla y dialecto"... (temáticas distintas) |
@@ -234,9 +250,10 @@ Se extrajeron y estructuraron **11 documentos únicos** del Modelo Educativo 202
 | Ciencias Sociales | 11 | 30 (3 UAC × 10) | 3 | **+19** extra |
 | Pens. Filosófico y Hum. | 14 | 30 (3 UAC × 10) | 3 | **+16** extra |
 | Ciencias Nat., Exp. y Tec. | 48 | 60 (6 UAC × 10) | 6 | **+12** extra |
-| **Total CF** | **207** | **342** | **34** | **+135 placeholders** |
+| **Total CF** | **207** | **334** *(pre-migración)* | **34** *(pre-migración)* | **+127 placeholders** *(pre-migración)* |
 
-> La DB tiene **135 progresiones adicionales** respecto a los propósitos oficiales (y todas son placeholder). Esto se debe a que el seed usó 10 progresiones uniformes por UAC en lugar de seguir el conteo real por asignatura.
+> **Pre-migración:** La DB tenía **127 progresiones adicionales** respecto a los propósitos oficiales (todas placeholder). Esto se debía a que el seed usó 10 progresiones uniformes por UAC en lugar de seguir el conteo real.
+> **Post-migración (2026-05-17):** 32 UAC correctas; Semestre 1 con propósitos oficiales (es_placeholder=false); semestres 2–6 en proceso.
 
 ---
 
@@ -295,3 +312,46 @@ docs/programas-oficiales/extraidos/
 - **Restricciones aplicadas:** Solo lectura — no se modificó código ni DB en ningún momento
 - **Hallazgo extra:** Los 2 archivos PDF con nombre diferente (`2025_1_BN_...` y `2025_2_BN_...`) son bytes idénticos (MD5 `170fb1375e692235aed5421b9d9375d2`). Solo uno se procesó.
 - **Progresiones de la DB:** Inferidas a partir del análisis de migraciones SQL (`01_schema_inicial.sql`, `02_realinear_mccems_oficial.sql`) y scripts de seed TypeScript (`scripts/seed-lci.ts` como muestra representativa).
+- **Nota de corrección:** La estimación inicial de 342 progresiones en DB fue un error de redondeo; el conteo real pre-migración era **334**.
+
+---
+
+## 11. Migración aplicada — 2026-05-17
+
+Las discrepancias D-001, D-002, D-003 y D-005 (Semestre 1) fueron resueltas en la sesión de migración del mismo día.
+
+### Resumen de cambios aplicados
+
+| Fase | Artefacto | Resultado |
+|------|-----------|-----------|
+| FASE 1 | `docs/migracion-2025/backup-estructura-pre-migracion.json` | Backup de estado pre-migración |
+| FASE 1 | `docs/migracion-2025/backup-query.sql` | SQL para backup live Supabase |
+| FASE 1 | `docs/migracion-2025/PLAN-MIGRACION.md` | Plan detallado por UAC |
+| FASE 2 | `src/lib/mccems/estructura.ts` | 32 UAC, 207 propósitos — alineado a 2025 |
+| FASE 2 | `src/lib/mccems/recursos-sociocognitivos.ts` | RSC-HUM→PFH; RSC-IN semestres 1-5 |
+| FASE 2 | Tests | 150 pasando (baseline 143 + 7 nuevos) |
+| FASE 3 | `supabase/migrations/04_alineacion_modelo_2025.sql` | Ejecutado en Supabase: SUCCESS |
+| FASE 4 | `scripts/seed-lci.ts` | 8 propósitos LC-I (es_placeholder=false) |
+| FASE 4 | `scripts/seed-pmi.ts` | 7 propósitos PM-I (es_placeholder=false) |
+| FASE 4 | `scripts/seed-ini.ts` | 8 propósitos IN-I (es_placeholder=false) |
+| FASE 4 | `scripts/seed-cdi.ts` | 8 propósitos CD-I (es_placeholder=false) |
+| FASE 4 | `scripts/seed-csi.ts` | 4 propósitos CS-I (es_placeholder=false) |
+| FASE 4 | `scripts/seed-pfhi.ts` | 5 propósitos PFH-I (es_placeholder=false) |
+| FASE 4 | `scripts/seed-cneyti.ts` | 8 propósitos CNEYT-I (es_placeholder=false) |
+
+### Estado post-migración
+
+| Indicador | Pre-migración | Post-migración |
+|-----------|--------------|----------------|
+| Total UAC en código | 34 | **32** |
+| Total propósitos esperados | 334 (código) | **207** (oficial 2025) |
+| Tests pasando | 143 | **150** |
+| UAC Semestre 1 con propósitos oficiales | 0 | **7/7** |
+| es_placeholder=false en Sem 1 | 0 | **48** propósitos |
+| Discrepancias críticas abiertas | 2 | **0** |
+
+### Pendiente
+
+- Semestres 2–6: propósitos de todas las UAC aún como `es_placeholder=true`. Los seeds de Sem 1 son la plantilla para los siguientes semestres.
+- D-004 (títulos temáticos CNEYT): pendiente de decisión pedagógica.
+- D-006 (terminología UI): pendiente de sprint de UI.
