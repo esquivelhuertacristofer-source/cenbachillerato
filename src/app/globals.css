@@ -80,70 +80,128 @@ body {
   }
 }
 
-/* ── Hub student UI ─────────────────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════
+   HUB STUDENT UI — Immersive Design System
+   ══════════════════════════════════════════════════════════════ */
 
+/* ── Page background: rich mesh gradient ─── */
+.hub-root {
+  background:
+    radial-gradient(ellipse 900px 600px at -8% -12%, rgba(56,189,248,0.09) 0%, transparent 65%),
+    radial-gradient(ellipse 700px 500px at 108% 108%, rgba(167,139,250,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 500px 400px at 50% 130%, rgba(30,64,175,0.06) 0%, transparent 55%),
+    #EEF3FA;
+}
+
+/* ── Keyframes ─── */
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(20px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
 }
 
 @keyframes hubOrb {
-  from { transform: translateY(0px) scale(1); }
-  to   { transform: translateY(-6px) scale(1.04); }
+  from { transform: translateY(0)   scale(1); }
+  to   { transform: translateY(-7px) scale(1.05); }
 }
 
-/* ── UAC card — cinematic hover ─── */
+@keyframes hubShine {
+  0%   { transform: translateX(-160%) skewX(-15deg); }
+  100% { transform: translateX(260%)  skewX(-15deg); }
+}
+
+@keyframes hubPulseRing {
+  0%   { transform: scale(1);    opacity: 0.60; }
+  60%  { transform: scale(1.22); opacity: 0.18; }
+  100% { transform: scale(1.22); opacity: 0; }
+}
+
+@keyframes hubCardEnter {
+  from { opacity: 0; transform: translateY(24px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+/* ── UAC card — cinematic hover with color-matched glow ─── */
+.hub-uac-card {
+  transition:
+    box-shadow 0.34s cubic-bezier(.22,1,.36,1),
+    transform  0.34s cubic-bezier(.22,1,.36,1) !important;
+}
+
 .hub-uac-card-link:hover .hub-uac-card {
   box-shadow:
-    0 20px 60px rgba(11,37,69,0.18),
-    0 0 0 1px rgba(11,37,69,0.10) !important;
-  transform: translateY(-5px) !important;
+    0 0 0 2px var(--hub-card-hex),
+    0 30px 70px rgba(11,37,69,0.18),
+    0 8px 28px var(--hub-card-rgba-soft) !important;
+  transform: translateY(-8px) scale(1.012) !important;
 }
 
-/* Image area zoom on hover */
+/* Shine sweep on hover */
+.hub-uac-card-link:hover .hub-uac-shine {
+  animation: hubShine 0.58s cubic-bezier(.22,1,.36,1) forwards;
+}
+
+/* Image area: brightness on hover */
 .hub-uac-card-link:hover .hub-uac-img-area {
-  filter: brightness(1.07);
+  filter: brightness(1.09) saturate(1.06);
+}
+.hub-uac-img-area {
+  transition: filter 0.34s ease;
 }
 
-/* Icon pop on hover */
-.hub-uac-card-link:hover .hub-uac-icon {
-  transform: scale(1.10);
-  transition: transform 0.28s cubic-bezier(.22,1,.36,1);
-}
+/* Icon: scale pop on hover */
 .hub-uac-icon {
-  transition: transform 0.28s cubic-bezier(.22,1,.36,1);
+  transition: transform 0.34s cubic-bezier(.22,1,.36,1), box-shadow 0.34s ease;
+}
+.hub-uac-card-link:hover .hub-uac-icon {
+  transform: scale(1.14) !important;
+  box-shadow: 0 0 40px var(--hub-card-rgba) !important;
 }
 
-/* Arrow bounce on hover */
-.hub-uac-card-link:hover .hub-uac-arrow {
-  transform: translateX(3px);
+/* Pulse ring: animate on hover */
+.hub-uac-pulse-ring {
+  transition: opacity 0.2s ease;
 }
+.hub-uac-card-link:hover .hub-uac-pulse-ring {
+  opacity: 1 !important;
+  animation: hubPulseRing 1.4s ease-out infinite;
+}
+
+/* Arrow: slide + fill on hover */
 .hub-uac-arrow {
-  transition: transform 0.22s ease, background 0.22s ease;
+  transition: all 0.28s cubic-bezier(.22,1,.36,1);
+}
+.hub-uac-card-link:hover .hub-uac-arrow {
+  background: var(--hub-card-hex) !important;
+  border-color: var(--hub-card-hex) !important;
+  color: #fff !important;
+  transform: translateX(4px) !important;
 }
 
 /* ── Progresion card hover ─── */
+.hub-prog-card {
+  transition: box-shadow 0.28s ease, transform 0.28s ease;
+}
 .hub-prog-card-link:hover .hub-prog-card {
-  box-shadow: 0 12px 36px rgba(11,37,69,0.14) !important;
-  transform: translateY(-3px) !important;
+  box-shadow: 0 16px 48px rgba(11,37,69,0.15) !important;
+  transform: translateY(-4px) !important;
 }
 
 /* ── CTA button ─── */
+.hub-cta-btn {
+  transition: transform 0.22s ease, opacity 0.22s ease !important;
+}
 .hub-cta-btn:hover {
-  opacity: 0.90 !important;
-  transform: translateY(-2px) !important;
-  box-shadow: none !important;
+  opacity: 0.88 !important;
+  transform: translateY(-2px) scale(1.02) !important;
 }
 
 /* ── Header dropdown ─── */
 .hub-dropdown-menu {
-  animation: slideDown 0.15s ease both;
+  animation: slideDown 0.16s cubic-bezier(.22,1,.36,1) both;
 }
 
-/* ── Right panel: hide on small screens ─── */
-.continuar-right-panel {
-  display: flex;
-}
+/* ── Right panel: hide on mobile ─── */
+.continuar-right-panel { display: flex; }
 @media (max-width: 680px) {
   .continuar-right-panel { display: none; }
 }
@@ -151,20 +209,15 @@ body {
 /* ── Sidebar responsive ─── */
 .hub-sidebar-desktop { display: block; }
 .hub-sidebar-mobile  { display: none; }
-
-@media (max-width: 1024px) {
+@media (max-width: 1060px) {
   .hub-sidebar-desktop { display: none; }
   .hub-sidebar-mobile  { display: block; }
 }
 
 /* ── UAC grid breakpoints ─── */
-@media (max-width: 860px) {
-  .hub-uac-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
+@media (max-width: 900px) {
+  .hub-uac-grid { grid-template-columns: repeat(2, 1fr) !important; }
 }
-@media (max-width: 540px) {
-  .hub-uac-grid {
-    grid-template-columns: 1fr !important;
-  }
+@media (max-width: 560px) {
+  .hub-uac-grid { grid-template-columns: 1fr !important; }
 }

@@ -22,7 +22,7 @@ export default async function HubLayout({
   const rachaData = await getRachaDelAlumno(user.id);
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F8FAFC", display: "flex", flexDirection: "column" }}>
+    <div className="hub-root" style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <HubHeader profile={profile} racha={rachaData.diasConsecutivos} />
       <main style={{ flex: 1 }}>
         {children}
