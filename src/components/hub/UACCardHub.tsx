@@ -8,10 +8,23 @@ interface UACCardHubProps {
   totalProgresiones: number;
   completadas: number;
   ultimaActividad: string | null;
+  semestre: number;
+  /** Optional image URL — when provided, shown as card background */
+  imageUrl?: string | null;
 }
 
+const DESCRIPCIONES: Record<string, string> = {
+  "LC-I":    "Desarrolla competencia lectora y comunicación en contextos reales, literarios y académicos.",
+  "PM-I":    "Construye pensamiento matemático para resolver situaciones cotidianas con lógica y precisión.",
+  "IN-I":    "Adquiere habilidades comunicativas en inglés como herramienta de conexión global.",
+  "CD-I":    "Explora el pensamiento computacional, la ciudadanía digital y las herramientas tecnológicas.",
+  "CS-I":    "Analiza fenómenos sociales, históricos y culturales para comprender el mundo contemporáneo.",
+  "PFH-I":   "Reflexiona sobre valores, identidad personal y el sentido ético de la vida en comunidad.",
+  "CNEYT-I": "Comprende los fenómenos naturales mediante el pensamiento científico y la experimentación.",
+};
+
 function timeAgo(dateStr: string | null): string {
-  if (!dateStr) return "Sin actividad aún";
+  if (!dateStr) return null as unknown as string;
   const date = new Date(dateStr);
   const diffMs = Date.now() - date.getTime();
   const diffMin = Math.floor(diffMs / 60000);
@@ -32,15 +45,15 @@ export function UACCardHub({
   totalProgresiones,
   completadas,
   ultimaActividad,
+  semestre,
+  imageUrl,
 }: UACCardHubProps) {
   const color = getRSCColor(rscCodigo);
   const pct = totalProgresiones > 0 ? Math.round((completadas / totalProgresiones) * 100) : 0;
   const isComplete = pct === 100 && totalProgresiones > 0;
-  const hasActivity = completadas > 0;
-
-  // Unique ID for SVG defs to avoid DOM collisions
-  const patternId = `dots-${codigo}`;
-  const glowId = `glow-${codigo}`;
+  const descripcion = DESCRIPCIONES[codigo] ?? "";
+  const lastActivity = timeAgo(ultimaActividad);
+  const patternId = `p-${codigo}`;
 
   return (
     <Link
@@ -48,264 +61,256 @@ export function UACCardHub({
       style={{
         textDecoration: "none",
         display: "block",
-        // CSS vars for color-matched glow in CSS
         "--hub-card-hex": color.hex,
-        "--hub-card-rgba": `rgba(${color.rgba}, 0.28)`,
-        "--hub-card-rgba-soft": `rgba(${color.rgba}, 0.12)`,
+        "--hub-card-rgba": `rgba(${color.rgba}, 0.35)`,
       } as React.CSSProperties}
       className="hub-uac-card-link"
     >
       <article
         className="hub-uac-card"
         style={{
-          borderRadius: 22,
+          borderRadius: 20,
           overflow: "hidden",
-          background: "#fff",
-          boxShadow:
-            "0 1px 3px rgba(11,37,69,0.07), 0 4px 16px rgba(11,37,69,0.05), 0 0 0 1px rgba(11,37,69,0.055)",
-          transition: "box-shadow 0.32s cubic-bezier(.22,1,.36,1), transform 0.32s cubic-bezier(.22,1,.36,1)",
-          cursor: "pointer",
-          display: "flex",
-          flexDirection: "column",
           position: "relative",
+          height: 300,
+          cursor: "pointer",
+          boxShadow: "0 4px 24px rgba(0,0,0,0.18), 0 1px 4px rgba(0,0,0,0.10)",
+          transition:
+            "box-shadow 0.34s cubic-bezier(.22,1,.36,1), transform 0.34s cubic-bezier(.22,1,.36,1)",
         }}
       >
-        {/* ── Shine overlay (sweeps on hover via CSS) ─────── */}
-        <div className="hub-uac-shine" aria-hidden="true" style={{
-          position: "absolute",
-          inset: 0,
-          zIndex: 20,
-          pointerEvents: "none",
-          background: "linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.13) 50%, transparent 65%)",
-          transform: "translateX(-150%) skewX(-15deg)",
-        }} />
-
-        {/* ── Image / cover area ──────────────────────────── */}
+        {/* ── Background: real image or RSC gradient ─── */}
         <div
           className="hub-uac-img-area"
           style={{
-            height: 210,
-            background: color.gradient,
-            position: "relative",
-            overflow: "hidden",
-            transition: "filter 0.32s ease",
+            position: "absolute",
+            inset: 0,
+            background: imageUrl ? undefined : color.gradient,
+            backgroundImage: imageUrl ? `url(${imageUrl})` : undefined,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            transition: "transform 0.50s cubic-bezier(.22,1,.36,1)",
           }}
         >
-          {/* SVG: dot pattern + geometric decoration + radial glow */}
-          <svg
-            aria-hidden="true"
-            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }}
-            viewBox="0 0 340 210"
-            preserveAspectRatio="xMidYMid slice"
-          >
-            <defs>
-              <pattern id={patternId} x="0" y="0" width="22" height="22" patternUnits="userSpaceOnUse">
-                <circle cx="2.5" cy="2.5" r="1.8" fill="rgba(255,255,255,0.13)" />
-              </pattern>
-              <radialGradient id={glowId} cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor={`rgba(${color.rgba}, 0.30)`} />
-                <stop offset="100%" stopColor="transparent" />
-              </radialGradient>
-            </defs>
-
-            {/* Dot grid texture */}
-            <rect width="100%" height="100%" fill={`url(#${patternId})`} />
-
-            {/* Center glow */}
-            <ellipse cx="170" cy="105" rx="100" ry="80" fill={`url(#${glowId})`} />
-
-            {/* Decorative circles */}
-            <circle cx="310" cy="-15" r="100" fill={`rgba(${color.rgba}, 0.20)`} />
-            <circle cx="-18" cy="195" r="80" fill={`rgba(${color.rgba}, 0.15)`} />
-            <circle cx="52" cy="24" r="28" fill="rgba(255,255,255,0.06)" />
-            <circle cx="288" cy="185" r="38" fill={`rgba(${color.rgba}, 0.12)`} />
-
-            {/* Diagonal arc */}
-            <path
-              d="M -20 180 Q 160 60 360 140"
-              stroke="rgba(255,255,255,0.07)"
-              strokeWidth="1.5"
-              fill="none"
-            />
-          </svg>
-
-          {/* Icon with pulsing glow ring */}
-          <div style={{
-            position: "absolute", inset: 0,
-            display: "flex", alignItems: "center", justifyContent: "center",
-          }}>
-            {/* Outer pulse ring */}
-            <div
-              className="hub-uac-pulse-ring"
-              style={{
-                position: "absolute",
-                width: 118,
-                height: 118,
-                borderRadius: "50%",
-                border: `1.5px solid rgba(${color.rgba}, 0.22)`,
-                opacity: 0,
-                transition: "opacity 0.3s ease",
-              }}
-            />
-            {/* Inner ring */}
-            <div style={{
-              position: "absolute",
-              width: 100,
-              height: 100,
-              borderRadius: "50%",
-              border: "1px solid rgba(255,255,255,0.10)",
-            }} />
-
-            {/* Icon */}
-            <div
-              className="hub-uac-icon"
-              style={{
-                width: 80, height: 80,
-                borderRadius: 24,
-                background: "rgba(255,255,255,0.13)",
-                border: "1.5px solid rgba(255,255,255,0.24)",
-                backdropFilter: "blur(14px)",
-                WebkitBackdropFilter: "blur(14px)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 34,
-                color: "#fff",
-                boxShadow: `0 8px 32px rgba(0,0,0,0.28), 0 0 0 8px rgba(255,255,255,0.06), 0 0 40px rgba(${color.rgba}, 0.25)`,
-                transition: "transform 0.32s cubic-bezier(.22,1,.36,1), box-shadow 0.32s ease",
-                position: "relative",
-                zIndex: 1,
-              }}
+          {/* SVG decorations (only shown when no real image) */}
+          {!imageUrl && (
+            <svg
+              aria-hidden="true"
+              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }}
+              viewBox="0 0 440 300"
+              preserveAspectRatio="xMidYMid slice"
             >
-              <i className={`fa-solid ${color.faIcon}`} />
-            </div>
-          </div>
+              <defs>
+                <pattern id={patternId} x="0" y="0" width="22" height="22" patternUnits="userSpaceOnUse">
+                  <circle cx="2.5" cy="2.5" r="1.6" fill="rgba(255,255,255,0.11)" />
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill={`url(#${patternId})`} />
+              {/* Big decorative circles (right side "image area") */}
+              <circle cx="380" cy="-30" r="160" fill={`rgba(${color.rgba}, 0.22)`} />
+              <circle cx="420" cy="330" r="130" fill={`rgba(${color.rgba}, 0.16)`} />
+              <circle cx="300" cy="150" r="70"  fill="rgba(255,255,255,0.05)" />
+              <circle cx="250" cy="60"  r="40"  fill={`rgba(${color.rgba}, 0.12)`} />
+              <path d="M 200 280 Q 340 100 480 180" stroke="rgba(255,255,255,0.08)" strokeWidth="1.5" fill="none" />
+            </svg>
+          )}
+        </div>
 
-          {/* Code badge — top left */}
-          <div style={{ position: "absolute", top: 14, left: 14, zIndex: 2 }}>
+        {/* ── Gradient overlays for text legibility ─── */}
+        {/* Left-to-right: dark left, transparent right */}
+        <div style={{
+          position: "absolute", inset: 0, zIndex: 1, pointerEvents: "none",
+          background:
+            "linear-gradient(to right, rgba(6,14,32,0.94) 0%, rgba(6,14,32,0.80) 38%, rgba(6,14,32,0.30) 64%, transparent 100%)",
+        }} />
+        {/* Bottom-to-top: darken bottom for CTA */}
+        <div style={{
+          position: "absolute", inset: 0, zIndex: 1, pointerEvents: "none",
+          background:
+            "linear-gradient(to top, rgba(6,14,32,0.90) 0%, rgba(6,14,32,0.40) 40%, transparent 70%)",
+        }} />
+
+        {/* ── Large decorative icon (right side visual) ─── */}
+        <div style={{
+          position: "absolute",
+          right: 24,
+          top: "50%",
+          transform: "translateY(-50%)",
+          zIndex: 2,
+          pointerEvents: "none",
+          opacity: 0.22,
+          fontSize: 120,
+          color: "#fff",
+          lineHeight: 1,
+          userSelect: "none",
+          transition: "opacity 0.34s ease, transform 0.50s cubic-bezier(.22,1,.36,1)",
+        }}
+          className="hub-uac-bg-icon"
+        >
+          <i className={`fa-solid ${color.faIcon}`} />
+        </div>
+
+        {/* ── Shine sweep ─── */}
+        <div
+          className="hub-uac-shine"
+          aria-hidden="true"
+          style={{
+            position: "absolute", inset: 0, zIndex: 10, pointerEvents: "none",
+            background:
+              "linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.11) 50%, transparent 65%)",
+            transform: "translateX(-150%) skewX(-12deg)",
+          }}
+        />
+
+        {/* ── Content ─── */}
+        <div style={{
+          position: "absolute", inset: 0, zIndex: 3,
+          padding: "20px 24px 22px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+        }}>
+          {/* TOP: code badge + semester */}
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{
-              display: "inline-block",
               borderRadius: 999,
-              background: "rgba(0,0,0,0.35)",
-              backdropFilter: "blur(12px)",
-              WebkitBackdropFilter: "blur(12px)",
-              border: "1px solid rgba(255,255,255,0.18)",
+              background: color.hex,
               padding: "4px 12px",
               fontSize: 10,
               fontWeight: 800,
-              color: "#fff",
+              color: "#0B2545",
               letterSpacing: "0.10em",
+              textTransform: "uppercase",
             }}>
               {codigo}
             </span>
+            <span style={{
+              borderRadius: 999,
+              background: "rgba(255,255,255,0.12)",
+              border: "1px solid rgba(255,255,255,0.16)",
+              padding: "4px 10px",
+              fontSize: 10,
+              fontWeight: 600,
+              color: "rgba(255,255,255,0.65)",
+            }}>
+              Semestre {semestre}
+            </span>
           </div>
 
-          {/* Status badge — top right */}
-          <div style={{ position: "absolute", top: 14, right: 14, zIndex: 2 }}>
-            {isComplete ? (
-              <span style={{
-                display: "inline-flex", alignItems: "center", gap: 4,
-                borderRadius: 999, background: "#16A34A",
-                padding: "4px 12px", fontSize: 10, fontWeight: 800, color: "#fff",
+          {/* BOTTOM: main content */}
+          <div>
+            {/* Completion badge */}
+            {isComplete && (
+              <div style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 5,
+                borderRadius: 999,
+                background: "rgba(22,163,74,0.25)",
+                border: "1px solid rgba(34,197,94,0.40)",
+                padding: "3px 10px",
+                fontSize: 10,
+                fontWeight: 700,
+                color: "#4ADE80",
+                marginBottom: 8,
               }}>
                 <i className="fa-solid fa-check" style={{ fontSize: 8 }} />
-                100%
+                Completada
+              </div>
+            )}
+
+            {/* UAC name */}
+            <h3 style={{
+              fontSize: "clamp(18px, 2.2vw, 22px)",
+              fontWeight: 900,
+              color: "#fff",
+              margin: "0 0 6px",
+              letterSpacing: "-0.03em",
+              lineHeight: 1.15,
+              textShadow: "0 2px 12px rgba(0,0,0,0.50)",
+              maxWidth: "70%",
+            }}>
+              {nombre}
+            </h3>
+
+            {/* Description */}
+            <p style={{
+              fontSize: 12,
+              color: "rgba(255,255,255,0.58)",
+              margin: "0 0 14px",
+              lineHeight: 1.60,
+              maxWidth: "65%",
+              overflow: "hidden",
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+            }}>
+              {descripcion}
+            </p>
+
+            {/* Stats row */}
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+              <span style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", fontWeight: 500 }}>
+                <span style={{ fontWeight: 700, color: "rgba(255,255,255,0.75)" }}>{completadas}</span>
+                {" "}/ {totalProgresiones} progresiones
               </span>
-            ) : (
+              {lastActivity && (
+                <>
+                  <span style={{ width: 3, height: 3, borderRadius: "50%", background: "rgba(255,255,255,0.25)", flexShrink: 0 }} />
+                  <span style={{ fontSize: 11, color: "rgba(255,255,255,0.38)" }}>{lastActivity}</span>
+                </>
+              )}
+            </div>
+
+            {/* Progress bar + CTA row */}
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              {/* Acceder button */}
               <span style={{
-                display: "inline-block",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 7,
                 borderRadius: 999,
-                background: "rgba(0,0,0,0.35)",
-                backdropFilter: "blur(12px)",
-                WebkitBackdropFilter: "blur(12px)",
-                border: "1px solid rgba(255,255,255,0.18)",
-                padding: "4px 12px",
-                fontSize: 11,
-                fontWeight: 900,
-                color: "#fff",
+                background: color.hex,
+                color: "#0B2545",
+                padding: "9px 20px",
+                fontSize: 13,
+                fontWeight: 800,
+                letterSpacing: "-0.01em",
+                boxShadow: `0 6px 20px rgba(${color.rgba}, 0.45)`,
+                transition: "transform 0.22s ease, box-shadow 0.22s ease",
+              }}
+                className="hub-uac-cta"
+              >
+                {completadas === 0 ? "Comenzar" : "Continuar"}
+                <i className="fa-solid fa-arrow-right" style={{ fontSize: 11 }} />
+              </span>
+
+              {/* Pct pill */}
+              <span style={{
+                fontSize: 13,
+                fontWeight: 800,
+                color: pct > 0 ? color.hex : "rgba(255,255,255,0.30)",
+                letterSpacing: "-0.01em",
               }}>
                 {pct}%
               </span>
-            )}
-          </div>
-
-          {/* Progress bar — image bottom */}
-          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 4, background: "rgba(0,0,0,0.25)", zIndex: 2 }}>
-            {pct > 0 && (
-              <div style={{
-                height: "100%",
-                width: `${pct}%`,
-                background: `rgba(${color.rgba}, 0.90)`,
-                boxShadow: `0 0 10px rgba(${color.rgba}, 0.80)`,
-                transition: "width 1s cubic-bezier(.22,1,.36,1)",
-              }} />
-            )}
+            </div>
           </div>
         </div>
 
-        {/* ── Card body ──────────────────────────────────────── */}
-        <div style={{ padding: "20px 22px 22px", display: "flex", flexDirection: "column", gap: 14 }}>
-
-          {/* Title */}
-          <h3 style={{
-            fontSize: 17,
-            fontWeight: 800,
-            color: "#0B2545",
-            margin: 0,
-            lineHeight: 1.3,
-            letterSpacing: "-0.025em",
-            overflow: "hidden",
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-          }}>
-            {nombre}
-          </h3>
-
-          {/* Mini progress bar */}
-          <div style={{ height: 5, borderRadius: 999, background: "rgba(11,37,69,0.07)", overflow: "hidden" }}>
+        {/* ── Bottom progress strip ─── */}
+        <div style={{
+          position: "absolute", bottom: 0, left: 0, right: 0,
+          height: 3, background: "rgba(255,255,255,0.08)", zIndex: 4,
+        }}>
+          {pct > 0 && (
             <div style={{
               height: "100%",
               width: `${pct}%`,
-              borderRadius: 999,
-              background: `linear-gradient(90deg, ${color.hex}, rgba(${color.rgba}, 0.75))`,
-              transition: "width 1s cubic-bezier(.22,1,.36,1)",
+              background: color.hex,
+              boxShadow: `0 0 8px rgba(${color.rgba}, 0.80)`,
             }} />
-          </div>
-
-          {/* Footer */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 2 }}>
-            <div>
-              <p style={{ fontSize: 14, fontWeight: 800, color: "#0B2545", margin: 0, lineHeight: 1 }}>
-                {completadas}
-                <span style={{ fontWeight: 400, color: "rgba(11,37,69,0.38)", fontSize: 13 }}>
-                  {" "}/ {totalProgresiones}
-                </span>
-              </p>
-              <p style={{
-                fontSize: 11, margin: "5px 0 0",
-                color: hasActivity ? color.hex : "rgba(11,37,69,0.32)",
-                fontWeight: hasActivity ? 600 : 400,
-              }}>
-                {timeAgo(ultimaActividad)}
-              </p>
-            </div>
-
-            <div
-              className="hub-uac-arrow"
-              style={{
-                width: 38, height: 38,
-                borderRadius: "50%",
-                background: `rgba(${color.rgba}, 0.10)`,
-                border: `1.5px solid rgba(${color.rgba}, 0.22)`,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                color: color.hex,
-                fontSize: 13,
-                flexShrink: 0,
-                transition: "all 0.28s cubic-bezier(.22,1,.36,1)",
-              }}
-            >
-              <i className="fa-solid fa-arrow-right" />
-            </div>
-          </div>
+          )}
         </div>
       </article>
     </Link>

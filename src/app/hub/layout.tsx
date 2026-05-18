@@ -1,13 +1,9 @@
 import { redirect } from "next/navigation";
 import { getUser, getProfile } from "@/lib/supabase-helpers";
-import { HubHeader } from "@/components/hub/HubHeader";
 import { getRachaDelAlumno } from "@/lib/queries/hub";
+import { HubShell } from "@/components/hub/HubShell";
 
-export default async function HubLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function HubLayout({ children }: { children: React.ReactNode }) {
   const user = await getUser();
   if (!user) redirect("/log-in");
 
@@ -22,11 +18,8 @@ export default async function HubLayout({
   const rachaData = await getRachaDelAlumno(user.id);
 
   return (
-    <div className="hub-root" style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-      <HubHeader profile={profile} racha={rachaData.diasConsecutivos} />
-      <main style={{ flex: 1 }}>
-        {children}
-      </main>
-    </div>
+    <HubShell profile={profile} racha={rachaData.diasConsecutivos}>
+      {children}
+    </HubShell>
   );
 }

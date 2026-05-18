@@ -389,43 +389,6 @@ export default function LandingPageBachillerato() {
             </div>
           </section>
 
-          {/* ── STATS BAND ── */}
-          <section className="live-band">
-            <div>
-              <div className="lb-eyebrow"><span className="pulse"></span>MCCEMS · Acuerdo 09/08/23</div>
-              <h2>La plataforma bachillerato<br /><em>más completa</em> de México.</h2>
-              <p>
-                Alineada al Marco Curricular Común de la Educación Media Superior y el Modelo Educativo 2025.
-                Lista para implementar en cualquier bachillerato del país.
-              </p>
-              <div className="live-stats">
-                <div className="live-stat">
-                  <h4>34</h4>
-                  <div className="lbl">UAC MCCEMS</div>
-                  <div className="sub"><i className="fas fa-book-open"></i> Currículum Fundamental</div>
-                </div>
-                <div className="live-stat">
-                  <h4>8</h4>
-                  <div className="lbl">Recursos Sociocognitivos</div>
-                  <div className="sub"><i className="fas fa-layer-group"></i> Transversales 1–6</div>
-                </div>
-                <div className="live-stat">
-                  <h4>4</h4>
-                  <div className="lbl">Ámbitos Socioemocionales</div>
-                  <div className="sub"><i className="fas fa-users"></i> Formación integral</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="live-band-visual">
-              <div className="visual-grid">
-                {['1°', '2°', '3°', '4°', '5°', '6°'].map((sem) => (
-                  <div key={sem} className="visual-badge">{sem} Sem.</div>
-                ))}
-              </div>
-            </div>
-          </section>
-
           {/* ── CTA BAND ── */}
           <section className="cta-band">
             <div>

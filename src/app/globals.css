@@ -215,9 +215,158 @@ body {
 }
 
 /* ── UAC grid breakpoints ─── */
-@media (max-width: 900px) {
+@media (max-width: 1060px) {
   .hub-uac-grid { grid-template-columns: repeat(2, 1fr) !important; }
 }
-@media (max-width: 560px) {
+@media (max-width: 680px) {
   .hub-uac-grid { grid-template-columns: 1fr !important; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   HUB V2 — 3-panel layout system
+   ══════════════════════════════════════════════════════════════ */
+
+/* Sidebar panel (dark navy, sticky left column) */
+.hub-sidebar-panel {
+  width: 240px;
+  flex-shrink: 0;
+  background: #060E20;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  border-right: 1px solid rgba(255,255,255,0.05);
+  display: flex;
+  flex-direction: column;
+  z-index: 50;
+}
+
+/* Main content panel (light bg, scrollable) */
+.hub-main-panel {
+  flex: 1;
+  min-width: 0;
+  min-height: 100vh;
+}
+
+/* Sidebar nav item */
+.hub-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  color: rgba(255,255,255,0.50);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+.hub-nav-item:hover {
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.88);
+}
+.hub-nav-item.active {
+  background: rgba(56,189,248,0.14);
+  color: #38BDF8;
+}
+.hub-nav-item .hub-nav-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+  transition: background 0.18s ease;
+}
+.hub-nav-item.active .hub-nav-icon {
+  background: rgba(56,189,248,0.18);
+}
+
+/* Logout button */
+.hub-logout-btn {
+  color: rgba(255,255,255,0.30) !important;
+  text-decoration: none !important;
+  transition: color 0.18s ease !important;
+}
+.hub-logout-btn:hover {
+  color: rgba(255,255,255,0.65) !important;
+}
+
+/* Mobile hamburger bar */
+.hub-mobile-bar {
+  display: none;
+  align-items: center;
+  gap: 12px;
+  background: #060E20;
+  padding: 14px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+/* Drawer overlay */
+.hub-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  z-index: 60;
+  backdrop-filter: blur(4px);
+}
+.hub-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 260px;
+  background: #060E20;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  border-right: 1px solid rgba(255,255,255,0.07);
+}
+
+/* Responsive: hide sidebar, show mobile bar */
+@media (max-width: 1024px) {
+  .hub-sidebar-panel { display: none !important; }
+  .hub-mobile-bar { display: flex !important; }
+}
+
+/* ── UAC card v2 (white + RSC accent) ─── */
+.hub-uac-card-v2 {
+  background: #fff;
+  border-radius: 20px;
+  border: 1px solid rgba(11,37,69,0.08);
+  box-shadow: 0 2px 16px rgba(11,37,69,0.06);
+  transition:
+    transform 0.28s cubic-bezier(.22,1,.36,1),
+    box-shadow 0.28s cubic-bezier(.22,1,.36,1);
+}
+.hub-uac-card-v2-link:hover .hub-uac-card-v2 {
+  transform: translateY(-6px);
+  box-shadow:
+    0 0 0 2px var(--card-color, #38BDF8),
+    0 24px 56px rgba(11,37,69,0.12),
+    0 8px 24px var(--card-shadow, rgba(56,189,248,0.18));
+}
+
+/* ── Biblioteca card hover ─── */
+.bib-ficha-card {
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+.bib-ficha-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(11,37,69,0.12) !important;
+}
+
+/* ── Progreso donut animation ─── */
+@keyframes progressStroke {
+  from { stroke-dashoffset: var(--circ); }
+  to   { stroke-dashoffset: var(--offset); }
+}
+.progress-ring-fill {
+  animation: progressStroke 1.2s cubic-bezier(.22,1,.36,1) forwards;
 }
