@@ -101,6 +101,11 @@ automáticamente.
 **Prioridad recomendada:** Baja. Atender después de validación funcional y piloto con
 estudiantes.
 
+**Prioridad de revisión cuando se decida ampliar lecturas:**
+- LC-I (8 lecturas, 144–179 palabras) — **prioridad alta**: es la materia de comprensión textual donde la longitud del texto importa directamente al propósito formativo
+- PM-I (6 lecturas, 175–197 palabras) — **prioridad media-baja**: diferencia moderada, el texto matemático es más denso conceptualmente aunque más corto
+- CD-I (6 lecturas, 187–199 palabras) — **prioridad baja**: diferencia mínima (1–13 palabras), probablemente no justifica revisión
+
 ---
 
 ## DEC-04: Heurísitica de secuencia pedagógica (TIPOS_A1/A2/A3)
