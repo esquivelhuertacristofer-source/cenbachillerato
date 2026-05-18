@@ -1,0 +1,281 @@
+/* ═══════════════════════════════════════════════════════════
+   HubV5.css — CEN Bachillerato Dark Hub Design System
+   Clonado visualmente de CEN Educación Financiera.
+   Paleta: navy #011126 base · accents per-UAC · white text
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  --hub-dark-bg:       #011126;
+  --hub-dark-surface:  #011C40;
+  --hub-border:        rgba(255, 255, 255, 0.07);
+  --hub-text:          #ffffff;
+  --hub-text-muted:    rgba(255, 255, 255, 0.40);
+  --hub-text-dim:      rgba(255, 255, 255, 0.20);
+}
+
+/* ── Full-page dark canvas ─────────────────────────────────── */
+.hub-v2-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 95%  5%,  rgba(56, 189, 248, 0.06) 0%, transparent 38%),
+    radial-gradient(circle at 5%   90%, rgba(167,139,250, 0.05) 0%, transparent 32%),
+    radial-gradient(circle at 50% 120%, rgba(34, 211, 238, 0.04) 0%, transparent 40%),
+    var(--hub-dark-bg);
+  font-family: var(--font-epilogue), 'Plus Jakarta Sans', sans-serif;
+  color: var(--hub-text);
+  padding: 56px 48px 100px;
+}
+
+/* ── Hero section ─────────────────────────────────────────── */
+.hub-v2-hero {
+  margin-bottom: 64px;
+}
+
+.hub-v2-eyebrow {
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.35em;
+  color: var(--hub-text-muted);
+  margin-bottom: 12px;
+}
+
+.hub-v2-title {
+  font-size: clamp(36px, 5vw, 64px);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+  color: var(--hub-text);
+  margin-bottom: 28px;
+}
+
+.hub-v2-title span {
+  background: linear-gradient(135deg, #38BDF8, #A78BFA);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hub-v2-stats {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.hub-v2-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--hub-border);
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.70);
+  backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
+}
+
+.hub-v2-stat:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.90);
+}
+
+.hub-v2-stat-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+/* ── Section header ──────────────────────────────────────── */
+.hub-v2-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  gap: 16px;
+}
+
+.hub-v2-section-title {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: var(--hub-text);
+}
+
+.hub-v2-section-line {
+  flex: 1;
+  height: 1px;
+  background: var(--hub-border);
+}
+
+.hub-v2-section-badge {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--hub-border);
+  border-radius: 999px;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--hub-text-muted);
+}
+
+/* ── UAC page dark canvas ─────────────────────────────────── */
+.uac-v2-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 90% 5%, rgba(255,255,255,0.03) 0%, transparent 30%),
+    var(--hub-dark-bg);
+  font-family: var(--font-epilogue), 'Plus Jakarta Sans', sans-serif;
+  color: var(--hub-text);
+  padding: 0 0 100px;
+}
+
+/* ── UAC page nav bar ─────────────────────────────────────── */
+.uac-v2-nav {
+  padding: 28px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(1, 17, 38, 0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--hub-border);
+}
+
+.uac-v2-back-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--hub-text-muted);
+  text-decoration: none;
+  transition: all 0.25s;
+}
+
+.uac-v2-back-link:hover {
+  color: var(--hub-text);
+  transform: translateX(-4px);
+}
+
+/* ── UAC page hero ────────────────────────────────────────── */
+.uac-v2-hero {
+  padding: 64px 48px 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+.uac-v2-hero-content {
+  max-width: 720px;
+  position: relative;
+  z-index: 10;
+}
+
+.uac-v2-tag {
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.4em;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.uac-v2-h1 {
+  font-size: clamp(40px, 5.5vw, 72px);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 0.92;
+  color: var(--hub-text);
+  margin-bottom: 28px;
+}
+
+.uac-v2-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  max-width: 480px;
+}
+
+.uac-v2-prog-track {
+  flex: 1;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.10);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.uac-v2-prog-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 1.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.uac-v2-prog-val {
+  font-size: 28px;
+  font-weight: 900;
+  font-family: var(--font-epilogue), sans-serif;
+  min-width: 60px;
+}
+
+/* ── Timeline section ─────────────────────────────────────── */
+.uac-v2-timeline {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 48px;
+}
+
+.uac-v2-timeline-header {
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--hub-text);
+  margin-bottom: 48px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.uac-v2-timeline-line {
+  flex: 1;
+  height: 1px;
+  background: var(--hub-border);
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .hub-v2-page,
+  .uac-v2-hero,
+  .uac-v2-nav,
+  .uac-v2-timeline {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .hub-v2-title {
+    font-size: 32px;
+  }
+  .uac-v2-h1 {
+    font-size: 36px;
+  }
+  .hub-v2-page {
+    padding-top: 32px;
+    padding-bottom: 60px;
+  }
+}
+
+/* ── Keyframes ───────────────────────────────────────────── */
+@keyframes hubV2FadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.hub-v2-animate {
+  animation: hubV2FadeIn 0.5s cubic-bezier(0.23, 1, 0.32, 1) both;
+}

@@ -46,48 +46,48 @@ function SidebarContent({
     <>
       {/* ── Logo ─── */}
       <div style={{
-        padding: "22px 18px 18px",
+        padding: "28px 20px 22px",
         borderBottom: "1px solid rgba(255,255,255,0.06)",
         flexShrink: 0,
       }}>
         <Link
           href="/hub"
           onClick={onClose}
-          style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}
+          style={{ display: "flex", alignItems: "center", gap: 12, textDecoration: "none" }}
         >
           <div style={{
-            width: 38, height: 38, borderRadius: 11,
-            background: "linear-gradient(135deg, #38BDF8 0%, #0EA5E9 100%)",
+            width: 44, height: 44, borderRadius: 13,
+            background: "white",
             display: "flex", alignItems: "center", justifyContent: "center",
-            boxShadow: "0 4px 14px rgba(56,189,248,0.40)",
+            boxShadow: "0 4px 14px rgba(0,0,0,0.20)",
             flexShrink: 0,
           }}>
             <img
               src="/Logo%20Cen.png"
               alt="CEN"
-              style={{ width: 23, height: 23, objectFit: "contain", filter: "brightness(0) invert(1)" }}
+              style={{ width: 26, height: 26, objectFit: "contain" }}
             />
           </div>
           <div>
-            <div style={{ fontSize: 15, fontWeight: 900, color: "#fff", letterSpacing: "-0.03em", lineHeight: 1.1 }}>
+            <div style={{ fontSize: 18, fontWeight: 900, color: "#fff", letterSpacing: "-0.03em", lineHeight: 1.05 }}>
               CEN
             </div>
-            <div style={{ fontSize: 10, fontWeight: 600, color: "rgba(255,255,255,0.35)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.40)", textTransform: "uppercase", letterSpacing: "0.12em" }}>
               Bachillerato
             </div>
           </div>
         </Link>
 
         {/* Semestre pill */}
-        <div style={{ marginTop: 14 }}>
+        <div style={{ marginTop: 16 }}>
           <span style={{
-            display: "inline-flex", alignItems: "center", gap: 5,
+            display: "inline-flex", alignItems: "center", gap: 6,
             background: "rgba(56,189,248,0.10)",
-            border: "1px solid rgba(56,189,248,0.18)",
+            border: "1px solid rgba(56,189,248,0.20)",
             borderRadius: 999,
-            padding: "4px 11px",
-            fontSize: 11, fontWeight: 700, color: "#7DD3FC",
-            letterSpacing: "0.05em",
+            padding: "5px 12px",
+            fontSize: 11, fontWeight: 800, color: "#7DD3FC",
+            letterSpacing: "0.06em",
           }}>
             <i className="fa-solid fa-graduation-cap" style={{ fontSize: 9 }} />
             Semestre {profile.semestre ?? 1}
