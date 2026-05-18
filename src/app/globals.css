@@ -83,45 +83,87 @@ body {
 /* ── Hub student UI ─────────────────────────────────────────────────────────── */
 
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* UAC card hover */
+@keyframes hubOrb {
+  from { transform: translateY(0px) scale(1); }
+  to   { transform: translateY(-6px) scale(1.04); }
+}
+
+/* ── UAC card — cinematic hover ─── */
 .hub-uac-card-link:hover .hub-uac-card {
-  box-shadow: 0 8px 28px rgba(11,37,69,0.13) !important;
-  border-color: rgba(11,37,69,0.22) !important;
-  transform: translateY(-2px) !important;
+  box-shadow:
+    0 20px 60px rgba(11,37,69,0.18),
+    0 0 0 1px rgba(11,37,69,0.10) !important;
+  transform: translateY(-5px) !important;
 }
 
-/* Progresion card hover */
+/* Image area zoom on hover */
+.hub-uac-card-link:hover .hub-uac-img-area {
+  filter: brightness(1.07);
+}
+
+/* Icon pop on hover */
+.hub-uac-card-link:hover .hub-uac-icon {
+  transform: scale(1.10);
+  transition: transform 0.28s cubic-bezier(.22,1,.36,1);
+}
+.hub-uac-icon {
+  transition: transform 0.28s cubic-bezier(.22,1,.36,1);
+}
+
+/* Arrow bounce on hover */
+.hub-uac-card-link:hover .hub-uac-arrow {
+  transform: translateX(3px);
+}
+.hub-uac-arrow {
+  transition: transform 0.22s ease, background 0.22s ease;
+}
+
+/* ── Progresion card hover ─── */
 .hub-prog-card-link:hover .hub-prog-card {
-  box-shadow: 0 6px 24px rgba(11,37,69,0.12) !important;
-  transform: translateY(-1px) !important;
+  box-shadow: 0 12px 36px rgba(11,37,69,0.14) !important;
+  transform: translateY(-3px) !important;
 }
 
-/* CTA button hover (ContinuarCard) */
+/* ── CTA button ─── */
 .hub-cta-btn:hover {
-  opacity: 0.88 !important;
-  transform: translateY(-1px) !important;
+  opacity: 0.90 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: none !important;
 }
 
-/* Hub header dropdown animation */
+/* ── Header dropdown ─── */
 .hub-dropdown-menu {
   animation: slideDown 0.15s ease both;
 }
 
-/* Responsive sidebar: desktop shows right column, mobile shows below grid */
+/* ── Right panel: hide on small screens ─── */
+.continuar-right-panel {
+  display: flex;
+}
+@media (max-width: 680px) {
+  .continuar-right-panel { display: none; }
+}
+
+/* ── Sidebar responsive ─── */
 .hub-sidebar-desktop { display: block; }
 .hub-sidebar-mobile  { display: none; }
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .hub-sidebar-desktop { display: none; }
   .hub-sidebar-mobile  { display: block; }
 }
 
-/* UAC grid: single column on very small screens */
-@media (max-width: 480px) {
+/* ── UAC grid breakpoints ─── */
+@media (max-width: 860px) {
+  .hub-uac-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+@media (max-width: 540px) {
   .hub-uac-grid {
     grid-template-columns: 1fr !important;
   }

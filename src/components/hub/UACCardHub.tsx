@@ -36,11 +36,7 @@ export function UACCardHub({
   const color = getRSCColor(rscCodigo);
   const pct = totalProgresiones > 0 ? Math.round((completadas / totalProgresiones) * 100) : 0;
   const isComplete = pct === 100 && totalProgresiones > 0;
-
-  // SVG progress ring
-  const R = 22;
-  const circ = 2 * Math.PI * R;
-  const offset = circ * (1 - pct / 100);
+  const hasActivity = completadas > 0;
 
   return (
     <Link
@@ -48,136 +44,211 @@ export function UACCardHub({
       style={{ textDecoration: "none", display: "block" }}
       className="hub-uac-card-link"
     >
-      <div
+      <article
         style={{
+          borderRadius: 24,
+          overflow: "hidden",
+          background: "#fff",
+          boxShadow: "0 2px 8px rgba(11,37,69,0.07), 0 0 0 1px rgba(11,37,69,0.06)",
+          transition: "box-shadow 0.28s ease, transform 0.28s ease",
+          cursor: "pointer",
           display: "flex",
           flexDirection: "column",
-          gap: 16,
-          borderRadius: 20,
-          border: `1px solid rgba(11,37,69,0.10)`,
-          background: "#fff",
-          padding: "20px 20px 16px",
-          boxShadow: "0 2px 8px rgba(11,37,69,0.06)",
-          transition: "box-shadow 0.22s ease, border-color 0.22s ease, transform 0.22s ease",
-          cursor: "pointer",
-          position: "relative",
-          overflow: "hidden",
         }}
         className="hub-uac-card"
       >
-        {/* Completed badge */}
-        {isComplete && (
-          <div style={{
-            position: "absolute",
-            top: 12,
-            right: 12,
-            borderRadius: 999,
-            background: "#DCFCE7",
-            border: "1px solid rgba(34,197,94,0.30)",
-            padding: "3px 10px",
-            fontSize: 11,
-            fontWeight: 700,
-            color: "#16A34A",
-            display: "flex",
-            alignItems: "center",
-            gap: 4,
-          }}>
-            <i className="fa-solid fa-check" style={{ fontSize: 9 }} />
-            ¡Completada!
-          </div>
-        )}
+        {/* ── Image / visual area ────────────────────────────────── */}
+        <div
+          style={{
+            height: 196,
+            background: color.gradient,
+            position: "relative",
+            overflow: "hidden",
+          }}
+          className="hub-uac-img-area"
+        >
+          {/* Decorative SVG geometry */}
+          <svg
+            aria-hidden="true"
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }}
+            viewBox="0 0 340 196"
+            preserveAspectRatio="xMidYMid slice"
+          >
+            <circle cx="300" cy="-18" r="110" fill={`rgba(${color.rgba}, 0.22)`} />
+            <circle cx="-28" cy="180" r="88" fill={`rgba(${color.rgba}, 0.16)`} />
+            <circle cx="170" cy="98" r="52" fill="rgba(255,255,255,0.04)" />
+            <circle cx="54" cy="28" r="32" fill="rgba(255,255,255,0.05)" />
+            <circle cx="290" cy="170" r="42" fill={`rgba(${color.rgba}, 0.12)`} />
+          </svg>
 
-        {/* Top row: ring + icon */}
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <div style={{ position: "relative", width: 58, height: 58, flexShrink: 0 }}>
-            {/* Icon circle */}
-            <div style={{
+          {/* Icon */}
+          <div
+            style={{
               position: "absolute",
-              inset: 8,
-              borderRadius: "50%",
-              background: `rgba(${color.rgba}, 0.12)`,
+              inset: 0,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: 20,
-              color: color.hex,
-            }}>
+            }}
+          >
+            <div
+              style={{
+                width: 88,
+                height: 88,
+                borderRadius: 26,
+                background: "rgba(255,255,255,0.12)",
+                border: "1.5px solid rgba(255,255,255,0.22)",
+                backdropFilter: "blur(12px)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 38,
+                color: "#fff",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.28), 0 0 0 10px rgba(255,255,255,0.05)",
+              }}
+              className="hub-uac-icon"
+            >
               <i className={`fa-solid ${color.faIcon}`} />
             </div>
-            {/* SVG ring */}
-            <svg
-              width={58}
-              height={58}
-              viewBox="0 0 58 58"
-              style={{ position: "absolute", inset: 0, transform: "rotate(-90deg)" }}
-            >
-              <circle cx={29} cy={29} r={R} fill="none" stroke={`rgba(${color.rgba}, 0.14)`} strokeWidth={3.5} />
-              {pct > 0 && (
-                <circle
-                  cx={29}
-                  cy={29}
-                  r={R}
-                  fill="none"
-                  stroke={color.hex}
-                  strokeWidth={3.5}
-                  strokeDasharray={circ}
-                  strokeDashoffset={offset}
-                  strokeLinecap="round"
-                />
-              )}
-            </svg>
           </div>
 
-          <div style={{ minWidth: 0, flex: 1 }}>
-            <p style={{ fontSize: 11, fontWeight: 700, color: color.hex, margin: "0 0 3px", letterSpacing: "0.04em", textTransform: "uppercase" }}>
-              {codigo}
-            </p>
-            <h3 style={{
-              fontSize: 14,
+          {/* Code badge — top left */}
+          <div style={{ position: "absolute", top: 14, left: 14 }}>
+            <span style={{
+              display: "inline-block",
+              borderRadius: 999,
+              background: "rgba(0,0,0,0.32)",
+              backdropFilter: "blur(10px)",
+              border: "1px solid rgba(255,255,255,0.18)",
+              padding: "4px 12px",
+              fontSize: 11,
               fontWeight: 700,
-              color: "#0B2545",
-              margin: 0,
-              lineHeight: 1.35,
-              overflow: "hidden",
-              display: "-webkit-box",
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical",
+              color: "#fff",
+              letterSpacing: "0.07em",
             }}>
-              {nombre}
-            </h3>
+              {codigo}
+            </span>
+          </div>
+
+          {/* Status badge — top right */}
+          <div style={{ position: "absolute", top: 14, right: 14 }}>
+            {isComplete ? (
+              <span style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 4,
+                borderRadius: 999,
+                background: "#16A34A",
+                padding: "4px 12px",
+                fontSize: 11,
+                fontWeight: 700,
+                color: "#fff",
+                letterSpacing: "0.04em",
+              }}>
+                <i className="fa-solid fa-check" style={{ fontSize: 9 }} />
+                Completada
+              </span>
+            ) : (
+              <span style={{
+                display: "inline-block",
+                borderRadius: 999,
+                background: "rgba(0,0,0,0.32)",
+                backdropFilter: "blur(10px)",
+                border: "1px solid rgba(255,255,255,0.18)",
+                padding: "4px 12px",
+                fontSize: 12,
+                fontWeight: 800,
+                color: "#fff",
+              }}>
+                {pct}%
+              </span>
+            )}
+          </div>
+
+          {/* Progress bar — bottom of image */}
+          <div style={{
+            position: "absolute",
+            bottom: 0, left: 0, right: 0,
+            height: 4,
+            background: "rgba(0,0,0,0.20)",
+          }}>
+            {pct > 0 && (
+              <div style={{
+                height: "100%",
+                width: `${pct}%`,
+                background: color.hex,
+                boxShadow: `0 0 8px rgba(${color.rgba}, 0.70)`,
+                transition: "width 0.8s cubic-bezier(.22,1,.36,1)",
+              }} />
+            )}
           </div>
         </div>
 
-        {/* Footer */}
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          borderTop: "1px solid rgba(11,37,69,0.07)",
-          paddingTop: 12,
-          gap: 8,
-        }}>
-          <div>
-            <p style={{ fontSize: 13, fontWeight: 700, color: "#0B2545", margin: 0 }}>
-              {completadas} <span style={{ fontWeight: 400, color: "rgba(11,37,69,0.45)" }}>de {totalProgresiones}</span>
-            </p>
-            <p style={{ fontSize: 11, color: "rgba(11,37,69,0.40)", margin: 0, marginTop: 1 }}>
-              {timeAgo(ultimaActividad)}
-            </p>
-          </div>
+        {/* ── Card body ──────────────────────────────────────────── */}
+        <div style={{ padding: "20px 22px 22px", flex: 1, display: "flex", flexDirection: "column", gap: 14 }}>
+
+          {/* Name */}
+          <h3 style={{
+            fontSize: 17,
+            fontWeight: 800,
+            color: "#0B2545",
+            margin: 0,
+            lineHeight: 1.3,
+            letterSpacing: "-0.02em",
+            overflow: "hidden",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+          }}>
+            {nombre}
+          </h3>
+
+          {/* Footer */}
           <div style={{
-            fontSize: 12,
-            fontWeight: 700,
-            color: color.hex,
             display: "flex",
             alignItems: "center",
-            gap: 4,
+            justifyContent: "space-between",
+            marginTop: "auto",
           }}>
-            {pct}%
-            <i className="fa-solid fa-chevron-right" style={{ fontSize: 10, color: "rgba(11,37,69,0.25)" }} />
+            <div>
+              <p style={{ fontSize: 14, fontWeight: 700, color: "#0B2545", margin: 0, lineHeight: 1 }}>
+                {completadas}
+                <span style={{ fontWeight: 400, color: "rgba(11,37,69,0.40)", fontSize: 13 }}>
+                  {" "}/ {totalProgresiones}
+                </span>
+              </p>
+              <p style={{
+                fontSize: 11,
+                color: hasActivity ? `rgba(${color.rgba}, 0.85)` : "rgba(11,37,69,0.35)",
+                margin: "4px 0 0",
+                fontWeight: hasActivity ? 600 : 400,
+              }}>
+                {timeAgo(ultimaActividad)}
+              </p>
+            </div>
+
+            {/* Arrow CTA */}
+            <div style={{
+              width: 38,
+              height: 38,
+              borderRadius: "50%",
+              background: `rgba(${color.rgba}, 0.12)`,
+              border: `1px solid rgba(${color.rgba}, 0.20)`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: color.hex,
+              fontSize: 13,
+              flexShrink: 0,
+              transition: "background 0.2s, transform 0.2s",
+            }}
+              className="hub-uac-arrow"
+            >
+              <i className="fa-solid fa-arrow-right" />
+            </div>
           </div>
         </div>
-      </div>
+      </article>
     </Link>
   );
 }

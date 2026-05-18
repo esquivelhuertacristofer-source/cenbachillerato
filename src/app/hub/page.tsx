@@ -52,33 +52,35 @@ export default async function HubPage() {
   });
 
   return (
-    <div style={{ maxWidth: 1280, margin: "0 auto", padding: "28px 32px 48px" }}>
+    <div style={{ maxWidth: 1440, margin: "0 auto", padding: "32px 40px 64px" }}>
       {/* 2-column layout: main + sidebar */}
-      <div style={{
-        display: "flex",
-        gap: 28,
-        alignItems: "flex-start",
-      }}>
-        {/* Main content */}
-        <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 32 }}>
+      <div style={{ display: "flex", gap: 32, alignItems: "flex-start" }}>
 
-          {/* BLOQUE 2 — Continuar */}
+        {/* Main content */}
+        <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 40 }}>
+
+          {/* Hero — Continuar */}
           <section aria-label="Continuar donde dejaste">
             <ContinuarCard data={continuar} nombre={nombre} />
           </section>
 
-          {/* BLOQUE 3 — Mis UAC */}
+          {/* UAC grid */}
           <section id="mis-materias" aria-label="Mis materias del semestre">
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
-              <h2 style={{ fontSize: 18, fontWeight: 800, color: "#0B2545", letterSpacing: "-0.02em", margin: 0 }}>
-                Semestre {semestre}
-              </h2>
+            <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 24 }}>
+              <div>
+                <p style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "#1E40AF", margin: "0 0 4px" }}>
+                  Tus áreas de aprendizaje
+                </p>
+                <h2 style={{ fontSize: 26, fontWeight: 900, color: "#0B2545", letterSpacing: "-0.03em", margin: 0, lineHeight: 1 }}>
+                  Semestre {semestre}
+                </h2>
+              </div>
               <span style={{
                 borderRadius: 999,
                 background: "#EFF6FF",
                 border: "1px solid rgba(30,64,175,0.15)",
-                padding: "4px 12px",
-                fontSize: 12,
+                padding: "6px 16px",
+                fontSize: 13,
                 fontWeight: 700,
                 color: "#1E40AF",
               }}>
@@ -86,20 +88,20 @@ export default async function HubPage() {
               </span>
             </div>
 
-            {/* UAC grid */}
-            <div style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-              gap: 16,
-            }}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+                gap: 20,
+              }}
               className="hub-uac-grid"
             >
               {uacConProgreso.map((uac, i) => (
                 <div
                   key={uac.codigo}
                   style={{
-                    animationDelay: `${i * 60}ms`,
-                    animation: "fadeInUp 0.4s ease both",
+                    animationDelay: `${i * 70}ms`,
+                    animation: "fadeInUp 0.45s cubic-bezier(.22,1,.36,1) both",
                   }}
                 >
                   <UACCardHub
@@ -116,23 +118,17 @@ export default async function HubPage() {
           </section>
         </div>
 
-        {/* BLOQUE 4 — Sidebar progreso (desktop) */}
+        {/* Sidebar — desktop */}
         <div
-          style={{
-            width: 296,
-            flexShrink: 0,
-            position: "sticky",
-            top: 88,
-            alignSelf: "flex-start",
-          }}
+          style={{ width: 310, flexShrink: 0, position: "sticky", top: 88, alignSelf: "flex-start" }}
           className="hub-sidebar-desktop"
         >
           <ProgressSidebar progreso={progreso} racha={racha} semestre={semestre} />
         </div>
       </div>
 
-      {/* BLOQUE 4 — Sidebar mobile (below grid) */}
-      <div className="hub-sidebar-mobile" style={{ marginTop: 32 }}>
+      {/* Sidebar — mobile */}
+      <div className="hub-sidebar-mobile" style={{ marginTop: 40 }}>
         <ProgressSidebar progreso={progreso} racha={racha} semestre={semestre} />
       </div>
     </div>
