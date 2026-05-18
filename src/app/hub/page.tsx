@@ -1,11 +1,16 @@
 import { redirect } from "next/navigation";
 import { getUser, getProfile } from "@/lib/supabase-helpers";
-import { UACCard } from "@/components/hub/UACCard";
-import {
-  UAC_BASE,
-  RECURSOS_SOCIOEMOCIONALES,
-} from "@/lib/mccems/estructura";
+import { UAC_BASE } from "@/lib/mccems/estructura";
 import { RECURSOS_SOCIOCOGNITIVOS } from "@/lib/mccems/recursos-sociocognitivos";
+import { ContinuarCard } from "@/components/hub/ContinuarCard";
+import { UACCardHub } from "@/components/hub/UACCardHub";
+import { ProgressSidebar } from "@/components/hub/ProgressSidebar";
+import {
+  getUltimaActividadActiva,
+  getProgresoSemestre,
+  getRachaDelAlumno,
+  getProgresionesCompletadasDeUAC,
+} from "@/lib/queries/hub";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -19,123 +24,116 @@ export default async function HubPage() {
   const profile = await getProfile(user.id);
   if (!profile) redirect("/log-in");
 
-  const semestreActual = profile.semestre ?? 1;
-  const uacDelSemestre = UAC_BASE.filter(
-    (uac) => uac.semestre === semestreActual
-  );
-
+  const semestre = profile.semestre ?? 1;
   const nombre = profile.full_name?.split(" ")[0] ?? "Alumno";
 
+  const uacDelSemestre = UAC_BASE.filter((u) => u.semestre === semestre);
+
+  // Parallel queries
+  const [continuar, progreso, racha, ...progresosUAC] = await Promise.all([
+    getUltimaActividadActiva(user.id, semestre),
+    getProgresoSemestre(user.id, semestre),
+    getRachaDelAlumno(user.id),
+    ...uacDelSemestre.map((u) => getProgresionesCompletadasDeUAC(u.codigo, user.id)),
+  ]);
+
+  const uacConProgreso = uacDelSemestre.map((uac, i) => {
+    const recurso = RECURSOS_SOCIOCOGNITIVOS.find((r) => r.codigo === uac.recursoCodigo);
+    const p = progresosUAC[i] ?? { completadas: 0, total: uac.totalProgresionesEsperadas, ultimaActividad: null };
+    return {
+      codigo: uac.codigo,
+      nombre: uac.nombre,
+      rscCodigo: uac.recursoCodigo ?? "RSC-LC",
+      totalProgresiones: p.total > 0 ? p.total : uac.totalProgresionesEsperadas,
+      completadas: p.completadas,
+      ultimaActividad: p.ultimaActividad,
+      recurso,
+    };
+  });
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 32, maxWidth: 1100 }}>
-
-      {/* Saludo */}
-      <div>
-        <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#1E40AF', marginBottom: 8 }}>
-          <i className="fa-solid fa-circle" style={{ fontSize: 8, color: '#10b981', marginRight: 6 }} />
-          Sesión activa
-        </div>
-        <h1 style={{ fontSize: 26, fontWeight: 900, color: '#0B2545', letterSpacing: '-0.03em', margin: '0 0 4px' }}>
-          Hola, {nombre}
-        </h1>
-        <p style={{ fontSize: 14, color: 'rgba(11,37,69,0.55)', margin: 0 }}>
-          Semestre {semestreActual}
-          {profile.area_eleccion ? ` · ${profile.area_eleccion}` : ""}
-        </p>
-      </div>
-
-      {/* Banner de próximo contenido */}
+    <div style={{ maxWidth: 1280, margin: "0 auto", padding: "28px 32px 48px" }}>
+      {/* 2-column layout: main + sidebar */}
       <div style={{
-        borderRadius: 16,
-        border: '1px solid rgba(30,64,175,0.15)',
-        background: '#EFF6FF',
-        padding: '20px 24px',
-        display: 'flex',
-        alignItems: 'flex-start',
-        gap: 16,
+        display: "flex",
+        gap: 28,
+        alignItems: "flex-start",
       }}>
-        <i className="fa-solid fa-hammer" style={{ fontSize: 22, color: '#1E40AF', marginTop: 2, flexShrink: 0 }} />
-        <div>
-          <h2 style={{ fontSize: 15, fontWeight: 800, color: '#0B2545', margin: '0 0 4px' }}>
-            Contenido pedagógico en desarrollo
-          </h2>
-          <p style={{ fontSize: 13, color: 'rgba(11,37,69,0.65)', margin: 0, lineHeight: 1.6 }}>
-            La estructura curricular MCCEMS está cargada. Las actividades y
-            progresiones de aprendizaje se publicarán próximamente. Por ahora
-            puedes explorar la organización por semestre y UAC.
-          </p>
-        </div>
-      </div>
+        {/* Main content */}
+        <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 32 }}>
 
-      {/* UAC del semestre actual */}
-      <div>
-        <h2 style={{ fontSize: 18, fontWeight: 800, color: '#0B2545', letterSpacing: '-0.02em', marginBottom: 16 }}>
-          Tus UAC — Semestre {semestreActual}
-        </h2>
+          {/* BLOQUE 2 — Continuar */}
+          <section aria-label="Continuar donde dejaste">
+            <ContinuarCard data={continuar} nombre={nombre} />
+          </section>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16 }}>
-          {uacDelSemestre.map((uac) => {
-            const recurso = uac.recursoCodigo
-              ? RECURSOS_SOCIOCOGNITIVOS.find((r) => r.codigo === uac.recursoCodigo)
-              : undefined;
-
-            return (
-              <UACCard
-                key={uac.codigo}
-                codigo={uac.codigo}
-                nombre={uac.nombre}
-                icono={recurso?.icono ?? "📚"}
-                colorClass={
-                  recurso
-                    ? `${recurso.color} bg-opacity-10 text-gray-700`
-                    : "bg-purple-100 text-purple-700"
-                }
-                totalProgresiones={uac.totalProgresionesEsperadas}
-                semestre={semestreActual}
-                tipo="sociocognitivo"
-              />
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Recursos Socioemocionales */}
-      <div>
-        <h2 style={{ fontSize: 18, fontWeight: 800, color: '#0B2545', letterSpacing: '-0.02em', marginBottom: 16 }}>
-          Ámbitos de Formación Socioemocional
-        </h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 12 }}>
-          {RECURSOS_SOCIOEMOCIONALES.map((rse) => (
-            <div
-              key={rse.codigo}
-              style={{
-                borderRadius: 14,
-                border: '1px solid rgba(11,37,69,0.10)',
-                background: '#fff',
-                padding: '16px 20px',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                <i className="fa-solid fa-seedling" style={{ fontSize: 14, color: '#1E40AF' }} />
-                <p style={{ fontSize: 13, fontWeight: 700, color: '#0B2545', margin: 0 }}>{rse.nombre}</p>
-              </div>
-              <p style={{ fontSize: 12, color: 'rgba(11,37,69,0.55)', margin: '0 0 10px', lineHeight: 1.5 }}>
-                {rse.descripcion}
-              </p>
+          {/* BLOQUE 3 — Mis UAC */}
+          <section id="mis-materias" aria-label="Mis materias del semestre">
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
+              <h2 style={{ fontSize: 18, fontWeight: 800, color: "#0B2545", letterSpacing: "-0.02em", margin: 0 }}>
+                Semestre {semestre}
+              </h2>
               <span style={{
-                display: 'inline-block',
                 borderRadius: 999,
-                background: 'rgba(11,37,69,0.07)',
-                padding: '2px 10px',
-                fontSize: 11,
-                fontWeight: 600,
-                color: 'rgba(11,37,69,0.50)',
+                background: "#EFF6FF",
+                border: "1px solid rgba(30,64,175,0.15)",
+                padding: "4px 12px",
+                fontSize: 12,
+                fontWeight: 700,
+                color: "#1E40AF",
               }}>
-                Transversal
+                {uacConProgreso.length} materias
               </span>
             </div>
-          ))}
+
+            {/* UAC grid */}
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+              gap: 16,
+            }}
+              className="hub-uac-grid"
+            >
+              {uacConProgreso.map((uac, i) => (
+                <div
+                  key={uac.codigo}
+                  style={{
+                    animationDelay: `${i * 60}ms`,
+                    animation: "fadeInUp 0.4s ease both",
+                  }}
+                >
+                  <UACCardHub
+                    codigo={uac.codigo}
+                    nombre={uac.nombre}
+                    rscCodigo={uac.rscCodigo}
+                    totalProgresiones={uac.totalProgresiones}
+                    completadas={uac.completadas}
+                    ultimaActividad={uac.ultimaActividad}
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
         </div>
+
+        {/* BLOQUE 4 — Sidebar progreso (desktop) */}
+        <div
+          style={{
+            width: 296,
+            flexShrink: 0,
+            position: "sticky",
+            top: 88,
+            alignSelf: "flex-start",
+          }}
+          className="hub-sidebar-desktop"
+        >
+          <ProgressSidebar progreso={progreso} racha={racha} semestre={semestre} />
+        </div>
+      </div>
+
+      {/* BLOQUE 4 — Sidebar mobile (below grid) */}
+      <div className="hub-sidebar-mobile" style={{ marginTop: 32 }}>
+        <ProgressSidebar progreso={progreso} racha={racha} semestre={semestre} />
       </div>
     </div>
   );

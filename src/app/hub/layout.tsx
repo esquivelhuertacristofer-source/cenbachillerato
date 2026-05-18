@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getUser, getProfile } from "@/lib/supabase-helpers";
-import { Sidebar } from "@/components/hub/Sidebar";
+import { HubHeader } from "@/components/hub/HubHeader";
+import { getRachaDelAlumno } from "@/lib/queries/hub";
 
 export default async function HubLayout({
   children,
@@ -18,10 +19,14 @@ export default async function HubLayout({
     if (profile.role === "admin" || profile.role === "super_admin") redirect("/admin/escuelas");
   }
 
+  const rachaData = await getRachaDelAlumno(user.id);
+
   return (
-    <div data-hub-layout="" style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: '#F8FAFC' }}>
-      <Sidebar profile={profile} />
-      <main data-hub-main="" style={{ flex: 1, overflowY: 'auto', padding: 32 }}>{children}</main>
+    <div style={{ minHeight: "100vh", background: "#F8FAFC", display: "flex", flexDirection: "column" }}>
+      <HubHeader profile={profile} racha={rachaData.diasConsecutivos} />
+      <main style={{ flex: 1 }}>
+        {children}
+      </main>
     </div>
   );
 }
