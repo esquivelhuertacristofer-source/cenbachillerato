@@ -76,7 +76,7 @@ async function main() {
     } else {
       invalidas++;
       const erroresZod = "error" in result && result.error && "issues" in result.error
-        ? (result.error as { issues: Array<{ path: (string | number)[]; message: string }> }).issues.map(
+        ? (result.error as unknown as { issues: Array<{ path: (string | number)[]; message: string }> }).issues.map(
             (i) => `${i.path.join(".")}: ${i.message}`
           )
         : ["error_desconocido"];

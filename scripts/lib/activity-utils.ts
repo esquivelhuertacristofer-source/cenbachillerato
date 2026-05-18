@@ -4,7 +4,7 @@
  */
 
 import { createClient } from "@supabase/supabase-js";
-import type { Database } from "../../src/types/database.types";
+import type { Database, Json } from "../../src/types/database.types";
 import { validarContenidoActividad } from "../../src/lib/activities/validators";
 import type { TipoActividadKey } from "../../src/lib/activities/validators";
 
@@ -63,7 +63,7 @@ export async function getProgresionesDeUAC(sb: SB, uacCodigo: string): Promise<A
 export async function upsertActividad(sb: SB, act: ActividadInput): Promise<boolean> {
   const validacion = validarContenidoActividad(act.tipo, act.contenido);
   if (!validacion.success) {
-    log(`  ✗ VALIDACIÓN FALLÓ [${act.codigo}]: ${JSON.stringify(validacion.error.issues)}`);
+    log(`  ✗ VALIDACIÓN FALLÓ [${act.codigo}]: ${JSON.stringify((validacion.error as unknown as { issues: unknown[] }).issues)}`);
     return false;
   }
 
@@ -72,7 +72,7 @@ export async function upsertActividad(sb: SB, act: ActividadInput): Promise<bool
     titulo: act.titulo,
     descripcion: act.descripcion,
     tipo: act.tipo,
-    contenido: validacion.data as Record<string, unknown>,
+    contenido: validacion.data as unknown as Json,
     progresion_id: act.progresion_id,
     xp: act.xp ?? 10,
     estado: "borrador",

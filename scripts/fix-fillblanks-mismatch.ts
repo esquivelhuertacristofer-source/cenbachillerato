@@ -7,7 +7,7 @@
 import { config } from "dotenv";
 import { resolve } from "path";
 import { createClient } from "@supabase/supabase-js";
-import type { Database } from "../src/types/database.types";
+import type { Database, Json } from "../src/types/database.types";
 import { validarContenidoActividad } from "../src/lib/activities/validators";
 import * as fs from "fs";
 
@@ -74,11 +74,11 @@ async function main() {
       // Validar antes de guardar
       const validacion = validarContenidoActividad("fill_blanks", nuevoContenido);
       if (!validacion.success) {
-        log(`  ❌ Validación Zod falló: ${JSON.stringify((validacion as { error: { issues: unknown[] } }).error.issues)}`);
+        log(`  ❌ Validación Zod falló: ${JSON.stringify((validacion as unknown as { error: { issues: unknown[] } }).error.issues)}`);
       } else {
         const { error: upErr } = await sb
           .from("actividades")
-          .update({ contenido: nuevoContenido as Record<string, unknown> })
+          .update({ contenido: nuevoContenido as unknown as Json })
           .eq("id", act05.id);
 
         if (upErr) {
@@ -153,11 +153,11 @@ async function main() {
       // Validar antes de guardar
       const validacion = validarContenidoActividad("fill_blanks", nuevoContenido);
       if (!validacion.success) {
-        log(`  ❌ Validación Zod falló: ${JSON.stringify((validacion as { error: { issues: unknown[] } }).error.issues)}`);
+        log(`  ❌ Validación Zod falló: ${JSON.stringify((validacion as unknown as { error: { issues: unknown[] } }).error.issues)}`);
       } else {
         const { error: upErr } = await sb
           .from("actividades")
-          .update({ contenido: nuevoContenido as Record<string, unknown> })
+          .update({ contenido: nuevoContenido as unknown as Json })
           .eq("id", act07.id);
 
         if (upErr) {
