@@ -137,7 +137,13 @@ export function ActivityRunner({
   if (tipo === "reflexion_escrita") {
     return (
       <ActivityShell {...shellProps}>
-        <ReflexionEscritaActivity actividad={{ ...base, tipo: "reflexion_escrita", contenido: contenido as never }} onProgreso={handleProgreso} color={color} />
+        <ReflexionEscritaActivity
+          actividad={{ ...base, tipo: "reflexion_escrita", contenido: contenido as never }}
+          onProgreso={handleProgreso}
+          color={color}
+          estado={estado}
+          respuestasIntento={respuestasIntento ?? undefined}
+        />
       </ActivityShell>
     );
   }
