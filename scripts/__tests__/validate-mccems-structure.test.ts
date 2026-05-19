@@ -263,6 +263,38 @@ describe("MCCEMS Structure Validation — Totales y conteo (Modelo Educativo 202
   });
 });
 
+describe("MCCEMS Structure Validation — Semestre 3 propósitos (Modelo Educativo 2025)", () => {
+  test("LC-III tiene exactamente 7 propósitos formativos esperados", () => {
+    const lciii = UAC_BASE.find((u) => u.codigo === "LC-III");
+    expect(lciii).toBeDefined();
+    expect(lciii?.totalProgresionesEsperadas).toBe(7);
+  });
+
+  test("PM-III tiene exactamente 6 propósitos formativos esperados", () => {
+    const pmiii = UAC_BASE.find((u) => u.codigo === "PM-III");
+    expect(pmiii).toBeDefined();
+    expect(pmiii?.totalProgresionesEsperadas).toBe(6);
+  });
+
+  test("IN-III tiene exactamente 8 propósitos formativos esperados", () => {
+    const iniii = UAC_BASE.find((u) => u.codigo === "IN-III");
+    expect(iniii).toBeDefined();
+    expect(iniii?.totalProgresionesEsperadas).toBe(8);
+  });
+
+  test("PFH-III tiene exactamente 4 propósitos formativos esperados", () => {
+    const pfhiii = UAC_BASE.find((u) => u.codigo === "PFH-III");
+    expect(pfhiii).toBeDefined();
+    expect(pfhiii?.totalProgresionesEsperadas).toBe(4);
+  });
+
+  test("CNEYT-III tiene exactamente 8 propósitos formativos esperados", () => {
+    const cneytiii = UAC_BASE.find((u) => u.codigo === "CNEYT-III");
+    expect(cneytiii).toBeDefined();
+    expect(cneytiii?.totalProgresionesEsperadas).toBe(8);
+  });
+});
+
 describe("MCCEMS Structure Validation — Semestre 2 propósitos (Modelo Educativo 2025)", () => {
   test("LC-II tiene exactamente 8 propósitos formativos esperados", () => {
     const lcii = UAC_BASE.find((u) => u.codigo === "LC-II");
