@@ -2,7 +2,12 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { motion } from 'motion/react';
+import { springs, stagger } from '@/lib/motion/tokens';
+import { useReducedMotion, useMouseAura, useInView } from '@/lib/motion/hooks';
 import './LandingCEN.css';
+
+const MotionLink = motion(Link);
 
 const SUBSISTEMAS = [
   'DGB', 'DGETI', 'DGETAyCM', 'CONALEP', 'COBACH', 'CECYT', 'CCH', 'ENP',
@@ -252,6 +257,97 @@ const STEPS = [
   { icon: 'fa-rocket', title: 'Empieza a enseñar', desc: 'Desde el primer día, acceso completo al currículo oficial alineado a la SEP.', num: '04' },
 ];
 
+// ── Accordion panel subcomponent — needs useMouseAura per instance ──
+interface AccPanelProps {
+  p: typeof PRODUCTS[0];
+  i: number;
+  isActive: boolean;
+  onActivate: (i: number) => void;
+  reducedMotion: boolean;
+}
+
+function AccPanel({ p, i, isActive, onActivate, reducedMotion }: AccPanelProps) {
+  const auraRef = useMouseAura<HTMLDivElement>();
+
+  return (
+    <motion.div
+      ref={auraRef}
+      className={`acc-panel${isActive ? ' acc--active' : ''}`}
+      style={{ '--acc-accent': p.accent } as React.CSSProperties}
+      onClick={() => onActivate(i)}
+      whileHover={reducedMotion ? {} : { scale: 1.012 }}
+      whileTap={reducedMotion ? {} : { scale: 0.99 }}
+      transition={springs.snappy}
+    >
+      {/* Mouse aura highlight */}
+      {!reducedMotion && (
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute', inset: 0, pointerEvents: 'none', borderRadius: 'inherit',
+            background: 'radial-gradient(180px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.07), transparent 70%)',
+            zIndex: 5,
+          }}
+        />
+      )}
+
+      {/* Background image */}
+      <div className="acc-bg" style={{ backgroundImage: `url(${p.image})` }} />
+      {/* Solid overlay — collapsed state */}
+      <div className="acc-ov-solid" style={{ background: p.color }} />
+      {/* Gradient overlay — expanded state */}
+      <div className="acc-ov-gradient" />
+      {/* Crystalline edge */}
+      <div className="acc-glass-edge" />
+
+      {/* Collapsed content */}
+      <div className="acc-collapsed-content">
+        {p.tier && <span className="acc-tier">{p.tier}</span>}
+        <span className="acc-vname">{p.name}</span>
+      </div>
+
+      {/* Expanded content */}
+      <div className="acc-expanded-content">
+        <div className="acc-exp-inner">
+          <span className="acc-exp-eyebrow">{p.badge}</span>
+          <h3 className="acc-exp-name">{p.name}</h3>
+          <p className="acc-exp-desc">{p.description}</p>
+          {p.telemetry && (
+            <div className="acc-exp-tel">
+              {p.telemetry.slice(0, 3).map((t, ti) => (
+                <div key={ti} className="acc-tel-item">
+                  <i className={`fas ${t.icon}`}></i>
+                  <span className="acc-tel-val">{t.val}</span>
+                  <span className="acc-tel-lbl">{t.lbl}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          {p.available ? (
+            p.external ? (
+              <a href={p.href} target="_blank" rel="noopener noreferrer"
+                 className="acc-exp-cta" style={{ background: p.accent }}
+                 onClick={e => e.stopPropagation()}>
+                Explorar <i className="fas fa-arrow-right"></i>
+              </a>
+            ) : (
+              <Link href={p.href} className="acc-exp-cta"
+                    style={{ background: p.accent }}
+                    onClick={e => e.stopPropagation()}>
+                Explorar <i className="fas fa-arrow-right"></i>
+              </Link>
+            )
+          ) : (
+            <span className="acc-exp-soon">
+              <i className="fas fa-clock"></i> Próximamente
+            </span>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 
 export default function LandingPageCEN() {
   const [mounted, setMounted] = useState(false);
@@ -262,6 +358,10 @@ export default function LandingPageCEN() {
   const [wordVisible, setWordVisible] = useState(true);
   const [navScrolled, setNavScrolled] = useState(false);
   const [liveCount, setLiveCount] = useState(0);
+
+  const reducedMotion = useReducedMotion();
+  const [procesoRef, procesoInView] = useInView<HTMLDivElement>();
+  const [featureListRef, featureListInView] = useInView<HTMLUListElement>();
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -343,7 +443,15 @@ export default function LandingPageCEN() {
               <a href="#por-que-cen">Por qué CEN</a>
             </div>
             <div className="nav-right">
-              <a href="#productos" className="nav-btn-primary">¡Empieza Ahora!</a>
+              <motion.a
+                href="#productos"
+                className="nav-btn-primary"
+                whileHover={reducedMotion ? {} : { scale: 1.05, y: -1 }}
+                whileTap={reducedMotion ? {} : { scale: 0.97 }}
+                transition={springs.snappy}
+              >
+                ¡Empieza Ahora!
+              </motion.a>
             </div>
           </nav>
 
@@ -404,26 +512,68 @@ export default function LandingPageCEN() {
 
 
               <div className="hero-left">
-                <div className="hero-badge">Campaña Educativa Nacional</div>
-                <h1 className="hero-title">
+                <motion.div
+                  initial={reducedMotion ? {} : { opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ ...springs.smooth, delay: 0.05 }}
+                >
+                  <div className="hero-badge">Campaña Educativa Nacional</div>
+                </motion.div>
+
+                <motion.h1
+                  className="hero-title"
+                  initial={reducedMotion ? {} : { opacity: 0, y: 28 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ ...springs.smooth, delay: 0.05 + stagger.fast }}
+                >
                   Educación que<br />
                   <span className={`accent cycling-word${wordVisible ? ' visible' : ''}${wordIdx % 2 !== 0 ? ' cw-outline' : ''}`}>
                     {CYCLING_WORDS[wordIdx]}
                   </span>
-                </h1>
-                <p className="hero-sub">
+                </motion.h1>
+
+                <motion.p
+                  className="hero-sub"
+                  initial={reducedMotion ? {} : { opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ ...springs.smooth, delay: 0.05 + stagger.fast * 2 }}
+                >
                   CEN reúne el currículo oficial mexicano en una plataforma moderna para escuelas,
                   docentes y estudiantes. Bachillerato, educación financiera, laboratorios y más.
-                </p>
-                <div className="hero-cta-row">
-                  <a href="#productos" className="btn-cta">
+                </motion.p>
+
+                <motion.div
+                  className="hero-cta-row"
+                  initial={reducedMotion ? {} : { opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ ...springs.smooth, delay: 0.05 + stagger.fast * 3 }}
+                >
+                  <motion.a
+                    href="#productos"
+                    className="btn-cta"
+                    whileHover={reducedMotion ? {} : { scale: 1.05, y: -2 }}
+                    whileTap={reducedMotion ? {} : { scale: 0.97 }}
+                    transition={springs.snappy}
+                  >
                     ¡Empieza Ahora! <i className="fas fa-arrow-right"></i>
-                  </a>
-                  <a href="/log-in" className="btn-cta-demo">
+                  </motion.a>
+                  <motion.a
+                    href="/log-in"
+                    className="btn-cta-demo"
+                    whileHover={reducedMotion ? {} : { scale: 1.04, y: -1 }}
+                    whileTap={reducedMotion ? {} : { scale: 0.97 }}
+                    transition={springs.snappy}
+                  >
                     Iniciar Sesión <i className="fas fa-chevron-right"></i>
-                  </a>
-                </div>
-                <div className="hero-cred-row">
+                  </motion.a>
+                </motion.div>
+
+                <motion.div
+                  className="hero-cred-row"
+                  initial={reducedMotion ? {} : { opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ ...springs.smooth, delay: 0.05 + stagger.fast * 4 }}
+                >
                   {[
                     { icon: 'fa-landmark',       text: 'SEP Oficial'        },
                     { icon: 'fa-graduation-cap', text: 'MCCEMS 2023'        },
@@ -435,7 +585,7 @@ export default function LandingPageCEN() {
                       <span>{p.text}</span>
                     </div>
                   ))}
-                </div>
+                </motion.div>
               </div>
 
               <div className="hero-right">
@@ -624,66 +774,14 @@ export default function LandingPageCEN() {
                 >
                   <div className="acc-wrapper">
                     {PRODUCTS.map((p, i) => (
-                      <div
+                      <AccPanel
                         key={p.id}
-                        className={`acc-panel${activePanel === i ? ' acc--active' : ''}`}
-                        style={{ '--acc-accent': p.accent } as React.CSSProperties}
-                        onClick={() => setActivePanel(i)}
-                      >
-                        {/* Background image */}
-                        <div className="acc-bg" style={{ backgroundImage: `url(${p.image})` }} />
-                        {/* Solid overlay — collapso state */}
-                        <div className="acc-ov-solid" style={{ background: p.color }} />
-                        {/* Gradient overlay — expanded state */}
-                        <div className="acc-ov-gradient" />
-                        {/* Crystalline edge */}
-                        <div className="acc-glass-edge" />
-
-                        {/* Collapsed content */}
-                        <div className="acc-collapsed-content">
-                          {p.tier && <span className="acc-tier">{p.tier}</span>}
-                          <span className="acc-vname">{p.name}</span>
-                        </div>
-
-                        {/* Expanded content */}
-                        <div className="acc-expanded-content">
-                          <div className="acc-exp-inner">
-                            <span className="acc-exp-eyebrow">{p.badge}</span>
-                            <h3 className="acc-exp-name">{p.name}</h3>
-                            <p className="acc-exp-desc">{p.description}</p>
-                            {p.telemetry && (
-                              <div className="acc-exp-tel">
-                                {p.telemetry.slice(0, 3).map((t, ti) => (
-                                  <div key={ti} className="acc-tel-item">
-                                    <i className={`fas ${t.icon}`}></i>
-                                    <span className="acc-tel-val">{t.val}</span>
-                                    <span className="acc-tel-lbl">{t.lbl}</span>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                            {p.available ? (
-                              p.external ? (
-                                <a href={p.href} target="_blank" rel="noopener noreferrer"
-                                   className="acc-exp-cta" style={{ background: p.accent }}
-                                   onClick={e => e.stopPropagation()}>
-                                  Explorar <i className="fas fa-arrow-right"></i>
-                                </a>
-                              ) : (
-                                <Link href={p.href} className="acc-exp-cta"
-                                      style={{ background: p.accent }}
-                                      onClick={e => e.stopPropagation()}>
-                                  Explorar <i className="fas fa-arrow-right"></i>
-                                </Link>
-                              )
-                            ) : (
-                              <span className="acc-exp-soon">
-                                <i className="fas fa-clock"></i> Próximamente
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
+                        p={p}
+                        i={i}
+                        isActive={activePanel === i}
+                        onActivate={setActivePanel}
+                        reducedMotion={reducedMotion}
+                      />
                     ))}
                   </div>
                 </div>
@@ -691,7 +789,6 @@ export default function LandingPageCEN() {
               </div>
             </div>
           </section>
-
 
 
 
@@ -709,10 +806,16 @@ export default function LandingPageCEN() {
                   Sin infraestructura propia. Sin instalación. Solo un correo y tu plantel opera desde el primer día.
                 </p>
               </div>
-              <div className="proceso-steps">
+              <div className="proceso-steps" ref={procesoRef}>
                 <div className="proceso-connector" aria-hidden="true" />
                 {STEPS.map((step, i) => (
-                  <div key={i} className="proceso-step">
+                  <motion.div
+                    key={i}
+                    className="proceso-step"
+                    initial={reducedMotion ? {} : { opacity: 0, y: 32 }}
+                    animate={procesoInView ? { opacity: 1, y: 0 } : {}}
+                    transition={{ ...springs.smooth, delay: i * stagger.normal }}
+                  >
                     <div className="paso-num-bg" aria-hidden="true">{step.num}</div>
                     <div className="paso-step-num">Paso {step.num}</div>
                     <div className="paso-icon-wrap">
@@ -720,7 +823,7 @@ export default function LandingPageCEN() {
                     </div>
                     <div className="paso-title">{step.title}</div>
                     <p className="paso-desc">{step.desc}</p>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </div>
@@ -745,23 +848,39 @@ export default function LandingPageCEN() {
                   La plataforma educativa que<br />
                   <em>México merece</em>
                 </h2>
-                <ul className="feature-split-list">
-                  <li>
+                <ul className="feature-split-list" ref={featureListRef}>
+                  <motion.li
+                    initial={reducedMotion ? {} : { opacity: 0, x: -20 }}
+                    animate={featureListInView ? { opacity: 1, x: 0 } : {}}
+                    transition={{ ...springs.smooth, delay: 0 }}
+                  >
                     <i className="fas fa-check-circle"></i>
                     <span>Más de <mark>34 UAC</mark> del currículo oficial, alineadas a la SEP y el MCCEMS 2023</span>
-                  </li>
-                  <li>
+                  </motion.li>
+                  <motion.li
+                    initial={reducedMotion ? {} : { opacity: 0, x: -20 }}
+                    animate={featureListInView ? { opacity: 1, x: 0 } : {}}
+                    transition={{ ...springs.smooth, delay: stagger.normal }}
+                  >
                     <i className="fas fa-check-circle"></i>
                     <span>Compatible con los <mark>principales subsistemas</mark> de educación media superior en México</span>
-                  </li>
-                  <li>
+                  </motion.li>
+                  <motion.li
+                    initial={reducedMotion ? {} : { opacity: 0, x: -20 }}
+                    animate={featureListInView ? { opacity: 1, x: 0 } : {}}
+                    transition={{ ...springs.smooth, delay: stagger.normal * 2 }}
+                  >
                     <i className="fas fa-check-circle"></i>
                     <span>Evaluación formativa en <mark>tiempo real</mark> que no interrumpe el ritmo de la clase</span>
-                  </li>
-                  <li>
+                  </motion.li>
+                  <motion.li
+                    initial={reducedMotion ? {} : { opacity: 0, x: -20 }}
+                    animate={featureListInView ? { opacity: 1, x: 0 } : {}}
+                    transition={{ ...springs.smooth, delay: stagger.normal * 3 }}
+                  >
                     <i className="fas fa-check-circle"></i>
                     <span>Operativo desde el <mark>primer día</mark>, sin instalación ni infraestructura propia</span>
-                  </li>
+                  </motion.li>
                 </ul>
                 <Link href="/bachillerato" className="feature-split-cta">
                   Explorar CEN Bachillerato <i className="fas fa-arrow-right"></i>
@@ -848,17 +967,29 @@ export default function LandingPageCEN() {
               {/* Columna derecha — acciones */}
               <div className="cta-split-right">
                 <div className="cta-action-cards">
-                  <Link href="/bachillerato" className="cta-action-card cta-action-card--primary">
-                    <div className="cac-icon">
-                      <i className="fas fa-graduation-cap"></i>
-                    </div>
-                    <div className="cac-text">
-                      <div className="cac-label">Plataforma principal</div>
-                      <div className="cac-title">CEN Bachillerato</div>
-                    </div>
-                    <i className="fas fa-arrow-right cac-arrow"></i>
-                  </Link>
-                  <a href="mailto:gerencia@campanaeducativanacional.com.mx" className="cta-action-card">
+                  <motion.div
+                    whileHover={reducedMotion ? {} : { y: -4, scale: 1.02 }}
+                    whileTap={reducedMotion ? {} : { scale: 0.98 }}
+                    transition={springs.snappy}
+                  >
+                    <MotionLink href="/bachillerato" className="cta-action-card cta-action-card--primary">
+                      <div className="cac-icon">
+                        <i className="fas fa-graduation-cap"></i>
+                      </div>
+                      <div className="cac-text">
+                        <div className="cac-label">Plataforma principal</div>
+                        <div className="cac-title">CEN Bachillerato</div>
+                      </div>
+                      <i className="fas fa-arrow-right cac-arrow"></i>
+                    </MotionLink>
+                  </motion.div>
+                  <motion.a
+                    href="mailto:gerencia@campanaeducativanacional.com.mx"
+                    className="cta-action-card"
+                    whileHover={reducedMotion ? {} : { y: -4, scale: 1.02 }}
+                    whileTap={reducedMotion ? {} : { scale: 0.98 }}
+                    transition={springs.snappy}
+                  >
                     <div className="cac-icon">
                       <i className="fas fa-envelope"></i>
                     </div>
@@ -867,7 +998,7 @@ export default function LandingPageCEN() {
                       <div className="cac-title">Contactar al equipo</div>
                     </div>
                     <i className="fas fa-arrow-right cac-arrow"></i>
-                  </a>
+                  </motion.a>
                 </div>
               </div>
             </div>
