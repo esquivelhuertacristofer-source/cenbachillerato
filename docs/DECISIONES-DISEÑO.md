@@ -65,8 +65,14 @@ Todos los renderers usan inline styles con glassmorphism dark (bg rgba(255,255,2
 
 ## DEC-07: EjercicioMatematico con respuesta incorrecta — no navega de vuelta
 
-**Contexto:** Si el alumno responde incorrectamente, `entregarActividad` NO se llama (completada=false). El alumno permanece en la pantalla.
+**Estado:** ✅ RESUELTA (feat(ejercicio-matematico) — 2026-05-18)
 
-**Decisión:** Sin cambiar la lógica actual. El alumno puede ver la solución correcta pero la actividad queda sin completar hasta que... no hay reintento en la UI actual.
+**Contexto:** Si el alumno responde incorrectamente, `entregarActividad` NO se llama (completada=false). El alumno permanece en la pantalla sin posibilidad de reintentar.
 
-**TODO para próxima sesión:** Agregar botón "Reintentar" que resetea el estado del renderer. Actualmente el alumno debe recargar la página para reintentar.
+**Solución implementada:**
+- Sistema de 3 intentos con contador visible entre intentos
+- Shake animation (`em-shake`) en cada respuesta incorrecta
+- Después del 3er intento fallido: solución revelada con explicación
+- Botón "Volver a hacer el ejercicio" que resetea el estado completo
+- Botón "Continuar de todas formas" para avanzar (puntaje 0)
+- Botón "Reintentar" entre intentos 1–2

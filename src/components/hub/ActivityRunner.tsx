@@ -123,14 +123,26 @@ export function ActivityRunner({
   if (tipo === "fill_blanks") {
     return (
       <ActivityShell {...shellProps}>
-        <FillBlanksActivity actividad={{ ...base, tipo: "fill_blanks", contenido: contenido as never }} onProgreso={handleProgreso} color={color} />
+        <FillBlanksActivity
+          actividad={{ ...base, tipo: "fill_blanks", contenido: contenido as never }}
+          onProgreso={handleProgreso}
+          color={color}
+          estado={estado}
+          respuestasIntento={respuestasIntento ?? undefined}
+        />
       </ActivityShell>
     );
   }
   if (tipo === "ejercicio_matematico") {
     return (
       <ActivityShell {...shellProps}>
-        <EjercicioMatematicoActivity actividad={{ ...base, tipo: "ejercicio_matematico", contenido: contenido as never }} onProgreso={handleProgreso} color={color} />
+        <EjercicioMatematicoActivity
+          actividad={{ ...base, tipo: "ejercicio_matematico", contenido: contenido as never }}
+          onProgreso={handleProgreso}
+          color={color}
+          estado={estado}
+          respuestasIntento={respuestasIntento ?? undefined}
+        />
       </ActivityShell>
     );
   }
@@ -164,7 +176,13 @@ export function ActivityRunner({
   if (tipo === "debate_estructurado") {
     return (
       <ActivityShell {...shellProps}>
-        <DebateEstructuradoActivity actividad={{ ...base, tipo: "debate_estructurado", contenido: contenido as never }} onProgreso={handleProgreso} color={color} />
+        <DebateEstructuradoActivity
+          actividad={{ ...base, tipo: "debate_estructurado", contenido: contenido as never }}
+          onProgreso={handleProgreso}
+          color={color}
+          estado={estado}
+          respuestasIntento={respuestasIntento ?? undefined}
+        />
       </ActivityShell>
     );
   }
