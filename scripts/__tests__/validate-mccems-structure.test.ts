@@ -295,6 +295,38 @@ describe("MCCEMS Structure Validation — Semestre 3 propósitos (Modelo Educati
   });
 });
 
+describe("MCCEMS Structure Validation — Semestre 4 propósitos (Modelo Educativo 2025)", () => {
+  test("CH-I tiene exactamente 4 propósitos formativos esperados (primera aparición de Conciencia Histórica)", () => {
+    const chi = UAC_BASE.find((u) => u.codigo === "CH-I");
+    expect(chi).toBeDefined();
+    expect(chi?.totalProgresionesEsperadas).toBe(4);
+  });
+
+  test("CNEYT-IV tiene exactamente 8 propósitos formativos esperados", () => {
+    const cneytiv = UAC_BASE.find((u) => u.codigo === "CNEYT-IV");
+    expect(cneytiv).toBeDefined();
+    expect(cneytiv?.totalProgresionesEsperadas).toBe(8);
+  });
+
+  test("CS-III tiene exactamente 3 propósitos formativos esperados", () => {
+    const csiii = UAC_BASE.find((u) => u.codigo === "CS-III");
+    expect(csiii).toBeDefined();
+    expect(csiii?.totalProgresionesEsperadas).toBe(3);
+  });
+
+  test("IN-IV tiene exactamente 8 propósitos formativos esperados", () => {
+    const iniv = UAC_BASE.find((u) => u.codigo === "IN-IV");
+    expect(iniv).toBeDefined();
+    expect(iniv?.totalProgresionesEsperadas).toBe(8);
+  });
+
+  test("PM-IV tiene exactamente 7 propósitos formativos esperados", () => {
+    const pmiv = UAC_BASE.find((u) => u.codigo === "PM-IV");
+    expect(pmiv).toBeDefined();
+    expect(pmiv?.totalProgresionesEsperadas).toBe(7);
+  });
+});
+
 describe("MCCEMS Structure Validation — Semestre 2 propósitos (Modelo Educativo 2025)", () => {
   test("LC-II tiene exactamente 8 propósitos formativos esperados", () => {
     const lcii = UAC_BASE.find((u) => u.codigo === "LC-II");
