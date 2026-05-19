@@ -176,9 +176,6 @@ export default async function ProgresionPage({ params }: Props) {
               const isActEnProgreso = act.estado === "en_progreso";
               const isLast = i === actividades.length - 1;
 
-              const prevCompleted = i === 0 || actividades[i - 1]!.estado === "completada";
-              const bloqueada = !prevCompleted;
-
               const LABELS = ["Activación", "Práctica", "Aplicación"];
               const phaseLabel = LABELS[i] ?? `Actividad ${act.orden}`;
 
@@ -196,9 +193,7 @@ export default async function ProgresionPage({ params }: Props) {
                         ? "2px solid #16A34A"
                         : isActEnProgreso
                           ? `2px solid ${color.hex}`
-                          : bloqueada
-                            ? "2px solid rgba(11,37,69,0.12)"
-                            : "2px solid rgba(11,37,69,0.18)",
+                          : "2px solid rgba(11,37,69,0.18)",
                       background: isActCompleta
                         ? "#DCFCE7"
                         : isActEnProgreso
@@ -208,16 +203,12 @@ export default async function ProgresionPage({ params }: Props) {
                         ? "#16A34A"
                         : isActEnProgreso
                           ? color.hex
-                          : bloqueada
-                            ? "rgba(11,37,69,0.20)"
-                            : "rgba(11,37,69,0.50)",
+                          : "rgba(11,37,69,0.50)",
                       zIndex: 1,
                     }}>
                       {isActCompleta
                         ? <i className="fa-solid fa-check" />
-                        : bloqueada
-                          ? <i className="fa-solid fa-lock" style={{ fontSize: 12 }} />
-                          : <i className={`fa-solid ${tc.faIcon}`} style={{ fontSize: 13 }} />
+                        : <i className={`fa-solid ${tc.faIcon}`} style={{ fontSize: 13 }} />
                       }
                     </div>
                     {!isLast && (
@@ -231,54 +222,38 @@ export default async function ProgresionPage({ params }: Props) {
                     )}
                   </div>
 
-                  {/* Card */}
+                  {/* Card — always clickable */}
                   <div style={{ flex: 1, paddingBottom: isLast ? 0 : 16 }}>
-                    {bloqueada ? (
+                    <Link
+                      href={`/hub/uac/${codigo}/progresion/${numParsed}/actividad/${act.orden}`}
+                      style={{ textDecoration: "none", display: "block" }}
+                      className="hub-prog-card-link"
+                    >
                       <div
-                        title="Completá la actividad anterior primero"
                         style={{
                           borderRadius: 18,
-                          border: "1px solid rgba(11,37,69,0.08)",
-                          background: "#F8FAFC",
+                          border: isActCompleta
+                            ? "1.5px solid rgba(34,197,94,0.25)"
+                            : isActEnProgreso
+                              ? `1.5px solid rgba(${color.rgba}, 0.35)`
+                              : "1px solid rgba(11,37,69,0.10)",
+                          background: isActCompleta
+                            ? "#F0FDF4"
+                            : isActEnProgreso
+                              ? `rgba(${color.rgba}, 0.05)`
+                              : "#fff",
                           padding: "18px 20px",
-                          opacity: 0.55,
-                          cursor: "not-allowed",
+                          boxShadow: isActEnProgreso
+                            ? `0 4px 20px rgba(${color.rgba}, 0.15)`
+                            : "0 1px 4px rgba(11,37,69,0.05)",
+                          transition: "box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease",
+                          cursor: "pointer",
                         }}
+                        className="hub-prog-card"
                       >
-                        <ActivityCardContent act={act} phaseLabel={phaseLabel} color={color} tc={tc} isEnProgreso={false} />
+                        <ActivityCardContent act={act} phaseLabel={phaseLabel} color={color} tc={tc} isEnProgreso={isActEnProgreso} />
                       </div>
-                    ) : (
-                      <Link
-                        href={`/hub/uac/${codigo}/progresion/${numParsed}/actividad/${act.orden}`}
-                        style={{ textDecoration: "none", display: "block" }}
-                        className="hub-prog-card-link"
-                      >
-                        <div
-                          style={{
-                            borderRadius: 18,
-                            border: isActCompleta
-                              ? "1.5px solid rgba(34,197,94,0.25)"
-                              : isActEnProgreso
-                                ? `1.5px solid rgba(${color.rgba}, 0.35)`
-                                : "1px solid rgba(11,37,69,0.10)",
-                            background: isActCompleta
-                              ? "#F0FDF4"
-                              : isActEnProgreso
-                                ? `rgba(${color.rgba}, 0.05)`
-                                : "#fff",
-                            padding: "18px 20px",
-                            boxShadow: isActEnProgreso
-                              ? `0 4px 20px rgba(${color.rgba}, 0.15)`
-                              : "0 1px 4px rgba(11,37,69,0.05)",
-                            transition: "box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease",
-                            cursor: "pointer",
-                          }}
-                          className="hub-prog-card"
-                        >
-                          <ActivityCardContent act={act} phaseLabel={phaseLabel} color={color} tc={tc} isEnProgreso={isActEnProgreso} />
-                        </div>
-                      </Link>
-                    )}
+                    </Link>
                   </div>
                 </div>
               );
@@ -353,6 +328,16 @@ function ActivityCardContent({
           }}>
             A{act.orden} · {phaseLabel}
           </span>
+          {isCompleta && (
+            <span style={{
+              borderRadius: 999, background: "#DCFCE7",
+              border: "1.5px solid rgba(34,197,94,0.25)",
+              padding: "1px 7px", fontSize: 9, fontWeight: 700, color: "#16A34A",
+              textTransform: "uppercase", letterSpacing: "0.08em",
+            }}>
+              Completada
+            </span>
+          )}
           {isEnProgreso && (
             <span style={{
               borderRadius: 999, background: `rgba(${color.rgba}, 0.15)`,
@@ -360,7 +345,7 @@ function ActivityCardContent({
               padding: "1px 7px", fontSize: 9, fontWeight: 700, color: color.hex,
               textTransform: "uppercase", letterSpacing: "0.08em",
             }}>
-              Actual
+              En curso
             </span>
           )}
         </div>
@@ -381,19 +366,20 @@ function ActivityCardContent({
         </div>
       </div>
 
-      {/* State indicator */}
+      {/* State indicator — CTA label */}
       <div style={{ flexShrink: 0 }}>
         {isCompleta ? (
-          <div style={{
-            width: 32, height: 32, borderRadius: "50%",
-            background: "#DCFCE7", border: "1.5px solid rgba(34,197,94,0.30)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 13, color: "#16A34A",
-          }}>
-            <i className="fa-solid fa-check" />
-          </div>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "#16A34A", display: "flex", alignItems: "center", gap: 4, whiteSpace: "nowrap" }}>
+            Volver a hacer <i className="fa-solid fa-rotate-right" style={{ fontSize: 10 }} />
+          </span>
+        ) : isEnProgreso ? (
+          <span style={{ fontSize: 11, fontWeight: 700, color: color.hex, display: "flex", alignItems: "center", gap: 4, whiteSpace: "nowrap" }}>
+            Continuar <i className="fa-solid fa-play" style={{ fontSize: 10 }} />
+          </span>
         ) : (
-          <i className="fa-solid fa-chevron-right" style={{ fontSize: 12, color: "rgba(11,37,69,0.25)" }} />
+          <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(11,37,69,0.55)", display: "flex", alignItems: "center", gap: 4, whiteSpace: "nowrap" }}>
+            Empezar <i className="fa-solid fa-chevron-right" style={{ fontSize: 10 }} />
+          </span>
         )}
       </div>
     </div>

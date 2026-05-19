@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { entregarActividad } from "@/lib/actions/entregar-actividad";
 import { LecturaActivity } from "@/components/activities/LecturaActivity";
 import { QuizMultipleOpcionActivity } from "@/components/activities/QuizMultipleOpcionActivity";
 import { QuizVerdaderoFalsoActivity } from "@/components/activities/QuizVerdaderoFalsoActivity";
@@ -42,8 +43,13 @@ export function ActivityRunner({
 }: ActivityRunnerProps) {
   const router = useRouter();
 
-  function handleProgreso(resultado: ResultadoActividad) {
+  async function handleProgreso(resultado: ResultadoActividad) {
     if (resultado.completada) {
+      await entregarActividad(actividadId, {
+        puntaje: resultado.puntaje,
+        respuestas: resultado.respuestas,
+        tiempoSegundos: resultado.tiempoSegundos,
+      });
       router.push(backHref);
     }
   }

@@ -312,28 +312,38 @@ export async function getActividadesConEstado(
 ): Promise<{ progresion: ProgresionConEstado | null; actividades: ActividadConEstado[] }> {
   const sb = await getSupabaseServer();
 
-  const { data: uacRow } = await sb
+  const { data: uacRow, error: uacError } = await sb
     .from("uac")
     .select("id")
     .eq("codigo", codigoUAC)
     .single();
 
+  if (uacError) console.error("[getActividadesConEstado] UAC lookup error:", uacError, { codigoUAC });
   if (!uacRow) return { progresion: null, actividades: [] };
 
-  const { data: prog } = await sb
+  const { data: prog, error: progError } = await sb
     .from("progresiones")
     .select("id, numero, titulo, descripcion, tiempo_estimado_horas, ejes_articuladores, transversalidades")
     .eq("uac_id", uacRow.id)
     .eq("numero", progNumero)
     .maybeSingle();
 
+  if (progError) console.error("[getActividadesConEstado] Progresion lookup error:", progError, { uacId: uacRow.id, progNumero });
   if (!prog) return { progresion: null, actividades: [] };
 
-  const { data: acts } = await sb
+  const { data: acts, error: actsError } = await sb
     .from("actividades")
     .select("id, codigo, titulo, tipo, xp")
     .eq("progresion_id", prog.id)
     .order("codigo");
+
+  if (actsError) {
+    console.error("[getActividadesConEstado] Supabase error fetching actividades:", actsError, { codigoUAC, progNumero, progresionId: prog.id });
+  }
+
+  if (!actsError && acts && acts.length === 0) {
+    console.warn("[getActividadesConEstado] Query OK but no actividades found for progresion_id:", prog.id, { codigoUAC, progNumero });
+  }
 
   if (!acts || acts.length === 0)
     return {
