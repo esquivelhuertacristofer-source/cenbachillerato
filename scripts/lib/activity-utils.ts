@@ -73,6 +73,7 @@ export async function upsertActividad(sb: SB, act: ActividadInput): Promise<bool
     titulo: act.titulo,
     descripcion: act.descripcion,
     tipo: act.tipo,
+    tipo_codigo: act.tipo,
     contenido: validacion.data as unknown as Json,
     progresion_id: act.progresion_id,
     xp: act.xp ?? 10,
