@@ -35,6 +35,10 @@ export async function getSupabaseServer() {
   });
 }
 
+/**
+ * @deprecated Usa getUser() en su lugar. getSession() lee el token de la cookie
+ * sin verificarlo con el servidor y no debe usarse para decisiones de acceso.
+ */
 export async function getSession() {
   const supabase = await getSupabaseServer();
   try {
@@ -42,7 +46,7 @@ export async function getSession() {
     if (error) throw error;
     return data.session;
   } catch (error) {
-    console.error("[supabase-helpers] getSession error:", error);
+    console.error("[supabase-helpers] getSession error:", (error as Error).message);
     return null;
   }
 }
@@ -55,7 +59,7 @@ export const getUser = cache(async function getUser() {
     if (error) throw error;
     return data.user;
   } catch (error) {
-    console.error("[supabase-helpers] getUser error:", error);
+    console.error("[supabase-helpers] getUser error:", (error as Error).message);
     return null;
   }
 });
@@ -73,7 +77,7 @@ export const getProfile = cache(async function getProfile(
     if (error) throw error;
     return data as Profile | null;
   } catch (error) {
-    console.error("[supabase-helpers] getProfile error:", error);
+    console.error("[supabase-helpers] getProfile error:", (error as Error).message);
     return null;
   }
 });
