@@ -28,6 +28,7 @@ interface ActivityRunnerProps {
   contenido: unknown;
   estado: "no_iniciada" | "en_progreso" | "completada";
   intentoId: string | null;
+  respuestasIntento?: Record<string, string> | null;
   color: AreaColor;
   backHref: string;
   uacNombre: string;
@@ -46,6 +47,7 @@ export function ActivityRunner({
   xp,
   contenido,
   estado,
+  respuestasIntento,
   color,
   backHref,
   uacNombre,
@@ -88,7 +90,13 @@ export function ActivityRunner({
   if (tipo === "lectura") {
     return (
       <ActivityShell {...shellProps}>
-        <LecturaActivity actividad={{ ...base, tipo: "lectura", contenido: contenido as never }} onProgreso={handleProgreso} color={color} />
+        <LecturaActivity
+          actividad={{ ...base, tipo: "lectura", contenido: contenido as never }}
+          onProgreso={handleProgreso}
+          color={color}
+          estado={estado}
+          respuestasIntento={respuestasIntento ?? undefined}
+        />
       </ActivityShell>
     );
   }

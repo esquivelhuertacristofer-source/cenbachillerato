@@ -26,12 +26,18 @@ export interface PreguntaComprension {
   respuesta_guia?: string;
 }
 
+export interface CalloutLectura {
+  tipo: 'info' | 'importante' | 'sabias' | 'advertencia';
+  contenido: string;
+}
+
 export interface ContenidoLectura {
   texto: string;
   fuente?: string;
   nivel_lectura?: 'basico' | 'intermedio' | 'avanzado';
   preguntas_comprension?: PreguntaComprension[];
   tiempo_estimado_minutos?: number;
+  callouts?: CalloutLectura[];
 }
 
 export interface ActividadLectura extends ActividadBase {

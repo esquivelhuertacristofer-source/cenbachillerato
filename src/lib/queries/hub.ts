@@ -569,6 +569,7 @@ export async function getActividadConContenido(
   contenido: unknown;
   estado: "no_iniciada" | "en_progreso" | "completada";
   intentoId: string | null;
+  respuestasIntento: Record<string, string> | null;
 } | null> {
   const sb = await getSupabaseServer();
 
@@ -608,7 +609,7 @@ export async function getActividadConContenido(
   // Get student's latest intento for this activity
   const { data: intento } = await sb
     .from("intentos")
-    .select("id, status")
+    .select("id, status, respuestas")
     .eq("user_id", userId)
     .eq("actividad_id", act.id)
     .order("started_at", { ascending: false })
@@ -622,6 +623,14 @@ export async function getActividadConContenido(
         ? "en_progreso"
         : "no_iniciada";
 
+  const respuestasRaw = intento?.respuestas;
+  const respuestasIntento: Record<string, string> | null =
+    respuestasRaw && typeof respuestasRaw === "object" && !Array.isArray(respuestasRaw)
+      ? Object.fromEntries(
+          Object.entries(respuestasRaw as Record<string, unknown>).map(([k, v]) => [k, String(v)])
+        )
+      : null;
+
   return {
     id: act.id,
     codigo: act.codigo,
@@ -632,6 +641,7 @@ export async function getActividadConContenido(
     contenido: act.contenido,
     estado: estado as "no_iniciada" | "en_progreso" | "completada",
     intentoId: intento?.id ?? null,
+    respuestasIntento,
   };
 }
 
