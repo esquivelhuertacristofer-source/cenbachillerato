@@ -371,3 +371,49 @@ body {
 .progress-ring-fill {
   animation: progressStroke 1.2s cubic-bezier(.22,1,.36,1) forwards;
 }
+
+/* ── Aura card (mouse-follow glow) ──────────────────────────────── */
+.aura-card {
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+  position: relative;
+  overflow: hidden;
+}
+.aura-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    600px circle at var(--mouse-x) var(--mouse-y),
+    rgba(255, 255, 255, 0.04),
+    transparent 60%
+  );
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: inherit;
+  z-index: 0;
+}
+.aura-card:hover::before {
+  opacity: 1;
+}
+.aura-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Accent variant — stronger glow using area color */
+.aura-accent::before {
+  background: radial-gradient(
+    500px circle at var(--mouse-x) var(--mouse-y),
+    rgba(var(--aura-color, 255, 255, 255), 0.08),
+    transparent 55%
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aura-card::before,
+  .aura-accent::before {
+    display: none;
+  }
+}
