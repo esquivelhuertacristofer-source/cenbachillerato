@@ -3,6 +3,7 @@ import { getUser, getProfile } from "@/lib/supabase-helpers";
 import { UAC_BASE } from "@/lib/mccems/estructura";
 import { getRSCColor } from "@/components/hub/hub-colors";
 import { getFichaBiblioteca, marcarFichaLeida } from "@/lib/queries/biblioteca";
+import { FichaHeroSection } from "@/components/hub/FichaHeroSection";
 import type { SeccionContenido } from "@/lib/queries/biblioteca";
 import Link from "next/link";
 import type { Metadata } from "next";
@@ -19,7 +20,7 @@ function RenderSeccion({ seccion }: { seccion: SeccionContenido }) {
     case "subtitulo":
       return (
         <h2 style={{
-          fontSize: 20, fontWeight: 800, color: "#0B2545",
+          fontSize: 20, fontWeight: 800, color: "#fff",
           margin: "36px 0 14px", letterSpacing: "-0.025em", lineHeight: 1.25,
         }}>
           {seccion.contenido}
@@ -28,7 +29,7 @@ function RenderSeccion({ seccion }: { seccion: SeccionContenido }) {
 
     case "parrafo":
       return (
-        <p style={{ fontSize: 16, color: "rgba(11,37,69,0.80)", lineHeight: 1.80, margin: "0 0 20px" }}>
+        <p style={{ fontSize: 16, color: "rgba(255,255,255,0.78)", lineHeight: 1.80, margin: "0 0 20px" }}>
           {seccion.contenido}
         </p>
       );
@@ -37,7 +38,7 @@ function RenderSeccion({ seccion }: { seccion: SeccionContenido }) {
       return (
         <ul style={{ paddingLeft: 24, margin: "0 0 20px" }}>
           {(seccion.items ?? []).map((item, i) => (
-            <li key={i} style={{ fontSize: 15, color: "rgba(11,37,69,0.75)", lineHeight: 1.7, marginBottom: 8 }}>
+            <li key={i} style={{ fontSize: 15, color: "rgba(255,255,255,0.70)", lineHeight: 1.7, marginBottom: 8 }}>
               {item}
             </li>
           ))}
@@ -51,11 +52,11 @@ function RenderSeccion({ seccion }: { seccion: SeccionContenido }) {
           paddingLeft: 20, margin: "24px 0",
           fontStyle: "italic",
         }}>
-          <p style={{ fontSize: 16, color: "rgba(11,37,69,0.70)", lineHeight: 1.70, margin: "0 0 8px" }}>
+          <p style={{ fontSize: 16, color: "rgba(255,255,255,0.65)", lineHeight: 1.70, margin: "0 0 8px" }}>
             &ldquo;{seccion.contenido}&rdquo;
           </p>
           {seccion.fuente && (
-            <cite style={{ fontSize: 12, color: "rgba(11,37,69,0.40)", fontStyle: "normal", fontWeight: 600 }}>
+            <cite style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", fontStyle: "normal", fontWeight: 600 }}>
               — {seccion.fuente}
             </cite>
           )}
@@ -64,9 +65,9 @@ function RenderSeccion({ seccion }: { seccion: SeccionContenido }) {
 
     case "callout": {
       const paleta = {
-        importante: { bg: "rgba(239,68,68,0.07)", border: "rgba(239,68,68,0.20)", icon: "fa-circle-exclamation", iconColor: "#EF4444", label: "Importante" },
-        sabias:     { bg: "rgba(56,189,248,0.07)", border: "rgba(56,189,248,0.20)", icon: "fa-lightbulb", iconColor: "#38BDF8", label: "¿Sabías que...?" },
-        advertencia:{ bg: "rgba(251,191,36,0.08)", border: "rgba(251,191,36,0.22)", icon: "fa-triangle-exclamation", iconColor: "#FBBF24", label: "Atención" },
+        importante: { bg: "rgba(239,68,68,0.12)", border: "rgba(239,68,68,0.25)", icon: "fa-circle-exclamation", iconColor: "#EF4444", label: "Importante" },
+        sabias:     { bg: "rgba(56,189,248,0.10)", border: "rgba(56,189,248,0.22)", icon: "fa-lightbulb", iconColor: "#38BDF8", label: "¿Sabías que...?" },
+        advertencia:{ bg: "rgba(251,191,36,0.10)", border: "rgba(251,191,36,0.25)", icon: "fa-triangle-exclamation", iconColor: "#FBBF24", label: "Atención" },
       };
       const v = seccion.variante ?? "importante";
       const p = paleta[v] ?? paleta.importante;
@@ -81,7 +82,7 @@ function RenderSeccion({ seccion }: { seccion: SeccionContenido }) {
             <div style={{ fontSize: 11, fontWeight: 800, color: p.iconColor, textTransform: "uppercase", letterSpacing: "0.10em", marginBottom: 6 }}>
               {p.label}
             </div>
-            <p style={{ fontSize: 14, color: "rgba(11,37,69,0.75)", lineHeight: 1.65, margin: 0 }}>
+            <p style={{ fontSize: 14, color: "rgba(255,255,255,0.72)", lineHeight: 1.65, margin: 0 }}>
               {seccion.contenido}
             </p>
           </div>
@@ -96,10 +97,10 @@ function RenderSeccion({ seccion }: { seccion: SeccionContenido }) {
           <img
             src={seccion.url ?? "/biblioteca/placeholder-ficha.svg"}
             alt={seccion.alt ?? ""}
-            style={{ width: "100%", borderRadius: 14, border: "1px solid rgba(11,37,69,0.08)", display: "block" }}
+            style={{ width: "100%", borderRadius: 14, border: "1px solid rgba(255,255,255,0.08)", display: "block" }}
           />
           {seccion.caption && (
-            <figcaption style={{ fontSize: 12, color: "rgba(11,37,69,0.40)", marginTop: 8, textAlign: "center", fontStyle: "italic" }}>
+            <figcaption style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", marginTop: 8, textAlign: "center", fontStyle: "italic" }}>
               {seccion.caption}
             </figcaption>
           )}
@@ -135,12 +136,12 @@ export default async function FichaPage({ params }: Props) {
     <div style={{ maxWidth: 1200, margin: "0 auto", padding: "36px 40px 80px" }}>
 
       {/* ── Breadcrumb ─── */}
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 28, fontSize: 13, color: "rgba(11,37,69,0.40)", flexWrap: "wrap" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 28, fontSize: 13, color: "rgba(255,255,255,0.35)", flexWrap: "wrap" }}>
         <Link href="/hub/biblioteca" style={{ color: "inherit", textDecoration: "none", fontWeight: 600 }}>Biblioteca</Link>
         <i className="fa-solid fa-chevron-right" style={{ fontSize: 9 }} />
         <Link href={`/hub/biblioteca/${codigo}`} style={{ color: color.hex, textDecoration: "none", fontWeight: 700 }}>{codigo}</Link>
         <i className="fa-solid fa-chevron-right" style={{ fontSize: 9 }} />
-        <span style={{ color: "rgba(11,37,69,0.60)", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 200 }}>
+        <span style={{ color: "rgba(255,255,255,0.50)", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 200 }}>
           {ficha.titulo}
         </span>
       </div>
@@ -150,48 +151,20 @@ export default async function FichaPage({ params }: Props) {
         {/* ── Main article ─── */}
         <article style={{ flex: 1, minWidth: 0 }}>
 
-          {/* Hero */}
-          <div style={{
-            borderRadius: 20,
-            background: `rgba(${color.rgba}, 0.06)`,
-            border: `1.5px solid rgba(${color.rgba}, 0.12)`,
-            padding: "32px 36px",
-            marginBottom: 36,
-          }}>
-            {ficha.categoria && (
-              <span style={{ fontSize: 10, fontWeight: 800, color: color.hex, textTransform: "uppercase", letterSpacing: "0.14em", display: "block", marginBottom: 10 }}>
-                {ficha.categoria}
-              </span>
-            )}
-            <h1 style={{
-              fontSize: "clamp(22px, 3vw, 34px)",
-              fontWeight: 900, color: "#0B2545",
-              margin: "0 0 16px", letterSpacing: "-0.04em", lineHeight: 1.12,
-            }}>
-              {ficha.titulo}
-            </h1>
-            <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
-              <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "rgba(11,37,69,0.45)", fontWeight: 500 }}>
-                <i className={`fa-solid ${color.faIcon}`} style={{ color: color.hex }} />
-                {uacData.nombre}
-              </span>
-              <span style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "rgba(11,37,69,0.45)", fontWeight: 500 }}>
-                <i className="fa-solid fa-clock" />
-                {ficha.tiempo_lectura_minutos} min de lectura
-              </span>
-              {ficha.leida && (
-                <span style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "#16A34A", fontWeight: 700 }}>
-                  <i className="fa-solid fa-check-circle" />
-                  Leída
-                </span>
-              )}
-            </div>
-          </div>
+          {/* Hero — client component for entrance animation */}
+          <FichaHeroSection
+            titulo={ficha.titulo}
+            categoria={ficha.categoria}
+            color={color}
+            uacNombre={uacData.nombre}
+            tiempoLectura={ficha.tiempo_lectura_minutos}
+            leida={ficha.leida}
+          />
 
           {/* Content body */}
           <div style={{ maxWidth: 720 }}>
             {secciones.length === 0 ? (
-              <p style={{ fontSize: 15, color: "rgba(11,37,69,0.45)", lineHeight: 1.7 }}>
+              <p style={{ fontSize: 15, color: "rgba(255,255,255,0.40)", lineHeight: 1.7 }}>
                 El contenido de esta ficha estará disponible próximamente.
               </p>
             ) : (
@@ -204,19 +177,19 @@ export default async function FichaPage({ params }: Props) {
             <div style={{
               marginTop: 40,
               borderRadius: 16,
-              background: "#EFF6FF",
-              border: "1px solid rgba(30,64,175,0.12)",
+              background: "rgba(125,211,252,0.08)",
+              border: "1px solid rgba(125,211,252,0.15)",
               padding: "22px 24px",
             }}>
-              <p style={{ fontSize: 11, fontWeight: 800, color: "#1E40AF", textTransform: "uppercase", letterSpacing: "0.14em", margin: "0 0 12px" }}>
+              <p style={{ fontSize: 11, fontWeight: 800, color: "#7DD3FC", textTransform: "uppercase", letterSpacing: "0.14em", margin: "0 0 12px" }}>
                 Conceptos clave
               </p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                 {ficha.conceptos_clave.map((c) => (
                   <span key={c} style={{
-                    background: "#fff", border: "1px solid rgba(30,64,175,0.18)",
+                    background: "rgba(255,255,255,0.06)", border: "1px solid rgba(125,211,252,0.18)",
                     borderRadius: 999, padding: "5px 14px",
-                    fontSize: 12, fontWeight: 700, color: "#1E40AF",
+                    fontSize: 12, fontWeight: 700, color: "#7DD3FC",
                   }}>
                     {c}
                   </span>
@@ -226,17 +199,17 @@ export default async function FichaPage({ params }: Props) {
           )}
 
           {/* Navigation footer */}
-          <div style={{ marginTop: 40, paddingTop: 24, borderTop: "1px solid rgba(11,37,69,0.08)", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+          <div style={{ marginTop: 40, paddingTop: 24, borderTop: "1px solid rgba(255,255,255,0.08)", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
             <Link
               href={`/hub/biblioteca/${codigo}`}
-              style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 13, fontWeight: 700, color: "#1E40AF", textDecoration: "none" }}
+              style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 13, fontWeight: 700, color: color.hex, textDecoration: "none" }}
             >
               <i className="fa-solid fa-arrow-left" style={{ fontSize: 11 }} />
               Volver a {uacData.nombre}
             </Link>
             <Link
               href="/hub/biblioteca"
-              style={{ fontSize: 13, fontWeight: 600, color: "rgba(11,37,69,0.40)", textDecoration: "none" }}
+              style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.35)", textDecoration: "none" }}
             >
               Ver toda la Biblioteca
             </Link>
@@ -248,8 +221,8 @@ export default async function FichaPage({ params }: Props) {
           {/* UAC card */}
           <div style={{
             borderRadius: 16,
-            background: `rgba(${color.rgba}, 0.06)`,
-            border: `1.5px solid rgba(${color.rgba}, 0.14)`,
+            background: `rgba(${color.rgba}, 0.08)`,
+            border: `1.5px solid rgba(${color.rgba}, 0.18)`,
             padding: "18px",
             marginBottom: 16,
           }}>
@@ -263,8 +236,8 @@ export default async function FichaPage({ params }: Props) {
                 <i className={`fa-solid ${color.faIcon}`} />
               </div>
               <div>
-                <div style={{ fontSize: 12, fontWeight: 800, color: "#0B2545" }}>{codigo}</div>
-                <div style={{ fontSize: 10, color: "rgba(11,37,69,0.45)" }}>Semestre {uacData.semestre}</div>
+                <div style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}>{codigo}</div>
+                <div style={{ fontSize: 10, color: "rgba(255,255,255,0.40)" }}>Semestre {uacData.semestre}</div>
               </div>
             </div>
             <Link
@@ -275,19 +248,19 @@ export default async function FichaPage({ params }: Props) {
             </Link>
           </div>
 
-          {/* Placeholder for related fichas */}
+          {/* Related fichas */}
           {ficha.fichas_relacionadas.length > 0 && (
-            <div style={{ borderRadius: 16, background: "#fff", border: "1px solid rgba(11,37,69,0.08)", padding: "16px" }}>
-              <p style={{ fontSize: 11, fontWeight: 800, color: "rgba(11,37,69,0.45)", textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px" }}>
+            <div style={{ borderRadius: 16, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", padding: "16px" }}>
+              <p style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,0.35)", textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 12px" }}>
                 Relacionadas
               </p>
-              {ficha.fichas_relacionadas.map((slug) => (
+              {ficha.fichas_relacionadas.map((relSlug) => (
                 <Link
-                  key={slug}
-                  href={`/hub/biblioteca/${codigo}/ficha/${slug}`}
-                  style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#1E40AF", textDecoration: "none", padding: "6px 0", borderBottom: "1px solid rgba(11,37,69,0.06)" }}
+                  key={relSlug}
+                  href={`/hub/biblioteca/${codigo}/ficha/${relSlug}`}
+                  style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#7DD3FC", textDecoration: "none", padding: "6px 0", borderBottom: "1px solid rgba(255,255,255,0.06)" }}
                 >
-                  {slug}
+                  {relSlug}
                 </Link>
               ))}
             </div>
