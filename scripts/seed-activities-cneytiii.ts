@@ -85,7 +85,7 @@ const contenidosA1 = [
   { // P01 — infografia (Biomas y ecosistemas)
     titulo: "Biomas del mundo y ecosistemas de México",
     url_imagen: "/placeholder/infografia.svg",
-    descripcion: "Infografía de los principales biomas terrestres y acuáticos del planeta, sus características climáticas, flora y fauna representativa, y los ecosistemas más importantes de México: selvas húmedas, bosques templados, manglares, desiertos y arrecifes de coral.",
+    descripcion_accesible: "Infografía de los principales biomas terrestres y acuáticos del planeta, sus características climáticas, flora y fauna representativa, y los ecosistemas más importantes de México: selvas húmedas, bosques templados, manglares, desiertos y arrecifes de coral.",
     puntos_clave: [
       "Bioma: región geográfica caracterizada por clima, vegetación y fauna propios. Ejemplos: tundra (<0°C), taiga, bosque templado, selva tropical (>2000 mm lluvia/año), desierto (<250 mm/año), sabana y pradera.",
       "Ecosistema: sistema formado por la comunidad biótica (organismos) + el entorno abiótico (clima, suelo, agua, luz). Los componentes se relacionan en ciclos de materia y flujos de energía.",
@@ -111,20 +111,19 @@ const contenidosA1 = [
     ],
   },
   { // P03 — video_con_preguntas (Fotosíntesis)
-    url: "https://example.com/video-pendiente-cen",
+    url_video: "https://example.com/video-pendiente-cen",
+    titulo_video: "Fotosíntesis: la ecuación de la vida",
     duracion_segundos: 510,
-    titulo: "Fotosíntesis: la ecuación de la vida",
-    descripcion: "Explica la ecuación general de la fotosíntesis (CO₂ + H₂O + luz → glucosa + O₂), las fases de la fotosíntesis (reacciones de luz y ciclo de Calvin), los tipos de plantas C3, C4 y CAM y sus adaptaciones a diferentes ambientes, y la importancia ecológica de la fotosíntesis como base de casi todas las redes tróficas y reguladora del CO₂ atmosférico.",
     preguntas: [
-      { timestamp_segundos: 90, pregunta: "¿Cuáles son los reactivos y los productos de la fotosíntesis? Escribe la ecuación general.", respuesta_guia: "6 CO₂ + 6 H₂O + energía luminosa → C₆H₁₂O₆ (glucosa) + 6 O₂. Los reactivos son CO₂, H₂O y luz; los productos son glucosa y O₂." },
-      { timestamp_segundos: 280, pregunta: "¿Qué diferencia existe entre las plantas C3, C4 y CAM en cuanto a su estrategia fotosintética?", respuesta_guia: "C3 (mayoría de plantas): fijan CO₂ directamente en el ciclo de Calvin; pierden agua. C4 (maíz, caña): prefijan CO₂ en mesófilo para concentrarlo; más eficientes en calor. CAM (cactus, agaves): abren estomas de noche para reducir pérdida de agua en ambientes áridos." },
-      { timestamp_segundos: 450, pregunta: "¿Por qué se dice que la fotosíntesis es 'la base de casi toda la vida en la Tierra'?", respuesta_guia: "Porque convierte energía solar en materia orgánica que alimenta a todos los demás organismos; además produce el oxígeno que respiramos y absorbe CO₂, regulando el clima." },
+      { tiempo_segundos: 90, pregunta: "¿Cuáles son los reactivos y los productos de la fotosíntesis? Escribe la ecuación general.", respuesta_guia: "6 CO₂ + 6 H₂O + energía luminosa → C₆H₁₂O₆ (glucosa) + 6 O₂. Los reactivos son CO₂, H₂O y luz; los productos son glucosa y O₂." },
+      { tiempo_segundos: 280, pregunta: "¿Qué diferencia existe entre las plantas C3, C4 y CAM en cuanto a su estrategia fotosintética?", respuesta_guia: "C3 (mayoría de plantas): fijan CO₂ directamente en el ciclo de Calvin; pierden agua. C4 (maíz, caña): prefijan CO₂ en mesófilo para concentrarlo; más eficientes en calor. CAM (cactus, agaves): abren estomas de noche para reducir pérdida de agua en ambientes áridos." },
+      { tiempo_segundos: 450, pregunta: "¿Por qué se dice que la fotosíntesis es 'la base de casi toda la vida en la Tierra'?", respuesta_guia: "Porque convierte energía solar en materia orgánica que alimenta a todos los demás organismos; además produce el oxígeno que respiramos y absorbe CO₂, regulando el clima." },
     ],
   },
   { // P04 — infografia (Ciclos biogeoquímicos)
     titulo: "Los ciclos que sostienen la vida: agua, carbono, nitrógeno y fósforo",
     url_imagen: "/placeholder/infografia.svg",
-    descripcion: "Infografía de los cuatro principales ciclos biogeoquímicos: el ciclo del agua (hidrológico), el ciclo del carbono, el ciclo del nitrógeno y el ciclo del fósforo. Muestra los reservorios, flujos y procesos clave de cada ciclo, y cómo la actividad humana los altera.",
+    descripcion_accesible: "Infografía de los cuatro principales ciclos biogeoquímicos: el ciclo del agua (hidrológico), el ciclo del carbono, el ciclo del nitrógeno y el ciclo del fósforo. Muestra los reservorios, flujos y procesos clave de cada ciclo, y cómo la actividad humana los altera.",
     puntos_clave: [
       "Ciclo del agua: evaporación (océanos, lagos, suelo), transpiración vegetal, condensación (nubes), precipitación (lluvia, nieve), escorrentía e infiltración. El agua circula continuamente entre atmósfera, hidrosfera y litosfera.",
       "Ciclo del carbono: fijación fotosintética (CO₂ → glucosa), respiración celular (glucosa → CO₂), descomposición, combustión de fósiles (libera carbono acumulado durante millones de años), y el océano como gran reservorio (absorbe ~25% del CO₂ antropogénico).",
@@ -148,14 +147,13 @@ const contenidosA1 = [
     ],
   },
   { // P06 — video_con_preguntas (Deterioro ambiental)
-    url: "https://example.com/video-pendiente-cen",
+    url_video: "https://example.com/video-pendiente-cen",
+    titulo_video: "Crisis ambiental: contaminación, deforestación y cambio climático",
     duracion_segundos: 540,
-    titulo: "Crisis ambiental: contaminación, deforestación y cambio climático",
-    descripcion: "Analiza las principales formas de deterioro ambiental: contaminación del agua (metales pesados, plásticos, agroquímicos), contaminación del aire (PM2.5, ozono troposférico, CO₂), deforestación (pérdida de 10 millones de ha/año), cambio climático (causas, evidencias del IPCC y consecuencias), y la huella ecológica como herramienta de medición del impacto humano.",
     preguntas: [
-      { timestamp_segundos: 100, pregunta: "¿Qué diferencia hay entre contaminación del agua por fuentes puntuales y fuentes difusas? Da un ejemplo de cada una.", respuesta_guia: "Fuente puntual: descarga identificable como una tubería de fábrica o drenaje urbano. Fuente difusa: escorrentía agrícola que arrastra agroquímicos de toda una región, sin un punto de origen único." },
-      { timestamp_segundos: 310, pregunta: "¿Cuáles son las tres evidencias más sólidas del cambio climático según el IPCC?", respuesta_guia: "Aumento de la temperatura media global (~1.1°C desde 1850), aumento del nivel del mar (~20 cm desde 1900) y disminución de la cobertura de hielo ártico y glaciares en todo el mundo." },
-      { timestamp_segundos: 490, pregunta: "¿Qué es la huella ecológica y qué nos dice si es mayor que 1 Tierra?", respuesta_guia: "La huella ecológica mide cuánta superficie bioproductiva necesita una población para sostener su consumo y absorber sus residuos. Si supera 1 Tierra, estamos consumiendo más recursos de los que el planeta puede regenerar (déficit ecológico)." },
+      { tiempo_segundos: 100, pregunta: "¿Qué diferencia hay entre contaminación del agua por fuentes puntuales y fuentes difusas? Da un ejemplo de cada una.", respuesta_guia: "Fuente puntual: descarga identificable como una tubería de fábrica o drenaje urbano. Fuente difusa: escorrentía agrícola que arrastra agroquímicos de toda una región, sin un punto de origen único." },
+      { tiempo_segundos: 310, pregunta: "¿Cuáles son las tres evidencias más sólidas del cambio climático según el IPCC?", respuesta_guia: "Aumento de la temperatura media global (~1.1°C desde 1850), aumento del nivel del mar (~20 cm desde 1900) y disminución de la cobertura de hielo ártico y glaciares en todo el mundo." },
+      { tiempo_segundos: 490, pregunta: "¿Qué es la huella ecológica y qué nos dice si es mayor que 1 Tierra?", respuesta_guia: "La huella ecológica mide cuánta superficie bioproductiva necesita una población para sostener su consumo y absorber sus residuos. Si supera 1 Tierra, estamos consumiendo más recursos de los que el planeta puede regenerar (déficit ecológico)." },
     ],
   },
   { // P07 — lectura (Políticas de conservación en México)
@@ -190,40 +188,40 @@ const contenidosA1 = [
 const contenidosA2 = [
   { // P01 — quiz_multiple_opcion (Biomas y ecosistemas)
     preguntas: [
-      { pregunta: "¿Qué distingue un bioma de un ecosistema?", opciones: ["Un bioma es microscópico; un ecosistema es macroscópico", "Un bioma es una región geográfica amplia con clima y vegetación característica; un ecosistema incluye la comunidad biótica y el entorno abiótico a cualquier escala", "Son sinónimos perfectos", "Un ecosistema solo aplica al mar; un bioma, a la tierra"], respuesta_correcta: 1, retroalimentacion: "El bioma es una unidad biogeográfica regional (como la selva tropical o la tundra); el ecosistema incluye la comunidad viva + factores abióticos y puede tener cualquier tamaño, desde un charco hasta un océano." },
-      { pregunta: "¿Por qué México es considerado un país 'megadiverso'?", opciones: ["Porque tiene la mayor superficie territorial de América", "Porque posee entre el 10-12% de la biodiversidad mundial en menos del 2% de la superficie terrestre", "Porque tiene el mayor número de parques nacionales del continente", "Porque solo en México viven los jaguares y los axolotes"], respuesta_correcta: 1, retroalimentacion: "México comparte el título de megadiverso con solo 17 países del mundo que juntos albergan más del 70% de la biodiversidad del planeta. La combinación de climas, topografía y su posición biogeográfica explican esta riqueza." },
-      { pregunta: "¿Cuál de estos factores abióticos es determinante para distinguir un desierto de una selva tropical?", opciones: ["La altitud sobre el nivel del mar", "La temperatura y la precipitación anual", "La presencia de suelo arenoso", "La latitud geográfica exclusivamente"], respuesta_correcta: 1, retroalimentacion: "La temperatura y la precipitación son los factores climáticos más determinantes para definir un bioma. Los desiertos tienen <250 mm de lluvia/año; las selvas tropicales, >2000 mm, con temperaturas cálidas todo el año." },
-      { pregunta: "¿Qué son los servicios ecosistémicos?", opciones: ["Empresas que limpian ecosistemas contaminados", "Los beneficios que los ecosistemas proporcionan a las sociedades humanas (alimentos, agua limpia, regulación del clima, polinización)", "Los servicios turísticos en áreas naturales protegidas", "Las actividades económicas que se realizan dentro de un ecosistema"], respuesta_correcta: 1, retroalimentacion: "Los servicios ecosistémicos son todos los beneficios que las personas obtienen de los ecosistemas, incluyendo aprovisionamiento (alimento, agua), regulación (clima, inundaciones), culturales y de soporte (fotosíntesis, ciclos de nutrientes)." },
-      { pregunta: "Un ecotono es:", opciones: ["Un tipo de bioma polar extremo", "La zona de transición entre dos ecosistemas, con alta biodiversidad propia", "Un organismo que vive en dos ecosistemas distintos", "El nivel máximo de un nivel trófico"], respuesta_correcta: 1, retroalimentacion: "El ecotono es la zona de contacto o transición entre dos ecosistemas (ej. borde entre un bosque y una pradera). Suele tener mayor biodiversidad que cada uno por separado, ya que combina especies de ambos." },
+      { enunciado: "¿Qué distingue un bioma de un ecosistema?", opciones: ["Un bioma es microscópico; un ecosistema es macroscópico", "Un bioma es una región geográfica amplia con clima y vegetación característica; un ecosistema incluye la comunidad biótica y el entorno abiótico a cualquier escala", "Son sinónimos perfectos", "Un ecosistema solo aplica al mar; un bioma, a la tierra"], respuesta_correcta: 1, retroalimentacion: "El bioma es una unidad biogeográfica regional (como la selva tropical o la tundra); el ecosistema incluye la comunidad viva + factores abióticos y puede tener cualquier tamaño, desde un charco hasta un océano." },
+      { enunciado: "¿Por qué México es considerado un país 'megadiverso'?", opciones: ["Porque tiene la mayor superficie territorial de América", "Porque posee entre el 10-12% de la biodiversidad mundial en menos del 2% de la superficie terrestre", "Porque tiene el mayor número de parques nacionales del continente", "Porque solo en México viven los jaguares y los axolotes"], respuesta_correcta: 1, retroalimentacion: "México comparte el título de megadiverso con solo 17 países del mundo que juntos albergan más del 70% de la biodiversidad del planeta. La combinación de climas, topografía y su posición biogeográfica explican esta riqueza." },
+      { enunciado: "¿Cuál de estos factores abióticos es determinante para distinguir un desierto de una selva tropical?", opciones: ["La altitud sobre el nivel del mar", "La temperatura y la precipitación anual", "La presencia de suelo arenoso", "La latitud geográfica exclusivamente"], respuesta_correcta: 1, retroalimentacion: "La temperatura y la precipitación son los factores climáticos más determinantes para definir un bioma. Los desiertos tienen <250 mm de lluvia/año; las selvas tropicales, >2000 mm, con temperaturas cálidas todo el año." },
+      { enunciado: "¿Qué son los servicios ecosistémicos?", opciones: ["Empresas que limpian ecosistemas contaminados", "Los beneficios que los ecosistemas proporcionan a las sociedades humanas (alimentos, agua limpia, regulación del clima, polinización)", "Los servicios turísticos en áreas naturales protegidas", "Las actividades económicas que se realizan dentro de un ecosistema"], respuesta_correcta: 1, retroalimentacion: "Los servicios ecosistémicos son todos los beneficios que las personas obtienen de los ecosistemas, incluyendo aprovisionamiento (alimento, agua), regulación (clima, inundaciones), culturales y de soporte (fotosíntesis, ciclos de nutrientes)." },
+      { enunciado: "Un ecotono es:", opciones: ["Un tipo de bioma polar extremo", "La zona de transición entre dos ecosistemas, con alta biodiversidad propia", "Un organismo que vive en dos ecosistemas distintos", "El nivel máximo de un nivel trófico"], respuesta_correcta: 1, retroalimentacion: "El ecotono es la zona de contacto o transición entre dos ecosistemas (ej. borde entre un bosque y una pradera). Suele tener mayor biodiversidad que cada uno por separado, ya que combina especies de ambos." },
     ],
     intentos_maximos: 3,
     puntaje_minimo_aprobacion: 70,
     mezclar_preguntas: false,
   },
   { // P02 — ejercicio_matematico (Regla del 10% - flujo de energía)
-    enunciado: "En una pradera, los productores (pastos) fijan 10,000 kcal de energía solar mediante fotosíntesis. Aplicando la regla del 10% de eficiencia ecológica:\n\n(a) ¿Cuánta energía (en kcal) estará disponible para los consumidores primarios (ratones y conejos)?\n(b) ¿Cuánta energía estará disponible para los consumidores secundarios (zorros)?\n(c) ¿Cuánta energía estará disponible para los consumidores terciarios (águilas)?\n(d) ¿Qué porcentaje de la energía original de los productores llega al nivel de los consumidores terciarios?",
-    datos: ["Energía fijada por productores: 10,000 kcal", "Eficiencia ecológica entre niveles: 10% (regla del 10%)", "Niveles: productores → consumidores primarios → consumidores secundarios → consumidores terciarios"],
+    problema: "En una pradera, los productores (pastos) fijan 10,000 kcal de energía solar mediante fotosíntesis. Aplicando la regla del 10% de eficiencia ecológica:\n\n(a) ¿Cuánta energía (en kcal) estará disponible para los consumidores primarios (ratones y conejos)?\n(b) ¿Cuánta energía estará disponible para los consumidores secundarios (zorros)?\n(c) ¿Cuánta energía estará disponible para los consumidores terciarios (águilas)?\n(d) ¿Qué porcentaje de la energía original de los productores llega al nivel de los consumidores terciarios?\n\nDatos: Energía fijada por productores: 10,000 kcal. Eficiencia ecológica entre niveles: 10% (regla del 10%). Niveles: productores → consumidores primarios → consumidores secundarios → consumidores terciarios.",
+    tipo_respuesta: "numerica",
     pasos_guia: [
       "Nivel 1 (productores): 10,000 kcal",
       "Nivel 2 (consumidores primarios): 10,000 × 10% = 10,000 × 0.10 = 1,000 kcal",
       "Nivel 3 (consumidores secundarios): 1,000 × 10% = 1,000 × 0.10 = 100 kcal",
       "Nivel 4 (consumidores terciarios): 100 × 10% = 100 × 0.10 = 10 kcal",
       "Porcentaje que llega al nivel 4: (10 kcal / 10,000 kcal) × 100 = 0.1%",
+      "Respuesta final: 10 kcal llegan al nivel de consumidores terciarios. (a) 1,000 kcal; (b) 100 kcal; (c) 10 kcal; (d) 0.1% de la energía original llega al nivel de los consumidores terciarios. El 99.9% se pierde como calor en los procesos metabólicos de los niveles intermedios.",
     ],
-    solucion: 10,
-    solucion_explicada: "(a) 1,000 kcal; (b) 100 kcal; (c) 10 kcal; (d) 0.1% de la energía original llega al nivel de los consumidores terciarios. El 99.9% se pierde como calor en los procesos metabólicos de los niveles intermedios.",
-    tolerancia: 0,
+    respuesta_final: "10",
+    tolerancia_error: 0,
     unidades: "kcal (kilocalorías)",
   },
   { // P03 — quiz_verdadero_falso (Fotosíntesis)
     preguntas: [
-      { afirmacion: "La fotosíntesis produce CO₂ y consume O₂, lo opuesto a la respiración celular.", es_verdadero: false, retroalimentacion: "Al revés: la fotosíntesis consume CO₂ y H₂O, y produce glucosa y O₂. La respiración celular consume O₂ y glucosa, y produce CO₂ y H₂O." },
-      { afirmacion: "Las plantas C4 como el maíz son más eficientes que las C3 en ambientes cálidos y con alta radiación solar porque evitan la fotorrespiración.", es_verdadero: true, retroalimentacion: "Correcto. Las plantas C4 prefijan el CO₂ en el mesófilo y lo concentran en las células del haz vascular, reduciendo la fotorrespiración que afecta a las plantas C3 en condiciones de calor y luz intensa." },
-      { afirmacion: "Los agaves y los cactus son plantas CAM que abren sus estomas de día para capturar CO₂.", es_verdadero: false, retroalimentacion: "Las plantas CAM abren sus estomas de NOCHE para capturar CO₂ y almacenarlo como ácido málico; durante el día los cierran para evitar la pérdida de agua (una adaptación clave a ambientes áridos)." },
-      { afirmacion: "La fotosíntesis solo ocurre en las hojas de las plantas vasculares.", es_verdadero: false, retroalimentacion: "La fotosíntesis ocurre en todo tejido verde (hojas, tallos jóvenes, frutos verdes). Además, la realizan algas, cianobacterias y algunas bacterias fotosintéticas, no solo plantas terrestres." },
-      { afirmacion: "El oxígeno liberado en la fotosíntesis proviene de la molécula de agua (H₂O), no del CO₂.", es_verdadero: true, retroalimentacion: "Correcto. En la fotólisis del agua (reacciones de luz), las moléculas de H₂O se dividen; el O₂ liberado proviene del oxígeno del agua, comprobado con experimentos con isótopos marcados (¹⁸O)." },
-      { afirmacion: "Sin fotosíntesis, la concentración de O₂ en la atmósfera se mantendría igual gracias a la descomposición de materia orgánica.", es_verdadero: false, retroalimentacion: "Sin fotosíntesis, el O₂ atmosférico se consumiría rápidamente por la respiración y la oxidación. La fotosíntesis es prácticamente la única fuente de O₂ libre de la atmósfera terrestre." },
-      { afirmacion: "Las algas unicelulares (fitoplancton) realizan fotosíntesis y son responsables de aproximadamente el 50% del O₂ que produce la Tierra.", es_verdadero: true, retroalimentacion: "Correcto. El fitoplancton marino (diatomeas, dinoflagelados, cianobacterias) genera alrededor de la mitad del oxígeno atmosférico global, a pesar de su pequeño tamaño individual." },
+      { enunciado: "La fotosíntesis produce CO₂ y consume O₂, lo opuesto a la respiración celular.", respuesta: false, retroalimentacion: "Al revés: la fotosíntesis consume CO₂ y H₂O, y produce glucosa y O₂. La respiración celular consume O₂ y glucosa, y produce CO₂ y H₂O." },
+      { enunciado: "Las plantas C4 como el maíz son más eficientes que las C3 en ambientes cálidos y con alta radiación solar porque evitan la fotorrespiración.", respuesta: true, retroalimentacion: "Correcto. Las plantas C4 prefijan el CO₂ en el mesófilo y lo concentran en las células del haz vascular, reduciendo la fotorrespiración que afecta a las plantas C3 en condiciones de calor y luz intensa." },
+      { enunciado: "Los agaves y los cactus son plantas CAM que abren sus estomas de día para capturar CO₂.", respuesta: false, retroalimentacion: "Las plantas CAM abren sus estomas de NOCHE para capturar CO₂ y almacenarlo como ácido málico; durante el día los cierran para evitar la pérdida de agua (una adaptación clave a ambientes áridos)." },
+      { enunciado: "La fotosíntesis solo ocurre en las hojas de las plantas vasculares.", respuesta: false, retroalimentacion: "La fotosíntesis ocurre en todo tejido verde (hojas, tallos jóvenes, frutos verdes). Además, la realizan algas, cianobacterias y algunas bacterias fotosintéticas, no solo plantas terrestres." },
+      { enunciado: "El oxígeno liberado en la fotosíntesis proviene de la molécula de agua (H₂O), no del CO₂.", respuesta: true, retroalimentacion: "Correcto. En la fotólisis del agua (reacciones de luz), las moléculas de H₂O se dividen; el O₂ liberado proviene del oxígeno del agua, comprobado con experimentos con isótopos marcados (¹⁸O)." },
+      { enunciado: "Sin fotosíntesis, la concentración de O₂ en la atmósfera se mantendría igual gracias a la descomposición de materia orgánica.", respuesta: false, retroalimentacion: "Sin fotosíntesis, el O₂ atmosférico se consumiría rápidamente por la respiración y la oxidación. La fotosíntesis es prácticamente la única fuente de O₂ libre de la atmósfera terrestre." },
+      { enunciado: "Las algas unicelulares (fitoplancton) realizan fotosíntesis y son responsables de aproximadamente el 50% del O₂ que produce la Tierra.", respuesta: true, retroalimentacion: "Correcto. El fitoplancton marino (diatomeas, dinoflagelados, cianobacterias) genera alrededor de la mitad del oxígeno atmosférico global, a pesar de su pequeño tamaño individual." },
     ],
     intentos_maximos: 2,
     puntaje_minimo_aprobacion: 70,
@@ -231,19 +229,20 @@ const contenidosA2 = [
   { // P04 — fill_blanks (Ciclos biogeoquímicos)
     texto_con_huecos: `El ciclo del agua comienza con la ___ del agua de océanos, ríos y suelo, que sube a la atmósfera como vapor. Al enfriarse forma nubes (___), y cae nuevamente como ___ o nieve. En las plantas, el proceso de ___ también devuelve vapor de agua a la atmósfera.\n\nEn el ciclo del carbono, las plantas absorben ___ del aire durante la fotosíntesis. Este carbono pasa a los animales por la alimentación y regresa al aire mediante la ___ celular y la descomposición. La combustión de ___ libera carbono acumulado durante millones de años.\n\nEl nitrógeno atmosférico (N₂) no puede ser usado directamente por la mayoría de los organismos. Bacterias como ___ lo convierten en formas asimilables (fijación), y otras bacterias devuelven el N₂ al aire mediante la ___.`,
     huecos: [
-      { respuesta_correcta: "evaporación", alternativas_aceptadas: ["evaporacion"], pista: "Proceso por el que el agua líquida pasa a vapor" },
-      { respuesta_correcta: "condensación", alternativas_aceptadas: ["condensacion"], pista: "Proceso por el que el vapor de agua forma gotitas de agua en la atmósfera" },
-      { respuesta_correcta: "precipitación", alternativas_aceptadas: ["precipitacion", "lluvia"], pista: "Caída de agua desde las nubes (lluvia, granizo)" },
-      { respuesta_correcta: "transpiración", alternativas_aceptadas: ["transpiracion"], pista: "Las plantas liberan vapor de agua por sus estomas" },
-      { respuesta_correcta: "CO₂", alternativas_aceptadas: ["co2", "dióxido de carbono", "dioxido de carbono"], pista: "Gas que las plantas fijan en la fotosíntesis; fórmula: CO₂" },
-      { respuesta_correcta: "respiración", alternativas_aceptadas: ["respiracion"], pista: "Proceso metabólico que libera CO₂ y produce energía (ATP)" },
-      { respuesta_correcta: "combustibles fósiles", alternativas_aceptadas: ["fosiles", "fósiles", "petroleo", "petróleo", "carbon", "carbón"], pista: "Petróleo, carbón y gas natural acumulados durante millones de años" },
-      { respuesta_correcta: "Rhizobium", alternativas_aceptadas: ["rhizobium", "bacterias fijadoras de nitrógeno", "bacterias fijadoras"], pista: "Bacteria simbiótica de las raíces de leguminosas que fija N₂ atmosférico" },
-      { respuesta_correcta: "desnitrificación", alternativas_aceptadas: ["desnitrificacion"], pista: "Proceso bacteriano que convierte nitratos en N₂ atmosférico" },
+      { posicion: 0, respuesta_correcta: "evaporación", alternativas_aceptadas: ["evaporacion"], pista: "Proceso por el que el agua líquida pasa a vapor" },
+      { posicion: 1, respuesta_correcta: "condensación", alternativas_aceptadas: ["condensacion"], pista: "Proceso por el que el vapor de agua forma gotitas de agua en la atmósfera" },
+      { posicion: 2, respuesta_correcta: "precipitación", alternativas_aceptadas: ["precipitacion", "lluvia"], pista: "Caída de agua desde las nubes (lluvia, granizo)" },
+      { posicion: 3, respuesta_correcta: "transpiración", alternativas_aceptadas: ["transpiracion"], pista: "Las plantas liberan vapor de agua por sus estomas" },
+      { posicion: 4, respuesta_correcta: "CO₂", alternativas_aceptadas: ["co2", "dióxido de carbono", "dioxido de carbono"], pista: "Gas que las plantas fijan en la fotosíntesis; fórmula: CO₂" },
+      { posicion: 5, respuesta_correcta: "respiración", alternativas_aceptadas: ["respiracion"], pista: "Proceso metabólico que libera CO₂ y produce energía (ATP)" },
+      { posicion: 6, respuesta_correcta: "combustibles fósiles", alternativas_aceptadas: ["fosiles", "fósiles", "petroleo", "petróleo", "carbon", "carbón"], pista: "Petróleo, carbón y gas natural acumulados durante millones de años" },
+      { posicion: 7, respuesta_correcta: "Rhizobium", alternativas_aceptadas: ["rhizobium", "bacterias fijadoras de nitrógeno", "bacterias fijadoras"], pista: "Bacteria simbiótica de las raíces de leguminosas que fija N₂ atmosférico" },
+      { posicion: 8, respuesta_correcta: "desnitrificación", alternativas_aceptadas: ["desnitrificacion"], pista: "Proceso bacteriano que convierte nitratos en N₂ atmosférico" },
     ],
     distingue_mayusculas: false,
   },
   { // P05 — simulacion (Interacciones entre subsistemas terrestres)
+    tipo_simulacion: "laboratorio",
     descripcion: "Simulación de las interacciones entre los cuatro subsistemas terrestres (atmósfera, hidrosfera, litosfera y biosfera). El estudiante modifica variables como la concentración de CO₂ atmosférico, la cobertura vegetal o la actividad volcánica, y observa cómo estas modificaciones alteran el comportamiento de los demás subsistemas (temperatura, nivel del mar, ciclo del agua, biodiversidad).",
     instrucciones: [
       "Observa el estado inicial del sistema: temperatura media, nivel del mar, concentración de CO₂ y cobertura vegetal en valores de referencia (año 1850).",
@@ -263,11 +262,11 @@ const contenidosA2 = [
   },
   { // P06 — quiz_multiple_opcion (Deterioro ambiental)
     preguntas: [
-      { pregunta: "¿Qué es la eutrofización de un cuerpo de agua?", opciones: ["La salinización excesiva de lagos y ríos por evaporación", "El enriquecimiento excesivo de nutrientes (N y P) que causa proliferación de algas y agotamiento del oxígeno disuelto", "La contaminación por metales pesados de origen industrial", "El calentamiento artificial del agua por plantas termoeléctricas"], respuesta_correcta: 1, retroalimentacion: "La eutrofización ocurre cuando el exceso de nitrógeno y fósforo (de fertilizantes o aguas residuales) estimula la explosión de algas (bloom). Al morir, su descomposición agota el oxígeno disuelto y mata a los peces y otros organismos." },
-      { pregunta: "¿Cuál de los siguientes es un GEI (gas de efecto invernadero) de MAYOR potencial de calentamiento que el CO₂?", opciones: ["Nitrógeno (N₂)", "Argón (Ar)", "Metano (CH₄)", "Oxígeno (O₂)"], respuesta_correcta: 2, retroalimentacion: "El metano (CH₄) tiene un potencial de calentamiento global ~80 veces mayor que el CO₂ en un horizonte de 20 años; aunque su concentración atmosférica es menor, su efecto por molécula es mucho más potente." },
-      { pregunta: "La deforestación contribuye al cambio climático principalmente porque:", opciones: ["Genera lluvias ácidas por la quema de madera", "Libera el carbono almacenado en la biomasa y reduce la capacidad de absorción de CO₂ del planeta", "Aumenta la reflexión solar (albedo) del suelo, enfriando la atmósfera", "Solo afecta la biodiversidad local, no tiene efecto climático global"], respuesta_correcta: 1, retroalimentacion: "Los bosques almacenan grandes cantidades de carbono en su biomasa. Al deforestar (especialmente al quemar), ese carbono se libera como CO₂. Además, se pierde la capacidad fotosintética que absorbería CO₂ futuro." },
-      { pregunta: "¿Qué describe mejor el concepto de 'islas de calor urbanas'?", opciones: ["Zonas del mar con temperatura anormalmente alta por corrientes oceánicas", "Áreas urbanas con temperaturas más altas que su entorno rural, por pavimento, edificios y poco verde", "Zonas geotérmicas dentro de ciudades con actividad volcánica subterránea", "Regiones costeras que reciben más radiación solar que el interior"], respuesta_correcta: 1, retroalimentacion: "Las islas de calor urbanas se forman porque el asfalto, el concreto y los edificios absorben más calor que la vegetación, y los autos, industrias y aires acondicionados generan calor adicional. La falta de áreas verdes agrava el fenómeno." },
-      { pregunta: "¿Qué es la acidificación del océano y cuál es su causa principal?", opciones: ["El aumento de sal marina por la evaporación acelerada", "La absorción de CO₂ atmosférico por el océano, que forma ácido carbónico y reduce el pH", "El vertido de ácidos industriales directamente al mar", "El calentamiento del agua que libera ácidos naturales del suelo marino"], respuesta_correcta: 1, retroalimentacion: "El océano absorbe ~25% del CO₂ humano. El CO₂ disuelto reacciona con el agua: CO₂ + H₂O → H₂CO₃ (ácido carbónico), que se disocia y libera H⁺, bajando el pH. Esto daña corales, moluscos y otros organismos con concha de carbonato de calcio." },
+      { enunciado: "¿Qué es la eutrofización de un cuerpo de agua?", opciones: ["La salinización excesiva de lagos y ríos por evaporación", "El enriquecimiento excesivo de nutrientes (N y P) que causa proliferación de algas y agotamiento del oxígeno disuelto", "La contaminación por metales pesados de origen industrial", "El calentamiento artificial del agua por plantas termoeléctricas"], respuesta_correcta: 1, retroalimentacion: "La eutrofización ocurre cuando el exceso de nitrógeno y fósforo (de fertilizantes o aguas residuales) estimula la explosión de algas (bloom). Al morir, su descomposición agota el oxígeno disuelto y mata a los peces y otros organismos." },
+      { enunciado: "¿Cuál de los siguientes es un GEI (gas de efecto invernadero) de MAYOR potencial de calentamiento que el CO₂?", opciones: ["Nitrógeno (N₂)", "Argón (Ar)", "Metano (CH₄)", "Oxígeno (O₂)"], respuesta_correcta: 2, retroalimentacion: "El metano (CH₄) tiene un potencial de calentamiento global ~80 veces mayor que el CO₂ en un horizonte de 20 años; aunque su concentración atmosférica es menor, su efecto por molécula es mucho más potente." },
+      { enunciado: "La deforestación contribuye al cambio climático principalmente porque:", opciones: ["Genera lluvias ácidas por la quema de madera", "Libera el carbono almacenado en la biomasa y reduce la capacidad de absorción de CO₂ del planeta", "Aumenta la reflexión solar (albedo) del suelo, enfriando la atmósfera", "Solo afecta la biodiversidad local, no tiene efecto climático global"], respuesta_correcta: 1, retroalimentacion: "Los bosques almacenan grandes cantidades de carbono en su biomasa. Al deforestar (especialmente al quemar), ese carbono se libera como CO₂. Además, se pierde la capacidad fotosintética que absorbería CO₂ futuro." },
+      { enunciado: "¿Qué describe mejor el concepto de 'islas de calor urbanas'?", opciones: ["Zonas del mar con temperatura anormalmente alta por corrientes oceánicas", "Áreas urbanas con temperaturas más altas que su entorno rural, por pavimento, edificios y poco verde", "Zonas geotérmicas dentro de ciudades con actividad volcánica subterránea", "Regiones costeras que reciben más radiación solar que el interior"], respuesta_correcta: 1, retroalimentacion: "Las islas de calor urbanas se forman porque el asfalto, el concreto y los edificios absorben más calor que la vegetación, y los autos, industrias y aires acondicionados generan calor adicional. La falta de áreas verdes agrava el fenómeno." },
+      { enunciado: "¿Qué es la acidificación del océano y cuál es su causa principal?", opciones: ["El aumento de sal marina por la evaporación acelerada", "La absorción de CO₂ atmosférico por el océano, que forma ácido carbónico y reduce el pH", "El vertido de ácidos industriales directamente al mar", "El calentamiento del agua que libera ácidos naturales del suelo marino"], respuesta_correcta: 1, retroalimentacion: "El océano absorbe ~25% del CO₂ humano. El CO₂ disuelto reacciona con el agua: CO₂ + H₂O → H₂CO₃ (ácido carbónico), que se disocia y libera H⁺, bajando el pH. Esto daña corales, moluscos y otros organismos con concha de carbonato de calcio." },
     ],
     intentos_maximos: 3,
     puntaje_minimo_aprobacion: 70,
@@ -275,12 +274,12 @@ const contenidosA2 = [
   },
   { // P07 — quiz_verdadero_falso (Conservación en México)
     preguntas: [
-      { afirmacion: "La LGEEPA es la ley federal que regula el equilibrio ecológico y la protección ambiental en México desde 1988.", es_verdadero: true, retroalimentacion: "Correcto. La Ley General del Equilibrio Ecológico y la Protección al Ambiente (LGEEPA) es el principal instrumento jurídico ambiental de México, que norma la protección de ecosistemas, el uso racional de recursos y la participación ciudadana." },
-      { afirmacion: "Las Reservas de Biosfera en México permiten cualquier tipo de actividad económica dentro de su perímetro total.", es_verdadero: false, retroalimentacion: "Las Reservas de Biosfera tienen zonas diferenciadas: una zona núcleo (máxima protección, sin actividades extractivas) y zonas de amortiguamiento donde se permiten actividades sostenibles controladas. No todo es libre." },
-      { afirmacion: "Más del 80% de la biodiversidad silvestre de México se encuentra en tierras de ejidos y comunidades agrarias, no solo en ANP.", es_verdadero: true, retroalimentacion: "Correcto. Esto significa que la conservación de la biodiversidad en México depende en gran medida del manejo que hacen las comunidades locales e indígenas de sus tierras, no solo de las áreas protegidas formales." },
-      { afirmacion: "México no ha firmado ningún tratado internacional relacionado con la biodiversidad.", es_verdadero: false, retroalimentacion: "México es parte del Convenio sobre la Diversidad Biológica (CDB, 1992), del Protocolo de Nagoya sobre acceso y distribución de beneficios, del Acuerdo de París sobre cambio climático y de las Metas de Kunming-Montreal (2022), entre otros." },
-      { afirmacion: "Las Metas de Kunming-Montreal (2022) proponen proteger el 30% de la superficie terrestre y marina del planeta para el año 2030.", es_verdadero: true, retroalimentacion: "Correcto. El acuerdo conocido como '30x30' fue adoptado en la COP15 de biodiversidad en Montreal. México firmó este acuerdo como parte de sus compromisos con el Convenio de Diversidad Biológica." },
-      { afirmacion: "La CONANP (Comisión Nacional de Áreas Naturales Protegidas) es la institución encargada de administrar las ANP en México.", es_verdadero: true, retroalimentacion: "Correcto. La CONANP es el órgano desconcentrado de la SEMARNAT responsable de administrar y vigilar las Áreas Naturales Protegidas federales de México." },
+      { enunciado: "La LGEEPA es la ley federal que regula el equilibrio ecológico y la protección ambiental en México desde 1988.", respuesta: true, retroalimentacion: "Correcto. La Ley General del Equilibrio Ecológico y la Protección al Ambiente (LGEEPA) es el principal instrumento jurídico ambiental de México, que norma la protección de ecosistemas, el uso racional de recursos y la participación ciudadana." },
+      { enunciado: "Las Reservas de Biosfera en México permiten cualquier tipo de actividad económica dentro de su perímetro total.", respuesta: false, retroalimentacion: "Las Reservas de Biosfera tienen zonas diferenciadas: una zona núcleo (máxima protección, sin actividades extractivas) y zonas de amortiguamiento donde se permiten actividades sostenibles controladas. No todo es libre." },
+      { enunciado: "Más del 80% de la biodiversidad silvestre de México se encuentra en tierras de ejidos y comunidades agrarias, no solo en ANP.", respuesta: true, retroalimentacion: "Correcto. Esto significa que la conservación de la biodiversidad en México depende en gran medida del manejo que hacen las comunidades locales e indígenas de sus tierras, no solo de las áreas protegidas formales." },
+      { enunciado: "México no ha firmado ningún tratado internacional relacionado con la biodiversidad.", respuesta: false, retroalimentacion: "México es parte del Convenio sobre la Diversidad Biológica (CDB, 1992), del Protocolo de Nagoya sobre acceso y distribución de beneficios, del Acuerdo de París sobre cambio climático y de las Metas de Kunming-Montreal (2022), entre otros." },
+      { enunciado: "Las Metas de Kunming-Montreal (2022) proponen proteger el 30% de la superficie terrestre y marina del planeta para el año 2030.", respuesta: true, retroalimentacion: "Correcto. El acuerdo conocido como '30x30' fue adoptado en la COP15 de biodiversidad en Montreal. México firmó este acuerdo como parte de sus compromisos con el Convenio de Diversidad Biológica." },
+      { enunciado: "La CONANP (Comisión Nacional de Áreas Naturales Protegidas) es la institución encargada de administrar las ANP en México.", respuesta: true, retroalimentacion: "Correcto. La CONANP es el órgano desconcentrado de la SEMARNAT responsable de administrar y vigilar las Áreas Naturales Protegidas federales de México." },
     ],
     intentos_maximos: 2,
     puntaje_minimo_aprobacion: 70,
@@ -288,7 +287,6 @@ const contenidosA2 = [
   { // P08 — autoevaluacion (Agencia ambiental y acción local)
     criterios: [
       {
-        nombre: "Comprensión de los ODS relacionados con el ambiente",
         descripcion: "Identifico y comprendo los Objetivos de Desarrollo Sostenible vinculados a la protección ambiental (ODS 13, 14, 15) y puedo explicar su relevancia local.",
         escala: [
           { valor: 1, etiqueta: "Inicio", descripcion: "No conozco los ODS o no puedo relacionarlos con problemas ambientales concretos." },
@@ -297,7 +295,6 @@ const contenidosA2 = [
         ],
       },
       {
-        nombre: "Identificación de problemas ambientales locales",
         descripcion: "Puedo identificar y describir con evidencia al menos un problema ambiental de mi comunidad o región.",
         escala: [
           { valor: 1, etiqueta: "Inicio", descripcion: "Solo puedo nombrar problemas globales generales; no identifico problemas específicos de mi entorno." },
@@ -306,7 +303,6 @@ const contenidosA2 = [
         ],
       },
       {
-        nombre: "Diseño de propuestas de acción ambiental",
         descripcion: "Soy capaz de diseñar una propuesta de acción ambiental concreta, factible y fundamentada para mi contexto.",
         escala: [
           { valor: 1, etiqueta: "Inicio", descripcion: "Mis propuestas son muy vagas (ej. 'cuidar el ambiente') sin pasos concretos ni fundamento." },
@@ -315,7 +311,6 @@ const contenidosA2 = [
         ],
       },
       {
-        nombre: "Sentido de agencia y responsabilidad ambiental",
         descripcion: "Reconozco mi capacidad de influir en el ambiente desde mi posición como estudiante y ciudadano.",
         escala: [
           { valor: 1, etiqueta: "Inicio", descripcion: "Siento que los problemas ambientales son tan grandes que lo que yo haga no importa." },
@@ -324,7 +319,7 @@ const contenidosA2 = [
         ],
       },
     ],
-    prompt_reflexion_final: "¿En qué criterio obtuviste la puntuación más baja? Describe una acción concreta y específica que puedas realizar en los próximos 7 días para mejorar en ese aspecto.",
+    reflexion_final_prompt: "¿En qué criterio obtuviste la puntuación más baja? Describe una acción concreta y específica que puedas realizar en los próximos 7 días para mejorar en ese aspecto.",
   },
 ];
 
@@ -334,20 +329,19 @@ const contenidosA3 = [
     prompt: "Observa el ecosistema más cercano a tu casa o escuela. Puede ser un parque, un jardín, un camellón arbolado, un canal, o incluso el patio de tu escuela.\n\n¿Qué organismos puedes identificar? ¿Cuáles son los productores, los consumidores y los descomponedores que observas o sabes que están ahí? ¿Qué factores abióticos determinan ese ecosistema (luz, suelo, agua, temperatura)? ¿En qué bioma o tipo de ecosistema se clasifica ese lugar? Reflexiona: ¿ese ecosistema está bien conservado o muestra señales de deterioro? ¿Qué lo amenaza?",
     pistas: ["Los productores son cualquier planta, árbol, pasto o alga que veas (o imagines que hay).", "Los consumidores pueden ser insectos, pájaros, perros, gatos, ardillas, incluso humanos.", "Los descomponedores suelen ser invisibles: hongos en la tierra, bacterias del suelo.", "Un camellón en la ciudad es un fragmento de ecosistema rodeado de asfalto — ¿eso es una amenaza?"],
     pistas_evaluacion: ["Identifica al menos 3 organismos de diferentes niveles tróficos", "Menciona al menos 2 factores abióticos del lugar", "Relaciona lo observado con los conceptos de bioma y ecosistema", "Reflexiona críticamente sobre el estado de conservación"],
-    longitud_minima: 80,
+    longitud_minima_palabras: 80,
     criterios_evaluacion: ["Identifica organismos de al menos dos niveles tróficos diferentes en su entorno", "Menciona factores abióticos relevantes del ecosistema observado", "Relaciona el ecosistema local con algún bioma o tipo de ecosistema estudiado", "Reflexiona críticamente sobre el estado de conservación y las amenazas"],
   },
   { // P02 — reflexion_escrita (La regla del 10% y lo que comemos)
     prompt: "Acabas de calcular que del total de energía que fijan los productores, solo el 0.1% llega al nivel de los consumidores terciarios. Esto no es solo un cálculo de biología: tiene consecuencias enormes para cómo producimos alimentos.\n\n¿Qué implica la regla del 10% para comparar una dieta basada en plantas con una basada en carne? ¿Por qué se necesita más tierra y agua para producir 1 kg de carne que 1 kg de frijoles o maíz? ¿Tiene esto relación con el hambre en el mundo? Reflexiona: ¿cambiará esto alguna decisión sobre lo que comes? No tienes que decir que sí — argumenta honestamente.",
     pistas: ["Para producir 1 kg de carne de res se necesitan entre 6 y 15 kg de granos vegetales (según el sistema de producción).", "El agua necesaria para producir 1 kg de carne (~15,000 litros) es muy superior a la de 1 kg de legumbres (~1,000-4,000 litros).", "No se trata de juzgar dietas: se trata de entender las implicaciones ecológicas de las cadenas alimentarias.", "La soberanía alimentaria y el acceso a alimentos son dimensiones sociales que también importan."],
     pistas_evaluacion: ["Aplica la regla del 10% a la producción de alimentos", "Compara la eficiencia de al menos dos tipos de alimentos", "Conecta con el contexto de sustentabilidad o justicia alimentaria", "Argumenta con honestidad su postura personal"],
-    longitud_minima: 80,
+    longitud_minima_palabras: 80,
     criterios_evaluacion: ["Aplica correctamente la lógica de la regla del 10% a la producción de alimentos", "Compara al menos dos tipos de alimentos en términos de eficiencia energética o uso de recursos", "Conecta el análisis con alguna dimensión social, ambiental o de justicia", "Argumenta su postura personal con coherencia, sin importar cuál sea"],
   },
   { // P03 — autoevaluacion (Fotosíntesis)
     criterios: [
       {
-        nombre: "Ecuación general de la fotosíntesis",
         descripcion: "Escribo y explico la ecuación general de la fotosíntesis, identificando reactivos, productos y la fuente de energía.",
         escala: [
           { valor: 1, etiqueta: "Inicio", descripcion: "No recuerdo la ecuación o confundo reactivos con productos." },
@@ -356,7 +350,6 @@ const contenidosA3 = [
         ],
       },
       {
-        nombre: "Tipos de plantas fotosintéticas: C3, C4 y CAM",
         descripcion: "Distingo los tres tipos de plantas según su estrategia fotosintética y los relaciono con sus adaptaciones al ambiente.",
         escala: [
           { valor: 1, etiqueta: "Inicio", descripcion: "No conozco la diferencia entre plantas C3, C4 y CAM." },
@@ -365,7 +358,6 @@ const contenidosA3 = [
         ],
       },
       {
-        nombre: "Importancia ecológica de la fotosíntesis",
         descripcion: "Explico por qué la fotosíntesis es la base de casi toda la vida en la Tierra y su papel en el ciclo del carbono.",
         escala: [
           { valor: 1, etiqueta: "Inicio", descripcion: "Solo sé que 'las plantas necesitan luz solar para vivir'; no puedo explicar sus implicaciones ecológicas." },
@@ -374,7 +366,6 @@ const contenidosA3 = [
         ],
       },
       {
-        nombre: "Conexión con el cambio climático",
         descripcion: "Relaciono la fotosíntesis con el cambio climático: su papel como sumidero de carbono y las consecuencias de la deforestación.",
         escala: [
           { valor: 1, etiqueta: "Inicio", descripcion: "No veo relación entre la fotosíntesis y el cambio climático." },
@@ -383,15 +374,15 @@ const contenidosA3 = [
         ],
       },
     ],
-    prompt_reflexion_final: "¿En cuál de los cuatro criterios te sientes menos seguro/a? Escribe dos preguntas específicas sobre ese tema que todavía no puedes responder con confianza.",
+    reflexion_final_prompt: "¿En cuál de los cuatro criterios te sientes menos seguro/a? Escribe dos preguntas específicas sobre ese tema que todavía no puedes responder con confianza.",
   },
   { // P04 — quiz_multiple_opcion (Ciclos biogeoquímicos — cierre)
     preguntas: [
-      { pregunta: "¿Qué proceso del ciclo del nitrógeno convierte el N₂ atmosférico en formas que las plantas pueden absorber?", opciones: ["Desnitrificación", "Nitrificación", "Fijación de nitrógeno", "Denitrificación"], respuesta_correcta: 2, retroalimentacion: "La fijación de nitrógeno (realizada por bacterias como Rhizobium y Azotobacter) convierte el N₂ gaseoso en amoníaco (NH₃) o iones amonio (NH₄⁺), que las plantas pueden absorber. Sin este proceso, el N₂ del aire sería inaccesible para los organismos." },
-      { pregunta: "¿Por qué el ciclo del fósforo es diferente a los ciclos del carbono y del nitrógeno?", opciones: ["Porque el fósforo es un gas a temperatura ambiente", "Porque el fósforo no tiene una fase atmosférica significativa; circula principalmente entre la litosfera, el suelo y los seres vivos", "Porque el fósforo solo existe en los océanos", "Porque los microorganismos no participan en el ciclo del fósforo"], respuesta_correcta: 1, retroalimentacion: "A diferencia del C y N, el fósforo casi no tiene fase gaseosa; su ciclo es sedimentario. Se libera de las rocas por meteorización, es absorbido por plantas y devuelto al suelo por descomposición, o llega al océano y se deposita en sedimentos." },
-      { pregunta: "La eutrofización de un lago es un ejemplo de perturbación humana en el ciclo del:", opciones: ["Agua únicamente", "Carbono únicamente", "Nitrógeno y fósforo principalmente", "Silicio y hierro"], respuesta_correcta: 2, retroalimentacion: "La eutrofización ocurre por el exceso de nitrógeno (N) y fósforo (P) provenientes de fertilizantes agrícolas o aguas residuales. Estos nutrientes estimulan el crecimiento masivo de algas, alterando gravemente el ciclo de ambos elementos en el ecosistema acuático." },
-      { pregunta: "¿Qué papel juegan los hongos y las bacterias en los ciclos biogeoquímicos?", opciones: ["Solo perjudican los ciclos al consumir nutrientes", "Son descomponedores que liberan nutrientes de la materia orgánica muerta, haciéndolos disponibles para los productores", "Solo intervienen en el ciclo del nitrógeno", "No tienen un papel relevante en los ciclos biogeoquímicos"], respuesta_correcta: 1, retroalimentacion: "Los descomponedores (hongos y bacterias) son esenciales: sin ellos, los nutrientes quedarían atrapados en la materia orgánica muerta y los productores no podrían reincorporarlos. Son el cierre indispensable de todos los ciclos biogeoquímicos." },
-      { pregunta: "El proceso de evapotranspiración combina:", opciones: ["La evaporación del suelo y la transpiración de las plantas", "La evaporación del océano y la precipitación de lluvia", "La transpiración animal y la condensación en nubes", "La filtración del agua y su evaporación en el subsuelo"], respuesta_correcta: 0, retroalimentacion: "La evapotranspiración suma la evaporación directa del agua del suelo, lagos y ríos, más la transpiración de las plantas (liberación de vapor de agua por los estomas). Es un proceso clave en el ciclo hidrológico, especialmente en bosques tropicales." },
+      { enunciado: "¿Qué proceso del ciclo del nitrógeno convierte el N₂ atmosférico en formas que las plantas pueden absorber?", opciones: ["Desnitrificación", "Nitrificación", "Fijación de nitrógeno", "Denitrificación"], respuesta_correcta: 2, retroalimentacion: "La fijación de nitrógeno (realizada por bacterias como Rhizobium y Azotobacter) convierte el N₂ gaseoso en amoníaco (NH₃) o iones amonio (NH₄⁺), que las plantas pueden absorber. Sin este proceso, el N₂ del aire sería inaccesible para los organismos." },
+      { enunciado: "¿Por qué el ciclo del fósforo es diferente a los ciclos del carbono y del nitrógeno?", opciones: ["Porque el fósforo es un gas a temperatura ambiente", "Porque el fósforo no tiene una fase atmosférica significativa; circula principalmente entre la litosfera, el suelo y los seres vivos", "Porque el fósforo solo existe en los océanos", "Porque los microorganismos no participan en el ciclo del fósforo"], respuesta_correcta: 1, retroalimentacion: "A diferencia del C y N, el fósforo casi no tiene fase gaseosa; su ciclo es sedimentario. Se libera de las rocas por meteorización, es absorbido por plantas y devuelto al suelo por descomposición, o llega al océano y se deposita en sedimentos." },
+      { enunciado: "La eutrofización de un lago es un ejemplo de perturbación humana en el ciclo del:", opciones: ["Agua únicamente", "Carbono únicamente", "Nitrógeno y fósforo principalmente", "Silicio y hierro"], respuesta_correcta: 2, retroalimentacion: "La eutrofización ocurre por el exceso de nitrógeno (N) y fósforo (P) provenientes de fertilizantes agrícolas o aguas residuales. Estos nutrientes estimulan el crecimiento masivo de algas, alterando gravemente el ciclo de ambos elementos en el ecosistema acuático." },
+      { enunciado: "¿Qué papel juegan los hongos y las bacterias en los ciclos biogeoquímicos?", opciones: ["Solo perjudican los ciclos al consumir nutrientes", "Son descomponedores que liberan nutrientes de la materia orgánica muerta, haciéndolos disponibles para los productores", "Solo intervienen en el ciclo del nitrógeno", "No tienen un papel relevante en los ciclos biogeoquímicos"], respuesta_correcta: 1, retroalimentacion: "Los descomponedores (hongos y bacterias) son esenciales: sin ellos, los nutrientes quedarían atrapados en la materia orgánica muerta y los productores no podrían reincorporarlos. Son el cierre indispensable de todos los ciclos biogeoquímicos." },
+      { enunciado: "El proceso de evapotranspiración combina:", opciones: ["La evaporación del suelo y la transpiración de las plantas", "La evaporación del océano y la precipitación de lluvia", "La transpiración animal y la condensación en nubes", "La filtración del agua y su evaporación en el subsuelo"], respuesta_correcta: 0, retroalimentacion: "La evapotranspiración suma la evaporación directa del agua del suelo, lagos y ríos, más la transpiración de las plantas (liberación de vapor de agua por los estomas). Es un proceso clave en el ciclo hidrológico, especialmente en bosques tropicales." },
     ],
     intentos_maximos: 3,
     puntaje_minimo_aprobacion: 70,
@@ -399,11 +390,11 @@ const contenidosA3 = [
   },
   { // P05 — quiz_multiple_opcion (Subsistemas terrestres — cierre)
     preguntas: [
-      { pregunta: "¿Cuál de los cuatro subsistemas terrestres incluye todos los organismos vivos del planeta?", opciones: ["Hidrosfera", "Litosfera", "Atmósfera", "Biosfera"], respuesta_correcta: 3, retroalimentacion: "La biosfera comprende todos los organismos vivos y los ecosistemas que habitan, desde las profundidades oceánicas hasta la alta atmósfera. Es el único subsistema formado exclusivamente por seres vivos y sus interacciones." },
-      { pregunta: "¿Cuál es la composición aproximada de la atmósfera terrestre actual?", opciones: ["78% O₂, 21% N₂, 1% CO₂", "78% N₂, 21% O₂, ~1% otros gases (Ar, CO₂, vapor de agua)", "50% N₂, 50% O₂", "100% N₂ con trazas de O₂"], respuesta_correcta: 1, retroalimentacion: "La atmósfera es ~78% nitrógeno (N₂), ~21% oxígeno (O₂) y ~1% otros gases (argón, CO₂, metano, vapor de agua). El CO₂ actual es ~0.042% (420 ppm), pequeño en volumen pero enorme en efecto climático." },
-      { pregunta: "¿Qué causa el movimiento de las placas tectónicas?", opciones: ["La rotación de la Tierra sobre su eje", "Las corrientes de convección en el manto terrestre caliente (astenósfera)", "La atracción gravitacional de la Luna", "La presión del agua de los océanos sobre la litosfera"], respuesta_correcta: 1, retroalimentacion: "Las corrientes de convección en la astenósfera (parte del manto superior, plástica y caliente) arrastran las placas tectónicas. El calor interno de la Tierra (radioactividad y calor residual de la formación) impulsa estas corrientes." },
-      { pregunta: "¿Cómo conecta la biosfera con el ciclo del carbono de la atmósfera?", opciones: ["La biosfera solo produce CO₂ mediante la respiración", "Las plantas fijan CO₂ atmosférico mediante fotosíntesis; los organismos lo liberan por respiración y descomposición, creando un intercambio continuo entre biosfera y atmósfera", "La biosfera no tiene efecto sobre el CO₂ atmosférico", "Solo los océanos intercambian carbono con la atmósfera"], respuesta_correcta: 1, retroalimentacion: "La biosfera es un componente activo del ciclo del carbono: la fotosíntesis extrae CO₂ de la atmósfera y lo fija en biomasa; la respiración, descomposición y combustión de biomasa lo devuelven. Los bosques son grandes sumideros de carbono." },
-      { pregunta: "¿Por qué el calentamiento global afecta la hidrosfera (ciclo del agua)?", opciones: ["Porque el calor evapora el agua de la atmósfera directamente", "Porque el aumento de temperatura acelera la evaporación, intensifica las precipitaciones extremas, derrite glaciares y eleva el nivel del mar, alterando todo el ciclo hidrológico", "Porque el calor crea nuevos océanos al derretir la litosfera", "Porque el calentamiento reduce la densidad del agua, lo que detiene las corrientes oceánicas inmediatamente"], respuesta_correcta: 1, retroalimentacion: "El calentamiento global altera el ciclo del agua en múltiples formas: mayor evaporación (más lluvias intensas y más sequías en otras regiones), deshielo de glaciares y casquetes (sube el nivel del mar), y alteración de las corrientes oceánicas que distribuyen calor." },
+      { enunciado: "¿Cuál de los cuatro subsistemas terrestres incluye todos los organismos vivos del planeta?", opciones: ["Hidrosfera", "Litosfera", "Atmósfera", "Biosfera"], respuesta_correcta: 3, retroalimentacion: "La biosfera comprende todos los organismos vivos y los ecosistemas que habitan, desde las profundidades oceánicas hasta la alta atmósfera. Es el único subsistema formado exclusivamente por seres vivos y sus interacciones." },
+      { enunciado: "¿Cuál es la composición aproximada de la atmósfera terrestre actual?", opciones: ["78% O₂, 21% N₂, 1% CO₂", "78% N₂, 21% O₂, ~1% otros gases (Ar, CO₂, vapor de agua)", "50% N₂, 50% O₂", "100% N₂ con trazas de O₂"], respuesta_correcta: 1, retroalimentacion: "La atmósfera es ~78% nitrógeno (N₂), ~21% oxígeno (O₂) y ~1% otros gases (argón, CO₂, metano, vapor de agua). El CO₂ actual es ~0.042% (420 ppm), pequeño en volumen pero enorme en efecto climático." },
+      { enunciado: "¿Qué causa el movimiento de las placas tectónicas?", opciones: ["La rotación de la Tierra sobre su eje", "Las corrientes de convección en el manto terrestre caliente (astenósfera)", "La atracción gravitacional de la Luna", "La presión del agua de los océanos sobre la litosfera"], respuesta_correcta: 1, retroalimentacion: "Las corrientes de convección en la astenósfera (parte del manto superior, plástica y caliente) arrastran las placas tectónicas. El calor interno de la Tierra (radioactividad y calor residual de la formación) impulsa estas corrientes." },
+      { enunciado: "¿Cómo conecta la biosfera con el ciclo del carbono de la atmósfera?", opciones: ["La biosfera solo produce CO₂ mediante la respiración", "Las plantas fijan CO₂ atmosférico mediante fotosíntesis; los organismos lo liberan por respiración y descomposición, creando un intercambio continuo entre biosfera y atmósfera", "La biosfera no tiene efecto sobre el CO₂ atmosférico", "Solo los océanos intercambian carbono con la atmósfera"], respuesta_correcta: 1, retroalimentacion: "La biosfera es un componente activo del ciclo del carbono: la fotosíntesis extrae CO₂ de la atmósfera y lo fija en biomasa; la respiración, descomposición y combustión de biomasa lo devuelven. Los bosques son grandes sumideros de carbono." },
+      { enunciado: "¿Por qué el calentamiento global afecta la hidrosfera (ciclo del agua)?", opciones: ["Porque el calor evapora el agua de la atmósfera directamente", "Porque el aumento de temperatura acelera la evaporación, intensifica las precipitaciones extremas, derrite glaciares y eleva el nivel del mar, alterando todo el ciclo hidrológico", "Porque el calor crea nuevos océanos al derretir la litosfera", "Porque el calentamiento reduce la densidad del agua, lo que detiene las corrientes oceánicas inmediatamente"], respuesta_correcta: 1, retroalimentacion: "El calentamiento global altera el ciclo del agua en múltiples formas: mayor evaporación (más lluvias intensas y más sequías en otras regiones), deshielo de glaciares y casquetes (sube el nivel del mar), y alteración de las corrientes oceánicas que distribuyen calor." },
     ],
     intentos_maximos: 3,
     puntaje_minimo_aprobacion: 70,
@@ -411,32 +402,36 @@ const contenidosA3 = [
   },
   { // P06 — debate_estructurado (Responsabilidad climática)
     tema: "¿La principal responsabilidad del cambio climático recae en los individuos o en las corporaciones y gobiernos?",
-    postura_a: "La responsabilidad principal recae en las corporaciones y gobiernos, que deben liderar el cambio sistémico",
-    postura_b: "La responsabilidad es compartida e individual: cada persona debe cambiar sus hábitos para generar presión y transformación",
-    argumentos_a: [
-      "El 71% de las emisiones globales de GEI proviene de solo 100 empresas (Carbon Disclosure Project, 2017); el impacto individual es marginal frente a decisiones corporativas.",
-      "Las empresas fósiles han financiado activamente la desinformación climática durante décadas para retrasar regulaciones (documentado por investigaciones de Harvard y Columbia).",
-      "Sin regulación estatal obligatoria (impuestos al carbono, prohibición de combustibles fósiles, estándares de emisiones), las empresas no cambiarán voluntariamente porque sus incentivos son económicos.",
-      "Los países del G7 son responsables históricos desproporcionados: emitieron la mayor parte del CO₂ acumulado en la atmósfera mientras se industrializaban.",
-      "La narrativa de la 'huella de carbono individual' fue popularizada por BP en una campaña de relaciones públicas de 2004 para desviar la atención de las emisiones industriales.",
+    posturas: [
+      "La responsabilidad principal recae en las corporaciones y gobiernos, que deben liderar el cambio sistémico",
+      "La responsabilidad es compartida e individual: cada persona debe cambiar sus hábitos para generar presión y transformación",
     ],
-    argumentos_b: [
-      "La demanda de los consumidores impulsa la producción: sin demanda de combustibles fósiles, autos de gasolina y carne industrial, las empresas tendrían que cambiar.",
-      "Las acciones individuales tienen efecto político: millones de personas que exigen políticas climáticas, votan informadas y cambian hábitos crean presión de mercado y política.",
-      "Esperar solo a corporaciones y gobiernos genera pasividad; las comunidades que actúan localmente demuestran que el cambio es posible y construyen modelos replicables.",
-      "Las decisiones de consumo individuales (dieta, transporte, energía en el hogar) representan entre el 40-60% de las emisiones totales en países de ingreso medio-alto.",
-    ],
+    argumentos_guia: {
+      "La responsabilidad principal recae en las corporaciones y gobiernos, que deben liderar el cambio sistémico": [
+        "El 71% de las emisiones globales de GEI proviene de solo 100 empresas (Carbon Disclosure Project, 2017); el impacto individual es marginal frente a decisiones corporativas.",
+        "Las empresas fósiles han financiado activamente la desinformación climática durante décadas para retrasar regulaciones (documentado por investigaciones de Harvard y Columbia).",
+        "Sin regulación estatal obligatoria (impuestos al carbono, prohibición de combustibles fósiles, estándares de emisiones), las empresas no cambiarán voluntariamente porque sus incentivos son económicos.",
+        "Los países del G7 son responsables históricos desproporcionados: emitieron la mayor parte del CO₂ acumulado en la atmósfera mientras se industrializaban.",
+        "La narrativa de la 'huella de carbono individual' fue popularizada por BP en una campaña de relaciones públicas de 2004 para desviar la atención de las emisiones industriales.",
+      ],
+      "La responsabilidad es compartida e individual: cada persona debe cambiar sus hábitos para generar presión y transformación": [
+        "La demanda de los consumidores impulsa la producción: sin demanda de combustibles fósiles, autos de gasolina y carne industrial, las empresas tendrían que cambiar.",
+        "Las acciones individuales tienen efecto político: millones de personas que exigen políticas climáticas, votan informadas y cambian hábitos crean presión de mercado y política.",
+        "Esperar solo a corporaciones y gobiernos genera pasividad; las comunidades que actúan localmente demuestran que el cambio es posible y construyen modelos replicables.",
+        "Las decisiones de consumo individuales (dieta, transporte, energía en el hogar) representan entre el 40-60% de las emisiones totales en países de ingreso medio-alto.",
+      ],
+    },
   },
   { // P07 — reflexion_escrita (Conservación y comunidades indígenas)
     prompt: "Aprendiste que más del 80% de la biodiversidad silvestre de México se encuentra en tierras de comunidades indígenas y ejidos, no en las ANP formales. Esto significa que la conservación de la naturaleza en México depende en gran parte de decisiones comunitarias, no solo del Estado.\n\n¿Qué opinas sobre esto? ¿Por qué el conocimiento ecológico tradicional podría ser tan valioso (o más) que el conocimiento científico formal para conservar ecosistemas locales? ¿Qué riesgos corren estas comunidades que conservan sus territorios? ¿Cómo debería el Estado apoyar (o no interferir) en la conservación comunitaria? Argumenta con al menos una referencia a algún instrumento legal o acuerdo internacional que viste en esta progresión.",
     pistas: ["El Convenio de Biodiversidad reconoce el valor del conocimiento indígena. ¿Qué implica eso en la práctica?", "Muchas comunidades indígenas que conservan sus bosques enfrentan amenazas: proyectos mineros, turísticos o agroindustriales que ignoran sus derechos.", "El concepto de 'territorio' para los pueblos indígenas va más allá de la propiedad: incluye identidad, espiritualidad y forma de vida.", "¿Puede la ley proteger la conservación comunitaria? Piensa en la LGEEPA y en los Acuerdos de Libre Determinación."],
-    longitud_minima: 90,
+    longitud_minima_palabras: 90,
     criterios_evaluacion: ["Reflexiona sobre el valor del conocimiento ecológico tradicional con argumentos concretos", "Menciona al menos un instrumento legal (LGEEPA, CDB u otro) en contexto correcto", "Identifica al menos una amenaza real que enfrentan las comunidades conservacionistas", "Toma y defiende una postura propia sobre el papel del Estado en la conservación comunitaria"],
   },
   { // P08 — reflexion_escrita (Propuesta de acción local)
     prompt: "Has estudiado ecosistemas, ciclos biogeoquímicos, deterioro ambiental, políticas de conservación y conceptos de sustentabilidad. Ahora es momento de pasar del conocimiento a la acción.\n\nDiseña una propuesta de acción ambiental local basada en los principios de la Investigación Acción Participativa (IAP). Tu propuesta debe:\n1. Identificar un problema ambiental específico de tu comunidad, escuela o barrio.\n2. Proponer al menos dos acciones concretas y factibles (no solo 'sensibilizar').\n3. Mencionar quiénes son los actores que deberían involucrarse.\n4. Conectar tu propuesta con al menos un ODS.\n5. Proponer cómo medirías si la acción funcionó.\n\nSé específico/a. No sirve 'plantar árboles en general'; sí sirve 'reforestar el camellón de la calle X con especies nativas del Bajío en coordinación con la delegación municipal'.",
     pistas: ["Investiga si hay un comité ambiental en tu escuela, municipio o colonia.", "Los ODS 13 (Acción por el clima), 14 (Vida submarina) y 15 (Vida de ecosistemas terrestres) son los más relevantes, pero ODS 11 (ciudades sostenibles) o 3 (salud) también pueden conectar.", "Una métrica sencilla puede ser: número de árboles plantados que sobrevivieron a 6 meses, kilos de residuos separados por mes, % de compañeros que cambiaron un hábito.", "Recuerda: el principio de la IAP es que la comunidad participa en todo el proceso, no solo como 'beneficiaria'."],
-    longitud_minima: 100,
+    longitud_minima_palabras: 100,
     criterios_evaluacion: ["Identifica un problema ambiental local real y específico", "Propone al menos dos acciones concretas y factibles (no genéricas)", "Menciona actores involucrados con roles definidos", "Conecta la propuesta con al menos un ODS correctamente", "Propone al menos una métrica para evaluar el éxito de la acción"],
   },
 ];

@@ -197,26 +197,27 @@ Desde América Latina, Enrique Dussel ofrece una perspectiva crítica: la modern
   },
 
   { // P03 — video_con_preguntas (Estética filosófica)
-    url: "https://example.com/video-pendiente-cen",
+    url_video: "https://example.com/video-pendiente-cen",
+    titulo_video: "Estética filosófica: lo bello, lo sublime y lo grotesco",
     duracion_segundos: 540,
     preguntas: [
       {
-        timestamp_segundos: 90,
+        tiempo_segundos: 90,
         pregunta: "¿Qué diferencia hace la filosofía entre la experiencia de 'lo bello' y la experiencia de 'lo sublime'? Da un ejemplo de cada una.",
         respuesta_guia: "Lo bello produce placer armonioso y seguro; lo sublime combina fascinación y cierto terror ante algo que supera la escala humana (una tormenta, una montaña enorme). Kant analizó esta distinción en la Crítica del juicio.",
       },
       {
-        timestamp_segundos: 270,
+        tiempo_segundos: 270,
         pregunta: "¿En qué sentido puede el arte ser una forma de conocimiento filosófico y no solo entretenimiento?",
         respuesta_guia: "El arte puede revelar verdades sobre la condición humana, la sociedad o la experiencia que el pensamiento conceptual no captura igual. Hegel y Gadamer argumentaron que el arte es una forma de desvelamiento de la verdad.",
       },
       {
-        timestamp_segundos: 420,
+        tiempo_segundos: 420,
         pregunta: "¿Qué aporta la estética latinoamericana —el arte indígena, el muralismo mexicano, el arte popular— a los debates filosóficos sobre lo bello?",
         respuesta_guia: "Desafía los cánones estéticos europeos y muestra que hay otros criterios de belleza, significado y función del arte. El muralismo de Rivera, Orozco y Siqueiros, por ejemplo, hizo del arte un instrumento de crítica social y memoria histórica.",
       },
       {
-        timestamp_segundos: 510,
+        tiempo_segundos: 510,
         pregunta: "¿Cómo puede la experiencia estética cotidiana (escuchar música, ver una película, observar un paisaje) ser un punto de partida para la reflexión filosófica?",
         respuesta_guia: "Porque toda experiencia estética implica juicios de valor, emociones y formas de atención que pueden analizarse filosóficamente: ¿qué me mueve y por qué? ¿Hay criterios universales de belleza o solo preferencias subjetivas?",
       },
@@ -259,7 +260,7 @@ const contenidosA2 = [
   { // P01 — quiz_multiple_opcion (Lógica y falacias)
     preguntas: [
       {
-        pregunta: "¿Cuál de los siguientes ejemplos es una falacia ad hominem?",
+        enunciado: "¿Cuál de los siguientes ejemplos es una falacia ad hominem?",
         opciones: [
           "Si permites que los estudiantes usen celular, pronto querrán hacer lo que quieran.",
           "No vale la pena escuchar sus propuestas ambientales porque ni él separa su basura.",
@@ -270,13 +271,13 @@ const contenidosA2 = [
         retroalimentacion: "El ad hominem ataca al emisor del argumento (su conducta personal) en lugar de refutar el argumento mismo. Que el proponente no separe basura no invalida lógicamente sus argumentos ambientales.",
       },
       {
-        pregunta: "¿Qué tipo de razonamiento garantiza que, si las premisas son verdaderas, la conclusión también lo es necesariamente?",
+        enunciado: "¿Qué tipo de razonamiento garantiza que, si las premisas son verdaderas, la conclusión también lo es necesariamente?",
         opciones: ["Inducción", "Abducción", "Analogía", "Deducción"],
         respuesta_correcta: 3,
         retroalimentacion: "La deducción es el único razonamiento que garantiza la verdad de la conclusión a partir de premisas verdaderas. La inducción y la abducción son probables, no necesarias.",
       },
       {
-        pregunta: "¿Cuál es el error central de la falacia de pendiente resbaladiza?",
+        enunciado: "¿Cuál es el error central de la falacia de pendiente resbaladiza?",
         opciones: [
           "Atacar a la persona en lugar de al argumento",
           "Presentar solo dos opciones cuando hay más posibilidades",
@@ -287,7 +288,7 @@ const contenidosA2 = [
         retroalimentacion: "La pendiente resbaladiza asume una cadena de consecuencias inevitables sin argumentar por qué cada paso ocurrirá. Es un error porque las consecuencias extremas no son automáticas.",
       },
       {
-        pregunta: "Un silogismo válido es aquel en el que:",
+        enunciado: "Un silogismo válido es aquel en el que:",
         opciones: [
           "Todas las premisas son verdaderas y comprobadas científicamente",
           "La conclusión se sigue necesariamente de las premisas por su forma lógica",
@@ -298,13 +299,13 @@ const contenidosA2 = [
         retroalimentacion: "La validez de un silogismo es una propiedad formal: la conclusión se deriva necesariamente de la estructura lógica de las premisas, independientemente de si el contenido es verdadero o falso.",
       },
       {
-        pregunta: "Un analista político dice: 'O apoyan esta reforma o quieren que el país siga en el caos.' ¿Qué falacia está usando?",
+        enunciado: "Un analista político dice: 'O apoyan esta reforma o quieren que el país siga en el caos.' ¿Qué falacia está usando?",
         opciones: ["Ad hominem", "Apelación a la autoridad", "Falsa dicotomía", "Hombre de paja"],
         respuesta_correcta: 2,
         retroalimentacion: "La falsa dicotomía reduce la discusión a solo dos opciones (apoyo total o caos) ignorando alternativas como reformas distintas, ajustes parciales o diagnósticos diferentes.",
       },
       {
-        pregunta: "¿En qué se diferencia un argumento inductivo de uno deductivo?",
+        enunciado: "¿En qué se diferencia un argumento inductivo de uno deductivo?",
         opciones: [
           "El inductivo parte de principios generales para llegar a casos particulares; el deductivo va de lo particular a lo general",
           "El inductivo parte de casos particulares y generaliza con probabilidad; el deductivo garantiza la conclusión a partir de las premisas",
@@ -323,7 +324,7 @@ const contenidosA2 = [
   { // P02 — quiz_multiple_opcion (Filosofía política)
     preguntas: [
       {
-        pregunta: "¿En qué consiste el 'velo de ignorancia' de John Rawls?",
+        enunciado: "¿En qué consiste el 'velo de ignorancia' de John Rawls?",
         opciones: [
           "Un velo que cubre la vista del juez para que no vea el rostro del acusado",
           "Un experimento mental en el que diseñamos las reglas de la sociedad sin saber qué posición social tendremos",
@@ -334,7 +335,7 @@ const contenidosA2 = [
         retroalimentacion: "El velo de ignorancia es una herramienta filosófica para diseñar principios de justicia imparciales: si no sé qué posición ocuparé, elegiré reglas que sean justas para todos, incluidos los más desfavorecidos.",
       },
       {
-        pregunta: "¿Cuál es la crítica principal de Dussel a la filosofía política occidental?",
+        enunciado: "¿Cuál es la crítica principal de Dussel a la filosofía política occidental?",
         opciones: [
           "Que es demasiado abstracta y debería ser más práctica",
           "Que fue construida ignorando la perspectiva de los pueblos colonizados y oprimidos",
@@ -345,7 +346,7 @@ const contenidosA2 = [
         retroalimentacion: "Dussel argumenta que la filosofía política moderna construyó sus categorías (libertad, Estado, justicia) desde la perspectiva del dominador europeo, invisibilizando la experiencia colonial y la voz del oprimido.",
       },
       {
-        pregunta: "El enfoque de las capacidades de Martha Nussbaum sostiene que una sociedad justa debe:",
+        enunciado: "El enfoque de las capacidades de Martha Nussbaum sostiene que una sociedad justa debe:",
         opciones: [
           "Garantizar únicamente la libertad de expresión y el voto igualitario",
           "Asegurar que cada persona pueda desarrollar capacidades humanas fundamentales como la salud, la afiliación y la participación política",
@@ -356,7 +357,7 @@ const contenidosA2 = [
         retroalimentacion: "Nussbaum va más allá de los derechos formales: exige que el Estado garantice capacidades reales y concretas para que cada persona pueda vivir una vida verdaderamente humana.",
       },
       {
-        pregunta: "¿Qué significa que la democracia sea 'deliberativa' en la teoría filosófica contemporánea?",
+        enunciado: "¿Qué significa que la democracia sea 'deliberativa' en la teoría filosófica contemporánea?",
         opciones: [
           "Que las decisiones se toman por votación secreta sin debate previo",
           "Que la legitimidad política se funda en el diálogo razonado y el debate público entre ciudadanos",
@@ -367,7 +368,7 @@ const contenidosA2 = [
         retroalimentacion: "La democracia deliberativa (Habermas, Cohen) sostiene que las decisiones colectivas son legítimas cuando resultan de un proceso de argumentación pública en el que todos pueden participar y las razones deben poder ser evaluadas.",
       },
       {
-        pregunta: "¿Cuál es el principio de diferencia de Rawls?",
+        enunciado: "¿Cuál es el principio de diferencia de Rawls?",
         opciones: [
           "Que todas las personas deben ser idénticas en riqueza y poder",
           "Que las desigualdades sociales y económicas solo son justas si benefician a los miembros menos favorecidos de la sociedad",
@@ -386,7 +387,7 @@ const contenidosA2 = [
   { // P03 — quiz_multiple_opcion (Estética filosófica)
     preguntas: [
       {
-        pregunta: "¿Cómo distingue la filosofía entre lo 'bello' y lo 'sublime'?",
+        enunciado: "¿Cómo distingue la filosofía entre lo 'bello' y lo 'sublime'?",
         opciones: [
           "Lo bello es caro y exclusivo; lo sublime es accesible a todos",
           "Lo bello produce placer armonioso; lo sublime combina fascinación con una sensación de desbordamiento o terror ante algo que supera la escala humana",
@@ -397,7 +398,7 @@ const contenidosA2 = [
         retroalimentacion: "Kant analizó esta distinción: lo bello agrada sin interés, produce armonía; lo sublime (una montaña, una tormenta) desborda nuestras facultades y genera una mezcla de admiración y temor que nos hace conscientes de nuestra pequeñez.",
       },
       {
-        pregunta: "¿Qué quiere decir que el arte puede ser una forma de 'conocimiento' filosófico?",
+        enunciado: "¿Qué quiere decir que el arte puede ser una forma de 'conocimiento' filosófico?",
         opciones: [
           "Que el arte sustituye a la ciencia como método de investigación",
           "Que el arte puede revelar verdades sobre la experiencia humana que el pensamiento conceptual no captura de igual manera",
@@ -408,7 +409,7 @@ const contenidosA2 = [
         retroalimentacion: "Hegel y Gadamer argumentaron que el arte no es mero entretenimiento sino una forma de desvelamiento de la verdad: muestra cómo es el mundo y la condición humana desde ángulos que el concepto puro no puede alcanzar.",
       },
       {
-        pregunta: "¿Qué aporte filosófico tiene el muralismo mexicano (Rivera, Orozco, Siqueiros)?",
+        enunciado: "¿Qué aporte filosófico tiene el muralismo mexicano (Rivera, Orozco, Siqueiros)?",
         opciones: [
           "Demostró que el arte solo tiene valor estético cuando sigue los cánones europeos",
           "Separó definitivamente el arte de la política y la historia",
@@ -419,7 +420,7 @@ const contenidosA2 = [
         retroalimentacion: "El muralismo mexicano integró estética y política: usó el arte público para narrar la historia desde los oprimidos, celebrar la identidad indígena y mestiza, y criticar la desigualdad. Esto desafía la idea de arte como objeto de élite.",
       },
       {
-        pregunta: "Según la estética filosófica, ¿puede haber belleza en lo grotesco o en lo feo?",
+        enunciado: "Según la estética filosófica, ¿puede haber belleza en lo grotesco o en lo feo?",
         opciones: [
           "No, lo feo y lo grotesco son simplemente ausencia de belleza sin valor estético",
           "Sí, lo grotesco puede producir experiencias estéticas significativas al subvertir lo convencional y revelar lo que lo bello oculta",
@@ -430,7 +431,7 @@ const contenidosA2 = [
         retroalimentacion: "La estética filosófica reconoce que lo grotesco, lo feo o lo perturbador pueden producir experiencias estéticas poderosas y conocimiento filosófico: revelan lo que la idealización de lo bello oculta sobre la realidad.",
       },
       {
-        pregunta: "¿Por qué la experiencia estética cotidiana (escuchar música, ver una película) puede ser un punto de partida para la reflexión filosófica?",
+        enunciado: "¿Por qué la experiencia estética cotidiana (escuchar música, ver una película) puede ser un punto de partida para la reflexión filosófica?",
         opciones: [
           "Porque el entretenimiento es la base de toda filosofía seria",
           "Porque toda experiencia estética implica juicios de valor, emociones y formas de atención que pueden analizarse filosóficamente",
@@ -447,11 +448,8 @@ const contenidosA2 = [
   },
 
   { // P04 — autoevaluacion (Praxis filosófica — avance en propuesta comunitaria)
-    nombre: "Autoevaluación: avance en mi proyecto filosófico comunitario",
-    descripcion: "Reflexiona sobre el estado actual de tu proyecto filosófico comunitario. Esta evaluación no busca medir si ya tienes todo resuelto, sino ayudarte a identificar en qué punto del proceso estás y qué necesitas fortalecer para avanzar.",
     criterios: [
       {
-        nombre: "Identificación del problema o pregunta filosófica",
         descripcion: "He identificado un problema real de mi comunidad (barrio, escuela, familia) que tiene dimensiones filosóficas genuinas (de justicia, sentido, convivencia, identidad, bien común).",
         escala: [
           { valor: 1, etiqueta: "Inicio", descripcion: "Aún no tengo claro cuál es el problema filosófico que quiero abordar; tengo ideas generales pero no una pregunta concreta." },
@@ -460,7 +458,6 @@ const contenidosA2 = [
         ],
       },
       {
-        nombre: "Diagnóstico comunitario",
         descripcion: "He realizado algún tipo de indagación (conversaciones, observación, cuestionario) para entender cómo vive mi comunidad el problema que identificé.",
         escala: [
           { valor: 1, etiqueta: "Inicio", descripcion: "No he hablado aún con nadie de mi comunidad sobre el problema; mi diagnóstico es solo desde mi propia perspectiva." },
@@ -469,7 +466,6 @@ const contenidosA2 = [
         ],
       },
       {
-        nombre: "Conexión teoría-práctica",
         descripcion: "Puedo relacionar mi problema comunitario con conceptos o autores filosóficos estudiados (Rawls, Nussbaum, Dussel, Freire u otros).",
         escala: [
           { valor: 1, etiqueta: "Inicio", descripcion: "No encuentro aún cómo conectar lo que estudié en filosofía con el problema de mi comunidad; me parecen mundos separados." },
@@ -478,7 +474,6 @@ const contenidosA2 = [
         ],
       },
       {
-        nombre: "Propuesta de acción filosófica",
         descripcion: "He diseñado o estoy diseñando una intervención o propuesta concreta (taller, diálogo, texto, investigación participativa) que ponga la filosofía al servicio de la comunidad.",
         escala: [
           { valor: 1, etiqueta: "Inicio", descripcion: "Aún no tengo ninguna propuesta de acción; estoy en fase de diagnóstico o simplemente no he llegado a este paso." },
@@ -487,7 +482,6 @@ const contenidosA2 = [
         ],
       },
       {
-        nombre: "Reflexión crítica sobre el proceso",
         descripcion: "Soy capaz de mirar críticamente mi propio proceso: qué supuestos tengo sobre la comunidad, qué sesgos puedo estar proyectando, qué no sé todavía.",
         escala: [
           { valor: 1, etiqueta: "Inicio", descripcion: "Aún no he reflexionado sobre mis propios supuestos o sesgos en relación con el problema o la comunidad." },
@@ -496,7 +490,7 @@ const contenidosA2 = [
         ],
       },
     ],
-    prompt_reflexion_final: "Basándote en tu autoevaluación, ¿cuál es el paso más importante que necesitas dar en las próximas dos semanas para avanzar en tu proyecto filosófico comunitario? Sé específico: describe la acción, con quién la realizarás (si aplica) y cómo sabrás que la completaste.",
+    reflexion_final_prompt: "Basándote en tu autoevaluación, ¿cuál es el paso más importante que necesitas dar en las próximas dos semanas para avanzar en tu proyecto filosófico comunitario? Sé específico: describe la acción, con quién la realizarás (si aplica) y cómo sabrás que la completaste.",
   },
 ];
 
@@ -504,40 +498,48 @@ const contenidosA2 = [
 const contenidosA3 = [
   { // P01 — debate_estructurado (Lógica — desobediencia civil)
     tema: "¿La desobediencia civil está justificada en una democracia?",
-    postura_a: "La desobediencia civil SÍ está justificada en una democracia cuando las leyes son profundamente injustas",
-    postura_b: "La desobediencia civil NO está justificada en una democracia: hay canales legales para el cambio",
-    argumentos_a: [
-      "Henry Thoreau argumentó que la conciencia moral individual tiene una obligación que supera a la obediencia legal: si la ley es injusta, el deber es desobedecerla.",
-      "La historia confirma la eficacia ética de la desobediencia civil: el movimiento de derechos civiles de MLK Jr., la resistencia de Gandhi y el sufragio femenino se lograron desafiando leyes injustas, no solo usando canales institucionales.",
-      "En una democracia real, los grupos minoritarios pueden ser sistemáticamente ignorados por la mayoría; la desobediencia civil es su mecanismo para hacerse escuchar cuando las vías normales fallan.",
-      "Rawls reconoció la desobediencia civil como apelación pública a los principios de justicia de la sociedad: no destruye la democracia, sino que la interpela desde sus propios valores.",
-      "Si una ley viola derechos fundamentales (discriminación racial, supresión del voto, tortura), no obedecerla no es anti-democrático: es defender la democracia real frente a su forma legal corrupta.",
+    posturas: [
+      "La desobediencia civil SÍ está justificada en una democracia cuando las leyes son profundamente injustas",
+      "La desobediencia civil NO está justificada en una democracia: hay canales legales para el cambio",
     ],
-    argumentos_b: [
-      "En una democracia, las leyes son producto de procesos legítimos de deliberación colectiva; rechazarlas unilateralmente socava el fundamento del contrato social.",
-      "Si cada ciudadano pudiera desobedecer las leyes que considera injustas, el resultado sería el caos: todos tenemos criterios morales distintos y ninguno puede erigirse en árbitro universal.",
-      "La democracia ofrece mecanismos legítimos para el cambio: el voto, las reformas legislativas, los recursos judiciales, las iniciativas ciudadanas. Usarlos es la vía democrática.",
-      "La desobediencia civil puede ser manipulada por grupos con intereses antidemocráticos para bloquear políticas legítimamente aprobadas por la mayoría.",
-    ],
+    argumentos_guia: {
+      "La desobediencia civil SÍ está justificada en una democracia cuando las leyes son profundamente injustas": [
+        "Henry Thoreau argumentó que la conciencia moral individual tiene una obligación que supera a la obediencia legal: si la ley es injusta, el deber es desobedecerla.",
+        "La historia confirma la eficacia ética de la desobediencia civil: el movimiento de derechos civiles de MLK Jr., la resistencia de Gandhi y el sufragio femenino se lograron desafiando leyes injustas, no solo usando canales institucionales.",
+        "En una democracia real, los grupos minoritarios pueden ser sistemáticamente ignorados por la mayoría; la desobediencia civil es su mecanismo para hacerse escuchar cuando las vías normales fallan.",
+        "Rawls reconoció la desobediencia civil como apelación pública a los principios de justicia de la sociedad: no destruye la democracia, sino que la interpela desde sus propios valores.",
+        "Si una ley viola derechos fundamentales (discriminación racial, supresión del voto, tortura), no obedecerla no es anti-democrático: es defender la democracia real frente a su forma legal corrupta.",
+      ],
+      "La desobediencia civil NO está justificada en una democracia: hay canales legales para el cambio": [
+        "En una democracia, las leyes son producto de procesos legítimos de deliberación colectiva; rechazarlas unilateralmente socava el fundamento del contrato social.",
+        "Si cada ciudadano pudiera desobedecer las leyes que considera injustas, el resultado sería el caos: todos tenemos criterios morales distintos y ninguno puede erigirse en árbitro universal.",
+        "La democracia ofrece mecanismos legítimos para el cambio: el voto, las reformas legislativas, los recursos judiciales, las iniciativas ciudadanas. Usarlos es la vía democrática.",
+        "La desobediencia civil puede ser manipulada por grupos con intereses antidemocráticos para bloquear políticas legítimamente aprobadas por la mayoría.",
+      ],
+    },
   },
 
   { // P02 — debate_estructurado (Filosofía política — Estado y justicia social)
     tema: "¿El Estado debe garantizar la justicia social o solo las libertades individuales?",
-    postura_a: "El Estado debe garantizar la justicia social activamente, redistribuyendo recursos y asegurando capacidades para todos",
-    postura_b: "El Estado debe limitarse a proteger las libertades individuales y no intervenir en la distribución de la riqueza",
-    argumentos_a: [
-      "Rawls demostró que, bajo el velo de ignorancia, elegiríamos un Estado que garantice condiciones básicas para los más desfavorecidos: el principio de diferencia exige redistribución.",
-      "Nussbaum mostró que las libertades formales son insuficientes si una persona no tiene las capacidades reales para ejercerlas: la libertad de expresión no vale nada si no sabes leer.",
-      "Dussel señala que la 'libertad individual' proclamada por el liberalismo se construyó sobre la exclusión de los colonizados: sin redistribución, se perpetúan injusticias históricas.",
-      "Las desigualdades extremas de riqueza destruyen la igualdad política real: quien tiene más dinero tiene más poder sobre los medios de comunicación, los políticos y las leyes.",
-      "Garantizar salud, educación y vivienda no restringe la libertad: crea las condiciones para que la libertad sea real y no solo nominal.",
+    posturas: [
+      "El Estado debe garantizar la justicia social activamente, redistribuyendo recursos y asegurando capacidades para todos",
+      "El Estado debe limitarse a proteger las libertades individuales y no intervenir en la distribución de la riqueza",
     ],
-    argumentos_b: [
-      "Robert Nozick argumentó que el Estado redistributivo viola los derechos de propiedad: si obtuve mis recursos legítimamente, nadie puede arrebatármelos, ni siquiera el Estado.",
-      "La economía de mercado es más eficiente que el Estado para asignar recursos; la intervención estatal genera burocracia, corrupción e ineficiencia.",
-      "Las libertades individuales (expresión, propiedad, contrato) son el fundamento de toda sociedad libre; ampliar el Estado amenaza estas libertades.",
-      "Las personas tienen derecho a los frutos de su trabajo y su talento; redistribuirlos coercitivamente trata a las personas como medios para los fines ajenos.",
-    ],
+    argumentos_guia: {
+      "El Estado debe garantizar la justicia social activamente, redistribuyendo recursos y asegurando capacidades para todos": [
+        "Rawls demostró que, bajo el velo de ignorancia, elegiríamos un Estado que garantice condiciones básicas para los más desfavorecidos: el principio de diferencia exige redistribución.",
+        "Nussbaum mostró que las libertades formales son insuficientes si una persona no tiene las capacidades reales para ejercerlas: la libertad de expresión no vale nada si no sabes leer.",
+        "Dussel señala que la 'libertad individual' proclamada por el liberalismo se construyó sobre la exclusión de los colonizados: sin redistribución, se perpetúan injusticias históricas.",
+        "Las desigualdades extremas de riqueza destruyen la igualdad política real: quien tiene más dinero tiene más poder sobre los medios de comunicación, los políticos y las leyes.",
+        "Garantizar salud, educación y vivienda no restringe la libertad: crea las condiciones para que la libertad sea real y no solo nominal.",
+      ],
+      "El Estado debe limitarse a proteger las libertades individuales y no intervenir en la distribución de la riqueza": [
+        "Robert Nozick argumentó que el Estado redistributivo viola los derechos de propiedad: si obtuve mis recursos legítimamente, nadie puede arrebatármelos, ni siquiera el Estado.",
+        "La economía de mercado es más eficiente que el Estado para asignar recursos; la intervención estatal genera burocracia, corrupción e ineficiencia.",
+        "Las libertades individuales (expresión, propiedad, contrato) son el fundamento de toda sociedad libre; ampliar el Estado amenaza estas libertades.",
+        "Las personas tienen derecho a los frutos de su trabajo y su talento; redistribuirlos coercitivamente trata a las personas como medios para los fines ajenos.",
+      ],
+    },
   },
 
   { // P03 — reflexion_escrita (Estética — experiencia estética cotidiana)
@@ -554,7 +556,7 @@ const contenidosA3 = [
       "Argumenta por qué esa experiencia tiene relevancia filosófica más allá del gusto personal",
       "Muestra reflexión genuina sobre los límites del lenguaje conceptual frente a la experiencia estética",
     ],
-    longitud_minima: 120,
+    longitud_minima_palabras: 120,
   },
 
   { // P04 — reflexion_escrita (Praxis filosófica — problema comunitario)
@@ -570,7 +572,7 @@ const contenidosA3 = [
       "Conecta el problema con al menos un concepto o pensador filosófico estudiado de manera sustantiva (no solo nominal)",
       "Propone una acción filosófica concreta, aunque sea pequeña, que pueda realizarse de verdad",
     ],
-    longitud_minima: 130,
+    longitud_minima_palabras: 130,
   },
 ];
 
