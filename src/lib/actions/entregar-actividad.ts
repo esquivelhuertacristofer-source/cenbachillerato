@@ -28,8 +28,8 @@ export async function entregarActividad(
   });
 
   if (error) {
-    console.error("[entregarActividad] Error inserting intento:", error, { actividadId, userId: user.id });
-    return { error: error.message };
+    console.error("[entregarActividad] Error inserting intento:", error.message, { actividadId });
+    return { error: "Error al guardar el intento. Intenta de nuevo." };
   }
 
   return { ok: true };
