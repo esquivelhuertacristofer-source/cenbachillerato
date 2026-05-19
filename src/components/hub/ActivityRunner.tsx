@@ -103,7 +103,13 @@ export function ActivityRunner({
   if (tipo === "quiz_multiple_opcion") {
     return (
       <ActivityShell {...shellProps}>
-        <QuizMultipleOpcionActivity actividad={{ ...base, tipo: "quiz_multiple_opcion", contenido: contenido as never }} onProgreso={handleProgreso} color={color} />
+        <QuizMultipleOpcionActivity
+          actividad={{ ...base, tipo: "quiz_multiple_opcion", contenido: contenido as never }}
+          onProgreso={handleProgreso}
+          color={color}
+          estado={estado}
+          respuestasIntento={respuestasIntento ?? undefined}
+        />
       </ActivityShell>
     );
   }
