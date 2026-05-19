@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { motion } from "motion/react";
+import { springs } from "@/lib/motion/tokens";
+import { useReducedMotion } from "@/lib/motion/hooks";
 import { UAC_BASE } from "@/lib/mccems/estructura";
 import {
   getCurrentProfile,
@@ -89,6 +92,8 @@ export default function HubPage() {
     fetchData();
     return () => { cancelled = true; };
   }, [router]);
+
+  const reducedMotion = useReducedMotion();
 
   if (loading) return <HubV2Skeleton />;
 
@@ -209,28 +214,33 @@ export default function HubPage() {
               Completaste más del 80% del currículo. El examen integrador está desbloqueado.
             </p>
           </div>
-          <Link
-            href="/hub/evaluacion-semestre"
-            style={{
-              position: "relative",
-              zIndex: 1,
-              background: "#fff",
-              color: "#065F46",
-              borderRadius: 20,
-              padding: "18px 36px",
-              fontWeight: 900,
-              fontSize: 13,
-              textTransform: "uppercase",
-              letterSpacing: "0.12em",
-              textDecoration: "none",
-              whiteSpace: "nowrap",
-              boxShadow: "0 8px 24px rgba(0,0,0,0.20)",
-              transition: "transform 0.2s ease",
-            }}
+          <motion.div
+            whileHover={reducedMotion ? {} : { y: -3, scale: 1.03 }}
+            whileTap={reducedMotion ? {} : { scale: 0.97 }}
+            transition={springs.snappy}
+            style={{ position: "relative", zIndex: 1 }}
           >
-            Iniciar evaluación
-            <i className="fa-solid fa-arrow-right" style={{ marginLeft: 8, fontSize: 11 }} />
-          </Link>
+            <Link
+              href="/hub/evaluacion-semestre"
+              style={{
+                display: "block",
+                background: "#fff",
+                color: "#065F46",
+                borderRadius: 20,
+                padding: "18px 36px",
+                fontWeight: 900,
+                fontSize: 13,
+                textTransform: "uppercase",
+                letterSpacing: "0.12em",
+                textDecoration: "none",
+                whiteSpace: "nowrap",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.20)",
+              }}
+            >
+              Iniciar evaluación
+              <i className="fa-solid fa-arrow-right" style={{ marginLeft: 8, fontSize: 11 }} />
+            </Link>
+          </motion.div>
         </div>
       ) : (
         <div
