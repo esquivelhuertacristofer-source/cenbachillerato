@@ -18,6 +18,7 @@ export interface ActividadInput {
   contenido: unknown;
   progresion_id: string;
   xp?: number;
+  estado?: "borrador" | "publicada" | "archivada";
 }
 
 let logLines: string[] = [];
@@ -75,7 +76,7 @@ export async function upsertActividad(sb: SB, act: ActividadInput): Promise<bool
     contenido: validacion.data as unknown as Json,
     progresion_id: act.progresion_id,
     xp: act.xp ?? 10,
-    estado: "borrador",
+    estado: act.estado ?? "borrador",
   }, { onConflict: "codigo" });
 
   if (error) {

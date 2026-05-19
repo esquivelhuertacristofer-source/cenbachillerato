@@ -262,3 +262,47 @@ describe("MCCEMS Structure Validation — Totales y conteo (Modelo Educativo 202
     expect(byRSC("RSC-CNEYT")).toBe(48); // 8×6
   });
 });
+
+describe("MCCEMS Structure Validation — Semestre 2 propósitos (Modelo Educativo 2025)", () => {
+  test("LC-II tiene exactamente 8 propósitos formativos esperados", () => {
+    const lcii = UAC_BASE.find((u) => u.codigo === "LC-II");
+    expect(lcii).toBeDefined();
+    expect(lcii?.totalProgresionesEsperadas).toBe(8);
+  });
+
+  test("PM-II tiene exactamente 6 propósitos formativos esperados", () => {
+    const pmii = UAC_BASE.find((u) => u.codigo === "PM-II");
+    expect(pmii).toBeDefined();
+    expect(pmii?.totalProgresionesEsperadas).toBe(6);
+  });
+
+  test("IN-II tiene exactamente 8 propósitos formativos esperados", () => {
+    const inii = UAC_BASE.find((u) => u.codigo === "IN-II");
+    expect(inii).toBeDefined();
+    expect(inii?.totalProgresionesEsperadas).toBe(8);
+  });
+
+  test("CD-II tiene exactamente 5 propósitos formativos esperados", () => {
+    const cdii = UAC_BASE.find((u) => u.codigo === "CD-II");
+    expect(cdii).toBeDefined();
+    expect(cdii?.totalProgresionesEsperadas).toBe(5);
+  });
+
+  test("CS-II tiene exactamente 4 propósitos formativos esperados", () => {
+    const csii = UAC_BASE.find((u) => u.codigo === "CS-II");
+    expect(csii).toBeDefined();
+    expect(csii?.totalProgresionesEsperadas).toBe(4);
+  });
+
+  test("PFH-II tiene exactamente 5 propósitos formativos esperados", () => {
+    const pfhii = UAC_BASE.find((u) => u.codigo === "PFH-II");
+    expect(pfhii).toBeDefined();
+    expect(pfhii?.totalProgresionesEsperadas).toBe(5);
+  });
+
+  test("CNEYT-II tiene exactamente 8 propósitos formativos esperados", () => {
+    const cneytii = UAC_BASE.find((u) => u.codigo === "CNEYT-II");
+    expect(cneytii).toBeDefined();
+    expect(cneytii?.totalProgresionesEsperadas).toBe(8);
+  });
+});
