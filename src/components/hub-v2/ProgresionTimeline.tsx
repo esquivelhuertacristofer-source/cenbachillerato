@@ -1,6 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { motion } from "motion/react";
+import { springs, stagger } from "@/lib/motion/tokens";
+import { useReducedMotion, useInView } from "@/lib/motion/hooks";
 import ProgresionCard from "./ProgresionCard";
 
 interface Actividad {
@@ -35,6 +38,8 @@ export default function ProgresionTimeline({
   uacEmoji,
 }: ProgresionTimelineProps) {
   const router = useRouter();
+  const reducedMotion = useReducedMotion();
+  const [listRef, inView] = useInView<HTMLDivElement>();
 
   function getStatus(prog: Progresion, index: number): "locked" | "available" | "completed" {
     if (prog.estado === "completada") return "completed";
@@ -43,22 +48,28 @@ export default function ProgresionTimeline({
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column" }}>
+    <div ref={listRef} style={{ display: "flex", flexDirection: "column" }}>
       {progresiones.map((prog, i) => (
-        <ProgresionCard
+        <motion.div
           key={prog.id}
-          numero={prog.numero}
-          titulo={prog.titulo}
-          descripcion={prog.descripcion}
-          ejesArticuladores={prog.ejes_articuladores}
-          actividades={prog.actividades}
-          status={getStatus(prog, i)}
-          isLast={i === progresiones.length - 1}
-          accentColor={accentColor}
-          accentRgb={accentRgb}
-          uacEmoji={uacEmoji}
-          onClick={() => router.push(`/hub/uac/${codigoUAC}/progresion/${prog.numero}`)}
-        />
+          initial={reducedMotion ? {} : { opacity: 0, y: 24 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ ...springs.smooth, delay: i * stagger.fast }}
+        >
+          <ProgresionCard
+            numero={prog.numero}
+            titulo={prog.titulo}
+            descripcion={prog.descripcion}
+            ejesArticuladores={prog.ejes_articuladores}
+            actividades={prog.actividades}
+            status={getStatus(prog, i)}
+            isLast={i === progresiones.length - 1}
+            accentColor={accentColor}
+            accentRgb={accentRgb}
+            uacEmoji={uacEmoji}
+            onClick={() => router.push(`/hub/uac/${codigoUAC}/progresion/${prog.numero}`)}
+          />
+        </motion.div>
       ))}
     </div>
   );

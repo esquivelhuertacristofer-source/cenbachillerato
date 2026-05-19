@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { motion } from "motion/react";
+import { springs, stagger } from "@/lib/motion/tokens";
+import { useReducedMotion } from "@/lib/motion/hooks";
 import { getUACPorCodigo } from "@/lib/mccems/estructura";
 import {
   getCurrentProfile,
@@ -140,6 +143,8 @@ export default function UACPage() {
     );
   }
 
+  const reducedMotion = useReducedMotion();
+
   if (loading) return <UACPageSkeleton accentColor={cfg.accentRgb} />;
 
   const completadas = progresiones.filter((p) => p.estado === "completada").length;
@@ -204,13 +209,31 @@ export default function UACPage() {
         />
 
         <div className="uac-v2-hero-content">
-          <span className="uac-v2-tag" style={{ color: cfg.accent }}>
+          <motion.span
+            className="uac-v2-tag"
+            style={{ color: cfg.accent }}
+            initial={reducedMotion ? {} : { opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...springs.smooth, delay: 0.05 }}
+          >
             CEN Bachillerato · {codigo}
-          </span>
+          </motion.span>
 
-          <h1 className="uac-v2-h1">{uac.nombre}</h1>
+          <motion.h1
+            className="uac-v2-h1"
+            initial={reducedMotion ? {} : { opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...springs.smooth, delay: 0.05 + stagger.fast }}
+          >
+            {uac.nombre}
+          </motion.h1>
 
-          <div className="uac-v2-progress-row">
+          <motion.div
+            className="uac-v2-progress-row"
+            initial={reducedMotion ? {} : { opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...springs.smooth, delay: 0.05 + stagger.fast * 2 }}
+          >
             <div className="uac-v2-prog-track">
               <div
                 className="uac-v2-prog-fill"
@@ -220,9 +243,9 @@ export default function UACPage() {
             <div className="uac-v2-prog-val" style={{ color: cfg.accent }}>
               {pct}%
             </div>
-          </div>
+          </motion.div>
 
-          <p
+          <motion.p
             style={{
               marginTop: 20,
               fontSize: 15,
@@ -230,10 +253,13 @@ export default function UACPage() {
               maxWidth: 520,
               lineHeight: 1.65,
             }}
+            initial={reducedMotion ? {} : { opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...springs.smooth, delay: 0.05 + stagger.fast * 3 }}
           >
             {completadas} de {total > 0 ? total : uac.totalProgresionesEsperadas} progresiones
             completadas. Avanzá secuencialmente para desbloquear cada etapa del aprendizaje.
-          </p>
+          </motion.p>
         </div>
       </header>
 
