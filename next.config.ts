@@ -5,6 +5,10 @@ const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   {
+    key: "Strict-Transport-Security",
+    value: "max-age=63072000; includeSubDomains; preload",
+  },
+  {
     key: "Permissions-Policy",
     value: "camera=(), microphone=(), geolocation=()",
   },
@@ -12,8 +16,8 @@ const securityHeaders = [
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      // Next.js inline scripts + React hydration
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+      // Next.js inline scripts + React hydration (unsafe-eval removed)
+      "script-src 'self' 'unsafe-inline'",
       // Inline styles (React) + Font Awesome CSS from CDN
       "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com",
       // Font Awesome web fonts
@@ -30,6 +34,7 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
   reactCompiler: true,
   async headers() {
     return [
