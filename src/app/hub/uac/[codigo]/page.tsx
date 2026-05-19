@@ -76,6 +76,7 @@ export default function UACPage() {
 
   const [loading, setLoading] = useState(true);
   const [progresiones, setProgresiones] = useState<ProgresionBrowser[]>([]);
+  const reducedMotion = useReducedMotion();
 
   const uac = getUACPorCodigo(codigo);
   const cfg = getUACConfig(codigo);
@@ -142,8 +143,6 @@ export default function UACPage() {
       </div>
     );
   }
-
-  const reducedMotion = useReducedMotion();
 
   if (loading) return <UACPageSkeleton accentColor={cfg.accentRgb} />;
 
