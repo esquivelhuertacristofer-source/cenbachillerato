@@ -64,6 +64,17 @@ Credenciales para entorno de desarrollo/demo. Todos los usuarios están en Supab
 
 ---
 
+### 👤 Alumnos Semestre 3 (cuenta dedicada)
+
+| Email | Password | Nombre | Semestre | Script |
+|-------|----------|--------|---------|--------|
+| alumno-sem3@cenbachillerato-demo.com | Demo2026! | Alumno Sem 3 Demo | 3 | `npx tsx scripts/create-demo-alumno-sem3.ts` |
+
+**Grupo asignado:** Grupo 3A Demo (semestre=3)
+**Qué se ve después del login:** Hub con UACs de Semestre 3 (LC-III, PM-III, IN-III, PFH-III, CNEYT-III)
+
+---
+
 ### 👤 Alumnos Semestre 2 (cuenta dedicada)
 
 | Email | Password | Nombre | Semestre | Script |
