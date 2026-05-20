@@ -315,7 +315,7 @@ const contenidosA2 = [
   { // P01 — quiz_multiple_opcion (estadística descriptiva/inferencial, tipos de variables, fuentes, ética)
     preguntas: [
       {
-        problema: "¿Cuál es la diferencia principal entre la estadística descriptiva y la estadística inferencial?",
+        enunciado: "¿Cuál es la diferencia principal entre la estadística descriptiva y la estadística inferencial?",
         opciones: [
           "La descriptiva usa graficas y la inferencial solo usa numeros",
           "La descriptiva resume y organiza los datos observados sin ir mas alla; la inferencial usa una muestra para sacar conclusiones sobre una poblacion mas grande",
@@ -326,7 +326,7 @@ const contenidosA2 = [
         retroalimentacion: "La estadistica descriptiva describe lo que hay en los datos sin extrapolacion: calcula medias, construye tablas y graficas del conjunto observado. La inferencial va mas alla: usa una muestra representativa para estimar parametros de la poblacion completa con un margen de error controlado. Por ejemplo, la ENIGH del INEGI usa una muestra de hogares para estimar las condiciones de vida de todos los hogares mexicanos.",
       },
       {
-        problema: "¿Cuál de las siguientes variables es cuantitativa continua?",
+        enunciado: "¿Cuál de las siguientes variables es cuantitativa continua?",
         opciones: [
           "Numero de hijos en el hogar",
           "Nivel educativo (primaria, secundaria, bachillerato)",
@@ -337,7 +337,7 @@ const contenidosA2 = [
         retroalimentacion: "El ingreso mensual en pesos puede tomar cualquier valor real positivo (por ejemplo, 8,750.50 pesos), por lo que es cuantitativa continua. El numero de hijos es cuantitativa discreta (solo enteros). El nivel educativo es cualitativa ordinal (tiene orden pero no es numerica). El municipio de residencia es cualitativa nominal (sin orden natural).",
       },
       {
-        problema: "¿Qué mide el CONEVAL en México y qué tipo de datos usa del INEGI?",
+        enunciado: "¿Qué mide el CONEVAL en México y qué tipo de datos usa del INEGI?",
         opciones: [
           "La inflacion mensual usando precios de la canasta basica",
           "La pobreza multidimensional, usando datos de la ENIGH del INEGI sobre ingresos y acceso a servicios",
@@ -348,7 +348,7 @@ const contenidosA2 = [
         retroalimentacion: "El CONEVAL (Consejo Nacional de Evaluacion de la Politica de Desarrollo Social) mide la pobreza multidimensional en Mexico: considera tanto el ingreso como el acceso a derechos sociales (educacion, salud, seguridad social, alimentacion, vivienda). Para ello usa principalmente los datos de la ENIGH (Encuesta Nacional de Ingresos y Gastos de los Hogares) que levanta el INEGI cada dos anos.",
       },
       {
-        problema: "En una encuesta del INEGI, ¿cuál es la diferencia entre la 'población' del estudio y la 'muestra'?",
+        enunciado: "En una encuesta del INEGI, ¿cuál es la diferencia entre la 'población' del estudio y la 'muestra'?",
         opciones: [
           "La poblacion son los encuestadores y la muestra son las preguntas del cuestionario",
           "La poblacion es el conjunto completo de todos los elementos de interes (todos los hogares mexicanos); la muestra es el subconjunto seleccionado para ser encuestado",
@@ -359,7 +359,7 @@ const contenidosA2 = [
         retroalimentacion: "La poblacion es el universo completo de estudio: todos los hogares, todas las personas, o todas las empresas sobre las que se quiere obtener informacion. La muestra es el subconjunto representativo que realmente se encuesta. La ENIGH encuesta decenas de miles de hogares (muestra) para estimar condiciones de vida de los mas de 35 millones de hogares mexicanos (poblacion).",
       },
       {
-        problema: "¿Por qué los grupos marginalizados frecuentemente quedan subcontados en las estadísticas oficiales del INEGI?",
+        enunciado: "¿Por qué los grupos marginalizados frecuentemente quedan subcontados en las estadísticas oficiales del INEGI?",
         opciones: [
           "Porque el INEGI les hace cuestionarios mas cortos para ahorrar tiempo",
           "Porque comunidades en zonas de dificil acceso, personas en situacion de calle y migrantes irregulares son mas dificiles de alcanzar con los metodos de levantamiento estandar, generando sesgos de representacion",
@@ -370,7 +370,7 @@ const contenidosA2 = [
         retroalimentacion: "El sesgo de representacion en datos oficiales ocurre por razones practicas y metodologicas: comunidades indigenas en zonas rurales de dificil acceso, personas sin domicilio fijo, trabajadores informales sin direccion registrada y migrantes en situacion irregular son grupos que los metodos de levantamiento estandar (basados en marcos muestrales de viviendas) dificultan alcanzar. Esto genera estadisticas que subestiman sus condiciones de vida y necesidades.",
       },
       {
-        problema: "Florence Nightingale es considerada pionera de la estadística aplicada porque:",
+        enunciado: "Florence Nightingale es considerada pionera de la estadística aplicada porque:",
         opciones: [
           "Invento la formula para calcular la media aritmetica en 1858",
           "Uso graficas innovadoras de causas de muerte durante la guerra de Crimea para convencer al Parlamento britanico de que las condiciones sanitarias, no las batallas, eran la principal causa de muerte entre soldados",
@@ -440,7 +440,7 @@ const contenidosA2 = [
   { // P05 — quiz_multiple_opcion (probabilidad: clasica, frecuentista, subjetiva, axiomas, complemento)
     preguntas: [
       {
-        problema: "¿Cuál es la definición de probabilidad clásica (de Laplace) y qué supuesto fundamental requiere?",
+        enunciado: "¿Cuál es la definición de probabilidad clásica (de Laplace) y qué supuesto fundamental requiere?",
         opciones: [
           "P(A) = frecuencia de A en muchas repeticiones; requiere un numero grande de experimentos",
           "P(A) = numero de casos favorables a A / numero total de casos posibles; requiere que todos los resultados sean igualmente posibles (equiprobabilidad)",
@@ -451,7 +451,7 @@ const contenidosA2 = [
         retroalimentacion: "La probabilidad clasica de Laplace calcula P(A) = casos favorables / casos posibles, pero SOLO funciona bajo el supuesto de equiprobabilidad: todos los resultados del espacio muestral deben ser igualmente posibles. Funciona perfectamente para dados no cargados, monedas equilibradas, cartas bien mezcladas. No aplica a situaciones reales donde los resultados no son equiprobables (por ejemplo, la probabilidad de ganar una loteria no es 1/numero de participantes si los boletos no estan distribuidos uniformemente).",
       },
       {
-        problema: "¿Qué garantiza la ley de los grandes números en el contexto de la probabilidad frecuentista?",
+        enunciado: "¿Qué garantiza la ley de los grandes números en el contexto de la probabilidad frecuentista?",
         opciones: [
           "Que con mas datos la media siempre aumenta",
           "Que conforme aumenta el numero de repeticiones del experimento, la frecuencia relativa del evento converge al valor verdadero de la probabilidad",
@@ -462,7 +462,7 @@ const contenidosA2 = [
         retroalimentacion: "La ley de los grandes numeros establece que la frecuencia relativa de un evento en un experimento aleatorio converge al valor de la probabilidad verdadera conforme el numero de repeticiones tiende a infinito. Con pocas repeticiones hay mucha variabilidad por azar (puedo obtener 7 caras de 10 lanzamientos de una moneda justa). Con miles de repeticiones, la frecuencia relativa se acerca al 50% para una moneda equilibrada. Ojo: esto no significa que 'te toca' un evento si no ha salido; cada repeticion es independiente.",
       },
       {
-        problema: "¿Cuáles son los axiomas de Kolmogorov que fundamentan matemáticamente la probabilidad?",
+        enunciado: "¿Cuáles son los axiomas de Kolmogorov que fundamentan matemáticamente la probabilidad?",
         opciones: [
           "P(A) esta entre -1 y 1; P(vacio) = 0; P(A union B) = P(A) x P(B)",
           "P(A) es mayor o igual a 0; P(espacio muestral) = 1; si A y B son mutuamente excluyentes, P(A union B) = P(A) + P(B)",
@@ -473,7 +473,7 @@ const contenidosA2 = [
         retroalimentacion: "Los tres axiomas de Kolmogorov (1933) son: (1) la probabilidad de cualquier evento es no negativa, P(A) >= 0; (2) la probabilidad del espacio muestral completo es 1, P(omega) = 1; (3) si dos eventos son mutuamente excluyentes (no pueden ocurrir al mismo tiempo), la probabilidad de que ocurra al menos uno es la suma de sus probabilidades, P(A union B) = P(A) + P(B). De estos tres principios se pueden deducir todas las demas propiedades y formulas de la probabilidad.",
       },
       {
-        problema: "Si la probabilidad de que llueva mañana es P(lluvia) = 0.35, ¿cuál es la probabilidad de que NO llueva?",
+        enunciado: "Si la probabilidad de que llueva mañana es P(lluvia) = 0.35, ¿cuál es la probabilidad de que NO llueva?",
         opciones: [
           "0.35",
           "0.65",
@@ -484,7 +484,7 @@ const contenidosA2 = [
         retroalimentacion: "Por la propiedad del complemento: P(A') = 1 - P(A). P(no lluvia) = 1 - P(lluvia) = 1 - 0.35 = 0.65. Esto se deriva directamente del axioma de Kolmogorov que establece P(espacio muestral) = 1: como lluvia y no lluvia son mutuamente excluyentes y exhaustivos (uno de los dos debe ocurrir), sus probabilidades deben sumar 1.",
       },
       {
-        problema: "¿Cuál de los siguientes es un ejemplo de probabilidad subjetiva?",
+        enunciado: "¿Cuál de los siguientes es un ejemplo de probabilidad subjetiva?",
         opciones: [
           "La probabilidad de sacar un 6 al lanzar un dado justo es 1/6",
           "La probabilidad de que un recien nacido sea nino es 0.51 segun los registros del INEGI",
@@ -495,7 +495,7 @@ const contenidosA2 = [
         retroalimentacion: "La probabilidad subjetiva es el grado de creencia personal de un experto basada en experiencia e informacion disponible, no en un calculo formal de casos equiprobables ni en frecuencias historicas de millones de repeticiones. La estimacion del medico es tipicamente subjetiva: combina experiencia clinica, intuicion y la informacion del paciente particular. La opcion a es clasica (equiprobabilidad), la b es frecuentista (datos del INEGI), la d es frecuentista (modelos historicos de lluvia).",
       },
       {
-        problema: "¿En cuál de las siguientes situaciones mexicanas se usa la probabilidad para tomar decisiones de política pública?",
+        enunciado: "¿En cuál de las siguientes situaciones mexicanas se usa la probabilidad para tomar decisiones de política pública?",
         opciones: [
           "El INEGI decide cuantos empleados contratar para el proximo censo",
           "La SSA estima probabilidades de contagio de enfermedades infecciosas para decidir cuantas vacunas producir y distribuir antes de una temporada de influenza",
@@ -548,37 +548,37 @@ const contenidosA2 = [
   { // P08 — quiz_verdadero_falso (lectura critica de estadisticas en medios)
     preguntas: [
       {
-        problema: "Un grafico de barras que empieza el eje vertical (eje Y) en 3.5% en lugar de 0% es metodologicamente valido porque muestra mejor las diferencias entre las barras.",
+        enunciado: "Un grafico de barras que empieza el eje vertical (eje Y) en 3.5% en lugar de 0% es metodologicamente valido porque muestra mejor las diferencias entre las barras.",
         respuesta: false,
         retroalimentacion: "Falso. Truncar el eje Y es una forma comun de distorsion visual: hace que diferencias pequenas parezcan enormes. Si la tasa de desempleo pasa de 3.8% a 4.1%, un grafico con eje desde 3.5% hace que la barra parezca casi doblar su altura cuando el cambio real es de solo 0.3 puntos porcentuales. Los graficos que comparan magnitudes deben comenzar el eje Y en cero para dar una perspectiva visual honesta del cambio.",
       },
       {
-        problema: "Si una noticia dice que 'el riesgo de cancer se duplico', esto siempre significa un aumento grave que deberia preocupar significativamente a la poblacion.",
+        enunciado: "Si una noticia dice que 'el riesgo de cancer se duplico', esto siempre significa un aumento grave que deberia preocupar significativamente a la poblacion.",
         respuesta: false,
         retroalimentacion: "Falso. Duplicar un riesgo pequeno sigue siendo un riesgo pequeno en terminos absolutos. Si la probabilidad base era de 1 en un millon (0.0001%) y se duplica a 2 en un millon (0.0002%), el riesgo se duplico pero el aumento absoluto es minimo. Los medios frecuentemente reportan el riesgo relativo (que suena dramatico) sin mencionar el riesgo absoluto (que da perspectiva). Para evaluar correctamente el riesgo, es necesario conocer ambas cifras.",
       },
       {
-        problema: "Si en verano aumentan tanto el consumo de helado como el numero de ahogamientos en playas, podemos concluir que comer helado causa ahogamientos.",
+        enunciado: "Si en verano aumentan tanto el consumo de helado como el numero de ahogamientos en playas, podemos concluir que comer helado causa ahogamientos.",
         respuesta: false,
         retroalimentacion: "Falso. Esta es la confusion clasica entre correlacion y causalidad. El calor del verano es la variable confusora que causa ambos fenomenos independientemente: hace calor, la gente compra mas helado Y tambien va mas a la playa (aumentando los accidentes). Correlacion estadistica no implica causalidad. Para establecer causalidad se requieren disenos experimentales controlados, como ensayos clinicos aleatorizados, no simplemente observar que dos variables se mueven juntas.",
       },
       {
-        problema: "Una encuesta electoral que da al candidato A 35% y al candidato B 33% con un margen de error de +/- 3 puntos porcentuales muestra que A va claramente adelante.",
+        enunciado: "Una encuesta electoral que da al candidato A 35% y al candidato B 33% con un margen de error de +/- 3 puntos porcentuales muestra que A va claramente adelante.",
         respuesta: false,
         retroalimentacion: "Falso. Con un margen de error de +/- 3 puntos, el candidato A podria tener entre 32% y 38%, y el candidato B entre 30% y 36%. Los rangos se solapan: estadisticamente es un empate tecnico. Reportar 'A va adelante' sin mencionar el margen de error, o sin señalar que la diferencia no es estadisticamente significativa, es una distorsion que puede influir indebidamente en la percepcion de la competencia electoral.",
       },
       {
-        problema: "Las gráficas con escala logarítmica son siempre engañosas y no deben usarse en periodismo de datos.",
+        enunciado: "Las gráficas con escala logarítmica son siempre engañosas y no deben usarse en periodismo de datos.",
         respuesta: false,
         retroalimentacion: "Falso. La escala logaritmica es una herramienta valida y a veces la mas adecuada: permite visualizar crecimientos que abarcan varios ordenes de magnitud (como el crecimiento de contagios en una pandemia, donde los primeros dias hay decenas y semanas despues hay millones). El problema no es la escala logaritmica en si, sino no aclarar explicitamente al lector que el eje usa esa escala. La transparencia metodologica es la clave.",
       },
       {
-        problema: "Cuando una encuesta en línea reporta que '8 de cada 10 mexicanos apoyan una medida', el tamaño grande de respuestas (100,000 personas) garantiza que el resultado es representativo de todos los mexicanos.",
+        enunciado: "Cuando una encuesta en línea reporta que '8 de cada 10 mexicanos apoyan una medida', el tamaño grande de respuestas (100,000 personas) garantiza que el resultado es representativo de todos los mexicanos.",
         respuesta: false,
         retroalimentacion: "Falso. El tamaño de la muestra no corrige el sesgo de seleccion. Una encuesta en linea con autoselecion excluye sistematicamente a personas sin acceso a internet o sin redes sociales (adultos mayores, poblacion rural, personas de bajos ingresos) e incluye principalmente a usuarios activos del medio que publica la encuesta (con sesgos politicos o demograficos propios de esa audiencia). Un millon de respuestas sesgadas siguen siendo un millon de respuestas sesgadas.",
       },
       {
-        problema: "Animal Político y Parámetría son ejemplos de medios y organizaciones en México que han introducido estándares más rigurosos en el uso y verificación de estadísticas.",
+        enunciado: "Animal Político y Parámetría son ejemplos de medios y organizaciones en México que han introducido estándares más rigurosos en el uso y verificación de estadísticas.",
         respuesta: true,
         retroalimentacion: "Correcto. Animal Politico ha desarrollado periodismo de datos con verificacion de fuentes y Parámetría es una empresa de investigacion por encuestas con metodologia transparente. Ambas organizaciones han contribuido a elevar los estandares del periodismo estadistico en Mexico, reportando margenes de error, metodologias de muestreo y fichas tecnicas de sus encuestas. Son referencias de buenas practicas en el uso de estadisticas en medios mexicanos.",
       },
