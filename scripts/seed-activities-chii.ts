@@ -424,31 +424,30 @@ const contenidosA3 = [
 
   { // P03 — debate_estructurado (¿La historia condena a repetir o da herramientas?)
     tema: "¿La historia nos condena a repetir el pasado, o nos da herramientas para cambiarlo?",
-    descripcion: "Debate filosófico-histórico sobre el valor del conocimiento histórico para transformar el presente.",
-    postura_a: {
-      titulo: "La historia nos condena a repetir el pasado",
-      argumentos_guia: [
+    posturas: [
+      "La historia nos condena a repetir el pasado: las estructuras de desigualdad, los ciclos de crisis económica y las dinámicas de poder se repiten en México con variaciones mínimas desde la Colonia hasta el siglo XXI.",
+      "La historia nos da herramientas para cambiar el presente: el conocimiento histórico permite identificar causas profundas, inspira movimientos sociales (EZLN 1994) y fortalece la ciudadanía activa frente al fraude y la manipulación.",
+    ],
+    argumentos_guia: {
+      "postura_a_condena": [
         "Las estructuras sociales son muy resistentes al cambio: la desigualdad en México, con raíces en el colonialismo, persiste a pesar de la Independencia, la Reforma, la Revolución y décadas de programas sociales.",
-        "Los patrones de desigualdad en México se repiten desde la Colonia: concentración de tierras en el Porfiriato, concentración de riqueza en la era neoliberal. El coeficiente de GINI apenas ha variado en décadas.",
-        "Las élites utilizan la historia para legitimar el status quo: la historia oficial del PRI convirtió la Revolución en justificación del partido en el poder durante 70 años, neutralizando su potencial transformador.",
-        "Los ciclos de crisis económica se repiten con variaciones mínimas: la crisis de 1982, el Efecto Tequila de 1994, la crisis de 2008-2009, todas siguieron patrones similares de endeudamiento, especulación y ajuste que afectaron a los mismos sectores populares.",
+        "Los patrones de desigualdad se repiten desde la Colonia: concentración de tierras en el Porfiriato, concentración de riqueza en la era neoliberal. El coeficiente de GINI apenas ha variado en décadas.",
+        "Las élites utilizan la historia para legitimar el status quo: la historia oficial del PRI convirtió la Revolución en justificación de 70 años de hegemonía, neutralizando su potencial transformador.",
+        "Los ciclos de crisis económica se repiten: las crisis de 1982, 1994 y 2008-2009 siguieron patrones similares de endeudamiento, especulación y ajuste que afectaron siempre a los mismos sectores populares.",
       ],
-    },
-    postura_b: {
-      titulo: "La historia nos da herramientas para cambiar el presente",
-      argumentos_guia: [
+      "postura_b_herramientas": [
         "El conocimiento histórico permite identificar las causas profundas de los problemas actuales: saber que la desigualdad tiene raíces coloniales orienta las políticas hacia reformas estructurales, no solo paliativos.",
-        "Los movimientos sociales se inspiran en experiencias históricas de cambio exitoso: el movimiento zapatista (EZLN, 1994) se nutrió de la memoria de Zapata y la Revolución para articular demandas de autonomía indígena y reforma agraria.",
-        "La conciencia histórica es la base de la ciudadanía activa y la democracia: identificar cómo se han usado históricamente el fraude, la represión y la manipulación mediática en México permite a los ciudadanos reconocer esos patrones y resistirlos.",
-        "México ha experimentado transformaciones profundas a lo largo de su historia: la Reforma juarista separó la Iglesia del Estado, la Revolución redistribuyó tierras, la alternancia política de 2000 terminó 70 años de hegemonía priista. El cambio histórico es posible.",
+        "Los movimientos sociales se inspiran en cambios históricos exitosos: el EZLN (1994) se nutrió de la memoria de Zapata y la Revolución para articular demandas de autonomía indígena y reforma agraria.",
+        "La conciencia histórica fortalece la ciudadanía democrática: identificar cómo se han usado el fraude, la represión y la manipulación mediática en México permite a los ciudadanos reconocer esos patrones y resistirlos.",
+        "México ha logrado transformaciones reales: la Reforma juarista separó Iglesia y Estado, la Revolución redistribuyó tierras, la alternancia de 2000 terminó 70 años de hegemonía priista. El cambio histórico es posible.",
       ],
     },
-    reglas_debate: [
+    reglas: [
       "Argumentar con evidencias históricas concretas, no solo con opiniones abstractas",
       "Escuchar y refutar los argumentos del lado contrario antes de presentar los propios",
       "No usar falacias ad hominem ni atacar a personas o partidos políticos",
     ],
-    duracion_minutos: 20,
+    tiempo_argumentacion_minutos: 20,
   },
 
   { // P04 — reflexion_escrita (análisis multicausal de un proceso histórico mexicano)
