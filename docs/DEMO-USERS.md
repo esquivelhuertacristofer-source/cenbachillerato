@@ -64,6 +64,17 @@ Credenciales para entorno de desarrollo/demo. Todos los usuarios están en Supab
 
 ---
 
+### 👤 Alumnos Semestre 5 (cuenta dedicada)
+
+| Email | Password | Nombre | Semestre | Script |
+|-------|----------|--------|---------|--------|
+| alumno-sem5@cenbachillerato-demo.com | Demo2026! | Alumno Sem 5 Demo | 5 | `npx tsx scripts/create-demo-alumno-sem5.ts` |
+
+**Grupo asignado:** Grupo 5A Demo (semestre=5)
+**Qué se ve después del login:** Hub con UACs de Semestre 5 (CH-II, CNEYT-V, IN-V, PM-V)
+
+---
+
 ### 👤 Alumnos Semestre 4 (cuenta dedicada)
 
 | Email | Password | Nombre | Semestre | Script |
