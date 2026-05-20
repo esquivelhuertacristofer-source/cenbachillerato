@@ -189,31 +189,31 @@ const contenidosA2 = [
   { // P01 — quiz_multiple_opcion (Origen de la vida)
     preguntas: [
       {
-        pregunta: "¿Qué moléculas orgánicas obtuvo Miller en su experimento de 1953 al simular la atmósfera primitiva?",
+        enunciado: "¿Qué moléculas orgánicas obtuvo Miller en su experimento de 1953 al simular la atmósfera primitiva?",
         opciones: ["Ácidos grasos y glucosa", "Aminoácidos y otras moléculas orgánicas", "Nucleótidos y ATP", "Cloroplastos y mitocondrias"],
         respuesta_correcta: 1,
         retroalimentacion: "Miller obtuvo aminoácidos y otras moléculas orgánicas, demostrando que los bloques de la vida pueden formarse abioticamente. Este resultado respaldó la hipótesis de Oparin y Haldane.",
       },
       {
-        pregunta: "¿Cuál hipótesis propone que el ARN fue la primera molécula capaz de almacenar información y catalizar reacciones?",
+        enunciado: "¿Cuál hipótesis propone que el ARN fue la primera molécula capaz de almacenar información y catalizar reacciones?",
         opciones: ["Panspermia", "Mundo ARN", "Caldo primordial", "Ventiladeros hidrotermales"],
         respuesta_correcta: 1,
         retroalimentacion: "La hipótesis del Mundo ARN resuelve el dilema 'ADN vs. proteína' porque el ARN puede hacer ambas funciones. Las ribozimas son ARN catalíticos que respaldan esta hipótesis.",
       },
       {
-        pregunta: "¿Qué evidencia respalda la hipótesis de la panspermia?",
+        enunciado: "¿Qué evidencia respalda la hipótesis de la panspermia?",
         opciones: ["La síntesis de ADN en laboratorio", "El meteorito de Murchison contenía aminoácidos extraterrestres", "La existencia de ribozimas", "Los ventiladeros hidrotermales oceánicos"],
         respuesta_correcta: 1,
         retroalimentacion: "El meteorito de Murchison (1969) contenía más de 70 aminoácidos distintos de origen extraterrestre. Esto muestra que las moléculas orgánicas pueden formarse en el espacio.",
       },
       {
-        pregunta: "¿Por qué se descartó la hipótesis de la generación espontánea en el siglo XIX?",
+        enunciado: "¿Por qué se descartó la hipótesis de la generación espontánea en el siglo XIX?",
         opciones: ["Porque Oparin la refutó matemáticamente", "Porque los experimentos de Pasteur demostraron que la vida solo surge de vida preexistente", "Porque Miller demostró lo contrario", "Porque la panspermia la sustituyó"],
         respuesta_correcta: 1,
         retroalimentacion: "Pasteur demostró con sus matraces de cuello de cisne que los microorganismos provenían del aire, no surgían espontáneamente. Esto estableció el principio de biogénesis.",
       },
       {
-        pregunta: "Los ventiladeros hidrotermales son atractivos como cuna de la vida porque:",
+        enunciado: "Los ventiladeros hidrotermales son atractivos como cuna de la vida porque:",
         opciones: ["Tienen mucho oxígeno libre", "Proveen gradientes de energía y minerales sin necesitar atmósfera reductora", "Están cerca de la superficie oceánica", "Emiten radiación ultravioleta"],
         respuesta_correcta: 1,
         retroalimentacion: "Los ventiladeros ofrecen gradientes de temperatura, pH y concentración de minerales que pueden impulsar reacciones prebióticas sin requerir la atmósfera reductora que se discute si existió en la Tierra primitiva.",
@@ -223,31 +223,31 @@ const contenidosA2 = [
   { // P02 — quiz_multiple_opcion (Tipos de células y organelos)
     preguntas: [
       {
-        pregunta: "¿Cuál es la principal diferencia entre una célula procariota y una eucariota?",
+        enunciado: "¿Cuál es la principal diferencia entre una célula procariota y una eucariota?",
         opciones: ["La procariota tiene mitocondrias y la eucariota no", "La eucariota tiene núcleo definido con membrana nuclear; la procariota no", "La procariota tiene cloroplastos y la eucariota no", "La eucariota carece de membrana celular"],
         respuesta_correcta: 1,
         retroalimentacion: "La presencia de núcleo rodeado por membrana nuclear es la característica definitoria de las células eucariotas. Las procariotas tienen ADN circular en el nucleoide sin membrana que lo rodee.",
       },
       {
-        pregunta: "¿Qué organelo produce la mayor parte del ATP en la célula eucariota?",
+        enunciado: "¿Qué organelo produce la mayor parte del ATP en la célula eucariota?",
         opciones: ["Ribosoma", "Retículo endoplásmico", "Mitocondria", "Aparato de Golgi"],
         respuesta_correcta: 2,
         retroalimentacion: "La mitocondria es el sitio de la respiración aerobia y produce ~32-34 ATP por glucosa mediante la cadena transportadora de electrones y la ATP sintasa.",
       },
       {
-        pregunta: "¿Qué evidencia apoya la teoría endosimbiótica de Lynn Margulis?",
+        enunciado: "¿Qué evidencia apoya la teoría endosimbiótica de Lynn Margulis?",
         opciones: ["Las mitocondrias no tienen membrana propia", "Las mitocondrias tienen ADN propio y ribosomas 70S similares a los de bacterias", "El cloroplasto no puede reproducirse de forma independiente", "Las células procariotas no tienen pared celular"],
         respuesta_correcta: 1,
         retroalimentacion: "Las mitocondrias (y cloroplastos) tienen doble membrana, ADN circular propio y ribosomas 70S como las bacterias, lo que sugiere que fueron bacterias ancestrales incorporadas por endosimbiosis.",
       },
       {
-        pregunta: "¿Cuál es la función principal del aparato de Golgi?",
+        enunciado: "¿Cuál es la función principal del aparato de Golgi?",
         opciones: ["Síntesis de ATP", "Procesamiento, empaque y distribución de proteínas y lípidos", "Digestión intracelular de desechos", "Síntesis de ARN mensajero"],
         respuesta_correcta: 1,
         retroalimentacion: "El aparato de Golgi recibe vesículas del retículo endoplásmico, modifica y empaca las proteínas y lípidos, y los dirige a su destino final: membrana plasmática, lisosomas o secreción.",
       },
       {
-        pregunta: "¿Qué organelo realizan exclusivamente las células vegetales y algunas algas?",
+        enunciado: "¿Qué organelo realizan exclusivamente las células vegetales y algunas algas?",
         opciones: ["Lisosoma", "Mitocondria", "Cloroplasto", "Vacuola pequeña"],
         respuesta_correcta: 2,
         retroalimentacion: "El cloroplasto es exclusivo de células vegetales y algas fotosintéticas; contiene clorofila y es el sitio de la fotosíntesis. Las mitocondrias están presentes en casi todas las células eucariotas.",
@@ -255,10 +255,11 @@ const contenidosA2 = [
     ],
   },
   { // P03 — ejercicio_matematico (ATP total respiración aerobia)
-    enunciado: "Una célula lleva a cabo la respiración aerobia completa de 1 molécula de glucosa. La glucólisis produce 2 ATP netos. El ciclo de Krebs produce 2 ATP. La cadena transportadora de electrones produce 32 ATP. ¿Cuántos ATP se producen en total?",
-    solucion_numerica: 36,
-    unidad: "ATP",
-    pasos: [
+    problema: "Una célula lleva a cabo la respiración aerobia completa de 1 molécula de glucosa. La glucólisis produce 2 ATP netos. El ciclo de Krebs produce 2 ATP. La cadena transportadora de electrones produce 32 ATP. ¿Cuántos ATP se producen en total?",
+    tipo_respuesta: "numerica" as const,
+    respuesta_final: "36",
+    unidades: "ATP",
+    pasos_guia: [
       "Paso 1 — Glucólisis (citoplasma): 1 glucosa -> 2 piruvatos + 2 ATP netos + 2 NADH.",
       "Paso 2 — Ciclo de Krebs (mitocondria, matriz): 2 piruvatos -> CO2 + 2 ATP + 8 NADH + 2 FADH2.",
       "Paso 3 — Cadena transportadora de electrones (membrana interna mitocondrial): NADH y FADH2 ceden electrones; el gradiente de H+ impulsa la ATP sintasa produciendo 32 ATP.",
@@ -277,10 +278,11 @@ const contenidosA2 = [
     ],
   },
   { // P05 — ejercicio_matematico (Cruce monohíbrido Aa×Aa)
-    enunciado: "Cruza dos plantas heterocigotas para el carácter color de semilla (Aa × Aa). Usa el cuadro de Punnett para determinar la probabilidad de obtener descendencia homocigota recesiva (aa). Expresa la respuesta como porcentaje.",
-    solucion_numerica: 25,
-    unidad: "%",
-    pasos: [
+    problema: "Cruza dos plantas heterocigotas para el carácter color de semilla (Aa × Aa). Usa el cuadro de Punnett para determinar la probabilidad de obtener descendencia homocigota recesiva (aa). Expresa la respuesta como porcentaje.",
+    tipo_respuesta: "numerica" as const,
+    respuesta_final: "25",
+    unidades: "%",
+    pasos_guia: [
       "Paso 1 — Gametos: cada progenitor Aa produce gametos A y a en igual proporción (50% cada uno).",
       "Paso 2 — Cuadro de Punnett: cruce Aa × Aa da cuatro combinaciones: AA (25%), Aa (25%), Aa (25%), aa (25%).",
       "Paso 3 — Contar homocigotos recesivos: solo la combinación aa es homocigota recesiva: 1 de 4 = 25%.",
@@ -291,31 +293,31 @@ const contenidosA2 = [
   { // P06 — quiz_multiple_opcion (Mutaciones y variabilidad genética)
     preguntas: [
       {
-        pregunta: "¿Qué tipo de mutación génica desplaza el marco de lectura del ARNm?",
+        enunciado: "¿Qué tipo de mutación génica desplaza el marco de lectura del ARNm?",
         opciones: ["Sustitución puntual silenciosa", "Inserción o deleción de un nucleótido", "Translocación cromosómica", "Inversión cromosómica"],
         respuesta_correcta: 1,
         retroalimentacion: "Las inserciones o deleciones de un nucleótido desplazan el marco de lectura (frameshift), alterando todos los codones posteriores y generalmente produciendo una proteína no funcional.",
       },
       {
-        pregunta: "¿Cuál de los siguientes es un mutágeno físico?",
+        enunciado: "¿Cuál de los siguientes es un mutágeno físico?",
         opciones: ["Benzopireno del tabaco", "VPH (virus del papiloma humano)", "Radiación ultravioleta UV-B", "Formaldehído"],
         respuesta_correcta: 2,
         retroalimentacion: "La radiación UV-B es un mutágeno físico que causa dímeros de timina en el ADN. Los benzopirenos y el formaldehído son mutágenos químicos; el VPH es un mutágeno biológico.",
       },
       {
-        pregunta: "Las mutaciones germinales se diferencian de las somáticas porque:",
+        enunciado: "Las mutaciones germinales se diferencian de las somáticas porque:",
         opciones: ["Son siempre dañinas y causan cáncer", "Ocurren en células reproductoras y pueden transmitirse a la descendencia", "Solo afectan a células musculares", "No alteran la secuencia del ADN"],
         respuesta_correcta: 1,
         retroalimentacion: "Las mutaciones germinales ocurren en gametos o células que los producen, por lo que pueden heredarse. Las somáticas afectan solo al individuo y no se transmiten.",
       },
       {
-        pregunta: "¿Cuál es el papel de las mutaciones en la evolución?",
+        enunciado: "¿Cuál es el papel de las mutaciones en la evolución?",
         opciones: ["Son siempre letales y eliminan especies", "Generan variabilidad genética sobre la que actúa la selección natural", "Solo afectan a individuos viejos", "Reducen la diversidad de alelos en la población"],
         respuesta_correcta: 1,
         retroalimentacion: "Las mutaciones son la fuente última de nuevos alelos. La mayor parte son neutras o ligeramente perjudiciales, pero ocasionalmente producen variantes ventajosas que la selección natural puede favorecer.",
       },
       {
-        pregunta: "La trisomía 21 (síndrome de Down) es un ejemplo de:",
+        enunciado: "La trisomía 21 (síndrome de Down) es un ejemplo de:",
         opciones: ["Mutación génica puntual", "Mutación cromosómica por aneuploidía", "Mutación por inserción de nucleótido", "Mutación somática causada por UV"],
         respuesta_correcta: 1,
         retroalimentacion: "La trisomía 21 resulta de la no disyunción del cromosoma 21 durante la meiosis, produciendo una célula con tres copias del cromosoma 21. Es una mutación cromosómica numérica (aneuploidía).",
@@ -346,31 +348,31 @@ const contenidosA2 = [
   { // P08 — quiz_multiple_opcion (Bioética y biotecnología)
     preguntas: [
       {
-        pregunta: "¿Cuál es el mecanismo de acción de CRISPR-Cas9?",
+        enunciado: "¿Cuál es el mecanismo de acción de CRISPR-Cas9?",
         opciones: ["Inserta genes al azar en el genoma usando virus", "Una ARN guía dirige la proteína Cas9 al sitio exacto del ADN para cortarlo", "Produce copias de ARNm para aumentar la expresión génica", "Elimina cromosomas completos de la célula"],
         respuesta_correcta: 1,
         retroalimentacion: "CRISPR-Cas9 usa una ARN guía complementaria al sitio diana del ADN. La Cas9 corta el ADN con precisión y la célula puede repararlo con o sin la secuencia deseada.",
       },
       {
-        pregunta: "¿Por qué el maíz transgénico es tema de debate especial en México?",
+        enunciado: "¿Por qué el maíz transgénico es tema de debate especial en México?",
         opciones: ["Porque México no produce maíz nativo", "Porque México es centro de origen y diversificación del maíz, y hay riesgo de contaminación del germoplasma nativo", "Porque el maíz OGM es ilegal en todo el mundo", "Porque el maíz Bt produce toxinas peligrosas para humanos"],
         respuesta_correcta: 1,
         retroalimentacion: "México es el centro de origen del maíz y alberga cientos de variedades nativas. La contaminación por flujo génico de variedades transgénicas amenaza esa biodiversidad y la soberanía alimentaria.",
       },
       {
-        pregunta: "¿Cuál principio bioético obliga al médico a respetar la decision informada del paciente sobre su tratamiento?",
+        enunciado: "¿Cuál principio bioético obliga al médico a respetar la decision informada del paciente sobre su tratamiento?",
         opciones: ["No maleficencia", "Beneficencia", "Autonomia", "Justicia"],
         respuesta_correcta: 2,
         retroalimentacion: "El principio de autonomia establece que el paciente tiene derecho a tomar decisiones informadas sobre su propio cuerpo y tratamiento. El consentimiento informado es su expresion concreta.",
       },
       {
-        pregunta: "¿Cuál es la diferencia entre clonacion reproductiva y clonacion terapéutica?",
+        enunciado: "¿Cuál es la diferencia entre clonacion reproductiva y clonacion terapéutica?",
         opciones: ["La reproductiva usa CRISPR y la terapéutica no", "La reproductiva busca crear un individuo completo; la terapéutica busca obtener células madre para tratar enfermedades", "La terapéutica esta prohibida en todos los paises", "No hay diferencia; son el mismo proceso"],
         respuesta_correcta: 1,
         retroalimentacion: "La clonacion reproductiva persigue generar un organismo completo geneticamente identico (como Dolly). La terapéutica usa embriones clonados solo para obtener células madre compatibles con un paciente, sin fines reproductivos.",
       },
       {
-        pregunta: "¿Qué organismo regula en México el uso y liberacion de OGM al ambiente?",
+        enunciado: "¿Qué organismo regula en México el uso y liberacion de OGM al ambiente?",
         opciones: ["IMSS", "CIBIOGEM", "UNAM", "PEMEX"],
         respuesta_correcta: 1,
         retroalimentacion: "La CIBIOGEM (Comision Intersecretarial de Bioseguridad de los Organismos Geneticamente Modificados) es el organismo gubernamental mexicano que aplica el principio de precaucion y regula los OGM.",
@@ -382,7 +384,7 @@ const contenidosA2 = [
 // ── A3 ──────────────────────────────────────────────────────────────────────────
 const contenidosA3 = [
   { // P01 — reflexion_escrita (Origen de la vida)
-    pregunta: "¿Cual hipótesis sobre el origen de la vida te parece más convincente y por qué? Analiza sus evidencias y limitaciones.",
+    prompt: "¿Cual hipótesis sobre el origen de la vida te parece más convincente y por qué? Analiza sus evidencias y limitaciones.",
     instrucciones: "Elige una hipotesis (caldo primordial, ventiladeros hidrotermales, Mundo ARN o panspermia) y argumenta tu postura con evidencias concretas. Reconoce también sus limitaciones.",
     longitud_minima_palabras: 100,
     pistas: [
@@ -392,7 +394,7 @@ const contenidosA3 = [
     ],
   },
   { // P02 — reflexion_escrita (Célula ideal)
-    pregunta: "Diseña mentalmente una célula optimizada para una función específica. ¿Qué organelos tendría en mayor cantidad? ¿Por qué?",
+    prompt: "Diseña mentalmente una célula optimizada para una función específica. ¿Qué organelos tendría en mayor cantidad? ¿Por qué?",
     instrucciones: "Elige una función (ej. secreción de enzimas, fotosintesis intensa, alta demanda energética) y justifica qué organelos serían más abundantes basándote en sus funciones reales.",
     longitud_minima_palabras: 80,
     pistas: [
@@ -401,7 +403,7 @@ const contenidosA3 = [
     ],
   },
   { // P03 — reflexion_escrita (Aerobia vs. fermentación)
-    pregunta: "Compara la eficiencia energetica de la respiracion aerobia y la fermentacion. ¿En qué situaciones usa cada proceso tu cuerpo?",
+    prompt: "Compara la eficiencia energetica de la respiracion aerobia y la fermentacion. ¿En qué situaciones usa cada proceso tu cuerpo?",
     instrucciones: "Usa los valores de ATP producidos por cada via para cuantificar la diferencia de eficiencia. Describe situaciones fisiologicas reales donde el cuerpo utiliza cada proceso.",
     longitud_minima_palabras: 80,
     pistas: [
@@ -411,7 +413,7 @@ const contenidosA3 = [
     ],
   },
   { // P04 — reflexion_escrita (Dogma central)
-    pregunta: "Explica con tus palabras el dogma central de la biologia molecular. ¿Por qué es tan importante para entender la herencia y las enfermedades geneticas?",
+    prompt: "Explica con tus palabras el dogma central de la biologia molecular. ¿Por qué es tan importante para entender la herencia y las enfermedades geneticas?",
     instrucciones: "Describe el flujo de informacion ADN -> ARN -> proteina y explica por qué una alteracion en cualquier punto puede causar enfermedad. Menciona un ejemplo concreto.",
     longitud_minima_palabras: 100,
     pistas: [
@@ -421,7 +423,7 @@ const contenidosA3 = [
     ],
   },
   { // P05 — reflexion_escrita (Daltonismo)
-    pregunta: "¿Por qué el daltonismo afecta más a hombres que a mujeres? Explica usando los conceptos de herencia ligada al sexo y cromosomas X e Y.",
+    prompt: "¿Por qué el daltonismo afecta más a hombres que a mujeres? Explica usando los conceptos de herencia ligada al sexo y cromosomas X e Y.",
     instrucciones: "Usa la notacion de herencia ligada al sexo (X^D, X^d) para explicar los genotipos posibles en hombres y mujeres. Calcula la probabilidad de que un hijo de una mujer portadora tenga daltonismo.",
     longitud_minima_palabras: 80,
     pistas: [
@@ -452,7 +454,7 @@ const contenidosA3 = [
     tiempo_argumentacion_minutos: 15,
   },
   { // P07 — reflexion_escrita (Evidencia de la evolución)
-    pregunta: "¿Cuál consideras la evidencia más solida a favor de la evolucion por seleccion natural? ¿Por qué?",
+    prompt: "¿Cuál consideras la evidencia más solida a favor de la evolucion por seleccion natural? ¿Por qué?",
     instrucciones: "Elige un tipo de evidencia (registro fosil, anatomia comparada, biogeografia o genomica comparada) y argumenta por qué la consideras la más convincente. Usa ejemplos concretos.",
     longitud_minima_palabras: 100,
     pistas: [
