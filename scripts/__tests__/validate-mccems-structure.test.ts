@@ -370,3 +370,29 @@ describe("MCCEMS Structure Validation — Semestre 2 propósitos (Modelo Educati
     expect(cneytii?.totalProgresionesEsperadas).toBe(8);
   });
 });
+
+describe("MCCEMS Structure Validation — Semestre 5 propósitos (Modelo Educativo 2025)", () => {
+  test("CH-II tiene exactamente 4 propósitos formativos esperados (Conciencia Histórica II, continuación Sem 4)", () => {
+    const chii = UAC_BASE.find((u) => u.codigo === "CH-II");
+    expect(chii).toBeDefined();
+    expect(chii?.totalProgresionesEsperadas).toBe(4);
+  });
+
+  test("CNEYT-V tiene exactamente 8 propósitos formativos esperados (Física clásica)", () => {
+    const cneytv = UAC_BASE.find((u) => u.codigo === "CNEYT-V");
+    expect(cneytv).toBeDefined();
+    expect(cneytv?.totalProgresionesEsperadas).toBe(8);
+  });
+
+  test("IN-V tiene exactamente 8 propósitos formativos esperados (nivel A2+/B1, 5h/semana)", () => {
+    const inv = UAC_BASE.find((u) => u.codigo === "IN-V");
+    expect(inv).toBeDefined();
+    expect(inv?.totalProgresionesEsperadas).toBe(8);
+  });
+
+  test("PM-V tiene exactamente 8 propósitos formativos esperados (Cálculo diferencial)", () => {
+    const pmv = UAC_BASE.find((u) => u.codigo === "PM-V");
+    expect(pmv).toBeDefined();
+    expect(pmv?.totalProgresionesEsperadas).toBe(8);
+  });
+});
