@@ -228,6 +228,30 @@ describe("MCCEMS Structure Validation — Componentes curriculares", () => {
   });
 });
 
+describe("MCCEMS Semestre 6 — Seeds de propósitos formativos oficiales", () => {
+  // Importing from seed files guarantees the static arrays match the official MCCEMS 2025 counts.
+  // These tests run in CI without a DB connection.
+  test("CD-III tiene 4 propósitos formativos (comunicación multimodal → proyecto comunitario)", async () => {
+    const { PROGRESIONES_CDIII } = await import("../seed-cdiii");
+    expect(PROGRESIONES_CDIII).toHaveLength(4);
+  });
+
+  test("CH-III tiene 4 propósitos formativos (cierre familia CH: narrativa argumentada)", async () => {
+    const { PROGRESIONES_CHIII } = await import("../seed-chiii");
+    expect(PROGRESIONES_CHIII).toHaveLength(4);
+  });
+
+  test("CNEYT-VI tiene 8 propósitos formativos (biología: origen vida → bioética)", async () => {
+    const { PROGRESIONES_CNEYTVI } = await import("../seed-cneytvi");
+    expect(PROGRESIONES_CNEYTVI).toHaveLength(8);
+  });
+
+  test("PM-VI tiene 8 propósitos formativos (estadística y probabilidad, no cálculo integral)", async () => {
+    const { PROGRESIONES_PMVI } = await import("../seed-pmvi");
+    expect(PROGRESIONES_PMVI).toHaveLength(8);
+  });
+});
+
 describe("MCCEMS Structure Validation — Totales y conteo (Modelo Educativo 2025)", () => {
   test("Total de UAC es 32 (CF únicamente, Modelo 2025)", () => {
     expect(UAC_BASE).toHaveLength(32);
