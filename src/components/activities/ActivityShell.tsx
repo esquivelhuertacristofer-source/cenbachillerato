@@ -22,6 +22,7 @@ export interface ActivityShellProps {
   phaseLabel: string;
   actividadesProg: ActividadConEstado[];
   children: ReactNode;
+  nivel_revision?: string | null;
 }
 
 export function ActivityShell({
@@ -38,9 +39,11 @@ export function ActivityShell({
   phaseLabel,
   actividadesProg,
   children,
+  nivel_revision,
 }: ActivityShellProps) {
   const tc = getTipoConfig(tipo);
   const isCompleta = estado === "completada";
+  const isBorrador = nivel_revision === "borrador";
 
   return (
     <>
@@ -189,6 +192,18 @@ export function ActivityShell({
                     }}>
                       <i className="fa-solid fa-check" style={{ marginRight: 5 }} />
                       Completada
+                    </span>
+                  )}
+                  {isBorrador && (
+                    <span style={{
+                      fontSize: 10, fontWeight: 700, letterSpacing: "0.10em",
+                      color: "#CA8A04", padding: "5px 14px",
+                      background: "rgba(202,138,4,0.10)",
+                      border: "1px solid rgba(202,138,4,0.25)",
+                      borderRadius: 999,
+                    }}>
+                      <i className="fa-solid fa-pen-ruler" style={{ marginRight: 5, fontSize: 9 }} />
+                      En revisión pedagógica
                     </span>
                   )}
                 </div>

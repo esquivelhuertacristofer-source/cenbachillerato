@@ -37,6 +37,7 @@ interface ActivityRunnerProps {
   ordenNum: number;
   phaseLabel: string;
   actividadesProg: ActividadConEstado[];
+  nivel_revision?: string | null;
 }
 
 export function ActivityRunner({
@@ -56,6 +57,7 @@ export function ActivityRunner({
   ordenNum,
   phaseLabel,
   actividadesProg,
+  nivel_revision,
 }: ActivityRunnerProps) {
   const router = useRouter();
 
@@ -85,6 +87,7 @@ export function ActivityRunner({
     ordenNum,
     phaseLabel,
     actividadesProg,
+    nivel_revision,
   };
 
   if (tipo === "lectura") {
