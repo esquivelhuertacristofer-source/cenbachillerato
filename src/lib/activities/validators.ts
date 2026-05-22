@@ -126,6 +126,11 @@ export const ContenidoVideoConPreguntasSchema = z.object({
 
 // ── 8. INFOGRAFÍA ─────────────────────────────────────────────────────────────
 
+export const GlosarioTerminoInfografiaSchema = z.object({
+  termino: z.string().min(1),
+  definicion: z.string().min(5),
+});
+
 export const ContenidoInfografiaSchema = z.object({
   titulo: z.string().min(1),
   url_imagen: z.string().min(1, 'La URL de la imagen es requerida'),
@@ -133,6 +138,9 @@ export const ContenidoInfografiaSchema = z.object({
   puntos_clave: z.array(z.string()).min(1).optional(),
   fuente: z.string().optional(),
   actividad_post: z.string().optional(),
+  contexto_mexicano: z.string().optional(),
+  glosario: z.array(GlosarioTerminoInfografiaSchema).optional(),
+  preguntas_reflexion: z.array(z.string()).optional(),
 });
 
 // ── 9. DEBATE ESTRUCTURADO ────────────────────────────────────────────────────

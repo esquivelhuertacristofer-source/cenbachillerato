@@ -177,6 +177,11 @@ export interface ActividadVideoConPreguntas extends ActividadBase {
 
 // ── 8. INFOGRAFÍA ─────────────────────────────────────────────────────────────
 
+export interface GlosarioTerminoInfografia {
+  termino: string;
+  definicion: string;
+}
+
 export interface ContenidoInfografia {
   titulo: string;
   url_imagen: string;
@@ -186,6 +191,12 @@ export interface ContenidoInfografia {
   fuente?: string;
   /** Consigna de actividad posterior a la revisión */
   actividad_post?: string;
+  /** Contextualización del tema en México con datos reales */
+  contexto_mexicano?: string;
+  /** Términos clave con definición pedagógica */
+  glosario?: GlosarioTerminoInfografia[];
+  /** Preguntas de análisis para activar reflexión crítica */
+  preguntas_reflexion?: string[];
 }
 
 export interface ActividadInfografia extends ActividadBase {
