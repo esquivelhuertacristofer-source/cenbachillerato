@@ -59,6 +59,7 @@ export default async function ActividadPage({ params }: Props) {
       estado={actividad.estado}
       intentoId={actividad.intentoId}
       respuestasIntento={actividad.respuestasIntento}
+      nivel_revision={actividad.nivel_revision}
       color={color}
       backHref={`/hub/uac/${codigo}/progresion/${progNum}`}
       uacNombre={uac.nombre}

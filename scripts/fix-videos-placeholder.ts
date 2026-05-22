@@ -1517,7 +1517,7 @@ async function main() {
         tipo: 'lectura',
         titulo: fix.nuevo_titulo,
         contenido: fix.nuevo_contenido as never,
-        // nivel_revision: 'robustecida',  // Uncomment after migration 06 runs
+        nivel_revision: 'robustecida',
       })
       .eq('codigo', fix.codigo);
 
@@ -1529,8 +1529,6 @@ async function main() {
   console.log(`\n${'='.repeat(60)}`);
   console.log(`✅ LISTO — ${actualizadas} convertidas, ${omitidas} omitidas`);
   console.log(`${'='.repeat(60)}\n`);
-  console.log('NOTA: Para marcar nivel_revision=\'robustecida\' después de correr la migración SQL,');
-  console.log('      descomentá la línea // nivel_revision: \'robustecida\' en el script.');
 }
 
 // ── CLI guard ───────────────────────────────────────────────────────────────

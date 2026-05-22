@@ -321,6 +321,7 @@ export interface Database {
           created_at: string;
           updated_at: string;
           tipo_codigo: string | null;
+          nivel_revision: "borrador" | "robustecida" | "validada_pedagogicamente";
         };
         Insert: {
           id?: string;
@@ -336,6 +337,7 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
           tipo_codigo?: string | null;
+          nivel_revision?: "borrador" | "robustecida" | "validada_pedagogicamente";
         };
         Update: Partial<Database["public"]["Tables"]["actividades"]["Insert"]>;
         Relationships: [];

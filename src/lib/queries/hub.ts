@@ -570,8 +570,7 @@ export async function getActividadConContenido(
   estado: "no_iniciada" | "en_progreso" | "completada";
   intentoId: string | null;
   respuestasIntento: Record<string, string> | null;
-  // Activar después de correr migración 06_nivel_revision.sql:
-  // nivel_revision: string | null;
+  nivel_revision: string | null;
 } | null> {
   const sb = await getSupabaseServer();
 
@@ -593,10 +592,9 @@ export async function getActividadConContenido(
   if (!prog) return null;
 
   // Get all activities for this progresion and find by order suffix
-  // Add "nivel_revision" to select string after running migración 06_nivel_revision.sql
   const { data: acts } = await sb
     .from("actividades")
-    .select("id, codigo, titulo, descripcion, tipo, xp, contenido")
+    .select("id, codigo, titulo, descripcion, tipo, xp, contenido, nivel_revision")
     .eq("progresion_id", prog.id)
     .order("codigo");
 
@@ -645,6 +643,7 @@ export async function getActividadConContenido(
     estado: estado as "no_iniciada" | "en_progreso" | "completada",
     intentoId: intento?.id ?? null,
     respuestasIntento,
+    nivel_revision: act.nivel_revision ?? null,
   };
 }
 
