@@ -909,13 +909,17 @@ export async function getFichasBibliotecaPorSemestre(
   const uacIds = uacs.map((u) => u.id);
   const uacMap = new Map(uacs.map((u) => [u.id, u]));
 
-  const { data: fichas } = await sb
+  // fichas_biblioteca is not in the generated types until migration 05_biblioteca.sql runs
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sba: any = sb;
+  const { data: fichas } = await sba
     .from("fichas_biblioteca")
     .select("id, titulo, categoria, slug, tiempo_lectura_minutos, uac_id")
     .in("uac_id", uacIds)
     .order("orden", { ascending: true });
 
-  return (fichas ?? []).map((f) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (fichas ?? []).map((f: any) => {
     const uac = uacMap.get(f.uac_id);
     return {
       ...f,

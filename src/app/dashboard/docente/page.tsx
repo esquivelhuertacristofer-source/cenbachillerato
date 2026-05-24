@@ -1,18 +1,36 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { getUser, getProfile } from "@/lib/supabase-helpers";
-import { getMetricasDocente } from "@/lib/queries/docente";
+import {
+  getMetricasDocente,
+  getIntentosRecientesDocente,
+  getGruposDocente,
+  getUACsConCompletionGrupo,
+} from "@/lib/queries/docente";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Dashboard Docente — CEN Bachillerato",
 };
 
-const METRIC_ICONS = [
-  { fa: "fa-solid fa-users", color: "#7DD3FC" },
-  { fa: "fa-solid fa-school", color: "#7DD3FC" },
-  { fa: "fa-solid fa-book-open", color: "#7DD3FC" },
-  { fa: "fa-solid fa-chart-bar", color: "#7DD3FC" },
-];
+const STATUS_CFG: Record<string, { color: string; label: string; icon: string }> = {
+  completed: { color: '#10b981', label: 'Completado', icon: 'fa-solid fa-circle-check' },
+  in_progress: { color: '#f59e0b', label: 'En progreso', icon: 'fa-solid fa-clock' },
+  failed: { color: '#ef4444', label: 'Fallido', icon: 'fa-solid fa-circle-xmark' },
+  abandoned: { color: '#94a3b8', label: 'Abandonado', icon: 'fa-regular fa-circle' },
+};
+
+function timeAgo(iso: string | null): string {
+  if (!iso) return '—';
+  const diff = Date.now() - new Date(iso).getTime();
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+  if (hours < 1) return 'Hace unos minutos';
+  if (hours < 24) return `Hace ${hours}h`;
+  if (days === 1) return 'Ayer';
+  if (days < 7) return `Hace ${days} días`;
+  return new Date(iso).toLocaleDateString('es-MX', { day: 'numeric', month: 'short' });
+}
 
 export default async function DocenteDashboardPage() {
   const user = await getUser();
@@ -25,19 +43,45 @@ export default async function DocenteDashboardPage() {
   if (profile.role === "admin" || profile.role === "super_admin") redirect("/admin/escuelas");
 
   const nombre = profile.full_name?.split(" ")[0] ?? "Docente";
-  const metricas = await getMetricasDocente(user.id);
+
+  const [metricas, intentosRecientes, grupos] = await Promise.all([
+    getMetricasDocente(user.id),
+    getIntentosRecientesDocente(user.id, 8),
+    getGruposDocente(user.id),
+  ]);
+
+  // Calcular avance global promedio usando el primer grupo como referencia si hay varios
+  let promedioAvanceGlobal: number | null = null;
+  if (grupos.length > 0) {
+    const avances = await Promise.all(
+      grupos.map(async (g) => {
+        const uacs = await getUACsConCompletionGrupo(g.id);
+        if (uacs.length === 0) return null;
+        return Math.round(uacs.reduce((s, u) => s + u.pct_completion, 0) / uacs.length);
+      })
+    );
+    const validos = avances.filter((v): v is number => v !== null);
+    if (validos.length > 0) {
+      promedioAvanceGlobal = Math.round(validos.reduce((s, v) => s + v, 0) / validos.length);
+    }
+  }
 
   const metricCards = [
-    { label: "Alumnos activos", valor: String(metricas.totalAlumnos) },
-    { label: "Grupos asignados", valor: String(metricas.totalGrupos) },
-    { label: "Semestres en curso", valor: String(metricas.uacEnCurso) },
-    { label: "Promedio de avance", valor: "—" },
+    { label: "Alumnos activos", valor: String(metricas.totalAlumnos), icon: "fa-solid fa-users", color: '#7DD3FC' },
+    { label: "Grupos asignados", valor: String(metricas.totalGrupos), icon: "fa-solid fa-school", color: '#7DD3FC' },
+    { label: "Semestres en curso", valor: String(metricas.uacEnCurso), icon: "fa-solid fa-layer-group", color: '#7DD3FC' },
+    {
+      label: "Avance global promedio",
+      valor: promedioAvanceGlobal !== null ? `${promedioAvanceGlobal}%` : "—",
+      icon: "fa-solid fa-chart-bar",
+      color: promedioAvanceGlobal !== null ? (promedioAvanceGlobal >= 70 ? '#10b981' : promedioAvanceGlobal >= 40 ? '#f59e0b' : '#ef4444') : '#7DD3FC',
+    },
   ];
 
-  const quickCards = [
-    { icon: "fa-solid fa-file-import", title: "Alta de alumnos", desc: "Carga masiva por Excel/CSV. Próximamente disponible." },
-    { icon: "fa-solid fa-clipboard-list", title: "Reportes SEP", desc: "Generación de reportes en formato institucional. Próximamente." },
-    { icon: "fa-solid fa-layer-group", title: "Gestión de grupos", desc: "Crear y gestionar grupos por semestre y UAC. Próximamente." },
+  const quickLinks = [
+    { href: '/dashboard/docente/grupos', icon: 'fa-solid fa-users-rectangle', title: 'Mis grupos', desc: 'Ver alumnos y progreso por grupo' },
+    { href: '/dashboard/docente/planteamiento', icon: 'fa-solid fa-map', title: 'Planteamiento', desc: 'Avance curricular MCCEMS por UAC' },
+    { href: '/dashboard/docente/alumnos', icon: 'fa-solid fa-user-graduate', title: 'Alumnos', desc: 'Historial de actividades individual' },
   ];
 
   return (
@@ -53,13 +97,13 @@ export default async function DocenteDashboardPage() {
           Bienvenido, {nombre}
         </h1>
         <p style={{ fontSize: 15, color: 'rgba(11,37,69,0.60)', marginTop: 6 }}>
-          Aquí tienes un resumen de tu actividad docente.
+          Panel de seguimiento académico · MCCEMS Bachillerato
         </p>
       </div>
 
       {/* Metric cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16, marginBottom: 32 }}>
-        {metricCards.map((metric, i) => (
+        {metricCards.map((metric) => (
           <div key={metric.label} style={{
             background: '#0B2545',
             border: '1px solid rgba(255,255,255,0.09)',
@@ -69,7 +113,7 @@ export default async function DocenteDashboardPage() {
             flexDirection: 'column',
             gap: 12,
           }}>
-            <i className={METRIC_ICONS[i]?.fa} style={{ fontSize: 22, color: METRIC_ICONS[i]?.color }} />
+            <i className={metric.icon} style={{ fontSize: 22, color: metric.color }} />
             <div>
               <div style={{ fontSize: 32, fontWeight: 900, color: '#fff', letterSpacing: '-0.03em', lineHeight: 1 }}>
                 {metric.valor}
@@ -82,21 +126,110 @@ export default async function DocenteDashboardPage() {
         ))}
       </div>
 
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: 24, marginBottom: 24 }}>
+        {/* Quick links */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {quickLinks.map((ql) => (
+            <Link key={ql.href} href={ql.href} style={{ textDecoration: 'none' }}>
+              <div style={{
+                background: '#fff', border: '1px solid rgba(11,37,69,0.10)',
+                borderRadius: 18, padding: '20px 24px',
+                display: 'flex', alignItems: 'center', gap: 16,
+                transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+              }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.borderColor = 'rgba(30,64,175,0.25)';
+                  (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 20px rgba(11,37,69,0.08)';
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.borderColor = 'rgba(11,37,69,0.10)';
+                  (e.currentTarget as HTMLElement).style.boxShadow = 'none';
+                }}
+              >
+                <div style={{
+                  width: 44, height: 44, borderRadius: 12,
+                  background: '#EFF6FF', flexShrink: 0,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <i className={ql.icon} style={{ fontSize: 18, color: '#1E40AF' }} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: '#0B2545' }}>{ql.title}</div>
+                  <div style={{ fontSize: 12, color: 'rgba(11,37,69,0.50)', marginTop: 2 }}>{ql.desc}</div>
+                </div>
+                <i className="fa-solid fa-chevron-right" style={{ fontSize: 12, color: 'rgba(11,37,69,0.25)' }} />
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* Activity feed */}
+        <div style={{ background: '#fff', border: '1px solid rgba(11,37,69,0.10)', borderRadius: 20, padding: '24px 28px' }}>
+          <h2 style={{ fontSize: 16, fontWeight: 800, color: '#0B2545', marginBottom: 18, letterSpacing: '-0.02em' }}>
+            <i className="fa-solid fa-bolt" style={{ color: '#1E40AF', marginRight: 8, fontSize: 14 }} />
+            Actividad reciente
+          </h2>
+
+          {intentosRecientes.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '32px 0', color: 'rgba(11,37,69,0.40)' }}>
+              <i className="fa-regular fa-clock" style={{ fontSize: 28, marginBottom: 10, display: 'block' }} />
+              <p style={{ fontSize: 13, margin: 0 }}>Aún no hay actividad registrada.</p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {intentosRecientes.map((intento) => {
+                const cfg = STATUS_CFG[intento.status] ?? STATUS_CFG.in_progress!;
+                return (
+                  <div key={intento.id} style={{
+                    display: 'flex', alignItems: 'center', gap: 12,
+                    padding: '10px 0',
+                    borderBottom: '1px solid rgba(11,37,69,0.05)',
+                  }}>
+                    <i className={cfg.icon} style={{ fontSize: 14, color: cfg.color, flexShrink: 0 }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: '#0B2545', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {intento.alumno_nombre ?? intento.alumno_email}
+                      </div>
+                      <div style={{ fontSize: 11, color: 'rgba(11,37,69,0.50)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {intento.actividad_titulo}
+                      </div>
+                    </div>
+                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                      {intento.score !== null && (
+                        <div style={{
+                          fontSize: 13, fontWeight: 700,
+                          color: intento.score >= 80 ? '#10b981' : intento.score >= 60 ? '#f59e0b' : '#ef4444',
+                        }}>
+                          {intento.score}/100
+                        </div>
+                      )}
+                      <div style={{ fontSize: 11, color: 'rgba(11,37,69,0.40)' }}>
+                        {timeAgo(intento.completed_at ?? intento.started_at)}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Grupos table */}
-      <div style={{ background: '#fff', border: '1px solid rgba(11,37,69,0.10)', borderRadius: 20, padding: 32, marginBottom: 24 }}>
-        <h2 style={{ fontSize: 18, fontWeight: 800, color: '#0B2545', letterSpacing: '-0.02em', marginBottom: 20 }}>
-          <i className="fa-solid fa-users-rectangle" style={{ color: '#1E40AF', marginRight: 10 }} />
-          Mis grupos
-        </h2>
-        {metricas.grupos.length === 0 ? (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '48px 0', textAlign: 'center' }}>
-            <i className="fa-regular fa-clipboard" style={{ fontSize: 40, color: 'rgba(11,37,69,0.18)', marginBottom: 16 }} />
-            <p style={{ fontSize: 16, fontWeight: 600, color: '#0B2545' }}>Sin grupos asignados</p>
-            <p style={{ fontSize: 14, color: 'rgba(11,37,69,0.55)', marginTop: 4 }}>
-              El administrador debe asignarte a un grupo para ver alumnos aquí.
-            </p>
+      {metricas.grupos.length > 0 && (
+        <div style={{ background: '#fff', border: '1px solid rgba(11,37,69,0.10)', borderRadius: 20, padding: 32 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+            <h2 style={{ fontSize: 17, fontWeight: 800, color: '#0B2545', letterSpacing: '-0.02em', margin: 0 }}>
+              <i className="fa-solid fa-users-rectangle" style={{ color: '#1E40AF', marginRight: 10 }} />
+              Mis grupos
+            </h2>
+            <Link href="/dashboard/docente/grupos" style={{
+              fontSize: 12, fontWeight: 700, color: '#1E40AF', textDecoration: 'none',
+              display: 'flex', alignItems: 'center', gap: 4,
+            }}>
+              Ver todos <i className="fa-solid fa-chevron-right" style={{ fontSize: 10 }} />
+            </Link>
           </div>
-        ) : (
           <table style={{ width: '100%', fontSize: 14, borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ borderBottom: '2px solid rgba(11,37,69,0.08)' }}>
@@ -108,37 +241,32 @@ export default async function DocenteDashboardPage() {
             <tbody>
               {metricas.grupos.map((g) => (
                 <tr key={g.id} style={{ borderBottom: '1px solid rgba(11,37,69,0.06)' }}>
-                  <td style={{ padding: '14px 0', fontWeight: 600, color: '#0B2545' }}>{g.nombre}</td>
-                  <td style={{ padding: '14px 0', color: 'rgba(11,37,69,0.65)' }}>{g.semestre}°</td>
-                  <td style={{ padding: '14px 0', textAlign: 'right', fontWeight: 700, color: '#1E40AF' }}>{g.total_alumnos}</td>
+                  <td style={{ padding: '12px 0' }}>
+                    <Link href={`/dashboard/docente/grupos/${g.id}`} style={{
+                      fontWeight: 600, color: '#1E40AF', textDecoration: 'none', fontSize: 14,
+                    }}>
+                      {g.nombre}
+                    </Link>
+                  </td>
+                  <td style={{ padding: '12px 0', color: 'rgba(11,37,69,0.65)' }}>{g.semestre}°</td>
+                  <td style={{ padding: '12px 0', textAlign: 'right', fontWeight: 700, color: '#0B2545' }}>{g.total_alumnos}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-        )}
-      </div>
+        </div>
+      )}
 
-      {/* Quick access */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 16 }}>
-        {quickCards.map((card) => (
-          <div key={card.title} style={{
-            background: '#fff',
-            border: '1px solid rgba(11,37,69,0.10)',
-            borderRadius: 20,
-            padding: 28,
-            cursor: 'pointer',
-            transition: 'box-shadow 0.2s ease, border-color 0.2s ease',
-          }}>
-            <i className={card.icon} style={{ fontSize: 20, color: '#1E40AF', marginBottom: 12, display: 'block' }} />
-            <div style={{ fontSize: 15, fontWeight: 800, color: '#0B2545', marginBottom: 8, letterSpacing: '-0.01em' }}>
-              {card.title}
-            </div>
-            <p style={{ fontSize: 13, color: 'rgba(11,37,69,0.55)', lineHeight: 1.6, margin: 0 }}>
-              {card.desc}
-            </p>
-          </div>
-        ))}
-      </div>
+      <style>{`
+        @media (max-width: 768px) {
+          div[style*="grid-template-columns: 1fr 1.4fr"] {
+            grid-template-columns: 1fr !important;
+          }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          * { transition: none !important; }
+        }
+      `}</style>
     </main>
   );
 }
