@@ -4,8 +4,6 @@ import { getUser, getProfile } from "@/lib/supabase-helpers";
 import {
   getMetricasDocente,
   getIntentosRecientesDocente,
-  getGruposDocente,
-  getUACsConCompletionGrupo,
 } from "@/lib/queries/docente";
 import type { Metadata } from "next";
 
@@ -44,38 +42,16 @@ export default async function DocenteDashboardPage() {
 
   const nombre = profile.full_name?.split(" ")[0] ?? "Docente";
 
-  const [metricas, intentosRecientes, grupos] = await Promise.all([
+  const [metricas, intentosRecientes] = await Promise.all([
     getMetricasDocente(user.id),
     getIntentosRecientesDocente(user.id, 8),
-    getGruposDocente(user.id),
   ]);
-
-  // Calcular avance global promedio usando el primer grupo como referencia si hay varios
-  let promedioAvanceGlobal: number | null = null;
-  if (grupos.length > 0) {
-    const avances = await Promise.all(
-      grupos.map(async (g) => {
-        const uacs = await getUACsConCompletionGrupo(g.id);
-        if (uacs.length === 0) return null;
-        return Math.round(uacs.reduce((s, u) => s + u.pct_completion, 0) / uacs.length);
-      })
-    );
-    const validos = avances.filter((v): v is number => v !== null);
-    if (validos.length > 0) {
-      promedioAvanceGlobal = Math.round(validos.reduce((s, v) => s + v, 0) / validos.length);
-    }
-  }
 
   const metricCards = [
     { label: "Alumnos activos", valor: String(metricas.totalAlumnos), icon: "fa-solid fa-users", color: '#7DD3FC' },
     { label: "Grupos asignados", valor: String(metricas.totalGrupos), icon: "fa-solid fa-school", color: '#7DD3FC' },
     { label: "Semestres en curso", valor: String(metricas.uacEnCurso), icon: "fa-solid fa-layer-group", color: '#7DD3FC' },
-    {
-      label: "Avance global promedio",
-      valor: promedioAvanceGlobal !== null ? `${promedioAvanceGlobal}%` : "—",
-      icon: "fa-solid fa-chart-bar",
-      color: promedioAvanceGlobal !== null ? (promedioAvanceGlobal >= 70 ? '#10b981' : promedioAvanceGlobal >= 40 ? '#f59e0b' : '#ef4444') : '#7DD3FC',
-    },
+    { label: "Planteamiento", valor: "Ver →", icon: "fa-solid fa-map", color: '#7DD3FC' },
   ];
 
   const quickLinks = [

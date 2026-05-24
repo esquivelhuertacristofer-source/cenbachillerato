@@ -14,7 +14,8 @@ const NAV = [
   { href: '/dashboard/docente/biblioteca', label: 'Biblioteca', icon: 'fa-solid fa-book-open' },
 ];
 
-function isActive(pathname: string, href: string, exact?: boolean) {
+function isActive(pathname: string | null, href: string, exact?: boolean) {
+  if (!pathname) return false;
   if (exact) return pathname === href;
   return pathname === href || pathname.startsWith(href + '/');
 }
