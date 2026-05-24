@@ -11,7 +11,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "pages:build": "npx @opennextjs/cloudflare build",
+    "postinstall": "node scripts/patch-opennext-turbopack.mjs",
+    "pages:build": "npx @opennextjs/cloudflare build && node scripts/postbuild-turbopack.mjs",
     "pages:dev": "npx @opennextjs/cloudflare preview",
     "pages:deploy": "npx @opennextjs/cloudflare deploy"
   },
@@ -31,7 +32,7 @@
     "zustand": "^5.0.13"
   },
   "devDependencies": {
-    "@opennextjs/cloudflare": "^1.19.9",
+    "@opennextjs/cloudflare": "^1.19.11",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
