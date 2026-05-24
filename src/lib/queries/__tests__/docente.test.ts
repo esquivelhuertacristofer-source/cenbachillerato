@@ -47,7 +47,8 @@ function makeSbDocente(
 // Builder genérico para mocks con cadena más compleja
 function makeChain(result: unknown) {
   const resolved = Promise.resolve(result);
-  const c: Record<string, jest.Mock> = {};
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const c: Record<string | symbol, any> = {};
   c.select = jest.fn(() => c);
   c.eq = jest.fn(() => c);
   c.in = jest.fn(() => c);
@@ -197,7 +198,8 @@ describe("getAlumnosConProgreso", () => {
     let callOrder = 0;
     const makeCallChain = (res: unknown) => {
       const resolved = Promise.resolve(res);
-      const c: Record<string, jest.Mock> = {};
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const c: Record<string | symbol, any> = {};
       c.select = jest.fn(() => c);
       c.eq = jest.fn(() => c);
       c.in = jest.fn(() => c);
@@ -272,7 +274,8 @@ describe("getUACsConCompletionGrupo", () => {
 
     const makeC = (res: unknown) => {
       const resolved = Promise.resolve(res);
-      const c: Record<string, jest.Mock> = {};
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const c: Record<string | symbol, any> = {};
       c.select = jest.fn(() => c);
       c.eq = jest.fn(() => c);
       c.in = jest.fn(() => c);
@@ -310,7 +313,8 @@ describe("getActividadesDificiles", () => {
     let call = 0;
     const makeC = (res: unknown) => {
       const resolved = Promise.resolve(res);
-      const c: Record<string, jest.Mock> = {};
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const c: Record<string | symbol, any> = {};
       c.select = jest.fn(() => c);
       c.eq = jest.fn(() => c);
       c.in = jest.fn(() => c);
@@ -361,7 +365,8 @@ describe("getActividadesDificiles", () => {
     let call = 0;
     const makeC = (res: unknown) => {
       const resolved = Promise.resolve(res);
-      const c: Record<string, jest.Mock> = {};
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const c: Record<string | symbol, any> = {};
       c.select = jest.fn(() => c);
       c.eq = jest.fn(() => c);
       c.in = jest.fn(() => c);
@@ -415,7 +420,8 @@ describe("getAlumnosEnRiesgo", () => {
     ];
     const makeC = (res: unknown) => {
       const resolved = Promise.resolve(res);
-      const c: Record<string, jest.Mock> = {};
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const c: Record<string | symbol, any> = {};
       c.select = jest.fn(() => c);
       c.eq = jest.fn(() => c);
       c.in = jest.fn(() => c);
