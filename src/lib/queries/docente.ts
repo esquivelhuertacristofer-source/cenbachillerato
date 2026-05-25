@@ -1180,3 +1180,159 @@ export async function getFichasBibliotecaPorSemestre(
     };
   });
 }
+
+// ── Planteamiento académico (contenido pedagógico) ─────────────────────────
+
+export interface PlanteamientoContenido {
+  id: string;
+  progresion_id: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  contenido: Record<string, any>;
+  version_curricular: string;
+  nivel_revision: string;
+  updated_at: string;
+}
+
+export interface AvanceProgresion {
+  progresion_id: string;
+  total_alumnos: number;
+  alumnos_con_actividad: number;
+  pct_completion: number;
+  score_promedio: number | null;
+}
+
+/**
+ * Devuelve el contenido pedagógico MCCEMS de una progresión específica.
+ * Retorna null si la progresión no tiene planteamiento cargado.
+ */
+export async function getPlanteamientoPorProgresion(
+  progresionId: string
+): Promise<PlanteamientoContenido | null> {
+  const sb = await getSupabaseServer();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sba: any = sb;
+  const { data, error } = await sba
+    .from("planteamiento_progresiones")
+    .select("id, progresion_id, contenido, version_curricular, nivel_revision, updated_at")
+    .eq("progresion_id", progresionId)
+    .eq("version_curricular", "MCCEMS_2025")
+    .maybeSingle();
+
+  if (error || !data) return null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return data as PlanteamientoContenido;
+}
+
+/**
+ * Devuelve mapa { progresion_id: contenido } para todas las progresiones
+ * del semestre del grupo. Útil para precargar el visor de contenido.
+ */
+export async function getPlanteamientosDelGrupo(
+  grupoId: string
+): Promise<Map<string, PlanteamientoContenido>> {
+  const sb = await getSupabaseServer();
+
+  const { data: grupoRaw } = await sb
+    .from("grupos")
+    .select("semestre")
+    .eq("id", grupoId)
+    .maybeSingle();
+
+  if (!grupoRaw) return new Map();
+
+  // Obtener IDs de todas las progresiones del semestre via uac
+  const { data: uacs } = await sb
+    .from("uac")
+    .select("id")
+    .eq("semestre", grupoRaw.semestre);
+
+  if (!uacs || uacs.length === 0) return new Map();
+
+  const uacIds = uacs.map((u) => u.id);
+
+  const { data: progresiones } = await sb
+    .from("progresiones")
+    .select("id")
+    .in("uac_id", uacIds);
+
+  if (!progresiones || progresiones.length === 0) return new Map();
+
+  const progresionIds = progresiones.map((p) => p.id);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sba: any = sb;
+  const { data: planteamientos } = await sba
+    .from("planteamiento_progresiones")
+    .select("id, progresion_id, contenido, version_curricular, nivel_revision, updated_at")
+    .in("progresion_id", progresionIds)
+    .eq("version_curricular", "MCCEMS_2025");
+
+  const resultado = new Map<string, PlanteamientoContenido>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  for (const p of (planteamientos ?? []) as any[]) {
+    resultado.set(p.progresion_id as string, p as PlanteamientoContenido);
+  }
+  return resultado;
+}
+
+/**
+ * Calcula avance de los alumnos del grupo en una progresión específica:
+ * % de alumnos que completaron alguna actividad de esa progresión y score promedio.
+ */
+export async function getAvanceGrupoEnProgresion(
+  grupoId: string,
+  progresionId: string
+): Promise<AvanceProgresion> {
+  const sb = await getSupabaseServer();
+
+  // Total alumnos en el grupo
+  const { count: totalAlumnos } = await sb
+    .from("alumnos_grupos")
+    .select("id_alumno", { count: "exact", head: true })
+    .eq("id_grupo", grupoId);
+
+  if (!totalAlumnos || totalAlumnos === 0) {
+    return { progresion_id: progresionId, total_alumnos: 0, alumnos_con_actividad: 0, pct_completion: 0, score_promedio: null };
+  }
+
+  // Actividades de la progresión
+  const { data: actividades } = await sb
+    .from("actividades")
+    .select("id")
+    .eq("progresion_id", progresionId);
+
+  if (!actividades || actividades.length === 0) {
+    return { progresion_id: progresionId, total_alumnos: totalAlumnos, alumnos_con_actividad: 0, pct_completion: 0, score_promedio: null };
+  }
+
+  const actividadIds = actividades.map((a) => a.id);
+
+  // Alumnos del grupo
+  const { data: alumnosGrupo } = await sb
+    .from("alumnos_grupos")
+    .select("id_alumno")
+    .eq("id_grupo", grupoId);
+
+  const alumnoIds = (alumnosGrupo ?? []).map((a) => a.id_alumno);
+
+  // Intentos completados de esos alumnos en esas actividades
+  const { data: intentos } = await sb
+    .from("intentos")
+    .select("user_id, score")
+    .in("actividad_id", actividadIds)
+    .in("user_id", alumnoIds)
+    .eq("status", "completed");
+
+  const alumnosConActividad = new Set((intentos ?? []).map((i) => i.user_id)).size;
+  const pct = Math.round((alumnosConActividad / totalAlumnos) * 100);
+  const scores = (intentos ?? []).map((i) => i.score).filter((s): s is number => s !== null);
+  const scorePromedio = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : null;
+
+  return {
+    progresion_id: progresionId,
+    total_alumnos: totalAlumnos,
+    alumnos_con_actividad: alumnosConActividad,
+    pct_completion: pct,
+    score_promedio: scorePromedio,
+  };
+}

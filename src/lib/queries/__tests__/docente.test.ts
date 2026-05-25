@@ -12,6 +12,9 @@ import {
   getAlumnoDetalle,
   getUACsForSemestre,
   getProgresionesAlumno,
+  getPlanteamientoPorProgresion,
+  getPlanteamientosDelGrupo,
+  getAvanceGrupoEnProgresion,
 } from "../docente";
 
 jest.mock("@/lib/supabase-helpers", () => ({
@@ -657,5 +660,175 @@ describe("getProgresionesAlumno", () => {
     const result = await getProgresionesAlumno("a1", "g1");
     expect(result).toHaveLength(1);
     expect(result[0]!.total_actividades).toBe(2);
+  });
+});
+
+// ── getPlanteamientoPorProgresion ───────────────────────────────────────────
+
+describe("getPlanteamientoPorProgresion", () => {
+  test("devuelve contenido cuando existe planteamiento para la progresion", async () => {
+    const planteamiento = {
+      id: "plan-1",
+      progresion_id: "prog-1",
+      contenido: { code: "LC-I-P01", title: "Test" },
+      version_curricular: "MCCEMS_2025",
+      nivel_revision: "borrador",
+      updated_at: "2026-01-01T00:00:00Z",
+    };
+    const chain = makeChain({ data: planteamiento, error: null });
+    const sb = { from: jest.fn(() => chain) } as unknown as Awaited<ReturnType<typeof getSupabaseServer>>;
+    mockGetSupabaseServer.mockResolvedValue(sb);
+
+    const result = await getPlanteamientoPorProgresion("prog-1");
+
+    expect(result).not.toBeNull();
+    expect(result!.progresion_id).toBe("prog-1");
+    expect(result!.contenido).toMatchObject({ code: "LC-I-P01" });
+  });
+
+  test("devuelve null si no existe planteamiento para la progresion", async () => {
+    const chain = makeChain({ data: null, error: null });
+    const sb = { from: jest.fn(() => chain) } as unknown as Awaited<ReturnType<typeof getSupabaseServer>>;
+    mockGetSupabaseServer.mockResolvedValue(sb);
+
+    const result = await getPlanteamientoPorProgresion("prog-inexistente");
+
+    expect(result).toBeNull();
+  });
+
+  test("devuelve null si Supabase retorna error", async () => {
+    const chain = makeChain({ data: null, error: { message: "DB error" } });
+    const sb = { from: jest.fn(() => chain) } as unknown as Awaited<ReturnType<typeof getSupabaseServer>>;
+    mockGetSupabaseServer.mockResolvedValue(sb);
+
+    const result = await getPlanteamientoPorProgresion("prog-error");
+
+    expect(result).toBeNull();
+  });
+});
+
+// ── getPlanteamientosDelGrupo ───────────────────────────────────────────────
+
+describe("getPlanteamientosDelGrupo", () => {
+  test("devuelve Map vacío si el grupo no existe", async () => {
+    const chain = makeChain({ data: null, error: null });
+    const sb = { from: jest.fn(() => chain) } as unknown as Awaited<ReturnType<typeof getSupabaseServer>>;
+    mockGetSupabaseServer.mockResolvedValue(sb);
+
+    const result = await getPlanteamientosDelGrupo("grupo-inexistente");
+
+    expect(result).toBeInstanceOf(Map);
+    expect(result.size).toBe(0);
+  });
+
+  test("devuelve Map vacío si el semestre no tiene UACs", async () => {
+    let call = 0;
+    const responses = [
+      { data: { semestre: 1 }, error: null },
+      { data: [], error: null },
+    ];
+    const makeC = (r: unknown) => makeChain(r);
+    const sb = {
+      from: jest.fn(() => {
+        const r = responses[call] ?? responses[responses.length - 1];
+        call++;
+        return makeC(r);
+      }),
+    } as unknown as Awaited<ReturnType<typeof getSupabaseServer>>;
+    mockGetSupabaseServer.mockResolvedValue(sb);
+
+    const result = await getPlanteamientosDelGrupo("grupo-1");
+
+    expect(result.size).toBe(0);
+  });
+
+  test("devuelve Map con contenido indexado por progresion_id", async () => {
+    const planteamiento = { id: "pp1", progresion_id: "prog-1", contenido: { code: "LC-I-P01" }, version_curricular: "MCCEMS_2025", nivel_revision: "borrador", updated_at: "2026-01-01T00:00:00Z" };
+    let call = 0;
+    const responses = [
+      { data: { semestre: 1 }, error: null },
+      { data: [{ id: "uac-1" }], error: null },
+      { data: [{ id: "prog-1" }], error: null },
+      { data: [planteamiento], error: null },
+    ];
+    const makeC = (r: unknown) => makeChain(r);
+    const sb = {
+      from: jest.fn(() => {
+        const r = responses[call] ?? responses[responses.length - 1];
+        call++;
+        return makeC(r);
+      }),
+    } as unknown as Awaited<ReturnType<typeof getSupabaseServer>>;
+    mockGetSupabaseServer.mockResolvedValue(sb);
+
+    const result = await getPlanteamientosDelGrupo("grupo-1");
+
+    expect(result.size).toBe(1);
+    expect(result.get("prog-1")).toMatchObject({ contenido: { code: "LC-I-P01" } });
+  });
+});
+
+// ── getAvanceGrupoEnProgresion ──────────────────────────────────────────────
+
+describe("getAvanceGrupoEnProgresion", () => {
+  test("retorna pct 0 y score null si no hay alumnos en el grupo", async () => {
+    const chain = makeChain({ data: null, count: 0, error: null });
+    const sb = { from: jest.fn(() => chain) } as unknown as Awaited<ReturnType<typeof getSupabaseServer>>;
+    mockGetSupabaseServer.mockResolvedValue(sb);
+
+    const result = await getAvanceGrupoEnProgresion("grupo-1", "prog-1");
+
+    expect(result.total_alumnos).toBe(0);
+    expect(result.pct_completion).toBe(0);
+    expect(result.score_promedio).toBeNull();
+  });
+
+  test("retorna pct 0 si la progresion no tiene actividades", async () => {
+    let call = 0;
+    const responses = [
+      { data: null, count: 5, error: null },
+      { data: [], error: null },
+    ];
+    const makeC = (r: unknown) => makeChain(r);
+    const sb = {
+      from: jest.fn(() => {
+        const r = responses[call] ?? responses[responses.length - 1];
+        call++;
+        return makeC(r);
+      }),
+    } as unknown as Awaited<ReturnType<typeof getSupabaseServer>>;
+    mockGetSupabaseServer.mockResolvedValue(sb);
+
+    const result = await getAvanceGrupoEnProgresion("grupo-1", "prog-1");
+
+    expect(result.total_alumnos).toBe(5);
+    expect(result.alumnos_con_actividad).toBe(0);
+    expect(result.pct_completion).toBe(0);
+  });
+
+  test("calcula pct y score_promedio correctamente con intentos completados", async () => {
+    let call = 0;
+    const responses = [
+      { data: null, count: 4, error: null },
+      { data: [{ id: "act-1" }], error: null },
+      { data: [{ id_alumno: "a1" }, { id_alumno: "a2" }, { id_alumno: "a3" }, { id_alumno: "a4" }], error: null },
+      { data: [{ user_id: "a1", score: 80 }, { user_id: "a2", score: 90 }], error: null },
+    ];
+    const makeC = (r: unknown) => makeChain(r);
+    const sb = {
+      from: jest.fn(() => {
+        const r = responses[call] ?? responses[responses.length - 1];
+        call++;
+        return makeC(r);
+      }),
+    } as unknown as Awaited<ReturnType<typeof getSupabaseServer>>;
+    mockGetSupabaseServer.mockResolvedValue(sb);
+
+    const result = await getAvanceGrupoEnProgresion("grupo-1", "prog-1");
+
+    expect(result.total_alumnos).toBe(4);
+    expect(result.alumnos_con_actividad).toBe(2);
+    expect(result.pct_completion).toBe(50);
+    expect(result.score_promedio).toBe(85);
   });
 });
