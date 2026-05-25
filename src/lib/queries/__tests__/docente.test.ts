@@ -8,6 +8,10 @@ import {
   getUACsConCompletionGrupo,
   getActividadesDificiles,
   getAlumnosEnRiesgo,
+  getTopAlumnosDocente,
+  getAlumnoDetalle,
+  getUACsForSemestre,
+  getProgresionesAlumno,
 } from "../docente";
 
 jest.mock("@/lib/supabase-helpers", () => ({
@@ -442,5 +446,216 @@ describe("getAlumnosEnRiesgo", () => {
     const result = await getAlumnosEnRiesgo("g1");
     // Ana tiene intento reciente → no debe aparecer en riesgo
     expect(result.find((a) => a.id === "a1")).toBeUndefined();
+  });
+});
+
+// ── getTopAlumnosDocente ────────────────────────────────────────────────────
+
+describe("getTopAlumnosDocente", () => {
+  function makeChainSeq(responses: unknown[]) {
+    let call = 0;
+    const makeC = (res: unknown) => {
+      const resolved = Promise.resolve(res);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const c: Record<string | symbol, any> = {};
+      c.select = jest.fn(() => c);
+      c.eq = jest.fn(() => c);
+      c.in = jest.fn(() => c);
+      c.order = jest.fn(() => c);
+      c.limit = jest.fn(() => c);
+      c.maybeSingle = jest.fn(() => resolved);
+      c.then = (resolved as Promise<unknown>).then.bind(resolved);
+      return c;
+    };
+    return {
+      from: jest.fn(() => {
+        const r = responses[call] ?? responses[responses.length - 1];
+        call++;
+        return makeC(r);
+      }),
+    } as unknown as Awaited<ReturnType<typeof getSupabaseServer>>;
+  }
+
+  test("retorna [] si docente no tiene grupos", async () => {
+    mockGetSupabaseServer.mockResolvedValue(
+      makeChainSeq([{ data: [], error: null }])
+    );
+    const result = await getTopAlumnosDocente("docente-x");
+    expect(result).toEqual([]);
+  });
+
+  test("ordena alumnos por score_total descendente", async () => {
+    mockGetSupabaseServer.mockResolvedValue(
+      makeChainSeq([
+        { data: [{ id: "g1" }], error: null },                                           // grupos
+        { data: [{ id_alumno: "a1" }, { id_alumno: "a2" }], error: null },              // alumnos_grupos
+        { data: [{ id: "a1", full_name: "Ana", email: "ana@t.com" }, { id: "a2", full_name: "Bob", email: "bob@t.com" }], error: null }, // profiles
+        { data: [
+            { user_id: "a1", score: 80 }, { user_id: "a1", score: 90 },                // a1: 170 total
+            { user_id: "a2", score: 95 },                                               // a2: 95 total
+          ], error: null },                                                               // intentos
+      ])
+    );
+    const result = await getTopAlumnosDocente("docente-1", 5);
+    expect(result[0]?.id).toBe("a1");
+    expect(result[0]?.score_total).toBe(170);
+    expect(result[1]?.id).toBe("a2");
+  });
+
+  test("alumno sin intentos completados no aparece en top", async () => {
+    mockGetSupabaseServer.mockResolvedValue(
+      makeChainSeq([
+        { data: [{ id: "g1" }], error: null },
+        { data: [{ id_alumno: "a1" }], error: null },
+        { data: [{ id: "a1", full_name: "Ana", email: "ana@t.com" }], error: null },
+        { data: [], error: null }, // sin intentos
+      ])
+    );
+    const result = await getTopAlumnosDocente("docente-1", 5);
+    expect(result).toHaveLength(0);
+  });
+});
+
+// ── getAlumnoDetalle ────────────────────────────────────────────────────────
+
+describe("getAlumnoDetalle", () => {
+  function makeChainSeq(responses: unknown[]) {
+    let call = 0;
+    const makeC = (res: unknown) => {
+      const resolved = Promise.resolve(res);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const c: Record<string | symbol, any> = {};
+      c.select = jest.fn(() => c);
+      c.eq = jest.fn(() => c);
+      c.in = jest.fn(() => c);
+      c.order = jest.fn(() => c);
+      c.limit = jest.fn(() => c);
+      c.maybeSingle = jest.fn(() => resolved);
+      c.then = (resolved as Promise<unknown>).then.bind(resolved);
+      return c;
+    };
+    return {
+      from: jest.fn(() => {
+        const r = responses[call] ?? responses[responses.length - 1];
+        call++;
+        return makeC(r);
+      }),
+    } as unknown as Awaited<ReturnType<typeof getSupabaseServer>>;
+  }
+
+  test("retorna null si el perfil no existe", async () => {
+    mockGetSupabaseServer.mockResolvedValue(
+      makeChainSeq([{ data: null, error: null }])
+    );
+    const result = await getAlumnoDetalle("alumno-inexistente");
+    expect(result).toBeNull();
+  });
+
+  test("calcula score_promedio y actividades_completadas correctamente", async () => {
+    mockGetSupabaseServer.mockResolvedValue(
+      makeChainSeq([
+        { data: { id: "a1", full_name: "Ana", email: "ana@t.com" }, error: null },  // profile
+        { data: [
+            { id: "i1", actividad_id: "act1", score: 80, tiempo_segundos: 300, status: "completed", completed_at: "2026-01-01", started_at: "2026-01-01" },
+            { id: "i2", actividad_id: "act2", score: 60, tiempo_segundos: 200, status: "completed", completed_at: "2026-01-02", started_at: "2026-01-02" },
+          ], error: null },
+        { data: [{ id: "act1", codigo: "A1", titulo: "Actividad 1" }, { id: "act2", codigo: "A2", titulo: "Actividad 2" }], error: null }, // actividades
+      ])
+    );
+    const result = await getAlumnoDetalle("a1");
+    expect(result).not.toBeNull();
+    expect(result!.actividades_completadas).toBe(2);
+    expect(result!.score_promedio).toBe(70);
+    expect(result!.historial).toHaveLength(2);
+  });
+});
+
+// ── getUACsForSemestre ──────────────────────────────────────────────────────
+
+describe("getUACsForSemestre", () => {
+  function makeSimpleChain(data: unknown) {
+    const resolved = Promise.resolve({ data, error: null });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const c: Record<string | symbol, any> = {};
+    c.select = jest.fn(() => c);
+    c.eq = jest.fn(() => c);
+    c.order = jest.fn(() => c);
+    c.then = (resolved as Promise<unknown>).then.bind(resolved);
+    return c;
+  }
+
+  test("retorna UACs del semestre solicitado", async () => {
+    const uacs = [
+      { id: "u1", codigo: "UAC-I-01", nombre: "UAC Uno", semestre: 1, total_progresiones: 3 },
+      { id: "u2", codigo: "UAC-I-02", nombre: "UAC Dos", semestre: 1, total_progresiones: 4 },
+    ];
+    const sb = {
+      from: jest.fn(() => makeSimpleChain(uacs)),
+    } as unknown as Awaited<ReturnType<typeof getSupabaseServer>>;
+    mockGetSupabaseServer.mockResolvedValue(sb);
+
+    const result = await getUACsForSemestre(1);
+    expect(result).toHaveLength(2);
+    expect(result[0]!.codigo).toBe("UAC-I-01");
+  });
+
+  test("retorna [] si no hay UACs para el semestre", async () => {
+    const sb = {
+      from: jest.fn(() => makeSimpleChain(null)),
+    } as unknown as Awaited<ReturnType<typeof getSupabaseServer>>;
+    mockGetSupabaseServer.mockResolvedValue(sb);
+
+    const result = await getUACsForSemestre(9);
+    expect(result).toEqual([]);
+  });
+});
+
+// ── getProgresionesAlumno ───────────────────────────────────────────────────
+
+describe("getProgresionesAlumno", () => {
+  function makeChainSeq(responses: unknown[]) {
+    let call = 0;
+    const makeC = (res: unknown) => {
+      const resolved = Promise.resolve(res);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const c: Record<string | symbol, any> = {};
+      c.select = jest.fn(() => c);
+      c.eq = jest.fn(() => c);
+      c.in = jest.fn(() => c);
+      c.order = jest.fn(() => c);
+      c.maybeSingle = jest.fn(() => resolved);
+      c.then = (resolved as Promise<unknown>).then.bind(resolved);
+      return c;
+    };
+    return {
+      from: jest.fn(() => {
+        const r = responses[call] ?? responses[responses.length - 1];
+        call++;
+        return makeC(r);
+      }),
+    } as unknown as Awaited<ReturnType<typeof getSupabaseServer>>;
+  }
+
+  test("retorna [] si el grupo no existe", async () => {
+    mockGetSupabaseServer.mockResolvedValue(
+      makeChainSeq([{ data: null, error: null }])
+    );
+    const result = await getProgresionesAlumno("a1", "g-inexistente");
+    expect(result).toEqual([]);
+  });
+
+  test("calcula pct_completion por progresion correctamente", async () => {
+    mockGetSupabaseServer.mockResolvedValue(
+      makeChainSeq([
+        { data: { semestre: 1 }, error: null },                                         // grupo
+        { data: [{ id: "u1", codigo: "UAC-I-01" }], error: null },                      // uacs
+        { data: [{ id: "p1", codigo: "P1", numero: 1, titulo: "Prog 1", uac_id: "u1" }], error: null }, // progresiones
+        { data: [{ id: "act1" }, { id: "act2" }], error: null },                         // actividades (2 total)
+        { data: null, count: 1, error: null },                                           // intentos completados (1 de 2)
+      ])
+    );
+    const result = await getProgresionesAlumno("a1", "g1");
+    expect(result).toHaveLength(1);
+    expect(result[0]!.total_actividades).toBe(2);
   });
 });

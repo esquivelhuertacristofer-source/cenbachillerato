@@ -893,6 +893,258 @@ export async function getIntentosRecientesDocente(
   });
 }
 
+// ── Queries nuevas para componentes clonados de Financiera ─────────────────
+
+export interface TopAlumno {
+  id: string;
+  full_name: string | null;
+  email: string;
+  actividades_completadas: number;
+  score_total: number;
+  score_promedio: number | null;
+}
+
+export interface AlumnoDetalle {
+  id: string;
+  full_name: string | null;
+  email: string;
+  actividades_completadas: number;
+  score_promedio: number | null;
+  tiempo_total_minutos: number;
+  ultimo_intento: string | null;
+  historial: Array<{
+    id: string;
+    actividad_titulo: string;
+    actividad_codigo: string;
+    score: number | null;
+    status: string;
+    completed_at: string | null;
+    started_at: string;
+  }>;
+}
+
+export interface UACResumen {
+  id: string;
+  codigo: string;
+  nombre: string;
+  semestre: number;
+  total_progresiones: number;
+}
+
+export interface ProgresionAlumno {
+  id: string;
+  codigo: string;
+  numero: number;
+  titulo: string;
+  uac_id: string;
+  uac_codigo: string;
+  actividades_completadas: number;
+  total_actividades: number;
+  pct_completion: number;
+}
+
+/** Top N alumnos del docente por score acumulado de intentos completados */
+export async function getTopAlumnosDocente(
+  docenteId: string,
+  limit = 5
+): Promise<TopAlumno[]> {
+  const sb = await getSupabaseServer();
+
+  const { data: grupos } = await sb
+    .from('grupos')
+    .select('id')
+    .eq('id_docente', docenteId);
+
+  if (!grupos || grupos.length === 0) return [];
+
+  const grupoIds = grupos.map((g) => g.id);
+
+  const { data: relaciones } = await sb
+    .from('alumnos_grupos')
+    .select('id_alumno')
+    .in('id_grupo', grupoIds);
+
+  const alumnoIds = [...new Set(relaciones?.map((r) => r.id_alumno) ?? [])];
+  if (alumnoIds.length === 0) return [];
+
+  const { data: profiles } = await sb
+    .from('profiles')
+    .select('id, full_name, email')
+    .in('id', alumnoIds);
+
+  const { data: intentos } = await sb
+    .from('intentos')
+    .select('user_id, score')
+    .in('user_id', alumnoIds)
+    .eq('status', 'completed');
+
+  const statsPorAlumno = new Map<string, { count: number; scoreSum: number }>();
+  for (const i of intentos ?? []) {
+    const prev = statsPorAlumno.get(i.user_id) ?? { count: 0, scoreSum: 0 };
+    statsPorAlumno.set(i.user_id, {
+      count: prev.count + 1,
+      scoreSum: prev.scoreSum + (i.score ?? 0),
+    });
+  }
+
+  return (profiles ?? [])
+    .map((p) => {
+      const stats = statsPorAlumno.get(p.id);
+      return {
+        id: p.id,
+        full_name: p.full_name,
+        email: p.email,
+        actividades_completadas: stats?.count ?? 0,
+        score_total: stats?.scoreSum ?? 0,
+        score_promedio: stats && stats.count > 0 ? Math.round(stats.scoreSum / stats.count) : null,
+      };
+    })
+    .filter((a) => a.actividades_completadas > 0)
+    .sort((a, b) => b.score_total - a.score_total)
+    .slice(0, limit);
+}
+
+/** Detalle completo de un alumno: stats + historial de intentos */
+export async function getAlumnoDetalle(alumnoId: string): Promise<AlumnoDetalle | null> {
+  const sb = await getSupabaseServer();
+
+  const { data: profile } = await sb
+    .from('profiles')
+    .select('id, full_name, email')
+    .eq('id', alumnoId)
+    .maybeSingle();
+
+  if (!profile) return null;
+
+  const { data: intentos } = await sb
+    .from('intentos')
+    .select('id, actividad_id, score, tiempo_segundos, status, completed_at, started_at')
+    .eq('user_id', alumnoId)
+    .order('started_at', { ascending: false })
+    .limit(50);
+
+  const actividadIds = [...new Set((intentos ?? []).map((i) => i.actividad_id))];
+  const { data: actividades } = actividadIds.length > 0
+    ? await sb.from('actividades').select('id, codigo, titulo').in('id', actividadIds)
+    : { data: [] };
+
+  const actMap = new Map((actividades ?? []).map((a) => [a.id, a]));
+
+  const completadas = (intentos ?? []).filter((i) => i.status === 'completed');
+  const scoreSum = completadas.reduce((s, i) => s + (i.score ?? 0), 0);
+  const tiempoSum = completadas.reduce((s, i) => s + (i.tiempo_segundos ?? 0), 0);
+  const ultimo = completadas[0]?.completed_at ?? null;
+
+  return {
+    id: profile.id,
+    full_name: profile.full_name,
+    email: profile.email,
+    actividades_completadas: completadas.length,
+    score_promedio: completadas.length > 0 ? Math.round(scoreSum / completadas.length) : null,
+    tiempo_total_minutos: Math.round(tiempoSum / 60),
+    ultimo_intento: ultimo,
+    historial: (intentos ?? []).map((i) => {
+      const act = actMap.get(i.actividad_id);
+      return {
+        id: i.id,
+        actividad_titulo: act?.titulo ?? '—',
+        actividad_codigo: act?.codigo ?? '—',
+        score: i.score,
+        status: i.status,
+        completed_at: i.completed_at,
+        started_at: i.started_at,
+      };
+    }),
+  };
+}
+
+/** UACs de un semestre (para página módulos) */
+export async function getUACsForSemestre(semestre: number): Promise<UACResumen[]> {
+  const sb = await getSupabaseServer();
+
+  const { data } = await sb
+    .from('uac')
+    .select('id, codigo, nombre, semestre, total_progresiones')
+    .eq('semestre', semestre)
+    .order('orden', { ascending: true });
+
+  return data ?? [];
+}
+
+/** Progresiones de un alumno en su grupo con completion individual */
+export async function getProgresionesAlumno(
+  alumnoId: string,
+  grupoId: string
+): Promise<ProgresionAlumno[]> {
+  const sb = await getSupabaseServer();
+
+  const { data: grupo } = await sb
+    .from('grupos')
+    .select('semestre')
+    .eq('id', grupoId)
+    .maybeSingle();
+
+  if (!grupo) return [];
+
+  const { data: uacs } = await sb
+    .from('uac')
+    .select('id, codigo')
+    .eq('semestre', grupo.semestre);
+
+  if (!uacs || uacs.length === 0) return [];
+
+  const uacIds = uacs.map((u) => u.id);
+  const uacMap = new Map(uacs.map((u) => [u.id, u]));
+
+  const { data: progresiones } = await sb
+    .from('progresiones')
+    .select('id, codigo, numero, titulo, uac_id')
+    .in('uac_id', uacIds)
+    .order('uac_id')
+    .order('numero');
+
+  if (!progresiones || progresiones.length === 0) return [];
+
+  return await Promise.all(
+    progresiones.map(async (prog) => {
+      const { data: actividades } = await sb
+        .from('actividades')
+        .select('id')
+        .eq('progresion_id', prog.id)
+        .eq('estado', 'publicada');
+
+      const actividadIds = (actividades ?? []).map((a) => a.id);
+      let completadas = 0;
+
+      if (actividadIds.length > 0) {
+        const { count } = await sb
+          .from('intentos')
+          .select('id', { count: 'exact', head: true })
+          .in('actividad_id', actividadIds)
+          .eq('user_id', alumnoId)
+          .eq('status', 'completed');
+        completadas = count ?? 0;
+      }
+
+      const uac = uacMap.get(prog.uac_id);
+      const total = actividadIds.length;
+      const pct = total > 0 ? Math.round((completadas / total) * 100) : 0;
+
+      return {
+        id: prog.id,
+        codigo: prog.codigo,
+        numero: prog.numero,
+        titulo: prog.titulo,
+        uac_id: prog.uac_id,
+        uac_codigo: uac?.codigo ?? '—',
+        actividades_completadas: completadas,
+        total_actividades: total,
+        pct_completion: pct,
+      };
+    })
+  );
+}
+
 /** Fichas de biblioteca del semestre del grupo */
 export async function getFichasBibliotecaPorSemestre(
   semestre: number
