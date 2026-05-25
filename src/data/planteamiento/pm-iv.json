@@ -1,0 +1,93 @@
+{
+  "PM-IV-P01": {
+    "code": "PM-IV-P01",
+    "title": "Comprende el concepto de función y sus representaciones (tabular, gráfica, algebraica, verbal).",
+    "level": "Pensamiento Matemático IV",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Funciones",
+    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
+    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
+    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
+    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
+    "teacher_tips": ["_TODO: Contenido pendiente"]
+  },
+  "PM-IV-P02": {
+    "code": "PM-IV-P02",
+    "title": "Analiza y grafica funciones polinomiales de primer y segundo grado y sus transformaciones.",
+    "level": "Pensamiento Matemático IV",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Funciones",
+    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
+    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
+    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
+    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
+    "teacher_tips": ["_TODO: Contenido pendiente"]
+  },
+  "PM-IV-P03": {
+    "code": "PM-IV-P03",
+    "title": "Define las razones trigonométricas en triángulos rectángulos y las aplica en problemas de medición indirecta.",
+    "level": "Pensamiento Matemático IV",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Trigonometría",
+    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
+    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
+    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
+    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
+    "teacher_tips": ["_TODO: Contenido pendiente"]
+  },
+  "PM-IV-P04": {
+    "code": "PM-IV-P04",
+    "title": "Extiende las razones trigonométricas a ángulos en el círculo unitario y maneja sus valores.",
+    "level": "Pensamiento Matemático IV",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Trigonometría",
+    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
+    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
+    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
+    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
+    "teacher_tips": ["_TODO: Contenido pendiente"]
+  },
+  "PM-IV-P05": {
+    "code": "PM-IV-P05",
+    "title": "Aplica la Ley de Senos y la Ley de Cosenos en la resolución de triángulos oblicuángulos.",
+    "level": "Pensamiento Matemático IV",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Trigonometría",
+    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
+    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
+    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
+    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
+    "teacher_tips": ["_TODO: Contenido pendiente"]
+  },
+  "PM-IV-P06": {
+    "code": "PM-IV-P06",
+    "title": "Introduce la geometría analítica: distancia, punto medio y ecuación de la recta en el plano cartesiano.",
+    "level": "Pensamiento Matemático IV",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Geometría analítica",
+    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
+    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
+    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
+    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
+    "teacher_tips": ["_TODO: Contenido pendiente"]
+  },
+  "PM-IV-P07": {
+    "code": "PM-IV-P07",
+    "title": "Analiza cónicas básicas: circunferencia y parábola como lugares geométricos en el plano.",
+    "level": "Pensamiento Matemático IV",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Geometría analítica",
+    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
+    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
+    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
+    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
+    "teacher_tips": ["_TODO: Contenido pendiente"]
+  }
+}

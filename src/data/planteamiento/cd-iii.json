@@ -1,0 +1,54 @@
+{
+  "CD-III-P01": {
+    "code": "CD-III-P01",
+    "title": "Analiza críticamente la comunicación digital multimodal y sus efectos en la construcción de identidades y realidades sociales.",
+    "level": "Cultura Digital III",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Ciudadanía digital crítica",
+    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
+    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
+    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
+    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
+    "teacher_tips": ["_TODO: Contenido pendiente"]
+  },
+  "CD-III-P02": {
+    "code": "CD-III-P02",
+    "title": "Produce contenidos digitales de calidad orientados a la transformación social con perspectiva de género e inclusión.",
+    "level": "Cultura Digital III",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Producción digital con perspectiva crítica",
+    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
+    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
+    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
+    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
+    "teacher_tips": ["_TODO: Contenido pendiente"]
+  },
+  "CD-III-P03": {
+    "code": "CD-III-P03",
+    "title": "Explora vocaciones y trayectorias profesionales vinculadas a las tecnologías digitales con perspectiva de género.",
+    "level": "Cultura Digital III",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Vocaciones y trayectorias digitales",
+    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
+    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
+    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
+    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
+    "teacher_tips": ["_TODO: Contenido pendiente"]
+  },
+  "CD-III-P04": {
+    "code": "CD-III-P04",
+    "title": "Diseña un proyecto de participación comunitaria mediado por tecnologías digitales.",
+    "level": "Cultura Digital III",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Proyecto comunitario digital",
+    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
+    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
+    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
+    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
+    "teacher_tips": ["_TODO: Contenido pendiente"]
+  }
+}

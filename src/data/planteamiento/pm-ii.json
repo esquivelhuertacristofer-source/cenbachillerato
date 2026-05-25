@@ -1,0 +1,80 @@
+{
+  "PM-II-P01": {
+    "code": "PM-II-P01",
+    "title": "Identifica y describe patrones numéricos y geométricos para generalizarlos mediante expresiones algebraicas.",
+    "level": "Pensamiento Matemático II",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Álgebra",
+    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
+    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
+    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
+    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
+    "teacher_tips": ["_TODO: Contenido pendiente"]
+  },
+  "PM-II-P02": {
+    "code": "PM-II-P02",
+    "title": "Interpreta y manipula expresiones algebraicas: monomios, polinomios, operaciones entre ellos.",
+    "level": "Pensamiento Matemático II",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Álgebra",
+    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
+    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
+    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
+    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
+    "teacher_tips": ["_TODO: Contenido pendiente"]
+  },
+  "PM-II-P03": {
+    "code": "PM-II-P03",
+    "title": "Factoriza polinomios mediante técnicas básicas: factor común, diferencia de cuadrados, trinomio cuadrado perfecto.",
+    "level": "Pensamiento Matemático II",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Álgebra",
+    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
+    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
+    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
+    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
+    "teacher_tips": ["_TODO: Contenido pendiente"]
+  },
+  "PM-II-P04": {
+    "code": "PM-II-P04",
+    "title": "Plantea y resuelve ecuaciones lineales en una variable en contextos problemáticos.",
+    "level": "Pensamiento Matemático II",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Álgebra",
+    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
+    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
+    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
+    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
+    "teacher_tips": ["_TODO: Contenido pendiente"]
+  },
+  "PM-II-P05": {
+    "code": "PM-II-P05",
+    "title": "Plantea y resuelve sistemas de ecuaciones lineales en dos variables mediante los métodos de sustitución, igualación y eliminación.",
+    "level": "Pensamiento Matemático II",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Álgebra",
+    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
+    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
+    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
+    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
+    "teacher_tips": ["_TODO: Contenido pendiente"]
+  },
+  "PM-II-P06": {
+    "code": "PM-II-P06",
+    "title": "Aplica inecuaciones lineales para describir y resolver situaciones de restricción y optimización básica.",
+    "level": "Pensamiento Matemático II",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Álgebra",
+    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
+    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
+    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
+    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
+    "teacher_tips": ["_TODO: Contenido pendiente"]
+  }
+}

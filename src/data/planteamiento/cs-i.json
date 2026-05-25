@@ -1,0 +1,467 @@
+{
+  "CS-I-P01": {
+    "code": "CS-I-P01",
+    "title": "El Estado mexicano: examino sus funciones, instituciones y mi relación como ciudadano",
+    "level": "Ciencias Sociales I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Estado y ciudadanía",
+    "metadata": {
+      "objective": "El estudiante examinará la noción de Estado, sus funciones e instituciones, y la relación entre Estado y ciudadanía en el contexto mexicano, identificando las formas de democracia representativa, participativa y deliberativa.",
+      "competencies": [
+        "Define el Estado y distingue sus elementos: territorio, población, gobierno y soberanía",
+        "Describe las funciones del Estado mexicano y sus poderes (Ejecutivo, Legislativo, Judicial)",
+        "Diferencia democracia representativa, participativa y deliberativa con ejemplos mexicanos",
+        "Analiza el papel de las instituciones del Estado en la vida cotidiana de los ciudadanos",
+        "Reflexiona sobre la relación entre ciudadanos y Estado en contextos de exigencia de derechos"
+      ],
+      "materials": [
+        "Organigrama del Estado mexicano (Constitución de 1917 vigente)",
+        "Noticias recientes sobre decisiones del gobierno federal, estatal o municipal",
+        "Ficha de análisis: 'Qué hace el Estado por mí y qué hago yo por el Estado'",
+        "Fragmento de la Constitución Política de los Estados Unidos Mexicanos (Arts. 39-41)",
+        "Casos de participación ciudadana: consultas populares, referéndums"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Qué es el Estado en mi vida cotidiana?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Funciones, poderes y formas de democracia" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Mi rol como ciudadano en el Estado" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — El Estado en lo cotidiano",
+          "duration": "10 min",
+          "description": "El docente pregunta: ¿qué hicieron hoy que tenga relación con el Estado? Los estudiantes reflexionan: llegaron en carretera estatal, comieron alimentos regulados por la COFEPRIS, asistieron a una escuela pública financiada por la SEP, respiraron aire cuya calidad monitorea la SEMARNAT. El Estado está presente en casi cada acto de la vida cotidiana — muchas veces sin que lo notemos.",
+          "activity": "En parejas, los estudiantes listan 5 cosas de su día que involucran al Estado (servicios, infraestructura, regulaciones, instituciones). Comparten en plenaria y el docente construye un mapa visual de las funciones del Estado a partir de los ejemplos del grupo."
+        },
+        {
+          "title": "FASE II: DESARROLLO — Estado, poderes y democracia",
+          "duration": "30 min",
+          "description": "Se construyen 3 conceptos: 1) El Estado y sus elementos: territorio (fronteras reconocidas), población (ciudadanos con derechos y obligaciones), gobierno (quienes ejercen el poder) y soberanía (poder supremo reconocido). 2) Poderes del Estado mexicano: Ejecutivo (Presidencia, Secretarías), Legislativo (Cámara de Diputados y Senado), Judicial (SCJN, Tribunales). División de poderes como mecanismo de control mutuo. 3) Formas de democracia: representativa (votamos para elegir representantes), participativa (referéndums, consultas populares, como la de 2021 sobre juicio a expresidentes), deliberativa (asambleas comunitarias, cabildos abiertos).",
+          "activity": "Juego de roles 'Sesión del Congreso': el grupo se divide en 3 bloques — diputados que proponen una ley de transporte escolar gratuito, senadores que la revisan y el presidente que decide firmarla o vetarla. La dinámica simula el proceso legislativo real y hace tangible la división de poderes."
+        },
+        {
+          "title": "FASE III: CIERRE — Ciudadanía activa",
+          "duration": "10 min",
+          "description": "El docente introduce la distinción clave: el Estado no es lo mismo que el gobierno. El Estado es la estructura permanente; el gobierno es quien lo administra temporalmente. Reflexión: ¿qué pasa cuando el gobierno actúa en contra de los ciudadanos? ¿Qué mecanismos tienen los ciudadanos para exigir sus derechos? (amparos, organizaciones civiles, movilización social).",
+          "activity": "Ticket de salida: elige una institución del Estado mexicano (IMSS, SEP, INE, SCJN) y escribe: qué función cumple, a qué poder pertenece, y cómo un ciudadano podría relacionarse con ella para ejercer un derecho."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "El Estado es la forma de organización política que define las sociedades modernas. En México, el Estado surge de la Revolución de 1910 y se consolida con la Constitución de 1917 — una de las primeras constituciones sociales del mundo, que reconoció derechos laborales, agrarios y educativos antes que la mayoría de los países europeos.",
+      "sections": [
+        {
+          "subtitle": "El Estado: origen, elementos y funciones",
+          "content": "El Estado moderno se define como la institución política soberana que ejerce autoridad sobre un territorio y una población determinados. Sus elementos fundamentales son: territorio (espacio geográfico delimitado por fronteras reconocidas internacionalmente), población (conjunto de personas que habitan el territorio y son sujetos de derechos y obligaciones), gobierno (conjunto de personas e instituciones que ejercen el poder del Estado) y soberanía (poder supremo que no reconoce autoridad por encima de sí mismo al interior, y que es reconocido por otros Estados al exterior). Las funciones clásicas del Estado son: legislar (crear normas), administrar (ejecutar políticas) y juzgar (resolver conflictos según las normas). En el Estado mexicano, estas funciones corresponden a los poderes Legislativo, Ejecutivo y Judicial, consagrados en los artículos 49 al 107 de la Constitución Política de los Estados Unidos Mexicanos."
+        },
+        {
+          "subtitle": "Democracia: más que votar",
+          "content": "La democracia no se reduce a las elecciones. Los teóricos políticos contemporáneos distinguen tres dimensiones: la democracia representativa (los ciudadanos eligen a sus representantes mediante el voto — presidentes, diputados, senadores, gobernadores, alcaldes — quienes toman decisiones en su nombre); la democracia participativa (los ciudadanos intervienen directamente en decisiones específicas mediante consultas populares, referéndums, plebiscitos e iniciativas ciudadanas — en México, la Ley Federal de Consulta Popular de 2014 regula este mecanismo); y la democracia deliberativa (procesos de discusión pública argumentada donde los ciudadanos razonan colectivamente sobre los asuntos comunes — asambleas comunitarias, foros de consulta, presupuestos participativos). Una democracia robusta integra las tres dimensiones."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuáles son los cuatro elementos del Estado moderno?",
+          "options": [
+            "Presidente, Congreso, SCJN y ejército",
+            "Territorio, población, gobierno y soberanía",
+            "Constitución, leyes, instituciones y ciudadanos",
+            "Nación, cultura, idioma y religión"
+          ],
+          "correct": "Territorio, población, gobierno y soberanía"
+        },
+        {
+          "question": "¿A qué poder del Estado pertenece la Cámara de Diputados?",
+          "options": ["Ejecutivo", "Judicial", "Legislativo", "Electoral"],
+          "correct": "Legislativo"
+        },
+        {
+          "question": "¿Cuál es un ejemplo de democracia participativa en México?",
+          "options": [
+            "La elección del Presidente de la República",
+            "La consulta popular de 2021 sobre juicio a expresidentes",
+            "Las sesiones del Senado",
+            "La designación de ministros de la SCJN"
+          ],
+          "correct": "La consulta popular de 2021 sobre juicio a expresidentes"
+        },
+        {
+          "question": "¿Cuál es la diferencia entre Estado y gobierno?",
+          "options": [
+            "Son exactamente lo mismo",
+            "El Estado es la estructura permanente; el gobierno es quien lo administra temporalmente",
+            "El gobierno es permanente; el Estado cambia con las elecciones",
+            "El Estado solo existe a nivel federal; el gobierno existe en todos los niveles"
+          ],
+          "correct": "El Estado es la estructura permanente; el gobierno es quien lo administra temporalmente"
+        },
+        {
+          "question": "¿En qué artículo de la Constitución se establece que la soberanía nacional reside en el pueblo?",
+          "options": ["Art. 1°", "Art. 39", "Art. 123", "Art. 3°"],
+          "correct": "Art. 39"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: define correctamente los 4 elementos del Estado, identifica a qué poder pertenece al menos 5 instituciones del Estado mexicano, distingue las 3 formas de democracia con ejemplos concretos del contexto mexicano, y reflexiona sobre al menos 1 mecanismo ciudadano para exigir derechos al Estado."
+    },
+    "teacher_tips": [
+      "El juego de roles legislativo funciona mejor con un caso concreto y local: en lugar de una ley genérica, usa una situación real de su municipio o plantel (falta de transporte escolar, condición del parque, seguridad vial) — el contexto auténtico maximiza la implicación.",
+      "Para evitar la desmotivación ('la política no me importa'), parte siempre de servicios que los estudiantes ya usan: la beca Benito Juárez, el IMSS de sus padres, la SEP que financia su escuela — estos son el Estado en acción en su vida real.",
+      "Conecta con el INE: el proceso de credencialización a los 18 años es el momento en que los jóvenes se convierten formalmente en ciudadanos con derecho al voto — preguntar cuántos ya se inscribieron o piensan hacerlo da relevancia inmediata al tema."
+    ]
+  },
+  "CS-I-P02": {
+    "code": "CS-I-P02",
+    "title": "Ciudadanía y derechos: analizo la ciudadanía como derecho histórico y práctica social",
+    "level": "Ciencias Sociales I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Estado y ciudadanía",
+    "metadata": {
+      "objective": "El estudiante analizará la ciudadanía como derecho histórico y práctica social, reconociendo la diferencia entre ciudadanía formal y sustantiva, y las generaciones de derechos humanos en el contexto mexicano.",
+      "competencies": [
+        "Distingue ciudadanía formal (legal) de ciudadanía sustantiva (ejercida en la práctica)",
+        "Clasifica los derechos civiles, políticos y sociales como generaciones de derechos humanos",
+        "Identifica brechas reales en el ejercicio de la ciudadanía en México (pobreza, discriminación, género)",
+        "Analiza la historia de la ampliación de derechos ciudadanos en México (sufragio femenino, LGBTQ+)",
+        "Reflexiona sobre qué condiciones materiales y culturales permiten ejercer la ciudadanía plenamente"
+      ],
+      "materials": [
+        "Línea del tiempo de derechos ciudadanos en México (1810-2025)",
+        "Datos del CONEVAL sobre pobreza y acceso a derechos sociales",
+        "Caso de estudio: el voto femenino en México (1953) y sus antecedentes",
+        "Declaración Universal de los Derechos Humanos (fragmentos clave)",
+        "Noticias recientes sobre derechos negados o exigidos en México"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Tengo todos los derechos que la ley dice?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Generaciones de derechos y brechas reales" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Ciudadanía como práctica cotidiana" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — La brecha entre el papel y la práctica",
+          "duration": "10 min",
+          "description": "El docente pregunta: ¿conoces algún derecho que la Constitución te garantiza pero que en la práctica no puedes ejercer? Se recogen respuestas del grupo: derecho a la salud (sin IMSS o ISSSTE), derecho a la educación (sin internet para estudiar en línea), derecho al trabajo (desempleo juvenil). Se introduce la distinción central: ciudadanía formal (lo que dice la ley) vs. ciudadanía sustantiva (lo que realmente se puede ejercer).",
+          "activity": "Actividad '¿Tienes este derecho?': el docente lee una lista de 10 derechos constitucionales y los estudiantes señalan cuáles pueden ejercer plenamente, cuáles parcialmente y cuáles no tienen acceso real. Los resultados revelan las brechas ciudadanas en su propio contexto."
+        },
+        {
+          "title": "FASE II: DESARROLLO — Las generaciones de derechos",
+          "duration": "30 min",
+          "description": "Se trabajan las generaciones de derechos humanos: 1ª generación — derechos civiles y políticos (libertad, voto, debido proceso — siglo XVIII-XIX). 2ª generación — derechos económicos, sociales y culturales (trabajo, salud, educación, vivienda — siglo XX). 3ª generación — derechos de solidaridad (medio ambiente sano, paz, desarrollo — siglo XXI). En México: Constitución de 1917 incluyó derechos de 2ª generación antes que muchos países. Se analiza la historia de la ampliación: voto femenino (1953), derechos LGBTQ+ (matrimonio igualitario en todos los estados: 2022).",
+          "activity": "Análisis de caso en grupos: cada grupo recibe una noticia reciente sobre un derecho exigido o negado en México (comunidades sin agua potable, mujeres sin acceso a aborto legal, pueblos indígenas sin educación en su lengua). Responden: ¿qué derecho está en juego? ¿es 1ª, 2ª o 3ª generación? ¿qué brecha representa? ¿qué acciones ciudadanas se tomaron?"
+        },
+        {
+          "title": "FASE III: CIERRE — Ciudadanía como práctica",
+          "duration": "10 min",
+          "description": "El docente enfatiza que la ciudadanía no es solo un estatus legal — es una práctica activa que requiere información, organización y voluntad política. Las brechas ciudadanas no se cierran solas: son resultado de movilización, legislación y cambio cultural. Se reflexiona: ¿qué podemos hacer desde el bachillerato para ejercer y promover la ciudadanía?",
+          "activity": "Ticket de salida: identifica una brecha ciudadana en tu comunidad o plantel (acceso, discriminación, falta de servicio). Describe brevemente qué derecho está en juego, a qué generación pertenece, y una acción concreta que podrías tomar para contribuir a cerrar esa brecha."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La ciudadanía es una de las construcciones políticas más poderosas de la modernidad: define quién pertenece a una comunidad política y qué derechos y obligaciones le corresponden. Pero la ciudadanía no es estática — ha sido históricamente negada a mujeres, pueblos indígenas, personas pobres y minorías, y ha sido ampliada gracias a luchas sociales concretas.",
+      "sections": [
+        {
+          "subtitle": "Ciudadanía formal y ciudadanía sustantiva: la brecha que importa",
+          "content": "La ciudadanía formal es el estatuto legal que una persona tiene en un Estado: ser reconocida como ciudadana con derechos consagrados en la ley. En México, la Constitución reconoce formalmente a todos los ciudadanos mayores de 18 años como iguales ante la ley. La ciudadanía sustantiva, en cambio, refiere al grado efectivo en que esos derechos pueden ejercerse en la práctica. La brecha entre ambas es enorme en México: según el CONEVAL (2022), el 36.3% de la población vive en pobreza — lo que significa que no puede ejercer plenamente derechos como acceso a servicios de salud de calidad (29.3% en carencia), seguridad social (39.4%), vivienda digna (12.0%) o alimentación nutritiva (25.3%). La ciudadanía sustantiva depende de condiciones materiales (ingresos, infraestructura) y culturales (información, organización, ausencia de discriminación)."
+        },
+        {
+          "subtitle": "Las generaciones de derechos humanos en México",
+          "content": "Los teóricos de los derechos humanos, siguiendo a Karel Vasak, distinguen tres generaciones: la primera generación incluye los derechos civiles y políticos surgidos con las revoluciones del siglo XVIII (libertad de expresión, de reunión, de conciencia; derecho al voto, al debido proceso, a la no detención arbitraria). La segunda generación agrupa los derechos económicos, sociales y culturales que emergieron con el siglo XX como respuesta a las desigualdades del capitalismo industrial (derecho a la salud, a la educación, al trabajo, a la seguridad social, a la vivienda). La Constitución mexicana de 1917 fue pionera mundial al incluir estos derechos (Arts. 3, 27, 123). La tercera generación comprende los derechos de solidaridad o derechos colectivos que emergen en la segunda mitad del siglo XX (derecho a un medio ambiente sano, al desarrollo, a la paz, a la autodeterminación de los pueblos). En México, el derecho a un medio ambiente sano fue reconocido constitucionalmente en 1999 (Art. 4°)."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Qué diferencia la ciudadanía formal de la ciudadanía sustantiva?",
+          "options": [
+            "La formal es para adultos; la sustantiva para menores de edad",
+            "La formal es el estatuto legal; la sustantiva es el ejercicio efectivo de los derechos",
+            "La formal aplica solo a hombres; la sustantiva a mujeres",
+            "La formal requiere credencial del INE; la sustantiva requiere título universitario"
+          ],
+          "correct": "La formal es el estatuto legal; la sustantiva es el ejercicio efectivo de los derechos"
+        },
+        {
+          "question": "¿A qué generación de derechos pertenece el derecho al trabajo?",
+          "options": ["Primera generación", "Segunda generación", "Tercera generación", "No es un derecho humano reconocido"],
+          "correct": "Segunda generación"
+        },
+        {
+          "question": "¿En qué año obtuvieron el derecho al voto las mujeres en México?",
+          "options": ["1917", "1934", "1953", "1968"],
+          "correct": "1953"
+        },
+        {
+          "question": "¿Cuál es un ejemplo de derecho de tercera generación?",
+          "options": [
+            "Libertad de expresión",
+            "Derecho al trabajo",
+            "Derecho a un medio ambiente sano",
+            "Derecho al voto"
+          ],
+          "correct": "Derecho a un medio ambiente sano"
+        },
+        {
+          "question": "¿Qué institución mexicana mide el acceso efectivo a los derechos sociales?",
+          "options": ["INE", "SCJN", "CONEVAL", "IMSS"],
+          "correct": "CONEVAL"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: explica con sus propias palabras la diferencia entre ciudadanía formal y sustantiva con un ejemplo concreto de México, clasifica correctamente al menos 6 derechos en sus generaciones correspondientes, e identifica al menos 2 brechas reales en el ejercicio de derechos en el contexto mexicano con datos o evidencias."
+    },
+    "teacher_tips": [
+      "La actividad de '¿Tienes este derecho?' funciona mejor cuando los derechos mencionados son concretos y locales (acceso a médico del IMSS, internet en casa, agua potable las 24 horas) — no usar derechos abstractos que nadie puede evaluar en su propia vida.",
+      "Para evitar la desesperanza aprendida ('da igual, nada cambia'), cierra siempre con ejemplos de cambios logrados por movilización ciudadana: el voto femenino, el matrimonio igualitario, los programas de becas — el cambio social es posible y los jóvenes lo han protagonizado.",
+      "Los datos del CONEVAL están disponibles en línea y actualizados anualmente — usarlos hace la clase más rigurosa y enseña a los estudiantes a buscar evidencias estadísticas para argumentar, una competencia clave de la ciudadanía informada."
+    ]
+  },
+  "CS-I-P03": {
+    "code": "CS-I-P03",
+    "title": "Normas e instituciones: problematizo las reglas sociales como construcciones históricas cambiantes",
+    "level": "Ciencias Sociales I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Sociedad y normas",
+    "metadata": {
+      "objective": "El estudiante problematizará las normas sociales e instituciones como construcciones históricas sujetas a cambio y disputa, distinguiendo costumbre, moral y derecho, y analizando el concepto de legitimidad.",
+      "competencies": [
+        "Distingue entre normas de costumbre, normas morales y normas jurídicas",
+        "Analiza cómo las normas sociales reflejan relaciones de poder y consensos históricos",
+        "Evalúa la legitimidad de una norma distinguiéndola de su legalidad",
+        "Identifica casos de normas que cambiaron por presión social o evolución cultural en México",
+        "Reflexiona sobre el papel del conflicto y el debate en la transformación de las instituciones"
+      ],
+      "materials": [
+        "Casos históricos de normas que cambiaron en México (esclavitud, voto femenino, aborto)",
+        "Fragmentos del Código Civil y del Código Penal para análisis de normas jurídicas",
+        "Dilemas morales para debate grupal",
+        "Hoja de análisis de normas: tipo, origen, quién la establece, quién la cumple",
+        "Noticias sobre conflictos normativos actuales en México"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Por qué seguimos ciertas reglas?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Costumbre, moral y derecho; legitimidad" },
+        { "phase": "Cierre", "duration": "10 min", "label": "¿Cuándo una norma injusta puede cambiarse?" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — Las reglas invisibles",
+          "duration": "10 min",
+          "description": "El docente pregunta: '¿Quién decidió que en México se saluda de beso en la mejilla? ¿Qué pasa si no lo haces? ¿Hay una ley que lo exija?' Los estudiantes descubren que muchas reglas que seguimos son costumbres — no leyes — y sin embargo tienen fuerza social real. Se introduce la pregunta: ¿por qué seguimos las normas? ¿Por miedo a la sanción? ¿Por convicción? ¿Por costumbre?",
+          "activity": "Actividad de diagnóstico: el docente plantea 5 situaciones y los estudiantes identifican qué tipo de norma se viola en cada caso: 1) No ceder el asiento a un adulto mayor en el metro, 2) Robar un celular, 3) Ir al velorio de un familiar con ropa de colores brillantes, 4) No pagar impuestos, 5) Usar lenguaje irrespetuoso con un compañero. El debate sobre la clasificación activa el pensamiento previo sobre los tipos de normas."
+        },
+        {
+          "title": "FASE II: DESARROLLO — Tipos de normas y legitimidad",
+          "duration": "30 min",
+          "description": "Se construyen los conceptos: 1) Tipos de normas: costumbre (sanción social: exclusión, crítica), moral (sanción interior: culpa, vergüenza), derecho (sanción jurídica: multa, prisión, reparación). Las tres pueden coincidir o entrar en conflicto. 2) Instituciones: 'reglas del juego' que estructuran la interacción social (familia, escuela, mercado, Estado). Son construcciones históricas — cambian. 3) Legalidad vs. Legitimidad: una norma es legal si cumple con el procedimiento formal; es legítima si es aceptada como justa por quienes están sujetos a ella. Casos: la esclavitud fue legal pero ilegítima para los esclavizados; las leyes de apartheid eran legales en Sudáfrica.",
+          "activity": "Análisis de casos en grupos: cada grupo analiza una norma histórica que cambió en México (esclavitud abolida 1829, voto femenino 1953, despenalización del aborto en CDMX 2007, matrimonio igualitario 2022). Responden: ¿era legal antes del cambio? ¿era legítima? ¿qué movimiento social promovió el cambio? ¿quién se resistió? ¿qué argumentos se usaron?"
+        },
+        {
+          "title": "FASE III: CIERRE — El derecho a cuestionar",
+          "duration": "10 min",
+          "description": "El docente introduce la idea de la desobediencia civil: la resistencia no violenta a normas consideradas injustas (Gandhi, MLK, movimientos feministas en México). ¿Cuándo está justificado desobedecer una norma? La reflexión conecta con la competencia de ciudadanía crítica del MCCEMS — no obediencia ciega, sino participación informada y reflexiva.",
+          "activity": "Ticket de salida: identifica una norma de tu plantel, familia o comunidad que consideres injusta o desactualizada. Explica: ¿qué tipo de norma es? ¿por qué la consideras injusta? ¿cómo podría cambiarse de forma legítima y sin violencia?"
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Las normas sociales son el tejido invisible que hace posible la vida en común: regulan qué podemos hacer, qué debemos hacer y qué nos está prohibido hacer. Pero no caen del cielo — son construcciones históricas que reflejan las relaciones de poder, los valores dominantes y los conflictos de cada época. Comprenderlas críticamente es una condición de la ciudadanía.",
+      "sections": [
+        {
+          "subtitle": "Tipos de normas sociales: costumbre, moral y derecho",
+          "content": "Las normas sociales se clasifican según su origen, su sanción y su nivel de formalización. Las normas de costumbre son hábitos sociales consolidados por la repetición y el tiempo — no están escritas, pero tienen fuerza social. Su incumplimiento genera sanciones informales: crítica, exclusión, burla. Las normas morales son principios internalizados sobre el bien y el mal — su sanción es interior (culpa, vergüenza) y social (juicio de los demás). No son universales: lo que una cultura considera moralmente correcto puede diferir de otra. Las normas jurídicas son reglas creadas por autoridades competentes, escritas, generales y respaldadas por la coerción del Estado. Su incumplimiento genera sanciones formales: multas, prisión, reparación del daño. Las tres categorías se superponen frecuentemente: el homicidio está prohibido por la costumbre (tabú social), la moral (es malo matar) y el derecho (es un delito tipificado en el Código Penal)."
+        },
+        {
+          "subtitle": "Instituciones, legitimidad y cambio social",
+          "content": "Las instituciones son las 'reglas del juego' que estructuran la interacción social — formales (leyes, constituciones) e informales (costumbres, convenciones). El economista Douglas North define las instituciones como las restricciones humanamente diseñadas que dan forma a la interacción humana. Son construcciones históricas: surgieron en un contexto, respondían a necesidades específicas y pueden cambiar cuando esas necesidades o los equilibrios de poder cambian. La legitimidad es el atributo de una norma o institución de ser percibida como justa y válida por quienes están sujetos a ella. Max Weber distinguió tres fuentes de legitimidad: la tradición (lo que siempre se ha hecho), el carisma (la autoridad personal de un líder) y la racionalidad legal (el cumplimiento de procedimientos formalmente establecidos). En las democracias modernas, la legitimidad proviene fundamentalmente del consentimiento de los gobernados — lo que hace posible la desobediencia civil como herramienta de cambio cuando las instituciones pierden esa legitimidad."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál es la principal diferencia entre una norma moral y una norma jurídica?",
+          "options": [
+            "La norma moral es más antigua que la jurídica",
+            "La norma jurídica está respaldada por la coerción del Estado; la moral solo por la conciencia y el juicio social",
+            "La norma moral solo aplica a personas religiosas",
+            "La norma jurídica solo aplica a adultos mayores de 18 años"
+          ],
+          "correct": "La norma jurídica está respaldada por la coerción del Estado; la moral solo por la conciencia y el juicio social"
+        },
+        {
+          "question": "¿Qué diferencia la legalidad de la legitimidad?",
+          "options": [
+            "La legalidad es más importante que la legitimidad",
+            "La legalidad es el cumplimiento del procedimiento formal; la legitimidad es la aceptación como justa por parte de quienes están sujetos a la norma",
+            "La legitimidad requiere aprobación del Congreso; la legalidad no",
+            "La legalidad aplica solo a normas escritas; la legitimidad a costumbres"
+          ],
+          "correct": "La legalidad es el cumplimiento del procedimiento formal; la legitimidad es la aceptación como justa por parte de quienes están sujetos a la norma"
+        },
+        {
+          "question": "¿Cuál es un ejemplo de norma de costumbre?",
+          "options": [
+            "El Código Penal Federal",
+            "El Artículo 3° de la Constitución",
+            "Saludar de beso en la mejilla en México",
+            "El reglamento de tránsito"
+          ],
+          "correct": "Saludar de beso en la mejilla en México"
+        },
+        {
+          "question": "¿Qué es la desobediencia civil?",
+          "options": [
+            "Un delito penal grave",
+            "La resistencia violenta contra el Estado",
+            "La resistencia no violenta a normas consideradas injustas, con aceptación de las consecuencias legales",
+            "El rechazo a pagar impuestos"
+          ],
+          "correct": "La resistencia no violenta a normas consideradas injustas, con aceptación de las consecuencias legales"
+        },
+        {
+          "question": "¿Las instituciones sociales son permanentes e inmutables?",
+          "options": [
+            "Sí, las instituciones son naturales y no cambian",
+            "No, son construcciones históricas que cambian con el tiempo y las relaciones de poder",
+            "Solo cambian cuando hay guerras o revoluciones",
+            "Solo las instituciones informales pueden cambiar"
+          ],
+          "correct": "No, son construcciones históricas que cambian con el tiempo y las relaciones de poder"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: clasifica correctamente al menos 4 normas en sus tipos (costumbre/moral/jurídica) con justificación, distingue legalidad de legitimidad con un ejemplo histórico concreto, y argumenta de forma coherente cuándo estaría justificada la desobediencia civil, usando criterios filosófico-políticos."
+    },
+    "teacher_tips": [
+      "El debate sobre casos reales de cambio normativo en México (voto femenino, aborto, matrimonio igualitario) suele generar opiniones fuertes — aprovéchalo: el objetivo no es que todos lleguen al mismo punto de vista, sino que argumenten con evidencias y respeten el desacuerdo.",
+      "Para la distinción legalidad/legitimidad, el ejemplo de la esclavitud legal es el más contundente y universal: nadie puede defender que era legítima, aunque era completamente legal en su época — esto hace la distinción concreta e inolvidable.",
+      "Si en el grupo hay estudiantes de comunidades indígenas, el derecho consuetudinario (usos y costumbres) es un ejemplo extraordinario de sistema normativo alternativo al derecho positivo — México lo reconoce constitucionalmente en el Art. 2°."
+    ]
+  },
+  "CS-I-P04": {
+    "code": "CS-I-P04",
+    "title": "Diversidad y democracia: reconozco que la diversidad es condición de justicia y convivencia democrática",
+    "level": "Ciencias Sociales I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Sociedad y normas",
+    "metadata": {
+      "objective": "El estudiante discutirá y reconocerá que la diversidad étnica, cultural, de género, de orientación sexual y de capacidad forma parte del espacio democrático y es condición de justicia, analizando la discriminación y los derechos de las minorías en México.",
+      "competencies": [
+        "Distingue diversidad (diferencia) de desigualdad (jerarquía injusta entre diferencias)",
+        "Identifica formas de discriminación en contextos cotidianos y estructurales en México",
+        "Analiza los derechos de grupos históricamente discriminados: pueblos indígenas, mujeres, comunidad LGBTQ+, personas con discapacidad",
+        "Reflexiona sobre el concepto de justicia distributiva y justicia de reconocimiento",
+        "Valora la diversidad como fuente de riqueza cultural y condición para una democracia genuina"
+      ],
+      "materials": [
+        "Datos del CONAPRED sobre discriminación en México (Encuesta Nacional sobre Discriminación)",
+        "Casos de movimientos por derechos de grupos minoritarios en México",
+        "Artículo 1° de la Constitución Política de los Estados Unidos Mexicanos (principio de no discriminación)",
+        "Testimonios o videos de personas de grupos diversos hablando de su experiencia",
+        "Mapa de diversidad cultural de México: lenguas indígenas, regiones, tradiciones"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Qué es diversidad y qué es desigualdad?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Discriminación, derechos y justicia" },
+        { "phase": "Cierre", "duration": "10 min", "label": "La diversidad como fortaleza democrática" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — Diferencia vs. jerarquía",
+          "duration": "10 min",
+          "description": "El docente traza en el pizarrón dos columnas: 'Diferencias' y 'Desigualdades'. Pregunta: ¿ser de diferente estado, hablar una lengua indígena, tener discapacidad, ser mujer... son diferencias o desigualdades? La respuesta clave: son diferencias que se convierten en desigualdades cuando se les asigna una jerarquía de valor — cuando algunas personas son tratadas como inferiores por ser diferentes. Esta distinción es el núcleo conceptual de la progresión.",
+          "activity": "El docente comparte datos de la Encuesta Nacional sobre Discriminación (ENADIS) del CONAPRED: en México, el 20.2% de las personas mayores de 18 años declararon haber sido discriminadas en los últimos 5 años (2022). Las principales razones: forma de vestir, peso o estatura, color de piel, edad, orientación sexual, discapacidad. Los estudiantes discuten: ¿han vivido o presenciado alguna de estas formas de discriminación?"
+        },
+        {
+          "title": "FASE II: DESARROLLO — Grupos, derechos y justicia",
+          "duration": "30 min",
+          "description": "Se trabajan cuatro ejes de diversidad y sus derechos específicos en México: 1) Diversidad étnica e indígena: 68 lenguas nacionales (INALI), Art. 2° Constitucional, derechos de autonomía y libre determinación. 2) Diversidad de género: brechas salariales (las mujeres ganan 16% menos que los hombres por trabajo equivalente, OIT México 2023), violencia de género, derechos reproductivos. 3) Diversidad sexual: matrimonio igualitario en todos los estados (2022), identidad de género (reforma al Art. 4° CDMX). 4) Diversidad funcional: personas con discapacidad (Convención de la ONU, Ley General para la Inclusión de las Personas con Discapacidad).",
+          "activity": "Galería de derechos: en grupos, los estudiantes investigan brevemente los derechos de uno de los cuatro grupos y preparan un cartel de 5 puntos: quiénes son, qué derechos tienen, qué brechas enfrentan, qué organizaciones los defienden y una acción que pueden hacer desde el plantel. Se hace recorrido por la galería."
+        },
+        {
+          "title": "FASE III: CIERRE — México plural, democracia real",
+          "duration": "10 min",
+          "description": "El docente cierra con la distinción entre justicia distributiva (reparto equitativo de recursos y oportunidades) y justicia de reconocimiento (que las diferencias sean valoradas y no jerarquizadas). Una democracia genuina requiere ambas: no basta con dar los mismos recursos si ciertas diferencias siguen siendo estigmatizadas. Se conecta con la pluriculturalidad reconocida en el Art. 2° de la Constitución mexicana.",
+          "activity": "Ticket de salida: escribe un compromiso personal concreto para contribuir a una convivencia más inclusiva en tu plantel o comunidad — específico, realizable y fundamentado en lo aprendido en la progresión."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "México es uno de los países con mayor diversidad étnica, lingüística y cultural del mundo: 68 agrupaciones lingüísticas, 7 zonas culturales mesoamericanas y una diáspora de identidades regionales que van de la Tarahumara a los Alteños de Jalisco. Esta diversidad es una riqueza — pero también ha sido históricamente fuente de exclusión y discriminación. El reto democrático es construir una convivencia que reconozca y valore la diferencia sin convertirla en desigualdad.",
+      "sections": [
+        {
+          "subtitle": "Discriminación: cuando la diferencia se convierte en exclusión",
+          "content": "La discriminación ocurre cuando una persona o grupo es tratado de forma desfavorable por razones ajenas a sus méritos o capacidades — por su origen étnico, género, orientación sexual, condición socioeconómica, discapacidad, edad u otras características. El Art. 1° de la Constitución Política de los Estados Unidos Mexicanos prohíbe toda discriminación que atente contra la dignidad humana. La Ley Federal para Prevenir y Eliminar la Discriminación (2003) creó el CONAPRED como organismo rector. La discriminación puede ser directa (trato explícitamente diferenciado y perjudicial) o indirecta (normas o prácticas aparentemente neutrales que tienen impacto desproporcionado sobre ciertos grupos). La discriminación estructural es la que opera a través de instituciones, políticas y normas que perpetúan desventajas sistemáticas para ciertos grupos, independientemente de las intenciones individuales."
+        },
+        {
+          "subtitle": "Justicia de reconocimiento: más allá de la igualdad formal",
+          "content": "La filósofa Nancy Fraser distingue dos dimensiones de la justicia: la justicia distributiva (distribución equitativa de recursos, oportunidades y bienes) y la justicia de reconocimiento (valoración igualitaria de las identidades y culturas, sin jerarquías de prestigio). En sociedades diversas como México, la injusticia de reconocimiento es tan grave como la injusticia distributiva: los pueblos indígenas enfrentan no solo pobreza (injusticia distributiva) sino también desprecio de su lengua, cultura y formas de vida (injusticia de reconocimiento). Una democracia genuinamente incluyente debe atender ambas dimensiones: garantizar recursos equitativos Y que ninguna identidad sea tratada como inferior. La pluriculturalidad reconocida en el Art. 2° de la Constitución mexicana es un paso hacia la justicia de reconocimiento — pero su realización práctica requiere políticas concretas y cambios culturales profundos."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál es la diferencia entre diversidad y desigualdad?",
+          "options": [
+            "Son sinónimos en el contexto de los derechos humanos",
+            "La diversidad refiere a la diferencia; la desigualdad ocurre cuando la diferencia genera jerarquías de valor injustas",
+            "La diversidad es positiva; la desigualdad siempre es negativa",
+            "La diversidad es cultural; la desigualdad es solo económica"
+          ],
+          "correct": "La diversidad refiere a la diferencia; la desigualdad ocurre cuando la diferencia genera jerarquías de valor injustas"
+        },
+        {
+          "question": "¿Qué artículo de la Constitución mexicana prohíbe la discriminación?",
+          "options": ["Art. 39", "Art. 123", "Art. 1°", "Art. 27"],
+          "correct": "Art. 1°"
+        },
+        {
+          "question": "¿Cuántas agrupaciones lingüísticas indígenas existen en México?",
+          "options": ["12", "32", "68", "128"],
+          "correct": "68"
+        },
+        {
+          "question": "¿Qué es la discriminación estructural?",
+          "options": [
+            "El trato explícitamente diferenciado y perjudicial por razones de identidad",
+            "La discriminación que opera a través de instituciones y normas que perpetúan desventajas para ciertos grupos",
+            "La discriminación que ocurre solo en el espacio laboral",
+            "La discriminación que realizan solo las personas con autoridad"
+          ],
+          "correct": "La discriminación que opera a través de instituciones y normas que perpetúan desventajas para ciertos grupos"
+        },
+        {
+          "question": "¿Qué es la justicia de reconocimiento según Nancy Fraser?",
+          "options": [
+            "La distribución equitativa de recursos económicos",
+            "La valoración igualitaria de identidades y culturas sin jerarquías de prestigio",
+            "El reconocimiento de títulos académicos entre países",
+            "El derecho a ser reconocido ante una institución del Estado"
+          ],
+          "correct": "La valoración igualitaria de identidades y culturas sin jerarquías de prestigio"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: explica con sus propias palabras la diferencia entre diversidad y desigualdad con al menos 2 ejemplos del contexto mexicano, identifica al menos 3 grupos históricamente discriminados y describe una brecha de derechos que enfrentan, y reflexiona sobre qué condiciones (materiales y culturales) serían necesarias para una democracia genuinamente incluyente en México."
+    },
+    "teacher_tips": [
+      "Los datos de la ENADIS del CONAPRED son la herramienta más poderosa para bajar el debate al nivel empírico: el 20% que declaró discriminación no es una opinión, es una medición — enseñar a usar estadísticas para argumentar es una competencia ciudadana clave.",
+      "Si en el grupo hay estudiantes de comunidades indígenas, de la comunidad LGBTQ+ o con discapacidad, no los conviertas en 'representantes' de su grupo — pregunta si quieren compartir su perspectiva, sin presión, y valida que su experiencia es una fuente de conocimiento válida.",
+      "Para el compromiso final, sugiere acciones muy concretas y pequeñas: 'usar el nombre correcto de mis compañeros trans', 'denunciar un comentario discriminatorio en el grupo de WhatsApp', 'aprender 5 palabras en náhuatl o zapoteco' — los compromisos realizables generan más cambio que las declaraciones grandiosas."
+    ]
+  }
+}

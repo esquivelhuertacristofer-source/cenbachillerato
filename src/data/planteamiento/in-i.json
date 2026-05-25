@@ -1,0 +1,802 @@
+{
+  "IN-I-P01": {
+    "code": "IN-I-P01",
+    "title": "Presentaciones y saludos: Me presento y presento a otros con respeto e inclusión",
+    "level": "Inglés I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Comunicación interpersonal",
+    "metadata": {
+      "objective": "El estudiante utilizará el verbo to be y los pronombres personales para presentarse y presentar a otras personas en contextos sociales y culturales diversos con respeto e inclusión.",
+      "competencies": [
+        "Usa pronombres personales (I, you, he, she, we, they) correctamente en oraciones simples",
+        "Conjuga el verbo to be en forma afirmativa, negativa e interrogativa",
+        "Formula saludos formales e informales según el contexto",
+        "Intercambia información personal básica (nombre, edad, origen) en inglés",
+        "Reconoce la diversidad cultural en los saludos del mundo angloparlante"
+      ],
+      "materials": [
+        "Tarjetas de presentación en blanco (name cards)",
+        "Proyector o pizarrón para ejemplos escritos",
+        "Audio de saludos en variantes del inglés (UK, US, AU)",
+        "Hoja de trabajo: árbol de conversaciones de presentación",
+        "Diccionario ilustrado inglés-español"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "Enganche con saludos del mundo" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Verbo to be + presentaciones" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Mini presentación al grupo" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — Saludos alrededor del mundo",
+          "duration": "10 min",
+          "description": "El docente muestra cómo se saluda en distintos países angloparlantes (handshake en UK, wave en US, hongi en NZ) y pregunta al grupo: ¿cómo saludamos en México según el contexto? Se activa el conocimiento previo sobre saludos formales vs. informales en español para transferirlos al inglés.",
+          "activity": "El docente escribe en el pizarrón: 'Hi / Hello / Good morning / Good afternoon / How are you?' y pide a 3 voluntarios que demuestren un saludo informal y uno formal. Se introduce la pregunta generadora: ¿Cómo me presento correctamente en inglés?"
+        },
+        {
+          "title": "FASE II: DESARROLLO — Verbo to be y pronombres",
+          "duration": "30 min",
+          "description": "Se modela el verbo to be con énfasis en las formas I am / You are / He is / She is. Los estudiantes practican en parejas usando tarjetas de presentación: escriben su nombre, origen y una característica. Se hace un juego de role-play donde cada quien presenta a su compañero al grupo.",
+          "activity": "Actividad 'Find someone who...': los estudiantes circulan por el aula con su name card y se presentan a 4 compañeros usando la estructura 'My name is ___, I am from ___, I am ___.' Luego registran en una tabla: nombre, origen y una característica de cada persona que conocieron."
+        },
+        {
+          "title": "FASE III: CIERRE — Mini presentación y metacognición",
+          "duration": "10 min",
+          "description": "Cada estudiante presenta brevemente a uno de sus compañeros frente al grupo usando 'This is ___. He/She is from ___.' El docente cierra con preguntas de metacognición: ¿Qué fue difícil? ¿Qué estrategia usé para recordar las formas del verbo to be?",
+          "activity": "Ticket de salida: cada estudiante escribe en un papel: 1 cosa que aprendió (I learned...), 1 pregunta que todavía tiene (I still wonder...) y 1 forma de usar esto fuera del aula (I can use this when...)."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La comunicación interpersonal en una lengua extranjera comienza con el acto de presentarse: un gesto universal que activa la identidad, la cortesía y la pertenencia social. En el MCCEMS 2025, el aprendizaje del inglés se sitúa desde contextos reales y culturalmente relevantes para el estudiante mexicano de bachillerato.",
+      "sections": [
+        {
+          "subtitle": "El verbo to be: eje de la identidad en inglés",
+          "content": "El verbo to be es el verbo más fundamental del inglés. En presente simple tiene tres formas: am (para I), is (para he, she, it) y are (para you, we, they). Se usa para expresar identidad, origen, características y estados. Forma afirmativa: 'I am María.' Forma negativa: 'I am not from Veracruz.' Forma interrogativa: 'Are you a student?' Las contracciones (I'm, you're, he's) son propias del inglés oral e informal."
+        },
+        {
+          "subtitle": "Saludos formales e informales: contexto cultural",
+          "content": "En inglés, el nivel de formalidad del saludo depende del contexto. Saludos informales: Hi, Hey, What's up? (entre amigos y pares). Saludos formales: Good morning, Good afternoon, How do you do? (entornos profesionales o con adultos). La respuesta a 'How are you?' puede ser 'Fine, thank you' (formal) o 'Good, thanks' (informal). En México, el apretón de mano o el beso en la mejilla tienen equivalentes culturales distintos en países angloparlantes — reflexionar sobre esto desarrolla la competencia intercultural."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál es la forma correcta del verbo to be para el pronombre 'she'?",
+          "options": ["am", "are", "is", "be"],
+          "correct": "is"
+        },
+        {
+          "question": "Completa la oración: '___ are from Oaxaca.' (nosotros)",
+          "options": ["I", "He", "We", "She"],
+          "correct": "We"
+        },
+        {
+          "question": "¿Cuál de estos saludos es informal?",
+          "options": ["Good morning", "How do you do?", "Hey, what's up?", "Good afternoon"],
+          "correct": "Hey, what's up?"
+        },
+        {
+          "question": "¿Qué estructura se usa para presentar a otra persona en inglés?",
+          "options": ["I am ___", "This is ___", "You are ___", "He am ___"],
+          "correct": "This is ___"
+        },
+        {
+          "question": "¿Cuál es la contracción correcta de 'I am'?",
+          "options": ["Im", "I'm", "Iam", "Am'I"],
+          "correct": "I'm"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: presenta correctamente a una persona usando pronombres y formas del verbo to be sin errores de concordancia, selecciona el nivel de formalidad del saludo según el contexto dado, y demuestra consciencia intercultural al comparar convenciones sociales del inglés y el español."
+    },
+    "teacher_tips": [
+      "Antes de la clase, prepara name cards con imágenes de personas de distintas culturas angloparlantes para ampliar la perspectiva intercultural más allá del estereotipo US/UK.",
+      "El error más frecuente es usar 'he are' o 'she am' — anticípalo con un ejercicio de identificación de errores en 5 oraciones en el pizarrón antes de practicar en parejas.",
+      "Para grupos numerosos, el juego 'Find someone who...' puede realizarse en filas enfrentadas que avanzan en círculo, garantizando que todos interactúen con al menos 4 compañeros en los 30 minutos."
+    ]
+  },
+  "IN-I-P02": {
+    "code": "IN-I-P02",
+    "title": "Interacciones en el aula: sigo indicaciones y participo en situaciones comunicativas básicas",
+    "level": "Inglés I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Comunicación interpersonal",
+    "metadata": {
+      "objective": "El estudiante comprenderá y usará imperativos y expresiones de aula frecuentes para seguir instrucciones, pedir permiso y aclarar dudas en contextos educativos reales.",
+      "competencies": [
+        "Identifica y sigue instrucciones básicas en inglés (Open your book, Listen, Write)",
+        "Formula peticiones y solicitudes corteses usando 'Can I / May I'",
+        "Pide aclaraciones con expresiones como 'I don't understand' y 'Can you repeat, please?'",
+        "Distingue el uso del imperativo afirmativo y negativo en contexto escolar",
+        "Usa expresiones de agradecimiento y disculpa apropiadas en el aula"
+      ],
+      "materials": [
+        "Tarjetas de instrucciones con imagen + texto (flashcards de comandos de aula)",
+        "Juego de mímica para practicar imperativos",
+        "Audio de instrucciones de aula en inglés con distintos acentos",
+        "Hoja de expresiones útiles para el aula (classroom language poster)",
+        "Dados con acciones escritas para juego de imperativos"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "Total Physical Response con imperativos" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Classroom language en contexto real" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Role play docente-alumno" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — Total Physical Response (TPR)",
+          "duration": "10 min",
+          "description": "El docente da instrucciones en inglés con movimientos corporales exagerados: 'Stand up! Sit down! Open your book! Close the door!' Los estudiantes responden con acción sin hablar. Esta técnica (TPR de Asher) reduce el filtro afectivo y permite comprensión antes de producción. Se introduce gradualmente: primero el docente hace la acción, luego los estudiantes.",
+          "activity": "Juego 'Simon Says' adaptado al aula: 'Simon says, touch your desk.' Los estudiantes solo obedecen cuando el docente dice 'Simon says'. Quien obedece sin 'Simon says' pasa al frente y da la siguiente instrucción. Esto genera participación alta con baja presión de producción oral."
+        },
+        {
+          "title": "FASE II: DESARROLLO — Classroom language en situaciones reales",
+          "duration": "30 min",
+          "description": "Se introduce el vocabulario de aula dividido en 3 bloques: 1) Instrucciones del docente (Open, Close, Read, Write, Listen, Repeat, Work in pairs). 2) Peticiones del alumno (Can I go to the restroom? May I borrow a pencil? Can you repeat, please?). 3) Expresiones de duda y aclaración (I don't understand, What does ___ mean?). Los estudiantes practican en diálogos de 3 turnos.",
+          "activity": "Tarjetas de situación: en grupos de 3, cada grupo recibe una tarjeta con un escenario de aula (ej: 'No entiendes una instrucción', 'Necesitas ir al baño', 'Perdiste tu lápiz'). Tienen 5 minutos para construir el diálogo en inglés y lo presentan al grupo."
+        },
+        {
+          "title": "FASE III: CIERRE — Mini role-play y reflexión",
+          "duration": "10 min",
+          "description": "Dos voluntarios hacen un role-play breve: uno es docente dando instrucciones, el otro es alumno que sigue, pregunta y aclara dudas usando solo el inglés aprendido. El grupo evalúa con pulgares: ¿Usaron los imperativos correctamente? ¿Pidieron permiso con cortesía?",
+          "activity": "Cada estudiante completa el cartel personal 'My Classroom English': selecciona 5 expresiones de la lista del aula que usará en las próximas clases y las escribe en su cuaderno con una traducción personal (no necesariamente literal)."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Las interacciones cotidianas en el aula son el laboratorio natural para adquirir una lengua extranjera. El MCCEMS 2025 promueve el uso real del inglés desde el primer día, situando las instrucciones y los intercambios de aula como el primer dominio comunicativo auténtico al que accede el estudiante.",
+      "sections": [
+        {
+          "subtitle": "El imperativo en inglés: instrucciones directas y cortesía",
+          "content": "El imperativo en inglés se forma con el verbo en forma base, sin sujeto: 'Open your book', 'Listen carefully', 'Work in pairs'. Para hacerlo más cortés se añade 'please' al inicio o al final: 'Please, open the door' / 'Sit down, please'. La forma negativa usa 'don't': 'Don't talk', 'Don't use your phone'. Los imperativos son la estructura gramatical más frecuente en entornos escolares y de instrucción, lo que los hace un punto de entrada ideal para el aprendizaje del inglés."
+        },
+        {
+          "subtitle": "Classroom language: el inglés como herramienta de la clase",
+          "content": "Las expresiones de aula (classroom language) son frases fijas y predecibles que crean un entorno de inmersión parcial en el inglés. Incluyen: instrucciones del docente ('Take out your notebook'), respuestas del alumno ('I finished!', 'I have a question'), peticiones ('Can I go out?') y expresiones de incomprensión ('I don't understand', 'Can you say it again?'). Investigaciones en adquisición de segundas lenguas (SLA) demuestran que el uso consistente del classroom language en las primeras semanas acelera la comprensión auditiva y reduce la ansiedad lingüística."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál es la instrucción correcta para pedir a los estudiantes que abran su libro?",
+          "options": ["Opens your book", "Open your book", "You open book", "Opening your book"],
+          "correct": "Open your book"
+        },
+        {
+          "question": "¿Cómo se pide permiso para ir al baño en inglés de forma cortés?",
+          "options": ["I go bathroom?", "Can I go to the restroom, please?", "Go bathroom?", "Me go restroom"],
+          "correct": "Can I go to the restroom, please?"
+        },
+        {
+          "question": "¿Qué expresión usas cuando no entiendes algo que dijo el docente?",
+          "options": ["I no understand", "I don't understand", "Me not understand", "No understand me"],
+          "correct": "I don't understand"
+        },
+        {
+          "question": "¿Cuál es la forma negativa del imperativo para 'habla'?",
+          "options": ["Not talk", "Don't talk", "No talk", "Didn't talk"],
+          "correct": "Don't talk"
+        },
+        {
+          "question": "¿Qué significa la expresión 'Work in pairs'?",
+          "options": ["Trabaja solo", "Trabaja en parejas", "Trabaja en equipo de 4", "Escucha con cuidado"],
+          "correct": "Trabaja en parejas"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: sigue al menos 5 instrucciones en inglés sin necesidad de traducción, formula peticiones de permiso y aclaración con la estructura can/may + I, y demuestra comprensión auditiva de comandos básicos de aula en una actividad de TPR sin apoyarse en la lengua materna."
+    },
+    "teacher_tips": [
+      "Adopta el classroom language desde el día 1: saluda en inglés, da al menos 3 instrucciones en inglés por clase aunque hagas la pausa en español si es necesario. La consistencia supera la perfección.",
+      "Coloca un póster permanente de 'Classroom English' visible en el aula con las 15 expresiones más frecuentes — los estudiantes lo usarán de referencia rápida y reducirán la dependencia del español.",
+      "Para alumnos con ansiedad alta, el TPR (Total Physical Response) es una intervención validada: participar con el cuerpo antes de hablar baja el filtro afectivo y permite la comprensión sin exposición pública al error."
+    ]
+  },
+  "IN-I-P03": {
+    "code": "IN-I-P03",
+    "title": "Objetos y espacios: identifico y describo mi entorno cotidiano en inglés",
+    "level": "Inglés I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Descripción y vocabulario",
+    "metadata": {
+      "objective": "El estudiante identificará y describirá objetos y espacios cotidianos del hogar o la escuela usando sustantivos, artículos, adjetivos y las estructuras there is / there are.",
+      "competencies": [
+        "Usa artículos (a, an, the) correctamente con sustantivos contables en singular y plural",
+        "Aplica adjetivos de color, forma y tamaño para describir objetos",
+        "Usa demostrativos (this, that, these, those) para señalar objetos según proximidad",
+        "Construye oraciones con there is / there are para describir espacios",
+        "Identifica vocabulario de objetos comunes del hogar y la escuela"
+      ],
+      "materials": [
+        "Fotografías de aulas, habitaciones y espacios comunitarios mexicanos",
+        "Tarjetas de vocabulario con imagen y palabra (flashcards)",
+        "Hoja de descripción: 'My classroom / My bedroom'",
+        "Objetos reales del aula para práctica contextualizada",
+        "Juego de bingo de vocabulario (imágenes)"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "Vocabulario desde el entorno inmediato" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Artículos, adjetivos y there is/are" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Descripción escrita del aula real" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — El aula como primer texto",
+          "duration": "10 min",
+          "description": "El docente señala objetos del aula real y los nombra en inglés: 'This is a desk. That is a window. These are chairs.' Los estudiantes repiten y señalan. Se activa el vocabulario previo preguntando: ¿qué palabras en inglés ya conocen para describir objetos de su cuarto o escuela? Se registran en el pizarrón creando un mapa conceptual colaborativo.",
+          "activity": "Juego '¿Qué es esto?': el docente toca un objeto del aula sin nombrarlo y los estudiantes compiten para decir su nombre en inglés. El primero en responder correctamente gana un punto para su equipo. Esto diagnóstica el vocabulario previo y genera motivación."
+        },
+        {
+          "title": "FASE II: DESARROLLO — Artículos, demostrativos y there is/are",
+          "duration": "30 min",
+          "description": "Se introduce el sistema en tres momentos: 1) Artículos: a (consonante) / an (vocal) para indefinidos; the para definidos. Práctica: identificar artículo correcto para lista de 10 objetos. 2) Demostrativos: this/these (cerca) vs. that/those (lejos). Práctica con objetos reales. 3) There is/there are: descripción de espacios. Práctica: describir el aula real usando 'In my classroom, there is a board. There are 30 desks.'",
+          "activity": "Actividad 'My space, your space': en parejas, cada estudiante describe oralmente su lugar de estudio en casa usando al menos: 2 oraciones con artículos, 2 con demostrativos y 3 con there is/are. El compañero dibuja lo que escucha y luego comparan."
+        },
+        {
+          "title": "FASE III: CIERRE — Descripción escrita y metacognición",
+          "duration": "10 min",
+          "description": "Cada estudiante escribe 5 oraciones describiendo el aula real o su espacio favorito usando las 3 estructuras aprendidas. Comparten una con el grupo. Reflexión: ¿en qué situaciones de mi vida real podría usar estas estructuras en inglés?",
+          "activity": "Ticket de salida: escribe 2 oraciones con there is/are describiendo tu hogar, y clasifica 5 objetos indicando el artículo correcto (a/an/the). El docente recoge para retroalimentación formativa."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "El vocabulario situado — aprendido en el contexto donde será usado — es el más duradero. Describir objetos y espacios conocidos en inglés es una de las estrategias más efectivas para construir un vocabulario productivo básico, ya que el estudiante puede practicar fuera del aula simplemente observando su entorno.",
+      "sections": [
+        {
+          "subtitle": "Artículos y sustantivos: el sistema de referencia del inglés",
+          "content": "En inglés, los artículos determinan si nos referimos a algo conocido o desconocido, y si es singular o plural. El artículo indefinido 'a' se usa antes de consonante (a book, a chair) y 'an' antes de vocal (an apple, an eraser). El artículo definido 'the' se usa cuando el hablante y el oyente ya saben a qué objeto se refieren (the board, the teacher's desk). A diferencia del español, el inglés no tiene artículos de género (masculino/femenino), lo que simplifica su uso inicial."
+        },
+        {
+          "subtitle": "Demostrativos y there is/are: ubicar y cuantificar el espacio",
+          "content": "Los demostrativos (this, that, these, those) ubican objetos en relación a la distancia del hablante. 'This' (esto) y 'these' (estos) se usan para lo cercano; 'that' (eso/aquello) y 'those' (esos/aquellos) para lo distante. La estructura 'there is' (hay, singular) y 'there are' (hay, plural) se usa para indicar existencia en un espacio: 'There is a clock on the wall. There are 20 students in the room.' Esta estructura es fundamental para descripciones de lugares y es equivalente al 'hay' del español."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Qué artículo se usa antes de 'apple'?",
+          "options": ["a", "an", "the", "no article"],
+          "correct": "an"
+        },
+        {
+          "question": "¿Cuál es la oración correcta para describir varios libros en tu mesa?",
+          "options": ["There is books on my desk", "There are books on my desk", "There have books on my desk", "Is books on my desk"],
+          "correct": "There are books on my desk"
+        },
+        {
+          "question": "¿Qué demostrativo se usa para señalar un objeto que está lejos?",
+          "options": ["This", "These", "That", "Those"],
+          "correct": "That"
+        },
+        {
+          "question": "¿Cuál de estos es un adjetivo para describir objetos?",
+          "options": ["run", "blue", "open", "eat"],
+          "correct": "blue"
+        },
+        {
+          "question": "¿Cómo se dice 'Hay una silla en el aula' en inglés?",
+          "options": ["There are a chair in the classroom", "There is a chair in the classroom", "Is a chair in classroom", "There have a chair in classroom"],
+          "correct": "There is a chair in the classroom"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: usa artículos a/an/the correctamente en al menos 8 de 10 casos, aplica there is/are sin confundir singular/plural, y puede describir oralmente un espacio usando mínimo 4 objetos con adjetivos y estructuras gramaticales correctas."
+    },
+    "teacher_tips": [
+      "Usa el aula real como principal recurso didáctico: los objetos físicos presentes eliminan la abstracción y permiten señalar, tocar y nombrar en tiempo real, acelerando la retención del vocabulario.",
+      "El error más frecuente en este tema es usar 'a' antes de vocal (a apple) — trabaja con un mnemónico: 'an = antes de vocal, como en AN-imal', y practica con conteo de sílabas del artículo y el sustantivo.",
+      "Para diversificar, pide a los estudiantes que fotografíen con su celular 5 objetos de su casa esa noche y preparen 5 oraciones con there is/are para compartir al día siguiente — convierte el hogar en extensión del aula."
+    ]
+  },
+  "IN-I-P04": {
+    "code": "IN-I-P04",
+    "title": "Información personal: solicito y proporciono datos básicos en contextos escolares y comunitarios",
+    "level": "Inglés I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Comunicación interpersonal",
+    "metadata": {
+      "objective": "El estudiante solicitará y proporcionará información personal básica (nombre, edad, nacionalidad, teléfono, dirección, correo) usando preguntas wh- y números cardinales y ordinales en contextos escolares y comunitarios.",
+      "competencies": [
+        "Usa preguntas con wh- (what, where, who) para solicitar información personal",
+        "Nombra números cardinales del 1 al 100 y ordinales del 1° al 10°",
+        "Identifica nacionalidades y gentilicios en inglés de al menos 10 países",
+        "Responde preguntas sobre información personal en inglés con fluidez básica",
+        "Reconoce la importancia de la privacidad en contextos de intercambio de información personal"
+      ],
+      "materials": [
+        "Formulario de datos personales en inglés (school enrollment form)",
+        "Mapa del mundo con nombres de países en inglés",
+        "Tarjetas de números (bingo de números del 1 al 100)",
+        "Hoja de práctica: entrevista de información personal",
+        "Dados numerados y ruleta de preguntas wh-"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Qué información pedimos y damos?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Números, países y preguntas wh-" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Entrevista de registro escolar" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — La información personal en contexto",
+          "duration": "10 min",
+          "description": "El docente presenta un formulario de inscripción escolar en inglés y pregunta al grupo: ¿qué datos piden aquí que ya conocemos en español? Los estudiantes identifican campos como Name, Age, Address, Phone, Email y reflexionan sobre cuándo y a quién es seguro proporcionar estos datos. Se introduce la pregunta generadora: ¿Cómo pregunto y respondo esta información en inglés?",
+          "activity": "El docente llena el formulario con sus propios datos ficticios en voz alta usando preguntas: 'What is your name? Where are you from? How old are you?' Los estudiantes van completando su propio formulario en borrador a medida que el docente modela."
+        },
+        {
+          "title": "FASE II: DESARROLLO — Números, países y wh- questions",
+          "duration": "30 min",
+          "description": "Se trabaja en tres bloques de 10 minutos: 1) Números: cardinales 1-100 con juego de bingo oral; ordinales 1°-10° con ejemplos de grados escolares. 2) Países y nacionalidades: práctica con mapa — Mexico/Mexican, USA/American, France/French. 3) Wh- questions: What is your name? How old are you? Where are you from? Who is your emergency contact? Práctica en parejas con el formulario.",
+          "activity": "Actividad 'School Registration': en parejas, uno hace de estudiante nuevo y el otro de oficial de inscripción. El 'oficial' entrevista al 'estudiante' con 6 preguntas wh- y completa el formulario. Luego cambian roles. Al final, presentan los datos de su compañero al grupo en 3 oraciones."
+        },
+        {
+          "title": "FASE III: CIERRE — Reflexión sobre privacidad digital",
+          "duration": "10 min",
+          "description": "El docente cierra con una reflexión: en inglés, ¿cuándo es apropiado compartir información personal? Compara el contexto de una inscripción escolar (datos necesarios), una red social (datos opcionales) y un desconocido en la calle (datos privados). Se conecta con la competencia de ciudadanía digital del MCCEMS.",
+          "activity": "Ticket de salida: escribe 3 preguntas wh- que harías para conocer a un nuevo compañero y 3 respuestas sobre ti mismo usando los datos del formulario completado en clase."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La información personal es el primer campo semántico con el que cualquier hablante entra en contacto al aprender una lengua: permite la identidad, la pertenencia y la comunicación funcional inmediata. En el contexto del bachillerato mexicano, este vocabulario se conecta directamente con situaciones reales como inscripciones, viajes y comunicación intercultural.",
+      "sections": [
+        {
+          "subtitle": "Preguntas wh-: el sistema de interrogación del inglés",
+          "content": "Las preguntas wh- son la herramienta principal para solicitar información específica en inglés. Las más frecuentes para información personal son: What (¿qué?/¿cuál?): 'What is your name?'; Where (¿dónde?): 'Where are you from?'; Who (¿quién?): 'Who is your teacher?'; How (¿cómo?/¿cuánto?): 'How old are you?'. Estas preguntas se forman con el auxiliar do/does + sujeto + verbo en forma base: 'What do you study?' Para el verbo to be no se usa auxiliar: 'Where are you from?' La entonación de las preguntas wh- es descendente, a diferencia de las preguntas de sí/no cuya entonación es ascendente."
+        },
+        {
+          "subtitle": "Números y nacionalidades: datos esenciales de identidad",
+          "content": "Los números cardinales (one, two, three...) se usan para contar y para dar teléfonos, edades y direcciones. Los ordinales (first, second, third, fourth, fifth...) se usan para grados escolares ('I am in first semester'), fechas y posiciones. Las nacionalidades en inglés se forman con sufijos variados: Mexican, American (sufijo -an); French, Japanese (sin sufijo predecible); British, Spanish (sufijo -ish). Reconocer esta variación es parte del aprendizaje léxico del inglés y fomenta la consciencia metalingüística."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Qué pregunta wh- se usa para preguntar el nombre de alguien?",
+          "options": ["Where is your name?", "What is your name?", "Who is your name?", "How is your name?"],
+          "correct": "What is your name?"
+        },
+        {
+          "question": "¿Cómo se dice el número 45 en inglés?",
+          "options": ["Fourty-five", "Forty-five", "Four-five", "Fortyfive"],
+          "correct": "Forty-five"
+        },
+        {
+          "question": "¿Cuál es la nacionalidad correcta para alguien de México?",
+          "options": ["Mexic", "Mexicano", "Mexican", "Mexicish"],
+          "correct": "Mexican"
+        },
+        {
+          "question": "¿Cómo se pregunta la edad en inglés?",
+          "options": ["What old are you?", "How years you have?", "How old are you?", "Where old are you?"],
+          "correct": "How old are you?"
+        },
+        {
+          "question": "¿Cuál es el ordinal correcto para el número 3?",
+          "options": ["Threeth", "Thirdth", "Third", "Threest"],
+          "correct": "Third"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: responde correctamente al menos 5 preguntas wh- sobre información personal propia, nombra números del 1 al 50 sin errores y aplica al menos 5 nacionalidades correctamente en contexto de presentación oral o escrita."
+    },
+    "teacher_tips": [
+      "Conecta los números con contextos mexicanos: el INEGI reporta la edad mediana de México en 29 años — usa este dato para practicar números en contexto estadístico real y ampliar la competencia de pensamiento crítico.",
+      "La pronunciación de números es un área de alta ansiedad: practica 'thirteen vs. thirty' y 'fourteen vs. forty' con ritmo y palmadas, ya que la diferencia de acento es el único marcador auditivo.",
+      "Para el tema de privacidad, puedes mencionar que en muchos países angloparlantes, compartir la edad o el estado civil no es tan común en contextos formales — esto desarrolla la competencia intercultural crítica del MCCEMS."
+    ]
+  },
+  "IN-I-P05": {
+    "code": "IN-I-P05",
+    "title": "Preguntas y ubicación: hago preguntas sencillas para obtener información sobre lugares y horarios",
+    "level": "Inglés I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Comunicación interpersonal",
+    "metadata": {
+      "objective": "El estudiante formulará preguntas sencillas con when y how y usará preposiciones de tiempo y lugar para obtener y proporcionar información sobre ubicación y horarios en contextos comunitarios.",
+      "competencies": [
+        "Usa preguntas con when (cuándo) y how (cómo/cuánto) en contextos cotidianos",
+        "Aplica preposiciones de lugar (in, on, at, next to, between, behind, in front of)",
+        "Aplica preposiciones de tiempo (at, in, on) con horas, días y meses",
+        "Nombra lugares de la comunidad en inglés y los ubica en relación a otros",
+        "Da y sigue indicaciones básicas de ubicación en inglés"
+      ],
+      "materials": [
+        "Mapa de una comunidad ficticia (con escuela, mercado, hospital, parque, banco, etc.)",
+        "Reloj de manecillas manipulable para práctica de horarios",
+        "Tarjetas de preposiciones de lugar con imagen",
+        "Juego de mesa: ¿Dónde está? (ubicar con preposiciones)",
+        "Horario escolar en inglés para práctica de preposiciones de tiempo"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "El mapa de mi comunidad en inglés" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Preposiciones y preguntas when/how" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Ruta y horario: diálogo situado" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — Mi comunidad en el mapa",
+          "duration": "10 min",
+          "description": "El docente presenta un mapa de comunidad y nombra los lugares en inglés: school, market, hospital, park, bank, library, pharmacy. Los estudiantes ubican en el mapa los que tienen en su comunidad real y añaden otros relevantes de su contexto local (tortillería, zócalo, delegación). Se reflexiona: ¿cómo pedirías indicaciones en inglés si estuvieras perdido?",
+          "activity": "El docente modela una pregunta de ubicación: 'Excuse me, where is the school?' y la respuesta: 'It's next to the park, between the market and the hospital.' Los estudiantes practican en parejas usando el mapa con 3 preguntas de ubicación."
+        },
+        {
+          "title": "FASE II: DESARROLLO — When, how y preposiciones",
+          "duration": "30 min",
+          "description": "Se trabaja en dos bloques: 1) Preposiciones de lugar: in (dentro), on (sobre), at (en/en el punto), next to (junto a), between (entre), behind (detrás), in front of (enfrente). Práctica con objetos del aula. 2) Preposiciones de tiempo y preguntas when/how: 'at 8 o'clock' (horas), 'on Monday' (días), 'in January' (meses). 'When is the class? How long is the break?' Práctica con horario escolar.",
+          "activity": "Actividad 'Mi plantel': con el mapa del plantel o uno dibujado, en grupos de 3 los estudiantes dan indicaciones para llegar desde la entrada hasta: la biblioteca, la cafetería, el laboratorio, la dirección. Usan mínimo 4 preposiciones de lugar por ruta. Luego practican horarios: 'When does Math start? At 8. How long is the class? 50 minutes.'"
+        },
+        {
+          "title": "FASE III: CIERRE — Diálogo situado: ¿cómo llego?",
+          "duration": "10 min",
+          "description": "Role-play final: un estudiante es turista que no habla español y pregunta cómo llegar desde la escuela al mercado más cercano. El otro es habitante local que responde en inglés con preposiciones y referencias a horarios (market is open at 8 in the morning). El grupo evalúa la comprensibilidad de las indicaciones.",
+          "activity": "Ticket de salida: dibuja un mini-mapa de tu colonia con 5 lugares y escribe 3 oraciones de ubicación usando preposiciones de lugar, y 2 oraciones con preposiciones de tiempo sobre horarios de esos lugares."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Orientarse en el espacio y el tiempo en una lengua extranjera es una competencia comunicativa esencial que conecta el aprendizaje del inglés con la autonomía real del estudiante en entornos locales y globales. Las preposiciones son un sistema gramatical altamente funcional que organiza la relación entre objetos, lugares y momentos.",
+      "sections": [
+        {
+          "subtitle": "Preposiciones de lugar: el inglés organiza el espacio",
+          "content": "Las preposiciones de lugar más frecuentes del inglés son: 'in' (dentro de un espacio cerrado o delimitado: in the classroom, in Mexico), 'on' (sobre una superficie: on the table, on the street), 'at' (en un punto específico: at school, at home, at the bus stop), 'next to' (al lado de), 'between' (entre dos cosas), 'behind' (detrás de), 'in front of' (enfrente de). A diferencia del español, el inglés usa 'at' para indicar presencia en lugares de actividad habitual (at school, at work, at home) sin artículo, lo que confunde frecuentemente a hablantes del español."
+        },
+        {
+          "subtitle": "Preposiciones de tiempo: at, on, in para precisar momentos",
+          "content": "En inglés, las preposiciones de tiempo siguen una lógica de precisión decreciente: 'at' se usa para horas exactas y momentos precisos ('at 7 am', 'at noon', 'at midnight'); 'on' se usa para días y fechas específicas ('on Monday', 'on January 15th'); 'in' se usa para períodos más largos: meses, estaciones, años y partes del día ('in January', 'in summer', 'in 2025', 'in the morning'). Una regla mnemotécnica útil: los períodos más cortos usan preposiciones 'más pequeñas' (at para horas), y los más largos usan 'in' (para meses y años)."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Qué preposición completa correctamente: 'The school is ___ the park and the hospital'?",
+          "options": ["at", "between", "on", "in front"],
+          "correct": "between"
+        },
+        {
+          "question": "¿Cómo se pregunta el horario de inicio de una clase?",
+          "options": ["When does the class start?", "Where starts the class?", "How start class?", "When the class starts?"],
+          "correct": "When does the class start?"
+        },
+        {
+          "question": "¿Qué preposición se usa con días de la semana?",
+          "options": ["at", "in", "on", "for"],
+          "correct": "on"
+        },
+        {
+          "question": "¿Cuál es la traducción correcta de 'next to'?",
+          "options": ["enfrente de", "detrás de", "al lado de", "entre"],
+          "correct": "al lado de"
+        },
+        {
+          "question": "¿Qué preposición se usa para indicar horas exactas?",
+          "options": ["on", "in", "at", "by"],
+          "correct": "at"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: da indicaciones de al menos 3 lugares usando preposiciones de lugar correctamente, formula preguntas con when y how para obtener información de horarios, y aplica at/on/in con horas, días y meses sin confusión sistemática."
+    },
+    "teacher_tips": [
+      "Usa el plantel real como mapa de práctica: en lugar de mapas ficticios, pide a los estudiantes que tracen el mapa de su escuela y lo usen para dar indicaciones — el contexto auténtico mejora la retención.",
+      "La confusión entre at/on/in es inevitable: en lugar de reglas abstractas, practica con el horario de clases real: 'at 8:00 / on Monday / in September' — datos concretos que los estudiantes ya conocen.",
+      "Para desarrollar la competencia intercultural, compara cómo se dan indicaciones en México ('a dos cuadras del Oxxo') vs. en ciudades angloparlantes ('go north on 5th Avenue, turn left on Park') — la diferencia en sistemas de referencia espacial es un tema rico de reflexión."
+    ]
+  },
+  "IN-I-P06": {
+    "code": "IN-I-P06",
+    "title": "Descripción de personas y entorno: describo con respeto la diversidad a mi alrededor",
+    "level": "Inglés I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Descripción y vocabulario",
+    "metadata": {
+      "objective": "El estudiante describirá personas, vestimenta y clima en contextos cotidianos usando adjetivos físicos, pronombres posesivos y vocabulario temático, respetando la diversidad corporal y cultural.",
+      "competencies": [
+        "Usa adjetivos físicos para describir personas de forma respetuosa e inclusiva",
+        "Aplica pronombres posesivos (mine, yours, his, hers, ours, theirs) correctamente",
+        "Describe vestimenta usando vocabulario de prendas y colores",
+        "Describe el clima con vocabulario básico y construcciones impersonales (it is, it's)",
+        "Demuestra consciencia de la diversidad corporal al usar lenguaje descriptivo en inglés"
+      ],
+      "materials": [
+        "Fotografías diversas de personas de distintas culturas, edades y corporalidades",
+        "Tarjetas de vocabulario de ropa y clima",
+        "Hoja de trabajo: 'Describe your classmate respectfully'",
+        "Mapa de climas de México y del mundo",
+        "Revistas o catálogos de ropa para actividad de descripción"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Cómo describimos sin ofender?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Adjetivos, posesivos y clima" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Mi compañero en 5 oraciones" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — Describir con respeto",
+          "duration": "10 min",
+          "description": "El docente introduce el tema con una reflexión: ¿cómo describimos personas en español sin hacer referencias irrespetuosas? Trasladamos eso al inglés. Se presentan adjetivos neutros y positivos para describir personas: tall, short, young, old, athletic, elegant. Se discute cuáles son descriptivos (neutral) vs. cuáles pueden ser ofensivos dependiendo del contexto. Se conecta con el eje articulador de Igualdad de género del MCCEMS.",
+          "activity": "El docente muestra 5 fotografías de personas diversas y pide al grupo que proponga adjetivos descriptivos en inglés. Se construye un semáforo colectivo: verde (descriptivo neutro), amarillo (requiere contexto), rojo (evitar en descripción formal)."
+        },
+        {
+          "title": "FASE II: DESARROLLO — Adjetivos, posesivos y clima",
+          "duration": "30 min",
+          "description": "Se trabaja en tres bloques: 1) Adjetivos físicos y de personalidad con práctica de colocación (adjetivo antes del sustantivo en inglés: 'a tall student', no 'a student tall'). 2) Pronombres posesivos: mine, yours, his, hers, ours, theirs — distinción con adjetivos posesivos (my/mine: 'This is my book' vs. 'This book is mine'). 3) Clima: 'It is sunny / cloudy / rainy / windy / hot / cold in Monterrey today.' Práctica con mapa de México.",
+          "activity": "Actividad 'Fashion Detective': con imágenes de revistas/catálogos, los estudiantes describen a una persona en 5 oraciones: 2 sobre características físicas, 2 sobre su ropa y 1 sobre el clima del lugar donde está. Luego el compañero adivina de qué imagen se trata."
+        },
+        {
+          "title": "FASE III: CIERRE — Descripción oral respetuosa",
+          "duration": "10 min",
+          "description": "En parejas, cada estudiante describe a su compañero usando el vocabulario aprendido. La regla: solo usar adjetivos que el compañero describiría aprobarías si te los dijeran a ti. El grupo reflexiona sobre cómo el lenguaje construye o destruye la autoestima y la identidad.",
+          "activity": "Ticket de salida: escribe 5 oraciones describiéndote a ti mismo en inglés (físico, ropa que llevas hoy, clima de tu ciudad) usando adjetivos, pronombres posesivos y 'it is' para el clima."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La descripción de personas en una lengua extranjera activa simultáneamente la competencia lingüística y la competencia intercultural: ¿qué se describe? ¿con qué palabras? ¿qué se omite por respeto? En el MCCEMS 2025, el aprendizaje del inglés es inseparable de los ejes de igualdad de género e interculturalidad crítica.",
+      "sections": [
+        {
+          "subtitle": "Adjetivos y su posición en inglés: antes del sustantivo",
+          "content": "A diferencia del español donde el adjetivo puede ir antes o después del sustantivo, en inglés el adjetivo va obligatoriamente antes del sustantivo cuando lo modifica directamente: 'a tall student' (no 'a student tall'). Cuando el adjetivo va después del verbo to be o un verbo copulativo (seem, look, feel), funciona como predicado: 'She is tall', 'He looks tired'. Esta posición fija es uno de los contrastes gramaticales más importantes entre el español y el inglés, y requiere práctica explícita para evitar la interferencia de la L1."
+        },
+        {
+          "subtitle": "Pronombres posesivos vs. adjetivos posesivos: función y forma",
+          "content": "Los adjetivos posesivos (my, your, his, her, our, their) van siempre antes de un sustantivo: 'my book', 'her phone'. Los pronombres posesivos (mine, yours, his, hers, ours, theirs) reemplazan al sustantivo: 'That book is mine', 'Is this phone yours?' La distinción es importante porque en español ambas funciones a menudo se resuelven con la misma forma ('mío/mía'). El contexto visual — señalar el objeto — facilita la comprensión inicial antes de profundizar en la diferencia gramatical."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál es la posición correcta del adjetivo en inglés?",
+          "options": ["a student tall", "a tall student", "tall the student", "the student tall"],
+          "correct": "a tall student"
+        },
+        {
+          "question": "¿Cuál es el pronombre posesivo correcto para 'ella'?",
+          "options": ["her", "hers", "she", "his"],
+          "correct": "hers"
+        },
+        {
+          "question": "¿Cómo se describe el clima en inglés?",
+          "options": ["He is sunny", "It is sunny", "Is sunny it", "The weather sunny"],
+          "correct": "It is sunny"
+        },
+        {
+          "question": "¿Cuál de estas oraciones usa correctamente el pronombre posesivo?",
+          "options": ["That is my book", "That book is mine", "That is mine book", "Mine book is that"],
+          "correct": "That book is mine"
+        },
+        {
+          "question": "¿Cuál es la forma correcta de describir el clima frío?",
+          "options": ["It is cold", "The weather is coldly", "Cold is it", "Is cold today"],
+          "correct": "It is cold"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: describe a una persona usando al menos 4 adjetivos en posición correcta, distingue entre adjetivos posesivos y pronombres posesivos en 8 de 10 casos, y describe el clima de al menos 3 ciudades con vocabulario adecuado y la estructura impersonal 'it is'."
+    },
+    "teacher_tips": [
+      "Trabaja el tema de la diversidad corporal con cuidado: establece desde el inicio que el objetivo no es evaluar apariencia sino practicar vocabulario — una norma de aula de 'descripción con dignidad' reduce comentarios inapropiados y hace el aprendizaje más seguro.",
+      "Para el pronombre posesivo, el juego 'Whose is this?' es muy efectivo: el docente toma un objeto de un estudiante y pregunta al grupo '¿Whose pencil is this?' y el grupo responde 'It's his/hers/yours' — contexto real de comunicación auténtica.",
+      "Al describir el clima, conecta con la variedad climática de México: Guadalajara tiene clima diferente al de Monterrey o Mérida — datos del SMN (Servicio Meteorológico Nacional) pueden ser punto de partida para una actividad de comparación."
+    ]
+  },
+  "IN-I-P07": {
+    "code": "IN-I-P07",
+    "title": "Gustos y preferencias: expreso lo que me gusta y por qué de forma empática",
+    "level": "Inglés I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Comunicación interpersonal",
+    "metadata": {
+      "objective": "El estudiante expresará gustos, preferencias y opiniones simples en situaciones cotidianas usando el gerundio, adjetivos, conjunciones e intensificadores, comunicándose de forma empática y respetuosa.",
+      "competencies": [
+        "Expresa gustos y aversiones con 'I like/don't like + gerundio'",
+        "Usa intensificadores (very, really, so) para enfatizar preferencias",
+        "Conecta ideas con conjunciones (and, but, because)",
+        "Responde a los gustos de otros con empatía usando 'Me too!' y 'I prefer...'",
+        "Reconoce la diversidad de gustos y preferencias como parte de la identidad cultural"
+      ],
+      "materials": [
+        "Tarjetas de actividades cotidianas ilustradas (reading, cooking, playing soccer, watching movies)",
+        "Tabla de preferencias personales para completar",
+        "Ruleta de 'I like...' con actividades del mundo hispanohablante",
+        "Fragmentos de canciones en inglés sobre gustos y actividades",
+        "Hoja de debate: 'Do you prefer X or Y?'"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "Survey de gustos del grupo" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Gerundio, intensificadores y conjunciones" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Mi perfil de gustos en inglés" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — ¿Qué le gusta a nuestro grupo?",
+          "duration": "10 min",
+          "description": "El docente hace un survey rápido levantando la mano: '¿A cuántos les gusta el futbol? ¿La música? ¿El anime? ¿Las películas de terror?' Luego pregunta cómo se diría en inglés 'me gusta leer', 'no me gusta levantarme temprano'. Se introduce 'I like + -ing' como estructura central y se activa el conocimiento previo de los estudiantes sobre gramática del inglés.",
+          "activity": "El docente modela: 'I really like cooking because it's creative. I don't like waking up early, but I love watching sunsets.' Los estudiantes identifican: 1) verbo con -ing, 2) intensificador, 3) conjunción. Se registran en el pizarrón como bloques de construcción."
+        },
+        {
+          "title": "FASE II: DESARROLLO — Gerundio, intensificadores y conjunciones",
+          "duration": "30 min",
+          "description": "Se trabaja en dos bloques: 1) Gerundio (-ing): afirmativo ('I like reading'), negativo ('I don't like cooking'), con adjetivo ('I like spicy food'). Lista de actividades con formación correcta del gerundio (swimming, running, playing). 2) Intensificadores y conjunciones: 'I really love dancing but I hate singing.' 'I like soccer because it's exciting.' Práctica en parejas con tabla de preferencias.",
+          "activity": "Actividad 'Similarities and Differences': en grupos de 4, cada estudiante completa su tabla de gustos (5 categorías: food, sports, music, hobbies, school subjects). Luego comparten y buscan: ¿qué tienen en común? ¿qué los diferencia? Presentan sus hallazgos: 'We all like listening to music, but Ana doesn't like running.'"
+        },
+        {
+          "title": "FASE III: CIERRE — Mi perfil de gustos",
+          "duration": "10 min",
+          "description": "Cada estudiante escribe su 'perfil de gustos' en 5 oraciones en inglés para publicar en el tablero de la clase o compartir en el grupo. La condición: usar gerundio, al menos un intensificador y al menos una conjunción. El docente enfatiza: nuestros gustos son parte de nuestra identidad y el inglés nos da una nueva forma de expresarla.",
+          "activity": "Ticket de salida: escribe 3 cosas que te gustan (I like/love + -ing) y 2 que no te gustan (I don't like + -ing), usando because para justificar al menos 2 de ellas."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Expresar gustos y preferencias es una de las primeras funciones comunicativas que cualquier hablante busca dominar en una lengua extranjera — permite la conexión personal, el intercambio de identidad y la construcción de relaciones. El gerundio como sustantivo verbal es una estructura central del inglés que no tiene equivalente exacto en español y requiere atención explícita.",
+      "sections": [
+        {
+          "subtitle": "El gerundio en inglés: el verbo que actúa como sustantivo",
+          "content": "En inglés, cuando un verbo funciona como objeto de otro verbo, se convierte en gerundio (-ing): 'I like swimming', 'She loves dancing', 'He hates studying'. Esta estructura es diferente al español donde se usa el infinitivo ('Me gusta nadar'). El gerundio se forma añadiendo -ing al verbo base, con las siguientes reglas: si el verbo termina en -e, se elimina y se añade -ing (write → writing); si termina en consonante + vocal + consonante (CVC) y la sílaba es tónica, se duplica la consonante final (run → running, swim → swimming). El gerundio también puede funcionar como sujeto: 'Swimming is great exercise.'"
+        },
+        {
+          "subtitle": "Intensificadores y conjunciones: matizar y conectar ideas",
+          "content": "Los intensificadores modifican adjetivos y verbos para indicar grado: 'very' (neutro: 'very good'), 'really' (enfático coloquial: 'really fun'), 'so' (intensidad emocional: 'so boring'). Las conjunciones conectan ideas: 'and' (adición: 'I like swimming and running'), 'but' (contraste: 'I like coffee but I don't like tea'), 'because' (causa: 'I love soccer because it's exciting'). Usar estas palabras hace el discurso más fluido y natural, y es un marcador clave del nivel de competencia comunicativa."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cómo se dice correctamente 'Me gusta nadar' en inglés?",
+          "options": ["I like swim", "I like to swiming", "I like swimming", "I like swims"],
+          "correct": "I like swimming"
+        },
+        {
+          "question": "¿Cuál es el gerundio correcto del verbo 'run'?",
+          "options": ["runing", "running", "runned", "runs"],
+          "correct": "running"
+        },
+        {
+          "question": "¿Qué intensificador se usa para enfatizar en lenguaje coloquial?",
+          "options": ["very", "so", "really", "quite"],
+          "correct": "really"
+        },
+        {
+          "question": "¿Cuál conjunción introduce contraste entre dos ideas?",
+          "options": ["and", "because", "but", "so"],
+          "correct": "but"
+        },
+        {
+          "question": "¿Cuál oración es correcta?",
+          "options": ["I like dance very much", "I really like dancing", "I like danced very", "I very like to dance"],
+          "correct": "I really like dancing"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: construye al menos 4 oraciones con 'I like/don't like + gerundio' sin errores de formación, usa correctamente al menos 2 intensificadores y conecta ideas con 'and', 'but' y 'because' en un texto coherente sobre sus preferencias."
+    },
+    "teacher_tips": [
+      "Conecta con la cultura pop que los estudiantes ya consumen: canciones en inglés, series de Netflix — ¿qué actividades mencionan? Los estudiantes identifican gerundios en contexto auténtico y la gramática deja de ser abstracta.",
+      "El error de 'I like dance' (sin -ing) es el más frecuente en hablantes del español porque en L1 se usa infinitivo. Crea un recordatorio visual en el aula: 'Like + VERB + ing' con un ejemplo permanente.",
+      "Para desarrollar la empatía comunicativa, practica la respuesta activa: cuando alguien dice 'I like soccer', el compañero debe responder 'Me too!' o 'Really? I prefer basketball.' Esto convierte el ejercicio gramatical en comunicación real."
+    ]
+  },
+  "IN-I-P08": {
+    "code": "IN-I-P08",
+    "title": "Posesión y pertenencia: expreso de quién es algo con claridad y respeto",
+    "level": "Inglés I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Gramática comunicativa",
+    "metadata": {
+      "objective": "El estudiante expresará posesión y pertenencia de forma clara y respetuosa usando el genitivo sajón, los adjetivos posesivos y los pronombres posesivos en contextos cotidianos.",
+      "competencies": [
+        "Usa el genitivo sajón ('s) para indicar posesión de personas y animales",
+        "Distingue y aplica adjetivos posesivos (my, your, his, her, our, their) correctamente",
+        "Usa pronombres posesivos (mine, yours, his, hers, ours, theirs) para reemplazar al sustantivo",
+        "Formula preguntas sobre posesión ('Whose is this?') y las responde",
+        "Reconoce las diferencias entre el sistema posesivo del inglés y el español"
+      ],
+      "materials": [
+        "Objetos personales de los estudiantes para juego de posesión",
+        "Tarjetas de familia con relaciones y posesiones",
+        "Hoja de trabajo: árbol familiar con posesivos",
+        "Juego de cartas: ¿De quién es esto?",
+        "Imágenes de situaciones de posesión para describir"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿De quién es esto? — Contexto real" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Genitivo sajón y posesivos" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Mi árbol familiar en inglés" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — El juego de los objetos",
+          "duration": "10 min",
+          "description": "El docente recoge 5 objetos de distintos estudiantes sin decir de quién son, los coloca en el escritorio y pregunta: 'Whose pencil is this?' Los estudiantes responden usando su nombre: 'It's Ana's pencil.' El docente modela luego la variedad completa: 'It's hers. It's Ana's. It's her pencil.' Este contexto real activa la necesidad comunicativa auténtica de expresar posesión.",
+          "activity": "Continuando con los objetos, el docente pregunta a diferentes estudiantes: 'Whose eraser is this?' El propietario responde: 'It's mine!' Un compañero confirma: 'It's [nombre]'s eraser.' Se introducen naturalmente las tres formas antes de sistematizarlas."
+        },
+        {
+          "title": "FASE II: DESARROLLO — Genitivo sajón, adjetivos y pronombres posesivos",
+          "duration": "30 min",
+          "description": "Se sistematiza en tres momentos: 1) Genitivo sajón: nombre + 's para singular (Ana's book, the teacher's desk); nombre + solo apóstrofo para plural terminado en -s (students' desks). 2) Adjetivos posesivos: my, your, his, her, our, their — van antes del sustantivo. 3) Pronombres posesivos: mine, yours, his, hers, ours, theirs — reemplazan al sustantivo. Práctica con árbol familiar: 'This is my grandfather. His name is Jorge. This car is his.'",
+          "activity": "Actividad 'Family Album': cada estudiante dibuja (o imagina) a 5 miembros de su familia y escribe 3 oraciones por persona usando las 3 formas: 'This is my sister Valeria. Valeria's room is big. That phone is hers.' Se comparte en grupos de 3."
+        },
+        {
+          "title": "FASE III: CIERRE — Árbol familiar y metacognición",
+          "duration": "10 min",
+          "description": "Se juega una ronda rápida de '¿Cuál es la diferencia?' El docente escribe en el pizarrón pares como: 'My book / Mine' — 'Her dog / Hers' — y los estudiantes explican en español cuándo usar cada forma. Se cierra con la reflexión: ¿cómo expresa posesión el español? (preposición 'de') vs. el inglés (sufijo 's o pronombre posesivo).",
+          "activity": "Ticket de salida: escribe 5 oraciones sobre objetos de tu salón o casa usando: 2 con genitivo sajón, 2 con adjetivo posesivo y 1 con pronombre posesivo. El docente recoge para retroalimentación formativa."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La posesión es una de las categorías semánticas fundamentales del lenguaje humano. El inglés ha desarrollado un sistema morfológico único — el genitivo sajón con 's — que difiere profundamente del sistema preposicional del español ('el libro de Ana' vs. 'Ana's book'). Esta diferencia tipológica requiere atención explícita en el aprendizaje del inglés como lengua extranjera.",
+      "sections": [
+        {
+          "subtitle": "El genitivo sajón: la 's de posesión en inglés",
+          "content": "El genitivo sajón es un morfema posesivo que se añade al poseedor con apóstrofo y 's: 'the teacher's book' (el libro del profesor), 'my brother's car' (el carro de mi hermano). Para sustantivos plurales que ya terminan en -s, solo se añade el apóstrofo: 'the students' homework' (la tarea de los estudiantes), 'my parents' house' (la casa de mis padres). Para nombres propios terminados en -s, ambas formas son aceptables: 'Carlos's notebook' o 'Carlos' notebook'. El genitivo sajón contrasta fuertemente con el español que usa la preposición 'de' como marcador de posesión."
+        },
+        {
+          "subtitle": "Adjetivos vs. pronombres posesivos: modificar vs. reemplazar",
+          "content": "El inglés distingue entre adjetivos posesivos (que modifican un sustantivo: my, your, his, her, our, their) y pronombres posesivos (que reemplazan al sustantivo: mine, yours, his, hers, ours, theirs). La confusión más frecuente es el par 'her/hers': 'This is her book' (her = adjetivo, modifica book) vs. 'This book is hers' (hers = pronombre, reemplaza book). Nota: his se usa como adjetivo y pronombre sin cambio de forma ('his car' / 'the car is his'). El español resuelve ambas funciones con los posesivos tónicos (mío, tuyo, suyo) y átonos (mi, tu, su), pero la correspondencia no es exacta."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cómo se expresa 'el libro de María' usando el genitivo sajón?",
+          "options": ["The book of María", "María book", "María's book", "Book's María"],
+          "correct": "María's book"
+        },
+        {
+          "question": "¿Cuál es el pronombre posesivo correcto para 'nosotros'?",
+          "options": ["our", "ours", "we", "us"],
+          "correct": "ours"
+        },
+        {
+          "question": "¿Cuál oración usa correctamente el adjetivo posesivo?",
+          "options": ["That is mine backpack", "That is my backpack", "That is backpack my", "That backpack is my"],
+          "correct": "That is my backpack"
+        },
+        {
+          "question": "¿Cómo se pregunta de quién es un objeto en inglés?",
+          "options": ["Who is this?", "Whose is this?", "Which is this?", "What is this?"],
+          "correct": "Whose is this?"
+        },
+        {
+          "question": "¿Cuál oración usa correctamente el pronombre posesivo?",
+          "options": ["This is hers phone", "This phone is hers", "This is her phone is hers", "Hers phone is this"],
+          "correct": "This phone is hers"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: construye correctamente al menos 4 oraciones con genitivo sajón, distingue adjetivos posesivos de pronombres posesivos en 8 de 10 casos, y puede responder la pregunta 'Whose is this?' con las tres formas (genitivo, adjetivo posesivo, pronombre posesivo)."
+    },
+    "teacher_tips": [
+      "El juego de los objetos del aula es la actividad más efectiva para este tema porque crea necesidad comunicativa auténtica: los estudiantes QUIEREN decir de quién es su objeto.",
+      "La diferencia entre 'her' y 'hers' es el mayor obstáculo — un mnemónico: 'si va antes del sustantivo usa -her, si va después usa -hers' con énfasis en la posición en la oración.",
+      "Para cerrar el semestre, esta progresión se puede integrar con las anteriores en una actividad tipo 'Who does this belong to?' usando todos los objetos y personas trabajadas en las 8 progresiones — cierre integrador de IN-I."
+    ]
+  }
+}

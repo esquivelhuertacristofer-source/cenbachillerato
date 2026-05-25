@@ -1,0 +1,741 @@
+{
+  "LC-I-P01": {
+    "code": "LC-I-P01",
+    "title": "Escritura y lectura: la necesidad humana de comunicar",
+    "level": "Lengua y Comunicación I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Lectura y escritura como prácticas sociales",
+    "metadata": {
+      "objective": "Reflexionar sobre los vínculos entre la escritura y la lectura como actos colectivos de la experiencia humana, reconociendo su función en la comunicación de información, ideas, pensamientos y opiniones en diferentes contextos sociales y culturales.",
+      "competencies": ["Reflexión sobre la comunicación escrita", "Apropiación de las culturas a través de la lectura", "Pensamiento crítico lingüístico"],
+      "materials": ["Textos breves de géneros diversos (carta personal, artículo periodístico, poema, manual)", "Ejemplos de escritura prehispánica (códices, sistema maya)", "Cuadernos de escritura libre"]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Por qué escribimos?" },
+        { "phase": "Desarrollo", "duration": "35 min", "label": "Leer y escribir como diálogo" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Mi primera reflexión escrita" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — EL ORIGEN DE LA ESCRITURA",
+          "duration": "10 min",
+          "description": "¿Qué pasaría si no pudieras escribir ni leer? ¿Cómo conservarías tus recuerdos? ¿Cómo te comunicarías con alguien que no está presente? La escritura es una de las invenciones más poderosas de la humanidad — no solo para transmitir información, sino para pensar con más claridad. Cuando escribes, organizas tus ideas de una manera que el pensamiento oral no exige.",
+          "activity": "Ejercicio de escritura libre (5 min): cada alumno escribe sin parar sobre '¿Por qué es importante saber leer y escribir?'. Sin revisión, sin corrección. Al final: ¿notaron que pensar por escrito es diferente a pensar en voz alta?"
+        },
+        {
+          "title": "FASE II: DESARROLLO — LECTURA Y ESCRITURA COMO DIÁLOGO",
+          "duration": "35 min",
+          "description": "Parte 1: La escritura como herramienta de pensamiento — textos que cambiaron el mundo (Constitución de 1917, Tratado de Guadalupe Hidalgo, textos de Sor Juana). Parte 2: La lectura como acto de diálogo — leer es conversar con un autor que puede estar muerto, en otro continente o en otra época. Parte 3: Diversidad de prácticas lectoras en México — la lectura en comunidades indígenas (textos en lenguas originarias), la escritura digital (WhatsApp, redes sociales) como práctica contemporánea.",
+          "activity": "Análisis comparativo: los alumnos reciben un párrafo del mismo tema escrito de tres formas (artículo de periódico, mensaje de WhatsApp, poema). ¿Cuál comunica mejor? ¿Para qué propósito? ¿Quién sería el lector ideal de cada uno?"
+        },
+        {
+          "title": "FASE III: CIERRE — REFLEXIÓN METACOMUNICATIVA",
+          "duration": "10 min",
+          "description": "La escritura y la lectura no son habilidades escolares: son prácticas sociales que definen nuestra participación en la vida cultural, económica y política. Quien lee con comprensión y escribe con claridad tiene más poder de agencia en el mundo. El MCCEMS 2025 entiende la Lengua y Comunicación como un derecho, no solo como una asignatura.",
+          "activity": "Carta breve a un autor favorito (real o imaginario): ¿qué le dirías sobre cómo su texto te afectó? Esta actividad integra lectura + escritura + reflexión emocional."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La escritura y la lectura son prácticas sociales — no habilidades puramente individuales — que han transformado radicalmente las posibilidades de la experiencia humana. Permiten la acumulación de conocimiento a través del tiempo (una generación no tiene que redescubrir lo que descubrió la anterior), la comunicación a distancia (espacial y temporal), la construcción de identidades individuales y colectivas, y el desarrollo del pensamiento abstracto. El MCCEMS 2025 reconoce que la literacidad — la capacidad de leer y escribir de manera crítica y contextualizada — es la base de toda formación académica y ciudadana.",
+      "sections": [
+        {
+          "subtitle": "La escritura como tecnología del pensamiento",
+          "content": "La escritura no es solo un medio para registrar lo que ya pensamos: es una herramienta que estructura y expande el pensamiento mismo. El acto de escribir obliga a organizar ideas en secuencia, a elegir palabras con precisión y a considerar al lector. Los estudios de psicología cognitiva muestran que escribir sobre un tema profundiza la comprensión de manera diferente a la lectura o la discusión oral. En México, la tradición literaria es extraordinariamente rica: de los códices prehispánicos y las crónicas coloniales a la narrativa contemporánea (Carlos Fuentes, Elena Poniatowska, Juan Rulfo, Rosario Castellanos). Leer esta producción cultural es una forma de diálogo con la historia nacional."
+        },
+        {
+          "subtitle": "Lectura como acto relacional y placer individual",
+          "content": "Leer un texto es entrar en relación con la subjetividad del autor: su visión del mundo, sus valores, sus conocimientos y sus limitaciones. Esta relación puede ser de acuerdo, cuestionamiento o resistencia — y todas son formas legítimas de lectura activa. La lectura por placer — sin propósito evaluativo — es un factor predictor del desarrollo lingüístico, según múltiples estudios de la OCDE: estudiantes que leen por placer tienen vocabularios más amplios, mayor comprensión lectora y mejor desempeño académico general. En México, la Red Nacional de Lectura del INBA y los Clubes de Lectura de las bibliotecas públicas promueven esta práctica. El MCCEMS 2025 reconoce la lectura recreativa como parte del currículum, no como actividad extracurricular."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál de las siguientes afirmaciones describe mejor la lectura desde una perspectiva sociocultural?",
+          "options": ["Es decodificar letras para extraer información", "Es un acto de diálogo entre lector y autor mediado por el texto", "Es una habilidad individual sin dimensión social", "Es solo útil para obtener calificaciones"],
+          "correct": "Es un acto de diálogo entre lector y autor mediado por el texto"
+        },
+        {
+          "question": "¿Cómo contribuye la escritura al desarrollo del pensamiento?",
+          "options": ["No contribuye, solo registra lo que ya pensamos", "Obliga a organizar ideas, elegir palabras y considerar al lector", "Solo sirve para comunicarse con otros", "Es menos efectiva que hablar"],
+          "correct": "Obliga a organizar ideas, elegir palabras y considerar al lector"
+        },
+        {
+          "question": "¿Qué son los códices mesoamericanos?",
+          "options": ["Libros importados de Europa durante la Colonia", "Sistemas de escritura prehispánicos en papel de amate o piel", "Textos religiosos del siglo XIX", "Registros de la Inquisición"],
+          "correct": "Sistemas de escritura prehispánicos en papel de amate o piel"
+        },
+        {
+          "question": "Según el MCCEMS 2025, la lectura y la escritura son...",
+          "options": ["Habilidades individuales sin dimensión cultural", "Prácticas sociales que implican participación cultural y ciudadana", "Únicamente herramientas para el éxito académico", "Competencias exclusivas de lengua y literatura"],
+          "correct": "Prácticas sociales que implican participación cultural y ciudadana"
+        },
+        {
+          "question": "¿Cuál es una diferencia clave entre leer un texto literario y leer un manual de instrucciones?",
+          "options": ["El manual requiere más inteligencia", "Ambos tienen el mismo propósito y estructura", "El propósito, el destinatario y los recursos estilísticos son diferentes", "El texto literario siempre es más largo"],
+          "correct": "El propósito, el destinatario y los recursos estilísticos son diferentes"
+        }
+      ],
+      "rubric": "El alumno reflexiona por escrito sobre la función social de la lectura y la escritura en al menos 150 palabras, identifica correctamente al menos 3 funciones distintas de la escritura en la vida humana, y analiza la diferencia entre al menos dos tipos de texto."
+    },
+    "teacher_tips": [
+      "Evita tratar esta progresión como 'teoría de la comunicación abstracta'. Ancla cada concepto en textos reales del contexto de los alumnos: WhatsApp, redes sociales, cartas familiares son tan legítimos como los textos literarios canónicos.",
+      "Si hay alumnos que hablan una lengua indígena, esta es una oportunidad de oro: la escritura en esas lenguas tiene sistemas y tradiciones propias que enriquecen enormemente la discusión sobre diversidad de la literacidad.",
+      "La escritura libre sin evaluación (freewriting) al inicio de la sesión es muy efectiva para reducir la ansiedad hacia la escritura. Muchos alumnos de bachillerato temen escribir 'mal'. El freewriting normaliza el proceso."
+    ]
+  },
+  "LC-I-P02": {
+    "code": "LC-I-P02",
+    "title": "Diversidad de textos: géneros, formatos y soportes",
+    "level": "Lengua y Comunicación I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Lectura y escritura como prácticas sociales",
+    "metadata": {
+      "objective": "Investigar los gustos y preferencias lectoras de la comunidad escolar para reconocer la diversidad de textos escritos en sus soportes, formatos y características generales, desarrollando conciencia de la pluralidad textual.",
+      "competencies": ["Reconocimiento de la diversidad textual", "Investigación cualitativa básica", "Interculturalidad crítica en la lectura"],
+      "materials": ["Encuesta breve de hábitos lectores (preparada por el docente o co-construida)", "Colección de textos en diferentes soportes: papel, digital, visual", "Revistas, periódicos, libros, pantallas"]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Qué leen en tu casa?" },
+        { "phase": "Desarrollo", "duration": "35 min", "label": "El universo de los textos" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Mapa de la diversidad textual" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — ENCUESTA DE HÁBITOS LECTORES",
+          "duration": "10 min",
+          "description": "¿Cuántos tipos de texto diferente leíste esta semana? ¿Mensajes de WhatsApp cuentan? ¿Las instrucciones de un videojuego? ¿Los memes? La pregunta '¿te gusta leer?' depende enormemente de a qué llamamos 'leer'. En México, el 73% de los mayores de 18 años no leyeron ningún libro en el último año (INEGI 2023), pero la misma población pasa horas diarias leyendo en pantallas.",
+          "activity": "Mini-encuesta: cada alumno responde 5 preguntas sobre sus hábitos lectores (¿qué lees? ¿cuándo? ¿en qué soporte? ¿por qué? ¿qué te gusta leer?). En 3 minutos, sistematizar los resultados en la pizarra."
+        },
+        {
+          "title": "FASE II: DESARROLLO — TAXONOMÍA DE TEXTOS",
+          "duration": "35 min",
+          "description": "Clasificación de textos en tres dimensiones: (1) POR PROPÓSITO: informativo (noticias, manuales, enciclopedias), literario (novela, poesía, cuento), persuasivo (publicidad, editorial, discurso político), instructivo (recetas, instrucciones, guías). (2) POR SOPORTE: papel (libros, revistas, periódicos), digital (sitios web, e-books, redes), audiovisual (video, podcast con texto). (3) POR FORMATO: continuo (narrativa linear), discontinuo (tablas, gráficas, formularios), multimodal (combina imagen y texto). La distinción entre soporte (el material) y formato (la organización del texto) es fundamental para el análisis textual.",
+          "activity": "Clasificación colaborativa: el docente reparte 12 textos diferentes (impresos o en pantalla). Los equipos los clasifican según las tres dimensiones y presentan sus criterios. Debate: ¿hay textos que no encajan en ninguna categoría?"
+        },
+        {
+          "title": "FASE III: CIERRE — PLURALIDAD Y VALOR DE LOS TEXTOS",
+          "duration": "10 min",
+          "description": "No hay textos mejores ni peores per se — hay textos más o menos adecuados para propósitos específicos. Un meme puede ser un texto literario sofisticado (usa metáfora, ironía, intertextualidad). Una receta puede ser más valiosa que una novela en ciertos contextos. El MCCEMS 2025 valida la pluralidad textual: desde los textos de la tradición académica hasta los textos digitales contemporáneos.",
+          "activity": "Cada alumno elabora su 'mapa textual personal': en un papel, dibuja una red de todos los textos que consume en una semana típica, clasificados por propósito y soporte."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La noción de 'texto' en la lingüística y la didáctica contemporánea va mucho más allá del libro impreso: incluye todo enunciado con coherencia y cohesión interna, sin importar su soporte material, extensión o propósito comunicativo. Esta ampliación del concepto de texto es fundamental para la educación en el siglo XXI, donde los estudiantes de bachillerato son simultáneamente lectores y productores de textos en soportes múltiples y formatos complejos que combinan escritura, imagen, audio y video.",
+      "sections": [
+        {
+          "subtitle": "Géneros discursivos: funciones sociales del texto",
+          "content": "Los géneros discursivos son categorías de textos estabilizadas por el uso social: la carta personal, el informe científico, la noticia periodística, la publicidad y el cuento son géneros porque comparten un propósito comunicativo, una estructura típica y un estilo. Los géneros no son camisa de fuerza sino convenciones que facilitan la comunicación: el lector de una receta sabe que encontrará ingredientes, cantidades y pasos; el lector de una noticia busca quién, qué, cuándo, dónde, cómo y por qué. La ruptura deliberada de convenciones genéricas (como en la literatura experimental) es un recurso estético que solo funciona porque el lector conoce la norma que se transgrede."
+        },
+        {
+          "subtitle": "Soportes digitales y nuevas prácticas lectoras",
+          "content": "La digitalización ha transformado radicalmente los soportes textuales y las prácticas de lectura. La lectura digital tiende a ser más fragmentada, no linear y participativa (comentarios, likes, reacciones). El hipertexto permite navegar entre textos de manera no secuencial. Los textos multimodales combinan escritura con imagen, video, audio y elementos interactivos. Estas transformaciones no equivalen a 'la muerte del libro': equivalen a la aparición de nuevas prácticas letradas que coexisten con las tradicionales. El MCCEMS 2025 reconoce la Cultura Digital (CD-I, transversal) como complementaria a la Lengua y Comunicación: ambas forman parte de una literacidad plena para el siglo XXI."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál es la diferencia entre el soporte y el formato de un texto?",
+          "options": [
+            "No hay diferencia, son sinónimos",
+            "El soporte es el material (papel, digital) y el formato es la organización interna del texto",
+            "El soporte es el contenido y el formato es el material",
+            "Ambos se refieren solo a textos impresos"
+          ],
+          "correct": "El soporte es el material (papel, digital) y el formato es la organización interna del texto"
+        },
+        {
+          "question": "¿Cuál de los siguientes es un texto con propósito INSTRUCTIVO?",
+          "options": ["Una novela de Juan Rulfo", "Un artículo de opinión del periódico", "Las instrucciones de una vacuna", "Un meme de internet"],
+          "correct": "Las instrucciones de una vacuna"
+        },
+        {
+          "question": "¿Qué son los géneros discursivos?",
+          "options": [
+            "Únicamente los textos literarios (novela, cuento, poesía)",
+            "Categorías de textos estabilizadas por el uso social con propósito, estructura y estilo característicos",
+            "Clasificaciones inventadas por académicos sin aplicación real",
+            "Solo los textos escritos en papel"
+          ],
+          "correct": "Categorías de textos estabilizadas por el uso social con propósito, estructura y estilo característicos"
+        },
+        {
+          "question": "¿Cuál es un ejemplo de texto MULTIMODAL?",
+          "options": ["Una novela sin imágenes", "Un mensaje de texto sin emojis", "Una infografía que combina texto, estadísticas y gráficas", "Un código de barras"],
+          "correct": "Una infografía que combina texto, estadísticas y gráficas"
+        },
+        {
+          "question": "Según el MCCEMS 2025, ¿cómo se relacionan Lengua y Comunicación con Cultura Digital?",
+          "options": [
+            "No se relacionan, son asignaturas independientes",
+            "Cultura Digital reemplaza a Lengua y Comunicación en el mundo moderno",
+            "Ambas forman parte de una literacidad plena para el siglo XXI",
+            "Cultura Digital solo abarca el uso de redes sociales"
+          ],
+          "correct": "Ambas forman parte de una literacidad plena para el siglo XXI"
+        }
+      ],
+      "rubric": "El alumno clasifica correctamente al menos 8 de 12 textos según propósito, soporte y formato, describe con ejemplos propios al menos 4 géneros discursivos diferentes e identifica características de los textos multimodales."
+    },
+    "teacher_tips": [
+      "Los memes, TikToks con subtítulos y threads de Twitter son textos legítimos para analizar. Incluirlos en la clase no baja el nivel académico — demuestra que las categorías de análisis textual aplican a todo texto.",
+      "La mini-encuesta de hábitos lectores no es solo una actividad: es un instrumento de diagnóstico real sobre las prácticas lectoras del grupo. Usa los resultados para personalizar los ejemplos del resto del semestre.",
+      "Conecta con CD-I (transversal): la alfabetización digital incluye la capacidad de navegar, evaluar y producir textos en entornos digitales — complemento directo de esta progresión."
+    ]
+  },
+  "LC-I-P03": {
+    "code": "LC-I-P03",
+    "title": "Claridad, coherencia y concordancia: propiedades fundamentales del texto",
+    "level": "Lengua y Comunicación I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Lectura y escritura como prácticas sociales",
+    "metadata": {
+      "objective": "Analizar textos de diversa naturaleza identificando las propiedades de claridad, coherencia y concordancia, para comprender su importancia en la transmisión efectiva de ideas y aplicarlas en la producción escrita propia.",
+      "competencies": ["Análisis textual crítico", "Escritura con propiedades formales", "Pensamiento crítico sobre el discurso"],
+      "materials": ["Textos con errores deliberados de coherencia y concordancia para análisis", "Textos ejemplares de claridad (Constitución Política, noticias del periódico)", "Hoja de análisis textual"]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "El texto que no se entiende" },
+        { "phase": "Desarrollo", "duration": "35 min", "label": "Las tres propiedades del texto" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Revisión con criterios" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — TEXTOS QUE FALLAN",
+          "duration": "10 min",
+          "description": "Se presenta a los alumnos un párrafo intencionalmente defectuoso con problemas de claridad, incoherencia y errores de concordancia. Los alumnos identifican qué hace difícil entenderlo. Esto activa conocimiento previo intuitivo sobre las propiedades textuales antes de formalizarlas.",
+          "activity": "Lectura grupal del párrafo defectuoso. Cada alumno subraya las partes que le parecen confusas. Discusión: '¿qué falla en este texto?'. El docente anota las observaciones en el pizarrón sin nominarlas todavía."
+        },
+        {
+          "title": "FASE II: DESARROLLO — TRES PROPIEDADES CLAVE",
+          "duration": "35 min",
+          "description": "Propiedad 1 — CLARIDAD: el texto comunica exactamente lo que el autor quiere decir, sin ambigüedad. Recursos: vocabulario preciso, oraciones con sujeto-verbo-complemento identificables, evitar construcciones complejas cuando las simples bastan. Propiedad 2 — COHERENCIA: el texto tiene un hilo lógico continuo; cada parte se relaciona con las demás y contribuye al propósito global. Coherencia global (el texto tiene un tema unificador) vs. coherencia local (cada párrafo tiene una idea central). Propiedad 3 — CONCORDANCIA: los elementos gramaticales concuerdan en género, número y persona (sujeto-verbo, sustantivo-adjetivo). Errores frecuentes: 'los alumnos estudiaron → el alumno estudió' (número), 'la mesa azul → la mesa azules' (número en adjetivo).",
+          "activity": "Taller de diagnóstico y corrección: los alumnos reciben 4 párrafos con problemas distintos. Deben (a) identificar qué propiedad falla, (b) explicar por qué es un problema, (c) reescribir el párrafo corrigiéndolo."
+        },
+        {
+          "title": "FASE III: CIERRE — AUTOEVALUACIÓN ESCRITA",
+          "duration": "10 min",
+          "description": "Las tres propiedades no son reglas arbitrarias — son condiciones para que la comunicación funcione. Un texto que no cumple con claridad, coherencia y concordancia no comunica: genera confusión, malentendidos o ruido comunicativo. Aplicar estas propiedades en la propia escritura requiere desarrollar la habilidad de leer el propio texto como si fuera escrito por otro.",
+          "activity": "Los alumnos revisan un párrafo que escribieron en LC-I-P01 usando las tres propiedades como lista de verificación. Identifican qué mejorarían."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Las propiedades textuales son los criterios que permiten juzgar si un texto cumple su propósito comunicativo con eficacia. La lingüística del texto, desarrollada desde los años 70 del siglo XX, identificó una serie de condiciones de textualidad — entre las más relevantes para la educación: cohesión, coherencia, intencionalidad, aceptabilidad, situacionalidad e intertextualidad. En el nivel del bachillerato, las tres propiedades fundamentales para el análisis y la producción textual son la claridad, la coherencia y la concordancia gramatical.",
+      "sections": [
+        {
+          "subtitle": "Coherencia: la unidad temática del texto",
+          "content": "La coherencia es la propiedad por la cual el texto forma una unidad semántica completa y no contradictoria. Un texto coherente tiene un tema central identificable, un progreso lógico de la información y relaciones claras entre sus partes. La coherencia tiene dos niveles: global (el texto en conjunto tiene una unidad temática) y local (cada párrafo desarrolla una idea central relacionada con el tema global). Los textos periodísticos bien escritos son modelos de coherencia: la pirámide invertida coloca la información más importante al inicio y la desarrolla en orden decreciente de importancia. Textos académicos como tesis o reportes de investigación usan estructura IMRD (Introducción, Métodos, Resultados, Discusión)."
+        },
+        {
+          "subtitle": "Concordancia y corrección gramatical",
+          "content": "La concordancia es la relación de correspondencia entre elementos gramaticales relacionados. En español, los dos tipos principales son: (1) Concordancia nominal: el adjetivo concuerda en género y número con el sustantivo al que modifica (mesa redonda, mesas redondas). (2) Concordancia verbal: el verbo concuerda en número y persona con su sujeto (el alumno estudia, los alumnos estudian). Los errores de concordancia son frecuentes cuando el sujeto y el verbo están alejados por complementos intercalados: 'La lista de los requisitos están disponibles' (error: el sujeto es 'lista', debería ser 'está'). La concordancia también involucra pronombres: el pronombre debe concordar en género y número con su antecedente."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál oración tiene un error de concordancia?",
+          "options": ["Los estudiantes aprobaron el examen", "La maestra revisó los cuadernos cuidadosamente", "Los alumnos de la preparatoria estudiaron mucho", "Los director y los maestros están reunidos"],
+          "correct": "Los director y los maestros están reunidos"
+        },
+        {
+          "question": "¿Qué propiedad del texto garantiza que cada párrafo se relacione con el tema central?",
+          "options": ["Claridad", "Concordancia", "Coherencia", "Corrección ortográfica"],
+          "correct": "Coherencia"
+        },
+        {
+          "question": "Un texto con claridad se caracteriza por...",
+          "options": ["Usar vocabulario especializado siempre", "Comunicar exactamente lo que el autor quiere decir sin ambigüedad", "Tener muchos adjetivos y adverbios", "Ser muy extenso y detallado"],
+          "correct": "Comunicar exactamente lo que el autor quiere decir sin ambigüedad"
+        },
+        {
+          "question": "¿Cuáles son los dos niveles de coherencia textual?",
+          "options": ["Fonológico y sintáctico", "Global (unidad temática del texto) y local (cada párrafo tiene idea central)", "Denotativo y connotativo", "Explícito e implícito"],
+          "correct": "Global (unidad temática del texto) y local (cada párrafo tiene idea central)"
+        },
+        {
+          "question": "En el enunciado 'La lista de los alumnos inscritos están disponible', ¿cuál es el error?",
+          "options": ["Error de claridad porque es ambiguo", "Error de coherencia porque no tiene tema", "Error de concordancia: el sujeto 'lista' requiere 'está', no 'están'", "No hay ningún error"],
+          "correct": "Error de concordancia: el sujeto 'lista' requiere 'está', no 'están'"
+        }
+      ],
+      "rubric": "El alumno identifica correctamente al menos 4 problemas textuales (claridad, coherencia o concordancia) en textos proporcionados y los corrige de manera apropiada, además de aplicar las tres propiedades en la revisión de un párrafo propio."
+    },
+    "teacher_tips": [
+      "Los errores de concordancia más comunes en el habla cotidiana de la región son excelentes ejemplos para la clase. No presentes los ejemplos como 'errores del pasado' — son errores que los alumnos mismos cometen y eso los hace relevantes.",
+      "Distingue entre error de concordancia (problema gramatical formal) y variedad dialectal (forma legítima en ciertos registros). El objetivo no es estigmatizar el habla popular, sino que los alumnos dominen la variedad estándar escrita.",
+      "Esta progresión es transversal con CS-I (textos sobre desigualdad y democracia): usa textos de ciencias sociales para practicar el análisis de claridad, coherencia y concordancia en un contexto temático relevante."
+    ]
+  },
+  "LC-I-P04": {
+    "code": "LC-I-P04",
+    "title": "Tipos de párrafos: descriptivos, narrativos y argumentativos",
+    "level": "Lengua y Comunicación I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Escritura",
+    "metadata": {
+      "objective": "Reconocer los tipos de párrafos (descriptivo, narrativo y argumentativo) a partir de la exploración de textos diversos, identificando su estructura, función comunicativa y rasgos diferenciales para aplicarlos en la producción escrita propia.",
+      "competencies": ["Análisis y producción textual", "Escritura estructurada", "Distinción de modalidades discursivas"],
+      "materials": ["Textos ejemplares de los tres tipos de párrafos (noticias, narraciones literarias, editoriales)", "Guía de análisis estructural de párrafos", "Papel y lápiz para producción escrita"]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿De qué tipo es este párrafo?" },
+        { "phase": "Desarrollo", "duration": "35 min", "label": "Tres formas de organizar ideas" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Escribo mi propio párrafo" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — CLASIFICACIÓN INTUITIVA",
+          "duration": "10 min",
+          "description": "Se presentan tres párrafos sin etiqueta: uno que describe un mercado oaxaqueño, uno que narra un episodio de la Revolución Mexicana y uno que argumenta a favor de la energía solar. Los alumnos los leen y describen intuitivamente las diferencias que perciben. ¿Cuál 'pinta' la escena? ¿Cuál 'cuenta'? ¿Cuál 'convence'?",
+          "activity": "Lectura grupal de los tres párrafos. Cada alumno escribe en una tarjeta: 'Este párrafo _____ porque _____.'"
+        },
+        {
+          "title": "FASE II: DESARROLLO — ESTRUCTURA Y FUNCIÓN DE CADA TIPO",
+          "duration": "35 min",
+          "description": "PÁRRAFO DESCRIPTIVO: presenta características y atributos de personas, lugares, objetos o conceptos. Estructura: tema + detalles sensoriales o conceptuales. Recursos: adjetivos, comparaciones, metáforas. Uso: en narrativa literaria, artículos científicos, guías turísticas. PÁRRAFO NARRATIVO: presenta una secuencia de eventos en el tiempo. Estructura: situación inicial → complicación → resolución (o variantes). Recursos: verbos de acción, marcadores temporales, nexos de secuencia. Uso: en cuento, novela, crónica periodística, historia. PÁRRAFO ARGUMENTATIVO: defiende una tesis con razones y evidencias. Estructura: tesis + argumentos (con datos) + conclusión. Recursos: conectores causales y concesivos, citas de autoridad, estadísticas. Uso: en ensayo académico, editorial, debate.",
+          "activity": "Producción guiada: cada alumno escribe un párrafo de cada tipo sobre el mismo tema (el mercado de su comunidad). El docente circula y da retroalimentación individual."
+        },
+        {
+          "title": "FASE III: CIERRE — EL PÁRRAFO COMO UNIDAD DE PENSAMIENTO",
+          "duration": "10 min",
+          "description": "El párrafo no es solo una unidad gráfica (bloque de texto) sino una unidad de pensamiento: cada párrafo desarrolla una idea. Dominar los tres tipos de párrafos es dominar tres formas de organizar el pensamiento: describir, narrar y argumentar son operaciones cognitivas distintas que se usan en contextos diferentes.",
+          "activity": "Compartir: cada equipo comparte uno de sus párrafos. El grupo identifica el tipo y sugiere una mejora específica."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Los tipos de párrafo no son categorías escolares arbitrarias: reflejan tres modos fundamentales de organización del pensamiento humano — la descripción (cómo es algo), la narración (qué sucedió) y la argumentación (por qué algo es verdadero o deseable). Estos modos también se llaman 'secuencias textuales dominantes' en la lingüística contemporánea, y en la práctica real los textos suelen combinarlos: una novela tiene narración + descripción; un ensayo tiene argumentación + descripción; un artículo periodístico combina los tres.",
+      "sections": [
+        {
+          "subtitle": "Párrafo descriptivo: el arte de hacer visible lo invisible",
+          "content": "La descripción consiste en caracterizar un objeto, persona, lugar o concepto para que el lector pueda construir una imagen mental de él. La descripción puede ser objetiva (como en un informe científico o una definición de diccionario) o subjetiva (como en la literatura, donde el narrador imprime su percepción y emociones al describir). En la tradición literaria mexicana, autores como Juan Rulfo (Comala en Pedro Páramo), Carlos Fuentes (la CDMX de La región más transparente) y Elena Poniatowska son maestros de la descripción que condensa en pocos párrafos toda una realidad social y sensorial. La descripción efectiva selecciona detalles significativos — no lista todos los atributos, sino los que construyen la impresión más precisa."
+        },
+        {
+          "subtitle": "Párrafo argumentativo: la base del pensamiento académico",
+          "content": "La argumentación es la forma dominante del discurso académico, científico y político. Un argumento válido tiene tres componentes: (1) tesis (lo que se defiende), (2) argumentos o razones (por qué la tesis es verdadera), y (3) evidencias (datos, ejemplos, citas de autoridad que respaldan los argumentos). En el nivel bachillerato, los alumnos necesitan aprender tanto a construir argumentos propios como a identificar y evaluar críticamente los argumentos de otros. La distinción entre argumento y opinión es fundamental: una opinión es una creencia sin respaldo explícito; un argumento es una tesis respaldada por razones y evidencias. El MCCEMS 2025 enfatiza el pensamiento crítico y la argumentación como competencias transversales a todas las UAC."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál de los siguientes es un ejemplo de párrafo argumentativo?",
+          "options": [
+            "El lago de Pátzcuaro, en Michoacán, tiene aguas cristalinas rodeadas de montañas verdes",
+            "El 15 de septiembre de 1810, el cura Hidalgo llamó al pueblo a rebelarse contra la corona española",
+            "Es urgente regular el uso de plásticos de un solo uso en México porque generan 12 millones de toneladas anuales de basura que contamina mares y ríos",
+            "La abuela sacó los tamales del bote de vapor y los colocó sobre la mesa"
+          ],
+          "correct": "Es urgente regular el uso de plásticos de un solo uso en México porque generan 12 millones de toneladas anuales de basura que contamina mares y ríos"
+        },
+        {
+          "question": "¿Cuál recurso lingüístico es más característico del párrafo narrativo?",
+          "options": ["Adjetivos descriptivos abundantes", "Verbos de acción y marcadores temporales (después, luego, entonces)", "Conectores causales (porque, ya que, por lo tanto)", "Definiciones de conceptos"],
+          "correct": "Verbos de acción y marcadores temporales (después, luego, entonces)"
+        },
+        {
+          "question": "En un párrafo argumentativo, ¿qué es la 'tesis'?",
+          "options": ["Un documento universitario muy extenso", "La afirmación central que se defiende con razones y evidencias", "Un resumen del texto anterior", "Un tipo de poema filosófico"],
+          "correct": "La afirmación central que se defiende con razones y evidencias"
+        },
+        {
+          "question": "¿Cuál es la principal diferencia entre descripción objetiva y subjetiva?",
+          "options": ["La descripción objetiva es más larga", "La objetiva presenta atributos sin valoración personal; la subjetiva incluye percepción y emociones del autor", "La descripción subjetiva usa estadísticas y datos", "No hay diferencia relevante"],
+          "correct": "La objetiva presenta atributos sin valoración personal; la subjetiva incluye percepción y emociones del autor"
+        },
+        {
+          "question": "¿En qué tipo de texto predomina el párrafo argumentativo?",
+          "options": ["En una novela de aventuras", "En una receta de cocina", "En un ensayo académico o editorial periodístico", "En una guía turística"],
+          "correct": "En un ensayo académico o editorial periodístico"
+        }
+      ],
+      "rubric": "El alumno produce correctamente un párrafo de cada tipo (descriptivo, narrativo y argumentativo) con la estructura apropiada, identifica los rasgos diferenciales de cada tipo en textos dados y utiliza los recursos lingüísticos característicos de al menos dos tipos."
+    },
+    "teacher_tips": [
+      "El párrafo argumentativo es el que más trabajo requiere en bachillerato. Muchos alumnos confunden opinión con argumento. Dedica tiempo específico a mostrar la diferencia con ejemplos: 'Me gusta el metro' (opinión) vs. 'El metro de la CDMX es el medio de transporte más eficiente de la ciudad porque moviliza 4 millones de personas diariamente con menor huella de carbono que el automóvil privado' (argumento).",
+      "Usa textos de la tradición literaria mexicana para los ejemplos descriptivos y narrativos. Rulfo, Poniatowska y Fuentes son autores del programa nacional y los alumnos deberían conocerlos.",
+      "La producción simultánea de los tres tipos de párrafo sobre el mismo tema (el mercado de la comunidad) es pedagógicamente poderosa: muestra cómo el mismo referente puede tratarse de tres maneras radicalmente diferentes."
+    ]
+  },
+  "LC-I-P05": {
+    "code": "LC-I-P05",
+    "title": "Comprensión lectora: ideas principales, secundarias y elementos paratextuales",
+    "level": "Lengua y Comunicación I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Lectura",
+    "metadata": {
+      "objective": "Identificar las ideas principales y secundarias en textos de diversa naturaleza, reconocer el papel de los elementos paratextuales en la construcción de sentido y desarrollar estrategias de comprensión lectora aplicables a cualquier tipo de texto.",
+      "competencies": ["Comprensión lectora estratégica", "Identificación de jerarquía informativa", "Análisis de elementos paratextuales"],
+      "materials": ["Textos informativos con títulos, subtítulos, imágenes y recuadros (artículos de revista o periódico)", "Textos sin elementos paratextuales para contraste", "Guía de estrategias de lectura"]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "Antes de leer: el paratexto" },
+        { "phase": "Desarrollo", "duration": "35 min", "label": "Ideas principales y secundarias" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Estrategias para toda la vida" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — EL PARATEXTO COMO MAPA",
+          "duration": "10 min",
+          "description": "Antes de leer una sola palabra del texto, ya tenemos información: el título, la imagen de portada, el nombre del autor, la fecha, la fuente. Esta información se llama paratexto y nos permite anticipar el contenido, calibrar nuestra lectura y decidir si el texto es relevante para nuestro propósito.",
+          "activity": "Se muestra la portada de un artículo sin mostrar el cuerpo del texto. Los alumnos responden: ¿De qué crees que trata? ¿A qué tipo de lector va dirigido? ¿Es un texto académico o popular? Luego leen el primer párrafo y confirman o corrigen sus predicciones."
+        },
+        {
+          "title": "FASE II: DESARROLLO — JERARQUÍA INFORMATIVA",
+          "duration": "35 min",
+          "description": "Dos momentos: PARTE 1 (20 min) — IDEA PRINCIPAL: la proposición más importante del texto o párrafo, que expresa el tema central y sin la cual el resto no tendría sentido. Técnica para identificarla: al final de cada párrafo, pregunta '¿de qué trató principalmente este párrafo?'. IDEAS SECUNDARIAS: información que apoya, ilustra, explica o amplía la idea principal. Incluye: ejemplos, datos, citas, comparaciones, causas y consecuencias. PARTE 2 (15 min) — PARATEXTO: título (anticipa el tema), subtítulos (organizan el texto en secciones), imágenes + pie de foto (complementan o ilustran), recuadros informativos (información adicional), negrita/cursiva (términos clave), bibliografía (fuentes).",
+          "activity": "Los alumnos analizan un artículo completo identificando: (a) la idea principal de cada párrafo, (b) 3 ideas secundarias importantes, (c) todos los elementos paratextuales y su función. Comparten en plenaria."
+        },
+        {
+          "title": "FASE III: CIERRE — ESTRATEGIAS TRANSFERIBLES",
+          "duration": "10 min",
+          "description": "Las estrategias de comprensión lectora no son técnicas para exámenes: son hábitos mentales que se aplican cada vez que se lee con propósito. Leer el paratexto primero, identificar ideas principales, reconocer las secundarias como evidencia de apoyo son estrategias usadas por lectores expertos en todas las disciplinas.",
+          "activity": "Los alumnos elaboran un organizador gráfico (mapa conceptual o esquema) que represente la jerarquía de ideas del artículo analizado."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La comprensión lectora es un proceso activo de construcción de significado — no la recepción pasiva de información que está 'en el texto'. El lector aporta su conocimiento previo, sus expectativas y sus propósitos para construir, junto con el texto, una representación mental del contenido. Las estrategias de comprensión lectora son procedimientos deliberados que el lector experto usa antes, durante y después de la lectura para maximizar la comprensión y la retención.",
+      "sections": [
+        {
+          "subtitle": "Macroestructura y jerarquía de ideas",
+          "content": "La macroestructura es la organización global de significado de un texto — lo que el texto 'dice en resumen'. Está formada por las ideas principales de cada sección y sus relaciones. La jerarquía informativa tiene, en la mayoría de los textos académicos e informativos, tres niveles: (1) Tema global del texto (expresado en el título o la tesis inicial), (2) Ideas principales de cada sección o párrafo (expresadas típicamente en la oración temática del párrafo), (3) Ideas secundarias o de apoyo (ejemplos, datos, citas, explicaciones). Comprender la macroestructura de un texto es comprender lo más esencial de su contenido — la habilidad de mayor impacto en el aprendizaje a largo plazo."
+        },
+        {
+          "subtitle": "Paratexto: los límites del texto y sus funciones",
+          "content": "El paratexto (término acuñado por el teórico literario Gérard Genette) engloba todos los elementos que rodean y enmarcan el texto propiamente dicho: el título, el subtítulo, el nombre del autor, la editorial, la fecha, el prólogo, las notas al pie, el índice, la bibliografía, las imágenes, los gráficos y sus pies de foto. En la lectura estratégica, el paratexto cumple funciones clave: orienta al lector sobre el contenido antes de leerlo, indica el nivel de tecnicidad del texto (bibliografía extensa = texto académico), señala los conceptos clave (negrita, cursiva, recuadros), y en los textos periodísticos, el titular y el sumario condensan la información esencial para quien no lee todo el artículo."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cómo se identifica la idea principal de un párrafo?",
+          "options": ["Es la primera oración siempre", "Es la proposición más importante, sin la cual el resto del párrafo no tendría sentido", "Es la oración más larga del párrafo", "Es la última oración del párrafo"],
+          "correct": "Es la proposición más importante, sin la cual el resto del párrafo no tendría sentido"
+        },
+        {
+          "question": "¿Qué función cumple el subtítulo en un texto informativo?",
+          "options": ["Es decorativo y no aporta información", "Organiza el texto en secciones y anticipa el contenido de cada una", "Resume todo el texto en una frase", "Indica el nombre del autor"],
+          "correct": "Organiza el texto en secciones y anticipa el contenido de cada una"
+        },
+        {
+          "question": "¿Cuál de los siguientes es un elemento PARATEXTUAL?",
+          "options": ["El primer párrafo del artículo", "El ejemplo en el cuerpo del texto", "El pie de foto de una imagen", "La idea principal del texto"],
+          "correct": "El pie de foto de una imagen"
+        },
+        {
+          "question": "¿Cuál es la relación entre ideas principales e ideas secundarias?",
+          "options": ["Son independientes y no se relacionan", "Las ideas secundarias apoyan, ilustran o explican las ideas principales", "Las ideas secundarias son más importantes que las principales", "Solo los textos científicos tienen ideas secundarias"],
+          "correct": "Las ideas secundarias apoyan, ilustran o explican las ideas principales"
+        },
+        {
+          "question": "La macroestructura de un texto es...",
+          "options": ["El diseño visual de las páginas", "La organización global de significado: lo que el texto dice en resumen", "La lista de palabras difíciles que contiene", "El número de párrafos del texto"],
+          "correct": "La organización global de significado: lo que el texto dice en resumen"
+        }
+      ],
+      "rubric": "El alumno identifica correctamente la idea principal de al menos 4 de 5 párrafos analizados, enumera al menos 3 ideas secundarias con su función (ejemplo/dato/cita), e identifica y describe la función de al menos 4 elementos paratextuales de un texto dado."
+    },
+    "teacher_tips": [
+      "Insiste en que la comprensión lectora se construye ANTES de leer (predecir con el paratexto), DURANTE la lectura (monitorear la comprensión, identificar ideas) y DESPUÉS (sintetizar, conectar). Enseña las estrategias de estos tres momentos.",
+      "Los textos del INEGI, CONEVAL o de la SEP son excelentes para practicar comprensión de textos con alto contenido informativo y múltiples elementos paratextuales. Son además textos que los alumnos podrían necesitar en su vida adulta.",
+      "Enseña explícitamente que una idea principal puede estar implícita (no expresada directamente en ninguna oración del párrafo). Esto es más difícil pero ocurre frecuentemente en textos literarios y de opinión."
+    ]
+  },
+  "LC-I-P06": {
+    "code": "LC-I-P06",
+    "title": "Conectores y concordancia: cohesión textual",
+    "level": "Lengua y Comunicación I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Escritura",
+    "metadata": {
+      "objective": "Analizar y aplicar el uso de conectores (causales, comparativos y de adición) y la puntuación correcta en textos propios y ajenos, comprendiendo su función en la cohesión y el flujo lógico del discurso escrito.",
+      "competencies": ["Dominio de la cohesión textual", "Escritura con conectores apropiados", "Análisis de la sintaxis textual"],
+      "materials": ["Textos con conectores resaltados para análisis", "Lista de conectores por función", "Ejercicios de completamiento y reescritura"]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "El texto sin conectores" },
+        { "phase": "Desarrollo", "duration": "35 min", "label": "Tipos de conectores y puntuación" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Producción con cohesión" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — COHESIÓN VS. INCOHERENCIA",
+          "duration": "10 min",
+          "description": "Se presentan dos versiones del mismo párrafo: uno sin conectores (una lista de oraciones yuxtapuestas) y uno con conectores apropiados. Los alumnos comparan la diferencia en fluidez, claridad y lógica. Los conectores son el 'cemento' del texto: unen las ideas y señalan la relación lógica entre ellas.",
+          "activity": "Los alumnos reciben el párrafo sin conectores y deben agregar los conectores que faltan. Luego comparan con la versión original."
+        },
+        {
+          "title": "FASE II: DESARROLLO — CONECTORES Y PUNTUACIÓN",
+          "duration": "35 min",
+          "description": "Clasificación de conectores: ADICIÓN (además, también, asimismo, por otro lado, incluso) — añaden información. CAUSA (porque, ya que, dado que, pues, puesto que) — expresan la causa de algo. CONSECUENCIA (por lo tanto, en consecuencia, así que, de ahí que) — expresan el resultado de algo. COMPARACIÓN (de la misma manera, en cambio, sin embargo, a diferencia de, mientras que) — comparan o contrastan. TEMPORALES (luego, después, antes, finalmente, en primer lugar). Puntuación en textos complejos: coma con conectores iniciales, punto y coma para separar claúsulas largas, dos puntos antes de explicación o enumeración.",
+          "activity": "Análisis y clasificación: los alumnos reciben un artículo periodístico y subrayan todos los conectores en colores diferentes según su tipo. Luego identifican cuál tipo predomina y por qué (el tipo de texto lo determina)."
+        },
+        {
+          "title": "FASE III: CIERRE — PRODUCCIÓN COHESIVA",
+          "duration": "10 min",
+          "description": "La cohesión es la propiedad por la cual las oraciones de un texto se vinculan explícitamente mediante recursos lingüísticos: conectores, pronombres anafóricos, elipsis y repetición léxica controlada. El dominio de los conectores permite escribir textos que fluyen naturalmente sin repetición innecesaria y con relaciones lógicas claras.",
+          "activity": "Los alumnos reescriben el párrafo argumentativo que escribieron en LC-I-P04 agregando al menos 3 conectores de diferentes tipos. Mejoran la cohesión de su propio texto."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La cohesión es el conjunto de mecanismos lingüísticos que establecen relaciones explícitas entre las oraciones de un texto, creando la continuidad y el flujo que permiten al lector seguir el desarrollo del significado sin ambigüedad. A diferencia de la coherencia (que es semántica — el texto tiene sentido), la cohesión es formal: se realiza en la superficie textual mediante recursos gramaticales y léxicos concretos. Los conectores o marcadores del discurso son el mecanismo cohesivo más visible y sistemático.",
+      "sections": [
+        {
+          "subtitle": "Los conectores como señales del razonamiento",
+          "content": "Los conectores (también llamados marcadores del discurso o conectivos textuales) son expresiones lingüísticas que señalan la relación lógica entre segmentos del texto. No solo conectan — revelan el tipo de razonamiento que el autor está haciendo: 'porque' señala causalidad, 'sin embargo' señala contraste, 'además' señala adición, 'por lo tanto' señala inferencia. Un lector experto lee estos conectores como instrucciones de navegación del texto. Un escritor experto los usa deliberadamente para guiar la lectura en la dirección correcta. El uso incorrecto o ausente de conectores es una de las causas más frecuentes de textos incoherentes o poco persuasivos."
+        },
+        {
+          "subtitle": "Puntuación y sintaxis compleja",
+          "content": "La puntuación en español no es solo una convención ortográfica — es un sistema de organización sintáctica que indica unidades de significado y sus relaciones. La coma (,) separa elementos de una enumeración, enmarca incisos explicativos y se usa obligatoriamente después de conectores que inician oración ('Sin embargo, los resultados mostraron...'). El punto y coma (;) separa oraciones relacionadas pero con cierta independencia. Los dos puntos (:) anticipan una enumeración, una explicación o una cita. El dominio de la puntuación es esencial para la escritura académica y profesional: un documento oficial mal puntuado puede cambiar su significado legal. La Constitución Política de México es un texto donde la puntuación tiene consecuencias jurídicas precisas."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál conector expresa la causa de algo?",
+          "options": ["Sin embargo", "Por lo tanto", "Ya que", "Además"],
+          "correct": "Ya que"
+        },
+        {
+          "question": "¿Cuál es la función del conector 'sin embargo'?",
+          "options": ["Añadir información similar", "Expresar una causa", "Introducir un contraste o restricción", "Señalar una consecuencia"],
+          "correct": "Introducir un contraste o restricción"
+        },
+        {
+          "question": "¿En cuál oración el uso de la coma es CORRECTO?",
+          "options": ["Los alumnos, estudiaron mucho", "Sin embargo, los resultados no fueron los esperados", "La maestra de matemáticas, revisó los exámenes", "El libro, que me prestaste, ya lo devolví a la biblioteca"],
+          "correct": "Sin embargo, los resultados no fueron los esperados"
+        },
+        {
+          "question": "¿Qué tipo de conector es 'asimismo'?",
+          "options": ["Causal", "De adición", "De contraste", "Temporal"],
+          "correct": "De adición"
+        },
+        {
+          "question": "¿Cuál es la función de los dos puntos (:) en el texto?",
+          "options": ["Indicar el final de una oración", "Separar dos oraciones independientes", "Anticipar una enumeración, explicación o cita directa", "Reemplazar al punto y seguido"],
+          "correct": "Anticipar una enumeración, explicación o cita directa"
+        }
+      ],
+      "rubric": "El alumno clasifica correctamente al menos 15 de 20 conectores según su función, aplica correctamente los signos de puntuación (coma, punto y coma, dos puntos) en al menos 8 de 10 oraciones, y produce un párrafo cohesivo usando al menos 4 tipos distintos de conectores."
+    },
+    "teacher_tips": [
+      "Los alumnos suelen sobreusar 'pero' y 'y' como únicos conectores. Haz ejercicios de sustitución: '¿Cómo reemplazarías 'pero' por un conector más preciso en este contexto?' Esto enriquece el vocabulario conectivo.",
+      "La puntuación varía en el habla coloquial y en la escritura informal digital. Distingue claramente entre registro coloquial (donde la puntuación es más libre) y registro formal (donde las reglas son más estrictas). Ambos son legítimos en su contexto.",
+      "El texto argumentativo producido en LC-I-P04 es el vehículo ideal para esta progresión: los alumnos mejoran un texto propio, lo que genera más compromiso que corregir textos ajenos."
+    ]
+  },
+  "LC-I-P07": {
+    "code": "LC-I-P07",
+    "title": "Lectura en voz alta y opinión fundamentada",
+    "level": "Lengua y Comunicación I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Oralidad",
+    "metadata": {
+      "objective": "Practicar la lectura en voz alta de textos literarios e informativos con entonación, ritmo y expresividad apropiados, para luego emitir opiniones fundamentadas que articulen comprensión lectora con expresión oral.",
+      "competencies": ["Lectura expresiva y fluida", "Expresión oral de opiniones argumentadas", "Comprensión lectora profunda"],
+      "materials": ["Textos literarios de autores mexicanos (poemas, fragmentos narrativos)", "Textos de opinión o informativos para lectura y debate", "Grabadora o app de voz (para que los alumnos escuchen su propia lectura)"]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "Cuando un texto cobra vida" },
+        { "phase": "Desarrollo", "duration": "35 min", "label": "Lectura, escucha y opinión" },
+        { "phase": "Cierre", "duration": "10 min", "label": "La voz como instrumento" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — LA VOZ QUE TRANSFORMA EL TEXTO",
+          "duration": "10 min",
+          "description": "Se presentan dos lecturas del mismo fragmento de 'Nos han dado la tierra' de Juan Rulfo: una monótona y sin entonación, otra expresiva y con pausas apropiadas. Los alumnos identifican la diferencia radical en la experiencia del oyente. La lectura en voz alta no es simplemente 'decir en voz alta': es una interpretación del texto.",
+          "activity": "Escucha comparativa de dos lecturas. ¿Cuál transmite mejor el tono melancólico del texto de Rulfo? ¿Por qué? ¿Qué herramientas usa el segundo lector que no usa el primero?"
+        },
+        {
+          "title": "FASE II: DESARROLLO — TÉCNICA Y PRÁCTICA",
+          "duration": "35 min",
+          "description": "Parte 1 (20 min) — Técnica de lectura en voz alta: (a) Preparación previa: leer el texto en silencio, identificar el tono general y los momentos de mayor intensidad emocional. (b) Recursos vocales: velocidad (más lento para énfasis, más rápido para narración rápida), volumen (más alto para clímax, más bajo para suspenso), pausa (después de comas, punto y seguido, punto y aparte). (c) Comprensión como prerequisito: no puedes leer bien lo que no entiendes. Parte 2 (15 min) — Expresión de opinión: el alumno lee un texto breve y luego expresa en voz alta su opinión fundamentada. Estructura: 'En mi opinión, ___. Pienso esto porque ___. El texto dice que ___, lo que apoya mi postura.'",
+          "activity": "Práctica en parejas: un alumno lee en voz alta un fragmento (preparado en casa o durante la clase). El otro escucha y luego da retroalimentación usando una lista de criterios. Luego invierten. Al final, cada alumno expresa su opinión sobre lo que leyó."
+        },
+        {
+          "title": "FASE III: CIERRE — LA LECTURA COMO ACTO SOCIAL",
+          "duration": "10 min",
+          "description": "La lectura en voz alta tiene una larga tradición social en México: los lectores en las fábricas de tabaco en el siglo XIX, las tertulias literarias, la tradición oral indígena de contar historias. Leer en voz alta es un acto de generosidad — compartes el texto con otros — y de interpretación — le das tu voz al texto.",
+          "activity": "Círculo de lectura: cada alumno lee en voz alta una oración o frase del texto que más le impactó y en una sola frase dice por qué."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La oralidad y la literacidad no son opuestos: son dimensiones complementarias de la comunicación humana que se enriquecen mutuamente. La lectura en voz alta es el punto de encuentro entre ambas: requiere comprensión lectora profunda (no se puede leer bien lo que no se entiende), control vocal (entonación, ritmo, pausas, volumen) y sensibilidad interpretativa (captar el tono del texto y transmitirlo). La expresión oral de opiniones fundamentadas sobre textos es la forma más básica del análisis y la crítica literaria.",
+      "sections": [
+        {
+          "subtitle": "La lectura expresiva como interpretación",
+          "content": "Leer en voz alta expresivamente es una forma de interpretación — no diferente en principio de la interpretación teatral o musical. El lector toma decisiones sobre el ritmo, la entonación, las pausas, el volumen y la emoción que comunica al oyente. Estas decisiones están informadas por la comprensión profunda del texto: el tono sombrío de Rulfo en 'Nos han dado la tierra' requiere una lectura lenta, con pausas largas y voz baja; la urgencia política de un discurso de Juárez requiere una lectura más enérgica y articulada. Los actores y locutores profesionales estudian técnica vocal durante años — en el bachillerato, el objetivo es desarrollar conciencia básica de los recursos vocales y su impacto."
+        },
+        {
+          "subtitle": "Opinión fundamentada: entre el subjetivismo y la argumentación",
+          "content": "Emitir una opinión fundamentada sobre un texto no es opinar cualquier cosa ('me gustó porque sí') ni tampoco es hacer análisis académico especializado. Es articular una respuesta personal con razones relacionadas con el texto: '¿Qué sentí o pensé? ¿Qué elementos del texto provocaron esa reacción? ¿Puedo citar algo concreto del texto que respalde mi opinión?'. La estructura básica de una opinión fundamentada: (1) Postura clara ('En mi opinión, el personaje de Rulfo...'), (2) Razón o argumento ('...porque el texto muestra...'), (3) Evidencia textual ('...cuando el narrador dice: \"...\"'). Esta estructura es la misma del ensayo académico — la progresión LC-I-P07 es un puente entre la respuesta emocional inmediata y el análisis riguroso."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál es el prerequisito más importante para una lectura en voz alta expresiva?",
+          "options": ["Tener una voz agradable naturalmente", "Comprender profundamente el texto antes de leerlo", "Leer muy rápido para no aburrir al oyente", "Memorizar el texto"],
+          "correct": "Comprender profundamente el texto antes de leerlo"
+        },
+        {
+          "question": "¿Qué indica una PAUSA en la lectura en voz alta?",
+          "options": ["Que el lector olvidó la siguiente línea", "Que el texto termina ahí", "Que ese momento requiere énfasis o reflexión del oyente", "Que el texto es aburrido"],
+          "correct": "Que ese momento requiere énfasis o reflexión del oyente"
+        },
+        {
+          "question": "¿Cuál de las siguientes es una opinión FUNDAMENTADA sobre un texto?",
+          "options": [
+            "Me gustó mucho el texto",
+            "El texto está bien escrito",
+            "El personaje muestra resignación ante la injusticia, como cuando afirma que aceptará la tierra aunque sea de piedra",
+            "No entendí el texto"
+          ],
+          "correct": "El personaje muestra resignación ante la injusticia, como cuando afirma que aceptará la tierra aunque sea de piedra"
+        },
+        {
+          "question": "¿Cuáles son los tres componentes de una opinión fundamentada?",
+          "options": [
+            "Introducción, desarrollo y conclusión",
+            "Postura clara, razón o argumento, y evidencia textual",
+            "Descripción, narración y argumentación",
+            "Título, cuerpo y bibliografía"
+          ],
+          "correct": "Postura clara, razón o argumento, y evidencia textual"
+        },
+        {
+          "question": "La lectura en voz alta es descrita en el MCCEMS 2025 como...",
+          "options": [
+            "Una habilidad opcional para quienes quieren ser actores",
+            "Una práctica social y una forma de diálogo con el texto y la comunidad",
+            "Solo útil en educación primaria",
+            "Un ejercicio de pronunciación sin relación con la comprensión"
+          ],
+          "correct": "Una práctica social y una forma de diálogo con el texto y la comunidad"
+        }
+      ],
+      "rubric": "El alumno lee en voz alta un fragmento de al menos 150 palabras con entonación, ritmo y pausas apropiados al tono del texto, y expresa una opinión fundamentada con los tres componentes (postura, razón, evidencia textual) en al menos 60 palabras."
+    },
+    "teacher_tips": [
+      "Muchos alumnos de bachillerato tienen vergüenza de leer en voz alta por miedo a equivocarse. Normaliza el error creando un ambiente seguro: los errores se corrigen con naturalidad, sin burla. La práctica en parejas antes de leer al grupo reduce la ansiedad.",
+      "La grabación de la propia voz es poderosa: cuando los alumnos escuchan su propia lectura, identifican por sí mismos aspectos a mejorar sin necesidad de que el docente los señale.",
+      "Usa textos de autores mexicanos canónicos del programa nacional (Rulfo, Sor Juana, Poniatowska, Paz). La lectura expresiva de estos textos es también un acercamiento significativo a la tradición literaria nacional."
+    ]
+  },
+  "LC-I-P08": {
+    "code": "LC-I-P08",
+    "title": "La exposición oral: planeación, estructura y recursos de apoyo",
+    "level": "Lengua y Comunicación I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Oralidad",
+    "metadata": {
+      "objective": "Identificar las características de una exposición oral efectiva, planearla con estructura clara y apoyos visuales apropiados, y ponerla en práctica ante el grupo desarrollando competencias de comunicación pública.",
+      "competencies": ["Comunicación oral pública", "Organización y planeación del discurso", "Uso de recursos visuales de apoyo"],
+      "materials": ["Guía de planeación de exposición oral", "Canva o PowerPoint para diapositivas (en caso de disponibilidad tecnológica)", "Rúbrica de evaluación de exposición oral"]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Qué hace que una exposición sea memorable?" },
+        { "phase": "Desarrollo", "duration": "35 min", "label": "De la idea a la presentación" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Ensayo y retroalimentación" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — ANATOMÍA DE UNA BUENA EXPOSICIÓN",
+          "duration": "10 min",
+          "description": "¿Recuerdas alguna presentación en clase que te haya impresionado? ¿O alguna que te haya aburrido? La diferencia entre ambas generalmente no es el tema — es la organización, la claridad, el contacto visual y el uso inteligente de apoyos visuales. Hoy aprendemos a construir una exposición que la gente recuerde.",
+          "activity": "Los alumnos listan en una hoja las características de la 'peor exposición que han visto' y de la 'mejor'. El docente sistematiza en el pizarrón: las columnas muestran los criterios de calidad implícitos que los alumnos ya conocen intuitivamente."
+        },
+        {
+          "title": "FASE II: DESARROLLO — ESTRUCTURA Y PLANEACIÓN",
+          "duration": "35 min",
+          "description": "Parte 1 (20 min) — ESTRUCTURA DE LA EXPOSICIÓN ORAL: (a) APERTURA: capturar la atención (pregunta, dato sorprendente, anécdota breve) + presentar el tema y el propósito. (b) DESARROLLO: presentar la información organizada en 3-5 puntos clave, con transiciones explícitas ('En primer lugar..., En segundo lugar..., Finalmente...'). (c) CIERRE: síntesis de los puntos clave + conclusión + apertura a preguntas. Parte 2 (15 min) — APOYOS VISUALES: diapositivas (máximo 6-8, texto mínimo, imagen central), mapas conceptuales, objetos reales o maquetas. Regla del 6×6: máximo 6 líneas por diapositiva, máximo 6 palabras por línea. El apoyo visual complementa, no sustituye al expositor.",
+          "activity": "Planeación en 15 minutos: cada alumno elige un tema de LC-I (o de cualquier otra UAC del semestre) y completa la guía de planeación: tema, propósito, audiencia, tres puntos clave, apertura y cierre propuestos, y esbozo de 2 diapositivas."
+        },
+        {
+          "title": "FASE III: CIERRE — ENSAYO EXPRESS",
+          "duration": "10 min",
+          "description": "La exposición oral requiere práctica — no solo planeación. El ensayo previo es la diferencia entre una presentación fluida y una llena de muletillas (este..., o sea..., ¿me entendieron?). Incluso un ensayo breve de 2 minutos mejora significativamente el desempeño.",
+          "activity": "Exposición en parejas: cada alumno presenta su tema durante 2 minutos usando su guía de planeación. El compañero evalúa con la rúbrica (contacto visual, estructura, claridad, apoyo visual). Retroalimentación positiva y una sugerencia de mejora."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La exposición oral es una de las formas más importantes de comunicación pública en la vida académica, profesional y ciudadana. Presentar un proyecto escolar, exponer en una reunión de trabajo, defender una propuesta ante una autoridad, hablar en una asamblea comunitaria — todas estas son formas de exposición oral que requieren preparación, organización y habilidades de comunicación pública. El MCCEMS 2025 reconoce la oralidad como una dimensión igualmente importante que la escritura en la formación lingüística.",
+      "sections": [
+        {
+          "subtitle": "Estructura retórica de la exposición oral",
+          "content": "La estructura clásica de la exposición oral retoma la retórica clásica (Aristóteles) y la didáctica contemporánea: (1) Captatio benevolentiae o apertura: capturar la atención y establecer la relación con la audiencia. Las investigaciones en comunicación muestran que los primeros 30-60 segundos son decisivos para que el público decida si prestará atención. (2) Exposición o desarrollo: presentar el contenido de manera organizada, con transiciones claras entre puntos. La regla de tres (presentar tres argumentos o tres puntos clave) es una estructura cognitivamente manejable para la audiencia. (3) Peroratio o cierre: sintetizar los puntos clave, proporcionar una conclusión memorable y agradecer la atención. Una exposición sin cierre claro deja a la audiencia sin saber cuándo terminó."
+        },
+        {
+          "subtitle": "Recursos de apoyo y comunicación no verbal",
+          "content": "Los recursos visuales de apoyo (diapositivas, mapas conceptuales, videos breves, objetos reales) tienen una función de complemento: refuerzan visualmente lo que el expositor dice, pero no deben reemplazar su discurso. El error más común en presentaciones académicas es leer las diapositivas — esto hace redundante la presencia del expositor. La regla general: las diapositivas deben contener la estructura visual (términos clave, imágenes, gráficas) que el expositor explica con su voz. La comunicación no verbal es igualmente importante: el contacto visual (conecta con la audiencia), la postura (transmite confianza), el gesto (refuerza el énfasis verbal) y el movimiento (dirige la atención) son elementos que los alumnos pueden mejorar deliberadamente con práctica."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál es la función de la APERTURA en una exposición oral?",
+          "options": ["Presentar la bibliografía", "Capturar la atención y establecer el tema y propósito de la exposición", "Sintetizar los puntos principales", "Hacer preguntas al público sobre el tema"],
+          "correct": "Capturar la atención y establecer el tema y propósito de la exposición"
+        },
+        {
+          "question": "¿Qué establece la 'regla del 6×6' en presentaciones con diapositivas?",
+          "options": ["Usar mínimo 6 diapositivas y máximo 6 imágenes", "Hablar al menos 6 minutos por cada 6 diapositivas", "Máximo 6 líneas por diapositiva y máximo 6 palabras por línea", "Usar 6 colores diferentes en cada diapositiva"],
+          "correct": "Máximo 6 líneas por diapositiva y máximo 6 palabras por línea"
+        },
+        {
+          "question": "¿Cuál es el error más común al usar diapositivas en una exposición oral?",
+          "options": ["Usar demasiadas imágenes", "Leer literalmente el contenido de las diapositivas en lugar de explicarlo con la propia voz", "Presentar en color en lugar de blanco y negro", "Hablar demasiado despacio"],
+          "correct": "Leer literalmente el contenido de las diapositivas en lugar de explicarlo con la propia voz"
+        },
+        {
+          "question": "¿Qué es la comunicación no verbal en una exposición?",
+          "options": ["El uso de textos escritos en el pizarrón", "El contacto visual, la postura, los gestos y el movimiento del expositor", "El volumen de la voz únicamente", "Los recursos audiovisuales de apoyo"],
+          "correct": "El contacto visual, la postura, los gestos y el movimiento del expositor"
+        },
+        {
+          "question": "¿Por qué es importante el ensayo previo a una exposición oral?",
+          "options": ["Para memorizar el texto palabra por palabra", "Para reducir las muletillas, mejorar la fluidez y aumentar la confianza del expositor", "Para que el docente apruebe la presentación", "Solo es necesario para exposiciones muy largas"],
+          "correct": "Para reducir las muletillas, mejorar la fluidez y aumentar la confianza del expositor"
+        }
+      ],
+      "rubric": "El alumno presenta una exposición oral de 3-5 minutos con apertura, desarrollo (al menos 3 puntos) y cierre claramente identificables, mantiene contacto visual con la audiencia durante al menos el 60% del tiempo, y usa al menos un recurso visual de apoyo con información mínima y apropiada."
+    },
+    "teacher_tips": [
+      "El miedo escénico es real y común. Normalízalo: incluso los oradores más experimentados sienten nervios antes de hablar en público. Estrategias breves: respiración profunda, ensayo en voz alta el día anterior, llevar las notas como red de seguridad.",
+      "La autoevaluación con video (grabar la propia exposición y verla) es la retroalimentación más efectiva disponible. Si el plantel tiene acceso a tablets o celulares, úsalo. Los alumnos son sus críticos más honestos cuando se ven a sí mismos.",
+      "LC-I cierra con la exposición oral porque integra todas las progresiones del semestre: el alumno selecciona un texto (P01-P02), lo analiza (P03-P05), usa conectores (P06), practica la lectura expresiva (P07) y comunica sus ideas en público (P08). Es un cierre de ciclo pedagógico."
+    ]
+  }
+}

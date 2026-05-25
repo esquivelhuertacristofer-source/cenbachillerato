@@ -1,0 +1,54 @@
+{
+  "CS-II-P01": {
+    "code": "CS-II-P01",
+    "title": "Analiza los conceptos de bienestar social, desarrollo humano y calidad de vida, y examina las desigualdades en su distribución en México y el mundo.",
+    "level": "Ciencias Sociales II",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Sociedad y economía",
+    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
+    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
+    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
+    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
+    "teacher_tips": ["_TODO: Contenido pendiente"]
+  },
+  "CS-II-P02": {
+    "code": "CS-II-P02",
+    "title": "Examina las formas de organización social —familia, comunidad, asociaciones civiles, movimientos sociales— y su papel en la construcción del tejido social.",
+    "level": "Ciencias Sociales II",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Organización social",
+    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
+    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
+    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
+    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
+    "teacher_tips": ["_TODO: Contenido pendiente"]
+  },
+  "CS-II-P03": {
+    "code": "CS-II-P03",
+    "title": "Estudia los procesos de producción, distribución y consumo desde una perspectiva crítica, vinculando economía formal e informal, y trabajo remunerado y no remunerado.",
+    "level": "Ciencias Sociales II",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Economía y trabajo",
+    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
+    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
+    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
+    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
+    "teacher_tips": ["_TODO: Contenido pendiente"]
+  },
+  "CS-II-P04": {
+    "code": "CS-II-P04",
+    "title": "Analiza las relaciones de poder en la sociedad —clase, género, etnia, edad— y cómo estas estructuran el acceso a recursos y oportunidades.",
+    "level": "Ciencias Sociales II",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Poder y sociedad",
+    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
+    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
+    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
+    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
+    "teacher_tips": ["_TODO: Contenido pendiente"]
+  }
+}

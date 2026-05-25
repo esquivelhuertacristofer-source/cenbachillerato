@@ -1,0 +1,587 @@
+{
+  "PFH-I-P01": {
+    "code": "PFH-I-P01",
+    "title": "El filosofar: distingo el acto de preguntarse del conocimiento filosófico acumulado",
+    "level": "Pensamiento Filosófico y Humanidades I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Filosofía como práctica",
+    "metadata": {
+      "objective": "El estudiante distinguirá el ejercicio de filosofar — el acto de preguntarse, dudar y reflexionar — como práctica humana fundamental, diferenciándolo del conocimiento filosófico ya acumulado y conectándolo con su propia experiencia.",
+      "competencies": [
+        "Diferencia el acto de filosofar (práctica) del conocimiento filosófico (producto acumulado)",
+        "Identifica el asombro y la duda como actitudes filosóficas fundamentales",
+        "Formula preguntas filosóficas genuinas a partir de su propia experiencia",
+        "Reconoce que la filosofía no tiene respuestas definitivas sino procesos de reflexión",
+        "Valora la capacidad de cuestionarse como habilidad transferible a todos los ámbitos de la vida"
+      ],
+      "materials": [
+        "Fragmentos de textos filosóficos accesibles: Platón (Apología de Sócrates), Descartes (Meditaciones)",
+        "Citas sobre el asombro filosófico (Aristóteles, María Zambrano)",
+        "Diario filosófico personal (cuaderno para reflexiones)",
+        "Preguntas escritas en tarjetas para actividad de clasificación",
+        "Video breve sobre qué es la filosofía (Filosofía en 5 minutos, disponible en YouTube)"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Cuándo fue la última vez que te preguntaste algo importante?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Asombro, duda y el acto de filosofar" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Mi primera pregunta filosófica" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — La pregunta que cambia todo",
+          "duration": "10 min",
+          "description": "El docente inicia sin presentarse como 'clase de filosofía'. Simplemente hace una pregunta: '¿Por qué existes tú y no más bien nada?' Pausa. La incomodidad del silencio es la primera experiencia filosófica. Luego pregunta: ¿qué sintieron cuando escucharon esa pregunta? ¿Por qué preguntas como esa nos incomodan más que preguntas como '¿cuánto es 2+2?' La diferencia entre preguntas con respuesta única y preguntas que abren mundos es la puerta al filosofar.",
+          "activity": "Los estudiantes escriben en 3 minutos la pregunta más importante que tienen sobre la vida, sobre ellos mismos, sobre el mundo — la que más les inquieta. No se comparte todavía. Este ejercicio activa el asombro personal antes de conceptualizarlo."
+        },
+        {
+          "title": "FASE II: DESARROLLO — Filosofar como práctica",
+          "duration": "30 min",
+          "description": "Se construyen 3 ideas: 1) El asombro como origen de la filosofía: Aristóteles escribió 'los hombres comenzaron a filosofar al asombrarse'. El asombro no es ingenuidad — es la disposición a no dar nada por supuesto. 2) La duda metódica: Descartes dudó de todo lo que podía dudar para encontrar algo indudable. La duda filosófica no es escepticismo paralizante — es herramienta de clarificación. 3) Filosofar vs. conocimiento filosófico: filosofar es el acto vivo de preguntar y reflexionar. El conocimiento filosófico es el producto acumulado de 25 siglos de ese acto — importante, pero secundario al ejercicio mismo.",
+          "activity": "Clasificación de preguntas: el docente distribuye tarjetas con preguntas de distintos tipos ('¿Cuánto pesa la Luna?', '¿Es justo que los ricos paguen más impuestos?', '¿Qué es el tiempo?', '¿Cuál es la capital de Francia?', '¿Tenemos libre albedrío?', '¿Es el amor una elección o un sentimiento?'). En grupos, los estudiantes las clasifican: ¿cuáles tienen respuesta definitiva? ¿cuáles permanecen abiertas? ¿cuáles son filosóficas? El debate sobre la clasificación es el filosofar en acción."
+        },
+        {
+          "title": "FASE III: CIERRE — Mi pregunta, mi filosofía",
+          "duration": "10 min",
+          "description": "Los estudiantes retoman la pregunta que escribieron al inicio. Ahora la reformulan usando las herramientas del desarrollo: ¿es una pregunta que tiene respuesta definitiva o que permanece abierta? ¿De dónde viene su asombro frente a esa pregunta? ¿Cómo podría explorarla? El docente enfatiza: filosofar no requiere haber leído a Platón — requiere la actitud de preguntarse honestamente.",
+          "activity": "Primera entrada del Diario Filosófico: cada estudiante escribe su pregunta reformulada y explica por qué es importante para él o ella en este momento de su vida. El diario los acompañará durante el semestre como espacio de reflexión personal. No se califica — se valida."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Filosofar es una de las actividades más humanas y universales: la capacidad de detenerse ante el mundo, asombrarse y preguntar '¿por qué?' y '¿cómo?' más allá de lo funcional y lo inmediato. No es un privilegio de académicos ni de tiempos pasados — cada persona que se ha preguntado genuinamente por el sentido de su vida, por la justicia de una situación o por la naturaleza del tiempo, ha filosofado.",
+      "sections": [
+        {
+          "subtitle": "El asombro como punto de partida: la filosofía nace de la extrañeza",
+          "content": "Aristóteles afirmó en la Metafísica: 'Los hombres comenzaron a filosofar, ahora como antes, a causa de la admiración (thaumazein)'. El thaumazein griego — asombro, extrañeza — es la disposición a dejar de dar las cosas por evidentes y preguntarse por su fundamento. Antes de que Sócrates, Platón o Aristóteles hubiera filósofos formales, había personas que se asombraban de que existiera algo en lugar de nada, de que el fuego quemara, de que los seres vivos murieran. La filósofa española María Zambrano desarrolló el concepto de 'razón poética' para describir esta apertura al asombro que precede a la razón instrumental — una apertura que las artes, la poesía y la filosofía comparten. El asombro filosófico no es una curiosidad pasajera — es una disposición sostenida a cuestionar lo dado."
+        },
+        {
+          "subtitle": "Duda y reflexión: herramientas del filosofar",
+          "content": "René Descartes, en sus Meditaciones Metafísicas (1641), inicia un ejercicio radical: dudar de todo lo que puede ser dudado para encontrar algo absolutamente cierto. Descartó los sentidos (que a veces engañan), la razón matemática (podría ser una ilusión generada por un 'genio maligno') y la existencia del mundo externo — hasta llegar a su célebre cogito: 'Pienso, luego existo' (cogito ergo sum). El ejercicio de Descartes ilustra lo que los filósofos llaman 'duda metódica': no el escepticismo radical que niega que se pueda conocer algo, sino una herramienta para examinar críticamente las creencias y conservar solo las bien fundamentadas. La filosofía no lleva necesariamente a certezas — a veces lleva a una pregunta más profunda. Pero el proceso de examinar las propias creencias es en sí mismo valioso: nos hace más conscientes de por qué creemos lo que creemos y nos abre a la posibilidad de cambiar de opinión con buenos argumentos."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál es la diferencia entre filosofar y el conocimiento filosófico?",
+          "options": [
+            "El conocimiento filosófico es más valioso que el acto de filosofar",
+            "Filosofar es el acto vivo de preguntar y reflexionar; el conocimiento filosófico es el producto acumulado de ese acto a lo largo de la historia",
+            "Filosofar es leer a los filósofos clásicos; el conocimiento filosófico es aplicar sus ideas",
+            "Son exactamente lo mismo"
+          ],
+          "correct": "Filosofar es el acto vivo de preguntar y reflexionar; el conocimiento filosófico es el producto acumulado de ese acto a lo largo de la historia"
+        },
+        {
+          "question": "¿Qué significa el término griego 'thaumazein'?",
+          "options": ["Conocimiento", "Asombro o extrañeza filosófica", "Verdad", "Argumento"],
+          "correct": "Asombro o extrañeza filosófica"
+        },
+        {
+          "question": "¿Qué es la duda metódica de Descartes?",
+          "options": [
+            "Una forma de escepticismo radical que niega que sea posible conocer algo",
+            "Una herramienta para examinar críticamente las creencias y conservar solo las bien fundamentadas",
+            "Un método para memorizar textos filosóficos",
+            "Una técnica de meditación budista"
+          ],
+          "correct": "Una herramienta para examinar críticamente las creencias y conservar solo las bien fundamentadas"
+        },
+        {
+          "question": "¿Cuál de estas preguntas es filosófica (abierta, sin respuesta definitiva)?",
+          "options": [
+            "¿Cuántos planetas tiene el sistema solar?",
+            "¿Cuál es la fórmula del agua?",
+            "¿Tenemos libre albedrío o nuestras decisiones están determinadas?",
+            "¿En qué año nació Simón Bolívar?"
+          ],
+          "correct": "¿Tenemos libre albedrío o nuestras decisiones están determinadas?"
+        },
+        {
+          "question": "Según Aristóteles, ¿cuál es el origen de la filosofía?",
+          "options": ["La necesidad práctica de resolver problemas cotidianos", "El asombro o admiración ante el mundo", "La lectura de textos antiguos", "La enseñanza de los sabios a sus discípulos"],
+          "correct": "El asombro o admiración ante el mundo"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: distingue con sus propias palabras el acto de filosofar del conocimiento filosófico acumulado, formula al menos 1 pregunta genuinamente filosófica (abierta, sin respuesta definitiva, relacionada con su experiencia) y la justifica, y reflexiona en su Diario Filosófico sobre qué actitud mental requiere el acto de filosofar."
+    },
+    "teacher_tips": [
+      "La primera sesión de filosofía es la más importante del semestre: si generas asombro genuino desde el principio, el resto fluye. La pregunta inicial ('¿Por qué existes y no más bien nada?') funciona — no la cambies por algo más 'accesible', la incomodidad inicial es parte del aprendizaje.",
+      "El Diario Filosófico es el recurso más potente del semestre: un cuaderno personal donde los estudiantes escriben sus reflexiones sin formato académico ni corrección gramatical. La condición: honestidad. No se califica el contenido — se valida que lo hacen.",
+      "Para grupos con alta resistencia ('filosofía es aburrida / no sirve para nada'), ancla siempre en preguntas de la cultura popular que ya los inquietan: ¿Es justa la riqueza extrema? ¿Los superhéroes tienen derecho a matar villanos? ¿La inteligencia artificial puede ser consciente? Estas son preguntas filosóficas reales."
+    ]
+  },
+  "PFH-I-P02": {
+    "code": "PFH-I-P02",
+    "title": "Tipos de preguntas filosóficas: identifico las ramas de la filosofía y sus preguntas centrales",
+    "level": "Pensamiento Filosófico y Humanidades I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Filosofía como práctica",
+    "metadata": {
+      "objective": "El estudiante identificará los tipos de preguntas filosóficas (ontológicas, epistemológicas, éticas, estéticas, políticas) y sus características frente a preguntas científicas o cotidianas, distinguiendo las ramas de la filosofía.",
+      "competencies": [
+        "Distingue preguntas filosóficas de preguntas científicas y preguntas cotidianas",
+        "Identifica las ramas de la filosofía: ontología, epistemología, ética, estética, filosofía política",
+        "Clasifica preguntas específicas en la rama filosófica correspondiente",
+        "Formula al menos 1 pregunta propia en cada rama filosófica a partir de su experiencia",
+        "Reconoce la interrelación entre las ramas de la filosofía en problemas complejos"
+      ],
+      "materials": [
+        "Mapa conceptual de las ramas de la filosofía",
+        "Banco de 30 preguntas de distintos tipos para clasificar",
+        "Fichas de cada rama con ejemplos de preguntas y filósofos representativos",
+        "Diario filosófico personal (continuación)",
+        "Casos contemporáneos que involucran múltiples ramas (bioética, filosofía de la IA)"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Cuántos tipos de preguntas hay?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Las 5 ramas de la filosofía" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Un problema, múltiples ramas" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — La taxonomía de las preguntas",
+          "duration": "10 min",
+          "description": "El docente escribe en el pizarrón tres preguntas: '¿Qué temperatura hierve el agua?', '¿Es correcto mentir para proteger a alguien?', '¿Qué es el tiempo?' Pregunta: ¿qué diferencia a estas preguntas? La primera tiene una respuesta empírica verificable. La segunda involucra valores morales. La tercera cuestiona la naturaleza misma de algo que todos experimentamos pero nadie puede definir con precisión. Esta distinción abre la tipología de preguntas.",
+          "activity": "Actividad de clasificación rápida: el docente da al grupo 10 preguntas escritas en tarjetas. En 5 minutos, en grupos de 3, los estudiantes las clasifican en: 'tiene respuesta única', 'depende de valores', 'cuestiona la naturaleza de algo'. La diversidad de clasificaciones entre grupos genera el debate que introduce las ramas filosóficas."
+        },
+        {
+          "title": "FASE II: DESARROLLO — Las 5 ramas y sus preguntas",
+          "duration": "30 min",
+          "description": "Se presentan las 5 ramas con sus preguntas centrales: 1) Ontología/Metafísica: ¿qué existe? ¿qué es la realidad? ¿existe Dios? ¿qué es el tiempo? 2) Epistemología: ¿qué podemos conocer? ¿cómo sabemos que algo es verdad? ¿son confiables los sentidos? 3) Ética: ¿qué es el bien? ¿cómo debemos actuar? ¿hay valores universales? 4) Estética: ¿qué es la belleza? ¿qué hace que algo sea arte? ¿es subjetiva la experiencia estética? 5) Filosofía política: ¿qué es la justicia? ¿por qué obedecer al Estado? ¿qué tipo de sociedad es la mejor?",
+          "activity": "Juego de 'Filosofía Speed Dating': 5 estaciones (una por rama), 5 minutos en cada una. En cada estación, el grupo responde 2 preguntas de esa rama y elige 1 pregunta propia que formularía en esa área. Al final, cada estudiante tiene un mapa personal de 1 pregunta propia por rama."
+        },
+        {
+          "title": "FASE III: CIERRE — La filosofía como red",
+          "duration": "10 min",
+          "description": "El docente presenta un caso que involucra múltiples ramas: la inteligencia artificial. ¿Puede una IA ser consciente? (Ontología). ¿Cómo sabemos si la IA 'entiende' o solo simula? (Epistemología). ¿Es ético reemplazar médicos por IA? (Ética). ¿Puede una IA crear arte genuino? (Estética). ¿Quién es responsable si una IA causa daño? (Filosofía política). Las ramas no son compartimentos — son lentes que se complementan.",
+          "activity": "Entrada en el Diario Filosófico: escoge la rama que más te interesa y formula tu propia pregunta filosófica en esa área. Explica por qué esa pregunta te parece importante en tu vida actual."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La filosofía es un territorio vasto con regiones especializadas. Aunque estas regiones están interconectadas — difícilmente se puede hacer ética sin ontología, o epistemología sin filosofía de la mente — es útil distinguirlas para saber qué tipo de pregunta estamos haciendo y qué herramientas usar para explorarla.",
+      "sections": [
+        {
+          "subtitle": "Las ramas de la filosofía: ontología, epistemología, ética, estética y filosofía política",
+          "content": "La ontología (del griego on, ser, y logos, estudio) es la rama que estudia la naturaleza fundamental de lo que existe: ¿qué tipos de cosas hay en el mundo? ¿Son reales las propiedades abstractas como los números o la justicia? ¿Existe Dios? ¿Qué es el tiempo? La epistemología (del griego episteme, conocimiento) estudia la naturaleza, los límites y la justificación del conocimiento: ¿cómo sabemos lo que sabemos? ¿Son confiables los sentidos? ¿Puede la razón alcanzar verdades independientes de la experiencia? La ética estudia la moralidad: ¿qué acciones son correctas o incorrectas? ¿Hay valores morales universales o son relativos a cada cultura? ¿Qué nos hace responsables de nuestros actos? La estética estudia la experiencia estética, la naturaleza del arte y la belleza: ¿qué hace que algo sea bello? ¿Es el arte una forma de conocimiento? ¿Puede haber criterios objetivos del gusto? La filosofía política estudia las formas de organización social y sus fundamentos: ¿qué justifica la autoridad del Estado? ¿Qué es la justicia social? ¿Cuáles son los límites de la libertad individual?"
+        },
+        {
+          "subtitle": "Preguntas filosóficas vs. científicas: complementarias, no competidoras",
+          "content": "Una confusión frecuente es creer que la ciencia y la filosofía compiten por el mismo territorio. En realidad, son complementarias: la ciencia responde preguntas empíricas (verificables mediante observación y experimento), mientras que la filosofía explora preguntas que no pueden resolverse solo con datos. Por ejemplo: la neurociencia puede describir qué sucede en el cerebro cuando tomamos una decisión — pero la pregunta de si 'realmente' tenemos libre albedrío, dado que el cerebro sigue leyes físicas, es filosófica. La física puede describir el universo desde el Big Bang — pero la pregunta de si ese universo 'tiene sentido' o 'propósito' es metafísica. La filosofía también estudia los fundamentos de la ciencia misma: ¿qué hace que un método sea científico? ¿Cómo se justifica la inducción? ¿Son las teorías científicas verdaderas o solo útiles? Estas preguntas pertenecen a la filosofía de la ciencia — una rama que la ciencia no puede responder por sí sola."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál rama de la filosofía estudia la pregunta '¿qué es el bien?'",
+          "options": ["Ontología", "Epistemología", "Ética", "Estética"],
+          "correct": "Ética"
+        },
+        {
+          "question": "¿A qué rama pertenece la pregunta '¿cómo podemos saber si algo es verdad?'",
+          "options": ["Filosofía política", "Estética", "Ontología", "Epistemología"],
+          "correct": "Epistemología"
+        },
+        {
+          "question": "¿Cuál de estas es una pregunta filosófica y NO una pregunta científica?",
+          "options": [
+            "¿A qué temperatura hierve el agua?",
+            "¿Cuántas neuronas tiene el cerebro humano?",
+            "¿Tenemos realmente libre albedrío si el cerebro sigue leyes físicas?",
+            "¿Cuál es la velocidad de la luz?"
+          ],
+          "correct": "¿Tenemos realmente libre albedrío si el cerebro sigue leyes físicas?"
+        },
+        {
+          "question": "La pregunta '¿qué justifica la autoridad del Estado sobre los ciudadanos?' pertenece a:",
+          "options": ["Ontología", "Estética", "Filosofía política", "Ética"],
+          "correct": "Filosofía política"
+        },
+        {
+          "question": "¿Por qué decimos que la filosofía y la ciencia son complementarias y no competidoras?",
+          "options": [
+            "Porque ambas usan el mismo método experimental",
+            "Porque la ciencia responde preguntas empíricas y la filosofía explora preguntas que no pueden resolverse solo con datos",
+            "Porque la filosofía es más antigua que la ciencia",
+            "Porque los filósofos también son científicos"
+          ],
+          "correct": "Porque la ciencia responde preguntas empíricas y la filosofía explora preguntas que no pueden resolverse solo con datos"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: identifica correctamente la rama filosófica de al menos 8 de 10 preguntas presentadas, formula 1 pregunta genuinamente filosófica en al menos 3 ramas distintas a partir de su propia experiencia, y explica con sus palabras por qué una pregunta dada es filosófica y no científica o cotidiana."
+    },
+    "teacher_tips": [
+      "El juego de Speed Dating filosófico funciona bien con música de fondo suave que marque los cambios de estación — la energía del movimiento rompe la pasividad del aula y hace la sesión memorable.",
+      "Para la IA como caso multirrama, los estudiantes suelen tener opiniones fuertes y contradictorias — aprovéchalo para mostrar que cuando un problema es realmente complejo, involucra simultáneamente múltiples dimensiones filosóficas.",
+      "Si el grupo tiene conexión con la filosofía indígena (nahualismo, cosmovisión maya), puede usarse para mostrar que las ramas filosóficas también aparecen en tradiciones no occidentales — preguntas sobre la naturaleza del tiempo, la justicia comunitaria y la belleza del arte prehispánico son filosóficas en el sentido más pleno."
+    ]
+  },
+  "PFH-I-P03": {
+    "code": "PFH-I-P03",
+    "title": "Problemas filosóficos: analizo problemas de identidad, libertad, justicia y verdad en mi experiencia",
+    "level": "Pensamiento Filosófico y Humanidades I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Problemas filosóficos",
+    "metadata": {
+      "objective": "El estudiante analizará problemas filosóficos clásicos y contemporáneos relacionados con su propia experiencia — identidad, libertad, justicia y verdad — aplicando herramientas del análisis filosófico.",
+      "competencies": [
+        "Analiza el problema filosófico de la identidad personal: ¿qué me hace ser yo?",
+        "Reflexiona sobre el libre albedrío: ¿son nuestras decisiones realmente libres?",
+        "Examina el concepto de justicia desde distintas perspectivas filosóficas",
+        "Cuestiona la naturaleza de la verdad: ¿existe la verdad objetiva?",
+        "Conecta los problemas filosóficos clásicos con dilemas contemporáneos en México y el mundo"
+      ],
+      "materials": [
+        "Casos filosóficos accesibles: el experimento del Barco de Teseo, el problema del cerebro en cubeta",
+        "Dilemas morales contemporáneos relacionados con México (migración, violencia, desigualdad)",
+        "Fragmentos filosóficos accesibles: Platón (mito de la caverna), Rawls (el velo de la ignorancia)",
+        "Diario filosófico personal",
+        "Tarjetas de 'posiciones filosóficas' para el juego de roles de debate"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "El problema que más te inquieta" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Identidad, libertad, justicia, verdad" },
+        { "phase": "Cierre", "duration": "10 min", "label": "¿Cómo cambió mi perspectiva?" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — El inventario filosófico personal",
+          "duration": "10 min",
+          "description": "Los estudiantes reabren su Diario Filosófico y el docente pregunta: ¿cuál de estos cuatro temas te inquieta más ahora mismo? Identidad: ¿quién soy realmente? Libertad: ¿tomo decisiones libres o estoy condicionado por mi familia, mi clase social, mis genes? Justicia: ¿es justa la sociedad en que vivo? ¿qué merezco? Verdad: ¿puedo confiar en lo que creo? ¿cómo distingo la verdad de la mentira o del sesgo? Se hace una votación para ver cuál tema inquieta más al grupo.",
+          "activity": "Escritura libre de 3 minutos: escribe sin censura sobre el tema que elegiste. ¿Por qué te inquieta? ¿Cuándo lo pensaste por primera vez? ¿Tienes una respuesta provisional? Estos textos son personales — no se comparten necesariamente."
+        },
+        {
+          "title": "FASE II: DESARROLLO — Cuatro problemas, cuatro lentes",
+          "duration": "30 min",
+          "description": "Se trabajan los 4 problemas en estaciones de 7 minutos: 1) Identidad: El Barco de Teseo — si reemplazas todas las piezas de un barco, ¿sigue siendo el mismo barco? ¿Y si te reemplazaran todas las células de tu cuerpo? ¿Qué te hace ser 'tú'? 2) Libertad: ¿Puedes elegir no pensar en un elefante rosa en los próximos 30 segundos? El determinismo vs. libre albedrío. 3) Justicia: El velo de la ignorancia de Rawls — ¿qué sociedad diseñarías si no supieras en qué posición nacerías? 4) Verdad: ¿Cómo sabes que no estás en una simulación de computadora? El problema del conocimiento y la certeza.",
+          "activity": "Debate filosófico estructurado: el docente elige el tema que más votaron y realiza un debate con posiciones asignadas al azar. Los estudiantes defienden posiciones filosóficas establecidas (relativismo, universalismo, determinismo, libertarismo, igualitarismo) sin necesariamente compartirlas — aprenden a argumentar desde múltiples ángulos."
+        },
+        {
+          "title": "FASE III: CIERRE — La transformación del pensamiento",
+          "duration": "10 min",
+          "description": "El docente pregunta: ¿alguien cambió su posición inicial durante el debate? ¿Por qué? La disposición a cambiar de opinión con buenos argumentos es la señal más clara de que el filosofar está funcionando. No es debilidad — es fortaleza intelectual. Se conecta con la metacognición: ¿qué herramientas usé para pensar sobre estos problemas?",
+          "activity": "Entrada en el Diario Filosófico: escribe cómo cambió (o se profundizó) tu perspectiva sobre el problema que elegiste. ¿Tienes nuevas preguntas que no tenías al inicio? ¿Cuáles? El crecimiento filosófico no es tener certezas — es tener mejores preguntas."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Los grandes problemas filosóficos no son reliquias de la antigüedad — son preguntas vivas que cada generación debe responder de nuevo con sus propias herramientas y desde su propio contexto. La identidad, la libertad, la justicia y la verdad son temas que atraviesan la vida de cualquier estudiante de bachillerato en México del siglo XXI.",
+      "sections": [
+        {
+          "subtitle": "El problema de la identidad: ¿qué me hace ser yo a lo largo del tiempo?",
+          "content": "El filósofo inglés John Locke argumentó que la identidad personal reside en la continuidad de la memoria — somos 'nosotros mismos' en la medida en que recordamos nuestras experiencias pasadas. El problema del Barco de Teseo (si reemplazas todas las piezas de un barco de una en una, ¿sigue siendo el mismo barco?) se aplica al cuerpo humano: nuestras células se reemplazan completamente cada 7-10 años. ¿Qué nos mantiene siendo 'nosotros'? Los filósofos contemporáneos debaten si la identidad es una 'narrativa' — una historia que contamos sobre nosotros mismos — o si hay un 'yo' sustancial que permanece. La psicología y las neurociencias agregan capas: las memorias son reconstructivas (no registros literales), los rasgos de personalidad cambian con el tiempo, y los hemisferios cerebrales pueden tener 'preferencias' distintas. La identidad es, paradójicamente, lo más íntimo y lo más misterioso."
+        },
+        {
+          "subtitle": "El problema de la justicia: diseñar una sociedad justa tras el velo de la ignorancia",
+          "content": "El filósofo político John Rawls propuso en Teoría de la Justicia (1971) un experimento mental llamado 'el velo de la ignorancia': imagina que debes diseñar los principios básicos de una sociedad — qué derechos reconocer, cómo distribuir la riqueza, qué oportunidades garantizar — pero no sabes qué posición ocuparás en esa sociedad: no sabes si nacerás rico o pobre, hombre o mujer, de qué etnia, con qué talentos o discapacidades. ¿Qué principios elegirías? Rawls argumentó que detrás de ese velo, las personas racionales elegirían principios que maximicen la situación de los peor posicionados — porque nadie querría arriesgarse a estar en la peor situación sin ninguna protección. Este experimento es una herramienta poderosa para evaluar la justicia de las instituciones reales: ¿aceptarías el sistema de salud mexicano actual si no supieras si nacerías en el 20% más rico o el 20% más pobre?"
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Qué ilustra el experimento del Barco de Teseo en filosofía?",
+          "options": [
+            "La importancia de reparar los barcos cuando se deterioran",
+            "El problema de la identidad a lo largo del tiempo cuando los componentes cambian",
+            "La continuidad de las tradiciones culturales",
+            "La relación entre la materia y la forma en la física aristotélica"
+          ],
+          "correct": "El problema de la identidad a lo largo del tiempo cuando los componentes cambian"
+        },
+        {
+          "question": "¿Qué es el 'velo de la ignorancia' de Rawls?",
+          "options": [
+            "Una técnica de meditación filosófica para eliminar prejuicios",
+            "Un experimento mental donde se diseña una sociedad justa sin saber qué posición social se ocupará",
+            "La idea de que no podemos conocer la verdad objetiva",
+            "Una metáfora para la ignorancia de las masas"
+          ],
+          "correct": "Un experimento mental donde se diseña una sociedad justa sin saber qué posición social se ocupará"
+        },
+        {
+          "question": "¿Qué filósofo argumentó que la identidad personal reside en la continuidad de la memoria?",
+          "options": ["Aristóteles", "Descartes", "John Locke", "Platón"],
+          "correct": "John Locke"
+        },
+        {
+          "question": "¿Por qué cambiar de opinión durante un debate filosófico se considera una fortaleza intelectual?",
+          "options": [
+            "Porque demuestra que no tenías convicción en tu posición original",
+            "Porque demuestra que estás dispuesto a modificar tus creencias ante argumentos mejores",
+            "Porque la filosofía exige no tener posiciones fijas",
+            "Porque los filósofos siempre están de acuerdo al final"
+          ],
+          "correct": "Porque demuestra que estás dispuesto a modificar tus creencias ante argumentos mejores"
+        },
+        {
+          "question": "¿Cuál de estos problemas es un ejemplo del problema filosófico de la verdad?",
+          "options": [
+            "¿Qué temperatura hierve el agua?",
+            "¿Cómo sabes que no estás en una simulación y todo lo que percibes es falso?",
+            "¿Cuánto mide la Tierra?",
+            "¿Qué pasó antes del Big Bang?"
+          ],
+          "correct": "¿Cómo sabes que no estás en una simulación y todo lo que percibes es falso?"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: analiza al menos 2 de los 4 problemas filosóficos (identidad, libertad, justicia, verdad) con argumentos coherentes y referencias a al menos 1 pensador, formula preguntas propias que profundizan el análisis, y demuestra capacidad de modificar su posición inicial ante argumentos mejor fundamentados."
+    },
+    "teacher_tips": [
+      "El velo de la ignorancia de Rawls es el experimento mental más poderoso para trabajar justicia con adolescentes mexicanos: conecta inmediatamente con su experiencia de la desigualdad y genera debates genuinamente apasionados sobre el sistema de salud, la educación y las oportunidades.",
+      "Para el problema de la libertad, el experimento de 'no pienses en un elefante rosa' es inmediato y visceral — los estudiantes experimentan en carne propia la tensión entre querer controlar sus propios pensamientos y no poder, lo que hace tangible el problema del libre albedrío.",
+      "El objetivo no es que los estudiantes 'lleguen' a la respuesta correcta — es que aprendan a sostener una pregunta difícil sin cerrarla prematuramente. Valida explícitamente la incertidumbre como una posición filosófica legítima."
+    ]
+  },
+  "PFH-I-P04": {
+    "code": "PFH-I-P04",
+    "title": "Diálogo filosófico: pratico la escucha activa y reformulo mis ideas en comunidad",
+    "level": "Pensamiento Filosófico y Humanidades I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Filosofía como práctica",
+    "metadata": {
+      "objective": "El estudiante practicará el diálogo filosófico como forma de construir conocimiento colectivo, desarrollando la escucha activa, la argumentación rigurosa y la disposición a reformular sus propias ideas.",
+      "competencies": [
+        "Practica la escucha activa: escuchar para comprender, no solo para responder",
+        "Formula preguntas socráticamente: preguntas que profundizan y cuestionan supuestos",
+        "Distingue un argumento filosófico de una opinión personal no fundamentada",
+        "Reformula sus ideas en respuesta a argumentos del interlocutor",
+        "Reconoce la construcción colectiva del conocimiento como valor filosófico y democrático"
+      ],
+      "materials": [
+        "Guía del diálogo socrático (reglas y técnicas)",
+        "Pregunta detonadora para la sesión de diálogo (preparada por el docente)",
+        "Diario filosófico personal",
+        "Hoja de autoevaluación del diálogo (¿escuché? ¿argumenté? ¿reformulé?)",
+        "Fragmentos del Menón de Platón o de una Comunidad de Indagación (Philosophy for Children)"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Dialogar es lo mismo que debatir?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Sesión de diálogo socrático" },
+        { "phase": "Cierre", "duration": "10 min", "label": "¿Qué aprendí de escuchar?" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — Diálogo vs. debate",
+          "duration": "10 min",
+          "description": "El docente traza una distinción clave: en un debate, cada participante busca ganar — defender su posición y rebatir la del otro. En un diálogo filosófico, el objetivo es llegar colectivamente a una comprensión más profunda — aunque sea a más preguntas, no a certezas. Sócrates no enseñaba — preguntaba. Su método (la maiéutica) consistía en hacer preguntas que revelaban las contradicciones de las creencias del interlocutor, ayudando al conocimiento a 'nacer' desde el propio pensamiento.",
+          "activity": "El docente modela el estilo socrático haciendo 5 minutos de preguntas al grupo sobre una afirmación cotidiana: 'Está bien mentir si es para proteger a alguien.' Preguntas: ¿Siempre? ¿A quién proteges? ¿El mentiroso siempre sabe qué es mejor para el otro? ¿Qué pasa con la autonomía de la persona a quien proteges? Los estudiantes observan cómo las preguntas desmontan los supuestos de una afirmación aparentemente simple."
+        },
+        {
+          "title": "FASE II: DESARROLLO — Sesión de diálogo filosófico",
+          "duration": "30 min",
+          "description": "El grupo se sienta en círculo (o el docente reorganiza el espacio para facilitar el contacto visual). El docente presenta la pregunta detonadora y establece las reglas del diálogo filosófico: 1) Escuchar antes de hablar (no interrumpir). 2) Hablar en primera persona ('Yo pienso que... porque...'). 3) Hacer preguntas que profundicen, no solo atacar. 4) Reformular la idea de otro antes de criticarla ('Si entiendo bien, estás diciendo que... ¿es correcto?'). 5) El objetivo es comprender, no ganar. El docente facilita sin imponer su posición.",
+          "activity": "Diálogo filosófico de 25 minutos con la pregunta detonadora. El docente interviene solo para: retomar a quien se aleja del tema, invitar a quien no ha participado, pedir fundamentación cuando alguien hace una afirmación sin argumento, o hacer una pregunta socrática que abra una nueva dimensión del problema. Registra en un mapa en el pizarrón las ideas principales que van emergiendo."
+        },
+        {
+          "title": "FASE III: CIERRE — Metacognición del diálogo",
+          "duration": "10 min",
+          "description": "El docente cierra con la autoevaluación: ¿escuchaste activamente? ¿reformulaste alguna de tus ideas? ¿preguntaste de forma socrática? ¿construiste sobre las ideas de otro? Se reflexiona colectivamente: ¿qué aprendimos que no hubiera podido aprenderse individualmente? El conocimiento colectivo como producto del diálogo.",
+          "activity": "Entrada en el Diario Filosófico: escribe 1 idea que llegaste al diálogo creyendo firmemente, 1 idea que cambiaste o matizaste, y 1 nueva pregunta que surgió que no tenías al principio. Esta reflexión consolida el aprendizaje del diálogo."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "El diálogo es el método filosófico por excelencia desde Sócrates: no la lectura solitaria de textos ni la exposición magistral de doctrinas, sino el intercambio vivo de ideas entre personas que piensan juntas. La tradición socrática parte de un supuesto radical: nadie tiene toda la verdad, pero el pensamiento colectivo puede acercarse más a ella que el pensamiento individual.",
+      "sections": [
+        {
+          "subtitle": "La mayéutica socrática: el arte de ayudar a nacer las ideas",
+          "content": "Sócrates comparaba su método filosófico con el oficio de su madre, que era partera: así como la partera no da a luz ella sino que ayuda a la madre a parir, Sócrates no enseñaba conocimiento sino que ayudaba a sus interlocutores a 'dar a luz' las ideas que ya tenían dentro pero no habían examinado. El método socrático funciona mediante preguntas: Sócrates hacía preguntas aparentemente simples ('¿Qué es la justicia?', '¿Qué es el valor?') y luego mostraba, mediante más preguntas, que las respuestas intuitivas del interlocutor contenían contradicciones o presuponían cosas que no podían sostenerse. Este proceso — la 'elencos' o refutación socrática — no humillaba al interlocutor: lo invitaba a pensar con más cuidado. El objetivo final era la 'aporía' (perplejidad) — el reconocimiento de que no se sabe lo que se creía saber, que es el punto de partida honesto del aprendizaje filosófico."
+        },
+        {
+          "subtitle": "Escucha activa y reformulación: las dos claves del diálogo filosófico",
+          "content": "La escucha activa es la disposición a comprender genuinamente lo que el otro dice, sin estar simultáneamente preparando la respuesta. Implica: atención completa al mensaje verbal y no verbal, verificar la comprensión antes de responder ('Si entiendo bien, estás diciendo que... ¿es correcto?'), y suspender temporalmente el juicio propio. La reformulación es la habilidad de reconstruir la idea del interlocutor con las propias palabras — antes de criticarla. Un debate que omite la reformulación frecuentemente es un diálogo de sordos: cada participante ataca una versión caricaturizada de la posición del otro (lo que los filósofos llaman 'el hombre de paja'). Un diálogo filosófico genuino requiere la disposición a modificar las propias ideas cuando el interlocutor presenta argumentos mejores — lo que los filósofos llaman 'seguir el argumento dondequiera que lleve'."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál es la principal diferencia entre un debate y un diálogo filosófico?",
+          "options": [
+            "En el debate hay un moderador; en el diálogo no",
+            "En el debate se busca ganar defendiendo la posición propia; en el diálogo se busca comprender colectivamente",
+            "El diálogo es más largo que el debate",
+            "En el debate solo participan expertos; en el diálogo cualquiera puede participar"
+          ],
+          "correct": "En el debate se busca ganar defendiendo la posición propia; en el diálogo se busca comprender colectivamente"
+        },
+        {
+          "question": "¿Qué es la mayéutica socrática?",
+          "options": [
+            "El método de enseñanza por exposición magistral",
+            "El arte de ayudar al interlocutor a 'dar a luz' ideas que ya tiene mediante preguntas",
+            "La técnica de memorizar textos filosóficos",
+            "El proceso de refutar públicamente a los sofistas"
+          ],
+          "correct": "El arte de ayudar al interlocutor a 'dar a luz' ideas que ya tiene mediante preguntas"
+        },
+        {
+          "question": "¿Qué es el 'hombre de paja' en el contexto del argumento filosófico?",
+          "options": [
+            "Un ejemplo filosófico clásico sobre la identidad",
+            "Atacar una versión debilitada o caricaturizada de la posición del interlocutor",
+            "Un argumento filosófico basado en la naturaleza",
+            "Una metáfora sobre la fragilidad del conocimiento"
+          ],
+          "correct": "Atacar una versión debilitada o caricaturizada de la posición del interlocutor"
+        },
+        {
+          "question": "¿Qué es la 'aporía' socrática?",
+          "options": [
+            "La solución definitiva de un problema filosófico",
+            "La perplejidad que surge al reconocer que no se sabe lo que se creía saber",
+            "Un argumento circular",
+            "La conclusión de un silogismo filosófico"
+          ],
+          "correct": "La perplejidad que surge al reconocer que no se sabe lo que se creía saber"
+        },
+        {
+          "question": "¿Cuál es el objetivo de la reformulación en el diálogo filosófico?",
+          "options": [
+            "Repetir exactamente lo que dijo el interlocutor para ganar tiempo",
+            "Verificar la comprensión de la idea del interlocutor antes de responderla o criticarla",
+            "Simplificar las ideas complejas para que todos las entiendan",
+            "Demostrar que uno escuchó aunque no esté de acuerdo"
+          ],
+          "correct": "Verificar la comprensión de la idea del interlocutor antes de responderla o criticarla"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: participa en el diálogo filosófico con al menos 2 intervenciones que incluyen argumento (no solo afirmación), reformula correctamente la idea de al menos 1 interlocutor antes de responderle, y demuestra en su Diario Filosófico que al menos 1 de sus ideas iniciales cambió o se matizó como resultado del diálogo."
+    },
+    "teacher_tips": [
+      "La calidad del diálogo depende enormemente de la pregunta detonadora: debe ser abierta, relevante para el grupo y genuinamente difícil de responder. Ejemplos para bachillerato mexicano: '¿Es la pobreza en México justa o injusta?', '¿Debería haber límite a la riqueza individual?', '¿Las redes sociales nos hacen más libres o más manipulables?'",
+      "Como facilitador, tu papel es facilitar, no enseñar: resiste el impulso de dar tu opinión o 'resolver' el problema. Tu poder está en las preguntas socráticamente formuladas que abren nuevas dimensiones. Cada vez que vayas a hablar, pregúntate: ¿estoy abriendo o cerrando el pensamiento?",
+      "Para el diálogo, reorganizar el espacio importa: el círculo de sillas sin escritorios elimina la jerarquía visual del aula tradicional y facilita el contacto visual directo — condición del diálogo genuino. Vale la pena los 3 minutos de reorganización."
+    ]
+  },
+  "PFH-I-P05": {
+    "code": "PFH-I-P05",
+    "title": "Tradiciones filosóficas: reconozco la diversidad del pensamiento filosófico occidental, oriental e indígena",
+    "level": "Pensamiento Filosófico y Humanidades I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Pensamiento filosófico diverso",
+    "metadata": {
+      "objective": "El estudiante reconocerá la diversidad de tradiciones filosóficas — occidental, oriental e indígena — como formas legítimas y distintas de pensar el mundo, con énfasis en el pensamiento filosófico mesoamericano.",
+      "competencies": [
+        "Distingue características del pensamiento filosófico occidental (griegos, racionalismo, ilustración)",
+        "Identifica conceptos fundamentales de tradiciones filosóficas orientales (budismo, taoísmo, confucianismo)",
+        "Reconoce el pensamiento filosófico mesoamericano como sistema filosófico legítimo",
+        "Compara cómo distintas tradiciones abordan preguntas sobre la realidad, el bien y la identidad",
+        "Reflexiona sobre la influencia del contexto cultural en el tipo de preguntas filosóficas que se formulan"
+      ],
+      "materials": [
+        "Mapas del mundo con centros de desarrollo filosófico (Grecia, India, China, Mesoamérica)",
+        "Textos breves de tradiciones filosóficas diversas (fragmentos del Tao Te Ching, Upanishads, textos nahuas)",
+        "Fragmentos de La filosofía náhuatl de Miguel León-Portilla",
+        "Diario filosófico personal",
+        "Infografías comparativas de las tradiciones filosóficas"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Solo los griegos filosofaron?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Tres tradiciones, tres formas de pensar el mundo" },
+        { "phase": "Cierre", "duration": "10 min", "label": "El pensamiento filosófico de mi herencia cultural" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — El mapa del pensamiento humano",
+          "duration": "10 min",
+          "description": "El docente muestra un mapa del mundo y pregunta: ¿en qué parte del mapa ubican la filosofía? La mayoría señalará Europa — específicamente Grecia. El docente revela simultáneamente que en el siglo VI a.C. — cuando Tales de Mileto iniciaba la filosofía griega — Buda predicaba en India, Confucio enseñaba en China y los pueblos mesoamericanos desarrollaban sistemas cosmológicos y éticos sofisticados. La filosofía no es un invento griego ni europeo.",
+          "activity": "Pregunta diagnóstica: '¿Puedes nombrar un filósofo que no sea europeo o norteamericano?' Se registran las respuestas — generalmente pocas. Esta brecha en el conocimiento previo es el punto de partida para la progresión."
+        },
+        {
+          "title": "FASE II: DESARROLLO — Tradiciones filosóficas en diálogo",
+          "duration": "30 min",
+          "description": "Se trabajan 3 tradiciones comparadas en 3 preguntas filosóficas centrales: 1) ¿Qué es la realidad? Occidente (Platón): mundo de ideas eternas + mundo de apariencias. Oriente (budismo): la realidad es vacuidad, impermanencia (anatta). Mesoamérica (náhuatl): nepantla — el 'entre', la realidad como proceso en tensión de opuestos. 2) ¿Cómo debo vivir? Occidente (Aristóteles): eudaimonia, florecimiento según la virtud. Oriente (taoísmo): wu wei, actuar en armonía con el flujo natural. Náhuatl: toltecáyotl, el ideal del 'ser artista de la vida'. 3) ¿Qué es el yo? Occidente (Descartes): el yo como mente pensante. Budismo: el yo como ilusión (anatta). Náhuatl: el ser humano como 'rostro y corazón' (ixtli-yóllotl).",
+          "activity": "Galería comparativa: 3 estaciones (una por tradición) con un texto breve y 2 preguntas de análisis. Los estudiantes rotan en grupos de 4 y registran en una tabla comparativa las respuestas de cada tradición a las 3 preguntas filosóficas centrales."
+        },
+        {
+          "title": "FASE III: CIERRE — Mi herencia filosófica",
+          "duration": "10 min",
+          "description": "El docente pregunta: ¿de qué tradición filosófica viene tu familia, tu comunidad, tu cultura? En México, la mayoría de las familias tiene una mezcla de pensamiento occidental (catolicismo, racionalismo moderno) y mesoamericano (cosmovisiones, relación con la naturaleza, concepción del tiempo cíclico). Esta mezcla no es contradicción — es el producto de 500 años de encuentros y resistencias culturales.",
+          "activity": "Entrada en el Diario Filosófico: elige 1 concepto de alguna de las tres tradiciones que te resulte poderoso para pensar tu propia vida (nepantla, wu wei, eudaimonia, toltecáyotl, anatta...). Explica por qué ese concepto te resuena y cómo se relaciona con algo que has vivido o pensado."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La filosofía no nació en un solo lugar ni en un solo momento. El siglo VI a.C. — conocido como la 'Era Axial' por el historiador Karl Jaspers — fue un período extraordinario en que surgieron tradiciones de pensamiento filosófico y religioso de forma simultánea e independiente en Grecia, India, China y el Cercano Oriente. Mesoamérica desarrolló sus propias tradiciones filosóficas que, aunque con distinta cronología, alcanzan una profundidad comparable.",
+      "sections": [
+        {
+          "subtitle": "La filosofía náhuatl: toltecáyotl e ixtli-yóllotl",
+          "content": "El historiador y filósofo mexicano Miguel León-Portilla (1926-2019) sistematizó el pensamiento filosófico náhuatl en su obra La filosofía náhuatl estudiada en sus fuentes (1956). León-Portilla demostró que los pueblos nahuas del Altiplano central mexicano desarrollaron reflexiones filosóficas sofisticadas sobre la naturaleza del ser, el conocimiento y la ética. El concepto de 'ixtli-yóllotl' — 'rostro y corazón' — define al ser humano como la unidad entre la identidad exterior visible y el mundo interior de los sentimientos y la voluntad. Los tlamatinime (sabios nahuas) buscaban ayudar a los jóvenes a 'hacer sabio su rostro y dar corazón a las cosas' — desarrollar la integridad entre el ser exterior y el interior. El toltecáyotl es el 'arte de los toltecas' — el ideal de una vida vivida con maestría y creatividad, como artista de sí mismo. La realidad náhuatl está organizada en torno al concepto de 'nepantla' — 'en el medio', el espacio de tensión entre opuestos donde se genera la vida — que Octavio Paz y Gloria Anzaldúa recuperaron para la filosofía contemporánea."
+        },
+        {
+          "subtitle": "Tradiciones filosóficas orientales: budismo y taoísmo",
+          "content": "El budismo, fundado por Siddhartha Gautama (Buda, siglo V a.C. en India), parte de un diagnóstico radical: el sufrimiento (dukkha) es la condición básica de la existencia, y surge del apego — a las cosas, a las personas, a la propia identidad. La solución budista es el Óctuple Sendero que conduce al nirvana (extinción del apego) mediante meditación, sabiduría y conducta ética. El concepto de anatta ('no-yo') afirma que no existe un yo substancial permanente — lo que llamamos 'yo' es una ilusión conveniente, un proceso en flujo constante. Esta idea, desarrollada 23 siglos antes que la neurociencia contemporánea, tiene paralelos sorprendentes con las teorías actuales sobre la construcción narrativa del yo. El taoísmo, articulado en el Tao Te Ching de Laozi (siglo VI a.C. en China), propone el wu wei ('no-acción') como principio de vida: actuar en armonía con el flujo natural de las cosas (el Tao, 'el Camino') en lugar de forzar y controlar. El agua es la metáfora central del taoísmo: es lo más suave del mundo, pero horada la piedra más dura."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Qué historiador y filósofo mexicano sistematizó la filosofía náhuatl en su obra clásica?",
+          "options": ["Octavio Paz", "Alfonso Reyes", "Miguel León-Portilla", "Samuel Ramos"],
+          "correct": "Miguel León-Portilla"
+        },
+        {
+          "question": "¿Qué significa el concepto náhuatl 'ixtli-yóllotl'?",
+          "options": [
+            "El movimiento del sol y la luna",
+            "La unidad entre el rostro (identidad exterior) y el corazón (mundo interior)",
+            "El ritual del fuego nuevo",
+            "El calendario de 365 días"
+          ],
+          "correct": "La unidad entre el rostro (identidad exterior) y el corazón (mundo interior)"
+        },
+        {
+          "question": "¿Cuál es el principio central del taoísmo?",
+          "options": [
+            "Actuar con virtud para alcanzar la felicidad (eudaimonia)",
+            "Actuar en armonía con el flujo natural de las cosas (wu wei)",
+            "Liberar la mente de todo pensamiento mediante la meditación",
+            "Obedecer a los ancestros y las tradiciones"
+          ],
+          "correct": "Actuar en armonía con el flujo natural de las cosas (wu wei)"
+        },
+        {
+          "question": "¿Qué concepto budista niega la existencia de un yo substancial permanente?",
+          "options": ["Nirvana", "Dukkha", "Anatta", "Karma"],
+          "correct": "Anatta"
+        },
+        {
+          "question": "¿Qué evento histórico se conoce como la 'Era Axial'?",
+          "options": [
+            "La Revolución Científica del siglo XVII",
+            "El siglo VI a.C. cuando surgieron tradiciones filosóficas simultáneamente en Grecia, India, China y el Cercano Oriente",
+            "El Renacimiento europeo del siglo XV",
+            "La Ilustración del siglo XVIII"
+          ],
+          "correct": "El siglo VI a.C. cuando surgieron tradiciones filosóficas simultáneamente en Grecia, India, China y el Cercano Oriente"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: describe las características de al menos 2 tradiciones filosóficas distintas con conceptos específicos de cada una, compara cómo al menos 2 tradiciones abordan una misma pregunta filosófica (realidad, bien o identidad), y reflexiona en su Diario sobre cómo al menos 1 concepto filosófico de cualquier tradición ilumina un aspecto de su propia vida o cultura."
+    },
+    "teacher_tips": [
+      "Para muchos estudiantes mexicanos, descubrir que sus propias raíces culturales tienen una tradición filosófica rica y sofisticada es un momento de reconocimiento identitario poderoso — dale peso a ese momento, no lo trates como un dato más.",
+      "León-Portilla escribió de forma accesible y su obra está disponible en bibliotecas públicas y en línea — si tienes un plantel con población indígena, este es el texto que puede hacer la diferencia entre una clase académica y una experiencia transformadora.",
+      "La comparación entre el anatta budista y las teorías neurocientíficas contemporáneas sobre la construcción del yo (Daniel Dennett, Antonio Damasio) conecta la filosofía oriental con la ciencia actual — un puente motivador para estudiantes con perfil científico."
+    ]
+  }
+}

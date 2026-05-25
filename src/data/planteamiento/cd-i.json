@@ -1,0 +1,947 @@
+{
+  "CD-I-P01": {
+    "code": "CD-I-P01",
+    "title": "Hardware y software: identifico los componentes básicos de los dispositivos digitales",
+    "level": "Cultura Digital I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Cultura digital",
+    "metadata": {
+      "objective": "El estudiante identificará los componentes básicos del hardware y software de dispositivos digitales, comprendiendo su función y la relación entre ambos en el funcionamiento de un sistema computacional.",
+      "competencies": [
+        "Distingue hardware (componentes físicos) de software (programas e instrucciones)",
+        "Identifica los componentes principales del hardware: CPU, RAM, almacenamiento, periféricos",
+        "Clasifica el software en sistema operativo, aplicaciones y utilidades",
+        "Explica la función de cada componente en el procesamiento de información",
+        "Relaciona las especificaciones técnicas de un dispositivo con su capacidad de desempeño"
+      ],
+      "materials": [
+        "Computadora, laptop o tablet disponibles para inspección visual",
+        "Diagrama de arquitectura de una computadora (motherboard y componentes)",
+        "Tarjetas de vocabulario de hardware y software",
+        "Fichas técnicas de dispositivos populares para comparación",
+        "Simulador en línea de componentes de PC (disponible en español)"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Qué hay dentro de mi teléfono?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Hardware y software: componentes y funciones" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Comparativa técnica de dispositivos" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — El dispositivo como sistema",
+          "duration": "10 min",
+          "description": "El docente pregunta: si tu teléfono se cayó y se rompió la pantalla, ¿sigue funcionando lo que tenías guardado? La respuesta activa la distinción entre el componente físico (pantalla = hardware) y los datos e instrucciones (software = apps, fotos, contactos). ¿Qué pasaría si borras el sistema operativo pero el teléfono físico está bien? ¿Funcionaría? La relación de interdependencia entre hardware y software es el núcleo conceptual.",
+          "activity": "Diagnóstico visual: los estudiantes sacan su teléfono o el docente muestra uno y el grupo identifica elementos de hardware (pantalla, botones, cámara, micrófono, altavoz) y elementos de software (apps visibles, sistema operativo). Se construye el mapa inicial en el pizarrón."
+        },
+        {
+          "title": "FASE II: DESARROLLO — Componentes y funciones",
+          "duration": "30 min",
+          "description": "Se trabajan los componentes en dos bloques: 1) Hardware principal: CPU (procesador — cerebro del sistema, ejecuta instrucciones); RAM (memoria de trabajo — rápida pero temporal); almacenamiento (HDD/SSD — permanente pero más lento); tarjeta gráfica (GPU — procesa imágenes y video); periféricos de entrada (teclado, mouse, cámara, micrófono) y de salida (pantalla, bocinas, impresora). 2) Software: sistema operativo (iOS, Android, Windows, Linux — gestiona el hardware y permite ejecutar apps); aplicaciones (Chrome, WhatsApp, Spotify — realizan tareas específicas); utilidades (antivirus, gestores de archivos — mantienen el sistema).",
+          "activity": "Actividad 'Ficha técnica real': cada grupo recibe la ficha técnica de 2 dispositivos diferentes (teléfono de gama baja vs. alta, laptop de $8,000 vs. $20,000). Comparan: procesador, RAM, almacenamiento, cámara. Concluyen: ¿qué tareas podría hacer mejor cada uno? ¿Qué componente tiene mayor impacto en el precio? ¿Qué componente importa más para estudiar vs. jugar videojuegos?"
+        },
+        {
+          "title": "FASE III: CIERRE — El dispositivo en mi vida",
+          "duration": "10 min",
+          "description": "El docente conecta con la brecha digital en México: según el INEGI (2022), el 88.0% de la población urbana tiene acceso a internet vs. el 60.6% de la rural. Los dispositivos y su calidad no son neutros — determinan qué pueden hacer educativa y laboralmente sus usuarios. Conocer los componentes permite hacer decisiones más informadas al comprar o usar dispositivos.",
+          "activity": "Ticket de salida: elige un dispositivo que uses o quieras usar y describe: 2 componentes de hardware que reconoces, el sistema operativo que usa, y 2 aplicaciones que instalarías para estudiar. El docente recoge para retroalimentación formativa."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Un dispositivo digital es un sistema: un conjunto de componentes físicos (hardware) e instrucciones (software) que interactúan para procesar, almacenar y comunicar información. Comprender cómo funciona este sistema es la base de la cultura digital — no para ser técnicos informáticos, sino para ser usuarios críticos y agentes informados en la sociedad digital.",
+      "sections": [
+        {
+          "subtitle": "Hardware: la infraestructura física del cómputo",
+          "content": "El hardware es el conjunto de componentes físicos que forman un sistema computacional. La CPU (Central Processing Unit o procesador) es el componente más crítico: ejecuta instrucciones millones de veces por segundo y determina la velocidad general del sistema. Los procesadores modernos tienen múltiples núcleos (cores) que permiten ejecutar tareas simultáneas (multitarea). La RAM (Random Access Memory o memoria de acceso aleatorio) es la memoria de trabajo: almacena temporalmente los datos y programas en uso — es rápida pero se borra al apagar el dispositivo. El almacenamiento (HDD — disco duro mecánico — o SSD — disco de estado sólido) guarda datos de forma permanente: el SSD es significativamente más rápido que el HDD. Los periféricos son dispositivos de entrada (teclado, mouse, cámara, micrófono, escáner) o salida (pantalla, bocinas, impresora, proyector) que permiten la interacción con el sistema."
+        },
+        {
+          "subtitle": "Software: las instrucciones que dan vida al hardware",
+          "content": "El software es el conjunto de instrucciones, programas y datos que permiten al hardware realizar tareas. Se clasifica en tres categorías: el sistema operativo (OS) es el software fundamental que gestiona los recursos de hardware y proporciona la interfaz entre el usuario y la máquina — los más usados son Android e iOS (móviles), Windows y macOS (computadoras de escritorio/laptop), y Linux (servidores y sistemas especializados). Las aplicaciones o 'apps' son programas diseñados para realizar tareas específicas del usuario: navegadores web (Chrome, Firefox), procesadores de texto (Word, Google Docs), redes sociales (Instagram, TikTok), videojuegos. Las utilidades son programas que mantienen y optimizan el sistema: antivirus, gestores de archivos, compresores, herramientas de diagnóstico. El software de código abierto (open source) puede ser estudiado, modificado y distribuido libremente — Linux, LibreOffice y Firefox son ejemplos. El software propietario pertenece a una empresa y su código fuente no está disponible al público — Windows y macOS son ejemplos."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál es la función principal de la CPU en un dispositivo digital?",
+          "options": [
+            "Almacenar datos de forma permanente",
+            "Ejecutar instrucciones y procesar datos",
+            "Conectar el dispositivo a internet",
+            "Mostrar la imagen en la pantalla"
+          ],
+          "correct": "Ejecutar instrucciones y procesar datos"
+        },
+        {
+          "question": "¿Cuál es la diferencia entre RAM y almacenamiento (SSD/HDD)?",
+          "options": [
+            "La RAM es para videos; el almacenamiento para fotos",
+            "La RAM es memoria temporal de trabajo; el almacenamiento guarda datos permanentemente",
+            "La RAM es más lenta que el almacenamiento",
+            "El almacenamiento se borra al apagar; la RAM no"
+          ],
+          "correct": "La RAM es memoria temporal de trabajo; el almacenamiento guarda datos permanentemente"
+        },
+        {
+          "question": "¿Cuál de estos es un ejemplo de sistema operativo?",
+          "options": ["Google Chrome", "Microsoft Word", "Android", "Spotify"],
+          "correct": "Android"
+        },
+        {
+          "question": "¿Qué es el software de código abierto (open source)?",
+          "options": [
+            "Software que solo puede usarse en sistemas operativos Linux",
+            "Software gratuito pero sin acceso a actualizaciones",
+            "Software cuyo código fuente puede ser estudiado, modificado y distribuido libremente",
+            "Software exclusivo para instituciones educativas"
+          ],
+          "correct": "Software cuyo código fuente puede ser estudiado, modificado y distribuido libremente"
+        },
+        {
+          "question": "¿Cuál es un ejemplo de periférico de entrada?",
+          "options": ["Pantalla", "Bocinas", "Impresora", "Cámara web"],
+          "correct": "Cámara web"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: identifica correctamente al menos 5 componentes de hardware con su función, clasifica al menos 6 programas en sistema operativo, aplicación o utilidad, y puede explicar con sus propias palabras la diferencia entre hardware y software usando un ejemplo de su experiencia cotidiana."
+    },
+    "teacher_tips": [
+      "Si tienes acceso a una computadora desmontable (PC de escritorio), abrirla frente al grupo y señalar físicamente los componentes es la experiencia más efectiva — hace tangible lo que de otro modo es abstracto.",
+      "Para contextualizar la brecha digital, los datos del INEGI sobre acceso a internet en México por región, edad e ingreso son gratuitos y actualizados anualmente — úsalos para conectar los componentes técnicos con la desigualdad real.",
+      "El teléfono es el dispositivo más familiar para los estudiantes: basar todo el aprendizaje en el teléfono (CPU de un Snapdragon vs. un MediaTek, RAM de 4 vs. 12 GB) es más motivador que usar la computadora de escritorio como modelo."
+    ]
+  },
+  "CD-I-P02": {
+    "code": "CD-I-P02",
+    "title": "Licencias digitales: distingo el uso libre del propietario en software y contenidos",
+    "level": "Cultura Digital I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Cultura digital",
+    "metadata": {
+      "objective": "El estudiante distinguirá los tipos de licencias de uso de software y contenidos digitales (libre, propietario, Creative Commons) y aplicará este conocimiento para usar, compartir y crear contenido de forma ética y legal.",
+      "competencies": [
+        "Distingue software libre de software propietario y de software gratuito",
+        "Identifica los principales tipos de licencias Creative Commons y sus condiciones",
+        "Aplica el criterio de licencia para usar imágenes, música y textos de internet éticamente",
+        "Reflexiona sobre el derecho de autor y la propiedad intelectual en el entorno digital",
+        "Valora el movimiento de software libre y el conocimiento abierto como proyecto político y cultural"
+      ],
+      "materials": [
+        "Infografía de tipos de licencias Creative Commons",
+        "Casos prácticos: búsqueda de imágenes libres en Creative Commons Search o Unsplash",
+        "Ejemplos de software libre (LibreOffice, Firefox, Linux) vs. propietario (Office, Chrome, Windows)",
+        "Hoja de análisis: '¿Puedo usar esto legalmente?'",
+        "Fragmento de la Ley Federal de Derechos de Autor de México"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Puedo usar esa imagen en mi tarea?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Licencias de software y Creative Commons" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Mis creaciones y sus licencias" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — El dilema de la imagen de internet",
+          "duration": "10 min",
+          "description": "El docente plantea el escenario: encontraste una imagen perfecta en Google para tu tarea o presentación — ¿puedes usarla? Los estudiantes generalmente dicen 'sí' porque está en internet. El docente introduce la sorpresa: la mayoría de las imágenes en internet tienen derechos de autor — usarlas sin permiso puede ser ilegal. ¿Pero no se supone que internet es libre? Este dilema activa la necesidad de comprender las licencias.",
+          "activity": "El docente hace una búsqueda en vivo de imágenes en Google y muestra cómo filtrar por 'Licencias de uso' — la diferencia entre imágenes con copyright y las de uso libre es visible inmediatamente. Los estudiantes se sorprenden de cuántas imágenes de uso común tienen derechos restringidos."
+        },
+        {
+          "title": "FASE II: DESARROLLO — Tipos de licencias",
+          "duration": "30 min",
+          "description": "Se trabajan en dos bloques: 1) Licencias de software: Propietario (el código fuente no se comparte, el usuario paga por una licencia de uso — Windows, Office, Adobe Creative Cloud). Libre (el código fuente es abierto, el usuario puede estudiar, modificar y distribuir — Linux, LibreOffice, Firefox). Gratuito/freeware (se puede usar sin costo pero no es libre — el código no se comparte y hay condiciones de uso). 2) Licencias Creative Commons (CC): CC-BY (solo atribución, usos libres), CC-BY-SA (atribución + misma licencia), CC-BY-NC (atribución + no comercial), CC-BY-ND (atribución + no derivadas), hasta CC BY-NC-ND (la más restrictiva). Dominio público: sin restricciones.",
+          "activity": "Práctica de búsqueda ética: cada estudiante busca en Creative Commons Search (search.creativecommons.org) 3 imágenes que podría usar legalmente en una presentación escolar. Verifica: ¿qué tipo de CC tiene? ¿requiere atribución? ¿puede modificarse? ¿puede usarse comercialmente? Registra los resultados en la hoja de análisis."
+        },
+        {
+          "title": "FASE III: CIERRE — Yo como creador con derechos",
+          "duration": "10 min",
+          "description": "El docente cambia la perspectiva: hasta ahora hablamos de usar contenido ajeno. Pero el estudiante también crea — fotos, videos, textos, diseños. Esos tienen derechos de autor automáticamente (la Ley Federal de Derechos de Autor de México). Si quiero que otros puedan usar mis creaciones, puedo elegir una licencia CC. ¿Cuál elegirías para tus fotos de Instagram? ¿Para un video que hiciste?",
+          "activity": "Ticket de salida: para cada caso, indica qué licencia CC es apropiada: 1) Una foto que quieres compartir libremente pero que siempre te mencionen. 2) Una canción que compusiste y no quieres que se use con fines comerciales. 3) Un texto que quieres que otros puedan usar y modificar libremente. 4) Un logo de marca que no quieres que nadie modifique."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "En la era digital, el conocimiento, la cultura y las herramientas se producen, copian y distribuyen a cero costo marginal. Este hecho tecnológico entra en tensión con los sistemas de propiedad intelectual diseñados para el mundo físico. Las licencias son el mecanismo que regula esta tensión: definen quién puede usar, copiar, modificar y distribuir un trabajo, y en qué condiciones.",
+      "sections": [
+        {
+          "subtitle": "Software libre vs. software propietario: más que un precio, un modelo político",
+          "content": "Richard Stallman fundó el movimiento de software libre en 1983 con una premisa filosófica y política: el software controla máquinas que median nuestra vida social, educativa y económica — quien controla el software controla el poder. El software propietario — cuyo código fuente es secreto — crea dependencia: el usuario no puede saber qué hace el programa en su computadora, no puede adaptarlo a sus necesidades ni distribuirlo libremente. El software libre garantiza 4 libertades: usar el programa para cualquier propósito, estudiar cómo funciona (requiere acceso al código fuente), redistribuir copias, y mejorar y distribuir las mejoras. GNU/Linux, LibreOffice, Firefox y Blender son ejemplos de software libre ampliamente usado. La distinción crucial: 'libre' (en el sentido de libertad, libre speech) no es sinónimo de 'gratuito' (free beer) — el software libre puede venderse, y el software propietario puede ofrecerse sin costo."
+        },
+        {
+          "subtitle": "Creative Commons: un sistema de licencias para la cultura libre",
+          "content": "Creative Commons (CC) es un sistema de licencias legales estandarizadas diseñado por Lawrence Lessig en 2001 para permitir a los creadores compartir sus obras con condiciones flexibles. Las licencias CC combinan 4 elementos: BY (atribución — el usuario debe mencionar al autor), SA (ShareAlike — las obras derivadas deben tener la misma licencia), NC (NonCommercial — el uso no puede tener fines comerciales) y ND (NoDerivatives — no se pueden crear obras derivadas). La combinación más restrictiva es CC BY-NC-ND (solo se puede usar tal cual, con atribución y sin fines comerciales). La más abierta es CC BY (cualquier uso siempre que se cite al autor). CC0 (Creative Commons Zero) equivale al dominio público — sin restricciones. En México, la Ley Federal de Derechos de Autor (1996) protege automáticamente las obras originales — las licencias CC son mecanismos voluntarios para relajar esas protecciones."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál es la diferencia principal entre software libre y software gratuito?",
+          "options": [
+            "El software libre no tiene precio; el gratuito sí",
+            "El software libre garantiza acceso al código fuente y libertades de uso; el gratuito solo se puede usar sin costo pero sin acceso al código",
+            "El software libre es mejor calidad que el gratuito",
+            "El software gratuito solo funciona en Linux"
+          ],
+          "correct": "El software libre garantiza acceso al código fuente y libertades de uso; el gratuito solo se puede usar sin costo pero sin acceso al código"
+        },
+        {
+          "question": "¿Qué significa el elemento 'NC' en una licencia Creative Commons?",
+          "options": ["No Copy (no se puede copiar)", "Non-Commercial (no se puede usar con fines comerciales)", "No Credit (no requiere atribución)", "New Content (solo para contenido nuevo)"],
+          "correct": "Non-Commercial (no se puede usar con fines comerciales)"
+        },
+        {
+          "question": "¿Cuál de estos es un ejemplo de software libre?",
+          "options": ["Microsoft Windows", "Google Chrome", "Adobe Photoshop", "LibreOffice"],
+          "correct": "LibreOffice"
+        },
+        {
+          "question": "Si encuentras una imagen con licencia CC BY en internet, ¿qué DEBES hacer al usarla?",
+          "options": [
+            "Pagar una tarifa al autor",
+            "Mencionar al autor (dar atribución)",
+            "Modificarla obligatoriamente",
+            "Usarla solo sin fines comerciales"
+          ],
+          "correct": "Mencionar al autor (dar atribución)"
+        },
+        {
+          "question": "¿Qué implica que una obra esté en el 'dominio público' o tenga licencia CC0?",
+          "options": [
+            "Que solo puede usarse en plataformas públicas como YouTube",
+            "Que cualquiera puede usarla sin restricciones ni necesidad de atribución",
+            "Que fue creada con fondos del gobierno",
+            "Que solo puede usarse con fines educativos"
+          ],
+          "correct": "Que cualquiera puede usarla sin restricciones ni necesidad de atribución"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: distingue correctamente las 4 libertades del software libre de las condiciones del software propietario, identifica el tipo de licencia CC para al menos 4 situaciones de uso distintas, y puede buscar y verificar la licencia de una imagen o recurso en línea de forma autónoma."
+    },
+    "teacher_tips": [
+      "La práctica de búsqueda en Creative Commons Search es la actividad más efectiva: en 10 minutos los estudiantes aprenden más sobre licencias que con cualquier explicación teórica — el aprendizaje por descubrimiento en contexto real supera la exposición.",
+      "Menciona que Wikipedia usa licencias CC BY-SA — todo su contenido puede reutilizarse con atribución. Esto convierte a los estudiantes de consumidores de Wikipedia en potenciales contribuidores y redistribuidores legítimos.",
+      "Para grupos con interés en música o diseño, muestra Freesound.org (audios CC) y Unsplash (fotos CC) — son recursos directamente útiles para sus proyectos escolares y hacen la licencia relevante de inmediato."
+    ]
+  },
+  "CD-I-P03": {
+    "code": "CD-I-P03",
+    "title": "Colonialismo de datos: reflexiono sobre las asimetrías en la producción y control de información digital",
+    "level": "Cultura Digital I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Ciudadanía digital",
+    "metadata": {
+      "objective": "El estudiante reflexionará sobre el colonialismo de datos y las asimetrías en la producción y control de información digital, analizando las implicaciones de la soberanía digital para México y América Latina.",
+      "competencies": [
+        "Define el concepto de colonialismo de datos y lo relaciona con el neocolonialismo digital",
+        "Identifica quién produce, controla y monetiza los datos generados por usuarios mexicanos",
+        "Analiza el modelo de negocio de las plataformas digitales basado en datos personales",
+        "Reflexiona sobre la privacidad digital y la soberanía de los datos como derechos",
+        "Valora iniciativas de soberanía tecnológica desde América Latina (software libre, cloud soberana)"
+      ],
+      "materials": [
+        "Infografía: ¿cuántos datos generas al día?",
+        "Documental/video: 'El dilema de las redes' (Netflix, 2020) — fragmento",
+        "Mapa de servidores de datos globales vs. América Latina",
+        "Artículos sobre la Ley Federal de Protección de Datos en México",
+        "Casos de uso de datos: Cambridge Analytica, AMLO y la soberanía digital"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Si el producto es gratis, el producto eres tú?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Datos, poder y soberanía digital" },
+        { "phase": "Cierre", "duration": "10 min", "label": "México en la economía de datos" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — El precio de 'gratis'",
+          "duration": "10 min",
+          "description": "El docente pregunta: ¿cuánto cuesta usar Instagram? ¿TikTok? ¿Google? La respuesta es $0. Luego pregunta: ¿cómo ganan dinero estas empresas? Después de un momento, introduce el modelo: los usuarios pagan con sus datos. Cada búsqueda, cada like, cada segundos de video visto, cada ubicación — son datos que se recopilan, analizan y venden a anunciantes. Las empresas de internet más valiosas del mundo no venden productos — venden predicciones sobre el comportamiento humano.",
+          "activity": "Actividad '¿Cuántos datos generas?': el docente muestra una infografía de los datos generados por segundo en el mundo (mensajes de WhatsApp, búsquedas en Google, tweets, videos subidos a YouTube). Los estudiantes estiman cuántos datos generaron ayer con sus dispositivos: ¿cuántas búsquedas? ¿cuántos videos? ¿cuántas fotos? ¿cuántos minutos en redes? El total es sorprendente."
+        },
+        {
+          "title": "FASE II: DESARROLLO — Colonialismo de datos",
+          "duration": "30 min",
+          "description": "Se construyen 3 conceptos: 1) Economía de datos: las plataformas generan valor extrayendo datos del comportamiento de los usuarios para crear perfiles y venderlos a anunciantes. Los datos son el 'petróleo del siglo XXI' — como el petróleo, quienes los controlan tienen un poder económico y político enorme. 2) Colonialismo de datos: los académicos Couldry y Mejas propusieron este concepto en 2019 — la extracción masiva de datos de países del Sur Global por empresas del Norte es una nueva forma de colonialismo: los recursos son extraídos, procesados y monetizados por corporaciones ajenas sin beneficio para las comunidades que los generan. 3) Soberanía digital: el derecho de países y comunidades a controlar sus propios datos y tecnologías — infraestructura propia, legislación protectora, software libre y alternativas locales.",
+          "activity": "Análisis de caso: Cambridge Analytica (2018) usó datos de 87 millones de usuarios de Facebook — sin su consentimiento — para influir en las elecciones de EE.UU. y el Brexit. ¿Podrían haber usado datos de usuarios mexicanos? Los estudiantes investigan brevemente y responden: ¿qué datos de sus redes sociales creen que están siendo usados? ¿para qué?"
+        },
+        {
+          "title": "FASE III: CIERRE — México y la soberanía digital",
+          "duration": "10 min",
+          "description": "El docente introduce iniciativas de soberanía digital: la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (México, 2010) y el INAI como autoridad reguladora. La propuesta de cloud soberana de América Latina. El software libre como herramienta de soberanía tecnológica. La pregunta: ¿puede México tener soberanía digital en un mundo dominado por corporaciones estadounidenses y chinas?",
+          "activity": "Ticket de salida: revisa la configuración de privacidad de una app que uses (Instagram, TikTok, WhatsApp). ¿Qué datos recopila? ¿Con quién los comparte? ¿Puedes limitar la recopilación? Escribe 3 cosas que descubriste y 1 acción que tomarás para proteger mejor tus datos."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Los datos son el recurso estratégico del siglo XXI — y al igual que el petróleo, el carbón o el caucho del siglo XIX y XX, su extracción y control están generando nuevas formas de poder y desigualdad a escala global. El concepto de 'colonialismo de datos' nombra una dinámica en que los países del Norte Global extraen, procesan y monetizan los datos generados por ciudadanos del Sur Global, reproduciendo relaciones de dependencia análogas al colonialismo histórico.",
+      "sections": [
+        {
+          "subtitle": "La economía de la atención: el modelo de negocio de las plataformas digitales",
+          "content": "Las plataformas digitales dominantes (Google, Meta/Facebook, Amazon, TikTok/ByteDance) operan bajo un modelo económico conocido como 'capitalismo de vigilancia' — concepto acuñado por Shoshana Zuboff en La era del capitalismo de vigilancia (2019). El modelo funciona así: los usuarios reciben servicios gratuitos (buscador, red social, mapas) a cambio de ceder sus datos de comportamiento. La plataforma analiza esos datos para construir perfiles detallados del usuario y vende a anunciantes la capacidad de mostrar publicidad ultrasegmentada — predecir y modificar el comportamiento del usuario. El ex presidente de Google Eric Schmidt dijo: 'Si tienes algo que quieres ocultar, quizás no deberías estar haciéndolo.' Esta postura normaliza la vigilancia — el argumento 'no tengo nada que ocultar' ignora que la privacidad no es sobre culpa sino sobre autonomía y poder."
+        },
+        {
+          "subtitle": "Soberanía digital: el derecho de los pueblos a controlar sus datos y tecnologías",
+          "content": "La soberanía digital es el principio de que los Estados, las comunidades y los individuos tienen derecho a controlar sus propios datos e infraestructuras tecnológicas. En el plano nacional: los datos generados por ciudadanos mexicanos son procesados principalmente en servidores ubicados en EE.UU. (AWS de Amazon, Azure de Microsoft, GCP de Google) — esto crea dependencia tecnológica y vulnerabilidad de privacidad. La Unión Europea lidera la regulación con el GDPR (Reglamento General de Protección de Datos, 2018) — el estándar más exigente del mundo. México tiene la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (2010) y el INAI como autoridad reguladora, pero con menor capacidad de enforcement. En el plano individual: los derechos ARCO (Acceso, Rectificación, Cancelación y Oposición) permiten a los ciudadanos mexicanos solicitar a las empresas qué datos tienen sobre ellos y cómo los usan."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál es el modelo de negocio principal de plataformas gratuitas como Instagram o Google?",
+          "options": [
+            "Cobrar suscripciones premium a usuarios avanzados",
+            "Vender hardware complementario (teléfonos, tablets)",
+            "Recopilar datos de comportamiento de usuarios para vender publicidad ultrasegmentada",
+            "Recibir subvenciones gubernamentales"
+          ],
+          "correct": "Recopilar datos de comportamiento de usuarios para vender publicidad ultrasegmentada"
+        },
+        {
+          "question": "¿Qué es el 'colonialismo de datos' según Couldry y Mejas?",
+          "options": [
+            "El robo de datos por parte de hackers en países en desarrollo",
+            "La extracción masiva de datos de países del Sur Global por corporaciones del Norte, reproduciendo dinámicas coloniales de dependencia",
+            "La censura de internet en regímenes autoritarios",
+            "La piratería de software en países latinoamericanos"
+          ],
+          "correct": "La extracción masiva de datos de países del Sur Global por corporaciones del Norte, reproduciendo dinámicas coloniales de dependencia"
+        },
+        {
+          "question": "¿Qué son los derechos ARCO en el contexto de la protección de datos en México?",
+          "options": [
+            "Acceso, Reproducción, Copyright y Obra",
+            "Acceso, Rectificación, Cancelación y Oposición — derechos sobre los datos personales",
+            "Anonimato, Resistencia, Control y Opacidad",
+            "Autonomía, Respeto, Consentimiento y Obligación"
+          ],
+          "correct": "Acceso, Rectificación, Cancelación y Oposición — derechos sobre los datos personales"
+        },
+        {
+          "question": "¿Qué institución en México es la autoridad reguladora de la protección de datos personales?",
+          "options": ["CONACYT", "INEGI", "INAI", "SEP"],
+          "correct": "INAI"
+        },
+        {
+          "question": "¿Por qué el argumento 'no tengo nada que ocultar' es problemático desde la perspectiva de la soberanía digital?",
+          "options": [
+            "Porque ignora que la privacidad es sobre culpa y no sobre autonomía",
+            "Porque ignora que la privacidad no es sobre culpa sino sobre autonomía y poder sobre los propios datos",
+            "Porque desafía las leyes de protección de datos",
+            "Porque fomenta el colonialismo de datos"
+          ],
+          "correct": "Porque ignora que la privacidad no es sobre culpa sino sobre autonomía y poder sobre los propios datos"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: explica el modelo de negocio de al menos 2 plataformas digitales con terminología correcta, define el colonialismo de datos y lo relaciona con al menos 1 ejemplo concreto, y propone al menos 2 acciones personales para ejercer sus derechos ARCO o proteger mejor sus datos."
+    },
+    "teacher_tips": [
+      "El fragmento del documental 'El dilema de las redes' (Netflix, 2020) es el recurso más poderoso para este tema — si es posible proyectar 10-15 minutos, genera conversación inmediata. Si no hay acceso, el tráiler de 2 minutos en YouTube es suficiente para activar la reflexión.",
+      "Para la actividad de revisar configuración de privacidad de una app, los estudiantes suelen descubrir que TikTok o Instagram acceden al micrófono, la cámara y los contactos incluso cuando la app está cerrada — este hallazgo genera reacción emocional genuina que fija el aprendizaje.",
+      "Conecta con el escándalo de Cambridge Analytica y las elecciones de 2018 en México — hay evidencia de que herramientas de microtargeting similares se usaron en campañas políticas mexicanas. La política y los datos están entrelazados."
+    ]
+  },
+  "CD-I-P04": {
+    "code": "CD-I-P04",
+    "title": "Algoritmos y filtros: analizo cómo los algoritmos moldean mi experiencia digital cotidiana",
+    "level": "Cultura Digital I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Ciudadanía digital",
+    "metadata": {
+      "objective": "El estudiante analizará el funcionamiento básico de los algoritmos y su impacto en la experiencia digital cotidiana, identificando los filtros burbuja y las cámaras de eco como fenómenos que afectan la formación de opinión.",
+      "competencies": [
+        "Define algoritmo y explica cómo funcionan los algoritmos de recomendación en plataformas digitales",
+        "Identifica el filtro burbuja como mecanismo de personalización que limita la exposición a información diversa",
+        "Distingue cámara de eco de filtro burbuja",
+        "Reflexiona sobre cómo los algoritmos influyen en sus creencias, opiniones y consumo de información",
+        "Aplica estrategias para diversificar sus fuentes de información y salir del filtro burbuja"
+      ],
+      "materials": [
+        "Video: 'Beware online filter bubbles' de Eli Pariser (TED Talk, 9 min)",
+        "Infografía de cómo funciona el algoritmo de TikTok o YouTube",
+        "Experimento de búsqueda: mismo término en distintos dispositivos/cuentas",
+        "Hoja de análisis: 'Mi burbuja informativa'",
+        "Lista de fuentes diversas de noticias en México para diversificar"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Por qué TikTok siempre me muestra lo que me gusta?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Algoritmos, filtro burbuja y cámara de eco" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Salir de la burbuja: estrategias" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — La trampa del 'para ti'",
+          "duration": "10 min",
+          "description": "El docente pregunta: ¿alguna vez abriste TikTok y de repente pasó una hora? ¿Por qué es tan difícil parar? La respuesta está en el algoritmo: TikTok tiene el algoritmo de recomendación más sofisticado del mundo — aprende en minutos qué tipo de contenido te mantiene más tiempo en la app, y te lo muestra sin parar. ¿Qué significaría que una máquina conoce tus gustos mejor que tus amigos?",
+          "activity": "Experimento de 'Busca el mismo tema en dos cuentas diferentes': el docente busca 'elecciones México' en Google desde la cuenta del plantel y un estudiante busca lo mismo desde su cuenta personal. ¿Son iguales los primeros 5 resultados? ¿Por qué no? Este experimento hace visible la personalización algorítmica."
+        },
+        {
+          "title": "FASE II: DESARROLLO — Algoritmos y sus efectos sociales",
+          "duration": "30 min",
+          "description": "Se construyen 3 conceptos: 1) Algoritmo de recomendación: programa que analiza el comportamiento del usuario (qué ve, por cuánto tiempo, qué comparte, qué omite) para predecir qué contenido lo mantendrá más tiempo en la plataforma. La métrica objetivo no es 'qué es verdad' sino 'qué genera engagement'. 2) Filtro burbuja: término acuñado por Eli Pariser (2011) — la personalización algorítmica reduce gradualmente la exposición a puntos de vista distintos a los propios. Cada usuario vive en una versión diferente de internet. 3) Cámara de eco: fenómeno social donde las personas se rodean de otras con las mismas opiniones, reforzándolas sin cuestionarlas. El filtro burbuja es tecnológico; la cámara de eco es social — pero los algoritmos amplifican ambas.",
+          "activity": "Análisis de mi burbuja: cada estudiante completa la hoja: ¿Qué temas aparecen más en su 'Para ti' de TikTok o en su feed de Instagram? ¿Tienen grupos de WhatsApp con personas de opiniones muy diferentes? ¿Cuándo fue la última vez que leyeron algo que cambió su opinión sobre un tema importante? Las respuestas revelan el grado de exposición a la diversidad informativa."
+        },
+        {
+          "title": "FASE III: CIERRE — Estrategias para el ciudadano digital crítico",
+          "duration": "10 min",
+          "description": "El docente presenta 5 estrategias para salir del filtro burbuja: 1) Buscar fuentes con perspectivas distintas intencionalmente. 2) Usar búsqueda incógnito para obtener resultados menos personalizados. 3) Seguir cuentas con las que no se esté de acuerdo para exponerse a otros puntos de vista. 4) Contrastar noticias con al menos 2 fuentes de diferente tendencia editorial. 5) Leer los términos de servicio de las plataformas que usas.",
+          "activity": "Ticket de salida: elige 1 tema sobre el que crees que tienes un filtro burbuja (política, deportes, música, videojuegos). Describe cómo se manifestaría ese filtro en tu experiencia digital y enuncia 1 acción concreta que tomarás esta semana para exponerte a una perspectiva diferente."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Los algoritmos de recomendación son la tecnología que define la experiencia digital de más de 5 mil millones de personas en el mundo. No son neutrales: están diseñados para maximizar el tiempo que los usuarios pasan en las plataformas, lo que los lleva a priorizar contenido que genere reacciones emocionales fuertes — incluyendo indignación, miedo y polarización — sobre contenido que sea preciso o diverso.",
+      "sections": [
+        {
+          "subtitle": "Cómo funcionan los algoritmos de recomendación",
+          "content": "Un algoritmo es un conjunto de instrucciones paso a paso para resolver un problema o realizar una tarea. Los algoritmos de recomendación son programas que analizan el comportamiento de los usuarios para predecir qué contenido les mostrará para maximizar la métrica objetivo de la plataforma (generalmente tiempo de permanencia, clics o interacciones). El algoritmo de YouTube analiza: historial de visualización, tiempo de visionado (cuánto del video viste), interacciones (likes, comentarios, compartidos), y qué ves después. El algoritmo de TikTok es especialmente sofisticado: aprende las preferencias del usuario en minutos analizando micropausas (cuánto tardas en pasar a lo siguiente), replays (cuántas veces ves el mismo video) y la velocidad de scroll. El resultado: un feed personalizado que parece leerte la mente — pero que en realidad te muestra una versión del mundo curada por criterios comerciales, no editoriales."
+        },
+        {
+          "subtitle": "Filtro burbuja y cámara de eco: consecuencias sociales de la personalización",
+          "content": "El periodista Eli Pariser acuñó el término 'filtro burbuja' en 2011 para describir el resultado acumulativo de la personalización algorítmica: cada usuario vive en una versión diferente de internet — una burbuja informativa construida a medida por los algoritmos. El problema no es que veas contenido que te gusta — es que dejas de ver perspectivas distintas, y esto afecta la formación de una opinión pública informada y plural. La 'cámara de eco' es un fenómeno social complementario: cuando nos rodeamos principalmente de personas con las mismas opiniones (en grupos de WhatsApp, en redes sociales, en medios de comunicación), nuestras creencias se refuerzan sin cuestionamiento. Los estudios del MIT (2018) encontraron que las noticias falsas se difunden 6 veces más rápido que las verdaderas en Twitter — porque generan más reacciones emocionales, lo que el algoritmo interpreta como señal de relevancia. El resultado: los algoritmos, diseñados para el engagement, tienen efectos no intencionados sobre la calidad del debate democrático."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál es la métrica principal que los algoritmos de recomendación intentan maximizar?",
+          "options": [
+            "La precisión y veracidad del contenido mostrado",
+            "El tiempo de permanencia del usuario en la plataforma",
+            "La diversidad de perspectivas en el feed",
+            "La popularidad del contenido en términos de vistas totales"
+          ],
+          "correct": "El tiempo de permanencia del usuario en la plataforma"
+        },
+        {
+          "question": "¿Qué es el filtro burbuja según Eli Pariser?",
+          "options": [
+            "Un programa que bloquea contenido inapropiado para menores",
+            "La burbuja informativa personalizada que crea la personalización algorítmica, limitando la exposición a perspectivas diversas",
+            "Un filtro de privacidad que protege los datos del usuario",
+            "Una cámara de burbujas usada para filtrar agua"
+          ],
+          "correct": "La burbuja informativa personalizada que crea la personalización algorítmica, limitando la exposición a perspectivas diversas"
+        },
+        {
+          "question": "¿Cuál es la diferencia entre filtro burbuja y cámara de eco?",
+          "options": [
+            "Son exactamente lo mismo",
+            "El filtro burbuja es un fenómeno tecnológico (algoritmos); la cámara de eco es un fenómeno social (rodearse de personas similares)",
+            "La cámara de eco es tecnológica; el filtro burbuja es social",
+            "El filtro burbuja ocurre solo en redes sociales; la cámara de eco en medios tradicionales"
+          ],
+          "correct": "El filtro burbuja es un fenómeno tecnológico (algoritmos); la cámara de eco es un fenómeno social (rodearse de personas similares)"
+        },
+        {
+          "question": "¿Por qué las noticias falsas se difunden más rápido que las verdaderas en plataformas sociales?",
+          "options": [
+            "Porque son más cortas y fáciles de leer",
+            "Porque generan reacciones emocionales más fuertes, lo que los algoritmos interpretan como relevancia",
+            "Porque las redes sociales favorecen a los medios independientes",
+            "Porque los usuarios verifican menos el contenido que reciben"
+          ],
+          "correct": "Porque generan reacciones emocionales más fuertes, lo que los algoritmos interpretan como relevancia"
+        },
+        {
+          "question": "¿Cuál es una estrategia efectiva para salir del filtro burbuja?",
+          "options": [
+            "Usar menos internet",
+            "Buscar intencionalmente fuentes con perspectivas distintas a las propias",
+            "Solo leer medios oficiales del gobierno",
+            "Borrar el historial del navegador cada semana"
+          ],
+          "correct": "Buscar intencionalmente fuentes con perspectivas distintas a las propias"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: explica con sus propias palabras cómo funciona un algoritmo de recomendación y qué métrica busca optimizar, distingue filtro burbuja de cámara de eco con ejemplos de su experiencia digital real, y propone al menos 2 estrategias concretas y viables para diversificar su consumo de información."
+    },
+    "teacher_tips": [
+      "El experimento de buscar el mismo término en dos cuentas diferentes es la actividad más convincente de la progresión — los estudiantes ven con sus propios ojos que 'internet' no es igual para todos, y esto hace tangible un concepto abstracto.",
+      "Para conectar con el pensamiento matemático (transversalidad PM-I), un algoritmo se puede introducir como una secuencia de pasos condicionados: 'si el usuario pasó más de 3 segundos en este video, muéstrale otro similar; si lo saltó antes de 1 segundo, no lo repitas'. Esta formalización desmistifica el algoritmo.",
+      "La TED Talk de Eli Pariser ('Beware online filter bubbles', 9 minutos, 2011, disponible con subtítulos en español) es el recurso más efectivo y accesible para este tema — si el tiempo lo permite, proyéctala completa."
+    ]
+  },
+  "CD-I-P05": {
+    "code": "CD-I-P05",
+    "title": "Derechos digitales: reconozco mis derechos en el ciberespacio y aprendo a ejercerlos",
+    "level": "Cultura Digital I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Ciudadanía digital",
+    "metadata": {
+      "objective": "El estudiante reconocerá sus derechos digitales — privacidad, acceso, no discriminación, libertad de expresión — y los mecanismos para ejercerlos y defenderlos en el contexto mexicano.",
+      "competencies": [
+        "Identifica los derechos digitales fundamentales: privacidad, acceso, no discriminación y libertad de expresión",
+        "Distingue los derechos digitales como extensión de los derechos humanos al entorno digital",
+        "Conoce los mecanismos institucionales para ejercer derechos digitales en México (INAI, CONAMER)",
+        "Identifica situaciones de vulneración de derechos digitales y sabe a dónde acudir",
+        "Reflexiona sobre la intersección entre privacidad digital y seguridad pública"
+      ],
+      "materials": [
+        "Declaración de derechos digitales del INAI y la CNDH",
+        "Casos de vulneración de derechos digitales en México (vigilancia con Pegasus, IMSI catchers)",
+        "Guía ARCO del INAI para solicitar información sobre datos personales",
+        "Comparativa de protección de datos en México vs. UE (GDPR)",
+        "Hoja de trabajo: 'Mis derechos digitales en acción'"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Tengo derechos en internet?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Los derechos digitales y cómo ejercerlos" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Mecanismos de defensa digital" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — La extensión digital de los derechos",
+          "duration": "10 min",
+          "description": "El docente plantea: si tienes derecho a la privacidad en tu vida física (nadie puede entrar a tu casa sin una orden judicial), ¿tienes ese mismo derecho en tu vida digital (en tus mensajes de WhatsApp, en tus búsquedas de Google, en tu ubicación por GPS)? La mayoría de los estudiantes intuye que 'debería', pero no sabe qué protecciones concretas existen. Este punto de partida activa la necesidad de conocer los derechos digitales.",
+          "activity": "El docente comparte el caso de Pegasus: el spyware israelí fue usado por el gobierno mexicano (durante la administración Peña Nieto) para espiar a periodistas, activistas y opositores políticos — sin orden judicial. ¿Eso viola algún derecho? ¿Cuál? ¿Quién puede defenderlos? El caso introduce la relevancia concreta de los derechos digitales en México."
+        },
+        {
+          "title": "FASE II: DESARROLLO — Derechos digitales fundamentales",
+          "duration": "30 min",
+          "description": "Se construyen 4 derechos digitales fundamentales: 1) Privacidad digital: protección de los datos personales y las comunicaciones privadas — Art. 16 Constitucional + LFPDPPP + INAI. 2) Acceso: derecho a internet como servicio básico — 47 millones de mexicanos sin acceso a internet según INEGI 2022. 3) No discriminación: nadie puede ser discriminado por su identidad, opinión o condición en el entorno digital — ni por algoritmos ni por operadores humanos. 4) Libertad de expresión: derecho a comunicarse en línea sin censura arbitraria — con límites (discurso de odio, desinformación, intimidad).",
+          "activity": "Análisis de casos en grupos: cada grupo recibe un caso de posible vulneración de derechos digitales (censura en redes, espionaje sin orden judicial, discriminación algorítmica, denegación de servicio a personas con discapacidad). Identifican: ¿qué derecho se viola? ¿quién es el responsable? ¿qué mecanismo legal existe para defenderlo en México?"
+        },
+        {
+          "title": "FASE III: CIERRE — Mecanismos de defensa",
+          "duration": "10 min",
+          "description": "El docente presenta los mecanismos disponibles en México: INAI (solicitudes ARCO, quejas por tratamiento ilícito de datos), CNDH (quejas contra autoridades que violen derechos digitales), Artículo 19 (organización que defiende la libertad de expresión y prensa en línea), R3D: Red en Defensa de los Derechos Digitales (organización civil especializada en derechos digitales). La ciudadanía digital requiere conocer estos recursos.",
+          "activity": "Ticket de salida: elige 1 de tus derechos digitales que consideras más vulnerado en tu experiencia digital actual. Describe cómo se vulnera, qué legislación lo protege en México y a qué organización o institución acudirías si quisieras defenderlo."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Los derechos digitales son los derechos humanos en el entorno digital: la extensión de la privacidad, la libertad de expresión, el acceso a la información y la no discriminación al espacio del internet y las tecnologías de la información. No son derechos nuevos — son los mismos derechos humanos fundamentales aplicados a un entorno tecnológico que no existía cuando se redactaron la Declaración Universal de 1948 o la Constitución de 1917.",
+      "sections": [
+        {
+          "subtitle": "Derechos digitales en México: marco legal",
+          "content": "El marco legal de los derechos digitales en México incluye: la Constitución Política de los Estados Unidos Mexicanos (el Art. 6° garantiza el derecho a la información; el Art. 16° protege las comunicaciones privadas, incluyendo las digitales, y requiere orden judicial para interceptarlas); la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (2010) que regula cómo las empresas deben tratar los datos de los usuarios; la Ley Federal de Telecomunicaciones y Radiodifusión (2014) que incluye disposiciones de privacidad en comunicaciones; y el INAI (Instituto Nacional de Transparencia, Acceso a la Información y Protección de Datos Personales) como organismo autónomo que supervisa el cumplimiento de estos derechos. Comparado con la Unión Europea (GDPR, 2018), México tiene protecciones más débiles y menor capacidad de enforcement — las multas del GDPR pueden llegar al 4% del ingreso global anual de la empresa infractora."
+        },
+        {
+          "subtitle": "Pegasus y la vigilancia digital en México: cuando el Estado vigila a sus ciudadanos",
+          "content": "En 2017, el Citizen Lab de la Universidad de Toronto reveló que el gobierno mexicano (Presidencia de la República, PGR y CISEN) había adquirido el spyware Pegasus de la empresa NSO Group de Israel para espiar a periodistas, activistas de derechos humanos, opositores políticos y hasta familiares de víctimas de la masacre de Iguala. Pegasus es un software de vigilancia que puede acceder remotamente al micrófono, cámara, mensajes y ubicación de un teléfono sin que el usuario sepa — y puede instalarse sin que la víctima haga clic en nada. Esto viola el Art. 16° Constitucional (que prohíbe la interceptación de comunicaciones sin orden judicial), el derecho a la privacidad y la libertad de prensa. El caso de Pegasus en México es el ejemplo más claro de que los derechos digitales no son teóricos — tienen consecuencias reales para la libertad, la seguridad y la democracia."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál artículo de la Constitución mexicana protege la privacidad de las comunicaciones digitales?",
+          "options": ["Art. 1°", "Art. 3°", "Art. 16°", "Art. 39°"],
+          "correct": "Art. 16°"
+        },
+        {
+          "question": "¿Qué institución mexicana supervisa el cumplimiento de los derechos de protección de datos personales?",
+          "options": ["SEP", "INAI", "CNDH", "INE"],
+          "correct": "INAI"
+        },
+        {
+          "question": "¿Qué reveló el caso de Pegasus en México?",
+          "options": [
+            "Que el gobierno promovió la alfabetización digital",
+            "Que el gobierno usó spyware para vigilar a periodistas, activistas y opositores sin orden judicial",
+            "Que las redes sociales espían a los políticos mexicanos",
+            "Que México desarrolló su propio sistema de vigilancia"
+          ],
+          "correct": "Que el gobierno usó spyware para vigilar a periodistas, activistas y opositores sin orden judicial"
+        },
+        {
+          "question": "¿Qué organización civil en México se especializa en la defensa de los derechos digitales?",
+          "options": ["CONEVAL", "CIDE", "R3D: Red en Defensa de los Derechos Digitales", "COPARMEX"],
+          "correct": "R3D: Red en Defensa de los Derechos Digitales"
+        },
+        {
+          "question": "¿Por qué el acceso a internet se considera un derecho digital fundamental?",
+          "options": [
+            "Porque el internet es gratuito en México",
+            "Porque sin acceso a internet no se pueden ejercer plenamente otros derechos como la educación, la salud y la información en la era digital",
+            "Porque la Constitución de 1917 lo establece explícitamente",
+            "Porque la ONU obliga a todos los países a garantizarlo"
+          ],
+          "correct": "Porque sin acceso a internet no se pueden ejercer plenamente otros derechos como la educación, la salud y la información en la era digital"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: identifica al menos 4 derechos digitales con su fundamento legal en México, describe el caso de Pegasus explicando qué derechos violó y qué artículos constitucionales, e identifica al menos 2 mecanismos o instituciones a las que podría acudir para defender sus derechos digitales."
+    },
+    "teacher_tips": [
+      "El caso de Pegasus en México tiene documentación accesible en español: el informe de Citizen Lab está disponible en línea y Aristegui Noticias publicó investigaciones detalladas. Es un caso mexicano real que conecta la teoría de los derechos digitales con la política actual.",
+      "Para grupos con alta desconfianza en las instituciones ('para qué quejarse al INAI si no sirve'), no minimices la frustración — reconócela y reencuadra: conocer los mecanismos no garantiza que funcionen, pero no conocerlos garantiza que no funcionen.",
+      "Conecta con la progresión CD-I-P03 (colonialismo de datos) y CD-I-P06 (navegación segura): los tres temas forman un bloque coherente sobre ciudadanía digital crítica que se refuerzan mutuamente."
+    ]
+  },
+  "CD-I-P06": {
+    "code": "CD-I-P06",
+    "title": "Navegación segura: navego críticamente en entornos digitales identificando riesgos",
+    "level": "Cultura Digital I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Ciudadanía digital",
+    "metadata": {
+      "objective": "El estudiante navegará de forma segura y crítica en entornos digitales, identificando riesgos como el phishing, la desinformación y la vigilancia, y aplicando estrategias de protección básicas.",
+      "competencies": [
+        "Identifica intentos de phishing en correos, mensajes y sitios web",
+        "Distingue desinformación (contenido falso) de información errónea (contenido incorrecto involuntario)",
+        "Aplica criterios de verificación de fuentes para evaluar la confiabilidad de información en línea",
+        "Crea y gestiona contraseñas seguras para proteger sus cuentas digitales",
+        "Reconoce la huella digital permanente de sus actividades en línea"
+      ],
+      "materials": [
+        "Ejemplos reales de correos y mensajes de phishing",
+        "Checklist de verificación de noticias: sitios como Verificado.mx o Animal Político",
+        "Generador de contraseñas para práctica",
+        "Infografía: 'Cómo funciona el phishing'",
+        "Casos de desinformación viral en México (cadenas de WhatsApp)"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Puedes distinguir un sitio falso de uno real?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Phishing, desinformación y contraseñas" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Mi kit de navegación segura" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — El test del phishing",
+          "duration": "10 min",
+          "description": "El docente muestra en proyector 4 correos electrónicos o mensajes de WhatsApp: 2 reales y 2 de phishing. El grupo vota cuáles son falsos. La sorpresa: muchos no detectan el phishing porque están diseñados para parecer auténticos. Se introduce la pregunta generadora: ¿cómo protegerse de amenazas digitales que parecen legítimas?",
+          "activity": "Google tiene un juego en línea gratuito llamado 'Phishing Quiz' que permite identificar correos de phishing vs. reales. Si hay acceso a internet, los estudiantes lo completan individualmente y luego comparten sus resultados. Discuten: ¿cuáles detectaron? ¿cuáles los engañaron? ¿qué señales son más reveladoras?"
+        },
+        {
+          "title": "FASE II: DESARROLLO — Las tres amenazas y las defensas",
+          "duration": "30 min",
+          "description": "Se trabajan 3 amenazas y sus defensas: 1) Phishing: correos/mensajes que simulan ser de entidades legítimas (banco, SAT, IMSS) para robar datos. Señales: urgencia artificial, links con URL extrañas, errores ortográficos, solicitar datos que el remitente ya debería tener. Defensa: no hacer clic en links, verificar el remitente, ir directamente al sitio oficial. 2) Desinformación: contenido falso creado intencionalmente para engañar. Cómo verificar: buscar la fuente original, consultar Verificado.mx, buscar en reversa la imagen. 3) Contraseñas: las contraseñas débiles son la causa #1 de hackeos. Buenas prácticas: longitud mínima 12 caracteres, combinación de tipos, única por cuenta, usar gestor de contraseñas.",
+          "activity": "Práctica de verificación: el docente selecciona 3 noticias virales de WhatsApp o redes sociales (idealmente relacionadas con México) y los grupos aplican el proceso de verificación: buscar la fuente original, verificar en sitios especializados (Verificado.mx, AFP Factual, Animal Político Verificado), buscar en reversa la imagen si aplica. Concluyen: ¿verdadera, falsa o no verificable?"
+        },
+        {
+          "title": "FASE III: CIERRE — Mi kit digital de seguridad",
+          "duration": "10 min",
+          "description": "El docente resume el kit básico de navegación segura: 1) Reconocer phishing. 2) Verificar antes de compartir. 3) Contraseñas únicas y largas. 4) Actualizar el sistema operativo y apps. 5) Revisar configuraciones de privacidad. 6) Usar HTTPS (candado en la URL). 7) No conectarse a WiFi públicos para actividades sensibles. Estos 7 hábitos cubren el 80% de las amenazas digitales cotidianas.",
+          "activity": "Ticket de salida: elige 2 hábitos de seguridad digital que NO estás haciendo actualmente. Describe qué cambiarás esta semana y por qué es importante para tu seguridad."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La seguridad digital no es solo un problema técnico — es una competencia ciudadana. En México, las estafas digitales costaron más de 12 mil millones de pesos en 2022 según la CONDUSEF, y el 70% de los usuarios nunca verifica la información antes de compartirla. Navegar críticamente y de forma segura es tan esencial para la vida en el siglo XXI como aprender a cruzar la calle.",
+      "sections": [
+        {
+          "subtitle": "Phishing: la ingeniería social digital",
+          "content": "El phishing es una técnica de ataque que explota la psicología humana más que las vulnerabilidades técnicas: engaña al usuario para que voluntariamente proporcione información confidencial o haga clic en un enlace malicioso. Los ataques de phishing más comunes suplantan a instituciones de confianza: el SAT ('Tu declaración tiene errores — accede aquí'), el IMSS ('Hay un problema con tu afiliación'), bancos ('Tu cuenta fue bloqueada — confirma tus datos') o WhatsApp ('Tu código de verificación expiró — renuévalo'). Las señales de alerta incluyen: urgencia artificial que presiona a actuar sin verificar; URLs con pequeños errores ('iimss.gob.mx' en lugar de 'imss.gob.mx'); solicitar información que la institución ya debería tener; y mensajes no solicitados. La defensa más efectiva: nunca hacer clic en links de mensajes no esperados — ir directamente al sitio oficial escribiendo la dirección en el navegador."
+        },
+        {
+          "subtitle": "Desinformación, información errónea y verificación de hechos",
+          "content": "Los investigadores distinguen entre desinformación (disinformation: contenido falso creado y difundido intencionalmente para engañar o manipular) e información errónea (misinformation: contenido incorrecto difundido sin intención maliciosa, generalmente porque quien lo comparte no sabía que era falso). Las cadenas de WhatsApp son el vector más común de ambos tipos en México: mensajes sobre remedios contra el COVID, alertas de secuestros, noticias políticas tergiversadas. Las organizaciones de verificación de hechos (fact-checking) en México incluyen: Verificado.mx (plataforma colaborativa), AFP Factual (agencia internacional), Animal Político Verificado y Verificación 19 (UNAM). El proceso básico de verificación consiste en: buscar la fuente original del dato o imagen, verificar en sitios especializados de fact-checking, buscar en reversa la imagen con Google Images o TinEye para saber si fue sacada de contexto, y contrastar con al menos 2 medios con diferente línea editorial."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál es la señal más clara de un intento de phishing?",
+          "options": [
+            "Un correo bien escrito y formateado profesionalmente",
+            "Un mensaje urgente que pide confirmar datos personales a través de un link",
+            "Un mensaje de tu banco informando que tu saldo aumentó",
+            "Un correo de tu escuela con tu calificación"
+          ],
+          "correct": "Un mensaje urgente que pide confirmar datos personales a través de un link"
+        },
+        {
+          "question": "¿Cuál es la diferencia entre desinformación e información errónea?",
+          "options": [
+            "La desinformación es más peligrosa que la información errónea",
+            "La desinformación es falsa e intencional; la información errónea es incorrecta pero difundida sin intención de engañar",
+            "Son lo mismo pero con diferentes nombres según el contexto",
+            "La información errónea proviene de medios; la desinformación de redes sociales"
+          ],
+          "correct": "La desinformación es falsa e intencional; la información errónea es incorrecta pero difundida sin intención de engañar"
+        },
+        {
+          "question": "¿Cuál organización mexicana se especializa en verificación de hechos (fact-checking)?",
+          "options": ["INEGI", "IMSS", "Verificado.mx", "CONDUSEF"],
+          "correct": "Verificado.mx"
+        },
+        {
+          "question": "¿Cuál de estas es una contraseña segura?",
+          "options": ["12345678", "password", "Mx$ecur3_2025!", "nombre123"],
+          "correct": "Mx$ecur3_2025!"
+        },
+        {
+          "question": "¿Por qué es riesgoso usar WiFi público para acceder a tu cuenta bancaria?",
+          "options": [
+            "Porque el WiFi público es más lento y puede interrumpir la transacción",
+            "Porque en redes públicas los datos pueden ser interceptados por terceros en la misma red",
+            "Porque los bancos bloquean el acceso desde WiFi público",
+            "Porque el WiFi público no tiene suficiente cobertura"
+          ],
+          "correct": "Porque en redes públicas los datos pueden ser interceptados por terceros en la misma red"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: identifica correctamente al menos 3 señales de phishing en ejemplos reales, aplica el proceso de verificación de hechos a una noticia viral y concluye fundamentadamente si es verdadera, falsa o no verificable, y describe una contraseña segura con los criterios correctos."
+    },
+    "teacher_tips": [
+      "Los ejemplos de phishing más efectivos son los actuales y locales — busca capturas de pantalla de mensajes falsos del SAT o del IMSS que circulen en ese momento. La relevancia inmediata hace que los estudiantes retengan las señales de alerta.",
+      "La actividad de verificación de noticias virales funciona mejor con cadenas de WhatsApp reales que los propios estudiantes hayan recibido — pídeles al inicio de la clase que compartan una cadena 'sospechosa' que tengan en sus teléfonos y úsala como material.",
+      "Conecta con la progresión LC-I (Lengua y Comunicación): identificar desinformación requiere las mismas habilidades de análisis crítico del discurso que se trabajan en la UAC de lengua — la transversalidad es genuina y vale la pena nombrarla."
+    ]
+  },
+  "CD-I-P07": {
+    "code": "CD-I-P07",
+    "title": "Identidad digital: valoro la diversidad en el ciberespacio y practico la comunicación inclusiva",
+    "level": "Cultura Digital I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Ciudadanía digital",
+    "metadata": {
+      "objective": "El estudiante valorará la diversidad de identidades en el ciberespacio y practicará la comunicación digital respetuosa e inclusiva, reflexionando sobre su propia identidad en línea y sus responsabilidades como ciudadano digital.",
+      "competencies": [
+        "Reflexiona sobre la relación entre identidad fuera de línea e identidad digital",
+        "Reconoce la diversidad de identidades en el ciberespacio como reflejo de la diversidad humana",
+        "Identifica formas de ciberacoso, discurso de odio y discriminación en entornos digitales",
+        "Practica la comunicación digital respetuosa e inclusiva",
+        "Reflexiona sobre la huella digital permanente y la gestión de la propia identidad en línea"
+      ],
+      "materials": [
+        "Casos de ciberacoso y sus consecuencias (con sensibilidad y anonimato)",
+        "Guía de comunicación digital inclusiva",
+        "Casos de activismo digital positivo en México",
+        "Hoja de reflexión: 'Mi identidad digital'",
+        "Infografía de 'huella digital' y su permanencia"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Quién eres en internet?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Identidad digital, ciberacoso e inclusión" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Comunicación digital que quiero tener" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — La identidad en los dos mundos",
+          "duration": "10 min",
+          "description": "El docente pregunta: ¿eres la misma persona en WhatsApp que en persona? ¿En TikTok que con tus padres? Los estudiantes reflexionan: internet permite múltiples presentaciones del yo — más auténticas en algunos casos, más performativas en otros. La identidad digital no es una copia de la identidad real — es una extensión, una faceta o a veces una construcción diferente.",
+          "activity": "Actividad de reflexión personal: los estudiantes escriben 5 palabras que los describen en persona y 5 que los describen en línea. Comparan: ¿coinciden? ¿qué muestran en redes que no muestran en persona? ¿qué ocultan en línea que sí son en persona? Esta reflexión personal abre el tema sin invasividad."
+        },
+        {
+          "title": "FASE II: DESARROLLO — Identidad, ciberacoso e inclusión",
+          "duration": "30 min",
+          "description": "Se trabajan 3 temas: 1) Diversidad de identidades digitales: en internet existen personas de todas las identidades posibles — étnicas, culturales, religiosas, de género, de orientación sexual, de capacidad — con derecho a existir y expresarse sin discriminación. El anonimato que ofrece internet puede ser herramienta de expresión para quienes son discriminados en su contexto presencial, pero también escudo para el acoso. 2) Ciberacoso: persecución, amenazas, difusión de contenido íntimo sin consentimiento, doxing (publicar datos personales de alguien sin su consentimiento). En México, el 'revenge porn' fue tipificado como delito en varios estados (Ley Olimpia). 3) Comunicación digital inclusiva: lenguaje respetuoso, verificar antes de compartir, no participar en pile-ons o cancelaciones masivas sin evidencia, reportar contenido dañino.",
+          "activity": "Análisis de casos con alternativas: el docente presenta 3 situaciones de ciberacoso o discriminación digital y el grupo propone: ¿qué haría la persona involucrada? ¿qué haría un testigo? ¿qué reportaría a la plataforma? ¿qué aconsejaría a alguien que fue víctima? El rol del 'upstander' (quien interviene) vs. el 'bystander' (quien observa sin actuar)."
+        },
+        {
+          "title": "FASE III: CIERRE — Mi huella digital",
+          "duration": "10 min",
+          "description": "El docente introduce el concepto de huella digital: todo lo que haces en línea deja rastro — fotos, comentarios, likes, búsquedas. Esta huella es permanente y puede afectar estudios, trabajo y relaciones futuras. La regla práctica: antes de publicar algo, imagina que lo verán tu familia, tu empleador futuro y un desconocido — ¿todavía lo publicarías? Esta regla no censura la expresión — ayuda a ser intencional.",
+          "activity": "Ticket de salida: escribe 1 compromiso de comunicación digital que quieres practicar a partir de hoy — específico y concreto. Y 1 aspecto de tu identidad digital que quieres que represente más auténticamente quién eres."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La identidad digital es la manera en que existimos, nos relacionamos y nos presentamos en el entorno digital — una extensión de nuestra identidad humana compleja, pero con características propias: la permanencia (lo publicado no desaparece fácilmente), la replicabilidad (se puede copiar y difundir masivamente) y la potencial invisibilidad del autor (el anonimato). Estas características crean tanto oportunidades como riesgos únicos.",
+      "sections": [
+        {
+          "subtitle": "Ciberacoso y sus formas: el daño real del entorno digital",
+          "content": "El ciberacoso (cyberbullying) es el uso de tecnologías digitales para hostigar, amenazar, avergonzar o dañar a otra persona. A diferencia del acoso presencial, el ciberacoso: puede ser anónimo (el agresor oculta su identidad), tiene una audiencia potencialmente masiva (un post puede llegar a millones en horas), es permanente (el contenido puede persistir aunque se elimine mediante capturas de pantalla), y sigue a la víctima más allá del espacio físico (no hay 'salir del colegio' para escapar). Las formas más comunes incluyen: acoso repetido (mensajes hostiles, amenazas); doxing (publicar datos personales de alguien sin consentimiento para exponerlo al acoso de otros); IBSA (Intimate Images Shared Without Consent, difusión de imágenes íntimas sin consentimiento — en México tipificado como delito por la Ley Olimpia en varios estados); impersonación (crear perfiles falsos con la identidad de otra persona); y pile-on o cancelación masiva (organización de ataques coordinados). El impacto del ciberacoso en la salud mental es severo y documentado: asociado con ansiedad, depresión y comportamiento suicida."
+        },
+        {
+          "subtitle": "La huella digital: permanencia, identidad y responsabilidad",
+          "content": "La huella digital es el registro de toda la actividad de una persona en línea — voluntaria (lo que publica) e involuntaria (datos que las plataformas recopilan sobre el comportamiento). La característica más importante de la huella digital es su permanencia: aunque se borre una publicación, puede haber sido capturada en capturas de pantalla o indexada por buscadores. Los casos de personas que perdieron empleos u oportunidades educativas por publicaciones de años atrás son numerosos y documentados. La identidad digital es gestionable: es posible construir intencionalmente una presencia en línea coherente, auténtica y que refleje los valores que se quieren proyectar. Esto no significa autocensura — significa intencionalidad. La regla del 'empleador-familia-desconocido' es una heurística práctica: antes de publicar, imaginar que el contenido será visto por el futuro empleador, por un familiar y por un desconocido. Si estarías cómodo con los tres, publícalo. El activismo digital positivo — usar las plataformas para defender causas, amplificar voces marginadas, conectar comunidades — es una forma poderosa de construir una huella digital significativa."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Qué es el doxing?",
+          "options": [
+            "Un tipo de software espía que roba datos",
+            "La publicación de datos personales de alguien sin su consentimiento para exponerlo al acoso",
+            "Una técnica de phishing avanzada",
+            "El proceso de eliminar la huella digital propia"
+          ],
+          "correct": "La publicación de datos personales de alguien sin su consentimiento para exponerlo al acoso"
+        },
+        {
+          "question": "¿Qué es la 'Ley Olimpia' en México?",
+          "options": [
+            "Una ley de derechos digitales para usuarios menores de edad",
+            "Una ley que tipifica la difusión de imágenes íntimas sin consentimiento como delito",
+            "Una ley que regula las plataformas de streaming en México",
+            "Una ley de acceso gratuito a internet en zonas rurales"
+          ],
+          "correct": "Una ley que tipifica la difusión de imágenes íntimas sin consentimiento como delito"
+        },
+        {
+          "question": "¿Cuál de estas características distingue al ciberacoso del acoso presencial?",
+          "options": [
+            "El ciberacoso es menos grave que el acoso presencial",
+            "El ciberacoso puede ser anónimo, masivo y seguir a la víctima fuera del espacio físico",
+            "El ciberacoso solo ocurre entre menores de edad",
+            "El ciberacoso no tiene consecuencias legales en México"
+          ],
+          "correct": "El ciberacoso puede ser anónimo, masivo y seguir a la víctima fuera del espacio físico"
+        },
+        {
+          "question": "¿Qué es la huella digital involuntaria?",
+          "options": [
+            "Las publicaciones que se hacen sin querer en redes sociales",
+            "Los datos que las plataformas recopilan automáticamente sobre el comportamiento del usuario",
+            "El historial de búsqueda que se borra automáticamente",
+            "Las fotos que otras personas publican de nosotros sin permiso"
+          ],
+          "correct": "Los datos que las plataformas recopilan automáticamente sobre el comportamiento del usuario"
+        },
+        {
+          "question": "¿Cuál es la diferencia entre un 'upstander' y un 'bystander' en el ciberacoso?",
+          "options": [
+            "El upstander es el agresor; el bystander es la víctima",
+            "El upstander interviene para detener el acoso; el bystander observa sin actuar",
+            "El upstander reporta a las autoridades; el bystander denuncia en redes",
+            "Son sinónimos con diferente origen lingüístico"
+          ],
+          "correct": "El upstander interviene para detener el acoso; el bystander observa sin actuar"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: identifica al menos 3 formas de ciberacoso y sus características distintivas respecto al acoso presencial, describe qué es la Ley Olimpia y qué comportamiento tipifica, y formula un compromiso de comunicación digital inclusiva con criterios específicos de comportamiento en línea."
+    },
+    "teacher_tips": [
+      "El tema de ciberacoso puede tocar experiencias dolorosas en el grupo — establece desde el inicio una norma de cuidado: los casos que se discuten son genéricos o anónimos, y si alguien necesita apoyo existe el servicio de orientación del plantel. La seguridad emocional es condición del aprendizaje.",
+      "La Ley Olimpia tiene nombre de persona real: Olimpia Coral Melo, activista mexicana que impulsó la ley tras ser víctima de difusión de imágenes íntimas sin consentimiento. Conocer la historia detrás de la ley hace el marco legal humano y relevante.",
+      "Para grupos con alto uso de redes sociales, el análisis de la propia huella digital puede hacerse como ejercicio: googlea tu nombre y apellido — ¿qué aparece? Esta búsqueda simple suele generar reflexión genuina sobre la permanencia de la identidad digital."
+    ]
+  },
+  "CD-I-P08": {
+    "code": "CD-I-P08",
+    "title": "Herramientas digitales: uso aplicaciones básicas para organizar información y comunicarme en la escuela",
+    "level": "Cultura Digital I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Productividad digital",
+    "metadata": {
+      "objective": "El estudiante utilizará herramientas digitales básicas para la organización de información y la comunicación escolar, desarrollando competencias de productividad digital aplicables a su trayectoria académica.",
+      "competencies": [
+        "Usa procesadores de texto para crear documentos académicos con formato básico",
+        "Organiza información en hojas de cálculo simples con fórmulas básicas",
+        "Crea presentaciones digitales efectivas con criterios de diseño básicos",
+        "Usa herramientas de comunicación y colaboración en línea (correo, calendario, documentos compartidos)",
+        "Organiza archivos y carpetas de forma lógica para gestionar su trabajo escolar"
+      ],
+      "materials": [
+        "Acceso a Google Workspace (Docs, Sheets, Slides, Drive) o LibreOffice",
+        "Plantilla de documento académico para práctica",
+        "Hoja de trabajo: organización de calificaciones en hoja de cálculo",
+        "Rúbrica de evaluación de presentaciones digitales",
+        "Guía de organización de archivos escolares por materia y fecha"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Cómo organizo mi trabajo escolar digital?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Procesador de texto, hoja de cálculo y presentaciones" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Mi flujo de trabajo digital escolar" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — El escritorio digital caótico",
+          "duration": "10 min",
+          "description": "El docente muestra (con humor) un escritorio digital desorganizado: archivos llamados 'tarea', 'tarea2', 'tarea_final', 'tarea_FINAL_FINAL', todos mezclados sin carpetas. Pregunta: ¿a cuántos les parece familiar? ¿Cuánto tiempo pierden buscando un archivo? La organización digital no es un detalle — es una competencia que impacta directamente la eficiencia académica.",
+          "activity": "Diagnóstico rápido: los estudiantes responden en 3 minutos: ¿cómo guardas tus tareas? ¿tienes carpetas por materia? ¿cuándo fue la última vez que perdiste un archivo importante? Las respuestas revelan el punto de partida del grupo y activan la necesidad de organización."
+        },
+        {
+          "title": "FASE II: DESARROLLO — Las 3 herramientas fundamentales",
+          "duration": "30 min",
+          "description": "Se trabajan en bloques de 10 minutos cada uno: 1) Procesador de texto (Google Docs o Word): formato básico (títulos, párrafos, listas, negrita/cursiva), insertar imágenes y tablas, exportar a PDF, citar fuentes. Práctica: crear un documento académico de 1 página con el formato aprendido. 2) Hoja de cálculo (Google Sheets o Excel): ingresar datos, fórmulas básicas (SUMA, PROMEDIO, si hay tiempo: SI condicional), crear un gráfico simple. Práctica: hoja de calificaciones del semestre con promedio automático. 3) Presentaciones (Google Slides o PowerPoint): criterios de diseño básicos (1 idea por slide, tamaño de letra mínimo 24pt, contraste, no leer el texto). Práctica: 3 slides sobre el tema que elijan.",
+          "activity": "Práctica integrada: los estudiantes crean en 15 minutos: 1 documento de texto, 1 tabla de datos y 1 presentación de 3 slides — todos sobre un mismo tema relacionado con otra UAC del semestre. La integración de herramientas en un solo ejercicio refuerza la transferencia."
+        },
+        {
+          "title": "FASE III: CIERRE — Mi sistema de organización",
+          "duration": "10 min",
+          "description": "El docente presenta un sistema de organización de archivos escolares: carpeta Escolar → carpeta por semestre → carpeta por materia → archivos con nombre coherente (MATERIA-TIPO-FECHA: 'PM-I-Tarea1-20250912'). La convención de nombres no es obligatoria — cualquier sistema consistente funciona. Lo importante: tener un sistema y usarlo siempre.",
+          "activity": "Ticket de salida: describe tu sistema de organización de archivos escolares que usarás este semestre (carpetas, nombres de archivos, herramienta de backup). El compromiso explícito aumenta la probabilidad de seguirlo."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Las herramientas de productividad digital — procesadores de texto, hojas de cálculo, presentaciones, correo, calendarios — son el alfabeto del trabajo académico y profesional del siglo XXI. Dominarlas no es un lujo ni una competencia avanzada: es una habilidad básica que determina la eficiencia y la calidad del trabajo escolar.",
+      "sections": [
+        {
+          "subtitle": "El ecosistema de herramientas de productividad: alternativas libres y propietarias",
+          "content": "Existen dos grandes ecosistemas de herramientas de productividad digital. El ecosistema propietario de Microsoft (Office 365/Microsoft 365) incluye Word (procesador de texto), Excel (hoja de cálculo), PowerPoint (presentaciones) y Teams (comunicación y colaboración). El ecosistema de Google (Google Workspace) incluye Docs, Sheets, Slides, Forms, Drive y Gmail — con la ventaja de ser gratuito para usuarios personales y estar basado en la nube (acceso desde cualquier dispositivo). LibreOffice es la alternativa de software libre y gratuita que funciona sin internet y sin cuenta: Writer (texto), Calc (hoja de cálculo) y Impress (presentaciones). Los tres ecosistemas son funcionalmente similares para usos básicos — la habilidad de usar uno facilita el aprendizaje de los otros. Para el contexto escolar mexicano donde el acceso a internet puede ser limitado, LibreOffice ofrece la ventaja de no requerir conexión."
+        },
+        {
+          "subtitle": "Principios de diseño de presentaciones efectivas",
+          "content": "Una presentación digital es un apoyo visual, no un guión a leer. Los errores más frecuentes de los estudiantes al crear presentaciones son: texto excesivo (la audiencia lee la pantalla en lugar de escuchar al presentador), tamaño de letra demasiado pequeño (difícil de leer desde el fondo del aula), falta de contraste entre texto y fondo (texto negro sobre fondo oscuro o viceversa es ilegible), y abuso de animaciones que distraen en lugar de apoyar. Los principios básicos del diseño de presentaciones efectivas son: 1) Una idea central por diapositiva — no intentar poner todo en una sola pantalla. 2) Tamaño de letra mínimo 24pt para texto principal, 32-36pt para títulos. 3) Alto contraste (texto oscuro sobre fondo claro o viceversa). 4) Imágenes de alta calidad que apoyen el mensaje, no que lo repitan. 5) El presentador habla; la diapositiva apoya visualmente. La regla 6-6-6: máximo 6 viñetas por diapositiva, 6 palabras por viñeta, 6 diapositivas por presentación de 15 minutos es una guía útil aunque no absoluta."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál es la ventaja principal de Google Docs sobre LibreOffice Writer para trabajo en grupo?",
+          "options": [
+            "Google Docs tiene más funciones de formato",
+            "Google Docs permite la colaboración en tiempo real desde cualquier dispositivo con internet",
+            "LibreOffice Writer es más caro",
+            "Google Docs funciona sin internet"
+          ],
+          "correct": "Google Docs permite la colaboración en tiempo real desde cualquier dispositivo con internet"
+        },
+        {
+          "question": "¿Cuál es el error más común al diseñar una presentación digital?",
+          "options": [
+            "Usar demasiadas imágenes",
+            "Poner demasiado texto en cada diapositiva, convirtiendo la presentación en un guión a leer",
+            "Usar fondos de colores claros",
+            "No incluir animaciones"
+          ],
+          "correct": "Poner demasiado texto en cada diapositiva, convirtiendo la presentación en un guión a leer"
+        },
+        {
+          "question": "¿Cuál es una fórmula básica para calcular el promedio en una hoja de cálculo?",
+          "options": ["=TOTAL(A1:A5)", "=MEDIA(A1:A5)", "=PROMEDIO(A1:A5)", "=AVERAGE.ES(A1:A5)"],
+          "correct": "=PROMEDIO(A1:A5)"
+        },
+        {
+          "question": "¿Cuál es la ventaja de LibreOffice respecto a Microsoft Office y Google Workspace?",
+          "options": [
+            "Tiene más funciones avanzadas",
+            "Es software libre y gratuito que funciona sin internet ni cuenta",
+            "Es el más usado en empresas mexicanas",
+            "Funciona solo en computadoras con Windows"
+          ],
+          "correct": "Es software libre y gratuito que funciona sin internet ni cuenta"
+        },
+        {
+          "question": "¿Qué significa el principio 'el presentador habla; la diapositiva apoya visualmente'?",
+          "options": [
+            "Que el presentador debe leer el texto de las diapositivas para asegurar la comprensión",
+            "Que la diapositiva debe contener la información complementaria que no se dice oralmente",
+            "Que el texto en la diapositiva debe ser mínimo y servir como referencia visual, no como guión",
+            "Que el presentador no necesita preparar contenido adicional a las diapositivas"
+          ],
+          "correct": "Que el texto en la diapositiva debe ser mínimo y servir como referencia visual, no como guión"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: crea un documento de texto con formato básico correcto (título, párrafos, listas, interlineado), usa al menos una fórmula en una hoja de cálculo para calcular un dato automáticamente, y diseña una presentación de al menos 3 diapositivas siguiendo al menos 3 de los principios de diseño efectivo."
+    },
+    "teacher_tips": [
+      "Si el plantel no tiene acceso a internet estable, LibreOffice es la solución completa: se puede descargar previamente en una USB y funciona sin conexión. Asegura tener la versión instalada en las computadoras del laboratorio antes de la clase.",
+      "La práctica de crear 3 productos en 15 minutos parece ambiciosa pero funciona si los ejercicios son muy estructurados y el contenido es simple: el foco debe estar en usar la herramienta, no en crear contenido perfecto.",
+      "Para contextualizar la importancia de estas herramientas, menciona que prácticamente todas las becas, empleos y trámites escolares en México requieren documentos en Word o PDF — dominar estas herramientas no es académico, es práctico y urgente."
+    ]
+  }
+}

@@ -1,0 +1,912 @@
+{
+  "CNEYT-I-P01": {
+    "code": "CNEYT-I-P01",
+    "title": "La ciencia como práctica social: reconozco el carácter histórico, colectivo y cultural de las ciencias",
+    "level": "Ciencias Naturales, Experimentales y Tecnología I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Naturaleza de la ciencia",
+    "metadata": {
+      "objective": "El estudiante reconocerá a las ciencias como una práctica social, histórica y colectiva influida por contextos culturales, cuestionando la visión de la ciencia como actividad neutral y universal.",
+      "competencies": [
+        "Distingue la ciencia como construcción social de la visión positivista de la ciencia como verdad absoluta",
+        "Identifica el papel de la cultura, el género y la historia en el desarrollo del conocimiento científico",
+        "Analiza ejemplos de ciencia producida en contextos no occidentales (conocimiento tradicional mexicano)",
+        "Reflexiona sobre la influencia del contexto sociocultural en las preguntas que formula la ciencia",
+        "Valora el diálogo entre saberes científicos y saberes comunitarios como fuente de conocimiento"
+      ],
+      "materials": [
+        "Línea del tiempo de descubrimientos científicos con contexto histórico y cultural",
+        "Casos de estudio: medicina tradicional mexicana vs. farmacología occidental",
+        "Fragmentos de texto sobre epistemología de la ciencia (nivel bachillerato)",
+        "Ficha de análisis: '¿Quién hace ciencia y por qué?'",
+        "Video o podcast sobre ciencia y cultura (UNAM, Cinvestav)"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿La ciencia tiene historia y cultura?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Sociología e historia de la ciencia" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Reflexión: ciencia y saberes locales" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — ¿La ciencia tiene historia?",
+          "duration": "10 min",
+          "description": "El docente plantea la pregunta: '¿La ciencia descubre verdades o las construye?' Se comparte con el grupo la imagen de la 'ciencia como libro de la naturaleza' (visión positivista) y se confronta con la pregunta: ¿por qué casi todos los científicos famosos en los libros de texto son hombres europeos del siglo XVII-XIX? ¿Eso significa que otros no hacían ciencia? Esta tensión activa el pensamiento crítico.",
+          "activity": "El docente muestra 3 imágenes: 1) Newton con la manzana, 2) un curandero tradicional mexicano, 3) astrónomos mayas. Pregunta: ¿cuál de estas es 'ciencia'? Los estudiantes votan y justifican en parejas durante 2 minutos. Se comparte en plenaria — el debate inicial revela las concepciones previas sobre qué cuenta como conocimiento científico."
+        },
+        {
+          "title": "FASE II: DESARROLLO — Ciencia, historia y sociedad",
+          "duration": "30 min",
+          "description": "Se construyen tres conceptos: 1) Ciencia como práctica histórica: el conocimiento científico cambia — la Tierra fue plana, luego esférica, luego geoide. La ciencia no es una acumulación lineal de verdades, sino revisable. 2) Ciencia como práctica social y colectiva: los científicos trabajan en comunidades, publican, debaten, se financian — los intereses sociales y económicos influyen en qué se investiga. 3) Ciencia y cultura: el conocimiento tradicional mexica sobre astronomía, medicina y agricultura fue ciencia, producida desde otro paradigma cultural.",
+          "activity": "Análisis de caso en grupos: cada grupo recibe una ficha sobre un conocimiento científico (medicina tradicional del cacao, astronomía maya, etnobotánica de Oaxaca) y responde: ¿Qué pregunta científica resolvía? ¿Quién lo desarrolló? ¿Por qué no aparece en los libros de texto convencionales? Se expone en plenaria y se construye un mapa colectivo de 'tipos de ciencia'."
+        },
+        {
+          "title": "FASE III: CIERRE — Diálogo de saberes",
+          "duration": "10 min",
+          "description": "El docente introduce el concepto de 'diálogo de saberes': la posibilidad de que la ciencia occidental y los conocimientos tradicionales dialoguen en lugar de que uno subordine al otro. Se reflexiona: ¿cómo cambiaría la ciencia si se incluyeran más perspectivas culturales, de género y geográficas? Se conecta con los ejes de interculturalidad crítica y pensamiento crítico del MCCEMS.",
+          "activity": "Ticket de salida: escribe 3 ideas que tenías sobre la ciencia al inicio de la clase y 3 ideas que tienes ahora — ¿qué cambió? ¿qué sigue siendo igual? Esta reflexión metacognitiva sirve de evaluación formativa."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La ciencia no emergió en un vacío: cada descubrimiento, cada teoría y cada experimento fue producido por personas situadas en un tiempo, un lugar, una cultura y unas relaciones de poder específicas. Reconocer este carácter situado de la ciencia no la debilita — la enriquece, al abrir la posibilidad de que múltiples comunidades y culturas contribuyan al conocimiento colectivo de la humanidad.",
+      "sections": [
+        {
+          "subtitle": "Epistemología de la ciencia: ¿cómo sabemos lo que sabemos?",
+          "content": "La epistemología estudia el origen, la naturaleza y los límites del conocimiento. En ciencias, las preguntas epistemológicas son: ¿qué cuenta como evidencia científica? ¿Cómo se construye una teoría? ¿Cuándo se acepta o rechaza una explicación? El filósofo Thomas Kuhn describió cómo la ciencia avanza no de forma lineal, sino por 'revoluciones científicas' — momentos en que un paradigma (marco explicativo dominante) es reemplazado por otro. El paso de la física newtoniana a la relatividad de Einstein es el ejemplo más conocido en el siglo XX. Esto demuestra que incluso las teorías mejor establecidas son provisionales y revisables."
+        },
+        {
+          "subtitle": "Ciencia y cultura: el conocimiento tradicional como sistema científico",
+          "content": "Los pueblos originarios de México desarrollaron a lo largo de milenios sistemas complejos de conocimiento sobre astronomía, botánica, medicina y agricultura — validados por observación sistemática, experimentación implícita y transmisión generacional. El sistema calendárico mexica, la etnobotánica de los pueblos zapotecos y la ingeniería hidráulica de Tenochtitlán son ejemplos de ciencia producida fuera del paradigma europeo. La antropología contemporánea y la etnociencia reconocen estos sistemas como formas legítimas de conocimiento que dialogan, y en muchos casos complementan, a la ciencia occidental. La UNESCO promueve el diálogo entre ciencias y conocimientos tradicionales como estrategia para la sustentabilidad y el bienestar humano."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál de estas afirmaciones describe mejor la visión contemporánea de la ciencia?",
+          "options": [
+            "La ciencia descubre verdades absolutas e inmutables",
+            "La ciencia es una práctica social, histórica y revisable",
+            "La ciencia es neutral y no tiene influencia cultural",
+            "La ciencia solo la practican los países desarrollados"
+          ],
+          "correct": "La ciencia es una práctica social, histórica y revisable"
+        },
+        {
+          "question": "¿Qué es un paradigma científico según Thomas Kuhn?",
+          "options": [
+            "Un experimento de laboratorio",
+            "Un marco explicativo dominante que guía la investigación en una época",
+            "Una ley científica comprobada",
+            "Un instrumento de medición preciso"
+          ],
+          "correct": "Un marco explicativo dominante que guía la investigación en una época"
+        },
+        {
+          "question": "¿Por qué el conocimiento tradicional de los pueblos originarios puede considerarse científico?",
+          "options": [
+            "Porque fue publicado en revistas internacionales",
+            "Porque fue validado por observación sistemática y transmisión generacional",
+            "Porque fue aprobado por universidades europeas",
+            "Porque no tiene influencia cultural"
+          ],
+          "correct": "Porque fue validado por observación sistemática y transmisión generacional"
+        },
+        {
+          "question": "¿Qué es el 'diálogo de saberes' en el contexto del MCCEMS?",
+          "options": [
+            "Reemplazar la ciencia occidental con conocimientos tradicionales",
+            "Reconocer solo la ciencia publicada en inglés",
+            "El intercambio respetuoso entre ciencia occidental y conocimientos comunitarios",
+            "Ignorar los saberes locales en favor de la ciencia universal"
+          ],
+          "correct": "El intercambio respetuoso entre ciencia occidental y conocimientos comunitarios"
+        },
+        {
+          "question": "¿Cuál es un ejemplo de ciencia producida en un contexto cultural no occidental?",
+          "options": [
+            "La ley de la gravedad de Newton",
+            "El sistema calendárico mexica basado en observación astronómica",
+            "La tabla periódica de Mendeleiev",
+            "La teoría de la evolución de Darwin"
+          ],
+          "correct": "El sistema calendárico mexica basado en observación astronómica"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: explica con sus propias palabras la diferencia entre la visión positivista y la visión sociohistórica de la ciencia, identifica al menos 2 ejemplos de conocimiento científico producido fuera del paradigma europeo occidental, y reflexiona sobre cómo la cultura influye en qué preguntas hace y qué valora la ciencia."
+    },
+    "teacher_tips": [
+      "Evita la trampa de relativizar toda la ciencia: el objetivo no es decir 'toda creencia vale igual', sino reconocer que el método científico también tiene historia y limitaciones — hay una diferencia entre relativismo epistemológico y pensamiento crítico.",
+      "Conecta con ejemplos locales: el CINVESTAV, el IMSS y la UNAM producen ciencia desde México — mostrar que la ciencia también se hace en nuestro contexto desmitifica la idea de que 'la ciencia viene de fuera'.",
+      "Para grupos con alta resistencia al pensamiento crítico, empieza con la pregunta más personal: '¿Has visto funcionar un remedio de tu abuela? ¿Eso cuenta como ciencia?' Aterrizar en la experiencia propia baja la resistencia al cuestionamiento del paradigma dominante."
+    ]
+  },
+  "CNEYT-I-P02": {
+    "code": "CNEYT-I-P02",
+    "title": "Propiedades de la materia: distingo y mido las características físicas y químicas de lo que me rodea",
+    "level": "Ciencias Naturales, Experimentales y Tecnología I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Materia y sus propiedades",
+    "metadata": {
+      "objective": "El estudiante distinguirá las propiedades físicas y químicas generales de la materia, interpretando datos de densidad, solubilidad y puntos de fusión/ebullición en contextos cotidianos.",
+      "competencies": [
+        "Clasifica propiedades de la materia en físicas (observables sin cambio) y químicas (requieren reacción)",
+        "Calcula densidad a partir de masa y volumen con unidades correctas del SI",
+        "Interpreta datos de solubilidad en contextos de preparación de mezclas",
+        "Relaciona puntos de fusión y ebullición con cambios de estado en situaciones cotidianas",
+        "Diseña observaciones simples para medir propiedades físicas de materiales del entorno"
+      ],
+      "materials": [
+        "Báscula de precisión o balanza de cocina, vasos graduados",
+        "Materiales del entorno: sal, azúcar, aceite, agua, hielo, monedas",
+        "Tabla periódica con propiedades físicas de elementos comunes",
+        "Hoja de registro de datos de laboratorio (formato simple)",
+        "Termómetro de alcohol o digital para medición de temperatura"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Por qué el aceite flota en el agua?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Propiedades físicas y químicas: medición" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Aplicación: materiales de mi entorno" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — El misterio cotidiano",
+          "duration": "10 min",
+          "description": "El docente vierte aceite en agua ante el grupo y pregunta: ¿por qué el aceite no se mezcla con el agua y siempre flota? Esta pregunta cotidiana conduce a la densidad. También se plantea: ¿por qué el agua del mar tarda más en hervir que el agua de grifo? (solubilidad y punto de ebullición). Se activa el conocimiento previo preguntando qué propiedades de la materia ya conocen del secundaria.",
+          "activity": "Los estudiantes escriben individualmente 5 propiedades de un objeto cotidiano (libro, moneda, vaso de agua) — cualquier característica que puedan observar. Comparten en plenaria y el docente clasifica en el pizarrón las que son físicas vs. las que implican cambio químico, anticipando la distinción central de la sesión."
+        },
+        {
+          "title": "FASE II: DESARROLLO — Propiedades físicas y químicas",
+          "duration": "30 min",
+          "description": "Se trabaja en dos bloques: 1) Propiedades físicas: densidad (d = m/V), solubilidad, punto de fusión/ebullición, dureza, conductividad eléctrica. Práctica: medir masa y volumen de 3 materiales y calcular su densidad. Comparar con tabla de referencia. 2) Propiedades químicas: inflamabilidad, reactividad, corrosividad — estas solo se observan durante una reacción. Ejemplos: herrumbre del hierro (Fe → Fe₂O₃), combustión de madera, digestión de alimentos.",
+          "activity": "Mini-laboratorio de densidades: en grupos de 4 los estudiantes miden la masa y el volumen de 3 materiales disponibles (moneda, trozo de madera, goma de borrar). Calculan densidad y determinan si flotarían en agua (d < 1 g/cm³) o se hundirían (d > 1 g/cm³). Registran datos en tabla y verifican experimentalmente con un vaso de agua."
+        },
+        {
+          "title": "FASE III: CIERRE — Materiales de mi comunidad",
+          "duration": "10 min",
+          "description": "Se conecta con aplicaciones industriales y cotidianas en México: el IMSS usa la densidad del hueso para diagnosticar osteoporosis, la industria alimentaria controla la solubilidad del azúcar en refrescos y dulces mexicanos, los bomberos conocen los puntos de inflamación de materiales para protocolos de seguridad.",
+          "activity": "Ticket de salida: elige un material de tu cocina (sal, azúcar, aceite, agua) y describe: 2 propiedades físicas medibles, 1 propiedad química que conozcas de ese material y 1 situación cotidiana donde esa propiedad sea relevante."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Todo lo que nos rodea es materia: el agua, el aire, la ropa, los alimentos, nuestro propio cuerpo. Conocer las propiedades de la materia no es solo un ejercicio académico — es la base del diseño de materiales, la medicina, la ingeniería alimentaria y la química ambiental. Medir y clasificar son las operaciones fundacionales de cualquier ciencia.",
+      "sections": [
+        {
+          "subtitle": "Propiedades físicas: características observables sin transformación",
+          "content": "Las propiedades físicas son aquellas que se pueden medir u observar sin que la sustancia cambie su composición química. Las más importantes para el bachillerato son: Densidad (d = m/V): relación entre masa y volumen; el agua tiene d = 1 g/cm³ a 4°C — todo lo que tiene mayor densidad se hunde, lo que tiene menor densidad flota. Solubilidad: cantidad máxima de una sustancia (soluto) que se disuelve en un disolvente a temperatura dada. La sal tiene mayor solubilidad en agua caliente que fría. Punto de fusión: temperatura a la que un sólido cambia a líquido (hielo → 0°C). Punto de ebullición: temperatura a la que un líquido cambia a gas (agua → 100°C al nivel del mar — en la Ciudad de México, a 2240 m de altitud, hierve a ~94°C por la presión atmosférica menor)."
+        },
+        {
+          "subtitle": "Propiedades químicas: características que definen la reactividad",
+          "content": "Las propiedades químicas solo se manifiestan cuando la sustancia participa en una reacción química, cambiando su composición. Las más relevantes son: Inflamabilidad: capacidad de arder en presencia de oxígeno (gasolina, etanol). Reactividad: tendencia a reaccionar con otras sustancias (el sodio metálico reacciona violentamente con el agua). Corrosividad: capacidad de destruir materiales biológicos o metálicos (ácido sulfúrico, lejía). Toxicidad: capacidad de causar daño biológico al entrar en contacto con organismos vivos. A diferencia de las propiedades físicas, las químicas no se pueden 'deshacer' — una vez que el papel se quema, no puede volver a ser papel."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál de estas es una propiedad FÍSICA de la materia?",
+          "options": ["Inflamabilidad", "Reactividad", "Densidad", "Corrosividad"],
+          "correct": "Densidad"
+        },
+        {
+          "question": "Un objeto tiene masa de 50 g y volumen de 25 cm³. ¿Cuál es su densidad?",
+          "options": ["0.5 g/cm³", "2 g/cm³", "75 g/cm³", "1250 g/cm³"],
+          "correct": "2 g/cm³"
+        },
+        {
+          "question": "¿Por qué el agua en la Ciudad de México hierve a menos de 100°C?",
+          "options": [
+            "Porque la altitud aumenta la presión atmosférica",
+            "Porque la altitud disminuye la presión atmosférica",
+            "Porque el agua de CDMX es menos pura",
+            "Porque la temperatura ambiental es más alta"
+          ],
+          "correct": "Porque la altitud disminuye la presión atmosférica"
+        },
+        {
+          "question": "¿Cuál es un ejemplo de propiedad QUÍMICA?",
+          "options": ["El punto de fusión del hielo", "La densidad del aceite", "La inflamabilidad de la gasolina", "El color azul del cobre"],
+          "correct": "La inflamabilidad de la gasolina"
+        },
+        {
+          "question": "Un objeto con densidad de 0.8 g/cm³ colocado en agua (d = 1 g/cm³):",
+          "options": ["Se hunde completamente", "Flota en la superficie", "Se disuelve", "No le pasa nada"],
+          "correct": "Flota en la superficie"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: clasifica correctamente al menos 6 de 8 propiedades en físicas o químicas, calcula densidad con unidades correctas a partir de datos de masa y volumen, y relaciona al menos 2 propiedades físicas con aplicaciones cotidianas del entorno mexicano."
+    },
+    "teacher_tips": [
+      "El mini-laboratorio de densidades funciona con materiales económicos: monedas mexicanas de 1 y 10 pesos tienen densidades diferentes — es un contexto auténtico y los estudiantes siempre recuerdan el experimento.",
+      "El punto de ebullición del agua en la CDMX (94°C vs. 100°C al nivel del mar) es un hecho sorprendente para muchos estudiantes que no lo habían considerado — úsalo para conectar la física con la experiencia cotidiana de cocinar.",
+      "Para grupos sin acceso a laboratorio, usa simulaciones virtuales del COBACH o del PHET (Universidad de Colorado) — tienen simulaciones de propiedades de la materia disponibles en español y sin costo."
+    ]
+  },
+  "CNEYT-I-P03": {
+    "code": "CNEYT-I-P03",
+    "title": "Estructura del átomo: comprendo los modelos atómicos y su relevancia para entender la materia",
+    "level": "Ciencias Naturales, Experimentales y Tecnología I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Materia y sus propiedades",
+    "metadata": {
+      "objective": "El estudiante describirá la estructura básica del átomo usando los modelos atómicos históricos (Dalton, Thomson, Rutherford, Bohr) y comprenderá la función de protones, neutrones y electrones.",
+      "competencies": [
+        "Describe los componentes del átomo: protones (carga +), neutrones (neutros) y electrones (carga -)",
+        "Relaciona la evolución de los modelos atómicos con la historia de la ciencia",
+        "Usa número atómico y número de masa para identificar elementos en la tabla periódica",
+        "Explica cómo la distribución de electrones en niveles de energía determina las propiedades del elemento",
+        "Distingue entre átomos, iones e isótopos a nivel conceptual básico"
+      ],
+      "materials": [
+        "Tabla periódica de los elementos (versión bachillerato)",
+        "Materiales para construir modelos atómicos (plastilina, papel, foami)",
+        "Línea del tiempo de modelos atómicos con imágenes",
+        "Fichas de trabajo: número atómico y número de masa",
+        "Simulación PhET: modelos del átomo (disponible en español)"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Qué hay dentro de la materia?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Modelos atómicos y estructura nuclear" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Construyo mi modelo atómico" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — La pregunta que cambió la ciencia",
+          "duration": "10 min",
+          "description": "El docente parte de una pregunta filosófica con 2500 años de historia: '¿Cuál es la partícula más pequeña de la materia?' Se traza la línea: Demócrito (átomos griegos, 400 a.C.) → Dalton (bolas macizas, 1803) → Thomson (modelo del pudín de pasas, 1897) → Rutherford (núcleo, 1911) → Bohr (niveles de energía, 1913). La pregunta no es nueva — lo que cambia es el método para responderla.",
+          "activity": "El docente muestra una manzana y pregunta: si la cortáramos a la mitad, y luego a la mitad, y así sucesivamente... ¿cuándo dejaría de ser manzana? ¿Cuándo llegaríamos a algo que ya no se puede dividir? Esta reductio al límite introduce naturalmente el concepto de átomo como unidad fundamental de la materia."
+        },
+        {
+          "title": "FASE II: DESARROLLO — Estructura atómica y modelos históricos",
+          "duration": "30 min",
+          "description": "Se construyen 3 conceptos en secuencia: 1) Partículas subatómicas: protones (p+, carga positiva, en el núcleo), neutrones (n0, sin carga, en el núcleo) y electrones (e-, carga negativa, en la corteza). Número atómico Z = número de protones. Número de masa A = p + n. 2) Modelos históricos: Dalton (esferas macizas, 1803), Thomson (pudín con pasas, 1897), Rutherford (núcleo con electrones en la corteza, 1911), Bohr (electrones en órbitas fijas de energía, 1913). 3) Tabla periódica: usar número atómico para identificar elementos y deducir protones, neutrones y electrones.",
+          "activity": "Construcción de modelos: en grupos de 3, los estudiantes reciben una ficha con datos de un elemento (H, He, Li, C, O, Na) y construyen su modelo atómico con plastilina o materiales disponibles, representando el núcleo y los electrones en niveles. Luego comparan su modelo con el de otro grupo y buscan patrones: ¿qué cambia al aumentar el número atómico?"
+        },
+        {
+          "title": "FASE III: CIERRE — Del modelo al elemento",
+          "duration": "10 min",
+          "description": "Se conecta con aplicaciones reales: el carbono-14 (isótopo) permite datar fósiles y piezas arqueológicas mexicanas; los iones de sodio y potasio permiten que nuestros nervios funcionen; la radiactividad del uranio es la base de la energía nuclear. La estructura atómica no es teoría abstracta — es la explicación de por qué las cosas son como son.",
+          "activity": "Ticket de salida: dado el elemento Oxígeno (Z=8, A=16), el estudiante debe indicar: número de protones, número de neutrones, número de electrones, y dibujar su modelo de Bohr simplificado (2 electrones en primer nivel, 6 en segundo)."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "El átomo es la unidad fundamental de la materia ordinaria — el ladrillo con el que está construido todo lo que existe: las estrellas, el agua, el ADN, el papel de este libro. Pero el átomo no es una entidad simple: tiene una estructura interna fascinante cuya comprensión tardó más de dos mil años en construirse, y cuya historia es uno de los mejores ejemplos de cómo avanza la ciencia.",
+      "sections": [
+        {
+          "subtitle": "La evolución de los modelos atómicos: una historia de revoluciones",
+          "content": "Los modelos atómicos son representaciones simplificadas de la realidad — útiles para explicar propiedades, pero no fotografías literales del átomo. Dalton (1803): el átomo como esfera maciza indivisible, explicó las proporciones fijas en las reacciones químicas. Thomson (1897): descubrió el electrón y propuso el modelo 'pudín de pasas' — electrones incrustados en una esfera de carga positiva. Rutherford (1911): bombardeó láminas de oro con partículas alfa y descubrió que la mayor parte del átomo es espacio vacío, con toda la carga positiva concentrada en un núcleo diminuto. Bohr (1913): propuso que los electrones orbitan el núcleo en niveles fijos de energía — solo pueden estar en niveles permitidos, y cuando saltan entre niveles emiten o absorben luz. El modelo cuántico moderno (post-1926) describe los electrones como nubes de probabilidad, no como partículas en órbitas definidas — pero para el bachillerato, el modelo de Bohr es suficientemente preciso y matemáticamente manejable."
+        },
+        {
+          "subtitle": "Número atómico, número de masa e isótopos: la identidad del átomo",
+          "content": "El número atómico (Z) es el número de protones en el núcleo y define la identidad química del elemento: todos los átomos con Z=6 son carbono, independientemente de todo lo demás. El número de masa (A) es la suma de protones y neutrones: A = Z + N. Los isótopos son átomos del mismo elemento (mismo Z) con diferente número de neutrones (diferente A). El carbono-12 (⁶¹²C) y el carbono-14 (⁶¹⁴C) son isótopos: ambos son carbono, pero el ¹⁴C es inestable (radiactivo) y se usa en datación arqueológica. La energía de un isótopo radiactivo se puede medir con el tiempo de vida media (tiempo en que se desintegra la mitad). El ¹⁴C tiene vida media de ~5730 años — por eso es útil para fechar restos arqueológicos de hasta ~50,000 años."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Qué partícula subatómica determina la identidad química de un elemento?",
+          "options": ["Electrón", "Neutrón", "Protón", "Fotón"],
+          "correct": "Protón"
+        },
+        {
+          "question": "El modelo atómico de Rutherford demostró que:",
+          "options": [
+            "Los electrones están incrustados en una esfera de carga positiva",
+            "El átomo es una esfera maciza indivisible",
+            "El átomo tiene un núcleo pequeño y denso rodeado de espacio vacío",
+            "Los electrones orbitan en niveles fijos de energía"
+          ],
+          "correct": "El átomo tiene un núcleo pequeño y denso rodeado de espacio vacío"
+        },
+        {
+          "question": "Si un átomo tiene Z=8 y A=16, ¿cuántos neutrones tiene?",
+          "options": ["8", "16", "24", "6"],
+          "correct": "8"
+        },
+        {
+          "question": "¿Qué son los isótopos?",
+          "options": [
+            "Átomos de diferentes elementos con la misma masa",
+            "Átomos del mismo elemento con diferente número de neutrones",
+            "Átomos con carga eléctrica positiva",
+            "Átomos que han perdido electrones"
+          ],
+          "correct": "Átomos del mismo elemento con diferente número de neutrones"
+        },
+        {
+          "question": "¿Qué modelo atómico introdujo la idea de los niveles de energía del electrón?",
+          "options": ["Dalton", "Thomson", "Rutherford", "Bohr"],
+          "correct": "Bohr"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: describe correctamente las 3 partículas subatómicas con su carga y ubicación, ordena cronológicamente los modelos atómicos y explica qué evidencia experimental llevó a cada cambio, y a partir del número atómico y de masa determina el número de protones, neutrones y electrones de al menos 4 elementos."
+    },
+    "teacher_tips": [
+      "El modelo de Bohr con plastilina o papel es el recurso más efectivo: construir físicamente el modelo fuerza a los estudiantes a decidir cuántos protones, neutrones y electrones hay — el error en la construcción es detectable y corregible de inmediato.",
+      "Para contextualizar el carbono-14, menciona que los arqueólogos del INAH usan esta técnica para fechar cerámica y restos orgánicos de sitios como Teotihuacán y Monte Albán — la estructura atómica tiene aplicaciones en la arqueología mexicana.",
+      "Anticipa la confusión entre número atómico y número de masa — un recordatorio visual: 'Z = zona del protón (solo protones), A = todos adentro (protones + neutrones)' ayuda a retener la distinción."
+    ]
+  },
+  "CNEYT-I-P04": {
+    "code": "CNEYT-I-P04",
+    "title": "Sustancias y mezclas: clasifico la materia y aplico métodos de separación",
+    "level": "Ciencias Naturales, Experimentales y Tecnología I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Materia y sus propiedades",
+    "metadata": {
+      "objective": "El estudiante clasificará la materia en sustancias puras y mezclas, distinguirá mezclas homogéneas de heterogéneas y aplicará métodos de separación apropiados según las propiedades físicas de los componentes.",
+      "competencies": [
+        "Distingue sustancias puras (elementos y compuestos) de mezclas (homogéneas y heterogéneas)",
+        "Selecciona el método de separación adecuado según las propiedades físicas de los componentes",
+        "Realiza filtración, decantación o evaporación con materiales del entorno",
+        "Relaciona los métodos de separación con procesos industriales y ambientales en México",
+        "Interpreta la composición de mezclas cotidianas (agua potable, leche, aire)"
+      ],
+      "materials": [
+        "Materiales de cocina: sal, arena, agua, aceite, limaduras de hierro",
+        "Embudo, papel filtro, vasos de precipitados (o sustituir con materiales domésticos)",
+        "Imán para separar limaduras de hierro",
+        "Hoja de clasificación de la materia (árbol de categorías)",
+        "Fotos de procesos industriales: potabilización de agua SACMEX, refinería PEMEX"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Qué hay en el agua del grifo?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Clasificación y separación de mezclas" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Diseño de un método de separación" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — La complejidad de lo cotidiano",
+          "duration": "10 min",
+          "description": "El docente pregunta: ¿el agua del grifo es una sustancia pura o una mezcla? ¿Por qué? La mayoría asumirá que es pura — el docente revela que el agua potable contiene cloro, flúor, minerales disueltos y, en algunas colonias, sedimentos. ¿Cómo separaríamos cada componente? Esta pregunta cotidiana activa la necesidad de clasificar y separar la materia.",
+          "activity": "El docente prepara 4 vasos visibles: agua pura, agua con sal (mezcla homogénea), agua con arena (mezcla heterogénea) y aceite con agua (mezcla heterogénea no miscible). Los estudiantes los observan y clasifican antes de recibir definiciones formales. El criterio de clasificación emerge de la observación."
+        },
+        {
+          "title": "FASE II: DESARROLLO — Clasificación y métodos de separación",
+          "duration": "30 min",
+          "description": "Se construye el árbol de clasificación: Materia → Sustancias puras (Elementos: Fe, O₂ / Compuestos: H₂O, NaCl) → Mezclas (Homogéneas: agua con sal, aire / Heterogéneas: ensalada, granito). Luego se ven los métodos: 1) Filtración: separa sólido-líquido (arena-agua). 2) Decantación: separa líquidos no miscibles (aceite-agua). 3) Evaporación/cristalización: separa sólido disuelto en líquido (sal-agua). 4) Separación magnética: separa sólidos magnéticos (hierro de arena). 5) Destilación: separa líquidos por diferente punto de ebullición.",
+          "activity": "Laboratorio rotatorio: 4 estaciones de 6 minutos cada una. E1: filtrar mezcla agua-arena. E2: decantar aceite-agua. E3: evaporar agua salada (observar cristales). E4: separar limaduras de hierro de arena con imán. Cada grupo registra: qué separaron, cómo funciona el método y en qué industria se usa ese método."
+        },
+        {
+          "title": "FASE III: CIERRE — Aplicaciones industriales mexicanas",
+          "duration": "10 min",
+          "description": "Se conecta cada método con la industria mexicana: SACMEX filtra y decanta el agua de la CDMX antes de clorarla. PEMEX usa destilación fraccionada para separar gasolina, diésel y aceites del petróleo crudo en refinerías de Hidalgo, Tabasco y Nuevo León. La minería en Sonora y Zacatecas usa métodos físicos y químicos para separar minerales de la roca.",
+          "activity": "Ticket de salida: para la mezcla 'sal + arena + limaduras de hierro', diseña la secuencia de pasos para separar los 3 componentes uno a uno. Explica qué propiedad física aprovechas en cada paso."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Todo lo que vemos en la naturaleza y en la industria son mezclas: el agua del mar, el aire, la sangre, el suelo. La capacidad de separar los componentes de una mezcla es una de las habilidades más prácticas de la química, con aplicaciones que van desde la cocina hasta la industria petrolera.",
+      "sections": [
+        {
+          "subtitle": "Clasificación de la materia: del elemento a la mezcla",
+          "content": "La materia se clasifica en sustancias puras y mezclas. Las sustancias puras tienen composición fija y propiedades definidas: pueden ser elementos (formados por un solo tipo de átomo: Fe, O, Au) o compuestos (formados por dos o más tipos de átomos en proporción fija: H₂O, NaCl, CO₂). Las mezclas son combinaciones de dos o más sustancias puras en proporciones variables. Las mezclas homogéneas (o soluciones) tienen composición uniforme en toda su extensión — no se pueden distinguir los componentes a simple vista (agua con sal, aire, vinagre). Las mezclas heterogéneas tienen composición no uniforme y los componentes son visibles o distinguibles (ensalada, granito, leche entera, agua con arena)."
+        },
+        {
+          "subtitle": "Métodos de separación: aprovechan diferencias en propiedades físicas",
+          "content": "Los métodos de separación de mezclas funcionan porque los componentes tienen diferentes propiedades físicas. Filtración: separa sólido de líquido aprovechando el tamaño de partícula (arena-agua). Decantación: separa líquidos inmiscibles por diferencia de densidad (aceite-agua; el menos denso sube). Evaporación/cristalización: separa un sólido disuelto en un líquido usando la diferencia en punto de ebullición — se evapora el líquido y el sólido queda (obtención de sal de mar). Destilación: separa líquidos miscibles con diferente punto de ebullición — el más volátil se evapora primero, se condensa y se recoge por separado (separación de agua-alcohol, destilación fraccionada del petróleo). Separación magnética: usa un imán para atraer materiales ferromagnéticos (hierro de arena). Cromatografía: separa mezclas de pigmentos por diferente afinidad con el disolvente (se observa fácilmente con tinta de marcador sobre papel filtro)."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál de estas es una mezcla HOMOGÉNEA?",
+          "options": ["Ensalada de frutas", "Agua con sal", "Arena con piedras", "Aceite con agua"],
+          "correct": "Agua con sal"
+        },
+        {
+          "question": "¿Qué método se usa para separar sal del agua?",
+          "options": ["Filtración", "Decantación", "Evaporación", "Separación magnética"],
+          "correct": "Evaporación"
+        },
+        {
+          "question": "¿Qué propiedad aprovecha la decantación para separar aceite y agua?",
+          "options": ["Diferencia de temperatura", "Diferencia de densidad", "Diferencia de tamaño de partícula", "Diferencia de magnetismo"],
+          "correct": "Diferencia de densidad"
+        },
+        {
+          "question": "El agua (H₂O) es un ejemplo de:",
+          "options": ["Elemento", "Mezcla homogénea", "Compuesto", "Mezcla heterogénea"],
+          "correct": "Compuesto"
+        },
+        {
+          "question": "¿Qué proceso industrial usa PEMEX para separar los productos del petróleo crudo?",
+          "options": ["Filtración", "Decantación", "Destilación fraccionada", "Cristalización"],
+          "correct": "Destilación fraccionada"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: clasifica correctamente al menos 8 de 10 sustancias en el árbol de clasificación de la materia, selecciona el método de separación adecuado para 4 mezclas distintas justificando la propiedad física aprovechada, y puede describir al menos 1 aplicación industrial real de un método de separación."
+    },
+    "teacher_tips": [
+      "El laboratorio rotatorio es más efectivo que una demostración frontal: 4 estaciones simultáneas permiten que todos los grupos experimenten en los 30 minutos disponibles — organiza los materiales en charolas por estación antes de clase.",
+      "Para grupos sin laboratorio equipado, la evaporación del agua salada puede hacerse con una taza de agua con sal de cocina y un comal — la sal cristaliza y los estudiantes ven el proceso completo en 20 minutos.",
+      "Conecta con la crisis del agua: la CDMX obtiene parte de su agua del sistema Cutzamala, que usa filtración y decantación a escala industrial — datos del SACMEX sobre el proceso de potabilización son recursos auténticos y motivadores."
+    ]
+  },
+  "CNEYT-I-P05": {
+    "code": "CNEYT-I-P05",
+    "title": "Estados de la materia: explico los cambios de estado en función de temperatura y presión",
+    "level": "Ciencias Naturales, Experimentales y Tecnología I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Materia y sus propiedades",
+    "metadata": {
+      "objective": "El estudiante explicará los estados de agregación de la materia (sólido, líquido, gaseoso) y sus cambios en función de la temperatura y la presión, relacionándolos con fenómenos cotidianos y climáticos.",
+      "competencies": [
+        "Describe las características de los tres estados de agregación de la materia a nivel macroscópico y microscópico",
+        "Identifica y explica los 6 cambios de estado: fusión, solidificación, evaporación, condensación, sublimación, deposición",
+        "Relaciona temperatura y presión con los cambios de estado del agua",
+        "Interpreta diagramas de cambio de estado (curvas de calentamiento)",
+        "Conecta los cambios de estado con fenómenos naturales mexicanos (lluvia, neblina, heladas, volcanes)"
+      ],
+      "materials": [
+        "Cubos de hielo, agua, hornilla o mechero de alcohol (o vela)",
+        "Termómetro para registro de temperatura durante cambios de estado",
+        "Gráfica de cambio de estado del agua en blanco para completar",
+        "Fotografías de fenómenos de cambio de estado en México (neblina en Xalapa, nieve en Popocatépetl)",
+        "Naftalina (bolas de alcanfor) para demostración de sublimación"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "El agua: la sustancia de los tres estados" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Cambios de estado y energía" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Fenómenos climáticos de México" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — El agua como modelo universal",
+          "duration": "10 min",
+          "description": "El docente muestra 3 formas del agua simultáneamente: hielo (sólido), agua líquida y vapor visible de una taza caliente (gas). Pregunta: ¿es la misma sustancia? ¿qué cambió? La respuesta — la temperatura determinó el estado — conduce a la pregunta generadora: ¿cómo y por qué cambia el estado de la materia? Se activan conocimientos previos sobre el ciclo del agua (aprendido en secundaria).",
+          "activity": "El docente coloca un cubo de hielo en un vaso y lo calienta lentamente (o muestra un video del proceso). Los estudiantes predicen: ¿qué temperatura tiene el hielo al inicio? ¿a qué temperatura empieza a derretirse? ¿el agua sigue subiendo de temperatura mientras se derrite? Estas predicciones se registran y se verifican en el desarrollo."
+        },
+        {
+          "title": "FASE II: DESARROLLO — Estados, cambios y energía",
+          "duration": "30 min",
+          "description": "Se trabaja en dos bloques: 1) Los 3 estados y sus características: Sólido: forma y volumen fijo, partículas muy juntas en posición fija. Líquido: volumen fijo, forma variable, partículas cercanas pero en movimiento. Gas: forma y volumen variable, partículas muy separadas y en movimiento rápido. 2) Los 6 cambios de estado con energía: Fusión (sólido→líquido, absorbe calor), Solidificación (líquido→sólido, libera calor), Evaporación (líquido→gas, absorbe calor), Condensación (gas→líquido, libera calor), Sublimación (sólido→gas directamente, absorbe calor: naftalina, hielo seco), Deposición (gas→sólido directamente: escarcha).",
+          "activity": "Construcción de curva de calentamiento: los estudiantes completan una gráfica temperatura vs. tiempo para el agua. El docente explica que durante los cambios de estado la temperatura se mantiene constante (las mesetas de la gráfica) porque la energía se usa en cambiar el estado, no en aumentar la temperatura. Luego identifican en la gráfica los 6 puntos/segmentos y los nombran."
+        },
+        {
+          "title": "FASE III: CIERRE — México y sus fenómenos de cambio de estado",
+          "duration": "10 min",
+          "description": "Se identifican fenómenos climáticos mexicanos como cambios de estado: la neblina de Xalapa (condensación), las nieves del Popocatépetl (deposición), los aguaceros del sur (condensación en nubes), las heladas del norte en invierno (solidificación del agua en plantas), la evaporación del Golfo de México que alimenta las lluvias tropicales. La meteorología es física de cambios de estado a gran escala.",
+          "activity": "Ticket de salida: identifica en 3 fotografías de fenómenos climáticos mexicanos qué cambio de estado ocurre, qué temperatura y condiciones lo provocan, y si absorbe o libera calor en el proceso."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "El agua es la única sustancia que en condiciones normales del planeta Tierra se encuentra en sus tres estados de agregación de forma natural y simultánea: el vapor en la atmósfera, el agua líquida en los océanos y ríos, y el hielo en los polos y las cimas de las montañas. Por eso el agua es el modelo perfecto para estudiar los estados de la materia y sus cambios.",
+      "sections": [
+        {
+          "subtitle": "Los tres estados: una cuestión de distancia y movimiento entre partículas",
+          "content": "Los estados de agregación de la materia se distinguen por la disposición y el movimiento de sus partículas (átomos o moléculas). En el estado sólido, las partículas están muy juntas y en posiciones fijas — solo vibran. Por eso los sólidos tienen forma y volumen definidos. En el estado líquido, las partículas están cerca pero pueden moverse — el líquido toma la forma del recipiente pero mantiene su volumen. En el estado gaseoso, las partículas están muy separadas y se mueven rápidamente en todas direcciones — el gas no tiene forma ni volumen propio y se expande para llenar cualquier recipiente. La temperatura refleja la energía cinética promedio de las partículas: mayor temperatura = mayor movimiento = tendencia a pasar a un estado más desordenado."
+        },
+        {
+          "subtitle": "Cambios de estado y energía: las curvas de calentamiento",
+          "content": "Los cambios de estado ocurren cuando la temperatura y la presión alcanzan valores críticos específicos para cada sustancia. El punto de fusión del agua (0°C a 1 atm) y el punto de ebullición (100°C a 1 atm, pero 94°C en la CDMX por la menor presión) son ejemplos cotidianos. Durante un cambio de estado, la temperatura permanece constante aunque se siga añadiendo calor — esta energía se llama 'calor latente' y se usa en romper (al calentar) o formar (al enfriar) las fuerzas entre partículas, no en aumentar la temperatura. La sublimación es el cambio de estado menos intuitivo: el sólido pasa directamente a gas sin pasar por líquido. El hielo seco (CO₂ sólido) sublima a -78.5°C y es el ejemplo industrial más conocido; la naftalina de las bolas de alcanfor sublima a temperatura ambiente."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Qué cambio de estado ocurre cuando el vapor de agua se convierte en lluvia?",
+          "options": ["Evaporación", "Condensación", "Sublimación", "Fusión"],
+          "correct": "Condensación"
+        },
+        {
+          "question": "Durante un cambio de estado, ¿qué ocurre con la temperatura?",
+          "options": [
+            "Sube constantemente mientras se añade calor",
+            "Baja mientras se añade calor",
+            "Se mantiene constante mientras dura el cambio",
+            "Varía de forma impredecible"
+          ],
+          "correct": "Se mantiene constante mientras dura el cambio"
+        },
+        {
+          "question": "¿Qué es la sublimación?",
+          "options": [
+            "El paso de sólido a líquido",
+            "El paso de líquido a gas",
+            "El paso de sólido a gas directamente",
+            "El paso de gas a líquido"
+          ],
+          "correct": "El paso de sólido a gas directamente"
+        },
+        {
+          "question": "¿Por qué el agua hierve a menos de 100°C en la Ciudad de México?",
+          "options": [
+            "Porque la temperatura ambiental es mayor",
+            "Porque la presión atmosférica es menor a esa altitud",
+            "Porque el agua de CDMX tiene más impurezas",
+            "Porque la altitud aumenta la presión atmosférica"
+          ],
+          "correct": "Porque la presión atmosférica es menor a esa altitud"
+        },
+        {
+          "question": "¿Cuál de estas características corresponde al estado gaseoso?",
+          "options": [
+            "Forma fija y volumen fijo",
+            "Forma variable y volumen fijo",
+            "Forma variable y volumen variable",
+            "Forma fija y volumen variable"
+          ],
+          "correct": "Forma variable y volumen variable"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: describe correctamente los 6 cambios de estado con su nombre e indica si absorben o liberan calor, interpreta una curva de calentamiento identificando mesetas y segmentos de cambio de temperatura, y relaciona al menos 3 fenómenos climáticos mexicanos con cambios de estado específicos."
+    },
+    "teacher_tips": [
+      "La experiencia de calentar hielo y medir la temperatura con termómetro es la más impactante: los estudiantes se sorprenden al ver que el hielo permanece a 0°C mientras se derrite, aunque se siga calentando — este dato contradice la intuición y lo hace memorable.",
+      "Para demostrar sublimación sin hielo seco, usa pastillas de alcanfor (naftalina, bolas antimpolilla): coloca una sobre un plato y con una lámpara de escritorio calentándola desde arriba — el olor indica que está sublimando sin dejar líquido.",
+      "Conecta con el Popocatépetl: las fumarolas del volcán son vapor de agua y gases que salen a temperaturas de cientos de grados — el SMN reporta la actividad del Popo en tiempo real y es un recurso motivador para analizar cambios de estado en contexto geológico mexicano."
+    ]
+  },
+  "CNEYT-I-P06": {
+    "code": "CNEYT-I-P06",
+    "title": "Método científico: diseño y realizo observaciones e investigaciones sencillas del entorno",
+    "level": "Ciencias Naturales, Experimentales y Tecnología I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Naturaleza de la ciencia",
+    "metadata": {
+      "objective": "El estudiante aplicará el método científico para diseñar y realizar observaciones e investigaciones sencillas del entorno, registrando datos, formulando hipótesis y extrayendo conclusiones fundamentadas.",
+      "competencies": [
+        "Distingue entre observación, pregunta científica, hipótesis, experimentación y conclusión",
+        "Formula hipótesis verificables a partir de una observación del entorno",
+        "Diseña un experimento simple controlando variables independientes y dependientes",
+        "Registra datos cuantitativos y cualitativos en tablas y gráficas",
+        "Redacta conclusiones coherentes con los datos obtenidos, reconociendo limitaciones"
+      ],
+      "materials": [
+        "Hoja de diseño experimental (plantilla método científico)",
+        "Materiales para experimento de germinación (semillas de frijol, tierra, vasos)",
+        "Regla, báscula, termómetro para mediciones precisas",
+        "Cuaderno de ciencias (bitácora de observaciones)",
+        "Laptop o tablet con acceso a datos del INEGI o SMN para análisis de datos secundarios"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿La ciencia es un método o una actitud?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Diseño experimental paso a paso" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Comunicamos nuestros hallazgos" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — La pregunta que da inicio a todo",
+          "duration": "10 min",
+          "description": "El docente presenta una observación cotidiana: 'Noto que las plantas de mi casa crecen hacia la ventana.' Pregunta al grupo: ¿cómo pasaríamos de esta observación a una investigación científica? Se mapea colectivamente el recorrido: Observación → Pregunta → Hipótesis → Experimento → Análisis → Conclusión. Se enfatiza que el método científico es una guía flexible, no una receta rígida, y que la creatividad y el error son parte del proceso.",
+          "activity": "El docente comparte un experimento fallido (real o ficticio) y pregunta: ¿qué salió mal? ¿cómo lo mejorarías? Esta discusión de un experimento defectuoso activa el pensamiento crítico y desmitifica la idea de que la ciencia siempre funciona a la primera."
+        },
+        {
+          "title": "FASE II: DESARROLLO — Diseño experimental en práctica",
+          "duration": "30 min",
+          "description": "En grupos de 4, los estudiantes diseñan un experimento simple sobre uno de estos temas: germinación de semillas (¿afecta la cantidad de agua a la velocidad de germinación?), temperatura del agua (¿afecta la sal al punto de ebullición?), o crecimiento de plantas (¿afecta la luz al crecimiento?). Completan la plantilla: pregunta de investigación, hipótesis, variable independiente (la que manipulas), variable dependiente (la que mides), variables controladas (las que mantienes igual) y procedimiento de 5 pasos.",
+          "activity": "Cada grupo presenta su diseño experimental a otro grupo para revisión de pares: ¿La hipótesis es verificable? ¿Están controladas las variables? ¿Los datos que planean recoger son suficientes? Se retroalimentan mutuamente antes de que el docente consolide en plenaria. Si el tiempo lo permite, se inicia la primera observación del experimento de germinación."
+        },
+        {
+          "title": "FASE III: CIERRE — Comunicación científica",
+          "duration": "10 min",
+          "description": "El docente introduce el concepto de comunicación científica: los científicos no solo hacen experimentos, también los reportan para que otros puedan replicarlos y verificarlos. Se muestra el formato básico de un reporte científico: título, pregunta, hipótesis, procedimiento, resultados, conclusión. Se reflexiona: ¿por qué es importante que otros puedan replicar un experimento? (reproductibilidad como criterio de validez).",
+          "activity": "Ticket de salida: completa la plantilla de método científico para un experimento personal: elige una pregunta que tengas sobre tu entorno cotidiano, formula una hipótesis, y describe cómo la comprobarías. El docente recoge para retroalimentación formativa."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "El método científico no es un algoritmo fijo — es una actitud: la disposición a cuestionar, observar, comprobar y revisar. Es el mayor acuerdo de la humanidad para generar conocimiento confiable sobre el mundo natural. Aprender a usar el método científico no es solo aprender química o biología — es aprender a pensar con rigor en cualquier ámbito de la vida.",
+      "sections": [
+        {
+          "subtitle": "Etapas del método científico: una guía flexible",
+          "content": "El método científico describe un proceso iterativo de generación de conocimiento: 1) Observación: registro sistemático y preciso de un fenómeno. 2) Pregunta de investigación: una pregunta concreta, específica y verificable ('¿Afecta X a Y en condiciones Z?'). 3) Hipótesis: una explicación provisional y verificable ('Si X aumenta, entonces Y disminuirá, porque...'). La hipótesis debe poder refutarse — si ningún experimento posible podría demostrar que está equivocada, no es científica (criterio de falsabilidad de Karl Popper). 4) Diseño experimental: plan para probar la hipótesis controlando variables. 5) Recolección y análisis de datos: mediciones precisas registradas en tablas y gráficas. 6) Conclusión: ¿los datos apoyan o refutan la hipótesis? ¿qué nuevas preguntas surgen?"
+        },
+        {
+          "subtitle": "Variables y control experimental: la clave de la validez",
+          "content": "Un experimento científico válido manipula una sola cosa a la vez. La variable independiente (VI) es la que el investigador modifica deliberadamente (cantidad de luz que recibe una planta). La variable dependiente (VD) es la que se mide para ver el efecto de la VI (altura de la planta). Las variables controladas son todas las demás que se mantienen constantes para que no interfieran (cantidad de agua, tipo de tierra, temperatura ambiental). Si no se controlan las variables, no se puede afirmar que el cambio en la VD se debe a la VI — el experimento no es concluyente. El grupo control es el grupo que no recibe la manipulación experimental — sirve de referencia para comparar."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál de estas es una hipótesis científicamente válida?",
+          "options": [
+            "Las plantas son hermosas",
+            "Si aumenta la cantidad de luz, la planta crecerá más rápido porque la luz impulsa la fotosíntesis",
+            "Las plantas crecen",
+            "La luz es buena para las plantas"
+          ],
+          "correct": "Si aumenta la cantidad de luz, la planta crecerá más rápido porque la luz impulsa la fotosíntesis"
+        },
+        {
+          "question": "En un experimento sobre el efecto de la temperatura en la velocidad de disolución de sal, ¿cuál es la variable independiente?",
+          "options": ["La cantidad de sal que se disuelve", "El tiempo que tarda en disolverse", "La temperatura del agua", "El tipo de sal utilizada"],
+          "correct": "La temperatura del agua"
+        },
+        {
+          "question": "¿Para qué sirve el grupo control en un experimento?",
+          "options": [
+            "Para probar la hipótesis directamente",
+            "Para servir de referencia de comparación sin la variable manipulada",
+            "Para medir la variable independiente",
+            "Para registrar los datos finales"
+          ],
+          "correct": "Para servir de referencia de comparación sin la variable manipulada"
+        },
+        {
+          "question": "Según el criterio de falsabilidad de Popper, una hipótesis es científica si:",
+          "options": [
+            "Siempre se puede demostrar que es verdadera",
+            "Ningún experimento podría refutarla",
+            "Es posible que un experimento demuestre que está equivocada",
+            "Fue propuesta por un científico famoso"
+          ],
+          "correct": "Es posible que un experimento demuestre que está equivocada"
+        },
+        {
+          "question": "¿Por qué es importante que un experimento sea replicable?",
+          "options": [
+            "Para que sea más caro de realizar",
+            "Para que otros investigadores puedan verificar los resultados independientemente",
+            "Para que el investigador original tenga más crédito",
+            "Para evitar que alguien más investigue el tema"
+          ],
+          "correct": "Para que otros investigadores puedan verificar los resultados independientemente"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: formula una hipótesis verificable con la estructura 'Si X, entonces Y, porque Z', identifica correctamente la variable independiente, la dependiente y al menos 2 variables controladas en un experimento dado, y redacta una conclusión coherente con datos hipotéticos proporcionados, reconociendo si la hipótesis fue apoyada o refutada."
+    },
+    "teacher_tips": [
+      "El experimento de germinación de frijoles es el más accesible y poderoso: es barato, no requiere laboratorio especializado, permite recolección de datos durante varias semanas y conecta con la agricultura mexicana — cultura del frijol como alimento básico.",
+      "Para desarrollar la honestidad científica, comparte un experimento cuyos resultados no apoyaron la hipótesis y explica cómo eso también es valioso — 'un resultado negativo no es un fracaso, es información'. Esto desmitifica la ciencia y reduce la ansiedad al experimentar.",
+      "Introduce la bitácora de ciencias como hábito: un cuaderno donde los estudiantes registran observaciones, preguntas y reflexiones a lo largo del semestre — es la práctica más similar a cómo trabajan los científicos reales y desarrolla el hábito del registro sistemático."
+    ]
+  },
+  "CNEYT-I-P07": {
+    "code": "CNEYT-I-P07",
+    "title": "Ciencia con perspectiva: valoro las aportaciones de mujeres y comunidades históricamente excluidas",
+    "level": "Ciencias Naturales, Experimentales y Tecnología I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Naturaleza de la ciencia",
+    "metadata": {
+      "objective": "El estudiante valorará el papel de las mujeres y los grupos históricamente marginados en el desarrollo científico, analizando casos concretos de científicas mexicanas y de comunidades indígenas que generaron conocimiento.",
+      "competencies": [
+        "Identifica contribuciones científicas de mujeres que han sido ocultadas o minimizadas en la historia oficial",
+        "Analiza las barreras estructurales que históricamente excluyeron a mujeres y comunidades indígenas de la ciencia institucional",
+        "Reconoce aportaciones científicas de comunidades indígenas mexicanas al conocimiento botánico, astronómico y médico",
+        "Reflexiona sobre cómo una ciencia más diversa e inclusiva genera conocimiento más completo",
+        "Valora la igualdad de género e inclusión como condición para el avance científico"
+      ],
+      "materials": [
+        "Fichas biográficas de científicas mexicanas y latinas: Matilde Montoya, Amalia Meza, Julieta Fierro",
+        "Casos de conocimiento indígena con impacto científico (fitomedicina nahua, astronomía maya)",
+        "Documental o fragmento: 'Figuras ocultas' o equivalente en contexto latinoamericano",
+        "Artículos del CONACYT o UNAM sobre mujeres en ciencia en México",
+        "Línea del tiempo de la participación de la mujer en ciencia e instituciones académicas en México"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Cuántas científicas mexicanas conoces?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Casos: ciencia borrada, ciencia recuperada" },
+        { "phase": "Cierre", "duration": "10 min", "label": "¿Qué perdemos cuando excluimos?" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — El inventario del conocimiento previo",
+          "duration": "10 min",
+          "description": "El docente pide al grupo que en 2 minutos escriban todos los nombres de científicos que conozcan. Se comparte en plenaria y el docente registra en el pizarrón — cuántos hombres, cuántas mujeres, cuántos mexicanos o latinoamericanos vs. europeos/norteamericanos. El resultado visible activa la reflexión: ¿refleja eso quiénes realmente hicieron ciencia, o quiénes tuvieron más visibilidad?",
+          "activity": "El docente introduce el concepto de 'efecto Matilda' (nombrado por Margaret Rossiter, historiadora de la ciencia): la tendencia sistemática a ignorar o minimizar las contribuciones científicas de las mujeres, atribuyéndolas frecuentemente a sus colegas hombres. Se citan ejemplos históricos: Rosalind Franklin y el ADN, Lise Meitner y la fisión nuclear. ¿Hay casos similares en México?"
+        },
+        {
+          "title": "FASE II: DESARROLLO — Casos de ciencia recuperada",
+          "duration": "30 min",
+          "description": "Se trabajan dos bloques de casos: 1) Científicas mexicanas y latinas: Matilde Montoya (primera médica titulada de México, 1887), Julieta Fierro (astrofísica, divulgadora y directora del Instituto de Astronomía UNAM), investigadoras del CINVESTAV y del IMSS. 2) Conocimiento científico indígena: fitomedicina nahua y maya (plantas medicinales con propiedades farmacológicas validadas por el IMSS), calendario azteca como sistema astronómico, ingeniería hidráulica de Tenochtitlán, técnicas agrícolas de chinampas.",
+          "activity": "Estudio de caso en grupos: cada grupo recibe la ficha de una científica o de un conocimiento indígena y responde: ¿Qué aportó al conocimiento? ¿Qué barreras enfrentó? ¿Cómo fue reconocida o ignorada en su tiempo? ¿Qué impacto tuvo su trabajo? Se presenta al grupo con el formato: 'presentamos el caso de... que aportó... y enfrentó... y hoy reconocemos que...'"
+        },
+        {
+          "title": "FASE III: CIERRE — Diversidad como fortaleza científica",
+          "duration": "10 min",
+          "description": "El docente cierra con la pregunta: ¿qué perdemos cuando excluimos perspectivas de la ciencia? Se reflexiona colectivamente: las enfermedades de mujeres fueron históricamente poco estudiadas porque los ensayos clínicos se hacían con hombres — esto tuvo consecuencias reales para la salud femenina. La biodiversidad que las comunidades indígenas custodian representa un banco genético invaluable que la biotecnología moderna apenas empieza a valorar.",
+          "activity": "Ticket de salida: escribe el nombre de una persona (mujer, indígena, o de tu comunidad) que consideres que hace o hace ciencia aunque no tenga un título formal — ¿qué conocimiento produce? ¿cómo lo valida? ¿cómo lo transmite? Esta reflexión conecta la ciencia con la comunidad inmediata del estudiante."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La ciencia que conocemos es el resultado de quién tuvo acceso a hacerla. Durante siglos, las mujeres y los pueblos no europeos fueron excluidos de las instituciones científicas por barreras legales, económicas y culturales — no por falta de capacidad o curiosidad. Recuperar sus contribuciones no es un acto de cortesía política: es una corrección necesaria del registro histórico que enriquece nuestra comprensión del conocimiento humano.",
+      "sections": [
+        {
+          "subtitle": "Mujeres en la ciencia mexicana: pioneras y contemporáneas",
+          "content": "México tiene una historia rica de mujeres científicas que frecuentemente no aparece en los libros de texto. Matilde Montoya (1857-1938) fue la primera mujer en obtener un título de médica en México (1887) venciendo la resistencia institucional de la UNAM y logrando que Porfirio Díaz firmara un decreto especial que le permitiera ejercer. Eulalia Guzmán (1890-1985) fue arqueóloga pionera que trabajó en las raíces prehispánicas de México. En el presente, Julieta Fierro Gossman es astrofísica y directora honoraria del Instituto de Astronomía de la UNAM y una de las divulgadoras científicas más reconocidas de América Latina. Según el CONACYT (ahora CONAHCYT), el 47% de los investigadores del Sistema Nacional de Investigadores son mujeres en 2024, aunque siguen subrepresentadas en los niveles más altos (SNI nivel III)."
+        },
+        {
+          "subtitle": "Conocimiento indígena como ciencia: fitomedicina, astronomía y agronomía",
+          "content": "Los pueblos originarios de México acumularon a lo largo de milenios sistemas de conocimiento sofisticados que cumplen los criterios básicos de la ciencia: observación sistemática, verificación por experiencia y transmisión estructurada. La fitomedicina nahua y maya incluye más de 3,000 especies de plantas con usos medicinales documentados — el IMSS tiene un programa de Medicina Tradicional que trabaja en conjunto con curanderos y parteras para validar clínicamente estos conocimientos. El calendario mexica (xiuhpohualli de 365 días y tonalpohualli de 260 días) es el resultado de observaciones astronómicas precisas de Venus, la Luna y el Sol durante siglos. Las chinampas del Valle de México son un sistema agroecológico de alta productividad que investigadores del Colegio de Posgraduados estudian como modelo de agricultura sustentable. Reconocer estos conocimientos como ciencia no los folkloriza — los sitúa en el diálogo de saberes que el MCCEMS promueve."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Qué es el 'efecto Matilda' en la historia de la ciencia?",
+          "options": [
+            "El aumento de mujeres en la ciencia del siglo XX",
+            "La tendencia sistemática a ignorar o minimizar las contribuciones científicas de las mujeres",
+            "Un premio de ciencia para mujeres latinoamericanas",
+            "La exclusión de los hombres de la biología"
+          ],
+          "correct": "La tendencia sistemática a ignorar o minimizar las contribuciones científicas de las mujeres"
+        },
+        {
+          "question": "¿Quién fue la primera mujer en obtener un título de médica en México?",
+          "options": ["Julieta Fierro", "Eulalia Guzmán", "Matilde Montoya", "Rosalind Franklin"],
+          "correct": "Matilde Montoya"
+        },
+        {
+          "question": "¿Por qué el conocimiento fitomédico de los pueblos indígenas mexicanos puede considerarse científico?",
+          "options": [
+            "Porque fue publicado en revistas internacionales",
+            "Porque fue desarrollado por médicos con título universitario",
+            "Porque está basado en observación sistemática y verificación empírica durante siglos",
+            "Porque fue aprobado por la OMS desde el siglo XIX"
+          ],
+          "correct": "Porque está basado en observación sistemática y verificación empírica durante siglos"
+        },
+        {
+          "question": "¿Qué consecuencia real tuvo la exclusión de mujeres en los ensayos clínicos históricos?",
+          "options": [
+            "Los medicamentos resultaron más económicos",
+            "Las enfermedades de mujeres fueron históricamente poco estudiadas y mal tratadas",
+            "Las mujeres desarrollaron inmunidad natural a las enfermedades",
+            "Los ensayos tardaron menos tiempo en completarse"
+          ],
+          "correct": "Las enfermedades de mujeres fueron históricamente poco estudiadas y mal tratadas"
+        },
+        {
+          "question": "Las chinampas del Valle de México son un ejemplo de conocimiento indígena en el área de:",
+          "options": ["Astronomía", "Física cuántica", "Agronomía sustentable", "Química orgánica"],
+          "correct": "Agronomía sustentable"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: nombra y describe las contribuciones de al menos 2 científicas mexicanas o latinas, explica el efecto Matilda con al menos 1 ejemplo concreto, y argumenta por qué incluir más perspectivas diversas en la ciencia genera conocimiento más completo y útil para más personas."
+    },
+    "teacher_tips": [
+      "El ejercicio inicial de 'nombra científicos que conoces' funciona con todos los grupos y siempre genera el mismo resultado revelador — la desproporción entre hombres y mujeres, entre europeos y mexicanos, es inmediatamente visible y no requiere persuasión del docente.",
+      "Para grupos con resistencia al tema de género, enmarca la discusión desde la eficiencia: excluir el 50% del talento humano de la ciencia es desperdiciar potencial — la diversidad no es solo justicia, es ventaja competitiva cognitiva, y hay investigación científica que lo sustenta.",
+      "Busca investigadoras del CONAHCYT o de la universidad local para una videocharla de 15 minutos: ver a una científica real de su comunidad o región tiene un impacto mucho mayor que leer una ficha biográfica histórica."
+    ]
+  },
+  "CNEYT-I-P08": {
+    "code": "CNEYT-I-P08",
+    "title": "Materia y ambiente: relaciono las transformaciones de la materia con problemas ambientales locales y globales",
+    "level": "Ciencias Naturales, Experimentales y Tecnología I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Ciencia y sociedad",
+    "metadata": {
+      "objective": "El estudiante relacionará los conceptos de materia y sus transformaciones con problemas ambientales locales y globales, analizando el impacto de la contaminación y explorando alternativas sustentables desde la perspectiva de las ciencias.",
+      "competencies": [
+        "Explica cómo las transformaciones de la materia (físicas y químicas) contribuyen a la contaminación ambiental",
+        "Identifica tipos de contaminantes (sólidos, líquidos, gaseosos) y sus efectos sobre ecosistemas locales",
+        "Analiza datos sobre contaminación ambiental en México (ZMVM, ríos Lerma, Atoyac)",
+        "Relaciona el cambio climático con transformaciones químicas a escala global (efecto invernadero)",
+        "Propone al menos 2 acciones de sustentabilidad fundamentadas en propiedades y transformaciones de la materia"
+      ],
+      "materials": [
+        "Datos del INECC y SEMARNAT sobre calidad del aire en la ZMVM",
+        "Mapa de ríos contaminados en México (Lerma, Atoyac, Tula)",
+        "Noticias recientes de contaminación ambiental en México",
+        "Materiales para experimento de acidez del agua (papel tornasol o pH digital)",
+        "Infografías sobre el ciclo del carbono y el efecto invernadero"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "La contaminación es química transformada" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Transformaciones de la materia y ambiente" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Propuestas sustentables desde la ciencia" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — La química de la contaminación",
+          "duration": "10 min",
+          "description": "El docente muestra la imagen satelital de una contingencia ambiental en la ZMVM y pregunta: ¿qué tiene que ver la química con lo que ven en esta imagen? Se introduce la idea de que la contaminación no es magia — es química: transformaciones de la materia que producen sustancias que el ambiente no puede procesar a la velocidad que las generamos. ¿Qué reacciones químicas producen el smog de CDMX?",
+          "activity": "Diagnóstico de la percepción ambiental: cada estudiante responde anónimamente: ¿Cuál es el problema ambiental más grave de su comunidad? Los resultados se tabulan en clase y sirven de punto de partida para conectar la ciencia con el contexto local real del grupo."
+        },
+        {
+          "title": "FASE II: DESARROLLO — Materia, transformación y ambiente",
+          "duration": "30 min",
+          "description": "Se trabajan tres niveles: 1) Local: contaminación del agua en ríos mexicanos. Los ríos Lerma y Atoyac son los más contaminados del país — ¿qué sustancias los contaminan? Metales pesados (plomo, mercurio), plásticos, agroquímicos. Medición de pH del agua local. 2) Nacional/regional: calidad del aire en la ZMVM. El CO y el ozono troposférico son productos de transformaciones químicas de la combustión. 3) Global: cambio climático. El CO₂ (producto de la combustión de carbono) es el principal gas de efecto invernadero. Ciclo del carbono: cómo las transformaciones de la materia a escala global afectan el clima.",
+          "activity": "Análisis de datos: en grupos, los estudiantes analizan una gráfica real del INECC sobre calidad del aire en la ZMVM (índice IMECA) o datos del SEMARNAT sobre contaminación de un río mexicano. Responden: ¿cuándo es peor la contaminación? ¿qué factores se relacionan con los picos? ¿qué transformaciones químicas están detrás? Presentan sus conclusiones al grupo."
+        },
+        {
+          "title": "FASE III: CIERRE — Ciencia para la sustentabilidad",
+          "duration": "10 min",
+          "description": "El docente enfatiza que la misma ciencia que explica los problemas ambientales también proporciona las herramientas para resolverlos. Se presentan brevemente: energías renovables (transformaciones físicas del sol y viento en electricidad), materiales biodegradables (transformaciones químicas diseñadas para ser compatibles con el ambiente), tratamiento de aguas residuales (filtración + reacciones químicas de descontaminación).",
+          "activity": "Compromiso de acción: cada estudiante propone 2 acciones concretas y fundamentadas en ciencia que puede tomar en su vida cotidiana para reducir su impacto ambiental. La condición: deben justificar la acción con un principio químico aprendido en la progresión (ej: 'compostar residuos orgánicos aprovecha la transformación química de la materia orgánica en nutrientes por acción microbiana')."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La crisis ambiental global es, en su núcleo, una crisis de transformaciones de la materia que superan la capacidad de autorregulación de los ecosistemas. Comprender la química detrás de la contaminación y el cambio climático es el primer paso para diseñar soluciones informadas — no como víctimas del problema, sino como ciudadanos científicamente capacitados para actuar.",
+      "sections": [
+        {
+          "subtitle": "Contaminación: transformaciones de la materia en el ambiente",
+          "content": "La contaminación ocurre cuando sustancias — naturales o artificiales — se introducen en el ambiente en cantidades o velocidades que superan la capacidad de los ecosistemas para procesarlas. Contaminación del agua: metales pesados (plomo, mercurio, cadmio) se acumulan en sedimentos y organismos acuáticos — el río Atoyac en Puebla y Tlaxcala recibe descargas industriales de plomo y cromo que rebasan los límites de la NOM-001-SEMARNAT. Contaminación del aire: la combustión de hidrocarburos (gasolina, diésel) produce CO, CO₂, NOx y partículas suspendidas PM2.5 — en la ZMVM, las verificaciones vehiculares y los programas 'Hoy no circula' son respuestas regulatorias a estos contaminantes. Contaminación por plásticos: el PET y el poliestireno son polímeros sintéticos que no se degradan en escalas de tiempo humanas — se fragmentan en microplásticos que ya se detectan en agua potable, organismos marinos y aire."
+        },
+        {
+          "subtitle": "Cambio climático y ciclo del carbono: química a escala planetaria",
+          "content": "El efecto invernadero es un proceso natural y necesario: ciertos gases atmosféricos (CO₂, CH₄, vapor de agua, N₂O) atrapan parte de la radiación infrarroja que emite la Tierra, manteniendo la temperatura promedio en ~15°C. Sin efecto invernadero, la temperatura promedio sería de -18°C y la vida como la conocemos sería imposible. El problema actual es el efecto invernadero intensificado por actividades humanas: desde la Revolución Industrial, la combustión de carbón, petróleo y gas natural ha liberado a la atmósfera CO₂ que estaba almacenado en sedimentos durante millones de años. La concentración de CO₂ pasó de ~280 ppm preindustrial a 423 ppm en 2024 — el nivel más alto en 3 millones de años. México es vulnerable: el cambio climático intensifica huracanes en el Golfo y el Pacífico (el huracán Otis en Acapulco, 2023, es un ejemplo reciente), prolonga sequías en el norte y pone en riesgo la producción de maíz, cultivo fundamental de la identidad y la seguridad alimentaria mexicana."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál es la principal causa química de la contaminación del aire en la ZMVM?",
+          "options": [
+            "La evaporación del agua de los lagos",
+            "La combustión de hidrocarburos en vehículos e industria",
+            "La fotosíntesis de las plantas en el Bosque de Chapultepec",
+            "La condensación del vapor de agua en las nubes"
+          ],
+          "correct": "La combustión de hidrocarburos en vehículos e industria"
+        },
+        {
+          "question": "¿Por qué los plásticos son contaminantes ambientales persistentes?",
+          "options": [
+            "Porque son tóxicos para los animales que los comen",
+            "Porque son polímeros sintéticos que no se degradan en escalas de tiempo humanas",
+            "Porque pesan demasiado para flotar en el agua",
+            "Porque producen CO₂ cuando se queman"
+          ],
+          "correct": "Porque son polímeros sintéticos que no se degradan en escalas de tiempo humanas"
+        },
+        {
+          "question": "¿Cuál es el principal gas de efecto invernadero producido por actividad humana?",
+          "options": ["O₂ (oxígeno)", "H₂O (vapor de agua natural)", "CO₂ (dióxido de carbono)", "N₂ (nitrógeno)"],
+          "correct": "CO₂ (dióxido de carbono)"
+        },
+        {
+          "question": "¿Qué proceso de separación podría usarse para eliminar partículas sólidas del agua contaminada?",
+          "options": ["Destilación", "Sublimación", "Filtración", "Evaporación"],
+          "correct": "Filtración"
+        },
+        {
+          "question": "El huracán Otis en Acapulco (2023) es un ejemplo de cómo el cambio climático afecta a México porque:",
+          "options": [
+            "El CO₂ hace más pesada la atmósfera",
+            "Los océanos más cálidos generan huracanes más intensos y rápidos",
+            "El calentamiento global reduce la presión atmosférica en el Pacífico",
+            "Los glaciares derretidos generan más lluvia en el Pacífico"
+          ],
+          "correct": "Los océanos más cálidos generan huracanes más intensos y rápidos"
+        }
+      ],
+      "rubric": "El estudiante logra el propósito cuando: explica con terminología química correcta al menos 2 procesos de contaminación ambiental local o nacional, relaciona el efecto invernadero con transformaciones químicas a escala global, y propone al menos 2 acciones de sustentabilidad justificadas con principios científicos aprendidos en el semestre."
+    },
+    "teacher_tips": [
+      "Usa datos del INECC y SEMARNAT actualizados: son gratuitos, en español y permiten analizar la situación real de la ZMVM o del estado donde está el plantel — conectar la ciencia con datos locales reales es la forma más poderosa de mostrar su relevancia.",
+      "Para el ejercicio del pH del agua, el papel tornasol es económico y suficientemente preciso para el nivel bachillerato — mide el pH del agua del grifo, agua purificada, refresco y agua de lluvia, y compara resultados. Los estudiantes quedan sorprendidos por las diferencias.",
+      "El huracán Otis es un punto de entrada emotivo y reciente para hablar de cambio climático en México — usarlo con sensibilidad (puede haber estudiantes afectados directamente) pero también con firmeza: la ciencia climática predijo que los huracanes se intensificarían, y Otis fue la confirmación más dramática de esa predicción en el Pacífico mexicano."
+    ]
+  }
+}

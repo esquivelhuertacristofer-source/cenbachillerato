@@ -1,0 +1,719 @@
+{
+  "PM-I-P01": {
+    "code": "PM-I-P01",
+    "title": "Las matemáticas como construcción humana: historia y cultura",
+    "level": "Pensamiento Matemático I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Pensamiento matemático como práctica social",
+    "metadata": {
+      "objective": "Reconocer las matemáticas como construcción humana con historia, diversidad cultural y vinculación con la vida cotidiana, comprendiendo que el conocimiento matemático surge de necesidades concretas de diferentes culturas.",
+      "competencies": [
+        "Pensamiento histórico-matemático",
+        "Interculturalidad crítica",
+        "Reflexión sobre el conocimiento"
+      ],
+      "materials": [
+        "Línea del tiempo de las matemáticas (Babilonia → México prehispánico → Actualidad)",
+        "Tarjetas con numerales mayas, romanos y árabes",
+        "Video: Contribuciones matemáticas mesoamericanas (UNAM-TV)"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Quién inventó los números?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Matemáticas que nos rodean" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Reflexión intercultural" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA Y ENGANCHE",
+          "duration": "10 min",
+          "description": "¿Sabías que los mayas desarrollaron el concepto del cero independientemente de Europa, siglos antes? ¿O que el sistema de quipus inca permitía contabilizar poblaciones enteras sin papel? Las matemáticas no nacieron en un solo lugar: son una construcción colectiva de la humanidad.",
+          "activity": "Dinámica inicial: muestra en el pizarrón el numeral maya del año actual (2025 = ?) y pide a los alumnos que intenten descifrarlo sin explicación previa. Genera curiosidad antes de dar contexto."
+        },
+        {
+          "title": "FASE II: DESARROLLO Y EXPLORACIÓN",
+          "duration": "30 min",
+          "description": "Recorrido histórico-cultural por el desarrollo del pensamiento matemático: 1. Los sistemas numéricos mesoamericanos (maya vigesimal, sistema posicional con cero). 2. Las matemáticas en la vida cotidiana de México: calendarios, arquitectura prehispánica, mercados. 3. De Euclides a Euler: cómo viajó el conocimiento matemático por culturas. 4. Las matemáticas modernas y México: aportaciones de matemáticos mexicanos como José Ádem Chaín (topología algebraica).",
+          "activity": "Actividad en equipos: Cada equipo recibe una ficha con un sistema numérico diferente (maya, babilónico, romano, árabe, chino). Deben calcular '365 días en su sistema' y presentar. Reflexión: ¿por qué unos sistemas son más eficientes?"
+        },
+        {
+          "title": "FASE III: CIERRE Y METACOGNICIÓN",
+          "duration": "10 min",
+          "description": "Las matemáticas que estudias hoy son el resultado de miles de años de pensamiento colectivo de diversas culturas. El número cero que usas a diario tiene origen mesoamericano. Comprender esto transforma la manera en que te relacionas con el conocimiento matemático.",
+          "activity": "Cada alumno escribe en un post-it: 'Algo que aprendí hoy sobre las matemáticas que no sabía' y una pregunta que le generó la clase. Se comparten en círculo."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Las matemáticas son una de las manifestaciones más profundas del pensamiento humano: una práctica social, histórica y colectiva que diferentes culturas han desarrollado para responder a necesidades concretas de contar, medir, construir, predecir y comunicar. Comprender este carácter histórico y cultural no es un adorno pedagógico sino una condición para desarrollar un pensamiento matemático crítico y contextualizado, especialmente relevante en el bachillerato mexicano donde conviven múltiples herencias culturales.",
+      "sections": [
+        {
+          "subtitle": "Sistemas numéricos y diversidad cultural",
+          "content": "La humanidad ha desarrollado sistemas numéricos radicalmente diferentes. El sistema maya era vigesimal (base 20) y poseía un símbolo para el cero (la concha) siglos antes que Europa. El sistema babilónico era sexagesimal (base 60), herencia que perdura en nuestra medición del tiempo (60 segundos, 60 minutos). El sistema árabe (en realidad hindú-árabe) que usamos hoy llegó a Europa en el siglo XII a través del matemático Fibonacci. El sistema romano, sin cero y sin posicionalidad, dificultaba enormemente los cálculos complejos. Esta diversidad muestra que los sistemas matemáticos son construcciones culturales adaptadas a necesidades y contextos específicos, no verdades universales caídas del cielo."
+        },
+        {
+          "subtitle": "Matemáticas y vida cotidiana en México",
+          "content": "En México, las matemáticas están presentes en múltiples prácticas culturales: el calendario azteca de 365 días (Xiuhpōhualli) y el ritual de 260 días (Tōnalpōhualli) requerían cálculos astronómicos sofisticados; la arquitectura de Teotihuacán incorpora razones geométricas precisas relacionadas con el cosmos; los sistemas de pesas y medidas en los tianguis prehispánicos (el cacao como moneda contable) eran sistemas matemáticos aplicados. En la actualidad, albañiles, cocineros, comerciantes y artesanos mexicanos aplican razonamiento matemático sin necesariamente usar fórmulas explícitas. El MCCEMS 2025 enfatiza reconocer estas 'matemáticas del pueblo' como conocimiento legítimo."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál cultura mesoamericana desarrolló independientemente el concepto del cero?",
+          "options": ["Los aztecas", "Los mayas", "Los toltecas", "Los zapotecas"],
+          "correct": "Los mayas"
+        },
+        {
+          "question": "¿Por qué decimos que las matemáticas son una 'construcción humana'?",
+          "options": [
+            "Porque solo las inventaron los humanos europeos",
+            "Porque surgieron de necesidades concretas de diversas culturas a lo largo de la historia",
+            "Porque no tienen aplicación en la naturaleza",
+            "Porque solo existen en los libros de texto"
+          ],
+          "correct": "Porque surgieron de necesidades concretas de diversas culturas a lo largo de la historia"
+        },
+        {
+          "question": "¿Qué base numérica usaba el sistema maya?",
+          "options": ["Base 10", "Base 12", "Base 20", "Base 60"],
+          "correct": "Base 20"
+        },
+        {
+          "question": "¿Por qué el sistema romano era menos eficiente que el árabe para cálculos complejos?",
+          "options": [
+            "Porque usaba letras en lugar de números",
+            "Porque carecía de cero y de posicionalidad",
+            "Porque solo llegaba hasta el número 100",
+            "Porque era demasiado complicado de aprender"
+          ],
+          "correct": "Porque carecía de cero y de posicionalidad"
+        },
+        {
+          "question": "¿Cuál es la herencia del sistema sexagesimal babilónico en nuestra vida cotidiana?",
+          "options": [
+            "El sistema decimal moderno",
+            "La medición del tiempo en 60 segundos y 60 minutos",
+            "El calendario gregoriano",
+            "El sistema métrico decimal"
+          ],
+          "correct": "La medición del tiempo en 60 segundos y 60 minutos"
+        }
+      ],
+      "rubric": "El alumno identifica al menos dos culturas que contribuyeron al desarrollo de las matemáticas, explica el concepto de posicionalidad y cero, y relaciona las matemáticas con prácticas cotidianas de su contexto cultural."
+    },
+    "teacher_tips": [
+      "Evita presentar la historia de las matemáticas como un progreso lineal de 'bárbaros a civilizados'. Todas las culturas desarrollaron sistemas matemáticos sofisticados acordes a sus necesidades.",
+      "Si hay alumnos de comunidades indígenas en el grupo, invítalos a compartir prácticas matemáticas de sus comunidades (tejer, cocinar, construir). Esto valida su identidad cultural.",
+      "El video de contribuciones mayas disponible en el canal de UNAM-TV es excelente para arrancar la discusión con material audiovisual de calidad institucional."
+    ]
+  },
+  "PM-I-P02": {
+    "code": "PM-I-P02",
+    "title": "Operaciones con números naturales, enteros y racionales en contextos reales",
+    "level": "Pensamiento Matemático I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Aritmética",
+    "metadata": {
+      "objective": "Aplicar operaciones con números naturales, enteros y racionales en situaciones problemáticas concretas del entorno mexicano, comprendiendo las propiedades de cada conjunto numérico.",
+      "competencies": [
+        "Pensamiento aritmético",
+        "Resolución de problemas contextualizados",
+        "Conexión matemáticas-vida cotidiana"
+      ],
+      "materials": [
+        "Notas de precios del mercado local (el docente trae notas reales o simula un mercado)",
+        "Calculadora (verificación únicamente)",
+        "Hojas de ejercicios con situaciones del contexto mexicano"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "El mercado de la colonia" },
+        { "phase": "Desarrollo", "duration": "35 min", "label": "Números que sirven para todo" },
+        { "phase": "Cierre", "duration": "10 min", "label": "¿Cuándo uso cada conjunto?" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA Y CONTEXTUALIZACIÓN",
+          "duration": "10 min",
+          "description": "Escenario: Tu familia va al mercado con $200. Compran jitomates ($18.50/kg, 1.5 kg), tortillas ($22 el kg, 2 kg), frijoles ($35/kg, 0.75 kg) y un litro de leche ($24). ¿Cuánto gastan? ¿Cuánto les sobra? ¿Podrían comprar también un aguacate a $15? Este escenario usa naturales, racionales y requiere operaciones combinadas.",
+          "activity": "En parejas, los alumnos resuelven el problema del mercado sin restricciones metodológicas. Comparten sus estrategias (mentalmente, algoritmo escrito, estimación)."
+        },
+        {
+          "title": "FASE II: DESARROLLO SISTEMÁTICO",
+          "duration": "35 min",
+          "description": "Organización del contenido en tres momentos: (1) Números naturales y enteros: operaciones, propiedades (conmutativa, asociativa, distributiva), números negativos en contexto (temperaturas en el norte de México, deudas, pisos bajo tierra). (2) Racionales: fracciones y decimales como formas de expresar partes — conversión entre formas, operaciones, jerarquía de operaciones. (3) Problemas integrados: situaciones que combinan los tres conjuntos con contexto mexicano (salarios mínimos, gasto familiar, precios de mercado).",
+          "activity": "Banco de problemas contextualizados: temperatura en Chihuahua en invierno (-8°C a +22°C = diferencia), descuento del 15% en una tienda departamental, división de herencia en fracciones. Cada equipo resuelve 3 problemas y explica su proceso."
+        },
+        {
+          "title": "FASE III: CIERRE Y SÍNTESIS",
+          "duration": "10 min",
+          "description": "Síntesis visual: los tres conjuntos numéricos son herramientas, no fines en sí mismos. Los naturales para contar, los enteros para opuestos y comparaciones, los racionales para partes y precisión. El MCCEMS 2025 enfatiza que los alumnos comprendan CUÁNDO y POR QUÉ usar cada herramienta.",
+          "activity": "Mapa mental colectivo en el pizarrón: ¿En qué situaciones de mi vida uso números naturales? ¿Enteros? ¿Racionales? Los alumnos aportan ejemplos de su contexto."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Los conjuntos numéricos no son una jerarquía abstracta de la matemática pura: son herramientas desarrolladas históricamente para resolver necesidades concretas. Los números naturales surgieron para contar; los negativos para representar deudas y oposiciones; los racionales para medir con precisión. Comprender las propiedades de cada conjunto permite a los estudiantes seleccionar la herramienta adecuada para cada situación, desarrollando un pensamiento aritmético flexible y eficiente.",
+      "sections": [
+        {
+          "subtitle": "Números naturales y enteros: propiedades y operaciones",
+          "content": "Los números naturales (ℕ = {0, 1, 2, 3, …}) son el conjunto más intuitivo para contar elementos discretos. Los números enteros (ℤ = {…, -2, -1, 0, 1, 2, …}) amplían los naturales para incluir opuestos, esenciales para representar deudas, temperaturas bajo cero, altitudes negativas o movimientos en sentidos opuestos. Las propiedades fundamentales de las operaciones — conmutativa (a+b = b+a), asociativa ((a+b)+c = a+(b+c)) y distributiva (a(b+c) = ab+ac) — son instrumentos de pensamiento, no reglas que memorizar. La jerarquía de operaciones (PEMDAS/BODMAS) garantiza que las expresiones matemáticas tengan un único valor sin ambigüedad."
+        },
+        {
+          "subtitle": "Números racionales: fracciones, decimales y porcentajes",
+          "content": "Los números racionales (ℚ) son aquellos que se expresan como cociente de dos enteros (p/q, q≠0). Incluyen las fracciones propias e impropias, los números mixtos, los decimales finitos (como 0.5 = 1/2) y los periódicos (como 0.333… = 1/3). En la vida cotidiana mexicana, los racionales son omnipresentes: recetas de cocina con medidas en fracciones (¾ de taza), precios con decimales, descuentos y propinas en porcentajes, tasas de interés bancario. La conversión fluida entre formas (fracción ↔ decimal ↔ porcentaje) es una habilidad esencial para la vida financiera y ciudadana. El INEGI reporta sus estadísticas con decimales y porcentajes; comprender estas representaciones es educación cívica aplicada."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "En Chihuahua la temperatura bajó de 3°C a -8°C. ¿Cuántos grados descendió la temperatura?",
+          "options": ["5°C", "11°C", "3°C", "8°C"],
+          "correct": "11°C"
+        },
+        {
+          "question": "¿Cuál es el resultado de 3/4 + 1/3?",
+          "options": ["4/7", "13/12", "4/12", "1/12"],
+          "correct": "13/12"
+        },
+        {
+          "question": "Un artículo cuesta $350 y tiene un descuento del 20%. ¿Cuánto pagas?",
+          "options": ["$280", "$330", "$70", "$300"],
+          "correct": "$280"
+        },
+        {
+          "question": "¿Cuál propiedad se aplica en: 3×(4+5) = 3×4 + 3×5?",
+          "options": ["Conmutativa", "Asociativa", "Distributiva", "Transitiva"],
+          "correct": "Distributiva"
+        },
+        {
+          "question": "¿En qué conjunto numérico se encuentra el -7?",
+          "options": ["Solo en los naturales", "Solo en los racionales", "En los enteros y los racionales", "En ningún conjunto"],
+          "correct": "En los enteros y los racionales"
+        }
+      ],
+      "rubric": "El alumno resuelve correctamente operaciones mixtas con los tres conjuntos numéricos en al menos 4 de 5 problemas contextualizados, identifica las propiedades aplicadas y justifica la elección del conjunto numérico adecuado para cada situación."
+    },
+    "teacher_tips": [
+      "Los errores más comunes en fracciones son la suma de denominadores distintos (1/2 + 1/3 = 2/5, incorrecto). Diseña un ejercicio específico para diagnosticar y corregir esta confusión antes de avanzar.",
+      "Usa precios reales del mercado de la comunidad para los problemas. Los alumnos se involucran mucho más cuando los números tienen sentido contextual. Pide a los alumnos que traigan recibos o notas de tiendas.",
+      "El porcentaje es el puente entre aritmética y vida financiera. Conecta esta progresión con el concepto de IVA, propinas y descuentos que los alumnos ya conocen de la vida real."
+    ]
+  },
+  "PM-I-P03": {
+    "code": "PM-I-P03",
+    "title": "Razonamiento lógico: proposiciones, conectivos y tablas de verdad",
+    "level": "Pensamiento Matemático I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Lógica matemática",
+    "metadata": {
+      "objective": "Utilizar el razonamiento lógico mediante proposiciones, conectivos y tablas de verdad para analizar enunciados y argumentos de la vida cotidiana y científica, desarrollando pensamiento crítico formal.",
+      "competencies": [
+        "Pensamiento lógico-formal",
+        "Argumentación rigurosa",
+        "Análisis de enunciados complejos"
+      ],
+      "materials": [
+        "Tarjetas con afirmaciones verdaderas/falsas del contexto escolar",
+        "Hojas de trabajo para tablas de verdad",
+        "Ejemplos de noticias con falacias lógicas (fuente: medios confiables)"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Puedo demostrar que esto es mentira?" },
+        { "phase": "Desarrollo", "duration": "35 min", "label": "La lógica como herramienta" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Lógica en la vida real" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — EL VALOR DE LA VERDAD",
+          "duration": "10 min",
+          "description": "¿Cómo saber si un enunciado es verdadero o falso? ¿Qué hace que 'Todos los perros son animales Y todos los animales tienen cuatro patas' sea una afirmación problemática? La lógica matemática nos da herramientas formales para analizar argumentos sin ambigüedad. Esto es fundamental para no ser engañados por falacias en publicidad, política y redes sociales.",
+          "activity": "Lectura rápida de 3 titulares de noticias (reales o inventados). Los alumnos votan: ¿verdadero o falso? Luego discuten: ¿cómo lo saben? Introduce la necesidad de criterios formales."
+        },
+        {
+          "title": "FASE II: DESARROLLO — PROPOSICIONES Y CONECTIVOS",
+          "duration": "35 min",
+          "description": "Contenido estructurado: (1) Proposición: enunciado declarativo con valor de verdad definido (V o F). Ejemplos de contexto mexicano: 'El IMSS es una institución pública de salud' (V), 'La CDMX es la ciudad más poblada del mundo' (F). (2) Conectivos lógicos: negación (¬), conjunción (∧), disyunción (∨), condicional (→), bicondicional (↔). (3) Construcción de tablas de verdad para proposiciones compuestas. (4) Leyes de De Morgan: ¬(p∧q) = ¬p∨¬q y su aplicación en circuitos y programación.",
+          "activity": "Taller de análisis: Los alumnos reciben 5 enunciados compuestos y deben: (a) identificar las proposiciones simples, (b) identificar los conectivos, (c) construir la tabla de verdad, (d) determinar si el enunciado es una tautología, contradicción o contingencia."
+        },
+        {
+          "title": "FASE III: CIERRE — LÓGICA Y CIUDADANÍA",
+          "duration": "10 min",
+          "description": "El pensamiento lógico formal no es solo matemática abstracta: es la base del pensamiento científico, jurídico y ciudadano. Los contratos tienen forma lógica condicional ('Si incumples el contrato, entonces...'). Las leyes tienen forma bicondicional. Detectar falacias lógicas en discursos políticos o publicitarios es una competencia ciudadana fundamental.",
+          "activity": "Debate express: El docente presenta una falacia lógica clásica ('Todos los políticos mienten. Juan es político. Luego Juan miente.'). Los alumnos identifican el error lógico y proponen cómo reformular correctamente."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La lógica matemática es el estudio formal del razonamiento válido. A diferencia de la lógica informal (sentido común), la lógica proposicional establece reglas precisas para determinar cuándo un argumento es válido independientemente de si su contenido es verdadero. Esta distinción entre validez y verdad es fundamental: un argumento puede ser válido (con forma lógica correcta) pero tener premisas falsas. El dominio de la lógica proposicional desarrolla la capacidad de analizar críticamente cualquier tipo de discurso, una competencia urgente en la era de la información.",
+      "sections": [
+        {
+          "subtitle": "Proposiciones y conectivos lógicos",
+          "content": "Una proposición es un enunciado declarativo que tiene exactamente un valor de verdad: verdadero (V) o falso (F), sin ambigüedad posible. 'México limita al norte con Estados Unidos' es una proposición (V). '¿Cómo estás?' no es una proposición (es una pregunta). 'Esta afirmación es falsa' tampoco (paradoja). Los conectivos lógicos permiten combinar proposiciones simples en compuestas: la negación (¬p) invierte el valor; la conjunción (p∧q) es verdadera solo cuando ambas son verdaderas; la disyunción (p∨q) es falsa solo cuando ambas son falsas; el condicional (p→q) es falso solo cuando p es verdadera y q es falsa; el bicondicional (p↔q) es verdadero cuando ambas tienen el mismo valor de verdad. Las tablas de verdad sistematizaron el análisis de proposiciones compuestas."
+        },
+        {
+          "subtitle": "Tautologías, contradicciones y contingencias",
+          "content": "Una vez construida la tabla de verdad de una proposición compuesta, podemos clasificarla: (1) Tautología: verdadera para todos los valores posibles de sus variables (e.g., p∨¬p — 'llueve o no llueve'). Las tautologías son leyes lógicas universales. (2) Contradicción: falsa para todos los valores posibles (e.g., p∧¬p — 'llueve y no llueve al mismo tiempo'). Las contradicciones revelan inconsistencias en un argumento. (3) Contingencia: puede ser verdadera o falsa según los valores de sus variables. La mayoría de las proposiciones reales son contingentes. Las Leyes de De Morgan (¬(p∧q) ≡ ¬p∨¬q y ¬(p∨q) ≡ ¬p∧¬q) son herramientas esenciales para simplificar expresiones lógicas y tienen aplicación directa en programación y diseño de circuitos digitales."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál de los siguientes enunciados es una proposición lógica?",
+          "options": [
+            "¿Cuántos estudiantes hay en el grupo?",
+            "La UNAM es la universidad más grande de México",
+            "¡Qué interesante es la lógica!",
+            "Estudia más"
+          ],
+          "correct": "La UNAM es la universidad más grande de México"
+        },
+        {
+          "question": "Si p = V y q = F, ¿cuál es el valor de p → q?",
+          "options": ["Verdadero", "Falso", "Indeterminado", "Depende del contexto"],
+          "correct": "Falso"
+        },
+        {
+          "question": "¿Qué ley lógica expresa: ¬(p∧q) = ¬p∨¬q?",
+          "options": [
+            "Ley conmutativa",
+            "Primera ley de De Morgan",
+            "Ley del tercio excluido",
+            "Ley distributiva"
+          ],
+          "correct": "Primera ley de De Morgan"
+        },
+        {
+          "question": "Una tautología es una proposición que...",
+          "options": [
+            "Siempre es falsa",
+            "Siempre es verdadera independientemente de los valores de sus variables",
+            "A veces es verdadera y a veces falsa",
+            "Solo es verdadera en un contexto específico"
+          ],
+          "correct": "Siempre es verdadera independientemente de los valores de sus variables"
+        },
+        {
+          "question": "¿Cuál es el valor de verdad de p∨¬p para cualquier valor de p?",
+          "options": ["Siempre falso", "Siempre verdadero", "Depende de p", "Indeterminado"],
+          "correct": "Siempre verdadero"
+        }
+      ],
+      "rubric": "El alumno construye correctamente al menos 3 tablas de verdad con proposiciones compuestas, clasifica las proposiciones (tautología/contradicción/contingencia) y aplica correctamente las Leyes de De Morgan en al menos un ejercicio."
+    },
+    "teacher_tips": [
+      "Conecta la lógica proposicional con el análisis de noticias falsas (fake news). Los alumnos de bachillerato están constantemente expuestos a falacias en redes sociales; identificarlas con herramientas lógicas formales es una aplicación inmediata y motivadora.",
+      "El error más frecuente es confundir el condicional: muchos alumnos creen que si p→q es verdadero, entonces q→p también lo es. Diseña ejemplos contraintuitivos: 'Si llueve, el suelo está mojado' ≠ 'Si el suelo está mojado, entonces llueve'.",
+      "Las tablas de verdad se vuelven tediosas con más de 3 variables (8+ filas). Limita los ejercicios de práctica a 2 variables y reserva las de 3 para el reto opcional."
+    ]
+  },
+  "PM-I-P04": {
+    "code": "PM-I-P04",
+    "title": "Fracciones, decimales y porcentajes en contextos de medición y economía",
+    "level": "Pensamiento Matemático I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Aritmética",
+    "metadata": {
+      "objective": "Operar con fracciones, decimales y porcentajes en contextos de medición, economía doméstica y ciencias, convirtiendo fluidamente entre representaciones y resolviendo problemas del entorno cotidiano mexicano.",
+      "competencies": [
+        "Pensamiento aritmético aplicado",
+        "Educación financiera básica",
+        "Conexión matemáticas-ciencias"
+      ],
+      "materials": [
+        "Recibos de luz o agua (el docente trae o los alumnos traen de casa)",
+        "Artículos de periódico con estadísticas del INEGI en porcentajes",
+        "Regla y recipientes graduados para medición práctica"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Qué tanto es el 15%?" },
+        { "phase": "Desarrollo", "duration": "35 min", "label": "Fracciones, decimales y porcentajes" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Conversión y aplicación" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — EL MUNDO EN PARTES",
+          "duration": "10 min",
+          "description": "Análisis de un recibo de CFE: la tarifa eléctrica tiene varios cargos en diferentes formas (cargo fijo en pesos, cargo por energía en centavos por kWh, subsidio en porcentaje, IVA del 16%). Para entender tu recibo, necesitas dominar fracciones, decimales y porcentajes. Esta es matemática que te afecta directamente.",
+          "activity": "El docente muestra un recibo real (con datos privados cubiertos) o simula uno. Los alumnos identifican: ¿cuántos números son fracciones? ¿cuántos decimales? ¿cuántos porcentajes? ¿cuánto es el IVA sobre el total?"
+        },
+        {
+          "title": "FASE II: DESARROLLO INTEGRADO",
+          "duration": "35 min",
+          "description": "Tres bloques de 10 minutos más síntesis: BLOQUE 1 — Fracciones: operaciones con denominadores distintos, simplificación, fracciones equivalentes. BLOQUE 2 — Decimales: operaciones, notación científica básica, decimales periódicos como fracciones. BLOQUE 3 — Porcentajes: cálculo de porcentaje de una cantidad, calcular la cantidad dado el porcentaje, calcular el porcentaje que representa una cantidad. SÍNTESIS — El triángulo de conversiones: fracción ↔ decimal ↔ porcentaje con ejemplos de la vida real.",
+          "activity": "Estación de trabajo: 3 estaciones físicas en el aula. E1: resolver 4 problemas con fracciones (receta de cocina). E2: resolver 4 problemas con decimales (medición científica). E3: resolver 4 problemas con porcentajes (descuentos y estadísticas del INEGI). Rotación cada 10 minutos."
+        },
+        {
+          "title": "FASE III: CIERRE — FLUIDEZ DE CONVERSIÓN",
+          "duration": "10 min",
+          "description": "El dominio real de fracciones, decimales y porcentajes no es memorizar algoritmos: es tener fluidez de conversión según el contexto. Un científico prefiere decimales para cálculos; un banquero prefiere porcentajes para tasas de interés; un cocinero prefiere fracciones para proporciones.",
+          "activity": "Reto rápido: el docente dice un número en una forma (ej: 3/8) y los alumnos deben dar el equivalente decimal y porcentual en menos de 30 segundos. Trabajo en parejas para mayor participación."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Las fracciones, los decimales y los porcentajes son tres representaciones del mismo concepto matemático: partes de un todo o razones entre cantidades. Cada representación tiene ventajas en contextos específicos: las fracciones preservan la exactitud de la relación, los decimales facilitan las operaciones algorítmicas y la comparación, y los porcentajes permiten comparar proporciones de manera intuitiva. La fluidez para convertir entre estas representaciones es una habilidad matemática fundamental con aplicaciones inmediatas en la vida económica, científica y ciudadana.",
+      "sections": [
+        {
+          "subtitle": "Fracciones: operaciones y equivalencias",
+          "content": "Una fracción p/q representa la división de p unidades entre q partes iguales, o la parte p de un todo dividido en q partes iguales. Las operaciones con fracciones de diferentes denominadores requieren encontrar el mínimo común múltiplo (MCM) del denominador. La simplificación de fracciones aplica el máximo común divisor (MCD). Las fracciones impropias (p>q) pueden convertirse en números mixtos. En el contexto MCCEMS, las fracciones aparecen en mediciones de laboratorio (CNEYT-I), en proporciones culinarias, en la arquitectura (¾ de taza, 1/3 de kilo) y en divisiones de terrenos. Comprender fracciones es prerequisito para la geometría analítica, el álgebra y el cálculo de semestres posteriores."
+        },
+        {
+          "subtitle": "Porcentajes y su aplicación económica",
+          "content": "El porcentaje es un caso especial de fracción donde el denominador siempre es 100. Su omnipresencia en la vida económica hace que su dominio sea urgente: el IVA en México es del 16% (en zonas fronterizas, 8%); las tasas de interés bancario se expresan como porcentaje anual (TIIE + puntos porcentuales); el INEGI reporta la pobreza, el desempleo y el crecimiento económico en porcentajes; los descuentos comerciales son porcentajes del precio original. Los tres tipos de problemas de porcentaje son: (1) Calcular el porcentaje de una cantidad: ¿cuánto es el 16% de $350? (2) Calcular la cantidad dado el porcentaje: si el 20% son $80, ¿cuánto es el total? (3) Calcular qué porcentaje representa una cantidad: $45 es qué porcentaje de $300. El dominio de estos tres tipos es fundamental para la alfabetización financiera."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuánto es el 16% de IVA sobre una compra de $625?",
+          "options": ["$100", "$87.50", "$37.50", "$125"],
+          "correct": "$100"
+        },
+        {
+          "question": "¿Cuál es la fracción decimal equivalente a 3/8?",
+          "options": ["0.38", "0.375", "0.3", "0.4"],
+          "correct": "0.375"
+        },
+        {
+          "question": "Si un producto costaba $480 y tiene un descuento del 25%, ¿cuánto cuesta ahora?",
+          "options": ["$455", "$360", "$120", "$340"],
+          "correct": "$360"
+        },
+        {
+          "question": "¿Cuál es el resultado de 2/3 + 5/6?",
+          "options": ["7/9", "3/2", "7/6", "3/18"],
+          "correct": "3/2"
+        },
+        {
+          "question": "$120 representa el 40% de cierta cantidad. ¿Cuánto es el total?",
+          "options": ["$300", "$48", "$160", "$280"],
+          "correct": "$300"
+        }
+      ],
+      "rubric": "El alumno convierte correctamente entre fracciones, decimales y porcentajes en al menos 4 conversiones, resuelve correctamente los 3 tipos de problemas de porcentaje y opera correctamente con fracciones de denominadores distintos en situaciones contextualizadas."
+    },
+    "teacher_tips": [
+      "El error conceptual más persistente es creer que un porcentaje mayor siempre significa un número mayor. '80% de $10 vs. 20% de $100' — el segundo es mayor. Diseña al menos un ejercicio que aborde este error.",
+      "Para contexto financiero real, la página del Banco de México (Banxico.org.mx) publica tasas de interés actuales. Usar datos reales de una institución oficial aumenta la credibilidad y el contexto real.",
+      "El recibo de CFE o de agua es el material pedagógico más poderoso para esta progresión porque obliga a usar las tres representaciones en un documento que los alumnos verán toda su vida."
+    ]
+  },
+  "PM-I-P05": {
+    "code": "PM-I-P05",
+    "title": "Razón y proporción: proporcionalidad directa e inversa",
+    "level": "Pensamiento Matemático I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Aritmética",
+    "metadata": {
+      "objective": "Comprender y aplicar el concepto de razón y proporción en situaciones de proporcionalidad directa e inversa, usando regla de tres y porcentajes en contextos científicos, sociales y económicos del entorno mexicano.",
+      "competencies": [
+        "Pensamiento proporcional",
+        "Modelación matemática de situaciones reales",
+        "Razonamiento multiplicativo"
+      ],
+      "materials": [
+        "Fotografías de mapas de México a escala (INEGI ofrece mapas gratuitos)",
+        "Datos de velocidad y distancia de rutas de transporte CDMX",
+        "Tablas de proporcionalidad directa e inversa para completar"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿A qué velocidad va el Metro?" },
+        { "phase": "Desarrollo", "duration": "35 min", "label": "Proporcionalidad directa e inversa" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Regla de tres y el mundo" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — PROPORCIONES EN LA VIDA DIARIA",
+          "duration": "10 min",
+          "description": "El Metro de la CDMX recorre 25 km en 40 minutos. ¿Cuánto tardará en recorrer 10 km? ¿Y 60 km? Un mapa de México tiene escala 1:5,000,000 — si en el mapa hay 3.6 cm entre Monterrey y la CDMX, ¿cuál es la distancia real? La proporción es la herramienta matemática detrás de estas preguntas cotidianas.",
+          "activity": "Los alumnos resuelven los dos problemas anteriores intuitivamente, sin una técnica formal, usando sus estrategias propias. Luego comparten métodos: algunos usarán multiplicación mental, otros proporciones, otros estimación."
+        },
+        {
+          "title": "FASE II: DESARROLLO — DOS TIPOS DE PROPORCIONALIDAD",
+          "duration": "35 min",
+          "description": "Parte 1 (15 min) — PROPORCIONALIDAD DIRECTA: cuando una cantidad aumenta, la otra aumenta en la misma razón (y = kx, donde k es la constante de proporcionalidad). Ejemplos: velocidad-distancia a tiempo constante, precio-cantidad de un producto. Regla de tres directa. Identificación gráfica (línea recta por el origen). Parte 2 (15 min) — PROPORCIONALIDAD INVERSA: cuando una cantidad aumenta, la otra disminuye en la misma razón (xy = k). Ejemplos: obreros-tiempo para completar un trabajo, velocidad-tiempo para recorrer una distancia fija. Regla de tres inversa. Parte 3 (5 min) — CASOS ESPECIALES: mezclas y proporciones en 3 cantidades.",
+          "activity": "Situaciones de diagnóstico: el docente presenta 6 situaciones. Los alumnos deben primero decidir si la proporcionalidad es directa, inversa o ninguna, y luego resolver. Situaciones incluyen: receta de cocina para más personas, tiempo de trabajo con más trabajadores, precio por cantidad, consumo de gasolina."
+        },
+        {
+          "title": "FASE III: CIERRE — ESCALA Y MODELACIÓN",
+          "duration": "10 min",
+          "description": "Las escalas cartográficas son proporcionalidad directa aplicada a la representación del territorio. El INEGI utiliza escalas 1:50,000 para mapas topográficos y 1:1,000,000 para mapas del país. Comprender escalas es comprender la proporcionalidad en el contexto geográfico, esencial para ciencias, arquitectura y urbanismo.",
+          "activity": "Los alumnos calculan la distancia real entre dos puntos usando un mapa de México con escala conocida. Usan regla para medir en el mapa y regla de tres para calcular la distancia real."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La proporcionalidad es uno de los conceptos matemáticos más potentes y transversales: aparece en la física (velocidad = distancia/tiempo), en la química (concentraciones de soluciones), en la geografía (escalas de mapas), en la economía (precios y cantidades), en la biología (relación talla-peso en organismos). El pensamiento proporcional — la capacidad de reconocer y razonar con relaciones multiplicativas entre cantidades — es un marcador crítico de madurez matemática y una puerta de entrada al álgebra, la geometría y el cálculo.",
+      "sections": [
+        {
+          "subtitle": "Razón, proporción y constante de proporcionalidad",
+          "content": "Una razón es el cociente entre dos cantidades del mismo tipo (o de tipos comparables). La razón entre la distancia recorrida y el tiempo empleado es la velocidad. Cuando dos razones son iguales, forman una proporción: a/b = c/d. La propiedad fundamental de las proporciones es que el producto de extremos es igual al producto de medios (ad = bc), lo que permite resolver cualquier proporción con una incógnita. En la proporcionalidad directa, la razón y/x es constante (y = kx). En la proporcionalidad inversa, el producto xy es constante (y = k/x). La constante k en ambos casos tiene interpretación física o contextual: en velocidad, k es la velocidad constante; en el trabajo con obreros, k es la cantidad total de trabajo."
+        },
+        {
+          "subtitle": "Regla de tres y sus aplicaciones",
+          "content": "La regla de tres es un procedimiento algorítmico para resolver proporciones con tres datos conocidos y una incógnita. En la regla de tres directa (para proporcionalidad directa), si a↔b y c↔x, entonces x = (b·c)/a. En la regla de tres inversa (para proporcionalidad inversa), x = (a·b)/c. La identificación correcta del tipo de proporcionalidad antes de aplicar la regla es el paso más crítico y el que genera más errores. Una prueba diagnóstica útil: ¿si aumento la primera cantidad, la segunda aumenta (directa) o disminuye (inversa)? En el contexto del MCCEMS 2025, la regla de tres se conecta con las ciencias (diluciones, densidades), con la geografía (escalas) y con la economía (precios unitarios, tasas de cambio). El INEGI utiliza proporciones para calcular índices y proyecciones de población."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Si 4 albañiles tardan 12 días en construir una barda, ¿cuántos días tardarán 6 albañiles?",
+          "options": ["8 días", "18 días", "12 días", "6 días"],
+          "correct": "8 días"
+        },
+        {
+          "question": "En un mapa con escala 1:1,000,000, dos ciudades están separadas 4.5 cm. ¿Cuál es la distancia real?",
+          "options": ["4.5 km", "45 km", "450 km", "4500 km"],
+          "correct": "450 km"
+        },
+        {
+          "question": "¿Cuál es un ejemplo de proporcionalidad INVERSA?",
+          "options": [
+            "A mayor precio por kg, mayor costo total de la compra",
+            "A mayor velocidad, menor tiempo para recorrer una distancia fija",
+            "A mayor número de horas trabajadas, mayor salario",
+            "A mayor temperatura, mayor expansión del metal"
+          ],
+          "correct": "A mayor velocidad, menor tiempo para recorrer una distancia fija"
+        },
+        {
+          "question": "Si la razón entre estudiantes y computadoras en un aula es 3:1, y hay 24 estudiantes, ¿cuántas computadoras hay?",
+          "options": ["72", "8", "24", "3"],
+          "correct": "8"
+        },
+        {
+          "question": "¿Cuál es la constante de proporcionalidad si y = 15 cuando x = 3 en una relación directa?",
+          "options": ["18", "12", "5", "45"],
+          "correct": "5"
+        }
+      ],
+      "rubric": "El alumno identifica correctamente el tipo de proporcionalidad (directa o inversa) en al menos 5 situaciones, aplica la regla de tres correspondiente y obtiene el resultado correcto, justificando la elección del método."
+    },
+    "teacher_tips": [
+      "El error diagnóstico clave: muchos alumnos aplican siempre la regla de tres directa sin verificar el tipo de proporcionalidad. Diseña deliberadamente situaciones de proporcionalidad inversa disfrazadas de directas para entrenar el ojo crítico.",
+      "Los mapas del INEGI son gratuitos y descargables. Usar un mapa real de la región donde viven los alumnos hace la sesión de escalas mucho más significativa — miden la distancia real entre su comunidad y la capital estatal.",
+      "Conecta esta progresión con CNEYT-I (densidad = masa/volumen es proporcionalidad) y con IN-I (comparación de cantidades en inglés). Las transversalidades MCCEMS refuerzan el aprendizaje."
+    ]
+  },
+  "PM-I-P06": {
+    "code": "PM-I-P06",
+    "title": "Sistema Internacional de Unidades: medición y conversión",
+    "level": "Pensamiento Matemático I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Medición",
+    "metadata": {
+      "objective": "Realizar mediciones precisas usando unidades del Sistema Internacional (SI) y convertir entre unidades del mismo sistema y entre sistemas (SI y sistema inglés), aplicando el análisis dimensional en situaciones científicas y cotidianas.",
+      "competencies": [
+        "Pensamiento de medición",
+        "Análisis dimensional",
+        "Conexión matemáticas-ciencias naturales"
+      ],
+      "materials": [
+        "Regla, cinta métrica, balanza de cocina y cronómetro (o app del celular)",
+        "Tabla del Sistema Internacional de Unidades (impresa o proyectada)",
+        "Objetos del aula para medir (cuadernos, escritorios, mochilas)"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "El Universo en metros" },
+        { "phase": "Desarrollo", "duration": "35 min", "label": "Medir con precisión" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Conversión como razonamiento" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — LA IMPORTANCIA DE LAS UNIDADES",
+          "duration": "10 min",
+          "description": "En 1999, la sonda Mars Climate Orbiter de la NASA se perdió porque un equipo usó unidades imperiales (libras-fuerza) y otro usó unidades SI (newton). El resultado: $327 millones de dólares destruidos. Las unidades no son un detalle burocrático — son la diferencia entre el éxito y el fracaso en ciencias, ingeniería y medicina. México usa el Sistema Internacional, pero ¿por qué también necesitamos entender pies y pulgadas?",
+          "activity": "Medición sin instrumento: los alumnos estiman en centímetros el ancho de su mano, el largo de su zapato y la altura del salón. Luego miden con cinta métrica. ¿Cuánto se equivocaron? Discusión: ¿por qué es importante la medición precisa?"
+        },
+        {
+          "title": "FASE II: DESARROLLO — EL SISTEMA INTERNACIONAL",
+          "duration": "35 min",
+          "description": "Parte 1 (15 min) — Las 7 unidades base del SI: metro (longitud), kilogramo (masa), segundo (tiempo), ampere (corriente eléctrica), kelvin (temperatura), mol (cantidad de sustancia), candela (intensidad luminosa). Prefijos: nano-, micro-, mili-, centi-, deci-, deca-, hecto-, kilo-, mega-, giga-. Parte 2 (15 min) — Conversión por factores de conversión (análisis dimensional). El método del pato: escribir la unidad original × (unidad nueva / unidad original) = resultado en unidad nueva. Parte 3 (5 min) — Conversión entre SI y sistema inglés: metros ↔ pies, kilogramos ↔ libras, litros ↔ galones, Celsius ↔ Fahrenheit.",
+          "activity": "Práctica de medición real: cada equipo mide 3 objetos del aula en centímetros, los convierte a metros, milímetros y pulgadas, y pesa un objeto en gramos y lo convierte a kilogramos y libras. Registran en tabla."
+        },
+        {
+          "title": "FASE III: CIERRE — ANÁLISIS DIMENSIONAL COMO RAZONAMIENTO",
+          "duration": "10 min",
+          "description": "La conversión de unidades por análisis dimensional es un método de razonamiento, no de memorización. Si entiendes que multiplicar por (1000 m / 1 km) no cambia la cantidad (es multiplicar por 1), puedes convertir cualquier unidad sin memorizar fórmulas. Esta es la base del pensamiento científico cuantitativo.",
+          "activity": "Reto de conversión encadenada: ¿Cuántos milímetros hay en 2.5 km? (2.5 km × 1000 m/km × 100 cm/m × 10 mm/cm). Los alumnos ven la cadena de factores como razonamiento paso a paso."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "El Sistema Internacional de Unidades (SI) es el lenguaje cuantitativo de la ciencia moderna, adoptado por prácticamente todos los países del mundo (con excepción notable de Estados Unidos en uso cotidiano). Su coherencia interna — todas las unidades derivadas se obtienen de las 7 unidades base mediante multiplicación y división — lo hace ideal para el trabajo científico. En México, el SI es la unidad legal de medida en todos los ámbitos técnicos, industriales y científicos. La comprensión profunda del SI, incluyendo el manejo fluido de los prefijos y las conversiones, es una competencia transversal que aparece en física, química, biología, geografía e ingeniería.",
+      "sections": [
+        {
+          "subtitle": "Unidades base y prefijos del SI",
+          "content": "Las 7 unidades base del SI son independientes entre sí y cubren las magnitudes físicas fundamentales. Las unidades derivadas se construyen a partir de ellas: la velocidad es m/s, la densidad es kg/m³, la fuerza es kg·m/s² (newton). Los prefijos multiplican o dividen la unidad base por potencias de 10, lo que hace al SI extremadamente práctico: un nanómetro (10⁻⁹ m) para medir moléculas, un megawatt (10⁶ W) para medir generación eléctrica. El manejo de notación científica es indispensable para trabajar con los extremos de la escala del SI. En México, la CONAE (Comisión Nacional para el Uso Eficiente de la Energía) publica el consumo energético nacional en kWh y TJ (terajoules), usando prefijos del SI en documentos oficiales."
+        },
+        {
+          "subtitle": "Conversión por análisis dimensional",
+          "content": "El análisis dimensional es una técnica algebraica para convertir unidades que consiste en multiplicar por fracciones equivalentes a 1 (factores de conversión). Por ejemplo, para convertir 5 km a metros: 5 km × (1000 m / 1 km) = 5000 m. El kilómetro en el numerador y denominador se 'cancela', dejando metros. Para conversiones más complejas (km/h → m/s), se encadenan dos factores. Esta técnica tiene la ventaja de ser verificable: si las unidades no se cancelan correctamente, la conversión está mal. En física y química, el análisis dimensional también permite verificar si una ecuación es dimensionalmente consistente (análisis de consistencia dimensional), una herramienta poderosa para detectar errores."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuántos metros hay en 3.5 km?",
+          "options": ["35 m", "350 m", "3500 m", "35000 m"],
+          "correct": "3500 m"
+        },
+        {
+          "question": "¿Cuál es la unidad base del SI para medir masa?",
+          "options": ["Libra", "Gramo", "Kilogramo", "Tonelada"],
+          "correct": "Kilogramo"
+        },
+        {
+          "question": "¿Qué prefijo del SI indica una millonésima parte (10⁻⁶)?",
+          "options": ["Nano", "Micro", "Mili", "Pico"],
+          "correct": "Micro"
+        },
+        {
+          "question": "Un bebé pesa 3200 gramos. ¿Cuántos kilogramos pesa?",
+          "options": ["320 kg", "3.2 kg", "32 kg", "0.32 kg"],
+          "correct": "3.2 kg"
+        },
+        {
+          "question": "¿Por qué el Sistema Internacional es preferible al sistema inglés para trabajo científico?",
+          "options": [
+            "Porque lo inventaron los europeos",
+            "Porque usa base 10 y tiene unidades coherentes derivadas de 7 unidades base",
+            "Porque los números son más grandes",
+            "Porque es obligatorio en México"
+          ],
+          "correct": "Porque usa base 10 y tiene unidades coherentes derivadas de 7 unidades base"
+        }
+      ],
+      "rubric": "El alumno convierte correctamente entre al menos 5 pares de unidades del SI usando análisis dimensional, identifica las 7 unidades base y aplica correctamente los prefijos nano, micro, mili, centi, kilo y mega."
+    },
+    "teacher_tips": [
+      "La anécdota de la sonda Mars Climate Orbiter es genuinamente impactante para los alumnos. Está documentada públicamente por la NASA — úsala para demostrar que las unidades tienen consecuencias reales y costosas.",
+      "Si el plantel tiene equipos de laboratorio (balanzas, termómetros), esta es la progresión ideal para usarlos. La medición real es mucho más memorable que la medición ficticia.",
+      "Conecta con CNEYT-I: la densidad, el punto de fusión y la solubilidad se expresan en unidades SI. Esta progresión de PM-I es literalmente el prerrequisito matemático para el trabajo cuantitativo en ciencias."
+    ]
+  },
+  "PM-I-P07": {
+    "code": "PM-I-P07",
+    "title": "Estimación, aproximación y verificación de resultados matemáticos",
+    "level": "Pensamiento Matemático I",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Fundamental",
+    "category": "Razonamiento matemático",
+    "metadata": {
+      "objective": "Desarrollar el sentido numérico para estimar y aproximar resultados, verificar la razonabilidad de cálculos en contextos cotidianos y científicos, y reconocer cuándo un resultado no tiene sentido sin necesidad de recalcular.",
+      "competencies": [
+        "Sentido numérico y de medida",
+        "Pensamiento crítico matemático",
+        "Metacognición en resolución de problemas"
+      ],
+      "materials": [
+        "Calculadora (para verificar estimaciones)",
+        "Situaciones problemas con 'resultados trampa' (errores deliberados para detectar)",
+        "Notas periodísticas con datos numéricos del INEGI o CONEVAL"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Tiene sentido ese número?" },
+        { "phase": "Desarrollo", "duration": "35 min", "label": "Estimar antes de calcular" },
+        { "phase": "Cierre", "duration": "10 min", "label": "El ojo matemático crítico" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — CUANDO LAS CALCULADORAS MIENTEN",
+          "duration": "10 min",
+          "description": "Una calculadora siempre da un número, pero no siempre el número correcto: si introduces mal los datos, obtienes una respuesta exactamente incorrecta. El sentido numérico es la capacidad de saber si un resultado 'suena razonable' antes de creerle. Ejemplo: si calculas el área de un cuarto de 4m × 5m y la calculadora dice 2000 m², algo salió mal — deberían ser 20 m².",
+          "activity": "El docente presenta 5 resultados de problemas cotidianos (algunos correctos, algunos absurdamente incorrectos). Los alumnos levantan la mano si el número 'suena mal' sin hacer cálculos. Discusión: ¿qué información mental usaron para decidir?"
+        },
+        {
+          "title": "FASE II: DESARROLLO — TÉCNICAS DE ESTIMACIÓN",
+          "duration": "35 min",
+          "description": "Cuatro estrategias de estimación: (1) REDONDEO PREVIO: redondear todos los números a la cifra significativa más conveniente antes de operar (e.g., 398 × 52 ≈ 400 × 50 = 20,000). (2) COMPATIBLES: buscar números que combinan convenientemente (e.g., 48 + 52 ≈ 50 + 50 = 100). (3) FRENTE IZQUIERDO: operar primero con los dígitos de mayor valor posicional. (4) VERIFICACIÓN DE ORDEN DE MAGNITUD: ¿el resultado está en el orden correcto de magnitud? ¿miles, millones, millardos?. Contexto: datos del INEGI. Población de México ≈ 130 millones — ¿un gasto per cápita de $1000 significa un gasto total de millones o miles de millones?",
+          "activity": "Banco de estimaciones: 10 situaciones del contexto mexicano donde los alumnos primero estiman sin calculadora (30 segundos por problema), luego verifican con calculadora y calculan el error porcentual de su estimación."
+        },
+        {
+          "title": "FASE III: CIERRE — LA METACOGNICIÓN MATEMÁTICA",
+          "duration": "10 min",
+          "description": "La verificación de resultados es metacognición matemática: pensar sobre el propio pensamiento. Herramientas: (1) ¿Las unidades son coherentes? (2) ¿El resultado está en el orden de magnitud esperado? (3) ¿Casos extremos tienen sentido? (4) ¿El resultado satisface las condiciones del problema? Desarrollar este hábito es la diferencia entre un pensador matemático y un ejecutor de algoritmos.",
+          "activity": "Autoevaluación: los alumnos revisan sus propios ejercicios de la clase con la lista de verificación y detectan si algún resultado propio 'no suena bien' usando las estrategias aprendidas."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "El sentido numérico — la intuición cuantitativa que permite juzgar si un número es razonable en contexto — es una de las competencias matemáticas más valiosas y menos sistemáticamente desarrolladas en la educación tradicional. Mientras que el cálculo exacto puede delegarse a dispositivos electrónicos, el juicio sobre si un resultado es razonable es irreemplazablemente humano. Desarrollar la capacidad de estimar, aproximar y verificar resultados transforma a un ejecutor de algoritmos en un pensador matemático autónomo, capaz de detectar errores propios y ajenos en cualquier contexto.",
+      "sections": [
+        {
+          "subtitle": "Redondeo, cifras significativas y aproximación",
+          "content": "El redondeo es la simplificación de un número a un número de dígitos determinado, siguiendo reglas convencionales: si el dígito siguiente al de redondeo es 5 o más, se sube; si es menos de 5, se mantiene. Las cifras significativas indican la precisión de una medición o cálculo — no todos los dígitos en un resultado son igualmente confiables. En mediciones científicas (CNEYT-I), reportar más cifras significativas de las que el instrumento de medición permite es un error metodológico. La notación científica (a × 10ⁿ, con 1 ≤ a < 10) facilita tanto el redondeo como la visualización del orden de magnitud para números muy grandes o muy pequeños. Los datos del INEGI sobre PIB, población y pobreza se presentan con distintos niveles de precisión según el contexto — un investigador necesita decimales; un titular periodístico necesita redondeo."
+        },
+        {
+          "subtitle": "Verificación de razonabilidad: el pensamiento crítico cuantitativo",
+          "content": "La verificación de razonabilidad es el proceso de comprobar si un resultado matemático 'tiene sentido' en el contexto del problema, sin necesariamente recalcular desde cero. Implica: (1) revisar las unidades y dimensiones del resultado, (2) comparar con valores de referencia conocidos (benchmarks — ¿cuánto pesa un ser humano promedio, cuánto cuesta un litro de gasolina, cuál es el salario mínimo?), (3) verificar que el resultado satisface las condiciones del problema (no puede ser negativo si representa una longitud), (4) estimar el resultado antes de calcular y comparar. Esta práctica desarrolla lo que los matemáticos llaman 'sentido de plausibilidad': una intuición cuantitativa que se construye con práctica deliberada en contextos variados. Según la OCDE, los estudiantes con buen sentido numérico tienen mayor éxito en resolución de problemas no rutinarios, que son los que predominan en la vida real."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál es la mejor estimación de 487 × 62?",
+          "options": ["20,000", "30,000", "40,000", "15,000"],
+          "correct": "30,000"
+        },
+        {
+          "question": "Un alumno calcula que una sala de 6m × 4m tiene un área de 240 m². Sin recalcular, ¿qué puedes concluir?",
+          "options": [
+            "El resultado es correcto",
+            "Debería ser alrededor de 24 m², hubo un error de un factor de 10",
+            "Falta información para saberlo",
+            "Las salas nunca tienen esas dimensiones"
+          ],
+          "correct": "Debería ser alrededor de 24 m², hubo un error de un factor de 10"
+        },
+        {
+          "question": "¿Cuántas cifras significativas tiene el número 0.00480?",
+          "options": ["6", "5", "3", "2"],
+          "correct": "3"
+        },
+        {
+          "question": "El PIB de México en 2024 fue aproximadamente 2.8 billones de dólares. ¿Cuánto es esto en notación científica?",
+          "options": ["2.8 × 10⁶", "2.8 × 10⁹", "2.8 × 10¹²", "2.8 × 10¹⁵"],
+          "correct": "2.8 × 10¹²"
+        },
+        {
+          "question": "¿Cuál estrategia de estimación se usa al calcular 48+52 como 50+50?",
+          "options": ["Redondeo previo", "Números compatibles", "Frente izquierdo", "Orden de magnitud"],
+          "correct": "Números compatibles"
+        }
+      ],
+      "rubric": "El alumno estima correctamente al menos 7 de 10 situaciones con un error menor al 20%, identifica resultados absurdos sin recalcular en al menos 4 de 5 casos, y aplica correctamente al menos dos técnicas de estimación distintas."
+    },
+    "teacher_tips": [
+      "Esta progresión cierra el ciclo de PM-I con metacognición: no es solo sobre las matemáticas, sino sobre CÓMO pensamos matemáticamente. Dedica tiempo a la reflexión sobre el proceso, no solo a los resultados.",
+      "Los datos del INEGI y CONEVAL son perfectos para esta sesión: población (millones), PIB (billones), gasto público (miles de millones). Los alumnos aprenden a orientarse en el espacio numérico de su país.",
+      "Evita calificar únicamente la exactitud de la estimación — premia la estrategia usada y el razonamiento explicitado. Estimar bien es más valioso que calcular mecánicamente."
+    ]
+  }
+}
