@@ -2,6 +2,7 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { getUser, getProfile } from "@/lib/supabase-helpers";
 import { getAlumnosConProgreso, getUACsConCompletionGrupo, getGruposDocente } from "@/lib/queries/docente";
+import AlumnoRow from "@/components/dashboard/AlumnoRow";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -158,37 +159,14 @@ export default async function GrupoDetallePage({ params }: { params: Promise<{ g
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               {alumnos.map((alumno) => (
-                <Link
+                <AlumnoRow
                   key={alumno.id}
-                  href={`/dashboard/docente/alumnos/${alumno.id}`}
-                  style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    padding: '10px 12px', borderRadius: 12, textDecoration: 'none',
-                    color: 'inherit', transition: 'background 0.15s ease',
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(11,37,69,0.04)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div style={{
-                      width: 32, height: 32, borderRadius: 999,
-                      background: '#EFF6FF', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 13, fontWeight: 700, color: '#1E40AF', flexShrink: 0,
-                    }}>
-                      {(alumno.full_name ?? alumno.email).charAt(0).toUpperCase()}
-                    </div>
-                    <div>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: '#0B2545' }}>
-                        {alumno.full_name ?? alumno.email}
-                      </div>
-                      <div style={{ fontSize: 11, color: 'rgba(11,37,69,0.50)' }}>
-                        {alumno.actividades_completadas} completadas
-                        {alumno.score_promedio !== null ? ` · ${alumno.score_promedio} pts` : ''}
-                      </div>
-                    </div>
-                  </div>
-                  <i className="fa-solid fa-chevron-right" style={{ fontSize: 11, color: 'rgba(11,37,69,0.25)' }} />
-                </Link>
+                  id={alumno.id}
+                  full_name={alumno.full_name}
+                  email={alumno.email}
+                  actividades_completadas={alumno.actividades_completadas}
+                  score_promedio={alumno.score_promedio}
+                />
               ))}
             </div>
           )}
