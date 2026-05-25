@@ -417,3 +417,112 @@ body {
     display: none;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   DASHBOARD DOCENTE — Utilities (ported from Financiera teacher dashboard)
+   Paleta adaptada: naranja #FF8C00 → dorado CEN #D4A574
+                    rojos financieros → coral suave #E27D7D
+   ══════════════════════════════════════════════════════════════ */
+
+.bento-card {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(40px);
+  border: 1px solid white;
+  border-radius: 2.5rem;
+  box-shadow: 0 20px 50px rgba(1, 28, 64, 0.03);
+  transition: all 700ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.bento-card:hover {
+  box-shadow: 0 40px 80px rgba(1, 28, 64, 0.08);
+  transform: translateY(-8px) scale(1.01);
+}
+
+.premium-gradient-text {
+  color: transparent;
+  background: linear-gradient(to right, #D4A574, #E8C99A, #D4A574);
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: dashboard-gradient 4s linear infinite;
+  padding: 0 8px 8px;
+  margin: 0 -8px -8px;
+}
+
+.noise-texture {
+  position: relative;
+}
+.noise-texture::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.03;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  z-index: 1;
+  background-image: url('https://grainy-gradients.vercel.app/noise.svg');
+}
+
+.dashboard-scrollbar-thin::-webkit-scrollbar { width: 6px; }
+.dashboard-scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+.dashboard-scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(1, 28, 64, 0.1);
+  border-radius: 10px;
+}
+.theme-dark .dashboard-scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.dashboard-serif-premium {
+  font-family: 'Epilogue', system-ui, sans-serif;
+}
+
+/* Gradient dorado CEN — reemplaza naranja financiero */
+.dashboard-gradient-orange {
+  background: linear-gradient(135deg, #D4A574 0%, #E8C99A 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar { width: 8px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(1, 28, 64, 0.08);
+  border-radius: 20px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(1, 28, 64, 0.15); }
+.theme-dark .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.08); }
+.theme-dark .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.15); }
+
+.premium-shadow { box-shadow: 0 50px 100px rgba(1, 28, 64, 0.08); }
+.theme-dark .premium-shadow { box-shadow: 0 50px 100px rgba(0, 0, 0, 0.5); }
+
+.diamond-glow {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(120px);
+  opacity: 0.20;
+  pointer-events: none;
+}
+
+.glass-pill {
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 9999px;
+  padding: 8px 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+@keyframes dashboard-gradient {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes twinkle { 0%, 100% { opacity: 0.2; } 50% { opacity: 0.8; } }
+@keyframes float-slow { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+.animate-twinkle { animation: twinkle 4s infinite; }
+.animate-float-slow { animation: float-slow 8s infinite ease-in-out; }
+.animate-spin-slow { animation: spin 60s linear infinite; }
