@@ -91,9 +91,7 @@ export default function PlanteamientoPage() {
           style={{
             width: 'clamp(260px, 26vw, 380px)',
             flexShrink: 0,
-            background: 'rgba(255,255,255,0.75)',
-            backdropFilter: 'blur(24px)',
-            WebkitBackdropFilter: 'blur(24px)',
+            background: '#FFFFFF',
           }}
         >
           {/* Header */}
