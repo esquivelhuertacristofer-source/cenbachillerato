@@ -46,14 +46,13 @@ function isTodo(val?: string | null) {
 // ── Main Page ──────────────────────────────────────────────────────────────
 
 export default function PlanteamientoPage() {
-  const [selectedUAC, setSelectedUAC] = useState(FIRST_UAC?.codigo ?? 'LC-I');
+  const [selectedUAC, setSelectedUAC]           = useState(FIRST_UAC?.codigo ?? 'LC-I');
   const [selectedProgCode, setSelectedProgCode] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<ContentTab>('estrategia');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab]               = useState<ContentTab>('estrategia');
+  const [searchQuery, setSearchQuery]           = useState('');
 
   const progresiones = getPlanUAC(selectedUAC);
 
-  // Derived: si selectedProgCode no está en la lista actual, cae al primero
   const activeProgresion = (selectedProgCode
     ? progresiones.find((p) => p.code === selectedProgCode)
     : undefined) ?? progresiones[0];
@@ -85,39 +84,39 @@ export default function PlanteamientoPage() {
       <main className="flex-1 md:ml-[260px] flex flex-col md:flex-row md:h-screen md:overflow-hidden">
 
         {/* ── LEFT PANEL ─────────────────────────────────────────────────── */}
-        <div
-          className="hidden md:flex flex-col"
+        {/* z-[50] > Sidebar z-40: el background del panel pinta sobre la
+            sombra rightward del Sidebar (shadow-[20px_0_60px_rgba(1,28,64,0.3)]),
+            eliminando el "gap" oscuro visible entre ambos paneles. */}
+        <aside
+          className="hidden md:flex flex-col relative z-[50] border-r border-[#0B2545]/10 shadow-[16px_0_48px_rgba(11,37,69,0.07)]"
           style={{
-            width: 380, flexShrink: 0,
-            background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(20px)',
-            borderRight: '1px solid rgba(255,255,255,0.5)',
+            width: 'clamp(260px, 26vw, 380px)',
+            flexShrink: 0,
+            background: 'rgba(255,255,255,0.75)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
           }}
         >
           {/* Header */}
-          <div style={{ padding: '32px 28px 20px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+          <div className="p-7 space-y-5">
 
-            {/* Title + UAC selector */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ width: 40, height: 40, background: '#0B2545', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <ListTodo style={{ width: 20, height: 20, color: '#fff' }} />
+            {/* Title row + UAC selector */}
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-[#0B2545] rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-[#0B2545]/20">
+                  <ListTodo className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <div style={{ fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#0B2545' }}>Contenido</div>
-                  <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#94a3b8' }}>MCCEMS 2025</div>
+                  <p className="text-[11px] font-black uppercase tracking-[0.15em] text-[#0B2545] m-0">Contenido</p>
+                  <p className="text-[9px] font-bold uppercase tracking-[0.1em] text-slate-400 m-0">MCCEMS 2025</p>
                 </div>
               </div>
 
-              <div style={{ position: 'relative' }}>
+              <div className="relative">
                 <select
                   value={selectedUAC}
                   onChange={(e) => handleUACChange(e.target.value)}
-                  style={{
-                    appearance: 'none', background: '#D4A574', color: '#fff',
-                    fontSize: 10, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.08em',
-                    padding: '8px 26px 8px 12px', borderRadius: 10, border: 'none',
-                    cursor: 'pointer', outline: 'none',
-                  }}
+                  className="appearance-none bg-[#D4A574] text-white text-[10px] font-black uppercase tracking-[0.08em] pl-3 pr-7 py-2 rounded-xl border-none cursor-pointer outline-none hover:bg-[#c4955e] motion-safe:transition-colors"
                 >
                   {UAC_POR_SEMESTRE.map(({ semestre, uacs }) => (
                     <optgroup key={semestre} label={`Semestre ${semestre}`}>
@@ -127,78 +126,70 @@ export default function PlanteamientoPage() {
                     </optgroup>
                   ))}
                 </select>
-                <div style={{ position: 'absolute', right: 9, top: '50%', transform: 'translateY(-60%) rotate(45deg)', width: 6, height: 6, borderRight: '2px solid #fff', borderBottom: '2px solid #fff', pointerEvents: 'none' }} />
+                <div className="absolute right-2.5 top-1/2 -translate-y-[60%] rotate-45 w-1.5 h-1.5 border-r-2 border-b-2 border-white pointer-events-none" />
               </div>
             </div>
 
             {/* Search */}
-            <div style={{ position: 'relative' }}>
-              <Search style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', width: 14, height: 14, color: '#94a3b8' }} />
+            <div className="relative">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
               <input
                 type="text"
                 placeholder="Buscar en el currículo..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                style={{
-                  width: '100%', boxSizing: 'border-box',
-                  paddingLeft: 38, paddingRight: 14, paddingTop: 12, paddingBottom: 12,
-                  background: 'rgba(255,255,255,0.85)', border: '1px solid rgba(255,255,255,0.9)',
-                  borderRadius: 14, fontSize: 12, fontWeight: 500, color: '#0B2545', outline: 'none',
-                }}
+                className="w-full pl-10 pr-4 py-3 bg-white/90 border border-white rounded-2xl text-[12px] font-medium text-[#0B2545] placeholder-slate-400 outline-none focus:ring-2 focus:ring-[#D4A574]/30 focus:border-[#D4A574]/40 motion-safe:transition-all"
               />
             </div>
           </div>
 
-          {/* UAC label */}
-          <div style={{ padding: '0 28px 10px', fontSize: 11, fontWeight: 700, color: 'rgba(11,37,69,0.45)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          {/* UAC name label */}
+          <div className="px-7 pb-3 text-[11px] font-bold uppercase tracking-[0.06em] text-[#0B2545]/45 truncate border-b border-[#0B2545]/[0.05]">
             {currentUACMeta?.nombre}
           </div>
 
           {/* Progresion list */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: '0 20px 28px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div className="flex-1 overflow-y-auto px-5 py-4 space-y-2.5 custom-scrollbar">
             {filtered.map((prog) => {
               const isActive = activeProgresion?.code === prog.code;
               return (
                 <button
                   key={prog.code}
                   onClick={() => { setSelectedProgCode(prog.code); setActiveTab('estrategia'); }}
-                  style={{
-                    width: '100%', textAlign: 'left', padding: '18px 20px',
-                    borderRadius: 22, border: 'none', cursor: 'pointer',
-                    background: isActive ? '#0B2545' : '#fff',
-                    color: isActive ? '#fff' : '#0B2545',
-                    transform: isActive ? 'scale(1.02) translateY(-2px)' : 'scale(1)',
-                    boxShadow: isActive ? '0 16px 32px rgba(11,37,69,0.2)' : 'none',
-                    transition: 'all 0.2s ease',
-                    position: 'relative', overflow: 'hidden',
-                  }}
+                  className={[
+                    'w-full text-left px-5 py-[18px] rounded-[22px] border-none cursor-pointer',
+                    'motion-safe:transition-all motion-safe:duration-200 relative overflow-hidden',
+                    isActive
+                      ? 'bg-[#0B2545] text-white shadow-[0_16px_32px_rgba(11,37,69,0.20)] scale-[1.02] -translate-y-px'
+                      : 'bg-white text-[#0B2545] hover:bg-[#FFF8F0] hover:shadow-md hover:scale-[1.01]',
+                  ].join(' ')}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, alignItems: 'center' }}>
-                    <span style={{ fontSize: 9, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color: isActive ? '#7DD3FC' : '#D4A574' }}>
+                  <div className="flex justify-between mb-2 items-center">
+                    <span className={`text-[9px] font-black uppercase tracking-[0.2em] ${isActive ? 'text-[#7DD3FC]' : 'text-[#D4A574]'}`}>
                       {prog.code}
                     </span>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, opacity: 0.6 }}>
-                      <Clock style={{ width: 10, height: 10 }} />
-                      <span style={{ fontSize: 9, fontWeight: 700 }}>{prog.duration}</span>
+                    <div className="flex items-center gap-1 opacity-50">
+                      <Clock className="w-2.5 h-2.5" />
+                      <span className="text-[9px] font-bold">{prog.duration}</span>
                     </div>
                   </div>
-                  <p style={{ fontSize: 13, fontWeight: 900, lineHeight: 1.35, letterSpacing: '-0.01em', margin: 0 }}>
+                  <p className="text-[13px] font-black leading-snug tracking-tight m-0">
                     {prog.title}
                   </p>
-                  <div style={{ marginTop: 12, fontSize: 10, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4, opacity: isActive ? 0.4 : 0 }}>
-                    Ver planeamiento completo <ArrowRight style={{ width: 10, height: 10 }} />
+                  <div className={`mt-3 text-[10px] font-bold flex items-center gap-1 motion-safe:transition-opacity ${isActive ? 'opacity-40' : 'opacity-0'}`}>
+                    Ver planeamiento completo <ArrowRight className="w-2.5 h-2.5" />
                   </div>
                 </button>
               );
             })}
 
             {filtered.length === 0 && (
-              <div style={{ padding: '32px 16px', textAlign: 'center', color: 'rgba(11,37,69,0.4)' }}>
-                <p style={{ fontSize: 13, fontWeight: 600, margin: 0 }}>Sin resultados</p>
+              <div className="py-8 text-center text-[#0B2545]/40">
+                <p className="text-[13px] font-semibold m-0">Sin resultados</p>
               </div>
             )}
           </div>
-        </div>
+        </aside>
 
         {/* ── MOBILE: compact UAC + progresión selector ──────────────────── */}
         <div className="md:hidden bg-white/80 backdrop-blur border-b border-white/50 p-4 space-y-3 flex-shrink-0">
