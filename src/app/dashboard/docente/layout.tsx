@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getUser, getProfile } from "@/lib/supabase-helpers";
+import MobileNav from "@/components/dashboard/MobileNav";
 
 export default async function DocenteLayout({
   children,
@@ -15,5 +16,10 @@ export default async function DocenteLayout({
   if (profile.role === "student") redirect("/hub");
   if (profile.role === "admin" || profile.role === "super_admin") redirect("/admin/escuelas");
 
-  return <>{children}</>;
+  return (
+    <div className="pt-14 md:pt-0">
+      <MobileNav teacherName={profile.full_name ?? undefined} />
+      {children}
+    </div>
+  );
 }
