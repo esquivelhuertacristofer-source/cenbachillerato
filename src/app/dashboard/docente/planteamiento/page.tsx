@@ -1,4 +1,5 @@
 import { redirect, notFound } from "next/navigation";
+import Link from "next/link";
 import { getUser, getProfile } from "@/lib/supabase-helpers";
 import { getGruposDocente, getPlanteamientoGrupo } from "@/lib/queries/docente";
 import { PlanteamientoTabs } from "@/components/dashboard/PlanteamientoTabs";
@@ -73,10 +74,21 @@ export default async function PlanteamientoPage({
           </p>
         </div>
 
-        {/* Grupo selector (client island) */}
+        {/* Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
           <span style={{ fontSize: 13, fontWeight: 600, color: 'rgba(11,37,69,0.55)' }}>Grupo:</span>
           <GrupoSelectorClient grupos={grupos} selectedId={grupoId} />
+          <Link
+            href="/dashboard/docente/planteamiento/contenido"
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              padding: '10px 18px', background: '#0B2545', color: '#fff',
+              borderRadius: 12, fontSize: 13, fontWeight: 700, textDecoration: 'none',
+            }}
+          >
+            <i className="fa-solid fa-book-open" style={{ fontSize: 12, color: '#7DD3FC' }} />
+            Ver contenido MCCEMS
+          </Link>
         </div>
       </div>
 
