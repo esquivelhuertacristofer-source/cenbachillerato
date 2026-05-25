@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { getUser, getProfile } from "@/lib/supabase-helpers";
-import { DocenteHeader } from "@/components/dashboard/DocenteHeader";
 
 export default async function DocenteLayout({
   children,
@@ -14,12 +13,7 @@ export default async function DocenteLayout({
   if (!profile) redirect("/log-in");
 
   if (profile.role === "student") redirect("/hub");
-  if (profile.role === "admin") redirect("/admin/escuelas");
+  if (profile.role === "admin" || profile.role === "super_admin") redirect("/admin/escuelas");
 
-  return (
-    <div style={{ minHeight: "100vh", background: "#F8FAFC" }}>
-      <DocenteHeader />
-      {children}
-    </div>
-  );
+  return <>{children}</>;
 }
