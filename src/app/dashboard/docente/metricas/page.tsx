@@ -1,5 +1,0 @@
-import { redirect } from "next/navigation";
-
-export default function MetricasPage() {
-  redirect("/dashboard/docente/actividades");
-}
