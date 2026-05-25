@@ -23,11 +23,9 @@ interface LatestDeliveriesProps {
 export default function LatestDeliveries({ grupoIds, isDark = true }: LatestDeliveriesProps) {
   const [deliveries, setDeliveries] = useState<DeliveryItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [mounted, setMounted] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<{ id: string; name: string } | null>(null);
 
   useEffect(() => {
-    setMounted(true);
     const sb = getSupabaseBrowser();
 
     const fetchLatest = async () => {
@@ -110,8 +108,6 @@ export default function LatestDeliveries({ grupoIds, isDark = true }: LatestDeli
 
     return () => { void sb.removeChannel(channel); };
   }, [grupoIds, isDark]);
-
-  if (!mounted) return null;
 
   return (
     <div className={`rounded-[4rem] p-12 flex flex-col h-full relative overflow-hidden group/main border transition-all ${
