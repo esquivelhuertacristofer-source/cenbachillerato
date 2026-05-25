@@ -82,7 +82,7 @@ export default function PlanteamientoPage() {
     >
       <Sidebar />
 
-      <main className="flex-1 md:ml-[260px] flex h-screen overflow-hidden">
+      <main className="flex-1 md:ml-[260px] flex flex-col md:flex-row md:h-screen md:overflow-hidden">
 
         {/* ── LEFT PANEL ─────────────────────────────────────────────────── */}
         <div
@@ -200,6 +200,51 @@ export default function PlanteamientoPage() {
           </div>
         </div>
 
+        {/* ── MOBILE: compact UAC + progresión selector ──────────────────── */}
+        <div className="md:hidden bg-white/80 backdrop-blur border-b border-white/50 p-4 space-y-3 flex-shrink-0">
+          <div style={{ display: 'flex', gap: 10 }}>
+            <div style={{ position: 'relative', flex: 1 }}>
+              <select
+                value={selectedUAC}
+                onChange={(e) => handleUACChange(e.target.value)}
+                style={{
+                  width: '100%', appearance: 'none', background: '#0B2545', color: '#fff',
+                  fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.06em',
+                  padding: '10px 32px 10px 14px', borderRadius: 12, border: 'none',
+                  cursor: 'pointer', outline: 'none',
+                }}
+              >
+                {UAC_POR_SEMESTRE.map(({ semestre, uacs }) => (
+                  <optgroup key={semestre} label={`Semestre ${semestre}`}>
+                    {uacs.map((u) => (
+                      <option key={u.codigo} value={u.codigo}>{u.codigo}</option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+              <div style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-60%) rotate(45deg)', width: 6, height: 6, borderRight: '2px solid #fff', borderBottom: '2px solid #fff', pointerEvents: 'none' }} />
+            </div>
+          </div>
+          {progresiones.length > 0 && (
+            <div style={{ position: 'relative' }}>
+              <select
+                value={selectedProgCode ?? progresiones[0]?.code ?? ''}
+                onChange={(e) => { setSelectedProgCode(e.target.value); setActiveTab('estrategia'); }}
+                style={{
+                  width: '100%', appearance: 'none', background: '#D4A574', color: '#fff',
+                  fontSize: 11, fontWeight: 700, padding: '10px 32px 10px 14px',
+                  borderRadius: 12, border: 'none', cursor: 'pointer', outline: 'none',
+                }}
+              >
+                {progresiones.map((p) => (
+                  <option key={p.code} value={p.code}>{p.code} — {p.title}</option>
+                ))}
+              </select>
+              <div style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-60%) rotate(45deg)', width: 6, height: 6, borderRight: '2px solid #fff', borderBottom: '2px solid #fff', pointerEvents: 'none' }} />
+            </div>
+          )}
+        </div>
+
         {/* ── RIGHT PANEL ────────────────────────────────────────────────── */}
         <div style={{ flex: 1, overflowY: 'auto', background: '#F4F1EA' }}>
 
@@ -207,7 +252,7 @@ export default function PlanteamientoPage() {
           <div style={{
             position: 'sticky', top: 0, zIndex: 30,
             background: 'rgba(244,241,234,0.85)', backdropFilter: 'blur(20px)',
-            padding: '18px 48px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             borderBottom: '1px solid rgba(11,37,69,0.06)',
           }}>
             <span style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(11,37,69,0.5)' }}>
@@ -224,7 +269,7 @@ export default function PlanteamientoPage() {
             </button>
           </div>
 
-          <div style={{ padding: '48px', display: 'flex', flexDirection: 'column', gap: 48 }}>
+          <div style={{ padding: 'clamp(16px, 4vw, 48px)', display: 'flex', flexDirection: 'column', gap: 'clamp(24px, 3vw, 48px)' }}>
 
             {/* ── HERO BENTO ─────────────────────────────────────────────── */}
             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 20 }}>
