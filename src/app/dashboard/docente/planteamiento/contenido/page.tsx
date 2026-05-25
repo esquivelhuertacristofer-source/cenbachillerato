@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import {
   Search,
@@ -23,7 +23,6 @@ import {
 import Sidebar from '@/components/dashboard/Sidebar';
 import { planteamientoData, getPlanUAC } from '@/data/planteamiento/hub';
 import { UAC_BASE } from '@/lib/mccems/estructura';
-import type { ProgresionPlan } from '@/lib/schemas/planteamiento.schema';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -50,23 +49,23 @@ function isTodo(val?: string | null) {
 
 export default function ContenidoMCCEMSPage() {
   const [selectedUAC, setSelectedUAC] = useState(FIRST_UAC?.codigo ?? 'LC-I');
-  const [activeProgresion, setActiveProgresion] = useState<ProgresionPlan | undefined>(undefined);
-  const [activeTab, setActiveTab]   = useState<ContentTab>('estrategia');
+  const [selectedProgCode, setSelectedProgCode] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<ContentTab>('estrategia');
   const [searchQuery, setSearchQuery] = useState('');
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => { setMounted(true); }, []);
 
   const progresiones = getPlanUAC(selectedUAC);
 
-  useEffect(() => {
-    setActiveProgresion(progresiones[0]);
+  // Derived: si selectedProgCode no está en la lista actual, cae al primero
+  const activeProgresion = (selectedProgCode
+    ? progresiones.find((p) => p.code === selectedProgCode)
+    : undefined) ?? progresiones[0];
+
+  function handleUACChange(codigo: string) {
+    setSelectedUAC(codigo);
+    setSelectedProgCode(null);
     setSearchQuery('');
     setActiveTab('estrategia');
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedUAC]);
-
-  if (!mounted) return null;
+  }
 
   const filtered = progresiones.filter(
     (p) =>
@@ -114,7 +113,7 @@ export default function ContenidoMCCEMSPage() {
               <div style={{ position: 'relative' }}>
                 <select
                   value={selectedUAC}
-                  onChange={(e) => setSelectedUAC(e.target.value)}
+                  onChange={(e) => handleUACChange(e.target.value)}
                   style={{
                     appearance: 'none', background: '#D4A574', color: '#fff',
                     fontSize: 10, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.08em',
@@ -164,7 +163,7 @@ export default function ContenidoMCCEMSPage() {
               return (
                 <button
                   key={prog.code}
-                  onClick={() => { setActiveProgresion(prog); setActiveTab('estrategia'); }}
+                  onClick={() => { setSelectedProgCode(prog.code); setActiveTab('estrategia'); }}
                   style={{
                     width: '100%', textAlign: 'left', padding: '18px 20px',
                     borderRadius: 22, border: 'none', cursor: 'pointer',

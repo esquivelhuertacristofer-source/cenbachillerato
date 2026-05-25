@@ -1219,7 +1219,6 @@ export async function getPlanteamientoPorProgresion(
     .maybeSingle();
 
   if (error || !data) return null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return data as PlanteamientoContenido;
 }
 

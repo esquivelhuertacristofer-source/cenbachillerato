@@ -41,8 +41,7 @@ async function upsertProgresion(
     return "notfound";
   }
 
-  // 2. Upsert into planteamiento_progresiones (table not yet in DB types → cast via any)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // 2. Upsert into planteamiento_progresiones (table not yet in DB types)
   const sbAny = sb as unknown as ReturnType<typeof createClient>;
   const { error: upsertErr } = await sbAny
     .from("planteamiento_progresiones")
