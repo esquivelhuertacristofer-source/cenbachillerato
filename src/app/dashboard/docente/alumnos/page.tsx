@@ -369,7 +369,7 @@ export default function AlumnosPage() {
   if (loading) return (
     <div className="flex min-h-screen bg-[#F4F1EA] font-['Epilogue']">
       <Sidebar />
-      <main className="flex-1 md:ml-[260px] p-12 space-y-16">
+      <main className="flex-1 md:ml-[260px] p-4 sm:p-8 md:p-12 space-y-8 lg:space-y-16">
         <div className="h-64 bg-[#011C40] rounded-[4rem] animate-pulse" />
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
           {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -384,25 +384,25 @@ export default function AlumnosPage() {
     <div className="flex min-h-screen bg-[#F4F1EA] font-['Epilogue'] relative overflow-hidden">
       <Sidebar teacherName={teacherName} />
 
-      <main className="flex-1 md:ml-[260px] p-12 space-y-16 relative z-10">
+      <main className="flex-1 md:ml-[260px] p-4 sm:p-8 md:p-12 space-y-8 lg:space-y-16 relative z-10">
 
         {/* Header */}
-        <div className="relative overflow-hidden rounded-[4rem] bg-[#011C40] p-16 shadow-2xl">
+        <div className="relative overflow-hidden rounded-[3rem] md:rounded-[4rem] bg-[#011C40] p-8 sm:p-12 md:p-16 shadow-2xl">
           <div className="absolute top-0 right-0 w-96 h-96 bg-[#D4A574]/10 rounded-full blur-[100px]" />
-          <div className="relative z-10 flex flex-col xl:flex-row items-center justify-between gap-12">
-            <div className="space-y-6">
+          <div className="relative z-10 flex flex-col xl:flex-row items-center justify-between gap-8 md:gap-12">
+            <div className="space-y-4 md:space-y-6 w-full xl:w-auto">
               <div className="flex items-center gap-3">
                 <Users className="w-5 h-5 text-[#7DD3FC]" />
                 <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">Gestión de Alumnado</span>
               </div>
-              <h1 className="text-7xl font-black text-white leading-none tracking-tighter">
+              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black text-white leading-none tracking-tighter">
                 Mis <span className="italic text-[#D4A574]">Alumnos</span>
               </h1>
               <p className="text-white/50 font-medium text-lg max-w-xl">
                 Supervisa el avance individual, entrega de actividades y desempeño MCCEMS en tiempo real.
               </p>
             </div>
-            <div className="w-full xl:w-96 space-y-4">
+            <div className="w-full xl:w-96 space-y-3 md:space-y-4">
               <div className="relative group">
                 <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30 group-focus-within:text-[#D4A574] transition-colors" />
                 <input

@@ -64,10 +64,10 @@ export default async function DocenteDashboardPage() {
         currentSemestre={semestre as 1 | 2 | 3 | 4 | 5 | 6}
       />
 
-      <main className="flex-1 md:ml-[260px] relative z-10 custom-scrollbar overflow-y-auto h-screen flex flex-col">
+      <main className="flex-1 md:ml-[260px] relative z-10 custom-scrollbar md:overflow-y-auto md:h-screen flex flex-col">
 
         {/* HUD Status Bar */}
-        <div className="sticky top-0 z-50 backdrop-blur-3xl border-b px-12 py-5 flex items-center justify-between bg-[#011C40]/80 border-white/5 shadow-2xl">
+        <div className="sticky top-0 z-50 backdrop-blur-3xl border-b px-4 sm:px-8 md:px-12 py-4 flex items-center justify-between bg-[#011C40]/80 border-white/5 shadow-2xl">
           <div className="flex items-center gap-4">
             <div className="w-3 h-3 rounded-full animate-pulse shadow-[0_0_15px_rgba(52,211,153,0.5)] bg-emerald-400" />
             <span className="text-[11px] font-black uppercase tracking-[0.4em] text-white/50">SISTEMA ONLINE</span>
@@ -80,7 +80,7 @@ export default async function DocenteDashboardPage() {
         </div>
 
         {/* Main content */}
-        <div className="p-12 space-y-24 flex-1">
+        <div className="p-4 sm:p-8 md:p-12 space-y-12 lg:space-y-24 flex-1">
 
           {/* Welcome */}
           <div>

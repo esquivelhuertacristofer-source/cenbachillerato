@@ -45,10 +45,10 @@ export default function ModulosPage() {
 
       <Sidebar />
 
-      <main className="flex-1 md:ml-[260px] relative z-10 custom-scrollbar overflow-y-auto h-screen flex flex-col">
+      <main className="flex-1 md:ml-[260px] relative z-10 custom-scrollbar md:overflow-y-auto md:h-screen flex flex-col">
 
         {/* HUD Status Bar */}
-        <div className="sticky top-0 z-50 backdrop-blur-3xl border-b px-12 py-5 flex items-center justify-between bg-[#011C40]/80 border-white/5 shadow-2xl">
+        <div className="sticky top-0 z-50 backdrop-blur-3xl border-b px-4 sm:px-8 md:px-12 py-4 flex items-center justify-between bg-[#011C40]/80 border-white/5 shadow-2xl">
           <div className="flex items-center gap-12">
             <div className="flex items-center gap-4">
               <div className="w-3 h-3 rounded-full animate-pulse shadow-[0_0_15px_rgba(212,165,116,0.5)] bg-[#D4A574]" />
@@ -69,14 +69,14 @@ export default function ModulosPage() {
         </div>
 
         {/* Main content */}
-        <div className="p-12 space-y-16 flex-1">
+        <div className="p-4 sm:p-8 md:p-12 space-y-8 lg:space-y-16 flex-1">
 
           {!selectedSemestre ? (
-            <div className="space-y-24">
+            <div className="space-y-12 lg:space-y-24">
 
               {/* Header */}
               <div className="space-y-4">
-                <h1 className="text-7xl font-black tracking-tighter leading-none text-white">
+                <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tighter leading-none text-white">
                   Módulos <span className="italic font-sans text-[#D4A574]">CEN</span>
                 </h1>
                 <p className="text-lg font-medium max-w-xl text-white/40">

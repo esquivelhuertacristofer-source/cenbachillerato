@@ -163,20 +163,20 @@ export default function BibliotecaPage() {
     <div className="flex min-h-screen bg-[#F4F1EA] font-['Epilogue'] text-[#011C40]">
       <Sidebar />
 
-      <main className="flex-1 md:ml-[260px] p-8 md:p-12 space-y-12 relative">
+      <main className="flex-1 md:ml-[260px] p-4 sm:p-8 md:p-12 space-y-8 md:space-y-12 relative">
 
         {/* Header */}
-        <div className="relative overflow-hidden rounded-[3.5rem] bg-[#011C40] p-16 shadow-[0_40px_80px_rgba(1,28,64,0.3)]">
+        <div className="relative overflow-hidden rounded-[2.5rem] md:rounded-[3.5rem] bg-[#011C40] p-8 sm:p-12 md:p-16 shadow-[0_40px_80px_rgba(1,28,64,0.3)]">
           <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#D4A574]/20 rounded-full blur-[140px] animate-pulse" />
-          <div className="relative z-10 flex flex-col xl:flex-row items-center justify-between gap-12">
-            <div className="space-y-8 flex-1 text-center xl:text-left">
+          <div className="relative z-10 flex flex-col xl:flex-row items-center justify-between gap-8 md:gap-12">
+            <div className="space-y-5 md:space-y-8 flex-1 text-center xl:text-left">
               <div className="flex items-center justify-center xl:justify-start gap-4">
-                <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center border border-white/20">
-                  <Library className="w-6 h-6 text-[#7DD3FC]" />
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-white/10 rounded-2xl flex items-center justify-center border border-white/20">
+                  <Library className="w-5 h-5 md:w-6 md:h-6 text-[#7DD3FC]" />
                 </div>
                 <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/50">CEN Bachillerato · MCCEMS</span>
               </div>
-              <h1 className="text-6xl md:text-8xl font-black text-white leading-none tracking-tighter">
+              <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-white leading-none tracking-tighter">
                 Biblioteca <span className="italic font-sans text-[#D4A574]">Maestra</span>
               </h1>
               <p className="max-w-2xl text-xl text-white/50 font-medium leading-relaxed">
@@ -200,44 +200,49 @@ export default function BibliotecaPage() {
         </div>
 
         {/* Filters */}
-        <div className="sticky top-8 z-30 bg-[#F4F1EA]/80 backdrop-blur-2xl p-6 rounded-[3rem] border border-white shadow-xl flex flex-wrap items-center justify-between gap-8">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-[#011C40] text-white rounded-2xl">
-              <Filter className="w-5 h-5" />
+        <div className="sticky top-0 z-30 bg-[#F4F1EA]/90 backdrop-blur-2xl p-4 md:p-6 rounded-[2rem] md:rounded-[3rem] border border-white shadow-xl flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-8">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 md:p-3 bg-[#011C40] text-white rounded-xl md:rounded-2xl flex-shrink-0">
+              <Filter className="w-4 h-4 md:w-5 md:h-5" />
             </div>
-            <div className="flex gap-2 p-1.5 bg-white rounded-2xl border border-slate-100">
-              {['Todos', 'Oficial', 'Evaluación', 'Libros', 'Docentes', 'Ciencia y Tech'].map(cat => (
-                <button
-                  key={cat}
-                  onClick={() => setActiveCategory(cat)}
-                  className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-                    activeCategory === cat
-                      ? 'bg-[#011C40] text-white shadow-lg scale-[1.02]'
-                      : 'text-slate-400 hover:text-[#011C40] hover:bg-slate-50'
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
+            <div className="overflow-x-auto -mr-4 pr-4 md:mr-0 md:pr-0">
+              <div className="flex gap-1.5 md:gap-2 p-1.5 bg-white rounded-2xl border border-slate-100 min-w-max">
+                {['Todos', 'Oficial', 'Evaluación', 'Libros', 'Docentes', 'Ciencia y Tech'].map(cat => (
+                  <button
+                    key={cat}
+                    onClick={() => setActiveCategory(cat)}
+                    className={`px-4 md:px-6 py-2.5 md:py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${
+                      activeCategory === cat
+                        ? 'bg-[#011C40] text-white shadow-lg scale-[1.02]'
+                        : 'text-slate-400 hover:text-[#011C40] hover:bg-slate-50'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mr-2">Semestre:</span>
-            <div className="flex gap-2">
-              {['Todos', '1-2 Semestre', '3-4 Semestre', '5-6 Semestre', 'Docentes'].map(lvl => (
-                <button
-                  key={lvl}
-                  onClick={() => setActiveLevel(lvl)}
-                  className={`px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${
-                    activeLevel === lvl
-                      ? 'bg-[#D4A574] border-[#D4A574] text-white'
-                      : 'bg-white border-slate-100 text-slate-400 hover:border-[#D4A574] hover:text-[#D4A574]'
-                  }`}
-                >
-                  {lvl}
-                </button>
-              ))}
+          <div className="flex items-center gap-2 md:gap-3 overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest whitespace-nowrap flex-shrink-0">Semestre:</span>
+            <div className="flex gap-1.5 md:gap-2 min-w-max">
+              {['Todos', '1-2 Sem', '3-4 Sem', '5-6 Sem', 'Docentes'].map((lvl, i) => {
+                const lvlFull = ['Todos', '1-2 Semestre', '3-4 Semestre', '5-6 Semestre', 'Docentes'][i]!;
+                return (
+                  <button
+                    key={lvl}
+                    onClick={() => setActiveLevel(lvlFull)}
+                    className={`px-3 md:px-5 py-2.5 md:py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all whitespace-nowrap ${
+                      activeLevel === lvlFull
+                        ? 'bg-[#D4A574] border-[#D4A574] text-white'
+                        : 'bg-white border-slate-100 text-slate-400 hover:border-[#D4A574] hover:text-[#D4A574]'
+                    }`}
+                  >
+                    {lvl}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
