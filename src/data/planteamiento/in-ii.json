@@ -6,11 +6,135 @@
     "duration": "~3h (2 sesiones de 50 min)",
     "difficulty": "Fundamental",
     "category": "Comunicación oral y escrita",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "metadata": {
+      "objective": "El estudiante describe en inglés rutinas diarias propias y ajenas usando el presente simple con adverbios de frecuencia, contextualizando en su entorno familiar, escolar y comunitario mexicano.",
+      "competencies": [
+        "Usa el presente simple afirmativo, negativo e interrogativo con corrección básica",
+        "Emplea adverbios de frecuencia (always, usually, sometimes, never) en contextos reales",
+        "Conecta vocabulario de actividades cotidianas con su vida en México",
+        "Produce textos orales y escritos breves sobre rutinas diarias"
+      ],
+      "materials": [
+        "Tarjetas de vocabulario con imágenes de rutinas (levantarse, desayunar, tomar el camión, estudiar)",
+        "Hoja de trabajo: 'My Daily Schedule' con bloques horarios",
+        "Grabaciones de audio con diálogos de rutinas en contexto mexicano (mercado, escuela, casa)",
+        "Diccionario bilingüe SEP o acceso a WordReference",
+        "Proyector o pizarrón para tabla de adverbios de frecuencia"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {
+          "phase": "Apertura",
+          "duration": "15 min",
+          "label": "Mimica de rutinas — Act it out"
+        },
+        {
+          "phase": "Desarrollo",
+          "duration": "60 min",
+          "label": "Estructura del presente simple + entrevista en pares"
+        },
+        {
+          "phase": "Cierre",
+          "duration": "25 min",
+          "label": "Presentacion oral My Partner Routine + coevaluacion"
+        }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "15 min",
+          "description": "Activación de conocimientos previos mediante mímica de rutinas. El docente realiza acciones (despertarse, cepillarse dientes, comer) y los alumnos identifican la actividad en inglés. Se introduce la pregunta guía: 'What do you do every day?'",
+          "activity": "Juego 'Act it out': El docente o un alumno voluntario mima una rutina diaria mientras el grupo adivina en inglés. Se listan en el pizarrón 10 verbos clave: wake up, eat, go to school, study, work, sleep, cook, clean, play, read. Cada alumno señala cuáles hace diariamente."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "60 min",
+          "description": "Presentación explícita del presente simple (estructura afirmativa, negativa, interrogativa) y adverbios de frecuencia. Práctica controlada con ejercicios de sustitución. Práctica comunicativa en pares: entrevista sobre rutinas usando preguntas modelo ('What time do you wake up?', 'How often do you eat breakfast?'). Producción escrita: párrafo de 5-7 oraciones 'My Daily Routine'.",
+          "activity": "Tarea 1: Completar tabla de rutinas (hora + actividad + frecuencia) propia. Tarea 2: Entrevistar a un compañero y reportar en tercera persona ('Carlos usually wakes up at 6 a.m.'). Tarea 3: Redactar párrafo 'My Daily Routine' usando al menos 3 adverbios de frecuencia y tiempos correctos del presente simple."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "25 min",
+          "description": "Presentación oral breve (1 min por alumno o en equipos de 3) describiendo la rutina de su compañero. Coevaluación con lista de cotejo: ¿usó presente simple correctamente?, ¿incluyó adverbios de frecuencia?, ¿se entendió el mensaje? Reflexión final sobre la importancia del inglés en contextos cotidianos mexicanos (turismo, comercio, tecnología).",
+          "activity": "Presentación 'My Partner's Routine': Cada alumno presenta 3 datos de la rutina de su compañero entrevistado. La clase vota por la rutina más sorprendente. Cierre con pregunta metacognitiva: '¿En qué momento de tu día usarías el inglés para describir lo que haces?'"
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "El presente simple es el tiempo verbal fundamental para describir acciones habituales, rutinas y verdades generales. Según el Marco Curricular MCCEMS (SEP, 2022) y el Programa Nacional de Inglés (PRONI), los estudiantes de bachillerato deben alcanzar un nivel A2 del Marco Común Europeo de Referencia (MCER), lo que implica comprender y producir descripciones básicas de rutinas cotidianas. En México, donde el inglés es la principal lengua extranjera con relevancia en el mercado laboral, el turismo y la educación superior, dominar esta estructura es una competencia prioritaria. El INEGI reporta que el 3.8% de hogares mexicanos usa el inglés como segunda lengua en contextos familiares, cifra que crece en zonas turísticas como Cancún, Los Cabos y Ciudad de México.",
+      "sections": [
+        {
+          "subtitle": "El Presente Simple: Estructura y Uso",
+          "content": "El presente simple se forma con el infinitivo del verbo sin 'to'. En tercera persona singular (he/she/it) se agrega -s o -es al verbo. La forma negativa usa el auxiliar do/does + not, y la interrogativa invierte do/does al inicio de la oración. Ejemplos contextualizados en México: 'I take the metro every day' (Ciudad de México), 'She sells tamales in the market on Sundays' (cualquier comunidad), 'We study at the preparatoria from 7 to 2 pm'. Los adverbios de frecuencia se colocan entre el sujeto y el verbo principal: always (100%), usually (75%), often (50%), sometimes (25%), rarely (10%), never (0%). Regla de excepción: con el verbo 'to be' el adverbio va después: 'She is always punctual.'"
+        },
+        {
+          "subtitle": "Vocabulario de Rutinas en Contexto Mexicano",
+          "content": "El vocabulario de rutinas debe conectarse con la realidad cultural del estudiante. Actividades matutinas comunes en México: wake up / get up (levantarse), take a shower (bañarse), get dressed (vestirse), have breakfast (desayunar — café de olla, chilaquiles, pan dulce), take the bus/metro/combi (tomar el transporte). Actividades escolares: attend class (asistir a clases), take notes (tomar apuntes), have lunch (comer — en muchas comunidades la comida es la comida principal del día, no el breakfast). Actividades vespertinas/nocturnas: do homework (hacer tarea), help at home (ayudar en casa), watch TV (ver televisión), go to bed (acostarse). Es importante que el docente valide rutinas culturalmente diversas: alumnos que trabajan, cuidan hermanos menores, o tienen actividades agrícolas o artesanales en sus comunidades."
+        },
+        {
+          "subtitle": "El Inglés en la Vida Cotidiana Mexicana",
+          "content": "El PRONI (Programa Nacional de Inglés) de la SEP busca que al concluir el bachillerato los estudiantes alcancen nivel B1 del MCER. El inglés está presente en la vida cotidiana mexicana de formas que los estudiantes no siempre reconocen: etiquetas de productos (ingredients, net content), redes sociales (post, like, share, story), videojuegos, música popular, series de streaming, y el ámbito laboral (maquiladoras, turismo, call centers, tecnología). El CENNI (Certificación Nacional de Nivel de Idioma), administrado por la SEP, permite a los egresados certificar su competencia en inglés, lo que mejora sus perspectivas laborales. Reconocer el inglés en contextos cotidianos motiva al estudiante y reduce la ansiedad lingüística."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Which sentence correctly describes a daily routine in the simple present tense?",
+          "options": [
+            "A) She eat breakfast at 7 a.m. every day.",
+            "B) She eats breakfast at 7 a.m. every day.",
+            "C) She is eat breakfast at 7 a.m. every day."
+          ],
+          "correct": "B) She eats breakfast at 7 a.m. every day."
+        },
+        {
+          "question": "Where does the adverb of frequency go in the sentence: 'Carlos / wakes up / late'?",
+          "options": [
+            "A) Carlos wakes up late usually.",
+            "B) Carlos usually wakes up late.",
+            "C) Usually Carlos wakes up late."
+          ],
+          "correct": "B) Carlos usually wakes up late."
+        },
+        {
+          "question": "How do you make a question in the simple present with the verb 'study'?",
+          "options": [
+            "A) Study you English every day?",
+            "B) You study English every day?",
+            "C) Do you study English every day?"
+          ],
+          "correct": "C) Do you study English every day?"
+        },
+        {
+          "question": "A student says: 'My mother sells handmade crafts at the market on Saturdays and Sundays.' What does this tell us about her routine?",
+          "options": [
+            "A) Her mother works every day of the week at the market.",
+            "B) Her mother has a weekend routine of selling crafts, reflecting a common economic activity in Mexican communities.",
+            "C) Her mother never works during the week."
+          ],
+          "correct": "B) Her mother has a weekend routine of selling crafts, reflecting a common economic activity in Mexican communities."
+        },
+        {
+          "question": "The PRONI program (SEP) aims for bachillerato students to reach which level of the CEFR by graduation?",
+          "options": [
+            "A) A1 — Beginner",
+            "B) B1 — Intermediate",
+            "C) C1 — Advanced"
+          ],
+          "correct": "B) B1 — Intermediate"
+        }
+      ],
+      "rubric": "RÚBRICA — Párrafo 'My Daily Routine' (20 pts)\n\nCORRECCIÓN GRAMATICAL (6 pts): 6=Sin errores en presente simple y adverbios | 4=1-2 errores menores que no afectan comprensión | 2=Errores frecuentes pero mensaje reconocible | 0=Errores sistemáticos que impiden comprensión\n\nVOCABULARIO (5 pts): 5=8+ verbos de rutina variados y precisos | 4=5-7 verbos con vocabulario adecuado | 2=3-4 verbos con repetición excesiva | 0=Menos de 3 verbos o vocabulario inadecuado\n\nCOHERENCIA Y ORGANIZACIÓN (5 pts): 5=Párrafo fluido con conectores (then, after that, finally) | 4=Orden lógico con algunos conectores | 2=Ideas presentes pero sin organización clara | 0=Sin estructura identificable\n\nCONTEXTUALIZACIÓN CULTURAL (4 pts): 4=Incluye actividades auténticas de su comunidad/entorno mexicano | 3=Menciona algún elemento contextualizado | 2=Rutinas genéricas sin contextualización | 0=No incluye elementos contextuales"
+    },
+    "teacher_tips": [
+      "Error frecuente: Los alumnos olvidan la -s en 3ª persona singular. Crea un cartel permanente: 'He/She/It → VERB+S' y señálalo cada vez que aparezca este patrón en el aula.",
+      "Contextualización: Pide a los alumnos que nombren sus rutinas en español primero y luego las traduzcan. Esto reduce la ansiedad y valida su conocimiento cultural. Las rutinas varían mucho en comunidades rurales vs urbanas, semiurbanas — aprovecha esa diversidad.",
+      "Diferenciación: Para alumnos avanzados, pide que usen conectores de tiempo (first, then, after that, finally, at the end of the day). Para alumnos con dificultades, proporciona una lista de verbos con imágenes y permite que usen traducción como andamiaje.",
+      "Integración SEL: La actividad de entrevista promueve la escucha activa y el respeto por las rutinas de los demás. Reflexiona con el grupo: '¿Qué nos dicen las rutinas sobre nuestra cultura y valores?' Esto conecta con el eje de bienestar del MCCEMS.",
+      "Evaluación formativa: Circula mientras los alumnos escriben el párrafo y anota los errores más comunes en el pizarrón (sin señalar a nadie). Al final, corrijan juntos los 3 errores más frecuentes — esto es más eficaz que corregir individualmente cada texto."
+    ]
   },
   "IN-II-P02": {
     "code": "IN-II-P02",
@@ -19,11 +143,135 @@
     "duration": "~3h (2 sesiones de 50 min)",
     "difficulty": "Fundamental",
     "category": "Comunicación oral y escrita",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "metadata": {
+      "objective": "El estudiante describe en inglés actividades de tiempo libre de terceras personas usando el presente simple en 3ª persona singular y expresiones de frecuencia y tiempo, valorando la diversidad de intereses recreativos en el contexto mexicano.",
+      "competencies": [
+        "Aplica correctamente la terminación -s/-es en el presente simple para 3ª persona singular",
+        "Usa expresiones de tiempo (on weekends, in the evening, every Saturday, twice a week)",
+        "Produce descripciones orales y escritas de actividades de ocio de compañeros, familiares o personajes",
+        "Reconoce y valora la diversidad cultural en las actividades recreativas mexicanas"
+      ],
+      "materials": [
+        "Tarjetas de actividades de tiempo libre con imágenes (deportes, música, lectura, videojuegos, artesanías)",
+        "Cuestionario 'Free Time Survey' para entrevistar a compañeros",
+        "Mapa de México con regiones y actividades recreativas típicas",
+        "Grabación de audio: descripción de tiempo libre de un estudiante mexicano (nivel A2)",
+        "Tarjetas de expresiones de tiempo y frecuencia para pegar en el cuaderno"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {
+          "phase": "Apertura",
+          "duration": "15 min",
+          "label": "Bingo de actividades de tiempo libre"
+        },
+        {
+          "phase": "Desarrollo",
+          "duration": "60 min",
+          "label": "Regla de la -s + Free Time Survey + redaccion de perfiles"
+        },
+        {
+          "phase": "Cierre",
+          "duration": "25 min",
+          "label": "Infografia Our Class Free Time Profile"
+        }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "15 min",
+          "description": "El docente presenta imágenes de actividades de tiempo libre típicas en México (jugar fútbol, tocar guitarra, ir a la tianguis, ver novelas, jugar videojuegos, bordado, jardinería). Los alumnos identifican cuáles practican y cuáles son más comunes en su comunidad. Se introduce la diferencia gramatical: 'I play' vs 'He/She plays'.",
+          "activity": "Bingo de actividades: Cada alumno tiene un cartón con 9 actividades de tiempo libre en inglés (con imagen). El docente describe en inglés ('This person reads books every night') y los alumnos marcan la actividad. El primero en completar una línea grita 'Bingo!' y dice una oración completa con cada actividad marcada."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "60 min",
+          "description": "Presentación de la regla de la -s en 3ª persona singular con atención a irregularidades: goes, does, watches, studies (verbos terminados en -o, -ch, -sh, -x: +es; en consonante+y: -ies). Práctica con encuesta ('Free Time Survey'): cada alumno entrevista a 3 compañeros usando preguntas modelo. Luego completan ficha de descripción de cada persona entrevistada.",
+          "activity": "Survey en pares/trío: Cada estudiante pregunta a 3 compañeros usando: 'What do you do in your free time?', 'How often?', 'When?', 'Who do you do it with?'. Registra respuestas en tabla. Después redacta 3 párrafos (uno por persona): 'My classmate [name]...'. El grupo comparte resultados y el docente proyecta estadísticas: '7 out of 25 students play football on weekends.'"
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "25 min",
+          "description": "Presentación de 'nuestro grupo': Cada equipo de 4 presenta un perfil de las actividades de su micro-grupo. Se conecta con el contexto cultural: ¿Qué nos dicen estas actividades sobre nuestra comunidad? ¿Cómo varían entre alumnos de Ciudad de México, Oaxaca, o Monterrey?",
+          "activity": "Infografía rápida: En cartulina o digital, los alumnos crean 'Our Class Free Time Profile' con las actividades más populares, usando oraciones en 3ª persona plural ('Most students in our class play video games on weekdays'). Se pega en el salón o se comparte en el grupo escolar."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Hablar sobre lo que otras personas hacen en su tiempo libre es una función comunicativa esencial del nivel A2 del MCER. Esta progresión desarrolla la competencia sociolingüística: reconocer que las actividades recreativas reflejan valores, recursos económicos, acceso a tecnología y tradiciones culturales. En México, el tiempo libre está fuertemente influenciado por la geografía y la cultura regional: el fútbol (deporte más practicado según INEGI), la música en vivo, las ferias patronales, la danza folklórica, la artesanía, y más recientemente, los videojuegos y las redes sociales. El Programa Nacional de Inglés (PRONI-SEP) enfatiza que el aprendizaje del inglés debe conectarse con contextos culturales auténticos y significativos para el alumno.",
+      "sections": [
+        {
+          "subtitle": "La Tercera Persona Singular: Reglas y Excepciones",
+          "content": "En el presente simple, cuando el sujeto es he, she, o it (o un nombre singular), el verbo añade una terminación especial. La regla general es añadir -s: plays, reads, works, eats. Hay reglas específicas para ciertos grupos de verbos: (1) Verbos terminados en -ch, -sh, -x, -o, -ss: añaden -es → watches, washes, fixes, goes, does, kisses. (2) Verbos terminados en consonante + y: cambian -y por -ies → study→studies, try→tries, fly→flies. Excepción: si antes de la -y hay vocal, solo se añade -s → plays, says, buys. Verbos irregulares: have→has. Práctica con ejemplos mexicanos: 'Lupita studies English at the CELE-UNAM.' / 'My dad watches fútbol on Sundays.' / 'The vendor goes to the market at 5 a.m.' / 'My sister does her homework before dinner.'"
+        },
+        {
+          "subtitle": "Expresiones de Tiempo y Frecuencia",
+          "content": "Para hablar de cuándo y con qué frecuencia alguien hace algo, usamos expresiones de tiempo que se colocan generalmente al inicio o al final de la oración: On + días de la semana: on Mondays, on weekends, on Saturdays and Sundays. In + partes del día: in the morning, in the afternoon, in the evening (no in the night → at night). At + momentos específicos: at noon, at night, at midnight, at 3 p.m. Every + unidad de tiempo: every day, every week, every month. Once/twice/three times + a week/month/year. Ejemplos contextualizados: 'She goes to the tianguis every Sunday morning.' / 'He plays basketball twice a week after school.' / 'My grandmother watches telenovelas every evening at 8 p.m.'"
+        },
+        {
+          "subtitle": "El Tiempo Libre como Reflejo Cultural",
+          "content": "Las actividades de tiempo libre no son universales: reflejan el contexto socioeconómico, cultural y geográfico de cada comunidad. Según la Encuesta Nacional de Prácticas y Consumo Culturales (SEGOB/CNCPC), los mexicanos dedican tiempo libre principalmente a: ver televisión (61%), escuchar música (58%), leer (45%), practicar deportes (40%), y actividades artísticas (25%). En comunidades indígenas y rurales, el tiempo libre incluye actividades artesanales, festivas y comunitarias que tienen valor cultural e identitario. Es importante que el aprendizaje del inglés reconozca y valore esta diversidad, usando vocabulario que permita describir actividades propias: 'She weaves traditional textiles on weekends' / 'He participates in the community dance festival every year.'"
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Which sentence is grammatically correct in the simple present, third person singular?",
+          "options": [
+            "A) My sister play volleyball every Friday.",
+            "B) My sister plays volleyball every Friday.",
+            "C) My sister is playing volleyball every Friday."
+          ],
+          "correct": "B) My sister plays volleyball every Friday."
+        },
+        {
+          "question": "How do you form the third person singular of the verb 'study'?",
+          "options": [
+            "A) studys",
+            "B) studies",
+            "C) studiess"
+          ],
+          "correct": "B) studies"
+        },
+        {
+          "question": "What is the correct way to express frequency using 'twice'?",
+          "options": [
+            "A) He goes to the gym twice times a week.",
+            "B) He goes to the gym twice a week.",
+            "C) He goes twice times the gym per week."
+          ],
+          "correct": "B) He goes to the gym twice a week."
+        },
+        {
+          "question": "According to the Encuesta Nacional de Prácticas y Consumo Culturales, which is the most common leisure activity among Mexicans?",
+          "options": [
+            "A) Reading books",
+            "B) Watching television",
+            "C) Playing sports"
+          ],
+          "correct": "B) Watching television"
+        },
+        {
+          "question": "A student writes: 'My friend Luis go to the cinema on weekends.' What correction is needed?",
+          "options": [
+            "A) Change 'go' to 'goes' because Luis is third person singular.",
+            "B) Change 'go' to 'going' to make a continuous tense.",
+            "C) Add 'does' before 'go': 'My friend Luis does go.'"
+          ],
+          "correct": "A) Change 'go' to 'goes' because Luis is third person singular."
+        }
+      ],
+      "rubric": "RÚBRICA — Párrafo 'My Classmate's Free Time' (20 pts)\n\nCORRECCIÓN GRAMATICAL 3ª PERSONA (7 pts): 7=Todas las formas de 3ª persona correctas sin excepción | 5=1-2 errores en terminaciones pero patrón correcto | 3=Errores frecuentes pero identifica la estructura | 0=No aplica la regla de 3ª persona\n\nEXPRESIONES DE TIEMPO (5 pts): 5=Usa 4+ expresiones de tiempo/frecuencia variadas y correctas | 4=2-3 expresiones correctas | 2=1 expresión correcta con errores en otras | 0=No usa expresiones de tiempo\n\nFLUIDEZ Y COHERENCIA (5 pts): 5=Texto fluido, lógico, con conectores adecuados | 4=Ideas claras con algunos saltos | 2=Ideas presentes pero difíciles de seguir | 0=Texto incoherente\n\nRIQUEZA DE VOCABULARIO (3 pts): 3=5+ actividades de tiempo libre variadas y precisas | 2=3-4 actividades | 1=1-2 actividades con vocabulario muy básico | 0=Sin vocabulario de tiempo libre"
+    },
+    "teacher_tips": [
+      "La regla de la -s en 3ª persona es uno de los errores más persistentes en hablantes de inglés como L2 cuya L1 no tiene esta marca morfológica. No esperes que desaparezca después de una clase; refuerza consistentemente durante todo el semestre señalando el error con gentileza pero con constancia.",
+      "Aprovecha la diversidad del grupo: si tienes alumnos de distintas regiones de México, pídeles que describan actividades de tiempo libre de su comunidad. Un alumno oaxaqueño puede describir 'My grandmother weaves huipiles on weekends.' Esto enriquece el vocabulario y valida su identidad cultural.",
+      "Para el survey, da un tiempo límite estricto (10 minutos para las 3 entrevistas) para que el ejercicio sea dinámico. Los alumnos tienden a conversar en español si el tiempo es ilimitado. El límite crea la urgencia de usar el inglés.",
+      "Errores culturales de vocabulario: En inglés, 'free time' y 'leisure time' son sinónimos, pero 'holiday' (British English) y 'vacation' (American English) difieren. En México se usa más el inglés americano, pero es útil mencionar la diferencia. También: 'play' para deportes e instrumentos ('play football', 'play guitar'), pero 'do' para artes marciales y actividades individuales ('do yoga', 'do karate').",
+      "Extensión para alumnos avanzados: Pídeles que hagan una mini-encuesta fuera del aula (a familiares o vecinos) y presenten los resultados como una pequeña investigación social: '5 out of 8 people in my neighborhood watch TV in the evenings. 3 of them also...' Esto desarrolla pensamiento crítico y competencia comunicativa auténtica."
+    ]
   },
   "IN-II-P03": {
     "code": "IN-II-P03",
@@ -32,11 +280,135 @@
     "duration": "~3h (2 sesiones de 50 min)",
     "difficulty": "Fundamental",
     "category": "Comunicación oral y escrita",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "metadata": {
+      "objective": "El estudiante usa los verbos modales can/can't y may/could para expresar habilidades personales y solicitar o dar permiso en situaciones cotidianas, desarrollando competencia comunicativa en contextos educativos y comunitarios mexicanos.",
+      "competencies": [
+        "Distingue el uso de can/can't para expresar habilidad vs imposibilidad",
+        "Usa may/could para solicitudes de permiso formales e informales",
+        "Produce diálogos cortos sobre habilidades y permisos en contextos reales",
+        "Valora las diversas habilidades y talentos de sus compañeros"
+      ],
+      "materials": [
+        "Tarjetas de habilidades con imágenes (nadar, cocinar, tocar un instrumento, hablar idiomas, programar)",
+        "Tarjetas de situaciones para pedir permiso (aula, hospital, biblioteca, museo, oficina gubernamental)",
+        "Guión de diálogo modelo: pedido de permiso en la dirección de la escuela",
+        "Rúbrica de autoevaluación de habilidades personales",
+        "Videos cortos de mexicanos describiendo sus talentos en inglés (TikToks, YouTube clips — nivel A2)"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {
+          "phase": "Apertura",
+          "duration": "15 min",
+          "label": "Find Someone Who Can — encuesta de habilidades"
+        },
+        {
+          "phase": "Desarrollo",
+          "duration": "60 min",
+          "label": "Can/Cannot + May/Could + role-play de permiso"
+        },
+        {
+          "phase": "Cierre",
+          "duration": "25 min",
+          "label": "Autoevaluacion My English Abilities"
+        }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "15 min",
+          "description": "El docente presenta tarjetas de habilidades y pregunta al grupo: '¿Quién puede hacer esto?' Los alumnos responden alzando la mano. Se introduce la estructura: 'Can you [skill]?' — 'Yes, I can / No, I can't.' Se contextualiza: en México, habilidades como hablar una lengua indígena, cocinar platillos regionales o tocar sones son valiosas.",
+          "activity": "Dinámica 'Find Someone Who Can...': Cada alumno recibe una lista de 10 habilidades ('play the guitar', 'speak an indigenous language', 'cook tamales', 'ride a bike', 'use Excel'). Deben circular por el salón y preguntar a compañeros hasta encontrar a alguien que pueda hacer cada cosa. Registran el nombre. El primero en completar la lista gana."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "60 min",
+          "description": "Presentación de can/can't para habilidades (afirmativo, negativo, interrogativo) y su uso como respuesta corta. Luego presentación de may/could para permiso, diferenciando contextos formales (may) e informales (can/could). Role-play en pares de 5 situaciones: pedir permiso al maestro para salir, en la biblioteca para usar el equipo, en el hospital para visitar a alguien, en una tienda para probar un producto, en la escuela para usar el celular.",
+          "activity": "Actividad 1: Completar tabla de habilidades del grupo + estadísticas ('12 out of 25 students can cook.' / 'Only 3 students can speak an indigenous language.'). Actividad 2: Role-play de permiso — cada pareja recibe una tarjeta de situación y crea un diálogo de 6-8 turnos que incluya: request, permission granted/denied, reason, thank you. Presentan ante el grupo (2 parejas)."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "25 min",
+          "description": "Presentación de role-plays seleccionados. El grupo evalúa usando una lista de cotejo simple: ¿Usaron can/can't para habilidades? ¿Usaron may/could para permiso? ¿El diálogo fue fluido? ¿El contexto fue realista? Reflexión final sobre la importancia de saber pedir permiso apropiadamente en inglés (en una empresa, al ir a EE.UU., al atender turistas).",
+          "activity": "Autoevaluación 'My English Abilities': Los alumnos completan una tabla personal: '5 things I can do in English / 3 things I can't do yet but want to learn.' Esto se guarda en su portafolio de aprendizaje. El docente pregunta: '¿Cómo podrías practicar las habilidades que aún no tienes?'"
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Los verbos modales son auxiliares que modifican el significado del verbo principal sin conjugarse. Can, could, y may son modales fundamentales en el nivel A2 que permiten expresar capacidad, posibilidad y permiso. Dominar estos modales es esencial para la comunicación cotidiana: desde pedir permiso a un profesor o jefe hasta describir habilidades en una entrevista de trabajo. El Marco Curricular MCCEMS enfatiza el desarrollo de la competencia comunicativa en contextos reales, y el ámbito laboral y social en México requiere cada vez más la capacidad de negociar permisos y presentar habilidades propias en inglés, especialmente en sectores como el turismo (donde México recibe más de 40 millones de turistas anuales según SECTUR) y la industria maquiladora.",
+      "sections": [
+        {
+          "subtitle": "Can / Can't — Expresar Habilidad",
+          "content": "Can es un verbo modal que expresa capacidad o habilidad. Se usa con el infinitivo sin 'to' y es invariable (no cambia para 3ª persona singular). Estructura: Sujeto + can/can't + verbo base. Afirmativo: 'I can speak English.' / 'She can cook mole negro.' Negativo: 'He can't swim.' / 'We can't play piano.' Interrogativo: 'Can you ride a horse?' / 'Can she read music?' Respuestas cortas: 'Yes, I can.' / 'No, I can't.' Importante: Can no lleva 'to' después ('I can to swim' es incorrecto). En contextos de trabajo: 'I can use Excel, design graphics, and speak English' son habilidades valoradas en el mercado laboral mexicano. Can también expresa posibilidad lógica: 'It can be cold in the mountains at night.'"
+        },
+        {
+          "subtitle": "May / Could — Solicitar Permiso",
+          "content": "Para pedir permiso en inglés, usamos principalmente: Can I...? (informal, entre amigos o en contextos relajados), Could I...? (más cortés y formal), May I...? (muy formal, en contextos oficiales o de respeto). Respuestas: afirmativas: 'Yes, you can/may.' / 'Of course.' / 'Sure, go ahead.' / 'Certainly.' Negativas: 'No, you can't/may not.' / 'I'm afraid not.' / 'Sorry, it's not allowed.' Situaciones formales en México donde se usa May/Could: en oficinas gubernamentales (IMSS, SAT, SEP), en hospitales ('May I visit the patient in room 12?'), en museos como el Museo Nacional de Antropología ('Could I take photos here?'), en entrevistas de trabajo ('May I ask about the salary?'). La elección del modal adecuado muestra competencia sociolingüística: usar 'Can I leave?' con el director sería percibido como descortés; 'May I be excused?' es más apropiado."
+        },
+        {
+          "subtitle": "Habilidades Valoradas en el Contexto Mexicano",
+          "content": "Hablar de habilidades propias en inglés es una competencia clave para el mercado laboral. El STPS (Secretaría del Trabajo y Previsión Social) señala que el inglés es la segunda habilidad más demandada en el mercado laboral mexicano (después de las habilidades digitales). Habilidades específicas al contexto cultural: hablar una lengua indígena (hay 68 lenguas nacionales reconocidas por el INALI — Instituto Nacional de Lenguas Indígenas), tocar un instrumento regional (mariachi, marimba, son jarocho), dominar técnicas artesanales (cerámica Talavera, textiles Zapotec, alebrijes de Oaxaca), cocinar platillos de la cocina mexicana (Patrimonio Cultural Inmaterial de la Humanidad según UNESCO desde 2010). El inglés permite presentar estas habilidades a audiencias internacionales, abriendo oportunidades en turismo cultural, exportación artesanal y educación."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Which sentence correctly uses 'can' to express ability?",
+          "options": [
+            "A) She can to speak three languages.",
+            "B) She can speaks three languages.",
+            "C) She can speak three languages."
+          ],
+          "correct": "C) She can speak three languages."
+        },
+        {
+          "question": "You want to ask permission to leave class early in a formal, respectful way. Which is the most appropriate?",
+          "options": [
+            "A) Can I go? I'm done.",
+            "B) May I be excused a few minutes early, please?",
+            "C) I want to leave now."
+          ],
+          "correct": "B) May I be excused a few minutes early, please?"
+        },
+        {
+          "question": "What is the correct negative form of 'can' in English?",
+          "options": [
+            "A) I no can swim.",
+            "B) I don't can swim.",
+            "C) I can't swim."
+          ],
+          "correct": "C) I can't swim."
+        },
+        {
+          "question": "The INALI (Instituto Nacional de Lenguas Indígenas) recognizes how many national languages in Mexico, which students might describe using 'I can speak...'?",
+          "options": [
+            "A) 12",
+            "B) 68",
+            "C) 34"
+          ],
+          "correct": "B) 68"
+        },
+        {
+          "question": "Which response correctly grants permission in English?",
+          "options": [
+            "A) 'May I use the restroom?' — 'Yes, you may go.'",
+            "B) 'May I use the restroom?' — 'Yes, you can to go.'",
+            "C) 'May I use the restroom?' — 'Yes, you are able going.'"
+          ],
+          "correct": "A) 'May I use the restroom?' — 'Yes, you may go.'"
+        }
+      ],
+      "rubric": "RÚBRICA — Role-play de Habilidades y Permiso (20 pts)\n\nUSO DE MODALES (7 pts): 7=Usa can/can't y may/could correctamente en todos los contextos | 5=Pequeños errores pero uso consistente | 3=Errores frecuentes pero reconocible la estructura | 0=No usa verbos modales\n\nFLUIDEZ COMUNICATIVA (5 pts): 5=Diálogo natural, turnos equilibrados, pocas pausas largas | 4=Comunicación efectiva con algunas interrupciones | 2=Comunicación difícil pero mensaje transmitido | 0=Comunicación bloqueada\n\nAPROPIADAD CONTEXTUAL (5 pts): 5=Registros formal/informal correctamente diferenciados | 4=Algún ajuste necesario en registro | 2=Sin distinción de registro formal/informal | 0=Registro inapropiado en todos los contextos\n\nPRONUNCIACIÓN Y CLARIDAD (3 pts): 3=Clara y comprensible con buena entonación | 2=Comprensible con algunos problemas de pronunciación | 1=Difícil de entender pero hay intento | 0=Incomprensible"
+    },
+    "teacher_tips": [
+      "Error muy común: alumnos dicen 'I can to swim' añadiendo 'to'. Crea un recordatorio visual en el aula: 'CAN + VERB (no TO)'. Usa la analogía: can ya es el auxiliar, no necesita ayuda adicional.",
+      "Diferencia cultural importante: En México, el uso de 'may' en situaciones formales muestra respeto que los estudiantes ya practican en español ('¿Me permite salir?'). Ayúdales a ver que están traduciendo una competencia que ya tienen en su L1.",
+      "Inclusión: Cuando pidas que listen sus habilidades, algunos alumnos pueden sentir que 'no pueden hacer nada interesante'. Redirige: 'Can you cook? Can you take care of a younger sibling? Can you ride a bike? Can you speak Nahuatl or Zapotec?' Todas las habilidades son válidas y valiosas.",
+      "Para la actividad de role-play, da tarjetas de situación claras con el contexto: lugar, relación entre los personajes, y el objeto del permiso. Esto reduce la ansiedad de improvisar completamente y permite que el foco sea la forma lingüística.",
+      "Extensión PRONI: Comparte con los alumnos que el CENNI (Certificación Nacional de Nivel de Idioma de la SEP) evalúa competencias como exactamente esta — describir habilidades y participar en intercambios cotidianos. Motivarlos con un objetivo concreto de certificación puede aumentar su compromiso."
+    ]
   },
   "IN-II-P04": {
     "code": "IN-II-P04",
@@ -45,11 +417,135 @@
     "duration": "~3h (2 sesiones de 50 min)",
     "difficulty": "Fundamental",
     "category": "Comunicación oral y escrita",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "metadata": {
+      "objective": "El estudiante describe en inglés la apariencia física de personas, la ropa que usan y las condiciones climáticas, reconociendo la diversidad cultural en el vestido y el clima en las distintas regiones de México, evitando estereotipos.",
+      "competencies": [
+        "Usa adjetivos de descripción física y de personalidad en inglés (tall, short, young, kind)",
+        "Nombra prendas de vestir y conecta el vestuario con identidad cultural y clima",
+        "Describe condiciones climáticas y las conecta con regiones geográficas de México",
+        "Produce descripciones orales y escritas que respetan la diversidad y evitan estereotipos"
+      ],
+      "materials": [
+        "Imágenes de personas de distintas regiones de México (trajes típicos, ropa cotidiana, uniformes)",
+        "Mapa climático de México (climas: árido, templado, tropical, frío) con vocabulario en inglés",
+        "Tarjetas de vocabulario: ropa (shirt, dress, huipil, rebozo, hat, jeans, sneakers) y clima (sunny, rainy, foggy, cold, hot, windy)",
+        "Fotografías de festividades mexicanas donde el vestido tiene significado cultural",
+        "Guión de descripción física: 'Mystery Person' (juego de adivinanza)"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {
+          "phase": "Apertura",
+          "duration": "15 min",
+          "label": "Cadena de descripciones — diversidad regional"
+        },
+        {
+          "phase": "Desarrollo",
+          "duration": "60 min",
+          "label": "Adjetivos fisicos + ropa + clima mexicano"
+        },
+        {
+          "phase": "Cierre",
+          "duration": "25 min",
+          "label": "Mystery Person + reflexion sobre descripcion respetuosa"
+        }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "15 min",
+          "description": "El docente muestra imágenes de personas de distintas regiones de México con vestimentas diversas (traje típico de Oaxaca, ropa de maquiladora en Tijuana, traje formal en Ciudad de México, ropa de trabajo del campo en Sinaloa). Los alumnos describen en español primero, luego el docente introduce el vocabulario en inglés. Reflexión inicial: '¿La ropa dice algo sobre quién somos?'",
+          "activity": "Cadena de descripciones: El docente describe en inglés a un alumno voluntario (con su consentimiento): 'This person has dark hair. They are wearing a blue sweater and jeans. They look friendly.' Los alumnos adivinan. Luego en pares se describen mutuamente usando la plantilla: 'My partner has [hair] hair. They are [height]. They are wearing [clothes]. They look [adjective].'"
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "60 min",
+          "description": "Presentación sistemática de: (1) Adjetivos de descripción física: color de cabello, ojos, estatura, complexión — con énfasis en vocabulario respetuoso e inclusivo. (2) Vocabulario de ropa: prendas básicas + ropa tradicional mexicana en inglés. (3) Vocabulario climático y conectores: 'It's sunny today, so people are wearing light clothes.' / 'It's cold in the mountains, that's why women wear rebozo.' Ejercicio de escritura: descripción de una persona real o imaginaria con ropa apropiada al clima de su región.",
+          "activity": "Tarea 1: En parejas, describir una fotografía de persona + ropa + clima de fondo (5-7 oraciones). Tarea 2: Crear una 'Mystery Person' — descripción de 5 pistas sin decir el nombre. El compañero adivina. Tarea 3: Escribir párrafo 'Dress for the Weather': '¿Qué ropa usarías en Chihuahua en enero? ¿Y en Mérida en julio?' — conectando clima con vestimenta."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "25 min",
+          "description": "Presentación del juego 'Mystery Person' con los mejores ejemplos. Reflexión sobre diversidad: ¿Cómo podemos describir personas respetuosamente en inglés, evitando comentarios sobre el peso, la piel u otras características que pueden ser hirientes? Se introduce el concepto de 'body-neutral language' apropiado para el nivel.",
+          "activity": "Reflexión escrita breve (5 min): 'One thing I learned about describing people respectfully in English.' Se socializa en parejas y luego 3 alumnos comparten con el grupo. El docente cierra con pregunta: '¿Por qué es importante poder describir a las personas en inglés en México?' (turismo, relaciones internacionales, trabajo en empresas extranjeras)."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La descripción de personas, ropa y clima son funciones comunicativas fundamentales del nivel A2 del MCER que aparecen constantemente en la vida real: al describir a alguien perdido en un aeropuerto, al recomendar ropa para un viaje, al hablar del tiempo en una conversación casual. México posee una extraordinaria diversidad climática — desde el desierto de Sonora hasta la selva chiapaneca, desde las nieves del Popocatépetl hasta las playas tropicales de Quintana Roo — lo que hace que el vocabulario climático sea especialmente relevante. Asimismo, la diversidad cultural en el vestido es inmensa: México tiene 68 grupos indígenas (INALI) con indumentaria propia que forma parte del Patrimonio Cultural Inmaterial reconocido por la UNESCO.",
+      "sections": [
+        {
+          "subtitle": "Descripción Física: Vocabulario y Respeto",
+          "content": "Para describir el aspecto físico de una persona en inglés se usan adjetivos y el verbo 'to be' o 'to have': She is tall and slim. / He has short, curly hair. / They have brown eyes. Adjetivos de estatura: tall (alto), medium height (de estatura media), short (bajo). Cabello: long/short (largo/corto), straight/curly/wavy (liso/chino/ondulado), dark/light/grey/red (oscuro/claro/canoso/rojo). Ojos: brown, black, green, blue, hazel. Complexión: muscular, slim, average build. Importante — vocabulario respetuoso: evitar términos como 'fat' (prefiere 'plus-size' o simplemente no mencionarlo). El inglés contemporáneo enfatiza el respeto a la diversidad corporal, la identidad de género (usar 'they/them' cuando no se conoce el género) y la apariencia étnica. En México, la diversidad fenotípica es enorme, y el aula de inglés debe ser un espacio de respeto hacia todas las apariencias."
+        },
+        {
+          "subtitle": "La Ropa: Vocabulario y Contexto Cultural",
+          "content": "Vocabulario de ropa básica: shirt (camisa), blouse (blusa), T-shirt (playera), pants/trousers (pantalón), jeans (mezclilla), skirt (falda), dress (vestido), suit (traje), jacket (chamarra/saco), coat (abrigo), sweater (suéter), shorts (short), shoes (zapatos), sneakers (tenis), boots (botas), sandals (sandalias). Ropa tradicional mexicana en inglés: huipil (huipil — tunic worn by indigenous women), rebozo (rebozo — traditional shawl), sombrero (sombrero — hat, but in English refers specifically to the Mexican-style wide-brimmed hat), sarape (sarape — colorful blanket/shawl), guayabera (guayabera — traditional shirt popular in Veracruz and Yucatán). Conectar ropa con ocasión: formal wear vs casual wear, work clothes vs festive clothes. El vestido tradicional no es 'disfraz' sino expresión de identidad cultural viva."
+        },
+        {
+          "subtitle": "El Clima en México: Diversidad Geográfica",
+          "content": "México es uno de los 12 países megadiversos del mundo (CONABIO), con una extraordinaria variedad climática. Vocabulario climático: sunny/sunny and hot (soleado/caluroso), cloudy (nublado), rainy (lluvioso), windy (ventoso), foggy (con niebla), cold (frío), warm (tibio), humid (húmedo), dry (seco), stormy (tormentoso). Regiones climáticas y vocabulario: Norte árido (Baja California, Sonora, Chihuahua): 'It is usually hot and dry in the summer. It can be very cold in winter nights.' Centro-Occidente templado (Jalisco, Michoacán, CDMX): 'The weather is mild most of the year. It rains in summer.' Sureste tropical (Veracruz, Tabasco, Chiapas, Quintana Roo): 'It is hot and humid all year round. There are hurricanes in summer and fall.' Alta montaña (Volcanes, Sierra Madre): 'It is cold and snowy in winter. You need a heavy coat.' Esta variedad hace que la pregunta 'What's the weather like?' tenga respuestas muy distintas según la región."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Which sentence correctly describes a person's appearance?",
+          "options": [
+            "A) She have long dark hair and brown eyes.",
+            "B) She has long dark hair and brown eyes.",
+            "C) She is have long dark hair and brown eyes."
+          ],
+          "correct": "B) She has long dark hair and brown eyes."
+        },
+        {
+          "question": "How would you describe the traditional shawl worn by many women in Mexico, using the English word that appears in international contexts?",
+          "options": [
+            "A) scarf",
+            "B) blanket",
+            "C) rebozo"
+          ],
+          "correct": "C) rebozo"
+        },
+        {
+          "question": "Which climate description best fits the state of Quintana Roo (Cancún, Playa del Carmen)?",
+          "options": [
+            "A) It is cold and snowy in winter.",
+            "B) It is hot and humid all year round.",
+            "C) It is dry and sunny with cold nights."
+          ],
+          "correct": "B) It is hot and humid all year round."
+        },
+        {
+          "question": "According to INALI (Instituto Nacional de Lenguas Indígenas), how many indigenous groups with their own distinctive clothing traditions exist in Mexico?",
+          "options": [
+            "A) 12",
+            "B) 35",
+            "C) 68"
+          ],
+          "correct": "C) 68"
+        },
+        {
+          "question": "A student wants to describe a person respectfully without commenting on body size. Which option is most appropriate?",
+          "options": [
+            "A) 'He is fat and short.'",
+            "B) 'He is short with curly dark hair and a friendly smile.'",
+            "C) 'He looks weird and different.'"
+          ],
+          "correct": "B) 'He is short with curly dark hair and a friendly smile.'"
+        }
+      ],
+      "rubric": "RÚBRICA — Descripción 'Mystery Person + Climate' (20 pts)\n\nVOCABULARIO DE DESCRIPCIÓN (6 pts): 6=8+ adjetivos/sustantivos de descripción física, ropa y clima usados correctamente | 4=5-7 elementos correctos | 2=3-4 elementos con errores ocasionales | 0=Vocabulario insuficiente o incorrecto\n\nCORRECCIÓN GRAMATICAL (5 pts): 5=Uso correcto de 'to be' y 'to have' en descripciones sin errores sistemáticos | 4=1-2 errores menores | 2=Errores frecuentes pero texto comprensible | 0=Errores que impiden comprensión\n\nRESPETO E INCLUSIÓN (5 pts): 5=Descripción completamente respetuosa, sin estereotipos, valorando diversidad | 4=Respetuosa con algún área de mejora | 2=Involuntariamente irrespetuosa — requiere guía | 0=Descripción estereotipada o hiriente\n\nCONEXIÓN CULTURAL-CLIMÁTICA (4 pts): 4=Conecta explícitamente ropa con clima y contexto cultural mexicano | 3=Menciona ropa y clima pero sin conexión explícita | 2=Solo describe ropa o solo clima | 0=Sin elementos culturales o climáticos"
+    },
+    "teacher_tips": [
+      "La descripción física puede ser un tema sensible — algunos alumnos se sienten incómodos siendo descritos o describiéndose. Usa siempre fotografías de personas públicas, personajes de series o imágenes proporcionadas tú mismo en lugar de pedir que se describan entre sí sin preparación.",
+      "Vocabulario de ropa tradicional: Muchos estudiantes no saben cómo decir en inglés las prendas de su propia cultura. Llena ese vacío: enseña 'huipil', 'rebozo', 'sarape', 'guayabera' como palabras que el inglés toma del español mexicano. Esto empodera culturalmente.",
+      "Para el vocabulario climático, usa datos reales: muestra temperaturas promedio de distintas ciudades mexicanas en enero y en julio. Esto hace la actividad más auténtica y conecta con geografía (interdisciplinariedad).",
+      "Género gramatical: En inglés no hay género gramatical, pero sí género en identidad. Introduce el pronombre 'they' para personas de género no binario o cuando el género es desconocido. 'This person has short hair. They are wearing...' Esto es lingüísticamente correcto y socialmente inclusivo.",
+      "Extensión creativa: Pide a los alumnos que describan a un personaje histórico mexicano en inglés para que otra clase lo adivine: 'This person was short and brave. They had dark braided hair with flowers. They wore traditional Tehuana clothing and painted self-portraits.' (Frida Kahlo). Conecta con historia e identidad cultural."
+    ]
   },
   "IN-II-P05": {
     "code": "IN-II-P05",
@@ -58,11 +554,135 @@
     "duration": "~3h (2 sesiones de 50 min)",
     "difficulty": "Fundamental",
     "category": "Comunicación oral y escrita",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "metadata": {
+      "objective": "El estudiante usa comparativos y superlativos en inglés para comparar personas, lugares y objetos de su entorno, desarrollando pensamiento crítico al analizar similitudes y diferencias en contextos mexicanos.",
+      "competencies": [
+        "Forma y usa comparativos de igualdad (as...as), superioridad (er/more) e inferioridad (less)",
+        "Forma y usa superlativos (the est/the most) con precisión ortográfica",
+        "Aplica comparaciones en contextos auténticos: ciudades mexicanas, productos, personas",
+        "Produce textos comparativos orales y escritos con argumentos justificados"
+      ],
+      "materials": [
+        "Infografías de datos comparativos de ciudades mexicanas (INEGI): población, temperatura, altitud",
+        "Imágenes de productos de consumo común para comparar (precio, tamaño, calidad)",
+        "Tabla de comparativos y superlativos regulares e irregulares",
+        "Tarjetas de actividad: 'Compare and Contrast' (objetos del salón, ciudades, alimentos)",
+        "Datos de olimpiadas, campeonatos u otros contextos donde se compara el rendimiento"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {
+          "phase": "Apertura",
+          "duration": "15 min",
+          "label": "Comparacion visual — ciudades y productos mexicanos"
+        },
+        {
+          "phase": "Desarrollo",
+          "duration": "60 min",
+          "label": "Comparativos (as...as, -er, more) + superlativos + datos INEGI"
+        },
+        {
+          "phase": "Cierre",
+          "duration": "25 min",
+          "label": "Debate Mejor ciudad para vivir + exit ticket"
+        }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "15 min",
+          "description": "El docente coloca dos objetos del salón (dos libros, dos sillas, dos mochilas) y hace preguntas: '¿Cuál es más grande? ¿Cuál es más pesado? ¿Son iguales?' Se introduce el vocabulario comparativo en inglés. Luego se presentan datos curiosos: '¿Sabías que la Ciudad de México tiene más habitantes que toda Australia?' para motivar.",
+          "activity": "Comparación visual rápida: El docente muestra pares de imágenes (Cancún vs Monterrey, taco vs hamburguesa, teléfonos de distintas marcas) y los alumnos votan cuál es 'bigger / cheaper / more famous / more popular' usando tarjetas o alzando la mano. No se corrige todavía — el objetivo es activar la función comunicativa."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "60 min",
+          "description": "Presentación sistematizada de: (1) Comparativo de igualdad: as + adjective + as. (2) Comparativo de superioridad: adj+er (cortos) o more + adj (largos) + than. (3) Comparativo de inferioridad: less + adj + than. (4) Superlativos: the + adj+est (cortos) o the most + adj (largos). Irregulares: good-better-best, bad-worse-worst, far-farther-farthest. Práctica con datos reales de INEGI y CONABIO sobre México.",
+          "activity": "Tarea 1: Completar tabla comparativa de 5 ciudades mexicanas (CDMX, Guadalajara, Monterrey, Mérida, Cancún) usando datos de población, temperatura media y altitud. Tarea 2: Escribir 10 oraciones comparativas basadas en la tabla. Tarea 3: Debate rápido en parejas: '¿Qué ciudad mexicana es la mejor para vivir?' — cada alumno defiende una ciudad usando comparativos y superlativos."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "25 min",
+          "description": "Presentación del debate: 2 parejas presentan sus argumentos. El grupo vota y justifica. Reflexión: Las comparaciones pueden ser herramientas objetivas (datos, estadísticas) o subjetivas (opiniones). El inglés tiene estructuras para ambas: 'Mexico City is the largest city in Mexico' (objetivo) vs 'Mexico City is the most exciting city in Mexico' (subjetivo/opinión).",
+          "activity": "Exit ticket: Cada alumno escribe 3 oraciones comparativas sobre su entorno: algo de su colonia/comunidad, algo de su familia, algo de su experiencia escolar. Se recogen para evaluación formativa."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Los comparativos y superlativos son estructuras gramaticales que permiten establecer relaciones entre personas, objetos, lugares o ideas. Son esenciales para el pensamiento crítico: argumentar, justificar decisiones y presentar información de manera organizada. En el nivel A2, el MCER espera que el estudiante pueda comparar objetos y personas en situaciones familiares. En el contexto mexicano, las comparaciones tienen aplicaciones prácticas cotidianas: comparar precios en el mercado, evaluar opciones educativas, analizar datos del INEGI, tomar decisiones de consumo responsable.",
+      "sections": [
+        {
+          "subtitle": "Comparativos: Formación y Uso",
+          "content": "Los comparativos se forman siguiendo reglas según el número de sílabas del adjetivo. Adjetivos cortos (1 sílaba): añadir -er + than: tall→taller than, fast→faster than, cheap→cheaper than. Si terminan en consonante-vocal-consonante, se duplica la última consonante: big→bigger than, hot→hotter than. Adjetivos de 2 sílabas terminados en -y: cambiar -y por -ier: happy→happier than, easy→easier than. Adjetivos largos (2+ sílabas): more/less + adjective + than: expensive→more expensive than, difficult→more difficult than, interesting→more interesting than. Irregulares: good→better than, bad→worse than, far→farther than. Comparativo de igualdad: as + adjective + as: 'The metro is as fast as the Metrobús in some routes.' Ejemplos mexicanos: 'Guadalajara is cheaper than Mexico City.' / 'Mérida is hotter than Monterrey in summer.' / 'The huaraches in this market are less expensive than in the mall.'"
+        },
+        {
+          "subtitle": "Superlativos: Formación y Uso",
+          "content": "Los superlativos expresan el grado máximo dentro de un grupo. Se forman con 'the' al inicio. Adjetivos cortos: the + adj+est: tallest, fastest, cheapest. Con doble consonante: biggest, hottest. Adjetivos en -y: the + adj+iest: happiest, easiest. Adjetivos largos: the most/least + adjective: the most expensive, the most interesting, the least difficult. Irregulares: the best, the worst, the farthest. Datos reales de México con superlativos: 'The Popocatépetl is one of the highest active volcanoes in Mexico.' / 'Mexico City is the most populated metropolitan area in North America.' / 'The monarch butterfly sanctuary in Michoacán is the most visited natural reserve of its kind in the world.' / 'Tabasco is one of the rainiest states in Mexico.' Fuente: INEGI, CONABIO, SECTUR."
+        },
+        {
+          "subtitle": "Comparaciones con Pensamiento Crítico",
+          "content": "Las comparaciones son una herramienta de análisis. El pensamiento crítico requiere distinguir entre comparaciones basadas en datos objetivos y comparaciones de opinión. Comparaciones objetivas: 'Mexico City has more inhabitants than Guadalajara according to INEGI.' (verificable, basada en datos). Comparaciones de opinión: 'Mexico City is more interesting than Guadalajara.' (subjetivo, depende de criterios personales). Para hacer comparaciones responsables en inglés se deben citar fuentes: 'According to INEGI, ...' / 'Based on the 2020 Census, ...' / 'CONABIO reports that...' Esto desarrolla la competencia de pensamiento crítico del eje MCCEMS y prepara al alumno para leer y producir textos académicos en inglés, habilidad esencial para el acceso a la educación superior y la investigación internacional."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Which sentence correctly uses the comparative form of 'expensive'?",
+          "options": [
+            "A) This phone is more expensive that that one.",
+            "B) This phone is more expensive than that one.",
+            "C) This phone is expensiver than that one."
+          ],
+          "correct": "B) This phone is more expensive than that one."
+        },
+        {
+          "question": "What is the superlative form of 'good'?",
+          "options": [
+            "A) the most good",
+            "B) the goodest",
+            "C) the best"
+          ],
+          "correct": "C) the best"
+        },
+        {
+          "question": "How do you form the comparative of the adjective 'big'?",
+          "options": [
+            "A) more big than",
+            "B) bigger than",
+            "C) biger than"
+          ],
+          "correct": "B) bigger than"
+        },
+        {
+          "question": "According to INEGI data, which is the most populated metropolitan area in North America?",
+          "options": [
+            "A) Los Angeles",
+            "B) Mexico City",
+            "C) New York"
+          ],
+          "correct": "B) Mexico City"
+        },
+        {
+          "question": "A student writes: 'Oaxaca is more rich in cultural heritage than any other Mexican state.' What is the error?",
+          "options": [
+            "A) 'rich' should use 'richer' (one syllable adjective, use -er form).",
+            "B) 'cultural heritage' is incorrect vocabulary.",
+            "C) The sentence should use 'as rich as' instead."
+          ],
+          "correct": "A) 'rich' should use 'richer' (one syllable adjective, use -er form)."
+        }
+      ],
+      "rubric": "RÚBRICA — Texto comparativo de ciudades mexicanas (20 pts)\n\nCORRECCIÓN DE COMPARATIVOS/SUPERLATIVOS (8 pts): 8=Todas las formas correctas (regulares e irregulares) | 6=Mayoría correctas, 1-2 errores menores | 4=Errores frecuentes pero patrón identificable | 0=Formas incorrectas en todos los casos\n\nUSO DE DATOS (5 pts): 5=Cita datos reales (INEGI, CONABIO, etc.) en al menos 3 comparaciones | 4=Datos presentes en 1-2 comparaciones | 2=Comparaciones genéricas sin datos específicos | 0=Sin datos de referencia\n\nARGUMENTACIÓN (4 pts): 4=Distingue claramente datos objetivos de opiniones y justifica su posición | 3=Argumentación presente con algunas generalizaciones | 2=Solo afirmaciones sin justificación | 0=Sin argumentación\n\nVOCABULARIO Y COHESIÓN (3 pts): 3=Usa conectores comparativos variados (however, on the other hand, in contrast, similarly) | 2=Algunos conectores | 1=Sin conectores, oraciones aisladas | 0=Texto incoherente"
+    },
+    "teacher_tips": [
+      "Error doble muy común: 'more taller' o 'more bigger'. Esto se llama 'double comparative' y es un error de hipercorrección. Los alumnos que ya saben 'more + adj' lo aplican donde no corresponde. Practica específicamente con adjetivos de una sílaba para consolidar la regla -er.",
+      "Usa datos del INEGI que los alumnos ya conocen de Geografía o Historia para hacer las comparaciones más significativas. '¿Cuál estado produce más maíz?' → 'Sinaloa produces more corn than Jalisco.' Esto activa conocimiento previo y refuerza el aprendizaje interdisciplinar.",
+      "El debate 'mejor ciudad para vivir' puede generar regionalismos acalorados (defeños vs regios, etc.). Aprovecha esto positivamente: '¿Cómo justificas tu opinión en inglés?' Enseña frases como 'In my opinion...', 'I think...because...', 'The data shows that...'",
+      "Para ortografía: La regla de la doble consonante (big→bigger, hot→hotter) es confusa. Crea un mnemónico: 'Si la vocal está sola entre dos consonantes y el adjetivo termina en consonante, la duplicamos.' Practica con una lista de 10 adjetivos antes de la prueba.",
+      "Extensión ambiental: Usa datos de CONABIO para comparar la biodiversidad de distintos estados: 'Oaxaca has more endemic species than any other Mexican state.' / 'The Lacandona rainforest in Chiapas is the most biodiverse forest in North America.' Conecta con educación ambiental."
+    ]
   },
   "IN-II-P06": {
     "code": "IN-II-P06",
@@ -71,11 +691,135 @@
     "duration": "~3h (2 sesiones de 50 min)",
     "difficulty": "Fundamental",
     "category": "Comunicación oral y escrita",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "metadata": {
+      "objective": "El estudiante pregunta e indica cómo llegar a lugares en inglés usando preposiciones de lugar, expresiones de dirección e imperativos, aplicando estas habilidades en contextos turísticos y comunitarios mexicanos.",
+      "competencies": [
+        "Usa imperativos para dar instrucciones de dirección (turn left, go straight, cross the street)",
+        "Aplica preposiciones de lugar (next to, across from, on the corner of, between)",
+        "Comprende y produce diálogos de petición y provisión de instrucciones de dirección",
+        "Conecta el vocabulario de orientación espacial con lugares emblemáticos mexicanos"
+      ],
+      "materials": [
+        "Mapas de comunidades o ciudades mexicanas (mapa simple de barrio o centro histórico)",
+        "Tarjetas de lugares: mercado, iglesia, hospital, escuela, farmacia, parada de autobús, parque",
+        "Grabación de audio: turista preguntando cómo llegar al Zócalo de CDMX",
+        "Plano en blanco para que alumnos tracen rutas",
+        "Guión de diálogo modelo para dar indicaciones"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {
+          "phase": "Apertura",
+          "duration": "15 min",
+          "label": "Geo-reto — identificar lugares en mapa de barrio mexicano"
+        },
+        {
+          "phase": "Desarrollo",
+          "duration": "60 min",
+          "label": "Imperativos + preposiciones de lugar + role-play con mapa"
+        },
+        {
+          "phase": "Cierre",
+          "duration": "25 min",
+          "label": "Mini-guias turisticas + simulacion final con mapa"
+        }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "15 min",
+          "description": "El docente simula ser un turista extranjero que llega a la ciudad y no sabe dónde está. En español exagerado pregunta: '¿Cómo llego al mercado?' Los alumnos responden. El docente pregunta: '¿Cómo le dirían esto en inglés a alguien que no habla español?' Se introduce la situación comunicativa y el vocabulario de la progresión.",
+          "activity": "Geo-reto: El docente muestra un mapa simple de un barrio mexicano genérico (trazado a mano o proyectado) con 8 lugares marcados. Los alumnos deben identificar los lugares en inglés: market, church, school, pharmacy, bus stop, park, hospital, post office. Gana puntos quien los identifica primero."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "60 min",
+          "description": "Presentación de: (1) Imperativos para dar indicaciones: Go straight, Turn left/right, Cross the street, Take the bus, Walk two blocks, Go past the school. (2) Preposiciones de lugar: on the corner of, next to, across from, between, in front of, behind, on [street name]. (3) Frases para pedir indicaciones: 'Excuse me, how do I get to...?', 'Could you tell me where the ... is?', 'Is it far from here?'. Role-play en mapa: alumno A pregunta, alumno B indica usando el mapa.",
+          "activity": "Tarea 1: Role-play con mapa (cada pareja recibe un mapa y tarjetas de destino). A pide cómo llegar a 3 lugares; B da indicaciones usando imperativos y preposiciones. Luego invierten roles. Tarea 2: Escribir un párrafo de instrucciones para llegar de la escuela a un lugar importante de la comunidad (mercado, clínica, transporte). Tarea 3: Crear mini-guía turística de 3 instrucciones para llegar a un lugar famoso de su ciudad/estado."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "25 min",
+          "description": "Presentación de las mini-guías turísticas. El grupo evalúa: ¿son claras las instrucciones? ¿Se puede llegar al lugar siguiéndolas? Reflexión sobre la importancia de esta habilidad: México recibe más de 40 millones de turistas al año (SECTUR) — los mexicanos que hablan inglés pueden orientar a turistas, trabajar en turismo y crear conexiones internacionales.",
+          "activity": "Simulación final: El docente pone un punto de partida en el mapa ('You are at the school') y un destino ('You need to get to the market'). Los alumnos escriben las instrucciones en 60 segundos. Se comparan las rutas — ¿hay varias formas de llegar? ¿Cuál es la más clara?"
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Pedir y dar indicaciones de cómo llegar a un lugar es una de las funciones comunicativas más prácticas del nivel A2. Esta competencia es esencial para el turismo, la vida urbana y la orientación espacial. México recibe anualmente más de 40 millones de turistas internacionales (SECTUR, 2023), y los destinos más visitados — Cancún, Ciudad de México, Los Cabos, Guadalajara — requieren que la población local pueda comunicarse básicamente en inglés para orientar a visitantes. El Marco MCCEMS enfatiza que el aprendizaje del inglés debe tener aplicaciones reales e inmediatas para el estudiante, y esta progresión es un ejemplo perfecto: cualquier alumno podría ser el puente lingüístico entre un turista perdido y su destino.",
+      "sections": [
+        {
+          "subtitle": "Imperativos para Dar Instrucciones",
+          "content": "El imperativo en inglés se forma con la forma base del verbo sin sujeto. Es directo y claro, apropiado para dar instrucciones. Instrucciones de dirección esenciales: Go straight (sigue derecho / sigue recto), Turn left (dobla a la izquierda), Turn right (dobla a la derecha), Cross the street (cruza la calle), Walk / Go two blocks (camina dos cuadras), Take the first street on the left/right (toma la primera calle a la izquierda/derecha), Go past the school / the market (pasa la escuela / el mercado), Continue until you reach... (continúa hasta llegar a...), Stop at the traffic light (detente en el semáforo), Take the metro/bus to... (toma el metro/camión a...). Para suavizar el imperativo (más cortés): 'Please turn left at the corner.' / 'Could you go straight for two blocks?' La negación del imperativo: 'Don't turn right there, it's a one-way street.'"
+        },
+        {
+          "subtitle": "Preposiciones de Lugar",
+          "content": "Las preposiciones de lugar sitúan un objeto o lugar en relación a otro. Preposiciones esenciales para dar indicaciones: next to (junto a): 'The pharmacy is next to the school.' Across from / Opposite (enfrente de): 'The park is across from the church.' On the corner of (en la esquina de): 'The market is on the corner of Morelos and Juárez streets.' Between (entre): 'The clinic is between the bank and the post office.' In front of (frente a): 'The bus stop is in front of the hotel.' Behind (detrás de): 'The parking lot is behind the market.' At the traffic light / intersection (en el semáforo / cruce): 'Turn left at the traffic light.' On [street name]: 'The school is on Av. Insurgentes.' Near / Close to (cerca de): 'The metro station is near the park.' Far from (lejos de): 'The airport is far from downtown.' Práctica contextualizada: usar nombres de calles y lugares reales de la comunidad escolar."
+        },
+        {
+          "subtitle": "El Turismo y el Inglés en México",
+          "content": "El turismo es uno de los sectores económicos más importantes de México. Según la SECTUR (Secretaría de Turismo), México se ubica entre los 10 países más visitados del mundo, con Cancún, CDMX, Los Cabos, Riviera Maya, Guadalajara y Oaxaca como principales destinos. El inglés es la lengua franca del turismo internacional. Puestos laborales relacionados con el turismo que requieren inglés: recepcionista de hotel, guía turístico, empleado de restaurante o tienda de artesanías, conductor de turibus, personal de aeropuerto. El ICTUR (Inventario de Competencias Turísticas) de la SECTUR incluye el inglés básico como competencia mínima para trabajar en el sector. Saber dar indicaciones en inglés no solo ayuda a los turistas — también abre puertas laborales para los alumnos en uno de los sectores con mayor demanda de empleo en México."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "How do you tell someone to go straight in English?",
+          "options": [
+            "A) Walk in front.",
+            "B) Go straight.",
+            "C) Move forward ahead."
+          ],
+          "correct": "B) Go straight."
+        },
+        {
+          "question": "Which preposition correctly completes: 'The pharmacy is ___ the school and the market'?",
+          "options": [
+            "A) across from",
+            "B) between",
+            "C) on the corner of"
+          ],
+          "correct": "B) between"
+        },
+        {
+          "question": "A tourist asks: 'Excuse me, how do I get to the Zócalo?' What is the best opening for your response?",
+          "options": [
+            "A) 'Go you to the right, then left then...'",
+            "B) 'Sure! Go straight for two blocks, then turn left at the traffic light.'",
+            "C) 'The Zócalo is there, far from here, you can't miss it.'"
+          ],
+          "correct": "B) 'Sure! Go straight for two blocks, then turn left at the traffic light.'"
+        },
+        {
+          "question": "According to SECTUR, approximately how many international tourists visit Mexico annually?",
+          "options": [
+            "A) 5 million",
+            "B) 20 million",
+            "C) 40 million"
+          ],
+          "correct": "C) 40 million"
+        },
+        {
+          "question": "Which sentence correctly uses 'across from'?",
+          "options": [
+            "A) The bank is across from between the school.",
+            "B) The bank is across from the park.",
+            "C) The bank is across to the park."
+          ],
+          "correct": "B) The bank is across from the park."
+        }
+      ],
+      "rubric": "RÚBRICA — Párrafo de indicaciones turísticas (20 pts)\n\nIMPERATIVOS DE DIRECCIÓN (7 pts): 7=4+ imperativos variados y correctos en secuencia lógica | 5=2-3 imperativos correctos | 3=Imperativos presentes con errores ocasionales | 0=Sin uso de imperativos\n\nPREPOSICIONES DE LUGAR (5 pts): 5=3+ preposiciones de lugar correctas y variadas | 4=2 preposiciones correctas | 2=1 preposición con errores en otras | 0=Sin preposiciones de lugar\n\nCLARIDAD DE LAS INSTRUCCIONES (5 pts): 5=Las instrucciones permiten llegar al destino sin ambigüedad | 4=Instrucciones claras con algún paso ambiguo | 2=Destino alcanzable con dificultad | 0=Instrucciones no llevan al destino\n\nVOCABULARIO DE LUGARES (3 pts): 3=5+ nombres de lugares en inglés correctos | 2=3-4 lugares correctos | 1=1-2 lugares con errores | 0=Sin vocabulario de lugares"
+    },
+    "teacher_tips": [
+      "La confusión más común: 'left' y 'right'. Los alumnos las confunden bajo presión al hablar. Usa un mnemónico: 'Left tiene L de Leer (lectura: izquierda en México) y Right tiene R de Recto (no, pero la L/R visual ayuda). Mejor: haz que pongan la mano en L: la mano izquierda en L es la 'L de Left'. Refuérzalo físicamente girando el cuerpo.",
+      "Contextualiza con Google Maps en inglés: muestra cómo cuando pones Google Maps en inglés, las instrucciones son exactamente las que estás enseñando. Esto conecta el aprendizaje con una herramienta que usan diariamente.",
+      "Para el mapa de role-play, usa un mapa de la colonia o ciudad real de los alumnos en lugar de uno inventado. Esto hace el ejercicio auténtico y los alumnos ya conocen los puntos de referencia. Busca en Google Maps la zona escolar.",
+      "Turismo local: Si tu escuela está en un destino turístico o ciudad histórica, lleva información real sobre los monumentos y tu zona. Si no, conéctalo con la región: '¿Cómo le explicarías a un turista cómo llegar a la zona arqueológica más cercana?'",
+      "Extensión emprendedora: Pide a los alumnos que creen una mini-guía turística en inglés de su barrio o comunidad con 3-5 lugares de interés y cómo llegar a cada uno desde la escuela. Pueden hacerla en papel o digital. Esto tiene valor real — podrían publicarla en redes sociales para ayudar a visitantes."
+    ]
   },
   "IN-II-P07": {
     "code": "IN-II-P07",
@@ -84,11 +828,135 @@
     "duration": "~3h (2 sesiones de 50 min)",
     "difficulty": "Fundamental",
     "category": "Comunicación oral y escrita",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "metadata": {
+      "objective": "El estudiante participa en intercambios comunicativos cotidianos en inglés expresando deseos, necesidades y empatía usando estructuras como 'would like to', 'want to', 'need to' y respuestas empáticas, valorando la comunicación afectiva en su comunidad.",
+      "competencies": [
+        "Usa 'would like to', 'want to', 'need to' para expresar deseos y necesidades con matices de formalidad",
+        "Produce y responde a expresiones de empatía en inglés (I understand, That must be hard, I'm sorry to hear that)",
+        "Participa en intercambios comunicativos equilibrados (escuchar + responder + aportar)",
+        "Conecta la comunicación empática con valores comunitarios en el contexto mexicano"
+      ],
+      "materials": [
+        "Tarjetas de situaciones comunitarias: necesidades de salud, educación, trabajo, vivienda",
+        "Grabación de diálogo modelo: conversación empática entre estudiantes mexicanos",
+        "Lista de expresiones de empatía y solidaridad en inglés",
+        "Cuadro comparativo: 'want to' (informal) vs 'would like to' (formal/cortés)",
+        "Fotografías de organizaciones comunitarias mexicanas (Cruz Roja, IMSS, DIF)"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {
+          "phase": "Apertura",
+          "duration": "15 min",
+          "label": "Lluvia de ideas — wants vs needs comunitarios"
+        },
+        {
+          "phase": "Desarrollo",
+          "duration": "60 min",
+          "label": "Want/Need/Would like + empatia + role-play en trios"
+        },
+        {
+          "phase": "Cierre",
+          "duration": "25 min",
+          "label": "Carta de solidaridad comunitaria"
+        }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "15 min",
+          "description": "El docente presenta una situación: 'Imagina que tu vecino acaba de llegar de otro país. No habla español. ¿Cómo le explicarías qué necesitas de tu comunidad? ¿Cómo le mostrarías que te importa lo que él necesita?' Se introduce la diferencia entre querer y necesitar, y la importancia de la empatía en la comunicación.",
+          "activity": "Lluvia de ideas en inglés: El docente escribe en el pizarrón 'Things I WANT' / 'Things I NEED' / 'Things my community NEEDS'. Los alumnos dictan ideas en español y el docente las traduce/escribe en inglés. Se diferencia: want (deseo personal, puede no ser urgente) vs need (necesidad, más urgente). '¿Qué necesita tu comunidad? Health care? Better public transport? A park?'"
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "60 min",
+          "description": "Presentación de: (1) 'Want to + infinitive': 'I want to study medicine.' / 'She wants to find a job.' (2) 'Need to + infinitive': 'We need to fix the road in our neighborhood.' / 'He needs to see a doctor.' (3) 'Would like to + infinitive' (más formal/cortés): 'I would like to apply for a scholarship.' / 'We would like to request support from the municipality.' (4) Expresiones de empatía: 'I understand.', 'I'm sorry to hear that.', 'That must be very difficult.', 'Is there anything I can do to help?', 'You're not alone.'",
+          "activity": "Tarea 1: Completar diálogos incompletos sobre necesidades comunitarias usando want/need/would like. Tarea 2: Role-play en tríos: A expresa una necesidad personal o comunitaria, B responde con empatía y hace preguntas, C añade una posible solución o apoyo. Situaciones: necesidad médica, problema en la escuela, desempleo familiar, falta de acceso a internet."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "25 min",
+          "description": "Presentación de los mejores role-plays. Reflexión sobre la empatía como competencia socioemocional y comunicativa: ¿Cómo se siente que alguien te escuche y responda con empatía? ¿Cómo podemos ser puente de comunicación en nuestra comunidad usando el inglés? Se conecta con el eje de bienestar del MCCEMS.",
+          "activity": "Carta breve de solidaridad: Cada alumno escribe una carta corta (5-6 oraciones) a una persona imaginaria de su comunidad que enfrenta una dificultad, usando 'I understand', 'I know you need...', 'I would like to help you by...'. Se comparten en pares. El docente cierra: 'El inglés no solo sirve para transacciones — también para construir comunidad y mostrar humanidad.'"
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La comunicación afectiva — expresar deseos, necesidades y empatía — es una dimensión fundamental de la competencia comunicativa que suele descuidarse en la enseñanza del inglés. El Marco MCCEMS incluye el bienestar socioemocional como un eje transversal, y el aprendizaje de lenguas es un espacio idóneo para desarrollar la empatía intercultural. En el contexto mexicano, donde los lazos comunitarios son fuertes (el concepto de 'comunidad' tiene raíces profundas en tradiciones indígenas y mestizas), poder expresar solidaridad y necesidad en inglés tiene un valor doble: lingüístico y social. Organizaciones como la Cruz Roja Mexicana, el DIF, y numerosas ONGs operan en contextos bilingües y requieren esta competencia.",
+      "sections": [
+        {
+          "subtitle": "Expresar Deseos y Necesidades: Matices y Formalidad",
+          "content": "En inglés, hay varias formas de expresar lo que queremos o necesitamos, cada una con un nivel diferente de formalidad y urgencia. 'Want to + verb': El más informal y directo. 'I want to eat tacos.' / 'He wants to study abroad.' Apropiado entre amigos y familia. En contextos formales puede sonar demandante. 'Need to + verb': Expresa necesidad o urgencia. 'We need to see a doctor.' / 'They need to repair the road.' Puede usarse en cualquier contexto. 'Would like to + verb': El más formal y cortés. Es la forma preferida en situaciones de respeto, entrevistas, solicitudes oficiales. 'I would like to apply for a scholarship.' / 'We would like to request support.' Contracción usual: 'I'd like to...' Para necesidades colectivas o comunitarias: 'Our community needs...' / 'We would like our neighborhood to have...' Esto conecta el inglés con la participación ciudadana."
+        },
+        {
+          "subtitle": "Empatía en Inglés: Frases y Cultura",
+          "content": "La empatía comunicativa en inglés se expresa con frases específicas según la situación. Para reconocer el problema del otro: 'I understand how you feel.' / 'I can see that this is difficult for you.' / 'That must be very hard.' / 'I'm sorry to hear that.' / 'That sounds really tough.' Para ofrecer apoyo: 'Is there anything I can do to help?' / 'You're not alone in this.' / 'I'm here for you.' / 'Let me know if you need anything.' Para validar emociones: 'It's completely understandable that you feel that way.' / 'Anyone would feel the same in your situation.' Diferencia cultural importante: En inglés americano, las expresiones de empatía son frecuentes y directas. En el contexto mexicano, la solidaridad se expresa también con acciones (traer comida, acompañar a una cita médica), no solo palabras. Invita a los alumnos a reflexionar: '¿Cómo expresamos empatía en nuestra cultura?' y cómo traducir eso al inglés."
+        },
+        {
+          "subtitle": "Necesidades Comunitarias en México",
+          "content": "Las necesidades comunitarias en México son diversas y reflejan desafíos sociales reales. El INEGI y el CONEVAL (Consejo Nacional de Evaluación de la Política de Desarrollo Social) documentan las principales carencias sociales: acceso a servicios de salud (en 2020, 28.2 millones de mexicanos no tenían acceso a servicios de salud), acceso a educación (rezago educativo afecta a 18.3% de la población), vivienda digna (21.9% de la población en hacinamiento o vivienda inadecuada), seguridad alimentaria (alrededor del 25% de la población en inseguridad alimentaria moderada o severa). Poder hablar sobre estas necesidades en inglés permite a los alumnos: acceder a organizaciones internacionales de ayuda, participar en foros globales de derechos humanos, comunicarse con ONGs y voluntarios internacionales que trabajan en México. Vocabulario clave: health care access, education gap, housing shortage, food security, public transportation, internet access, community safety."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Which sentence is the most formal and appropriate for a scholarship application?",
+          "options": [
+            "A) I want a scholarship.",
+            "B) I need a scholarship now.",
+            "C) I would like to apply for a scholarship to continue my education."
+          ],
+          "correct": "C) I would like to apply for a scholarship to continue my education."
+        },
+        {
+          "question": "A friend tells you: 'I failed my exam and I'm really worried about it.' Which is the most empathetic response?",
+          "options": [
+            "A) 'That's your problem. Study more next time.'",
+            "B) 'I'm sorry to hear that. That must be really stressful. Do you want to study together?'",
+            "C) 'Oh well, exams are not that important.'"
+          ],
+          "correct": "B) 'I'm sorry to hear that. That must be really stressful. Do you want to study together?'"
+        },
+        {
+          "question": "What is the difference between 'want to' and 'need to'?",
+          "options": [
+            "A) 'Want to' expresses desire or preference; 'need to' expresses necessity or urgency.",
+            "B) 'Want to' is for formal contexts; 'need to' is for informal contexts.",
+            "C) 'Want to' is more polite than 'need to'."
+          ],
+          "correct": "A) 'Want to' expresses desire or preference; 'need to' expresses necessity or urgency."
+        },
+        {
+          "question": "According to CONEVAL, what percentage of the Mexican population faced food insecurity in recent years?",
+          "options": [
+            "A) Around 5%",
+            "B) Around 25%",
+            "C) Around 50%"
+          ],
+          "correct": "B) Around 25%"
+        },
+        {
+          "question": "How do you correctly express a collective community need in English?",
+          "options": [
+            "A) 'Our community need better health care.'",
+            "B) 'Our community needs better health care.'",
+            "C) 'Our community is need better health care.'"
+          ],
+          "correct": "B) 'Our community needs better health care.'."
+        }
+      ],
+      "rubric": "RÚBRICA — Role-play de necesidades y empatía (20 pts)\n\nUSO DE ESTRUCTURAS DE DESEO/NECESIDAD (6 pts): 6=Usa want/need/would like correctamente y distingue formalidad | 4=Usa 2 de las 3 estructuras correctamente | 2=Usa solo una estructura con errores ocasionales | 0=No usa las estructuras objetivo\n\nEXPRESIONES DE EMPATÍA (6 pts): 6=3+ expresiones de empatía auténticas y apropiadas al contexto | 4=2 expresiones de empatía correctas | 2=1 expresión de empatía presente | 0=Sin expresiones de empatía\n\nFLUIDEZ E INTERACCIÓN (5 pts): 5=Intercambio equilibrado, escucha activa, respuestas pertinentes | 4=Comunicación efectiva con algún desequilibrio de turnos | 2=Un hablante domina, el otro responde mínimamente | 0=Sin intercambio real\n\nCONEXIÓN COMUNITARIA (3 pts): 3=La situación del role-play refleja una necesidad real y específica del contexto comunitario mexicano | 2=Situación genérica pero plausible | 1=Situación artificial o desconectada | 0=Sin contexto comunitario"
+    },
+    "teacher_tips": [
+      "Este tema puede resonar emocionalmente con los alumnos si las 'necesidades comunitarias' tocan realidades difíciles de sus propias familias o colonias. Crea un ambiente de confianza antes: establece que el salón es un espacio seguro donde las realidades se respetan y no se juzgan.",
+      "La diferencia entre 'want' y 'would like' es clave para la competencia sociolingüística. Usa una situación clara: '¿Le dirías a tu jefe I want a raise? ¿O I would like to discuss a salary adjustment?' La respuesta obvia muestra la diferencia de registro.",
+      "Empatía cultural: En algunas familias mexicanas, expresar verbalmente 'I understand how you feel' puede sentirse extraño — la solidaridad se muestra con presencia y acción. Valida esa diferencia: 'En inglés también expresamos empatía verbalmente más directamente. Ambas formas son válidas en sus contextos.'",
+      "Para alumnos con experiencias difíciles (migración, pobreza, violencia): Si un alumno usa el role-play para expresar algo real, no lo conviertas en drama de clase. Escúchalo, valídalo brevemente en español, y ofrece recursos de apoyo fuera del salón (orientador escolar, trabajo social).",
+      "Conexión con educación cívica: Pide a los alumnos que investiguen una organización comunitaria real en su municipio (DIF, IMSS, ISSSTE, Cruz Roja) y escriban en inglés cuáles son sus servicios y qué necesidades atiende. Esto desarrolla competencia ciudadana e inglés funcional simultáneamente."
+    ]
   },
   "IN-II-P08": {
     "code": "IN-II-P08",
@@ -97,10 +965,134 @@
     "duration": "~3h (2 sesiones de 50 min)",
     "difficulty": "Fundamental",
     "category": "Consolidación",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "metadata": {
+      "objective": "El estudiante integra y consolida los aprendizajes del semestre (rutinas, actividades, habilidades, descripciones, comparaciones, direcciones, empatía) en una producción comunicativa auténtica que refleje su identidad y su comunidad en inglés.",
+      "competencies": [
+        "Integra estructuras gramaticales del semestre (presente simple, modales, comparativos, imperativos, want/need/would like) en producciones coherentes",
+        "Produce un texto oral y escrito de mediana extensión sobre sí mismo y su comunidad en inglés",
+        "Autoevalúa su proceso de aprendizaje e identifica áreas de fortaleza y mejora",
+        "Valora el inglés como herramienta de identidad, comunicación intercultural y movilidad social"
+      ],
+      "materials": [
+        "Portafolio de aprendizaje (producciones del semestre: rutinas, descripciones, párrafos comparativos, guías turísticas, cartas de empatía)",
+        "Rúbrica de autoevaluación del semestre",
+        "Plantilla para el proyecto final: 'My Community in English'",
+        "Recursos digitales: diccionario en línea, corrector gramatical básico, imágenes de su comunidad",
+        "Grabadora (teléfono) para la presentación oral"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {
+          "phase": "Apertura",
+          "duration": "15 min",
+          "label": "Mapa de aprendizaje semestral"
+        },
+        {
+          "phase": "Desarrollo",
+          "duration": "60 min",
+          "label": "Proyecto integrador My Community in English"
+        },
+        {
+          "phase": "Cierre",
+          "duration": "25 min",
+          "label": "Presentaciones orales + carta a mi yo futuro"
+        }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "15 min",
+          "description": "El docente hace un recorrido visual por los temas del semestre (proyecta imágenes representativas de cada progresión). Los alumnos identifican qué aprendieron en cada uno. Se introduce el proyecto final: 'My Community in English — una presentación de quién soy y dónde vivo, en inglés.' Se modela un ejemplo breve del docente.",
+          "activity": "Mapa de aprendizaje: Cada alumno dibuja un mapa mental rápido (5 min) con todos los temas del semestre que recuerda. Lo comparte con un compañero: '¿Qué recordamos mejor? ¿Qué necesitamos repasar?' El docente registra en el pizarrón las áreas de mayor y menor dominio para orientar el repaso final."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "60 min",
+          "description": "Elaboración del proyecto integrador 'My Community in English' (escrito + oral). El texto debe incluir: (1) Una descripción de su rutina diaria [IN-II-P01]. (2) Las actividades de tiempo libre de alguien de su familia o comunidad [IN-II-P02]. (3) Sus habilidades y algo que quisiera aprender a hacer [IN-II-P03]. (4) Descripción de alguien importante para él/ella [IN-II-P04]. (5) Una comparación entre su comunidad y otra [IN-II-P05]. (6) Cómo llegar a un lugar importante de su comunidad [IN-II-P06]. (7) Una necesidad de su comunidad expresada con empatía [IN-II-P07].",
+          "activity": "Escritura guiada del proyecto (30 min): Con la plantilla, los alumnos redactan su texto integrando los 7 elementos. El docente circula y ofrece retroalimentación personalizada. Revisión en pares (10 min): Un compañero lee el texto y marca con ✓ cada elemento que aparece. Grabación de la presentación oral (10 min): Los alumnos graban una presentación de 2-3 minutos usando su texto como guía (pueden leer, no es memorizado)."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "25 min",
+          "description": "Presentaciones orales seleccionadas (3-4 alumnos presentan en vivo o comparten su grabación). Coevaluación usando rúbrica simplificada. Autoevaluación final del semestre: ¿En qué mejoré? ¿Qué aún me cuesta trabajo? ¿Cuándo usaré el inglés fuera del salón? Reflexión y cierre semestral.",
+          "activity": "Carta a mi yo futuro: En los últimos 5 minutos, cada alumno escribe en inglés (2-3 oraciones) una carta a su yo del siguiente semestre: 'Dear future me, this semester I learned... I want to improve... I will practice English by...' Se guardan en el portafolio. El docente cierra con afirmación: 'You can communicate in English. That is already a superpower in Mexico.'"
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La progresión de consolidación integra y sintetiza todos los aprendizajes del semestre en una producción comunicativa auténtica. Desde la perspectiva del enfoque comunicativo (Communicative Language Teaching, CLT), el aprendizaje de la lengua se consolida cuando el estudiante la usa para expresar algo genuinamente significativo para él/ella. El proyecto 'My Community in English' cumple exactamente esta función: no es un ejercicio artificial sino una producción real que integra identidad, comunidad, gramática y vocabulario. El PRONI-SEP y el MCCEMS coinciden en que el objetivo último del aprendizaje del inglés en bachillerato no es memorizar reglas sino poder comunicarse en situaciones reales de la vida personal, social y laboral.",
+      "sections": [
+        {
+          "subtitle": "Integración de Aprendizajes del Semestre",
+          "content": "A lo largo del semestre de Inglés II, el estudiante ha desarrollado competencias comunicativas progresivas que ahora convergen: Presente simple para rutinas y actividades (P01, P02) — la base gramatical del nivel A2. Modales can/may/could para habilidades y permiso (P03) — la negociación social en inglés. Adjetivos y descripción para personas, ropa, clima (P04) — la pintura del mundo observable. Comparativos y superlativos (P05) — el pensamiento analítico y crítico. Imperativos y preposiciones para dar indicaciones (P06) — la acción y la orientación espacial. Estructuras de deseo, necesidad y empatía (P07) — la dimensión afectiva y social. Estas competencias no son aisladas: en la vida real, una conversación puede integrar todas en pocos minutos. El proyecto final simula ese uso integrado y auténtico, preparando al alumno para el Inglés III del siguiente semestre, donde se espera mayor autonomía y complejidad."
+        },
+        {
+          "subtitle": "El Portafolio como Herramienta de Evaluación",
+          "content": "El portafolio de aprendizaje es una colección de producciones del estudiante a lo largo del semestre que evidencia su progreso. A diferencia de los exámenes tradicionales que miden un punto en el tiempo, el portafolio muestra la trayectoria: desde los primeros intentos torpes con el presente simple hasta una presentación integrada de mediana extensión. El Marco MCCEMS valora la evaluación formativa y la autoevaluación como parte del aprendizaje. El portafolio desarrolla: metacognición (pensar sobre el propio aprendizaje), autonomía (el alumno es responsable de su colección), orgullo de logro (ver cuánto se ha avanzado). Para el portafolio de Inglés II, se recomienda incluir: un texto de rutina diaria revisado, el párrafo comparativo de ciudades, la guía turística, la carta de empatía, y el proyecto final 'My Community in English'. Estos documentos son también evidencia para el CENNI si el alumno decide certificarse."
+        },
+        {
+          "subtitle": "El Inglés como Herramienta de Identidad y Movilidad",
+          "content": "Aprender inglés en México no es simplemente aprender un idioma extranjero — es acceder a un conjunto de oportunidades que amplían la movilidad social, educativa y laboral. Datos del mercado laboral (STPS, 2023): Los profesionistas bilingües en México ganan en promedio 30-50% más que sus contrapartes monolingües. Las empresas con mayor demanda de inglés: industria automotriz (BMW en San Luis Potosí, Kia en Nuevo León, VW en Puebla), aeroespacial (Airbus, Bombardier en Querétaro y Baja California), tecnología (Amazon, Oracle, IBM, HP con centros en CDMX y Guadalajara), turismo y hotelería, call centers. Educación superior: las principales universidades mexicanas (UNAM, Tec de Monterrey, UAM, UdeG) requieren nivel de inglés para titulación o tienen programas en inglés. El inglés da acceso a becas internacionales (Fulbright-García Robles SEP-COMEXUS, CONACYT, Erasmus+). La conclusión para el alumno: 'El inglés que aprendiste este semestre ya te abre puertas. Cada vez que lo practicas, las puertas se abren más.'"
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Which of the following best describes the purpose of a language learning portfolio?",
+          "options": [
+            "A) To collect all the tests and grades from the semester in one place.",
+            "B) To show the student's learning progress and development over time through their own productions.",
+            "C) To replace the final exam with a collection of random activities."
+          ],
+          "correct": "B) To show the student's learning progress and development over time through their own productions."
+        },
+        {
+          "question": "In the project 'My Community in English', a student writes: 'My neighbor she works at the market every day.' What is the grammatical error?",
+          "options": [
+            "A) 'works' should be 'work' — third person doesn't add -s.",
+            "B) 'My neighbor she' has a double subject — use 'My neighbor' OR 'She' but not both.",
+            "C) 'every day' should be 'every days'."
+          ],
+          "correct": "B) 'My neighbor she' has a double subject — use 'My neighbor' OR 'She' but not both."
+        },
+        {
+          "question": "According to STPS data, what advantage do bilingual professionals have in the Mexican labor market?",
+          "options": [
+            "A) They earn on average 30-50% more than monolingual counterparts.",
+            "B) They can only work in international companies.",
+            "C) They are automatically promoted to management positions."
+          ],
+          "correct": "A) They earn on average 30-50% more than monolingual counterparts."
+        },
+        {
+          "question": "A student wants to write about a community need using the most formal structure. Which is the best option?",
+          "options": [
+            "A) Our neighborhood wants a new park.",
+            "B) Our neighborhood needs a new park urgently.",
+            "C) Our neighborhood would like to request the construction of a community park."
+          ],
+          "correct": "C) Our neighborhood would like to request the construction of a community park."
+        },
+        {
+          "question": "Which combination of structures is most appropriate for an integrative presentation about oneself and one's community?",
+          "options": [
+            "A) Only past tense verbs to describe history.",
+            "B) Simple present, comparatives, modal verbs, and empathy expressions to cover routines, descriptions, abilities, and community needs.",
+            "C) Only modal verbs since they are the most important structure in English."
+          ],
+          "correct": "B) Simple present, comparatives, modal verbs, and empathy expressions to cover routines, descriptions, abilities, and community needs."
+        }
+      ],
+      "rubric": "RÚBRICA — Proyecto Integrador 'My Community in English' (30 pts)\n\nINTEGRACIÓN DE CONTENIDOS (10 pts): 10=Los 7 elementos del semestre están presentes y bien desarrollados | 8=5-6 elementos presentes con desarrollo adecuado | 5=3-4 elementos presentes | 2=1-2 elementos presentes | 0=Sin integración de contenidos del semestre\n\nCORRECCIÓN GRAMATICAL GLOBAL (8 pts): 8=Pocas erratas, dominio sólido de estructuras trabajadas | 6=Errores menores que no afectan la comprensión | 4=Errores frecuentes pero comunicación efectiva | 2=Errores sistemáticos que dificultan la comprensión | 0=Ininteligible\n\nFLUIDEZ Y COHERENCIA (6 pts): 6=Texto/presentación fluida, conectores variados, lógica interna | 5=Fluida con algún salto | 3=Ideas presentes pero organización deficiente | 1=Sin coherencia reconocible\n\nAUTENTICIDAD Y CONTEXTUALIZACIÓN (6 pts): 6=Refleja genuinamente la identidad, comunidad y realidad del alumno | 5=Contextualización parcial pero auténtica | 3=Texto genérico sin elementos personales o comunitarios | 0=Sin elementos de identidad o comunidad\n\nPRODUCCIÓN ORAL (PRESENTACIÓN) — BONUS 5 pts adicionales si aplica: 5=Clara, fluida, pronunciación comprensible, buen uso del tiempo (2-3 min) | 4=Comprensible con pausas ocasionales | 2=Comprensible con esfuerzo | 0=Incomprensible"
+    },
+    "teacher_tips": [
+      "El proyecto final debe sentirse como un logro, no como un examen más. Crea un ambiente de celebración: presenta los proyectos de forma pública (dentro del grupo, en una 'feria de inglés' con otros grupos, o publicados digitalmente con permiso). El reconocimiento público motiva y valida el esfuerzo.",
+      "Para alumnos con ansiedad ante la producción oral: ofrece la opción de grabar en privado en lugar de presentar en vivo. La grabación puede hacerse en casa o en un espacio tranquilo de la escuela. Lo importante es la producción, no el formato de presentación.",
+      "El mapa de aprendizaje inicial te dará información valiosa: si muchos alumnos no recuerdan los comparativos, dedica 10 minutos de repaso antes del proyecto. Es mejor invertir ese tiempo que tener proyectos llenos de errores en el área olvidada.",
+      "Para la autoevaluación, usa preguntas abiertas en inglés (nivel apropiado): 'What can you do in English now that you couldn't do in August?' / 'What was your favorite activity this semester? Why?' / 'What do you want to learn next semester?' Estas respuestas también son evidencia de producción lingüística.",
+      "Cierre motivacional: Termina el semestre con datos concretos sobre oportunidades: muestra una oferta de trabajo real (job posting en inglés de una empresa en México), una convocatoria de beca, o la descripción de un programa de turismo bilingüe. Conecta lo aprendido con el futuro real de los alumnos. El inglés deja de ser 'la clase de inglés' y se convierte en una puerta."
+    ]
   }
 }
