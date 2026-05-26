@@ -1,4 +1,14 @@
-{
+"""
+gen-cneyt-vi.py -- CNEYT VI (Biologia) -- 8 progresiones
+Referencias: UNAM-IBt, CONABIO, CONAFOR, CONAHCYT, INIFAP, BIRMEX,
+SNICS-SAGARPA, INAOE, CIBIOGEM, R3D, principio de precaucion
+"""
+import json, os
+
+OUT = os.path.join(os.path.dirname(__file__),
+                   '..', 'src', 'data', 'planteamiento', 'cneyt-vi.json')
+
+data = {
   "CNEYT-VI-P01": {
     "code": "CNEYT-VI-P01",
     "title": "Analiza las hipotesis sobre el origen de la vida en la Tierra y su relacion con el contexto cientifico actual.",
@@ -24,21 +34,9 @@
     },
     "strategy": {
       "timeline": [
-        {
-          "phase": "Apertura",
-          "duration": "10 min",
-          "label": "Linea del tiempo: 4600 Ma de historia terrestre"
-        },
-        {
-          "phase": "Desarrollo",
-          "duration": "30 min",
-          "label": "Las cinco hipotesis y el experimento Miller-Urey"
-        },
-        {
-          "phase": "Cierre",
-          "duration": "10 min",
-          "label": "Evaluacion de hipotesis con criterios cientificos"
-        }
+        {"phase": "Apertura", "duration": "10 min", "label": "Linea del tiempo: 4600 Ma de historia terrestre"},
+        {"phase": "Desarrollo", "duration": "30 min", "label": "Las cinco hipotesis y el experimento Miller-Urey"},
+        {"phase": "Cierre", "duration": "10 min", "label": "Evaluacion de hipotesis con criterios cientificos"}
       ],
       "phases": [
         {
@@ -116,6 +114,7 @@
       "Los extremofilos mexicanos de la CONABIO (bacterias en la laguna de Cuatro Cienegas, Coahuila, uno de los ecosistemas mas primitivos del planeta) son un ejemplo fascinante y nacional."
     ]
   },
+
   "CNEYT-VI-P02": {
     "code": "CNEYT-VI-P02",
     "title": "Compara las caracteristicas de la celula procariota y eucariota, y describe su organizacion interna y funcion.",
@@ -141,21 +140,9 @@
     },
     "strategy": {
       "timeline": [
-        {
-          "phase": "Apertura",
-          "duration": "10 min",
-          "label": "¿Que tan grande es una celula? -- escala y tipos"
-        },
-        {
-          "phase": "Desarrollo",
-          "duration": "30 min",
-          "label": "Organelos, funciones y comparacion procariota/eucariota"
-        },
-        {
-          "phase": "Cierre",
-          "duration": "10 min",
-          "label": "Teoria endosimbiotica: la celula como consorcio"
-        }
+        {"phase": "Apertura", "duration": "10 min", "label": "¿Que tan grande es una celula? -- escala y tipos"},
+        {"phase": "Desarrollo", "duration": "30 min", "label": "Organelos, funciones y comparacion procariota/eucariota"},
+        {"phase": "Cierre", "duration": "10 min", "label": "Teoria endosimbiotica: la celula como consorcio"}
       ],
       "phases": [
         {
@@ -233,6 +220,7 @@
       "El dato de que hay ~37 billones de celulas en el cuerpo humano pero ~370 billones de microorganismos asociados siempre sorprende -- es una excelente entrada para discutir el microbioma."
     ]
   },
+
   "CNEYT-VI-P03": {
     "code": "CNEYT-VI-P03",
     "title": "Explica los procesos de metabolismo celular: respiracion celular y fotosintesis, y su importancia ecologica.",
@@ -258,21 +246,9 @@
     },
     "strategy": {
       "timeline": [
-        {
-          "phase": "Apertura",
-          "duration": "10 min",
-          "label": "¿De donde viene la energia que usas ahora mismo?"
-        },
-        {
-          "phase": "Desarrollo",
-          "duration": "30 min",
-          "label": "Respiracion celular aerobia y fotosintesis: fases y rendimiento"
-        },
-        {
-          "phase": "Cierre",
-          "duration": "10 min",
-          "label": "Ciclo del carbono y deforestacion en Mexico"
-        }
+        {"phase": "Apertura", "duration": "10 min", "label": "¿De donde viene la energia que usas ahora mismo?"},
+        {"phase": "Desarrollo", "duration": "30 min", "label": "Respiracion celular aerobia y fotosintesis: fases y rendimiento"},
+        {"phase": "Cierre", "duration": "10 min", "label": "Ciclo del carbono y deforestacion en Mexico"}
       ],
       "phases": [
         {
@@ -350,6 +326,7 @@
       "Para la fotosintesis, el experimento de la hoja sumergida en agua al sol (produccion de burbujas de O2 visibles) es un demo clasico que solo necesita agua, luz solar y una hoja de planta acuatica (elodea)."
     ]
   },
+
   "CNEYT-VI-P04": {
     "code": "CNEYT-VI-P04",
     "title": "Describe la estructura del ADN y los mecanismos de replicacion, transcripcion y traduccion (dogma central de la biologia molecular).",
@@ -375,21 +352,9 @@
     },
     "strategy": {
       "timeline": [
-        {
-          "phase": "Apertura",
-          "duration": "10 min",
-          "label": "El descubrimiento de la estructura del ADN: una historia de ciencia y conflicto"
-        },
-        {
-          "phase": "Desarrollo",
-          "duration": "30 min",
-          "label": "Estructura del ADN, replicacion y el dogma central"
-        },
-        {
-          "phase": "Cierre",
-          "duration": "10 min",
-          "label": "Mutaciones y sus consecuencias: del gen a la proteina"
-        }
+        {"phase": "Apertura", "duration": "10 min", "label": "El descubrimiento de la estructura del ADN: una historia de ciencia y conflicto"},
+        {"phase": "Desarrollo", "duration": "30 min", "label": "Estructura del ADN, replicacion y el dogma central"},
+        {"phase": "Cierre", "duration": "10 min", "label": "Mutaciones y sus consecuencias: del gen a la proteina"}
       ],
       "phases": [
         {
@@ -467,6 +432,7 @@
       "El ejercicio de decodificacion (ADN→ARNm→proteina) es mejor hacerlo con una secuencia que produzca una palabra reconocible -- algunos docentes codifican palabras en espanol con el codigo genetico para hacer el ejercicio memorable."
     ]
   },
+
   "CNEYT-VI-P05": {
     "code": "CNEYT-VI-P05",
     "title": "Analiza los patrones de herencia genetica: leyes de Mendel y herencia no mendeliana con ejemplos de diversidad biologica mexicana.",
@@ -492,21 +458,9 @@
     },
     "strategy": {
       "timeline": [
-        {
-          "phase": "Apertura",
-          "duration": "10 min",
-          "label": "El monje que invento la genetica: Mendel y los chicheros"
-        },
-        {
-          "phase": "Desarrollo",
-          "duration": "30 min",
-          "label": "Cuadros de Punnett y herencia no mendeliana"
-        },
-        {
-          "phase": "Cierre",
-          "duration": "10 min",
-          "label": "Herencia ligada al sexo y diversidad del maiz mexicano"
-        }
+        {"phase": "Apertura", "duration": "10 min", "label": "El monje que invento la genetica: Mendel y los chicheros"},
+        {"phase": "Desarrollo", "duration": "30 min", "label": "Cuadros de Punnett y herencia no mendeliana"},
+        {"phase": "Cierre", "duration": "10 min", "label": "Herencia ligada al sexo y diversidad del maiz mexicano"}
       ],
       "phases": [
         {
@@ -584,6 +538,7 @@
       "Para la herencia ligada al X: construir el arbol genealogico con simbolos estandar (cuadro=varon, circulo=mujer, circulo con punto=portadora) antes de calcular probabilidades."
     ]
   },
+
   "CNEYT-VI-P06": {
     "code": "CNEYT-VI-P06",
     "title": "Examina las causas de las mutaciones y su papel en la variabilidad genetica, la evolucion y el cancer.",
@@ -609,21 +564,9 @@
     },
     "strategy": {
       "timeline": [
-        {
-          "phase": "Apertura",
-          "duration": "10 min",
-          "label": "¿Por que nos enfermamos de cancer? La base genetica"
-        },
-        {
-          "phase": "Desarrollo",
-          "duration": "30 min",
-          "label": "Tipos de mutaciones, mutagejos y variabilidad"
-        },
-        {
-          "phase": "Cierre",
-          "duration": "10 min",
-          "label": "Mutaciones, evolucion y cancer: la doble cara"
-        }
+        {"phase": "Apertura", "duration": "10 min", "label": "¿Por que nos enfermamos de cancer? La base genetica"},
+        {"phase": "Desarrollo", "duration": "30 min", "label": "Tipos de mutaciones, mutagejos y variabilidad"},
+        {"phase": "Cierre", "duration": "10 min", "label": "Mutaciones, evolucion y cancer: la doble cara"}
       ],
       "phases": [
         {
@@ -701,6 +644,7 @@
       "La reflexion sobre edicion germinale con CRISPR es una discusion bioetica que puede extenderse si el tiempo lo permite -- es el mejor gancho para la progresion P08."
     ]
   },
+
   "CNEYT-VI-P07": {
     "code": "CNEYT-VI-P07",
     "title": "Explica la teoria de la evolucion por seleccion natural y la evidencia que la sustenta, con ejemplos de la biodiversidad mexicana.",
@@ -726,21 +670,9 @@
     },
     "strategy": {
       "timeline": [
-        {
-          "phase": "Apertura",
-          "duration": "10 min",
-          "label": "Mexico: el epicentro de la biodiversidad mundial"
-        },
-        {
-          "phase": "Desarrollo",
-          "duration": "30 min",
-          "label": "Darwin, seleccion natural y evidencias de la evolucion"
-        },
-        {
-          "phase": "Cierre",
-          "duration": "10 min",
-          "label": "Mecanismos microevolutivos y el futuro de la biodiversidad"
-        }
+        {"phase": "Apertura", "duration": "10 min", "label": "Mexico: el epicentro de la biodiversidad mundial"},
+        {"phase": "Desarrollo", "duration": "30 min", "label": "Darwin, seleccion natural y evidencias de la evolucion"},
+        {"phase": "Cierre", "duration": "10 min", "label": "Mecanismos microevolutivos y el futuro de la biodiversidad"}
       ],
       "phases": [
         {
@@ -818,6 +750,7 @@
       "La deriva genetica en poblaciones pequenas es el concepto mas relevante para la biologia de la conservacion -- vincular con las listas de especies en peligro critico de la CONABIO."
     ]
   },
+
   "CNEYT-VI-P08": {
     "code": "CNEYT-VI-P08",
     "title": "Reflexiona sobre las implicaciones eticas de la biotecnologia (transgenicos, edicion genomica, farmacogenomica) en el contexto mexicano.",
@@ -843,21 +776,9 @@
     },
     "strategy": {
       "timeline": [
-        {
-          "phase": "Apertura",
-          "duration": "15 min",
-          "label": "La biotecnologia en tu vida: lo que ya usas sin saberlo"
-        },
-        {
-          "phase": "Desarrollo",
-          "duration": "45 min",
-          "label": "Tres debates: OGM, CRISPR y farmacogenomica"
-        },
-        {
-          "phase": "Cierre",
-          "duration": "20 min",
-          "label": "El principio de precaucion y la responsabilidad ciudadana"
-        }
+        {"phase": "Apertura", "duration": "15 min", "label": "La biotecnologia en tu vida: lo que ya usas sin saberlo"},
+        {"phase": "Desarrollo", "duration": "45 min", "label": "Tres debates: OGM, CRISPR y farmacogenomica"},
+        {"phase": "Cierre", "duration": "20 min", "label": "El principio de precaucion y la responsabilidad ciudadana"}
       ],
       "phases": [
         {
@@ -936,3 +857,9 @@
     ]
   }
 }
+
+os.makedirs(os.path.dirname(os.path.abspath(OUT)), exist_ok=True)
+with open(OUT, 'w', encoding='utf-8') as f:
+    json.dump(data, f, ensure_ascii=False, indent=2)
+
+print(f"Written {len(data)} progressions to {os.path.abspath(OUT)}")
