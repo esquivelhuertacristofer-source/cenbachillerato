@@ -1,54 +1,550 @@
 {
   "CS-II-P01": {
     "code": "CS-II-P01",
-    "title": "Analiza los conceptos de bienestar social, desarrollo humano y calidad de vida, y examina las desigualdades en su distribución en México y el mundo.",
+    "title": "Analiza los conceptos de bienestar social, desarrollo humano y calidad de vida, y examina las desigualdades en su distribucion en Mexico y el mundo.",
     "level": "Ciencias Sociales II",
     "duration": "~3h (2 sesiones de 50 min)",
     "difficulty": "Intermedio",
-    "category": "Sociedad y economía",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "category": "Sociedad y economia",
+    "metadata": {
+      "objective": "El estudiante analiza los conceptos de bienestar social, desarrollo humano y calidad de vida usando indicadores nacionales e internacionales (IDH, CONEVAL, GINI), identificando las desigualdades en su distribucion en Mexico y reflexionando sobre sus causas estructurales.",
+      "competencies": [
+        "Distingue bienestar social, desarrollo humano y calidad de vida como conceptos relacionados pero distintos",
+        "Usa indicadores cuantitativos (IDH, coeficiente Gini, linea de pobreza CONEVAL) para analizar desigualdades",
+        "Identifica factores estructurales que explican la desigualdad en Mexico: region, genero, etnia, nivel educativo",
+        "Propone acciones individuales y colectivas para contribuir a mayor equidad en su comunidad"
+      ],
+      "materials": [
+        "Informe de Desarrollo Humano PNUD Mexico (datos de IDH estatal)",
+        "Datos CONEVAL: porcentaje de poblacion en pobreza por estado 2022",
+        "Mapa de Mexico con IDH por entidad federativa (PNUD-Mexico)",
+        "Grafica del coeficiente Gini de Mexico vs paises de la OCDE (INEGI)",
+        "Casos de estudio: Chiapas (IDH mas bajo) vs Nuevo Leon (IDH mas alto)"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {
+          "phase": "Apertura",
+          "duration": "15 min",
+          "label": "Mapa de IDH estatal: donde naciste importa?"
+        },
+        {
+          "phase": "Desarrollo",
+          "duration": "60 min",
+          "label": "Analisis de indicadores PNUD/CONEVAL + causas estructurales de la desigualdad"
+        },
+        {
+          "phase": "Cierre",
+          "duration": "25 min",
+          "label": "Debate: que factores explican que Chiapas tenga el IDH mas bajo de Mexico?"
+        }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "15 min",
+          "description": "El docente proyecta el mapa de IDH (Indice de Desarrollo Humano) por entidad federativa de Mexico. Pregunta detonadora: si pudieras elegir nacer en cualquier estado de Mexico para tener mejor calidad de vida, donde elegirías? Los alumnos identifican diferencias y se cuestiona: que hace que unos estados tengan mayor desarrollo que otros?",
+          "activity": "Votacion y debate inicial: cada alumno elige el estado donde vivir y lo justifica en una frase. El docente registra en el pizarron cuantos eligieron cada estado y pregunta: es justo que el bienestar dependa de donde naces? Esta pregunta genera el conflicto cognitivo que orienta toda la progresion."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "60 min",
+          "description": "Presentacion conceptual: diferencia entre bienestar social (satisfaccion de necesidades basicas colectivas), desarrollo humano (PNUD: salud + educacion + ingreso) y calidad de vida (percepcion subjetiva del bienestar). Analisis de datos en equipos: cada equipo recibe datos de un indicador (IDH estatal PNUD, porcentaje en pobreza CONEVAL, Gini INEGI) y los analiza para responder: en que region del pais hay mayor desigualdad, que factores correlacionan con el nivel de desarrollo.",
+          "activity": "Tarea 1: Identificar los 3 estados con IDH mas alto y los 3 con IDH mas bajo en Mexico. Tarea 2: Analizar que factores tienen en comun los estados con IDH bajo (region sur, poblacion indigena mayoritaria, menor inversion publica historica, limitado acceso a servicios). Tarea 3: Proponer una hipotesis: que medida de politica publica podria reducir la brecha de IDH entre Chiapas y Nuevo Leon?"
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "25 min",
+          "description": "Debate sobre causas estructurales: la desigualdad no es accidental sino producto de decisiones historicas y politicas. Referencia a la historia economica de Mexico: el modelo de industrializacion concentrado en el norte y el centro, el abandono historico del sur, la desigualdad en la inversion publica educativa y de infraestructura. Cierre con reflexion: que puede hacer cada alumno desde su comunidad para contribuir al bienestar colectivo?",
+          "activity": "Propuesta ciudadana: en equipos, los alumnos elaboran una propuesta concreta (2-3 oraciones) de accion que podria implementarse en su municipio para mejorar algun indicador de bienestar. Se comparten con el grupo y se discute su viabilidad."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La desigualdad en el bienestar social es uno de los grandes desafios de Mexico y del mundo. Mexico ocupa el lugar 77 en el IDH global (PNUD, 2022) pero es el pais con mayor desigualdad de ingresos dentro de la OCDE (Organizacion para la Cooperacion y el Desarrollo Economicos), con un coeficiente Gini de 0.454 segun el INEGI. El CONEVAL (Consejo Nacional de Evaluacion de la Politica de Desarrollo Social) reporta que el 36.3% de la poblacion mexicana vive en condiciones de pobreza (2022). Esta desigualdad no es uniforme: se distribuye geograficamente (sur vs norte), por etnia (poblaciones indigenas tienen mayor carencia), por genero (las mujeres tienen menor acceso al trabajo remunerado y la educacion en zonas rurales) y por grupo etario (ninos y adultos mayores concentran mayor vulnerabilidad).",
+      "sections": [
+        {
+          "subtitle": "Bienestar Social, Desarrollo Humano y Calidad de Vida: Distinciones Conceptuales",
+          "content": "Bienestar social: es un concepto colectivo que alude a las condiciones materiales e institucionales que permiten a una poblacion satisfacer sus necesidades basicas: acceso a salud, educacion, vivienda, alimentacion, seguridad. Es medible con indicadores objetivos. Desarrollo humano: concepto desarrollado por Amartya Sen y el PNUD (Programa de las Naciones Unidas para el Desarrollo). El IDH (Indice de Desarrollo Humano) mide tres dimensiones: longevidad y salud (esperanza de vida), educacion (anos de escolaridad) e ingreso (PNB per capita). El IDH va de 0 a 1: Mexico tiene 0.781 (desarrollo humano alto, aunque con brechas enormes entre estados). Calidad de vida: es una dimension subjetiva del bienestar: como percibe la persona su propia vida en funcion de sus expectativas y valores. Puede diferir del bienestar objetivo: una persona con bajos ingresos puede reportar alta calidad de vida si su comunidad satisface sus necesidades de pertenencia y sentido. El INEGI mide la calidad de vida con la ENBIARE (Encuesta Nacional de Bienestar Autorreportado)."
+        },
+        {
+          "subtitle": "Desigualdad en Mexico: Indicadores y Causas",
+          "content": "Mexico es uno de los paises mas desiguales del mundo. El coeficiente Gini mide la desigualdad de ingresos en una escala de 0 (igualdad perfecta) a 1 (desigualdad total). Mexico tiene un Gini de 0.454 (INEGI, 2022), muy por encima del promedio de la OCDE (0.315). Datos clave: el 10% mas rico de Mexico concentra el 63.4% de la riqueza del pais. El 10% mas pobre tiene el 1.9%. Disparidades regionales en IDH (PNUD-Mexico): Nuevo Leon (0.800), CDMX (0.830) vs Chiapas (0.667), Guerrero (0.678), Oaxaca (0.681). Las causas estructurales incluyen: modelo economico concentrador (inversion en zonas ya desarrolladas), desigualdad historica en el gasto educativo por region, discriminacion etnica y racial, brecha de genero en el mercado laboral, y acceso diferenciado a infraestructura (agua, electricidad, internet). El CONEVAL reporta que los estados del sur concentran las mayores carencias sociales en Mexico."
+        },
+        {
+          "subtitle": "Politicas Publicas para la Equidad",
+          "content": "Reducir la desigualdad requiere politicas publicas especificas. En Mexico han existido programas con distintos enfoques: Oportunidades/Prospera/Bienestar: transferencias monetarias condicionadas a asistencia escolar y revision medica (creado en 1997, ha pasado por varias reformas). Sembrando Vida: apoyo a productores rurales del sur del pais. IMSS-Bienestar: atencion medica en zonas sin seguridad social. El PNUD recomienda un enfoque de capacidades (Amartya Sen): no solo satisfacer necesidades basicas sino expandir las opciones reales de vida de las personas (educacion de calidad, libertad de movilidad, participacion politica). A nivel internacional, los Objetivos de Desarrollo Sostenible (ODS) de la ONU, especialmente el ODS 10 (reduccion de desigualdades), orientan las politicas de los paises miembro, incluyendo Mexico. La evaluacion de politicas publicas por el CONEVAL es una herramienta clave: permite medir si los programas realmente reducen la pobreza y la desigualdad."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "El IDH (Indice de Desarrollo Humano) del PNUD mide tres dimensiones. Cuales son?",
+          "options": [
+            "A) Crecimiento economico, seguridad publica e infraestructura vial.",
+            "B) Longevidad y salud, educacion e ingreso (PNB per capita).",
+            "C) Democracia, libertad de prensa y acceso a internet."
+          ],
+          "correct": "B) Longevidad y salud, educacion e ingreso (PNB per capita)."
+        },
+        {
+          "question": "El coeficiente Gini de Mexico (0.454) comparado con el promedio de la OCDE (0.315) indica que:",
+          "options": [
+            "A) Mexico tiene menos desigualdad de ingresos que el promedio de paises desarrollados.",
+            "B) Mexico tiene mayor desigualdad de ingresos que el promedio de la OCDE.",
+            "C) Mexico y los paises de la OCDE tienen niveles similares de desigualdad."
+          ],
+          "correct": "B) Mexico tiene mayor desigualdad de ingresos que el promedio de la OCDE."
+        },
+        {
+          "question": "Segun el CONEVAL, que porcentaje aproximado de la poblacion mexicana vivia en pobreza en 2022?",
+          "options": [
+            "A) 10%",
+            "B) 36%",
+            "C) 65%"
+          ],
+          "correct": "B) 36%"
+        },
+        {
+          "question": "Cual estado de Mexico tiene el IDH mas alto segun el PNUD?",
+          "options": [
+            "A) Chiapas",
+            "B) Ciudad de Mexico",
+            "C) Veracruz"
+          ],
+          "correct": "B) Ciudad de Mexico"
+        },
+        {
+          "question": "La diferencia entre bienestar social y calidad de vida radica en que:",
+          "options": [
+            "A) El bienestar social es un concepto colectivo y objetivo; la calidad de vida es una percepcion subjetiva individual.",
+            "B) El bienestar social solo aplica a paises desarrollados; la calidad de vida aplica a todos.",
+            "C) Son sinonimos que el INEGI usa de manera intercambiable."
+          ],
+          "correct": "A) El bienestar social es un concepto colectivo y objetivo; la calidad de vida es una percepcion subjetiva individual."
+        }
+      ],
+      "rubric": "RUBRICA — Analisis de desigualdad con datos (20 pts)\n\nUSO DE INDICADORES (7 pts): 7=Usa correctamente IDH, Gini y datos CONEVAL con referencias especificas | 5=Usa 2 indicadores correctamente | 3=Menciona indicadores sin usarlos para argumentar | 0=Sin uso de datos cuantitativos\n\nANALISIS DE CAUSAS ESTRUCTURALES (6 pts): 6=Identifica 3+ causas estructurales de la desigualdad con argumentacion | 4=2 causas con argumentacion parcial | 2=Causas mencionadas sin analisis | 0=Sin analisis causal\n\nPROPUESTA CIUDADANA (4 pts): 4=Propuesta concreta, viable y fundamentada en los datos analizados | 3=Propuesta presente con fundamentacion limitada | 2=Propuesta vaga | 0=Sin propuesta\n\nCRITICO Y REFLEXIVO (3 pts): 3=Reflexion critica sobre la desigualdad estructural y el papel de las politicas publicas | 2=Reflexion presente pero superficial | 0=Sin reflexion critica"
+    },
+    "teacher_tips": [
+      "El mapa de IDH estatal es el mejor detonador visual para esta progresion: la diferencia entre Chiapas (0.667) y CDMX (0.830) es mas elocuente que cualquier explicacion textual. Proyectalo en color para que la diferencia sea impactante.",
+      "Cuidado con los estereotipos: algunos alumnos pueden asociar los estados del sur con atraso o con culpa de sus propios habitantes. Dirige el analisis hacia las causas estructurales (inversion historica, colonialismo interno) y no hacia caracteristicas de la gente.",
+      "El coeficiente Gini puede ser abstracto: usa la analogia de una pizza de 10 rebanadas. Si en un grupo de 10 personas una sola tiene 6 rebanadas y las otras 9 se reparten 4, ese grupo tiene alta desigualdad (Gini alto). Con datos reales de Mexico: 1 persona tiene 6 rebanadas y las otras 9 se reparten 4.",
+      "Conecta con la vida cotidiana: pregunta a los alumnos sobre el acceso a internet, agua potable, servicios de salud y transporte en su propia comunidad. Eso los convierte de observadores externos a actores en el analisis.",
+      "La propuesta ciudadana es el cierre mas importante: transforma el analisis en agencia. Aunque sean propuestas pequenas (pedir al municipio que habilite un espacio de salud comunitaria, organizar brigadas de tutoria entre pares), el ejercicio de pensar en soluciones es fundamental para la formacion civica."
+    ]
   },
   "CS-II-P02": {
     "code": "CS-II-P02",
-    "title": "Examina las formas de organización social —familia, comunidad, asociaciones civiles, movimientos sociales— y su papel en la construcción del tejido social.",
+    "title": "Examina las formas de organizacion social (familia, comunidad, asociaciones civiles, movimientos sociales) y su papel en la construccion del tejido social.",
     "level": "Ciencias Sociales II",
     "duration": "~3h (2 sesiones de 50 min)",
     "difficulty": "Intermedio",
-    "category": "Organización social",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "category": "Organizacion social",
+    "metadata": {
+      "objective": "El estudiante examina las distintas formas de organizacion social presentes en Mexico (familia, comunidad, sociedad civil, movimientos sociales) analizando su funcion en la construccion del tejido social y en la resistencia ante las desigualdades.",
+      "competencies": [
+        "Identifica y caracteriza las principales formas de organizacion social: familiar, comunitaria, civil y movimientos sociales",
+        "Analiza como cada forma de organizacion contribuye o puede contribuir al bienestar colectivo",
+        "Reconoce movimientos sociales mexicanos historicos y contemporaneos y su impacto en la vida publica",
+        "Valora la participacion ciudadana organizada como mecanismo de transformacion social"
+      ],
+      "materials": [
+        "Infografia de formas de organizacion social: caracteristicas y ejemplos mexicanos",
+        "Casos de estudio: EZLN (Chiapas, 1994), movimiento feminista #MeToo Mexico, movimiento estudiantil #YoSoy132 (2012), tequio en comunidades oaxaquenas",
+        "Datos INEGI sobre estructura familiar en Mexico: ENIGH 2022",
+        "Mapa de organizaciones de la sociedad civil registradas por INDESOL",
+        "Video: Un ejemplo de tequio o faena comunitaria en comunidad indigena"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {
+          "phase": "Apertura",
+          "duration": "15 min",
+          "label": "Mapeo de organizaciones sociales en la comunidad del alumno"
+        },
+        {
+          "phase": "Desarrollo",
+          "duration": "60 min",
+          "label": "Analisis de formas de organizacion + casos de movimientos sociales mexicanos"
+        },
+        {
+          "phase": "Cierre",
+          "duration": "25 min",
+          "label": "Debate: el tequio como modelo de organizacion comunitaria para el siglo XXI?"
+        }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "15 min",
+          "description": "El docente pide a los alumnos que listen en 3 minutos todos los grupos, organizaciones o colectivos a los que pertenecen o que conocen en su comunidad: familia extensa, equipo de futbol, iglesia, vecinos de la colonia, grupo de WhatsApp de padres, asociacion de colonos, banda escolar, etc. Se listan en el pizarron y se categoriza: cual es formal, cual es informal, cual tiene caracter reivindicativo.",
+          "activity": "Categorizar colectivamente: el grupo clasifica las organizaciones listadas segun: familiar, comunitaria (barrio, colonia, ejido), civil formal (asociacion registrada) o movimiento social. Pregunta: por que los seres humanos nos organizamos en grupos? Que logran los grupos que los individuos solos no pueden?"
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "60 min",
+          "description": "Presentacion de las cuatro formas de organizacion social con sus caracteristicas: familia (unidad basica, cada vez mas diversa segun el INEGI: nucleares, monoparentales, homoparentales, extendidas), comunidad (territorio compartido, identidad comun, practicas colectivas como el tequio oaxaqueno o la minka andina), sociedad civil (OSC registradas ante INDESOL: derechos humanos, medio ambiente, educacion), movimientos sociales (accion colectiva reivindicativa: EZLN, feminismo, estudiantiles). Analisis de casos en equipos.",
+          "activity": "Tarea 1: Cada equipo analiza un caso de organizacion social mexicana: EZLN (autonomia indigena), #YoSoy132 (participacion juvenil), movimiento feminista (marcha del 8M), tequio (reciprocidad comunitaria). Respondan: quien organiza, que demanda, que logro, que obstaculos enfrentaron. Tarea 2: Elaborar un esquema comparativo de los 4 casos."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "25 min",
+          "description": "Debate: el tequio (practica comunitaria indigena de trabajo colectivo sin remuneracion para el bien comun) es un modelo de organizacion que podria aplicarse en comunidades urbanas? Los alumnos argumentan a favor y en contra. Se conecta con el concepto de capital social: los lazos de confianza y reciprocidad entre personas son un recurso social valioso para el desarrollo.",
+          "activity": "Propuesta de accion: cada alumno escribe una forma concreta en que podria contribuir a una organizacion social de su comunidad. No tiene que ser grande: participar en la brigada de limpieza de la colonia, apoyar en una organizacion de ayuda a adultos mayores, unirse a un grupo de defensa ambiental. El docente recoge las propuestas y las publica en el salon."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La organizacion social es la forma en que los seres humanos se agrupan para satisfacer necesidades, defender derechos y construir comunidad. En Mexico, las formas de organizacion social son enormemente diversas y tienen raices historicas profundas: las comunidades indigenas con sus sistemas de cargo y tequio, los ejidos posrevolucionarios, las organizaciones obreras del siglo XX, los movimientos estudiantiles de 1968 y 1999, el EZLN y la autonomia indigena, los movimientos feministas contemporaneos. El INEGI documenta que el 23% de los mexicanos mayores de 18 anos participa en alguna organizacion de la sociedad civil (ENCIVO, 2021). Esta participacion es un indicador de salud democratica y capital social.",
+      "sections": [
+        {
+          "subtitle": "La Familia como Unidad de Organizacion Social",
+          "content": "La familia es la forma de organizacion social mas basica y universal, aunque su estructura varia enormemente segun la cultura, la clase social, la region y la epoca. En Mexico, segun el INEGI (ENIGH 2022), los hogares se distribuyen en: Nucleares (padre/madre + hijos): 64.4% de los hogares. Monoparentales (un solo progenitor + hijos): 19.2%. Extendidos (familia nuclear + parientes): 13.2%. Unipersonales: 11.1%. Homoparentales: aunque el INEGI no los cataloga por separado, 11,700 parejas del mismo sexo fueron registradas en el censo 2020. La familia extensa tiene especial importancia en Mexico, particularmente en comunidades rurales e indigenas: abuelos, tios y primos forman redes de apoyo economico y emocional que compensan la ausencia de servicios sociales formales. El concepto de familismo mexicano (alta valoracion de los lazos familiares sobre el individualismo) tiene impactos en la movilidad social, en el cuidado de personas dependientes y en la insercion laboral."
+        },
+        {
+          "subtitle": "Comunidad, Sociedad Civil y Movimientos Sociales",
+          "content": "Comunidad: conjunto de personas que comparten un territorio, una historia y una identidad. En Mexico, las comunidades indigenas tienen formas de organizacion propias reconocidas constitucionalmente (Art. 2): el tequio (trabajo colectivo comunitario sin remuneracion), el sistema de cargos (estructura de gobierno comunitario que distribuye responsabilidades), la asamblea comunitaria (maxima autoridad de decision colectiva). Estas formas de organizacion son patrimonio cultural y modelo de gobernanza participativa. Sociedad civil organizada: el INDESOL (Instituto Nacional de Desarrollo Social) registra mas de 45,000 Organizaciones de la Sociedad Civil (OSC) en Mexico activas en areas como derechos humanos, educacion, medio ambiente, salud comunitaria. Movimientos sociales: accion colectiva organizada para demandar cambios sociales o politicos. Los mas relevantes en Mexico contemporaneo: EZLN (1994): autonomia de los pueblos indigenas de Chiapas; #YoSoy132 (2012): democratizacion de los medios de comunicacion; movimiento feminista (2019-presente): contra la violencia de genero y el feminicidio; movimiento de desaparecidos (familiares buscando a victimas de desaparicion forzada)."
+        },
+        {
+          "subtitle": "Capital Social y Tejido Social",
+          "content": "El capital social es el conjunto de relaciones de confianza, reciprocidad y cooperacion que existen entre los miembros de una sociedad. El sociologo Robert Putnam (Bowling Alone, 2000) analizo como la erosion del capital social en EEUU (menos participacion en asociaciones, menos confianza en los vecinos) estaba correlacionada con mayor desigualdad, peor salud publica y menor bienestar. En Mexico, el tejido social ha sido dañado por la violencia del crimen organizado, la migracion masiva interna y externa, y la desconfianza en las instituciones. Sin embargo, existen formas de resistencia y reconstruccion del tejido social: las redes de ayuda mutua surgidas despues del terremoto de 1985 (antecedente de la sociedad civil organizada moderna), la respuesta comunitaria al sismo de 2017, las cocinas comunitarias en zonas de pobreza, los sistemas de alerta y autoproteccion comunitaria en municipios con alta violencia. Fortalecer el capital social es una estrategia tanto de desarrollo comunitario como de prevencion de violencia."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "El tequio es una forma de organizacion comunitaria de origen indigena que consiste en:",
+          "options": [
+            "A) El pago de impuestos comunitarios al gobierno municipal.",
+            "B) Trabajo colectivo sin remuneracion para el bien comun de la comunidad.",
+            "C) El sistema de eleccion de autoridades en comunidades con usos y costumbres."
+          ],
+          "correct": "B) Trabajo colectivo sin remuneracion para el bien comun de la comunidad."
+        },
+        {
+          "question": "Segun el INEGI (ENIGH 2022), cual es el tipo de hogar mas comun en Mexico?",
+          "options": [
+            "A) Hogar extendido (familia nuclear + parientes)",
+            "B) Hogar nuclear (padre/madre + hijos)",
+            "C) Hogar unipersonal (persona que vive sola)"
+          ],
+          "correct": "B) Hogar nuclear (padre/madre + hijos)"
+        },
+        {
+          "question": "El movimiento #YoSoy132 (2012) demandaba principalmente:",
+          "options": [
+            "A) La autonomia de las comunidades indigenas de Chiapas.",
+            "B) La democratizacion de los medios de comunicacion en Mexico.",
+            "C) La reduccion de la violencia de genero y los feminicidios."
+          ],
+          "correct": "B) La democratizacion de los medios de comunicacion en Mexico."
+        },
+        {
+          "question": "El concepto de capital social se refiere a:",
+          "options": [
+            "A) El dinero que una comunidad tiene en el banco como ahorro colectivo.",
+            "B) Las relaciones de confianza, reciprocidad y cooperacion entre los miembros de una sociedad.",
+            "C) El presupuesto que el gobierno asigna a obras de infraestructura comunitaria."
+          ],
+          "correct": "B) Las relaciones de confianza, reciprocidad y cooperacion entre los miembros de una sociedad."
+        },
+        {
+          "question": "Cuantas Organizaciones de la Sociedad Civil registradas ante el INDESOL existen en Mexico aproximadamente?",
+          "options": [
+            "A) Mas de 45,000",
+            "B) Aproximadamente 5,000",
+            "C) Menos de 1,000"
+          ],
+          "correct": "A) Mas de 45,000"
+        }
+      ],
+      "rubric": "RUBRICA — Analisis de caso de organizacion social (20 pts)\n\nIDENTIFICACION Y CARACTERIZACION (5 pts): 5=Identifica y caracteriza correctamente la forma de organizacion del caso analizado | 4=Caracterizacion correcta con algun elemento impreciso | 2=Caracterizacion incompleta | 0=Sin caracterizacion\n\nANALISIS DEL CASO (7 pts): 7=Responde quien organiza, que demanda, que logro y que obstaculos enfrentaron con argumentacion y datos | 5=Responde 3 de las 4 preguntas con argumentacion | 3=Responde 1-2 preguntas sin argumentacion | 0=Sin analisis del caso\n\nCOMPARACION CON OTRAS FORMAS (5 pts): 5=Esquema comparativo completo con 3+ formas de organizacion identificadas y diferenciadas | 4=Comparacion de 2 formas | 2=Descripcion de 1 forma sin comparacion | 0=Sin esquema comparativo\n\nPROPUESTA DE PARTICIPACION (3 pts): 3=Propuesta concreta, personal y vinculada a una organizacion real de la comunidad | 2=Propuesta presente pero vaga | 0=Sin propuesta"
+    },
+    "teacher_tips": [
+      "El tequio es un concepto poderoso para esta clase porque es un ejemplo concreto de una forma de organizacion que funciona (y ha funcionado por siglos) diferente al modelo capitalista. Usalos para cuestionar el supuesto de que solo el trabajo remunerado tiene valor.",
+      "Para el analisis del EZLN: evita presentarlo como un tema politicamente polarizante. El EZLN es un movimiento social con una historia documentada (levantamiento armado del 1 de enero de 1994, Acuerdos de San Andres, las Juntas de Buen Gobierno). Presentalo como un caso de estudio de organizacion social, no como posicionamiento politico.",
+      "El mapeo inicial de organizaciones en la comunidad del alumno es una herramienta de diagnostico valiosa: revela el capital social disponible en la comunidad escolar. Ese mapeo puede ser el inicio de un proyecto de servicio comunitario.",
+      "El sesgo de visibilidad: los movimientos sociales urbanos (feminismo, #YoSoy132) son mas visibles mediatica y culturalmente que las formas de organizacion comunitaria indigena. Equilibra deliberadamente: el tequio oaxaqueno es tan movimiento social como la marcha del 8M.",
+      "Conexion con la CDMX y el 85: el terremoto de 1985 en la Ciudad de Mexico es un caso historico clave de emergencia del capital social: las brigadas de vecinos que actuaron antes que el gobierno son consideradas el origen de la sociedad civil moderna en Mexico. Es un ejemplo emotivo y bien documentado."
+    ]
   },
   "CS-II-P03": {
     "code": "CS-II-P03",
-    "title": "Estudia los procesos de producción, distribución y consumo desde una perspectiva crítica, vinculando economía formal e informal, y trabajo remunerado y no remunerado.",
+    "title": "Estudia los procesos de produccion, distribucion y consumo desde una perspectiva critica, vinculando economia formal e informal, y trabajo remunerado y no remunerado.",
     "level": "Ciencias Sociales II",
     "duration": "~3h (2 sesiones de 50 min)",
     "difficulty": "Intermedio",
-    "category": "Economía y trabajo",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "category": "Economia y trabajo",
+    "metadata": {
+      "objective": "El estudiante analiza los procesos economicos de produccion, distribucion y consumo identificando la coexistencia de economia formal e informal en Mexico, y reconoce el trabajo no remunerado (especialmente el de cuidados) como parte fundamental de la economia que el mercado invisibiliza.",
+      "competencies": [
+        "Distingue los procesos de produccion, distribucion y consumo en la cadena de valor de un bien o servicio",
+        "Diferencia economia formal e informal usando datos del INEGI (ENOE) sobre ocupacion en Mexico",
+        "Reconoce y valora el trabajo no remunerado (cuidados del hogar) como trabajo economico invisible",
+        "Analiza de manera critica sus propios patrones de consumo y sus implicaciones sociales y ambientales"
+      ],
+      "materials": [
+        "Datos INEGI-ENOE sobre tasa de informalidad laboral en Mexico (sector formal vs informal)",
+        "Cuenta Satelite del Trabajo No Remunerado del Hogar (INEGI): valor economico del trabajo de cuidados",
+        "Mapa de cadena de valor: un producto mexicano desde su produccion hasta el consumo (jitomate, aguacate, tequila, artesania)",
+        "Infografia de distribucion del ingreso en la cadena de valor: quien se lleva mas, quien produce mas",
+        "Videos o testimonios de trabajadores informales y de cuidadoras en Mexico"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {
+          "phase": "Apertura",
+          "duration": "15 min",
+          "label": "De donde viene lo que consumimos? Trazando la cadena de un producto mexicano"
+        },
+        {
+          "phase": "Desarrollo",
+          "duration": "60 min",
+          "label": "Economia formal vs informal + trabajo no remunerado: datos INEGI"
+        },
+        {
+          "phase": "Cierre",
+          "duration": "25 min",
+          "label": "Debate: el trabajo de mi mama en casa vale cuanto? La cuenta satelite del INEGI"
+        }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "15 min",
+          "description": "El docente muestra un aguacate (o una bolsa de tortillas, una playera, un celular) y pregunta: cuantas personas trabajaron para que esto llegara a tus manos? Los alumnos imaginan la cadena: campesino, empacadora, transportista, tienda, cajero, empleado de limpieza. Se introduce el concepto de cadena de valor: el recorrido de un bien desde su produccion hasta el consumo final.",
+          "activity": "Traza la cadena: en equipos, los alumnos eligen un producto tipico mexicano (aguacate de Michoacan, jitomate de Sinaloa, artesania de Oaxaca, tequila de Jalisco) y trazas su cadena de valor: quien produce, quien transforma, quien distribuye, quien vende. Marcan en la cadena quienes pertenecen a la economia formal y quienes a la informal."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "60 min",
+          "description": "Presentacion de conceptos: economia formal (trabajadores con contrato, prestaciones, seguridad social) vs economia informal (sin contrato, sin prestaciones: vendedores ambulantes, trabajadores del hogar, campesinos sin registro). El INEGI (ENOE, 2023) reporta que el 55.1% de la poblacion ocupada en Mexico trabaja en el sector informal. Analisis de datos y discusion sobre las causas y consecuencias de la informalidad. Luego: trabajo no remunerado del hogar (cuidado de hijos, ancianos, personas enfermas, limpieza, cocina): el INEGI estima que equivaldria al 22.8% del PIB nacional si se valorara economicamente.",
+          "activity": "Tarea 1: Calcular la tasa de informalidad en el sector elegido (agricultura de temporal: casi 100% informal; comercio ambulante: 100% informal; manufactura grande: mayoritariamente formal). Tarea 2: Analizar quien hace mas trabajo no remunerado en Mexico por genero segun la Cuenta Satelite del INEGI. Tarea 3: Calcular cuantas horas a la semana se realizan actividades de cuidado en el hogar propio del alumno y quien las realiza."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "25 min",
+          "description": "Debate detonador: si el trabajo de cuidados del hogar equivale al 22.8% del PIB segun el INEGI, por que no se paga, no se cuenta en las estadisticas economicas convencionales y no genera derechos de seguridad social para quien lo realiza? Reflexion sobre la economia del cuidado, el genero y la invisibilidad del trabajo reproductivo.",
+          "activity": "Acta de reconocimiento: cada alumno escribe en una tarjeta una actividad de cuidado que alguien en su hogar realiza de manera no remunerada y cuanto valoraria economicamente esa actividad. Se comparte en clase. El docente cierra: reconocer el trabajo invisible es el primer paso para valorarlo."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La economia no se reduce a los mercados formales y al dinero que circula en ellos. En Mexico y en el mundo, una enorme proporcion de la actividad economica ocurre fuera de los registros oficiales: la economia informal (55.1% de los ocupados en Mexico segun el INEGI-ENOE 2023) y el trabajo no remunerado del hogar (equivalente al 22.8% del PIB mexicano segun la Cuenta Satelite del INEGI) son dos dimensiones economicas fundamentales que las estadisticas convencionales suelen ignorar. Esta invisibilidad no es neutral: tiene consecuencias sobre quien recibe proteccion social, quien acumula derechos de pension, quien puede dedicarse a la educacion y al trabajo remunerado. En Mexico, las mujeres realizan el 71.6% del trabajo no remunerado del hogar (INEGI, 2021).",
+      "sections": [
+        {
+          "subtitle": "Produccion, Distribucion y Consumo",
+          "content": "El ciclo economico basico tiene tres fases: Produccion: el proceso de transformacion de recursos naturales y trabajo en bienes y servicios. En Mexico, sectores clave: agricultura (aguacate, jitomate, maiz, berries — Mexico es el principal exportador de aguacate del mundo, con 80% del mercado global segun la SAGARPA), manufactura (industria automotriz, aeroespacial, electronica), servicios (turismo, comercio, finanzas). Distribucion: el proceso por el cual los bienes y servicios llegan del productor al consumidor. Incluye transporte, almacenamiento, mayoreo, menudeo. La distribucion de la riqueza generada en la cadena es profundamente desigual: el productor de aguacate en Michoacan puede recibir el 5% del precio de venta final en EEUU; el exportador y el supermercado extranjero se quedan con el resto. Consumo: la utilizacion final de bienes y servicios para satisfacer necesidades o deseos. El consumo critico analiza: de donde viene lo que compro, quien lo produjo y en que condiciones, cuales son los impactos ambientales de mi consumo. El comercio justo (Fair Trade) es una alternativa que busca redistribuir mejor el valor en la cadena de distribucion."
+        },
+        {
+          "subtitle": "Economia Formal e Informal en Mexico",
+          "content": "La economia informal en Mexico es un fenomeno masivo y estructural. El INEGI la define como toda actividad economica que no esta sujeta a la legislacion laboral y fiscal vigente. Incluye: trabajadores sin contrato ni prestaciones, vendedores ambulantes, microempresarios sin registro, trabajadores domesticos sin contrato, agricultores de temporal sin seguridad social. Datos INEGI-ENOE (2023): 55.1% de los 57.5 millones de ocupados en Mexico pertenecen al sector informal (32 millones de personas). La informalidad concentra mas a: mujeres (57.4% de las mujeres ocupadas son informales), jovenes (18-24 anos: 69.8% de informalidad), trabajadores sin educacion superior, zonas rurales y sur del pais. Causas: rigidez del mercado formal, altos costos de la formalizacion para microempresas, baja fiscalizacion, necesidad de ingresos inmediatos. Consecuencias: falta de acceso a IMSS/ISSSTE, sin pension, sin acceso a credito formal, sin proteccion ante despido. El INAES (Instituto Nacional de la Economia Social) y la SE (Secretaria de Economia) tienen programas para apoyar la formalizacion."
+        },
+        {
+          "subtitle": "El Trabajo No Remunerado: La Economia Invisible",
+          "content": "El trabajo no remunerado del hogar (TNRH) incluye actividades como cocinar, limpiar, lavar ropa, cuidar a hijos/as, cuidar a personas enfermas o adultos mayores, hacer compras para el hogar. Estas actividades son imprescindibles para la reproduccion de la fuerza de trabajo y para la sostenibilidad de la vida, pero no son contabilizadas en el Producto Interno Bruto (PIB) convencional. El INEGI desarrolla la Cuenta Satelite del Trabajo No Remunerado del Hogar (CSTNRH) para estimar su valor economico. Dato clave: en 2021, el valor economico del TNRH equivalio al 22.8% del PIB de Mexico (mas que todo el sector manufacturero). Distribucion por genero: las mujeres realizan el 71.6% del TNRH, los hombres el 28.4%. Tiempo promedio diario: mujeres dedican 5.4 horas al dia al TNRH; hombres, 2.2 horas. Esta brecha de genero en el trabajo de cuidados limita la participacion de las mujeres en el mercado laboral remunerado, en la educacion y en la vida publica."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Segun el INEGI-ENOE 2023, que porcentaje de los ocupados en Mexico pertenece al sector informal?",
+          "options": [
+            "A) 20%",
+            "B) 55%",
+            "C) 80%"
+          ],
+          "correct": "B) 55%"
+        },
+        {
+          "question": "La Cuenta Satelite del Trabajo No Remunerado del Hogar del INEGI estimo que en 2021 este trabajo equivalia al:",
+          "options": [
+            "A) 5% del PIB de Mexico",
+            "B) 22.8% del PIB de Mexico",
+            "C) 50% del PIB de Mexico"
+          ],
+          "correct": "B) 22.8% del PIB de Mexico"
+        },
+        {
+          "question": "Que porcentaje del trabajo no remunerado del hogar realizan las mujeres en Mexico segun el INEGI?",
+          "options": [
+            "A) 50% (a partes iguales entre hombres y mujeres)",
+            "B) 71.6%",
+            "C) 30%"
+          ],
+          "correct": "B) 71.6%"
+        },
+        {
+          "question": "Mexico es el principal exportador mundial de cual producto agricola?",
+          "options": [
+            "A) Maiz",
+            "B) Aguacate",
+            "C) Cafe"
+          ],
+          "correct": "B) Aguacate"
+        },
+        {
+          "question": "La economia informal se diferencia de la formal principalmente porque:",
+          "options": [
+            "A) La economia informal solo existe en paises pobres; la formal en paises desarrollados.",
+            "B) Los trabajadores informales no tienen contrato, prestaciones ni seguridad social reconocida por ley.",
+            "C) La economia informal no genera riqueza real, solo circula dinero sin crear valor."
+          ],
+          "correct": "B) Los trabajadores informales no tienen contrato, prestaciones ni seguridad social reconocida por ley."
+        }
+      ],
+      "rubric": "RUBRICA — Analisis de cadena de valor + trabajo no remunerado (20 pts)\n\nCADENA DE VALOR (5 pts): 5=Cadena completa con produccion, transformacion, distribucion y consumo, identificando actores formales e informales | 4=Cadena con 3 eslabones correctamente identificados | 2=Cadena parcial o sin distincion formal/informal | 0=Sin cadena de valor\n\nANALISIS DE INFORMALIDAD (5 pts): 5=Usa datos INEGI-ENOE correctamente para caracterizar la informalidad del sector analizado y sus consecuencias | 4=Datos presentes con analisis parcial | 2=Mencion de informalidad sin datos | 0=Sin analisis de informalidad\n\nTRABAJO NO REMUNERADO (6 pts): 6=Reconoce el trabajo no remunerado, usa datos de la Cuenta Satelite INEGI y analiza la brecha de genero | 4=Reconoce el trabajo no remunerado con datos parciales | 2=Mencion del trabajo no remunerado sin datos ni analisis de genero | 0=No reconoce el trabajo no remunerado\n\nCRITICA Y REFLEXION (4 pts): 4=Reflexion critica sobre la distribucion desigual del valor en la cadena y sobre la economia invisible con propuesta de mejora | 3=Reflexion presente con argumentacion limitada | 0=Sin reflexion critica"
+    },
+    "teacher_tips": [
+      "El tema del trabajo no remunerado puede generar incomodidad en algunos alumnos varones que nunca habian pensado en que su madre, hermana o abuela realiza trabajo economico sin reconocimiento. Maneja la incomodidad con cuidado y como oportunidad de reflexion, no de culpa.",
+      "La actividad de calcular cuantas horas se realizan labores del hogar en casa del alumno es reveladora: muchos alumnos nunca habian contabilizado ese tiempo. Ayudales a valorar economicamente esas horas usando el salario minimo como referencia.",
+      "Conecta la informalidad con el contexto de los propios alumnos: probablemente muchos tienen familiares que trabajan en el sector informal (vendedores, trabajadores del hogar, taxistas sin registro). Eso hace el analisis inmediatamente relevante.",
+      "El ejemplo del aguacate es poderoso y actualmente muy relevante dado el auge exportador: Mexico exporta aguacate por mas de 3,000 millones de dolares anuales (SAGARPA). Pregunta: cuanto de ese dinero llega a las manos de los jornaleros que lo cosechan en Michoacan?",
+      "Para la conexion con genero: la ENDIREH (Encuesta Nacional sobre la Dinamica de las Relaciones en los Hogares) del INEGI tiene datos sobre la distribucion de las tareas del hogar por genero que complementan la Cuenta Satelite. Combinarlos ofrece un panorama completo."
+    ]
   },
   "CS-II-P04": {
     "code": "CS-II-P04",
-    "title": "Analiza las relaciones de poder en la sociedad —clase, género, etnia, edad— y cómo estas estructuran el acceso a recursos y oportunidades.",
+    "title": "Analiza las relaciones de poder en la sociedad (clase, genero, etnia, edad) y como estas estructuran el acceso a recursos y oportunidades.",
     "level": "Ciencias Sociales II",
     "duration": "~3h (2 sesiones de 50 min)",
     "difficulty": "Intermedio",
     "category": "Poder y sociedad",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "metadata": {
+      "objective": "El estudiante analiza las relaciones de poder estructurales en la sociedad mexicana (clase social, genero, etnia, edad) usando datos del INEGI y el CONAPRED, comprende el concepto de interseccionalidad y reflexiona sobre como estas relaciones determinan el acceso diferenciado a recursos y oportunidades.",
+      "competencies": [
+        "Identifica las principales categorias de diferenciacion social con poder: clase, genero, etnia y edad",
+        "Comprende el concepto de interseccionalidad: la experiencia de multiples discriminaciones simultaneas",
+        "Usa datos del CONAPRED, INEGI, ENDIREH para documentar la discriminacion en Mexico",
+        "Reflexiona sobre sus propias posiciones de privilegio y vulnerabilidad en el sistema de poder"
+      ],
+      "materials": [
+        "Informe sobre discriminacion en Mexico: ENADIS (Encuesta Nacional sobre Discriminacion) INEGI-CONAPRED 2022",
+        "Datos INEGI: brecha salarial de genero, brecha salarial etnica, acceso diferenciado a educacion",
+        "Infografia de interseccionalidad: una mujer indigena rural enfrenta discriminacion por genero + etnia + clase + zona geografica simultaneamente",
+        "Casos de discriminacion documentados por el CONAPRED",
+        "Cuadro de privilegio vs vulnerabilidad para reflexion personal"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {
+          "phase": "Apertura",
+          "duration": "15 min",
+          "label": "La mochila del privilegio: que cargas tu, que no cargas?"
+        },
+        {
+          "phase": "Desarrollo",
+          "duration": "60 min",
+          "label": "Analisis de categorias de poder: clase, genero, etnia, edad con datos CONAPRED-INEGI"
+        },
+        {
+          "phase": "Cierre",
+          "duration": "25 min",
+          "label": "Interseccionalidad: el caso de la mujer indigena rural en Mexico"
+        }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "15 min",
+          "description": "El docente usa la dinamica de la mochila del privilegio (adaptada para Mexico): se leen en voz alta frases sobre posiciones sociales y los alumnos dan un paso adelante o atras segun su situacion (adaptado a reflexion escrita para evitar exposicion). Ejemplo: Si tienes acceso a internet en casa, da un paso adelante. Si tu familia habla una lengua indigena como primera lengua, da un paso atras. Si eres hombre, da un paso adelante. Si vives en zona rural, da un paso atras.",
+          "activity": "Reflexion individual escrita (no se comparte si el alumno no quiere): al final de la dinamica, cada alumno anota: en que aspectos tengo posicion de privilegio y en cuales de mayor vulnerabilidad. El docente pregunta: estas posiciones las elegiste tu? O naciste en ellas? Eso es lo que llamamos estructura social."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "60 min",
+          "description": "Analisis sistematizado de cuatro categorias de poder con datos reales de Mexico: (1) Clase social: INEGI reporta que el 10% mas rico concentra el 63% de la riqueza; la movilidad social intergeneracional es muy limitada. (2) Genero: brecha salarial de 16% (INEGI 2022), mayor desempleo femenino, violencia de genero (ENDIREH: 66.1% de mujeres mayores de 15 anos ha sufrido alguna forma de violencia). (3) Etnia: personas indigenas tienen mayor pobreza, menor escolaridad, menor ingreso (INEGI: 74.9% de la poblacion indigena esta en situacion de pobreza). (4) Edad: adultos mayores y jovenes enfrentan discriminacion en el mercado laboral; el 22.6% de los jovenes de 15-29 anos son NINI (ni estudian ni trabajan, INEGI 2022).",
+          "activity": "Cada equipo analiza una categoria de poder: datos cuantitativos (INEGI, CONAPRED), un caso concreto de discriminacion documentado, y sus consecuencias en el acceso a recursos. Presentacion en formato de infografia o tabla comparativa."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "25 min",
+          "description": "Presentacion del concepto de interseccionalidad (Kimberle Crenshaw, 1989): la experiencia de la discriminacion no es sumativa (genero + etnia + clase) sino multiplicativa. Una mujer indigena rural en Chiapas enfrenta discriminacion simultanea por genero, etnia, clase y ubicacion geografica de manera que ninguna de estas dimensiones por si sola explica. Se conecta con el caso de Mexico: las mujeres indigenas tienen los peores indicadores de salud, educacion e ingreso.",
+          "activity": "Propuesta anti-discriminacion: cada equipo elabora una propuesta concreta de politica publica o accion comunitaria para reducir la discriminacion en la categoria analizada. Se presentan al grupo y se evalua su viabilidad. El docente cierra con la pregunta: que puedo hacer YO, con las posiciones que tengo, para reducir las desigualdades de poder a mi alrededor?"
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Las relaciones de poder estructuran el acceso diferenciado a recursos, oportunidades y reconocimiento en la sociedad. No son relaciones entre individuos aislados sino patrones sistematicos que reproducen desigualdades a traves del tiempo. En Mexico, estas relaciones tienen una historia larga: la jerarquia colonial (espanol, criollo, mestizo, indigeno, negro) dejo huellas que aun se expresan en la distribucion del ingreso, el acceso a la educacion, la representacion politica y la violencia diferenciada. El CONAPRED (Consejo Nacional para Prevenir la Discriminacion) y el INEGI documentan estas desigualdades con datos periodicos que permiten analizar su persistencia y transformacion.",
+      "sections": [
+        {
+          "subtitle": "Clase, Genero, Etnia y Edad: Cuatro Ejes de Poder",
+          "content": "Clase social: la posicion que ocupa una persona en la estructura economica determina su acceso a recursos materiales, culturales y simbolicos. En Mexico, la movilidad social intergeneracional es muy limitada: segun el INEGI, el 51% de los hijos de padres del quintil mas bajo permanecen en el quintil mas bajo. La desigualdad de clase se reproduce a traves de la educacion (acceso a escuelas de calidad), las redes sociales (capital social) y la herencia. Genero: el sistema de genero en Mexico asigna roles, espacios y valores diferenciados a hombres y mujeres. La brecha salarial de genero es del 16% segun el INEGI (2022): las mujeres ganan en promedio un 16% menos que los hombres con las mismas caracteristicas educativas y en los mismos sectores. La ENDIREH (2021) reporta que el 66.1% de las mujeres mayores de 15 anos ha vivido alguna forma de violencia. La violencia feminicida: en Mexico se registran en promedio 10 feminicidios diarios (SESNSP, 2022). Etnia: las personas con identidad indigena o afromexicana enfrentan mayor discriminacion en el mercado laboral, en el acceso a servicios de salud y en el sistema de justicia. Segun el INEGI, el 74.9% de la poblacion que se autoidentifica como indigena se encuentra en situacion de pobreza. Edad: los jovenes (especialmente jovenes de bajo nivel educativo y de zonas rurales) y los adultos mayores (especialmente mujeres sin pension) son grupos con alta vulnerabilidad en el mercado laboral y en el acceso a servicios sociales."
+        },
+        {
+          "subtitle": "Interseccionalidad: El Cruce de Opresiones",
+          "content": "El concepto de interseccionalidad fue desarrollado por la academica afroestadounidense Kimberle Crenshaw (1989) para analizar como las distintas dimensiones de identidad (raza, genero, clase) se intersectan y crean experiencias de discriminacion que no pueden entenderse analizando cada dimension por separado. Ejemplo en Mexico: una mujer indigena monolingue, rural, de clase baja, mayor de 60 anos, enfrenta: discriminacion por ser mujer (brecha salarial, violencia de genero), discriminacion etnica (acceso limitado a servicios en su lengua, estereotipos racistas), discriminacion de clase (sin acceso a educacion o capital de arranque), discriminacion por zona geografica (menor inversion publica en su region), discriminacion por edad (exclusion del mercado laboral formal). Su experiencia no es la suma de estas discriminaciones sino algo cualitativamente distinto y mas complejo. La interseccionalidad tiene implicaciones para las politicas publicas: una politica que atiende solo el genero puede beneficiar a mujeres urbanas de clase media sin alcanzar a mujeres indigenas rurales."
+        },
+        {
+          "subtitle": "Discriminacion en Mexico: Datos del CONAPRED",
+          "content": "El CONAPRED (Consejo Nacional para Prevenir la Discriminacion) es el organismo del Estado mexicano responsable de recibir quejas por discriminacion, investigar, sancionar y promover una cultura de igualdad. La ENADIS (Encuesta Nacional sobre Discriminacion, 2022) revela que: El 23.3% de los mexicanos mayores de 18 anos declara haber sido discriminado en el ultimo ano. Los motivos de discriminacion mas frecuentes: apariencia fisica (30%), manera de hablar (26%), nivel educativo (20%), forma de vestir (18%), ser mujer (17%), ser indigena (16%). Los espacios donde mas se discrimina: la calle (28%), el trabajo (21%), los servicios de salud (19%), la escuela (18%). Las poblaciones mas discriminadas: personas con discapacidad, personas indigenas, personas LGBTQ+, personas en situacion de pobreza, personas con sobrepeso. La discriminacion no es solo un problema moral: tiene consecuencias economicas medibles. El CONAPRED estima que la discriminacion le cuesta a Mexico el 1.5% del PIB anual en productividad perdida."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "El concepto de interseccionalidad, desarrollado por Kimberle Crenshaw, sostiene que:",
+          "options": [
+            "A) Las discriminaciones de raza, genero y clase son independientes y deben estudiarse por separado.",
+            "B) Las distintas dimensiones de identidad se intersectan y crean experiencias de discriminacion que no pueden entenderse analizando cada una por separado.",
+            "C) La clase social es la unica forma de opresion que importa, pues determina todas las demas."
+          ],
+          "correct": "B) Las distintas dimensiones de identidad se intersectan y crean experiencias de discriminacion que no pueden entenderse analizando cada una por separado."
+        },
+        {
+          "question": "Segun el INEGI, la brecha salarial de genero en Mexico (2022) es de aproximadamente:",
+          "options": [
+            "A) 5%",
+            "B) 16%",
+            "C) 40%"
+          ],
+          "correct": "B) 16%"
+        },
+        {
+          "question": "Que porcentaje de la poblacion que se autoidentifica como indigena se encuentra en situacion de pobreza segun el INEGI?",
+          "options": [
+            "A) 35%",
+            "B) 74.9%",
+            "C) 50%"
+          ],
+          "correct": "B) 74.9%"
+        },
+        {
+          "question": "Segun la ENADIS 2022, cual es el motivo de discriminacion mas frecuente reportado en Mexico?",
+          "options": [
+            "A) Ser mujer",
+            "B) Ser indigena",
+            "C) Apariencia fisica"
+          ],
+          "correct": "C) Apariencia fisica"
+        },
+        {
+          "question": "El CONAPRED estima que la discriminacion le cuesta a Mexico en terminos de productividad:",
+          "options": [
+            "A) El 0.1% del PIB anual",
+            "B) El 1.5% del PIB anual",
+            "C) El 10% del PIB anual"
+          ],
+          "correct": "B) El 1.5% del PIB anual"
+        }
+      ],
+      "rubric": "RUBRICA — Analisis de relaciones de poder + propuesta anti-discriminacion (20 pts)\n\nIDENTIFICACION Y ANALISIS DE CATEGORIA DE PODER (7 pts): 7=Analiza correctamente la categoria asignada con datos del CONAPRED/INEGI, caso concreto y consecuencias en el acceso a recursos | 5=Analisis con datos parciales | 3=Mencion de la categoria sin datos ni analisis | 0=Sin analisis\n\nCOMPRENSION DE INTERSECCIONALIDAD (5 pts): 5=Explica correctamente la interseccionalidad con un ejemplo especifico y complejo de Mexico | 4=Comprension basica con ejemplo parcial | 2=Mencion del concepto sin aplicacion | 0=Sin comprension del concepto\n\nPROPUESTA ANTI-DISCRIMINACION (5 pts): 5=Propuesta concreta, fundamentada en el analisis de la categoria, viable y con identificacion de actores responsables | 4=Propuesta presente con argumentacion limitada | 2=Propuesta vaga o inalcanzable | 0=Sin propuesta\n\nREFLEXION PERSONAL (3 pts): 3=Reflexion genuina sobre posiciones propias de privilegio y vulnerabilidad, con conexion a la accion personal posible | 2=Reflexion presente pero superficial | 0=Sin reflexion personal"
+    },
+    "teacher_tips": [
+      "La dinamica de la mochila del privilegio puede ser muy poderosa pero tambien sensible: algunos alumnos pueden sentirse expuestos o avergonzados. Adapta la dinamica a reflexion escrita individual (no publica) para que sea un momento de autoconocimiento, no de exposicion.",
+      "Cuidado con el peligro de victimizar: el objetivo no es hacer que los alumnos con mayor vulnerabilidad se sientan sin agencia, ni que los de mayor privilegio se sientan culpables. El objetivo es reconocer estructuras para poder actuar sobre ellas.",
+      "Los datos del CONAPRED y la ENDIREH son actualizados periodicamente. Verifica que estes usando los mas recientes antes de la clase. El INEGI tiene todas las encuestas disponibles en su portal para descarga gratuita.",
+      "El concepto de interseccionalidad es abstracto: usa siempre ejemplos concretos de Mexico. El caso de la mujer indigena monolingue rural es el mas potente porque multiplica todas las dimensiones de vulnerabilidad.",
+      "Conexion con la actualidad: los movimientos sociales feministas en Mexico (marcha del 8M, el tendedero de acusaciones, las grafiteras) pueden servir como casos actuales de respuesta colectiva a las relaciones de poder. Presentarlos con contexto y matiz, no como heroes o villanos."
+    ]
   }
 }
