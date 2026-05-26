@@ -1,4 +1,14 @@
-{
+"""
+gen-ch-iii.py -- Ciencias Historicas III -- 4 progresiones
+Referencias: AGN, Mediateca INAH, HNDM-UNAM, BNM-UNAM, COLMEX,
+metodo historico critico, historiografia mexicana del siglo XXI
+"""
+import json, os
+
+OUT = os.path.join(os.path.dirname(__file__),
+                   '..', 'src', 'data', 'planteamiento', 'ch-iii.json')
+
+data = {
   "CH-III-P01": {
     "code": "CH-III-P01",
     "title": "Selecciona, evalua y contrasta fuentes historicas diversas para construir interpretaciones fundamentadas del pasado.",
@@ -24,21 +34,9 @@
     },
     "strategy": {
       "timeline": [
-        {
-          "phase": "Apertura",
-          "duration": "15 min",
-          "label": "¿Que es una fuente historica? Todo puede ser fuente"
-        },
-        {
-          "phase": "Desarrollo",
-          "duration": "60 min",
-          "label": "Critica externa e interna + acceso a repositorios mexicanos"
-        },
-        {
-          "phase": "Cierre",
-          "duration": "25 min",
-          "label": "Contraste de perspectivas: el mismo hecho, dos voces"
-        }
+        {"phase": "Apertura", "duration": "15 min", "label": "¿Que es una fuente historica? Todo puede ser fuente"},
+        {"phase": "Desarrollo", "duration": "60 min", "label": "Critica externa e interna + acceso a repositorios mexicanos"},
+        {"phase": "Cierre", "duration": "25 min", "label": "Contraste de perspectivas: el mismo hecho, dos voces"}
       ],
       "phases": [
         {
@@ -116,6 +114,7 @@
       "Conectar la critica de fuentes con la critica de noticias falsas en redes sociales -- la checklist de evaluacion de una fuente historica es sorprendentemente similar a la de verificacion de noticias."
     ]
   },
+
   "CH-III-P02": {
     "code": "CH-III-P02",
     "title": "Aplica el procedimiento de corroboracion de fuentes para validar evidencia historica y detectar anacronismos y manipulaciones.",
@@ -141,21 +140,9 @@
     },
     "strategy": {
       "timeline": [
-        {
-          "phase": "Apertura",
-          "duration": "15 min",
-          "label": "El anacronismo: cuando el pasado habla con palabras del presente"
-        },
-        {
-          "phase": "Desarrollo",
-          "duration": "60 min",
-          "label": "Triangulacion de evidencia y deteccion de manipulaciones"
-        },
-        {
-          "phase": "Cierre",
-          "duration": "25 min",
-          "label": "Historia y politica: el uso del pasado en el discurso publico"
-        }
+        {"phase": "Apertura", "duration": "15 min", "label": "El anacronismo: cuando el pasado habla con palabras del presente"},
+        {"phase": "Desarrollo", "duration": "60 min", "label": "Triangulacion de evidencia y deteccion de manipulaciones"},
+        {"phase": "Cierre", "duration": "25 min", "label": "Historia y politica: el uso del pasado en el discurso publico"}
       ],
       "phases": [
         {
@@ -233,6 +220,7 @@
       "La distincion entre 'tener una posicion moral sobre el pasado' y 'cometer presentismo metodologico' es sutil pero crucial -- se puede condenar moralmente la esclavitud sin cometer presentismo si se aclara que ese juicio es nuestro, no una categoria explicativa de los actores del siglo XVII."
     ]
   },
+
   "CH-III-P03": {
     "code": "CH-III-P03",
     "title": "Elabora narraciones historicas argumentadas que incorporan causas, consecuencias, continuidades y cambios con sustento en fuentes.",
@@ -258,21 +246,9 @@
     },
     "strategy": {
       "timeline": [
-        {
-          "phase": "Apertura",
-          "duration": "15 min",
-          "label": "¿Que es un ensayo historico? Leer uno breve juntos"
-        },
-        {
-          "phase": "Desarrollo",
-          "duration": "60 min",
-          "label": "Multicausalidad, continuidades/cambios y estructura del ensayo"
-        },
-        {
-          "phase": "Cierre",
-          "duration": "25 min",
-          "label": "Redaccion guiada y peer review del borrador"
-        }
+        {"phase": "Apertura", "duration": "15 min", "label": "¿Que es un ensayo historico? Leer uno breve juntos"},
+        {"phase": "Desarrollo", "duration": "60 min", "label": "Multicausalidad, continuidades/cambios y estructura del ensayo"},
+        {"phase": "Cierre", "duration": "25 min", "label": "Redaccion guiada y peer review del borrador"}
       ],
       "phases": [
         {
@@ -350,6 +326,7 @@
       "El peer review con ficha estructurada produce retroalimentacion de calidad superior a la retroalimentacion libre -- los estudiantes aprenden a evaluar trabajo historico al mismo tiempo que reciben retroalimentacion sobre el suyo."
     ]
   },
+
   "CH-III-P04": {
     "code": "CH-III-P04",
     "title": "Comunica su interpretacion historica de manera oral o escrita con rigor metodologico y perspectiva critica.",
@@ -375,21 +352,9 @@
     },
     "strategy": {
       "timeline": [
-        {
-          "phase": "Apertura",
-          "duration": "15 min",
-          "label": "Balance del semestre: ¿que significa 'hacer historia'?"
-        },
-        {
-          "phase": "Desarrollo",
-          "duration": "60 min",
-          "label": "Revision y mejora del ensayo + preparacion de la presentacion"
-        },
-        {
-          "phase": "Cierre",
-          "duration": "75 min",
-          "label": "Presentaciones finales y reflexion metacognitiva"
-        }
+        {"phase": "Apertura", "duration": "15 min", "label": "Balance del semestre: ¿que significa 'hacer historia'?"},
+        {"phase": "Desarrollo", "duration": "60 min", "label": "Revision y mejora del ensayo + preparacion de la presentacion"},
+        {"phase": "Cierre", "duration": "75 min", "label": "Presentaciones finales y reflexion metacognitiva"}
       ],
       "phases": [
         {
@@ -468,3 +433,9 @@
     ]
   }
 }
+
+os.makedirs(os.path.dirname(os.path.abspath(OUT)), exist_ok=True)
+with open(OUT, 'w', encoding='utf-8') as f:
+    json.dump(data, f, ensure_ascii=False, indent=2)
+
+print(f"Written {len(data)} progressions to {os.path.abspath(OUT)}")
