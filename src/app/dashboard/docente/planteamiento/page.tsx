@@ -141,7 +141,7 @@ export default function PlanteamientoPage() {
   const [selectedProgCode, setSelectedProgCode] = useState<string | null>(null);
   const [activeTab, setActiveTab]               = useState<ContentTab>('estrategia');
   const [searchQuery, setSearchQuery]           = useState('');
-  const [dark, setDark]                         = useState(false);
+  const [dark, setDark]                         = useState(true);
 
   const t = buildTheme(dark);
   const phaseColors = dark
