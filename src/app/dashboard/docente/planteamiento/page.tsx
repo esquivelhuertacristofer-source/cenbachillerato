@@ -52,82 +52,83 @@ function buildTheme(dark: boolean) {
     rootBg:        dark ? '#011C40'  : '#F4F1EA',
     rootColor:     dark ? '#F4F1EA'  : '#0B2545',
     leftBg:        dark ? '#0B2545'  : '#FFFFFF',
-    leftBorder:    dark ? 'border-white/10'             : 'border-[#0B2545]/10',
-    leftShadow:    dark ? 'shadow-[16px_0_48px_rgba(0,0,0,0.35)]' : 'shadow-[16px_0_48px_rgba(11,37,69,0.07)]',
-    rightBg:       dark ? '#011C40'  : '#F4F1EA',
-    iconBg:        dark ? 'bg-white/10'                 : 'bg-[#0B2545]',
-    labelPrimary:  dark ? 'text-white'                  : 'text-[#0B2545]',
-    labelMuted:    dark ? 'text-white/40'               : 'text-slate-400',
-    labelSubtle:   dark ? 'text-white/25'               : 'text-[#0B2545]/45',
-    sectionBorder: dark ? 'border-white/[0.06]'         : 'border-[#0B2545]/[0.05]',
-    inputBg:       dark ? 'bg-white/10'                 : 'bg-white/90',
-    inputBorder:   dark ? 'border-white/10'             : 'border-white',
-    inputText:     dark ? 'text-white'                  : 'text-[#0B2545]',
-    inputPH:       dark ? 'placeholder-white/30'        : 'placeholder-slate-400',
+    leftShadow:    dark ? 'shadow-[16px_0_48px_rgba(0,0,0,0.4)]'  : 'shadow-[16px_0_48px_rgba(11,37,69,0.07)]',
+    iconBg:        dark ? 'bg-white/10'           : 'bg-[#0B2545]',
+    labelPrimary:  dark ? 'text-white'            : 'text-[#0B2545]',
+    labelMuted:    dark ? 'text-white/40'         : 'text-slate-400',
+    labelSubtle:   dark ? 'text-white/25'         : 'text-[#0B2545]/45',
+    sectionBorder: dark ? 'border-white/[0.06]'   : 'border-[#0B2545]/[0.05]',
+    inputBg:       dark ? 'bg-white/10'           : 'bg-white/90',
+    inputBorder:   dark ? 'border-white/10'       : 'border-white',
+    inputText:     dark ? 'text-white'            : 'text-[#0B2545]',
+    inputPH:       dark ? 'placeholder-white/30'  : 'placeholder-slate-400',
     inputFocus:    dark ? 'focus:ring-white/20 focus:border-white/30' : 'focus:ring-[#D4A574]/30 focus:border-[#D4A574]/40',
+    progressTrack: dark ? 'bg-white/10'           : 'bg-[#0B2545]/8',
     activeItem:    dark
-      ? 'bg-[#D4A574] text-white shadow-[0_16px_32px_rgba(212,165,116,0.25)] scale-[1.02] -translate-y-px'
+      ? 'bg-[#D4A574] text-white shadow-[0_0_28px_rgba(212,165,116,0.45),0_16px_32px_rgba(212,165,116,0.25)] scale-[1.02] -translate-y-px'
       : 'bg-[#0B2545] text-white shadow-[0_16px_32px_rgba(11,37,69,0.20)] scale-[1.02] -translate-y-px',
     inactiveItem:  dark
       ? 'bg-white/5 text-white hover:bg-white/10 hover:shadow-md hover:scale-[1.01]'
       : 'bg-white text-[#0B2545] hover:bg-[#FFF8F0] hover:shadow-md hover:scale-[1.01]',
-    activeCode:    dark ? 'text-white/60'               : 'text-[#7DD3FC]',
-    stickyBg:      dark ? 'bg-[#011C40]/90'             : 'bg-[#F4F1EA]/85',
-    stickyBorder:  dark ? 'border-white/10'             : 'border-[#0B2545]/[0.06]',
-    stickyLabel:   dark ? 'text-white/40'               : 'text-[#0B2545]/50',
+    activeCode:    dark ? 'text-white/60'         : 'text-[#7DD3FC]',
+    stickyBg:      dark ? 'bg-[#011C40]/90'       : 'bg-[#F4F1EA]/85',
+    stickyBorder:  dark ? 'border-white/10'       : 'border-[#0B2545]/[0.06]',
+    stickyLabel:   dark ? 'text-white/40'         : 'text-[#0B2545]/50',
     exportBtn:     dark ? 'bg-white/10 text-white hover:bg-white/20 border border-white/10' : 'bg-[#0B2545] text-white hover:bg-[#1a3a6e]',
-    toggleBtn:     dark ? 'bg-white/10 text-[#D4A574] hover:bg-white/20' : 'bg-[#0B2545]/10 text-[#0B2545] hover:bg-[#0B2545]/20',
-    heroCard:      dark ? 'bg-white/5'                  : 'bg-white',
-    heroGlow:      dark ? 'bg-[#D4A574]/10'             : 'bg-[#D4A574]/15',
-    heroTitle:     dark ? 'text-white'                  : 'text-[#0B2545]',
-    heroCode:      dark ? 'text-white/30'               : 'text-slate-400',
-    durCard:       dark ? 'bg-white/10'                 : 'bg-[#0B2545]',
-    diffCard:      dark ? 'bg-white/5'                  : 'bg-white',
-    diffLabel:     dark ? 'text-white/40'               : 'text-slate-400',
-    diffText:      dark ? 'text-white'                  : 'text-[#0B2545]',
-    tabContainer:  dark ? 'bg-white/5 border-white/10'  : 'bg-white/50 border-white/80',
+    toggleBtn:     dark ? 'bg-white/10 text-[#D4A574] hover:bg-white/15' : 'bg-[#0B2545]/10 text-[#0B2545] hover:bg-[#0B2545]/20',
+    heroCard:      dark ? 'bg-white/5'            : 'bg-white',
+    heroGlow:      dark ? 'bg-[#D4A574]/10'       : 'bg-[#D4A574]/15',
+    heroTitle:     dark ? 'text-white'            : 'text-[#0B2545]',
+    heroCode:      dark ? 'text-white/30'         : 'text-slate-400',
+    metaChip:      dark ? 'bg-white/8 text-white/50 border border-white/10' : 'bg-[#0B2545]/[0.06] text-[#0B2545]/55 border border-[#0B2545]/10',
+    metaChipGold:  dark ? 'bg-[#D4A574]/20 text-[#D4A574] border border-[#D4A574]/30' : 'bg-[#D4A574]/10 text-[#D4A574] border border-[#D4A574]/20',
+    durCard:       dark ? 'bg-white/10'           : 'bg-[#0B2545]',
+    diffCard:      dark ? 'bg-white/5'            : 'bg-white',
+    diffLabel:     dark ? 'text-white/40'         : 'text-slate-400',
+    diffText:      dark ? 'text-white'            : 'text-[#0B2545]',
+    tabContainer:  dark ? 'bg-white/5 border-white/10' : 'bg-white/50 border-white/80',
     tabActive:     dark ? 'bg-[#D4A574] text-white shadow-2xl scale-[1.04]' : 'bg-[#0B2545] text-white shadow-2xl scale-[1.04]',
-    tabActiveIcon: dark ? 'text-white'                  : 'text-[#7DD3FC]',
+    tabActiveIcon: dark ? 'text-white'            : 'text-[#7DD3FC]',
     tabInactive:   dark ? 'text-white/40 hover:bg-white/10 hover:text-white' : 'bg-transparent text-slate-500 hover:bg-white hover:text-[#0B2545]',
-    tabInactiveIcon: dark ? 'text-white/30'             : 'text-slate-400',
-    phaseCard:     dark ? 'bg-white/5'                  : 'bg-white',
-    phaseTitle:    dark ? 'text-white'                  : 'text-[#0B2545]',
-    phaseDur:      dark ? 'text-white/40 bg-white/5'    : 'text-slate-400 bg-slate-50',
-    phaseDesc:     dark ? 'text-white/55'               : 'text-[#475569]',
-    activityBg:    dark ? 'bg-white/5 border-white/5'   : 'bg-[#F4F1EA] border-black/[0.04]',
-    activityText:  dark ? 'text-white/70'               : 'text-[#0B2545]',
-    theoryCard:    dark ? 'bg-white/5'                  : 'bg-white',
-    theoryTitle:   dark ? 'text-white'                  : 'text-[#0B2545]',
-    theoryIntro:   dark ? 'text-white/45'               : 'text-slate-500',
-    secNumBg:      dark ? 'bg-white/5 text-white'       : 'bg-slate-50 text-[#0B2545]',
-    secTitle:      dark ? 'text-white'                  : 'text-[#0B2545]',
-    secContent:    dark ? 'text-white/50'               : 'text-[#475569]',
-    evalCard:      dark ? 'bg-white/5'                  : 'bg-white',
-    evalTitle:     dark ? 'text-white'                  : 'text-[#0B2545]',
-    evalBorder:    dark ? 'border-white/10'             : 'border-slate-100',
+    tabInactiveIcon: dark ? 'text-white/30'       : 'text-slate-400',
+    phaseCard:     dark ? 'bg-white/5'            : 'bg-white',
+    phaseTitle:    dark ? 'text-white'            : 'text-[#0B2545]',
+    phaseDur:      dark ? 'text-white/40 bg-white/5' : 'text-slate-400 bg-slate-50',
+    phaseDesc:     dark ? 'text-white/55'         : 'text-[#475569]',
+    activityBg:    dark ? 'bg-white/5 border-white/5' : 'bg-[#F4F1EA] border-black/[0.04]',
+    activityText:  dark ? 'text-white/70'         : 'text-[#0B2545]',
+    theoryCard:    dark ? 'bg-white/5'            : 'bg-white',
+    theoryTitle:   dark ? 'text-white'            : 'text-[#0B2545]',
+    theoryIntro:   dark ? 'text-white/45'         : 'text-slate-500',
+    secNumBg:      dark ? 'bg-white/5 text-white' : 'bg-slate-50 text-[#0B2545]',
+    secTitle:      dark ? 'text-white'            : 'text-[#0B2545]',
+    secContent:    dark ? 'text-white/50'         : 'text-[#475569]',
+    evalCard:      dark ? 'bg-white/5'            : 'bg-white',
+    evalTitle:     dark ? 'text-white'            : 'text-[#0B2545]',
+    evalBorder:    dark ? 'border-white/10'       : 'border-slate-100',
     evalBadge:     dark ? 'bg-emerald-900/30 text-emerald-300' : 'bg-emerald-50 text-emerald-700',
-    qBg:           dark ? 'bg-white/5'                  : 'bg-slate-50',
-    qText:         dark ? 'text-white'                  : 'text-[#0B2545]',
+    qBg:           dark ? 'bg-white/5'            : 'bg-slate-50',
+    qText:         dark ? 'text-white'            : 'text-[#0B2545]',
     optDefault:    dark ? 'bg-white/5 border-white/5 text-white/50' : 'bg-white border-transparent text-slate-500',
     optCorrect:    dark
       ? 'bg-emerald-900/30 border-emerald-500/30 text-emerald-300 shadow-[0_8px_16px_rgba(16,185,129,0.08)]'
       : 'bg-emerald-50 border-emerald-500/20 text-emerald-800 shadow-[0_8px_16px_rgba(16,185,129,0.08)]',
-    dotDefault:    dark ? 'bg-white/20'                 : 'bg-slate-200',
-    fichaCard:     dark ? 'bg-white/5'                  : 'bg-white',
-    fichaGlow:     dark ? 'bg-[#7DD3FC]/5'              : 'bg-[#7DD3FC]/10',
-    fichaIconBg:   dark ? 'bg-white/10'                 : 'bg-[#0B2545]',
-    fichaTitle:    dark ? 'text-white'                  : 'text-[#0B2545]',
-    fichaVal:      dark ? 'text-white/55'               : 'text-[#475569]',
-    fichaEmpty:    dark ? 'text-white/30'               : 'text-slate-400',
+    dotDefault:    dark ? 'bg-white/20'           : 'bg-slate-200',
+    fichaCard:     dark ? 'bg-white/5'            : 'bg-white',
+    fichaGlow:     dark ? 'bg-[#7DD3FC]/5'        : 'bg-[#7DD3FC]/10',
+    fichaIconBg:   dark ? 'bg-white/10'           : 'bg-[#0B2545]',
+    fichaTitle:    dark ? 'text-white'            : 'text-[#0B2545]',
+    fichaVal:      dark ? 'text-white/55'         : 'text-[#475569]',
+    fichaEmpty:    dark ? 'text-white/30'         : 'text-slate-400',
     competency:    dark ? 'bg-white/5 text-white border-white/10' : 'bg-slate-50 text-[#0B2545] border-slate-100',
-    materialBg:    dark ? 'bg-white/5'                  : 'bg-[#F4F1EA]/60',
-    materialText:  dark ? 'text-white/70'               : 'text-[#0B2545]',
-    consejoBg:     dark ? 'bg-white/5 border-white/5'   : 'bg-[#FEF9F2] border-[#E8D5B7]',
-    consejoTitle:  dark ? 'text-white'                  : 'text-[#0B2545]',
-    consejoText:   dark ? 'text-white/45'               : 'text-[#0B2545]/70',
-    consejoEmpty:  dark ? 'text-white/25'               : 'text-[#0B2545]/40',
-    emptyCard:     dark ? 'bg-white/5'                  : 'bg-white',
-    emptyText:     dark ? 'text-white/30'               : 'text-[#0B2545]/35',
+    materialBg:    dark ? 'bg-white/5'            : 'bg-[#F4F1EA]/60',
+    materialText:  dark ? 'text-white/70'         : 'text-[#0B2545]',
+    consejoBg:     dark ? 'bg-white/5 border-white/5' : 'bg-[#FEF9F2] border-[#E8D5B7]',
+    consejoTitle:  dark ? 'text-white'            : 'text-[#0B2545]',
+    consejoText:   dark ? 'text-white/45'         : 'text-[#0B2545]/70',
+    consejoEmpty:  dark ? 'text-white/25'         : 'text-[#0B2545]/40',
+    emptyCard:     dark ? 'bg-white/5'            : 'bg-white',
+    emptyText:     dark ? 'text-white/30'         : 'text-[#0B2545]/35',
     pendingBg:     dark
       ? 'bg-[#D4A574]/10 border border-dashed border-[#D4A574]/20'
       : 'bg-[#D4A574]/5 border border-dashed border-[#D4A574]/30',
@@ -145,7 +146,7 @@ export default function PlanteamientoPage() {
 
   const t = buildTheme(dark);
   const phaseColors = dark
-    ? ['#D4A574', '#7DD3FC', '#F4F1EA']
+    ? ['#D4A574', '#7DD3FC', 'rgba(255,255,255,0.5)']
     : ['#D4A574', '#0B2545', '#7DD3FC'];
 
   const progresiones = getPlanUAC(selectedUAC);
@@ -153,6 +154,8 @@ export default function PlanteamientoPage() {
   const activeProgresion = (selectedProgCode
     ? progresiones.find((p) => p.code === selectedProgCode)
     : undefined) ?? progresiones[0];
+
+  const progresionIndex = progresiones.findIndex((p) => p.code === activeProgresion?.code);
 
   function handleUACChange(codigo: string) {
     setSelectedUAC(codigo);
@@ -168,23 +171,47 @@ export default function PlanteamientoPage() {
   );
 
   const currentUACMeta = UAC_BASE.find((u) => u.codigo === selectedUAC);
+  const progresionPct  = Math.min(
+    Math.round((progresiones.length / (currentUACMeta?.totalProgresionesEsperadas ?? progresiones.length)) * 100),
+    100,
+  );
 
   return (
     <div
       className="flex min-h-screen font-['Epilogue'] motion-safe:transition-colors motion-safe:duration-300"
       style={{ background: t.rootBg, color: t.rootColor }}
     >
+      {/* ── Cinematic background (dark mode only) ──────────────────────── */}
+      {dark && (
+        <div className="fixed inset-0 pointer-events-none z-0">
+          <div className="absolute top-0 right-0 w-[1400px] h-[1400px] rounded-full blur-[200px] -mr-80 -mt-80 animate-pulse bg-[#D4A574]/5" />
+          <div className="absolute bottom-0 left-[300px] w-[1200px] h-[1200px] rounded-full blur-[180px] -ml-80 -mb-80 bg-[#7DD3FC]/5" />
+          <div
+            className="absolute inset-0 opacity-[0.025]"
+            style={{ backgroundImage: 'linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px)', backgroundSize: '60px 60px' }}
+          />
+        </div>
+      )}
+
       <Sidebar />
 
-      <main className="flex-1 md:ml-[260px] flex flex-col md:flex-row md:h-screen md:overflow-hidden">
+      <main className="flex-1 md:ml-[260px] relative z-10 flex flex-col md:flex-row md:h-screen md:overflow-hidden">
 
-        {/* ── LEFT PANEL (desktop) ──────────────────────────────────────────
-            z-[50] > Sidebar z-40 → background pinta sobre la sombra del
-            Sidebar, eliminando el "gap" oscuro en el borde del panel. */}
+        {/* ── LEFT PANEL (desktop) ──────────────────────────────────────── */}
         <aside
-          className={`hidden md:flex flex-col relative z-[50] border-r ${t.leftBorder} ${t.leftShadow} motion-safe:transition-colors motion-safe:duration-300`}
+          className={`hidden md:flex flex-col relative z-[50] ${t.leftShadow} motion-safe:transition-colors motion-safe:duration-300`}
           style={{ width: 'clamp(260px, 26vw, 380px)', flexShrink: 0, background: t.leftBg }}
         >
+          {/* Gradient border right — replaces flat border-r */}
+          <div
+            className="absolute top-0 right-0 w-px h-full pointer-events-none z-20"
+            style={{
+              background: dark
+                ? 'linear-gradient(180deg, #D4A574 0%, rgba(125,211,252,0.35) 38%, rgba(255,255,255,0.04) 100%)'
+                : 'linear-gradient(180deg, #D4A574 0%, rgba(11,37,69,0.12) 42%, rgba(11,37,69,0.02) 100%)',
+            }}
+          />
+
           {/* Header */}
           <div className="p-7 space-y-5">
             <div className="flex items-center justify-between gap-2">
@@ -227,22 +254,38 @@ export default function PlanteamientoPage() {
             </div>
           </div>
 
-          <div className={`px-7 pb-3 text-[11px] font-bold uppercase tracking-[0.06em] ${t.labelSubtle} truncate border-b ${t.sectionBorder}`}>
-            {currentUACMeta?.nombre}
+          {/* UAC name + progress bar */}
+          <div className={`px-7 pb-3 border-b ${t.sectionBorder} space-y-2.5`}>
+            <p className={`text-[11px] font-bold uppercase tracking-[0.06em] ${t.labelSubtle} truncate`}>
+              {currentUACMeta?.nombre}
+            </p>
+            <div className="flex items-center gap-3">
+              <div className={`h-0.5 flex-1 rounded-full overflow-hidden ${t.progressTrack}`}>
+                <div
+                  className="h-full bg-[#D4A574] rounded-full motion-safe:transition-all motion-safe:duration-700"
+                  style={{ width: `${progresionPct}%` }}
+                />
+              </div>
+              <span className="text-[9px] font-black text-[#D4A574] tabular-nums whitespace-nowrap">
+                {progresiones.length} / {currentUACMeta?.totalProgresionesEsperadas ?? '?'}
+              </span>
+            </div>
           </div>
 
           <div className="flex-1 overflow-y-auto px-5 py-4 space-y-2.5 custom-scrollbar">
-            {filtered.map((prog) => {
+            {filtered.map((prog, index) => {
               const isActive = activeProgresion?.code === prog.code;
               return (
                 <button
-                  key={prog.code}
+                  key={`${selectedUAC}-${prog.code}`}
                   onClick={() => { setSelectedProgCode(prog.code); setActiveTab('estrategia'); }}
                   className={[
                     'w-full text-left px-5 py-[18px] rounded-[22px] border-none cursor-pointer',
                     'motion-safe:transition-all motion-safe:duration-200 relative overflow-hidden',
+                    'plan-item-enter',
                     isActive ? t.activeItem : t.inactiveItem,
                   ].join(' ')}
+                  style={{ animationDelay: `${index * 38}ms` }}
                 >
                   <div className="flex justify-between mb-2 items-center">
                     <span className={`text-[9px] font-black uppercase tracking-[0.2em] ${isActive ? t.activeCode : 'text-[#D4A574]'}`}>
@@ -323,23 +366,33 @@ export default function PlanteamientoPage() {
         {/* ── RIGHT PANEL ────────────────────────────────────────────────── */}
         <div
           className="flex-1 overflow-y-auto custom-scrollbar motion-safe:transition-colors motion-safe:duration-300"
-          style={{ background: t.rightBg }}
+          style={dark ? undefined : { background: '#F4F1EA' }}
         >
-          {/* Sticky nav */}
+          {/* ── HUD Sticky nav ─────────────────────────────────────────── */}
           <div className={`sticky top-0 z-30 border-b flex items-center justify-between px-6 lg:px-12 py-4 backdrop-blur-xl ${t.stickyBg} ${t.stickyBorder}`}>
-            <span className={`text-[11px] font-extrabold uppercase tracking-[0.1em] ${t.stickyLabel}`}>
-              Contenido MCCEMS
-            </span>
+            <div className="flex items-center gap-4">
+              {dark && (
+                <>
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-2 h-2 rounded-full animate-pulse bg-[#D4A574] shadow-[0_0_8px_rgba(212,165,116,0.7)]" />
+                    <span className="hidden lg:block text-[10px] font-black uppercase tracking-[0.3em] text-[#D4A574]/60">
+                      PLANEAMIENTO ACTIVO
+                    </span>
+                  </div>
+                  <div className="h-4 w-px bg-white/10 hidden lg:block" />
+                </>
+              )}
+              <span className={`text-[11px] font-extrabold uppercase tracking-[0.1em] truncate max-w-[180px] lg:max-w-none ${t.stickyLabel}`}>
+                {currentUACMeta?.nombre ?? 'Contenido MCCEMS'}
+              </span>
+            </div>
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setDark((d) => !d)}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-[0.1em] cursor-pointer border-none motion-safe:transition-all ${t.toggleBtn}`}
                 aria-label={dark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
               >
-                {dark
-                  ? <Sun className="w-3.5 h-3.5" />
-                  : <Moon className="w-3.5 h-3.5" />
-                }
+                {dark ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
                 <span className="hidden sm:inline">{dark ? 'Claro' : 'Oscuro'}</span>
               </button>
               <button className={`flex items-center gap-2.5 px-5 py-2.5 rounded-xl font-black text-[11px] uppercase tracking-[0.1em] cursor-pointer border-none motion-safe:transition-colors ${t.exportBtn}`}>
@@ -357,7 +410,7 @@ export default function PlanteamientoPage() {
               {/* Main title card */}
               <div className={`${t.heroCard} rounded-[2rem] p-8 lg:p-12 relative overflow-hidden motion-safe:transition-colors`}>
                 <div className={`absolute top-0 right-0 w-56 h-56 ${t.heroGlow} rounded-full -mr-20 -mt-20 blur-3xl pointer-events-none`} />
-                <div className="relative z-10 flex flex-col gap-5">
+                <div className="relative z-10 flex flex-col gap-4">
                   <div className="flex items-center gap-3 flex-wrap">
                     <span className="px-3.5 py-1.5 bg-[#D4A574]/10 text-[#D4A574] rounded-full text-[10px] font-black uppercase tracking-[0.15em]">
                       {activeProgresion?.level ?? 'MCCEMS 2025'}
@@ -373,6 +426,27 @@ export default function PlanteamientoPage() {
                   {activeProgresion?.category && !isTodo(activeProgresion.category) && (
                     <span className="text-[13px] font-bold text-[#D4A574]">{activeProgresion.category}</span>
                   )}
+
+                  {/* Metric chips */}
+                  <div className="flex flex-wrap items-center gap-2 pt-1">
+                    {progresionIndex >= 0 && (
+                      <span className={`px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.12em] ${t.metaChipGold}`}>
+                        Prog. {progresionIndex + 1} / {progresiones.length}
+                      </span>
+                    )}
+                    {(activeProgresion?.strategy?.phases?.length ?? 0) > 0 && (
+                      <span className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.12em] ${t.metaChip}`}>
+                        <Zap className="w-3 h-3" />
+                        {activeProgresion!.strategy.phases.length} Fases
+                      </span>
+                    )}
+                    {activeProgresion?.difficulty && !isTodo(activeProgresion.difficulty) && (
+                      <span className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.12em] ${t.metaChip}`}>
+                        <BarChart className="w-3 h-3" />
+                        {activeProgresion.difficulty}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -430,11 +504,16 @@ export default function PlanteamientoPage() {
                     {(activeProgresion?.strategy?.phases ?? []).length > 0 ? (
                       activeProgresion!.strategy.phases.map((phase, i) => (
                         <div key={i} className={`${t.phaseCard} rounded-[1.75rem] px-10 py-9 relative overflow-hidden motion-safe:transition-colors`}>
-                          <div className="absolute top-0 left-0 w-1.5 h-full" style={{ background: phaseColors[i] ?? '#D4A574' }} />
+                          {/* Gradient accent stripe */}
+                          <div
+                            className="absolute top-0 left-0 w-1.5 h-full pointer-events-none"
+                            style={{ background: `linear-gradient(to bottom, ${phaseColors[i] ?? '#D4A574'}, transparent)` }}
+                          />
                           <div className="flex flex-col gap-5">
                             <div className="flex items-center gap-3 flex-wrap">
+                              {/* Enlarged phase badge */}
                               <div
-                                className="w-8 h-8 rounded-[10px] flex items-center justify-center text-white font-black text-[13px] flex-shrink-0"
+                                className="w-10 h-10 rounded-[12px] flex items-center justify-center text-white font-black text-[16px] flex-shrink-0 shadow-lg"
                                 style={{ background: phaseColors[i] ?? '#D4A574' }}
                               >
                                 {i + 1}

@@ -526,3 +526,15 @@ body {
 .animate-twinkle { animation: twinkle 4s infinite; }
 .animate-float-slow { animation: float-slow 8s infinite ease-in-out; }
 .animate-spin-slow { animation: spin 60s linear infinite; }
+
+/* ── Planteamiento — list item stagger entrance ─── */
+@keyframes slideInItem {
+  from { opacity: 0; transform: translateY(7px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.plan-item-enter {
+  animation: slideInItem 0.22s ease both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .plan-item-enter { animation: none; }
+}
