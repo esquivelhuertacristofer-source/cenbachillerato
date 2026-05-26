@@ -6,11 +6,123 @@
     "duration": "~3h (2 sesiones de 50 min)",
     "difficulty": "Intermedio",
     "category": "Funciones",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "metadata": {
+      "objective": "Distinguir si una relación entre variables es o no una función usando la regla de la línea vertical, y representar la misma función de cuatro formas equivalentes: tabla de valores, gráfica en el plano cartesiano, expresión algebraica y descripción verbal.",
+      "competencies": [
+        "Identifica dominio, codominio y rango de una función concreta.",
+        "Convierte entre las cuatro representaciones de una función.",
+        "Aplica la prueba de la línea vertical para verificar si una gráfica representa una función.",
+        "Interpreta el significado contextual de f(x) con datos reales nacionales."
+      ],
+      "materials": [
+        "Tabla de datos del INEGI: PIB per cápita México 2000-2023 (pesos corrientes).",
+        "Cuadrícula milimetrada o GeoGebra en línea (geogebra.org/graphing).",
+        "Tarjetas de emparejamiento: tabla ↔ gráfica ↔ fórmula ↔ verbal.",
+        "Calculadora científica o app Desmos.",
+        "Pizarrón para construcción colectiva de la gráfica."
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {
+          "phase": "Apertura",
+          "duration": "10 min",
+          "label": "Activación: Datos PIB"
+        },
+        {
+          "phase": "Desarrollo",
+          "duration": "30 min",
+          "label": "Cuatro representaciones"
+        },
+        {
+          "phase": "Cierre",
+          "duration": "10 min",
+          "label": "Prueba línea vertical"
+        }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "El docente presenta la tabla del PIB per cápita de México (INEGI, 2023): años 2000-2023 vs monto en pesos. Pregunta: '¿Para cada año hay exactamente un valor de PIB?' → intuición de función.",
+          "activity": "Estudiantes identifican si hay años repetidos con valores distintos. Discuten en binas: ¿puede un año tener dos valores de PIB simultáneamente? Se establece la idea de asignación única."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "Se formaliza el concepto: función f: A → B asigna a cada elemento de A exactamente un elemento de B. Se trabaja la misma función en cuatro representaciones: (1) tabla con seis pares (año, PIB), (2) gráfica de puntos en plano cartesiano, (3) modelo lineal aproximado f(x)=3500x+80000 donde x es años desde 2000, (4) descripción verbal 'El PIB per cápita crece aproximadamente 3500 pesos cada año'. Se introduce notación f(x), f(5), f(20).",
+          "activity": "Equipos de 3: cada uno recibe una relación diferente (diagrama de flechas, conjunto de pares ordenados, gráfica con curva que pasa la prueba o la falla). Determinan si es función, identifican dominio y rango, y la representan en al menos dos formas adicionales. Presentan al grupo."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Prueba de la línea vertical: se traza una línea vertical sobre la gráfica; si corta en más de un punto, no es función. Se aplica a tres gráficas proyectadas (parábola vertical —no función—, parábola horizontal —sí función—, círculo —no función—).",
+          "activity": "Metacognición: cada estudiante escribe en su cuaderno 'Una función ES... / NO ES...' con un ejemplo personal de su contexto (temperatura-hora del día, precio-cantidad en mercado)."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Una función es una regla de correspondencia que asigna a cada elemento x del dominio exactamente un elemento y del codominio. Esta idea, formalizada por Dirichlet en el siglo XIX, es la base de toda la matemática aplicada: desde modelos económicos del INEGI hasta algoritmos de streaming.",
+      "sections": [
+        {
+          "subtitle": "Definición y notación",
+          "content": "f: A → B es función si ∀x∈A existe un único y∈B tal que f(x)=y. El dominio A es el conjunto de entradas válidas; el rango (o imagen) es el subconjunto de B que realmente se alcanza. Notación: y = f(x), se lee 'f de x'."
+        },
+        {
+          "subtitle": "Las cuatro representaciones",
+          "content": "Tabla: pares (x, f(x)) ordenados. Gráfica: puntos en el plano cartesiano unidos o no. Algebraica: fórmula explícita como f(x)=2x+1. Verbal: descripción del proceso ('el doble de x más uno'). Pasar entre representaciones desarrolla flexibilidad matemática."
+        },
+        {
+          "subtitle": "Prueba de la línea vertical",
+          "content": "Una gráfica en el plano cartesiano representa una función si y solo si toda línea vertical x=k intersecta la gráfica en exactamente un punto (o ninguno, si k no pertenece al dominio). Contraejemplo: la circunferencia x²+y²=r² no es función pues para |x|<r hay dos valores de y."
+        },
+        {
+          "subtitle": "Dominio natural y restricciones",
+          "content": "El dominio natural es el mayor subconjunto de ℝ donde f(x) está definida: para f(x)=√x se requiere x≥0; para f(x)=1/x se excluye x=0. En contextos reales el dominio puede restringirse aún más (x=año: entero positivo)."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál de las siguientes relaciones NO es una función de ℝ en ℝ?",
+          "options": [
+            "f = {(1,2),(2,4),(3,6)}",
+            "g = {(1,2),(1,5),(2,4)}",
+            "h(x) = x² + 3",
+            "k(x) = √(x+1) con dominio x≥−1"
+          ],
+          "correct": "g = {(1,2),(1,5),(2,4)}"
+        },
+        {
+          "question": "Si f(x) = 3x − 7, ¿cuánto vale f(4)?",
+          "options": [
+            "5",
+            "7",
+            "12",
+            "19"
+          ],
+          "correct": "5"
+        },
+        {
+          "question": "El dominio natural de f(x) = 1/(x−3) es:",
+          "options": [
+            "ℝ",
+            "ℝ \\ {3}",
+            "ℝ \\ {−3}",
+            "x > 3"
+          ],
+          "correct": "ℝ \\ {3}"
+        }
+      ],
+      "rubric": "4: Identifica correctamente función/no-función, convierte entre las 4 representaciones y calcula valores. 3: Convierte entre al menos 3 representaciones con errores menores. 2: Identifica función pero confunde dominio y rango. 1: Errores conceptuales graves; no distingue función de relación."
+    },
+    "teacher_tips": [
+      "Usar Desmos (desmos.com) en vivo para graficar y mostrar la prueba de la línea vertical de forma interactiva.",
+      "El dato del PIB per cápita del INEGI conecta con Ciencias Sociales; coordinar con el docente de CS si es posible.",
+      "Evitar la definición formal con conjuntos antes de la intuición; partir siempre del ejemplo concreto.",
+      "Estudiantes que confunden función con ecuación se benefician de múltiples ejemplos no algebraicos (tabla de temperatura-hora)."
+    ]
   },
   "PM-IV-P02": {
     "code": "PM-IV-P02",
@@ -19,11 +131,117 @@
     "duration": "~3h (2 sesiones de 50 min)",
     "difficulty": "Intermedio",
     "category": "Funciones",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "metadata": {
+      "objective": "Graficar funciones lineales f(x)=mx+b y cuadráticas f(x)=a(x−h)²+k identificando pendiente, ordenada al origen, vértice, eje de simetría, apertura y zeros; aplicar transformaciones de traslación y reflexión.",
+      "competencies": [
+        "Calcula pendiente e interceptos de una función lineal a partir de su gráfica o ecuación.",
+        "Escribe la forma estándar y vértice de una cuadrática, completa el cuadrado si es necesario.",
+        "Aplica transformaciones: f(x)+k (traslación vertical), f(x−h) (traslación horizontal), −f(x) (reflexión).",
+        "Interpreta el significado de los zeros en contexto (precio de equilibrio, tiempo de vuelo)."
+      ],
+      "materials": [
+        "GeoGebra Graphing Calculator (gratuito en línea o app).",
+        "Hojas de papel cuadriculado para bocetos manuales.",
+        "Datos: tarifa del Metro CDMX (precio fijo) y estimación de consumo eléctrico estacional (modelo cuadrático aproximado).",
+        "Tarjetas con ecuaciones para clasificar y graficar en equipo."
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {
+          "phase": "Apertura",
+          "duration": "10 min",
+          "label": "Pendiente como razón de cambio"
+        },
+        {
+          "phase": "Desarrollo",
+          "duration": "30 min",
+          "label": "Cuadráticas y transformaciones"
+        },
+        {
+          "phase": "Cierre",
+          "duration": "10 min",
+          "label": "Galería de gráficas"
+        }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Se presentan dos situaciones: (A) costo de taxi = 15 + 3.5·km (lineal, CFE tarifa fija + variable); (B) altura de un proyectil h(t)=−4.9t²+20t+1.5 (cuadrática). ¿En qué se diferencian sus gráficas?",
+          "activity": "Los estudiantes esbozan a mano la forma esperada de cada gráfica sin calcular puntos. Discuten: ¿cuándo cruza el eje x el proyectil? ¿Tiene máximo el taxi?"
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "Lineal f(x)=mx+b: m = razón de cambio (pendiente), b = ordenada al origen. Dos puntos determinan la recta. Paralelas (mismo m), perpendiculares (m₁·m₂=−1). Cuadrática f(x)=ax²+bx+c: forma vértice f(x)=a(x−h)²+k, vértice (h,k), eje x=h, apertura según signo de a. Zeros: fórmula cuadrática. Transformaciones: f(x)+k sube/baja la gráfica; f(x−h) desplaza izquierda/derecha; −f(x) refleja en eje x.",
+          "activity": "En GeoGebra, cada equipo modifica deslizadores a, h, k de f(x)=a(x−h)²+k y registra qué cambia. Luego analiza la función h(t)=−4.9t²+20t+1.5: calcula el tiempo de vuelo máximo y cuándo cae al piso."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Galería: cada equipo pega en la pared su hoja con gráfica anotada (vértice, zeros, dominio, rango). El grupo hace recorrido de 5 minutos dando retroalimentación con notas adhesivas.",
+          "activity": "Síntesis colectiva: ¿qué determina que la parábola abra hacia arriba o hacia abajo? ¿Cuándo tiene 0, 1 o 2 zeros reales? (conectar con discriminante Sem 3)."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Las funciones polinomiales de grado 1 y 2 modelan una enorme variedad de fenómenos físicos, económicos y sociales. La recta modela relaciones de proporcionalidad constante; la parábola modela movimientos uniformemente acelerados, curvas de oferta-demanda y trayectorias balísticas.",
+      "sections": [
+        {
+          "subtitle": "Función lineal f(x) = mx + b",
+          "content": "m = (y₂−y₁)/(x₂−x₁) es la pendiente: razón de cambio constante. Si m>0 la función es creciente; m<0 decreciente; m=0 constante. b = f(0) es el intercepto con el eje y. La cero de f es x = −b/m."
+        },
+        {
+          "subtitle": "Función cuadrática: formas equivalentes",
+          "content": "Forma estándar: f(x)=ax²+bx+c. Forma vértice: f(x)=a(x−h)²+k donde h=−b/(2a) y k=f(h). Forma factorizada: f(x)=a(x−r₁)(x−r₂) cuando los zeros reales r₁, r₂ existen. Pasar entre formas requiere completar el cuadrado o aplicar la fórmula general."
+        },
+        {
+          "subtitle": "Transformaciones de funciones",
+          "content": "Sean f(x) la función base: f(x)+k traslada verticalmente k unidades (k>0: arriba). f(x−h) traslada horizontalmente h unidades (h>0: derecha). −f(x) refleja respecto al eje x. cf(x) con c>1 estira verticalmente; 0<c<1 comprime. f(−x) refleja respecto al eje y."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "La función f(x) = −2(x−3)² + 8 tiene su vértice en:",
+          "options": [
+            "(3, 8)",
+            "(−3, 8)",
+            "(3, −8)",
+            "(−3, −8)"
+          ],
+          "correct": "(3, 8)"
+        },
+        {
+          "question": "¿Qué transformación convierte f(x)=x² en g(x)=x²−5?",
+          "options": [
+            "Traslación vertical hacia abajo 5 unidades",
+            "Traslación horizontal 5 unidades a la derecha",
+            "Reflexión en el eje x",
+            "Compresión vertical por factor 5"
+          ],
+          "correct": "Traslación vertical hacia abajo 5 unidades"
+        },
+        {
+          "question": "Una función lineal pasa por (0, 4) y (2, 10). Su ecuación es:",
+          "options": [
+            "f(x)=3x+4",
+            "f(x)=2x+4",
+            "f(x)=3x+2",
+            "f(x)=5x+4"
+          ],
+          "correct": "f(x)=3x+4"
+        }
+      ],
+      "rubric": "4: Grafica con precisión, identifica todos los elementos clave y aplica transformaciones correctamente. 3: Gráficas correctas con errores menores en transformaciones. 2: Identifica pendiente/vértice pero comete errores en ceros o transformaciones. 1: Confunde formas de la función o no puede graficar sin plantilla."
+    },
+    "teacher_tips": [
+      "GeoGebra permite que los estudiantes manipulen deslizadores a, h, k en tiempo real — invaluable para construir intuición sobre transformaciones.",
+      "Conectar pendiente negativa con conceptos de decrecimiento trabajados en Ciencias Naturales (desintegración radiactiva, enfriamiento).",
+      "Para estudiantes avanzados: introducir el concepto de función par e impar visualmente."
+    ]
   },
   "PM-IV-P03": {
     "code": "PM-IV-P03",
@@ -32,37 +250,353 @@
     "duration": "~3h (2 sesiones de 50 min)",
     "difficulty": "Intermedio",
     "category": "Trigonometría",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "metadata": {
+      "objective": "Calcular seno, coseno y tangente de ángulos agudos en un triángulo rectángulo, y aplicarlos para determinar distancias y alturas que no pueden medirse directamente, usando contextos mexicanos.",
+      "competencies": [
+        "Identifica los lados de un triángulo rectángulo respecto a un ángulo de referencia (opuesto, adyacente, hipotenusa).",
+        "Calcula las seis razones trigonométricas y sus recíprocas (csc, sec, cot).",
+        "Resuelve triángulos rectángulos dado un ángulo y un lado.",
+        "Aplica ángulos de elevación y depresión en medición indirecta de alturas y distancias."
+      ],
+      "materials": [
+        "Transportador, regla y cinta métrica para práctica exterior.",
+        "Tabla de valores trigonométricos o calculadora científica.",
+        "Fotografías de la Pirámide del Sol (Teotihuacán, INAH): base 222 m, altura 63 m.",
+        "Clinómetro casero (transportador + hilo y plomada).",
+        "Hoja de trabajo con triángulos para calcular."
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {
+          "phase": "Apertura",
+          "duration": "10 min",
+          "label": "¿Cómo medir la Pirámide del Sol sin escalarla?"
+        },
+        {
+          "phase": "Desarrollo",
+          "duration": "30 min",
+          "label": "Razones trigonométricas y aplicaciones"
+        },
+        {
+          "phase": "Cierre",
+          "duration": "10 min",
+          "label": "Medición indirecta en el plantel"
+        }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Se proyecta la imagen de la Pirámide del Sol (INAH, Teotihuacán): base cuadrada de ~222 m por lado, altura original estimada en 71 m (hoy 63 m por erosión). Pregunta detonadora: 'Los arqueólogos determinaron estas medidas sin poder escalarla — ¿cómo lo hicieron?'",
+          "activity": "Los estudiantes proponen métodos (sombras, ángulos, cuerdas). Se introduce la idea de medición indirecta usando ángulos y una distancia conocida."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "En un triángulo rectángulo con ángulo agudo θ: sen θ = cateto opuesto / hipotenusa; cos θ = cateto adyacente / hipotenusa; tan θ = cateto opuesto / cateto adyacente. Mnemotecnia: SOH-CAH-TOA. Recíprocas: csc=1/sen, sec=1/cos, cot=1/tan. Identidad fundamental: sen²θ + cos²θ = 1. Aplicación: ángulo de elevación α desde punto a distancia d de la base de un edificio de altura h: tan α = h/d → h = d·tan α. Problema Pirámide: desde 100 m de distancia el ángulo de elevación a la cima es arctan(63/100) ≈ 32.2°.",
+          "activity": "Ejercicios graduados: (1) dado triángulo con lados 3-4-5, calcular las 6 razones. (2) Torre de TV del Ajusco (200 m): ¿qué ángulo de elevación se ve desde 150 m? (3) Barco en el Golfo de México: desde un faro a 40 m de altura se ve el barco con ángulo de depresión de 5°; ¿a qué distancia está?"
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Práctica exterior (o simulada en aula con objeto vertical): usando el clinómetro casero, los estudiantes miden el ángulo de elevación a la cima de un árbol o poste del plantel y calculan su altura.",
+          "activity": "Conclusión: ¿qué ventaja tiene la trigonometría sobre medir directamente? Reflexión sobre su uso en topografía, arquitectura, astronomía y arqueología mexicana."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La trigonometría nació de la astronomía y la geodesia. En México, los ingenieros del INEGI usan razones trigonométricas en la cartografía; los arquitectos del INAH las aplican para restaurar monumentos arqueológicos sin alterar su estructura.",
+      "sections": [
+        {
+          "subtitle": "Las seis razones trigonométricas",
+          "content": "Para un ángulo agudo θ en un triángulo rectángulo: sen θ = op/hip; cos θ = ad/hip; tan θ = op/ad; csc θ = hip/op; sec θ = hip/ad; cot θ = ad/op. Los ángulos notables: 30°(π/6), 45°(π/4), 60°(π/3) tienen valores exactos: sen 30°=1/2; cos 60°=1/2; tan 45°=1; sen 60°=√3/2."
+        },
+        {
+          "subtitle": "Resolución de triángulos rectángulos",
+          "content": "Conociendo un ángulo agudo θ y cualquier lado, se puede determinar los otros dos lados y el ángulo complementario (90°−θ). Procedimiento: (1) identificar el lado conocido (op, ad o hip), (2) seleccionar la razón que conecte ese lado con el buscado, (3) despejar y calcular."
+        },
+        {
+          "subtitle": "Ángulos de elevación y depresión",
+          "content": "Ángulo de elevación: se mide desde la horizontal hacia arriba hasta la línea de visión al objeto. Ángulo de depresión: desde la horizontal hacia abajo. Son ángulos alternos internos, por lo que son iguales cuando observador y objeto están al mismo nivel horizontal. Aplicaciones: altimetría, navegación, astronomía."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "En un triángulo rectángulo con ángulo θ, el cateto opuesto mide 5 cm y la hipotenusa 13 cm. ¿Cuánto mide cos θ?",
+          "options": [
+            "5/13",
+            "12/13",
+            "5/12",
+            "13/12"
+          ],
+          "correct": "12/13"
+        },
+        {
+          "question": "Desde un punto en el suelo a 80 m de la base de un edificio, el ángulo de elevación a la azotea es 35°. La altura del edificio es aproximadamente: (tan 35° ≈ 0.70)",
+          "options": [
+            "56 m",
+            "80 m",
+            "114 m",
+            "65 m"
+          ],
+          "correct": "56 m"
+        },
+        {
+          "question": "La identidad pitagórica fundamental de la trigonometría es:",
+          "options": [
+            "sen²θ + cos²θ = 1",
+            "sen θ + cos θ = 1",
+            "tan²θ + 1 = sec θ",
+            "sen θ · cos θ = 1"
+          ],
+          "correct": "sen²θ + cos²θ = 1"
+        }
+      ],
+      "rubric": "4: Resuelve todos los problemas de medición indirecta correctamente, justifica cada paso. 3: Resuelve con errores menores de cálculo. 2: Identifica la razón correcta pero comete errores al despejar. 1: Confunde los lados del triángulo o aplica la razón incorrecta."
+    },
+    "teacher_tips": [
+      "La práctica exterior con clinómetro casero es altamente motivante — si el plantel tiene patio con árboles o postes, usarla obligatoriamente.",
+      "El contexto arqueológico de Teotihuacán (INAH) conecta con Historia; coordinar con el docente de Humanidades.",
+      "Introducir la notación arcsen, arccos, arctan para 'despejar el ángulo' cuando se conocen los lados.",
+      "Usar videos de YouTube del INAH sobre restauración de pirámides donde se menciona topografía."
+    ]
   },
   "PM-IV-P04": {
     "code": "PM-IV-P04",
     "title": "Extiende las razones trigonométricas a ángulos en el círculo unitario y maneja sus valores.",
     "level": "Pensamiento Matemático IV",
     "duration": "~3h (2 sesiones de 50 min)",
-    "difficulty": "Intermedio",
+    "difficulty": "Intermedio-Avanzado",
     "category": "Trigonometría",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "metadata": {
+      "objective": "Definir seno y coseno como coordenadas del punto en el círculo unitario para ángulos de cualquier magnitud (0° a 360°, y en radianes), determinar el signo de las razones en cada cuadrante y reconocer la periodicidad de las funciones trigonométricas.",
+      "competencies": [
+        "Convierte ángulos entre grados y radianes usando la relación π rad = 180°.",
+        "Ubica ángulos en el círculo unitario y lee sus coordenadas (cos θ, sen θ).",
+        "Determina el signo de sen, cos y tan en cada cuadrante usando la regla CAAS.",
+        "Identifica los ángulos de referencia y calcula razones para ángulos en cuadrantes II, III y IV."
+      ],
+      "materials": [
+        "Círculo unitario impreso o en GeoGebra con deslizador de ángulo.",
+        "Tabla de valores de ángulos notables (0°, 30°, 45°, 60°, 90°, 120°, 135°, 150°, 180°, 210°, 225°, 240°, 270°, 300°, 315°, 330°, 360°).",
+        "Calculadora científica (modo grados y radianes).",
+        "Hilo y transportador grande (de 30 cm) para construir el círculo unitario físicamente."
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {
+          "phase": "Apertura",
+          "duration": "10 min",
+          "label": "Del triángulo al círculo"
+        },
+        {
+          "phase": "Desarrollo",
+          "duration": "30 min",
+          "label": "Cuatro cuadrantes y periodicidad"
+        },
+        {
+          "phase": "Cierre",
+          "duration": "10 min",
+          "label": "Reconstrucción colectiva del círculo unitario"
+        }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Pregunta: '¿Cuánto vale sen(150°)? ¿Y sen(−30°)? Con triángulos no podemos responder directamente.' Se plantea la necesidad de una definición más general. Se introduce el círculo de radio 1 centrado en el origen.",
+          "activity": "Los estudiantes marcan en el pizarrón un punto P=(x,y) sobre un círculo de radio 1 para θ=30°. Se define cos 30°=x, sen 30°=y. Reconocen que coincide con la definición anterior para ángulos agudos."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "Definición general: para cualquier ángulo θ medido desde el eje x positivo, el punto P=(cos θ, sen θ) está sobre el círculo unitario. Signos por cuadrante: C I (+,+), C II (−,+), C III (−,−), C IV (+,−). Regla CAAS: Cuadrante I Todo positivo, II Solo Sen, III Solo tan, IV Solo Cos. Ángulo de referencia: ángulo agudo formado con el eje x más cercano. Radianes: π rad = 180°; 1 rad ≈ 57.3°. Periodicidad: sen(θ+360°)=sen θ; período = 360° = 2π rad.",
+          "activity": "Equipos completan la tabla del círculo unitario para los 16 ángulos estándar. Luego verifican en calculadora. Resuelven: ¿En qué cuadrante está 210°? ¿Cuál es su ángulo de referencia? ¿Cuánto vale sen(210°) y cos(210°)?"
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Reconstrucción colectiva: cada equipo aporta 4 ángulos al círculo unitario dibujado en el pizarrón. Al final queda el círculo completo con coordenadas.",
+          "activity": "Aplicación contextual: el movimiento periódico de las mareas en el Golfo de México tiene período de ~12.4 horas. La función h(t)=A·sen(2π/12.4·t)+h₀ modela la altura. ¿Qué significan A y h₀?"
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La extensión de la trigonometría al círculo unitario permite analizar fenómenos periódicos: mareas, corrientes eléctricas alternas, señales de radio, vibraciones sísmicas. El CENAPRED usa funciones trigonométricas para modelar ondas sísmicas en México.",
+      "sections": [
+        {
+          "subtitle": "Definición mediante el círculo unitario",
+          "content": "Sea P el punto de intersección del lado terminal del ángulo θ con el círculo x²+y²=1. Se define: cos θ = abscisa de P; sen θ = ordenada de P; tan θ = sen θ/cos θ (siempre que cos θ ≠ 0). Esta definición es consistente con la definición triangular para 0°<θ<90° y la extiende a todos los ángulos reales."
+        },
+        {
+          "subtitle": "Ángulos de referencia y signos",
+          "content": "El ángulo de referencia θ' de un ángulo θ es el ángulo agudo positivo formado entre el lado terminal y el eje x más próximo. |sen θ| = sen θ'; |cos θ| = cos θ'. El signo se determina por el cuadrante: en QI ambos positivos; QII sen positivo, cos negativo; QIII ambos negativos; QIV cos positivo, sen negativo."
+        },
+        {
+          "subtitle": "Conversión grados-radianes",
+          "content": "1 vuelta completa = 360° = 2π rad. Conversión: θ[rad] = θ[°] × π/180. Ángulos frecuentes: 30°=π/6; 45°=π/4; 60°=π/3; 90°=π/2; 120°=2π/3; 180°=π; 270°=3π/2. La calculadora debe estar en el modo correcto (DEG o RAD) según el problema."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿En qué cuadrante está el ángulo 240° y cuál es su ángulo de referencia?",
+          "options": [
+            "Cuadrante III, ángulo de referencia 60°",
+            "Cuadrante III, ángulo de referencia 30°",
+            "Cuadrante II, ángulo de referencia 60°",
+            "Cuadrante IV, ángulo de referencia 60°"
+          ],
+          "correct": "Cuadrante III, ángulo de referencia 60°"
+        },
+        {
+          "question": "El valor de cos(300°) es:",
+          "options": [
+            "−1/2",
+            "√3/2",
+            "1/2",
+            "−√3/2"
+          ],
+          "correct": "1/2"
+        },
+        {
+          "question": "Convierte 3π/4 radianes a grados:",
+          "options": [
+            "120°",
+            "135°",
+            "150°",
+            "270°"
+          ],
+          "correct": "135°"
+        }
+      ],
+      "rubric": "4: Ubica ángulos en el círculo, calcula razones para cualquier cuadrante y convierte grados-radianes fluidamente. 3: Calcula correctamente con errores menores en signos. 2: Domina cuadrante I pero falla en otros cuadrantes. 1: No distingue la extensión del triángulo al círculo."
+    },
+    "teacher_tips": [
+      "El círculo unitario impreso que el estudiante completa a mano es la mejor herramienta de estudio — sugerirlo como material de consulta en exámenes.",
+      "La aplicación a mareas en el Golfo de México es perfecta para conectar con CNEYT (oceanografía y clima).",
+      "Pedir a los estudiantes que ubiquen en el celular la 'calculadora en modo radianes' — muchos no saben que existe ese modo."
+    ]
   },
   "PM-IV-P05": {
     "code": "PM-IV-P05",
     "title": "Aplica la Ley de Senos y la Ley de Cosenos en la resolución de triángulos oblicuángulos.",
     "level": "Pensamiento Matemático IV",
     "duration": "~3h (2 sesiones de 50 min)",
-    "difficulty": "Intermedio",
+    "difficulty": "Avanzado",
     "category": "Trigonometría",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "metadata": {
+      "objective": "Resolver triángulos oblicuángulos (sin ángulo recto) usando la Ley de Senos a/sen A = b/sen B = c/sen C y la Ley de Cosenos c²=a²+b²−2ab·cos C, seleccionando la ley apropiada según los datos disponibles.",
+      "competencies": [
+        "Selecciona la Ley de Senos o de Cosenos según el caso (LAL, LLL, ALA, LAA).",
+        "Aplica la Ley de Senos para encontrar lados o ángulos desconocidos.",
+        "Aplica la Ley de Cosenos para el caso LAL y para encontrar ángulos dado LLL.",
+        "Resuelve problemas de navegación, topografía y arquitectura con triángulos oblicuángulos."
+      ],
+      "materials": [
+        "Mapa topográfico simplificado de una región de México (INEGI 1:50 000).",
+        "Calculadora científica.",
+        "Problemas contextualizados: distancias entre poblados del Istmo de Tehuantepec.",
+        "Hoja cuadriculada para bocetos de triángulos."
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {
+          "phase": "Apertura",
+          "duration": "10 min",
+          "label": "El problema del topógrafo"
+        },
+        {
+          "phase": "Desarrollo",
+          "duration": "30 min",
+          "label": "Leyes de Senos y Cosenos"
+        },
+        {
+          "phase": "Cierre",
+          "duration": "10 min",
+          "label": "Problema de navegación"
+        }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Situación: un topógrafo del INEGI necesita calcular la distancia entre dos puntos A y B separados por un barranco en Oaxaca. Desde un punto C accesible puede medir AC=500 m, BC=380 m y el ángulo ACB=72°. ¿Cómo calcula AB?",
+          "activity": "Los estudiantes intentan resolver con Pitágoras (fallan, no hay ángulo recto). Reconocen la necesidad de una nueva ley para triángulos oblicuángulos."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "Ley de Cosenos: c²=a²+b²−2ab·cos C. Se usa cuando: (1) se conocen dos lados y el ángulo incluido (LAL), o (2) se conocen los tres lados (LLL). Solución del problema del topógrafo: AB²=500²+380²−2(500)(380)cos72° ≈ 250000+144400−148000(0.309) ≈ 349137; AB≈591 m. Ley de Senos: a/sen A = b/sen B = c/sen C. Se usa cuando: (1) dos ángulos y un lado (ALA o LAA), o (2) dos lados y un ángulo NO incluido (LAL con ambigüedad). Problema: dos embarcaciones parten del mismo puerto; la primera viaja a N30°E durante 45 km; la segunda a N70°E durante 60 km. ¿Qué distancia hay entre ellas?",
+          "activity": "Ejercicios en parejas: (1) LLL → encontrar todos los ángulos. (2) ALA → encontrar el lado desconocido. (3) Caso ambiguo SSA → dos triángulos posibles (discusión)."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Mapa del Istmo de Tehuantepec: los estudiantes localizan tres poblados, estiman distancias usando la escala del mapa y verifican con la Ley de Cosenos.",
+          "activity": "Resumen visual: tabla de cuándo usar cada ley. Reflexión: ¿por qué la Ley de Cosenos se reduce a Pitágoras cuando C=90°?"
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La Ley de Senos y la Ley de Cosenos generalizan el Teorema de Pitágoras a triángulos cualesquiera. Son herramientas fundamentales en topografía, navegación, astronomía y arquitectura. El INEGI las usa al trazar redes geodésicas para la cartografía nacional.",
+      "sections": [
+        {
+          "subtitle": "Ley de Cosenos",
+          "content": "Para cualquier triángulo con lados a, b, c y ángulos A, B, C opuestos respectivamente: c²=a²+b²−2ab·cos C. Análogamente para a² y b². Cuando C=90°, cos 90°=0 y se obtiene c²=a²+b² (Pitágoras). Casos de aplicación: LAL (dos lados y ángulo incluido) y LLL (tres lados conocidos → despejar el coseno)."
+        },
+        {
+          "subtitle": "Ley de Senos",
+          "content": "a/sen A = b/sen B = c/sen C = 2R (donde R es el radio del circuncírculo). Se usa para ALA (dos ángulos y un lado) y LAA. El caso ambiguo SSA: cuando se dan dos lados y un ángulo no incluido, pueden existir 0, 1 o 2 triángulos solución, dependiendo de si el lado opuesto al ángulo dado es mayor, igual o menor que h=b·sen A."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "En un triángulo, a=7, b=10, C=60°. La longitud de c es aproximadamente: (use c²=a²+b²−2ab·cos C)",
+          "options": [
+            "√79 ≈ 8.9",
+            "√109 ≈ 10.4",
+            "√149 ≈ 12.2",
+            "√51 ≈ 7.1"
+          ],
+          "correct": "√79 ≈ 8.9"
+        },
+        {
+          "question": "¿Cuándo se debe usar la Ley de Cosenos en lugar de la Ley de Senos?",
+          "options": [
+            "Cuando se conocen dos lados y el ángulo entre ellos (LAL)",
+            "Cuando se conocen dos ángulos y el lado entre ellos (ALA)",
+            "Siempre que el triángulo tenga un ángulo de 90°",
+            "Cuando se conocen dos ángulos y el lado opuesto a uno (LAA)"
+          ],
+          "correct": "Cuando se conocen dos lados y el ángulo entre ellos (LAL)"
+        },
+        {
+          "question": "La Ley de Cosenos se reduce al Teorema de Pitágoras cuando el ángulo C vale:",
+          "options": [
+            "45°",
+            "60°",
+            "90°",
+            "180°"
+          ],
+          "correct": "90°"
+        }
+      ],
+      "rubric": "4: Selecciona y aplica correctamente la ley apropiada en todos los casos, incluyendo el caso ambiguo. 3: Resuelve casos LAL y ALA con errores menores. 2: Aplica la fórmula pero comete errores algebraicos. 1: No distingue cuándo usar cada ley."
+    },
+    "teacher_tips": [
+      "Usar un mapa real del INEGI (disponible en inegi.org.mx/app/mapas/) es altamente motivante — los estudiantes pueden verificar distancias con Google Maps.",
+      "El caso ambiguo SSA es el más difícil conceptualmente; dedicar 10 minutos extra con diagrama.",
+      "Conectar con navegación marítima: las costas del Golfo y Pacífico son contexto natural para México."
+    ]
   },
   "PM-IV-P06": {
     "code": "PM-IV-P06",
@@ -70,24 +604,239 @@
     "level": "Pensamiento Matemático IV",
     "duration": "~3h (2 sesiones de 50 min)",
     "difficulty": "Intermedio",
-    "category": "Geometría analítica",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "category": "Geometría Analítica",
+    "metadata": {
+      "objective": "Calcular la distancia entre dos puntos y el punto medio de un segmento; escribir la ecuación de una recta en sus formas punto-pendiente, pendiente-intersección y general; determinar si dos rectas son paralelas o perpendiculares.",
+      "competencies": [
+        "Aplica las fórmulas de distancia y punto medio a coordenadas reales.",
+        "Convierte entre las tres formas de la ecuación de la recta.",
+        "Encuentra la ecuación de la recta dado un punto y la pendiente, o dos puntos.",
+        "Verifica paralelismo y perpendicularidad por comparación de pendientes."
+      ],
+      "materials": [
+        "Plano cartesiano en cuaderno o papel milimetrado.",
+        "GeoGebra o Desmos para verificación.",
+        "Mapa cuadriculado simplificado del Metro CDMX (Líneas 1, 2, 3) como contexto de distancias.",
+        "Calculadora."
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {
+          "phase": "Apertura",
+          "duration": "10 min",
+          "label": "Distancias en el Metro CDMX"
+        },
+        {
+          "phase": "Desarrollo",
+          "duration": "30 min",
+          "label": "Fórmulas y ecuaciones de recta"
+        },
+        {
+          "phase": "Cierre",
+          "duration": "10 min",
+          "label": "Diseño de una ruta óptima"
+        }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Se muestra el mapa del Metro CDMX asignando coordenadas (km) a estaciones clave: Observatorio (0,0), Balderas (3.2, 0), Bellas Artes (4.1, 0.5), Pantitlán (12, 1). Pregunta: '¿Cuál es la distancia en línea recta de Observatorio a Bellas Artes?'",
+          "activity": "Los estudiantes aplican intuitivamente Pitágoras sobre el plano. Se formaliza: d = √[(x₂−x₁)²+(y₂−y₁)²]."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "Fórmula de distancia: d(P₁,P₂)=√[(x₂−x₁)²+(y₂−y₁)²]. Punto medio: M=((x₁+x₂)/2, (y₁+y₂)/2). Ecuación de la recta: (1) Punto-pendiente: y−y₁=m(x−x₁). (2) Pendiente-intersección: y=mx+b. (3) Forma general: Ax+By+C=0. Rectas paralelas: m₁=m₂, b₁≠b₂. Rectas perpendiculares: m₁·m₂=−1. Distancia de un punto a una recta: d=|Ax₀+By₀+C|/√(A²+B²).",
+          "activity": "Ejercicio integrador: dos alcaldías de CDMX se representan como puntos A(2,5) y B(8,3). Calcular: (1) distancia AB, (2) punto medio, (3) ecuación de la recta que las une, (4) ecuación de la mediatriz (perpendicular en el punto medio)."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Diseño de ruta: dado un mapa cuadriculado con 5 puntos de interés (escuela, hospital, mercado, parque, Metro), el equipo traza la ruta más corta visitando todos (aproximación al Problema del Viajero como motivación).",
+          "activity": "Reflexión: ¿en qué situaciones cotidianas usamos implícitamente estas fórmulas? (GPS, diseño urbano, videojuegos)."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La geometría analítica, creada por Descartes en el siglo XVII, unió álgebra y geometría mediante el sistema de coordenadas. Hoy es la base del diseño asistido por computadora (CAD), los sistemas GIS del INEGI y los algoritmos de Google Maps.",
+      "sections": [
+        {
+          "subtitle": "Fórmulas fundamentales",
+          "content": "Distancia: d = √[(x₂−x₁)²+(y₂−y₁)²] (se deriva del Teorema de Pitágoras en el triángulo rectángulo formado por los dos puntos). Punto medio: M = ((x₁+x₂)/2, (y₁+y₂)/2) (promedio aritmético de coordenadas). Estas fórmulas se generalizan a n dimensiones en el espacio euclidiano."
+        },
+        {
+          "subtitle": "Ecuación de la recta: tres formas",
+          "content": "Punto-pendiente: y−y₀=m(x−x₀) — útil cuando se conoce un punto y la pendiente. Pendiente-intersección: y=mx+b — explícita, fácil de graficar. Forma general: Ax+By+C=0 (A,B no ambos cero) — incluye rectas verticales (x=k). La conversión entre formas es álgebra elemental."
+        },
+        {
+          "subtitle": "Paralelismo y perpendicularidad",
+          "content": "Dos rectas son paralelas si tienen la misma pendiente y diferente intercepto (y nunca se intersectan). Son coincidentes si tienen la misma pendiente e igual intercepto. Son perpendiculares si el producto de sus pendientes es −1: m₁·m₂=−1. Las rectas verticales (sin pendiente definida) son perpendiculares a las horizontales (m=0)."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál es la distancia entre los puntos A(1,−2) y B(4,2)?",
+          "options": [
+            "5",
+            "√7",
+            "√25=5",
+            "√34"
+          ],
+          "correct": "5"
+        },
+        {
+          "question": "La ecuación de la recta que pasa por (2,3) con pendiente m=−1 en forma pendiente-intersección es:",
+          "options": [
+            "y=−x+5",
+            "y=−x+3",
+            "y=x+5",
+            "y=−x−5"
+          ],
+          "correct": "y=−x+5"
+        },
+        {
+          "question": "Dos rectas son perpendiculares entre sí. Si la primera tiene pendiente m=2/3, la segunda tiene pendiente:",
+          "options": [
+            "−3/2",
+            "3/2",
+            "2/3",
+            "−2/3"
+          ],
+          "correct": "−3/2"
+        }
+      ],
+      "rubric": "4: Aplica las tres fórmulas con precisión, convierte entre formas de la recta y determina paralelismo/perpendicularidad. 3: Resuelve con errores menores de signo. 2: Aplica la fórmula de distancia pero comete errores en ecuaciones de recta. 1: Confunde coordenadas o no recuerda las fórmulas."
+    },
+    "teacher_tips": [
+      "El mapa del Metro CDMX es inmediatamente reconocible para todos los estudiantes urbanos — funciona como ancla cognitiva.",
+      "Desmos permite graficar rectas y verificar intersecciones en tiempo real; usar como herramienta de verificación, no de sustitución.",
+      "Relacionar con programación: las coordenadas (x,y) son la base de los sistemas de sprites en videojuegos y de la geolocalización.",
+      "Para la mediatriz: enfatizar que es el lugar geométrico de puntos equidistantes de A y B — conecta con la siguiente progresión sobre cónicas."
+    ]
   },
   "PM-IV-P07": {
     "code": "PM-IV-P07",
     "title": "Analiza cónicas básicas: circunferencia y parábola como lugares geométricos en el plano.",
     "level": "Pensamiento Matemático IV",
     "duration": "~3h (2 sesiones de 50 min)",
-    "difficulty": "Intermedio",
-    "category": "Geometría analítica",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "difficulty": "Avanzado",
+    "category": "Geometría Analítica",
+    "metadata": {
+      "objective": "Definir la circunferencia como lugar geométrico (puntos equidistantes de un centro) y la parábola (puntos equidistantes de un foco y una directriz); escribir y reconocer sus ecuaciones estándar; identificar sus elementos y graficarlas.",
+      "competencies": [
+        "Escribe la ecuación estándar de la circunferencia (x−h)²+(y−k)²=r² y la convierte a forma general.",
+        "Identifica centro y radio de una circunferencia a partir de cualquier forma de su ecuación.",
+        "Escribe la ecuación de una parábola con vértice en el origen y en (h,k), identifica foco, directriz y eje de simetría.",
+        "Grafica circunferencias y parábolas a mano e interpreta sus elementos en contexto físico."
+      ],
+      "materials": [
+        "Compás, regla y papel cuadriculado.",
+        "GeoGebra: herramienta cónica para visualización interactiva.",
+        "Imagen del reflector parabólico del Radiotelescopio de Tonantzintla (INAOE, Puebla) y del telescopio óptico.",
+        "Problema: diseño de antena parabólica (IMSS, televisión satelital).",
+        "Cuerdas y tachuelas para construir parábola con definición locus."
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {
+          "phase": "Apertura",
+          "duration": "10 min",
+          "label": "Cónicas como secciones del cono"
+        },
+        {
+          "phase": "Desarrollo",
+          "duration": "30 min",
+          "label": "Circunferencia y parábola: ecuaciones y elementos"
+        },
+        {
+          "phase": "Cierre",
+          "duration": "10 min",
+          "label": "Diseño de reflector parabólico"
+        }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Se proyecta la imagen del Radiotelescopio de Tonantzintla (INAOE, Instituto Nacional de Astrofísica, Óptica y Electrónica, Puebla) y se pregunta: '¿Por qué la antena tiene forma de parábola y no de esfera?' Se introduce que las cónicas son secciones de un doble cono y que cada forma tiene propiedades únicas de reflexión.",
+          "activity": "Construcción manual: con cuerda y tachuela, los estudiantes trazan una circunferencia (cuerda de longitud fija = radio) y luego una parábola (cuerda del punto al foco igual que la distancia vertical a la directriz)."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "Circunferencia: lugar geométrico de puntos (x,y) con d al centro C=(h,k) igual a r. Ecuación estándar: (x−h)²+(y−k)²=r². Forma general: x²+y²+Dx+Ey+F=0; completar cuadrado para convertir. Parábola: lugar geométrico de puntos equidistantes del foco F y la directriz d. Parábola vertical vértice origen: x²=4py (p>0: abre arriba; p<0: abajo). Vértice en (h,k): (x−h)²=4p(y−k). Foco: (h, k+p); directriz: y=k−p. Parábola horizontal: (y−k)²=4p(x−h). Aplicación: antena de 4 m de ancho y 1 m de profundidad — ¿dónde colocar el receptor? (foco a p=1 m del vértice en la parábola x²=4(1)y → x²=4y).",
+          "activity": "En GeoGebra: mover el foco y la directriz y observar cómo cambia la parábola. Calcular el foco de un reflector parabólico real (datos del INAOE). Ejercicios: dado el foco y el vértice, escribir la ecuación; dado la ecuación, identificar todos los elementos."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Diseño de reflector parabólico: cada equipo diseña una antena parabólica de dimensiones dadas y calcula la posición del foco donde se colocaría el receptor para captar máxima señal.",
+          "activity": "Síntesis: ¿qué tienen en común la circunferencia y la parábola como lugares geométricos? ¿En qué se diferencen la elipse e hipérbola (cursos futuros)? Conexión con física: la propiedad reflectora de la parábola (rayos paralelos al eje → foco)."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Las secciones cónicas fueron estudiadas por Apolonio de Perga (~200 a.C.) y son esenciales en física (trayectorias planetarias de Kepler, reflectores, lentes). En México, el INAOE en Tonantzintla y el Gran Telescopio Milimétrico (GTM-50) en la Sierra Negra de Puebla usan espejos parabólicos para colectar señales astronómicas.",
+      "sections": [
+        {
+          "subtitle": "Circunferencia: definición y ecuación",
+          "content": "Definición: conjunto de puntos en el plano a distancia r (radio) de un punto fijo C=(h,k) (centro). De la fórmula de distancia: √[(x−h)²+(y−k)²]=r → (x−h)²+(y−k)²=r². Forma general x²+y²+Dx+Ey+F=0 se convierte completando el cuadrado: agrupar términos en x y en y, completar, reescribir como ecuación estándar. Si r²>0 es circunferencia real; r²=0 es punto; r²<0 no existe."
+        },
+        {
+          "subtitle": "Parábola: definición y ecuaciones canónicas",
+          "content": "Definición: lugar geométrico de puntos equidistantes de un punto (foco F) y una recta (directriz d). El vértice V es el punto de la parábola más cercano al foco (y por tanto a la directriz). Parábola vertical con vértice en origen: x²=4py. Si p>0 abre hacia arriba, F=(0,p), d: y=−p. Si p<0 abre hacia abajo. La cuerda focal (recta doble pasa por el foco ⊥ al eje) tiene longitud |4p|. Traslación al vértice (h,k): (x−h)²=4p(y−k)."
+        },
+        {
+          "subtitle": "Propiedad reflectora de la parábola",
+          "content": "Todo rayo paralelo al eje de simetría de una parábola, al reflejarse en ella, pasa por el foco. Y viceversa: una fuente luminosa o de sonido en el foco produce rayos paralelos al eje al reflejarse. Esta propiedad hace que las parábolas sean ideales para antenas de radar, reflectores de focos de luz, telescopios y radiotelescopios."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "La ecuación (x−2)²+(y+3)²=25 representa una circunferencia con centro y radio:",
+          "options": [
+            "Centro (2,−3) y radio 5",
+            "Centro (−2,3) y radio 5",
+            "Centro (2,−3) y radio 25",
+            "Centro (2,3) y radio 5"
+          ],
+          "correct": "Centro (2,−3) y radio 5"
+        },
+        {
+          "question": "La parábola x²=12y tiene su foco en:",
+          "options": [
+            "(0, 3)",
+            "(3, 0)",
+            "(0,−3)",
+            "(0, 12)"
+          ],
+          "correct": "(0, 3)"
+        },
+        {
+          "question": "Una antena parabólica tiene la ecuación x²=8y con vértice en el origen. El receptor debe colocarse en el foco, que está en:",
+          "options": [
+            "(0, 2)",
+            "(0, 8)",
+            "(2, 0)",
+            "(0, 4)"
+          ],
+          "correct": "(0, 2)"
+        }
+      ],
+      "rubric": "4: Identifica correctamente todos los elementos de circunferencia y parábola, convierte entre formas y aplica la propiedad reflectora. 3: Identifica elementos con errores menores en signo o valor de p. 2: Reconoce la forma estándar pero no puede convertir desde la forma general. 1: Confunde circunferencia con parábola o no puede identificar centro/foco."
+    },
+    "teacher_tips": [
+      "El Radiotelescopio de Tonantzintla y el GTM-50 son contextos de orgullo nacional — mostrar fotos y el trabajo del INAOE motiva enormemente.",
+      "La construcción de parábola con cuerda (definición locus) es la actividad más poderosa — no omitirla.",
+      "Para completar el cuadrado en circunferencias forma general: práctica extra con 3-4 ejercicios graduados.",
+      "Adelantar que elipse e hipérbola son las otras dos cónicas y se estudiarán en Sem 5 — genera expectativa."
+    ]
   }
 }
