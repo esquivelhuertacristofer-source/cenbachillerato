@@ -1,4 +1,14 @@
-{
+"""
+gen-pm-vi.py -- Pensamiento Matematico VI (Estadistica y Probabilidad) -- 8 progresiones
+Referencias: INEGI-ENOE, CONEVAL, ENSANUT, ENAJUV-IMJUVE, CENAPRED, ENCIG-INEGI,
+GRUMA, BIMBO, INER, INE, Serendipia-Ciencia UNAM
+"""
+import json, os
+
+OUT = os.path.join(os.path.dirname(__file__),
+                   '..', 'src', 'data', 'planteamiento', 'pm-vi.json')
+
+data = {
   "PM-VI-P01": {
     "code": "PM-VI-P01",
     "title": "Distingue estadistica descriptiva e inferencial y reconoce su papel en la toma de decisiones con datos reales.",
@@ -24,21 +34,9 @@
     },
     "strategy": {
       "timeline": [
-        {
-          "phase": "Apertura",
-          "duration": "10 min",
-          "label": "La ENOE: preguntas y decision"
-        },
-        {
-          "phase": "Desarrollo",
-          "duration": "30 min",
-          "label": "Conceptos clave y clasificacion de variables"
-        },
-        {
-          "phase": "Cierre",
-          "duration": "10 min",
-          "label": "Descriptiva vs inferencial: aplicacion"
-        }
+        {"phase": "Apertura", "duration": "10 min", "label": "La ENOE: preguntas y decision"},
+        {"phase": "Desarrollo", "duration": "30 min", "label": "Conceptos clave y clasificacion de variables"},
+        {"phase": "Cierre", "duration": "10 min", "label": "Descriptiva vs inferencial: aplicacion"}
       ],
       "phases": [
         {
@@ -116,6 +114,7 @@
       "Conectar explicitamente con el proyecto integrador de la progresion P07 (encuesta real) para que los estudiantes vean desde P01 para que sirven estos conceptos."
     ]
   },
+
   "PM-VI-P02": {
     "code": "PM-VI-P02",
     "title": "Organiza y representa conjuntos de datos en tablas de frecuencia, histogramas, diagramas de caja y graficas de dispersion.",
@@ -141,21 +140,9 @@
     },
     "strategy": {
       "timeline": [
-        {
-          "phase": "Apertura",
-          "duration": "10 min",
-          "label": "Dataset real: temperaturas CDMX 2023"
-        },
-        {
-          "phase": "Desarrollo",
-          "duration": "30 min",
-          "label": "Tabla de frecuencias, histograma y boxplot"
-        },
-        {
-          "phase": "Cierre",
-          "duration": "10 min",
-          "label": "Diagrama de dispersion e interpretacion"
-        }
+        {"phase": "Apertura", "duration": "10 min", "label": "Dataset real: temperaturas CDMX 2023"},
+        {"phase": "Desarrollo", "duration": "30 min", "label": "Tabla de frecuencias, histograma y boxplot"},
+        {"phase": "Cierre", "duration": "10 min", "label": "Diagrama de dispersion e interpretacion"}
       ],
       "phases": [
         {
@@ -233,6 +220,7 @@
       "La correlacion espuria es uno de los conceptos mas importantes para la ciudadania estadistica -- dedicar 5 minutos extra si el tiempo lo permite."
     ]
   },
+
   "PM-VI-P03": {
     "code": "PM-VI-P03",
     "title": "Calcula e interpreta medidas de tendencia central (media, mediana, moda) y las usa para caracterizar conjuntos de datos.",
@@ -258,21 +246,9 @@
     },
     "strategy": {
       "timeline": [
-        {
-          "phase": "Apertura",
-          "duration": "10 min",
-          "label": "¿Cual es el ingreso tipico de un mexicano?"
-        },
-        {
-          "phase": "Desarrollo",
-          "duration": "30 min",
-          "label": "Calculo de media, mediana y moda; datos agrupados"
-        },
-        {
-          "phase": "Cierre",
-          "duration": "10 min",
-          "label": "Sesgo y eleccion de la medida correcta"
-        }
+        {"phase": "Apertura", "duration": "10 min", "label": "¿Cual es el ingreso tipico de un mexicano?"},
+        {"phase": "Desarrollo", "duration": "30 min", "label": "Calculo de media, mediana y moda; datos agrupados"},
+        {"phase": "Cierre", "duration": "10 min", "label": "Sesgo y eleccion de la medida correcta"}
       ],
       "phases": [
         {
@@ -350,6 +326,7 @@
       "Para el calculo de mediana en datos pares: recalcar que es el PROMEDIO de los dos valores centrales, no simplemente uno de ellos."
     ]
   },
+
   "PM-VI-P04": {
     "code": "PM-VI-P04",
     "title": "Calcula e interpreta medidas de dispersion (rango, varianza, desviacion estandar) y las aplica al control de calidad.",
@@ -375,21 +352,9 @@
     },
     "strategy": {
       "timeline": [
-        {
-          "phase": "Apertura",
-          "duration": "10 min",
-          "label": "Control de calidad en GRUMA: ¿cuanto pesa tu tortilla?"
-        },
-        {
-          "phase": "Desarrollo",
-          "duration": "30 min",
-          "label": "Rango, varianza, desviacion estandar y CV"
-        },
-        {
-          "phase": "Cierre",
-          "duration": "10 min",
-          "label": "Regla empirica 68-95-99.7 y limites de control"
-        }
+        {"phase": "Apertura", "duration": "10 min", "label": "Control de calidad en GRUMA: ¿cuanto pesa tu tortilla?"},
+        {"phase": "Desarrollo", "duration": "30 min", "label": "Rango, varianza, desviacion estandar y CV"},
+        {"phase": "Cierre", "duration": "10 min", "label": "Regla empirica 68-95-99.7 y limites de control"}
       ],
       "phases": [
         {
@@ -467,6 +432,7 @@
       "GeoGebra permite visualizar la curva normal y marcar las tres zonas de la regla empirica -- esta visualizacion dinamica vale mas que cualquier explicacion verbal."
     ]
   },
+
   "PM-VI-P05": {
     "code": "PM-VI-P05",
     "title": "Comprende y aplica el concepto de probabilidad clasica, frecuentista y subjetiva en fenomenos aleatorios reales.",
@@ -492,21 +458,9 @@
     },
     "strategy": {
       "timeline": [
-        {
-          "phase": "Apertura",
-          "duration": "10 min",
-          "label": "¿Que tan probable es un sismo en Mexico hoy?"
-        },
-        {
-          "phase": "Desarrollo",
-          "duration": "30 min",
-          "label": "Tres enfoques: clasico, frecuentista, subjetivo"
-        },
-        {
-          "phase": "Cierre",
-          "duration": "10 min",
-          "label": "Ley de los grandes numeros: simulacion"
-        }
+        {"phase": "Apertura", "duration": "10 min", "label": "¿Que tan probable es un sismo en Mexico hoy?"},
+        {"phase": "Desarrollo", "duration": "30 min", "label": "Tres enfoques: clasico, frecuentista, subjetivo"},
+        {"phase": "Cierre", "duration": "10 min", "label": "Ley de los grandes numeros: simulacion"}
       ],
       "phases": [
         {
@@ -584,6 +538,7 @@
       "Para el calculo de probabilidades con combinatoria (permutaciones, combinaciones), conectar con PM-VI-P06 donde se profundiza en probabilidades de eventos compuestos."
     ]
   },
+
   "PM-VI-P06": {
     "code": "PM-VI-P06",
     "title": "Calcula probabilidades de eventos simples, compuestos, condicionales e independientes con reglas de adicion y multiplicacion.",
@@ -609,21 +564,9 @@
     },
     "strategy": {
       "timeline": [
-        {
-          "phase": "Apertura",
-          "duration": "10 min",
-          "label": "Diagnostico medico: el test da positivo, ¿tienes la enfermedad?"
-        },
-        {
-          "phase": "Desarrollo",
-          "duration": "30 min",
-          "label": "Reglas de adicion, multiplicacion y probabilidad condicional"
-        },
-        {
-          "phase": "Cierre",
-          "duration": "10 min",
-          "label": "Razonamiento bayesiano con arbol de probabilidad"
-        }
+        {"phase": "Apertura", "duration": "10 min", "label": "Diagnostico medico: el test da positivo, ¿tienes la enfermedad?"},
+        {"phase": "Desarrollo", "duration": "30 min", "label": "Reglas de adicion, multiplicacion y probabilidad condicional"},
+        {"phase": "Cierre", "duration": "10 min", "label": "Razonamiento bayesiano con arbol de probabilidad"}
       ],
       "phases": [
         {
@@ -701,6 +644,7 @@
       "El Teorema de Bayes tiene aplicaciones en IA/machine learning que muchos estudiantes encontraran en la universidad -- mencionarlo como puente hacia el futuro academico."
     ]
   },
+
   "PM-VI-P07": {
     "code": "PM-VI-P07",
     "title": "Aplica tecnicas de muestreo para planear y ejecutar una encuesta o estudio estadistico sobre un tema de interes comunitario.",
@@ -726,21 +670,9 @@
     },
     "strategy": {
       "timeline": [
-        {
-          "phase": "Apertura",
-          "duration": "15 min",
-          "label": "Diseño del estudio: pregunta, poblacion y variable"
-        },
-        {
-          "phase": "Desarrollo",
-          "duration": "70 min",
-          "label": "Muestreo, tamaño de muestra y aplicacion de encuesta"
-        },
-        {
-          "phase": "Cierre",
-          "duration": "65 min",
-          "label": "Analisis de resultados y presentacion"
-        }
+        {"phase": "Apertura", "duration": "15 min", "label": "Diseño del estudio: pregunta, poblacion y variable"},
+        {"phase": "Desarrollo", "duration": "70 min", "label": "Muestreo, tamaño de muestra y aplicacion de encuesta"},
+        {"phase": "Cierre", "duration": "65 min", "label": "Analisis de resultados y presentacion"}
       ],
       "phases": [
         {
@@ -818,6 +750,7 @@
       "La 'conferencia de prensa del INEGI' es un formato de presentacion motivador que le da a los estudiantes un rol profesional real y desarrolla comunicacion estadistica publica."
     ]
   },
+
   "PM-VI-P08": {
     "code": "PM-VI-P08",
     "title": "Interpreta resultados estadisticos presentados en medios de comunicacion y detecta falacias, graficas enganosas y usos incorrectos de la estadistica.",
@@ -843,21 +776,9 @@
     },
     "strategy": {
       "timeline": [
-        {
-          "phase": "Apertura",
-          "duration": "15 min",
-          "label": "La grafica que miente diciendo la verdad"
-        },
-        {
-          "phase": "Desarrollo",
-          "duration": "50 min",
-          "label": "Catalogo de falacias estadisticas con casos reales"
-        },
-        {
-          "phase": "Cierre",
-          "duration": "35 min",
-          "label": "Auditoria estadistica de una noticia real"
-        }
+        {"phase": "Apertura", "duration": "15 min", "label": "La grafica que miente diciendo la verdad"},
+        {"phase": "Desarrollo", "duration": "50 min", "label": "Catalogo de falacias estadisticas con casos reales"},
+        {"phase": "Cierre", "duration": "35 min", "label": "Auditoria estadistica de una noticia real"}
       ],
       "phases": [
         {
@@ -936,3 +857,9 @@
     ]
   }
 }
+
+os.makedirs(os.path.dirname(os.path.abspath(OUT)), exist_ok=True)
+with open(OUT, 'w', encoding='utf-8') as f:
+    json.dump(data, f, ensure_ascii=False, indent=2)
+
+print(f"Written {len(data)} progressions to {os.path.abspath(OUT)}")
