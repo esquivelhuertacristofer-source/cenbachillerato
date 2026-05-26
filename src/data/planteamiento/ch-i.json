@@ -2,53 +2,485 @@
   "CH-I-P01": {
     "code": "CH-I-P01",
     "title": "Ubica eventos y procesos históricos en coordenadas espacio-temporales para situar su contexto de desarrollo.",
-    "level": "Conciencia Histórica I",
+    "level": "Ciencias Históricas I",
     "duration": "~3h (2 sesiones de 50 min)",
-    "difficulty": "Intermedio",
+    "difficulty": "Básico-Intermedio",
     "category": "Pensamiento histórico",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "metadata": {
+      "objective": "Localizar hechos y procesos históricos en líneas de tiempo y mapas históricos, distinguir entre hecho, proceso y coyuntura, y reconocer que los eventos ocurren en contextos espaciales y temporales específicos que condicionan su desarrollo.",
+      "competencies": [
+        "Construye líneas de tiempo multicausales con hechos y procesos históricos de México.",
+        "Localiza en mapas históricos los territorios y rutas de eventos significativos.",
+        "Distingue hecho puntual, proceso (largo plazo) y coyuntura (momento de inflexión).",
+        "Argumenta por qué el contexto espacio-temporal es condicionante del curso histórico."
+      ],
+      "materials": [
+        "Línea de tiempo mural del México Antiguo al México contemporáneo (INAH, educación patrimonial).",
+        "Mapas históricos: Mesoamérica 200 d.C., Nueva España 1650, México 1824, México actual.",
+        "Tarjetas de eventos para clasificar: hechos, procesos, coyunturas.",
+        "Atlas Histórico de México del INAH (versión digital disponible en mediateca.inah.gob.mx).",
+        "Crónica de Fernando de Alva Ixtlilxóchitl (fragmento) como fuente primaria."
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {
+          "phase": "Apertura",
+          "duration": "10 min",
+          "label": "¿Dónde y cuándo ocurrió?"
+        },
+        {
+          "phase": "Desarrollo",
+          "duration": "30 min",
+          "label": "Coordenadas espacio-temporales y tipos de tiempo"
+        },
+        {
+          "phase": "Cierre",
+          "duration": "10 min",
+          "label": "Construir la línea de tiempo colectiva"
+        }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Se proyectan dos noticias sobre el mismo evento (la caída de Tenochtitlan, 1521): una desde la perspectiva española (Hernán Cortés, cartas de relación) y una desde la perspectiva indígena (Cantares mexicanos, Relación de Tlatelolco). Pregunta: ¿cómo influye el lugar y el tiempo en cómo se narra un evento?",
+          "activity": "Los estudiantes identifican: ¿quién escribe?, ¿desde dónde?, ¿cuándo? Discuten cómo el contexto espacio-temporal de cada narrador cambia lo que se cuenta y cómo se cuenta."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "Conceptos clave: HECHO histórico: evento singular, localizable en tiempo y espacio (Caída de Tenochtitlan, 13 de agosto de 1521). PROCESO: serie de transformaciones interrelacionadas de largo plazo (colonización novohispana, 1521-1821). COYUNTURA: momento de inflexión donde múltiples procesos convergen y producen un cambio acelerado (1808: invasión napoleónica en España → crisis de legitimidad del virreinato). Coordenadas espacio-temporales: el TIEMPO (cuándo: fecha, período, época) y el ESPACIO (dónde: territorio, región, escala local/regional/nacional/mundial). La Independencia de México no se entiende sin el contexto atlántico de la Ilustración y las revoluciones americana (1776) y francesa (1789).",
+          "activity": "En equipos: cada uno recibe 10 tarjetas con eventos de la historia de México. Las clasifican en hecho/proceso/coyuntura y las ordenan cronológicamente. Luego las ubican en el mapa histórico correspondiente. Presentan al grupo justificando su clasificación."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Construcción colectiva: en el mural de la línea de tiempo, cada equipo pega sus tarjetas en el período correspondiente. Al final, el mural muestra la historia de México desde Mesoamérica hasta el presente.",
+          "activity": "Reflexión: ¿qué período de la historia de México te parece el más importante? ¿Por qué importa el contexto para entender ese período?"
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "El pensamiento histórico requiere ubicar los eventos en sus coordenadas espacio-temporales: no existe historia 'en abstracto' — todo hecho ocurre en un lugar y en un tiempo específicos que condicionan su desarrollo y su significado. El INAH, a través de su mediateca digital, pone a disposición cartografía histórica para este análisis.",
+      "sections": [
+        {
+          "subtitle": "El tiempo histórico: capas y escalas",
+          "content": "Braudel (Escuela de los Annales) distingue tres temporalidades: (1) Larga duración (structures): cambios muy lentos, casi imperceptibles (clima, geografía, mentalidades). (2) Mediana duración (coyunturas): ciclos de 10-50 años (economías, guerras, migraciones). (3) Corta duración (événements): eventos individuales (batallas, tratados, personajes). La historia de México puede leerse en las tres temporalidades: la meseta central como eje geográfico de largo plazo; los ciclos de bonanza-crisis; los eventos de la Conquista o la Revolución."
+        },
+        {
+          "subtitle": "El espacio histórico: territorio y escalas geográficas",
+          "content": "El espacio no es un mero 'escenario' de la historia: influye activamente en los procesos (rutas comerciales, fronteras, recursos naturales, clima). La escala importa: un evento puede tener significado diferente en escala local (aldea), regional (Nueva Galicia), nacional (México) o global (sistema-mundo). El Valle de México como nodo geográfico ha concentrado poder durante 2000 años: Teotihuacán, Tula, Tenochtitlan, CDMX. El INEGI produce cartografía histórica que permite este análisis multiescalar."
+        },
+        {
+          "subtitle": "Hecho, proceso y coyuntura",
+          "content": "Hecho: evento discreto, fechable (Grito de Independencia, 15-16 septiembre 1810 en Dolores, Guanajuato). Proceso: transformación de larga duración con múltiples actores y causas interrelacionadas (proceso de Independencia, 1808-1821, con múltiples frentes: insurgente, realista, ilustrado, popular). Coyuntura: momento de aceleración donde varias tendencias confluyen (1808: vacío de poder en España + ideas ilustradas + descontento criollo + miseria indígena → inicio del proceso independentista)."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál de los siguientes es un PROCESO histórico (no un hecho)?",
+          "options": [
+            "La industrialización de México (1940-1970)",
+            "La firma del TLCAN (1 enero 1994)",
+            "El terremoto del 19 de septiembre de 1985",
+            "El natalicio de Benito Juárez (21 marzo 1806)"
+          ],
+          "correct": "La industrialización de México (1940-1970)"
+        },
+        {
+          "question": "La 'larga duración' en la historiografía de Braudel se refiere a:",
+          "options": [
+            "Cambios lentos en estructuras geográficas, climáticas y mentales",
+            "Los eventos bélicos de la historia política",
+            "Las biografías de personajes históricos importantes",
+            "La cronología de hechos del siglo XX"
+          ],
+          "correct": "Cambios lentos en estructuras geográficas, climáticas y mentales"
+        },
+        {
+          "question": "¿Por qué es importante conocer el contexto espacial de un hecho histórico?",
+          "options": [
+            "Porque el espacio influye en los procesos y su significado varía según la escala geográfica",
+            "Porque sin mapas no existe la historia",
+            "Porque todos los eventos históricos ocurren en CDMX",
+            "Para memorizar fechas y lugares de batallas"
+          ],
+          "correct": "Porque el espacio influye en los procesos y su significado varía según la escala geográfica"
+        }
+      ],
+      "rubric": "4: Clasifica correctamente hechos, procesos y coyunturas; ubica en línea de tiempo y mapa con justificación del contexto espacio-temporal. 3: Clasifica con errores menores, ubica en línea de tiempo pero no siempre en mapa. 2: Distingue hecho de proceso pero no identifica coyunturas ni usa el mapa. 1: No distingue los tres tipos de tiempo histórico."
+    },
+    "teacher_tips": [
+      "El Atlas Histórico del INAH (mediateca.inah.gob.mx) es un recurso gratuito y de alta calidad — mostrar cómo navegar por él.",
+      "El mural de línea de tiempo puede mantenerse en el aula todo el semestre y actualizarse progresivamente.",
+      "La comparación de fuentes sobre la Caída de Tenochtitlan es ideal para trabajar perspectiva histórica desde el inicio.",
+      "Conectar con la ENAH (Escuela Nacional de Antropología e Historia) como institución formadora de historiadores mexicanos."
+    ]
   },
   "CH-I-P02": {
     "code": "CH-I-P02",
     "title": "Distingue diferentes formas de medir y conceptualizar el tiempo histórico (cronológico, cíclico, subjetivo).",
-    "level": "Conciencia Histórica I",
+    "level": "Ciencias Históricas I",
     "duration": "~3h (2 sesiones de 50 min)",
     "difficulty": "Intermedio",
-    "category": "Tiempo histórico",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "category": "Pensamiento histórico",
+    "metadata": {
+      "objective": "Comparar las concepciones occidentales lineales del tiempo histórico con las concepciones cíclicas mesoamericanas (calendario azteca/maya), y reflexionar sobre cómo la concepción del tiempo de una civilización influye en sus prácticas sociales, religiosas y políticas.",
+      "competencies": [
+        "Describe las características del tiempo cronológico lineal y del tiempo cíclico mesoamericano.",
+        "Interpreta los elementos básicos del Calendario Azteca (Piedra del Sol) y del calendario maya.",
+        "Analiza cómo la concepción del tiempo influye en la organización social y política de una civilización.",
+        "Reflexiona críticamente sobre la eurocentrismo en la periodización histórica universal (Antigüedad-Medievo-Modernidad)."
+      ],
+      "materials": [
+        "Imagen de la Piedra del Sol (INAH, Sala Mexica del Museo Nacional de Antropología).",
+        "Diagrama del calendario maya haab' (365 días) y tzolkin (260 días).",
+        "Fragmento del Chilam Balam de Chumayel (texto maya yucateco, INAH).",
+        "Comparativa de calendarios: gregoriano, azteca, maya, chino, islámico.",
+        "Video del INAH: 'El Calendario Azteca: más que un reloj' (YouTube canal INAH TV)."
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {
+          "phase": "Apertura",
+          "duration": "10 min",
+          "label": "¿El tiempo es siempre una línea recta?"
+        },
+        {
+          "phase": "Desarrollo",
+          "duration": "30 min",
+          "label": "Tiempo lineal vs tiempo cíclico"
+        },
+        {
+          "phase": "Cierre",
+          "duration": "10 min",
+          "label": "El eurocentrismo en la periodización histórica"
+        }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Se muestra la imagen de la Piedra del Sol (Calendario Azteca) y se pregunta: '¿Por qué es redondo? ¿Qué dice esa forma sobre cómo los mexicas entendían el tiempo?' Se contrasta con la línea de tiempo lineal del cuaderno. Discusión: ¿el tiempo es natural o es una construcción cultural?",
+          "activity": "Los estudiantes describen en dos palabras cómo perciben el tiempo en su vida cotidiana. Se agrupan las respuestas: ¿más lineal (metas, progreso) o más cíclica (estaciones, rutinas, fiestas religiosas)?"
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "TIEMPO LINEAL (occidental-judeo-cristiano): historia como progreso hacia un fin (Creación → Juicio Final; o Ilustración → Progreso → Modernidad). Periodización eurocéntrica: Prehistoria / Antigüedad / Edad Media / Modernidad / Contemporánea — basada en eventos europeos (Caída de Roma 476 d.C.; Descubrimiento de América 1492; Revolución Francesa 1789). TIEMPO CÍCLICO (mesoamericano): historia como repetición de ciclos cósmicos. Calendario Azteca: dos ciclos entrelazados: tonalpohualli (260 días, ritual) + xiuhpohualli (365 días, solar). Ciclo de 52 años: 'Xiuhmolpilli' o atadura de años. Maya: haab' (365 días) + tzolkin (260 días) + Cuenta Larga (ciclos de 144,000 días = baktun). TIEMPO SUBJETIVO: el tiempo vivido difiere del tiempo medido (Bergson); la memoria histórica de comunidades indígenas mexicanas mantiene vivos eventos del siglo XVI como si fueran recientes.",
+          "activity": "Análisis de fuente primaria: fragmento del Chilam Balam donde se describe la llegada de los españoles como el cumplimiento de un ciclo profético. ¿Cómo influye la concepción cíclica del tiempo en la resistencia/aceptación de los mayas a la Conquista? Debate en grupos de 4."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Crítica al eurocentrismo: ¿tiene sentido usar la periodización Antigüedad-Medievo-Modernidad para historiar a México? ¿Cuándo empieza la 'Edad Media' mexica? Propuesta: periodizaciones alternativas centradas en Mesoamérica (Preclásico/Clásico/Posclásico → Colonización → Independencia → Siglo XX).",
+          "activity": "Reflexión escrita breve: ¿cómo concibe el tiempo tu propia comunidad o familia? ¿Hay eventos que 'vuelven' cíclicamente (fiestas patronales, ciclos agrícolas, rituales)? ¿En qué se parece a la concepción mesoamericana?"
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La concepción del tiempo no es universal: cada civilización construye su propio sistema para medir, narrar y dar sentido al transcurso del tiempo. El estudio comparado de los calendarios azteca, maya y gregoriano revela filosofías completamente diferentes sobre el cosmos, la historia y el destino humano. El INAH custodia las evidencias materiales de estas concepciones en el Museo Nacional de Antropología.",
+      "sections": [
+        {
+          "subtitle": "El Calendario Azteca: cosmos y poder",
+          "content": "La Piedra del Sol (monolito de 3.6 m de diámetro, 25 toneladas, Posclásico tardío) no es un 'reloj' sino un monumento cosmogónico. El centro muestra al Sol (Tonatiuh) en el 4 Ollin (4 Movimiento) — el quinto sol destinado a destruirse por terremotos. Los anillos representan los 20 días del tonalpohualli, las 4 eras anteriores (soles), y los rayos solares. La astronomía azteca era tan precisa que el tonalpohualli se adelanta solo 0.07 días por año al ciclo tropical."
+        },
+        {
+          "subtitle": "Tiempo cíclico y profecía en Mesoamérica",
+          "content": "En la cosmovisión mesoamericana, el tiempo es cíclico y las eras se repiten. Los sacerdotes-astrónomos ('tlamatinime' aztecas; 'ajkin' mayas) calculaban los ciclos para predecir el futuro a partir del pasado. La Cuenta Larga maya mide desde una fecha mítológica de creación (11 agosto 3114 a.C.) en baktunes (144,000 días). El fin del decimotercero baktun (21 diciembre 2012) fue malinterpretado por la cultura popular occidental como 'fin del mundo' — los mayas lo entendían como inicio de un nuevo ciclo."
+        },
+        {
+          "subtitle": "Eurocentrismo y periodización histórica",
+          "content": "La periodización Antigüedad/Medievo/Modernidad/Contemporánea fue diseñada por historiadores europeos (Bruni, Petrarca, Gibbon) para narrar la historia de Europa. Aplicarla globalmente distorsiona: ¿México tuvo 'Edad Media'? El Clásico Maya (300-900 d.C.) coincide con el 'Medievo' europeo pero no tiene nada que ver con él. Alternativas: Walter Mignolo propone la 'herida colonial' como categoría analítica; Edmundo O'Gorman (UNAM/Colmex) habla de la 'invención de América' para cuestionar el eurocentrismo de la historiografía tradicional."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "El Calendario Azteca (Piedra del Sol) muestra principalmente:",
+          "options": [
+            "Una concepción cíclica del tiempo y los ciclos cósmicos",
+            "Un registro de las batallas ganadas por los mexicas",
+            "El equivalente al calendario gregoriano en días y meses",
+            "Un mapa geográfico del Imperio Mexica"
+          ],
+          "correct": "Una concepción cíclica del tiempo y los ciclos cósmicos"
+        },
+        {
+          "question": "¿Qué problema tiene aplicar la periodización 'Antigüedad-Medievo-Modernidad' a la historia de México?",
+          "options": [
+            "Que fue diseñada para narrar la historia europea y distorsiona la historia americana",
+            "Que México no tiene historia anterior a 1519",
+            "Que es demasiado larga para estudiar en un semestre",
+            "Que INAH la rechaza porque no tiene mapas"
+          ],
+          "correct": "Que fue diseñada para narrar la historia europea y distorsiona la historia americana"
+        },
+        {
+          "question": "¿Qué caracteriza al tiempo subjetivo en la historia?",
+          "options": [
+            "Que el tiempo vivido por comunidades no coincide necesariamente con el tiempo cronológico medido",
+            "Que es más exacto que el calendario gregoriano",
+            "Que solo se aplica a civilizaciones antiguas",
+            "Que niega la existencia del pasado"
+          ],
+          "correct": "Que el tiempo vivido por comunidades no coincide necesariamente con el tiempo cronológico medido"
+        }
+      ],
+      "rubric": "4: Describe y compara los tres tipos de tiempo histórico, interpreta el Calendario Azteca e identifica el eurocentrismo en la periodización estándar con argumentos. 3: Describe correctamente tiempo lineal y cíclico, interpreta el Calendario con apoyo. 2: Distingue lineal de cíclico pero no analiza críticamente la periodización. 1: No distingue los tipos de tiempo o reduce todo a 'el calendario azteca es igual que el gregoriano'."
+    },
+    "teacher_tips": [
+      "El video del INAH TV en YouTube sobre la Piedra del Sol es excelente — incluye animación del mecanismo calendárico.",
+      "La crítica al eurocentrismo es políticamente sensible pero esencial — crear un ambiente de análisis, no de descalificación.",
+      "Conectar con la lengua y cultura de estudiantes de origen indígena si los hay en el grupo — sus comunidades mantienen vivos estos sistemas temporales.",
+      "Para estudiantes avanzados: la obra de Edmundo O'Gorman 'La invención de América' (FCE, 1958) es accesible y fundamental."
+    ]
   },
   "CH-I-P03": {
     "code": "CH-I-P03",
     "title": "Analiza relaciones de causalidad entre fenómenos históricos para comprender su multicausalidad y consecuencias.",
-    "level": "Conciencia Histórica I",
+    "level": "Ciencias Históricas I",
     "duration": "~3h (2 sesiones de 50 min)",
     "difficulty": "Intermedio",
-    "category": "Causalidad histórica",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "category": "Pensamiento histórico",
+    "metadata": {
+      "objective": "Identificar y analizar las causas y consecuencias de procesos históricos, distinguiendo causas estructurales (de largo plazo) de causas inmediatas (coyunturales), y reconociendo que los fenómenos históricos son multicausales y tienen consecuencias múltiples e imprevistas.",
+      "competencies": [
+        "Distingue causas estructurales de causas detonadoras en un proceso histórico.",
+        "Construye un diagrama causal (espina de pez o mapa conceptual) para un evento histórico mexicano.",
+        "Identifica consecuencias de corto, mediano y largo plazo de un proceso histórico.",
+        "Reconoce la multicausalidad como principio fundamental del pensamiento histórico."
+      ],
+      "materials": [
+        "Caso de estudio: La Independencia de México (1810-1821) — causas y consecuencias.",
+        "Diagrama de espina de pez (Ishikawa) en blanco para rellenar.",
+        "Fuente primaria: carta de Miguel Hidalgo a Ignacio Allende, 1810 (fragmento).",
+        "Datos del INEGI histórico: población de Nueva España en 1810 por grupos sociales.",
+        "Infografía sobre las consecuencias de la Independencia (económicas, territoriales, sociales)."
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {
+          "phase": "Apertura",
+          "duration": "10 min",
+          "label": "¿Por qué estalló la Independencia?"
+        },
+        {
+          "phase": "Desarrollo",
+          "duration": "30 min",
+          "label": "Multicausalidad y cadenas de consecuencias"
+        },
+        {
+          "phase": "Cierre",
+          "duration": "10 min",
+          "label": "Diagrama causal colectivo"
+        }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Pregunta directa: '¿Por qué se independizó México?' Los estudiantes responden libremente. El docente registra todas las causas que mencionan en el pizarrón sin evaluar. Luego pregunta: '¿Es una sola causa suficiente para explicar un proceso tan complejo?'",
+          "activity": "Los estudiantes agrupan las causas que listaron en categorías: económicas, políticas, sociales, culturales/ideológicas, internacionales. Constatan que ninguna categoría por sí sola explica el todo."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "Multicausalidad: los procesos históricos no tienen UNA causa, sino múltiples causas interrelacionadas. CAUSAS ESTRUCTURALES (largo plazo): desigualdad racial y social (castas novohispanas: español/criollo/mestizo/indio/esclavo); monopolio comercial España-colonias; exclusión de criollos de cargos públicos. CAUSAS COYUNTURALES (mediano plazo): crisis agrícola 1809-1810 (heladas, hambruna en el Bajío); Ilustración europea e ideales liberales. CAUSA DETONADORA (inmediata): invasión napoleónica en España 1808 → crisis de legitimidad del Virrey → conspiración de Querétaro descubierta → Grito de Dolores. CONSECUENCIAS: corto plazo: guerra civil 1810-1821 (600,000 muertos, destrucción de minas y haciendas). Mediano plazo: inestabilidad política (50 presidentes en 30 años, 1821-1855). Largo plazo: formación de la nación mexicana; incorporación al sistema-mundo capitalista como periferia.",
+          "activity": "En equipos: construyen el diagrama de espina de pez. La 'espina central' es la Independencia. Las espinas grandes son categorías de causas. Las pequeñas son causas específicas. Cada equipo elige también 3 consecuencias y las clasifican en temporalidades. Presentan."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Diagrama causal colectivo en el pizarrón: el docente consolida los diagramas de todos los equipos en un mapa único. Se discute cuál es la causa MÁS importante (polémica intencional — no hay respuesta única).",
+          "activity": "Reflexión: ¿puede haber consecuencias imprevistas? Ejemplo: la Independencia causó el colapso económico por 30 años, lo opuesto a lo que los insurgentes esperaban. ¿Qué dice esto sobre la capacidad de planear el futuro en la historia?"
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La causalidad histórica es uno de los conceptos más complejos del pensamiento histórico. A diferencia de la causalidad mecánica de la física (A→B), la causalidad histórica es multicausal, multinivel y produce consecuencias no lineales. El análisis de la Independencia de México ilustra perfectamente estos principios.",
+      "sections": [
+        {
+          "subtitle": "Niveles de causalidad histórica",
+          "content": "Causas estructurales: condiciones de largo plazo que crean las condiciones para el cambio (desigualdad social, sistema colonial, ideas ilustradas que circulan por décadas). Causas coyunturales: factores de mediano plazo que aceleran el proceso (crisis agrícola, invasión napoleónica). Causas inmediatas o detonadoras: el evento específico que 'dispara' el proceso (descubrimiento de la conspiración). Sin las causas estructurales, la causa detonadora no habría tenido el efecto que tuvo. El concepto de 'condición necesaria pero no suficiente' es clave."
+        },
+        {
+          "subtitle": "Consecuencias: intencionales e imprevistas",
+          "content": "Las consecuencias de un proceso histórico rara vez son las que sus actores esperaban. Los insurgentes buscaban independencia de España pero también igualdad social — la Independencia de 1821 eliminó lo primero (formalmente) pero no lo segundo. Las consecuencias pueden clasificarse: por temporalidad (inmediata/mediana/larga), por alcance (local/regional/global), por tipo (económicas/políticas/culturales/demográficas), por intencionalidad (previstas/imprevistas)."
+        },
+        {
+          "subtitle": "Multicausalidad y pensamiento crítico",
+          "content": "Reconocer la multicausalidad es un antídoto contra el determinismo histórico ('la historia tenía que ocurrir así') y contra las explicaciones simplistas ('la culpa fue de.../ la razón fue solo...'). Los historiadores mexicanos del Colegio de México (COLMEX) y del INAH han producido investigaciones multicausales sobre la Independencia: Enrique Krauze, Eric Van Young, Brian Hamnett. El pensamiento multicausal se conecta con el pensamiento científico: ningún fenómeno tiene una sola causa."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál de las siguientes es una CAUSA ESTRUCTURAL de la Independencia de México?",
+          "options": [
+            "La desigualdad social del sistema de castas novohispano",
+            "El Grito de Dolores del 16 de septiembre de 1810",
+            "El descubrimiento de la conspiración de Querétaro",
+            "La derrota de Napoleón en Waterloo en 1815"
+          ],
+          "correct": "La desigualdad social del sistema de castas novohispano"
+        },
+        {
+          "question": "La multicausalidad histórica implica que:",
+          "options": [
+            "Los procesos históricos tienen múltiples causas interrelacionadas de diferente tipo y temporalidad",
+            "Solo existen causas económicas en la historia",
+            "La historia siempre tiene una sola causa principal",
+            "Las consecuencias siempre son las que los actores esperaban"
+          ],
+          "correct": "Los procesos históricos tienen múltiples causas interrelacionadas de diferente tipo y temporalidad"
+        },
+        {
+          "question": "Una consecuencia IMPREVISTA de la Independencia de México fue:",
+          "options": [
+            "La profunda inestabilidad económica y política de las primeras décadas",
+            "La independencia del dominio español",
+            "La eliminación formal del sistema de castas",
+            "La firma del Tratado de Córdoba en 1821"
+          ],
+          "correct": "La profunda inestabilidad económica y política de las primeras décadas"
+        }
+      ],
+      "rubric": "4: Construye diagrama causal completo con causas en tres niveles temporales y consecuencias clasificadas, argumenta la multicausalidad. 3: Diagrama con dos niveles de causas y algunas consecuencias clasificadas. 2: Lista causas pero no las distingue por tipo o temporalidad. 1: Identifica solo la causa detonadora o no distingue causa de consecuencia."
+    },
+    "teacher_tips": [
+      "El diagrama de espina de pez (Ishikawa) es una herramienta visual poderosa — hacerlo físicamente en papel grande.",
+      "La polémica sobre cuál es la causa más importante es intencionalmente irresuelta — el objetivo es que los estudiantes argumenten con evidencia.",
+      "Conectar con CNEYT: la multicausalidad también opera en fenómenos naturales (causas de un incendio forestal, de una epidemia).",
+      "Para fuente primaria: el AGN (Archivo General de la Nación) tiene documentos del proceso independentista digitalizados en gob.mx/agn."
+    ]
   },
   "CH-I-P04": {
     "code": "CH-I-P04",
     "title": "Identifica y evalúa fuentes históricas primarias y secundarias como evidencias del pasado.",
-    "level": "Conciencia Histórica I",
+    "level": "Ciencias Históricas I",
     "duration": "~3h (2 sesiones de 50 min)",
-    "difficulty": "Intermedio",
-    "category": "Fuentes históricas",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "difficulty": "Intermedio-Avanzado",
+    "category": "Métodos de la investigación histórica",
+    "metadata": {
+      "objective": "Distinguir fuentes históricas primarias de secundarias; analizar críticamente una fuente histórica considerando su origen, contexto, propósito y limitaciones; y valorar los repositorios digitales mexicanos como herramientas de investigación histórica.",
+      "competencies": [
+        "Clasifica documentos como fuentes primarias o secundarias con justificación.",
+        "Aplica el análisis crítico de fuentes: autor, fecha, contexto, propósito, destinatario, limitaciones.",
+        "Identifica el punto de vista (perspectiva) del autor y su efecto sobre el contenido.",
+        "Usa repositorios digitales mexicanos para acceder a fuentes primarias: AGN, INAH Mediateca, BNM."
+      ],
+      "materials": [
+        "Fuente primaria 1: fragmento de la Segunda Carta de Relación de Hernán Cortés (1520).",
+        "Fuente primaria 2: fragmento del Códice Florentino (Fray Bernardino de Sahagún, siglo XVI) — perspectiva indígena sobre la Conquista.",
+        "Fuente secundaria: fragmento de 'La Conquista de México' de Hugh Thomas (1993).",
+        "Ficha de análisis de fuente histórica (guía estructurada de preguntas).",
+        "Guía de repositorios: AGN (gob.mx/agn), Mediateca INAH, Biblioteca Nacional de México (BNM-UNAM)."
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {
+          "phase": "Apertura",
+          "duration": "10 min",
+          "label": "¿Quién escribió la historia de la Conquista?"
+        },
+        {
+          "phase": "Desarrollo",
+          "duration": "30 min",
+          "label": "Análisis crítico de fuentes primarias y secundarias"
+        },
+        {
+          "phase": "Cierre",
+          "duration": "10 min",
+          "label": "Evaluación: ¿a quién le creemos?"
+        }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Se presentan dos descripciones del mismo evento (la matanza del Templo Mayor, 1520): una de Bernal Díaz del Castillo (soldado español, testigo presencial) y una del Códice Florentino (informantes indígenas entrevistados por Sahagún 50 años después). Las descripciones difieren significativamente. Pregunta: ¿cuál fuente es más 'verdadera'?",
+          "activity": "Los estudiantes leen ambos fragmentos brevemente y listan: ¿quién escribió cada texto? ¿cuándo? ¿para quién? ¿cuál es el propósito? Observan que 'verdad' no es una sola."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "FUENTE PRIMARIA: documento, objeto o testimonio producido durante el período histórico estudiado o por un testigo directo. Tipos: documentos escritos (actas, cartas, decretos), objetos materiales (monedas, cerámica, armas), fuentes orales (testimonios grabados), iconografía (pinturas, códices), estadísticas históricas (censos, registros). FUENTE SECUNDARIA: interpretación o análisis de fuentes primarias, producida después del período. Tipos: libros de historia, artículos académicos, documentales. No es 'inferior' — su fortaleza es la perspectiva y el análisis crítico. ANÁLISIS CRÍTICO de una fuente: (1) Origen: ¿quién produjo la fuente, cuándo y dónde? (2) Propósito: ¿para qué se produjo? ¿a quién iba dirigida? (3) Contenido: ¿qué dice? ¿qué omite? (4) Contexto: ¿qué estaba pasando en ese momento? (5) Limitaciones: ¿qué no puede decirnos esta fuente? ¿qué sesgos tiene? Repositorios digitales mexicanos: AGN (actas coloniales, revolucionarias, presidenciales), Mediateca INAH (fotografías, documentos, objetos), BNM-UNAM (libros raros, mapas históricos, hemeroteca).",
+          "activity": "En parejas: cada una recibe el mismo evento histórico descrito en una fuente primaria y una secundaria. Completan la ficha de análisis para ambas. Comparten: ¿qué puede decirte la fuente primaria que la secundaria no puede? ¿Y al revés?"
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Evaluación colectiva: ¿es posible escribir historia objetiva? Posiciones: (A) Las fuentes primarias son más objetivas por ser contemporáneas al evento. (B) Las fuentes secundarias son más objetivas por tener distancia crítica. (C) Ninguna fuente es completamente objetiva — el historiador debe triangular múltiples fuentes.",
+          "activity": "Ejercicio de repositorios: los estudiantes buscan en la Mediateca INAH o en el AGN digital una fuente primaria sobre un evento del siglo XIX mexicano y la describen usando la ficha. Tarea extensión: traer una fuente encontrada en repositorios digitales."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "El trabajo con fuentes es el núcleo del método histórico. 'Sin documentos no hay historia' (Langlois y Seignobos, 1898). Pero los documentos no hablan solos: el historiador los interroga críticamente. México cuenta con repositorios digitales de primer nivel — AGN, INAH, BNM-UNAM — que hacen accesible el archivo histórico nacional a cualquier ciudadano con internet.",
+      "sections": [
+        {
+          "subtitle": "Clasificación y tipos de fuentes históricas",
+          "content": "Fuentes primarias: directas al período estudiado. Pueden ser escritas (cartas, leyes, diarios, censos), materiales (objetos, monedas, edificios), orales (testimonios, canciones, tradición), icónicas (pinturas, fotografías, mapas, códices mesoamericanos). Fuentes secundarias: producidas con distancia temporal, analizan y contextualizan las primarias. En México: obras del COLMEX, UNAM, INAH. Fuentes terciarias: enciclopedias, manuales, que sintetizan secundarias. Wikipedia NO es fuente académica pero puede ser punto de partida."
+        },
+        {
+          "subtitle": "El método heurístico-crítico: interrogar las fuentes",
+          "content": "Heurística: búsqueda y localización de las fuentes relevantes. Crítica externa: ¿es auténtico el documento? ¿Ha sido alterado? Crítica interna: ¿qué dice el documento? ¿Qué no dice? ¿Cuál es el punto de vista del autor? ¿Qué intereses tiene? ¿Con qué otras fuentes podemos verificar/contrastar? Sesgos frecuentes: sesgo de supervivencia (solo sobrevivieron los documentos de los vencedores), sesgo de perspectiva (quien escribe tiene una posición social, étnica, de género que influye en lo que escribe), sesgo de selección (el historiador elige qué fuentes consultar)."
+        },
+        {
+          "subtitle": "Repositorios digitales mexicanos para investigación histórica",
+          "content": "AGN (Archivo General de la Nación — gob.mx/agn): 40 millones de documentos desde el siglo XVI, en proceso de digitalización. Incluye Inquisición, Bienes Nacionales, Gobernación, entre otros. Mediateca INAH (mediateca.inah.gob.mx): fotografías históricas, videos de patrimonio, documentos de zonas arqueológicas. BNM-UNAM (bnm.unam.mx): libros raros, mapas, hemeroteca digital (periódicos del siglo XIX-XX). Hemeroteca Nacional Digital de México (HNDM): periódicos desde 1722 hasta el presente. Estas herramientas democratizan el acceso a la investigación histórica."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál de los siguientes es un ejemplo de FUENTE PRIMARIA para estudiar la Revolución Mexicana?",
+          "options": [
+            "Un telegrama del general Emiliano Zapata a Venustiano Carranza, 1914",
+            "Un libro publicado en 1990 sobre la Revolución Mexicana",
+            "Un documental de Netflix sobre la Revolución",
+            "Un artículo de Wikipedia sobre Emiliano Zapata"
+          ],
+          "correct": "Un telegrama del general Emiliano Zapata a Venustiano Carranza, 1914"
+        },
+        {
+          "question": "Al analizar críticamente una fuente histórica, ¿qué debemos considerar PRIMERO?",
+          "options": [
+            "Origen: quién la produjo, cuándo y con qué propósito",
+            "Si está en Internet y tiene muchas vistas",
+            "Si corrobora lo que ya sabemos",
+            "Si fue escrita en español o en otra lengua"
+          ],
+          "correct": "Origen: quién la produjo, cuándo y con qué propósito"
+        },
+        {
+          "question": "El AGN (Archivo General de la Nación) es un recurso valioso porque:",
+          "options": [
+            "Contiene millones de documentos históricos primarios de México desde el siglo XVI",
+            "Es el único lugar donde están los libros de historia de México",
+            "Publica los libros de texto gratuitos de la SEP",
+            "Almacena los datos del INEGI sobre población"
+          ],
+          "correct": "Contiene millones de documentos históricos primarios de México desde el siglo XVI"
+        }
+      ],
+      "rubric": "4: Clasifica correctamente fuentes primarias y secundarias, aplica el análisis crítico completo (origen/propósito/contexto/limitaciones) y accede a repositorios digitales. 3: Clasifica y analiza con errores menores en propósito o limitaciones. 2: Distingue primaria de secundaria pero no realiza análisis crítico. 1: Confunde tipos de fuentes o no comprende la utilidad del análisis crítico."
+    },
+    "teacher_tips": [
+      "La actividad de búsqueda en el AGN digital o Mediateca INAH puede hacerse en el aula con celulares si hay WiFi.",
+      "Los códices mesoamericanos (disponibles en la Mediateca INAH) son fuentes primarias fascinantes — no limitarse a documentos escritos.",
+      "La discusión sobre objetividad histórica es crucial para el pensamiento crítico — no hay respuesta única y está bien explicitarlo.",
+      "Conectar con LC (Lengua y Comunicación): el análisis crítico de fuentes se aplica también a textos periodísticos y digitales actuales."
+    ]
   }
 }
