@@ -49,28 +49,25 @@ function isTodo(val?: string | null) {
 
 function buildTheme(dark: boolean) {
   return {
+    // ── LEFT PANEL — siempre oscuro, continúa visualmente con el sidebar ──
     rootBg:        dark ? '#011C40'  : '#F4F1EA',
     rootColor:     dark ? '#F4F1EA'  : '#0B2545',
-    leftBg:        dark ? '#0B2545'  : '#FFFFFF',
-    leftShadow:    dark ? 'shadow-[16px_0_48px_rgba(0,0,0,0.4)]'  : 'shadow-[16px_0_48px_rgba(11,37,69,0.07)]',
-    iconBg:        dark ? 'bg-white/10'           : 'bg-[#0B2545]',
-    labelPrimary:  dark ? 'text-white'            : 'text-[#0B2545]',
-    labelMuted:    dark ? 'text-white/40'         : 'text-slate-400',
-    labelSubtle:   dark ? 'text-white/25'         : 'text-[#0B2545]/45',
-    sectionBorder: dark ? 'border-white/[0.06]'   : 'border-[#0B2545]/[0.05]',
-    inputBg:       dark ? 'bg-white/10'           : 'bg-white/90',
-    inputBorder:   dark ? 'border-white/10'       : 'border-white',
-    inputText:     dark ? 'text-white'            : 'text-[#0B2545]',
-    inputPH:       dark ? 'placeholder-white/30'  : 'placeholder-slate-400',
-    inputFocus:    dark ? 'focus:ring-white/20 focus:border-white/30' : 'focus:ring-[#D4A574]/30 focus:border-[#D4A574]/40',
-    progressTrack: dark ? 'bg-white/10'           : 'bg-[#0B2545]/8',
-    activeItem:    dark
-      ? 'bg-[#D4A574] text-white shadow-[0_0_28px_rgba(212,165,116,0.45),0_16px_32px_rgba(212,165,116,0.25)] scale-[1.02] -translate-y-px'
-      : 'bg-[#0B2545] text-white shadow-[0_16px_32px_rgba(11,37,69,0.20)] scale-[1.02] -translate-y-px',
-    inactiveItem:  dark
-      ? 'bg-white/5 text-white hover:bg-white/10 hover:shadow-md hover:scale-[1.01]'
-      : 'bg-white text-[#0B2545] hover:bg-[#FFF8F0] hover:shadow-md hover:scale-[1.01]',
-    activeCode:    dark ? 'text-white/60'         : 'text-[#7DD3FC]',
+    leftBg:        '#0B2545',
+    leftShadow:    'shadow-[16px_0_48px_rgba(0,0,0,0.4)]',
+    iconBg:        'bg-white/10',
+    labelPrimary:  'text-white',
+    labelMuted:    'text-white/40',
+    labelSubtle:   'text-white/25',
+    sectionBorder: 'border-white/[0.06]',
+    inputBg:       'bg-white/10',
+    inputBorder:   'border-white/10',
+    inputText:     'text-white',
+    inputPH:       'placeholder-white/30',
+    inputFocus:    'focus:ring-white/20 focus:border-white/30',
+    progressTrack: 'bg-white/10',
+    activeItem:    'bg-[#D4A574] text-white shadow-[0_0_28px_rgba(212,165,116,0.45),0_16px_32px_rgba(212,165,116,0.25)] scale-[1.02] -translate-y-px',
+    inactiveItem:  'bg-white/5 text-white hover:bg-white/10 hover:shadow-md hover:scale-[1.01]',
+    activeCode:    'text-white/60',
     stickyBg:      dark ? 'bg-[#011C40]/90'       : 'bg-[#F4F1EA]/85',
     stickyBorder:  dark ? 'border-white/10'       : 'border-[#0B2545]/[0.06]',
     stickyLabel:   dark ? 'text-white/40'         : 'text-[#0B2545]/50',
