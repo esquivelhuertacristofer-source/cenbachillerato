@@ -6,12 +6,113 @@
     "duration": "~3h (2 sesiones de 50 min)",
     "difficulty": "Intermedio",
     "category": "Álgebra",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "metadata": {
+      "objective": "Reconocer, describir y generalizar patrones numéricos y geométricos presentes en contextos reales mexicanos, traduciendo regularidades a expresiones algebraicas y comprendiendo el álgebra como lenguaje universal de generalización.",
+      "competencies": [
+        "Pensamiento algebraico y generalización",
+        "Modelación matemática de situaciones reales",
+        "Comunicación matemática formal e informal"
+      ],
+      "materials": [
+        "Fichas con secuencias de figuras geométricas (triángulos, cuadrados, hexágonos)",
+        "Tablas de datos del INEGI sobre crecimiento poblacional por municipio",
+        "Papel cuadriculado y colores para construir patrones visuales",
+        "Calculadora básica o app Desmos"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Cuántos cuadros tiene la figura 100?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Del patrón a la fórmula" },
+        { "phase": "Cierre", "duration": "10 min", "label": "El álgebra como atajo" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — EL RETO DEL MOSAICO",
+          "duration": "10 min",
+          "description": "En los mercados tradicionales mexicanos, los artesanos de Talavera de Puebla crean mosaicos siguiendo patrones geométricos precisos transmitidos de generación en generación. Un artesano coloca azulejos siguiendo esta regla: en la figura 1 usa 5 azulejos, en la figura 2 usa 9, en la figura 3 usa 13. ¿Cuántos necesitará para la figura 50? El reto abre la necesidad de una herramienta más potente que contar uno por uno.",
+          "activity": "Plantear el problema del mosaico en el pizarrón. Los alumnos trabajan en parejas intentando encontrar la respuesta sin álgebra (contando, haciendo tabla). Después de 3 minutos, se discute: ¿qué tan difícil sería calcular la figura 1000? Esto genera la motivación para el álgebra."
+        },
+        {
+          "title": "FASE II: DESARROLLO — DEL PATRÓN A LA EXPRESIÓN",
+          "duration": "30 min",
+          "description": "Tres momentos de construcción: (1) Patrón numérico: analizar secuencias como 3, 7, 11, 15... identificando la diferencia constante (+4) y expresando el término n como 4n - 1. (2) Patrón geométrico: construir con cuadros de papel una secuencia de 'cruces griegas' y contar cuadros por posición, luego generalizar. (3) Conexión con contexto real: con datos del INEGI de crecimiento de una ciudad (p. ej. Querétaro: 2010=800,000 hab, 2015=900,000, 2020=1,000,000), ¿se puede modelar el crecimiento con una expresión algebraica? ¿Qué limitaciones tiene el modelo lineal?",
+          "activity": "Actividad en equipos: cada equipo recibe una secuencia diferente (numérica o geométrica). Deben: (a) completar la tabla de valores, (b) identificar la regla de formación, (c) escribir la expresión algebraica para el término n, (d) calcular el término 50 y 100. Presentación de 2 minutos por equipo."
+        },
+        {
+          "title": "FASE III: CIERRE — ÁLGEBRA COMO LENGUAJE",
+          "duration": "10 min",
+          "description": "El álgebra no es un conjunto de reglas arbitrarias: es el lenguaje que los matemáticos inventaron para hablar de 'cualquier número' o 'cualquier situación'. Sotero Prieto, el gran matemático mexicano del siglo XX, usó el álgebra como herramienta para modelar fenómenos físicos y estableció las bases de la matemática moderna en México desde la UNAM. Cuando escribes 4n - 1, estás usando el mismo lenguaje que los científicos usan para describir el universo.",
+          "activity": "Cada alumno escribe en su cuaderno: (1) La expresión algebraica que generó su equipo, (2) Qué representa cada letra, (3) Un ejemplo de su vida cotidiana donde podría haber un patrón generalizable. Socialización voluntaria."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Un patrón es una regularidad que se repite siguiendo una regla. Reconocer patrones es una de las habilidades cognitivas más fundamentales del ser humano: la arquitectura prehispánica mexicana, los textiles oaxaqueños, los ciclos agrícolas y hasta los datos del INEGI contienen patrones matemáticos. El álgebra surge precisamente de la necesidad de expresar estas regularidades de forma general y compacta, sin tener que enumerar caso por caso. Pasar de 'el siguiente número es 4 más que el anterior' a escribir 'a_n = 4n + k' es el salto conceptual central del pensamiento algebraico.",
+      "sections": [
+        {
+          "subtitle": "Patrones numéricos: progresiones aritméticas y su generalización",
+          "content": "Una sucesión numérica es una lista ordenada de números donde cada elemento se obtiene aplicando una regla. Las progresiones aritméticas son el tipo más común: tienen una diferencia constante entre términos consecutivos (llamada razón o diferencia común, d). Por ejemplo: 5, 8, 11, 14... tiene d = 3. La expresión general del término n-ésimo es a_n = a_1 + (n-1)d, donde a_1 es el primer término. Esta fórmula permite calcular cualquier término sin tener que construir toda la secuencia. En México, el INEGI usa modelos aritméticos lineales como primera aproximación para proyecciones demográficas de municipios pequeños con crecimiento estable, antes de pasar a modelos exponenciales más complejos."
+        },
+        {
+          "subtitle": "Patrones geométricos y su conexión algebraica",
+          "content": "Los patrones geométricos son secuencias de figuras que crecen siguiendo una regla visual. Para analizarlos algebraicamente, se construye una tabla que relaciona el número de figura (n) con el número de elementos (puntos, segmentos, cuadros). Por ejemplo, una secuencia de 'L' formadas con cuadros: figura 1 tiene 3 cuadros, figura 2 tiene 5, figura 3 tiene 7. La diferencia constante es 2, y la expresión general es 2n + 1. Este tipo de razonamiento está en la base del diseño de los mosaicos Talavera de Puebla y los bordados mazatecas de Oaxaca, donde los artesanos calculan mentalmente cuántos elementos necesitan para una figura de tamaño n sin construirla previamente. La habilidad de ver la expresión algebraica 'dentro' de la figura geométrica es una competencia central del pensamiento matemático avanzado."
+        },
+        {
+          "subtitle": "Variables, constantes y expresiones algebraicas",
+          "content": "Una expresión algebraica combina números (constantes) y letras (variables) mediante operaciones. La variable no es 'una x misteriosa': representa una cantidad que puede cambiar, como el número de figura, el número de días, o el número de personas. Cuando escribimos 2n + 1, la letra n es una variable que puede tomar cualquier valor natural, y la expresión completa da el número de cuadros para la figura n. Reconocer qué varía y qué permanece constante en una situación es el primer paso del pensamiento algebraico. El matemático mexicano Carlos Imaz Jahnke, investigador del Instituto de Investigaciones en Matemáticas Aplicadas y en Sistemas (IIMAS-UNAM), ha enfatizado la importancia de desarrollar este pensamiento variable-constante desde el bachillerato como base para la modelación computacional."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Una artesana de Tonalá, Jalisco, elabora collares siguiendo un patrón: el collar 1 lleva 4 cuentas, el collar 2 lleva 7, el collar 3 lleva 10. ¿Cuántas cuentas lleva el collar número 15?",
+          "options": ["40 cuentas", "46 cuentas", "43 cuentas", "49 cuentas"],
+          "correct": "46 cuentas"
+        },
+        {
+          "question": "En la secuencia 5, 9, 13, 17, 21... ¿cuál es la expresión algebraica que representa el término n?",
+          "options": ["4n + 1", "n + 4", "4n - 1", "5n - 4"],
+          "correct": "4n + 1"
+        },
+        {
+          "question": "¿Qué representa la variable en la expresión algebraica de un patrón geométrico como 3n + 2?",
+          "options": [
+            "Un número desconocido que nunca podemos saber",
+            "El número de figura o posición en la secuencia",
+            "La diferencia entre dos figuras consecutivas",
+            "El primer elemento de la secuencia"
+          ],
+          "correct": "El número de figura o posición en la secuencia"
+        },
+        {
+          "question": "Una progresión aritmética tiene primer término a_1 = 6 y diferencia común d = 5. ¿Cuánto vale el término a_20?",
+          "options": ["101", "96", "106", "100"],
+          "correct": "101"
+        },
+        {
+          "question": "¿Por qué el álgebra es más poderosa que simplemente contar para trabajar con patrones?",
+          "options": [
+            "Porque el álgebra siempre da resultados exactos y contar no",
+            "Porque permite calcular cualquier término sin construir toda la secuencia",
+            "Porque el álgebra solo funciona con números grandes",
+            "Porque contar es incorrecto matemáticamente"
+          ],
+          "correct": "Porque permite calcular cualquier término sin construir toda la secuencia"
+        }
+      ],
+      "rubric": "CRITERIO 1 — Identificación del patrón: Inicial: No identifica la regla de formación. En desarrollo: Identifica la diferencia pero no la generaliza. Consolidado: Escribe la expresión general correctamente. Destacado: Explica la expresión en términos del contexto real y verifica con ejemplos.\n\nCRITERIO 2 — Uso de la variable: Inicial: Confunde variable con número específico. En desarrollo: Usa la variable pero sin comprender su significado. Consolidado: Define claramente qué representa la variable. Destacado: Analiza cómo cambia la expresión si cambia el primer término o la razón.\n\nCRITERIO 3 — Cálculo de términos específicos: Inicial: No puede calcular términos más allá de los dados. En desarrollo: Calcula correctamente términos cercanos pero falla en n grande. Consolidado: Usa la expresión general correctamente para cualquier n. Destacado: Anticipa el valor de n para un término dado (problema inverso).\n\nCRITERIO 4 — Conexión con contexto real: Inicial: No relaciona el patrón con ninguna situación real. En desarrollo: Menciona un contexto pero sin desarrollar la conexión. Consolidado: Relaciona patrón y contexto de forma coherente. Destacado: Propone un ejemplo original de patrón en su entorno cotidiano y lo generaliza."
+    },
+    "teacher_tips": [
+      "Error más común: los alumnos confunden el índice n con el valor del término. Por ejemplo, en 4n + 1, piensan que cuando n = 3 el término es 3, no 13. Insistir en que n es la POSICIÓN y la expresión da el VALOR en esa posición.",
+      "Error frecuente: buscar el patrón como 'suma del término anterior' (recursivo) en lugar de una fórmula directa (explícita). Hacer ejercicios donde se pide 'sin calcular los anteriores, dime el término 50' para forzar la fórmula explícita.",
+      "Estrategia de andamiaje: empezar siempre con la tabla de valores antes de la expresión algebraica. Columna n | columna valor | columna 'qué hago con n para obtener el valor'. Esta estructura reduce la carga cognitiva.",
+      "Pregunta socrática: '¿Qué cambiaría en tu expresión si la secuencia empezara en 0 en lugar de 1?' — Esta pregunta desarrolla la comprensión profunda del papel del primer término.",
+      "Conexión cotidiana: los precios de tarifas de servicios (agua, luz CFE, internet Telmex) siguen a veces un patrón: cargo fijo + cargo variable por consumo. Eso es exactamente 'constante + coeficiente × variable'. Usar la última factura del hogar como material didáctico."
+    ]
   },
+
   "PM-II-P02": {
     "code": "PM-II-P02",
     "title": "Interpreta y manipula expresiones algebraicas: monomios, polinomios, operaciones entre ellos.",
@@ -19,12 +120,104 @@
     "duration": "~3h (2 sesiones de 50 min)",
     "difficulty": "Intermedio",
     "category": "Álgebra",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "metadata": {
+      "objective": "Identificar, clasificar y operar con monomios y polinomios, comprendiendo el significado de cada término en contextos de modelación matemática y desarrollando fluidez en la manipulación simbólica algebraica.",
+      "competencies": [
+        "Manipulación simbólica algebraica",
+        "Modelación matemática con polinomios",
+        "Pensamiento abstracto y formalización"
+      ],
+      "materials": [
+        "Fichas manipulables de álgebra (cuadrado = x², rectángulo = x, cuadrito = 1)",
+        "Situaciones de área y perímetro con medidas variables",
+        "Hoja de trabajo con expresiones para clasificar y operar",
+        "Software Geogebra (opcional) para visualizar polinomios como áreas"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Cuánto mide la parcela?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Monomios, binomios, polinomios" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Suma y resta de expresiones" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — EL CAMPO VARIABLE",
+          "duration": "10 min",
+          "description": "Un ejidatario de Oaxaca tiene un campo rectangular cuyo largo es 'x metros' (variable porque puede medirlo con precisión después) y cuyo ancho es 5 metros. Su hijo quiere ampliar el campo agregando un cuadrado de lado x junto al rectángulo. ¿Cómo expresamos el área total? Este contexto real introduce la necesidad de sumar expresiones con diferentes tipos de términos (x² y 5x) que NO se pueden simplificar entre sí.",
+          "activity": "Dibujar en el pizarrón el campo del ejidatario. Los alumnos calculan el área de cada parte (x·x = x², 5·x = 5x) y luego intentan 'simplificar' x² + 5x. Discutir por qué NO se puede: metro cuadrado y metro son unidades diferentes, igual que x² y x son potencias diferentes."
+        },
+        {
+          "title": "FASE II: DESARROLLO — VOCABULARIO Y OPERACIONES",
+          "duration": "30 min",
+          "description": "Tres bloques: (1) Clasificación: monomio (un solo término: 3x²), binomio (dos términos: 2x + 5), trinomio (tres: x² - 3x + 1), polinomio general. Grado del polinomio = exponente mayor. Coeficiente y parte literal. (2) Suma y resta de polinomios: solo se suman TÉRMINOS SEMEJANTES (misma parte literal y mismo exponente). Analogía: no puedo sumar manzanas con naranjas, solo manzanas con manzanas. (3) Multiplicación de monomio × polinomio: distribuir el monomio a cada término (propiedad distributiva). Ejemplos con contextos de área.",
+          "activity": "Estaciones de trabajo: Estación 1 — Clasificar 10 expresiones en tarjetas (monomio, binomio, trinomio, identifica grado). Estación 2 — Suma y resta de 5 pares de polinomios. Estación 3 — Multiplicar monomio × polinomio en contextos geométricos. Rotación cada 8 minutos."
+        },
+        {
+          "title": "FASE III: CIERRE — SISTEMATIZACIÓN",
+          "duration": "10 min",
+          "description": "La manipulación algebraica es el 'cálculo mental' de las matemáticas avanzadas: igual que necesitamos fluidez en la multiplicación básica para trabajar con fracciones, necesitamos fluidez con polinomios para trabajar con funciones, ecuaciones complejas y modelos matemáticos. El matemático mexicano Manuel López de Haro ha señalado que muchos estudiantes que fracasan en cálculo lo hacen por debilidad en álgebra básica, no por dificultad con los conceptos de límite.",
+          "activity": "Los alumnos completan un organizador gráfico en su cuaderno con: definición de monomio/polinomio, regla de términos semejantes, regla de suma/resta, y un ejemplo propio de cada uno. Se revisa con el compañero de al lado."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Un monomio es la unidad básica del álgebra: el producto de un número (coeficiente) por una o más variables elevadas a potencias no negativas. Los polinomios son sumas de monomios y constituyen las expresiones algebraicas más comunes en matemáticas y ciencias. Aprender a operar con ellos es como aprender el alfabeto antes de escribir: es la infraestructura sobre la que se construye todo el álgebra de bachillerato, el cálculo diferencial e integral, y la estadística. Históricamente, los polinomios fueron la primera familia de funciones que los matemáticos supieron manejar completamente, y siguen siendo las funciones más usadas en aproximación numérica (polinomios de Taylor, interpolación de Lagrange).",
+      "sections": [
+        {
+          "subtitle": "Anatomía de un monomio: coeficiente, variable y grado",
+          "content": "Un monomio tiene tres partes: el coeficiente (número que multiplica), la parte literal (variable o variables), y el grado (suma de los exponentes de las variables). En 7x³y², el coeficiente es 7, la parte literal es x³y², y el grado es 3 + 2 = 5. Dos monomios son semejantes si tienen exactamente la misma parte literal (mismo exponente en cada variable). Solo los monomios semejantes se pueden sumar o restar: 3x² + 5x² = 8x², pero 3x² + 5x NO se simplifica más. Esta regla tiene una explicación dimensional: sumar x² (área) con x (longitud) es como sumar metros cuadrados con metros — no tiene sentido físico."
+        },
+        {
+          "subtitle": "Operaciones con polinomios: suma, resta y multiplicación por monomio",
+          "content": "La suma y resta de polinomios se realiza agrupando y operando los términos semejantes: (3x² + 2x - 1) + (x² - 5x + 4) = (3+1)x² + (2-5)x + (-1+4) = 4x² - 3x + 3. La resta requiere especial cuidado con los signos: restar un polinomio equivale a multiplicar cada término por -1. La multiplicación de un monomio por un polinomio aplica la propiedad distributiva: 2x(3x² - x + 5) = 6x³ - 2x² + 10x. En México, el Instituto Mexicano del Petróleo (IMP) usa polinomios en modelos de producción petrolera; el Banco de México (Banxico) usa polinomios para aproximar funciones de demanda en análisis económicos a corto plazo."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál de las siguientes es la suma correcta de (2x² + 3x - 1) + (x² - x + 4)?",
+          "options": ["3x² + 2x + 3", "3x⁴ + 2x² + 3", "2x⁴ + 3x² + 3", "3x² + 4x + 3"],
+          "correct": "3x² + 2x + 3"
+        },
+        {
+          "question": "En la expresión 5x³y², ¿cuál es el grado del monomio?",
+          "options": ["3", "2", "5", "6"],
+          "correct": "5"
+        },
+        {
+          "question": "¿Por qué NO se puede simplificar 4x² + 3x a una sola expresión?",
+          "options": [
+            "Porque los coeficientes son diferentes",
+            "Porque los términos no son semejantes (diferente parte literal)",
+            "Porque x² siempre es mayor que x",
+            "Porque solo se pueden sumar términos con el mismo coeficiente"
+          ],
+          "correct": "Porque los términos no son semejantes (diferente parte literal)"
+        },
+        {
+          "question": "¿Cuál es el resultado de 3x(2x² - 4x + 1)?",
+          "options": ["6x³ - 12x² + 3x", "5x³ - 7x² + 4x", "6x² - 12x + 3x", "6x³ - 4x + 1"],
+          "correct": "6x³ - 12x² + 3x"
+        },
+        {
+          "question": "Un lote rectangular tiene base (x + 3) metros y altura (2x - 1) metros. ¿Cuál es la expresión del perímetro?",
+          "options": ["6x + 4 metros", "2x² + 5x - 3 metros", "3x + 2 metros", "6x + 4 metros"],
+          "correct": "6x + 4 metros"
+        }
+      ],
+      "rubric": "CRITERIO 1 — Identificación y clasificación: Inicial: No distingue entre monomio y polinomio. En desarrollo: Clasifica correctamente pero no identifica el grado. Consolidado: Clasifica e identifica coeficiente, parte literal y grado correctamente. Destacado: Explica la clasificación con argumentos matemáticos propios.\n\nCRITERIO 2 — Operaciones con términos semejantes: Inicial: Suma todos los términos independientemente de su tipo. En desarrollo: Identifica términos semejantes pero comete errores de signo. Consolidado: Opera correctamente con suma y resta de polinomios. Destacado: Verifica sus resultados sustituyendo valores específicos.\n\nCRITERIO 3 — Propiedad distributiva: Inicial: No aplica la distributiva correctamente. En desarrollo: Distribuye el monomio pero olvida algún término. Consolidado: Aplica la distributiva correctamente en todos los términos. Destacado: Usa la distributiva en contextos geométricos y verifica numéricamente.\n\nCRITERIO 4 — Contextualización: Inicial: No relaciona las expresiones con situaciones reales. En desarrollo: Identifica la situación pero no construye la expresión. Consolidado: Construye y opera expresiones desde una situación real. Destacado: Propone e interpreta expresiones polinomiales en contextos propios."
+    },
+    "teacher_tips": [
+      "Error universal: al restar polinomios, los alumnos olvidan distribuir el signo negativo a TODOS los términos del segundo polinomio. Ejemplo clásico: (3x² + 2) - (x² - 5) = 3x² + 2 - x² + 5 (el - convierte -5 en +5). Hacer la distribución del negativo paso a paso, explícitamente, hasta que sea automático.",
+      "Error frecuente: sumar los exponentes al sumar términos semejantes. 3x² + 5x² = 8x⁴ (INCORRECTO). Recordar que al SUMAR no cambia la variable, solo el coeficiente. Al MULTIPLICAR sí se suman exponentes.",
+      "Estrategia de andamiaje: las fichas manipulables de álgebra (cuadrado grande = x², rectángulo = x, cuadrito = 1) permiten hacer operaciones físicamente antes de la notación simbólica. Muy útil para alumnos con dificultades de abstracción.",
+      "Pregunta socrática: '¿Puedes encontrar dos valores de x para los cuales (2x² + 3x) y (5x²) dan el mismo resultado?' — Esto conecta la manipulación simbólica con la evaluación numérica.",
+      "Conexión real: pedir a los alumnos que consulten el precio de electricidad CFE (costo fijo + costo por kWh) y lo expresen como monomio + término constante. Luego sumar dos 'facturas' algebraicamente."
+    ]
   },
+
   "PM-II-P03": {
     "code": "PM-II-P03",
     "title": "Factoriza polinomios mediante técnicas básicas: factor común, diferencia de cuadrados, trinomio cuadrado perfecto.",
@@ -32,12 +225,108 @@
     "duration": "~3h (2 sesiones de 50 min)",
     "difficulty": "Intermedio",
     "category": "Álgebra",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "metadata": {
+      "objective": "Descomponer polinomios en sus factores mediante las técnicas de factor común máximo, diferencia de cuadrados y trinomio cuadrado perfecto, relacionando la factorización con la simplificación y la resolución de ecuaciones.",
+      "competencies": [
+        "Razonamiento algebraico inverso (síntesis)",
+        "Reconocimiento de estructuras matemáticas",
+        "Pensamiento analítico y descomposición"
+      ],
+      "materials": [
+        "Fichas de álgebra geométrica para visualizar a² - b² como área",
+        "Tabla de cuadrados perfectos del 1 al 20",
+        "Ejemplos de factorización en criptografía básica (RSA simplificado)",
+        "Calculadora para verificar factorizaciones"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Cuántas formas de hacer 12?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Tres técnicas de factorización" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Factorizar para simplificar" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — DESCOMPONER ES ENTENDER",
+          "duration": "10 min",
+          "description": "¿Cuántas maneras hay de descomponer 12 como producto? (1×12, 2×6, 3×4). Factorizar polinomios es lo mismo: encontrar qué expresiones multiplicadas dan el polinomio original. ¿Para qué sirve? Si tenemos x² - 9 y queremos saber cuándo vale cero, es difícil directamente. Pero si sabemos que x² - 9 = (x+3)(x-3), inmediatamente vemos que vale cero cuando x = 3 o x = -3. La factorización revela la estructura interna de los polinomios.",
+          "activity": "Juego rápido: el docente escribe un producto como (x+4)(x+3) y los alumnos lo expanden mentalmente. Luego el docente escribe el resultado y pide que encuentren los factores. ¿Es como encontrar los 'ingredientes' de un platillo conociendo solo el resultado?"
+        },
+        {
+          "title": "FASE II: DESARROLLO — TRES TÉCNICAS",
+          "duration": "30 min",
+          "description": "Técnica 1 — Factor común máximo (FCM): identificar el mayor factor que divide a todos los términos. Ejemplo: 6x³ + 9x² - 3x = 3x(2x² + 3x - 1). Técnica 2 — Diferencia de cuadrados: a² - b² = (a+b)(a-b). Visualización geométrica: un cuadrado de lado a con un cuadrado de lado b quitado del interior = dos rectángulos. Ejemplos: x² - 25 = (x+5)(x-5), 9x² - 16 = (3x+4)(3x-4). Técnica 3 — Trinomio cuadrado perfecto: a² + 2ab + b² = (a+b)², a² - 2ab + b² = (a-b)². Reconocer la firma: el primer y último término deben ser cuadrados perfectos, y el término medio debe ser el doble del producto de sus raíces.",
+          "activity": "Práctica por técnica: 5 ejercicios de FCM → 5 de diferencia de cuadrados → 5 de trinomio cuadrado perfecto. Después: 5 ejercicios mixtos sin indicar la técnica. Los alumnos deben diagnosticar primero qué técnica aplica."
+        },
+        {
+          "title": "FASE III: CIERRE — VERIFICACIÓN Y APLICACIÓN",
+          "duration": "10 min",
+          "description": "La verificación de factorizaciones es inmediata: simplemente se expande el resultado y se compara con el original. Esta es una de las pocas áreas de matemáticas donde el alumno puede autocorregirse sin depender del docente. La factorización es la base del cálculo de raíces de ecuaciones cuadráticas y de la simplificación de fracciones algebraicas.",
+          "activity": "Los alumnos factorizan y verifican 3 expresiones: una por cada técnica. La verificación es obligatoria y se entrega al docente. Discusión final: ¿qué pasa si un polinomio no cabe en ninguna de las tres técnicas? ¿Existen polinomios 'irreducibles'?"
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Factorizar un polinomio es encontrar su descomposición como producto de polinomios de menor grado. Es la operación inversa a la multiplicación: así como 12 = 2 × 2 × 3 (factorización en números primos), x² - 4 = (x+2)(x-2) (factorización en binomios). La factorización es una herramienta fundamental en álgebra porque permite resolver ecuaciones, simplificar expresiones, y encontrar la estructura de funciones polinomiales. La criptografía moderna (que protege transacciones bancarias en México y el mundo) se basa en la dificultad de factorizar números muy grandes en sus factores primos.",
+      "sections": [
+        {
+          "subtitle": "Factor común máximo: el divisor de todos los términos",
+          "content": "El Factor Común Máximo (FCM) de un polinomio es el monomio de mayor grado y mayor coeficiente que divide exactamente a todos los términos del polinomio. Para encontrarlo: (1) Calcular el MCD de los coeficientes, (2) Para cada variable, tomar el menor exponente que aparece en todos los términos, (3) Dividir cada término por el FCM y escribir el resultado entre paréntesis. Ejemplo: 12x⁴ - 8x³ + 4x² = 4x²(3x² - 2x + 1). Verificación: 4x² × 3x² = 12x⁴ ✓, 4x² × (-2x) = -8x³ ✓, 4x² × 1 = 4x² ✓. En ingeniería civil, los planos de construcción del Metro de la Ciudad de México usan factorización implícitamente cuando se simplifica la descripción de estructuras repetitivas."
+        },
+        {
+          "subtitle": "Diferencia de cuadrados: la identidad más elegante del álgebra",
+          "content": "La identidad a² - b² = (a+b)(a-b) es válida para cualquier expresión a y b. Su demostración visual es geométrica: si tenemos un cuadrado de lado a y quitamos un cuadrado de lado b de una esquina, el área restante (a² - b²) se puede reorganizar como un rectángulo de lados (a+b) y (a-b). Esta identidad permite factorizar instantáneamente expresiones como: x² - 49 = (x+7)(x-7), 4x² - 25 = (2x+5)(2x-5), 100 - y² = (10+y)(10-y). El reconocimiento de cuadrados perfectos (1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 121, 144...) es esencial. El matemático Luis Mochán Backal, investigador del Instituto de Ciencias Físicas UNAM en Cuernavaca, usa identidades algebraicas como estas en cálculos de física teórica."
+        },
+        {
+          "subtitle": "Trinomio cuadrado perfecto: reconocer la firma",
+          "content": "Un trinomio cuadrado perfecto tiene la forma a² ± 2ab + b² y factoriza como (a ± b)². Para reconocerlo: (1) El primer término debe ser cuadrado perfecto (a²), (2) El último término debe ser cuadrado perfecto (b²), (3) El término del medio debe ser exactamente ±2ab (el doble del producto de las raíces). Ejemplos: x² + 6x + 9 = (x+3)² porque 9 = 3², 6x = 2(x)(3). x² - 10x + 25 = (x-5)² porque 25 = 5², -10x = 2(x)(-5). Error clásico: x² + 5x + 9 NO es trinomio cuadrado perfecto porque 2·x·3 = 6x ≠ 5x. La verificación siempre es posible expandiendo el resultado."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál es la factorización correcta de 15x³ - 10x² + 5x?",
+          "options": ["5x(3x² - 2x + 1)", "5(3x³ - 2x² + x)", "x(15x² - 10x + 5)", "5x²(3x - 2 + 1/x)"],
+          "correct": "5x(3x² - 2x + 1)"
+        },
+        {
+          "question": "¿Cuál expresión representa la factorización de x² - 64?",
+          "options": ["(x - 8)²", "(x + 8)(x - 8)", "(x + 32)(x - 2)", "(x + 64)(x - 1)"],
+          "correct": "(x + 8)(x - 8)"
+        },
+        {
+          "question": "¿Cuál de los siguientes trinomios es un cuadrado perfecto?",
+          "options": ["x² + 5x + 25", "x² + 6x + 9", "x² + 8x + 16x²", "x² + 3x + 4"],
+          "correct": "x² + 6x + 9"
+        },
+        {
+          "question": "¿Cuál es la factorización de 4x² - 20x + 25?",
+          "options": ["(2x - 5)²", "(4x - 5)(x - 5)", "(2x + 5)²", "(2x - 5)(2x + 5)"],
+          "correct": "(2x - 5)²"
+        },
+        {
+          "question": "¿Por qué la factorización es útil para resolver ecuaciones como x² - 9 = 0?",
+          "options": [
+            "Porque factorizar siempre produce números más pequeños",
+            "Porque al escribir (x+3)(x-3)=0 vemos directamente que x=3 o x=-3",
+            "Porque la factorización elimina las variables de la ecuación",
+            "Porque toda ecuación factorizable tiene solución entera"
+          ],
+          "correct": "Porque al escribir (x+3)(x-3)=0 vemos directamente que x=3 o x=-3"
+        }
+      ],
+      "rubric": "CRITERIO 1 — Identificación de la técnica: Inicial: No identifica qué técnica aplicar. En desarrollo: Identifica la técnica en ejemplos evidentes pero falla en casos no obvios. Consolidado: Identifica correctamente la técnica en todos los casos. Destacado: Justifica la elección de técnica con argumentos matemáticos.\n\nCRITERIO 2 — Aplicación del FCM: Inicial: No encuentra el factor común. En desarrollo: Encuentra el FCM numérico pero no el de variables. Consolidado: Aplica FCM correctamente en coeficientes y variables. Destacado: Verifica el resultado y factoriza más de una vez si es posible.\n\nCRITERIO 3 — Reconocimiento y aplicación de identidades: Inicial: No reconoce diferencia de cuadrados ni cuadrado perfecto. En desarrollo: Reconoce la estructura pero comete errores en la escritura del resultado. Consolidado: Aplica ambas identidades correctamente. Destacado: Crea sus propios ejemplos de cada tipo.\n\nCRITERIO 4 — Verificación: Inicial: No verifica el resultado. En desarrollo: Verifica sustituyendo un valor numérico específico. Consolidado: Verifica expandiendo el resultado algebraicamente. Destacado: Verifica por dos métodos diferentes y explica por qué ambos confirman el resultado."
+    },
+    "teacher_tips": [
+      "Error universal: en la diferencia de cuadrados, los alumnos escriben (x+a)(x+a) en lugar de (x+a)(x-a). Enfatizar que DIFERENCIA implica un + y un -. Mnemotécnico: 'la diferencia de cuadrados da un par que se suma y uno que se resta'.",
+      "Error frecuente en cuadrado perfecto: verificar solo el primer y último término sin revisar el término medio. Siempre hacer el check triple: ¿a² está? ¿b² está? ¿el medio es exactamente 2ab?",
+      "Estrategia de andamiaje: para el FCM, enseñar a hacer el 'árbol de factores' de los coeficientes (como en primaria) y luego aplicar la misma lógica a las variables. Esto conecta con conocimiento previo.",
+      "Pregunta socrática: '¿Existe algún polinomio que NO se pueda factorizar? ¿Cómo lo sabrías?' — Introducir la idea de polinomios irreducibles como los números primos.",
+      "Conexión con criptografía: explicar brevemente que la seguridad de las transferencias bancarias en SPEI (Sistema de Pagos Electrónicos Interbancarios de Banxico) depende de que factorizar números muy grandes sea computacionalmente muy difícil. El álgebra elemental tiene consecuencias en la economía digital."
+    ]
   },
+
   "PM-II-P04": {
     "code": "PM-II-P04",
     "title": "Plantea y resuelve ecuaciones lineales en una variable en contextos problemáticos.",
@@ -45,25 +334,209 @@
     "duration": "~3h (2 sesiones de 50 min)",
     "difficulty": "Intermedio",
     "category": "Álgebra",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "metadata": {
+      "objective": "Plantear ecuaciones lineales a partir de situaciones problemáticas reales, resolverlas aplicando propiedades de igualdad, e interpretar la solución en el contexto original, desarrollando la modelación matemática como competencia central.",
+      "competencies": [
+        "Modelación matemática de situaciones cotidianas",
+        "Razonamiento algebraico y resolución de problemas",
+        "Interpretación crítica de resultados matemáticos"
+      ],
+      "materials": [
+        "Situaciones-problema impresas con contextos mexicanos (mercados, transporte, salarios)",
+        "Balanza física o imagen de balanza para visualizar la igualdad",
+        "Tabla para organizar: 'lo que sé — la variable — la ecuación — la solución — la interpretación'",
+        "Datos reales de tarifas de transporte público CDMX (Metro, Metrobús)"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "La balanza en equilibrio" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Del problema a la ecuación" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Verificar e interpretar" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — LA BALANZA",
+          "duration": "10 min",
+          "description": "Una ecuación es como una balanza en equilibrio: lo que hay en un platillo debe pesar igual que el otro. Si agrego algo a un lado, debo agregar lo mismo al otro para mantener el equilibrio. Esta metáfora es poderosa: resolver una ecuación significa 'aislar la x en un platillo sin desequilibrar la balanza'. El principio fundamental: cualquier operación (sumar, restar, multiplicar, dividir) que aplique a un lado de la ecuación debo aplicarla al otro lado también.",
+          "activity": "Mostrar una balanza física (o imagen). Plantear: 'Tengo una caja misteriosa (x) y 3 bloques de 1 kg en un platillo. En el otro, 10 kg. ¿Cuánto pesa la caja?' Los alumnos quitan 3 kg de cada lado y ven que x = 7. Pasar a notación algebraica: x + 3 = 10."
+        },
+        {
+          "title": "FASE II: DESARROLLO — MODELAR Y RESOLVER",
+          "duration": "30 min",
+          "description": "Cuatro situaciones progresivas: (1) Directa: 'Un boleto del Metro de CDMX cuesta $5. Gasté $35 en boletos. ¿Cuántos compré?' → 5n = 35, n = 7. (2) Con suma: 'En el mercado de Jamaica, compraste chiles y tomates. Los chiles costaron $45 y el total fue $73. ¿Cuánto gastaste en tomates?' → x + 45 = 73, x = 28. (3) Con multiplicación y suma: 'Un trabajador gana $180 diarios. Si ya tiene $540 ahorrados, ¿cuántos días necesita trabajar para llegar a $2,700?' → 540 + 180d = 2700, d = 12. (4) Con fracciones: 'Un tercio de los alumnos de un plantel tienen beca. Si 80 tienen beca, ¿cuántos alumnos hay en total?' → x/3 = 80, x = 240.",
+          "activity": "Los alumnos trabajan en parejas con la tabla de modelación: problema → variable → ecuación → solución → verificación → interpretación. Cada pareja resuelve 4 situaciones de complejidad creciente. El docente circula y enfatiza: la interpretación es tan importante como el cálculo."
+        },
+        {
+          "title": "FASE III: CIERRE — EL CICLO COMPLETO",
+          "duration": "10 min",
+          "description": "Resolver una ecuación es la mitad del trabajo; interpretar la solución es la otra mitad. Un resultado de x = -3 días de trabajo no tiene sentido real aunque sea matemáticamente correcto: el modelo tiene una limitación. Aprender a identificar cuándo una solución matemática no aplica al contexto real es una competencia crítica que distingue a quienes usan las matemáticas como herramienta de quienes solo saben operar mecánicamente.",
+          "activity": "Reflexión escrita: 'Plantea un problema de tu vida cotidiana que se pueda resolver con una ecuación lineal. Escribe la ecuación y resuélvela.' Socialización voluntaria. Discusión: ¿cuántas situaciones de su día a día implican ecuaciones implícitas?"
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Una ecuación lineal en una variable es una igualdad de la forma ax + b = c, donde a ≠ 0. La solución de la ecuación es el valor de x que hace verdadera la igualdad. Las ecuaciones lineales modelan una enorme variedad de situaciones reales: precios, tiempos, distancias, tasas de crecimiento, distribución de recursos. En México, desde las decisiones de compra en un mercado tianguis hasta los cálculos de crédito del Infonavit, las ecuaciones lineales aparecen constantemente, aunque raramente se reconozcan como tales. El pensamiento algebraico no es un fin en sí mismo: es una herramienta para tomar mejores decisiones.",
+      "sections": [
+        {
+          "subtitle": "Propiedades de igualdad: las reglas de la balanza",
+          "content": "Resolver una ecuación significa aplicar sistemáticamente cuatro propiedades de la igualdad: (1) Propiedad de adición: si a = b, entonces a + c = b + c. Se usa para mover términos al pasar de un lado al otro. (2) Propiedad de sustracción: si a = b, entonces a - c = b - c. (3) Propiedad de multiplicación: si a = b, entonces a·c = b·c. Se usa para eliminar denominadores fraccionarios. (4) Propiedad de división: si a = b y c ≠ 0, entonces a/c = b/c. Se usa para aislar la variable cuando tiene un coeficiente. Estas propiedades son el fundamento formal de todo el álgebra: garantizan que si empezamos con una verdad (a = b), las operaciones producen nuevas verdades equivalentes."
+        },
+        {
+          "subtitle": "Proceso de resolución: del caos al orden",
+          "content": "El proceso estándar para resolver 3x + 7 = 2x - 5: (1) Agrupar los términos con variable en un lado: 3x - 2x = -5 - 7 → x = -12. En problemas más complejos como 2(3x - 1) + 4 = 3(x + 5) - 2, primero se distribuye: 6x - 2 + 4 = 3x + 15 - 2 → 6x + 2 = 3x + 13 → 3x = 11 → x = 11/3. El Sistema Nacional de Información Estadística del INEGI usa modelos lineales para estimar datos en municipios con información faltante, aplicando ecuaciones del tipo y = ax + b donde a y b se calculan a partir de regresión lineal con datos de municipios vecinos."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "En un mercado de Oaxaca, un kilogramo de quesillo cuesta $85 y una pieza de tlayuda cuesta $35. Si María gastó $255 en total comprando solo quesillo y 2 tlayudas, ¿cuántos kilos de quesillo compró?",
+          "options": ["2 kilos", "3 kilos", "1 kilo", "4 kilos"],
+          "correct": "2 kilos"
+        },
+        {
+          "question": "¿Cuál es la solución de la ecuación 5x - 8 = 2x + 10?",
+          "options": ["x = 6", "x = 2", "x = 18/7", "x = 3"],
+          "correct": "x = 6"
+        },
+        {
+          "question": "Al resolver una ecuación lineal obtienes x = -5. El problema pregunta cuántas personas asistieron a un evento. ¿Qué debes concluir?",
+          "options": [
+            "El evento tuvo -5 personas, lo que indica ausencias",
+            "La solución matemática no tiene sentido en el contexto real; el modelo tiene un error o la situación es imposible",
+            "El evento aún no ocurrió, por eso el número es negativo",
+            "Hay que multiplicar por -1 y la respuesta es 5 personas"
+          ],
+          "correct": "La solución matemática no tiene sentido en el contexto real; el modelo tiene un error o la situación es imposible"
+        },
+        {
+          "question": "¿Cuál es la solución de 2(x + 3) = 5x - 6?",
+          "options": ["x = 4", "x = 3", "x = 12/7", "x = 6"],
+          "correct": "x = 4"
+        },
+        {
+          "question": "Un programa de becas del IMSS entrega un monto fijo más una cantidad por cada año de estudio. Si un becario con 3 años recibe $2,500 y uno con 6 años recibe $3,700, ¿cuánto es la cantidad por año de estudio?",
+          "options": ["$400 por año", "$500 por año", "$350 por año", "$600 por año"],
+          "correct": "$400 por año"
+        }
+      ],
+      "rubric": "CRITERIO 1 — Planteamiento de la ecuación: Inicial: No logra traducir el problema a una ecuación. En desarrollo: Plantea la ecuación pero con alguna variable o relación incorrecta. Consolidado: Plantea la ecuación correctamente identificando variable y relaciones. Destacado: Plantea la ecuación con notación clara, define explícitamente la variable y señala las unidades.\n\nCRITERIO 2 — Aplicación de propiedades de igualdad: Inicial: Aplica operaciones sin justificación o con errores sistemáticos. En desarrollo: Aplica correctamente algunas propiedades pero comete errores de signo o procedimiento. Consolidado: Resuelve correctamente aplicando todas las propiedades necesarias. Destacado: Resuelve el problema de más de una forma y verifica la equivalencia.\n\nCRITERIO 3 — Verificación: Inicial: No verifica la solución. En desarrollo: Sustituye el valor pero comete errores al verificar. Consolidado: Sustituye y verifica correctamente que la igualdad se cumple. Destacado: Explica por qué la verificación funciona como criterio de correctitud.\n\nCRITERIO 4 — Interpretación contextual: Inicial: Da la respuesta numérica sin relacionarla con el problema. En desarrollo: Menciona el contexto pero sin incluir unidades ni análisis de validez. Consolidado: Interpreta la solución en el contexto original con unidades correctas. Destacado: Analiza si la solución tiene sentido en el contexto y propone modificaciones al modelo cuando no lo tiene."
+    },
+    "teacher_tips": [
+      "Error más común: 'pasar al otro lado cambiando el signo' sin entender que es una suma o resta de ambos lados. Esto genera errores cuando hay multiplicaciones o divisiones. Siempre enfatizar la operación que se está haciendo en AMBOS lados.",
+      "Error frecuente con paréntesis: 2(x + 3) = 2x + 3 en lugar de 2x + 6. Recordar que la distribución afecta a TODOS los términos dentro del paréntesis. Dibujar flechas explícitas de la distribución.",
+      "Estrategia de andamiaje: usar siempre la tabla de 5 columnas (lo que sé / la variable / la ecuación / la solución / la interpretación). Esto estructura el pensamiento y reduce errores al plantear.",
+      "Pregunta socrática: '¿Podrías resolver el mismo problema sin ecuaciones? ¿Cuándo las ecuaciones son más ventajosas?' — Esto ayuda a valorar el álgebra como herramienta, no como imposición.",
+      "Conexión con crédito Infonavit: mostrar un ejemplo real de cálculo de mensualidades. '¿Si tienes $50,000 ahorrados y quieres una casa de $320,000 con crédito Infonavit al 12% anual, cuántos años necesitas pagar?' — simplificando como ecuación lineal básica."
+    ]
   },
+
   "PM-II-P05": {
     "code": "PM-II-P05",
-    "title": "Plantea y resuelve sistemas de ecuaciones lineales en dos variables mediante los métodos de sustitución, igualación y eliminación.",
+    "title": "Plantea y resuelve sistemas de ecuaciones lineales en dos variables mediante sustitución, igualación y eliminación.",
     "level": "Pensamiento Matemático II",
-    "duration": "~3h (2 sesiones de 50 min)",
+    "duration": "~4h (2 sesiones de 50 min + tarea guiada)",
     "difficulty": "Intermedio",
     "category": "Álgebra",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "metadata": {
+      "objective": "Formular sistemas de ecuaciones lineales a partir de situaciones con dos condiciones simultáneas, resolverlos con los tres métodos algebraicos (sustitución, igualación, eliminación), e interpretar la solución como intersección de dos relaciones lineales.",
+      "competencies": [
+        "Modelación matemática multivariable",
+        "Pensamiento sistemático y comparación de métodos",
+        "Interpretación geométrica del álgebra"
+      ],
+      "materials": [
+        "Situaciones-problema de dos incógnitas (productos, tarifas, mezclas)",
+        "Papel milimétrico o Geogebra para interpretación gráfica",
+        "Datos de precios PROFECO (Procuraduría Federal del Consumidor)",
+        "Fichas de trabajo para los tres métodos en paralelo"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "Dos pistas, dos incógnitas" },
+        { "phase": "Desarrollo", "duration": "35 min", "label": "Tres métodos para la misma respuesta" },
+        { "phase": "Cierre", "duration": "15 min", "label": "Gráfica: el punto de intersección" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — DOS PRECIOS DESCONOCIDOS",
+          "duration": "10 min",
+          "description": "En el mercado de Tlatelolco, compraste 2 kg de aguacate y 3 limones y pagaste $74. Tu compañera compró 1 kg de aguacate y 5 limones y pagó $52. ¿Cuánto cuesta cada producto? Con una sola ecuación no podemos: hay dos cosas que no sabemos. Necesitamos DOS ecuaciones, una por cada compra. Esta es la situación que origina los sistemas de ecuaciones: múltiples condiciones que deben cumplirse simultáneamente.",
+          "activity": "Los alumnos intentan resolver el problema del mercado por tanteo (prueba y error) durante 3 minutos. Algunos llegarán a la respuesta (aguacate = $28/kg, limón = $6). Discutir: ¿fue eficiente? ¿Funcionaría si los números fueran más complicados? Motivar la necesidad de un método sistemático."
+        },
+        {
+          "title": "FASE II: DESARROLLO — TRES MÉTODOS",
+          "duration": "35 min",
+          "description": "Con el mismo problema del mercado, demostrar los tres métodos: (1) Sustitución: despejar una variable en una ecuación y sustituir en la otra. (2) Igualación: despejar la misma variable en ambas ecuaciones e igualar las expresiones resultantes. (3) Eliminación (Gauss): multiplicar ecuaciones por constantes para que los coeficientes de una variable sean opuestos, luego sumar para eliminarla. Destacar: los tres métodos dan exactamente la misma respuesta; la elección del método depende de la forma de las ecuaciones.",
+          "activity": "Los alumnos resuelven el mismo sistema por los tres métodos en paralelo (ficha con tres columnas). Después, 5 sistemas nuevos donde ellos eligen el método más eficiente según la estructura. Discusión: ¿cuándo conviene sustitución? ¿cuándo eliminación?"
+        },
+        {
+          "title": "FASE III: CIERRE — SIGNIFICADO GEOMÉTRICO",
+          "duration": "15 min",
+          "description": "Cada ecuación lineal representa una RECTA en el plano. La solución del sistema es el PUNTO donde se cruzan las dos rectas. Si las rectas son paralelas, no hay solución (sistema incompatible). Si son la misma recta, hay infinitas soluciones (sistema dependiente). La interpretación geométrica da significado visual a lo que calculamos algebraicamente: la solución (28, 6) es el único punto que está simultáneamente en las dos rectas.",
+          "activity": "Graficar en papel milimétrico o Geogebra las dos ecuaciones del problema del mercado. Verificar que el punto (28, 6) está en AMBAS rectas. Dibujar un ejemplo de sistema sin solución (paralelas) y uno con infinitas (mismo trazo). Reflexión: ¿qué significa en el contexto real que no haya solución?"
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Un sistema de ecuaciones lineales es un conjunto de dos o más ecuaciones que deben cumplirse simultáneamente. La solución del sistema es el par (o conjunto de valores) que satisface todas las ecuaciones al mismo tiempo. Los sistemas de ecuaciones modelan situaciones con múltiples restricciones: presupuestos con dos tipos de gastos, problemas de mezclas en química, equilibrio de mercados en economía. La ingeniería de estructuras del Sistema de Transporte Colectivo Metro de la Ciudad de México usa sistemas de ecuaciones lineales para calcular las fuerzas en cada elemento de soporte bajo diferentes condiciones de carga.",
+      "sections": [
+        {
+          "subtitle": "Método de sustitución: despejar y reemplazar",
+          "content": "El método de sustitución consiste en: (1) Despejar una variable en una de las ecuaciones (elegir la que tenga coeficiente 1 o que sea más fácil de despejar), (2) Sustituir esa expresión en la otra ecuación (que ahora tendrá solo una variable), (3) Resolver la ecuación resultante, (4) Sustituir el valor encontrado para hallar la otra variable, (5) Verificar en ambas ecuaciones originales. Ejemplo: dado 2x + y = 10 y x - y = 2, de la segunda: x = y + 2. Sustituyendo: 2(y+2) + y = 10 → 2y + 4 + y = 10 → 3y = 6 → y = 2 → x = 4. Este método es especialmente eficiente cuando una ecuación tiene un término con coeficiente 1 o cuando ya está despejada una variable."
+        },
+        {
+          "subtitle": "Método de igualación y método de eliminación",
+          "content": "Igualación: se despeja la misma variable en ambas ecuaciones y se igualan los resultados. Si de la primera ecuación y = 10 - 2x y de la segunda y = x - 2, entonces 10 - 2x = x - 2 → 12 = 3x → x = 4. Eliminación (Gauss-Jordan): se multiplica cada ecuación por una constante para que los coeficientes de una variable sean opuestos y se suman. Para 2x + y = 10 y x - y = 2: sumando directamente (porque los coeficientes de y son 1 y -1, opuestos): 3x = 12 → x = 4. El método de eliminación generalizado es la base del álgebra lineal universitaria y es el algoritmo que usan las computadoras para resolver sistemas de cientos de ecuaciones con cientos de incógnitas, como en los modelos macroeconómicos del Banco de México."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Dos taqueros en la Feria de Xochimilco cobran diferente por taco de pastor y taco de canasta. Taquero 1: 3 de pastor + 2 de canasta = $75. Taquero 2: 1 de pastor + 4 de canasta = $70. ¿Cuánto cuesta cada taco de pastor?",
+          "options": ["$15", "$20", "$10", "$25"],
+          "correct": "$15"
+        },
+        {
+          "question": "Al resolver el sistema {2x + y = 8, x - y = 1} por eliminación, ¿qué resultado se obtiene al sumar las dos ecuaciones?",
+          "options": ["3x = 9", "3x = 7", "x + 2y = 9", "3x = 8"],
+          "correct": "3x = 9"
+        },
+        {
+          "question": "¿Qué significa geométricamente que un sistema de dos ecuaciones lineales NO tenga solución?",
+          "options": [
+            "Las dos rectas se cruzan en el punto (0,0)",
+            "Las dos rectas son paralelas y nunca se intersectan",
+            "Las dos ecuaciones representan la misma recta",
+            "Una de las rectas no existe en el plano cartesiano"
+          ],
+          "correct": "Las dos rectas son paralelas y nunca se intersectan"
+        },
+        {
+          "question": "¿Cuál es la solución del sistema {x + 2y = 11, 3x - y = 3}?",
+          "options": ["x = 1, y = 5", "x = 3, y = 4", "x = 2, y = 4.5", "x = 5, y = 3"],
+          "correct": "x = 1, y = 5"
+        },
+        {
+          "question": "Un distribuidor mezcla café de Veracruz ($180/kg) con café de Chiapas ($120/kg) para obtener 20 kg de mezcla a $150/kg. ¿Cuántos kilogramos de cada tipo usa?",
+          "options": ["10 kg de cada uno", "8 kg Veracruz y 12 kg Chiapas", "12 kg Veracruz y 8 kg Chiapas", "15 kg Veracruz y 5 kg Chiapas"],
+          "correct": "10 kg de cada uno"
+        }
+      ],
+      "rubric": "CRITERIO 1 — Planteamiento del sistema: Inicial: No logra identificar las dos ecuaciones. En desarrollo: Plantea una ecuación correcta pero falla en la segunda. Consolidado: Plantea correctamente ambas ecuaciones con variables bien definidas. Destacado: Define las variables con unidades, plantea el sistema y verifica que ambas ecuaciones representan las condiciones del problema.\n\nCRITERIO 2 — Aplicación del método elegido: Inicial: No aplica ningún método coherentemente. En desarrollo: Aplica el método con errores procedimentales que llevan a resultado incorrecto. Consolidado: Aplica el método seleccionado correctamente. Destacado: Aplica el método con eficiencia, elige el más adecuado según la estructura del sistema y justifica su elección.\n\nCRITERIO 3 — Verificación en ambas ecuaciones: Inicial: No verifica. En desarrollo: Verifica solo en una ecuación. Consolidado: Verifica en ambas ecuaciones originales. Destacado: Verifica algebraica y numéricamente, y coincide la interpretación geométrica si aplica.\n\nCRITERIO 4 — Interpretación y coherencia contextual: Inicial: Da la respuesta como par (x,y) sin relacionar con el problema. En desarrollo: Relaciona con el problema pero omite unidades o análisis. Consolidado: Interpreta la solución con unidades y verifica que tiene sentido en el contexto. Destacado: Analiza casos especiales (sin solución, infinitas) en términos del contexto y propone modificaciones al problema."
+    },
+    "teacher_tips": [
+      "Error más común en sustitución: al sustituir x = (expresión con y) en la ecuación que contenía x, olvidar parentesizar correctamente. Ejemplo: si x = 3 - 2y y se sustituye en 2x + y = 5, hay que escribir 2(3 - 2y) + y = 5, NO 2·3 - 2y + y = 5.",
+      "Error frecuente en eliminación: multiplicar solo una ecuación cuando se necesita multiplicar ambas. O cambiar el signo incorrecto. Hacer siempre el paso explícito de multiplicación antes de sumar.",
+      "Estrategia de andamiaje: comenzar siempre con problemas donde los coeficientes son 1 (fáciles de despejar). Luego escalar a coeficientes 2 o 3. Evitar fracciones en las ecuaciones originales hasta que el método sea fluido.",
+      "Pregunta socrática: '¿Podría existir un problema que requiera TRES ecuaciones para resolverse? ¿Cuándo pasaría eso?' — Abre la puerta al álgebra lineal y a la idea de que los métodos se generalizan.",
+      "Conexión PROFECO: usar la 'Canasta Básica' del INEGI/PROFECO. Si en enero el kilo de tortilla vale $x y el de frijol $y, y el gasto promedio mensual en dos artículos se conoce de dos fuentes distintas, ¿cuánto vale cada uno? Problema real con datos verificables en profeco.gob.mx."
+    ]
   },
+
   "PM-II-P06": {
     "code": "PM-II-P06",
     "title": "Aplica inecuaciones lineales para describir y resolver situaciones de restricción y optimización básica.",
@@ -71,10 +544,106 @@
     "duration": "~3h (2 sesiones de 50 min)",
     "difficulty": "Intermedio",
     "category": "Álgebra",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "metadata": {
+      "objective": "Plantear, resolver y representar inecuaciones lineales en una variable, interpretando la solución como un conjunto de valores que satisfacen una restricción, y aplicando este razonamiento a situaciones de optimización básica en contextos reales.",
+      "competencies": [
+        "Razonamiento lógico-matemático con desigualdades",
+        "Modelación de restricciones y condiciones de frontera",
+        "Representación en la recta numérica e interpretación"
+      ],
+      "materials": [
+        "Recta numérica grande para el salón (cinta adhesiva o cartel)",
+        "Situaciones de presupuesto, tiempo y capacidad con restricciones",
+        "Hoja de trabajo con inecuaciones y sus soluciones gráficas",
+        "Datos de salario mínimo (CONASAMI 2025) y presupuestos familiares INEGI"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Cuántos puedes comprar como máximo?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Resolver e interpretar inecuaciones" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Infinitas soluciones, una región" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — EL PRESUPUESTO LIMITADO",
+          "duration": "10 min",
+          "description": "Tienes $200 para gastar en el tianguis y quieres comprar mangos que cuestan $15 cada uno. ¿Cuántos puedes comprar? La respuesta no es un número único: puedes comprar 0, 1, 2... hasta 13 (porque 14 × 15 = $210 > $200). Esta es la diferencia fundamental entre una ecuación (solución única) y una inecuación (conjunto de soluciones). La desigualdad 15n ≤ 200 tiene como solución todos los enteros desde 0 hasta 13.",
+          "activity": "Dinámica: los alumnos se paran y caminan a la derecha en la recta numérica del salón según el número de mangos que podrían comprar. Discutir: ¿por qué hay MUCHAS respuestas correctas? ¿Qué número es el máximo posible? Introducir la notación de inecuación."
+        },
+        {
+          "title": "FASE II: DESARROLLO — RESOLVER INECUACIONES",
+          "duration": "30 min",
+          "description": "Reglas para resolver inecuaciones lineales: idénticas a las ecuaciones EXCEPTO la regla crítica: al multiplicar o dividir por un número NEGATIVO, el sentido de la desigualdad SE INVIERTE. Por qué: si -x < 5, entonces x > -5 (multiplicar por -1 invierte la desigualdad). Representación: en la recta numérica, circulito abierto para < o >, circulito cerrado para ≤ o ≥, flecha hacia la región de soluciones. Ejemplos progresivos: (1) 3x + 5 < 20, (2) -2x + 8 ≥ 14, (3) 5 ≤ 2x + 1 ≤ 11 (inecuación doble = intersección de dos conjuntos).",
+          "activity": "Práctica en tres rondas: Ronda 1 (sin negativo) — 5 inecuaciones simples. Ronda 2 (con multiplicación por negativo) — 5 inecuaciones donde el signo se invierte. Ronda 3 (contexto real) — 3 situaciones-problema que deben traducirse a inecuación. Representación gráfica obligatoria en todas."
+        },
+        {
+          "title": "FASE III: CIERRE — LAS INECUACIONES EN LA VIDA REAL",
+          "duration": "10 min",
+          "description": "Las inecuaciones modelan restricciones: '¿cuánto puedo gastar sin quedarme sin dinero?' (≤ presupuesto), '¿cuántas horas debo estudiar para no reprobar?' (≥ mínimo necesario), '¿cuántos trabajadores puede contratar una empresa para no perder dinero?' (restricción de costo). En economía, la investigación de operaciones usa sistemas de inecuaciones para encontrar el punto de máxima ganancia con recursos limitados — la base de la programación lineal que usan empresas como Walmart México o Amazon para optimizar inventarios.",
+          "activity": "Juego de roles: cada equipo es una pequeña empresa (taquería, tortillería, papelería). Reciben sus costos y un presupuesto mensual. Deben plantear la inecuación que describe cuántos productos pueden producir, resolverla, y presentar su decisión de negocio. Reflexión: ¿las inecuaciones restringen o liberan la toma de decisiones?"
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Una inecuación lineal es una desigualdad de la forma ax + b < c (o ≤, >, ≥) cuya solución no es un valor único sino un conjunto de valores que forman un intervalo en la recta numérica. Las inecuaciones modelan restricciones, umbrales y rangos aceptables: situaciones donde 'más de x' o 'menos de y' define el espacio de soluciones posibles. Son fundamentales en optimización (¿qué es lo máximo o mínimo que puedo lograr dentro de ciertas restricciones?) y en análisis de inequidades sociales — el CONEVAL usa inecuaciones conceptualmente al definir 'línea de pobreza': los hogares con ingreso menor a cierto umbral están en situación de pobreza.",
+      "sections": [
+        {
+          "subtitle": "La regla de inversión: el caso especial de las inecuaciones",
+          "content": "Al resolver ecuaciones, cualquier operación que se aplica a ambos lados mantiene la igualdad. En inecuaciones, sumar o restar funciona igual. Pero al multiplicar o dividir ambos lados por un número NEGATIVO, el sentido de la desigualdad se invierte. Demostración intuitiva: sabemos que 3 < 5. Si multiplicamos por -1, obtenemos -3 y -5. En la recta numérica, -3 está a la DERECHA de -5 (es mayor), entonces -3 > -5. El < se convirtió en >. Esta regla es crucial y es el error más frecuente al resolver inecuaciones. Una forma de recordarla: imaginemos una deuda (negativo) — quien debe más dinero tiene menos riqueza, por eso el orden se invierte."
+        },
+        {
+          "subtitle": "Representación y conjuntos de soluciones",
+          "content": "La solución de una inecuación lineal como 2x - 3 ≤ 7 es un intervalo: 2x ≤ 10 → x ≤ 5, representado en la recta numérica con un círculo cerrado en 5 y una flecha hacia la izquierda (todos los valores menores o iguales a 5). La notación de intervalo es (-∞, 5]. Las inecuaciones dobles como -1 < 2x + 3 < 9 se resuelven operando sobre la expresión del medio en las tres partes simultáneamente: -1-3 < 2x < 9-3 → -4 < 2x < 6 → -2 < x < 3, representada como el intervalo abierto (-2, 3). La Comisión Nacional del Agua (CONAGUA) usa inecuaciones para definir niveles de alerta en presas: si el nivel ≥ 80% de capacidad, se activa alerta naranja; si ≥ 95%, alerta roja. Estas son restricciones del mundo real expresadas como inecuaciones."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Resuelve la inecuación -3x + 6 > 15. ¿Cuál es la solución correcta?",
+          "options": ["x > -3", "x < -3", "x > 3", "x < 3"],
+          "correct": "x < -3"
+        },
+        {
+          "question": "Un estudiante necesita al menos 70 puntos para pasar el semestre. Tiene 3 exámenes pendientes con valor máximo de 30, 30 y 40 puntos. Ya acumuló 15 puntos. ¿Cuántos puntos mínimos necesita sacar en los tres exámenes restantes?",
+          "options": ["Al menos 55 puntos", "Al menos 45 puntos", "Al menos 60 puntos", "Al menos 70 puntos"],
+          "correct": "Al menos 55 puntos"
+        },
+        {
+          "question": "¿Por qué al dividir ambos lados de una inecuación por -2 se debe invertir el signo de desigualdad?",
+          "options": [
+            "Porque -2 es un número negativo y los negativos cambian todo",
+            "Porque multiplicar o dividir por negativo invierte el orden en la recta numérica",
+            "Porque es una regla arbitraria sin demostración",
+            "Porque la división siempre cambia el signo en álgebra"
+          ],
+          "correct": "Porque multiplicar o dividir por negativo invierte el orden en la recta numérica"
+        },
+        {
+          "question": "¿Cuál es la representación correcta en la recta numérica de x ≥ 4?",
+          "options": [
+            "Círculo abierto en 4, flecha hacia la derecha",
+            "Círculo cerrado en 4, flecha hacia la derecha",
+            "Círculo cerrado en 4, flecha hacia la izquierda",
+            "Círculo abierto en 4, flecha hacia la izquierda"
+          ],
+          "correct": "Círculo cerrado en 4, flecha hacia la derecha"
+        },
+        {
+          "question": "Un fabricante de artesanías de Guerrero puede producir como mínimo 10 y como máximo 50 piezas al día según su capacidad. Si produce n piezas, ¿qué inecuación doble describe esta restricción?",
+          "options": ["10 < n < 50", "10 ≤ n ≤ 50", "n ≥ 10 y n ≥ 50", "n > 10 o n < 50"],
+          "correct": "10 ≤ n ≤ 50"
+        }
+      ],
+      "rubric": "CRITERIO 1 — Planteamiento de la inecuación: Inicial: No traduce la restricción a notación algebraica. En desarrollo: Plantea la inecuación pero usa el signo incorrecto (< vs ≤). Consolidado: Plantea correctamente la inecuación con el signo apropiado. Destacado: Plantea la inecuación, define la variable con unidades y explica qué significa el signo elegido en el contexto.\n\nCRITERIO 2 — Resolución algebraica: Inicial: Aplica el mismo procedimiento que en ecuaciones, ignora la inversión del signo. En desarrollo: Aplica la inversión en algunos casos pero no en todos. Consolidado: Resuelve correctamente, aplica la inversión cuando divide/multiplica por negativo. Destacado: Resuelve por más de un procedimiento y verifica con valor específico del conjunto solución.\n\nCRITERIO 3 — Representación gráfica: Inicial: No representa la solución en la recta numérica. En desarrollo: Representa en la recta pero confunde círculo abierto/cerrado. Consolidado: Representa correctamente con círculo apropiado y flecha en la dirección correcta. Destacado: Representa e indica en la gráfica cuál valor del conjunto solución usa para verificar.\n\nCRITERIO 4 — Interpretación de conjunto solución: Inicial: No interpreta el conjunto solución en el contexto. En desarrollo: Menciona algunos valores válidos pero no el conjunto completo. Consolidado: Describe el conjunto solución y lo interpreta en el contexto real. Destacado: Identifica el 'valor óptimo' dentro del conjunto solución según el objetivo del problema y justifica su elección."
+    },
+    "teacher_tips": [
+      "Error universal: olvidar invertir el signo al multiplicar o dividir por negativo. Es el error más frecuente y persistente en inecuaciones. Estrategia: al final de cada operación con negativo, hacer una PAUSA explícita y preguntar '¿multipliqué o dividí por negativo? ¿Invertí el signo?'",
+      "Error frecuente: confundir círculo abierto y cerrado en la recta numérica. Mnemotécnico: 'abierto = el punto NO está incluido' (como un hoyo en el que no cae el valor), 'cerrado = el punto SÍ está incluido' (como una tapa que lo atrapa).",
+      "Estrategia de andamiaje: comenzar con inecuaciones donde el coeficiente de x siempre es positivo para que el signo no cambie. Luego, de forma deliberada, introducir coeficientes negativos con la advertencia explícita del cambio de signo.",
+      "Pregunta socrática: '¿Puede una inecuación tener solución vacía? ¿Cuándo? ¿Y solución que sea TODOS los reales?' — Explorar los casos extremos (contradicción y tautología) conecta con lógica matemática.",
+      "Conexión CONASAMI: usar el salario mínimo vigente (publicado por CONASAMI, la Comisión Nacional de Salarios Mínimos). '¿Cuántos días de salario mínimo necesitas para cubrir una renta de $4,000?' se modela como inecuación 208.98d ≥ 4000 (usando el salario de 2025). Dato real, verificable, conectado con ciudadanía económica."
+    ]
   }
 }
