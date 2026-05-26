@@ -6,12 +6,114 @@
     "duration": "~3h (2 sesiones de 50 min)",
     "difficulty": "Fundamental",
     "category": "Energía",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "metadata": {
+      "objective": "Definir energía como capacidad de producir cambios e identificar sus principales formas (cinética, potencial gravitacional, potencial elástica, térmica, luminosa y eléctrica) reconociendo transformaciones entre ellas en situaciones cotidianas mexicanas.",
+      "competencies": [
+        "Pensamiento científico observacional",
+        "Clasificación y diferenciación de conceptos físicos",
+        "Conexión entre fenómenos naturales y tecnología"
+      ],
+      "materials": [
+        "Pelota de goma, resorte, vela, linterna y batería para demostrar formas de energía",
+        "Infografía de la CFE sobre mix energético nacional 2024",
+        "Video: 'Energía en México' — Canal Once o UNAM Digital",
+        "Termómetro digital y sensor de luz (o app de celular)"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Qué es energía?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Las seis formas de energía" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Energía en mi entorno" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — ¿QUÉ ES ENERGÍA?",
+          "duration": "10 min",
+          "description": "La palabra 'energía' viene del griego 'enérgeia', que significa 'en actividad'. Aristóteles la usaba filosóficamente. En física moderna, la energía es la capacidad de un sistema para producir trabajo, calor o cambios en su entorno. Es imposible crearla o destruirla (primer principio de la termodinámica), solo transformarla. En México, el 15% de la energía eléctrica proviene de fuentes renovables según la CFE — ¿pero qué es exactamente esa 'energía eléctrica' y cómo se convierte en luz, calor o movimiento en tu hogar?",
+          "activity": "Cadena de preguntas: el docente lanza una pelota al aire. Pregunta: '¿Tiene energía la pelota en el aire? ¿Y cuando cae? ¿Y cuando está en mi mano quieta?' Los alumnos discuten en tríos qué entienden por 'tener energía' y lo comparten. Recoger las ideas previas sin corregir aún."
+        },
+        {
+          "title": "FASE II: DESARROLLO — FORMAS DE ENERGÍA",
+          "duration": "30 min",
+          "description": "Seis formas de energía con demostración: (1) Cinética: energía del movimiento — Ec = ½mv². La pelota en movimiento, el aire de un ventilador, un auto en la autopista. (2) Potencial gravitacional: energía por posición en campo gravitacional — Ep = mgh. La pelota en lo alto, el agua en las presas hidroeléctricas de CFE (La Angostura, Chicoasén). (3) Potencial elástica: energía almacenada en deformación — resorte comprimido, arco tenso. (4) Térmica: energía de movimiento de partículas — el café caliente, los géiseres de Baja California. (5) Luminosa (radiante): energía transportada por fotones — la luz solar que aprovecha el Instituto de Energías Renovables UNAM en Temixco, Morelos. (6) Eléctrica: energía de cargas en movimiento — la corriente que llega a tu hogar.",
+          "activity": "Estaciones de 5 minutos: seis mesas con un objeto o demo diferente (pelota, pila+LED, vela, resorte, termómetro, linterna). Los alumnos visitan cada estación, observan y anotan: ¿qué forma de energía muestra? ¿Cómo lo identificaron? Puesta en común al final."
+        },
+        {
+          "title": "FASE III: CIERRE — MAPA DE ENERGÍA DEL DÍA",
+          "duration": "10 min",
+          "description": "La energía no aparece de la nada: viene de transformaciones de otras formas de energía. El Sol (energía nuclear → radiante) calienta la Tierra (radiante → térmica), evapora agua (térmica → potencial), llueve (potencial → cinética), corre un río (cinética → eléctrica en una presa), y enciende tu celular (eléctrica → luminosa + sonora). Este flujo de energía conecta el cosmos con tu vida cotidiana.",
+          "activity": "Cada alumno dibuja el 'mapa de energía de su mañana': desde que suena el despertador hasta que llega a la escuela, identificando al menos 4 formas de energía y 3 transformaciones. Se comparte con el compañero más cercano."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La energía es el concepto más fundamental de la física y quizás de toda la ciencia. Todo fenómeno natural — desde la fotosíntesis de los manglares de Campeche hasta el latido de un corazón — implica transformaciones de energía. En termodinámica clásica, la energía se define como la capacidad de un sistema de realizar trabajo (W) o transferir calor (Q). La ley de conservación de la energía establece que la energía total de un sistema aislado permanece constante: puede cambiar de forma, pero no crearse ni destruirse. Este principio, confirmado experimentalmente miles de veces, es la base de la ingeniería energética, la biología y la química.",
+      "sections": [
+        {
+          "subtitle": "Energía cinética y potencial: las formas mecánicas",
+          "content": "La energía cinética (Ec) es la energía asociada al movimiento: Ec = ½mv², donde m es la masa en kilogramos y v la velocidad en m/s. A mayor velocidad, mayor energía cinética de forma cuadrática — por eso un automóvil que viaja a 100 km/h tiene cuatro veces más energía cinética que uno que va a 50 km/h (con la misma masa), lo que explica la mayor peligrosidad de los accidentes a alta velocidad según la Secretaría de Comunicaciones y Transportes México. La energía potencial gravitacional (Ep) es la energía almacenada por posición: Ep = mgh, donde h es la altura sobre un nivel de referencia. Las presas hidroeléctricas como Chicoasén en Chiapas (la cuarta más alta del mundo, 261 m) convierten la energía potencial del agua embalsada en energía cinética al caer, y luego en eléctrica mediante generadores — ilustrando la cadena completa de transformación energética."
+        },
+        {
+          "subtitle": "Energía térmica, luminosa y eléctrica: formas no mecánicas",
+          "content": "La energía térmica es la energía interna de un sistema debida al movimiento aleatorio de sus partículas (átomos, moléculas). No es lo mismo que temperatura: la temperatura mide la energía cinética PROMEDIO por partícula, mientras que la energía térmica total depende también del número de partículas. Un vaso de agua hirviendo tiene mayor temperatura que un lago tibio, pero el lago tiene mucho más energía térmica total (más partículas). La energía luminosa (o radiante) se propaga en forma de fotones (ondas electromagnéticas) y no requiere materia para transmitirse — por eso nos llega la energía solar a través del vacío espacial. El Instituto de Energías Renovables de la UNAM en Temixco, Morelos, estudia la conversión de energía solar en otras formas útiles. La energía eléctrica es energía asociada al movimiento ordenado de cargas eléctricas (electrones en conductores), y es la forma más versátil y fácil de transmitir a grandes distancias — razón por la cual la CFE transporta electricidad desde Chicoasén hasta la Ciudad de México a través de líneas de alta tensión."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Una presa hidroeléctrica convierte la energía potencial del agua en energía eléctrica. ¿Qué forma de energía se produce en el paso intermedio (cuando el agua cae y hace girar la turbina)?",
+          "options": ["Energía térmica", "Energía cinética", "Energía luminosa", "Energía elástica"],
+          "correct": "Energía cinética"
+        },
+        {
+          "question": "¿Cuál es la diferencia fundamental entre energía térmica y temperatura?",
+          "options": [
+            "Son exactamente lo mismo, solo cambia la escala de medición",
+            "La temperatura mide el calor promedio por partícula; la energía térmica depende también del número de partículas",
+            "La energía térmica solo existe en sólidos; la temperatura en líquidos",
+            "La temperatura se mide en Joules y la energía térmica en grados"
+          ],
+          "correct": "La temperatura mide el calor promedio por partícula; la energía térmica depende también del número de partículas"
+        },
+        {
+          "question": "Un auto de 1,000 kg viaja a 20 m/s. ¿Cuál es su energía cinética?",
+          "options": ["200,000 J", "10,000 J", "400,000 J", "100,000 J"],
+          "correct": "200,000 J"
+        },
+        {
+          "question": "¿Qué tiene en común la energía solar que llega a México con la energía que emite una vela?",
+          "options": [
+            "Ambas son formas de energía cinética",
+            "Ambas son formas de energía radiante (luminosa) que se propagan como ondas",
+            "Ambas requieren de materia para propagarse",
+            "Ambas son formas de energía potencial gravitacional"
+          ],
+          "correct": "Ambas son formas de energía radiante (luminosa) que se propagan como ondas"
+        },
+        {
+          "question": "Según la Ley de Conservación de la Energía, ¿qué ocurre cuando un foco eléctrico se apaga?",
+          "options": [
+            "La energía eléctrica se destruye al convertirse en luz y calor",
+            "La energía eléctrica se transforma en luz y calor, que se disipan al ambiente",
+            "La energía desaparece porque ya no hay corriente",
+            "La energía regresa a la planta generadora"
+          ],
+          "correct": "La energía eléctrica se transforma en luz y calor, que se disipan al ambiente"
+        }
+      ],
+      "rubric": "CRITERIO 1 — Definición de energía: Inicial: No puede definir energía con sus propias palabras. En desarrollo: Da una definición parcial o confunde energía con fuerza o materia. Consolidado: Define energía correctamente como capacidad de producir trabajo o cambios. Destacado: Define energía, la diferencia de fuerza y materia, y explica la conservación con un ejemplo propio.\n\nCRITERIO 2 — Identificación de formas de energía: Inicial: Identifica menos de 3 formas correctamente. En desarrollo: Identifica 4-5 formas pero confunde algunas (p. ej., calor con temperatura). Consolidado: Identifica las 6 formas con un ejemplo de cada una. Destacado: Identifica las 6 formas, da ejemplos originales del entorno local y describe por qué cada ejemplo corresponde a esa forma.\n\nCRITERIO 3 — Reconocimiento de transformaciones: Inicial: No puede describir ninguna transformación entre formas de energía. En desarrollo: Describe una o dos transformaciones simples. Consolidado: Describe al menos tres transformaciones en cadena con ejemplos. Destacado: Diseña un diagrama de flujo de transformaciones energéticas desde el Sol hasta un electrodoméstico específico.\n\nCRITERIO 4 — Aplicación al contexto mexicano: Inicial: No conecta conceptos con el contexto energético de México. En desarrollo: Menciona un elemento mexicano (CFE, PEMEX) sin profundizar. Consolidado: Relaciona al menos dos formas de energía con la realidad energética de México (presas, petróleo, solar). Destacado: Analiza críticamente la mezcla energética de México y propone al menos una mejora basada en los conceptos de la progresión."
+    },
+    "teacher_tips": [
+      "Error más común: confundir energía con fuerza. Un objeto puede tener energía cinética alta pero fuerza baja (pluma a alta velocidad) o fuerza alta pero energía cinética baja (montaña estática — aunque esta no tiene energía cinética). Hacer la distinción explícita: fuerza es interacción, energía es capacidad.",
+      "Error frecuente: decir que la energía 'se gasta' o 'se consume'. Siempre se TRANSFORMA, nunca se destruye. Reemplazar el lenguaje cotidiano por el científico: en lugar de 'el foco gasta energía', decir 'el foco transforma energía eléctrica en luminosa y térmica'.",
+      "Estrategia de andamiaje: el 'mapa de energía' es muy potente para estudiantes visuales. Hacer que lo construyan con flechas de colores: flecha roja = transformación, etiqueta = qué forma entra y qué forma sale.",
+      "Pregunta socrática: '¿Dónde estaba la energía del petróleo antes de que se formara el petróleo?' — lleva a la energía solar → fotosíntesis → carbono orgánico → millones de años → combustibles fósiles. Conecta geología, biología y energía.",
+      "Conexión con el recibo de luz CFE: analizar el recibo de luz del hogar en términos de energía. ¿Cuántos kWh consume la familia? ¿Qué formas de energía produce en casa (luz, calor, movimiento)? Calcular el costo por transformación."
+    ]
   },
+
   "CNEYT-II-P02": {
     "code": "CNEYT-II-P02",
     "title": "Analiza la transformación y conservación de la energía en sistemas físicos.",
@@ -19,12 +121,114 @@
     "duration": "~3h (2 sesiones de 50 min)",
     "difficulty": "Fundamental",
     "category": "Energía",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "metadata": {
+      "objective": "Explicar y demostrar la Ley de Conservación de la Energía en sistemas mecánicos simples, identificando las transformaciones que ocurren y calculando la eficiencia energética de procesos cotidianos.",
+      "competencies": [
+        "Análisis cuantitativo de fenómenos físicos",
+        "Pensamiento sistémico: entradas, salidas y pérdidas",
+        "Aplicación de leyes físicas a situaciones reales"
+      ],
+      "materials": [
+        "Péndulo simple (hilo y bola metálica) para demostración de conservación",
+        "Rampa inclinada, pelota y regla para medir alturas",
+        "Calculadora o app de física (PhyPhox con acelerómetro)",
+        "Datos de eficiencia de electrodomésticos (etiqueta de eficiencia energética NOM)"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "El péndulo nunca engaña" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Conservación y eficiencia" },
+        { "phase": "Cierre", "duration": "10 min", "label": "¿Qué se 'pierde' realmente?" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — EL PÉNDULO COMO DEMOSTRACIÓN",
+          "duration": "10 min",
+          "description": "Demostración clásica pero siempre impactante: el docente sostiene una bola de péndulo a la altura de su nariz y la suelta sin empujar. Si la conservación de energía es correcta, la bola regresa exactamente a la misma altura (nariz) y no puede ir más lejos. La conservación garantiza que la energía potencial inicial se convierte en cinética y regresa a potencial — pero en la práctica la bola llega un poco más abajo. ¿Por qué? Eso se llama fricción: la energía no desaparece, se convierte en calor en el hilo y el aire.",
+          "activity": "El docente hace la demo del péndulo (opcionalmente con un alumno voluntario). Los alumnos predicen si la bola tocará la nariz del docente o irá más lejos. Discusión: ¿qué garantiza la conservación de energía? ¿Por qué en la práctica siempre hay 'pérdidas'?"
+        },
+        {
+          "title": "FASE II: DESARROLLO — CONSERVACIÓN Y EFICIENCIA",
+          "duration": "30 min",
+          "description": "Tres conceptos centrales: (1) Ley de Conservación de la Energía: la energía total de un sistema aislado es constante. Ec + Ep = constante en sistemas sin fricción. (2) Eficiencia energética: η = (Energía útil / Energía total) × 100%. Ningún sistema real es 100% eficiente porque siempre hay pérdidas por fricción, calor, sonido. (3) Casos reales: motor de automóvil (eficiencia ~25-35%), foco incandescente (5%), foco LED (90%), panel solar fotovoltaico (15-22%), turbina eólica (35-45%). La NOM-008-ENER certifica la eficiencia energética de electrodomésticos en México.",
+          "activity": "Experimento con rampa: una pelota rueda desde diferentes alturas. Los alumnos miden la altura inicial (h_i) y la altura máxima que alcanza al otro lado (h_f). Calculan η = h_f/h_i × 100%. ¿Por qué η < 100%? ¿Qué pasó con la diferencia de energía? Conectar con la fricción y el calor generado en la superficie."
+        },
+        {
+          "title": "FASE III: CIERRE — NADA SE PIERDE",
+          "duration": "10 min",
+          "description": "Cuando decimos que 'se pierde' energía en un proceso, nos referimos a que parte de la energía útil se convierte en calor no aprovechable que se disipa al ambiente. El sistema universo total siempre conserva la energía, pero la parte 'ordenada' (útil) disminuye — eso es lo que estudia el segundo principio de la termodinámica (entropía). En México, la ineficiencia energética en el sector industrial representa el 40% del desperdicio de energía según la SENER (Secretaría de Energía).",
+          "activity": "Los alumnos calculan la eficiencia de sus electrodomésticos en casa usando la etiqueta energética y comparan: ¿cuál es el más ineficiente? ¿Cuánto dinero 'pierden' en calor en un mes? Preparar para presentar en la siguiente clase."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La Ley de Conservación de la Energía es uno de los principios más robustos de la física: en ningún experimento jamás realizado en la historia de la ciencia se ha observado que la energía total de un sistema aislado cambie. Esta ley fue formulada matemáticamente por Julius Robert von Mayer, James Prescott Joule y Hermann von Helmholtz en el siglo XIX, y es la base de toda la ingeniería energética. En México, su aplicación práctica es central: el país desperdicia aproximadamente 30% de la energía que genera, según estimaciones de la Comisión Nacional para el Uso Eficiente de la Energía (CONUEE), lo que tiene consecuencias económicas y ambientales directas.",
+      "sections": [
+        {
+          "subtitle": "Conservación de la energía mecánica: sistemas sin fricción",
+          "content": "En un sistema ideal sin fricción, la energía mecánica total (Ec + Ep) se conserva: cuando un objeto gana energía cinética, pierde exactamente la misma cantidad de energía potencial, y viceversa. En una montaña rusa, en el punto más alto (v mínima, h máxima) la energía es predominantemente potencial; en el punto más bajo (v máxima, h = 0) es predominantemente cinética; pero la suma siempre es la misma. Esta predicción es confirmada experimentalmente con alta precisión en sistemas de baja fricción. Las presas de control de avenidas de la CONAGUA en ríos como el Pánuco usan estos principios para calcular las fuerzas que ejerce el agua."
+        },
+        {
+          "subtitle": "Eficiencia energética: la brecha entre lo ideal y lo real",
+          "content": "La eficiencia η = (Energía útil obtenida / Energía total suministrada) × 100% mide qué fracción de la energía de entrada se convierte en la forma deseada. Siempre η < 100% porque parte de la energía se disipa como calor no aprovechable. Ejemplos comparativos: motor a combustión (~30% eficiencia, 70% se va como calor en el escape y el enfriamiento); foco LED (~90%, solo 10% en calor); turbina de vapor de planta termoeléctrica (~40%). La CONUEE certificó en 2023 que los aparatos con etiqueta Nivel 1 (máxima eficiencia) consumen entre 30-60% menos energía que los modelos convencionales. Mejorar la eficiencia es tan importante para la sustentabilidad como desarrollar energías renovables: es la 'energía más limpia' la que no se usa."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Una pelota de 0.5 kg cae desde 10 metros de altura. Justo antes de tocar el suelo (h=0), ¿cuánta energía cinética tiene? (g = 10 m/s²)",
+          "options": ["50 J", "25 J", "100 J", "500 J"],
+          "correct": "50 J"
+        },
+        {
+          "question": "Un motor eléctrico recibe 1,000 J y produce 750 J de trabajo mecánico. ¿Cuál es su eficiencia?",
+          "options": ["75%", "25%", "133%", "50%"],
+          "correct": "75%"
+        },
+        {
+          "question": "¿Qué ocurre realmente con la energía 'perdida' por fricción en un sistema mecánico?",
+          "options": [
+            "Se destruye y deja de existir",
+            "Se convierte en energía térmica que se disipa al ambiente",
+            "Regresa al sistema como energía potencial",
+            "Se almacena en las moléculas del objeto y reaparece después"
+          ],
+          "correct": "Se convierte en energía térmica que se disipa al ambiente"
+        },
+        {
+          "question": "Un foco LED tiene 90% de eficiencia y uno incandescente 5%. ¿Qué significa esto en términos de consumo para producir la misma cantidad de luz?",
+          "options": [
+            "El LED consume 18 veces menos energía que el incandescente",
+            "El LED consume 90 veces más energía para brillar más",
+            "El incandescente produce más calor pero es más eficiente",
+            "Ambos consumen la misma energía pero en formas diferentes"
+          ],
+          "correct": "El LED consume 18 veces menos energía que el incandescente"
+        },
+        {
+          "question": "En la demostración del péndulo, la bola siempre regresa a una altura ligeramente menor que la inicial. Esto demuestra que:",
+          "options": [
+            "La Ley de Conservación de la Energía es incorrecta",
+            "Parte de la energía se convirtió en calor por fricción con el aire y el hilo",
+            "La gravedad consume parte de la energía del péndulo",
+            "La masa de la bola cambia durante el movimiento"
+          ],
+          "correct": "Parte de la energía se convirtió en calor por fricción con el aire y el hilo"
+        }
+      ],
+      "rubric": "CRITERIO 1 — Comprensión de la Ley de Conservación: Inicial: No puede enunciar la ley. En desarrollo: La enuncia parcialmente o con confusiones. Consolidado: La enuncia correctamente y la aplica en un ejemplo simple. Destacado: La enuncia, la aplica, e identifica cuándo aplica el sistema aislado y cuándo no.\n\nCRITERIO 2 — Cálculo de energías cinética y potencial: Inicial: No aplica las fórmulas. En desarrollo: Aplica las fórmulas con errores de sustitución. Consolidado: Calcula Ec y Ep correctamente con unidades. Destacado: Calcula en varias posiciones del sistema y verifica la conservación numéricamente.\n\nCRITERIO 3 — Cálculo e interpretación de eficiencia: Inicial: No puede calcular eficiencia. En desarrollo: Calcula η pero no lo interpreta. Consolidado: Calcula η e interpreta qué significa en el contexto del dispositivo. Destacado: Compara eficiencias de varios dispositivos y propone mejoras basadas en los datos.\n\nCRITERIO 4 — Aplicación a decisiones energéticas: Inicial: No conecta la eficiencia con decisiones cotidianas. En desarrollo: Menciona una decisión pero sin calcular el impacto. Consolidado: Calcula el impacto económico o ambiental de elegir un dispositivo más eficiente. Destacado: Propone un plan de ahorro energético para el hogar basado en datos reales de eficiencia."
+    },
+    "teacher_tips": [
+      "Error muy común: confundir 'eficiencia' con 'potencia'. La eficiencia mide qué fracción se convierte en forma útil; la potencia mide qué tan rápido se transforma. Un auto deportivo puede ser más potente que un subcompacto pero ambos tienen la misma eficiencia (~30%). Son conceptos independientes.",
+      "Error conceptual frecuente: creer que la energía 'se pierde' realmente. Insistir: la energía siempre se conserva en el universo, lo que cambia es si está en una forma 'útil' o 'dispersa'. El calor de los frenos es real y medible; no desapareció.",
+      "Estrategia de andamiaje: el experimento de la rampa es muy efectivo pero requiere una medición cuidadosa. Usar rampa de cartón y pelota de plastilina para minimizar el rebote y facilitar la lectura de alturas. La pelota de plastilina sube menos y hace el efecto de fricción más evidente.",
+      "Pregunta socrática: '¿Podría existir una máquina con eficiencia del 100%? ¿Por qué no?' — Introduce el concepto de segundo principio de la termodinámica (entropía) de forma intuitiva sin necesidad de la fórmula.",
+      "Conexión CONUEE: mostrar la etiqueta de eficiencia energética de la NOM-028 que aparece en refrigeradores, aires acondicionados y lavadoras. Los alumnos pueden buscar la de su refrigerador en casa y calcular cuánto dinero y kWh 'desperdicia' anualmente."
+    ]
   },
+
   "CNEYT-II-P03": {
     "code": "CNEYT-II-P03",
     "title": "Explica los principios básicos de la termodinámica aplicados a fenómenos cotidianos.",
@@ -32,12 +236,119 @@
     "duration": "~3h (2 sesiones de 50 min)",
     "difficulty": "Intermedio",
     "category": "Termodinámica",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "metadata": {
+      "objective": "Comprender y aplicar el primer y segundo principio de la termodinámica a fenómenos cotidianos, reconociendo la inevitabilidad de la disipación energética y su relación con los límites tecnológicos y ambientales.",
+      "competencies": [
+        "Pensamiento termodinámico y sistemas de energía",
+        "Argumentación científica sobre límites físicos",
+        "Conexión entre termodinámica y sustentabilidad"
+      ],
+      "materials": [
+        "Vaso de agua caliente y cubos de hielo para demostración de equilibrio térmico",
+        "Motor de Stirling de demostración (si disponible) o video del mismo",
+        "Diagrama de ciclo de Carnot simplificado",
+        "Artículo de divulgación: 'Entropía y cambio climático' — Ciencia UNAM"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Por qué el café se enfría?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Los dos principios" },
+        { "phase": "Cierre", "duration": "10 min", "label": "El límite de Carnot" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — LA FLECHA DEL TIEMPO",
+          "duration": "10 min",
+          "description": "¿Por qué el café caliente siempre se enfría y nunca vemos un café frío calentarse solo? ¿Por qué una taza rota nunca se vuelve a ensamblar espontáneamente? ¿Por qué el tiempo 'va hacia adelante'? Estas preguntas aparentemente cotidianas llevan al corazón de la termodinámica: el segundo principio y el concepto de entropía. La termodinámica no solo estudia cómo funciona el calor — estudia la dirección irreversible de los procesos naturales.",
+          "activity": "Video corto (3 min) de eventos en 'reversa': un huevo rompiéndose al revés, agua derramada volviendo al vaso, humo volviendo a la chimenea. Los alumnos identifican cuáles son posibles y cuáles imposibles. Discutir: ¿qué ley de la naturaleza prohíbe los procesos 'al revés'?"
+        },
+        {
+          "title": "FASE II: DESARROLLO — DOS PRINCIPIOS FUNDAMENTALES",
+          "duration": "30 min",
+          "description": "Primer principio (conservación): ΔU = Q - W. La energía interna de un sistema cambia cuando recibe calor (Q) o realiza trabajo (W). No se puede obtener más trabajo que la energía aportada — imposibilidad de la 'máquina de movimiento perpetuo de primera especie'. Segundo principio (entropía): en cualquier proceso espontáneo, la entropía total del universo aumenta. El calor fluye naturalmente de zonas calientes a frías, nunca al revés espontáneamente. Consecuencia: ningún motor puede ser 100% eficiente — siempre hay calor que se cede al ambiente (ciclo de Carnot: η_máx = 1 - T_fría/T_caliente). Ejemplo: un motor térmico que opera entre 600K y 300K tiene eficiencia máxima = 1 - 300/600 = 50%.",
+          "activity": "Los alumnos calculan la eficiencia de Carnot para tres pares de temperaturas: motor de vapor (300°C / 30°C), reactor nuclear (300°C / 50°C), motor de automóvil (250°C / 25°C). Comparan con eficiencias reales y discuten: ¿por qué los motores reales son menos eficientes que Carnot?"
+        },
+        {
+          "title": "FASE III: CIERRE — ENTROPÍA Y ECOLOGÍA",
+          "duration": "10 min",
+          "description": "La entropía creciente tiene consecuencias profundas: explica por qué el cambio climático es difícil de revertir (es más fácil desordenar que ordenar), por qué los ecosistemas degradados se recuperan lentamente, y por qué la energía solar es tan valiosa (es energía de baja entropía que 'ordena' la biosfera a través de la fotosíntesis). El CINVESTAV (Centro de Investigación y de Estudios Avanzados del IPN) estudia aplicaciones de la termodinámica en procesos biotecnológicos y energéticos en México.",
+          "activity": "Reflexión escrita (5 min): 'El segundo principio de la termodinámica dice que el desorden siempre aumenta. ¿Cómo es posible entonces que los seres vivos sean tan ordenados y complejos?' — Discusión que introduce el rol de la energía solar en la organización biológica."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La termodinámica es la rama de la física que estudia las relaciones entre el calor, el trabajo y la energía interna de los sistemas. Sus dos principios fundamentales son posiblemente las leyes más poderosas de la ciencia: el primer principio garantiza que la energía se conserva; el segundo establece que los procesos naturales tienen una dirección preferida — hacia el desorden. Ninguna máquina jamás construida ha violado estos principios, aunque muchos inventores han intentado crear 'máquinas de movimiento perpetuo' que los contradigan. En México, la comprensión de la termodinámica es crucial para diseñar políticas energéticas y ambientales más eficaces.",
+      "sections": [
+        {
+          "subtitle": "Primer principio: el balance energético del universo",
+          "content": "El primer principio de la termodinámica es la aplicación de la conservación de la energía a sistemas termodinámicos: la variación de la energía interna (ΔU) de un sistema es igual al calor absorbido (Q) menos el trabajo realizado por el sistema (W): ΔU = Q - W. Este principio prohíbe la 'máquina de movimiento perpetuo de primera especie': un motor que produzca más trabajo que la energía que consume. En la práctica, significa que para calentar tu hogar en invierno necesitas suministrar energía desde afuera; para enfriar en verano, tu aire acondicionado debe 'bombear' calor de adentro hacia afuera consumiendo electricidad. La SENER usa el primer principio en todos sus balances energéticos nacionales."
+        },
+        {
+          "subtitle": "Segundo principio y entropía: la flecha del tiempo",
+          "content": "La entropía (S) es una medida del desorden o de la cantidad de formas microscópicas en que un sistema puede estar organizado. El segundo principio establece que en cualquier proceso espontáneo, la entropía total del universo nunca disminuye (ΔS_universo ≥ 0). Esto tiene una consecuencia profunda: define la dirección del tiempo. Un vaso roto tiene más entropía que uno intacto; calor disperso tiene más entropía que calor concentrado. El rendimiento máximo de cualquier motor térmico (eficiencia de Carnot) está limitado por las temperaturas entre las que opera: η = 1 - T_fría/T_caliente. Esto explica por qué los esfuerzos mundiales (incluyendo los de México en la COP) se centran en reducir la 'producción de entropía' asociada al uso de combustibles fósiles."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Qué prohibe específicamente el primer principio de la termodinámica?",
+          "options": [
+            "Que el calor fluya de frío a caliente",
+            "Que una máquina produzca más energía de la que consume",
+            "Que la temperatura de un sistema sea negativa",
+            "Que la entropía del universo disminuya"
+          ],
+          "correct": "Que una máquina produzca más energía de la que consume"
+        },
+        {
+          "question": "Un motor térmico opera entre una temperatura caliente de 500K y una fría de 250K. ¿Cuál es su eficiencia máxima de Carnot?",
+          "options": ["50%", "25%", "75%", "40%"],
+          "correct": "50%"
+        },
+        {
+          "question": "¿Por qué el calor fluye espontáneamente de un cuerpo caliente a uno frío, y nunca al revés?",
+          "options": [
+            "Porque el segundo principio prohíbe que la entropía disminuya espontáneamente",
+            "Porque el primer principio establece la dirección del flujo de calor",
+            "Porque el calor siempre busca el punto de mayor temperatura",
+            "Porque la entropía de los cuerpos fríos es mayor que la de los calientes"
+          ],
+          "correct": "Porque el segundo principio prohíbe que la entropía disminuya espontáneamente"
+        },
+        {
+          "question": "¿Qué representa físicamente el concepto de entropía?",
+          "options": [
+            "La cantidad total de energía en un sistema",
+            "La temperatura promedio de las partículas del sistema",
+            "Una medida del desorden o dispersión de la energía en el sistema",
+            "La diferencia entre energía cinética y potencial"
+          ],
+          "correct": "Una medida del desorden o dispersión de la energía en el sistema"
+        },
+        {
+          "question": "Los organismos vivos mantienen un nivel de organización muy alto (baja entropía). ¿Cómo es esto posible sin violar el segundo principio?",
+          "options": [
+            "Los seres vivos son una excepción al segundo principio",
+            "Los seres vivos consumen energía del exterior (solar, química) para mantener su organización, aumentando la entropía del entorno",
+            "La entropía de los seres vivos sí disminuye, lo que refuta el segundo principio",
+            "Los seres vivos no están sujetos a las leyes de la termodinámica"
+          ],
+          "correct": "Los seres vivos consumen energía del exterior (solar, química) para mantener su organización, aumentando la entropía del entorno"
+        }
+      ],
+      "rubric": "CRITERIO 1 — Comprensión del primer principio: Inicial: Confunde el primer principio con la conservación de la masa. En desarrollo: Enuncia el principio pero no puede aplicar ΔU = Q - W. Consolidado: Aplica el primer principio a situaciones simples correctamente. Destacado: Usa el primer principio para analizar un dispositivo real y calcular su balance energético.\n\nCRITERIO 2 — Comprensión del segundo principio: Inicial: No puede enunciar el segundo principio. En desarrollo: Lo enuncia como 'el calor va de caliente a frío' sin comprender la entropía. Consolidado: Explica el segundo principio en términos de entropía y da ejemplos de procesos irreversibles. Destacado: Conecta el segundo principio con la dirección del tiempo y la complejidad de los seres vivos.\n\nCRITERIO 3 — Cálculo de eficiencia de Carnot: Inicial: No puede calcular la eficiencia máxima. En desarrollo: Aplica la fórmula con errores de conversión de temperatura. Consolidado: Calcula η de Carnot correctamente usando temperaturas en Kelvin. Destacado: Calcula η de Carnot para varios motores reales y analiza qué limitaciones adicionales los hacen menos eficientes.\n\nCRITERIO 4 — Argumentación sobre límites físicos: Inicial: No puede argumentar por qué es imposible la máquina de movimiento perpetuo. En desarrollo: Argumenta intuitivamente pero sin referencia a los principios. Consolidado: Argumenta citando los principios de la termodinámica correctamente. Destacado: Evalúa críticamente 'inventos' de máquinas de movimiento perpetuo usando los principios como criterio."
+    },
+    "teacher_tips": [
+      "Error muy común: confundir el primer y segundo principio. Ayuda mnemotécnica: '1° = cuánta energía hay (conservación); 2° = hacia dónde va la energía (dirección y entropía)'.",
+      "Error en cálculo de Carnot: olvidar convertir las temperaturas a Kelvin (K = °C + 273). Si se usan grados Celsius, el resultado es incorrecto. Siempre recordar: T en Kelvin, nunca en Celsius en la fórmula de Carnot.",
+      "Estrategia de andamiaje: el video de 'reversa' en la apertura es muy efectivo para construir la intuición del segundo principio antes del formalismo. Los alumnos reconocen naturalmente qué es 'posible' y qué no — el trabajo conceptual es conectar esa intuición con la entropía.",
+      "Pregunta socrática: '¿Podría un refrigerador funcionar sin electricidad? ¿Por qué no?' — Un refrigerador mueve calor de frío a caliente (internamente), lo que requiere trabajo externo porque viola la dirección espontánea del segundo principio.",
+      "Conexión con cambio climático: el aumento de CO₂ en la atmósfera reduce la eficiencia con que la Tierra disipa calor al espacio (altera el equilibrio termodinámico Tierra-espacio). El SEMARNAT y el INECC (Instituto Nacional de Ecología y Cambio Climático) publican reportes anuales sobre esto, accesibles para adolescentes."
+    ]
   },
+
   "CNEYT-II-P04": {
     "code": "CNEYT-II-P04",
     "title": "Distingue entre calor y temperatura, y describe los mecanismos de transferencia de calor.",
@@ -45,12 +356,114 @@
     "duration": "~3h (2 sesiones de 50 min)",
     "difficulty": "Fundamental",
     "category": "Termodinámica",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "metadata": {
+      "objective": "Diferenciar conceptualmente calor y temperatura como magnitudes físicas distintas, identificar los tres mecanismos de transferencia de calor (conducción, convección, radiación) y reconocerlos en fenómenos naturales y aplicaciones tecnológicas mexicanas.",
+      "competencies": [
+        "Diferenciación conceptual entre magnitudes físicas",
+        "Observación y análisis de fenómenos térmicos",
+        "Aplicación de conceptos físicos a diseño tecnológico"
+      ],
+      "materials": [
+        "Termómetro digital, vaso de agua caliente y fría, cucharas de distintos materiales",
+        "Vela y bandeja con polvo de talco para visualizar convección",
+        "Lámina negra y lámina blanca bajo luz solar para comparar absorción radiativa",
+        "Infografía de construcción de casas ecotecnológicas INFONAVIT"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Más caliente o más frío?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "Conducción, convección, radiación" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Diseñar con el calor" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — LA TRAMPA SENSORIAL",
+          "duration": "10 min",
+          "description": "Experimento de Locke: preparar tres recipientes — uno con agua caliente (~45°C), uno con agua tibia (~25°C) y uno con agua fría (~10°C). Un alumno mete la mano derecha en el caliente y la izquierda en el frío simultáneamente (30 segundos). Luego mete ambas manos en el tibio. La mano que estuvo en el caliente siente el tibio como 'frío'; la que estuvo en el frío lo siente como 'caliente'. Conclusión: nuestra percepción sensorial de calor y frío es relativa, no absoluta. Por eso necesitamos la temperatura como medida objetiva.",
+          "activity": "Hacer el experimento de Locke con 4-5 alumnos. El resto observa y predice qué va a sentir cada voluntario. Discusión: ¿qué mide realmente un termómetro? ¿Por qué nuestras manos no son 'termómetros confiables'?"
+        },
+        {
+          "title": "FASE II: DESARROLLO — TRES FORMAS DE TRANSFERIR CALOR",
+          "duration": "30 min",
+          "description": "Definición clara: temperatura = energía cinética promedio por partícula (medida en °C, K o °F); calor = energía en tránsito entre sistemas a diferente temperatura (medida en Joules o calorías). El calor fluye siempre de mayor a menor temperatura. Tres mecanismos: (1) Conducción: transferencia por contacto directo, a través de colisiones entre partículas adyacentes. Los metales conducen bien porque tienen electrones libres. La madera, el unicel y el aire son malos conductores (aislantes). (2) Convección: transferencia por movimiento de masas de fluido (líquido o gas). El fluido caliente sube (menos denso), el frío baja, creando corrientes. Olla de agua hirviendo, sistemas de calefacción, vientos alisios. (3) Radiación: transferencia por ondas electromagnéticas, sin necesidad de materia. El Sol nos calienta a través del vacío. Los cuerpos negros absorben más que los blancos — razón por la que los techos blancos del Caribe y Yucatán reflejan el calor solar.",
+          "activity": "Tres demos simultáneas: Conducción — cuchara de metal vs cuchara de madera en agua caliente (¿cuál está más caliente al tocar después de 2 min?). Convección — vela bajo bandeja con polvo de talco (el polvo revela la corriente de aire caliente ascendente). Radiación — lámina negra vs blanca bajo luz solar (termómetro mide diferencia)."
+        },
+        {
+          "title": "FASE III: CIERRE — DISEÑO Y BIOCLIMÁTICA",
+          "duration": "10 min",
+          "description": "El conocimiento de los mecanismos de transferencia de calor tiene aplicaciones directas en la construcción. Las casas bioclimáticas o ecotecnológicas del INFONAVIT en México están diseñadas para: minimizar la conducción (paredes gruesas de adobe o block termoaislante), aprovechar la convección natural (orientación y ventanas estratégicas para generar ventilación cruzada), y controlar la radiación (techos con pintura reflectiva en climas calurosos del sur, o techo verde en ciudad). El diseño bioclimático puede reducir el consumo de aire acondicionado hasta un 60%, según estudios del Instituto de Ingeniería UNAM.",
+          "activity": "Diseño rápido (5 min): cada equipo dibuja una vivienda para Mérida, Yucatán (clima caluroso y húmedo). ¿Qué forma tiene? ¿De qué material son las paredes y el techo? ¿Dónde van las ventanas? ¿Cómo controlan los tres mecanismos de transferencia? Presentación de 1 minuto por equipo."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Calor y temperatura son dos de los conceptos más confundidos en la física cotidiana. La temperatura es una propiedad del estado de un sistema: mide cuánta energía cinética promedio tienen sus partículas por unidad. El calor es un proceso: es la energía que se transfiere entre dos sistemas que están a diferente temperatura. No decimos que un objeto 'tiene calor' como propiedad; decimos que 'transfiere calor' cuando está en contacto con otro de diferente temperatura. Esta distinción, clarificada históricamente por Benjamin Thompson (Count Rumford) y James Joule en el siglo XIX, es fundamental para entender la termodinámica y el diseño de sistemas de calefacción, refrigeración y construcción sustentable.",
+      "sections": [
+        {
+          "subtitle": "Conducción: el calor por contacto",
+          "content": "La conducción es la transferencia de calor a través de un material por colisión entre partículas adyacentes, sin que el material se desplace. La conductividad térmica (k) es la propiedad que mide qué tan bien conduce el calor un material: los metales tienen k muy alta (el cobre: 400 W/m·K), mientras que materiales como la lana mineral o el unicel tienen k muy baja. En construcción, esto determina el espesor de las paredes necesario para aislar. Las paredes de adobe de las construcciones coloniales mexicanas (Puebla, Oaxaca) tienen un espesor de 40-60 cm precisamente para minimizar la conducción y mantener el interior fresco en verano y cálido en invierno — una tecnología bioclimática ancestral."
+        },
+        {
+          "subtitle": "Convección y radiación: transferencia a distancia",
+          "content": "La convección ocurre en fluidos (líquidos y gases): cuando se calienta una región del fluido, se vuelve menos densa, asciende y es reemplazada por fluido más frío que desciende, creando corrientes circulares. Este mecanismo es responsable de las brisas marinas en las costas de Veracruz y Guerrero (diferencia de temperatura entre mar y tierra crea convección), de las corrientes oceánicas que regulan el clima global, y de los sistemas de calefacción de tiro natural de casas coloniales. La radiación es la única forma de transferencia que no requiere materia: el calor del Sol llega como radiación infrarroja a través del vacío del espacio. Todo objeto con temperatura > 0 K emite radiación; los objetos más calientes emiten más y en longitudes de onda más cortas. Los techos de lámina negra en ciudades como Monterrey absorben hasta 95% de la radiación solar; los blancos o metálicos reflejan hasta 85%, reduciendo drásticamente el consumo de aire acondicionado."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál es la diferencia fundamental entre calor y temperatura?",
+          "options": [
+            "El calor se mide en grados y la temperatura en Joules",
+            "La temperatura es una propiedad del sistema; el calor es energía en tránsito entre sistemas",
+            "Son exactamente lo mismo: 'calor' es el término popular y 'temperatura' el científico",
+            "El calor solo existe en sólidos; la temperatura en todos los estados"
+          ],
+          "correct": "La temperatura es una propiedad del sistema; el calor es energía en tránsito entre sistemas"
+        },
+        {
+          "question": "¿Por qué los metales se sienten más fríos que la madera aunque estén a la misma temperatura?",
+          "options": [
+            "Porque los metales tienen menor temperatura que la madera en interiores",
+            "Porque los metales conducen el calor mejor, extrayendo más energía de tu mano más rápidamente",
+            "Porque la madera emite más radiación infrarroja que el metal",
+            "Porque los metales tienen convección interna que enfría su superficie"
+          ],
+          "correct": "Porque los metales conducen el calor mejor, extrayendo más energía de tu mano más rápidamente"
+        },
+        {
+          "question": "¿Qué mecanismo de transferencia de calor no requiere materia para propagarse?",
+          "options": ["Conducción", "Convección", "Radiación", "Difusión"],
+          "correct": "Radiación"
+        },
+        {
+          "question": "En la costa de Veracruz, la brisa marina que llega del mar hacia tierra durante el día es un ejemplo de:",
+          "options": ["Conducción térmica entre agua y tierra", "Convección generada por diferencia de temperatura entre mar y tierra", "Radiación del océano hacia la costa", "Conducción en el aire costero"],
+          "correct": "Convección generada por diferencia de temperatura entre mar y tierra"
+        },
+        {
+          "question": "Un techo de color blanco en Mérida absorbe menos radiación solar que uno negro. ¿Qué propiedad física explica esta diferencia?",
+          "options": [
+            "La conductividad térmica del color blanco es mayor",
+            "El color blanco refleja más radiación electromagnética (alta reflectividad/albedo)",
+            "El blanco convecta el calor hacia arriba más eficientemente",
+            "El negro tiene mayor capacidad calorífica que el blanco"
+          ],
+          "correct": "El color blanco refleja más radiación electromagnética (alta reflectividad/albedo)"
+        }
+      ],
+      "rubric": "CRITERIO 1 — Distinción entre calor y temperatura: Inicial: Usa los términos como sinónimos. En desarrollo: Distingue intuitivamente pero no formalmente. Consolidado: Define ambos términos correctamente con sus unidades. Destacado: Explica la distinción con ejemplos propios y corrige el uso incorrecto en contextos cotidianos.\n\nCRITERIO 2 — Identificación de mecanismos de transferencia: Inicial: No identifica ningún mecanismo. En desarrollo: Identifica 1-2 mecanismos con confusiones. Consolidado: Identifica correctamente los tres mecanismos con ejemplos. Destacado: Identifica los tres mecanismos en un fenómeno complejo y explica cuál predomina y por qué.\n\nCRITERIO 3 — Aplicación al diseño: Inicial: No conecta los mecanismos con aplicaciones tecnológicas. En desarrollo: Menciona una aplicación sin explicar el mecanismo involucrado. Consolidado: Explica cómo los mecanismos de transferencia se aprovechan o minimizan en una aplicación real. Destacado: Diseña una solución tecnológica (edificio, dispositivo) argumentando cómo controla cada mecanismo.\n\nCRITERIO 4 — Conexión con el contexto mexicano: Inicial: No hace ninguna referencia a México. En desarrollo: Menciona un ejemplo mexicano superficialmente. Consolidado: Relaciona los mecanismos con al menos dos fenómenos o tecnologías del contexto mexicano. Destacado: Analiza críticamente cómo el clima regional de México (norte árido, sureste tropical, altiplano) determina qué mecanismos son más relevantes y qué estrategias de diseño se requieren."
+    },
+    "teacher_tips": [
+      "Error universal: 'el frío entra por las ventanas'. El frío no se 'transmite' — lo que ocurre es que el calor interno sale hacia el exterior más frío. El calor siempre va de mayor a menor temperatura. Corregir este lenguaje cotidiano sistemáticamente.",
+      "Error frecuente: confundir temperatura con calor específico. 'El agua tarda más en calentarse porque es mejor conductor' — incorrecto. El agua tiene alta capacidad calorífica (absorbe mucho calor por grado), no es mejor conductor. Son propiedades distintas.",
+      "Estrategia de andamiaje: las demostraciones simultáneas de los tres mecanismos son muy efectivas porque permiten comparación directa. Si hay solo una fuente de calor, las demos secuenciales también funcionan bien, pero perder el elemento comparativo reduce el impacto.",
+      "Pregunta socrática: '¿Por qué en el espacio los astronautas no sienten el calor del Sol en el lado oscuro de la nave, aunque el Sol esté cerca?' — Lleva a distinguir radiación (solo en la superficie iluminada) de convección/conducción (imposible en el vacío).",
+      "Conexión bioclimática: llevar fotos de arquitectura vernácula mexicana — las casas de adobe de Oaxaca, los techos verdes de Xochimilco, las ventilaciones de las casas mayas en Yucatán. Cada característica arquitectónica tiene una razón termodinámica. El conocimiento indígena y la ciencia física convergen."
+    ]
   },
+
   "CNEYT-II-P05": {
     "code": "CNEYT-II-P05",
     "title": "Calcula trabajo y potencia mecánica en situaciones prácticas.",
@@ -58,12 +471,109 @@
     "duration": "~3h (2 sesiones de 50 min)",
     "difficulty": "Intermedio",
     "category": "Mecánica",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "metadata": {
+      "objective": "Definir, calcular e interpretar el trabajo mecánico y la potencia en situaciones cotidianas y laborales mexicanas, comprendiendo la relación entre fuerza, desplazamiento, tiempo y la unidad de potencia en términos prácticos.",
+      "competencies": [
+        "Aplicación de fórmulas físicas a situaciones reales",
+        "Pensamiento cuantitativo y estimación",
+        "Conexión entre física y trabajo cotidiano"
+      ],
+      "materials": [
+        "Cronómetro (celular), báscula, cinta métrica o regla de 2 metros",
+        "Escalera o rampa para medir trabajo al subir un objeto",
+        "Datos de potencia de electrodomésticos y motores (en watts)",
+        "Publicación: 'Trabajo decente y métricas energéticas' — STPS México"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Trabajaste si no hubo movimiento?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "W = F·d y P = W/t" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Potencia en el mundo laboral" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — TRABAJO EN FÍSICA ≠ TRABAJO COTIDIANO",
+          "duration": "10 min",
+          "description": "Un cargador del mercado de La Merced empuja con toda su fuerza una caja que no se mueve durante 5 minutos — ¿realizó trabajo en el sentido físico? En física: NO. El trabajo mecánico es W = F·d·cos(θ), y si d = 0 (sin desplazamiento), W = 0. Esto parece injusto: el cargador se cansa igual que si hubiera movido la caja. En física, 'trabajo' tiene una definición precisa que difiere del uso cotidiano: requiere fuerza Y desplazamiento en la dirección de la fuerza.",
+          "activity": "Experimento de motivación: un alumno sostiene un libro pesado con el brazo extendido durante 2 minutos (sí se cansa, sí hay fuerza, pero W = 0 porque no hay desplazamiento). Luego carga el libro subiendo un escalón (ahora sí W ≠ 0). Discutir la paradoja: ¿por qué nos cansamos si 'no hacemos trabajo'?"
+        },
+        {
+          "title": "FASE II: DESARROLLO — CÁLCULO DE TRABAJO Y POTENCIA",
+          "duration": "30 min",
+          "description": "Trabajo: W = F·d·cos(θ) en Joules. Cuando la fuerza es paralela al desplazamiento, cos(0°) = 1 y W = F·d. Cuando es perpendicular (cargar una caja mientras caminas horizontal), cos(90°) = 0 y W = 0. Ejemplos: levantar un costal de maíz de 50 kg una altura de 1.2 m: W = 50 × 10 × 1.2 = 600 J. Potencia: P = W/t en Watts (1 W = 1 J/s). La potencia mide qué tan rápido se realiza el trabajo. Un motor de 1 HP (caballo de vapor) = 745.7 W. Un humano promedio puede sostener ~75-100 W de potencia mecánica durante horas (un ciclista entrenado, ~300-400 W). Comparación: motor de automóvil típico mexicano (Volkswagen Jetta) ~ 85 kW = 85,000 W.",
+          "activity": "Experimento personal: cada alumno mide su potencia mecánica subiendo una escalera. (1) Medir su masa (o estimarla). (2) Medir la altura de la escalera. (3) Cronometrar el tiempo en subir. (4) Calcular W = mgh y P = W/t. Comparar resultados: ¿quién es más 'poderoso'? ¿Importa más la masa o la velocidad?"
+        },
+        {
+          "title": "FASE III: CIERRE — POTENCIA Y TRABAJO REAL",
+          "duration": "10 min",
+          "description": "La potencia tiene implicaciones directas en el mundo laboral y energético. Un trabajador de la construcción en México realiza en promedio 300-500 kJ de trabajo útil por jornada de 8 horas — equivalente a una potencia mecánica de ~10-17 W (la mayor parte del esfuerzo humano se pierde en calor). Esto explica por qué las máquinas (que pueden ser cientos de veces más potentes) han transformado la producción: un motor de construcción de 5 kW equivale al trabajo de ~300-500 trabajadores en términos de potencia sostenida.",
+          "activity": "Reflexión calculada: '¿Cuánto cuesta 1 hora de trabajo de un motor eléctrico de 1 kW vs el salario mínimo de un trabajador que puede producir ~15 W útiles?' Calcular y comparar. Discutir las implicaciones económicas y sociales de la automatización en México."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "El trabajo mecánico y la potencia son dos conceptos fundamentales de la mecánica clásica con profundas aplicaciones en ingeniería, economía y política laboral. En física, el trabajo (W) cuantifica cuánta energía se transfiere a través de una fuerza que produce desplazamiento; la potencia (P) mide la rapidez con que se realiza ese trabajo. Estos conceptos, desarrollados formalmente por Gaspard-Gustave de Coriolis y James Watt en el siglo XVIII y XIX, son la base del diseño de motores, turbinas y la evaluación de la capacidad humana de trabajo — con implicaciones directas en las normas laborales de la STPS (Secretaría del Trabajo y Previsión Social) en México.",
+      "sections": [
+        {
+          "subtitle": "Trabajo mecánico: fuerza con desplazamiento en su dirección",
+          "content": "El trabajo mecánico W = F·d·cos(θ) tiene tres componentes: la magnitud de la fuerza (F, en Newtons), el desplazamiento (d, en metros) y el ángulo (θ) entre la dirección de la fuerza y la del desplazamiento. El joule (J = N·m) es la unidad de trabajo y energía. Cuando se levanta verticalmente un objeto de masa m a una altura h: W = mgh (aquí F = mg y θ = 0°). Cuando una fuerza es perpendicular al desplazamiento (como la fuerza normal que ejerce el suelo sobre un objeto que se desliza horizontalmente), no realiza trabajo. La energía cinética y el trabajo están relacionados por el Teorema trabajo-energía: el trabajo neto sobre un objeto igual al cambio en su energía cinética (W_neto = ΔEc). Este teorema es la base del análisis energético en la ingeniería de puertos y ferrocarriales de la SCT (Secretaría de Comunicaciones y Transportes)."
+        },
+        {
+          "subtitle": "Potencia: rapidez de hacer trabajo",
+          "content": "La potencia P = W/t (en Watts = J/s) indica cuánto trabajo se realiza por unidad de tiempo. La unidad de caballos de vapor (HP = Horse Power) fue definida por James Watt comparando la potencia de sus motores a vapor con la de un caballo de trabajo: 1 HP = 745.7 W. En México, la Comisión Federal de Electricidad (CFE) factura el consumo en kWh (kilowatt-hora), que es una unidad de energía: 1 kWh = 1,000 W × 3,600 s = 3.6 millones de J = 3.6 MJ. Un hogar mexicano típico consume ~150-250 kWh/mes. La eficiencia en términos de potencia es crítica en el diseño industrial: una bomba hidráulica en la planta Pemex de Dos Bocas, Tabasco, con mayor potencia puede extraer el mismo volumen de petróleo en menos tiempo, reduciendo costos operativos."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Un obrero levanta un bulto de cemento de 40 kg hasta una altura de 1.5 m. ¿Cuánto trabajo mecánico realizó? (g = 10 m/s²)",
+          "options": ["600 J", "60 J", "400 J", "150 J"],
+          "correct": "600 J"
+        },
+        {
+          "question": "¿Por qué cargar un libro caminando horizontalmente realiza W = 0 en el libro?",
+          "options": [
+            "Porque la fuerza aplicada es muy pequeña",
+            "Porque la fuerza (vertical, hacia arriba) es perpendicular al desplazamiento (horizontal)",
+            "Porque el libro no tiene aceleración",
+            "Porque la fricción cancela el trabajo"
+          ],
+          "correct": "Porque la fuerza (vertical, hacia arriba) es perpendicular al desplazamiento (horizontal)"
+        },
+        {
+          "question": "Un motor realiza 90,000 J de trabajo en 1 minuto. ¿Cuál es su potencia?",
+          "options": ["1,500 W", "90,000 W", "1,500 kW", "90 W"],
+          "correct": "1,500 W"
+        },
+        {
+          "question": "Un alumno de 55 kg sube una escalera de 4 metros en 5 segundos. ¿Cuál es su potencia mecánica?",
+          "options": ["440 W", "44 W", "220 W", "880 W"],
+          "correct": "440 W"
+        },
+        {
+          "question": "¿Qué significa que un motor tenga una potencia de 5 kW?",
+          "options": [
+            "Que usa 5,000 Joules de energía en total durante su vida útil",
+            "Que realiza 5,000 Joules de trabajo cada segundo",
+            "Que su fuerza máxima es de 5,000 Newtons",
+            "Que consume 5,000 kilogramos de combustible por hora"
+          ],
+          "correct": "Que realiza 5,000 Joules de trabajo cada segundo"
+        }
+      ],
+      "rubric": "CRITERIO 1 — Definición y comprensión de trabajo mecánico: Inicial: Confunde trabajo físico con esfuerzo o trabajo laboral. En desarrollo: Define trabajo pero no incluye el factor del ángulo. Consolidado: Define W = F·d·cos(θ) y distingue cuándo W = 0. Destacado: Explica el Teorema trabajo-energía y conecta W con cambios en Ec.\n\nCRITERIO 2 — Cálculo de trabajo: Inicial: No aplica la fórmula correctamente. En desarrollo: Aplica W = F·d pero olvida considerar el ángulo o g. Consolidado: Calcula el trabajo correctamente con unidades. Destacado: Calcula en situaciones donde θ ≠ 0° y verifica la consistencia con la energía.\n\nCRITERIO 3 — Cálculo e interpretación de potencia: Inicial: No puede calcular potencia. En desarrollo: Calcula P = W/t pero no lo interpreta. Consolidado: Calcula P correctamente y lo interpreta (¿qué implica esa potencia?). Destacado: Convierte entre unidades (W, kW, HP, kWh) y compara la potencia humana con la de máquinas reales.\n\nCRITERIO 4 — Aplicación a contextos reales: Inicial: No conecta los cálculos con situaciones reales. En desarrollo: Menciona una aplicación sin calcular. Consolidado: Calcula trabajo y potencia en al menos un contexto real mexicano. Destacado: Analiza las implicaciones económicas o sociales de la diferencia de potencia entre trabajo humano y máquinas en el contexto laboral mexicano."
+    },
+    "teacher_tips": [
+      "Error más común: usar kg como unidad de fuerza en W = F·d. Recordar: la fuerza en SI es el Newton (N), y el peso de un objeto de masa m kg es F = m × g = m × 10 N (aproximando g = 10 m/s²). Siempre convertir masa a fuerza antes de calcular trabajo.",
+      "Error frecuente: confundir potencia con trabajo o con energía. 'Potencia' no es fuerza, no es trabajo acumulado — es la TASA de trabajo. Un motor débil puede hacer el mismo trabajo que uno potente, pero tarda más.",
+      "Estrategia de andamiaje: el experimento de subir la escalera midiendo la propia potencia es altamente motivador porque hace personal el concepto. Comparar los valores obtenidos con los de un motor eléctrico pequeño (taladro: ~500 W, licuadora: ~300 W) da perspectiva inmediata.",
+      "Pregunta socrática: '¿Por qué los ciclistas que suben una montaña 'más rápido' necesitan más potencia, aunque al final hagan el mismo trabajo?' — Lleva a distinguir trabajo total (igual) de potencia (diferente según el tiempo).",
+      "Conexión STPS: la Norma Oficial Mexicana NOM-006-STPS establece condiciones de manejo de cargas en el trabajo. Define límites de peso y altura de levantamiento precisamente para no superar la potencia sostenible del cuerpo humano sin daño musculosquelético — una aplicación directa de trabajo y potencia en la legislación laboral."
+    ]
   },
+
   "CNEYT-II-P06": {
     "code": "CNEYT-II-P06",
     "title": "Relaciona el consumo energético con el impacto ambiental y propone alternativas sustentables.",
@@ -71,12 +581,119 @@
     "duration": "~3h (2 sesiones de 50 min)",
     "difficulty": "Intermedio",
     "category": "Energía y ambiente",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "metadata": {
+      "objective": "Analizar la cadena causa-efecto entre consumo energético basado en combustibles fósiles, emisiones de CO₂ y cambio climático, evaluando alternativas sustentables con referencia al contexto y compromisos ambientales de México.",
+      "competencies": [
+        "Pensamiento sistémico y análisis de externalidades",
+        "Ciudadanía ambiental crítica",
+        "Propuesta y argumentación de soluciones sustentables"
+      ],
+      "materials": [
+        "Infografía INECC: Inventario Nacional de Emisiones de GEI México 2022",
+        "Calculadora de huella de carbono (CO₂.earth o calculadora SEMARNAT)",
+        "Video: 'México ante el cambio climático' — UNAM Global",
+        "Datos de consumo per cápita de energía INEGI 2023"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Cuánto CO₂ emití hoy?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "De la quema al clima" },
+        { "phase": "Cierre", "duration": "10 min", "label": "México en la COP y en casa" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — LA HUELLA INVISIBLE",
+          "duration": "10 min",
+          "description": "¿Cuánto CO₂ produjiste hoy antes de llegar a la escuela? El desayuno (gas LP para cocinar: ~0.3 kg CO₂), el transporte (autobús urbano: ~0.05 kg CO₂/km × distancia, automóvil: ~0.15 kg CO₂/km), la electricidad usada al cargar el celular (~0.001 kg CO₂). Este ejercicio hace visible lo invisible: el CO₂ que emiten las actividades cotidianas. México emite aproximadamente 755 millones de toneladas de CO₂ equivalente al año (INECC, 2022), colocándose entre los 15 países más emisores del mundo.",
+          "activity": "Cálculo rápido colectivo: construir en el pizarrón el 'inventario de CO₂ del grupo' para esta mañana. ¿Cuántos kg de CO₂ emitió el grupo solo en transporte hacia la escuela? Multiplicar el promedio individual por el número de alumnos y extrapolar a un año escolar. El resultado suele sorprender."
+        },
+        {
+          "title": "FASE II: DESARROLLO — CADENA CAUSA-EFECTO",
+          "duration": "30 min",
+          "description": "La cadena completa: (1) Quema de combustibles fósiles → CO₂ y otros GEI al atmosfera. (2) El CO₂ actúa como 'manta' atmosférica: atrapa la radiación infrarroja que la Tierra emite → efecto invernadero reforzado. (3) Temperatura global sube: glaciares retroceden (Popocatépetl ha perdido el 90% de su glaciar en 50 años — UNAM), nivel del mar sube, eventos extremos se intensifican. (4) Impactos en México: sequías más severas en el norte (Sonora, Chihuahua), huracanes más intensos en Golfo y Pacífico, pérdida de biodiversidad en Mesoamérica. Alternativas: (a) Energías renovables (solar, eólica, geotérmica — México tiene potencial extraordinario), (b) Eficiencia energética (CONUEE), (c) Cambios en patrones de consumo (movilidad, alimentación), (d) Políticas públicas (NDC de México: compromisos ante la UNFCCC).",
+          "activity": "Análisis de caso en equipos: cada equipo recibe un sector (transporte, industria, hogares, agricultura). Deben identificar: ¿cuánto emite ese sector en México? ¿Cuáles son las principales fuentes? ¿Qué tres alternativas concretas reducirían esas emisiones? Presentación en 3 minutos."
+        },
+        {
+          "title": "FASE III: CIERRE — ACCIÓN LOCAL Y COMPROMISO GLOBAL",
+          "duration": "10 min",
+          "description": "México firmó el Acuerdo de París y presentó sus Contribuciones Determinadas a Nivel Nacional (NDC) comprometiéndose a reducir el 35% de sus emisiones GEI al 2030 respecto al escenario tendencial. Sin embargo, la brecha entre los compromisos y las políticas implementadas es grande — el INECC monitorea este avance. La acción climática requiere tanto políticas estructurales como cambios individuales: nadie puede resolver el problema solo, pero colectivamente las decisiones de consumo tienen peso real.",
+          "activity": "Contrato de acción personal: cada alumno escribe en su cuaderno un compromiso concreto y medible de reducción de huella de carbono por un mes (no 'contaminar menos' sino 'usar el transporte público 3 días a la semana' o 'reducir el tiempo de la ducha a 5 min'). Se comparte con un compañero que será su 'monitor de compromiso'."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La relación entre el consumo energético y el impacto ambiental es una de las cuestiones científicas y políticas más urgentes del siglo XXI. Los combustibles fósiles (petróleo, gas natural, carbón) almacenan carbono capturado durante millones de años por organismos vivos; cuando los quemamos en décadas, liberamos ese carbono como CO₂ a una velocidad que el ciclo natural del carbono no puede absorber. La concentración de CO₂ atmosférico ha pasado de 280 partes por millón (ppm) en la era pre-industrial a 424 ppm en 2024 — el nivel más alto en 3 millones de años, según la NOAA (Administración Nacional Oceánica y Atmosférica de EE.UU.). México, como país megadiverso y altamente vulnerable al cambio climático, tiene tanto la responsabilidad como el potencial para liderar la transición energética en América Latina.",
+      "sections": [
+        {
+          "subtitle": "El efecto invernadero: mecanismo físico del cambio climático",
+          "content": "El efecto invernadero natural es fundamental para la vida: sin él, la temperatura promedio de la Tierra sería -18°C en lugar de los 15°C actuales. Los gases de efecto invernadero (GEI) — CO₂, metano (CH₄), óxido nitroso (N₂O), vapor de agua — absorben la radiación infrarroja que emite la superficie terrestre y la re-emiten en todas direcciones, incluyendo de regreso a la superficie. El problema es el reforzamiento antropogénico de este efecto: la quema de combustibles fósiles desde la Revolución Industrial ha aumentado la concentración de GEI más allá de la capacidad de los sumideros naturales (océanos, bosques). En México, la deforestación agrava el problema: la Selva Lacandona ha perdido el 70% de su cobertura en el último siglo, según el INAH y la CONAFOR, reduciendo drásticamente la capacidad de captura de carbono del país."
+        },
+        {
+          "subtitle": "Impactos en México y alternativas de mitigación",
+          "content": "México es particularmente vulnerable al cambio climático por su diversidad de ecosistemas y alta dependencia de sectores climáticamente sensibles (agricultura, turismo costero, agua). Los impactos ya observados incluyen: aumento de +0.85°C en temperatura promedio nacional (CONAGUA, 2023), reducción del caudal de ríos en el norte (Río Bravo), intensificación de huracanes en ambas costas, y expansión de zonas áridas. El glaciar del Popocatépetl ha retrocedido ~90% desde 1980 (UNAM). Las alternativas de mitigación más relevantes para México incluyen: (a) Expansión solar y eólica — México tiene un potencial de 5,000 GW solar en el Altiplano Norte, cinco veces la demanda eléctrica actual; (b) Movilidad eléctrica — el transporte representa el 24% de las emisiones nacionales; (c) Economía circular y eficiencia industrial — el CINVESTAV desarrolla tecnologías de valorización de residuos que reducen emisiones; (d) Protección y restauración forestal — la Comisión Nacional Forestal (CONAFOR) proyecta restaurar 500,000 ha para 2030 como sumidero de carbono."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál es el principal mecanismo físico por el que el CO₂ atmosférico contribuye al calentamiento global?",
+          "options": [
+            "El CO₂ absorbe la radiación solar antes de que llegue a la superficie",
+            "El CO₂ atrapa la radiación infrarroja que emite la Tierra, reduciendo la pérdida de calor al espacio",
+            "El CO₂ reacciona químicamente con el nitrógeno atmosférico generando calor",
+            "El CO₂ aumenta la densidad del aire y reduce la convección atmosférica"
+          ],
+          "correct": "El CO₂ atrapa la radiación infrarroja que emite la Tierra, reduciendo la pérdida de calor al espacio"
+        },
+        {
+          "question": "¿Qué sector económico es el mayor emisor de GEI en México según el INECC?",
+          "options": ["Agricultura", "Industria manufacturera", "Energía y transporte", "Residuos sólidos"],
+          "correct": "Energía y transporte"
+        },
+        {
+          "question": "La Selva Lacandona ha perdido el 70% de su cobertura forestal. ¿Qué implicación tiene esto para el ciclo del carbono en México?",
+          "options": [
+            "Aumenta la capacidad de México de absorber CO₂ del atmosphereera",
+            "Reduce los sumideros de carbono, haciendo que más CO₂ permanezca en la atmósfera",
+            "No tiene impacto porque los océanos absorben todo el CO₂ excedente",
+            "Disminuye las emisiones de metano del suelo forestal"
+          ],
+          "correct": "Reduce los sumideros de carbono, haciendo que más CO₂ permanezca en la atmósfera"
+        },
+        {
+          "question": "¿Qué ventaja tiene la energía solar fotovoltaica sobre los combustibles fósiles en términos de impacto ambiental?",
+          "options": [
+            "Los paneles solares no consumen ningún recurso natural en su fabricación",
+            "La energía solar no emite GEI durante su operación, a diferencia de la quema de combustibles",
+            "La energía solar es más barata que el petróleo en todos los contextos",
+            "Los paneles solares generan energía ilimitada sin ninguna pérdida"
+          ],
+          "correct": "La energía solar no emite GEI durante su operación, a diferencia de la quema de combustibles"
+        },
+        {
+          "question": "¿Qué significa que México se haya comprometido a reducir el 35% de sus emisiones GEI al 2030 en el Acuerdo de París?",
+          "options": [
+            "México eliminará completamente el uso de combustibles fósiles para 2030",
+            "México reducirá sus emisiones en 35% respecto a las que tendría si no tomara ninguna acción",
+            "México exportará 35% de su energía renovable a otros países",
+            "El 35% de la economía mexicana se volverá 'cero emisiones' para 2030"
+          ],
+          "correct": "México reducirá sus emisiones en 35% respecto a las que tendría si no tomara ninguna acción"
+        }
+      ],
+      "rubric": "CRITERIO 1 — Comprensión del efecto invernadero: Inicial: Confunde el efecto invernadero con la destrucción de la capa de ozono. En desarrollo: Describe el efecto invernadero pero no el mecanismo físico (radiación infrarroja). Consolidado: Explica el mecanismo físico del efecto invernadero y la diferencia entre el natural y el reforzado. Destacado: Argumenta por qué el CO₂ y el CH₄ son más preocupantes que el vapor de agua en términos del reforzamiento antropogénico.\n\nCRITERIO 2 — Análisis de impactos en México: Inicial: No puede mencionar impactos concretos del cambio climático en México. En desarrollo: Menciona impactos genéricos sin datos. Consolidado: Describe al menos tres impactos específicos de México con datos o fuentes. Destacado: Relaciona los impactos con la vulnerabilidad particular de México (megabiodiversidad, costas, norte árido) y analiza qué regiones o poblaciones son más afectadas.\n\nCRITERIO 3 — Propuesta de alternativas sustentables: Inicial: No puede proponer alternativas. En desarrollo: Propone alternativas genéricas sin analizar su viabilidad. Consolidado: Propone al menos tres alternativas específicas y viables para el contexto mexicano. Destacado: Evalúa las alternativas en términos de viabilidad técnica, económica y social, priorizando las más impactantes.\n\nCRITERIO 4 — Compromiso ciudadano: Inicial: Piensa que el problema no le concierne individualmente. En desarrollo: Reconoce el problema pero no ve relación con sus acciones. Consolidado: Identifica acciones individuales concretas con impacto verificable. Destacado: Diseña un plan de acción colectiva (familia, escuela, comunidad) con metas medibles y plazo específico."
+    },
+    "teacher_tips": [
+      "Error muy frecuente: confundir el cambio climático con el 'hoyo en la capa de ozono'. Son problemas distintos. El agotamiento del ozono afecta la radiación UV; el cambio climático afecta el balance térmico global. Corregir siempre con claridad.",
+      "Error conceptual: creer que las energías renovables son 'perfectas' y sin impacto. Los paneles solares requieren minería de materiales, las turbinas eólicas tienen impacto en aves y paisaje. El objetivo es MENOR impacto, no cero impacto.",
+      "Estrategia de andamiaje: comenzar siempre por lo local y personal (la huella de carbono del grupo) antes de escalar a lo nacional y global. Los datos abstractos de 'millones de toneladas' no generan la misma respuesta emocional y cognitiva que '¿cuántas toneladas emitiste tú esta semana?'",
+      "Pregunta socrática: '¿Por qué algunos países dicen que no es 'justo' que los países en desarrollo como México tengan las mismas restricciones de emisiones que los países industrializados que ya emitieron durante 150 años?' — Introduce la dimensión de justicia climática y responsabilidad histórica diferenciada.",
+      "Conexión con CONABIO: la Comisión Nacional para el Conocimiento y Uso de la Biodiversidad tiene mapas interactivos de cómo el cambio climático afecta la distribución de especies mexicanas (la mariposa Monarca, el axolote, la vaquita marina). Son herramientas pedagógicas potentes y gratuitas en conabio.gob.mx."
+    ]
   },
+
   "CNEYT-II-P07": {
     "code": "CNEYT-II-P07",
     "title": "Analiza las fuentes de energía renovable y no renovable en el contexto mexicano.",
@@ -84,23 +701,246 @@
     "duration": "~3h (2 sesiones de 50 min)",
     "difficulty": "Intermedio",
     "category": "Energía y sociedad",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "metadata": {
+      "objective": "Clasificar y comparar las fuentes de energía renovable y no renovable presentes en México, evaluando sus ventajas, limitaciones y potencial en el mix energético nacional con base en datos reales de la CFE, SENER y AMDEE.",
+      "competencies": [
+        "Análisis comparativo de fuentes energéticas",
+        "Pensamiento crítico sobre política energética",
+        "Valoración del potencial energético del territorio mexicano"
+      ],
+      "materials": [
+        "Mapa energético de México (fuentes: SENER, Prospectiva del Sector Eléctrico 2023)",
+        "Infografía de la Asociación Mexicana de Energía Eólica (AMDEE) sobre parques eólicos",
+        "Datos de producción por fuente CFE 2023",
+        "Video: 'Parque eólico La Venta, Oaxaca' — CFE o YouTube Canal Once"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿De dónde viene la luz de mi escuela?" },
+        { "phase": "Desarrollo", "duration": "30 min", "label": "El mapa energético de México" },
+        { "phase": "Cierre", "duration": "10 min", "label": "¿Qué futuro energético queremos?" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — EL RASTRO DE LA ELECTRICIDAD",
+          "duration": "10 min",
+          "description": "Cuando enciendes la luz de tu salón, la electricidad viajó desde una planta generadora a través de miles de kilómetros de líneas de transmisión. ¿Pero de qué planta vino? ¿Quemó gas natural? ¿Cayó agua en una presa? ¿Brilló el sol? En México, la respuesta depende de dónde estés: en el Istmo de Tehuantepec, Oaxaca, probablemente de un parque eólico; en Sonora, de una planta solar; en Chiapas, de Chicoasén. La mezcla de fuentes energéticas es un espejo de las decisiones políticas, económicas y ambientales de un país.",
+          "activity": "Juego de adivinanza: el docente muestra imágenes de diferentes instalaciones energéticas mexicanas (presa Chicoasén, parque solar Sonora, refinería Dos Bocas, parque eólico La Venta, planta geotérmica Los Azufres). Los alumnos identifican qué tipo de fuente es cada una y si es renovable o no."
+        },
+        {
+          "title": "FASE II: DESARROLLO — CLASIFICACIÓN Y ANÁLISIS",
+          "duration": "30 min",
+          "description": "Fuentes no renovables en México: (1) Petróleo y gas natural (PEMEX): 50% de la electricidad nacional generada con combustibles fósiles en 2023. Reservas probadas: ~8,000 millones de barriles (3P). (2) Carbón mineral: plantas termoeléctricas en Coahuila (Carbón II). Fuentes renovables en México: (3) Hidráulica: 10% de la electricidad. Presas Chicoasén (2,400 MW), Malpaso, Infiernillo. (4) Eólica: 6% y creciendo. La Venta (Oaxaca), región del Golfo. México tiene el quinto mayor potencial eólico de América Latina (AMDEE). (5) Solar fotovoltaica: 6% y creciendo aceleradamente. Sonora, Durango, Zacatecas tienen irradiación de 5-7 kWh/m²/día. (6) Geotérmica: 1%. Los Azufres (Michoacán), Los Humeros (Puebla). México es el 4° productor geotérmico mundial. (7) Biomasa: bagazo de caña, biogás de rellenos sanitarios.",
+          "activity": "Construir colectivamente el 'pastel energético de México' con datos reales de SENER 2023. Cada equipo recibe una fuente y debe: (a) calcular su porcentaje del total, (b) identificar una instalación específica en México, (c) listar 2 ventajas y 2 limitaciones. Luego, cada equipo coloca su 'rebanada' en el pastel del pizarrón."
+        },
+        {
+          "title": "FASE III: CIERRE — DEBATE ENERGÉTICO",
+          "duration": "10 min",
+          "description": "México tiene un debate nacional sobre el futuro energético: ¿debe fortalecer a PEMEX y CFE con inversión pública en fósiles (argumento: soberanía energética, empleos, precios bajos)? ¿O acelerar la transición a renovables privadas (argumento: menor costo a largo plazo, empleos verdes, menos contaminación)? No hay respuesta única: involucra valores, política, economía y ciencia. Los ciudadanos informados — como ustedes — son quienes eventualmente decidirán estos dilemas a través del voto y la participación.",
+          "activity": "Pequeño debate de 5 minutos: mitad del grupo defiende 'acelerar renovables privadas', la otra mitad 'fortalecer PEMEX y CFE con renovables'. Cada lado tiene 2 minutos para argumentar. El docente modera y resalta que ambas posiciones tienen argumentos científicos y políticos válidos."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Las fuentes de energía se clasifican según su tasa de renovación: las renovables se regeneran naturalmente en escalas de tiempo humanas (solar, viento, agua, geotérmica, biomasa); las no renovables se formaron en millones de años y se agotan con el uso (petróleo, gas natural, carbón, uranio). México es un caso único en el panorama energético mundial: posee abundantes reservas de petróleo y gas (PEMEX explota desde 1938), pero también un potencial extraordinario en energías renovables — el Istmo de Tehuantepec tiene vientos entre los más consistentes del mundo, el norte tiene radiación solar comparable al Sahara, y su posición geológica volcánica le da un enorme potencial geotérmico. Balancear estos recursos es el reto central de la política energética nacional.",
+      "sections": [
+        {
+          "subtitle": "Hidrocarburos en México: el legado de PEMEX y la transición pendiente",
+          "content": "México es el undécimo mayor productor de petróleo del mundo. PEMEX (Petróleos Mexicanos), fundado en 1938 tras la expropiación petrolera del presidente Cárdenas, ha sido históricamente el pilar energético e identitario del país. Sin embargo, la producción ha caído desde su pico de 3.4 millones de barriles/día en 2004 a ~1.7 millones en 2023. Las reservas probadas alcanzan para ~15-20 años adicionales al ritmo actual. El gas natural, aunque también fósil, emite ~50% menos CO₂ por kWh que el carbón y está siendo usado como 'puente' en la transición energética. La refinería Dos Bocas en Tabasco, inaugurada en 2023, representa la apuesta gubernamental por mantener la soberanía en refinación, aunque su viabilidad económica es debatida por economistas del COLMEX y el CIDE."
+        },
+        {
+          "subtitle": "Renovables en México: potencial y realidad",
+          "content": "México tiene un potencial técnico de energías renovables de 120,000 TWh/año — 300 veces su consumo eléctrico actual (SENER, 2023). La energía eólica concentra sus mejores recursos en el Istmo de Tehuantepec (Oaxaca), con factores de planta de hasta 45% — entre los más altos del mundo. La AMDEE reporta 7,000 MW instalados en 2023 y proyecta 25,000 MW para 2030. La solar fotovoltaica tiene costos que han caído 90% en la última década — el parque solar Villanueva en Coahuila (828 MW) fue el más grande de América Latina al inaugurarse en 2018. La energía geotérmica aprovecha el calor de los volcanes: México tiene 1,000 MW instalados en Los Azufres (Michoacán) y Los Humeros (Puebla), y el IIE (Instituto de Investigaciones Eléctricas) explora nuevos yacimientos en Nayarit y Jalisco. El Instituto de Energías Renovables (IER) de la UNAM en Temixco, Morelos, es el centro de investigación en energías limpias más importante de México."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Por qué la energía solar se considera 'renovable' mientras que el petróleo es 'no renovable'?",
+          "options": [
+            "Porque el sol es más barato de explotar que el petróleo",
+            "Porque la energía solar se regenera continuamente, mientras que el petróleo tarda millones de años en formarse",
+            "Porque el sol no produce emisiones y el petróleo sí",
+            "Porque México tiene más sol que petróleo"
+          ],
+          "correct": "Porque la energía solar se regenera continuamente, mientras que el petróleo tarda millones de años en formarse"
+        },
+        {
+          "question": "¿Qué región de México tiene el mayor potencial de energía eólica y por qué?",
+          "options": [
+            "La península de Baja California, por su cercanía al Pacífico",
+            "El Istmo de Tehuantepec, Oaxaca, por sus vientos persistentes entre dos océanos",
+            "El Altiplano Central, por su altitud",
+            "La Sierra Madre Occidental, por sus corrientes montañosas"
+          ],
+          "correct": "El Istmo de Tehuantepec, Oaxaca, por sus vientos persistentes entre dos océanos"
+        },
+        {
+          "question": "¿Cuál fue la importancia histórica de la fundación de PEMEX en 1938?",
+          "options": [
+            "México se convirtió en el primer productor de petróleo del mundo",
+            "México recuperó el control de sus recursos petroleros expropiando compañías extranjeras, afirmando su soberanía",
+            "PEMEX privatizó la industria petrolera para atraer inversión extranjera",
+            "México firmó un tratado de libre comercio energético con Estados Unidos"
+          ],
+          "correct": "México recuperó el control de sus recursos petroleros expropiando compañías extranjeras, afirmando su soberanía"
+        },
+        {
+          "question": "La planta geotérmica Los Azufres en Michoacán aprovecha el calor del interior de la Tierra. ¿Qué la hace una fuente renovable?",
+          "options": [
+            "El calor de la Tierra es producido por el sol",
+            "El calor interno de la Tierra es prácticamente inagotable en escalas de tiempo humanas",
+            "Los Azufres utiliza energía solar para complementar su generación",
+            "La geotérmica no emite ningún tipo de emisión o residuo"
+          ],
+          "correct": "El calor interno de la Tierra es prácticamente inagotable en escalas de tiempo humanas"
+        },
+        {
+          "question": "México tiene capacidad técnica renovable de 300 veces su consumo actual, pero solo genera ~25% con renovables. ¿Qué factores explican esta brecha?",
+          "options": [
+            "México no tiene suficiente tecnología para aprovechar las renovables",
+            "Factores económicos, de infraestructura de transmisión, regulación y decisiones de política energética",
+            "Las renovables son más caras que los combustibles fósiles en México",
+            "La geografía de México impide conectar las zonas renovables con las ciudades"
+          ],
+          "correct": "Factores económicos, de infraestructura de transmisión, regulación y decisiones de política energética"
+        }
+      ],
+      "rubric": "CRITERIO 1 — Clasificación de fuentes: Inicial: No distingue entre renovable y no renovable. En desarrollo: Clasifica correctamente las fuentes principales pero confunde algunas (p. ej., nuclear). Consolidado: Clasifica correctamente todas las fuentes con su justificación. Destacado: Añade la dimensión de 'bajo en carbono' (nuclear, hidro) vs 'sin carbono' (solar, viento) y explica la diferencia.\n\nCRITERIO 2 — Conocimiento del contexto mexicano: Inicial: No puede nombrar ninguna instalación energética específica de México. En desarrollo: Nombra una o dos instalaciones sin datos. Consolidado: Identifica instalaciones específicas para al menos 4 tipos de fuentes con su ubicación y capacidad aproximada. Destacado: Construye un mapa conceptual del sistema energético mexicano con instalaciones, rutas de transmisión y regiones de consumo.\n\nCRITERIO 3 — Análisis comparativo: Inicial: No puede comparar ventajas y limitaciones de diferentes fuentes. En desarrollo: Lista ventajas y limitaciones sin analizarlas. Consolidado: Compara al menos 3 fuentes en términos de costo, impacto ambiental, confiabilidad y potencial mexicano. Destacado: Propone un mix energético óptimo para México argumentando con criterios técnicos, ambientales y socioeconómicos.\n\nCRITERIO 4 — Pensamiento crítico sobre política energética: Inicial: No distingue entre decisiones técnicas y políticas en energía. En desarrollo: Identifica que hay debate pero no analiza los argumentos. Consolidado: Analiza al menos dos posiciones en el debate energético mexicano con sus argumentos. Destacado: Toma una posición argumentada sobre el futuro energético de México, reconociendo los trade-offs y la complejidad de la decisión."
+    },
+    "teacher_tips": [
+      "Error común: creer que la energía nuclear es 'renovable'. El uranio es un recurso limitado (aunque dura mucho más que el petróleo) y se clasifica como no renovable. Sin embargo, emite muy poco CO₂ en operación. Esta distinción entre 'baja en carbono' y 'renovable' es importante y frecuentemente confundida en medios.",
+      "Error frecuente: pensar que 'renovable' significa 'sin impacto'. Las presas hidroeléctricas inundan ecosistemas; las eólicas pueden afectar aves; los paneles solares requieren minería de silicio y tierras raras. Renovable significa 'no se agota', no 'sin consecuencias'.",
+      "Estrategia de andamiaje: el 'pastel energético' visual es muy efectivo para representar proporciones. Usar datos reales del SENER del año más reciente disponible para que los alumnos vean la situación actual, no una idealización.",
+      "Pregunta socrática: '¿Por qué México, con tanto sol y viento, sigue dependiendo tanto del petróleo?' — Esta pregunta abre análisis de política económica, soberanía, empleo, inversión e inercia institucional que van más allá de la física.",
+      "Conexión con la vida local: si la escuela está en Oaxaca, Sonora o Tamaulipas, hay alta probabilidad de que exista un parque eólico o solar cercano. Organizar una visita o videoconferencia con ingenieros de planta puede ser transformador. El IER-UNAM también tiene programas de divulgación para bachilleratos."
+    ]
   },
+
   "CNEYT-II-P08": {
     "code": "CNEYT-II-P08",
     "title": "Diseña investigaciones sobre fenómenos energéticos en su entorno inmediato.",
     "level": "Ciencias Naturales, Experimentales y Tecnología II",
-    "duration": "~3h (2 sesiones de 50 min)",
+    "duration": "~4h (2 sesiones de 60 min + trabajo fuera del aula)",
     "difficulty": "Intermedio",
     "category": "Investigación científica",
-    "metadata": { "objective": "_TODO: Contenido pendiente", "competencies": ["_TODO: Contenido pendiente"], "materials": ["_TODO: Contenido pendiente"] },
-    "strategy": { "timeline": [], "phases": [{ "title": "FASE I: APERTURA", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE II: DESARROLLO", "duration": "30 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }, { "title": "FASE III: CIERRE", "duration": "10 min", "description": "_TODO: Contenido pendiente", "activity": "_TODO: Contenido pendiente" }] },
-    "theory": { "introduction": "_TODO: Contenido pendiente", "sections": [{ "subtitle": "_TODO", "content": "_TODO: Contenido pendiente" }] },
-    "evaluation": { "exam_questions": [{ "question": "_TODO", "options": ["_TODO A", "_TODO B", "_TODO C"], "correct": "_TODO A" }], "rubric": "_TODO: Contenido pendiente" },
-    "teacher_tips": ["_TODO: Contenido pendiente"]
+    "metadata": {
+      "objective": "Aplicar el método científico al diseño y ejecución de una investigación sobre un fenómeno energético del entorno, desarrollando habilidades de formulación de hipótesis, control de variables, recolección de datos y comunicación de resultados.",
+      "competencies": [
+        "Metodología científica aplicada",
+        "Pensamiento hipotético-deductivo",
+        "Comunicación científica oral y escrita"
+      ],
+      "materials": [
+        "Formato de protocolo de investigación (variable dependiente/independiente/controlada)",
+        "Instrumentos de medición: termómetro, cronómetro, báscula (o apps equivalentes)",
+        "Materiales variables según la investigación de cada equipo",
+        "Rúbrica de evaluación de proyecto científico (IMECAFI México)"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        { "phase": "Apertura", "duration": "10 min", "label": "¿Qué pregunta energética tienes?" },
+        { "phase": "Desarrollo", "duration": "40 min", "label": "Del problema al protocolo" },
+        { "phase": "Cierre", "duration": "10 min", "label": "Ética y limitaciones" }
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA — PREGUNTAS QUE VALEN LA PENA",
+          "duration": "10 min",
+          "description": "Las mejores investigaciones científicas nacen de preguntas genuinas sobre el mundo cercano. ¿Por qué mi cuarto se calienta más en verano que en invierno aunque el mismo sol le da? ¿Cuánta energía ahorra un ventilador vs un aire acondicionado para reducir la sensación de calor? ¿Cuál calienta más rápido el agua: el microondas, la estufa de gas o la eléctrica? ¿Qué material de techo reduce más la temperatura interior? Estas son preguntas reales y locales que pueden investigarse con materiales simples. Investigar el propio entorno es lo que hacen los científicos del IER-UNAM y del CINVESTAV.",
+          "activity": "Lluvia de ideas individual (2 min): cada alumno escribe 3 preguntas sobre fenómenos energéticos que observe en su casa, escuela o comunidad. Socialización en parejas, luego en grupo. El docente categoriza en el pizarrón por tipo de fenómeno (transferencia de calor, eficiencia energética, consumo). Los equipos eligen su pregunta."
+        },
+        {
+          "title": "FASE II: DESARROLLO — PROTOCOLO DE INVESTIGACIÓN",
+          "duration": "40 min",
+          "description": "Los elementos de un protocolo científico: (1) Pregunta de investigación: específica, observable y medible. NO 'qué es la energía solar' SINO '¿cuánto aumenta la temperatura del agua en un vaso negro vs uno transparente expuesto 30 min al sol?'. (2) Hipótesis: predicción basada en conocimiento previo. Formato: 'Si [variable independiente], entonces [variable dependiente] porque [razón]'. (3) Variables: independiente (la que manipulas), dependiente (la que mides), controladas (las que mantienes constantes). (4) Procedimiento: pasos numerados, reproducibles, con instrumentos y cantidades específicas. (5) Tabla de datos: columnas para variable independiente, variable dependiente, repeticiones. (6) Análisis y conclusiones: ¿se confirmó la hipótesis? ¿Qué fuentes de error hubo?",
+          "activity": "Los equipos trabajan en su protocolo con el formato proporcionado. El docente rota y retroalimenta especialmente la formulación de la hipótesis y la identificación de variables controladas (el error más común es no controlar variables). Al final de la sesión, cada equipo presenta su pregunta, hipótesis y procedimiento para revisión del grupo."
+        },
+        {
+          "title": "FASE III: CIERRE — ÉTICA Y HONESTIDAD CIENTÍFICA",
+          "duration": "10 min",
+          "description": "La ciencia no es solo un conjunto de técnicas: es una práctica social basada en la honestidad y la transparencia. Reportar resultados que no confirmaron la hipótesis es tan valioso como los que sí la confirmaron: la ciencia avanza refutando. Los casos de fraude científico (inventar datos, manipular resultados) son sancionados duramente en la comunidad científica. En México, el CONAHCYT (antes CONACYT) tiene un código de ética científica que todos los investigadores deben seguir. Aprender a ser honesto con los datos desde el bachillerato es aprender a pensar científicamente.",
+          "activity": "Escenario ético: 'Tu hipótesis predijo que el agua en el vaso negro se calentaría 5°C más que en el transparente. Tu experimento dio solo 1°C de diferencia. ¿Qué haces?' Discusión: ¿repetir el experimento? ¿Reportar el resultado real? ¿Revisar la hipótesis? ¿Cambiar los datos? Solo la última opción es deshonesta."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "El método científico no es un algoritmo rígido sino una serie de principios que guían la investigación honesta y reproducible: observación, pregunta, hipótesis, experimento, análisis y conclusión. En ciencias de la energía, este método ha llevado al descubrimiento de la ley de conservación de la energía (Mayer, Joule, 1840s), a la formulación de la termodinámica (Carnot, Clausius, Kelvin) y al desarrollo de las energías renovables modernas. En México, instituciones como el CINVESTAV, el Instituto de Ingeniería UNAM, el IER-UNAM y el Instituto Mexicano del Petróleo siguen este proceso para resolver problemas energéticos específicos del país. Aprender a diseñar investigaciones no es solo prepararse para una carrera científica: es desarrollar la capacidad de pensar con evidencia en cualquier área de la vida.",
+      "sections": [
+        {
+          "subtitle": "Variables y control experimental: la clave de la causalidad",
+          "content": "Una investigación científica busca establecer relaciones causales: ¿X causa Y? Para responder esta pregunta con certeza, se necesita controlar todas las demás variables que podrían influir en Y. La variable independiente es la que el investigador manipula deliberadamente (p. ej., el color del vaso). La variable dependiente es la que se mide como resultado (p. ej., la temperatura del agua). Las variables controladas son todas las demás que se mantienen constantes (misma cantidad de agua, mismo tiempo de exposición, mismo lugar). Si no se controlan las variables, cualquier diferencia observada podría deberse a factores no considerados — lo que invalida la conclusión. Este principio del 'experimento controlado' fue formalizado por Claude Bernard en el siglo XIX y sigue siendo la base del diseño experimental moderno. En México, el Programa de Mejoramiento del Profesorado (PROMEP-SEP) enfatiza que los docentes de ciencias deben modelar el pensamiento experimental riguroso con sus estudiantes desde el bachillerato."
+        },
+        {
+          "subtitle": "Comunicación científica: del cuaderno al mundo",
+          "content": "Los resultados de una investigación solo tienen valor científico cuando se comunican de forma clara, completa y verificable. Un reporte científico básico incluye: introducción (contexto y justificación), pregunta de investigación e hipótesis, metodología (materiales y procedimiento detallado), resultados (tablas y gráficas), análisis y discusión (¿qué significan los datos?), conclusión (¿se confirmó la hipótesis?), limitaciones (fuentes de error) y referencias. La gráfica es una herramienta de comunicación poderosa: permite ver tendencias, comparar condiciones y detectar anomalías que una tabla de números puede ocultar. Los proyectos del concurso IMECAFI (Investigación en Matemáticas, Estadística, Computación, Astronomía, Física e Ingeniería) de la Sociedad Mexicana de Física siguen exactamente este formato y son accesibles para estudiantes de bachillerato."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Un alumno investiga si el color del techo afecta la temperatura interior de una casita de cartón. ¿Cuál es la variable independiente?",
+          "options": [
+            "La temperatura interior de la casita",
+            "El color del techo (blanco, negro, gris)",
+            "El material de las paredes de la casita",
+            "La intensidad de la luz solar durante el experimento"
+          ],
+          "correct": "El color del techo (blanco, negro, gris)"
+        },
+        {
+          "question": "¿Por qué es importante mantener las variables controladas constantes en un experimento?",
+          "options": [
+            "Para reducir el tiempo necesario para el experimento",
+            "Para asegurar que los cambios en la variable dependiente se deban solo a la independiente",
+            "Porque las variables controladas siempre afectan los resultados de forma positiva",
+            "Porque las normas de laboratorio exigen que todo sea constante"
+          ],
+          "correct": "Para asegurar que los cambios en la variable dependiente se deban solo a la independiente"
+        },
+        {
+          "question": "Un equipo obtiene resultados que NO confirman su hipótesis. ¿Cuál es la respuesta científicamente correcta?",
+          "options": [
+            "Eliminar los datos que no coinciden con la hipótesis",
+            "Reportar los resultados reales, analizar por qué difieren de la hipótesis y revisar las suposiciones",
+            "Considerar el experimento como fallido y descartarlo",
+            "Cambiar la hipótesis antes de reportar para que coincida con los resultados"
+          ],
+          "correct": "Reportar los resultados reales, analizar por qué difieren de la hipótesis y revisar las suposiciones"
+        },
+        {
+          "question": "¿Cuál de las siguientes es una hipótesis correctamente formulada?",
+          "options": [
+            "El agua caliente es mejor para regar plantas",
+            "Si el grosor del aislante en una taza aumenta, entonces la temperatura del café disminuirá más lentamente porque habrá menos conducción de calor",
+            "La energía solar puede calentar agua",
+            "El experimento mostrará que los materiales oscuros absorben más calor"
+          ],
+          "correct": "Si el grosor del aislante en una taza aumenta, entonces la temperatura del café disminuirá más lentamente porque habrá menos conducción de calor"
+        },
+        {
+          "question": "¿Por qué se hacen múltiples repeticiones (replicas) en un experimento científico?",
+          "options": [
+            "Para llenar más espacio en el reporte",
+            "Para reducir el efecto del error aleatorio y aumentar la confiabilidad de los resultados",
+            "Porque la primera repetición siempre está mal",
+            "Para demostrar que el investigador trabajó mucho"
+          ],
+          "correct": "Para reducir el efecto del error aleatorio y aumentar la confiabilidad de los resultados"
+        }
+      ],
+      "rubric": "CRITERIO 1 — Pregunta e hipótesis: Inicial: La pregunta no es investigable o la hipótesis no tiene formato adecuado. En desarrollo: Pregunta investigable pero hipótesis sin formato Si/Entonces/Porque. Consolidado: Pregunta específica e hipótesis bien formulada con los tres elementos. Destacado: Pregunta original, hipótesis fundamentada en conceptos físicos de la unidad, predicción cuantitativa específica.\n\nCRITERIO 2 — Diseño experimental: Inicial: No identifica las variables o confunde su tipo. En desarrollo: Identifica la independiente y dependiente pero no las controladas. Consolidado: Identifica correctamente los tres tipos de variables y describe el procedimiento. Destacado: Diseña un procedimiento que minimiza errores sistemáticos e incluye al menos 3 repeticiones por condición.\n\nCRITERIO 3 — Recolección y presentación de datos: Inicial: Los datos son incompletos o sin unidades. En desarrollo: Tabla de datos con datos y unidades pero sin gráfica o análisis estadístico básico. Consolidado: Tabla completa con unidades y gráfica correcta (ejes, unidades, título). Destacado: Tabla, gráfica y cálculo de promedio y rango; identifica valores atípicos y los discute.\n\nCRITERIO 4 — Análisis, conclusión y honestidad: Inicial: La conclusión no se relaciona con los datos. En desarrollo: Concluye correctamente si se confirmó la hipótesis pero sin analizar por qué. Consolidado: Analiza los resultados en términos de los conceptos físicos, concluye sobre la hipótesis e identifica limitaciones. Destacado: Discute implicaciones más amplias del resultado, propone investigaciones futuras y trata los resultados inesperados como oportunidad de aprendizaje."
+    },
+    "teacher_tips": [
+      "Error más común en la hipótesis: escribir 'creo que X pasará' sin incluir el mecanismo explicativo. La hipótesis debe incluir el 'porque': no solo predice el resultado sino que lo fundamenta en un principio científico.",
+      "Error frecuente en variables: no listar las controladas. Los alumnos identifican fácilmente la independiente y dependiente, pero olvidan que la temperatura ambiente, la marca del material, la hora del día, etc. también pueden afectar los resultados si no se controlan.",
+      "Estrategia de andamiaje: proporcionar un 'menú de proyectos' con 8-10 investigaciones pre-diseñadas sobre fenómenos energéticos del entorno escolar, para que los equipos con menos autonomía puedan elegir y adaptar en lugar de diseñar desde cero.",
+      "Pregunta socrática: '¿Cómo sabrías si tu resultado es el mismo que el de otro equipo en la Ciudad de México haciendo el mismo experimento? ¿Qué garantiza que son comparables?' — Introduce el concepto de reproducibilidad y estandarización de procedimientos.",
+      "Conexión con IMECAFI/Olimpiada de Ciencias: mencionar que concursos nacionales como las Olimpiadas de Física, Química y Biología de la AMC (Academia Mexicana de Ciencias) y IMECAFI tienen categorías para proyectos de investigación de bachillerato. Algunos alumnos de este salón podrían competir con proyectos emergentes de esta progresión."
+    ]
   }
 }
