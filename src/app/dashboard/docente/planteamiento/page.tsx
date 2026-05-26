@@ -192,7 +192,7 @@ export default function PlanteamientoPage() {
 
       <Sidebar />
 
-      <main className="flex-1 md:ml-[260px] relative z-10 flex flex-col md:flex-row md:h-screen md:overflow-hidden">
+      <main className="flex-1 md:ml-[260px] relative z-[50] flex flex-col md:flex-row md:h-screen md:overflow-hidden">
 
         {/* ── LEFT PANEL (desktop) ──────────────────────────────────────── */}
         <aside
