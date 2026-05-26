@@ -1,4 +1,14 @@
-{
+"""
+gen-in-v.py — Inglés V (CEFR B1) — 8 progresiones vocacional/profesional
+Referencias: PRONI-SEP, CENNI, CEFR 2020 Companion Volume,
+IMJUVE-ENAJUV 2022, STPS Jóvenes Construyendo Futuro, CONALEP, SEMS-SEP
+"""
+import json, os
+
+OUT = os.path.join(os.path.dirname(__file__),
+                   '..', 'src', 'data', 'planteamiento', 'in-v.json')
+
+data = {
   "IN-V-P01": {
     "code": "IN-V-P01",
     "title": "Explora y describe el area de estudio, ocupacion o interes del grupo (introduce el campo o tema y su relevancia).",
@@ -24,21 +34,9 @@
     },
     "strategy": {
       "timeline": [
-        {
-          "phase": "Apertura",
-          "duration": "15 min",
-          "label": "Field mapping y seleccion vocacional"
-        },
-        {
-          "phase": "Desarrollo",
-          "duration": "60 min",
-          "label": "Vocabulario, sentence patterns y borrador"
-        },
-        {
-          "phase": "Cierre",
-          "duration": "25 min",
-          "label": "Presentacion oral y coevaluacion"
-        }
+        {"phase": "Apertura", "duration": "15 min", "label": "Field mapping y seleccion vocacional"},
+        {"phase": "Desarrollo", "duration": "60 min", "label": "Vocabulario, sentence patterns y borrador"},
+        {"phase": "Cierre", "duration": "25 min", "label": "Presentacion oral y coevaluacion"}
       ],
       "phases": [
         {
@@ -116,6 +114,7 @@
       "El peer review funciona mejor con una lista de verificacion concreta (checklist) que con preguntas abiertas como 'is it good?'."
     ]
   },
+
   "IN-V-P02": {
     "code": "IN-V-P02",
     "title": "Comparte experiencias personales o escolares relacionadas con el campo de estudio elegido (narra por que le interesa).",
@@ -141,21 +140,9 @@
     },
     "strategy": {
       "timeline": [
-        {
-          "phase": "Apertura",
-          "duration": "15 min",
-          "label": "Modelo narrativo y story spine"
-        },
-        {
-          "phase": "Desarrollo",
-          "duration": "55 min",
-          "label": "Grammar focus e ensayo oral en triadas"
-        },
-        {
-          "phase": "Cierre",
-          "duration": "30 min",
-          "label": "Storytelling circle y votacion"
-        }
+        {"phase": "Apertura", "duration": "15 min", "label": "Modelo narrativo y story spine"},
+        {"phase": "Desarrollo", "duration": "55 min", "label": "Grammar focus e ensayo oral en triadas"},
+        {"phase": "Cierre", "duration": "30 min", "label": "Storytelling circle y votacion"}
       ],
       "phases": [
         {
@@ -233,6 +220,7 @@
       "El Past Continuous para 'escenario de fondo' es intuitivo si se ejemplifica con telenovelas o peliculas: 'It was raining when the detective arrived.'"
     ]
   },
+
   "IN-V-P03": {
     "code": "IN-V-P03",
     "title": "Formula y responde preguntas sobre procesos, conceptos o procedimientos basicos (entrevistas simuladas, demostraciones, explicaciones).",
@@ -258,21 +246,9 @@
     },
     "strategy": {
       "timeline": [
-        {
-          "phase": "Apertura",
-          "duration": "15 min",
-          "label": "Process mapping en ingles"
-        },
-        {
-          "phase": "Desarrollo",
-          "duration": "60 min",
-          "label": "Question bank y entrevista en parejas"
-        },
-        {
-          "phase": "Cierre",
-          "duration": "25 min",
-          "label": "Entrevista en vivo y retroalimentacion"
-        }
+        {"phase": "Apertura", "duration": "15 min", "label": "Process mapping en ingles"},
+        {"phase": "Desarrollo", "duration": "60 min", "label": "Question bank y entrevista en parejas"},
+        {"phase": "Cierre", "duration": "25 min", "label": "Entrevista en vivo y retroalimentacion"}
       ],
       "phases": [
         {
@@ -350,6 +326,7 @@
       "El lenguaje de pasiva en procesos es un atajo muy eficaz para sonar mas profesional en ingles tecnico — vale la pena enfatizarlo como 'hack de registro formal'."
     ]
   },
+
   "IN-V-P04": {
     "code": "IN-V-P04",
     "title": "Expresa opiniones, preferencias y preocupaciones sobre temas relacionados con el campo de estudio o la comunidad.",
@@ -375,21 +352,9 @@
     },
     "strategy": {
       "timeline": [
-        {
-          "phase": "Apertura",
-          "duration": "15 min",
-          "label": "Opinion spectrum y posicionamiento"
-        },
-        {
-          "phase": "Desarrollo",
-          "duration": "55 min",
-          "label": "Toolkit B1 y mesa redonda estructurada"
-        },
-        {
-          "phase": "Cierre",
-          "duration": "30 min",
-          "label": "Position paper oral y coevaluacion"
-        }
+        {"phase": "Apertura", "duration": "15 min", "label": "Opinion spectrum y posicionamiento"},
+        {"phase": "Desarrollo", "duration": "55 min", "label": "Toolkit B1 y mesa redonda estructurada"},
+        {"phase": "Cierre", "duration": "30 min", "label": "Position paper oral y coevaluacion"}
       ],
       "phases": [
         {
@@ -467,6 +432,7 @@
       "Si el grupo no conoce el dato de CONEVAL u otra fuente, el docente puede distribuir una hoja de 'datos clave de Mexico 2024' al inicio de la sesion de debate."
     ]
   },
+
   "IN-V-P05": {
     "code": "IN-V-P05",
     "title": "Lee y analiza textos breves vinculados con el campo tematico (comprension, resumen, opinion).",
@@ -492,21 +458,9 @@
     },
     "strategy": {
       "timeline": [
-        {
-          "phase": "Apertura",
-          "duration": "20 min",
-          "label": "Skimming y scanning cronometrados"
-        },
-        {
-          "phase": "Desarrollo",
-          "duration": "50 min",
-          "label": "Vocabulario en contexto y resumen"
-        },
-        {
-          "phase": "Cierre",
-          "duration": "30 min",
-          "label": "Respuesta critica y glosario vocacional"
-        }
+        {"phase": "Apertura", "duration": "20 min", "label": "Skimming y scanning cronometrados"},
+        {"phase": "Desarrollo", "duration": "50 min", "label": "Vocabulario en contexto y resumen"},
+        {"phase": "Cierre", "duration": "30 min", "label": "Respuesta critica y glosario vocacional"}
       ],
       "phases": [
         {
@@ -584,6 +538,7 @@
       "El glosario personal acumulado (una entrada por progresion, P01 a P08) se convierte en un recurso de vocabulario genuinamente util para el portafolio final."
     ]
   },
+
   "IN-V-P06": {
     "code": "IN-V-P06",
     "title": "Redacta textos funcionales para informar, solicitar o proponer acciones (correos, solicitudes, propuestas breves).",
@@ -609,21 +564,9 @@
     },
     "strategy": {
       "timeline": [
-        {
-          "phase": "Apertura",
-          "duration": "20 min",
-          "label": "Anatomia del correo formal: analisis de 3 ejemplos"
-        },
-        {
-          "phase": "Desarrollo",
-          "duration": "55 min",
-          "label": "Redaccion guiada de correo y propuesta breve"
-        },
-        {
-          "phase": "Cierre",
-          "duration": "25 min",
-          "label": "Revision de portafolio y version final"
-        }
+        {"phase": "Apertura", "duration": "20 min", "label": "Anatomia del correo formal: analisis de 3 ejemplos"},
+        {"phase": "Desarrollo", "duration": "55 min", "label": "Redaccion guiada de correo y propuesta breve"},
+        {"phase": "Cierre", "duration": "25 min", "label": "Revision de portafolio y version final"}
       ],
       "phases": [
         {
@@ -701,6 +644,7 @@
       "Si hay tiempo, enviar realmente el correo (o la propuesta) a una institucion real — aunque sea IMJUVE, la presidencia municipal o una ONG — eleva dramaticamente la motivacion y autenticidad."
     ]
   },
+
   "IN-V-P07": {
     "code": "IN-V-P07",
     "title": "Participa en una interaccion oral semiestructurada (entrevista, presentacion breve, panel).",
@@ -726,21 +670,9 @@
     },
     "strategy": {
       "timeline": [
-        {
-          "phase": "Apertura",
-          "duration": "15 min",
-          "label": "Formulas de turno y reparacion comunicativa"
-        },
-        {
-          "phase": "Desarrollo",
-          "duration": "60 min",
-          "label": "Circumlocucion y ensayo completo de panel"
-        },
-        {
-          "phase": "Cierre",
-          "duration": "25 min",
-          "label": "Feria vocacional simulada y autoevaluacion"
-        }
+        {"phase": "Apertura", "duration": "15 min", "label": "Formulas de turno y reparacion comunicativa"},
+        {"phase": "Desarrollo", "duration": "60 min", "label": "Circumlocucion y ensayo completo de panel"},
+        {"phase": "Cierre", "duration": "25 min", "label": "Feria vocacional simulada y autoevaluacion"}
       ],
       "phases": [
         {
@@ -818,6 +750,7 @@
       "Las formulas de reparacion son mas dificiles de interiorizar que las de turno — practicalas con juegos donde 'equivocarse' es parte del objetivo ('di algo incorrecto y corrígelo usando una formula de reparacion')."
     ]
   },
+
   "IN-V-P08": {
     "code": "IN-V-P08",
     "title": "Integra habilidades linguisticas y produce un proyecto final vinculado al campo tematico del grupo.",
@@ -843,21 +776,9 @@
     },
     "strategy": {
       "timeline": [
-        {
-          "phase": "Apertura",
-          "duration": "20 min",
-          "label": "Estructura del portafolio y seleccion de evidencias"
-        },
-        {
-          "phase": "Desarrollo",
-          "duration": "80 min",
-          "label": "Reflexion escrita y grabacion de video/podcast"
-        },
-        {
-          "phase": "Cierre",
-          "duration": "50 min",
-          "label": "Exhibicion del portafolio y evaluacion holistica"
-        }
+        {"phase": "Apertura", "duration": "20 min", "label": "Estructura del portafolio y seleccion de evidencias"},
+        {"phase": "Desarrollo", "duration": "80 min", "label": "Reflexion escrita y grabacion de video/podcast"},
+        {"phase": "Cierre", "duration": "50 min", "label": "Exhibicion del portafolio y evaluacion holistica"}
       ],
       "phases": [
         {
@@ -936,3 +857,9 @@
     ]
   }
 }
+
+os.makedirs(os.path.dirname(os.path.abspath(OUT)), exist_ok=True)
+with open(OUT, 'w', encoding='utf-8') as f:
+    json.dump(data, f, ensure_ascii=False, indent=2)
+
+print(f"Written {len(data)} progressions to {os.path.abspath(OUT)}")
