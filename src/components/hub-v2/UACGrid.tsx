@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import { springs, stagger } from "@/lib/motion/tokens";
 import { useReducedMotion, useInView } from "@/lib/motion/hooks";
+import { EmptyState } from "@/components/ui/EmptyState";
 import UACCard from "./UACCard";
 
 interface UACItem {
@@ -20,6 +21,17 @@ interface UACGridProps {
 export default function UACGrid({ items }: UACGridProps) {
   const reducedMotion = useReducedMotion();
   const [gridRef, inView] = useInView<HTMLDivElement>();
+
+  if (items.length === 0) {
+    return (
+      <EmptyState
+        icon="📚"
+        title="Sin materias asignadas"
+        description="Aún no hay materias registradas para tu semestre. Contacta a tu docente para que configure tu grupo."
+        variant="dark"
+      />
+    );
+  }
 
   return (
     <div

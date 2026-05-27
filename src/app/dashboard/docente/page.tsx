@@ -10,6 +10,7 @@ import WelcomeBanner from "@/components/dashboard/WelcomeBanner";
 import MetricCards from "@/components/dashboard/MetricCards";
 import LatestDeliveries from "@/components/dashboard/LatestDeliveries";
 import TopAlumnos from "@/components/dashboard/TopAlumnos";
+import { EmptyState } from "@/components/ui/EmptyState";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -44,6 +45,27 @@ export default async function DocenteDashboardPage() {
 
   // Total actividades completadas (sum de top list como proxy)
   const totalActividadesCompletadas = topList.reduce((s, a) => s + a.actividades_completadas, 0);
+
+  if (metricas.grupos.length === 0) {
+    return (
+      <div className="flex min-h-screen font-['Epilogue'] bg-[#011C40] theme-dark">
+        <Sidebar
+          teacherName={profile.full_name ?? undefined}
+          grupoNombre={undefined}
+          currentSemestre={1}
+        />
+        <main className="flex-1 md:ml-[260px] flex items-center justify-center p-8">
+          <EmptyState
+            icon="🏫"
+            title="Sin grupos asignados"
+            description="Aún no tienes grupos asignados. Contacta al administrador de tu escuela para que te asigne un grupo y puedas comenzar a monitorear el progreso de tus alumnos."
+            variant="dark"
+            className="max-w-md"
+          />
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen font-['Epilogue'] relative overflow-hidden bg-[#011C40] theme-dark">
