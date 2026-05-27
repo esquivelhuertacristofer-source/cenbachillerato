@@ -270,7 +270,7 @@ describe("getUACsConCompletionGrupo", () => {
     } as unknown as Awaited<ReturnType<typeof getSupabaseServer>>;
     mockGetSupabaseServer.mockResolvedValue(sb);
 
-    const result = await getUACsConCompletionGrupo("g-inexistente");
+    const result = await getUACsConCompletionGrupo("g-inexistente", "docente-uuid");
     expect(result).toEqual([]);
   });
 
@@ -306,7 +306,7 @@ describe("getUACsConCompletionGrupo", () => {
     } as unknown as Awaited<ReturnType<typeof getSupabaseServer>>;
     mockGetSupabaseServer.mockResolvedValue(sb);
 
-    const result = await getUACsConCompletionGrupo("g1");
+    const result = await getUACsConCompletionGrupo("g1", "docente-uuid");
     // Con 0 alumnos → sin-datos
     expect(result).toHaveLength(1);
     expect(result[0]!.estado).toBe("sin-datos");

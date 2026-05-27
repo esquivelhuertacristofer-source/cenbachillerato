@@ -35,7 +35,7 @@ export default async function DocenteDashboardPage() {
   // Calc avance global del primer grupo (si existe)
   let pctAvance = 0;
   if (primerGrupo) {
-    const uacs = await getUACsConCompletionGrupo(primerGrupo.id);
+    const uacs = await getUACsConCompletionGrupo(primerGrupo.id, user.id);
     if (uacs.length > 0) {
       pctAvance = Math.round(uacs.reduce((s, u) => s + u.pct_completion, 0) / uacs.length);
     }

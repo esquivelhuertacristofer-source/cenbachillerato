@@ -324,13 +324,14 @@ export async function getAlumnosConProgreso(
 }
 
 /** UACs del semestre del grupo con completion de la cohorte */
-export async function getUACsConCompletionGrupo(grupoId: string): Promise<UACCompletionData[]> {
+export async function getUACsConCompletionGrupo(grupoId: string, docenteId: string): Promise<UACCompletionData[]> {
   const sb = await getSupabaseServer();
 
   const { data: grupo } = await sb
     .from("grupos")
     .select("semestre")
     .eq("id", grupoId)
+    .eq("id_docente", docenteId)
     .maybeSingle();
 
   if (!grupo) return [];
@@ -736,7 +737,7 @@ export async function getRecomendacionesGrupo(
   const recomendaciones: Recomendacion[] = [];
 
   const [uacs, dificiles, enRiesgo] = await Promise.all([
-    getUACsConCompletionGrupo(grupoId),
+    getUACsConCompletionGrupo(grupoId, docenteId),
     getActividadesDificiles(grupoId, docenteId),
     getAlumnosEnRiesgo(grupoId),
   ]);
@@ -837,7 +838,7 @@ export async function getPlanteamientoGrupo(
   };
 
   const [uacs, progresiones, recomendaciones] = await Promise.all([
-    getUACsConCompletionGrupo(grupoId),
+    getUACsConCompletionGrupo(grupoId, docenteId),
     getProgresionesPorSemestre(grupoRaw.semestre, grupoId),
     getRecomendacionesGrupo(grupoId, docenteId),
   ]);
