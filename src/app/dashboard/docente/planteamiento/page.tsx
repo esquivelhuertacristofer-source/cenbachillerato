@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import type { ProgresionPlan } from '@/lib/schemas/planteamiento.schema';
 import {
   Search,
   Clock,
@@ -21,17 +22,17 @@ import {
   Moon,
 } from 'lucide-react';
 import Sidebar from '@/components/dashboard/Sidebar';
-import { planteamientoData, getPlanUAC } from '@/data/planteamiento/hub';
+import { PLANTEAMIENTO_CODES, loadUACProgresiones } from '@/data/planteamiento/hub-index';
 import { UAC_BASE } from '@/lib/mccems/estructura';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
 const UAC_POR_SEMESTRE = [1, 2, 3, 4, 5, 6].map((sem) => ({
   semestre: sem,
-  uacs: UAC_BASE.filter((u) => u.semestre === sem && planteamientoData[u.codigo]),
+  uacs: UAC_BASE.filter((u) => u.semestre === sem && PLANTEAMIENTO_CODES.includes(u.codigo)),
 }));
 
-const FIRST_UAC = UAC_BASE.find((u) => planteamientoData[u.codigo]);
+const FIRST_UAC = UAC_BASE.find((u) => PLANTEAMIENTO_CODES.includes(u.codigo));
 
 type ContentTab = 'estrategia' | 'teoria' | 'evaluacion';
 
@@ -140,13 +141,21 @@ export default function PlanteamientoPage() {
   const [activeTab, setActiveTab]               = useState<ContentTab>('estrategia');
   const [searchQuery, setSearchQuery]           = useState('');
   const [dark, setDark]                         = useState(true);
+  const [progresiones, setProgresiones]         = useState<ProgresionPlan[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setProgresiones([]);
+    loadUACProgresiones(selectedUAC).then((plans) => {
+      if (!cancelled) setProgresiones(plans);
+    });
+    return () => { cancelled = true; };
+  }, [selectedUAC]);
 
   const t = buildTheme(dark);
   const phaseColors = dark
     ? ['#D4A574', '#7DD3FC', 'rgba(255,255,255,0.5)']
     : ['#D4A574', '#0B2545', '#7DD3FC'];
-
-  const progresiones = getPlanUAC(selectedUAC);
 
   const activeProgresion = (selectedProgCode
     ? progresiones.find((p) => p.code === selectedProgCode)
