@@ -27,7 +27,19 @@ export async function middleware(request: NextRequest) {
 
   // Refresca el token de sesión Supabase si está próximo a expirar.
   // La autorización real se delega a los layout.tsx de cada sección.
-  await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  // Si el usuario tiene must_change_password activo y no está en /cambiar-password,
+  // redirigir para forzar el cambio antes de acceder a cualquier otra ruta.
+  if (
+    user &&
+    user.user_metadata?.must_change_password === true &&
+    !request.nextUrl.pathname.startsWith('/cambiar-password')
+  ) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/cambiar-password';
+    return NextResponse.redirect(url);
+  }
 
   return supabaseResponse;
 }
@@ -37,5 +49,6 @@ export const config = {
     "/hub/:path*",
     "/admin/:path*",
     "/dashboard/:path*",
+    "/cambiar-password",
   ],
 };
