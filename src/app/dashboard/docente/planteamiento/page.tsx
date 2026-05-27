@@ -145,7 +145,6 @@ export default function PlanteamientoPage() {
 
   useEffect(() => {
     let cancelled = false;
-    setProgresiones([]);
     loadUACProgresiones(selectedUAC).then((plans) => {
       if (!cancelled) setProgresiones(plans);
     });
