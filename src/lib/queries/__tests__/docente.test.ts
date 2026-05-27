@@ -42,7 +42,11 @@ function makeSbDocente(
   alumnosPorGrupo: number
 ) {
   const gruposChain = makeEqChain({ data: grupos, error: null });
-  const alumnosChain = makeEqChain({ count: alumnosPorGrupo, data: null, error: null });
+  // Batch query: devuelve filas con id_grupo (una fila por alumno por grupo)
+  const alumnosData = grupos.flatMap((g) =>
+    Array.from({ length: alumnosPorGrupo }, () => ({ id_grupo: g.id }))
+  );
+  const alumnosChain = makeChain({ data: alumnosData, error: null });
 
   return {
     from: jest.fn((table: string) =>
@@ -119,10 +123,11 @@ describe("getGruposDocente", () => {
     expect(gruposChain.eq).toHaveBeenCalledWith("id_docente", "docente-abc");
   });
 
-  test("count null → total_alumnos es 0", async () => {
+  test("sin alumnos en DB → total_alumnos es 0", async () => {
     const grupos = [{ id: "g1", nombre: "Grupo A", semestre: 1 }];
     const gruposChain = makeEqChain({ data: grupos, error: null });
-    const alumnosChain = makeEqChain({ count: null, data: null, error: null });
+    // Batch query devuelve data: null → se interpreta como 0 alumnos
+    const alumnosChain = makeChain({ data: null, error: null });
 
     const sb = {
       from: jest.fn((table: string) =>
@@ -653,8 +658,8 @@ describe("getProgresionesAlumno", () => {
         { data: { semestre: 1 }, error: null },                                         // grupo
         { data: [{ id: "u1", codigo: "UAC-I-01" }], error: null },                      // uacs
         { data: [{ id: "p1", codigo: "P1", numero: 1, titulo: "Prog 1", uac_id: "u1" }], error: null }, // progresiones
-        { data: [{ id: "act1" }, { id: "act2" }], error: null },                         // actividades (2 total)
-        { data: null, count: 1, error: null },                                           // intentos completados (1 de 2)
+        { data: [{ id: "act1", progresion_id: "p1" }, { id: "act2", progresion_id: "p1" }], error: null }, // actividades batch (incluye progresion_id)
+        { data: [{ actividad_id: "act1" }], error: null },                               // intentos completados (1 de 2, en array)
       ])
     );
     const result = await getProgresionesAlumno("a1", "g1");

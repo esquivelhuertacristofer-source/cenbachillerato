@@ -155,15 +155,21 @@ export async function getGruposDocente(docenteId: string): Promise<GrupoConAlumn
 
   if (!grupos || grupos.length === 0) return [];
 
-  const gruposConAlumnos = await Promise.all(
-    grupos.map(async (g) => {
-      const { count } = await sb
-        .from("alumnos_grupos")
-        .select("id_alumno", { count: "exact", head: true })
-        .eq("id_grupo", g.id);
-      return { ...g, total_alumnos: count ?? 0 };
-    })
-  );
+  const grupoIds = grupos.map((g) => g.id);
+  const { data: relsBatch } = await sb
+    .from("alumnos_grupos")
+    .select("id_grupo")
+    .in("id_grupo", grupoIds);
+
+  const countByGrupo = new Map<string, number>();
+  for (const r of relsBatch ?? []) {
+    countByGrupo.set(r.id_grupo, (countByGrupo.get(r.id_grupo) ?? 0) + 1);
+  }
+
+  const gruposConAlumnos = grupos.map((g) => ({
+    ...g,
+    total_alumnos: countByGrupo.get(g.id) ?? 0,
+  }));
 
   return gruposConAlumnos;
 }
@@ -345,71 +351,75 @@ export async function getUACsConCompletionGrupo(grupoId: string): Promise<UACCom
   const totalAlumnos = relaciones?.length ?? 0;
   const alumnoIds = relaciones?.map((r) => r.id_alumno) ?? [];
 
-  const resultados: UACCompletionData[] = await Promise.all(
-    uacs.map(async (uac) => {
-      // Actividades de esta UAC (publicadas)
-      const { data: progs } = await sb
-        .from("progresiones")
-        .select("id")
-        .eq("uac_id", uac.id);
+  const uacIds = uacs.map((u) => u.id);
 
-      const progIds = progs?.map((p) => p.id) ?? [];
+  // 1 query: todas las progresiones de todas las UACs del semestre
+  const { data: todasProgs } = await sb
+    .from("progresiones")
+    .select("id, uac_id")
+    .in("uac_id", uacIds);
 
-      if (progIds.length === 0) {
-        return {
-          id: uac.id,
-          codigo: uac.codigo,
-          nombre: uac.nombre,
-          semestre: uac.semestre,
-          total_progresiones: uac.total_progresiones,
-          total_actividades: 0,
-          actividades_completadas_cohorte: 0,
-          pct_completion: 0,
-          estado: "sin-datos" as const,
-        };
-      }
+  const allProgIds = (todasProgs ?? []).map((p) => p.id);
 
-      const { data: actividades } = await sb
-        .from("actividades")
-        .select("id")
-        .in("progresion_id", progIds)
-        .eq("estado", "publicada");
+  // 2 query: todas las actividades de todas las progresiones
+  const { data: todasActs } = allProgIds.length > 0
+    ? await sb.from("actividades").select("id, progresion_id").in("progresion_id", allProgIds).eq("estado", "publicada")
+    : { data: [] };
 
-      const totalActividades = actividades?.length ?? 0;
-      const actividadIds = actividades?.map((a) => a.id) ?? [];
+  const allActIds = (todasActs ?? []).map((a) => a.id);
 
-      // Intentos completados de alumnos del grupo en actividades de esta UAC
-      let completadasCohorte = 0;
-      if (actividadIds.length > 0 && alumnoIds.length > 0) {
-        const { count } = await sb
-          .from("intentos")
-          .select("id", { count: "exact", head: true })
-          .in("actividad_id", actividadIds)
-          .in("user_id", alumnoIds)
-          .eq("status", "completed");
-        completadasCohorte = count ?? 0;
-      }
+  // 3 query: todos los intentos completados del grupo en esas actividades
+  const { data: todosIntentos } = allActIds.length > 0 && alumnoIds.length > 0
+    ? await sb.from("intentos").select("actividad_id").in("actividad_id", allActIds).in("user_id", alumnoIds).eq("status", "completed")
+    : { data: [] };
 
-      const maxPosible = totalActividades * totalAlumnos;
-      const pct = maxPosible > 0 ? Math.round((completadasCohorte / maxPosible) * 100) : 0;
-      const estado =
-        totalAlumnos === 0 ? "sin-datos" :
-        pct >= 70 ? "verde" :
-        pct >= 40 ? "amarillo" : "rojo";
+  // Mapas para aggregate en memoria
+  const progsByUac = new Map<string, string[]>();
+  for (const p of todasProgs ?? []) {
+    const arr = progsByUac.get(p.uac_id) ?? [];
+    arr.push(p.id);
+    progsByUac.set(p.uac_id, arr);
+  }
 
-      return {
-        id: uac.id,
-        codigo: uac.codigo,
-        nombre: uac.nombre,
-        semestre: uac.semestre,
-        total_progresiones: uac.total_progresiones,
-        total_actividades: totalActividades,
-        actividades_completadas_cohorte: completadasCohorte,
-        pct_completion: pct,
-        estado: estado as UACCompletionData["estado"],
-      };
-    })
-  );
+  const actsByProg = new Map<string, string[]>();
+  for (const a of todasActs ?? []) {
+    if (!a.progresion_id || !a.id) continue;
+    const arr = actsByProg.get(a.progresion_id) ?? [];
+    arr.push(a.id);
+    actsByProg.set(a.progresion_id, arr);
+  }
+
+  const completadasByAct = new Map<string, number>();
+  for (const i of todosIntentos ?? []) {
+    if (!i.actividad_id) continue;
+    completadasByAct.set(i.actividad_id, (completadasByAct.get(i.actividad_id) ?? 0) + 1);
+  }
+
+  const resultados: UACCompletionData[] = uacs.map((uac) => {
+    const uacProgIds = progsByUac.get(uac.id) ?? [];
+    const uacActIds = uacProgIds.flatMap((pid) => actsByProg.get(pid) ?? []);
+    const totalActividades = uacActIds.length;
+    const completadasCohorte = uacActIds.reduce((s, aid) => s + (completadasByAct.get(aid) ?? 0), 0);
+
+    const maxPosible = totalActividades * totalAlumnos;
+    const pct = maxPosible > 0 ? Math.round((completadasCohorte / maxPosible) * 100) : 0;
+    const estado =
+      totalAlumnos === 0 ? "sin-datos" :
+      pct >= 70 ? "verde" :
+      pct >= 40 ? "amarillo" : "rojo";
+
+    return {
+      id: uac.id,
+      codigo: uac.codigo,
+      nombre: uac.nombre,
+      semestre: uac.semestre,
+      total_progresiones: uac.total_progresiones,
+      total_actividades: totalActividades,
+      actividades_completadas_cohorte: completadasCohorte,
+      pct_completion: pct,
+      estado: estado as UACCompletionData["estado"],
+    };
+  });
 
   return resultados;
 }
@@ -448,48 +458,64 @@ export async function getProgresionesPorSemestre(
   const totalAlumnos = relaciones?.length ?? 0;
   const alumnoIds = relaciones?.map((r) => r.id_alumno) ?? [];
 
-  const resultado: ProgresionData[] = await Promise.all(
-    progresiones.map(async (prog) => {
-      const { data: actividades } = await sb
-        .from("actividades")
-        .select("id")
-        .eq("progresion_id", prog.id)
-        .eq("estado", "publicada");
+  const progIds = progresiones.map((p) => p.id);
 
-      const actividadIds = actividades?.map((a) => a.id) ?? [];
-      let alumnosCompletaron = 0;
+  // 1 query: todas las actividades de todas las progresiones
+  const { data: todasActs } = await sb
+    .from("actividades")
+    .select("id, progresion_id")
+    .in("progresion_id", progIds)
+    .eq("estado", "publicada");
 
-      if (actividadIds.length > 0 && alumnoIds.length > 0) {
-        // Un alumno "completó la progresión" si completó al menos 1 actividad de ella
-        const { data: intentosCompletados } = await sb
-          .from("intentos")
-          .select("user_id")
-          .in("actividad_id", actividadIds)
-          .in("user_id", alumnoIds)
-          .eq("status", "completed");
+  const actsByProg = new Map<string, string[]>();
+  for (const a of todasActs ?? []) {
+    if (!a.progresion_id || !a.id) continue;
+    const arr = actsByProg.get(a.progresion_id) ?? [];
+    arr.push(a.id);
+    actsByProg.set(a.progresion_id, arr);
+  }
 
-        const alumnosUnicos = new Set(intentosCompletados?.map((i) => i.user_id) ?? []);
-        alumnosCompletaron = alumnosUnicos.size;
+  const allActIds = (todasActs ?? []).filter((a) => a.id).map((a) => a.id as string);
+
+  // 2 query: todos los intentos completados de alumnos del grupo
+  const { data: todosIntentos } = allActIds.length > 0 && alumnoIds.length > 0
+    ? await sb.from("intentos").select("actividad_id, user_id").in("actividad_id", allActIds).in("user_id", alumnoIds).eq("status", "completed")
+    : { data: [] };
+
+  // Aggregate: alumnos únicos que completaron al menos 1 actividad de cada progresión
+  const alumnosByProg = new Map<string, Set<string>>();
+  for (const intento of todosIntentos ?? []) {
+    // Encontrar a qué progresión pertenece esta actividad
+    for (const [progId, actIds] of actsByProg.entries()) {
+      if (actIds.includes(intento.actividad_id)) {
+        const set = alumnosByProg.get(progId) ?? new Set<string>();
+        set.add(intento.user_id);
+        alumnosByProg.set(progId, set);
+        break;
       }
+    }
+  }
 
-      const uac = uacMap.get(prog.uac_id);
-      const pct = totalAlumnos > 0 ? Math.round((alumnosCompletaron / totalAlumnos) * 100) : 0;
+  const resultado: ProgresionData[] = progresiones.map((prog) => {
+    const actividadIds = actsByProg.get(prog.id) ?? [];
+    const alumnosCompletaron = alumnosByProg.get(prog.id)?.size ?? 0;
+    const uac = uacMap.get(prog.uac_id);
+    const pct = totalAlumnos > 0 ? Math.round((alumnosCompletaron / totalAlumnos) * 100) : 0;
 
-      return {
-        id: prog.id,
-        codigo: prog.codigo,
-        numero: prog.numero,
-        titulo: prog.titulo,
-        uac_id: prog.uac_id,
-        uac_codigo: uac?.codigo ?? "—",
-        uac_nombre: uac?.nombre ?? "—",
-        total_actividades: actividadIds.length,
-        alumnos_completaron: alumnosCompletaron,
-        total_alumnos: totalAlumnos,
-        pct_completion: pct,
-      };
-    })
-  );
+    return {
+      id: prog.id,
+      codigo: prog.codigo,
+      numero: prog.numero,
+      titulo: prog.titulo,
+      uac_id: prog.uac_id,
+      uac_codigo: uac?.codigo ?? "—",
+      uac_nombre: uac?.nombre ?? "—",
+      total_actividades: actividadIds.length,
+      alumnos_completaron: alumnosCompletaron,
+      total_alumnos: totalAlumnos,
+      pct_completion: pct,
+    };
+  });
 
   return resultado;
 }
@@ -1105,44 +1131,51 @@ export async function getProgresionesAlumno(
 
   if (!progresiones || progresiones.length === 0) return [];
 
-  return await Promise.all(
-    progresiones.map(async (prog) => {
-      const { data: actividades } = await sb
-        .from('actividades')
-        .select('id')
-        .eq('progresion_id', prog.id)
-        .eq('estado', 'publicada');
+  const progIds = progresiones.map((p) => p.id);
 
-      const actividadIds = (actividades ?? []).map((a) => a.id);
-      let completadas = 0;
+  // 1 query: todas las actividades de todas las progresiones
+  const { data: todasActs } = await sb
+    .from('actividades')
+    .select('id, progresion_id')
+    .in('progresion_id', progIds)
+    .eq('estado', 'publicada');
 
-      if (actividadIds.length > 0) {
-        const { count } = await sb
-          .from('intentos')
-          .select('id', { count: 'exact', head: true })
-          .in('actividad_id', actividadIds)
-          .eq('user_id', alumnoId)
-          .eq('status', 'completed');
-        completadas = count ?? 0;
-      }
+  const actsByProg = new Map<string, string[]>();
+  for (const a of todasActs ?? []) {
+    if (!a.progresion_id || !a.id) continue;
+    const arr = actsByProg.get(a.progresion_id) ?? [];
+    arr.push(a.id);
+    actsByProg.set(a.progresion_id, arr);
+  }
 
-      const uac = uacMap.get(prog.uac_id);
-      const total = actividadIds.length;
-      const pct = total > 0 ? Math.round((completadas / total) * 100) : 0;
+  const allActIds = (todasActs ?? []).filter((a) => a.id).map((a) => a.id as string);
 
-      return {
-        id: prog.id,
-        codigo: prog.codigo,
-        numero: prog.numero,
-        titulo: prog.titulo,
-        uac_id: prog.uac_id,
-        uac_codigo: uac?.codigo ?? '—',
-        actividades_completadas: completadas,
-        total_actividades: total,
-        pct_completion: pct,
-      };
-    })
-  );
+  // 2 query: todos los intentos completados del alumno en esas actividades
+  const { data: intentosAlumno } = allActIds.length > 0
+    ? await sb.from('intentos').select('actividad_id').in('actividad_id', allActIds).eq('user_id', alumnoId).eq('status', 'completed')
+    : { data: [] };
+
+  const completadasSet = new Set((intentosAlumno ?? []).map((i) => i.actividad_id));
+
+  return progresiones.map((prog) => {
+    const actividadIds = actsByProg.get(prog.id) ?? [];
+    const completadas = actividadIds.filter((aid) => completadasSet.has(aid)).length;
+    const total = actividadIds.length;
+    const pct = total > 0 ? Math.round((completadas / total) * 100) : 0;
+    const uac = uacMap.get(prog.uac_id);
+
+    return {
+      id: prog.id,
+      codigo: prog.codigo,
+      numero: prog.numero,
+      titulo: prog.titulo,
+      uac_id: prog.uac_id,
+      uac_codigo: uac?.codigo ?? '—',
+      actividades_completadas: completadas,
+      total_actividades: total,
+      pct_completion: pct,
+    };
+  });
 }
 
 /** Fichas de biblioteca del semestre del grupo */
