@@ -1,0 +1,858 @@
+"""gen-in-iv.py — Inglés IV (Sem 4, CEFR A2-B1) — 8 progresiones completas."""
+import json, pathlib
+
+OUT = pathlib.Path(__file__).parent.parent / "src/data/planteamiento/in-iv.json"
+
+data = {
+  "IN-IV-P01": {
+    "code": "IN-IV-P01",
+    "title": "Describes past experiences with greater detail and connection (narrates what happened, where and how).",
+    "level": "Inglés IV",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "A2-B1",
+    "category": "Habilidades comunicativas — Narración",
+    "metadata": {
+      "objective": "Ampliar la narración de experiencias pasadas usando el Simple Past con mayor detalle (adverbios de tiempo, circunstanciales de lugar y modo), conectores narrativos (first, then, after that, finally) y vocabulario descriptivo; comparar el uso de Simple Past y Past Progressive para enmarcar acciones.",
+      "competencies": [
+        "Narra una experiencia pasada en 8-10 oraciones con detalle de lugar, tiempo y modo.",
+        "Usa conectores narrativos para dar coherencia al texto.",
+        "Distingue Simple Past (acción completada) de Past Progressive (acción en progreso cuando otra ocurrió).",
+        "Emplea vocabulario descriptivo apropiado al contexto (emociones, lugares, reacciones)."
+      ],
+      "materials": [
+        "Fotografías de lugares emblemáticos de México (Zócalo CDMX, Cenotes de Yucatán SECTUR, Mercado de San Juan Chamula Chiapas).",
+        "Tarjetas de conectores narrativos para ordenar en secuencia.",
+        "Modelo de narración escrita (8-10 oraciones) sobre una visita cultural.",
+        "Grabadora de voz del celular para práctica oral."
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "Apertura", "duration": "10 min", "label": "My last trip — sharing past stories"},
+        {"phase": "Desarrollo", "duration": "30 min", "label": "Detailed narration with connectors"},
+        {"phase": "Cierre", "duration": "10 min", "label": "Story swap — peer feedback"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "The teacher shares a short personal anecdote about a place in Mexico: 'Last year, I visited the ruins of Monte Albán in Oaxaca. It was early in the morning and the site was almost empty...' Students identify the verbs (Simple Past), the time markers (last year, early in the morning) and the connectors.",
+          "activity": "In pairs: students tell their partner about the last place they visited or something memorable they did. Partner listens and asks 2 follow-up questions: Where exactly? How did you feel? Then switch."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "Grammar focus: Simple Past for completed actions (I visited, we ate, they went) vs Past Progressive for background/ongoing actions (I was walking when it started to rain; While we were eating, the music began). Connectors: first, then, next, after that, finally, suddenly, at that moment. Vocabulary building: adjectives for descriptions (crowded, peaceful, ancient, vibrant, overwhelming) and emotions (excited, nervous, amazed, disappointed).",
+          "activity": "Writing task: students write an 8-10 sentence narrative about a real or imagined experience in a Mexican state they know or want to visit. Must include: 2 connectors, 1 Past Progressive sentence, 3 descriptive adjectives, and time markers. Then read to a partner who uses a checklist to give feedback."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Story swap: pairs join to form groups of 4. Each student summarizes their partner's story to the new pair. Discussion: What surprised you about your partner's story? What detail made it most vivid?",
+          "activity": "Self-assessment: students mark which elements they used successfully (connector ✓, Past Progressive ✓, adjectives ✓) and set one goal for improvement."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Narrating past experiences is one of the most fundamental communicative skills. At CEFR B1 level, learners can narrate events coherently with appropriate time sequencing and begin to add descriptive detail that makes stories engaging. Mexican cultural tourism (SECTUR) relies on personal narratives to promote destinations internationally.",
+      "sections": [
+        {
+          "subtitle": "Simple Past vs Past Progressive",
+          "content": "Simple Past: completed action at a specific time. 'We arrived at Teotihuacán at 8 am.' Past Progressive: ongoing action interrupted by another, or background setting. 'I was climbing the pyramid when the guide called us.' Signal words: Simple Past: yesterday, last week, in 2020, ago. Past Progressive: while, when (with Simple Past). Structure: was/were + verb-ing."
+        },
+        {
+          "subtitle": "Narrative connectors and cohesion",
+          "content": "Sequence connectors: first, then, next, after that, finally. Contrast: however, but, although. Addition: also, moreover, besides. Cause-result: so, because, as a result. Narrative detail: suddenly, at that moment, just then, unexpectedly. Using a variety of connectors (not just 'and then') marks a more advanced narrator (B1 level)."
+        },
+        {
+          "subtitle": "Descriptive vocabulary for narration",
+          "content": "Places: crowded, deserted, ancient, vibrant, colorful, noisy, peaceful, breathtaking. Emotions: amazed, overwhelmed, confused, thrilled, exhausted, disappointed. Actions: wandered, explored, discovered, climbed, tasted, bargained. Sensory details: smelled of copal, tasted like chilhuacle, echoed with drums. Adding sensory vocabulary transforms a report into a vivid narrative."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Choose the correct form: 'While I _______ through Tlalpan, I met an old friend.'",
+          "options": [
+            "was walking",
+            "walked",
+            "walk",
+            "have walked"
+          ],
+          "correct": "was walking"
+        },
+        {
+          "question": "Which connector shows the final step in a sequence?",
+          "options": ["finally", "however", "because", "while"],
+          "correct": "finally"
+        },
+        {
+          "question": "Which sentence uses the Simple Past correctly?",
+          "options": [
+            "We visited Chichen Itzá last summer.",
+            "We were visit Chichen Itzá last summer.",
+            "We have visit Chichen Itzá last summer.",
+            "We visiting Chichen Itzá last summer."
+          ],
+          "correct": "We visited Chichen Itzá last summer."
+        }
+      ],
+      "rubric": "4: Narrates 8+ sentences with varied connectors, at least one Past Progressive, 3+ descriptive adjectives, coherent time sequence. 3: 6-7 sentences, some connectors, minor grammar errors. 2: Simple narrative, few connectors, limited vocabulary. 1: Isolated sentences, no connectors, major grammar errors."
+    },
+    "teacher_tips": [
+      "Using photos of Mexican places students know personally makes the activity much more meaningful.",
+      "The voice recording option allows students to practice oral narration and listen back to themselves — very effective for fluency awareness.",
+      "Past Progressive is often introduced in Sem 3 (IN-III P07) — brief review before extending to more complex uses.",
+      "SECTUR's website has beautiful photos of 32 Mexican states freely available for classroom use."
+    ]
+  },
+
+  "IN-IV-P02": {
+    "code": "IN-IV-P02",
+    "title": "Expresses and justifies preferences respectfully (compares personal choices in everyday contexts).",
+    "level": "Inglés IV",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "A2-B1",
+    "category": "Habilidades comunicativas — Expresión de opinión",
+    "metadata": {
+      "objective": "Expresar preferencias y opiniones comparativas usando estructuras de comparación (comparative/superlative adjectives, prefer, would rather, like...better than) con justificación; practicar el respeto al punto de vista ajeno con expresiones de acuerdo y desacuerdo cortés.",
+      "competencies": [
+        "Usa adjetivos comparativos y superlativos correctamente para comparar opciones.",
+        "Expresa preferencias con prefer, would rather, like...better.",
+        "Justifica su elección con al least two reasons en inglés.",
+        "Acuerda y desacuerda cortésmente usando I see your point, but... / I agree because... / Actually, I think..."
+      ],
+      "materials": [
+        "Tarjetas de opciones para debates de preferencia (músicas, comidas, destinos, deportes, profesiones).",
+        "Lista de adjetivos comparativos frecuentes (better, worse, more interesting, less expensive, healthier).",
+        "Frases de acuerdo/desacuerdo cortés en póster de aula.",
+        "Datos de gustos de jóvenes mexicanos: ENAJUV 2022 (IMJUVE): preferencias de actividades de ocio."
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "Apertura", "duration": "10 min", "label": "Agree or disagree? Quick preferences"},
+        {"phase": "Desarrollo", "duration": "30 min", "label": "Comparatives, superlatives and justification"},
+        {"phase": "Cierre", "duration": "10 min", "label": "Class survey on preferences"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Teacher poses quick preference questions: 'Do you prefer tacos or pizza? Football or basketball? Mountains or beach?' Students vote by raising hands. Teacher models: 'I prefer tacos because they are more traditional and more affordable than pizza.' Introduces the idea that preferences need justification.",
+          "activity": "Think-pair-share: each student picks one preference from the board and writes 2 reasons. Shares with partner. Partner responds with agreement or polite disagreement."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "Grammar: Comparative adjectives: adj+er (shorter, cheaper, healthier) or more+adj (more interesting, more expensive, more traditional). Superlative: adj+est or most+adj. Irregular: good→better→best; bad→worse→worst. Preference structures: I prefer X to Y; I would rather X than Y; I like X better than Y because... Polite disagreement: I understand your point, but...; That's true, however...; I see what you mean, but I think...",
+          "activity": "Structured debate: 3 topics (Mexican food vs fast food; living in a city vs small town; studying vs working after preparatoria). Teams take assigned positions and must argue their side with 3 comparative sentences and 2 justifications. Then switch sides."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Class survey: using data from ENAJUV 2022 (IMJUVE) on leisure preferences of Mexican youth (sport, music, reading, social media). Students compare the survey results with their own class preferences using comparatives: 'Mexican youth spend more time on social media than on reading...'",
+          "activity": "Exit ticket: write 3 sentences: (1) I prefer ___ to ___ because... (2) My classmate prefers ___ because... (3) The most popular activity in our class is ___."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Expressing and justifying preferences is a key B1 communicative goal. It requires combining comparative grammar with discourse strategies for polite interaction. In international contexts, Mexican students often need these skills for academic exchange, tourism, and professional settings.",
+      "sections": [
+        {
+          "subtitle": "Comparative and superlative adjectives",
+          "content": "One-syllable adj: add -er/-est (cheap→cheaper→cheapest). Two+ syllables: more/most + adj (comfortable→more comfortable→most comfortable). Adjectives ending in -y: change to -i + er/est (happy→happier→happiest). Irregular: good→better→best; bad→worse→worst; far→farther→farthest. Comparative: X is adj-er than Y / X is more adj than Y. Superlative: X is the adj-est / X is the most adj (of all)."
+        },
+        {
+          "subtitle": "Preference structures",
+          "content": "Prefer + noun/gerund + to + noun/gerund: 'I prefer hiking to swimming.' Would rather + base verb + than + base verb: 'I'd rather travel by bus than fly.' Like + noun/gerund + better than: 'I like pozole better than birria.' All three can be followed by because + reason clause. Note: would rather is more formal/literary than prefer in spoken English."
+        },
+        {
+          "subtitle": "Polite disagreement strategies",
+          "content": "Direct disagreement sounds rude in English (as in Spanish). Preferred patterns: acknowledge first, then add your view. 'That's a good point, but I think...'; 'I see what you mean, however...'; 'You're right that X, but on the other hand...'. This 'yes, but...' strategy is used in academic debate (CEFR B1-B2) and professional settings. It also models critical thinking: engage with the other view before countering."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Choose the correct comparative: 'The Metro is ___ than taking an Uber in CDMX.'",
+          "options": ["cheaper", "more cheap", "cheapest", "most cheap"],
+          "correct": "cheaper"
+        },
+        {
+          "question": "Which sentence correctly expresses a preference?",
+          "options": [
+            "I prefer reading to watching TV.",
+            "I prefer reading than watching TV.",
+            "I prefer reading more watching TV.",
+            "I prefer reading as watching TV."
+          ],
+          "correct": "I prefer reading to watching TV."
+        },
+        {
+          "question": "A polite way to disagree in English is:",
+          "options": [
+            "I see your point, but I think...",
+            "No, you are wrong.",
+            "That is not true at all.",
+            "I disagree completely."
+          ],
+          "correct": "I see your point, but I think..."
+        }
+      ],
+      "rubric": "4: Uses comparative/superlative accurately, expresses 3+ preferences with justification, disagrees politely. 3: Accurate comparatives with minor errors, 2 preferences justified, some polite disagreement. 2: Expresses preferences without justification, errors in comparative forms. 1: Cannot form comparatives or express reasons."
+    },
+    "teacher_tips": [
+      "The structured debate with assigned positions (even against personal opinion) develops argumentation skills beyond language.",
+      "ENAJUV data on youth preferences is a great hook — students are curious about what others their age do.",
+      "Common error: 'more cheap' instead of 'cheaper' — explicit contrastive drill needed.",
+      "Connect with CS: the same data on youth preferences can be analyzed sociologically in CS class."
+    ]
+  },
+
+  "IN-IV-P03": {
+    "code": "IN-IV-P03",
+    "title": "Describes routines and habits with contextual awareness (explains what is done and why).",
+    "level": "Inglés IV",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "A2-B1",
+    "category": "Habilidades comunicativas — Descripción",
+    "metadata": {
+      "objective": "Describir rutinas y hábitos presentes usando el Present Simple con adverbios de frecuencia, y ampliar las descripciones con because/so que explican razones y consecuencias; comparar hábitos de diferentes contextos culturales usando datos reales.",
+      "competencies": [
+        "Describe una rutina diaria completa en al menos 8 oraciones con variedad de verbos.",
+        "Usa adverbios de frecuencia en la posición correcta (antes del verbo principal, después de be).",
+        "Explica razones y consecuencias de sus hábitos con because y so.",
+        "Compara sus hábitos con datos de salud y hábitos de jóvenes mexicanos (ENSANUT, IMJUVE)."
+      ],
+      "materials": [
+        "Tabla de adverbios de frecuencia con porcentajes (always=100%, usually=80%, often=60%, sometimes=40%, rarely=20%, never=0%).",
+        "Datos de ENSANUT 2022 sobre hábitos de jóvenes mexicanos: 35% consume refresco diariamente; 40% no hace ejercicio; 25% salta el desayuno.",
+        "Cuadrícula de rutina diaria (horario de 6am a 10pm).",
+        "Video corto: 'A day in the life of a Mexican student' (YouTube, fuentes en español con subtítulos)."
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "Apertura", "duration": "10 min", "label": "What do you always do before school?"},
+        {"phase": "Desarrollo", "duration": "30 min", "label": "Frequency adverbs + because/so"},
+        {"phase": "Cierre", "duration": "10 min", "label": "Comparing habits with national data"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Quick class poll: 'Do you always eat breakfast? Do you often use social media before bed? Do you sometimes exercise after school?' Students respond with frequency words. Teacher builds a class frequency chart on the board.",
+          "activity": "Students fill in a personal routine grid: 6am-10pm, 8 key activities, frequency adverb for each. Then compare with a partner: 'I always have coffee but you rarely do — interesting!'"
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "Position of frequency adverbs: BEFORE the main verb (I usually eat tacos); AFTER the verb 'to be' (I am rarely tired in the morning). Because + reason: 'I never skip breakfast because it gives me energy.' So + consequence: 'I rarely exercise, so I feel tired often.' Extended structures: 'Even though I usually sleep late, I always wake up at 7 because school starts at 8.' Cultural context: why do many Mexican families eat comida (main meal) at 2-3pm? Explain with because.",
+          "activity": "Writing + speaking: students write 8 sentences about their routine using because/so + frequency adverb. Read to partner. Partner identifies 3 habits they share and 3 differences."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Compare with national data: ENSANUT 2022 shows 35% of Mexican adolescents drink soda daily; only 40% exercise regularly. Students discuss: 'Our class is healthier/less healthy than the national average because...'",
+          "activity": "Healthy habit pledge: each student writes one habit they want to change and why, using 'I'm going to...' (future — preview of IN-IV-P05)."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Describing habits and routines is one of the first productive skills in English (A1), but at A2-B1 level, the focus shifts to explaining why habits exist and comparing them critically. This connects language learning with health literacy and cultural awareness.",
+      "sections": [
+        {
+          "subtitle": "Present Simple for habits and routines",
+          "content": "Present Simple describes habits, routines, general truths, and permanent states. Third person singular: add -s/-es (she eats, he watches, it goes). Negation: don't / doesn't + base verb. Questions: Do/Does + subject + base verb? Stative verbs (know, believe, love, prefer) use Present Simple even for now: 'I understand' (NOT 'I am understanding'). Time expressions: every day, on Mondays, in the morning, twice a week."
+        },
+        {
+          "subtitle": "Frequency adverbs: position and meaning",
+          "content": "Always (100%) → usually (≈80%) → often (≈60%) → sometimes (≈40%) → rarely/seldom (≈20%) → never (0%). Position rule: BEFORE main verbs ('I often skip lunch'), AFTER be ('She is always early'). Can also appear at the beginning or end of a sentence for emphasis: 'Sometimes I walk to school.' / 'I walk to school sometimes.' Note: 'never' is already negative — don't add 'don't': NOT 'I don't never...' (double negative)."
+        },
+        {
+          "subtitle": "Because and so: explaining habits",
+          "content": "'Because' introduces a reason (cause); 'so' introduces a consequence (result). Pattern: 'I [habit] because [reason].' / 'I [habit], so [consequence].' Note: a comma before 'so' but NOT before 'because' (in mid-sentence). Example: 'I drink water frequently because it keeps me hydrated. I rarely eat fast food, so I feel healthier.' These cause-effect structures move the learner from simple description to analytical thinking — a key B1 feature."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Choose the sentence with the frequency adverb in the CORRECT position:",
+          "options": [
+            "She rarely eats red meat.",
+            "She eats rarely red meat.",
+            "Rarely she eats red meat.",
+            "She eats red meat rarely always."
+          ],
+          "correct": "She rarely eats red meat."
+        },
+        {
+          "question": "Complete: 'I don't drink soda ___ it has too much sugar.'",
+          "options": ["because", "so", "but", "although"],
+          "correct": "because"
+        },
+        {
+          "question": "Which sentence describes a habit correctly?",
+          "options": [
+            "He usually walks to school on Mondays.",
+            "He is usually walking to school on Mondays.",
+            "He usually walked to school on Mondays.",
+            "He walk usually to school on Mondays."
+          ],
+          "correct": "He usually walks to school on Mondays."
+        }
+      ],
+      "rubric": "4: Describes 8+ habits with frequency adverbs in correct position, uses because/so accurately, compares with national data. 3: 6-7 habits, mostly correct adverb position, minor errors in because/so. 2: Describes habits without frequency adverbs or without reasons. 1: Cannot distinguish habits from past events or uses wrong verb form."
+    },
+    "teacher_tips": [
+      "The ENSANUT data comparison is very motivating — students love discovering they are healthier (or not) than the national average.",
+      "Common error: 'She always is tired' instead of 'She is always tired'. Drill with be separately.",
+      "The class frequency chart from the opening can become a class 'infographic' displayed in the classroom.",
+      "Connect with CNEYT-IV P05 (biomoléculas y nutrición) — the language for explaining healthy habits reinforces the science content."
+    ]
+  },
+
+  "IN-IV-P04": {
+    "code": "IN-IV-P04",
+    "title": "Requests and gives advice empathetically and in context (health, study, coexistence).",
+    "level": "Inglés IV",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "A2-B1",
+    "category": "Habilidades comunicativas — Interacción social",
+    "metadata": {
+      "objective": "Formular consejos y recomendaciones usando should/shouldn't, ought to, Why don't you...?, You could try...; escuchar activamente un problema y responder con empatía antes de dar el consejo; reconocer el tono apropiado en contextos de salud, estudio y convivencia escolar.",
+      "competencies": [
+        "Usa should, shouldn't, ought to y Why don't you con precisión para aconsejar.",
+        "Muestra empatía antes de dar un consejo: 'That sounds difficult. Have you tried...?'",
+        "Distingue consejo (should), obligación (must) y prohibición (must not) en contexto.",
+        "Participa en un roleplay de asesoría escolar o de salud usando vocabulario apropiado."
+      ],
+      "materials": [
+        "Tarjetas de problema (scenarios): 'I feel very stressed before exams', 'I have a conflict with my roommate', 'I can't sleep well', 'I don't have time to study'.",
+        "Frases de empatía en póster de aula: 'I understand how you feel...', 'That must be hard...', 'I'm sorry to hear that...'",
+        "Datos de salud mental: IMSS/SSA reporta que el 15% de adolescentes mexicanos tiene ansiedad (2022).",
+        "Guión modelo de diálogo de asesoría."
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "Apertura", "duration": "10 min", "label": "Listening first: what's the problem?"},
+        {"phase": "Desarrollo", "duration": "30 min", "label": "Should, could, Why don't you + empathy phrases"},
+        {"phase": "Cierre", "duration": "10 min", "label": "Roleplay: peer counselor"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Teacher presents a scenario: 'My friend says: I'm really stressed about my exams and I can't sleep. I eat junk food all the time and I feel terrible.' Two responses are shown: (A) 'You should exercise and sleep more.' (B) 'That sounds really hard. It's tough when everything piles up at once. Have you tried talking to someone at school? You could also try...' Discussion: which response is better? Why?",
+          "activity": "Students identify what makes response B better: empathy first, then practical advice, softer language (could/try). They brainstorm empathy phrases they know in English."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "Grammar review and extension: Should + base verb (advice): 'You should get more sleep.' Shouldn't: 'You shouldn't skip meals.' Ought to (similar to should, more formal): 'You ought to see a doctor.' Why don't you + base verb (suggestion): 'Why don't you try yoga?' You could + base verb (softer suggestion): 'You could talk to your teacher.' Empathy phrases before advice: 'I understand...', 'That must be really difficult...', 'I'm sorry you're going through this...', 'It sounds like...' Context: mental health in Mexican schools — IMSS reports 15% of adolescents have anxiety symptoms; UNAM has free counseling services (Dirección General de Atención a la Comunidad). It's okay to say: 'I think you should talk to a professional about this.'",
+          "activity": "Roleplay in pairs: one student draws a problem card, the other is the 'peer counselor'. Counselor must: (1) show empathy, (2) give 2 suggestions using different structures, (3) end encouragingly. Then switch roles."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Reflection: when should we NOT give advice and just listen? Discuss: in Mexican culture, is it common to give unsolicited advice? How does the directness differ in English vs Spanish communication styles?",
+          "activity": "Students write 4 sentences: a problem a friend might have + 2 pieces of advice using different structures + 1 empathy phrase. Share with the class."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Giving and receiving advice is a complex communicative act that requires both grammatical accuracy (modal verbs) and sociopragmatic competence (knowing when and how to advise appropriately). At B1 level, learners move beyond simple 'You should' to more nuanced, empathetic communication.",
+      "sections": [
+        {
+          "subtitle": "Modal verbs for advice and suggestions",
+          "content": "Should/shouldn't (general advice, neutral tone): 'You should visit the school nurse.' Ought to (slightly stronger, more formal): 'You ought to take this seriously.' Could (soft suggestion, respects autonomy): 'You could try meditation.' Why don't you...? (friendly suggestion): 'Why don't you talk to your parents?' Must/must not (obligation/prohibition — stronger than advice, see IN-III P05 review): 'You must not skip classes.' These modals do NOT add -s in third person and are followed by the BASE verb."
+        },
+        {
+          "subtitle": "Empathy before advice: pragmatic competence",
+          "content": "Research in linguistics shows that advice is better received when preceded by acknowledgment of the other's feelings. Empathy phrases: 'I understand how you feel.'; 'That must be really hard.'; 'I can see why you're worried.'; 'It sounds like you're going through a tough time.' Then transition to advice: 'Have you thought about...?'; 'One thing that might help is...'; 'It might be worth trying...' This pattern reflects B1 pragmatic competence: matching language to context and relationship."
+        },
+        {
+          "subtitle": "Context sensitivity: when to refer",
+          "content": "Not all problems can be solved by peer advice. When a classmate describes serious mental health concerns, the appropriate response includes: acknowledging their feelings, NOT minimizing ('It's not that bad'), and referring to professional support: 'I think you should talk to the school counselor about this — they are trained to help.' UNAM, IPN, and most public universities in Mexico have free psychological services. IMSS offers mental health support. Knowing this is part of health literacy."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Which sentence gives advice CORRECTLY using 'should'?",
+          "options": [
+            "You should to get more sleep.",
+            "You should getting more sleep.",
+            "You should get more sleep.",
+            "You shoulds get more sleep."
+          ],
+          "correct": "You should get more sleep."
+        },
+        {
+          "question": "An empathetic response to 'I'm really stressed' would be:",
+          "options": [
+            "That sounds really difficult. Have you tried talking to someone?",
+            "You should just relax. It's not a big deal.",
+            "Why are you stressed? That makes no sense.",
+            "Everyone feels stressed sometimes."
+          ],
+          "correct": "That sounds really difficult. Have you tried talking to someone?"
+        },
+        {
+          "question": "The softest/most indirect suggestion is:",
+          "options": [
+            "You could try yoga.",
+            "You must exercise.",
+            "You should definitely go.",
+            "You ought to see a doctor."
+          ],
+          "correct": "You could try yoga."
+        }
+      ],
+      "rubric": "4: Uses 3+ modal structures accurately, shows empathy before advice, adapts tone to context and suggests professional help when appropriate. 3: Uses should/could correctly with empathy phrases, minor errors in other modals. 2: Gives advice with should only, no empathy phrases. 1: Cannot use modal verbs for advice or gives inappropriate responses."
+    },
+    "teacher_tips": [
+      "The mental health context is very sensitive — establish a safe space before the roleplay. Emphasize that the scenarios are fictional.",
+      "The reference to UNAM and IMSS mental health services is important — many students don't know these resources exist.",
+      "For students who are dealing with real stress: the roleplay can be therapeutic but should never replace professional support.",
+      "Connect with PFH (filosofía) on ethics of advice and autonomy — interesting cross-curricular discussion."
+    ]
+  },
+
+  "IN-IV-P05": {
+    "code": "IN-IV-P05",
+    "title": "Talks about personal or community plans and purposes (expresses what will be done and why it matters).",
+    "level": "Inglés IV",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "A2-B1",
+    "category": "Habilidades comunicativas — Expresión de futuro",
+    "metadata": {
+      "objective": "Expresar planes, intenciones y predicciones en inglés usando going to (planes concretos), will (predicciones/decisiones espontáneas) y want to/plan to/hope to (intenciones); describir proyectos comunitarios o personales con propósito explicado.",
+      "competencies": [
+        "Usa going to para planes definidos e intenciones con evidencia presente.",
+        "Usa will para predicciones sobre el futuro y decisiones espontáneas.",
+        "Combina want to/plan to/hope to con infinitivos para expresar intenciones.",
+        "Describe un proyecto de mejora comunitaria o escolar en 6-8 oraciones en inglés."
+      ],
+      "materials": [
+        "Noticias de proyectos comunitarios de jóvenes mexicanos: IMJUVE, Sembrando Vida, Jóvenes Construyendo el Futuro (STPS).",
+        "Tarjetas de plan (What: the plan; Why: the reason/purpose; When: the timeline).",
+        "Modelo de presentación oral de proyecto (estructura: goal → plan → expected impact).",
+        "Datos: Jóvenes Construyendo el Futuro 2023 — 1.2 millones de jóvenes en aprendizaje laboral."
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "Apertura", "duration": "10 min", "label": "What's your plan for after preparatoria?"},
+        {"phase": "Desarrollo", "duration": "30 min", "label": "Going to, will, want to — three ways to talk about the future"},
+        {"phase": "Cierre", "duration": "10 min", "label": "My community project pitch"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Open question: 'What are your plans for next year? What do you want to do after graduating?' Students share freely. Teacher boards their answers and highlights the different structures they use naturally. Then clarifies: 'I'm going to...' (concrete plan), 'I think I'll...' (prediction), 'I want to...' (desire/intention).",
+          "activity": "3-2-1: students write 3 plans (going to), 2 predictions (will), 1 hope (hope to). Share with partner. Partner asks: 'Why is that important to you?'"
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "Going to + base verb: concrete plans with present intention and/or evidence. 'I'm going to study nursing because my community needs more health workers.' Will + base verb: spontaneous decisions, predictions, offers, promises. 'I think renewable energy will be important in Mexico.' / 'I'll help you with that.' Want to / plan to / hope to + base verb: intentions with varying degrees of certainty. Context: Programa Jóvenes Construyendo el Futuro (STPS) — young people plan a year of paid training in a company or social project. Students discuss: 'If you joined the program, what would you plan to do? Why?'",
+          "activity": "Project pitch: in groups of 3, students design a community micro-project (clean a park, organize a book exchange, create a school garden, hold a cultural event). They prepare a 3-minute pitch: What is your plan? (going to) Why does it matter? (because) When will you do it? (will/going to) What do you hope will happen? (hope to). Present to another group."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Gallery of plans: each group writes their project summary on a card. Class walks around and puts a sticker on the project they think is most impactful. Discussion: 'What makes a plan realistic? What resources would you need?'",
+          "activity": "Individual reflection: complete the sentence starter 'By the time I finish preparatoria, I hope to... because...' — connecting personal plans with purpose."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Future expression in English involves choosing between going to, will, and other forms based on context (certainty, evidence, spontaneity). At B1, learners can discuss plans with purpose and express hopes and expectations — skills essential for academic presentations, job interviews, and civic participation.",
+      "sections": [
+        {
+          "subtitle": "Going to vs will: the key distinction",
+          "content": "Going to: (1) Pre-arranged plans ('I'm going to visit my grandmother this weekend — I already bought the ticket.'); (2) Intentions with evidence ('Look at those clouds — it's going to rain.'). Will: (1) Spontaneous decisions ('The phone is ringing — I'll get it.'); (2) Predictions based on opinion ('I think electric cars will replace gasoline cars by 2040.'); (3) Promises/offers ('I'll help you with your homework.'). Both use BASE verb after going to / will. Negative: I'm not going to / I won't."
+        },
+        {
+          "subtitle": "Intention verbs: want/plan/hope/expect",
+          "content": "These verbs express intentions with different degrees of certainty. Want to (desire): 'I want to become an engineer.' Plan to (organized intention): 'I plan to apply to UNAM next year.' Hope to (optimistic expectation with some uncertainty): 'I hope to get a scholarship.' Expect to (fairly certain): 'I expect to graduate in 3 years.' All followed by infinitive (to + base verb). These are especially useful for talking about long-term goals, which is common in B1 spoken tasks."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Which sentence uses 'going to' correctly for a concrete plan?",
+          "options": [
+            "I'm going to study at UNAM — I already submitted my application.",
+            "I'm going to maybe try to study someday.",
+            "I will going to study at UNAM.",
+            "I going to study at UNAM."
+          ],
+          "correct": "I'm going to study at UNAM — I already submitted my application."
+        },
+        {
+          "question": "A spontaneous decision is best expressed with:",
+          "options": [
+            "will ('I'll answer that question.')",
+            "going to ('I'm going to answer that question.')",
+            "want to ('I want to answer that question.')",
+            "hope to ('I hope to answer that question.')"
+          ],
+          "correct": "will ('I'll answer that question.')"
+        },
+        {
+          "question": "Complete: 'I ___ become a nurse because my community needs more healthcare workers.'",
+          "options": [
+            "hope to",
+            "am hoping",
+            "hoped",
+            "will hoping"
+          ],
+          "correct": "hope to"
+        }
+      ],
+      "rubric": "4: Uses going to, will and intention verbs accurately and appropriately, presents community project with clear purpose and impact. 3: Uses going to and will correctly, minor errors with intention verbs. 2: Uses only will for all future references, or confuses going to and will. 1: Cannot form future expressions correctly."
+    },
+    "teacher_tips": [
+      "The Jóvenes Construyendo el Futuro program is well-known to students' families — it's a real hook into the content.",
+      "The community project pitch is an excellent assessment — it requires genuine future language use with purpose.",
+      "Common error: 'I will going to study' — needs explicit correction with visual rule.",
+      "Connect with CD-III P04 (proyecto comunitario digital) — students can expand their digital community project into an English pitch."
+    ]
+  },
+
+  "IN-IV-P06": {
+    "code": "IN-IV-P06",
+    "title": "Participates in brief social conversations with courtesy expressions (initiates, maintains and closes brief exchanges).",
+    "level": "Inglés IV",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "A2-B1",
+    "category": "Habilidades comunicativas — Interacción oral",
+    "metadata": {
+      "objective": "Desarrollar fluidez en intercambios sociales breves: saludos y presentaciones formales e informales, mantenimiento de la conversación mediante preguntas de seguimiento y expresiones de interés, y cierre cortés de una interacción; adaptar el registro según el contexto (informal con pares, formal con adultos/contexto laboral).",
+      "competencies": [
+        "Inicia y cierra una conversación de forma natural en inglés en diferentes contextos.",
+        "Usa preguntas de seguimiento para mantener la conversación (Really? What did you think? And then?).",
+        "Adapta el registro (formal vs informal) según la situación.",
+        "Practica small talk sobre temas cotidianos: clima, fin de semana, comida, eventos locales."
+      ],
+      "materials": [
+        "Tarjetas de rol: estudiante, profesor, empleador, turista extranjero, compañero de trabajo.",
+        "Lista de temas de small talk apropiados e inapropiados en inglés (cultural awareness).",
+        "Audio o video de conversaciones informales naturales en inglés mexicano (YouTube).",
+        "Dado de conversación: cada cara tiene un tema (weekend, food, music, plans, studies, a recent event)."
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "Apertura", "duration": "10 min", "label": "The conversation wheel — topics and turns"},
+        {"phase": "Desarrollo", "duration": "30 min", "label": "Opening, maintaining and closing conversations"},
+        {"phase": "Cierre", "duration": "10 min", "label": "Speed networking — 5 conversations in 5 minutes"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Teacher demonstrates two types of conversation: (A) short and awkward (one-word answers, no follow-up); (B) natural and warm (follow-up questions, expressions of interest, smooth turn-taking). Students identify what makes B better. Discussion: what topics are safe for small talk in English? (weather, weekend plans, food, sports) vs uncomfortable (politics, salary, age in some cultures).",
+          "activity": "Class brainstorm: 'What topics do you talk about with classmates?' vs 'What would you say to a teacher or job interviewer?' Students distinguish informal/formal openings."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "Conversation structure: OPENING: 'Hi! How are you doing?' / 'Good morning, nice to meet you.' MAINTAINING: follow-up questions ('Really? What was it like?'), expressions of interest ('Wow!', 'That's great!', 'Seriously?'), sharing your own experience ('Oh, I went there too! I thought...'), turn-taking ('What about you?', 'Have you ever...?'). CLOSING: 'Well, I should get going...', 'It was great talking to you!', 'See you around!', 'Nice meeting you.' (formal: 'It was a pleasure meeting you, I hope we can connect again.'). Register: informal with peers (gonna, wanna, yeah, cool), formal with adults (I would like to, certainly, I appreciate).",
+          "activity": "Scaffolded practice: (1) directed roleplay with script. (2) semi-directed with cue cards. (3) free roleplay with only the role card (student+tourist, student+employer, student+new classmate). Each conversation: 2-3 minutes."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Speed networking: all students stand. Teacher says 'Go!' — students find a partner, have a 60-second conversation, then 'Switch!' and find a new partner. 5 rounds. Each conversation must start differently and use a different topic.",
+          "activity": "Debrief: 'What was the hardest part? What helped the conversation flow? What will you practice more?'"
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Small talk and conversational maintenance are often neglected in formal language teaching but are critical for real-world English use. At B1, learners should be able to participate in conversations on familiar topics without undue strain. This skill is crucial for international tourism, workplace settings, and academic exchange programs (PRONI-SEP).",
+      "sections": [
+        {
+          "subtitle": "Turn-taking in English conversation",
+          "content": "English conversation uses implicit signals for turn-taking: rising intonation as invitation, falling intonation as turn-end, fillers ('Well...', 'So...', 'Actually...') as floor-holding. Back-channels (signals that you're listening): 'Mm-hmm', 'Right', 'I see', 'Exactly', 'Sure'. Following up: 'What happened next?', 'How did that make you feel?', 'What did you think?' These are not interruptions — they are invitations for the other person to continue, and native speakers expect them."
+        },
+        {
+          "subtitle": "Register: formal vs informal",
+          "content": "Informal register (peers, friends): contractions (I'm, it's, gonna, wanna), slang (cool, awesome, no way), questions without do/does inversion sometimes ('You like it?'), informal greetings ('Hey!', 'What's up?'). Formal register (teachers, employers, strangers): full forms (I am going to, I would like to), polite expressions (Could I...?, Would you mind...?, Certainly), formal closings ('It was a pleasure meeting you.'). Mexican English learners often use informal forms in formal contexts — explicit practice of register-switching is needed."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "A natural follow-up question after 'I went to the Frida Kahlo Museum last weekend' is:",
+          "options": [
+            "Oh, really? What did you think of it?",
+            "Why did you go there?",
+            "I also went somewhere.",
+            "The museum is famous."
+          ],
+          "correct": "Oh, really? What did you think of it?"
+        },
+        {
+          "question": "Which closing expression is more FORMAL?",
+          "options": [
+            "It was a pleasure meeting you.",
+            "See ya!",
+            "Gotta go!",
+            "Catch you later!"
+          ],
+          "correct": "It was a pleasure meeting you."
+        },
+        {
+          "question": "A back-channel response while listening is:",
+          "options": [
+            "I see / Right / Mm-hmm",
+            "Stop talking, I want to speak.",
+            "Could you repeat that?",
+            "What are you saying?"
+          ],
+          "correct": "I see / Right / Mm-hmm"
+        }
+      ],
+      "rubric": "4: Initiates, maintains (3+ follow-up questions) and closes conversations naturally in both formal and informal register; uses back-channels. 3: Maintains conversation with some follow-up, mostly correct register, minor awkwardness. 2: Responds to questions but rarely initiates or follows up; only one register used. 1: Cannot maintain a 2-minute conversation; gives only one-word answers."
+    },
+    "teacher_tips": [
+      "Speed networking is the most fun activity in this unit — students remember it for years.",
+      "Recording roleplays for self-analysis is very effective for conversation awareness.",
+      "Small talk about the weather is often cited as very English/British — clarify that it's also common in North American professional contexts.",
+      "For PRONI context: international exchange students need exactly these skills to navigate their host countries."
+    ]
+  },
+
+  "IN-IV-P07": {
+    "code": "IN-IV-P07",
+    "title": "Recounts an anecdote or significant experience (narrates clearly and in an organized way).",
+    "level": "Inglés IV",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "B1",
+    "category": "Habilidades comunicativas — Narración oral",
+    "metadata": {
+      "objective": "Narrar oralmente una anécdota o experiencia significativa de forma organizada (orientación, complicación, resolución, coda), usando vocabulario descriptivo, cambios de tiempo verbal apropiados y estrategias para captar y mantener la atención del oyente.",
+      "competencies": [
+        "Organiza una narración oral en las cuatro etapas: orientación, complicación, resolución, coda.",
+        "Alterna entre Simple Past y Past Progressive para crear tensión narrativa.",
+        "Usa expresiones para captar la atención: 'You won't believe what happened...', 'The thing is...'",
+        "Narra con fluidez durante al menos 2 minutos manteniendo el hilo y la atención del oyente."
+      ],
+      "materials": [
+        "Modelo de narración grabada (audio o video): anécdota de 2-3 minutos de un hablante natural.",
+        "Plantilla de estructura narrativa: orientación / complicación / resolución / coda.",
+        "Lista de expresiones de inicio ('You know what happened?', 'So there I was...') y de mantenimiento de tensión ('And then, suddenly...', 'Just when I thought...').",
+        "Cronómetro para practicar la duración mínima de 2 minutos."
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "Apertura", "duration": "10 min", "label": "A story that made you laugh/worry/proud"},
+        {"phase": "Desarrollo", "duration": "30 min", "label": "Narrative structure + tension + resolution"},
+        {"phase": "Cierre", "duration": "10 min", "label": "Storytelling circle"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Teacher tells a 2-minute personal anecdote using the 4-stage structure: 'Last year I was in Oaxaca [orientation: who, where, when] when I got completely lost in the market [complication]. I couldn't speak any Zapotec and my Spanish wasn't helping [tension]. Finally, a 10-year-old girl noticed I was confused and guided me to the exit [resolution]. It turned out to be the best part of my trip [coda].'",
+          "activity": "Students identify: Where is the orientation? The complication? The resolution? The coda? What made the story interesting? (specific details, change of events, emotional ending)"
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "Story structure: (1) ORIENTATION: 'It was last summer. I was at my grandmother's house in Puebla.' (2) COMPLICATION: 'Suddenly, I heard a loud noise...' / 'Just as we were leaving, something unexpected happened...' (3) RESOLUTION: 'Luckily, ...', 'In the end, ...', 'After a while, we managed to...' (4) CODA (reflection/lesson): 'That's when I realized...', 'From that day on, I always...', 'Looking back, I think...' Grammar: Simple Past for completed events + Past Progressive for interrupted ongoing actions = narrative tension. Attention-getters: 'You won't believe this, but...'; 'So there I was, minding my own business, when...'; 'The funniest/strangest/most embarrassing thing happened...'",
+          "activity": "Students plan their own anecdote using the 4-stage template (written notes only, not a script). Practice once with a partner (partner times them and gives feedback). Then polish for the storytelling circle."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Storytelling circle: groups of 5. Each student tells their anecdote (2 min). After each story, the group asks one question and gives one compliment: 'The most vivid part for me was when...'",
+          "activity": "Class vote: 'Which story would you most like to read as a written text? Which was the most suspenseful? Which had the best resolution?'"
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Oral storytelling is a universal human skill. In English language teaching, the ability to recount personal anecdotes coherently is a B1 benchmark (CEFR). The four-stage narrative structure (Labov-Waletzky, 1967) is found in stories across all cultures, including Mexican oral tradition.",
+      "sections": [
+        {
+          "subtitle": "The four-stage narrative structure",
+          "content": "Based on Labov & Waletzky (1967): (1) Abstract/orientation: sets the scene (who, where, when, what was the general situation). (2) Complication: the problem, unexpected event, or turning point that creates tension. (3) Resolution: how the situation was resolved or how it ended. (4) Coda: the lesson learned, the emotional reflection, or a return to the present ('And that's why I always carry a map now.'). Some stories also have an Evaluation embedded: comments on the significance ('It was the scariest moment of my life')."
+        },
+        {
+          "subtitle": "Creating narrative tension in English",
+          "content": "Tension is created through: (1) Timing: slow down at the key moment ('And then... very slowly... the door opened...'). (2) Past Progressive for interrupted actions: 'I was walking home when suddenly...'. (3) Dramatic language: 'I couldn't believe it!', 'I froze.', 'My heart was pounding.' (4) Direct speech: 'She looked at me and said: Don't move.' (5) Short sentences at the climax vs longer sentences at the resolution. These features distinguish a B1 storyteller from an A2 one."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "In a narrative, the 'coda' is:",
+          "options": [
+            "The reflection or lesson learned at the end of the story",
+            "The initial setting of the story",
+            "The main problem in the story",
+            "The list of characters"
+          ],
+          "correct": "The reflection or lesson learned at the end of the story"
+        },
+        {
+          "question": "Which sentence creates MORE narrative tension?",
+          "options": [
+            "I was walking home when suddenly someone grabbed my arm.",
+            "I walked home and someone grabbed my arm.",
+            "I was walking home and arrived.",
+            "I have walked home yesterday."
+          ],
+          "correct": "I was walking home when suddenly someone grabbed my arm."
+        },
+        {
+          "question": "An attention-getter to START a story is:",
+          "options": [
+            "You won't believe what happened to me last week!",
+            "In conclusion, the experience was significant.",
+            "The problem was that we got lost.",
+            "After that, we went home."
+          ],
+          "correct": "You won't believe what happened to me last week!"
+        }
+      ],
+      "rubric": "4: Narrates 2+ minutes with clear 4-stage structure, Past Progressive for tension, varied vocabulary and engaging delivery. 3: Clear structure, mostly correct grammar, some tension-building, 90+ seconds. 2: Basic narrative without clear structure, mostly Simple Past, 60+ seconds. 1: Disconnected sentences, no structure, under 60 seconds."
+    },
+    "teacher_tips": [
+      "The teacher's own anecdote at the start is crucial — model vulnerability and humor to lower affective filter.",
+      "The 4-stage structure template (written notes, not a script) is important: students who write full scripts read rather than narrate.",
+      "Video-record the storytelling circle (with permission) — students love watching themselves and it supports self-assessment.",
+      "Mexican oral tradition (cuentos de aparecidos, leyendas locales) can be retold in English — very motivating for students."
+    ]
+  },
+
+  "IN-IV-P08": {
+    "code": "IN-IV-P08",
+    "title": "Consolidates strategies for understanding and expressing ideas clearly and in a structured way.",
+    "level": "Inglés IV",
+    "duration": "~4h (proyecto integrador, 2-3 sesiones)",
+    "difficulty": "B1",
+    "category": "Proyecto integrador",
+    "metadata": {
+      "objective": "Integrar las habilidades comunicativas del semestre (narración, preferencias, rutinas, consejos, planes, conversación social, anécdotas) en un proyecto multimodal que demuestre el nivel A2-B1 del MCER; desarrollar estrategias metacognitivas para la comprensión y producción en inglés.",
+      "competencies": [
+        "Produce un texto multimodal en inglés (blog, podcast, video-diario, presentación) que integre 4+ habilidades del semestre.",
+        "Aplica estrategias de comprensión lectora y auditiva (skimming, scanning, inferring meaning from context).",
+        "Usa estrategias de comunicación (paraphrasing, asking for clarification, compensating strategies).",
+        "Autoevalúa su nivel MCER usando el Portfolio Europeo de las Lenguas adaptado al contexto mexicano (PRONI-SEP)."
+      ],
+      "materials": [
+        "Rúbrica del proyecto integrador alineada al MCER A2-B1.",
+        "Portfolio personal de inglés: recopilación de producciones del semestre.",
+        "Guía de estrategias de comunicación (paraphrase: 'I mean...', 'In other words...'; clarification: 'Could you repeat that?', 'What do you mean by...?'; compensation: 'the thing that you use to...' when you don't know the word).",
+        "Referencia PRONI-SEP: Marco Curricular Común de Bachillerato Tecnológico para Inglés.",
+        "Peer assessment form en inglés (evaluación entre pares)."
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "Planificación", "duration": "20 min", "label": "Choose your project format"},
+        {"phase": "Producción", "duration": "60 min", "label": "Create and draft your project"},
+        {"phase": "Presentación", "duration": "30 min", "label": "Share and receive feedback"},
+        {"phase": "Metacognición", "duration": "10 min", "label": "Self-assess your CEFR level"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: PLANIFICACIÓN",
+          "duration": "20 min",
+          "description": "Students choose one of four project formats: (A) Blog post (500 words): 'My life as a Mexican student' — includes routine, preferences, plans, anecdote. (B) Podcast episode (3-5 min audio): interview a classmate about their experience/plans, interspersed with your own commentary. (C) Video diary (3-4 min): narrate 3 days of your life with honest commentary. (D) Cultural guide (written + oral presentation): 'A visitor's guide to my city/state' — includes advice, descriptions, anecdote of a local experience.",
+          "activity": "Students complete a planning template: format chosen, topics to cover (must include at least 4 from the semester), language goals (3 structures to demonstrate), production timeline."
+        },
+        {
+          "title": "FASE II: PRODUCCIÓN",
+          "duration": "60 min",
+          "description": "In-class work time with teacher circulating. Students draft, record or design their project. Teacher provides individual feedback on language use, content and coherence. Students also practice communication strategies when they don't know a word: describe it ('the thing that you use to measure temperature'), use a synonym, or ask for clarification.",
+          "activity": "Peer review: exchange draft with a partner using the peer assessment form. Give feedback on: Is the content clear? Did they use 4+ structures from the semester? Is the English understandable? What's one thing to improve?"
+        },
+        {
+          "title": "FASE III: PRESENTACIÓN Y METACOGNICIÓN",
+          "duration": "40 min",
+          "description": "Sharing circle: students share their project (present, play recording, or read aloud). Audience completes: 'One thing I learned / noticed / want to try from this project is...' Then individual CEFR self-assessment: students read A2 and B1 descriptors and mark where they honestly feel they are in speaking, writing, listening and reading.",
+          "activity": "Semester reflection: 'Three things I can do in English now that I couldn't at the start of this semester. One goal for Semester 5.'"
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "The integrating project brings together all communicative skills developed during the semester in a meaningful, real-world task. Metacognitive strategies — awareness of one's own learning process — are central to CEFR-based language learning and are explicitly included in the PRONI curriculum (SEP, 2023).",
+      "sections": [
+        {
+          "subtitle": "Communication strategies at B1",
+          "content": "When vocabulary fails, use compensatory strategies: (1) Circumlocution: describe the concept ('It's a kind of food that is made with corn and is eaten at Day of the Dead — the one with...'). (2) Paraphrase: restate in simpler words ('I mean...', 'In other words...'). (3) Asking for clarification: 'Could you repeat that, please?', 'What do you mean by...?', 'Sorry, I didn't quite catch that.' (4) Approximation: use a related word ('vehicle' instead of 'minivan'). These are not signs of weakness — they are sophisticated communication skills used by native speakers too."
+        },
+        {
+          "subtitle": "CEFR self-assessment at B1 level",
+          "content": "Key B1 descriptors (CEFR, CoE 2001): Can understand the main points of clear standard input on familiar matters. Can deal with most situations likely to arise whilst travelling. Can produce simple connected text on topics which are familiar or of personal interest. Can describe experiences and events, dreams, hopes and ambitions and briefly give reasons and explanations. PRONI-SEP uses these descriptors to guide evaluation of Mexican EFL learners. Self-assessment using a checklist promotes learner autonomy."
+        },
+        {
+          "subtitle": "Portfolio-based assessment",
+          "content": "The language portfolio collects samples of the learner's work over time, showing development. It typically includes: (1) a language biography (personal history with the language), (2) a self-assessment grid (CEFR descriptors), (3) a dossier (best work samples). In Mexico, the PRONI portfolio is linked to the CENNI (Certificación Nacional de Nivel de Idioma) certification framework. Students who complete bachillerato at B1 level may be eligible for CENNI B1 certification."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "When you don't know a word in English, a good strategy is:",
+          "options": [
+            "Describe it: 'It's a kind of... used for...'",
+            "Stop talking and say nothing",
+            "Use the Spanish word with an English accent",
+            "Only speak about topics you know perfectly"
+          ],
+          "correct": "Describe it: 'It's a kind of... used for...'"
+        },
+        {
+          "question": "A CEFR B1 learner CAN:",
+          "options": [
+            "Describe experiences and briefly give reasons",
+            "Understand native speech at full speed on any topic",
+            "Only say isolated words and phrases",
+            "Write academic essays with complex argument"
+          ],
+          "correct": "Describe experiences and briefly give reasons"
+        },
+        {
+          "question": "Which structure from this semester's learning is used in: 'I'm going to study nursing because my community needs more doctors'?",
+          "options": [
+            "Future plan (going to) + reason (because)",
+            "Past narrative (Simple Past) + advice (should)",
+            "Habit description (frequency adverb) + result (so)",
+            "Preference (prefer) + comparison (than)"
+          ],
+          "correct": "Future plan (going to) + reason (because)"
+        }
+      ],
+      "rubric": "4: Project integrates 4+ structures, is 4+ minutes/500+ words, uses communication strategies, and includes B1-level reflection. 3: Integrates 3 structures, meets minimum length, minor language errors, partial reflection. 2: Integrates 2 structures, below minimum length, frequent errors, no reflection. 1: Does not demonstrate semester-level language use; isolated sentences without integration."
+    },
+    "teacher_tips": [
+      "Offering four project formats respects diverse learning styles and strengths — the podcast option particularly suits oral learners.",
+      "The CEFR self-assessment is most powerful when done with specific examples: 'I can narrate a 2-minute anecdote' is more meaningful than 'I can speak.'",
+      "If resources allow, connect with the CENNI certification timeline — knowing there's a real certification to work toward motivates students.",
+      "The semester reflection ('what I can do now that I couldn't before') is emotionally significant for many students — allow time for honest sharing."
+    ]
+  }
+}
+
+with open(OUT, "w", encoding="utf-8") as f:
+    json.dump(data, f, ensure_ascii=False, indent=2)
+
+print(f"Written {len(data)} progressions to {OUT}")

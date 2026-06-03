@@ -1,0 +1,109 @@
+/* ══════════════════════════════════════════════════════════════
+   Biblioteca — fichas editoriales (sin thumbnails repetidos).
+   Cada ficha = "lomo de libro": lomo de color + categoría + título.
+   El color lo inyecta cada grupo de UAC vía --chip-color.
+   ══════════════════════════════════════════════════════════════ */
+
+.biblio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.biblio-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 158px;
+  padding: 18px 20px 16px 24px;
+  border-radius: 16px;
+  text-decoration: none;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.022);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  transition: transform 0.24s ease, background 0.24s ease, border-color 0.24s ease;
+}
+
+/* Lomo de color a la izquierda (identidad de la materia) */
+.biblio-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 5px;
+  background: var(--chip-color);
+}
+
+.biblio-card:hover {
+  transform: translateY(-5px);
+  background: color-mix(in srgb, var(--chip-color) 8%, rgba(255, 255, 255, 0.02));
+  border-color: color-mix(in srgb, var(--chip-color) 45%, transparent);
+}
+
+/* Ficha leída: acento verde sutil */
+.biblio-card.is-read {
+  border-color: rgba(52, 211, 153, 0.22);
+}
+
+.biblio-card-tag {
+  font-size: 10.5px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--chip-color);
+  margin-bottom: 12px;
+}
+
+.biblio-card-title {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.32;
+  color: #fff;
+  margin: 0 0 16px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.biblio-card-foot {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.biblio-card-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.biblio-card-time i {
+  font-size: 10px;
+}
+
+.biblio-card-read {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  font-weight: 800;
+  color: #34d399;
+}
+
+.biblio-card-read i {
+  font-size: 9px;
+}
+
+@media (max-width: 640px) {
+  .biblio-grid {
+    grid-template-columns: 1fr;
+  }
+}

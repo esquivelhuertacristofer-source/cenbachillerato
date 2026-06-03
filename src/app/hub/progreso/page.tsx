@@ -11,10 +11,9 @@ import {
   getLogros,
 } from "@/lib/queries/progreso";
 import type { Metadata } from "next";
+import "./Progreso.css";
 
 export const metadata: Metadata = { title: "Mi Progreso — CEN Bachillerato" };
-
-const DAY_LABELS = ["D", "L", "M", "X", "J", "V", "S"];
 
 function timeAgo(dateStr: string): string {
   const diffMin = Math.floor((Date.now() - new Date(dateStr).getTime()) / 60000);
@@ -50,224 +49,177 @@ export default async function ProgresoPage() {
   const { porcentaje, totalProgresiones, progresionesCompletadas, actividadesEstaSemana, minutosEstaSemana } = progreso;
   const { diasConsecutivos } = rachaData;
 
-  // Donut ring
-  const R = 54;
+  // Medidor radial del hero
+  const R = 66;
   const circ = 2 * Math.PI * R;
   const offset = circ * (1 - porcentaje / 100);
 
   const rachaRecord = diasConsecutivos;
+  const tiempoTotal = `${Math.round(stats.totalMinutos / 60)}h ${stats.totalMinutos % 60}m`;
 
-  const CARD_STYLE = {
-    borderRadius: 20,
-    background: "rgba(255,255,255,0.04)",
-    border: "1px solid rgba(255,255,255,0.08)",
-    padding: "24px",
-  };
+  const HERO_STATS = [
+    { label: "Total XP ganado", value: stats.totalXP.toLocaleString("es-MX"), icon: "fa-star", color: "#FBBF24" },
+    { label: "Actividades completadas", value: stats.totalActividades, icon: "fa-check", color: "#34D399" },
+    { label: "Tiempo total", value: tiempoTotal, icon: "fa-clock", color: "#38BDF8" },
+  ];
 
   return (
-    <div style={{ padding: "36px 40px 80px", maxWidth: 1200, margin: "0 auto" }}>
+    <div className="prog-page">
 
-      {/* ── Header ─── */}
-      <div style={{ marginBottom: 36 }}>
-        <p style={{ fontSize: 11, fontWeight: 700, color: "#7DD3FC", textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 4px" }}>
-          Dashboard personal
-        </p>
-        <h1 style={{ fontSize: "clamp(26px, 3vw, 38px)", fontWeight: 900, color: "#fff", letterSpacing: "-0.04em", margin: 0 }}>
-          Mi Progreso
-        </h1>
+      {/* ── Encabezado ─── */}
+      <div className="prog-head">
+        <p className="prog-eyebrow">Dashboard personal</p>
+        <h1 className="prog-title">Mi Progreso</h1>
       </div>
 
-      {/* ── Bloque 1: Resumen global ─── */}
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-        gap: 20,
-        marginBottom: 32,
-      }}>
-        {/* Donut global — already dark */}
-        <div style={{
-          gridColumn: "span 1",
-          borderRadius: 20,
-          background: "linear-gradient(145deg, #0B2545 0%, #0E2D60 100%)",
-          border: "1px solid rgba(255,255,255,0.08)",
-          padding: "28px 24px",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.25)",
-          display: "flex", alignItems: "center", gap: 20,
-        }}>
-          <div style={{ position: "relative", flexShrink: 0 }}>
-            <svg width={120} height={120} viewBox="0 0 120 120" style={{ transform: "rotate(-90deg)" }}>
-              <circle cx={60} cy={60} r={R} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth={9} />
-              {porcentaje > 0 && (
-                <circle
-                  cx={60} cy={60} r={R}
-                  fill="none" stroke="#38BDF8" strokeWidth={9}
-                  strokeDasharray={circ}
-                  strokeDashoffset={offset}
-                  strokeLinecap="round"
-                  style={{ transition: "stroke-dashoffset 1.2s ease" }}
-                />
-              )}
-            </svg>
-            <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ fontSize: 22, fontWeight: 900, color: "#fff", lineHeight: 1, letterSpacing: "-0.03em" }}>{porcentaje}%</span>
-              <span style={{ fontSize: 10, color: "rgba(255,255,255,0.40)", fontWeight: 600, marginTop: 2 }}>avance</span>
-            </div>
-          </div>
-          <div>
-            <p style={{ fontSize: 11, fontWeight: 700, color: "rgba(125,211,252,0.70)", textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 6px" }}>
-              Semestre {semestre}
-            </p>
-            <p style={{ fontSize: 28, fontWeight: 900, color: "#fff", margin: "0 0 4px", letterSpacing: "-0.04em", lineHeight: 1 }}>
-              {progresionesCompletadas}
-              <span style={{ fontSize: 15, fontWeight: 400, color: "rgba(255,255,255,0.35)" }}>/{totalProgresiones}</span>
-            </p>
-            <p style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", margin: "0 0 12px" }}>progresiones</p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-              <span style={{ fontSize: 12, color: "rgba(255,255,255,0.55)" }}>
-                <span style={{ fontWeight: 800, color: "#38BDF8" }}>{actividadesEstaSemana}</span>
-                {" "}actividades esta semana
-              </span>
-              <span style={{ fontSize: 12, color: "rgba(255,255,255,0.55)" }}>
-                <span style={{ fontWeight: 800, color: "#38BDF8" }}>{minutosEstaSemana}m</span>
-                {" "}dedicados
-              </span>
-            </div>
+      {/* ── HERO: resumen global ─── */}
+      <section className="prog-hero">
+        {/* Medidor radial */}
+        <div className="prog-hero-gauge">
+          <svg viewBox="0 0 160 160">
+            <defs>
+              <linearGradient id="prog-gauge-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#38BDF8" />
+                <stop offset="100%" stopColor="#A78BFA" />
+              </linearGradient>
+            </defs>
+            <circle cx={80} cy={80} r={R} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth={12} />
+            {porcentaje > 0 && (
+              <circle
+                cx={80} cy={80} r={R}
+                fill="none" stroke="url(#prog-gauge-grad)" strokeWidth={12}
+                strokeDasharray={circ}
+                strokeDashoffset={offset}
+                strokeLinecap="round"
+                style={{ transition: "stroke-dashoffset 1.2s ease" }}
+              />
+            )}
+          </svg>
+          <div className="prog-hero-gauge-center">
+            <span className="prog-hero-gauge-num">{porcentaje}%</span>
+            <span className="prog-hero-gauge-cap">avance</span>
           </div>
         </div>
 
-        {/* XP + actividades */}
-        <div style={CARD_STYLE}>
-          <p style={{ fontSize: 11, fontWeight: 700, color: "#7DD3FC", textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 16px" }}>
-            Estadísticas
-          </p>
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            {[
-              { label: "Total XP ganado", value: stats.totalXP.toLocaleString("es-MX"), icon: "fa-star", color: "#FBBF24" },
-              { label: "Actividades completadas", value: stats.totalActividades, icon: "fa-check", color: "#34D399" },
-              { label: "Tiempo total", value: `${Math.round(stats.totalMinutos / 60)}h ${stats.totalMinutos % 60}m`, icon: "fa-clock", color: "#38BDF8" },
-            ].map((item) => (
-              <div key={item.label} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{
-                  width: 36, height: 36, borderRadius: 10,
-                  background: `${item.color}20`,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 14, color: item.color, flexShrink: 0,
-                }}>
-                  <i className={`fa-solid ${item.icon}`} />
-                </div>
+        {/* Contenido */}
+        <div className="prog-hero-main">
+          <p className="prog-hero-kicker">Semestre {semestre} · avance global</p>
+          {porcentaje === 0 ? (
+            <>
+              <p className="prog-hero-big">Tu semestre empieza aquí</p>
+              <p className="prog-hero-sub">
+                Completá tu primera actividad para arrancar tu avance, sumar XP y
+                encender tu racha. <strong>{totalProgresiones} progresiones</strong> te esperan.
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="prog-hero-big">
+                {progresionesCompletadas}<span> / {totalProgresiones} progresiones</span>
+              </p>
+              <p className="prog-hero-sub">
+                <strong>{actividadesEstaSemana}</strong> actividades y{" "}
+                <strong>{minutosEstaSemana} min</strong> dedicados esta semana.
+              </p>
+            </>
+          )}
+
+          <div className="prog-hero-stats">
+            {HERO_STATS.map((item) => (
+              <div key={item.label} className="prog-stat" style={{ "--stat-color": item.color } as React.CSSProperties}>
+                <div className="prog-stat-ico"><i className={`fa-solid ${item.icon}`} /></div>
                 <div>
-                  <div style={{ fontSize: 18, fontWeight: 900, color: "#fff", letterSpacing: "-0.02em", lineHeight: 1 }}>{item.value}</div>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,0.40)", fontWeight: 500 }}>{item.label}</div>
+                  <div className="prog-stat-val">{item.value}</div>
+                  <div className="prog-stat-lbl">{item.label}</div>
                 </div>
               </div>
             ))}
           </div>
-        </div>
 
-        {/* Materia más fuerte + tipo fav */}
-        <div style={CARD_STYLE}>
-          <p style={{ fontSize: 11, fontWeight: 700, color: "#7DD3FC", textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 16px" }}>
-            Destaque
-          </p>
-          {stats.materiaMasFuerte ? (
-            <div style={{ marginBottom: 16 }}>
-              <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", textTransform: "uppercase", letterSpacing: "0.10em", display: "block", marginBottom: 4 }}>
-                Materia más fuerte
-              </span>
-              <span style={{ fontSize: 16, fontWeight: 900, color: "#fff" }}>{stats.materiaMasFuerte.nombre}</span>
-            </div>
-          ) : (
-            <p style={{ fontSize: 14, color: "rgba(255,255,255,0.35)" }}>Completá actividades para ver estadísticas.</p>
-          )}
-          {stats.tipoActividades[0] && (
-            <div>
-              <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", textTransform: "uppercase", letterSpacing: "0.10em", display: "block", marginBottom: 4 }}>
-                Actividad favorita
-              </span>
-              <span style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>
-                {TIPO_CONFIG[stats.tipoActividades[0].tipo]?.label ?? stats.tipoActividades[0].tipo}
-              </span>
-              <span style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", marginLeft: 6 }}>({stats.tipoActividades[0].cantidad} veces)</span>
+          {(stats.materiaMasFuerte || stats.tipoActividades[0]) && (
+            <div className="prog-hero-chips">
+              {stats.materiaMasFuerte && (
+                <span className="prog-chip">
+                  Materia más fuerte <strong>{stats.materiaMasFuerte.nombre}</strong>
+                </span>
+              )}
+              {stats.tipoActividades[0] && (
+                <span className="prog-chip">
+                  Actividad favorita{" "}
+                  <strong>{TIPO_CONFIG[stats.tipoActividades[0].tipo]?.label ?? stats.tipoActividades[0].tipo}</strong>
+                </span>
+              )}
             </div>
           )}
         </div>
-      </div>
+      </section>
 
-      {/* ── Bloque 2: Por materia — client component with stagger ─── */}
-      <div style={{ marginBottom: 32 }}>
-        <h2 style={{ fontSize: 18, fontWeight: 900, color: "#fff", letterSpacing: "-0.03em", margin: "0 0 16px" }}>
-          Por materia
-        </h2>
+      {/* ── Por materia ─── */}
+      <div className="prog-block">
+        <h2 className="prog-section-title">Por materia</h2>
         <ProgresoUACGrid items={progresoUAC} />
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 32 }} className="progreso-2col">
+      <div className="prog-2col">
 
-        {/* ── Bloque 3: Racha 30 días ─── */}
-        <div style={CARD_STYLE}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-            <h2 style={{ fontSize: 15, fontWeight: 800, color: "#fff", margin: 0, letterSpacing: "-0.02em" }}>Racha diaria</h2>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, background: diasConsecutivos > 0 ? "rgba(251,146,60,0.12)" : "rgba(255,255,255,0.05)", border: diasConsecutivos > 0 ? "1px solid rgba(251,146,60,0.25)" : "1px solid rgba(255,255,255,0.08)", borderRadius: 999, padding: "4px 12px" }}>
-              <span style={{ fontSize: 16 }}>🔥</span>
-              <span style={{ fontSize: 16, fontWeight: 900, color: diasConsecutivos > 0 ? "#FB923C" : "rgba(255,255,255,0.20)", letterSpacing: "-0.02em" }}>{diasConsecutivos}</span>
+        {/* ── Racha 30 días ─── */}
+        <div className="prog-card">
+          <div className="prog-card-head">
+            <h2 className="prog-card-title">Racha diaria</h2>
+            <div className={`prog-racha-flame ${diasConsecutivos > 0 ? "" : "off"}`}>
+              <span style={{ fontSize: 15 }}>🔥</span>
+              <span>{diasConsecutivos}</span>
             </div>
           </div>
-          <p style={{ fontSize: 12, color: "rgba(255,255,255,0.40)", margin: "0 0 14px" }}>
-            {diasConsecutivos === 0 ? "Empezá hoy y construí tu racha 💪" : `¡${diasConsecutivos} día${diasConsecutivos !== 1 ? "s" : ""} seguido${diasConsecutivos !== 1 ? "s" : ""}!`}
+          <p className="prog-racha-sub">
+            {diasConsecutivos === 0
+              ? "Empezá hoy y construí tu racha 💪"
+              : `¡${diasConsecutivos} día${diasConsecutivos !== 1 ? "s" : ""} seguido${diasConsecutivos !== 1 ? "s" : ""}!`}
           </p>
 
-          {/* 30-day calendar */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(10, 1fr)", gap: 5 }}>
+          {/* Heatmap 30 días */}
+          <div className="prog-heat">
             {calendario.map((day) => {
-              const d = new Date(day.fecha + "T12:00:00");
-              const dow = d.getDay();
               const rscColor = day.rscCodigo ? getRSCColor(day.rscCodigo) : null;
+              const hex = rscColor?.hex ?? "#38BDF8";
               return (
-                <div key={day.fecha} title={day.fecha} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
-                  <span style={{ fontSize: 8, color: "rgba(255,255,255,0.22)", fontWeight: 600 }}>
-                    {DAY_LABELS[dow]}
-                  </span>
-                  <div style={{
-                    width: "100%", aspectRatio: "1", borderRadius: 5,
-                    background: day.activo
-                      ? (rscColor ? rscColor.hex : "#1E40AF")
-                      : "rgba(255,255,255,0.06)",
-                    opacity: day.activo ? 1 : 0.6,
-                    boxShadow: day.activo ? `0 2px 6px ${rscColor?.hex ?? "#1E40AF"}40` : "none",
-                  }} />
-                </div>
+                <div
+                  key={day.fecha}
+                  title={day.fecha}
+                  className={`prog-heat-cell ${day.activo ? "on" : ""}`}
+                  style={day.activo ? { background: hex, boxShadow: `0 2px 8px ${hex}55` } : undefined}
+                />
               );
             })}
           </div>
-          <p style={{ fontSize: 11, color: "rgba(255,255,255,0.28)", margin: "12px 0 0" }}>
-            Récord: {rachaRecord} días · Últimos 30 días
-          </p>
+          <div className="prog-heat-foot">
+            <span>Récord: {rachaRecord} días · últimos 30 días</span>
+            <span className="prog-heat-legend">
+              menos
+              <i style={{ background: "rgba(255,255,255,0.08)" }} />
+              <i style={{ background: "rgba(56,189,248,0.5)" }} />
+              <i style={{ background: "#38BDF8" }} />
+              más
+            </span>
+          </div>
         </div>
 
-        {/* ── Bloque 5: Logros ─── */}
-        <div style={CARD_STYLE}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-            <h2 style={{ fontSize: 15, fontWeight: 800, color: "#fff", margin: 0 }}>Logros</h2>
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.20)", cursor: "not-allowed" }}>Ver todos</span>
+        {/* ── Logros ─── */}
+        <div className="prog-card">
+          <div className="prog-card-head">
+            <h2 className="prog-card-title">Logros</h2>
+            <span className="prog-link-muted">Ver todos</span>
           </div>
           {logros.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "20px 0" }}>
-              <div style={{ fontSize: 44, marginBottom: 12 }}>🏆</div>
-              <p style={{ fontSize: 14, fontWeight: 700, color: "#fff", margin: "0 0 6px" }}>Sin logros todavía</p>
-              <p style={{ fontSize: 12, color: "rgba(255,255,255,0.40)", margin: 0, lineHeight: 1.55 }}>
-                Completá actividades y desbloqueá tus primeros logros.
-              </p>
+            <div className="prog-empty">
+              <div className="prog-empty-badge">🏆</div>
+              <p className="prog-empty-title">Sin logros todavía</p>
+              <p className="prog-empty-desc">Completá actividades y desbloqueá tus primeros logros.</p>
             </div>
           ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
+            <div className="prog-logros-grid">
               {logros.map((logro) => (
-                <div key={logro.id} title={`${logro.nombre}: ${logro.descripcion}`} style={{
-                  width: "100%", aspectRatio: "1",
-                  borderRadius: 12, background: "rgba(255,255,255,0.06)",
-                  border: "1px solid rgba(255,255,255,0.10)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 24, cursor: "default",
-                }}>
+                <div key={logro.id} title={`${logro.nombre}: ${logro.descripcion}`} className="prog-logro">
                   {logro.icono}
                 </div>
               ))}
@@ -276,45 +228,30 @@ export default async function ProgresoPage() {
         </div>
       </div>
 
-      {/* ── Bloque 4: Actividades recientes ─── */}
-      <div style={{ ...CARD_STYLE }}>
-        <h2 style={{ fontSize: 15, fontWeight: 800, color: "#fff", margin: "0 0 18px" }}>Actividades recientes</h2>
+      {/* ── Actividades recientes ─── */}
+      <div className="prog-card">
+        <h2 className="prog-card-title" style={{ marginBottom: 18 }}>Actividades recientes</h2>
         {actividadesRecientes.length === 0 ? (
-          <p style={{ fontSize: 14, color: "rgba(255,255,255,0.35)", textAlign: "center", padding: "20px 0" }}>
-            No hay actividades completadas todavía.
-          </p>
+          <p className="prog-empty-line">No hay actividades completadas todavía.</p>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
             {actividadesRecientes.map((act) => {
               const color = getRSCColor(act.rscCodigo);
               const tipoConf = TIPO_CONFIG[act.tipo];
               return (
-                <div key={act.id} style={{
-                  display: "flex", alignItems: "center", gap: 14,
-                  padding: "10px 12px", borderRadius: 12,
-                  cursor: "default",
-                }}>
-                  <div style={{
-                    width: 36, height: 36, borderRadius: 10,
-                    background: `rgba(${color.rgba}, 0.12)`,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 13, color: color.hex, flexShrink: 0,
-                  }}>
-                    <i className={`fa-solid ${tipoConf?.faIcon ?? "fa-check"}`} />
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {act.titulo}
-                    </div>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", display: "flex", gap: 8 }}>
-                      <span style={{ fontWeight: 600, color: color.hex }}>{act.uacCodigo}</span>
+                <div key={act.id} className="prog-act" style={{ "--chip-color": color.hex } as React.CSSProperties}>
+                  <div className="prog-act-ico"><i className={`fa-solid ${tipoConf?.faIcon ?? "fa-check"}`} /></div>
+                  <div className="prog-act-body">
+                    <div className="prog-act-title">{act.titulo}</div>
+                    <div className="prog-act-meta">
+                      <span className="uac">{act.uacCodigo}</span>
                       <span>·</span>
                       <span>{tipoConf?.label ?? act.tipo}</span>
                     </div>
                   </div>
-                  <div style={{ textAlign: "right", flexShrink: 0 }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "#FBBF24" }}>+{act.xpGanado} XP</div>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,0.28)" }}>{timeAgo(act.completadaEn)}</div>
+                  <div className="prog-act-right">
+                    <div className="prog-act-xp">+{act.xpGanado} XP</div>
+                    <div className="prog-act-when">{timeAgo(act.completadaEn)}</div>
                   </div>
                 </div>
               );

@@ -1,0 +1,590 @@
+/* ══════════════════════════════════════════════════════════════
+   Mi Progreso — dashboard personal.
+   Lenguaje visual unificado con Recursos / Biblioteca / Evaluación:
+   panel hero navy con glow, tipografía grande, acentos por color.
+   ══════════════════════════════════════════════════════════════ */
+
+.prog-page {
+  padding: 36px 40px 80px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ── Encabezado ─── */
+.prog-head {
+  margin-bottom: 26px;
+}
+
+.prog-eyebrow {
+  font-size: 11px;
+  font-weight: 900;
+  color: #7dd3fc;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  margin: 0 0 6px;
+}
+
+.prog-title {
+  font-size: clamp(28px, 3.4vw, 42px);
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.04em;
+  margin: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   HERO — resumen global (donut + stats en un solo bloque)
+   ══════════════════════════════════════════════════════════════ */
+.prog-hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  margin-bottom: 36px;
+  padding: clamp(28px, 4vw, 44px);
+  border-radius: 28px;
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  background:
+    radial-gradient(circle at 88% 8%, rgba(167, 139, 250, 0.16) 0%, transparent 50%),
+    radial-gradient(circle at 12% 110%, rgba(56, 189, 248, 0.16) 0%, transparent 55%),
+    linear-gradient(135deg, #07203c 0%, #04142d 60%, #051428 100%);
+  box-shadow: 0 32px 72px rgba(1, 17, 38, 0.5);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(24px, 4vw, 52px);
+}
+
+/* Punto de malla decorativo */
+.prog-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 26px 26px;
+  mask-image: linear-gradient(120deg, #000 0%, transparent 70%);
+}
+
+/* Medidor radial grande */
+.prog-hero-gauge {
+  position: relative;
+  flex-shrink: 0;
+  width: clamp(150px, 16vw, 190px);
+  height: clamp(150px, 16vw, 190px);
+}
+
+.prog-hero-gauge svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  filter: drop-shadow(0 0 22px rgba(56, 189, 248, 0.3));
+}
+
+.prog-hero-gauge-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.prog-hero-gauge-num {
+  font-size: clamp(34px, 4vw, 46px);
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.prog-hero-gauge-cap {
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: rgba(255, 255, 255, 0.42);
+}
+
+/* Contenido derecho */
+.prog-hero-main {
+  min-width: 0;
+}
+
+.prog-hero-kicker {
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: rgba(125, 211, 252, 0.85);
+  margin: 0 0 12px;
+}
+
+.prog-hero-big {
+  font-size: clamp(30px, 4vw, 46px);
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin: 0 0 6px;
+}
+
+.prog-hero-big span {
+  font-size: 0.5em;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.prog-hero-sub {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 0 0 22px;
+  line-height: 1.5;
+}
+
+.prog-hero-sub strong {
+  color: #fff;
+  font-weight: 800;
+}
+
+/* Tiles de estadística dentro del hero */
+.prog-hero-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.prog-stat {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.prog-stat-ico {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--stat-color) 18%, transparent);
+  color: var(--stat-color);
+}
+
+.prog-stat-val {
+  font-size: 18px;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
+.prog-stat-lbl {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.42);
+}
+
+/* Chip de destaque (materia fuerte / actividad favorita) */
+.prog-hero-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.prog-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.prog-chip strong {
+  color: #fff;
+  font-weight: 800;
+}
+
+/* ── Títulos de sección ─── */
+.prog-section-title {
+  font-size: 18px;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.03em;
+  margin: 0 0 16px;
+}
+
+.prog-block {
+  margin-bottom: 36px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   POR MATERIA — tarjetas editoriales con barra de progreso
+   ══════════════════════════════════════════════════════════════ */
+.prog-uac-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(248px, 1fr));
+  gap: 14px;
+}
+
+.prog-uac {
+  position: relative;
+  overflow: hidden;
+  padding: 18px 20px 20px 24px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  transition: transform 0.24s ease, background 0.24s ease, border-color 0.24s ease;
+}
+
+.prog-uac::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 5px;
+  background: var(--chip-color);
+}
+
+.prog-uac:hover {
+  transform: translateY(-4px);
+  background: color-mix(in srgb, var(--chip-color) 8%, rgba(255, 255, 255, 0.02));
+  border-color: color-mix(in srgb, var(--chip-color) 42%, transparent);
+}
+
+.prog-uac-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.prog-uac-code {
+  font-size: 10.5px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--chip-color);
+}
+
+.prog-uac-pct {
+  font-size: 16px;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.02em;
+}
+
+.prog-uac-name {
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.3;
+  margin: 0 0 16px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.6em;
+}
+
+.prog-uac-bar {
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  overflow: hidden;
+  margin-bottom: 9px;
+}
+
+.prog-uac-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--chip-color);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--chip-color) 55%, transparent);
+  transition: width 1s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.prog-uac-foot {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Tarjetas genéricas (racha / logros / recientes)
+   ══════════════════════════════════════════════════════════════ */
+.prog-2col {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 22px;
+  margin-bottom: 36px;
+}
+
+.prog-card {
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 26px;
+}
+
+.prog-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.prog-card-title {
+  font-size: 16px;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+/* ── Racha ─── */
+.prog-racha-flame {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border-radius: 999px;
+  padding: 5px 13px;
+  background: rgba(251, 146, 60, 0.12);
+  border: 1px solid rgba(251, 146, 60, 0.28);
+}
+
+.prog-racha-flame.off {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.prog-racha-flame span {
+  font-size: 16px;
+  font-weight: 900;
+  color: #fb923c;
+  letter-spacing: -0.02em;
+}
+
+.prog-racha-flame.off span {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.prog-racha-sub {
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0 0 18px;
+}
+
+.prog-heat {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 7px;
+}
+
+.prog-heat-cell {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.prog-heat-cell.on {
+  border-color: transparent;
+}
+
+.prog-heat-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.32);
+}
+
+.prog-heat-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.prog-heat-legend i {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+/* ── Logros ─── */
+.prog-link-muted {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.22);
+  cursor: not-allowed;
+}
+
+.prog-empty {
+  text-align: center;
+  padding: 28px 12px;
+}
+
+.prog-empty-badge {
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34px;
+  background: radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.03) 65%, transparent 75%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.prog-empty-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 6px;
+}
+
+.prog-empty-desc {
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.42);
+  margin: 0 auto;
+  max-width: 280px;
+  line-height: 1.55;
+}
+
+.prog-logros-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.prog-logro {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+}
+
+/* ── Actividades recientes ─── */
+.prog-act {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  transition: background 0.18s ease;
+}
+
+.prog-act:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.prog-act-ico {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--chip-color) 14%, transparent);
+  color: var(--chip-color);
+}
+
+.prog-act-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.prog-act-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #fff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.prog-act-meta {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.35);
+  display: flex;
+  gap: 8px;
+}
+
+.prog-act-meta .uac {
+  font-weight: 700;
+  color: var(--chip-color);
+}
+
+.prog-act-right {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.prog-act-xp {
+  font-size: 12px;
+  font-weight: 800;
+  color: #fbbf24;
+}
+
+.prog-act-when {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.28);
+}
+
+.prog-empty-line {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.35);
+  text-align: center;
+  padding: 24px 0;
+}
+
+/* ── Responsive ─── */
+@media (max-width: 880px) {
+  .prog-hero {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+  .prog-hero-main {
+    width: 100%;
+  }
+  .prog-hero-chips {
+    justify-content: center;
+  }
+  .prog-2col {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .prog-page {
+    padding: 28px 18px 64px;
+  }
+  .prog-logros-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

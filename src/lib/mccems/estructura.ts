@@ -36,31 +36,38 @@ export const COMPONENTES_CURRICULARES: ComponenteCurricularStatic[] = [
 ];
 
 // Ámbitos de Formación Socioemocional — MCCEMS 2025
-// Fuente: docs/programas-oficiales/extraidos/10-FORMACION-SOCIOEMOCIONAL.md
+// Eje transversal del Currículum Ampliado (NO es asignatura): 5 ámbitos, 23 propósitos formativos.
+// Fuente oficial: 00-MODELO-EDUCATIVO-2025.md (L246-255) y 10-FORMACION-SOCIOEMOCIONAL.md (L16).
 export const RECURSOS_SOCIOEMOCIONALES: RecursoSocioemocionalStatic[] = [
   {
-    codigo: "RSE-AFD",
-    nombre: "Actividades físicas y deportivas",
-    descripcion: "Promueve el desarrollo físico, la salud y el trabajo en equipo a través del deporte y la actividad física regular.",
+    codigo: "RSE-PCC",
+    nombre: "Práctica y Colaboración Ciudadana",
+    descripcion: "Ejercicio activo y crítico de la ciudadanía; análisis de problemáticas comunitarias.",
     orden: 1,
   },
   {
-    codigo: "RSE-AAC",
-    nombre: "Actividades artísticas y culturales",
-    descripcion: "Fomenta la expresión creativa, la identidad cultural y la apreciación estética mediante las artes y la cultura.",
+    codigo: "RSE-ES",
+    nombre: "Educación para la Salud",
+    descripcion: "Cuidado del cuerpo como práctica ética y política; bienestar físico, emocional, mental y social.",
     orden: 2,
   },
   {
-    codigo: "RSE-IESG",
-    nombre: "Educación integral en sexualidad y género",
-    descripcion: "Desarrolla una comprensión crítica y respetuosa de la sexualidad, el género y las relaciones interpersonales.",
+    codigo: "RSE-AFD",
+    nombre: "Actividades Físicas y Deportivas",
+    descripcion: "Deporte como derecho humano; inclusión, diversidad corporal y autorregulación emocional.",
     orden: 3,
   },
   {
-    codigo: "RSE-ESP",
-    nombre: "Educación para la salud y práctica ciudadana",
-    descripcion: "Promueve hábitos de vida saludable y la participación responsable en la vida democrática y comunitaria.",
+    codigo: "RSE-IESG",
+    nombre: "Educación Integral en Sexualidad y Género",
+    descripcion: "Comprensión de la sexualidad con enfoque en derechos, libertad, igualdad y cuidado; perspectiva interseccional.",
     orden: 4,
+  },
+  {
+    codigo: "RSE-AAC",
+    nombre: "Actividades Artísticas y Culturales",
+    descripcion: "Expresión y exploración a través de lenguajes plásticos, visuales, musicales, literarios y audiovisuales.",
+    orden: 5,
   },
 ];
 

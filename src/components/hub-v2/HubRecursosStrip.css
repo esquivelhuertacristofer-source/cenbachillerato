@@ -1,0 +1,320 @@
+/* ══════════════════════════════════════════════════════════════
+   Material de estudio — "Tablero de práctica" (cockpit).
+   Un medidor radial central (avance del semestre) rodeado de una
+   constelación de anillos circulares por tipo de actividad.
+   Al pasar el cursor por un anillo, el medidor central se sincroniza
+   con ese tipo. Datos reales; solo aparecen tipos con contenido.
+   ══════════════════════════════════════════════════════════════ */
+
+@property --pct {
+  syntax: "<number>";
+  initial-value: 0;
+  inherits: false;
+}
+
+.hub-cockpit {
+  margin-top: 8px;
+  margin-bottom: 56px;
+}
+
+/* ── Header ─── */
+.hub-cockpit-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.hub-cockpit-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: rgba(125, 211, 252, 0.85);
+  margin-bottom: 8px;
+}
+
+.hub-cockpit-eyebrow i {
+  font-size: 12px;
+}
+
+.hub-cockpit-title {
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: var(--hub-text, #fff);
+  line-height: 1.1;
+}
+
+.hub-cockpit-vertodo {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+  font-size: 12.5px;
+  font-weight: 800;
+  text-decoration: none;
+  color: rgba(125, 211, 252, 0.9);
+  transition: color 0.2s ease;
+}
+
+.hub-cockpit-vertodo i {
+  font-size: 10px;
+  transition: transform 0.2s ease;
+}
+
+.hub-cockpit-vertodo:hover {
+  color: #7dd3fc;
+}
+
+.hub-cockpit-vertodo:hover i {
+  transform: translateX(3px);
+}
+
+/* ── Panel ─── */
+.hub-cockpit-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+  gap: 36px;
+  align-items: center;
+  padding: 34px 38px;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    radial-gradient(circle at 18% 20%, rgba(56, 189, 248, 0.1) 0%, transparent 45%),
+    radial-gradient(circle at 90% 90%, rgba(167, 139, 250, 0.1) 0%, transparent 45%),
+    linear-gradient(160deg, #082a4d 0%, #061a33 55%, #04122a 100%);
+  background-color: #061a33;
+  box-shadow: 0 30px 70px rgba(1, 17, 38, 0.45);
+}
+
+/* ── Medidor central ─── */
+.hub-cockpit-gauge-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 18px;
+}
+
+.hub-cockpit-gauge {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from -90deg,
+    var(--chip-color) calc(var(--pct) * 1%),
+    rgba(255, 255, 255, 0.07) 0
+  );
+  transition: --pct 1.1s cubic-bezier(0.23, 1, 0.32, 1),
+    background 0.45s ease;
+  filter: drop-shadow(0 0 22px color-mix(in srgb, var(--chip-color) 35%, transparent));
+}
+
+.hub-cockpit-gauge::after {
+  content: "";
+  position: absolute;
+  inset: 14px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.05) 0%, transparent 60%),
+    #061a33;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.hub-cockpit-gauge-hole {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.hub-cockpit-gauge-num {
+  display: inline-flex;
+  align-items: baseline;
+  font-size: 56px;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  line-height: 1;
+  color: #fff;
+}
+
+.hub-cockpit-gauge-num i {
+  font-style: normal;
+  font-size: 22px;
+  font-weight: 800;
+  margin-left: 3px;
+  color: var(--chip-color);
+}
+
+.hub-cockpit-gauge-cap {
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.hub-cockpit-gauge-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.hub-cockpit-gauge-big {
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: #fff;
+}
+
+.hub-cockpit-gauge-big span {
+  font-size: 17px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.hub-cockpit-gauge-sub {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* ── Constelación de anillos ─── */
+.hub-cockpit-ring-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: 22px 14px;
+}
+
+.hub-cockpit-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  padding: 6px 2px;
+  border-radius: 16px;
+  transition: transform 0.22s ease;
+}
+
+.hub-cockpit-node:hover {
+  transform: translateY(-4px);
+}
+
+.hub-cockpit-node-ring {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from -90deg,
+    var(--chip-color) calc(var(--pct) * 1%),
+    rgba(255, 255, 255, 0.08) 0
+  );
+  transition: --pct 1.1s cubic-bezier(0.23, 1, 0.32, 1),
+    filter 0.25s ease;
+}
+
+.hub-cockpit-node:hover .hub-cockpit-node-ring {
+  filter: drop-shadow(0 0 16px color-mix(in srgb, var(--chip-color) 55%, transparent));
+}
+
+.hub-cockpit-node-ring::after {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border-radius: 50%;
+  background: #061a33;
+}
+
+.hub-cockpit-node-core {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: var(--chip-color);
+}
+
+.hub-cockpit-node--done .hub-cockpit-node-core {
+  color: #34d399;
+}
+
+.hub-cockpit-node--done .hub-cockpit-node-ring {
+  background: conic-gradient(from -90deg, #34d399 100%, #34d399 0);
+}
+
+.hub-cockpit-node-label {
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: rgba(255, 255, 255, 0.85);
+  text-align: center;
+  line-height: 1.2;
+}
+
+.hub-cockpit-node-count {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.hub-cockpit-node-count strong {
+  color: #fff;
+  font-weight: 900;
+}
+
+.hub-cockpit-node-done {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #34d399;
+}
+
+/* ── Responsive ─── */
+@media (max-width: 860px) {
+  .hub-cockpit-panel {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    padding: 30px 24px;
+  }
+  .hub-cockpit-gauge-wrap {
+    flex-direction: row;
+    justify-content: center;
+    gap: 24px;
+    text-align: left;
+  }
+  .hub-cockpit-gauge-meta {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 520px) {
+  .hub-cockpit-gauge-wrap {
+    flex-direction: column;
+    text-align: center;
+  }
+  .hub-cockpit-gauge-meta {
+    align-items: center;
+  }
+  .hub-cockpit-ring-grid {
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  }
+}

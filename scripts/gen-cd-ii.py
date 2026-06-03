@@ -1,0 +1,635 @@
+import json, os
+
+data = {
+  "CD-II-P01": {
+    "code": "CD-II-P01",
+    "title": "Aplica estrategias de busqueda, evaluacion y organizacion de informacion en entornos digitales.",
+    "level": "Cultura Digital II",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Informacion digital",
+    "metadata": {
+      "objective": "El estudiante aplica estrategias avanzadas de busqueda, evaluacion critica y organizacion de informacion en entornos digitales, utilizando criterios de confiabilidad, autoría y relevancia para distinguir fuentes validas de desinformacion, en el contexto de la infosfera mexicana.",
+      "competencies": [
+        "Usa operadores de busqueda avanzada (comillas, site:, filetype:, -termino) para busquedas precisas",
+        "Aplica criterios de evaluacion de fuentes: autoridad, exactitud, objetividad, actualidad, cobertura (modelo CRAAP)",
+        "Organiza y cita fuentes digitales usando gestores de referencias (Zotero, Google Scholar, Mendeley basico)",
+        "Distingue noticias falsas de informacion confiable usando tecnicas de verificacion del CNDH, Animal Politico, Verificado"
+      ],
+      "materials": [
+        "Guia de operadores de busqueda de Google (comandos avanzados)",
+        "Checklist CRAAP de evaluacion de fuentes (Currency, Relevance, Authority, Accuracy, Purpose)",
+        "Comparacion de fuentes: INEGI vs sitio anonimo vs blog personal vs portal academico UNAM",
+        "Casos de noticias falsas en Mexico: ejemplos verificados por Animal Politico y Verificado MX",
+        "Tutorial basico de Zotero (gestor de referencias gratuito)"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "Apertura", "duration": "15 min", "label": "Busqueda basica vs busqueda avanzada: cuanta diferencia hacen los operadores"},
+        {"phase": "Desarrollo", "duration": "60 min", "label": "Criterios CRAAP + ejercicio de evaluacion de 4 fuentes sobre un mismo tema mexicano"},
+        {"phase": "Cierre", "duration": "25 min", "label": "Verificacion de noticias falsas: caso real de desinformacion en Mexico"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "15 min",
+          "description": "El docente busca en vivo el mismo tema con busqueda basica y con operadores avanzados. Por ejemplo: tasa de desempleo Mexico vs tasa desempleo Mexico site:inegi.org.mx filetype:pdf 2023. Los alumnos observan la diferencia en calidad y precision de los resultados. Se introduce la idea de que la busqueda es una habilidad que puede mejorarse sistematicamente.",
+          "activity": "Reto de busqueda: cada equipo recibe el mismo tema (pobreza en Mexico, dengue en Oaxaca, becas universitarias CONACYT) y 5 minutos para encontrar el dato mas preciso y confiable. Comparten el resultado y la estrategia de busqueda usada. Se comparan las estrategias."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "60 min",
+          "description": "Presentacion del modelo CRAAP de evaluacion de fuentes: Currency (actualidad: fecha de publicacion, actualizacion reciente), Relevance (relevancia: corresponde al tema y nivel del usuario), Authority (autoridad: quien publica, credenciales, institucion), Accuracy (exactitud: tiene respaldo, citas, metodologia), Purpose (proposito: informar, vender, persuadir, entretener). Aplicacion practica: los alumnos evaluan 4 fuentes sobre el mismo tema usando el CRAAP y las rankean de mas a menos confiable.",
+          "activity": "Tarea 1: Aplicar CRAAP a 4 fuentes reales (INEGI, periodico sensacionalista, blog personal, UNAM-DGCS). Tarea 2: Usar Zotero o Google Scholar para guardar y citar las 2 fuentes mas confiables. Tarea 3: Buscar el mismo dato en 3 fuentes distintas y verificar si coinciden (triangulacion de datos)."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "25 min",
+          "description": "Ejercicio de verificacion: el docente presenta una noticia falsa real que circulo en Mexico (de las que Animal Politico o Verificado MX han desmontado). Los alumnos aplican los criterios CRAAP para identificar por que es falsa: quien la publica, cuando, con que datos, con que proposito. Reflexion: por que la desinformacion es mas rapida que la verificacion?",
+          "activity": "Compromiso digital: cada alumno escribe en su portafolio un compromiso de 3 habitos digitales de busqueda y evaluacion que practicara: usar al menos un operador avanzado por busqueda importante, verificar la autoridad de la fuente antes de compartir, y triangular datos importantes con 2 fuentes distintas."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Vivimos en la era de la infosfera: un entorno donde la cantidad de informacion disponible es practicamente infinita, pero la calidad y la veracidad de esa informacion varia enormemente. Mexico no es ajeno a este fenomeno: la ENDUTIH (Encuesta Nacional sobre Disponibilidad y Uso de Tecnologias de la Informacion en los Hogares, INEGI 2022) reporta que el 78.6% de los mexicanos mayores de 6 anos son usuarios de internet. Sin embargo, la competencia para evaluar criticamente la informacion encontrada en linea es baja: segun datos del informe Reuters Digital News 2022, Mexico tiene uno de los indices mas bajos de confianza en los medios digitales entre los paises de la OCDE. La brecha no es de acceso a internet sino de competencia digital critica.",
+      "sections": [
+        {
+          "subtitle": "Busqueda Avanzada: Operadores de Google y mas alla",
+          "content": "Los motores de busqueda como Google indexan mas de 100,000 millones de paginas web. La busqueda basica devuelve resultados genericos y ruidosos. Los operadores de busqueda avanzada permiten refinar: Comillas: busqueda exacta. Buscar cambio climatico Mexico en lugar de cambio climatico Mexico busca la frase exacta. Operador site: limita la busqueda a un dominio especifico. pobreza site:coneval.org.mx busca solo en el portal del CONEVAL. Operador filetype: busca tipos de archivo especificos. estadisticas desempleo filetype:pdf devuelve solo documentos PDF. Operador - (menos): excluye terminos. jaguar -coche busca el animal, no la marca de coches. Operador OR: busca uno u otro termino. IMSS OR ISSSTE seguridad social. Operadores de tiempo: Tools > Any time > Past year filtra resultados del ultimo ano. Busqueda en Google Scholar (scholar.google.com): especialmente util para fuentes academicas y cientificas. Acceso a repositorios institucionales: UNAM (ru.unam.mx), CIESAS, COLMEX, Conacyt (cris.conacyt.mx)."
+        },
+        {
+          "subtitle": "Evaluacion de Fuentes: El Modelo CRAAP",
+          "content": "El modelo CRAAP (desarrollado por Meriam Library, California State University) es una herramienta sistematica para evaluar la calidad de las fuentes de informacion. Currency (Actualidad): cuando se publico, cuando se actualizo por ultima vez. Para temas de salud publica o economia, datos de mas de 3 anos pueden estar desactualizados. Relevance (Relevancia): la fuente responde a mi pregunta especifica, el nivel de detalle es apropiado para mi proposito, el lenguaje es adecuado para mi nivel de comprension. Authority (Autoridad): quien firma el texto, que credenciales tiene, que institucion lo respalda, tiene datos de contacto verificables. Un texto del INEGI es mas confiable que un blog sin autor. Accuracy (Exactitud): tiene referencias, usa datos con metodologia explicita, puede verificarse con otras fuentes, tiene respaldo editorial o revision por pares. Purpose (Proposito): por que se publico este texto, busca informar, persuadir, vender, entretener o desinformar. La publicidad disfrazada de noticia (native advertising) es especialmente peligrosa. Fuentes de referencia confiables en Mexico: INEGI, CONEVAL, CONAPRED, IMCO, CIDE, portales .gob.mx con datos firmados, portales .edu.mx de universidades."
+        },
+        {
+          "subtitle": "Desinformacion en Mexico: El Ecosistema de las Noticias Falsas",
+          "content": "Mexico es uno de los paises con mayor circulacion de desinformacion en America Latina. El informe de Digital News Report (Reuters Institute, 2022) coloca a Mexico en los primeros lugares de exposicion a noticias falsas en la region. Las principales plataformas de desinformacion son WhatsApp (por su caracter cerrado y de confianza interpersonal) y Facebook. Tipos de desinformacion: Mal-informacion: informacion verdadera usada para causar dano. Mis-informacion: informacion falsa sin intencion de engañar. Dis-informacion: informacion falsa con intencion deliberada de engañar. Noticias falsas tipicas en Mexico durante 2020-2023: bulos sobre la vacuna COVID-19, informacion falsa sobre inseguridad, noticias de desastres naturales exageradas o fabricadas, desinformacion electoral. Organizaciones de verificacion en Mexico: Animal Politico (Mexico), Verificado (verificado.com.mx), Fact Check Mexico (El Universal), AFP Factual (agencia). Tecnicas de verificacion: busqueda inversa de imagen (Google Lens, TinEye), verificar la fecha original de publicacion, buscar la fuente primaria del dato, revisar quienes mas reportan la misma noticia."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "El operador de busqueda site: en Google sirve para:",
+          "options": [
+            "A) Buscar la definicion de un sitio web especifico.",
+            "B) Limitar los resultados de busqueda a un dominio o sitio web especifico.",
+            "C) Ver la fecha de creacion de un sitio web."
+          ],
+          "correct": "B) Limitar los resultados de busqueda a un dominio o sitio web especifico."
+        },
+        {
+          "question": "En el modelo CRAAP, la A de Authority (autoridad) evalua:",
+          "options": [
+            "A) Si la informacion esta actualizada y fue publicada recientemente.",
+            "B) Quien firma el texto, sus credenciales y que institucion lo respalda.",
+            "C) Si el texto tiene el proposito de informar, persuadir o vender."
+          ],
+          "correct": "B) Quien firma el texto, sus credenciales y que institucion lo respalda."
+        },
+        {
+          "question": "Segun la ENDUTIH del INEGI 2022, que porcentaje de mexicanos mayores de 6 anos son usuarios de internet?",
+          "options": [
+            "A) 45%",
+            "B) 78.6%",
+            "C) 95%"
+          ],
+          "correct": "B) 78.6%"
+        },
+        {
+          "question": "La dis-informacion se distingue de la mis-informacion principalmente porque:",
+          "options": [
+            "A) La dis-informacion es informacion verdadera usada para causar dano.",
+            "B) La dis-informacion es falsa con intencion deliberada de engañar; la mis-informacion es falsa sin esa intencion.",
+            "C) La dis-informacion se difunde solo por redes sociales; la mis-informacion, solo por medios impresos."
+          ],
+          "correct": "B) La dis-informacion es falsa con intencion deliberada de engañar; la mis-informacion es falsa sin esa intencion."
+        },
+        {
+          "question": "Cual de las siguientes es una organizacion mexicana de verificacion de noticias (fact-checking)?",
+          "options": [
+            "A) CONAPRED",
+            "B) Animal Politico y Verificado MX",
+            "C) INEGI"
+          ],
+          "correct": "B) Animal Politico y Verificado MX"
+        }
+      ],
+      "rubric": "RUBRICA — Evaluacion de fuentes con CRAAP + busqueda avanzada (20 pts)\n\nBUSQUEDA AVANZADA (5 pts): 5=Usa 3+ operadores avanzados de manera correcta y pertinente para el tema investigado | 4=Usa 2 operadores | 2=Usa 1 operador o los usa incorrectamente | 0=Sin operadores avanzados\n\nANALISIS CRAAP DE FUENTES (8 pts): 8=Las 4 fuentes evaluadas con los 5 criterios CRAAP, con justificacion especifica para cada criterio | 6=3 fuentes evaluadas con justificacion | 4=2 fuentes con evaluacion parcial | 0=Sin evaluacion CRAAP\n\nTRIANGULACION Y VERIFICACION (4 pts): 4=Triangulacion correcta con 3 fuentes y conclusion sobre la consistencia de los datos | 3=Triangulacion de 2 fuentes | 2=Verificacion parcial sin conclusion | 0=Sin verificacion\n\nCOMPROMISO DIGITAL (3 pts): 3=3 habitos de busqueda y evaluacion especificos y realizables en su contexto | 2=Habitos presentes pero vagos | 0=Sin compromiso"
+    },
+    "teacher_tips": [
+      "La busqueda en vivo es la mejor apertura: que los alumnos vean en tiempo real la diferencia entre una busqueda basica y una avanzada hace que la tecnica sea inmediatamente comprensible. No expliques: muestra.",
+      "Para el ejercicio CRAAP, elige un tema que genere controversia en Mexico (una estadistica de inseguridad, una cifra de pobreza, un dato de salud publica) y busca fuentes de distintos niveles de confiabilidad: el INEGI, un periodico sensacionalista, un blog de opinion, una noticia de redes sociales. El contraste es pedagogicamente poderoso.",
+      "Zotero es gratuito y funciona en todos los sistemas operativos. Si la escuela tiene sala de computo, una clase de Zotero basico (instalar, agregar fuentes, generar bibliografia en APA o Chicago) es una inversion que los alumnos usaran en todas sus materias.",
+      "La desinformacion sobre vacunas, inseguridad y politica en Mexico tiene impacto real en la vida de las personas. No trates el tema como abstracto: usa un caso real de desinformacion que haya causado dano concreto (panico colectivo, linchamiento por bulo en redes, rechazo de vacunas).",
+      "WhatsApp es el principal vector de desinformacion en Mexico, no Facebook. La desinformacion en WhatsApp es especialmente peligrosa porque viene de personas de confianza (familia, amigos). Ensenales a verificar antes de reenviar, aunque venga de la abuela."
+    ]
+  },
+  "CD-II-P02": {
+    "code": "CD-II-P02",
+    "title": "Utiliza herramientas digitales colaborativas para el trabajo en equipo y la produccion colectiva de conocimiento.",
+    "level": "Cultura Digital II",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Colaboracion digital",
+    "metadata": {
+      "objective": "El estudiante utiliza herramientas digitales colaborativas (Google Workspace, Padlet, Miro, control de versiones basico) para el trabajo en equipo, la produccion colectiva de conocimiento y la gestion de proyectos digitales, desarrollando competencias de colaboracion asincrónica y en tiempo real.",
+      "competencies": [
+        "Usa Google Docs/Slides/Sheets en modo colaborativo con control de comentarios y sugerencias",
+        "Crea y gestiona tableros colaborativos en Padlet o Miro para la organizacion visual de ideas",
+        "Aplica normas de netiqueta y convivencia digital en espacios colaborativos en linea",
+        "Comprende el principio basico del control de versiones y la gestion de cambios en documentos compartidos"
+      ],
+      "materials": [
+        "Cuentas de Google (Gmail) para acceder a Google Workspace gratuito",
+        "Acceso a Padlet (padlet.com — version gratuita) o Miro (miro.com — version educativa gratuita)",
+        "Guia de netiqueta digital (normas de convivencia en espacios digitales colaborativos)",
+        "Proyecto colaborativo modelo: wiki de terminos de cultura digital mexicana",
+        "Datos ENDUTIH INEGI sobre uso de herramientas de comunicacion digital en Mexico"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "Apertura", "duration": "10 min", "label": "Que herramientas digitales usamos ya para colaborar? Inventario del grupo"},
+        {"phase": "Desarrollo", "duration": "70 min", "label": "Proyecto colaborativo: wiki de cultura digital mexicana en Google Docs + Padlet"},
+        {"phase": "Cierre", "duration": "20 min", "label": "Reflexion sobre los desafios de la colaboracion digital: conflictos, netiqueta, versiones"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "El docente pregunta: para que cosas usas herramientas digitales para trabajar con otros (WhatsApp, Google Docs, Drive, Discord, Teams)? Los alumnos inventarian. Se identifican herramientas que ya usan informalmente y se propone aprender a usarlas de manera mas efectiva y profesional. Diferencia entre usar para comunicarse y usar para co-crear conocimiento.",
+          "activity": "Mapa de herramientas del grupo: en un Padlet compartido (creado antes de la clase), cada alumno agrega un post con: herramienta digital que usa para colaborar + para que la usa + que limitacion le encuentra. El docente muestra el Padlet en tiempo real: ya estan colaborando digitalmente."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "70 min",
+          "description": "Proyecto practico: Wiki de Cultura Digital Mexicana. En grupos de 4, los alumnos crean un documento colaborativo en Google Docs sobre un aspecto de la cultura digital en Mexico. Cada equipo tiene un tema: brecha digital en Mexico (ENDUTIH), economia digital mexicana (startups, unicornios tech mexicanos), ciberseguridad en Mexico (CERT-MX), derechos digitales en Mexico (R3D), cultura de memes y expresion digital mexicana. Todos trabajan simultaneamente en el mismo documento usando comentarios, sugerencias y control de cambios.",
+          "activity": "Tarea 1: Crear el documento compartido con control de acceso correcto (editor para todos los del equipo, lector para el docente). Tarea 2: Cada miembro aporta al menos 2 parrafos con fuentes citadas usando Zotero o Google Scholar. Tarea 3: Cada miembro hace al menos 1 comentario constructivo al texto de un companero y 1 sugerencia de edicion. Tarea 4: El equipo decide colectivamente si acepta o rechaza las sugerencias."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "20 min",
+          "description": "Reflexion sobre la colaboracion digital: que fue dificil (conflictos de edicion, que alguien borro algo, criterios distintos de calidad), que funciono bien, como se tomaron las decisiones colectivas. Presentacion del concepto de netiqueta digital: normas de convivencia en espacios digitales colaborativos. Discusion: como se traduce el respeto presencial al espacio digital?",
+          "activity": "Acuerdo de netiqueta del grupo: el grupo co-crea (en el Padlet) 5 normas de convivencia digital para su trabajo colaborativo del semestre. Estas normas se publican en el salon (fisico o digital) y se revisitan si hay conflictos."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La colaboracion digital es una competencia fundamental del siglo XXI. El Foro Economico Mundial (Future of Jobs Report 2023) identifica la colaboracion y el trabajo en equipo como una de las 10 habilidades mas demandadas para 2025 en todos los sectores productivos. En Mexico, la pandemia de COVID-19 (2020-2021) acelero exponencialmente la adopcion de herramientas de colaboracion digital: el uso de videoconferencias y documentos colaborativos crecio mas de un 300% segun datos de Google Mexico. Sin embargo, saber usar una herramienta tecnicamente no equivale a saber colaborar efectivamente en entornos digitales. La colaboracion digital efectiva requiere habilidades tecnicas (manejo de la herramienta), sociales (comunicacion, resolucion de conflictos) y eticas (netiqueta, respeto a la autoria, uso responsable de datos compartidos).",
+      "sections": [
+        {
+          "subtitle": "Herramientas de Colaboracion Digital: Tipos y Usos",
+          "content": "Las herramientas de colaboracion digital se clasifican por su funcion: Co-edicion de documentos: Google Docs, Microsoft 365, Notion. Permiten que multiples usuarios editen el mismo documento en tiempo real, con control de versiones (historial de cambios), comentarios y sugerencias. Imprescindibles para proyectos escritos colectivos. Tableros visuales colaborativos: Padlet (tableros de post-its digitales), Miro (pizarron colaborativo con diagramas, mapas mentales, wireframes), Jamboard (Google). Permiten la organizacion visual de ideas, lluvia de ideas y la representacion grafica de procesos. Ideales para la etapa de ideacion y planificacion. Gestion de proyectos: Trello, Asana, Notion. Permiten asignar tareas, establecer fechas limite, rastrear el progreso de un proyecto colectivo. Comunicacion asincrona y sincrona: Slack, Discord, Microsoft Teams, Google Meet. Fundamentales para la coordinacion de equipos que no estan en el mismo lugar o en el mismo horario. Control de versiones: Git/GitHub (para codigo) o simplemente el historial de versiones de Google Docs (para documentos). Permite recuperar versiones anteriores y entender quien cambio que y cuando. Para bachillerato, el historial de versiones de Google Docs es suficiente."
+        },
+        {
+          "subtitle": "Netiqueta: Etica y Convivencia en Espacios Digitales Colaborativos",
+          "content": "La netiqueta (network etiquette, etiqueta en la red) es el conjunto de normas de buena convivencia en espacios digitales. En el contexto de la colaboracion digital, incluye: Respeto a las contribuciones de los demas: no borrar el trabajo ajeno sin consenso, no sobrescribir sin comentar. Comunicacion clara y respetuosa: usar un tono profesional en comentarios y chats del proyecto, evitar el uso de MAYUSCULAS (equivale a gritar en internet). Citacion y atribucion correcta: dar credito a quien aporto una idea o un fragmento de texto. Silencio activo: en videoconferencias, silenciar el microfono cuando no se habla, prestar atencion sin actividades paralelas. Puntualidad digital: cumplir con las entregas y compromisos en los tiempos acordados. Gestion de conflictos digitales: cuando hay desacuerdo sobre una decision editorial, usar los comentarios del documento (no mensajes privados) para que el conflicto sea visible y resolvible colectivamente. Privacidad: no compartir acceso al documento con personas fuera del equipo sin autorizar, no publicar informacion personal de los companeros sin su consentimiento."
+        },
+        {
+          "subtitle": "La Brecha Digital en Mexico y la Colaboracion Digital",
+          "content": "La colaboracion digital presupone acceso a internet, dispositivos y habilidades digitales que no estan distribuidos equitativamente en Mexico. La ENDUTIH (INEGI 2022) reporta: el 78.6% de los mexicanos son usuarios de internet, pero esta cifra baja al 52.3% en zonas rurales. Solo el 44.3% de los hogares mexicanos tiene computadora (de escritorio o laptop). El 89.7% de los usuarios de internet accede principalmente desde el celular. Esta brecha digital tiene implicaciones para la colaboracion: herramientas como Google Docs pueden usarse desde el celular, pero con limitaciones. El trabajo colaborativo asincrónico (cada quien en su momento) puede ser mas equitativo que el sincrónico (todos a la vez) para alumnos con conectividad limitada. El docente debe disenar las actividades de colaboracion digital tomando en cuenta las diferentes condiciones de acceso de sus alumnos y ofreciendo alternativas para quienes tienen conectividad limitada."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "El control de versiones en Google Docs permite principalmente:",
+          "options": [
+            "A) Editar el documento desde cualquier dispositivo sin conexion a internet.",
+            "B) Ver el historial de cambios, recuperar versiones anteriores y saber quien edito que.",
+            "C) Traducir automaticamente el documento a otros idiomas."
+          ],
+          "correct": "B) Ver el historial de cambios, recuperar versiones anteriores y saber quien edito que."
+        },
+        {
+          "question": "Segun la ENDUTIH del INEGI 2022, que porcentaje de los hogares mexicanos tiene computadora?",
+          "options": [
+            "A) 44.3%",
+            "B) 78.6%",
+            "C) 90%"
+          ],
+          "correct": "A) 44.3%"
+        },
+        {
+          "question": "En un documento colaborativo, la netiqueta indica que cuando hay desacuerdo sobre una edicion, lo mas apropiado es:",
+          "options": [
+            "A) Borrar la parte con la que no estas de acuerdo y escribir la tuya sin comentar.",
+            "B) Usar los comentarios del documento para expresar el desacuerdo de manera visible y resolvible colectivamente.",
+            "C) Abandonar el proyecto y crear uno nuevo individual."
+          ],
+          "correct": "B) Usar los comentarios del documento para expresar el desacuerdo de manera visible y resolvible colectivamente."
+        },
+        {
+          "question": "Herramientas como Padlet y Miro son especialmente utiles para:",
+          "options": [
+            "A) Codificar aplicaciones moviles y sitios web de manera colaborativa.",
+            "B) La organizacion visual de ideas, lluvia de ideas y representacion grafica de procesos.",
+            "C) Comunicacion asincrona a traves de mensajes de texto en grupos de trabajo."
+          ],
+          "correct": "B) La organizacion visual de ideas, lluvia de ideas y representacion grafica de procesos."
+        },
+        {
+          "question": "El Future of Jobs Report 2023 del Foro Economico Mundial identifica la colaboracion y el trabajo en equipo como:",
+          "options": [
+            "A) Una habilidad en declive, reemplazada por la inteligencia artificial.",
+            "B) Una de las 10 habilidades mas demandadas para 2025 en todos los sectores productivos.",
+            "C) Una habilidad exclusiva de trabajos en tecnologia y programacion."
+          ],
+          "correct": "B) Una de las 10 habilidades mas demandadas para 2025 en todos los sectores productivos."
+        }
+      ],
+      "rubric": "RUBRICA — Proyecto colaborativo Wiki Cultura Digital Mexico (20 pts)\n\nUSO DE HERRAMIENTAS COLABORATIVAS (6 pts): 6=Usa Google Docs en modo colaborativo con comentarios, sugerencias y control de cambios correctamente | 4=Uso basico de modo colaborativo sin comentarios o sugerencias | 2=Documento compartido pero sin interaccion colaborativa | 0=Sin uso de herramientas colaborativas\n\nCALIDAD DE LA CONTRIBUCION (7 pts): 7=2+ parrafos propios con fuentes citadas, bien integrados al documento colectivo | 5=2 parrafos con fuentes parcialmente citadas | 3=1 parrafo sin fuentes | 0=Sin contribucion al documento\n\nCOLABORACION EFECTIVA (4 pts): 4=1+ comentario constructivo y 1+ sugerencia de edicion a companeros, con decision razonada de aceptar/rechazar | 3=Comentario o sugerencia sin decision razonada | 2=Interaccion minima | 0=Sin colaboracion con companeros\n\nNETIQUETA Y ACUERDO (3 pts): 3=Contribuye al acuerdo de netiqueta con 1+ norma fundamentada y participa respetuosamente en todo el proceso | 2=Participacion en el acuerdo pero sin argumentacion | 0=Sin participacion en el acuerdo de netiqueta"
+    },
+    "teacher_tips": [
+      "Antes de la clase, crea el Padlet y el documento de Google Docs del proyecto y comparte los enlaces. Que los alumnos accedan desde su celular si no hay computadoras. La actividad funciona desde celular aunque con menos comodidad.",
+      "El conflicto de edicion (alguien borra el trabajo de otro) es casi inevitable y es una oportunidad pedagogica invaluable: pausa la clase, analiza lo que paso, aplica los principios de netiqueta y resuelvanlo colectivamente. El conflicto real es mejor que un caso hipotetico.",
+      "Para la brecha digital: si hay alumnos sin acceso a internet en casa, diseña una version alternativa de la actividad que puedan hacer en la sala de computo de la escuela o en colaboracion con un companero que tenga acceso. No excluyas, adapta.",
+      "La wiki de cultura digital mexicana puede mantenerse como proyecto del semestre: cada progresion puede agregar nuevas entradas (brecha digital, economía digital, ciberseguridad, derechos digitales). Al final del semestre tienen un recurso colectivo real.",
+      "Conecta con el mercado laboral: las empresas mas valoradas de Mexico (Mercado Libre, Clip, Konfio, Rappi, Kavak — unicornios tech mexicanos) usan estas herramientas diariamente. Conocerlas bien es una ventaja competitiva en el mercado de trabajo."
+    ]
+  },
+  "CD-II-P03": {
+    "code": "CD-II-P03",
+    "title": "Desarrolla investigaciones utilizando fuentes digitales confiables y metodologias de verificacion de informacion.",
+    "level": "Cultura Digital II",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Informacion digital",
+    "metadata": {
+      "objective": "El estudiante desarrolla una mini-investigacion digital sobre un problema de su comunidad usando fuentes confiables, metodologia de busqueda estructurada y tecnicas de verificacion, produciendo un informe con datos citados correctamente.",
+      "competencies": [
+        "Formula preguntas de investigacion especificas y buscables en entornos digitales",
+        "Selecciona y usa fuentes institucionales mexicanas (INEGI, CONEVAL, SSA, SEP, CONAPRED) para investigaciones propias",
+        "Verifica la informacion encontrada usando tecnicas de fact-checking y triangulacion de datos",
+        "Produce un informe de investigacion digital con citas correctas y referencias verificables"
+      ],
+      "materials": [
+        "Guia de formulacion de preguntas de investigacion: de la pregunta vaga a la pregunta especifica y buscable",
+        "Directorio de fuentes institucionales mexicanas confiables: INEGI, CONEVAL, CONAPRED, SSA, SEP, SESNSP, IMCO, CIDE",
+        "Protocolo de verificacion en 5 pasos (adaptado de SIFT: Stop, Investigate, Find better coverage, Trace claims)",
+        "Plantilla de informe de investigacion digital con campos de cita",
+        "Rubrica de evaluacion de la investigacion"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "Apertura", "duration": "15 min", "label": "De la pregunta vaga a la pregunta de investigacion: transformando inquietudes en preguntas buscables"},
+        {"phase": "Desarrollo", "duration": "65 min", "label": "Mini-investigacion digital guiada sobre un problema de la comunidad"},
+        {"phase": "Cierre", "duration": "20 min", "label": "Presentacion de hallazgos y verificacion cruzada entre equipos"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "15 min",
+          "description": "El docente muestra la diferencia entre una pregunta vaga (como esta la situacion de Mexico?) y una pregunta de investigacion especifica y buscable (cual es la tasa de desempleo juvenil en Mexico en el cuarto trimestre de 2023 segun la ENOE del INEGI?). La segunda puede responderse con datos, la primera no. Ejercicio: transformar preguntas vagas en preguntas de investigacion.",
+          "activity": "En equipos, los alumnos toman 3 inquietudes sobre su comunidad (inseguridad, salud, educacion, medio ambiente) y las transforman en preguntas de investigacion especificas y buscables. Comparten sus preguntas con el grupo: el docente ayuda a refinar las que son demasiado amplias o demasiado cerradas."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "65 min",
+          "description": "Mini-investigacion digital: cada equipo investiga su pregunta usando el protocolo SIFT (Stop antes de compartir, Investigate the source, Find better coverage, Trace claims to the original source). Deben encontrar al menos 3 fuentes institucionales mexicanas y verificar que los datos son consistentes entre ellas. El informe incluye: pregunta de investigacion, fuentes con evaluacion CRAAP, datos encontrados con cita, conclusion y limitaciones de la investigacion.",
+          "activity": "Tarea 1: Busqueda estructurada con operadores avanzados en al menos 2 plataformas (Google + portal INEGI/CONEVAL). Tarea 2: Aplicar SIFT a las fuentes encontradas. Tarea 3: Triangular el dato central con 3 fuentes y verificar consistencia. Tarea 4: Redactar el informe usando la plantilla (300-400 palabras)."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "20 min",
+          "description": "Presentacion de hallazgos: cada equipo presenta en 3 minutos su pregunta, su dato mas relevante y la fuente. Los demas equipos hacen una pregunta de verificacion: como saben que ese dato es confiable? Los investigadores responden. Esta dinamica de verificacion cruzada simula el proceso de revision de pares en la ciencia.",
+          "activity": "Reflexion: que fue lo mas dificil de hacer la investigacion digital (encontrar la fuente adecuada, verificar, citar correctamente)? El docente cierra: la investigacion digital rigurosa es una habilidad que distingue a ciudadanos informados de consumidores pasivos de contenido."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La investigacion digital es la aplicacion del metodo cientifico al entorno de informacion en linea: formular preguntas, buscar datos, evaluar fuentes, verificar, sintetizar y comunicar hallazgos. En la era de la infosfera, donde la cantidad de informacion supera la capacidad humana de procesarla, la investigacion digital rigurosa es una habilidad de supervivencia epistemica. En Mexico, el acceso a datos institucionales confiables es relativamente bueno: el INEGI, el CONEVAL, la CONAPRED, el IMCO, el CIDE y muchas otras instituciones publican datos de calidad y de acceso gratuito. El problema no es la falta de datos sino la falta de habilidades para encontrarlos, evaluarlos y usarlos.",
+      "sections": [
+        {
+          "subtitle": "La Pregunta de Investigacion: El Arte de Preguntar lo que se puede Responder",
+          "content": "Una buena pregunta de investigacion es: Especifica: delimitada en tiempo, espacio y variable. No: como esta la educacion en Mexico, sino: cual fue la tasa de abandono escolar en el nivel medio superior en Mexico en 2022 segun la SEP? Buscable: puede responderse con datos existentes. No: deberia Mexico cambiar su sistema educativo?, sino: cuantos docentes de bachillerato en Mexico tienen certificacion en habilidades digitales segun la SEP? Significativa: aporta conocimiento util para la comunidad o el campo de estudio. Verificable: la respuesta puede ser verificada con multiples fuentes. Proceso de refinamiento de preguntas: empezar con una pregunta amplia (como es la salud en mi comunidad?), identificar la variable central (tasa de enfermedades cronicas, acceso a servicios de salud, mortalidad infantil), delimitar en tiempo y espacio (en mi municipio, en 2023), identificar la fuente que puede responderla (SINAVE-SSA, INEGI ENSANUT). El resultado es una pregunta buscable y verificable."
+        },
+        {
+          "subtitle": "Fuentes Institucionales Mexicanas: Un Directorio Esencial",
+          "content": "Mexico cuenta con un robusto sistema de produccion de datos institucionales de acceso publico gratuito: INEGI (Instituto Nacional de Estadistica y Geografia): el principal productor de estadisticas en Mexico. Publica el Censo de Poblacion y Vivienda, la ENOE (Encuesta Nacional de Ocupacion y Empleo), la ENDUTIH (encuesta digital), la ENSANUT (salud), y cientos de encuestas y censos. Portal: inegi.org.mx. CONEVAL (Consejo Nacional de Evaluacion de la Politica de Desarrollo Social): datos de pobreza y evaluacion de programas sociales. Portal: coneval.org.mx. CONAPRED (Consejo Nacional para Prevenir la Discriminacion): datos de discriminacion, ENADIS. Portal: conapred.org.mx. SESNSP (Secretaria de Seguridad y Proteccion Ciudadana): estadisticas de incidencia delictiva por estado y municipio. IMCO (Instituto Mexicano para la Competitividad): indices de competitividad estatal y urbano. CIDE (Centro de Investigacion y Docencia Economicas): investigacion social y economica. Secretaria de Educacion Publica: estadisticas educativas nacionales. Secretaria de Salud / SINAVE: vigilancia epidemiologica. CONABIO (Comision Nacional para el Conocimiento y Uso de la Biodiversidad): datos ambientales."
+        },
+        {
+          "subtitle": "El Protocolo SIFT de Verificacion",
+          "content": "El metodo SIFT (Stop, Investigate the source, Find better coverage, Trace claims) fue desarrollado por Mike Caulfield para la evaluacion rapida de informacion en linea. Stop (Detenerse): antes de leer, compartir o creer una informacion, hacer una pausa. La reaccion emocional (sorpresa, indignacion, alegria) es una señal de alerta: las noticias diseñadas para manipular apelan a emociones fuertes. Investigate the source (Investigar la fuente): abrir una nueva pestaña y buscar informacion sobre la fuente: quien es, que agenda tiene, como es su historial de precision. No evaluar la fuente solo desde dentro del articulo. Find better coverage (Buscar cobertura mejor): buscar si otras fuentes confiables reportan lo mismo. Si solo una fuente reporta un dato, es señal de alerta. Trace claims to the original source (Rastrear las afirmaciones a la fuente original): muchas noticias citan estudios, estadisticas o declaraciones de segunda mano. Buscar la fuente primaria: el estudio original, el portal del INEGI, el comunicado oficial. A menudo la fuente primaria dice algo distinto a lo que el articulo afirma."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Una buena pregunta de investigacion digital debe ser principalmente:",
+          "options": [
+            "A) Amplia y abierta para que no limite las posibles respuestas.",
+            "B) Especifica, buscable, significativa y verificable con datos existentes.",
+            "C) Interesante y emotiva para motivar al investigador."
+          ],
+          "correct": "B) Especifica, buscable, significativa y verificable con datos existentes."
+        },
+        {
+          "question": "Que institucion mexicana publica la Encuesta Nacional de Ocupacion y Empleo (ENOE) con datos sobre desempleo?",
+          "options": [
+            "A) CONEVAL",
+            "B) INEGI",
+            "C) STPS"
+          ],
+          "correct": "B) INEGI"
+        },
+        {
+          "question": "En el metodo SIFT, la S de Stop (Detenerse) sirve para:",
+          "options": [
+            "A) Dejar de leer el articulo si el tema no es de interes personal.",
+            "B) Hacer una pausa antes de leer, compartir o creer, especialmente si la informacion genera reaccion emocional fuerte.",
+            "C) Buscar la definicion de las palabras tecnicas antes de leer el articulo completo."
+          ],
+          "correct": "B) Hacer una pausa antes de leer, compartir o creer, especialmente si la informacion genera reaccion emocional fuerte."
+        },
+        {
+          "question": "La triangulacion de datos en investigacion digital consiste en:",
+          "options": [
+            "A) Dividir el tema de investigacion en tres subtemas iguales.",
+            "B) Verificar el mismo dato con 3 fuentes distintas para confirmar su consistencia.",
+            "C) Usar tres motores de busqueda distintos para la misma consulta."
+          ],
+          "correct": "B) Verificar el mismo dato con 3 fuentes distintas para confirmar su consistencia."
+        },
+        {
+          "question": "El CONEVAL (Consejo Nacional de Evaluacion de la Politica de Desarrollo Social) publica principalmente:",
+          "options": [
+            "A) Estadisticas de incidencia delictiva por estado y municipio.",
+            "B) Datos de pobreza multidimensional y evaluacion de programas sociales.",
+            "C) Indices de calidad educativa por escuela en Mexico."
+          ],
+          "correct": "B) Datos de pobreza multidimensional y evaluacion de programas sociales."
+        }
+      ],
+      "rubric": "RUBRICA — Mini-investigacion digital (25 pts)\n\nPREGUNTA DE INVESTIGACION (5 pts): 5=Pregunta especifica, buscable, significativa y verificable, bien delimitada en tiempo, espacio y variable | 4=Pregunta con 3 de los 4 criterios | 2=Pregunta parcialmente especifica | 0=Sin pregunta de investigacion\n\nCALIDAD DE LAS FUENTES (8 pts): 8=3+ fuentes institucionales mexicanas evaluadas con CRAAP, con citas correctas | 6=2 fuentes con evaluacion y cita | 4=1 fuente bien evaluada | 0=Sin fuentes institucionales o sin evaluacion\n\nVERIFICACION Y TRIANGULACION (7 pts): 7=Dato central triangulado con 3 fuentes, protocolo SIFT aplicado, resultados de verificacion documentados | 5=Triangulacion con 2 fuentes | 3=Verificacion parcial | 0=Sin verificacion\n\nINFORME FINAL (5 pts): 5=Informe completo (pregunta, fuentes, datos, conclusion, limitaciones) con 300-400 palabras y citas correctas | 4=Informe con algun elemento faltante | 2=Informe incompleto | 0=Sin informe"
+    },
+    "teacher_tips": [
+      "El refinamiento de preguntas es una habilidad que los alumnos desarrollan con practica. Haz el proceso visible: toma una pregunta vaga de un alumno y refinala en vivo con el grupo, explicando cada paso de la decision. Los alumnos aprendera el proceso al verlo.",
+      "Presenta el directorio de fuentes institucionales mexicanas como una herramienta de trabajo que llevaran toda la vida: INEGI, CONEVAL, CONAPRED son fuentes que usaran en cualquier campo profesional en Mexico. No es un truco para la clase: es alfabetizacion civica.",
+      "La verificacion cruzada al final (equipos haciendo preguntas a equipos) es la parte mas dinamica y mas valiosa: simula el proceso de revision de pares de la ciencia y desarrolla el pensamiento critico de manera natural. Dedica tiempo suficiente y no la recortes por presion de tiempo.",
+      "Para la cita correcta: ensenales APA 7 (el formato mas usado en bachillerato y universidad en Mexico). Una cita simple de INEGI: INEGI. (2022). Encuesta Nacional sobre Disponibilidad y Uso de Tecnologias de la Informacion en los Hogares. Instituto Nacional de Estadistica y Geografia. Que lo practiquen con datos reales.",
+      "Conecta con la ciudadania: un ciudadano que sabe buscar datos del INEGI, verificarlos y citarlos puede participar en debates publicos con evidencia. Eso es poder civico. El docente tiene la oportunidad de formar no solo alumnos sino ciudadanos digitalmente competentes."
+    ]
+  },
+  "CD-II-P04": {
+    "code": "CD-II-P04",
+    "title": "Emplea software estadistico basico para la representacion y analisis de datos relevantes para su comunidad.",
+    "level": "Cultura Digital II",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Datos digitales",
+    "metadata": {
+      "objective": "El estudiante emplea Google Sheets o Excel basico para organizar, analizar y visualizar datos relevantes para su comunidad, produciendo graficas interpretables y extrayendo conclusiones fundamentadas en datos reales del INEGI u otras fuentes institucionales mexicanas.",
+      "competencies": [
+        "Organiza datos en hojas de calculo usando filas, columnas, formulas basicas (suma, promedio, porcentaje) y filtros",
+        "Crea graficas adecuadas al tipo de dato: barras (comparacion), lineas (tendencia), pie (proporcion)",
+        "Interpreta graficas de datos sociales: identifica tendencias, valores atipicos y patrones",
+        "Extrae conclusiones basadas en datos y las comunica en formato de infografia o presentacion digital"
+      ],
+      "materials": [
+        "Conjunto de datos reales descargado del INEGI (por ejemplo: tasas de escolaridad por estado, incidencia de dengue por municipio, o datos del censo de su municipio)",
+        "Tutorial de Google Sheets: funciones basicas y creacion de graficas",
+        "Plantilla de infografia en Canva (gratuito) o Google Slides",
+        "Guia de interpretacion de graficas: que tipo de grafica para cada tipo de dato",
+        "Ejemplos de visualizaciones de datos del IMCO y Mexicovid19 para inspirar el diseno"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "Apertura", "duration": "15 min", "label": "Una grafica dice mas que mil numeros: analisis de visualizaciones del IMCO y INEGI"},
+        {"phase": "Desarrollo", "duration": "65 min", "label": "Practica con datos reales del INEGI: tablas, formulas y graficas en Google Sheets"},
+        {"phase": "Cierre", "duration": "20 min", "label": "Infografia de datos de mi comunidad: comunicar hallazgos visualmente"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "15 min",
+          "description": "El docente muestra 3 visualizaciones de datos sobre Mexico: una del IMCO (Indice de Competitividad Estatal), una del INEGI (piramide de edades de Mexico), y una visualizacion de datos periodistica (por ejemplo, el mapa de incidencia delictiva de El Universal). Para cada una, pregunta: que mensaje comunica esta grafica, que datos usa, que conclusion puedes sacar. Los alumnos responden y el docente introduce el vocabulario de la visualizacion de datos.",
+          "activity": "Analisis rapido de graficas: el docente muestra una grafica con un error deliberado (escala manipulada, eje truncado, tipo de grafica inadecuado para el dato). Los alumnos identifican el error. Esto introduce el concepto de que las graficas pueden mentir aunque los datos sean correctos: la etica de la visualizacion."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "65 min",
+          "description": "Practica guiada con Google Sheets usando datos reales del INEGI. El docente ha preparado una hoja de calculo con datos sobre su estado o municipio (escolaridad, pobreza, acceso a servicios, o tema relevante). Los alumnos: organizan los datos, calculan estadisticos basicos (suma, promedio, porcentaje) usando formulas de Sheets, crean al menos 2 graficas distintas, interpretan las graficas y extraen 3 conclusiones. Luego producen una infografia simple en Canva o Google Slides.",
+          "activity": "Tarea 1: Completar la tabla de datos con formulas =SUM(), =AVERAGE(), =porcentaje manual (parte/total*100). Tarea 2: Crear una grafica de barras (comparacion por estado/municipio) y una grafica de lineas (tendencia temporal). Tarea 3: Seleccionar el tipo de grafica correcto para 3 datos distintos y justificar la eleccion. Tarea 4: Infografia con titulo, 2 graficas, 3 datos clave y fuente."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "20 min",
+          "description": "Galeria de infografias: los equipos presentan su infografia en 1 minuto. Los observadores identifican: que dato es mas sorprendente, que grafica es mas clara, que conclusion esta mejor fundamentada. Reflexion sobre la comunicacion de datos: una buena visualizacion no solo muestra datos sino que cuenta una historia. La historia de los datos de tu comunidad importa.",
+          "activity": "Publicacion opcional: con permiso de los alumnos, las mejores infografias pueden publicarse en las redes del plantel o enviarse al municipio como aportacion ciudadana. Esto convierte el ejercicio academico en participacion civica real."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La competencia de datos (data literacy) es una de las habilidades mas demandadas del siglo XXI. En un mundo donde cada accion digital genera datos y donde las decisiones de politica publica, negocios y sociedad se toman cada vez mas basadas en datos, la capacidad de leer, interpretar y producir visualizaciones de datos es fundamental. En Mexico, el INEGI, el CONEVAL, el IMCO y otras instituciones producen datos de enorme valor que permanecen infrautilizados porque la mayoria de los ciudadanos no tienen las herramientas para leerlos e interpretarlos. Un ciudadano que puede analizar datos del INEGI sobre su municipio tiene una herramienta de participacion civica poderosa.",
+      "sections": [
+        {
+          "subtitle": "Hojas de Calculo: Organizacion y Analisis de Datos",
+          "content": "Las hojas de calculo (Google Sheets, Microsoft Excel, LibreOffice Calc) son la herramienta mas universal de analisis de datos. Sus funciones basicas para bachillerato: Organizacion: datos en filas (observaciones) y columnas (variables). Cada celda tiene una direccion (A1, B2, C10). Formulas basicas: =SUMA(rango) — suma de valores en un rango. =PROMEDIO(rango) — media aritmetica. =MAX(rango) y =MIN(rango) — valor maximo y minimo. =CONTARA(rango) — cuenta celdas no vacias. Porcentaje: =(parte/total)*100, sin formula especial. Filtros y ordenacion: para explorar subconjuntos de los datos. Tablas dinamicas (PivotTable): para resumir grandes conjuntos de datos rapidamente. Para el nivel bachillerato, dominar suma, promedio, porcentaje, filtros y graficas es suficiente para hacer analisis de datos basicos de la realidad mexicana."
+        },
+        {
+          "subtitle": "Visualizacion de Datos: El Tipo de Grafica Correcto",
+          "content": "La eleccion del tipo de grafica es una decision retorica y etica: una grafica mal elegida puede distorsionar o esconder la informacion real. Grafica de barras: para comparar categorias. Ejemplo: comparar el PIB per capita de los 32 estados de Mexico. Grafica de lineas: para mostrar tendencias temporales. Ejemplo: evolucion de la tasa de pobreza en Mexico de 2008 a 2022 segun CONEVAL. Grafica de pie (pastel): para mostrar proporciones de un todo. Solo funciona si el total es 100% y hay pocas categorias (maximo 5). Ejemplo: distribucion de la poblacion por grupo de edad en Mexico. Diagrama de dispersion (scatter plot): para mostrar la relacion entre dos variables numericas. Ejemplo: relacion entre escolaridad promedio y nivel de ingresos por municipio. Mapa de calor: para mostrar la distribucion geografica de un dato. Ejemplo: incidencia de dengue por municipio en Mexico (SINAVE-SSA). Errores comunes en visualizacion: eje Y que no empieza en cero (exagera diferencias), grafica de pie con demasiadas categorias (ininteligible), escala de colores no intuitiva, titulos que no explican el dato central."
+        },
+        {
+          "subtitle": "Datos Abiertos en Mexico: Un Recurso Civico",
+          "content": "El gobierno mexicano tiene el portal datos.gob.mx, que publica datos de todas las dependencias en formatos abiertos (CSV, JSON, XLS). Algunos conjuntos de datos especialmente utiles para bachillerato: INEGI — Censo de Poblacion 2020: edad, escolaridad, vivienda, acceso a servicios por municipio. CONEVAL — Medicion de pobreza 2022 por municipio. SESNSP — Incidencia delictiva mensual por municipio desde 2015. SSA — SINAVE: casos de enfermedades de notificacion obligatoria por estado. SEP — Estadisticas educativas: matricula, docentes, planteles por nivel y municipio. CONAFOR — Incendios forestales en Mexico por estado. Usar estos datos en clase no solo desarrolla competencias de analisis sino tambien conciencia civica: los alumnos pueden investigar y visualizar problemas reales de su entorno con datos oficiales verificables. El IMCO ha producido visualizaciones ejemplares de estos datos (indices de competitividad, mapas de desigualdad) que pueden servir de inspiracion para los alumnos."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Cual tipo de grafica es mas adecuado para mostrar la evolucion de la tasa de pobreza en Mexico de 2008 a 2022?",
+          "options": [
+            "A) Grafica de pie, porque muestra la proporcion de pobres respecto al total.",
+            "B) Grafica de lineas, porque muestra tendencias temporales.",
+            "C) Diagrama de dispersion, porque compara dos variables numericas."
+          ],
+          "correct": "B) Grafica de lineas, porque muestra tendencias temporales."
+        },
+        {
+          "question": "Que formula de Google Sheets calcula el promedio de los valores en el rango A1:A10?",
+          "options": [
+            "A) =SUMA(A1:A10)",
+            "B) =PROMEDIO(A1:A10)",
+            "C) =MEDIA(A1:A10)"
+          ],
+          "correct": "B) =PROMEDIO(A1:A10)"
+        },
+        {
+          "question": "Un error comun en visualizacion de datos es el eje Y que no empieza en cero. Esto es problematico porque:",
+          "options": [
+            "A) Hace la grafica mas dificil de leer tecnicamente.",
+            "B) Exagera visualmente las diferencias entre categorias, distorsionando la percepcion del lector.",
+            "C) Viola las normas de propiedad intelectual del INEGI."
+          ],
+          "correct": "B) Exagera visualmente las diferencias entre categorias, distorsionando la percepcion del lector."
+        },
+        {
+          "question": "El portal datos.gob.mx en Mexico sirve para:",
+          "options": [
+            "A) Registrar empresas y tramites de gobierno en linea.",
+            "B) Acceder a conjuntos de datos gubernamentales en formatos abiertos para cualquier ciudadano.",
+            "C) Pagar impuestos y servicios federales en linea."
+          ],
+          "correct": "B) Acceder a conjuntos de datos gubernamentales en formatos abiertos para cualquier ciudadano."
+        },
+        {
+          "question": "Una grafica de pie (pastel) es adecuada cuando:",
+          "options": [
+            "A) Se quiere mostrar la tendencia de un dato a lo largo del tiempo.",
+            "B) Se quiere mostrar proporciones de un todo, con pocas categorias (maximo 5) que suman 100%.",
+            "C) Se quiere comparar valores de dos variables en muchos puntos."
+          ],
+          "correct": "B) Se quiere mostrar proporciones de un todo, con pocas categorias (maximo 5) que suman 100%."
+        }
+      ],
+      "rubric": "RUBRICA — Hoja de calculo + infografia de datos de la comunidad (20 pts)\n\nORGANIZACION Y FORMULAS (6 pts): 6=Datos organizados correctamente, 3+ formulas basicas usadas correctamente (suma, promedio, porcentaje) | 4=Organizacion correcta con 1-2 formulas | 2=Organizacion parcial sin formulas | 0=Sin hoja de calculo\n\nGRAFICAS (7 pts): 7=2+ graficas del tipo correcto para el dato, con titulo, leyenda y fuente | 5=2 graficas con tipo adecuado pero elementos incompletos | 3=1 grafica | 0=Sin graficas\n\nINFOGRAFIA (4 pts): 4=Infografia clara, visualmente atractiva, con titulo, 2 graficas, 3 datos clave y fuente | 3=Infografia presente con algun elemento faltante | 2=Infografia muy basica | 0=Sin infografia\n\nINTERPRETACION Y CONCLUSIONES (3 pts): 3=3 conclusiones claras, fundamentadas en los datos y relevantes para la comunidad | 2=1-2 conclusiones con fundamentacion parcial | 0=Sin conclusiones"
+    },
+    "teacher_tips": [
+      "Usa datos reales de tu propio municipio o estado: si hay datos del INEGI sobre tu municipio (escolaridad, acceso a agua potable, ingreso promedio), usalos. El alumno que ve su propia colonia en los datos se engancha mucho mas que con datos abstractos.",
+      "La grafica que miente (con eje Y truncado) es un tema critico que los alumnos deben conocer: medios de comunicacion y politicos manipulan graficas con frecuencia. Un alumno que sabe detectar esta trampa es un ciudadano mas informado.",
+      "Canva es la herramienta mas accesible para la infografia: tiene plantillas gratuitas, funciona desde el celular, y produce resultados visualmente atractivos sin necesidad de habilidades de diseno. Crea una cuenta educativa de Canva para el grupo si es posible.",
+      "Para alumnos avanzados: presentales el concepto de datos abiertos (open data) y el portal datos.gob.mx. Que busquen un conjunto de datos sobre un tema que les interese y lo analicen de manera autonoma. Es un proyecto potencialmente muy rico.",
+      "Conecta con la participacion ciudadana: una infografia bien hecha con datos del INEGI sobre un problema de la comunidad puede enviarse al ayuntamiento, publicarse en redes sociales o presentarse en una audiencia publica. Eso es citizenship data: usar los datos como herramienta de participacion civica."
+    ]
+  },
+  "CD-II-P05": {
+    "code": "CD-II-P05",
+    "title": "Crea y difunde contenidos digitales eticos, creativos y con perspectiva critica en plataformas colaborativas.",
+    "level": "Cultura Digital II",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Produccion digital",
+    "metadata": {
+      "objective": "El estudiante crea y difunde contenidos digitales originales (video corto, podcast, infografia, hilo de Twitter/X, meme educativo) sobre temas de interes comunitario, aplicando criterios de etica digital, respeto a derechos de autor, accesibilidad y responsabilidad en la comunicacion publica.",
+      "competencies": [
+        "Produce contenido digital original en al menos un formato (video, audio, imagen, texto) usando herramientas gratuitas",
+        "Aplica principios de derecho de autor, licencias Creative Commons y uso justo en la produccion de contenidos",
+        "Evalua el impacto potencial de sus contenidos digitales antes de publicarlos: privacidad, veracidad, inclusividad",
+        "Desarrolla una identidad digital etica y consciente que refleje sus valores y su comunidad"
+      ],
+      "materials": [
+        "Herramientas gratuitas de produccion: CapCut (video corto), Anchor/Spotify (podcast basico), Canva (infografia/cartel), Twitter/X (hilo), Adobe Express (videos y graficos)",
+        "Guia de licencias Creative Commons: que puedo usar y como debo citarlo",
+        "Checklist de publicacion responsable: veracidad, privacidad, inclusividad, accesibilidad",
+        "Ejemplos de contenidos digitales mexicanos de calidad: podcasts (Recua de Ideas, Mexico Desconocido), cuentas de divulgacion en Instagram/TikTok",
+        "Datos ENDUTIH INEGI sobre plataformas mas usadas en Mexico"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "Apertura", "duration": "15 min", "label": "Que hace bueno a un contenido digital? Analisis critico de 3 formatos mexicanos"},
+        {"phase": "Desarrollo", "duration": "70 min", "label": "Produccion de contenido digital original sobre un tema de la comunidad"},
+        {"phase": "Cierre", "duration": "15 min", "label": "Checklist de publicacion responsable + decision de difusion"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "15 min",
+          "description": "El docente muestra 3 ejemplos de contenidos digitales mexicanos de calidad: un clip de divulgacion historica en TikTok (cuentas como MexicoDesconocido o Arqueologia Mexicana), un fragmento de podcast sobre temas sociales mexicanos, y una infografia sobre datos del INEGI publicada en redes. Analisis critico: que los hace efectivos? que tecnicas usan? Son eticos? Son verificables? Son accesibles?",
+          "activity": "Deconstruccion rapida: cada equipo analiza uno de los ejemplos respondiendo: formato, audiencia objetivo, mensaje central, tecnicas visuales o narrativas usadas, fuentes citadas (si las hay), nivel de accesibilidad (subtitulos, lenguaje claro, inclusivo). Se comparten los hallazgos."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "70 min",
+          "description": "Produccion de contenido digital original: cada equipo elige un formato (video corto, podcast de 3 min, hilo de Twitter/X de 5 tuits, infografia o carrusel de Instagram) y un tema relevante para su comunidad. El tema debe ser verificable con datos (INEGI, CONEVAL, SSA) y de interes publico: un problema de salud, de educacion, de seguridad, de medio ambiente o de derechos en su municipio. Produccion usando herramientas gratuitas.",
+          "activity": "Tarea 1: Definir formato, tema, mensaje central y audiencia objetivo. Tarea 2: Recopilar datos verificables y elegir las licencias correctas para imagenes o audios de terceros (Creative Commons). Tarea 3: Producir el contenido usando las herramientas disponibles. Tarea 4: Aplicar el checklist de publicacion responsable antes de difundir."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "15 min",
+          "description": "Presentacion de contenidos: cada equipo presenta su producto (1 min). El grupo evalua usando el checklist: es el mensaje verificable, respeta la privacidad, es inclusivo y accesible, es el formato adecuado para la audiencia. Decision colectiva: publicamos? En que plataforma? Con que configuracion de privacidad? Reflexion sobre la responsabilidad de quien produce contenido publico.",
+          "activity": "Reflexion final del semestre de Cultura Digital: en el portafolio, cada alumno escribe en 3 oraciones como ha cambiado su relacion con la informacion digital y la produccion de contenidos despues de este semestre. Que habitos nuevos tiene? Que hace diferente cuando busca, verifica o publica?"
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "En Mexico, el 65.6% de los internautas mayores de 12 anos produce o comparte contenido en redes sociales (ENDUTIH, INEGI 2022). Sin embargo, la produccion de contenidos con criterios eticos, verificacion de datos y respeto a derechos de autor es aun muy limitada. La brecha no es de produccion sino de produccion responsable. El creador de contenido del siglo XXI tiene un poder de comunicacion que hasta hace 20 anos era exclusivo de los medios masivos: puede llegar a millones de personas con un video desde su celular. Este poder implica responsabilidades eticas que el sistema educativo tiene la obligacion de desarrollar.",
+      "sections": [
+        {
+          "subtitle": "Produccion de Contenido Digital: Formatos y Herramientas",
+          "content": "El ecosistema de produccion de contenido digital ha democratizado enormemente: herramientas profesionales estan disponibles de manera gratuita o con planes educativos. Formatos y herramientas: Video corto (TikTok, Reels, YouTube Shorts): CapCut (editor de video gratuito, multiplataforma), InShot, Adobe Express. Para contenido educativo o de divulgacion: 60-90 segundos es el formato optimo. Podcast: Anchor (ahora Spotify for Podcasters) para grabar y publicar. Garage Band (iOS) o Audacity (gratuito, PC) para edicion. Para contenido de opinion, entrevistas o reportajes de audio. Infografia y carrusel: Canva (gratuito, plantillas prediseñadas), Adobe Express. Para comunicar datos, procesos o comparaciones visuales. Hilo de Twitter/X o carrusel de LinkedIn: para contenido textual con desarrollo progresivo. Requiere escritura concisa y persuasiva. Blog o newsletter: Medium, Substack (gratuito). Para contenido de mayor profundidad y desarrollo. Meme educativo: imagen + texto con humor o ironia para comunicar ideas complejas de manera accesible. Requiere conocimiento del contexto cultural del publico."
+        },
+        {
+          "subtitle": "Derechos de Autor y Licencias Creative Commons",
+          "content": "Todo contenido creado (texto, imagen, audio, video) esta protegido por derechos de autor desde el momento de su creacion, sin necesidad de registro. En Mexico, la Ley Federal del Derecho de Autor (LFDA) protege las obras por la vida del autor + 100 anos. Esto significa que no puedes usar libremente imagenes de Google, musica de Spotify o videos de YouTube en tus producciones sin verificar la licencia. Licencias Creative Commons (CC): permiten a los creadores dar permisos especificos a otros usuarios. Las mas comunes: CC BY: puedes usar, copiar y adaptar, solo cita al autor. CC BY-SA: puedes usar y adaptar, pero debes publicar con la misma licencia. CC BY-NC: puedes usar pero no comercialmente. CC0 (dominio publico): sin restricciones, usa libremente. Donde encontrar recursos con licencias libres: Unsplash.com (fotos), Pexels.com (fotos y video), Pixabay.com (fotos, video, audio), Freesound.org (efectos de sonido y musica), YouTube Audio Library (musica libre de derechos). Para uso en educacion: la LFDA permite la reproduccion parcial de obras para uso educativo sin fin de lucro (uso justo), pero con atribucion al autor."
+        },
+        {
+          "subtitle": "Etica en la Produccion y Difusion de Contenidos Digitales",
+          "content": "La etica en la produccion de contenidos digitales incluye multiples dimensiones: Veracidad: el contenido que publicas es verificable. Los datos que citas tienen fuente identificada. No publicas informacion que no puedas verificar. Privacidad: no publicas informacion personal de otras personas sin su consentimiento explicito. No compartes ubicaciones, nombres, fotos o datos personales de menores de edad. Respeto a la dignidad: el contenido no discrimina, no estigmatiza, no degrada a personas o grupos. Inclusividad y accesibilidad: usa lenguaje claro (sin jerga excesiva), incluye subtitulos en videos para personas con discapacidad auditiva, usa alt-text en imagenes para personas con discapacidad visual. Impacto: piensa en el efecto que tu contenido puede tener antes de publicar. Puede causar dano a alguien? Puede contribuir a desinformacion? Puede perpetuar estereotipos? En Mexico, la organizacion R3D (Red en Defensa de los Derechos Digitales) documenta casos de violaciones a los derechos digitales y promueve la etica en el entorno digital. La SFP y la CNDH tienen mecanismos de denuncia para violaciones a derechos digitales."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "La licencia Creative Commons CC BY permite que otros usuarios de tu obra:",
+          "options": [
+            "A) La usen libremente solo si es sin fines comerciales.",
+            "B) La usen, copien y adapten libremente, siempre que citen al autor original.",
+            "C) La usen solo si publican sus versiones modificadas con la misma licencia."
+          ],
+          "correct": "B) La usen, copien y adapten libremente, siempre que citen al autor original."
+        },
+        {
+          "question": "La Ley Federal del Derecho de Autor en Mexico protege las obras por:",
+          "options": [
+            "A) 10 anos desde la publicacion.",
+            "B) La vida del autor + 100 anos.",
+            "C) Solo mientras el autor este vivo."
+          ],
+          "correct": "B) La vida del autor + 100 anos."
+        },
+        {
+          "question": "El principio de accesibilidad en la produccion de contenidos digitales implica:",
+          "options": [
+            "A) Publicar el contenido en todas las plataformas disponibles para maxima difusion.",
+            "B) Incluir subtitulos en videos, alt-text en imagenes y lenguaje claro para que el contenido sea usable por personas con distintas capacidades.",
+            "C) Usar solo herramientas digitales gratuitas para que todos puedan replicar el contenido."
+          ],
+          "correct": "B) Incluir subtitulos en videos, alt-text en imagenes y lenguaje claro para que el contenido sea usable por personas con distintas capacidades."
+        },
+        {
+          "question": "Segun la ENDUTIH del INEGI 2022, que porcentaje de los internautas mayores de 12 anos en Mexico produce o comparte contenido en redes sociales?",
+          "options": [
+            "A) 35%",
+            "B) 65.6%",
+            "C) 90%"
+          ],
+          "correct": "B) 65.6%"
+        },
+        {
+          "question": "La organizacion R3D en Mexico se dedica principalmente a:",
+          "options": [
+            "A) Regular el contenido de las plataformas digitales en Mexico.",
+            "B) Documentar casos de violaciones a los derechos digitales y promover la etica en el entorno digital.",
+            "C) Producir contenido educativo digital financiado por la SEP."
+          ],
+          "correct": "B) Documentar casos de violaciones a los derechos digitales y promover la etica en el entorno digital."
+        }
+      ],
+      "rubric": "RUBRICA — Contenido digital original etico y responsable (25 pts)\n\nCALIDAD DEL CONTENIDO (8 pts): 8=Contenido original, con mensaje claro, datos verificables citados con fuente, formato adecuado a la audiencia | 6=Contenido con mensaje claro y algunos datos | 4=Contenido basico sin datos verificados | 0=Sin contenido original\n\nUSO ETICO DE RECURSOS (5 pts): 5=Todas las imagenes, musica y recursos de terceros tienen licencia identificada (CC, dominio publico o propios) | 4=La mayoria de recursos con licencia identificada | 2=Uso de recursos sin identificacion de licencia | 0=Plagio o uso sin permiso de recursos de terceros\n\nAPLICACION DEL CHECKLIST (6 pts): 6=Checklist aplicado con reflexion explicita sobre veracidad, privacidad, inclusividad y accesibilidad | 4=Checklist aplicado parcialmente | 2=Checklist sin reflexion | 0=Sin checklist\n\nCALIDAD TECNICA (3 pts): 3=Produccion tecnicamente solida: buen audio/imagen, texto legible, sin errores tecnicos evidentes | 2=Calidad aceptable con algun problema tecnico | 1=Problemas tecnicos que dificultan la recepcion del mensaje | 0=Inaccesible tecnicamente\n\nREFLEXION FINAL (3 pts): 3=Reflexion genuina y especifica sobre los cambios en los habitos digitales del alumno a lo largo del semestre | 2=Reflexion superficial | 0=Sin reflexion"
+    },
+    "teacher_tips": [
+      "El formato mas motivador para esta actividad en Mexico (2024-2026) es el video corto: los alumnos ya hacen TikToks y Reels informalmente. Canalizarlo hacia contenido de calidad, verificado y etico es una transformacion pedagogica poderosa.",
+      "Ensenales la diferencia entre viralidad y calidad: un video puede tener millones de vistas y contener desinformacion. Un video con 200 vistas puede cambiar la realidad de una comunidad. El objetivo no es ser viral sino ser util.",
+      "Para el tema de derechos de autor: no lo presentes como una lista de prohibiciones sino como un sistema de reconocimiento al trabajo creativo. Las licencias Creative Commons son una solucion elegante: permiten compartir con respeto a la autoria.",
+      "El checklist de publicacion responsable es el elemento mas importante de esta progresion: que los alumnos internalicen la pregunta verifique esto antes de publicar? transforma su relacion con la informacion digital de manera duradera.",
+      "Cierre del semestre de CD-II: conecta las 5 progresiones en una narrativa: busqueda critica (P01), colaboracion (P02), investigacion (P03), datos (P04), produccion responsable (P05). El ciudadano digital competente puede hacer todo esto. El alumno de bachillerato que termina este semestre tiene esas 5 competencias. Es un logro real."
+    ]
+  }
+}
+
+out_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src', 'data', 'planteamiento', 'cd-ii.json')
+with open(out_path, 'w', encoding='utf-8') as f:
+    json.dump(data, f, ensure_ascii=False, indent=2)
+
+print(f'Written {len(data)} progressions to {out_path}')

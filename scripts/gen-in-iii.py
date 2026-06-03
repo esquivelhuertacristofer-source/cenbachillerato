@@ -1,0 +1,844 @@
+"""Generate src/data/planteamiento/in-iii.json — Ingles III Semestre 3 (8 progresiones)."""
+import json, pathlib
+
+OUT = pathlib.Path(__file__).parent.parent / "src" / "data" / "planteamiento" / "in-iii.json"
+
+data = {
+  "IN-III-P01": {
+    "code": "IN-III-P01",
+    "title": "Habla sobre rutinas pasadas y recientes usando el Simple Past",
+    "level": "Ingles III",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Basico-Intermedio",
+    "category": "Gramatica y comunicacion oral",
+    "metadata": {
+      "objective": "Usar el Simple Past de verbos regulares e irregulares para hablar de rutinas y actividades pasadas, comprendiendo la diferencia temporal entre el presente y el pasado en conversaciones cotidianas.",
+      "competencies": [
+        "Forma el Simple Past de verbos regulares con -ed (walk -> walked, study -> studied) y de irregulares frecuentes (go -> went, eat -> ate, have -> had, do -> did, see -> saw)",
+        "Construye oraciones afirmativas, negativas e interrogativas en Simple Past",
+        "Usa marcadores temporales de pasado: yesterday, last week, ago, in 2020",
+        "Habla de rutinas de la infancia comparadas con las actuales",
+        "Lee y comprende textos cortos sobre la vida cotidiana en comunidades indigenas de Mexico en el pasado (fuente: INALI)"
+      ],
+      "materials": [
+        "Lista de 30 verbos irregulares frecuentes (poster en el salon)",
+        "Ficha de actividad: My life before and now (comparacion pasado-presente)",
+        "Tarjetas con imagenes de actividades cotidianas (escuela, comida, juegos tradicionales mexicanos)",
+        "Audio breve: una persona de la Ciudad de Mexico habla de su infancia",
+        "Texto corto: Life in a Zapotec community 50 years ago (fuente adaptada de INALI)"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "S1", "duration": "50 min", "label": "Simple Past: reglas, irregulares y oraciones basicas"},
+        {"phase": "S2", "duration": "50 min", "label": "Mi infancia vs mi vida actual: comparacion oral y escrita"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Activar el contraste pasado-presente con una imagen de Mexico antes y despues.",
+          "activity": "El docente muestra dos imagenes: Ciudad de Mexico en 1970 vs 2024 (INEGI foto aerea). Pregunta: What was different? What changed? Los estudiantes responden en espanol primero; el docente reformula en ingles: People walked more. They did not use cell phones. There were fewer cars."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "S1: estructura del Simple Past, verbos regulares e irregulares, ejercicios de transformacion. S2: actividad comunicativa My life before and now.",
+          "activity": "S1: El docente presenta la regla: afirmativo = sujeto + verbo-ed / verbo irregular; negativo = sujeto + did not + verbo base; pregunta = Did + sujeto + verbo base? Drills orales: I play -> I played; I go -> I went. Los estudiantes completan 10 oraciones con el verbo correcto. S2: En parejas, cada estudiante entrevista a su companero: When you were 8 years old, what did you eat for breakfast? Where did you go to school? Did you watch cartoons? Luego comparten 3 datos sorprendentes de su companero con la clase."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Escritura de un parrafo corto sobre el pasado.",
+          "activity": "Ticket de salida: escribir 5 oraciones en Simple Past sobre la infancia propia. Al menos 2 afirmativas, 1 negativa, 1 pregunta respondida. Usar al menos 3 verbos irregulares."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "The Simple Past tense is used to talk about completed actions that happened at a specific time in the past. In English, regular verbs add -ed to form the past (play -> played; study -> studied), while irregular verbs have unique past forms that must be memorized (go -> went; eat -> ate; see -> saw; have -> had). Understanding the Simple Past is fundamental for telling stories, describing your personal history, and understanding narratives in spoken and written English.",
+      "sections": [
+        {
+          "subtitle": "Regular verbs: -ed rules",
+          "content": "Most verbs: add -ed (walk -> walked, open -> opened, watch -> watched). Verbs ending in -e: add only -d (live -> lived, love -> loved). Verbs ending in consonant + y: change y -> i and add -ed (study -> studied, try -> tried). Verbs ending in consonant-vowel-consonant (short vowel): double the final consonant (stop -> stopped, plan -> planned). Pronunciation of -ed: /t/ after voiceless consonants (walked, stopped); /d/ after voiced sounds (played, studied); /id/ after t or d (wanted, needed)."
+        },
+        {
+          "subtitle": "High-frequency irregular verbs",
+          "content": "be -> was/were; go -> went; eat -> ate; have -> had; do -> did; see -> saw; come -> came; get -> got; give -> gave; know -> knew; take -> took; think -> thought; say -> said; make -> made; buy -> bought; bring -> brought; feel -> felt; find -> found; leave -> left; put -> put (no change); read -> read (pronunciation changes: /ri:d/ -> /red/); tell -> told."
+        },
+        {
+          "subtitle": "Negative and question forms",
+          "content": "Negative: Subject + did not (didn't) + verb base. Examples: She didn't go to school yesterday. We didn't eat tacos for lunch. Note: did not + base verb, NOT did not + past form (wrong: she didn't went). Questions: Did + subject + verb base? Did you study last night? What did he eat? Where did they go? Short answers: Yes, I did. / No, she didn't."
+        },
+        {
+          "subtitle": "Time expressions with Simple Past",
+          "content": "Yesterday / yesterday morning / yesterday afternoon. Last week / last month / last year / last Monday. Ago: two days ago, three years ago, a long time ago. Specific dates: in 2020, in January, on Monday. In Mexico, the INALI (Instituto Nacional de Lenguas Indigenas) has documented that many indigenous communities in Mexico transitioned from traditional occupations to urban work over the past 50 years — a change perfectly described with Simple Past: They worked in the fields. They spoke Nahuatl at home. They did not use electricity."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "What is the Simple Past of the verb GO?",
+          "options": ["Went", "Goed", "Going", "Goes"],
+          "correct": "Went"
+        },
+        {
+          "question": "Choose the correct negative form: She ___ watch TV last night.",
+          "options": ["didn't", "doesn't", "wasn't", "not"],
+          "correct": "didn't"
+        },
+        {
+          "question": "Which sentence is in Simple Past?",
+          "options": ["They ate tamales at the festival.", "They eat tamales every Sunday.", "They are eating tamales now.", "They will eat tamales tomorrow."],
+          "correct": "They ate tamales at the festival."
+        },
+        {
+          "question": "What is the correct question form?",
+          "options": ["Did you go to the market yesterday?", "Do you went to the market yesterday?", "You did go to the market yesterday?", "Were you go to the market yesterday?"],
+          "correct": "Did you go to the market yesterday?"
+        }
+      ],
+      "rubric": "Nivel 4: Uses Simple Past correctly in affirmative, negative and question forms with both regular and irregular verbs, including appropriate time expressions; communicates past experiences clearly in oral and written form; Nivel 3: Correctly forms Simple Past in most cases; minor errors with irregular verbs or time expressions; Nivel 2: Forms affirmative sentences correctly but makes errors in negatives or questions; confuses some irregular verbs; Nivel 1: Cannot form Simple Past correctly or confuses it with Simple Present."
+    },
+    "teacher_tips": [
+      "Display a permanent list of 30 high-frequency irregular verbs on the classroom wall; refer to it consistently so students internalize it gradually rather than trying to memorize it all at once.",
+      "Use Mexican cultural content for contextualization: ask students to interview a family member about their childhood using Simple Past questions; this creates a meaningful bridge between the language and their personal history.",
+      "For pronunciation of -ed endings (/t/, /d/, /id/), use a quick sorting game: students receive cards with verbs and must sort them into three columns based on the -ed pronunciation.",
+      "Connect to SEP PRONI program goals: the Simple Past is a Level A2 competency in the Common European Framework of Reference (CEFR), which Mexico's PRONI program uses as its standard."
+    ]
+  },
+
+  "IN-III-P02": {
+    "code": "IN-III-P02",
+    "title": "Comparte experiencias personales recientes usando el Present Perfect",
+    "level": "Ingles III",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Gramatica y comunicacion oral",
+    "metadata": {
+      "objective": "Usar el Present Perfect (have/has + past participle) para hablar de experiencias y logros recientes sin especificar cuando, distinguiendo su uso del Simple Past en contextos comunicativos reales.",
+      "competencies": [
+        "Forma el Present Perfect con have/has + past participle: I have visited, she has eaten",
+        "Usa ever/never para preguntar sobre experiencias de vida: Have you ever eaten chapulines?",
+        "Distingue el uso del Present Perfect (experiencia sin tiempo especifico) del Simple Past (accion en tiempo definido)",
+        "Usa already/yet/just: I have already done my homework; Have you finished yet?; She has just arrived",
+        "Participa en conversaciones sobre experiencias significativas en Mexico (viajes, gastronomia, eventos culturales)"
+      ],
+      "materials": [
+        "Cuadro Have you ever...? con 12 preguntas sobre experiencias en Mexico",
+        "Lista de 20 participios pasados irregulares",
+        "Tarjetas con frases en Simple Past y Present Perfect para clasificar",
+        "Mini-entrevista grabada: turista extranjero habla de su visita a Mexico (adaptacion SECTUR)",
+        "Ficha: Mexico experiences bucket list (Chichen Itza, comer mole negro, ver la Monarca)"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "S1", "duration": "50 min", "label": "Present Perfect: forma y uso con ever/never"},
+        {"phase": "S2", "duration": "50 min", "label": "Already/yet/just y diferencia con Simple Past"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Activar la idea de experiencias de vida vs eventos pasados especificos.",
+          "activity": "El docente pregunta: Have you ever eaten a grasshopper? (chapulines). Levanta la mano quien diga yes. Pregunta follow-up: When did you eat it? (Simple Past). La diferencia: Have you ever...? habla de experiencia de vida (sin importar cuando); When did you...? pide el momento especifico."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "S1: estructura del Present Perfect y encuesta Have you ever...?. S2: already/yet/just y distincion con Simple Past.",
+          "activity": "S1: Los estudiantes reciben el cuadro con 12 preguntas Have you ever...? (visited Chichen Itza? tried mole negro? seen the Mariposa Monarca? spoken to a foreign tourist? eaten a taco al pastor?). Circulan por el salon preguntando y anotando respuestas. Al final: quienes han visitado mas lugares de Mexico? S2: El docente presenta already/yet/just con ejemplos visuales en el pizarron. Actividad de clasificacion: reciben 16 oraciones y deben identificar si usan Simple Past (accion completada en tiempo especifico) o Present Perfect (experiencia/resultado reciente sin tiempo especifico)."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Escritura de un perfil de experiencias en Mexico.",
+          "activity": "Ticket de salida: escribir 5 oraciones con Present Perfect sobre experiencias propias usando ever/never/already/yet/just. Al menos una negativa con never y una pregunta con ever."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "The Present Perfect connects the past with the present. It is formed with have/has + past participle and is used to talk about: (1) life experiences without specifying when: I have visited Oaxaca; (2) recent actions with present relevance: She has just arrived; (3) actions that started in the past and continue: I have studied English for two years. Understanding the difference between Present Perfect and Simple Past is one of the most important grammar distinctions in English.",
+      "sections": [
+        {
+          "subtitle": "Formation of the Present Perfect",
+          "content": "Affirmative: I/you/we/they + have + past participle; he/she/it + has + past participle. Examples: I have eaten enchiladas. She has visited Mexico City. Negative: have not (haven't) / has not (hasn't) + past participle. Questions: Have you...? / Has she...? Short answers: Yes, I have. / No, she hasn't. Key past participles: gone, eaten, seen, been (to), had, done, spoken, visited, tried, taken, written, read, made."
+        },
+        {
+          "subtitle": "Ever and never",
+          "content": "Ever (en preguntas): Have you EVER tried tamales? = at any time in your life. Never (en negativas): I have NEVER eaten chapulines. = at no time in my life. Note: ever is placed between have/has and the past participle. Examples from Mexican culture: Have you ever seen the pyramids of Teotihuacan? Have you ever spoken to someone in Nahuatl? I have never visited the Copper Canyon in Chihuahua."
+        },
+        {
+          "subtitle": "Already, yet and just",
+          "content": "Already (ya, en afirmativas): action completed before expected. I have ALREADY finished my homework. She has ALREADY booked the hotel in Cancun. Yet (todavia, en negativas y preguntas): expected but not done. I have not arrived yet. Have you eaten yet? Just (justo, recien): very recently. She has JUST called. He has JUST left the classroom."
+        },
+        {
+          "subtitle": "Present Perfect vs Simple Past",
+          "content": "Simple Past: used when the time is specified or the action is completely finished with a definite past time. I visited Chichen Itza IN 2022. She ate tacos YESTERDAY. Present Perfect: used when the time is not specified, or when the past action has present relevance. I HAVE visited Chichen Itza. (experience, no time given). She HAS already eaten. (relevant now). Memory trick: if you can answer WHEN?, use Simple Past. If the question is HAVE you or not? (experience, no specific time), use Present Perfect."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Which sentence uses Present Perfect correctly?",
+          "options": ["I have visited Oaxaca last year.", "I visited Oaxaca last year.", "I have visited Oaxaca.", "I visit Oaxaca."],
+          "correct": "I have visited Oaxaca."
+        },
+        {
+          "question": "Complete: She ___ never ___ mole negro.",
+          "options": ["has / tried", "have / tried", "did / try", "was / trying"],
+          "correct": "has / tried"
+        },
+        {
+          "question": "Choose the correct sentence with YET:",
+          "options": ["I haven't finished my homework yet.", "I have finished my homework yet.", "I yet have finished my homework.", "I finished my homework yet."],
+          "correct": "I haven't finished my homework yet."
+        },
+        {
+          "question": "When do we use Simple Past instead of Present Perfect?",
+          "options": ["When we specify the time of the action (yesterday, last year, in 2010)", "When the time is unknown", "When the action has present relevance", "When we use ever or never"],
+          "correct": "When we specify the time of the action (yesterday, last year, in 2010)"
+        }
+      ],
+      "rubric": "Nivel 4: Uses Present Perfect correctly with all markers (ever/never/already/yet/just), clearly distinguishes it from Simple Past in both oral and written contexts, and communicates personal experiences fluently; Nivel 3: Forms Present Perfect correctly in most cases and distinguishes it from Simple Past; minor errors with markers; Nivel 2: Knows the form of Present Perfect but confuses its use with Simple Past or misplaces markers; Nivel 1: Cannot form Present Perfect correctly or consistently uses Simple Past for all past references."
+    },
+    "teacher_tips": [
+      "The Have you ever...? survey about Mexican experiences is very motivating because it centers the students' own culture and country; extend it by asking students to add their own questions about local experiences.",
+      "The Present Perfect vs Simple Past distinction is notoriously difficult for Spanish speakers because Spanish uses one form (preterito perfecto) for both uses. Acknowledge this explicitly and use lots of contrast practice.",
+      "For the Mexico bucket list activity, bring real photos of Chichen Itza, the Monarca butterflies, Hierve el Agua, and Guanajuato to make the conversation authentic and aspirational.",
+      "Connect to the CENNI certification (SEP/PRONI): the Present Perfect is tested at B1 level; tell students this is a real exam they can take to certify their English level."
+    ]
+  },
+
+  "IN-III-P03": {
+    "code": "IN-III-P03",
+    "title": "Describe lugares conocidos y actividades turisticas en Mexico en ingles",
+    "level": "Ingles III",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Basico-Intermedio",
+    "category": "Vocabulario y comunicacion descriptiva",
+    "metadata": {
+      "objective": "Usar vocabulario descriptivo y estructuras del ingles para presentar lugares turisticos de Mexico, practicando la descripcion de caracteristicas fisicas, actividades disponibles y recomendaciones en forma oral y escrita.",
+      "competencies": [
+        "Usa adjetivos descriptivos para caracterizar lugares: beautiful, ancient, crowded, peaceful, colorful, historic",
+        "Describe la ubicacion usando preposiciones y expresiones: in the north of, near, on the coast, in the center of Mexico",
+        "Usa la estructura There is / There are para describir lo que existe en un lugar",
+        "Hace y responde preguntas sobre lugares: What is there to do? Is it safe? How far is it?",
+        "Describe al menos tres destinos turisticos mexicanos usando datos reales de SECTUR"
+      ],
+      "materials": [
+        "Fotografias de 8 destinos turisticos de Mexico (Guanajuato, Merida, Oaxaca, Cabo San Lucas, CDMX, Palenque, Mazatlan, Teotihuacan)",
+        "Mapa turistico de Mexico en ingles (SECTUR)",
+        "Ficha de datos: Mexico recibio 35.4 millones de turistas internacionales en 2023 (SECTUR/DATATUR)",
+        "Guia de conversacion: preguntas sobre destinos turisticos",
+        "Actividad: disenar una guia de viaje mini de su estado"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "S1", "duration": "50 min", "label": "Vocabulario descriptivo y estructura There is/are"},
+        {"phase": "S2", "duration": "50 min", "label": "Presentacion de destinos y mini-guia de viaje"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Activar el vocabulario sobre lugares turisticos y motivar el orgullo por el patrimonio cultural mexicano.",
+          "activity": "El docente dice: Mexico received 35.4 million international tourists in 2023 (SECTUR). What do tourists come to see? Students brainstorm in English: pyramids, beaches, food, markets, festivals... El docente recoge las ideas y las organiza en categorias en el pizarron."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "S1: vocabulario descriptivo, There is/are, preposiciones de lugar. S2: presentacion de destinos y creacion de mini-guia de viaje.",
+          "activity": "S1: El docente presenta 8 fotografias de destinos; los estudiantes practican describir con adjetivos y There is/are: In Guanajuato there is a colorful historic city center. There are beautiful colonial buildings. It is located in central Mexico. S2: En equipos, los estudiantes eligen un destino (o su propio estado) y crean una mini-guia de viaje en ingles de una pagina: What is it? Where is it? What can you do there? Why should tourists visit? Presentan oralmente a la clase."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Reflexion sobre el valor del ingles para promover el turismo y el patrimonio de Mexico.",
+          "activity": "El docente pregunta: If a tourist asked you about your town or city in English, what would you say? Students share 3 sentences describing their local area. Ticket de salida: 5 sentences describing their state in English."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Describing places is a fundamental communication skill in English. Tourism professionals, hotel staff, guides, and anyone in the service industry in Mexico needs to describe places, give recommendations, and answer questions about destinations. Mexico is one of the world's top tourist destinations: according to SECTUR/DATATUR, Mexico received 35.4 million international tourists in 2023, generating approximately 28.8 billion USD in revenue. Knowing how to describe Mexican places in English is a practical and valuable skill.",
+      "sections": [
+        {
+          "subtitle": "Descriptive adjectives for places",
+          "content": "Natural features: beautiful, stunning, spectacular, remote, tranquil, tropical, mountainous, dry, lush. Historical/cultural: ancient, historic, colonial, traditional, sacred, UNESCO-listed. Practical: crowded, peaceful, safe, affordable, popular, off-the-beaten-track, accessible. Position adjectives before nouns: a beautiful ancient pyramid; a colorful traditional market. Or after linking verbs: Oaxaca is colorful and historic."
+        },
+        {
+          "subtitle": "There is / There are for describing places",
+          "content": "There is (singular or uncountable): There is a famous pyramid in Teotihuacan. There is incredible food in Oaxaca. There is a beautiful beach in Tulum. There are (plural): There are many cenotes in the Yucatan Peninsula. There are over 100,000 archaeological sites in Mexico (INAH). There are 35 UNESCO World Heritage Sites in Mexico. Negative: There is no direct flight. There are no hotels in that area. Question: Is there a market nearby? Are there any good restaurants?"
+        },
+        {
+          "subtitle": "Location expressions",
+          "content": "Compass directions: in the north of Mexico (Baja California, Sonora); in the south (Oaxaca, Chiapas); in the southeast (Yucatan, Quintana Roo); in central Mexico (CDMX, Puebla, Guanajuato). Proximity: near the Pacific coast; on the Gulf of Mexico; close to the US border; far from the capital. Geographic features: in the mountains (Sierra Tarahumara); on a peninsula (Baja California, Yucatan); on an island (Cozumel, Isla Mujeres)."
+        },
+        {
+          "subtitle": "Useful questions about tourist destinations",
+          "content": "What is there to do in...? What can you see in...? How far is it from Mexico City? How long does it take to get there? Is it safe to visit? What is the best time to go? How much does it cost to enter? Are there guided tours available? Is English spoken there? Example exchange: A: Have you ever visited Palenque? B: No, I haven't. What is it like? A: It is an ancient Mayan city in Chiapas. There are impressive jungle pyramids. It is about 8 hours from Mexico City by bus."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Complete: ___ many beautiful beaches in the Yucatan Peninsula.",
+          "options": ["There are", "There is", "It is", "They are"],
+          "correct": "There are"
+        },
+        {
+          "question": "Mexico received approximately how many international tourists in 2023 according to SECTUR?",
+          "options": ["35.4 million", "10 million", "100 million", "5 million"],
+          "correct": "35.4 million"
+        },
+        {
+          "question": "Which sentence correctly describes a location?",
+          "options": ["Oaxaca is located in southern Mexico.", "Oaxaca is locate in the southern from Mexico.", "Oaxaca it is in the south from Mexico.", "Oaxaca be located southern of Mexico."],
+          "correct": "Oaxaca is located in southern Mexico."
+        },
+        {
+          "question": "Which adjective describes a historical place?",
+          "options": ["Ancient", "Humid", "Salty", "Narrow"],
+          "correct": "Ancient"
+        }
+      ],
+      "rubric": "Nivel 4: Describes tourist destinations accurately using rich descriptive vocabulary, there is/are, and location expressions; creates a well-organized mini travel guide with specific details and cultural context; Nivel 3: Describes places correctly with basic vocabulary and there is/are; minor errors in adjective placement or location expressions; Nivel 2: Uses some descriptive adjectives but has difficulty with there is/are or location expressions; description is limited; Nivel 1: Cannot produce a coherent description of a place in English."
+    },
+    "teacher_tips": [
+      "If possible, bring printed SECTUR brochures in English to the classroom; real materials are far more motivating than textbook examples.",
+      "Allow students to describe their own state, city, or town: this is the most personally meaningful and practically useful application of the language.",
+      "For the mini travel guide activity, students can present to a partner pretending to be a tourist from the US or Canada; role-play increases authentic communication practice.",
+      "Connect to career aspirations: many students in tourism-adjacent states (Quintana Roo, Jalisco, Guanajuato, CDMX) may work in hospitality; frame English as a professional skill, not just an academic requirement."
+    ]
+  },
+
+  "IN-III-P04": {
+    "code": "IN-III-P04",
+    "title": "Habla sobre habitos, frecuencia y preferencias usando adverbios y expresiones de frecuencia",
+    "level": "Ingles III",
+    "duration": "~2.5h (2 sesiones de 50 min)",
+    "difficulty": "Basico",
+    "category": "Gramatica y comunicacion oral",
+    "metadata": {
+      "objective": "Usar adverbios de frecuencia (always, usually, often, sometimes, rarely, never) y expresiones de tiempo para hablar de habitos y preferencias cotidianas, aplicando este vocabulario a conversaciones sobre estilos de vida y salud en Mexico.",
+      "competencies": [
+        "Usa adverbios de frecuencia en la posicion correcta en la oracion (antes del verbo principal; despues de be)",
+        "Combina adverbios de frecuencia con expresiones de tiempo: twice a week, three times a day, every morning",
+        "Pregunta y responde sobre habitos: How often do you...? / I usually...",
+        "Contrasta habitos saludables y no saludables con datos de salud de Mexico (IMSS, ENSANUT)",
+        "Expresa preferencias con like/love/hate/prefer + gerundio o infinitivo"
+      ],
+      "materials": [
+        "Tarjetas con adverbios de frecuencia (escala del 0% al 100%)",
+        "Cuestionario de habitos de salud (basado en ENSANUT 2022)",
+        "Infografia: Habitos de salud de los adolescentes mexicanos (IMSS/INSP)",
+        "Actividad de conversacion en pares: My weekly routine",
+        "Hoja de registro: How often does your partner...?"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "S1", "duration": "50 min", "label": "Adverbios de frecuencia: posicion y escala de porcentaje"},
+        {"phase": "S2", "duration": "50 min", "label": "Habitos de salud y estilo de vida: conversacion y datos ENSANUT"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Conectar la frecuencia con la vida cotidiana de los estudiantes.",
+          "activity": "El docente pregunta: How often do you eat vegetables? How often do you exercise? How often do you check your phone? Students respond with numbers (every day, twice a week, once a month). El docente introduce la escala: never (0%) -> rarely (10%) -> sometimes (30%) -> often (60%) -> usually (80%) -> always (100%)."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "S1: reglas de posicion de adverbios y practica de oraciones. S2: encuesta de habitos de salud con datos nacionales.",
+          "activity": "S1: Regla de posicion: adverbio + verbo principal (I usually eat breakfast), be + adverbio (She is always late). Ejercicio de reorden: 10 oraciones desordenadas. Expresiones de frecuencia: twice a day, every morning, three times a week, once a year. S2: Los estudiantes completan el cuestionario de habitos de salud sobre si mismos. El docente comparte datos de la ENSANUT 2022: en Mexico, el 36% de los adolescentes no desayuna; solo el 23% hace ejercicio regularmente; el 35% consume refresco diariamente. Pregunta: How do your habits compare to the national average?"
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Reflexion sobre habitos saludables y comunicacion de metas.",
+          "activity": "Ticket de salida: escribe 5 oraciones sobre tus habitos usando adverbios de frecuencia. Include one thing you want to change: I rarely exercise, but I want to do it more often."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Frequency adverbs tell us how often something happens. They are essential for describing habits, routines, and lifestyle choices. In health conversations — relevant to Mexico's public health challenges — frequency language helps express and compare behaviors. The ENSANUT (Encuesta Nacional de Salud y Nutricion) 2022, conducted by the INSP (Instituto Nacional de Salud Publica), documents that sedentary lifestyles and poor dietary habits are increasing among Mexican adolescents.",
+      "sections": [
+        {
+          "subtitle": "Frequency adverbs: scale and position",
+          "content": "Scale from most to least frequent: always (100%), usually/normally (80%), often/frequently (60%), sometimes (30-50%), occasionally (20%), rarely/seldom (10%), never (0%). Position rule: BEFORE the main verb: I always drink water. She rarely eats junk food. They never miss school. AFTER the verb be: He is usually tired after school. We are sometimes late. Exception: sometimes can also go at the beginning of the sentence: Sometimes I wake up early."
+        },
+        {
+          "subtitle": "Frequency expressions with time units",
+          "content": "Per day: once a day, twice a day, three times a day (I brush my teeth twice a day). Per week: once a week, twice a week, three times a week (I exercise three times a week). Per month: once a month, twice a month. Per year: once a year, twice a year. Every + time: every day, every morning, every Monday, every two weeks. How often + do/does: How often do you eat fruit? I eat it twice a day. How often does she go to the gym? She goes three times a week."
+        },
+        {
+          "subtitle": "Expressing preferences: like/love/hate/prefer",
+          "content": "These verbs can be followed by a gerund (-ing) or an infinitive (to + verb base). Like/love/enjoy/hate + -ing: I love eating tacos. She hates waking up early. We enjoy playing football. Prefer + gerund or infinitive: I prefer swimming to running. I prefer to swim rather than run. Would like/would prefer (polite desire): I would like to visit Oaxaca. I would prefer tea, please. In surveys: Do you like cooking? Yes, I love it. / No, I hate it."
+        },
+        {
+          "subtitle": "Health habits in Mexico: context for language practice",
+          "content": "According to ENSANUT 2022 (INSP), Mexican adolescents report: 36% skip breakfast regularly; 35% drink soda daily; only 23% exercise three or more times per week; 40% spend more than 3 hours per day on screens. These statistics provide authentic context for practicing frequency language: More than a third of Mexican teens never eat breakfast. Many adolescents often drink soda. Few students usually exercise three times a week. Discussing these facts in English connects language learning to real health awareness."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Where does the frequency adverb go in this sentence? I ___ eat breakfast.",
+          "options": ["usually (before eat)", "usually (after eat)", "usually (at the end)", "usually (before I)"],
+          "correct": "usually (before eat)"
+        },
+        {
+          "question": "How often do you exercise? Choose the most natural response:",
+          "options": ["I usually exercise three times a week.", "I exercise three times a week usually.", "Three times a week I usually exercise.", "Usually I exercise three times a week usually."],
+          "correct": "I usually exercise three times a week."
+        },
+        {
+          "question": "Which sentence uses a frequency expression correctly?",
+          "options": ["She brushes her teeth twice a day.", "She brushes her teeth two times daily a day.", "She brush her teeth twice by day.", "She is brushing her teeth twice the day."],
+          "correct": "She brushes her teeth twice a day."
+        },
+        {
+          "question": "According to ENSANUT 2022, what percentage of Mexican adolescents skip breakfast regularly?",
+          "options": ["36%", "10%", "60%", "80%"],
+          "correct": "36%"
+        }
+      ],
+      "rubric": "Nivel 4: Places frequency adverbs correctly in all sentence types (including be), uses a variety of frequency expressions with time units, and engages authentically in conversation about health habits with reference to national data; Nivel 3: Uses frequency adverbs correctly in most cases; minor errors in position or time expressions; Nivel 2: Knows the meaning of frequency adverbs but makes systematic errors in position; Nivel 1: Cannot use frequency adverbs correctly or does not know their meaning."
+    },
+    "teacher_tips": [
+      "The health habits survey works best when students compare themselves to the ENSANUT national average: it creates genuine interest and makes the data personally relevant.",
+      "Use a line on the floor or a spectrum poster on the wall for the frequency scale: students physically place themselves on the spectrum (always/never) to answer questions. Kinesthetic learning reinforces the abstract concept.",
+      "For the prefer activity, use Mexican food as the content: Do you prefer eating tacos or tamales? Do you prefer drinking agua fresca or soda? Students have strong opinions and the conversation flows naturally.",
+      "Connect to IMSS health campaigns: the IMSS and ISSSTE regularly run awareness campaigns on adolescent health in Mexico; these can be mentioned as examples of institutions that care about the habits you are discussing."
+    ]
+  },
+
+  "IN-III-P05": {
+    "code": "IN-III-P05",
+    "title": "Habla sobre obligaciones y normas usando must, have to y should",
+    "level": "Ingles III",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Gramatica y comunicacion funcional",
+    "metadata": {
+      "objective": "Usar los verbos modales must, have to y should para expresar obligacion, necesidad y recomendacion en contextos cotidianos como la escuela, el trabajo y la vida en comunidad, relacionando estos usos con normas de convivencia en Mexico.",
+      "competencies": [
+        "Distingue must (obligacion fuerte/ley), have to (obligacion externa/regla) y should (consejo/recomendacion)",
+        "Forma oraciones afirmativas, negativas e interrogativas con los tres modales",
+        "Aplica los modales a situaciones de la escuela, el trabajo y la vida publica en Mexico",
+        "Comprende e interpreta anuncios, reglas escolares y normas de transito en ingles",
+        "Expresa consejos sobre salud, seguridad y ciudadania en forma oral y escrita"
+      ],
+      "materials": [
+        "Carteles con reglas del salon escritas en ingles (You must be on time; You should respect others)",
+        "Fichas: reglas de 5 lugares publicos (museum, airport, hospital, subway, school)",
+        "Texto corto: IMSS health recommendations for teenagers (adaptado)",
+        "Tarjetas de situacion para juego de rol: giving advice",
+        "Semaforo de modales: rojo=must, amarillo=should, verde=can"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "S1", "duration": "50 min", "label": "Must vs have to: obligacion fuerte y externa"},
+        {"phase": "S2", "duration": "50 min", "label": "Should: consejos y recomendaciones; juego de rol"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Activar el contraste entre obligacion y consejo con una situacion comun.",
+          "activity": "El docente dice: In Mexico, you MUST carry your ID at all times if you are an adult. You SHOULD drink 2 liters of water per day. You HAVE TO wear a uniform in this school. Ask: what is the difference between these three sentences? Students discuss in pairs. El docente revela el semaforo: rojo=must (ley/regla fuerte), amarillo=should (consejo), verde=have to (regla de la situacion)."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "S1: must vs have to; reglas de lugares publicos. S2: should; juego de rol de consejos.",
+          "activity": "S1: En equipos, los estudiantes reciben fichas de 5 lugares (metro CDMX, museo INAH, aeropuerto, hospital IMSS, escuela) y deben escribir al menos 3 reglas por lugar usando must o have to: In the IMSS hospital you must wear a mask. You must not smoke. S2: El docente distribuye tarjetas de situacion: My friend is always tired at school. My sister wants to improve her English. I have a job interview tomorrow. Los estudiantes escriben y representan oralmente 3 consejos usando should: You should sleep 8 hours. You should not use your phone late at night. You should practice speaking every day."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Sintesis: los tres modales en una produccion escrita coherente.",
+          "activity": "Ticket de salida: escribe 6 oraciones sobre las reglas de la escuela y consejos para un estudiante nuevo. Usa must, have to y should al menos dos veces cada uno. Include at least one negative (must not / should not)."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Modal verbs are auxiliary verbs that express degrees of obligation, necessity, permission, ability, and advice. Three of the most important for expressing rules and recommendations are: MUST (strong obligation, often from the speaker or a law), HAVE TO (obligation from an external source, a rule or circumstance), and SHOULD (advice, recommendation, what is right or beneficial). These distinctions are crucial for understanding and communicating about norms, rules, and social responsibilities.",
+      "sections": [
+        {
+          "subtitle": "MUST: strong obligation or prohibition",
+          "content": "Affirmative: You must stop at a red light. All passengers must fasten their seatbelts. (obligation). Prohibition: must not (mustn't): You must not smoke inside public buildings. (Mexican Law: Ley General para el Control del Tabaco, 2008). Must is often used for laws, moral imperatives, or strong personal obligation: You must report a crime if you witness one. Form: modal + base verb (no -s, no -ed, no to). Questions with must are rare; usually replaced by have to."
+        },
+        {
+          "subtitle": "HAVE TO: external obligation",
+          "content": "Affirmative: I have to wear a uniform at this school. She has to pay taxes. (3rd person = has to). Negative: don't/doesn't have to (NO obligation, NOT prohibition): You don't have to pay admission on Sundays at INAH museums. (free entry, not a rule against paying). This is a critical distinction: must not = prohibited; don't have to = not required. Question: Do you have to work on weekends? Does she have to take an exam?"
+        },
+        {
+          "subtitle": "SHOULD: advice and recommendation",
+          "content": "Affirmative: You should drink water, not soda. Students should study at least one hour a day. Negative: should not (shouldn't): You should not skip breakfast. (IMSS adolescent health recommendation). Should is NOT as strong as must; it expresses what is advisable or recommended. Common uses: health advice, travel tips, personal recommendations, moral guidance. Examples from Mexico: You should visit Oaxaca during Dia de Muertos. Tourists should not drink tap water in all regions."
+        },
+        {
+          "subtitle": "Practical comparison chart",
+          "content": "MUST: You must pay taxes (law). You must not drive without a license (law/prohibition). HAVE TO: I have to go to school (external rule). You don't have to buy the textbook (not required). SHOULD: You should eat more vegetables (advice). You shouldn't sleep less than 6 hours (recommendation). Negatives compared: must not = strictly prohibited; should not = not advisable; don't have to = not necessary/optional. Learning these three negatives is as important as the affirmatives."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "In Mexico, you ___ have a valid driver's license to drive a car. (law)",
+          "options": ["must", "should", "don't have to", "shouldn't"],
+          "correct": "must"
+        },
+        {
+          "question": "You ___ bring your own pencils to the exam. The school provides them. (not required)",
+          "options": ["don't have to", "must not", "should not", "mustn't"],
+          "correct": "don't have to"
+        },
+        {
+          "question": "What is the difference between must not and don't have to?",
+          "options": ["Must not = prohibited; don't have to = not required", "They mean the same thing", "Must not = advice; don't have to = prohibition", "Must not = past; don't have to = present"],
+          "correct": "Must not = prohibited; don't have to = not required"
+        },
+        {
+          "question": "Which sentence gives advice (not a rule)?",
+          "options": ["You should exercise regularly.", "You must stop at red lights.", "You have to wear a uniform.", "You must not smoke here."],
+          "correct": "You should exercise regularly."
+        }
+      ],
+      "rubric": "Nivel 4: Correctly distinguishes and uses must/have to/should in all forms (affirmative, negative, question), including the critical must not vs don't have to distinction; creates contextually appropriate rules and advice for Mexican settings; Nivel 3: Uses the three modals correctly in most cases; may confuse must not and don't have to occasionally; Nivel 2: Correctly uses should but confuses must and have to, or makes errors in negative forms; Nivel 1: Cannot distinguish the three modals or uses only one of them for all situations."
+    },
+    "teacher_tips": [
+      "The must not vs don't have to distinction is the hardest part of this progression: devote extra time to it with clear Mexican examples (you must not enter the pyramid without permission; you don't have to speak Spanish to visit Mexico City).",
+      "The semaforo (traffic light) visual is very effective: post it permanently in the classroom and refer to it every time a modal question comes up during the rest of the semester.",
+      "Use the INAH free museum Sundays as an example of don't have to: this is a real policy students may not know about, and it models how government policies can be expressed in English.",
+      "For the role-play with advice, use situations that are emotionally relevant to teenagers: stress, relationships, study habits, career choices. Students give advice more fluently when they care about the topic."
+    ]
+  },
+
+  "IN-III-P06": {
+    "code": "IN-III-P06",
+    "title": "Pide, da y entiende instrucciones completas en ingles",
+    "level": "Ingles III",
+    "duration": "~2.5h (2 sesiones de 50 min)",
+    "difficulty": "Basico-Intermedio",
+    "category": "Comunicacion funcional",
+    "metadata": {
+      "objective": "Usar el modo imperativo y expresiones de secuencia para dar y seguir instrucciones complejas en contextos practicos (recetas, indicaciones viales, instrucciones tecnicas), relacionando estas habilidades con situaciones de servicio al cliente en Mexico.",
+      "competencies": [
+        "Forma el imperativo afirmativo y negativo en ingles: Turn left. Do not open the door.",
+        "Usa conectores de secuencia para instrucciones: First, Then, Next, After that, Finally",
+        "Pide instrucciones de forma educada: Could you tell me how to...? How do I get to...?",
+        "Sigue instrucciones orales de al menos 5 pasos sin necesitar repeticion",
+        "Describe el proceso de preparacion de un platillo mexicano en ingles (receta)"
+      ],
+      "materials": [
+        "Mapa del centro historico de una ciudad mexicana (SECTUR)",
+        "Receta en ingles: Como preparar agua de jamaica (hibiscus water)",
+        "Tarjetas de instrucciones para juego de Simon Says adaptado",
+        "Audio: indicaciones de WAZE/Google Maps en ingles",
+        "Actividad de escritura: How to make guacamole (receta en ingles)"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "S1", "duration": "50 min", "label": "Imperativo y conectores de secuencia: indicaciones y recetas"},
+        {"phase": "S2", "duration": "50 min", "label": "Instrucciones tecnicas y proyecto de receta mexicana"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Demostrar la importancia de instrucciones claras y secuenciadas.",
+          "activity": "El docente da instrucciones intencionalmente desordenadas para llegar al bano del plantel: Then turn right. Finally enter the door. First, go out of the classroom. Next, walk 20 steps. Los estudiantes tienen que reordenar. Luego discuten: por que importa el orden en las instrucciones?"
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "S1: imperativo y conectores con actividad de mapa. S2: receta y proyecto de instrucciones tecnicas.",
+          "activity": "S1: Con el mapa del centro historico, en parejas un estudiante tiene los ojos cerrados (o da la espalda) y el otro guia usando imperativo + conectores: First, walk straight for two blocks. Then turn left on Hidalgo Street. Next, pass the cathedral on your right. You will arrive at the market. S2: El docente lee la receta del agua de jamaica en voz alta; los estudiantes escuchan y ordenan los pasos en la hoja. Luego cada estudiante escribe la receta de su platillo mexicano favorito en ingles usando imperativo y conectores."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Presentacion de recetas y reflexion sobre la utilidad de dar instrucciones en ingles.",
+          "activity": "Tres voluntarios presentan su receta oralmente. El docente pregunta: when in real life might you need to give instructions in English in Mexico? (cooking show, tourist guidance, technical job, customer service). Students brainstorm careers where this skill matters."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "The imperative mood is used to give instructions, commands, directions, and advice. It is one of the most practically useful structures in English because it appears constantly in recipes, directions, technical manuals, safety warnings, and customer service contexts. In Mexico's growing service and tourism sector, giving clear instructions in English to international visitors is a high-value professional skill.",
+      "sections": [
+        {
+          "subtitle": "Imperative: formation and use",
+          "content": "The imperative uses the base form of the verb (no subject, no conjugation). Affirmative: Turn left. Add salt. Press the green button. Open the window. Use the formal please to soften: Please turn off your phone. Negative: Do not + base verb (or Don't): Do not open the oven before 20 minutes. Don't touch the screen. Don't turn right here. The negative imperative is used for warnings and prohibitions."
+        },
+        {
+          "subtitle": "Sequencing connectors",
+          "content": "First / To start / To begin with: introduces the first step. Then / Next / After that: connects middle steps. Finally / Last / In the end: signals the last step. Also: While (simultaneous), Before (prior action), After (subsequent action). Example (recipe): First, boil 2 liters of water. Then add 1 cup of dried hibiscus flowers. Let them steep for 10 minutes. After that, strain the flowers out. Add sugar to taste. Finally, serve over ice. Mexico connection: hibiscus (jamaica) agua fresca is one of Mexico's most popular traditional beverages."
+        },
+        {
+          "subtitle": "Asking for instructions politely",
+          "content": "Could you tell me how to get to...? Can you explain how to...? How do I...? What do I do next? Could you repeat that, please? Sorry, I didn't understand. Could you say that more slowly? These phrases are essential for tourists and for anyone learning from instructions in a second language. In Mexico, SECTUR trains guides and hotel staff to use these formulas in English."
+        },
+        {
+          "subtitle": "Giving directions in Mexican cities",
+          "content": "Common direction words: Go straight (sigue recto). Turn left (gira a la izquierda). Turn right (gira a la derecha). Take the first left / second right. Walk two blocks. It is on the corner of... Pass the church / market / traffic light. It is opposite / next to / behind / in front of... Mexican cities often use landmark-based directions (vamos a la catedral, al mercado) rather than street names; teach students to use both: Walk past the Zocalo, then turn right at the Palacio Nacional."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Which sentence is a correct imperative?",
+          "options": ["Turn left at the corner.", "You should turn left at the corner.", "You must to turn left at the corner.", "Turning left at the corner."],
+          "correct": "Turn left at the corner."
+        },
+        {
+          "question": "Choose the correct sequence connector for the FIRST step of a recipe:",
+          "options": ["First, wash the vegetables.", "Finally, wash the vegetables.", "After that, wash the vegetables.", "Then, wash the vegetables."],
+          "correct": "First, wash the vegetables."
+        },
+        {
+          "question": "How do you ask for directions politely?",
+          "options": ["Could you tell me how to get to the museum?", "Tell me where the museum is.", "Where museum?", "I want museum direction."],
+          "correct": "Could you tell me how to get to the museum?"
+        },
+        {
+          "question": "What does Don't turn right mean?",
+          "options": ["You should not turn right (prohibition/instruction)", "Please turn right", "Turn right carefully", "You may turn right"],
+          "correct": "You should not turn right (prohibition/instruction)"
+        }
+      ],
+      "rubric": "Nivel 4: Gives clear, logically sequenced instructions using imperatives and connectors; confidently gives directions on a map; writes a complete recipe with correct imperatives and all sequence connectors; Nivel 3: Uses imperatives and connectors correctly in most cases; directions and recipes are clear but may miss some steps; Nivel 2: Understands the imperative but uses few connectors or in wrong order; Nivel 1: Cannot produce imperative sentences or does not sequence instructions."
+    },
+    "teacher_tips": [
+      "The map activity works best with a real local map (e.g., the centro historico of the nearest city to the school); students are far more engaged when navigating their own city in English.",
+      "The guacamole or agua de jamaica recipe activity is fun and culturally affirming; if possible, bring actual ingredients and have students give instructions while the teacher or a student follows them.",
+      "Simon Says is an excellent game for practicing imperatives kinesthetically: use classroom commands (Stand up! Touch your nose! Don't move!) to make the grammar physical and memorable.",
+      "Connect to SECTUR tourism training: Mexico's tourism ministry has produced English-language training materials for guides and hotel staff; they are publicly available and model exactly the instruction-giving language taught here."
+    ]
+  },
+
+  "IN-III-P07": {
+    "code": "IN-III-P07",
+    "title": "Relata eventos cotidianos y su secuencia usando conectores narrativos",
+    "level": "Ingles III",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Produccion oral y escrita",
+    "metadata": {
+      "objective": "Narrar eventos cotidianos y anecdotas breves usando conectores narrativos (first, then, after that, suddenly, finally) y el Simple Past para estructurar una historia coherente con inicio, desarrollo y desenlace.",
+      "competencies": [
+        "Usa conectores narrativos de secuencia y contraste: first, then, suddenly, however, finally, in the end",
+        "Narra anecdotas personales en Simple Past con estructura inicio-desarrollo-desenlace",
+        "Usa el Past Progressive (was/were + -ing) para describir acciones en desarrollo cuando otra ocurrio",
+        "Escucha y comprende narraciones cortas en ingles sobre la vida cotidiana en Mexico",
+        "Escribe una narracion de al menos 150 palabras con coherencia y cohesion"
+      ],
+      "materials": [
+        "Modelo de narracion: The day of the earthquake in Mexico City (Sept 19, 1985 - historia adaptada)",
+        "Tarjetas de conectores narrativos plastificadas",
+        "Fotosecuencia de 6 imagenes para narrar una historia",
+        "Audio: una persona describe su experiencia en el terremoto de 2017",
+        "Rubrica de escritura narrativa para autoevaluacion"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "S1", "duration": "50 min", "label": "Conectores narrativos y Simple Past/Past Progressive"},
+        {"phase": "S2", "duration": "50 min", "label": "Narracion oral y escrita: anecdotas personales"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Motivar la narracion con una historia real significativa para Mexico.",
+          "activity": "El docente lee en voz alta el inicio de la narracion adaptada del sismo de 1985: It was September 19, 1985. The city of Mexico was sleeping. Suddenly, the earth shook. Buildings collapsed. People ran into the streets. In the end, the community came together. Pregunta: which connectors did you hear? The students identify: suddenly, in the end."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "S1: conectores narrativos + Past Progressive para acciones en curso. S2: fotosecuencia + narracion escrita propia.",
+          "activity": "S1: El docente explica el Past Progressive: was/were + -ing. Se usa para describir una accion en curso cuando otra la interrumpio: I was eating dinner when the earthquake started. She was sleeping when the alarm went off. Practica: 8 oraciones combinando Past Progressive + when + Simple Past. S2: En parejas, cada equipo recibe una fotosecuencia de 6 imagenes (una historia anonima sobre un dia comun: ir al mercado, perderse, encontrar un amigo, llegar tarde). Narran la historia oralmente primero, luego la escriben individualmente con al menos 100 palabras usando todos los conectores."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Lectura en voz alta y co-evaluacion narrativa.",
+          "activity": "Tres voluntarios leen su narracion. La clase evalua usando la rubrica: Was the story clear? Did they use connectors? Was the Past tense correct? El docente provee retroalimentacion oral colectiva."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Narrative is one of the most fundamental forms of human communication: we tell stories to share experiences, build identity, and connect with others. In English, narrative uses primarily the Simple Past for completed events, the Past Progressive for ongoing actions that were interrupted, and narrative connectors to create coherence and flow. These skills are essential for telling anecdotes, writing autobiographies, and comprehending stories in literature, film, and conversation.",
+      "sections": [
+        {
+          "subtitle": "Narrative connectors",
+          "content": "Sequence: First of all / To begin with / At first -- Then / Next / After that / Afterwards -- Finally / In the end / Eventually. Time: One day / That morning / That evening / At that moment / Suddenly / All of a sudden / Immediately. Contrast/surprise: However / But / Unexpectedly / To my surprise. Result: As a result / So / Therefore / That is why. Conclusion: In the end / Finally / Eventually / To sum up."
+        },
+        {
+          "subtitle": "Past Progressive: interrupted actions",
+          "content": "Form: was/were + verb-ing. Use: to describe an action in progress at a specific past moment (I was sleeping at 7 am). To describe a background action that was interrupted by a Simple Past event: I was walking to school WHEN it started raining. She was cooking dinner WHEN the lights went out. While she was studying, her phone rang. Key words: when (= the interruption moment), while (= the background action). Two ongoing actions: While I was reading, she was listening to music."
+        },
+        {
+          "subtitle": "Story structure",
+          "content": "A well-structured narrative has three parts. Opening (Setting): introduce when, where, and who. One morning last week, I was waiting for the metro in Mexico City... Development: describe the events in sequence. Suddenly, a tourist asked me for directions... After that, I realized I did not know the station she needed... Climax and Resolution: the key moment and how it ended. However, I used my phone to look it up. Finally, she caught her train and thanked me warmly. A good ending often includes a reflection: It made me realize that my English skills were actually useful."
+        },
+        {
+          "subtitle": "Mexico as narrative context",
+          "content": "Mexico has a rich oral and written storytelling tradition. The September 19 earthquakes (1985 and 2017) are events that most Mexican families can narrate personally. The Dia de Muertos tradition involves telling stories of deceased relatives. Market interactions, fiesta preparations, and migration journeys are common narrative subjects in Mexican communities. Using these real contexts for English narrative practice makes the language personally meaningful. The INALI has documented hundreds of oral narratives from indigenous communities in Mexico -- evidence that storytelling is a universal and culturally vital human practice."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Which connector introduces an unexpected event in a narrative?",
+          "options": ["Suddenly", "First", "Finally", "Then"],
+          "correct": "Suddenly"
+        },
+        {
+          "question": "Complete: She ___ dinner when the earthquake started.",
+          "options": ["was cooking", "cooked", "is cooking", "has cooked"],
+          "correct": "was cooking"
+        },
+        {
+          "question": "Which sentence correctly combines Past Progressive and Simple Past?",
+          "options": ["I was walking to school when I saw my friend.", "I was walk to school when I saw my friend.", "I walking to school when I see my friend.", "I walked to school when I was seeing my friend."],
+          "correct": "I was walking to school when I saw my friend."
+        },
+        {
+          "question": "Which connector signals the final resolution of a narrative?",
+          "options": ["In the end", "First of all", "Suddenly", "Next"],
+          "correct": "In the end"
+        }
+      ],
+      "rubric": "Nivel 4: Writes a coherent narrative of 150+ words using Simple Past and Past Progressive correctly, with a variety of narrative connectors and clear story structure (opening, development, resolution); oral narration is fluent and engaging; Nivel 3: Writes a coherent narrative of 100+ words with correct Simple Past; uses at least 4 different connectors; Past Progressive may have minor errors; Nivel 2: Produces a basic narrative with Simple Past but limited connectors or no Past Progressive; story structure is unclear; Nivel 1: Cannot produce a coherent narrative or consistently uses wrong tenses."
+    },
+    "teacher_tips": [
+      "The September 19 earthquake narrative is deeply meaningful for Mexican students; use it with sensitivity, acknowledging that some students may have personal experiences. The narrative is a linguistic model but also an opportunity for emotional connection.",
+      "The fotosecuencia activity (sequential photos) works for students who struggle to invent a story: the visual scaffold helps them focus on language rather than content.",
+      "Record student oral narrations (with permission) using a phone: listening back to themselves is powerful feedback and helps them identify areas for improvement.",
+      "Connect to Mexican literature: short stories by Juan Rulfo (like Nos han dado la tierra, studied in LC-III) use exactly these narrative techniques; a cross-curricular connection reinforces both subjects."
+    ]
+  },
+
+  "IN-III-P08": {
+    "code": "IN-III-P08",
+    "title": "Consolida habilidades del semestre en un proyecto integrador de comunicacion en ingles",
+    "level": "Ingles III",
+    "duration": "~4h (3 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Proyecto integrador",
+    "metadata": {
+      "objective": "Integrar las competencias comunicativas del semestre (Simple Past, Present Perfect, modales, instrucciones, narracion) en un proyecto significativo que produzca un texto multimodal en ingles sobre un tema de relevancia personal o comunitaria en Mexico.",
+      "competencies": [
+        "Selecciona y aplica las estructuras gramaticales apropiadas segun el proposito comunicativo",
+        "Produce un texto coherente de al menos 200 palabras en ingles con variedad lexical y gramatical",
+        "Revisa y edita el propio texto aplicando criterios de correccion gramatical y coherencia",
+        "Presenta el proyecto oralmente con confianza y claridad en ingles",
+        "Reflexiona sobre su propio proceso de aprendizaje del ingles y establece metas para el siguiente semestre"
+      ],
+      "materials": [
+        "Opciones de proyecto: blog post, guia de viaje, recetario bilingue, mini-documental guion, carta a un estudiante extranjero",
+        "Rubrica integrada de evaluacion (CEFR A2-B1)",
+        "Portafolio del semestre con las producciones previas",
+        "Formulario de autoevaluacion y reflexion",
+        "Pautas de correccion entre pares (peer correction checklist)"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "S1", "duration": "50 min", "label": "Eleccion del proyecto, planificacion y primer borrador"},
+        {"phase": "S2", "duration": "50 min", "label": "Revision entre pares y segunda version"},
+        {"phase": "S3", "duration": "50 min", "label": "Presentaciones finales y autoevaluacion del semestre"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Celebrar el progreso del semestre y motivar el proyecto final.",
+          "activity": "El docente pide a los estudiantes que abran su portafolio y seleccionen la produccion de la que se sienten mas orgullosos. En parejas comparten: what have you learned this semester? What was the most useful structure? What was the hardest? Esto activa la metacognicion y contextualiza el proyecto integrador."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "S1: eleccion y planificacion. S2: revision entre pares. S3: presentaciones finales.",
+          "activity": "S1: Cada estudiante elige un formato de proyecto y un tema de relevancia personal o comunitaria en Mexico. El docente aprueba los temas y cada estudiante escribe un primer borrador de al menos 200 palabras en clase. S2: Intercambian borradores con un companero; usan el peer correction checklist para identificar errores de Simple Past, Present Perfect, modales e instrucciones; el autor recibe el checklist y escribe la segunda version. S3: Cada estudiante presenta su proyecto en 3-4 minutos. La audiencia completa un formulario de retroalimentacion simple (dos cosas que te gustaron, una sugerencia)."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Autoevaluacion y metas para el siguiente semestre.",
+          "activity": "Cada estudiante completa el formulario de autoevaluacion: cual estructura del semestre usas con mas confianza? Cual todavia te cuesta trabajo? Que quieres mejorar en Ingles IV? El docente recoge los formularios como insumo para la planeacion del siguiente semestre."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "The integrating project is both an assessment tool and a metacognitive exercise. By choosing a personally meaningful topic and format, students demonstrate that they can use the English they have learned for real communicative purposes. The ability to produce coherent, grammatically varied text — moving beyond isolated exercises — is the mark of genuine language acquisition. In Mexico's educational context, the PRONI program (SEP) uses the CEFR as its reference framework; this project aligns with demonstrating A2-B1 level productive skills.",
+      "sections": [
+        {
+          "subtitle": "Grammar structures to integrate",
+          "content": "Simple Past: narrating past events with specific time references (visited, ate, went, did not study). Present Perfect: describing experiences without specifying when (have visited, have never tried, have already finished). Modals: must/have to for rules, should for advice and recommendations. Imperatives + sequence connectors: giving instructions step by step. There is/there are + descriptive adjectives: describing places. Frequency adverbs: describing habits and routines. Past Progressive + when/while: background actions interrupted."
+        },
+        {
+          "subtitle": "Project format options",
+          "content": "Blog post (150-200 words): a personal experience or recommendation about a Mexican topic. Travel guide (one page): describing 3 places in your state or city using descriptive vocabulary and There is/are. Bilingual recipe book page: a recipe in English for a traditional Mexican dish using imperatives and connectors. Letter to an exchange student: advising a future foreign student about life at your school using should/must/have to. Mini-documentary script (2 minutes): narrating a community story using Simple Past and narrative connectors."
+        },
+        {
+          "subtitle": "Self-assessment and CEFR reference",
+          "content": "The Common European Framework of Reference (CEFR) describes language ability in six levels: A1, A2, B1, B2, C1, C2. After two semesters of English in NEM, students should be around A1-A2. After Ingles III, the target is A2 with some B1 elements. A2 can do: understand sentences about personal and family information, shopping, local geography, and employment; communicate in simple and routine tasks; describe own background and immediate environment. The CENNI (Certificacion Nacional de Nivel de Idioma, SEP) certifies English levels for Mexican students; it is free and nationally recognized."
+        },
+        {
+          "subtitle": "Peer correction and collaborative editing",
+          "content": "Peer correction develops both writing skills (as author) and analytical skills (as reader). The checklist should include: Are verb tenses correct? (Simple Past / Present Perfect). Are modal verbs used correctly? Are sequence connectors present? Is the vocabulary varied (not the same words repeated)? Is the text organized (beginning, middle, end)? Peer correction is not about finding all errors but about helping the author see the text through a reader's eyes. It is a skill used by professional writers, journalists, and academics worldwide."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "The CEFR (Common European Framework of Reference) is used in Mexico mainly by:",
+          "options": ["The PRONI program (SEP) to describe English language levels", "The INEGI to measure literacy rates", "The IMSS to certify medical English", "The CONANP to train environmental guides"],
+          "correct": "The PRONI program (SEP) to describe English language levels"
+        },
+        {
+          "question": "In a blog post about visiting Oaxaca, which structure would you use to recommend a restaurant?",
+          "options": ["You should try the mole negro at the central market.", "You must have tried the mole negro.", "You had to try the mole negro.", "You should have try the mole negro."],
+          "correct": "You should try the mole negro at the central market."
+        },
+        {
+          "question": "A student writes: I have visited Guanajuato last year. What is wrong?",
+          "options": ["Should use Simple Past: I visited Guanajuato last year.", "Should add ever: I have ever visited Guanajuato last year.", "Nothing is wrong.", "Should use future: I will visit Guanajuato last year."],
+          "correct": "Should use Simple Past: I visited Guanajuato last year."
+        },
+        {
+          "question": "What is an A2 CEFR level student able to do in English?",
+          "options": ["Communicate in simple and routine tasks about familiar topics", "Give professional presentations in formal contexts", "Read academic articles without difficulty", "Write complex literary analysis"],
+          "correct": "Communicate in simple and routine tasks about familiar topics"
+        }
+      ],
+      "rubric": "Nivel 4: Produces a well-organized text of 200+ words integrating at least 5 grammar structures from the semester correctly; oral presentation is clear and confident; peer correction shows analytical understanding of the language; self-assessment is thoughtful and specific; Nivel 3: Produces a coherent text of 150+ words with correct use of 3-4 grammar structures; oral presentation is comprehensible; Nivel 2: Produces a text of 100+ words but with limited structural variety or significant grammatical errors; oral presentation is hesitant; Nivel 1: Cannot produce 100 words or the text does not demonstrate use of semester structures."
+    },
+    "teacher_tips": [
+      "Give students genuine choice in both format and topic: this is a research-backed strategy for increasing motivation and quality of output in language learning.",
+      "The peer correction activity is most effective when students have a specific checklist rather than just being told to correct each other. Generic feedback (this is good / this has errors) is less useful than targeted questions.",
+      "Keep the presentations short (3-4 minutes): more students can present, the audience stays engaged, and the format mimics real-world communication contexts.",
+      "Connect the final project to PRONI and CENNI: tell students that what they have been practicing -- describing places, giving advice, telling stories -- are exactly the competencies tested in the national English certification. This reframes the curriculum as preparation for a tangible credential."
+    ]
+  }
+}
+
+with open(OUT, "w", encoding="utf-8") as f:
+    json.dump(data, f, ensure_ascii=False, indent=2)
+
+print(f"Written {len(data)} progressions to {OUT}")

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import Sidebar from '@/components/dashboard/Sidebar';
 import { UAC_BASE } from '@/lib/mccems/estructura';
 import {
@@ -15,12 +16,12 @@ import {
 } from 'lucide-react';
 
 const SEMESTRES = [
-  { num: 1, title: 'Primer Semestre', desc: 'Lengua y Comunicación, Pensamiento Matemático, Ciencias Naturales y Ciencias Sociales — fundamentos del bachillerato MCCEMS.', color: 'from-[#011C40] to-[#0B2545]', accent: '#D4A574' },
-  { num: 2, title: 'Segundo Semestre', desc: 'Continuación de los recursos sociocognitivos fundamentales con nuevos saberes y progresiones de aprendizaje.', color: 'from-[#0B2545] to-[#1E40AF]', accent: '#7DD3FC' },
-  { num: 3, title: 'Tercer Semestre', desc: 'Profundización en Lengua, Matemáticas y Humanidades. Inicio de las áreas de conocimiento del Currículum Fundamental Extendido.', color: 'from-[#1E40AF] to-[#1e3a8a]', accent: '#D4A574' },
-  { num: 4, title: 'Cuarto Semestre', desc: 'Saberes avanzados y progresiones de mayor complejidad cognitiva. Vinculación con contextos reales y socioemocionales.', color: 'from-[#7c3aed] to-[#6d28d9]', accent: '#7DD3FC' },
-  { num: 5, title: 'Quinto Semestre', desc: 'UAC del Currículum Fundamental Extendido y Ampliado. Preparación para el egreso y acceso a educación superior.', color: 'from-[#0e7490] to-[#0369a1]', accent: '#D4A574' },
-  { num: 6, title: 'Sexto Semestre', desc: 'Cierre del trayecto formativo MCCEMS. Integración de saberes, metacognición y vinculación con la vida personal y social.', color: 'from-[#065f46] to-[#047857]', accent: '#7DD3FC' },
+  { num: 1, title: 'Primer Semestre', desc: 'Lengua y Comunicación, Pensamiento Matemático, Ciencias Naturales y Ciencias Sociales — fundamentos del bachillerato MCCEMS.', color: 'from-[#011C40] to-[#0B2545]', accent: '#D4A574', image: '/1.png', fade: '#011C40' },
+  { num: 2, title: 'Segundo Semestre', desc: 'Continuación de los recursos sociocognitivos fundamentales con nuevos saberes y progresiones de aprendizaje.', color: 'from-[#0B2545] to-[#1E40AF]', accent: '#7DD3FC', image: '/Imagenes carrusel/7.png', fade: '#0B2545' },
+  { num: 3, title: 'Tercer Semestre', desc: 'Profundización en Lengua, Matemáticas y Humanidades. Inicio de las áreas de conocimiento del Currículum Fundamental Extendido.', color: 'from-[#1E40AF] to-[#1e3a8a]', accent: '#D4A574', image: '/Imagenes carrusel/9.png', fade: '#1E40AF' },
+  { num: 4, title: 'Cuarto Semestre', desc: 'Saberes avanzados y progresiones de mayor complejidad cognitiva. Vinculación con contextos reales y socioemocionales.', color: 'from-[#7c3aed] to-[#6d28d9]', accent: '#7DD3FC', image: '/4.png', fade: '#7c3aed' },
+  { num: 5, title: 'Quinto Semestre', desc: 'UAC del Currículum Fundamental Extendido y Ampliado. Preparación para el egreso y acceso a educación superior.', color: 'from-[#0e7490] to-[#0369a1]', accent: '#D4A574', image: '/Imagenes carrusel/11.png', fade: '#0e7490' },
+  { num: 6, title: 'Sexto Semestre', desc: 'Cierre del trayecto formativo MCCEMS. Integración de saberes, metacognición y vinculación con la vida personal y social.', color: 'from-[#065f46] to-[#047857]', accent: '#7DD3FC', image: '/6.png', fade: '#065f46' },
 ];
 
 export default function ModulosPage() {
@@ -45,10 +46,10 @@ export default function ModulosPage() {
 
       <Sidebar />
 
-      <main className="flex-1 md:ml-[260px] relative z-10 custom-scrollbar md:overflow-y-auto md:h-screen flex flex-col">
+      <main className="flex-1 relative z-10 custom-scrollbar md:overflow-y-auto md:h-screen flex flex-col">
 
         {/* HUD Status Bar */}
-        <div className="sticky top-0 z-50 backdrop-blur-3xl border-b px-4 sm:px-8 md:px-12 py-4 flex items-center justify-between bg-[#011C40]/80 border-white/5 shadow-2xl">
+        <div className="sticky top-0 z-50 backdrop-blur-3xl border-b px-4 sm:px-8 md:pr-12 md:pl-6 py-4 flex items-center justify-between bg-[#011C40]/80 border-white/5 shadow-2xl">
           <div className="flex items-center gap-12">
             <div className="flex items-center gap-4">
               <div className="w-3 h-3 rounded-full animate-pulse shadow-[0_0_15px_rgba(212,165,116,0.5)] bg-[#D4A574]" />
@@ -69,7 +70,7 @@ export default function ModulosPage() {
         </div>
 
         {/* Main content */}
-        <div className="p-4 sm:p-8 md:p-12 space-y-8 lg:space-y-16 flex-1">
+        <div className="p-4 sm:p-8 md:pt-12 md:pr-12 md:pb-12 md:pl-0 space-y-8 lg:space-y-16 flex-1">
 
           {!selectedSemestre ? (
             <div className="space-y-12 lg:space-y-24">
@@ -103,27 +104,41 @@ export default function ModulosPage() {
                         className="group relative h-[400px] rounded-[3.5rem] overflow-hidden shadow-2xl transition-all duration-700 hover:-translate-y-4 cursor-pointer hover:shadow-[0_40px_90px_rgba(212,165,116,0.2)]"
                         style={{ animationDelay: `${i * 100}ms` }}
                       >
+                        {/* Fondo gradiente del card */}
                         <div className={`absolute inset-0 bg-gradient-to-br ${sem.color}`} />
-                        <div className="absolute inset-0 opacity-[0.05]"
-                          style={{ backgroundImage: 'linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px)', backgroundSize: '30px 30px' }}
-                        />
-                        <div className="absolute top-0 right-0 w-64 h-64 rounded-full blur-[80px] opacity-20" style={{ background: sem.accent }} />
 
-                        <div className="absolute inset-0 p-12 flex flex-col justify-between z-10 text-white">
+                        {/* Imagen mitad derecha */}
+                        <div className="absolute right-0 top-0 bottom-0 w-[55%]">
+                          <Image
+                            src={sem.image}
+                            alt={sem.title}
+                            fill
+                            className="object-cover object-center"
+                            sizes="(max-width: 768px) 50vw, 25vw"
+                          />
+                          {/* Degradado muy fuerte — sin corte visible */}
+                          <div
+                            className="absolute inset-0"
+                            style={{ background: `linear-gradient(to right, ${sem.fade} 0%, ${sem.fade}dd 15%, ${sem.fade}99 30%, ${sem.fade}44 50%, transparent 65%)` }}
+                          />
+                        </div>
+
+                        {/* Contenido — mitad izquierda */}
+                        <div className="absolute inset-0 p-10 flex flex-col justify-between z-10 text-white">
                           <div className="flex items-start justify-between">
                             <div className="px-5 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-2xl text-[#011C40]" style={{ background: sem.accent }}>
                               {sem.num}° Semestre
                             </div>
-                            <span className="text-5xl font-black tracking-tighter opacity-20 group-hover:opacity-100 transition-opacity">{sem.num}°</span>
+                            <span className="text-5xl font-black tracking-tighter opacity-20 group-hover:opacity-60 transition-opacity">{sem.num}°</span>
                           </div>
-                          <div className="space-y-6">
+                          <div className="space-y-5 max-w-[55%]">
                             <div>
-                              <h3 className="text-3xl font-black tracking-tighter leading-none mb-4 group-hover:translate-x-2 transition-transform">{sem.title}</h3>
-                              <p className="text-sm text-white/60 font-medium leading-relaxed line-clamp-3">{sem.desc}</p>
+                              <h3 className="text-2xl font-black tracking-tighter leading-tight mb-3 group-hover:translate-x-1 transition-transform">{sem.title}</h3>
+                              <p className="text-xs text-white/60 font-medium leading-relaxed line-clamp-3">{sem.desc}</p>
                             </div>
-                            <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                            <div className="flex items-center justify-between pt-3 border-t border-white/10">
                               <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: sem.accent }}>{uacCount} UAC</p>
-                              <ArrowRight className="w-6 h-6 transition-transform group-hover:translate-x-2" style={{ color: sem.accent }} />
+                              <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-2" style={{ color: sem.accent }} />
                             </div>
                           </div>
                         </div>

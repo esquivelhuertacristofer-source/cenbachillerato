@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+const isDev = process.env.NODE_ENV !== "production";
+
 const securityHeaders = [
   { key: "X-Frame-Options", value: "DENY" },
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -16,8 +18,9 @@ const securityHeaders = [
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      // Next.js inline scripts + React hydration (unsafe-eval removed)
-      "script-src 'self' 'unsafe-inline'",
+      // Next.js inline scripts + React hydration.
+      // 'unsafe-eval' SOLO en dev: Turbopack/HMR lo requieren. React nunca usa eval() en producción.
+      `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
       // Inline styles (React) + Font Awesome CSS from CDN
       "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com",
       // Font Awesome web fonts

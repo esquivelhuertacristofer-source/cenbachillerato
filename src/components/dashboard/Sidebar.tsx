@@ -43,7 +43,7 @@ export default function Sidebar({
   const pathname = usePathname();
 
   return (
-    <aside className="hidden md:flex fixed left-0 top-0 z-40 h-screen w-[260px] flex-col bg-[#011C40] overflow-hidden shadow-[20px_0_60px_rgba(1,28,64,0.3)] border-r border-white/5 font-['Epilogue'] transition-all noise-texture">
+    <aside className="hidden md:flex sticky top-0 z-40 h-screen w-[260px] flex-shrink-0 flex-col bg-[#011C40] overflow-hidden border-r border-white/10 font-['Epilogue'] transition-all noise-texture">
 
       {/* Decorative Gradient Glows */}
       <div className="absolute -left-20 -top-20 w-64 h-64 bg-[#D4A574]/30 rounded-full blur-[100px] pointer-events-none opacity-40 animate-pulse" />

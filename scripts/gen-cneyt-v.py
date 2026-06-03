@@ -1,0 +1,818 @@
+"""gen-cneyt-v.py — CNEYT V Física (Sem 5) — 8 progresiones completas."""
+import json, pathlib
+
+OUT = pathlib.Path(__file__).parent.parent / "src/data/planteamiento/cneyt-v.json"
+
+data = {
+  "CNEYT-V-P01": {
+    "code": "CNEYT-V-P01",
+    "title": "Aplica las leyes de Newton para analizar el movimiento y las fuerzas en situaciones cotidianas.",
+    "level": "CNEYT V",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Mecánica clásica",
+    "metadata": {
+      "objective": "Enunciar y aplicar las tres leyes de Newton del movimiento para analizar sistemas de fuerzas en equilibrio y en movimiento; construir diagramas de cuerpo libre; aplicar F=ma en problemas con friccón y planos inclinados.",
+      "competencies": [
+        "Enuncia las tres leyes de Newton y da ejemplos cotidianos de cada una.",
+        "Construye el diagrama de cuerpo libre para un objeto con múltiples fuerzas.",
+        "Aplica la segunda ley de Newton (ΣF=ma) para calcular aceleración, fuerza o masa.",
+        "Analiza situaciones de equilibrio (ΣF=0) y movimiento (ΣF≠0) con fricción."
+      ],
+      "materials": [
+        "Dinámetros (balanzas de resorte) para medir fuerzas.",
+        "Plano inclinado ajustable, carros de juguete y masas calibradas.",
+        "Contexto: frenado de emergencia del Metro CDMX (STC-Metro: sistema de frenos neumáticos).",
+        "Diagrama de fuerzas impreso para rellenar.",
+        "Datos: peso promedio de un vagón del Metro CDMX = 38 toneladas; desaceleración de frenado = 1.2 m/s²."
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "Apertura", "duration": "10 min", "label": "¿Por qué te 'jala' hacia adelante al frenar?"},
+        {"phase": "Desarrollo", "duration": "30 min", "label": "Tres leyes de Newton y diagramas de cuerpo libre"},
+        {"phase": "Cierre", "duration": "10 min", "label": "Aplicación: frenado de emergencia del Metro"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Pregunta cotidiana: 'Cuando el Metro frena bruscamente, ¿por qué tu cuerpo se lanza hacia adelante? ¿Alguna fuerza te empuja?' La respuesta involucra la 1ª ley de Newton (inercia). Se presentan 3 situaciones cotidianas: libro en reposo, pelota lanzada, acción-reacción al empujar la pared.",
+          "activity": "Los estudiantes predicen qué ocurre en cada situación y cuál ley de Newton está involucrada. Votación y discusión. Corrección colectiva."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "LEY 1 (INERCIA): un objeto permanece en reposo o en movimiento rectilíneo uniforme a menos que una fuerza neta actúe sobre él. LEY 2 (F=ma): la fuerza neta sobre un objeto es igual a su masa por su aceleración. ΣF=ma. Unidades: fuerza en Newtons [N=kg·m/s²]. LEY 3 (ACCIÓN-REACCIÓN): si A ejerce fuerza sobre B, B ejerce una fuerza igual y opuesta sobre A. DIAGRAMA DE CUERPO LIBRE (DCL): representación de TODAS las fuerzas sobre UN objeto. Fuerzas comunes: peso (W=mg hacia abajo), normal (N perpendicular a la superficie), tensión (T a lo largo de la cuerda), fricción (f opuesta al movimiento). FRICCIÓN: f_estática_máx = μₑN; f_cinética = μₖN. PLANO INCLINADO: descomponer peso en componentes paralela y perpendicular al plano.",
+          "activity": "Laboratorio rápido: jalando un libro con un dinámetro, medir la fuerza necesaria para: (1) mantenerlo en reposo, (2) moverlo a velocidad constante, (3) acelerarlo. Comparar las tres lecturas. Calcular el coeficiente de fricción cinética."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Aplicación Metro CDMX: vagón de 38 ton que frena a 1.2 m/s². Fuerza de frenado: F=ma=38,000kg × 1.2 m/s²=45,600 N=45.6 kN. Si hay 300 pasajeros de 70 kg promedio: masa total=38,000+21,000=59,000 kg; F_frenado=70,800 N. Ingenieros del STC-Metro deben calcular estas fuerzas para el sistema de frenos.",
+          "activity": "Reflexión: la 3ª ley explica que si el Metro frena a los pasajeros, los pasajeros 'frenan' al Metro (fuerza de reacción). ¿Por qué no sentimos que empujamos el Metro? Masa relativa."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Las tres leyes de Newton, publicadas en los Principia Mathematica (1687), son los fundamentos de la mecánica clásica. Son válidas para velocidades mucho menores que la de la luz y objetos mucho mayores que los átomos. Prácticamente toda la ingeniería civil, mecánica y aeroespacial se basa en ellas. El STC-Metro de CDMX, PEMEX-perforación y la Agencia Espacial Mexicana (AEM) aplican estas leyes cotidianamente.",
+      "sections": [
+        {
+          "subtitle": "Las tres leyes y sus implicaciones",
+          "content": "1ª Ley: define la inercia (tendencia a resistir cambios en el estado de movimiento) y el concepto de 'sistema de referencia inercial'. 2ª Ley: F=ma es vectorial: tanto F como a son vectores. En componentes cartesianas: ΣFx=max; ΣFy=may. La masa m es la medida de la inercia. 3ª Ley: las fuerzas acción-reacción actúan sobre objetos DIFERENTES, nunca sobre el mismo. NO se 'cancelan' porque actúan sobre cuerpos distintos."
+        },
+        {
+          "subtitle": "Diagrama de cuerpo libre: metodología",
+          "content": "Pasos: (1) Identificar el objeto de estudio. (2) Aislar mentalmente el objeto de su entorno. (3) Identificar todas las fuerzas que actúan SOBRE el objeto (no las que el objeto ejerce). (4) Representar cada fuerza como un vector desde el centro de masa. (5) Establecer ejes de coordenadas convenientes. (6) Escribir la segunda ley en cada eje. El error más común: incluir fuerzas que el objeto ejerce sobre otros (3ª ley) en el DCL del objeto."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Un objeto de 5 kg experimenta una fuerza neta de 20 N. Su aceleración es:",
+          "options": ["4 m/s²", "100 m/s²", "0.25 m/s²", "25 m/s²"],
+          "correct": "4 m/s²"
+        },
+        {
+          "question": "La fricción cinética entre dos superficies:",
+          "options": [
+            "Es proporcional a la fuerza normal y actúa en dirección opuesta al movimiento",
+            "Es mayor que la fricción estática",
+            "Actúa en la misma dirección que el movimiento",
+            "Es independiente de la fuerza normal"
+          ],
+          "correct": "Es proporcional a la fuerza normal y actúa en dirección opuesta al movimiento"
+        },
+        {
+          "question": "En la 3ª ley de Newton, las fuerzas de acción y reacción:",
+          "options": [
+            "Son iguales en magnitud, opuestas en dirección y actúan sobre cuerpos diferentes",
+            "Actúan sobre el mismo objeto y se cancelan",
+            "La reacción es siempre mayor que la acción",
+            "Solo existen cuando los objetos están en contacto"
+          ],
+          "correct": "Son iguales en magnitud, opuestas en dirección y actúan sobre cuerpos diferentes"
+        }
+      ],
+      "rubric": "4: Construye DCL correcto, aplica F=ma con fuerzas en componentes, incluye fricción y analiza acción-reacción. 3: DCL correcto con errores menores en componentes. 2: Identifica las fuerzas pero no construye el DCL correctamente. 1: Confunde las tres leyes o aplica F=ma sin identificar la fuerza neta."
+    },
+    "teacher_tips": [
+      "El laboratorio con dinámetros y libro sobre mesa es simple y muy instructivo — hacerlo siempre.",
+      "El contexto del Metro CDMX es inmediatamente relevante para estudiantes urbanos.",
+      "Error más frecuente: incluir la fuerza de reacción en el diagrama del objeto estudiado. Repetir: 'En el DCL solo van las fuerzas SOBRE el objeto, no las que el objeto ejerce'.",
+      "Conectar con PM-V P01 (cálculo): la derivada de la velocidad es la aceleración — el puente entre cálculo y física."
+    ]
+  },
+
+  "CNEYT-V-P02": {
+    "code": "CNEYT-V-P02",
+    "title": "Describe el movimiento rectilíneo uniforme y uniformemente acelerado con representaciones gráficas y ecuaciones.",
+    "level": "CNEYT V",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Cinemática",
+    "metadata": {
+      "objective": "Describir y analizar el MRU (velocidad constante) y el MRUV (aceleración constante) usando ecuaciones cinemáticas y representaciones gráficas x-t, v-t, a-t; aplicar las ecuaciones del MRUV a caída libre y lanzamiento vertical.",
+      "competencies": [
+        "Distingue MRU de MRUV por sus gráficas x-t, v-t, a-t.",
+        "Aplica las cuatro ecuaciones del MRUV: v=v₀+at; x=x₀+v₀t+½at²; v²=v₀²+2a(x−x₀); x=x₀+½(v+v₀)t.",
+        "Analiza la caída libre (a=g=9.8 m/s²) y el lanzamiento vertical.",
+        "Interpreta el área bajo la curva v-t como desplazamiento y la pendiente de v-t como aceleración."
+      ],
+      "materials": [
+        "Sensor de movimiento (ultrasonido) conectado a computadora, o cámara de celular para análisis de video (app Tracker).",
+        "Pelota de tenis para caída libre medida con celular (app PhyPhox o video).",
+        "Datos de la carrera de Atletismo 100m: Usain Bolt (9.58 s, 2009) y Ana Guevara (49.26 s en 400m, OM 2003).",
+        "Papel milimetrado para gráficas x-t, v-t, a-t."
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "Apertura", "duration": "10 min", "label": "Usain Bolt vs Ana Guevara: velocidad vs aceleración"},
+        {"phase": "Desarrollo", "duration": "30 min", "label": "MRU, MRUV y ecuaciones cinemáticas"},
+        {"phase": "Cierre", "duration": "10 min", "label": "Caída libre: midiendo g con el celular"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Datos: Usain Bolt corre 100m en 9.58s. Ana Guevara corrió 400m en 49.26s en los Juegos Olímpicos de Atenas 2003 (medalla de plata). ¿Cuál tiene mayor velocidad media? ¿Corren a velocidad constante? ¿Qué ocurre en la salida (aceleración)?",
+          "activity": "Los estudiantes calculan velocidad media para Bolt (≈10.4 m/s) y Guevara (≈8.1 m/s). Discuten: '¿Esta velocidad es igual en todo el recorrido?' No — hay aceleración en los primeros metros."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "MRU: velocidad constante v=cte; x=x₀+vt. Gráfica x-t: línea recta con pendiente v. Gráfica v-t: línea horizontal. Gráfica a-t: línea en a=0. MRUV: aceleración constante a=cte. Las 4 ecuaciones cinemáticas: (1) v=v₀+at. (2) x=x₀+v₀t+½at². (3) v²=v₀²+2a(x−x₀). (4) x=x₀+½(v+v₀)t. Gráfica x-t: parábola. Gráfica v-t: línea recta (pendiente=a). El área bajo v-t = desplazamiento. CAÍDA LIBRE: caso especial de MRUV con a=g≈9.8 m/s² (hacia abajo). Resistencia del aire despreciada. Lanzamiento vertical (hacia arriba): a=−g; en el punto más alto v=0. LANZAMIENTO DESDE UNA ALTURA h: si se deja caer desde reposo: v=√(2gh); t=√(2h/g).",
+          "activity": "Laboratorio: dejar caer una pelota desde h=1.5 m. Medir el tiempo de caída con el celular (app PhyPhox). Calcular g experimental. Comparar con 9.8 m/s². Análisis de error porcentual."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Aplicación: el CENAPRED monitorea el tiempo de llegada de las ondas sísmicas P y S para calcular el epicentro. Las ondas se modelan con cinemática. Otra aplicación: el Sistema de Alerta Sísmica Mexicano (SASMEX) calcula tiempos de llegada usando velocidades conocidas de propagación.",
+          "activity": "Síntesis gráfica: los estudiantes dibujan en el mismo papel las tres gráficas (x-t, v-t, a-t) para MRU y MRUV, anotando qué característica gráfica distingue cada caso."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La cinemática describe el movimiento sin considerar las causas (fuerzas). Las ecuaciones del MRUV, derivadas por Galileo en el siglo XVII (confirmadas con experimentos en el plano inclinado de Pisa), son la base de la balística, la aeronáutica y la ingeniería de transporte. México tiene referentes propios: el análisis del movimiento sísmico por el CENAPRED usa cinemática de ondas.",
+      "sections": [
+        {
+          "subtitle": "Las cuatro ecuaciones del MRUV y su derivación",
+          "content": "De a=cte: integrando → v=v₀+at (ecs. 1). Integrando de nuevo → x=x₀+v₀t+½at² (ecs. 2). Eliminando t de (1) y (2): v²=v₀²+2a(x-x₀) (ecs. 3). Promediando velocidades (solo para a=cte): x=x₀+½(v+v₀)t (ecs. 4). Cada ecuación conecta 4 de las 5 variables (x₀, x, v₀, v, a, t) — para resolver un problema, identificar las 3 conocidas y la incógnita y seleccionar la ecuación que las conecta."
+        },
+        {
+          "subtitle": "Interpretación gráfica de la cinemática",
+          "content": "Pendiente de x-t = velocidad. Pendiente de v-t = aceleración. Área bajo v-t = desplazamiento. Área bajo a-t = cambio en velocidad. Estas relaciones gráficas anticipan el cálculo: la pendiente es la derivada y el área es la integral — conexión fundamental entre física y matemáticas que el estudiante de PM-V ya conoce."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Un auto parte del reposo y acelera uniformemente a 3 m/s² durante 8 s. Su velocidad final es:",
+          "options": ["24 m/s", "11 m/s", "8 m/s", "3 m/s"],
+          "correct": "24 m/s"
+        },
+        {
+          "question": "En la gráfica v-t de un MRUV, la pendiente representa:",
+          "options": ["La aceleración", "La velocidad", "El desplazamiento", "La posición"],
+          "correct": "La aceleración"
+        },
+        {
+          "question": "Un objeto cae libremente desde 80 m de altura (g=10 m/s²). El tiempo de caída es:",
+          "options": ["4 s", "8 s", "√8 s≈2.8 s", "16 s"],
+          "correct": "4 s"
+        }
+      ],
+      "rubric": "4: Aplica las 4 ecuaciones correctamente, selecciona la apropiada según las variables dadas, grafica MRU y MRUV e interpreta. 3: Aplica 2-3 ecuaciones con errores menores. 2: Aplica la ecuación x=v₀t+½at² pero no selecciona la más eficiente. 1: No distingue MRU de MRUV."
+    },
+    "teacher_tips": [
+      "La medición de g con el celular (PhyPhox o análisis de video con Tracker) es uno de los experimentos más gratificantes y accesibles.",
+      "Ana Guevara como referente deportivo mexicano y latinoamericano es una conexión de identidad importante.",
+      "Conectar explícitamente con PM-V: 'La pendiente de x-t es la derivada = velocidad. El área bajo v-t es la integral = desplazamiento.'",
+      "El SASMEX como aplicación real de la cinemática es muy motivante — muestra que la física salva vidas en México."
+    ]
+  },
+
+  "CNEYT-V-P03": {
+    "code": "CNEYT-V-P03",
+    "title": "Analiza la gravitación universal y sus implicaciones en el sistema solar y la exploración espacial.",
+    "level": "CNEYT V",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Avanzado",
+    "category": "Mecánica celeste",
+    "metadata": {
+      "objective": "Enunciar y aplicar la ley de gravitación universal de Newton; calcular fuerzas gravitacionales; analizar las leyes de Kepler sobre las órbitas planetarias; relacionar la gravitación con la exploración espacial y los satélites artificiales, incluyendo los esfuerzos mexicanos.",
+      "competencies": [
+        "Calcula la fuerza gravitacional usando F=Gm₁m₂/r².",
+        "Explica la relación entre la gravitación y el peso de los objetos (W=mg).",
+        "Describe las tres leyes de Kepler sobre el movimiento planetario.",
+        "Relaciona la velocidad orbital de satélites con la gravitación; conecta con la Agencia Espacial Mexicana (AEM)."
+      ],
+      "materials": [
+        "Simulación del sistema solar en GeoGebra o Phet Simulations (gratuito).",
+        "Datos de la AEM (aem.gob.mx): satélites Morelos y MexSat.",
+        "Tabla de masas y distancias de los planetas del sistema solar.",
+        "Calculadora científica para cálculos con G=6.674×10⁻¹¹ N·m²/kg².",
+        "Video de la misión UNAMSAT-B (primer satélite universitario mexicano, 1996)."
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "Apertura", "duration": "10 min", "label": "¿Por qué la Luna no cae hacia la Tierra?"},
+        {"phase": "Desarrollo", "duration": "30 min", "label": "Ley de gravitación, Kepler y órbitas"},
+        {"phase": "Cierre", "duration": "10 min", "label": "Satélites mexicanos: AEM y MexSat"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "La manzana de Newton: ¿la misma fuerza que cae la manzana es la que 'mueve' la Luna? La Luna sí cae hacia la Tierra — pero como se mueve horizontalmente a gran velocidad, la Tierra 'se curva' ante ella. Newton unificó la caída de objetos en la Tierra con el movimiento de los cuerpos celestes. Pregunta: ¿cuánto pesas en la Luna? (g_Luna = 1.63 m/s² ≈ g/6).",
+          "activity": "Los estudiantes calculan su peso en la Luna, Marte (g=3.72 m/s²) y Júpiter (g=24.79 m/s²). Discusión: ¿la masa cambia? ¿El peso? Distinción clave: masa (propiedad intrínseca) vs peso (fuerza gravitacional)."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "LEY DE GRAVITACIÓN UNIVERSAL (Newton, 1687): F = Gm₁m₂/r². G = 6.674×10⁻¹¹ N·m²/kg² (constante de gravitación universal). La fuerza es siempre atractiva y actúa a lo largo de la línea que une los centros. PESO: W = mg donde g = GM_Tierra/R²_Tierra ≈ 9.8 m/s². LEYES DE KEPLER (formuladas 70 años ANTES que Newton): (1ª) Las órbitas son elipses con el Sol en un foco. (2ª) La línea planeta-Sol barre áreas iguales en tiempos iguales (conservación del momento angular). (3ª) T²/a³ = constante para todos los planetas (T=período, a=semieje mayor). SATÉLITES ARTIFICIALES: velocidad orbital circular: v=√(GM/r); para la Estación Espacial Internacional: r≈6700 km, v≈7.7 km/s, T≈92 min.",
+          "activity": "Simulación PhET 'My Solar System': los estudiantes crean un sistema de dos cuerpos, varían masas y distancias y observan las órbitas. Verifican las leyes de Kepler cualitativamente. Calculan la fuerza gravitacional Tierra-Luna: F=GMm/r²=6.674×10⁻¹¹×6×10²⁴×7.35×10²²/(3.84×10⁸)²≈2×10²⁰ N."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "AEM (Agencia Espacial Mexicana, fundada 2010): satélites Morelos (telecomunicaciones), MexSat-1 y MexSat-3 (comunicaciones militares y de emergencia). UNAMSAT-B (1996): primer satélite diseñado y construido en México (UNAM). El 'Plan Nacional del Espacio' incluye nanosatélites tipo CubeSat. México es miembro de la COPUOS (Comité ONU para el Uso Pacífico del Espacio Ultraterrestre).",
+          "activity": "Cálculo: MexSat-1 en órbita geoestacionaria a r=42,000 km. ¿Cuál es su período? Usar T²/a³=T²_Tierra/a³_Tierra (con T_Tierra=1 año, a_Tierra=150×10⁶ km). Alternativamente: v=√(GM/r) y T=2πr/v."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La ley de gravitación universal fue uno de los mayores logros intelectuales de la historia: explicar con una sola ecuación tanto la caída de una manzana como las órbitas de los planetas. Las leyes de Kepler (1609-1619) fueron los datos que Newton explicó con la gravitación. Hoy, esta teoría guía el diseño de todos los satélites artificiales, incluyendo los mexicanos.",
+      "sections": [
+        {
+          "subtitle": "La constante G y su medición",
+          "content": "La constante G=6.674×10⁻¹¹ N·m²/kg² fue medida por Henry Cavendish en 1798 usando una balanza de torsión. Su valor extremadamente pequeño explica por qué la gravedad entre objetos cotidianos es imperceptible pero la gravedad entre cuerpos astronómicos (masas enormes) es dominante. El experimento de Cavendish también permitió calcular la masa de la Tierra por primera vez: M_Tierra = gR²/G ≈ 5.97×10²⁴ kg."
+        },
+        {
+          "subtitle": "Velocidades de escape y satélites",
+          "content": "Velocidad de escape: la velocidad mínima para escapar del campo gravitacional sin propulsión adicional: v_esc = √(2GM/R). Para la Tierra: v_esc ≈ 11.2 km/s. Satélite en órbita circular: la gravedad proporciona la fuerza centrípeta: GMm/r² = mv²/r → v = √(GM/r). Para r mayor (órbita más alta): v menor (el satélite se mueve más lento). Órbita geoestacionaria: T=24h, r≈42,000 km — el satélite permanece fijo sobre un punto de la Tierra."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál es el efecto de duplicar la distancia entre dos masas en la fuerza gravitacional?",
+          "options": [
+            "La fuerza se reduce a la cuarta parte",
+            "La fuerza se reduce a la mitad",
+            "La fuerza se duplica",
+            "La fuerza no cambia"
+          ],
+          "correct": "La fuerza se reduce a la cuarta parte"
+        },
+        {
+          "question": "La 2ª ley de Kepler establece que el área barrida por la línea planeta-Sol es:",
+          "options": [
+            "Igual en tiempos iguales (independiente de la posición en la órbita)",
+            "Mayor cuando el planeta está lejos del Sol",
+            "Proporcional al cuadrado del período",
+            "Igual al semieje mayor de la elipse"
+          ],
+          "correct": "Igual en tiempos iguales (independiente de la posición en la órbita)"
+        },
+        {
+          "question": "Un satélite en órbita geoestacionaria:",
+          "options": [
+            "Tiene un período orbital igual al período de rotación de la Tierra (24 h)",
+            "Está a la misma distancia de todos los puntos de la Tierra",
+            "Es inmune a la atracción gravitacional",
+            "Viaja a la velocidad de la luz"
+          ],
+          "correct": "Tiene un período orbital igual al período de rotación de la Tierra (24 h)"
+        }
+      ],
+      "rubric": "4: Aplica la ley de gravitación correctamente, explica las leyes de Kepler y calcula velocidades/períodos orbitales. 3: Aplica la ley y explica 2 leyes de Kepler con errores menores. 2: Usa la fórmula F=Gm₁m₂/r² pero confunde masa y peso. 1: Confunde gravitación universal con el peso simple."
+    },
+    "teacher_tips": [
+      "La simulación PhET 'My Solar System' es gratuita y visualmente impactante — preparar la URL antes de clase.",
+      "La AEM (aem.gob.mx) tiene material educativo sobre los satélites mexicanos — usarlo para contextualizar.",
+      "El cálculo del peso en diferentes planetas siempre genera entusiasmo y conecta con identidad científica.",
+      "Para estudiantes avanzados: derivar la 3ª ley de Kepler a partir de F=Gm₁m₂/r² y F_c=mv²/r — excelente ejercicio integrador."
+    ]
+  },
+
+  "CNEYT-V-P04": {
+    "code": "CNEYT-V-P04",
+    "title": "Explica el movimiento ondulatorio y sus características (amplitud, frecuencia, longitud de onda, velocidad).",
+    "level": "CNEYT V",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Ondas y oscilaciones",
+    "metadata": {
+      "objective": "Describir las características fundamentales de las ondas mecánicas (amplitud, frecuencia, período, longitud de onda, velocidad de propagación); distinguir ondas transversales de longitudinales; relacionar v=fλ; aplicar estos conceptos a ondas sísmicas, sonido y cuerdas musicales.",
+      "competencies": [
+        "Identifica y calcula las cuatro magnitudes características de una onda.",
+        "Distingue ondas transversales (cuerda, luz) de longitudinales (sonido, P sísmica).",
+        "Aplica la ecuación v=fλ para resolver problemas de ondas.",
+        "Relaciona el movimiento ondulatorio con sismos y el sonido en contextos mexicanos."
+      ],
+      "materials": [
+        "Cuerda o resorte slinky para demostrar ondas transversales y longitudinales.",
+        "Aplicación de onda en PhET: 'Wave on a String' (gratuito).",
+        "Datos del CENAPRED: velocidad de ondas P (6-8 km/s) y S (3.5-4.5 km/s) en la corteza.",
+        "Instrumentos musicales tradicionales mexicanos (guitarra, marimba): frecuencias de notas.",
+        "Audio de la alarma sísmica de la CDMX (SASMEX) como contextualización."
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "Apertura", "duration": "10 min", "label": "La onda sísmica: energía sin materia que viaja"},
+        {"phase": "Desarrollo", "duration": "30 min", "label": "Características de las ondas y v=fλ"},
+        {"phase": "Cierre", "duration": "10 min", "label": "Ondas en la guitarra y la marimba"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Cuando un sismo ocurre, las rocas no viajan de Guerrero a CDMX — la energía sí. Una ola del mar llega a Acapulco: el agua no viaja desde el Pacífico profundo, sino que transmite energía hacia la costa. Definición: una onda es una perturbación que transfiere energía de un punto a otro sin transportar materia.",
+          "activity": "Demostración con slinky: onda transversal (perturbación perpendicular a la propagación) y onda longitudinal (perturbación paralela a la propagación). Los estudiantes identifican cuál es cuál y ponen ejemplos."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "Características de una onda: AMPLITUD A: máximo desplazamiento del medio respecto al equilibrio. Relacionada con la energía: E ∝ A². PERÍODO T: tiempo en completar un ciclo completo. FRECUENCIA f=1/T: número de ciclos por segundo [Hz]. LONGITUD DE ONDA λ: distancia entre dos puntos en fase (cresta a cresta). VELOCIDAD v=fλ=λ/T. La velocidad depende del medio, no de la frecuencia. Tipos de ondas mecánicas: TRANSVERSALES (vibraci perpendicular a propagación): onda en cuerda, onda S sísmica, onda de agua. LONGITUDINALES (vibración paralela a propagación): sonido, onda P sísmica. Sonido en aire: v≈340 m/s a 20°C. Ondas sísmicas P: v≈6-8 km/s en corteza; S: v≈3.5-4.5 km/s. El SASMEX detecta las ondas P (más rápidas, menos destructivas) y da tiempo de aviso antes de que lleguen las ondas S (más lentas, más destructivas).",
+          "activity": "Simulación PhET 'Wave on a String': variar amplitud, frecuencia y tensión de la cuerda. Observar cómo cambia la longitud de onda manteniendo v constante. Calcular: para un sonido de 440 Hz (nota La), λ=v/f=340/440≈0.77 m."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Ondas en instrumentos musicales mexicanos: la marimba (instrumento nacional de México, patrimonio cultural inmaterial de la UNESCO) produce sonido por ondas transversales en placas de madera resonando con tubos de metal. La guitarra: las cuerdas vibran produciendo ondas estacionarias; la frecuencia depende de la longitud, tensión y densidad lineal de la cuerda.",
+          "activity": "Cálculo: si la cuerda de guitarra tiene v=320 m/s y vibra en su modo fundamental (longitud L=0.65 m: λ=2L=1.30 m), f=v/λ=320/1.30≈246 Hz (nota Si₃). Conexión entre física y música."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "El movimiento ondulatorio es uno de los fenómenos más universales de la naturaleza: desde las ondas sísmicas que el CENAPRED monitorea hasta la música de la marimba chiapaneca, desde las microondas del horno hasta la luz visible. Comprender las ondas es comprender cómo se transmite la información y la energía en el universo.",
+      "sections": [
+        {
+          "subtitle": "La función de onda y la ecuación de onda",
+          "content": "Una onda sinusoidal se describe por: y(x,t)=A·sen(2πx/λ−2πt/T+φ). Los términos 2π/λ=k (número de onda) y 2π/T=ω (frecuencia angular) dan: y=A·sen(kx−ωt+φ). La velocidad de fase es v=ω/k=fλ. La energía transportada por una onda es proporcional al cuadrado de la amplitud (E∝A²) y a la frecuencia (E∝f²), con variaciones según el tipo de onda."
+        },
+        {
+          "subtitle": "Ondas sísmicas en México: aplicación del CENAPRED",
+          "content": "En un sismo, se generan varios tipos de ondas: Ondas P (Primary, compresionales, longitudinales): más rápidas, v≈6-8 km/s. Ondas S (Secondary, de corte, transversales): más lentas, v≈3.5-4.5 km/s, más destructivas. El tiempo entre la llegada de P y S permite calcular la distancia al epicentro: d=(t_S−t_P)×v_P×v_S/(v_P−v_S). El SASMEX (Sistema de Alerta Sísmica Mexicano) detecta ondas P cerca de la costa de Guerrero y Oaxaca y da hasta 60 segundos de aviso previo a la llegada de ondas S a CDMX."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Una onda tiene frecuencia de 200 Hz y longitud de onda de 1.7 m. Su velocidad es:",
+          "options": ["340 m/s", "200 m/s", "1.7 m/s", "117 m/s"],
+          "correct": "340 m/s"
+        },
+        {
+          "question": "Las ondas P sísmicas son de tipo:",
+          "options": [
+            "Longitudinal (la vibración es paralela a la propagación)",
+            "Transversal (la vibración es perpendicular a la propagación)",
+            "Electromagnética",
+            "Superficial únicamente"
+          ],
+          "correct": "Longitudinal (la vibración es paralela a la propagación)"
+        },
+        {
+          "question": "¿Cuál magnitud de la onda está relacionada con la energía que transporta?",
+          "options": ["La amplitud", "La frecuencia", "La longitud de onda", "La velocidad"],
+          "correct": "La amplitud"
+        }
+      ],
+      "rubric": "4: Calcula las 4 magnitudes de la onda, aplica v=fλ y distingue ondas transversales de longitudinales con ejemplos sísmicos y sonoros. 3: Calcula con v=fλ y distingue tipos con errores menores. 2: Identifica las magnitudes pero no aplica la relación v=fλ. 1: Confunde los tipos de onda."
+    },
+    "teacher_tips": [
+      "El slinky es insustituible para la demostración dual transversal/longitudinal — conseguir uno antes de la clase.",
+      "La conexión SASMEX-ondas P/S es de vida o muerte — los estudiantes lo reciben con seriedad y atención.",
+      "La marimba como instrumento de física acústica conecta con identidad cultural chiapaneca y guatemalteca.",
+      "PhET 'Wave on a String' es gratuito, funciona en celular y es muy visual — preparar actividad guiada."
+    ]
+  },
+
+  "CNEYT-V-P05": {
+    "code": "CNEYT-V-P05",
+    "title": "Describe el espectro electromagnético y sus aplicaciones tecnológicas y biomédicas.",
+    "level": "CNEYT V",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Ondas electromagnéticas",
+    "metadata": {
+      "objective": "Describir las características y regiones del espectro electromagnético (ondas de radio, microondas, infrarrojo, visible, ultravioleta, rayos X y rayos gamma); relacionar cada región con sus aplicaciones tecnológicas y efectos sobre la salud; analizar las aplicaciones en telecomunicaciones y medicina en México.",
+      "competencies": [
+        "Describe el espectro EM ordenado por frecuencia/longitud de onda.",
+        "Relaciona cada región del espectro con su aplicación tecnológica específica.",
+        "Analiza los efectos biológicos de las distintas radiaciones (ionizantes y no ionizantes).",
+        "Evalúa el uso de la radiación en medicina nuclear y diagnóstico por imagen (IMSS, ISSSTE, INER)."
+      ],
+      "materials": [
+        "Infografía del espectro electromagnético completo (radio → rayos gamma).",
+        "Prisma o CD para dispersar la luz visible en sus colores.",
+        "Datos del INER (Instituto Nacional de Enfermedades Respiratorias) sobre diagnóstico por imagen.",
+        "Celular: detector de luz UV con papel moneda (hilo de seguridad fluorescente bajo luz UV).",
+        "Noticias: lanzamiento del satélite MORELOS-3 (2015, AEM/SCT) para telecomunicaciones."
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "Apertura", "duration": "10 min", "label": "La luz visible es solo una pequeña franja"},
+        {"phase": "Desarrollo", "duration": "30 min", "label": "El espectro EM: 7 regiones y sus aplicaciones"},
+        {"phase": "Cierre", "duration": "10 min", "label": "Radiación y salud: ionizante vs no ionizante"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "El control remoto del TV usa luz infrarroja — ¿lo sabías? El horno de microondas usa microondas. Los rayos X del hospital usan radiación de alta energía. El WiFi y el celular usan ondas de radio. TODAS son ondas electromagnéticas — se diferencian solo en frecuencia y longitud de onda. La luz visible que vemos es menos del 1% del espectro EM.",
+          "activity": "Demostración: usar el prisma o el CD para descomponer la luz del salón en su espectro visible. Observar ROYGBIV (rojo-anaranjado-amarillo-verde-azul-índigo-violeta). ¿Qué hay más allá del rojo? ¿Más allá del violeta?"
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "ESPECTRO EM (de menor a mayor frecuencia / mayor a menor λ): (1) ONDAS DE RADIO (λ>1m, f<300MHz): AM/FM radio, televisión, satélites (Morelos-3, SCT-AEM). (2) MICROONDAS (1mm<λ<1m): hornos, WiFi 2.4/5GHz, 5G, radar meteorológico (SMN). (3) INFRARROJO (700nm<λ<1mm): control remoto, cámaras térmicas, CENAPRED monitoreo volcánico. (4) VISIBLE (400-700nm): la franja detectable por el ojo humano. (5) ULTRAVIOLETA (10-400nm): esterilización UV, fluorescencia, producción de vitamina D, quemaduras solares. (6) RAYOS X (0.01-10nm): radiografías (IMSS, 80 millones de mexicanos asegurados), tomografía computarizada. (7) RAYOS GAMMA (<0.01nm): medicina nuclear (PET scan), tratamiento del cáncer (radioterapia, INER-IMSS). PROPIEDAD: v=c=3×10⁸ m/s en el vacío para TODAS las ondas EM; diferencia es solo λ y f (c=fλ).",
+          "activity": "Tarjetas de aplicación: cada equipo recibe 7 tarjetas de aplicaciones tecnológicas y debe asignarlas a la región correcta del espectro. Verificación colectiva. Luego: calcular la longitud de onda del WiFi 2.4 GHz: λ=c/f=3×10⁸/2.4×10⁹=0.125 m=12.5 cm."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Radiación ionizante vs no ionizante: IONIZANTE (UV alto, rayos X, rayos gamma): energía suficiente para ionizar átomos → puede dañar el ADN → cáncer a altas dosis. No ionizante (radio, micro, IR, UV bajo, visible): no ioniza átomos. En México, la COFEPRIS regula la exposición a radiaciones ionizantes. El INER y el IMSS aplican principios de radioprotección (ALARA: As Low As Reasonably Achievable).",
+          "activity": "Debate breve: '¿Los celulares causan cáncer?' (ondas de radio: no ionizantes → evidencia científica actual: no hay relación probada, OMS 2023). Crítica al pensamiento conspirativo usando ciencia."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "El espectro electromagnético, unificado por Maxwell en 1865, es la base de prácticamente toda la tecnología moderna: radio, televisión, internet, medicina por imagen, teledetección satelital. México, a través de la AEM, el SMN, el INER y el IMSS, usa activamente distintas regiones del espectro para telecomunicaciones, meteorología, diagnóstico médico y astronomía.",
+      "sections": [
+        {
+          "subtitle": "Las ecuaciones de Maxwell y la unificación",
+          "content": "Maxwell demostró en 1865 que los campos eléctrico y magnético variables producen ondas que se propagan en el vacío a c=1/√(ε₀μ₀)=3×10⁸ m/s — ¡la velocidad de la luz! Esto unificó la electricidad, el magnetismo y la óptica en una sola teoría: el electromagnetismo. Hertz verificó experimentalmente la existencia de las ondas de radio en 1888. La primera transmisión de radio en México fue en 1921 (estación CYL, Teatro Ideal, CDMX)."
+        },
+        {
+          "subtitle": "Aplicaciones mexicanas del espectro EM",
+          "content": "Telecomunicaciones: satélites Morelos-3 y MexSat (SCT/AEM) en órbita geoestacionaria — transmiten televisión, internet y comunicaciones de emergencia a todo México. Meteorología: el SMN usa radar meteorológico Doppler (microondas) para monitorear huracanes en el Golfo y el Pacífico. Astronomía: el Gran Telescopio Milimétrico (GTM-50, INAOE, Sierra Negra Puebla) capta microondas de objetos distantes. Medicina: el INER, el IMSS y el INCan usan rayos X (radiografía, TAC) y rayos gamma (medicina nuclear, PET-scan, radioterapia) para diagnóstico y tratamiento del cáncer."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "¿Cuál región del espectro EM se usa en los hornos de microondas?",
+          "options": ["Microondas (λ≈12cm, f≈2.4GHz)", "Rayos X", "Infrarrojo", "Ultravioleta"],
+          "correct": "Microondas (λ≈12cm, f≈2.4GHz)"
+        },
+        {
+          "question": "La velocidad de todas las ondas electromagnéticas en el vacío es:",
+          "options": [
+            "3×10⁸ m/s (independiente de la frecuencia)",
+            "Igual a la velocidad del sonido (340 m/s)",
+            "Variable según la frecuencia",
+            "Igual a la velocidad de la luz solo para la luz visible"
+          ],
+          "correct": "3×10⁸ m/s (independiente de la frecuencia)"
+        },
+        {
+          "question": "Las radiaciones ionizantes son peligrosas porque:",
+          "options": [
+            "Tienen energía suficiente para ionizar átomos y potencialmente dañar el ADN",
+            "Son visibles para el ojo humano",
+            "Tienen longitudes de onda largas",
+            "Solo afectan a objetos metálicos"
+          ],
+          "correct": "Tienen energía suficiente para ionizar átomos y potencialmente dañar el ADN"
+        }
+      ],
+      "rubric": "4: Ordena el espectro, asigna aplicaciones a cada región, distingue radiación ionizante y no ionizante y analiza aplicaciones en salud. 3: Ordena con errores menores, asigna la mayoría de aplicaciones correctamente. 2: Conoce las regiones pero no las aplica tecnológicamente. 1: No ordena el espectro o confunde regiones."
+    },
+    "teacher_tips": [
+      "El CD como prisma para descomponer la luz visible es gratis, accesible y muy visual.",
+      "El debate sobre celulares y cáncer es un excelente ejercicio de pensamiento científico crítico — usar la posición de la OMS.",
+      "La conexión con el GTM-50 (INAOE, Puebla) como instrumento de investigación astronómica mexicana es un orgullo nacional.",
+      "Para el cálculo de λ del WiFi: hacerlo en vivo con los celulares de los estudiantes como punto de partida."
+    ]
+  },
+
+  "CNEYT-V-P06": {
+    "code": "CNEYT-V-P06",
+    "title": "Analiza los fenómenos ópticos (reflexión, refracción, dispersión) y su relación con dispositivos tecnológicos.",
+    "level": "CNEYT V",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Óptica",
+    "metadata": {
+      "objective": "Describir y aplicar las leyes de reflexión y refracción de la luz; explicar la dispersión de la luz blanca y el fenómeno del arcoíris; analizar la formación de imágenes en espejos y lentes; conectar los principios ópticos con instrumentos tecnológicos y artísticos.",
+      "competencies": [
+        "Aplica la ley de reflexión (θ_i = θ_r) a espejos planos y curvos.",
+        "Aplica la ley de Snell: n₁senθ₁ = n₂senθ₂ para calcular la refracción.",
+        "Explica la dispersión de la luz como diferencia en el índice de refracción según la longitud de onda.",
+        "Analiza la formación de imágenes en lentes convergentes y divergentes usando la ecuación del lenticulador."
+      ],
+      "materials": [
+        "Kit óptico básico: fuente de luz (linterna), espejo plano, lente convergente, vaso con agua y papel.",
+        "Prisma de vidrio o plástico para dispersión.",
+        "Imágenes del arte muralista mexicano con análisis de luz y color (Diego Rivera, INBA).",
+        "Ecuación del espejo/lente: 1/f = 1/do + 1/di.",
+        "Datos: fibra óptica de TELMEX e Internet para Todos (SCT): velocidad de transmisión."
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "Apertura", "duration": "10 min", "label": "El lápiz partido en agua: ¿magia o física?"},
+        {"phase": "Desarrollo", "duration": "30 min", "label": "Reflexión, refracción, dispersión y lentes"},
+        {"phase": "Cierre", "duration": "10 min", "label": "Fibra óptica: la luz que lleva internet"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Un lápiz sumergido en un vaso de agua parece 'roto' en la interfaz. Una moneda invisible en el fondo de un vaso se vuelve visible al agregar agua. La cuchara en la taza de té parece doblada. TODOS son efectos de la refracción de la luz al pasar de un medio a otro.",
+          "activity": "Los estudiantes predicen: '¿hacia qué lado se dobla el rayo de luz al pasar del aire al agua? ¿Del agua al vidrio?' Votan. Se introduce el concepto de índice de refracción n=c/v."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "REFLEXIÓN: la luz rebota en una superficie. Ley: θ_incidencia = θ_reflexión (ángulos medidos respecto a la normal). Espejo plano: imagen virtual, derecha, mismo tamaño. Espejo cóncavo (convergente): foco real; espejo convexo (divergente): foco virtual. REFRACCIÓN: cambio de dirección de la luz al cambiar de medio (por cambio de velocidad). Índice de refracción: n=c/v; n_agua≈1.33; n_vidrio≈1.5; n_diamante≈2.42. Ley de Snell: n₁senθ₁=n₂senθ₂. Reflexión total interna: si θ≥θ_crítico=arcsen(n₂/n₁) → la luz no sale del medio más denso (base de la fibra óptica). DISPERSIÓN: diferentes colores (frecuencias) tienen diferente n en vidrio → el prisma los separa. El arcoíris: las gotas de agua actúan como prismas + espejos. LENTES: convergente (biconvexa): forma imágenes reales o virtuales según la distancia objeto. Divergente (bicóncava): siempre imagen virtual, derecha, reducida. Ecuación del lente/espejo: 1/f = 1/do + 1/di; aumento m = −di/do.",
+          "activity": "Laboratorio de óptica: (1) medir θ_incidencia y θ_reflexión con linterna y espejo. (2) Verificar Snell en agua (n=1.33): medir θ₁ y θ₂ con transportador. (3) Con lente convergente: encontrar la distancia focal proyectando la imagen de la ventana en una pared."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Reflexión total interna y fibra óptica: la luz viaja dentro de la fibra (n_núcleo>n_cubierta) por reflexión total interna continua — puede viajar miles de kilómetros sin salir. La red de fibra óptica de TELMEX y el programa 'Internet para Todos' de la SCT usa miles de km de fibra óptica en México.",
+          "activity": "Cálculo del ángulo crítico para fibra de sílice (n_núcleo=1.46, n_cubierta=1.44): θ_c=arcsen(1.44/1.46)≈80.5°. La luz que viaje con ángulo mayor a 9.5° de la normal se refleja totalmente. Reflexión sobre tecnología y ciencia: '¿cómo llega el internet a comunidades rurales de México?'"
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La óptica es una de las ramas más antiguas y aplicadas de la física. Desde los lentes de obsidiana usados por los olmecas hasta las fibras ópticas que llevan internet a millones de mexicanos, la comprensión de la luz ha transformado la civilización. Los principios de reflexión y refracción están en la base de todos los instrumentos ópticos: anteojos, microscopios, telescopios, cámaras, endoscopios médicos y fibras ópticas.",
+      "sections": [
+        {
+          "subtitle": "El índice de refracción y la velocidad de la luz",
+          "content": "El índice de refracción n de un medio es la razón entre la velocidad de la luz en el vacío c y la velocidad v en ese medio: n=c/v. Como v≤c siempre, n≥1. Un n mayor indica que la luz viaja más lento en ese medio y que se 'dobla' más al entrar. El diamante (n=2.42) tiene el mayor n de materiales comunes → las múltiples reflexiones internas producen el 'brillo' característico. La obsidiana volcánica (abundante en México, usada en artefactos prehispánicos) tiene n≈1.45."
+        },
+        {
+          "subtitle": "Instrumentos ópticos y sus aplicaciones en México",
+          "content": "Microscopio óptico compuesto: dos lentes convergentes (objetivo + ocular). Magnificación M=M_objetivo×M_ocular. Los laboratorios del IMSS, INER e INCan usan microscopios para diagnóstico histológico. Telescopio: el GTM-50 (INAOE) es el telescopio milimétrico más grande del mundo. El Telescopio Carlos Sánchez (INAOE, Tonantzintla) hace astronomía óptica. Fibra óptica: principio de reflexión total interna permite transmitir datos a la velocidad de la luz. 1 fibra puede transportar simultáneamente millones de llamadas telefónicas o streams de video."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Un rayo de luz pasa del aire (n=1) al agua (n=1.33) con ángulo de incidencia de 30°. ¿El ángulo de refracción es mayor o menor que 30°?",
+          "options": [
+            "Menor (la luz se dobla hacia la normal al entrar en un medio más denso)",
+            "Mayor (la luz se aleja de la normal al entrar al agua)",
+            "Igual (el ángulo no cambia al refractarse)",
+            "Depende del color de la luz"
+          ],
+          "correct": "Menor (la luz se dobla hacia la normal al entrar en un medio más denso)"
+        },
+        {
+          "question": "La dispersión de la luz blanca por un prisma ocurre porque:",
+          "options": [
+            "Diferentes colores tienen diferente índice de refracción en el vidrio",
+            "El prisma absorbe algunos colores y refleja otros",
+            "Todos los colores tienen la misma velocidad en el vacío y el vidrio",
+            "La luz blanca es una mezcla de luz ultravioleta e infrarroja"
+          ],
+          "correct": "Diferentes colores tienen diferente índice de refracción en el vidrio"
+        },
+        {
+          "question": "La reflexión total interna se aplica en:",
+          "options": [
+            "Fibras ópticas para telecomunicaciones",
+            "Espejos de baño",
+            "Lentes de anteojos divergentes",
+            "Prismas dispersores de luz"
+          ],
+          "correct": "Fibras ópticas para telecomunicaciones"
+        }
+      ],
+      "rubric": "4: Aplica la ley de Snell correctamente, explica dispersión, calcula imágenes con la ecuación del lente y conecta con fibra óptica. 3: Aplica Snell y explica dispersión con errores menores en el lente. 2: Distingue reflexión de refracción pero no aplica la ley de Snell cuantitativamente. 1: Confunde los tres fenómenos ópticos."
+    },
+    "teacher_tips": [
+      "El laboratorio de óptica casero (linterna, vaso de agua, espejo) funciona perfectamente incluso sin laboratorio formal.",
+      "La conexión con la obsidiana prehispánica (INAH) es un orgullo cultural único de México — mencionarlo.",
+      "Para el GTM-50 (INAOE, Tonantzintla): mostrar imágenes del telescopio y explicar que es un instrumento de clase mundial hecho en México.",
+      "La ecuación del lente es confusamente similar a la del espejo — hacer énfasis en las convenciones de signo (regla de signos del lente delgado)."
+    ]
+  },
+
+  "CNEYT-V-P07": {
+    "code": "CNEYT-V-P07",
+    "title": "Examina los principios del electromagnetismo y su aplicación en motores, generadores y tecnología cotidiana.",
+    "level": "CNEYT V",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Avanzado",
+    "category": "Electromagnetismo",
+    "metadata": {
+      "objective": "Describir los conceptos fundamentales del electromagnetismo (campo eléctrico, campo magnético, inducción electromagnética); explicar el principio de funcionamiento de motores y generadores eléctricos; analizar el papel de la electricidad en la infraestructura energética de México (CFE).",
+      "competencies": [
+        "Describe el campo eléctrico y magnético y las fuerzas que ejercen sobre cargas y corrientes.",
+        "Explica la ley de Faraday: cambios en el flujo magnético inducen una FEM.",
+        "Describe el principio de funcionamiento de un motor DC y un generador (alternador).",
+        "Analiza el sistema eléctrico nacional de México (CFE) y las fuentes de generación eléctrica."
+      ],
+      "materials": [
+        "Imán de barra, bobina de cable de cobre y galvanómetro (o ampérimetro) para demostración de inducción.",
+        "Motor eléctrico DC simple casero (pila, imán, espiral de cobre): construcción en aula.",
+        "Datos de la CFE: capacidad instalada por fuente (termoeléctrica, hidroeléctrica, eólica, solar).",
+        "Mapa del Sistema Eléctrico Nacional (CENACE/CFE).",
+        "Factura de luz de CFE como contexto cotidiano."
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "Apertura", "duration": "10 min", "label": "El imán y la bobina: electricidad de la nada"},
+        {"phase": "Desarrollo", "duration": "30 min", "label": "Campo magnético, inducción, motor y generador"},
+        {"phase": "Cierre", "duration": "10 min", "label": "La electricidad en México: CFE y renovables"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Demostración de Faraday: se inserta y extrae rápidamente un imán en una bobina conectada a un galvanómetro. La aguja se mueve cuando el imán está en movimiento, se detiene cuando el imán está quieto. 'La electricidad aparece de la nada?' No — de la energía mecánica del movimiento. Preguntar: ¿cuánta electricidad produce CFE para México? ¿Cómo?",
+          "activity": "Lluvia de ideas: ¿qué aparatos eléctricos usan motores en tu casa? (ventilador, licuadora, lavadora, aspiradora, bomba de agua). ¿Qué diferencia hay entre un motor y un generador?"
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "CAMPO ELÉCTRICO: región del espacio donde una carga experimenta una fuerza eléctrica. E=F/q [N/C=V/m]. CAMPO MAGNÉTICO: región donde una corriente o imán experimenta una fuerza magnética. F=qv×B; F=IL×B. FUERZA DE LORENTZ: F=q(E+v×B). LEY DE FARADAY (inducción electromagnética): FEM inducida = −dΦ_B/dt donde Φ_B=B·A·cosθ es el flujo magnético. Un cambio en el flujo genera corriente. LEY DE LENZ: la corriente inducida se opone al cambio que la origina (signo negativo en Faraday). GENERADOR: convierte energía mecánica en eléctrica: una bobina giratoria en un campo magnético genera FEM alterna. Principio: Φ_B=NAB·cos(ωt) → FEM=NABω·sen(ωt) (sinusoide). MOTOR: convierte energía eléctrica en mecánica: la corriente en un conductor dentro de un campo magnético experimenta una fuerza (torque → rotación). TRANSFORMADOR: aumenta o reduce el voltaje de CA usando inducción mutua: V₁/V₂=N₁/N₂.",
+          "activity": "Construcción de motor DC simple: espiral de cobre (bobina), imán de barra, pila de 1.5V y soporte (clips de papel). Con el campo magnético del imán y la corriente de la pila, el alambre gira. Cada equipo construye su motor y mide el número de RPM aproximado. Análisis: ¿qué transforma en qué?"
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "El sistema eléctrico de México (CENACE/CFE): capacidad instalada ≈88 GW (2023). Fuentes: termoeléctrica (gas natural, 60%), hidroeléctrica (18%), eólica (7%), solar (5%), nuclear (1%, Central Laguna Verde, Veracruz), otras. La reforma eléctrica de 2021 y el debate sobre la participación privada y las energías renovables. México se comprometió con el Acuerdo de París a reducir emisiones de GEI.",
+          "activity": "Análisis de la factura de CFE: ¿qué significa cada concepto (kWh consumido, cargo fijo, DAP)? Calcular el costo de dejar un foco LED de 9W encendido 8 horas diarias por 30 días: 9W×8h×30d=2,160 Wh=2.16 kWh × tarifa."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "El electromagnetismo, unificado por Maxwell en 1865, es la base de toda la tecnología eléctrica moderna. Desde el motor de la lavadora hasta los generadores de la presa Chicoasén (la mayor de México, 2,430 MW, CFE), los principios de Faraday y Lenz convierten movimiento en electricidad y electricidad en movimiento. Sin electromagnetismo, no habría radio, computadoras, celulares ni internet.",
+      "sections": [
+        {
+          "subtitle": "La ley de Faraday y sus aplicaciones",
+          "content": "FEM = −ΔΦ_B/Δt. El signo negativo (ley de Lenz) indica que la FEM inducida siempre se opone al cambio en flujo — es una consecuencia de la conservación de la energía. Aplicaciones: generadores hidráulicos (la caída del agua gira una turbina que mueve una bobina en un campo magnético), micrófonos dinámicos (membrana → movimiento de bobina → FEM), transformadores (inducción mutua entre dos bobinas), placas de inducción (campo magnético variable induce corrientes en la olla metálica)."
+        },
+        {
+          "subtitle": "Energía eléctrica en México: CFE y transición energética",
+          "content": "La Comisión Federal de Electricidad (CFE) genera y distribuye electricidad a 44 millones de usuarios. La Presa Chicoasén (Chiapas) tiene 2,430 MW; el Parque Eólico La Venta III (Oaxaca) tiene 306 MW; el Parque Solar Villanueva (Coahuila) tiene 828 MW. El Plan de Transición Energética (SENER) prevé llegar al 35% de energías renovables en 2024 (objetivo parcialmente incumplido). México ratificó el Acuerdo de París (2016): meta de reducir 22% de GEI para 2030."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "La ley de Faraday establece que la FEM inducida es proporcional a:",
+          "options": [
+            "La tasa de cambio del flujo magnético a través del circuito",
+            "La corriente que ya circula en el circuito",
+            "La resistencia del conductor",
+            "El cuadrado del campo magnético"
+          ],
+          "correct": "La tasa de cambio del flujo magnético a través del circuito"
+        },
+        {
+          "question": "Un generador eléctrico convierte:",
+          "options": [
+            "Energía mecánica en energía eléctrica",
+            "Energía eléctrica en energía mecánica",
+            "Energía química en energía eléctrica",
+            "Energía luminosa en energía eléctrica"
+          ],
+          "correct": "Energía mecánica en energía eléctrica"
+        },
+        {
+          "question": "¿Cuál es la principal fuente de generación eléctrica de la CFE en México?",
+          "options": [
+            "Termoeléctrica (gas natural y combustóleo, ~60%)",
+            "Solar fotovoltaica (~40%)",
+            "Nuclear (Central Laguna Verde, ~50%)",
+            "Hidroeléctrica (~80%)"
+          ],
+          "correct": "Termoeléctrica (gas natural y combustóleo, ~60%)"
+        }
+      ],
+      "rubric": "4: Explica la ley de Faraday y Lenz, describe el funcionamiento de motor y generador, construye el motor simple y analiza la matriz energética de México. 3: Explica inducción y motor con errores menores, construye el motor. 2: Describe la inducción cualitativamente pero no puede explicar motor vs generador. 1: Confunde motor y generador o no puede describir la inducción."
+    },
+    "teacher_tips": [
+      "El motor DC casero (pila + imán + espiral de cobre) es el experimento más gratificante del semestre de física — tener los materiales preparados.",
+      "La factura de CFE como texto auténtico de análisis es algo que TODOS los estudiantes reconocen y que conecta la física con la vida real.",
+      "La Central Nuclear de Laguna Verde (Veracruz) suele generar debate — usarlo para discutir energía nuclear vs renovable en México.",
+      "Conectar con CNEYT-IV P07 (contaminantes): la generación termoeléctrica es la mayor fuente de CO₂ en México (INECC)."
+    ]
+  },
+
+  "CNEYT-V-P08": {
+    "code": "CNEYT-V-P08",
+    "title": "Reflexiona sobre las implicaciones éticas y sociales del desarrollo tecnológico científico en México.",
+    "level": "CNEYT V",
+    "duration": "~4h (proyecto integrador, 2-3 sesiones)",
+    "difficulty": "Intermedio",
+    "category": "Ciencia, tecnología y sociedad",
+    "metadata": {
+      "objective": "Analizar críticamente el impacto social, ambiental y ético del desarrollo científico-tecnológico en México y el mundo; evaluar el papel del Estado, la iniciativa privada y la sociedad civil en la orientación de la ciencia; reflexionar sobre la responsabilidad del ciudadano en una sociedad tecnológica.",
+      "competencies": [
+        "Identifica beneficios y riesgos del desarrollo tecnológico en al menos 3 áreas (energía, medicina, comunicaciones, agricultura).",
+        "Analiza dilemas éticos concretos de la ciencia en México (transgénicos, energía nuclear, vigilancia digital, biotecnología).",
+        "Evalúa el papel de la CONAHCYT, la SEP y las universidades en la política científica nacional.",
+        "Propone lineamientos éticos para el desarrollo tecnológico en su comunidad."
+      ],
+      "materials": [
+        "Caso 1: Transgénicos y maíz en México (Colectivo Sin Maíz No Hay País vs SAGARPA/Monsanto).",
+        "Caso 2: Vigilancia digital y privacidad (NSO Group/Pegasus vs R3D México).",
+        "Caso 3: Energía nuclear (Central Laguna Verde) y energías renovables.",
+        "Informe CONAHCYT: 'Hacia una política de ciencia con pertinencia social' (2023).",
+        "Marco ético de la UNESCO para IA y biotecnología."
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "Apertura", "duration": "15 min", "label": "¿La tecnología es neutral?"},
+        {"phase": "Desarrollo", "duration": "50 min", "label": "Dilemas éticos de la ciencia en México"},
+        {"phase": "Cierre", "duration": "15 min", "label": "¿Qué ciencia queremos para México?"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "15 min",
+          "description": "Provocación: 'La tecnología es neutral — depende de cómo se use.' ¿Están de acuerdo? Ejemplos: (A) La misma energía nuclear produce electricidad limpia (Laguna Verde) o destrucción (bomba atómica). (B) El mismo conocimiento genético permite curar enfermedades o crear armas biológicas. (C) Los mismos algoritmos de IA pueden diagnosticar cáncer o controlar masivamente a la población. NINGUNA tecnología es completamente neutral — siempre refleja intereses, valores y relaciones de poder.",
+          "activity": "Votación y justificación: ¿la tecnología es neutral? (Escala 1-5). Compartir en parejas. El docente registra la distribución de opiniones para retomar al final."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "50 min",
+          "description": "Caso 1 — TRANSGÉNICOS Y MAÍZ: México es centro de origen y diversidad del maíz (9,000 años de historia; 60+ variedades nativas, CONABIO). En 2012, SAGARPA autorizó siembras experimentales de maíz transgénico (Monsanto). El colectivo 'Sin Maíz No Hay País' demandó y obtuvo amparo judicial. Dilema: ¿eficiencia agrícola vs diversidad genética y autonomía alimentaria? Caso 2 — PEGASUS Y VIGILANCIA: el software espía Pegasus (NSO Group, Israel) fue usado para vigilar a periodistas, activistas y políticos en México (2016-2017, R3D e Citizen Lab, UNAM). El Artículo 16 de la CPEUM garantiza privacidad. Dilema: ¿seguridad nacional vs derechos fundamentales? Caso 3 — ENERGÍA Y SUSTENTABILIDAD: la generación termoeléctrica (60% de la electricidad en México) produce 40% de las emisiones de CO₂ del sector energético (INECC). Las renovables son más costosas en inversión inicial. Dilema: ¿desarrollo económico inmediato vs sustentabilidad a largo plazo?",
+          "activity": "Debate estructurado por caso: cada equipo recibe un caso, tiene 10 minutos para preparar argumentos a favor y en contra, y debate durante 8 minutos. El grupo vota la posición más convincente."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "15 min",
+          "description": "¿Qué ciencia queremos para México? CONAHCYT (2022-2023) reformó su mandato hacia 'ciencia con pertinencia social': prioridades en salud, alimentación, energía, ambiente. La UNESCO tiene un marco ético para la IA y la biotecnología que México ha suscrito. El 'Principio de precaución': cuando hay incertidumbre científica y riesgo de daño grave, es prudente no actuar hasta tener más evidencia.",
+          "activity": "Carta ciudadana: cada estudiante escribe una carta breve (10 líneas) a la CONAHCYT o al Congreso de la Unión proponiendo UNA política específica para el desarrollo científico-tecnológico de México, con justificación ética. Opcionalmente enviar por correo electrónico al representante de su distrito."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La ética de la ciencia y la tecnología estudia los valores, responsabilidades y dilemas que surgen del desarrollo científico-tecnológico. No es una reflexión separada de la ciencia — es parte integral de ella. El filósofo Hans Jonas propuso el 'principio de responsabilidad': ante el poder transformador de la tecnología moderna, la responsabilidad del científico va más allá del laboratorio y se extiende a las generaciones futuras.",
+      "sections": [
+        {
+          "subtitle": "Ciencia, tecnología y poder en México",
+          "content": "La investigación científica no es políticamente neutral: refleja los intereses de quienes la financian. En México, el 0.32% del PIB se destina a I+D (CONACYT, 2022) — por debajo del 1% recomendado por la UNESCO para países en desarrollo. El financiamiento define las prioridades: si PEMEX financia la investigación petrolera, habrá más conocimiento sobre petróleo que sobre energías renovables. La privatización de la investigación (patentes) puede limitar el acceso al conocimiento, especialmente en salud (medicamentos, vacunas)."
+        },
+        {
+          "subtitle": "El principio de precaución y el marco ético de la UNESCO",
+          "content": "El Principio de Precaución (Declaración de Wingspread, 1998; adoptado por la ONU): 'Cuando una actividad representa una amenaza para la salud humana o el medio ambiente, deben tomarse medidas precautorias aunque algunas relaciones de causa y efecto no se hayan establecido científicamente.' Es relevante para: organismos genéticamente modificados (OGMs), nanotecnología, IA, geoingeniería. La UNESCO tiene marcos éticos para IA (2021) y biotecnología (Declaración de Oviedo). México debe adaptar estos marcos a su contexto: diversidad biológica, equidad social, soberanía alimentaria."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "El caso Pegasus en México ilustra el dilema entre:",
+          "options": [
+            "Seguridad nacional (argumento pro-vigilancia) y derecho a la privacidad (Art. 16 CPEUM)",
+            "Energía eléctrica y combustibles fósiles",
+            "Transgénicos y diversidad genética",
+            "Medicina nuclear y radiación ionizante"
+          ],
+          "correct": "Seguridad nacional (argumento pro-vigilancia) y derecho a la privacidad (Art. 16 CPEUM)"
+        },
+        {
+          "question": "El 'principio de precaución' en ética científica establece que:",
+          "options": [
+            "Ante incertidumbre y riesgo de daño grave, es prudente actuar con cautela antes de tener certeza científica",
+            "La ciencia debe esperar a tener certeza absoluta antes de publicar",
+            "Las empresas tecnológicas deben financiar toda la investigación",
+            "Los científicos no tienen responsabilidad sobre el uso de sus descubrimientos"
+          ],
+          "correct": "Ante incertidumbre y riesgo de daño grave, es prudente actuar con cautela antes de tener certeza científica"
+        },
+        {
+          "question": "México destina aproximadamente ___ del PIB a investigación y desarrollo:",
+          "options": ["0.32% (por debajo del 1% recomendado por la UNESCO)", "5%", "2%", "10%"],
+          "correct": "0.32% (por debajo del 1% recomendado por la UNESCO)"
+        }
+      ],
+      "rubric": "4: Analiza 2+ dilemas éticos con argumentos de ambas partes, aplica el principio de precaución y propone una política pública específica y fundamentada. 3: Analiza un dilema con argumentos básicos y propone una medida. 2: Identifica el dilema pero no argumenta desde múltiples perspectivas. 1: Reproduce una posición sin análisis crítico."
+    },
+    "teacher_tips": [
+      "Los debates deben ser estructurados con tiempo límite — sin estructura tienden a volverse discussions de opinión sin evidencia.",
+      "El caso Pegasus puede ser delicado políticamente — centrar en los principios constitucionales y éticos, no en partidos.",
+      "La carta ciudadana puede enviarse realmente — hacerlo aumenta la sensación de agencia política de los estudiantes.",
+      "Conectar con PFH (Filosofía): la ética de la responsabilidad de Jonas y el utilitarismo de Mill son marcos filosóficos relevantes aquí."
+    ]
+  }
+}
+
+with open(OUT, "w", encoding="utf-8") as f:
+    json.dump(data, f, ensure_ascii=False, indent=2)
+
+print(f"Written {len(data)} progressions to {OUT}")

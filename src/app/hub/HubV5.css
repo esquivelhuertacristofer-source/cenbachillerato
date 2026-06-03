@@ -120,6 +120,76 @@
   color: var(--hub-text-muted);
 }
 
+/* ── Rótulo por componente curricular ─────────────────────── */
+.hub-v2-componente {
+  margin-bottom: 56px;
+}
+
+.hub-v2-rotulo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.hub-v2-rotulo-tag {
+  flex-shrink: 0;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  color: #7dd3fc;
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+}
+
+.hub-v2-rotulo-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.hub-v2-rotulo-title {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: var(--hub-text);
+  line-height: 1.15;
+}
+
+.hub-v2-rotulo-desc {
+  margin-top: 3px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--hub-text-muted);
+  line-height: 1.45;
+}
+
+.hub-v2-rotulo-badge {
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--hub-border);
+  border-radius: 999px;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--hub-text-muted);
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .hub-v2-rotulo {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .hub-v2-rotulo-badge {
+    order: 3;
+  }
+}
+
 /* ── UAC page dark canvas ─────────────────────────────────── */
 .uac-v2-page {
   min-height: 100vh;

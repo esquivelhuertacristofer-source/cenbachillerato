@@ -21,7 +21,9 @@ import {
   Sun,
   Moon,
 } from 'lucide-react';
+import jsPDF from 'jspdf';
 import Sidebar from '@/components/dashboard/Sidebar';
+import PresentationMode from '@/components/dashboard/PresentationMode';
 import { PLANTEAMIENTO_CODES, loadUACProgresiones } from '@/data/planteamiento/hub-index';
 import { UAC_BASE } from '@/lib/mccems/estructura';
 
@@ -142,6 +144,8 @@ export default function PlanteamientoPage() {
   const [searchQuery, setSearchQuery]           = useState('');
   const [dark, setDark]                         = useState(true);
   const [progresiones, setProgresiones]         = useState<ProgresionPlan[]>([]);
+  const [exporting, setExporting]               = useState(false);
+  const [presenting, setPresenting]             = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -180,6 +184,212 @@ export default function PlanteamientoPage() {
     Math.round((progresiones.length / (currentUACMeta?.totalProgresionesEsperadas ?? progresiones.length)) * 100),
     100,
   );
+
+  // ── Export: PDF de la progresión activa ────────────────────────────────────
+  function handleExport() {
+    const prog = activeProgresion;
+    if (!prog || exporting) return;
+    setExporting(true);
+    try {
+      const NAVY:  [number, number, number] = [1, 28, 64];
+      const GOLD:  [number, number, number] = [212, 165, 116];
+      const DARK:  [number, number, number] = [30, 41, 59];
+      const GRAY:  [number, number, number] = [100, 116, 139];
+      const LIGHT: [number, number, number] = [148, 163, 184];
+
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      const PAGE_W = 210;
+      const M = 15;
+      const CW = PAGE_W - M * 2;
+      const BOTTOM = 282;
+      let y = 0;
+
+      const footer = () => {
+        doc.setFontSize(7);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(...LIGHT);
+        doc.text('© 2026 CEN Bachillerato — Documento generado automáticamente', PAGE_W / 2, 290, { align: 'center' });
+      };
+
+      const ensure = (needed: number) => {
+        if (y + needed > BOTTOM) {
+          footer();
+          doc.addPage();
+          y = M;
+        }
+      };
+
+      const heading = () => {
+        doc.setFillColor(...NAVY);
+        doc.rect(0, 0, PAGE_W, 42, 'F');
+        doc.setFillColor(...GOLD);
+        doc.rect(0, 42, PAGE_W, 2, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(18);
+        doc.setFont('helvetica', 'bold');
+        doc.text('CEN Bachillerato — Planeación Didáctica', M, 20);
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`${prog.level}  ·  MCCEMS 2025`, M, 30);
+        doc.text(`Generado: ${new Date().toLocaleDateString('es-MX')}`, M, 37);
+        y = 54;
+      };
+
+      const sectionTitle = (label: string) => {
+        ensure(16);
+        doc.setFillColor(...NAVY);
+        doc.rect(M, y, CW, 9, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.text(label.toUpperCase(), M + 4, y + 6);
+        y += 14;
+      };
+
+      const paragraph = (
+        text: string,
+        opts: { size?: number; color?: [number, number, number]; font?: 'normal' | 'bold' | 'italic'; lh?: number; indent?: number } = {},
+      ) => {
+        const { size = 9, color = DARK, font = 'normal', lh = 4.8, indent = 0 } = opts;
+        doc.setFontSize(size);
+        doc.setFont('helvetica', font);
+        doc.setTextColor(...color);
+        const lines = doc.splitTextToSize(text, CW - indent) as string[];
+        lines.forEach((line) => {
+          ensure(lh);
+          doc.text(line, M + indent, y);
+          y += lh;
+        });
+      };
+
+      heading();
+
+      // ── Encabezado de la progresión ──────────────────────────────────────
+      doc.setTextColor(...GOLD);
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'bold');
+      doc.text(prog.code, M, y);
+      y += 7;
+      doc.setTextColor(...NAVY);
+      doc.setFontSize(16);
+      doc.setFont('helvetica', 'bold');
+      (doc.splitTextToSize(prog.title, CW) as string[]).forEach((l) => { doc.text(l, M, y); y += 7; });
+      y += 1;
+
+      const meta = [
+        !isTodo(prog.duration)   ? `Duración: ${prog.duration}`     : null,
+        !isTodo(prog.difficulty) ? `Dificultad: ${prog.difficulty}` : null,
+        !isTodo(prog.category)   ? `Categoría: ${prog.category}`     : null,
+      ].filter(Boolean).join('     ·     ');
+      if (meta) paragraph(meta, { size: 8, color: GRAY, font: 'bold', lh: 5 });
+      y += 4;
+
+      // ── Ficha de la progresión ───────────────────────────────────────────
+      if (!isTodo(prog.metadata?.objective)) {
+        sectionTitle('Objetivo');
+        paragraph(prog.metadata.objective);
+        y += 4;
+      }
+      const competencies = (prog.metadata?.competencies ?? []).filter((c) => !isTodo(c));
+      if (competencies.length) {
+        sectionTitle('Competencias');
+        competencies.forEach((c) => paragraph(`•  ${c}`, { indent: 2 }));
+        y += 4;
+      }
+      const materials = (prog.metadata?.materials ?? []).filter((m) => !isTodo(m));
+      if (materials.length) {
+        sectionTitle('Materiales');
+        materials.forEach((m) => paragraph(`•  ${m}`, { indent: 2 }));
+        y += 4;
+      }
+
+      // ── Estrategia didáctica ─────────────────────────────────────────────
+      const phases = (prog.strategy?.phases ?? []).filter((p) => !isTodo(p.title) || !isTodo(p.description));
+      if (phases.length) {
+        sectionTitle('Estrategia Didáctica');
+        phases.forEach((phase, i) => {
+          ensure(10);
+          doc.setFontSize(10);
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor(...NAVY);
+          doc.text(`${i + 1}. ${phase.title}`, M, y);
+          if (!isTodo(phase.duration)) {
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(...GOLD);
+            doc.text(phase.duration, PAGE_W - M, y, { align: 'right' });
+          }
+          y += 6;
+          if (!isTodo(phase.description)) paragraph(phase.description);
+          if (!isTodo(phase.activity)) paragraph(`Actividad: ${phase.activity}`, { font: 'italic', color: GRAY });
+          y += 4;
+        });
+      }
+
+      // ── Marco teórico ────────────────────────────────────────────────────
+      const sections = (prog.theory?.sections ?? []).filter((s) => !isTodo(s.content));
+      if (!isTodo(prog.theory?.introduction) || sections.length) {
+        sectionTitle('Marco Teórico');
+        if (!isTodo(prog.theory?.introduction)) {
+          paragraph(prog.theory.introduction, { font: 'italic', color: GRAY });
+          y += 3;
+        }
+        sections.forEach((s) => {
+          if (!isTodo(s.subtitle)) {
+            ensure(8);
+            doc.setFontSize(9.5);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(...NAVY);
+            doc.text(s.subtitle, M, y);
+            y += 5.5;
+          }
+          paragraph(s.content);
+          y += 3;
+        });
+      }
+
+      // ── Evaluación ───────────────────────────────────────────────────────
+      const questions = (prog.evaluation?.exam_questions ?? []).filter((q) => !isTodo(q.question));
+      if (questions.length || !isTodo(prog.evaluation?.rubric)) {
+        sectionTitle('Evaluación');
+        questions.forEach((q, i) => {
+          ensure(8);
+          paragraph(`${i + 1}. ${q.question}`, { font: 'bold', color: NAVY });
+          q.options.forEach((opt, oi) => {
+            const isCorrect = opt === q.correct;
+            paragraph(`${String.fromCharCode(97 + oi)}) ${opt}${isCorrect ? '   (correcta)' : ''}`, {
+              indent: 4,
+              color: isCorrect ? NAVY : DARK,
+              font: isCorrect ? 'bold' : 'normal',
+            });
+          });
+          y += 3;
+        });
+        if (!isTodo(prog.evaluation?.rubric)) {
+          ensure(8);
+          doc.setFontSize(9.5);
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor(...NAVY);
+          doc.text('Rúbrica', M, y);
+          y += 5.5;
+          paragraph(prog.evaluation.rubric);
+          y += 4;
+        }
+      }
+
+      // ── Recomendaciones docentes ─────────────────────────────────────────
+      const tips = (prog.teacher_tips ?? []).filter((tp) => !isTodo(tp));
+      if (tips.length) {
+        sectionTitle('Recomendaciones para el Docente');
+        tips.forEach((tp) => paragraph(`•  ${tp}`, { indent: 2 }));
+      }
+
+      footer();
+      doc.save(`planeacion-${prog.code.replace(/\s+/g, '-').toLowerCase()}.pdf`);
+    } finally {
+      setExporting(false);
+    }
+  }
 
   return (
     <div
@@ -400,9 +610,14 @@ export default function PlanteamientoPage() {
                 {dark ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
                 <span className="hidden sm:inline">{dark ? 'Claro' : 'Oscuro'}</span>
               </button>
-              <button className={`flex items-center gap-2.5 px-5 py-2.5 rounded-xl font-black text-[11px] uppercase tracking-[0.1em] cursor-pointer border-none motion-safe:transition-colors ${t.exportBtn}`}>
+              <button
+                onClick={handleExport}
+                disabled={!activeProgresion || exporting}
+                aria-label="Exportar planeación de la progresión activa a PDF"
+                className={`flex items-center gap-2.5 px-5 py-2.5 rounded-xl font-black text-[11px] uppercase tracking-[0.1em] border-none motion-safe:transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${!activeProgresion || exporting ? '' : 'cursor-pointer'} ${t.exportBtn}`}
+              >
                 <Download className="w-3.5 h-3.5 text-[#7DD3FC]" />
-                Exportar
+                {exporting ? 'Generando…' : 'Exportar'}
               </button>
             </div>
           </div>
@@ -726,7 +941,12 @@ export default function PlanteamientoPage() {
                 </div>
 
                 <div
-                  className="rounded-[2.25rem] p-8 text-white cursor-pointer hover:scale-[1.02] active:scale-[0.99] motion-safe:transition-transform group"
+                  role="button"
+                  tabIndex={activeProgresion ? 0 : -1}
+                  aria-disabled={!activeProgresion}
+                  onClick={() => { if (activeProgresion) setPresenting(true); }}
+                  onKeyDown={(e) => { if (activeProgresion && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); setPresenting(true); } }}
+                  className={`rounded-[2.25rem] p-8 text-white motion-safe:transition-transform group ${activeProgresion ? 'cursor-pointer hover:scale-[1.02] active:scale-[0.99]' : 'opacity-50 cursor-not-allowed'}`}
                   style={{ background: 'linear-gradient(135deg, #0B2545 0%, #1a3a6e 100%)' }}
                 >
                   <div className="flex flex-col items-center text-center gap-3.5">
@@ -748,6 +968,10 @@ export default function PlanteamientoPage() {
           </div>
         </div>
       </main>
+
+      {presenting && activeProgresion && (
+        <PresentationMode prog={activeProgresion} onClose={() => setPresenting(false)} />
+      )}
     </div>
   );
 }

@@ -285,3 +285,152 @@ export async function getProgresoSemestreBrowser(
 
   return { totalProgresiones, progresionesCompletadas, porcentaje };
 }
+
+// ─── Centro de Recursos (acceso por tipo) ───────────────────────────────────
+
+export interface ProgresoTipo {
+  tipo: string;
+  total: number;
+  completadas: number;
+}
+
+/**
+ * Progreso por tipo de actividad en un semestre (total y completadas del usuario),
+ * para los tiles de "Accesos rápidos" del Home. Solo devuelve tipos con
+ * al menos 1 actividad real.
+ */
+export async function getProgresoRecursosSemestre(
+  userId: string,
+  semestre: number
+): Promise<ProgresoTipo[]> {
+  const sb = getClient();
+
+  const { data: uacRows } = await sb
+    .from("uac")
+    .select("id")
+    .eq("semestre", semestre);
+  if (!uacRows || uacRows.length === 0) return [];
+
+  const { data: progs } = await sb
+    .from("progresiones")
+    .select("id")
+    .in("uac_id", uacRows.map((u) => u.id))
+    .eq("es_placeholder", false);
+  if (!progs || progs.length === 0) return [];
+
+  const { data: acts } = await sb
+    .from("actividades")
+    .select("id, tipo")
+    .in("progresion_id", progs.map((p) => p.id));
+  if (!acts || acts.length === 0) return [];
+
+  const { data: completed } = await sb
+    .from("intentos")
+    .select("actividad_id")
+    .eq("user_id", userId)
+    .eq("status", "completed")
+    .in("actividad_id", acts.map((a) => a.id));
+
+  const doneSet = new Set(completed?.map((i) => i.actividad_id) ?? []);
+
+  const totalByTipo = new Map<string, number>();
+  const doneByTipo = new Map<string, number>();
+  for (const a of acts) {
+    totalByTipo.set(a.tipo, (totalByTipo.get(a.tipo) ?? 0) + 1);
+    if (doneSet.has(a.id)) doneByTipo.set(a.tipo, (doneByTipo.get(a.tipo) ?? 0) + 1);
+  }
+
+  return [...totalByTipo.entries()].map(([tipo, total]) => ({
+    tipo,
+    total,
+    completadas: doneByTipo.get(tipo) ?? 0,
+  }));
+}
+
+export interface RecursoActividad {
+  id: string;
+  titulo: string;
+  tipo: string;
+  xp: number;
+  uacCodigo: string;
+  uacNombre: string;
+  progresionId: string;
+  progresionNumero: number;
+  orden: number;
+  estado: "no_iniciada" | "en_progreso" | "completada";
+}
+
+/**
+ * Lista completa de actividades del semestre con estado por usuario,
+ * para la página /hub/recursos. Cada item trae el deep-link (uac + progresión + orden).
+ */
+export async function getRecursosSemestreBrowser(
+  userId: string,
+  semestre: number
+): Promise<RecursoActividad[]> {
+  const sb = getClient();
+
+  const { data: uacRows } = await sb
+    .from("uac")
+    .select("id, codigo, nombre")
+    .eq("semestre", semestre);
+  if (!uacRows || uacRows.length === 0) return [];
+
+  const uacById = new Map(uacRows.map((u) => [u.id, u]));
+
+  const { data: progs } = await sb
+    .from("progresiones")
+    .select("id, numero, uac_id")
+    .in("uac_id", uacRows.map((u) => u.id))
+    .eq("es_placeholder", false);
+  if (!progs || progs.length === 0) return [];
+
+  const progById = new Map(progs.map((p) => [p.id, p]));
+
+  const { data: acts } = await sb
+    .from("actividades")
+    .select("id, codigo, titulo, tipo, xp, progresion_id")
+    .in("progresion_id", progs.map((p) => p.id));
+  if (!acts || acts.length === 0) return [];
+
+  const actIds = acts.map((a) => a.id);
+  const estadoByAct = new Map<string, "in_progress" | "completed">();
+  const { data: intentos } = await sb
+    .from("intentos")
+    .select("actividad_id, status, started_at")
+    .eq("user_id", userId)
+    .in("actividad_id", actIds)
+    .order("started_at", { ascending: false });
+  for (const i of intentos ?? []) {
+    if (!estadoByAct.has(i.actividad_id)) {
+      estadoByAct.set(i.actividad_id, i.status as "in_progress" | "completed");
+    }
+  }
+
+  const items: RecursoActividad[] = [];
+  for (const a of acts) {
+    if (!a.progresion_id) continue;
+    const prog = progById.get(a.progresion_id);
+    if (!prog) continue;
+    const uac = uacById.get(prog.uac_id);
+    if (!uac) continue;
+    const ordenMatch = a.codigo.match(/-A(\d+)$/);
+    const orden = ordenMatch?.[1] ? parseInt(ordenMatch[1]) : 1;
+    const st = estadoByAct.get(a.id);
+    items.push({
+      id: a.id,
+      titulo: a.titulo,
+      tipo: a.tipo,
+      xp: a.xp,
+      uacCodigo: uac.codigo,
+      uacNombre: uac.nombre,
+      progresionId: prog.id,
+      progresionNumero: prog.numero,
+      orden,
+      estado:
+        st === "completed" ? "completada" : st === "in_progress" ? "en_progreso" : "no_iniciada",
+    });
+  }
+
+  return items;
+}

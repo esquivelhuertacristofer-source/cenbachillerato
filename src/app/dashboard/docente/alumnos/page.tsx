@@ -369,7 +369,7 @@ export default function AlumnosPage() {
   if (loading) return (
     <div className="flex min-h-screen bg-[#F4F1EA] font-['Epilogue']">
       <Sidebar />
-      <main className="flex-1 md:ml-[260px] p-4 sm:p-8 md:p-12 space-y-8 lg:space-y-16">
+      <main className="flex-1 bg-[#F4F1EA] p-4 sm:p-8 md:pt-12 md:pr-12 md:pb-12 md:pl-6 space-y-8 lg:space-y-16">
         <div className="h-64 bg-[#011C40] rounded-[4rem] animate-pulse" />
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
           {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -384,7 +384,7 @@ export default function AlumnosPage() {
     <div className="flex min-h-screen bg-[#F4F1EA] font-['Epilogue'] relative overflow-hidden">
       <Sidebar teacherName={teacherName} />
 
-      <main className="flex-1 md:ml-[260px] p-4 sm:p-8 md:p-12 space-y-8 lg:space-y-16 relative z-10">
+      <main className="flex-1 bg-[#F4F1EA] p-4 sm:p-8 md:pt-12 md:pr-12 md:pb-12 md:pl-6 space-y-8 lg:space-y-16 relative z-10">
 
         {/* Header */}
         <div className="relative overflow-hidden rounded-[3rem] md:rounded-[4rem] bg-[#011C40] p-8 sm:p-12 md:p-16 shadow-2xl">

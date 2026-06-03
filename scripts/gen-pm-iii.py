@@ -1,0 +1,634 @@
+"""Generate src/data/planteamiento/pm-iii.json — PM Semestre 3 (6 progresiones)."""
+import json, pathlib
+
+OUT = pathlib.Path(__file__).parent.parent / "src" / "data" / "planteamiento" / "pm-iii.json"
+
+data = {
+  "PM-III-P01": {
+    "code": "PM-III-P01",
+    "title": "Comprende y aplica el Teorema de Pitagoras en situaciones geometricas y de medicion",
+    "level": "Pensamiento Matematico III",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Geometria",
+    "metadata": {
+      "objective": "Verificar y aplicar el Teorema de Pitagoras para calcular longitudes desconocidas en triangulos rectangulos, vinculando la formula a contextos reales como arquitectura prehispanica, topografia e ingenieria civil.",
+      "competencies": [
+        "Identifica el triangulo rectangulo e identifica sus elementos (catetos, hipotenusa)",
+        "Enuncia el Teorema de Pitagoras (a^2 + b^2 = c^2) y verifica ternas pitagoricas (3-4-5, 5-12-13)",
+        "Calcula la medida desconocida dado dos lados de un triangulo rectangulo",
+        "Aplica el teorema a problemas de distancia, altura y construccion",
+        "Relaciona el teorema con proporciones de la Piramide del Sol en Teotihuacan (base 222 m, altura 63 m)"
+      ],
+      "materials": [
+        "Regla, compas, papel cuadriculado",
+        "Calculadora cientifica o app Desmos",
+        "Ficha con datos reales: dimensiones de la Piramide del Sol (INAH)",
+        "Plano simplificado del Metro CDMX (linea recta entre estaciones)",
+        "Hoja de problemas contextualizados"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "S1", "duration": "50 min", "label": "Descubrimiento geometrico y verificacion numerica"},
+        {"phase": "S2", "duration": "50 min", "label": "Aplicacion contextualizada y evaluacion"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Activar conocimiento previo sobre triangulos y cuadrados. Pregunta detonadora: si conoces dos lados de un triangulo recto, como calculas el tercero?",
+          "activity": "El docente muestra la imagen de la Piramide del Sol de Teotihuacan (INAH) y plantea: cuanto mide la arista inclinada? Los estudiantes estiman y anotan."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "Construccion inductiva del teorema con cuadricula; verificacion algebraica; aplicacion a 3 problemas contextualizados.",
+          "activity": "S1-Actividad 1: En papel cuadriculado, cada estudiante dibuja cuadrados sobre los tres lados de un triangulo rectangulo 3-4-5 y cuenta las cuadritas. Constata que Area(c^2) = Area(a^2) + Area(b^2). S2-Actividad 2: Aplican la formula para calcular (a) la distancia entre dos estaciones del Metro CDMX usando coordenadas simplificadas, (b) la altura alcanzable por una escalera de 5 m apoyada a 3 m del muro, (c) la arista inclinada de la Piramide del Sol (INAH: base triangular ~157 m de apotema, altura 63 m)."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Sintesis y autoevaluacion: los estudiantes redactan en tres oraciones que aprendieron, que les costo trabajo y para que sirve en la vida real.",
+          "activity": "Ticket de salida: Enunciado del Teorema de Pitagoras con sus propias palabras + un ejemplo propio con numeros reales."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "El Teorema de Pitagoras establece que en todo triangulo rectangulo la suma de los cuadrados de los catetos es igual al cuadrado de la hipotenusa: a^2 + b^2 = c^2. Esta relacion, conocida independientemente por matematicos babylonios, egipcios y griegos, es fundamental en geometria euclidiana y tiene aplicaciones directas en arquitectura, topografia y diseno de infraestructura. En Mexico, el INAH ha documentado que los constructores de Teotihuacan emplearon proporciones basadas en ternas pitagoricas para garantizar angulos rectos en sus estructuras.",
+      "sections": [
+        {
+          "subtitle": "Triangulo rectangulo: elementos y nomenclatura",
+          "content": "Un triangulo rectangulo tiene un angulo de 90 grados. Los dos lados que forman ese angulo se llaman catetos (a y b); el lado opuesto al angulo recto, el mas largo, se llama hipotenusa (c). La relacion que los une es a^2 + b^2 = c^2."
+        },
+        {
+          "subtitle": "Ternas pitagoricas",
+          "content": "Una terna pitagorica es un conjunto de tres numeros enteros positivos que satisfacen el teorema: 3-4-5 (9+16=25), 5-12-13 (25+144=169), 8-15-17 (64+225=289). Cualquier multiplo de una terna tambien es terna: 6-8-10, 10-24-26. Las ternas son utiles porque garantizan angulos rectos exactos sin medir el angulo directamente."
+        },
+        {
+          "subtitle": "Aplicacion al calculo de longitudes",
+          "content": "Dado el cateto a=6 y la hipotenusa c=10: b^2 = c^2 - a^2 = 100 - 36 = 64, entonces b=8. Dado cateto a=3 y cateto b=4: c = raiz(9+16) = raiz(25) = 5. Se usa la calculadora para casos no enteros: a=7, b=9, c = raiz(49+81) = raiz(130) aprox 11.4 cm."
+        },
+        {
+          "subtitle": "Contexto real: Piramide del Sol, Teotihuacan",
+          "content": "Segun el INAH, la Piramide del Sol tiene una base cuadrada de aproximadamente 222 m por lado y una altura de 63 m. La apotema (distancia del centro de la base al borde medio de la cara) es aprox 170 m. Con estos datos, la arista inclinada desde el angulo de la base hasta el apice se calcula: c = raiz(170^2 + 63^2) = raiz(28900 + 3969) = raiz(32869) aprox 181 m. Esto ilustra como el teorema se aplica a monumentos patrimoniales de Mexico."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "En un triangulo rectangulo los catetos miden 5 cm y 12 cm. Cuanto mide la hipotenusa?",
+          "options": ["13 cm", "17 cm", "10 cm", "7 cm"],
+          "correct": "13 cm"
+        },
+        {
+          "question": "Una escalera de 10 m se apoya en una pared. La base esta a 6 m del muro. A que altura llega la escalera?",
+          "options": ["8 m", "4 m", "12 m", "16 m"],
+          "correct": "8 m"
+        },
+        {
+          "question": "Cual de los siguientes NO es una terna pitagorica?",
+          "options": ["3-4-6", "3-4-5", "5-12-13", "8-15-17"],
+          "correct": "3-4-6"
+        },
+        {
+          "question": "Si la hipotenusa mide 17 y un cateto mide 15, cuanto mide el otro cateto?",
+          "options": ["8", "10", "12", "6"],
+          "correct": "8"
+        }
+      ],
+      "rubric": "Nivel 4 (Sobresaliente): Calcula correctamente los 3 problemas del desarrollo, justifica el procedimiento algebraico y relaciona el resultado con el contexto real; Nivel 3 (Satisfactorio): Resuelve correctamente al menos 2 problemas y usa la formula sin errores aritmeticos; Nivel 2 (En proceso): Identifica la formula pero comete errores aritmeticos en al menos 1 problema; Nivel 1 (Inicial): Confunde cateto e hipotenusa o no aplica la formula correctamente."
+    },
+    "teacher_tips": [
+      "Verificar que las calculadoras dispongan de la funcion raiz cuadrada antes de la sesion.",
+      "Para estudiantes con dificultades, comenzar con la terna 3-4-5 de forma tactil: cortar tiras de papel de 3, 4 y 5 cuadritos y verificar el angulo recto.",
+      "Relacionar con la asignatura de Historia: los antiguos mexicanos usaban cuerdas con 12 segmentos iguales (cuerda de 3-4-5) para construir esquinas perfectas.",
+      "Extension desafiante: pedir que calculen la longitud de la diagonal de la cancha de futbol del plantel usando un metro y el teorema."
+    ]
+  },
+
+  "PM-III-P02": {
+    "code": "PM-III-P02",
+    "title": "Plantea y resuelve ecuaciones cuadraticas mediante distintos metodos",
+    "level": "Pensamiento Matematico III",
+    "duration": "~4h (3 sesiones de 50 min)",
+    "difficulty": "Intermedio-Alto",
+    "category": "Algebra",
+    "metadata": {
+      "objective": "Resolver ecuaciones cuadraticas (ax^2 + bx + c = 0) usando factorizacion, completacion del cuadrado y formula general, aplicando los metodos a problemas de area, trayectoria y economia cotidiana mexicana.",
+      "competencies": [
+        "Identifica la forma estandar de una ecuacion cuadratica y sus coeficientes a, b, c",
+        "Resuelve por factorizacion cuando la ecuacion es factorizable en enteros",
+        "Completa el cuadrado para transformar a forma vertice",
+        "Aplica la formula general (cuadratica) y calcula el discriminante",
+        "Interpreta las soluciones en contextos de area de parcelas agricolas (INEGI) y trayectorias de proyectiles"
+      ],
+      "materials": [
+        "Fichas algebraicas (algebra tiles) o su representacion en papel cuadriculado",
+        "Tabla de metodos (factorizacion vs formula general vs completacion)",
+        "Problema contextualizado: calculo de area de milpa cuadrada (INEGI datos de superficie sembrada)",
+        "Calculadora cientifica",
+        "Desmos Graphing Calculator (en linea o app)"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "S1", "duration": "50 min", "label": "Factorizacion e introduccion al concepto"},
+        {"phase": "S2", "duration": "50 min", "label": "Formula general y discriminante"},
+        {"phase": "S3", "duration": "50 min", "label": "Completacion del cuadrado y contextos reales"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Conectar con ecuaciones lineales (resolucion conocida) y plantear la pregunta: que pasa cuando la variable esta elevada al cuadrado?",
+          "activity": "El docente plantea: una milpa cuadrada tiene area de 144 m^2, cuanto mide su lado? (x^2 = 144). Los estudiantes resuelven intuitivamente. Luego: el lado aumenta en 3 m y el area es ahora 225 m^2... ya no es tan facil. Surge la necesidad de un metodo sistematico."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "Tres metodos sistematicamente: factorizacion en S1, formula general en S2, completacion del cuadrado en S3.",
+          "activity": "S1-Factorizacion: x^2 + 5x + 6 = 0 -> (x+2)(x+3) = 0 -> x=-2 o x=-3. Verificacion sustituyendo. S2-Formula general: discriminante Delta = b^2-4ac; si Delta>0 dos soluciones reales, si Delta=0 una, si Delta<0 ninguna real. Ejemplo: 2x^2 - 3x - 2 = 0, a=2 b=-3 c=-2, Delta=9+16=25, x=(3+-5)/4 -> x=2 o x=-0.5. S3-Completacion: x^2 + 6x - 7 = 0 -> x^2 + 6x = 7 -> x^2 + 6x + 9 = 16 -> (x+3)^2 = 16 -> x+3 = +-4 -> x=1 o x=-7. Problema real S3: la trayectoria de un balon de futbol sigue h(t) = -5t^2 + 20t. En que momentos h=0? (cuanto tiempo tarda en caer)."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Mapa comparativo de los tres metodos: cuando conviene cada uno.",
+          "activity": "Ticket de salida: resolver x^2 - 7x + 10 = 0 por el metodo de su preferencia y justificar por que eligieron ese metodo."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Una ecuacion cuadratica tiene la forma ax^2 + bx + c = 0, con a distinto de cero. A diferencia de las ecuaciones lineales, puede tener dos soluciones, una (raiz doble), o ninguna solucion real. Las ecuaciones cuadraticas modelan fenomenos fisicos (trayectoria de proyectiles, caida libre) y economicos (utilidad maxima, punto de equilibrio). En el contexto mexicano, se aplican al calculo de superficies agricolas: segun el INEGI, Mexico cuenta con alrededor de 22 millones de hectareas de tierra de labor, donde los agricultores frecuentemente necesitan calcular dimensiones de parcelas a partir del area conocida.",
+      "sections": [
+        {
+          "subtitle": "Forma estandar y coeficientes",
+          "content": "ax^2 + bx + c = 0. Ejemplos: x^2 - 5x + 6 = 0 (a=1, b=-5, c=6); 3x^2 + 2x = 0 (a=3, b=2, c=0); x^2 - 9 = 0 (a=1, b=0, c=-9)."
+        },
+        {
+          "subtitle": "Metodo 1: Factorizacion",
+          "content": "Funciona cuando la ecuacion se puede escribir como producto de dos binomios. Para x^2 + bx + c, se buscan dos numeros p y q tal que p+q=b y p*q=c. Ejemplo: x^2 - 7x + 12 = 0 -> p=-3, q=-4 (suma=-7, producto=12) -> (x-3)(x-4)=0 -> x=3 o x=4."
+        },
+        {
+          "subtitle": "Metodo 2: Formula general (cuadratica)",
+          "content": "Funciona para cualquier ecuacion cuadratica: x = (-b +- raiz(b^2 - 4ac)) / 2a. El discriminante Delta = b^2 - 4ac determina el tipo de soluciones: Delta > 0 -> dos soluciones reales distintas; Delta = 0 -> una solucion real (raiz doble); Delta < 0 -> sin soluciones reales."
+        },
+        {
+          "subtitle": "Metodo 3: Completacion del cuadrado",
+          "content": "Se transforma la ecuacion a la forma (x+h)^2 = k. Pasos: (1) mover c al otro lado; (2) dividir b entre 2 y elevar al cuadrado: (b/2)^2; (3) sumar ese valor a ambos lados; (4) factorizar el lado izquierdo como cuadrado perfecto; (5) sacar raiz cuadrada. Este metodo tambien da la forma vertice de la parabola: y = a(x-h)^2 + k."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Cuales son las soluciones de x^2 - 5x + 6 = 0?",
+          "options": ["x=2 y x=3", "x=-2 y x=-3", "x=1 y x=6", "x=5 y x=1"],
+          "correct": "x=2 y x=3"
+        },
+        {
+          "question": "Para la ecuacion 2x^2 - 4x + 2 = 0, el valor del discriminante es:",
+          "options": ["0", "8", "16", "-8"],
+          "correct": "0"
+        },
+        {
+          "question": "Si Delta < 0, la ecuacion cuadratica tiene:",
+          "options": ["Ninguna solucion real", "Dos soluciones reales", "Una solucion real", "Infinitas soluciones"],
+          "correct": "Ninguna solucion real"
+        },
+        {
+          "question": "Resuelve x^2 - 9 = 0:",
+          "options": ["x=3 y x=-3", "x=9 y x=-9", "x=3", "x=4.5"],
+          "correct": "x=3 y x=-3"
+        }
+      ],
+      "rubric": "Nivel 4: Resuelve correctamente usando los tres metodos y explica cuando conviene cada uno; Nivel 3: Usa correctamente la formula general y factoriza ecuaciones simples; Nivel 2: Aplica la formula general con apoyo pero comete errores en el calculo de la raiz; Nivel 1: No aplica ninguno de los metodos de forma correcta."
+    },
+    "teacher_tips": [
+      "Iniciar siempre con factorizacion para ecuaciones con coeficientes enteros pequenos; reservar la formula general para casos que no factorizan facilmente.",
+      "Contextualizar con datos reales del INEGI: Mexico tiene aprox 22 millones de hectareas de tierra de labor; plantear problemas de area de parcelas con dimensiones realistas.",
+      "Usar Desmos para graficar la parabola y que los estudiantes vean visualmente donde la curva corta al eje x (esas son las soluciones).",
+      "Para el discriminante, usar una codificacion visual: Delta>0 (dos raices, verde), Delta=0 (una raiz, amarillo), Delta<0 (sin raices reales, rojo)."
+    ]
+  },
+
+  "PM-III-P03": {
+    "code": "PM-III-P03",
+    "title": "Analiza e interpreta la naturaleza de las raices de una ecuacion cuadratica",
+    "level": "Pensamiento Matematico III",
+    "duration": "~2.5h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Algebra",
+    "metadata": {
+      "objective": "Usar el discriminante para determinar sin calcular explicitamente si una ecuacion cuadratica tiene dos soluciones reales distintas, una real doble o ninguna real, y relacionar este analisis con la grafica de la parabola correspondiente.",
+      "competencies": [
+        "Calcula el discriminante Delta = b^2 - 4ac correctamente",
+        "Clasifica la naturaleza de las raices segun el signo del discriminante",
+        "Relaciona el discriminante con el numero de intersecciones de la parabola con el eje x",
+        "Interpreta graficamente en Desmos la correspondencia discriminante-grafica",
+        "Aplica el analisis a modelos economicos y de fisica (punto de equilibrio, altura maxima)"
+      ],
+      "materials": [
+        "Tarjetas con 8 ecuaciones cuadraticas variadas",
+        "Desmos Graphing Calculator (proyector o tabletas)",
+        "Tabla de clasificacion: Delta>0 / Delta=0 / Delta<0",
+        "Problema contextualizado: altura de un cohete artesanal (feria de ciencias IPN)",
+        "Regla y lapiz de colores para esbozar parabolas"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "S1", "duration": "50 min", "label": "Discriminante y clasificacion de raices"},
+        {"phase": "S2", "duration": "50 min", "label": "Interpretacion grafica y aplicacion contextual"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Recuperar el concepto de discriminante introducido en PM-III-P02 y explorar su significado geometrico.",
+          "activity": "El docente grafica en Desmos tres parabolas: y=x^2-4 (Delta>0), y=x^2 (Delta=0), y=x^2+1 (Delta<0). Los estudiantes observan y responden: cuantas veces cruza cada parabola el eje x?"
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "Calculo del discriminante para 8 ecuaciones; correlacion con la grafica; aplicacion a problema de altura de proyectil.",
+          "activity": "Actividad 1: En equipos, clasificar 8 ecuaciones cuadraticas segun el discriminante (dos reales / raiz doble / sin reales). Verificar en Desmos. Actividad 2 (S2): El cohete artesanal de un estudiante del IPN sigue h(t) = -4.9t^2 + 19.6t + 2. Preguntas: (a) cual es la altura maxima? (b) en que momentos esta a nivel del suelo? (c) que valor del discriminante indica si el cohete alcanza los 25 m?"
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Sintesis visual: mapa conceptual discriminante-raices-parabola.",
+          "activity": "Cada estudiante completa la tabla: Delta positivo -> grafica: ___; soluciones: ___. Delta cero -> ... Delta negativo -> ..."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "El discriminante de la ecuacion cuadratica ax^2 + bx + c = 0 es el valor Delta = b^2 - 4ac. Actua como un indicador: revela el tipo de soluciones sin necesidad de resolverla completamente. Geometricamente, el signo del discriminante indica cuantos puntos de interseccion tiene la parabola y = ax^2 + bx + c con el eje x.",
+      "sections": [
+        {
+          "subtitle": "Los tres casos del discriminante",
+          "content": "Delta > 0: la ecuacion tiene DOS soluciones reales distintas; la parabola corta el eje x en dos puntos. Delta = 0: la ecuacion tiene UNA solucion real (raiz doble); la parabola es tangente al eje x (toca pero no cruza). Delta < 0: la ecuacion NO tiene soluciones reales; la parabola no toca el eje x."
+        },
+        {
+          "subtitle": "Relacion con la formula general",
+          "content": "En la formula x = (-b +- raiz(Delta)) / 2a, si Delta < 0 la raiz cuadrada no tiene valor real, por eso no hay soluciones reales. Si Delta = 0, raiz(0)=0, la formula da un unico valor: x = -b / 2a (que es el eje de simetria de la parabola)."
+        },
+        {
+          "subtitle": "Aplicacion en modelacion fisica",
+          "content": "En el lanzamiento de un objeto, h(t) = -g*t^2 + v0*t + h0. Si se pregunta si el objeto alcanza una altura H, se plantea -g*t^2 + v0*t + h0 = H, lo que equivale a -g*t^2 + v0*t + (h0-H) = 0. El discriminante determina si H es alcanzable: Delta > 0 (si la alcanza en dos momentos: subida y bajada), Delta = 0 (la toca exactamente en la cima), Delta < 0 (nunca la alcanza)."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Para 3x^2 - 6x + 3 = 0, el discriminante vale:",
+          "options": ["0", "36", "-36", "9"],
+          "correct": "0"
+        },
+        {
+          "question": "Si Delta = -5, la ecuacion cuadratica tiene:",
+          "options": ["Ninguna solucion real", "Dos soluciones reales", "Una solucion real doble", "Tres soluciones"],
+          "correct": "Ninguna solucion real"
+        },
+        {
+          "question": "Una parabola que corta el eje x en dos puntos tiene un discriminante:",
+          "options": ["Positivo", "Negativo", "Igual a cero", "Cualquiera"],
+          "correct": "Positivo"
+        },
+        {
+          "question": "Para x^2 + 4x + 4 = 0, cuanto vale la unica solucion real?",
+          "options": ["-2", "2", "-4", "4"],
+          "correct": "-2"
+        }
+      ],
+      "rubric": "Nivel 4: Calcula el discriminante para todos los casos, interpreta geometricamente y aplica al problema de altura; Nivel 3: Calcula correctamente y clasifica los tres casos; Nivel 2: Calcula el discriminante pero confunde la clasificacion; Nivel 1: No calcula el discriminante correctamente."
+    },
+    "teacher_tips": [
+      "Hacer enfasis en que el discriminante es solo una parte de la formula general: no resuelve la ecuacion, solo anticipa cuantas soluciones habra.",
+      "Usar Desmos de forma activa: que los estudiantes arrastren el coeficiente c y observen como cambia el numero de intersecciones.",
+      "Relacionar con datos del IPN y UNAM: ambas instituciones ofrecen ferias de ciencias donde se usan funciones cuadraticas para modelar proyectiles en cohetes de agua.",
+      "Para estudiantes avanzados: investigar numeros complejos como extension cuando Delta < 0."
+    ]
+  },
+
+  "PM-III-P04": {
+    "code": "PM-III-P04",
+    "title": "Calcula perimetros, areas y volumenes de figuras y solidos geometricos",
+    "level": "Pensamiento Matematico III",
+    "duration": "~4h (3 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Geometria",
+    "metadata": {
+      "objective": "Calcular perimetros, areas y volumenes de figuras planas y solidos en 3D, utilizando formulas precisas y aplicando los calculos a contextos arquitectonicos, urbanos y ambientales de Mexico.",
+      "competencies": [
+        "Calcula el perimetro y area de poligonos regulares e irregulares",
+        "Aplica formulas de area: triangulo (base x altura / 2), circulo (pi*r^2), trapecio ((B+b)*h/2)",
+        "Calcula volumen de prismas (V = Area_base x altura), cilindros, piramides (V = A_base x h / 3) y conos",
+        "Convierte unidades de medida (cm2 a m2, m3 a litros)",
+        "Aplica calculos a problemas de albercas (CONADE), reservorios de agua (CONAGUA) y zonas urbanas (SEDESOL)"
+      ],
+      "materials": [
+        "Regla, transportador, cinta metrica",
+        "Formulario de figuras geometricas (plastificado)",
+        "Datos reales: capacidad de la presa Falcon (CONAGUA): 4 200 millones m3",
+        "Planos simplificados de una vivienda de interes social INFONAVIT",
+        "Calculadora; Desmos para formulas"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "S1", "duration": "50 min", "label": "Figuras planas: perimetro y area"},
+        {"phase": "S2", "duration": "50 min", "label": "Solidos: volumen y superficie lateral"},
+        {"phase": "S3", "duration": "50 min", "label": "Proyecto integrador: plano de vivienda INFONAVIT"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Activar el concepto de medicion: diferencia entre perimetro (longitud del borde), area (superficie), volumen (espacio interior).",
+          "activity": "El docente muestra una fotografia aerea de la zona del Zocalo de CDMX (INEGI) y pregunta: como calcularían el area del espacio abierto? Que necesitarian medir? Se identifican las figuras geometricas presentes."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "S1: figuras planas. S2: solidos 3D. S3: aplicacion a plano de vivienda.",
+          "activity": "S1: Cada equipo recibe cinco figuras (cuadrado, rectangulo, triangulo, circulo, trapecio) con medidas reales. Calculan perimetro y area. Comprueban con medicion directa. S2: Construyen con cartulina un prisma rectangular y un cilindro; calculan su volumen y comparan con capacidades reales de tinaco (1100 L = 1.1 m3) y cisterna domestica (5000 L = 5 m3). S3: Con el plano de una vivienda INFONAVIT de 42 m2, calculan el area de cada cuarto, el area total, el perimetro exterior y estiman el volumen total del inmueble (altura promedio 2.4 m)."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Presentacion de resultados del plano de vivienda; comparacion entre equipos.",
+          "activity": "Cada equipo comparte el calculo del area total del plano y justifica su procedimiento. El docente consolida el formulario unificado de figuras."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La medicion de longitudes, superficies y volumenes es una de las aplicaciones mas directas de la geometria. En Mexico, estas mediciones son esenciales en la construccion de vivienda social (INFONAVIT, que ha construido mas de 11 millones de viviendas segun sus reportes anuales), el manejo de cuencas hidrograficas (CONAGUA) y la planificacion urbana (SEDESOL/SEDATU). Conocer las formulas correctas y aplicarlas con precision evita errores costosos en materiales de construccion y diseno.",
+      "sections": [
+        {
+          "subtitle": "Perimetro y area de figuras planas",
+          "content": "Cuadrado: P = 4l, A = l^2. Rectangulo: P = 2(l+w), A = l*w. Triangulo: P = a+b+c, A = base*altura/2. Circulo: P = 2*pi*r (circunferencia), A = pi*r^2. Trapecio: A = (B+b)*h/2 donde B y b son las bases paralelas. Paralelogramo: A = base*altura."
+        },
+        {
+          "subtitle": "Volumen de solidos",
+          "content": "Prisma rectangular (caja): V = largo*ancho*alto. Cilindro: V = pi*r^2*h. Piramide: V = (1/3)*A_base*altura. Cono: V = (1/3)*pi*r^2*h. Esfera: V = (4/3)*pi*r^3. La clave es identificar correctamente la base y la altura en cada solido."
+        },
+        {
+          "subtitle": "Conversion de unidades",
+          "content": "Area: 1 m^2 = 10,000 cm^2; 1 hectarea = 10,000 m^2; 1 km^2 = 1,000,000 m^2. Volumen: 1 m^3 = 1,000 litros = 1,000,000 cm^3; 1 litro = 1 dm^3 = 1,000 cm^3. Ejemplo: una cisterna de 2m x 1.5m x 1m tiene V = 3 m^3 = 3,000 litros."
+        },
+        {
+          "subtitle": "Contexto mexicano: infraestructura hidraulica",
+          "content": "La presa Falcon en la frontera Mexico-EUA (CONAGUA) tiene capacidad de almacenamiento de aproximadamente 4,200 millones de m^3. Otro ejemplo: el Lago de Texcoco, en el proceso de gestion ambiental del nuevo aeropuerto AIFA (SEMARNAT), tiene una superficie de aproximadamente 144 km^2. Estos datos requieren precision en conversion de unidades."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Un rectangulo tiene base 8 m y altura 5 m. Cual es su area?",
+          "options": ["40 m^2", "26 m^2", "13 m^2", "80 m^2"],
+          "correct": "40 m^2"
+        },
+        {
+          "question": "Un cilindro tiene radio 3 m y altura 4 m. Su volumen es aproximadamente:",
+          "options": ["113 m^3", "75 m^3", "36 m^3", "226 m^3"],
+          "correct": "113 m^3"
+        },
+        {
+          "question": "Una cisterna mide 2m x 1m x 1.5m. Cuantos litros caben?",
+          "options": ["3000 litros", "300 litros", "30 litros", "30000 litros"],
+          "correct": "3000 litros"
+        },
+        {
+          "question": "El area de un triangulo con base 10 cm y altura 6 cm es:",
+          "options": ["30 cm^2", "60 cm^2", "16 cm^2", "15 cm^2"],
+          "correct": "30 cm^2"
+        }
+      ],
+      "rubric": "Nivel 4: Calcula correctamente area y volumen en todos los problemas, convierte unidades sin error y aplica al plano de vivienda con justificacion completa; Nivel 3: Calcula correctamente en la mayoria de los casos; errores menores en conversion de unidades; Nivel 2: Usa formulas correctas pero comete errores aritmeticos; Nivel 1: Confunde perimetro con area o no identifica la formula correcta."
+    },
+    "teacher_tips": [
+      "Llevar al salon objetos reales: un vaso (cilindro), una caja de cereales (prisma rectangular), una pelota (esfera) para medir directamente.",
+      "Para la actividad del plano de vivienda, conseguir con antelacion planos tipo INFONAVIT descargados del portal infonavit.org.mx.",
+      "Mencionar que el INEGI publica datos de superficie de estados y municipios de Mexico, y que esos calculos usan exactamente estas formulas.",
+      "Actividad de cierre opcional: calcular cuantos litros de pintura se necesitarian para pintar las paredes del salon (area lateral) con un rendimiento de 12 m^2/litro."
+    ]
+  },
+
+  "PM-III-P05": {
+    "code": "PM-III-P05",
+    "title": "Aplica semejanza y congruencia de triangulos en la resolucion de problemas",
+    "level": "Pensamiento Matematico III",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Geometria",
+    "metadata": {
+      "objective": "Distinguir y aplicar los criterios de congruencia (LLL, LAL, ALA) y semejanza (AA, LAL, LLL) de triangulos para resolver problemas de medicion indirecta en contextos geograficos y arquitectonicos de Mexico.",
+      "competencies": [
+        "Define congruencia (misma forma y tamano) y semejanza (misma forma, diferente tamano) con precision",
+        "Identifica y aplica los criterios de congruencia: LLL, LAL, ALA, AAL",
+        "Identifica y aplica los criterios de semejanza: AA, LAL proporcional, LLL proporcional",
+        "Usa la razon de semejanza para calcular longitudes desconocidas",
+        "Aplica medicion indirecta con semejanza para estimar altura de monumentos (INAH) o distancias en mapas (INEGI)"
+      ],
+      "materials": [
+        "Regla y transportador",
+        "Pares de triangulos impresos (congruentes y semejantes) en cartulina",
+        "Mapa topografico simplificado (INEGI) con escala 1:50,000",
+        "Fotografia del Angel de la Independencia (altura 6.7 m la victoria + 36 m columna = 42.7 m total)",
+        "Vara de 1 m y cinta metrica para actividad de medicion indirecta en el patio"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "S1", "duration": "50 min", "label": "Congruencia: criterios y aplicaciones"},
+        {"phase": "S2", "duration": "50 min", "label": "Semejanza: razon y medicion indirecta"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Diferenciar congruencia de semejanza con ejemplos cotidianos: fotografias (semejanza), piezas de rompecabezas iguales (congruencia), maquetas de edificios (semejanza).",
+          "activity": "El docente muestra dos triangulos en el proyector: uno a escala del otro. Pregunta: son iguales? son parecidos? Que tienen en comun? Que los diferencia? Introduce los terminos congruencia y semejanza con una comparacion entre el mapa de Mexico y el territorio real."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "S1: criterios de congruencia con actividad tactil. S2: semejanza y medicion indirecta en el patio del plantel.",
+          "activity": "S1: Cada equipo recibe 8 pares de triangulos en cartulina; deben clasificarlos como congruentes o no-congruentes y justificar con el criterio (LLL, LAL, ALA). S2: Actividad de sombra en el patio. Con una vara de 1 m y una regla, los estudiantes miden la sombra de la vara (s1) y la sombra de un arbol o edificio del plantel (s2). Por semejanza de triangulos: altura_objeto / s2 = 1 m / s1. Calculan la altura del arbol sin subirlo. Este metodo es el mismo que uso Tales de Mileto para medir la altura de las piramides."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Discusion del metodo de medicion indirecta: precision, fuentes de error, aplicaciones reales.",
+          "activity": "Los equipos comparten su resultado de la altura del arbol. Se calcula el promedio de la clase y se discuten las posibles fuentes de error (angulo del sol, superficie plana del suelo). Conexion con como el INEGI usa tecnicas similares en levantamiento topografico."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Dos figuras son congruentes si tienen exactamente la misma forma y el mismo tamano (se pueden superponer). Son semejantes si tienen la misma forma pero diferente tamano (una es una ampliacion o reduccion de la otra). Estos conceptos son fundamentales en cartografia: los mapas del INEGI son figuras semejantes al territorio real, con una escala definida como la razon entre una distancia en el mapa y la distancia real correspondiente.",
+      "sections": [
+        {
+          "subtitle": "Criterios de congruencia de triangulos",
+          "content": "LLL (Lado-Lado-Lado): si los tres lados de un triangulo son iguales a los tres lados del otro, son congruentes. LAL (Lado-Angulo-Lado): si dos lados y el angulo comprendido entre ellos son iguales. ALA (Angulo-Lado-Angulo): si dos angulos y el lado comprendido son iguales. AAL: dos angulos y un lado no comprendido. Nota: AAA no garantiza congruencia (solo semejanza)."
+        },
+        {
+          "subtitle": "Criterios de semejanza de triangulos",
+          "content": "AA (Angulo-Angulo): si dos angulos de un triangulo son iguales a dos angulos del otro, los triangulos son semejantes (el tercero tambien sera igual porque la suma de angulos = 180). LAL proporcional: si dos lados son proporcionales y el angulo entre ellos es igual. LLL proporcional: si los tres lados son proporcionales (misma razon de semejanza k)."
+        },
+        {
+          "subtitle": "Razon de semejanza y calculo de longitudes",
+          "content": "Si dos triangulos son semejantes con razon k, entonces cada lado del triangulo mayor = k * lado correspondiente del menor. Ejemplo: triangulo ABC semejante a triangulo DEF con k=3. Si AB=5, DE=15; si BC=7, EF=21. Para encontrar k: k = lado_mayor / lado_correspondiente_menor. Para encontrar un lado desconocido: x / lado_conocido_mayor = lado_correspondiente_menor / otro_lado_menor."
+        },
+        {
+          "subtitle": "Medicion indirecta: Tales de Mileto en Mexico",
+          "content": "El metodo de la sombra usa semejanza de triangulos: en el mismo momento del dia, la sombra de un objeto es proporcional a su altura. Si una vara de 1 m proyecta una sombra de 0.8 m, y un arbol proyecta una sombra de 6.4 m, entonces: altura_arbol / 6.4 = 1 / 0.8 -> altura_arbol = 8 m. Este principio se usa en topografia, fotogrametria (INEGI) y arqueologia (INAH) para estimar alturas de estructuras."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Dos triangulos tienen lados 3-4-5 y 6-8-10. Son:",
+          "options": ["Semejantes pero no congruentes", "Congruentes", "Ni semejantes ni congruentes", "Semejantes y congruentes"],
+          "correct": "Semejantes pero no congruentes"
+        },
+        {
+          "question": "Una vara de 2 m proyecta una sombra de 1.5 m. Un edificio proyecta una sombra de 12 m. Cuanto mide el edificio?",
+          "options": ["16 m", "9 m", "18 m", "8 m"],
+          "correct": "16 m"
+        },
+        {
+          "question": "Cual criterio garantiza que dos triangulos son congruentes?",
+          "options": ["LAL", "AA", "Mismo perimetro", "Misma area"],
+          "correct": "LAL"
+        },
+        {
+          "question": "La razon de semejanza entre dos triangulos es 1:4. Si un lado del triangulo mayor mide 20 cm, el lado correspondiente del menor mide:",
+          "options": ["5 cm", "4 cm", "16 cm", "80 cm"],
+          "correct": "5 cm"
+        }
+      ],
+      "rubric": "Nivel 4: Identifica y aplica correctamente todos los criterios, ejecuta la medicion indirecta con precision y justifica con semejanza de triangulos; Nivel 3: Aplica correctamente los criterios principales y calcula longitudes con razon de semejanza; Nivel 2: Distingue congruencia de semejanza pero confunde los criterios; Nivel 1: No distingue congruencia de semejanza o no aplica la razon de semejanza."
+    },
+    "teacher_tips": [
+      "La actividad de la sombra requiere un dia soleado y un espacio exterior; planificar con anticipacion y tener una actividad alternativa interior por si hay nubes.",
+      "Relacionar explicitamente con mapas: mostrar un mapa INEGI 1:50,000 y preguntar cuantos metros reales equivalen a 1 cm en el mapa (respuesta: 500 m).",
+      "Para consolidar congruencia, usar piezas de origami o tangram que los estudiantes manipulen y superpongan.",
+      "Mencionar que los ingenieros del IMSS, ISSSTE e INFONAVIT usan planos arquitectonicos que son figuras semejantes a la construccion real."
+    ]
+  },
+
+  "PM-III-P06": {
+    "code": "PM-III-P06",
+    "title": "Relaciona el algebra con la geometria mediante la representacion y analisis de funciones",
+    "level": "Pensamiento Matematico III",
+    "duration": "~4h (3 sesiones de 50 min)",
+    "difficulty": "Intermedio-Alto",
+    "category": "Algebra y geometria",
+    "metadata": {
+      "objective": "Graficar e interpretar funciones lineales y cuadraticas en el plano cartesiano, relacionando la expresion algebraica con su representacion geometrica, y aplicar el analisis a modelos de crecimiento demografico, economia y fenomenos fisicos en Mexico.",
+      "competencies": [
+        "Ubica puntos en el plano cartesiano y los conecta con pares ordenados",
+        "Grafica funciones lineales (y = mx + b) e identifica pendiente e intercepto",
+        "Grafica funciones cuadraticas (y = ax^2 + bx + c) e identifica vertice, eje de simetria y concavidad",
+        "Interpreta el significado de intersecciones con los ejes en contextos reales",
+        "Modela con funciones datos demograficos del INEGI (crecimiento poblacional, PIB per capita)"
+      ],
+      "materials": [
+        "Papel cuadriculado milimetrico o cuadricula impresa",
+        "Desmos Graphing Calculator (proyector o tabletas)",
+        "Tabla de datos: poblacion de Mexico 1950-2020 (INEGI Censos de Poblacion)",
+        "Tarjetas con ecuaciones para clasificar (lineal / cuadratica / ninguna)",
+        "Regla y lapiz de colores"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "S1", "duration": "50 min", "label": "Funciones lineales: pendiente, intercepto y grafica"},
+        {"phase": "S2", "duration": "50 min", "label": "Funciones cuadraticas: parabola, vertice y eje de simetria"},
+        {"phase": "S3", "duration": "50 min", "label": "Modelacion de datos reales y proyecto integrador"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Conectar algebra y geometria: la ecuacion como descripcion de una figura, la figura como visualizacion de la ecuacion.",
+          "activity": "El docente proyecta una tabla de la poblacion de Mexico en censos (INEGI): 1950=25.8M, 1970=48.2M, 1990=81.2M, 2010=112.3M, 2020=126.0M. Pregunta: si graficamos estos puntos, que forma tendran? Pueden predecir la poblacion en 2030?"
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "S1: funciones lineales y su grafica. S2: parabolas y sus propiedades. S3: modelacion con datos reales del INEGI.",
+          "activity": "S1: Graficar y = 2x + 3 y y = -x + 5 en cuadricula; identificar pendiente (inclinacion) e intercepto (donde corta el eje y). Juego: dados dos puntos, encontrar la ecuacion de la recta. S2: Graficar y = x^2 - 4x + 3 en Desmos; identificar vertice (minimo o maximo), eje de simetria x = -b/2a, intersecciones con eje x (raices) e intercepto y. S3: Con los datos del INEGI, estimar una funcion lineal aproximada para el crecimiento poblacional de Mexico entre 1990 y 2020; usarla para proyectar la poblacion en 2030 y 2040; discutir limitaciones del modelo lineal."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Reflexion sobre el poder y las limitaciones de los modelos matematicos para representar fenomenos reales.",
+          "activity": "Discusion grupal: la funcion lineal sobreestima o subestima la poblacion futura? Que tipo de funcion modelaria mejor el crecimiento demografico? (exponencial -- conexion con el proximo semestre). Ticket de salida: dibuja una parabola e identifica vertice, eje de simetria y concavidad."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Una funcion es una regla que asigna a cada valor de entrada (x) exactamente un valor de salida (y). La representacion grafica de una funcion permite visualizar su comportamiento: crecimiento, decrecimiento, maximos, minimos, intersecciones. El algebra y la geometria se unen en el plano cartesiano, donde cada ecuacion tiene una forma geometrica caracteristica. El INEGI usa estas representaciones en todos sus reportes estadisticos para comunicar tendencias demograficas, economicas y sociales.",
+      "sections": [
+        {
+          "subtitle": "Funcion lineal: y = mx + b",
+          "content": "m es la pendiente: indica la inclinacion y el sentido (m>0 crece, m<0 decrece, m=0 horizontal). b es el intercepto en y: el valor de y cuando x=0 (donde la recta cruza el eje vertical). Para graficar: trazar el punto (0, b) y desde ahi avanzar m unidades verticales por cada 1 horizontal. Ejemplo: y = 3x - 2 pasa por (0,-2) y tiene pendiente 3 (sube 3 por cada 1 que avanza a la derecha)."
+        },
+        {
+          "subtitle": "Funcion cuadratica: y = ax^2 + bx + c",
+          "content": "Su grafica es una parabola. Si a>0 abre hacia arriba (tiene minimo); si a<0 abre hacia abajo (tiene maximo). El vertice es el punto mas alto o mas bajo: x_vertice = -b/2a; y_vertice = f(x_vertice). El eje de simetria es la recta vertical x = -b/2a. Las intersecciones con el eje x son las soluciones de ax^2+bx+c=0 (calculadas con la formula general)."
+        },
+        {
+          "subtitle": "Modelacion con funciones: ejemplo INEGI",
+          "content": "Usando los censos de Mexico 1990 (81.2M) y 2020 (126.0M), la pendiente del modelo lineal es m = (126-81.2)/(2020-1990) = 44.8/30 = 1.49 millones/anio. La ecuacion: P(t) = 81.2 + 1.49*(t-1990). Para t=2030: P = 81.2 + 1.49*40 = 81.2 + 59.6 = 140.8 millones. Esta es una estimacion lineal; el CONAPO usa modelos mas sofisticados basados en tasas de natalidad, mortalidad y migracion."
+        },
+        {
+          "subtitle": "Intersecciones con los ejes",
+          "content": "Intercepto en y (cuando x=0): sustituir x=0 en la ecuacion. Para y=2x+5, el intercepto es 5. Para y=x^2-4, el intercepto es -4. Interseccion con el eje x (cuando y=0): resolver la ecuacion igualada a cero. Para y=2x+5: x=-2.5. Para y=x^2-4: x=+-2. Estas intersecciones tienen significado fisico: en un modelo de ingresos vs costos, la interseccion con el eje x es el punto de equilibrio (Break-Even Point)."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "En la funcion y = -3x + 6, la pendiente es:",
+          "options": ["-3", "6", "3", "-6"],
+          "correct": "-3"
+        },
+        {
+          "question": "El vertice de y = x^2 - 6x + 5 tiene coordenada x =",
+          "options": ["3", "-3", "6", "5"],
+          "correct": "3"
+        },
+        {
+          "question": "Una funcion cuadratica con a < 0 tiene una parabola que:",
+          "options": ["Abre hacia abajo (tiene maximo)", "Abre hacia arriba (tiene minimo)", "Es una linea recta", "No tiene vertice"],
+          "correct": "Abre hacia abajo (tiene maximo)"
+        },
+        {
+          "question": "Cual es el intercepto en y de la funcion y = 4x^2 - 2x + 7?",
+          "options": ["7", "4", "-2", "0"],
+          "correct": "7"
+        }
+      ],
+      "rubric": "Nivel 4: Grafica con precision funciones lineales y cuadraticas, identifica todos los elementos (pendiente, vertice, intersecciones) y construye un modelo con datos del INEGI con interpretacion correcta; Nivel 3: Grafica correctamente y identifica los elementos principales; Nivel 2: Grafica con errores menores; confunde pendiente con intercepto o no identifica el vertice; Nivel 1: No puede graficar correctamente una funcion lineal."
+    },
+    "teacher_tips": [
+      "Desmos es la herramienta ideal para esta progresion: permite ver en tiempo real como cambia la grafica al modificar los coeficientes.",
+      "Usar los datos reales del INEGI (Censos de Poblacion y Vivienda) disponibles en inegi.org.mx para la actividad de modelacion; descargarlos previamente.",
+      "Para la funcion cuadratica, hacer que los estudiantes experimenten con el slider de a en Desmos: que pasa cuando a se hace muy grande? muy pequeno? negativo?",
+      "Conexion interdisciplinaria: en Ciencias Naturales (CNEYT) se estudian funciones para modelar fenomenos fisicos como caida libre y movimiento armonico; coordinar con el docente correspondiente."
+    ]
+  }
+}
+
+with open(OUT, "w", encoding="utf-8") as f:
+    json.dump(data, f, ensure_ascii=False, indent=2)
+
+print(f"Written {len(data)} progressions to {OUT}")

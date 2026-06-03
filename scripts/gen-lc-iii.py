@@ -1,0 +1,742 @@
+"""Generate src/data/planteamiento/lc-iii.json — Lectura y Creatividad III (7 progresiones)."""
+import json, pathlib
+
+OUT = pathlib.Path(__file__).parent.parent / "src" / "data" / "planteamiento" / "lc-iii.json"
+
+data = {
+  "LC-III-P01": {
+    "code": "LC-III-P01",
+    "title": "Analiza la informacion extraida de un texto para darle sentido e interpretar su proposito",
+    "level": "Lectura y Creatividad III",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Comprension lectora",
+    "metadata": {
+      "objective": "Aplicar estrategias de lectura analitica (parafraseo, inferencia, identificacion de proposito, evaluacion de fuentes) para construir interpretaciones fundamentadas de textos informativos, argumentativos y literarios, distinguiendo hechos de opiniones.",
+      "competencies": [
+        "Parafrasea parrafos complejos identificando la idea central y las ideas de apoyo",
+        "Infiere el proposito comunicativo del texto (informar, persuadir, narrar, expresar) a partir de pistas textuales",
+        "Distingue hechos verificables de opiniones y juicios de valor en textos mixtos",
+        "Evalua la confiabilidad de la fuente con criterios basicos (autoria, institucion, fecha, coherencia interna)",
+        "Escribe un parrafo de sintesis que integre informacion de dos textos con perspectivas diferentes"
+      ],
+      "materials": [
+        "Texto 1: articulo informativo sobre la desigualdad educativa en Mexico (INEE/MEJOREDU 2022)",
+        "Texto 2: editorial de opinion sobre el mismo tema (Nexos o Letras Libres)",
+        "Cuadro comparativo hecho vs opinion (para completar en equipos)",
+        "Guia de evaluacion de fuentes: CRAAP adaptado al espanol (Confiabilidad, Relevancia, Autoria, Actualidad, Proposito)",
+        "Ficha de parafraseo: idea central + tres ideas de apoyo"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "S1", "duration": "50 min", "label": "Parafraseo, inferencia y distincion hecho-opinion"},
+        {"phase": "S2", "duration": "50 min", "label": "Evaluacion de fuentes y sintesis integradora"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Activar la conciencia critica del lector: no toda informacion es igual.",
+          "activity": "El docente muestra dos titulares sobre el mismo evento educativo: uno de un periodico de datos (INEGI) y otro de una red social. Pregunta: cual creen que es mas confiable? Por que? Introduce el concepto de lectura critica como habilidad ciudadana fundamental en la era de la infodemia."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "S1: lectura y analisis del articulo informativo con guia de parafraseo. S2: comparacion con el editorial y sintesis.",
+          "activity": "S1: Los estudiantes leen el articulo de MEJOREDU sobre brechas de aprendizaje en Mexico post-COVID. En parejas, completan la ficha: idea central del texto, tres ideas de apoyo, dos hechos con datos numericos, dos afirmaciones que son opiniones. S2: Leen el fragmento del editorial de Nexos o Letras Libres. Completan el cuadro comparativo: en que coinciden los textos? En que difieren? Cual esta mejor fundamentado? Cada estudiante escribe un parrafo de 8-10 oraciones que sintetice ambas perspectivas sin confundir sus voces."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Reflexion sobre la importancia de la lectura critica en la vida cotidiana.",
+          "activity": "Discusion: si solo leyeran uno de los dos textos, que perspectiva tendrian del problema educativo? Que se pierde al leer solo una fuente? Conexion con la desinformacion en redes sociales y el papel del lector critico."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La comprension lectora no se limita a decodificar palabras: implica construir significado activamente, identificar el proposito del texto, distinguir lo que dice el autor de lo que el lector infiere, y evaluar la confiabilidad de la fuente. Estas habilidades son cada vez mas urgentes en un contexto de sobreabundancia informativa: el INEGI reporta que el 78.6% de los mexicanos tiene acceso a internet (ENDUTIH 2022), lo que expone a millones de personas a noticias, opiniones y desinformacion mezcladas sin distincion.",
+      "sections": [
+        {
+          "subtitle": "Estrategias de lectura critica",
+          "content": "Parafraseo: reformular con palabras propias la idea de un parrafo, sin copiar y sin distorsionar. Inferencia: identificar informacion implicita que el texto no dice explicitamente pero que se desprende de sus datos o argumentos. Identificacion de proposito: preguntarse para que fue escrito este texto? (informar, persuadir, entretener, denunciar, vender). Evaluacion de fuentes: quien escribe, con que autoridad, cuando, con que evidencia."
+        },
+        {
+          "subtitle": "Hecho vs opinion",
+          "content": "Un hecho es verificable y no depende de quien lo diga: Mexico tiene 126 millones de habitantes segun el Censo INEGI 2020. Una opinion expresa el juicio o valoracion de alguien: el gobierno deberia invertir mas en educacion. Los textos mixtos combinan hechos y opiniones; identificar cuales son cuales es clave para no aceptar como verdad lo que es solo perspectiva. Pistas linguisticas de opinion: verbos de valor (creo, considero, es necesario, parece), adjetivos valorativos (inaceptable, urgente, excelente), adverbios evaluativos (lamentablemente, afortunadamente)."
+        },
+        {
+          "subtitle": "Evaluacion de fuentes: criterio CRAAP en espanol",
+          "content": "C - Confiabilidad: la fuente es reconocida y transparente sobre sus metodos? R - Relevancia: el contenido responde a mi pregunta? A - Autoria: quien lo escribio? tiene credenciales en el tema? A - Actualidad: cuando fue publicado? el tema requiere datos recientes? P - Proposito: por que fue creado? informar de forma neutral, persuadir, vender, entretener? Las instituciones como INEGI, MEJOREDU, CONEVAL publican datos con metodologia explicita; los editoriales de revistas como Nexos o Letras Libres publican opinion informada y referenciada."
+        },
+        {
+          "subtitle": "La sintesis integradora",
+          "content": "Una sintesis no es copiar parrafos de los textos: es construir un nuevo texto que integre las ideas mas importantes de multiples fuentes, usando las propias palabras y citando la fuente cuando se incluyen datos especificos. Estructura de un parrafo de sintesis: oracion tematica (idea central del tema) + integracion de perspectivas (ambos textos coinciden en X; sin embargo, difieren en Y) + valoracion propia fundamentada. Conectores utiles: por un lado... por otro; mientras que; en contraste; sin embargo; ambos autores coinciden en; a diferencia de."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Cual de los siguientes es un HECHO verificable?",
+          "options": ["Mexico tiene 126 millones de habitantes segun el Censo INEGI 2020.", "El gobierno mexicano deberia invertir mas en educacion.", "La educacion en Mexico es de baja calidad.", "Los maestros mexicanos no estan suficientemente preparados."],
+          "correct": "Mexico tiene 126 millones de habitantes segun el Censo INEGI 2020."
+        },
+        {
+          "question": "El proposito de un editorial de opinion es principalmente:",
+          "options": ["Persuadir al lector de adoptar una postura o reflexionar sobre un tema", "Narrar hechos historicos de manera objetiva", "Entretener al lector con una historia ficticia", "Instruir al lector sobre como realizar una tarea"],
+          "correct": "Persuadir al lector de adoptar una postura o reflexionar sobre un tema"
+        },
+        {
+          "question": "En la evaluacion de fuentes CRAAP, la A de Autoria se refiere a:",
+          "options": ["Quien escribio el texto y si tiene credenciales en el tema", "La fecha de publicacion del texto", "El proposito por el que fue creado el texto", "Si el texto es relevante para mi pregunta"],
+          "correct": "Quien escribio el texto y si tiene credenciales en el tema"
+        },
+        {
+          "question": "Una sintesis integradora de dos textos debe:",
+          "options": ["Construir un nuevo texto con las ideas principales de ambos en palabras propias", "Copiar los parrafos mas importantes de cada texto", "Resumir solo el texto que el lector considera mas confiable", "Transcribir literalmente las citas de los autores"],
+          "correct": "Construir un nuevo texto con las ideas principales de ambos en palabras propias"
+        }
+      ],
+      "rubric": "Nivel 4: Parafrasea con precision, identifica el proposito de ambos textos, distingue todos los hechos de las opiniones y escribe una sintesis coherente que integra ambas perspectivas con voz propia; Nivel 3: Parafrasea correctamente y distingue la mayoria de hechos y opiniones; la sintesis integra ambos textos aunque puede tender a uno de ellos; Nivel 2: Parafrasea pero confunde hecho y opinion en algunos casos; la sintesis es basicamente un resumen de un solo texto; Nivel 1: No puede parafrasear ni distinguir hecho de opinion, o copia literalmente del texto."
+    },
+    "teacher_tips": [
+      "Seleccionar textos sobre temas que realmente importen a los estudiantes: educacion, empleo, salud, medio ambiente en Mexico. La relevancia del contenido aumenta significativamente la motivacion para leer con atencion.",
+      "La revista Nexos (nexos.com.mx) y Letras Libres (letraslibres.com) publican articulos de opinion bien argumentados con referencias; son modelos ideales de escritura academica accesible.",
+      "Para el cuadro hecho-opinion, empezar con ejemplos obvios antes de pasar a casos ambiguos; el debate sobre si algo es hecho o opinion es en si mismo una actividad de pensamiento critico valiosa.",
+      "Conexion con CD-III: la evaluacion de fuentes es la misma competencia que se desarrolla en el protocolo SIFT de Cultura Digital; mencionar explicitamente la transversalidad para reforzar ambas materias."
+    ]
+  },
+
+  "LC-III-P02": {
+    "code": "LC-III-P02",
+    "title": "Reconoce los diversos movimientos literarios y sus caracteristicas en la literatura mexicana e hispanoamericana",
+    "level": "Lectura y Creatividad III",
+    "duration": "~4h (3 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Historia de la literatura",
+    "metadata": {
+      "objective": "Identificar las caracteristicas esteticas, historicas y sociales de los principales movimientos literarios (Romanticismo, Modernismo, Vanguardias, Boom latinoamericano) y leer textos representativos de autores mexicanos e hispanoamericanos de cada periodo.",
+      "competencies": [
+        "Describe las caracteristicas del Romanticismo (emocion, naturaleza, libertad, heroe romantico) con ejemplos mexicanos: Manuel Acuna, Ignacio Altamirano",
+        "Identifica el Modernismo hispanoamericano (Ruben Dario, Manuel Gutierrez Najera, Amado Nervo) y sus rasgos: musicalidad, simbolismo, esteticismo",
+        "Reconoce las vanguardias del siglo XX en Mexico: Estridentismo (Manuel Maples Arce) y Contemporaneos (Xavier Villaurrutia, Salvador Novo)",
+        "Lee fragmentos del Boom latinoamericano (Garcia Marquez, Cortazar, Fuentes) y los relaciona con el realismo magico",
+        "Ordena cronologicamente los movimientos y los relaciona con el contexto historico de Mexico"
+      ],
+      "materials": [
+        "Linea del tiempo de movimientos literarios 1820-1980 (para completar)",
+        "Antologia de fragmentos: Nocturno de Manuel Acuna; Perlas Negras de Amado Nervo; Morte de Villaurrutia; fragmento de Pedro Paramo de Rulfo",
+        "Ficha comparativa por movimiento: periodo, contexto historico, caracteristicas, autores mexicanos clave",
+        "Mapa literario: donde nacion cada autor mexicano (INEGI datos geograficos)",
+        "Video clip: Carlos Fuentes habla del Boom en entrevista (YouTube, El Colegio Nacional)"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "S1", "duration": "50 min", "label": "Romanticismo y Modernismo en Mexico: lectura y caracterizacion"},
+        {"phase": "S2", "duration": "50 min", "label": "Vanguardias mexicanas: Estridentismo y Contemporaneos"},
+        {"phase": "S3", "duration": "50 min", "label": "Boom latinoamericano y realismo magico; linea del tiempo integradora"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Introducir la idea de que la literatura cambia con la historia: cada epoca tiene su propia estetica.",
+          "activity": "El docente pregunta: han leido algo que les haya parecido completamente diferente a lo que conocian? Presenta tres fragmentos muy breves (3-4 oraciones cada uno) sin decir de que movimiento son: uno romantico, uno modernista, uno vanguardista. Los estudiantes adivinen cual es mas antiguo y por que."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "Tres sesiones dedicadas a tres periodos: Romanticismo/Modernismo, Vanguardias, Boom.",
+          "activity": "S1: Lectura en voz alta del Nocturno a Rosario de Manuel Acuna (1873) y Sonatina de Ruben Dario. Analisis guiado: que emociones transmiten? Que imagenes usan? Que diferencias hay entre ambos? Los estudiantes completan la ficha del Romanticismo y el Modernismo. S2: Estridentismo vs Contemporaneos: el Estridentismo celebra la maquina y la modernidad urbana (Maples Arce: Metropolis, 1918); los Contemporaneos prefieren la introspexcion y el dialogo con la tradicion europea (Villaurrutia: Nocturno de los angeles). Lectura comparada de un poema de cada grupo. S3: Fragmento de Pedro Paramo de Rulfo y de Cien Anos de Soledad. Discusion: que elementos del realismo magico identifican? El docente introduce la idea del Boom como fenomeno editorial latinoamericano de los 60-70, con Carlos Fuentes como figura central de Mexico (El Colegio Nacional)."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Linea del tiempo colectiva en el pizarron: movimiento, periodo, autores mexicanos, caracteristica clave.",
+          "activity": "Cada equipo aporta un cuadro de la linea del tiempo. Al terminar, el docente pregunta: cual movimiento les parece mas interesante para seguir leyendo? Por que? Se construye una lista de lecturas voluntarias por movimiento."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La historia de la literatura no es solo una secuencia de autores y fechas: es el registro de como cada generacion ha respondido estetica y emocionalmente a su contexto historico. El Romanticismo surge como reaccion a la razon ilustrada; el Modernismo como busqueda de belleza estetica ante la industrializacion; las Vanguardias como ruptura radical con toda tradicion; el Boom como explosion de creatividad que pone a Latinoamerica en el mapa literario mundial. Mexico ha tenido voces fundamentales en cada uno de estos momentos.",
+      "sections": [
+        {
+          "subtitle": "Romanticismo en Mexico (1830-1880)",
+          "content": "El Romanticismo mexicano coincide con la Independencia y la Reforma: la nacion busca su identidad. Caracteristicas: predominio de las emociones sobre la razon; idealizacion de la naturaleza y el pasado prehispanico; heroe solitario y melancolico; temas de amor, muerte, patria y libertad. Manuel Acuna (Saltillo, 1849-1873): su Nocturno a Rosario es uno de los poemas mas memorizados en Mexico; se suicido a los 24 anios. Ignacio Altamirano (Tixtla, Guerrero, 1834-1893): novelista y ensayista que uso la literatura para construir la identidad nacional post-Reforma; fundador del Renacimiento literario mexicano."
+        },
+        {
+          "subtitle": "Modernismo hispanoamericano (1880-1920)",
+          "content": "El Modernismo es el primer movimiento literario genuinamente latinoamericano: nace en America y se expande a Espana. Su fundador es el nicaraguense Ruben Dario. Caracteristicas: musicalidad y ritmo cuidado; simbolismo y referencias mitologicas; esteticismo (el arte por el arte); lenguaje refinado y suntuoso; figuras: cisne, princesa, torre de marfil. En Mexico: Manuel Gutierrez Najera (1859-1895, fundador de la Revista Azul); Amado Nervo (Tepic, 1870-1919, La amada inmovil); Jose Juan Tablada (CDMX, 1871-1945, introdujo el haiku al espanol)."
+        },
+        {
+          "subtitle": "Vanguardias en Mexico (1920-1940)",
+          "content": "Las vanguardias rompen con toda tradicion: experimentan con el lenguaje, la forma y el contenido. En Mexico coexisten dos grupos principales: Estridentismo (1921-1927): liderado por Manuel Maples Arce; celebra la maquina, la ciudad, la velocidad, la revolucion; influido por el futurismo italiano y el expresionismo aleman; manifiestos provocadores. Contemporaneos (1928-1931): grupo de poetas y criticos (Jorge Cuesta, Xavier Villaurrutia, Salvador Novo, Jose Gorostiza) que dialogan con la tradicion simbolista y surrealista europea; introspexcion, homosexualidad, muerte, soledad. Villaurrutia: Nocturno de los angeles (1936) es uno de los grandes poemas del siglo XX en Mexico."
+        },
+        {
+          "subtitle": "Boom latinoamericano y realismo magico (1960-1975)",
+          "content": "El Boom es el fenomeno de proyeccion internacional de la novela latinoamericana en los anios 60-70. Sus figuras principales: Gabriel Garcia Marquez (Colombia, Cien Anos de Soledad, 1967), Julio Cortazar (Argentina, Rayuela, 1963), Mario Vargas Llosa (Peru), Carlos Fuentes (Mexico, La muerte de Artemio Cruz, 1962; Terra Nostra, 1975). El realismo magico integra lo fantastico en lo cotidiano de forma natural. Mexico: Juan Rulfo (Pedro Paramo, 1955) es el precursor indiscutido; Carlos Fuentes llevo la novela mexicana al escenario mundial. Fuentes fue fundador y miembro del Colegio Nacional hasta su muerte en 2012."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Cual movimiento literario del siglo XIX en Mexico se caracterizo por el predominio de las emociones, la idealizacion de la naturaleza y el heroe solitario?",
+          "options": ["Romanticismo", "Modernismo", "Estridentismo", "Realismo"],
+          "correct": "Romanticismo"
+        },
+        {
+          "question": "Manuel Gutierrez Najera, Amado Nervo y Jose Juan Tablada son representantes mexicanos del:",
+          "options": ["Modernismo hispanoamericano", "Romanticismo", "Estridentismo", "Boom latinoamericano"],
+          "correct": "Modernismo hispanoamericano"
+        },
+        {
+          "question": "El Estridentismo mexicano se caracteriza principalmente por:",
+          "options": ["Celebrar la maquina, la ciudad y la velocidad con lenguaje provocador", "Idealizar el pasado prehispanico y las emociones", "Preferir la introspexcion y el dialogo con la tradicion europea", "Integrar lo fantastico en lo cotidiano de forma natural"],
+          "correct": "Celebrar la maquina, la ciudad y la velocidad con lenguaje provocador"
+        },
+        {
+          "question": "Pedro Paramo de Juan Rulfo es considerada precursora del:",
+          "options": ["Realismo magico y el Boom latinoamericano", "Modernismo hispanoamericano", "Romanticismo mexicano", "Estridentismo"],
+          "correct": "Realismo magico y el Boom latinoamericano"
+        }
+      ],
+      "rubric": "Nivel 4: Describe con precision los cuatro movimientos, identifica sus caracteristicas esteticas e historicas, lee e interpreta fragmentos de cada periodo y relaciona los autores mexicanos con su contexto; Nivel 3: Describe correctamente tres movimientos e identifica sus autores mexicanos principales; Nivel 2: Describe los movimientos con caracteristicas generales pero confunde autores o periodos; Nivel 1: No puede distinguir los movimientos entre si o confunde cronologicamente."
+    },
+    "teacher_tips": [
+      "La lectura en voz alta de poemas, hecha por el docente con emocion y claridad, es mucho mas efectiva que pedir a los estudiantes que lean silenciosamente un texto que no conocen. El ritmo y la musicalidad del Modernismo solo se revelan en voz alta.",
+      "El Nocturno a Rosario de Manuel Acuna es uno de los poemas mas conocidos en Mexico: es probable que algunos estudiantes lo hayan escuchado antes o que sus familias lo conozcan. Usar ese conocimiento previo como punto de partida.",
+      "Para los Contemporaneos, el tema de la identidad (incluyendo la homosexualidad de Villaurrutia y Novo, que fue censurada en su tiempo) puede abrirse con sensibilidad como parte de una conversacion sobre diversidad y expresion artistica en la historia de Mexico.",
+      "La antologia SEP de lecturas para bachillerato incluye fragmentos de varios de estos autores; verificar cuales estan disponibles en los materiales que ya tienen los estudiantes para no generar costo adicional."
+    ]
+  },
+
+  "LC-III-P03": {
+    "code": "LC-III-P03",
+    "title": "Lee los generos literarios para analizar su papel como formas de representacion de la experiencia humana",
+    "level": "Lectura y Creatividad III",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Basico-Intermedio",
+    "category": "Generos literarios",
+    "metadata": {
+      "objective": "Identificar y analizar las caracteristicas formales y expresivas de los tres grandes generos literarios (narrativa, lirica, drama) y sus subgeneros, reconociendo el genero como una convencion que orienta la lectura e interpretacion.",
+      "competencies": [
+        "Define y distingue los tres grandes generos literarios: narrativa, lirica, drama",
+        "Identifica subgeneros de la narrativa: cuento, novela, cronica, fabula",
+        "Distingue subgeneros liricos: ode, elegy, sonnet, epica, poema en prosa, haiku",
+        "Reconoce el drama y sus subgeneros: tragedia, comedia, drama moderno",
+        "Relaciona el genero con las convenciones de lectura e interpretacion que activa en el lector"
+      ],
+      "materials": [
+        "Antologia de fragmentos de los tres generos con autores mexicanos",
+        "Tarjetas de genero: cada tarjeta tiene caracteristicas formales del subgenero",
+        "Fragmento de obra de teatro: un acto de La casa de Bernarda Alba (Lorca) o de un dramaturgo mexicano (Emilio Carballido, Victor Hugo Rascon Banda)",
+        "Haiku de Jose Juan Tablada (primer haijin de lengua espanola)",
+        "Soneto de Sor Juana (revision desde LC-I en profundidad tecnica)"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "S1", "duration": "50 min", "label": "Narrativa y lirica: generos, subgeneros y caracteristicas formales"},
+        {"phase": "S2", "duration": "50 min", "label": "Drama y subgeneros teatrales; lectura dramatizada; integracion"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Activar la intuicion sobre los generos: los estudiantes ya los conocen aunque no sepan sus nombres tecnicos.",
+          "activity": "El docente lee tres fragmentos muy cortos sin decir de que genero son: uno narrativo (cuento), uno lirico (poema), uno dramatico (dialogo de obra de teatro). Los estudiantes identifican intuitivamente cual es cada uno y explican por que. Se formaliza con los nombres tecnicos."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "S1: narrativa y lirica con ejemplos mexicanos. S2: drama y actividad de lectura dramatizada.",
+          "activity": "S1: Narrativa: fabula de Iriarte o Samaniego (didactica, personajes animales); cuento de la tradicion oral mexicana (INALI: cuento en nahuatl adaptado al espanol); cronica periodistica de Carlos Monsivais. Lirica: haiku de Jose Juan Tablada (Pez, pez, / todo dentro del agua / que no se ve); soneto de Sor Juana (analisis de la estructura: 14 versos, dos cuartetos, dos tercetos). S2: Los estudiantes leen en voz alta un fragmento corto de una obra teatral mexicana (Rosalba y los Llaveros de Emilio Carballido o Contigo pan y cebolla de Manuel Eduardo de Gorostiza). Asignar papeles, leer dramaticamente. Analisis de las convenciones del drama: acotaciones, dialogos, division en actos y escenas."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Sintesis: el genero como contrato de lectura.",
+          "activity": "El docente pregunta: cuando leen una novela, que esperan encontrar? Cuando leen un poema? Cuando van al teatro? El genero activa expectativas en el lector. Cierre con reflexion: cual genero les resulta mas familiar? Cual les gustaria explorar mas?"
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "El genero literario es una convencion historica que agrupa obras con caracteristicas formales, tematicas y comunicativas compartidas. No es una camisa de fuerza sino una guia: el lector que reconoce el genero activa un conjunto de expectativas que orientan su interpretacion. Aristoteles en su Poetica distinguio por primera vez la epica, la lirica y el drama; desde entonces, la tradicion ha multiplicado y matizado estos grandes grupos en innumerables subgeneros.",
+      "sections": [
+        {
+          "subtitle": "Genero narrativo",
+          "content": "La narrativa relata una historia protagonizada por personajes en un espacio y tiempo determinados. Subgeneros principales: Novela (larga extension, multiples personajes y tramas; ej. Pedro Paramo de Juan Rulfo); Cuento (brevededad, un solo conflicto, final sorpresivo; ej. El guardagujas de Juan Jose Arreola); Cronica (narra hechos reales con estilo literario; Carlos Monsivais es su maximo exponente en Mexico); Fabula (personajes animales, moraleja explicita; tradicion grecolatina llegada a Mexico via Samaniego e Iriarte). Elementos narrativos: narrador, personajes, espacio, tiempo, argumento, conflicto."
+        },
+        {
+          "subtitle": "Genero lirico",
+          "content": "La lirica expresa la subjetividad del hablante lirico mediante un lenguaje altamente trabajado y concentrado. Subgeneros: Oda (canto de elogio; ej. Odas de Neruda); Elegia (poema de duelo; ej. Nocturno a Rosario de Acuna); Soneto (14 versos en dos cuartetos y dos tercetos; Sor Juana es maestra del soneto en espanol); Haiku (tres versos de 5-7-5 silabas; Jose Juan Tablada introdujo el haiku en espanol en 1919); Poema en prosa (sin verso ni rima regular; los Contemporaneos lo cultivaron). El hablante lirico NO es el autor: es una voz construida por el texto."
+        },
+        {
+          "subtitle": "Genero dramatico",
+          "content": "El drama esta escrito para ser representado ante un publico: su unidad basica es el dialogo entre personajes en escena. Subgeneros: Tragedia (el protagonista cae inevitablemente por un error o fatalidad; Edipo Rey, Hamlet); Comedia (final feliz, enredos, personajes tipicos; tradicion del siglo de oro espanol); Drama moderno (mezcla de tragico y comico; personajes psicologicamente complejos). Elementos dramaticos: acto (division mayor), escena (division menor), acotacion (instruccion del autor sobre escena o accion), dialogo, monologo, apartes. Dramaturgos mexicanos: Emilio Carballido (Rosalba y los Llaveros, 1950), Elena Garro (Un hogar solido), Victor Hugo Rascon Banda."
+        },
+        {
+          "subtitle": "El genero como contrato de lectura",
+          "content": "Cuando el lector identifica el genero, activa un conjunto de expectativas sobre la forma, el contenido y el proposito del texto. Esto es lo que el teorico literario Hans Robert Jauss llama horizonte de expectativas: el marco de conocimiento con que el lector aborda el texto. Si el texto cumple las expectativas del genero, puede parecer convencional; si las transgrede conscientemente (como Arreola, Borges o Garcia Marquez), produce el efecto de extranamieno que caracteriza a la gran literatura. Reconocer el genero es el primer paso de la interpretacion literaria."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Un texto escrito para ser representado en escena, con dialogos y acotaciones, pertenece al genero:",
+          "options": ["Dramatico", "Narrativo", "Lirico", "Ensayistico"],
+          "correct": "Dramatico"
+        },
+        {
+          "question": "El haiku de Jose Juan Tablada es un subgenero de la:",
+          "options": ["Lirica (poesia)", "Narrativa (cuento)", "Drama (teatro)", "Cronica"],
+          "correct": "Lirica (poesia)"
+        },
+        {
+          "question": "La cronica literaria, cultivada por Carlos Monsivais, es un subgenero de la:",
+          "options": ["Narrativa (relata hechos reales con estilo literario)", "Lirica", "Drama", "Fabula"],
+          "correct": "Narrativa (relata hechos reales con estilo literario)"
+        },
+        {
+          "question": "El soneto tiene la siguiente estructura:",
+          "options": ["14 versos: dos cuartetos (ABBA ABBA) y dos tercetos (CDC DCD)", "10 versos en dos estrofas de 5 cada una", "Tres versos de 5-7-5 silabas", "Sin estructura fija, depende del autor"],
+          "correct": "14 versos: dos cuartetos (ABBA ABBA) y dos tercetos (CDC DCD)"
+        }
+      ],
+      "rubric": "Nivel 4: Identifica y describe con precision los tres generos y sus subgeneros, analiza textos concretos de autores mexicanos en cada genero y explica el concepto de contrato de lectura con ejemplos; Nivel 3: Identifica los tres generos y la mayoria de subgeneros; analiza textos con apoyo de la ficha; Nivel 2: Distingue narrativa de lirica pero confunde el drama o no identifica subgeneros; Nivel 1: No puede distinguir los tres generos entre si."
+    },
+    "teacher_tips": [
+      "La lectura dramatizada es una actividad muy dinamica y motivadora: asignar papeles con anticipacion, dar tiempo para leer el fragmento antes de la clase, y que los estudiantes lean de pie en el frente del salon.",
+      "Los haiku de Tablada son cortos y perfectos para analizar: pedir a los estudiantes que dibujen la imagen que el haiku evoca; es una actividad que une lectura, imaginacion y expresion plastica.",
+      "Para el drama, si hay un teatro o centro cultural cerca del plantel, organizar una visita a una obra (muchos teatros universitarios tienen funciones gratuitas o de bajo costo para estudiantes de bachillerato).",
+      "El concepto de hablante lirico (vs autor) es difici pero fundamental: insistir en la diferencia entre quien escribio el poema y quien habla en el poema, usando ejemplos claros (el poema de amor no es la confesion personal del autor, sino una construccion literaria)."
+    ]
+  },
+
+  "LC-III-P04": {
+    "code": "LC-III-P04",
+    "title": "Identifica subgeneros narrativos y analiza sus elementos estructurales",
+    "level": "Lectura y Creatividad III",
+    "duration": "~4h (3 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Narrativa y subgeneros",
+    "metadata": {
+      "objective": "Leer y analizar textos de cuatro subgeneros narrativos (cuento fantastico, cuento policial, cronica y cuento de ciencia ficcion) identificando sus convenciones, elementos estructurales y autores mexicanos e hispanoamericanos representativos.",
+      "competencies": [
+        "Identifica las convenciones del cuento fantastico: ambiguedad entre lo real y lo sobrenatural; autores: Arreola, Borges, Cortazar",
+        "Reconoce el cuento policial: enigma, investigador, deduccion logica; autores: Poe, Arthur Conan Doyle, Rafael Bernal (El complot mongol)",
+        "Lee y analiza cronicas de Carlos Monsivais como ejemplo del periodismo literario mexicano",
+        "Identifica el cuento de ciencia ficcion: mundo alternativo, tecnologia, cuestionamiento etico; autores mexicanos: Amado Nervo, Luisa Valenzuela, Jose Luis Zarate",
+        "Escribe un cuento breve (1-2 paginas) en uno de los subgeneros estudiados"
+      ],
+      "materials": [
+        "El guardagujas de Juan Jose Arreola (cuento fantastico-absurdo)",
+        "Fragmento de El complot mongol de Rafael Bernal (policial mexicano)",
+        "Cronica La noche de Tlatelolco (pasaje de Elena Poniatowska)",
+        "Cuento de ciencia ficcion mexicana: Antes de acostarse de Jose Luis Zarate (UNAM)",
+        "Guia de analisis por subgenero (para completar)"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "S1", "duration": "50 min", "label": "Cuento fantastico (Arreola) y cuento policial (Bernal)"},
+        {"phase": "S2", "duration": "50 min", "label": "Cronica literaria (Poniatowska) y ciencia ficcion mexicana"},
+        {"phase": "S3", "duration": "50 min", "label": "Escritura de cuento breve en subgenero elegido"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Activar el conocimiento previo sobre subgeneros narrativos a traves de referencias populares.",
+          "activity": "El docente pregunta: han leido una historia de misterio? Una de ciencia ficcion? Una nota de periodismo que contaba algo como si fuera una historia? Recoger ejemplos de la cultura popular y conectarlos con los subgeneros literarios que se analizaran."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "S1: analisis del cuento fantastico y policial. S2: cronica y ciencia ficcion. S3: escritura.",
+          "activity": "S1: Lectura en voz alta de El guardagujas de Arreola (20 min). Analisis: que elementos son realistas? cuales son imposibles? donde esta la ambiguedad? Luego fragmento de El complot mongol: presentacion del detective Filiberto Garcia. Que lo hace reconocible como policial? S2: Lectura de un pasaje de La noche de Tlatelolco: como Elena Poniatowska convierte el periodismo en literatura. Ciencia ficcion: lectura del cuento breve de Zarate y discusion: que interrogante etico plantea? S3: Cada estudiante elige un subgenero y escribe un cuento de 250-400 palabras con estructura clara (planteamiento, nudo, desenlace) usando las convenciones del subgenero."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Lectura de cuentos voluntarios y retroalimentacion.",
+          "activity": "Tres voluntarios leen sus cuentos. La clase identifica en voz alta las convenciones del subgenero: logro usar las caracteristicas del cuento fantastico/policial/SF? Que fue lo mas creativo?"
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "El cuento como forma narrativa breve es una de las contribuciones mas ricas de la literatura hispanoamericana al mundo: Juan Jose Arreola y Jorge Luis Borges son maestros del cuento fantastico; Rafael Bernal creo al detective mas mexicano de la literatura policial; Elena Poniatowska elevo la cronica a la altura de la literatura; y una nueva generacion de escritores mexicanos (Jose Luis Zarate, Bernardo Fernandez BEF) explora la ciencia ficcion con ojos latinoamericanos.",
+      "sections": [
+        {
+          "subtitle": "Cuento fantastico",
+          "content": "El cuento fantastico introduce un elemento que viola las leyes de la realidad conocida, pero lo hace de tal manera que el lector no puede determinar si es real o producto de la imaginacion del personaje. Esta ambiguedad es su caracteristica esencial: si lo sobrenatural tiene una explicacion racional, es cuento de terror o misterio, no fantastico. Juan Jose Arreola (Ciudad Guzman, Jalisco, 1918-2001): El guardagujas es el cuento fantastico mexicano mas antologado; plantea una empresa ferroviaria que puede o no llegar a su destino, metafora del destino y del lenguaje. Jorge Luis Borges (Argentina) es el maestro del genero en lengua espanola. Julio Cortazar: La noche boca arriba."
+        },
+        {
+          "subtitle": "Cuento y novela policial",
+          "content": "El genero policial gira en torno a un enigma (generalmente un crimen) que un investigador resuelve mediante la deduccion logica y la observacion. El origen del genero es anglosajion: Edgar Allan Poe (Los crimenes de la calle Morgue) y Arthur Conan Doyle (Sherlock Holmes). En Mexico, Rafael Bernal (1915-1972) escribio El complot mongol (1969), considerada la primera gran novela policial mexicana: el detective Filiberto Garcia, corrupto y pragmatico, es el antihero perfecto del Mexico posrevolucionario. La novela es tambien una feroz satira politica."
+        },
+        {
+          "subtitle": "Cronica literaria",
+          "content": "La cronica es un genero hibrido entre el periodismo y la literatura: narra hechos reales usando tecnicas narrativas (descripcion de escenas, dialogos, perspectiva del narrador). En Mexico, Carlos Monsivais (1938-2010) elevo la cronica a genero mayor con obras como Entrada libre (1987). Elena Poniatowska (nacida en Paris, 1932, Premio Cervantes 2013) es autora de La noche de Tlatelolco (1971), cronica testimonial de la masacre del 2 de octubre de 1968 construida con voces de sobrevivientes. Su obra es a la vez documento historico y literatura."
+        },
+        {
+          "subtitle": "Ciencia ficcion en Mexico",
+          "content": "La ciencia ficcion imagina futuros o mundos alternativos a partir de especulaciones tecnologicas o cientificas, planteando interrogantes eticos sobre la humanidad. En Mexico tiene una tradicion menos conocida pero rica: Amado Nervo escribio algunos de los primeros cuentos de CF en lengua espanola a principios del siglo XX. Jose Luis Zarate (Puebla, 1966) es uno de sus cultores contemporaneos mas reconocidos. El Consejo Nacional para la Cultura y las Artes (CONACULTA, hoy Secretaria de Cultura) ha apoyado publicaciones de CF mexicana. La editorial mexicana Lumen y la UNAM han publicado antologias del genero."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "La caracteristica esencial del cuento fantastico, segun Tzvetan Todorov, es:",
+          "options": ["La ambiguedad irresuelta entre lo real y lo sobrenatural", "La presencia de un detective que resuelve el enigma", "La narracion de hechos reales con estilo literario", "La descripcion de un mundo futuro con tecnologia avanzada"],
+          "correct": "La ambiguedad irresuelta entre lo real y lo sobrenatural"
+        },
+        {
+          "question": "El complot mongol de Rafael Bernal es un ejemplo del genero:",
+          "options": ["Novela policial mexicana", "Cuento fantastico", "Cronica testimonial", "Ciencia ficcion"],
+          "correct": "Novela policial mexicana"
+        },
+        {
+          "question": "La noche de Tlatelolco de Elena Poniatowska es un ejemplo de:",
+          "options": ["Cronica testimonial que combina periodismo y literatura", "Novela de ciencia ficcion politica", "Cuento fantastico sobre 1968", "Drama en tres actos sobre la masacre"],
+          "correct": "Cronica testimonial que combina periodismo y literatura"
+        },
+        {
+          "question": "Cual es el elemento central que distingue el cuento de ciencia ficcion de otros subgeneros?",
+          "options": ["Imagina futuros o mundos alternativos a partir de especulaciones cientificas o tecnologicas", "Tiene siempre un final sorpresivo e inexplicable", "Se basa exclusivamente en hechos historicos reales", "Sus personajes son siempre animales con cualidades humanas"],
+          "correct": "Imagina futuros o mundos alternativos a partir de especulaciones cientificas o tecnologicas"
+        }
+      ],
+      "rubric": "Nivel 4: Analiza con precision las convenciones de los cuatro subgeneros con ejemplos textuales especificos y escribe un cuento breve que demuestra dominio de las convenciones del subgenero elegido; Nivel 3: Analiza correctamente tres subgeneros y escribe un cuento coherente con algunas convenciones del subgenero; Nivel 2: Identifica los subgeneros pero el analisis es superficial; el cuento tiene estructura pero no usa claramente las convenciones del subgenero; Nivel 1: No puede distinguir los subgeneros o no produce un cuento coherente."
+    },
+    "teacher_tips": [
+      "El guardagujas de Arreola es corto (aprox 5 paginas) y perfecto para leer completo en clase; su humor absurdo suele generar una respuesta entusiasta en adolescentes.",
+      "Para el cuento policial, mostrar un fragmento de alguna serie policial mexicana conocida (ej. Club de Cuervos o Narcos: Mexico, con los filtros adecuados) para conectar con el genero en su version audiovisual antes de la literatura.",
+      "La cronica de La noche de Tlatelolco tiene un potencial interdisciplinario enorme: coordinar con el docente de Historia para que contextualice el 2 de octubre de 1968 antes de la lectura.",
+      "Para la escritura del cuento, dar un banco de primeras oraciones como andamio: El tren de las doce nunca llego... / La detective Lucia Soto encontro la primera pista... / En el ano 2075, cuando el agua ya se vendia... Los estudiantes eligen y continuan."
+    ]
+  },
+
+  "LC-III-P05": {
+    "code": "LC-III-P05",
+    "title": "Analiza fragmentos de poesia y practica la lectura expresiva en voz alta",
+    "level": "Lectura y Creatividad III",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Lirica y expresion oral",
+    "metadata": {
+      "objective": "Analizar recursos poeticos (metafora, imagen, ritmo, tono, hablante lirico) en poemas de la literatura mexicana del siglo XX, practicar la lectura expresiva en voz alta y escribir un poema propio usando al menos dos recursos estudiados.",
+      "competencies": [
+        "Identifica y nombra recursos retoricos: metafora, simil, personificacion, hiperbole, sinestesia, aliteracion",
+        "Distingue el tono del poema (melancolico, ironico, celebratorio, erotico, politico) con evidencia textual",
+        "Practica la lectura expresiva en voz alta: entonacion, ritmo, pausas, volumen",
+        "Interpreta el hablante lirico y su perspectiva emocional en el poema",
+        "Escribe un poema libre de al menos 10 versos usando metafora e imagen sensorial"
+      ],
+      "materials": [
+        "Antologia: Muerte sin fin de Jose Gorostiza (fragmento), Dos cuerpos de Octavio Paz, Homenaje y profanaciones de Jaime Sabines (fragmento), No me preguntes como pasa el tiempo de Jose Emilio Pacheco",
+        "Ficha de recursos retoricos con definicion y ejemplo",
+        "Tarjetas de tono: melancolico, ironico, celebratorio, politico, amoroso",
+        "Rubrica de lectura expresiva en voz alta",
+        "Plantilla de escritura poetica: primeras metaforas (el amor es..., la vida es...)"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "S1", "duration": "50 min", "label": "Recursos poeticos, hablante lirico y analisis de poemas"},
+        {"phase": "S2", "duration": "50 min", "label": "Lectura expresiva en voz alta y escritura de poema propio"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Abrir el espacio emocional necesario para la poesia: el poema no se resuelve, se habita.",
+          "activity": "El docente lee en voz alta los primeros versos de Dos cuerpos de Octavio Paz: Dos cuerpos frente a frente / son a veces dos olas / y la noche es oceano. Pausa. Pregunta: que sintieron? no que entendieron, sino que sintieron. La primera respuesta a la poesia es emocional. El analisis viene despues."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "S1: analisis de tres poemas con guia de recursos retoricos. S2: lectura expresiva y escritura.",
+          "activity": "S1: En equipos, cada uno analiza un poema diferente con la ficha de recursos: Muerte sin fin (imagen del agua como metafora de la identidad y la muerte), Sabines sobre el amor y la perdida, Pacheco sobre el tiempo y la memoria. Presentan al grupo un recurso que encontraron y lo explican con el verso concreto. S2: El docente modela la lectura expresiva de uno de los poemas (entonacion, pause, ritmo). Tres voluntarios leen el poema que mas les gusta en voz alta; reciben retroalimentacion de la rubrica. Luego: 20 minutos de escritura de poema propio. El docente circula ofreciendo sugerencias."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Compartir y celebrar: el poema del salon.",
+          "activity": "Cinco voluntarios leen su poema en voz alta. El docente cierra con una reflexion: la poesia no es solo de los poetas famosos; es la forma en que cualquier persona puede decir lo que la prosa no alcanza."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La poesia es el genero literario que lleva el lenguaje a su maximo grado de concentracion y musicalidad. A diferencia de la prosa, donde el sentido fluye linealmente, en el poema cada palabra, cada sonido, cada pausa, contribuye al significado. Los poetas mexicanos del siglo XX -- Octavio Paz (Nobel 1990), Jose Gorostiza, Jaime Sabines, Jose Emilio Pacheco -- han creado una de las tradiciones liricas mas ricas del mundo hispanohablante.",
+      "sections": [
+        {
+          "subtitle": "Recursos retoricos fundamentales",
+          "content": "Metafora: identificacion de dos terminos sin nexo comparativo. La vida es un sueno (Calderon). Tu pelo es una cascada de noche. Simil: comparacion con nexo (como, tal como, parece): Tus ojos como estrellas. Personificacion: atribuir cualidades humanas a objetos o ideas: La muerte camina entre nosotros. Hiperbole: exageracion expresiva: Me muero de aburrimiento. Sinestesia: mezcla de sensaciones: verde musica; fragancia oscura. Aliteracion: repeticion de sonidos: el susurro del susurro sedoso. Imagen sensorial: descripcion que activa los sentidos del lector."
+        },
+        {
+          "subtitle": "El hablante lirico y el tono",
+          "content": "El hablante lirico es la voz construida por el poema: no es el autor real sino una perspectiva emocional que el texto crea. Puede ser primera persona (yo lirico), segunda (tu lirico) o tercera. El tono es la actitud emocional del hablante hacia el tema: melancolico, ironico, celebratorio, erotico, politico, mistico. Identificar el tono requiere leer con atencion las palabras cargadas de valor emocional (adjetivos, verbos, imagenes). Ejemplo: Jaime Sabines en el fragmento de Tabanque tiene un tono de amor desgarrado y urgente; Pacheco en No me preguntes... tiene un tono de ironia melancolica ante el paso del tiempo."
+        },
+        {
+          "subtitle": "Poetas mexicanos del siglo XX: panorama",
+          "content": "Octavio Paz (CDMX, 1914-1998): Premio Nobel de Literatura 1990; su ensayo El laberinto de la soledad (1950) es tan fundamental como su poesia; Piedra de Sol (1957) es el mas ambicioso poema mexicano del siglo. Jose Gorostiza (1901-1973): Muerte sin fin (1939) es considerada la cumbre de la poesia mexicana moderna; meditacion profunda sobre la identidad del ser. Jaime Sabines (Chiapas, 1926-1999): la poesia mas popular del siglo XX mexicano; amor, muerte, cotidianeidad; sus Poemas sueltos y Tabanque son profundamente amados. Jose Emilio Pacheco (CDMX, 1939-2014): Premio Cervantes 2009; poesia de la memoria, el tiempo y la ecologia."
+        },
+        {
+          "subtitle": "La lectura expresiva en voz alta",
+          "content": "Leer en voz alta es una forma de interpretacion: las decisiones de entonacion, ritmo y pausa afectan el significado que el oyente percibe. Elementos de la lectura expresiva: Entonacion: subir y bajar el tono segun el contenido emocional. Pausas: respetar los signos de puntuacion; hacer pausa larga al final de cada verso o estrofa. Ritmo: mantener el compas del poema; la poesia con metro regular tiene un ritmo que debe sostenerse. Volumen: variar entre susurro y voz plena segun la intensidad emocional. Mirar al publico: leer no es recitar de memoria; es comunicar al oyente. La lectura en voz alta transforma el texto escrito en experiencia compartida."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "La frase Tu pelo es una cascada de noche es un ejemplo de:",
+          "options": ["Metafora", "Simil", "Hiperbole", "Aliteracion"],
+          "correct": "Metafora"
+        },
+        {
+          "question": "Octavio Paz fue galardonado con el Premio Nobel de Literatura en:",
+          "options": ["1990", "1967", "2009", "1981"],
+          "correct": "1990"
+        },
+        {
+          "question": "El hablante lirico de un poema es:",
+          "options": ["La voz construida por el poema, no necesariamente el autor real", "Siempre el autor del poema que habla en primera persona", "El personaje principal de la narracion", "El lector que interpreta el poema en voz alta"],
+          "correct": "La voz construida por el poema, no necesariamente el autor real"
+        },
+        {
+          "question": "La sinestesia es un recurso que:",
+          "options": ["Mezcla sensaciones de distintos sentidos: verde musica, fragancia oscura", "Repite el mismo sonido en palabras consecutivas", "Exagera una cualidad para producir efecto emocional", "Atribuye cualidades humanas a objetos o ideas"],
+          "correct": "Mezcla sensaciones de distintos sentidos: verde musica, fragancia oscura"
+        }
+      ],
+      "rubric": "Nivel 4: Identifica y nombra con precision al menos 5 recursos retoricos con evidencia textual, interpreta el tono del hablante lirico, lee expresivamente con dominio de entonacion y pausa, y escribe un poema de 10+ versos con metaforas e imagenes sensoriales originales; Nivel 3: Identifica 3-4 recursos, interpreta el tono y lee con entonacion correcta; el poema tiene metaforas aunque algunas son convencionales; Nivel 2: Identifica los recursos mas obvios (simil, metafora) pero tiene dificultad con los sutiles; la lectura carece de variacion de tono; el poema es un listado descriptivo mas que un poema; Nivel 1: No identifica los recursos o confunde metafora con descripcion directa; no produce un poema coherente."
+    },
+    "teacher_tips": [
+      "La clave es crear un ambiente emocionalmente seguro antes de la poesia: pedir interpretaciones emocionales (que sentiste) antes que intelectuales (que quiso decir el autor) reduce la ansiedad de los estudiantes que creen que la poesia es difici.",
+      "Jaime Sabines es ideal para adolescentes: su poesia habla de amor, muerte, cotidianeidad y tiene un lenguaje muy accesible; no es academica ni intimidante.",
+      "Para la escritura del poema, el andamio de la plantilla (el amor es..., el tiempo es..., mi ciudad es...) reduce el bloqueo inicial; una vez que escriben las primeras lineas, el poema fluye.",
+      "Si el salon tiene internet, mostrar la lectura de sus propios poemas por Octavio Paz o Jaime Sabines en YouTube: ver al poeta leer su propio texto es una experiencia irrepetible y transmite la musicalidad que la pagina no puede dar."
+    ]
+  },
+
+  "LC-III-P06": {
+    "code": "LC-III-P06",
+    "title": "Comprende las caracteristicas de la resena critica y realiza una propia",
+    "level": "Lectura y Creatividad III",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio-Alto",
+    "category": "Escritura academica",
+    "metadata": {
+      "objective": "Analizar la estructura y los recursos argumentativos de la resena critica literaria, y producir una resena propia de un texto leido durante el semestre con criterios de fundamentacion, argumentacion y expresion valorativa.",
+      "competencies": [
+        "Identifica la estructura de la resena: presentacion del texto, sintesis, analisis critico, valoracion argumentada",
+        "Distingue la resena de la sinopsis (no es un resumen) y del analisis academico (es mas breve y para publico general)",
+        "Usa conectores de argumentacion: sin embargo, no obstante, si bien es cierto que, en contraste, cabe destacar que",
+        "Formula un juicio critico fundamentado: no me gusto porque... sino este texto es valioso/limitado porque...",
+        "Escribe una resena de 300-400 palabras de un texto del semestre con estructura y argumentacion correctas"
+      ],
+      "materials": [
+        "Dos resenas modelo: una de la Revista de la Universidad de Mexico (UNAM) y una de Letras Libres",
+        "Ficha de estructura de la resena: cuatro partes con funcion y extension sugerida",
+        "Texto a resenar: El guardagujas de Arreola o el poema elegido en P05",
+        "Lista de criterios de evaluacion literaria: originalidad, coherencia, profundidad, estilo",
+        "Guia de conectores argumentativos para la resena"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "S1", "duration": "50 min", "label": "Analisis de resenas modelo: estructura y argumentacion"},
+        {"phase": "S2", "duration": "50 min", "label": "Escritura de resena propia con retroalimentacion entre pares"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Diferenciar la resena del resumen: resenar es tomar una postura critica, no solo contar de que trata.",
+          "activity": "El docente muestra un resumen y una resena del mismo libro. Pregunta: cual es la diferencia? Los estudiantes identifican: el resumen dice que pasa; la resena dice si vale la pena leerlo y por que, fundamentandose en el texto. Introduccion: la resena es el genero que usan los criticos literarios en revistas como la Revista de la Universidad de Mexico (UNAM) y Letras Libres."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "S1: analisis de las dos resenas modelo. S2: escritura y revision entre pares.",
+          "activity": "S1: En equipos, los estudiantes leen una resena de cada revista y responden: cual es el texto resenado? que sintesis hace el reseniador? que juicios criticos formula? en que evidencias del texto los apoya? como termina: recomienda o no el texto? Discusion: cual resena les parece mas convincente y por que? S2: Cada estudiante escribe su resena de 300-400 palabras. Al terminar, intercambian con un companero que revisa usando la ficha de estructura: tiene las cuatro partes? el juicio critico esta argumentado? usa conectores de argumentacion? El autor recibe retroalimentacion y realiza ajustes."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Lectura de resenas y valoracion del genero.",
+          "activity": "Dos voluntarios leen su resena. El docente pregunta: la resena te convence de leer el texto? que haria mas solida la argumentacion? Cierre: la resena es el genero mas util para desarrollar el pensamiento critico porque obliga a fundamentar cada juicio."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La resena critica es un texto breve (generalmente 300-600 palabras) que presenta, sintetiza y valora un texto literario, cinematografico, musical o de otro tipo, dirigido a un publico general que no ha leido o visto el objeto de la resena. A diferencia del analisis academico (mas largo y tecnico) y del resumen (que solo reproduce contenido sin evaluar), la resena toma una postura argumentada: dice si el texto vale la pena y por que, fundamentando cada juicio con evidencia del texto mismo.",
+      "sections": [
+        {
+          "subtitle": "Estructura de la resena critica",
+          "content": "1. Presentacion (10%): titulo, autor, genero, edicion, contexto de publicacion. Sin olvidar: quien es el autor y por que merece atencion. 2. Sintesis (30%): de que trata el texto sin revelar el final (para narrativa) o cual es su argumento central (para ensayo/poesia). No es un resumen exhaustivo: se seleccionan los elementos mas relevantes para la evaluacion. 3. Analisis critico (40%): los aspectos que el reseniador considera mas logrados o mas cuestionables, con evidencia textual concreta. Ej: Arreola maneja magistralmente la ambiguedad al nunca resolver si el tren llegara, lo que produce una angustia existencial sostenida. 4. Valoracion y recomendacion (20%): juicio final fundamentado y para que tipo de lector recomienda o no el texto."
+        },
+        {
+          "subtitle": "El juicio critico: como argumentarlo",
+          "content": "Un juicio critico NO es una preferencia personal (no me gusto porque no me llamo la atencion) sino una evaluacion con criterios: originalidad (el texto propone algo nuevo en su genero o tema), coherencia (los elementos del texto funcionan de manera articulada), profundidad (aborda el tema con matices y complejidad), calidad del estilo (el lenguaje es preciso, evocador o audaz). Cada juicio debe ir respaldado por evidencia textual: una cita, un ejemplo, una escena especifica."
+        },
+        {
+          "subtitle": "Conectores argumentativos de la resena",
+          "content": "Para introducir el analisis: cabe destacar que; resulta significativo que; llama la atencion que. Para senalar logros: el autor logra; es especialmente efectivo; uno de los puntos fuertes es. Para senalar limitaciones: sin embargo; no obstante; si bien es cierto que... tambien es verdad que; el unico punto debil es. Para la valoracion final: en sintesis; en conclusion; en definitiva; por todo lo anterior; se trata de una obra que. Para la recomendacion: esta obra resultara especialmente valiosa para; se recomienda especialmente a; los lectores interesados en X encontraran en este texto."
+        },
+        {
+          "subtitle": "La critica literaria en Mexico: referentes institucionales",
+          "content": "La Revista de la Universidad de Mexico (UNAM) publica resenas y ensayos criticos desde 1930; es de acceso libre en revistadelauniversidad.unam.mx. La revista Letras Libres (letraslibres.com) tiene una seccion de critica literaria con resenas de los principales libros publicados en Mexico y el mundo hispanohablante. El suplemento cultural de La Jornada (jornada.com.mx) publica critica literaria, cinematografica y de artes escenicas. Estas publicaciones son modelos reales del genero y ofrecen lecturas actualizadas sobre la literatura mexicana e hispanoamericana."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "La principal diferencia entre una resena y un resumen es que:",
+          "options": ["La resena evalua y argumenta un juicio critico; el resumen solo reproduce el contenido", "El resumen es mas largo y detallado que la resena", "La resena solo puede hacerse de libros; el resumen de cualquier texto", "No hay diferencia significativa entre ambos generos"],
+          "correct": "La resena evalua y argumenta un juicio critico; el resumen solo reproduce el contenido"
+        },
+        {
+          "question": "Cual elemento NO forma parte de la estructura de una resena critica?",
+          "options": ["Una copia completa del texto resenado", "La presentacion del texto y su autor", "La sintesis del contenido", "La valoracion y recomendacion argumentada"],
+          "correct": "Una copia completa del texto resenado"
+        },
+        {
+          "question": "Cual es un juicio critico bien argumentado?",
+          "options": ["El manejo de la ambiguedad en El guardagujas genera angustia existencial sostenida porque nunca resuelve si el tren llega", "El cuento no me gusto porque es confuso y aburrido", "Arreola es un autor muy famoso en Mexico", "El cuento es interesante y vale la pena leerlo"],
+          "correct": "El manejo de la ambiguedad en El guardagujas genera angustia existencial sostenida porque nunca resuelve si el tren llega"
+        },
+        {
+          "question": "La Revista de la Universidad de Mexico (UNAM) es un referente de critica literaria porque:",
+          "options": ["Publica resenas y ensayos criticos de acceso libre desde 1930", "Es la unica revista que puede publicar critica literaria en Mexico", "Solo publica trabajos de estudiantes de bachillerato", "Es una revista de distribucion exclusiva para universitarios de pago"],
+          "correct": "Publica resenas y ensayos criticos de acceso libre desde 1930"
+        }
+      ],
+      "rubric": "Nivel 4: La resena tiene las cuatro partes claramente diferenciadas, la sintesis no revela el final, los juicios criticos estan argumentados con evidencia textual especifica, usa conectores de argumentacion y la recomendacion es convincente; Nivel 3: La resena tiene las cuatro partes y al menos dos juicios argumentados; la sintesis puede ser algo extensa; Nivel 2: La resena distingue resumen de analisis pero los juicios no estan argumentados con evidencia textual; Nivel 1: La resena es basicamente un resumen sin juicios criticos o la estructura es indistinguible."
+    },
+    "teacher_tips": [
+      "Pedir a los estudiantes que lean una resena de una pelicula o serie que conozcan antes de leer resenas literarias: la transferencia de conocimiento del genero es mas facil cuando el objeto resenado es familiar.",
+      "Mostrar resenas de la Revista de la Universidad de Mexico (disponibles en linea) como ejemplos reales del genero: el contacto con la publicacion autentica tiene mas impacto que un modelo fabricado para la clase.",
+      "Para el juicio critico, practicar primero oralmente: dar una vuelta por el salon donde cada estudiante dice en una oracion su juicio sobre el texto y el docente pregunta siempre: y en que parte del texto te basas para decir eso?",
+      "La retroalimentacion entre pares funciona mejor con un instrumento concreto: la ficha de estructura evita que la retroalimentacion sea vaga (esta bien / me gusto) y orienta hacia criterios especificos."
+    ]
+  },
+
+  "LC-III-P07": {
+    "code": "LC-III-P07",
+    "title": "Realiza una exposicion oral formal en formato coloquio o foro literario",
+    "level": "Lectura y Creatividad III",
+    "duration": "~4h (3 sesiones de 50 min)",
+    "difficulty": "Intermedio-Alto",
+    "category": "Comunicacion oral academica",
+    "metadata": {
+      "objective": "Planificar, preparar y realizar una exposicion oral de caracter academico (en formato coloquio, foro o panel literario) sobre un tema de la literatura mexicana estudiada en el semestre, desarrollando habilidades de comunicacion publica, argumentacion y manejo de preguntas.",
+      "competencies": [
+        "Planifica una exposicion oral con objetivo, tesis, argumentos y cierre",
+        "Distingue los formatos de exposicion publica: coloquio, foro, simposio, panel, mesa redonda",
+        "Usa el lenguaje academico oral: conectores formales, citas de autoridad, registro adecuado",
+        "Maneja el tiempo: introduce en 1 min, desarrolla en 5-7 min, concluye en 1 min",
+        "Responde preguntas del publico con argumentos fundamentados y sin improvisacion vaga"
+      ],
+      "materials": [
+        "Programa de coloquio literario del salon (disenar colectivamente)",
+        "Guia de preparacion de exposicion oral: tesis, argumentos, cierre, preguntas posibles",
+        "Rubrica de evaluacion de exposicion oral (UNAM: criterios de coloquios estudiantiles)",
+        "Temporizador visible para el salon",
+        "Lista de formatos de exposicion academica con diferencias y usos"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "S1", "duration": "50 min", "label": "Formatos de exposicion academica y planificacion del coloquio"},
+        {"phase": "S2", "duration": "50 min", "label": "Preparacion y ensayo de exposiciones"},
+        {"phase": "S3", "duration": "50 min", "label": "Coloquio literario del salon: exposiciones y preguntas"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Conectar con experiencias previas de hablar en publico y analizar los formatos academicos reales.",
+          "activity": "El docente muestra un fragmento de un coloquio de la UNAM o del Colegio Nacional en YouTube: como hablan? que estructura tienen? El docente introduce el programa del Primer Coloquio Literario del Grupo y pide a los estudiantes que proponen los temas en que les gustaria hablar (relacionados con los movimientos o textos del semestre)."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "S1: diferencias entre formatos y planificacion. S2: preparacion y ensayo en parejas. S3: coloquio real.",
+          "activity": "S1: El docente explica las diferencias entre coloquio (exposiciones breves, preguntas al final), foro (mas participativo, publico interviene), simposio (varios expertos en un tema), panel (moderador con panelistas) y mesa redonda (todos iguales). Se acuerda el formato: coloquio de 7 min por exposicion + 3 min de preguntas. Cada estudiante o par elige su tema y completa la guia de planificacion. S2: En parejas, ensayan su exposicion: uno expone, el otro mide el tiempo y hace preguntas al final. Intercambian roles. S3 (sesion 3): Coloquio real. El docente actua como moderador. La audiencia completa la rubrica de evaluacion de cada exposicion."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Cierre del coloquio y reflexion metacognitiva sobre la comunicacion oral academica.",
+          "activity": "El docente felicita al grupo por el coloquio realizado. Cada estudiante completa: que fue lo mas dificil de la exposicion oral? que haria diferente? como mejorar el manejo de las preguntas? Los estudiantes que destacaron por su claridad, argumentacion o manejo de preguntas reciben mencion especial."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "La exposicion oral academica es una competencia comunicativa fundamental en la vida profesional y ciudadana: desde los coloquios universitarios hasta los foros publicos de politica, desde las defensas de tesis hasta los paneles de empresa, la capacidad de hablar en publico con claridad, argumentacion y confianza es una habilidad que se cultiva. La UNAM, el COLMEX, el Colegio Nacional y la FIL de Guadalajara son espacios donde la cultura oral academica de Mexico se manifiesta en su mayor nivel.",
+      "sections": [
+        {
+          "subtitle": "Formatos de exposicion oral academica",
+          "content": "Coloquio: reunion de academicos o estudiantes donde cada uno presenta un trabajo breve (10-20 min) seguido de preguntas. Es el formato mas comun en el bachillerato universitario. Foro: espacio de discusion mas abierto, con participacion del publico; el moderador coordina. Simposio: varias ponencias sobre un mismo tema, generalmente con expertos de areas distintas; hay un coordinador. Panel: un grupo pequeno de participantes (3-5) discute un tema ante el publico, moderado por un conductor. Mesa redonda: todos los participantes tienen igual estatus; se discute sin jerarquia; el moderador garantiza que todos hablen."
+        },
+        {
+          "subtitle": "Estructura de la exposicion oral",
+          "content": "Introduccion (1 minuto): capturar la atencion del publico con una pregunta provocadora, una cita, un dato sorprendente o una anecdota; enunciar la tesis o pregunta central de la exposicion. Desarrollo (5-7 minutos): presentar 2-3 argumentos con evidencia textual concreta; usar conectores formales: en primer lugar, cabe destacar, por otra parte, sin embargo. Cierre (1 minuto): retomar la tesis, sintetizar los argumentos y abrir una pregunta para el publico. El tiempo de las preguntas (3 min): escuchar con atencion, parafrasear la pregunta antes de responder, si no se sabe decir honestamente: no lo se con certeza, pero una aproximacion seria..."
+        },
+        {
+          "subtitle": "Lenguaje academico oral",
+          "content": "El registro oral academico difiere del coloquial: usa vocabulario preciso, conectores argumentativos, referencias a autores y textos, y evita las muletillas (como que, o sea, este). Frases de apertura academica: El objetivo de esta exposicion es...; Me propongo argumentar que...; La pregunta que guia esta reflexion es... Frases para presentar evidencia: Como senala el propio autor...; Segun el critico X...; En el fragmento que he analizado... Frases para el cierre: En sintesis...; Por todo lo anterior...; Me atrevo a concluir que... Frases para manejar preguntas: Es una pregunta muy pertinente...; Permita que reformule su pregunta...; Desde mi perspectiva..."
+        },
+        {
+          "subtitle": "La cultura del coloquio en Mexico",
+          "content": "El Colegio Nacional (fondado en 1943) es la institucion mas prestigiosa de Mexico para la exposicion oral academica: sus sesiones publicas son gratuitas y transmitidas en linea. La FIL de Guadalajara (Feria Internacional del Libro de Guadalajara) es el evento literario mas importante del mundo hispanohablante: cada noviembre reune a miles de escritores, editores y lectores; hay coloquios, mesas redondas y paneles abiertos al publico general. La UNAM organiza coloquios estudiantiles en todas sus facultades y bachilleratos. Participar en estas instancias, aunque sea como publico, es una forma de socializar en la cultura oral academica mexicana."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Cual es la diferencia principal entre un coloquio y un foro?",
+          "options": ["En el coloquio se presentan trabajos con preguntas al final; el foro es mas participativo y abierto al publico", "El coloquio es para expertos y el foro para estudiantes", "En el foro no hay moderador; en el coloquio si", "Son sinonimos sin diferencia practica"],
+          "correct": "En el coloquio se presentan trabajos con preguntas al final; el foro es mas participativo y abierto al publico"
+        },
+        {
+          "question": "Cual es el tiempo recomendado para la introduccion de una exposicion de 7 minutos?",
+          "options": ["Aproximadamente 1 minuto", "3-4 minutos", "La mitad del tiempo total", "No hay tiempo definido para la introduccion"],
+          "correct": "Aproximadamente 1 minuto"
+        },
+        {
+          "question": "Si el expositor no sabe la respuesta a una pregunta del publico, debe:",
+          "options": ["Reconocer honestamente que no lo sabe con certeza y ofrecer una aproximacion", "Inventar una respuesta para no quedar mal", "Ignorar la pregunta y seguir con otro tema", "Pedir al docente que responda por el"],
+          "correct": "Reconocer honestamente que no lo sabe con certeza y ofrecer una aproximacion"
+        },
+        {
+          "question": "La FIL de Guadalajara es relevante para la cultura oral academica literaria porque:",
+          "options": ["Es el evento literario mas importante del mundo hispanohablante con coloquios y paneles abiertos", "Es la unica editorial de libros universitarios en Mexico", "Es una feria exclusiva para estudiantes de bachillerato", "Es un concurso de ortografia para escritores jovenes"],
+          "correct": "Es el evento literario mas importante del mundo hispanohablante con coloquios y paneles abiertos"
+        }
+      ],
+      "rubric": "Nivel 4: La exposicion tiene estructura clara (intro-desarrollo-cierre), la tesis es precisa y los argumentos estan respaldados por evidencia textual, el lenguaje es academico y apropiado, el tiempo se maneja bien y las preguntas se responden con fundamentacion; Nivel 3: La exposicion tiene estructura reconocible y argumentacion basica; puede exceder el tiempo o tener algunas muletillas; responde las preguntas aunque con cierta inseguridad; Nivel 2: La exposicion tiene informacion correcta pero carece de estructura o argumentacion clara; habla del texto pero no argumenta una tesis; Nivel 1: No puede sostener una exposicion de 5 minutos o el contenido no se relaciona con el tema propuesto."
+    },
+    "teacher_tips": [
+      "El video de un coloquio del Colegio Nacional o de la UNAM en YouTube es una inversion de 5 minutos con alto impacto: los estudiantes ven que la exposicion oral academica es una practica real y valorada, no un ejercicio escolar arbitrario.",
+      "Designar un moderador estudiantil para el coloquio del salon: el rol de moderador desarrolla habilidades de escucha, gestion del tiempo y formulacion de preguntas que complementan las del expositor.",
+      "Para los estudiantes con ansiedad ante hablar en publico: permitir que primero ensayen con un solo companero (no el grupo completo) y gradually aumentar el tamano de la audiencia.",
+      "Conectar con la FIL de Guadalajara: si el coloquio ocurre en noviembre, se puede vincular con el evento en vivo via streaming que la FIL transmite gratuitamente; ver a escritores y criticos reales haciendo lo que los estudiantes practican es enormemente motivador."
+    ]
+  }
+}
+
+with open(OUT, "w", encoding="utf-8") as f:
+    json.dump(data, f, ensure_ascii=False, indent=2)
+
+print(f"Written {len(data)} progressions to {OUT}")

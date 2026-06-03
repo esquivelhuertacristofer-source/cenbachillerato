@@ -1,29 +1,23 @@
 "use client";
 
-import React, { useState } from "react";
 import Link from "next/link";
 import { getUACConfig } from "./uac-config";
+import { getUACPorCodigo } from "@/lib/mccems/estructura";
+import { RECURSOS_SOCIOCOGNITIVOS } from "@/lib/mccems/recursos-sociocognitivos";
+import { COMPONENTES_CURRICULARES } from "@/lib/mccems/estructura";
+import "./UACFicha.css";
 
-const R = 18;
-const C = 2 * Math.PI * R;
-
-function ProgressRing({ pct }: { pct: number }) {
-  const offset = C - (pct / 100) * C;
-  return (
-    <div className="relative flex items-center justify-center">
-      <svg width="40" height="40" viewBox="0 0 40 40" style={{ transform: "rotate(-90deg)" }}>
-        <circle cx="20" cy="20" r={R} fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="3.5" />
-        <circle
-          cx="20" cy="20" r={R} fill="none" stroke="white" strokeWidth="3.5"
-          strokeDasharray={C} strokeDashoffset={offset}
-          strokeLinecap="round"
-          style={{ transition: "stroke-dashoffset 1s ease" }}
-        />
-      </svg>
-      <span className="absolute text-[9px] font-black text-white leading-none">{pct}%</span>
-    </div>
-  );
-}
+// Imagen ilustrativa por recurso sociocognitivo (archivos reales en public/rsc/)
+const RSC_IMAGE: Record<string, string> = {
+  "RSC-LC": "/rsc/lc.png",
+  "RSC-PM": "/rsc/pm.png",
+  "RSC-IN": "/rsc/in.png",
+  "RSC-CD": "/rsc/cd.png",
+  "RSC-CH": "/rsc/ch.png",
+  "RSC-CS": "/rsc/cs.png",
+  "RSC-PFH": "/rsc/hum.png",
+  "RSC-CNEYT": "/rsc/cneyt.png",
+};
 
 interface UACCardProps {
   codigo: string;
@@ -35,125 +29,93 @@ interface UACCardProps {
 
 export default function UACCard({ codigo, nombre, done, total, pct }: UACCardProps) {
   const cfg = getUACConfig(codigo);
+  const uac = getUACPorCodigo(codigo);
+  const recurso = RECURSOS_SOCIOCOGNITIVOS.find((r) => r.codigo === uac?.recursoCodigo);
+  const componente = COMPONENTES_CURRICULARES.find((c) => c.codigo === uac?.componenteCodigo);
+
   const isComplete = done === total && total > 0;
   const isStarted = done > 0 && !isComplete;
 
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const [auraPos, setAuraPos] = useState({ x: 50, y: 50 });
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    setTilt({ x: (y - rect.height / 2) / 1000, y: (rect.width / 2 - x) / 1000 });
-    setAuraPos({ x: (x / rect.width) * 100, y: (y / rect.height) * 100 });
-  };
-
-  const handleMouseLeave = () => setTilt({ x: 0, y: 0 });
-
-  const displayTitle = cfg.shortTitle || nombre;
+  const descripcion =
+    recurso?.descripcion ??
+    "Recurso de aprendizaje alineado al Marco Curricular Común de la Educación Media Superior.";
+  const imagen = uac?.recursoCodigo ? RSC_IMAGE[uac.recursoCodigo] : undefined;
 
   return (
     <Link
       href={`/hub/uac/${codigo}`}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
+      className="uac-ficha group"
       style={{
-        transform: `perspective(2000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
-        transition: "all 1.5s cubic-bezier(0.23, 1, 0.32, 1)",
-        textDecoration: "none",
-        display: "block",
-        outline: isComplete ? "2px solid #34D399" : "none",
-        outlineOffset: isComplete ? "4px" : "0",
+        // @ts-expect-error CSS custom props
+        "--accent": cfg.accent,
+        "--accent-rgb": cfg.accentRgb,
+        "--glow": cfg.glow,
+        outline: isComplete ? "2px solid #34D399" : undefined,
+        outlineOffset: isComplete ? "4px" : undefined,
       }}
-      className="group relative flex flex-col justify-end overflow-hidden rounded-[2.5rem] min-h-[350px] shadow-lg hover:shadow-[0_40px_80px_rgba(0,0,0,0.5)] transition-shadow duration-500"
     >
-      {/* Mouse aura (flare) */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"
-        style={{
-          background: `radial-gradient(circle at ${auraPos.x}% ${auraPos.y}%, rgba(255,255,255,0.18) 0%, transparent 60%)`,
-        }}
-      />
-
-      {/* Gradient background */}
-      <div
-        className="absolute inset-0 transition-transform duration-700 group-hover:scale-105"
-        style={{ background: cfg.bg }}
-      />
-
-      {/* Dot-grid texture */}
-      <div
-        className="absolute inset-0 opacity-[0.07]"
-        style={{
-          backgroundImage: "radial-gradient(white 1px, transparent 1px)",
-          backgroundSize: "22px 22px",
-        }}
-      />
-
-      {/* Colored glow orb top-right */}
-      <div
-        className="absolute -top-16 -right-16 w-48 h-48 rounded-full blur-3xl"
-        style={{ background: cfg.glow }}
-      />
-      {/* Dark shadow orb bottom-left */}
-      <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-black/20 rounded-full blur-2xl" />
-
-      {/* Emoji icon + progress ring */}
-      <div className="absolute inset-0 flex items-center justify-center pb-24">
-        <div className="relative">
-          <div
-            className="w-28 h-28 rounded-[2rem] flex items-center justify-center text-6xl shadow-2xl group-hover:scale-110 transition-transform duration-500 border border-white/20"
-            style={{ background: "rgba(255,255,255,0.12)", backdropFilter: "blur(8px)" }}
-          >
-            {cfg.emoji}
-          </div>
-          <div className="absolute -top-3 -right-3">
-            <ProgressRing pct={pct} />
-          </div>
-        </div>
+      {/* ── Panel de imagen ─── */}
+      <div className="uac-ficha-media">
+        <div
+          className="uac-ficha-img"
+          style={imagen ? { backgroundImage: `url('${imagen}')` } : { background: cfg.bg }}
+        />
+        {/* Tinte de marca sobre la imagen */}
+        <div className="uac-ficha-tint" style={{ background: cfg.bg }} />
+        {/* Orbe de glow */}
+        <div className="uac-ficha-orb" style={{ background: cfg.glow }} />
+        {/* Emoji + código flotantes */}
+        <div className="uac-ficha-badge">{codigo}</div>
+        <div className="uac-ficha-emoji">{cfg.emoji}</div>
       </div>
 
-      {/* Bottom gradient overlay + content */}
-      <div className="relative z-10 bg-gradient-to-t from-black/70 via-black/30 to-transparent px-6 pt-12 pb-6 flex flex-col gap-3">
-        <div>
-          <p className="text-white/50 text-[9px] font-black uppercase tracking-[0.3em] mb-0.5">
-            {codigo}
-          </p>
-          <h3 className="text-white font-black text-2xl leading-tight tracking-tight">
-            {displayTitle}
-          </h3>
+      {/* ── Contenido ─── */}
+      <div className="uac-ficha-body">
+        <div className="uac-ficha-top">
+          <span className="uac-ficha-chip uac-ficha-chip--accent">{codigo}</span>
+          {componente && <span className="uac-ficha-chip">{componente.nombre}</span>}
         </div>
 
-        <div>
-          <div className="flex justify-between items-center mb-1.5">
-            <span className="text-white/60 text-[10px] font-bold">
-              {done} de {total} progresiones
+        <div className="uac-ficha-headline">
+          <h3 className="uac-ficha-title">{nombre}</h3>
+          <p className="uac-ficha-desc">{descripcion}</p>
+        </div>
+
+        <div className="uac-ficha-meta">
+          <span className="uac-ficha-metaitem">
+            <i className="fa-solid fa-layer-group" /> {total} progresiones
+          </span>
+          {uac?.semestre != null && (
+            <span className="uac-ficha-metaitem">
+              <i className="fa-solid fa-calendar-days" /> Semestre {uac.semestre}
             </span>
-            {isComplete && (
-              <span className="text-emerald-300 text-[10px] font-black uppercase tracking-wider">
-                ✓ Completada
-              </span>
-            )}
-          </div>
-          <div className="h-1.5 bg-white/20 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-white rounded-full transition-all duration-700"
-              style={{ width: `${pct}%` }}
-            />
-          </div>
+          )}
+          <span className="uac-ficha-metaitem">
+            <i className="fa-solid fa-brain" /> Recurso sociocognitivo
+          </span>
         </div>
 
-        <div
-          className={`w-full py-3 rounded-2xl text-center text-[11px] font-black uppercase tracking-widest transition-all duration-200 ${
-            isComplete
-              ? "bg-emerald-400 text-emerald-900"
-              : isStarted
-              ? "bg-white text-[#011C40]"
-              : "bg-white/20 text-white/80 border border-white/20 group-hover:bg-white/30"
-          }`}
-        >
-          {isComplete ? "✓ Completada" : isStarted ? "Continuar →" : "Comenzar →"}
+        <div className="uac-ficha-footer">
+          <div className="uac-ficha-progress">
+            <div className="uac-ficha-progress-head">
+              <span>
+                {done} de {total} completadas
+              </span>
+              <span className="uac-ficha-pct">{pct}%</span>
+            </div>
+            <div className="uac-ficha-bar">
+              <div className="uac-ficha-bar-fill" style={{ width: `${pct}%` }} />
+            </div>
+          </div>
+
+          <span
+            className={`uac-ficha-cta ${
+              isComplete ? "is-complete" : isStarted ? "is-started" : ""
+            }`}
+          >
+            {isComplete ? "✓ Completada" : isStarted ? "Continuar" : "Comenzar"}
+            {!isComplete && <i className="fa-solid fa-arrow-right" />}
+          </span>
         </div>
       </div>
     </Link>

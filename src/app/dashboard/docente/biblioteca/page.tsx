@@ -160,10 +160,10 @@ export default function BibliotecaPage() {
   }, [activeCategory, activeLevel, search]);
 
   return (
-    <div className="flex min-h-screen bg-[#F4F1EA] font-['Epilogue'] text-[#011C40]">
+    <div className="flex min-h-screen md:h-screen md:overflow-hidden bg-[#F4F1EA] font-['Epilogue'] text-[#011C40]">
       <Sidebar />
 
-      <main className="flex-1 md:ml-[260px] p-4 sm:p-8 md:p-12 space-y-8 md:space-y-12 relative">
+      <main className="flex-1 md:h-screen md:overflow-y-auto custom-scrollbar bg-[#F4F1EA] p-4 sm:p-8 md:pt-12 md:pr-12 md:pb-12 md:pl-6 space-y-8 md:space-y-12 relative">
 
         {/* Header */}
         <div className="relative overflow-hidden rounded-[2.5rem] md:rounded-[3.5rem] bg-[#011C40] p-8 sm:p-12 md:p-16 shadow-[0_40px_80px_rgba(1,28,64,0.3)]">

@@ -1,0 +1,325 @@
+"""Generate src/data/planteamiento/cs-iii.json — Ciencias Sociales III (3 progresiones)."""
+import json, pathlib
+
+OUT = pathlib.Path(__file__).parent.parent / "src" / "data" / "planteamiento" / "cs-iii.json"
+
+data = {
+  "CS-III-P01": {
+    "code": "CS-III-P01",
+    "title": "Analiza situaciones de crisis social desde multiples escalas y perspectivas disciplinares",
+    "level": "Ciencias Sociales III",
+    "duration": "~4h (3 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Analisis social",
+    "metadata": {
+      "objective": "Analizar situaciones de crisis social (economica, sanitaria, ecologica, politica) desde multiples escalas (local, nacional, global) y perspectivas disciplinares (economia, sociologia, ciencia politica, historia), identificando causas estructurales, efectos diferenciados y respuestas institucionales.",
+      "competencies": [
+        "Distingue crisis coyuntural (temporal) de crisis estructural (sistemica) con ejemplos historicos de Mexico",
+        "Aplica la perspectiva multiescalar: como un mismo fenomeno tiene causas y efectos diferentes en escala local, nacional y global",
+        "Usa fuentes estadisticas para documentar el impacto diferenciado de una crisis: CONEVAL, INEGI, CEPAL, OCDE",
+        "Analiza el impacto de la crisis por COVID-19 en Mexico: empleo, pobreza, educacion, salud (ENOE, ENIGH, SEP)",
+        "Identifica los grupos mas vulnerables ante las crisis: indigenas, mujeres, ninos, trabajadores informales (INEGI/CONEVAL)"
+      ],
+      "materials": [
+        "Infografia: Impacto economico de COVID-19 en Mexico 2020-2021 (INEGI/CONEVAL)",
+        "Grafica: tasa de pobreza en Mexico 2018-2022 (CONEVAL: paso del 41.9% al 43.9% en 2020)",
+        "Mapa: distribucion de la pobreza extrema por estado (CONEVAL 2022)",
+        "Texto: analisis del efecto Tequila 1994-1995 como crisis estructural mexicana (Banco de Mexico)",
+        "Ficha comparativa de crisis: COVID-19 vs Crisis 1994 vs Crisis 2008 (efectos en empleo, PIB, pobreza)"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "S1", "duration": "50 min", "label": "Tipos de crisis social: coyuntural vs estructural con ejemplos de Mexico"},
+        {"phase": "S2", "duration": "50 min", "label": "Analisis multiescalar: COVID-19 en Mexico (local/nacional/global)"},
+        {"phase": "S3", "duration": "50 min", "label": "Impactos diferenciados: quienes fueron mas afectados y por que"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Partir de la experiencia vivida: la pandemia de COVID-19 como crisis social compleja.",
+          "activity": "El docente pregunta: cuando llego el COVID-19 en 2020, como cambio la vida de su familia? Les afecto el empleo? La escuela? La salud? Se recogen respuestas en el pizarron y se categorizan: economicas, educativas, de salud, de convivencia. Introduccion: estos cambios son las manifestaciones de una crisis social multidimensional."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "S1: tipos de crisis y ejemplos historicos mexicanos. S2: analisis multiescalar del COVID-19. S3: impactos diferenciados.",
+          "activity": "S1: El docente presenta la distincion coyuntural (temporal, origen externo) vs estructural (sistemica, evidencia debilidades previas). La crisis de 1994-1995 (Efecto Tequila): devaluacion del peso, caida del PIB -6.2%, 1 millon de empleos perdidos (Banco de Mexico). El COVID-19 en Mexico combino ambos: origen externo (pandemia) + revelacion de debilidades estructurales (informalidad laboral, cobertura de salud). S2: Analisis multiescalar del COVID-19. Escala local: cierre de negocios, escuelas, conflictos familiares. Nacional: caida del PIB -8.2% en 2020 (INEGI); pobreza subio del 41.9% al 43.9%, equivalente a 3.8 millones de nuevos pobres (CONEVAL 2020). Global: ruptura de cadenas de suministro, cierre de fronteras, recesion mundial. S3: Los grupos mas vulnerables: trabajadores informales (55.1% de la PEA segun ENOE) perdieron ingresos sin seguro de desempleo; mujeres con carga de trabajo de cuidados (Cuenta Satelite TNRH, INEGI); comunidades indigenas con menor acceso a salud digital; ninos: el 75% perdio un anio de aprendizaje (MEJOREDU 2022)."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Sintesis: la crisis como reveladora de desigualdades estructurales.",
+          "activity": "Debate: el COVID-19 no creo las desigualdades de Mexico, las revelo. Los estudiantes expresan acuerdo o desacuerdo con evidencia. Reflexion final: que cambiaria en la estructura social de Mexico para que una proxima crisis no afecte tan desigualmente a su poblacion?"
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Las crisis sociales son situaciones de ruptura o perturbacion grave de los equilibrios y mecanismos que sostienen el funcionamiento normal de una sociedad. Pueden originarse en factores economicos (recesion, desempleo masivo), sanitarios (pandemia), ecologicos (desastre natural, sequias) o politicos (golpe de Estado, conflicto armado). Lo que las convierte en crisis sociales es su impacto sobre las condiciones de vida de amplios sectores de la poblacion. En Mexico, la pandemia de COVID-19 (2020-2022) fue la crisis social mas grave desde la de 1994-1995 y revelo con crudeza las desigualdades estructurales del pais.",
+      "sections": [
+        {
+          "subtitle": "Crisis coyuntural vs crisis estructural",
+          "content": "Crisis coyuntural: perturbacion temporal y de origen generalmente externo que altera el funcionamiento normal de una sociedad pero no cuestiona su estructura basica. Ejemplo: la Crisis del Tequila (1994-1995) genero una recesion severa pero el pais se recupero en 2-3 anios. Crisis estructural: perturbacion que pone de manifiesto o profundiza contradicciones sistemicas del modelo social, economico o politico; su resolucion requiere cambios profundos. El COVID-19 fue en Mexico tanto coyuntural (origen externo) como revelador de crisis estructurales: 55% de informalidad laboral sin proteccion social, sistema de salud con brechas enormes, desigualdad educativa digital."
+        },
+        {
+          "subtitle": "Perspectiva multiescalar del analisis social",
+          "content": "Un mismo fenomeno tiene manifestaciones y causas diferentes segun la escala de analisis. Escala micro (individuo/familia): un trabajador informal pierde su fuente de ingresos durante el confinamiento; su familia reduce el consumo de alimentos. Escala meso (comunidad/ciudad/estado): una ciudad con alta dependencia del turismo (Cancun, Los Cabos) sufre una caida del 80% de sus ingresos en 2020. Escala macro (pais): el PIB de Mexico cae -8.2% en 2020, la mayor contraccion desde la Gran Depresion. Escala global: la recesion mundial de 2020 afecta las exportaciones y remesas mexicanas (sin embargo, las remesas aumentaron a un record de 36,000 millones USD en 2020 por el esfuerzo de los migrantes)."
+        },
+        {
+          "subtitle": "Fuentes de datos para analizar crisis en Mexico",
+          "content": "INEGI (ENOE): Encuesta Nacional de Ocupacion y Empleo; mide el mercado laboral trimestralmente. En el segundo trimestre de 2020, la tasa de desocupacion formal subio al 5.4% pero la subocupacion (quien trabaja menos horas de las que quiere) llego al 22.7%. CONEVAL: Consejo Nacional de Evaluacion de la Politica de Desarrollo Social; mide la pobreza multidimensional. En 2020, la pobreza subio del 41.9% al 43.9% (52.4 millones de personas). CEPAL (Comision Economica para America Latina y el Caribe): analiza el impacto macroeconomico y las politicas de respuesta a nivel regional. OCDE: compara Mexico con otros paises desarrollados; en 2020 reporto que Mexico tuvo uno de los paquetes de estimulo fiscal mas pequenos de la OCDE ante el COVID-19 (0.7% del PIB vs promedio OCDE del 17%)."
+        },
+        {
+          "subtitle": "Impactos diferenciados: vulnerabilidad social",
+          "content": "Las crisis no afectan igual a todos: las personas en situacion de mayor vulnerabilidad sufren impactos desproporcionados. En Mexico durante COVID-19: Trabajadores informales (55.1% de la PEA segun ENOE): sin seguro de desempleo, sin prestaciones, sin posibilidad de trabajo remoto; perdieron ingresos de forma inmediata. Mujeres: la Cuenta Satelite del Trabajo No Remunerado del Hogar (TNRH-INEGI) mostro que las mujeres asumieron el 75% de los cuidados adicionales de hijos, enfermos y ancianos durante el confinamiento. Comunidades indigenas: con menor acceso a servicios de salud y conectividad digital (solo 19.5% de hogares indigenas con internet, ENDUTIH 2020). Ninos y jovenes: la MEJOREDU (2022) reporto que el 75% de los estudiantes perdio aprendizajes equivalentes a un anio escolar; la brecha fue mayor en comunidades rurales e indigenas."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Segun el CONEVAL, cuantos nuevos pobres genero la pandemia de COVID-19 en Mexico en 2020?",
+          "options": ["3.8 millones de nuevos pobres (del 41.9% al 43.9%)", "1 millon de nuevos pobres", "10 millones de nuevos pobres", "La pobreza disminuyo en 2020"],
+          "correct": "3.8 millones de nuevos pobres (del 41.9% al 43.9%)"
+        },
+        {
+          "question": "La diferencia entre una crisis coyuntural y una crisis estructural es que:",
+          "options": ["La coyuntural es temporal y de origen externo; la estructural revela contradicciones sistemicas del modelo social", "La coyuntural es mas grave que la estructural", "La estructural solo ocurre en paises en desarrollo", "Ambas requieren exactamente las mismas respuestas politicas"],
+          "correct": "La coyuntural es temporal y de origen externo; la estructural revela contradicciones sistemicas del modelo social"
+        },
+        {
+          "question": "La perspectiva multiescalar en ciencias sociales implica:",
+          "options": ["Analizar un fenomeno en sus dimensiones micro (individuo), meso (comunidad) y macro (pais/global)", "Usar tres fuentes de datos diferentes para el mismo analisis", "Comparar Mexico con tres paises similares", "Medir tres variables distintas del mismo problema"],
+          "correct": "Analizar un fenomeno en sus dimensiones micro (individuo), meso (comunidad) y macro (pais/global)"
+        },
+        {
+          "question": "Por que los trabajadores informales fueron especialmente vulnerables durante el COVID-19 en Mexico?",
+          "options": ["No tienen seguro de desempleo, prestaciones ni posibilidad de trabajo remoto", "Tienen mas ahorros que los trabajadores formales", "El gobierno les ofrecio apoyos especiales inmediatos", "Trabajan en sectores esenciales que nunca cerraron"],
+          "correct": "No tienen seguro de desempleo, prestaciones ni posibilidad de trabajo remoto"
+        }
+      ],
+      "rubric": "Nivel 4: Distingue con precision crisis coyuntural y estructural, aplica la perspectiva multiescalar con datos cuantitativos de fuentes institucionales (CONEVAL, INEGI, OCDE), analiza los impactos diferenciados por grupos vulnerables y propone preguntas para el debate sobre la respuesta institucional; Nivel 3: Distingue los tipos de crisis y analiza el impacto del COVID-19 en al menos dos escalas con datos; Nivel 2: Identifica los tipos de crisis pero no los aplica con datos o confunde las escalas de analisis; Nivel 1: No distingue crisis coyuntural de estructural o no puede analizar el impacto diferenciado."
+    },
+    "teacher_tips": [
+      "Iniciar con la experiencia personal de los estudiantes durante la pandemia valida sus vivencias como datos sociales validos, no solo como anecdota. Luego conectar esas experiencias personales con los datos agregados del CONEVAL e INEGI.",
+      "El mapa de pobreza por estado del CONEVAL es visualmente impactante y permite identificar rapidamente cuales estados del pais enfrentan mayor vulnerabilidad; usar el del estado del plantel para hacerlo localmente relevante.",
+      "Para el debate final, organizar dos grupos: uno argumenta que el COVID-19 creo las desigualdades de Mexico; otro argumenta que solo las revelo. El ejercicio de tomar una posicion y defenderla con datos es mas formativo que la leccion magistral.",
+      "Relacionar con PFH-III: el debate sobre la responsabilidad del Estado ante las crisis (justicia social, derecho a la salud, obligacion de proteger a los mas vulnerables) tiene una dimension etica que se puede explorar en la clase de filosofia."
+    ]
+  },
+
+  "CS-III-P02": {
+    "code": "CS-III-P02",
+    "title": "Examina el diseno, implementacion y evaluacion de politicas publicas en Mexico",
+    "level": "Ciencias Sociales III",
+    "duration": "~4h (3 sesiones de 50 min)",
+    "difficulty": "Intermedio-Alto",
+    "category": "Politica publica",
+    "metadata": {
+      "objective": "Analizar el ciclo de las politicas publicas (definicion del problema, diseno, implementacion, evaluacion) aplicado a casos concretos de politica social en Mexico, evaluando su efectividad con datos del CONEVAL y discutiendo la participacion ciudadana en su construccion.",
+      "competencies": [
+        "Describe el ciclo de las politicas publicas: agenda, formulacion, adopcion, implementacion, evaluacion, reformulacion",
+        "Distingue tipos de politica publica: social (salud, educacion, vivienda), economica, ambiental, de seguridad",
+        "Analiza el caso del programa Oportunidades/PROSPERA/Becas Bienestar como politica social longitudinal (1997-hoy)",
+        "Evalua una politica publica usando criterios de eficiencia, eficacia, equidad y sostenibilidad",
+        "Identifica actores en el proceso de politica publica: gobierno federal/estatal/municipal, OSC, sector privado, academia, ciudadania"
+      ],
+      "materials": [
+        "Esquema del ciclo de politicas publicas (Harold Lasswell adaptado)",
+        "Ficha comparativa: PROGRESA (1997) -> Oportunidades (2002) -> PROSPERA (2014) -> Sembrando Vida/Becas Bienestar (2019)",
+        "Datos CONEVAL: evaluacion de impacto de PROSPERA 2016 (reduccion de pobreza extrema en zonas rurales)",
+        "Caso 2: Programa IMSS-Bienestar (expansion del acceso a salud en comunidades sin seguridad social)",
+        "Diagrama de actores: mapa de stakeholders de una politica de salud"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "S1", "duration": "50 min", "label": "Ciclo de politicas publicas y tipos de politica social"},
+        {"phase": "S2", "duration": "50 min", "label": "Caso PROGRESA/PROSPERA/Becas Bienestar: diseno y evaluacion"},
+        {"phase": "S3", "duration": "50 min", "label": "Participacion ciudadana y evaluacion de una politica publica local"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Activar el concepto de politica publica desde la experiencia cotidiana.",
+          "activity": "El docente pregunta: alguien en su familia recibe o ha recibido algun apoyo del gobierno? (Becas Bienestar, IMSS, PROSPERA, Sembrando Vida, FONACOT, credito INFONAVIT, pensión para adultos mayores). Se hace un inventario en el pizarron. Introduccion: todos esos apoyos son politicas publicas; la pregunta es si son efectivas y para quien."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "S1: ciclo de politicas publicas y tipos. S2: caso longitudinal de politica social mexicana. S3: evaluacion participativa.",
+          "activity": "S1: El ciclo en 6 etapas: (1) Identificacion del problema y agenda (por que el gobierno decide actuar); (2) Formulacion (diseno de opciones de politica); (3) Adopcion/decision (por que se elige una opcion y no otra); (4) Implementacion (quien la lleva a cabo, con que recursos); (5) Evaluacion (funcionó? para quien?); (6) Reformulacion (ajustes o terminacion). Tipos: politica social (IMSS, SEP, CONAVI), economica (politica fiscal, monetaria), ambiental (SEMARNAT), de seguridad (SSP). S2: El caso PROGRESA-PROSPERA-Becas Bienestar es el mas estudiado de Mexico. PROGRESA (1997, Zedillo): primer programa de transferencias condicionadas en el mundo; pago a familias pobres a cambio de que ninos asistieran a escuela y a consultas medicas. CONEVAL (2016) lo evaluo como efectivo para reducir pobreza extrema rural (-10% en zonas cubiertas). Criticas: no resuelve causas estructurales de la pobreza; condicionalidades pueden ser paternalistas. S3: En equipos, los estudiantes eligen una politica publica de su municipio (pueden investigar en el portal del gobierno municipal) y la evaluan segun cuatro criterios: eficiencia (uso de recursos), eficacia (logro de metas), equidad (quien se beneficia), sostenibilidad (puede mantenerse en el tiempo)."
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Reflexion: quien tiene derecho a evaluar las politicas publicas?",
+          "activity": "Debate: la ciudadania tiene el derecho y la responsabilidad de evaluar las politicas publicas que el gobierno disena con el dinero de los impuestos. Como puede participar un ciudadano en la evaluacion de politicas publicas? (Encuestas ciudadanas, OSC, presupuesto participativo, consultas publicas, acceso a informacion gubernamental via INAI)."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Las politicas publicas son el conjunto de decisiones y acciones que los gobiernos toman para atender problemas sociales y satisfacer necesidades colectivas. No son solo leyes o decretos: son procesos complejos que involucran multiples actores (gobierno, sociedad civil, academia, sector privado), que requieren recursos, que tienen efectos intencionales y no intencionales, y que deben ser evaluados para saber si realmente resuelven el problema que pretendian atender. En Mexico, el CONEVAL (Consejo Nacional de Evaluacion de la Politica de Desarrollo Social) es la institucion independiente encargada de evaluar las politicas sociales.",
+      "sections": [
+        {
+          "subtitle": "El ciclo de las politicas publicas",
+          "content": "El modelo del ciclo de politicas (Harold Lasswell, 1956; adaptado por muchos autores) describe el proceso en fases: (1) Identificacion del problema y entrada a la agenda: no todo problema social se convierte en politica publica; para entrar a la agenda gubernamental un problema debe ser visible, tener defensores con voz publica y coincidir con prioridades politicas. (2) Formulacion: el gobierno y sus asesores disenan opciones de politica; se consideran viabilidad tecnica, financiera y politica. (3) Adopcion: decision oficial (ley, decreto, presupuesto). (4) Implementacion: la etapa mas critica; muchas politicas fallan no en su diseno sino en su ejecucion por burocracia, falta de recursos o resistencia de actores locales. (5) Evaluacion: medir los efectos reales, tanto los esperados como los no previstos. (6) Reformulacion: ajustar o terminar la politica."
+        },
+        {
+          "subtitle": "PROGRESA / Oportunidades / PROSPERA / Becas Bienestar: evolucion de una politica",
+          "content": "Este programa es el mas estudiado de Mexico y uno de los mas influyentes del mundo en el diseno de transferencias condicionadas de ingreso (TCI). PROGRESA (1997-2001, gobierno Zedillo): primer TCI del mundo; pago mensual a familias en pobreza extrema rural con tres condiciones: asistencia escolar, asistencia a consultas medicas y nutricion. Su evaluacion de impacto (realizada por el IFPRI con datos del CONEVAL) mostro reduccion de ingresos en desnutricion infantil y mayor permanencia escolar. Oportunidades (2002-2013, gobiernos Fox y Calderon): se expandio a zonas urbanas; cobertura maxima de 5.8 millones de familias. PROSPERA (2014-2018, gobierno Pena Nieto): se incorporo el componente de inclusion productiva (conectar a beneficiarios con programas de empleo y credito). Becas Bienestar / Sembrando Vida (2019-hoy, gobierno AMLO): se eliminaron las condicionalidades; se creo una pension universal para adultos mayores; Sembrando Vida apoya a campesinos con pagos directos."
+        },
+        {
+          "subtitle": "Criterios de evaluacion de politicas publicas",
+          "content": "Eficiencia: se logran los resultados al menor costo posible? Se usa el presupuesto de forma adecuada? Eficacia: se alcanzaron las metas propuestas? Cuantos beneficiarios recibieron el apoyo prometido? Se redujo el problema que se pretendia resolver? Equidad: los beneficios llegan a quienes mas lo necesitan? Se reducen o amplifican las brechas de genero, etnia, region? Sostenibilidad: la politica puede mantenerse financiera, institucional y politicamente en el mediano y largo plazo? En Mexico, el CONEVAL publica evaluaciones de cada programa social usando estos criterios; sus reportes son de acceso libre en coneval.org.mx."
+        },
+        {
+          "subtitle": "Actores en el ciclo de politicas publicas",
+          "content": "Gobierno federal: Secretarias (SEDESOL/BIENESTAR, SS/IMSS, SEP); define prioridades, asigna presupuesto, emite reglas de operacion. Gobierno estatal y municipal: implementa en el territorio; puede crear sus propias politicas complementarias. Academia y centros de investigacion: COLMEX, CIDE, CIESAS, UNAM; investigan el problema, evaluan las politicas. Organizaciones de la Sociedad Civil (OSC): implementan programas en territorios que el gobierno no alcanza; también exigen rendicion de cuentas. Sector privado: puede implementar politicas como el IMSS (seguridad social para trabajadores formales) o complementar servicios. Ciudadania: en teoria, el origen y destinatario de toda politica publica; en la practica, su participacion va desde votar hasta organizarse en comites de vigilancia de obras o presentar solicitudes de informacion via INAI."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Cual es la etapa del ciclo de politicas publicas donde mas frecuentemente fallan los programas en Mexico?",
+          "options": ["La implementacion (ejecucion en el territorio con recursos y actores reales)", "La formulacion del diseno tecnico", "La identificacion del problema", "La evaluacion de resultados"],
+          "correct": "La implementacion (ejecucion en el territorio con recursos y actores reales)"
+        },
+        {
+          "question": "PROGRESA fue el primer programa de su tipo en el mundo porque:",
+          "options": ["Fue la primera transferencia condicionada de ingreso (TCI) implementada a escala nacional en el mundo", "Fue el primer programa de salud universal en Mexico", "Fue el primer programa de vivienda social del gobierno mexicano", "Fue el primer programa financiado por el Banco Mundial en America Latina"],
+          "correct": "Fue la primera transferencia condicionada de ingreso (TCI) implementada a escala nacional en el mundo"
+        },
+        {
+          "question": "El CONEVAL en Mexico tiene la funcion de:",
+          "options": ["Evaluar de forma independiente las politicas de desarrollo social", "Disenar los programas sociales del gobierno federal", "Administrar el presupuesto de los programas sociales", "Supervisar el cumplimiento de la Constitucion"],
+          "correct": "Evaluar de forma independiente las politicas de desarrollo social"
+        },
+        {
+          "question": "El criterio de EQUIDAD en la evaluacion de una politica publica pregunta:",
+          "options": ["Si los beneficios llegan a quienes mas lo necesitan y si se reducen las brechas existentes", "Si la politica usa el presupuesto de forma eficiente", "Si la politica logra todas sus metas cuantitativas", "Si la politica puede mantenerse financieramente en el largo plazo"],
+          "correct": "Si los beneficios llegan a quienes mas lo necesitan y si se reducen las brechas existentes"
+        }
+      ],
+      "rubric": "Nivel 4: Describe con precision el ciclo de politicas publicas, analiza el caso PROGRESA/PROSPERA con datos de impacto del CONEVAL, evalua una politica local usando los cuatro criterios con evidencia y reflexiona sobre la participacion ciudadana en la rendicion de cuentas; Nivel 3: Describe el ciclo, analiza el caso principal y aplica al menos tres criterios de evaluacion; Nivel 2: Conoce el ciclo y el caso pero la evaluacion carece de datos o de criterios claros; Nivel 1: No puede describir el ciclo de politicas publicas o no distingue entre tipos de politica."
+    },
+    "teacher_tips": [
+      "La experiencia directa de los estudiantes con programas sociales (becas, apoyos de salud, pensiones familiares) es el mejor punto de partida: invitar a compartir sin juzgar que programas reciben, y luego analizarlos con los criterios academicos.",
+      "El portal del CONEVAL (coneval.org.mx) tiene evaluaciones de todos los programas sociales con fichas accesibles para bachillerato; asignar la lectura de una ficha como tarea previa a la sesion.",
+      "Para la actividad de evaluacion de politica local, coordinar con el docente de Cultura Digital para que los estudiantes busquen informacion del gobierno municipal en linea; es una aplicacion practica de las habilidades de busqueda digital.",
+      "El debate sobre las condicionalidades (PROGRESA las tenia; Becas Bienestar no) es ideologicamente rico: algunos argumentan que las condicionalidades son paternalistas y violatorias de derechos; otros que sin ellas los incentivos para la educacion y salud desaparecen. Usarlo como debate argumentado sin imponer una posicion."
+    ]
+  },
+
+  "CS-III-P03": {
+    "code": "CS-III-P03",
+    "title": "Reconoce a las juventudes como sujetos historicos y politicos en Mexico",
+    "level": "Ciencias Sociales III",
+    "duration": "~3h (2 sesiones de 50 min)",
+    "difficulty": "Intermedio",
+    "category": "Sociologia politica",
+    "metadata": {
+      "objective": "Analizar las condiciones de vida, formas de participacion y contribuciones de las juventudes mexicanas a la vida social y politica del pais, reconociendo la heterogeneidad de las experiencias juveniles segun genero, clase, etnia y region.",
+      "competencies": [
+        "Describe las condiciones de vida de las juventudes mexicanas con datos de la ENAJUV y el IMJUVE",
+        "Distingue juventud como categoria social de la adolescencia como categoria biologica",
+        "Analiza la participacion politica juvenil en Mexico: del movimiento estudiantil 1968 al YoSoy132 (2012) y las marchas feministas (#NiUnaMas)",
+        "Identifica las principales problematicas de la juventud mexicana: NINIS, desempleo, violencia, migracion, acceso a educacion superior",
+        "Reflexiona sobre su propia agencia como joven mexicano: que derechos tienen, que pueden exigir y como pueden participar"
+      ],
+      "materials": [
+        "Datos ENAJUV 2022 (Encuesta Nacional de Juventud, IMJUVE): perfil de los jovenes mexicanos 15-29 anios",
+        "Linea de tiempo: movimientos juveniles en Mexico 1968-2022",
+        "Video corto: fragmento del movimiento YoSoy132 (2012, YouTube)",
+        "Mapa conceptual: problematicas de la juventud mexicana (NINIS, violencia, empleo informal)",
+        "Ficha: Derechos de los jovenes en Mexico (Ley del Instituto Mexicano de la Juventud)"
+      ]
+    },
+    "strategy": {
+      "timeline": [
+        {"phase": "S1", "duration": "50 min", "label": "Perfil de las juventudes mexicanas: ENAJUV y heterogeneidad"},
+        {"phase": "S2", "duration": "50 min", "label": "Participacion politica juvenil en Mexico: historia y presente"}
+      ],
+      "phases": [
+        {
+          "title": "FASE I: APERTURA",
+          "duration": "10 min",
+          "description": "Partir del autoconocimiento: los estudiantes como jovenes mexicanos son el sujeto de estudio.",
+          "activity": "El docente pregunta: cuando dicen que son jovenes, a que se refieren? Es lo mismo ser joven en CDMX que en una comunidad indigena de Oaxaca? Ser joven hombre que joven mujer? La respuesta es no: la juventud es una categoria social heterogenea. Introduccion: la ENAJUV (IMJUVE) es la fuente de datos mas completa sobre jovenes en Mexico."
+        },
+        {
+          "title": "FASE II: DESARROLLO",
+          "duration": "30 min",
+          "description": "S1: perfil de la juventud mexicana con datos ENAJUV. S2: participacion politica juvenil historica y actual.",
+          "activity": "S1: El docente presenta datos de la ENAJUV 2022: hay 36.6 millones de jovenes de 15 a 29 anios en Mexico (29% de la poblacion). De ellos, el 23.3% son NINIS (no estudian ni trabajan); sin embargo, la mayoria de los NINIS son mujeres que realizan trabajo de cuidados no remunerado en el hogar. El 40% de los jovenes trabaja en la informalidad. El 65.3% de los jovenes de 15 a 17 anios asiste a la escuela (gap respecto a educacion superior). La violencia es la principal preocupacion reportada por jovenes mexicanos. Actividad: en equipos, los estudiantes comparan su propia situacion con los datos nacionales: en que coinciden? en que difieren? S2: Linea del tiempo de movimientos juveniles: 1968 (masacre de Tlatelolco y el movimiento estudiantil, vinculado a los Juegos Olimpicos); 1999 (huelga de la UNAM por las cuotas); 2012 (YoSoy132, movimiento de universitarios contra Pena Nieto y la cobertura mediatica parcial); 2019-2020 (marchas feministas #NiUnaMas, fuerte protagonismo de jovenes mujeres). Video de 5 min del YoSoy132. Discusion: que caracteriza a estos movimientos? Por que las juventudes se movilizan? Que lograron?"
+        },
+        {
+          "title": "FASE III: CIERRE",
+          "duration": "10 min",
+          "description": "Agencia juvenil: de espectadores a sujetos politicos.",
+          "activity": "El docente pregunta: que pueden hacer los jovenes de su plantel para incidir en su comunidad? Se hace un brainstorming: desde votar a los 18, hasta organizarse en brigadas de reforestacion, pasando por usar redes sociales para causas colectivas, participar en consultas municipales o crear una cooperativa. Cierre: las juventudes no son el futuro de Mexico, son el presente."
+        }
+      ]
+    },
+    "theory": {
+      "introduction": "Las juventudes (plural intencional) son uno de los grupos sociales mas heterogeneos de Mexico: hay 36.6 millones de jovenes de 15 a 29 anios (ENAJUV 2022), que viven en condiciones muy distintas segun su genero, clase social, etnia, region, y si estudian, trabajan, o ninguna de las dos. La sociologia distingue la adolescencia (categoria biologica: pubertad y desarrollo fisico) de la juventud (categoria social: periodo de construccion de la identidad, transicion a la adultez, definida culturalmente y que varia enormemente entre grupos). En Mexico, los jovenes han sido protagonistas de algunos de los momentos politicos mas significativos del siglo XX y XXI.",
+      "sections": [
+        {
+          "subtitle": "Perfil sociodemografico de la juventud mexicana (ENAJUV 2022)",
+          "content": "La ENAJUV 2022 (realizada por el IMJUVE y el INEGI) encuesto a 36.6 millones de jovenes de 15 a 29 anios en Mexico. Principales datos: 23.3% son NINIS (no estudian ni trabajan); de ellos, el 78% son mujeres que realizan trabajo de cuidados en el hogar (invisibilizado en la estadistica). 40% trabaja en la informalidad. Solo el 22% de los jovenes de 18-24 anios esta en educacion superior (vs promedio OCDE de 60%). El 72% de los jovenes usa internet cotidianamente. La violencia es la mayor preocupacion: 1 de cada 3 jovenes ha sido victima de violencia fisica o psicologica en el ultimo anio. 68% preferiria no emigrar si tuviera oportunidades en Mexico."
+        },
+        {
+          "subtitle": "Heterogeneidad de las juventudes",
+          "content": "Ser joven en Mexico no es una experiencia uniforme. Genero: las jovenes mujeres tienen menor acceso a educacion superior, mayor riesgo de violencia (7 feminicidios diarios en Mexico, SESNSP 2023), y mayor carga de trabajo de cuidados. Etnia: los jovenes indigenas tienen tasas de escolaridad significativamente menores; solo el 6.9% de los jovenes de comunidades indigenas accede a educacion superior (INALI/SEP 2021). Clase social: los jovenes del quintil mas rico tienen 5 veces mas probabilidad de llegar a la universidad que los del quintil mas pobre. Region: ser joven en Nuevo Leon (zona metropolitana, industria) es radicalmente diferente a ser joven en Guerrero o Chiapas (mayor pobreza, menor infraestructura, mayor violencia rural)."
+        },
+        {
+          "subtitle": "Movimientos juveniles en Mexico",
+          "content": "El movimiento estudiantil de 1968 culmino el 2 de octubre en la Masacre de Tlatelolco, cuando el ejercito disparo contra estudiantes universitarios y del IPN en la Plaza de las Tres Culturas (CDMX). La masacre ocurrio 10 dias antes de la inauguracion de los Juegos Olimpicos. Su impacto historico fue enorme: politicamente inicio la apertura democratica que llevo a las primeras elecciones competitivas de Mexico. YoSoy132 (2012): movimiento de estudiantes universitarios (IPN, UNAM, Iberoamericana) que se opuso a la candidatura de Pena Nieto y denuncio la parcialidad de los medios de comunicacion. Fue un hito en el uso de redes sociales como herramienta de organizacion politica en Mexico. Marchas feministas 2019-2020: protagonizadas en gran medida por jovenes mujeres; la marcha del 8M de 2020 fue la mas grande en la historia del movimiento feminista mexicano; su consigna: ni una mas, ni una menos."
+        },
+        {
+          "subtitle": "Problematicas y derechos de las juventudes en Mexico",
+          "content": "Problematicas principales: NINIS (8.5 millones de jovenes; fenomeno complejo que incluye tanto jovenes excluidos como mujeres con trabajo de cuidados invisibilizado); desempleo y subempleo juvenil (40% en informalidad); violencia (primer causa de muerte de jovenes mexicanos es homicidio en algunas regiones); migracion forzada (miles de jovenes huyen de la violencia del crimen organizado). Derechos formales: la Ley del Instituto Mexicano de la Juventud (IMJUVE) reconoce los derechos de los jovenes a la educacion, salud, trabajo, participacion politica y cultura. El IMJUVE tiene delegaciones en todos los estados y programas de apoyo al empleo y emprendimiento juvenil. El voto a los 18 es el derecho politico fundamental; desde 2019 se discute en Mexico reducir la edad de voto a 16."
+        }
+      ]
+    },
+    "evaluation": {
+      "exam_questions": [
+        {
+          "question": "Segun la ENAJUV 2022, que porcentaje de jovenes mexicanos de 15-29 anios son NINIS?",
+          "options": ["23.3%", "10%", "50%", "5%"],
+          "correct": "23.3%"
+        },
+        {
+          "question": "Por que la mayoria de los NINIS en Mexico son mujeres?",
+          "options": ["Porque realizan trabajo de cuidados no remunerado en el hogar que no contabiliza la estadistica de empleo", "Porque las mujeres no tienen acceso a educacion en Mexico", "Porque las mujeres prefieren no trabajar", "Porque el gobierno no tiene programas para mujeres jovenes"],
+          "correct": "Porque realizan trabajo de cuidados no remunerado en el hogar que no contabiliza la estadistica de empleo"
+        },
+        {
+          "question": "El movimiento YoSoy132 (2012) fue significativo porque:",
+          "options": ["Fue un hito en el uso de redes sociales como herramienta de organizacion politica en Mexico y denuncio la parcialidad mediatica", "Fue el primer movimiento estudiantil de Mexico", "Logro cancelar las elecciones presidenciales de 2012", "Fue organizado exclusivamente por estudiantes de la UNAM"],
+          "correct": "Fue un hito en el uso de redes sociales como herramienta de organizacion politica en Mexico y denuncio la parcialidad mediatica"
+        },
+        {
+          "question": "La diferencia entre juventud y adolescencia como categorias es que:",
+          "options": ["La adolescencia es una categoria biologica (desarrollo fisico); la juventud es una categoria social (definida culturalmente)", "La juventud comienza antes que la adolescencia", "Ambas categorias son identicas y se usan de forma intercambiable", "La adolescencia abarca de los 20 a los 30 anios"],
+          "correct": "La adolescencia es una categoria biologica (desarrollo fisico); la juventud es una categoria social (definida culturalmente)"
+        }
+      ],
+      "rubric": "Nivel 4: Describe el perfil de la juventud mexicana con datos especificos de la ENAJUV, analiza la heterogeneidad de las experiencias juveniles por genero/etnia/clase/region, interpreta los movimientos juveniles como expresion de agencia politica y reflexiona sobre su propia participacion ciudadana posible; Nivel 3: Describe el perfil con datos y analiza los movimientos juveniles principales; puede no profundizar en la heterogeneidad; Nivel 2: Conoce algunos datos de la ENAJUV y nombra los movimientos pero no los analiza en profundidad; Nivel 1: No puede describir el perfil de la juventud mexicana o confunde juventud con adolescencia."
+    },
+    "teacher_tips": [
+      "Los estudiantes SON el sujeto de estudio en esta progresion: esto genera un nivel de implicacion personal excepcional. Comenzar con sus propias experiencias y luego conectar con los datos nacionales, no al reves.",
+      "El fenomeno NINI es frecuentemente malentendido y estigmatizado; es importante aclarar desde el principio que la mayoria de las jovenes en esta categoria realizan trabajo de cuidados invisible, no estan en inactividad voluntaria.",
+      "El video del YoSoy132 esta disponible en YouTube; la imagen de Enrique Olivares Ventura (Ibero) con credencial en mano es un icono de la participacion juvenil reciente. El movimiento fue protagonizado en parte por estudiantes de bachillerato universitario como los que estan en el salon.",
+      "Para el cierre de agencia: evitar la trampa del fatalismo (nada cambia en Mexico) sin caer en el optimismo ingenuo. El ejemplo de Cheran (visto en CNEYT-III) es un modelo de accion colectiva juvenil exitosa que puede retomarse aqui."
+    ]
+  }
+}
+
+with open(OUT, "w", encoding="utf-8") as f:
+    json.dump(data, f, ensure_ascii=False, indent=2)
+
+print(f"Written {len(data)} progressions to {OUT}")

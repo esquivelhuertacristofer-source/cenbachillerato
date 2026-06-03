@@ -45,19 +45,14 @@ export function Sidebar({ profile }: SidebarProps) {
       borderRight: '1px solid rgba(255,255,255,0.07)',
       flexShrink: 0,
     }}>
-      {/* Logo */}
-      <div style={{ padding: '16px 16px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-        <Link href="/hub" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-          <img
-            src="/Logo%20Cen.png"
-            alt="CEN"
-            style={{ width: 30, height: 30, objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.92 }}
-          />
-          <div>
-            <div style={{ color: '#fff', fontWeight: 700, fontSize: 14, lineHeight: 1.2 }}>CEN Bachillerato</div>
-            <div style={{ color: 'rgba(125,211,252,0.65)', fontSize: 11, fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-              Hub Alumno
-            </div>
+      {/* Marca */}
+      <div style={{ padding: '18px 16px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+        <Link href="/hub" style={{ display: 'block', textDecoration: 'none' }}>
+          <div style={{ color: '#fff', fontWeight: 800, fontSize: 16, lineHeight: 1.2, letterSpacing: '-0.01em' }}>
+            CEN Bachillerato
+          </div>
+          <div style={{ color: 'rgba(125,211,252,0.65)', fontSize: 11, fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', marginTop: 2 }}>
+            Hub Alumno
           </div>
         </Link>
       </div>

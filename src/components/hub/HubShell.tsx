@@ -18,9 +18,10 @@ interface HubShellProps {
 }
 
 const NAV_ITEMS = [
-  { href: "/hub",            icon: "fa-house",      label: "Inicio",     exact: true  },
-  { href: "/hub/biblioteca", icon: "fa-book-open",  label: "Biblioteca", exact: false },
-  { href: "/hub/progreso",   icon: "fa-chart-line", label: "Progreso",   exact: false },
+  { href: "/hub",            icon: "fa-house",       label: "Inicio",     exact: true  },
+  { href: "/hub/recursos",   icon: "fa-layer-group", label: "Recursos",   exact: false },
+  { href: "/hub/biblioteca", icon: "fa-book-open",   label: "Biblioteca", exact: false },
+  { href: "/hub/progreso",   icon: "fa-chart-line",  label: "Progreso",   exact: false },
 ] as const;
 
 function SidebarContent({
@@ -53,28 +54,10 @@ function SidebarContent({
         <Link
           href="/hub"
           onClick={onClose}
-          style={{ display: "flex", alignItems: "center", gap: 12, textDecoration: "none" }}
+          style={{ display: "block", textDecoration: "none" }}
         >
-          <div style={{
-            width: 44, height: 44, borderRadius: 13,
-            background: "white",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            boxShadow: "0 4px 14px rgba(0,0,0,0.20)",
-            flexShrink: 0,
-          }}>
-            <img
-              src="/Logo%20Cen.png"
-              alt="CEN"
-              style={{ width: 26, height: 26, objectFit: "contain" }}
-            />
-          </div>
-          <div>
-            <div style={{ fontSize: 18, fontWeight: 900, color: "#fff", letterSpacing: "-0.03em", lineHeight: 1.05 }}>
-              CEN
-            </div>
-            <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.40)", textTransform: "uppercase", letterSpacing: "0.12em" }}>
-              Bachillerato
-            </div>
+          <div style={{ fontSize: 20, fontWeight: 900, color: "#fff", letterSpacing: "-0.03em", lineHeight: 1.1 }}>
+            CEN Bachillerato
           </div>
         </Link>
 
