@@ -12,8 +12,10 @@
 -- por lo que cualquier query del docente a alumnos_grupos regresaba 0 filas
 -- (sin error) → conteo de alumnos siempre 0.
 --
--- Esta migración agrega esa política, alineada con la de grupos:
--- un docente/admin puede leer las membresías de los grupos de SU escuela.
+-- Esta migración agrega esa política con scope por DOCENTE (privacidad de
+-- datos de menores): cada docente lee SOLO las membresías de SUS propios
+-- grupos (grupos.id_docente = auth.uid()). admin/super_admin sí ven todo,
+-- porque su rol requiere acceso amplio a la escuela.
 --
 -- (La causa raíz #1 — "Sin grupos asignados" — es de DATOS: el profile del
 --  docente demo tiene escuela_id NULL/distinto al de sus grupos, por lo que
@@ -23,15 +25,21 @@
 -- NO ejecutar automáticamente — pegar en Supabase SQL Editor.
 -- ============================================================
 
--- alumnos_grupos: docente/admin ve las membresías de los grupos de su escuela
-CREATE POLICY "teacher/admin can read alumnos_grupos in their escuela"
+-- alumnos_grupos: docente ve SOLO sus grupos; admin/super_admin ven todo
+DROP POLICY IF EXISTS "teacher/admin can read alumnos_grupos in their escuela" ON public.alumnos_grupos;
+DROP POLICY IF EXISTS "teacher can read alumnos_grupos in own groups" ON public.alumnos_grupos;
+
+CREATE POLICY "teacher can read alumnos_grupos in own groups"
   ON public.alumnos_grupos FOR SELECT TO authenticated
   USING (
-    public.get_my_role() IN ('teacher', 'admin', 'super_admin') AND
-    EXISTS (
-      SELECT 1 FROM public.grupos g
-      WHERE g.id = alumnos_grupos.id_grupo
-        AND g.escuela_id = public.get_my_escuela_id()
+    public.get_my_role() IN ('admin', 'super_admin')
+    OR (
+      public.get_my_role() = 'teacher'
+      AND EXISTS (
+        SELECT 1 FROM public.grupos g
+        WHERE g.id = alumnos_grupos.id_grupo
+          AND g.id_docente = auth.uid()
+      )
     )
   );
 
