@@ -45,3 +45,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local audit / build logs (no commitear)
+audit-*.log
+audit-*.json
+cf-build.log
+pages-build-audit.log
