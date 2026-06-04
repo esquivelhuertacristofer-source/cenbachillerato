@@ -5,7 +5,6 @@ import { getSupabaseBrowser } from '@/lib/supabase-browser';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/dashboard/Sidebar';
 import PerformanceChart from '@/components/dashboard/PerformanceChart';
-import jsPDF from 'jspdf';
 import {
   PieChart,
   Target,
@@ -142,10 +141,11 @@ export default function ReportesPage() {
   }, [students]);
 
   // ── Export: Informe grupal en PDF con datos reales ─────────────────────────
-  function handleExport() {
+  async function handleExport() {
     if (exporting) return;
     setExporting(true);
     try {
+      const { jsPDF } = await import('jspdf');
       const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
       const PAGE_W = 297;
       const M = 15;

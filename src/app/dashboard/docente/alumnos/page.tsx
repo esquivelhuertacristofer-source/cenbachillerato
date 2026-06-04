@@ -20,7 +20,6 @@ import {
   FileText,
   Trophy,
 } from 'lucide-react';
-import jsPDF from 'jspdf';
 
 interface IntentoEntry {
   actividad_id: string;
@@ -178,7 +177,8 @@ export default function AlumnosPage() {
     return display.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase();
   };
 
-  const handleIndividualPDF = (student: Student) => {
+  const handleIndividualPDF = async (student: Student) => {
+    const { jsPDF } = await import('jspdf');
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
     doc.setFillColor(1, 28, 64);
@@ -272,7 +272,8 @@ export default function AlumnosPage() {
     doc.save(`expediente-${(student.full_name ?? student.email).replace(/\s+/g, '-').toLowerCase()}.pdf`);
   };
 
-  const handleGroupPDF = () => {
+  const handleGroupPDF = async () => {
+    const { jsPDF } = await import('jspdf');
     const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
 
     doc.setFillColor(1, 28, 64);
