@@ -194,16 +194,17 @@ describe("MCCEMS Structure Validation — Recursos Sociocognitivos", () => {
 });
 
 describe("MCCEMS Structure Validation — Ámbitos Socioemocionales", () => {
-  test("Hay 4 Ámbitos de Formación Socioemocional (no 3)", () => {
-    expect(RECURSOS_SOCIOEMOCIONALES).toHaveLength(4);
+  test("Hay 5 Ámbitos de Formación Socioemocional (MCCEMS 2025)", () => {
+    expect(RECURSOS_SOCIOEMOCIONALES).toHaveLength(5);
   });
 
-  test("Los ámbitos tienen los nombres oficiales MCCEMS (no NEM 2019)", () => {
+  test("Los ámbitos tienen los nombres oficiales MCCEMS 2025", () => {
     const nombres = RECURSOS_SOCIOEMOCIONALES.map((r) => r.nombre);
-    expect(nombres).toContain("Actividades físicas y deportivas");
-    expect(nombres).toContain("Actividades artísticas y culturales");
-    expect(nombres).toContain("Educación integral en sexualidad y género");
-    expect(nombres).toContain("Educación para la salud y práctica ciudadana");
+    expect(nombres).toContain("Práctica y Colaboración Ciudadana");
+    expect(nombres).toContain("Educación para la Salud");
+    expect(nombres).toContain("Actividades Físicas y Deportivas");
+    expect(nombres).toContain("Educación Integral en Sexualidad y Género");
+    expect(nombres).toContain("Actividades Artísticas y Culturales");
   });
 
   test("No existen los nombres incorrectos del NEM 2019", () => {
