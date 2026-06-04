@@ -10,7 +10,7 @@ import type { Database } from "../../src/types/database.types";
 
 export type SB = ReturnType<typeof createClient<Database>>;
 
-const DATA_DIR = resolve(process.cwd(), "src/data/planteamiento");
+const DATA_DIR = resolve(process.cwd(), "scripts/seed-planteamiento/data");
 
 // ── Stub detection ─────────────────────────────────────────────────────────
 

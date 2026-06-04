@@ -21,10 +21,10 @@ import {
   Sun,
   Moon,
 } from 'lucide-react';
-import jsPDF from 'jspdf';
 import Sidebar from '@/components/dashboard/Sidebar';
 import PresentationMode from '@/components/dashboard/PresentationMode';
-import { PLANTEAMIENTO_CODES, loadUACProgresiones } from '@/data/planteamiento/hub-index';
+import { PLANTEAMIENTO_CODES } from '@/data/planteamiento/hub-index';
+import { getPlanteamientoPorUAC } from '@/lib/actions/planteamiento';
 import { UAC_BASE } from '@/lib/mccems/estructura';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -149,7 +149,7 @@ export default function PlanteamientoPage() {
 
   useEffect(() => {
     let cancelled = false;
-    loadUACProgresiones(selectedUAC).then((plans) => {
+    getPlanteamientoPorUAC(selectedUAC).then((plans) => {
       if (!cancelled) setProgresiones(plans);
     });
     return () => { cancelled = true; };
@@ -186,11 +186,13 @@ export default function PlanteamientoPage() {
   );
 
   // ── Export: PDF de la progresión activa ────────────────────────────────────
-  function handleExport() {
+  async function handleExport() {
     const prog = activeProgresion;
     if (!prog || exporting) return;
     setExporting(true);
     try {
+      const { jsPDF } = await import('jspdf');
+
       const NAVY:  [number, number, number] = [1, 28, 64];
       const GOLD:  [number, number, number] = [212, 165, 116];
       const DARK:  [number, number, number] = [30, 41, 59];
