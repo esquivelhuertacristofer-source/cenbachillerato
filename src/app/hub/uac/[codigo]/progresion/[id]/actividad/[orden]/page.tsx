@@ -68,6 +68,11 @@ export default async function ActividadPage({ params }: Props) {
       ordenNum={ordenNum}
       phaseLabel={phaseLabel}
       actividadesProg={actividadesProg}
+      practicaHref={
+        actividad.practica_slug
+          ? `/hub/uac/${codigo}/progresion/${progNum}/actividad/${ordenNum}/practica`
+          : null
+      }
     />
   );
 }

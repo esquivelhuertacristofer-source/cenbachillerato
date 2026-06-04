@@ -23,6 +23,8 @@ export interface ActivityShellProps {
   actividadesProg: ActividadConEstado[];
   children: ReactNode;
   nivel_revision?: string | null;
+  /** Si la actividad tiene práctica experimental, URL a su sección. */
+  practicaHref?: string | null;
 }
 
 export function ActivityShell({
@@ -40,6 +42,7 @@ export function ActivityShell({
   actividadesProg,
   children,
   nivel_revision,
+  practicaHref,
 }: ActivityShellProps) {
   const tc = getTipoConfig(tipo);
   const isCompleta = estado === "completada";
@@ -49,6 +52,7 @@ export function ActivityShell({
     <>
       <style>{`
         .ash-back:hover { color: #fff !important; transform: translateX(-3px); }
+        .ash-practica:hover { filter: brightness(1.18); transform: translateY(-1px); }
         .ash-sidebar-link:hover { background: rgba(255,255,255,0.07) !important; border-color: rgba(255,255,255,0.12) !important; }
         @media (max-width: 1023px) {
           .ash-sidebar { display: none !important; }
@@ -222,6 +226,35 @@ export function ActivityShell({
                 >
                   {titulo}
                 </h1>
+
+                {/* Botón a la práctica experimental (solo si la actividad la tiene) */}
+                {practicaHref && (
+                  <Link
+                    href={practicaHref}
+                    className="ash-practica"
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 10,
+                      marginTop: 22,
+                      padding: "12px 20px",
+                      borderRadius: 14,
+                      fontSize: 13,
+                      fontWeight: 800,
+                      letterSpacing: "0.02em",
+                      color: color.hex,
+                      textDecoration: "none",
+                      background: `rgba(${color.rgba}, 0.12)`,
+                      border: `1.5px solid rgba(${color.rgba}, 0.30)`,
+                      boxShadow: `0 0 30px rgba(${color.rgba}, 0.10)`,
+                      transition: "all 0.2s ease",
+                    }}
+                  >
+                    <i className="fa-solid fa-flask-vial" style={{ fontSize: 14 }} />
+                    Práctica experimental
+                    <i className="fa-solid fa-arrow-right" style={{ fontSize: 11, opacity: 0.7 }} />
+                  </Link>
+                )}
               </div>
             </div>
           </div>

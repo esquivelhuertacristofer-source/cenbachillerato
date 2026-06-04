@@ -14,6 +14,7 @@ import {
   Info,
   Globe,
   Layers,
+  type LucideIcon,
 } from 'lucide-react';
 
 interface Resource {
@@ -126,7 +127,7 @@ const resources: Resource[] = [
   },
 ];
 
-const CATEGORY_ICON: Record<string, React.ElementType> = {
+const CATEGORY_ICON: Record<string, LucideIcon> = {
   'Oficial': ShieldCheck,
   'Evaluación': Scale,
   'Libros': Book,

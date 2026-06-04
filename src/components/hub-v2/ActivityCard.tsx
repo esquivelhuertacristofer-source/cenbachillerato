@@ -5,6 +5,7 @@ import { motion } from 'motion/react'
 import {
   BookOpen, ListChecks, PenLine, Calculator, TextCursor, MessagesSquare,
   ArrowRight, RotateCcw, Play, CheckCircle2, Star,
+  type LucideIcon,
 } from 'lucide-react'
 import { springs } from '@/lib/motion/tokens'
 import { useMouseAura, useReducedMotion } from '@/lib/motion/hooks'
@@ -22,7 +23,7 @@ interface Props {
   phaseLabel: string
 }
 
-const TIPO_ICONS: Record<string, React.ElementType> = {
+const TIPO_ICONS: Record<string, LucideIcon> = {
   lectura:              BookOpen,
   quiz_multiple_opcion: ListChecks,
   reflexion_escrita:    PenLine,

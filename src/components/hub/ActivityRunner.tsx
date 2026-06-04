@@ -38,6 +38,7 @@ interface ActivityRunnerProps {
   phaseLabel: string;
   actividadesProg: ActividadConEstado[];
   nivel_revision?: string | null;
+  practicaHref?: string | null;
 }
 
 export function ActivityRunner({
@@ -58,6 +59,7 @@ export function ActivityRunner({
   phaseLabel,
   actividadesProg,
   nivel_revision,
+  practicaHref,
 }: ActivityRunnerProps) {
   const router = useRouter();
 
@@ -88,6 +90,7 @@ export function ActivityRunner({
     phaseLabel,
     actividadesProg,
     nivel_revision,
+    practicaHref,
   };
 
   if (tipo === "lectura") {

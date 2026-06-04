@@ -571,6 +571,7 @@ export async function getActividadConContenido(
   intentoId: string | null;
   respuestasIntento: Record<string, string> | null;
   nivel_revision: string | null;
+  practica_slug: string | null;
 } | null> {
   const sb = await getSupabaseServer();
 
@@ -594,7 +595,7 @@ export async function getActividadConContenido(
   // Get all activities for this progresion and find by order suffix
   const { data: acts } = await sb
     .from("actividades")
-    .select("id, codigo, titulo, descripcion, tipo, xp, contenido, nivel_revision")
+    .select("id, codigo, titulo, descripcion, tipo, xp, contenido, nivel_revision, practica_slug")
     .eq("progresion_id", prog.id)
     .order("codigo");
 
@@ -644,6 +645,7 @@ export async function getActividadConContenido(
     intentoId: intento?.id ?? null,
     respuestasIntento,
     nivel_revision: act.nivel_revision ?? null,
+    practica_slug: act.practica_slug ?? null,
   };
 }
 

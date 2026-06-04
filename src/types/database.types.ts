@@ -322,6 +322,7 @@ export interface Database {
           updated_at: string;
           tipo_codigo: string | null;
           nivel_revision: "borrador" | "robustecida" | "validada_pedagogicamente";
+          practica_slug: string | null;
         };
         Insert: {
           id?: string;
@@ -338,6 +339,7 @@ export interface Database {
           updated_at?: string;
           tipo_codigo?: string | null;
           nivel_revision?: "borrador" | "robustecida" | "validada_pedagogicamente";
+          practica_slug?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["actividades"]["Insert"]>;
         Relationships: [];
