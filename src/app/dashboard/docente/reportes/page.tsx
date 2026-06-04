@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { getSupabaseBrowser } from '@/lib/supabase-browser';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/dashboard/Sidebar';
-import PerformanceChart from '@/components/dashboard/PerformanceChart';
+import PerformanceChart, { type WeeklyBar } from '@/components/dashboard/PerformanceChart';
 import {
   PieChart,
   Target,
@@ -31,6 +31,7 @@ export default function ReportesPage() {
   const [teacherName, setTeacherName] = useState<string | undefined>(undefined);
   const [students, setStudents] = useState<StudentRow[]>([]);
   const [grupoNombres, setGrupoNombres] = useState<string[]>([]);
+  const [weekly, setWeekly] = useState<{ bars: WeeklyBar[]; trend: number | null }>({ bars: [], trend: null });
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
   const router = useRouter();
@@ -78,7 +79,7 @@ export default function ReportesPage() {
 
       const [profilesRes, intentosRes] = await Promise.all([
         sb.from('profiles').select('id, full_name, email').in('id', studentIds),
-        sb.from('intentos').select('user_id, score, tiempo_segundos')
+        sb.from('intentos').select('user_id, score, tiempo_segundos, completed_at')
           .in('user_id', studentIds)
           .eq('status', 'completed'),
       ]);
@@ -89,11 +90,47 @@ export default function ReportesPage() {
       const countMap: Record<string, number> = {};
       const scoreSum: Record<string, number> = {};
       const timeSum: Record<string, number> = {};
-      for (const it of intentos as { user_id: string; score: number | null; tiempo_segundos: number | null }[]) {
+      // Engagement por día de la semana (Lun..Dom) desde completed_at real.
+      const diaLabels = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+      const diaCounts = [0, 0, 0, 0, 0, 0, 0];
+      const now = Date.now();
+      const DAY = 86_400_000;
+      let last7 = 0;
+      let prev7 = 0;
+      for (const it of intentos as {
+        user_id: string;
+        score: number | null;
+        tiempo_segundos: number | null;
+        completed_at: string | null;
+      }[]) {
         countMap[it.user_id] = (countMap[it.user_id] ?? 0) + 1;
         scoreSum[it.user_id] = (scoreSum[it.user_id] ?? 0) + (it.score ?? 0);
         timeSum[it.user_id] = (timeSum[it.user_id] ?? 0) + (it.tiempo_segundos ?? 0);
+
+        if (it.completed_at) {
+          const ts = new Date(it.completed_at).getTime();
+          if (!Number.isNaN(ts)) {
+            const js = new Date(ts).getDay(); // 0=Dom..6=Sáb
+            const idx = js === 0 ? 6 : js - 1; // → 0=Lun..6=Dom
+            diaCounts[idx] = (diaCounts[idx] ?? 0) + 1;
+            const age = now - ts;
+            if (age < 7 * DAY) last7++;
+            else if (age < 14 * DAY) prev7++;
+          }
+        }
       }
+
+      const maxDia = Math.max(...diaCounts);
+      const weeklyBars: WeeklyBar[] = diaCounts.map((c, i) => ({
+        label: diaLabels[i]!,
+        value: c,
+        pct: maxDia > 0 ? Math.round((c / maxDia) * 100) : 0,
+      }));
+      const trend =
+        prev7 === 0
+          ? (last7 > 0 ? 100 : null)
+          : Math.round(((last7 - prev7) / prev7) * 100);
+      setWeekly({ bars: weeklyBars, trend });
 
       const enriched: StudentRow[] = (profiles as { id: string; full_name: string | null; email: string }[]).map((p) => ({
         id: p.id,
@@ -342,7 +379,7 @@ export default function ReportesPage() {
 
             {/* Main performance chart */}
             <div className="col-span-12 lg:col-span-8">
-              <PerformanceChart isDark={true} />
+              <PerformanceChart isDark={true} bars={weekly.bars} trend={weekly.trend} />
             </div>
 
             {/* Side metrics */}
