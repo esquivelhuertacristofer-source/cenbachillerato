@@ -23,7 +23,6 @@ function NavCEN() {
   const reducedMotion = useReducedMotion();
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     const fn = () => setNavScrolled(window.scrollY > 20);
     window.addEventListener('scroll', fn, { passive: true });
     return () => window.removeEventListener('scroll', fn);
@@ -90,7 +89,6 @@ function NavCEN() {
 function MobileStickyTCA() {
   const [visible, setVisible] = useState(false);
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     const fn = () => setVisible(window.scrollY > 20);
     window.addEventListener('scroll', fn, { passive: true });
     return () => window.removeEventListener('scroll', fn);

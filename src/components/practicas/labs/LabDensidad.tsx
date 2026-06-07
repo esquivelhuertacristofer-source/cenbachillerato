@@ -5,16 +5,22 @@
  * Práctica experimental para "Cálculo de densidad" (CNEYT-I-P02-A6).
  *
  * El estudiante elige un líquido y un material (o entra en modo personalizado
- * con masa y volumen), y observa en 3D si el objeto flota o se hunde según
+ * con masa y volumen) y observa en 3D si el objeto flota o se hunde según
  * ρ = m / V comparada con la densidad del líquido (principio de Arquímedes).
  *
- * Diseño: sistema visual consistente (una escala de tipografía/espaciado,
- * controles propios — segmentados, tiles, lectura tipo instrumento).
+ * Diseño: tema oscuro "instrumento de laboratorio" que se funde con el shell
+ * PracticaRunner (navy). La física se hace VISIBLE con:
+ *   · Cara a cara de densidades (ρ objeto vs ρ líquido en la misma escala).
+ *   · Balanza de fuerzas Peso ↔ Empuje con aguja.
+ *   · Indicador EN VIVO + veredicto animado.
+ * Si el dispositivo no soporta WebGL, un fallback 2D sigue demostrando la
+ * física (sin 3D) en lugar de crashear.
  */
 
 import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
+import { T, NUM, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
 
 const DensidadScene = dynamic(() => import("./DensidadScene"), {
   ssr: false,
@@ -27,7 +33,7 @@ const DensidadScene = dynamic(() => import("./DensidadScene"), {
         alignItems: "center",
         justifyContent: "center",
         gap: 14,
-        color: "#64748b",
+        color: "rgba(255,255,255,0.55)",
       }}
     >
       <i className="fa-solid fa-flask-vial fa-bounce" style={{ fontSize: 28 }} />
@@ -38,19 +44,12 @@ const DensidadScene = dynamic(() => import("./DensidadScene"), {
 
 const G = 9.81; // m/s²
 
-/* ── Tokens de diseño ───────────────────────────────────────────────── */
-const T = {
-  ink: "#13233b",
-  ink2: "#56657b",
-  ink3: "#93a0b2",
-  line: "#e8edf3",
-  lineStrong: "#d7dfea",
-  surface: "#ffffff",
-  canvas: "#f4f7fb",
-  shadow: "0 1px 2px rgba(19,35,59,0.05), 0 16px 38px -18px rgba(19,35,59,0.18)",
-  shadowSm: "0 1px 2px rgba(19,35,59,0.06)",
-};
-const NUM: React.CSSProperties = { fontVariantNumeric: "tabular-nums" };
+// Colores de estado (calibrados para fondo oscuro)
+const C_FLOTA = "#34D399";
+const C_HUNDE = "#F87171";
+const C_EQUI = "#FBBF24";
+const C_PESO = "#F87171"; // = flecha de Peso en la escena 3D
+const C_EMPUJE = "#38BDF8"; // = flecha de Empuje en la escena 3D
 
 /* ── Datos físicos ──────────────────────────────────────────────────── */
 interface Liquido {
@@ -90,14 +89,6 @@ const MATERIALES: Material[] = [
 const fmt = (n: number, dec = 2) =>
   n.toLocaleString("es-MX", { minimumFractionDigits: dec, maximumFractionDigits: dec });
 
-/* ── Componentes de UI (declarados fuera del render: estado estable) ──── */
-
-const Eyebrow = ({ children }: { children: React.ReactNode }) => (
-  <p style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.13em", color: T.ink3, margin: "0 0 12px" }}>
-    {children}
-  </p>
-);
-
 // Tile seleccionable (líquido / material)
 const Tile = ({
   active,
@@ -120,18 +111,20 @@ const Tile = ({
 }) => (
   <button
     onClick={onClick}
+    className="dx-tile"
+    data-on={active}
     style={{
       display: "flex",
       alignItems: "center",
       gap: 11,
-      padding: "11px 13px",
+      padding: "10px 12px",
       textAlign: "left",
       cursor: "pointer",
       borderRadius: 13,
       border: active ? `1.5px solid ${accent}` : `1px solid ${T.line}`,
-      background: active ? `rgba(${colorRgba},0.08)` : T.surface,
-      boxShadow: active ? `inset 0 0 0 1px ${accent}` : T.shadowSm,
-      transition: "all 0.15s ease",
+      background: active ? `rgba(${colorRgba},0.14)` : T.glass,
+      boxShadow: active ? `0 0 18px -4px rgba(${colorRgba},0.5)` : "none",
+      transition: "all 0.16s ease",
       width: "100%",
     }}
   >
@@ -142,27 +135,146 @@ const Tile = ({
         flexShrink: 0,
         borderRadius: round ? "50%" : 5,
         background: swatch,
-        border: "1px solid rgba(0,0,0,0.14)",
-        boxShadow: "inset 0 1px 2px rgba(255,255,255,0.4)",
+        border: "1px solid rgba(255,255,255,0.25)",
+        boxShadow: "inset 0 1px 2px rgba(255,255,255,0.45)",
       }}
     />
     <span style={{ flex: 1, minWidth: 0 }}>
-      <span style={{ display: "block", fontSize: 14, fontWeight: 700, color: T.ink, lineHeight: 1.2 }}>{label}</span>
-      <span style={{ display: "block", fontSize: 12, color: T.ink3, ...NUM }}>{sub}</span>
+      <span style={{ display: "block", fontSize: 13.5, fontWeight: 700, color: T.text, lineHeight: 1.2 }}>{label}</span>
+      <span style={{ display: "block", fontSize: 11.5, color: T.text3, ...NUM }}>{sub}</span>
     </span>
     {active && <i className="fa-solid fa-check" style={{ fontSize: 12, color: accent }} />}
   </button>
 );
 
-// Lectura tipo instrumento
-const Readout = ({ label, value, unit, col }: { label: string; value: string; unit: string; col?: string }) => (
-  <div style={{ flex: 1, padding: "12px 8px", textAlign: "center" }}>
-    <div style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: "0.07em", color: T.ink3, textTransform: "uppercase" }}>{label}</div>
-    <div style={{ marginTop: 5, fontSize: 18, fontWeight: 800, color: col ?? T.ink, ...NUM }}>
-      {value} <span style={{ fontSize: 11, fontWeight: 600, color: T.ink3 }}>{unit}</span>
+/* ── Cara a cara de densidades: el "porqué" del resultado ─────────────── */
+const DensityBar = ({ label, value, unit, width, color }: { label: string; value: number; unit: string; width: number; color: string }) => (
+  <div style={{ marginBottom: 12 }}>
+    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+      <span style={{ fontSize: 12, fontWeight: 700, color: T.text2 }}>{label}</span>
+      <span style={{ fontSize: 12.5, fontWeight: 800, color: T.text, ...NUM }}>
+        {fmt(value)} <span style={{ color: T.text3, fontWeight: 600 }}>{unit}</span>
+      </span>
+    </div>
+    <div style={{ height: 14, borderRadius: 999, background: T.inset, overflow: "hidden", border: `1px solid ${T.line}` }}>
+      <div
+        style={{
+          width: `${width}%`,
+          height: "100%",
+          borderRadius: 999,
+          background: `linear-gradient(90deg, ${color}, ${color}bb)`,
+          boxShadow: `0 0 14px -2px ${color}`,
+          transition: "width 0.5s cubic-bezier(0.34,1.2,0.64,1)",
+        }}
+      />
     </div>
   </div>
 );
+
+const DensityFaceoff = ({
+  objDensity,
+  liquidDensity,
+  liquidColor,
+  objColor,
+  veredictoCol,
+}: {
+  objDensity: number;
+  liquidDensity: number;
+  liquidColor: string;
+  objColor: string;
+  veredictoCol: string;
+}) => {
+  const max = Math.max(objDensity, liquidDensity) * 1.12 || 1;
+  const objW = Math.max((objDensity / max) * 100, 2);
+  const liqW = Math.max((liquidDensity / max) * 100, 2);
+  const op = objDensity < liquidDensity - 0.001 ? "<" : objDensity > liquidDensity + 0.001 ? ">" : "=";
+
+  return (
+    <div>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+        <Eyebrow>Comparación de densidades</Eyebrow>
+        <span
+          style={{
+            fontSize: 13,
+            fontWeight: 800,
+            color: veredictoCol,
+            padding: "3px 12px",
+            borderRadius: 999,
+            background: `${veredictoCol}1f`,
+            border: `1px solid ${veredictoCol}44`,
+            ...NUM,
+          }}
+        >
+          ρ&nbsp;objeto&nbsp;<span style={{ fontSize: 15 }}>{op}</span>&nbsp;ρ&nbsp;líquido
+        </span>
+      </div>
+      <DensityBar label="Densidad del objeto" value={objDensity} unit="g/cm³" width={objW} color={objColor} />
+      <DensityBar label="Densidad del líquido" value={liquidDensity} unit="g/mL" width={liqW} color={liquidColor} />
+    </div>
+  );
+};
+
+/* ── Balanza de fuerzas Peso ↔ Empuje ────────────────────────────────── */
+const ForceBalance = ({ weightN, buoyancyN, netN, veredictoCol }: { weightN: number; buoyancyN: number; netN: number; veredictoCol: string }) => {
+  const max = Math.max(weightN, buoyancyN, 0.0001);
+  // posición de la aguja: -1 (empuje gana, sube) … +1 (peso gana, baja)
+  const tilt = Math.max(-1, Math.min(1, (weightN - buoyancyN) / max));
+  const needleLeft = 50 + tilt * 46; // %
+
+  return (
+    <div>
+      <Eyebrow>Balanza de fuerzas</Eyebrow>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 11.5, fontWeight: 700 }}>
+        <span style={{ color: C_EMPUJE }}>
+          <i className="fa-solid fa-arrow-up" style={{ marginRight: 5 }} />Empuje sube
+        </span>
+        <span style={{ color: C_PESO }}>
+          Peso baja<i className="fa-solid fa-arrow-down" style={{ marginLeft: 5 }} />
+        </span>
+      </div>
+      <div
+        style={{
+          position: "relative",
+          height: 12,
+          borderRadius: 999,
+          background: `linear-gradient(90deg, ${C_EMPUJE}55 0%, ${T.inset} 50%, ${C_PESO}55 100%)`,
+          border: `1px solid ${T.line}`,
+        }}
+      >
+        {/* centro = equilibrio */}
+        <div style={{ position: "absolute", left: "50%", top: -3, bottom: -3, width: 1.5, background: "rgba(255,255,255,0.22)", transform: "translateX(-50%)" }} />
+        {/* aguja */}
+        <div
+          style={{
+            position: "absolute",
+            left: `${needleLeft}%`,
+            top: "50%",
+            width: 18,
+            height: 18,
+            borderRadius: "50%",
+            background: veredictoCol,
+            border: "2px solid rgba(255,255,255,0.85)",
+            boxShadow: `0 0 16px -1px ${veredictoCol}`,
+            transform: "translate(-50%,-50%)",
+            transition: "left 0.5s cubic-bezier(0.34,1.2,0.64,1), background 0.3s ease",
+          }}
+        />
+      </div>
+      <div style={{ marginTop: 16, display: "flex", borderRadius: 13, background: T.inset, border: `1px solid ${T.line}` }}>
+        <Readout label="Peso (P)" value={fmt(weightN)} unit="N" col={C_PESO} />
+        <div style={{ width: 1, background: T.line }} />
+        <Readout label="Empuje (E)" value={fmt(buoyancyN)} unit="N" col={C_EMPUJE} />
+        <div style={{ width: 1, background: T.line }} />
+        <Readout
+          label="Fuerza neta"
+          value={`${netN > 0.005 ? "↓" : netN < -0.005 ? "↑" : "="} ${fmt(Math.abs(netN))}`}
+          unit="N"
+          col={veredictoCol}
+        />
+      </div>
+    </div>
+  );
+};
 
 export function LabDensidad({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
@@ -198,9 +310,9 @@ export function LabDensidad({ color }: PracticaLabProps) {
   const netN = weightN - buoyancyN;
 
   const veredicto = useMemo(() => {
-    if (neutral) return { txt: "Equilibrio", sub: "Densidades casi iguales: queda suspendido", icon: "fa-arrows-up-down", col: "#C2790B" };
-    if (ratio < 1) return { txt: "Flota", sub: `Se sumerge sólo el ${sumergido}%`, icon: "fa-arrow-up", col: "#0E9F6E" };
-    return { txt: "Se hunde", sub: "Más denso que el líquido", icon: "fa-arrow-down", col: "#D63A3A" };
+    if (neutral) return { txt: "Equilibrio", sub: "Densidades casi iguales: queda suspendido", icon: "fa-arrows-up-down", col: C_EQUI };
+    if (ratio < 1) return { txt: "Flota", sub: `Se sumerge sólo el ${sumergido}%`, icon: "fa-arrow-up", col: C_FLOTA };
+    return { txt: "Se hunde", sub: "Más denso que el líquido", icon: "fa-arrow-down", col: C_HUNDE };
   }, [neutral, ratio, sumergido]);
 
   // ── Objetivos guiados (se marcan en vivo) ──────────────────────────
@@ -211,66 +323,62 @@ export function LabDensidad({ color }: PracticaLabProps) {
     { txt: "Haz flotar un metal cambiando el líquido", done: !isCustom && (material?.metal ?? 0) > 0.5 && ratio < 1 },
   ];
 
-  const card: React.CSSProperties = {
-    background: T.surface,
-    border: `1px solid ${T.line}`,
-    borderRadius: 18,
-    boxShadow: T.shadow,
-  };
-
   const grid2: React.CSSProperties = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 };
 
+  // Fallback 2D cuando no hay WebGL: sigue mostrando la física
+  const sceneFallback = (
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 28, textAlign: "center" }}>
+      <div
+        style={{
+          width: 74,
+          height: 74,
+          borderRadius: 20,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: 30,
+          color: "#fff",
+          background: veredicto.col,
+          boxShadow: `0 10px 30px -6px ${veredicto.col}`,
+        }}
+      >
+        <i className={`fa-solid ${veredicto.icon}`} />
+      </div>
+      <div style={{ fontSize: 22, fontWeight: 900, color: T.text }}>{veredicto.txt}</div>
+      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 320, lineHeight: 1.5 }}>
+        Tu equipo no puede mostrar la vista 3D, pero el experimento sigue funcionando: revisa la comparación de densidades y la
+        balanza de fuerzas más abajo. <strong style={{ color: T.text }}>{sumergido}% sumergido.</strong>
+      </div>
+    </div>
+  );
+
   return (
-    <div style={{ color: T.ink }}>
+    <div style={{ color: T.text }}>
       <style>{`
+        @keyframes dxPulse { 0%,100%{ box-shadow:0 0 0 0 var(--dxc); } 50%{ box-shadow:0 0 0 6px transparent; } }
+        .dx-live-dot { animation: dxPulse 1.6s ease-in-out infinite; }
         .dx-slider { -webkit-appearance:none; appearance:none; width:100%; height:7px; border-radius:999px;
           background:${T.lineStrong}; outline:none; }
         .dx-slider::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:21px; height:21px;
-          border-radius:50%; background:#fff; cursor:pointer; border:1px solid ${T.lineStrong};
-          box-shadow:0 1px 4px rgba(19,35,59,0.22); }
-        .dx-slider::-webkit-slider-thumb:hover { border-color:${accent}; }
+          border-radius:50%; background:#fff; cursor:pointer; border:2px solid ${accent};
+          box-shadow:0 1px 8px rgba(0,0,0,0.5); }
         .dx-slider::-moz-range-thumb { width:21px; height:21px; border-radius:50%; background:#fff; cursor:pointer;
-          border:1px solid ${T.lineStrong}; box-shadow:0 1px 4px rgba(19,35,59,0.22); }
-        .dx-grid { display:grid; grid-template-columns: minmax(0,1.5fr) minmax(0,1fr); gap:22px; align-items:start; }
+          border:2px solid ${accent}; box-shadow:0 1px 8px rgba(0,0,0,0.5); }
+        .dx-tile:hover { border-color:${T.lineStrong} !important; background:${T.glassSoft} !important; }
+        .dx-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(300px,26vw,380px); gap:22px; align-items:start; }
         @media (max-width: 1000px){ .dx-grid { grid-template-columns: 1fr; } }
-        .dx-seg { display:flex; gap:4px; padding:4px; border-radius:12px; background:${T.canvas}; border:1px solid ${T.line}; }
+        .dx-seg { display:flex; gap:4px; padding:4px; border-radius:12px; background:${T.inset}; border:1px solid ${T.line}; }
         .dx-seg button { flex:1; cursor:pointer; border:none; background:transparent; border-radius:9px;
-          padding:9px 10px; font-size:13.5px; font-weight:700; color:${T.ink2}; display:flex; align-items:center;
+          padding:9px 10px; font-size:13.5px; font-weight:700; color:${T.text2}; display:flex; align-items:center;
           justify-content:center; gap:7px; transition:all .15s ease; }
-        .dx-seg button[data-on="true"] { background:#fff; color:${T.ink}; box-shadow:${T.shadowSm}; }
+        .dx-seg button[data-on="true"] { background:rgba(${color.rgba},0.18); color:#fff; box-shadow:0 0 14px -4px rgba(${color.rgba},0.6); }
         .dx-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:${T.ink2}; transition:all .15s; }
-        .dx-icobtn[data-on="true"] { background:rgba(${color.rgba},0.14); color:${T.ink}; }
-        .dx-icobtn:hover { background:rgba(${color.rgba},0.10); }
+          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
+        .dx-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
+        .dx-icobtn:hover { background:rgba(255,255,255,0.12); }
         .dx-divider { height:1px; background:${T.line}; margin:18px 0; }
+        @media (max-width: 1000px){ .dx-bottom { grid-template-columns: 1fr !important; } }
       `}</style>
-
-      {/* ── Encabezado ─────────────────────────────────────────────── */}
-      <header style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 20, flexWrap: "wrap" }}>
-        <div style={{ flex: 1, minWidth: 220 }}>
-          <p style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.14em", color: accent, margin: 0, textTransform: "uppercase" }}>
-            Práctica experimental
-          </p>
-          <h2 style={{ fontSize: 24, fontWeight: 800, color: T.ink, margin: "4px 0 0", letterSpacing: "-0.01em" }}>
-            Densidad y flotación
-          </h2>
-        </div>
-        <div
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 10,
-            padding: "9px 16px",
-            borderRadius: 999,
-            background: `${veredicto.col}14`,
-            border: `1px solid ${veredicto.col}33`,
-          }}
-        >
-          <span style={{ width: 9, height: 9, borderRadius: "50%", background: veredicto.col, boxShadow: `0 0 0 3px ${veredicto.col}22` }} />
-          <span style={{ fontSize: 14, fontWeight: 800, color: veredicto.col }}>{veredicto.txt}</span>
-          <span style={{ fontSize: 13, color: T.ink2, ...NUM }}>· {sumergido}% sumergido</span>
-        </div>
-      </header>
 
       <div className="dx-grid">
         {/* ── Columna visor ──────────────────────────────────────── */}
@@ -279,32 +387,60 @@ export function LabDensidad({ color }: PracticaLabProps) {
           <div
             style={{
               position: "relative",
-              height: 520,
-              borderRadius: 18,
+              height: "clamp(460px, 66vh, 780px)",
+              borderRadius: 20,
               overflow: "hidden",
-              border: `1px solid ${T.line}`,
-              background: "linear-gradient(180deg,#eef4fb 0%,#dde9f6 100%)",
-              boxShadow: T.shadow,
+              border: `1px solid rgba(${color.rgba},0.22)`,
+              background: `radial-gradient(120% 80% at 50% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06182f 0%,#020d1d 100%)`,
+              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
             }}
           >
-            <DensidadScene
-              liquidDensity={liquido.d}
-              liquidColor={liquido.color}
-              objDensity={objDensity}
-              objColor={objColor}
-              objMetalness={objMetal}
-              objRoughness={objRough}
-              shape={shape}
-              volume={volume}
-              accent={accent}
-              showForces={showForces}
-              autoRotate={autoRotate}
-              dropNonce={dropNonce}
-              weightN={weightN}
-              buoyancyN={buoyancyN}
-            />
+            <SceneBoundary fallback={sceneFallback}>
+              <DensidadScene
+                liquidDensity={liquido.d}
+                liquidColor={liquido.color}
+                objDensity={objDensity}
+                objColor={objColor}
+                objMetalness={objMetal}
+                objRoughness={objRough}
+                shape={shape}
+                volume={volume}
+                accent={accent}
+                showForces={showForces}
+                autoRotate={autoRotate}
+                dropNonce={dropNonce}
+                weightN={weightN}
+                buoyancyN={buoyancyN}
+              />
+            </SceneBoundary>
 
-            {/* Toolbar unificada */}
+            {/* Cinta EN VIVO + veredicto */}
+            <div
+              style={{
+                position: "absolute",
+                top: 14,
+                left: 16,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 10,
+                padding: "8px 14px 8px 12px",
+                borderRadius: 999,
+                background: "rgba(2,12,28,0.74)",
+                border: `1px solid ${veredicto.col}66`,
+                backdropFilter: "blur(10px)",
+              }}
+            >
+              <span
+                className="dx-live-dot"
+                style={{ ["--dxc" as string]: `${veredicto.col}aa`, width: 9, height: 9, borderRadius: "50%", background: veredicto.col }}
+              />
+              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3 }}>EN VIVO</span>
+              <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)" }} />
+              <i className={`fa-solid ${veredicto.icon}`} style={{ fontSize: 12, color: veredicto.col }} />
+              <span style={{ fontSize: 13.5, fontWeight: 800, color: T.text }}>{veredicto.txt}</span>
+            </div>
+
+            {/* Toolbar */}
             <div
               style={{
                 position: "absolute",
@@ -314,10 +450,9 @@ export function LabDensidad({ color }: PracticaLabProps) {
                 gap: 2,
                 padding: 4,
                 borderRadius: 12,
-                background: "rgba(255,255,255,0.92)",
+                background: "rgba(2,12,28,0.74)",
                 border: `1px solid ${T.line}`,
-                boxShadow: T.shadowSm,
-                backdropFilter: "blur(8px)",
+                backdropFilter: "blur(10px)",
               }}
             >
               <button className="dx-icobtn" data-on={showForces} onClick={() => setShowForces((v) => !v)} title="Vectores de fuerza">
@@ -337,13 +472,13 @@ export function LabDensidad({ color }: PracticaLabProps) {
                 bottom: 14,
                 left: 16,
                 fontSize: 11.5,
-                color: T.ink2,
+                color: T.text2,
                 fontWeight: 600,
                 pointerEvents: "none",
-                background: "rgba(255,255,255,0.78)",
+                background: "rgba(2,12,28,0.6)",
                 padding: "4px 11px",
                 borderRadius: 999,
-                backdropFilter: "blur(4px)",
+                backdropFilter: "blur(6px)",
               }}
             >
               <i className="fa-solid fa-hand-pointer" style={{ marginRight: 6 }} />
@@ -351,54 +486,17 @@ export function LabDensidad({ color }: PracticaLabProps) {
             </div>
           </div>
 
-          {/* Veredicto + barra de sumergido */}
-          <div style={{ ...card, padding: "18px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 15 }}>
-              <div
-                style={{
-                  width: 46,
-                  height: 46,
-                  borderRadius: 13,
-                  flexShrink: 0,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 19,
-                  color: "#fff",
-                  background: veredicto.col,
-                  boxShadow: `0 6px 16px -4px ${veredicto.col}88`,
-                }}
-              >
-                <i className={`fa-solid ${veredicto.icon}`} />
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 17, fontWeight: 800, color: T.ink }}>{veredicto.txt}</div>
-                <div style={{ fontSize: 13, color: T.ink2, marginTop: 1 }}>{veredicto.sub}</div>
-              </div>
-              <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: 26, fontWeight: 800, color: T.ink, ...NUM, lineHeight: 1 }}>{sumergido}%</div>
-                <div style={{ fontSize: 10.5, color: T.ink3, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", marginTop: 3 }}>
-                  Sumergido
-                </div>
-              </div>
-            </div>
-
-            <div style={{ marginTop: 16, height: 9, borderRadius: 999, background: T.canvas, overflow: "hidden", border: `1px solid ${T.line}` }}>
-              <div style={{ width: `${sumergido}%`, height: "100%", borderRadius: 999, background: veredicto.col, transition: "width 0.4s ease" }} />
-            </div>
-
-            <div style={{ marginTop: 16, display: "flex", borderRadius: 13, background: T.canvas, border: `1px solid ${T.line}` }}>
-              <Readout label="Peso (P)" value={fmt(weightN)} unit="N" col="#D63A3A" />
-              <div style={{ width: 1, background: T.line }} />
-              <Readout label="Empuje (E)" value={fmt(buoyancyN)} unit="N" col="#1E84C7" />
-              <div style={{ width: 1, background: T.line }} />
-              <Readout
-                label="Fuerza neta"
-                value={`${netN > 0.005 ? "↓" : netN < -0.005 ? "↑" : "="} ${fmt(Math.abs(netN))}`}
-                unit="N"
-                col={veredicto.col}
-              />
-            </div>
+          {/* Lectura del experimento: densidades + fuerzas */}
+          <div style={{ ...card, padding: "20px 22px" }}>
+            <DensityFaceoff
+              objDensity={objDensity}
+              liquidDensity={liquido.d}
+              liquidColor={liquido.color}
+              objColor={isCustom ? accent : objColor}
+              veredictoCol={veredicto.col}
+            />
+            <div className="dx-divider" />
+            <ForceBalance weightN={weightN} buoyancyN={buoyancyN} netN={netN} veredictoCol={veredicto.col} />
           </div>
         </div>
 
@@ -410,27 +508,28 @@ export function LabDensidad({ color }: PracticaLabProps) {
             style={{
               borderRadius: 14,
               border: `1px solid ${T.line}`,
-              background: T.canvas,
+              background: T.inset,
               padding: "16px 18px",
               display: "flex",
               alignItems: "center",
               gap: 14,
+              flexWrap: "wrap",
             }}
           >
-            <span style={{ color: T.ink2, fontSize: 17, fontWeight: 700 }}>ρ =</span>
+            <span style={{ color: T.text2, fontSize: 17, fontWeight: 700 }}>ρ =</span>
             <div style={{ textAlign: "center", ...NUM }}>
-              <div style={{ color: T.ink, fontWeight: 700, fontSize: 14 }}>{fmt(objMass, 0)} g</div>
-              <div style={{ height: 2, background: T.ink2, margin: "4px 0", borderRadius: 2 }} />
-              <div style={{ color: T.ink, fontWeight: 700, fontSize: 14 }}>{fmt(volume, 0)} cm³</div>
+              <div style={{ color: T.text, fontWeight: 700, fontSize: 14 }}>{fmt(objMass, 0)} g</div>
+              <div style={{ height: 2, background: T.text2, margin: "4px 0", borderRadius: 2 }} />
+              <div style={{ color: T.text, fontWeight: 700, fontSize: 14 }}>{fmt(volume, 0)} cm³</div>
             </div>
-            <span style={{ color: T.ink2, fontSize: 17, fontWeight: 700 }}>=</span>
+            <span style={{ color: T.text2, fontSize: 17, fontWeight: 700 }}>=</span>
             <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
-              <span style={{ color: accent, fontWeight: 800, fontSize: 30, ...NUM, letterSpacing: "-0.02em" }}>{fmt(objDensity)}</span>
-              <span style={{ color: T.ink2, fontSize: 13, fontWeight: 600 }}>g/cm³</span>
+              <span style={{ color: accent, fontWeight: 900, fontSize: 30, ...NUM, letterSpacing: "-0.02em", textShadow: `0 0 22px ${accent}66` }}>{fmt(objDensity)}</span>
+              <span style={{ color: T.text2, fontSize: 13, fontWeight: 600 }}>g/cm³</span>
             </div>
             <div style={{ marginLeft: "auto", textAlign: "right" }}>
-              <div style={{ fontSize: 10.5, color: T.ink3, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>Líquido</div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: T.ink, ...NUM }}>{fmt(liquido.d)} g/mL</div>
+              <div style={{ fontSize: 10, color: T.text3, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>Líquido</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: T.text, ...NUM }}>{fmt(liquido.d)} g/mL</div>
             </div>
           </div>
 
@@ -487,8 +586,9 @@ export function LabDensidad({ color }: PracticaLabProps) {
               fontSize: 13.5,
               fontWeight: 700,
               border: isCustom ? `1.5px solid ${accent}` : `1px dashed ${T.lineStrong}`,
-              background: isCustom ? `rgba(${color.rgba},0.08)` : T.surface,
-              color: isCustom ? T.ink : T.ink2,
+              background: isCustom ? `rgba(${color.rgba},0.14)` : "transparent",
+              color: isCustom ? T.text : T.text2,
+              boxShadow: isCustom ? `0 0 18px -4px rgba(${color.rgba},0.5)` : "none",
             }}
           >
             <i className="fa-solid fa-sliders" /> Masa y volumen personalizados
@@ -513,16 +613,16 @@ export function LabDensidad({ color }: PracticaLabProps) {
           {isCustom && (
             <div style={{ marginBottom: 18 }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
-                <span style={{ fontSize: 13.5, color: T.ink2, fontWeight: 700 }}>Masa</span>
-                <span style={{ fontSize: 14, color: T.ink, fontWeight: 800, ...NUM }}>{fmt(customMass, 0)} g</span>
+                <span style={{ fontSize: 13.5, color: T.text2, fontWeight: 700 }}>Masa</span>
+                <span style={{ fontSize: 14, color: T.text, fontWeight: 800, ...NUM }}>{fmt(customMass, 0)} g</span>
               </div>
               <input className="dx-slider" type="range" min={5} max={2000} step={5} value={customMass} onChange={(e) => setCustomMass(Number(e.target.value))} />
             </div>
           )}
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
-              <span style={{ fontSize: 13.5, color: T.ink2, fontWeight: 700 }}>Volumen</span>
-              <span style={{ fontSize: 14, color: T.ink, fontWeight: 800, ...NUM }}>{fmt(volume, 0)} cm³</span>
+              <span style={{ fontSize: 13.5, color: T.text2, fontWeight: 700 }}>Volumen</span>
+              <span style={{ fontSize: 14, color: T.text, fontWeight: 800, ...NUM }}>{fmt(volume, 0)} cm³</span>
             </div>
             <input className="dx-slider" type="range" min={10} max={500} step={5} value={volume} onChange={(e) => setVolume(Number(e.target.value))} />
           </div>
@@ -530,7 +630,7 @@ export function LabDensidad({ color }: PracticaLabProps) {
       </div>
 
       {/* ── Objetivos + pista ──────────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1.5fr) minmax(0,1fr)", gap: 22, marginTop: 22 }} className="dx-bottom">
+      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="dx-bottom">
         <div style={{ ...card, padding: "18px 22px" }}>
           <Eyebrow>
             <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
@@ -538,8 +638,8 @@ export function LabDensidad({ color }: PracticaLabProps) {
           </Eyebrow>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
             {objetivos.map((o, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? "#0E9F6E" : T.ink2 }}>
-                <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.28 }} />
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? C_FLOTA : T.text2 }}>
+                <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
                 <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
               </div>
             ))}
@@ -551,9 +651,9 @@ export function LabDensidad({ color }: PracticaLabProps) {
             borderRadius: 18,
             padding: "18px 20px",
             border: `1px solid rgba(${color.rgba},0.3)`,
-            background: `rgba(${color.rgba},0.05)`,
+            background: `rgba(${color.rgba},0.08)`,
             fontSize: 13.5,
-            color: T.ink2,
+            color: T.text2,
             lineHeight: 1.55,
             display: "flex",
             gap: 13,
@@ -561,13 +661,11 @@ export function LabDensidad({ color }: PracticaLabProps) {
         >
           <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 17, marginTop: 1 }} />
           <span>
-            El objeto flota cuando su densidad es <strong style={{ color: T.ink }}>menor</strong> que la del líquido. Por eso el
-            hierro se hunde en agua… pero <strong style={{ color: T.ink }}>flota en mercurio</strong>. ¡Compruébalo!
+            El objeto flota cuando su densidad es <strong style={{ color: T.text }}>menor</strong> que la del líquido. Por eso el
+            hierro se hunde en agua… pero <strong style={{ color: T.text }}>flota en mercurio</strong>. ¡Compruébalo!
           </span>
         </div>
       </div>
-
-      <style>{`@media (max-width: 1000px){ .dx-bottom { grid-template-columns: 1fr !important; } }`}</style>
     </div>
   );
 }

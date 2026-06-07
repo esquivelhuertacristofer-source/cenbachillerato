@@ -111,7 +111,7 @@ export function PracticaRunner({
           </nav>
 
           {/* Hero content */}
-          <div className="prac-hero" style={{ padding: "52px 48px 48px", maxWidth: 1200, margin: "0 auto" }}>
+          <div className="prac-hero" style={{ padding: "52px 48px 48px", maxWidth: 1560, margin: "0 auto" }}>
             <div style={{ display: "flex", alignItems: "flex-start", gap: 28 }}>
               <div
                 style={{
@@ -176,7 +176,7 @@ export function PracticaRunner({
         </div>
 
         {/* ── BODY ──────────────────────────────────────────────────── */}
-        <div className="prac-body" style={{ maxWidth: 1200, margin: "0 auto", padding: "44px 48px 100px" }}>
+        <div className="prac-body" style={{ maxWidth: 1560, margin: "0 auto", padding: "44px 48px 100px" }}>
           {practica ? (
             <practica.Component
               color={color}

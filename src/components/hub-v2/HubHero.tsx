@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { getUACPorCodigo } from "@/lib/mccems/estructura";
 import { RECURSOS_SOCIOCOGNITIVOS } from "@/lib/mccems/recursos-sociocognitivos";
 import { getVideoBienvenida } from "@/lib/mccems/bienvenida";

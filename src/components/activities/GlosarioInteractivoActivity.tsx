@@ -19,7 +19,8 @@ export function GlosarioInteractivoActivity({ actividad, onProgreso }: Props) {
   function toggleDominado(i: number) {
     setDominados(prev => {
       const next = new Set(prev);
-      next.has(i) ? next.delete(i) : next.add(i);
+      if (next.has(i)) next.delete(i);
+      else next.add(i);
       return next;
     });
   }

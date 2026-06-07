@@ -93,7 +93,6 @@ function RenderSeccion({ seccion }: { seccion: SeccionContenido }) {
     case "imagen":
       return (
         <figure style={{ margin: "28px 0" }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={seccion.url ?? "/biblioteca/placeholder-ficha.svg"}
             alt={seccion.alt ?? ""}

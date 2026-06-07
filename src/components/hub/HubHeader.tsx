@@ -69,7 +69,6 @@ export function HubHeader({ profile, racha }: HubHeaderProps) {
             href="/hub"
             style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none", flexShrink: 0 }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/Logo%20Cen.png"
               alt="CEN"

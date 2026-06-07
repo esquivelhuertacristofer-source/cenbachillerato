@@ -16,7 +16,7 @@ interface TopAlumnosProps {
   isDark?: boolean;
 }
 
-export default function TopAlumnos({ topList, isDark = true }: TopAlumnosProps) {
+export default function TopAlumnos({ topList }: TopAlumnosProps) {
   const getInitials = (name: string | null, email: string) => {
     const display = name ?? email;
     return display

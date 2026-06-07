@@ -21,6 +21,7 @@ import {
   Lightformer,
   Html,
   Sparkles,
+  Edges,
 } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 
@@ -100,29 +101,29 @@ function ForceArrow({
 }) {
   const head = 0.16;
   const shaft = Math.max(length - head, 0.04);
+  const s = dir; // sentido (+1 arriba, -1 abajo): se construye sin rotar el grupo
   return (
-    <group position={[xOffset, 0, 0]} rotation={[0, 0, dir === 1 ? 0 : Math.PI]}>
-      <mesh position={[0, shaft / 2, 0]}>
+    <group position={[xOffset, 0, 0]}>
+      <mesh position={[0, (s * shaft) / 2, 0]}>
         <cylinderGeometry args={[0.028, 0.028, shaft, 16]} />
         <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.5} toneMapped={false} />
       </mesh>
-      <mesh position={[0, shaft + head / 2, 0]}>
+      <mesh position={[0, s * (shaft + head / 2), 0]} rotation={[0, 0, dir === 1 ? 0 : Math.PI]}>
         <coneGeometry args={[0.075, head, 20]} />
         <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.5} toneMapped={false} />
       </mesh>
-      <Html position={[0, dir === 1 ? shaft + head + 0.18 : -(shaft + head + 0.18), 0]} center distanceFactor={6} zIndexRange={[10, 0]}>
+      <Html position={[0, s * (shaft + head + 0.2), 0]} center distanceFactor={6} zIndexRange={[10, 0]}>
         <div
           style={{
-            transform: dir === 1 ? "none" : "rotate(180deg)",
             whiteSpace: "nowrap",
             fontWeight: 800,
             fontSize: 11,
             color: "#fff",
-            background: `${color}cc`,
-            padding: "2px 7px",
+            background: `${color}e6`,
+            padding: "3px 8px",
             borderRadius: 7,
-            border: "1px solid rgba(255,255,255,0.35)",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.4)",
+            border: "1px solid rgba(255,255,255,0.4)",
+            boxShadow: "0 2px 10px rgba(0,0,0,0.5)",
           }}
         >
           {label}
@@ -255,18 +256,18 @@ function GlassPanel(props: {
   return (
     <mesh position={props.position}>
       <boxGeometry args={props.args} />
+      {/* Vidrio simple semitransparente: NO usa transmission, que ocultaría
+          el cuerpo (transparente) del líquido detrás de la pared frontal. */}
       <meshPhysicalMaterial
         transparent
-        transmission={1}
-        thickness={0.4}
-        roughness={0.03}
-        ior={1.5}
+        opacity={0.12}
+        roughness={0.05}
+        metalness={0}
         clearcoat={1}
         clearcoatRoughness={0.04}
-        color="#eaf6ff"
-        opacity={1}
-        envMapIntensity={1.3}
-        specularIntensity={1}
+        color="#dff1ff"
+        envMapIntensity={1.1}
+        depthWrite={false}
       />
     </mesh>
   );
@@ -281,10 +282,16 @@ function Tank() {
       <GlassPanel args={[w, h, t]} position={[0, h / 2, d / 2]} />
       <GlassPanel args={[t, h, d]} position={[-w / 2, h / 2, 0]} />
       <GlassPanel args={[t, h, d]} position={[w / 2, h / 2, 0]} />
+      {/* Contorno del tanque: aristas visibles para que se lea el recipiente */}
+      <mesh position={[0, h / 2, 0]}>
+        <boxGeometry args={[w, h, d]} />
+        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+        <Edges threshold={15} color="#bfe8ff" />
+      </mesh>
       {/* Borde superior resaltado */}
       <mesh position={[0, h, 0]}>
         <boxGeometry args={[w + 0.04, 0.04, d + 0.04]} />
-        <meshStandardMaterial color="#9fd8ff" emissive="#3aa0d8" emissiveIntensity={0.25} metalness={0.4} roughness={0.3} />
+        <meshStandardMaterial color="#9fd8ff" emissive="#3aa0d8" emissiveIntensity={0.15} metalness={0.4} roughness={0.3} />
       </mesh>
     </group>
   );
@@ -322,35 +329,33 @@ function Liquid({ color, liquidTop }: { color: string; liquidTop: number }) {
 
   return (
     <group>
-      {/* volumen del líquido */}
+      {/* volumen del líquido: bloque translúcido coloreado (cuerpo de agua claro,
+          se ve la parte sumergida del objeto a través de él) */}
       <mesh position={[0, LIQ.bottom + height / 2, 0]}>
         <boxGeometry args={[w, height, d]} />
-        <meshPhysicalMaterial
+        <meshStandardMaterial
           transparent
-          transmission={0.92}
-          thickness={1.6}
-          roughness={0.14}
-          ior={1.33}
           color={color}
-          opacity={0.9}
-          envMapIntensity={0.7}
-          attenuationColor={color}
-          attenuationDistance={1.4}
+          opacity={0.62}
+          roughness={0.4}
+          metalness={0.0}
+          emissive={color}
+          emissiveIntensity={0.5}
+          depthWrite={false}
         />
       </mesh>
-      {/* superficie con oleaje */}
+      {/* superficie con oleaje (translúcida, sin sobreexponer) */}
       <mesh ref={surfaceRef} position={[0, liquidTop, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry ref={geoRef} args={[w, d, 48, 36]} />
-        <meshPhysicalMaterial
+        <meshStandardMaterial
           transparent
           color={color}
-          transmission={0.55}
-          roughness={0.06}
-          ior={1.33}
-          opacity={0.6}
+          roughness={0.3}
           metalness={0.1}
+          opacity={0.7}
+          emissive={color}
+          emissiveIntensity={0.3}
           side={THREE.DoubleSide}
-          envMapIntensity={1.6}
         />
       </mesh>
     </group>
@@ -408,7 +413,7 @@ function Pedestal() {
   return (
     <mesh position={[0, -0.18, 0]} receiveShadow>
       <cylinderGeometry args={[2.2, 2.5, 0.28, 64]} />
-      <meshStandardMaterial color="#cdd9e6" metalness={0.2} roughness={0.7} />
+      <meshStandardMaterial color="#22344b" metalness={0.45} roughness={0.55} />
     </mesh>
   );
 }
@@ -424,13 +429,13 @@ export default function DensidadScene(props: DensidadSceneProps) {
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
       camera={{ position: [4, 3, 5], fov: 42 }}
     >
-      <color attach="background" args={["#eef4fb"]} />
-      <fog attach="fog" args={["#eef4fb", 12, 22]} />
+      <color attach="background" args={["#03101f"]} />
+      <fog attach="fog" args={["#03101f", 13, 24]} />
 
-      <ambientLight intensity={0.75} />
+      <ambientLight intensity={0.55} />
       <directionalLight
         position={[4, 8, 4]}
-        intensity={2.4}
+        intensity={2.6}
         castShadow
         shadow-mapSize-width={2048}
         shadow-mapSize-height={2048}
@@ -438,8 +443,8 @@ export default function DensidadScene(props: DensidadSceneProps) {
         shadow-camera-far={24}
         shadow-bias={-0.0004}
       />
-      <pointLight position={[-4, 3, -3]} intensity={16} color={props.accent} />
-      <pointLight position={[3, 1, 4]} intensity={10} color="#ffffff" />
+      <pointLight position={[-4, 3, -3]} intensity={22} color={props.accent} />
+      <pointLight position={[3, 1, 4]} intensity={11} color="#ffffff" />
 
       <group position={[0, -1.2, 0]}>
         <Pedestal />
@@ -480,8 +485,8 @@ export default function DensidadScene(props: DensidadSceneProps) {
       />
 
       <EffectComposer enableNormalPass={false}>
-        <Bloom intensity={0.32} luminanceThreshold={0.9} luminanceSmoothing={0.25} mipmapBlur radius={0.6} />
-        <Vignette eskil={false} offset={0.3} darkness={0.32} />
+        <Bloom intensity={0.32} luminanceThreshold={0.86} luminanceSmoothing={0.28} mipmapBlur radius={0.6} />
+        <Vignette eskil={false} offset={0.28} darkness={0.42} />
       </EffectComposer>
     </Canvas>
   );

@@ -14,7 +14,6 @@ export function UACCard({
   codigo,
   nombre,
   icono = "📚",
-  colorClass = "bg-indigo-100 text-indigo-700",
   totalProgresiones,
   semestre,
   tipo,

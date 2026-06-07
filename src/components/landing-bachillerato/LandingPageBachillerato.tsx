@@ -69,7 +69,6 @@ export default function LandingPageBachillerato() {
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setMounted(true); }, []);
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     const fn = () => setNavScrolled(window.scrollY > 20);
     window.addEventListener('scroll', fn, { passive: true });
     return () => window.removeEventListener('scroll', fn);
