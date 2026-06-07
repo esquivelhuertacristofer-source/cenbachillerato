@@ -20,9 +20,9 @@ describe("UACCard", () => {
     expect(screen.getByText("Sem. 3")).toBeInTheDocument();
   });
 
-  test("muestra el total de progresiones", () => {
+  test("muestra el total de propósitos formativos", () => {
     render(<UACCard {...defaultProps} totalProgresiones={12} />);
-    expect(screen.getByText("12 progresiones")).toBeInTheDocument();
+    expect(screen.getByText("12 propósitos formativos")).toBeInTheDocument();
   });
 
   test("badge 'sociocognitivo' → muestra 'Recurso Sociocognitivo'", () => {

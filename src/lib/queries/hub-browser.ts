@@ -5,6 +5,7 @@
  */
 
 import { createBrowserClient } from "@supabase/ssr";
+import { CATEGORIA_COMPLEMENTO } from "@/lib/mccems/categorias";
 
 function getClient() {
   return createBrowserClient(
@@ -65,14 +66,16 @@ export async function getProgresionesCompletadasDeUAC(
 
   const { data: progs } = await sb
     .from("progresiones")
-    .select("id")
+    .select("id, categoria")
     .eq("uac_id", uacRow.id)
     .eq("es_placeholder", false);
 
-  const total = progs?.length ?? 0;
+  // Solo cuentan los propósitos oficiales 2025; los complementos no inflan la meta.
+  const oficiales = (progs ?? []).filter((p) => p.categoria !== CATEGORIA_COMPLEMENTO);
+  const total = oficiales.length;
   if (total === 0) return { completadas: 0, total: 0, ultimaActividad: null };
 
-  const progIds = (progs ?? []).map((p) => p.id);
+  const progIds = oficiales.map((p) => p.id);
 
   const { data: acts } = await sb
     .from("actividades")
@@ -111,12 +114,16 @@ export async function getProgresionesCompletadasDeUAC(
   return { completadas, total, ultimaActividad };
 }
 
+/** Categoría que marca contenido construido fuera de los propósitos oficiales 2025. */
+export { CATEGORIA_COMPLEMENTO };
+
 export interface ProgresionBrowser {
   id: string;
   numero: number;
   titulo: string;
   descripcion: string | null;
   ejes_articuladores: string[] | null;
+  categoria: string | null;
   estado: "no_iniciada" | "en_progreso" | "completada";
   actividades: Array<{
     orden: number;
@@ -142,7 +149,7 @@ export async function getProgresionesConEstadoBrowser(
 
   const { data: progs } = await sb
     .from("progresiones")
-    .select("id, numero, titulo, descripcion, ejes_articuladores")
+    .select("id, numero, titulo, descripcion, ejes_articuladores, categoria")
     .eq("uac_id", uacRow.id)
     .eq("es_placeholder", false)
     .order("numero");
@@ -208,6 +215,7 @@ export async function getProgresionesConEstadoBrowser(
       titulo: prog.titulo,
       descripcion: prog.descripcion,
       ejes_articuladores: prog.ejes_articuladores,
+      categoria: prog.categoria,
       estado,
       actividades: actsForProg,
     };
@@ -239,15 +247,17 @@ export async function getProgresoSemestreBrowser(
 
   const { data: progs } = await sb
     .from("progresiones")
-    .select("id")
+    .select("id, categoria")
     .in("uac_id", uacIds)
     .eq("es_placeholder", false);
 
-  const totalProgresiones = progs?.length ?? 0;
+  // Solo cuentan los propósitos oficiales 2025; los complementos no inflan la meta.
+  const oficiales = (progs ?? []).filter((p) => p.categoria !== CATEGORIA_COMPLEMENTO);
+  const totalProgresiones = oficiales.length;
   if (totalProgresiones === 0)
     return { totalProgresiones: 0, progresionesCompletadas: 0, porcentaje: 0 };
 
-  const progIds = (progs ?? []).map((p) => p.id);
+  const progIds = oficiales.map((p) => p.id);
 
   const { data: allActs } = await sb
     .from("actividades")

@@ -124,12 +124,12 @@ export const UAC_BASE: UACStatic[] = [
 
   // ── CNEYT — Ciencias Naturales, Experimentales y Tecnología (sems 1-6) ─────
   // Fuente: 03-CIENCIAS-NATURALES.md | CNEYT I-VI: 8×6 = 48 | secuencia obligatoria
-  { codigo: "CNEYT-I",   nombre: "La materia y sus interacciones",        semestre: 1, componenteCodigo: "CF", recursoCodigo: "RSC-CNEYT", orden: 8, totalProgresionesEsperadas: 8 },
-  { codigo: "CNEYT-II",  nombre: "Conservación de la energía",            semestre: 2, componenteCodigo: "CF", recursoCodigo: "RSC-CNEYT", orden: 8, totalProgresionesEsperadas: 8 },
-  { codigo: "CNEYT-III", nombre: "Ecosistemas, interacciones y energía",  semestre: 3, componenteCodigo: "CF", recursoCodigo: "RSC-CNEYT", orden: 8, totalProgresionesEsperadas: 8 },
-  { codigo: "CNEYT-IV",  nombre: "Reacciones químicas",                   semestre: 4, componenteCodigo: "CF", recursoCodigo: "RSC-CNEYT", orden: 8, totalProgresionesEsperadas: 8 },
-  { codigo: "CNEYT-V",   nombre: "La energía en procesos de vida diaria", semestre: 5, componenteCodigo: "CF", recursoCodigo: "RSC-CNEYT", orden: 8, totalProgresionesEsperadas: 8 },
-  { codigo: "CNEYT-VI",  nombre: "Organismos y evolución biológica",      semestre: 6, componenteCodigo: "CF", recursoCodigo: "RSC-CNEYT", orden: 8, totalProgresionesEsperadas: 8 },
+  { codigo: "CNEYT-I",   nombre: "Ciencias Naturales, Experimentales y Tecnología I",   semestre: 1, componenteCodigo: "CF", recursoCodigo: "RSC-CNEYT", orden: 8, totalProgresionesEsperadas: 8 },
+  { codigo: "CNEYT-II",  nombre: "Ciencias Naturales, Experimentales y Tecnología II",  semestre: 2, componenteCodigo: "CF", recursoCodigo: "RSC-CNEYT", orden: 8, totalProgresionesEsperadas: 8 },
+  { codigo: "CNEYT-III", nombre: "Ciencias Naturales, Experimentales y Tecnología III", semestre: 3, componenteCodigo: "CF", recursoCodigo: "RSC-CNEYT", orden: 8, totalProgresionesEsperadas: 8 },
+  { codigo: "CNEYT-IV",  nombre: "Ciencias Naturales, Experimentales y Tecnología IV",  semestre: 4, componenteCodigo: "CF", recursoCodigo: "RSC-CNEYT", orden: 8, totalProgresionesEsperadas: 8 },
+  { codigo: "CNEYT-V",   nombre: "Ciencias Naturales, Experimentales y Tecnología V",   semestre: 5, componenteCodigo: "CF", recursoCodigo: "RSC-CNEYT", orden: 8, totalProgresionesEsperadas: 8 },
+  { codigo: "CNEYT-VI",  nombre: "Ciencias Naturales, Experimentales y Tecnología VI",  semestre: 6, componenteCodigo: "CF", recursoCodigo: "RSC-CNEYT", orden: 8, totalProgresionesEsperadas: 8 },
 ];
 
 export function getUACPorSemestre(semestre: number): UACStatic[] {

@@ -5,6 +5,7 @@
 
 import { getSupabaseServer } from "@/lib/supabase-helpers";
 import { UAC_BASE } from "@/lib/mccems/estructura";
+import { CATEGORIA_COMPLEMENTO } from "@/lib/mccems/categorias";
 import { getRachaDelAlumno } from "@/lib/queries/hub";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SbAny = any;
@@ -76,10 +77,12 @@ export async function getProgresoDetallePorUAC(
     for (const uac of uacRows) {
       const { data: progresiones } = await sb
         .from("progresiones")
-        .select("id")
+        .select("id, categoria")
         .eq("uac_id", uac.id);
 
-      const progIds = (progresiones ?? []).map((p) => p.id);
+      // Solo cuentan los propósitos oficiales 2025; los complementos no inflan la meta.
+      const oficiales = (progresiones ?? []).filter((p) => p.categoria !== CATEGORIA_COMPLEMENTO);
+      const progIds = oficiales.map((p) => p.id);
       if (progIds.length === 0) {
         const baseUAC0 = UAC_BASE.find((b) => b.codigo === uac.codigo);
         results.push({
@@ -87,7 +90,7 @@ export async function getProgresoDetallePorUAC(
           nombre: uac.nombre,
           rscCodigo: baseUAC0?.recursoCodigo ?? "RSC-LC",
           completadas: 0,
-          total: uac.total_progresiones ?? 0,
+          total: 0,
           pct: 0,
           ultimaActividad: null,
         });
@@ -112,7 +115,7 @@ export async function getProgresoDetallePorUAC(
 
       // Count fully completed progressions
       let completadasProg = 0;
-      for (const prog of progresiones ?? []) {
+      for (const prog of oficiales) {
         const { data: acts } = await sb
           .from("actividades")
           .select("id")
@@ -128,7 +131,7 @@ export async function getProgresoDetallePorUAC(
         .sort((a, b) => new Date(b.completed_at ?? 0).getTime() - new Date(a.completed_at ?? 0).getTime())[0];
 
       const baseUAC = UAC_BASE.find((b) => b.codigo === uac.codigo);
-      const total = uac.total_progresiones ?? progIds.length;
+      const total = oficiales.length;
       results.push({
         codigo: uac.codigo,
         nombre: uac.nombre,

@@ -109,13 +109,13 @@ export default async function ProgresoPage() {
               <p className="prog-hero-big">Tu semestre empieza aquí</p>
               <p className="prog-hero-sub">
                 Completá tu primera actividad para arrancar tu avance, sumar XP y
-                encender tu racha. <strong>{totalProgresiones} progresiones</strong> te esperan.
+                encender tu racha. <strong>{totalProgresiones} propósitos formativos</strong> te esperan.
               </p>
             </>
           ) : (
             <>
               <p className="prog-hero-big">
-                {progresionesCompletadas}<span> / {totalProgresiones} progresiones</span>
+                {progresionesCompletadas}<span> / {totalProgresiones} propósitos formativos</span>
               </p>
               <p className="prog-hero-sub">
                 <strong>{actividadesEstaSemana}</strong> actividades y{" "}

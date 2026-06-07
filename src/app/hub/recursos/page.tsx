@@ -238,7 +238,7 @@ function RecursosContent() {
                 <div className="recursos-card-foot">
                   <span className="recursos-card-uac">{it.uacNombre}</span>
                   <span className="recursos-card-prog">
-                    Progresión {it.progresionNumero}
+                    Propósito formativo {it.progresionNumero}
                   </span>
                 </div>
               </Link>

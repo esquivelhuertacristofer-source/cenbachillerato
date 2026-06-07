@@ -227,7 +227,7 @@ export default function ProgresionCard({
                 marginBottom: 16,
               }}
             >
-              PROGRESIÓN {numero} · CEN BACHILLERATO
+              PROPÓSITO FORMATIVO {numero} · CEN BACHILLERATO
             </div>
 
             {/* Title */}
@@ -427,7 +427,7 @@ export default function ProgresionCard({
                   color: "rgba(255,255,255,0.30)",
                 }}
               >
-                Progresión Bloqueada
+                Propósito formativo Bloqueado
               </span>
             </div>
           </div>

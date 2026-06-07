@@ -78,7 +78,7 @@ export function UACCard({
           paddingTop: 12,
         }}>
           <span style={{ fontSize: 12, color: 'rgba(11,37,69,0.50)' }}>
-            {totalProgresiones} progresiones
+            {totalProgresiones} propósitos formativos
           </span>
           <span style={{ fontSize: 12, fontWeight: 700, color: '#1E40AF' }}>
             Ver contenido <i className="fa-solid fa-arrow-right" style={{ fontSize: 10 }} />

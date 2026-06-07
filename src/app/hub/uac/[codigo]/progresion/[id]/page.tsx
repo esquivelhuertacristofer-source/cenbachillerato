@@ -15,8 +15,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const uac = getUACPorCodigo(codigo);
   return {
     title: uac
-      ? `Progresión ${id} · ${uac.nombre} — CEN Bachillerato`
-      : "Progresión — CEN Bachillerato",
+      ? `Propósito formativo ${id} · ${uac.nombre} — CEN Bachillerato`
+      : "Propósito formativo — CEN Bachillerato",
   };
 }
 

@@ -10,6 +10,7 @@ import { getUACPorCodigo } from "@/lib/mccems/estructura";
 import {
   getCurrentProfile,
   getProgresionesConEstadoBrowser,
+  CATEGORIA_COMPLEMENTO,
   type ProgresionBrowser,
 } from "@/lib/queries/hub-browser";
 import { getUACConfig } from "@/components/hub-v2/uac-config";
@@ -146,8 +147,11 @@ export default function UACPage() {
 
   if (loading) return <UACPageSkeleton accentColor={cfg.accentRgb} />;
 
-  const completadas = progresiones.filter((p) => p.estado === "completada").length;
-  const total = progresiones.length;
+  // Solo los propósitos OFICIALES 2025 cuentan para el avance; los complementos
+  // se muestran (timeline) pero no inflan la meta.
+  const oficiales = progresiones.filter((p) => p.categoria !== CATEGORIA_COMPLEMENTO);
+  const completadas = oficiales.filter((p) => p.estado === "completada").length;
+  const total = oficiales.length;
   const pct = total > 0 ? Math.round((completadas / total) * 100) : 0;
 
   return (
@@ -256,8 +260,8 @@ export default function UACPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...springs.smooth, delay: 0.05 + stagger.fast * 3 }}
           >
-            {completadas} de {total > 0 ? total : uac.totalProgresionesEsperadas} progresiones
-            completadas. Avanzá secuencialmente para desbloquear cada etapa del aprendizaje.
+            {completadas} de {total > 0 ? total : uac.totalProgresionesEsperadas} propósitos formativos
+            completados. Avanzá secuencialmente para desbloquear cada etapa del aprendizaje.
           </motion.p>
         </div>
       </header>
@@ -298,7 +302,7 @@ export default function UACPage() {
               Contenido en preparación
             </p>
             <p style={{ fontSize: 13, marginTop: 8, lineHeight: 1.6 }}>
-              Las progresiones de {uac.nombre} estarán disponibles próximamente.
+              Los propósitos formativos de {uac.nombre} estarán disponibles próximamente.
             </p>
           </div>
         ) : (

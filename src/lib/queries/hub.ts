@@ -4,6 +4,7 @@
  */
 
 import { getSupabaseServer } from "@/lib/supabase-helpers";
+import { CATEGORIA_COMPLEMENTO } from "@/lib/mccems/categorias";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -424,16 +425,18 @@ export async function getProgresoSemestre(
 
   const { data: progs } = await sb
     .from("progresiones")
-    .select("id")
+    .select("id, categoria")
     .in("uac_id", uacIds)
     .eq("es_placeholder", false);
 
-  const totalProgresiones = progs?.length ?? 0;
+  // Solo cuentan los propósitos oficiales 2025; los complementos no inflan la meta.
+  const oficiales = (progs ?? []).filter((p) => p.categoria !== CATEGORIA_COMPLEMENTO);
+  const totalProgresiones = oficiales.length;
   if (totalProgresiones === 0) {
     return { totalProgresiones: 0, progresionesCompletadas: 0, actividadesEstaSemana: 0, minutosEstaSemana: 0, porcentaje: 0 };
   }
 
-  const progIds = (progs ?? []).map((p) => p.id);
+  const progIds = oficiales.map((p) => p.id);
 
   const { data: allActs } = await sb
     .from("actividades")

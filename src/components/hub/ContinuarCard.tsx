@@ -94,7 +94,7 @@ export function ContinuarCard({ data, nombre }: ContinuarCardProps) {
             {data.progresionTitulo}
           </h2>
           <p style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", margin: "0 0 28px", letterSpacing: "0.01em" }}>
-            Progresión {data.progresionNumero} · Actividad {data.actividadOrden} de {data.totalActividades}
+            Propósito formativo {data.progresionNumero} · Actividad {data.actividadOrden} de {data.totalActividades}
           </p>
 
           {/* Progress bar */}

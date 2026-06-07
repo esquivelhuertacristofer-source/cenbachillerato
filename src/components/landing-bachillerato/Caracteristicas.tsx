@@ -26,8 +26,8 @@ const CARACTERISTICAS = [
   },
   {
     icono: "🎯",
-    titulo: "Progresiones de Aprendizaje",
-    descripcion: "Estructura pedagógica UAC → Progresión → Actividad, alineada al programa oficial.",
+    titulo: "Propósitos formativos",
+    descripcion: "Estructura pedagógica UAC → Propósito formativo → Actividad, alineada al Marco Curricular Común 2025.",
   },
   {
     icono: "📱",

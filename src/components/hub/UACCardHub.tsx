@@ -252,7 +252,7 @@ export function UACCardHub({
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
               <span style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", fontWeight: 500 }}>
                 <span style={{ fontWeight: 700, color: "rgba(255,255,255,0.75)" }}>{completadas}</span>
-                {" "}/ {totalProgresiones} progresiones
+                {" "}/ {totalProgresiones} propósitos formativos
               </span>
               {lastActivity && (
                 <>

@@ -109,7 +109,7 @@ export function ActivityShell({
               }}
             >
               <i className="fa-solid fa-arrow-left" style={{ fontSize: 10 }} />
-              Progresión {progresionNum}
+              Propósito formativo {progresionNum}
             </Link>
             <span style={{ color: "rgba(255,255,255,0.18)", fontSize: 14, fontWeight: 300 }}>·</span>
             <div style={{

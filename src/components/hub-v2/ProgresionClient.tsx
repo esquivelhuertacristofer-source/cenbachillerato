@@ -263,10 +263,10 @@ export function ProgresionClient({
               </div>
               <div style={{ flex: 1, minWidth: 200 }}>
                 <p style={{ fontSize: 18, fontWeight: 900, color: '#4ADE80', margin: '0 0 4px' }}>
-                  ¡Progresión completada!
+                  ¡Propósito formativo completado!
                 </p>
                 <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.50)', margin: 0 }}>
-                  Ganaste <strong style={{ color: '#FBBF24' }}>+{xpTotal} XP</strong> en esta progresión.
+                  Ganaste <strong style={{ color: '#FBBF24' }}>+{xpTotal} XP</strong> en este propósito formativo.
                 </p>
               </div>
               <Link

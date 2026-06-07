@@ -85,7 +85,7 @@ export function ProgresionHero({
           <span>/</span>
           <Link href={`/hub/uac/${codigo}`} style={{ color: 'rgba(255,255,255,0.28)', textDecoration: 'none' }}>{codigo}</Link>
           <span>/</span>
-          <span style={{ color: color.hex, fontWeight: 700 }}>Progresión {numParsed}</span>
+          <span style={{ color: color.hex, fontWeight: 700 }}>Propósito formativo {numParsed}</span>
         </motion.div>
 
         {/* Completion badge */}

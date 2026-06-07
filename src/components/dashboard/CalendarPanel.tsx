@@ -111,7 +111,7 @@ export default function CalendarPanel() {
               <span className="text-[9px] font-bold text-gray-300">14:20</span>
             </div>
             <p className="text-xs font-black text-[#0B2545]">Actividad reciente</p>
-            <p className="text-[10px] text-gray-400 font-medium italic">Progresión completada</p>
+            <p className="text-[10px] text-gray-400 font-medium italic">Propósito formativo completado</p>
           </div>
         </div>
       </div>
