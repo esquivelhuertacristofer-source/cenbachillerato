@@ -163,7 +163,7 @@ export function HeroCEN() {
             <div className="hero-student-glow" aria-hidden="true" />
 
             <div className="hero-student-card">
-              <img src="/1.png" alt="Estudiante CEN" className="hero-student-img" />
+              <img src="/1.webp" alt="Estudiante CEN" className="hero-student-img" />
             </div>
 
             <div className="hero-bottom-fade" aria-hidden="true" />

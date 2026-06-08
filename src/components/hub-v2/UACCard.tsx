@@ -9,14 +9,14 @@ import "./UACFicha.css";
 
 // Imagen ilustrativa por recurso sociocognitivo (archivos reales en public/rsc/)
 const RSC_IMAGE: Record<string, string> = {
-  "RSC-LC": "/rsc/lc.png",
-  "RSC-PM": "/rsc/pm.png",
-  "RSC-IN": "/rsc/in.png",
-  "RSC-CD": "/rsc/cd.png",
-  "RSC-CH": "/rsc/ch.png",
-  "RSC-CS": "/rsc/cs.png",
-  "RSC-PFH": "/rsc/hum.png",
-  "RSC-CNEYT": "/rsc/cneyt.png",
+  "RSC-LC": "/rsc/lc.webp",
+  "RSC-PM": "/rsc/pm.webp",
+  "RSC-IN": "/rsc/in.webp",
+  "RSC-CD": "/rsc/cd.webp",
+  "RSC-CH": "/rsc/ch.webp",
+  "RSC-CS": "/rsc/cs.webp",
+  "RSC-PFH": "/rsc/hum.webp",
+  "RSC-CNEYT": "/rsc/cneyt.webp",
 };
 
 interface UACCardProps {

@@ -70,7 +70,7 @@ export function HeroBachillerato() {
               {/* Halo decorativo */}
               <div className="absolute inset-0 -bottom-8 rounded-full bg-indigo-500/20 blur-3xl" />
               <Image
-                src="/AHORRO.png"
+                src="/AHORRO.webp"
                 alt="Alumna CEN Bachillerato"
                 fill
                 className="relative z-10 object-contain object-bottom drop-shadow-2xl"

@@ -1,0 +1,50 @@
+1	CNEYT-I · S1 · La Tabla Periódica: El Mapa del Universo de la Materia
+2	CNEYT-I · S1 · El Método Científico: El Arte de Preguntar al Universo
+3	CNEYT-I · S1 · La Materia y sus Estados: Todo lo que Nos Rodea
+4	CNEYT-II · S2 · Transformaciones energéticas: cadenas de conversión
+5	CNEYT-II · S2 · Fuentes renovables en México: solar, eólica y geotérmica
+6	CNEYT-III · S3 · El sistema terrestre: atmósfera, hidrosfera, litosfera y biosfera
+7	CNEYT-III · S3 · El ciclo del agua: de la lluvia a los mares
+8	CNEYT-III · S3 · México: país megadiverso
+9	CNEYT-IV · S4 · pH, la escala de acidez e indicadores ácido-base
+10	CNEYT-IV · S4 · Tipos de reacciones químicas
+11	CNEYT-V · S5 · Energía nuclear en México: Laguna Verde y el ININ
+12	CNEYT-V · S5 · SASMEX y ondas sísmicas: cómo los sensores salvan vidas
+13	CNEYT-VI · S6 · Genómica y diversidad genética del pueblo mexicano: el INMEGEN
+14	PM-I · S1 · Proporcionalidad directa e inversa
+15	PM-II · S2 · El lenguaje algebraico
+16	PM-III · S3 · La fórmula general (ecuación cuadrática)
+17	PM-III · S3 · Pirámides, conos y esferas: volúmenes y áreas
+18	PM-IV · S4 · Razones trigonométricas en el triángulo rectángulo
+19	PM-IV · S4 · El círculo unitario
+20	PM-V · S5 · Reglas de derivación (potencia, suma y constante)
+21	PM-VI · S6 · Visualizaciones engañosas en estadística
+22	PM-VI · S6 · Media, mediana y moda
+23	LC-I · S1 · Tipos de texto: narrativo, descriptivo, expositivo, argumentativo
+24	LC-I · S1 · El acento ortográfico: reglas de acentuación
+25	LC-II · S2 · Estructura del relato
+26	LC-III · S3 · Los géneros literarios
+27	LC-III · S3 · Metáfora, hipérbole e ironía
+28	IN-I · S1 · The Verb 'To Be'
+29	IN-II · S2 · Adverbios de frecuencia
+30	IN-III · S3 · Past Simple vs Present Perfect
+31	IN-IV · S4 · Be going to vs Will
+32	IN-V · S5 · Conditionals (type 1 & 2)
+33	CD-I · S1 · Ciberacoso: Identificar, Prevenir y Actuar
+34	CD-I · S1 · Inteligencia Artificial: qué es y cómo afecta tu vida
+35	CD-II · S2 · Fact-checking paso a paso
+36	CD-II · S2 · Phishing y estafas digitales
+37	CD-III · S6 · La economía de la atención
+38	CS-I · S1 · Derechos Humanos
+39	CS-I · S1 · México Prehispánico
+40	CS-II · S2 · Pobreza multidimensional
+41	CS-III · S4 · Desigualdad en México (INEGI)
+42	CH-I · S4 · Fuentes primarias y secundarias
+43	CH-I · S4 · Independencia de México (1810-1821): análisis multicausal
+44	CH-II · S5 · La Revolución Mexicana: actores
+45	CH-III · S6 · Cinco criterios para evaluar una fuente histórica
+46	PFH-I · S1 · Pensamiento Crítico
+47	PFH-I · S1 · Ética y Moral: ¿Cómo Debemos Vivir?
+48	PFH-I · S1 · Lógica y Argumentación
+49	PFH-III · S3 · Falacias: los errores del razonamiento
+50	PFH-III · S3 · Deducción e inducción

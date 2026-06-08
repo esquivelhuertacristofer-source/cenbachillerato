@@ -16,12 +16,12 @@ import {
 } from 'lucide-react';
 
 const SEMESTRES = [
-  { num: 1, title: 'Primer Semestre', desc: 'Lengua y Comunicación, Pensamiento Matemático, Ciencias Naturales y Ciencias Sociales — fundamentos del bachillerato MCCEMS.', color: 'from-[#011C40] to-[#0B2545]', accent: '#D4A574', image: '/1.png', fade: '#011C40' },
-  { num: 2, title: 'Segundo Semestre', desc: 'Continuación de los recursos sociocognitivos fundamentales con nuevos saberes y progresiones de aprendizaje.', color: 'from-[#0B2545] to-[#1E40AF]', accent: '#7DD3FC', image: '/Imagenes carrusel/7.png', fade: '#0B2545' },
-  { num: 3, title: 'Tercer Semestre', desc: 'Profundización en Lengua, Matemáticas y Humanidades. Inicio de las áreas de conocimiento del Currículum Fundamental Extendido.', color: 'from-[#1E40AF] to-[#1e3a8a]', accent: '#D4A574', image: '/Imagenes carrusel/9.png', fade: '#1E40AF' },
-  { num: 4, title: 'Cuarto Semestre', desc: 'Saberes avanzados y progresiones de mayor complejidad cognitiva. Vinculación con contextos reales y socioemocionales.', color: 'from-[#7c3aed] to-[#6d28d9]', accent: '#7DD3FC', image: '/4.png', fade: '#7c3aed' },
-  { num: 5, title: 'Quinto Semestre', desc: 'UAC del Currículum Fundamental Extendido y Ampliado. Preparación para el egreso y acceso a educación superior.', color: 'from-[#0e7490] to-[#0369a1]', accent: '#D4A574', image: '/Imagenes carrusel/11.png', fade: '#0e7490' },
-  { num: 6, title: 'Sexto Semestre', desc: 'Cierre del trayecto formativo MCCEMS. Integración de saberes, metacognición y vinculación con la vida personal y social.', color: 'from-[#065f46] to-[#047857]', accent: '#7DD3FC', image: '/6.png', fade: '#065f46' },
+  { num: 1, title: 'Primer Semestre', desc: 'Lengua y Comunicación, Pensamiento Matemático, Ciencias Naturales y Ciencias Sociales — fundamentos del bachillerato MCCEMS.', color: 'from-[#011C40] to-[#0B2545]', accent: '#D4A574', image: '/1.webp', fade: '#011C40' },
+  { num: 2, title: 'Segundo Semestre', desc: 'Continuación de los recursos sociocognitivos fundamentales con nuevos saberes y progresiones de aprendizaje.', color: 'from-[#0B2545] to-[#1E40AF]', accent: '#7DD3FC', image: '/Imagenes carrusel/7.webp', fade: '#0B2545' },
+  { num: 3, title: 'Tercer Semestre', desc: 'Profundización en Lengua, Matemáticas y Humanidades. Inicio de las áreas de conocimiento del Currículum Fundamental Extendido.', color: 'from-[#1E40AF] to-[#1e3a8a]', accent: '#D4A574', image: '/Imagenes carrusel/9.webp', fade: '#1E40AF' },
+  { num: 4, title: 'Cuarto Semestre', desc: 'Saberes avanzados y progresiones de mayor complejidad cognitiva. Vinculación con contextos reales y socioemocionales.', color: 'from-[#7c3aed] to-[#6d28d9]', accent: '#7DD3FC', image: '/4.webp', fade: '#7c3aed' },
+  { num: 5, title: 'Quinto Semestre', desc: 'UAC del Currículum Fundamental Extendido y Ampliado. Preparación para el egreso y acceso a educación superior.', color: 'from-[#0e7490] to-[#0369a1]', accent: '#D4A574', image: '/Imagenes carrusel/11.webp', fade: '#0e7490' },
+  { num: 6, title: 'Sexto Semestre', desc: 'Cierre del trayecto formativo MCCEMS. Integración de saberes, metacognición y vinculación con la vida personal y social.', color: 'from-[#065f46] to-[#047857]', accent: '#7DD3FC', image: '/6.webp', fade: '#065f46' },
 ];
 
 export default function ModulosPage() {

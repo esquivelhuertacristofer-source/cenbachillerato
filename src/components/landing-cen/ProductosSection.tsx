@@ -36,7 +36,7 @@ export const PRODUCTS: ProductItem[] = [
     icon: 'fa-child',
     color: 'linear-gradient(135deg, #1D4ED8 0%, #3B82F6 100%)',
     accent: '#60A5FA',
-    image: '/4.png',
+    image: '/4.webp',
     href: '#',
     available: false,
     telemetry: [
@@ -56,7 +56,7 @@ export const PRODUCTS: ProductItem[] = [
     color: 'linear-gradient(135deg, #1E40AF 0%, #2563EB 100%)',
     accent: '#3B82F6',
     features: ['6 Grados', 'NEM 2025', 'Educación Básica'],
-    image: '/5.png',
+    image: '/5.webp',
     href: '#',
     available: false,
     telemetry: [
@@ -76,7 +76,7 @@ export const PRODUCTS: ProductItem[] = [
     color: 'linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%)',
     accent: '#2563EB',
     features: ['3 Grados', 'NEM 2025', 'Evaluación formativa'],
-    image: '/6.png',
+    image: '/6.webp',
     href: '#',
     available: false,
     telemetry: [
@@ -96,7 +96,7 @@ export const PRODUCTS: ProductItem[] = [
     color: 'linear-gradient(135deg, #0A1628 0%, #1E3A8A 100%)',
     accent: '#3B82F6',
     features: ['34 UAC', '8 RSC', 'MCCEMS 2023', 'Multi-subsistema'],
-    image: '/bachillerato.png',
+    image: '/bachillerato.webp',
     href: '/bachillerato',
     available: true,
     telemetry: [
@@ -117,7 +117,7 @@ export const PRODUCTS: ProductItem[] = [
     color: 'linear-gradient(135deg, #064E3B 0%, #059669 100%)',
     accent: '#10B981',
     features: ['364 Actividades', '9 Grados escolares', 'Primaria · Secundaria'],
-    image: '/2.png',
+    image: '/2.webp',
     href: 'https://cenfinancierafinal.vercel.app',
     available: true,
     external: true,
@@ -138,7 +138,7 @@ export const PRODUCTS: ProductItem[] = [
     color: 'linear-gradient(135deg, #2E1065 0%, #6D28D9 100%)',
     accent: '#8B5CF6',
     features: ['40 Simuladores', 'Química · Física · Bio', 'MCCEMS Alineado'],
-    image: '/3.png',
+    image: '/3.webp',
     href: 'https://www.cenlaboratorios.com.mx',
     available: true,
     external: true,
@@ -158,7 +158,7 @@ export const PRODUCTS: ProductItem[] = [
     icon: 'fa-robot',
     color: 'linear-gradient(135deg, #7C2D12 0%, #C2410C 100%)',
     accent: '#F97316',
-    image: '/7.png',
+    image: '/7.webp',
     href: '#',
     available: false,
     telemetry: [
@@ -177,7 +177,7 @@ export const PRODUCTS: ProductItem[] = [
     icon: 'fa-language',
     color: 'linear-gradient(135deg, #4A044E 0%, #86198F 100%)',
     accent: '#D946EF',
-    image: '/8.png',
+    image: '/8.webp',
     href: '#',
     available: false,
     telemetry: [

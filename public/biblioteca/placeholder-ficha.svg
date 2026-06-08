@@ -1,11 +1,42 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">
-  <rect width="800" height="450" fill="#EFF6FF"/>
-  <rect x="60" y="60" width="680" height="330" rx="16" fill="#DBEAFE" stroke="#BFDBFE" stroke-width="1.5"/>
-  <circle cx="400" cy="180" r="52" fill="#BFDBFE"/>
-  <rect x="340" y="162" width="56" height="44" rx="4" fill="#93C5FD"/>
-  <rect x="330" y="152" width="16" height="52" rx="3" fill="#60A5FA"/>
-  <rect x="454" y="152" width="16" height="52" rx="3" fill="#60A5FA"/>
-  <rect x="280" y="262" width="240" height="12" rx="6" fill="#BFDBFE"/>
-  <rect x="320" y="286" width="160" height="10" rx="5" fill="#DBEAFE"/>
-  <text x="400" y="340" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#93C5FD" font-weight="600" letter-spacing="0.05em">IMAGEN PENDIENTE</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450" role="img" aria-label="Infografía de la ficha">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#141c2e"/>
+      <stop offset="1" stop-color="#0d1320"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="42%" r="55%">
+      <stop offset="0" stop-color="#7dd3fc" stop-opacity="0.10"/>
+      <stop offset="1" stop-color="#7dd3fc" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="800" height="450" fill="url(#bg)"/>
+  <rect width="800" height="450" fill="url(#glow)"/>
+
+  <!-- subtle grid -->
+  <g stroke="#ffffff" stroke-opacity="0.035" stroke-width="1">
+    <path d="M0 112.5H800M0 225H800M0 337.5H800"/>
+    <path d="M160 0V450M320 0V450M480 0V450M640 0V450"/>
+  </g>
+
+  <!-- minimalist infographic motif (low opacity, decorative) -->
+  <g transform="translate(252,150)" fill="none" stroke="#7dd3fc" stroke-opacity="0.28" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <!-- donut -->
+    <circle cx="40" cy="75" r="42"/>
+    <path d="M40 33 A42 42 0 0 1 78 95" stroke="#ffffff" stroke-opacity="0.22"/>
+    <!-- bars -->
+    <line x1="150" y1="117" x2="150" y2="78"/>
+    <line x1="186" y1="117" x2="186" y2="50"/>
+    <line x1="222" y1="117" x2="222" y2="92"/>
+    <line x1="258" y1="117" x2="258" y2="34"/>
+    <!-- baseline + trend -->
+    <line x1="132" y1="117" x2="276" y2="117" stroke="#ffffff" stroke-opacity="0.14"/>
+    <polyline points="132,70 168,86 204,52 240,64 276,30" stroke="#ffffff" stroke-opacity="0.20" stroke-width="2.5"/>
+  </g>
+
+  <!-- discreet label -->
+  <g transform="translate(400,322)" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif">
+    <text y="0" fill="#ffffff" fill-opacity="0.32" font-size="14" font-weight="700" letter-spacing="0.16em">CEN · BIBLIOTECA</text>
+    <text y="24" fill="#ffffff" fill-opacity="0.18" font-size="12" font-weight="500" letter-spacing="0.04em">Infografía del concepto</text>
+  </g>
 </svg>

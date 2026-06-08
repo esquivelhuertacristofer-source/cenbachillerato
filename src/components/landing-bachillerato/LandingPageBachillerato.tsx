@@ -32,14 +32,14 @@ const CURRICULUM_CARDS = [
 ];
 
 const RSC_CARDS = [
-  { code: 'LC',    name: 'Lengua y Comunicación',                            semestres: 'Semestres 1–6',      progresiones: '32 Progresiones', ejes: ['Comprensión Lectora', 'Composición de Textos', 'Debate y Retórica'],    desc: 'Lectura crítica, composición escrita, debate y comunicación asertiva.',              image: '/rsc/lc.png'    },
-  { code: 'PM',    name: 'Pensamiento Matemático',                           semestres: 'Semestres 1–6',      progresiones: '36 Progresiones', ejes: ['Álgebra y Funciones', 'Estadística Descriptiva', 'Modelación Lógica'],   desc: 'Modelación matemática, lógica formal y resolución de problemas cotidianos.',         image: '/rsc/pm.png'    },
-  { code: 'IN',    name: 'Inglés',                                           semestres: 'Semestres 1–4',      progresiones: '24 Progresiones', ejes: ['Comprensión Auditiva', 'Comunicación Técnica', 'Fluidez Conversacional'], desc: 'Adquisición del idioma como segunda lengua con énfasis en comunicación real.',        image: '/rsc/in.png'    },
-  { code: 'CD',    name: 'Cultura Digital',                                  semestres: 'Semestres 1, 2 y 6', progresiones: '18 Progresiones', ejes: ['Programación y Algoritmia', 'Ciudadanía Digital', 'Colaboración Cloud'],  desc: 'Uso ético y estratégico de tecnologías de la información.',                         image: '/rsc/cd.png'    },
-  { code: 'CH',    name: 'Conciencia Histórica',                             semestres: 'Semestres 4–6',      progresiones: '16 Progresiones', ejes: ['Memoria Histórica', 'Procesos Nacionales', 'Análisis Geopolítico'],       desc: 'Análisis crítico de procesos históricos locales y globales.',                        image: '/rsc/ch.png'    },
-  { code: 'CS',    name: 'Ciencias Sociales',                                semestres: 'Semestres 1, 2 y 4', progresiones: '20 Progresiones', ejes: ['Estructuras Sociales', 'Derechos Humanos', 'Participación Ciudadana'],    desc: 'Estructuras socioeconómicas, derechos humanos y organización comunitaria.',          image: '/rsc/cs.png'    },
-  { code: 'HUM',   name: 'Humanidades',                                      semestres: 'Semestres 1–3',      progresiones: '24 Progresiones', ejes: ['Ética y Valores', 'Filosofía Práctica', 'Apreciación Estética'],          desc: 'Reflexión filosófica, ética y pensamiento crítico.',                                 image: '/rsc/hum.png'   },
-  { code: 'CNEYT', name: 'Ciencias Naturales, Experimentales y Tecnología',  semestres: 'Semestres 1–6',      progresiones: '30 Progresiones', ejes: ['Física Aplicada', 'Química Orgánica', 'Biología y Ecosistemas'],           desc: 'Comprensión científica del mundo físico con enfoque experimental.',                  image: '/rsc/cneyt.png' },
+  { code: 'LC',    name: 'Lengua y Comunicación',                            semestres: 'Semestres 1–6',      progresiones: '32 Progresiones', ejes: ['Comprensión Lectora', 'Composición de Textos', 'Debate y Retórica'],    desc: 'Lectura crítica, composición escrita, debate y comunicación asertiva.',              image: '/rsc/lc.webp'    },
+  { code: 'PM',    name: 'Pensamiento Matemático',                           semestres: 'Semestres 1–6',      progresiones: '36 Progresiones', ejes: ['Álgebra y Funciones', 'Estadística Descriptiva', 'Modelación Lógica'],   desc: 'Modelación matemática, lógica formal y resolución de problemas cotidianos.',         image: '/rsc/pm.webp'    },
+  { code: 'IN',    name: 'Inglés',                                           semestres: 'Semestres 1–4',      progresiones: '24 Progresiones', ejes: ['Comprensión Auditiva', 'Comunicación Técnica', 'Fluidez Conversacional'], desc: 'Adquisición del idioma como segunda lengua con énfasis en comunicación real.',        image: '/rsc/in.webp'    },
+  { code: 'CD',    name: 'Cultura Digital',                                  semestres: 'Semestres 1, 2 y 6', progresiones: '18 Progresiones', ejes: ['Programación y Algoritmia', 'Ciudadanía Digital', 'Colaboración Cloud'],  desc: 'Uso ético y estratégico de tecnologías de la información.',                         image: '/rsc/cd.webp'    },
+  { code: 'CH',    name: 'Conciencia Histórica',                             semestres: 'Semestres 4–6',      progresiones: '16 Progresiones', ejes: ['Memoria Histórica', 'Procesos Nacionales', 'Análisis Geopolítico'],       desc: 'Análisis crítico de procesos históricos locales y globales.',                        image: '/rsc/ch.webp'    },
+  { code: 'CS',    name: 'Ciencias Sociales',                                semestres: 'Semestres 1, 2 y 4', progresiones: '20 Progresiones', ejes: ['Estructuras Sociales', 'Derechos Humanos', 'Participación Ciudadana'],    desc: 'Estructuras socioeconómicas, derechos humanos y organización comunitaria.',          image: '/rsc/cs.webp'    },
+  { code: 'HUM',   name: 'Humanidades',                                      semestres: 'Semestres 1–3',      progresiones: '24 Progresiones', ejes: ['Ética y Valores', 'Filosofía Práctica', 'Apreciación Estética'],          desc: 'Reflexión filosófica, ética y pensamiento crítico.',                                 image: '/rsc/hum.webp'   },
+  { code: 'CNEYT', name: 'Ciencias Naturales, Experimentales y Tecnología',  semestres: 'Semestres 1–6',      progresiones: '30 Progresiones', ejes: ['Física Aplicada', 'Química Orgánica', 'Biología y Ecosistemas'],           desc: 'Comprensión científica del mundo físico con enfoque experimental.',                  image: '/rsc/cneyt.webp' },
 ];
 
 const FEATURES = [
@@ -216,7 +216,7 @@ export default function LandingPageBachillerato() {
             {/* Columna derecha — foto a sangre con fade en la base */}
             <div className="hv3-right">
               <img
-                src="/AHORRO.png"
+                src="/AHORRO.webp"
                 alt="Alumna CEN Bachillerato"
                 className="hv3-photo"
               />
@@ -371,7 +371,7 @@ export default function LandingPageBachillerato() {
 
           {/* ── STUDENTS BANNER ──────────────────────────────────────── */}
           <section className="students-banner">
-            <img src="/bachillerato.png" alt="Estudiantes CEN" className="sb-photo" />
+            <img src="/bachillerato.webp" alt="Estudiantes CEN" className="sb-photo" />
             <div className="sb-overlay" />
             <div className="sb-content">
               <h2 className="sb-title">
