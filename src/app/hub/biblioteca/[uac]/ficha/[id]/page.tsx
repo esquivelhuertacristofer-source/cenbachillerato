@@ -125,8 +125,11 @@ export default async function FichaPage({ params }: Props) {
   const ficha = await getFichaBiblioteca(slug, user.id);
   if (!ficha) notFound();
 
-  // Marcar como leída (fire-and-forget)
-  marcarFichaLeida(ficha.id, user.id).catch(() => {});
+  // Marcar como leída (fire-and-forget): no debe bloquear el render, pero
+  // registramos el fallo para no perder señal de errores reales (RLS, red).
+  marcarFichaLeida(ficha.id, user.id).catch((err) => {
+    console.error("[FichaPage] no se pudo marcar la ficha como leída:", err);
+  });
 
   const color = getRSCColor(uacData.recursoCodigo ?? "");
   const secciones = ficha.contenido?.secciones ?? [];

@@ -460,22 +460,25 @@ export async function getProgresoSemestre(
   // Count completed progresiones (all activities completed)
   const completedByProg = new Map<string, Set<string>>();
   for (const act of allActs ?? []) {
-    if (!completedByProg.has(act.progresion_id!)) {
-      completedByProg.set(act.progresion_id!, new Set());
+    if (!act.progresion_id) continue;
+    if (!completedByProg.has(act.progresion_id)) {
+      completedByProg.set(act.progresion_id, new Set());
     }
   }
   const completedActIds = new Set(completedIntentos?.map((i) => i.actividad_id) ?? []);
   for (const act of allActs ?? []) {
+    if (!act.progresion_id) continue;
     if (completedActIds.has(act.id)) {
-      completedByProg.get(act.progresion_id!)?.add(act.id);
+      completedByProg.get(act.progresion_id)?.add(act.id);
     }
   }
 
   // A progresion is complete when all its activities are completed
   const actsByProg = new Map<string, string[]>();
   for (const act of allActs ?? []) {
-    if (!actsByProg.has(act.progresion_id!)) actsByProg.set(act.progresion_id!, []);
-    actsByProg.get(act.progresion_id!)!.push(act.id);
+    if (!act.progresion_id) continue;
+    if (!actsByProg.has(act.progresion_id)) actsByProg.set(act.progresion_id, []);
+    actsByProg.get(act.progresion_id)!.push(act.id);
   }
 
   let progresionesCompletadas = 0;
@@ -708,8 +711,9 @@ export async function getProgresionesCompletadasDeUAC(
   // Group acts by progresion
   const actsByProg = new Map<string, string[]>();
   for (const a of acts ?? []) {
-    if (!actsByProg.has(a.progresion_id!)) actsByProg.set(a.progresion_id!, []);
-    actsByProg.get(a.progresion_id!)!.push(a.id);
+    if (!a.progresion_id) continue;
+    if (!actsByProg.has(a.progresion_id)) actsByProg.set(a.progresion_id, []);
+    actsByProg.get(a.progresion_id)!.push(a.id);
   }
 
   let completadas = 0;

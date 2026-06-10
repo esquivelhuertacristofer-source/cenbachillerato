@@ -56,8 +56,10 @@ export async function getPlanteamientoPorUAC(
     .filter(Boolean);
 
   planes.sort((a, b) => {
-    const numA = parseInt(a.code.split('-P')[1] ?? '0', 10);
-    const numB = parseInt(b.code.split('-P')[1] ?? '0', 10);
+    // code puede venir ausente/malformado desde el JSONB: optional-chain + ||0
+    // evita que un dato sucio lance (split de undefined) o rompa el orden (NaN).
+    const numA = parseInt(a.code?.split('-P')[1] ?? '0', 10) || 0;
+    const numB = parseInt(b.code?.split('-P')[1] ?? '0', 10) || 0;
     return numA - numB;
   });
 

@@ -1,4 +1,6 @@
+import { redirect } from "next/navigation";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
+import { getUser, getProfile } from "@/lib/supabase-helpers";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -20,12 +22,32 @@ const ROLE_STYLES: Record<string, { background: string; color: string }> = {
 };
 
 export default async function UsuariosAdminPage() {
+  // Aislamiento multi-tenant: este page lee con service_role, que SALTA RLS.
+  // Por eso el filtro por escuela DEBE hacerse aquí explícitamente, o un admin
+  // escolar vería PII de menores de OTRAS escuelas (LFPDPPP). super_admin
+  // (operador de la plataforma) conserva visión global.
+  const user = await getUser();
+  if (!user) redirect("/log-in");
+  const profile = await getProfile(user.id);
+  if (!profile) redirect("/log-in");
+
   const sb = getSupabaseAdmin();
-  const { data: usuarios } = await sb
+  let query = sb
     .from("profiles")
     .select("id, email, full_name, role, semestre, created_at")
     .order("role")
     .order("full_name");
+
+  if (profile.role !== "super_admin") {
+    // Admin escolar: solo su escuela. Sin escuela asignada ⇒ no ve a nadie.
+    if (!profile.escuela_id) {
+      query = query.eq("escuela_id", "00000000-0000-0000-0000-000000000000");
+    } else {
+      query = query.eq("escuela_id", profile.escuela_id);
+    }
+  }
+
+  const { data: usuarios } = await query;
 
   const totales = {
     student: usuarios?.filter((u) => u.role === "student").length ?? 0,

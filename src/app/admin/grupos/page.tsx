@@ -1,4 +1,6 @@
+import { redirect } from "next/navigation";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
+import { getUser, getProfile } from "@/lib/supabase-helpers";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -6,12 +8,32 @@ export const metadata: Metadata = {
 };
 
 export default async function GruposAdminPage() {
+  // Aislamiento multi-tenant: service_role salta RLS ⇒ filtramos por escuela
+  // del admin aquí. super_admin conserva visión global. Ver admin/usuarios.
+  const user = await getUser();
+  if (!user) redirect("/log-in");
+  const profile = await getProfile(user.id);
+  if (!profile) redirect("/log-in");
+
+  const esGlobal = profile.role === "super_admin";
+  // Admin sin escuela asignada ⇒ scope imposible (no ve nada).
+  const escuelaScope = esGlobal ? null : (profile.escuela_id ?? "00000000-0000-0000-0000-000000000000");
+
   const sb = getSupabaseAdmin();
 
+  let gruposQuery = sb.from("grupos").select("id, nombre, semestre, escuela_id, id_docente").order("semestre").order("nombre");
+  let escuelasQuery = sb.from("escuelas").select("id, nombre");
+  let docentesQuery = sb.from("profiles").select("id, full_name, email").eq("role", "teacher");
+  if (escuelaScope !== null) {
+    gruposQuery = gruposQuery.eq("escuela_id", escuelaScope);
+    escuelasQuery = escuelasQuery.eq("id", escuelaScope);
+    docentesQuery = docentesQuery.eq("escuela_id", escuelaScope);
+  }
+
   const [{ data: grupos }, { data: escuelas }, { data: docentes }] = await Promise.all([
-    sb.from("grupos").select("id, nombre, semestre, escuela_id, id_docente").order("semestre").order("nombre"),
-    sb.from("escuelas").select("id, nombre"),
-    sb.from("profiles").select("id, full_name, email").eq("role", "teacher"),
+    gruposQuery,
+    escuelasQuery,
+    docentesQuery,
   ]);
 
   const escuelaMap = new Map(escuelas?.map((e) => [e.id, e.nombre]) ?? []);

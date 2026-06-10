@@ -271,12 +271,33 @@ export default function AltaMasivaForm({ disabled = false }: Props) {
             </div>
 
             {resultado.credenciales.length > 0 && (
-              <button
-                style={s.btn('primary')}
-                onClick={() => descargarCSV(credencialesACsv(resultado.credenciales), 'credenciales-alta-masiva.csv')}
-              >
-                ⬇ Descargar credenciales ({resultado.credenciales.length} usuarios)
-              </button>
+              <>
+                <div
+                  role="alert"
+                  style={{
+                    marginTop: 8,
+                    padding: '12px 16px',
+                    background: '#FEFCE8',
+                    border: '1px solid #FDE68A',
+                    borderRadius: 10,
+                    fontSize: 13,
+                    color: '#854D0E',
+                    lineHeight: 1.5,
+                  }}
+                >
+                  <strong>⚠ Datos personales de menores.</strong> Este archivo contiene
+                  contraseñas temporales. Distribúyelo solo por un canal seguro a cada
+                  usuario y <strong>elimínalo en cuanto entregues las credenciales</strong>.
+                  Cada usuario deberá cambiar su contraseña en el primer inicio de sesión
+                  (se aplica automáticamente).
+                </div>
+                <button
+                  style={s.btn('primary')}
+                  onClick={() => descargarCSV(credencialesACsv(resultado.credenciales), 'credenciales-alta-masiva.csv')}
+                >
+                  ⬇ Descargar credenciales ({resultado.credenciales.length} usuarios)
+                </button>
+              </>
             )}
           </div>
 

@@ -29,7 +29,7 @@ export function FooterLegal() {
             <Link href="/terminos" style={{ fontSize: 12, color: 'rgba(11,37,69,0.50)', textDecoration: 'none' }}>
               Términos de Uso
             </Link>
-            <a href="mailto:contacto@cen.edu.mx" style={{ fontSize: 12, color: 'rgba(11,37,69,0.50)', textDecoration: 'none' }}>
+            <a href="mailto:campanaeducativanacional@gmail.com" style={{ fontSize: 12, color: 'rgba(11,37,69,0.50)', textDecoration: 'none' }}>
               Contacto
             </a>
           </nav>

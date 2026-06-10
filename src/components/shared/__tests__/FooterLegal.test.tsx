@@ -25,6 +25,6 @@ describe("FooterLegal", () => {
 
   test("enlace de contacto apunta a mailto", () => {
     render(<FooterLegal />);
-    expect(screen.getByRole("link", { name: "Contacto" })).toHaveAttribute("href", "mailto:contacto@cen.edu.mx");
+    expect(screen.getByRole("link", { name: "Contacto" })).toHaveAttribute("href", "mailto:campanaeducativanacional@gmail.com");
   });
 });
