@@ -28,6 +28,18 @@ const MAPPING: Record<string, string> = {
   "04": "cneyt-ii-transformaciones-energeticas",
   "05": "cneyt-ii-energias-renovables-mexico",
   "06": "cneyt-iii-sistema-terrestre-subsistemas",
+  "07": "cneyt-iii-ciclo-del-agua",
+  "08": "cneyt-iii-mexico-megadiverso",
+  "09": "cneyt-iv-ph-escala-indicadores",
+  "10": "cneyt-iv-tipos-reacciones-quimicas",
+  "11": "cneyt-v-energia-nuclear-laguna-verde",
+  "12": "cneyt-v-sasmex-ondas-sismicas",
+  "13": "cneyt-vi-genetica-genomica-inmegen-mexico",
+  "14": "pm-i-proporcionalidad",
+  "15": "pm-ii-lenguaje-algebraico",
+  "16": "pm-iii-formula-general",
+  "17": "pm-iii-piramides-conos-esferas",
+  "18": "pm-iv-razones-trigonometricas-basicas",
 };
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
