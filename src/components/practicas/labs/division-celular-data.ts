@@ -552,7 +552,7 @@ export interface EjemploResuelto {
 export const EJEMPLO: EjemploResuelto = {
   enunciado:
     "Una célula somática humana tiene 2n = 46 cromosomas. (a) Si se divide por mitosis, ¿cuántas células hijas se obtienen y con cuántos cromosomas cada una? (b) Si en cambio entra en meiosis, ¿cuántas células y con cuántos cromosomas? (c) ¿Cuántas combinaciones distintas de cromosomas puede generar la distribución independiente?",
-  datos: ["2n = 46 ⇒ n = 23 pares", "Mitosis: 1 división", "Meiosis: 2 divisiones"],
+  datos: ["2n = 46 (23 pares) ⇒ n = 23 cromosomas", "Mitosis: 1 división", "Meiosis: 2 divisiones"],
   solucion:
     "(a) Mitosis: 1 célula → 2 células hijas, cada una con 46 cromosomas (2n, idénticas). (b) Meiosis: 1 célula → 4 células hijas, cada una con 23 cromosomas (n, haploides). (c) Por distribución independiente de 23 pares hay 2²³ = 8 388 608 combinaciones posibles (¡sin contar aún el crossing over!).",
   resultado: "Mitosis: 2 células × 46 · Meiosis: 4 células × 23 · 2²³ = 8 388 608 combinaciones",

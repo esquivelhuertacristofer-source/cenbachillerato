@@ -6,6 +6,13 @@
 
 import { createBrowserClient } from "@supabase/ssr";
 import { CATEGORIA_COMPLEMENTO } from "@/lib/mccems/categorias";
+import { ORDEN_TIPOS } from "@/lib/mccems/tipos-recurso";
+
+/** Tipos con etiqueta propia. Cualquier otro colapsa en un único "otro". */
+const TIPOS_CONOCIDOS = new Set(ORDEN_TIPOS);
+function normalizarTipo(tipo: string): string {
+  return TIPOS_CONOCIDOS.has(tipo) ? tipo : "otro";
+}
 
 function getClient() {
   return createBrowserClient(
@@ -348,8 +355,9 @@ export async function getProgresoRecursosSemestre(
   const totalByTipo = new Map<string, number>();
   const doneByTipo = new Map<string, number>();
   for (const a of acts) {
-    totalByTipo.set(a.tipo, (totalByTipo.get(a.tipo) ?? 0) + 1);
-    if (doneSet.has(a.id)) doneByTipo.set(a.tipo, (doneByTipo.get(a.tipo) ?? 0) + 1);
+    const tipo = normalizarTipo(a.tipo);
+    totalByTipo.set(tipo, (totalByTipo.get(tipo) ?? 0) + 1);
+    if (doneSet.has(a.id)) doneByTipo.set(tipo, (doneByTipo.get(tipo) ?? 0) + 1);
   }
 
   return [...totalByTipo.entries()].map(([tipo, total]) => ({

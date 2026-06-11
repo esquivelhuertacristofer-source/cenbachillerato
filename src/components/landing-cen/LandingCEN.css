@@ -8991,3 +8991,433 @@ a.pcards-item:hover {
     font-size: clamp(40px, 10vw, 60px) !important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   NumerosSection — "La plataforma en números"
+   Banda CLARA con profundidad: glass blanco, sombras en capas, glow por acento,
+   aura de mouse y count-up animado. (Mismo lenguaje que el acordeón, sin oscurecer.)
+   NOTA: este bloque se usa SOLO en /bachillerato (NumerosSection se renderiza ahí);
+   por eso el acento es teal/mint, a juego con la paleta de la landing de bachillerato.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.num-section {
+  position: relative;
+  overflow: hidden;
+  padding: 110px max(48px, 6vw);
+  background:
+    radial-gradient(120% 80% at 50% 0%, #FFFFFF 0%, #F0FDFA 45%, #ECFDF5 100%);
+  isolation: isolate;
+}
+@media (max-width: 768px) { .num-section { padding: 80px 24px; } }
+
+/* Glows ambientales suaves — profundidad sin oscurecer el fondo */
+.num-ambient {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.55;
+}
+.num-ambient-a {
+  width: 620px; height: 620px;
+  top: -200px; left: -120px;
+  background: radial-gradient(circle, rgba(13,148,136,0.16) 0%, transparent 70%);
+}
+.num-ambient-b {
+  width: 540px; height: 540px;
+  bottom: -220px; right: -100px;
+  background: radial-gradient(circle, rgba(94,234,212,0.24) 0%, transparent 70%);
+}
+
+.num-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+/* Header */
+.num-header { text-align: center; max-width: 720px; margin: 0 auto 64px; }
+.num-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(13,148,136,0.08);
+  border: 1px solid rgba(13,148,136,0.18);
+  color: #0D9488;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.num-eyebrow i { font-size: 11px; }
+.num-title {
+  margin: 22px 0 16px;
+  font-size: var(--t-title);
+  font-weight: 800;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.num-title em {
+  font-style: normal;
+  background: linear-gradient(120deg, #0D9488, #14B8A6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.num-sub {
+  font-size: var(--t-body);
+  line-height: 1.6;
+  color: var(--ink-60);
+  margin: 0;
+}
+
+/* Grid */
+.num-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+@media (max-width: 900px) { .num-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; } }
+@media (max-width: 540px) { .num-grid { grid-template-columns: 1fr; } }
+
+/* Card glass claro con profundidad */
+.num-card {
+  position: relative;
+  overflow: hidden;
+  padding: 34px 30px 30px;
+  border-radius: 24px;
+  background: rgba(255,255,255,0.82);
+  border: 1px solid rgba(11,37,69,0.08);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow:
+    0 1px 2px rgba(11,37,69,0.04),
+    0 12px 30px -12px rgba(11,37,69,0.16);
+  transition: box-shadow 0.4s var(--ease-standard), border-color 0.4s var(--ease-standard);
+  isolation: isolate;
+}
+.num-card:hover {
+  border-color: color-mix(in srgb, var(--num-accent) 38%, transparent);
+  box-shadow:
+    0 2px 4px rgba(11,37,69,0.05),
+    0 26px 50px -16px color-mix(in srgb, var(--num-accent) 30%, rgba(11,37,69,0.22));
+}
+
+/* Glow superior por acento */
+.num-card-glow {
+  position: absolute;
+  top: -60px; left: 50%;
+  width: 220px; height: 160px;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--num-accent) 45%, transparent) 0%, transparent 70%);
+  opacity: 0.18;
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity 0.4s var(--ease-standard);
+}
+.num-card:hover .num-card-glow { opacity: 0.4; }
+
+/* Aura que sigue el mouse (mismo recurso que el acordeón) */
+.num-card-aura {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(180px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), color-mix(in srgb, var(--num-accent) 14%, transparent), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s var(--ease-standard);
+}
+.num-card:hover .num-card-aura { opacity: 1; }
+
+.num-card-icon {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px; height: 50px;
+  border-radius: 15px;
+  margin-bottom: 22px;
+  background: color-mix(in srgb, var(--num-accent) 14%, #fff);
+  border: 1px solid color-mix(in srgb, var(--num-accent) 26%, transparent);
+  color: var(--num-accent);
+  font-size: 20px;
+}
+.num-card-value {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  font-size: clamp(44px, 5vw, 60px);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.num-card-suffix { font-size: 0.5em; font-weight: 800; color: var(--num-accent); }
+.num-card-label {
+  position: relative;
+  z-index: 2;
+  margin-top: 12px;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.num-card-sub {
+  position: relative;
+  z-index: 2;
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-60);
+}
+
+/* Glass edge highlight (igual que .acc-glass-edge) */
+.num-card-edge {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 3;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.9),
+    inset 1px 0 0 rgba(255,255,255,0.5);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ProcesoSection — profundidad: glow ambiental, línea que se dibuja, glass cards
+   ═══════════════════════════════════════════════════════════════════════════ */
+.pv2-section {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background: linear-gradient(180deg, #FFFFFF 0%, #F6FAFE 55%, #EFF5FD 100%);
+}
+.pv2-ambient {
+  position: absolute;
+  top: 8%; right: -160px;
+  width: 560px; height: 560px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(125,211,252,0.18) 0%, transparent 70%);
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+}
+.pv2-inner { position: relative; z-index: 1; }
+
+/* Línea de color que se "dibuja" sobre el track estático */
+.pv2-line-fill {
+  position: absolute;
+  left: 43px;
+  top: 24px;
+  bottom: 24px;
+  width: 2px;
+  transform: translateX(-0.5px);
+  transform-origin: top center;
+  background: linear-gradient(to bottom, var(--cen-blue) 0%, var(--cen-accent) 100%);
+  border-radius: 2px;
+  box-shadow: 0 0 12px rgba(30,64,175,0.30);
+  pointer-events: none;
+  z-index: 1;
+}
+@media (max-width: 768px) { .pv2-line-fill { left: 31px; } }
+
+.pv2-step { z-index: 2; }
+
+/* Contenido como glass card con profundidad */
+.pv2-content {
+  position: relative;
+  overflow: hidden;
+  padding: 22px 26px 24px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.78);
+  border: 1px solid rgba(11,37,69,0.07);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    0 1px 2px rgba(11,37,69,0.04),
+    0 14px 32px -16px rgba(11,37,69,0.18);
+  transition: transform 0.3s var(--ease-standard), box-shadow 0.3s var(--ease-standard), border-color 0.3s var(--ease-standard);
+  isolation: isolate;
+}
+.pv2-step:hover .pv2-content {
+  transform: translateY(-3px);
+  border-color: rgba(30,64,175,0.22);
+  box-shadow:
+    0 2px 4px rgba(11,37,69,0.05),
+    0 24px 46px -18px rgba(30,64,175,0.28);
+}
+.pv2-content-aura {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(220px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(30,64,175,0.08), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s var(--ease-standard);
+}
+.pv2-step:hover .pv2-content-aura { opacity: 1; }
+.pv2-content > .pv2-step-label,
+.pv2-content > .pv2-step-title,
+.pv2-content > .pv2-step-desc { position: relative; z-index: 1; }
+.pv2-content-edge {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 2;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.9),
+    inset 1px 0 0 rgba(255,255,255,0.45);
+}
+/* Label "Paso N" — azul para contraste sobre la card blanca */
+.pv2-content .pv2-step-label { color: var(--cen-blue); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   AlliesBand — profundidad sutil (banda de transición, se mantiene clara)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.ab-band-light {
+  background: linear-gradient(180deg, #FFFFFF 0%, #FBFDFF 50%, #F8FAFC 100%) !important;
+  position: relative;
+  overflow: hidden;
+}
+/* Línea de acento superior — apenas perceptible */
+.ab-band-light::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(30,64,175,0.22), transparent);
+  pointer-events: none;
+}
+/* Glow central muy suave */
+.ab-band-light::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 620px; height: 260px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(ellipse, rgba(125,211,252,0.16) 0%, transparent 70%);
+  filter: blur(40px);
+  pointer-events: none;
+  z-index: 0;
+}
+.ab-band-light .allies-eyebrow,
+.ab-band-light .marquee { position: relative; z-index: 1; }
+.ab-band-light .ally-name { color: var(--ink-80); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TestimoniosSection — profundidad: fondo con relieve, glows, cards más ricas
+   ═══════════════════════════════════════════════════════════════════════════ */
+.tcv-section {
+  background: radial-gradient(ellipse 120% 85% at 50% -10%, #FFFFFF 0%, #F4F8FE 48%, #EEF4FD 100%);
+}
+/* Glows ambientales — profundidad sin oscurecer */
+.tcv-section::before {
+  content: '';
+  position: absolute;
+  top: 4%; left: -140px;
+  width: 480px; height: 480px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(30,64,175,0.10) 0%, transparent 70%);
+  filter: blur(70px);
+  pointer-events: none;
+  z-index: 0;
+}
+.tcv-section::after {
+  content: '';
+  position: absolute;
+  bottom: 0%; right: -160px;
+  width: 520px; height: 520px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(125,211,252,0.16) 0%, transparent 70%);
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+}
+.tcv-header,
+.tcv-mq-wrap { position: relative; z-index: 1; }
+
+/* Card — navy con relieve, sheen superior y borde de vidrio */
+.tcv-card {
+  position: relative;
+  background: linear-gradient(165deg, #0E2D56 0%, var(--cen-navy) 62%);
+  border: 1px solid rgba(255,255,255,0.07);
+  box-shadow:
+    0 1px 2px rgba(11,37,69,0.10),
+    0 14px 34px -16px rgba(11,37,69,0.28);
+}
+/* Sheen superior de acento */
+.tcv-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 22px; right: 22px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(125,211,252,0.55), transparent);
+  pointer-events: none;
+}
+/* Borde de vidrio interior */
+.tcv-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+}
+.tcv-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(125,211,252,0.28);
+  box-shadow:
+    0 2px 4px rgba(11,37,69,0.12),
+    0 26px 54px -18px rgba(11,37,69,0.40),
+    0 0 0 1px rgba(125,211,252,0.10);
+}
+/* Avatar con anillo sutil */
+.tcv-avatar {
+  box-shadow:
+    0 0 0 2px rgba(255,255,255,0.10),
+    0 4px 10px rgba(0,0,0,0.25);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Hero — pulido fino: aurora mesh de profundidad + badge como pill de estado
+   ═══════════════════════════════════════════════════════════════════════════ */
+/* Aurora mesh detrás del contenido (sobre el degradado base, bajo el contenido) */
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(60% 50% at 12% 18%, rgba(30,64,175,0.32) 0%, transparent 60%),
+    radial-gradient(46% 42% at 2% 84%, rgba(125,211,252,0.13) 0%, transparent 62%),
+    radial-gradient(52% 55% at 52% -4%, rgba(56,189,248,0.10) 0%, transparent 55%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Badge → pill de vidrio con punto de estado */
+.hero-badge {
+  padding: 6px 14px 6px 11px;
+  border-radius: 999px;
+  background: rgba(125,211,252,0.07);
+  border: 1px solid rgba(125,211,252,0.20);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+}
+.hero-badge::before {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(125,211,252,0.85);
+}

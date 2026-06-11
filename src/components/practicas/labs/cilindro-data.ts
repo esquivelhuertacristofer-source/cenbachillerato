@@ -63,9 +63,9 @@ export const ESCENARIOS: Escenario[] = [
     titulo: "El tambo de 200 litros",
     icono: "fa-oil-can",
     contexto:
-      "Un tambo industrial mide 0.28 m de radio y 0.88 m de altura. Comprueba que su capacidad es de unos 200 litros.",
+      "Un tambo industrial de los que se venden «de 200 litros» mide 0.28 m de radio y 0.88 m de altura. Calcula su volumen lleno al ras y compáralo con esa capacidad nominal.",
     porque:
-      "Aunque el tambo es pequeño, su volumen sale de la misma fórmula. Verás que V·1000 da los litros que anuncia el fabricante.",
+      "Su volumen lleno hasta el borde es V·1000 ≈ 217 L: un poco más que los 200 L que anuncia el fabricante, porque el tambo nunca se llena al tope y se deja un margen libre. La capacidad nominal siempre es algo menor que el volumen geométrico.",
     r: 0.28,
     h: 0.88,
     liquido: "Combustible",

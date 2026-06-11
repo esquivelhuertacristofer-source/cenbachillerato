@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { motion } from 'motion/react';
 import { springs, stagger } from '@/lib/motion/tokens';
 import { useReducedMotion } from '@/lib/motion/hooks';
+import { NumerosSection } from '../landing-cen/NumerosSection';
 import '../landing-cen/LandingCEN.css';
 import './LandingBachillerato.css';
 
@@ -25,21 +26,21 @@ const PARTICLES = [
 // ── Data ──────────────────────────────────────────────────────────────────────
 
 const CURRICULUM_CARDS = [
-  { code: 'CF',  tag: 'Tronco común',        title: 'Currículum Fundamental',          desc: '34 UAC en 6 semestres. Tronco común obligatorio para todo bachiller del sistema educativo mexicano.',  meta: '34 UAC · 6 semestres' },
+  { code: 'CF',  tag: 'Tronco común',        title: 'Currículum Fundamental',          desc: '32 UAC en 6 semestres. Tronco común obligatorio para todo bachiller del sistema educativo mexicano.',  meta: '32 UAC · 6 semestres' },
   { code: 'CFE', tag: 'Semestres 5 y 6',     title: 'Currículum Fundamental Extendido', desc: 'UAC electivas en semestres 5 y 6. Profundización disciplinar según la oferta de cada institución.',    meta: 'Electivas institucionales' },
   { code: 'CA',  tag: 'Desarrollo integral', title: 'Currículum Ampliado',              desc: '4 Ámbitos de Formación Socioemocional para el desarrollo integral del estudiante. Actividades transversales.', meta: '4 Ámbitos · Transversal' },
   { code: 'CL',  tag: 'Técnico-profesional', title: 'Currículum Laboral',               desc: 'Componentes técnicos para bachilleratos tecnológicos y profesional-técnico. Formación para el trabajo.',    meta: 'DGETI · CONALEP · DGETAyCM' },
 ];
 
 const RSC_CARDS = [
-  { code: 'LC',    name: 'Lengua y Comunicación',                            semestres: 'Semestres 1–6',      progresiones: '32 Progresiones', ejes: ['Comprensión Lectora', 'Composición de Textos', 'Debate y Retórica'],    desc: 'Lectura crítica, composición escrita, debate y comunicación asertiva.',              image: '/rsc/lc.webp'    },
-  { code: 'PM',    name: 'Pensamiento Matemático',                           semestres: 'Semestres 1–6',      progresiones: '36 Progresiones', ejes: ['Álgebra y Funciones', 'Estadística Descriptiva', 'Modelación Lógica'],   desc: 'Modelación matemática, lógica formal y resolución de problemas cotidianos.',         image: '/rsc/pm.webp'    },
-  { code: 'IN',    name: 'Inglés',                                           semestres: 'Semestres 1–4',      progresiones: '24 Progresiones', ejes: ['Comprensión Auditiva', 'Comunicación Técnica', 'Fluidez Conversacional'], desc: 'Adquisición del idioma como segunda lengua con énfasis en comunicación real.',        image: '/rsc/in.webp'    },
-  { code: 'CD',    name: 'Cultura Digital',                                  semestres: 'Semestres 1, 2 y 6', progresiones: '18 Progresiones', ejes: ['Programación y Algoritmia', 'Ciudadanía Digital', 'Colaboración Cloud'],  desc: 'Uso ético y estratégico de tecnologías de la información.',                         image: '/rsc/cd.webp'    },
-  { code: 'CH',    name: 'Conciencia Histórica',                             semestres: 'Semestres 4–6',      progresiones: '16 Progresiones', ejes: ['Memoria Histórica', 'Procesos Nacionales', 'Análisis Geopolítico'],       desc: 'Análisis crítico de procesos históricos locales y globales.',                        image: '/rsc/ch.webp'    },
-  { code: 'CS',    name: 'Ciencias Sociales',                                semestres: 'Semestres 1, 2 y 4', progresiones: '20 Progresiones', ejes: ['Estructuras Sociales', 'Derechos Humanos', 'Participación Ciudadana'],    desc: 'Estructuras socioeconómicas, derechos humanos y organización comunitaria.',          image: '/rsc/cs.webp'    },
-  { code: 'HUM',   name: 'Humanidades',                                      semestres: 'Semestres 1–3',      progresiones: '24 Progresiones', ejes: ['Ética y Valores', 'Filosofía Práctica', 'Apreciación Estética'],          desc: 'Reflexión filosófica, ética y pensamiento crítico.',                                 image: '/rsc/hum.webp'   },
-  { code: 'CNEYT', name: 'Ciencias Naturales, Experimentales y Tecnología',  semestres: 'Semestres 1–6',      progresiones: '30 Progresiones', ejes: ['Física Aplicada', 'Química Orgánica', 'Biología y Ecosistemas'],           desc: 'Comprensión científica del mundo físico con enfoque experimental.',                  image: '/rsc/cneyt.webp' },
+  { code: 'LC',    name: 'Lengua y Comunicación',                            semestres: 'Semestres 1–3',      progresiones: '23 Progresiones', ejes: ['Comprensión Lectora', 'Composición de Textos', 'Debate y Retórica'],    desc: 'Lectura crítica, composición escrita, debate y comunicación asertiva.',              image: '/rsc/lc.webp'    },
+  { code: 'PM',    name: 'Pensamiento Matemático',                           semestres: 'Semestres 1–6',      progresiones: '42 Progresiones', ejes: ['Álgebra y Funciones', 'Estadística Descriptiva', 'Modelación Lógica'],   desc: 'Modelación matemática, lógica formal y resolución de problemas cotidianos.',         image: '/rsc/pm.webp'    },
+  { code: 'IN',    name: 'Inglés',                                           semestres: 'Semestres 1–5',      progresiones: '40 Progresiones', ejes: ['Comprensión Auditiva', 'Comunicación Técnica', 'Fluidez Conversacional'], desc: 'Adquisición del idioma como segunda lengua con énfasis en comunicación real.',        image: '/rsc/in.webp'    },
+  { code: 'CD',    name: 'Cultura Digital',                                  semestres: 'Semestres 1, 2 y 6', progresiones: '17 Progresiones', ejes: ['Programación y Algoritmia', 'Ciudadanía Digital', 'Colaboración Cloud'],  desc: 'Uso ético y estratégico de tecnologías de la información.',                         image: '/rsc/cd.webp'    },
+  { code: 'CH',    name: 'Conciencia Histórica',                             semestres: 'Semestres 4–6',      progresiones: '12 Progresiones', ejes: ['Memoria Histórica', 'Procesos Nacionales', 'Análisis Geopolítico'],       desc: 'Análisis crítico de procesos históricos locales y globales.',                        image: '/rsc/ch.webp'    },
+  { code: 'CS',    name: 'Ciencias Sociales',                                semestres: 'Semestres 1, 2 y 4', progresiones: '11 Progresiones', ejes: ['Estructuras Sociales', 'Derechos Humanos', 'Participación Ciudadana'],    desc: 'Estructuras socioeconómicas, derechos humanos y organización comunitaria.',          image: '/rsc/cs.webp'    },
+  { code: 'HUM',   name: 'Humanidades',                                      semestres: 'Semestres 1–3',      progresiones: '14 Progresiones', ejes: ['Ética y Valores', 'Filosofía Práctica', 'Apreciación Estética'],          desc: 'Reflexión filosófica, ética y pensamiento crítico.',                                 image: '/rsc/hum.webp'   },
+  { code: 'CNEYT', name: 'Ciencias Naturales, Experimentales y Tecnología',  semestres: 'Semestres 1–6',      progresiones: '48 Progresiones', ejes: ['Física Aplicada', 'Química Orgánica', 'Biología y Ecosistemas'],           desc: 'Comprensión científica del mundo físico con enfoque experimental.',                  image: '/rsc/cneyt.webp' },
 ];
 
 const FEATURES = [
@@ -172,7 +173,7 @@ export default function LandingPageBachillerato() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ ...springs.smooth, delay: 0.28 }}
               >
-                34 UAC y 334 progresiones de aprendizaje al alcance de cada alumno.
+                32 UAC y 207 progresiones de aprendizaje al alcance de cada alumno.
                 Dashboard en tiempo real para cada docente.
               </motion.p>
 
@@ -197,8 +198,8 @@ export default function LandingPageBachillerato() {
                 transition={{ ...springs.smooth, delay: 0.5 }}
               >
                 {[
-                  { n: '334', l: 'Progresiones' },
-                  { n: '34',  l: 'UAC base' },
+                  { n: '207', l: 'Progresiones' },
+                  { n: '32',  l: 'UAC base' },
                   { n: '8',   l: 'RSC' },
                   { n: '6',   l: 'Semestres' },
                 ].map((s, i) => (
@@ -368,6 +369,9 @@ export default function LandingPageBachillerato() {
               ))}
             </div>
           </section>
+
+          {/* ── LA PLATAFORMA EN NÚMEROS ─────────────────────────────── */}
+          <NumerosSection />
 
           {/* ── STUDENTS BANNER ──────────────────────────────────────── */}
           <section className="students-banner">

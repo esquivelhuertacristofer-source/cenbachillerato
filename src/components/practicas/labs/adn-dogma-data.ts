@@ -169,7 +169,12 @@ export function secuenciaPorId(id: string): SecuenciaDef {
 export function limpiarADN(s: string): string {
   return s.toUpperCase().replace(/[^ATGC]/g, "").slice(0, 30);
 }
-/** Hebra molde (antiparalela) a partir de la codificante: complemento invertido. */
+/**
+ * Hebra molde a partir de la codificante: su complemento base a base (A↔T, G↔C).
+ * NO se invierte el orden: la molde se muestra alineada DEBAJO de la codificante
+ * (que va 5'→3'), de modo que cada base queda bajo su pareja y la molde se lee
+ * 3'→5'. P. ej. codificante 5'-ATGCCC-3' → molde 3'-TACGGG-5' (verbatim del A5).
+ */
 export function hebraMolde(codificante: string): string {
   return codificante
     .split("")

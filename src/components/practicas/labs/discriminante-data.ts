@@ -123,7 +123,7 @@ export const ESCENARIOS: Escenario[] = [
   { label: "Tangente (una)", icono: "fa-circle-dot", a: 1, b: -4, c: 4, k: 0, desc: "y = x² − 4x + 4 · Δ = 0 · raíz doble en x = 2 (el vértice)." },
   { label: "Sin raíces reales", icono: "fa-ban", a: 1, b: 0, c: 4, k: 0, desc: "y = x² + 4 · Δ = −16 < 0 · raíces complejas 0 ± 2i." },
   { label: "Cohete 🚀", icono: "fa-rocket", a: -5, b: 30, c: 10, k: 55, desc: "h(t) = −5t² + 30t + 10 · toca el suelo (Δ = 1100) y llega a 55 m una sola vez (tangente)." },
-  { label: "No llega a 100 m", icono: "fa-arrow-up", a: -5, b: 30, c: 10, k: 100, desc: "Para h = 100 m: Δ = −36 < 0 → el cohete nunca alcanza esa altura." },
+  { label: "No llega a 100 m", icono: "fa-arrow-up", a: -5, b: 30, c: 10, k: 100, desc: "Para h = 100 m: Δ = −900 < 0 → el cohete nunca alcanza esa altura." },
 ];
 
 /* ── La fórmula general (para el panel) ──────────────────────────────────── */

@@ -193,7 +193,7 @@ export function LabPh({ color }: PracticaLabProps) {
             <div style={{ position: "absolute", top: 58, left: 16, display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${clase.color}88`, backdropFilter: "blur(10px)" }}>
               <span style={{ width: 11, height: 11, borderRadius: 3, background: colorLiquido, border: "1px solid rgba(255,255,255,0.4)" }} />
               <span style={{ fontSize: 11.5, fontWeight: 900, color: clase.color }}>
-                {clase.etiqueta}{clase.matiz ? ` ${clase.matiz}` : ""}
+                {clase.etiqueta}{clase.matiz ? ` (${clase.matiz})` : ""}
               </span>
             </div>
 
@@ -310,7 +310,7 @@ export function LabPh({ color }: PracticaLabProps) {
               </div>
               <div>
                 <div style={{ fontSize: 22, fontWeight: 900, color: "#fff", lineHeight: 1, fontFamily: "ui-monospace, monospace" }}>pH {fmtPh(ph)}</div>
-                <div style={{ fontSize: 12, color: clase.color, fontWeight: 800 }}>{clase.etiqueta}{clase.matiz ? ` ${clase.matiz}` : ""}</div>
+                <div style={{ fontSize: 12, color: clase.color, fontWeight: 800 }}>{clase.etiqueta}{clase.matiz ? ` (${clase.matiz})` : ""}</div>
               </div>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10 }}>

@@ -260,7 +260,7 @@ export const COMPARACION: FilaComparacion[] = [
   { caracteristica: "ADN", procariota: "ADN circular en nucleoide", eucariota: "ADN lineal en cromosomas" },
   { caracteristica: "Ribosomas", procariota: "70S", eucariota: "80S" },
   { caracteristica: "Organelos", procariota: "Sin organelos membranosos", eucariota: "Organelos especializados" },
-  { caracteristica: "Tamaño", procariota: "~1–10 µm", eucariota: "~10–100 µm" },
+  { caracteristica: "Tamaño", procariota: "~0.5–5 µm", eucariota: "~10–100 µm" },
 ];
 
 /* ── Barra de tamaño (verbatim de A1, descripción accesible) ───────────────── */

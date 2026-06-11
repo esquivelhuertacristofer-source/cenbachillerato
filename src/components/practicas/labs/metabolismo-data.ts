@@ -65,7 +65,7 @@ export const ETAPAS: EtapaDef[] = [
     color: "#f97316",
     icono: "fa-rotate",
     reactivos: "2 piruvato",
-    productos: "4 CO₂ + 8 NADH + 2 FADH₂",
+    productos: "6 CO₂ + 8 NADH + 2 FADH₂",
     atp: 2,
     descripcion:
       "Paso 2 — Ciclo de Krebs (mitocondria, matriz): 2 piruvatos -> CO2 + 2 ATP + 8 NADH + 2 FADH2.",

@@ -8,7 +8,7 @@ import { useReducedMotion, useInView } from '@/lib/motion/hooks';
 const FEATURES = [
   {
     title: 'Currículo oficial alineado al 100%',
-    desc: 'Más de 34 UAC del MCCEMS 2023, el Acuerdo 09/08/23 y el Modelo Educativo vigente de la SEP.',
+    desc: '32 UAC del MCCEMS 2025, el Acuerdo 09/08/23 y el Modelo Educativo vigente de la SEP.',
   },
   {
     title: 'Compatible con todos los subsistemas',
@@ -25,8 +25,8 @@ const FEATURES = [
 ];
 
 const STATS = [
-  { icon: 'fa-book-open',    val: '34 UAC',    lbl: 'Currículo Fundamental · SEP' },
-  { icon: 'fa-check-circle', val: '100%',       lbl: 'Alineación MCCEMS 2023'      },
+  { icon: 'fa-book-open',    val: '32 UAC',    lbl: 'Currículo Fundamental · SEP' },
+  { icon: 'fa-check-circle', val: '100%',       lbl: 'Alineación MCCEMS 2025'      },
   { icon: 'fa-certificate',  val: 'Acuerdo',    lbl: '09/08/23 · SEP'              },
 ];
 
@@ -70,9 +70,9 @@ export function PorQueCEN() {
           </Link>
         </div>
 
-        {/* Columna derecha — visual con watermark "34" */}
+        {/* Columna derecha — visual con watermark "32" */}
         <div className="pqcen-visual">
-          <span className="pqcen-watermark" aria-hidden="true">34</span>
+          <span className="pqcen-watermark" aria-hidden="true">32</span>
           <div className="pqcen-stat-stack">
             {STATS.map(s => (
               <div key={s.lbl} className="pqcen-stat-card">

@@ -5,6 +5,8 @@ import { getSupabaseBrowser } from '@/lib/supabase-browser';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/dashboard/Sidebar';
 import PerformanceChart, { type WeeklyBar } from '@/components/dashboard/PerformanceChart';
+import DonutChart from '@/components/dashboard/charts/DonutChart';
+import HBarChart, { type HBarItem } from '@/components/dashboard/charts/HBarChart';
 import {
   PieChart,
   Target,
@@ -32,6 +34,7 @@ export default function ReportesPage() {
   const [students, setStudents] = useState<StudentRow[]>([]);
   const [grupoNombres, setGrupoNombres] = useState<string[]>([]);
   const [weekly, setWeekly] = useState<{ bars: WeeklyBar[]; trend: number | null }>({ bars: [], trend: null });
+  const [uacBars, setUacBars] = useState<HBarItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
   const router = useRouter();
@@ -56,7 +59,7 @@ export default function ReportesPage() {
 
       const { data: grupos } = await sb
         .from('grupos')
-        .select('id, nombre')
+        .select('id, nombre, semestre')
         .eq('id_docente', user.id);
 
       if (!grupos || grupos.length === 0) { setLoading(false); return; }
@@ -79,7 +82,7 @@ export default function ReportesPage() {
 
       const [profilesRes, intentosRes] = await Promise.all([
         sb.from('profiles').select('id, full_name, email').in('id', studentIds),
-        sb.from('intentos').select('user_id, score, tiempo_segundos, completed_at')
+        sb.from('intentos').select('user_id, actividad_id, score, tiempo_segundos, completed_at')
           .in('user_id', studentIds)
           .eq('status', 'completed'),
       ]);
@@ -143,6 +146,72 @@ export default function ReportesPage() {
       }));
 
       setStudents(enriched);
+
+      // ── Avance por asignatura (cohorte, semestre del primer grupo) ───────────
+      // Replica la semántica de getUACsConCompletionGrupo: pct = completadas /
+      // (actividades publicadas × nº de alumnos) por UAC.
+      const semestre = grupos[0]?.semestre;
+      if (semestre != null) {
+        const { data: uacs } = await sb
+          .from('uac')
+          .select('id, codigo, nombre, semestre')
+          .eq('semestre', semestre)
+          .order('orden', { ascending: true });
+
+        if (uacs && uacs.length > 0) {
+          const uacIds = uacs.map((u) => u.id);
+          const { data: progs } = await sb
+            .from('progresiones')
+            .select('id, uac_id')
+            .in('uac_id', uacIds);
+
+          const progIds = (progs ?? []).map((p) => p.id);
+          const { data: acts } = progIds.length > 0
+            ? await sb.from('actividades').select('id, progresion_id')
+                .in('progresion_id', progIds).eq('estado', 'publicada')
+            : { data: [] as { id: string; progresion_id: string }[] };
+
+          // actividad → uac
+          const progToUac = new Map<string, string>();
+          for (const p of (progs ?? []) as { id: string; uac_id: string }[]) {
+            progToUac.set(p.id, p.uac_id);
+          }
+          const actToUac = new Map<string, string>();
+          const totalActsByUac = new Map<string, number>();
+          for (const a of (acts ?? []) as { id: string; progresion_id: string }[]) {
+            const uacId = progToUac.get(a.progresion_id);
+            if (!uacId) continue;
+            actToUac.set(a.id, uacId);
+            totalActsByUac.set(uacId, (totalActsByUac.get(uacId) ?? 0) + 1);
+          }
+
+          // intentos completados de la cohorte por UAC
+          const completadasByUac = new Map<string, number>();
+          for (const it of intentos as { actividad_id: string | null }[]) {
+            if (!it.actividad_id) continue;
+            const uacId = actToUac.get(it.actividad_id);
+            if (!uacId) continue;
+            completadasByUac.set(uacId, (completadasByUac.get(uacId) ?? 0) + 1);
+          }
+
+          const totalAlumnos = studentIds.length;
+          const palette = ['#7DD3FC', '#D4A574', '#34d399', '#a78bfa', '#fb7185', '#f59e0b', '#22d3ee'];
+          const bars: HBarItem[] = uacs.map((uac, i) => {
+            const totalActs = totalActsByUac.get(uac.id) ?? 0;
+            const completadas = completadasByUac.get(uac.id) ?? 0;
+            const maxPosible = totalActs * totalAlumnos;
+            const pct = maxPosible > 0 ? Math.round((completadas / maxPosible) * 100) : 0;
+            return {
+              label: uac.codigo,
+              sublabel: uac.nombre,
+              pct,
+              color: palette[i % palette.length]!,
+            };
+          });
+          setUacBars(bars);
+        }
+      }
+
       setLoading(false);
     };
     void init();
@@ -160,10 +229,10 @@ export default function ReportesPage() {
 
     // Distribución de desempeño (sobre alumnos con actividad)
     const buckets = [
-      { label: 'Excelente (90-100)', min: 90, color: 'bg-emerald-400', count: 0 },
-      { label: 'Bueno (70-89)',      min: 70, color: 'bg-[#7DD3FC]',   count: 0 },
-      { label: 'Suficiente (60-69)', min: 60, color: 'bg-[#D4A574]',   count: 0 },
-      { label: 'En riesgo (<60)',    min: 0,  color: 'bg-rose-400',     count: 0 },
+      { label: 'Excelente (90-100)', min: 90, color: 'bg-emerald-400', hex: '#34d399', count: 0 },
+      { label: 'Bueno (70-89)',      min: 70, color: 'bg-[#7DD3FC]',   hex: '#7DD3FC', count: 0 },
+      { label: 'Suficiente (60-69)', min: 60, color: 'bg-[#D4A574]',   hex: '#D4A574', count: 0 },
+      { label: 'En riesgo (<60)',    min: 0,  color: 'bg-rose-400',     hex: '#fb7185', count: 0 },
     ];
     active.forEach((s) => {
       const b = buckets.find((bk) => s.avg_score >= bk.min)!;
@@ -411,24 +480,44 @@ export default function ReportesPage() {
                   </div>
                   <p className="text-[10px] font-black uppercase tracking-widest text-white/30">Distribución de Desempeño</p>
                 </div>
-                <div className="space-y-6">
-                  {stats.distribution.map(item => (
-                    <div key={item.label} className="space-y-3">
-                      <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
-                        <span className="text-white/50">{item.label}</span>
-                        <span className="text-white">{item.val}%</span>
-                      </div>
-                      <div className="h-2.5 w-full rounded-full overflow-hidden bg-white/5">
-                        <div className={`h-full ${item.color} rounded-full transition-all duration-1000`} style={{ width: `${item.val}%` }} />
-                      </div>
-                    </div>
-                  ))}
-                  {stats.active === 0 && (
-                    <p className="text-[11px] font-medium text-white/30 italic">Aún no hay alumnos con actividad registrada.</p>
-                  )}
-                </div>
+                {stats.active === 0 ? (
+                  <p className="text-[11px] font-medium text-white/30 italic">Aún no hay alumnos con actividad registrada.</p>
+                ) : (
+                  <DonutChart
+                    size={180}
+                    thickness={20}
+                    centerValue={stats.active}
+                    centerLabel="Activos"
+                    segments={stats.distribution
+                      .filter((d) => d.count > 0)
+                      .map((d) => ({
+                        label: d.label,
+                        value: d.count,
+                        color: d.hex,
+                      }))}
+                  />
+                )}
               </div>
             </div>
+          </div>
+
+          {/* Avance por asignatura (cohorte) */}
+          <div className="rounded-[3rem] p-10 border shadow-xl bg-white/5 border-white/5">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-[#7DD3FC]/10 text-[#7DD3FC]">
+                <Activity className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-white/30">Avance por Asignatura</p>
+                <p className="text-[11px] font-medium text-white/40 mt-1">
+                  % de actividades completadas por el grupo en cada UAC del semestre.
+                </p>
+              </div>
+            </div>
+            <HBarChart
+              items={uacBars}
+              emptyText="Aún no hay avance registrado por asignatura."
+            />
           </div>
 
           {/* Bottom quick stats */}

@@ -40,10 +40,11 @@ export const biomaDe = (temp: number, precip: number): BiomaKey => {
   if (temp <= 2) return "tundra";                       // muy frío: alta montaña
   if (temp <= 13) return precip < 400 ? "pastizal" : "bosque_templado";
   // cálido (temp > 13 °C)
-  if (precip < 250) return "desierto";
-  if (precip < 1000) return "selva_seca";
-  if (precip < 2600) return "selva_humeda";
-  return "manglar";                                     // cálido + muy húmedo (costa)
+  if (precip <= 250) return "desierto";                 // muy árido: cactáceas
+  if (precip < 600) return "pastizal";                  // semiárido cálido: mar de pastos
+  if (precip < 1000) return "selva_seca";               // estacional: bosque caducifolio
+  if (precip < 3500) return "selva_humeda";             // lluvioso todo el año: selva tropical
+  return "manglar";                                     // cálido + muy húmedo (costa salobre)
 };
 
 /* ── Los biomas (anclados a ejemplos de México, datos verbatim) ──────────── */

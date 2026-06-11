@@ -27,14 +27,21 @@ export type Tipo = "acido" | "neutro" | "base";
 export interface Clase {
   tipo: Tipo;
   etiqueta: string; // "Ácido" | "Neutro" | "Base"
-  matiz: string; // "fuerte" | "moderado" | "débil" | "" (cualitativo)
+  /**
+   * INTENSIDAD del pH según su distancia al neutro (cualitativo: "muy intenso" |
+   * "moderado" | "leve" | ""). NO confundir con la fuerza química del ácido/base
+   * (grado de disociación): el vinagre es un ácido DÉBIL aunque su pH (≈3) sea
+   * muy intenso. Esa fuerza química va en el campo `contexto` de cada sustancia.
+   */
+  matiz: string;
   color: string; // color de acento para badges
 }
 
 export function clasifica(ph: number): Clase {
   if (Math.abs(ph - 7) < 0.05) return { tipo: "neutro", etiqueta: "Neutro", matiz: "", color: "#A78BFA" };
   const d = Math.abs(ph - 7);
-  const matiz = d >= 4 ? "fuerte" : d >= 2 ? "moderado" : "débil";
+  // distancia al neutro = qué tan intenso es el pH (NO es la fuerza química)
+  const matiz = d >= 4 ? "muy intenso" : d >= 2 ? "moderado" : "leve";
   return ph < 7
     ? { tipo: "acido", etiqueta: "Ácido", matiz, color: "#FB7185" }
     : { tipo: "base", etiqueta: "Base", matiz, color: "#34D399" };

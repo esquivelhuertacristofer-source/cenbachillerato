@@ -1,0 +1,240 @@
+/* ── Carrusel de infografías de estudio ─────────────────────────── */
+
+.infg-carousel-wrap {
+  position: relative;
+  margin-bottom: 48px;
+}
+
+.infg-track {
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  padding: 4px 2px 18px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.infg-track::-webkit-scrollbar {
+  display: none;
+}
+
+.infg-card {
+  position: relative;
+  flex: 0 0 auto;
+  width: 280px;
+  scroll-snap-align: start;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: left;
+  padding: 0;
+  font-family: inherit;
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.infg-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--infg-accent-border);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45);
+}
+.infg-card:focus-visible {
+  outline: 2px solid var(--infg-accent);
+  outline-offset: 2px;
+}
+
+.infg-thumb {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.03);
+}
+.infg-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+.infg-card:hover .infg-thumb img {
+  transform: scale(1.05);
+}
+.infg-thumb::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 55%, rgba(8, 12, 24, 0.55) 100%);
+  pointer-events: none;
+}
+
+.infg-zoom {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #fff;
+  background: rgba(8, 12, 24, 0.55);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+.infg-card:hover .infg-zoom {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.infg-meta {
+  padding: 12px 14px 14px;
+}
+.infg-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 999px;
+  margin-bottom: 8px;
+}
+.infg-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.4;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── Botones de navegación ─────────────────────────── */
+.infg-nav {
+  position: absolute;
+  top: calc(50% - 40px);
+  transform: translateY(-50%);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(12, 18, 32, 0.82);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+.infg-nav:hover {
+  background: rgba(20, 28, 48, 0.95);
+  transform: translateY(-50%) scale(1.07);
+}
+.infg-nav-prev { left: -8px; }
+.infg-nav-next { right: -8px; }
+
+/* ── Lightbox ─────────────────────────── */
+.infg-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(4, 7, 16, 0.92);
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+.infg-lb-img {
+  max-width: min(94vw, 1100px);
+  max-height: 76vh;
+  border-radius: 12px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
+  object-fit: contain;
+}
+.infg-lb-caption {
+  margin-top: 18px;
+  text-align: center;
+  max-width: 720px;
+}
+.infg-lb-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 999px;
+  margin-bottom: 10px;
+}
+.infg-lb-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+  line-height: 1.45;
+}
+.infg-lb-close {
+  position: absolute;
+  top: 22px;
+  right: 24px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.infg-lb-close:hover { background: rgba(255, 255, 255, 0.14); }
+.infg-lb-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.infg-lb-nav:hover { background: rgba(255, 255, 255, 0.14); }
+.infg-lb-prev { left: 22px; }
+.infg-lb-next { right: 22px; }
+.infg-lb-counter {
+  position: absolute;
+  bottom: 26px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 640px) {
+  .infg-card { width: 230px; }
+  .infg-nav { display: none; }
+  .infg-lb-nav { width: 44px; height: 44px; }
+}

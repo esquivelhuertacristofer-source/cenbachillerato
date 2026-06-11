@@ -4,6 +4,8 @@ import { UAC_BASE } from "@/lib/mccems/estructura";
 import { getRSCColor } from "@/components/hub/hub-colors";
 import { getFichasBibliotecaTodasUAC } from "@/lib/queries/biblioteca";
 import { BibliotecaFichaGrid } from "@/components/hub/BibliotecaFichaGrid";
+import { InfografiasCarousel } from "@/components/hub/InfografiasCarousel";
+import { getInfografiasSemestre } from "@/lib/mccems/infografias";
 import Link from "next/link";
 import type { Metadata } from "next";
 
@@ -18,6 +20,7 @@ export default async function BibliotecaPage({ searchParams }: { searchParams: P
 
   const { q } = await searchParams;
   const semestre = profile.semestre ?? 1;
+  const infografias = getInfografiasSemestre(semestre);
   const uacDelSemestre = UAC_BASE.filter((u) => u.semestre === semestre);
   const codigos = uacDelSemestre.map((u) => u.codigo);
 
@@ -89,6 +92,11 @@ export default async function BibliotecaPage({ searchParams }: { searchParams: P
           </div>
         </form>
       </div>
+
+      {/* ── Carrusel de infografías (solo fuera de búsqueda) ─── */}
+      {!query && infografias.length > 0 && (
+        <InfografiasCarousel infografias={infografias} />
+      )}
 
       {/* ── Empty state si no hay fichas en DB ─── */}
       {totalFichas === 0 && (

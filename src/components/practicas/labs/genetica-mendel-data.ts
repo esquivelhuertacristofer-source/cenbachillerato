@@ -258,12 +258,13 @@ export function resolverLig(madre: GenoMadre, padre: GenoPadre): ResLig {
       const dalt = m === "d";
       celdas.push({ fila: m, col: p, etqGeno: `X^${m} Y`, feno: dalt ? "hijoDaltonico" : "hijoNormal" });
     } else {
-      const geno = normaliza1(m, p); // sobre alelos D/d
-      const feno: FenoLig = geno === "AA"
-        ? "hijaNormal"          // ambos D (representados como mayúscula)
-        : geno === "Aa"
-          ? "hijaPortadora"     // un D y un d
-          : "hijaDaltonica";    // ambos d
+      // alelos D/d de la hija: cuántas copias del recesivo (d) recibe
+      const nRecesivo = (m === "d" ? 1 : 0) + (p === "d" ? 1 : 0);
+      const feno: FenoLig = nRecesivo === 0
+        ? "hijaNormal"          // ambos D (X^D X^D)
+        : nRecesivo === 1
+          ? "hijaPortadora"     // un D y un d (X^D X^d)
+          : "hijaDaltonica";    // ambos d (X^d X^d)
       const etqGeno = `X^${m} X^${p}`;
       celdas.push({ fila: m, col: p, etqGeno, feno });
     }

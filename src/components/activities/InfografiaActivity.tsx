@@ -13,6 +13,11 @@ export function InfografiaActivity({ actividad, onProgreso }: Props) {
   const [respuesta, setRespuesta] = useState('');
   const [completado, setCompletado] = useState(false);
   const [glosarioAbierto, setGlosarioAbierto] = useState(false);
+  const [imgError, setImgError] = useState(false);
+
+  // El placeholder genérico no existe en disco; evita el ícono de imagen rota.
+  const urlImagen = contenido.url_imagen ?? '';
+  const tieneImagen = urlImagen.length > 0 && !urlImagen.includes('/placeholder/') && !imgError;
 
   const tieneContexto = Boolean(contenido.contexto_mexicano?.trim());
   const tieneGlosario = Array.isArray(contenido.glosario) && contenido.glosario.length > 0;
@@ -27,15 +32,24 @@ export function InfografiaActivity({ actividad, onProgreso }: Props) {
     <div className="mx-auto max-w-2xl space-y-6">
 
       {/* Imagen principal */}
-      <div className="rounded-xl border border-gray-200 overflow-hidden bg-white">
-        <img
-          src={contenido.url_imagen}
-          alt={contenido.descripcion_accesible ?? contenido.titulo}
-          className="w-full object-contain max-h-[500px]"
-        />
-      </div>
+      {tieneImagen ? (
+        <div className="rounded-xl border border-gray-200 overflow-hidden bg-white">
+          <img
+            src={urlImagen}
+            alt={contenido.descripcion_accesible ?? contenido.titulo}
+            className="w-full object-contain max-h-[500px]"
+            onError={() => setImgError(true)}
+          />
+        </div>
+      ) : (
+        <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50 p-10 text-center">
+          <div className="text-3xl mb-2" aria-hidden="true">🖼️</div>
+          <p className="text-sm font-semibold text-gray-500">Lámina visual en preparación</p>
+          <p className="text-xs text-gray-400 mt-1">Revisa los puntos clave y el contexto a continuación.</p>
+        </div>
+      )}
 
-      {contenido.fuente && (
+      {tieneImagen && contenido.fuente && (
         <p className="text-xs text-gray-400">Fuente: {contenido.fuente}</p>
       )}
 
