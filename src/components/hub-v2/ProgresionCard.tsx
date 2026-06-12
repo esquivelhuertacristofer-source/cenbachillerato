@@ -19,7 +19,8 @@ interface ProgresionCardProps {
   isLast: boolean;
   accentColor: string;
   accentRgb: string;
-  uacEmoji: string;
+  /** Ruta de la imagen temática (WebP) de la materia para esta tarjeta. */
+  imagenTema: string;
   onClick: () => void;
 }
 
@@ -33,7 +34,7 @@ export default function ProgresionCard({
   isLast,
   accentColor,
   accentRgb,
-  uacEmoji,
+  imagenTema,
   onClick,
 }: ProgresionCardProps) {
   const isLocked = status === "locked";
@@ -147,44 +148,36 @@ export default function ProgresionCard({
           />
         )}
 
-        {/* Left panel — colored SVG placeholder */}
+        {/* Left panel — thematic photo of the subject */}
         <div
-          className="w-full md:w-[35%] min-h-[220px] md:min-h-full relative overflow-hidden shrink-0 flex items-center justify-center p-8"
-          style={{
-            background: `linear-gradient(135deg, #011C40 0%, rgba(${accentRgb},0.10) 100%)`,
-          }}
+          className="w-full md:w-[35%] min-h-[220px] md:min-h-full relative overflow-hidden shrink-0"
+          style={{ background: "#011C40" }}
         >
-          {/* Glow blob */}
-          <div
-            className="absolute w-48 h-48 rounded-full blur-[60px] group-hover:opacity-100 transition-all duration-700"
-            style={{ background: `rgba(${accentRgb},0.08)`, opacity: 0.5 }}
+          {/* Foto temática (licencia libre, WebP optimizado) */}
+          <img
+            src={imagenTema}
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+            decoding="async"
+            width={800}
+            height={600}
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
 
-          {/* Circular placeholder with emoji */}
+          {/* Tinte de acento + degradado para legibilidad y fusión con el panel */}
           <div
-            className="relative z-10 transition-transform duration-700 group-hover:scale-110"
+            className="absolute inset-0"
             style={{
-              width: 160,
-              height: 160,
-              borderRadius: "50%",
-              background: `radial-gradient(circle, rgba(${accentRgb},0.18) 0%, rgba(${accentRgb},0.04) 100%)`,
-              border: `2px solid rgba(${accentRgb},0.20)`,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 72,
-              boxShadow: `0 0 60px rgba(${accentRgb},0.15)`,
+              background: `linear-gradient(135deg, rgba(${accentRgb},0.34) 0%, rgba(1,28,64,0.20) 50%, #011C40 100%)`,
             }}
-          >
-            {uacEmoji}
-            {/* Subtle inner gradient overlay */}
-            <div
-              className="absolute inset-0 rounded-full"
-              style={{
-                background: "linear-gradient(to bottom, transparent 40%, rgba(1,17,38,0.5) 100%)",
-              }}
-            />
-          </div>
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background: `radial-gradient(circle at 30% 30%, rgba(${accentRgb},0.18) 0%, transparent 60%)`,
+            }}
+          />
 
           {/* Número de progresión badge */}
           <div
@@ -315,13 +308,13 @@ export default function ProgresionCard({
           >
             {/* Activity type icons */}
             <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-              {actividades.map((act) => {
+              {actividades.map((act, idx) => {
                 const icon = TIPO_ICON[act.tipo] ?? "fa-star";
                 const isDoneAct = act.estado === "completada";
                 const isInProg = act.estado === "en_progreso";
                 return (
                   <div
-                    key={act.orden}
+                    key={`${act.orden}-${idx}`}
                     title={`A${act.orden}`}
                     style={{
                       width: 40,

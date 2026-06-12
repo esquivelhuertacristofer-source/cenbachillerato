@@ -4,7 +4,13 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import type { AreaColor } from "@/components/hub/hub-colors";
 import { getTipoConfig } from "@/components/hub/hub-colors";
+import { HubBreadcrumb } from "@/components/hub/HubBreadcrumb";
 import type { ActividadConEstado } from "@/lib/queries/hub";
+import {
+  NarracionProvider,
+  NarradorControl,
+  ContenidoNarrable,
+} from "@/components/activities/NarracionContext";
 
 const PHASE_LABELS = ["Activación", "Práctica", "Aplicación"];
 
@@ -48,14 +54,158 @@ export function ActivityShell({
   const isCompleta = estado === "completada";
   const isBorrador = nivel_revision === "borrador";
 
+  // Navegación lineal dentro de la progresión (footer Anterior/Siguiente).
+  const idx = actividadesProg.findIndex((a) => a.orden === ordenNum);
+  const prevAct = idx > 0 ? actividadesProg[idx - 1] : null;
+  const nextAct =
+    idx >= 0 && idx < actividadesProg.length - 1 ? actividadesProg[idx + 1] : null;
+  const actHref = (orden: number) =>
+    `/hub/uac/${uacCodigo}/progresion/${progresionNum}/actividad/${orden}`;
+
+  // Lista de actividades de la progresión: una sola fuente reutilizada por el
+  // panel lateral (desktop) y el acordeón (móvil), para no duplicar el markup.
+  const actividadLinks = actividadesProg.map((act, i) => {
+    const isActive = act.orden === ordenNum;
+    const isDone = act.estado === "completada";
+    const tc2 = getTipoConfig(act.tipo);
+    const pl = PHASE_LABELS[i] ?? `A${act.orden}`;
+    return (
+      <Link
+        key={act.id}
+        href={actHref(act.orden)}
+        className="ash-sidebar-link"
+        style={{
+          display: "flex", alignItems: "center", gap: 12,
+          padding: "12px 14px",
+          borderRadius: 14,
+          textDecoration: "none",
+          background: isActive
+            ? `rgba(${color.rgba}, 0.10)`
+            : "rgba(255,255,255,0.03)",
+          border: isActive
+            ? `1.5px solid rgba(${color.rgba}, 0.25)`
+            : "1px solid rgba(255,255,255,0.06)",
+          transition: "all 0.2s ease",
+        }}
+      >
+        <div style={{
+          width: 34, height: 34, borderRadius: 10, flexShrink: 0,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 13,
+          background: isDone
+            ? "rgba(74,222,128,0.12)"
+            : isActive
+              ? `rgba(${color.rgba}, 0.12)`
+              : "rgba(255,255,255,0.05)",
+          color: isDone ? "#4ADE80" : isActive ? color.hex : "rgba(255,255,255,0.35)",
+        }}>
+          {isDone
+            ? <i className="fa-solid fa-check" />
+            : <i className={`fa-solid ${tc2.faIcon}`} />
+          }
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{
+            fontSize: 9, fontWeight: 800, textTransform: "uppercase",
+            letterSpacing: "0.12em",
+            color: isActive ? color.hex : "rgba(255,255,255,0.28)",
+            marginBottom: 3,
+          }}>
+            A{act.orden} · {pl}
+          </div>
+          <div style={{
+            fontSize: 11, fontWeight: 600, lineHeight: 1.3,
+            color: isActive ? "#fff" : isDone ? "rgba(255,255,255,0.60)" : "rgba(255,255,255,0.48)",
+            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+          }}>
+            {act.titulo}
+          </div>
+        </div>
+        {isDone && (
+          <i className="fa-solid fa-circle-check" style={{ fontSize: 12, color: "#4ADE80", flexShrink: 0 }} />
+        )}
+      </Link>
+    );
+  });
+
   return (
-    <>
+    <NarracionProvider>
       <style>{`
         .ash-back:hover { color: #fff !important; transform: translateX(-3px); }
+        .ash-narrador:hover { background: rgba(255,255,255,0.10) !important; border-color: rgba(255,255,255,0.20) !important; }
+        .ash-narrador-eq { display: inline-flex; align-items: flex-end; gap: 2px; height: 11px; }
+        .ash-narrador-eq span {
+          width: 2px; border-radius: 1px; background: currentColor;
+          animation: ash-eq 0.9s ease-in-out infinite;
+        }
+        .ash-narrador-eq span:nth-child(1) { height: 5px; animation-delay: 0s; }
+        .ash-narrador-eq span:nth-child(2) { height: 11px; animation-delay: 0.18s; }
+        .ash-narrador-eq span:nth-child(3) { height: 7px; animation-delay: 0.36s; }
+        @keyframes ash-eq { 0%, 100% { transform: scaleY(0.4); } 50% { transform: scaleY(1); } }
         .ash-practica:hover { filter: brightness(1.18); transform: translateY(-1px); }
         .ash-sidebar-link:hover { background: rgba(255,255,255,0.07) !important; border-color: rgba(255,255,255,0.12) !important; }
+
+        /* ── Footer Anterior / Siguiente (visible en todas las pantallas) ── */
+        .ash-foot {
+          display: flex; gap: 14px;
+          margin-top: 44px; padding-top: 28px;
+          border-top: 1px solid rgba(255,255,255,0.07);
+        }
+        .ash-foot-link {
+          flex: 1 1 0; min-width: 0;
+          display: flex; flex-direction: column; gap: 7px;
+          padding: 16px 20px; border-radius: 16px; text-decoration: none;
+          background: rgba(255,255,255,0.03);
+          border: 1px solid rgba(255,255,255,0.07);
+          transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+        }
+        .ash-foot-link:hover {
+          background: rgba(255,255,255,0.06) !important;
+          border-color: rgba(255,255,255,0.16) !important;
+          transform: translateY(-2px);
+        }
+        .ash-foot-next { align-items: flex-end; text-align: right; }
+        .ash-foot-eyebrow {
+          display: inline-flex; align-items: center; gap: 8px;
+          font-size: 10px; font-weight: 900; text-transform: uppercase;
+          letter-spacing: 0.16em; color: rgba(255,255,255,0.40);
+        }
+        .ash-foot-titulo {
+          max-width: 100%;
+          font-size: 14px; font-weight: 700; color: #fff; line-height: 1.3;
+          overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+
+        /* ── Acordeón móvil: reemplaza al panel lateral oculto en <1023px ── */
+        .ash-accordion { display: none; margin-bottom: 28px; }
+        .ash-accordion-summary {
+          display: flex; align-items: center; justify-content: space-between; gap: 12px;
+          padding: 14px 18px; cursor: pointer; list-style: none;
+          border-radius: 14px;
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,255,255,0.08);
+          font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.14em;
+          color: rgba(255,255,255,0.55);
+        }
+        .ash-accordion-summary::-webkit-details-marker { display: none; }
+        .ash-accordion[open] .ash-accordion-summary { border-radius: 14px 14px 0 0; border-bottom-color: transparent; }
+        .ash-accordion[open] .ash-accordion-chevron { transform: rotate(180deg); }
+        .ash-accordion-chevron { transition: transform 0.2s ease; font-size: 11px; }
+        .ash-accordion-count {
+          display: inline-flex; align-items: center; gap: 10px;
+          color: rgba(255,255,255,0.35); font-weight: 700; letter-spacing: 0.06em;
+        }
+        .ash-accordion-body {
+          display: flex; flex-direction: column; gap: 6px;
+          padding: 12px;
+          border: 1px solid rgba(255,255,255,0.08); border-top: none;
+          border-radius: 0 0 14px 14px;
+          background: rgba(255,255,255,0.02);
+        }
+
         @media (max-width: 1023px) {
           .ash-sidebar { display: none !important; }
+          .ash-accordion { display: block; }
         }
         @media (max-width: 640px) {
           .ash-hero { padding: 32px 20px 36px !important; }
@@ -63,6 +213,8 @@ export function ActivityShell({
           .ash-body { padding: 28px 20px 80px !important; }
           .ash-title { font-size: 26px !important; }
           .ash-icon { width: 56px !important; height: 56px !important; font-size: 24px !important; border-radius: 16px !important; }
+          .ash-foot { flex-direction: column; }
+          .ash-foot-next { align-items: flex-start; text-align: left; }
         }
       `}</style>
 
@@ -112,24 +264,14 @@ export function ActivityShell({
               Propósito formativo {progresionNum}
             </Link>
             <span style={{ color: "rgba(255,255,255,0.18)", fontSize: 14, fontWeight: 300 }}>·</span>
-            <div style={{
-              display: "flex", alignItems: "center", gap: 5,
-              fontSize: 11, overflow: "hidden", minWidth: 0,
-            }}>
-              <Link href="/hub" style={{ color: "rgba(255,255,255,0.28)", textDecoration: "none", whiteSpace: "nowrap" }}>Hub</Link>
-              <span style={{ color: "rgba(255,255,255,0.16)" }}>/</span>
-              <Link
-                href={`/hub/uac/${uacCodigo}`}
-                style={{
-                  color: "rgba(255,255,255,0.28)", textDecoration: "none",
-                  whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 140,
-                }}
-              >
-                {uacNombre}
-              </Link>
-              <span style={{ color: "rgba(255,255,255,0.16)" }}>/</span>
-              <span style={{ color: "rgba(255,255,255,0.65)", fontWeight: 700 }}>A{ordenNum} · {phaseLabel}</span>
-            </div>
+            <HubBreadcrumb
+              accentHex={color.hex}
+              items={[
+                { label: "Hub", href: "/hub" },
+                { label: uacNombre, href: `/hub/uac/${uacCodigo}`, maxWidth: 140 },
+                { label: `A${ordenNum} · ${phaseLabel}` },
+              ]}
+            />
           </nav>
 
           {/* Hero content */}
@@ -186,6 +328,7 @@ export function ActivityShell({
                   }}>
                     +{xp} XP
                   </span>
+                  <NarradorControl accentHex={color.hex} />
                   {isCompleta && (
                     <span style={{
                       fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.14em",
@@ -274,7 +417,74 @@ export function ActivityShell({
         >
           {/* Main content */}
           <div style={{ flex: 1, minWidth: 0 }}>
-            {children}
+            {/* Acordeón móvil: el panel lateral se oculta en <1023px, así que
+                aquí vive la navegación de la progresión para pantallas chicas. */}
+            {actividadesProg.length > 0 && (
+              <details className="ash-accordion">
+                <summary className="ash-accordion-summary">
+                  <span>En este propósito formativo</span>
+                  <span className="ash-accordion-count">
+                    A{ordenNum} de {actividadesProg.length}
+                    <i className="fa-solid fa-chevron-down ash-accordion-chevron" />
+                  </span>
+                </summary>
+                <div className="ash-accordion-body">{actividadLinks}</div>
+              </details>
+            )}
+
+            <ContenidoNarrable>{children}</ContenidoNarrable>
+
+            {/* Footer Anterior / Siguiente — fuera del @media que oculta el
+                panel lateral, así que también sirve en móvil. */}
+            {actividadesProg.length > 0 && (
+              <nav className="ash-foot">
+                {prevAct ? (
+                  <Link href={actHref(prevAct.orden)} className="ash-foot-link">
+                    <span className="ash-foot-eyebrow">
+                      <i className="fa-solid fa-arrow-left" /> Anterior
+                    </span>
+                    <span className="ash-foot-titulo">{prevAct.titulo}</span>
+                  </Link>
+                ) : (
+                  <Link href={backHref} className="ash-foot-link">
+                    <span className="ash-foot-eyebrow">
+                      <i className="fa-solid fa-arrow-left" /> Volver
+                    </span>
+                    <span className="ash-foot-titulo">Propósito formativo {progresionNum}</span>
+                  </Link>
+                )}
+
+                {nextAct ? (
+                  <Link
+                    href={actHref(nextAct.orden)}
+                    className="ash-foot-link ash-foot-next"
+                    style={{
+                      background: `rgba(${color.rgba}, 0.07)`,
+                      borderColor: `rgba(${color.rgba}, 0.20)`,
+                    }}
+                  >
+                    <span className="ash-foot-eyebrow" style={{ color: color.hex }}>
+                      Siguiente <i className="fa-solid fa-arrow-right" />
+                    </span>
+                    <span className="ash-foot-titulo">{nextAct.titulo}</span>
+                  </Link>
+                ) : (
+                  <Link
+                    href={backHref}
+                    className="ash-foot-link ash-foot-next"
+                    style={{
+                      background: `rgba(${color.rgba}, 0.07)`,
+                      borderColor: `rgba(${color.rgba}, 0.20)`,
+                    }}
+                  >
+                    <span className="ash-foot-eyebrow" style={{ color: color.hex }}>
+                      Terminar <i className="fa-solid fa-flag-checkered" />
+                    </span>
+                    <span className="ash-foot-titulo">Volver al propósito formativo</span>
+                  </Link>
+                )}
+              </nav>
+            )}
           </div>
 
           {/* Sidebar */}
@@ -299,69 +509,7 @@ export function ActivityShell({
                 En esta progresión
               </div>
 
-              {actividadesProg.map((act, i) => {
-                const isActive = act.orden === ordenNum;
-                const isDone = act.estado === "completada";
-                const tc2 = getTipoConfig(act.tipo);
-                const pl = PHASE_LABELS[i] ?? `A${act.orden}`;
-                return (
-                  <Link
-                    key={act.id}
-                    href={`/hub/uac/${uacCodigo}/progresion/${progresionNum}/actividad/${act.orden}`}
-                    className="ash-sidebar-link"
-                    style={{
-                      display: "flex", alignItems: "center", gap: 12,
-                      padding: "12px 14px",
-                      borderRadius: 14,
-                      textDecoration: "none",
-                      background: isActive
-                        ? `rgba(${color.rgba}, 0.10)`
-                        : "rgba(255,255,255,0.03)",
-                      border: isActive
-                        ? `1.5px solid rgba(${color.rgba}, 0.25)`
-                        : "1px solid rgba(255,255,255,0.06)",
-                      transition: "all 0.2s ease",
-                    }}
-                  >
-                    <div style={{
-                      width: 34, height: 34, borderRadius: 10, flexShrink: 0,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 13,
-                      background: isDone
-                        ? "rgba(74,222,128,0.12)"
-                        : isActive
-                          ? `rgba(${color.rgba}, 0.12)`
-                          : "rgba(255,255,255,0.05)",
-                      color: isDone ? "#4ADE80" : isActive ? color.hex : "rgba(255,255,255,0.35)",
-                    }}>
-                      {isDone
-                        ? <i className="fa-solid fa-check" />
-                        : <i className={`fa-solid ${tc2.faIcon}`} />
-                      }
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{
-                        fontSize: 9, fontWeight: 800, textTransform: "uppercase",
-                        letterSpacing: "0.12em",
-                        color: isActive ? color.hex : "rgba(255,255,255,0.28)",
-                        marginBottom: 3,
-                      }}>
-                        A{act.orden} · {pl}
-                      </div>
-                      <div style={{
-                        fontSize: 11, fontWeight: 600, lineHeight: 1.3,
-                        color: isActive ? "#fff" : isDone ? "rgba(255,255,255,0.60)" : "rgba(255,255,255,0.48)",
-                        overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                      }}>
-                        {act.titulo}
-                      </div>
-                    </div>
-                    {isDone && (
-                      <i className="fa-solid fa-circle-check" style={{ fontSize: 12, color: "#4ADE80", flexShrink: 0 }} />
-                    )}
-                  </Link>
-                );
-              })}
+              {actividadLinks}
 
               <Link
                 href={backHref}
@@ -384,6 +532,6 @@ export function ActivityShell({
           )}
         </div>
       </div>
-    </>
+    </NarracionProvider>
   );
 }

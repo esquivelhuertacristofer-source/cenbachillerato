@@ -100,16 +100,22 @@ function RecursosContent() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const prof = await getCurrentProfile();
-      if (cancelled) return;
-      if (!prof) {
-        router.replace("/log-in");
-        return;
+      try {
+        const prof = await getCurrentProfile();
+        if (cancelled) return;
+        if (!prof) {
+          router.replace("/log-in");
+          return;
+        }
+        const data = await getRecursosSemestreBrowser(prof.userId, prof.semestre);
+        if (cancelled) return;
+        setItems(data);
+      } catch {
+        // Una query que falle deja la lista vacía (se muestra el estado vacío),
+        // nunca un skeleton infinito.
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-      const data = await getRecursosSemestreBrowser(prof.userId, prof.semestre);
-      if (cancelled) return;
-      setItems(data);
-      setLoading(false);
     })();
     return () => {
       cancelled = true;
@@ -150,6 +156,22 @@ function RecursosContent() {
 
   return (
     <div className="hub-v2-page">
+      {/* ── Acceso directo a la pantalla de laboratorios 3D ─── */}
+      <Link href="/hub/recursos/laboratorios" className="recursos-labs-banner">
+        <span className="recursos-labs-banner-icon">
+          <i className="fa-solid fa-flask" />
+        </span>
+        <span className="recursos-labs-banner-body">
+          <span className="recursos-labs-banner-titulo">Laboratorios 3D</span>
+          <span className="recursos-labs-banner-sub">
+            Abre todas las prácticas experimentales de tu semestre en un solo lugar.
+          </span>
+        </span>
+        <span className="recursos-labs-banner-cta">
+          Ver todos <i className="fa-solid fa-arrow-right" />
+        </span>
+      </Link>
+
       {/* ── Panel único: tabs fusionadas con el hero del tipo activo ─── */}
       {metaActivo && heroActivo && (
         <section
@@ -221,7 +243,7 @@ function RecursosContent() {
             return (
               <Link
                 key={it.id}
-                href={`/hub/uac/${it.uacCodigo}/progresion/${it.progresionId}/actividad/${it.orden}`}
+                href={`/hub/uac/${it.uacCodigo}/progresion/${it.progresionNumero}/actividad/${it.orden}`}
                 className={`recursos-card ${est.className}`}
                 style={{ "--chip-color": m.color } as React.CSSProperties}
               >

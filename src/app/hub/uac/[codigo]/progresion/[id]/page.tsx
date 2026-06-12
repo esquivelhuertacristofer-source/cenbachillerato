@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { getUser, getProfile } from "@/lib/supabase-helpers";
 import { getUACPorCodigo } from "@/lib/mccems/estructura";
-import { getActividadesConEstado } from "@/lib/queries/hub";
+import { getActividadesConEstado, getSiguienteProgresion } from "@/lib/queries/hub";
 import { getRSCColor } from "@/components/hub/hub-colors";
 import { ProgresionClient } from "@/components/hub-v2/ProgresionClient";
 import type { Metadata } from "next";
@@ -39,6 +39,7 @@ export default async function ProgresionPage({ params }: Props) {
   if (!progresion) notFound();
 
   const color = getRSCColor(uac.recursoCodigo ?? null);
+  const siguiente = await getSiguienteProgresion(codigo, numParsed);
 
   return (
     <ProgresionClient
@@ -48,6 +49,7 @@ export default async function ProgresionPage({ params }: Props) {
       actividades={actividades}
       color={color}
       numParsed={numParsed}
+      siguiente={siguiente}
     />
   );
 }

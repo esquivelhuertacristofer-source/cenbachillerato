@@ -4,6 +4,7 @@ import { getUACPorCodigo } from "@/lib/mccems/estructura";
 import { getActividadConContenido, getActividadesConEstado } from "@/lib/queries/hub";
 import { getRSCColor } from "@/components/hub/hub-colors";
 import { ActivityRunner } from "@/components/hub/ActivityRunner";
+import { extraerGlosarioPresente } from "@/lib/glosario/extraer";
 import type { Metadata } from "next";
 
 type Props = {
@@ -48,6 +49,17 @@ export default async function ActividadPage({ params }: Props) {
   const LABELS = ["Activación", "Práctica", "Aplicación"];
   const phaseLabel = LABELS[ordenNum - 1] ?? `Actividad ${ordenNum}`;
 
+  // Glosario de la materia presente en la prosa (solo lecturas). Se calcula en
+  // el servidor para no enviar el diccionario completo al cliente: sólo viaja
+  // el pequeño subconjunto {t,d}[] de términos que realmente aparecen.
+  const glosario =
+    actividad.tipo === "lectura"
+      ? extraerGlosarioPresente(
+          codigo,
+          (actividad.contenido as { texto?: string } | null)?.texto ?? "",
+        )
+      : [];
+
   return (
     <ActivityRunner
       actividadId={actividad.id}
@@ -67,6 +79,7 @@ export default async function ActividadPage({ params }: Props) {
       progresionNum={progNum}
       ordenNum={ordenNum}
       phaseLabel={phaseLabel}
+      glosario={glosario}
       actividadesProg={actividadesProg}
       practicaHref={
         actividad.practica_slug

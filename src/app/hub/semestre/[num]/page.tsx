@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { getUser } from "@/lib/supabase-helpers";
+import { getUser, getProfile } from "@/lib/supabase-helpers";
 import { UACCard } from "@/components/hub/UACCard";
 import { UAC_BASE } from "@/lib/mccems/estructura";
 import { RECURSOS_SOCIOCOGNITIVOS } from "@/lib/mccems/recursos-sociocognitivos";
@@ -23,10 +23,38 @@ export default async function SemestrePage({ params }: Props) {
   const user = await getUser();
   if (!user) redirect("/log-in");
 
+  const profile = await getProfile(user.id);
+  if (!profile) redirect("/log-in");
+
+  const miSemestre = profile.semestre ?? 1;
+  const esExploracion = miSemestre !== semestre;
+
   const uacSemestre = UAC_BASE.filter((uac) => uac.semestre === semestre);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 28, maxWidth: 1100 }}>
+
+      {esExploracion && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap',
+          background: '#FEF3C7', border: '1px solid #FDE68A', borderRadius: 14,
+          padding: '12px 16px',
+        }}>
+          <i className="fa-solid fa-compass" style={{ fontSize: 16, color: '#B45309' }} />
+          <span style={{ fontSize: 13, color: '#92400E', fontWeight: 600, flex: 1, minWidth: 200 }}>
+            Estás explorando el {semestre}.º semestre. Tu semestre es el {miSemestre}.º — aquí no se guarda tu progreso.
+          </span>
+          <a href="/hub" style={{
+            display: 'inline-flex', alignItems: 'center', gap: 7,
+            background: '#0B2545', color: '#fff', textDecoration: 'none',
+            borderRadius: 999, padding: '8px 16px', fontSize: 12.5, fontWeight: 700,
+            whiteSpace: 'nowrap',
+          }}>
+            <i className="fa-solid fa-arrow-left" style={{ fontSize: 10 }} />
+            Volver a mi hub
+          </a>
+        </div>
+      )}
 
       <div>
         <nav style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'rgba(11,37,69,0.45)', marginBottom: 12 }}>

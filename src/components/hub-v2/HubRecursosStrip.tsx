@@ -18,9 +18,13 @@ export default function HubRecursosStrip({
 
   useEffect(() => {
     let cancelled = false;
-    getProgresoRecursosSemestre(userId, semestre).then((d) => {
-      if (!cancelled) setDatos(d);
-    });
+    getProgresoRecursosSemestre(userId, semestre)
+      .then((d) => {
+        if (!cancelled) setDatos(d);
+      })
+      .catch(() => {
+        if (!cancelled) setDatos([]);
+      });
     return () => {
       cancelled = true;
     };

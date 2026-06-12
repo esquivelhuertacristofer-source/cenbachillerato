@@ -2,13 +2,16 @@
 
 import { useState } from 'react';
 import type { ActividadInfografia, CallbackProgreso } from '@/types/activities';
+import { imagenDeLectura } from '@/lib/contenido/lectura-imagenes';
 
 interface Props {
   actividad: ActividadInfografia;
   onProgreso?: CallbackProgreso;
+  /** Código de la UAC, para elegir una imagen temática cuando no hay lámina propia. */
+  uacCodigo?: string;
 }
 
-export function InfografiaActivity({ actividad, onProgreso }: Props) {
+export function InfografiaActivity({ actividad, onProgreso, uacCodigo }: Props) {
   const { contenido } = actividad;
   const [respuesta, setRespuesta] = useState('');
   const [completado, setCompletado] = useState(false);
@@ -18,6 +21,8 @@ export function InfografiaActivity({ actividad, onProgreso }: Props) {
   // El placeholder genérico no existe en disco; evita el ícono de imagen rota.
   const urlImagen = contenido.url_imagen ?? '';
   const tieneImagen = urlImagen.length > 0 && !urlImagen.includes('/placeholder/') && !imgError;
+  // Sin lámina propia → imagen temática con licencia libre acorde a la materia.
+  const imagenTematica = imagenDeLectura(uacCodigo, contenido.titulo);
 
   const tieneContexto = Boolean(contenido.contexto_mexicano?.trim());
   const tieneGlosario = Array.isArray(contenido.glosario) && contenido.glosario.length > 0;
@@ -42,10 +47,19 @@ export function InfografiaActivity({ actividad, onProgreso }: Props) {
           />
         </div>
       ) : (
-        <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50 p-10 text-center">
-          <div className="text-3xl mb-2" aria-hidden="true">🖼️</div>
-          <p className="text-sm font-semibold text-gray-500">Lámina visual en preparación</p>
-          <p className="text-xs text-gray-400 mt-1">Revisa los puntos clave y el contexto a continuación.</p>
+        <div className="rounded-xl border border-gray-200 overflow-hidden bg-white relative">
+          <img
+            src={imagenTematica}
+            alt={contenido.descripcion_accesible ?? contenido.titulo}
+            className="w-full object-cover h-56"
+          />
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{ background: 'linear-gradient(to top, rgba(1,17,38,0.55) 0%, rgba(1,17,38,0.10) 40%, transparent 70%)' }}
+          />
+          <p className="absolute bottom-3 left-4 right-4 text-xs font-medium text-white/85">
+            {contenido.titulo}
+          </p>
         </div>
       )}
 

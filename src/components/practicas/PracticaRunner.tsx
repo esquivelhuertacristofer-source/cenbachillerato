@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { AreaColor } from "@/components/hub/hub-colors";
+import { HubBreadcrumb } from "@/components/hub/HubBreadcrumb";
 import { getPractica } from "./registry";
 
 interface PracticaRunnerProps {
@@ -96,18 +97,14 @@ export function PracticaRunner({
               Volver al ejercicio
             </Link>
             <span style={{ color: "rgba(255,255,255,0.18)", fontSize: 14, fontWeight: 300 }}>·</span>
-            <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, overflow: "hidden", minWidth: 0 }}>
-              <Link href="/hub" style={{ color: "rgba(255,255,255,0.28)", textDecoration: "none", whiteSpace: "nowrap" }}>Hub</Link>
-              <span style={{ color: "rgba(255,255,255,0.16)" }}>/</span>
-              <Link
-                href={`/hub/uac/${uacCodigo}`}
-                style={{ color: "rgba(255,255,255,0.28)", textDecoration: "none", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 140 }}
-              >
-                {uacNombre}
-              </Link>
-              <span style={{ color: "rgba(255,255,255,0.16)" }}>/</span>
-              <span style={{ color: "rgba(255,255,255,0.65)", fontWeight: 700, whiteSpace: "nowrap" }}>P{progresionNum} · A{ordenNum} · Práctica</span>
-            </div>
+            <HubBreadcrumb
+              accentHex={color.hex}
+              items={[
+                { label: "Hub", href: "/hub" },
+                { label: uacNombre, href: `/hub/uac/${uacCodigo}`, maxWidth: 140 },
+                { label: `P${progresionNum} · A${ordenNum} · Práctica` },
+              ]}
+            />
           </nav>
 
           {/* Hero content */}

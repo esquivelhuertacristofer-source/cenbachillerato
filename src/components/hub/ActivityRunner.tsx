@@ -39,6 +39,8 @@ interface ActivityRunnerProps {
   actividadesProg: ActividadConEstado[];
   nivel_revision?: string | null;
   practicaHref?: string | null;
+  /** Términos del glosario de la materia presentes en la prosa (solo lectura). */
+  glosario?: { t: string; d: string }[];
 }
 
 export function ActivityRunner({
@@ -60,6 +62,7 @@ export function ActivityRunner({
   actividadesProg,
   nivel_revision,
   practicaHref,
+  glosario,
 }: ActivityRunnerProps) {
   const router = useRouter();
 
@@ -70,7 +73,16 @@ export function ActivityRunner({
         respuestas: resultado.respuestas,
         tiempoSegundos: resultado.tiempoSegundos,
       });
-      router.push(backHref);
+      // Avanzar a la siguiente actividad de la progresión. Si es la última,
+      // volver a la progresión (ahí vive la celebración de "completada").
+      const idx = actividadesProg.findIndex((a) => a.orden === ordenNum);
+      const next =
+        idx >= 0 && idx < actividadesProg.length - 1 ? actividadesProg[idx + 1] : null;
+      router.push(
+        next
+          ? `/hub/uac/${uacCodigo}/progresion/${progresionNum}/actividad/${next.orden}`
+          : backHref
+      );
     }
   }
 
@@ -102,6 +114,9 @@ export function ActivityRunner({
           color={color}
           estado={estado}
           respuestasIntento={respuestasIntento ?? undefined}
+          glosario={glosario}
+          materia={uacNombre}
+          uacCodigo={uacCodigo}
         />
       </ActivityShell>
     );
@@ -175,7 +190,7 @@ export function ActivityRunner({
   if (tipo === "infografia") {
     return (
       <ActivityShell {...shellProps}>
-        <InfografiaActivity actividad={{ ...base, tipo: "infografia", contenido: contenido as never }} onProgreso={handleProgreso} />
+        <InfografiaActivity actividad={{ ...base, tipo: "infografia", contenido: contenido as never }} onProgreso={handleProgreso} uacCodigo={uacCodigo} />
       </ActivityShell>
     );
   }

@@ -301,6 +301,40 @@ export async function getProgresionesConEstado(
   });
 }
 
+// ─── getSiguienteProgresion ───────────────────────────────────────────────────
+
+/**
+ * Siguiente propósito formativo (la progresión con el menor `numero` mayor al
+ * actual) de la misma UAC, o null si el actual es el último. Alimenta el CTA
+ * "Siguiente propósito →" al completar una progresión. Consulta ligera: solo
+ * numero + titulo, sin actividades ni intentos.
+ */
+export async function getSiguienteProgresion(
+  codigoUAC: string,
+  numeroActual: number
+): Promise<{ numero: number; titulo: string } | null> {
+  const sb = await getSupabaseServer();
+
+  const { data: uacRow } = await sb
+    .from("uac")
+    .select("id")
+    .eq("codigo", codigoUAC)
+    .single();
+  if (!uacRow) return null;
+
+  const { data: sig } = await sb
+    .from("progresiones")
+    .select("numero, titulo")
+    .eq("uac_id", uacRow.id)
+    .eq("es_placeholder", false)
+    .gt("numero", numeroActual)
+    .order("numero")
+    .limit(1)
+    .maybeSingle();
+
+  return sig ?? null;
+}
+
 // ─── getActividadesConEstado ──────────────────────────────────────────────────
 
 /**

@@ -1,0 +1,65 @@
+{
+  "generado": "Wikimedia Commons API",
+  "creditos": [
+    {
+      "tema": "filosofia",
+      "archivo": "temas/filosofia.webp",
+      "titulo": "File:Socrate du Louvre.jpg",
+      "licencia": "CC BY-SA 2.5",
+      "autor": "Copy of Lysippos (?)",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Socrate_du_Louvre.jpg",
+      "query": "Socrates marble bust sculpture",
+      "dims": "1500×2000"
+    },
+    {
+      "tema": "sociales",
+      "archivo": "temas/sociales.webp",
+      "titulo": "File:Max Rudin speaking to crowd at James Baldwin plaque unveiling at 81 Horatio Street 10-7-15.jpg",
+      "licencia": "CC BY 2.0",
+      "autor": "Village Preservation (Greenwich Village Society for Historic Preservation)",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Max_Rudin_speaking_to_crowd_at_James_Baldwin_plaque_unveiling_at_81_Horatio_Street_10-7-15.jpg",
+      "query": "crowd people city street society",
+      "dims": "2352×1568"
+    },
+    {
+      "tema": "historia",
+      "archivo": "temas/historia.webp",
+      "titulo": "File:Ancient Roman City - Columns Area.jpg",
+      "licencia": "CC BY-SA 4.0",
+      "autor": "Hisham Mansour Zayadnh",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Ancient_Roman_City_-_Columns_Area.jpg",
+      "query": "ancient roman ruins columns",
+      "dims": "4000×6000"
+    },
+    {
+      "tema": "digital",
+      "archivo": "temas/digital.webp",
+      "titulo": "File:Code on computer monitor (Unsplash).jpg",
+      "licencia": "CC0",
+      "autor": "Markus Spiske markusspiske",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Code_on_computer_monitor_(Unsplash).jpg",
+      "query": "computer code programming screen",
+      "dims": "5760×3840"
+    },
+    {
+      "tema": "lengua",
+      "archivo": "temas/lengua.webp",
+      "titulo": "File:Aufgeschlagenes Buch -- 2020 -- 4195-201.jpg",
+      "licencia": "CC BY-SA 4.0",
+      "autor": "Dietmar Rabich",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Aufgeschlagenes_Buch_--_2020_--_4195-201.jpg",
+      "query": "open book pages photograph macro",
+      "dims": "5739×4304"
+    },
+    {
+      "tema": "ingles",
+      "archivo": "temas/ingles.webp",
+      "titulo": "File:Wooden Block Letters Vision.jpg",
+      "licencia": "CC0",
+      "autor": "WOKANDAPIX",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Wooden_Block_Letters_Vision.jpg",
+      "query": "scrabble letters wooden tiles",
+      "dims": "1920×1283"
+    }
+  ]
+}

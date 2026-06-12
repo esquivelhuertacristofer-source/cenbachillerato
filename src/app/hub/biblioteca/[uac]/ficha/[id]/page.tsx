@@ -2,6 +2,7 @@ import { redirect, notFound } from "next/navigation";
 import { getUser, getProfile } from "@/lib/supabase-helpers";
 import { UAC_BASE } from "@/lib/mccems/estructura";
 import { getRSCColor } from "@/components/hub/hub-colors";
+import { imagenDeLectura } from "@/lib/contenido/lectura-imagenes";
 import { getFichaBiblioteca, marcarFichaLeida } from "@/lib/queries/biblioteca";
 import { FichaHeroSection } from "@/components/hub/FichaHeroSection";
 import type { SeccionContenido } from "@/lib/queries/biblioteca";
@@ -15,7 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return { title: `Ficha · ${id} — CEN Bachillerato` };
 }
 
-function RenderSeccion({ seccion }: { seccion: SeccionContenido }) {
+function RenderSeccion({ seccion, uacCodigo }: { seccion: SeccionContenido; uacCodigo: string }) {
   switch (seccion.tipo) {
     case "subtitulo":
       return (
@@ -90,11 +91,18 @@ function RenderSeccion({ seccion }: { seccion: SeccionContenido }) {
       );
     }
 
-    case "imagen":
+    case "imagen": {
+      // Si la ficha no trae imagen propia (o apunta a un placeholder), usamos una
+      // imagen temática con licencia libre acorde al área de la UAC.
+      const tieneImagenReal =
+        !!seccion.url && !/placeholder/i.test(seccion.url);
+      const src = tieneImagenReal
+        ? seccion.url!
+        : imagenDeLectura(uacCodigo, seccion.alt ?? seccion.caption ?? "");
       return (
         <figure style={{ margin: "28px 0" }}>
           <img
-            src={seccion.url ?? "/biblioteca/placeholder-ficha.svg"}
+            src={src}
             alt={seccion.alt ?? ""}
             style={{ width: "100%", borderRadius: 14, border: "1px solid rgba(255,255,255,0.08)", display: "block" }}
           />
@@ -105,6 +113,7 @@ function RenderSeccion({ seccion }: { seccion: SeccionContenido }) {
           )}
         </figure>
       );
+    }
 
     default:
       return null;
@@ -170,7 +179,7 @@ export default async function FichaPage({ params }: Props) {
                 El contenido de esta ficha estará disponible próximamente.
               </p>
             ) : (
-              secciones.map((sec, i) => <RenderSeccion key={i} seccion={sec} />)
+              secciones.map((sec, i) => <RenderSeccion key={i} seccion={sec} uacCodigo={codigo} />)
             )}
           </div>
 
@@ -247,6 +256,20 @@ export default async function FichaPage({ params }: Props) {
               style={{ display: "block", fontSize: 12, fontWeight: 700, color: color.hex, textDecoration: "none" }}
             >
               Ver más fichas de esta materia →
+            </Link>
+            <Link
+              href={`/hub/uac/${codigo}`}
+              style={{
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 7,
+                marginTop: 12,
+                background: `rgba(${color.rgba}, 0.16)`,
+                border: `1px solid rgba(${color.rgba}, 0.30)`,
+                borderRadius: 10, padding: "9px 12px",
+                fontSize: 12, fontWeight: 800, color: color.hex, textDecoration: "none",
+              }}
+            >
+              <i className="fa-solid fa-graduation-cap" style={{ fontSize: 11 }} />
+              Estudiar esta materia
             </Link>
           </div>
 

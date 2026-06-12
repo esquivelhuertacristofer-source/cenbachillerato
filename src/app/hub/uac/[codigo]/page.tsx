@@ -15,6 +15,7 @@ import {
 } from "@/lib/queries/hub-browser";
 import { getUACConfig } from "@/components/hub-v2/uac-config";
 import ProgresionTimeline from "@/components/hub-v2/ProgresionTimeline";
+import AccesosMateria from "@/components/hub-v2/AccesosMateria";
 import "../../HubV5.css";
 
 function UACPageSkeleton({ accentColor }: { accentColor: string }) {
@@ -87,14 +88,19 @@ export default function UACPage() {
     let cancelled = false;
 
     async function fetchData() {
-      const prof = await getCurrentProfile();
-      if (cancelled) return;
-      if (!prof) { router.replace("/log-in"); return; }
+      try {
+        const prof = await getCurrentProfile();
+        if (cancelled) return;
+        if (!prof) { router.replace("/log-in"); return; }
 
-      const progs = await getProgresionesConEstadoBrowser(codigo, prof.userId);
-      if (cancelled) return;
-      setProgresiones(progs);
-      setLoading(false);
+        const progs = await getProgresionesConEstadoBrowser(codigo, prof.userId);
+        if (cancelled) return;
+        setProgresiones(progs);
+      } catch {
+        // Si falla la carga, queda lista vacía en vez de skeleton infinito.
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     }
 
     fetchData();
@@ -211,6 +217,7 @@ export default function UACPage() {
           }}
         />
 
+        <div className="uac-v2-hero-grid">
         <div className="uac-v2-hero-content">
           <motion.span
             className="uac-v2-tag"
@@ -263,6 +270,36 @@ export default function UACPage() {
             {completadas} de {total > 0 ? total : uac.totalProgresionesEsperadas} propósitos formativos
             completados. Avanzá secuencialmente para desbloquear cada etapa del aprendizaje.
           </motion.p>
+
+          <motion.div
+            style={{ marginTop: 22, display: "flex", gap: 10, flexWrap: "wrap" }}
+            initial={reducedMotion ? {} : { opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...springs.smooth, delay: 0.05 + stagger.fast * 4 }}
+          >
+            <Link
+              href={`/hub/biblioteca/${codigo}`}
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                background: `rgba(${cfg.accentRgb},0.12)`,
+                border: `1px solid rgba(${cfg.accentRgb},0.22)`,
+                color: cfg.accent, textDecoration: "none",
+                borderRadius: 999, padding: "9px 18px", fontSize: 13, fontWeight: 700,
+              }}
+            >
+              <i className="fa-solid fa-book-open" style={{ fontSize: 12 }} />
+              Biblioteca de esta materia
+            </Link>
+          </motion.div>
+        </div>
+
+        {progresiones.length > 0 && (
+          <AccesosMateria
+            progresiones={progresiones}
+            codigoUAC={codigo}
+            accent={cfg.accent}
+          />
+        )}
         </div>
       </header>
 
@@ -311,7 +348,6 @@ export default function UACPage() {
             codigoUAC={codigo}
             accentColor={cfg.accent}
             accentRgb={cfg.accentRgb}
-            uacEmoji={cfg.emoji}
           />
         )}
       </main>

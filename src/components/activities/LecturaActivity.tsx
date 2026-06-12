@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'motion/react';
 import ReactMarkdown from 'react-markdown';
@@ -9,8 +9,28 @@ import { Info, Lightbulb, AlertCircle, Quote, Check, Loader2 } from 'lucide-reac
 import { springs, stagger as staggerTokens } from '@/lib/motion/tokens';
 import { useReducedMotion, useInView } from '@/lib/motion/hooks';
 import { celebrate } from '@/lib/motion/celebrate';
+import { prepararTerminos } from '@/lib/glosario/matcher';
+import { resaltarChildren, type GlosarioCtx } from '@/components/activities/GlosarioTooltip';
 import type { ActividadLectura, CallbackProgreso, CalloutLectura } from '@/types/activities';
 import type { AreaColor } from '@/components/hub/hub-colors';
+import { imagenDeLectura } from '@/lib/contenido/lectura-imagenes';
+import { useRegistrarNarracion } from '@/components/activities/NarracionContext';
+
+/** Convierte markdown a texto plano legible en voz alta (sin #, *, enlaces, etc.). */
+function markdownAPlano(md: string): string {
+  return md
+    .replace(/```[\s\S]*?```/g, ' ')          // bloques de código
+    .replace(/`([^`]+)`/g, '$1')               // código inline
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')     // imágenes
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')   // enlaces → solo el texto
+    .replace(/^#{1,6}\s+/gm, '')               // encabezados
+    .replace(/^\s*>\s?/gm, '')                  // citas
+    .replace(/^\s*[-*+]\s+/gm, '')              // viñetas
+    .replace(/[*_~]{1,3}/g, '')                 // énfasis
+    .replace(/\|/g, ' ')                         // tablas
+    .replace(/\s+/g, ' ')
+    .trim();
+}
 
 const FALLBACK_COLOR: AreaColor = {
   hex: '#38BDF8', rgba: '56,189,248', faIcon: 'fa-book-open', gradient: '',
@@ -22,6 +42,12 @@ interface Props {
   color?: AreaColor;
   estado?: 'no_iniciada' | 'en_progreso' | 'completada';
   respuestasIntento?: Record<string, string>;
+  /** Términos del glosario de la materia presentes en la prosa (verbatim, filtrados en el servidor). */
+  glosario?: { t: string; d: string }[];
+  /** Nombre de la materia, para la atribución del tooltip ("Glosario · {materia}"). */
+  materia?: string;
+  /** Código de la UAC, para elegir la imagen destacada temática. */
+  uacCodigo?: string;
 }
 
 // ── Callout ────────────────────────────────────────────────────────────────────
@@ -240,12 +266,38 @@ export function LecturaActivity({
   color = FALLBACK_COLOR,
   estado,
   respuestasIntento,
+  glosario,
+  materia,
+  uacCodigo,
 }: Props) {
   const { contenido } = actividad;
+  const imagenDestacada = imagenDeLectura(uacCodigo, actividad.titulo);
   const preguntas = contenido.preguntas_comprension ?? [];
   const callouts = contenido.callouts ?? [];
+
+  // Prosa limpia para el narrador: título + cuerpo + callouts (sin marcado).
+  const textoNarracion = useMemo(() => {
+    const cuerpo = markdownAPlano(contenido.texto ?? '');
+    const extras = (contenido.callouts ?? [])
+      .map((c) => markdownAPlano(c.contenido))
+      .join('. ');
+    return [actividad.titulo, cuerpo, extras].filter(Boolean).join('. ');
+  }, [actividad.titulo, contenido.texto, contenido.callouts]);
+  useRegistrarNarracion(textoNarracion);
   const reducedMotion = useReducedMotion();
   const [bodyRef, bodyInView] = useInView<HTMLDivElement>();
+
+  // Glosario de la materia: preparamos los términos presentes una sola vez. El
+  // resaltado es por-materia y verbatim; `seen` se recrea en cada render para
+  // que la "primera aparición por documento" se recalcule de forma estable.
+  const glosarioPrepared = useMemo(
+    () => prepararTerminos(glosario ?? []),
+    [glosario],
+  );
+  const glosarioCtx: GlosarioCtx | null =
+    glosarioPrepared.length > 0
+      ? { prepared: glosarioPrepared, seen: new Set<string>(), accent: color.hex, materia: materia ?? 'la materia' }
+      : null;
 
   const initialRespuestas = respuestasIntento
     ? Object.fromEntries(
@@ -293,7 +345,7 @@ export function LecturaActivity({
             letterSpacing: '-0.01em',
           }}
         >
-          {children}
+          {glosarioCtx ? resaltarChildren(children, glosarioCtx) : children}
         </motion.p>
       );
     },
@@ -370,7 +422,7 @@ export function LecturaActivity({
             width: 7, height: 7, borderRadius: '50%',
             background: color.hex,
           }} />
-          {children}
+          {glosarioCtx ? resaltarChildren(children, glosarioCtx) : children}
         </li>
       );
     },
@@ -511,18 +563,32 @@ export function LecturaActivity({
           }}
         >
           <Image
-            src="/biblioteca/placeholder-lectura.svg"
-            alt="Imagen destacada de la lectura"
+            src={imagenDestacada}
+            alt={`Imagen temática de ${materia ?? 'la lectura'}`}
             fill
+            sizes="(max-width: 720px) 100vw, 720px"
             style={{ objectFit: 'cover' }}
             priority
           />
-          {/* Color overlay tint */}
+          {/* Tinte de acento + oscurecido inferior para legibilidad y unidad visual */}
           <div style={{
             position: 'absolute', inset: 0,
-            background: `linear-gradient(135deg, rgba(${color.rgba}, 0.04) 0%, transparent 60%)`,
+            background: `linear-gradient(135deg, rgba(${color.rgba}, 0.20) 0%, rgba(${color.rgba}, 0.04) 45%, transparent 70%)`,
             pointerEvents: 'none',
           }} />
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'linear-gradient(to top, rgba(1,17,38,0.55) 0%, rgba(1,17,38,0.12) 35%, transparent 65%)',
+            pointerEvents: 'none',
+          }} />
+          {/* Atribución discreta: imágenes temáticas de Wikimedia Commons (licencias libres) */}
+          <span style={{
+            position: 'absolute', bottom: 8, right: 12,
+            fontSize: 10, fontWeight: 600, letterSpacing: '0.02em',
+            color: 'rgba(255,255,255,0.45)', pointerEvents: 'none',
+          }}>
+            Imagen temática · Wikimedia Commons
+          </span>
         </motion.div>
 
         {/* ── Cuerpo de la lectura ── */}

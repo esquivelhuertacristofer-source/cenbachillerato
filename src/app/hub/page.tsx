@@ -7,8 +7,11 @@ import {
   getCurrentProfile,
   getProgresionesCompletadasDeUAC,
   getProgresoSemestreBrowser,
+  getUltimaActividadActivaBrowser,
   type HubProfile,
 } from "@/lib/queries/hub-browser";
+import type { ContinuarData } from "@/lib/queries/hub";
+import { ContinuarCard } from "@/components/hub/ContinuarCard";
 import UACGrid from "@/components/hub-v2/UACGrid";
 import HubHero from "@/components/hub-v2/HubHero";
 import HubRecursosStrip from "@/components/hub-v2/HubRecursosStrip";
@@ -42,43 +45,58 @@ export default function HubPage() {
   const router = useRouter();
 
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [profile, setProfile] = useState<HubProfile | null>(null);
   const [uacs, setUACs] = useState<UACItem[]>([]);
   const [pctGlobal, setPctGlobal] = useState(0);
+  const [continuar, setContinuar] = useState<ContinuarData | null>(null);
 
   useEffect(() => {
     let cancelled = false;
 
     async function fetchData() {
-      const prof = await getCurrentProfile();
-      if (cancelled) return;
-      if (!prof) { router.replace("/log-in"); return; }
+      try {
+        const prof = await getCurrentProfile();
+        if (cancelled) return;
+        if (!prof) { router.replace("/log-in"); return; }
 
-      const semestre = prof.semestre;
-      const uacDelSemestre = UAC_BASE.filter((u) => u.semestre === semestre);
+        const semestre = prof.semestre;
+        const uacDelSemestre = UAC_BASE.filter((u) => u.semestre === semestre);
 
-      const [progreso, ...progresosUAC] = await Promise.all([
-        getProgresoSemestreBrowser(prof.userId, semestre),
-        ...uacDelSemestre.map((u) =>
-          getProgresionesCompletadasDeUAC(u.codigo, prof.userId)
-        ),
-      ]);
+        // allSettled: una query que falle (RLS, red) no tumba el hub completo.
+        // Las materias salen de UAC_BASE (config estática), así nunca desaparecen;
+        // solo el progreso quedaría en 0 si su query falla.
+        const [progresoR, continuarR, ...progresosUACR] = await Promise.allSettled([
+          getProgresoSemestreBrowser(prof.userId, semestre),
+          getUltimaActividadActivaBrowser(prof.userId, semestre),
+          ...uacDelSemestre.map((u) =>
+            getProgresionesCompletadasDeUAC(u.codigo, prof.userId)
+          ),
+        ]);
 
-      if (cancelled) return;
+        if (cancelled) return;
 
-      setPctGlobal(progreso.porcentaje);
-      setProfile(prof);
+        setPctGlobal(progresoR.status === "fulfilled" ? progresoR.value.porcentaje : 0);
+        setContinuar(continuarR.status === "fulfilled" ? continuarR.value : null);
+        setProfile(prof);
 
-      const items: UACItem[] = uacDelSemestre.map((uac, i) => {
-        const p = progresosUAC[i] ?? { completadas: 0, total: uac.totalProgresionesEsperadas, ultimaActividad: null };
-        const total = p.total > 0 ? p.total : uac.totalProgresionesEsperadas;
-        const done = p.completadas;
-        const pct = total > 0 ? Math.round((done / total) * 100) : 0;
-        return { codigo: uac.codigo, nombre: uac.nombre, done, total, pct };
-      });
+        const items: UACItem[] = uacDelSemestre.map((uac, i) => {
+          const r = progresosUACR[i];
+          const p = r && r.status === "fulfilled"
+            ? r.value
+            : { completadas: 0, total: uac.totalProgresionesEsperadas, ultimaActividad: null };
+          const total = p.total > 0 ? p.total : uac.totalProgresionesEsperadas;
+          const done = p.completadas;
+          const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+          return { codigo: uac.codigo, nombre: uac.nombre, done, total, pct };
+        });
 
-      setUACs(items);
-      setLoading(false);
+        setUACs(items);
+      } catch {
+        if (!cancelled) setError(true);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     }
 
     fetchData();
@@ -86,6 +104,31 @@ export default function HubPage() {
   }, [router]);
 
   if (loading) return <HubV2Skeleton />;
+
+  if (error) {
+    return (
+      <div className="hub-v2-page" style={{ textAlign: "center", paddingTop: 80 }}>
+        <h2 style={{ marginBottom: 12 }}>No pudimos cargar tu hub</h2>
+        <p style={{ opacity: 0.7, marginBottom: 24 }}>
+          Revisa tu conexión e inténtalo de nuevo.
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          style={{
+            padding: "10px 24px",
+            borderRadius: 10,
+            border: "none",
+            background: "var(--accent, #6366f1)",
+            color: "#fff",
+            fontWeight: 600,
+            cursor: "pointer",
+          }}
+        >
+          Reintentar
+        </button>
+      </div>
+    );
+  }
 
   const semestre = profile?.semestre ?? 1;
   const dia = getDiaDelSemestre();
@@ -102,9 +145,11 @@ export default function HubPage() {
     }))
     .filter((g) => g.items.length > 0);
 
+  const nombre = profile?.fullName?.trim().split(/\s+/)[0] ?? "Alumno";
+
   return (
     <div className="hub-v2-page">
-      {/* ── Hero ─── */}
+      {/* ── Hero del semestre — identidad y bienvenida primero ─── */}
       <HubHero
         semestre={semestre}
         pctGlobal={pctGlobal}
@@ -112,6 +157,11 @@ export default function HubPage() {
         materiasActivas={materiasActivas}
         uacs={uacs}
       />
+
+      {/* ── Continuar donde te quedaste — CTA primaria, bajo el hero del semestre ─── */}
+      <div className="hub-v2-animate" style={{ marginBottom: 56 }}>
+        <ContinuarCard data={continuar} nombre={nombre} />
+      </div>
 
       {/* ── Materias por componente curricular ─── */}
       <div id="hub-materias" style={{ scrollMarginTop: 24 }}>

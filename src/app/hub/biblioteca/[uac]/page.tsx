@@ -4,6 +4,7 @@ import { UAC_BASE } from "@/lib/mccems/estructura";
 import { getRSCColor } from "@/components/hub/hub-colors";
 import { getFichasBibliotecaUAC } from "@/lib/queries/biblioteca";
 import { BibliotecaFichaGrid } from "@/components/hub/BibliotecaFichaGrid";
+import { HubBreadcrumb } from "@/components/hub/HubBreadcrumb";
 import Link from "next/link";
 import type { Metadata } from "next";
 
@@ -43,11 +44,16 @@ export default async function BibliotecaUACPage({ params }: Props) {
     <div style={{ padding: "36px 40px 80px", maxWidth: 1200, margin: "0 auto" }}>
 
       {/* ── Breadcrumb ─── */}
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 28, fontSize: 13, color: "rgba(255,255,255,0.35)" }}>
-        <Link href="/hub/biblioteca" style={{ color: "inherit", textDecoration: "none", fontWeight: 600 }}>Biblioteca</Link>
-        <i className="fa-solid fa-chevron-right" style={{ fontSize: 9 }} />
-        <span style={{ fontWeight: 700, color: color.hex }}>{codigo}</span>
-      </div>
+      <HubBreadcrumb
+        separator="chevron"
+        accentHex={color.hex}
+        style={{ fontSize: 13, marginBottom: 28 }}
+        items={[
+          { label: "Hub", href: "/hub" },
+          { label: "Biblioteca", href: "/hub/biblioteca" },
+          { label: codigo },
+        ]}
+      />
 
       {/* ── Hero header ─── */}
       <div style={{
@@ -84,6 +90,20 @@ export default async function BibliotecaUACPage({ params }: Props) {
               </span>
             )}
           </div>
+          <Link
+            href={`/hub/uac/${codigo}`}
+            style={{
+              display: "inline-flex", alignItems: "center", gap: 8, marginTop: 16,
+              background: `rgba(${color.rgba}, 0.16)`,
+              border: `1px solid rgba(${color.rgba}, 0.30)`,
+              color: color.hex, textDecoration: "none",
+              borderRadius: 999, padding: "9px 18px", fontSize: 13, fontWeight: 700,
+            }}
+          >
+            <i className="fa-solid fa-graduation-cap" style={{ fontSize: 12 }} />
+            Ir a la ruta de aprendizaje
+            <i className="fa-solid fa-arrow-right" style={{ fontSize: 11 }} />
+          </Link>
         </div>
       </div>
 

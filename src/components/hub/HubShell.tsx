@@ -18,11 +18,132 @@ interface HubShellProps {
 }
 
 const NAV_ITEMS = [
-  { href: "/hub",            icon: "fa-house",       label: "Inicio",     exact: true  },
-  { href: "/hub/recursos",   icon: "fa-layer-group", label: "Recursos",   exact: false },
-  { href: "/hub/biblioteca", icon: "fa-book-open",   label: "Biblioteca", exact: false },
-  { href: "/hub/progreso",   icon: "fa-chart-line",  label: "Progreso",   exact: false },
+  { href: "/hub",                       icon: "fa-house",       label: "Inicio",       exact: true  },
+  { href: "/hub/recursos/laboratorios", icon: "fa-flask",       label: "Laboratorios", exact: false },
+  { href: "/hub/recursos",              icon: "fa-layer-group", label: "Recursos",     exact: false },
+  { href: "/hub/biblioteca",            icon: "fa-book-open",   label: "Biblioteca",   exact: false },
+  { href: "/hub/progreso",              icon: "fa-chart-line",  label: "Progreso",     exact: false },
 ] as const;
+
+/** Coincidencia por prefijo más largo: solo un item se ilumina aunque varias
+ *  rutas compartan prefijo (p.ej. /hub/recursos vs /hub/recursos/laboratorios). */
+function activeHrefFor(pathname: string): string | null {
+  let best: string | null = null;
+  for (const item of NAV_ITEMS) {
+    const matches = item.exact ? pathname === item.href : pathname.startsWith(item.href);
+    if (matches && (best === null || item.href.length > best.length)) {
+      best = item.href;
+    }
+  }
+  return best;
+}
+
+const SEMESTRES = [1, 2, 3, 4, 5, 6] as const;
+
+/** Selector de semestre del sidebar (tema oscuro). La etiqueta refleja el
+ *  semestre que se está viendo (deriva del pathname); el chip del semestre
+ *  del propio alumno lleva un punto para no perder su identidad. El propio
+ *  semestre lleva a /hub (con progreso); los demás a /hub/semestre/{s}. */
+function SemestreSwitcher({
+  pathname,
+  semestreActual,
+  onNavigate,
+}: {
+  pathname: string;
+  semestreActual: number;
+  onNavigate?: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const match = pathname.match(/\/hub\/semestre\/(\d+)/);
+  const viendo = match?.[1] ? parseInt(match[1], 10) : semestreActual;
+
+  return (
+    <div style={{ marginTop: 16 }}>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        aria-label="Cambiar de semestre"
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 6,
+          background: "rgba(56,189,248,0.10)",
+          border: "1px solid rgba(56,189,248,0.20)",
+          borderRadius: 999,
+          padding: "5px 12px",
+          fontSize: 11,
+          fontWeight: 800,
+          color: "#7DD3FC",
+          letterSpacing: "0.06em",
+          cursor: "pointer",
+        }}
+      >
+        <i className="fa-solid fa-graduation-cap" style={{ fontSize: 9 }} />
+        Semestre {viendo}
+        <i className={`fa-solid fa-chevron-${open ? "up" : "down"}`} style={{ fontSize: 8, marginLeft: 1, opacity: 0.7 }} />
+      </button>
+
+      {open && (
+        <div style={{ marginTop: 10 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {SEMESTRES.map((s) => {
+              const activo = s === viendo;
+              const propio = s === semestreActual;
+              return (
+                <Link
+                  key={s}
+                  href={propio ? "/hub" : `/hub/semestre/${s}`}
+                  onClick={() => {
+                    setOpen(false);
+                    onNavigate?.();
+                  }}
+                  aria-current={activo ? "page" : undefined}
+                  title={propio ? "Tu semestre" : `Explorar ${s}.º semestre`}
+                  style={{
+                    position: "relative",
+                    width: 30,
+                    height: 30,
+                    borderRadius: 9,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 13,
+                    fontWeight: 800,
+                    textDecoration: "none",
+                    background: activo ? "rgba(56,189,248,0.18)" : "rgba(255,255,255,0.04)",
+                    border: activo ? "1px solid rgba(56,189,248,0.55)" : "1px solid rgba(255,255,255,0.08)",
+                    color: activo ? "#7DD3FC" : "rgba(255,255,255,0.55)",
+                  }}
+                >
+                  {s}
+                  {propio && (
+                    <span
+                      aria-hidden
+                      style={{
+                        position: "absolute",
+                        top: 3,
+                        right: 3,
+                        width: 5,
+                        height: 5,
+                        borderRadius: "50%",
+                        background: "#FB923C",
+                      }}
+                    />
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+          <div style={{ marginTop: 7, fontSize: 9.5, color: "rgba(255,255,255,0.32)", display: "flex", alignItems: "center", gap: 5 }}>
+            <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#FB923C", flexShrink: 0 }} />
+            Tu semestre · los demás son solo de exploración
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function SidebarContent({
   pathname,
@@ -38,10 +159,7 @@ function SidebarContent({
   const nombre = profile.full_name?.split(" ")[0] ?? "Alumno";
   const initials = ((profile.full_name ?? profile.email ?? "A")[0] ?? "A").toUpperCase();
 
-  function isActive(href: string, exact: boolean) {
-    if (exact) return pathname === href;
-    return pathname.startsWith(href);
-  }
+  const activeHref = activeHrefFor(pathname);
 
   return (
     <>
@@ -61,27 +179,18 @@ function SidebarContent({
           </div>
         </Link>
 
-        {/* Semestre pill */}
-        <div style={{ marginTop: 16 }}>
-          <span style={{
-            display: "inline-flex", alignItems: "center", gap: 6,
-            background: "rgba(56,189,248,0.10)",
-            border: "1px solid rgba(56,189,248,0.20)",
-            borderRadius: 999,
-            padding: "5px 12px",
-            fontSize: 11, fontWeight: 800, color: "#7DD3FC",
-            letterSpacing: "0.06em",
-          }}>
-            <i className="fa-solid fa-graduation-cap" style={{ fontSize: 9 }} />
-            Semestre {profile.semestre ?? 1}
-          </span>
-        </div>
+        {/* Selector de semestre (antes era un pill estático) */}
+        <SemestreSwitcher
+          pathname={pathname}
+          semestreActual={profile.semestre ?? 1}
+          onNavigate={onClose}
+        />
       </div>
 
       {/* ── Nav ─── */}
       <nav style={{ flex: 1, padding: "12px 10px", display: "flex", flexDirection: "column", gap: 2 }}>
         {NAV_ITEMS.map((item) => {
-          const active = isActive(item.href, item.exact);
+          const active = item.href === activeHref;
           return (
             <Link
               key={item.href}

@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import { springs, stagger } from "@/lib/motion/tokens";
 import { useReducedMotion, useInView } from "@/lib/motion/hooks";
 import { CATEGORIA_COMPLEMENTO } from "@/lib/queries/hub-browser";
+import { imagenDePropositos } from "@/lib/mccems/tema-imagenes";
 import ProgresionCard from "./ProgresionCard";
 
 interface Actividad {
@@ -29,7 +30,6 @@ interface ProgresionTimelineProps {
   codigoUAC: string;
   accentColor: string;
   accentRgb: string;
-  uacEmoji: string;
 }
 
 export default function ProgresionTimeline({
@@ -37,7 +37,6 @@ export default function ProgresionTimeline({
   codigoUAC,
   accentColor,
   accentRgb,
-  uacEmoji,
 }: ProgresionTimelineProps) {
   const router = useRouter();
   const reducedMotion = useReducedMotion();
@@ -91,7 +90,7 @@ export default function ProgresionTimeline({
             isLast={i === progresiones.length - 1}
             accentColor={accentColor}
             accentRgb={accentRgb}
-            uacEmoji={uacEmoji}
+            imagenTema={imagenDePropositos(codigoUAC, prog.numero)}
             onClick={() => router.push(`/hub/uac/${codigoUAC}/progresion/${prog.numero}`)}
           />
         </motion.div>

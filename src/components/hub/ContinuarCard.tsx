@@ -294,7 +294,7 @@ function ContinuarCardBienvenida({ nombre }: { nombre: string }) {
         </div>
 
         <Link
-          href="#mis-materias"
+          href="#hub-materias"
           className="hub-cta-btn"
           style={{
             display: "inline-flex", alignItems: "center", gap: 10,

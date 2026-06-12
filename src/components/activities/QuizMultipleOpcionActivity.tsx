@@ -172,6 +172,10 @@ export function QuizMultipleOpcionActivity({ actividad, onProgreso, color = FALL
   const [xpGanado, setXpGanado] = useState(0);
   const [entregado, setEntregado] = useState(false);
   const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Guard síncrono contra doble-clic: el estado `verificada` llega tarde entre
+  // dos clics en el mismo tick, lo que duplicaba la respuesta y atascaba la
+  // transición de AnimatePresence. lockRef bloquea de inmediato.
+  const lockRef = useRef(false);
   const [tiempoFin, setTiempoFin] = useState(0);
 
   // Cleanup timer on unmount
@@ -192,6 +196,8 @@ export function QuizMultipleOpcionActivity({ actividad, onProgreso, color = FALL
   }, [fase]);
 
   function handleEmpezar() {
+    if (advanceTimer.current) clearTimeout(advanceTimer.current);
+    lockRef.current = false;
     setFase('quiz');
     setTiempoInicio(Date.now());
     setPreguntaActual(0);
@@ -202,7 +208,9 @@ export function QuizMultipleOpcionActivity({ actividad, onProgreso, color = FALL
   }
 
   function handleSeleccion(indice: number) {
-    if (verificada) return;
+    if (lockRef.current || verificada) return;
+    lockRef.current = true;
+    if (advanceTimer.current) clearTimeout(advanceTimer.current);
     const pregunta = preguntas[preguntaActual]!;
     const correcta = indice === pregunta.respuesta_correcta;
 
@@ -225,10 +233,13 @@ export function QuizMultipleOpcionActivity({ actividad, onProgreso, color = FALL
         setRespuestaActual(null);
         setVerificada(false);
       }
+      lockRef.current = false;
     }, reducedMotion ? 600 : delay);
   }
 
   function handleReiniciar() {
+    if (advanceTimer.current) clearTimeout(advanceTimer.current);
+    lockRef.current = false;
     fireworksFired.current = false;
     setFase('quiz');
     setPreguntaActual(0);

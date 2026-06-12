@@ -10,6 +10,7 @@ import { celebrate, fireworks } from '@/lib/motion/celebrate'
 import { ProgresionHero } from './ProgresionHero'
 import { ActivityCard } from './ActivityCard'
 import { ActivityTimeline } from './ActivityTimeline'
+import { HubBreadcrumb } from '@/components/hub/HubBreadcrumb'
 import type { AreaColor } from '@/components/hub/hub-colors'
 import type { ProgresionConEstado, ActividadConEstado } from '@/lib/queries/hub'
 import type { VisualState } from './ActivityCard'
@@ -23,6 +24,8 @@ interface Props {
   actividades: ActividadConEstado[]
   color: AreaColor
   numParsed: number
+  /** Siguiente propósito formativo de la UAC (null si éste es el último). */
+  siguiente: { numero: number; titulo: string } | null
 }
 
 function computeVisualState(
@@ -36,7 +39,7 @@ function computeVisualState(
 }
 
 export function ProgresionClient({
-  uacNombre, uacCodigo, progresion, actividades, color, numParsed,
+  uacNombre, uacCodigo, progresion, actividades, color, numParsed, siguiente,
 }: Props) {
   const reducedMotion = useReducedMotion()
   const isCompleta = progresion.estado === 'completada'
@@ -126,16 +129,14 @@ export function ProgresionClient({
           <i className="fa-solid fa-arrow-left" style={{ fontSize: 10 }} />
           {uacNombre}
         </Link>
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 6,
-          fontSize: 11, color: 'rgba(255,255,255,0.25)',
-        }}>
-          <Link href="/hub" style={{ color: 'rgba(255,255,255,0.25)', textDecoration: 'none' }}>Hub</Link>
-          <span>/</span>
-          <Link href={`/hub/uac/${uacCodigo}`} style={{ color: 'rgba(255,255,255,0.25)', textDecoration: 'none' }}>{uacCodigo}</Link>
-          <span>/</span>
-          <span style={{ color: color.hex, fontWeight: 700 }}>P-{numParsed}</span>
-        </div>
+        <HubBreadcrumb
+          accentHex={color.hex}
+          items={[
+            { label: 'Hub', href: '/hub' },
+            { label: uacCodigo, href: `/hub/uac/${uacCodigo}` },
+            { label: `P-${numParsed}` },
+          ]}
+        />
       </motion.nav>
 
       {/* Hero */}
@@ -268,21 +269,59 @@ export function ProgresionClient({
                 <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.50)', margin: 0 }}>
                   Ganaste <strong style={{ color: '#FBBF24' }}>+{xpTotal} XP</strong> en este propósito formativo.
                 </p>
+                {siguiente && (
+                  <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.40)', margin: '8px 0 0', lineHeight: 1.4 }}>
+                    Sigue · Propósito {siguiente.numero}:{' '}
+                    <strong style={{ color: 'rgba(255,255,255,0.68)', fontWeight: 700 }}>{siguiente.titulo}</strong>
+                  </p>
+                )}
               </div>
-              <Link
-                href={`/hub/uac/${uacCodigo}`}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 8,
-                  padding: '12px 24px', borderRadius: 999,
-                  background: '#4ADE80', color: '#011126',
-                  fontSize: 12, fontWeight: 900, textDecoration: 'none',
-                  textTransform: 'uppercase', letterSpacing: '0.12em',
-                  flexShrink: 0,
-                }}
-              >
-                Volver a {uacNombre}
-                <i className="fa-solid fa-arrow-right" style={{ fontSize: 10 }} />
-              </Link>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0, flexWrap: 'wrap' }}>
+                {siguiente ? (
+                  <>
+                    <Link
+                      href={`/hub/uac/${uacCodigo}/progresion/${siguiente.numero}`}
+                      style={{
+                        display: 'inline-flex', alignItems: 'center', gap: 8,
+                        padding: '12px 24px', borderRadius: 999,
+                        background: '#4ADE80', color: '#011126',
+                        fontSize: 12, fontWeight: 900, textDecoration: 'none',
+                        textTransform: 'uppercase', letterSpacing: '0.12em',
+                      }}
+                    >
+                      Siguiente propósito
+                      <i className="fa-solid fa-arrow-right" style={{ fontSize: 10 }} />
+                    </Link>
+                    <Link
+                      href={`/hub/uac/${uacCodigo}`}
+                      style={{
+                        display: 'inline-flex', alignItems: 'center', gap: 8,
+                        padding: '12px 22px', borderRadius: 999,
+                        background: 'rgba(74,222,128,0.10)', color: '#4ADE80',
+                        border: '1px solid rgba(74,222,128,0.30)',
+                        fontSize: 12, fontWeight: 800, textDecoration: 'none',
+                        textTransform: 'uppercase', letterSpacing: '0.12em',
+                      }}
+                    >
+                      Volver a la materia
+                    </Link>
+                  </>
+                ) : (
+                  <Link
+                    href={`/hub/uac/${uacCodigo}`}
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 8,
+                      padding: '12px 24px', borderRadius: 999,
+                      background: '#4ADE80', color: '#011126',
+                      fontSize: 12, fontWeight: 900, textDecoration: 'none',
+                      textTransform: 'uppercase', letterSpacing: '0.12em',
+                    }}
+                  >
+                    Volver a {uacNombre}
+                    <i className="fa-solid fa-arrow-right" style={{ fontSize: 10 }} />
+                  </Link>
+                )}
+              </div>
             </motion.div>
           )}
 

@@ -7,6 +7,8 @@
 import { createBrowserClient } from "@supabase/ssr";
 import { CATEGORIA_COMPLEMENTO } from "@/lib/mccems/categorias";
 import { ORDEN_TIPOS } from "@/lib/mccems/tipos-recurso";
+import { getUACPorCodigo } from "@/lib/mccems/estructura";
+import type { ContinuarData } from "@/lib/queries/hub";
 
 /** Tipos con etiqueta propia. Cualquier otro colapsa en un único "otro". */
 const TIPOS_CONOCIDOS = new Set(ORDEN_TIPOS);
@@ -40,13 +42,129 @@ export async function getCurrentProfile(): Promise<HubProfile | null> {
     .from("profiles")
     .select("full_name, email, semestre")
     .eq("id", user.id)
-    .single();
+    .maybeSingle();
 
   return {
     userId: user.id,
     fullName: profile?.full_name ?? null,
     email: profile?.email ?? user.email ?? null,
     semestre: profile?.semestre ?? 1,
+  };
+}
+
+/**
+ * Última actividad en progreso del alumno, o la primera no iniciada de su
+ * semestre si no hay ninguna en progreso. Alimenta la ContinuarCard del hub.
+ * Versión browser de getUltimaActividadActiva (hub.ts) usando createBrowserClient.
+ */
+export async function getUltimaActividadActivaBrowser(
+  userId: string,
+  semestre: number
+): Promise<ContinuarData | null> {
+  const sb = getClient();
+
+  // 1. Intento en progreso más reciente
+  const { data: intentoRaw } = await sb
+    .from("intentos")
+    .select("id, actividad_id, status, started_at")
+    .eq("user_id", userId)
+    .eq("status", "in_progress")
+    .order("started_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  let actividadId: string | null = intentoRaw?.actividad_id ?? null;
+
+  // 2. Si no hay en progreso, primera actividad de la primera progresión del semestre
+  if (!actividadId) {
+    const { data: uacRows } = await sb
+      .from("uac")
+      .select("id, codigo")
+      .eq("semestre", semestre);
+    if (!uacRows || uacRows.length === 0) return null;
+
+    const { data: progRows } = await sb
+      .from("progresiones")
+      .select("id, numero, uac_id")
+      .in("uac_id", uacRows.map((u) => u.id))
+      .eq("es_placeholder", false)
+      .order("numero");
+    if (!progRows || progRows.length === 0) return null;
+
+    const { data: actRow } = await sb
+      .from("actividades")
+      .select("id, codigo")
+      .in("progresion_id", progRows.map((p) => p.id))
+      .order("codigo")
+      .limit(1)
+      .maybeSingle();
+    if (!actRow) return null;
+    actividadId = actRow.id;
+  }
+
+  // 3. Detalles de la actividad
+  const { data: act } = await sb
+    .from("actividades")
+    .select("id, codigo, titulo, tipo, progresion_id")
+    .eq("id", actividadId)
+    .maybeSingle();
+  if (!act?.progresion_id) return null;
+
+  // 4. Progresión
+  const { data: prog } = await sb
+    .from("progresiones")
+    .select("id, numero, titulo, uac_id")
+    .eq("id", act.progresion_id)
+    .maybeSingle();
+  if (!prog?.uac_id) return null;
+
+  // 5. UAC
+  const { data: uac } = await sb
+    .from("uac")
+    .select("id, codigo, nombre")
+    .eq("id", prog.uac_id)
+    .maybeSingle();
+  if (!uac) return null;
+
+  const uacStatic = getUACPorCodigo(uac.codigo);
+
+  // 6. Contar actividades completadas de esta progresión
+  const { data: allActs } = await sb
+    .from("actividades")
+    .select("id, codigo")
+    .eq("progresion_id", prog.id)
+    .order("codigo");
+
+  const totalActividades = allActs?.length ?? 3;
+  const actIds = (allActs ?? []).map((a) => a.id);
+
+  let completadas = 0;
+  if (actIds.length > 0) {
+    const { data: completadosData } = await sb
+      .from("intentos")
+      .select("actividad_id")
+      .eq("user_id", userId)
+      .eq("status", "completed")
+      .in("actividad_id", actIds);
+    completadas = new Set(completadosData?.map((i) => i.actividad_id) ?? []).size;
+  }
+
+  // 7. orden desde el sufijo -A{n} del código
+  const ordenMatch = act.codigo.match(/-A(\d+)$/);
+  const orden = ordenMatch?.[1] ? parseInt(ordenMatch[1]) : 1;
+
+  return {
+    progresionId: prog.id,
+    progresionNumero: prog.numero,
+    progresionTitulo: prog.titulo,
+    uacCodigo: uac.codigo,
+    uacNombre: uac.nombre,
+    uacRscCodigo: uacStatic?.recursoCodigo ?? "RSC-LC",
+    actividadOrden: orden,
+    actividadTitulo: act.titulo,
+    actividadTipo: act.tipo,
+    actividadesCompletadas: completadas,
+    totalActividades,
   };
 }
 
@@ -67,7 +185,7 @@ export async function getProgresionesCompletadasDeUAC(
     .from("uac")
     .select("id")
     .eq("codigo", codigoUAC)
-    .single();
+    .maybeSingle();
 
   if (!uacRow) return { completadas: 0, total: 0, ultimaActividad: null };
 
@@ -453,4 +571,102 @@ export async function getRecursosSemestreBrowser(
   }
 
   return items;
+}
+
+// ─── Laboratorios 3D (todas las prácticas experimentales del semestre) ───────
+
+export interface LaboratorioItem {
+  /** id de la actividad que monta el lab. */
+  id: string;
+  /** practica_slug — clave del registro de laboratorios. */
+  slug: string;
+  /** Título de la actividad asociada. */
+  actividadTitulo: string;
+  uacCodigo: string;
+  uacNombre: string;
+  progresionNumero: number;
+  orden: number;
+  estado: "no_iniciada" | "en_progreso" | "completada";
+}
+
+/**
+ * Todas las prácticas experimentales (laboratorios 3D) del semestre del alumno,
+ * con su deep-link directo (uac + progresión + orden → /practica) y estado por
+ * usuario. Alimenta la pantalla dedicada /hub/recursos/laboratorios para que el
+ * alumno los abra sin navegar UAC → progresión → actividad.
+ */
+export async function getLaboratoriosSemestreBrowser(
+  userId: string,
+  semestre: number
+): Promise<LaboratorioItem[]> {
+  const sb = getClient();
+
+  const { data: uacRows } = await sb
+    .from("uac")
+    .select("id, codigo, nombre")
+    .eq("semestre", semestre);
+  if (!uacRows || uacRows.length === 0) return [];
+
+  const uacById = new Map(uacRows.map((u) => [u.id, u]));
+
+  const { data: progs } = await sb
+    .from("progresiones")
+    .select("id, numero, uac_id")
+    .in("uac_id", uacRows.map((u) => u.id))
+    .eq("es_placeholder", false);
+  if (!progs || progs.length === 0) return [];
+
+  const progById = new Map(progs.map((p) => [p.id, p]));
+
+  const { data: acts } = await sb
+    .from("actividades")
+    .select("id, codigo, titulo, progresion_id, practica_slug")
+    .in("progresion_id", progs.map((p) => p.id))
+    .not("practica_slug", "is", null);
+  if (!acts || acts.length === 0) return [];
+
+  const actIds = acts.map((a) => a.id);
+  const estadoByAct = new Map<string, "in_progress" | "completed">();
+  const { data: intentos } = await sb
+    .from("intentos")
+    .select("actividad_id, status, started_at")
+    .eq("user_id", userId)
+    .in("actividad_id", actIds)
+    .order("started_at", { ascending: false });
+  for (const i of intentos ?? []) {
+    if (!estadoByAct.has(i.actividad_id)) {
+      estadoByAct.set(i.actividad_id, i.status as "in_progress" | "completed");
+    }
+  }
+
+  const items: LaboratorioItem[] = [];
+  for (const a of acts) {
+    if (!a.progresion_id || !a.practica_slug) continue;
+    const prog = progById.get(a.progresion_id);
+    if (!prog) continue;
+    const uac = uacById.get(prog.uac_id);
+    if (!uac) continue;
+    const ordenMatch = a.codigo.match(/-A(\d+)$/);
+    const orden = ordenMatch?.[1] ? parseInt(ordenMatch[1]) : 1;
+    const st = estadoByAct.get(a.id);
+    items.push({
+      id: a.id,
+      slug: a.practica_slug,
+      actividadTitulo: a.titulo,
+      uacCodigo: uac.codigo,
+      uacNombre: uac.nombre,
+      progresionNumero: prog.numero,
+      orden,
+      estado:
+        st === "completed" ? "completada" : st === "in_progress" ? "en_progreso" : "no_iniciada",
+    });
+  }
+
+  // Orden estable: por UAC, luego progresión, luego orden de actividad.
+  return items.sort(
+    (a, b) =>
+      a.uacCodigo.localeCompare(b.uacCodigo) ||
+      a.progresionNumero - b.progresionNumero ||
+      a.orden - b.orden
+  );
 }

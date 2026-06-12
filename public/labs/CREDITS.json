@@ -1,0 +1,235 @@
+{
+  "generado": "Wikimedia Commons API",
+  "creditos": [
+    {
+      "tema": "molecula",
+      "archivo": "labs/molecula.webp",
+      "titulo": "File:Alpha endorphin stick molecular model.png",
+      "licencia": "CC BY-SA 4.0",
+      "autor": "Mplanine",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Alpha_endorphin_stick_molecular_model.png",
+      "query": "molecular model 3d structure rendering",
+      "dims": "1712×1651"
+    },
+    {
+      "tema": "reaccion",
+      "archivo": "labs/reaccion.webp",
+      "titulo": "File:\"Party\" in a chemical laboratory.JPG",
+      "licencia": "CC BY-SA 4.0",
+      "autor": "Botasuleimen",
+      "fuente": "https://commons.wikimedia.org/wiki/File:%22Party%22_in_a_chemical_laboratory.JPG",
+      "query": "chemical reaction flask laboratory",
+      "dims": "5184×3456"
+    },
+    {
+      "tema": "materia",
+      "archivo": "labs/materia.webp",
+      "titulo": "File:Aqua Spout.jpg",
+      "licencia": "CC BY-SA 3.0",
+      "autor": "JJ Harrison ( https://www.jjharrison.com.au/ )",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Aqua_Spout.jpg",
+      "query": "water surface blue macro",
+      "dims": "1944×1296"
+    },
+    {
+      "tema": "electricidad",
+      "archivo": "labs/electricidad.webp",
+      "titulo": "File:Labyrinthine circuit board lines - Flickr - quapan.jpg",
+      "licencia": "CC BY 2.0",
+      "autor": "quapan",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Labyrinthine_circuit_board_lines_-_Flickr_-_quapan.jpg",
+      "query": "electronic circuit board macro",
+      "dims": "1273×927"
+    },
+    {
+      "tema": "energia",
+      "archivo": "labs/energia.webp",
+      "titulo": "File:Abandoned concrete factory mechanism.jpg",
+      "licencia": "CC BY 3.0",
+      "autor": "Diacritica",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Abandoned_concrete_factory_mechanism.jpg",
+      "query": "gears metal mechanism machine",
+      "dims": "3900×2613"
+    },
+    {
+      "tema": "termo",
+      "archivo": "labs/termo.webp",
+      "titulo": "File:Pāhoehoe lava meets Pacific.jpg",
+      "licencia": "CC BY-SA 3.0",
+      "autor": "Brocken Inaglory",
+      "fuente": "https://commons.wikimedia.org/wiki/File:P%C4%81hoehoe_lava_meets_Pacific.jpg",
+      "query": "lava flow molten",
+      "dims": "2824×1772"
+    },
+    {
+      "tema": "movimiento",
+      "archivo": "labs/movimiento.webp",
+      "titulo": "File:Riyadh - Mecca Highway (3667796464).jpg",
+      "licencia": "CC BY 2.0",
+      "autor": "Andrew A. Shenouda from Riyadh, Saudi Arabia",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Riyadh_-_Mecca_Highway_(3667796464).jpg",
+      "query": "highway light trails night long exposure",
+      "dims": "1024×850"
+    },
+    {
+      "tema": "espacio",
+      "archivo": "labs/espacio.webp",
+      "titulo": "File:Solar system scale edit.jpg",
+      "licencia": "Public domain",
+      "autor": "File:Solar system scale 2 wide.jpg : * File:Solar system scale.jpg : Lunar and Planetary Laboratory File:Jupiter and its shrunken Great Red Spot.jpg : NASA, ESA, and A. Simon (Goddard Space Flight Center) derivative work: Martin Kraft File:Sun in February (transparent).png : HalloweenNight derivative work: JCPagc2015",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Solar_system_scale_edit.jpg",
+      "query": "solar system planets illustration",
+      "dims": "2809×1280"
+    },
+    {
+      "tema": "ondas",
+      "archivo": "labs/ondas.webp",
+      "titulo": "File:2006-01-14 Surface waves.jpg",
+      "licencia": "CC BY-SA 3.0",
+      "autor": "Roger McLassus",
+      "fuente": "https://commons.wikimedia.org/wiki/File:2006-01-14_Surface_waves.jpg",
+      "query": "water ripple concentric wave",
+      "dims": "1920×1320"
+    },
+    {
+      "tema": "espectro",
+      "archivo": "labs/espectro.webp",
+      "titulo": "File:Colorato dalla luce.jpg",
+      "licencia": "CC BY-SA 4.0",
+      "autor": "Albarubescens",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Colorato_dalla_luce.jpg",
+      "query": "prism light dispersion rainbow",
+      "dims": "4049×2869"
+    },
+    {
+      "tema": "optica",
+      "archivo": "labs/optica.webp",
+      "titulo": "File:Photo 2023-12-19 18-58-54 Струменевий потік світла в переломленні багатогранного випромінювання 01.jpg",
+      "licencia": "CC BY-SA 4.0",
+      "autor": "Roman Selskiy",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Photo_2023-12-19_18-58-54_%D0%A1%D1%82%D1%80%D1%83%D0%BC%D0%B5%D0%BD%D0%B5%D0%B2%D0%B8%D0%B9_%D0%BF%D0%BE%D1%82%D1%96%D0%BA_%D1%81%D0%B2%D1%96%D1%82%D0%BB%D0%B0_%D0%B2_%D0%BF%D0%B5%D1%80%D0%B5%D0%BB%D0%BE%D0%BC%D0%BB%D0%B5%D0%BD%D0%BD%D1%96_%D0%B1%D0%B0%D0%B3%D0%B0%D1%82%D0%BE%D0%B3%D1%80%D0%B0%D0%BD%D0%BD%D0%BE%D0%B3%D0%BE_%D0%B2%D0%B8%D0%BF%D1%80%D0%BE%D0%BC%D1%96%D0%BD%D1%8E%D0%B2%D0%B0%D0%BD%D0%BD%D1%8F_01.jpg",
+      "query": "glass prism light refraction",
+      "dims": "1280×960"
+    },
+    {
+      "tema": "fluidos",
+      "archivo": "labs/fluidos.webp",
+      "titulo": "File:Water drop impact on a water-surface.jpg",
+      "licencia": "CC BY-SA 2.0",
+      "autor": "Davide Restivo from Aarau, Switzerland",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Water_drop_impact_on_a_water-surface.jpg",
+      "query": "blue water splash macro",
+      "dims": "3888×2592"
+    },
+    {
+      "tema": "algebra",
+      "archivo": "labs/algebra.webp",
+      "titulo": "File:Example absolute value.jpg",
+      "licencia": "CC BY-SA 4.0",
+      "autor": "Manuelzapata04",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Example_absolute_value.jpg",
+      "query": "mathematical equations chalkboard",
+      "dims": "1280×720"
+    },
+    {
+      "tema": "geometria",
+      "archivo": "labs/geometria.webp",
+      "titulo": "File:The Nunnery (Las Monjas), Inner Façade of West Wing, Uxmal (3675128725).jpg",
+      "licencia": "No restrictions",
+      "autor": "Cornell University Library",
+      "fuente": "https://commons.wikimedia.org/wiki/File:The_Nunnery_(Las_Monjas),_Inner_Fa%C3%A7ade_of_West_Wing,_Uxmal_(3675128725).jpg",
+      "query": "geometric architecture facade pattern",
+      "dims": "1536×1216"
+    },
+    {
+      "tema": "trigonometria",
+      "archivo": "labs/trigonometria.webp",
+      "titulo": "File:SextanteEspañolBaleatoFerrolSIgloXVIII.JPG",
+      "licencia": "CC BY-SA 4.0",
+      "autor": "Rowanwindwhistler",
+      "fuente": "https://commons.wikimedia.org/wiki/File:SextanteEspa%C3%B1olBaleatoFerrolSIgloXVIII.JPG",
+      "query": "sextant navigation brass instrument",
+      "dims": "3648×2736"
+    },
+    {
+      "tema": "graficas",
+      "archivo": "labs/graficas.webp",
+      "titulo": "File:Ngrip yd pb do18 ch4 2.png",
+      "licencia": "CC BY-SA 3.0",
+      "autor": "Merikanto",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Ngrip_yd_pb_do18_ch4_2.png",
+      "query": "line chart graph data screen",
+      "dims": "1114×604"
+    },
+    {
+      "tema": "calculo",
+      "archivo": "labs/calculo.webp",
+      "titulo": "File:CMAP - Centre de Mathématiques Appliquées de l'Ecole polytechnique.jpg",
+      "licencia": "CC BY-SA 3.0",
+      "autor": "Jérémy Barande",
+      "fuente": "https://commons.wikimedia.org/wiki/File:CMAP_-_Centre_de_Math%C3%A9matiques_Appliqu%C3%A9es_de_l%27Ecole_polytechnique.jpg",
+      "query": "blackboard mathematics equations",
+      "dims": "1536×1024"
+    },
+    {
+      "tema": "celula",
+      "archivo": "labs/celula.webp",
+      "titulo": "File:SK8-18-2 human derived cells, fluorescence microscopy (29942101073).jpg",
+      "licencia": "CC BY 2.0",
+      "autor": "ZEISS Microscopy from Germany",
+      "fuente": "https://commons.wikimedia.org/wiki/File:SK8-18-2_human_derived_cells,_fluorescence_microscopy_(29942101073).jpg",
+      "query": "cells microscopy stained fluorescence",
+      "dims": "2758×2214"
+    },
+    {
+      "tema": "adn",
+      "archivo": "labs/adn.webp",
+      "titulo": "File:DNA Helix CPK.jpg",
+      "licencia": "Public domain",
+      "autor": "Ude",
+      "fuente": "https://commons.wikimedia.org/wiki/File:DNA_Helix_CPK.jpg",
+      "query": "DNA double helix render",
+      "dims": "3000×2250"
+    },
+    {
+      "tema": "planta",
+      "archivo": "labs/planta.webp",
+      "titulo": "File:Macro view of a single green leaf fragment on a mossy rock.jpg",
+      "licencia": "CC0",
+      "autor": "Krishna k. sahh",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Macro_view_of_a_single_green_leaf_fragment_on_a_mossy_rock.jpg",
+      "query": "green leaf macro sunlight",
+      "dims": "5536×4160"
+    },
+    {
+      "tema": "evolucion",
+      "archivo": "labs/evolucion.webp",
+      "titulo": "File:Ammonite-Fossil.jpg",
+      "licencia": "CC BY 3.0",
+      "autor": "FluffyBiscuit",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Ammonite-Fossil.jpg",
+      "query": "fossil ammonite rock",
+      "dims": "4000×3000"
+    },
+    {
+      "tema": "ecosistema",
+      "archivo": "labs/ecosistema.webp",
+      "titulo": "File:Aerial View of Sunset over Forest Slope.jpg",
+      "licencia": "CC BY-SA 2.5",
+      "autor": "Wing-Chi Poon",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Aerial_View_of_Sunset_over_Forest_Slope.jpg",
+      "query": "forest aerial green nature",
+      "dims": "2048×1360"
+    },
+    {
+      "tema": "tierra",
+      "archivo": "labs/tierra.webp",
+      "titulo": "File:Ross Ice Shelf, Antarctica on Earth.jpg",
+      "licencia": "Public domain",
+      "autor": "NASA/JPL",
+      "fuente": "https://commons.wikimedia.org/wiki/File:Ross_Ice_Shelf,_Antarctica_on_Earth.jpg",
+      "query": "planet earth from space continents",
+      "dims": "2146×1548"
+    }
+  ]
+}

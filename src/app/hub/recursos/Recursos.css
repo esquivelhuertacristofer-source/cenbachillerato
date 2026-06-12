@@ -364,6 +364,84 @@
   font-weight: 600;
 }
 
+/* ══════════════════════════════════════════════════════════════
+   Banda de acceso a Laboratorios 3D (arriba de las tabs)
+   ══════════════════════════════════════════════════════════════ */
+.recursos-labs-banner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding: 16px 20px;
+  border-radius: 18px;
+  text-decoration: none;
+  border: 1px solid rgba(34, 211, 238, 0.26);
+  background:
+    radial-gradient(circle at 6% 50%, rgba(34, 211, 238, 0.16) 0%, transparent 46%),
+    linear-gradient(135deg, #061a33 0%, #051428 100%);
+  transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+}
+
+.recursos-labs-banner:hover {
+  transform: translateY(-3px);
+  border-color: rgba(34, 211, 238, 0.5);
+  box-shadow: 0 18px 40px rgba(1, 17, 38, 0.42);
+}
+
+.recursos-labs-banner-icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  border-radius: 13px;
+  background: rgba(34, 211, 238, 0.14);
+  border: 1px solid rgba(34, 211, 238, 0.26);
+  color: #22d3ee;
+  font-size: 19px;
+}
+
+.recursos-labs-banner-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.recursos-labs-banner-titulo {
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
+.recursos-labs-banner-sub {
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.58);
+}
+
+.recursos-labs-banner-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-left: auto;
+  flex-shrink: 0;
+  padding: 9px 16px;
+  border-radius: 999px;
+  background: rgba(34, 211, 238, 0.12);
+  color: #22d3ee;
+  font-size: 12.5px;
+  font-weight: 800;
+  transition: gap 0.2s ease, background 0.2s ease;
+}
+
+.recursos-labs-banner:hover .recursos-labs-banner-cta {
+  gap: 11px;
+  background: rgba(34, 211, 238, 0.2);
+}
+
 /* ── Responsive ─── */
 @media (max-width: 640px) {
   .recursos-grid {
@@ -381,5 +459,13 @@
   }
   .recursos-hero-stats {
     flex-wrap: wrap;
+  }
+  .recursos-labs-banner {
+    flex-wrap: wrap;
+  }
+  .recursos-labs-banner-cta {
+    margin-left: 0;
+    width: 100%;
+    justify-content: center;
   }
 }
