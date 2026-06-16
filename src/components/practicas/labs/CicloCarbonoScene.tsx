@@ -17,11 +17,11 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useMemo, useRef, useState } from "react";
+import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, ContactShadows, Environment, Lightformer, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
-import { RESERVORIOS, FLUJOS, EMIS_MAX } from "./carbono-data";
+import { RESERVORIOS, FLUJOS, EMIS_MAX, EMIS_MIN } from "./carbono-data";
 
 export interface CicloCarbonoSceneProps {
   emisiones: number;
@@ -29,7 +29,27 @@ export interface CicloCarbonoSceneProps {
   pausado: boolean;
   autoRotate: boolean;
   resetNonce: number;
+  /** Si true, la palanca de emisiones se puede arrastrar en 3D. */
+  arrastrable?: boolean;
+  /** El alumno arrastró la palanca → nuevo nivel de emisiones (Gt/año). */
+  onEmisionesChange?: (v: number) => void;
+  /** Tomó la palanca (para sonido). */
+  onGrab?: () => void;
 }
+
+/* ── Palanca de emisiones (arrastre vertical) ──────────────────────────── */
+const LEVER_X = -6.4;
+const LEVER_Z = 0;
+const Y_BOT = -3.2;
+const Y_TOP = 2.6;
+const _plane = new THREE.Plane();
+const _hit = new THREE.Vector3();
+const _norm = new THREE.Vector3();
+const _cop = new THREE.Vector3();
+const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+const emisToY = (e: number) => Y_BOT + ((e - EMIS_MIN) / (EMIS_MAX - EMIS_MIN)) * (Y_TOP - Y_BOT);
+const yToEmis = (y: number) =>
+  Math.round(EMIS_MIN + ((clamp(y, Y_BOT, Y_TOP) - Y_BOT) / (Y_TOP - Y_BOT)) * (EMIS_MAX - EMIS_MIN));
 
 /* Posiciones de cada reservorio alrededor de la Tierra. */
 const NODOS: Record<string, [number, number, number]> = {
@@ -102,6 +122,111 @@ function Flujo({ de, a, color, rapidez, pausado }: {
   );
 }
 
+/* ─── Palanca de emisiones: knob que se arrastra a lo largo de un riel ──── */
+function PalancaEmisiones({ emisiones, arrastrable, onEmisionesChange, onGrab, onDraggingChange }: {
+  emisiones: number; arrastrable?: boolean;
+  onEmisionesChange?: (v: number) => void; onGrab?: () => void; onDraggingChange?: (d: boolean) => void;
+}) {
+  const { camera } = useThree();
+  const [hover, setHover] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const draggingRef = useRef(false);
+
+  const y = emisToY(emisiones);
+  const frac = (emisiones - EMIS_MIN) / (EMIS_MAX - EMIS_MIN);
+  const knobCol = useMemo(
+    () => new THREE.Color("#5ab0ff").lerp(new THREE.Color("#ff5a36"), Math.min(1, frac)),
+    [frac],
+  );
+
+  const down = (e: ThreeEvent<PointerEvent>) => {
+    if (!arrastrable) return;
+    e.stopPropagation();
+    draggingRef.current = true;
+    setDragging(true);
+    onDraggingChange?.(true);
+    onGrab?.();
+    (e.target as Element).setPointerCapture?.(e.pointerId);
+  };
+  const move = (e: ThreeEvent<PointerEvent>) => {
+    if (!draggingRef.current) return;
+    e.stopPropagation();
+    // plano vertical que contiene el riel y mira a la cámara (robusto al giro)
+    _norm.set(camera.position.x - LEVER_X, 0, camera.position.z - LEVER_Z).normalize();
+    _cop.set(LEVER_X, 0, LEVER_Z);
+    _plane.setFromNormalAndCoplanarPoint(_norm, _cop);
+    if (!e.ray.intersectPlane(_plane, _hit)) return;
+    onEmisionesChange?.(yToEmis(_hit.y));
+  };
+  const up = (e: ThreeEvent<PointerEvent>) => {
+    if (!draggingRef.current) return;
+    e.stopPropagation();
+    draggingRef.current = false;
+    setDragging(false);
+    onDraggingChange?.(false);
+    (e.target as Element).releasePointerCapture?.(e.pointerId);
+  };
+
+  return (
+    <group position={[LEVER_X, 0, LEVER_Z]}>
+      {/* riel */}
+      <Line points={[[0, Y_BOT, 0], [0, Y_TOP, 0]]} color="#5b7286" lineWidth={3} />
+      <mesh position={[0, Y_TOP, 0]}>
+        <sphereGeometry args={[0.07, 12, 12]} />
+        <meshBasicMaterial color="#ff5a36" />
+      </mesh>
+      <mesh position={[0, Y_BOT, 0]}>
+        <sphereGeometry args={[0.07, 12, 12]} />
+        <meshBasicMaterial color="#5ab0ff" />
+      </mesh>
+      <Html position={[0, Y_TOP + 0.35, 0]} center distanceFactor={15} pointerEvents="none">
+        <div style={{ color: "#ff8a6a", fontSize: 10.5, fontWeight: 800, whiteSpace: "nowrap" }}>más emisiones</div>
+      </Html>
+      <Html position={[0, Y_BOT - 0.35, 0]} center distanceFactor={15} pointerEvents="none">
+        <div style={{ color: "#7fc4ff", fontSize: 10.5, fontWeight: 800, whiteSpace: "nowrap" }}>equilibrio (0)</div>
+      </Html>
+
+      {/* halo de agarre */}
+      {arrastrable && (hover || dragging) && (
+        <mesh position={[0, y, 0]}>
+          <ringGeometry args={[0.34, 0.46, 32]} />
+          <meshBasicMaterial color={knobCol} transparent opacity={0.7} side={THREE.DoubleSide} toneMapped={false} />
+        </mesh>
+      )}
+
+      {/* knob arrastrable */}
+      <mesh
+        position={[0, y, 0]}
+        castShadow
+        onPointerDown={down}
+        onPointerMove={move}
+        onPointerUp={up}
+        onPointerCancel={up}
+        onPointerOver={() => arrastrable && setHover(true)}
+        onPointerOut={() => setHover(false)}
+      >
+        <sphereGeometry args={[0.3, 24, 24]} />
+        <meshStandardMaterial color={knobCol} emissive={knobCol} emissiveIntensity={0.7} roughness={0.35} toneMapped={false} />
+      </mesh>
+
+      {/* valor */}
+      <Html position={[0, y, 0]} center distanceFactor={13} pointerEvents="none">
+        <div style={{ transform: "translateX(46px)", display: "flex", alignItems: "center", gap: 6, padding: "3px 9px", borderRadius: 999, background: "rgba(2,12,28,0.82)", border: `1px solid ${knobCol.getStyle()}aa`, whiteSpace: "nowrap" }}>
+          <i className="fa-solid fa-industry" style={{ color: knobCol.getStyle(), fontSize: 10 }} />
+          <span style={{ color: "#eaf2fb", fontSize: 11, fontWeight: 900, fontFamily: "ui-monospace, monospace" }}>{emisiones} Gt/año</span>
+        </div>
+      </Html>
+      {arrastrable && (
+        <Html position={[0, y, 0]} center distanceFactor={14} pointerEvents="none">
+          <div style={{ transform: "translateY(34px)", color: dragging ? "#fff" : "#9fb2c8", fontSize: 10, fontWeight: 700, whiteSpace: "nowrap", textShadow: "0 2px 6px #000" }}>
+            {dragging ? "moviendo las emisiones" : "arrastra ↑↓"}
+          </div>
+        </Html>
+      )}
+    </group>
+  );
+}
+
 /* ─── Nodo reservorio: esfera + etiqueta ───────────────────────────────── */
 function Nodo({ pos, color, icono, nombre, gtC }: {
   pos: [number, number, number]; color: string; icono: string; nombre: string; gtC: number;
@@ -152,7 +277,10 @@ function Tierra({ tint }: { tint: THREE.Color }) {
 }
 
 /* ─── Contenido de la escena ───────────────────────────────────────────── */
-function Mundo({ emisiones, pausado }: { emisiones: number; pausado: boolean }) {
+function Mundo({ emisiones, pausado, arrastrable, onEmisionesChange, onGrab, onDraggingChange }: {
+  emisiones: number; pausado: boolean; arrastrable?: boolean;
+  onEmisionesChange?: (v: number) => void; onGrab?: () => void; onDraggingChange?: (d: boolean) => void;
+}) {
   const combRapidez = useMemo(() => emisiones / EMIS_MAX, [emisiones]);
 
   // tinte de la atmósfera: azul calmado → naranja-rojo según emisiones
@@ -181,6 +309,15 @@ function Mundo({ emisiones, pausado }: { emisiones: number; pausado: boolean }) 
           <Flujo key={f.id} de={NODOS[f.de]!} a={NODOS[f.a]!} color={f.color} rapidez={rapidez} pausado={pausado} />
         );
       })}
+
+      {/* palanca de emisiones (arrastre) */}
+      <PalancaEmisiones
+        emisiones={emisiones}
+        arrastrable={arrastrable}
+        onEmisionesChange={onEmisionesChange}
+        onGrab={onGrab}
+        onDraggingChange={onDraggingChange}
+      />
 
       {/* etiqueta del Sol/energía como motor del ciclo */}
       <group position={[-5.2, 4.4, 2.2]}>
@@ -214,7 +351,8 @@ export default function CicloCarbonoScene(props: CicloCarbonoSceneProps) {
 }
 
 function Contenido(props: CicloCarbonoSceneProps) {
-  const { emisiones, accent, pausado, autoRotate, resetNonce } = props;
+  const { emisiones, accent, pausado, autoRotate, resetNonce, arrastrable, onEmisionesChange, onGrab } = props;
+  const [dragging, setDragging] = useState(false);
   return (
     <>
       <color attach="background" args={["#03101f"]} />
@@ -235,7 +373,14 @@ function Contenido(props: CicloCarbonoSceneProps) {
       <pointLight position={[6, 2, 6]} intensity={0.4} color={accent} />
 
       <group key={`${resetNonce}`}>
-        <Mundo emisiones={emisiones} pausado={pausado} />
+        <Mundo
+          emisiones={emisiones}
+          pausado={pausado}
+          arrastrable={arrastrable}
+          onEmisionesChange={onEmisionesChange}
+          onGrab={onGrab}
+          onDraggingChange={setDragging}
+        />
       </group>
 
       <Environment resolution={256}>
@@ -251,7 +396,8 @@ function Contenido(props: CicloCarbonoSceneProps) {
         minPolarAngle={Math.PI / 8}
         maxPolarAngle={Math.PI / 1.9}
         target={[0, 0, 0]}
-        autoRotate={autoRotate}
+        enabled={!dragging}
+        autoRotate={autoRotate && !dragging}
         autoRotateSpeed={0.4}
       />
 

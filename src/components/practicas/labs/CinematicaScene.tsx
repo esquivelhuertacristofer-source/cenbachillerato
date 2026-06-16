@@ -23,11 +23,11 @@
  */
 
 import * as THREE from "three";
-import { useMemo } from "react";
-import { Canvas } from "@react-three/fiber";
+import { useMemo, useRef, useState } from "react";
+import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, ContactShadows, Environment, Lightformer, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
-import { resolver, estadoEn, fmt0, fmt1 } from "./cinematica-data";
+import { resolver, estadoEn, tiempoEnX, fmt0, fmt1 } from "./cinematica-data";
 
 export interface CinematicaSceneProps {
   a1: number;
@@ -36,6 +36,12 @@ export interface CinematicaSceneProps {
   t: number;        // tiempo actual del recorrido (s)
   accent: string;
   resetNonce: number;
+  /** Cuando true, el alumno puede arrastrar el auto sobre la autopista. */
+  arrastrable?: boolean;
+  /** Avisa el nuevo instante de tiempo al arrastrar el auto. */
+  onScrub?: (t: number) => void;
+  /** Se dispara al tomar el auto (para sonido/feedback). */
+  onGrab?: () => void;
 }
 
 type Pt = [number, number, number];
@@ -52,6 +58,48 @@ const SCENE_LEN = 18;       // largo de la carretera en unidades de escena
 const X0 = -SCENE_LEN / 2;  // x de la salida
 const ROAD_W = 2.4;         // ancho de la carretera
 const Y_ROAD = 0;           // altura del asfalto
+
+/* Scratch a nivel de módulo (evita asignar por frame). El plano del asfalto es
+ * horizontal (y = 0); arrastrar el auto = intersectar el rayo del puntero con él. */
+const _planeRoad = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+const _hit = new THREE.Vector3();
+const _obj = new THREE.Object3D();
+const PART_N = 14;           // motas de polvo levantadas por el auto
+
+/* ── Polvo / estela de las ruedas (partículas en tiempo real) ─────────────── */
+function Polvo({ v, frenando }: { v: number; frenando: boolean }) {
+  const mesh = useRef<THREE.InstancedMesh>(null);
+  useFrame((state) => {
+    const m = mesh.current;
+    if (!m) return;
+    const t = state.clock.elapsedTime;
+    const intensidad = Math.min(1, v / 22);     // 0 detenido … 1 a tope
+    for (let i = 0; i < PART_N; i++) {
+      const p = (t * 0.7 + i / PART_N) % 1;      // 0→1 vida de la mota
+      const back = -0.62 - p * 1.7;              // se aleja hacia atrás del auto
+      const up = 0.1 + p * 0.55;                 // se eleva
+      const spread = (i % 2 === 0 ? 1 : -1) * 0.34 * p;
+      const s = Math.max(0.001, (1 - p) * 0.2 * (0.25 + intensidad));
+      _obj.position.set(back, up, spread);
+      _obj.scale.setScalar(s);
+      _obj.updateMatrix();
+      m.setMatrixAt(i, _obj.matrix);
+    }
+    m.instanceMatrix.needsUpdate = true;
+  });
+  return (
+    <instancedMesh ref={mesh} args={[undefined, undefined, PART_N]}>
+      <sphereGeometry args={[1, 8, 8]} />
+      <meshStandardMaterial
+        color={frenando ? "#f8c4c4" : "#d8c8a8"}
+        transparent
+        opacity={0.45}
+        depthWrite={false}
+        toneMapped={false}
+      />
+    </instancedMesh>
+  );
+}
 
 /* ── Flecha horizontal (asta + punta) a lo largo de ±x ────────────────────── */
 function Flecha({
@@ -164,13 +212,39 @@ function Hito({ x, color, titulo, sub }: { x: number; color: string; titulo: str
 }
 
 /* ── Contenido (descendiente del Canvas) ─────────────────────────────────── */
-function Contenido({ a1, t1, a2, t, accent, resetNonce }: CinematicaSceneProps) {
+function Contenido({ a1, t1, a2, t, accent, resetNonce, arrastrable, onScrub, onGrab }: CinematicaSceneProps) {
   const mov = resolver(a1, t1, a2);
   const est = estadoEn(mov, t);
 
   const SCALE = SCENE_LEN / Math.max(mov.xTotal, 1);   // unidades de escena por metro
   const xToWorld = (xm: number) => X0 + xm * SCALE;
   const carX = xToWorld(est.x);
+
+  // ── Arrastre del auto sobre la autopista (mapea posición → tiempo) ──────────
+  const dragRef = useRef(false);
+  const [dragging, setDragging] = useState(false);
+  const [hover, setHover] = useState(false);
+
+  const onDown = (e: ThreeEvent<PointerEvent>) => {
+    if (!arrastrable) return;
+    e.stopPropagation();
+    (e.target as Element).setPointerCapture?.(e.pointerId);
+    dragRef.current = true;
+    setDragging(true);
+    onGrab?.();
+  };
+  const onMove = (e: ThreeEvent<PointerEvent>) => {
+    if (!dragRef.current) return;
+    if (!e.ray.intersectPlane(_planeRoad, _hit)) return;
+    const xm = (_hit.x - X0) / SCALE;                 // mundo → metros
+    onScrub?.(tiempoEnX(mov, xm));
+  };
+  const onUp = (e: ThreeEvent<PointerEvent>) => {
+    if (!dragRef.current) return;
+    (e.target as Element).releasePointerCapture?.(e.pointerId);
+    dragRef.current = false;
+    setDragging(false);
+  };
 
   // escalas de las flechas (independientes; el número va en la etiqueta)
   const vScale = 2.6 / Math.max(mov.v1, 1);   // m/s → unidades
@@ -238,7 +312,35 @@ function Contenido({ a1, t1, a2, t, accent, resetNonce }: CinematicaSceneProps) 
 
         {/* auto + flechas */}
         <group position={[carX, Y_ROAD, 0]}>
+          {/* halo de agarre cuando es arrastrable */}
+          {arrastrable && (
+            <mesh position={[0, 0.4, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+              <ringGeometry args={[0.95, 1.12, 40]} />
+              <meshBasicMaterial
+                color={dragging ? accent : hover ? "#ffffff" : accent}
+                transparent
+                opacity={dragging ? 0.85 : hover ? 0.6 : 0.3}
+                toneMapped={false}
+                side={THREE.DoubleSide}
+              />
+            </mesh>
+          )}
           <Auto color={accent} frenando={frenando} />
+          <Polvo v={est.v} frenando={frenando} />
+          {/* caja invisible de agarre (solo si es arrastrable) */}
+          {arrastrable && (
+            <mesh
+              position={[0, 0.5, 0]}
+              onPointerDown={onDown}
+              onPointerMove={onMove}
+              onPointerUp={onUp}
+              onPointerOver={(e) => { e.stopPropagation(); setHover(true); }}
+              onPointerOut={() => setHover(false)}
+            >
+              <boxGeometry args={[1.8, 1.3, 1.2]} />
+              <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+            </mesh>
+          )}
           <Flecha base={[0, 1.15, 0]} hacia={1} len={vLen} color={C_VEL} label={`v = ${fmt1(est.v)} m/s`} />
           {aLen > 0.06 && (
             <Flecha
@@ -280,6 +382,7 @@ function Contenido({ a1, t1, a2, t, accent, resetNonce }: CinematicaSceneProps) 
 
       <OrbitControls
         makeDefault
+        enabled={!dragging}
         enablePan={false}
         minDistance={8}
         maxDistance={28}

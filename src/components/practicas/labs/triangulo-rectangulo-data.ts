@@ -111,3 +111,61 @@ export const fmtNum = (n: number): string => ES(n, 3);
 export const fmtNum2 = (n: number): string => ES(n, 2);
 export const fmtM = (n: number): string => `${ES(n, 2)} m`;
 export const fmtDeg = (n: number): string => `${ES(Math.round(n), 0)}°`;
+
+/* ── Reto evaluable ───────────────────────────────────────────────────────── */
+// Fuente: PM-IV-P03-A2 (ejercicio_matematico, practica_slug=triangulo-rectangulo).
+// Reproduce VERBATIM el enunciado, los pasos guía y la respuesta final.
+//
+// Aritmética verificada (tan 35° ≈ 0.7002, cos 35° ≈ 0.8192):
+//   (b) tan(35°) = altura_sobre_ojos / 15  →  altura_sobre_ojos = 15 × 0.7002 = 10.503 m
+//       objetivo=10.503, tolerancia=0.05 → acepta 10.45–10.56 m  (respuesta_final: ≈10.50 m) ✓
+//   (c) Altura total = 10.503 + 1.70 = 12.203 m
+//       objetivo=12.203, tolerancia=0.05 → acepta 12.15–12.25 m  (respuesta_final: ≈12.20 m) ✓
+//   (d) hipotenusa = 15 / 0.8192 ≈ 18.31 m
+//       objetivo=18.31, tolerancia=0.05 → acepta 18.26–18.36 m   (respuesta_final: ≈18.31 m) ✓
+
+import type { RetoNumericoData } from "./_reto-numerico";
+
+export const RETO_A2: RetoNumericoData = {
+  titulo: "Calculo la altura de un árbol con razones trigonométricas",
+  contexto:
+    "Daniela tiene 1.70 m de estatura (desde el suelo hasta sus ojos). Está parada a 15 metros de la base de un árbol en el Bosque de Chapultepec. Cuando levanta la vista hacia la cima del árbol, forma un ángulo de elevación de 35°.",
+  problema:
+    "(a) Dibuja el triángulo rectángulo que describe la situación (opcional pero recomendado).\n" +
+    "(b) ¿Qué razón trigonométrica relaciona el ángulo de elevación con la distancia horizontal y la altura desconocida?\n" +
+    "(c) Calcula la altura del árbol sobre el nivel de los ojos de Daniela. (Usa tan 35° ≈ 0.7002.)\n" +
+    "(d) ¿Cuánto mide el árbol desde el suelo?\n" +
+    "(e) Calcula la longitud de la línea de visión de Daniela hasta la cima del árbol (hipotenusa). (Usa cos 35° ≈ 0.8192.)",
+  campos: [
+    {
+      etiqueta: "(c) Altura sobre los ojos de Daniela",
+      objetivo: 10.503,
+      tolerancia: 0.05,
+      unidad: "m",
+      placeholder: "10.503",
+    },
+    {
+      etiqueta: "(d) Altura total del árbol desde el suelo",
+      objetivo: 12.203,
+      tolerancia: 0.05,
+      unidad: "m",
+      placeholder: "12.203",
+    },
+    {
+      etiqueta: "(e) Longitud de la línea de visión (hipotenusa)",
+      objetivo: 18.31,
+      tolerancia: 0.05,
+      unidad: "m",
+      placeholder: "18.31",
+    },
+  ],
+  pasosGuia: [
+    "(b) La tangente relaciona el cateto opuesto (altura sobre los ojos) con el cateto adyacente (distancia horizontal): tan(35°) = altura_sobre_ojos / 15.",
+    "(c) Despeja: altura_sobre_ojos = 15 × tan(35°) = 15 × 0.7002 = 10.503 m.",
+    "(d) Altura total = altura_sobre_ojos + estatura de Daniela = 10.503 + 1.70 = 12.203 m.",
+    "(e) Línea de visión (hipotenusa): cos(35°) = 15 / hipotenusa → hipotenusa = 15 / cos(35°) = 15 / 0.8192 ≈ 18.31 m.",
+    "Verificación con Pitágoras: √(15² + 10.503²) = √(225 + 110.31) = √335.31 ≈ 18.31 m. ✓",
+  ],
+  respuestaFinal:
+    "(c) Altura sobre los ojos ≈ 10.50 m. (d) Altura total del árbol ≈ 12.20 m. (e) Longitud de la línea de visión ≈ 18.31 m.",
+};

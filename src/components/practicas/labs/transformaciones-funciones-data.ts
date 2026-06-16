@@ -162,3 +162,48 @@ export function ecuacion(modo: Modo, a: number, h: number, k: number): string {
   const cuerpo = modo === "cuadratica" ? `(x ${term(h)})²` : `(x ${term(h)})`;
   return `f(x) = ${fa}·${cuerpo} ${suma(k)}`;
 }
+
+/* ── Reto evaluable (PM-IV-P02-A2) ───────────────────────────────────────────
+ * Reproduce VERBATIM el ejercicio ancla A2 «Modelo la trayectoria de un balón
+ * con una función cuadrática» (ejercicio_matematico, tipo_respuesta "desarrollo").
+ *
+ * Verificación aritmética:
+ *   h(t) = −5t² + 20t + 1;  a = −5, b = 20, c = 1.
+ *   (a) t_v = −b/(2a) = −20/(2·(−5)) = −20/(−10) = 2 s  ✓
+ *   (b) h(2) = −5(4) + 20(2) + 1 = −20 + 40 + 1 = 21 m  ✓
+ *   (c) Discriminante = b² − 4ac = 400 − 4(−5)(1) = 420;
+ *       √420 ≈ 20.49;  t = (−20 ± 20.49)/(2·(−5))
+ *       t₁ = (−20 + 20.49)/(−10) ≈ −0.049 → descarta (negativo)
+ *       t₂ = (−20 − 20.49)/(−10) ≈ 4.05 s  ✓
+ *   (d) Dominio físico: [0, 4.05] s  ✓
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+import type { RetoNumericoData } from "./_reto-numerico";
+
+// VERBATIM de PM-IV-P02-A2 (ejercicio_matematico, practica_slug=transformaciones-funciones).
+export const RETO_A2: RetoNumericoData = {
+  titulo: "Modelo la trayectoria de un balón con una función cuadrática",
+  contexto:
+    "Desde la azotea de un edificio en Guadalajara, se lanza verticalmente hacia arriba una pelota. La altura (en metros sobre el suelo) en función del tiempo (en segundos) está dada por: h(t) = -5t² + 20t + 1, donde t es el tiempo en segundos y 1 metro es la altura inicial de lanzamiento sobre la azotea.",
+  problema:
+    "(a) ¿A qué tiempo alcanza la pelota su altura máxima?\n" +
+    "(b) ¿Cuál es la altura máxima?\n" +
+    "(c) ¿En qué tiempo la pelota llega al suelo (h = 0)? Plantea la ecuación y usa la fórmula general.\n" +
+    "(d) ¿Cuál es el dominio físico razonable de esta función?",
+  campos: [
+    { etiqueta: "(a) Tiempo en que alcanza la altura máxima (s)", objetivo: 2, tolerancia: 0, unidad: "s", placeholder: "2" },
+    { etiqueta: "(b) Altura máxima (m)", objetivo: 21, tolerancia: 0, unidad: "m", placeholder: "21" },
+    { etiqueta: "(c) Tiempo en que llega al suelo (s)", objetivo: 4.05, tolerancia: 0.05, unidad: "s", placeholder: "4.05" },
+    { etiqueta: "(d) Extremo superior del dominio físico (s)", objetivo: 4.05, tolerancia: 0.05, unidad: "s", placeholder: "4.05" },
+  ],
+  pasosGuia: [
+    "(a) El vértice de una parábola f(t) = at² + bt + c tiene su abscisa en t_v = -b / (2a). Identifica a = -5, b = 20.",
+    "(a) t_v = -20 / (2 × (-5)) = -20 / (-10) = 2 segundos.",
+    "(b) Sustituye t = 2 en h(t): h(2) = -5(4) + 20(2) + 1 = -20 + 40 + 1 = 21 metros.",
+    "(c) Resuelve -5t² + 20t + 1 = 0. Aplica la fórmula: t = (-20 ± √(400 + 20)) / (-10) = (-20 ± √420) / (-10).",
+    "(c) √420 ≈ 20.49. Raíces: t = (-20 + 20.49)/(-10) ≈ -0.049 (descarta: negativo) y t = (-20 - 20.49)/(-10) ≈ 4.05 s.",
+    "(d) El dominio físico es 0 ≤ t ≤ 4.05 s (desde el lanzamiento hasta que toca el suelo).",
+  ],
+  respuestaFinal:
+    "(a) t = 2 s. (b) Altura máxima = 21 m. (c) La pelota llega al suelo en t ≈ 4.05 s. (d) Dominio físico: [0, 4.05] segundos.",
+};

@@ -10,10 +10,15 @@
  * Cuatro modos: glucólisis · respiración aerobia · fermentación · comparar.
  */
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, card, Eyebrow, SceneBoundary } from "./_kit";
+import { T, card, Eyebrow, SceneBoundary, OK } from "./_kit";
+import { FichaTeorica } from "./_ficha";
+import { RESPIRACION_FICHA } from "./respiracion-celular-ficha";
+import { RetoNumericoCard } from "./_reto-numerico";
+import { RETO_A2 } from "./respiracion-celular-data";
+import { LabSfx } from "./lab-audio";
 import {
   type Modo,
   MODOS,
@@ -60,6 +65,31 @@ export function LabRespiracion({ color }: PracticaLabProps) {
   const [playing, setPlaying] = useState<boolean>(true);
   const [resetNonce, setResetNonce] = useState(0);
 
+  // reto evaluable, teoría (cajón deslizable) y sonido
+  const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
+  const [drawer, setDrawer] = useState(false);
+  const [sonido, setSonido] = useState(false);
+  const audioRef = useRef<LabSfx | null>(null);
+
+  const toggleSonido = useCallback(async () => {
+    if (!audioRef.current) audioRef.current = new LabSfx();
+    const sfx = audioRef.current;
+    if (sonido) {
+      sfx.mute();
+      setSonido(false);
+    } else {
+      await sfx.enable();
+      setSonido(true);
+    }
+  }, [sonido]);
+
+  useEffect(() => {
+    return () => {
+      audioRef.current?.dispose();
+      audioRef.current = null;
+    };
+  }, []);
+
   // calculadora de la actividad A2
   const [rutaId, setRutaId] = useState<string>("aerobia");
   const [molGlucosa, setMolGlucosa] = useState<number>(5);
@@ -86,6 +116,7 @@ export function LabRespiracion({ color }: PracticaLabProps) {
     setModo(m);
     setPaso(0);
     setPlaying(m !== "comparar");
+    if (sonido) audioRef.current?.blip();
     bump();
   };
   const reiniciar = () => {
@@ -144,6 +175,26 @@ export function LabRespiracion({ color }: PracticaLabProps) {
         .eq-cmp td, .eq-cmp th { padding:8px 9px; font-size:11px; border-bottom:1px solid ${T.line}; vertical-align:top; text-align:left; }
         .eq-cmp th { font-size:9.5px; letter-spacing:0.08em; text-transform:uppercase; color:${T.text3}; }
         @media (max-width: 1000px){ .eq-bottom { grid-template-columns: 1fr !important; } }
+
+        /* Cajón de teoría */
+        .eq-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
+          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
+        .eq-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
+        .eq-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
+          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
+          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
+          display:flex; flex-direction:column; }
+        .eq-drawer[data-open="true"] { transform:translateX(0); }
+        .eq-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
+          padding:18px 20px; border-bottom:1px solid ${T.line}; }
+        .eq-drawer-body { overflow-y:auto; padding:20px; flex:1; }
+        .eq-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
+          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+        .eq-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
+        .eq-teoria-fab { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); cursor:pointer; display:inline-flex; align-items:center; gap:9px;
+          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
+          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
+        .eq-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateX(-50%) translateY(-1px); }
       `}</style>
 
       {/* Selector de modo */}
@@ -190,23 +241,37 @@ export function LabRespiracion({ color }: PracticaLabProps) {
               <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{def.etq.toUpperCase()}</span>
             </div>
 
-            {/* Toolbar (oculta en comparar) */}
-            {!esComparar && (
-              <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-                <button className="eq-icobtn" onClick={() => { setPlaying(false); setPaso((p) => Math.max(0, p - 1)); }} title="Fase anterior">
-                  <i className="fa-solid fa-backward-step" />
-                </button>
-                <button className="eq-icobtn" data-on={playing} onClick={() => setPlaying((p) => !p)} title={playing ? "Pausar" : "Reanudar"}>
-                  <i className={`fa-solid ${playing ? "fa-pause" : "fa-play"}`} />
-                </button>
-                <button className="eq-icobtn" onClick={() => { setPlaying(false); setPaso((p) => Math.min(total, p + 1)); }} title="Fase siguiente">
-                  <i className="fa-solid fa-forward-step" />
-                </button>
-                <button className="eq-icobtn" onClick={reiniciar} title="Reiniciar">
-                  <i className="fa-solid fa-rotate-left" />
-                </button>
-              </div>
-            )}
+            {/* Toolbar Teoría + Sonido (siempre visible) */}
+            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
+              <button className="eq-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
+                <i className="fa-solid fa-book-open" />
+              </button>
+              <button className="eq-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
+                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
+              </button>
+              {!esComparar && (
+                <>
+                  <button className="eq-icobtn" onClick={() => { setPlaying(false); setPaso((p) => Math.max(0, p - 1)); }} title="Fase anterior">
+                    <i className="fa-solid fa-backward-step" />
+                  </button>
+                  <button className="eq-icobtn" data-on={playing} onClick={() => setPlaying((p) => !p)} title={playing ? "Pausar" : "Reanudar"}>
+                    <i className={`fa-solid ${playing ? "fa-pause" : "fa-play"}`} />
+                  </button>
+                  <button className="eq-icobtn" onClick={() => { setPlaying(false); setPaso((p) => Math.min(total, p + 1)); }} title="Fase siguiente">
+                    <i className="fa-solid fa-forward-step" />
+                  </button>
+                  <button className="eq-icobtn" onClick={reiniciar} title="Reiniciar">
+                    <i className="fa-solid fa-rotate-left" />
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* Botón flotante de Teoría */}
+            <button className="eq-teoria-fab" onClick={() => setDrawer(true)}>
+              <i className="fa-solid fa-book-open" />
+              Teoría
+            </button>
 
             {/* Pie: lectura en vivo */}
             <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 18px 14px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
@@ -495,6 +560,61 @@ export function LabRespiracion({ color }: PracticaLabProps) {
           El balance de ATP, el O₂ consumido, el CO₂/H₂O producido y la eficiencia energética que devuelve la calculadora usan la <strong>estequiometría estándar</strong> y el <strong>rendimiento teórico máximo</strong> (38 ATP/glucosa). Las estimaciones modernas, contando el costo de transportar protones, lo sitúan en <strong>~30–32 ATP</strong>. El modelo 3D es <strong>esquemático</strong> (no a escala): las esferas, la mitocondria, la cadena de complejos y las monedas de ATP representan el mecanismo, no medidas físicas. Fuente: {FUENTE}
         </span>
       </div>
+
+      {/* ── Objetivos ─────────────────────────────────────────────────────── */}
+      <div style={{ ...card, padding: "18px 22px", marginTop: 22 }}>
+        <Eyebrow>
+          <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
+          Objetivos
+        </Eyebrow>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
+          {[
+            { txt: "Observa las cuatro fases de la glucólisis en el modo Glucólisis", done: modo !== "glucolisis" || paso > 0 },
+            { txt: "Recorre las etapas de Krebs y cadena transportadora (Aerobia)", done: modo === "aerobia" || modo === "comparar" },
+            { txt: "Compara aerobia vs fermentación en el modo Comparar", done: modo === "comparar" },
+            { txt: "Usa la calculadora para ver el balance de ATP, O₂ y CO₂", done: molGlucosa !== 5 || rutaId !== "aerobia" },
+            { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
+          ].map((o, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? OK : T.text2 }}>
+              <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
+              <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Reto evaluable: el ejercicio verbatim del ancla A2 ────────────── */}
+      <RetoNumericoCard
+        reto={RETO_A2}
+        accent={accent}
+        aprobado={ejercicioAprobado}
+        onAprobado={() => setEjercicioAprobado(true)}
+        playSfx={
+          sonido
+            ? (ok) => {
+                if (ok) audioRef.current?.correcto();
+                else audioRef.current?.incorrecto();
+              }
+            : undefined
+        }
+      />
+
+      {/* ── Cajón de teoría ──────────────────────────────────────────────── */}
+      <div className="eq-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
+      <aside className="eq-drawer" data-open={drawer} aria-hidden={!drawer}>
+        <div className="eq-drawer-head">
+          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
+            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
+          </div>
+          <button className="eq-close" onClick={() => setDrawer(false)} title="Cerrar">
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
+        <div className="eq-drawer-body">
+          <FichaTeorica data={RESPIRACION_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+        </div>
+      </aside>
     </div>
   );
 }

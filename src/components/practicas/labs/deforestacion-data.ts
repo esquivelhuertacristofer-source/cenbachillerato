@@ -171,3 +171,73 @@ const ES = (n: number, dec: number) =>
 
 export const fmt0 = (n: number): string => ES(Math.round(n), 0);
 export const fmt1 = (n: number): string => ES(n, 1);
+
+/* ── Quiz evaluable — VERBATIM de CNEYT-III-P06-A2 ─────────────────────── */
+import type { QuizEvaluable } from "./_reto-quiz";
+
+export const QUIZ_A2: QuizEvaluable = {
+  titulo: "¿Cuánto sabes sobre el deterioro ambiental?",
+  puntajeMinimo: 70,
+  reactivos: [
+    {
+      enunciado: "¿Qué es la eutrofización de un cuerpo de agua?",
+      opciones: [
+        "La salinización excesiva de lagos y ríos por evaporación",
+        "El enriquecimiento excesivo de nutrientes (N y P) que causa proliferación de algas y agotamiento del oxígeno disuelto",
+        "La contaminación por metales pesados de origen industrial",
+        "El calentamiento artificial del agua por plantas termoeléctricas",
+      ],
+      respuestaCorrecta: 1,
+      retroalimentacion:
+        "La eutrofización ocurre cuando el exceso de nitrógeno y fósforo (de fertilizantes o aguas residuales) estimula la explosión de algas (bloom). Al morir, su descomposición agota el oxígeno disuelto y mata a los peces y otros organismos.",
+    },
+    {
+      enunciado: "¿Cuál de los siguientes es un GEI (gas de efecto invernadero) de MAYOR potencial de calentamiento que el CO₂?",
+      opciones: [
+        "Nitrógeno (N₂)",
+        "Argón (Ar)",
+        "Metano (CH₄)",
+        "Oxígeno (O₂)",
+      ],
+      respuestaCorrecta: 2,
+      retroalimentacion:
+        "El metano (CH₄) tiene un potencial de calentamiento global ~80 veces mayor que el CO₂ en un horizonte de 20 años; aunque su concentración atmosférica es menor, su efecto por molécula es mucho más potente.",
+    },
+    {
+      enunciado: "La deforestación contribuye al cambio climático principalmente porque:",
+      opciones: [
+        "Genera lluvias ácidas por la quema de madera",
+        "Libera el carbono almacenado en la biomasa y reduce la capacidad de absorción de CO₂ del planeta",
+        "Aumenta la reflexión solar (albedo) del suelo, enfriando la atmósfera",
+        "Solo afecta la biodiversidad local, no tiene efecto climático global",
+      ],
+      respuestaCorrecta: 1,
+      retroalimentacion:
+        "Los bosques almacenan grandes cantidades de carbono en su biomasa. Al deforestar (especialmente al quemar), ese carbono se libera como CO₂. Además, se pierde la capacidad fotosintética que absorbería CO₂ futuro.",
+    },
+    {
+      enunciado: "¿Qué describe mejor el concepto de 'islas de calor urbanas'?",
+      opciones: [
+        "Zonas del mar con temperatura anormalmente alta por corrientes oceánicas",
+        "Áreas urbanas con temperaturas más altas que su entorno rural, por pavimento, edificios y poco verde",
+        "Zonas geotérmicas dentro de ciudades con actividad volcánica subterránea",
+        "Regiones costeras que reciben más radiación solar que el interior",
+      ],
+      respuestaCorrecta: 1,
+      retroalimentacion:
+        "Las islas de calor urbanas se forman porque el asfalto, el concreto y los edificios absorben más calor que la vegetación, y los autos, industrias y aires acondicionados generan calor adicional. La falta de áreas verdes agrava el fenómeno.",
+    },
+    {
+      enunciado: "¿Qué es la acidificación del océano y cuál es su causa principal?",
+      opciones: [
+        "El aumento de sal marina por la evaporación acelerada",
+        "La absorción de CO₂ atmosférico por el océano, que forma ácido carbónico y reduce el pH",
+        "El vertido de ácidos industriales directamente al mar",
+        "El calentamiento del agua que libera ácidos naturales del suelo marino",
+      ],
+      respuestaCorrecta: 1,
+      retroalimentacion:
+        "El océano absorbe ~25% del CO₂ humano. El CO₂ disuelto reacciona con el agua: CO₂ + H₂O → H₂CO₃ (ácido carbónico), que se disocia y libera H⁺, bajando el pH. Esto daña corales, moluscos y otros organismos con concha de carbonato de calcio.",
+    },
+  ],
+};

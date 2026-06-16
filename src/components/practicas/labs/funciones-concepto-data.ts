@@ -327,6 +327,40 @@ export const RETO = {
   ] as RetoPaso[],
 };
 
+/* ── Reto evaluable (verbatim PM-IV-P01-A2, ejercicio_matematico) ─────────── */
+// Fuente: _sem4_dump.txt líneas 3335-3350.
+// Sub-preguntas con respuesta numérica exacta:
+//   (a) ¿La tabla es función? → cada tiempo tiene EXACTAMENTE 1 temperatura → 1 (sí)
+//   (b) Tasa de cambio (°C/min) → T disminuye 12 °C cada 2 min → −6 °C/min
+//   (c) T(10) = 90 − 6(10) = 30 °C
+//   (d) t cuando T = 20 °C → 90 − 6t = 20 → t = 70/6 ≈ 11.67 min
+import type { RetoNumericoData } from "./_reto-numerico";
+
+export const RETO_A2: RetoNumericoData = {
+  titulo: "Identifico y evalúo una función a partir de una tabla de valores",
+  contexto: "Se registró la temperatura (en °C) de una taza de café en reposo a lo largo del tiempo: t (min): 0, 2, 4, 6, 8 — T (°C): 90, 78, 66, 54, 42. Unidades: °C y minutos.",
+  problema:
+    "(a) ¿La tabla representa una función? — escribe 1 si sí, 0 si no.\n" +
+    "(b) ¿Cuántos grados Celsius baja la temperatura por cada minuto que pasa? (tasa de cambio; escribe el valor con signo.)\n" +
+    "(c) Usando la regla T(t) = 90 − 6t, calcula la temperatura a los 10 minutos.\n" +
+    "(d) Según el modelo, ¿a qué tiempo (en minutos) la temperatura llegará a 20 °C? Plantea 90 − 6t = 20 y resuelve.",
+  campos: [
+    { etiqueta: "(a) ¿Es función? (1 = sí, 0 = no)", objetivo: 1, tolerancia: 0, placeholder: "1" },
+    { etiqueta: "(b) Tasa de cambio (°C/min)", objetivo: -6, tolerancia: 0, unidad: "°C/min", placeholder: "−6" },
+    { etiqueta: "(c) T(10) en °C", objetivo: 30, tolerancia: 0.1, unidad: "°C", placeholder: "30" },
+    { etiqueta: "(d) Tiempo para T = 20 °C (min)", objetivo: 70 / 6, tolerancia: 0.1, unidad: "min", placeholder: "11.67" },
+  ],
+  pasosGuia: [
+    "(a) Verifica que a cada valor de t (0, 2, 4, 6, 8) le corresponde exactamente un valor de T. Sí es función: cada entrada tiene una única salida.",
+    "(b) Observa el cambio: T disminuye 12 °C cada 2 minutos → tasa de cambio = −6 °C por minuto.",
+    "(c) Sustituye t = 10: T(10) = 90 − 6(10) = 90 − 60 = 30 °C.",
+    "(d) Resuelve 90 − 6t = 20 → 6t = 70 → t = 70/6 ≈ 11.67 minutos.",
+    "Verifica: T(11.67) = 90 − 6(11.67) = 90 − 70 = 20 °C. ✓",
+  ],
+  respuestaFinal:
+    "(a) Sí es función: cada tiempo tiene exactamente una temperatura. (b) −6 °C/min. (c) T(10) = 30 °C. (d) t = 70/6 ≈ 11.7 minutos.",
+};
+
 /* ── Formato ──────────────────────────────────────────────────────────────── */
 const ES = (n: number, dec: number) =>
   n.toLocaleString("es-MX", { maximumFractionDigits: dec, minimumFractionDigits: 0 }).replace("-", "−");

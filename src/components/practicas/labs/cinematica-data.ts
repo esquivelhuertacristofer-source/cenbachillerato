@@ -82,6 +82,23 @@ export function estadoEn(m: Mov, t: number): Estado {
   return { t, x: m.xTotal, v: 0, a: 0, fase: 3 };
 }
 
+/** Tiempo en el que el auto pasa por la posición `xm` (inversa de x(t)).
+ *  Como x(t) es monótona creciente (el auto siempre avanza hasta detenerse),
+ *  la posición se puede invertir: sirve para ARRASTRAR el auto sobre la
+ *  autopista y que el instante de tiempo siga la física correcta. */
+export function tiempoEnX(m: Mov, xm: number): number {
+  const x = Math.max(0, Math.min(xm, m.xTotal));
+  if (x <= m.x1) {
+    // fase 1: x = ½·a₁·t²  ⇒  t = √(2x/a₁)
+    return Math.sqrt((2 * x) / Math.max(m.a1, 1e-6));
+  }
+  // fase 2: ½·a₂·τ² − v₁·τ + (x − x₁) = 0  ⇒  τ = (v₁ − √(v₁² − 2·a₂·(x−x₁)))/a₂
+  const c = x - m.x1;
+  const disc = Math.max(0, m.v1 * m.v1 - 2 * m.a2 * c);
+  const tau = (m.v1 - Math.sqrt(disc)) / Math.max(m.a2, 1e-6);
+  return m.t1 + tau;
+}
+
 /* ── Muestreo para las gráficas (x-t, v-t, a-t) ───────────────────────────── */
 export interface Punto { t: number; x: number; v: number; a: number; }
 

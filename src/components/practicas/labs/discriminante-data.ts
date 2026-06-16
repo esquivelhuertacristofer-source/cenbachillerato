@@ -154,3 +154,57 @@ const ES = (n: number, dec: number) =>
 export const fmtDelta = (n: number): string => (Number.isNaN(n) ? "—" : ES(n, 2));
 export const fmtNum = (n: number): string => ES(n, 2);
 export const fmtCoef = (n: number): string => ES(n, 1);
+
+/* ── Reto evaluable: verbatim de PM-III-P03-A2 (ejercicio_matematico) ─────── */
+import type { RetoNumericoData } from "./_reto-numerico";
+
+// VERBATIM de PM-III-P03-A2 (ejercicio_matematico, tipo_respuesta "desarrollo").
+// Aritmética verificada:
+//   (a) a=-5, b=30, c=10 → Δ = 30²−4(−5)(10) = 900+200 = 1100 > 0 ✓
+//   (b) h(t)=55 → −5t²+30t−45=0 → t²−6t+9=0 → Δ = 36−36 = 0 → t = 3 s ✓
+//   (c) h(t)=100 → −5t²+30t−90=0 → t²−6t+18=0 → Δ = 36−72 = −36 < 0 ✓
+export const RETO_A2: RetoNumericoData = {
+  titulo: "Determino el número de soluciones reales usando el discriminante",
+  contexto:
+    "El discriminante es una herramienta de análisis previo: permite saber cuántas soluciones reales tendrá un problema antes de resolverlo completamente, lo que es útil en ingeniería y diseño.",
+  problema:
+    "Una empresa de pirotecnia modela la altura (en metros) de un cohete con la función h(t) = -5t² + 30t + 10, donde t es el tiempo en segundos.\n" +
+    "(a) Calcula el discriminante de la ecuación -5t² + 30t + 10 = 0. ¿Cuántas veces toca el suelo el cohete?\n" +
+    "(b) ¿A qué tiempo alcanza el cohete exactamente 55 m de altura? Plantea la ecuación correspondiente y calcula el discriminante.\n" +
+    "(c) ¿Puede el cohete alcanzar 100 m de altura? Calcula el discriminante de t² - 6t + 18 = 0 para justificar sin resolver la ecuación completa.",
+  campos: [
+    {
+      etiqueta: "(a) Discriminante de −5t² + 30t + 10 = 0",
+      objetivo: 1100,
+      tolerancia: 0,
+      placeholder: "1100",
+    },
+    {
+      etiqueta: "(b) Discriminante de t² − 6t + 9 = 0 (h = 55 m)",
+      objetivo: 0,
+      tolerancia: 0,
+      placeholder: "0",
+    },
+    {
+      etiqueta: "(b) Tiempo en que el cohete alcanza 55 m",
+      objetivo: 3,
+      tolerancia: 0,
+      unidad: "s",
+      placeholder: "3",
+    },
+    {
+      etiqueta: "(c) Discriminante de t² − 6t + 18 = 0 (h = 100 m)",
+      objetivo: -36,
+      tolerancia: 0,
+      placeholder: "−36",
+    },
+  ],
+  pasosGuia: [
+    "(a) Ecuación al tocar el suelo: h(t) = 0 → −5t² + 30t + 10 = 0. Identifica a = −5, b = 30, c = 10.",
+    "(a) Calcula Δ = b² − 4ac = 900 − 4(−5)(10) = 900 + 200 = 1100 > 0 → dos raíces reales, pero solo la positiva es física.",
+    "(b) h(t) = 55 → −5t² + 30t + 10 = 55 → −5t² + 30t − 45 = 0 → t² − 6t + 9 = 0. Δ = 36 − 36 = 0 → raíz doble: t = 3 s.",
+    "(c) h(t) = 100 → −5t² + 30t − 90 = 0 → t² − 6t + 18 = 0. Δ = 36 − 72 = −36 < 0 → no alcanza 100 m.",
+  ],
+  respuestaFinal:
+    "(a) Δ = 1100 > 0, el cohete toca el suelo una vez (raíz positiva). (b) t = 3 s (raíz doble, toca los 55 m exactamente en el vértice). (c) No puede alcanzar 100 m porque Δ < 0.",
+};

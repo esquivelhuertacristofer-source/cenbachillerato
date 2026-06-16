@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getUser, getProfile } from "@/lib/supabase-helpers";
-import { getRachaDelAlumno } from "@/lib/queries/hub";
+import { getRachaDelAlumno, getUltimaActividadActiva } from "@/lib/queries/hub";
 import { HubShell } from "@/components/hub/HubShell";
 
 export default async function HubLayout({ children }: { children: React.ReactNode }) {
@@ -15,10 +15,18 @@ export default async function HubLayout({ children }: { children: React.ReactNod
     if (profile.role === "admin" || profile.role === "super_admin") redirect("/admin/escuelas");
   }
 
-  const rachaData = await getRachaDelAlumno(user.id);
+  const [rachaData, continuar] = await Promise.all([
+    getRachaDelAlumno(user.id),
+    getUltimaActividadActiva(user.id, profile.semestre ?? 1),
+  ]);
 
   return (
-    <HubShell profile={profile} racha={rachaData.diasConsecutivos}>
+    <HubShell
+      profile={profile}
+      racha={rachaData.diasConsecutivos}
+      ultimos7Dias={rachaData.ultimos7Dias}
+      continuar={continuar}
+    >
       {children}
     </HubShell>
   );

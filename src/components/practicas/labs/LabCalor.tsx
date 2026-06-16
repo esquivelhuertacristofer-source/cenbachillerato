@@ -10,10 +10,15 @@
  * Cuatro modos: conducción · convección · radiación · comparar.
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, card, Eyebrow, SceneBoundary } from "./_kit";
+import { T, OK, card, Eyebrow, SceneBoundary } from "./_kit";
+import { FichaTeorica } from "./_ficha";
+import { RetoNumericoCard } from "./_reto-numerico";
+import { LabSfx } from "./lab-audio";
+import { PROPAGACION_CALOR_FICHA } from "./propagacion-calor-ficha";
+import { RETO_A2 } from "./propagacion-calor-data";
 import {
   type Modo,
   MODOS,
@@ -65,6 +70,31 @@ export function LabCalor({ color }: PracticaLabProps) {
   const [deltaT, setDeltaT] = useState<number>(80);
   const [masaKg, setMasaKg] = useState<number>(1);
 
+  // reto evaluable, teoría (cajón deslizable) y sonido
+  const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [sonido, setSonido] = useState(false);
+  const audioRef = useRef<LabSfx | null>(null);
+
+  const toggleSonido = useCallback(async () => {
+    if (!audioRef.current) audioRef.current = new LabSfx();
+    const sfx = audioRef.current;
+    if (sonido) {
+      sfx.mute();
+      setSonido(false);
+    } else {
+      await sfx.enable();
+      setSonido(true);
+    }
+  }, [sonido]);
+
+  useEffect(() => {
+    return () => {
+      audioRef.current?.dispose();
+      audioRef.current = null;
+    };
+  }, []);
+
   const bump = () => setResetNonce((n) => n + 1);
 
   const def = MODOS_DEF[modo];
@@ -88,6 +118,7 @@ export function LabCalor({ color }: PracticaLabProps) {
     setPaso(0);
     setPlaying(m !== "comparar");
     bump();
+    if (sonido) audioRef.current?.blip();
   };
   const reiniciar = () => {
     setPaso(0);
@@ -104,6 +135,8 @@ export function LabCalor({ color }: PracticaLabProps) {
   const flujo = conduccion(mat.k, areaM2, dT, largoM); // W
   const energia = calorSensible(m, mat.c, dT); // J
   const tCal = tiempoCalentar(m, mat.c, dT, flujo); // s
+
+  const objetivo = { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado };
 
   const sceneFallback = (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 28, textAlign: "center" }}>
@@ -149,6 +182,26 @@ export function LabCalor({ color }: PracticaLabProps) {
         .cl-cmp td, .cl-cmp th { padding:8px 9px; font-size:11px; border-bottom:1px solid ${T.line}; vertical-align:top; text-align:left; }
         .cl-cmp th { font-size:9.5px; letter-spacing:0.08em; text-transform:uppercase; color:${T.text3}; }
         @media (max-width: 1000px){ .cl-bottom { grid-template-columns: 1fr !important; } }
+
+        /* Cajón de teoría */
+        .ex-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
+          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
+        .ex-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
+        .ex-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
+          background:linear-gradient(180deg,#06121e 0%,#040a16 100%); border-left:1px solid rgba(${color.rgba},0.32);
+          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
+          display:flex; flex-direction:column; }
+        .ex-drawer[data-open="true"] { transform:translateX(0); }
+        .ex-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
+          padding:18px 20px; border-bottom:1px solid ${T.line}; }
+        .ex-drawer-body { overflow-y:auto; padding:20px; flex:1; }
+        .ex-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
+          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+        .ex-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
+        .ex-teoria-fab { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); cursor:pointer; display:inline-flex; align-items:center; gap:9px;
+          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
+          background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
+        .ex-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateX(-50%) translateY(-1px); }
       `}</style>
 
       {/* Selector de modo */}
@@ -195,9 +248,19 @@ export function LabCalor({ color }: PracticaLabProps) {
               <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{def.etq.toUpperCase()}</span>
             </div>
 
-            {/* Toolbar (oculta en comparar) */}
+            {/* Toolbar siempre visible: teoría + sonido */}
+            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
+              <button className="cl-icobtn" data-on={drawerOpen} onClick={() => setDrawerOpen(true)} title="Teoría">
+                <i className="fa-solid fa-book-open" />
+              </button>
+              <button className="cl-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
+                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
+              </button>
+            </div>
+
+            {/* Toolbar de fases (oculta en comparar) */}
             {!esComparar && (
-              <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
+              <div style={{ position: "absolute", top: 60, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
                 <button className="cl-icobtn" onClick={() => { setPlaying(false); setPaso((p) => Math.max(0, p - 1)); }} title="Fase anterior">
                   <i className="fa-solid fa-backward-step" />
                 </button>
@@ -221,6 +284,12 @@ export function LabCalor({ color }: PracticaLabProps) {
               </div>
               <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6 }}>{pie}</div>
             </div>
+
+            {/* Botón flotante de Teoría */}
+            <button className="ex-teoria-fab" onClick={() => setDrawerOpen(true)}>
+              <i className="fa-solid fa-book-open" />
+              Teoría
+            </button>
           </div>
 
           {/* Panel de control */}
@@ -449,6 +518,14 @@ export function LabCalor({ color }: PracticaLabProps) {
               <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>{x}</li>
             ))}
           </ul>
+
+          <div style={{ marginTop: 16, paddingTop: 14, borderTop: `1px solid ${T.line}` }}>
+            <Eyebrow><i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />Objetivo</Eyebrow>
+            <div style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13, color: objetivo.done ? OK : T.text2, marginTop: 4 }}>
+              <i className={`fa-solid ${objetivo.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: objetivo.done ? 1 : 0.3 }} />
+              <span style={{ fontWeight: objetivo.done ? 700 : 500 }}>{objetivo.txt}</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -459,6 +536,39 @@ export function LabCalor({ color }: PracticaLabProps) {
           El flujo de conducción (Q/t = k·A·ΔT/L), la energía sensible (Q = m·c·ΔT) y el tiempo de calentamiento que devuelve la calculadora son <strong>exactos</strong> para los valores de k y c reales de cada material. El modelo 3D es <strong>esquemático</strong> (no a escala): el gradiente de color, las corrientes del fluido y los anillos de onda representan el mecanismo de transporte, no medidas físicas. Fuente: {FUENTE}
         </span>
       </div>
+
+      {/* ── Reto evaluable: el ejercicio verbatim del ancla A2 ────────── */}
+      <RetoNumericoCard
+        reto={RETO_A2}
+        accent={accent}
+        aprobado={ejercicioAprobado}
+        onAprobado={() => setEjercicioAprobado(true)}
+        playSfx={
+          sonido
+            ? (ok) => {
+                if (ok) audioRef.current?.correcto();
+                else audioRef.current?.incorrecto();
+              }
+            : undefined
+        }
+      />
+
+      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
+      <div className="ex-scrim" data-open={drawerOpen} onClick={() => setDrawerOpen(false)} />
+      <aside className="ex-drawer" data-open={drawerOpen} aria-hidden={!drawerOpen}>
+        <div className="ex-drawer-head">
+          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
+            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
+          </div>
+          <button className="ex-close" onClick={() => setDrawerOpen(false)} title="Cerrar">
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
+        <div className="ex-drawer-body">
+          <FichaTeorica data={PROPAGACION_CALOR_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+        </div>
+      </aside>
     </div>
   );
 }

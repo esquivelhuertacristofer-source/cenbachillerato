@@ -16,6 +16,8 @@
  * escena, respetando el límite de 3 MiB gzipped del Worker de Cloudflare).
  */
 
+import type { QuizEvaluable } from "./_reto-quiz";
+
 export type Pt = [number, number, number];
 export type Modo = "conejos" | "tipos" | "evidencias";
 
@@ -491,3 +493,58 @@ export const DATOS: DatoCard[] = [
   { valor: "1859", texto: "Darwin publica «El origen de las especies».", icono: "fa-book" },
   { valor: "4 postulados", texto: "fundamentan la selección natural de Darwin-Wallace.", icono: "fa-list-check" },
 ];
+
+/* ════════════════════════════════════════════════════════════════════════════
+   RETO EVALUABLE (parte B del tratamiento) — VERBATIM del quiz A4
+   «Verdadero o Falso — Teoría de la evolución por selección natural»
+   (quiz_verdadero_falso). La actividad ancla del lab (A2) es una SIMULACIÓN,
+   no evaluable como quiz; por eso el reto evaluable se ancla a A4.
+   Cada reactivo V/F se mapea a opciones ["Verdadero","Falso"]; respuesta=true
+   → respuestaCorrecta 0, respuesta=false → respuestaCorrecta 1.
+   ════════════════════════════════════════════════════════════════════════════ */
+export const QUIZ_A2: QuizEvaluable = {
+  titulo: "Verdadero o Falso — Teoría de la evolución por selección natural",
+  puntajeMinimo: 70,
+  reactivos: [
+    {
+      enunciado:
+        "La selección natural actúa sobre el fenotipo, favoreciendo a los individuos cuyas características les confieren mayor éxito reproductivo en un ambiente particular.",
+      opciones: ["Verdadero", "Falso"],
+      respuestaCorrecta: 0,
+      retroalimentacion:
+        "Correcto. Darwin identificó los tres requisitos para que ocurra la selección natural: variación heredable en la población, diferencias en supervivencia/reproducción según esa variación (aptitud diferencial), y que el rasgo sea heritable.",
+    },
+    {
+      enunciado:
+        "Darwin propuso que la evolución ocurre porque los individuos adquieren características útiles durante su vida y las transmiten a su descendencia, mecanismo conocido como herencia de los caracteres adquiridos.",
+      opciones: ["Verdadero", "Falso"],
+      respuestaCorrecta: 1,
+      retroalimentacion:
+        "Falso. Esa es la teoría de Lamarck (herencia de caracteres adquiridos), que fue descartada. Darwin propuso la selección natural: los individuos con variaciones heredables ventajosas sobreviven y se reproducen más, no adquieren rasgos durante su vida.",
+    },
+    {
+      enunciado:
+        "Los fósiles constituyen una evidencia directa de la evolución porque muestran formas de vida del pasado y permiten rastrear la aparición y transformación de grupos biológicos a lo largo del tiempo geológico.",
+      opciones: ["Verdadero", "Falso"],
+      respuestaCorrecta: 0,
+      retroalimentacion:
+        "Correcto. El registro fósil es la evidencia más directa de la evolución. Los fósiles de Tiktaalik (pez con aletas similares a extremidades), Archaeopteryx (transición dinosaurio-ave) y la secuencia de equinos (Hyracotherium→Equus) son ejemplos icónicos.",
+    },
+    {
+      enunciado:
+        "Las estructuras análogas (como las alas de los murciélagos, las aves y los insectos) son evidencia de ancestro común porque muestran la misma arquitectura ósea adaptada a funciones distintas.",
+      opciones: ["Verdadero", "Falso"],
+      respuestaCorrecta: 1,
+      retroalimentacion:
+        "Falso. Las estructuras con la misma arquitectura interna pero funciones distintas son estructuras HOMÓLOGAS (evidencia de ancestro común). Las estructuras ANÁLOGAS tienen funciones similares pero origen evolutivo independiente (evolución convergente), como las alas de aves e insectos.",
+    },
+    {
+      enunciado:
+        "La biología molecular y la comparación de secuencias de ADN y proteínas entre especies son evidencias de la evolución: cuanto más parecidas son las secuencias, más cercano es el parentesco evolutivo.",
+      opciones: ["Verdadero", "Falso"],
+      respuestaCorrecta: 0,
+      retroalimentacion:
+        "Correcto. La filogenia molecular compara genomas, proteínas (como el citocromo c) y ARNr para reconstruir árboles filogenéticos. El genoma humano comparte ~98.7% de similitud con el chimpancé y ~85% con el ratón, consistente con el parentesco evolutivo.",
+    },
+  ],
+};

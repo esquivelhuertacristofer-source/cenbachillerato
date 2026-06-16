@@ -18,8 +18,8 @@
  */
 
 import * as THREE from "three";
-import { useCallback, useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useCallback, useMemo, useRef, useState } from "react";
+import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, ContactShadows, Environment, Lightformer, Line, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import {
@@ -47,6 +47,14 @@ export interface NormalSceneProps {
   pausado: boolean;
   autoRotate: boolean;
   resetNonce: number;
+  /** Habilita arrastrar los tiradores (μ, σ, extremos a/b) sobre la campana. */
+  arrastrable?: boolean;
+  onDragMu?: (mu: number) => void;
+  onDragSigma?: (sigma: number) => void;
+  onDragA?: (a: number) => void;
+  onDragB?: (b: number) => void;
+  /** Se llama al tomar un tirador (para el sonido). */
+  onGrab?: () => void;
 }
 
 const ORO = "#ffd24a";
@@ -62,12 +70,133 @@ const BANDAS = ["#34D399", "#5fb0ff", "#a78bfa"];
 const BOARD_W = 12;
 const BOARD_H = 7;
 
+/* ── Scratch a nivel de módulo (sin asignar memoria por frame) ─────────── */
+const _planeZ = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0); // plano del tablero (z=0)
+const _hit = new THREE.Vector3();
+const _obj = new THREE.Object3D();
+const MUESTRAS_N = 46; // datos cayendo sobre la campana (partículas en tiempo real)
+
+// Hash determinista [0,1) (sin Math.random, válido en useFrame).
+const hashU = (n: number): number => {
+  const s = Math.sin(n * 127.1) * 43758.5453;
+  return s - Math.floor(s);
+};
+// Suma de 3 uniformes (Irwin-Hall) ≈ normal estándar (σ≈0.5): da una nube en forma de campana.
+const quasiNormal = (i: number): number =>
+  hashU(i * 1.7 + 0.3) + hashU(i * 2.3 + 1.1) + hashU(i * 3.1 + 2.7) - 1.5;
+
+/* ── Muestras cayendo que “llenan” la campana (InstancedMesh) ──────────── */
+function LluviaMuestras({ mu, sigma, xMin, xMax, OX, SX, OY, SY, yMax, accent, pausado }: {
+  mu: number; sigma: number; xMin: number; xMax: number;
+  OX: number; SX: number; OY: number; SY: number; yMax: number; accent: string; pausado: boolean;
+}) {
+  const ref = useRef<THREE.InstancedMesh>(null);
+  const reloj = useRef(0);
+  useFrame((_, delta) => {
+    const m = ref.current;
+    if (!m) return;
+    if (!pausado) reloj.current += delta;
+    const t = reloj.current;
+    const wyTop = OY + yMax * SY + 0.6;
+    for (let i = 0; i < MUESTRAS_N; i++) {
+      let tx = mu + quasiNormal(i) * 2 * sigma;
+      tx = Math.max(xMin, Math.min(xMax, tx));
+      const wx = OX + (tx - xMin) * SX;
+      const curveY = OY + pdf(tx, mu, sigma) * SY;
+      const p = (t * 0.22 + i * 0.111) % 1; // 0 arriba → 1 sobre la curva
+      const y = curveY + (1 - p) * (wyTop - curveY);
+      _obj.position.set(wx, y, 0.05);
+      _obj.scale.setScalar(0.06 + 0.05 * p);
+      _obj.updateMatrix();
+      m.setMatrixAt(i, _obj.matrix);
+    }
+    m.instanceMatrix.needsUpdate = true;
+  });
+  return (
+    <instancedMesh ref={ref} args={[undefined, undefined, MUESTRAS_N]}>
+      <sphereGeometry args={[1, 8, 8]} />
+      <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.6} transparent opacity={0.72} toneMapped={false} />
+    </instancedMesh>
+  );
+}
+
+/* ── Tirador arrastrable (μ / σ / extremo a / extremo b) ───────────────── */
+function Tirador({ px, py, color, label, invX, toValue, lo, hi, onSet, onGrab, setDragging }: {
+  px: number; py: number; color: string; label: string;
+  invX: (worldX: number) => number; toValue: (mathX: number) => number;
+  lo: number; hi: number;
+  onSet: (v: number) => void; onGrab?: () => void; setDragging: (v: boolean) => void;
+}) {
+  const drag = useRef(false);
+  const knob = useRef<THREE.Mesh>(null);
+  const [hover, setHover] = useState(false);
+  useFrame((s) => {
+    if (knob.current) {
+      const t = s.clock.elapsedTime;
+      knob.current.scale.setScalar((hover || drag.current ? 1.3 : 1) * (1 + Math.sin(t * 4) * 0.06));
+    }
+  });
+  const set = (e: ThreeEvent<PointerEvent>) => {
+    if (!e.ray.intersectPlane(_planeZ, _hit)) return;
+    onSet(Math.max(lo, Math.min(hi, toValue(invX(_hit.x)))));
+  };
+  return (
+    <group position={[px, py, 0.16]}>
+      <mesh ref={knob}>
+        <sphereGeometry args={[0.2, 20, 20]} />
+        <meshStandardMaterial color="#ffffff" emissive={color} emissiveIntensity={0.9} toneMapped={false} />
+      </mesh>
+      <mesh rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[0.36, 0.04, 12, 28]} />
+        <meshBasicMaterial color={color} transparent opacity={hover ? 0.95 : 0.5} />
+      </mesh>
+      <mesh
+        onPointerOver={() => setHover(true)}
+        onPointerOut={() => setHover(false)}
+        onPointerDown={(e) => {
+          e.stopPropagation();
+          (e.target as Element).setPointerCapture?.(e.pointerId);
+          drag.current = true;
+          setDragging(true);
+          onGrab?.();
+          set(e);
+        }}
+        onPointerMove={(e) => {
+          if (!drag.current) return;
+          e.stopPropagation();
+          set(e);
+        }}
+        onPointerUp={(e) => {
+          drag.current = false;
+          setDragging(false);
+          (e.target as Element).releasePointerCapture?.(e.pointerId);
+        }}
+      >
+        <sphereGeometry args={[0.6, 14, 14]} />
+        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+      </mesh>
+      <Html position={[0, 0.55, 0]} center distanceFactor={14} zIndexRange={[30, 0]} style={{ pointerEvents: "none" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "3px 8px", borderRadius: 999, background: "rgba(4,10,22,0.82)", border: `1px solid ${color}`, color: "#fff", fontSize: 10, fontWeight: 800, whiteSpace: "nowrap" }}>
+          <i className="fa-solid fa-hand-pointer" /> {label}
+        </div>
+      </Html>
+    </group>
+  );
+}
+
 /* ════════════════════ CONTENIDO DEL PLANO ═══════════════════════════════ */
-function Plano({ presetId, accent, modo, mu, sigma, a, b, pausado }: {
+function Plano({ presetId, accent, modo, mu, sigma, a, b, pausado, arrastrable, onDragMu, onDragSigma, onDragA, onDragB, onGrab, setDragging }: {
   presetId: string; accent: string; modo: Modo; mu: number; sigma: number; a: number; b: number; pausado: boolean;
+  arrastrable?: boolean;
+  onDragMu?: (mu: number) => void;
+  onDragSigma?: (sigma: number) => void;
+  onDragA?: (a: number) => void;
+  onDragB?: (b: number) => void;
+  onGrab?: () => void;
+  setDragging: (v: boolean) => void;
 }) {
   const preset = useMemo(() => presetPorId(presetId), [presetId]);
-  const { xMin, xMax, unidad } = preset;
+  const { xMin, xMax, unidad, muMin, muMax, sigmaMin, sigmaMax } = preset;
   const yMax = useMemo(() => picoMaximo(preset) * 1.06, [preset]);
 
   // Mapeo matemático → mundo.
@@ -77,6 +206,7 @@ function Plano({ presetId, accent, modo, mu, sigma, a, b, pausado }: {
   const OY = -BOARD_H / 2;
   const wx = useCallback((x: number): number => OX + (x - xMin) * SX, [OX, xMin, SX]);
   const wy = useCallback((y: number): number => OY + y * SY, [OY, SY]);
+  const invX = useCallback((worldX: number): number => xMin + (worldX - OX) / SX, [OX, xMin, SX]);
   const w3 = (x: number, y: number, z = 0): [number, number, number] => [wx(x), wy(y), z];
 
   const curva = useMemo(() => curvaNormal(mu, sigma, xMin, xMax), [mu, sigma, xMin, xMax]);
@@ -279,6 +409,39 @@ function Plano({ presetId, accent, modo, mu, sigma, a, b, pausado }: {
         </mesh>
       )}
 
+      {/* muestras que “llueven” y se acomodan en la campana (partículas en vivo) */}
+      <LluviaMuestras mu={mu} sigma={sigma} xMin={xMin} xMax={xMax} OX={OX} SX={SX} OY={OY} SY={SY} yMax={yMax} accent={accent} pausado={pausado} />
+
+      {/* ── Tiradores arrastrables (manipular μ, σ y el rango directamente) ── */}
+      {arrastrable && (
+        <>
+          <Tirador
+            px={wx(mu)} py={wy(pdf(mu, mu, sigma))} color={ORO} label="μ"
+            invX={invX} toValue={(mx) => mx} lo={muMin} hi={muMax}
+            onSet={(v) => onDragMu?.(v)} onGrab={onGrab} setDragging={setDragging}
+          />
+          <Tirador
+            px={wx(Math.min(mu + sigma, xMax))} py={wy(pdf(mu + sigma, mu, sigma))} color={AZUL} label="σ"
+            invX={invX} toValue={(mx) => mx - mu} lo={sigmaMin} hi={sigmaMax}
+            onSet={(v) => onDragSigma?.(v)} onGrab={onGrab} setDragging={setDragging}
+          />
+          {modo === "probabilidad" && (
+            <>
+              <Tirador
+                px={wx(a)} py={wy(pdf(a, mu, sigma))} color={VERDE} label="a"
+                invX={invX} toValue={(mx) => mx} lo={xMin} hi={xMax}
+                onSet={(v) => onDragA?.(v)} onGrab={onGrab} setDragging={setDragging}
+              />
+              <Tirador
+                px={wx(b)} py={wy(pdf(b, mu, sigma))} color={MAGENTA} label="b"
+                invX={invX} toValue={(mx) => mx} lo={xMin} hi={xMax}
+                onSet={(v) => onDragB?.(v)} onGrab={onGrab} setDragging={setDragging}
+              />
+            </>
+          )}
+        </>
+      )}
+
       <ContactShadows position={[0, OY - 0.4, 0]} opacity={0.26} scale={BOARD_W + 6} blur={2.4} far={6} />
     </group>
   );
@@ -299,7 +462,8 @@ export default function NormalScene(props: NormalSceneProps) {
 }
 
 function Contenido(props: NormalSceneProps) {
-  const { presetId, accent, modo, mu, sigma, a, b, pausado, autoRotate, resetNonce } = props;
+  const { presetId, accent, modo, mu, sigma, a, b, pausado, autoRotate, resetNonce, arrastrable, onDragMu, onDragSigma, onDragA, onDragB, onGrab } = props;
+  const [dragging, setDragging] = useState(false);
   return (
     <>
       <color attach="background" args={["#03101f"]} />
@@ -319,7 +483,11 @@ function Contenido(props: NormalSceneProps) {
       <pointLight position={[0, 0, 8]} intensity={2.4} color="#ffffff" />
 
       <group key={`${resetNonce}`}>
-        <Plano presetId={presetId} accent={accent} modo={modo} mu={mu} sigma={sigma} a={a} b={b} pausado={pausado} />
+        <Plano
+          presetId={presetId} accent={accent} modo={modo} mu={mu} sigma={sigma} a={a} b={b} pausado={pausado}
+          arrastrable={arrastrable} onDragMu={onDragMu} onDragSigma={onDragSigma} onDragA={onDragA} onDragB={onDragB}
+          onGrab={onGrab} setDragging={setDragging}
+        />
       </group>
 
       <Environment resolution={256}>
@@ -330,12 +498,13 @@ function Contenido(props: NormalSceneProps) {
 
       <OrbitControls
         enablePan={false}
+        enabled={!dragging}
         minDistance={9}
         maxDistance={24}
         minPolarAngle={Math.PI / 6}
         maxPolarAngle={Math.PI / 1.9}
         target={[0, 0, 0]}
-        autoRotate={autoRotate}
+        autoRotate={autoRotate && !dragging}
         autoRotateSpeed={0.4}
       />
 

@@ -6,6 +6,8 @@
  * estándar (la tabla de codones es el código genético universal).
  */
 
+import type { QuizEvaluable } from "./_reto-quiz";
+
 export type Pt = [number, number, number];
 export type Base = "A" | "T" | "G" | "C" | "U";
 export type Modo = "replicacion" | "transcripcion" | "traduccion";
@@ -347,3 +349,52 @@ export const HECHOS: string[] = [
   "La replicación es semiconservativa: cada hija conserva una cadena parental (Meselson-Stahl, 1958).",
   "El ARNr forma parte del ribosoma y cataliza la formación del enlace peptídico.",
 ];
+
+/* ── Reto evaluable (parte B) ─────────────────────────────────────────────
+ * VERBATIM del quiz A2 «Verdadero o Falso: ADN, ARN y proteínas»
+ * (tipo quiz_verdadero_falso, puntaje mínimo de aprobación 70).
+ * Cada reactivo V/F se mapea a opciones ["Verdadero","Falso"]:
+ *   respuestaCorrecta = respuesta ? 0 (Verdadero) : 1 (Falso).
+ */
+export const QUIZ_A2: QuizEvaluable = {
+  titulo: "Verdadero o Falso: ADN, ARN y proteínas",
+  puntajeMinimo: 70,
+  reactivos: [
+    {
+      enunciado: "El ADN se replica de forma semiconservativa: cada cadena original sirve de molde para una nueva cadena.",
+      opciones: ["Verdadero", "Falso"],
+      respuestaCorrecta: 0,
+      retroalimentacion: "La afirmación es Verdadero. Si tu respuesta fue distinta, revisa el concepto clave mencionado en el enunciado dentro del texto de la progresión para confirmar el razonamiento correcto.",
+    },
+    {
+      enunciado: "La transcripción produce una molécula de ADN a partir de una de ARN.",
+      opciones: ["Verdadero", "Falso"],
+      respuestaCorrecta: 1,
+      retroalimentacion: "La afirmación es Falso. Si tu respuesta fue distinta, revisa el concepto clave mencionado en el enunciado dentro del texto de la progresión para confirmar el razonamiento correcto.",
+    },
+    {
+      enunciado: "El ARN mensajero (ARNm) lleva la información genética del núcleo al ribosoma para la traducción.",
+      opciones: ["Verdadero", "Falso"],
+      respuestaCorrecta: 0,
+      retroalimentacion: "La afirmación es Verdadero. Si tu respuesta fue distinta, revisa el concepto clave mencionado en el enunciado dentro del texto de la progresión para confirmar el razonamiento correcto.",
+    },
+    {
+      enunciado: "El codón AUG codifica metionina y es el codón de inicio de la traducción.",
+      opciones: ["Verdadero", "Falso"],
+      respuestaCorrecta: 0,
+      retroalimentacion: "La afirmación es Verdadero. Si tu respuesta fue distinta, revisa el concepto clave mencionado en el enunciado dentro del texto de la progresión para confirmar el razonamiento correcto.",
+    },
+    {
+      enunciado: "Una mutación puntual silenciosa siempre cambia el aminoácido de la proteína resultante.",
+      opciones: ["Verdadero", "Falso"],
+      respuestaCorrecta: 1,
+      retroalimentacion: "La afirmación es Falso. Si tu respuesta fue distinta, revisa el concepto clave mencionado en el enunciado dentro del texto de la progresión para confirmar el razonamiento correcto.",
+    },
+    {
+      enunciado: "El ARN ribosómico (ARNr) forma parte de la estructura del ribosoma y cataliza la formación del enlace peptídico.",
+      opciones: ["Verdadero", "Falso"],
+      respuestaCorrecta: 0,
+      retroalimentacion: "La afirmación es Verdadero. Si tu respuesta fue distinta, revisa el concepto clave mencionado en el enunciado dentro del texto de la progresión para confirmar el razonamiento correcto.",
+    },
+  ],
+};

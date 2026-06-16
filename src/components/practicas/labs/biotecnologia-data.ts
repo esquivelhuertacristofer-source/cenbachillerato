@@ -11,6 +11,7 @@
  * reparación NHEJ/HDR).
  */
 
+import type { QuizEvaluable } from "./_reto-quiz";
 import {
   type Base,
   complementoADN,
@@ -451,3 +452,66 @@ export const CONTEXTO =
 
 export const FUENTE =
   "LANGEBIO CINVESTAV Irapuato — Edición Genómica en Maíces Mexicanos 2023; CONBIOÉTICA — Marco ético para la biotecnología 2022; CIBIOGEM — Informe anual de OGM en México 2022. Contenido verbatim del MCCEMS 2025 (infografía A1, glosario A5, quizzes A2/A4).";
+
+/* ════════════════════════════════════════════════════════════════════════
+   QUIZ EVALUABLE — VERBATIM de CNEYT-VI-P08-A2 (quiz_multiple_opcion
+   «Quiz: Bioética y biotecnología»). Se usa en la tarjeta evaluable del lab
+   (parte B del tratamiento): el alumno responde el quiz real dentro del lab.
+   ════════════════════════════════════════════════════════════════════════ */
+export const QUIZ_A2: QuizEvaluable = {
+  titulo: "Bioética y biotecnología",
+  puntajeMinimo: 70,
+  reactivos: [
+    {
+      enunciado: "¿Cuál es el mecanismo de acción de CRISPR-Cas9?",
+      opciones: [
+        "Inserta genes al azar en el genoma usando virus",
+        "Una ARN guía dirige la proteína Cas9 al sitio exacto del ADN para cortarlo",
+        "Produce copias de ARNm para aumentar la expresión génica",
+        "Elimina cromosomas completos de la célula",
+      ],
+      respuestaCorrecta: 1,
+      retroalimentacion:
+        "CRISPR-Cas9 usa una ARN guía complementaria al sitio diana del ADN. La Cas9 corta el ADN con precisión y la célula puede repararlo con o sin la secuencia deseada.",
+    },
+    {
+      enunciado: "¿Por qué el maíz transgénico es tema de debate especial en México?",
+      opciones: [
+        "Porque México no produce maíz nativo",
+        "Porque México es centro de origen y diversificación del maíz, y hay riesgo de contaminación del germoplasma nativo",
+        "Porque el maíz OGM es ilegal en todo el mundo",
+        "Porque el maíz Bt produce toxinas peligrosas para humanos",
+      ],
+      respuestaCorrecta: 1,
+      retroalimentacion:
+        "México es el centro de origen del maíz y alberga cientos de variedades nativas. La contaminación por flujo génico de variedades transgénicas amenaza esa biodiversidad y la soberanía alimentaria.",
+    },
+    {
+      enunciado:
+        "¿Cuál principio bioético obliga al médico a respetar la decision informada del paciente sobre su tratamiento?",
+      opciones: ["No maleficencia", "Beneficencia", "Autonomia", "Justicia"],
+      respuestaCorrecta: 2,
+      retroalimentacion:
+        "El principio de autonomia establece que el paciente tiene derecho a tomar decisiones informadas sobre su propio cuerpo y tratamiento. El consentimiento informado es su expresion concreta.",
+    },
+    {
+      enunciado: "¿Cuál es la diferencia entre clonacion reproductiva y clonacion terapéutica?",
+      opciones: [
+        "La reproductiva usa CRISPR y la terapéutica no",
+        "La reproductiva busca crear un individuo completo; la terapéutica busca obtener células madre para tratar enfermedades",
+        "La terapéutica esta prohibida en todos los paises",
+        "No hay diferencia; son el mismo proceso",
+      ],
+      respuestaCorrecta: 1,
+      retroalimentacion:
+        "La clonacion reproductiva persigue generar un organismo completo geneticamente identico (como Dolly). La terapéutica usa embriones clonados solo para obtener células madre compatibles con un paciente, sin fines reproductivos.",
+    },
+    {
+      enunciado: "¿Qué organismo regula en México el uso y liberacion de OGM al ambiente?",
+      opciones: ["IMSS", "CIBIOGEM", "UNAM", "PEMEX"],
+      respuestaCorrecta: 1,
+      retroalimentacion:
+        "La CIBIOGEM (Comision Intersecretarial de Bioseguridad de los Organismos Geneticamente Modificados) es el organismo gubernamental mexicano que aplica el principio de precaucion y regula los OGM.",
+    },
+  ],
+};

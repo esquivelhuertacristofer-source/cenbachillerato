@@ -17,15 +17,15 @@
  */
 
 import * as THREE from "three";
-import { useEffect, useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, ContactShadows, Environment, Lightformer, Edges, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import {
   presion,
   velocidadRel,
   fmtNum,
-  V_MIN, V_MAX, N_MIN, N_MAX, T_MIN, T_MAX, P_GAUGE_MAX,
+  V_MIN, V_MAX, V_STEP, N_MIN, N_MAX, T_MIN, T_MAX, P_GAUGE_MAX,
 } from "./gas-ideal-data";
 
 export interface GasIdealSceneProps {
@@ -36,7 +36,14 @@ export interface GasIdealSceneProps {
   pausado: boolean;
   autoRotate: boolean;
   resetNonce: number;
+  /** Permite ARRASTRAR el pistón (pilar de interactividad). */
+  arrastrable?: boolean;
+  /** Se llama mientras el alumno arrastra el pistón → nuevo volumen (L). */
+  onVolumenChange?: (v: number) => void;
 }
+
+// Y del grupo raíz de la escena (para convertir coordenadas mundo↔columna).
+const GROUP_Y = -1.5;
 
 // Recipiente (semiejes de la sección transversal, en unidades de mundo)
 const BOX = { hx: 1.05, hz: 1.05 };
@@ -57,6 +64,18 @@ const HOT = new THREE.Color("#ff5a1f");
 
 /** Altura de la columna de gas para un volumen dado. */
 const alturaDeV = (V: number) => H_MIN + ((V - V_MIN) / (V_MAX - V_MIN)) * (H_MAX - H_MIN);
+
+/** Inverso: volumen (L) para una altura de columna dada, recortado y a escalón. */
+const vDeAltura = (h: number) => {
+  const raw = V_MIN + ((h - H_MIN) / (H_MAX - H_MIN)) * (V_MAX - V_MIN);
+  const snapped = Math.round(raw / V_STEP) * V_STEP;
+  return Math.min(V_MAX, Math.max(V_MIN, snapped));
+};
+
+// Vectores de trabajo para el arrastre (una sola instancia de pistón).
+const _planeN = new THREE.Vector3();
+const _hit = new THREE.Vector3();
+const _dragPlane = new THREE.Plane();
 
 /** Número de partículas activas para una cantidad de sustancia dada. */
 const countDeN = (n: number) => {
@@ -224,24 +243,103 @@ function Cilindro() {
 }
 
 /* ── Pistón (tapa móvil que marca el volumen) ─────────────────────────── */
-function Piston({ h }: { h: number }) {
+/**
+ * Pistón ARRASTRABLE. Si `onVolumenChange` está presente, el alumno puede
+ * agarrar el mango y deslizarlo: se proyecta el rayo del puntero sobre un plano
+ * vertical que mira a la cámara, se lee la altura y se convierte a volumen
+ * (PV = nRT responde en tiempo real). Usa captura de puntero para seguir el
+ * arrastre aunque el cursor salga de la malla, y desactiva OrbitControls.
+ */
+function Piston({
+  h,
+  arrastrable = false,
+  onVolumenChange,
+  onDragState,
+}: {
+  h: number;
+  arrastrable?: boolean;
+  onVolumenChange?: (v: number) => void;
+  onDragState?: (dragging: boolean) => void;
+}) {
   const w = BOX.hx * 2 - 0.06, d = BOX.hz * 2 - 0.06;
+  const { camera } = useThree();
+  const dragging = useRef(false);
+  const grabOffset = useRef(0); // h − altura-de-agarre, para no dar saltos
+  const [hover, setHover] = useState(false);
+  const interactivo = arrastrable && !!onVolumenChange;
+
+  const onDown = (e: ThreeEvent<PointerEvent>) => {
+    if (!interactivo) return;
+    e.stopPropagation();
+    dragging.current = true;
+    onDragState?.(true);
+    // Plano vertical que pasa por el punto de agarre y mira a la cámara.
+    camera.getWorldDirection(_planeN);
+    _planeN.y = 0;
+    _planeN.normalize();
+    _dragPlane.setFromNormalAndCoplanarPoint(_planeN, e.point);
+    grabOffset.current = h - (e.point.y - GROUP_Y);
+    (e.target as Element).setPointerCapture?.(e.pointerId);
+  };
+
+  const onMove = (e: ThreeEvent<PointerEvent>) => {
+    if (!dragging.current) return;
+    e.stopPropagation();
+    if (e.ray.intersectPlane(_dragPlane, _hit)) {
+      const nuevaH = (_hit.y - GROUP_Y) + grabOffset.current;
+      onVolumenChange!(vDeAltura(nuevaH));
+    }
+  };
+
+  const onUp = (e: ThreeEvent<PointerEvent>) => {
+    if (!dragging.current) return;
+    e.stopPropagation();
+    dragging.current = false;
+    onDragState?.(false);
+    (e.target as Element).releasePointerCapture?.(e.pointerId);
+  };
+
+  const matColor = interactivo ? (hover ? "#d6ecff" : "#bcd6f2") : "#9fc0e0";
+
   return (
     <group position={[0, h, 0]}>
-      <mesh castShadow>
+      <mesh
+        castShadow
+        onPointerDown={onDown}
+        onPointerMove={onMove}
+        onPointerUp={onUp}
+        onPointerOver={() => interactivo && setHover(true)}
+        onPointerOut={() => setHover(false)}
+      >
         <boxGeometry args={[w, 0.14, d]} />
-        <meshStandardMaterial color="#9fc0e0" metalness={0.7} roughness={0.3} />
+        <meshStandardMaterial color={matColor} metalness={0.7} roughness={0.3} emissive={interactivo && hover ? "#3aa0ff" : "#000000"} emissiveIntensity={interactivo && hover ? 0.35 : 0} />
       </mesh>
       {/* Vástago */}
       <mesh position={[0, (H_MAX + 0.6 - h) / 2 + 0.07, 0]}>
         <cylinderGeometry args={[0.07, 0.07, H_MAX + 0.6 - h, 16]} />
         <meshStandardMaterial color="#6f8aa6" metalness={0.6} roughness={0.4} />
       </mesh>
-      {/* Mango */}
-      <mesh position={[0, H_MAX + 0.6 - h + 0.12, 0]}>
+      {/* Mango (zona de agarre) */}
+      <mesh
+        position={[0, H_MAX + 0.6 - h + 0.12, 0]}
+        onPointerDown={onDown}
+        onPointerMove={onMove}
+        onPointerUp={onUp}
+        onPointerOver={() => interactivo && setHover(true)}
+        onPointerOut={() => setHover(false)}
+      >
         <boxGeometry args={[0.6, 0.12, 0.2]} />
-        <meshStandardMaterial color="#b9d2ec" metalness={0.5} roughness={0.4} />
+        <meshStandardMaterial color={matColor} metalness={0.5} roughness={0.4} emissive={interactivo && hover ? "#3aa0ff" : "#000000"} emissiveIntensity={interactivo && hover ? 0.4 : 0} />
       </mesh>
+      {/* Pista de "arrástrame" cuando es interactivo y el cursor pasa por encima */}
+      {interactivo && hover && (
+        <Html center position={[0, H_MAX + 0.6 - h + 0.45, 0]} distanceFactor={14} pointerEvents="none">
+          <div style={{ whiteSpace: "nowrap", fontSize: 11, fontWeight: 800, color: "#bfe8ff", textShadow: "0 2px 10px rgba(0,0,0,0.95)" }}>
+            <i className="fa-solid fa-up-down" style={{ marginRight: 6 }} />
+            arrastra el pistón
+          </div>
+        </Html>
+      )}
     </group>
   );
 }
@@ -282,7 +380,8 @@ export default function GasIdealScene(props: GasIdealSceneProps) {
 
 /** Contenido: DEBE vivir dentro de <Canvas> (useFrame solo funciona ahí). */
 function Contenido(props: GasIdealSceneProps) {
-  const { temp, volumen, moles, accent, pausado, autoRotate, resetNonce } = props;
+  const { temp, volumen, moles, accent, pausado, autoRotate, resetNonce, arrastrable, onVolumenChange } = props;
+  const [dragging, setDragging] = useState(false);
 
   const h = useMemo(() => alturaDeV(volumen), [volumen]);
   const P = useMemo(() => presion(moles, temp, volumen), [moles, temp, volumen]);
@@ -320,7 +419,7 @@ function Contenido(props: GasIdealSceneProps) {
         </mesh>
 
         <Cilindro />
-        <Piston h={h} />
+        <Piston h={h} arrastrable={arrastrable} onVolumenChange={onVolumenChange} onDragState={setDragging} />
         <GasParticulas temp={temp} volumen={volumen} moles={moles} accent={accent} pausado={pausado} resetNonce={resetNonce} />
         <Manometro P={P} accent={accent} />
 
@@ -348,13 +447,14 @@ function Contenido(props: GasIdealSceneProps) {
       </Environment>
 
       <OrbitControls
+        enabled={!dragging}
         enablePan={false}
         minDistance={4}
         maxDistance={12}
         minPolarAngle={Math.PI / 7}
         maxPolarAngle={Math.PI / 2.05}
         target={[0.3, 0.2, 0]}
-        autoRotate={autoRotate}
+        autoRotate={autoRotate && !dragging}
         autoRotateSpeed={0.4}
       />
 

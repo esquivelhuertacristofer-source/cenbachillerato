@@ -5,6 +5,9 @@
  * Módulo de DATOS PUROS (sin three, sin react): lo comparten el shell de UI
  * (LabEcuacionRecta.tsx) y la escena 3D (EcuacionRectaScene.tsx).
  *
+ * También exporta RETO_A2 (RetoNumericoData) — reto evaluable verbatim del
+ * ejercicio A2 de la progresión PM-III-P10.
+ *
  * Idea pedagógica (MCCEMS 2025 — PM-III, propósito 2 / contenido C2:
  * "Ecuaciones lineales con dos incógnitas · Ecuación de la recta · Concepto de
  *  plano cartesiano: ejes perpendiculares horizontal (X) y vertical (Y) ·
@@ -124,4 +127,52 @@ export const fmtEstandar = (m: number, b: number): string => {
   const sa = a < 0 ? "−" : "";
   const ax = `${sa}${fmtNum(Math.abs(a))}x`;
   return `${ax} + y = ${fmtNum(b)}`;
+};
+
+/* ── Reto evaluable (verbatim PM-III-P10-A2) ─────────────────────────── */
+import type { RetoNumericoData } from "./_reto-numerico";
+
+// VERBATIM de PM-III-P10-A2 (ejercicio_matematico, practica_slug=ecuacion-recta).
+// Tarifa de taxi de la CDMX: y = 1.07·x + 8.74  (x en cientos de metros, y en pesos).
+// Verificación: a) b = 8.74; b) m = 1.07; c) y = 1.07×30 + 8.74 = 32.10 + 8.74 = 40.84.
+// tolerancia_error en el ancla: 0.01.
+export const RETO_A2: RetoNumericoData = {
+  titulo: "Grafico la ecuación de la recta y sus soluciones",
+  contexto:
+    "La forma y = m·x + b separa lo fijo (la ordenada b, el banderazo) de lo variable (la pendiente m, el costo por distancia). Cada punto de la recta es una pareja distancia–costo posible.",
+  problema:
+    "La tarifa de un taxi de la Ciudad de México se modela como una ecuación lineal con dos incógnitas: el costo y (en pesos) en función de la distancia x (en cientos de metros) es y = 1.07·x + 8.74.\n\n" +
+    "a) ¿Cuál es la ordenada al origen y qué significa en este contexto?\n" +
+    "b) ¿Cuál es la pendiente y qué significa?\n" +
+    "c) Calcula el costo de un viaje de 3 km (x = 30).",
+  campos: [
+    {
+      etiqueta: "a) Ordenada al origen b (banderazo en pesos)",
+      objetivo: 8.74,
+      tolerancia: 0.01,
+      unidad: "$",
+      placeholder: "8.74",
+    },
+    {
+      etiqueta: "b) Pendiente m ($ por cada 100 m)",
+      objetivo: 1.07,
+      tolerancia: 0.01,
+      unidad: "$/100 m",
+      placeholder: "1.07",
+    },
+    {
+      etiqueta: "c) Costo del viaje de 3 km (x = 30)",
+      objetivo: 40.84,
+      tolerancia: 0.01,
+      unidad: "$",
+      placeholder: "40.84",
+    },
+  ],
+  pasosGuia: [
+    "a) La ordenada al origen es b = 8.74: es el costo cuando x = 0 (sin avanzar), es decir, el banderazo de $8.74.",
+    "b) La pendiente es m = 1.07: por cada 100 m recorridos (cada unidad de x) el costo sube $1.07.",
+    "c) y = 1.07·(30) + 8.74 = 32.10 + 8.74 = $40.84.",
+  ],
+  respuestaFinal:
+    "b = 8.74 (banderazo); m = 1.07 ($/100 m); viaje de 3 km: y = $40.84; infinitas soluciones = todos los puntos de la recta.",
 };

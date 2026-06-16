@@ -139,3 +139,60 @@ export const TRANSFORMACIONES: Transformacion[] = [
 
 /** ¿El estudiante clasificó correctamente la transformación? */
 export const clasificaBien = (t: Transformacion, eleccion: TipoCambio) => t.tipo === eleccion;
+
+/* ─────────────────────────────────────────────────────────────────────────
+ * Cuestionario de comprensión — VERBATIM del quiz A2 de CNEYT-I-P02.
+ * Es la actividad ancla evaluada de la progresión. Se reproduce íntegro para
+ * la "interactividad ampliada": el estudiante comprueba lo aprendido aquí
+ * mismo, con retroalimentación por reactivo.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+export interface PreguntaQuiz {
+  pregunta: string;
+  opciones: string[];
+  correcta: number; // índice de la opción correcta
+  retro: string; // retroalimentación verbatim
+}
+
+export const QUIZ_COMPRENSION: PreguntaQuiz[] = [
+  {
+    pregunta: "¿Cuál de estas es una propiedad FÍSICA de la materia?",
+    opciones: ["La inflamabilidad", "La oxidación", "El punto de fusión", "La reactividad con ácidos"],
+    correcta: 2,
+    retro: "El punto de fusión es una propiedad física: se mide sin cambiar la composición química de la sustancia.",
+  },
+  {
+    pregunta: "¿Cuál de estas es una propiedad QUÍMICA de la materia?",
+    opciones: ["La densidad", "El color", "La conductividad eléctrica", "La oxidación (reacción con el oxígeno)"],
+    correcta: 3,
+    retro: "La oxidación es una propiedad química: se observa solo cuando la sustancia reacciona y se transforma.",
+  },
+  {
+    pregunta: "La densidad se define como:",
+    opciones: [
+      "El peso de un objeto en la báscula",
+      "La masa por unidad de volumen",
+      "El espacio que ocupa un objeto",
+      "La resistencia de un material a ser rayado",
+    ],
+    correcta: 1,
+    retro: "Densidad = masa / volumen. Es lo que determina si un objeto flota o se hunde en un líquido.",
+  },
+  {
+    pregunta: "¿Para qué sirven las propiedades físicas y químicas en la práctica?",
+    opciones: [
+      "Solo para aprobar exámenes de química",
+      "Para identificar sustancias y predecir cómo se comportarán en distintas condiciones",
+      "Para saber cuánto pesa algo",
+      "Para determinar el precio de los materiales",
+    ],
+    correcta: 1,
+    retro: "Conocer las propiedades permite identificar materiales y diseñar aplicaciones industriales, médicas y tecnológicas.",
+  },
+  {
+    pregunta: "El oro se puede identificar por su color amarillo y su alta densidad (19.3 g/cm³). Estas son propiedades:",
+    opciones: ["Químicas", "Físicas", "Biológicas", "Atómicas"],
+    correcta: 1,
+    retro: "El color y la densidad son propiedades físicas: se observan sin cambiar la composición química del oro.",
+  },
+];

@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { motion, LayoutGroup } from "motion/react";
+import type { ContinuarData } from "@/lib/queries/hub";
+import { getRSCColor, getTipoConfig } from "./hub-colors";
 
 interface ShellProfile {
   full_name: string | null;
@@ -11,10 +14,27 @@ interface ShellProfile {
   semestre?: number | null;
 }
 
+interface DiaRacha {
+  fecha: string;
+  activo: boolean;
+}
+
 interface HubShellProps {
   profile: ShellProfile;
   racha: number;
+  ultimos7Dias: DiaRacha[];
+  continuar: ContinuarData | null;
   children: React.ReactNode;
+}
+
+/** Inicial del día de la semana a partir de "YYYY-MM-DD".
+ *  Se parsea con componentes locales (new Date(y, m-1, d)) para evitar el
+ *  corrimiento de día que provoca interpretar la fecha como UTC. */
+const DOW_INICIAL = ["D", "L", "M", "M", "J", "V", "S"] as const;
+function inicialDia(fecha: string): string {
+  const [y, m, d] = fecha.split("-").map(Number);
+  if (!y || !m || !d) return "·";
+  return DOW_INICIAL[new Date(y, m - 1, d).getDay()] ?? "·";
 }
 
 const NAV_ITEMS = [
@@ -145,15 +165,89 @@ function SemestreSwitcher({
   );
 }
 
+/** Tarjeta compacta de "seguir donde lo dejaste" — vive en el hueco entre
+ *  el nav y la racha. Toma el color del RSC de la UAC para mantener identidad
+ *  de área y enlaza directo a la actividad pendiente. */
+function ContinuarSidebarCard({ data, onClose }: { data: ContinuarData; onClose?: () => void }) {
+  const color = getRSCColor(data.uacRscCodigo);
+  const tipo = getTipoConfig(data.actividadTipo);
+  const total = data.totalActividades || 0;
+  const hechas = data.actividadesCompletadas || 0;
+  const pct = total > 0 ? Math.round((hechas / total) * 100) : 0;
+  const href = `/hub/uac/${data.uacCodigo}/progresion/${data.progresionNumero}/actividad/${data.actividadOrden}`;
+
+  return (
+    <Link
+      href={href}
+      onClick={onClose}
+      className="hub-continuar-card"
+      style={{
+        background: `linear-gradient(150deg, rgba(${color.rgba},0.16) 0%, rgba(255,255,255,0.03) 70%)`,
+        border: `1px solid rgba(${color.rgba},0.28)`,
+        padding: "12px 13px",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+        <span style={{
+          fontSize: 8.5, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.16em",
+          color: color.hex,
+        }}>
+          Continúa
+        </span>
+        <span className="hub-continuar-go" style={{
+          width: 22, height: 22, borderRadius: 7, flexShrink: 0,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          background: `rgba(${color.rgba},0.18)`, color: color.hex, fontSize: 10,
+        }}>
+          <i className="fa-solid fa-play" />
+        </span>
+      </div>
+
+      <div style={{
+        fontSize: 12.5, fontWeight: 800, color: "#fff", lineHeight: 1.25, marginTop: 7,
+        display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden",
+      }}>
+        {data.actividadTitulo}
+      </div>
+
+      <div style={{
+        display: "flex", alignItems: "center", gap: 6, marginTop: 6,
+        fontSize: 9.5, fontWeight: 600, color: "rgba(255,255,255,0.45)",
+      }}>
+        <i className={`fa-solid ${tipo.faIcon}`} style={{ fontSize: 9, color: tipo.color }} />
+        <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          {data.uacNombre}
+        </span>
+      </div>
+
+      {/* Barra de progreso de la progresión */}
+      <div style={{ marginTop: 9 }}>
+        <div style={{ height: 4, borderRadius: 999, background: "rgba(255,255,255,0.08)", overflow: "hidden" }}>
+          <div style={{ height: "100%", width: `${pct}%`, borderRadius: 999, background: color.hex }} />
+        </div>
+        <div style={{ fontSize: 9, fontWeight: 600, color: "rgba(255,255,255,0.40)", marginTop: 4 }}>
+          {hechas}/{total} actividades · {pct}%
+        </div>
+      </div>
+    </Link>
+  );
+}
+
 function SidebarContent({
   pathname,
   profile,
   racha,
+  ultimos7Dias,
+  continuar,
+  instanceId,
   onClose,
 }: {
   pathname: string;
   profile: ShellProfile;
   racha: number;
+  ultimos7Dias: DiaRacha[];
+  continuar: ContinuarData | null;
+  instanceId: string;
   onClose?: () => void;
 }) {
   const nombre = profile.full_name?.split(" ")[0] ?? "Alumno";
@@ -169,14 +263,14 @@ function SidebarContent({
         borderBottom: "1px solid rgba(255,255,255,0.06)",
         flexShrink: 0,
       }}>
-        <Link
-          href="/hub"
-          onClick={onClose}
-          style={{ display: "block", textDecoration: "none" }}
-        >
-          <div style={{ fontSize: 20, fontWeight: 900, color: "#fff", letterSpacing: "-0.03em", lineHeight: 1.1 }}>
-            CEN Bachillerato
-          </div>
+        <Link href="/hub" onClick={onClose} className="hub-brand">
+          <span className="hub-brand-badge" aria-hidden>
+            <i className="fa-solid fa-graduation-cap" />
+          </span>
+          <span>
+            <span className="hub-brand-title" style={{ display: "block" }}>CEN Bachillerato</span>
+            <span className="hub-brand-sub" style={{ display: "block" }}>Hub del alumno</span>
+          </span>
         </Link>
 
         {/* Selector de semestre (antes era un pill estático) */}
@@ -188,59 +282,112 @@ function SidebarContent({
       </div>
 
       {/* ── Nav ─── */}
-      <nav style={{ flex: 1, padding: "12px 10px", display: "flex", flexDirection: "column", gap: 2 }}>
-        {NAV_ITEMS.map((item) => {
-          const active = item.href === activeHref;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onClose}
-              className={`hub-nav-item${active ? " active" : ""}`}
-            >
-              <span className="hub-nav-icon">
-                <i className={`fa-solid ${item.icon}`} />
-              </span>
-              {item.label}
-              {active && (
-                <span style={{
-                  marginLeft: "auto",
-                  width: 6, height: 6, borderRadius: "50%",
-                  background: "#38BDF8",
-                  flexShrink: 0,
-                }} />
-              )}
-            </Link>
-          );
-        })}
+      <nav style={{ padding: "14px 10px 6px", display: "flex", flexDirection: "column", gap: 3 }}>
+        <p className="hub-nav-section-label" style={{ margin: 0 }}>Navegación</p>
+        <LayoutGroup id={`hub-nav-${instanceId}`}>
+          {NAV_ITEMS.map((item) => {
+            const active = item.href === activeHref;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={onClose}
+                aria-current={active ? "page" : undefined}
+                className={`hub-nav-item${active ? " active" : ""}`}
+              >
+                {active && (
+                  <motion.span
+                    layoutId={`hub-nav-active-${instanceId}`}
+                    className="hub-nav-active-bg"
+                    transition={{ type: "spring", stiffness: 520, damping: 38 }}
+                  />
+                )}
+                <span className="hub-nav-icon">
+                  <i className={`fa-solid ${item.icon}`} />
+                </span>
+                <span className="hub-nav-label">{item.label}</span>
+              </Link>
+            );
+          })}
+        </LayoutGroup>
       </nav>
 
-      {/* ── Racha ─── */}
-      {racha > 0 && (
-        <div style={{ margin: "0 10px 8px", borderRadius: 14, background: "rgba(251,146,60,0.08)", border: "1px solid rgba(251,146,60,0.14)", padding: "11px 13px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ fontSize: 22, lineHeight: 1 }}>🔥</span>
+      {/* ── Continuar (rellena el hueco central) ─── */}
+      <div style={{ flex: 1, minHeight: 8, padding: "8px 10px", display: "flex", flexDirection: "column", justifyContent: "flex-start" }}>
+        {continuar ? <ContinuarSidebarCard data={continuar} onClose={onClose} /> : null}
+      </div>
+
+      {/* ── Racha (con semana L M M J V S D) ─── */}
+      {(racha > 0 || ultimos7Dias.some((d) => d.activo)) && (
+        <div style={{
+          margin: "0 10px 8px",
+          borderRadius: 14,
+          background: "linear-gradient(135deg, rgba(251,146,60,0.16) 0%, rgba(251,146,60,0.05) 100%)",
+          border: "1px solid rgba(251,146,60,0.22)",
+          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.05)",
+          padding: "11px 13px",
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{
+              width: 34, height: 34, borderRadius: 10, flexShrink: 0,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 17, lineHeight: 1,
+              background: "rgba(251,146,60,0.16)",
+              border: "1px solid rgba(251,146,60,0.28)",
+            }}>🔥</span>
             <div>
               <div style={{ fontSize: 17, fontWeight: 900, color: "#FB923C", lineHeight: 1, letterSpacing: "-0.02em" }}>
-                {racha}
+                {racha} <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(251,146,60,0.75)" }}>{racha === 1 ? "día" : "días"}</span>
               </div>
-              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.38)", fontWeight: 600, marginTop: 2 }}>
-                días seguidos
+              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.42)", fontWeight: 600, marginTop: 3 }}>
+                de racha · ¡sigue así!
               </div>
             </div>
+          </div>
+
+          {/* Semana: un punto por día, el último es hoy */}
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 4, marginTop: 11 }}>
+            {ultimos7Dias.map((dia, i) => {
+              const hoy = i === ultimos7Dias.length - 1;
+              return (
+                <div key={dia.fecha} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, flex: 1 }}>
+                  <span style={{
+                    fontSize: 8.5, fontWeight: 800, letterSpacing: "0.02em",
+                    color: dia.activo ? "rgba(251,146,60,0.85)" : "rgba(255,255,255,0.28)",
+                  }}>
+                    {inicialDia(dia.fecha)}
+                  </span>
+                  <span
+                    title={dia.activo ? "Activo" : "Sin actividad"}
+                    style={{
+                      width: 9, height: 9, borderRadius: "50%",
+                      background: dia.activo ? "#FB923C" : "rgba(255,255,255,0.10)",
+                      boxShadow: dia.activo ? "0 0 8px rgba(251,146,60,0.55)" : "none",
+                      outline: hoy ? "2px solid rgba(251,146,60,0.45)" : "none",
+                      outlineOffset: 1.5,
+                    }}
+                  />
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
 
       {/* ── Profile + logout ─── */}
       <div style={{ padding: "10px 10px 18px", borderTop: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 9, padding: "9px 8px", borderRadius: 11 }}>
+        <div style={{
+          display: "flex", alignItems: "center", gap: 9, padding: "9px 10px", borderRadius: 12,
+          background: "rgba(255,255,255,0.03)",
+          border: "1px solid rgba(255,255,255,0.06)",
+        }}>
           <div style={{
-            width: 32, height: 32, borderRadius: "50%",
-            background: "linear-gradient(135deg, #38BDF8, #0EA5E9)",
+            width: 34, height: 34, borderRadius: "50%",
+            background: "linear-gradient(135deg, #7DD3FC, #38BDF8, #0EA5E9)",
             display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 13, fontWeight: 800, color: "#0B2545",
+            fontSize: 13, fontWeight: 800, color: "#011C40",
             flexShrink: 0,
+            boxShadow: "0 4px 12px rgba(56,189,248,0.30), inset 0 1px 0 rgba(255,255,255,0.4)",
           }}>
             {initials}
           </div>
@@ -266,7 +413,7 @@ function SidebarContent({
   );
 }
 
-export function HubShell({ profile, racha, children }: HubShellProps) {
+export function HubShell({ profile, racha, ultimos7Dias, continuar, children }: HubShellProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -274,7 +421,14 @@ export function HubShell({ profile, racha, children }: HubShellProps) {
     <div style={{ display: "flex", minHeight: "100vh" }}>
       {/* ── Desktop sidebar ─── */}
       <div className="hub-sidebar-panel">
-        <SidebarContent pathname={pathname} profile={profile} racha={racha} />
+        <SidebarContent
+          pathname={pathname}
+          profile={profile}
+          racha={racha}
+          ultimos7Dias={ultimos7Dias}
+          continuar={continuar}
+          instanceId="desktop"
+        />
       </div>
 
       {/* ── Mobile drawer ─── */}
@@ -285,6 +439,9 @@ export function HubShell({ profile, racha, children }: HubShellProps) {
               pathname={pathname}
               profile={profile}
               racha={racha}
+              ultimos7Dias={ultimos7Dias}
+              continuar={continuar}
+              instanceId="mobile"
               onClose={() => setMobileOpen(false)}
             />
           </div>

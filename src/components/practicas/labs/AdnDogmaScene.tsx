@@ -16,8 +16,8 @@
  */
 
 import * as THREE from "three";
-import { useRef, type ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useRef, useState, type ReactNode } from "react";
+import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, Environment, Lightformer, Html, Line, Stars } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import {
@@ -45,7 +45,23 @@ export interface AdnDogmaSceneProps {
   accent: string;
   modoColor: string;
   resetNonce: number;
+  /** Habilita arrastrar la maquinaria (helicasa/ARN polimerasa/ribosoma). */
+  arrastrable?: boolean;
+  /** Arrastrar la maquinaria fija el paso del proceso. */
+  onScrub?: (paso: number) => void;
+  /** Se llama al tomar la maquinaria (para el sonido). */
+  onGrab?: () => void;
 }
+
+/* ── Scratch a nivel de módulo (sin asignar memoria por frame) ─────────── */
+const _planeCam = new THREE.Plane();
+const _camDir = new THREE.Vector3();
+const _hit = new THREE.Vector3();
+const _zero = new THREE.Vector3(0, 0, 0);
+const _col = new THREE.Color();
+const _obj = new THREE.Object3D();
+const PART_N = 26; // nucleótidos libres flotando (partículas en tiempo real)
+const PAL_BASE = ["#34d399", "#f87171", "#fbbf24", "#38bdf8"]; // A, T/U, G, C
 
 /* ── helpers de geometría (puros) ─────────────────────────────────────── */
 function seg(a: Pt, b: Pt): { pos: Pt; quat: [number, number, number, number]; len: number } {
@@ -330,13 +346,143 @@ function MundoTraduccion({ arnm, codones, progreso, modoColor }: { arnm: string;
   );
 }
 
+/* ── Nucleótidos libres flotando (partículas en tiempo real) ──────────── */
+function NucleotidosLibres() {
+  const ref = useRef<THREE.InstancedMesh>(null);
+  useFrame((s) => {
+    const m = ref.current;
+    if (!m) return;
+    const t = s.clock.elapsedTime;
+    for (let i = 0; i < PART_N; i++) {
+      const a = (i / PART_N) * Math.PI * 2;
+      const rad = 4.2 + (i % 5) * 0.55;
+      const p = (t * 0.07 + i / PART_N) % 1; // fase ascendente continua
+      const y = -6 + p * 12;
+      _obj.position.set(Math.cos(a + t * 0.18) * rad, y, Math.sin(a + t * 0.18) * rad);
+      const sc = 0.12 + 0.05 * Math.sin(t * 1.8 + i);
+      _obj.scale.setScalar(sc);
+      _obj.updateMatrix();
+      m.setMatrixAt(i, _obj.matrix);
+      m.setColorAt(i, _col.set(PAL_BASE[i % 4] as string));
+    }
+    m.instanceMatrix.needsUpdate = true;
+    if (m.instanceColor) m.instanceColor.needsUpdate = true;
+  });
+  return (
+    <instancedMesh ref={ref} args={[undefined, undefined, PART_N]}>
+      <sphereGeometry args={[1, 10, 10]} />
+      <meshStandardMaterial transparent opacity={0.5} emissiveIntensity={0.6} toneMapped={false} />
+    </instancedMesh>
+  );
+}
+
+/* ── Maquinaria arrastrable (helicasa / ARN polimerasa / ribosoma) ────── */
+function Arrastrador({
+  modo,
+  total,
+  progreso,
+  y0,
+  x0,
+  start,
+  accent,
+  onScrub,
+  onGrab,
+  setDragging,
+}: {
+  modo: Modo;
+  total: number;
+  progreso: number;
+  y0: number;
+  x0: number;
+  start: number;
+  accent: string;
+  onScrub?: (paso: number) => void;
+  onGrab?: () => void;
+  setDragging: (v: boolean) => void;
+}) {
+  const drag = useRef(false);
+  const knob = useRef<THREE.Mesh>(null);
+  const [hover, setHover] = useState(false);
+  const { camera } = useThree();
+  const vertical = modo !== "traduccion";
+
+  useFrame((s) => {
+    if (knob.current) {
+      const t = s.clock.elapsedTime;
+      knob.current.scale.setScalar((hover || drag.current ? 1.28 : 1) * (1 + Math.sin(t * 4) * 0.06));
+    }
+  });
+
+  const hx = vertical ? -(R + 1.9) : x0 + (start + progreso * 3 + 1) * PASO;
+  const hy = vertical ? y0 + progreso * PASO : -1.9;
+  const pos: [number, number, number] = [hx, hy, 0];
+
+  const scrub = (e: ThreeEvent<PointerEvent>) => {
+    camera.getWorldDirection(_camDir);
+    _planeCam.setFromNormalAndCoplanarPoint(_camDir, _zero);
+    if (!e.ray.intersectPlane(_planeCam, _hit)) return;
+    const idx = vertical
+      ? Math.round((_hit.y - y0) / PASO)
+      : Math.round(((_hit.x - x0) / PASO - start - 1) / 3);
+    onScrub?.(Math.max(0, Math.min(total, idx)));
+  };
+
+  return (
+    <group position={pos}>
+      {/* perilla visible */}
+      <mesh ref={knob}>
+        <sphereGeometry args={[0.34, 22, 22]} />
+        <meshStandardMaterial color="#ffffff" emissive={accent} emissiveIntensity={0.85} toneMapped={false} />
+      </mesh>
+      <mesh rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[0.6, 0.05, 12, 32]} />
+        <meshBasicMaterial color={accent} transparent opacity={hover ? 0.9 : 0.45} />
+      </mesh>
+      {/* esfera de captura (invisible, área grande) */}
+      <mesh
+        onPointerOver={() => setHover(true)}
+        onPointerOut={() => setHover(false)}
+        onPointerDown={(e) => {
+          e.stopPropagation();
+          (e.target as Element).setPointerCapture?.(e.pointerId);
+          drag.current = true;
+          setDragging(true);
+          onGrab?.();
+          scrub(e);
+        }}
+        onPointerMove={(e) => {
+          if (!drag.current) return;
+          e.stopPropagation();
+          scrub(e);
+        }}
+        onPointerUp={(e) => {
+          drag.current = false;
+          setDragging(false);
+          (e.target as Element).releasePointerCapture?.(e.pointerId);
+        }}
+      >
+        <sphereGeometry args={[0.95, 16, 16]} />
+        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+      </mesh>
+      <Etiqueta pos={[0, 0.95, 0]} col={`${accent}cc`}>
+        <i className="fa-solid fa-hand-pointer" /> arrástrame
+      </Etiqueta>
+    </group>
+  );
+}
+
 /* ── Mundo + cámara + post ────────────────────────────────────────────── */
 function Contenido(props: AdnDogmaSceneProps) {
-  const { modo, codificante, molde, arnm, codones, progreso, modoColor, resetNonce, playing } = props;
+  const { modo, codificante, molde, arnm, codones, progreso, total, modoColor, resetNonce, playing, accent, arrastrable, onScrub, onGrab } = props;
+  const [dragging, setDragging] = useState(false);
   const giro = useRef<THREE.Group>(null);
   useFrame((s, dt) => {
-    if (giro.current && playing && modo !== "traduccion") giro.current.rotation.y += dt * 0.18;
+    if (giro.current && playing && !dragging && modo !== "traduccion") giro.current.rotation.y += dt * 0.18;
   });
+
+  const y0 = -((codificante.length - 1) * PASO) / 2;
+  const x0 = -((arnm.length - 1) * PASO) / 2;
+  const start = Math.max(0, arnm.indexOf(CODON_INICIO));
 
   const mundo: ReactNode =
     modo === "replicacion" ? (
@@ -355,14 +501,30 @@ function Contenido(props: AdnDogmaSceneProps) {
       <directionalLight position={[6, 9, 6]} intensity={1.5} castShadow shadow-mapSize={[1024, 1024]} />
       <directionalLight position={[-6, 4, -4]} intensity={0.5} color={modoColor} />
       <Stars radius={70} depth={30} count={1100} factor={3} fade speed={0.5} />
+      <NucleotidosLibres />
 
       <group ref={giro} key={`${modo}-${resetNonce}`}>{mundo}</group>
+
+      {arrastrable && (
+        <Arrastrador
+          modo={modo}
+          total={total}
+          progreso={progreso}
+          y0={y0}
+          x0={x0}
+          start={start}
+          accent={accent}
+          onScrub={onScrub}
+          onGrab={onGrab}
+          setDragging={setDragging}
+        />
+      )}
 
       <Environment resolution={128}>
         <Lightformer form="rect" intensity={1.1} position={[0, 6, 4]} scale={8} color="#bcd4ff" />
         <Lightformer form="rect" intensity={0.7} position={[5, 0, -4]} scale={6} color={modoColor} />
       </Environment>
-      <OrbitControls enablePan={false} minDistance={7} maxDistance={28} autoRotate={false} />
+      <OrbitControls enablePan={false} enabled={!dragging} minDistance={7} maxDistance={28} autoRotate={false} />
       <EffectComposer>
         <Bloom intensity={0.55} luminanceThreshold={0.2} mipmapBlur />
         <Vignette eskil={false} offset={0.18} darkness={0.72} />

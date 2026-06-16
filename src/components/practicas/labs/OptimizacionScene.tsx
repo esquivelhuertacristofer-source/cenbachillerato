@@ -20,12 +20,12 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useMemo, useRef, useState } from "react";
+import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, ContactShadows, Environment, Lightformer, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import {
-  VISTA, R_OPT, A_OPT, hDeR, areaTotal,
+  VISTA, R_OPT, A_OPT, R_MIN, R_MAX, hDeR, areaTotal,
   muestrear, tangente, clipRecta, fmt1, fmt2,
   type Curva, type Vista,
 } from "./optimizacion-data";
@@ -35,6 +35,12 @@ export interface OptimizacionSceneProps {
   showDecomp: boolean; // mostrar base/lateral en el plano
   accent: string;
   resetNonce: number;
+  /** Cuando true, el alumno puede arrastrar la sonda r sobre el plano de costo. */
+  arrastrable?: boolean;
+  /** Avisa el nuevo radio al arrastrar la sonda. */
+  onScrubR?: (r: number) => void;
+  /** Se dispara al tomar la sonda (para sonido/feedback). */
+  onGrab?: () => void;
 }
 
 type Pt = [number, number, number];
@@ -52,6 +58,13 @@ const BY = 3.0;               // semialto del plano
 const PLANE_X = 3.2;          // desplazamiento del plano (derecha)
 const CYL_X = -5.2;           // desplazamiento del cilindro (izquierda)
 const W = 0.165;              // escala cm → unidades de escena (cilindro)
+
+/* Scratch a nivel de módulo (evita asignar por frame). El plano de costo es
+ * vertical (XY, normal z); arrastrar la sonda = intersectar el rayo del puntero. */
+const _planeCost = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+const _hitC = new THREE.Vector3();
+const _objC = new THREE.Object3D();
+const PART_N = 18;            // chispas de lámina sobre la lata
 
 /* ── Mapeo datos → plano ──────────────────────────────────────────────────── */
 function hacerMapa(v: Vista) {
@@ -160,10 +173,23 @@ function Minimo({ v }: { v: Vista }) {
   );
 }
 
-/* ── Sonda en r: punto sobre A(r) + recta tangente (horizontal en el óptimo) ─ */
-function SondaActiva({ v, rPos }: { v: Vista; rPos: number }) {
+/* ── Sonda en r: punto sobre A(r) + recta tangente (horizontal en el óptimo) ─
+ * Si `arrastrable`, el alumno toma la manija sobre el eje r y la barre: el rayo
+ * del puntero se interseca con el plano de costo (XY, z=0) y se invierte el
+ * mapeo sx → r, acotado a [R_MIN, R_MAX]. */
+function SondaActiva({
+  v, rPos, arrastrable, onScrubR, onGrab, setDragging,
+}: {
+  v: Vista; rPos: number;
+  arrastrable?: boolean;
+  onScrubR?: (r: number) => void;
+  onGrab?: () => void;
+  setDragging?: (d: boolean) => void;
+}) {
   const { sx, S } = useMemo(() => hacerMapa(v), [v]);
   const pulso = useRef<THREE.Group>(null);
+  const dragRef = useRef(false);
+  const [hover, setHover] = useState(false);
   useFrame((s) => {
     const k = 1 + Math.sin(s.clock.elapsedTime * 4) * 0.16;
     if (pulso.current) pulso.current.scale.setScalar(k);
@@ -178,6 +204,40 @@ function SondaActiva({ v, rPos }: { v: Vista; rPos: number }) {
   const vis = Number.isFinite(a) && a >= v.ymin && a <= v.ymax && rPos >= v.xmin && rPos <= v.xmax;
   const P = S(rPos, a);
 
+  // invierte el rayo del puntero → r (el plano de costo vive en X = PLANE_X)
+  const scrub = (e: ThreeEvent<PointerEvent>) => {
+    if (!e.ray.intersectPlane(_planeCost, _hitC)) return;
+    const localX = _hitC.x - PLANE_X;
+    const frac = (localX + BX) / (2 * BX);
+    const dx = v.xmin + frac * (v.xmax - v.xmin);
+    const r = Math.min(R_MAX, Math.max(R_MIN, dx));
+    onScrubR?.(r);
+  };
+  const onDown = (e: ThreeEvent<PointerEvent>) => {
+    if (!arrastrable) return;
+    e.stopPropagation();
+    (e.target as Element).setPointerCapture?.(e.pointerId);
+    dragRef.current = true;
+    setDragging?.(true);
+    onGrab?.();
+    scrub(e);
+  };
+  const onMove = (e: ThreeEvent<PointerEvent>) => {
+    if (!dragRef.current) return;
+    e.stopPropagation();
+    scrub(e);
+  };
+  const onUp = (e: ThreeEvent<PointerEvent>) => {
+    if (!dragRef.current) return;
+    e.stopPropagation();
+    (e.target as Element).releasePointerCapture?.(e.pointerId);
+    dragRef.current = false;
+    setDragging?.(false);
+  };
+
+  const handleY = -BY;          // la manija vive sobre el eje r
+  const grande = arrastrable && hover;
+
   return (
     <group>
       <Line points={[[sx(rPos), -BY, 0], [sx(rPos), BY, 0]]} color={R_COL} lineWidth={1.5} dashed dashSize={0.16} gapSize={0.12} transparent opacity={0.5} />
@@ -185,6 +245,33 @@ function SondaActiva({ v, rPos }: { v: Vista; rPos: number }) {
 
       {tanSeg.length === 2 && (
         <Line points={[tanSeg[0]!, tanSeg[1]!]} color={OPT_COL} lineWidth={3} />
+      )}
+
+      {/* manija de arrastre sobre el eje r */}
+      {arrastrable && (
+        <group position={[sx(rPos), handleY, 0.05]}>
+          {/* halo */}
+          <mesh rotation={[-Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[0.22, 0.3, 28]} />
+            <meshBasicMaterial color={R_COL} transparent opacity={grande ? 0.95 : 0.6} toneMapped={false} side={THREE.DoubleSide} />
+          </mesh>
+          {/* esfera visible */}
+          <mesh scale={grande ? 1.25 : 1}>
+            <sphereGeometry args={[0.16, 20, 20]} />
+            <meshStandardMaterial color="#fff" emissive={R_COL} emissiveIntensity={1.7} toneMapped={false} />
+          </mesh>
+          {/* esfera invisible mayor para capturar el puntero con holgura */}
+          <mesh
+            onPointerOver={() => setHover(true)}
+            onPointerOut={() => setHover(false)}
+            onPointerDown={onDown}
+            onPointerMove={onMove}
+            onPointerUp={onUp}
+          >
+            <sphereGeometry args={[0.55, 16, 16]} />
+            <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+          </mesh>
+        </group>
       )}
 
       {vis && (
@@ -204,6 +291,45 @@ function SondaActiva({ v, rPos }: { v: Vista; rPos: number }) {
   );
 }
 
+/* ── Chispas de lámina sobre la lata (partículas en tiempo real) ──────────────
+ * Motas que ascienden girando alrededor de la pared del cilindro, como destellos
+ * del material. En el óptimo se vuelven verdes (celebran el mínimo de lámina). */
+function Chispas({ rPos, cerca }: { rPos: number; cerca: boolean }) {
+  const mesh = useRef<THREE.InstancedMesh>(null);
+  const rW = rPos * W;
+  const hW = hDeR(rPos) * W;
+  useFrame((state) => {
+    const m = mesh.current;
+    if (!m) return;
+    const t = state.clock.elapsedTime;
+    for (let i = 0; i < PART_N; i++) {
+      const ang = (i / PART_N) * Math.PI * 2 + t * 0.6;   // gira alrededor de la pared
+      const p = (t * 0.4 + i / PART_N) % 1;               // 0→1 sube por la lata
+      const rr = rW + 0.05 + Math.sin(t * 3 + i) * 0.02;  // pegada a la superficie
+      const s = Math.max(0.001, (0.45 + 0.45 * Math.sin(t * 4 + i)) * 0.05 * (1 - p * 0.4));
+      _objC.position.set(Math.cos(ang) * rr, p * hW, Math.sin(ang) * rr);
+      _objC.scale.setScalar(s);
+      _objC.updateMatrix();
+      m.setMatrixAt(i, _objC.matrix);
+    }
+    m.instanceMatrix.needsUpdate = true;
+  });
+  return (
+    <instancedMesh ref={mesh} args={[undefined, undefined, PART_N]}>
+      <sphereGeometry args={[1, 8, 8]} />
+      <meshStandardMaterial
+        color={cerca ? OPT_COL : LAT_COL}
+        emissive={cerca ? OPT_COL : LAT_COL}
+        emissiveIntensity={1.5}
+        transparent
+        opacity={0.85}
+        depthWrite={false}
+        toneMapped={false}
+      />
+    </instancedMesh>
+  );
+}
+
 /* ── Cilindro físico (lata sin tapa): radio r, altura h por la restricción ──── */
 function Lata({ rPos }: { rPos: number }) {
   const giro = useRef<THREE.Group>(null);
@@ -213,9 +339,12 @@ function Lata({ rPos }: { rPos: number }) {
 
   const rW = rPos * W;
   const hW = hDeR(rPos) * W;
+  const cerca = Math.abs(rPos - R_OPT) < 0.12;
 
   return (
     <group position={[CYL_X, -BY, 0]}>
+      {/* chispas de lámina (partículas) — fuera del giro, orbitan solas */}
+      <Chispas rPos={rPos} cerca={cerca} />
       {/* base de apoyo (suelo) */}
       <mesh position={[0, -0.04, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <circleGeometry args={[Math.max(rW, 1) + 0.6, 48]} />
@@ -255,8 +384,9 @@ function Lata({ rPos }: { rPos: number }) {
 }
 
 /* ── Contenido (descendiente del Canvas) ─────────────────────────────────── */
-function Contenido({ rPos, showDecomp, accent, resetNonce }: OptimizacionSceneProps) {
+function Contenido({ rPos, showDecomp, accent, resetNonce, arrastrable, onScrubR, onGrab }: OptimizacionSceneProps) {
   const v = VISTA;
+  const [dragging, setDragging] = useState(false);
   return (
     <>
       <color attach="background" args={["#08131f"]} />
@@ -277,7 +407,10 @@ function Contenido({ rPos, showDecomp, accent, resetNonce }: OptimizacionScenePr
           {showDecomp && <CurvaTrazo which="lateral" v={v} color={LAT_COL} width={2.6} dashed />}
           <CurvaTrazo which="total" v={v} color={TOTAL_COL} width={4.5} />
           <Minimo v={v} />
-          <SondaActiva v={v} rPos={rPos} />
+          <SondaActiva
+            v={v} rPos={rPos}
+            arrastrable={arrastrable} onScrubR={onScrubR} onGrab={onGrab} setDragging={setDragging}
+          />
         </group>
       </group>
 
@@ -293,6 +426,7 @@ function Contenido({ rPos, showDecomp, accent, resetNonce }: OptimizacionScenePr
 
       <OrbitControls
         makeDefault
+        enabled={!dragging}
         enablePan={false}
         minDistance={9}
         maxDistance={34}

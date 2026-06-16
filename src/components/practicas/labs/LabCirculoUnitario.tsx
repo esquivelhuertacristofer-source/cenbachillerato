@@ -12,13 +12,19 @@
  * signos por cuadrante y la identidad sen²θ + cos²θ = 1. Matemática exacta.
  */
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, OK, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { T, NUM, OK, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { FichaTeorica } from "./_ficha";
+import { CIRCULO_FICHA } from "./circulo-unitario-ficha";
+import { RetoNumericoCard } from "./_reto-numerico";
+import { EppGate, type EppItem } from "./_epp-gate";
+import { LabSfx } from "./lab-audio";
 import {
   calcTrig, valorExacto, CUADRANTES, ESCENARIOS, IDEAS, DATOS,
   THETA_MIN, THETA_MAX, THETA_STEP, THETA_DEF,
+  RETO_A2,
   fmtNum, fmtNum2, fmtDeg, fmtTan, type Escenario,
 } from "./circulo-unitario-data";
 
@@ -35,6 +41,18 @@ const CirculoUnitarioScene = dynamic(() => import("./CirculoUnitarioScene"), {
 const SIN_COL = "#34D399";
 const COS_COL = "#60a5fa";
 const TAN_COL = "#f472b6";
+const WARN = "#FF8A3C";
+const RETO_KEY = "cen-circulo-reto";
+
+/* Instrumentos de trazo (pilar EQUIPARSE) — 3 correctos + 3 distractores. */
+const INSTRUMENTOS: EppItem[] = [
+  { key: "transportador", nombre: "Transportador", icono: "fa-ruler-combined", ok: true, nota: "Mide el ángulo θ en grados sobre el círculo." },
+  { key: "compas", nombre: "Compás", icono: "fa-compass-drafting", ok: true, nota: "Traza el círculo de radio 1 con precisión." },
+  { key: "regla", nombre: "Regla graduada", icono: "fa-ruler", ok: true, nota: "Mide los catetos sen θ y cos θ del triángulo." },
+  { key: "audifonos", nombre: "Audífonos", icono: "fa-headphones", ok: false, nota: "Te distraen; no sirven para trazar ni medir ángulos." },
+  { key: "chicle", nombre: "Goma de mascar", icono: "fa-cookie-bite", ok: false, nota: "No es un instrumento de trazo geométrico." },
+  { key: "mochila", nombre: "Mochila", icono: "fa-bag-shopping", ok: false, nota: "Guárdala: no se usa para construir el círculo." },
+];
 
 export function LabCirculoUnitario({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
@@ -46,6 +64,40 @@ export function LabCirculoUnitario({ color }: PracticaLabProps) {
   const [mostrarTan, setMostrarTan] = useState(false);
   const [autoRotate, setAutoRotate] = useState(false);
   const [resetNonce, setResetNonce] = useState(0);
+
+  // pilares: equiparse, arrastrar, calcular
+  const [eppListo, setEppListo] = useState(false);
+  const [arrastro, setArrastro] = useState(false);
+  const [predicho, setPredicho] = useState(false);
+  const [mejorEstrellas, setMejorEstrellas] = useState<number>(() => {
+    if (typeof window === "undefined") return 0;
+    try { return Number(window.localStorage.getItem(RETO_KEY)) || 0; } catch { return 0; }
+  });
+
+  // reto evaluable, teoría (cajón deslizable) y sonido
+  const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
+  const [drawer, setDrawer] = useState(false);
+  const [sonido, setSonido] = useState(false);
+  const audioRef = useRef<LabSfx | null>(null);
+
+  const toggleSonido = useCallback(async () => {
+    if (!audioRef.current) audioRef.current = new LabSfx();
+    const sfx = audioRef.current;
+    if (sonido) {
+      sfx.mute();
+      setSonido(false);
+    } else {
+      await sfx.enable();
+      setSonido(true);
+    }
+  }, [sonido]);
+
+  useEffect(() => {
+    return () => {
+      audioRef.current?.dispose();
+      audioRef.current = null;
+    };
+  }, []);
 
   // Barrido automático del ángulo (oscilloscopio): rAF en effect → sí actualiza
   // las lecturas. El timestamp lo da requestAnimationFrame (no Date.now()).
@@ -72,14 +124,57 @@ export function LabCirculoUnitario({ color }: PracticaLabProps) {
   const cuadColor = cuad?.color ?? "#94a3b8";
 
   const setManual = (v: number) => { setReproduciendo(false); setTheta(v); };
-  const aplicar = (e: Escenario) => { setReproduciendo(false); setTheta(e.deg); bump(); };
+  const aplicar = (e: Escenario) => {
+    setReproduciendo(false);
+    setTheta(e.deg);
+    bump();
+    if (sonido) audioRef.current?.blip();
+  };
   const reset = () => { setReproduciendo(false); setTheta(THETA_DEF); bump(); };
   const bump = () => setResetNonce((n) => n + 1);
+
+  // arrastre del punto P en la escena 3D (pilar "manipular")
+  const onArrastraTheta = useCallback((deg: number) => {
+    setReproduciendo(false);
+    setArrastro(true);
+    setTheta(((deg % 360) + 360) % 360);
+  }, []);
+  const onGrabPunto = useCallback(() => { if (sonido) audioRef.current?.blip(); }, [sonido]);
+
+  // registro del reto de cálculo (estrellas + récord local)
+  const registraEstrellas = useCallback((est: number) => {
+    setPredicho(true);
+    setMejorEstrellas((prev) => {
+      const mejor = Math.max(prev, est);
+      try { window.localStorage.setItem(RETO_KEY, String(mejor)); } catch { /* ignore */ }
+      return mejor;
+    });
+  }, []);
 
   const senStr = exacto ? exacto.sinStr : fmtNum(t.sin);
   const cosStr = exacto ? exacto.cosStr : fmtNum(t.cos);
   const tanStr = exacto ? (exacto.tanStr === "∄" ? "∄ (indef.)" : exacto.tanStr) : fmtTan(t.tan);
   const radStr = exacto ? `${exacto.radStr} rad` : `${fmtNum2(t.rad)} rad`;
+
+  const aplicado = ESCENARIOS.some((e) => Math.abs(theta - e.deg) < 0.5);
+
+  const pasos = [
+    { txt: "Equípate con tus instrumentos de trazo", done: eppListo },
+    { txt: "Arrastra el punto P por el círculo para fijar θ", done: arrastro },
+    { txt: "Aplica un ángulo notable y léelo", done: aplicado },
+    { txt: "Calcula sen θ y gana estrellas", done: predicho },
+  ];
+  const pasoActivo = pasos.findIndex((p) => !p.done);
+
+  const objetivos = [
+    { txt: "Equípate con los instrumentos de trazo correctos", done: eppListo },
+    { txt: "Arrastra el punto P y observa P = (cos θ, sen θ)", done: arrastro },
+    { txt: "Aplica un ángulo clave (30°, 45°, 60°, 90°, 135°, 210° o 300°)", done: aplicado },
+    { txt: "Identifica el cuadrante activo y su regla de signos", done: t.cuadrante !== "eje" },
+    { txt: "Verifica la identidad pitagórica en un ángulo notable", done: Math.abs(pit - 1) < 0.001 },
+    { txt: "Calcula sen θ en el reto y gana estrellas", done: predicho },
+    { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
+  ];
 
   const sceneFallback = (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 28, textAlign: "center" }}>
@@ -117,7 +212,62 @@ export function LabCirculoUnitario({ color }: PracticaLabProps) {
           border:1px solid ${T.line}; background:${T.inset}; color:${T.text2}; font-size:12px; font-weight:800; transition:all .15s; }
         .ex-tog[data-on="true"] { color:#fff; }
         @media (max-width: 1000px){ .ex-bottom { grid-template-columns: 1fr !important; } }
+
+        /* Cajón de teoría */
+        .ex-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
+          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
+        .ex-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
+        .ex-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
+          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
+          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
+          display:flex; flex-direction:column; }
+        .ex-drawer[data-open="true"] { transform:translateX(0); }
+        .ex-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
+          padding:18px 20px; border-bottom:1px solid ${T.line}; }
+        .ex-drawer-body { overflow-y:auto; padding:20px; flex:1; }
+        .ex-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
+          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+        .ex-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
+        .ex-teoria-fab { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); cursor:pointer; display:inline-flex; align-items:center; gap:9px;
+          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
+          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
+        .ex-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateX(-50%) translateY(-1px); }
+
+        /* Pasos guiados */
+        .ex-steps { display:flex; flex-wrap:wrap; gap:8px; }
+        .ex-step { display:flex; align-items:center; gap:9px; padding:9px 13px; border-radius:12px; flex:1 1 180px;
+          border:1px solid ${T.line}; background:${T.inset}; color:${T.text2}; font-size:12.5px; font-weight:700; transition:all .18s; }
+        .ex-step[data-state="active"] { border-color:rgba(${color.rgba},0.7); background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 0 1px rgba(${color.rgba},0.4); }
+        .ex-step[data-state="done"] { border-color:${OK}66; background:${OK}14; color:${OK}; }
+        .ex-step-n { width:24px; height:24px; flex-shrink:0; border-radius:7px; display:flex; align-items:center; justify-content:center;
+          font-size:12px; font-weight:900; background:rgba(255,255,255,0.08); color:inherit; }
+        .ex-step[data-state="active"] .ex-step-n { background:${accent}; color:#04121f; }
+        .ex-step[data-state="done"] .ex-step-n { background:${OK}; color:#04121f; }
+
+        /* Reto de cálculo */
+        .calc-in { width:100%; padding:11px 13px; border-radius:11px; border:1px solid ${T.line}; background:${T.inset};
+          color:#fff; font-size:16px; font-weight:800; font-family:ui-monospace, monospace; outline:none; transition:border-color .15s; }
+        .calc-in:focus { border-color:${accent}; }
+        .calc-btn { cursor:pointer; border:none; border-radius:11px; font-size:13.5px; font-weight:800; padding:11px 16px; transition:filter .15s; }
+        .calc-btn-primary { background:${accent}; color:#04121f; }
+        .calc-btn-primary:hover:not(:disabled) { filter:brightness(1.08); }
+        .calc-btn-primary:disabled { opacity:0.45; cursor:not-allowed; }
+        .calc-btn-ghost { background:${T.inset}; color:${T.text2}; border:1px solid ${T.line}; }
+        .calc-btn-ghost:hover { color:#fff; border-color:${T.lineStrong}; }
       `}</style>
+
+      {/* ── Pasos guiados ─────────────────────────────────────────────────── */}
+      <div className="ex-steps" style={{ marginBottom: 18 }}>
+        {pasos.map((p, i) => {
+          const estado = p.done ? "done" : i === pasoActivo ? "active" : "todo";
+          return (
+            <div key={i} className="ex-step" data-state={estado}>
+              <span className="ex-step-n">{p.done ? <i className="fa-solid fa-check" /> : i + 1}</span>
+              <span>{p.txt}</span>
+            </div>
+          );
+        })}
+      </div>
 
       <div className="ex-grid">
         {/* ── Columna visor ──────────────────────────────────────── */}
@@ -143,8 +293,25 @@ export function LabCirculoUnitario({ color }: PracticaLabProps) {
                 autoRotate={autoRotate}
                 pausado={false}
                 resetNonce={resetNonce}
+                arrastrable={eppListo}
+                onThetaChange={onArrastraTheta}
+                onGrab={onGrabPunto}
               />
             </SceneBoundary>
+
+            {/* Compuerta de equipamiento (pilar EQUIPARSE) */}
+            {!eppListo && (
+              <EppGate
+                accent={accent}
+                rgba={color.rgba}
+                items={INSTRUMENTOS}
+                titulo="Antes de trazar: equípate"
+                subtitulo="Elige tus instrumentos de trazo"
+                intro="Para construir y medir ángulos en el círculo unitario necesitas tus instrumentos de trazo. Selecciona los 3 instrumentos correctos (no los distractores) para entrar."
+                verbo="instrumentos de trazo"
+                onEntrar={() => { setEppListo(true); if (sonido) audioRef.current?.blip(); }}
+              />
+            )}
 
             {/* Cinta EN VIVO — ángulo y punto */}
             <div style={{ position: "absolute", top: 14, left: 16, display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${accent}66`, backdropFilter: "blur(10px)" }}>
@@ -157,6 +324,12 @@ export function LabCirculoUnitario({ color }: PracticaLabProps) {
 
             {/* Toolbar */}
             <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
+              <button className="ex-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
+                <i className="fa-solid fa-book-open" />
+              </button>
+              <button className="ex-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
+                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
+              </button>
               <button className="ex-icobtn" data-on={reproduciendo} onClick={() => setReproduciendo((p) => !p)} title={reproduciendo ? "Pausar el giro" : "Girar el radio (barrido)"}>
                 <i className={`fa-solid ${reproduciendo ? "fa-pause" : "fa-play"}`} />
               </button>
@@ -167,6 +340,12 @@ export function LabCirculoUnitario({ color }: PracticaLabProps) {
                 <i className="fa-solid fa-rotate-left" />
               </button>
             </div>
+
+            {/* Botón flotante de Teoría */}
+            <button className="ex-teoria-fab" onClick={() => setDrawer(true)}>
+              <i className="fa-solid fa-book-open" />
+              Teoría
+            </button>
 
             {/* Pie: punto + cuadrante */}
             <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 18px 14px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
@@ -189,6 +368,10 @@ export function LabCirculoUnitario({ color }: PracticaLabProps) {
             <Deslizador label="θ · ángulo del radio" icon="fa-rotate" colr={accent}
               valor={fmtDeg(t.deg)} min={THETA_MIN} max={THETA_MAX} step={THETA_STEP} value={theta}
               onChange={setManual} hintL="0°" hintR="360° (vuelta completa)" />
+            <div style={{ marginTop: 10, fontSize: 11.8, color: T.text3, lineHeight: 1.45, display: "flex", gap: 8, alignItems: "center" }}>
+              <i className="fa-solid fa-hand-pointer" style={{ color: accent }} />
+              <span>También puedes <strong style={{ color: "#fff" }}>arrastrar el punto P</strong> directamente sobre el círculo en la escena 3D.</span>
+            </div>
 
             {/* toggles de visualización */}
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 16 }}>
@@ -367,6 +550,72 @@ export function LabCirculoUnitario({ color }: PracticaLabProps) {
           Cálculo <strong>exacto</strong>: el seno, el coseno y la tangente salen directamente de las coordenadas del punto en el círculo de radio 1; en los ángulos notables se muestran sus valores cerrados (√3/2, √2/2, π/6…). La escena usa unidades de pantalla para encuadrar las ondas, pero los <strong>valores numéricos</strong> de las lecturas siempre son reales.
         </span>
       </div>
+
+      {/* ── Objetivos ─────────────────────────────────────────────────────── */}
+      <div style={{ ...card, padding: "18px 22px", marginTop: 22 }}>
+        <Eyebrow>
+          <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
+          Objetivos
+        </Eyebrow>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
+          {objetivos.map((o, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? OK : T.text2 }}>
+              <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
+              <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Reto de cálculo en vivo: predice sen θ (estrellas + récord) ───── */}
+      <PrediccionTrigCard
+        accent={accent}
+        degLive={t.deg}
+        sinLive={t.sin}
+        mejor={mejorEstrellas}
+        onResultado={registraEstrellas}
+        playSfx={
+          sonido
+            ? (ok) => {
+                if (ok) audioRef.current?.correcto();
+                else audioRef.current?.incorrecto();
+              }
+            : undefined
+        }
+      />
+
+      {/* ── Reto evaluable: el ejercicio verbatim del ancla A2 ────────────── */}
+      <RetoNumericoCard
+        reto={RETO_A2}
+        accent={accent}
+        aprobado={ejercicioAprobado}
+        onAprobado={() => setEjercicioAprobado(true)}
+        playSfx={
+          sonido
+            ? (ok) => {
+                if (ok) audioRef.current?.correcto();
+                else audioRef.current?.incorrecto();
+              }
+            : undefined
+        }
+      />
+
+      {/* ── Cajón de teoría ───────────────────────────────────────────────── */}
+      <div className="ex-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
+      <aside className="ex-drawer" data-open={drawer} aria-hidden={!drawer}>
+        <div className="ex-drawer-head">
+          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
+            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
+          </div>
+          <button className="ex-close" onClick={() => setDrawer(false)} title="Cerrar">
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
+        <div className="ex-drawer-body">
+          <FichaTeorica data={CIRCULO_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+        </div>
+      </aside>
     </div>
   );
 }
@@ -380,6 +629,133 @@ function RazonRow({ label, valor, col, icon }: { label: string; valor: string; c
       </div>
       <span style={{ fontSize: 13, fontWeight: 800, color: T.text2 }}>{label}</span>
       <span style={{ marginLeft: "auto", fontSize: 16, fontWeight: 900, color: col, fontFamily: "ui-monospace, monospace" }}>{valor}</span>
+    </div>
+  );
+}
+
+/* ── Reto de cálculo en vivo: predecir sen θ ─────────────────────────────── */
+function PrediccionTrigCard({
+  accent, degLive, sinLive, mejor, onResultado, playSfx,
+}: {
+  accent: string;
+  degLive: number;
+  sinLive: number;
+  mejor: number;
+  onResultado: (estrellas: number) => void;
+  playSfx?: (ok: boolean) => void;
+}) {
+  const [snap, setSnap] = useState<{ deg: number; sin: number } | null>(null);
+  const [val, setVal] = useState("");
+  const [intentos, setIntentos] = useState(0);
+  const [estrellas, setEstrellas] = useState<number | null>(null);
+  const [msg, setMsg] = useState<string | null>(null);
+
+  const tomarLectura = () => {
+    setSnap({ deg: degLive, sin: sinLive });
+    setVal("");
+    setIntentos(0);
+    setEstrellas(null);
+    setMsg(null);
+  };
+
+  const comprobar = () => {
+    if (!snap) return;
+    const num = Number(val.replace(",", "."));
+    if (val.trim() === "" || Number.isNaN(num)) {
+      setMsg("Escribe tu valor de sen θ (por ejemplo 0.5 o −0.87).");
+      return;
+    }
+    const n = intentos + 1;
+    setIntentos(n);
+    const ok = Math.abs(num - snap.sin) <= 0.04;
+    if (ok) {
+      const est = n <= 1 ? 3 : n === 2 ? 2 : 1;
+      setEstrellas(est);
+      setMsg(null);
+      onResultado(est);
+      playSfx?.(true);
+    } else {
+      const cerca = Math.abs(num - snap.sin) <= 0.12;
+      setMsg(cerca ? "Muy cerca. Revisa el redondeo y vuelve a intentar." : "Aún no. Recuerda: sen θ es la ALTURA del punto (y su signo depende del cuadrante).");
+      playSfx?.(false);
+    }
+  };
+
+  return (
+    <div style={{ ...card, padding: "20px 22px 22px", marginTop: 22, border: `1px solid ${accent}55` }}>
+      <Eyebrow>
+        <i className="fa-solid fa-calculator" style={{ marginRight: 8, color: accent }} />
+        Reto de cálculo: predice sen θ
+      </Eyebrow>
+
+      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 14 }}>
+        {[1, 2, 3].map((s) => (
+          <i key={s} className="fa-solid fa-star" style={{ fontSize: 15, color: (estrellas ?? 0) >= s ? "#fbbf24" : "rgba(255,255,255,0.18)" }} />
+        ))}
+        <span style={{ marginLeft: 8, fontSize: 11.5, color: T.text3, fontWeight: 700 }}>Mejor: {mejor}★</span>
+      </div>
+
+      {!snap ? (
+        <>
+          <div style={{ fontSize: 13, color: T.text2, lineHeight: 1.55, marginBottom: 14 }}>
+            Coloca el punto P en un ángulo (arrástralo, usa el deslizador o aplica un ángulo notable) y captura la lectura. Luego tú calculas <strong style={{ color: "#fff" }}>sen θ</strong> con tu transportador y tu calculadora —sin mirar la lectura del seno— y lo verificas.
+          </div>
+          <button className="calc-btn calc-btn-primary" onClick={tomarLectura}>
+            <i className="fa-solid fa-camera" style={{ marginRight: 8 }} /> Capturar el ángulo actual (θ = {fmtDeg(degLive)})
+          </button>
+        </>
+      ) : (
+        <>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", borderRadius: 12, background: T.inset, border: `1px solid ${T.line}`, marginBottom: 14 }}>
+            <i className="fa-solid fa-compass" style={{ fontSize: 18, color: accent }} />
+            <div>
+              <div style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: "0.08em", color: T.text3 }}>ÁNGULO CAPTURADO</div>
+              <div style={{ ...NUM, fontSize: 17, fontWeight: 900, color: "#fff" }}>θ = {fmtDeg(snap.deg)}</div>
+            </div>
+            <button className="calc-btn calc-btn-ghost" style={{ marginLeft: "auto", padding: "8px 12px", fontSize: 12 }} onClick={tomarLectura}>
+              <i className="fa-solid fa-rotate-left" style={{ marginRight: 6 }} /> Otro ángulo
+            </button>
+          </div>
+
+          <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.5, marginBottom: 10 }}>
+            ¿Cuánto vale <strong style={{ color: SIN_COL }}>sen {fmtDeg(snap.deg)}</strong>? Escribe tu resultado (2 decimales; usa signo negativo si el punto está debajo del eje).
+          </div>
+
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <input
+              className="calc-in"
+              style={{ flex: "1 1 160px" }}
+              inputMode="decimal"
+              placeholder="sen θ = …"
+              value={val}
+              onChange={(e) => setVal(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") comprobar(); }}
+              disabled={estrellas !== null}
+            />
+            <button className="calc-btn calc-btn-primary" onClick={comprobar} disabled={estrellas !== null || val.trim() === ""}>
+              <i className="fa-solid fa-check" style={{ marginRight: 8 }} /> Verificar
+            </button>
+          </div>
+
+          {msg && (
+            <div style={{ marginTop: 12, fontSize: 12.5, color: WARN, lineHeight: 1.45, display: "flex", gap: 8, alignItems: "flex-start" }}>
+              <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
+              <span>{msg}</span>
+            </div>
+          )}
+
+          {estrellas !== null && (
+            <div style={{ marginTop: 14, padding: "13px 15px", borderRadius: 12, background: `${OK}14`, border: `1px solid ${OK}55` }}>
+              <div style={{ fontSize: 13.5, fontWeight: 900, color: OK }}>
+                <i className="fa-solid fa-circle-check" style={{ marginRight: 8 }} /> ¡Correcto!
+              </div>
+              <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.5, marginTop: 6 }}>
+                sen {fmtDeg(snap.deg)} = <strong style={{ ...NUM, color: "#fff" }}>{fmtNum2(snap.sin)}</strong>. Es la altura (coordenada y) del punto en el círculo de radio 1. Captura otro ángulo para seguir practicando.
+              </div>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }

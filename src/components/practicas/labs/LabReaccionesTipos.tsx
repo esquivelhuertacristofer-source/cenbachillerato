@@ -16,7 +16,7 @@
  * exactas y están balanceadas; las geometrías son representaciones didácticas.
  */
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, card, Eyebrow, SceneBoundary } from "./_kit";
@@ -24,6 +24,11 @@ import {
   TIPOS, ELEMS, reaccion, tipoInfo, reaccionesDe, conteo, faseDe,
   IDEAS, DATOS, RETO, REACCION_DEF, type TipoId,
 } from "./reacciones-tipos-data";
+import { FichaTeorica } from "./_ficha";
+import { REACCIONES_TIPOS_FICHA } from "./tipos-reacciones-quimicas-ficha";
+import { RetoQuizCard } from "./_reto-quiz";
+import { QUIZ_A2 } from "./tipos-reacciones-quimicas-data";
+import { LabSfx } from "./lab-audio";
 
 const ReaccionesTiposScene = dynamic(() => import("./ReaccionesTiposScene"), {
   ssr: false,
@@ -43,6 +48,30 @@ export function LabReaccionesTipos({ color }: PracticaLabProps) {
   const [playing, setPlaying] = useState(false);
   const [girar, setGirar] = useState(false);
   const [resetNonce, setResetNonce] = useState(0);
+  const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
+  // teoría (cajón deslizable) y sonido
+  const [drawer, setDrawer] = useState(false);
+  const [sonido, setSonido] = useState(false);
+  const audioRef = useRef<LabSfx | null>(null);
+
+  const toggleSonido = useCallback(async () => {
+    if (!audioRef.current) audioRef.current = new LabSfx();
+    const sfx = audioRef.current;
+    if (sonido) {
+      sfx.mute();
+      setSonido(false);
+    } else {
+      await sfx.enable();
+      setSonido(true);
+    }
+  }, [sonido]);
+
+  useEffect(() => {
+    return () => {
+      audioRef.current?.dispose();
+      audioRef.current = null;
+    };
+  }, []);
 
   const r = useMemo(() => reaccion(reaccId), [reaccId]);
   const tipo = useMemo(() => tipoInfo(r.tipo), [r.tipo]);
@@ -74,12 +103,20 @@ export function LabReaccionesTipos({ color }: PracticaLabProps) {
     setReaccId(id);
     setProgreso(0);
     setPlaying(false);
+    if (sonido) audioRef.current?.blip();
   };
   const elegirTipo = (id: TipoId) => {
     const lista = reaccionesDe(id);
     if (lista.length > 0) elegirReaccion(lista[0]!.id);
   };
   const reiniciar = () => { setProgreso(0); setPlaying(false); setResetNonce((n) => n + 1); };
+
+  const objetivos = [
+    { txt: "Explora los 5 tipos de reacción", done: TIPOS.every((tp) => reaccionesDe(tp.id).length > 0) },
+    { txt: "Reproduce una reacción completa (llega al 100%)", done: progreso >= 1 },
+    { txt: "Observa la conservación de la masa (Lavoisier)", done: progreso > 0.5 },
+    { txt: "Aprueba el cuestionario de la actividad A2", done: ejercicioAprobado },
+  ];
 
   const faseLabel = fase === "reactivos" ? "REACTIVOS" : fase === "productos" ? "PRODUCTOS" : "REACCIONANDO";
   const faseColor = fase === "reactivos" ? "#9DB4CE" : fase === "productos" ? "#7DF0C0" : tc;
@@ -121,6 +158,26 @@ export function LabReaccionesTipos({ color }: PracticaLabProps) {
           background:#fff; border:3px solid var(--fc); cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.4); }
         .rx-range::-moz-range-thumb { width:18px; height:18px; border-radius:50%; background:#fff; border:3px solid var(--fc); cursor:pointer; }
         @media (max-width: 1000px){ .rx-bottom { grid-template-columns: 1fr !important; } }
+
+        /* Cajón de teoría */
+        .ex-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
+          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
+        .ex-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
+        .ex-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
+          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
+          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
+          display:flex; flex-direction:column; }
+        .ex-drawer[data-open="true"] { transform:translateX(0); }
+        .ex-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
+          padding:18px 20px; border-bottom:1px solid ${T.line}; }
+        .ex-drawer-body { overflow-y:auto; padding:20px; flex:1; }
+        .ex-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
+          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+        .ex-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
+        .ex-teoria-fab { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); cursor:pointer; display:inline-flex; align-items:center; gap:9px;
+          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
+          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
+        .ex-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateX(-50%) translateY(-1px); }
       `}</style>
 
       <div className="rx-grid">
@@ -172,6 +229,12 @@ export function LabReaccionesTipos({ color }: PracticaLabProps) {
 
             {/* Toolbar */}
             <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
+              <button className="rx-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
+                <i className="fa-solid fa-book-open" />
+              </button>
+              <button className="rx-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
+                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
+              </button>
               <button className="rx-icobtn" data-on={playing} onClick={togglePlay} title="Reproducir la reacción">
                 <i className={`fa-solid ${playing ? "fa-pause" : "fa-play"}`} />
               </button>
@@ -203,6 +266,12 @@ export function LabReaccionesTipos({ color }: PracticaLabProps) {
                 style={{ ["--fc" as string]: tc, ["--pct" as string]: `${progreso * 100}%` }}
               />
             </div>
+
+            {/* Botón flotante de Teoría */}
+            <button className="ex-teoria-fab" onClick={() => setDrawer(true)}>
+              <i className="fa-solid fa-book-open" />
+              Teoría
+            </button>
           </div>
 
           {/* Selector de tipo + reacciones */}
@@ -364,6 +433,57 @@ export function LabReaccionesTipos({ color }: PracticaLabProps) {
           Las <strong>ecuaciones químicas son exactas y están balanceadas</strong>, y el conteo de átomos por elemento es real (igual en reactivos y productos). El movimiento de los átomos y las distancias entre ellos son una representación <strong>didáctica</strong> de bolas y barras: sirven para ver cómo se rompen y se forman enlaces, no son las geometrías ni las trayectorias reales. Reacciones tomadas de la progresión 2 (CNEYT-IV).
         </span>
       </div>
+
+      {/* ── Objetivos guiados ─────────────────────────────────────────── */}
+      <div style={{ ...card, padding: "18px 22px", marginTop: 22 }}>
+        <Eyebrow>
+          <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
+          Objetivos
+        </Eyebrow>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
+          {objetivos.map((o, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? "#34D399" : T.text2 }}>
+              <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
+              <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Reto evaluable: el quiz verbatim del ancla ───────────────── */}
+      <RetoQuizCard
+        quiz={QUIZ_A2}
+        accent={accent}
+        rgba={color.rgba}
+        aprobado={ejercicioAprobado}
+        onAprobado={() => setEjercicioAprobado(true)}
+        playSfx={
+          sonido
+            ? (ok) => {
+                if (ok) audioRef.current?.correcto();
+                else audioRef.current?.incorrecto();
+              }
+            : undefined
+        }
+        playPick={sonido ? () => audioRef.current?.blip() : undefined}
+      />
+
+      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
+      <div className="ex-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
+      <aside className="ex-drawer" data-open={drawer} aria-hidden={!drawer}>
+        <div className="ex-drawer-head">
+          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
+            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
+          </div>
+          <button className="ex-close" onClick={() => setDrawer(false)} title="Cerrar">
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
+        <div className="ex-drawer-body">
+          <FichaTeorica data={REACCIONES_TIPOS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+        </div>
+      </aside>
     </div>
   );
 }

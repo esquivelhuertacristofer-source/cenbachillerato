@@ -6,18 +6,21 @@
  * Un vaso de precipitados con una disolución cuyo color lo fija el indicador de
  * col morada según el pH (rojo/rosa en ácido, morado en neutro, azul/verde en
  * básico). Al lado, una torre-escala de 0 a 14 con un marcador que sube o baja
- * con el pH. En modo "neutralizar", un gotero deja caer gotas de base sobre el
- * vaso (animación cosmética).
+ * con el pH. En modo "neutralizar", una BURETA de NaOH con una perilla
+ * ARRASTRABLE: el alumno la mueve a lo largo de su riel y gotea base sobre el
+ * vaso en tiempo real (gotas que caen + burbujas de mezcla), y el pH responde.
  *
  * Patrón R3F: el default export solo monta <Canvas> y delega en <Contenido>.
  * React Compiler: nada de Math.random()/Date.now()/setState en render; las
- * animaciones viven en refs dentro de useFrame (cosméticas, permitido).
+ * animaciones viven en refs dentro de useFrame; el arrastre usa raycasting sobre
+ * un plano que mira a la cámara (robusto al orbitar). OrbitControls se desactiva
+ * mientras se arrastra.
  */
 
 import * as THREE from "three";
-import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer } from "@react-three/drei";
+import { useMemo, useRef, useState } from "react";
+import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
+import { OrbitControls, ContactShadows, Environment, Lightformer, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { colorCol } from "./ph-data";
 
@@ -27,12 +30,38 @@ export interface PhSceneProps {
   accent: string;
   modo: "medir" | "neutralizar";
   goteando: boolean;
+  gotas: number;
+  gotasMax: number;
   resetNonce: number;
+  /** Habilita arrastrar la perilla de la bureta (tras equiparse). */
+  arrastrable?: boolean;
+  /** El alumno arrastró la perilla → nuevo número de gotas. */
+  onGotasChange?: (gotas: number) => void;
+  /** Tomó la perilla (para sonido). */
+  onGrab?: () => void;
 }
 
 const R_VASO = 1.35; // radio del vaso
 const H_VASO = 2.9; // alto del vaso
 const NIVEL = 0.66; // fracción de llenado del líquido
+
+const NAOH = "#bfeaff"; // color de la gota de NaOH (incolora → azulada)
+
+// Riel de la bureta (coordenadas de mundo, a la izquierda del vaso).
+const TRACK_X = -3.0;
+const TRACK_Z = 0;
+const Y_BOT = -1.25;
+const Y_TOP = 2.65;
+const gotasToY = (g: number, max: number) => Y_BOT + (Math.max(0, Math.min(max, g)) / max) * (Y_TOP - Y_BOT);
+const yToGotas = (y: number, max: number) =>
+  Math.round(((Math.max(Y_BOT, Math.min(Y_TOP, y)) - Y_BOT) / (Y_TOP - Y_BOT)) * max);
+
+// Scratch de módulo (evita asignaciones por frame).
+const _plane = new THREE.Plane();
+const _norm = new THREE.Vector3();
+const _cop = new THREE.Vector3();
+const _hit = new THREE.Vector3();
+const _obj = new THREE.Object3D();
 
 /* ── Vaso de precipitados (cristal) + líquido coloreado ──────────────────── */
 function Vaso({ colorLiquido }: { colorLiquido: string }) {
@@ -98,24 +127,9 @@ function Vaso({ colorLiquido }: { colorLiquido: string }) {
   );
 }
 
-/* ── Gotero: deja caer gotas de base sobre el vaso (modo neutralizar) ────── */
-function Gotero({ activo, colorGota }: { activo: boolean; colorGota: string }) {
-  const gota = useRef<THREE.Mesh>(null);
+/* ── Gotero fijo sobre el vaso (cuerpo del instrumento) ──────────────────── */
+function Gotero() {
   const yTop = H_VASO / 2 + 1.6;
-  const yBottom = -H_VASO / 2 + H_VASO * NIVEL;
-
-  useFrame((_, dt) => {
-    if (!gota.current) return;
-    if (!activo) {
-      gota.current.visible = false;
-      gota.current.position.y = yTop;
-      return;
-    }
-    gota.current.visible = true;
-    gota.current.position.y -= dt * 6;
-    if (gota.current.position.y < yBottom) gota.current.position.y = yTop;
-  });
-
   return (
     <group position={[0, yTop + 0.2, 0]}>
       {/* cuerpo del gotero */}
@@ -128,11 +142,197 @@ function Gotero({ activo, colorGota }: { activo: boolean; colorGota: string }) {
         <coneGeometry args={[0.1, 0.36, 20]} />
         <meshStandardMaterial color="#cfe6f7" roughness={0.2} transparent opacity={0.6} />
       </mesh>
-      {/* gota que cae */}
-      <mesh ref={gota} position={[0, -0.4, 0]}>
-        <sphereGeometry args={[0.1, 16, 16]} />
-        <meshStandardMaterial color={colorGota} emissive={colorGota} emissiveIntensity={0.5} roughness={0.15} toneMapped={false} />
+    </group>
+  );
+}
+
+/* ── Lluvia de gotas de NaOH (partículas en tiempo real) ─────────────────── */
+function GotasStream({ activo }: { activo: boolean }) {
+  const ref = useRef<THREE.InstancedMesh>(null);
+  const N = 7;
+  const yTop = H_VASO / 2 + 1.25; // punta del gotero
+  const ySurf = -H_VASO / 2 + H_VASO * NIVEL; // superficie del líquido
+
+  useFrame((st) => {
+    const m = ref.current;
+    if (!m) return;
+    const t = st.clock.elapsedTime;
+    for (let i = 0; i < N; i++) {
+      const phase = (t * 1.15 + i / N) % 1;
+      const y = yTop - phase * (yTop - ySurf);
+      _obj.position.set(0, y, 0);
+      const s = activo ? 0.085 * (1 - phase * 0.25) : 0.0001;
+      _obj.scale.setScalar(s);
+      _obj.updateMatrix();
+      m.setMatrixAt(i, _obj.matrix);
+    }
+    m.instanceMatrix.needsUpdate = true;
+  });
+
+  return (
+    <instancedMesh ref={ref} args={[undefined, undefined, N]} frustumCulled={false}>
+      <sphereGeometry args={[1, 12, 12]} />
+      <meshStandardMaterial color={NAOH} emissive={NAOH} emissiveIntensity={0.55} roughness={0.15} toneMapped={false} />
+    </instancedMesh>
+  );
+}
+
+/* ── Burbujas de mezcla que suben desde la superficie (reacción en vivo) ──── */
+function Burbujas({ activo }: { activo: boolean }) {
+  const ref = useRef<THREE.InstancedMesh>(null);
+  const N = 12;
+  const ySurf = -H_VASO / 2 + H_VASO * NIVEL;
+  // posiciones x/z deterministas (ángulo áureo) — sin Math.random.
+  const spots = useMemo(() => {
+    const a: { x: number; z: number; sp: number; off: number }[] = [];
+    for (let i = 0; i < N; i++) {
+      const r = (R_VASO - 0.35) * Math.sqrt((i * 0.61803399) % 1);
+      const th = i * 2.39996323;
+      a.push({ x: Math.cos(th) * r, z: Math.sin(th) * r, sp: 0.6 + ((i * 0.37) % 1) * 0.5, off: (i * 0.137) % 1 });
+    }
+    return a;
+  }, []);
+
+  useFrame((st) => {
+    const m = ref.current;
+    if (!m) return;
+    const t = st.clock.elapsedTime;
+    for (let i = 0; i < N; i++) {
+      const s0 = spots[i]!;
+      const phase = (t * s0.sp + s0.off) % 1;
+      const y = ySurf + phase * 0.6;
+      _obj.position.set(s0.x, y, s0.z);
+      const s = activo ? 0.05 * (1 - phase) : 0.0001;
+      _obj.scale.setScalar(s);
+      _obj.updateMatrix();
+      m.setMatrixAt(i, _obj.matrix);
+    }
+    m.instanceMatrix.needsUpdate = true;
+  });
+
+  return (
+    <instancedMesh ref={ref} args={[undefined, undefined, N]} frustumCulled={false}>
+      <sphereGeometry args={[1, 10, 10]} />
+      <meshStandardMaterial color="#eaffff" emissive="#cfeeff" emissiveIntensity={0.4} roughness={0.1} transparent opacity={0.8} toneMapped={false} />
+    </instancedMesh>
+  );
+}
+
+/* ── Bureta de NaOH con perilla arrastrable ──────────────────────────────── */
+function BuretaArrastrable({
+  gotas,
+  gotasMax,
+  accent,
+  arrastrable,
+  onGotasChange,
+  onGrab,
+  onDraggingChange,
+}: {
+  gotas: number;
+  gotasMax: number;
+  accent: string;
+  arrastrable: boolean;
+  onGotasChange?: (g: number) => void;
+  onGrab?: () => void;
+  onDraggingChange: (d: boolean) => void;
+}) {
+  const { camera } = useThree();
+  const draggingRef = useRef(false);
+  const [hover, setHover] = useState(false);
+  const knob = useRef<THREE.Group>(null);
+
+  const yKnob = gotasToY(gotas, gotasMax);
+  const frac = Math.max(0, Math.min(1, gotas / gotasMax));
+  // perilla azul (poca base) → acento (mucha base)
+  const knobCol = useMemo(() => {
+    const c = new THREE.Color(NAOH).lerp(new THREE.Color(accent), frac);
+    return `#${c.getHexString()}`;
+  }, [accent, frac]);
+
+  // halo que late suave cuando se puede arrastrar.
+  useFrame((st) => {
+    if (knob.current) {
+      const s = arrastrable && !draggingRef.current ? 1 + Math.sin(st.clock.elapsedTime * 3) * 0.05 : 1;
+      knob.current.scale.setScalar(s);
+    }
+  });
+
+  const move = (e: ThreeEvent<PointerEvent>) => {
+    if (!draggingRef.current) return;
+    e.stopPropagation();
+    _norm.set(camera.position.x - TRACK_X, 0, camera.position.z - TRACK_Z).normalize();
+    _cop.set(TRACK_X, 0, TRACK_Z);
+    _plane.setFromNormalAndCoplanarPoint(_norm, _cop);
+    if (!e.ray.intersectPlane(_plane, _hit)) return;
+    onGotasChange?.(yToGotas(_hit.y, gotasMax));
+  };
+
+  const down = (e: ThreeEvent<PointerEvent>) => {
+    if (!arrastrable) return;
+    e.stopPropagation();
+    draggingRef.current = true;
+    onDraggingChange(true);
+    onGrab?.();
+    (e.target as Element).setPointerCapture?.(e.pointerId);
+  };
+
+  const up = (e: ThreeEvent<PointerEvent>) => {
+    if (!draggingRef.current) return;
+    e.stopPropagation();
+    draggingRef.current = false;
+    onDraggingChange(false);
+    (e.target as Element).releasePointerCapture?.(e.pointerId);
+  };
+
+  return (
+    <group position={[TRACK_X, 0, TRACK_Z]}>
+      {/* soporte / riel */}
+      <mesh position={[0, (Y_TOP + Y_BOT) / 2, -0.04]}>
+        <boxGeometry args={[0.12, Y_TOP - Y_BOT + 0.5, 0.08]} />
+        <meshStandardMaterial color="#0a1a2c" roughness={0.6} metalness={0.3} />
       </mesh>
+      {/* cuerpo de la bureta (cristal) */}
+      <mesh position={[0, (Y_TOP + Y_BOT) / 2, 0.02]}>
+        <cylinderGeometry args={[0.14, 0.14, Y_TOP - Y_BOT + 0.4, 24, 1, true]} />
+        <meshPhysicalMaterial color="#dff1ff" roughness={0.1} transmission={0.9} thickness={0.3} transparent opacity={0.3} side={THREE.DoubleSide} />
+      </mesh>
+      {/* perilla arrastrable */}
+      <group
+        ref={knob}
+        position={[0, yKnob, 0.12]}
+        onPointerDown={down}
+        onPointerMove={move}
+        onPointerUp={up}
+        onPointerOver={() => arrastrable && setHover(true)}
+        onPointerOut={() => setHover(false)}
+      >
+        {/* halo */}
+        <mesh rotation={[-Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[0.24, 0.34, 28]} />
+          <meshBasicMaterial color={accent} transparent opacity={arrastrable ? (hover ? 0.85 : 0.4) : 0.12} side={THREE.DoubleSide} toneMapped={false} />
+        </mesh>
+        <mesh>
+          <sphereGeometry args={[0.2, 24, 24]} />
+          <meshStandardMaterial color={knobCol} emissive={knobCol} emissiveIntensity={hover ? 0.7 : 0.4} roughness={0.25} metalness={0.2} toneMapped={false} />
+        </mesh>
+        <Html center distanceFactor={11} position={[0, 0.42, 0]} style={{ pointerEvents: "none" }}>
+          <div style={{ fontFamily: "ui-monospace, monospace", fontWeight: 900, fontSize: 13, color: "#fff", background: "rgba(3,12,28,0.82)", border: `1px solid ${accent}88`, borderRadius: 8, padding: "3px 8px", whiteSpace: "nowrap", textShadow: "0 1px 2px rgba(0,0,0,0.6)" }}>
+            {gotas} gotas
+          </div>
+        </Html>
+        {arrastrable && (
+          <Html center distanceFactor={13} position={[0, -0.42, 0]} style={{ pointerEvents: "none" }}>
+            <div style={{ fontSize: 10.5, fontWeight: 800, color: "#cfe8ff", whiteSpace: "nowrap", opacity: hover ? 0 : 0.85 }}>
+              <i className="fa-solid fa-arrows-up-down" style={{ marginRight: 5 }} />
+              arrastra para titular
+            </div>
+          </Html>
+        )}
+      </group>
+      {/* etiqueta del riel */}
+      <Html center distanceFactor={13} position={[0, Y_TOP + 0.5, 0]} style={{ pointerEvents: "none" }}>
+        <div style={{ fontSize: 11, fontWeight: 900, letterSpacing: "0.08em", color: accent, whiteSpace: "nowrap" }}>BURETA · NaOH</div>
+      </Html>
     </group>
   );
 }
@@ -196,9 +396,11 @@ function EscalaPh({ ph }: { ph: number }) {
 }
 
 /* ── Contenido (descendiente del Canvas) ─────────────────────────────────── */
-function Contenido({ ph, colorLiquido, accent, modo, goteando, resetNonce }: PhSceneProps) {
+function Contenido({ ph, colorLiquido, accent, modo, goteando, gotas, gotasMax, resetNonce, arrastrable = false, onGotasChange, onGrab }: PhSceneProps) {
   const sig = `${modo}-${resetNonce}`;
-  const colorGota = "#bfeaff"; // gota de NaOH (incolora → azulada)
+  const [dragging, setDragging] = useState(false);
+  const vertiendo = modo === "neutralizar" && (goteando || dragging);
+
   return (
     <>
       <color attach="background" args={["#04111c"]} />
@@ -209,12 +411,30 @@ function Contenido({ ph, colorLiquido, accent, modo, goteando, resetNonce }: PhS
       <pointLight position={[-5, 3, 4]} intensity={8} color={accent} />
       <pointLight position={[4, 2, 5]} intensity={6} color="#ffffff" />
 
-      <group key={sig} position={[-0.9, 0.2, 0]}>
+      <group key={sig} position={[-0.6, 0.2, 0]}>
         <Vaso colorLiquido={colorLiquido} />
-        {modo === "neutralizar" && <Gotero activo={goteando} colorGota={colorGota} />}
+        {modo === "neutralizar" && (
+          <>
+            <Gotero />
+            <GotasStream activo={vertiendo} />
+            <Burbujas activo={vertiendo} />
+          </>
+        )}
         <EscalaPh ph={ph} />
         <ContactShadows position={[0, -H_VASO / 2 - 0.05, 0]} opacity={0.34} scale={12} blur={2.6} far={6} color="#10283e" />
       </group>
+
+      {modo === "neutralizar" && (
+        <BuretaArrastrable
+          gotas={gotas}
+          gotasMax={gotasMax}
+          accent={accent}
+          arrastrable={arrastrable}
+          onGotasChange={onGotasChange}
+          onGrab={onGrab}
+          onDraggingChange={setDragging}
+        />
+      )}
 
       <Environment resolution={256}>
         <Lightformer intensity={1.9} position={[0, 5, 4]} scale={[10, 4, 1]} color="#ffffff" />
@@ -224,12 +444,13 @@ function Contenido({ ph, colorLiquido, accent, modo, goteando, resetNonce }: PhS
 
       <OrbitControls
         makeDefault
+        enabled={!dragging}
         enablePan={false}
         minDistance={5}
         maxDistance={16}
         minPolarAngle={Math.PI / 6}
         maxPolarAngle={Math.PI / 1.7}
-        target={[0.2, 0, 0]}
+        target={[-0.3, 0, 0]}
       />
 
       <EffectComposer enableNormalPass={false}>
@@ -242,7 +463,7 @@ function Contenido({ ph, colorLiquido, accent, modo, goteando, resetNonce }: PhS
 
 export default function PhScene(props: PhSceneProps) {
   return (
-    <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={{ position: [0.5, 1.4, 9.5], fov: 44 }}>
+    <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={{ position: [0, 1.4, 10], fov: 44 }}>
       <Contenido {...props} />
     </Canvas>
   );

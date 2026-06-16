@@ -16,16 +16,20 @@
  * Toda la genética es de conteo cerrado (probabilidad de cada casilla).
  */
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { FichaTeorica } from "./_ficha";
+import { RetoNumericoCard } from "./_reto-numerico";
+import { LabSfx } from "./lab-audio";
+import { GENETICA_MENDEL_FICHA } from "./genetica-mendel-ficha";
 import {
   type Modo, type Geno1, type Herencia, type GenoMadre, type GenoPadre,
   resolverMono, resolverDi, resolverLig, HERENCIAS,
   CASOS_MONO, CASOS_DI, CASOS_LIG,
   PROBLEMA, INSTRUCCIONES, PREGUNTAS, IDEAS, DATOS, GLOSARIO,
-  EJEMPLO_A2, EJEMPLO_LIG, fmtPct,
+  EJEMPLO_A2, EJEMPLO_LIG, fmtPct, RETO_A2,
 } from "./genetica-mendel-data";
 
 const GeneticaMendelScene = dynamic(() => import("./GeneticaMendelScene"), {
@@ -81,6 +85,31 @@ export function LabGeneticaMendel({ color }: PracticaLabProps) {
   const [playing, setPlaying] = useState<boolean>(true);
   const [resetNonce, setResetNonce] = useState(0);
 
+  // reto evaluable, teoría (cajón deslizable) y sonido
+  const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
+  const [drawer, setDrawer] = useState(false);
+  const [sonido, setSonido] = useState(false);
+  const audioRef = useRef<LabSfx | null>(null);
+
+  const toggleSonido = useCallback(async () => {
+    if (!audioRef.current) audioRef.current = new LabSfx();
+    const sfx = audioRef.current;
+    if (sonido) {
+      sfx.mute();
+      setSonido(false);
+    } else {
+      await sfx.enable();
+      setSonido(true);
+    }
+  }, [sonido]);
+
+  useEffect(() => {
+    return () => {
+      audioRef.current?.dispose();
+      audioRef.current = null;
+    };
+  }, []);
+
   const bump = () => setResetNonce((n) => n + 1);
   const resetModo = () => {
     if (modo === "monohibrido") { setMonoP1("Aa"); setMonoP2("Aa"); setHerencia("completa"); }
@@ -88,7 +117,7 @@ export function LabGeneticaMendel({ color }: PracticaLabProps) {
     else { setMadre("XDXd"); setPadre("XDY"); }
     bump();
   };
-  const cambiarModo = (m: Modo) => { setModo(m); bump(); };
+  const cambiarModo = (m: Modo) => { setModo(m); bump(); if (sonido) audioRef.current?.blip(); };
 
   // valores en vivo
   const mono = resolverMono(monoP1, monoP2, herencia);
@@ -132,6 +161,26 @@ export function LabGeneticaMendel({ color }: PracticaLabProps) {
         .gm-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.6); }
         .gm-tab:hover { background:rgba(255,255,255,0.06); }
         @media (max-width: 1000px){ .gm-bottom { grid-template-columns: 1fr !important; } }
+
+        /* Cajón de teoría */
+        .gm-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
+          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
+        .gm-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
+        .gm-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
+          background:linear-gradient(180deg,#06121e 0%,#040a16 100%); border-left:1px solid rgba(${color.rgba},0.32);
+          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
+          display:flex; flex-direction:column; }
+        .gm-drawer[data-open="true"] { transform:translateX(0); }
+        .gm-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
+          padding:18px 20px; border-bottom:1px solid ${T.line}; }
+        .gm-drawer-body { overflow-y:auto; padding:20px; flex:1; }
+        .gm-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
+          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+        .gm-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
+        .gm-teoria-fab { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); cursor:pointer; display:inline-flex; align-items:center; gap:9px;
+          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
+          background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
+        .gm-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateX(-50%) translateY(-1px); }
       `}</style>
 
       {/* Selector de modo */}
@@ -185,6 +234,12 @@ export function LabGeneticaMendel({ color }: PracticaLabProps) {
 
             {/* Toolbar */}
             <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
+              <button className="gm-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
+                <i className="fa-solid fa-book-open" />
+              </button>
+              <button className="gm-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
+                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
+              </button>
               <button className="gm-icobtn" data-on={playing} onClick={() => setPlaying((p) => !p)} title={playing ? "Pausar" : "Reproducir"}>
                 <i className={`fa-solid ${playing ? "fa-pause" : "fa-play"}`} />
               </button>
@@ -192,6 +247,12 @@ export function LabGeneticaMendel({ color }: PracticaLabProps) {
                 <i className="fa-solid fa-rotate-left" />
               </button>
             </div>
+
+            {/* Botón flotante de Teoría */}
+            <button className="gm-teoria-fab" onClick={() => setDrawer(true)}>
+              <i className="fa-solid fa-book-open" />
+              Teoría
+            </button>
 
             {/* Pie: lectura en vivo */}
             <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 18px 14px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
@@ -469,6 +530,32 @@ export function LabGeneticaMendel({ color }: PracticaLabProps) {
           Genética <strong>exacta</strong> de conteo cerrado: el cuadro de Punnett combina los gametos de cada progenitor y cada casilla tiene la misma probabilidad. Las proporciones (1:2:1 genotípica, 3:1 fenotípica, 9:3:3:1 dihíbrida) y los porcentajes de los paneles son <strong>exactos</strong>. La escena 3D es <strong>esquemática</strong>: las flores, las semillas y los cromosomas son representaciones visuales (no a escala biológica) para distinguir los fenotipos y los sexos. El ejemplo resuelto es verbatim del ejercicio A2 y de la actividad final del glosario A5; las ideas clave, el glosario y el contexto se basan en la lectura A1; las preguntas para reflexionar se derivan de ese mismo contenido.
         </span>
       </div>
+
+      {/* ── Reto evaluable: el ejercicio verbatim del ancla A2 ────────── */}
+      <RetoNumericoCard
+        reto={RETO_A2}
+        accent={accent}
+        aprobado={ejercicioAprobado}
+        onAprobado={() => setEjercicioAprobado(true)}
+        playSfx={() => { if (sonido) audioRef.current?.correcto(); }}
+      />
+
+      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
+      <div className="gm-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
+      <aside className="gm-drawer" data-open={drawer} aria-hidden={!drawer}>
+        <div className="gm-drawer-head">
+          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
+            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
+          </div>
+          <button className="gm-close" onClick={() => setDrawer(false)} title="Cerrar">
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
+        <div className="gm-drawer-body">
+          <FichaTeorica data={GENETICA_MENDEL_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+        </div>
+      </aside>
     </div>
   );
 }

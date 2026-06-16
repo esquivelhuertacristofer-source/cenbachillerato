@@ -18,10 +18,14 @@
  *      biológicos, y la reparación del ADN (NER).
  */
 
-import { useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, card, Eyebrow, SceneBoundary } from "./_kit";
+import { FichaTeorica } from "./_ficha";
+import { RetoQuizCard } from "./_reto-quiz";
+import { LabSfx } from "./lab-audio";
+import { MUTACIONES_FICHA } from "./mutaciones-ficha";
 import {
   type Modo,
   type ClasePuntual,
@@ -49,6 +53,7 @@ import {
   DATOS,
   CONTEXTO,
   FUENTE,
+  QUIZ_A2,
 } from "./mutaciones-data";
 
 const MutacionesScene = dynamic(() => import("./MutacionesScene"), {
@@ -72,6 +77,30 @@ export function LabMutaciones({ color }: PracticaLabProps) {
   const [reparar, setReparar] = useState<boolean>(false); // NER aplicado
   const [playing, setPlaying] = useState<boolean>(true);
   const [resetNonce, setResetNonce] = useState(0);
+  const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
+  // teoría (cajón deslizable) y sonido
+  const [drawer, setDrawer] = useState(false);
+  const [sonido, setSonido] = useState(false);
+  const audioRef = useRef<LabSfx | null>(null);
+
+  const toggleSonido = useCallback(async () => {
+    if (!audioRef.current) audioRef.current = new LabSfx();
+    const sfx = audioRef.current;
+    if (sonido) {
+      sfx.mute();
+      setSonido(false);
+    } else {
+      await sfx.enable();
+      setSonido(true);
+    }
+  }, [sonido]);
+
+  useEffect(() => {
+    return () => {
+      audioRef.current?.dispose();
+      audioRef.current = null;
+    };
+  }, []);
 
   const bump = () => setResetNonce((n) => n + 1);
 
@@ -87,6 +116,7 @@ export function LabMutaciones({ color }: PracticaLabProps) {
   const cambiarModo = (m: Modo) => {
     setModo(m);
     setPlaying(true);
+    if (sonido) audioRef.current?.blip();
     bump();
   };
   const reiniciar = () => {
@@ -260,6 +290,26 @@ export function LabMutaciones({ color }: PracticaLabProps) {
           background:rgba(4,10,22,0.4); color:#fff; font-size:12.5px; font-weight:900; text-align:left; transition:all .15s; }
         .mu-toggle:hover { background:rgba(255,255,255,0.07); }
         @media (max-width: 1000px){ .mu-bottom { grid-template-columns: 1fr !important; } }
+
+        /* Cajón de teoría */
+        .mu-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
+          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
+        .mu-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
+        .mu-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
+          background:linear-gradient(180deg,#06121e 0%,#040a16 100%); border-left:1px solid rgba(${color.rgba},0.32);
+          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
+          display:flex; flex-direction:column; }
+        .mu-drawer[data-open="true"] { transform:translateX(0); }
+        .mu-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
+          padding:18px 20px; border-bottom:1px solid ${T.line}; }
+        .mu-drawer-body { overflow-y:auto; padding:20px; flex:1; }
+        .mu-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
+          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+        .mu-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
+        .mu-teoria-fab { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); cursor:pointer; display:inline-flex; align-items:center; gap:9px;
+          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
+          background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
+        .mu-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateX(-50%) translateY(-1px); }
       `}</style>
 
       {/* Selector de modo */}
@@ -320,6 +370,12 @@ export function LabMutaciones({ color }: PracticaLabProps) {
 
             {/* Toolbar */}
             <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
+              <button className="mu-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
+                <i className="fa-solid fa-book-open" />
+              </button>
+              <button className="mu-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
+                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
+              </button>
               {modo === "mutagenos" && mutageno.id === "uv" && (
                 <button className="mu-icobtn" data-on={dimero} onClick={() => { setDimero((d) => !d); setReparar(false); }} title={dimero ? "Quitar daño UV" : "Aplicar radiación UV"}>
                   <i className={`fa-solid ${dimero ? "fa-sun" : "fa-ban"}`} />
@@ -341,6 +397,12 @@ export function LabMutaciones({ color }: PracticaLabProps) {
               </div>
               <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6 }}>{pie}</div>
             </div>
+
+            {/* Botón flotante de Teoría */}
+            <button className="mu-teoria-fab" onClick={() => setDrawer(true)}>
+              <i className="fa-solid fa-book-open" />
+              Teoría
+            </button>
           </div>
 
           {/* Panel de control del modo */}
@@ -474,6 +536,38 @@ export function LabMutaciones({ color }: PracticaLabProps) {
           La lectura A1, las preguntas de reflexión, el glosario A5 (con sus ejemplos) y los hechos de «¿sabías que?» (quizzes A2/A4) son <strong>verbatim</strong> del MCCEMS 2025. En el modo de mutaciones puntuales, la secuencia, la traducción a aminoácidos y el efecto de cada mutación se <strong>calculan</strong> sobre el inicio real del gen de la β-globina humana usando el código genético universal estándar. Los cromosomas de bandas, la doble hélice y el dímero de timina son representaciones <strong>esquemáticas</strong> del mecanismo, no modelos a escala molecular. El contexto del INMEGEN es informativo. Fuente: {FUENTE}
         </span>
       </div>
+
+      {/* ── Reto evaluable: el quiz verbatim de la actividad A2 ──────── */}
+      <RetoQuizCard
+        quiz={QUIZ_A2}
+        accent={accent}
+        rgba={color.rgba}
+        aprobado={ejercicioAprobado}
+        onAprobado={() => setEjercicioAprobado(true)}
+        playSfx={() => {
+          if (sonido) audioRef.current?.correcto();
+        }}
+        playPick={() => {
+          if (sonido) audioRef.current?.blip();
+        }}
+      />
+
+      {/* ── Cajón de teoría ─────────────────────────────────────────── */}
+      <div className="mu-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
+      <aside className="mu-drawer" data-open={drawer} aria-hidden={!drawer}>
+        <div className="mu-drawer-head">
+          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
+            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
+          </div>
+          <button className="mu-close" onClick={() => setDrawer(false)} title="Cerrar">
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
+        <div className="mu-drawer-body">
+          <FichaTeorica data={MUTACIONES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+        </div>
+      </aside>
     </div>
   );
 }

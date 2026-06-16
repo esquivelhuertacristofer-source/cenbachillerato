@@ -16,10 +16,15 @@
  * (MCCEMS 2025).
  */
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, OK, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { EppGate, type EppItem } from "./_epp-gate";
+import { FichaTeorica } from "./_ficha";
+import { RetoNumericoCard } from "./_reto-numerico";
+import { LabSfx } from "./lab-audio";
+import { NORMAL_FICHA } from "./normal-ficha";
 import {
   PRESETS,
   PRESET_DEFAULT,
@@ -34,6 +39,7 @@ import {
   cdfEstandar,
   fmtNum,
   fmtPct,
+  RETO_A2,
   type Modo,
 } from "./normal-data";
 
@@ -51,6 +57,19 @@ const VERDE = "#34D399";
 const ORO = "#ffd24a";
 const AZUL = "#5fb0ff";
 const MAGENTA = "#f0a6ff";
+
+const RETO_KEY = "cen-normal-reto";
+
+// Pilar EQUIPARSE: en un estudio estadístico el “equipo” es el instrumental para
+// MUESTREAR y CALCULAR (3 correctos + 3 distractores que miden otra cosa o azar).
+const INSTRUMENTOS: EppItem[] = [
+  { key: "cinta", nombre: "Cinta métrica", icono: "fa-ruler-vertical", ok: true, nota: "Mide la estatura de cada persona de la muestra: es tu dato X." },
+  { key: "hoja", nombre: "Hoja de registro", icono: "fa-table-list", ok: true, nota: "Anota cada medición para luego calcular media μ y desviación σ." },
+  { key: "calc", nombre: "Calculadora científica", icono: "fa-calculator", ok: true, nota: "Calcula μ, σ, la puntuación z = (x−μ)/σ y las áreas/probabilidades." },
+  { key: "dado", nombre: "Dado", icono: "fa-dice", ok: false, nota: "Genera azar artificial; no mide el fenómeno real que quieres modelar." },
+  { key: "termo", nombre: "Termómetro", icono: "fa-temperature-half", ok: false, nota: "Mide temperatura, no la variable de este estudio." },
+  { key: "crono", nombre: "Cronómetro", icono: "fa-stopwatch", ok: false, nota: "Mide tiempo; aquí la variable son las estaturas, no la duración." },
+];
 
 export function LabNormal({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
@@ -71,6 +90,46 @@ export function LabNormal({ color }: PracticaLabProps) {
   const [movioSigma, setMovioSigma] = useState(false);
   const [vioEmpirica, setVioEmpirica] = useState(false);
   const [calculoProb, setCalculoProb] = useState(false);
+  const [arrastro, setArrastro] = useState(false);
+  const [predicho, setPredicho] = useState(false);
+
+  // compuerta de equipamiento (pilar EQUIPARSE)
+  const [eppListo, setEppListo] = useState(false);
+
+  // reto evaluable, teoría (cajón deslizable) y sonido
+  const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
+  const [drawer, setDrawer] = useState(false);
+  const [sonido, setSonido] = useState(false);
+  const audioRef = useRef<LabSfx | null>(null);
+
+  // mejor marca de la predicción (estrellas), persistida en el navegador
+  const [mejorEstrellas, setMejorEstrellas] = useState<number>(() => {
+    if (typeof window === "undefined") return 0;
+    try {
+      return Number(window.localStorage.getItem(RETO_KEY)) || 0;
+    } catch {
+      return 0;
+    }
+  });
+
+  const toggleSonido = useCallback(async () => {
+    if (!audioRef.current) audioRef.current = new LabSfx();
+    const sfx = audioRef.current;
+    if (sonido) {
+      sfx.mute();
+      setSonido(false);
+    } else {
+      await sfx.enable();
+      setSonido(true);
+    }
+  }, [sonido]);
+
+  useEffect(() => {
+    return () => {
+      audioRef.current?.dispose();
+      audioRef.current = null;
+    };
+  }, []);
 
   const bump = () => setResetNonce((k) => k + 1);
 
@@ -88,12 +147,33 @@ export function LabNormal({ color }: PracticaLabProps) {
 
   const elegirModo = (m: Modo) => {
     setModo(m);
+    if (sonido) audioRef.current?.blip();
     if (m === "empirica") setVioEmpirica(true);
     if (m === "probabilidad") setCalculoProb(true);
   };
 
   const cambiarMu = (v: number) => { setMu(v); setMovioMu(true); };
   const cambiarSigma = (v: number) => { setSigma(v); setMovioSigma(true); };
+
+  // arrastre directo en 3D (pilar ARRASTRAR/MANIPULAR)
+  const onDragMu = useCallback((v: number) => { setMu(v); setMovioMu(true); setArrastro(true); }, []);
+  const onDragSigma = useCallback((v: number) => { setSigma(v); setMovioSigma(true); setArrastro(true); }, []);
+  const onDragA = useCallback((v: number) => { setA(v); setArrastro(true); }, []);
+  const onDragB = useCallback((v: number) => { setB(v); setArrastro(true); }, []);
+  const onGrab = useCallback(() => { audioRef.current?.blip(); }, []);
+
+  const registraEstrellas = useCallback((est: number) => {
+    setPredicho(true);
+    setMejorEstrellas((m) => {
+      const nx = Math.max(m, est);
+      try {
+        window.localStorage.setItem(RETO_KEY, String(nx));
+      } catch {
+        /* almacenamiento no disponible */
+      }
+      return nx;
+    });
+  }, []);
 
   const reset = () => {
     const p = presetPorId(presetId);
@@ -112,10 +192,14 @@ export function LabNormal({ color }: PracticaLabProps) {
   const modoActual = MODOS.find((m) => m.id === modo) ?? MODOS[0]!;
 
   const objetivos = [
+    { txt: "Equípate con el instrumental de muestreo", done: eppListo },
     { txt: "Desplaza la media μ", done: movioMu },
     { txt: "Cambia la dispersión σ", done: movioSigma },
+    { txt: "Arrastra los controles en la escena 3D", done: arrastro },
     { txt: "Observa la regla 68-95-99.7", done: vioEmpirica },
     { txt: "Calcula una probabilidad P(a≤X≤b)", done: calculoProb },
+    { txt: "Predice un área y acierta", done: predicho },
+    { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
   ];
 
   const sceneFallback = (
@@ -160,7 +244,76 @@ export function LabNormal({ color }: PracticaLabProps) {
           background:var(--nrm); border:2px solid #061528; box-shadow:0 2px 8px -2px var(--nrm); cursor:pointer; }
         .nrm-slider::-moz-range-thumb { width:18px; height:18px; border-radius:50%; background:var(--nrm); border:2px solid #061528; cursor:pointer; }
         @media (max-width: 1000px){ .nrm-bottom { grid-template-columns: 1fr !important; } }
+
+        /* Banda de pasos guiados (pilar SEGUIR PASOS) */
+        .nrm-steps { display:grid; grid-template-columns: repeat(5, 1fr); gap:10px; }
+        @media (max-width: 760px){ .nrm-steps { grid-template-columns: 1fr 1fr; } }
+        .nrm-step { display:flex; gap:10px; align-items:flex-start; padding:11px 12px; border-radius:13px;
+          border:1px solid ${T.line}; background:${T.inset}; transition:all .18s; }
+        .nrm-step[data-on="true"] { border-color:var(--nrm); background:rgba(${color.rgba},0.12); box-shadow:0 4px 16px -8px var(--nrm); }
+        .nrm-step-n { flex-shrink:0; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+          font-size:12px; font-weight:900; color:${T.text3}; background:${T.glass}; border:1px solid ${T.line}; }
+        .nrm-step[data-on="true"] .nrm-step-n { color:#04121f; background:var(--nrm); border-color:var(--nrm); }
+        .nrm-step-tx { font-size:11.5px; line-height:1.4; color:${T.text2}; }
+        .nrm-step[data-on="true"] .nrm-step-tx { color:#fff; }
+        .nrm-step-tx strong { display:block; font-size:12px; color:${T.text}; margin-bottom:1px; }
+
+        /* Tarjeta de predicción (pilar HACER CÁLCULOS) */
+        .nrm-calc-in { width:120px; padding:9px 12px; border-radius:10px; border:1px solid ${T.line}; background:${T.inset};
+          color:#fff; font-size:15px; font-weight:800; font-family:ui-monospace, monospace; outline:none; transition:border-color .15s; }
+        .nrm-calc-in:focus { border-color:var(--nrm); }
+        .nrm-calc-btn { cursor:pointer; border-radius:10px; font-size:13px; font-weight:800; padding:10px 16px; border:1px solid transparent; transition:filter .15s, background .15s; }
+        .nrm-calc-primary { background:var(--nrm); color:#04121f; }
+        .nrm-calc-primary:hover:not(:disabled) { filter:brightness(1.08); }
+        .nrm-calc-primary:disabled { opacity:.45; cursor:not-allowed; }
+        .nrm-calc-ghost { background:transparent; border-color:${T.line}; color:${T.text2}; }
+        .nrm-calc-ghost:hover { border-color:${T.lineStrong}; color:#fff; }
+
+        /* Cajón de teoría */
+        .nm-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
+          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
+        .nm-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
+        .nm-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
+          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
+          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
+          display:flex; flex-direction:column; }
+        .nm-drawer[data-open="true"] { transform:translateX(0); }
+        .nm-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
+          padding:18px 20px; border-bottom:1px solid ${T.line}; }
+        .nm-drawer-body { overflow-y:auto; padding:20px; flex:1; }
+        .nm-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
+          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+        .nm-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
+        .nm-teoria-fab { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); cursor:pointer; display:inline-flex; align-items:center; gap:9px;
+          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
+          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
+        .nm-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateX(-50%) translateY(-1px); }
       `}</style>
+
+      {/* ── Banda de pasos guiados (pilar SEGUIR PASOS) ──────────────── */}
+      <div style={{ ...card, padding: "16px 20px", marginBottom: 18 }}>
+        <Eyebrow>
+          <i className="fa-solid fa-list-check" style={{ marginRight: 8, color: accent }} />
+          Sigue los pasos del experimento
+        </Eyebrow>
+        <div className="nrm-steps" style={{ ["--nrm" as string]: accent }}>
+          {[
+            { n: 1, done: eppListo, t: "Equípate", d: "Elige el instrumental de muestreo correcto." },
+            { n: 2, done: movioMu || movioSigma, t: "Mueve la campana", d: "Ajusta la media μ y la desviación σ." },
+            { n: 3, done: arrastro, t: "Arrastra en 3D", d: "Toma los tiradores μ, σ, a, b en la escena." },
+            { n: 4, done: calculoProb, t: "Calcula P(a≤X≤b)", d: "En modo probabilidad, lee el área y la z." },
+            { n: 5, done: predicho || ejercicioAprobado, t: "Predice y resuelve", d: "Predice un área y aprueba el reto A2." },
+          ].map((s) => (
+            <div key={s.n} className="nrm-step" data-on={s.done}>
+              <span className="nrm-step-n">{s.done ? <i className="fa-solid fa-check" /> : s.n}</span>
+              <span className="nrm-step-tx">
+                <strong>{s.t}</strong>
+                {s.d}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
 
       <div className="nrm-grid">
         {/* ── Columna visor ──────────────────────────────────────── */}
@@ -188,8 +341,31 @@ export function LabNormal({ color }: PracticaLabProps) {
                 pausado={pausado}
                 autoRotate={autoRotate}
                 resetNonce={resetNonce}
+                arrastrable={eppListo}
+                onDragMu={onDragMu}
+                onDragSigma={onDragSigma}
+                onDragA={onDragA}
+                onDragB={onDragB}
+                onGrab={onGrab}
               />
             </SceneBoundary>
+
+            {/* Compuerta de equipamiento (pilar EQUIPARSE) */}
+            {!eppListo && (
+              <EppGate
+                accent={accent}
+                rgba={color.rgba}
+                items={INSTRUMENTOS}
+                titulo="Prepara tu estación de muestreo"
+                subtitulo="Antes de modelar, equípate con el instrumental correcto"
+                intro={`Para levantar la muestra y calcular μ, σ y las probabilidades necesitas el instrumental adecuado. Selecciona solo las ${INSTRUMENTOS.filter((i) => i.ok).length} piezas que sirven para medir y calcular este fenómeno (deja fuera las que miden otra cosa o generan azar).`}
+                verbo="muestreo y cálculo"
+                onEntrar={() => {
+                  setEppListo(true);
+                  if (sonido) audioRef.current?.blip();
+                }}
+              />
+            )}
 
             {/* Cinta EN VIVO */}
             <div style={{ position: "absolute", top: 14, left: 16, display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(2,12,28,0.74)", border: `1px solid ${accent}66`, backdropFilter: "blur(10px)" }}>
@@ -204,6 +380,12 @@ export function LabNormal({ color }: PracticaLabProps) {
 
             {/* Toolbar */}
             <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(2,12,28,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
+              <button className="nrm-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
+                <i className="fa-solid fa-book-open" />
+              </button>
+              <button className="nrm-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
+                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
+              </button>
               <button className="nrm-icobtn" data-on={!pausado} onClick={() => setPausado((p) => !p)} title={pausado ? "Reanudar" : "Pausar"}>
                 <i className={`fa-solid ${pausado ? "fa-play" : "fa-pause"}`} />
               </button>
@@ -229,6 +411,12 @@ export function LabNormal({ color }: PracticaLabProps) {
                 )}
               </div>
             </div>
+
+            {/* Botón flotante de Teoría */}
+            <button className="nm-teoria-fab" onClick={() => setDrawer(true)}>
+              <i className="fa-solid fa-book-open" />
+              Teoría
+            </button>
           </div>
 
           {/* Controles: modo + sliders */}
@@ -515,6 +703,201 @@ export function LabNormal({ color }: PracticaLabProps) {
           ))}
         </div>
       </div>
+
+      {/* ── Predicción de área (pilar HACER CÁLCULOS + reto con estrellas) ── */}
+      <PrediccionProbCard
+        accent={accent}
+        rgba={color.rgba}
+        mu={mu}
+        sigma={sigma}
+        a={a}
+        b={b}
+        unidad={preset.unidad}
+        mejorEstrellas={mejorEstrellas}
+        onResultado={registraEstrellas}
+        playSfx={() => {
+          if (sonido) audioRef.current?.correcto();
+        }}
+        playFail={() => {
+          if (sonido) audioRef.current?.incorrecto();
+        }}
+      />
+
+      {/* ── Reto evaluable: el ejercicio verbatim del ancla A2 ────────── */}
+      <RetoNumericoCard
+        reto={RETO_A2}
+        accent={accent}
+        aprobado={ejercicioAprobado}
+        onAprobado={() => setEjercicioAprobado(true)}
+        playSfx={() => {
+          if (sonido) audioRef.current?.correcto();
+        }}
+      />
+
+      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
+      <div className="nm-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
+      <aside className="nm-drawer" data-open={drawer} aria-hidden={!drawer}>
+        <div className="nm-drawer-head">
+          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
+            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
+          </div>
+          <button className="nm-close" onClick={() => setDrawer(false)} title="Cerrar">
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
+        <div className="nm-drawer-body">
+          <FichaTeorica data={NORMAL_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+        </div>
+      </aside>
+    </div>
+  );
+}
+
+/* ── Tarjeta de predicción de área (HACER CÁLCULOS + reto con estrellas) ── */
+function PrediccionProbCard({
+  accent,
+  rgba,
+  mu,
+  sigma,
+  a,
+  b,
+  unidad,
+  mejorEstrellas,
+  onResultado,
+  playSfx,
+  playFail,
+}: {
+  accent: string;
+  rgba: string;
+  mu: number;
+  sigma: number;
+  a: number;
+  b: number;
+  unidad: string;
+  mejorEstrellas: number;
+  onResultado: (estrellas: number) => void;
+  playSfx: () => void;
+  playFail: () => void;
+}) {
+  const [snap, setSnap] = useState<{ a: number; b: number; mu: number; sigma: number } | null>(null);
+  const [valor, setValor] = useState("");
+  const [intentos, setIntentos] = useState(0);
+  const [veredicto, setVeredicto] = useState<{ ok: boolean; real: number; estrellas: number; dif: number } | null>(null);
+
+  const tomar = () => {
+    setSnap({ a, b, mu, sigma });
+    setValor("");
+    setIntentos(0);
+    setVeredicto(null);
+  };
+
+  const comprobar = () => {
+    if (!snap) return;
+    const pred = Number(valor);
+    if (!Number.isFinite(pred)) return;
+    const real = areaEntre(snap.a, snap.b, snap.mu, snap.sigma) * 100;
+    const dif = Math.abs(pred - real);
+    const ok = dif <= 3;
+    if (ok) {
+      const estrellas = intentos === 0 ? 3 : intentos === 1 ? 2 : 1;
+      setVeredicto({ ok: true, real, estrellas, dif });
+      onResultado(estrellas);
+      playSfx();
+    } else {
+      setIntentos((n) => n + 1);
+      setVeredicto({ ok: false, real, estrellas: 0, dif });
+      playFail();
+    }
+  };
+
+  const lo = snap ? Math.min(snap.a, snap.b) : Math.min(a, b);
+  const hi = snap ? Math.max(snap.a, snap.b) : Math.max(a, b);
+
+  return (
+    <div style={{ ...card, padding: "20px 22px 22px", marginTop: 22 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+        <Eyebrow>
+          <i className="fa-solid fa-wand-magic-sparkles" style={{ marginRight: 8, color: accent }} />
+          Predice el área antes de calcularla
+        </Eyebrow>
+        {mejorEstrellas > 0 && (
+          <span style={{ fontSize: 12, fontWeight: 800, color: "#ffd24a", display: "inline-flex", alignItems: "center", gap: 4 }}>
+            <i className="fa-solid fa-trophy" />
+            Mejor marca:
+            {[1, 2, 3].map((s) => (
+              <i key={s} className="fa-solid fa-star" style={{ fontSize: 11, color: s <= mejorEstrellas ? "#ffd24a" : "rgba(255,255,255,0.18)" }} />
+            ))}
+          </span>
+        )}
+      </div>
+
+      <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55, margin: "6px 0 14px" }}>
+        Estima a ojo qué porcentaje del área cae en el rango y escríbelo. Luego compáralo con el valor exacto que calcula la normal. Aciertas si tu predicción está a <strong style={{ color: accent }}>±3 puntos</strong>; menos intentos, más estrellas.
+      </div>
+
+      {!snap ? (
+        <button className="nrm-calc-btn nrm-calc-primary" style={{ ["--nrm" as string]: accent }} onClick={tomar}>
+          <i className="fa-solid fa-crosshairs" style={{ marginRight: 7 }} />
+          Tomar la lectura actual (a, b, μ, σ)
+        </button>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div style={{ padding: "11px 14px", borderRadius: 11, background: `rgba(${rgba},0.08)`, border: `1px solid rgba(${rgba},0.28)`, fontSize: 12.5, color: T.text2 }}>
+            Lectura tomada: <strong style={{ color: "#34D399" }}>P({fmtNum(lo, 1)} ≤ X ≤ {fmtNum(hi, 1)} {unidad})</strong> con μ = <strong>{fmtNum(snap.mu, 1)}</strong>, σ = <strong>{fmtNum(snap.sigma, 1)}</strong>.
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+            <span style={{ fontSize: 13, color: T.text2, fontWeight: 700 }}>Mi predicción:</span>
+            <input
+              className="nrm-calc-in"
+              style={{ ["--nrm" as string]: accent }}
+              type="number"
+              inputMode="decimal"
+              placeholder="0–100"
+              value={valor}
+              onChange={(e) => setValor(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") comprobar(); }}
+            />
+            <span style={{ fontSize: 14, fontWeight: 800, color: T.text2 }}>%</span>
+            <button className="nrm-calc-btn nrm-calc-primary" style={{ ["--nrm" as string]: accent }} onClick={comprobar} disabled={valor.trim() === ""}>
+              <i className="fa-solid fa-check-double" style={{ marginRight: 7 }} />
+              Comprobar
+            </button>
+            <button className="nrm-calc-btn nrm-calc-ghost" onClick={tomar}>
+              <i className="fa-solid fa-rotate-left" style={{ marginRight: 7 }} />
+              Otra lectura
+            </button>
+          </div>
+
+          {veredicto && (
+            <div
+              style={{
+                padding: "12px 15px",
+                borderRadius: 12,
+                border: `1px solid ${veredicto.ok ? "#34D39988" : "#FF5E5E66"}`,
+                background: veredicto.ok ? "#34D39914" : "#FF5E5E12",
+                fontSize: 13, color: T.text, lineHeight: 1.55,
+              }}
+            >
+              {veredicto.ok ? (
+                <span>
+                  <i className="fa-solid fa-circle-check" style={{ color: "#34D399", marginRight: 8 }} />
+                  ¡Acertaste! El área exacta es <strong style={{ color: "#34D399" }}>{fmtPct(veredicto.real / 100, 2)}</strong> (tu error: {fmtNum(veredicto.dif, 1)} pts).{" "}
+                  {[1, 2, 3].map((s) => (
+                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 13, marginLeft: 2, color: s <= veredicto.estrellas ? "#ffd24a" : "rgba(255,255,255,0.18)" }} />
+                  ))}
+                </span>
+              ) : (
+                <span>
+                  <i className="fa-solid fa-circle-xmark" style={{ color: "#FF5E5E", marginRight: 8 }} />
+                  Aún no. El área exacta es <strong style={{ color: "#34D399" }}>{fmtPct(veredicto.real / 100, 2)}</strong>; tu predicción se aleja {fmtNum(veredicto.dif, 1)} pts (necesitas ±3). Ajusta y vuelve a intentar.
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

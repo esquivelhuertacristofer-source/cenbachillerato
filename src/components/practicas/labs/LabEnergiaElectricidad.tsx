@@ -11,11 +11,16 @@
  * foco brilla más a mayor voltaje (P = V·I).
  */
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, NUM, OK, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
 import { MATERIALES, VOLTAJES, corriente, potencia, brilloDe } from "./electricidad-data";
+import { FichaTeorica } from "./_ficha";
+import { ENERGIA_ELECTRICIDAD_FICHA } from "./energia-electricidad-ficha";
+import { RetoQuizCard } from "./_reto-quiz";
+import { QUIZ_A2 } from "./energia-electricidad-data";
+import { LabSfx } from "./lab-audio";
 
 const EnergiaElectricidadScene = dynamic(() => import("./EnergiaElectricidadScene"), {
   ssr: false,
@@ -39,6 +44,31 @@ export function LabEnergiaElectricidad({ color }: PracticaLabProps) {
   const [voltaje, setVoltaje] = useState(4.5);
   const [autoRotate, setAutoRotate] = useState(false);
   const [resetNonce, setResetNonce] = useState(0);
+  const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
+  // teoría (cajón deslizable) y sonido
+  const [drawer, setDrawer] = useState(false);
+  const [sonido, setSonido] = useState(false);
+  const audioRef = useRef<LabSfx | null>(null);
+
+  const toggleSonido = useCallback(async () => {
+    if (!audioRef.current) audioRef.current = new LabSfx();
+    const sfx = audioRef.current;
+    if (sonido) {
+      sfx.mute();
+      setSonido(false);
+    } else {
+      await sfx.enable();
+      setSonido(true);
+    }
+  }, [sonido]);
+
+  useEffect(() => {
+    return () => {
+      audioRef.current?.dispose();
+      audioRef.current = null;
+    };
+  }, []);
+
   // seguimiento de objetivos
   const [cerro, setCerro] = useState(false);
   const [encendio, setEncendio] = useState(false);
@@ -54,6 +84,7 @@ export function LabEnergiaElectricidad({ color }: PracticaLabProps) {
   const toggleSwitch = () => {
     const next = !switchClosed;
     setSwitchClosed(next);
+    if (sonido) audioRef.current?.blip();
     if (next) setCerro(true);
     if (next && material.conductor) setEncendio(true);
   };
@@ -87,6 +118,7 @@ export function LabEnergiaElectricidad({ color }: PracticaLabProps) {
     { txt: "Enciende el foco con un conductor", done: encendio },
     { txt: "Comprueba que un aislante no conduce", done: proboAislante },
     { txt: "Prueba los 4 voltajes", done: voltajesProbados.size >= 4 },
+    { txt: "Resuelve el reto de energía y electricidad", done: ejercicioAprobado },
   ];
 
   const sceneFallback = (
@@ -123,6 +155,26 @@ export function LabEnergiaElectricidad({ color }: PracticaLabProps) {
           border-radius:13px; border:none; font-size:15px; font-weight:800; transition:all .15s; }
         .ex-bigbtn:hover { filter:brightness(1.08); }
         @media (max-width: 1000px){ .ex-bottom { grid-template-columns: 1fr !important; } }
+
+        /* Cajón de teoría */
+        .ex-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
+          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
+        .ex-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
+        .ex-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
+          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
+          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
+          display:flex; flex-direction:column; }
+        .ex-drawer[data-open="true"] { transform:translateX(0); }
+        .ex-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
+          padding:18px 20px; border-bottom:1px solid ${T.line}; }
+        .ex-drawer-body { overflow-y:auto; padding:20px; flex:1; }
+        .ex-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
+          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+        .ex-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
+        .ex-teoria-fab { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); cursor:pointer; display:inline-flex; align-items:center; gap:9px;
+          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
+          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
+        .ex-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateX(-50%) translateY(-1px); }
       `}</style>
 
       <div className="ex-grid">
@@ -167,6 +219,12 @@ export function LabEnergiaElectricidad({ color }: PracticaLabProps) {
 
             {/* Toolbar */}
             <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(2,12,28,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
+              <button className="ex-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
+                <i className="fa-solid fa-book-open" />
+              </button>
+              <button className="ex-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
+                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
+              </button>
               <button className="ex-icobtn" data-on={autoRotate} onClick={() => setAutoRotate((v) => !v)} title="Girar automáticamente">
                 <i className="fa-solid fa-arrows-rotate" />
               </button>
@@ -174,6 +232,12 @@ export function LabEnergiaElectricidad({ color }: PracticaLabProps) {
                 <i className="fa-solid fa-rotate-left" />
               </button>
             </div>
+
+            {/* Botón flotante de Teoría */}
+            <button className="ex-teoria-fab" onClick={() => setDrawer(true)}>
+              <i className="fa-solid fa-book-open" />
+              Teoría
+            </button>
 
             {/* Foco status (esquina inferior) */}
             <div style={{ position: "absolute", bottom: 14, left: "50%", transform: "translateX(-50%)", display: "flex", alignItems: "center", gap: 12, padding: "9px 18px", borderRadius: 13, background: "rgba(2,12,28,0.7)", border: `1px solid ${T.line}`, backdropFilter: "blur(8px)", pointerEvents: "none", whiteSpace: "nowrap" }}>
@@ -303,6 +367,41 @@ export function LabEnergiaElectricidad({ color }: PracticaLabProps) {
           </span>
         </div>
       </div>
+
+      {/* ── Reto evaluable: el quiz verbatim del ancla ───────────────── */}
+      <RetoQuizCard
+        quiz={QUIZ_A2}
+        accent={accent}
+        rgba={color.rgba}
+        aprobado={ejercicioAprobado}
+        onAprobado={() => setEjercicioAprobado(true)}
+        playSfx={
+          sonido
+            ? (ok) => {
+                if (ok) audioRef.current?.correcto();
+                else audioRef.current?.incorrecto();
+              }
+            : undefined
+        }
+        playPick={sonido ? () => audioRef.current?.blip() : undefined}
+      />
+
+      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
+      <div className="ex-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
+      <aside className="ex-drawer" data-open={drawer} aria-hidden={!drawer}>
+        <div className="ex-drawer-head">
+          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
+            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
+          </div>
+          <button className="ex-close" onClick={() => setDrawer(false)} title="Cerrar">
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
+        <div className="ex-drawer-body">
+          <FichaTeorica data={ENERGIA_ELECTRICIDAD_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+        </div>
+      </aside>
     </div>
   );
 }

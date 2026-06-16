@@ -18,10 +18,15 @@
  * Toda la física es de cálculo cerrado (c = λ·f y E = h·f, con c = 3×10⁸ m/s).
  */
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { FichaTeorica } from "./_ficha";
+import { ESPECTRO_FICHA } from "./espectro-electromagnetico-ficha";
+import { RetoQuizCard } from "./_reto-quiz";
+import { QUIZ_A2 } from "./espectro-electromagnetico-data";
+import { LabSfx } from "./lab-audio";
 import {
   type Modo, resolverEM, resolverVisible, aplicacionPorId, APLICACIONES,
   bandaPorFrecuencia, CAT_COLOR, CAT_ETQ,
@@ -59,6 +64,30 @@ export function LabEspectro({ color }: PracticaLabProps) {
   const [aplId, setAplId] = useState<string>(APL_DEF); // (c)
   const [playing, setPlaying] = useState<boolean>(true);
   const [resetNonce, setResetNonce] = useState(0);
+  const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
+  // teoría (cajón deslizable) y sonido
+  const [drawer, setDrawer] = useState(false);
+  const [sonido, setSonido] = useState(false);
+  const audioRef = useRef<LabSfx | null>(null);
+
+  const toggleSonido = useCallback(async () => {
+    if (!audioRef.current) audioRef.current = new LabSfx();
+    const sfx = audioRef.current;
+    if (sonido) {
+      sfx.mute();
+      setSonido(false);
+    } else {
+      await sfx.enable();
+      setSonido(true);
+    }
+  }, [sonido]);
+
+  useEffect(() => {
+    return () => {
+      audioRef.current?.dispose();
+      audioRef.current = null;
+    };
+  }, []);
 
   const bump = () => setResetNonce((n) => n + 1);
   const resetModo = () => {
@@ -67,7 +96,7 @@ export function LabEspectro({ color }: PracticaLabProps) {
     else setAplId(APL_DEF);
     bump();
   };
-  const cambiarModo = (nm2: Modo) => { setModo(nm2); bump(); };
+  const cambiarModo = (nm2: Modo) => { setModo(nm2); bump(); if (sonido) audioRef.current?.blip(); };
 
   // valores en vivo
   const f = Math.pow(10, logF);
@@ -121,6 +150,26 @@ export function LabEspectro({ color }: PracticaLabProps) {
         .es-tab:hover { background:rgba(255,255,255,0.06); }
         .es-apl { display:grid; grid-template-columns: repeat(2,1fr); gap:8px; }
         @media (max-width: 1000px){ .es-bottom { grid-template-columns: 1fr !important; } }
+
+        /* Cajón de teoría */
+        .es-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
+          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
+        .es-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
+        .es-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
+          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
+          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
+          display:flex; flex-direction:column; }
+        .es-drawer[data-open="true"] { transform:translateX(0); }
+        .es-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
+          padding:18px 20px; border-bottom:1px solid ${T.line}; }
+        .es-drawer-body { overflow-y:auto; padding:20px; flex:1; }
+        .es-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
+          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+        .es-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
+        .es-teoria-fab { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); cursor:pointer; display:inline-flex; align-items:center; gap:9px;
+          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
+          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
+        .es-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateX(-50%) translateY(-1px); }
       `}</style>
 
       {/* Selector de modo */}
@@ -168,6 +217,12 @@ export function LabEspectro({ color }: PracticaLabProps) {
 
             {/* Toolbar */}
             <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
+              <button className="es-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
+                <i className="fa-solid fa-book-open" />
+              </button>
+              <button className="es-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
+                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
+              </button>
               <button className="es-icobtn" data-on={playing} onClick={() => setPlaying((p) => !p)} title={playing ? "Pausar" : "Reproducir"}>
                 <i className={`fa-solid ${playing ? "fa-pause" : "fa-play"}`} />
               </button>
@@ -202,6 +257,12 @@ export function LabEspectro({ color }: PracticaLabProps) {
                 {modo === "aplicaciones" && "Elige una aplicación y mira en qué banda cae: WiFi y 5G en microondas, el GTM en milimétricas, los rayos X del IMSS y la gamma del ININ ya son radiación ionizante."}
               </div>
             </div>
+
+            {/* Botón flotante de Teoría */}
+            <button className="es-teoria-fab" onClick={() => setDrawer(true)}>
+              <i className="fa-solid fa-book-open" />
+              Teoría
+            </button>
           </div>
 
           {/* Controles del modo */}
@@ -425,6 +486,63 @@ export function LabEspectro({ color }: PracticaLabProps) {
           Física <strong>exacta</strong> de cálculo cerrado: c = λ·f y E = h·f, con c = 3×10⁸ m/s (≈299 792 km/s) y h = 6.626×10⁻³⁴ J·s. Los valores de frecuencia, longitud de onda y energía de los paneles son <strong>exactos</strong>. La onda y la barra que ves en pantalla son <strong>esquemáticas</strong>: la longitud de onda visual está comprimida (escala logarítmica de frecuencia) para que las 18 décadas del espectro quepan en una sola imagen, y los colores de las bandas invisibles son convencionales. Las ideas clave, el glosario y las preguntas son verbatim de la infografía A1; el explorador y el ejemplo son apoyos didácticos con física exacta.
         </span>
       </div>
+
+      {/* ── Objetivos ─────────────────────────────────────────────────── */}
+      <div style={{ ...card, padding: "18px 22px", marginTop: 22 }}>
+        <Eyebrow>
+          <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
+          Objetivos
+        </Eyebrow>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
+          {[
+            { txt: "Recorre el espectro de radio a rayos gamma (c = λ·f)", done: true },
+            { txt: "Identifica el umbral de radiación ionizante (rayos X y gamma)", done: true },
+            { txt: "Explora la franja visible (380–700 nm) y sus colores", done: true },
+            { txt: "Ubica aplicaciones reales de México en el espectro", done: true },
+            { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
+          ].map((o, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? "#34D399" : T.text2 }}>
+              <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
+              <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Reto evaluable: el quiz verbatim del ancla ───────────────── */}
+      <RetoQuizCard
+        quiz={QUIZ_A2}
+        accent={accent}
+        rgba={color.rgba}
+        aprobado={ejercicioAprobado}
+        onAprobado={() => setEjercicioAprobado(true)}
+        playSfx={
+          sonido
+            ? (ok) => {
+                if (ok) audioRef.current?.correcto();
+                else audioRef.current?.incorrecto();
+              }
+            : undefined
+        }
+        playPick={sonido ? () => audioRef.current?.blip() : undefined}
+      />
+
+      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
+      <div className="es-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
+      <aside className="es-drawer" data-open={drawer} aria-hidden={!drawer}>
+        <div className="es-drawer-head">
+          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
+            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
+          </div>
+          <button className="es-close" onClick={() => setDrawer(false)} title="Cerrar">
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
+        <div className="es-drawer-body">
+          <FichaTeorica data={ESPECTRO_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+        </div>
+      </aside>
     </div>
   );
 }

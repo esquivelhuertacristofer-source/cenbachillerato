@@ -440,3 +440,49 @@ export const HECHOS: string[] = [
   "La doble flecha ⇌ no significa «igual»: significa que la reacción avanza y retrocede al mismo tiempo (es reversible).",
   "La fotosíntesis y la combustión son casi la reacción inversa una de la otra: una guarda energía del Sol en glucosa y la otra la libera.",
 ];
+
+/* ── Reto evaluable A2 (ejercicio_matematico) — VERBATIM CNEYT-III-P09-A2 ────
+ *
+ * Ecuación: CH₄ + 2 O₂ → CO₂ + 2 H₂O
+ *
+ * Aritmética verificada:
+ *   b) "2 O₂" → coeficiente 2 × subíndice 2 = 4 átomos de O
+ *   c) Reactivos:  C = 1×1 = 1 ; H = 1×4 = 4 ; O = 2×2 = 4
+ *   c) Productos:  C = 1×1 = 1 ; H = 2×2 = 4 ; O = 1×2 + 2×1 = 4
+ *      (CO₂: 1 mol × 2 O = 2 ; 2 H₂O: 2 mol × 1 O = 2 → total 4 O)
+ *   d) Todos los elementos coinciden → balanceada ✓
+ */
+import type { RetoNumericoData } from "./_reto-numerico";
+
+// VERBATIM de CNEYT-III-P09-A2 (ejercicio_matematico, practica_slug=estructura-reaccion).
+export const RETO_A2: RetoNumericoData = {
+  titulo: "Cuenta los átomos: ¿está balanceada? (CH₄ + 2 O₂ → CO₂ + 2 H₂O)",
+  contexto:
+    "Los incisos recorren el contenido formativo: la estructura de la reacción y la ecuación química (a), la simbología de coeficientes y subíndices (b), y la ley de conservación de la materia comprobada átomo por átomo (c–d). En el laboratorio 3D el modo «Anatomía» señala cada parte de la ecuación, la calculadora cuenta los átomos de cada elemento a ambos lados y el modo «Conservación» dictamina si se conserva la materia.",
+  problema:
+    "Trabaja con la combustión del metano (el gas de muchas estufas): CH₄ + 2 O₂ → CO₂ + 2 H₂O.\n\n" +
+    "a) ESTRUCTURA. ¿Cuáles son los reactivos y cuáles los productos? ¿Qué indica la flecha →?\n\n" +
+    "b) COEFICIENTES Y SUBÍNDICES. En «2 O₂», ¿qué significa el 2 grande de adelante (coeficiente) y qué significa el 2 pequeño de O₂ (subíndice)? ¿Cuántos átomos de oxígeno aporta «2 O₂» en total?\n\n" +
+    "c) CONTEO DE ÁTOMOS. Cuenta los átomos de C, H y O en los reactivos y en los productos (multiplica coeficiente × subíndice).\n\n" +
+    "d) CONSERVACIÓN. ¿La ecuación está balanceada? Justifica con la ley de conservación de la materia de Lavoisier.",
+  campos: [
+    // b) Total átomos de O en "2 O₂" = coef 2 × subíndice 2 = 4
+    { etiqueta: "b) Átomos de O totales en «2 O₂» (coeficiente × subíndice)", objetivo: 4, tolerancia: 0, unidad: "átomos", placeholder: "4" },
+    // c) Reactivos
+    { etiqueta: "c) Átomos de C en reactivos (CH₄)", objetivo: 1, tolerancia: 0, unidad: "átomos", placeholder: "1" },
+    { etiqueta: "c) Átomos de H en reactivos (CH₄)", objetivo: 4, tolerancia: 0, unidad: "átomos", placeholder: "4" },
+    { etiqueta: "c) Átomos de O en reactivos (2 O₂)", objetivo: 4, tolerancia: 0, unidad: "átomos", placeholder: "4" },
+    // c) Productos
+    { etiqueta: "c) Átomos de C en productos (CO₂)", objetivo: 1, tolerancia: 0, unidad: "átomos", placeholder: "1" },
+    { etiqueta: "c) Átomos de H en productos (2 H₂O)", objetivo: 4, tolerancia: 0, unidad: "átomos", placeholder: "4" },
+    { etiqueta: "c) Átomos de O en productos (CO₂ + 2 H₂O)", objetivo: 4, tolerancia: 0, unidad: "átomos", placeholder: "4" },
+  ],
+  pasosGuia: [
+    "a) Reactivos (izquierda de la flecha): CH₄ y O₂. Productos (derecha): CO₂ y H₂O. La flecha → se lee «se transforma en / produce»: el metano y el oxígeno reaccionan para formar dióxido de carbono y agua.",
+    "b) El coeficiente 2 (grande, delante) indica 2 moléculas de O₂. El subíndice 2 (pequeño, en O₂) indica 2 átomos de oxígeno por molécula. Total de átomos de O en «2 O₂» = 2 × 2 = 4 átomos de oxígeno.",
+    "c) Reactivos: C = 1 (de CH₄); H = 4 (de CH₄); O = 2 × 2 = 4 (de 2 O₂). Productos: C = 1 (de CO₂); H = 2 × 2 = 4 (de 2 H₂O); O = 2 (de CO₂) + 2 × 1 (de 2 H₂O) = 4.",
+    "d) Sí está balanceada: C 1=1, H 4=4, O 4=4. El número de átomos de cada elemento es el mismo antes y después, así que cumple la ley de conservación de la materia de Lavoisier: la materia no se crea ni se destruye, solo se transforma.",
+  ],
+  respuestaFinal:
+    "a) Reactivos CH₄ y O₂; productos CO₂ y H₂O; la flecha = «se transforma en». b) Coeficiente 2 = 2 moléculas de O₂; subíndice 2 = 2 átomos por molécula; «2 O₂» aporta 4 átomos de O. c) Reactivos C1 H4 O4 ; productos C1 H4 O4. d) Sí está balanceada (todos los elementos coinciden): cumple la ley de conservación de la materia.",
+};

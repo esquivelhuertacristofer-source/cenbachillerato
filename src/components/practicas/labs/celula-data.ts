@@ -22,6 +22,8 @@
  * son verbatim de A5 y A1 respectivamente.
  */
 
+import type { QuizEvaluable } from "./_reto-quiz";
+
 export type Modo = "animal" | "vegetal" | "procariota";
 
 /** Forma esquemática con la que la escena 3D dibuja cada organelo. */
@@ -327,3 +329,61 @@ export const DATOS: { valor: string; texto: string; icono: string }[] = [
   { valor: "0.5–100 μm", texto: "rango de tamaño: procariota a eucariota", icono: "fa-ruler-horizontal" },
   { valor: "2,000 M años", texto: "antigüedad de la endosimbiosis (Margulis, 1967)", icono: "fa-clock-rotate-left" },
 ];
+
+/* ── Reto evaluable: quiz A2 «Quiz: Tipos de células y organelos» (VERBATIM) ── */
+export const QUIZ_A2: QuizEvaluable = {
+  titulo: "Quiz: Tipos de células y organelos",
+  puntajeMinimo: 70,
+  reactivos: [
+    {
+      enunciado: "¿Cuál es la principal diferencia entre una célula procariota y una eucariota?",
+      opciones: [
+        "La procariota tiene mitocondrias y la eucariota no",
+        "La eucariota tiene núcleo definido con membrana nuclear; la procariota no",
+        "La procariota tiene cloroplastos y la eucariota no",
+        "La eucariota carece de membrana celular",
+      ],
+      respuestaCorrecta: 1,
+      retroalimentacion:
+        "La presencia de núcleo rodeado por membrana nuclear es la característica definitoria de las células eucariotas. Las procariotas tienen ADN circular en el nucleoide sin membrana que lo rodee.",
+    },
+    {
+      enunciado: "¿Qué organelo produce la mayor parte del ATP en la célula eucariota?",
+      opciones: ["Ribosoma", "Retículo endoplásmico", "Mitocondria", "Aparato de Golgi"],
+      respuestaCorrecta: 2,
+      retroalimentacion:
+        "La mitocondria es el sitio de la respiración aerobia y produce ~32-34 ATP por glucosa mediante la cadena transportadora de electrones y la ATP sintasa.",
+    },
+    {
+      enunciado: "¿Qué evidencia apoya la teoría endosimbiótica de Lynn Margulis?",
+      opciones: [
+        "Las mitocondrias no tienen membrana propia",
+        "Las mitocondrias tienen ADN propio y ribosomas 70S similares a los de bacterias",
+        "El cloroplasto no puede reproducirse de forma independiente",
+        "Las células procariotas no tienen pared celular",
+      ],
+      respuestaCorrecta: 1,
+      retroalimentacion:
+        "Las mitocondrias (y cloroplastos) tienen doble membrana, ADN circular propio y ribosomas 70S como las bacterias, lo que sugiere que fueron bacterias ancestrales incorporadas por endosimbiosis.",
+    },
+    {
+      enunciado: "¿Cuál es la función principal del aparato de Golgi?",
+      opciones: [
+        "Síntesis de ATP",
+        "Procesamiento, empaque y distribución de proteínas y lípidos",
+        "Digestión intracelular de desechos",
+        "Síntesis de ARN mensajero",
+      ],
+      respuestaCorrecta: 1,
+      retroalimentacion:
+        "El aparato de Golgi recibe vesículas del retículo endoplásmico, modifica y empaca las proteínas y lípidos, y los dirige a su destino final: membrana plasmática, lisosomas o secreción.",
+    },
+    {
+      enunciado: "¿Qué organelo realizan exclusivamente las células vegetales y algunas algas?",
+      opciones: ["Lisosoma", "Mitocondria", "Cloroplasto", "Vacuola pequeña"],
+      respuestaCorrecta: 2,
+      retroalimentacion:
+        "El cloroplasto es exclusivo de células vegetales y algas fotosintéticas; contiene clorofila y es el sitio de la fotosíntesis. Las mitocondrias están presentes en casi todas las células eucariotas.",
+    },
+  ],
+};

@@ -124,3 +124,58 @@ export const fmtNum2 = (n: number): string => ES(n, 2);
 export const fmtM = (n: number): string => `${ES(n, 2)} m`;
 export const fmtM2 = (n: number): string => `${ES(n, 1)} m²`;
 export const fmtDeg = (n: number): string => `${ES(n, 1)}°`;
+
+/* ── Reto evaluable A2 ────────────────────────────────────────────────────── */
+// VERBATIM de PM-IV-P05-A2 (ejercicio_matematico, tipo_respuesta "numerica").
+// Fuente: scripts/_sem4_dump.txt líneas 4722-4737 (estado=publicada).
+//
+// Aritmética verificada:
+//   a=80, b=95, C=42°, cos 42°≈0.7431, sen 42°≈0.6691
+//   c² = 6 400 + 9 025 − 15 200 × 0.7431 = 15 425 − 11 295.12 = 4 129.88
+//   c = √4 129.88 ≈ 64.26 m   ✓
+//   Perímetro = 80 + 95 + 64.26 = 239.26 m   ✓
+//   Área = 0.5 × 80 × 95 × 0.6691 = 3 800 × 0.6691 ≈ 2 542.58 m²   ✓
+
+import type { RetoNumericoData } from "./_reto-numerico";
+
+export const RETO_A2: RetoNumericoData = {
+  titulo: "Calculo el lado desconocido de un terreno con la Ley de Cosenos",
+  contexto:
+    "Un terreno triangular en las afueras de Oaxaca tiene dos lados medidos con cinta métrica: a = 80 m y b = 95 m. El ángulo C entre esos dos lados mide 42°.",
+  problema:
+    "(a) Escribe la fórmula de la Ley de Cosenos para encontrar el lado c (opuesto al ángulo C).\n" +
+    "(b) Sustituye los valores y calcula c. (Usa cos 42° ≈ 0.7431.)\n" +
+    "(c) Calcula el perímetro del terreno.\n" +
+    "(d) Calcula el área del triángulo usando la fórmula: Área = (1/2)·a·b·sen(C). (Usa sen 42° ≈ 0.6691.)",
+  campos: [
+    {
+      etiqueta: "(b) Lado c (opuesto al ángulo C)",
+      objetivo: 64.26,
+      tolerancia: 0.5,
+      unidad: "m",
+      placeholder: "64.26",
+    },
+    {
+      etiqueta: "(c) Perímetro del terreno",
+      objetivo: 239.26,
+      tolerancia: 0.5,
+      unidad: "m",
+      placeholder: "239.26",
+    },
+    {
+      etiqueta: "(d) Área del triángulo",
+      objetivo: 2542.58,
+      tolerancia: 0.5,
+      unidad: "m²",
+      placeholder: "2542.58",
+    },
+  ],
+  pasosGuia: [
+    "(a) Ley de Cosenos: c² = a² + b² - 2·a·b·cos(C). Identifica a = 80, b = 95, C = 42°.",
+    "(b) c² = (80)² + (95)² - 2·(80)·(95)·cos(42°) = 6400 + 9025 - 15200 × 0.7431.",
+    "(b) c² = 15425 - 11295.12 = 4129.88. c = √4129.88 ≈ 64.26 m.",
+    "(c) Perímetro = a + b + c = 80 + 95 + 64.26 = 239.26 m.",
+    "(d) Área = (1/2)·80·95·sen(42°) = (1/2)·7600·0.6691 = 3800 × 0.6691 ≈ 2542.58 m².",
+  ],
+  respuestaFinal: "(b) c ≈ 64.26 m. (c) Perímetro ≈ 239.26 m. (d) Área ≈ 2542.58 m².",
+};

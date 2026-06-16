@@ -63,3 +63,30 @@ export function nivelDisolucion(soluto: number, d: Disolucion): { texto: string;
   if (d.concentracion < 25) return { texto: "Concentrada", color: "#34D399" };
   return { texto: "Muy concentrada", color: "#FFD166" };
 }
+
+/**
+ * Ejercicio ancla del laboratorio — VERBATIM del A6 de CNEYT-I-P04
+ * (ejercicio_matematico «Concentración de una disolución (% en masa)»).
+ *
+ * Lo usa la tarjeta evaluable RetoDisolucionCard: el alumno arma la disolución
+ * (20 g de sal + 80 g de agua) y calcula el % m/m. La respuesta correcta es 20 %.
+ */
+export const EJERCICIO_A6 = {
+  titulo: "Concentración de una disolución (% en masa)",
+  contexto: "% en masa = (masa de soluto / masa de disolución) × 100. La masa de la disolución es soluto + disolvente.",
+  problema: "Disuelves 20 g de sal en 80 g de agua. ¿Cuál es la concentración de la disolución en porcentaje de masa (% m/m)?",
+  unidades: "% m/m",
+  pasosGuia: [
+    "Masa de disolución = 20 g + 80 g = 100 g.",
+    "% m/m = (20 / 100) × 100.",
+    "% m/m = 20%.",
+  ],
+  instrucciones: "Resuelve mostrando el procedimiento.",
+  respuestaFinal: "20% en masa",
+  toleranciaError: 0.5,
+  // Valores objetivo para validar la disolución que arma el alumno.
+  solutoObjetivo: 20, // g de sal
+  aguaObjetivo: 80, // g de agua
+  porcentajeObjetivo: 20, // % m/m
+} as const;
+

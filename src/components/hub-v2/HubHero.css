@@ -322,3 +322,248 @@
     font-size: 17px;
   }
 }
+
+/* ── Panorama del Semestre ─── */
+.hub-hero-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.hub-hero-btn {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 999px;
+  color: #7dd3fc;
+  padding: 10px 22px;
+  font-size: 13.5px;
+  font-weight: 750;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 12px rgba(56, 189, 248, 0.05);
+}
+
+.hub-hero-btn:hover {
+  background: rgba(56, 189, 248, 0.16);
+  border-color: rgba(56, 189, 248, 0.45);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(56, 189, 248, 0.12);
+}
+
+.hub-hero-panorama {
+  margin-top: 36px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 20px 50px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Glassmorphism treatment inside panorama */
+.hub-hero-panorama::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 10% 10%, rgba(56, 189, 248, 0.03) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.hub-hero-panorama-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+}
+
+@media (max-width: 820px) {
+  .hub-hero-panorama-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+
+.hub-hero-pan-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.hub-hero-pan-h3 {
+  font-size: 18px;
+  font-weight: 850;
+  color: #fff;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: -0.01em;
+}
+
+.hub-hero-pan-h3 i {
+  color: #7dd3fc;
+  font-size: 16px;
+}
+
+.hub-hero-pan-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.hub-hero-pan-item {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.hub-hero-pan-bullet {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  color: #7dd3fc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11.5px;
+  font-weight: 800;
+}
+
+.hub-hero-pan-text {
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0;
+}
+
+.hub-hero-pan-sub {
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 18px;
+  margin-top: -6px;
+}
+
+.hub-hero-pan-labs {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hub-hero-pan-lab-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.22s ease-in-out;
+}
+
+.hub-hero-pan-lab-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  transform: translateX(4px);
+}
+
+.hub-hero-pan-lab-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.hub-hero-pan-lab-uac {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--lab-accent, #7dd3fc);
+}
+
+.hub-hero-pan-lab-title {
+  font-size: 14.5px;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hub-hero-pan-lab-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.hub-hero-pan-lab-badge {
+  font-size: 11px;
+  font-weight: 750;
+  padding: 4px 10px;
+  border-radius: 99px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hub-hero-pan-lab-badge.is-done {
+  background: rgba(52, 211, 153, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.25);
+  color: #34d399;
+}
+
+.hub-hero-pan-lab-badge.is-active {
+  background: rgba(251, 146, 60, 0.12);
+  border: 1px solid rgba(251, 146, 60, 0.25);
+  color: #fb923c;
+}
+
+.hub-hero-pan-lab-badge.is-todo {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.hub-hero-pan-lab-btn {
+  font-size: 12.5px;
+  font-weight: 750;
+  color: var(--lab-accent, #7dd3fc);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: gap 0.2s;
+}
+
+.hub-hero-pan-lab-card:hover .hub-hero-pan-lab-btn {
+  gap: 10px;
+}
+
+/* Animaciones */
+.hub-v2-animate-fade {
+  animation: hubFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes hubFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

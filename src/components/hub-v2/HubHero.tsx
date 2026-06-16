@@ -1,8 +1,11 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { getUACPorCodigo } from "@/lib/mccems/estructura";
 import { RECURSOS_SOCIOCOGNITIVOS } from "@/lib/mccems/recursos-sociocognitivos";
 import { getVideoBienvenida } from "@/lib/mccems/bienvenida";
+import { getCurrentProfile, getLaboratoriosSemestreBrowser, type LaboratorioItem } from "@/lib/queries/hub-browser";
 import "./HubHero.css";
 
 interface HeroUAC {
@@ -28,6 +31,10 @@ export default function HubHero({
   materiasActivas,
   uacs,
 }: HubHeroProps) {
+  const router = useRouter();
+  const [mostrarPanorama, setMostrarPanorama] = useState(false);
+  const [labs, setLabs] = useState<LaboratorioItem[]>([]);
+
   // ── Métricas reales (todo sale del progreso del alumno) ──
   const totalUAC = uacs.length;
   const totalProg = uacs.reduce((s, u) => s + u.total, 0);
@@ -48,6 +55,36 @@ export default function HubHero({
   const dominioColor = pctGlobal >= 80 ? "#34D399" : "#7DD3FC";
 
   const video = getVideoBienvenida(semestre);
+
+  // Cargar laboratorios del semestre actual
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const prof = await getCurrentProfile();
+        if (cancelled) return;
+        if (prof) {
+          const data = await getLaboratoriosSemestreBrowser(prof.userId, semestre);
+          if (cancelled) return;
+          setLabs(data);
+        }
+      } catch (err) {
+        console.error("Error loading labs for hero:", err);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [semestre]);
+
+  const irAlLaboratorio = (slug: string, uacCodigo: string) => {
+    const matchingLab = labs.find((l) => l.slug === slug);
+    if (matchingLab) {
+      router.push(`/hub/uac/${matchingLab.uacCodigo}/progresion/${matchingLab.progresionNumero}/actividad/${matchingLab.orden}/practica`);
+    } else {
+      router.push(`/hub/uac/${uacCodigo}`);
+    }
+  };
 
   return (
     <header className="hub-hero hub-v2-animate">
@@ -72,13 +109,97 @@ export default function HubHero({
             en {areas.length} áreas: {areasTexto}. Es la base común y obligatoria para todos
             los bachilleratos del país.
           </p>
+
+          <div className="hub-hero-actions">
+            <button
+              onClick={() => setMostrarPanorama(!mostrarPanorama)}
+              className="hub-hero-btn"
+            >
+              <i className={`fa-solid ${mostrarPanorama ? 'fa-xmark' : 'fa-map'}`} style={{ marginRight: 8 }} />
+              {mostrarPanorama ? 'Ocultar mapa del semestre' : 'Ver mapa y laboratorios 3D'}
+            </button>
+          </div>
         </div>
 
         {/* ── Columna de media (video de bienvenida) ─── */}
         <div className="hub-hero-media">
-          <HeroVideo video={video} semestre={semestre} />
+          <HeroVideo
+            video={video}
+            semestre={semestre}
+            onPlayClick={() => setMostrarPanorama(!mostrarPanorama)}
+          />
         </div>
       </div>
+
+      {/* ── Desglose interactivo del Panorama / Mapa del Semestre ─── */}
+      {mostrarPanorama && (
+        <div className="hub-hero-panorama hub-v2-animate-fade">
+          <div className="hub-hero-panorama-grid">
+            {/* Columna Objetivos */}
+            <div className="hub-hero-pan-col">
+              <h3 className="hub-hero-pan-h3">
+                <i className="fa-solid fa-bullseye" /> Objetivos de Aprendizaje
+              </h3>
+              <ul className="hub-hero-pan-list">
+                {video.objetivos?.map((obj, i) => (
+                  <li key={i} className="hub-hero-pan-item">
+                    <span className="hub-hero-pan-bullet">{i + 1}</span>
+                    <p className="hub-hero-pan-text">{obj}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Columna Laboratorios */}
+            <div className="hub-hero-pan-col">
+              <h3 className="hub-hero-pan-h3">
+                <i className="fa-solid fa-flask" /> Laboratorios 3D Destacados
+              </h3>
+              <p className="hub-hero-pan-sub">
+                Experimenta y pon en práctica tus conocimientos interactuando con variables reales en los simuladores de este semestre:
+              </p>
+              <div className="hub-hero-pan-labs">
+                {video.laboratorios?.map((lab, i) => {
+                  const matchingLab = labs.find((l) => l.slug === lab.slug);
+                  const estado = matchingLab ? matchingLab.estado : "no_iniciada";
+                  
+                  let badgeLabel = "Disponible";
+                  let badgeClass = "is-todo";
+                  if (estado === "completada") {
+                    badgeLabel = "Completado";
+                    badgeClass = "is-done";
+                  } else if (estado === "en_progreso") {
+                    badgeLabel = "En curso";
+                    badgeClass = "is-active";
+                  }
+
+                  return (
+                    <div
+                      key={i}
+                      onClick={() => irAlLaboratorio(lab.slug, lab.uac)}
+                      className="hub-hero-pan-lab-card"
+                    >
+                      <div className="hub-hero-pan-lab-info">
+                        <span className="hub-hero-pan-lab-uac">{lab.uac}</span>
+                        <h4 className="hub-hero-pan-lab-title">{lab.titulo}</h4>
+                      </div>
+                      <div className="hub-hero-pan-lab-meta">
+                        <span className={`hub-hero-pan-lab-badge ${badgeClass}`}>
+                          <span className="lab-card-estado-dot" />
+                          {badgeLabel}
+                        </span>
+                        <span className="hub-hero-pan-lab-btn">
+                          Iniciar <i className="fa-solid fa-arrow-right" />
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Barra de dominio global: full-width, debajo de todo el bloque ─── */}
       <div className="hub-hero-progress">
@@ -126,20 +247,19 @@ export default function HubHero({
 function HeroVideo({
   video,
   semestre,
+  onPlayClick,
 }: {
   video: ReturnType<typeof getVideoBienvenida>;
   semestre: number;
+  onPlayClick: () => void;
 }) {
   const hayVideo = Boolean(video.url);
 
   return (
     <div
       className={`hub-hero-featured${hayVideo ? "" : " hub-hero-featured--placeholder"}`}
-      style={
-        !hayVideo && video.poster
-          ? { backgroundImage: `url(${video.poster})` }
-          : undefined
-      }
+      onClick={!hayVideo ? onPlayClick : undefined}
+      style={!hayVideo ? { cursor: "pointer" } : undefined}
     >
       {/* Reproductor real (llena el panel) */}
       {hayVideo &&

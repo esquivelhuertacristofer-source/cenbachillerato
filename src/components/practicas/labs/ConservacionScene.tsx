@@ -13,9 +13,10 @@
  * Nada de Math.random ni Date.now: la animación usa state.clock y delta.
  */
 
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { Canvas, useFrame } from "@react-three/fiber";
+import type { ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, ContactShadows, Environment, Lightformer, Line, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import {
@@ -24,6 +25,8 @@ import {
   energiaPotencial,
   energiaTotal,
   fmtNum,
+  ANG_MIN,
+  ANG_MAX,
 } from "./conservacion-data";
 
 export interface ConservacionSceneProps {
@@ -36,7 +39,15 @@ export interface ConservacionSceneProps {
   accent: string;
   autoRotate: boolean;
   resetNonce: number;
+  /** Habilita arrastrar la masa para fijar el ángulo de suelta. */
+  arrastrable?: boolean;
+  /** Se llama al soltar la masa con el nuevo ángulo (grados). */
+  onAnguloChange?: (deg: number) => void;
 }
+
+// vectores de trabajo reutilizados en el arrastre (el péndulo oscila en el plano XY)
+const _zPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+const _hit = new THREE.Vector3();
 
 const EP_COL = "#3BA7FF"; // potencial → azul
 const EC_COL = "#FFB13B"; // cinética → ámbar
@@ -67,13 +78,54 @@ export default function ConservacionScene(props: ConservacionSceneProps) {
  * demás hooks de R3F solo funcionan dentro del árbol del Canvas.
  */
 function Contenido(props: ConservacionSceneProps) {
-  const { anguloDeg, largo: L, masa: m, g, friccion, pausado, accent } = props;
+  const { anguloDeg, largo: L, masa: m, g, friccion, pausado, accent, arrastrable, onAnguloChange } = props;
 
   // estado de la simulación en refs (no dispara renders)
   const thetaRef = useRef(grados2rad(anguloDeg));
   const omegaRef = useRef(0);
   const e0Ref = useRef(energiaTotal(m, g, L, grados2rad(anguloDeg)));
   const prevNonce = useRef(props.resetNonce);
+
+  // arrastre de la masa para fijar el ángulo de suelta (pilar: manipular)
+  const [dragging, setDragging] = useState(false);
+  const draggingRef = useRef(false);
+  const [hover, setHover] = useState(false);
+  const [dragDeg, setDragDeg] = useState(anguloDeg); // ángulo en vivo durante el arrastre (para la etiqueta)
+  const lastDegRef = useRef(anguloDeg);
+
+  const onBobDown = (e: ThreeEvent<PointerEvent>) => {
+    if (!arrastrable) return;
+    e.stopPropagation();
+    draggingRef.current = true;
+    setDragging(true);
+    omegaRef.current = 0;
+    (e.target as Element).setPointerCapture?.(e.pointerId);
+  };
+  const onBobMove = (e: ThreeEvent<PointerEvent>) => {
+    if (!draggingRef.current) return;
+    e.stopPropagation();
+    if (!e.ray.intersectPlane(_zPlane, _hit)) return;
+    const dx = _hit.x - PIVOT[0];
+    const dy = _hit.y - PIVOT[1];
+    // θ medido desde la vertical hacia abajo; signo = lado del arrastre
+    const raw = Math.atan2(dx, -dy);
+    const sign = raw < 0 ? -1 : 1;
+    const maxR = grados2rad(ANG_MAX);
+    const mag = Math.min(Math.abs(raw), maxR);
+    thetaRef.current = sign * mag;
+    omegaRef.current = 0;
+    const deg = Math.max(ANG_MIN, Math.min(ANG_MAX, Math.round((mag * 180) / Math.PI)));
+    lastDegRef.current = deg;
+    setDragDeg(deg);
+  };
+  const endDrag = (e: ThreeEvent<PointerEvent>) => {
+    if (!draggingRef.current) return;
+    e.stopPropagation();
+    draggingRef.current = false;
+    setDragging(false);
+    (e.target as Element).releasePointerCapture?.(e.pointerId);
+    onAnguloChange?.(lastDegRef.current);
+  };
 
   // refs de objetos 3D
   const armRef = useRef<THREE.Group>(null);
@@ -118,7 +170,7 @@ function Contenido(props: ConservacionSceneProps) {
     }
 
     const delta = Math.min(rawDelta, 0.03);
-    if (!pausado) {
+    if (!pausado && !draggingRef.current) {
       // integración (semi-implícita de Euler)
       const damping = friccion * 1.1;
       const alpha = -(g / L) * Math.sin(thetaRef.current) - damping * omegaRef.current;
@@ -211,7 +263,37 @@ function Contenido(props: ConservacionSceneProps) {
           <mesh ref={bobRef} position={[0, -L, 0]} castShadow>
             <sphereGeometry args={[bobR, 32, 32]} />
             <meshStandardMaterial color={accent} roughness={0.3} metalness={0.25} emissive={accent} emissiveIntensity={0.12} />
+            {(hover || dragging) && arrastrable && (
+              <mesh>
+                <sphereGeometry args={[bobR * 1.18, 24, 24]} />
+                <meshBasicMaterial color={accent} transparent opacity={0.18} />
+              </mesh>
+            )}
           </mesh>
+
+          {/* Objetivo de agarre (invisible, mayor que la masa para arrastrar con facilidad) */}
+          {arrastrable && (
+            <mesh
+              position={[0, -L, 0]}
+              onPointerDown={onBobDown}
+              onPointerMove={onBobMove}
+              onPointerUp={endDrag}
+              onPointerOver={() => setHover(true)}
+              onPointerOut={() => setHover(false)}
+            >
+              <sphereGeometry args={[Math.max(bobR * 2.1, 0.42), 16, 16]} />
+              <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+            </mesh>
+          )}
+
+          {arrastrable && (hover || dragging) && (
+            <Html center position={[0, -L - bobR - 0.45, 0]} distanceFactor={16} pointerEvents="none">
+              <div style={{ whiteSpace: "nowrap", textShadow: "0 2px 10px rgba(0,0,0,0.95)", fontWeight: 800, fontSize: 12, color: accent, background: "rgba(2,12,28,0.7)", padding: "3px 8px", borderRadius: 8 }}>
+                <i className="fa-solid fa-hand-pointer" style={{ marginRight: 6 }} />
+                {dragging ? `suelta a ${dragDeg}°` : "arrastra la masa"}
+              </div>
+            </Html>
+          )}
         </group>
 
         {/* Plataforma de las barras */}
@@ -293,7 +375,8 @@ function Contenido(props: ConservacionSceneProps) {
         minPolarAngle={Math.PI / 9}
         maxPolarAngle={Math.PI / 2.05}
         target={[0.8, 1.9, 0]}
-        autoRotate={props.autoRotate}
+        enabled={!dragging}
+        autoRotate={props.autoRotate && !dragging}
         autoRotateSpeed={0.35}
       />
 

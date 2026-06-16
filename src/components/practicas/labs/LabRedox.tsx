@@ -10,10 +10,15 @@
  * Cuatro modos: óxido-reducción · combustión · pila galvánica · comparar.
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, card, Eyebrow, SceneBoundary } from "./_kit";
+import { FichaTeorica } from "./_ficha";
+import { REDOX_FICHA } from "./redox-combustion-ficha";
+import { RetoNumericoCard } from "./_reto-numerico";
+import { RETO_A2 } from "./redox-combustion-data";
+import { LabSfx } from "./lab-audio";
 import {
   type Modo,
   MODOS,
@@ -55,6 +60,31 @@ const RedoxScene = dynamic(() => import("./RedoxScene"), {
 export function LabRedox({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
 
+  // reto evaluable, teoría (cajón deslizable) y sonido
+  const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
+  const [drawer, setDrawer] = useState(false);
+  const [sonido, setSonido] = useState(false);
+  const audioRef = useRef<LabSfx | null>(null);
+
+  const toggleSonido = useCallback(async () => {
+    if (!audioRef.current) audioRef.current = new LabSfx();
+    const sfx = audioRef.current;
+    if (sonido) {
+      sfx.mute();
+      setSonido(false);
+    } else {
+      await sfx.enable();
+      setSonido(true);
+    }
+  }, [sonido]);
+
+  useEffect(() => {
+    return () => {
+      audioRef.current?.dispose();
+      audioRef.current = null;
+    };
+  }, []);
+
   const [modo, setModo] = useState<Modo>("redox");
   const [paso, setPaso] = useState<number>(0);
   const [playing, setPlaying] = useState<boolean>(true);
@@ -88,6 +118,7 @@ export function LabRedox({ color }: PracticaLabProps) {
     setModo(m);
     setPaso(0);
     setPlaying(m !== "comparar");
+    if (sonido) audioRef.current?.blip();
     bump();
   };
   const reiniciar = () => {
@@ -119,6 +150,14 @@ export function LabRedox({ color }: PracticaLabProps) {
       </div>
     </div>
   );
+
+  const objetivos = [
+    { txt: "Explora el modo Óxido-reducción", done: false },
+    { txt: "Explora el modo Combustión", done: false },
+    { txt: "Explora el modo Pila galvánica", done: false },
+    { txt: "Usa la calculadora de E°pila y Q", done: false },
+    { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
+  ];
 
   const pie: string = esComparar
     ? "Compara los tres procesos: en todos hay transferencia de electrones. La combustión es un redox muy rápido; la pila es un redox separado para dar corriente."
@@ -152,6 +191,30 @@ export function LabRedox({ color }: PracticaLabProps) {
         .rx-cmp td, .rx-cmp th { padding:8px 9px; font-size:11px; border-bottom:1px solid ${T.line}; vertical-align:top; text-align:left; }
         .rx-cmp th { font-size:9.5px; letter-spacing:0.08em; text-transform:uppercase; color:${T.text3}; }
         @media (max-width: 1000px){ .rx-bottom { grid-template-columns: 1fr !important; } }
+
+        /* Cajón de teoría */
+        .ex-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
+          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
+        .ex-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
+        .ex-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
+          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
+          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
+          display:flex; flex-direction:column; }
+        .ex-drawer[data-open="true"] { transform:translateX(0); }
+        .ex-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
+          padding:18px 20px; border-bottom:1px solid ${T.line}; }
+        .ex-drawer-body { overflow-y:auto; padding:20px; flex:1; }
+        .ex-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
+          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+        .ex-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
+        .ex-icobtn-rx { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
+          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
+        .ex-icobtn-rx[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
+        .ex-icobtn-rx:hover { background:rgba(255,255,255,0.12); }
+        .ex-teoria-fab { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); cursor:pointer; display:inline-flex; align-items:center; gap:9px;
+          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
+          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
+        .ex-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateX(-50%) translateY(-1px); }
       `}</style>
 
       {/* Selector de modo */}
@@ -198,23 +261,37 @@ export function LabRedox({ color }: PracticaLabProps) {
               <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{def.etq.toUpperCase()}</span>
             </div>
 
-            {/* Toolbar (oculta en comparar) */}
-            {!esComparar && (
-              <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-                <button className="rx-icobtn" onClick={() => { setPlaying(false); setPaso((p) => Math.max(0, p - 1)); }} title="Fase anterior">
-                  <i className="fa-solid fa-backward-step" />
-                </button>
-                <button className="rx-icobtn" data-on={playing} onClick={() => setPlaying((p) => !p)} title={playing ? "Pausar" : "Reanudar"}>
-                  <i className={`fa-solid ${playing ? "fa-pause" : "fa-play"}`} />
-                </button>
-                <button className="rx-icobtn" onClick={() => { setPlaying(false); setPaso((p) => Math.min(total, p + 1)); }} title="Fase siguiente">
-                  <i className="fa-solid fa-forward-step" />
-                </button>
-                <button className="rx-icobtn" onClick={reiniciar} title="Reiniciar">
-                  <i className="fa-solid fa-rotate-left" />
-                </button>
-              </div>
-            )}
+            {/* Toolbar: Teoría + sonido (siempre visible) y controles de reproducción (ocultos en comparar) */}
+            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
+              <button className="ex-icobtn-rx" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
+                <i className="fa-solid fa-book-open" />
+              </button>
+              <button className="ex-icobtn-rx" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
+                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
+              </button>
+              {!esComparar && (
+                <>
+                  <button className="rx-icobtn" onClick={() => { setPlaying(false); setPaso((p) => Math.max(0, p - 1)); }} title="Fase anterior">
+                    <i className="fa-solid fa-backward-step" />
+                  </button>
+                  <button className="rx-icobtn" data-on={playing} onClick={() => setPlaying((p) => !p)} title={playing ? "Pausar" : "Reanudar"}>
+                    <i className={`fa-solid ${playing ? "fa-pause" : "fa-play"}`} />
+                  </button>
+                  <button className="rx-icobtn" onClick={() => { setPlaying(false); setPaso((p) => Math.min(total, p + 1)); }} title="Fase siguiente">
+                    <i className="fa-solid fa-forward-step" />
+                  </button>
+                  <button className="rx-icobtn" onClick={reiniciar} title="Reiniciar">
+                    <i className="fa-solid fa-rotate-left" />
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* Botón flotante de Teoría */}
+            <button className="ex-teoria-fab" onClick={() => setDrawer(true)}>
+              <i className="fa-solid fa-book-open" />
+              Teoría
+            </button>
 
             {/* Pie: lectura en vivo */}
             <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 18px 14px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
@@ -489,6 +566,55 @@ export function LabRedox({ color }: PracticaLabProps) {
           El potencial de la pila (E°pila = E°cátodo − E°ánodo), la energía eléctrica (W = n·F·E°) y el calor de combustión (Q = |ΔH|·n) que devuelve la calculadora son <strong>exactos</strong> para los potenciales estándar y las entalpías reales de cada especie. El modelo 3D es <strong>esquemático</strong> (no a escala): las esferas, los electrones y la llama representan el mecanismo de transferencia de electrones, no medidas físicas. Fuente: {FUENTE}
         </span>
       </div>
+
+      {/* ── Objetivos ─────────────────────────────────────────────────────── */}
+      <div style={{ ...card, padding: "18px 22px", marginTop: 22 }}>
+        <Eyebrow>
+          <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
+          Objetivos
+        </Eyebrow>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
+          {objetivos.map((o, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? "#4ade80" : T.text2 }}>
+              <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
+              <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Reto evaluable: el ejercicio verbatim del ancla A2 ──────────── */}
+      <RetoNumericoCard
+        reto={RETO_A2}
+        accent={accent}
+        aprobado={ejercicioAprobado}
+        onAprobado={() => setEjercicioAprobado(true)}
+        playSfx={
+          sonido
+            ? (ok) => {
+                if (ok) audioRef.current?.correcto();
+                else audioRef.current?.incorrecto();
+              }
+            : undefined
+        }
+      />
+
+      {/* ── Cajón de teoría ──────────────────────────────────────────────── */}
+      <div className="ex-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
+      <aside className="ex-drawer" data-open={drawer} aria-hidden={!drawer}>
+        <div className="ex-drawer-head">
+          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
+            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
+          </div>
+          <button className="ex-close" onClick={() => setDrawer(false)} title="Cerrar">
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
+        <div className="ex-drawer-body">
+          <FichaTeorica data={REDOX_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+        </div>
+      </aside>
     </div>
   );
 }

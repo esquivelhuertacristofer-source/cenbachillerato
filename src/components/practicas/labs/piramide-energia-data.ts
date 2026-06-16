@@ -4,6 +4,8 @@
  * progresión 2). Módulo de DATOS PUROS (sin three, sin react): lo comparten el
  * shell de UI (LabPiramideEnergia.tsx) y la escena 3D (PiramideEnergiaScene.tsx).
  *
+ * También exporta RETO_A2: RetoNumericoData (el ejercicio evaluable A2 verbatim).
+ *
  * Idea pedagógica (MCCEMS 2025 — CNEYT-III P2: "Explica el flujo de energía y el
  * ciclo de materia en los ecosistemas"): la energía entra por los productores
  * (fotosíntesis) y sube por la cadena trófica, pero en cada salto solo se
@@ -17,6 +19,8 @@
  *   Al nivel terciario llega 0.1% de la energía original; el 99.9% se disipó.
  *   (La "regla del 10%" es una simplificación didáctica; lo real es 5–20%.)
  */
+
+import type { RetoNumericoData } from "./_reto-numerico";
 
 /* ── Controles ────────────────────────────────────────────────────────── */
 // Energía fijada por los productores (kcal). Por defecto, los 10,000 verbatim.
@@ -102,4 +106,37 @@ export const fmtPct = (p: number): string => {
   else if (p < 10) dec = 1;
   const r = Math.round(p * Math.pow(10, dec)) / Math.pow(10, dec);
   return r.toLocaleString("es-MX", { maximumFractionDigits: dec, minimumFractionDigits: 0 }).replace("-", "−") + "%";
+};
+
+/* ── Reto evaluable — VERBATIM de CNEYT-III-P02-A2 ─────────────────────── */
+// VERBATIM de CNEYT-III-P02-A2 (ejercicio_matematico, tipo_respuesta "numerica").
+// Aritmética verificada:
+//   (a) 10 000 × 10% = 1 000 kcal  ✓
+//   (b) 1 000 × 10% = 100 kcal  ✓
+//   (c) 100 × 10% = 10 kcal  ✓
+//   (d) (10 / 10 000) × 100 = 0.1%  ✓
+export const RETO_A2: RetoNumericoData = {
+  titulo: "Calcula: ¿cuánta energía llega al tercer nivel trófico?",
+  contexto: "En una pradera, los productores (pastos) fijan 10,000 kcal de energía solar mediante fotosíntesis. Aplica la regla del 10% de eficiencia ecológica.",
+  problema:
+    "(a) ¿Cuánta energía (en kcal) estará disponible para los consumidores primarios (ratones y conejos)?\n" +
+    "(b) ¿Cuánta energía estará disponible para los consumidores secundarios (zorros)?\n" +
+    "(c) ¿Cuánta energía estará disponible para los consumidores terciarios (águilas)?\n" +
+    "(d) ¿Qué porcentaje de la energía original de los productores llega al nivel de los consumidores terciarios?\n\n" +
+    "Datos: Energía fijada por productores: 10,000 kcal. Eficiencia ecológica entre niveles: 10% (regla del 10%). Niveles: productores → consumidores primarios → consumidores secundarios → consumidores terciarios.",
+  campos: [
+    { etiqueta: "(a) Energía para consumidores primarios", objetivo: 1000, tolerancia: 0, unidad: "kcal", placeholder: "1000" },
+    { etiqueta: "(b) Energía para consumidores secundarios", objetivo: 100, tolerancia: 0, unidad: "kcal", placeholder: "100" },
+    { etiqueta: "(c) Energía para consumidores terciarios", objetivo: 10, tolerancia: 0, unidad: "kcal", placeholder: "10" },
+    { etiqueta: "(d) Porcentaje que llega al nivel terciario", objetivo: 0.1, tolerancia: 0, unidad: "%", placeholder: "0.1" },
+  ],
+  pasosGuia: [
+    "Nivel 1 (productores): 10,000 kcal",
+    "Nivel 2 (consumidores primarios): 10,000 × 10% = 10,000 × 0.10 = 1,000 kcal",
+    "Nivel 3 (consumidores secundarios): 1,000 × 10% = 1,000 × 0.10 = 100 kcal",
+    "Nivel 4 (consumidores terciarios): 100 × 10% = 100 × 0.10 = 10 kcal",
+    "Porcentaje que llega al nivel 4: (10 kcal / 10,000 kcal) × 100 = 0.1%",
+  ],
+  respuestaFinal:
+    "10 kcal llegan al nivel de consumidores terciarios. (a) 1,000 kcal; (b) 100 kcal; (c) 10 kcal; (d) 0.1% de la energía original llega al nivel de los consumidores terciarios. El 99.9% se pierde como calor en los procesos metabólicos de los niveles intermedios.",
 };

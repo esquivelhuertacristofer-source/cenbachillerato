@@ -17,11 +17,16 @@
  *  (3) Mundo ARN — la ribozima (información + catálisis) y el coacervado.
  */
 
-import { useState, useEffect, type ReactNode } from "react";
+import { useState, useEffect, useRef, useCallback, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, card, Eyebrow, SceneBoundary } from "./_kit";
+import { FichaTeorica } from "./_ficha";
+import { RetoQuizCard } from "./_reto-quiz";
+import { LabSfx } from "./lab-audio";
+import { ORIGEN_VIDA_FICHA } from "./origen-vida-ficha";
 import {
+  QUIZ_A2,
   type Modo,
   type Ambiente,
   MODOS,
@@ -67,6 +72,30 @@ export function LabOrigenVida({ color }: PracticaLabProps) {
   const [chispa, setChispa] = useState<boolean>(true);
   const [playing, setPlaying] = useState<boolean>(true);
   const [resetNonce, setResetNonce] = useState(0);
+  const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
+  // teoría (cajón deslizable) y sonido
+  const [drawer, setDrawer] = useState(false);
+  const [sonido, setSonido] = useState(false);
+  const audioRef = useRef<LabSfx | null>(null);
+
+  const toggleSonido = useCallback(async () => {
+    if (!audioRef.current) audioRef.current = new LabSfx();
+    const sfx = audioRef.current;
+    if (sonido) {
+      sfx.mute();
+      setSonido(false);
+    } else {
+      await sfx.enable();
+      setSonido(true);
+    }
+  }, [sonido]);
+
+  useEffect(() => {
+    return () => {
+      audioRef.current?.dispose();
+      audioRef.current = null;
+    };
+  }, []);
 
   const bump = () => setResetNonce((n) => n + 1);
 
@@ -89,11 +118,13 @@ export function LabOrigenVida({ color }: PracticaLabProps) {
     setModo(m);
     setPlaying(true);
     if (m === "miller") setDias(0);
+    if (sonido) audioRef.current?.blip();
     bump();
   };
   const cambiarAmbiente = (a: Ambiente) => {
     setAmbiente(a);
     setPlaying(true);
+    if (sonido) audioRef.current?.blip();
     bump();
   };
   const reiniciar = () => {
@@ -263,6 +294,26 @@ export function LabOrigenVida({ color }: PracticaLabProps) {
         .ov-toggle[data-on="true"] { background:rgba(251,191,36,0.12); }
         .ov-toggle:hover { background:rgba(255,255,255,0.07); }
         @media (max-width: 1000px){ .ov-bottom { grid-template-columns: 1fr !important; } }
+
+        /* Cajón de teoría */
+        .ov-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
+          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
+        .ov-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
+        .ov-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
+          background:linear-gradient(180deg,#06121e 0%,#040a16 100%); border-left:1px solid rgba(${color.rgba},0.32);
+          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
+          display:flex; flex-direction:column; }
+        .ov-drawer[data-open="true"] { transform:translateX(0); }
+        .ov-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
+          padding:18px 20px; border-bottom:1px solid ${T.line}; }
+        .ov-drawer-body { overflow-y:auto; padding:20px; flex:1; }
+        .ov-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
+          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+        .ov-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
+        .ov-teoria-fab { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); cursor:pointer; display:inline-flex; align-items:center; gap:9px;
+          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
+          background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
+        .ov-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateX(-50%) translateY(-1px); }
       `}</style>
 
       {/* Selector de modo */}
@@ -321,6 +372,12 @@ export function LabOrigenVida({ color }: PracticaLabProps) {
 
             {/* Toolbar */}
             <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
+              <button className="ov-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
+                <i className="fa-solid fa-book-open" />
+              </button>
+              <button className="ov-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
+                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
+              </button>
               {modo === "miller" && (
                 <button className="ov-icobtn" data-on={chispa} onClick={() => setChispa((c) => !c)} title={chispa ? "Apagar chispa" : "Encender chispa"}>
                   <i className={`fa-solid ${chispa ? "fa-bolt" : "fa-bolt-slash"}`} />
@@ -342,6 +399,12 @@ export function LabOrigenVida({ color }: PracticaLabProps) {
               </div>
               <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6 }}>{pie}</div>
             </div>
+
+            {/* Botón flotante de Teoría */}
+            <button className="ov-teoria-fab" onClick={() => setDrawer(true)}>
+              <i className="fa-solid fa-book-open" />
+              Teoría
+            </button>
           </div>
 
           {/* Panel de control del modo */}
@@ -501,6 +564,38 @@ export function LabOrigenVida({ color }: PracticaLabProps) {
           Las cinco hipótesis, la definición de hipótesis abiótica, las preguntas de reflexión y el contexto de la CONABIO son <strong>verbatim</strong> de la lectura A1 (etiqueta «LECTURA A1»); el glosario y sus ejemplos son verbatim del glosario A5; los datos de «¿sabías que?» provienen de los quizzes A2/A4. El experimento de Miller-Urey está reconstruido de forma <strong>esquemática</strong>: el aparato (matraces, electrodos, condensador y trampa), la acumulación de aminoácidos y los dioramas de los ambientes son representaciones <strong>ilustrativas</strong> del mecanismo, no simulaciones químicas a escala molecular. La cifra «más de 20 aminoácidos tras una semana» es el resultado histórico verbatim del glosario A5. Fuente: {FUENTE}
         </span>
       </div>
+
+      {/* ── Reto evaluable: el quiz verbatim de la actividad A2 ──────────── */}
+      <RetoQuizCard
+        quiz={QUIZ_A2}
+        accent={accent}
+        rgba={color.rgba}
+        aprobado={ejercicioAprobado}
+        onAprobado={() => setEjercicioAprobado(true)}
+        playSfx={() => {
+          if (sonido) audioRef.current?.correcto();
+        }}
+        playPick={() => {
+          if (sonido) audioRef.current?.blip();
+        }}
+      />
+
+      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
+      <div className="ov-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
+      <aside className="ov-drawer" data-open={drawer} aria-hidden={!drawer}>
+        <div className="ov-drawer-head">
+          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
+            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
+          </div>
+          <button className="ov-close" onClick={() => setDrawer(false)} title="Cerrar">
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
+        <div className="ov-drawer-body">
+          <FichaTeorica data={ORIGEN_VIDA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+        </div>
+      </aside>
     </div>
   );
 }

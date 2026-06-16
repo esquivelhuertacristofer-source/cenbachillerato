@@ -11,15 +11,19 @@
  * los ángulos restantes. Cálculo exacto.
  */
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { T, OK, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { FichaTeorica } from "./_ficha";
+import { LEY_SENOS_FICHA } from "./ley-senos-cosenos-ficha";
+import { RetoNumericoCard } from "./_reto-numerico";
+import { LabSfx } from "./lab-audio";
 import {
   calcTri, LEYES, ESCENARIOS, IDEAS, DATOS,
   A_MIN, A_MAX, A_STEP, A_DEF, B_MIN, B_MAX, B_STEP, B_DEF,
   C_MIN, C_MAX, C_STEP, C_DEF,
-  fmtNum2, fmtM, fmtM2, fmtDeg, type Escenario,
+  fmtNum2, fmtM, fmtM2, fmtDeg, RETO_A2, type Escenario,
 } from "./ley-senos-cosenos-data";
 
 const LeySenosCosenosScene = dynamic(() => import("./LeySenosCosenosScene"), {
@@ -49,6 +53,31 @@ export function LabLeySenosCosenos({ color }: PracticaLabProps) {
   const [resetNonce, setResetNonce] = useState(0);
   const dir = useRef(1);
 
+  // reto evaluable, cajón de teoría y sonido
+  const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
+  const [drawer, setDrawer] = useState(false);
+  const [sonido, setSonido] = useState(false);
+  const audioRef = useRef<LabSfx | null>(null);
+
+  const toggleSonido = useCallback(async () => {
+    if (!audioRef.current) audioRef.current = new LabSfx();
+    const sfx = audioRef.current;
+    if (sonido) {
+      sfx.mute();
+      setSonido(false);
+    } else {
+      await sfx.enable();
+      setSonido(true);
+    }
+  }, [sonido]);
+
+  useEffect(() => {
+    return () => {
+      audioRef.current?.dispose();
+      audioRef.current = null;
+    };
+  }, []);
+
   // Barrido automático del ángulo C (rebota entre los límites).
   useEffect(() => {
     if (!reproduciendo) return;
@@ -75,9 +104,16 @@ export function LabLeySenosCosenos({ color }: PracticaLabProps) {
   const setAman = (v: number) => { setReproduciendo(false); setA(v); };
   const setBman = (v: number) => { setReproduciendo(false); setB(v); };
   const setCman = (v: number) => { setReproduciendo(false); setAngC(v); };
-  const aplicar = (e: Escenario) => { setReproduciendo(false); setA(e.a); setB(e.b); setAngC(e.angC); bump(); };
+  const aplicar = (e: Escenario) => { setReproduciendo(false); setA(e.a); setB(e.b); setAngC(e.angC); bump(); if (sonido) audioRef.current?.blip(); };
   const reset = () => { setReproduciendo(false); setA(A_DEF); setB(B_DEF); setAngC(C_DEF); bump(); };
   const bump = () => setResetNonce((n) => n + 1);
+
+  const objetivos = [
+    { txt: "Ajusta los lados a y b para explorar el triángulo", done: false },
+    { txt: "Prueba un ángulo C mayor de 90° (triángulo obtuso)", done: false },
+    { txt: "Carga el escenario «Casi recto» y comprueba Pitágoras", done: false },
+    { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
+  ];
 
   const sceneFallback = (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 28, textAlign: "center" }}>
@@ -114,6 +150,26 @@ export function LabLeySenosCosenos({ color }: PracticaLabProps) {
         .ex-tog { cursor:pointer; display:flex; align-items:center; gap:8px; padding:9px 12px; border-radius:11px;
           border:1px solid ${T.line}; background:${T.inset}; color:${T.text2}; font-size:12px; font-weight:800; transition:all .15s; }
         @media (max-width: 1000px){ .ex-bottom { grid-template-columns: 1fr !important; } }
+
+        /* Cajón de teoría */
+        .ex-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
+          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
+        .ex-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
+        .ex-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
+          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
+          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
+          display:flex; flex-direction:column; }
+        .ex-drawer[data-open="true"] { transform:translateX(0); }
+        .ex-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
+          padding:18px 20px; border-bottom:1px solid ${T.line}; }
+        .ex-drawer-body { overflow-y:auto; padding:20px; flex:1; }
+        .ex-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
+          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+        .ex-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
+        .ex-teoria-fab { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); cursor:pointer; display:inline-flex; align-items:center; gap:9px;
+          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
+          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
+        .ex-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateX(-50%) translateY(-1px); }
       `}</style>
 
       <div className="ex-grid">
@@ -153,6 +209,12 @@ export function LabLeySenosCosenos({ color }: PracticaLabProps) {
 
             {/* Toolbar */}
             <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
+              <button className="ex-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
+                <i className="fa-solid fa-book-open" />
+              </button>
+              <button className="ex-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
+                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
+              </button>
               <button className="ex-icobtn" data-on={reproduciendo} onClick={() => setReproduciendo((p) => !p)} title={reproduciendo ? "Pausar el barrido del ángulo C" : "Barrer el ángulo C"}>
                 <i className={`fa-solid ${reproduciendo ? "fa-pause" : "fa-play"}`} />
               </button>
@@ -163,6 +225,12 @@ export function LabLeySenosCosenos({ color }: PracticaLabProps) {
                 <i className="fa-solid fa-rotate-left" />
               </button>
             </div>
+
+            {/* Botón flotante de Teoría */}
+            <button className="ex-teoria-fab" onClick={() => setDrawer(true)}>
+              <i className="fa-solid fa-book-open" />
+              Teoría
+            </button>
 
             {/* Pie: ecuación en vivo */}
             <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 18px 14px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
@@ -335,6 +403,55 @@ export function LabLeySenosCosenos({ color }: PracticaLabProps) {
           Cálculo <strong>exacto</strong>: el lado c sale de la Ley de Cosenos (c = √(a²+b²−2ab·cos C)) y los ángulos A y B de la Ley de Senos/Cosenos; siempre A + B + C = 180°. La escena <strong>centra y escala</strong> el terreno para encuadrarlo (su forma depende de a, b y C), pero los <strong>valores numéricos</strong> de las etiquetas y lecturas siempre son reales.
         </span>
       </div>
+
+      {/* ── Objetivos ──────────────────────────────────────────────────────── */}
+      <div style={{ ...card, padding: "18px 22px", marginTop: 22 }}>
+        <Eyebrow>
+          <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
+          Objetivos
+        </Eyebrow>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
+          {objetivos.map((o, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? OK : T.text2 }}>
+              <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
+              <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Reto evaluable: el ejercicio verbatim del ancla A2 ────────────── */}
+      <RetoNumericoCard
+        reto={RETO_A2}
+        accent={accent}
+        aprobado={ejercicioAprobado}
+        onAprobado={() => setEjercicioAprobado(true)}
+        playSfx={
+          sonido
+            ? (ok) => {
+                if (ok) audioRef.current?.correcto();
+                else audioRef.current?.incorrecto();
+              }
+            : undefined
+        }
+      />
+
+      {/* ── Cajón de teoría ──────────────────────────────────────────────── */}
+      <div className="ex-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
+      <aside className="ex-drawer" data-open={drawer} aria-hidden={!drawer}>
+        <div className="ex-drawer-head">
+          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
+            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
+          </div>
+          <button className="ex-close" onClick={() => setDrawer(false)} title="Cerrar">
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
+        <div className="ex-drawer-body">
+          <FichaTeorica data={LEY_SENOS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+        </div>
+      </aside>
     </div>
   );
 }

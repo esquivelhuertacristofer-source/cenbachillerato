@@ -9,6 +9,8 @@
  * quizzes A2/A4 (hechos de «¿sabías que?»). No se inventan datos.
  */
 
+import type { QuizEvaluable } from "./_reto-quiz";
+
 export type Pt = [number, number, number];
 
 /** Los tres modos del laboratorio. */
@@ -324,3 +326,72 @@ export const IDEAS: string[] = [
   "La generación espontánea fue refutada por Pasteur; la abiogénesis científica es distinta.",
   "Ninguna hipótesis es aún una teoría completamente probada: el origen de la vida sigue investigándose.",
 ];
+
+/* ── Reto evaluable: quiz VERBATIM de la actividad A2 ───────────────────── */
+// VERBATIM de CNEYT-VI-P01-A2 (quiz_multiple_opcion). Índices ya 0-based.
+export const QUIZ_A2: QuizEvaluable = {
+  titulo: "Quiz: Origen de la vida",
+  puntajeMinimo: 70,
+  reactivos: [
+    {
+      enunciado: "¿Qué moléculas orgánicas obtuvo Miller en su experimento de 1953 al simular la atmósfera primitiva?",
+      opciones: [
+        "Ácidos grasos y glucosa",
+        "Aminoácidos y otras moléculas orgánicas",
+        "Nucleótidos y ATP",
+        "Cloroplastos y mitocondrias",
+      ],
+      respuestaCorrecta: 1,
+      retroalimentacion:
+        "Miller obtuvo aminoácidos y otras moléculas orgánicas, demostrando que los bloques de la vida pueden formarse abioticamente. Este resultado respaldó la hipótesis de Oparin y Haldane.",
+    },
+    {
+      enunciado: "¿Cuál hipótesis propone que el ARN fue la primera molécula capaz de almacenar información y catalizar reacciones?",
+      opciones: [
+        "Panspermia",
+        "Mundo ARN",
+        "Caldo primordial",
+        "Ventiladeros hidrotermales",
+      ],
+      respuestaCorrecta: 1,
+      retroalimentacion:
+        "La hipótesis del Mundo ARN resuelve el dilema 'ADN vs. proteína' porque el ARN puede hacer ambas funciones. Las ribozimas son ARN catalíticos que respaldan esta hipótesis.",
+    },
+    {
+      enunciado: "¿Qué evidencia respalda la hipótesis de la panspermia?",
+      opciones: [
+        "La síntesis de ADN en laboratorio",
+        "El meteorito de Murchison contenía aminoácidos extraterrestres",
+        "La existencia de ribozimas",
+        "Los ventiladeros hidrotermales oceánicos",
+      ],
+      respuestaCorrecta: 1,
+      retroalimentacion:
+        "El meteorito de Murchison (1969) contenía más de 70 aminoácidos distintos de origen extraterrestre. Esto muestra que las moléculas orgánicas pueden formarse en el espacio.",
+    },
+    {
+      enunciado: "¿Por qué se descartó la hipótesis de la generación espontánea en el siglo XIX?",
+      opciones: [
+        "Porque Oparin la refutó matemáticamente",
+        "Porque los experimentos de Pasteur demostraron que la vida solo surge de vida preexistente",
+        "Porque Miller demostró lo contrario",
+        "Porque la panspermia la sustituyó",
+      ],
+      respuestaCorrecta: 1,
+      retroalimentacion:
+        "Pasteur demostró con sus matraces de cuello de cisne que los microorganismos provenían del aire, no surgían espontáneamente. Esto estableció el principio de biogénesis.",
+    },
+    {
+      enunciado: "Los ventiladeros hidrotermales son atractivos como cuna de la vida porque:",
+      opciones: [
+        "Tienen mucho oxígeno libre",
+        "Proveen gradientes de energía y minerales sin necesitar atmósfera reductora",
+        "Están cerca de la superficie oceánica",
+        "Emiten radiación ultravioleta",
+      ],
+      respuestaCorrecta: 1,
+      retroalimentacion:
+        "Los ventiladeros ofrecen gradientes de temperatura, pH y concentración de minerales que pueden impulsar reacciones prebióticas sin requerir la atmósfera reductora que se discute si existió en la Tierra primitiva.",
+    },
+  ],
+};

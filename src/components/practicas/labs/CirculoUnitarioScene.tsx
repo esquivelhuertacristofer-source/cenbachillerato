@@ -21,8 +21,8 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useMemo, useRef, useState } from "react";
+import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, ContactShadows, Environment, Lightformer, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { calcTrig, fmtNum2 } from "./circulo-unitario-data";
@@ -36,6 +36,10 @@ export interface CirculoUnitarioSceneProps {
   autoRotate: boolean;
   pausado: boolean;
   resetNonce: number;
+  /* arrastre del punto P (pilar "manipular") */
+  arrastrable?: boolean;
+  onThetaChange?: (deg: number) => void;
+  onGrab?: () => void;
 }
 
 type Pt = [number, number, number];
@@ -45,6 +49,12 @@ const SZ = 8 / (2 * Math.PI);      // profundidad por radián (eje tiempo)
 const SIN_COL = "#34D399";
 const COS_COL = "#60a5fa";
 const TAN_COL = "#f472b6";
+
+/* raycast contra el plano del círculo (z = 0) para arrastrar P */
+const _planeXY = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+const _hit = new THREE.Vector3();
+const _obj = new THREE.Object3D();
+const PART_N = 18;                  // motas que recorren la onda seno en tiempo real
 
 /* anillo del círculo (no depende de θ) */
 const RING: Pt[] = (() => {
@@ -127,10 +137,43 @@ function Etiqueta({
   );
 }
 
+/* ── Motas que viajan por la onda seno en tiempo real (pilar "partículas") ── */
+function Particulas({ pausado }: { pausado: boolean }) {
+  const mesh = useRef<THREE.InstancedMesh>(null);
+  const DEPTH = 7;                  // hasta dónde se desenrolla la onda
+  useFrame((state) => {
+    const m = mesh.current;
+    if (!m || pausado) return;
+    const t = state.clock.elapsedTime;
+    for (let i = 0; i < PART_N; i++) {
+      const p = (t * 0.12 + i / PART_N) % 1;     // fase 0→1, determinista
+      const z = -p * DEPTH;
+      const y = R * Math.sin((p * DEPTH) / SZ);   // ¡yace sobre la onda seno!
+      const s = Math.sin(p * Math.PI) * 0.09 + 0.02;
+      _obj.position.set(0, y, z);
+      _obj.scale.setScalar(s);
+      _obj.updateMatrix();
+      m.setMatrixAt(i, _obj.matrix);
+    }
+    m.instanceMatrix.needsUpdate = true;
+  });
+  return (
+    <instancedMesh ref={mesh} args={[undefined, undefined, PART_N]}>
+      <sphereGeometry args={[1, 10, 10]} />
+      <meshStandardMaterial color={SIN_COL} emissive={SIN_COL} emissiveIntensity={1.6} toneMapped={false} transparent opacity={0.85} />
+    </instancedMesh>
+  );
+}
+
 /* ── La construcción completa ────────────────────────────────────────────── */
-function Escena({ thetaDeg, accent, mostrarCos, mostrarHelice, mostrarTan, pausado }: Omit<CirculoUnitarioSceneProps, "autoRotate" | "resetNonce">) {
+function Escena({
+  thetaDeg, accent, mostrarCos, mostrarHelice, mostrarTan, pausado,
+  arrastrable, onThetaChange, onGrab, onDraggingChange,
+}: Omit<CirculoUnitarioSceneProps, "autoRotate" | "resetNonce"> & { onDraggingChange?: (d: boolean) => void }) {
   const g = useMemo(() => construir(thetaDeg, mostrarTan), [thetaDeg, mostrarTan]);
   const punto = useRef<THREE.Group>(null);
+  const dragRef = useRef(false);
+  const [hover, setHover] = useState(false);
 
   useFrame((state) => {
     if (punto.current && !pausado) {
@@ -138,6 +181,30 @@ function Escena({ thetaDeg, accent, mostrarCos, mostrarHelice, mostrarTan, pausa
       punto.current.scale.setScalar(s);
     }
   });
+
+  const onDown = (e: ThreeEvent<PointerEvent>) => {
+    if (!arrastrable) return;
+    e.stopPropagation();
+    (e.target as Element).setPointerCapture?.(e.pointerId);
+    dragRef.current = true;
+    onDraggingChange?.(true);
+    onGrab?.();
+  };
+  const onMove = (e: ThreeEvent<PointerEvent>) => {
+    if (!dragRef.current) return;
+    e.stopPropagation();
+    if (!e.ray.intersectPlane(_planeXY, _hit)) return;
+    let deg = (Math.atan2(_hit.y, _hit.x) * 180) / Math.PI;
+    if (deg < 0) deg += 360;
+    onThetaChange?.(deg);
+  };
+  const onUp = (e: ThreeEvent<PointerEvent>) => {
+    if (!dragRef.current) return;
+    e.stopPropagation();
+    dragRef.current = false;
+    onDraggingChange?.(false);
+    (e.target as Element).releasePointerCapture?.(e.pointerId);
+  };
 
   const axL = R + 0.7;
   const sinPos = g.sin >= 0 ? 1 : -1;
@@ -203,12 +270,35 @@ function Escena({ thetaDeg, accent, mostrarCos, mostrarHelice, mostrarTan, pausa
         </>
       )}
 
-      {/* ── Punto P que gira (con latido) ── */}
+      {/* ── Motas viajando por la onda seno ── */}
+      <Particulas pausado={pausado} />
+
+      {/* ── Punto P (arrastrable: fija θ girándolo por el círculo) ── */}
       <group ref={punto} position={g.P}>
+        {/* halo cuando se puede arrastrar / al pasar el cursor */}
+        {arrastrable && (
+          <mesh>
+            <sphereGeometry args={[hover ? 0.34 : 0.26, 20, 20]} />
+            <meshBasicMaterial color={accent} transparent opacity={hover ? 0.3 : 0.16} toneMapped={false} />
+          </mesh>
+        )}
         <mesh castShadow>
           <sphereGeometry args={[0.16, 20, 20]} />
           <meshStandardMaterial color="#fff7e6" emissive={accent} emissiveIntensity={1.8} toneMapped={false} />
         </mesh>
+        {/* esfera invisible amplia para agarrar con facilidad */}
+        {arrastrable && (
+          <mesh
+            onPointerDown={onDown}
+            onPointerMove={onMove}
+            onPointerUp={onUp}
+            onPointerOver={(e) => { e.stopPropagation(); setHover(true); }}
+            onPointerOut={() => setHover(false)}
+          >
+            <sphereGeometry args={[0.5, 16, 16]} />
+            <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+          </mesh>
+        )}
       </group>
 
       {/* ── Etiquetas ── */}
@@ -240,7 +330,8 @@ function Escena({ thetaDeg, accent, mostrarCos, mostrarHelice, mostrarTan, pausa
 }
 
 /* ── Contenido (descendiente del Canvas) ─────────────────────────────────── */
-function Contenido({ thetaDeg, accent, mostrarCos, mostrarHelice, mostrarTan, autoRotate, pausado, resetNonce }: CirculoUnitarioSceneProps) {
+function Contenido({ thetaDeg, accent, mostrarCos, mostrarHelice, mostrarTan, autoRotate, pausado, resetNonce, arrastrable, onThetaChange, onGrab }: CirculoUnitarioSceneProps) {
+  const [dragging, setDragging] = useState(false);
   return (
     <>
       <color attach="background" args={["#06101f"]} />
@@ -251,7 +342,12 @@ function Contenido({ thetaDeg, accent, mostrarCos, mostrarHelice, mostrarTan, au
       <pointLight position={[-6, 4, -4]} intensity={0.5} color={accent} />
 
       <group key={`${resetNonce}`}>
-        <Escena thetaDeg={thetaDeg} accent={accent} mostrarCos={mostrarCos} mostrarHelice={mostrarHelice} mostrarTan={mostrarTan} pausado={pausado} />
+        <Escena
+          thetaDeg={thetaDeg} accent={accent} mostrarCos={mostrarCos} mostrarHelice={mostrarHelice}
+          mostrarTan={mostrarTan} pausado={pausado}
+          arrastrable={arrastrable} onThetaChange={onThetaChange} onGrab={onGrab}
+          onDraggingChange={setDragging}
+        />
       </group>
 
       <ContactShadows position={[0, -2.9, 0]} opacity={0.32} scale={20} blur={2.6} far={6} />
@@ -272,7 +368,8 @@ function Contenido({ thetaDeg, accent, mostrarCos, mostrarHelice, mostrarTan, au
         minPolarAngle={Math.PI / 9}
         maxPolarAngle={Math.PI / 1.85}
         target={[0, 0.2, -3]}
-        autoRotate={autoRotate && !pausado}
+        enabled={!dragging}
+        autoRotate={autoRotate && !pausado && !dragging}
         autoRotateSpeed={0.4}
       />
 

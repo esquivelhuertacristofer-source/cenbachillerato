@@ -206,3 +206,38 @@ export const CONTEXTO =
 
 export const FUENTE =
   "MCCEMS 2025 — Pensamiento Matemático VI «Pensamiento estadístico y probabilístico», propósito formativo O8 y contenido formativo C8: Distribución normal · Medidas de tendencia central · Medidas de dispersión.";
+
+// ── Reto evaluable (parte B del "tratamiento") ───────────────────────────────
+// VERBATIM de PM-VI-P09-A2 (ejercicio_matematico «Estaturas en México: probabilidad
+// bajo la campana (μ = 170, σ = 7)», slug=distribucion-normal, tipo_respuesta
+// "desarrollo", tolerancia_error 0.5).
+//
+// Aritmética verificada (μ = 170 cm, σ = 7 cm):
+//   a) [163, 177] = μ ± 1σ ⇒ regla empírica ⇒ 68 % (68.27 %).
+//   b) z = (184 − 170)/7 = 14/7 = 2 ⇒ P(X < 184) = Φ(2) ≈ 0.9772 = 97.72 %.
+//   c) 95 % central = μ ± 2σ = 170 ± 14 = [156, 184] cm.
+import type { RetoNumericoData } from "./_reto-numerico";
+
+export const RETO_A2: RetoNumericoData = {
+  titulo: "Estaturas en México: probabilidad bajo la campana (μ = 170, σ = 7)",
+  contexto:
+    "Los tres incisos recorren el contenido formativo de la progresión: la distribución normal descrita por sus medidas de tendencia central (μ) y de dispersión (σ), la regla empírica, y el cálculo de probabilidad como área bajo la curva con la puntuación z. En el laboratorio 3D el fenómeno «estaturas» trae justo estos parámetros, y los modos «Regla 68-95-99.7» y «Probabilidad / z» hacen visible cada inciso sobre la campana.",
+  problema:
+    "La estatura de los hombres adultos en México se modela con una distribución normal de media μ = 170 cm y desviación estándar σ = 7 cm.\n\n" +
+    "a) REGLA EMPÍRICA. ¿Qué porcentaje de la población mide entre 163 cm y 177 cm?\n\n" +
+    "b) PUNTUACIÓN z. ¿Qué probabilidad hay de que una persona mida menos de 184 cm? Estandariza con z = (x − μ)/σ y usa Φ(2) ≈ 0.9772.\n\n" +
+    "c) INTERVALO CENTRAL. ¿Entre qué dos estaturas se encuentra el 95 % central de la población?",
+  campos: [
+    { etiqueta: "a) Porcentaje entre 163 y 177 cm (μ ± 1σ)", objetivo: 68, tolerancia: 0.5, unidad: "%", placeholder: "68" },
+    { etiqueta: "b) P(X < 184 cm) con z = 2 ⇒ Φ(2)", objetivo: 97.72, tolerancia: 0.5, unidad: "%", placeholder: "97.72" },
+    { etiqueta: "c) Estatura inferior del 95 % central (μ − 2σ)", objetivo: 156, tolerancia: 0.5, unidad: "cm", placeholder: "156" },
+    { etiqueta: "c) Estatura superior del 95 % central (μ + 2σ)", objetivo: 184, tolerancia: 0.5, unidad: "cm", placeholder: "184" },
+  ],
+  pasosGuia: [
+    "a) 163 = 170 − 7 = μ − σ y 177 = 170 + 7 = μ + σ: es el intervalo μ ± 1σ. Por la regla empírica, ahí cae el 68 % (más exacto, 68.27 %) de la población.",
+    "b) Estandariza 184 cm: z = (184 − 170)/7 = 14/7 = 2. P(X < 184) = P(Z < 2) = Φ(2) ≈ 0.9772 = 97.72 %. Casi todos miden menos de 184 cm.",
+    "c) El 95 % central corresponde a μ ± 2σ = 170 ± 2·7 = 170 ± 14, es decir el intervalo [156, 184] cm.",
+  ],
+  respuestaFinal:
+    "a) 68 % (68.27 %), porque [163, 177] = μ ± 1σ. b) z = 2 ⇒ P(X < 184) = Φ(2) ≈ 97.72 %. c) μ ± 2σ = [156, 184] cm contiene el 95 % central.",
+};

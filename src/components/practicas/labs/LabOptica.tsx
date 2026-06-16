@@ -18,10 +18,15 @@
  * Toda la física es de cálculo cerrado (ecuación de Gauss y ley de Snell).
  */
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { FichaTeorica } from "./_ficha";
+import { OPTICA_FICHA } from "./optica-lentes-espejos-ficha";
+import { RetoQuizCard } from "./_reto-quiz";
+import { QUIZ_A2 } from "./optica-lentes-espejos-data";
+import { LabSfx } from "./lab-audio";
 import {
   type Modo, type TipoLente, type TipoEspejo,
   resolverGauss, resolverSnell, medioPorId, MEDIOS, CASOS_LENTE, CASOS_ESPEJO,
@@ -63,6 +68,30 @@ export function LabOptica({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
 
   const [modo, setModo] = useState<Modo>("lentes");
+  // teoría (cajón deslizable), estado evaluable y sonido
+  const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
+  const [drawer, setDrawer] = useState(false);
+  const [sonido, setSonido] = useState(false);
+  const audioRef = useRef<LabSfx | null>(null);
+
+  const toggleSonido = useCallback(async () => {
+    if (!audioRef.current) audioRef.current = new LabSfx();
+    const sfx = audioRef.current;
+    if (sonido) {
+      sfx.mute();
+      setSonido(false);
+    } else {
+      await sfx.enable();
+      setSonido(true);
+    }
+  }, [sonido]);
+
+  useEffect(() => {
+    return () => {
+      audioRef.current?.dispose();
+      audioRef.current = null;
+    };
+  }, []);
   // (a) lentes
   const [tipoLente, setTipoLente] = useState<TipoLente>("convergente");
   const [fLente, setFLente] = useState<number>(F_LENTE_DEF);
@@ -86,7 +115,7 @@ export function LabOptica({ color }: PracticaLabProps) {
     else { setMedio1(MEDIO1_DEF); setMedio2(MEDIO2_DEF); setThetaInc(THETA_DEF); }
     bump();
   };
-  const cambiarModo = (m: Modo) => { setModo(m); bump(); };
+  const cambiarModo = (m: Modo) => { setModo(m); if (sonido) audioRef.current?.blip(); bump(); };
 
   // valores en vivo
   const fLentSign = tipoLente === "convergente" ? Math.abs(fLente) : -Math.abs(fLente);
@@ -137,6 +166,26 @@ export function LabOptica({ color }: PracticaLabProps) {
         .op-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.6); }
         .op-tab:hover { background:rgba(255,255,255,0.06); }
         @media (max-width: 1000px){ .op-bottom { grid-template-columns: 1fr !important; } }
+
+        /* Cajón de teoría */
+        .op-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
+          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
+        .op-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
+        .op-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
+          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
+          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
+          display:flex; flex-direction:column; }
+        .op-drawer[data-open="true"] { transform:translateX(0); }
+        .op-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
+          padding:18px 20px; border-bottom:1px solid ${T.line}; }
+        .op-drawer-body { overflow-y:auto; padding:20px; flex:1; }
+        .op-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
+          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+        .op-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
+        .op-teoria-fab { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); cursor:pointer; display:inline-flex; align-items:center; gap:9px;
+          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
+          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
+        .op-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateX(-50%) translateY(-1px); }
       `}</style>
 
       {/* Selector de modo */}
@@ -190,6 +239,12 @@ export function LabOptica({ color }: PracticaLabProps) {
 
             {/* Toolbar */}
             <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
+              <button className="op-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
+                <i className="fa-solid fa-book-open" />
+              </button>
+              <button className="op-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
+                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
+              </button>
               <button className="op-icobtn" data-on={playing} onClick={() => setPlaying((p) => !p)} title={playing ? "Pausar" : "Reproducir"}>
                 <i className={`fa-solid ${playing ? "fa-pause" : "fa-play"}`} />
               </button>
@@ -197,6 +252,12 @@ export function LabOptica({ color }: PracticaLabProps) {
                 <i className="fa-solid fa-rotate-left" />
               </button>
             </div>
+
+            {/* Botón flotante de Teoría */}
+            <button className="op-teoria-fab" onClick={() => setDrawer(true)}>
+              <i className="fa-solid fa-book-open" />
+              Teoría
+            </button>
 
             {/* Pie: lectura en vivo */}
             <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 18px 14px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
@@ -426,6 +487,27 @@ export function LabOptica({ color }: PracticaLabProps) {
         </div>
       </div>
 
+      {/* ── Objetivo evaluable ─────────────────────────────────────── */}
+      <div style={{ ...card, padding: "16px 22px", marginTop: 22 }}>
+        <Eyebrow>
+          <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
+          Objetivos
+        </Eyebrow>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
+          {[
+            { txt: "Explora los tres modos: lentes, espejos y refracción", done: false },
+            { txt: "Verifica la ecuación de Gauss 1/f = 1/dₒ + 1/dᵢ", done: false },
+            { txt: "Supera el ángulo crítico y observa reflexión total interna", done: false },
+            { txt: "Resuelve el reto evaluable de la actividad", done: ejercicioAprobado },
+          ].map((o, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? "#34D399" : T.text2 }}>
+              <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
+              <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* ── Lecturas + ideas clave ─────────────────────────────────── */}
       <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="op-bottom">
         <div style={{ ...card, padding: "18px 22px" }}>
@@ -508,6 +590,41 @@ export function LabOptica({ color }: PracticaLabProps) {
           Física <strong>exacta</strong> de cálculo cerrado: ecuación de las lentes y espejos delgados 1/f = 1/dₒ + 1/dᵢ (óptica paraxial de Gauss), aumento M = −dᵢ/dₒ y ley de Snell n₁·sen θ₁ = n₂·sen θ₂, con el ángulo crítico θ_c = arcsen(n₂/n₁). Los valores de los paneles son <strong>exactos</strong>. El trazado de rayos en pantalla es <strong>esquemático</strong> (construcción paraxial con dos rayos principales): las distancias usan una escala visual y los símbolos de lente/espejo son convencionales. Las instrucciones y las preguntas de reflexión son verbatim de la simulación A2; el ejemplo es la pregunta de comprensión 2 de la lectura A1; las ideas clave y el glosario se basan en la lectura A1.
         </span>
       </div>
+
+      {/* ── Reto evaluable: quiz verbatim CNEYT-V-P06-A4 ───────────────── */}
+      <RetoQuizCard
+        quiz={QUIZ_A2}
+        accent={accent}
+        rgba={color.rgba}
+        aprobado={ejercicioAprobado}
+        onAprobado={() => setEjercicioAprobado(true)}
+        playSfx={
+          sonido
+            ? (ok) => {
+                if (ok) audioRef.current?.correcto();
+                else audioRef.current?.incorrecto();
+              }
+            : undefined
+        }
+        playPick={sonido ? () => audioRef.current?.blip() : undefined}
+      />
+
+      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
+      <div className="op-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
+      <aside className="op-drawer" data-open={drawer} aria-hidden={!drawer}>
+        <div className="op-drawer-head">
+          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
+            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
+          </div>
+          <button className="op-close" onClick={() => setDrawer(false)} title="Cerrar">
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
+        <div className="op-drawer-body">
+          <FichaTeorica data={OPTICA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+        </div>
+      </aside>
     </div>
   );
 }

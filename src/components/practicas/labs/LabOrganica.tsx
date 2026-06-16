@@ -14,7 +14,7 @@
  * enlace exactas).
  */
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
@@ -22,6 +22,11 @@ import {
   FAMILIAS, compuesto, familiaInfo, compuestosDe,
   IDEAS, DATOS, COMP_DEF, type Familia,
 } from "./organica-data";
+import { FichaTeorica } from "./_ficha";
+import { ORGANICA_FICHA } from "./organica-visor-ficha";
+import { RetoQuizCard } from "./_reto-quiz";
+import { QUIZ_A2 } from "./organica-visor-data";
+import { LabSfx } from "./lab-audio";
 
 const OrganicaScene = dynamic(() => import("./OrganicaScene"), {
   ssr: false,
@@ -41,6 +46,30 @@ export function LabOrganica({ color }: PracticaLabProps) {
   const [girar, setGirar] = useState(true);
   const [autoRotate, setAutoRotate] = useState(false);
   const [resetNonce, setResetNonce] = useState(0);
+  const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
+  // teoría (cajón deslizable) y sonido
+  const [drawer, setDrawer] = useState(false);
+  const [sonido, setSonido] = useState(false);
+  const audioRef = useRef<LabSfx | null>(null);
+
+  const toggleSonido = useCallback(async () => {
+    if (!audioRef.current) audioRef.current = new LabSfx();
+    const sfx = audioRef.current;
+    if (sonido) {
+      sfx.mute();
+      setSonido(false);
+    } else {
+      await sfx.enable();
+      setSonido(true);
+    }
+  }, [sonido]);
+
+  useEffect(() => {
+    return () => {
+      audioRef.current?.dispose();
+      audioRef.current = null;
+    };
+  }, []);
 
   const comp = useMemo(() => compuesto(compId), [compId]);
   const fam = useMemo(() => familiaInfo(comp.familia), [comp.familia]);
@@ -48,7 +77,10 @@ export function LabOrganica({ color }: PracticaLabProps) {
 
   const elegirFamilia = (id: Familia) => {
     const lista = compuestosDe(id);
-    if (lista.length > 0) setCompId(lista[0]!.id);
+    if (lista.length > 0) {
+      setCompId(lista[0]!.id);
+      if (sonido) audioRef.current?.blip();
+    }
   };
   const reiniciar = () => setResetNonce((n) => n + 1);
 
@@ -84,6 +116,26 @@ export function LabOrganica({ color }: PracticaLabProps) {
         .org-comp:hover { border-color:rgba(${color.rgba},0.5); color:#fff; }
         .org-comp[data-on="true"] { border-color:rgba(${color.rgba},0.7); background:rgba(${color.rgba},0.18); color:#fff; }
         @media (max-width: 1000px){ .org-bottom { grid-template-columns: 1fr !important; } }
+
+        /* Cajón de teoría */
+        .ex-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
+          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
+        .ex-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
+        .ex-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
+          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
+          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
+          display:flex; flex-direction:column; }
+        .ex-drawer[data-open="true"] { transform:translateX(0); }
+        .ex-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
+          padding:18px 20px; border-bottom:1px solid ${T.line}; }
+        .ex-drawer-body { overflow-y:auto; padding:20px; flex:1; }
+        .ex-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
+          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+        .ex-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
+        .ex-teoria-fab { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); cursor:pointer; display:inline-flex; align-items:center; gap:9px;
+          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
+          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
+        .ex-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateX(-50%) translateY(-1px); }
       `}</style>
 
       <div className="org-grid">
@@ -131,6 +183,12 @@ export function LabOrganica({ color }: PracticaLabProps) {
 
             {/* Toolbar */}
             <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
+              <button className="org-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
+                <i className="fa-solid fa-book-open" />
+              </button>
+              <button className="org-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
+                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
+              </button>
               <button className="org-icobtn" data-on={resaltarFG} onClick={() => setResaltarFG((v) => !v)} title="Resaltar el grupo funcional">
                 <i className="fa-solid fa-highlighter" />
               </button>
@@ -155,6 +213,12 @@ export function LabOrganica({ color }: PracticaLabProps) {
                 {resaltarFG ? <>El grupo funcional <strong style={{ color: fgColor }}>{fam.grupoFuncional}</strong> está resaltado.</> : <>Pulsa el resaltador para ver el grupo funcional.</>}
               </div>
             </div>
+
+            {/* Botón flotante de Teoría */}
+            <button className="ex-teoria-fab" onClick={() => setDrawer(true)}>
+              <i className="fa-solid fa-book-open" />
+              Teoría
+            </button>
           </div>
 
           {/* Selector de familia */}
@@ -289,6 +353,62 @@ export function LabOrganica({ color }: PracticaLabProps) {
           La composición (número de C, H y O), la fórmula y el grupo funcional son los <strong>valores reales</strong> de cada compuesto. Las moléculas se dibujan como modelos de <strong>bolas y barras</strong> con ángulos tetraédricos (sp3, 109.5°) y trigonales planos (sp2, 120°): son representaciones <strong>didácticas</strong>, no las distancias de enlace reales. Compuestos tomados de la lectura de la progresión 4.
         </span>
       </div>
+
+      {/* ── Objetivos guiados ──────────────────────────────────────────── */}
+      <div style={{ ...card, padding: "18px 22px", marginTop: 22 }}>
+        <Eyebrow>
+          <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
+          Objetivos
+        </Eyebrow>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
+          {[
+            { txt: "Explora las cuatro familias orgánicas", done: FAMILIAS.every((f) => f.id === comp.familia || compuestosDe(f.id).length > 0) && comp.familia !== COMP_DEF.split("-")[0] },
+            { txt: "Identifica un grupo funcional resaltado", done: resaltarFG },
+            { txt: "Observa un alqueno (doble enlace C=C)", done: comp.familia === "alqueno" },
+            { txt: "Aprueba el cuestionario de la actividad A2", done: ejercicioAprobado },
+          ].map((o, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? "#34D399" : T.text2 }}>
+              <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
+              <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Reto evaluable: el quiz verbatim del ancla ───────────────── */}
+      <RetoQuizCard
+        quiz={QUIZ_A2}
+        accent={accent}
+        rgba={color.rgba}
+        aprobado={ejercicioAprobado}
+        onAprobado={() => setEjercicioAprobado(true)}
+        playSfx={
+          sonido
+            ? (ok) => {
+                if (ok) audioRef.current?.correcto();
+                else audioRef.current?.incorrecto();
+              }
+            : undefined
+        }
+        playPick={sonido ? () => audioRef.current?.blip() : undefined}
+      />
+
+      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
+      <div className="ex-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
+      <aside className="ex-drawer" data-open={drawer} aria-hidden={!drawer}>
+        <div className="ex-drawer-head">
+          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
+            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
+          </div>
+          <button className="ex-close" onClick={() => setDrawer(false)} title="Cerrar">
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
+        <div className="ex-drawer-body">
+          <FichaTeorica data={ORGANICA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+        </div>
+      </aside>
     </div>
   );
 }

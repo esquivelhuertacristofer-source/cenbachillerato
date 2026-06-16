@@ -475,3 +475,69 @@ export const RETO = {
     "Chapulín → ~70% proteína y ~10% grasa.",
   ],
 };
+
+/* ────────────────────────────────────────────────────────────────────────────
+ * QUIZ EVALUABLE — VERBATIM de CNEYT-IV-P05-A2 (quiz_verdadero_falso)
+ * "¿Verdadero o falso? Biomoléculas a fondo"
+ *
+ * Fuente (dump): scripts/_sem4_dump.txt líneas 1574–1611.
+ * puntaje_minimo_aprobacion=70 → puntajeMinimo: 70
+ * Mapeo V/F: respuesta true  → respuestaCorrecta: 0 ("Verdadero", índice 0)
+ *            respuesta false → respuestaCorrecta: 1 ("Falso",     índice 1)
+ * ──────────────────────────────────────────────────────────────────────────── */
+import type { QuizEvaluable } from "./_reto-quiz";
+
+export const QUIZ_A2: QuizEvaluable = {
+  titulo: "¿Verdadero o falso? Biomoléculas a fondo",
+  puntajeMinimo: 70,
+  reactivos: [
+    {
+      // respuesta: true
+      enunciado: "Las proteínas son polímeros de aminoácidos unidos por enlaces peptídicos.",
+      opciones: ["Verdadero", "Falso"],
+      respuestaCorrecta: 0,
+      retroalimentacion:
+        "Correcto. Los aminoácidos se unen mediante enlaces peptídicos (–CO–NH–) formando cadenas que se pliegan en estructuras tridimensionales específicas (estructura secundaria, terciaria y cuaternaria) que determinan su función.",
+    },
+    {
+      // respuesta: false
+      enunciado: "La glucosa (C₆H₁₂O₆) es un lípido que sirve como fuente inmediata de energía para las células.",
+      opciones: ["Verdadero", "Falso"],
+      respuestaCorrecta: 1,
+      retroalimentacion:
+        "La glucosa es un carbohidrato (monosacárido), no un lípido. Es la principal fuente de energía inmediata para las células, incluyendo las neuronas del cerebro. Los lípidos (grasas) son la reserva de energía a largo plazo (9 kcal/g vs 4 kcal/g de los carbohidratos).",
+    },
+    {
+      // respuesta: true
+      enunciado: "El ADN contiene la información genética codificada en la secuencia de sus cuatro bases nitrogenadas: adenina, timina, guanina y citosina.",
+      opciones: ["Verdadero", "Falso"],
+      respuestaCorrecta: 0,
+      retroalimentacion:
+        "Correcto. El código genético está escrito en el lenguaje de cuatro bases (A, T, G, C en el ADN; A, U, G, C en el ARN). La secuencia de estas bases en los genes determina la secuencia de aminoácidos en las proteínas.",
+    },
+    {
+      // respuesta: false
+      enunciado: "Las grasas saturadas tienen dobles enlaces C=C en sus cadenas de ácidos grasos, lo que las hace líquidas a temperatura ambiente.",
+      opciones: ["Verdadero", "Falso"],
+      respuestaCorrecta: 1,
+      retroalimentacion:
+        "Es al revés: las grasas INSATURADAS tienen dobles enlaces C=C que crean 'codos' en la cadena, impidiendo el empaquetamiento y haciéndolas líquidas (aceites). Las grasas SATURADAS no tienen dobles enlaces: sus cadenas se empaquetan bien y son sólidas a temperatura ambiente (manteca, mantequilla).",
+    },
+    {
+      // respuesta: true
+      enunciado: "El colágeno es la proteína más abundante del cuerpo humano y tiene función estructural en piel, tendones y cartílagos.",
+      opciones: ["Verdadero", "Falso"],
+      respuestaCorrecta: 0,
+      retroalimentacion:
+        "Correcto. El colágeno representa ~30% de todas las proteínas del cuerpo humano. Forma fibras resistentes en tendones, cartílagos, huesos, piel y córnea. Su degradación con el envejecimiento produce arrugas y pérdida de elasticidad en la piel.",
+    },
+    {
+      // respuesta: false
+      enunciado: "Los ácidos nucleicos (ADN y ARN) son los únicos polímeros biológicos que existen en la naturaleza.",
+      opciones: ["Verdadero", "Falso"],
+      respuestaCorrecta: 1,
+      retroalimentacion:
+        "Los polímeros biológicos (biopolímeros) incluyen cuatro familias: ácidos nucleicos (ADN y ARN), proteínas (polímeros de aminoácidos), polisacáridos como el almidón y la celulosa (polímeros de glucosa), y en algunos contextos los lípidos de membrana (fosfolípidos). Hay muchos tipos de biopolímeros, no solo los ácidos nucleicos.",
+    },
+  ],
+};

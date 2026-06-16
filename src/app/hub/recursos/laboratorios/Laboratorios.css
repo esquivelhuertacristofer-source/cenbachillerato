@@ -410,9 +410,298 @@
   font-weight: 600;
 }
 
+/* ══════════════════════════════════════════════════════════════
+   ⚠️ TEMPORAL (presentación) — Pestaña "Destacados".
+   Para revertir: borrar TODO este bloque + el archivo
+   labs-destacados.ts + la pestaña en page.tsx.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Switcher de pestañas ─── */
+.labs-tabs {
+  display: inline-flex;
+  gap: 6px;
+  padding: 6px;
+  margin-bottom: 30px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.labs-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 11px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 13.5px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.labs-tab:hover {
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.labs-tab.is-active {
+  color: #061a33;
+  background: linear-gradient(135deg, #67e8f9 0%, #22d3ee 100%);
+  box-shadow: 0 6px 18px rgba(34, 211, 238, 0.28);
+}
+
+.labs-tab-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+  background: rgba(6, 26, 51, 0.18);
+  color: inherit;
+}
+
+.labs-tab:not(.is-active) .labs-tab-count {
+  background: rgba(34, 211, 238, 0.16);
+  color: #67e8f9;
+}
+
+/* ── Secciones por semestre ─── */
+.dest-sem {
+  margin-bottom: 46px;
+}
+
+.dest-sem-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.dest-sem-num {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  border-radius: 14px;
+  font-size: 20px;
+  font-weight: 900;
+  color: #061a33;
+  background: linear-gradient(135deg, #67e8f9 0%, #22d3ee 100%);
+  box-shadow: 0 8px 20px rgba(34, 211, 238, 0.26);
+}
+
+.dest-sem-title {
+  font-size: clamp(18px, 2.4vw, 23px);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: #fff;
+  margin: 0 0 2px;
+}
+
+.dest-sem-sub {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.42);
+  margin: 0;
+}
+
+/* Video grande de presentación del semestre */
+.dest-sem-video {
+  max-width: 760px;
+  margin-bottom: 22px;
+  border: 1px solid rgba(34, 211, 238, 0.22);
+  box-shadow: 0 20px 48px rgba(1, 17, 38, 0.42);
+}
+
+/* ── Grid de tarjetas destacadas ─── */
+.dest-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 18px;
+}
+
+.dest-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 18px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(var(--lab-accent-rgb, 255, 255, 255), 0.16);
+  transition: transform 0.24s ease, border-color 0.24s ease, box-shadow 0.24s ease;
+}
+
+.dest-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(var(--lab-accent-rgb, 255, 255, 255), 0.34);
+  box-shadow: 0 20px 44px rgba(1, 17, 38, 0.4);
+}
+
+.dest-card-vid {
+  border-radius: 0;
+}
+
+.dest-card-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 15px 18px 18px;
+}
+
+.dest-card-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  align-self: flex-start;
+  padding: 4px 10px;
+  margin-bottom: 11px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--lab-accent, #22d3ee);
+  background: rgba(var(--lab-accent-rgb, 34, 211, 238), 0.1);
+  border: 1px solid rgba(var(--lab-accent-rgb, 34, 211, 238), 0.28);
+}
+
+.dest-card-titulo {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  font-size: 16.5px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  color: #fff;
+  margin: 0 0 8px;
+}
+
+.dest-card-n {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--lab-accent, #22d3ee);
+  opacity: 0.7;
+}
+
+.dest-card-desc {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 0 0 16px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.dest-card-cta {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  align-self: flex-start;
+  padding: 9px 15px;
+  border-radius: 11px;
+  font-size: 12.5px;
+  font-weight: 800;
+  text-decoration: none;
+  color: var(--lab-accent, #22d3ee);
+  background: rgba(var(--lab-accent-rgb, 34, 211, 238), 0.1);
+  border: 1px solid rgba(var(--lab-accent-rgb, 34, 211, 238), 0.26);
+  transition: background 0.2s ease, gap 0.2s ease;
+}
+
+.dest-card-cta:hover {
+  gap: 13px;
+  background: rgba(var(--lab-accent-rgb, 34, 211, 238), 0.18);
+}
+
+/* ── Video facade (lite-youtube) ─── */
+.vid-frame {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #061425;
+  border: 0;
+  padding: 0;
+}
+
+.vid-facade {
+  cursor: pointer;
+  isolation: isolate;
+}
+
+.vid-thumb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease, filter 0.3s ease;
+}
+
+.vid-facade::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(6, 20, 37, 0.1) 0%, rgba(6, 20, 37, 0.45) 100%);
+  transition: background 0.3s ease;
+}
+
+.vid-facade:hover .vid-thumb {
+  transform: scale(1.05);
+}
+
+.vid-play {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  font-size: 19px;
+  color: #fff;
+  background: rgba(220, 30, 40, 0.92);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.vid-facade:hover .vid-play {
+  transform: translate(-50%, -50%) scale(1.08);
+  background: rgba(255, 0, 0, 0.96);
+}
+
+.vid-iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
 /* ── Responsive ─── */
 @media (max-width: 640px) {
   .labs-grid {
+    grid-template-columns: 1fr;
+  }
+  .dest-grid {
     grid-template-columns: 1fr;
   }
   .labs-hero-word {
@@ -421,5 +710,13 @@
   }
   .labs-hero-stats {
     flex-wrap: wrap;
+  }
+  .labs-tabs {
+    display: flex;
+    width: 100%;
+  }
+  .labs-tab {
+    flex: 1;
+    justify-content: center;
   }
 }

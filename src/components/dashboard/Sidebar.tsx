@@ -7,7 +7,6 @@ import {
   GraduationCap,
   BarChart3,
   LogOut,
-  ChevronRight,
   Sparkles,
   Zap,
   ChevronDown,
@@ -15,6 +14,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { motion, LayoutGroup } from 'motion/react';
 import { getSupabaseBrowser } from '@/lib/supabase-browser';
 
 const navItems = [
@@ -43,40 +43,47 @@ export default function Sidebar({
   const pathname = usePathname();
 
   return (
-    <aside className="hidden md:flex sticky top-0 z-40 h-screen w-[260px] flex-shrink-0 flex-col bg-[#011C40] overflow-hidden border-r border-white/10 font-['Epilogue'] transition-all noise-texture">
+    <aside
+      className="hidden md:flex sticky top-0 z-40 h-screen w-[260px] flex-shrink-0 flex-col overflow-hidden border-r border-white/10 font-['Epilogue'] noise-texture"
+      style={{
+        background:
+          'radial-gradient(120% 60% at 0% -5%, rgba(212,165,116,0.12) 0%, transparent 55%), linear-gradient(180deg, #06234A 0%, #011C40 42%, #01152F 100%)',
+      }}
+    >
+      {/* Hairline de acento dorado en el borde derecho */}
+      <div
+        className="absolute top-0 right-0 w-px h-full pointer-events-none"
+        style={{ background: 'linear-gradient(180deg, rgba(212,165,116,0.40) 0%, transparent 28%)' }}
+      />
 
-      {/* Decorative Gradient Glows */}
-      <div className="absolute -left-20 -top-20 w-64 h-64 bg-[#D4A574]/30 rounded-full blur-[100px] pointer-events-none opacity-40 animate-pulse" />
-      <div className="absolute -right-40 bottom-20 w-80 h-80 bg-[#7DD3FC]/10 rounded-full blur-[120px] pointer-events-none" />
+      {/* Decorative Gradient Glow (suave) */}
+      <div className="absolute -left-24 -top-24 w-64 h-64 bg-[#D4A574]/20 rounded-full blur-[110px] pointer-events-none opacity-50" />
 
       {/* Logo Section */}
-      <div className="relative z-10 pt-10 pb-8 px-8">
-        <div className="flex items-center gap-4 group cursor-pointer">
-          <div className="relative flex h-12 w-12 items-center justify-center rounded-[1.25rem] bg-gradient-to-br from-[#D4A574] to-[#b8895a] shadow-[0_15px_30px_rgba(212,165,116,0.3)] overflow-hidden transition-all duration-500 group-hover:rotate-6">
-            <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <span className="relative text-white font-black text-2xl tracking-tighter">C</span>
+      <div className="relative z-10 pt-7 pb-6 px-5 border-b border-white/[0.06]">
+        <Link href="/dashboard/docente" className="flex items-center gap-3 group">
+          <div className="relative flex h-[38px] w-[38px] items-center justify-center rounded-xl bg-gradient-to-br from-[#E5C295] via-[#D4A574] to-[#b8895a] shadow-[0_6px_16px_rgba(212,165,116,0.30),inset_0_1px_0_rgba(255,255,255,0.45)] overflow-hidden">
+            <span className="relative text-[#3a2410] font-black text-lg tracking-tighter">C</span>
           </div>
           <div className="flex flex-col">
-            <span className="text-white font-black text-xl leading-none tracking-tighter">CEN</span>
-            <div className="flex items-center gap-1.5 mt-1">
-              <span className="text-[#7DD3FC] text-[7px] font-black uppercase tracking-[0.2em]">Bachillerato MCCEMS</span>
-            </div>
+            <span className="text-white font-black text-[17px] leading-[1.05] tracking-[-0.03em]">CEN Bachillerato</span>
+            <span className="text-[#E5C295]/70 text-[9.5px] font-bold uppercase tracking-[0.16em] mt-[3px]">Panel docente</span>
           </div>
-        </div>
+        </Link>
       </div>
 
       {/* Semestre Selector */}
-      <div className="relative z-10 px-6 mb-6">
-        <p className="text-white/20 text-[8px] font-black uppercase tracking-widest mb-2 px-1">Semestre activo</p>
-        <div className="bg-white/5 p-1.5 rounded-2xl border border-white/10 grid grid-cols-3 gap-1">
+      <div className="relative z-10 px-[18px] pt-4 mb-5">
+        <p className="text-white/28 text-[9.5px] font-extrabold uppercase tracking-[0.16em] mb-2 px-0.5">Semestre activo</p>
+        <div className="bg-white/[0.04] p-1.5 rounded-2xl border border-white/[0.08] grid grid-cols-3 gap-1">
           {SEMESTRES.map((s) => (
             <button
               key={s}
               onClick={() => onSemestreChange?.(s)}
-              className={`py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all duration-500 ${
+              className={`py-2 rounded-xl text-[11px] font-extrabold transition-all duration-200 ${
                 currentSemestre === s
-                  ? 'bg-white text-[#011C40] shadow-xl -translate-y-[1px]'
-                  : 'text-white/30 hover:text-white/60'
+                  ? 'bg-gradient-to-br from-[#E5C295] to-[#D4A574] text-[#3a2410] shadow-[0_6px_14px_rgba(212,165,116,0.30)]'
+                  : 'text-white/35 hover:text-white/70 hover:bg-white/[0.04]'
               }`}
             >
               {s}°
@@ -86,70 +93,90 @@ export default function Sidebar({
       </div>
 
       {/* Active Group Badge */}
-      <div className="relative z-10 px-6 mb-8">
-        <button className="w-full flex items-center gap-4 rounded-[1.75rem] bg-white/5 backdrop-blur-2xl border border-white/10 px-5 py-4 shadow-inner group transition-all duration-500 hover:bg-white/10 hover:border-white/20 text-left">
-          <div className="relative h-8 w-8 shrink-0">
-            <div className="absolute inset-0 bg-[#D4A574] rounded-xl blur-lg opacity-40 group-hover:opacity-100 transition-opacity" />
-            <div className="relative h-full w-full rounded-xl bg-gradient-to-br from-[#D4A574] to-[#b8895a] flex items-center justify-center text-white shadow-xl">
-              <Zap className="w-4 h-4" />
-            </div>
+      <div className="relative z-10 px-[18px] mb-5">
+        <button className="w-full flex items-center gap-3 rounded-2xl bg-white/[0.03] border border-white/[0.08] px-3.5 py-3 group transition-all duration-200 hover:bg-white/[0.06] hover:border-white/[0.14] text-left">
+          <div className="relative h-[34px] w-[34px] shrink-0 rounded-[10px] bg-gradient-to-br from-[#E5C295] to-[#b8895a] flex items-center justify-center text-[#3a2410] shadow-[0_4px_12px_rgba(212,165,116,0.35)]">
+            <Zap className="w-4 h-4" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-white/40 text-[8px] font-black uppercase tracking-widest leading-none mb-1">Grupo Activo</p>
+            <p className="text-white/40 text-[9px] font-extrabold uppercase tracking-[0.14em] leading-none mb-1">Grupo activo</p>
             <div className="flex items-center justify-between gap-2">
-              <p className="text-white font-black text-[12px] truncate tracking-tight">
+              <p className="text-white font-bold text-[13px] truncate tracking-tight">
                 {grupoNombre || `Semestre ${currentSemestre}`}
               </p>
-              <ChevronDown className="w-3.5 h-3.5 text-white/20 group-hover:text-white transition-colors" />
+              <ChevronDown className="w-3.5 h-3.5 text-white/25 group-hover:text-white/70 transition-colors shrink-0" />
             </div>
           </div>
         </button>
       </div>
 
       {/* Primary Navigation */}
-      <nav className="relative z-10 flex-1 px-4 space-y-3">
-        {navItems.map((item) => {
-          const isActive = item.href === '/dashboard/docente'
-            ? pathname === item.href
-            : pathname.startsWith(item.href);
+      <nav className="relative z-10 flex-1 px-2.5 flex flex-col gap-[3px]">
+        <p className="text-white/28 text-[9.5px] font-extrabold uppercase tracking-[0.16em] px-3.5 pt-1 pb-1.5">Navegación</p>
+        <LayoutGroup id="docente-nav">
+          {navItems.map((item) => {
+            const isActive = item.href === '/dashboard/docente'
+              ? pathname === item.href
+              : pathname.startsWith(item.href);
 
-          return (
-            <Link
-              key={item.label}
-              href={item.href}
-              className={`group relative flex items-center gap-4 rounded-[1.5rem] px-6 py-4 text-[13px] font-black uppercase tracking-widest transition-all duration-700 ${
-                isActive
-                  ? 'bg-white text-[#011C40] shadow-[0_20px_40px_rgba(0,0,0,0.3)] translate-x-3 scale-[1.02]'
-                  : 'text-white/30 hover:text-white hover:bg-white/5 hover:translate-x-1'
-              }`}
-            >
-              {isActive && (
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-[#D4A574] rounded-full" />
-              )}
-              <item.icon
-                className={`h-5 w-5 transition-all duration-500 ${
-                  isActive ? 'text-[#D4A574] scale-110 rotate-3' : 'text-white/20 group-hover:text-[#7DD3FC] group-hover:rotate-12'
+            return (
+              <Link
+                key={item.label}
+                href={item.href}
+                aria-current={isActive ? 'page' : undefined}
+                className={`group relative flex items-center gap-3 rounded-[14px] px-4 py-[11px] text-[14px] font-bold transition-[color,transform] duration-200 ${
+                  isActive
+                    ? 'text-white'
+                    : 'text-white/55 hover:text-white/90 hover:translate-x-[3px]'
                 }`}
-              />
-              <span className="flex-1">{item.label}</span>
-              {isActive && <ChevronRight className="h-4 w-4 text-[#011C40]/20" />}
-            </Link>
-          );
-        })}
+              >
+                {isActive && (
+                  <motion.span
+                    layoutId="docente-nav-active"
+                    transition={{ type: 'spring', stiffness: 520, damping: 38 }}
+                    className="absolute inset-0 rounded-[14px] border"
+                    style={{
+                      zIndex: 0,
+                      background:
+                        'linear-gradient(135deg, rgba(212,165,116,0.22) 0%, rgba(184,137,90,0.10) 100%)',
+                      borderColor: 'rgba(212,165,116,0.32)',
+                      boxShadow:
+                        '0 10px 24px rgba(212,165,116,0.16), inset 0 1px 0 rgba(255,255,255,0.06)',
+                    }}
+                  >
+                    <span
+                      className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-[22px] rounded-r-[3px]"
+                      style={{ background: '#E5C295', boxShadow: '0 0 10px rgba(212,165,116,0.65)' }}
+                    />
+                  </motion.span>
+                )}
+                <span
+                  className={`relative z-[1] flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[10px] border transition-all duration-200 ${
+                    isActive
+                      ? 'border-transparent bg-gradient-to-br from-[#E5C295] to-[#D4A574] text-[#3a2410] shadow-[0_4px_12px_rgba(212,165,116,0.40)]'
+                      : 'border-white/[0.05] bg-white/[0.04] text-white/65 group-hover:bg-[#D4A574]/15 group-hover:text-[#E5C295]'
+                  }`}
+                >
+                  <item.icon className="h-[17px] w-[17px]" />
+                </span>
+                <span className="relative z-[1] flex-1">{item.label}</span>
+              </Link>
+            );
+          })}
+        </LayoutGroup>
       </nav>
 
       {/* Footer / Profile */}
-      <div className="relative z-10 p-6 mt-auto">
-        <div className="mb-6 p-1 bg-white/5 rounded-[2.5rem] flex items-center gap-4 pr-6 border border-white/5">
-          <div className="h-12 w-12 rounded-[2rem] bg-gradient-to-tr from-white/10 to-white/20 backdrop-blur-xl border border-white/20 flex items-center justify-center text-white font-black text-lg shadow-2xl relative overflow-hidden group">
-            <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="relative z-10 px-2.5 pb-[18px] pt-2.5 border-t border-white/[0.06]">
+        <div className="flex items-center gap-2.5 px-2.5 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+          <div className="h-[34px] w-[34px] rounded-full bg-gradient-to-tr from-[#E5C295] to-[#D4A574] flex items-center justify-center text-[#3a2410] font-extrabold text-[13px] shadow-[0_4px_12px_rgba(212,165,116,0.30),inset_0_1px_0_rgba(255,255,255,0.4)] shrink-0">
             {teacherName?.charAt(0)?.toUpperCase() ?? 'D'}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-white/30 text-[9px] font-black uppercase tracking-[0.2em] leading-none mb-1">Docente</p>
-            <p className="text-white font-black text-[14px] truncate tracking-tighter leading-none">{teacherName ?? 'Docente CEN'}</p>
+            <p className="text-white font-bold text-[13px] truncate leading-tight">{teacherName ?? 'Docente CEN'}</p>
+            <p className="text-white/32 text-[10px] truncate leading-tight">Docente</p>
           </div>
-          <Sparkles className="w-4 h-4 text-[#D4A574] animate-pulse" />
+          <Sparkles className="w-3.5 h-3.5 text-[#D4A574] shrink-0" />
         </div>
 
         <button
@@ -157,10 +184,10 @@ export default function Sidebar({
             await getSupabaseBrowser().auth.signOut();
             window.location.href = '/log-in';
           }}
-          className="group flex w-full items-center justify-center gap-3 rounded-[1.75rem] bg-white text-[#011C40] px-6 py-5 text-[11px] font-black uppercase tracking-[0.2em] transition-all duration-500 hover:bg-[#D4A574] hover:text-white hover:shadow-[0_20px_40px_rgba(212,165,116,0.3)] active:scale-95 border border-white/10"
+          className="group mt-1 flex w-full items-center gap-[7px] rounded-[10px] px-2 py-2 text-[12px] font-semibold text-white/30 transition-colors duration-200 hover:text-white/65"
         >
-          <LogOut className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-          Desconectar
+          <LogOut className="h-[13px] w-[13px] transition-transform group-hover:-translate-x-0.5" />
+          Cerrar sesión
         </button>
       </div>
     </aside>

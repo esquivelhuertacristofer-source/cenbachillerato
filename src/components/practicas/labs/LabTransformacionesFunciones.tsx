@@ -12,15 +12,20 @@
  * más alto (vértice) está en (h, k). Cálculo exacto.
  */
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { FichaTeorica } from "./_ficha";
+import { TRANSFORMACIONES_FICHA } from "./transformaciones-funciones-ficha";
+import { RetoNumericoCard } from "./_reto-numerico";
+import { LabSfx } from "./lab-audio";
 import {
   calcFuncion, ecuacion, TRANSFORMACIONES, ESCENARIOS, IDEAS, DATOS,
   A_MIN, A_MAX, A_STEP, A_DEF, H_MIN, H_MAX, H_STEP, H_DEF,
   K_MIN, K_MAX, K_STEP, K_DEF, MODO_DEF,
   fmtNum2, fmtNum1, fmtCoord, fmtPar, type Escenario, type Modo,
+  RETO_A2,
 } from "./transformaciones-funciones-data";
 
 const TransformacionesFuncionesScene = dynamic(() => import("./TransformacionesFuncionesScene"), {
@@ -52,6 +57,31 @@ export function LabTransformacionesFunciones({ color }: PracticaLabProps) {
   const [resetNonce, setResetNonce] = useState(0);
   const dir = useRef(1);
 
+  // reto evaluable, teoría (cajón deslizable) y sonido
+  const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
+  const [drawer, setDrawer] = useState(false);
+  const [sonido, setSonido] = useState(false);
+  const audioRef = useRef<LabSfx | null>(null);
+
+  const toggleSonido = useCallback(async () => {
+    if (!audioRef.current) audioRef.current = new LabSfx();
+    const sfx = audioRef.current;
+    if (sonido) {
+      sfx.mute();
+      setSonido(false);
+    } else {
+      await sfx.enable();
+      setSonido(true);
+    }
+  }, [sonido]);
+
+  useEffect(() => {
+    return () => {
+      audioRef.current?.dispose();
+      audioRef.current = null;
+    };
+  }, []);
+
   // Barrido automático de h (traslación horizontal): la gráfica completa se
   // desliza de un lado al otro del plano sin deformarse.
   useEffect(() => {
@@ -79,8 +109,8 @@ export function LabTransformacionesFunciones({ color }: PracticaLabProps) {
   const setAman = (v: number) => { setReproduciendo(false); setA(v); };
   const setHman = (v: number) => { setReproduciendo(false); setH(v); };
   const setKman = (v: number) => { setReproduciendo(false); setK(v); };
-  const setModoMan = (m: Modo) => { setReproduciendo(false); setModo(m); bump(); };
-  const aplicar = (e: Escenario) => { setReproduciendo(false); setModo(e.modo); setA(e.a); setH(e.h); setK(e.k); bump(); };
+  const setModoMan = (m: Modo) => { setReproduciendo(false); setModo(m); if (sonido) audioRef.current?.blip(); bump(); };
+  const aplicar = (e: Escenario) => { setReproduciendo(false); setModo(e.modo); setA(e.a); setH(e.h); setK(e.k); if (sonido) audioRef.current?.blip(); bump(); };
   const reset = () => { setReproduciendo(false); setModo(MODO_DEF); setA(A_DEF); setH(H_DEF); setK(K_DEF); bump(); };
   const bump = () => setResetNonce((n) => n + 1);
 
@@ -126,6 +156,26 @@ export function LabTransformacionesFunciones({ color }: PracticaLabProps) {
           color:${T.text2}; font-size:12.5px; font-weight:800; transition:all .15s; display:flex; align-items:center; justify-content:center; gap:7px; }
         .ex-seg[data-on="true"] { border-color:rgba(${color.rgba},0.7); background:rgba(${color.rgba},0.2); color:#fff; }
         @media (max-width: 1000px){ .ex-bottom { grid-template-columns: 1fr !important; } }
+
+        /* Cajón de teoría */
+        .ex-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
+          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
+        .ex-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
+        .ex-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
+          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
+          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
+          display:flex; flex-direction:column; }
+        .ex-drawer[data-open="true"] { transform:translateX(0); }
+        .ex-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
+          padding:18px 20px; border-bottom:1px solid ${T.line}; }
+        .ex-drawer-body { overflow-y:auto; padding:20px; flex:1; }
+        .ex-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
+          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+        .ex-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
+        .ex-teoria-fab { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); cursor:pointer; display:inline-flex; align-items:center; gap:9px;
+          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
+          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
+        .ex-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateX(-50%) translateY(-1px); }
       `}</style>
 
       <div className="ex-grid">
@@ -166,6 +216,12 @@ export function LabTransformacionesFunciones({ color }: PracticaLabProps) {
 
             {/* Toolbar */}
             <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
+              <button className="ex-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
+                <i className="fa-solid fa-book-open" />
+              </button>
+              <button className="ex-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
+                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
+              </button>
               <button className="ex-icobtn" data-on={reproduciendo} onClick={() => setReproduciendo((p) => !p)} title={reproduciendo ? "Pausar la traslación" : "Trasladar (mover h)"}>
                 <i className={`fa-solid ${reproduciendo ? "fa-pause" : "fa-play"}`} />
               </button>
@@ -176,6 +232,12 @@ export function LabTransformacionesFunciones({ color }: PracticaLabProps) {
                 <i className="fa-solid fa-rotate-left" />
               </button>
             </div>
+
+            {/* Botón flotante de Teoría */}
+            <button className="ex-teoria-fab" onClick={() => setDrawer(true)}>
+              <i className="fa-solid fa-book-open" />
+              Teoría
+            </button>
 
             {/* Pie: lectura en vivo */}
             <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 18px 14px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
@@ -356,6 +418,25 @@ export function LabTransformacionesFunciones({ color }: PracticaLabProps) {
         </div>
       </div>
 
+      {/* ── Objetivos ──────────────────────────────────────────────────────── */}
+      <div style={{ ...card, padding: "18px 22px", marginTop: 22 }}>
+        <Eyebrow>
+          <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
+          Objetivos
+        </Eyebrow>
+        {[
+          { txt: "Identifica la función padre (y = x² o y = x) y sus transformaciones", done: resetNonce > 0 },
+          { txt: "Modifica a, h y k para ver el efecto de cada transformación", done: resetNonce > 1 },
+          { txt: "Aplica al menos un escenario guiado (balón, recta, etc.)", done: resetNonce > 0 },
+          { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
+        ].map((o, i) => (
+          <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? "#4ade80" : T.text2, marginTop: 10 }}>
+            <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
+            <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
+          </div>
+        ))}
+      </div>
+
       {/* nota de honestidad del modelo */}
       <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
         <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
@@ -363,6 +444,39 @@ export function LabTransformacionesFunciones({ color }: PracticaLabProps) {
           Cálculo <strong>exacto</strong>: la gráfica se evalúa punto por punto con f(x) = a(x−h)² + k (o a(x−h) + k en lineal); el vértice es exactamente (h, k). El plano se dibuja a <strong>escala fija</strong> sobre una rejilla y la curva se <strong>recorta</strong> al rango visible, pero los <strong>valores numéricos</strong> de las etiquetas y lecturas siempre son los exactos.
         </span>
       </div>
+
+      {/* ── Reto evaluable: el ejercicio verbatim del ancla A2 ────────── */}
+      <RetoNumericoCard
+        reto={RETO_A2}
+        accent={accent}
+        aprobado={ejercicioAprobado}
+        onAprobado={() => setEjercicioAprobado(true)}
+        playSfx={
+          sonido
+            ? (ok) => {
+                if (ok) audioRef.current?.correcto();
+                else audioRef.current?.incorrecto();
+              }
+            : undefined
+        }
+      />
+
+      {/* ── Cajón de teoría ──────────────────────────────────────────────── */}
+      <div className="ex-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
+      <aside className="ex-drawer" data-open={drawer} aria-hidden={!drawer}>
+        <div className="ex-drawer-head">
+          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
+            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
+          </div>
+          <button className="ex-close" onClick={() => setDrawer(false)} title="Cerrar">
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
+        <div className="ex-drawer-body">
+          <FichaTeorica data={TRANSFORMACIONES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+        </div>
+      </aside>
     </div>
   );
 }

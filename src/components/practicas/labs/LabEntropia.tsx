@@ -15,10 +15,15 @@
  * Ciencias Naturales, Experimentales y Tecnología II (MCCEMS 2025).
  */
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, OK, card, Eyebrow, SceneBoundary } from "./_kit";
+import { FichaTeorica } from "./_ficha";
+import { RetoQuizCard } from "./_reto-quiz";
+import { LabSfx } from "./lab-audio";
+import { ENTROPIA_FICHA } from "./entropia-segunda-ley-ficha";
+import { QUIZ_A2 } from "./entropia-segunda-ley-data";
 import {
   type ProcesoKey,
   PROCESOS,
@@ -57,6 +62,31 @@ export function LabEntropia({ color }: PracticaLabProps) {
   const [vioCristal, setVioCristal] = useState(false);
   const [enfrioCerca, setEnfrioCerca] = useState(false);
 
+  // reto evaluable, teoría (cajón) y sonido
+  const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [sonido, setSonido] = useState(false);
+  const audioRef = useRef<LabSfx | null>(null);
+
+  const toggleSonido = useCallback(async () => {
+    if (!audioRef.current) audioRef.current = new LabSfx();
+    const sfx = audioRef.current;
+    if (sonido) {
+      sfx.mute();
+      setSonido(false);
+    } else {
+      await sfx.enable();
+      setSonido(true);
+    }
+  }, [sonido]);
+
+  useEffect(() => {
+    return () => {
+      audioRef.current?.dispose();
+      audioRef.current = null;
+    };
+  }, []);
+
   const proc = useMemo(() => getProceso(proceso), [proceso]);
   const tC = useMemo(() => kelvinACelsius(tempCristal), [tempCristal]);
 
@@ -66,6 +96,7 @@ export function LabEntropia({ color }: PracticaLabProps) {
     setProceso(k);
     setActivo(false); // cada proceso arranca en su estado inicial
     bump();
+    if (sonido) audioRef.current?.blip();
     if (k === "mezcla") setVioMezcla(true);
     if (k === "calor") setVioCalor(true);
     if (k === "cristal") setVioCristal(true);
@@ -89,6 +120,7 @@ export function LabEntropia({ color }: PracticaLabProps) {
     { txt: "Deja que el calor fluya al equilibrio", done: vioCalor },
     { txt: "Ordena un cristal cerca de 0 K", done: vioCristal },
     { txt: "Acércate al cero absoluto (S → 0)", done: enfrioCerca },
+    { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
   ];
 
   const sceneFallback = (
@@ -129,6 +161,26 @@ export function LabEntropia({ color }: PracticaLabProps) {
         .ex-actbtn { cursor:pointer; width:100%; display:flex; align-items:center; justify-content:center; gap:9px;
           padding:13px 16px; border-radius:13px; border:1px solid var(--exc); font-size:13.5px; font-weight:800; transition:all .15s; }
         @media (max-width: 1000px){ .ex-bottom { grid-template-columns: 1fr !important; } }
+
+        /* Cajón de teoría */
+        .ex-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
+          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
+        .ex-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
+        .ex-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
+          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
+          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
+          display:flex; flex-direction:column; }
+        .ex-drawer[data-open="true"] { transform:translateX(0); }
+        .ex-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
+          padding:18px 20px; border-bottom:1px solid ${T.line}; }
+        .ex-drawer-body { overflow-y:auto; padding:20px; flex:1; }
+        .ex-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
+          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+        .ex-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
+        .ex-teoria-fab { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); cursor:pointer; display:inline-flex; align-items:center; gap:9px;
+          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
+          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
+        .ex-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateX(-50%) translateY(-1px); }
       `}</style>
 
       <div className="ex-grid">
@@ -171,6 +223,12 @@ export function LabEntropia({ color }: PracticaLabProps) {
 
             {/* Toolbar */}
             <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(2,12,28,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
+              <button className="ex-icobtn" data-on={drawerOpen} onClick={() => setDrawerOpen(true)} title="Teoría">
+                <i className="fa-solid fa-book-open" />
+              </button>
+              <button className="ex-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
+                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
+              </button>
               <button className="ex-icobtn" data-on={!pausado} onClick={() => setPausado((p) => !p)} title={pausado ? "Reanudar" : "Pausar"}>
                 <i className={`fa-solid ${pausado ? "fa-play" : "fa-pause"}`} />
               </button>
@@ -186,6 +244,12 @@ export function LabEntropia({ color }: PracticaLabProps) {
             <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 18px 14px", background: "linear-gradient(0deg, rgba(2,10,24,0.88) 0%, transparent 100%)", pointerEvents: "none" }}>
               <div style={{ fontSize: 12.5, color: "#dCE8F6", lineHeight: 1.5, maxWidth: 560 }}>{proc.resumen}</div>
             </div>
+
+            {/* Botón flotante de Teoría */}
+            <button className="ex-teoria-fab" onClick={() => setDrawerOpen(true)}>
+              <i className="fa-solid fa-book-open" />
+              Teoría
+            </button>
           </div>
 
           {/* Selector de proceso + controles */}
@@ -328,6 +392,41 @@ export function LabEntropia({ color }: PracticaLabProps) {
           </span>
         </div>
       </div>
+
+      {/* ── Reto evaluable: el quiz verbatim del ancla ───────────────── */}
+      <RetoQuizCard
+        quiz={QUIZ_A2}
+        accent={accent}
+        rgba={color.rgba}
+        aprobado={ejercicioAprobado}
+        onAprobado={() => setEjercicioAprobado(true)}
+        playSfx={
+          sonido
+            ? (ok) => {
+                if (ok) audioRef.current?.correcto();
+                else audioRef.current?.incorrecto();
+              }
+            : undefined
+        }
+        playPick={sonido ? () => audioRef.current?.blip() : undefined}
+      />
+
+      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
+      <div className="ex-scrim" data-open={drawerOpen} onClick={() => setDrawerOpen(false)} />
+      <aside className="ex-drawer" data-open={drawerOpen} aria-hidden={!drawerOpen}>
+        <div className="ex-drawer-head">
+          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
+            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
+          </div>
+          <button className="ex-close" onClick={() => setDrawerOpen(false)} title="Cerrar">
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
+        <div className="ex-drawer-body">
+          <FichaTeorica data={ENTROPIA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+        </div>
+      </aside>
     </div>
   );
 }

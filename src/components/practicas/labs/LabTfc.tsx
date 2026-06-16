@@ -14,10 +14,15 @@
  * «Cálculo diferencial», propósito formativo 8 (MCCEMS 2025).
  */
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, OK, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { FichaTeorica } from "./_ficha";
+import { TFC_FICHA } from "./teorema-fundamental-calculo-ficha";
+import { RetoNumericoCard } from "./_reto-numerico";
+import { RETO_A2 } from "./teorema-fundamental-calculo-data";
+import { LabSfx } from "./lab-audio";
 import {
   FUNCIONES,
   FUNCION_DEFAULT,
@@ -62,6 +67,31 @@ export function LabTfc({ color }: PracticaLabProps) {
   const [autoRotate, setAutoRotate] = useState(false);
   const [resetNonce, setResetNonce] = useState(0);
 
+  // reto evaluable, teoría (cajón deslizable) y sonido
+  const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
+  const [drawer, setDrawer] = useState(false);
+  const [sonido, setSonido] = useState(false);
+  const audioRef = useRef<LabSfx | null>(null);
+
+  const toggleSonido = useCallback(async () => {
+    if (!audioRef.current) audioRef.current = new LabSfx();
+    const sfx = audioRef.current;
+    if (sonido) {
+      sfx.mute();
+      setSonido(false);
+    } else {
+      await sfx.enable();
+      setSonido(true);
+    }
+  }, [sonido]);
+
+  useEffect(() => {
+    return () => {
+      audioRef.current?.dispose();
+      audioRef.current = null;
+    };
+  }, []);
+
   // objetivos
   const [cambioFuncion, setCambioFuncion] = useState(false);
   const [refinoRiemann, setRefinoRiemann] = useState(false);
@@ -70,9 +100,10 @@ export function LabTfc({ color }: PracticaLabProps) {
 
   const bump = () => setResetNonce((k) => k + 1);
 
-  const elegir = (id: string) => { setFuncionId(id); setCambioFuncion(true); };
+  const elegir = (id: string) => { setFuncionId(id); setCambioFuncion(true); if (sonido) audioRef.current?.blip(); };
   const elegirModo = (m: Modo) => {
     setModo(m);
+    if (sonido) audioRef.current?.blip();
     if (m === "acumulacion") setVioAcumulacion(true);
     if (m === "conexion") setVioConexion(true);
   };
@@ -98,6 +129,7 @@ export function LabTfc({ color }: PracticaLabProps) {
     { txt: "Refina la suma de Riemann (≥16 rect.)", done: refinoRiemann },
     { txt: "Observa la función de acumulación", done: vioAcumulacion },
     { txt: "Verifica F′(x) = f(x) (el TFC)", done: vioConexion },
+    { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
   ];
 
   const sceneFallback = (
@@ -142,6 +174,26 @@ export function LabTfc({ color }: PracticaLabProps) {
           background:var(--tfc); border:2px solid #061528; box-shadow:0 2px 8px -2px var(--tfc); cursor:pointer; }
         .tfc-slider::-moz-range-thumb { width:18px; height:18px; border-radius:50%; background:var(--tfc); border:2px solid #061528; cursor:pointer; }
         @media (max-width: 1000px){ .tfc-bottom { grid-template-columns: 1fr !important; } }
+
+        /* Cajón de teoría */
+        .tfc-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
+          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
+        .tfc-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
+        .tfc-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
+          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
+          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
+          display:flex; flex-direction:column; }
+        .tfc-drawer[data-open="true"] { transform:translateX(0); }
+        .tfc-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
+          padding:18px 20px; border-bottom:1px solid ${T.line}; }
+        .tfc-drawer-body { overflow-y:auto; padding:20px; flex:1; }
+        .tfc-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
+          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+        .tfc-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
+        .tfc-teoria-fab { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); cursor:pointer; display:inline-flex; align-items:center; gap:9px;
+          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
+          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
+        .tfc-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateX(-50%) translateY(-1px); }
       `}</style>
 
       <div className="tfc-grid">
@@ -184,6 +236,12 @@ export function LabTfc({ color }: PracticaLabProps) {
 
             {/* Toolbar */}
             <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(2,12,28,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
+              <button className="tfc-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
+                <i className="fa-solid fa-book-open" />
+              </button>
+              <button className="tfc-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
+                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
+              </button>
               <button className="tfc-icobtn" data-on={!pausado} onClick={() => setPausado((p) => !p)} title={pausado ? "Reanudar" : "Pausar"}>
                 <i className={`fa-solid ${pausado ? "fa-play" : "fa-pause"}`} />
               </button>
@@ -194,6 +252,12 @@ export function LabTfc({ color }: PracticaLabProps) {
                 <i className="fa-solid fa-rotate-left" />
               </button>
             </div>
+
+            {/* Botón flotante de Teoría */}
+            <button className="tfc-teoria-fab" onClick={() => setDrawer(true)}>
+              <i className="fa-solid fa-book-open" />
+              Teoría
+            </button>
 
             {/* Pie: lectura del modo actual */}
             <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 18px 14px", background: "linear-gradient(0deg, rgba(2,10,24,0.88) 0%, transparent 100%)", pointerEvents: "none" }}>
@@ -385,6 +449,39 @@ export function LabTfc({ color }: PracticaLabProps) {
           </span>
         </div>
       </div>
+
+      {/* ── Reto evaluable: el ejercicio verbatim del ancla A2 ────────── */}
+      <RetoNumericoCard
+        reto={RETO_A2}
+        accent={accent}
+        aprobado={ejercicioAprobado}
+        onAprobado={() => setEjercicioAprobado(true)}
+        playSfx={
+          sonido
+            ? (ok) => {
+                if (ok) audioRef.current?.correcto();
+                else audioRef.current?.incorrecto();
+              }
+            : undefined
+        }
+      />
+
+      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
+      <div className="tfc-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
+      <aside className="tfc-drawer" data-open={drawer} aria-hidden={!drawer}>
+        <div className="tfc-drawer-head">
+          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
+            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
+          </div>
+          <button className="tfc-close" onClick={() => setDrawer(false)} title="Cerrar">
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
+        <div className="tfc-drawer-body">
+          <FichaTeorica data={TFC_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+        </div>
+      </aside>
     </div>
   );
 }

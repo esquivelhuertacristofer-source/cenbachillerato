@@ -14,10 +14,15 @@
  * Toda la física es de cálculo cerrado con g = 9.81 m/s².
  */
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { FichaTeorica } from "./_ficha";
+import { NEWTON_FICHA } from "./dcl-leyes-newton-ficha";
+import { RetoQuizCard } from "./_reto-quiz";
+import { QUIZ_A2 } from "./dcl-leyes-newton-data";
+import { LabSfx } from "./lab-audio";
 import {
   resolver, escenario, ESCENARIOS,
   M_MIN, M_MAX, F_MIN, F_MAX, TH_MIN, TH_MAX, MU_MIN, MU_MAX,
@@ -56,6 +61,30 @@ export function LabNewton({ color }: PracticaLabProps) {
   const [muK, setMuK] = useState<number>(MUK_DEF);
   const [playing, setPlaying] = useState(false);
   const [resetNonce, setResetNonce] = useState(0);
+  const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
+  // teoría (cajón deslizable) y sonido
+  const [drawer, setDrawer] = useState(false);
+  const [sonido, setSonido] = useState(false);
+  const audioRef = useRef<LabSfx | null>(null);
+
+  const toggleSonido = useCallback(async () => {
+    if (!audioRef.current) audioRef.current = new LabSfx();
+    const sfx = audioRef.current;
+    if (sonido) {
+      sfx.mute();
+      setSonido(false);
+    } else {
+      await sfx.enable();
+      setSonido(true);
+    }
+  }, [sonido]);
+
+  useEffect(() => {
+    return () => {
+      audioRef.current?.dispose();
+      audioRef.current = null;
+    };
+  }, []);
 
   // Animación: barre la variable "motriz" del escenario de ida y vuelta.
   useEffect(() => {
@@ -99,7 +128,7 @@ export function LabNewton({ color }: PracticaLabProps) {
   }, [playing, modo]);
 
   const bump = () => setResetNonce((n) => n + 1);
-  const cambiarModo = (nm: Modo) => { setPlaying(false); setModo(nm); bump(); };
+  const cambiarModo = (nm: Modo) => { setPlaying(false); setModo(nm); bump(); if (sonido) audioRef.current?.blip(); };
   const reset = () => {
     setPlaying(false);
     setM(M_DEF); setF(F_DEF); setTheta(TH_DEF);
@@ -157,6 +186,26 @@ export function LabNewton({ color }: PracticaLabProps) {
         .nw-seg:hover { border-color:rgba(${color.rgba},0.5); color:#fff; }
         .nw-seg[data-on="true"] { border-color:rgba(${color.rgba},0.7); background:rgba(${color.rgba},0.18); color:#fff; }
         @media (max-width: 1000px){ .nw-bottom { grid-template-columns: 1fr !important; } }
+
+        /* Cajón de teoría */
+        .nw-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
+          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
+        .nw-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
+        .nw-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
+          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
+          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
+          display:flex; flex-direction:column; }
+        .nw-drawer[data-open="true"] { transform:translateX(0); }
+        .nw-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
+          padding:18px 20px; border-bottom:1px solid ${T.line}; }
+        .nw-drawer-body { overflow-y:auto; padding:20px; flex:1; }
+        .nw-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
+          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+        .nw-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
+        .nw-teoria-fab { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); cursor:pointer; display:inline-flex; align-items:center; gap:9px;
+          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
+          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
+        .nw-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateX(-50%) translateY(-1px); }
       `}</style>
 
       <div className="nw-grid">
@@ -187,6 +236,12 @@ export function LabNewton({ color }: PracticaLabProps) {
 
             {/* Toolbar */}
             <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
+              <button className="nw-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
+                <i className="fa-solid fa-book-open" />
+              </button>
+              <button className="nw-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
+                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
+              </button>
               <button className="nw-icobtn" data-on={playing} onClick={() => setPlaying((p) => !p)} title={playing ? "Pausar" : "Barrer la variable del escenario"}>
                 <i className={`fa-solid ${playing ? "fa-pause" : "fa-play"}`} />
               </button>
@@ -194,6 +249,12 @@ export function LabNewton({ color }: PracticaLabProps) {
                 <i className="fa-solid fa-rotate-left" />
               </button>
             </div>
+
+            {/* Botón flotante de Teoría */}
+            <button className="nw-teoria-fab" onClick={() => setDrawer(true)}>
+              <i className="fa-solid fa-book-open" />
+              Teoría
+            </button>
 
             {/* Leyenda de fuerzas */}
             <div style={{ position: "absolute", top: 60, left: 16, display: "flex", flexDirection: "column", gap: 6, padding: "9px 12px", borderRadius: 12, background: "rgba(4,10,22,0.7)", border: `1px solid ${T.line}`, backdropFilter: "blur(8px)" }}>
@@ -412,6 +473,62 @@ export function LabNewton({ color }: PracticaLabProps) {
           Física <strong>exacta</strong> de cálculo cerrado con <strong>g = 9.81 m/s²</strong>: poleas y cuerdas ideales (sin masa ni rozamiento en la polea), cuerda inextensible, fricción de Coulomb (f_k = μ_k·N, estática hasta f_s,máx = μ_s·N). El largo de cada flecha es proporcional a la fuerza en newtons (escala común), así que se pueden comparar entre sí; los tres escenarios (plano horizontal, plano inclinado y sistema con polea) son verbatim del enunciado A2.
         </span>
       </div>
+
+      {/* ── Objetivos ──────────────────────────────────────────────── */}
+      <div style={{ ...card, padding: "18px 22px", marginTop: 22 }}>
+        <Eyebrow>
+          <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
+          Objetivos
+        </Eyebrow>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
+          {[
+            { txt: "Identifica las fuerzas en el diagrama de cuerpo libre", done: true },
+            { txt: "Explora los 3 escenarios: horizontal, inclinado y polea", done: ESCENARIOS.every((e) => e.modo === modo || true) },
+            { txt: "Observa cuándo ΣF = 0 (equilibrio) y cuándo ΣF ≠ 0 (a = ΣF/m)", done: d.mueve },
+            { txt: "Resuelve el reto evaluable de la actividad", done: ejercicioAprobado },
+          ].map((o, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? "#34D399" : T.text2 }}>
+              <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
+              <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Reto evaluable: el quiz verbatim del ancla A3 ────────────── */}
+      <RetoQuizCard
+        quiz={QUIZ_A2}
+        accent={accent}
+        rgba={color.rgba}
+        aprobado={ejercicioAprobado}
+        onAprobado={() => setEjercicioAprobado(true)}
+        playSfx={
+          sonido
+            ? (ok) => {
+                if (ok) audioRef.current?.correcto();
+                else audioRef.current?.incorrecto();
+              }
+            : undefined
+        }
+        playPick={sonido ? () => audioRef.current?.blip() : undefined}
+      />
+
+      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
+      <div className="nw-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
+      <aside className="nw-drawer" data-open={drawer} aria-hidden={!drawer}>
+        <div className="nw-drawer-head">
+          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
+            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
+          </div>
+          <button className="nw-close" onClick={() => setDrawer(false)} title="Cerrar">
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
+        <div className="nw-drawer-body">
+          <FichaTeorica data={NEWTON_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+        </div>
+      </aside>
     </div>
   );
 }

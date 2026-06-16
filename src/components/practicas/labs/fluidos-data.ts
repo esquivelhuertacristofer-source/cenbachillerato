@@ -311,3 +311,66 @@ export const DATOS: Dato[] = [
   { valor: "1 000 m", texto: "Desnivel que vence el Cutzamala para llevar agua al Valle de México.", icono: "💧" },
   { valor: "~1 400×", texto: "La glicerina es ~1 400 veces más viscosa que el agua.", icono: "🍯" },
 ];
+
+/* ── Reto evaluable A2 ── VERBATIM de CNEYT-V-P09-A2 (ejercicio_matematico) ── */
+// Fuente: scripts/_sem5_dump.txt líneas 2654-2669
+import type { RetoNumericoData } from "./_reto-numerico";
+
+export const RETO_A2: RetoNumericoData = {
+  titulo: "Analizando el comportamiento de los fluidos",
+  contexto:
+    "Los tres incisos recorren el contenido formativo de la progresión: Arquímedes (a), Pascal e hidrostática (b) y continuidad/Bernoulli (c). En el laboratorio 3D cada uno corresponde a un modo.",
+  problema:
+    "Resuelve tres situaciones con fluidos (usa g = 9.81 m/s²; densidad del agua ρ = 1000 kg/m³).\n\n" +
+    "a) FLOTACIÓN (Arquímedes). Un bloque de madera de pino de densidad ρ = 500 kg/m³ y volumen V = 8 L = 0.008 m³ se coloca en agua. ¿Flota o se hunde? ¿Qué fracción queda sumergida y cuánto vale el empuje?\n\n" +
+    "b) PRESIÓN (Pascal / hidrostática). ¿Cuál es la presión manométrica (debida solo al agua) a una profundidad de h = 8 m en una presa? Si además sobre la superficie actúa la presión atmosférica de 101 325 Pa, ¿cuál es la presión absoluta?\n\n" +
+    "c) CONTINUIDAD. Por una tubería de sección A₁ = 0.02 m² circula agua con velocidad v₁ = 1.5 m/s. La tubería se estrecha a A₂ = 0.005 m² (la cuarta parte). ¿Cuál es la velocidad v₂ en la sección estrecha? Según Bernoulli, ¿la presión ahí sube o baja?",
+  // Campos evaluables — valores exactos de la respuesta_final verbatim:
+  // a) E = ρ_cuerpo·V·g = 500 × 0.008 × 9.81 = 39.24 N; fracción = 500/1000 = 0.50 (50 %)
+  // b) P_manométrica = 1000 × 9.81 × 8 = 78 480 Pa; P_absoluta = 101 325 + 78 480 = 179 805 Pa
+  // c) v₂ = 1.5 × (0.02/0.005) = 1.5 × 4 = 6 m/s
+  campos: [
+    {
+      etiqueta: "a) Fracción sumergida del bloque de pino (%)",
+      objetivo: 50,
+      tolerancia: 0,
+      unidad: "%",
+      placeholder: "50",
+    },
+    {
+      etiqueta: "a) Empuje E sobre el bloque",
+      objetivo: 39.24,
+      tolerancia: 0.02,
+      unidad: "N",
+      placeholder: "39.24",
+    },
+    {
+      etiqueta: "b) Presión manométrica a h = 8 m",
+      objetivo: 78480,
+      tolerancia: 5,
+      unidad: "Pa",
+      placeholder: "78480",
+    },
+    {
+      etiqueta: "b) Presión absoluta a h = 8 m",
+      objetivo: 179805,
+      tolerancia: 10,
+      unidad: "Pa",
+      placeholder: "179805",
+    },
+    {
+      etiqueta: "c) Velocidad v₂ en la sección estrecha",
+      objetivo: 6,
+      tolerancia: 0,
+      unidad: "m/s",
+      placeholder: "6",
+    },
+  ],
+  pasosGuia: [
+    "a) Como ρ_cuerpo (500) < ρ_agua (1000), FLOTA. Fracción sumergida = ρ_cuerpo/ρ_agua = 500/1000 = 0.50 (50 %). En equilibrio el empuje iguala al peso: E = ρ_cuerpo·V·g = 500 × 0.008 × 9.81 = 39.24 N.",
+    "b) Presión manométrica: P = ρ·g·h = 1000 × 9.81 × 8 = 78 480 Pa ≈ 78.5 kPa. Presión absoluta: P_abs = P_atm + ρ·g·h = 101 325 + 78 480 = 179 805 Pa ≈ 179.8 kPa.",
+    "c) Continuidad A₁·v₁ = A₂·v₂ → v₂ = v₁·(A₁/A₂) = 1.5 × (0.02/0.005) = 1.5 × 4 = 6 m/s. Por Bernoulli, donde la velocidad aumenta la presión BAJA, así que la presión en la sección estrecha es menor.",
+  ],
+  respuestaFinal:
+    "a) Flota, 50 % sumergido, E = 39.24 N. b) Manométrica 78 480 Pa (≈78.5 kPa); absoluta ≈179 805 Pa (≈179.8 kPa). c) v₂ = 6 m/s; la presión baja en el estrechamiento.",
+};

@@ -17,10 +17,15 @@
  * Toda la física es de cálculo cerrado (Gravitación universal y 3.ª ley de Kepler).
  */
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { FichaTeorica } from "./_ficha";
+import { GRAVITACION_FICHA } from "./gravitacion-universal-ficha";
+import { RetoNumericoCard } from "./_reto-numerico";
+import { RETO_A2 } from "./gravitacion-universal-data";
+import { LabSfx } from "./lab-audio";
 import {
   type Modo, resolverFuerza, resolverPeso, resolverOrbita, cuerpoPorId, CUERPOS,
   R_MIN, R_MAX, R_DEF, F_DEF,
@@ -62,6 +67,31 @@ export function LabGravitacion({ color }: PracticaLabProps) {
   const [playing, setPlaying] = useState<boolean>(true);
   const [resetNonce, setResetNonce] = useState(0);
 
+  // reto evaluable, teoría (cajón deslizable) y sonido
+  const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
+  const [drawer, setDrawer] = useState(false);
+  const [sonido, setSonido] = useState(false);
+  const audioRef = useRef<LabSfx | null>(null);
+
+  const toggleSonido = useCallback(async () => {
+    if (!audioRef.current) audioRef.current = new LabSfx();
+    const sfx = audioRef.current;
+    if (sonido) {
+      sfx.mute();
+      setSonido(false);
+    } else {
+      await sfx.enable();
+      setSonido(true);
+    }
+  }, [sonido]);
+
+  useEffect(() => {
+    return () => {
+      audioRef.current?.dispose();
+      audioRef.current = null;
+    };
+  }, []);
+
   // Reproduce el movimiento orbital (rAF) — solo en el modo órbita.
   useEffect(() => {
     if (modo !== "orbita" || !playing) return;
@@ -88,7 +118,12 @@ export function LabGravitacion({ color }: PracticaLabProps) {
     else { setAlt(ALT_DEF); setT(0); }
     bump();
   };
-  const cambiarModo = (nm: Modo) => { setModo(nm); setT(0); bump(); };
+  const cambiarModo = (nm: Modo) => {
+    if (sonido) audioRef.current?.blip();
+    setModo(nm);
+    setT(0);
+    bump();
+  };
 
   // valores en vivo según el modo
   const fz = resolverFuerza(r);
@@ -104,6 +139,13 @@ export function LabGravitacion({ color }: PracticaLabProps) {
 
   const modoActual = MODOS.find((x) => x.id === modo)!;
   const modoCol = modoActual.col;
+
+  const objetivos = [
+    { txt: "Explora la fuerza gravitacional Tierra–Luna (modo Fuerza)", done: modo === "fuerza" || modo === "peso" || modo === "orbita" },
+    { txt: "Compara el peso en distintos cuerpos celestes (modo Peso)", done: modo === "peso" || modo === "orbita" },
+    { txt: "Descubre la órbita geoestacionaria Mexsat (modo Órbita)", done: modo === "orbita" },
+    { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
+  ];
 
   const sceneFallback = (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 28, textAlign: "center" }}>
@@ -143,6 +185,26 @@ export function LabGravitacion({ color }: PracticaLabProps) {
         .gv-tab:hover { background:rgba(255,255,255,0.06); }
         .gv-bodies { display:grid; grid-template-columns: repeat(4,1fr); gap:8px; }
         @media (max-width: 1000px){ .gv-bottom { grid-template-columns: 1fr !important; } }
+
+        /* Cajón de teoría */
+        .gv-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
+          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
+        .gv-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
+        .gv-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
+          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
+          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
+          display:flex; flex-direction:column; }
+        .gv-drawer[data-open="true"] { transform:translateX(0); }
+        .gv-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
+          padding:18px 20px; border-bottom:1px solid ${T.line}; }
+        .gv-drawer-body { overflow-y:auto; padding:20px; flex:1; }
+        .gv-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
+          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+        .gv-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
+        .ex-teoria-fab { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); cursor:pointer; display:inline-flex; align-items:center; gap:9px;
+          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
+          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
+        .ex-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateX(-50%) translateY(-1px); }
       `}</style>
 
       {/* Selector de modo */}
@@ -190,8 +252,14 @@ export function LabGravitacion({ color }: PracticaLabProps) {
 
             {/* Toolbar */}
             <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
+              <button className="gv-icobtn" data-on={String(drawer)} onClick={() => setDrawer(true)} title="Teoría">
+                <i className="fa-solid fa-book-open" />
+              </button>
+              <button className="gv-icobtn" data-on={String(sonido)} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
+                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
+              </button>
               {modo === "orbita" && (
-                <button className="gv-icobtn" data-on={playing} onClick={() => setPlaying((p) => !p)} title={playing ? "Pausar" : "Reproducir la órbita"}>
+                <button className="gv-icobtn" data-on={String(playing)} onClick={() => setPlaying((p) => !p)} title={playing ? "Pausar" : "Reproducir la órbita"}>
                   <i className={`fa-solid ${playing ? "fa-pause" : "fa-play"}`} />
                 </button>
               )}
@@ -199,6 +267,12 @@ export function LabGravitacion({ color }: PracticaLabProps) {
                 <i className="fa-solid fa-rotate-left" />
               </button>
             </div>
+
+            {/* Botón flotante de Teoría */}
+            <button className="ex-teoria-fab" onClick={() => setDrawer(true)}>
+              <i className="fa-solid fa-book-open" />
+              Teoría
+            </button>
 
             {/* Pie: lectura en vivo */}
             <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 18px 14px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
@@ -407,6 +481,55 @@ export function LabGravitacion({ color }: PracticaLabProps) {
           Física <strong>exacta</strong> de cálculo cerrado: Ley de Gravitación Universal (F = G·M·m/r²), peso (W = m·g, con g_Tierra = 9.81 m/s²) y órbita circular con la 3.ª ley de Kepler (T = 2π·√(r³/GM), v = √(GM/r)). Tamaños y distancias del sistema solar <strong>no</strong> están a escala real (la Luna está 30 diámetros terrestres más lejos de lo que cabe en pantalla); las longitudes de las flechas son proporcionales a sus magnitudes (acotadas para verse). El radio de la órbita sí es proporcional al radio terrestre. Valores, datos y procedimiento son verbatim del enunciado A2.
         </span>
       </div>
+
+      {/* ── Objetivos ─────────────────────────────────────────────────────── */}
+      <div style={{ ...card, padding: "18px 22px", marginTop: 22 }}>
+        <Eyebrow>
+          <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
+          Objetivos
+        </Eyebrow>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
+          {objetivos.map((o, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? "#34D399" : T.text2 }}>
+              <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
+              <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Reto evaluable: el ejercicio verbatim del ancla A2 ────────────── */}
+      <RetoNumericoCard
+        reto={RETO_A2}
+        accent={accent}
+        aprobado={ejercicioAprobado}
+        onAprobado={() => setEjercicioAprobado(true)}
+        playSfx={
+          sonido
+            ? (ok) => {
+                if (ok) audioRef.current?.correcto();
+                else audioRef.current?.incorrecto();
+              }
+            : undefined
+        }
+      />
+
+      {/* ── Cajón de teoría ──────────────────────────────────────────────── */}
+      <div className="gv-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
+      <aside className="gv-drawer" data-open={drawer} aria-hidden={!drawer}>
+        <div className="gv-drawer-head">
+          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
+            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
+          </div>
+          <button className="gv-close" onClick={() => setDrawer(false)} title="Cerrar">
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
+        <div className="gv-drawer-body">
+          <FichaTeorica data={GRAVITACION_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+        </div>
+      </aside>
     </div>
   );
 }

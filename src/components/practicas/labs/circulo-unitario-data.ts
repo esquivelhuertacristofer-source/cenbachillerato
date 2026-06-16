@@ -160,6 +160,62 @@ export const DATOS: { valor: string; texto: string; icono: string }[] = [
   { valor: "tan θ = sen θ / cos θ", texto: "indefinida cuando cos θ = 0 (en 90° y 270°)", icono: "fa-slash" },
 ];
 
+/* ── Reto evaluable — PM-IV-P04-A2 (ejercicio_matematico) ────────────────── */
+// VERBATIM de PM-IV-P04-A2, tipo=ejercicio_matematico, practica_slug=circulo-unitario.
+// Fuente: scripts/_sem4_dump.txt líneas 4365–4380.
+//
+// Aritmética verificada:
+//   (a) ángulo ref. 150° = 180°−150° = 30°; Q-II → sen>0, cos<0.
+//       sen(150°) = +sen(30°) = 1/2 = 0.5
+//       cos(150°) = −cos(30°) = −√3/2 ≈ −0.8660
+//       tan(150°) = (1/2)/(−√3/2) = −1/√3 = −√3/3 ≈ −0.5774
+//   (b) 270° sobre eje y negativo → punto (0, −1).
+//       cos(270°) = 0    sen(270°) = −1
+//   (c) tan(45°) = (√2/2)/(√2/2) = 1
+//       sen²(45°)+cos²(45°) = (0.5)+(0.5) = 1 ✓
+//   (d) 225° = 180°+45° → Q-III → ref = 45°; sen<0, cos<0.
+//       sen(225°) = −√2/2 ≈ −0.7071    cos(225°) = −√2/2 ≈ −0.7071
+
+import type { RetoNumericoData } from "./_reto-numerico";
+
+export const RETO_A2: RetoNumericoData = {
+  titulo: "Determino valores trigonométricos exactos en el círculo unitario",
+  contexto: "valores adimensionales (razones trigonométricas)",
+  problema:
+    "Usando el círculo unitario y los valores exactos de las razones trigonométricas:\n\n" +
+    "(a) Encuentra sen(150°), cos(150°) y tan(150°) usando el ángulo de referencia en el Cuadrante II.\n" +
+    "(b) Encuentra cos(270°) y sen(270°) directamente de las coordenadas del círculo unitario.\n" +
+    "(c) Calcula tan(45°) usando sus valores exactos. Verifica la identidad: sen²(45°) + cos²(45°) = 1.\n" +
+    "(d) En el círculo unitario, ¿en qué cuadrante está el ángulo 225°? ¿Cuáles son sus valores exactos de seno y coseno?",
+  campos: [
+    // (a) sen(150°) = 1/2 = 0.5  (exacto)
+    { etiqueta: "a) sen(150°)", objetivo: 0.5, tolerancia: 0, placeholder: "0.5" },
+    // (a) cos(150°) = −√3/2 ≈ −0.8660  (irracional → tolerancia 0.002)
+    { etiqueta: "a) cos(150°)", objetivo: -0.866, tolerancia: 0.002, placeholder: "−0.866" },
+    // (a) tan(150°) = −√3/3 ≈ −0.5774  (irracional → tolerancia 0.002)
+    { etiqueta: "a) tan(150°)", objetivo: -0.577, tolerancia: 0.002, placeholder: "−0.577" },
+    // (b) cos(270°) = 0  (exacto)
+    { etiqueta: "b) cos(270°)", objetivo: 0, tolerancia: 0, placeholder: "0" },
+    // (b) sen(270°) = −1  (exacto)
+    { etiqueta: "b) sen(270°)", objetivo: -1, tolerancia: 0, placeholder: "−1" },
+    // (c) tan(45°) = 1  (exacto)
+    { etiqueta: "c) tan(45°)", objetivo: 1, tolerancia: 0, placeholder: "1" },
+    // (d) sen(225°) = −√2/2 ≈ −0.7071  (irracional → tolerancia 0.002)
+    { etiqueta: "d) sen(225°)", objetivo: -0.707, tolerancia: 0.002, placeholder: "−0.707" },
+    // (d) cos(225°) = −√2/2 ≈ −0.7071  (irracional → tolerancia 0.002)
+    { etiqueta: "d) cos(225°)", objetivo: -0.707, tolerancia: 0.002, placeholder: "−0.707" },
+  ],
+  pasosGuia: [
+    "(a) El ángulo de referencia de 150° es 180° - 150° = 30°. En el cuadrante II: sen > 0, cos < 0.",
+    "(a) sen(150°) = sen(30°) = 1/2. cos(150°) = -cos(30°) = -√3/2. tan(150°) = sen/cos = (1/2)/(-√3/2) = -1/√3 = -√3/3.",
+    "(b) 270° está en el eje negativo de las y. Las coordenadas del punto son (0, -1). Por lo tanto cos(270°) = 0 y sen(270°) = -1.",
+    "(c) tan(45°) = sen(45°)/cos(45°) = (√2/2)/(√2/2) = 1. Verificación: sen²(45°) + cos²(45°) = (√2/2)² + (√2/2)² = 1/2 + 1/2 = 1. ✓",
+    "(d) 225° = 180° + 45°, está en el Cuadrante III (entre 180° y 270°). En el Q-III sen < 0 y cos < 0. Ángulo de referencia = 45°. sen(225°) = -√2/2, cos(225°) = -√2/2.",
+  ],
+  respuestaFinal:
+    "(a) sen(150°)=1/2, cos(150°)=-√3/2, tan(150°)=-√3/3. (b) cos(270°)=0, sen(270°)=-1. (c) tan(45°)=1; identidad verificada: 1/2+1/2=1. (d) Q-III: sen(225°)=-√2/2, cos(225°)=-√2/2.",
+};
+
 /* ── Formato ──────────────────────────────────────────────────────────────── */
 const ES = (n: number, dec: number) =>
   n.toLocaleString("es-MX", { maximumFractionDigits: dec, minimumFractionDigits: 0 }).replace("-", "−");

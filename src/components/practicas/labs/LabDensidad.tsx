@@ -17,10 +17,14 @@
  * física (sin 3D) en lugar de crashear.
  */
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, NUM, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { T, OK, NUM, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { LabSfx } from "./lab-audio";
+import { FichaTeorica } from "./_ficha";
+import { DENSIDAD_FICHA } from "./densidad-ficha";
+import { EJERCICIO_A6 } from "./densidad-data";
 
 const DensidadScene = dynamic(() => import("./DensidadScene"), {
   ssr: false,
@@ -286,6 +290,32 @@ export function LabDensidad({ color }: PracticaLabProps) {
   const [showForces, setShowForces] = useState(true);
   const [autoRotate, setAutoRotate] = useState(false);
   const [dropNonce, setDropNonce] = useState(0);
+  // sonido + teoría + interactividad ampliada
+  const [sonido, setSonido] = useState(false);
+  const [drawer, setDrawer] = useState(false); // cajón de teoría
+  const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
+  const audioRef = useRef<LabSfx | null>(null);
+
+  useEffect(() => () => audioRef.current?.dispose(), []);
+
+  const toggleSonido = async () => {
+    if (!sonido) {
+      if (!audioRef.current) audioRef.current = new LabSfx();
+      await audioRef.current.enable();
+      audioRef.current.burbujas(true); // ambiente acuático del tanque
+      setSonido(true);
+    } else {
+      audioRef.current?.burbujas(false);
+      audioRef.current?.mute();
+      setSonido(false);
+    }
+  };
+
+  // Soltar el objeto de nuevo (con salpicadura sonora si el sonido está activo)
+  const soltar = () => {
+    setDropNonce((n) => n + 1);
+    if (sonido) audioRef.current?.gota();
+  };
 
   const liquido = LIQUIDOS.find((l) => l.key === liquidoKey)!;
   const isCustom = materialKey === "custom";
@@ -321,6 +351,7 @@ export function LabDensidad({ color }: PracticaLabProps) {
     { txt: "Haz que un objeto se hunda", done: ratio > 1 },
     { txt: "Logra el equilibrio (ρ ≈ ρ líquido)", done: neutral },
     { txt: "Haz flotar un metal cambiando el líquido", done: !isCustom && (material?.metal ?? 0) > 0.5 && ratio < 1 },
+    { txt: "Resuelve el ejercicio de cálculo de densidad", done: ejercicioAprobado },
   ];
 
   const grid2: React.CSSProperties = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 };
@@ -378,6 +409,28 @@ export function LabDensidad({ color }: PracticaLabProps) {
         .dx-icobtn:hover { background:rgba(255,255,255,0.12); }
         .dx-divider { height:1px; background:${T.line}; margin:18px 0; }
         @media (max-width: 1000px){ .dx-bottom { grid-template-columns: 1fr !important; } }
+        .dx-play { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:13px 20px;
+          border-radius:12px; border:none; background:${accent}; color:#04121f; font-size:14.5px; font-weight:800; transition:all .15s; }
+        .dx-play:hover { filter:brightness(1.08); }
+        .dx-play:disabled { opacity:0.55; cursor:default; }
+        .dx-cls { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:12px 22px;
+          border-radius:12px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:14px; font-weight:800; transition:all .14s; }
+        .dx-drawer { position:absolute; top:0; right:0; height:100%; width:min(540px, 94%); transform:translateX(102%);
+          transition:transform .34s cubic-bezier(.22,.61,.36,1); z-index:30; display:flex; flex-direction:column;
+          background:linear-gradient(180deg, rgba(6,18,38,0.97), rgba(3,12,26,0.98)); border-left:1px solid rgba(${color.rgba},0.3);
+          box-shadow:-20px 0 60px -20px rgba(0,0,0,0.6); }
+        .dx-drawer[data-open="true"] { transform:translateX(0); }
+        .dx-scrim { position:absolute; inset:0; background:rgba(2,8,18,0.5); backdrop-filter:blur(2px); z-index:20; opacity:0;
+          pointer-events:none; transition:opacity .3s; }
+        .dx-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
+        .dx-opt { cursor:pointer; display:flex; align-items:center; gap:10px; padding:11px 14px; border-radius:11px;
+          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:700;
+          text-align:left; transition:all .14s; }
+        .dx-opt:hover:not(:disabled) { border-color:${T.lineStrong}; background:${T.glassSoft}; color:#fff; }
+        .dx-opt:disabled { cursor:default; }
+        .dx-num { width:120px; background:${T.inset}; border:1.5px solid ${T.line}; border-radius:10px; color:${T.text};
+          font-size:16px; font-weight:800; padding:10px 12px; outline:none; text-align:right; }
+        .dx-num:focus { border-color:${accent}; }
       `}</style>
 
       <div className="dx-grid">
@@ -455,15 +508,48 @@ export function LabDensidad({ color }: PracticaLabProps) {
                 backdropFilter: "blur(10px)",
               }}
             >
+              <button className="dx-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
+                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
+              </button>
               <button className="dx-icobtn" data-on={showForces} onClick={() => setShowForces((v) => !v)} title="Vectores de fuerza">
                 <i className="fa-solid fa-arrows-up-down" />
               </button>
               <button className="dx-icobtn" data-on={autoRotate} onClick={() => setAutoRotate((v) => !v)} title="Girar automáticamente">
                 <i className="fa-solid fa-arrows-rotate" />
               </button>
-              <button className="dx-icobtn" onClick={() => setDropNonce((n) => n + 1)} title="Soltar de nuevo">
+              <button className="dx-icobtn" onClick={soltar} title="Soltar de nuevo">
                 <i className="fa-solid fa-rotate-left" />
               </button>
+              <button className="dx-icobtn" data-on={drawer} onClick={() => setDrawer((v) => !v)} title="Teoría">
+                <i className="fa-solid fa-book-open" />
+              </button>
+            </div>
+
+            {/* Botón Teoría destacado (cuando el cajón está cerrado) */}
+            {!drawer && (
+              <button
+                onClick={() => setDrawer(true)}
+                style={{ position: "absolute", top: 62, right: 14, display: "inline-flex", alignItems: "center", gap: 8, padding: "9px 14px", borderRadius: 12, cursor: "pointer", color: "#fff", fontSize: 13, fontWeight: 800, background: "rgba(2,12,28,0.74)", border: `1px solid rgba(${color.rgba},0.4)`, backdropFilter: "blur(10px)", zIndex: 5 }}
+              >
+                <i className="fa-solid fa-book-open" style={{ color: accent }} />
+                Teoría
+              </button>
+            )}
+
+            {/* ── CAJÓN DE TEORÍA ── */}
+            <div className="dx-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
+            <div className="dx-drawer" data-open={drawer}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 18px", borderBottom: `1px solid ${T.line}` }}>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 10, fontSize: 15, fontWeight: 900, color: "#fff" }}>
+                  <i className="fa-solid fa-book-open" style={{ color: accent }} /> Teoría de la práctica
+                </span>
+                <button className="dx-icobtn" onClick={() => setDrawer(false)} title="Cerrar">
+                  <i className="fa-solid fa-xmark" />
+                </button>
+              </div>
+              <div style={{ flex: 1, overflowY: "auto", padding: "18px" }}>
+                <FichaTeorica data={DENSIDAD_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </div>
             </div>
 
             <div
@@ -665,6 +751,200 @@ export function LabDensidad({ color }: PracticaLabProps) {
             hierro se hunde en agua… pero <strong style={{ color: T.text }}>flota en mercurio</strong>. ¡Compruébalo!
           </span>
         </div>
+      </div>
+
+      {/* ── Ejercicio de cálculo (interactividad ampliada — A6 verbatim) ───── */}
+      <CalcDensidadCard
+        accent={accent}
+        rgba={color.rgba}
+        aprobado={ejercicioAprobado}
+        onAprobado={() => setEjercicioAprobado(true)}
+        playSfx={
+          sonido
+            ? (ok) => {
+                if (ok) audioRef.current?.correcto();
+                else audioRef.current?.incorrecto();
+              }
+            : undefined
+        }
+      />
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+ * Ejercicio de cálculo — reproduce el problema A6 «Cálculo de densidad»
+ * (verbatim) como "interactividad ampliada": el alumno calcula ρ = m/V, escribe
+ * su resultado, identifica el metal y comprueba su procedimiento. Análogo a la
+ * tarjeta de cálculos del laboratorio de destilación.
+ * ──────────────────────────────────────────────────────────────────────── */
+function CalcDensidadCard({
+  accent,
+  rgba,
+  aprobado,
+  onAprobado,
+  playSfx,
+}: {
+  accent: string;
+  rgba: string;
+  aprobado: boolean;
+  onAprobado: () => void;
+  playSfx?: (ok: boolean) => void;
+}) {
+  const NO = "#FF5E5E";
+  const ej = EJERCICIO_A6;
+  const [valor, setValor] = useState("");
+  const [metal, setMetal] = useState<string | null>(null);
+  const [comprobado, setComprobado] = useState(false);
+
+  const num = Number(valor.replace(",", "."));
+  const valorOk = valor.trim() !== "" && Number.isFinite(num) && Math.abs(num - ej.respuestaValor) <= ej.tolerancia;
+  const metalOk = metal === ej.metalCorrecto;
+  const todoOk = valorOk && metalOk;
+  const puedeComprobar = valor.trim() !== "" && metal !== null;
+
+  const comprobar = () => {
+    setComprobado(true);
+    playSfx?.(todoOk);
+    if (todoOk) onAprobado();
+  };
+
+  const reintentar = () => {
+    setValor("");
+    setMetal(null);
+    setComprobado(false);
+  };
+
+  return (
+    <div style={{ ...card, padding: "20px 24px 24px", marginTop: 22 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4, flexWrap: "wrap" }}>
+        <Eyebrow>
+          <i className="fa-solid fa-calculator" style={{ marginRight: 8, color: accent }} />
+          Resuelve el ejercicio
+        </Eyebrow>
+        {aprobado && (
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 12, fontWeight: 800, color: OK }}>
+            <i className="fa-solid fa-circle-check" /> Resuelto
+          </span>
+        )}
+      </div>
+
+      {/* Enunciado verbatim */}
+      <div style={{ borderRadius: 14, border: `1px solid rgba(${rgba},0.3)`, background: `rgba(${rgba},0.08)`, padding: "14px 16px", marginTop: 6 }}>
+        <div style={{ fontSize: 14, color: T.text, lineHeight: 1.55, fontWeight: 600 }}>
+          <i className="fa-solid fa-flask-vial" style={{ marginRight: 8, color: accent }} />
+          {ej.enunciado}
+        </div>
+        <div style={{ fontSize: 12.5, color: T.text3, marginTop: 9, fontStyle: "italic" }}>{ej.contexto}</div>
+      </div>
+
+      {/* Datos */}
+      <div style={{ display: "flex", gap: 22, flexWrap: "wrap", marginTop: 16 }}>
+        <div style={{ ...NUM }}>
+          <span style={{ fontSize: 11, color: T.text3, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.06em" }}>Masa (m)</span>
+          <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{ej.datos.masa} g</div>
+        </div>
+        <div style={{ ...NUM }}>
+          <span style={{ fontSize: 11, color: T.text3, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.06em" }}>Volumen (V)</span>
+          <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{ej.datos.volumen} cm³</div>
+        </div>
+      </div>
+
+      {/* Respuesta numérica */}
+      <div style={{ marginTop: 18 }}>
+        <div style={{ fontSize: 13.5, fontWeight: 800, color: T.text2, marginBottom: 9 }}>
+          1. Calcula la densidad (ρ = m / V):
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+          <span style={{ fontSize: 16, fontWeight: 800, color: T.text2 }}>ρ =</span>
+          <input
+            className="dx-num"
+            inputMode="decimal"
+            placeholder="?"
+            value={valor}
+            disabled={comprobado}
+            onChange={(e) => setValor(e.target.value)}
+            style={comprobado ? { borderColor: valorOk ? OK : NO } : undefined}
+          />
+          <span style={{ fontSize: 14, fontWeight: 700, color: T.text2 }}>g/cm³</span>
+          {comprobado && (
+            <i className={`fa-solid ${valorOk ? "fa-circle-check" : "fa-circle-xmark"}`} style={{ color: valorOk ? OK : NO, fontSize: 18 }} />
+          )}
+        </div>
+      </div>
+
+      {/* Identificación del metal */}
+      <div style={{ marginTop: 18 }}>
+        <div style={{ fontSize: 13.5, fontWeight: 800, color: T.text2, marginBottom: 9 }}>
+          2. ¿De qué metal podría tratarse?
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 9 }}>
+          {ej.opcionesMetal.map((m) => {
+            const sel = metal === m.key;
+            const esCorrecta = m.key === ej.metalCorrecto;
+            let borde = T.line;
+            let fondo = T.glass;
+            let colorTxt = T.text2;
+            if (comprobado && esCorrecta) {
+              borde = OK;
+              fondo = `${OK}1c`;
+              colorTxt = "#fff";
+            } else if (comprobado && sel && !esCorrecta) {
+              borde = NO;
+              fondo = `${NO}1c`;
+              colorTxt = "#fff";
+            } else if (!comprobado && sel) {
+              borde = accent;
+              fondo = `rgba(${rgba},0.16)`;
+              colorTxt = "#fff";
+            }
+            return (
+              <button
+                key={m.key}
+                className="dx-opt"
+                onClick={() => !comprobado && setMetal(m.key)}
+                disabled={comprobado}
+                style={{ borderColor: borde, background: fondo, color: colorTxt }}
+              >
+                <span style={{ flex: 1 }}>{m.label}</span>
+                <span style={{ fontSize: 12, color: T.text3, ...NUM }}>{fmt(m.d)} g/cm³</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Procedimiento + resultado tras comprobar */}
+      {comprobado && (
+        <div style={{ marginTop: 18, borderRadius: 13, border: `1px solid ${todoOk ? OK : NO}55`, background: `${todoOk ? OK : NO}14`, padding: "14px 16px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 14, fontWeight: 900, color: todoOk ? OK : NO }}>
+            <i className={`fa-solid ${todoOk ? "fa-trophy" : "fa-circle-half-stroke"}`} />
+            {todoOk ? "¡Correcto!" : "Revisa tu procedimiento"}
+          </div>
+          <ol style={{ margin: "11px 0 0", paddingLeft: 20, display: "flex", flexDirection: "column", gap: 6 }}>
+            {ej.pasos.map((p, i) => (
+              <li key={i} style={{ fontSize: 13.5, lineHeight: 1.5, color: T.text2 }}>{p}</li>
+            ))}
+          </ol>
+          <div style={{ fontSize: 13, color: T.text, fontWeight: 700, marginTop: 10 }}>
+            <i className="fa-solid fa-flag-checkered" style={{ marginRight: 8, color: accent }} />
+            Respuesta: {ej.respuestaTexto}
+          </div>
+        </div>
+      )}
+
+      <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 20, flexWrap: "wrap" }}>
+        {!comprobado ? (
+          <button className="dx-play" onClick={comprobar} disabled={!puedeComprobar}>
+            <i className="fa-solid fa-list-check" />
+            Comprobar
+          </button>
+        ) : (
+          <button className="dx-cls" onClick={reintentar}>
+            <i className="fa-solid fa-rotate-left" />
+            Reintentar
+          </button>
+        )}
       </div>
     </div>
   );

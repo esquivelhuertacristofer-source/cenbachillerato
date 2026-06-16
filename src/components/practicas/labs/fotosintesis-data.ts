@@ -151,3 +151,55 @@ export const fmtPct = (p: number): string => {
   const r = Math.round(p * Math.pow(10, dec)) / Math.pow(10, dec);
   return r.toLocaleString("es-MX", { maximumFractionDigits: dec, minimumFractionDigits: 0 }).replace("-", "−") + "%";
 };
+
+/* ── Quiz evaluable — VERBATIM de CNEYT-III-P03-A2 ───────────────────── */
+import type { QuizEvaluable } from "./_reto-quiz";
+
+export const QUIZ_A2: QuizEvaluable = {
+  titulo: "¿Verdadero o falso? Fotosíntesis a fondo",
+  puntajeMinimo: 70,
+  reactivos: [
+    {
+      enunciado: "La fotosíntesis produce CO₂ y consume O₂, lo opuesto a la respiración celular.",
+      opciones: ["Verdadero", "Falso"],
+      respuestaCorrecta: 1,
+      retroalimentacion: "Al revés: la fotosíntesis consume CO₂ y H₂O, y produce glucosa y O₂. La respiración celular consume O₂ y glucosa, y produce CO₂ y H₂O.",
+    },
+    {
+      enunciado: "Las plantas C4 como el maíz son más eficientes que las C3 en ambientes cálidos y con alta radiación solar porque evitan la fotorrespiración.",
+      opciones: ["Verdadero", "Falso"],
+      respuestaCorrecta: 0,
+      retroalimentacion: "Correcto. Las plantas C4 prefijan el CO₂ en el mesófilo y lo concentran en las células del haz vascular, reduciendo la fotorrespiración que afecta a las plantas C3 en condiciones de calor y luz intensa.",
+    },
+    {
+      enunciado: "Los agaves y los cactus son plantas CAM que abren sus estomas de día para capturar CO₂.",
+      opciones: ["Verdadero", "Falso"],
+      respuestaCorrecta: 1,
+      retroalimentacion: "Las plantas CAM abren sus estomas de NOCHE para capturar CO₂ y almacenarlo como ácido málico; durante el día los cierran para evitar la pérdida de agua (una adaptación clave a ambientes áridos).",
+    },
+    {
+      enunciado: "La fotosíntesis solo ocurre en las hojas de las plantas vasculares.",
+      opciones: ["Verdadero", "Falso"],
+      respuestaCorrecta: 1,
+      retroalimentacion: "La fotosíntesis ocurre en todo tejido verde (hojas, tallos jóvenes, frutos verdes). Además, la realizan algas, cianobacterias y algunas bacterias fotosintéticas, no solo plantas terrestres.",
+    },
+    {
+      enunciado: "El oxígeno liberado en la fotosíntesis proviene de la molécula de agua (H₂O), no del CO₂.",
+      opciones: ["Verdadero", "Falso"],
+      respuestaCorrecta: 0,
+      retroalimentacion: "Correcto. En la fotólisis del agua (reacciones de luz), las moléculas de H₂O se dividen; el O₂ liberado proviene del oxígeno del agua, comprobado con experimentos con isótopos marcados (¹⁸O).",
+    },
+    {
+      enunciado: "Sin fotosíntesis, la concentración de O₂ en la atmósfera se mantendría igual gracias a la descomposición de materia orgánica.",
+      opciones: ["Verdadero", "Falso"],
+      respuestaCorrecta: 1,
+      retroalimentacion: "Sin fotosíntesis, el O₂ atmosférico se consumiría rápidamente por la respiración y la oxidación. La fotosíntesis es prácticamente la única fuente de O₂ libre de la atmósfera terrestre.",
+    },
+    {
+      enunciado: "Las algas unicelulares (fitoplancton) realizan fotosíntesis y son responsables de aproximadamente el 50% del O₂ que produce la Tierra.",
+      opciones: ["Verdadero", "Falso"],
+      respuestaCorrecta: 0,
+      retroalimentacion: "Correcto. El fitoplancton marino (diatomeas, dinoflagelados, cianobacterias) genera alrededor de la mitad del oxígeno atmosférico global, a pesar de su pequeño tamaño individual.",
+    },
+  ],
+};

@@ -304,3 +304,26 @@ export const DATOS: { valor: string; texto: string; icono: string }[] = [
   { valor: "6CO₂ + 6H₂O", texto: "reactivos de la fotosíntesis → C₆H₁₂O₆ + 6O₂", icono: "fa-leaf" },
   { valor: "~2.5 / ~1.5", texto: "ATP por cada NADH / FADH₂ en la cadena de electrones", icono: "fa-battery-full" },
 ];
+
+/* ── Reto evaluable numérico (VERBATIM del ejercicio A2) ───────────────────── */
+import type { RetoNumericoData } from "./_reto-numerico";
+
+// VERBATIM de CNEYT-VI-P03-A2 (ejercicio_matematico, tipo_respuesta "numerica").
+// Aritmética verificada: 2 (glucólisis) + 2 (Krebs) + 32 (cadena) = 36 ATP.
+export const RETO_A2: RetoNumericoData = {
+  titulo: "ATP total en respiración aerobia",
+  contexto:
+    "El problema, los pasos guía y la respuesta (36 ATP) son verbatim del ejercicio A2 de la progresión. Unidades: ATP.",
+  problema:
+    "Una célula lleva a cabo la respiración aerobia completa de 1 molécula de glucosa. La glucólisis produce 2 ATP netos. El ciclo de Krebs produce 2 ATP. La cadena transportadora de electrones produce 32 ATP. ¿Cuántos ATP se producen en total?",
+  campos: [
+    { etiqueta: "ATP totales producidos (2 + 2 + 32)", objetivo: 36, tolerancia: 0, unidad: "ATP", placeholder: "36" },
+  ],
+  pasosGuia: [
+    "Paso 1 — Glucólisis (citoplasma): 1 glucosa -> 2 piruvatos + 2 ATP netos + 2 NADH.",
+    "Paso 2 — Ciclo de Krebs (mitocondria, matriz): 2 piruvatos -> CO2 + 2 ATP + 8 NADH + 2 FADH2.",
+    "Paso 3 — Cadena transportadora de electrones (membrana interna mitocondrial): NADH y FADH2 ceden electrones; el gradiente de H+ impulsa la ATP sintasa produciendo 32 ATP.",
+    "Paso 4 — Total: 2 + 2 + 32 = 36 ATP por molécula de glucosa.",
+  ],
+  respuestaFinal: "36 ATP por molécula de glucosa (2 + 2 + 32 = 36).",
+};

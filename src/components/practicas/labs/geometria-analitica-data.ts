@@ -122,3 +122,81 @@ export const fmtInt = (n: number): string => ES(Math.round(n), 0);
 export const fmtPar = (x: number, y: number): string => `(${ES(x, 2)}, ${ES(y, 2)})`;
 export const fmtPend = (g: { pendienteDef: boolean; pendiente: number }): string =>
   g.pendienteDef ? ES(g.pendiente, 2) : "indefinida";
+
+/* ── Reto evaluable (PM-IV-P06-A2) ──────────────────────────────────────────
+ * VERBATIM del ejercicio_matematico A2 «Distancia, punto medio y pendiente
+ * entre dos puntos reales».  Fuente: scripts/_sem4_dump.txt líneas 5041-5056.
+ *
+ * Aritmética verificada:
+ *   A(2, -1), B(8, 7)
+ *   (a) d = √((8-2)²+(7-(-1))²) = √(36+64) = √100 = 10 km
+ *   (b) Mx = (2+8)/2 = 5  ;  My = (-1+7)/2 = 3
+ *   (c) m = (7-(-1))/(8-2) = 8/6 = 4/3 ≈ 1.3333…
+ *   (d) y+1 = (4/3)(x-2) → y = (4/3)x − 8/3 − 3/3 = (4/3)x − 11/3 → b = −11/3 ≈ −3.6667
+ *   (e) AM = √((5-2)²+(3-(-1))²) = √(9+16) = 5 km  ;  MB = √((8-5)²+(7-3)²) = 5 km ✓
+ * ─────────────────────────────────────────────────────────────────────────── */
+import type { RetoNumericoData } from "./_reto-numerico";
+
+// VERBATIM de PM-IV-P06-A2 (ejercicio_matematico, tipo_respuesta "desarrollo").
+export const RETO_A2: RetoNumericoData = {
+  titulo: "Distancia, punto medio y pendiente entre dos puntos reales",
+  contexto:
+    "Dos técnicos de una empresa de telecomunicaciones colocan repetidoras de señal en dos puntos del mapa de la Ciudad de México, representados en coordenadas (en kilómetros desde un punto de referencia central) como: A(2, -1) y B(8, 7).",
+  problema:
+    "(a) Calcula la distancia entre las dos repetidoras.\n" +
+    "(b) Encuentra el punto medio M entre A y B (donde colocarán un amplificador de señal).\n" +
+    "    · Coordenada x del punto medio M\n" +
+    "    · Coordenada y del punto medio M\n" +
+    "(c) Calcula la pendiente de la recta que une A con B (escribe la fracción como decimal, 2 decimales).\n" +
+    "(d) Escribe la ecuación de la recta y = mx + b — ¿cuánto vale el intercepto b (en fracción decimal, 2 decimales)?\n" +
+    "(e) ¿Cuánto mide el segmento AM?",
+  campos: [
+    {
+      etiqueta: "(a) Distancia entre las repetidoras d",
+      objetivo: 10,
+      tolerancia: 0,
+      unidad: "km",
+      placeholder: "10",
+    },
+    {
+      etiqueta: "(b) Coordenada x del punto medio M",
+      objetivo: 5,
+      tolerancia: 0,
+      placeholder: "5",
+    },
+    {
+      etiqueta: "(b) Coordenada y del punto medio M",
+      objetivo: 3,
+      tolerancia: 0,
+      placeholder: "3",
+    },
+    {
+      etiqueta: "(c) Pendiente m (decimal, 2 dec.)",
+      objetivo: 4 / 3,
+      tolerancia: 0.005,
+      placeholder: "1.33",
+    },
+    {
+      etiqueta: "(d) Intercepto b (decimal, 2 dec.)",
+      objetivo: -(11 / 3),
+      tolerancia: 0.005,
+      placeholder: "-3.67",
+    },
+    {
+      etiqueta: "(e) Longitud del segmento AM",
+      objetivo: 5,
+      tolerancia: 0,
+      unidad: "km",
+      placeholder: "5",
+    },
+  ],
+  pasosGuia: [
+    "(a) d = √((x₂-x₁)² + (y₂-y₁)²) = √((8-2)² + (7-(-1))²) = √(36 + 64) = √100 = 10 km.",
+    "(b) M = ((2+8)/2, (-1+7)/2) = (10/2, 6/2) = (5, 3).",
+    "(c) m = (y₂-y₁)/(x₂-x₁) = (7-(-1))/(8-2) = 8/6 = 4/3.",
+    "(d) Usa la forma punto-pendiente con A(2,-1) y m=4/3: y - (-1) = (4/3)(x - 2) → y + 1 = (4/3)x - 8/3 → y = (4/3)x - 8/3 - 1 = (4/3)x - 11/3.",
+    "(e) AM = √((5-2)² + (3-(-1))²) = √(9+16) = √25 = 5 km. MB = √((8-5)²+(7-3)²) = √(9+16) = 5 km. AM = MB = 5 = d/2. ✓",
+  ],
+  respuestaFinal:
+    "(a) d = 10 km. (b) M = (5, 3). (c) m = 4/3. (d) y = (4/3)x - 11/3. (e) AM = MB = 5 km, confirma que M es el punto medio.",
+};

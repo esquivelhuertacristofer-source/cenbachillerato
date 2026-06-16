@@ -24,6 +24,8 @@
  * verbatim de la lectura A1, el ejercicio A2 y el glosario A5.
  */
 
+import type { RetoNumericoData } from "./_reto-numerico";
+
 export type Modo = "monohibrido" | "dihibrido" | "ligado";
 export type Herencia = "completa" | "incompleta" | "codominancia";
 
@@ -408,3 +410,25 @@ export const fmt1 = (n: number): string => ES(n, 1);
 export const fmtPct = (p: number): string => `${Number.isInteger(p) ? ES(p, 0) : ES(p, 1)} %`;
 /** Fracción n/total como texto (p.ej. "1/4"). */
 export const fmtFrac = (n: number, total: number): string => `${n}/${total}`;
+
+/* ── Reto evaluable: el ejercicio verbatim del ancla A2 ───────────────────── */
+// VERBATIM de CNEYT-VI-P05-A2 (ejercicio_matematico, tipo_respuesta "numerica").
+// Cruce monohíbrido Aa × Aa: el cuadro de Punnett da AA, Aa, Aa, aa; solo la
+// casilla aa es homocigota recesiva → 1 de 4 = 25 %. respuesta_final = "25",
+// unidades "%", tolerancia_error = 0. Verificado: 1/4 = 0.25 = 25 %.
+export const RETO_A2: RetoNumericoData = {
+  titulo: "Cruce monohíbrido Aa×Aa",
+  contexto: "Leyes de Mendel: un cruce monohíbrido entre dos heterocigotos (Aa × Aa) y el cuadro de Punnett para predecir la descendencia.",
+  problema:
+    "Cruza dos plantas heterocigotas para el carácter color de semilla (Aa × Aa). Usa el cuadro de Punnett para determinar la probabilidad de obtener descendencia homocigota recesiva (aa). Expresa la respuesta como porcentaje.",
+  campos: [
+    { etiqueta: "Probabilidad de descendencia homocigota recesiva (aa)", objetivo: 25, tolerancia: 0, unidad: "%", placeholder: "25" },
+  ],
+  pasosGuia: [
+    "Paso 1 — Gametos: cada progenitor Aa produce gametos A y a en igual proporción (50% cada uno).",
+    "Paso 2 — Cuadro de Punnett: cruce Aa × Aa da cuatro combinaciones: AA (25%), Aa (25%), Aa (25%), aa (25%).",
+    "Paso 3 — Contar homocigotos recesivos: solo la combinación aa es homocigota recesiva: 1 de 4 = 25%.",
+    "Paso 4 — Proporción genotípica: 1 AA : 2 Aa : 1 aa. Proporción fenotípica: 3 dominante : 1 recesivo.",
+  ],
+  respuestaFinal: "P(aa) = 25 % (1 de 4 casillas del cuadro de Punnett).",
+};

@@ -14,10 +14,14 @@
  *  (3) evidencias  — homología: mismos huesos en humano, ballena y murciélago.
  */
 
-import { useState, useEffect, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, card, Eyebrow, SceneBoundary } from "./_kit";
+import { FichaTeorica } from "./_ficha";
+import { RetoQuizCard } from "./_reto-quiz";
+import { LabSfx } from "./lab-audio";
+import { SELECCION_NATURAL_FICHA } from "./seleccion-natural-ficha";
 import {
   type Modo,
   MODOS,
@@ -48,6 +52,7 @@ import {
   CONTEXTO,
   FUENTE,
   DATOS,
+  QUIZ_A2,
 } from "./seleccion-natural-data";
 
 const SeleccionNaturalScene = dynamic(() => import("./SeleccionNaturalScene"), {
@@ -71,6 +76,30 @@ export function LabSeleccionNatural({ color }: PracticaLabProps) {
   const [gen, setGen] = useState<number>(0);
   const [playing, setPlaying] = useState<boolean>(true);
   const [resetNonce, setResetNonce] = useState(0);
+  const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
+  // teoría (cajón deslizable) y sonido
+  const [drawer, setDrawer] = useState(false);
+  const [sonido, setSonido] = useState(false);
+  const audioRef = useRef<LabSfx | null>(null);
+
+  const toggleSonido = useCallback(async () => {
+    if (!audioRef.current) audioRef.current = new LabSfx();
+    const sfx = audioRef.current;
+    if (sonido) {
+      sfx.mute();
+      setSonido(false);
+    } else {
+      await sfx.enable();
+      setSonido(true);
+    }
+  }, [sonido]);
+
+  useEffect(() => {
+    return () => {
+      audioRef.current?.dispose();
+      audioRef.current = null;
+    };
+  }, []);
 
   const bump = () => setResetNonce((n) => n + 1);
 
@@ -105,6 +134,7 @@ export function LabSeleccionNatural({ color }: PracticaLabProps) {
     setModo(m);
     setGen(0);
     bump();
+    if (sonido) audioRef.current?.blip();
   };
   const reiniciar = () => {
     setGen(0);
@@ -140,6 +170,14 @@ export function LabSeleccionNatural({ color }: PracticaLabProps) {
       : modo === "tipos"
         ? `Selección ${tipo.etq.toLowerCase()} · generación ${genActual}/${maxGen} — la distribución del rasgo se reforma según la aptitud`
         : `Homología: brazo humano, aleta de ballena y ala de murciélago comparten los mismos huesos (ancestro amniota común)`;
+
+  // ── Objetivos guiados (se marcan en vivo) ──────────────────────────
+  const objetivos = [
+    { txt: "Recorre los tres modos del visor de la evolución", done: modo === "evidencias" },
+    { txt: "Avanza generaciones y observa cambiar las frecuencias alélicas", done: genActual >= 1 },
+    { txt: "Compara los tipos de selección y las evidencias", done: modo === "tipos" || modo === "evidencias" },
+    { txt: "Resuelve el reto evaluable de la actividad A4", done: ejercicioAprobado },
+  ];
 
   const sceneFallback = (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 28, textAlign: "center" }}>
@@ -312,6 +350,26 @@ export function LabSeleccionNatural({ color }: PracticaLabProps) {
         .sn-read-v { font-size:20px; font-weight:900; font-family:ui-monospace,monospace; margin-top:3px; }
         .sn-range { width:100%; accent-color: var(--snc); cursor:pointer; }
         @media (max-width: 1000px){ .sn-bottom { grid-template-columns: 1fr !important; } }
+
+        /* Cajón de teoría */
+        .sn-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
+          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
+        .sn-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
+        .sn-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
+          background:linear-gradient(180deg,#06121e 0%,#040a16 100%); border-left:1px solid rgba(${color.rgba},0.32);
+          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
+          display:flex; flex-direction:column; }
+        .sn-drawer[data-open="true"] { transform:translateX(0); }
+        .sn-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
+          padding:18px 20px; border-bottom:1px solid ${T.line}; }
+        .sn-drawer-body { overflow-y:auto; padding:20px; flex:1; }
+        .sn-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
+          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+        .sn-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
+        .sn-teoria-fab { position:absolute; bottom:54px; left:50%; transform:translateX(-50%); cursor:pointer; display:inline-flex; align-items:center; gap:9px;
+          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
+          background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:2; }
+        .sn-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateX(-50%) translateY(-1px); }
       `}</style>
 
       {/* Selector de modo */}
@@ -374,6 +432,12 @@ export function LabSeleccionNatural({ color }: PracticaLabProps) {
 
             {/* Toolbar */}
             <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
+              <button className="sn-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
+                <i className="fa-solid fa-book-open" />
+              </button>
+              <button className="sn-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
+                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
+              </button>
               <button className="sn-icobtn" data-on={playing} onClick={() => setPlaying((p) => !p)} title={playing ? "Pausar" : "Reanudar"}>
                 <i className={`fa-solid ${playing ? "fa-pause" : "fa-play"}`} />
               </button>
@@ -381,6 +445,12 @@ export function LabSeleccionNatural({ color }: PracticaLabProps) {
                 <i className="fa-solid fa-rotate-left" />
               </button>
             </div>
+
+            {/* Botón flotante de Teoría */}
+            <button className="sn-teoria-fab" onClick={() => setDrawer(true)}>
+              <i className="fa-solid fa-book-open" />
+              Teoría
+            </button>
 
             {/* Pie: lectura en vivo */}
             <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 18px 14px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
@@ -531,13 +601,27 @@ export function LabSeleccionNatural({ color }: PracticaLabProps) {
           </div>
         </div>
 
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow><i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />Ideas clave</Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-            {IDEAS.map((x, i) => (
-              <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>{x}</li>
-            ))}
-          </ul>
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <div style={{ ...card, padding: "18px 22px" }}>
+            <Eyebrow><i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />Objetivos</Eyebrow>
+            <div style={{ display: "grid", gap: 10 }}>
+              {objetivos.map((o, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 12.5, color: o.done ? "#34D399" : T.text2 }}>
+                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 14, opacity: o.done ? 1 : 0.3 }} />
+                  <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ ...card, padding: "18px 22px" }}>
+            <Eyebrow><i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />Ideas clave</Eyebrow>
+            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
+              {IDEAS.map((x, i) => (
+                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>{x}</li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
 
@@ -548,6 +632,38 @@ export function LabSeleccionNatural({ color }: PracticaLabProps) {
           La descripción y las preguntas de reflexión del modo «conejos» son <strong>verbatim</strong> de la simulación A2 (etiqueta «SIMULACIÓN A2»). Los tres tipos de selección y el glosario son verbatim del glosario A5 (etiqueta «GLOSARIO A5»); los cuatro postulados, las evidencias (homología, ~98.7% de ADN compartido con el chimpancé) y el contexto de la CONABIO son verbatim de la lectura A1 (etiqueta «LECTURA A1»). El modelo 3D es <strong>esquemático</strong>: las frecuencias alélicas siguen un modelo de un gen con dos alelos (D dominante oscuro, d recesivo claro) y selección sobre el fenotipo con el coeficiente <i>s</i> de la presión elegida; los conejos, los depredadores, las barras del rasgo y los huesos son representaciones visuales (no a escala) para entender el mecanismo, no medidas reales de una población concreta. Fuente: {FUENTE}
         </span>
       </div>
+
+      {/* ── Reto evaluable: el quiz V/F verbatim de A4 ───────────────── */}
+      <RetoQuizCard
+        quiz={QUIZ_A2}
+        accent={accent}
+        rgba={color.rgba}
+        aprobado={ejercicioAprobado}
+        onAprobado={() => setEjercicioAprobado(true)}
+        playSfx={() => {
+          if (sonido) audioRef.current?.correcto();
+        }}
+        playPick={() => {
+          if (sonido) audioRef.current?.blip();
+        }}
+      />
+
+      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
+      <div className="sn-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
+      <aside className="sn-drawer" data-open={drawer} aria-hidden={!drawer}>
+        <div className="sn-drawer-head">
+          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
+            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
+          </div>
+          <button className="sn-close" onClick={() => setDrawer(false)} title="Cerrar">
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
+        <div className="sn-drawer-body">
+          <FichaTeorica data={SELECCION_NATURAL_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+        </div>
+      </aside>
     </div>
   );
 }

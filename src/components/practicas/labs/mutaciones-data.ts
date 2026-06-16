@@ -11,6 +11,7 @@ import {
   transcribir,
   traducir,
 } from "./adn-dogma-data";
+import type { QuizEvaluable } from "./_reto-quiz";
 
 export type Pt = [number, number, number];
 export type Modo = "puntuales" | "cromosomicas" | "mutagenos";
@@ -527,3 +528,75 @@ export const CONTEXTO =
 
 export const FUENTE =
   "Material elaborado para CEN Bachillerato — CNEYT-VI. Ref: Campbell, Biología (12a ed.); Alberts, Biología Molecular de la Célula. Código genético: referencia universal estándar.";
+
+/* ════════════════════════════════════════════════════════════════════════
+ * RETO EVALUABLE — quiz VERBATIM de CNEYT-VI-P06-A2 (quiz_multiple_opcion)
+ * ════════════════════════════════════════════════════════════════════════ */
+
+// VERBATIM de CNEYT-VI-P06-A2 «Quiz: Mutaciones y variabilidad genética».
+export const QUIZ_A2: QuizEvaluable = {
+  titulo: "Quiz: Mutaciones y variabilidad genética",
+  puntajeMinimo: 70,
+  reactivos: [
+    {
+      enunciado: "¿Qué tipo de mutación génica desplaza el marco de lectura del ARNm?",
+      opciones: [
+        "Sustitución puntual silenciosa",
+        "Inserción o deleción de un nucleótido",
+        "Translocación cromosómica",
+        "Inversión cromosómica",
+      ],
+      respuestaCorrecta: 1,
+      retroalimentacion:
+        "Las inserciones o deleciones de un nucleótido desplazan el marco de lectura (frameshift), alterando todos los codones posteriores y generalmente produciendo una proteína no funcional.",
+    },
+    {
+      enunciado: "¿Cuál de los siguientes es un mutágeno físico?",
+      opciones: [
+        "Benzopireno del tabaco",
+        "VPH (virus del papiloma humano)",
+        "Radiación ultravioleta UV-B",
+        "Formaldehído",
+      ],
+      respuestaCorrecta: 2,
+      retroalimentacion:
+        "La radiación UV-B es un mutágeno físico que causa dímeros de timina en el ADN. Los benzopirenos y el formaldehído son mutágenos químicos; el VPH es un mutágeno biológico.",
+    },
+    {
+      enunciado: "Las mutaciones germinales se diferencian de las somáticas porque:",
+      opciones: [
+        "Son siempre dañinas y causan cáncer",
+        "Ocurren en células reproductoras y pueden transmitirse a la descendencia",
+        "Solo afectan a células musculares",
+        "No alteran la secuencia del ADN",
+      ],
+      respuestaCorrecta: 1,
+      retroalimentacion:
+        "Las mutaciones germinales ocurren en gametos o células que los producen, por lo que pueden heredarse. Las somáticas afectan solo al individuo y no se transmiten.",
+    },
+    {
+      enunciado: "¿Cuál es el papel de las mutaciones en la evolución?",
+      opciones: [
+        "Son siempre letales y eliminan especies",
+        "Generan variabilidad genética sobre la que actúa la selección natural",
+        "Solo afectan a individuos viejos",
+        "Reducen la diversidad de alelos en la población",
+      ],
+      respuestaCorrecta: 1,
+      retroalimentacion:
+        "Las mutaciones son la fuente última de nuevos alelos. La mayor parte son neutras o ligeramente perjudiciales, pero ocasionalmente producen variantes ventajosas que la selección natural puede favorecer.",
+    },
+    {
+      enunciado: "La trisomía 21 (síndrome de Down) es un ejemplo de:",
+      opciones: [
+        "Mutación génica puntual",
+        "Mutación cromosómica por aneuploidía",
+        "Mutación por inserción de nucleótido",
+        "Mutación somática causada por UV",
+      ],
+      respuestaCorrecta: 1,
+      retroalimentacion:
+        "La trisomía 21 resulta de la no disyunción del cromosoma 21 durante la meiosis, produciendo una célula con tres copias del cromosoma 21. Es una mutación cromosómica numérica (aneuploidía).",
+    },
+  ],
+};

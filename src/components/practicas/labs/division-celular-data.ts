@@ -575,3 +575,38 @@ export const HECHOS: string[] = [
   "La recombinación de la meiosis es la razón de fondo por la que cada persona (salvo gemelos idénticos) es genéticamente única.",
   "Sin meiosis, la fecundación duplicaría el número de cromosomas en cada generación: la meiosis mantiene constante el 2n de la especie.",
 ];
+
+/* ── Reto evaluable (parte B del tratamiento) ─────────────────────────────── */
+import type { RetoNumericoData } from "./_reto-numerico";
+
+// VERBATIM de CNEYT-VI-P09-A2 (ejercicio_matematico, slug=division-celular,
+// tipo_respuesta "desarrollo"). Aritmética verificada para 2n = 46:
+//   a) Mitosis: 2 células × 46 cromosomas (2n, idénticas).
+//   b) Meiosis: 4 células × 23 cromosomas (n = 46/2, distintas).
+//   c) Distribución independiente de 23 pares: 2²³ = 8 388 608 combinaciones;
+//      tras 3 rondas de mitosis: 2³ = 8 células.
+export const RETO_A2: RetoNumericoData = {
+  titulo: "Analizando la división celular",
+  contexto:
+    "Los tres incisos recorren el contenido formativo de la progresión: fases e importancia de la mitosis (a), de la meiosis (b) y la recombinación como factor de biodiversidad (c). En el laboratorio 3D cada proceso es un modo y la calculadora da estos números para cualquier 2n.",
+  problema:
+    "Trabaja con una célula somática humana de 2n = 46 cromosomas.\n\n" +
+    "a) MITOSIS. Si esta célula se divide por mitosis, ¿cuántas células hijas se obtienen y con cuántos cromosomas cada una? ¿Son iguales o distintas a la madre?\n\n" +
+    "b) MEIOSIS. Si en cambio entra en meiosis, ¿cuántas células hijas se obtienen y con cuántos cromosomas cada una? ¿Diploides o haploides?\n\n" +
+    "c) RECOMBINACIÓN. Sin contar el crossing over, ¿cuántas combinaciones distintas de cromosomas puede generar la distribución independiente de los 23 pares? ¿Y cuántas células tendrías tras 3 rondas seguidas de mitosis a partir de una sola célula?",
+  campos: [
+    { etiqueta: "a) Células hijas tras la mitosis", objetivo: 2, tolerancia: 0, unidad: "células", placeholder: "2" },
+    { etiqueta: "a) Cromosomas por célula hija (mitosis)", objetivo: 46, tolerancia: 0, unidad: "cromosomas", placeholder: "46" },
+    { etiqueta: "b) Células hijas tras la meiosis", objetivo: 4, tolerancia: 0, unidad: "células", placeholder: "4" },
+    { etiqueta: "b) Cromosomas por célula hija (meiosis)", objetivo: 23, tolerancia: 0, unidad: "cromosomas", placeholder: "23" },
+    { etiqueta: "c) Combinaciones por distribución independiente (2²³)", objetivo: 8388608, tolerancia: 0, unidad: "combinaciones", placeholder: "8388608" },
+    { etiqueta: "c) Células tras 3 rondas de mitosis (2³)", objetivo: 8, tolerancia: 0, unidad: "células", placeholder: "8" },
+  ],
+  pasosGuia: [
+    "a) Mitosis: 1 división → 2 células hijas. Cada una conserva el número diploide: 46 cromosomas (2n). Son genéticamente IDÉNTICAS a la madre (clones).",
+    "b) Meiosis: 2 divisiones → 4 células hijas. Cada una tiene la mitad: n = 46/2 = 23 cromosomas (haploides). Son genéticamente DISTINTAS entre sí.",
+    "c) Distribución independiente de 23 pares: 2ⁿ = 2²³ = 8 388 608 combinaciones posibles. Tras 3 rondas de mitosis: 2³ = 8 células.",
+  ],
+  respuestaFinal:
+    "a) 2 células × 46 cromosomas (2n, idénticas). b) 4 células × 23 cromosomas (n, distintas). c) 2²³ = 8 388 608 combinaciones; 2³ = 8 células tras 3 mitosis.",
+};
