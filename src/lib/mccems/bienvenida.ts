@@ -32,7 +32,7 @@ export interface VideoBienvenida {
 /** Registro por semestre con videos educativos y mapa del semestre */
 const VIDEOS_BIENVENIDA: Record<number, VideoBienvenida> = {
   1: {
-    url: "https://www.youtube.com/embed/fNZa81zU1Vw",
+    url: "https://www.youtube.com/embed/f6xbnUSB3kg",
     tipo: "embed",
     poster: null,
     titulo: "Bienvenida e Introducción a las Ciencias y el Pensamiento Lógico",
@@ -50,7 +50,7 @@ const VIDEOS_BIENVENIDA: Record<number, VideoBienvenida> = {
     ]
   },
   2: {
-    url: "https://www.youtube.com/embed/8F6v31GvRrs",
+    url: "https://www.youtube.com/embed/7AdtSLlJPVI",
     tipo: "embed",
     poster: null,
     titulo: "Bienvenida y Panorama de Energía, Termodinámica y Álgebra",
@@ -68,7 +68,7 @@ const VIDEOS_BIENVENIDA: Record<number, VideoBienvenida> = {
     ]
   },
   3: {
-    url: "https://www.youtube.com/embed/E8Z_wskdCiw",
+    url: "https://www.youtube.com/embed/tuz8GQa39N0",
     tipo: "embed",
     poster: null,
     titulo: "Bienvenida y Panorama de Ecosistemas y Geometría Plana",
@@ -86,7 +86,7 @@ const VIDEOS_BIENVENIDA: Record<number, VideoBienvenida> = {
     ]
   },
   4: {
-    url: "https://www.youtube.com/embed/P35c_M5t-Y8",
+    url: "https://www.youtube.com/embed/BFv_cSEYIBE",
     tipo: "embed",
     poster: null,
     titulo: "Bienvenida y Panorama de Química y Trigonometría",
@@ -104,7 +104,7 @@ const VIDEOS_BIENVENIDA: Record<number, VideoBienvenida> = {
     ]
   },
   5: {
-    url: "https://www.youtube.com/embed/w3F6wG4a2S4",
+    url: "https://www.youtube.com/embed/uae0vhy0xMw",
     tipo: "embed",
     poster: null,
     titulo: "Bienvenida y Panorama de Cálculo Diferencial y Leyes Físicas",
@@ -122,7 +122,7 @@ const VIDEOS_BIENVENIDA: Record<number, VideoBienvenida> = {
     ]
   },
   6: {
-    url: "https://www.youtube.com/embed/8o0e17mB-y0",
+    url: "https://www.youtube.com/embed/6Llgjipl4z4",
     tipo: "embed",
     poster: null,
     titulo: "Bienvenida y Panorama de Biología Molecular y Estadística",
