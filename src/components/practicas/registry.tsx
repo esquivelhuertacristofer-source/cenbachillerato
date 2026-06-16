@@ -17,94 +17,124 @@
 
 import type { ComponentType } from "react";
 import type { AreaColor } from "@/components/hub/hub-colors";
-import { LabDensidad } from "./labs/LabDensidad";
-import { LabEstadosMateria } from "./labs/LabEstadosMateria";
-import { LabModelosAtomicos } from "./labs/LabModelosAtomicos";
-import { LabEnlacesQuimicos } from "./labs/LabEnlacesQuimicos";
-import { LabConservacionMateria } from "./labs/LabConservacionMateria";
-import { LabEnergiaElectricidad } from "./labs/LabEnergiaElectricidad";
-import { LabSeparacionMezclas } from "./labs/LabSeparacionMezclas";
-import { LabPropiedadesMateria } from "./labs/LabPropiedadesMateria";
-import { LabFracciones } from "./labs/LabFracciones";
-import { LabPotencias } from "./labs/LabPotencias";
-import { LabConcentracion } from "./labs/LabConcentracion";
-import { LabProporcion } from "./labs/LabProporcion";
-import { LabRectaNumerica } from "./labs/LabRectaNumerica";
-import { LabNotacionCientifica } from "./labs/LabNotacionCientifica";
-import { LabValorPosicional } from "./labs/LabValorPosicional";
-import { LabSistemas } from "./labs/LabSistemas";
-import { LabBalanza } from "./labs/LabBalanza";
-import { LabPitagoras } from "./labs/LabPitagoras";
-import { LabCilindro } from "./labs/LabCilindro";
-import { LabFactorizacion } from "./labs/LabFactorizacion";
-import { LabEcuaciones } from "./labs/LabEcuaciones";
-import { LabProductos } from "./labs/LabProductos";
-import { LabConservacion } from "./labs/LabConservacion";
-import { LabGasIdeal } from "./labs/LabGasIdeal";
-import { LabTransferenciaCalor } from "./labs/LabTransferenciaCalor";
-import { LabEntropia } from "./labs/LabEntropia";
-import { LabMaquinaTermica } from "./labs/LabMaquinaTermica";
-import { LabTrabajoPotencia } from "./labs/LabTrabajoPotencia";
-import { LabInecuaciones } from "./labs/LabInecuaciones";
-import { LabEnergiaFormas } from "./labs/LabEnergiaFormas";
-import { LabParabola } from "./labs/LabParabola";
-import { LabEcuacionRecta } from "./labs/LabEcuacionRecta";
-import { LabFunciones } from "./labs/LabFunciones";
-import { LabPiramideEnergia } from "./labs/LabPiramideEnergia";
-import { LabFotosintesis } from "./labs/LabFotosintesis";
-import { LabSemejanza } from "./labs/LabSemejanza";
-import { LabCicloCarbono } from "./labs/LabCicloCarbono";
-import { LabCuadratica } from "./labs/LabCuadratica";
-import { LabSubsistemas } from "./labs/LabSubsistemas";
-import { LabBiomas } from "./labs/LabBiomas";
-import { LabTroficas } from "./labs/LabTroficas";
-import { LabDeforestacion } from "./labs/LabDeforestacion";
-import { LabDiscriminante } from "./labs/LabDiscriminante";
-import { LabCirculoUnitario } from "./labs/LabCirculoUnitario";
-import { LabTrianguloRectangulo } from "./labs/LabTrianguloRectangulo";
-import { LabLeySenosCosenos } from "./labs/LabLeySenosCosenos";
-import { LabGeometriaAnalitica } from "./labs/LabGeometriaAnalitica";
-import { LabTransformacionesFunciones } from "./labs/LabTransformacionesFunciones";
-import { LabBalanceo } from "./labs/LabBalanceo";
-import { LabOrganica } from "./labs/LabOrganica";
-import { LabPh } from "./labs/LabPh";
-import { LabCo2 } from "./labs/LabCo2";
-import { LabConicas } from "./labs/LabConicas";
-import { LabReaccionesTipos } from "./labs/LabReaccionesTipos";
-import { LabBiomoleculas } from "./labs/LabBiomoleculas";
-import { LabFuncionesConcepto } from "./labs/LabFuncionesConcepto";
-import { LabLimites } from "./labs/LabLimites";
-import { LabContinuidad } from "./labs/LabContinuidad";
-import { LabDerivada } from "./labs/LabDerivada";
-import { LabReglas } from "./labs/LabReglas";
-import { LabTrascendentes } from "./labs/LabTrascendentes";
-import { LabAnalisis } from "./labs/LabAnalisis";
-import { LabOptimizacion } from "./labs/LabOptimizacion";
-import { LabDiferencial } from "./labs/LabDiferencial";
-import { LabNewton } from "./labs/LabNewton";
-import { LabCinematica } from "./labs/LabCinematica";
-import { LabGravitacion } from "./labs/LabGravitacion";
-import { LabOndas } from "./labs/LabOndas";
-import { LabEspectro } from "./labs/LabEspectro";
-import { LabOptica } from "./labs/LabOptica";
-import { LabElectromagnetismo } from "./labs/LabElectromagnetismo";
-import { LabGeneticaMendel } from "./labs/LabGeneticaMendel";
-import { LabCelula } from "./labs/LabCelula";
-import { LabMetabolismo } from "./labs/LabMetabolismo";
-import { LabSeleccionNatural } from "./labs/LabSeleccionNatural";
-import { LabAdnDogma } from "./labs/LabAdnDogma";
-import { LabOrigenVida } from "./labs/LabOrigenVida";
-import { LabMutaciones } from "./labs/LabMutaciones";
-import { LabBiotecnologia } from "./labs/LabBiotecnologia";
-import { LabFluidos } from "./labs/LabFluidos";
-import { LabDivisionCelular } from "./labs/LabDivisionCelular";
-import { LabCalor } from "./labs/LabCalor";
-import { LabRedox } from "./labs/LabRedox";
-import { LabTfc } from "./labs/LabTfc";
-import { LabNormal } from "./labs/LabNormal";
-import { LabEquilibrio } from "./labs/LabEquilibrio";
-import { LabRespiracion } from "./labs/LabRespiracion";
-import { LabEstructuraReaccion } from "./labs/LabEstructuraReaccion";
+import dynamic from "next/dynamic";
+
+/**
+ * Fallback mientras se carga el chunk del laboratorio.
+ * Los labs se importan con `dynamic(..., { ssr: false })` para mantenerlos
+ * FUERA del bundle del Worker (límite 3 MiB gzip): así el three.js y los
+ * datos verbatim de cada práctica viajan en chunks de cliente, no en SSR.
+ */
+function LabCargando() {
+  return (
+    <div
+      style={{
+        minHeight: 320,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 14,
+        color: "rgba(255,255,255,0.45)",
+        fontFamily: "var(--font-epilogue), 'Plus Jakarta Sans', sans-serif",
+      }}
+    >
+      <i className="fa-solid fa-circle-notch fa-spin" style={{ fontSize: 28 }} />
+      <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.02em" }}>
+        Cargando laboratorio 3D…
+      </span>
+    </div>
+  );
+}
+
+const LabDensidad = dynamic(() => import("./labs/LabDensidad").then((m) => m.LabDensidad), { ssr: false, loading: LabCargando });
+const LabEstadosMateria = dynamic(() => import("./labs/LabEstadosMateria").then((m) => m.LabEstadosMateria), { ssr: false, loading: LabCargando });
+const LabModelosAtomicos = dynamic(() => import("./labs/LabModelosAtomicos").then((m) => m.LabModelosAtomicos), { ssr: false, loading: LabCargando });
+const LabEnlacesQuimicos = dynamic(() => import("./labs/LabEnlacesQuimicos").then((m) => m.LabEnlacesQuimicos), { ssr: false, loading: LabCargando });
+const LabConservacionMateria = dynamic(() => import("./labs/LabConservacionMateria").then((m) => m.LabConservacionMateria), { ssr: false, loading: LabCargando });
+const LabEnergiaElectricidad = dynamic(() => import("./labs/LabEnergiaElectricidad").then((m) => m.LabEnergiaElectricidad), { ssr: false, loading: LabCargando });
+const LabSeparacionMezclas = dynamic(() => import("./labs/LabSeparacionMezclas").then((m) => m.LabSeparacionMezclas), { ssr: false, loading: LabCargando });
+const LabPropiedadesMateria = dynamic(() => import("./labs/LabPropiedadesMateria").then((m) => m.LabPropiedadesMateria), { ssr: false, loading: LabCargando });
+const LabFracciones = dynamic(() => import("./labs/LabFracciones").then((m) => m.LabFracciones), { ssr: false, loading: LabCargando });
+const LabPotencias = dynamic(() => import("./labs/LabPotencias").then((m) => m.LabPotencias), { ssr: false, loading: LabCargando });
+const LabConcentracion = dynamic(() => import("./labs/LabConcentracion").then((m) => m.LabConcentracion), { ssr: false, loading: LabCargando });
+const LabProporcion = dynamic(() => import("./labs/LabProporcion").then((m) => m.LabProporcion), { ssr: false, loading: LabCargando });
+const LabRectaNumerica = dynamic(() => import("./labs/LabRectaNumerica").then((m) => m.LabRectaNumerica), { ssr: false, loading: LabCargando });
+const LabNotacionCientifica = dynamic(() => import("./labs/LabNotacionCientifica").then((m) => m.LabNotacionCientifica), { ssr: false, loading: LabCargando });
+const LabValorPosicional = dynamic(() => import("./labs/LabValorPosicional").then((m) => m.LabValorPosicional), { ssr: false, loading: LabCargando });
+const LabSistemas = dynamic(() => import("./labs/LabSistemas").then((m) => m.LabSistemas), { ssr: false, loading: LabCargando });
+const LabBalanza = dynamic(() => import("./labs/LabBalanza").then((m) => m.LabBalanza), { ssr: false, loading: LabCargando });
+const LabPitagoras = dynamic(() => import("./labs/LabPitagoras").then((m) => m.LabPitagoras), { ssr: false, loading: LabCargando });
+const LabCilindro = dynamic(() => import("./labs/LabCilindro").then((m) => m.LabCilindro), { ssr: false, loading: LabCargando });
+const LabFactorizacion = dynamic(() => import("./labs/LabFactorizacion").then((m) => m.LabFactorizacion), { ssr: false, loading: LabCargando });
+const LabEcuaciones = dynamic(() => import("./labs/LabEcuaciones").then((m) => m.LabEcuaciones), { ssr: false, loading: LabCargando });
+const LabProductos = dynamic(() => import("./labs/LabProductos").then((m) => m.LabProductos), { ssr: false, loading: LabCargando });
+const LabConservacion = dynamic(() => import("./labs/LabConservacion").then((m) => m.LabConservacion), { ssr: false, loading: LabCargando });
+const LabGasIdeal = dynamic(() => import("./labs/LabGasIdeal").then((m) => m.LabGasIdeal), { ssr: false, loading: LabCargando });
+const LabTransferenciaCalor = dynamic(() => import("./labs/LabTransferenciaCalor").then((m) => m.LabTransferenciaCalor), { ssr: false, loading: LabCargando });
+const LabEntropia = dynamic(() => import("./labs/LabEntropia").then((m) => m.LabEntropia), { ssr: false, loading: LabCargando });
+const LabMaquinaTermica = dynamic(() => import("./labs/LabMaquinaTermica").then((m) => m.LabMaquinaTermica), { ssr: false, loading: LabCargando });
+const LabTrabajoPotencia = dynamic(() => import("./labs/LabTrabajoPotencia").then((m) => m.LabTrabajoPotencia), { ssr: false, loading: LabCargando });
+const LabInecuaciones = dynamic(() => import("./labs/LabInecuaciones").then((m) => m.LabInecuaciones), { ssr: false, loading: LabCargando });
+const LabEnergiaFormas = dynamic(() => import("./labs/LabEnergiaFormas").then((m) => m.LabEnergiaFormas), { ssr: false, loading: LabCargando });
+const LabParabola = dynamic(() => import("./labs/LabParabola").then((m) => m.LabParabola), { ssr: false, loading: LabCargando });
+const LabEcuacionRecta = dynamic(() => import("./labs/LabEcuacionRecta").then((m) => m.LabEcuacionRecta), { ssr: false, loading: LabCargando });
+const LabFunciones = dynamic(() => import("./labs/LabFunciones").then((m) => m.LabFunciones), { ssr: false, loading: LabCargando });
+const LabPiramideEnergia = dynamic(() => import("./labs/LabPiramideEnergia").then((m) => m.LabPiramideEnergia), { ssr: false, loading: LabCargando });
+const LabFotosintesis = dynamic(() => import("./labs/LabFotosintesis").then((m) => m.LabFotosintesis), { ssr: false, loading: LabCargando });
+const LabSemejanza = dynamic(() => import("./labs/LabSemejanza").then((m) => m.LabSemejanza), { ssr: false, loading: LabCargando });
+const LabCicloCarbono = dynamic(() => import("./labs/LabCicloCarbono").then((m) => m.LabCicloCarbono), { ssr: false, loading: LabCargando });
+const LabCuadratica = dynamic(() => import("./labs/LabCuadratica").then((m) => m.LabCuadratica), { ssr: false, loading: LabCargando });
+const LabSubsistemas = dynamic(() => import("./labs/LabSubsistemas").then((m) => m.LabSubsistemas), { ssr: false, loading: LabCargando });
+const LabBiomas = dynamic(() => import("./labs/LabBiomas").then((m) => m.LabBiomas), { ssr: false, loading: LabCargando });
+const LabTroficas = dynamic(() => import("./labs/LabTroficas").then((m) => m.LabTroficas), { ssr: false, loading: LabCargando });
+const LabDeforestacion = dynamic(() => import("./labs/LabDeforestacion").then((m) => m.LabDeforestacion), { ssr: false, loading: LabCargando });
+const LabDiscriminante = dynamic(() => import("./labs/LabDiscriminante").then((m) => m.LabDiscriminante), { ssr: false, loading: LabCargando });
+const LabCirculoUnitario = dynamic(() => import("./labs/LabCirculoUnitario").then((m) => m.LabCirculoUnitario), { ssr: false, loading: LabCargando });
+const LabTrianguloRectangulo = dynamic(() => import("./labs/LabTrianguloRectangulo").then((m) => m.LabTrianguloRectangulo), { ssr: false, loading: LabCargando });
+const LabLeySenosCosenos = dynamic(() => import("./labs/LabLeySenosCosenos").then((m) => m.LabLeySenosCosenos), { ssr: false, loading: LabCargando });
+const LabGeometriaAnalitica = dynamic(() => import("./labs/LabGeometriaAnalitica").then((m) => m.LabGeometriaAnalitica), { ssr: false, loading: LabCargando });
+const LabTransformacionesFunciones = dynamic(() => import("./labs/LabTransformacionesFunciones").then((m) => m.LabTransformacionesFunciones), { ssr: false, loading: LabCargando });
+const LabBalanceo = dynamic(() => import("./labs/LabBalanceo").then((m) => m.LabBalanceo), { ssr: false, loading: LabCargando });
+const LabOrganica = dynamic(() => import("./labs/LabOrganica").then((m) => m.LabOrganica), { ssr: false, loading: LabCargando });
+const LabPh = dynamic(() => import("./labs/LabPh").then((m) => m.LabPh), { ssr: false, loading: LabCargando });
+const LabCo2 = dynamic(() => import("./labs/LabCo2").then((m) => m.LabCo2), { ssr: false, loading: LabCargando });
+const LabConicas = dynamic(() => import("./labs/LabConicas").then((m) => m.LabConicas), { ssr: false, loading: LabCargando });
+const LabReaccionesTipos = dynamic(() => import("./labs/LabReaccionesTipos").then((m) => m.LabReaccionesTipos), { ssr: false, loading: LabCargando });
+const LabBiomoleculas = dynamic(() => import("./labs/LabBiomoleculas").then((m) => m.LabBiomoleculas), { ssr: false, loading: LabCargando });
+const LabFuncionesConcepto = dynamic(() => import("./labs/LabFuncionesConcepto").then((m) => m.LabFuncionesConcepto), { ssr: false, loading: LabCargando });
+const LabLimites = dynamic(() => import("./labs/LabLimites").then((m) => m.LabLimites), { ssr: false, loading: LabCargando });
+const LabContinuidad = dynamic(() => import("./labs/LabContinuidad").then((m) => m.LabContinuidad), { ssr: false, loading: LabCargando });
+const LabDerivada = dynamic(() => import("./labs/LabDerivada").then((m) => m.LabDerivada), { ssr: false, loading: LabCargando });
+const LabReglas = dynamic(() => import("./labs/LabReglas").then((m) => m.LabReglas), { ssr: false, loading: LabCargando });
+const LabTrascendentes = dynamic(() => import("./labs/LabTrascendentes").then((m) => m.LabTrascendentes), { ssr: false, loading: LabCargando });
+const LabAnalisis = dynamic(() => import("./labs/LabAnalisis").then((m) => m.LabAnalisis), { ssr: false, loading: LabCargando });
+const LabOptimizacion = dynamic(() => import("./labs/LabOptimizacion").then((m) => m.LabOptimizacion), { ssr: false, loading: LabCargando });
+const LabDiferencial = dynamic(() => import("./labs/LabDiferencial").then((m) => m.LabDiferencial), { ssr: false, loading: LabCargando });
+const LabNewton = dynamic(() => import("./labs/LabNewton").then((m) => m.LabNewton), { ssr: false, loading: LabCargando });
+const LabCinematica = dynamic(() => import("./labs/LabCinematica").then((m) => m.LabCinematica), { ssr: false, loading: LabCargando });
+const LabGravitacion = dynamic(() => import("./labs/LabGravitacion").then((m) => m.LabGravitacion), { ssr: false, loading: LabCargando });
+const LabOndas = dynamic(() => import("./labs/LabOndas").then((m) => m.LabOndas), { ssr: false, loading: LabCargando });
+const LabEspectro = dynamic(() => import("./labs/LabEspectro").then((m) => m.LabEspectro), { ssr: false, loading: LabCargando });
+const LabOptica = dynamic(() => import("./labs/LabOptica").then((m) => m.LabOptica), { ssr: false, loading: LabCargando });
+const LabElectromagnetismo = dynamic(() => import("./labs/LabElectromagnetismo").then((m) => m.LabElectromagnetismo), { ssr: false, loading: LabCargando });
+const LabGeneticaMendel = dynamic(() => import("./labs/LabGeneticaMendel").then((m) => m.LabGeneticaMendel), { ssr: false, loading: LabCargando });
+const LabCelula = dynamic(() => import("./labs/LabCelula").then((m) => m.LabCelula), { ssr: false, loading: LabCargando });
+const LabMetabolismo = dynamic(() => import("./labs/LabMetabolismo").then((m) => m.LabMetabolismo), { ssr: false, loading: LabCargando });
+const LabSeleccionNatural = dynamic(() => import("./labs/LabSeleccionNatural").then((m) => m.LabSeleccionNatural), { ssr: false, loading: LabCargando });
+const LabAdnDogma = dynamic(() => import("./labs/LabAdnDogma").then((m) => m.LabAdnDogma), { ssr: false, loading: LabCargando });
+const LabOrigenVida = dynamic(() => import("./labs/LabOrigenVida").then((m) => m.LabOrigenVida), { ssr: false, loading: LabCargando });
+const LabMutaciones = dynamic(() => import("./labs/LabMutaciones").then((m) => m.LabMutaciones), { ssr: false, loading: LabCargando });
+const LabBiotecnologia = dynamic(() => import("./labs/LabBiotecnologia").then((m) => m.LabBiotecnologia), { ssr: false, loading: LabCargando });
+const LabFluidos = dynamic(() => import("./labs/LabFluidos").then((m) => m.LabFluidos), { ssr: false, loading: LabCargando });
+const LabDivisionCelular = dynamic(() => import("./labs/LabDivisionCelular").then((m) => m.LabDivisionCelular), { ssr: false, loading: LabCargando });
+const LabCalor = dynamic(() => import("./labs/LabCalor").then((m) => m.LabCalor), { ssr: false, loading: LabCargando });
+const LabRedox = dynamic(() => import("./labs/LabRedox").then((m) => m.LabRedox), { ssr: false, loading: LabCargando });
+const LabTfc = dynamic(() => import("./labs/LabTfc").then((m) => m.LabTfc), { ssr: false, loading: LabCargando });
+const LabNormal = dynamic(() => import("./labs/LabNormal").then((m) => m.LabNormal), { ssr: false, loading: LabCargando });
+const LabEquilibrio = dynamic(() => import("./labs/LabEquilibrio").then((m) => m.LabEquilibrio), { ssr: false, loading: LabCargando });
+const LabRespiracion = dynamic(() => import("./labs/LabRespiracion").then((m) => m.LabRespiracion), { ssr: false, loading: LabCargando });
+const LabEstructuraReaccion = dynamic(() => import("./labs/LabEstructuraReaccion").then((m) => m.LabEstructuraReaccion), { ssr: false, loading: LabCargando });
 
 /** Props que recibe cada componente de laboratorio. */
 export interface PracticaLabProps {
