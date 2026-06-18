@@ -230,6 +230,56 @@
       "fuente": "https://commons.wikimedia.org/wiki/File:Ross_Ice_Shelf,_Antarctica_on_Earth.jpg",
       "query": "planet earth from space continents",
       "dims": "2146×1548"
+    },
+    {
+      "tema": "aritmetica",
+      "archivo": "labs/aritmetica.webp",
+      "titulo": "Ábaco para conteo y aritmética",
+      "licencia": "Unsplash License",
+      "autor": "Crissy Jarvis",
+      "fuente": "https://unsplash.com/photos/photo-1548690596-f1722c190938",
+      "query": "abacus mathematics",
+      "dims": "800×~"
+    },
+    {
+      "tema": "ecuaciones",
+      "archivo": "labs/ecuaciones.webp",
+      "titulo": "Ecuaciones matemáticas en pizarrón",
+      "licencia": "Unsplash License",
+      "autor": "Roman Mager",
+      "fuente": "https://unsplash.com/photos/photo-1453733190371-0a9bedd82893",
+      "query": "mathematics equations chalkboard",
+      "dims": "800×~"
+    },
+    {
+      "tema": "estadistica",
+      "archivo": "labs/estadistica.webp",
+      "titulo": "Gráficas estadísticas",
+      "licencia": "Unsplash License",
+      "autor": "Nicholas Cappello",
+      "fuente": "https://unsplash.com/photos/photo-1560221328-12fe60f83ab8",
+      "query": "statistics charts graph",
+      "dims": "800×~"
+    },
+    {
+      "tema": "laboratorio",
+      "archivo": "labs/laboratorio.webp",
+      "titulo": "Material de vidrio de laboratorio",
+      "licencia": "Unsplash License",
+      "autor": "Girl with red hat",
+      "fuente": "https://unsplash.com/photos/photo-1601961545517-59307b1fbac3",
+      "query": "laboratory glassware beakers",
+      "dims": "800×~"
+    },
+    {
+      "tema": "microscopio",
+      "archivo": "labs/microscopio.webp",
+      "titulo": "Microscopio de laboratorio",
+      "licencia": "Unsplash License",
+      "autor": "Yassine Khalfalli",
+      "fuente": "https://unsplash.com/photos/photo-1572884267966-02340ebc90ac",
+      "query": "microscope laboratory",
+      "dims": "800×~"
     }
   ]
 }

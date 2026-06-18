@@ -130,6 +130,116 @@
       "fuente": "https://commons.wikimedia.org/wiki/File%3AAtari%20800%20XL%20home%20computer%20with%20monitor%20and%20tape%20program%20recorder%20XC12.jpg",
       "query": "computer code programming screen",
       "dims": "6153×3829"
+    },
+    {
+      "tema": "biblioteca",
+      "archivo": "lecturas/biblioteca.webp",
+      "titulo": "Estantería de biblioteca con libros",
+      "licencia": "Unsplash License",
+      "autor": "Clay Banks",
+      "fuente": "https://unsplash.com/photos/photo-1494809610410-160faaed4de0",
+      "query": "bookshelf library",
+      "dims": "800×~"
+    },
+    {
+      "tema": "poesia",
+      "archivo": "lecturas/poesia.webp",
+      "titulo": "Escritura manuscrita con pluma y tinta",
+      "licencia": "Unsplash License",
+      "autor": "Aaron Burden",
+      "fuente": "https://unsplash.com/photos/photo-1462642109801-4ac2971a3a51",
+      "query": "poetry handwriting notebook",
+      "dims": "800×~"
+    },
+    {
+      "tema": "oratoria",
+      "archivo": "lecturas/oratoria.webp",
+      "titulo": "Persona hablando ante público con micrófono",
+      "licencia": "Unsplash License",
+      "autor": "Kane Reinholdtsen",
+      "fuente": "https://unsplash.com/photos/photo-1475721027785-f74eccf877e2",
+      "query": "public speaking microphone",
+      "dims": "800×~"
+    },
+    {
+      "tema": "salon-clase",
+      "archivo": "lecturas/salon-clase.webp",
+      "titulo": "Estudiantes en un salón de clases",
+      "licencia": "Unsplash License",
+      "autor": "Quilia",
+      "fuente": "https://unsplash.com/photos/photo-1524178232363-1fb2b075b655",
+      "query": "students classroom learning",
+      "dims": "800×~"
+    },
+    {
+      "tema": "viaje",
+      "archivo": "lecturas/viaje.webp",
+      "titulo": "Mapa de viaje con accesorios",
+      "licencia": "Unsplash License",
+      "autor": "Agus Dietrich",
+      "fuente": "https://unsplash.com/photos/photo-1532188142562-df556b861e6a",
+      "query": "travel map passport",
+      "dims": "800×~"
+    },
+    {
+      "tema": "globo",
+      "archivo": "lecturas/globo.webp",
+      "titulo": "Globo terráqueo",
+      "licencia": "Unsplash License",
+      "autor": "Juliana Kozoski",
+      "fuente": "https://unsplash.com/photos/photo-1531266752426-aad472b7bbf4",
+      "query": "globe world communication",
+      "dims": "800×~"
+    },
+    {
+      "tema": "codigo",
+      "archivo": "lecturas/codigo.webp",
+      "titulo": "Código de programación en pantalla",
+      "licencia": "Unsplash License",
+      "autor": "Ilya Pavlov",
+      "fuente": "https://unsplash.com/photos/photo-1461749280684-dccba630e2f6",
+      "query": "programming code screen",
+      "dims": "800×~"
+    },
+    {
+      "tema": "hardware",
+      "archivo": "lecturas/hardware.webp",
+      "titulo": "Placa de circuito / hardware de computadora",
+      "licencia": "Unsplash License",
+      "autor": "Alexandre Debiève",
+      "fuente": "https://unsplash.com/photos/photo-1518770660439-4636190af475",
+      "query": "circuit board hardware",
+      "dims": "800×~"
+    },
+    {
+      "tema": "ciberseguridad",
+      "archivo": "lecturas/ciberseguridad.webp",
+      "titulo": "Candado digital / ciberseguridad",
+      "licencia": "Unsplash License",
+      "autor": "Sasun Bughdaryan",
+      "fuente": "https://unsplash.com/photos/photo-1768839721176-2fa91fdce725",
+      "query": "cybersecurity padlock digital",
+      "dims": "800×~"
+    },
+    {
+      "tema": "datos",
+      "archivo": "lecturas/datos.webp",
+      "titulo": "Tablero de análisis de datos",
+      "licencia": "Unsplash License",
+      "autor": "Luke Chesser",
+      "fuente": "https://unsplash.com/photos/photo-1551288049-bebda4e38f71",
+      "query": "data analytics dashboard",
+      "dims": "800×~"
+    },
+    {
+      "tema": "colaboracion",
+      "archivo": "lecturas/colaboracion.webp",
+      "titulo": "Equipo trabajando con computadoras",
+      "licencia": "Unsplash License",
+      "autor": "Arlington Research",
+      "fuente": "https://unsplash.com/photos/photo-1560264357-8d9202250f21",
+      "query": "team working computers office",
+      "dims": "800×~"
     }
   ]
 }

@@ -2,13 +2,18 @@
 
 import { useState } from 'react';
 import type { ActividadQuizVerdaderoFalso, CallbackProgreso } from '@/types/activities';
+import type { AreaColor } from '@/components/hub/hub-colors';
+
+const FALLBACK_COLOR: AreaColor = { hex: '#A78BFA', rgba: '167,139,250', faIcon: 'fa-circle-dot', gradient: '' };
+const FONT = 'var(--font-epilogue), sans-serif';
 
 interface Props {
   actividad: ActividadQuizVerdaderoFalso;
   onProgreso?: CallbackProgreso;
+  color?: AreaColor;
 }
 
-export function QuizVerdaderoFalsoActivity({ actividad, onProgreso }: Props) {
+export function QuizVerdaderoFalsoActivity({ actividad, onProgreso, color = FALLBACK_COLOR }: Props) {
   const { contenido } = actividad;
   const [respuestas, setRespuestas] = useState<Record<number, boolean>>({});
   const [enviado, setEnviado] = useState(false);
@@ -40,17 +45,25 @@ export function QuizVerdaderoFalsoActivity({ actividad, onProgreso }: Props) {
   const aprobado = puntaje !== null && puntaje >= (contenido.puntaje_minimo_aprobacion ?? 70);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div style={{ maxWidth: 672, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24, fontFamily: FONT }}>
       {enviado && puntaje !== null && (
-        <div className={`rounded-xl border p-4 text-center ${aprobado ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}`}>
-          <p className={`text-2xl font-bold ${aprobado ? 'text-green-700' : 'text-red-700'}`}>{puntaje}%</p>
-          <p className={`text-sm ${aprobado ? 'text-green-600' : 'text-red-600'}`}>
+        <div
+          style={{
+            borderRadius: 16,
+            border: `1px solid ${aprobado ? 'rgba(74,222,128,0.30)' : 'rgba(248,113,113,0.30)'}`,
+            background: aprobado ? 'rgba(74,222,128,0.10)' : 'rgba(248,113,113,0.10)',
+            padding: '20px 16px',
+            textAlign: 'center',
+          }}
+        >
+          <p style={{ fontSize: 30, fontWeight: 800, margin: 0, color: aprobado ? '#4ADE80' : '#F87171' }}>{puntaje}%</p>
+          <p style={{ fontSize: 14, margin: '4px 0 0', color: aprobado ? '#4ADE80' : '#F87171' }}>
             {aprobado ? 'Aprobado ✓' : 'Sigue intentando'}
           </p>
         </div>
       )}
 
-      <div className="space-y-4">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         {contenido.preguntas.map((pregunta, pi) => {
           const seleccionada = respuestas[pi];
           const esCorrecta = enviado && seleccionada === pregunta.respuesta;
@@ -58,23 +71,51 @@ export function QuizVerdaderoFalsoActivity({ actividad, onProgreso }: Props) {
           return (
             <div
               key={pi}
-              className={`rounded-xl border p-5 ${enviado ? (esCorrecta ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50') : 'border-gray-200 bg-white'}`}
+              style={{
+                borderRadius: 16,
+                border: `1px solid ${enviado ? (esCorrecta ? 'rgba(74,222,128,0.30)' : 'rgba(248,113,113,0.30)') : 'rgba(255,255,255,0.08)'}`,
+                background: enviado ? (esCorrecta ? 'rgba(74,222,128,0.07)' : 'rgba(248,113,113,0.07)') : 'rgba(255,255,255,0.04)',
+                padding: 20,
+              }}
             >
-              <p className="mb-3 font-medium text-gray-800">{pi + 1}. {pregunta.enunciado}</p>
-              <div className="flex gap-3">
+              <p style={{ margin: '0 0 12px', fontWeight: 600, color: '#fff', fontSize: 15, lineHeight: 1.5 }}>
+                {pi + 1}. {pregunta.enunciado}
+              </p>
+              <div style={{ display: 'flex', gap: 12 }}>
                 {([true, false] as const).map((valor) => {
                   const seleccionadaEsta = seleccionada === valor;
                   const correctaEsta = enviado && valor === pregunta.respuesta;
+                  const errorEsta = enviado && seleccionadaEsta && valor !== pregunta.respuesta;
+
+                  let bg = 'transparent';
+                  let borderColor = 'rgba(255,255,255,0.12)';
+                  let textColor = 'rgba(255,255,255,0.70)';
+                  if (correctaEsta) {
+                    bg = 'rgba(74,222,128,0.14)'; borderColor = 'rgba(74,222,128,0.55)'; textColor = '#4ADE80';
+                  } else if (errorEsta) {
+                    bg = 'rgba(248,113,113,0.14)'; borderColor = 'rgba(248,113,113,0.55)'; textColor = '#F87171';
+                  } else if (seleccionadaEsta) {
+                    bg = `rgba(${color.rgba},0.14)`; borderColor = color.hex; textColor = '#fff';
+                  }
+
                   return (
                     <button
                       key={String(valor)}
                       disabled={enviado}
                       onClick={() => setRespuestas(r => ({ ...r, [pi]: valor }))}
-                      className={`flex-1 rounded-lg border py-2.5 text-sm font-semibold transition-colors
-                        ${correctaEsta ? 'border-green-400 bg-green-100 text-green-800'
-                          : seleccionadaEsta && enviado ? 'border-red-400 bg-red-100 text-red-800'
-                          : seleccionadaEsta ? 'border-blue-500 bg-blue-50 text-blue-700'
-                          : 'border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                      style={{
+                        flex: 1,
+                        borderRadius: 12,
+                        border: `1.5px solid ${borderColor}`,
+                        background: bg,
+                        color: textColor,
+                        padding: '11px 0',
+                        fontSize: 14,
+                        fontWeight: 700,
+                        fontFamily: FONT,
+                        cursor: enviado ? 'default' : 'pointer',
+                        transition: 'all 0.15s ease',
+                      }}
                     >
                       {valor ? 'Verdadero' : 'Falso'}
                     </button>
@@ -82,7 +123,9 @@ export function QuizVerdaderoFalsoActivity({ actividad, onProgreso }: Props) {
                 })}
               </div>
               {enviado && pregunta.retroalimentacion && (
-                <p className="mt-2 text-xs text-gray-600 italic">{pregunta.retroalimentacion}</p>
+                <p style={{ margin: '10px 0 0', fontSize: 12.5, fontStyle: 'italic', color: 'rgba(255,255,255,0.55)' }}>
+                  {pregunta.retroalimentacion}
+                </p>
               )}
             </div>
           );
@@ -93,7 +136,20 @@ export function QuizVerdaderoFalsoActivity({ actividad, onProgreso }: Props) {
         <button
           onClick={handleEnviar}
           disabled={respondidas < total}
-          className="w-full rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          style={{
+            width: '100%',
+            borderRadius: 12,
+            border: 'none',
+            background: color.hex,
+            color: '#011126',
+            padding: '14px 0',
+            fontSize: 14,
+            fontWeight: 700,
+            fontFamily: FONT,
+            cursor: respondidas < total ? 'not-allowed' : 'pointer',
+            opacity: respondidas < total ? 0.4 : 1,
+            transition: 'opacity 0.15s ease',
+          }}
         >
           Enviar respuestas ({respondidas}/{total})
         </button>

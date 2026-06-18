@@ -2,13 +2,18 @@
 
 import { useState } from 'react';
 import type { ActividadSimulacion, CallbackProgreso } from '@/types/activities';
+import type { AreaColor } from '@/components/hub/hub-colors';
+
+const FALLBACK_COLOR: AreaColor = { hex: '#A78BFA', rgba: '167,139,250', faIcon: 'fa-circle-dot', gradient: '' };
+const FONT = 'var(--font-epilogue), sans-serif';
 
 interface Props {
   actividad: ActividadSimulacion;
   onProgreso?: CallbackProgreso;
+  color?: AreaColor;
 }
 
-export function SimulacionActivity({ actividad, onProgreso }: Props) {
+export function SimulacionActivity({ actividad, onProgreso, color = FALLBACK_COLOR }: Props) {
   const { contenido } = actividad;
   const [reporte, setReporte] = useState('');
   const [completado, setCompletado] = useState(false);
@@ -27,24 +32,24 @@ export function SimulacionActivity({ actividad, onProgreso }: Props) {
   };
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
-      <div className="flex items-center gap-2">
-        <span className="rounded-full bg-purple-100 px-3 py-0.5 text-xs font-medium text-purple-700">
+    <div style={{ maxWidth: 672, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24, fontFamily: FONT }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span style={{ borderRadius: 999, background: `rgba(${color.rgba},0.14)`, border: `1px solid rgba(${color.rgba},0.32)`, color: color.hex, padding: '3px 12px', fontSize: 12.5, fontWeight: 600 }}>
           {etiquetaTipo[contenido.tipo_simulacion]}
         </span>
       </div>
 
-      <div className="rounded-xl border border-gray-200 bg-white p-5">
-        <p className="text-gray-700 leading-relaxed">{contenido.descripcion}</p>
+      <div style={{ borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', padding: 20 }}>
+        <p style={{ margin: 0, fontSize: 14.5, color: 'rgba(255,255,255,0.80)', lineHeight: 1.6 }}>{contenido.descripcion}</p>
       </div>
 
       {contenido.instrucciones && contenido.instrucciones.length > 0 && (
-        <div className="space-y-2">
-          <p className="text-sm font-semibold text-gray-700">Instrucciones</p>
-          <ol className="space-y-2">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.82)' }}>Instrucciones</p>
+          <ol style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
             {contenido.instrucciones.map((inst, i) => (
-              <li key={i} className="flex items-start gap-3 text-sm text-gray-700">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">{i + 1}</span>
+              <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, fontSize: 14, color: 'rgba(255,255,255,0.78)', lineHeight: 1.55 }}>
+                <span style={{ display: 'flex', height: 20, width: 20, flexShrink: 0, alignItems: 'center', justifyContent: 'center', borderRadius: 999, background: `rgba(${color.rgba},0.16)`, fontSize: 11, fontWeight: 800, color: color.hex }}>{i + 1}</span>
                 {inst}
               </li>
             ))}
@@ -57,43 +62,68 @@ export function SimulacionActivity({ actividad, onProgreso }: Props) {
           href={contenido.url_simulacion}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 w-full rounded-lg border-2 border-blue-600 py-3 text-sm font-semibold text-blue-700 hover:bg-blue-50 transition-colors"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+            width: '100%',
+            borderRadius: 12,
+            border: `2px solid ${color.hex}`,
+            color: color.hex,
+            padding: '13px 0',
+            fontSize: 14,
+            fontWeight: 700,
+            textDecoration: 'none',
+            fontFamily: FONT,
+          }}
         >
           Abrir simulación ↗
         </a>
       )}
 
       {contenido.variables_a_explorar && contenido.variables_a_explorar.length > 0 && (
-        <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 space-y-1">
-          <p className="text-xs font-semibold text-gray-500 uppercase">Variables a explorar</p>
-          <ul className="space-y-0.5">
+        <div style={{ borderRadius: 12, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.025)', padding: 16, display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <p style={{ margin: 0, fontSize: 11.5, fontWeight: 700, color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: 0.5 }}>Variables a explorar</p>
+          <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 2 }}>
             {contenido.variables_a_explorar.map((v, i) => (
-              <li key={i} className="text-sm text-gray-700">• {v}</li>
+              <li key={i} style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)' }}>• {v}</li>
             ))}
           </ul>
         </div>
       )}
 
       {contenido.preguntas_reflexion && contenido.preguntas_reflexion.length > 0 && (
-        <div className="space-y-2">
-          <p className="text-sm font-semibold text-gray-700">Preguntas de reflexión</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.82)' }}>Preguntas de reflexión</p>
           {contenido.preguntas_reflexion.map((q, i) => (
-            <p key={i} className="text-sm text-gray-600 rounded-lg border border-gray-200 bg-white p-3">{i + 1}. {q}</p>
+            <p key={i} style={{ margin: 0, fontSize: 14, color: 'rgba(255,255,255,0.72)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', padding: 12 }}>{i + 1}. {q}</p>
           ))}
         </div>
       )}
 
       {contenido.reporte_esperado && (
-        <div className="space-y-2">
-          <p className="text-sm font-semibold text-gray-700">Reporte a entregar</p>
-          <p className="text-xs text-gray-500 italic">{contenido.reporte_esperado}</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.82)' }}>Reporte a entregar</p>
+          <p style={{ margin: 0, fontSize: 12.5, fontStyle: 'italic', color: 'rgba(255,255,255,0.50)' }}>{contenido.reporte_esperado}</p>
           <textarea
             value={reporte}
             onChange={e => setReporte(e.target.value)}
             disabled={completado}
             rows={6}
             placeholder="Escribe tu reporte aquí..."
-            className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+            style={{
+              width: '100%',
+              borderRadius: 12,
+              border: '1px solid rgba(255,255,255,0.12)',
+              background: 'rgba(255,255,255,0.04)',
+              color: '#fff',
+              padding: '12px 16px',
+              fontSize: 14,
+              fontFamily: FONT,
+              resize: 'vertical',
+              outline: 'none',
+            }}
           />
         </div>
       )}
@@ -101,7 +131,18 @@ export function SimulacionActivity({ actividad, onProgreso }: Props) {
       {!completado && (
         <button
           onClick={handleCompletar}
-          className="w-full rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
+          style={{
+            width: '100%',
+            borderRadius: 12,
+            border: 'none',
+            background: color.hex,
+            color: '#011126',
+            padding: '14px 0',
+            fontSize: 14,
+            fontWeight: 700,
+            fontFamily: FONT,
+            cursor: 'pointer',
+          }}
         >
           Completar simulación
         </button>

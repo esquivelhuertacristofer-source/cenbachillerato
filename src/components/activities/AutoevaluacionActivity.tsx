@@ -2,13 +2,18 @@
 
 import { useState } from 'react';
 import type { ActividadAutoevaluacion, CallbackProgreso } from '@/types/activities';
+import type { AreaColor } from '@/components/hub/hub-colors';
+
+const FALLBACK_COLOR: AreaColor = { hex: '#A78BFA', rgba: '167,139,250', faIcon: 'fa-circle-dot', gradient: '' };
+const FONT = 'var(--font-epilogue), sans-serif';
 
 interface Props {
   actividad: ActividadAutoevaluacion;
   onProgreso?: CallbackProgreso;
+  color?: AreaColor;
 }
 
-export function AutoevaluacionActivity({ actividad, onProgreso }: Props) {
+export function AutoevaluacionActivity({ actividad, onProgreso, color = FALLBACK_COLOR }: Props) {
   const { contenido } = actividad;
   const [respuestas, setRespuestas] = useState<Record<number, number>>({});
   const [reflexion, setReflexion] = useState('');
@@ -32,20 +37,31 @@ export function AutoevaluacionActivity({ actividad, onProgreso }: Props) {
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div style={{ maxWidth: 672, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24, fontFamily: FONT }}>
       {contenido.instrucciones && (
-        <div className="rounded-lg border border-blue-100 bg-blue-50 p-4">
-          <p className="text-sm text-blue-800">{contenido.instrucciones}</p>
+        <div style={{ borderRadius: 14, border: `1px solid rgba(${color.rgba},0.25)`, background: `rgba(${color.rgba},0.08)`, padding: 16 }}>
+          <p style={{ margin: 0, fontSize: 14, color: 'rgba(255,255,255,0.82)', lineHeight: 1.55 }}>{contenido.instrucciones}</p>
         </div>
       )}
 
-      <div className="space-y-4">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         {contenido.criterios.map((criterio, ci) => {
           const seleccionado = respuestas[ci];
           return (
-            <div key={ci} className="rounded-xl border border-gray-200 bg-white p-5 space-y-3">
-              <p className="text-sm font-semibold text-gray-800">{criterio.descripcion}</p>
-              <div className="flex flex-wrap gap-2">
+            <div
+              key={ci}
+              style={{
+                borderRadius: 16,
+                border: '1px solid rgba(255,255,255,0.08)',
+                background: 'rgba(255,255,255,0.04)',
+                padding: 20,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 12,
+              }}
+            >
+              <p style={{ margin: 0, fontSize: 14.5, fontWeight: 600, color: '#fff', lineHeight: 1.5 }}>{criterio.descripcion}</p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                 {criterio.escala.map((nivel) => {
                   const activo = seleccionado === nivel.valor;
                   return (
@@ -54,11 +70,18 @@ export function AutoevaluacionActivity({ actividad, onProgreso }: Props) {
                       disabled={entregado}
                       onClick={() => handleSeleccion(ci, nivel.valor)}
                       title={nivel.descripcion}
-                      className={`rounded-lg border px-3 py-2 text-xs font-medium transition-colors
-                        ${activo
-                          ? 'border-blue-500 bg-blue-600 text-white'
-                          : 'border-gray-200 text-gray-600 hover:border-blue-300 hover:bg-blue-50'
-                        } disabled:cursor-not-allowed`}
+                      style={{
+                        borderRadius: 10,
+                        border: `1.5px solid ${activo ? color.hex : 'rgba(255,255,255,0.12)'}`,
+                        background: activo ? color.hex : 'transparent',
+                        color: activo ? '#011126' : 'rgba(255,255,255,0.70)',
+                        padding: '8px 12px',
+                        fontSize: 12.5,
+                        fontWeight: 600,
+                        fontFamily: FONT,
+                        cursor: entregado ? 'not-allowed' : 'pointer',
+                        transition: 'all 0.15s ease',
+                      }}
                     >
                       {nivel.etiqueta}
                     </button>
@@ -66,7 +89,7 @@ export function AutoevaluacionActivity({ actividad, onProgreso }: Props) {
                 })}
               </div>
               {seleccionado !== undefined && (
-                <p className="text-xs text-gray-400 italic">
+                <p style={{ margin: 0, fontSize: 12.5, fontStyle: 'italic', color: 'rgba(255,255,255,0.50)' }}>
                   {criterio.escala.find(e => e.valor === seleccionado)?.descripcion}
                 </p>
               )}
@@ -76,23 +99,36 @@ export function AutoevaluacionActivity({ actividad, onProgreso }: Props) {
       </div>
 
       {contenido.reflexion_final_prompt && (
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">{contenido.reflexion_final_prompt}</label>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <label style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.82)' }}>{contenido.reflexion_final_prompt}</label>
           <textarea
             value={reflexion}
             onChange={e => setReflexion(e.target.value)}
             disabled={entregado}
             rows={4}
             placeholder="Escribe tu reflexión..."
-            className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+            style={{
+              width: '100%',
+              borderRadius: 12,
+              border: '1px solid rgba(255,255,255,0.12)',
+              background: 'rgba(255,255,255,0.04)',
+              color: '#fff',
+              padding: '12px 16px',
+              fontSize: 14,
+              fontFamily: FONT,
+              resize: 'vertical',
+              outline: 'none',
+            }}
           />
         </div>
       )}
 
-      <div className="flex items-center justify-between text-xs text-gray-400">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 12.5, color: 'rgba(255,255,255,0.45)' }}>
         <span>{respondidos} / {totalCriterios} criterios evaluados</span>
         {contenido.visible_para_docente && (
-          <span className="rounded-full bg-amber-50 px-2 py-0.5 text-amber-600 border border-amber-100">Visible para docente</span>
+          <span style={{ borderRadius: 999, background: 'rgba(251,191,36,0.12)', border: '1px solid rgba(251,191,36,0.30)', color: '#FBBF24', padding: '2px 10px' }}>
+            Visible para docente
+          </span>
         )}
       </div>
 
@@ -100,12 +136,25 @@ export function AutoevaluacionActivity({ actividad, onProgreso }: Props) {
         <button
           onClick={handleEntregar}
           disabled={!todosRespondidos}
-          className="w-full rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          style={{
+            width: '100%',
+            borderRadius: 12,
+            border: 'none',
+            background: color.hex,
+            color: '#011126',
+            padding: '14px 0',
+            fontSize: 14,
+            fontWeight: 700,
+            fontFamily: FONT,
+            cursor: todosRespondidos ? 'pointer' : 'not-allowed',
+            opacity: todosRespondidos ? 1 : 0.4,
+            transition: 'opacity 0.15s ease',
+          }}
         >
           Entregar autoevaluación
         </button>
       ) : (
-        <div className="rounded-lg bg-green-50 border border-green-200 p-3 text-center text-sm text-green-700 font-medium">
+        <div style={{ borderRadius: 12, background: 'rgba(74,222,128,0.10)', border: '1px solid rgba(74,222,128,0.30)', padding: 12, textAlign: 'center', fontSize: 14, color: '#4ADE80', fontWeight: 600 }}>
           Autoevaluación entregada ✓
         </div>
       )}

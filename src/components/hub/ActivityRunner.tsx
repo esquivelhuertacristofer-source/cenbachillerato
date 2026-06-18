@@ -137,7 +137,7 @@ export function ActivityRunner({
   if (tipo === "quiz_verdadero_falso") {
     return (
       <ActivityShell {...shellProps}>
-        <QuizVerdaderoFalsoActivity actividad={{ ...base, tipo: "quiz_verdadero_falso", contenido: contenido as never }} onProgreso={handleProgreso} />
+        <QuizVerdaderoFalsoActivity actividad={{ ...base, tipo: "quiz_verdadero_falso", contenido: contenido as never }} onProgreso={handleProgreso} color={color} />
       </ActivityShell>
     );
   }
@@ -183,14 +183,14 @@ export function ActivityRunner({
   if (tipo === "video_con_preguntas") {
     return (
       <ActivityShell {...shellProps}>
-        <VideoConPreguntasActivity actividad={{ ...base, tipo: "video_con_preguntas", contenido: contenido as never }} onProgreso={handleProgreso} />
+        <VideoConPreguntasActivity actividad={{ ...base, tipo: "video_con_preguntas", contenido: contenido as never }} onProgreso={handleProgreso} color={color} />
       </ActivityShell>
     );
   }
   if (tipo === "infografia") {
     return (
       <ActivityShell {...shellProps}>
-        <InfografiaActivity actividad={{ ...base, tipo: "infografia", contenido: contenido as never }} onProgreso={handleProgreso} uacCodigo={uacCodigo} />
+        <InfografiaActivity actividad={{ ...base, tipo: "infografia", contenido: contenido as never }} onProgreso={handleProgreso} uacCodigo={uacCodigo} color={color} />
       </ActivityShell>
     );
   }
@@ -210,21 +210,21 @@ export function ActivityRunner({
   if (tipo === "simulacion") {
     return (
       <ActivityShell {...shellProps}>
-        <SimulacionActivity actividad={{ ...base, tipo: "simulacion", contenido: contenido as never }} onProgreso={handleProgreso} />
+        <SimulacionActivity actividad={{ ...base, tipo: "simulacion", contenido: contenido as never }} onProgreso={handleProgreso} color={color} />
       </ActivityShell>
     );
   }
   if (tipo === "glosario_interactivo") {
     return (
       <ActivityShell {...shellProps}>
-        <GlosarioInteractivoActivity actividad={{ ...base, tipo: "glosario_interactivo", contenido: contenido as never }} onProgreso={handleProgreso} />
+        <GlosarioInteractivoActivity actividad={{ ...base, tipo: "glosario_interactivo", contenido: contenido as never }} onProgreso={handleProgreso} color={color} />
       </ActivityShell>
     );
   }
   if (tipo === "autoevaluacion") {
     return (
       <ActivityShell {...shellProps}>
-        <AutoevaluacionActivity actividad={{ ...base, tipo: "autoevaluacion", contenido: contenido as never }} onProgreso={handleProgreso} />
+        <AutoevaluacionActivity actividad={{ ...base, tipo: "autoevaluacion", contenido: contenido as never }} onProgreso={handleProgreso} color={color} />
       </ActivityShell>
     );
   }

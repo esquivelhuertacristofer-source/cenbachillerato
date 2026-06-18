@@ -2,13 +2,18 @@
 
 import { useState } from 'react';
 import type { ActividadVideoConPreguntas, CallbackProgreso } from '@/types/activities';
+import type { AreaColor } from '@/components/hub/hub-colors';
+
+const FALLBACK_COLOR: AreaColor = { hex: '#A78BFA', rgba: '167,139,250', faIcon: 'fa-circle-dot', gradient: '' };
+const FONT = 'var(--font-epilogue), sans-serif';
 
 interface Props {
   actividad: ActividadVideoConPreguntas;
   onProgreso?: CallbackProgreso;
+  color?: AreaColor;
 }
 
-export function VideoConPreguntasActivity({ actividad, onProgreso }: Props) {
+export function VideoConPreguntasActivity({ actividad, onProgreso, color = FALLBACK_COLOR }: Props) {
   const { contenido } = actividad;
   const preguntas = contenido.preguntas ?? [];
   const [respuestas, setRespuestas] = useState<Record<number, string>>({});
@@ -20,40 +25,40 @@ export function VideoConPreguntasActivity({ actividad, onProgreso }: Props) {
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
-      <div className="rounded-xl overflow-hidden border border-gray-200 bg-black aspect-video flex items-center justify-center">
+    <div style={{ maxWidth: 672, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24, fontFamily: FONT }}>
+      <div style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)', background: '#000', aspectRatio: '16 / 9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         {contenido.url_video ? (
           <iframe
             src={contenido.url_video}
             title={contenido.titulo_video}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
-            className="w-full h-full"
+            style={{ width: '100%', height: '100%', border: 'none' }}
           />
         ) : (
-          <p className="text-gray-400 text-sm">Video no disponible</p>
+          <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 14 }}>Video no disponible</p>
         )}
       </div>
 
       {contenido.descripcion_video && (
-        <p className="text-sm text-gray-600">{contenido.descripcion_video}</p>
+        <p style={{ margin: 0, fontSize: 14, color: 'rgba(255,255,255,0.72)', lineHeight: 1.6 }}>{contenido.descripcion_video}</p>
       )}
 
       {preguntas.length > 0 && (
-        <div className="space-y-4">
-          <h3 className="font-semibold text-gray-700">Preguntas de comprensión</h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.85)' }}>Preguntas de comprensión</h3>
           {preguntas.map((p, i) => (
-            <div key={i} className="rounded-xl border border-gray-200 bg-white p-4 space-y-2">
-              <p className="text-sm font-medium text-gray-800">{i + 1}. {p.pregunta}</p>
+            <div key={i} style={{ borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', padding: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#fff', lineHeight: 1.5 }}>{i + 1}. {p.pregunta}</p>
               {p.tipo === 'opcion_multiple' && p.opciones ? (
                 p.opciones.map((op, oi) => (
-                  <label key={oi} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                  <label key={oi} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: 'rgba(255,255,255,0.78)', cursor: 'pointer' }}>
                     <input
                       type="radio"
                       name={`vq-${i}`}
                       disabled={completado}
                       onChange={() => setRespuestas(r => ({ ...r, [i]: String(oi) }))}
-                      className="accent-blue-600"
+                      style={{ accentColor: color.hex }}
                     />
                     {op}
                   </label>
@@ -64,7 +69,18 @@ export function VideoConPreguntasActivity({ actividad, onProgreso }: Props) {
                   rows={3}
                   placeholder="Tu respuesta..."
                   onChange={e => setRespuestas(r => ({ ...r, [i]: e.target.value }))}
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm resize-y focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  style={{
+                    width: '100%',
+                    borderRadius: 10,
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    background: 'rgba(255,255,255,0.04)',
+                    color: '#fff',
+                    padding: '8px 12px',
+                    fontSize: 14,
+                    fontFamily: FONT,
+                    resize: 'vertical',
+                    outline: 'none',
+                  }}
                 />
               )}
             </div>
@@ -75,13 +91,24 @@ export function VideoConPreguntasActivity({ actividad, onProgreso }: Props) {
       {!completado && (
         <button
           onClick={handleCompletar}
-          className="w-full rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
+          style={{
+            width: '100%',
+            borderRadius: 12,
+            border: 'none',
+            background: color.hex,
+            color: '#011126',
+            padding: '14px 0',
+            fontSize: 14,
+            fontWeight: 700,
+            fontFamily: FONT,
+            cursor: 'pointer',
+          }}
         >
           Completar actividad
         </button>
       )}
       {completado && (
-        <div className="rounded-lg bg-green-50 border border-green-200 p-3 text-center text-sm text-green-700 font-medium">
+        <div style={{ borderRadius: 12, background: 'rgba(74,222,128,0.10)', border: '1px solid rgba(74,222,128,0.30)', padding: 12, textAlign: 'center', fontSize: 14, color: '#4ADE80', fontWeight: 600 }}>
           Actividad completada ✓
         </div>
       )}

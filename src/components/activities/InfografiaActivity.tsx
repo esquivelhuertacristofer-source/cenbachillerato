@@ -2,21 +2,27 @@
 
 import { useState } from 'react';
 import type { ActividadInfografia, CallbackProgreso } from '@/types/activities';
+import type { AreaColor } from '@/components/hub/hub-colors';
 import { imagenDeLectura } from '@/lib/contenido/lectura-imagenes';
+
+const FALLBACK_COLOR: AreaColor = { hex: '#A78BFA', rgba: '167,139,250', faIcon: 'fa-circle-dot', gradient: '' };
+const FONT = 'var(--font-epilogue), sans-serif';
 
 interface Props {
   actividad: ActividadInfografia;
   onProgreso?: CallbackProgreso;
   /** Código de la UAC, para elegir una imagen temática cuando no hay lámina propia. */
   uacCodigo?: string;
+  color?: AreaColor;
 }
 
-export function InfografiaActivity({ actividad, onProgreso, uacCodigo }: Props) {
+export function InfografiaActivity({ actividad, onProgreso, uacCodigo, color = FALLBACK_COLOR }: Props) {
   const { contenido } = actividad;
   const [respuesta, setRespuesta] = useState('');
   const [completado, setCompletado] = useState(false);
   const [glosarioAbierto, setGlosarioAbierto] = useState(false);
   const [imgError, setImgError] = useState(false);
+  const [imgTematicaError, setImgTematicaError] = useState(false);
 
   // El placeholder genérico no existe en disco; evita el ícono de imagen rota.
   const urlImagen = contenido.url_imagen ?? '';
@@ -33,48 +39,75 @@ export function InfografiaActivity({ actividad, onProgreso, uacCodigo }: Props) 
     onProgreso?.({ actividadId: actividad.id ?? '', completada: true, puntaje: 100 });
   }
 
+  const card: React.CSSProperties = {
+    borderRadius: 16,
+    border: '1px solid rgba(255,255,255,0.08)',
+    background: 'rgba(255,255,255,0.04)',
+    padding: 20,
+  };
+
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div style={{ maxWidth: 672, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24, fontFamily: FONT }}>
 
       {/* Imagen principal */}
       {tieneImagen ? (
-        <div className="rounded-xl border border-gray-200 overflow-hidden bg-white">
+        <div style={{ borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', overflow: 'hidden', background: 'rgba(255,255,255,0.04)' }}>
           <img
             src={urlImagen}
             alt={contenido.descripcion_accesible ?? contenido.titulo}
-            className="w-full object-contain max-h-[500px]"
+            style={{ width: '100%', objectFit: 'contain', maxHeight: 500, display: 'block' }}
             onError={() => setImgError(true)}
           />
         </div>
-      ) : (
-        <div className="rounded-xl border border-gray-200 overflow-hidden bg-white relative">
+      ) : !imgTematicaError ? (
+        <div style={{ borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', overflow: 'hidden', background: 'rgba(255,255,255,0.04)', position: 'relative' }}>
           <img
             src={imagenTematica}
             alt={contenido.descripcion_accesible ?? contenido.titulo}
-            className="w-full object-cover h-56"
+            style={{ width: '100%', objectFit: 'cover', height: 224, display: 'block' }}
+            onError={() => setImgTematicaError(true)}
           />
           <div
-            className="absolute inset-0 pointer-events-none"
-            style={{ background: 'linear-gradient(to top, rgba(1,17,38,0.55) 0%, rgba(1,17,38,0.10) 40%, transparent 70%)' }}
+            style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(to top, rgba(1,17,38,0.55) 0%, rgba(1,17,38,0.10) 40%, transparent 70%)' }}
           />
-          <p className="absolute bottom-3 left-4 right-4 text-xs font-medium text-white/85">
+          <p style={{ position: 'absolute', bottom: 12, left: 16, right: 16, margin: 0, fontSize: 12.5, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>
+            {contenido.titulo}
+          </p>
+        </div>
+      ) : (
+        // Fallback honesto si tampoco hay imagen temática en disco: bloque temático sin <img> roto.
+        <div
+          style={{
+            borderRadius: 16,
+            border: `1px solid rgba(${color.rgba},0.25)`,
+            background: `linear-gradient(135deg, rgba(${color.rgba},0.14), rgba(${color.rgba},0.04))`,
+            height: 180,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 10,
+          }}
+        >
+          <i className="fa-solid fa-chart-pie" style={{ fontSize: 34, color: `rgba(${color.rgba},0.55)` }} />
+          <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.70)', textAlign: 'center', maxWidth: 320 }}>
             {contenido.titulo}
           </p>
         </div>
       )}
 
       {tieneImagen && contenido.fuente && (
-        <p className="text-xs text-gray-400">Fuente: {contenido.fuente}</p>
+        <p style={{ margin: 0, fontSize: 12.5, color: 'rgba(255,255,255,0.45)' }}>Fuente: {contenido.fuente}</p>
       )}
 
       {/* Puntos clave */}
       {contenido.puntos_clave && contenido.puntos_clave.length > 0 && (
-        <div className="rounded-xl border border-gray-200 bg-white p-5 space-y-2">
-          <p className="text-sm font-semibold text-gray-700">Puntos clave</p>
-          <ul className="space-y-1.5">
+        <div style={{ ...card, display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.82)' }}>Puntos clave</p>
+          <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 6 }}>
             {contenido.puntos_clave.map((punto, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
-                <span className="text-blue-500 mt-0.5 shrink-0">›</span>
+              <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 14, color: 'rgba(255,255,255,0.72)', lineHeight: 1.55 }}>
+                <span style={{ color: color.hex, marginTop: 1, flexShrink: 0 }}>›</span>
                 {punto}
               </li>
             ))}
@@ -84,12 +117,12 @@ export function InfografiaActivity({ actividad, onProgreso, uacCodigo }: Props) 
 
       {/* Contexto mexicano */}
       {tieneContexto && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-5 space-y-2">
-          <div className="flex items-center gap-2">
-            <span className="text-base" aria-hidden="true">🇲🇽</span>
-            <p className="text-sm font-semibold text-amber-900">Contexto mexicano</p>
+        <div style={{ borderRadius: 16, border: '1px solid rgba(251,191,36,0.28)', background: 'rgba(251,191,36,0.08)', padding: 20, display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 16 }} aria-hidden="true">🇲🇽</span>
+            <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#FBBF24' }}>Contexto mexicano</p>
           </div>
-          <p className="text-sm text-amber-800 leading-relaxed">
+          <p style={{ margin: 0, fontSize: 14, color: 'rgba(255,255,255,0.78)', lineHeight: 1.6 }}>
             {contenido.contexto_mexicano}
           </p>
         </div>
@@ -97,22 +130,32 @@ export function InfografiaActivity({ actividad, onProgreso, uacCodigo }: Props) 
 
       {/* Glosario expandible */}
       {tieneGlosario && (
-        <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
+        <div style={{ borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', overflow: 'hidden' }}>
           <button
             type="button"
             onClick={() => setGlosarioAbierto((prev) => !prev)}
-            className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-gray-50 transition-colors"
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '16px 20px',
+              textAlign: 'left',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              fontFamily: FONT,
+            }}
             aria-expanded={glosarioAbierto}
           >
-            <div className="flex items-center gap-2">
-              <span className="text-base" aria-hidden="true">📖</span>
-              <span className="text-sm font-semibold text-gray-700">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 16 }} aria-hidden="true">📖</span>
+              <span style={{ fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.82)' }}>
                 Glosario ({contenido.glosario!.length} términos)
               </span>
             </div>
             <span
-              className="text-gray-400 text-xs transition-transform duration-200"
-              style={{ transform: glosarioAbierto ? 'rotate(180deg)' : 'rotate(0deg)' }}
+              style={{ color: 'rgba(255,255,255,0.45)', fontSize: 12, transition: 'transform 0.2s', transform: glosarioAbierto ? 'rotate(180deg)' : 'rotate(0deg)' }}
               aria-hidden="true"
             >
               ▼
@@ -120,11 +163,11 @@ export function InfografiaActivity({ actividad, onProgreso, uacCodigo }: Props) 
           </button>
 
           {glosarioAbierto && (
-            <div className="border-t border-gray-100 divide-y divide-gray-100">
+            <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
               {contenido.glosario!.map((item, i) => (
-                <div key={i} className="px-5 py-3">
-                  <p className="text-sm font-medium text-gray-800">{item.termino}</p>
-                  <p className="text-sm text-gray-500 mt-0.5">{item.definicion}</p>
+                <div key={i} style={{ padding: '12px 20px', borderTop: i === 0 ? 'none' : '1px solid rgba(255,255,255,0.06)' }}>
+                  <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#fff' }}>{item.termino}</p>
+                  <p style={{ margin: '2px 0 0', fontSize: 14, color: 'rgba(255,255,255,0.60)' }}>{item.definicion}</p>
                 </div>
               ))}
             </div>
@@ -134,9 +177,9 @@ export function InfografiaActivity({ actividad, onProgreso, uacCodigo }: Props) 
 
       {/* Actividad posterior */}
       {contenido.actividad_post && (
-        <div className="space-y-3">
-          <div className="rounded-lg border border-blue-100 bg-blue-50 p-4">
-            <p className="text-sm font-medium text-blue-900">{contenido.actividad_post}</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ borderRadius: 14, border: `1px solid rgba(${color.rgba},0.25)`, background: `rgba(${color.rgba},0.08)`, padding: 16 }}>
+            <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>{contenido.actividad_post}</p>
           </div>
           <textarea
             value={respuesta}
@@ -144,22 +187,33 @@ export function InfografiaActivity({ actividad, onProgreso, uacCodigo }: Props) 
             disabled={completado}
             rows={4}
             placeholder="Escribe tu respuesta..."
-            className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm resize-y focus:outline-none focus:ring-2 focus:ring-blue-500"
+            style={{
+              width: '100%',
+              borderRadius: 12,
+              border: '1px solid rgba(255,255,255,0.12)',
+              background: 'rgba(255,255,255,0.04)',
+              color: '#fff',
+              padding: '12px 16px',
+              fontSize: 14,
+              fontFamily: FONT,
+              resize: 'vertical',
+              outline: 'none',
+            }}
           />
         </div>
       )}
 
       {/* Preguntas para reflexionar */}
       {tienePreguntas && (
-        <div className="rounded-xl border border-violet-200 bg-violet-50 p-5 space-y-3">
-          <div className="flex items-center gap-2">
-            <span className="text-base" aria-hidden="true">🔍</span>
-            <p className="text-sm font-semibold text-violet-900">Preguntas para reflexionar</p>
+        <div style={{ borderRadius: 16, border: '1px solid rgba(167,139,250,0.28)', background: 'rgba(167,139,250,0.08)', padding: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 16 }} aria-hidden="true">🔍</span>
+            <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#C4B5FD' }}>Preguntas para reflexionar</p>
           </div>
-          <ol className="space-y-2 list-none">
+          <ol style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
             {contenido.preguntas_reflexion!.map((pregunta, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm text-violet-800">
-                <span className="font-semibold shrink-0 text-violet-500">{i + 1}.</span>
+              <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 14, color: 'rgba(255,255,255,0.78)', lineHeight: 1.55 }}>
+                <span style={{ fontWeight: 700, flexShrink: 0, color: '#A78BFA' }}>{i + 1}.</span>
                 {pregunta}
               </li>
             ))}
@@ -170,7 +224,18 @@ export function InfografiaActivity({ actividad, onProgreso, uacCodigo }: Props) 
       {!completado && (
         <button
           onClick={handleCompletar}
-          className="w-full rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
+          style={{
+            width: '100%',
+            borderRadius: 12,
+            border: 'none',
+            background: color.hex,
+            color: '#011126',
+            padding: '14px 0',
+            fontSize: 14,
+            fontWeight: 700,
+            fontFamily: FONT,
+            cursor: 'pointer',
+          }}
         >
           Marcar como revisado
         </button>

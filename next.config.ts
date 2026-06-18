@@ -41,6 +41,11 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactCompiler: true,
+  // El optimizador /_next/image no corre en Cloudflare Workers (OpenNext) sin un
+  // loader dedicado, así que ahí las imágenes de next/image salían rotas. Nuestras
+  // imágenes ya vienen pre-optimizadas a WebP ~800px, por lo que las servimos
+  // directo desde /public (igual que un <img> plano, que sí cargaba).
+  images: { unoptimized: true },
   async headers() {
     return [
       {
