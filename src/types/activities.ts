@@ -51,7 +51,6 @@ export interface PreguntaOpcionMultiple {
   opciones: string[];
   respuesta_correcta: number;
   retroalimentacion?: string;
-  imagen_url?: string;
 }
 
 export interface ContenidoQuizMultipleOpcion {
@@ -121,7 +120,6 @@ export interface ContenidoEjercicioMatematico {
   respuesta_final?: string;
   unidades?: string;
   tolerancia_error?: number;
-  imagen_problema?: string;
 }
 
 export interface ActividadEjercicioMatematico extends ActividadBase {
@@ -247,7 +245,6 @@ export interface TerminoGlosario {
   termino: string;
   definicion: string;
   ejemplo?: string;
-  imagen_url?: string;
   etiquetas?: string[];
 }
 

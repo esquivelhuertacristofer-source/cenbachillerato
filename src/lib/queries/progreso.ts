@@ -42,7 +42,7 @@ export interface Logro {
 }
 
 export interface EstadisticasProgreso {
-  materiaMasFuerte: { nombre: string; pct: number } | null;
+  materiaMasFuerte: { nombre: string; xp: number } | null;
   tipoActividades: { tipo: string; cantidad: number }[];
   totalXP: number;
   totalMinutos: number;
@@ -72,23 +72,81 @@ export async function getProgresoDetallePorUAC(
 
     if (!uacRows || uacRows.length === 0) return [];
 
+    // ── Carga por lotes (evita N+1): 3 consultas para todo el semestre en lugar
+    //    de ~(2 + nProgresiones) consultas por UAC. Todo lo demás se agrupa en
+    //    memoria. Mismo patrón que getResumenGrupoDocente en docente.ts.
+    const uacIds = (uacRows as { id: string }[]).map((u) => u.id);
+
+    const { data: progRows } = await sb
+      .from("progresiones")
+      .select("id, categoria, uac_id")
+      .in("uac_id", uacIds);
+
+    // Solo cuentan los propósitos oficiales 2025; los complementos no inflan la meta.
+    const oficialesPorUac = new Map<string, string[]>(); // uac_id -> progIds oficiales
+    const uacIdPorProg = new Map<string, string>();      // prog_id -> uac_id
+    const allProgIds: string[] = [];
+    for (const p of (progRows ?? []) as { id: string; categoria: string; uac_id: string }[]) {
+      if (p.categoria === CATEGORIA_COMPLEMENTO) continue;
+      const arr = oficialesPorUac.get(p.uac_id) ?? [];
+      arr.push(p.id);
+      oficialesPorUac.set(p.uac_id, arr);
+      uacIdPorProg.set(p.id, p.uac_id);
+      allProgIds.push(p.id);
+    }
+
+    // Actividades de todas las progresiones oficiales, en una sola consulta.
+    const actsPorProg = new Map<string, string[]>(); // prog_id -> actIds
+    const uacIdPorAct = new Map<string, string>();   // act_id -> uac_id (para "última actividad")
+    const allActIds: string[] = [];
+    if (allProgIds.length > 0) {
+      const { data: actRows } = await sb
+        .from("actividades")
+        .select("id, progresion_id")
+        .in("progresion_id", allProgIds);
+      for (const a of (actRows ?? []) as { id: string; progresion_id: string }[]) {
+        const arr = actsPorProg.get(a.progresion_id) ?? [];
+        arr.push(a.id);
+        actsPorProg.set(a.progresion_id, arr);
+        allActIds.push(a.id);
+        const uid = uacIdPorProg.get(a.progresion_id);
+        if (uid) uacIdPorAct.set(a.id, uid);
+      }
+    }
+
+    // Intentos completados del alumno, en una sola consulta.
+    const completadasSet = new Set<string>();
+    const intentosPorUac = new Map<string, string[]>(); // uac_id -> completed_at[]
+    if (allActIds.length > 0) {
+      const { data: intentos } = await sb
+        .from("intentos")
+        .select("actividad_id, completed_at")
+        .eq("user_id", alumnoId)
+        .in("actividad_id", allActIds)
+        .eq("status", "completed");
+      for (const it of (intentos ?? []) as { actividad_id: string; completed_at: string | null }[]) {
+        completadasSet.add(it.actividad_id);
+        const uid = uacIdPorAct.get(it.actividad_id);
+        if (uid && it.completed_at) {
+          const arr = intentosPorUac.get(uid) ?? [];
+          arr.push(it.completed_at);
+          intentosPorUac.set(uid, arr);
+        }
+      }
+    }
+
+    // Ensamblar resultados por UAC en memoria.
     const results: ProgresoUAC[] = [];
+    for (const uac of uacRows as { id: string; codigo: string; nombre: string }[]) {
+      const baseUAC = UAC_BASE.find((b) => b.codigo === uac.codigo);
+      const rscCodigo = baseUAC?.recursoCodigo ?? "RSC-LC";
+      const oficiales = oficialesPorUac.get(uac.id) ?? [];
 
-    for (const uac of uacRows) {
-      const { data: progresiones } = await sb
-        .from("progresiones")
-        .select("id, categoria")
-        .eq("uac_id", uac.id);
-
-      // Solo cuentan los propósitos oficiales 2025; los complementos no inflan la meta.
-      const oficiales = (progresiones ?? []).filter((p) => p.categoria !== CATEGORIA_COMPLEMENTO);
-      const progIds = oficiales.map((p) => p.id);
-      if (progIds.length === 0) {
-        const baseUAC0 = UAC_BASE.find((b) => b.codigo === uac.codigo);
+      if (oficiales.length === 0) {
         results.push({
           codigo: uac.codigo,
           nombre: uac.nombre,
-          rscCodigo: baseUAC0?.recursoCodigo ?? "RSC-LC",
+          rscCodigo,
           completadas: 0,
           total: 0,
           pct: 0,
@@ -97,49 +155,27 @@ export async function getProgresoDetallePorUAC(
         continue;
       }
 
-      const { data: actividades } = await sb
-        .from("actividades")
-        .select("id")
-        .in("progresion_id", progIds);
-
-      const actIds = (actividades ?? []).map((a) => a.id);
-
-      const { data: intentos } = await sb
-        .from("intentos")
-        .select("actividad_id, status, completed_at")
-        .eq("user_id", alumnoId)
-        .in("actividad_id", actIds)
-        .eq("status", "completed");
-
-      const completadasSet = new Set((intentos ?? []).map((i) => i.actividad_id));
-
-      // Count fully completed progressions
+      // Progresión completada = todas sus actividades tienen intento "completed".
       let completadasProg = 0;
-      for (const prog of oficiales) {
-        const { data: acts } = await sb
-          .from("actividades")
-          .select("id")
-          .eq("progresion_id", prog.id);
-        const allActs = (acts ?? []).map((a) => a.id);
+      for (const progId of oficiales) {
+        const allActs = actsPorProg.get(progId) ?? [];
         if (allActs.length > 0 && allActs.every((id) => completadasSet.has(id))) {
           completadasProg++;
         }
       }
 
-      const lastIntento = (intentos ?? [])
-        .filter((i) => i.completed_at)
-        .sort((a, b) => new Date(b.completed_at ?? 0).getTime() - new Date(a.completed_at ?? 0).getTime())[0];
+      const ultimaActividad = (intentosPorUac.get(uac.id) ?? [])
+        .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())[0] ?? null;
 
-      const baseUAC = UAC_BASE.find((b) => b.codigo === uac.codigo);
       const total = oficiales.length;
       results.push({
         codigo: uac.codigo,
         nombre: uac.nombre,
-        rscCodigo: baseUAC?.recursoCodigo ?? "RSC-LC",
+        rscCodigo,
         completadas: completadasProg,
         total,
         pct: total > 0 ? Math.round((completadasProg / total) * 100) : 0,
-        ultimaActividad: lastIntento?.completed_at ?? null,
+        ultimaActividad,
       });
     }
 
@@ -304,10 +340,10 @@ export async function getEstadisticasProgreso(
       }
     }
 
-    let materiaMasFuerte: { nombre: string; pct: number } | null = null;
+    let materiaMasFuerte: { nombre: string; xp: number } | null = null;
     let maxXP = 0;
     for (const [, val] of xpPorUAC) {
-      if (val.xp > maxXP) { maxXP = val.xp; materiaMasFuerte = { nombre: val.nombre, pct: val.xp }; }
+      if (val.xp > maxXP) { maxXP = val.xp; materiaMasFuerte = { nombre: val.nombre, xp: val.xp }; }
     }
 
     const tipoActividades = [...conteoTipos.entries()]

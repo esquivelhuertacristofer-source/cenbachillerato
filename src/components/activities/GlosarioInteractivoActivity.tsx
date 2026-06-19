@@ -32,7 +32,9 @@ export function GlosarioInteractivoActivity({ actividad, onProgreso, color = FAL
 
   function handleCompletar() {
     setCompletado(true);
-    onProgreso?.({ actividadId: actividad.id ?? '', completada: true, puntaje: Math.round((dominados.size / contenido.terminos.length) * 100) });
+    const totalTerminos = contenido.terminos.length;
+    const puntaje = totalTerminos > 0 ? Math.round((dominados.size / totalTerminos) * 100) : 100;
+    onProgreso?.({ actividadId: actividad.id ?? '', completada: true, puntaje });
   }
 
   const navBtn = (disabled: boolean): React.CSSProperties => ({
@@ -64,6 +66,10 @@ export function GlosarioInteractivoActivity({ actividad, onProgreso, color = FAL
           <span style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.45)' }}>{flashIdx + 1} / {contenido.terminos.length}</span>
         </div>
         <div
+          role="button"
+          tabIndex={0}
+          aria-pressed={mostrandoDefinicion}
+          aria-label={mostrandoDefinicion ? `Definición de ${termino.termino}. Toca para ocultar.` : `Término ${termino.termino}. Toca para ver la definición.`}
           style={{
             borderRadius: 20,
             border: '1px solid rgba(255,255,255,0.10)',
@@ -78,6 +84,12 @@ export function GlosarioInteractivoActivity({ actividad, onProgreso, color = FAL
             gap: 16,
           }}
           onClick={() => setMostrandoDefinicion(v => !v)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setMostrandoDefinicion(v => !v);
+            }
+          }}
         >
           {!mostrandoDefinicion ? (
             <>
@@ -158,6 +170,8 @@ export function GlosarioInteractivoActivity({ actividad, onProgreso, color = FAL
                 <button
                   onClick={() => toggleDominado(i)}
                   disabled={completado}
+                  aria-pressed={dominado}
+                  aria-label={dominado ? `${termino.termino}: marcado como dominado` : `Marcar ${termino.termino} como dominado`}
                   style={{
                     flexShrink: 0,
                     borderRadius: 999,

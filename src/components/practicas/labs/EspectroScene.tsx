@@ -23,7 +23,7 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Environment, Lightformer, Html, Line, Stars } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
@@ -84,6 +84,24 @@ function nuevaCurva(color: string, opacity: number, lineWidth = 2): THREE.Line {
   return new THREE.Line(g, m);
 }
 
+/**
+ * Libera geometría y material de las curvas `nuevaCurva` al desmontar. R3F no
+ * dispone los objetos pasados por `<primitive object={...} />`, y el <Canvas> se
+ * remonta con key={modo}, así que sin esto cada cambio de modo dejaría recursos
+ * huérfanos en la GPU.
+ */
+function useDisposeCurvas(...curvas: THREE.Line[]) {
+  useEffect(() => {
+    return () => {
+      for (const c of curvas) {
+        c.geometry.dispose();
+        (c.material as THREE.Material).dispose();
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+}
+
 /* ── Título flotante ──────────────────────────────────────────────────────── */
 function Titulo({ texto, sub, color }: { texto: string; sub?: string; color: string }) {
   return (
@@ -112,6 +130,7 @@ function OndaViajera({ f, color, playing }: { f: number; color: string; playing:
   // se crea una sola vez; el color se actualiza en cada render con .color.set()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const curva = useMemo(() => nuevaCurva(color, 0.95, 2), []);
+  useDisposeCurvas(curva);
   (curva.material as THREE.LineBasicMaterial).color.set(color);
 
   useFrame((_, dt) => {
@@ -270,6 +289,7 @@ function EscenaVisible({ nm, playing }: Pick<EspectroSceneProps, "nm" | "playing
   // se crea una sola vez; el color se actualiza en cada render con .color.set()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const curva = useMemo(() => nuevaCurva(col, 0.98, 2), []);
+  useDisposeCurvas(curva);
   (curva.material as THREE.LineBasicMaterial).color.set(col);
   useFrame((_, dt) => {
     if (playing) tRef.current += dt;

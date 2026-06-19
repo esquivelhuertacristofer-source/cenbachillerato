@@ -769,6 +769,7 @@ export function LabModelosAtomicos({ color }: PracticaLabProps) {
         accent={accent}
         rgba={color.rgba}
         aprobado={ejercicioAprobado}
+        mensajeAprobado="¡Aprobado! Dominas la estructura del átomo."
         onAprobado={() => setEjercicioAprobado(true)}
         playSfx={
           sonido

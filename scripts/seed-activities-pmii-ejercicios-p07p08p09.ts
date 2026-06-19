@@ -47,7 +47,6 @@ const ejercicios: Record<string, Ejercicio> = {
       respuesta_final: "(a) 4x + 6; (b) 8x² + 12x; (c) 6x²",
       unidades: "",
       tolerancia_error: 0,
-      imagen_problema: "",
     },
   },
 
@@ -76,7 +75,6 @@ const ejercicios: Record<string, Ejercicio> = {
       respuesta_final: "(a) x² + 10x + 25; (b) x² − 25; (c) 4x² + x + 3",
       unidades: "",
       tolerancia_error: 0,
-      imagen_problema: "",
     },
   },
 
@@ -106,7 +104,6 @@ const ejercicios: Record<string, Ejercicio> = {
         "(a) x = 5 (restando 7 a ambos lados, propiedad de uniformidad); (b) 5 + 7 = 12, verdadero; (c) 2(x + 3) = 2x + 6 es IDENTIDAD y x + 4 = 9 es ECUACIÓN",
       unidades: "",
       tolerancia_error: 0,
-      imagen_problema: "",
     },
   },
 };

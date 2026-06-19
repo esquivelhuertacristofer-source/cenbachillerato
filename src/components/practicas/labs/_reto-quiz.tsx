@@ -42,6 +42,7 @@ export function RetoQuizCard({
   onAprobado,
   playSfx,
   playPick,
+  mensajeAprobado,
 }: {
   quiz: QuizEvaluable;
   accent: string;
@@ -52,7 +53,10 @@ export function RetoQuizCard({
   playSfx?: (ok: boolean) => void;
   /** Sonido al seleccionar una opción. */
   playPick?: () => void;
+  /** Mensaje al aprobar (p.ej. "Dominas la estructura del átomo."). Por defecto, genérico. */
+  mensajeAprobado?: string;
 }) {
+  const elogio = mensajeAprobado ?? "¡Aprobado! Dominas el tema.";
   const n = quiz.reactivos.length;
   const [sel, setSel] = useState<(number | null)[]>(() => Array(n).fill(null));
   const [comprobado, setComprobado] = useState(false);
@@ -124,10 +128,10 @@ export function RetoQuizCard({
           const elegida = sel[i];
           return (
             <div key={i}>
-              <div style={{ fontSize: 14.5, fontWeight: 800, color: T.text, lineHeight: 1.45, marginBottom: 10 }}>
+              <div id={`rq-q-${i}`} style={{ fontSize: 14.5, fontWeight: 800, color: T.text, lineHeight: 1.45, marginBottom: 10 }}>
                 <span style={{ color: accent, ...NUM }}>{i + 1}.</span> {r.enunciado}
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <div role="radiogroup" aria-labelledby={`rq-q-${i}`} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {r.opciones.map((op, j) => {
                   const isSel = elegida === j;
                   const showOk = comprobado && j === r.respuestaCorrecta;
@@ -136,6 +140,8 @@ export function RetoQuizCard({
                     <button
                       key={j}
                       className="rq-opt"
+                      role="radio"
+                      aria-checked={isSel}
                       data-sel={isSel && !comprobado}
                       data-ok={showOk}
                       data-bad={showBad}
@@ -200,6 +206,8 @@ export function RetoQuizCard({
       {/* Resultado */}
       {comprobado && (
         <div
+          role="status"
+          aria-live="polite"
           style={{
             marginTop: 14,
             borderRadius: 13,
@@ -220,7 +228,7 @@ export function RetoQuizCard({
               {aciertos} / {n} correctas · {puntaje}%
             </strong>
             {aprueba ? (
-              <span> — ¡Aprobado! Dominas la estructura del átomo.</span>
+              <span> — {elogio}</span>
             ) : (
               <span> — Aún no llegas al {quiz.puntajeMinimo}%. Revisa la retroalimentación y reintenta.</span>
             )}

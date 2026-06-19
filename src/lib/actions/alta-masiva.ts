@@ -16,7 +16,7 @@ export async function procesarAltaMasiva(csvText: string): Promise<ResultadoAlta
     return { error: 'Solo administradores pueden hacer alta masiva' };
   }
 
-  const escuelaId = (profile as Record<string, unknown>).escuela_id as string | null;
+  const escuelaId = profile.escuela_id;
   if (!escuelaId) {
     return { error: 'Tu perfil no tiene escuela asignada. Contacta a un super_admin.' };
   }
@@ -187,21 +187,35 @@ export async function procesarAltaMasiva(csvText: string): Promise<ResultadoAlta
     // Marcar email como usado en el lote
     emailsEnEsteLote.add(email);
 
-    // Asignar alumno a grupo
+    // Asignar alumno a grupo. El usuario YA quedó creado; si la asignación falla
+    // no se descarta, pero se reporta para que el admin la corrija (antes este
+    // error se tragaba y el alumno quedaba sin grupo sin avisar a nadie).
     if (data.rol === 'alumno' && grupo) {
-      await sbAdmin.from('alumnos_grupos').insert({
+      const { error: asignError } = await sbAdmin.from('alumnos_grupos').insert({
         id_alumno: newUserId,
         id_grupo: grupo.id,
       });
+      if (asignError) {
+        erroresCreacion.push({
+          fila,
+          mensaje: `Usuario creado (${email}) pero no se pudo asignar al grupo "${data.grupo_nombre}": ${asignError.message}`,
+        });
+      }
     }
 
     // Asignar docente al grupo (primer docente asignado gana)
     if (data.rol === 'docente' && grupo) {
-      await sbAdmin
+      const { error: docError } = await sbAdmin
         .from('grupos')
         .update({ id_docente: newUserId })
         .eq('id', grupo.id)
         .is('id_docente', null); // no sobreescribir si ya tiene docente
+      if (docError) {
+        erroresCreacion.push({
+          fila,
+          mensaje: `Docente creado (${email}) pero no se pudo asignar al grupo "${data.grupo_nombre}": ${docError.message}`,
+        });
+      }
     }
 
     credenciales.push({

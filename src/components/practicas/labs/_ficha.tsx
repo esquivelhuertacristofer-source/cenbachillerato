@@ -98,6 +98,8 @@ export function FichaTeorica({
       {/* Cabecera (toggle) */}
       <button
         onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        aria-label={open ? "Ocultar ficha teórica" : "Ver ficha teórica"}
         style={{
           width: "100%",
           display: "flex",
@@ -143,6 +145,8 @@ export function FichaTeorica({
         <div style={{ padding: "0 20px 22px" }}>
           {/* Pestañas */}
           <div
+            role="tablist"
+            aria-label="Secciones de la ficha teórica"
             style={{
               display: "flex",
               gap: 4,
@@ -158,6 +162,10 @@ export function FichaTeorica({
               <button
                 key={t.key}
                 className="fc-tab"
+                role="tab"
+                id={`fc-tab-${t.key}`}
+                aria-selected={tab === t.key}
+                aria-controls={`fc-panel-${t.key}`}
                 data-on={tab === t.key}
                 onClick={() => setTab(t.key)}
                 style={tab === t.key ? { background: accent, boxShadow: `0 6px 16px -6px ${accent}` } : undefined}
@@ -169,6 +177,7 @@ export function FichaTeorica({
           </div>
 
           {/* Contenido */}
+          <div role="tabpanel" id={`fc-panel-${tab}`} aria-labelledby={`fc-tab-${tab}`}>
           {tab === "marco" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
               {data.marcoTeorico.map((p, i) => (
@@ -280,6 +289,7 @@ export function FichaTeorica({
               ))}
             </div>
           )}
+          </div>
         </div>
       )}
     </div>

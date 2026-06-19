@@ -70,7 +70,7 @@ export const ETAPAS: EtapaDef[] = [
     descripcion:
       "Paso 2 — Ciclo de Krebs (mitocondria, matriz): 2 piruvatos -> CO2 + 2 ATP + 8 NADH + 2 FADH2.",
     detalle:
-      "Segunda etapa de la respiración aerobia. Ocurre en la matriz mitocondrial. El piruvato se convierte en acetil-CoA (2C) que ingresa al ciclo. Por glucosa: 2 vueltas = 6 NADH, 2 FADH₂, 2 ATP y 4 CO₂.",
+      "Segunda etapa de la respiración aerobia (matriz mitocondrial). El piruvato se convierte primero en acetil-CoA (2C) y este ingresa al ciclo. Los 8 NADH y 6 CO₂ que ves arriba incluyen esa conexión: el ciclo de Krebs en sí rinde por glucosa (2 vueltas) 6 NADH, 2 FADH₂, 2 ATP y 4 CO₂, y la oxidación previa de los 2 piruvatos a acetil-CoA aporta 2 NADH y 2 CO₂ más (6 + 2 = 8 NADH; 4 + 2 = 6 CO₂). Esos 8 NADH, sumados a los 2 de la glucólisis, son los 10 NADH que alimentan la cadena respiratoria.",
     fuente: "A2",
   },
   {

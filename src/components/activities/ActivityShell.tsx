@@ -142,6 +142,9 @@ export function ActivityShell({
         .ash-narrador-eq span:nth-child(2) { height: 11px; animation-delay: 0.18s; }
         .ash-narrador-eq span:nth-child(3) { height: 7px; animation-delay: 0.36s; }
         @keyframes ash-eq { 0%, 100% { transform: scaleY(0.4); } 50% { transform: scaleY(1); } }
+        @media (prefers-reduced-motion: reduce) {
+          .ash-narrador-eq span { animation: none; transform: scaleY(0.7); }
+        }
         .ash-practica:hover { filter: brightness(1.18); transform: translateY(-1px); }
         .ash-sidebar-link:hover { background: rgba(255,255,255,0.07) !important; border-color: rgba(255,255,255,0.12) !important; }
 

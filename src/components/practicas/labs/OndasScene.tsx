@@ -23,7 +23,7 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Environment, Lightformer, Html, Line, Stars } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
@@ -96,6 +96,24 @@ function nuevaCurva(color: string, opacity: number, lineWidth = 1): THREE.Line {
   return new THREE.Line(g, m);
 }
 
+/**
+ * Libera la geometría y el material de las curvas creadas con `nuevaCurva` al
+ * desmontar. R3F no dispone los objetos pasados por `<primitive object={...} />`,
+ * y como el <Canvas> se remonta con key={modo}, sin esto cada cambio de modo
+ * dejaría una BufferGeometry + material huérfanos en la GPU.
+ */
+function useDisposeCurvas(...curvas: THREE.Line[]) {
+  useEffect(() => {
+    return () => {
+      for (const c of curvas) {
+        c.geometry.dispose();
+        (c.material as THREE.Material).dispose();
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+}
+
 /* ── Título flotante de la escena ─────────────────────────────────────────── */
 function Titulo({ texto, sub, color }: { texto: string; sub?: string; color: string }) {
   return (
@@ -129,6 +147,7 @@ function EscenaOnda({ A, f, medioId, playing }: Pick<OndasSceneProps, "A" | "f" 
   const tRef = useRef(0);
   const dummy = useMemo(() => new THREE.Object3D(), []);
   const curva = useMemo(() => nuevaCurva(C_ONDA, 0.9), []);
+  useDisposeCurvas(curva);
   const dotsRef = useRef<THREE.InstancedMesh>(null);
   const tracerRef = useRef<THREE.Mesh>(null);
 
@@ -212,6 +231,7 @@ function EscenaInterferencia({ A, phi, estacionaria, playing }: Pick<OndasSceneP
   const w1 = useMemo(() => nuevaCurva(C_W1, 0.45), []);
   const w2 = useMemo(() => nuevaCurva(C_W2, 0.45), []);
   const res = useMemo(() => nuevaCurva(C_INTER, 1), []);
+  useDisposeCurvas(w1, w2, res);
 
   // color de la resultante: estacionaria usa otro tono
   (res.material as THREE.LineBasicMaterial).color.set(estacionaria ? "#a78bfa" : C_INTER);

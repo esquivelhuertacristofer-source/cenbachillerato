@@ -63,8 +63,10 @@ export interface RachaData {
 // ─── getUltimaActividadActiva ─────────────────────────────────────────────────
 
 /**
- * Devuelve la última actividad en progreso del alumno, o la primera no iniciada
- * de su semestre si no hay ninguna en progreso.
+ * Devuelve la actividad por la que el alumno debe "continuar": la primera de su
+ * semestre (en orden por código) que aún no ha completado. Si ya completó todas,
+ * devuelve la última. Los intentos se guardan ya como "completed" (no existe un
+ * estado "in_progress" persistido), así que el avance se deriva de las completadas.
  */
 export async function getUltimaActividadActiva(
   userId: string,
@@ -72,108 +74,64 @@ export async function getUltimaActividadActiva(
 ): Promise<ContinuarData | null> {
   const sb = await getSupabaseServer();
 
-  // 1. Buscar intento en progreso más reciente
-  const { data: intentoRaw } = await sb
-    .from("intentos")
-    .select("id, actividad_id, status, started_at")
-    .eq("user_id", userId)
-    .eq("status", "in_progress")
-    .order("started_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  let actividadId: string | null = intentoRaw?.actividad_id ?? null;
-
-  // 2. Si no hay en progreso, buscar la primera actividad no completada del semestre
-  if (!actividadId) {
-    const { data: uacRows } = await sb
-      .from("uac")
-      .select("id, codigo")
-      .eq("semestre", semestre);
-
-    if (!uacRows || uacRows.length === 0) return null;
-
-    const uacIds = uacRows.map((u) => u.id);
-
-    const { data: progRows } = await sb
-      .from("progresiones")
-      .select("id, numero, uac_id")
-      .in("uac_id", uacIds)
-      .eq("es_placeholder", false)
-      .order("numero");
-
-    if (!progRows || progRows.length === 0) return null;
-
-    const progIds = progRows.map((p) => p.id);
-
-    // Get first activity of first progresion
-    const { data: actRow } = await sb
-      .from("actividades")
-      .select("id, codigo")
-      .in("progresion_id", progIds)
-      .order("codigo")
-      .limit(1)
-      .maybeSingle();
-
-    if (!actRow) return null;
-    actividadId = actRow.id;
-  }
-
-  // 3. Get activity details
-  const { data: act } = await sb
-    .from("actividades")
-    .select("id, codigo, titulo, tipo, progresion_id")
-    .eq("id", actividadId)
-    .single();
-
-  if (!act?.progresion_id) return null;
-
-  // 4. Get progresion
-  const { data: prog } = await sb
-    .from("progresiones")
-    .select("id, numero, titulo, uac_id")
-    .eq("id", act.progresion_id)
-    .single();
-
-  if (!prog?.uac_id) return null;
-
-  // 5. Get UAC
-  const { data: uac } = await sb
+  // 1. UACs del semestre (con nombre, para no re-consultar después)
+  const { data: uacRows } = await sb
     .from("uac")
     .select("id, codigo, nombre")
-    .eq("id", prog.uac_id)
-    .single();
+    .eq("semestre", semestre);
+  if (!uacRows || uacRows.length === 0) return null;
+  const uacById = new Map(uacRows.map((u) => [u.id, u] as const));
 
+  // 2. Progresiones publicadas del semestre (con título)
+  const { data: progRows } = await sb
+    .from("progresiones")
+    .select("id, numero, titulo, uac_id")
+    .in("uac_id", uacRows.map((u) => u.id))
+    .eq("es_placeholder", false);
+  if (!progRows || progRows.length === 0) return null;
+  const progById = new Map(progRows.map((p) => [p.id, p] as const));
+
+  // 3. Todas las actividades del semestre, ordenadas por código
+  const { data: actRows } = await sb
+    .from("actividades")
+    .select("id, codigo, titulo, tipo, progresion_id")
+    .in("progresion_id", progRows.map((p) => p.id))
+    .order("codigo");
+  if (!actRows || actRows.length === 0) return null;
+
+  // 4. Actividades ya completadas por el alumno
+  const { data: completadosData } = await sb
+    .from("intentos")
+    .select("actividad_id")
+    .eq("user_id", userId)
+    .eq("status", "completed")
+    .in("actividad_id", actRows.map((a) => a.id));
+  const completadasSet = new Set(completadosData?.map((i) => i.actividad_id) ?? []);
+
+  // 5. "Continuar" = primera actividad no completada (en orden por código); si el
+  //    alumno ya completó todo el semestre, la última. Antes este paso consultaba
+  //    intentos con status "in_progress", que nunca se escriben (los intentos se
+  //    guardan ya como "completed"), así que el resultado siempre era la actividad 1.
+  const siguiente = actRows.find((a) => !completadasSet.has(a.id)) ?? actRows[actRows.length - 1];
+  if (!siguiente?.progresion_id) return null;
+
+  const prog = progById.get(siguiente.progresion_id);
+  if (!prog?.uac_id) return null;
+
+  const uac = uacById.get(prog.uac_id);
   if (!uac) return null;
 
-  // 6. Get UAC static info for rscCodigo
+  // 6. Info estática de la UAC para rscCodigo
   const { getUACPorCodigo } = await import("@/lib/mccems/estructura");
   const uacStatic = getUACPorCodigo(uac.codigo);
 
-  // 7. Count completed activities in this progresion
-  const { data: allActs } = await sb
-    .from("actividades")
-    .select("id, codigo")
-    .eq("progresion_id", prog.id)
-    .order("codigo");
-
-  const totalActividades = allActs?.length ?? 3;
-  const actIds = (allActs ?? []).map((a) => a.id);
-
-  let completadas = 0;
-  if (actIds.length > 0) {
-    const { data: completadosData } = await sb
-      .from("intentos")
-      .select("actividad_id")
-      .eq("user_id", userId)
-      .eq("status", "completed")
-      .in("actividad_id", actIds);
-    const uniqueCompleted = new Set(completadosData?.map((i) => i.actividad_id) ?? []);
-    completadas = uniqueCompleted.size;
-  }
+  // 7. Conteo de actividades de la progresión y completadas (derivado en memoria)
+  const actsDeProg = actRows.filter((a) => a.progresion_id === prog.id);
+  const totalActividades = actsDeProg.length || 3;
+  const completadas = actsDeProg.filter((a) => completadasSet.has(a.id)).length;
 
   // 8. Extract orden from codigo (last char: A1, A2, A3 → 1, 2, 3)
-  const ordenMatch = act.codigo.match(/-A(\d+)$/);
+  const ordenMatch = siguiente.codigo.match(/-A(\d+)$/);
   const orden = ordenMatch?.[1] ? parseInt(ordenMatch[1]) : 1;
 
   return {
@@ -184,8 +142,8 @@ export async function getUltimaActividadActiva(
     uacNombre: uac.nombre,
     uacRscCodigo: uacStatic?.recursoCodigo ?? "RSC-LC",
     actividadOrden: orden,
-    actividadTitulo: act.titulo,
-    actividadTipo: act.tipo,
+    actividadTitulo: siguiente.titulo,
+    actividadTipo: siguiente.tipo,
     actividadesCompletadas: completadas,
     totalActividades,
   };

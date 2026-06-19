@@ -30,9 +30,15 @@ export function AutoevaluacionActivity({ actividad, onProgreso, color = FALLBACK
 
   function handleEntregar() {
     setEntregado(true);
-    const puntaje = totalCriterios > 0
-      ? Math.round((Object.values(respuestas).reduce((a, b) => a + b, 0) / (totalCriterios * Math.max(...contenido.criterios.flatMap(c => c.escala.map(e => e.valor))))) * 100)
-      : 100;
+    // Máximo posible = suma del valor más alto de la escala de CADA criterio.
+    // (Antes usaba un único máximo global y, con escalas vacías, Math.max() daba
+    // -Infinity → puntaje NaN.)
+    const maxPosible = contenido.criterios.reduce((acc, c) => {
+      const valores = c.escala.map(e => e.valor);
+      return acc + (valores.length > 0 ? Math.max(...valores) : 0);
+    }, 0);
+    const sumaObtenida = Object.values(respuestas).reduce((a, b) => a + b, 0);
+    const puntaje = maxPosible > 0 ? Math.round((sumaObtenida / maxPosible) * 100) : 100;
     onProgreso?.({ actividadId: actividad.id ?? '', completada: true, puntaje, respuestas: { criterios: respuestas, reflexion } });
   }
 

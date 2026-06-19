@@ -61,10 +61,11 @@ export function PlantillaPractica({ color }: PracticaLabProps) {
 
       {/* Demo de interactividad */}
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        <label style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>
+        <label htmlFor="plantilla-rango" style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>
           Variable de ejemplo: {valor}
         </label>
         <input
+          id="plantilla-rango"
           type="range"
           min={0}
           max={100}

@@ -27,7 +27,6 @@ export const PreguntaOpcionMultipleSchema = z.object({
   opciones: z.array(z.string()).min(2).max(5),
   respuesta_correcta: z.number().int().min(0),
   retroalimentacion: z.string().optional(),
-  imagen_url: z.string().url().optional().or(z.literal('')),
 }).refine(
   (data) => data.respuesta_correcta < data.opciones.length,
   { message: 'respuesta_correcta debe ser un índice válido dentro de opciones' }
@@ -84,7 +83,6 @@ export const ContenidoEjercicioMatematicoSchema = z.object({
   respuesta_final: z.string().optional(),
   unidades: z.string().optional(),
   tolerancia_error: z.number().min(0).optional().default(0),
-  imagen_problema: z.string().url().optional().or(z.literal('')),
 });
 
 // ── 6. REFLEXIÓN ESCRITA ──────────────────────────────────────────────────────
@@ -173,7 +171,6 @@ export const TerminoGlosarioSchema = z.object({
   termino: z.string().min(1),
   definicion: z.string().min(5),
   ejemplo: z.string().optional(),
-  imagen_url: z.string().url().optional().or(z.literal('')),
   etiquetas: z.array(z.string()).optional(),
 });
 

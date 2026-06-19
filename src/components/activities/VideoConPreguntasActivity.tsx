@@ -19,9 +19,31 @@ export function VideoConPreguntasActivity({ actividad, onProgreso, color = FALLB
   const [respuestas, setRespuestas] = useState<Record<number, string>>({});
   const [completado, setCompletado] = useState(false);
 
-  function handleCompletar() {
+  // Una pregunta es "calificable" si declara respuesta correcta y es de opción.
+  const esCalificable = (p: typeof preguntas[number]) =>
+    (p.tipo === 'opcion_multiple' || p.tipo === 'verdadero_falso') && p.respuesta_correcta != null;
+
+  const totalPreguntas = preguntas.length;
+  const respondidas = preguntas.filter((_, i) => (respuestas[i] ?? '').trim().length > 0).length;
+  const todasRespondidas = respondidas === totalPreguntas;
+
+  function calcularPuntaje() {
+    const calificables = preguntas.filter(esCalificable);
+    // Sin preguntas calificables → actividad de participación (100 al completarse).
+    if (calificables.length === 0) return 100;
+    let correctas = 0;
+    preguntas.forEach((p, i) => {
+      if (esCalificable(p) && respuestas[i] === String(p.respuesta_correcta)) correctas++;
+    });
+    return Math.round((correctas / calificables.length) * 100);
+  }
+
+  async function handleCompletar() {
+    if (!todasRespondidas) return;
     setCompletado(true);
-    onProgreso?.({ actividadId: actividad.id ?? '', completada: true, puntaje: 100, respuestas });
+    const puntaje = calcularPuntaje();
+    const res = await onProgreso?.({ actividadId: actividad.id ?? '', completada: true, puntaje, respuestas });
+    if (res && !res.ok) setCompletado(false);
   }
 
   return (
@@ -57,10 +79,25 @@ export function VideoConPreguntasActivity({ actividad, onProgreso, color = FALLB
                       type="radio"
                       name={`vq-${i}`}
                       disabled={completado}
+                      checked={respuestas[i] === String(oi)}
                       onChange={() => setRespuestas(r => ({ ...r, [i]: String(oi) }))}
                       style={{ accentColor: color.hex }}
                     />
                     {op}
+                  </label>
+                ))
+              ) : p.tipo === 'verdadero_falso' ? (
+                ([['true', 'Verdadero'], ['false', 'Falso']] as const).map(([valor, etiqueta]) => (
+                  <label key={valor} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: 'rgba(255,255,255,0.78)', cursor: 'pointer' }}>
+                    <input
+                      type="radio"
+                      name={`vq-${i}`}
+                      disabled={completado}
+                      checked={respuestas[i] === valor}
+                      onChange={() => setRespuestas(r => ({ ...r, [i]: valor }))}
+                      style={{ accentColor: color.hex }}
+                    />
+                    {etiqueta}
                   </label>
                 ))
               ) : (
@@ -68,6 +105,7 @@ export function VideoConPreguntasActivity({ actividad, onProgreso, color = FALLB
                   disabled={completado}
                   rows={3}
                   placeholder="Tu respuesta..."
+                  value={respuestas[i] ?? ''}
                   onChange={e => setRespuestas(r => ({ ...r, [i]: e.target.value }))}
                   style={{
                     width: '100%',
@@ -91,6 +129,7 @@ export function VideoConPreguntasActivity({ actividad, onProgreso, color = FALLB
       {!completado && (
         <button
           onClick={handleCompletar}
+          disabled={!todasRespondidas}
           style={{
             width: '100%',
             borderRadius: 12,
@@ -101,10 +140,12 @@ export function VideoConPreguntasActivity({ actividad, onProgreso, color = FALLB
             fontSize: 14,
             fontWeight: 700,
             fontFamily: FONT,
-            cursor: 'pointer',
+            cursor: todasRespondidas ? 'pointer' : 'not-allowed',
+            opacity: todasRespondidas ? 1 : 0.4,
+            transition: 'opacity 0.15s ease',
           }}
         >
-          Completar actividad
+          {totalPreguntas > 0 ? `Completar actividad (${respondidas}/${totalPreguntas})` : 'Completar actividad'}
         </button>
       )}
       {completado && (

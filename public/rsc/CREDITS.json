@@ -1,0 +1,15 @@
+{
+  "generado": "Imágenes de portada por área (recurso visual de las tarjetas de UAC).",
+  "nota_provenance": "La procedencia exacta de estos 8 archivos NO quedó registrada en el repositorio: el script que descargó las imágenes temáticas (mismo flujo que public/labs, public/lecturas y public/temas, basado en la API de Wikimedia Commons) fue efímero y se borró tras su uso. Por honestidad NO se inventan títulos/autores/licencias por archivo. Antes de cualquier publicación externa debe verificarse la licencia de cada imagen (o sustituirse por una de licencia libre con su crédito), siguiendo el mismo formato que public/labs/CREDITS.json.",
+  "licencia_global": "Pendiente de verificación",
+  "creditos": [
+    { "archivo": "rsc/cneyt.webp", "area": "Ciencias Naturales, Experimentales y Tecnología", "licencia": "pendiente_verificar" },
+    { "archivo": "rsc/pm.webp", "area": "Pensamiento Matemático", "licencia": "pendiente_verificar" },
+    { "archivo": "rsc/lc.webp", "area": "Lengua y Comunicación", "licencia": "pendiente_verificar" },
+    { "archivo": "rsc/in.webp", "area": "Inglés", "licencia": "pendiente_verificar" },
+    { "archivo": "rsc/hum.webp", "area": "Humanidades / Pensamiento Filosófico", "licencia": "pendiente_verificar" },
+    { "archivo": "rsc/cs.webp", "area": "Ciencias Sociales", "licencia": "pendiente_verificar" },
+    { "archivo": "rsc/ch.webp", "area": "Conciencia Histórica", "licencia": "pendiente_verificar" },
+    { "archivo": "rsc/cd.webp", "area": "Cultura Digital", "licencia": "pendiente_verificar" }
+  ]
+}

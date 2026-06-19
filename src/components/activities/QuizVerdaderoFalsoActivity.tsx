@@ -26,7 +26,7 @@ export function QuizVerdaderoFalsoActivity({ actividad, onProgreso, color = FALL
     contenido.preguntas.forEach((p, i) => {
       if (respuestas[i] === p.respuesta) correctas++;
     });
-    return Math.round((correctas / total) * 100);
+    return total > 0 ? Math.round((correctas / total) * 100) : 100;
   }
 
   function handleEnviar() {

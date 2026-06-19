@@ -75,6 +75,9 @@ export function EjercicioMatematicoActivity({
       if (nuevosIntentos >= MAX_INTENTOS) {
         setSolucionRevelada(true);
       } else {
+        // Marca el intento como incorrecto para mostrar el feedback rojo y el
+        // botón "Volver a intentar" (antes quedaba en null y esa rama era código muerto).
+        setCorrecto(false);
         setShaking(true);
         shakeTimer.current = setTimeout(() => setShaking(false), 500);
       }
@@ -305,7 +308,7 @@ export function EjercicioMatematicoActivity({
           transition={{ ...springs.smooth, delay: 0.16 }}
           style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
         >
-          <label style={{
+          <label htmlFor="em-respuesta" style={{
             fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.20em',
             color: 'rgba(255,255,255,0.38)',
           }}>
@@ -314,7 +317,11 @@ export function EjercicioMatematicoActivity({
 
           {/* Intentos badge */}
           {!verificado && intentos > 0 && !intentosAgotados && (
-            <div style={{
+            <div
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
+              style={{
               display: 'flex', alignItems: 'center', gap: 8, padding: '8px 14px',
               borderRadius: 10, background: 'rgba(248,113,113,0.10)',
               border: '1px solid rgba(248,113,113,0.22)', alignSelf: 'flex-start',
@@ -329,6 +336,7 @@ export function EjercicioMatematicoActivity({
           <div style={{ animation: shaking && !reducedMotion ? 'em-shake 0.45s ease' : 'none' }}>
             {!esDesarrollo ? (
               <input
+                id="em-respuesta"
                 type="text"
                 className="em-input"
                 value={respuesta}
@@ -355,6 +363,7 @@ export function EjercicioMatematicoActivity({
               />
             ) : (
               <textarea
+                id="em-respuesta"
                 className="em-textarea"
                 value={respuesta}
                 onChange={e => !verificado ? setRespuesta(e.target.value) : undefined}
@@ -412,6 +421,9 @@ export function EjercicioMatematicoActivity({
             initial={reducedMotion ? { opacity: 1 } : { opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={springs.bouncy}
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
             style={{
               padding: '20px 26px', borderRadius: 16,
               background: 'rgba(74,222,128,0.10)', border: '1.5px solid rgba(74,222,128,0.30)',

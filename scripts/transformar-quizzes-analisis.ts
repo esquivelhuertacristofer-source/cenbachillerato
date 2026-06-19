@@ -28,7 +28,6 @@ interface PreguntaMC {
   opciones: string[];
   respuesta_correcta: number;
   retroalimentacion?: string;
-  imagen_url?: string;
 }
 
 interface ContenidoMC {

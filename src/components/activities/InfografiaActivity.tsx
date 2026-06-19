@@ -24,9 +24,11 @@ export function InfografiaActivity({ actividad, onProgreso, uacCodigo, color = F
   const [imgError, setImgError] = useState(false);
   const [imgTematicaError, setImgTematicaError] = useState(false);
 
-  // El placeholder genérico no existe en disco; evita el ícono de imagen rota.
+  // Los SVG de placeholder ya no existen en disco; cualquier url que contenga
+  // "placeholder" se trata como "sin lámina" para ir directo a la imagen temática
+  // (evita una petición 404 y el ícono de imagen rota).
   const urlImagen = contenido.url_imagen ?? '';
-  const tieneImagen = urlImagen.length > 0 && !urlImagen.includes('/placeholder/') && !imgError;
+  const tieneImagen = urlImagen.length > 0 && !/placeholder/i.test(urlImagen) && !imgError;
   // Sin lámina propia → imagen temática con licencia libre acorde a la materia.
   const imagenTematica = imagenDeLectura(uacCodigo, contenido.titulo);
 
@@ -34,9 +36,17 @@ export function InfografiaActivity({ actividad, onProgreso, uacCodigo, color = F
   const tieneGlosario = Array.isArray(contenido.glosario) && contenido.glosario.length > 0;
   const tienePreguntas = Array.isArray(contenido.preguntas_reflexion) && contenido.preguntas_reflexion.length > 0;
 
-  function handleCompletar() {
+  async function handleCompletar() {
     setCompletado(true);
-    onProgreso?.({ actividadId: actividad.id ?? '', completada: true, puntaje: 100 });
+    // Persiste la respuesta escrita del estudiante (antes se descartaba).
+    const res = await onProgreso?.({
+      actividadId: actividad.id ?? '',
+      completada: true,
+      puntaje: 100,
+      respuestas: { respuesta: respuesta.trim() },
+    });
+    // Si la escritura falló, revierte el estado para que pueda reintentar.
+    if (res && !res.ok) setCompletado(false);
   }
 
   const card: React.CSSProperties = {

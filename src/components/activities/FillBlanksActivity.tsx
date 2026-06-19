@@ -425,10 +425,17 @@ export function FillBlanksActivity({
       {/* Progress counter */}
       {!verificado && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <div style={{
-            flex: 1, height: 5, borderRadius: 999,
-            background: 'rgba(255,255,255,0.08)', overflow: 'hidden',
-          }}>
+          <div
+            role="progressbar"
+            aria-valuenow={llenos}
+            aria-valuemin={0}
+            aria-valuemax={numHuecos}
+            aria-label={`${llenos} de ${numHuecos} huecos completados`}
+            style={{
+              flex: 1, height: 5, borderRadius: 999,
+              background: 'rgba(255,255,255,0.08)', overflow: 'hidden',
+            }}
+          >
             <motion.div
               animate={{ width: `${pct}%` }}
               transition={reducedMotion ? { duration: 0 } : { ...springs.gentle }}
@@ -448,6 +455,9 @@ export function FillBlanksActivity({
             initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={springs.gentle}
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
             style={{
               ...card,
               padding: '22px 28px',

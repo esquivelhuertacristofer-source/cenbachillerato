@@ -135,6 +135,7 @@ export function RetoNumericoCard({
                   className="rn-num"
                   type="number"
                   inputMode="decimal"
+                  aria-label={c.unidad ? `${c.etiqueta} (${c.unidad})` : c.etiqueta}
                   placeholder={c.placeholder ?? "?"}
                   value={vals[i] ?? ""}
                   onChange={(e) => set(i, e.target.value)}
@@ -173,6 +174,8 @@ export function RetoNumericoCard({
       {/* Retroalimentación */}
       {comprobado && (
         <div
+          role="status"
+          aria-live="polite"
           style={{
             marginTop: 14,
             borderRadius: 13,

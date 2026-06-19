@@ -69,9 +69,10 @@ interface OpcionCardProps {
   estado: EstadoOpcion;
   onClick: () => void;
   disabled: boolean;
+  seleccionada: boolean;
 }
 
-function OpcionCard({ letra, texto, estado, onClick, disabled }: OpcionCardProps) {
+function OpcionCard({ letra, texto, estado, onClick, disabled, seleccionada }: OpcionCardProps) {
   const reducedMotion = useReducedMotion();
 
   const estilos: Record<EstadoOpcion, { bg: string; border: string; letraBg: string; letraColor: string; textColor: string }> = {
@@ -103,6 +104,8 @@ function OpcionCard({ letra, texto, estado, onClick, disabled }: OpcionCardProps
     <motion.button
       onClick={onClick}
       disabled={disabled}
+      aria-pressed={seleccionada}
+      aria-label={`Opción ${letra}: ${texto}`}
       whileHover={!disabled && !reducedMotion ? { scale: 1.015, y: -2 } : {}}
       whileTap={!disabled && !reducedMotion ? { scale: 0.98 } : {}}
       animate={estado === 'correct' && !reducedMotion ? { scale: [1, 1.025, 1] } : { scale: 1 }}
@@ -171,15 +174,11 @@ export function QuizMultipleOpcionActivity({ actividad, onProgreso, color = FALL
   const [tiempoInicio, setTiempoInicio] = useState(0);
   const [xpGanado, setXpGanado] = useState(0);
   const [entregado, setEntregado] = useState(false);
-  const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Guard síncrono contra doble-clic: el estado `verificada` llega tarde entre
   // dos clics en el mismo tick, lo que duplicaba la respuesta y atascaba la
   // transición de AnimatePresence. lockRef bloquea de inmediato.
   const lockRef = useRef(false);
   const [tiempoFin, setTiempoFin] = useState(0);
-
-  // Cleanup timer on unmount
-  useEffect(() => () => { if (advanceTimer.current) clearTimeout(advanceTimer.current); }, []);
 
   // fireworks on resumen si score >= 80
   useEffect(() => {
@@ -196,7 +195,6 @@ export function QuizMultipleOpcionActivity({ actividad, onProgreso, color = FALL
   }, [fase]);
 
   function handleEmpezar() {
-    if (advanceTimer.current) clearTimeout(advanceTimer.current);
     lockRef.current = false;
     setFase('quiz');
     setTiempoInicio(Date.now());
@@ -210,7 +208,6 @@ export function QuizMultipleOpcionActivity({ actividad, onProgreso, color = FALL
   function handleSeleccion(indice: number) {
     if (lockRef.current || verificada) return;
     lockRef.current = true;
-    if (advanceTimer.current) clearTimeout(advanceTimer.current);
     const pregunta = preguntas[preguntaActual]!;
     const correcta = indice === pregunta.respuesta_correcta;
 
@@ -222,23 +219,25 @@ export function QuizMultipleOpcionActivity({ actividad, onProgreso, color = FALL
       void celebrate('small');
       setXpGanado(prev => prev + Math.floor((actividad.xp ?? 0) / total));
     }
+    // El avance ya NO es automático: el alumno lee la retroalimentación a su
+    // propio ritmo y pulsa "Siguiente" cuando esté listo (WCAG 2.2.1 — sin
+    // límite de tiempo). lockRef se libera al avanzar.
+  }
 
-    const delay = correcta ? 1200 : 2500;
-    advanceTimer.current = setTimeout(() => {
-      if (preguntaActual + 1 >= total) {
-        setTiempoFin(Date.now());
-        setFase('resumen');
-      } else {
-        setPreguntaActual(prev => prev + 1);
-        setRespuestaActual(null);
-        setVerificada(false);
-      }
-      lockRef.current = false;
-    }, reducedMotion ? 600 : delay);
+  function handleAvanzar() {
+    if (!verificada) return;
+    if (preguntaActual + 1 >= total) {
+      setTiempoFin(Date.now());
+      setFase('resumen');
+    } else {
+      setPreguntaActual(prev => prev + 1);
+      setRespuestaActual(null);
+      setVerificada(false);
+    }
+    lockRef.current = false;
   }
 
   function handleReiniciar() {
-    if (advanceTimer.current) clearTimeout(advanceTimer.current);
     lockRef.current = false;
     fireworksFired.current = false;
     setFase('quiz');
@@ -587,6 +586,7 @@ export function QuizMultipleOpcionActivity({ actividad, onProgreso, color = FALL
     <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
       <style>{`
         .quiz-opcion:focus-visible { outline: 2px solid var(--quiz-opt-color, #A78BFA); outline-offset: 3px; }
+        .quiz-start-btn:focus-visible { outline: 2px solid var(--quiz-color); outline-offset: 3px; }
       `}</style>
 
       {/* Progress bar + counter */}
@@ -608,7 +608,14 @@ export function QuizMultipleOpcionActivity({ actividad, onProgreso, color = FALL
             +{xpGanado} XP
           </span>
         </div>
-        <div style={{ height: 6, borderRadius: 999, background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+        <div
+          role="progressbar"
+          aria-valuenow={preguntaActual + 1}
+          aria-valuemin={1}
+          aria-valuemax={total}
+          aria-label={`Pregunta ${preguntaActual + 1} de ${total}`}
+          style={{ height: 6, borderRadius: 999, background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}
+        >
           <motion.div
             initial={{ width: `${progPct}%` }}
             animate={{ width: verificada ? `${progPctFinal}%` : `${progPct}%` }}
@@ -655,6 +662,7 @@ export function QuizMultipleOpcionActivity({ actividad, onProgreso, color = FALL
                 estado={getEstadoOpcion(i)}
                 onClick={() => handleSeleccion(i)}
                 disabled={verificada}
+                seleccionada={respuestaActual === i}
               />
             ))}
           </div>
@@ -667,6 +675,9 @@ export function QuizMultipleOpcionActivity({ actividad, onProgreso, color = FALL
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
                 transition={reducedMotion ? { duration: 0.2 } : springs.gentle}
+                role="status"
+                aria-live="polite"
+                aria-atomic="true"
                 style={{
                   padding: '18px 22px', borderRadius: 16,
                   borderLeft: `4px solid ${respuestaActual === pregunta.respuesta_correcta ? '#4ADE80' : '#F87171'}`,
@@ -693,6 +704,31 @@ export function QuizMultipleOpcionActivity({ actividad, onProgreso, color = FALL
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Avance manual — el alumno controla cuándo pasar (WCAG 2.2.1) */}
+          {verificada && (
+            <motion.button
+              className="quiz-start-btn"
+              onClick={handleAvanzar}
+              autoFocus
+              whileHover={reducedMotion ? {} : { scale: 1.02, y: -2 }}
+              whileTap={reducedMotion ? {} : { scale: 0.98 }}
+              transition={springs.snappy}
+              style={{
+                '--quiz-color': color.hex,
+                alignSelf: 'flex-end',
+                display: 'flex', alignItems: 'center', gap: 10,
+                padding: '14px 32px', borderRadius: 16, border: 'none',
+                background: color.hex, color: '#011126', cursor: 'pointer',
+                fontSize: 14, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.10em',
+                fontFamily: "var(--font-epilogue), sans-serif",
+                boxShadow: `0 10px 28px rgba(${color.rgba}, 0.28)`, outline: 'none',
+              } as React.CSSProperties}
+            >
+              {preguntaActual + 1 >= total ? 'Ver resultados' : 'Siguiente pregunta'}
+              <ArrowRight size={16} />
+            </motion.button>
+          )}
         </motion.div>
       </AnimatePresence>
     </div>

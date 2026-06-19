@@ -13,7 +13,7 @@
  * replicable". NO importa three: seguro de usar desde cualquier shell.
  */
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { T, OK } from "./_kit";
 
 const NO = "#FF5E5E";
@@ -65,6 +65,14 @@ export function EppGate({
   const listos = items.filter((e) => e.ok && puestos.has(e.key)).length;
   const completo = listos === correctos;
 
+  // Limpia los temporizadores de "shake" pendientes al desmontar (evita
+  // setState sobre un componente desmontado).
+  const timers = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
+  useEffect(() => {
+    const set = timers.current;
+    return () => { for (const t of set) clearTimeout(t); set.clear(); };
+  }, []);
+
   const tocar = (e: EppItem) => {
     if (e.ok) {
       setPuestos((p) => (p.has(e.key) ? p : new Set(p).add(e.key)));
@@ -73,7 +81,11 @@ export function EppGate({
     } else {
       setMalo(e.key);
       setAviso(e.nota);
-      window.setTimeout(() => setMalo((m) => (m === e.key ? null : m)), 480);
+      const t = setTimeout(() => {
+        setMalo((m) => (m === e.key ? null : m));
+        timers.current.delete(t);
+      }, 480);
+      timers.current.add(t);
     }
   };
 
@@ -136,7 +148,7 @@ export function EppGate({
           {items.map((e) => {
             const puesto = e.ok && puestos.has(e.key);
             return (
-              <button key={e.key} className="epp-card" data-puesto={puesto} data-malo={malo === e.key} onClick={() => tocar(e)} title={e.nombre}>
+              <button key={e.key} className="epp-card" data-puesto={puesto} data-malo={malo === e.key} aria-pressed={puesto} aria-label={e.nombre} onClick={() => tocar(e)} title={e.nombre}>
                 <i className={`fa-solid ${e.icono}`} style={{ fontSize: 22 }} />
                 <span style={{ fontSize: 11.5, fontWeight: 700, lineHeight: 1.2, textAlign: "center" }}>{e.nombre}</span>
                 {puesto && <i className="fa-solid fa-circle-check" style={{ position: "absolute", top: 7, right: 8, fontSize: 12, color: OK }} />}

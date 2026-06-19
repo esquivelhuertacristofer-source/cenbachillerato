@@ -60,10 +60,20 @@ export function resolverEmailUnico(
 }
 
 export function generarPassword(): string {
-  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789'; // 36 caracteres
+  // Aleatoriedad criptográficamente segura: estas son las contraseñas iniciales
+  // de alumnos, generadas en lote, así que no se usa Math.random() (predecible).
+  // crypto.getRandomValues está disponible en el server (Node) y en Workers.
+  // Se descartan los bytes ≥ 252 para no introducir sesgo de módulo (256 % 36 ≠ 0).
+  const limite = Math.floor(256 / chars.length) * chars.length; // 252
+  const LARGO = 8;
+  const buf = new Uint8Array(1);
   let pw = 'Bachi-';
-  for (let i = 0; i < 8; i++) {
-    pw += chars[Math.floor(Math.random() * chars.length)];
+  while (pw.length < 'Bachi-'.length + LARGO) {
+    crypto.getRandomValues(buf);
+    const b = buf[0]!;
+    if (b >= limite) continue; // byte sesgado: reintentar
+    pw += chars[b % chars.length];
   }
   return pw;
 }
