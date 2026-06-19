@@ -81,15 +81,19 @@ export function EjercicioMatematicoActivity({
     }
   }
 
-  function handleEntregar() {
+  async function handleEntregar() {
     if (entregando) return;
     setEntregando(true);
-    onProgreso?.({
+    const completada = correcto === true;
+    const res = await onProgreso?.({
       actividadId: actividad.id ?? '',
-      completada: correcto === true,
+      completada,
       puntaje: correcto === true ? 100 : 0,
       respuestas: { respuesta: respuesta.trim() },
     });
+    // En éxito con `completada` el runner navega y desmonta; si falló o no se
+    // completó, rehabilitamos el botón.
+    if (!completada || (res && !res.ok)) setEntregando(false);
   }
 
   function handleReiniciar() {

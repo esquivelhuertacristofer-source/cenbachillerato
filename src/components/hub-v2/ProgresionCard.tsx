@@ -45,6 +45,8 @@ export default function ProgresionCard({
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (isLocked) return;
+    // Respetar prefers-reduced-motion: sin tilt 3D para quien lo pidió.
+    if (typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -224,7 +226,7 @@ export default function ProgresionCard({
             </div>
 
             {/* Title */}
-            <h4
+            <h3
               style={{
                 fontSize: "clamp(22px,2.5vw,32px)",
                 fontWeight: 900,
@@ -235,7 +237,7 @@ export default function ProgresionCard({
               }}
             >
               {titulo}
-            </h4>
+            </h3>
 
             {/* Chips */}
             {chips.length > 0 && (
@@ -283,7 +285,7 @@ export default function ProgresionCard({
               <p
                 style={{
                   fontSize: 15,
-                  color: "rgba(255,255,255,0.50)",
+                  color: "rgba(255,255,255,0.72)",
                   lineHeight: 1.65,
                   maxWidth: "100%",
                   marginBottom: 24,
@@ -342,8 +344,21 @@ export default function ProgresionCard({
               })}
             </div>
 
-            {/* CTA */}
+            {/* CTA — control real de teclado (la tarjeta entera es atajo de ratón) */}
             <button
+              type="button"
+              disabled={isLocked}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (!isLocked) onClick();
+              }}
+              aria-label={
+                isDone
+                  ? `Repasar propósito formativo ${numero}: ${titulo}`
+                  : isLocked
+                  ? `Propósito formativo ${numero} bloqueado: ${titulo}`
+                  : `Iniciar propósito formativo ${numero}: ${titulo}`
+              }
               style={{
                 display: "flex",
                 alignItems: "center",

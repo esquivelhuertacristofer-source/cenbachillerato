@@ -57,3 +57,6 @@ _diagnostico-*.log
 
 # inspección temporal de paquetes (no commitear)
 tmp-inspect/
+
+# Material fuente oficial 2025 (PDFs grandes) — solo local, no se despliega
+docs/fuentes-oficiales-2025/

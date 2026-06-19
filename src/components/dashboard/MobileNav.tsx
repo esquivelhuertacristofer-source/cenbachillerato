@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -28,6 +28,16 @@ const navItems = [
 export default function MobileNav({ teacherName }: { teacherName?: string }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+
+  // Cerrar el drawer con Escape cuando está abierto.
+  useEffect(() => {
+    if (!open) return;
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') setOpen(false);
+    }
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [open]);
 
   return (
     <>

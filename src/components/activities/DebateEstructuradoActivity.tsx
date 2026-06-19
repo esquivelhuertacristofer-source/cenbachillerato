@@ -53,12 +53,12 @@ export function DebateEstructuradoActivity({
     setTimeout(() => editorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 120);
   }
 
-  function handleEntregar() {
+  async function handleEntregar() {
     if (!cumpleMinimo || enviando || modoRevision) return;
     setEnviando(true);
     void celebrate('medium');
     const posturaNombre = posturaSeleccionada !== null ? contenido.posturas[posturaSeleccionada] : '';
-    onProgreso?.({
+    const res = await onProgreso?.({
       actividadId: actividad.id ?? '',
       completada: true,
       puntaje: 100,
@@ -68,6 +68,8 @@ export function DebateEstructuradoActivity({
         argumentacion,
       },
     });
+    // En éxito el runner navega y desmonta; si la entrega falló, rehabilitamos.
+    if (res && !res.ok) setEnviando(false);
   }
 
   const card: React.CSSProperties = {

@@ -305,7 +305,7 @@ export default function UACPage() {
 
       {/* ── Progresiones ─── */}
       <main className="uac-v2-timeline">
-        <div className="uac-v2-timeline-header">
+        <h2 className="uac-v2-timeline-header" style={{ marginTop: 0 }}>
           <i className="fa-solid fa-route" style={{ color: cfg.accent, fontSize: 22 }} />
           Ruta de Aprendizaje
           <div className="uac-v2-timeline-line" />
@@ -321,7 +321,7 @@ export default function UACPage() {
               {completadas}/{total}
             </span>
           )}
-        </div>
+        </h2>
 
         {progresiones.length === 0 ? (
           <div

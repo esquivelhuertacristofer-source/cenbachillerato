@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { X, Trophy, Clock, CheckCircle2, Zap, ShieldCheck } from 'lucide-react';
 import { getSupabaseBrowser } from '@/lib/supabase-browser';
 
@@ -25,6 +25,17 @@ export default function StudentRecordModal({
 }) {
   const [intentos, setIntentos] = useState<IntentoItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
+
+  // Cerrar con Escape y enfocar el botón de cierre al abrir (accesibilidad de modal).
+  useEffect(() => {
+    closeBtnRef.current?.focus();
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose();
+    }
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [onClose]);
 
   useEffect(() => {
     async function fetchRecord() {
@@ -71,9 +82,14 @@ export default function StudentRecordModal({
 
   return (
     <div className="fixed inset-0 z-[10000] flex items-center justify-center p-6">
-      <div className="absolute inset-0 bg-[#0A0118]/90 backdrop-blur-3xl" onClick={onClose} />
+      <div className="absolute inset-0 bg-[#0A0118]/90 backdrop-blur-3xl" onClick={onClose} aria-hidden="true" />
 
-      <div className={`relative z-10 w-full max-w-3xl rounded-[60px] border p-12 overflow-hidden shadow-[0_50px_100px_rgba(0,0,0,0.5)] ${
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="student-record-title"
+        tabIndex={-1}
+        className={`relative z-10 w-full max-w-3xl rounded-[60px] border p-12 overflow-hidden shadow-[0_50px_100px_rgba(0,0,0,0.5)] ${
         isDark ? 'bg-white/[0.03] border-white/10 text-white' : 'bg-white border-slate-100 text-slate-900'
       }`}>
         {/* Header decor */}
@@ -89,14 +105,14 @@ export default function StudentRecordModal({
             </div>
             <div>
               <div className="text-[10px] font-black uppercase tracking-[0.4em] text-[#D4A574] mb-2">Expediente Académico</div>
-              <h2 className="text-4xl font-black tracking-tighter uppercase">{studentName}</h2>
+              <h2 id="student-record-title" className="text-4xl font-black tracking-tighter uppercase">{studentName}</h2>
               <div className="flex items-center gap-4 mt-4 opacity-50 font-bold text-xs uppercase tracking-widest">
                 <ShieldCheck size={16} className="text-[#7DD3FC]" /> Alumno MCCEMS
               </div>
             </div>
           </div>
-          <button onClick={onClose} className="p-4 bg-white/5 rounded-full hover:bg-[#E27D7D]/70 transition-all">
-            <X size={24} />
+          <button ref={closeBtnRef} onClick={onClose} aria-label="Cerrar expediente" className="p-4 bg-white/5 rounded-full hover:bg-[#E27D7D]/70 transition-all">
+            <X size={24} aria-hidden="true" />
           </button>
         </div>
 

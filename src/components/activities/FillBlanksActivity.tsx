@@ -295,16 +295,20 @@ export function FillBlanksActivity({
     setShakingAll(false);
   }
 
-  function handleEntregar() {
+  async function handleEntregar() {
     if (entregando) return;
     setEntregando(true);
     const puntaje = numHuecos > 0 ? Math.round((aciertos / numHuecos) * 100) : 0;
-    onProgreso?.({
+    const completada = puntaje >= 70;
+    const res = await onProgreso?.({
       actividadId: actividad.id ?? '',
-      completada: puntaje >= 70,
+      completada,
       puntaje,
       respuestas: Object.fromEntries(respuestas.map((r, i) => [String(i), r])),
     });
+    // En éxito con `completada` el runner navega y este componente se desmonta;
+    // si la entrega falló o no se completó, rehabilitamos el botón.
+    if (!completada || (res && !res.ok)) setEntregando(false);
   }
 
   const card: React.CSSProperties = {

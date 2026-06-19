@@ -63,12 +63,14 @@ export function ReflexionEscritaActivity({
     if (!cumpleMinimo || enviando || modoRevision) return;
     setEnviando(true);
     void celebrate('medium');
-    onProgreso?.({
+    const res = await onProgreso?.({
       actividadId: actividad.id ?? '',
       completada: true,
       puntaje: 100,
       respuestas: { texto },
     });
+    // En éxito el runner navega y desmonta; si la entrega falló, rehabilitamos.
+    if (res && !res.ok) setEnviando(false);
   }
 
   const card: React.CSSProperties = {

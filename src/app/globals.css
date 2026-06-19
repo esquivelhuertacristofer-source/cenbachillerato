@@ -18,6 +18,20 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* ── Accesibilidad: anillo de foco global por teclado ──────────────
+   Doble capa (cian + halo oscuro) para que sea visible tanto sobre el
+   hub oscuro como sobre los tableros claros. Solo aparece con :focus-visible
+   (navegación por teclado), no al hacer clic con el mouse. */
+:focus-visible {
+  outline: 2px solid #38BDF8;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(1, 28, 64, 0.55);
+  border-radius: 4px;
+}
+@media (prefers-reduced-motion: reduce) {
+  :focus-visible { transition: none; }
+}
+
 /* Keyframes used by landing and login pages */
 @keyframes float {
   0%, 100% { transform: translateY(0); }

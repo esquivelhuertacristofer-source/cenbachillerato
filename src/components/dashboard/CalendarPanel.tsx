@@ -26,8 +26,8 @@ export default function CalendarPanel() {
             </div>
             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#0B2545]">Agenda Docente</h3>
           </div>
-          <button className="h-8 w-8 rounded-xl bg-[#D4A574]/10 text-[#D4A574] hover:bg-[#D4A574] hover:text-white transition-all flex items-center justify-center shadow-sm">
-            <PlusCircle className="w-4 h-4" />
+          <button aria-label="Agregar evento" className="h-8 w-8 rounded-xl bg-[#D4A574]/10 text-[#D4A574] hover:bg-[#D4A574] hover:text-white transition-all flex items-center justify-center shadow-sm">
+            <PlusCircle className="w-4 h-4" aria-hidden="true" />
           </button>
         </div>
 
@@ -40,9 +40,10 @@ export default function CalendarPanel() {
                 prev.setMonth(prev.getMonth() - 1);
                 setCurrentDate(prev);
               }}
+              aria-label="Mes anterior"
               className="p-1 hover:bg-gray-100 rounded-lg"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-4 h-4" aria-hidden="true" />
             </button>
             <button
               onClick={() => {
@@ -50,9 +51,10 @@ export default function CalendarPanel() {
                 next.setMonth(next.getMonth() + 1);
                 setCurrentDate(next);
               }}
+              aria-label="Mes siguiente"
               className="p-1 hover:bg-gray-100 rounded-lg"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-4 h-4" aria-hidden="true" />
             </button>
           </div>
         </div>

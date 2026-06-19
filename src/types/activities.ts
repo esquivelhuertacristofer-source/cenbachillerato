@@ -1,7 +1,6 @@
 // =============================================================================
 // CEN Bachillerato — Tipos de actividades pedagógicas
 // Alineado con tabla tipos_actividad (migración 03)
-// TODO: Marcar es_placeholder=true en todas las instancias hasta validación
 // =============================================================================
 
 // ── Tipo base compartido ──────────────────────────────────────────────────────
@@ -331,4 +330,14 @@ export interface ResultadoActividad {
   tiempoSegundos?: number;
 }
 
-export type CallbackProgreso = (resultado: ResultadoActividad) => void;
+/**
+ * Resultado de persistir un intento. Lo devuelve `onProgreso` para que el hijo
+ * (botón de envío) sepa si la entrega tuvo éxito y NO deje el botón colgado en
+ * "Registrando…" cuando falla. `ActivityRunner` lo usa para mostrar un banner de
+ * reintento y NO navegar si el alumno perdería su trabajo.
+ */
+export type ResultadoEntrega = { ok: boolean; error?: string };
+
+export type CallbackProgreso = (
+  resultado: ResultadoActividad
+) => void | Promise<ResultadoEntrega>;

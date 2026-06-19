@@ -305,6 +305,7 @@ export default function LoginPage() {
                 transition={{ ...springs.smooth, delay: 0.15 }}
               >
                 <label
+                  htmlFor="login-email"
                   style={{
                     display: 'block', color: 'rgba(255,255,255,0.65)', fontWeight: 700,
                     fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.15em',
@@ -319,9 +320,10 @@ export default function LoginPage() {
                     display: 'flex', alignItems: 'center', pointerEvents: 'none',
                     color: 'rgba(255,255,255,0.3)',
                   }}>
-                    <i className="fas fa-envelope" style={{ fontSize: 16 }}></i>
+                    <i className="fas fa-envelope" style={{ fontSize: 16 }} aria-hidden="true"></i>
                   </div>
                   <input
+                    id="login-email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -358,6 +360,7 @@ export default function LoginPage() {
                 transition={{ ...springs.smooth, delay: 0.15 + stagger.normal }}
               >
                 <label
+                  htmlFor="login-password"
                   style={{
                     display: 'block', color: 'rgba(255,255,255,0.65)', fontWeight: 700,
                     fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.15em',
@@ -372,9 +375,10 @@ export default function LoginPage() {
                     display: 'flex', alignItems: 'center', pointerEvents: 'none',
                     color: 'rgba(255,255,255,0.3)',
                   }}>
-                    <i className="fas fa-lock" style={{ fontSize: 16 }}></i>
+                    <i className="fas fa-lock" style={{ fontSize: 16 }} aria-hidden="true"></i>
                   </div>
                   <input
+                    id="login-password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
