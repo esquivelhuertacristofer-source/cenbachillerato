@@ -15,7 +15,7 @@ import { imagenDeLab } from "@/lib/practicas/lab-imagenes";
 import HubV2Skeleton from "@/components/hub-v2/HubV2Skeleton";
 // ⚠️ TEMPORAL (presentación): pestaña "Destacados". Para revertir, eliminar
 // este import, el bloque <DestacadosView/> + tabs, y el archivo labs-destacados.ts.
-import { LABS_DESTACADOS, SEMESTRE_VIDEOS } from "@/lib/practicas/labs-destacados";
+import { LABS_DESTACADOS } from "@/lib/practicas/labs-destacados";
 import "../../HubV5.css";
 import "./Laboratorios.css";
 
@@ -89,84 +89,90 @@ function VideoEmbed({
 }
 
 /* ──────────────────────────────────────────────────────────────
-   DestacadosView — 18 prácticas destacadas (3 por semestre), con
-   video de presentación por semestre + holder de video por lab.
+   DestacadoCard — tarjeta de una práctica destacada: video propio
+   del laboratorio (fachada click-to-play) + materia + acceso 3D.
+   Proporción uniforme; ningún elemento domina la pantalla.
+   ⚠️ TEMPORAL: solo para la presentación.
+   ────────────────────────────────────────────────────────────── */
+function DestacadoCard({ lab }: { lab: (typeof LABS_DESTACADOS)[number] }) {
+  const color = getRSCColor(getUACPorCodigo(lab.uacCodigo)?.recursoCodigo ?? null);
+  const nombre = nombreLab(lab.slug);
+  return (
+    <article
+      className="dest-card"
+      style={
+        {
+          "--lab-accent": color.hex,
+          "--lab-accent-rgb": color.rgba,
+        } as CSSProperties
+      }
+    >
+      <VideoEmbed videoId={lab.videoId} title={nombre} className="dest-card-video" />
+      <div className="dest-card-body">
+        <span className="dest-card-uac">
+          <i className={`fa-solid ${color.faIcon}`} /> {lab.uacCodigo}
+        </span>
+        <h3 className="dest-card-title">{nombre}</h3>
+        <Link
+          href={lab.ruta}
+          className="dest-card-cta"
+          aria-label={`Abrir laboratorio 3D: ${nombre}`}
+        >
+          <i className="fa-solid fa-cube" /> Abrir laboratorio 3D
+          <i className="fa-solid fa-arrow-right dest-card-cta-arrow" />
+        </Link>
+      </div>
+    </article>
+  );
+}
+
+/* ──────────────────────────────────────────────────────────────
+   SemestreDestacado — encabezado del semestre + rejilla uniforme
+   de sus prácticas destacadas. Sin video de semestre, sin escenario.
+   ⚠️ TEMPORAL: solo para la presentación.
+   ────────────────────────────────────────────────────────────── */
+function SemestreDestacado({
+  semestre,
+  labs,
+}: {
+  semestre: number;
+  labs: typeof LABS_DESTACADOS;
+}) {
+  return (
+    <section className="dest-sem">
+      <div className="dest-sem-head">
+        <span className="dest-sem-num">{semestre}</span>
+        <div>
+          <h2 className="dest-sem-title">Semestre {semestre}</h2>
+          <p className="dest-sem-sub">
+            {labs.length}{" "}
+            {labs.length === 1 ? "práctica destacada" : "prácticas destacadas"}
+          </p>
+        </div>
+      </div>
+
+      <div className="dest-grid">
+        {labs.map((lab) => (
+          <DestacadoCard key={lab.n} lab={lab} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ──────────────────────────────────────────────────────────────
+   DestacadosView — 18 prácticas destacadas (3 por semestre).
    ⚠️ TEMPORAL: solo para la presentación.
    ────────────────────────────────────────────────────────────── */
 function DestacadosView() {
-  const semestres = [1, 2, 3, 4, 5, 6].map((s) => ({
-    semestre: s,
-    video: SEMESTRE_VIDEOS[s],
-    labs: LABS_DESTACADOS.filter((l) => l.semestre === s),
-  }));
-
   return (
     <div className="dest-wrap">
-      {semestres.map(({ semestre, video, labs }) => (
-        <section key={semestre} className="dest-sem">
-          <div className="dest-sem-head">
-            <span className="dest-sem-num">{semestre}</span>
-            <div>
-              <h2 className="dest-sem-title">Semestre {semestre}</h2>
-              <p className="dest-sem-sub">
-                Video de presentación · {labs.length} prácticas destacadas
-              </p>
-            </div>
-          </div>
-
-          {/* Video de presentación del semestre */}
-          {video && (
-            <VideoEmbed
-              videoId={video}
-              title={`Presentación · Semestre ${semestre}`}
-              className="dest-sem-video"
-            />
-          )}
-
-          {/* Tarjetas de laboratorio */}
-          <div className="dest-grid">
-            {labs.map((lab) => {
-              const color = getRSCColor(
-                getUACPorCodigo(lab.uacCodigo)?.recursoCodigo ?? null
-              );
-              const desc = LAB_CATALOGO[lab.slug]?.descripcion ?? "";
-              return (
-                <article
-                  key={lab.n}
-                  className="dest-card"
-                  style={
-                    {
-                      "--lab-accent": color.hex,
-                      "--lab-accent-rgb": color.rgba,
-                    } as CSSProperties
-                  }
-                >
-                  {/* Holder de video del lab */}
-                  <VideoEmbed
-                    videoId={lab.videoId}
-                    title={nombreLab(lab.slug)}
-                    className="dest-card-vid"
-                  />
-
-                  <div className="dest-card-body">
-                    <span className="dest-card-badge">
-                      <i className={`fa-solid ${color.faIcon}`} /> {lab.uacCodigo}
-                    </span>
-                    <h3 className="dest-card-titulo">
-                      <span className="dest-card-n">{lab.n}</span>
-                      {nombreLab(lab.slug)}
-                    </h3>
-                    {desc && <p className="dest-card-desc">{desc}</p>}
-                    <Link href={lab.ruta} className="dest-card-cta">
-                      <i className="fa-solid fa-cube" /> Abrir laboratorio 3D
-                      <i className="fa-solid fa-arrow-right" />
-                    </Link>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        </section>
+      {[1, 2, 3, 4, 5, 6].map((s) => (
+        <SemestreDestacado
+          key={s}
+          semestre={s}
+          labs={LABS_DESTACADOS.filter((l) => l.semestre === s)}
+        />
       ))}
     </div>
   );
@@ -229,8 +235,21 @@ export default function LaboratoriosPage() {
     <div className="labs-page">
       {/* ── Hero ─── */}
       <header className="labs-hero">
-        <div className="labs-hero-word" aria-hidden="true">
-          LAB
+        <div className="labs-hero-grid" aria-hidden="true" />
+        <div className="labs-hero-glow" aria-hidden="true" />
+        <div className="labs-hero-art" aria-hidden="true">
+          <span className="labs-hero-ring labs-hero-ring--3" />
+          <span className="labs-hero-ring labs-hero-ring--2" />
+          <span className="labs-hero-ring labs-hero-ring--1" />
+          <span className="labs-hero-cube">
+            <i className="fa-solid fa-cube" />
+          </span>
+          <span className="labs-hero-spark labs-hero-spark--a">
+            <i className="fa-solid fa-atom" />
+          </span>
+          <span className="labs-hero-spark labs-hero-spark--b">
+            <i className="fa-solid fa-flask" />
+          </span>
         </div>
         <div className="labs-hero-body">
           <div className="labs-hero-eyebrow">
@@ -244,7 +263,7 @@ export default function LaboratoriosPage() {
           </h1>
           <p className="labs-hero-frase">
             {enDestacados
-              ? "Una selección de las prácticas más representativas de los seis semestres, con su video de presentación. Ábrelas directo, sin importar el semestre."
+              ? "Una selección de las prácticas más representativas de los seis semestres, cada una con su video. Ábrelas directo, sin importar el semestre."
               : "Cada práctica experimental de tu semestre en un solo lugar. Ábrelas directo, sin buscar entre materias ni actividades."}
           </p>
           <div className="labs-hero-stats">

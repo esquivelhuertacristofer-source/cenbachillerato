@@ -59,6 +59,9 @@ export const LAB_TEMA: Record<string, string> = {
   "ecuacion-lineal-barras": "algebra",
   "factorizacion-area": "algebra",
   "inecuaciones-lineales": "algebra",
+  "lenguaje-algebraico-mosaicos": "algebra",
+  "clasificacion-expresiones-mosaicos": "algebra",
+  "operaciones-binomios-mosaicos": "algebra",
   "sistemas-ecuaciones-2x2": "graficas",
 
   // ── Matemáticas — geometría ──
@@ -67,6 +70,7 @@ export const LAB_TEMA: Record<string, string> = {
   "productos-notables-3d": "geometria",
   "semejanza-triangulos": "geometria",
   "conicas-lugares-geometricos": "geometria",
+  "modelado-conicas-estimacion": "geometria",
 
   // ── Matemáticas — trigonometría ──
   "circulo-unitario": "trigonometria",
@@ -83,6 +87,9 @@ export const LAB_TEMA: Record<string, string> = {
   "transformaciones-funciones": "graficas",
   "funciones-concepto": "graficas",
   "distribucion-normal": "graficas",
+  "medidas-tendencia-central": "graficas",
+  "medidas-dispersion": "graficas",
+  "datos-graficas-estadisticas": "graficas",
   "teorema-fundamental-calculo": "calculo",
   "limites-acercamiento": "calculo",
   "continuidad-tres-condiciones": "calculo",

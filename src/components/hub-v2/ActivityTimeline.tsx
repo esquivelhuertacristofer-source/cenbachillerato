@@ -16,7 +16,7 @@ export function ActivityTimeline({ color, delay = 0.4 }: Props) {
     <div style={{
       display: 'flex',
       justifyContent: 'flex-start',
-      paddingLeft: 52,
+      paddingLeft: 53,
       height: 48,
       alignItems: 'center',
     }}>

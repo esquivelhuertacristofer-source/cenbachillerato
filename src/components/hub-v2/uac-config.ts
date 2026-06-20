@@ -1,3 +1,5 @@
+import { getUACPorCodigo } from "@/lib/mccems/estructura";
+
 export interface UACVisualConfig {
   emoji: string;
   bg: string;
@@ -68,6 +70,24 @@ export const UAC_CONFIG_FALLBACK: UACVisualConfig = {
 
 export function getUACConfig(codigo: string): UACVisualConfig {
   return UAC_CONFIG[codigo] ?? UAC_CONFIG_FALLBACK;
+}
+
+/** Imagen ilustrativa por recurso sociocognitivo (archivos reales en public/rsc/). */
+const RSC_IMAGE: Record<string, string> = {
+  "RSC-LC": "/rsc/lc.webp",
+  "RSC-PM": "/rsc/pm.webp",
+  "RSC-IN": "/rsc/in.webp",
+  "RSC-CD": "/rsc/cd.webp",
+  "RSC-CH": "/rsc/ch.webp",
+  "RSC-CS": "/rsc/cs.webp",
+  "RSC-PFH": "/rsc/hum.webp",
+  "RSC-CNEYT": "/rsc/cneyt.webp",
+};
+
+/** Ruta de la imagen ilustrativa de una UAC, o undefined si no hay. */
+export function getUACImagen(codigo: string): string | undefined {
+  const uac = getUACPorCodigo(codigo);
+  return uac?.recursoCodigo ? RSC_IMAGE[uac.recursoCodigo] : undefined;
 }
 
 export const TIPO_ICON: Record<string, string> = {

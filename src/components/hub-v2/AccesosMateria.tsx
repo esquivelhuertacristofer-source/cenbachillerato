@@ -24,6 +24,8 @@ interface Props {
   progresiones: ProgresionBrowser[];
   codigoUAC: string;
   accent: string;
+  /** Banda horizontal a todo el ancho (bajo el hero) en lugar de panel lateral. */
+  horizontal?: boolean;
 }
 
 /** Orden canónico de los tipos para que el mosaico sea estable y legible. */
@@ -62,7 +64,7 @@ function agregarPorTipo(progresiones: ProgresionBrowser[]): TipoAgg[] {
     .sort((a, b) => (PESO_TIPO.get(a.tipo) ?? 99) - (PESO_TIPO.get(b.tipo) ?? 99));
 }
 
-export default function AccesosMateria({ progresiones, codigoUAC, accent }: Props) {
+export default function AccesosMateria({ progresiones, codigoUAC, accent, horizontal = false }: Props) {
   const reducedMotion = useReducedMotion();
   const tipos = agregarPorTipo(progresiones);
 
@@ -70,14 +72,15 @@ export default function AccesosMateria({ progresiones, codigoUAC, accent }: Prop
 
   return (
     <motion.aside
-      className="uac-mosaico"
-      initial={reducedMotion ? {} : { opacity: 0, y: 18, scale: 0.98 }}
+      className={`uac-mosaico${horizontal ? " uac-mosaico--horizontal" : ""}`}
+      initial={reducedMotion ? {} : { opacity: 0, y: 18, scale: horizontal ? 1 : 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ ...springs.smooth, delay: 0.05 + stagger.fast * 3 }}
     >
       <div className="uac-mosaico-head">
         <i className="fa-solid fa-table-cells-large" style={{ color: accent, fontSize: 13 }} />
         <span>Contenido de la materia</span>
+        {horizontal && <span className="uac-mosaico-head-line" aria-hidden />}
       </div>
 
       <div className="uac-mosaico-grid">

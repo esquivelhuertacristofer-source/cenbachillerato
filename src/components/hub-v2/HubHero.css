@@ -34,13 +34,29 @@
   display: flex;
 }
 
+/* Apila el reproductor y su pie de foto sin que se encimen. */
+.hub-hero-media-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  height: 100%;
+}
+
+.hub-hero-media-caption {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 0 4px;
+}
+
 /* Panel de video: superficie grande que llena toda la columna derecha,
    a la misma altura que la columna de texto. El reproductor / placeholder
    cubre el panel entero (object-fit: cover), sin marco interno. */
 .hub-hero-featured {
   position: relative;
   width: 100%;
-  height: 100%;
+  flex: 1 1 auto;
   min-height: 300px;
   display: flex;
   flex-direction: column;
@@ -105,6 +121,60 @@
 
 .hub-hero-video-play i {
   margin-left: 3px;
+}
+
+/* Fachada limpia del video: miniatura + botón play propio, sin el chrome
+   incrustado de YouTube. El iframe real solo se monta al hacer clic. */
+.hub-hero-video-facade {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  display: block;
+  overflow: hidden;
+}
+
+.hub-hero-video-facade:focus-visible {
+  outline: 2px solid rgba(125, 211, 252, 0.9);
+  outline-offset: -3px;
+}
+
+/* Scrim de legibilidad: oscurece la base para el pie de texto */
+.hub-hero-video-facade .hub-hero-video-glow {
+  background:
+    linear-gradient(to top, rgba(2, 11, 28, 0.88) 0%, rgba(2, 11, 28, 0.15) 46%, transparent 72%);
+}
+
+.hub-hero-video-facade .hub-hero-featured-meta {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  bottom: 24px;
+  z-index: 3;
+  text-align: left;
+}
+
+/* Botón play gigante (lo que pidió la indicación estética) */
+.hub-hero-video-play--xl {
+  top: 50%;
+  width: 86px;
+  height: 86px;
+  font-size: 30px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hub-hero-video-facade:hover .hub-hero-video-play--xl,
+.hub-hero-video-facade:focus-visible .hub-hero-video-play--xl {
+  transform: translate(-50%, -50%) scale(1.09);
+  background: #fff;
+  box-shadow: 0 20px 50px rgba(56, 189, 248, 0.35);
 }
 
 /* Pie del panel (sobre la imagen) */
@@ -177,13 +247,37 @@
   font-size: 12px;
 }
 
+.hub-hero-greeting {
+  font-size: clamp(15px, 1.8vw, 19px);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 14px;
+}
+
+.hub-hero-greeting strong {
+  font-weight: 800;
+  color: #7dd3fc;
+}
+
 .hub-hero-title {
-  font-size: clamp(56px, 8vw, 116px);
+  /* Vive en la columna izquierda (~mitad del ancho), por eso el factor vw
+     es moderado: llena la columna sin desbordarse sobre el video. nowrap
+     evita que el número salte a otra línea. */
+  font-size: clamp(52px, 8.6vw, 148px);
   font-weight: 900;
   letter-spacing: -0.05em;
   line-height: 0.9;
   color: #fff;
   margin-bottom: 24px;
+  white-space: nowrap;
+}
+
+/* En una sola columna (móvil/tablet) hay todo el ancho disponible. */
+@media (max-width: 980px) {
+  .hub-hero-title {
+    font-size: clamp(64px, 16vw, 160px);
+  }
 }
 
 .hub-hero-sem-num {

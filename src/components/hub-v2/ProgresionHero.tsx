@@ -23,6 +23,12 @@ export function ProgresionHero({
 }: Props) {
   const reducedMotion = useReducedMotion()
 
+  // El título ES el propósito formativo (oración larga). Si la descripción
+  // repite ese mismo texto, no la mostramos: sería un eco redundante.
+  const norm = (s: string) => s.trim().replace(/\s+/g, ' ').toLowerCase()
+  const mostrarDesc =
+    !!progresion.descripcion && norm(progresion.descripcion) !== norm(progresion.titulo)
+
   const itemVariants = reducedMotion
     ? { hidden: { opacity: 1, y: 0 }, visible: { opacity: 1, y: 0 } }
     : {
@@ -46,14 +52,16 @@ export function ProgresionHero({
       animate="visible"
       variants={containerVariants}
       style={{
-        padding: 'clamp(32px, 5vw, 56px) clamp(20px, 5vw, 48px) clamp(36px, 5vw, 52px)',
+        padding: 'clamp(32px, 5vw, 56px) 0 clamp(36px, 5vw, 52px)',
         background: `linear-gradient(180deg, rgba(${color.rgba}, 0.10) 0%, rgba(${color.rgba}, 0.02) 100%), #011C40`,
         borderBottom: `1px solid rgba(${color.rgba}, 0.14)`,
         borderLeft: `6px solid ${color.hex}`,
         boxShadow: `inset 4px 0 60px rgba(${color.rgba}, 0.05)`,
       }}
     >
-      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+      {/* mismo contenedor que la lista de actividades (maxWidth 1100 + padding
+          clamp(20px,4vw,48px)) para que el borde izquierdo coincida exacto */}
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 clamp(20px, 4vw, 48px)' }}>
 
         {/* Back button */}
         <motion.div variants={itemVariants} style={{ marginBottom: 28 }}>
@@ -85,7 +93,7 @@ export function ProgresionHero({
           <span>/</span>
           <Link href={`/hub/uac/${codigo}`} style={{ color: 'rgba(255,255,255,0.28)', textDecoration: 'none' }}>{codigo}</Link>
           <span>/</span>
-          <span style={{ color: color.hex, fontWeight: 700 }}>Propósito formativo {numParsed}</span>
+          <span style={{ color: color.hex, fontWeight: 700 }}>P-{numParsed}</span>
         </motion.div>
 
         {/* Completion badge */}
@@ -105,24 +113,52 @@ export function ProgresionHero({
           </motion.div>
         )}
 
-        {/* Title */}
-        <motion.h1
+        {/* Eyebrow: encuadra la oración larga como lo que es */}
+        <motion.div
           variants={itemVariants}
           style={{
-            fontSize: 'clamp(2rem, 5vw, 3.5rem)',
-            fontWeight: 900,
-            letterSpacing: '-0.04em',
-            lineHeight: 1.1,
-            color: '#fff',
-            margin: '0 0 18px',
-            maxWidth: 820,
+            display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14,
           }}
         >
-          {progresion.titulo}
-        </motion.h1>
+          <span style={{
+            fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.18em',
+            color: color.hex,
+          }}>
+            Propósito formativo {numParsed}
+          </span>
+          <span aria-hidden style={{
+            flex: 1, maxWidth: 120, height: 1,
+            background: `linear-gradient(90deg, rgba(${color.rgba},0.35), transparent)`,
+          }} />
+        </motion.div>
 
-        {/* Description */}
-        {progresion.descripcion && (
+        {/* Título = el propósito formativo (enunciado), tamaño legible,
+            enmarcado por una barra de acento a la izquierda. */}
+        <motion.div
+          variants={itemVariants}
+          style={{
+            display: 'flex', gap: 'clamp(14px, 1.6vw, 22px)',
+            maxWidth: 880, margin: '0 0 22px',
+          }}
+        >
+          <span aria-hidden style={{
+            width: 4, borderRadius: 4, flexShrink: 0,
+            background: `linear-gradient(180deg, ${color.hex}, rgba(${color.rgba},0.18))`,
+          }} />
+          <h1 style={{
+            fontSize: 'clamp(1.45rem, 2.8vw, 2.3rem)',
+            fontWeight: 800,
+            letterSpacing: '-0.02em',
+            lineHeight: 1.3,
+            color: '#fff',
+            margin: 0,
+          }}>
+            {progresion.titulo}
+          </h1>
+        </motion.div>
+
+        {/* Descripción: solo si aporta algo distinto al título */}
+        {mostrarDesc && (
           <motion.p
             variants={itemVariants}
             style={{
@@ -134,57 +170,77 @@ export function ProgresionHero({
           </motion.p>
         )}
 
-        {/* Metrics row */}
+        {/* Metrics row — stat-pills consistentes */}
         <motion.div
           variants={itemVariants}
-          style={{ display: 'flex', flexWrap: 'wrap', gap: 20, marginBottom: 28, alignItems: 'center' }}
+          style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 28, alignItems: 'center' }}
         >
           {progresion.tiempo_estimado_horas != null && (
             <span style={{
-              display: 'flex', alignItems: 'center', gap: 6,
-              fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.48)',
+              display: 'inline-flex', alignItems: 'center', gap: 7,
+              fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.55)',
+              padding: '8px 14px', borderRadius: 12,
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.07)',
             }}>
-              <Clock size={14} />
+              <Clock size={14} style={{ opacity: 0.7 }} />
               {progresion.tiempo_estimado_horas}h estimadas
             </span>
           )}
           {xpTotal > 0 && (
             <span style={{
-              display: 'flex', alignItems: 'center', gap: 6,
+              display: 'inline-flex', alignItems: 'center', gap: 7,
               fontSize: 13, fontWeight: 700, color: '#FBBF24',
+              padding: '8px 14px', borderRadius: 12,
+              background: 'rgba(251,191,36,0.08)',
+              border: '1px solid rgba(251,191,36,0.16)',
             }}>
               <Zap size={14} />
-              +{xpTotal} XP disponibles
+              +{xpTotal} XP
             </span>
           )}
           <span style={{
-            display: 'flex', alignItems: 'center', gap: 6,
-            fontSize: 13, color: 'rgba(255,255,255,0.38)',
+            display: 'inline-flex', alignItems: 'center', gap: 7,
+            fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.55)',
+            padding: '8px 14px', borderRadius: 12,
+            background: 'rgba(255,255,255,0.04)',
+            border: '1px solid rgba(255,255,255,0.07)',
           }}>
-            <BookMarked size={14} />
+            <BookMarked size={14} style={{ opacity: 0.7 }} />
             {progresion.actividadesCompletadas} / {progresion.totalActividades} actividades
           </span>
 
-          {/* Progress bar */}
+          {/* Progress pill (barra + %) */}
           {progresion.totalActividades > 0 && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{
-                width: 100, height: 5, borderRadius: 999,
-                background: 'rgba(255,255,255,0.10)', overflow: 'hidden',
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', gap: 10,
+              padding: '8px 14px', borderRadius: 12,
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.07)',
+            }}>
+              <span style={{
+                width: 88, height: 5, borderRadius: 999,
+                background: 'rgba(255,255,255,0.10)', overflow: 'hidden', display: 'block',
               }}>
-                <motion.div
+                <motion.span
                   initial={{ width: 0 }}
                   animate={{
                     width: `${Math.round((progresion.actividadesCompletadas / progresion.totalActividades) * 100)}%`,
                   }}
                   transition={{ duration: 0.8, ease: [0.0, 0.0, 0.2, 1], delay: 0.5 }}
                   style={{
-                    height: '100%', borderRadius: 999,
+                    height: '100%', borderRadius: 999, display: 'block',
                     background: progresion.estado === 'completada' ? '#4ADE80' : color.hex,
                   }}
                 />
-              </div>
-            </div>
+              </span>
+              <span style={{
+                fontSize: 12, fontWeight: 800,
+                color: progresion.estado === 'completada' ? '#4ADE80' : color.hex,
+              }}>
+                {Math.round((progresion.actividadesCompletadas / progresion.totalActividades) * 100)}%
+              </span>
+            </span>
           )}
         </motion.div>
 

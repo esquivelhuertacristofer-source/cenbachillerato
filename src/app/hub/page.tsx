@@ -156,6 +156,7 @@ export default function HubPage() {
         dia={dia}
         materiasActivas={materiasActivas}
         uacs={uacs}
+        nombre={nombre}
       />
 
       {/* ── Continuar donde te quedaste — CTA primaria, bajo el hero del semestre ─── */}

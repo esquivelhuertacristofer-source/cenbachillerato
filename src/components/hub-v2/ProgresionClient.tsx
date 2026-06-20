@@ -172,6 +172,47 @@ export function ProgresionClient({
           <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.06)' }} />
         </motion.div>
 
+        {/* Stepper de fases formativas (legenda del arco) */}
+        {actividades.length > 0 && (
+          <motion.div
+            initial={reducedMotion ? {} : { opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+            style={{
+              display: 'flex', alignItems: 'center', flexWrap: 'wrap',
+              gap: 10, marginBottom: 36,
+            }}
+          >
+            {PHASE_LABELS.map((label, i) => (
+              <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8,
+                  fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.10em',
+                  color: 'rgba(255,255,255,0.55)',
+                  padding: '7px 14px', borderRadius: 999,
+                  background: `rgba(${color.rgba}, 0.07)`,
+                  border: `1px solid rgba(${color.rgba}, 0.16)`,
+                }}>
+                  <span style={{
+                    width: 18, height: 18, borderRadius: '50%', flexShrink: 0,
+                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 10, fontWeight: 900,
+                    background: `rgba(${color.rgba}, 0.16)`, color: color.hex,
+                  }}>
+                    {i + 1}
+                  </span>
+                  {label}
+                </span>
+                {i < PHASE_LABELS.length - 1 && (
+                  <i className="fa-solid fa-arrow-right" style={{
+                    fontSize: 9, color: 'rgba(255,255,255,0.22)',
+                  }} />
+                )}
+              </div>
+            ))}
+          </motion.div>
+        )}
+
         {actividades.length === 0 ? (
           <motion.div
             initial={reducedMotion ? {} : { opacity: 0, scale: 0.97 }}

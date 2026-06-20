@@ -1,23 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { getUACConfig } from "./uac-config";
+import { getUACConfig, getUACImagen } from "./uac-config";
 import { getUACPorCodigo } from "@/lib/mccems/estructura";
 import { RECURSOS_SOCIOCOGNITIVOS } from "@/lib/mccems/recursos-sociocognitivos";
 import { COMPONENTES_CURRICULARES } from "@/lib/mccems/estructura";
 import "./UACFicha.css";
-
-// Imagen ilustrativa por recurso sociocognitivo (archivos reales en public/rsc/)
-const RSC_IMAGE: Record<string, string> = {
-  "RSC-LC": "/rsc/lc.webp",
-  "RSC-PM": "/rsc/pm.webp",
-  "RSC-IN": "/rsc/in.webp",
-  "RSC-CD": "/rsc/cd.webp",
-  "RSC-CH": "/rsc/ch.webp",
-  "RSC-CS": "/rsc/cs.webp",
-  "RSC-PFH": "/rsc/hum.webp",
-  "RSC-CNEYT": "/rsc/cneyt.webp",
-};
 
 interface UACCardProps {
   codigo: string;
@@ -39,7 +27,7 @@ export default function UACCard({ codigo, nombre, done, total, pct }: UACCardPro
   const descripcion =
     recurso?.descripcion ??
     "Recurso de aprendizaje alineado al Marco Curricular Común de la Educación Media Superior.";
-  const imagen = uac?.recursoCodigo ? RSC_IMAGE[uac.recursoCodigo] : undefined;
+  const imagen = getUACImagen(codigo);
 
   return (
     <Link
@@ -67,6 +55,22 @@ export default function UACCard({ codigo, nombre, done, total, pct }: UACCardPro
         {/* Emoji + código flotantes */}
         <div className="uac-ficha-badge">{codigo}</div>
         <div className="uac-ficha-emoji">{cfg.emoji}</div>
+        {/* Estado de avance, legible de un vistazo */}
+        <div
+          className={`uac-ficha-estado ${
+            isComplete ? "is-complete" : isStarted ? "is-started" : "is-new"
+          }`}
+        >
+          {isComplete ? (
+            <>
+              <i className="fa-solid fa-circle-check" /> Completada
+            </>
+          ) : isStarted ? (
+            `${pct}%`
+          ) : (
+            "Nuevo"
+          )}
+        </div>
       </div>
 
       {/* ── Contenido ─── */}

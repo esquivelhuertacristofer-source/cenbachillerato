@@ -43,7 +43,7 @@ export default async function BibliotecaPage({ searchParams }: { searchParams: P
     : fichasPorUAC;
 
   return (
-    <div style={{ padding: "36px 40px 80px", maxWidth: 1200, margin: "0 auto" }}>
+    <div style={{ padding: "36px 40px 80px" }}>
 
       {/* ── Header ─── */}
       <div style={{ marginBottom: 36 }}>

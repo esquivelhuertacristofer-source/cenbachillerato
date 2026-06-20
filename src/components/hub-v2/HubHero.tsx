@@ -22,6 +22,7 @@ interface HubHeroProps {
   dia: number;
   materiasActivas: number;
   uacs: HeroUAC[];
+  nombre?: string;
 }
 
 export default function HubHero({
@@ -30,6 +31,7 @@ export default function HubHero({
   dia,
   materiasActivas,
   uacs,
+  nombre,
 }: HubHeroProps) {
   const router = useRouter();
   const [mostrarPanorama, setMostrarPanorama] = useState(false);
@@ -91,11 +93,11 @@ export default function HubHero({
       <div className="hub-hero-grid">
         {/* ── Columna de texto: el semestre es el protagonista ─── */}
         <div className="hub-hero-inner">
-          <div className="hub-hero-eyebrow">
-            <i className="fa-solid fa-graduation-cap" />
-            Marco Curricular Común · Currículum Fundamental
-          </div>
-
+          {nombre && (
+            <p className="hub-hero-greeting">
+              Hola, <strong>{nombre}</strong> <span aria-hidden>👋</span>
+            </p>
+          )}
           <h1 className="hub-hero-title">
             Semestre <span className="hub-hero-sem-num">{semestre}</span>
           </h1>
@@ -243,6 +245,12 @@ export default function HubHero({
   );
 }
 
+/** Extrae el ID de un URL de YouTube (formato embed o watch). */
+function youTubeId(url: string): string | null {
+  const m = url.match(/(?:youtube\.com\/(?:embed\/|watch\?v=)|youtu\.be\/)([\w-]{11})/);
+  return m?.[1] ?? null;
+}
+
 /* ── Panel de video: reproductor real si hay URL, placeholder honesto si no ── */
 function HeroVideo({
   video,
@@ -254,32 +262,75 @@ function HeroVideo({
   onPlayClick: () => void;
 }) {
   const hayVideo = Boolean(video.url);
+  const ytId = video.url && video.tipo === "embed" ? youTubeId(video.url) : null;
+  // Fachada: mostramos una miniatura limpia + botón play propio y solo montamos
+  // el iframe de YouTube (con su chrome) al hacer clic. Evita el "ruido" del
+  // reproductor incrustado (cabecera del canal, compartir, "Mirar en YouTube").
+  const [reproduciendo, setReproduciendo] = useState(false);
+  // Si maxresdefault no existe, caemos a hqdefault (siempre disponible).
+  const [thumbAlt, setThumbAlt] = useState(false);
+  const thumb = ytId
+    ? `https://i.ytimg.com/vi/${ytId}/${thumbAlt ? "hqdefault" : "maxresdefault"}.jpg`
+    : null;
 
   return (
+    <div className="hub-hero-media-stack">
     <div
       className={`hub-hero-featured${hayVideo ? "" : " hub-hero-featured--placeholder"}`}
       onClick={!hayVideo ? onPlayClick : undefined}
       style={!hayVideo ? { cursor: "pointer" } : undefined}
     >
-      {/* Reproductor real (llena el panel) */}
-      {hayVideo &&
-        (video.tipo === "embed" ? (
+      {/* Video con URL real */}
+      {hayVideo && video.tipo === "embed" && ytId ? (
+        reproduciendo ? (
           <iframe
             className="hub-hero-video-frame"
-            src={video.url!}
+            src={`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1&playsinline=1`}
             title={video.titulo}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           />
         ) : (
-          <video
-            className="hub-hero-video-frame"
-            src={video.url!}
-            poster={video.poster ?? undefined}
-            controls
-            preload="metadata"
-          />
-        ))}
+          // Fachada limpia: miniatura + botón play gigante (sin chrome de YouTube)
+          <button
+            type="button"
+            className="hub-hero-video-facade"
+            onClick={() => setReproduciendo(true)}
+            aria-label={`Reproducir: ${video.titulo}`}
+          >
+            {thumb && (
+              <img
+                className="hub-hero-video-frame"
+                src={thumb}
+                alt=""
+                aria-hidden="true"
+                onError={() => setThumbAlt(true)}
+              />
+            )}
+            <span className="hub-hero-video-glow" aria-hidden="true" />
+            <span className="hub-hero-video-play hub-hero-video-play--xl">
+              <i className="fa-solid fa-play" />
+            </span>
+            <span className="hub-hero-featured-meta">
+              <span className="hub-hero-featured-text">
+                <span className="hub-hero-featured-eyebrow">Video de bienvenida</span>
+                <span className="hub-hero-featured-title">{video.titulo}</span>
+              </span>
+              <span className="hub-hero-featured-badge">
+                <i className="fa-brands fa-youtube" /> Ver
+              </span>
+            </span>
+          </button>
+        )
+      ) : hayVideo && video.tipo === "file" ? (
+        <video
+          className="hub-hero-video-frame"
+          src={video.url!}
+          poster={video.poster ?? undefined}
+          controls
+          preload="metadata"
+        />
+      ) : null}
 
       {/* Placeholder: botón play centrado */}
       {!hayVideo && (
@@ -291,18 +342,29 @@ function HeroVideo({
         </>
       )}
 
-      {/* Pie del panel, anclado abajo a la izquierda */}
-      <div className="hub-hero-featured-meta">
-        <div className="hub-hero-featured-text">
-          <span className="hub-hero-featured-eyebrow">{video.titulo}</span>
-          <span className="hub-hero-featured-title">Bienvenida · Semestre {semestre}</span>
-        </div>
-        {!hayVideo && (
+      {/* Pie del panel: SOLO en el placeholder. Para video real, el pie vive
+          dentro de la fachada (arriba) o como caption debajo del reproductor. */}
+      {!hayVideo && (
+        <div className="hub-hero-featured-meta">
+          <div className="hub-hero-featured-text">
+            <span className="hub-hero-featured-eyebrow">{video.titulo}</span>
+            <span className="hub-hero-featured-title">Bienvenida · Semestre {semestre}</span>
+          </div>
           <span className="hub-hero-featured-badge">
             <i className="fa-solid fa-clock" /> Próximamente
           </span>
-        )}
-      </div>
+        </div>
+      )}
+    </div>
+
+      {/* Caption debajo del reproductor, solo mientras se está reproduciendo
+          (la fachada ya muestra su propio título encima de la miniatura). */}
+      {hayVideo && reproduciendo && (
+        <div className="hub-hero-media-caption">
+          <span className="hub-hero-featured-eyebrow">Video de bienvenida</span>
+          <span className="hub-hero-featured-title">{video.titulo}</span>
+        </div>
+      )}
     </div>
   );
 }

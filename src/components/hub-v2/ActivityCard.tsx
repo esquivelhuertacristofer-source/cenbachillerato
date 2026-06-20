@@ -95,9 +95,9 @@ export function ActivityCard({ actividad, visualState, uacCodigo, progresionNum,
           0%, 100% { opacity: 1; }
           50% { opacity: 0.55; }
         }
-        @media (max-width: 640px) {
-          .act-card-layout { flex-direction: column !important; }
-          .act-card-icon-panel { width: 100% !important; min-height: 140px !important; }
+        @media (max-width: 560px) {
+          .act-card-footer { flex-direction: column !important; align-items: stretch !important; }
+          .act-card-footer .act-card-cta { justify-content: center !important; }
         }
       `}</style>
 
@@ -115,7 +115,7 @@ export function ActivityCard({ actividad, visualState, uacCodigo, progresionNum,
             style={{
               position: 'absolute',
               inset: -3,
-              borderRadius: 31,
+              borderRadius: 25,
               border: `2px solid rgba(${areaColor.rgba}, 0.50)`,
               pointerEvents: 'none',
               zIndex: 0,
@@ -131,11 +131,12 @@ export function ActivityCard({ actividad, visualState, uacCodigo, progresionNum,
           transition={springs.snappy}
           style={{
             position: 'relative', zIndex: 1,
-            borderRadius: 28,
+            borderRadius: 22,
             border: `1.5px solid ${borderColor}`,
             overflow: 'hidden',
-            display: 'flex',
-            opacity: isCompletada ? 0.88 : 1,
+            opacity: isCompletada ? 0.9 : 1,
+            background: `linear-gradient(180deg, rgba(${areaColor.rgba}, 0.05) 0%, #011C40 60%)`,
+            padding: '20px 26px',
             boxShadow: isActual
               ? `0 0 40px rgba(${areaColor.rgba}, 0.10), 0 8px 32px rgba(0,0,0,0.20)`
               : isEnProgreso
@@ -146,205 +147,161 @@ export function ActivityCard({ actividad, visualState, uacCodigo, progresionNum,
             '--aura-color': areaColor.rgba,
           } as React.CSSProperties}
         >
-
-          {/* Left icon panel */}
-          <div
-            className="act-card-icon-panel act-card-layout"
-            style={{
-              width: '38%', minWidth: 160, minHeight: 220, flexShrink: 0,
-              background: `linear-gradient(145deg, #011C40 0%, rgba(${areaColor.rgba}, 0.12) 100%)`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              position: 'relative', overflow: 'hidden',
-            }}
-          >
-            {/* Background glow blob */}
-            <div style={{
-              position: 'absolute',
-              width: 130, height: 130, borderRadius: '50%',
-              background: `rgba(${areaColor.rgba}, 0.07)`,
-              filter: 'blur(50px)',
-            }} />
-
-            {/* Order badge */}
-            <div style={{
-              position: 'absolute', top: 16, left: 16,
-              background: `rgba(${areaColor.rgba}, 0.12)`,
-              border: `1px solid rgba(${areaColor.rgba}, 0.22)`,
-              borderRadius: 8, padding: '4px 10px',
-              fontSize: 10, fontWeight: 900, color: areaColor.hex,
-              letterSpacing: '0.12em',
-            }}>
-              A-{actividad.orden}
+          {/* Estado badge (top-right) */}
+          {(isEnProgreso || isActual) && (
+            <div style={{ position: 'absolute', top: 18, right: 20 }}>
+              <span className={isEnProgreso ? 'act-badge-pulse' : undefined} style={{
+                display: 'inline-flex', alignItems: 'center', gap: 5,
+                fontSize: 9, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.14em',
+                color: areaColor.hex, padding: '4px 10px',
+                background: `rgba(${areaColor.rgba}, ${isEnProgreso ? 0.12 : 0.08})`,
+                border: `1px solid rgba(${areaColor.rgba}, ${isEnProgreso ? 0.28 : 0.20})`,
+                borderRadius: 999,
+              }}>
+                {isEnProgreso && (
+                  <span style={{ width: 5, height: 5, borderRadius: '50%', background: areaColor.hex }} />
+                )}
+                {isEnProgreso ? 'En curso' : 'Siguiente'}
+              </span>
             </div>
+          )}
 
-            {/* Main icon */}
+          {/* Header: ícono + (eyebrow / título) */}
+          <div style={{ display: 'flex', gap: 18, alignItems: 'flex-start' }}>
+            {/* Ícono */}
             <motion.div
-              whileHover={reducedMotion ? {} : { scale: 1.08, rotate: isCompletada ? 0 : 5 }}
+              whileHover={reducedMotion ? {} : { scale: 1.06, rotate: isCompletada ? 0 : 4 }}
               transition={springs.smooth}
               style={{
-                width: 90, height: 90, borderRadius: '50%',
+                width: 56, height: 56, borderRadius: 16, flexShrink: 0,
                 background: iconBg,
                 border: `2px solid ${iconBorder}`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                position: 'relative',
-                boxShadow: `0 0 32px ${iconBg}`,
+                boxShadow: `0 0 24px ${iconBg}`,
               }}
             >
               {isCompletada ? (
-                <CheckCircle2 size={38} color="#4ADE80" />
+                <CheckCircle2 size={26} color="#4ADE80" />
               ) : (
-                <Icon size={38} color={iconColor} />
+                <Icon size={26} color={iconColor} />
               )}
             </motion.div>
-          </div>
 
-          {/* Right content panel */}
-          <div style={{
-            flex: 1, display: 'flex', flexDirection: 'column',
-            justifyContent: 'space-between',
-            padding: '28px 36px',
-            background: '#011C40',
-            minWidth: 0,
-            position: 'relative',
-          }}>
-            <div>
-              {/* En progreso badge (pulsing) */}
-              {isEnProgreso && (
-                <div style={{
-                  position: 'absolute', top: 20, right: 20,
-                  display: 'flex', alignItems: 'center', gap: 6,
-                }}>
-                  <span className="act-badge-pulse" style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 5,
-                    fontSize: 9, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.14em',
-                    color: areaColor.hex, padding: '4px 10px',
-                    background: `rgba(${areaColor.rgba}, 0.12)`,
-                    border: `1px solid rgba(${areaColor.rgba}, 0.28)`,
-                    borderRadius: 999,
-                  }}>
-                    <span style={{
-                      width: 5, height: 5, borderRadius: '50%',
-                      background: areaColor.hex,
-                    }} />
-                    En curso
-                  </span>
-                </div>
-              )}
-
-              {/* Actual badge */}
-              {isActual && (
-                <div style={{ position: 'absolute', top: 20, right: 20 }}>
-                  <span style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 5,
-                    fontSize: 9, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.14em',
-                    color: areaColor.hex, padding: '4px 10px',
-                    background: `rgba(${areaColor.rgba}, 0.08)`,
-                    border: `1px solid rgba(${areaColor.rgba}, 0.20)`,
-                    borderRadius: 999,
-                  }}>
-                    Siguiente
-                  </span>
-                </div>
-              )}
-
-              {/* Eyebrow */}
+            {/* Texto */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              {/* Eyebrow: A-N · fase formativa */}
               <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: 8,
                 fontSize: 10, fontWeight: 900, textTransform: 'uppercase',
-                letterSpacing: '0.35em', marginBottom: 12,
+                letterSpacing: '0.18em', marginBottom: 8,
                 color: isCompletada
                   ? '#4ADE80'
                   : isEnProgreso || isActual
                     ? areaColor.hex
-                    : 'rgba(255,255,255,0.28)',
+                    : 'rgba(255,255,255,0.34)',
               }}>
-                A{actividad.orden} · {phaseLabel}
+                <span style={{
+                  padding: '2px 7px', borderRadius: 6,
+                  background: isCompletada ? 'rgba(74,222,128,0.12)' : `rgba(${areaColor.rgba}, 0.12)`,
+                  letterSpacing: '0.10em',
+                }}>
+                  A-{actividad.orden}
+                </span>
+                <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'currentColor', opacity: 0.6 }} />
+                {phaseLabel}
               </div>
 
-              {/* Title */}
+              {/* Título */}
               <h3 style={{
-                fontSize: 'clamp(16px, 2vw, 22px)',
+                fontSize: 'clamp(16px, 1.7vw, 20px)',
                 fontWeight: 900, color: '#fff',
-                margin: '0 0 14px', lineHeight: 1.25,
+                margin: 0, lineHeight: 1.28,
                 letterSpacing: '-0.02em',
+                paddingRight: isEnProgreso || isActual ? 90 : 0,
               }}>
                 {actividad.titulo}
               </h3>
+            </div>
+          </div>
 
-              {/* Badges */}
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          {/* Footer: badges (izq) + CTA (der) en una sola fila */}
+          <div
+            className="act-card-footer"
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              gap: 14, flexWrap: 'wrap',
+              paddingTop: 16, marginTop: 16,
+              borderTop: '1px solid rgba(255,255,255,0.06)',
+            }}
+          >
+            {/* Badges */}
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', gap: 5,
+                fontSize: 10, fontWeight: 700,
+                color: 'rgba(255,255,255,0.50)',
+                padding: '4px 10px', borderRadius: 999,
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.08)',
+              }}>
+                <Icon size={9} />
+                {tipoLabel}
+              </span>
+              <span style={{
+                fontSize: 10, fontWeight: 700, color: '#FBBF24',
+                padding: '4px 10px', borderRadius: 999,
+                background: 'rgba(251,191,36,0.08)',
+                border: '1px solid rgba(251,191,36,0.16)',
+              }}>
+                +{actividad.xp} XP
+              </span>
+              {isCompletada && (
                 <span style={{
                   display: 'inline-flex', alignItems: 'center', gap: 5,
-                  fontSize: 10, fontWeight: 700,
-                  color: 'rgba(255,255,255,0.50)',
+                  fontSize: 10, fontWeight: 800, color: '#4ADE80',
                   padding: '4px 10px', borderRadius: 999,
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.08)',
+                  background: 'rgba(74,222,128,0.10)',
+                  border: '1px solid rgba(74,222,128,0.22)',
                 }}>
-                  <Icon size={9} />
-                  {tipoLabel}
+                  <CheckCircle2 size={9} />
+                  Completada
                 </span>
-                <span style={{
-                  fontSize: 10, fontWeight: 700, color: '#FBBF24',
-                  padding: '4px 10px', borderRadius: 999,
-                  background: 'rgba(251,191,36,0.08)',
-                  border: '1px solid rgba(251,191,36,0.16)',
-                }}>
-                  +{actividad.xp} XP
-                </span>
-                {isCompletada && (
-                  <span style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 5,
-                    fontSize: 10, fontWeight: 800, color: '#4ADE80',
-                    padding: '4px 10px', borderRadius: 999,
-                    background: 'rgba(74,222,128,0.10)',
-                    border: '1px solid rgba(74,222,128,0.22)',
-                  }}>
-                    <CheckCircle2 size={9} />
-                    Completada
-                  </span>
-                )}
-              </div>
+              )}
             </div>
 
-            {/* CTA row */}
-            <div style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
-              paddingTop: 20,
-              borderTop: '1px solid rgba(255,255,255,0.06)',
-              marginTop: 20,
-            }}>
-              <motion.div
-                whileHover={reducedMotion ? {} : { gap: 14 }}
-                transition={springs.snappy}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 10,
-                  padding: '12px 24px', borderRadius: 24,
-                  background: isCompletada
-                    ? 'rgba(74,222,128,0.10)'
-                    : isEnProgreso
-                      ? areaColor.hex
-                      : `rgba(${areaColor.rgba}, 0.12)`,
-                  border: isCompletada
-                    ? '1px solid rgba(74,222,128,0.25)'
-                    : isEnProgreso
-                      ? 'none'
-                      : `1px solid rgba(${areaColor.rgba}, 0.22)`,
-                  fontSize: 11, fontWeight: 900,
-                  textTransform: 'uppercase', letterSpacing: '0.12em',
-                  color: isEnProgreso
-                    ? '#011126'
-                    : isCompletada
-                      ? '#4ADE80'
-                      : areaColor.hex,
-                  boxShadow: isEnProgreso
-                    ? `0 8px 24px rgba(${areaColor.rgba}, 0.30)`
-                    : 'none',
-                }}
-              >
-                {cta.text}
-                <cta.Icon size={11} />
-              </motion.div>
-            </div>
+            {/* CTA */}
+            <motion.div
+              className="act-card-cta"
+              whileHover={reducedMotion ? {} : { gap: 14 }}
+              transition={springs.snappy}
+              style={{
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 9,
+                padding: '10px 20px', borderRadius: 999,
+                background: isCompletada
+                  ? 'rgba(74,222,128,0.10)'
+                  : isEnProgreso
+                    ? areaColor.hex
+                    : `rgba(${areaColor.rgba}, 0.12)`,
+                border: isCompletada
+                  ? '1px solid rgba(74,222,128,0.25)'
+                  : isEnProgreso
+                    ? 'none'
+                    : `1px solid rgba(${areaColor.rgba}, 0.22)`,
+                fontSize: 11, fontWeight: 900,
+                textTransform: 'uppercase', letterSpacing: '0.12em',
+                color: isEnProgreso
+                  ? '#011126'
+                  : isCompletada
+                    ? '#4ADE80'
+                    : areaColor.hex,
+                boxShadow: isEnProgreso
+                  ? `0 8px 24px rgba(${areaColor.rgba}, 0.30)`
+                  : 'none',
+              }}
+            >
+              {cta.text}
+              <cta.Icon size={11} />
+            </motion.div>
           </div>
         </motion.div>
       </Link>

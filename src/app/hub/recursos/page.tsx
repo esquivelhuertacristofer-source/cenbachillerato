@@ -1,6 +1,13 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -9,6 +16,8 @@ import {
   type RecursoActividad,
 } from "@/lib/queries/hub-browser";
 import { getTipoRecursoMeta, ORDEN_TIPOS } from "@/lib/mccems/tipos-recurso";
+import { getUACPorCodigo } from "@/lib/mccems/estructura";
+import { getRSCColor } from "@/components/hub/hub-colors";
 import HubV2Skeleton from "@/components/hub-v2/HubV2Skeleton";
 import "../HubV5.css";
 import "./Recursos.css";
@@ -89,6 +98,152 @@ function getHeroTipo(tipo: string) {
   );
 }
 
+/* ──────────────────────────────────────────────────────────────
+   Grupo de actividades de una misma materia (UAC) dentro de un tipo.
+   ────────────────────────────────────────────────────────────── */
+interface GrupoMateria {
+  uacCodigo: string;
+  uacNombre: string;
+  rscCodigo: string | null;
+  items: RecursoActividad[];
+}
+
+/* ──────────────────────────────────────────────────────────────
+   MateriaRail — "estante" horizontal de una materia: encabezado con
+   color de área + progreso, y un riel de tarjetas con scroll lateral
+   y flechas. Rompe el muro vertical agrupando por materia.
+   ────────────────────────────────────────────────────────────── */
+function MateriaRail({ grupo }: { grupo: GrupoMateria }) {
+  const color = getRSCColor(grupo.rscCodigo);
+  const total = grupo.items.length;
+  const hechas = grupo.items.filter((i) => i.estado === "completada").length;
+  const pct = total > 0 ? Math.round((hechas / total) * 100) : 0;
+
+  const railRef = useRef<HTMLDivElement | null>(null);
+  const [edge, setEdge] = useState({ l: false, r: false });
+
+  const medir = useCallback(() => {
+    const el = railRef.current;
+    if (!el) return;
+    const l = el.scrollLeft > 4;
+    const r = el.scrollLeft + el.clientWidth < el.scrollWidth - 4;
+    setEdge((prev) => (prev.l === l && prev.r === r ? prev : { l, r }));
+  }, []);
+
+  // Medición inicial al montar el riel (sin setState en cuerpo de efecto).
+  const attach = useCallback(
+    (el: HTMLDivElement | null) => {
+      railRef.current = el;
+      if (el) medir();
+    },
+    [medir]
+  );
+
+  useEffect(() => {
+    window.addEventListener("resize", medir);
+    return () => window.removeEventListener("resize", medir);
+  }, [medir]);
+
+  const desplazar = (dir: number) =>
+    railRef.current?.scrollBy({ left: dir * 320, behavior: "smooth" });
+
+  return (
+    <section
+      className="recursos-mat"
+      style={
+        {
+          "--mat-color": color.hex,
+          "--mat-rgb": color.rgba,
+        } as CSSProperties
+      }
+    >
+      <div className="recursos-mat-head">
+        <span className="recursos-mat-icon">
+          <i className={`fa-solid ${color.faIcon}`} />
+        </span>
+        <div className="recursos-mat-headtext">
+          <h2 className="recursos-mat-title">{grupo.uacNombre}</h2>
+          <div className="recursos-mat-meta">
+            <span className="recursos-mat-count">
+              {grupo.uacCodigo} · {total}{" "}
+              {total === 1 ? "actividad" : "actividades"}
+            </span>
+            <span className="recursos-mat-bar" aria-hidden="true">
+              <span
+                className="recursos-mat-bar-fill"
+                style={{ width: `${pct}%` }}
+              />
+            </span>
+            <span className="recursos-mat-pct">{hechas}/{total}</span>
+          </div>
+        </div>
+        <div className="recursos-mat-nav">
+          <button
+            type="button"
+            className="recursos-mat-arrow"
+            onClick={() => desplazar(-1)}
+            disabled={!edge.l}
+            aria-label="Desplazar a la izquierda"
+          >
+            <i className="fa-solid fa-chevron-left" />
+          </button>
+          <button
+            type="button"
+            className="recursos-mat-arrow"
+            onClick={() => desplazar(1)}
+            disabled={!edge.r}
+            aria-label="Desplazar a la derecha"
+          >
+            <i className="fa-solid fa-chevron-right" />
+          </button>
+        </div>
+      </div>
+
+      <div
+        className={`recursos-rail ${edge.l ? "fade-l" : ""} ${
+          edge.r ? "fade-r" : ""
+        }`}
+      >
+        <div className="recursos-rail-track" ref={attach} onScroll={medir}>
+          {grupo.items.map((it) => {
+            const m = getTipoRecursoMeta(it.tipo);
+            const est = ESTADO_META[it.estado];
+            return (
+              <Link
+                key={it.id}
+                href={`/hub/uac/${it.uacCodigo}/progresion/${it.progresionNumero}/actividad/${it.orden}`}
+                className={`recursos-card ${est.className}`}
+                style={{ "--chip-color": m.color } as CSSProperties}
+              >
+                <div className="recursos-card-head">
+                  <span className="recursos-card-tag">{m.singular}</span>
+                  <span className={`recursos-card-estado ${est.className}`}>
+                    <span className="recursos-card-estado-dot" />
+                    <span className="recursos-card-estado-label">
+                      {est.label}
+                    </span>
+                  </span>
+                </div>
+
+                <h3 className="recursos-card-titulo">{it.titulo}</h3>
+
+                <div className="recursos-card-foot">
+                  <span className="recursos-card-prog">
+                    Propósito formativo {it.progresionNumero}
+                  </span>
+                  <span className="recursos-card-go" aria-hidden="true">
+                    <i className="fa-solid fa-arrow-right" />
+                  </span>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function RecursosContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -144,6 +299,22 @@ function RecursosContent() {
         a.progresionNumero - b.progresionNumero ||
         a.orden - b.orden
     );
+
+  // Agrupa la lista (ya ordenada) por materia, conservando el orden.
+  const grupos: GrupoMateria[] = [];
+  for (const it of lista) {
+    let g = grupos.find((x) => x.uacCodigo === it.uacCodigo);
+    if (!g) {
+      g = {
+        uacCodigo: it.uacCodigo,
+        uacNombre: it.uacNombre,
+        rscCodigo: getUACPorCodigo(it.uacCodigo)?.recursoCodigo ?? null,
+        items: [],
+      };
+      grupos.push(g);
+    }
+    g.items.push(it);
+  }
 
   function seleccionar(t: string) {
     setFiltro(t);
@@ -229,43 +400,17 @@ function RecursosContent() {
         </section>
       )}
 
-      {/* ── Galería ─── */}
+      {/* ── Galería: estantes horizontales por materia ─── */}
       {lista.length === 0 ? (
         <div className="recursos-empty">
           <i className="fa-solid fa-inbox" />
           <p>No hay actividades de este tipo en tu semestre todavía.</p>
         </div>
       ) : (
-        <div className="recursos-grid">
-          {lista.map((it) => {
-            const m = getTipoRecursoMeta(it.tipo);
-            const est = ESTADO_META[it.estado];
-            return (
-              <Link
-                key={it.id}
-                href={`/hub/uac/${it.uacCodigo}/progresion/${it.progresionNumero}/actividad/${it.orden}`}
-                className={`recursos-card ${est.className}`}
-                style={{ "--chip-color": m.color } as React.CSSProperties}
-              >
-                <div className="recursos-card-head">
-                  <span className="recursos-card-tag">{m.singular}</span>
-                  <span className={`recursos-card-estado ${est.className}`}>
-                    <span className="recursos-card-estado-dot" />
-                    <span className="recursos-card-estado-label">{est.label}</span>
-                  </span>
-                </div>
-
-                <h3 className="recursos-card-titulo">{it.titulo}</h3>
-
-                <div className="recursos-card-foot">
-                  <span className="recursos-card-uac">{it.uacNombre}</span>
-                  <span className="recursos-card-prog">
-                    Propósito formativo {it.progresionNumero}
-                  </span>
-                </div>
-              </Link>
-            );
-          })}
+        <div className="recursos-estantes">
+          {grupos.map((g) => (
+            <MateriaRail key={g.uacCodigo} grupo={g} />
+          ))}
         </div>
       )}
     </div>

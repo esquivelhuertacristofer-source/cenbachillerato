@@ -121,6 +121,42 @@ function leerSoporte(): boolean {
   return typeof window !== "undefined" && "speechSynthesis" in window;
 }
 
+/**
+ * Puntúa una voz por CALIDAD percibida. La Web Speech API solo expone las voces
+ * instaladas en el sistema; la elección por defecto del navegador suele caer en
+ * la voz SAPI genérica de Windows ("Microsoft Sabina"), que suena robótica.
+ * Esta heurística prioriza las voces neuronales/cloud — mucho más naturales —
+ * cuando están disponibles, para que la narración no use la voz genérica.
+ *
+ * Mejores voces gratuitas habituales:
+ *  - Edge: "Microsoft … Online (Natural)" (neuronales, localService=false).
+ *  - Chrome: "Google español" / "Google español de Estados Unidos".
+ */
+export function puntuarVoz(v: SpeechSynthesisVoice): number {
+  const n = v.name.toLowerCase();
+  let s = 0;
+  // Voces neuronales de Edge ("… Online (Natural)") — las más naturales.
+  if (/natural|neural/.test(n)) s += 120;
+  // Voces de Google (Chrome) — muy naturales.
+  if (/google/.test(n)) s += 80;
+  if (/premium|enhanced|wavenet|studio|siri/.test(n)) s += 60;
+  // Las voces remotas (cloud) suenan mejor que las SAPI locales del sistema.
+  if (v.localService === false) s += 40;
+  // Región preferida para el público mexicano.
+  if (/es[-_]MX/i.test(v.lang)) s += 16;
+  else if (/es[-_]419/i.test(v.lang)) s += 12;
+  else if (/es[-_]US/i.test(v.lang)) s += 8;
+  else if (/^es/i.test(v.lang)) s += 4;
+  // Penaliza las voces SAPI genéricas de Windows (las "robóticas").
+  if (/sabina|helena|laura|pablo|raul|microsoft server/.test(n)) s -= 14;
+  return s;
+}
+
+/** ¿La voz es de alta calidad (neuronal o cloud)? Para etiquetarla en la UI. */
+export function esVozPremium(v: SpeechSynthesisVoice): boolean {
+  return /natural|neural|google|premium|enhanced|wavenet|studio/i.test(v.name) || v.localService === false;
+}
+
 function elegirVozEspanol(
   voces: SpeechSynthesisVoice[],
   vozURI: string | null,
@@ -129,13 +165,10 @@ function elegirVozEspanol(
     const elegida = voces.find((x) => x.voiceURI === vozURI);
     if (elegida) return elegida;
   }
-  return (
-    voces.find((x) => /es[-_]MX/i.test(x.lang)) ??
-    voces.find((x) => /es[-_]419/i.test(x.lang)) ??
-    voces.find((x) => /es[-_]US/i.test(x.lang)) ??
-    voces.find((x) => /^es/i.test(x.lang)) ??
-    null
-  );
+  const espanol = voces.filter((x) => /^es/i.test(x.lang));
+  if (espanol.length === 0) return null;
+  // Mejor voz por calidad (no la primera es-MX que aparezca).
+  return espanol.slice().sort((a, b) => puntuarVoz(b) - puntuarVoz(a))[0] ?? null;
 }
 
 /* ── Store externo de voces disponibles (se llenan async vía voiceschanged) ── */
@@ -393,18 +426,24 @@ export function NarradorControl({ accentHex }: { accentHex: string }) {
                 border: "1px solid rgba(255,255,255,0.14)",
               }}
             >
-              <option value="">Automática (mejor en español)</option>
-              {voces.map((v) => (
-                <option key={v.voiceURI} value={v.voiceURI}>
-                  {v.name} ({v.lang})
-                </option>
-              ))}
+              <option value="">Automática (mejor calidad)</option>
+              {[...voces]
+                .sort((a, b) => puntuarVoz(b) - puntuarVoz(a))
+                .map((v) => (
+                  <option key={v.voiceURI} value={v.voiceURI}>
+                    {esVozPremium(v) ? "★ " : ""}{v.name} ({v.lang})
+                  </option>
+                ))}
             </select>
-            {voces.length === 0 && (
+            {voces.length === 0 ? (
               <span style={{ fontSize: 10, color: "rgba(255,255,255,0.45)" }}>
                 Tu navegador no expone voces en español; se usará la del sistema.
               </span>
-            )}
+            ) : !voces.some(esVozPremium) ? (
+              <span style={{ fontSize: 10, color: "rgba(255,255,255,0.45)" }}>
+                Para una voz más natural, abre en Microsoft Edge o Chrome (voces ★).
+              </span>
+            ) : null}
           </label>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>

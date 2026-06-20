@@ -336,9 +336,207 @@
 .recursos-card-prog {
   font-size: 11.5px;
   color: rgba(255, 255, 255, 0.38);
+  font-weight: 600;
+}
+
+.recursos-card-go {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin-left: auto;
   flex-shrink: 0;
-  padding-left: 10px;
-  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  font-size: 12px;
+  color: var(--chip-color);
+  background: color-mix(in srgb, var(--chip-color) 14%, transparent);
+  transition: transform 0.24s ease, background 0.24s ease;
+}
+
+.recursos-card:hover .recursos-card-go {
+  transform: translateX(3px);
+  background: color-mix(in srgb, var(--chip-color) 28%, transparent);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Estantes por materia: encabezado con color de área + riel lateral
+   ══════════════════════════════════════════════════════════════ */
+.recursos-estantes {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.recursos-mat {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.recursos-mat-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.recursos-mat-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 13px;
+  font-size: 18px;
+  color: var(--mat-color);
+  background: color-mix(in srgb, var(--mat-color) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--mat-color) 32%, transparent);
+}
+
+.recursos-mat-headtext {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  flex: 1;
+}
+
+.recursos-mat-title {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: #fff;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recursos-mat-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.recursos-mat-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  flex-shrink: 0;
+}
+
+.recursos-mat-bar {
+  position: relative;
+  display: block;
+  width: 120px;
+  max-width: 26vw;
+  height: 5px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.recursos-mat-bar-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 999px;
+  background: var(--mat-color);
+  transition: width 0.4s ease;
+}
+
+.recursos-mat-pct {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--mat-color);
+  flex-shrink: 0;
+}
+
+.recursos-mat-nav {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.recursos-mat-arrow {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: background 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+}
+
+.recursos-mat-arrow:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--mat-color) 18%, rgba(255, 255, 255, 0.04));
+  border-color: color-mix(in srgb, var(--mat-color) 45%, transparent);
+  color: #fff;
+}
+
+.recursos-mat-arrow:disabled {
+  opacity: 0.32;
+  cursor: default;
+}
+
+/* ── Riel con scroll lateral y desvanecidos en los bordes ─── */
+.recursos-rail {
+  position: relative;
+}
+
+.recursos-rail::before,
+.recursos-rail::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 46px;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.recursos-rail::before {
+  left: 0;
+  background: linear-gradient(90deg, #060911 0%, transparent 100%);
+}
+
+.recursos-rail::after {
+  right: 0;
+  background: linear-gradient(270deg, #060911 0%, transparent 100%);
+}
+
+.recursos-rail.fade-l::before {
+  opacity: 1;
+}
+
+.recursos-rail.fade-r::after {
+  opacity: 1;
+}
+
+.recursos-rail-track {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  padding: 4px 2px 12px;
+  scrollbar-width: none;
+}
+
+.recursos-rail-track::-webkit-scrollbar {
+  display: none;
+}
+
+.recursos-rail-track .recursos-card {
+  scroll-snap-align: start;
+  flex: 0 0 300px;
+  width: 300px;
+  min-height: 168px;
 }
 
 /* ── Empty ─── */

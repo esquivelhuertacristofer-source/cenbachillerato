@@ -235,16 +235,39 @@
 
 /* ── UAC page hero ────────────────────────────────────────── */
 .uac-v2-hero {
-  padding: 64px 48px 48px;
+  padding: 60px 0 40px;
   position: relative;
   overflow: hidden;
+}
+
+/* Imagen de la materia: anclada al lado derecho y degradada suave en todos
+   los bordes (máscara radial) para que no se vea un rectángulo recortado. */
+.uac-v2-hero-art {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center right;
+  -webkit-mask-image: radial-gradient(118% 132% at 100% 38%, #000 16%, rgba(0,0,0,0.32) 46%, transparent 64%);
+  mask-image: radial-gradient(118% 132% at 100% 38%, #000 16%, rgba(0,0,0,0.32) 46%, transparent 64%);
+  opacity: 0.45;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.uac-v2-hero-veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
 }
 
 .uac-v2-hero-grid {
   position: relative;
   z-index: 10;
+  width: 100%;
   max-width: 1400px;
   margin: 0 auto;
+  padding: 0 48px;
   display: flex;
   align-items: center;
   gap: 56px;
@@ -252,8 +275,28 @@
 
 .uac-v2-hero-content {
   flex: 1 1 auto;
-  max-width: 720px;
+  max-width: 640px;
   min-width: 0;
+}
+
+/* CTA primario sólido (Continuar/Comenzar la ruta) */
+.uac-v2-cta-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  border-radius: 999px;
+  padding: 12px 24px;
+  font-size: 13.5px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: #021018;
+  text-decoration: none;
+  transition: transform 0.18s ease, filter 0.18s ease;
+}
+
+.uac-v2-cta-primary:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
 }
 
 /* ── Mosaico de accesos directos (hero derecha) ──────────────── */
@@ -368,6 +411,49 @@
   color: #fff;
 }
 
+/* ── Variante horizontal: banda a todo el ancho bajo el hero ───── */
+.uac-mosaico--horizontal {
+  flex: none;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto 8px;
+  padding: 0 48px;
+  background: none;
+  border: none;
+  backdrop-filter: none;
+  box-shadow: none;
+  gap: 18px;
+}
+
+.uac-mosaico--horizontal .uac-mosaico-head {
+  font-size: 11px;
+}
+
+.uac-mosaico--horizontal .uac-mosaico-head-line {
+  flex: 1;
+  height: 1px;
+  background: var(--hub-border);
+  margin-left: 6px;
+}
+
+/* Fila equilibrada: los tiles crecen para llenar el ancho, sin huérfanos.
+   ≤8 tipos caben en una sola fila; con más, las filas quedan parejas. */
+.uac-mosaico--horizontal .uac-mosaico-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.uac-mosaico--horizontal .uac-mosaico-tile {
+  flex: 1 1 150px;
+}
+
+.uac-mosaico--horizontal .uac-mosaico-foot {
+  margin-top: 4px;
+  align-self: flex-end;
+  max-width: 280px;
+}
+
 @media (max-width: 1080px) {
   .uac-v2-hero-grid {
     flex-direction: column;
@@ -459,11 +545,18 @@
 /* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 900px) {
   .hub-v2-page,
-  .uac-v2-hero,
+  .uac-v2-hero-grid,
   .uac-v2-nav,
-  .uac-v2-timeline {
+  .uac-v2-timeline,
+  .uac-mosaico--horizontal {
     padding-left: 20px;
     padding-right: 20px;
+  }
+  /* La imagen se vuelve sutil para no competir con el texto en una columna */
+  .uac-v2-hero-art {
+    opacity: 0.28;
+    -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, transparent 75%);
+    mask-image: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, transparent 75%);
   }
 }
 

@@ -41,7 +41,7 @@ export default async function BibliotecaUACPage({ params }: Props) {
   const leidasCount = fichas.filter((f) => f.leida).length;
 
   return (
-    <div style={{ padding: "36px 40px 80px", maxWidth: 1200, margin: "0 auto" }}>
+    <div style={{ padding: "36px 40px 80px" }}>
 
       {/* ── Breadcrumb ─── */}
       <HubBreadcrumb

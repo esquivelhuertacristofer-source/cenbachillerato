@@ -13,7 +13,7 @@ import {
   CATEGORIA_COMPLEMENTO,
   type ProgresionBrowser,
 } from "@/lib/queries/hub-browser";
-import { getUACConfig } from "@/components/hub-v2/uac-config";
+import { getUACConfig, getUACImagen } from "@/components/hub-v2/uac-config";
 import ProgresionTimeline from "@/components/hub-v2/ProgresionTimeline";
 import AccesosMateria from "@/components/hub-v2/AccesosMateria";
 import "../../HubV5.css";
@@ -160,6 +160,21 @@ export default function UACPage() {
   const total = oficiales.length;
   const pct = total > 0 ? Math.round((completadas / total) * 100) : 0;
 
+  // Imagen ilustrativa de la materia (degradada al fondo del hero).
+  const imagen = getUACImagen(codigo);
+
+  // Destino directo de "continuar": primera progresión/actividad pendiente,
+  // o la primera de todas si ya está todo hecho.
+  const progPendiente = progresiones.find((p) => p.estado !== "completada") ?? progresiones[0];
+  const actPendiente =
+    progPendiente?.actividades.find((a) => a.estado !== "completada") ??
+    progPendiente?.actividades[0];
+  const continuarHref =
+    progPendiente && actPendiente
+      ? `/hub/uac/${codigo}/progresion/${progPendiente.numero}/actividad/${actPendiente.orden}`
+      : null;
+  const continuarLabel = completadas === 0 ? "Comenzar la ruta" : completadas >= total ? "Repasar la ruta" : "Continuar la ruta";
+
   return (
     <div className="uac-v2-page">
       {/* ── Sticky nav ─── */}
@@ -204,16 +219,20 @@ export default function UACPage() {
 
       {/* ── Hero ─── */}
       <header className="uac-v2-hero">
-        {/* Accent glow */}
+        {/* Imagen de la materia, degradada hacia el fondo (lado derecho) */}
+        {imagen && (
+          <div
+            className="uac-v2-hero-art"
+            style={{ backgroundImage: `url('${imagen}')` }}
+            aria-hidden
+          />
+        )}
+        {/* Velo: oscurece la izquierda (texto legible) y tiñe con el color del área */}
         <div
+          className="uac-v2-hero-veil"
+          aria-hidden
           style={{
-            position: "absolute",
-            top: 0,
-            right: 0,
-            width: "45%",
-            height: "100%",
-            background: `radial-gradient(circle at center, rgba(${cfg.accentRgb},0.08) 0%, transparent 70%)`,
-            pointerEvents: "none",
+            background: `linear-gradient(90deg, #011126 0%, #011126 32%, rgba(1,17,38,0.78) 52%, rgba(1,17,38,0.30) 80%, rgba(1,17,38,0.10) 100%), linear-gradient(180deg, transparent 55%, #011126 100%), radial-gradient(70% 90% at 88% 8%, rgba(${cfg.accentRgb},0.22) 0%, transparent 60%)`,
           }}
         />
 
@@ -272,11 +291,24 @@ export default function UACPage() {
           </motion.p>
 
           <motion.div
-            style={{ marginTop: 22, display: "flex", gap: 10, flexWrap: "wrap" }}
+            style={{ marginTop: 26, display: "flex", gap: 12, flexWrap: "wrap" }}
             initial={reducedMotion ? {} : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...springs.smooth, delay: 0.05 + stagger.fast * 4 }}
           >
+            {continuarHref && (
+              <Link
+                href={continuarHref}
+                className="uac-v2-cta-primary"
+                style={{
+                  background: cfg.accent,
+                  boxShadow: `0 14px 34px rgba(${cfg.accentRgb},0.35)`,
+                }}
+              >
+                <i className={`fa-solid ${completadas >= total ? "fa-rotate-right" : "fa-play"}`} style={{ fontSize: 12 }} />
+                {continuarLabel}
+              </Link>
+            )}
             <Link
               href={`/hub/biblioteca/${codigo}`}
               style={{
@@ -284,7 +316,7 @@ export default function UACPage() {
                 background: `rgba(${cfg.accentRgb},0.12)`,
                 border: `1px solid rgba(${cfg.accentRgb},0.22)`,
                 color: cfg.accent, textDecoration: "none",
-                borderRadius: 999, padding: "9px 18px", fontSize: 13, fontWeight: 700,
+                borderRadius: 999, padding: "11px 20px", fontSize: 13, fontWeight: 700,
               }}
             >
               <i className="fa-solid fa-book-open" style={{ fontSize: 12 }} />
@@ -292,16 +324,18 @@ export default function UACPage() {
             </Link>
           </motion.div>
         </div>
-
-        {progresiones.length > 0 && (
-          <AccesosMateria
-            progresiones={progresiones}
-            codigoUAC={codigo}
-            accent={cfg.accent}
-          />
-        )}
         </div>
       </header>
+
+      {/* ── Accesos rápidos por tipo de contenido (banda horizontal) ─── */}
+      {progresiones.length > 0 && (
+        <AccesosMateria
+          progresiones={progresiones}
+          codigoUAC={codigo}
+          accent={cfg.accent}
+          horizontal
+        />
+      )}
 
       {/* ── Progresiones ─── */}
       <main className="uac-v2-timeline">
