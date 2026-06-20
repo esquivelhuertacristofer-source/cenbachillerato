@@ -36,19 +36,54 @@ interface Grupo {
 }
 
 /* ──────────────────────────────────────────────────────────────
+   Lab3DPreview — miniatura 3D "viva" (CSS 3D, sin WebGL): un cubo de
+   alambre que rota en perspectiva, un núcleo con el ícono del área y
+   una partícula en órbita, todo con el color de la materia. Es ligero
+   ⇒ funciona con las 18 tarjetas a la vez sin agotar contextos WebGL.
+   Respeta prefers-reduced-motion (las animaciones se pausan).
+   ────────────────────────────────────────────────────────────── */
+function Lab3DPreview({ icon }: { icon: string }) {
+  return (
+    <div className="lab3d" aria-hidden="true">
+      <span className="lab3d-grid" />
+      <span className="lab3d-glow" />
+      <div className="lab3d-stage">
+        <div className="lab3d-cube">
+          <span className="lab3d-face" />
+          <span className="lab3d-face" />
+          <span className="lab3d-face" />
+          <span className="lab3d-face" />
+          <span className="lab3d-face" />
+          <span className="lab3d-face" />
+        </div>
+        <span className="lab3d-orbit">
+          <span className="lab3d-electron" />
+        </span>
+        <span className="lab3d-core">
+          <i className={`fa-solid ${icon}`} />
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/* ──────────────────────────────────────────────────────────────
    VideoEmbed — fachada "click-to-play" (lite-youtube).
-   Muestra la miniatura de YouTube + botón; al pulsar inserta el
-   iframe con autoplay. Evita cargar ~24 iframes a la vez.
+   Por defecto el póster es la miniatura de YouTube; si se pasa
+   `poster`, se usa ese nodo (p.ej. el preview 3D vivo). Al pulsar
+   inserta el iframe con autoplay (evita cargar ~24 iframes a la vez).
    ⚠️ TEMPORAL: parte de la pestaña Destacados.
    ────────────────────────────────────────────────────────────── */
 function VideoEmbed({
   videoId,
   title,
   className,
+  poster,
 }: {
   videoId: string;
   title: string;
   className?: string;
+  poster?: React.ReactNode;
 }) {
   const [play, setPlay] = useState(false);
   const cls = `vid-frame ${className ?? ""}`.trim();
@@ -70,17 +105,19 @@ function VideoEmbed({
   return (
     <button
       type="button"
-      className={`${cls} vid-facade`}
+      className={`${cls} vid-facade ${poster ? "has-poster" : ""}`.trim()}
       onClick={() => setPlay(true)}
       aria-label={`Reproducir video: ${title}`}
     >
-      <img
-        className="vid-thumb"
-        src={`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`}
-        alt=""
-        loading="lazy"
-        decoding="async"
-      />
+      {poster ?? (
+        <img
+          className="vid-thumb"
+          src={`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`}
+          alt=""
+          loading="lazy"
+          decoding="async"
+        />
+      )}
       <span className="vid-play" aria-hidden="true">
         <i className="fa-solid fa-play" />
       </span>
@@ -89,8 +126,9 @@ function VideoEmbed({
 }
 
 /* ──────────────────────────────────────────────────────────────
-   DestacadoCard — tarjeta de una práctica destacada: video propio
-   del laboratorio (fachada click-to-play) + materia + acceso 3D.
+   DestacadoCard — tarjeta de una práctica destacada: preview 3D vivo
+   (motivo animado con el color del área) que además es la fachada del
+   video (click-to-play) + materia + acceso al laboratorio 3D.
    Proporción uniforme; ningún elemento domina la pantalla.
    ⚠️ TEMPORAL: solo para la presentación.
    ────────────────────────────────────────────────────────────── */
@@ -107,7 +145,17 @@ function DestacadoCard({ lab }: { lab: (typeof LABS_DESTACADOS)[number] }) {
         } as CSSProperties
       }
     >
-      <VideoEmbed videoId={lab.videoId} title={nombre} className="dest-card-video" />
+      <div className="dest-card-media">
+        <VideoEmbed
+          videoId={lab.videoId}
+          title={nombre}
+          className="dest-card-video"
+          poster={<Lab3DPreview icon={color.faIcon} />}
+        />
+        <span className="dest-card-badge" aria-hidden="true">
+          <i className="fa-solid fa-cube" /> 3D interactivo
+        </span>
+      </div>
       <div className="dest-card-body">
         <span className="dest-card-uac">
           <i className={`fa-solid ${color.faIcon}`} /> {lab.uacCodigo}

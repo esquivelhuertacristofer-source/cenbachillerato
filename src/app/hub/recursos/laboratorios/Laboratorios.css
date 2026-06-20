@@ -661,11 +661,187 @@
   box-shadow: 0 20px 44px rgba(1, 17, 38, 0.4);
 }
 
+/* Cabecera de la tarjeta: preview 3D vivo + badge + play del video */
+.dest-card-media {
+  position: relative;
+  isolation: isolate;
+}
+
+.dest-card-badge {
+  position: absolute;
+  z-index: 2;
+  top: 10px;
+  left: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  color: #fff;
+  background: rgba(var(--lab-accent-rgb, 34, 211, 238), 0.22);
+  border: 1px solid rgba(var(--lab-accent-rgb, 34, 211, 238), 0.5);
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+}
+
 /* El video (fachada) ocupa la cabecera de la tarjeta */
 .dest-card-video {
   border-radius: 0;
   border: 0;
   border-bottom: 1px solid rgba(var(--lab-accent-rgb, 34, 211, 238), 0.18);
+}
+
+/* Con póster 3D el botón de play es discreto y crece al pasar el cursor */
+.vid-facade.has-poster .vid-play {
+  width: 46px;
+  height: 46px;
+  font-size: 15px;
+  opacity: 0.55;
+  background: rgba(220, 30, 40, 0.78);
+}
+
+.vid-facade.has-poster:hover .vid-play {
+  opacity: 1;
+}
+
+.vid-facade.has-poster::after {
+  background: linear-gradient(180deg, transparent 55%, rgba(6, 20, 37, 0.35) 100%);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Lab3DPreview — motivo 3D animado en CSS (sin WebGL)
+   ══════════════════════════════════════════════════════════════ */
+.lab3d {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  perspective: 620px;
+  background:
+    radial-gradient(circle at 50% 38%, rgba(var(--lab-accent-rgb, 34, 211, 238), 0.2) 0%, transparent 58%),
+    linear-gradient(150deg, #08203b 0%, #061123 70%, #050d1c 100%);
+}
+
+/* Piso de rejilla en perspectiva */
+.lab3d-grid {
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  bottom: -10%;
+  height: 70%;
+  background-image:
+    linear-gradient(rgba(var(--lab-accent-rgb, 34, 211, 238), 0.22) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--lab-accent-rgb, 34, 211, 238), 0.22) 1px, transparent 1px);
+  background-size: 26px 26px;
+  transform: rotateX(70deg);
+  transform-origin: bottom center;
+  opacity: 0.35;
+  -webkit-mask-image: linear-gradient(transparent, #000 60%);
+  mask-image: linear-gradient(transparent, #000 60%);
+}
+
+.lab3d-glow {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(var(--lab-accent-rgb, 34, 211, 238), 0.35), transparent 70%);
+  filter: blur(8px);
+  animation: lab3d-pulse 4.5s ease-in-out infinite;
+}
+
+.lab3d-stage {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  transform-style: preserve-3d;
+  display: grid;
+  place-items: center;
+}
+
+.lab3d-cube {
+  position: absolute;
+  width: 72px;
+  height: 72px;
+  transform-style: preserve-3d;
+  animation: lab3d-spin 16s linear infinite;
+}
+
+.lab3d-face {
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid color-mix(in srgb, var(--lab-accent, #22d3ee) 75%, transparent);
+  background: color-mix(in srgb, var(--lab-accent, #22d3ee) 8%, transparent);
+  box-shadow: inset 0 0 22px color-mix(in srgb, var(--lab-accent, #22d3ee) 26%, transparent);
+}
+
+.lab3d-face:nth-child(1) { transform: translateZ(36px); }
+.lab3d-face:nth-child(2) { transform: rotateY(180deg) translateZ(36px); }
+.lab3d-face:nth-child(3) { transform: rotateY(90deg) translateZ(36px); }
+.lab3d-face:nth-child(4) { transform: rotateY(-90deg) translateZ(36px); }
+.lab3d-face:nth-child(5) { transform: rotateX(90deg) translateZ(36px); }
+.lab3d-face:nth-child(6) { transform: rotateX(-90deg) translateZ(36px); }
+
+/* Órbita elíptica con una partícula */
+.lab3d-orbit {
+  position: absolute;
+  width: 116px;
+  height: 116px;
+  border-radius: 50%;
+  border: 1px solid rgba(var(--lab-accent-rgb, 34, 211, 238), 0.3);
+  transform: rotateX(74deg);
+  transform-style: preserve-3d;
+  animation: lab3d-orbit-spin 6s linear infinite;
+}
+
+.lab3d-electron {
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  width: 9px;
+  height: 9px;
+  margin-left: -4.5px;
+  border-radius: 50%;
+  background: var(--lab-accent, #22d3ee);
+  box-shadow: 0 0 12px 1px var(--lab-accent, #22d3ee);
+}
+
+/* Núcleo con el ícono del área, siempre legible (no rota) */
+.lab3d-core {
+  position: relative;
+  z-index: 1;
+  font-size: 26px;
+  color: #fff;
+  text-shadow: 0 0 18px color-mix(in srgb, var(--lab-accent, #22d3ee) 90%, transparent);
+  animation: lab3d-pulse 4.5s ease-in-out infinite;
+}
+
+@keyframes lab3d-spin {
+  from { transform: rotateX(-24deg) rotateY(0deg); }
+  to { transform: rotateX(-24deg) rotateY(360deg); }
+}
+
+@keyframes lab3d-orbit-spin {
+  from { transform: rotateX(74deg) rotateZ(0deg); }
+  to { transform: rotateX(74deg) rotateZ(360deg); }
+}
+
+@keyframes lab3d-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.92; }
+  50% { transform: scale(1.07); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lab3d-cube,
+  .lab3d-orbit,
+  .lab3d-glow,
+  .lab3d-core {
+    animation: none;
+  }
 }
 
 .dest-card-body {

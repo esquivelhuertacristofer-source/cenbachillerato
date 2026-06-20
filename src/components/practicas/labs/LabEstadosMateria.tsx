@@ -106,6 +106,8 @@ const Tile = ({
   onClick,
   accent,
   colorRgba,
+  onDragStart,
+  onDragEnd,
 }: {
   active: boolean;
   swatch: string;
@@ -114,9 +116,14 @@ const Tile = ({
   onClick: () => void;
   accent: string;
   colorRgba: string;
+  onDragStart?: (e: React.DragEvent) => void;
+  onDragEnd?: () => void;
 }) => (
   <button
     onClick={onClick}
+    draggable={!!onDragStart}
+    onDragStart={onDragStart}
+    onDragEnd={onDragEnd}
     className="ex-tile"
     data-on={active}
     style={{
@@ -283,6 +290,18 @@ export function LabEstadosMateria({ color }: PracticaLabProps) {
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
 
+  // ── Interacción de ARRASTRE (el alumno experimenta) ────────────────
+  // El alumno arrastra el mechero 🔥 sobre la sustancia para calentarla, o el
+  // hielo seco 🧊 para enfriarla; también puede arrastrar una sustancia al vaso.
+  const [aplicando, setAplicando] = useState<null | "calor" | "frio">(null);
+  const [arrastrando, setArrastrando] = useState<null | "calor" | "frio" | "sust">(null);
+  const [sobreVaso, setSobreVaso] = useState(false);
+  const [experimentado, setExperimentado] = useState(false);
+  const dragKindRef = useRef<string | null>(null);
+  const heatTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const boundsRef = useRef({ min: -50, max: 150 });
+  const sonidoRef = useRef(false);
+
   const toggleSonido = useCallback(async () => {
     if (!audioRef.current) audioRef.current = new LabSfx();
     const sfx = audioRef.current;
@@ -297,9 +316,65 @@ export function LabEstadosMateria({ color }: PracticaLabProps) {
 
   useEffect(() => {
     return () => {
+      if (heatTimerRef.current) clearInterval(heatTimerRef.current);
       audioRef.current?.dispose();
       audioRef.current = null;
     };
+  }, []);
+
+  // Mantener el ref de sonido sincronizado (lo lee el callback de arrastre).
+  useEffect(() => {
+    sonidoRef.current = sonido;
+  }, [sonido]);
+
+  // Detener la aplicación de calor/frío (al soltar o salir del vaso).
+  const detenerAplicacion = useCallback(() => {
+    if (heatTimerRef.current) {
+      clearInterval(heatTimerRef.current);
+      heatTimerRef.current = null;
+    }
+    setAplicando((prev) => {
+      if (prev === "calor") audioRef.current?.fuego(false);
+      if (prev === "frio") audioRef.current?.vapor(false);
+      return null;
+    });
+  }, []);
+
+  // Iniciar la aplicación continua: mientras el alumno mantiene la herramienta
+  // sobre la sustancia, la temperatura sube (calor) o baja (frío) en vivo.
+  const iniciarAplicacion = useCallback(
+    (tool: "calor" | "frio") => {
+      if (heatTimerRef.current) clearInterval(heatTimerRef.current);
+      setAplicando(tool);
+      setExperimentado(true);
+      if (sonidoRef.current) {
+        if (tool === "calor") audioRef.current?.fuego(true);
+        else audioRef.current?.vapor(true);
+      }
+      heatTimerRef.current = setInterval(() => {
+        setTemp((t) => {
+          const { min, max } = boundsRef.current;
+          const span = max - min || 1;
+          const step = Math.max(1, Math.round(span / 95));
+          const next = tool === "calor" ? t + step : t - step;
+          return Math.max(min, Math.min(max, next));
+        });
+      }, 55);
+    },
+    [],
+  );
+
+  // Aplicar un "golpe" puntual (clic/toque: respaldo táctil del arrastre).
+  const golpe = useCallback((tool: "calor" | "frio") => {
+    setExperimentado(true);
+    setTemp((t) => {
+      const { min, max } = boundsRef.current;
+      const span = max - min || 1;
+      const paso = Math.max(2, Math.round(span / 8));
+      const next = tool === "calor" ? t + paso : t - paso;
+      return Math.max(min, Math.min(max, next));
+    });
+    if (sonidoRef.current) audioRef.current?.blip();
   }, []);
 
   const sustancia = SUSTANCIAS.find((s) => s.key === sustanciaKey)!;
@@ -311,6 +386,11 @@ export function LabEstadosMateria({ color }: PracticaLabProps) {
     const margen = Math.max(spanReal * 0.45, 25);
     return { min: Math.round(sustancia.fusion - margen), max: Math.round(sustancia.ebullicion + margen) };
   }, [sustancia]);
+
+  // El callback de arrastre lee los límites vía ref (sin recrearse por cada cambio).
+  useEffect(() => {
+    boundsRef.current = { min, max };
+  }, [min, max]);
 
   const fase = faseDe(temp, sustancia);
   const info = FASE_INFO[fase];
@@ -344,9 +424,10 @@ export function LabEstadosMateria({ color }: PracticaLabProps) {
 
   // ── Objetivos guiados (se marcan en vivo) ──────────────────────────
   const objetivos = [
-    { txt: "Observa la red cristalina (sólido)", done: fase === "solido" },
+    { txt: "Arrastra el mechero o el hielo a la sustancia", done: experimentado },
+    { txt: "Enfría hasta ver la red cristalina (sólido)", done: fase === "solido" },
     { txt: "Funde la sustancia (líquido)", done: fase === "liquido" },
-    { txt: "Evapora la sustancia (gas)", done: fase === "gas" },
+    { txt: "Sigue calentando hasta evaporar (gas)", done: fase === "gas" },
     { txt: "Lleva la energía cinética al máximo", done: agitacion > 0.92 },
     { txt: "Resuelve el reto de estados de la materia", done: ejercicioAprobado },
   ];
@@ -426,21 +507,81 @@ export function LabEstadosMateria({ color }: PracticaLabProps) {
           padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
           background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
         .ex-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateX(-50%) translateY(-1px); }
+
+        /* Overlays de aplicación de calor/frío sobre la escena */
+        @keyframes exHeat { 0%,100%{ opacity:.5; } 50%{ opacity:.95; } }
+        @keyframes exCold { 0%,100%{ opacity:.45; } 50%{ opacity:.85; } }
+        .ex-aplica-calor { animation: exHeat 1s ease-in-out infinite;
+          background: radial-gradient(120% 70% at 50% 108%, ${C_GAS}55 0%, ${C_GAS}22 35%, transparent 65%); }
+        .ex-aplica-frio { animation: exCold 1.3s ease-in-out infinite;
+          background: radial-gradient(120% 80% at 50% -8%, ${C_SOLIDO}55 0%, ${C_SOLIDO}22 40%, transparent 68%); }
+
+        /* Herramientas arrastrables (mechero / hielo seco) */
+        .ex-tools { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        .ex-tool { position:relative; cursor:grab; user-select:none; display:flex; flex-direction:column;
+          align-items:center; gap:6px; padding:14px 10px 12px; border-radius:14px; text-align:center;
+          border:1px solid ${T.line}; background:${T.glass}; transition:transform .14s ease, box-shadow .14s ease, border-color .14s ease; }
+        .ex-tool:hover { transform:translateY(-2px); border-color:${T.lineStrong}; }
+        .ex-tool:active { cursor:grabbing; transform:scale(.97); }
+        .ex-tool[data-tool="calor"]:hover { border-color:${C_GAS}; box-shadow:0 0 20px -6px ${C_GAS}; }
+        .ex-tool[data-tool="frio"]:hover { border-color:${C_SOLIDO}; box-shadow:0 0 20px -6px ${C_SOLIDO}; }
+        .ex-tool[data-on="true"] { border-color:currentColor; }
+        .ex-tool-emoji { font-size:26px; line-height:1; filter:drop-shadow(0 3px 6px rgba(0,0,0,.5)); }
+        .ex-tool-name { font-size:13px; font-weight:800; color:${T.text}; }
+        .ex-tool-hint { font-size:10.5px; font-weight:600; color:${T.text3}; letter-spacing:.02em; }
+        @keyframes exToolPulse { 0%,100%{ box-shadow:0 0 0 0 currentColor; } 50%{ box-shadow:0 0 0 5px transparent; } }
+        .ex-tool[data-on="true"] .ex-tool-emoji { animation: exToolPulse 1s ease-in-out infinite; border-radius:50%; }
+        @media (prefers-reduced-motion: reduce){
+          .ex-aplica-calor, .ex-aplica-frio, .ex-tool[data-on="true"] .ex-tool-emoji { animation:none; }
+        }
       `}</style>
 
       <div className="ex-grid">
         {/* ── Columna visor ──────────────────────────────────────── */}
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          {/* Escena 3D */}
+          {/* Escena 3D — también es zona de SOLTAR para mechero / hielo / sustancia */}
           <div
+            data-sobre={sobreVaso}
+            onDragOver={(e) => {
+              if (dragKindRef.current) e.preventDefault();
+            }}
+            onDragEnter={(e) => {
+              const k = dragKindRef.current;
+              if (!k) return;
+              e.preventDefault();
+              setSobreVaso(true);
+              if (k === "calor" || k === "frio") iniciarAplicacion(k);
+            }}
+            onDragLeave={(e) => {
+              // Ignora la transición hacia un hijo dentro del mismo contenedor.
+              if (e.currentTarget.contains(e.relatedTarget as Node | null)) return;
+              setSobreVaso(false);
+              detenerAplicacion();
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              const k = dragKindRef.current;
+              if (k && k.startsWith("sust:")) {
+                const s = SUSTANCIAS.find((x) => x.key === k.slice(5));
+                if (s) seleccionarSustancia(s);
+              }
+              detenerAplicacion();
+              dragKindRef.current = null;
+              setArrastrando(null);
+              setSobreVaso(false);
+            }}
             style={{
               position: "relative",
               height: "clamp(460px, 66vh, 780px)",
               borderRadius: 20,
               overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
+              border:
+                sobreVaso && arrastrando
+                  ? `1.5px dashed ${arrastrando === "frio" ? C_SOLIDO : arrastrando === "calor" ? C_GAS : accent}`
+                  : `1px solid rgba(${color.rgba},0.22)`,
               background: `radial-gradient(120% 80% at 50% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06182f 0%,#020d1d 100%)`,
               boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
+              transition: "border-color .15s ease",
             }}
           >
             <SceneBoundary fallback={sceneFallback}>
@@ -458,6 +599,54 @@ export function LabEstadosMateria({ color }: PracticaLabProps) {
                 cohesion={sustancia.cohesion}
               />
             </SceneBoundary>
+
+            {/* Overlay: la sustancia recibe calor (rojo, abajo) o frío (azul, arriba) */}
+            {aplicando && (
+              <div
+                aria-hidden
+                className={aplicando === "calor" ? "ex-aplica-calor" : "ex-aplica-frio"}
+                style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 3 }}
+              />
+            )}
+
+            {/* Guía de soltar mientras se arrastra una herramienta */}
+            {arrastrando && !sobreVaso && (
+              <div
+                aria-hidden
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  zIndex: 4,
+                  pointerEvents: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <div
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 10,
+                    padding: "12px 18px",
+                    borderRadius: 14,
+                    background: "rgba(2,12,28,0.82)",
+                    border: `1.5px dashed ${arrastrando === "frio" ? C_SOLIDO : arrastrando === "calor" ? C_GAS : accent}`,
+                    color: T.text,
+                    fontSize: 14,
+                    fontWeight: 800,
+                    backdropFilter: "blur(6px)",
+                  }}
+                >
+                  <i
+                    className={`fa-solid ${
+                      arrastrando === "frio" ? "fa-snowflake" : arrastrando === "calor" ? "fa-fire" : "fa-flask"
+                    }`}
+                  />
+                  {arrastrando === "sust" ? "Suelta aquí para cargar la sustancia" : "Suelta sobre la sustancia"}
+                </div>
+              </div>
+            )}
 
             {/* Cinta EN VIVO + estado */}
             <div
@@ -622,13 +811,88 @@ export function LabEstadosMateria({ color }: PracticaLabProps) {
                 onClick={() => seleccionarSustancia(s)}
                 accent={accent}
                 colorRgba={color.rgba}
+                onDragStart={(e) => {
+                  dragKindRef.current = `sust:${s.key}`;
+                  setArrastrando("sust");
+                  e.dataTransfer.effectAllowed = "copy";
+                  e.dataTransfer.setData("text/plain", s.key);
+                }}
+                onDragEnd={() => {
+                  dragKindRef.current = null;
+                  setArrastrando(null);
+                  setSobreVaso(false);
+                }}
               />
             ))}
           </div>
 
           <div className="ex-divider" />
 
-          {/* Temperatura */}
+          {/* Herramientas arrastrables: el alumno EXPERIMENTA aplicando calor/frío */}
+          <Eyebrow>
+            <i className="fa-solid fa-hand-pointer" style={{ marginRight: 7, color: accent }} />
+            Experimenta — arrastra a la sustancia
+          </Eyebrow>
+          <div className="ex-tools">
+            <div
+              className="ex-tool"
+              data-tool="calor"
+              data-on={aplicando === "calor"}
+              draggable
+              style={aplicando === "calor" ? { color: C_GAS } : undefined}
+              title="Arrastra el mechero sobre la sustancia para calentarla (o haz clic para un golpe de calor)"
+              onClick={() => golpe("calor")}
+              onDragStart={(e) => {
+                dragKindRef.current = "calor";
+                setArrastrando("calor");
+                e.dataTransfer.effectAllowed = "copy";
+                e.dataTransfer.setData("text/plain", "calor");
+              }}
+              onDragEnd={() => {
+                detenerAplicacion();
+                dragKindRef.current = null;
+                setArrastrando(null);
+                setSobreVaso(false);
+              }}
+            >
+              <span className="ex-tool-emoji">🔥</span>
+              <span className="ex-tool-name">Mechero</span>
+              <span className="ex-tool-hint">arrastra para calentar</span>
+            </div>
+            <div
+              className="ex-tool"
+              data-tool="frio"
+              data-on={aplicando === "frio"}
+              draggable
+              style={aplicando === "frio" ? { color: C_SOLIDO } : undefined}
+              title="Arrastra el hielo seco sobre la sustancia para enfriarla (o haz clic para un golpe de frío)"
+              onClick={() => golpe("frio")}
+              onDragStart={(e) => {
+                dragKindRef.current = "frio";
+                setArrastrando("frio");
+                e.dataTransfer.effectAllowed = "copy";
+                e.dataTransfer.setData("text/plain", "frio");
+              }}
+              onDragEnd={() => {
+                detenerAplicacion();
+                dragKindRef.current = null;
+                setArrastrando(null);
+                setSobreVaso(false);
+              }}
+            >
+              <span className="ex-tool-emoji">🧊</span>
+              <span className="ex-tool-name">Hielo seco</span>
+              <span className="ex-tool-hint">arrastra para enfriar</span>
+            </div>
+          </div>
+          <p style={{ margin: "10px 2px 0", fontSize: 11.5, color: T.text3, lineHeight: 1.5 }}>
+            <i className="fa-solid fa-arrow-up-from-bracket" style={{ marginRight: 6 }} />
+            Mantén la herramienta sobre el vaso y mira cómo cambia el estado. ¿Hay un punto donde la temperatura se queda quieta?
+          </p>
+
+          <div className="ex-divider" />
+
+          {/* Temperatura (ajuste fino) */}
           <Eyebrow>Temperatura</Eyebrow>
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
@@ -708,8 +972,9 @@ export function LabEstadosMateria({ color }: PracticaLabProps) {
           <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 17, marginTop: 1 }} />
           <span>
             La materia cambia de estado porque cambia la <strong style={{ color: T.text }}>energía</strong> de sus partículas, no la
-            sustancia. El <strong style={{ color: T.text }}>oxígeno</strong> es gas a temperatura ambiente; el{" "}
-            <strong style={{ color: T.text }}>hierro</strong>, sólido. ¡Cámbialas de estado!
+            sustancia. <strong style={{ color: T.text }}>Arrastra el mechero 🔥</strong> hasta evaporar el{" "}
+            <strong style={{ color: T.text }}>hierro</strong>, o el <strong style={{ color: T.text }}>hielo seco 🧊</strong> hasta
+            congelar el <strong style={{ color: T.text }}>oxígeno</strong>. ¡Tú haces el experimento!
           </span>
         </div>
       </div>

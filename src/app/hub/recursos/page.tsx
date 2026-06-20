@@ -109,11 +109,20 @@ interface GrupoMateria {
 }
 
 /* ──────────────────────────────────────────────────────────────
-   MateriaRail — "estante" horizontal de una materia: encabezado con
-   color de área + progreso, y un riel de tarjetas con scroll lateral
-   y flechas. Rompe el muro vertical agrupando por materia.
+   MateriaAcordeon — fila plegable por materia. Cerrada: encabezado
+   compacto (ícono de área + título + progreso + chevron). Abierta:
+   despliega un riel horizontal de tarjetas. Solo una abierta a la vez
+   ⇒ se ve UNA materia, sin el muro de rieles apilados.
    ────────────────────────────────────────────────────────────── */
-function MateriaRail({ grupo }: { grupo: GrupoMateria }) {
+function MateriaAcordeon({
+  grupo,
+  abierta,
+  onToggle,
+}: {
+  grupo: GrupoMateria;
+  abierta: boolean;
+  onToggle: () => void;
+}) {
   const color = getRSCColor(grupo.rscCodigo);
   const total = grupo.items.length;
   const hechas = grupo.items.filter((i) => i.estado === "completada").length;
@@ -149,7 +158,8 @@ function MateriaRail({ grupo }: { grupo: GrupoMateria }) {
 
   return (
     <section
-      className="recursos-mat"
+      className="recursos-acc"
+      data-open={abierta || undefined}
       style={
         {
           "--mat-color": color.hex,
@@ -157,11 +167,16 @@ function MateriaRail({ grupo }: { grupo: GrupoMateria }) {
         } as CSSProperties
       }
     >
-      <div className="recursos-mat-head">
+      <button
+        type="button"
+        className="recursos-acc-head"
+        onClick={onToggle}
+        aria-expanded={abierta}
+      >
         <span className="recursos-mat-icon">
           <i className={`fa-solid ${color.faIcon}`} />
         </span>
-        <div className="recursos-mat-headtext">
+        <div className="recursos-acc-headtext">
           <h2 className="recursos-mat-title">{grupo.uacNombre}</h2>
           <div className="recursos-mat-meta">
             <span className="recursos-mat-count">
@@ -174,72 +189,81 @@ function MateriaRail({ grupo }: { grupo: GrupoMateria }) {
                 style={{ width: `${pct}%` }}
               />
             </span>
-            <span className="recursos-mat-pct">{hechas}/{total}</span>
+            <span className="recursos-mat-pct">
+              {hechas}/{total}
+            </span>
           </div>
         </div>
-        <div className="recursos-mat-nav">
-          <button
-            type="button"
-            className="recursos-mat-arrow"
-            onClick={() => desplazar(-1)}
-            disabled={!edge.l}
-            aria-label="Desplazar a la izquierda"
-          >
-            <i className="fa-solid fa-chevron-left" />
-          </button>
-          <button
-            type="button"
-            className="recursos-mat-arrow"
-            onClick={() => desplazar(1)}
-            disabled={!edge.r}
-            aria-label="Desplazar a la derecha"
-          >
-            <i className="fa-solid fa-chevron-right" />
-          </button>
-        </div>
-      </div>
+        <span className="recursos-acc-chev" aria-hidden="true">
+          <i className="fa-solid fa-chevron-down" />
+        </span>
+      </button>
 
-      <div
-        className={`recursos-rail ${edge.l ? "fade-l" : ""} ${
-          edge.r ? "fade-r" : ""
-        }`}
-      >
-        <div className="recursos-rail-track" ref={attach} onScroll={medir}>
-          {grupo.items.map((it) => {
-            const m = getTipoRecursoMeta(it.tipo);
-            const est = ESTADO_META[it.estado];
-            return (
-              <Link
-                key={it.id}
-                href={`/hub/uac/${it.uacCodigo}/progresion/${it.progresionNumero}/actividad/${it.orden}`}
-                className={`recursos-card ${est.className}`}
-                style={{ "--chip-color": m.color } as CSSProperties}
+      {abierta && (
+        <div className="recursos-acc-body">
+          <div
+            className={`recursos-rail ${edge.l ? "fade-l" : ""} ${
+              edge.r ? "fade-r" : ""
+            }`}
+          >
+            {edge.l && (
+              <button
+                type="button"
+                className="recursos-rail-nav is-left"
+                onClick={() => desplazar(-1)}
+                aria-label="Desplazar a la izquierda"
               >
-                <div className="recursos-card-head">
-                  <span className="recursos-card-tag">{m.singular}</span>
-                  <span className={`recursos-card-estado ${est.className}`}>
-                    <span className="recursos-card-estado-dot" />
-                    <span className="recursos-card-estado-label">
-                      {est.label}
-                    </span>
-                  </span>
-                </div>
+                <i className="fa-solid fa-chevron-left" />
+              </button>
+            )}
+            {edge.r && (
+              <button
+                type="button"
+                className="recursos-rail-nav is-right"
+                onClick={() => desplazar(1)}
+                aria-label="Desplazar a la derecha"
+              >
+                <i className="fa-solid fa-chevron-right" />
+              </button>
+            )}
+            <div className="recursos-rail-track" ref={attach} onScroll={medir}>
+              {grupo.items.map((it) => {
+                const m = getTipoRecursoMeta(it.tipo);
+                const est = ESTADO_META[it.estado];
+                return (
+                  <Link
+                    key={it.id}
+                    href={`/hub/uac/${it.uacCodigo}/progresion/${it.progresionNumero}/actividad/${it.orden}`}
+                    className={`recursos-card ${est.className}`}
+                    style={{ "--chip-color": m.color } as CSSProperties}
+                  >
+                    <div className="recursos-card-head">
+                      <span className="recursos-card-tag">{m.singular}</span>
+                      <span className={`recursos-card-estado ${est.className}`}>
+                        <span className="recursos-card-estado-dot" />
+                        <span className="recursos-card-estado-label">
+                          {est.label}
+                        </span>
+                      </span>
+                    </div>
 
-                <h3 className="recursos-card-titulo">{it.titulo}</h3>
+                    <h3 className="recursos-card-titulo">{it.titulo}</h3>
 
-                <div className="recursos-card-foot">
-                  <span className="recursos-card-prog">
-                    Propósito formativo {it.progresionNumero}
-                  </span>
-                  <span className="recursos-card-go" aria-hidden="true">
-                    <i className="fa-solid fa-arrow-right" />
-                  </span>
-                </div>
-              </Link>
-            );
-          })}
+                    <div className="recursos-card-foot">
+                      <span className="recursos-card-prog">
+                        Propósito formativo {it.progresionNumero}
+                      </span>
+                      <span className="recursos-card-go" aria-hidden="true">
+                        <i className="fa-solid fa-arrow-right" />
+                      </span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </section>
   );
 }
@@ -251,6 +275,7 @@ function RecursosContent() {
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<RecursoActividad[]>([]);
   const [filtro, setFiltro] = useState<string | null>(searchParams.get("tipo"));
+  const [abierta, setAbierta] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -316,8 +341,16 @@ function RecursosContent() {
     g.items.push(it);
   }
 
+  // Acordeón: una materia abierta a la vez. Si la guardada ya no existe
+  // (cambió el filtro), cae a la primera del grupo actual.
+  const abiertaEfectiva =
+    abierta && grupos.some((g) => g.uacCodigo === abierta)
+      ? abierta
+      : grupos[0]?.uacCodigo ?? null;
+
   function seleccionar(t: string) {
     setFiltro(t);
+    setAbierta(null); // al cambiar de tipo, reabre la primera materia
     router.replace(`/hub/recursos?tipo=${t}`);
   }
 
@@ -409,7 +442,12 @@ function RecursosContent() {
       ) : (
         <div className="recursos-estantes">
           {grupos.map((g) => (
-            <MateriaRail key={g.uacCodigo} grupo={g} />
+            <MateriaAcordeon
+              key={g.uacCodigo}
+              grupo={g}
+              abierta={g.uacCodigo === abiertaEfectiva}
+              onToggle={() => setAbierta(g.uacCodigo)}
+            />
           ))}
         </div>
       )}

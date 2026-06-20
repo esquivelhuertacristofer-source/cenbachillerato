@@ -156,6 +156,32 @@ const ELEMENTOS: Elemento[] = [
 const fmt = (n: number, dec = 0) =>
   n.toLocaleString("es-MX", { minimumFractionDigits: dec, maximumFractionDigits: dec });
 
+/* ── Constructor de átomos: límites y reparto de capas ─────────────────── */
+type Particula = "p" | "n" | "e";
+const MAX_P = 20; // hasta Z=20 (Ca), el alcance de la tabla del laboratorio
+const MAX_N = 26;
+const MAX_E = 22;
+
+// Capacidad de cada capa (regla 2-8-18…) para repartir electrones al construir.
+const CAPACIDAD = [2, 8, 18, 32, 32, 18, 8];
+function repartirCapas(e: number): number[] {
+  const out: number[] = [];
+  let rest = e;
+  for (const cap of CAPACIDAD) {
+    if (rest <= 0) break;
+    const n = Math.min(cap, rest);
+    out.push(n);
+    rest -= n;
+  }
+  return out.length ? out : [0];
+}
+
+const PARTICULAS: { tipo: Particula; label: string; color: string; carga: string; desc: string }[] = [
+  { tipo: "p", label: "Protón", color: PROTON_COLOR, carga: "+1", desc: "Define el elemento (núcleo)" },
+  { tipo: "n", label: "Neutrón", color: NEUTRON_COLOR, carga: "0", desc: "Aporta masa (núcleo)" },
+  { tipo: "e", label: "Electrón", color: ELECTRON_COLOR, carga: "−1", desc: "Orbita en las capas" },
+];
+
 /* ── Componentes de UI (declarados fuera del render: estado estable) ──── */
 
 // Tile de modelo histórico (seleccionable)
@@ -315,12 +341,19 @@ const AporteLimite = ({ modelo }: { modelo: Modelo }) => (
 
 export function LabModelosAtomicos({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
+  const [modo, setModo] = useState<"explorar" | "construir">("explorar");
   const [modeloKey, setModeloKey] = useState<ModeloKey>("dalton");
   const [elementoSym, setElementoSym] = useState("C");
   const [autoRotate, setAutoRotate] = useState(true);
   const [resetNonce, setResetNonce] = useState(0);
   const [visitados, setVisitados] = useState<Set<ModeloKey>>(() => new Set<ModeloKey>(["dalton"]));
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
+  // Constructor de átomos (modo "construir"): el alumno arrastra partículas.
+  const [bp, setBp] = useState(0); // protones armados
+  const [bn, setBn] = useState(0); // neutrones armados
+  const [be, setBe] = useState(0); // electrones armados
+  const [dragOver, setDragOver] = useState(false);
+  const [logros, setLogros] = useState<Set<string>>(() => new Set<string>());
   // teoría (cajón deslizable) y sonido
   const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
@@ -348,12 +381,98 @@ export function LabModelosAtomicos({ color }: PracticaLabProps) {
   const modelo = MODELOS.find((m) => m.key === modeloKey)!;
   const elemento = ELEMENTOS.find((e) => e.sym === elementoSym)!;
   const idxModelo = MODELOS.findIndex((m) => m.key === modeloKey);
+  const enConstruccion = modo === "construir";
 
-  // Composición: A = masa redondeada (número másico del isótopo más común).
+  // ── Identidad del átomo que el alumno está armando ──────────────────
+  const elementoConstruido = ELEMENTOS.find((e) => e.z === bp) ?? null;
+  const carga = bp - be; // >0 catión, <0 anión, 0 neutro
+  const numMasaConstruido = bp + bn;
+  const isotopoComun = elementoConstruido ? Math.round(elementoConstruido.masa) : 0;
+  const esIsotopo = !!elementoConstruido && bp > 0 && numMasaConstruido !== isotopoComun;
+  const shellsConstruido =
+    elementoConstruido && be === bp ? elementoConstruido.shells : repartirCapas(be);
+
+  // Composición efectiva (lo que se manda a la escena 3D):
+  // en "explorar" = elemento real; en "construir" = lo que armó el alumno.
   const A = Math.round(elemento.masa);
-  const protones = elemento.z;
-  const neutrones = Math.max(0, A - elemento.z);
-  const electrones = elemento.z;
+  const protones = enConstruccion ? bp : elemento.z;
+  const neutrones = enConstruccion ? bn : Math.max(0, A - elemento.z);
+  const electrones = enConstruccion ? be : elemento.z;
+  const shells = enConstruccion ? shellsConstruido : elemento.shells;
+  // Dalton/Thomson no muestran partículas: al construir usamos Bohr para verlas.
+  const modeloEfectivo: ModeloKey =
+    enConstruccion && (modeloKey === "dalton" || modeloKey === "thomson") ? "bohr" : modeloKey;
+
+  // Registra un logro del constructor (una sola vez) + sonido de acierto.
+  const marcarLogro = useCallback(
+    (id: string) => {
+      setLogros((prev) => {
+        if (prev.has(id)) return prev;
+        if (sonido) audioRef.current?.correcto();
+        const next = new Set(prev);
+        next.add(id);
+        return next;
+      });
+    },
+    [sonido],
+  );
+
+  // Evalúa los logros con los conteos resultantes (se llama tras cada cambio).
+  const evaluarLogros = useCallback(
+    (p: number, n: number, e: number) => {
+      if (p > 0) marcarLogro("primer-proton");
+      if (p > 0 && p === e) marcarLogro("neutro");
+      if (p > 0 && p !== e) marcarLogro("ion");
+      const el = ELEMENTOS.find((x) => x.z === p);
+      if (el && p > 0 && p + n !== Math.round(el.masa)) marcarLogro("isotopo");
+    },
+    [marcarLogro],
+  );
+
+  // Agrega una partícula (por arrastre o por clic).
+  const agregar = useCallback(
+    (tipo: Particula) => {
+      if (sonido) audioRef.current?.blip();
+      let p = bp, n = bn, e = be;
+      if (tipo === "p") p = Math.min(MAX_P, bp + 1);
+      else if (tipo === "n") n = Math.min(MAX_N, bn + 1);
+      else e = Math.min(MAX_E, be + 1);
+      setBp(p);
+      setBn(n);
+      setBe(e);
+      evaluarLogros(p, n, e);
+    },
+    [bp, bn, be, sonido, evaluarLogros],
+  );
+
+  const quitar = useCallback(
+    (tipo: Particula) => {
+      let p = bp, n = bn, e = be;
+      if (tipo === "p") p = Math.max(0, bp - 1);
+      else if (tipo === "n") n = Math.max(0, bn - 1);
+      else e = Math.max(0, be - 1);
+      setBp(p);
+      setBn(n);
+      setBe(e);
+      evaluarLogros(p, n, e);
+    },
+    [bp, bn, be, evaluarLogros],
+  );
+
+  const vaciar = useCallback(() => {
+    setBp(0);
+    setBn(0);
+    setBe(0);
+  }, []);
+
+  const conteo = (tipo: Particula) => (tipo === "p" ? bp : tipo === "n" ? bn : be);
+
+  const retosConstructor = [
+    { id: "primer-proton", txt: "Arrastra tu primer protón al núcleo" },
+    { id: "neutro", txt: "Arma un átomo neutro (protones = electrones)" },
+    { id: "ion", txt: "Forma un ion (quita o agrega electrones)" },
+    { id: "isotopo", txt: "Crea un isótopo (cambia los neutrones)" },
+  ];
 
   const irAModelo = (k: ModeloKey) => {
     setModeloKey(k);
@@ -452,13 +571,78 @@ export function LabModelosAtomicos({ color }: PracticaLabProps) {
           padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
           background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
         .ex-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateX(-50%) translateY(-1px); }
+
+        /* Selector de modo */
+        .ma-seg { display:flex; gap:6px; padding:5px; border-radius:14px; background:${T.inset}; border:1px solid ${T.line}; margin-bottom:18px; }
+        .ma-seg button { flex:1; display:flex; align-items:center; justify-content:center; gap:9px; padding:11px 14px;
+          border-radius:10px; border:none; cursor:pointer; background:transparent; color:${T.text2}; font-size:13.5px; font-weight:800;
+          transition:all .16s ease; }
+        .ma-seg button[data-on="true"] { background:rgba(${color.rgba},0.20); color:#fff; box-shadow:0 0 18px -6px ${accent}; }
+        .ma-seg button:hover:not([data-on="true"]) { color:#fff; background:rgba(255,255,255,0.06); }
+
+        /* Fichas de partícula arrastrables */
+        .ma-chip { display:flex; align-items:center; gap:11px; padding:10px 12px; border-radius:13px; border:1px solid ${T.line};
+          background:${T.glass}; cursor:grab; transition:all .14s ease; user-select:none; }
+        .ma-chip:hover { border-color:${T.lineStrong}; background:${T.glassSoft}; transform:translateY(-1px); }
+        .ma-chip:active { cursor:grabbing; transform:scale(0.98); }
+        .ma-orb { width:34px; height:34px; flex-shrink:0; border-radius:50%; display:flex; align-items:center; justify-content:center;
+          font-size:13px; font-weight:900; color:#06121f; }
+        .ma-pm { width:30px; height:30px; border-radius:9px; border:1px solid ${T.line}; background:${T.inset}; color:${T.text};
+          font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .14s; }
+        .ma-pm:hover:not(:disabled) { border-color:${accent}; background:rgba(${color.rgba},0.16); }
+        .ma-pm:disabled { opacity:0.3; cursor:not-allowed; }
       `}</style>
+
+      {/* Selector de modo: explorar la historia · o construir tu propio átomo */}
+      <div className="ma-seg" role="tablist">
+        <button
+          role="tab"
+          data-on={modo === "explorar"}
+          onClick={() => {
+            setModo("explorar");
+            if (sonido) audioRef.current?.blip();
+          }}
+        >
+          <i className="fa-solid fa-timeline" /> Explorar modelos
+        </button>
+        <button
+          role="tab"
+          data-on={modo === "construir"}
+          onClick={() => {
+            setModo("construir");
+            if (modeloKey === "dalton" || modeloKey === "thomson") setModeloKey("bohr");
+            if (sonido) audioRef.current?.blip();
+          }}
+        >
+          <i className="fa-solid fa-hand-pointer" /> Construir átomo
+        </button>
+      </div>
 
       <div className="ex-grid">
         {/* ── Columna visor ──────────────────────────────────────── */}
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {/* Escena 3D */}
           <div
+            onDragOver={
+              enConstruccion
+                ? (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = "copy";
+                    if (!dragOver) setDragOver(true);
+                  }
+                : undefined
+            }
+            onDragLeave={enConstruccion ? () => setDragOver(false) : undefined}
+            onDrop={
+              enConstruccion
+                ? (e) => {
+                    e.preventDefault();
+                    setDragOver(false);
+                    const tipo = e.dataTransfer.getData("text/particula") as Particula;
+                    if (tipo === "p" || tipo === "n" || tipo === "e") agregar(tipo);
+                  }
+                : undefined
+            }
             style={{
               position: "relative",
               height: "clamp(460px, 66vh, 780px)",
@@ -471,17 +655,49 @@ export function LabModelosAtomicos({ color }: PracticaLabProps) {
           >
             <SceneBoundary fallback={sceneFallback}>
               <ModelosAtomicosScene
-                modelo={modeloKey}
+                modelo={modeloEfectivo}
                 protones={protones}
                 neutrones={neutrones}
                 electrones={electrones}
-                shells={elemento.shells}
-                elementColor={elemento.color}
+                shells={shells}
+                elementColor={enConstruccion ? elementoConstruido?.color ?? "#cfe6ff" : elemento.color}
                 accent={accent}
                 autoRotate={autoRotate}
                 resetNonce={resetNonce}
               />
             </SceneBoundary>
+
+            {/* Realce visual + pista al arrastrar (no captura punteros: deja girar el átomo) */}
+            {enConstruccion && (
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  pointerEvents: "none",
+                  borderRadius: 20,
+                  border: dragOver ? `2px dashed ${accent}` : "2px dashed transparent",
+                  background: dragOver ? `rgba(${color.rgba},0.10)` : "transparent",
+                  transition: "all .15s ease",
+                }}
+              >
+                {bp + bn + be === 0 && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%,-50%)",
+                      textAlign: "center",
+                      color: "rgba(255,255,255,0.6)",
+                    }}
+                  >
+                    <i className="fa-solid fa-hand-pointer" style={{ fontSize: 30, marginBottom: 12, color: accent }} />
+                    <div style={{ fontSize: 14, fontWeight: 800, color: T.text }}>Arrastra partículas aquí</div>
+                    <div style={{ fontSize: 12, marginTop: 4 }}>protones y neutrones forman el núcleo; los electrones, las capas</div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Cinta EN VIVO + modelo */}
             <div
@@ -662,18 +878,182 @@ export function LabModelosAtomicos({ color }: PracticaLabProps) {
 
           <div className="ex-divider" />
 
-          {/* Elemento */}
-          <Eyebrow>Elemento</Eyebrow>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 6 }}>
-            {ELEMENTOS.map((e) => (
-              <button key={e.sym} className="ex-elem" data-on={e.sym === elementoSym} onClick={() => setElementoSym(e.sym)} title={`${e.nombre} (Z=${e.z})`}>
-                <span style={{ fontSize: 9, color: T.text3, ...NUM, lineHeight: 1 }}>{e.z}</span>
-                <span style={{ fontSize: 14, fontWeight: 800, color: e.sym === elementoSym ? "#fff" : T.text2, lineHeight: 1.05 }}>{e.sym}</span>
-              </button>
-            ))}
-          </div>
+          {/* Elemento (solo al explorar) */}
+          {!enConstruccion && (
+            <>
+              <Eyebrow>Elemento</Eyebrow>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 6 }}>
+                {ELEMENTOS.map((e) => (
+                  <button key={e.sym} className="ex-elem" data-on={e.sym === elementoSym} onClick={() => setElementoSym(e.sym)} title={`${e.nombre} (Z=${e.z})`}>
+                    <span style={{ fontSize: 9, color: T.text3, ...NUM, lineHeight: 1 }}>{e.z}</span>
+                    <span style={{ fontSize: 14, fontWeight: 800, color: e.sym === elementoSym ? "#fff" : T.text2, lineHeight: 1.05 }}>{e.sym}</span>
+                  </button>
+                ))}
+              </div>
+              <div className="ex-divider" />
+            </>
+          )}
 
-          <div className="ex-divider" />
+          {/* Constructor de átomos (modo construir): arrastra o pulsa +/− */}
+          {enConstruccion && (
+            <>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <Eyebrow>Tu átomo</Eyebrow>
+                <button
+                  onClick={vaciar}
+                  disabled={bp + bn + be === 0}
+                  style={{
+                    cursor: bp + bn + be === 0 ? "not-allowed" : "pointer",
+                    opacity: bp + bn + be === 0 ? 0.35 : 1,
+                    fontSize: 11.5,
+                    fontWeight: 700,
+                    color: T.text3,
+                    background: "transparent",
+                    border: `1px solid ${T.line}`,
+                    borderRadius: 8,
+                    padding: "5px 10px",
+                  }}
+                >
+                  <i className="fa-solid fa-trash-can" style={{ marginRight: 6 }} />
+                  Vaciar
+                </button>
+              </div>
+
+              {/* Identidad del átomo construido */}
+              <div
+                style={{
+                  borderRadius: 14,
+                  border: `1px solid ${bp > 0 ? accent + "66" : T.line}`,
+                  background: bp > 0 ? `rgba(${color.rgba},0.10)` : T.inset,
+                  padding: "14px 16px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 14,
+                }}
+              >
+                <div
+                  style={{
+                    width: 54,
+                    height: 54,
+                    flexShrink: 0,
+                    borderRadius: 14,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background: bp > 0 ? accent : T.glass,
+                    color: bp > 0 ? "#06121f" : T.text3,
+                    boxShadow: bp > 0 ? `0 8px 22px -8px ${accent}` : "none",
+                  }}
+                >
+                  <span style={{ fontSize: 22, fontWeight: 900, lineHeight: 1 }}>{elementoConstruido?.sym ?? "?"}</span>
+                </div>
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <div style={{ fontSize: 16, fontWeight: 900, color: T.text, lineHeight: 1.15 }}>
+                    {bp === 0 ? "Sin protones aún" : elementoConstruido ? elementoConstruido.nombre : `Z = ${bp} (fuera de la tabla)`}
+                  </div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 7 }}>
+                    {/* carga */}
+                    <span
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 800,
+                        ...NUM,
+                        padding: "3px 9px",
+                        borderRadius: 999,
+                        color: carga === 0 ? "#34D399" : carga > 0 ? "#F87171" : "#60A5FA",
+                        background: carga === 0 ? "#34D39922" : carga > 0 ? "#F8717122" : "#60A5FA22",
+                      }}
+                    >
+                      {bp === 0 ? "—" : carga === 0 ? "neutro" : carga > 0 ? `catión +${carga}` : `anión ${carga}`}
+                    </span>
+                    {/* número de masa */}
+                    {bp > 0 && (
+                      <span style={{ fontSize: 11, fontWeight: 800, ...NUM, padding: "3px 9px", borderRadius: 999, color: T.text2, background: T.glass }}>
+                        A = {numMasaConstruido}
+                      </span>
+                    )}
+                    {/* isótopo */}
+                    {esIsotopo && (
+                      <span style={{ fontSize: 11, fontWeight: 800, ...NUM, padding: "3px 9px", borderRadius: 999, color: "#FBBF24", background: "#FBBF2422" }}>
+                        isótopo
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Bandeja de partículas: arrastra al visor o usa +/− */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 12 }}>
+                {PARTICULAS.map((pt) => {
+                  const c = conteo(pt.tipo);
+                  const max = pt.tipo === "p" ? MAX_P : pt.tipo === "n" ? MAX_N : MAX_E;
+                  return (
+                    <div
+                      key={pt.tipo}
+                      className="ma-chip"
+                      draggable
+                      onDragStart={(e) => {
+                        e.dataTransfer.setData("text/particula", pt.tipo);
+                        e.dataTransfer.effectAllowed = "copy";
+                      }}
+                      onClick={() => agregar(pt.tipo)}
+                      title={`Arrastra al visor o pulsa para añadir ${pt.label.toLowerCase()}`}
+                    >
+                      <span className="ma-orb" style={{ background: pt.color, boxShadow: `0 0 12px -2px ${pt.color}` }}>
+                        {pt.carga}
+                      </span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 13.5, fontWeight: 800, color: T.text, lineHeight: 1.15 }}>{pt.label}</div>
+                        <div style={{ fontSize: 11, color: T.text3 }}>{pt.desc}</div>
+                      </div>
+                      <button
+                        className="ma-pm"
+                        disabled={c === 0}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          quitar(pt.tipo);
+                        }}
+                        title="Quitar"
+                      >
+                        <i className="fa-solid fa-minus" />
+                      </button>
+                      <span style={{ minWidth: 26, textAlign: "center", fontSize: 15, fontWeight: 900, color: T.text, ...NUM }}>{c}</span>
+                      <button
+                        className="ma-pm"
+                        disabled={c >= max}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          agregar(pt.tipo);
+                        }}
+                        title="Añadir"
+                      >
+                        <i className="fa-solid fa-plus" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Retos del constructor */}
+              <div style={{ marginTop: 14 }}>
+                <Eyebrow>Retos de construcción</Eyebrow>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {retosConstructor.map((r) => {
+                    const done = logros.has(r.id);
+                    return (
+                      <div key={r.id} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 12.5, color: done ? "#34D399" : T.text2 }}>
+                        <i className={`fa-solid ${done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 14, opacity: done ? 1 : 0.3 }} />
+                        <span style={{ fontWeight: done ? 700 : 500 }}>{r.txt}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="ex-divider" />
+            </>
+          )}
 
           {/* Lecturas instrumento: composición */}
           <Eyebrow>Composición del átomo</Eyebrow>
