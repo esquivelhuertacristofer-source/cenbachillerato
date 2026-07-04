@@ -142,6 +142,51 @@ const LabModeladoConicas = dynamic(() => import("./labs/LabModeladoConicas").the
 const LabLenguajeAlgebraico = dynamic(() => import("./labs/LabAlgebraTiles").then((m) => m.LabLenguajeAlgebraico), { ssr: false, loading: LabCargando });
 const LabClasificacionExpresiones = dynamic(() => import("./labs/LabAlgebraTiles").then((m) => m.LabClasificacionExpresiones), { ssr: false, loading: LabCargando });
 const LabOperacionesMonomiosBinomios = dynamic(() => import("./labs/LabAlgebraTiles").then((m) => m.LabOperacionesMonomiosBinomios), { ssr: false, loading: LabCargando });
+const LabHardwareSoftware = dynamic(() => import("./labs/LabHardwareSoftware").then((m) => m.LabHardwareSoftware), { ssr: false, loading: LabCargando });
+const LabConstructorAlgoritmos = dynamic(() => import("./labs/LabConstructorAlgoritmos").then((m) => m.LabConstructorAlgoritmos), { ssr: false, loading: LabCargando });
+const LabTallerParrafos = dynamic(() => import("./labs/LabTallerParrafos").then((m) => m.LabTallerParrafos), { ssr: false, loading: LabCargando });
+const LabPresentacionesIngles = dynamic(() => import("./labs/LabPresentacionesIngles").then((m) => m.LabPresentacionesIngles), { ssr: false, loading: LabCargando });
+const LabLicenciasSoftware = dynamic(() => import("./labs/LabLicenciasSoftware").then((m) => m.LabLicenciasSoftware), { ssr: false, loading: LabCargando });
+const LabEstadoMexicano = dynamic(() => import("./labs/LabEstadoMexicano").then((m) => m.LabEstadoMexicano), { ssr: false, loading: LabCargando });
+const LabConcordanciaConectores = dynamic(() => import("./labs/LabConcordanciaConectores").then((m) => m.LabConcordanciaConectores), { ssr: false, loading: LabCargando });
+const LabPosesivosIngles = dynamic(() => import("./labs/LabPosesivosIngles").then((m) => m.LabPosesivosIngles), { ssr: false, loading: LabCargando });
+const LabComparativosIngles = dynamic(() => import("./labs/LabComparativosIngles").then((m) => m.LabComparativosIngles), { ssr: false, loading: LabCargando });
+const LabPasadoSimpleIngles = dynamic(() => import("./labs/LabPasadoSimpleIngles").then((m) => m.LabPasadoSimpleIngles), { ssr: false, loading: LabCargando });
+const LabPersonajesEscenarios = dynamic(() => import("./labs/LabPersonajesEscenarios").then((m) => m.LabPersonajesEscenarios), { ssr: false, loading: LabCargando });
+const LabCausalidadHistorica = dynamic(() => import("./labs/LabCausalidadHistorica").then((m) => m.LabCausalidadHistorica), { ssr: false, loading: LabCargando });
+const LabFuentesHistoricas = dynamic(() => import("./labs/LabFuentesHistoricas").then((m) => m.LabFuentesHistoricas), { ssr: false, loading: LabCargando });
+const LabFakeNews = dynamic(() => import("./labs/LabFakeNews").then((m) => m.LabFakeNews), { ssr: false, loading: LabCargando });
+const LabFactoresProduccion = dynamic(() => import("./labs/LabFactoresProduccion").then((m) => m.LabFactoresProduccion), { ssr: false, loading: LabCargando });
+const LabNecesidadesSatisfactores = dynamic(() => import("./labs/LabNecesidadesSatisfactores").then((m) => m.LabNecesidadesSatisfactores), { ssr: false, loading: LabCargando });
+const LabMovimientosLiterarios = dynamic(() => import("./labs/LabMovimientosLiterarios").then((m) => m.LabMovimientosLiterarios), { ssr: false, loading: LabCargando });
+const LabFigurasRetoricas = dynamic(() => import("./labs/LabFigurasRetoricas").then((m) => m.LabFigurasRetoricas), { ssr: false, loading: LabCargando });
+const LabHipotesisHistoricas = dynamic(() => import("./labs/LabHipotesisHistoricas").then((m) => m.LabHipotesisHistoricas), { ssr: false, loading: LabCargando });
+const LabComunicacionMultimodal = dynamic(() => import("./labs/LabComunicacionMultimodal").then((m) => m.LabComunicacionMultimodal), { ssr: false, loading: LabCargando });
+const LabDiversidadDiscriminacion = dynamic(() => import("./labs/LabDiversidadDiscriminacion").then((m) => m.LabDiversidadDiscriminacion), { ssr: false, loading: LabCargando });
+const LabRelacionesPoder = dynamic(() => import("./labs/LabRelacionesPoder").then((m) => m.LabRelacionesPoder), { ssr: false, loading: LabCargando });
+const LabPoliticasPublicas = dynamic(() => import("./labs/LabPoliticasPublicas").then((m) => m.LabPoliticasPublicas), { ssr: false, loading: LabCargando });
+const LabGenerosLiterarios = dynamic(() => import("./labs/LabGenerosLiterarios").then((m) => m.LabGenerosLiterarios), { ssr: false, loading: LabCargando });
+const LabPresentPerfectIngles = dynamic(() => import("./labs/LabPresentPerfectIngles").then((m) => m.LabPresentPerfectIngles), { ssr: false, loading: LabCargando });
+const LabSentidoHistorico = dynamic(() => import("./labs/LabSentidoHistorico").then((m) => m.LabSentidoHistorico), { ssr: false, loading: LabCargando });
+const LabSubgenerosNarrativos = dynamic(() => import("./labs/LabSubgenerosNarrativos").then((m) => m.LabSubgenerosNarrativos), { ssr: false, loading: LabCargando });
+const LabResenaCritica = dynamic(() => import("./labs/LabResenaCritica").then((m) => m.LabResenaCritica), { ssr: false, loading: LabCargando });
+const LabExposicionOral = dynamic(() => import("./labs/LabExposicionOral").then((m) => m.LabExposicionOral), { ssr: false, loading: LabCargando });
+const LabProcesosIngles = dynamic(() => import("./labs/LabProcesosIngles").then((m) => m.LabProcesosIngles), { ssr: false, loading: LabCargando });
+const LabJuventudesPoliticas = dynamic(() => import("./labs/LabJuventudesPoliticas").then((m) => m.LabJuventudesPoliticas), { ssr: false, loading: LabCargando });
+const LabMexicoEnElMundo = dynamic(() => import("./labs/LabMexicoEnElMundo").then((m) => m.LabMexicoEnElMundo), { ssr: false, loading: LabCargando });
+const LabConsejosIngles = dynamic(() => import("./labs/LabConsejosIngles").then((m) => m.LabConsejosIngles), { ssr: false, loading: LabCargando });
+const LabBusquedaConfiable = dynamic(() => import("./labs/LabBusquedaConfiable").then((m) => m.LabBusquedaConfiable), { ssr: false, loading: LabCargando });
+const LabTiposGraficas = dynamic(() => import("./labs/LabTiposGraficas").then((m) => m.LabTiposGraficas), { ssr: false, loading: LabCargando });
+const LabEticaProduccionDigital = dynamic(() => import("./labs/LabEticaProduccionDigital").then((m) => m.LabEticaProduccionDigital), { ssr: false, loading: LabCargando });
+const LabCarrerasDigitales = dynamic(() => import("./labs/LabCarrerasDigitales").then((m) => m.LabCarrerasDigitales), { ssr: false, loading: LabCargando });
+const LabFalaciasLogica = dynamic(() => import("./labs/LabFalaciasLogica").then((m) => m.LabFalaciasLogica), { ssr: false, loading: LabCargando });
+const LabBioetica = dynamic(() => import("./labs/LabBioetica").then((m) => m.LabBioetica), { ssr: false, loading: LabCargando });
+const LabNavegacionSegura = dynamic(() => import("./labs/LabNavegacionSegura").then((m) => m.LabNavegacionSegura), { ssr: false, loading: LabCargando });
+const LabAlgoritmosDeciden = dynamic(() => import("./labs/LabAlgoritmosDeciden").then((m) => m.LabAlgoritmosDeciden), { ssr: false, loading: LabCargando });
+const LabTiempoHistorico = dynamic(() => import("./labs/LabTiempoHistorico").then((m) => m.LabTiempoHistorico), { ssr: false, loading: LabCargando });
+const LabReglasIngles = dynamic(() => import("./labs/LabReglasIngles").then((m) => m.LabReglasIngles), { ssr: false, loading: LabCargando });
+const LabTiposDePreguntas = dynamic(() => import("./labs/LabTiposDePreguntas").then((m) => m.LabTiposDePreguntas), { ssr: false, loading: LabCargando });
+const LabHerramientasColaborativas = dynamic(() => import("./labs/LabHerramientasColaborativas").then((m) => m.LabHerramientasColaborativas), { ssr: false, loading: LabCargando });
 
 /** Props que recibe cada componente de laboratorio. */
 export interface PracticaLabProps {
@@ -831,6 +876,321 @@ export const PRACTICAS: Record<string, PracticaDef> = {
     descripcion:
       "Una reacción química transforma unas sustancias (los reactivos) en otras nuevas (los productos) reacomodando sus átomos, y la ecuación química es la forma de representarla. Este laboratorio convierte el ejercicio A2 de CNEyT III·O4 en un visor 3D manipulable con TRES MODOS que cubren el contenido formativo «Concepto de reacción química; estructura de una reacción química; ecuación química como forma de representar una reacción; simbología utilizada en fórmulas y reacciones químicas». MODO «Anatomía»: arma la ecuación pieza por pieza —los reactivos a la izquierda, la flecha → («se transforma en», doble ⇌ si es reversible), los productos a la derecha, el signo + que separa sustancias— y resalta la diferencia clave entre el COEFICIENTE (número grande al frente: cuántas moléculas) y el SUBÍNDICE (número pequeño dentro: cuántos átomos por molécula); cada molécula se muestra como un grupo de esferas (un átomo cada una). MODO «Conservación»: con la reacción elegida cuenta los átomos de cada elemento a ambos lados de la flecha (coeficiente × subíndice) y, con un panel de barras, comprueba la Ley de Lavoisier: los mismos átomos que entran salen, solo reacomodados (la ecuación está balanceada cuando cada elemento coincide). MODO «Simbología»: una galería con el significado de →, ⇌, +, el coeficiente, el subíndice, los estados (s) sólido, (l) líquido, (g) gas, (ac) acuoso, el calor Δ y las flechas ↑ (gas) / ↓ (precipitado). Incluye una calculadora que, eligiendo entre seis reacciones reales (combustión del metano, síntesis del agua, fotosíntesis, formación de amoniaco, neutralización ácido-base y descomposición del agua oxigenada), devuelve la tabla de conteo de átomos por elemento en reactivos y productos, el total de átomos a cada lado, si la materia se conserva, el tipo de reacción y si es reversible, con el ejemplo resuelto de la combustión del metano (CH₄ + 2 O₂ → CO₂ + 2 H₂O: C 1=1, H 4=4, O 4=4 → balanceada). NOTA: las fórmulas, los coeficientes y el conteo de átomos son EXACTOS (todas las reacciones del catálogo están balanceadas); el modelo 3D es ESQUEMÁTICO (no a escala): cada esfera es un átomo y cada molécula un grupo de esferas, sin reflejar los ángulos ni las distancias reales de enlace. El propósito y los contenidos formativos son VERBATIM del MCCEMS 2025 (CNEyT III·O4).",
     Component: LabEstructuraReaccion,
+  },
+  "hardware-software": {
+    slug: "hardware-software",
+    titulo: "Laboratorio — Taller de hardware y software",
+    descripcion:
+      "Todo dispositivo digital se compone de hardware (todo lo que puedes tocar físicamente) y software (los programas e instrucciones que le dicen al hardware qué hacer). Este laboratorio convierte la lectura A1 «¿Qué hay dentro de mis dispositivos?» de Cultura Digital I·O1 (Ciudadanía digital) en un taller interactivo de arrastrar y soltar —funciona con ratón, teclado y pantalla táctil (tocar para seleccionar y tocar el destino para colocar)— con TRES MODOS. MODO «Arma el equipo»: el alumno lleva cada componente a su ranura en la tarjeta madre —procesador (CPU), el «cerebro» que ejecuta las instrucciones; memoria RAM, la memoria de trabajo temporal; almacenamiento (SSD), que guarda los archivos de forma permanente; y tarjeta gráfica (GPU), que procesa imágenes y videos— y enciende el equipo cuando todos están en su lugar. MODO «Hardware o software»: arrastra 12 elementos (pantalla, procesador, RAM, cámara, micrófono, disco; sistema operativo, WhatsApp, YouTube, calculadora, controladores y navegador) a la caja correcta, preguntándose «¿lo puedo tocar?». MODO «¿Por qué se traba?»: empareja tres síntomas reales con su causa —se traba (poca RAM o procesador lento), «almacenamiento lleno» (disco saturado), una app agota la batería (usa más el procesador)—, mostrando cómo conocer los componentes ayuda a entender y cuidar el equipo. Incluye un reto de estrellas (3★ si clasificas las 12 a la primera), sonido sintetizado opcional, lista de objetivos y un cuestionario de comprensión de cinco preguntas. El dato de contexto (ENDUTIH, INEGI 2023: 78.6% de uso de internet, con brecha urbano-rural) y todas las funciones y conceptos son VERBATIM de la actividad A1 del MCCEMS 2025 (Cultura Digital I·O1).",
+    Component: LabHardwareSoftware,
+  },
+  "constructor-algoritmos": {
+    slug: "constructor-algoritmos",
+    titulo: "Laboratorio — Constructor de algoritmos",
+    descripcion:
+      "Un algoritmo es un conjunto de instrucciones ordenadas para resolver un problema o completar una tarea. Este laboratorio convierte las lecturas A1 «Lenguaje algorítmico: datos, variables y operadores» (CD-I·P11) y «Los algoritmos deciden por nosotros» (CD-I·P04) de Cultura Digital I en un taller interactivo de arrastrar y soltar —funciona con ratón, teclado y pantalla táctil (tocar para seleccionar y tocar el destino para colocar)— con TRES MODOS. MODO «Construye el algoritmo»: el alumno arrastra los bloques de un diagrama de flujo (inicio/fin, entrada, proceso, decisión y salida, con su símbolo y color estándar) hasta ordenarlos y resolver tres problemas que combinan estructura secuencial y condicional —¿par o impar?, el mayor de dos números y ¿aprobado o reprobado? con el promedio de tres calificaciones—; solo avanza si coloca el paso correcto a continuación. MODO «Clasifica los operadores»: arrastra los once operadores (+, −, ×, ÷ aritméticos; >, <, =, ≠ relacionales; Y, O, NO lógicos) a su caja, según sirvan para calcular, comparar o combinar condiciones. MODO «Estructuras de control»: empareja tres situaciones cotidianas con su estructura —secuencial (instrucciones una tras otra), condicional o selectiva («si… entonces…») y repetitiva o cíclica (mientras se cumpla una condición)—. Incluye un reto de estrellas (una por algoritmo armado), sonido sintetizado opcional, lista de objetivos y un cuestionario de comprensión de cinco preguntas. El dato de contexto (los algoritmos no son neutrales: se diseñan para maximizar tu tiempo en la plataforma) y todas las definiciones son VERBATIM de las actividades del MCCEMS 2025 (Cultura Digital I).",
+    Component: LabConstructorAlgoritmos,
+  },
+  "taller-parrafos": {
+    slug: "taller-parrafos",
+    titulo: "Laboratorio — Taller de párrafos",
+    descripcion:
+      "El párrafo es la unidad básica de organización del texto escrito, y cada párrafo desarrolla una idea principal expresada en su oración temática. Este laboratorio convierte la lectura A1 «Los párrafos y su función en el texto» (LC-I·P04) de Lengua y Comunicación I en un taller interactivo de arrastrar y soltar —funciona con ratón, teclado y pantalla táctil (tocar para seleccionar y tocar el destino para colocar)— con TRES MODOS. MODO «Arma el texto»: el alumno arrastra los párrafos de dos textos breves («Leer todos los días» y «Cuidar el agua») hasta ordenarlos coherentemente en la secuencia introductorio → desarrollo → conclusión; solo avanza si coloca el párrafo correcto a continuación. MODO «Clasifica los párrafos»: lee seis párrafos-ejemplo y arrástralos a su función —introductorio (presenta el tema y anuncia lo que se desarrollará), de desarrollo (amplía, explica o argumenta una idea) o de conclusión (cierra el texto retomando las ideas principales)—, con una pista de la marca lingüística que delata cada función. MODO «Clasifica los conectores»: arrastra los nueve conectores (además, también, igualmente de adición; sin embargo, aunque, no obstante de contraste; porque, por lo tanto, en consecuencia de causa-consecuencia) a su tipo de relación. Incluye un reto de estrellas (una por cada modo dominado), sonido sintetizado opcional, lista de objetivos y un cuestionario de comprensión de cinco preguntas. El dato de contexto (el español de México incorpora más de 10,000 voces de origen náhuatl) y todas las definiciones, conectores y preguntas son VERBATIM de las actividades del MCCEMS 2025 (Lengua y Comunicación I).",
+    Component: LabTallerParrafos,
+  },
+  "presentaciones-ingles": {
+    slug: "presentaciones-ingles",
+    titulo: "English Lab — Greetings & introductions",
+    descripcion:
+      "Laboratorio interactivo de Inglés I. El alumno EXPERIMENTA con la lengua arrastrando palabras y frases: (1) «Build the sentence» —ordena las palabras hasta formar las cuatro oraciones de la presentación (My name is Valeria / I am from Guadalajara / This is my friend Diego / Nice to meet you), avanzando solo con la palabra correcta; (2) «The verb to be» —clasifica los siete sujetos (I, You, He, She, It, We, They) según su forma del verbo to be (am / is / are); (3) «Greeting, introduction or farewell?» —clasifica diez frases por su función comunicativa. Incluye sonido, reto de estrellas y un cuestionario de comprensión. Contenido verbatim de IN-I·P01 (A1/A2/A4/A6).",
+    Component: LabPresentacionesIngles,
+  },
+  "licencias-software": {
+    slug: "licencias-software",
+    titulo: "Laboratorio — Licencias digitales: ¿libre o privativo?",
+    descripcion:
+      "Laboratorio de Cultura Digital I sobre licenciamiento de software y contenidos. El alumno EXPERIMENTA arrastrando, con tres interacciones distintas: (1) «¿Libre o privativo?» —clasifica seis programas reales (Windows, Microsoft Office, Adobe Photoshop / GNU/Linux, LibreOffice, Firefox) en software privativo (código fuente secreto, no se modifica ni redistribuye) o libre (usar, estudiar, modificar y redistribuir); (2) «Creative Commons» —empareja las cuatro licencias (CC BY, CC BY-SA, CC BY-NC, CC BY-NC-ND) con el permiso exacto que conceden, descubriendo que CC BY-NC-ND es la más restrictiva; (3) «Las cuatro libertades» —ordena de 0 a 3 las libertades del software libre del proyecto GNU (usar → estudiar → distribuir → mejorar). Incluye el dato clave de que «software libre» NO significa «gratis», sonido sintetizado opcional, reto de estrellas (una por modo) y un cuestionario de comprensión de cinco preguntas. Contenido verbatim de CD-I·P02 (A1/A2/A5) y CD-I·P09-A1.",
+    Component: LabLicenciasSoftware,
+  },
+  "estado-mexicano": {
+    slug: "estado-mexicano",
+    titulo: "Laboratorio — El Estado: elementos, poderes y conceptos",
+    descripcion:
+      "Laboratorio de Ciencias Sociales I sobre el Estado mexicano. El alumno EXPERIMENTA arrastrando, con tres interacciones distintas: (1) «Arma el Estado» —arrastra al Estado sus tres elementos constitutivos (territorio delimitado, población y gobierno con el monopolio legítimo de la fuerza) y descubre que la bandera, el himno y el escudo son símbolos patrios, no elementos del Estado; (2) «División de poderes» —clasifica cargos y funciones en los tres poderes (Ejecutivo: presidente, gobernadores, presidentes municipales; Legislativo: Congreso de la Unión, Senado, Cámara de Diputados; Judicial: Suprema Corte, tribunales), que se controlan mutuamente; (3) «Conceptos clave» —empareja cinco conceptos (división de poderes, monopolio legítimo de la fuerza, captura del Estado, impunidad, institución) con su definición. Incluye sonido sintetizado opcional, reto de estrellas (una por modo) y un cuestionario de comprensión de cinco preguntas. Contenido verbatim de CS-I·P01 (A1 lectura, A4 quiz, A5 V/F, A6 glosario).",
+    Component: LabEstadoMexicano,
+  },
+  "concordancia-conectores": {
+    slug: "concordancia-conectores",
+    titulo: "Laboratorio — Concordancia y conectores: el hilo del texto",
+    descripcion:
+      "Laboratorio de Lengua y Comunicación I sobre concordancia gramatical y conectores. El alumno EXPERIMENTA arrastrando, con tres interacciones distintas: (1) «Repara la concordancia» —arrastra la forma correcta sobre la palabra tachada para corregir cuatro oraciones con error de concordancia (sustantivo-adjetivo en género y número; sujeto-verbo en número y persona); (2) «Conectores en su lugar» —arrastra el conector adecuado al hueco de cada oración según el sentido que debe expresar (causa, adición, comparación, consecuencia); (3) «Glosario» —empareja cinco términos (concordancia, conector, conector causal, conector comparativo, conector de adición) con su definición. Incluye sonido sintetizado opcional, reto de estrellas (una por modo) y un cuestionario de comprensión de cinco preguntas. Contenido verbatim de LC-I·P06 (A1 lectura, A2 quiz, A4 fill_blanks, A5 V/F, A6 glosario).",
+    Component: LabConcordanciaConectores,
+  },
+  "posesivos-ingles": {
+    slug: "posesivos-ingles",
+    titulo: "Laboratorio — Possession: mine or yours?",
+    descripcion:
+      "Laboratorio de Inglés I sobre el genitivo sajón y los pronombres posesivos. El alumno EXPERIMENTA arrastrando, con tres interacciones distintas: (1) «Saxon genitive» —arrastra el marcador correcto al hueco tras el poseedor para formar el genitivo (apóstrofo + s con poseedores singulares: Ana's book; solo apóstrofo con plurales terminados en s: the students' notebooks); (2) «Complete the sentence» —arrastra el posesivo o genitivo adecuado al hueco de ocho oraciones según el contexto (¿va antes de un sustantivo o va solo?); (3) «Adjective or pronoun?» —clasifica diez posesivos en dos columnas: adjetivos posesivos que van antes de un sustantivo (my, your, her, our, their) frente a pronombres posesivos que van solos (mine, yours, hers, ours, theirs). Incluye sonido sintetizado opcional, reto de estrellas (una por modo) y un cuestionario de comprensión de cinco preguntas. Contenido verbatim de IN-I·P08 (A1 lectura, A2 fill_blanks, A4 quiz, A5 V/F, A6 glosario).",
+    Component: LabPosesivosIngles,
+  },
+  "comparativos-ingles": {
+    slug: "comparativos-ingles",
+    titulo: "Laboratorio — Comparatives: bigger, better, more interesting",
+    descripcion:
+      "Laboratorio de Inglés II sobre los comparativos de los adjetivos. El alumno EXPERIMENTA arrastrando, con tres interacciones distintas (forma · regla · uso): (1) «Build the comparative» —arrastra la forma comparativa correcta a cada adjetivo (tall → taller, big → bigger, interesting → more interesting, good → better) evitando los errores típicos (more tall, gooder, bigger more); (2) «-er, more, or irregular?» —clasifica once adjetivos en tres columnas según cómo forman su comparativo: adjetivos cortos de una sílaba (-er + than), largos de dos o más sílabas (more + adjetivo + than) e irregulares (good/bad/far); (3) «Complete the comparison» —arrastra el comparativo adecuado al hueco de seis oraciones, recordando que toda comparación lleva «than». Incluye sonido sintetizado opcional, reto de estrellas (una por modo) y un cuestionario de comprensión de cinco preguntas verdadero/falso. Contenido verbatim de IN-II·P05 (A1 lectura, A2 y A4 quiz V/F, A5 glosario, A6 fill_blanks).",
+    Component: LabComparativosIngles,
+  },
+  "pasado-simple-ingles": {
+    slug: "pasado-simple-ingles",
+    titulo: "Laboratorio — Past Simple: what did you do yesterday?",
+    descripcion:
+      "Laboratorio de Inglés III sobre el pasado simple (Past Simple). El alumno EXPERIMENTA arrastrando, con tres interacciones distintas (regla · forma · uso): (1) «Regular or irregular?» —clasifica doce verbos en dos columnas según cómo forman su pasado: regulares que solo agregan -ed (walk → walked, play → played, study → studied) e irregulares con forma especial (go → went, eat → ate, buy → bought); (2) «Build the past form» —arrastra la forma de pasado correcta a cada verbo base evitando los errores típicos de sobre-regularización (eated, buyed, goed, maked); (3) «Complete the sentence» —arrastra el verbo en pasado al hueco de cinco oraciones verbatim con expresiones de tiempo (yesterday, last week, two days ago, in 2020). Incluye sonido sintetizado opcional, reto de estrellas (una por modo) y un cuestionario de comprensión de cinco preguntas verdadero/falso, incluida la regla de negación e interrogación con did/didn't + verbo base. Contenido verbatim de IN-III·P01 (A1 lectura, A2 fill_blanks, A3 quiz, A4 quiz V/F).",
+    Component: LabPasadoSimpleIngles,
+  },
+  "personajes-escenarios": {
+    slug: "personajes-escenarios",
+    titulo: "Laboratorio — Personajes y escenarios que dan vida a las historias",
+    descripcion:
+      "Laboratorio de Lengua y Comunicación II sobre los personajes y los escenarios narrativos. El alumno EXPERIMENTA arrastrando, con tres interacciones distintas (rol · ambiente · término): (1) «¿Qué tipo de personaje?» —clasifica nueve descripciones en protagonista (personaje principal alrededor del cual gira la historia), antagonista (quien se opone al protagonista o le crea conflicto) y secundario (quien acompaña o apoya sin ser el centro); (2) «¿Qué tipo de escenario?» —clasifica nueve ambientes en realista (vida cotidiana), fantástico (elementos sobrenaturales, como La Llorona) e histórico (épocas pasadas con contexto real, como el México prehispánico); (3) «Empareja término y definición» —arrastra cada término del glosario (caracterización, protagonista, antagonista, personaje secundario, escenario) a su definición verbatim. Incluye sonido sintetizado opcional, reto de estrellas (una por modo) y un cuestionario de comprensión de cinco preguntas verdadero/falso, incluido el concepto de arquetipo. Contenido verbatim de LC-II·P04 (A1 infografía, A2 quiz, A4 quiz V/F, A5 glosario).",
+    Component: LabPersonajesEscenarios,
+  },
+  "causalidad-historica": {
+    slug: "causalidad-historica",
+    titulo: "Laboratorio — Causalidad histórica y multicausalidad",
+    descripcion:
+      "Laboratorio de Conciencia Histórica I sobre la causalidad histórica: por qué nada ocurre por una sola razón. El alumno EXPERIMENTA arrastrando, con tres interacciones distintas (alcance · error · término): (1) «¿Qué tipo de causa?» —clasifica nueve hechos históricos en causa estructural (condición profunda y de larga duración, como la concentración de tierras en el porfiriato), causa coyuntural (detonante inmediato, como el Plan de San Luis o el asesinato del archiduque Francisco Fernando) y consecuencia (efecto posterior, como la Constitución de 1917); (2) «¿Monocausal o multicausal?» —detecta el error de explicación clasificando afirmaciones sobre la Revolución, la Independencia y la Conquista como monocausales (una sola causa, error) o multicausales (varios factores entrelazados, correctas); (3) «Empareja término y definición» —arrastra cada concepto del glosario (causalidad histórica, multicausalidad, causa estructural, causa coyuntural, consecuencia histórica, agencia histórica) a su definición verbatim. Incluye sonido sintetizado opcional, reto de estrellas (una por modo) y un cuestionario de comprensión de cinco preguntas verdadero/falso. Contenido verbatim de CH-I·P03 (A1 lectura, A2 quiz, A4 quiz V/F, A5 glosario, A6 fill_blanks).",
+    Component: LabCausalidadHistorica,
+  },
+  "fuentes-historicas": {
+    slug: "fuentes-historicas",
+    titulo: "Laboratorio — Fuentes históricas: selección, evaluación y contraste",
+    descripcion:
+      "Laboratorio de Conciencia Histórica III sobre cómo evaluar una fuente histórica: criterios y procedimientos para el análisis crítico. El alumno EXPERIMENTA arrastrando, con tres interacciones distintas (tipo · criterio · término): (1) «¿Primaria, secundaria o terciaria?» —clasifica ocho fuentes según su tipo: primarias producidas en el período o por participantes directos (una fotografía del archivo Casasola, el Diario de Cristóbal Colón, una carta de un soldado de la Revolución), secundarias que interpretan el pasado con base en primarias (el libro «México a través de los siglos», un artículo académico de 2010) y terciarias que recopilan secundarias (una bibliografía, una base de datos); (2) «Los cinco criterios» —empareja cada criterio de evaluación (autoría, fecha, intención, audiencia, contexto) con la pregunta clave que responde (¿quién?, ¿cuándo?, ¿para qué?, ¿para quién?, ¿en qué circunstancias?); (3) «Empareja término y definición» —arrastra cada concepto del glosario (fuente primaria, fuente secundaria, sesgo histórico, fiabilidad de una fuente, contraste de fuentes, fuente iconográfica) a su definición verbatim. Incluye sonido sintetizado opcional, reto de estrellas (una por modo) y un cuestionario de comprensión de cinco preguntas verdadero/falso. Contenido verbatim de CH-III·P01 (A1 lectura, A2 quiz, A4 quiz V/F, A5 glosario, A6 fill_blanks).",
+    Component: LabFuentesHistoricas,
+  },
+  "deteccion-fake-news": {
+    slug: "deteccion-fake-news",
+    titulo: "Laboratorio — Detección de fake news y verificación de información",
+    descripcion:
+      "Conviértete en verificador digital: clasifica indicios entre señales de alerta de desinformación y prácticas de verificación confiable, empareja cada técnica (fact-checking, búsqueda inversa de imágenes, fuente original, desconfiar de titulares sensacionalistas) con lo que hace, domina el glosario de métodos de investigación digital y comprueba lo aprendido con un cuestionario. Contenido de Cultura Digital II.",
+    Component: LabFakeNews,
+  },
+  "factores-produccion": {
+    slug: "factores-produccion",
+    titulo: "Laboratorio — Factores de producción y la cadena productiva",
+    descripcion:
+      "Laboratorio de Ciencias Sociales II sobre los factores de producción, la economía formal e informal y la cadena productiva. El alumno EXPERIMENTA arrastrando, con tres interacciones distintas: (1) «Los factores de producción» —clasifica diez ejemplos de la panadería y la milpa en las cinco columnas: tierra (recursos naturales), trabajo (esfuerzo humano), capital (medios y herramientas), organización (coordinación) y tiempo; (2) «¿Formal o informal?» —clasifica ocho actividades económicas según pertenezcan a la economía formal (registrada y regulada, con IMSS y facturas) o a la informal (sin registro ni seguridad social), recordando que en México cerca del 55% del empleo es informal; (3) «La cadena productiva» —ordena de la producción al consumo los cinco eslabones que recorre el tomate de Sinaloa (se cultiva → intermediarios → transportistas → mercados → la mesa), revelando quién se beneficia en cada eslabón. Incluye sonido sintetizado opcional, reto de estrellas (una por modo) y un cuestionario de comprensión de cinco preguntas verdadero/falso. Contenido verbatim de CS-II·P03 (A1 lectura, A2 y A4 quiz V/F, A5 glosario, A6 fill_blanks).",
+    Component: LabFactoresProduccion,
+  },
+  "necesidades-satisfactores": {
+    slug: "necesidades-satisfactores",
+    titulo: "Laboratorio — Necesidades y satisfactores",
+    descripcion:
+      "Clasifica tarjetas entre necesidad (carencia) y satisfactor (el medio con que se cubre), empareja cada necesidad con su satisfactor y domina el glosario de bienestar social. Contenido verbatim de Ciencias Sociales II.",
+    Component: LabNecesidadesSatisfactores,
+  },
+  "movimientos-literarios": {
+    slug: "movimientos-literarios",
+    titulo: "Laboratorio — Movimientos literarios: del Barroco a las Vanguardias",
+    descripcion:
+      "Clasifica obras y autores en su movimiento literario, empareja cada movimiento con su rasgo definitorio y domina el glosario. Contenido verbatim de Lenguaje y Comunicación III.",
+    Component: LabMovimientosLiterarios,
+  },
+  "figuras-retoricas": {
+    slug: "figuras-retoricas",
+    titulo: "Laboratorio — Figuras retóricas en la poesía",
+    descripcion:
+      "Arrastra cada figura retórica a su definición y a un verso real, clasifícalas entre figura retórica y forma poética, y comprueba lo aprendido. Contenido verbatim de Lenguaje y Comunicación III.",
+    Component: LabFigurasRetoricas,
+  },
+  "hipotesis-historicas": {
+    slug: "hipotesis-historicas",
+    titulo: "Laboratorio — Formular hipótesis históricas y clasificar fuentes",
+    descripcion:
+      "Clasifica fuentes primarias y secundarias, ordena los pasos para formular una hipótesis histórica y domina el glosario del análisis del pasado. Contenido verbatim de Conciencia Histórica II.",
+    Component: LabHipotesisHistoricas,
+  },
+  "comunicacion-multimodal": {
+    slug: "comunicacion-multimodal",
+    titulo: "Laboratorio — Comunicación digital multimodal",
+    descripcion:
+      "Clasifica elementos digitales por su modo semiótico (texto, imagen, audio, video), empareja los conceptos de identidad digital y algoritmos con su definición y domina el glosario de la era digital. Contenido verbatim de Cultura Digital III.",
+    Component: LabComunicacionMultimodal,
+  },
+  "diversidad-discriminacion": {
+    slug: "diversidad-discriminacion",
+    titulo: "Laboratorio — Diversidad cultural y discriminación",
+    descripcion:
+      "Clasifica las formas de organización social y las manifestaciones de la discriminación, empareja los conceptos clave con su definición y domina el glosario. Contenido verbatim de Ciencias Sociales II.",
+    Component: LabDiversidadDiscriminacion,
+  },
+  "relaciones-poder": {
+    slug: "relaciones-poder",
+    titulo: "Laboratorio — Relaciones de poder e interseccionalidad",
+    descripcion:
+      "Clasifica ejemplos por categoría de análisis (clase, género, etnia, edad), empareja los conceptos de poder e interseccionalidad con su definición y domina el glosario. Contenido verbatim de Ciencias Sociales II.",
+    Component: LabRelacionesPoder,
+  },
+  "politicas-publicas": {
+    slug: "politicas-publicas",
+    titulo: "Laboratorio — El ciclo de las políticas públicas",
+    descripcion:
+      "Ordena las etapas del ciclo de la política pública, empareja los conceptos con su definición y domina el glosario. Contenido verbatim de Ciencias Sociales III.",
+    Component: LabPoliticasPublicas,
+  },
+  "generos-literarios": {
+    slug: "generos-literarios",
+    titulo: "Laboratorio — Géneros literarios",
+    descripcion:
+      "Clasifica obras y características por género literario (narrativo, lírico, dramático, ensayístico), empareja cada género con su rasgo y domina el glosario. Contenido verbatim de Lengua y Comunicación III.",
+    Component: LabGenerosLiterarios,
+  },
+  "present-perfect-ingles": {
+    slug: "present-perfect-ingles",
+    titulo: "Laboratorio — Present perfect: sharing experiences",
+    descripcion:
+      "Construye el present perfect (have/has + past participle), completa oraciones con ever/never/already/yet/just y domina las estructuras clave. Contenido verbatim de Inglés V.",
+    Component: LabPresentPerfectIngles,
+  },
+  "sentido-historico": {
+    slug: "sentido-historico",
+    titulo: "Laboratorio — El sentido histórico",
+    descripcion:
+      "Clasifica actitudes frente al pasado, empareja fenómenos del presente con su raíz histórica y domina el glosario de la memoria colectiva. Contenido verbatim de Conciencia Histórica II.",
+    Component: LabSentidoHistorico,
+  },
+  "subgeneros-narrativos": {
+    slug: "subgeneros-narrativos",
+    titulo: "Laboratorio — Subgéneros narrativos",
+    descripcion:
+      "Clasifica obras y rasgos por subgénero narrativo (suspenso, terror, ciencia ficción, autoficción, neorrealismo urbano, literaturas del Antropoceno), empareja cada subgénero con su rasgo y domina el glosario. Contenido verbatim de Lengua y Comunicación III.",
+    Component: LabSubgenerosNarrativos,
+  },
+  "resena-critica": {
+    slug: "resena-critica",
+    titulo: "Laboratorio — La reseña crítica",
+    descripcion:
+      "Ordena las partes de una reseña crítica, distingue el resumen del juicio crítico y domina el glosario. Contenido verbatim de Lengua y Comunicación III.",
+    Component: LabResenaCritica,
+  },
+  "exposicion-oral": {
+    slug: "exposicion-oral",
+    titulo: "Laboratorio — La exposición oral formal",
+    descripcion:
+      "Clasifica escenarios por formato de exposición oral (coloquio, simposio, foro), empareja los conceptos con su definición y domina el glosario. Contenido verbatim de Lengua y Comunicación III.",
+    Component: LabExposicionOral,
+  },
+  "procesos-ingles": {
+    slug: "procesos-ingles",
+    titulo: "Laboratorio — Describing processes in English",
+    descripcion:
+      "Order the steps of a process with sequencers, classify question and passive-voice structures, and master the key structures. Contenido verbatim de Inglés V.",
+    Component: LabProcesosIngles,
+  },
+  "juventudes-politicas": {
+    slug: "juventudes-politicas",
+    titulo: "Laboratorio — Las juventudes como sujetos políticos",
+    descripcion:
+      "Clasifica ejemplos por forma de participación (electoral, comunitaria, cultural, digital), empareja los conceptos con su definición y domina el glosario. Contenido verbatim de Ciencias Sociales III.",
+    Component: LabJuventudesPoliticas,
+  },
+  "mexico-en-el-mundo": {
+    slug: "mexico-en-el-mundo",
+    titulo: "Laboratorio — México en el mundo (siglos XIX–XXI)",
+    descripcion:
+      "Ordena cronológicamente los procesos históricos, clasifícalos por siglo y domina el glosario de la historia interconectada. Contenido verbatim de Conciencia Histórica II.",
+    Component: LabMexicoEnElMundo,
+  },
+  "consejos-ingles": {
+    slug: "consejos-ingles",
+    titulo: "Lab — Advice in English: should, shouldn't & imperatives",
+    descripcion:
+      "Clasifica oraciones de consejo por su forma, completa recomendaciones y empareja estructuras. Contenido verbatim de Inglés IV.",
+    Component: LabConsejosIngles,
+  },
+  "busqueda-confiable": {
+    slug: "busqueda-confiable",
+    titulo: "Lab — Buscar información confiable en internet",
+    descripcion:
+      "Distingue fuentes confiables de señales de alerta, empareja estrategias de búsqueda con su pregunta clave y domina el glosario. Contenido verbatim de Cultura Digital II.",
+    Component: LabBusquedaConfiable,
+  },
+  "tipos-graficas": {
+    slug: "tipos-graficas",
+    titulo: "Lab — Tipos de gráficas y cuándo usarlas",
+    descripcion:
+      "Empareja cada gráfica con su propósito, clasifica escenarios de datos por la gráfica apropiada y reconoce trampas visuales. Contenido verbatim de Cultura Digital II.",
+    Component: LabTiposGraficas,
+  },
+  "etica-produccion-digital": {
+    slug: "etica-produccion-digital",
+    titulo: "Lab — Creatividad y ética en la producción digital",
+    descripcion:
+      "Clasifica prácticas éticas y no éticas, empareja conceptos con su definición (plagio, deepfake, autoría) y domina el glosario. Contenido verbatim de Cultura Digital II.",
+    Component: LabEticaProduccionDigital,
+  },
+  "carreras-digitales": {
+    slug: "carreras-digitales",
+    titulo: "Lab — Carreras y profesiones del campo digital",
+    descripcion:
+      "Clasifica perfiles profesionales por área, emparéjalos con su función en el mercado y domina el glosario. Contenido verbatim de Cultura Digital III.",
+    Component: LabCarrerasDigitales,
+  },
+  "falacias-logica": {
+    slug: "falacias-logica",
+    titulo: "Lab — Del silogismo a las falacias",
+    descripcion:
+      "Clasifica argumentos por el tipo de falacia que cometen, distingue razonamientos válidos de falacias y domina el glosario lógico. Contenido verbatim de Pensamiento Filosófico y Humanidades III.",
+    Component: LabFalaciasLogica,
+  },
+  "bioetica": {
+    slug: "bioetica",
+    titulo: "Lab — Bioética: ciencia y moral",
+    descripcion:
+      "Clasifica casos según el principio bioético (autonomía, beneficencia, no maleficencia, justicia), empareja conceptos y domina el glosario. Contenido verbatim de Pensamiento Filosófico y Humanidades II.",
+    Component: LabBioetica,
+  },
+  "navegacion-segura": {
+    slug: "navegacion-segura",
+    titulo: "Lab — Navegar seguro en internet",
+    descripcion:
+      "Clasifica prácticas seguras y riesgosas, empareja cada amenaza con su defensa y domina el glosario de seguridad digital. Contenido verbatim de Cultura Digital I.",
+    Component: LabNavegacionSegura,
+  },
+  "algoritmos-deciden": {
+    slug: "algoritmos-deciden",
+    titulo: "Lab — Los algoritmos deciden por nosotros",
+    descripcion:
+      "Clasifica qué decide cada algoritmo, relaciona causa y efecto y reconstruye cómo se arma tu feed. Contenido verbatim de Cultura Digital I.",
+    Component: LabAlgoritmosDeciden,
+  },
+  "tiempo-historico": {
+    slug: "tiempo-historico",
+    titulo: "Lab — Tipos de tiempo histórico",
+    descripcion:
+      "Clasifica hechos por su duración (Braudel: corta, mediana, larga), ordena la línea del tiempo y domina el glosario. Contenido verbatim de Conciencia Histórica I.",
+    Component: LabTiempoHistorico,
+  },
+  "reglas-ingles": {
+    slug: "reglas-ingles",
+    titulo: "Lab — Rules: Must, Mustn't and Have To",
+    descripcion:
+      "Clasifica reglas por su modal (must / mustn't / have to / don't have to), completa enunciados y domina el glosario. Contenido verbatim de Inglés III.",
+    Component: LabReglasIngles,
+  },
+  "tipos-de-preguntas": {
+    slug: "tipos-de-preguntas",
+    titulo: "Lab — Tipos de preguntas: cotidianas, científicas y filosóficas",
+    descripcion:
+      "Clasifica preguntas en cotidianas, científicas y filosóficas, ordénalas en las cinco ramas de la filosofía y profundiza de lo cotidiano a lo filosófico. Contenido verbatim de Pensamiento Filosófico y Humanidades I.",
+    Component: LabTiposDePreguntas,
+  },
+  "herramientas-colaborativas": {
+    slug: "herramientas-colaborativas",
+    titulo: "Lab — Trabajar juntos en la nube",
+    descripcion:
+      "Elige la herramienta colaborativa según la tarea, empareja las funciones de la nube y distingue buenas prácticas de errores. Contenido verbatim de Ciudadanía Digital II.",
+    Component: LabHerramientasColaborativas,
   },
 };
 

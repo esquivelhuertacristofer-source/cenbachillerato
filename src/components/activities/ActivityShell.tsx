@@ -11,8 +11,22 @@ import {
   NarradorControl,
   ContenidoNarrable,
 } from "@/components/activities/NarracionContext";
+import { ExerciseTools, type Herramienta } from "@/components/activities/ExerciseTools";
 
 const PHASE_LABELS = ["Activación", "Práctica", "Aplicación"];
+
+/**
+ * Herramientas de cálculo según el área de la UAC:
+ *   · Matemáticas (PM-*) → calculadora científica.
+ *   · Ciencias / CNEyT (CNEYT-*) → calculadora + tabla periódica.
+ * El resto de áreas no requiere herramientas de cálculo.
+ */
+function herramientasPorArea(uacCodigo: string): Herramienta[] {
+  const area = uacCodigo.split("-")[0];
+  if (area === "PM") return ["calc"];
+  if (area === "CNEYT") return ["calc", "tabla"];
+  return [];
+}
 
 export interface ActivityShellProps {
   titulo: string;
@@ -53,6 +67,7 @@ export function ActivityShell({
   const tc = getTipoConfig(tipo);
   const isCompleta = estado === "completada";
   const isBorrador = nivel_revision === "borrador";
+  const herramientas = herramientasPorArea(uacCodigo);
 
   // Navegación lineal dentro de la progresión (footer Anterior/Siguiente).
   const idx = actividadesProg.findIndex((a) => a.orden === ordenNum);
@@ -535,6 +550,10 @@ export function ActivityShell({
           )}
         </div>
       </div>
+
+      {herramientas.length > 0 && (
+        <ExerciseTools tools={herramientas} accentHex={color.hex} />
+      )}
     </NarracionProvider>
   );
 }
