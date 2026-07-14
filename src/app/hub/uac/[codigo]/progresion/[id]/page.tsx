@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { getUser, getProfile } from "@/lib/supabase-helpers";
 import { getUACPorCodigo } from "@/lib/mccems/estructura";
-import { getActividadesConEstado, getSiguienteProgresion } from "@/lib/queries/hub";
+import { getActividadesConEstadoOrThrow, getSiguienteProgresion } from "@/lib/queries/hub";
 import { getRSCColor } from "@/components/hub/hub-colors";
 import { ProgresionClient } from "@/components/hub-v2/ProgresionClient";
 import type { Metadata } from "next";
@@ -35,8 +35,14 @@ export default async function ProgresionPage({ params }: Props) {
 
   if (isNaN(numParsed)) notFound();
 
-  const { progresion, actividades } = await getActividadesConEstado(codigo, numParsed, user.id);
-  if (!progresion) notFound();
+  const { progresion, actividades } = await getActividadesConEstadoOrThrow(codigo, numParsed, user.id);
+  if (!progresion) {
+    // Si el número está fuera del rango esperado → 404 genuino.
+    // Si está dentro del rango pero RLS no devolvió nada → redirigir a la UAC
+    // para evitar un 404 engañoso cuando la policy bloquea el acceso.
+    if (numParsed < 1 || numParsed > uac.totalProgresionesEsperadas) notFound();
+    redirect(`/hub/uac/${codigo}`);
+  }
 
   const color = getRSCColor(uac.recursoCodigo ?? null);
   const siguiente = await getSiguienteProgresion(codigo, numParsed);

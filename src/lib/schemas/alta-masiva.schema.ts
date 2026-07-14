@@ -1,5 +1,12 @@
 import { z } from 'zod';
 
+// Límite total de filas por archivo (validado en cliente y servidor).
+export const MAX_FILAS_ALTA_MASIVA = 5000;
+
+// Tamaño de lote enviado por llamada al server action, para no bloquear
+// el CPU budget de una sola invocación del Worker con archivos grandes.
+export const ALTA_MASIVA_BATCH_SIZE = 150;
+
 export const FilaCSVSchema = z.object({
   rol: z.enum(['docente', 'alumno']),
   nombre: z.string().min(1).max(100).trim(),

@@ -19,6 +19,7 @@ import { TRANSFORMACIONES, clasificaBien, QUIZ_COMPRENSION, type TipoCambio } fr
 import { LabSfx } from "./lab-audio";
 import { FichaTeorica } from "./_ficha";
 import { PROPIEDADES_FICHA } from "./propiedades-ficha";
+import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
 
 const PropiedadesMateriaScene = dynamic(() => import("./PropiedadesMateriaScene"), {
   ssr: false,
@@ -123,6 +124,7 @@ export function LabPropiedadesMateria({ color }: PracticaLabProps) {
     } else {
       detenerSonidos();
     }
+    // `audioRef.current` and `detenerSonidos` are refs/stable functions, not reactive; only the listed deps actually change.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sonido, playing, transKey]);
 
@@ -197,6 +199,7 @@ export function LabPropiedadesMateria({ color }: PracticaLabProps) {
         }
         return est;
       });
+      void guardarEstrellas(RETO_KEY, est);
     }
   };
   const reset = () => {

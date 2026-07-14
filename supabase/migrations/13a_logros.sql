@@ -1,5 +1,5 @@
 -- ============================================================
--- 13_logros.sql
+-- 13a_logros.sql
 -- Sistema de logros (achievements) del alumno
 --   · public.logros          → catálogo de definiciones (qué logros existen)
 --   · public.logros_alumno   → qué alumno desbloqueó qué logro y cuándo
@@ -41,6 +41,12 @@ CREATE POLICY "logros_select_authenticated"
 CREATE POLICY "logros_admin_only_write"
   ON public.logros FOR ALL
   USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE id = auth.uid() AND role IN ('admin', 'super_admin')
+    )
+  )
+  WITH CHECK (
     EXISTS (
       SELECT 1 FROM public.profiles
       WHERE id = auth.uid() AND role IN ('admin', 'super_admin')

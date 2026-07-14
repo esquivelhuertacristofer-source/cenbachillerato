@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * Laboratorio 3D — "Optimización con la derivada: la lata de mínimo material".
@@ -46,6 +46,7 @@ const OPT_COL = "#34D399";    // óptimo / tangente horizontal
 const R_COL = "#7dd3fc";      // sonda r
 const WARN = "#FF8A3C";
 
+import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
 const RETO_KEY = "cen-cilindro-reto";
 
 /** Instrumentos de diseño/medición de un envase (3 correctos + 3 distractores). */
@@ -153,6 +154,7 @@ export function LabOptimizacion({ color }: PracticaLabProps) {
       try { window.localStorage.setItem(RETO_KEY, String(mejor)); } catch { /* sin persistencia */ }
       return mejor;
     });
+    void guardarEstrellas(RETO_KEY, estrellas);
   }, []);
 
   // valores en vivo

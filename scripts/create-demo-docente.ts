@@ -19,7 +19,9 @@ import type { Database } from "../src/types/database.types";
 config({ path: resolve(process.cwd(), ".env.local") });
 
 const DEMO_EMAIL = "docente-demo@cenbachillerato-demo.com";
-const DEMO_PASSWORD = "Demo2026!";
+// Configurable vía DEMO_SEED_PASSWORD (.env.local); si no, usa el valor
+// documentado en docs/DEMO-USERS.md.
+const DEMO_PASSWORD = process.env.DEMO_SEED_PASSWORD ?? "Demo2026!";
 const DEMO_NOMBRE = "Prof. Demo Bachillerato";
 
 async function main() {

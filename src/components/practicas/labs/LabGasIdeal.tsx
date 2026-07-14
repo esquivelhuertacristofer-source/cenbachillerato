@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * Laboratorio 3D — Gas ideal y primera ley de la termodinámica.
@@ -55,6 +55,7 @@ const T_COL = "#FF7A45"; // temperatura → cálido
 const V_COL = "#3BA7FF"; // volumen → azul
 const N_COL = "#34D399"; // cantidad → verde
 const WARN = "#FF8A3C";
+import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
 const RETO_KEY = "cen-gas-ideal-reto";
 
 export function LabGasIdeal({ color }: PracticaLabProps) {
@@ -157,6 +158,7 @@ export function LabGasIdeal({ color }: PracticaLabProps) {
       try { window.localStorage.setItem(RETO_KEY, String(mejor)); } catch { /* ignore */ }
       return mejor;
     });
+    void guardarEstrellas(RETO_KEY, est);
   }, []);
 
   // pasos guiados (pilar: seguir pasos)

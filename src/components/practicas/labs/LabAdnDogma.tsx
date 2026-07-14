@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * Laboratorio 3D — "El dogma central de la biología molecular".
@@ -67,6 +67,7 @@ const AdnDogmaScene = dynamic(() => import("./AdnDogmaScene"), {
 const CODON_DEMO: string[] = ["AUG", "UUU", "UUC", "GCA", "AAG", "GGU", "UGU", "UAA", "UAG", "UGA"];
 
 /** Registro local del mejor desempeño en el reto de traducción de codones. */
+import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
 const RETO_KEY = "cen-adn-reto";
 
 /** Equipo de protección y bioseguridad de un laboratorio de biología molecular. */
@@ -249,6 +250,7 @@ export function LabAdnDogma({ color }: PracticaLabProps) {
       }
       return mejor;
     });
+    void guardarEstrellas(RETO_KEY, estrellas);
   }, []);
 
   const toggleSonido = useCallback(async () => {

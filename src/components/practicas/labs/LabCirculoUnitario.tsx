@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * Laboratorio 3D — El círculo unitario genera las ondas seno y coseno.
@@ -42,6 +42,7 @@ const SIN_COL = "#34D399";
 const COS_COL = "#60a5fa";
 const TAN_COL = "#f472b6";
 const WARN = "#FF8A3C";
+import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
 const RETO_KEY = "cen-circulo-reto";
 
 /* Instrumentos de trazo (pilar EQUIPARSE) — 3 correctos + 3 distractores. */
@@ -149,6 +150,7 @@ export function LabCirculoUnitario({ color }: PracticaLabProps) {
       try { window.localStorage.setItem(RETO_KEY, String(mejor)); } catch { /* ignore */ }
       return mejor;
     });
+    void guardarEstrellas(RETO_KEY, est);
   }, []);
 
   const senStr = exacto ? exacto.sinStr : fmtNum(t.sin);

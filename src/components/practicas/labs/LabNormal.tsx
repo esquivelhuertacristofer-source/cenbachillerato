@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * Laboratorio 3D — Distribución normal (campana de Gauss).
@@ -58,6 +58,7 @@ const ORO = "#ffd24a";
 const AZUL = "#5fb0ff";
 const MAGENTA = "#f0a6ff";
 
+import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
 const RETO_KEY = "cen-normal-reto";
 
 // Pilar EQUIPARSE: en un estudio estadístico el “equipo” es el instrumental para
@@ -173,6 +174,7 @@ export function LabNormal({ color }: PracticaLabProps) {
       }
       return nx;
     });
+    void guardarEstrellas(RETO_KEY, est);
   }, []);
 
   const reset = () => {

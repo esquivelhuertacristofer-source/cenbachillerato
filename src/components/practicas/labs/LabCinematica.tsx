@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * Laboratorio 3D — "Cinemática del MRUA: acelerar y frenar".
@@ -50,6 +50,7 @@ const C_ACC = "#34D399";   // aceleración (positiva)
 const C_BRK = "#f87171";   // aceleración (frenado)
 const WARN = "#FF8A3C";
 
+import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
 const RETO_KEY = "cen-mrua-reto";
 
 /** Instrumentos de una prueba de cinemática en campo (3 correctos + 3 distractores). */
@@ -156,6 +157,7 @@ export function LabCinematica({ color }: PracticaLabProps) {
       try { window.localStorage.setItem(RETO_KEY, String(mejor)); } catch { /* sin persistencia */ }
       return mejor;
     });
+    void guardarEstrellas(RETO_KEY, estrellas);
   }, []);
 
   const mov = resolver(a1, t1, a2);

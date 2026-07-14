@@ -98,6 +98,7 @@ function useDisposeCurvas(...curvas: THREE.Line[]) {
         (c.material as THREE.Material).dispose();
       }
     };
+    // Cleanup on unmount: `curvas` is stable after initialization, not reactive.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 }
@@ -127,7 +128,7 @@ function OndaViajera({ f, color, playing }: { f: number; color: string; playing:
   const aVis = 0.62;
 
   const tRef = useRef(0);
-  // se crea una sola vez; el color se actualiza en cada render con .color.set()
+  // Geometry created once; `color` is applied via .color.set() below to avoid recreating the mesh on every color change.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const curva = useMemo(() => nuevaCurva(color, 0.95, 2), []);
   useDisposeCurvas(curva);
@@ -286,7 +287,7 @@ function EscenaVisible({ nm, playing }: Pick<EspectroSceneProps, "nm" | "playing
   const aVis = 0.7;
 
   const tRef = useRef(0);
-  // se crea una sola vez; el color se actualiza en cada render con .color.set()
+  // Geometry created once; `col` is applied via .color.set() below to avoid recreating the mesh on every color change.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const curva = useMemo(() => nuevaCurva(col, 0.98, 2), []);
   useDisposeCurvas(curva);

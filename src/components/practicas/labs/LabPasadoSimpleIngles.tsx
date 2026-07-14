@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * Laboratorio — Past Simple: what did you do yesterday?
@@ -35,6 +35,7 @@ import {
 } from "./pasado-simple-ingles-data";
 
 const NO = "#FF5E5E";
+import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
 const RETO_KEY = "cen-pasado-simple-reto";
 
 type Modo = "clasificar" | "construir" | "oraciones";
@@ -184,6 +185,7 @@ export function LabPasadoSimpleIngles({ color }: PracticaLabProps) {
       }
       return est;
     });
+    void guardarEstrellas(RETO_KEY, est);
   };
 
   const objetivos = [
@@ -211,6 +213,14 @@ export function LabPasadoSimpleIngles({ color }: PracticaLabProps) {
       e.preventDefault();
       const id = e.dataTransfer.getData("text/plain");
       if (id) onDrop(id);
+    },
+    role: "button" as const,
+    tabIndex: 0,
+    onKeyDown: (e: React.KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        (e.currentTarget as HTMLElement).click();
+      }
     },
   });
 

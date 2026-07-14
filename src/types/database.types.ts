@@ -378,6 +378,24 @@ export interface Database {
           }
         ];
       };
+      valoraciones_lab: {
+        Row: {
+          id: string;
+          alumno_id: string;
+          reto_key: string;
+          estrellas: number;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          alumno_id: string;
+          reto_key: string;
+          estrellas: number;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["valoraciones_lab"]["Insert"]>;
+        Relationships: [];
+      };
       user_consents: {
         Row: {
           id: string;

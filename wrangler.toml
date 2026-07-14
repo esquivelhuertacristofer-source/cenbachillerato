@@ -6,6 +6,14 @@ compatibility_flags = ["nodejs_compat"]
 [assets]
 directory = ".open-next/assets"
 
+[[kv_namespaces]]
+binding = "NEXT_INC_CACHE_KV"
+id = "0da92b588ccb44aa9af534d2596f541b"
+
+[[kv_namespaces]]
+binding = "RATE_LIMIT_KV"
+id = "8ede628e17004471b6301940af3f43b4"
+
 [observability]
 enabled = true
 

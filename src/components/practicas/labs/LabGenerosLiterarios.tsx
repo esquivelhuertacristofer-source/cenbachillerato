@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * Laboratorio — Géneros literarios: formas de contar y decir
@@ -33,6 +33,7 @@ import {
 } from "./generos-literarios-data";
 
 const NO = "#FF5E5E";
+import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
 const RETO_KEY = "cen-generos-literarios-reto";
 
 type Modo = "obras" | "rasgos" | "glosario";
@@ -176,6 +177,7 @@ export function LabGenerosLiterarios({ color }: PracticaLabProps) {
       }
       return est;
     });
+    void guardarEstrellas(RETO_KEY, est);
   };
 
   const objetivos = [
@@ -203,6 +205,14 @@ export function LabGenerosLiterarios({ color }: PracticaLabProps) {
       e.preventDefault();
       const id = e.dataTransfer.getData("text/plain");
       if (id) onDrop(id);
+    },
+    role: "button" as const,
+    tabIndex: 0,
+    onKeyDown: (e: React.KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        (e.currentTarget as HTMLElement).click();
+      }
     },
   });
 

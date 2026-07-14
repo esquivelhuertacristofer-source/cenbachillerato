@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * Laboratorio 3D — Conservación de la energía: el péndulo.
@@ -50,6 +50,7 @@ const EP_COL = "#3BA7FF";
 const EC_COL = "#FFB13B";
 const HEAT_COL = "#FF5A5A";
 const WARN = "#FF8A3C";
+import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
 const RETO_KEY = "cen-conservacion-reto";
 
 export function LabConservacion({ color }: PracticaLabProps) {
@@ -143,6 +144,7 @@ export function LabConservacion({ color }: PracticaLabProps) {
       try { window.localStorage.setItem(RETO_KEY, String(mejor)); } catch { /* ignore */ }
       return mejor;
     });
+    void guardarEstrellas(RETO_KEY, est);
   }, []);
 
   // pasos guiados (pilar: seguir pasos)

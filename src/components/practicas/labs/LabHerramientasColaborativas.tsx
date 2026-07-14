@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * Laboratorio — Trabajar juntos en la nube: herramientas colaborativas
@@ -37,6 +37,7 @@ import {
 } from "./herramientas-colaborativas-data";
 
 const NO = "#FF5E5E";
+import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
 const RETO_KEY = "cen-herramientas-colaborativas-reto";
 
 type Modo = "herramienta" | "funciones" | "practicas";
@@ -181,6 +182,7 @@ export function LabHerramientasColaborativas({ color }: PracticaLabProps) {
       }
       return est;
     });
+    void guardarEstrellas(RETO_KEY, est);
   };
 
   const objetivos = [
@@ -208,6 +210,14 @@ export function LabHerramientasColaborativas({ color }: PracticaLabProps) {
       e.preventDefault();
       const id = e.dataTransfer.getData("text/plain");
       if (id) onDrop(id);
+    },
+    role: "button" as const,
+    tabIndex: 0,
+    onKeyDown: (e: React.KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        (e.currentTarget as HTMLElement).click();
+      }
     },
   });
 

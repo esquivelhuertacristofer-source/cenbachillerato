@@ -4,7 +4,7 @@ import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
-import { getSupabaseBrowser } from "@/lib/supabase-browser";
+import { iniciarSesion } from "@/lib/actions/iniciar-sesion";
 import { springs, stagger } from "@/lib/motion/tokens";
 import { useReducedMotion } from "@/lib/motion/hooks";
 
@@ -28,62 +28,27 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      const supabase = getSupabaseBrowser();
-
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
+      const result = await iniciarSesion({
         email: email.trim(),
         password,
+        consentimiento,
       });
 
-      if (authError) {
-        const msg =
-          authError.message === "Invalid login credentials"
-            ? "Correo o contraseña incorrectos."
-            : authError.message === "Email not confirmed"
-            ? "Debes confirmar tu correo electrónico antes de acceder."
-            : "Ocurrió un error al iniciar sesión. Intenta de nuevo.";
-        setError(msg);
+      if ("error" in result) {
+        setError(result.error);
         return;
       }
 
-      if (!data.user) {
-        setError("No se pudo obtener la sesión. Intenta de nuevo.");
-        return;
-      }
-
-      // supabase-js NO lanza en error de insert: devuelve { error }. Por eso
-      // capturamos ambos caminos (el {error} normal y un throw inesperado de red)
-      // para no perder señal de fallos reales (RLS, conectividad). El consentimiento
-      // puede ya existir (idempotente), así que nunca bloquea el login.
-      try {
-        const { error: consentError } = await supabase.from("user_consents").insert([
-          { user_id: data.user.id, document_type: "privacy", document_version: "1.0" },
-          { user_id: data.user.id, document_type: "terms", document_version: "1.0" },
-        ]);
-        if (consentError) {
-          console.error("[LoginPage] no se pudo registrar consentimiento:", consentError.message);
-        }
-      } catch (consentErr) {
-        console.error("[LoginPage] error inesperado al registrar consentimiento:", consentErr);
-      }
-
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", data.user.id)
-        .single();
-
-      const role = profile?.role ?? "student";
-
-      if (role === "student") {
+      if (result.rol === "student") {
         router.replace("/hub");
-      } else if (role === "teacher") {
+      } else if (result.rol === "teacher") {
         router.replace("/dashboard/docente");
       } else {
         router.replace("/admin/escuelas");
       }
+      router.refresh();
     } catch (err) {
-      console.error("[LoginPage] error:", err);
+      if (process.env.NODE_ENV === 'development') console.error("[LoginPage] error:", err);
       setError("Error inesperado. Por favor intenta más tarde.");
     } finally {
       setLoading(false);

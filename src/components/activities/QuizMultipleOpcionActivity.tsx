@@ -191,6 +191,7 @@ export function QuizMultipleOpcionActivity({ actividad, onProgreso, color = FALL
         setTimeout(() => { void fireworks(); }, 400);
       }
     }
+  // `aciertos`/`total` are computed from stable `respuestasArr`; only `fase` is reactive here — adding the others would re-trigger on every answer selection.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fase]);
 

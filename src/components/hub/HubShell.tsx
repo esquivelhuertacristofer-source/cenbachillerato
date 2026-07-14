@@ -38,11 +38,12 @@ function inicialDia(fecha: string): string {
 }
 
 const NAV_ITEMS = [
-  { href: "/hub",                       icon: "fa-house",       label: "Inicio",       exact: true  },
-  { href: "/hub/recursos/laboratorios", icon: "fa-flask",       label: "Laboratorios", exact: false },
-  { href: "/hub/recursos",              icon: "fa-layer-group", label: "Recursos",     exact: false },
-  { href: "/hub/biblioteca",            icon: "fa-book-open",   label: "Biblioteca",   exact: false },
-  { href: "/hub/progreso",              icon: "fa-chart-line",  label: "Progreso",     exact: false },
+  { href: "/hub",                       icon: "fa-house",           label: "Inicio",       exact: true  },
+  { href: "/hub/recursos/laboratorios", icon: "fa-flask",           label: "Laboratorios", exact: false },
+  { href: "/hub/recursos",              icon: "fa-layer-group",     label: "Recursos",     exact: false },
+  { href: "/hub/biblioteca",            icon: "fa-book-open",       label: "Biblioteca",   exact: false },
+  { href: "/hub/progreso",              icon: "fa-chart-line",      label: "Progreso",     exact: false },
+  { href: "/hub/buscar",               icon: "fa-magnifying-glass", label: "Buscar",       exact: false },
 ] as const;
 
 /** Coincidencia por prefijo más largo: solo un item se ilumina aunque varias

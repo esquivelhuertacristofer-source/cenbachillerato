@@ -195,10 +195,9 @@ export function PracticaRunner({
               }}
             >
               <i className="fa-solid fa-flask-vial" style={{ fontSize: 40, color: "rgba(255,255,255,0.18)" }} />
-              <p style={{ fontSize: 15, fontWeight: 700, color: "#fff", margin: 0 }}>Práctica en construcción</p>
+              <p style={{ fontSize: 15, fontWeight: 700, color: "#fff", margin: 0 }}>Práctica próximamente</p>
               <p style={{ fontSize: 13, color: "rgba(255,255,255,0.50)", margin: 0, maxWidth: 380 }}>
-                El laboratorio «{slug}» aún no está registrado. Regístralo en
-                src/components/practicas/registry.tsx.
+                Esta práctica experimental aún no está disponible. Vuelve pronto.
               </p>
             </div>
           )}

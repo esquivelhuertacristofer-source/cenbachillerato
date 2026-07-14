@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * Laboratorio — Fuentes históricas: selección, evaluación y contraste
@@ -33,6 +33,7 @@ import {
 } from "./fuentes-historicas-data";
 
 const NO = "#FF5E5E";
+import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
 const RETO_KEY = "cen-fuentes-historicas-reto";
 
 type Modo = "tipos" | "criterios" | "glosario";
@@ -176,6 +177,7 @@ export function LabFuentesHistoricas({ color }: PracticaLabProps) {
       }
       return est;
     });
+    void guardarEstrellas(RETO_KEY, est);
   };
 
   const objetivos = [
@@ -203,6 +205,14 @@ export function LabFuentesHistoricas({ color }: PracticaLabProps) {
       e.preventDefault();
       const id = e.dataTransfer.getData("text/plain");
       if (id) onDrop(id);
+    },
+    role: "button" as const,
+    tabIndex: 0,
+    onKeyDown: (e: React.KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        (e.currentTarget as HTMLElement).click();
+      }
     },
   });
 

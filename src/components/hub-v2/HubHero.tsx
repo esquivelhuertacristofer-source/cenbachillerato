@@ -71,7 +71,7 @@ export default function HubHero({
           setLabs(data);
         }
       } catch (err) {
-        console.error("Error loading labs for hero:", err);
+        if (process.env.NODE_ENV === 'development') console.error("Error loading labs for hero:", err);
       }
     })();
     return () => {

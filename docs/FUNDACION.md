@@ -232,9 +232,11 @@ Checklist al clonar:
 - Archivos `NN_descripcion.sql` numerados y ordenados en `supabase/migrations/`.
 - **Idempotencia:** `CREATE OR REPLACE FUNCTION`, `DROP POLICY IF EXISTS` antes
   de `CREATE POLICY`. Re-correr una migración no debe romper nada.
-- **Sin colisiones de número.** *(Deuda conocida en este repo: existen
-  `13_logros.sql` y `13_rls_docente_intentos.sql`. En la plataforma hermana,
-  garantiza números únicos — el orden de aplicación importa.)*
+- **Sin colisiones de número.** *(Resuelto: `13_logros.sql` se renombró a
+  `13a_logros.sql` — `13_rls_docente_intentos.sql` conserva el número por
+  encajar en la secuencia de endurecimiento de RLS 11→12→13→14→15→16. En la
+  plataforma hermana, garantiza números únicos desde el inicio — el orden de
+  aplicación importa.)*
 - Toda policy nueva: prueba que `super_admin` (escuela_id NULL) **no** queda
   bloqueado por accidente (ver §1). Fue un bug real corregido en la migr. 15.
 

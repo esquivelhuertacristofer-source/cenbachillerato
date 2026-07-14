@@ -9,6 +9,7 @@ export default async function DocenteLayout({
 }) {
   const user = await getUser();
   if (!user) redirect("/log-in");
+  if (user.user_metadata?.must_change_password === true) redirect("/cambiar-password");
 
   const profile = await getProfile(user.id);
   if (!profile) redirect("/log-in");

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Sparkles, ArrowRight, Zap } from 'lucide-react';
 
 const MCCEMS_INSIGHTS = [
@@ -23,16 +23,15 @@ export default function WelcomeBanner({
   isDark = true,
 }: WelcomeBannerProps) {
   const [aiInsight, setAiInsight] = useState('');
-  const insightSet = useRef(false);
+  // Lazy initializer runs once on mount — no impure call during render.
+  const [insightIdx] = useState(() => Math.floor(Date.now() / 1000) % MCCEMS_INSIGHTS.length);
 
   useEffect(() => {
-    if (insightSet.current) return;
-    insightSet.current = true;
     const id = setTimeout(() => {
-      setAiInsight(MCCEMS_INSIGHTS[Math.floor(Math.random() * MCCEMS_INSIGHTS.length)] ?? '');
+      setAiInsight(MCCEMS_INSIGHTS[insightIdx] ?? '');
     }, 0);
     return () => clearTimeout(id);
-  }, []);
+  }, [insightIdx]);
 
   return (
     <div className={`relative overflow-hidden rounded-[4rem] p-12 md:p-20 shadow-2xl group border transition-all duration-1000 noise-texture ${

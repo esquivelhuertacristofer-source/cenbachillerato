@@ -1,7 +1,7 @@
 'use server';
 
 import { z } from 'zod';
-import { getUser, getSupabaseServer } from '@/lib/supabase-helpers';
+import { getUser, getProfile, getSupabaseServer } from '@/lib/supabase-helpers';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
 
 const CambiarPasswordSchema = z.object({
@@ -52,7 +52,10 @@ export async function cambiarPassword(
     .update({ must_change_password: false } as any)
     .eq('id', user.id);
 
-  // Devolver el rol para que el cliente redirija al dashboard correcto
-  const role = (user.user_metadata?.role as string | undefined) ?? 'student';
+  // Devolver el rol para que el cliente redirija al dashboard correcto.
+  // Se lee de profiles.role (fuente de verdad), no de user_metadata: el JWT
+  // puede traer un rol obsoleto si el admin lo cambió después del alta.
+  const profile = await getProfile(user.id);
+  const role = profile?.role ?? 'student';
   return { ok: true, rol: role };
 }

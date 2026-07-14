@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * Laboratorio 3D — Parábolas y funciones cuadráticas (tiro parabólico).
@@ -56,6 +56,7 @@ const VERDE = "#34D399";
 const ORO = "#ffd24a";
 const ROJO = "#ff6b6b";
 const WARN = "#FF8A3C";
+import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
 const RETO_KEY = "cen-parabola-reto";
 
 /** Instrumentos de medición del topógrafo del tiro (3 correctos + 3 distractores). */
@@ -160,6 +161,7 @@ export function LabParabola({ color }: PracticaLabProps) {
       try { window.localStorage.setItem(RETO_KEY, String(mejor)); } catch { /* ignore */ }
       return mejor;
     });
+    void guardarEstrellas(RETO_KEY, est);
   }, []);
 
   // magnitudes matemáticas (deterministas)

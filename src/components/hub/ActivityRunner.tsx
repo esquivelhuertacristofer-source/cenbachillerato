@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { entregarActividad } from "@/lib/actions/entregar-actividad";
+import { syncQueue, EVENTO_SYNC_RESUELTO } from "@/lib/sync-queue";
 import { ActivityShell } from "@/components/activities/ActivityShell";
 import { LecturaActivity } from "@/components/activities/LecturaActivity";
 import { QuizMultipleOpcionActivity } from "@/components/activities/QuizMultipleOpcionActivity";
@@ -73,22 +74,58 @@ export function ActivityRunner({
   const [reintentando, setReintentando] = useState(false);
   const ultimoResultado = useRef<ResultadoActividad | null>(null);
 
+  // Si un flush de fondo de la sync-queue (evento 'online' o el intervalo)
+  // resuelve esta entrega mientras seguimos montados en la actividad, el
+  // banner de error quedaría obsoleto (el alumno ya no tiene nada pendiente
+  // pero seguiría viendo "se sincronizará..."). Nos suscribimos al evento
+  // que dispara flush() para limpiarlo sin sondear.
+  useEffect(() => {
+    function onSyncResuelto(e: Event) {
+      const detail = (e as CustomEvent<{ actividadId: string }>).detail;
+      if (detail?.actividadId === actividadId) setErrorEntrega(null);
+    }
+    window.addEventListener(EVENTO_SYNC_RESUELTO, onSyncResuelto);
+    return () => window.removeEventListener(EVENTO_SYNC_RESUELTO, onSyncResuelto);
+  }, [actividadId]);
+
   async function handleProgreso(resultado: ResultadoActividad): Promise<ResultadoEntrega> {
     if (!resultado.completada) return { ok: true };
 
     ultimoResultado.current = resultado;
-    const res = await entregarActividad(actividadId, {
+    const payload = {
       puntaje: resultado.puntaje,
       respuestas: resultado.respuestas,
       tiempoSegundos: resultado.tiempoSegundos,
-    });
+    };
+
+    // entregarActividad normalmente resuelve { ok } | { error }, pero un
+    // corte de red real (offline/DNS/TLS) hace que el fetch interno de
+    // Supabase RECHACE la promesa en vez de resolver { error }. Sin este
+    // try/catch esa excepción quedaría como unhandled rejection y el
+    // alumno vería un fallo silencioso (ni banner ni cola). Lo normalizamos
+    // a la misma forma { error } para que caiga en la rama de abajo.
+    let res: Awaited<ReturnType<typeof entregarActividad>>;
+    try {
+      res = await entregarActividad(actividadId, payload);
+    } catch (e) {
+      res = { error: e instanceof Error ? e.message : "Sin conexión con el servidor" };
+    }
 
     if ("error" in res) {
       setErrorEntrega(res.error);
+      // No se pierde el trabajo del alumno: se encola para reenviarse solo
+      // en cuanto vuelva la conexión (evento 'online' o el intervalo de
+      // sync-queue), o cuando el alumno pulse "Reintentar".
+      syncQueue.enqueue(actividadId, payload);
       return { ok: false, error: res.error };
     }
 
     setErrorEntrega(null);
+    // Limpia cualquier copia que haya quedado encolada de un intento previo
+    // fallido de esta misma actividad (p.ej. el alumno reintentó manualmente
+    // y esta vez entregarActividad tuvo éxito directamente, sin pasar por
+    // reintentarEntrega, que es el único lugar que ya hacía este dequeue).
+    syncQueue.dequeue(actividadId);
     // Avanzar a la siguiente actividad de la progresión. Si es la última,
     // volver a la progresión (ahí vive la celebración de "completada").
     const idx = actividadesProg.findIndex((a) => a.orden === ordenNum);
@@ -107,7 +144,8 @@ export function ActivityRunner({
     if (!resultado || reintentando) return;
     setReintentando(true);
     try {
-      await handleProgreso(resultado);
+      const r = await handleProgreso(resultado);
+      if (r.ok) syncQueue.dequeue(actividadId); // limpia la cola si quedó una copia pendiente
     } finally {
       setReintentando(false);
     }
@@ -135,7 +173,25 @@ export function ActivityRunner({
   // Cada rama difiere solo en el hijo; `shellProps` es idéntico. Calculamos el
   // hijo una vez para poder renderizar el banner de error de entrega en todas.
   let activity: React.ReactNode;
-  if (tipo === "lectura") {
+  if (contenido == null) {
+    activity = (
+      <div style={{
+        borderRadius: 20,
+        border: "1px solid rgba(255,200,80,0.18)",
+        background: "rgba(255,200,80,0.06)",
+        padding: "48px 32px",
+        display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: 12,
+      }}>
+        <i className="fa-solid fa-circle-exclamation" style={{ fontSize: 40, color: "rgba(255,200,80,0.55)" }} />
+        <p style={{ fontSize: 15, fontWeight: 700, color: "#fff", margin: 0 }}>
+          Contenido no disponible
+        </p>
+        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.50)", margin: 0, maxWidth: 360 }}>
+          No se pudo cargar el contenido de esta actividad. Intenta recargar la página.
+        </p>
+      </div>
+    );
+  } else if (tipo === "lectura") {
     activity = (
       <LecturaActivity
         actividad={{ ...base, tipo: "lectura", contenido: contenido as never }}
@@ -246,26 +302,26 @@ export function ActivityRunner({
     <ActivityShell {...shellProps}>
       {errorEntrega && (
         <div
-          role="alert"
+          role="status"
           style={{
             display: "flex",
             alignItems: "center",
             gap: 12,
             flexWrap: "wrap",
             borderRadius: 14,
-            border: "1px solid rgba(248,113,113,0.45)",
-            background: "rgba(248,113,113,0.10)",
+            border: "1px solid rgba(255,200,80,0.35)",
+            background: "rgba(255,200,80,0.08)",
             padding: "14px 16px",
             marginBottom: 16,
           }}
         >
-          <i className="fa-solid fa-triangle-exclamation" style={{ color: "#fca5a5", fontSize: 18 }} />
+          <i className="fa-solid fa-cloud-arrow-up" style={{ color: "rgba(255,200,80,0.85)", fontSize: 18 }} />
           <div style={{ flex: 1, minWidth: 200 }}>
-            <p style={{ fontSize: 14, fontWeight: 700, color: "#fecaca", margin: 0 }}>
-              No se pudo guardar tu avance
+            <p style={{ fontSize: 14, fontWeight: 700, color: "#FFE0A3", margin: 0 }}>
+              Guardado. Se sincronizará cuando haya conexión
             </p>
-            <p style={{ fontSize: 13, color: "rgba(254,202,202,0.85)", margin: "2px 0 0" }}>
-              {errorEntrega} Tu respuesta sigue aquí; vuelve a intentarlo.
+            <p style={{ fontSize: 13, color: "rgba(255,224,163,0.85)", margin: "2px 0 0" }}>
+              {errorEntrega}. Tu respuesta no se perdió: se enviará sola en cuanto haya conexión, o puedes reintentar ahora.
             </p>
           </div>
           <button
@@ -274,8 +330,8 @@ export function ActivityRunner({
             disabled={reintentando}
             style={{
               borderRadius: 10,
-              border: "1px solid rgba(248,113,113,0.55)",
-              background: "rgba(248,113,113,0.18)",
+              border: "1px solid rgba(255,200,80,0.55)",
+              background: "rgba(255,200,80,0.18)",
               color: "#fff",
               fontSize: 13,
               fontWeight: 700,

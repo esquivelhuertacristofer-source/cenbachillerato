@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 import type { AreaColor } from "@/components/hub/hub-colors";
 import { getTipoConfig } from "@/components/hub/hub-colors";
 import { HubBreadcrumb } from "@/components/hub/HubBreadcrumb";
@@ -14,6 +14,26 @@ import {
 import { ExerciseTools, type Herramienta } from "@/components/activities/ExerciseTools";
 
 const PHASE_LABELS = ["Activación", "Práctica", "Aplicación"];
+
+const TIEMPO_MIN: Record<string, number> = {
+  lectura: 10, quiz_multiple_opcion: 5, quiz_verdadero_falso: 4, fill_blanks: 8,
+  ejercicio_matematico: 12, reflexion_escrita: 15, video_con_preguntas: 10,
+  infografia: 6, debate_estructurado: 15, simulacion: 10,
+  glosario_interactivo: 8, autoevaluacion: 10,
+};
+
+const ROMAN_TO_N: Record<string, number> = { I: 1, II: 2, III: 3, IV: 4, V: 5, VI: 6 };
+
+const REFLEXION_Q: Record<string, [string, string]> = {
+  lectura: ["¿Cuál fue la idea más importante que encontraste en el texto?", "¿Cómo conectas este contenido con lo que ya sabías?"],
+  ejercicio_matematico: ["¿Cuál fue el paso más difícil del ejercicio?", "¿En qué situación real aplicarías este procedimiento?"],
+  simulacion: ["¿Qué variable tuvo más impacto en los resultados?", "¿Qué pasaría si cambiaras los parámetros a sus extremos?"],
+  reflexion_escrita: ["¿Cambió tu perspectiva sobre el tema al escribir?", "¿Qué pregunta nueva te surgió al reflexionar?"],
+};
+const REFLEXION_DEFAULT: [string, string] = [
+  "¿Qué fue lo más sorprendente o desafiante de esta actividad?",
+  "¿Cómo se conecta este contenido con algo que ya conocías?",
+];
 
 /**
  * Herramientas de cálculo según el área de la UAC:
@@ -68,6 +88,14 @@ export function ActivityShell({
   const isCompleta = estado === "completada";
   const isBorrador = nivel_revision === "borrador";
   const herramientas = herramientasPorArea(uacCodigo);
+  const tiempoMin = TIEMPO_MIN[tipo] ?? 8;
+  const semestreUac = ROMAN_TO_N[uacCodigo.split("-").pop() ?? ""] ?? null;
+  const reflexKey = `reflexion-${uacCodigo}-${progresionNum}-${ordenNum}`;
+  const [reflexQ1, reflexQ2] = REFLEXION_Q[tipo] ?? REFLEXION_DEFAULT;
+  const [reflexion, setReflexion] = useState<string>(() => {
+    if (typeof window === "undefined" || !isCompleta) return "";
+    try { return localStorage.getItem(reflexKey) ?? ""; } catch { return ""; }
+  });
 
   // Navegación lineal dentro de la progresión (footer Anterior/Siguiente).
   const idx = actividadesProg.findIndex((a) => a.orden === ordenNum);
@@ -286,6 +314,7 @@ export function ActivityShell({
               accentHex={color.hex}
               items={[
                 { label: "Hub", href: "/hub" },
+                ...(semestreUac ? [{ label: `${semestreUac}.º sem`, href: `/hub/semestre/${semestreUac}` }] : []),
                 { label: uacNombre, href: `/hub/uac/${uacCodigo}`, maxWidth: 140 },
                 { label: `A${ordenNum} · ${phaseLabel}` },
               ]}
@@ -345,6 +374,16 @@ export function ActivityShell({
                     borderRadius: 999,
                   }}>
                     +{xp} XP
+                  </span>
+                  <span style={{
+                    fontSize: 10, fontWeight: 700, letterSpacing: "0.10em",
+                    color: "rgba(255,255,255,0.40)", padding: "5px 14px",
+                    background: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    borderRadius: 999,
+                  }}>
+                    <i className="fa-solid fa-clock" style={{ marginRight: 5, fontSize: 9 }} />
+                    ~{tiempoMin} min
                   </span>
                   <NarradorControl accentHex={color.hex} />
                   {isCompleta && (
@@ -451,6 +490,43 @@ export function ActivityShell({
             )}
 
             <ContenidoNarrable>{children}</ContenidoNarrable>
+
+            {/* ── Reflexión metacognitiva — solo cuando la actividad está completada ── */}
+            {isCompleta && (
+              <div style={{
+                marginTop: 36,
+                borderRadius: 18,
+                border: `1px solid rgba(${color.rgba}, 0.22)`,
+                background: `rgba(${color.rgba}, 0.05)`,
+                padding: "24px 28px",
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+                  <i className="fa-solid fa-brain" style={{ color: color.hex, fontSize: 16 }} />
+                  <span style={{ fontSize: 12, fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.18em", color: color.hex }}>
+                    Reflexión
+                  </span>
+                </div>
+                <p style={{ fontSize: 13.5, fontWeight: 700, color: "#fff", margin: "0 0 6px", lineHeight: 1.5 }}>{reflexQ1}</p>
+                <p style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", margin: "0 0 16px", lineHeight: 1.5 }}>{reflexQ2}</p>
+                <textarea
+                  rows={3}
+                  value={reflexion}
+                  onChange={(e) => {
+                    setReflexion(e.target.value);
+                    try { localStorage.setItem(reflexKey, e.target.value); } catch { /* noop */ }
+                  }}
+                  placeholder="Escribe tu reflexión (opcional)…"
+                  style={{
+                    width: "100%", boxSizing: "border-box",
+                    background: "rgba(255,255,255,0.05)",
+                    border: `1px solid rgba(${color.rgba}, 0.22)`,
+                    borderRadius: 12, color: "#fff", fontSize: 13,
+                    padding: "12px 14px", resize: "vertical",
+                    fontFamily: "inherit", lineHeight: 1.5, outline: "none",
+                  }}
+                />
+              </div>
+            )}
 
             {/* Footer Anterior / Siguiente — fuera del @media que oculta el
                 panel lateral, así que también sirve en móvil. */}

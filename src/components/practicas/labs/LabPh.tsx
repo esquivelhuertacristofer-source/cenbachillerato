@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * Laboratorio 3D — Escala de pH, ácidos y bases.
@@ -48,6 +48,7 @@ const PhScene = dynamic(() => import("./PhScene"), {
 type Modo = "medir" | "neutralizar";
 
 const WARN = "#FF8A3C";
+import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
 const RETO_KEY = "cen-ph-reto";
 
 /** Equipo de protección personal: en química se manejan ácidos y bases corrosivos. */
@@ -187,6 +188,7 @@ export function LabPh({ color }: PracticaLabProps) {
       try { window.localStorage.setItem(RETO_KEY, String(mejor)); } catch { /* ignore */ }
       return mejor;
     });
+    void guardarEstrellas(RETO_KEY, est);
   }, []);
 
   const elegirAcido = (id: TipoAcido) => {

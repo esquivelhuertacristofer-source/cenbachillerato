@@ -16,7 +16,9 @@ config({ path: resolve(process.cwd(), ".env.local") });
 // ── Constantes ───────────────────────────────────────────────────────────────
 
 const DEMO_EMAIL    = "alumno-sem2@cenbachillerato-demo.com";
-const DEMO_PASSWORD = "Demo2026!";
+// Configurable vía DEMO_SEED_PASSWORD (.env.local); si no, usa el valor
+// documentado en docs/DEMO-USERS.md.
+const DEMO_PASSWORD = process.env.DEMO_SEED_PASSWORD ?? "Demo2026!";
 const DEMO_NOMBRE   = "Alumno Sem 2 Demo";
 const DEMO_ESCUELA_CCT = "DEMO-001";
 const DEMO_GRUPO_SEM2  = "Grupo 2A Demo";

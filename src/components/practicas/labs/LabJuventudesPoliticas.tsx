@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * Laboratorio — Las juventudes como sujetos políticos
@@ -34,6 +34,7 @@ import {
 } from "./juventudes-politicas-data";
 
 const NO = "#FF5E5E";
+import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
 const RETO_KEY = "cen-juventudes-politicas-reto";
 
 type Modo = "clasificar" | "conceptos" | "glosario";
@@ -177,6 +178,7 @@ export function LabJuventudesPoliticas({ color }: PracticaLabProps) {
       }
       return est;
     });
+    void guardarEstrellas(RETO_KEY, est);
   };
 
   const objetivos = [
@@ -204,6 +206,14 @@ export function LabJuventudesPoliticas({ color }: PracticaLabProps) {
       e.preventDefault();
       const id = e.dataTransfer.getData("text/plain");
       if (id) onDrop(id);
+    },
+    role: "button" as const,
+    tabIndex: 0,
+    onKeyDown: (e: React.KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        (e.currentTarget as HTMLElement).click();
+      }
     },
   });
 

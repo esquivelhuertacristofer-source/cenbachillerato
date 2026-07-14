@@ -72,7 +72,11 @@ export function RetoQuizCard({
   };
 
   const aciertos = useMemo(
-    () => quiz.reactivos.reduce((acc, r, i) => acc + (sel[i] === r.respuestaCorrecta ? 1 : 0), 0),
+    () => quiz.reactivos.reduce((acc, r, i) => {
+      const selected = sel[i];
+      if (selected === null || r.respuestaCorrecta >= r.opciones.length) return acc;
+      return acc + (selected === r.respuestaCorrecta ? 1 : 0);
+    }, 0),
     [sel, quiz.reactivos],
   );
   const puntaje = Math.round((aciertos / n) * 100);
@@ -134,7 +138,7 @@ export function RetoQuizCard({
               <div role="radiogroup" aria-labelledby={`rq-q-${i}`} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {r.opciones.map((op, j) => {
                   const isSel = elegida === j;
-                  const showOk = comprobado && j === r.respuestaCorrecta;
+                  const showOk = comprobado && j === r.respuestaCorrecta && r.respuestaCorrecta < r.opciones.length;
                   const showBad = comprobado && isSel && j !== r.respuestaCorrecta;
                   return (
                     <button

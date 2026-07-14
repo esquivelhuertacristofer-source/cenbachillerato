@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Epilogue } from "next/font/google";
 import "./globals.css";
+import { PLATFORMS }        from "@/lib/platform";
+import { PlatformProvider } from "@/context/PlatformProvider";
 
 const epilogue = Epilogue({
   variable: "--font-epilogue",
@@ -16,7 +18,12 @@ export const metadata: Metadata = {
   },
   description:
     "Plataforma educativa digital alineada al MCCEMS y la Nueva Escuela Mexicana. Para escuelas y subsistemas del sistema educativo mexicano.",
-  metadataBase: new URL("https://cen.edu.mx"),
+  metadataBase: new URL("https://ceneducacion.com.mx"),
+  openGraph: {
+    siteName: "CEN — Campaña Educativa Nacional",
+    locale: "es_MX",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -33,7 +40,11 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
       </head>
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        <PlatformProvider platform={PLATFORMS.hub}>
+          {children}
+        </PlatformProvider>
+      </body>
     </html>
   );
 }

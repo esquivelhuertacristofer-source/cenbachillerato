@@ -48,7 +48,7 @@ const FEATURES = [
   { icon: 'fa-chart-line',   col: '#0891B2', title: 'Dashboard docente en vivo',     desc: 'Métricas por grupo, alumno y UAC. Identifica quién necesita apoyo antes del examen parcial.' },
   { icon: 'fa-school',       col: '#7C3AED', title: 'Multi-plantel y multi-escuela', desc: 'Arquitectura multi-tenant con Row Level Security. Escala desde 1 hasta 100 instituciones sin fricción.' },
   { icon: 'fa-file-alt',     col: '#EA580C', title: 'Alineación MCCEMS 100%',        desc: 'Acuerdo 09/08/23 y Modelo Educativo 2025. Todas las UAC, RSC y Ámbitos implementados al detalle.' },
-  { icon: 'fa-lock',         col: '#059669', title: 'Seguridad institucional PKCE',  desc: 'Autenticación con PKCE, cookies httpOnly y cumplimiento total de la LFPDPPP.' },
+  { icon: 'fa-lock',         col: '#059669', title: 'Seguridad institucional PKCE',  desc: 'Autenticación con PKCE, control de acceso por rol y cumplimiento total de la LFPDPPP.' },
   { icon: 'fa-bolt',         col: '#D97706', title: 'Implementación en horas',       desc: 'Alta masiva de alumnos y docentes por CSV. Sin capacitaciones largas. Sin integraciones complejas.' },
 ];
 

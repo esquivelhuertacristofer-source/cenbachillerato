@@ -42,6 +42,7 @@ import {
   type Llama,
 } from "./destilacion-data";
 import { LabAudio } from "./destilacion-audio";
+import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
 
 const DestilacionScene = dynamic(() => import("./DestilacionScene"), {
   ssr: false,
@@ -168,6 +169,7 @@ export function LabSeparacionMezclas({ color }: PracticaLabProps) {
           }
           return nx;
         });
+        void guardarEstrellas(RETO_KEY, est);
         setFase("listo");
         return;
       }

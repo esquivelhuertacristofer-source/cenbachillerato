@@ -531,12 +531,6 @@
   font-weight: 600;
 }
 
-/* ══════════════════════════════════════════════════════════════
-   ⚠️ TEMPORAL (presentación) — Pestaña "Destacados".
-   Para revertir: borrar TODO este bloque + el archivo
-   labs-destacados.ts + la pestaña en page.tsx.
-   ══════════════════════════════════════════════════════════════ */
-
 /* ── Switcher de pestañas ─── */
 .labs-tabs {
   display: inline-flex;

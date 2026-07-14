@@ -7,6 +7,7 @@ const NAV = [
   { href: '/admin/escuelas', label: 'Escuelas', icon: 'fa-solid fa-school' },
   { href: '/admin/grupos', label: 'Grupos', icon: 'fa-solid fa-layer-group' },
   { href: '/admin/usuarios', label: 'Usuarios', icon: 'fa-solid fa-users' },
+  { href: '/admin/alta-masiva', label: 'Alta masiva', icon: 'fa-solid fa-file-arrow-up' },
 ];
 
 export function AdminHeader() {

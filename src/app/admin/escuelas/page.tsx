@@ -1,4 +1,5 @@
-import { getSupabaseServer } from "@/lib/supabase-helpers";
+import Link from "next/link";
+import { getSupabaseServer, getUser, getProfile } from "@/lib/supabase-helpers";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -6,6 +7,10 @@ export const metadata: Metadata = {
 };
 
 export default async function EscuelasPage() {
+  const user = await getUser();
+  const profile = user ? await getProfile(user.id) : null;
+  const esSuperAdmin = profile?.role === "super_admin";
+
   const sb = await getSupabaseServer();
   const { data: escuelas } = await sb
     .from("escuelas")
@@ -37,19 +42,24 @@ export default async function EscuelasPage() {
             </span>
           </h1>
         </div>
-        <button style={{
-          borderRadius: 999,
-          background: '#0B2545',
-          padding: '10px 22px',
-          fontSize: 13,
-          fontWeight: 700,
-          color: '#fff',
-          border: 'none',
-          cursor: 'pointer',
-        }}>
-          <i className="fa-solid fa-plus" style={{ marginRight: 8 }} />
-          Agregar escuela
-        </button>
+        {esSuperAdmin && (
+          <Link href="/admin/escuelas/nueva" style={{
+            borderRadius: 999,
+            background: '#0B2545',
+            padding: '10px 22px',
+            fontSize: 13,
+            fontWeight: 700,
+            color: '#fff',
+            border: 'none',
+            cursor: 'pointer',
+            textDecoration: 'none',
+            display: 'inline-flex',
+            alignItems: 'center',
+          }}>
+            <i className="fa-solid fa-plus" style={{ marginRight: 8 }} />
+            Agregar escuela
+          </Link>
+        )}
       </div>
 
       {!escuelas || escuelas.length === 0 ? (

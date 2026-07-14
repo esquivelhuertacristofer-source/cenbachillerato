@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { getUser, getProfile } from "@/lib/supabase-helpers";
+import ResetearPasswordButton from "@/components/admin/ResetearPasswordButton";
+import CrearAdminEscolarForm from "@/components/admin/CrearAdminEscolarForm";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -49,6 +51,15 @@ export default async function UsuariosAdminPage() {
 
   const { data: usuarios } = await query;
 
+  // Crear admin escolar es exclusivo de super_admin (ADMIN-FLOW.md §5.2);
+  // el resto de altas (docentes/alumnos por escuela) usan alta-masiva.ts.
+  const esSuperAdmin = profile.role === "super_admin";
+  let escuelas: { id: string; nombre: string }[] = [];
+  if (esSuperAdmin) {
+    const { data } = await sb.from("escuelas").select("id, nombre").order("nombre");
+    escuelas = data ?? [];
+  }
+
   const totales = {
     student: usuarios?.filter((u) => u.role === "student").length ?? 0,
     teacher: usuarios?.filter((u) => u.role === "teacher").length ?? 0,
@@ -64,26 +75,29 @@ export default async function UsuariosAdminPage() {
   return (
     <main style={{ maxWidth: 1280, margin: '0 auto', padding: '40px 24px 64px' }}>
 
-      <div style={{ marginBottom: 32 }}>
-        <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#1E40AF', marginBottom: 8 }}>
-          Admin · Usuarios
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 32, gap: 24 }}>
+        <div>
+          <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#1E40AF', marginBottom: 8 }}>
+            Admin · Usuarios
+          </div>
+          <h1 style={{ fontSize: 26, fontWeight: 900, color: '#0B2545', letterSpacing: '-0.03em', margin: 0 }}>
+            Usuarios
+            <span style={{
+              display: 'inline-flex',
+              marginLeft: 12,
+              borderRadius: 999,
+              background: 'rgba(11,37,69,0.08)',
+              padding: '2px 12px',
+              fontSize: 15,
+              fontWeight: 600,
+              color: 'rgba(11,37,69,0.50)',
+              verticalAlign: 'middle',
+            }}>
+              {usuarios?.length ?? 0}
+            </span>
+          </h1>
         </div>
-        <h1 style={{ fontSize: 26, fontWeight: 900, color: '#0B2545', letterSpacing: '-0.03em', margin: 0 }}>
-          Usuarios
-          <span style={{
-            display: 'inline-flex',
-            marginLeft: 12,
-            borderRadius: 999,
-            background: 'rgba(11,37,69,0.08)',
-            padding: '2px 12px',
-            fontSize: 15,
-            fontWeight: 600,
-            color: 'rgba(11,37,69,0.50)',
-            verticalAlign: 'middle',
-          }}>
-            {usuarios?.length ?? 0}
-          </span>
-        </h1>
+        {esSuperAdmin && <CrearAdminEscolarForm escuelas={escuelas} />}
       </div>
 
       {/* Resumen por rol */}
@@ -129,11 +143,16 @@ export default async function UsuariosAdminPage() {
                 <th style={{ padding: '12px 24px', textAlign: 'left', fontWeight: 700, fontSize: 11, color: 'rgba(11,37,69,0.50)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Email</th>
                 <th style={{ padding: '12px 24px', textAlign: 'left', fontWeight: 700, fontSize: 11, color: 'rgba(11,37,69,0.50)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Rol</th>
                 <th style={{ padding: '12px 24px', textAlign: 'left', fontWeight: 700, fontSize: 11, color: 'rgba(11,37,69,0.50)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Semestre</th>
+                <th style={{ padding: '12px 24px', textAlign: 'left', fontWeight: 700, fontSize: 11, color: 'rgba(11,37,69,0.50)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Acciones</th>
               </tr>
             </thead>
             <tbody>
               {usuarios.map((u) => {
                 const roleStyle = ROLE_STYLES[u.role] ?? { background: 'rgba(11,37,69,0.07)', color: '#0B2545' };
+                // AdminLayout ya garantiza que profile.role es 'admin' o
+                // 'super_admin' aquí. Un admin escolar no puede resetear a un
+                // super_admin (mismo límite que aplica resetearPassword server-side).
+                const puedeResetear = profile.role === 'super_admin' || u.role !== 'super_admin';
                 return (
                   <tr key={u.id} style={{ borderBottom: '1px solid rgba(11,37,69,0.06)' }}>
                     <td style={{ padding: '14px 24px', fontWeight: 600, color: '#0B2545' }}>
@@ -153,6 +172,13 @@ export default async function UsuariosAdminPage() {
                     </td>
                     <td style={{ padding: '14px 24px', color: 'rgba(11,37,69,0.60)' }}>
                       {u.semestre ? `${u.semestre}°` : "—"}
+                    </td>
+                    <td style={{ padding: '14px 24px' }}>
+                      {puedeResetear ? (
+                        <ResetearPasswordButton userId={u.id} nombre={u.full_name ?? u.email} />
+                      ) : (
+                        <span style={{ fontSize: 12, color: 'rgba(11,37,69,0.30)' }}>—</span>
+                      )}
                     </td>
                   </tr>
                 );

@@ -8,12 +8,20 @@ import {
   getActividadesRecientes,
   getCalendario30Dias,
   getEstadisticasProgreso,
-  getLogros,
+  getLogrosCatalogo,
 } from "@/lib/queries/progreso";
 import type { Metadata } from "next";
 import "./Progreso.css";
 
 export const metadata: Metadata = { title: "Mi Progreso — CEN Bachillerato" };
+
+function criterioLabel(tipo: string, valor: number): string {
+  if (tipo === "actividades") return `Completá ${valor} actividad${valor === 1 ? "" : "es"}`;
+  if (tipo === "xp") return `Acumulá ${valor.toLocaleString("es-MX")} XP`;
+  if (tipo === "racha") return `Racha de ${valor} día${valor === 1 ? "" : "s"}`;
+  if (tipo === "minutos") return `Estudia ${Math.floor(valor / 60)}h en total`;
+  return String(valor);
+}
 
 function timeAgo(dateStr: string): string {
   const diffMin = Math.floor((Date.now() - new Date(dateStr).getTime()) / 60000);
@@ -36,14 +44,14 @@ export default async function ProgresoPage() {
 
   const semestre = profile.semestre ?? 1;
 
-  const [progreso, rachaData, progresoUAC, actividadesRecientes, calendario, stats, logros] = await Promise.all([
+  const [progreso, rachaData, progresoUAC, actividadesRecientes, calendario, stats, logrosCatalogo] = await Promise.all([
     getProgresoSemestre(user.id, semestre),
     getRachaDelAlumno(user.id),
     getProgresoDetallePorUAC(user.id, semestre),
     getActividadesRecientes(user.id, 15),
     getCalendario30Dias(user.id),
     getEstadisticasProgreso(user.id),
-    getLogros(user.id),
+    getLogrosCatalogo(user.id),
   ]);
 
   const { porcentaje, totalProgresiones, progresionesCompletadas, actividadesEstaSemana, minutosEstaSemana } = progreso;
@@ -208,9 +216,15 @@ export default async function ProgresoPage() {
         <div className="prog-card">
           <div className="prog-card-head">
             <h2 className="prog-card-title">Logros</h2>
-            <span className="prog-link-muted">Ver todos</span>
+            {logrosCatalogo.length > 0 && (
+              <span className="prog-logros-count">
+                {logrosCatalogo.filter((l) => l.desbloqueado).length}
+                {" / "}
+                {logrosCatalogo.length}
+              </span>
+            )}
           </div>
-          {logros.length === 0 ? (
+          {logrosCatalogo.length === 0 ? (
             <div className="prog-empty">
               <div className="prog-empty-badge">🏆</div>
               <p className="prog-empty-title">Sin logros todavía</p>
@@ -218,9 +232,20 @@ export default async function ProgresoPage() {
             </div>
           ) : (
             <div className="prog-logros-grid">
-              {logros.map((logro) => (
-                <div key={logro.id} title={`${logro.nombre}: ${logro.descripcion}`} className="prog-logro">
+              {logrosCatalogo.map((logro) => (
+                <div
+                  key={logro.id}
+                  title={
+                    logro.desbloqueado
+                      ? `${logro.nombre}: ${logro.descripcion}`
+                      : `🔒 ${logro.nombre} · ${criterioLabel(logro.criterio_tipo, logro.criterio_valor)}`
+                  }
+                  className={`prog-logro${logro.desbloqueado ? "" : " locked"}`}
+                >
                   {logro.icono}
+                  {!logro.desbloqueado && (
+                    <i className="fa-solid fa-lock prog-logro-lock" aria-hidden="true" />
+                  )}
                 </div>
               ))}
             </div>

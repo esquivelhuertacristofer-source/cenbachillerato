@@ -114,6 +114,7 @@ function Trayectoria({ a, b, c, showGol, accent, pausado, arrastrable, onVertice
       pts.push([sx(x), sy(evalH(a, b, c, x)), 0]);
     }
     return pts;
+    // `evalH`, `sx`, `sy`, `N` are stable helpers/constants defined outside the component.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [a, b, c, drawEnd, xMaxEff, hMaxEff]);
 

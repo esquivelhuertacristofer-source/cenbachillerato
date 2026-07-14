@@ -71,6 +71,7 @@ export function ProgresionClient({
     }
 
     sessionStorage.setItem(key, String(completadasAhora))
+  // Mount-only: reads sessionStorage once to detect progress since last visit; re-running on deps would double-fire the celebration.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

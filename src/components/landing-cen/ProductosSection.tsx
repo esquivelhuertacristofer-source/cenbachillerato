@@ -37,8 +37,9 @@ export const PRODUCTS: ProductItem[] = [
     color: 'linear-gradient(135deg, #1D4ED8 0%, #3B82F6 100%)',
     accent: '#60A5FA',
     image: '/4.webp',
-    href: '#',
-    available: false,
+    href: '/preescolar',
+    available: true,
+    external: true,
     telemetry: [
       { val: '3–6',      lbl: 'Años de Edad',  icon: 'fa-child'    },
       { val: '100%',     lbl: 'Lúdico Activo', icon: 'fa-gamepad'  },
@@ -57,8 +58,9 @@ export const PRODUCTS: ProductItem[] = [
     accent: '#3B82F6',
     features: ['6 Grados', 'NEM 2025', 'Educación Básica'],
     image: '/5.webp',
-    href: '#',
-    available: false,
+    href: '/primaria',
+    available: true,
+    external: true,
     telemetry: [
       { val: '6 Grados', lbl: 'Primaria SEP',      icon: 'fa-graduation-cap' },
       { val: 'Fases 3-5',lbl: 'Nueva Escuela Mex.', icon: 'fa-layer-group'  },
@@ -77,8 +79,9 @@ export const PRODUCTS: ProductItem[] = [
     accent: '#2563EB',
     features: ['3 Grados', 'NEM 2025', 'Evaluación formativa'],
     image: '/6.webp',
-    href: '#',
-    available: false,
+    href: '/secundaria',
+    available: true,
+    external: true,
     telemetry: [
       { val: '3 Grados', lbl: 'Secundaria SEP', icon: 'fa-school'          },
       { val: 'Fase 6',   lbl: 'NEM 2025',        icon: 'fa-compass'        },
@@ -255,8 +258,9 @@ function AccPanel({ p, i, isActive, onActivate, reducedMotion }: AccPanelProps) 
             p.external ? (
               <a
                 href={p.href}
-                target="_blank"
-                rel="noopener noreferrer"
+                {...(p.href.startsWith('http')
+                  ? { target: '_blank', rel: 'noopener noreferrer' }
+                  : {})}
                 className="acc-exp-cta"
                 style={{ background: p.accent }}
                 onClick={e => e.stopPropagation()}

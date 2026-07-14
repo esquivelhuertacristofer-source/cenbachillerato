@@ -3,9 +3,23 @@
 import Papa from 'papaparse';
 import { getUser, getProfile } from '@/lib/supabase-helpers';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
-import { FilaCSVSchema, type FilaCSV, type ErrorAlta, type Credencial, type ResultadoAlta } from '@/lib/schemas/alta-masiva.schema';
+import {
+  FilaCSVSchema,
+  MAX_FILAS_ALTA_MASIVA,
+  type FilaCSV,
+  type ErrorAlta,
+  type Credencial,
+  type ResultadoAlta,
+} from '@/lib/schemas/alta-masiva.schema';
 import { generarEmailBase, resolverEmailUnico, generarPassword } from '@/lib/email-generator';
 
+// NOTA: la UI (AltaMasivaForm) ahora parsea/valida el archivo completo en el
+// cliente y llama a esta acción una vez por lote (~150 filas, ver
+// ALTA_MASIVA_BATCH_SIZE) para no bloquear el CPU budget de una sola
+// invocación del Worker. La firma y el comportamiento por-llamada (parseo,
+// validación Zod, aborto atómico si hay errores, creación de usuarios/grupos)
+// se mantienen sin cambios: cada llamada sigue siendo autocontenida y trata
+// el texto recibido como un CSV completo e independiente.
 export async function procesarAltaMasiva(csvText: string): Promise<ResultadoAlta | { error: string }> {
   // ── Auth: solo admin/super_admin ────────────────────────────────────────────
   const user = await getUser();
@@ -32,8 +46,8 @@ export async function procesarAltaMasiva(csvText: string): Promise<ResultadoAlta
     return { error: 'El archivo CSV está vacío o no tiene filas de datos' };
   }
 
-  if (parsed.data.length > 5000) {
-    return { error: 'Máximo 5 000 filas por carga' };
+  if (parsed.data.length > MAX_FILAS_ALTA_MASIVA) {
+    return { error: `Máximo ${MAX_FILAS_ALTA_MASIVA} filas por carga` };
   }
 
   // ── 2. Validar todas las filas con Zod ────────────────────────────────────

@@ -41,6 +41,17 @@ export interface Logro {
   desbloqueadoEn: string | null;
 }
 
+export interface LogroCatalogo {
+  id: string;
+  nombre: string;
+  descripcion: string;
+  icono: string;
+  criterio_tipo: string;
+  criterio_valor: number;
+  desbloqueado: boolean;
+  desbloqueadoEn: string | null;
+}
+
 export interface EstadisticasProgreso {
   materiaMasFuerte: { nombre: string; xp: number } | null;
   tipoActividades: { tipo: string; cantidad: number }[];
@@ -464,6 +475,91 @@ export async function getLogros(alumnoId: string): Promise<Logro[]> {
         icono: l.icono,
         desbloqueadoEn: desbloqueados.get(l.id) ?? null,
       }));
+  } catch {
+    return [];
+  }
+}
+
+// ─── getLogrosCatalogo ────────────────────────────────────────────────────────
+// Igual que getLogros pero devuelve el catálogo COMPLETO con flag `desbloqueado`.
+// Otorga badges recién alcanzados de forma idempotente antes de devolver.
+export async function getLogrosCatalogo(alumnoId: string): Promise<LogroCatalogo[]> {
+  try {
+    const sb: SbAny = await getSupabaseServer();
+
+    const { data: catData, error: catErr } = await sb
+      .from("logros")
+      .select("id, nombre, descripcion, icono, criterio_tipo, criterio_valor")
+      .eq("activo", true)
+      .order("orden", { ascending: true });
+
+    if (catErr || !catData || catData.length === 0) return [];
+    const catalogo = catData as CatalogoLogro[];
+
+    const [{ data: intentosData }, racha] = await Promise.all([
+      sb
+        .from("intentos")
+        .select("actividades!actividad_id ( xp, duracion_estimada_minutos )")
+        .eq("user_id", alumnoId)
+        .eq("status", "completed"),
+      getRachaDelAlumno(alumnoId),
+    ]);
+
+    const intentos = (intentosData ?? []) as {
+      actividades: { xp: number | null; duracion_estimada_minutos: number | null } | null;
+    }[];
+
+    let totalXP = 0;
+    let totalMinutos = 0;
+    for (const it of intentos) {
+      totalXP += it.actividades?.xp ?? 0;
+      totalMinutos += it.actividades?.duracion_estimada_minutos ?? 5;
+    }
+
+    const metricas: Record<CriterioTipo, number> = {
+      actividades: intentos.length,
+      xp: totalXP,
+      minutos: totalMinutos,
+      racha: racha.diasConsecutivos,
+    };
+
+    const { data: unlockedData } = await sb
+      .from("logros_alumno")
+      .select("logro_id, desbloqueado_en")
+      .eq("alumno_id", alumnoId);
+
+    const desbloqueados = new Map<string, string>(
+      ((unlockedData ?? []) as { logro_id: string; desbloqueado_en: string }[]).map(
+        (r) => [r.logro_id, r.desbloqueado_en] as const
+      )
+    );
+
+    const nuevos = catalogo.filter(
+      (l) => !desbloqueados.has(l.id) && metricas[l.criterio_tipo] >= l.criterio_valor
+    );
+    if (nuevos.length > 0) {
+      const { data: insertados } = await sb
+        .from("logros_alumno")
+        .upsert(
+          nuevos.map((l) => ({ alumno_id: alumnoId, logro_id: l.id })),
+          { onConflict: "alumno_id,logro_id", ignoreDuplicates: true }
+        )
+        .select("logro_id, desbloqueado_en");
+      for (const r of (insertados ?? []) as { logro_id: string; desbloqueado_en: string }[]) {
+        desbloqueados.set(r.logro_id, r.desbloqueado_en);
+      }
+    }
+
+    return catalogo.map((l) => ({
+      id: l.id,
+      nombre: l.nombre,
+      descripcion: l.descripcion,
+      icono: l.icono,
+      criterio_tipo: l.criterio_tipo,
+      criterio_valor: l.criterio_valor,
+      desbloqueado: desbloqueados.has(l.id),
+      desbloqueadoEn: desbloqueados.get(l.id) ?? null,
+    }));
   } catch {
     return [];
   }

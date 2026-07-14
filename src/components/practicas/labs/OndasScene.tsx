@@ -110,6 +110,7 @@ function useDisposeCurvas(...curvas: THREE.Line[]) {
         (c.material as THREE.Material).dispose();
       }
     };
+    // Cleanup on unmount: `curvas` is stable after initialization; no reactive deps needed.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 }

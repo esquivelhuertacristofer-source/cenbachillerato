@@ -26,7 +26,10 @@ export const DEMO_GRUPO = {
   semestre: 1,
 };
 
-export const DEMO_PASSWORD = "Demo2026!";
+// Configurable vía DEMO_SEED_PASSWORD (.env.local) para no depender de un
+// literal fijo commiteado en el repo; si no se define, usa el valor por
+// defecto documentado en docs/DEMO-USERS.md.
+export const DEMO_PASSWORD = process.env.DEMO_SEED_PASSWORD ?? "Demo2026!";
 
 const NOMBRES_ALUMNOS = [
   "Alumno Uno", "Alumno Dos", "Alumno Tres", "Alumno Cuatro", "Alumno Cinco",

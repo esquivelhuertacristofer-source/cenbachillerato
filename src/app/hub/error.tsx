@@ -4,10 +4,10 @@ import { useEffect } from 'react';
 
 export default function HubError({
   error,
-  reset,
+  unstable_retry,
 }: {
   error: Error & { digest?: string };
-  reset: () => void;
+  unstable_retry: () => void;
 }) {
   useEffect(() => {
     console.error('[HubError]', error);
@@ -24,7 +24,7 @@ export default function HubError({
           Verifica tu conexión o intenta de nuevo.
         </p>
         <button
-          onClick={reset}
+          onClick={unstable_retry}
           className="px-5 py-2.5 bg-[#D4A574] text-[#011C40] rounded-xl font-bold text-sm hover:bg-[#c89560] transition-colors"
         >
           Reintentar

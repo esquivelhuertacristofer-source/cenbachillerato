@@ -95,7 +95,7 @@ La recuperación y cambio de contraseña la administra el usuario directamente d
 
 ## Lo que se puede hacer diferente (trade-offs conocidos)
 
-- **Turbopack vs Webpack**: usamos webpack (`--webpack`) porque tenemos conocimiento del ecosistema. Turbopack es más rápido en dev pero puede generar sorpresas.
+- **Turbopack vs Webpack**: usamos Turbopack, el default de Next.js 16 (`next dev` / `next build` sin flags). Es más rápido en dev y build; `--webpack` no está soportado en este proyecto — ver `docs/ARQUITECTURA.md`.
 - **Supabase vs otro backend**: la integración auth + DB + RLS de Supabase acelera el MVP. En escala grande podría ser un cuello de botella, pero no es el problema de hoy.
 - **Next.js 16 con React 19**: versión muy reciente. Puede haber edge cases. La regla es: leer los docs antes de escribir código que toque Server Actions, caching, o Suspense.
 
@@ -107,7 +107,7 @@ Antes de hacer PR, verificar:
 - [ ] `npm run typecheck` pasa sin errores
 - [ ] `npm run lint` pasa sin errores
 - [ ] `npm run test` pasa
-- [ ] `npm run build` pasa (con `--webpack`)
+- [ ] `npm run build` pasa (Turbopack)
 - [ ] No hay `any`, `@ts-ignore`, ni `console.log` de debug en código de producción
 - [ ] No hay secretos hardcodeados
 - [ ] Los Server Components no usan hooks de React

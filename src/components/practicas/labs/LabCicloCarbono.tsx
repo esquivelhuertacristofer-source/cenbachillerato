@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * Laboratorio 3D — El ciclo del carbono: equilibrio y desequilibrio.
@@ -52,6 +52,7 @@ const AZUL = "#38bdf8";
 const ROJO = "#ef4444";
 const NARANJA = "#f59e0b";
 const WARN = "#FF8A3C";
+import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
 const RETO_KEY = "cen-carbono-reto";
 
 /** Instrumentos para medir el carbono (3 correctos + 3 distractores). */
@@ -144,6 +145,7 @@ export function LabCicloCarbono({ color }: PracticaLabProps) {
       try { window.localStorage.setItem(RETO_KEY, String(mejor)); } catch { /* ignore */ }
       return mejor;
     });
+    void guardarEstrellas(RETO_KEY, est);
   }, []);
 
   const acum = useMemo(() => acumAtm(emisiones), [emisiones]);
