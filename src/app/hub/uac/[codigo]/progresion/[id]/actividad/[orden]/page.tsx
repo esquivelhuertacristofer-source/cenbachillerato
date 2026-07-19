@@ -66,7 +66,6 @@ export default async function ActividadPage({ params }: Props) {
       tipo={actividad.tipo}
       titulo={actividad.titulo}
       descripcion={actividad.descripcion}
-      xp={actividad.xp}
       contenido={actividad.contenido}
       estado={actividad.estado}
       intentoId={actividad.intentoId}

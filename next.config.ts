@@ -46,6 +46,13 @@ const nextConfig: NextConfig = {
   // imágenes ya vienen pre-optimizadas a WebP ~800px, por lo que las servimos
   // directo desde /public (igual que un <img> plano, que sí cargaba).
   images: { unoptimized: true },
+  experimental: {
+    // Cachea el RSC payload en el cliente por 30s en navegaciones dinámicas
+    // (default es 0s desde Next 15). Navegar ida/vuelta entre páginas del hub
+    // dentro de esa ventana reutiliza el payload en vez de volver a invocar
+    // el Worker — reduce el conteo de requests/día en el plan Free.
+    staleTimes: { dynamic: 30 },
+  },
   async headers() {
     return [
       {

@@ -1,0 +1,133 @@
+name: Backup diario de Supabase
+
+# ============================================================================
+# POR QUÉ EXISTE ESTE WORKFLOW
+#
+# Supabase, en el plan Free, NO ofrece backups automáticos ni Point-in-Time
+# Recovery (PITR) — eso es exclusivo del plan Pro ($25/mes, ver
+# scripts/monitoreo-supabase.sql para los umbrales de cuándo pagarlo). Sin
+# este workflow, un DROP TABLE accidental, un bug en un script con
+# service_role, o un borrado masivo hecho a mano en el SQL Editor son
+# IRRECUPERABLES: no hay ningún respaldo en Supabase al que volver.
+#
+# Por eso este workflow es OBLIGATORIO antes de dar de alta cualquier escuela
+# real — ver docs/diagnostico/AUDITORIA-GOLD-2026-07-13.md (hallazgo MEDIO
+# "Sin política de backup/PITR documentada") y
+# docs/diagnostico/OPTIMIZACION-ESCALA-2026-07-17.md.
+#
+# CÓMO CREAR EL SECRET SUPABASE_DB_URL (una sola vez, lo hace el usuario a mano):
+#   1. Dashboard de Supabase → Project Settings → Database → "Connection string".
+#   2. Elegir el modo "Session" del connection pooler (puerto 5432). NO usar
+#      el modo "Transaction" (puerto 6543): pg_dump necesita una sesión
+#      Postgres persistente y pgbouncer en modo transaction no se la da —
+#      falla o se degrada a mitad del dump.
+#      Formato esperado:
+#        postgresql://postgres.<project-ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres
+#   3. Sustituir <password> por la contraseña real de la base (si no se
+#      conoce: Project Settings → Database → "Reset database password").
+#      Si la contraseña tiene caracteres especiales (@, /, #, etc.), deben
+#      ir URL-encoded dentro de la cadena o pg_dump la interpreta mal.
+#   4. En GitHub: Settings del repo → "Secrets and variables" → Actions →
+#      "New repository secret" → nombre EXACTO `SUPABASE_DB_URL`, valor la
+#      cadena completa del paso 2-3.
+#
+# Si este repo todavía no se ha subido a GitHub, este archivo simplemente no
+# se ejecuta (no hay cron sin remoto) — queda listo para el momento en que se
+# suba y se configure el secret, sin requerir ningún otro cambio.
+# ============================================================================
+
+on:
+  schedule:
+    # 09:00 UTC = 03:00 hora de Ciudad de México (México no observa horario
+    # de verano desde 2022, así que el offset UTC-6 es constante todo el año).
+    - cron: "0 9 * * *"
+  # Permite lanzar un backup manual desde la pestaña "Actions" del repo sin
+  # esperar al cron — útil para probar la configuración del secret o para
+  # sacar un respaldo justo antes de una operación riesgosa (alta masiva,
+  # migración, etc.).
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    name: pg_dump → artifact
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Validar que el secret SUPABASE_DB_URL está configurado
+        run: |
+          if [ -z "${{ secrets.SUPABASE_DB_URL }}" ]; then
+            echo "::error::Falta el secret SUPABASE_DB_URL. Ver el comentario al inicio de este archivo (.github/workflows/backup-supabase.yml) para crearlo."
+            exit 1
+          fi
+
+      # ubuntu-latest trae postgresql-client desactualizado respecto a los
+      # proyectos nuevos de Supabase (Postgres 17). Un pg_dump más viejo que
+      # el servidor puede fallar de plano o, peor, omitir en silencio objetos
+      # que usan sintaxis reciente (p. ej. ciertas políticas RLS). Se instala
+      # la versión 17 exacta del cliente desde el repositorio oficial de
+      # PostgreSQL (apt.postgresql.org) en vez de confiar en el apt de Ubuntu.
+      - name: Instalar cliente de PostgreSQL 17 (pg_dump)
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends wget ca-certificates gnupg lsb-release
+          wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+            | sudo gpg --dearmor -o /usr/share/keyrings/postgresql-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/postgresql-keyring.gpg] http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list > /dev/null
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends postgresql-client-17
+          pg_dump --version
+
+      - name: Generar dump comprimido
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          FECHA="$(date -u +%Y%m%d-%H%M)"
+          NOMBRE="supabase-backup-${FECHA}.sql.gz"
+
+          # Formato plano (--format=plain, el default) en vez de --format=custom:
+          # se restaura con `psql -f` sin necesitar pg_restore ni recordar
+          # flags adicionales — más a prueba de balas para una emergencia
+          # operada por alguien que no vive en Postgres a diario.
+          # --no-owner / --no-privileges: el dump se piensa para restaurar en
+          # un proyecto de recuperación con roles distintos a los del
+          # original; sin estas banderas la restauración fallaría intentando
+          # reasignar dueños/permisos que no existen ahí.
+          pg_dump "$SUPABASE_DB_URL" \
+            --format=plain \
+            --no-owner \
+            --no-privileges \
+          | gzip -9 > "${NOMBRE}"
+
+          # Sanity check mínimo: un dump de 0 bytes (o casi) sugiere que
+          # pg_dump falló silenciosamente o que la conexión no trajo nada.
+          TAMANO=$(stat -c%s "${NOMBRE}")
+          if [ "$TAMANO" -lt 1024 ]; then
+            echo "::error::El dump generado (${NOMBRE}) pesa solo ${TAMANO} bytes — probablemente falló. Revisar el log de pg_dump arriba."
+            exit 1
+          fi
+
+          echo "DUMP_NOMBRE=${NOMBRE}" >> "$GITHUB_ENV"
+          echo "Dump generado: ${NOMBRE} (${TAMANO} bytes)"
+
+      - name: Subir dump como artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.DUMP_NOMBRE }}
+          path: ${{ env.DUMP_NOMBRE }}
+          # 30 días de retención: suficiente para detectar un problema y
+          # volver a un punto anterior sin acumular indefinidamente contra el
+          # cupo Free de GitHub Actions Storage (500 MB). Con la BD de
+          # Supabase muy por debajo del techo de 500 MB (ver
+          # scripts/monitoreo-supabase.sql), 30 dumps diarios caben sin
+          # problema — igual conviene vigilarlo si la BD crece mucho.
+          retention-days: 30
+          # El .sql.gz ya viene comprimido con gzip -9; volver a comprimirlo
+          # en el zip del artifact no ahorra espacio y solo gasta CPU del runner.
+          compression-level: 0

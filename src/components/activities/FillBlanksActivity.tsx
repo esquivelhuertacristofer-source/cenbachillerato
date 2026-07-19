@@ -8,12 +8,15 @@ import { useReducedMotion } from '@/lib/motion/hooks';
 import { celebrate } from '@/lib/motion/celebrate';
 import type { ActividadFillBlanks, HuecoFillBlanks, CallbackProgreso } from '@/types/activities';
 import type { AreaColor } from '@/components/hub/hub-colors';
+import { imagenDeLectura } from '@/lib/contenido/lectura-imagenes';
 
 const FALLBACK_COLOR: AreaColor = { hex: '#34D399', rgba: '52,211,153', faIcon: 'fa-pen-line', gradient: '' };
 
 interface Props {
   actividad: ActividadFillBlanks;
   onProgreso?: CallbackProgreso;
+  /** Código de la UAC, para elegir una imagen temática cuando no hay lámina propia. */
+  uacCodigo?: string;
   color?: AreaColor;
   estado?: 'no_iniciada' | 'en_progreso' | 'completada';
   respuestasIntento?: Record<string, string>;
@@ -226,7 +229,7 @@ function HuecoInput({
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export function FillBlanksActivity({
-  actividad, onProgreso, color = FALLBACK_COLOR, estado, respuestasIntento,
+  actividad, onProgreso, uacCodigo, color = FALLBACK_COLOR, estado, respuestasIntento,
 }: Props) {
   const { contenido } = actividad;
   const reducedMotion = useReducedMotion();
@@ -235,13 +238,32 @@ export function FillBlanksActivity({
   const partes = parsearTexto(contenido.texto_con_huecos);
   const numHuecos = contenido.huecos.length;
 
+  const [imgError, setImgError] = useState(false);
+  const [imgTematicaError, setImgTematicaError] = useState(false);
+  // Los SVG de placeholder ya no existen en disco; cualquier url que contenga
+  // "placeholder" se trata como "sin lámina" para ir directo a la imagen temática
+  // (evita una petición 404 y el ícono de imagen rota).
+  const urlImagen = contenido.url_imagen ?? '';
+  const tieneImagen = urlImagen.length > 0 && !/placeholder/i.test(urlImagen) && !imgError;
+  // Sin lámina propia → imagen temática con licencia libre acorde a la materia.
+  const imagenTematica = imagenDeLectura(uacCodigo, actividad.titulo);
+
+  // Estado neutral de revisión: el intento existe pero `respuestas` llegó null
+  // o vacío desde la BD (datos históricos, o detalle no disponible). Sin este
+  // guard reconstruíamos huecos vacíos y el marcador mostraba "0 / N aciertos"
+  // como si el alumno hubiera fallado todo.
+  const tieneRespuestasGuardadas = !!respuestasIntento && Object.keys(respuestasIntento).length > 0;
+  const revisionSinDetalle = modoRevision && !tieneRespuestasGuardadas;
+
   const [respuestas, setRespuestas] = useState<string[]>(() => {
-    if (modoRevision && respuestasIntento) {
+    if (modoRevision && tieneRespuestasGuardadas && respuestasIntento) {
       return Array.from({ length: numHuecos }, (_, i) => respuestasIntento[String(i)] ?? '');
     }
     return Array(numHuecos).fill('');
   });
-  const [verificado, setVerificado] = useState(modoRevision);
+  // Sin respuestas guardadas no hay nada que "verificar": arrancar verificado
+  // pintaría todos los huecos en rojo y un marcador de 0 aciertos falso.
+  const [verificado, setVerificado] = useState(modoRevision && !revisionSinDetalle);
   const [reveladas, setReveladas] = useState(false);
   const [pistaVisible, setPistaVisible] = useState<number | null>(null);
   const [shakingAll, setShakingAll] = useState(false);
@@ -342,7 +364,69 @@ export function FillBlanksActivity({
         >
           <Eye size={16} style={{ color: '#818CF8', flexShrink: 0 }} />
           <p style={{ fontSize: 13, fontWeight: 700, color: '#818CF8', margin: 0 }}>
-            Ya completaste esta actividad · Revisando tus respuestas anteriores
+            {revisionSinDetalle
+              ? 'Entrega registrada — la revisión detallada no está disponible'
+              : 'Ya completaste esta actividad · Revisando tus respuestas anteriores'}
+          </p>
+        </motion.div>
+      )}
+
+      {/* Imagen de ambientación */}
+      {tieneImagen ? (
+        <motion.div
+          initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={springs.smooth}
+          style={{ borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', overflow: 'hidden', background: 'rgba(255,255,255,0.04)' }}
+        >
+          <img
+            src={urlImagen}
+            alt={actividad.titulo}
+            style={{ width: '100%', objectFit: 'contain', maxHeight: 500, display: 'block' }}
+            onError={() => setImgError(true)}
+          />
+        </motion.div>
+      ) : !imgTematicaError ? (
+        <motion.div
+          initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={springs.smooth}
+          style={{ borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', overflow: 'hidden', background: 'rgba(255,255,255,0.04)', position: 'relative' }}
+        >
+          <img
+            src={imagenTematica}
+            alt={actividad.titulo}
+            style={{ width: '100%', objectFit: 'cover', height: 224, display: 'block' }}
+            onError={() => setImgTematicaError(true)}
+          />
+          <div
+            style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(to top, rgba(1,17,38,0.55) 0%, rgba(1,17,38,0.10) 40%, transparent 70%)' }}
+          />
+          <p style={{ position: 'absolute', bottom: 12, left: 16, right: 16, margin: 0, fontSize: 12.5, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>
+            {actividad.titulo}
+          </p>
+        </motion.div>
+      ) : (
+        // Fallback honesto si tampoco hay imagen temática en disco: bloque temático sin <img> roto.
+        <motion.div
+          initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={springs.smooth}
+          style={{
+            borderRadius: 16,
+            border: `1px solid rgba(${color.rgba},0.25)`,
+            background: `linear-gradient(135deg, rgba(${color.rgba},0.14), rgba(${color.rgba},0.04))`,
+            height: 180,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 10,
+          }}
+        >
+          <i className={`fa-solid ${color.faIcon}`} style={{ fontSize: 34, color: `rgba(${color.rgba},0.55)` }} />
+          <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.70)', textAlign: 'center', maxWidth: 320 }}>
+            {actividad.titulo}
           </p>
         </motion.div>
       )}
@@ -372,7 +456,9 @@ export function FillBlanksActivity({
             {contenido.instrucciones ?? 'Completá los huecos con la palabra correcta'}
           </p>
           <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.40)', margin: 0 }}>
-            {verificado ? `${aciertos} / ${numHuecos} correctos` : `${llenos} / ${numHuecos} huecos completados`}
+            {revisionSinDetalle
+              ? 'Entrega registrada'
+              : verificado ? `${aciertos} / ${numHuecos} correctos` : `${llenos} / ${numHuecos} huecos completados`}
           </p>
         </div>
       </motion.div>
@@ -422,8 +508,9 @@ export function FillBlanksActivity({
         </p>
       </motion.div>
 
-      {/* Progress counter */}
-      {!verificado && (
+      {/* Progress counter — oculto en revisión: en el estado neutral (sin
+          respuestas guardadas) "0 / N completados" sugeriría trabajo perdido */}
+      {!verificado && !modoRevision && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <div
             role="progressbar"

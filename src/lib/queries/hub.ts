@@ -6,6 +6,7 @@
 import { getSupabaseServer } from "@/lib/supabase-helpers";
 import { CATEGORIA_COMPLEMENTO } from "@/lib/mccems/categorias";
 import { withTimeout, withTimeoutOrThrow } from "@/lib/with-timeout";
+import { getRespuestas } from "@/lib/r2-respuestas";
 
 // Timeout budget for the Supabase query chain inside each function below.
 // On timeout (or any rejection), each function resolves to its own
@@ -33,7 +34,6 @@ export interface ActividadConEstado {
   codigo: string;
   titulo: string;
   tipo: string;
-  xp: number;
   orden: number;
   estado: "no_iniciada" | "en_progreso" | "completada";
   intentoId: string | null;
@@ -198,7 +198,7 @@ export async function getProgresionesConEstado(
       // Get all actividades for these progresiones
       const { data: allActs } = await sb
         .from("actividades")
-        .select("id, codigo, titulo, tipo, xp, progresion_id")
+        .select("id, codigo, titulo, tipo, progresion_id")
         .in("progresion_id", progIds)
         .order("codigo");
 
@@ -237,7 +237,6 @@ export async function getProgresionesConEstado(
               codigo: a.codigo,
               titulo: a.titulo,
               tipo: a.tipo,
-              xp: a.xp,
               orden,
               estado: (intentoStatus === "completed"
                 ? "completada"
@@ -348,7 +347,7 @@ async function fetchActividadesConEstado(
 
       const { data: acts, error: actsError } = await sb
         .from("actividades")
-        .select("id, codigo, titulo, tipo, xp")
+        .select("id, codigo, titulo, tipo")
         .eq("progresion_id", prog.id)
         .order("codigo");
 
@@ -390,7 +389,6 @@ async function fetchActividadesConEstado(
           codigo: a.codigo,
           titulo: a.titulo,
           tipo: a.tipo,
-          xp: a.xp,
           orden,
           estado: (intento?.status === "completed"
             ? "completada"
@@ -644,7 +642,6 @@ export async function getActividadConContenido(
   titulo: string;
   descripcion: string | null;
   tipo: string;
-  xp: number;
   contenido: unknown;
   estado: "no_iniciada" | "en_progreso" | "completada";
   intentoId: string | null;
@@ -673,19 +670,34 @@ export async function getActividadConContenido(
 
       if (!prog) return null;
 
-      // Get all activities for this progresion and find by order suffix
-      const { data: acts } = await sb
+      // Paso 1/2: query LIGERA (sin "contenido", que puede ser un jsonb
+      // pesado) de todas las actividades de la progresión, solo para
+      // resolver cuál id corresponde al sufijo -A{orden} del código. Antes
+      // esto se resolvía descargando el "contenido" completo de TODAS las
+      // actividades de la progresión para usar solo una — con progresiones
+      // largas eso es transferencia desperdiciada en cada carga del runner.
+      const { data: actsLigero } = await sb
         .from("actividades")
-        .select("id, codigo, titulo, descripcion, tipo, xp, contenido, nivel_revision, practica_slug")
+        .select("id, codigo")
         .eq("progresion_id", prog.id)
         .order("codigo");
 
-      if (!acts) return null;
+      if (!actsLigero) return null;
 
-      const act = acts.find((a) => {
+      const actLigero = actsLigero.find((a) => {
         const m = a.codigo.match(/-A(\d+)$/);
         return m?.[1] ? parseInt(m[1]) === orden : false;
       });
+
+      if (!actLigero) return null;
+
+      // Paso 2/2: ahora sí, "contenido" (y el resto de columnas pesadas)
+      // pero de SOLO esa actividad.
+      const { data: act } = await sb
+        .from("actividades")
+        .select("id, codigo, titulo, descripcion, tipo, contenido, nivel_revision, practica_slug")
+        .eq("id", actLigero.id)
+        .maybeSingle();
 
       if (!act) return null;
 
@@ -706,7 +718,22 @@ export async function getActividadConContenido(
             ? "en_progreso"
             : "no_iniciada";
 
-      const respuestasRaw = intento?.respuestas;
+      let respuestasRaw = intento?.respuestas;
+      // Marcador dejado por entregar-actividad.ts cuando "respuestas" superó
+      // el umbral y se descargó a R2 en vez de vivir en el jsonb de Postgres.
+      // Si el objeto no existe en R2 (o no hay binding, p.ej. `next dev`
+      // local/Jest) se trata como sin datos: los componentes de actividad ya
+      // muestran un estado neutral de revisión cuando respuestasIntento es
+      // null/vacío, así que degradar a null aquí nunca rompe la pantalla.
+      if (
+        respuestasRaw &&
+        typeof respuestasRaw === "object" &&
+        !Array.isArray(respuestasRaw) &&
+        (respuestasRaw as Record<string, unknown>).__r2 === 1
+      ) {
+        respuestasRaw = (await getRespuestas(userId, act.id)) as typeof respuestasRaw;
+      }
+
       const respuestasIntento: Record<string, string> | null =
         respuestasRaw && typeof respuestasRaw === "object" && !Array.isArray(respuestasRaw)
           ? Object.fromEntries(
@@ -720,7 +747,6 @@ export async function getActividadConContenido(
         titulo: act.titulo,
         descripcion: act.descripcion,
         tipo: act.tipo,
-        xp: act.xp,
         contenido: act.contenido,
         estado: estado as "no_iniciada" | "en_progreso" | "completada",
         intentoId: intento?.id ?? null,

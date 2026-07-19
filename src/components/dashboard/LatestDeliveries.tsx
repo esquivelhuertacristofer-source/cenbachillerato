@@ -96,17 +96,49 @@ export default function LatestDeliveries({ grupoIds, isDark = true }: LatestDeli
       }
     };
 
-    fetchLatest();
+    // --- Sondeo cada 60 s en lugar de Realtime ---
+    // Antes este widget se suscribía vía postgres_changes a TODOS los INSERT de
+    // public.intentos SIN filtro: con 15-20k alumnos activos, cada entrega en
+    // cualquier escuela del país disparaba un mensaje Realtime por dashboard
+    // abierto (millones de mensajes/día → revienta el tope Free de 2M/mes) y
+    // además re-disparaba fetchLatest() contra la BD en cada evento. Un sondeo
+    // fijo de 60 s da la misma sensación de "casi en vivo" para una lista de
+    // últimas entregas, con costo constante y predecible por pestaña.
+    const POLL_MS = 60_000;
+    let intervalId: ReturnType<typeof setInterval> | null = null;
 
-    // Realtime subscription
-    const channel = sb
-      .channel('realtime_deliveries_bachillerato')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'intentos' }, () => {
+    const startPolling = () => {
+      if (intervalId !== null) return; // ya hay un intervalo activo, no duplicar
+      intervalId = setInterval(() => { void fetchLatest(); }, POLL_MS);
+    };
+
+    const stopPolling = () => {
+      if (intervalId !== null) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+    };
+
+    // Con la pestaña oculta nadie ve el widget: pausamos el sondeo para no
+    // gastar consultas en vano. Al volver a ser visible refrescamos de
+    // inmediato (para no mostrar datos viejos) y reanudamos el intervalo.
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        stopPolling();
+      } else {
         void fetchLatest();
-      })
-      .subscribe();
+        startPolling();
+      }
+    };
 
-    return () => { void sb.removeChannel(channel); };
+    void fetchLatest();
+    if (!document.hidden) startPolling();
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
+    return () => {
+      stopPolling();
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
   }, [grupoIds, isDark]);
 
   return (

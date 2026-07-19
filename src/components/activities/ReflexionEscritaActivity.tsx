@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { PenLine, Clock, CheckCircle, Lightbulb, ClipboardList, Loader2, Send, RotateCcw } from 'lucide-react';
+import { PenLine, Clock, CheckCircle, Lightbulb, ClipboardList, Loader2, Send, RotateCcw, ImageOff } from 'lucide-react';
 import { springs } from '@/lib/motion/tokens';
 import { useReducedMotion } from '@/lib/motion/hooks';
 import { celebrate } from '@/lib/motion/celebrate';
 import type { ActividadReflexionEscrita, CallbackProgreso } from '@/types/activities';
 import type { AreaColor } from '@/components/hub/hub-colors';
+import { imagenDeLectura } from '@/lib/contenido/lectura-imagenes';
 
 const FALLBACK_COLOR: AreaColor = {
   hex: '#F87171', rgba: '248,113,113', faIcon: 'fa-feather-pointed', gradient: '',
@@ -16,6 +17,8 @@ const FALLBACK_COLOR: AreaColor = {
 interface Props {
   actividad: ActividadReflexionEscrita;
   onProgreso?: CallbackProgreso;
+  /** Código de la UAC, para elegir una imagen temática cuando no hay lámina propia. */
+  uacCodigo?: string;
   color?: AreaColor;
   estado?: 'no_iniciada' | 'en_progreso' | 'completada';
   respuestasIntento?: Record<string, string>;
@@ -42,6 +45,7 @@ function TiempoDedicado({ paused }: { paused: boolean }) {
 export function ReflexionEscritaActivity({
   actividad,
   onProgreso,
+  uacCodigo,
   color = FALLBACK_COLOR,
   estado,
   respuestasIntento,
@@ -52,8 +56,23 @@ export function ReflexionEscritaActivity({
   const reducedMotion = useReducedMotion();
 
   const textoInicial = modoRevision ? (respuestasIntento?.texto ?? '') : '';
+  // Estado neutral de revisión: el intento existe pero el texto guardado no
+  // está disponible (`respuestas` null en BD, o próximamente texto largo
+  // externo ausente). Sin este guard mostrábamos un textarea vacío con
+  // "0 / N palabras", como si la entrega se hubiera perdido.
+  const revisionSinDetalle = modoRevision && textoInicial.trim() === '';
   const [texto, setTexto] = useState(textoInicial);
   const [enviando, setEnviando] = useState(false);
+  const [imgError, setImgError] = useState(false);
+  const [imgTematicaError, setImgTematicaError] = useState(false);
+
+  // Los SVG de placeholder ya no existen en disco; cualquier url que contenga
+  // "placeholder" se trata como "sin lámina" para ir directo a la imagen temática
+  // (evita una petición 404 y el ícono de imagen rota).
+  const urlImagen = contenido.url_imagen ?? '';
+  const tieneImagen = urlImagen.length > 0 && !/placeholder/i.test(urlImagen) && !imgError;
+  // Sin lámina propia → imagen temática con licencia libre acorde a la materia.
+  const imagenTematica = imagenDeLectura(uacCodigo, actividad.titulo);
 
   const palabras = texto.trim() === '' ? 0 : texto.trim().split(/\s+/).length;
   const pct = Math.min(100, minPalabras > 0 ? Math.round((palabras / minPalabras) * 100) : 100);
@@ -119,6 +138,53 @@ export function ReflexionEscritaActivity({
         }
       `}</style>
 
+      {/* Imagen de ambientación */}
+      {tieneImagen ? (
+        <div style={{ borderRadius: 20, border: '1px solid rgba(255,255,255,0.08)', overflow: 'hidden', background: 'rgba(255,255,255,0.04)' }}>
+          <img
+            src={urlImagen}
+            alt={actividad.titulo}
+            style={{ width: '100%', objectFit: 'contain', maxHeight: 500, display: 'block' }}
+            onError={() => setImgError(true)}
+          />
+        </div>
+      ) : !imgTematicaError ? (
+        <div style={{ borderRadius: 20, border: '1px solid rgba(255,255,255,0.08)', overflow: 'hidden', background: 'rgba(255,255,255,0.04)', position: 'relative' }}>
+          <img
+            src={imagenTematica}
+            alt={actividad.titulo}
+            style={{ width: '100%', objectFit: 'cover', height: 224, display: 'block' }}
+            onError={() => setImgTematicaError(true)}
+          />
+          <div
+            style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(to top, rgba(1,17,38,0.55) 0%, rgba(1,17,38,0.10) 40%, transparent 70%)' }}
+          />
+          <p style={{ position: 'absolute', bottom: 12, left: 16, right: 16, margin: 0, fontSize: 12.5, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>
+            {actividad.titulo}
+          </p>
+        </div>
+      ) : (
+        // Fallback honesto si tampoco hay imagen temática en disco: bloque temático sin <img> roto.
+        <div
+          style={{
+            borderRadius: 20,
+            border: `1px solid rgba(${color.rgba},0.25)`,
+            background: `linear-gradient(135deg, rgba(${color.rgba},0.14), rgba(${color.rgba},0.04))`,
+            height: 180,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 10,
+          }}
+        >
+          <ImageOff size={34} style={{ color: color.hex, opacity: 0.55 }} />
+          <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.70)', textAlign: 'center', maxWidth: 320 }}>
+            {actividad.titulo}
+          </p>
+        </div>
+      )}
+
       {/* Revision mode banner */}
       <AnimatePresence>
         {modoRevision && (
@@ -134,10 +200,12 @@ export function ReflexionEscritaActivity({
             <RotateCcw size={18} style={{ color: '#818CF8', flexShrink: 0 }} />
             <div>
               <p style={{ fontSize: 13, fontWeight: 700, color: '#818CF8', margin: 0 }}>
-                Revisando tu entrega anterior
+                {revisionSinDetalle ? 'Entrega registrada' : 'Revisando tu entrega anterior'}
               </p>
               <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', margin: '2px 0 0' }}>
-                Esta es la reflexión que enviaste. Puedes leerla pero no editarla.
+                {revisionSinDetalle
+                  ? 'La revisión detallada no está disponible, pero tu reflexión quedó registrada al entregarla.'
+                  : 'Esta es la reflexión que enviaste. Puedes leerla pero no editarla.'}
               </p>
             </div>
           </motion.div>
@@ -203,6 +271,31 @@ export function ReflexionEscritaActivity({
           transition={{ ...springs.smooth, delay: 0.12 }}
           style={{ display: 'flex', flexDirection: 'column', gap: 14 }}
         >
+          {revisionSinDetalle ? (
+            /* Estado neutral: no hay texto que mostrar. Evitamos el textarea
+               vacío y el contador "0 / N palabras", que sugerían una entrega
+               perdida o fallida. */
+            <div style={{
+              ...card, minHeight: 260, padding: '48px 32px',
+              display: 'flex', flexDirection: 'column', alignItems: 'center',
+              justifyContent: 'center', gap: 12, textAlign: 'center',
+            }}>
+              <CheckCircle size={40} style={{ color: color.hex, opacity: 0.75 }} />
+              <p style={{
+                fontSize: 17, fontWeight: 800, color: 'rgba(255,255,255,0.90)',
+                margin: 0, fontFamily: 'var(--font-epilogue), sans-serif',
+              }}>
+                Entrega registrada
+              </p>
+              <p style={{
+                fontSize: 13, color: 'rgba(255,255,255,0.50)',
+                margin: 0, lineHeight: 1.6, maxWidth: 420,
+              }}>
+                La revisión detallada no está disponible para este intento.
+              </p>
+            </div>
+          ) : (
+          <>
           <textarea
             className="reflexion-textarea"
             value={texto}
@@ -317,6 +410,8 @@ export function ReflexionEscritaActivity({
                 `Faltan ${minPalabras - palabras} palabras`
               )}
             </motion.button>
+          )}
+          </>
           )}
         </motion.div>
 

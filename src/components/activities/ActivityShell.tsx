@@ -51,7 +51,6 @@ function herramientasPorArea(uacCodigo: string): Herramienta[] {
 export interface ActivityShellProps {
   titulo: string;
   tipo: string;
-  xp: number;
   color: AreaColor;
   estado: "no_iniciada" | "en_progreso" | "completada";
   backHref: string;
@@ -70,7 +69,6 @@ export interface ActivityShellProps {
 export function ActivityShell({
   titulo,
   tipo,
-  xp,
   color,
   estado,
   backHref,
@@ -365,15 +363,6 @@ export function ActivityShell({
                   }}>
                     <i className={`fa-solid ${tc.faIcon}`} style={{ marginRight: 6, fontSize: 9 }} />
                     {tc.label}
-                  </span>
-                  <span style={{
-                    fontSize: 10, fontWeight: 700, letterSpacing: "0.10em",
-                    color: "rgba(255,255,255,0.40)", padding: "5px 14px",
-                    background: "rgba(255,255,255,0.05)",
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    borderRadius: 999,
-                  }}>
-                    +{xp} XP
                   </span>
                   <span style={{
                     fontSize: 10, fontWeight: 700, letterSpacing: "0.10em",

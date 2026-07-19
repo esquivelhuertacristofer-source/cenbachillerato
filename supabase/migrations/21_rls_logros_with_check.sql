@@ -2,6 +2,28 @@
 -- Migración 21: WITH CHECK explícito en logros_admin_only_write
 -- ============================================================================
 --
+-- ⚠ ADEMÁS SUPERADA POR LA MIGRACIÓN 22 — la 22 elimina las tablas
+-- public.logros / public.logros_alumno por completo (se retiró el sistema de
+-- logros del producto), lo que vuelve moot cualquier policy sobre ellas. Si ya
+-- aplicaste la 22, esta migración (y la 20 en lo referente a logros) no tienen
+-- nada sobre qué operar.
+--
+-- ⚠ SUPERADA POR LA MIGRACIÓN 20 — NO APLICAR SI YA APLICASTE LA 20.
+--
+-- La migración 20 (20_rls_restringir_escritura_contenido_global.sql) borra
+-- "logros_admin_only_write" y crea "logros_super_admin_only_write" (solo
+-- super_admin, con WITH CHECK explícito ya incluido). Si esta migración 21 se
+-- aplica DESPUÉS de la 20, el DROP POLICY IF EXISTS no encuentra nada que
+-- borrar (20 ya renombró la policy) pero el CREATE POLICY de abajo sí corre,
+-- recreando "logros_admin_only_write" con la lógica amplia original
+-- (admin OR super_admin). Quedarían DOS policies PERMISSIVE activas sobre
+-- logros a la vez, y Postgres las combina con OR — es decir, revive el acceso
+-- de admin escolar que la 20 acababa de cerrar.
+--
+-- La 20 ya cubre todo lo que esta migración buscaba (WITH CHECK explícito) y
+-- de forma más estricta. Trátala como no-op: no hace falta aplicarla.
+--
+
 -- HALLAZGO (docs/diagnostico/AUDITORIA-GOLD-2026-07-13.md):
 --
 --   CREATE POLICY "logros_admin_only_write"

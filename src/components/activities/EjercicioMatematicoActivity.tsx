@@ -8,6 +8,7 @@ import { useReducedMotion } from '@/lib/motion/hooks';
 import { celebrate } from '@/lib/motion/celebrate';
 import type { ActividadEjercicioMatematico, CallbackProgreso } from '@/types/activities';
 import type { AreaColor } from '@/components/hub/hub-colors';
+import { imagenDeLectura } from '@/lib/contenido/lectura-imagenes';
 
 const FALLBACK_COLOR: AreaColor = { hex: '#FB923C', rgba: '251,146,60', faIcon: 'fa-calculator', gradient: '' };
 const MAX_INTENTOS = 3;
@@ -15,19 +16,25 @@ const MAX_INTENTOS = 3;
 interface Props {
   actividad: ActividadEjercicioMatematico;
   onProgreso?: CallbackProgreso;
+  /** Código de la UAC, para elegir una imagen temática cuando no hay lámina propia. */
+  uacCodigo?: string;
   color?: AreaColor;
   estado?: 'no_iniciada' | 'en_progreso' | 'completada';
   respuestasIntento?: Record<string, string>;
 }
 
 export function EjercicioMatematicoActivity({
-  actividad, onProgreso, color = FALLBACK_COLOR, estado, respuestasIntento,
+  actividad, onProgreso, uacCodigo, color = FALLBACK_COLOR, estado, respuestasIntento,
 }: Props) {
   const { contenido } = actividad;
   const reducedMotion = useReducedMotion();
   const modoRevision = estado === 'completada';
   const pasos = contenido.pasos_guia ?? [];
   const esDesarrollo = contenido.tipo_respuesta === 'desarrollo';
+  // Estado neutral de revisión: el intento existe pero la respuesta guardada
+  // no está disponible (`respuestas` null en BD, datos históricos). Lo decimos
+  // en el banner en lugar de fingir que hay una respuesta que revisar.
+  const revisionSinDetalle = modoRevision && !respuestasIntento?.respuesta;
 
   const [respuesta, setRespuesta] = useState(() =>
     modoRevision ? (respuestasIntento?.respuesta ?? '') : ''
@@ -39,12 +46,22 @@ export function EjercicioMatematicoActivity({
   const [entregando, setEntregando] = useState(false);
   const [pasosAbiertos, setPasosAbiertos] = useState<boolean[]>(() => Array(pasos.length).fill(false));
   const [maxUnlocked, setMaxUnlocked] = useState(modoRevision ? pasos.length : 0);
+  const [imgError, setImgError] = useState(false);
+  const [imgTematicaError, setImgTematicaError] = useState(false);
   const shakeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => () => { if (shakeTimer.current) clearTimeout(shakeTimer.current); }, []);
 
   const verificado = correcto !== null || solucionRevelada;
   const intentosAgotados = intentos >= MAX_INTENTOS;
+
+  // Los SVG de placeholder ya no existen en disco; cualquier url que contenga
+  // "placeholder" se trata como "sin lámina" para ir directo a la imagen temática
+  // (evita una petición 404 y el ícono de imagen rota).
+  const urlImagen = contenido.url_imagen ?? '';
+  const tieneImagen = urlImagen.length > 0 && !/placeholder/i.test(urlImagen) && !imgError;
+  // Sin lámina propia → imagen temática con licencia libre acorde a la materia.
+  const imagenTematica = imagenDeLectura(uacCodigo, actividad.titulo);
 
   function togglePaso(i: number) {
     if (i > maxUnlocked) return;
@@ -132,6 +149,53 @@ export function EjercicioMatematicoActivity({
         .em-paso-btn:focus-visible { outline: 2px solid rgba(255,255,255,0.30); outline-offset: 2px; }
       `}</style>
 
+      {/* Imagen principal */}
+      {tieneImagen ? (
+        <div style={{ ...card, overflow: 'hidden' }}>
+          <img
+            src={urlImagen}
+            alt={actividad.titulo}
+            style={{ width: '100%', objectFit: 'contain', maxHeight: 500, display: 'block' }}
+            onError={() => setImgError(true)}
+          />
+        </div>
+      ) : !imgTematicaError ? (
+        <div style={{ ...card, overflow: 'hidden', position: 'relative' }}>
+          <img
+            src={imagenTematica}
+            alt={actividad.titulo}
+            style={{ width: '100%', objectFit: 'cover', height: 224, display: 'block' }}
+            onError={() => setImgTematicaError(true)}
+          />
+          <div
+            style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(to top, rgba(1,17,38,0.55) 0%, rgba(1,17,38,0.10) 40%, transparent 70%)' }}
+          />
+          <p style={{ position: 'absolute', bottom: 12, left: 16, right: 16, margin: 0, fontSize: 12.5, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>
+            {actividad.titulo}
+          </p>
+        </div>
+      ) : (
+        // Fallback honesto si tampoco hay imagen temática en disco: bloque temático sin <img> roto.
+        <div
+          style={{
+            ...card,
+            background: `linear-gradient(135deg, rgba(${color.rgba},0.14), rgba(${color.rgba},0.04))`,
+            border: `1px solid rgba(${color.rgba},0.25)`,
+            height: 180,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 10,
+          }}
+        >
+          <Calculator size={34} style={{ color: `rgba(${color.rgba},0.55)` }} />
+          <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.70)', textAlign: 'center', maxWidth: 320 }}>
+            {actividad.titulo}
+          </p>
+        </div>
+      )}
+
       {/* Revision mode banner */}
       {modoRevision && (
         <motion.div
@@ -146,7 +210,9 @@ export function EjercicioMatematicoActivity({
         >
           <Check size={16} style={{ color: '#818CF8', flexShrink: 0 }} />
           <p style={{ fontSize: 13, fontWeight: 700, color: '#818CF8', margin: 0 }}>
-            Ya completaste este ejercicio · Revisando tu respuesta anterior
+            {revisionSinDetalle
+              ? 'Entrega registrada — la revisión detallada no está disponible'
+              : 'Ya completaste este ejercicio · Revisando tu respuesta anterior'}
           </p>
         </motion.div>
       )}

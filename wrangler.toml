@@ -14,6 +14,31 @@ id = "0da92b588ccb44aa9af534d2596f541b"
 binding = "RATE_LIMIT_KV"
 id = "8ede628e17004471b6301940af3f43b4"
 
+# Bucket R2 para el jsonb "respuestas" de `intentos` cuando supera 2 KB (ver
+# src/lib/r2-respuestas.ts y src/lib/actions/entregar-actividad.ts). R2 Free:
+# 10 GB + 1M operaciones Clase A/mes, cero egress — saca ese jsonb variable
+# del driver de tamaño de la fila en el plan Free de Supabase (500 MB).
+[[r2_buckets]]
+binding = "RESPUESTAS_BUCKET"
+bucket_name = "cen-respuestas"
+
+# Rate Limiting nativo de Workers (GA desde 2025-09-19, sin costo propio).
+# Camino primario del limiter: KV Free permite solo 1,000 escrituras/DÍA POR
+# CUENTA, así que a escala el limiter respaldado en KV se queda sin cupo a media
+# mañana y falla abierto en silencio; el binding nativo no consume ese cupo.
+# Los límites REALES viven AQUÍ (los `opts` de checkRateLimit solo gobiernan el
+# fallback KV). `period` solo acepta 10 o 60 (segundos). `namespace_id` es un
+# identificador arbitrario pero único por binding dentro de este Worker.
+[[ratelimits]]
+binding = "LOGIN_RATE_LIMITER"
+namespace_id = "1001"
+simple = { limit = 10, period = 60 }
+
+[[ratelimits]]
+binding = "ENTREGA_RATE_LIMITER"
+namespace_id = "1002"
+simple = { limit = 30, period = 60 }
+
 [observability]
 enabled = true
 

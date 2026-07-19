@@ -325,7 +325,8 @@
    ══════════════════════════════════════════════════════════════ */
 .prog-2col {
   display: grid;
-  grid-template-columns: 1.15fr 1fr;
+  grid-template-columns: 1fr;
+  max-width: 520px;
   gap: 22px;
   margin-bottom: 36px;
 }
@@ -426,84 +427,6 @@
   display: inline-block;
 }
 
-/* ── Logros ─── */
-.prog-logros-count {
-  font-size: 12px;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.32);
-}
-
-.prog-empty {
-  text-align: center;
-  padding: 28px 12px;
-}
-
-.prog-empty-badge {
-  width: 76px;
-  height: 76px;
-  margin: 0 auto 16px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 34px;
-  background: radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.03) 65%, transparent 75%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.prog-empty-title {
-  font-size: 15px;
-  font-weight: 800;
-  color: #fff;
-  margin: 0 0 6px;
-}
-
-.prog-empty-desc {
-  font-size: 12.5px;
-  color: rgba(255, 255, 255, 0.42);
-  margin: 0 auto;
-  max-width: 280px;
-  line-height: 1.55;
-}
-
-.prog-logros-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-}
-
-.prog-logro {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 1;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 26px;
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
-}
-
-.prog-logro:not(.locked):hover {
-  transform: scale(1.08);
-  box-shadow: 0 4px 18px rgba(255, 255, 255, 0.1);
-}
-
-.prog-logro.locked {
-  opacity: 0.22;
-  filter: grayscale(1) brightness(0.6);
-}
-
-.prog-logro-lock {
-  position: absolute;
-  bottom: 5px;
-  right: 6px;
-  font-size: 8px;
-  color: rgba(255, 255, 255, 0.7);
-}
-
 /* ── Actividades recientes ─── */
 .prog-act {
   display: flex;
@@ -562,12 +485,6 @@
   flex-shrink: 0;
 }
 
-.prog-act-xp {
-  font-size: 12px;
-  font-weight: 800;
-  color: #fbbf24;
-}
-
 .prog-act-when {
   font-size: 11px;
   color: rgba(255, 255, 255, 0.28);
@@ -594,15 +511,12 @@
     justify-content: center;
   }
   .prog-2col {
-    grid-template-columns: 1fr;
+    max-width: none;
   }
 }
 
 @media (max-width: 560px) {
   .prog-page {
     padding: 28px 18px 64px;
-  }
-  .prog-logros-grid {
-    grid-template-columns: repeat(3, 1fr);
   }
 }

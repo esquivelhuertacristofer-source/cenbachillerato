@@ -8,6 +8,7 @@ import { useReducedMotion } from '@/lib/motion/hooks';
 import { celebrate, fireworks } from '@/lib/motion/celebrate';
 import type { ActividadQuizMultipleOpcion, CallbackProgreso } from '@/types/activities';
 import type { AreaColor } from '@/components/hub/hub-colors';
+import { imagenDeLectura } from '@/lib/contenido/lectura-imagenes';
 
 const FALLBACK_COLOR: AreaColor = { hex: '#A78BFA', rgba: '167,139,250', faIcon: 'fa-circle-dot', gradient: '' };
 const LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'];
@@ -15,6 +16,8 @@ const LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'];
 interface Props {
   actividad: ActividadQuizMultipleOpcion;
   onProgreso?: CallbackProgreso;
+  /** Código de la UAC, para elegir una imagen temática cuando no hay lámina propia. */
+  uacCodigo?: string;
   color?: AreaColor;
   estado?: 'no_iniciada' | 'en_progreso' | 'completada';
   respuestasIntento?: Record<string, string>;
@@ -149,7 +152,7 @@ function OpcionCard({ letra, texto, estado, onClick, disabled, seleccionada }: O
 
 // ── Main component ─────────────────────────────────────────────────────────────
 
-export function QuizMultipleOpcionActivity({ actividad, onProgreso, color = FALLBACK_COLOR, estado, respuestasIntento }: Props) {
+export function QuizMultipleOpcionActivity({ actividad, onProgreso, uacCodigo, color = FALLBACK_COLOR, estado, respuestasIntento }: Props) {
   const { contenido } = actividad;
   const preguntas = contenido.preguntas;
   const total = preguntas.length;
@@ -158,8 +161,13 @@ export function QuizMultipleOpcionActivity({ actividad, onProgreso, color = FALL
   const modoRevision = estado === 'completada';
   const fireworksFired = useRef(false);
 
-  // Reconstruct previous answers for revision mode
-  const initialRespuestasArr: RespuestaRegistrada[] = modoRevision && respuestasIntento
+  // Reconstruct previous answers for revision mode. Si `respuestas` llegó null
+  // o vacío desde la BD (intentos históricos, o detalle almacenado fuera de la
+  // fila), NO fabricamos respuestas con '-1': eso marcaba todo como incorrecto
+  // y el resumen mostraba un "0 aciertos" engañoso, como si el alumno hubiera
+  // fallado todo. En ese caso el resumen cae al estado neutral (ver abajo).
+  const tieneRespuestasGuardadas = !!respuestasIntento && Object.keys(respuestasIntento).length > 0;
+  const initialRespuestasArr: RespuestaRegistrada[] = modoRevision && respuestasIntento && tieneRespuestasGuardadas
     ? preguntas.map((p, i) => {
         const seleccionada = parseInt(respuestasIntento[String(i)] ?? '-1', 10);
         return { seleccionada, correcta: seleccionada === p.respuesta_correcta };
@@ -172,13 +180,22 @@ export function QuizMultipleOpcionActivity({ actividad, onProgreso, color = FALL
   const [respuestaActual, setRespuestaActual] = useState<number | null>(null);
   const [verificada, setVerificada] = useState(false);
   const [tiempoInicio, setTiempoInicio] = useState(0);
-  const [xpGanado, setXpGanado] = useState(0);
   const [entregado, setEntregado] = useState(false);
   // Guard síncrono contra doble-clic: el estado `verificada` llega tarde entre
   // dos clics en el mismo tick, lo que duplicaba la respuesta y atascaba la
   // transición de AnimatePresence. lockRef bloquea de inmediato.
   const lockRef = useRef(false);
   const [tiempoFin, setTiempoFin] = useState(0);
+  const [imgError, setImgError] = useState(false);
+  const [imgTematicaError, setImgTematicaError] = useState(false);
+
+  // Los SVG de placeholder ya no existen en disco; cualquier url que contenga
+  // "placeholder" se trata como "sin lámina" para ir directo a la imagen temática
+  // (evita una petición 404 y el ícono de imagen rota).
+  const urlImagen = contenido.url_imagen ?? '';
+  const tieneImagen = urlImagen.length > 0 && !/placeholder/i.test(urlImagen) && !imgError;
+  // Sin lámina propia → imagen temática con licencia libre acorde a la materia.
+  const imagenTematica = imagenDeLectura(uacCodigo, actividad.titulo);
 
   // fireworks on resumen si score >= 80
   useEffect(() => {
@@ -203,7 +220,6 @@ export function QuizMultipleOpcionActivity({ actividad, onProgreso, color = FALL
     setRespuestasArr([]);
     setRespuestaActual(null);
     setVerificada(false);
-    setXpGanado(0);
   }
 
   function handleSeleccion(indice: number) {
@@ -218,7 +234,6 @@ export function QuizMultipleOpcionActivity({ actividad, onProgreso, color = FALL
 
     if (correcta && !reducedMotion) {
       void celebrate('small');
-      setXpGanado(prev => prev + Math.floor((actividad.xp ?? 0) / total));
     }
     // El avance ya NO es automático: el alumno lee la retroalimentación a su
     // propio ritmo y pulsa "Siguiente" cuando esté listo (WCAG 2.2.1 — sin
@@ -246,7 +261,6 @@ export function QuizMultipleOpcionActivity({ actividad, onProgreso, color = FALL
     setRespuestasArr([]);
     setRespuestaActual(null);
     setVerificada(false);
-    setXpGanado(0);
     setTiempoInicio(Date.now());
     setTiempoFin(0);
     setEntregado(false);
@@ -270,6 +284,11 @@ export function QuizMultipleOpcionActivity({ actividad, onProgreso, color = FALL
 
   if (fase === 'resumen') {
     const arr = respuestasArr.length > 0 ? respuestasArr : initialRespuestasArr;
+    // Estado neutral de revisión: el intento existe pero no hay respuestas
+    // guardadas que reconstruir (arr solo queda vacío en ese caso — fuera de
+    // revisión, al resumen siempre se llega con respuestas). No inventamos
+    // aciertos ni porcentajes: reconocemos la entrega y ofrecemos rehacer.
+    const sinDetalleRevision = modoRevision && arr.length === 0;
     const aciertos = arr.filter(r => r.correcta).length;
     const pct = total > 0 ? Math.round((aciertos / total) * 100) : 0;
     const tiempoTotal = tiempoInicio > 0 && tiempoFin > 0
@@ -286,6 +305,85 @@ export function QuizMultipleOpcionActivity({ actividad, onProgreso, color = FALL
     const itemVariants = reducedMotion
       ? { hidden: { opacity: 1 }, visible: { opacity: 1 } }
       : { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { ...springs.gentle } } };
+
+    if (sinDetalleRevision) {
+      return (
+        <motion.div
+          initial="hidden" animate="visible" variants={containerVariants}
+          style={{ display: 'flex', flexDirection: 'column', gap: 28 }}
+        >
+          <style>{`
+            .quiz-btn-sec:focus-visible { outline: 2px solid rgba(255,255,255,0.50); outline-offset: 3px; }
+          `}</style>
+
+          {/* Modo revisión banner */}
+          <motion.div variants={itemVariants} style={{
+            padding: '14px 20px', borderRadius: 14,
+            background: `rgba(${color.rgba}, 0.08)`,
+            border: `1px solid rgba(${color.rgba}, 0.22)`,
+            display: 'flex', alignItems: 'center', gap: 12, fontSize: 13,
+          }}>
+            <Check size={16} color={color.hex} style={{ flexShrink: 0 }} />
+            <div>
+              <span style={{ fontWeight: 700, color: '#fff' }}>Ya completaste este quiz.</span>
+              {' '}
+              <span style={{ color: 'rgba(255,255,255,0.50)' }}>Esta es una revisión.</span>
+            </div>
+          </motion.div>
+
+          {/* Aviso neutral: la entrega existe pero su detalle no está disponible */}
+          <motion.div
+            variants={itemVariants}
+            style={{
+              borderRadius: 28, padding: 'clamp(32px,5vw,52px) clamp(24px,5vw,48px)',
+              textAlign: 'center',
+              background: `rgba(${color.rgba}, 0.05)`,
+              border: `1.5px solid rgba(${color.rgba}, 0.18)`,
+            }}
+          >
+            <ListChecks size={56} color={color.hex} style={{ margin: '0 auto 20px', display: 'block', opacity: 0.85 }} />
+            <h2 style={{
+              fontSize: 'clamp(1.4rem,3.5vw,1.9rem)', fontWeight: 900, color: '#fff',
+              margin: '0 0 12px', letterSpacing: '-0.04em',
+              fontFamily: "var(--font-epilogue), sans-serif",
+            }}>
+              Entrega registrada
+            </h2>
+            <p style={{
+              fontSize: 15, color: 'rgba(255,255,255,0.55)', margin: '0 auto',
+              maxWidth: 460, lineHeight: 1.6,
+            }}>
+              La revisión detallada no está disponible para este intento.
+              Puedes volver a hacer el quiz si quieres repasarlo.
+            </p>
+          </motion.div>
+
+          {/* CTA: solo "Volver a hacer" — sin "Continuar", porque re-entregar
+              sin respuestas registraría un puntaje de 0 que no corresponde. */}
+          <motion.div variants={itemVariants} style={{ display: 'flex' }}>
+            <motion.button
+              className="quiz-btn-sec"
+              onClick={handleReiniciar}
+              whileHover={reducedMotion ? {} : { scale: 1.02, y: -2 }}
+              whileTap={reducedMotion ? {} : { scale: 0.98 }}
+              transition={springs.snappy}
+              style={{
+                flex: 1, minWidth: 160,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                padding: '16px 28px', borderRadius: 16, border: '1.5px solid rgba(255,255,255,0.12)',
+                background: 'rgba(255,255,255,0.05)', cursor: 'pointer',
+                fontSize: 13, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.10em',
+                color: 'rgba(255,255,255,0.65)', fontFamily: "var(--font-epilogue), sans-serif",
+                outline: 'none',
+              }}
+            >
+              <RotateCcw size={14} />
+              Volver a hacer
+            </motion.button>
+          </motion.div>
+        </motion.div>
+      );
+    }
 
     return (
       <motion.div
@@ -369,7 +467,6 @@ export function QuizMultipleOpcionActivity({ actividad, onProgreso, color = FALL
             {[
               { label: 'Aciertos', value: `${aciertos}/${total}`, Icon: Check },
               { label: 'Tiempo', value: tiempoTotal > 0 ? formatTiempo(tiempoTotal) : '—', Icon: Clock },
-              { label: 'XP', value: `+${xpGanado}`, Icon: Sparkles },
             ].map(({ label, value, Icon }) => (
               <div key={label} style={{
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
@@ -511,6 +608,54 @@ export function QuizMultipleOpcionActivity({ actividad, onProgreso, color = FALL
           .quiz-opcion:focus-visible { outline: 2px solid var(--quiz-opt-color, #A78BFA); outline-offset: 3px; }
         `}</style>
 
+        {/* Imagen de portada del quiz */}
+        {tieneImagen ? (
+          <div style={{ width: '100%', borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', overflow: 'hidden', background: 'rgba(255,255,255,0.04)' }}>
+            <img
+              src={urlImagen}
+              alt={actividad.titulo}
+              style={{ width: '100%', objectFit: 'contain', maxHeight: 500, display: 'block' }}
+              onError={() => setImgError(true)}
+            />
+          </div>
+        ) : !imgTematicaError ? (
+          <div style={{ width: '100%', borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', overflow: 'hidden', background: 'rgba(255,255,255,0.04)', position: 'relative' }}>
+            <img
+              src={imagenTematica}
+              alt={actividad.titulo}
+              style={{ width: '100%', objectFit: 'cover', height: 224, display: 'block' }}
+              onError={() => setImgTematicaError(true)}
+            />
+            <div
+              style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(to top, rgba(1,17,38,0.55) 0%, rgba(1,17,38,0.10) 40%, transparent 70%)' }}
+            />
+            <p style={{ position: 'absolute', bottom: 12, left: 16, right: 16, margin: 0, fontSize: 12.5, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>
+              {actividad.titulo}
+            </p>
+          </div>
+        ) : (
+          // Fallback honesto si tampoco hay imagen temática en disco: bloque temático sin <img> roto.
+          <div
+            style={{
+              width: '100%',
+              borderRadius: 16,
+              border: `1px solid rgba(${color.rgba},0.25)`,
+              background: `linear-gradient(135deg, rgba(${color.rgba},0.14), rgba(${color.rgba},0.04))`,
+              height: 180,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 10,
+            }}
+          >
+            <ListChecks size={34} color={color.hex} style={{ opacity: 0.55 }} />
+            <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.70)', textAlign: 'center', maxWidth: 320 }}>
+              {actividad.titulo}
+            </p>
+          </div>
+        )}
+
         <motion.div
           initial={reducedMotion ? {} : { scale: 0, rotate: -10 }}
           animate={{ scale: 1, rotate: 0 }}
@@ -600,13 +745,6 @@ export function QuizMultipleOpcionActivity({ actividad, onProgreso, color = FALL
             color: 'rgba(255,255,255,0.38)',
           }}>
             Pregunta {preguntaActual + 1} de {total}
-          </span>
-          <span style={{
-            fontSize: 12, fontWeight: 800, color: color.hex,
-            padding: '3px 12px', borderRadius: 999,
-            background: `rgba(${color.rgba}, 0.10)`,
-          }}>
-            +{xpGanado} XP
           </span>
         </div>
         <div

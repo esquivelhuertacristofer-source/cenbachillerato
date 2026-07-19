@@ -1,0 +1,408 @@
+[
+  {
+    "codigo": "CD-I-P01-A1",
+    "uac": "CD-I",
+    "progresion": "CD-I-P01",
+    "titulo": "¿Qué hay dentro de mis dispositivos?",
+    "extracto": "Cuando usas tu celular, tablet o computadora, estás interactuando con dos tipos de componentes que trabajan juntos: el hardware y el software. El hardware es todo lo que puedes tocar físicamente: la pantalla, el procesador, la memoria RAM, el disco de almacena"
+  },
+  {
+    "codigo": "CD-I-P02-A1",
+    "uac": "CD-I",
+    "progresion": "CD-I-P02",
+    "titulo": "¿De quién es el software que uso?",
+    "extracto": "Cuando instalas una aplicación o descargas un archivo, estás aceptando una licencia de uso, aunque rara vez la leas. Una licencia es un contrato legal que establece qué puedes y qué no puedes hacer con ese software o contenido. El software propietario (o priva"
+  },
+  {
+    "codigo": "CD-I-P03-A1",
+    "uac": "CD-I",
+    "progresion": "CD-I-P03",
+    "titulo": "¿Quién controla la información en internet?",
+    "extracto": "Cada vez que usas una aplicación gratuita, estás pagando con algo más valioso que el dinero: tus datos. Las grandes plataformas digitales (Google, Meta, Amazon, TikTok) recolectan enormes cantidades de información sobre sus usuarios: qué buscas, cuánto tiempo "
+  },
+  {
+    "codigo": "CD-I-P04-A1",
+    "uac": "CD-I",
+    "progresion": "CD-I-P04",
+    "titulo": "Los algoritmos deciden por nosotros",
+    "extracto": "Un algoritmo es un conjunto de instrucciones ordenadas para resolver un problema o completar una tarea. Los cocineros siguen algoritmos (recetas), los médicos siguen algoritmos (protocolos de diagnóstico), y las computadoras ejecutan algoritmos para hacer cual"
+  },
+  {
+    "codigo": "CD-I-P05-A1",
+    "uac": "CD-I",
+    "progresion": "CD-I-P05",
+    "titulo": "Mis derechos en el mundo digital",
+    "extracto": "En el mundo digital, tenemos derechos que muchas veces desconocemos. Los derechos digitales son extensiones de los derechos humanos fundamentales aplicados al entorno tecnológico. Algunos de los más importantes son: • Derecho a la privacidad digital: nadie pue"
+  },
+  {
+    "codigo": "CD-I-P06-A1",
+    "uac": "CD-I",
+    "progresion": "CD-I-P06",
+    "titulo": "Navegar seguro en internet",
+    "extracto": "Navegar en internet conlleva riesgos que conviene conocer para protegerse. Los tres principales que todo usuario debe reconocer son el phishing, la desinformación y la vigilancia. El phishing (suplantación de identidad) es cuando alguien crea una página web, c"
+  },
+  {
+    "codigo": "CD-I-P07-A1",
+    "uac": "CD-I",
+    "progresion": "CD-I-P07",
+    "titulo": "Identidades y respeto en el ciberespacio",
+    "extracto": "El ciberespacio es un espacio social donde conviven millones de personas con identidades, culturas, lenguas y perspectivas muy diversas. Así como en el mundo físico la diversidad es una riqueza, en el mundo digital también lo es. Sin embargo, el anonimato y la"
+  },
+  {
+    "codigo": "CD-I-P08-A1",
+    "uac": "CD-I",
+    "progresion": "CD-I-P08",
+    "titulo": "Herramientas digitales para estudiar",
+    "extracto": "Las herramientas digitales para el estudio y la organización han transformado la forma en que aprendemos, colaboramos y comunicamos. Conocerlas y usarlas estratégicamente puede marcar una gran diferencia en tu rendimiento académico. Para la organización de inf"
+  },
+  {
+    "codigo": "CD-I-P09-A1",
+    "uac": "CD-I",
+    "progresion": "CD-I-P09",
+    "titulo": "Las cuatro libertades del software libre",
+    "extracto": "El software libre es aquel que respeta la libertad de las personas usuarias. Se define por cuatro libertades: (0) usar el programa para cualquier propósito; (1) estudiar cómo funciona y adaptarlo, lo que requiere acceso al código fuente; (2) distribuir copias "
+  },
+  {
+    "codigo": "CD-I-P10-A1",
+    "uac": "CD-I",
+    "progresion": "CD-I-P10",
+    "titulo": "Uso responsable de la IA y huella ambiental de lo digital",
+    "extracto": "Las tecnologías digitales sirven para fines personales, académicos y sociales, pero su uso exige responsabilidad y ética. La inteligencia artificial (IA) puede ayudarte a estudiar, redactar o crear, pero conviene usarla de forma crítica: verifica la informació"
+  },
+  {
+    "codigo": "CD-I-P11-A1",
+    "uac": "CD-I",
+    "progresion": "CD-I-P11",
+    "titulo": "Lenguaje algorítmico: datos, variables y operadores",
+    "extracto": "Para que una computadora resuelva un problema necesitamos expresarlo en un lenguaje algorítmico, un conjunto ordenado de elementos que describen la solución paso a paso. La materia prima son los datos (valores como un número o un texto) que, al organizarse y d"
+  },
+  {
+    "codigo": "CNEYT-I-P01-A1",
+    "uac": "CNEYT-I",
+    "progresion": "CNEYT-I-P01",
+    "titulo": "Las ciencias: una práctica humana, no un conjunto de verdades absolutas",
+    "extracto": "La ciencia suele presentarse en los libros de texto como un conjunto de hechos establecidos y verdades definitivas. Pero esta imagen distorsiona profundamente lo que la ciencia realmente es: una práctica social, histórica y colectiva, llena de errores, debates"
+  },
+  {
+    "codigo": "CNEYT-I-P02-A1",
+    "uac": "CNEYT-I",
+    "progresion": "CNEYT-I-P02",
+    "titulo": "La materia y sus propiedades: lo que todo lo compone",
+    "extracto": "La materia es todo lo que tiene masa y ocupa un espacio. Desde el aire que respiramos hasta el agua, las rocas, los metales y nuestros propios cuerpos: todo está hecho de materia. Para estudiarla, los científicos la describen a través de sus propiedades, que s"
+  },
+  {
+    "codigo": "CNEYT-I-P03-A1",
+    "uac": "CNEYT-I",
+    "progresion": "CNEYT-I-P03",
+    "titulo": "El átomo: la unidad fundamental de la materia",
+    "extracto": "Todo lo que existe en el universo está hecho de átomos. El átomo es la partícula más pequeña de un elemento que conserva sus propiedades químicas. Durante siglos se creyó que el átomo era indivisible (su nombre viene del griego \"átomon\": sin división). Hoy sab"
+  },
+  {
+    "codigo": "CNEYT-I-P04-A1",
+    "uac": "CNEYT-I",
+    "progresion": "CNEYT-I-P04",
+    "titulo": "Sustancias puras, mezclas y métodos de separación",
+    "extracto": "La materia que nos rodea puede clasificarse en sustancias puras y mezclas. Una sustancia pura tiene composición definida y constante: el agua pura (H₂O) siempre tiene la misma proporción de hidrógeno y oxígeno; el hierro puro siempre es Fe. Las sustancias pura"
+  },
+  {
+    "codigo": "CNEYT-I-P05-A1",
+    "uac": "CNEYT-I",
+    "progresion": "CNEYT-I-P05",
+    "titulo": "Los estados de la materia y sus cambios",
+    "extracto": "La materia puede existir en diferentes estados de agregación: sólido, líquido, gas y plasma (este último menos común en la vida cotidiana). El estado en que se encuentra la materia depende principalmente de la temperatura y la presión, que determinan la energí"
+  },
+  {
+    "codigo": "CNEYT-I-P06-A1",
+    "uac": "CNEYT-I",
+    "progresion": "CNEYT-I-P06",
+    "titulo": "El método científico: cómo conocemos la naturaleza",
+    "extracto": "El método científico es el conjunto de procedimientos sistemáticos que los científicos usan para investigar fenómenos naturales y construir conocimiento confiable. No es un algoritmo rígido que siempre se sigue en el mismo orden, pero sí tiene componentes reco"
+  },
+  {
+    "codigo": "CNEYT-I-P07-A1",
+    "uac": "CNEYT-I",
+    "progresion": "CNEYT-I-P07",
+    "titulo": "Ciencia con historia: mujeres y grupos marginados en el desarrollo científico",
+    "extracto": "La historia de la ciencia que se enseña en la escuela suele ser la historia de un pequeño grupo de científicos europeos y norteamericanos de élite, casi todos hombres blancos. Esta narrativa borra la contribución de miles de científicos de otros contextos y, e"
+  },
+  {
+    "codigo": "CNEYT-I-P08-A1",
+    "uac": "CNEYT-I",
+    "progresion": "CNEYT-I-P08",
+    "titulo": "Materia, transformaciones y medio ambiente",
+    "extracto": "La materia no desaparece: se transforma. Este principio, conocido como la Ley de Conservación de la Materia (formulada por Antoine Lavoisier en el siglo XVIII), establece que en toda reacción química la masa total de los reactivos es igual a la masa total de l"
+  },
+  {
+    "codigo": "CNEYT-I-P09-A1",
+    "uac": "CNEYT-I",
+    "progresion": "CNEYT-I-P09",
+    "titulo": "Las ciencias no trabajan solas",
+    "extracto": "Aunque en la escuela estudiamos la física, la química y la biología por separado, en la naturaleza los fenómenos no vienen divididos en materias: están entrelazados. La FÍSICA estudia la materia, la energía y sus movimientos (fuerzas, luz, calor, electricidad)"
+  },
+  {
+    "codigo": "CNEYT-I-P10-A1",
+    "uac": "CNEYT-I",
+    "progresion": "CNEYT-I-P10",
+    "titulo": "Por qué los átomos se unen",
+    "extracto": "Casi nada en la naturaleza está hecho de átomos sueltos: los átomos se unen entre sí formando todo lo que existe. ¿Por qué se unen? Por sus ELECTRONES DE VALENCIA, los electrones de la última capa, que son los que participan en los enlaces. Muchos átomos son m"
+  },
+  {
+    "codigo": "CNEYT-I-P11-A1",
+    "uac": "CNEYT-I",
+    "progresion": "CNEYT-I-P11",
+    "titulo": "Energía, partículas y electricidad",
+    "extracto": "La materia tiene una doble naturaleza: es CORPUSCULAR (está hecha de partículas: átomos, iones, electrones) y a la vez está ligada a la ENERGÍA. De hecho, materia y energía están profundamente relacionadas: las partículas se mueven, vibran e interactúan, y en "
+  },
+  {
+    "codigo": "CS-I-P01-A1",
+    "uac": "CS-I",
+    "progresion": "CS-I-P01",
+    "titulo": "El Estado: ¿qué es y para qué sirve?",
+    "extracto": "El Estado es la forma de organización política que permite a una sociedad vivir bajo un sistema de normas comunes, resolver conflictos y tomar decisiones colectivas. En la teoría política clásica, el Estado se define por tres elementos: un territorio delimitad"
+  },
+  {
+    "codigo": "CS-I-P02-A1",
+    "uac": "CS-I",
+    "progresion": "CS-I-P02",
+    "titulo": "¿Qué significa ser ciudadano/a hoy?",
+    "extracto": "La ciudadanía es una de las ideas más importantes y más disputadas de la modernidad. En su dimensión formal, ser ciudadano significa tener un estatus jurídico reconocido por el Estado: documentos de identidad, derecho a votar, a ser votado, a acceder a servici"
+  },
+  {
+    "codigo": "CS-I-P03-A1",
+    "uac": "CS-I",
+    "progresion": "CS-I-P03",
+    "titulo": "Las normas sociales: ¿naturales o construidas?",
+    "extracto": "Las normas sociales son las reglas, escritas o no escritas, que regulan el comportamiento en una sociedad. Algunas son formales (leyes, reglamentos, constituciones) y otras son informales (costumbres, tradiciones, expectativas culturales). Las normas no son na"
+  },
+  {
+    "codigo": "CS-I-P04-A1",
+    "uac": "CS-I",
+    "progresion": "CS-I-P04",
+    "titulo": "Diversidad, democracia y justicia",
+    "extracto": "La diversidad —étnica, cultural, de género, de orientación sexual, de capacidad, de clase— no es un problema que la sociedad deba resolver: es una condición fundamental de la vida social y, en democracia, una riqueza. Sin embargo, históricamente las sociedades"
+  },
+  {
+    "codigo": "IN-I-P01-A1",
+    "uac": "IN-I",
+    "progresion": "IN-I-P01",
+    "titulo": "Hello! Nice to meet you — Presentaciones en inglés",
+    "extracto": "En inglés, presentarse es una de las primeras habilidades que necesitas dominar. Los saludos varían según el contexto: \"Hello\" y \"Hi\" son informales, mientras que \"Good morning\", \"Good afternoon\" y \"Good evening\" son más formales. Al conocer a alguien nuevo, d"
+  },
+  {
+    "codigo": "IN-I-P02-A1",
+    "uac": "IN-I",
+    "progresion": "IN-I-P02",
+    "titulo": "In the classroom — Interacciones básicas en el aula",
+    "extracto": "En el salón de clase en inglés, hay frases esenciales que necesitas conocer. Para pedir permiso: \"May I go to the bathroom?\" (¿Puedo ir al baño?), \"Can I open the window?\" (¿Puedo abrir la ventana?). Para aclarar dudas: \"I don't understand\" (No entiendo), \"Can"
+  },
+  {
+    "codigo": "IN-I-P03-A1",
+    "uac": "IN-I",
+    "progresion": "IN-I-P03",
+    "titulo": "What's around us? — Objetos y espacios cotidianos",
+    "extracto": "Describir objetos en inglés requiere conocer vocabulario de forma, color y tamaño. En inglés, los adjetivos van ANTES del sustantivo, al revés que en español: decimos \"a red book\" (un libro rojo), no \"a book red\". Palabras de tamaño: big/large (grande), small/"
+  },
+  {
+    "codigo": "IN-I-P04-A1",
+    "uac": "IN-I",
+    "progresion": "IN-I-P04",
+    "titulo": "About me — Información personal en inglés",
+    "extracto": "Dar y solicitar información personal es una de las interacciones más comunes en inglés. Las preguntas clave son: • \"What's your name?\" → \"My name is...\" / \"I'm...\" • \"How old are you?\" → \"I'm [edad] years old.\" • \"Where are you from?\" → \"I'm from [ciudad/país]"
+  },
+  {
+    "codigo": "IN-I-P05-A1",
+    "uac": "IN-I",
+    "progresion": "IN-I-P05",
+    "titulo": "Where and when? — Preguntas sencillas en inglés",
+    "extracto": "Hacer preguntas en inglés requiere conocer las palabras interrogativas (question words) y la estructura correcta. Las principales son: • Where (dónde): \"Where is the library?\" (¿Dónde está la biblioteca?) • When (cuándo): \"When does the class start?\" (¿Cuándo "
+  },
+  {
+    "codigo": "IN-I-P06-A1",
+    "uac": "IN-I",
+    "progresion": "IN-I-P06",
+    "titulo": "People, clothes and weather — Describir en inglés",
+    "extracto": "Describir personas en inglés involucra hablar de características físicas y de vestimenta con respeto hacia la diversidad. Para la apariencia física: • Altura: tall (alto), short (bajo), medium height (estatura mediana) • Complexión: slim/thin (delgado), heavy-"
+  },
+  {
+    "codigo": "IN-I-P07-A1",
+    "uac": "IN-I",
+    "progresion": "IN-I-P07",
+    "titulo": "What do you like? — Gustos y opiniones en inglés",
+    "extracto": "Expresar gustos y preferencias en inglés es más fácil de lo que parece. Usamos el verbo \"to like\" (gustar) de la siguiente manera: • \"I like [sustantivo/verbo-ing]\" (Me gusta...): \"I like music.\" / \"I like playing soccer.\" • \"I don't like [sustantivo/verbo-ing"
+  },
+  {
+    "codigo": "IN-I-P08-A1",
+    "uac": "IN-I",
+    "progresion": "IN-I-P08",
+    "titulo": "Mine or yours? — Posesión y pertenencia en inglés",
+    "extracto": "En inglés, expresar posesión y pertenencia puede hacerse de varias maneras. La primera es con el genitivo sajón ('s): se agrega apóstrofo + s al poseedor: \"María's book\" (el libro de María), \"the teacher's desk\" (el escritorio del maestro). Para sustantivos pl"
+  },
+  {
+    "codigo": "LC-I-P01-A1",
+    "uac": "LC-I",
+    "progresion": "LC-I-P01",
+    "titulo": "Lectura y escritura: un diálogo permanente",
+    "extracto": "Leer y escribir son dos caras de la misma moneda. Cuando leemos, construimos significado a partir de las palabras de otras personas; cuando escribimos, creamos significado para que otras personas lo lean. Esta relación no es unidireccional: la lectura alimenta"
+  },
+  {
+    "codigo": "LC-I-P02-A1",
+    "uac": "LC-I",
+    "progresion": "LC-I-P02",
+    "titulo": "¿Qué leen las personas de mi comunidad?",
+    "extracto": "Cuando pensamos en quiénes leen en nuestra comunidad, la respuesta puede sorprendernos. La lectura no ocurre solo en la escuela: ocurre en el trabajo, en el hogar, en el transporte público, en las redes sociales y en los mercados. Una persona puede leer las in"
+  },
+  {
+    "codigo": "LC-I-P03-A1",
+    "uac": "LC-I",
+    "progresion": "LC-I-P03",
+    "titulo": "Ideas, información y opiniones en un texto",
+    "extracto": "Cuando leemos un texto, no todos los elementos que encontramos son del mismo tipo. Algunos textos buscan informarnos sobre hechos y datos verificables; otros nos comparten la opinión de su autor; y otros mezclan información, ideas personales e incluso argument"
+  },
+  {
+    "codigo": "LC-I-P04-A1",
+    "uac": "LC-I",
+    "progresion": "LC-I-P04",
+    "titulo": "Los párrafos y su función en el texto",
+    "extracto": "El párrafo es la unidad básica de organización del texto escrito. Cada párrafo desarrolla una idea principal que se expresa generalmente en la oración temática —que puede estar al inicio, al final o en medio del párrafo— y que las demás oraciones apoyan, ejemp"
+  },
+  {
+    "codigo": "LC-I-P05-A1",
+    "uac": "LC-I",
+    "progresion": "LC-I-P05",
+    "titulo": "Subrayar e identificar lo esencial de un texto",
+    "extracto": "Leer un texto implica mucho más que entender las palabras que lo componen. Implica identificar cuáles son las ideas más importantes, cuáles son los detalles de apoyo y cuáles son los ejemplos o datos secundarios. Esta habilidad —conocida como selección de info"
+  },
+  {
+    "codigo": "LC-I-P06-A1",
+    "uac": "LC-I",
+    "progresion": "LC-I-P06",
+    "titulo": "Concordancia y conectores: el hilo del texto",
+    "extracto": "La concordancia gramatical es el acuerdo entre los elementos de una oración: el sustantivo y el adjetivo concuerdan en género y número; el sujeto y el verbo concuerdan en número y persona. Cuando esta concordancia se rompe, la oración resulta incorrecta o conf"
+  },
+  {
+    "codigo": "LC-I-P07-A1",
+    "uac": "LC-I",
+    "progresion": "LC-I-P07",
+    "titulo": "¿Por qué leer en voz alta?",
+    "extracto": "La lectura en voz alta es mucho más que pronunciar palabras. Es una práctica que requiere preparación, técnica y presencia. Cuando leemos en voz alta para otros, nos convertimos en intermediarios entre el texto y el público: nuestra voz, nuestro ritmo y nuestr"
+  },
+  {
+    "codigo": "LC-I-P08-A1",
+    "uac": "LC-I",
+    "progresion": "LC-I-P08",
+    "titulo": "Características de una exposición oral efectiva",
+    "extracto": "La exposición oral es una de las prácticas comunicativas más importantes en la vida académica y profesional. Exponer es organizar un conjunto de ideas sobre un tema y comunicarlas de manera clara, ordenada y adaptada a la audiencia. Una exposición oral efectiv"
+  },
+  {
+    "codigo": "PFH-I-P01-A1",
+    "uac": "PFH-I",
+    "progresion": "PFH-I-P01",
+    "titulo": "¿Qué significa filosofar?",
+    "extracto": "Filosofar no es lo mismo que saber filosofía. Una persona puede memorizar las ideas de Platón, Descartes o Kant sin haber filosofado nunca. Filosofar es el acto de preguntarse, de no dar por sentado lo que parece obvio, de detenerse ante algo y preguntarse: \"¿"
+  },
+  {
+    "codigo": "PFH-I-P02-A1",
+    "uac": "PFH-I",
+    "progresion": "PFH-I-P02",
+    "titulo": "Tipos de preguntas: científicas, cotidianas y filosóficas",
+    "extracto": "No todas las preguntas son iguales. La filosofía se distingue por el tipo de preguntas que hace, no solo por las respuestas que busca. Podemos distinguir al menos tres tipos de preguntas: Las preguntas cotidianas tienen respuestas inmediatas y prácticas: \"¿Qué"
+  },
+  {
+    "codigo": "PFH-I-P03-A1",
+    "uac": "PFH-I",
+    "progresion": "PFH-I-P03",
+    "titulo": "Problemas filosóficos que nos tocan",
+    "extracto": "La filosofía no es solo historia de ideas antiguas: aborda problemas que nos tocan en la vida real. Tres de los más fundamentales son la identidad, la libertad y la justicia. La identidad es el problema de quiénes somos. ¿Somos el mismo \"yo\" que éramos de niño"
+  },
+  {
+    "codigo": "PFH-I-P04-A1",
+    "uac": "PFH-I",
+    "progresion": "PFH-I-P04",
+    "titulo": "El diálogo como método filosófico",
+    "extracto": "El diálogo filosófico tiene una larga historia que comienza con Sócrates, quien no escribió ningún libro, pero pasó su vida conversando en las plazas de Atenas. Para Sócrates, el conocimiento no se transmite de un experto a un ignorante: emerge del encuentro e"
+  },
+  {
+    "codigo": "PFH-I-P05-A1",
+    "uac": "PFH-I",
+    "progresion": "PFH-I-P05",
+    "titulo": "La filosofía no es solo occidental",
+    "extracto": "Durante mucho tiempo, la filosofía que se enseñó en las escuelas del mundo hispanohablante fue principalmente filosofía occidental: griega, romana, medieval europea, moderna y contemporánea europea y norteamericana. Esta visión ignoró siglos de reflexión filos"
+  },
+  {
+    "codigo": "PFH-I-P06-A1",
+    "uac": "PFH-I",
+    "progresion": "PFH-I-P06",
+    "titulo": "Conocimiento, Ciencia y Verdad",
+    "extracto": "Desde siempre, los seres humanos se preguntan cómo conocen el mundo y qué significa que algo sea verdadero. La rama de la filosofía que estudia esto es la teoría del conocimiento o epistemología. Sus preguntas básicas son: ¿qué podemos conocer?, ¿cómo lo conoc"
+  },
+  {
+    "codigo": "PM-I-P01-A1",
+    "uac": "PM-I",
+    "progresion": "PM-I-P01",
+    "titulo": "Las matemáticas son una creación humana",
+    "extracto": "Las matemáticas no surgieron de la nada ni fueron inventadas por una sola persona. Son una construcción colectiva de la humanidad a lo largo de miles de años. Los babilonios desarrollaron un sistema de numeración posicional en base 60 que todavía usamos para m"
+  },
+  {
+    "codigo": "PM-I-P02-A1",
+    "uac": "PM-I",
+    "progresion": "PM-I-P02",
+    "titulo": "Números que usamos todos los días",
+    "extracto": "Los números que usamos en matemáticas no son todos del mismo tipo. Los números naturales (1, 2, 3, 4...) son los que usamos para contar objetos concretos. Los números enteros incluyen también los números negativos (-3, -2, -1, 0) y nos permiten representar sit"
+  },
+  {
+    "codigo": "PM-I-P03-A1",
+    "uac": "PM-I",
+    "progresion": "PM-I-P03",
+    "titulo": "Proposiciones, conectivos y lógica cotidiana",
+    "extracto": "La lógica matemática es el estudio de los principios que determinan si un argumento es válido o no. Una proposición es una afirmación que puede ser verdadera o falsa, pero no ambas al mismo tiempo. \"Hoy es lunes\" es una proposición. \"¿Qué hora es?\" no lo es, p"
+  },
+  {
+    "codigo": "PM-I-P04-A1",
+    "uac": "PM-I",
+    "progresion": "PM-I-P04",
+    "titulo": "Fracciones, decimales y porcentajes: tres formas de lo mismo",
+    "extracto": "Fracciones, decimales y porcentajes son tres formas de expresar la misma idea: una parte de un todo. La fracción 1/4 equivale al decimal 0.25 y al porcentaje 25%. Saber convertir entre estas representaciones es una habilidad fundamental para la vida cotidiana "
+  },
+  {
+    "codigo": "PM-I-P05-A1",
+    "uac": "PM-I",
+    "progresion": "PM-I-P05",
+    "titulo": "Razones, proporciones y proporcionalidad",
+    "extracto": "Una razón es una comparación entre dos cantidades. Si en un grupo hay 3 mujeres por cada 2 hombres, la razón es 3:2 o 3/2. Una proporción es una igualdad entre dos razones: 3/2 = 6/4, lo que significa que si duplicamos ambos grupos, la relación se mantiene. La"
+  },
+  {
+    "codigo": "PM-I-P06-A1",
+    "uac": "PM-I",
+    "progresion": "PM-I-P06",
+    "titulo": "El Sistema Internacional de Medidas",
+    "extracto": "El Sistema Internacional de Unidades (SI) es el sistema de medición más utilizado en el mundo y el estándar en ciencia y tecnología. Fue adoptado internacionalmente en 1960 y tiene siete unidades base: metro (longitud), kilogramo (masa), segundo (tiempo), ampe"
+  },
+  {
+    "codigo": "PM-I-P07-A1",
+    "uac": "PM-I",
+    "progresion": "PM-I-P07",
+    "titulo": "Estimar: el arte de calcular sin exactitud",
+    "extracto": "Estimar es calcular un valor aproximado sin necesidad de calcularlo con exactitud. No es adivinar al azar: es usar el razonamiento matemático para obtener una aproximación razonable en poco tiempo. La estimación es tan importante como el cálculo exacto, y a ve"
+  },
+  {
+    "codigo": "PM-I-P08-A1",
+    "uac": "PM-I",
+    "progresion": "PM-I-P08",
+    "titulo": "Contar: una historia humana",
+    "extracto": "Contar es una de las primeras necesidades de la humanidad: saber cuántos animales, cuántas personas o cuántos días pasaban. Desde esa necesidad social, cada cultura construyó su propio sistema de conteo. En Mesopotamia se contaba en grupos de 60; en Egipto se "
+  },
+  {
+    "codigo": "PM-I-P09-A1",
+    "uac": "PM-I",
+    "progresion": "PM-I-P09",
+    "titulo": "Potencias y raíces",
+    "extracto": "Una POTENCIA es una forma corta de escribir una multiplicación repetida de la misma base. En 5³, el número 5 es la BASE y el 3 es el EXPONENTE; significa 5 × 5 × 5 = 125. Hay reglas útiles: al multiplicar potencias de igual base se suman los exponentes (2³ × 2"
+  },
+  {
+    "codigo": "PM-I-P10-A1",
+    "uac": "PM-I",
+    "progresion": "PM-I-P10",
+    "titulo": "El orden importa: jerarquía de operaciones",
+    "extracto": "Cuando una expresión tiene varias operaciones, no se resuelven de izquierda a derecha sin más: hay un ORDEN o jerarquía que todos respetamos para obtener el mismo resultado. El orden es: (1) lo que está dentro de los símbolos de agrupación —paréntesis ( ), cor"
+  }
+]

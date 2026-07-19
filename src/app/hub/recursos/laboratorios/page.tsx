@@ -11,7 +11,7 @@ import {
 import { getUACPorCodigo } from "@/lib/mccems/estructura";
 import { getRSCColor } from "@/components/hub/hub-colors";
 import { LAB_CATALOGO, nombreLab } from "@/lib/practicas/lab-catalogo";
-import { imagenDeLab } from "@/lib/practicas/lab-imagenes";
+import { mejorImagenDeLab } from "@/lib/practicas/lab-imagenes";
 import HubV2Skeleton from "@/components/hub-v2/HubV2Skeleton";
 // ⚠️ TEMPORAL (presentación): pestaña "Destacados". Para revertir, eliminar
 // este import, el bloque <DestacadosView/> + tabs, y el archivo labs-destacados.ts.
@@ -423,7 +423,7 @@ export default function LaboratoriosPage() {
                         <div className="lab-card-media">
                           <img
                             className="lab-card-img"
-                            src={imagenDeLab(lab.slug)}
+                            src={mejorImagenDeLab(lab.slug)}
                             alt=""
                             loading="lazy"
                             decoding="async"

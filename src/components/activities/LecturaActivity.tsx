@@ -46,7 +46,7 @@ interface Props {
   glosario?: { t: string; d: string }[];
   /** Nombre de la materia, para la atribución del tooltip ("Glosario · {materia}"). */
   materia?: string;
-  /** Código de la UAC, para elegir la imagen destacada temática. */
+  /** Código de la UAC, para elegir una imagen temática cuando no hay lámina propia. */
   uacCodigo?: string;
 }
 
@@ -271,7 +271,13 @@ export function LecturaActivity({
   uacCodigo,
 }: Props) {
   const { contenido } = actividad;
-  const imagenDestacada = imagenDeLectura(uacCodigo, actividad.titulo);
+  // Nivel 1: lámina propia de la lectura (si existe, es válida y no ha fallado al cargar).
+  const [imgError, setImgError] = useState(false);
+  const urlImagenPropia = contenido.url_imagen ?? '';
+  const tieneImagenPropia = urlImagenPropia.length > 0 && !/placeholder/i.test(urlImagenPropia) && !imgError;
+  // Nivel 2: imagen temática del pool compartido por UAC (fallback si no hay lámina propia).
+  const imagenTematica = imagenDeLectura(uacCodigo, actividad.titulo);
+  const imagenDestacada = tieneImagenPropia ? urlImagenPropia : imagenTematica;
   const preguntas = contenido.preguntas_comprension ?? [];
   const callouts = contenido.callouts ?? [];
 
@@ -310,6 +316,12 @@ export function LecturaActivity({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const modoRevision = estado === 'completada';
+  // Estado neutral de revisión: el intento existe pero las respuestas guardadas
+  // no están disponibles (`respuestas` null en BD, datos históricos). Solo
+  // aplica cuando la lectura tiene preguntas: una lectura sin preguntas entrega
+  // legítimamente sin respuestas y no debe mostrar este aviso.
+  const revisionSinRespuestas = modoRevision && preguntas.length > 0 &&
+    (!respuestasIntento || Object.keys(respuestasIntento).length === 0);
   const todasRespondidas = preguntas.length === 0 ||
     preguntas.every((_, i) => (respuestas[i] ?? '').trim().length > 0);
 
@@ -499,10 +511,12 @@ export function LecturaActivity({
             <Check size={18} color={color.hex} style={{ flexShrink: 0, marginTop: 2 }} />
             <div>
               <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 2 }}>
-                Ya completaste esta lectura
+                {revisionSinRespuestas ? 'Entrega registrada' : 'Ya completaste esta lectura'}
               </div>
               <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.50)' }}>
-                Esta es una revisión. Puedes re-entregar para actualizar tus respuestas.
+                {revisionSinRespuestas
+                  ? 'La revisión detallada no está disponible. Puedes responder de nuevo y re-entregar si lo deseas.'
+                  : 'Esta es una revisión. Puedes re-entregar para actualizar tus respuestas.'}
               </div>
             </div>
           </motion.div>
@@ -564,11 +578,12 @@ export function LecturaActivity({
         >
           <Image
             src={imagenDestacada}
-            alt={`Imagen temática de ${materia ?? 'la lectura'}`}
+            alt={tieneImagenPropia ? actividad.titulo : `Imagen temática de ${materia ?? 'la lectura'}`}
             fill
             sizes="(max-width: 720px) 100vw, 720px"
             style={{ objectFit: 'cover' }}
             priority
+            onError={() => setImgError(true)}
           />
           {/* Tinte de acento + oscurecido inferior para legibilidad y unidad visual */}
           <div style={{
@@ -581,14 +596,16 @@ export function LecturaActivity({
             background: 'linear-gradient(to top, rgba(1,17,38,0.55) 0%, rgba(1,17,38,0.12) 35%, transparent 65%)',
             pointerEvents: 'none',
           }} />
-          {/* Atribución discreta: imágenes temáticas de Wikimedia Commons (licencias libres) */}
-          <span style={{
-            position: 'absolute', bottom: 8, right: 12,
-            fontSize: 10, fontWeight: 600, letterSpacing: '0.02em',
-            color: 'rgba(255,255,255,0.45)', pointerEvents: 'none',
-          }}>
-            Imagen temática · Wikimedia Commons
-          </span>
+          {/* Atribución discreta: solo aplica a la imagen temática del pool (Wikimedia Commons); la lámina propia no la lleva */}
+          {!tieneImagenPropia && (
+            <span style={{
+              position: 'absolute', bottom: 8, right: 12,
+              fontSize: 10, fontWeight: 600, letterSpacing: '0.02em',
+              color: 'rgba(255,255,255,0.45)', pointerEvents: 'none',
+            }}>
+              Imagen temática · Wikimedia Commons
+            </span>
+          )}
         </motion.div>
 
         {/* ── Cuerpo de la lectura ── */}

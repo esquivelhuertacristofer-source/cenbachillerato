@@ -14,8 +14,6 @@ export interface ActividadBase {
   titulo: string;
   /** Descripción breve del propósito pedagógico */
   descripcion?: string;
-  /** XP que otorga al completarse */
-  xp?: number;
 }
 
 // ── 1. LECTURA ────────────────────────────────────────────────────────────────
@@ -37,6 +35,8 @@ export interface ContenidoLectura {
   preguntas_comprension?: PreguntaComprension[];
   tiempo_estimado_minutos?: number;
   callouts?: CalloutLectura[];
+  /** Imagen de ambientación específica para esta lectura (fallback: pool temático por UAC) */
+  url_imagen?: string;
 }
 
 export interface ActividadLectura extends ActividadBase {
@@ -58,6 +58,8 @@ export interface ContenidoQuizMultipleOpcion {
   intentos_maximos?: number;
   puntaje_minimo_aprobacion?: number;
   mezclar_preguntas?: boolean;
+  /** Imagen de ambientación específica para esta actividad (fallback: pool temático por UAC) */
+  url_imagen?: string;
 }
 
 export interface ActividadQuizMultipleOpcion extends ActividadBase {
@@ -77,6 +79,8 @@ export interface ContenidoQuizVerdaderoFalso {
   preguntas: PreguntaVerdaderoFalso[];
   intentos_maximos?: number;
   puntaje_minimo_aprobacion?: number;
+  /** Imagen de ambientación específica para esta actividad (fallback: pool temático por UAC) */
+  url_imagen?: string;
 }
 
 export interface ActividadQuizVerdaderoFalso extends ActividadBase {
@@ -99,6 +103,8 @@ export interface ContenidoFillBlanks {
   texto_con_huecos: string;
   huecos: HuecoFillBlanks[];
   distingue_mayusculas?: boolean;
+  /** Imagen de ambientación específica para esta actividad (fallback: pool temático por UAC) */
+  url_imagen?: string;
 }
 
 export interface ActividadFillBlanks extends ActividadBase {
@@ -120,6 +126,8 @@ export interface ContenidoEjercicioMatematico {
   respuesta_final?: string;
   unidades?: string;
   tolerancia_error?: number;
+  /** Imagen de ambientación específica para esta actividad (fallback: pool temático por UAC) */
+  url_imagen?: string;
 }
 
 export interface ActividadEjercicioMatematico extends ActividadBase {
@@ -139,6 +147,8 @@ export interface ContenidoReflexionEscrita {
   criterios_evaluacion?: string[];
   ejemplo_respuesta?: string;
   formato_esperado?: FormatoReflexion;
+  /** Imagen de ambientación específica para esta actividad (fallback: pool temático por UAC) */
+  url_imagen?: string;
 }
 
 export interface ActividadReflexionEscrita extends ActividadBase {
@@ -165,6 +175,8 @@ export interface ContenidoVideoConPreguntas {
   duracion_segundos?: number;
   subtitulos_disponibles?: boolean;
   preguntas?: PreguntaVideo[];
+  /** Miniatura/portada específica mostrada antes de reproducir el video (fallback: pool temático por UAC) */
+  url_miniatura?: string;
 }
 
 export interface ActividadVideoConPreguntas extends ActividadBase {
@@ -213,6 +225,8 @@ export interface ContenidoDebateEstructurado {
   tiempo_argumentacion_minutos?: number;
   criterios_evaluacion?: string[];
   modalidad?: ModalidadDebate;
+  /** Imagen de ambientación específica para esta actividad (fallback: pool temático por UAC) */
+  url_imagen?: string;
 }
 
 export interface ActividadDebateEstructurado extends ActividadBase {
@@ -252,6 +266,8 @@ export interface ContenidoGlosarioInteractivo {
   terminos: TerminoGlosario[];
   /** Consigna integradora posterior al estudio */
   actividad_final?: string;
+  /** Imagen de ambientación específica para esta actividad (fallback: pool temático por UAC) */
+  url_imagen?: string;
 }
 
 export interface ActividadGlosarioInteractivo extends ActividadBase {
@@ -277,6 +293,8 @@ export interface ContenidoAutoevaluacion {
   criterios: CriterioAutoevaluacion[];
   reflexion_final_prompt?: string;
   visible_para_docente?: boolean;
+  /** Imagen de ambientación específica para esta actividad (fallback: pool temático por UAC) */
+  url_imagen?: string;
 }
 
 export interface ActividadAutoevaluacion extends ActividadBase {

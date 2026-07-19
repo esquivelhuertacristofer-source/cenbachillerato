@@ -120,6 +120,20 @@ export const LAB_TEMA: Record<string, string> = {
   "ciclo-carbono": "ecosistema",
   "deforestacion": "ecosistema",
   "subsistemas-terrestres": "tierra",
+
+  // ── No-STEM (CD/CS/IN/LC) ──
+  "bioetica": "laboratorio",
+  "busqueda-confiable": "laboratorio",
+  "comparativos-ingles": "laboratorio",
+  "deteccion-fake-news": "laboratorio",
+  "diversidad-discriminacion": "laboratorio",
+  "etica-produccion-digital": "laboratorio",
+  "factores-produccion": "graficas",
+  "herramientas-colaborativas": "laboratorio",
+  "necesidades-satisfactores": "laboratorio",
+  "personajes-escenarios": "laboratorio",
+  "relaciones-poder": "laboratorio",
+  "tipos-graficas": "graficas",
 };
 
 /** Tema por defecto cuando un slug no está en el mapa (labs nuevos). */
@@ -133,4 +147,180 @@ export function temaDeLab(slug: string): string {
 /** Ruta pública de la imagen temática (WebP optimizado) de un laboratorio. */
 export function imagenDeLab(slug: string): string {
   return `/labs/${temaDeLab(slug)}.webp`;
+}
+
+/**
+ * Slugs con carátula específica generada (ComfyUI, ver public/media/{semX}/labs/).
+ * A diferencia de la imagen temática (compartida por tema), esta es única por laboratorio.
+ * Un slug pertenece a un único semestre; se resuelve el más reciente primero.
+ */
+const LABS_CON_IMAGEN_ESPECIFICA_SEM2 = new Set<string>([
+  "bioetica",
+  "busqueda-confiable",
+  "clasificacion-expresiones-mosaicos",
+  "comparativos-ingles",
+  "conservacion-energia-pendulo",
+  "deteccion-fake-news",
+  "diversidad-discriminacion",
+  "ecuacion-lineal-balanza",
+  "entropia-segunda-ley",
+  "etica-produccion-digital",
+  "factores-produccion",
+  "factorizacion-area",
+  "formas-energia-transformacion",
+  "gas-ideal-piston",
+  "herramientas-colaborativas",
+  "lenguaje-algebraico-mosaicos",
+  "maquina-termica-ciclos",
+  "necesidades-satisfactores",
+  "operaciones-binomios-mosaicos",
+  "personajes-escenarios",
+  "productos-notables-3d",
+  "propagacion-calor",
+  "relaciones-poder",
+  "tipos-graficas",
+  "trabajo-potencia-mecanica",
+  "transferencia-calor-mecanismos",
+]);
+
+const LABS_CON_IMAGEN_ESPECIFICA_SEM1 = new Set<string>([
+  "algoritmos-deciden",
+  "concentracion-disolucion",
+  "concordancia-conectores",
+  "conservacion-materia",
+  "constructor-algoritmos",
+  "densidad",
+  "energia-electricidad",
+  "enlaces-quimicos",
+  "estado-mexicano",
+  "estados-materia",
+  "fracciones-porcentajes",
+  "hardware-software",
+  "licencias-software",
+  "modelos-atomicos",
+  "navegacion-segura",
+  "notacion-cientifica",
+  "posesivos-ingles",
+  "potencias-raices",
+  "presentaciones-ingles",
+  "propiedades-materia",
+  "razon-proporcion",
+  "recta-numerica",
+  "separacion-mezclas",
+  "taller-parrafos",
+  "tipos-de-preguntas",
+  "valor-posicional",
+]);
+
+const LABS_CON_IMAGEN_ESPECIFICA_SEM3 = new Set<string>([
+  "deforestacion",
+  "discriminante",
+  "ecuacion-cuadratica",
+  "ecuacion-lineal-barras",
+  "ecuacion-recta",
+  "estructura-reaccion",
+  "exposicion-oral",
+  "falacias-logica",
+  "figuras-retoricas",
+  "fotosintesis",
+  "generos-literarios",
+  "inecuaciones-lineales",
+  "movimientos-literarios",
+  "parabola-trayectoria",
+  "pasado-simple-ingles",
+  "piramide-energia",
+  "redes-troficas",
+  "reglas-ingles",
+  "resena-critica",
+  "semejanza-triangulos",
+  "sistemas-ecuaciones-2x2",
+  "subgeneros-narrativos",
+  "teorema-pitagoras",
+  "volumen-cilindro",
+]);
+
+const LABS_CON_IMAGEN_ESPECIFICA_SEM4 = new Set<string>([
+  "balanceo-ecuaciones",
+  "biomoleculas-cuatro-clases",
+  "causalidad-historica",
+  "circulo-unitario",
+  "conicas-lugares-geometricos",
+  "consejos-ingles",
+  "equilibrio-quimico",
+  "funciones-concepto",
+  "geometria-analitica",
+  "juventudes-politicas",
+  "ley-senos-cosenos",
+  "modelado-conicas-estimacion",
+  "organica-visor",
+  "ph-escala",
+  "politicas-publicas",
+  "reaccion-co2",
+  "redox-combustion",
+  "respiracion-celular",
+  "tiempo-historico",
+  "tipos-reacciones-quimicas",
+  "transformaciones-funciones",
+  "triangulo-rectangulo",
+]);
+
+const LABS_CON_IMAGEN_ESPECIFICA_SEM5 = new Set<string>([
+  "continuidad-tres-condiciones",
+  "dcl-leyes-newton",
+  "derivada-secante-tangente",
+  "diferencial-linealizacion",
+  "electromagnetismo-ohm-faraday",
+  "espectro-electromagnetico",
+  "extremos-inflexion",
+  "fluidos",
+  "funciones-variable-real",
+  "gravitacion-universal",
+  "hipotesis-historicas",
+  "limites-acercamiento",
+  "mexico-en-el-mundo",
+  "mrua-acelerar-frenar",
+  "ondas-amplitud-frecuencia",
+  "optica-lentes-espejos",
+  "optimizacion-cilindro",
+  "present-perfect-ingles",
+  "procesos-ingles",
+  "reglas-derivacion",
+  "sentido-historico",
+  "teorema-fundamental-calculo",
+  "trascendentes-derivacion",
+]);
+
+const LABS_CON_IMAGEN_ESPECIFICA_SEM6 = new Set<string>([
+  "adn-dogma-central-3d",
+  "biotecnologia-crispr-3d",
+  "carreras-digitales",
+  "celula-organelos-3d",
+  "comunicacion-multimodal",
+  "datos-graficas-estadisticas",
+  "distribucion-normal",
+  "division-celular",
+  "fuentes-historicas",
+  "genetica-mendeliana-punnett",
+  "medidas-dispersion",
+  "medidas-tendencia-central",
+  "metabolismo-celular-3d",
+  "mutaciones-3d",
+  "origen-vida-3d",
+  "seleccion-natural-evolucion-3d",
+]);
+
+/** Ruta de la carátula específica de un laboratorio, o null si aún no existe. */
+export function imagenEspecificaDeLab(slug: string): string | null {
+  if (LABS_CON_IMAGEN_ESPECIFICA_SEM6.has(slug)) return `/media/sem6/labs/${slug}.webp`;
+  if (LABS_CON_IMAGEN_ESPECIFICA_SEM5.has(slug)) return `/media/sem5/labs/${slug}.webp`;
+  if (LABS_CON_IMAGEN_ESPECIFICA_SEM4.has(slug)) return `/media/sem4/labs/${slug}.webp`;
+  if (LABS_CON_IMAGEN_ESPECIFICA_SEM3.has(slug)) return `/media/sem3/labs/${slug}.webp`;
+  if (LABS_CON_IMAGEN_ESPECIFICA_SEM2.has(slug)) return `/media/sem2/labs/${slug}.webp`;
+  if (LABS_CON_IMAGEN_ESPECIFICA_SEM1.has(slug)) return `/media/sem1/labs/${slug}.webp`;
+  return null;
+}
+
+/** Mejor imagen disponible para un laboratorio: carátula específica si existe, si no el pool temático. */
+export function mejorImagenDeLab(slug: string): string {
+  return imagenEspecificaDeLab(slug) ?? imagenDeLab(slug);
 }

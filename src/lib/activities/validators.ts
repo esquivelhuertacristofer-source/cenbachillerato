@@ -18,6 +18,7 @@ export const ContenidoLecturaSchema = z.object({
   nivel_lectura: z.enum(['basico', 'intermedio', 'avanzado']).optional(),
   preguntas_comprension: z.array(PreguntaComprensionSchema).optional(),
   tiempo_estimado_minutos: z.number().int().positive().optional(),
+  url_imagen: z.string().optional(),
 });
 
 // ── 2. QUIZ OPCIÓN MÚLTIPLE ───────────────────────────────────────────────────
@@ -37,6 +38,7 @@ export const ContenidoQuizMultipleOpcionSchema = z.object({
   intentos_maximos: z.number().int().positive().optional().default(3),
   puntaje_minimo_aprobacion: z.number().int().min(0).max(100).optional().default(70),
   mezclar_preguntas: z.boolean().optional().default(false),
+  url_imagen: z.string().optional(),
 });
 
 // ── 3. QUIZ VERDADERO O FALSO ─────────────────────────────────────────────────
@@ -51,6 +53,7 @@ export const ContenidoQuizVerdaderoFalsoSchema = z.object({
   preguntas: z.array(PreguntaVerdaderoFalsoSchema).min(1),
   intentos_maximos: z.number().int().positive().optional().default(2),
   puntaje_minimo_aprobacion: z.number().int().min(0).max(100).optional().default(70),
+  url_imagen: z.string().optional(),
 });
 
 // ── 4. COMPLETAR ESPACIOS ─────────────────────────────────────────────────────
@@ -67,6 +70,7 @@ export const ContenidoFillBlanksSchema = z.object({
   texto_con_huecos: z.string().min(1, 'Debe incluir texto con al menos un hueco (___)'),
   huecos: z.array(HuecoSchema).min(1),
   distingue_mayusculas: z.boolean().optional().default(false),
+  url_imagen: z.string().optional(),
 }).refine(
   (data) => (data.texto_con_huecos.match(/___/g) || []).length >= data.huecos.length,
   { message: 'El número de ___ en texto_con_huecos debe coincidir con el número de huecos' }
@@ -83,6 +87,7 @@ export const ContenidoEjercicioMatematicoSchema = z.object({
   respuesta_final: z.string().optional(),
   unidades: z.string().optional(),
   tolerancia_error: z.number().min(0).optional().default(0),
+  url_imagen: z.string().optional(),
 });
 
 // ── 6. REFLEXIÓN ESCRITA ──────────────────────────────────────────────────────
@@ -95,6 +100,7 @@ export const ContenidoReflexionEscritaSchema = z.object({
   criterios_evaluacion: z.array(z.string()).optional(),
   ejemplo_respuesta: z.string().optional(),
   formato_esperado: z.enum(['libre', 'ensayo', 'carta', 'diario', 'descripcion']).optional().default('libre'),
+  url_imagen: z.string().optional(),
 }).refine(
   (data) =>
     data.longitud_maxima_palabras === undefined ||
@@ -151,6 +157,7 @@ export const ContenidoDebateEstructuradoSchema = z.object({
   tiempo_argumentacion_minutos: z.number().int().positive().optional().default(3),
   criterios_evaluacion: z.array(z.string()).optional(),
   modalidad: z.enum(['oral', 'escrito', 'hibrido']).optional().default('escrito'),
+  url_imagen: z.string().optional(),
 });
 
 // ── 10. SIMULACIÓN ────────────────────────────────────────────────────────────
@@ -177,6 +184,7 @@ export const TerminoGlosarioSchema = z.object({
 export const ContenidoGlosarioInteractivoSchema = z.object({
   terminos: z.array(TerminoGlosarioSchema).min(3, 'Un glosario debe tener al menos 3 términos'),
   actividad_final: z.string().optional(),
+  url_imagen: z.string().optional(),
 });
 
 // ── 12. AUTOEVALUACIÓN ────────────────────────────────────────────────────────
@@ -197,6 +205,7 @@ export const ContenidoAutoevaluacionSchema = z.object({
   criterios: z.array(CriterioAutoevaluacionSchema).min(1),
   reflexion_final_prompt: z.string().optional(),
   visible_para_docente: z.boolean().optional().default(true),
+  url_imagen: z.string().optional(),
 });
 
 // ── MAPA DE VALIDADORES ───────────────────────────────────────────────────────

@@ -26,7 +26,6 @@ interface ActivityRunnerProps {
   tipo: string;
   titulo: string;
   descripcion: string | null;
-  xp: number;
   contenido: unknown;
   estado: "no_iniciada" | "en_progreso" | "completada";
   intentoId: string | null;
@@ -50,7 +49,6 @@ export function ActivityRunner({
   tipo,
   titulo,
   descripcion,
-  xp,
   contenido,
   estado,
   respuestasIntento,
@@ -115,8 +113,10 @@ export function ActivityRunner({
       setErrorEntrega(res.error);
       // No se pierde el trabajo del alumno: se encola para reenviarse solo
       // en cuanto vuelva la conexión (evento 'online' o el intervalo de
-      // sync-queue), o cuando el alumno pulse "Reintentar".
-      syncQueue.enqueue(actividadId, payload);
+      // sync-queue), o cuando el alumno pulse "Reintentar". enqueue es async
+      // (resuelve la sesión para encolar bajo la clave del usuario) pero no
+      // hace falta esperarla: nunca lanza y el banner ya está mostrado.
+      void syncQueue.enqueue(actividadId, payload);
       return { ok: false, error: res.error };
     }
 
@@ -125,7 +125,7 @@ export function ActivityRunner({
     // fallido de esta misma actividad (p.ej. el alumno reintentó manualmente
     // y esta vez entregarActividad tuvo éxito directamente, sin pasar por
     // reintentarEntrega, que es el único lugar que ya hacía este dequeue).
-    syncQueue.dequeue(actividadId);
+    void syncQueue.dequeue(actividadId);
     // Avanzar a la siguiente actividad de la progresión. Si es la última,
     // volver a la progresión (ahí vive la celebración de "completada").
     const idx = actividadesProg.findIndex((a) => a.orden === ordenNum);
@@ -145,18 +145,17 @@ export function ActivityRunner({
     setReintentando(true);
     try {
       const r = await handleProgreso(resultado);
-      if (r.ok) syncQueue.dequeue(actividadId); // limpia la cola si quedó una copia pendiente
+      if (r.ok) void syncQueue.dequeue(actividadId); // limpia la cola si quedó una copia pendiente
     } finally {
       setReintentando(false);
     }
   }
 
-  const base = { id: actividadId, titulo, descripcion: descripcion ?? undefined, xp };
+  const base = { id: actividadId, titulo, descripcion: descripcion ?? undefined };
 
   const shellProps = {
     titulo,
     tipo,
-    xp,
     color,
     estado,
     backHref,
@@ -212,11 +211,12 @@ export function ActivityRunner({
         color={color}
         estado={estado}
         respuestasIntento={respuestasIntento ?? undefined}
+        uacCodigo={uacCodigo}
       />
     );
   } else if (tipo === "quiz_verdadero_falso") {
     activity = (
-      <QuizVerdaderoFalsoActivity actividad={{ ...base, tipo: "quiz_verdadero_falso", contenido: contenido as never }} onProgreso={handleProgreso} color={color} />
+      <QuizVerdaderoFalsoActivity actividad={{ ...base, tipo: "quiz_verdadero_falso", contenido: contenido as never }} onProgreso={handleProgreso} color={color} uacCodigo={uacCodigo} />
     );
   } else if (tipo === "fill_blanks") {
     activity = (
@@ -226,6 +226,7 @@ export function ActivityRunner({
         color={color}
         estado={estado}
         respuestasIntento={respuestasIntento ?? undefined}
+        uacCodigo={uacCodigo}
       />
     );
   } else if (tipo === "ejercicio_matematico") {
@@ -236,6 +237,7 @@ export function ActivityRunner({
         color={color}
         estado={estado}
         respuestasIntento={respuestasIntento ?? undefined}
+        uacCodigo={uacCodigo}
       />
     );
   } else if (tipo === "reflexion_escrita") {
@@ -246,6 +248,7 @@ export function ActivityRunner({
         color={color}
         estado={estado}
         respuestasIntento={respuestasIntento ?? undefined}
+        uacCodigo={uacCodigo}
       />
     );
   } else if (tipo === "video_con_preguntas") {
@@ -264,6 +267,7 @@ export function ActivityRunner({
         color={color}
         estado={estado}
         respuestasIntento={respuestasIntento ?? undefined}
+        uacCodigo={uacCodigo}
       />
     );
   } else if (tipo === "simulacion") {
@@ -272,11 +276,11 @@ export function ActivityRunner({
     );
   } else if (tipo === "glosario_interactivo") {
     activity = (
-      <GlosarioInteractivoActivity actividad={{ ...base, tipo: "glosario_interactivo", contenido: contenido as never }} onProgreso={handleProgreso} color={color} />
+      <GlosarioInteractivoActivity actividad={{ ...base, tipo: "glosario_interactivo", contenido: contenido as never }} onProgreso={handleProgreso} color={color} uacCodigo={uacCodigo} />
     );
   } else if (tipo === "autoevaluacion") {
     activity = (
-      <AutoevaluacionActivity actividad={{ ...base, tipo: "autoevaluacion", contenido: contenido as never }} onProgreso={handleProgreso} color={color} />
+      <AutoevaluacionActivity actividad={{ ...base, tipo: "autoevaluacion", contenido: contenido as never }} onProgreso={handleProgreso} color={color} uacCodigo={uacCodigo} />
     );
   } else {
     activity = (

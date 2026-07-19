@@ -5,23 +5,12 @@ import { getRSCColor, TIPO_CONFIG } from "@/components/hub/hub-colors";
 import { ProgresoUACGrid } from "@/components/hub/ProgresoUACGrid";
 import {
   getProgresoDetallePorUAC,
-  getActividadesRecientes,
-  getCalendario30Dias,
-  getEstadisticasProgreso,
-  getLogrosCatalogo,
+  getResumenActividadAlumno,
 } from "@/lib/queries/progreso";
 import type { Metadata } from "next";
 import "./Progreso.css";
 
 export const metadata: Metadata = { title: "Mi Progreso — CEN Bachillerato" };
-
-function criterioLabel(tipo: string, valor: number): string {
-  if (tipo === "actividades") return `Completá ${valor} actividad${valor === 1 ? "" : "es"}`;
-  if (tipo === "xp") return `Acumulá ${valor.toLocaleString("es-MX")} XP`;
-  if (tipo === "racha") return `Racha de ${valor} día${valor === 1 ? "" : "s"}`;
-  if (tipo === "minutos") return `Estudia ${Math.floor(valor / 60)}h en total`;
-  return String(valor);
-}
 
 function timeAgo(dateStr: string): string {
   const diffMin = Math.floor((Date.now() - new Date(dateStr).getTime()) / 60000);
@@ -44,15 +33,13 @@ export default async function ProgresoPage() {
 
   const semestre = profile.semestre ?? 1;
 
-  const [progreso, rachaData, progresoUAC, actividadesRecientes, calendario, stats, logrosCatalogo] = await Promise.all([
+  const [progreso, rachaData, progresoUAC, resumenActividad] = await Promise.all([
     getProgresoSemestre(user.id, semestre),
     getRachaDelAlumno(user.id),
     getProgresoDetallePorUAC(user.id, semestre),
-    getActividadesRecientes(user.id, 15),
-    getCalendario30Dias(user.id),
-    getEstadisticasProgreso(user.id),
-    getLogrosCatalogo(user.id),
+    getResumenActividadAlumno(user.id, 15),
   ]);
+  const { recientes: actividadesRecientes, calendario, stats } = resumenActividad;
 
   const { porcentaje, totalProgresiones, progresionesCompletadas, actividadesEstaSemana, minutosEstaSemana } = progreso;
   const { diasConsecutivos } = rachaData;
@@ -66,7 +53,6 @@ export default async function ProgresoPage() {
   const tiempoTotal = `${Math.round(stats.totalMinutos / 60)}h ${stats.totalMinutos % 60}m`;
 
   const HERO_STATS = [
-    { label: "Total XP ganado", value: stats.totalXP.toLocaleString("es-MX"), icon: "fa-star", color: "#FBBF24" },
     { label: "Actividades completadas", value: stats.totalActividades, icon: "fa-check", color: "#34D399" },
     { label: "Tiempo total", value: tiempoTotal, icon: "fa-clock", color: "#38BDF8" },
   ];
@@ -116,7 +102,7 @@ export default async function ProgresoPage() {
             <>
               <p className="prog-hero-big">Tu semestre empieza aquí</p>
               <p className="prog-hero-sub">
-                Completá tu primera actividad para arrancar tu avance, sumar XP y
+                Completá tu primera actividad para arrancar tu avance y
                 encender tu racha. <strong>{totalProgresiones} propósitos formativos</strong> te esperan.
               </p>
             </>
@@ -211,46 +197,6 @@ export default async function ProgresoPage() {
             </span>
           </div>
         </div>
-
-        {/* ── Logros ─── */}
-        <div className="prog-card">
-          <div className="prog-card-head">
-            <h2 className="prog-card-title">Logros</h2>
-            {logrosCatalogo.length > 0 && (
-              <span className="prog-logros-count">
-                {logrosCatalogo.filter((l) => l.desbloqueado).length}
-                {" / "}
-                {logrosCatalogo.length}
-              </span>
-            )}
-          </div>
-          {logrosCatalogo.length === 0 ? (
-            <div className="prog-empty">
-              <div className="prog-empty-badge">🏆</div>
-              <p className="prog-empty-title">Sin logros todavía</p>
-              <p className="prog-empty-desc">Completá actividades y desbloqueá tus primeros logros.</p>
-            </div>
-          ) : (
-            <div className="prog-logros-grid">
-              {logrosCatalogo.map((logro) => (
-                <div
-                  key={logro.id}
-                  title={
-                    logro.desbloqueado
-                      ? `${logro.nombre}: ${logro.descripcion}`
-                      : `🔒 ${logro.nombre} · ${criterioLabel(logro.criterio_tipo, logro.criterio_valor)}`
-                  }
-                  className={`prog-logro${logro.desbloqueado ? "" : " locked"}`}
-                >
-                  {logro.icono}
-                  {!logro.desbloqueado && (
-                    <i className="fa-solid fa-lock prog-logro-lock" aria-hidden="true" />
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
       </div>
 
       {/* ── Actividades recientes ─── */}
@@ -275,7 +221,6 @@ export default async function ProgresoPage() {
                     </div>
                   </div>
                   <div className="prog-act-right">
-                    <div className="prog-act-xp">+{act.xpGanado} XP</div>
                     <div className="prog-act-when">{timeAgo(act.completadaEn)}</div>
                   </div>
                 </div>

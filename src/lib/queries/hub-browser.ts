@@ -2,6 +2,10 @@
  * hub-browser.ts — Browser-client versions of hub queries.
  * Used by Client Component pages ('use client') in the Hub.
  * Mirrors the logic of hub.ts but uses createBrowserClient.
+ *
+ * El progreso del hub (tarjetas de UAC, héroe y tiles de recursos) se sirve
+ * desde un núcleo consolidado de 3 queries por carga (ver "Datos consolidados
+ * del semestre" abajo) en lugar de una cascada de ~4 queries por UAC.
  */
 
 import { createBrowserClient } from "@supabase/ssr";
@@ -52,6 +56,183 @@ export async function getCurrentProfile(): Promise<HubProfile | null> {
   };
 }
 
+// ─── Datos consolidados del semestre (anti-cascada N×4) ──────────────────────
+//
+// El hub llama a getProgresionesCompletadasDeUAC una vez POR CADA UAC del
+// semestre; con la cascada original (uac → progresiones → actividades →
+// intentos) eso eran ~4 queries × 6-7 UAC ≈ 24-28 requests browser→Supabase
+// en cada carga — el mayor amplificador de tráfico contra el plan Free.
+// Aquí se consolida en 3 queries TOTALES por carga, compartidas por todas las
+// tarjetas de UAC, el héroe (getProgresoSemestreBrowser) y los tiles de
+// recursos (getProgresoRecursosSemestre); cada función reconstruye en memoria
+// lo que antes calculaba con su propia cascada.
+//
+// La fuente de verdad sigue siendo la BD bajo RLS con la sesión del alumno:
+// las actividades en borrador NO cuentan porque la policy solo expone
+// estado='publicada' (migración 01), exactamente igual que en la cascada
+// original. El catálogo estático solo se usa para derivar el semestre de un
+// código de UAC (agrupar la carga), nunca para conteos.
+
+interface DatosSemestre {
+  /** Progresiones no-placeholder con el código de su UAC (join con uac). */
+  progresiones: Array<{ id: string; uacCodigo: string; categoria: string | null }>;
+  /** Actividades visibles bajo RLS, sin contenido (solo id/agrupación/tipo). */
+  actividades: Array<{ id: string; progresionId: string; tipo: string }>;
+  /** TODOS los intentos del usuario, ordenados por started_at desc. */
+  intentos: Array<{ actividadId: string; status: string; startedAt: string }>;
+  /** actividad_ids agrupadas por progresión (derivado de `actividades`). */
+  actsPorProgresion: Map<string, string[]>;
+  /** actividad_ids con al menos un intento completed (derivado de `intentos`). */
+  completadas: Set<string>;
+  /** true si alguna query falló (red/RLS): el resultado no se cachea. */
+  huboError: boolean;
+}
+
+/**
+ * Las 3 queries consolidadas. El filtro admite un semestre completo (caso
+ * normal, cacheable) o una sola UAC por código (fallback para códigos fuera
+ * del catálogo estático, sin caché).
+ */
+async function fetchDatosUACs(
+  userId: string,
+  filtro: { semestre: number } | { codigo: string }
+): Promise<DatosSemestre> {
+  const sb = getClient();
+
+  // (a) Progresiones de TODAS las UAC del alcance en UNA query. El join
+  //     !inner con uac (FK progresiones.uac_id → uac.id, migración 01)
+  //     permite filtrar por semestre/código sin una query previa a la tabla
+  //     uac.
+  const progsBase = sb
+    .from("progresiones")
+    .select("id, categoria, uac!inner(codigo)")
+    .eq("es_placeholder", false);
+  const progsQuery =
+    "semestre" in filtro
+      ? progsBase.eq("uac.semestre", filtro.semestre)
+      : progsBase.eq("uac.codigo", filtro.codigo);
+
+  // (c) Intentos del usuario SIN .in(actividad_id, [...]): con cientos de
+  //     actividades por semestre ese .in reventaría el límite de longitud de
+  //     URL de PostgREST. Son pocas filas (UNIQUE user/actividad/status) y el
+  //     cruce con las actividades del semestre se hace en memoria. Además de
+  //     actividad_id se piden status y started_at porque
+  //     UACProgreso.ultimaActividad necesita el intento más reciente de
+  //     CUALQUIER status, no solo completed.
+  const intentosQuery = sb
+    .from("intentos")
+    .select("actividad_id, status, started_at")
+    .eq("user_id", userId)
+    .order("started_at", { ascending: false });
+
+  // (a) y (c) no dependen entre sí: en paralelo para ahorrar un round-trip.
+  const [progsRes, intentosRes] = await Promise.all([progsQuery, intentosQuery]);
+
+  // Sin tipos generados de la BD, supabase-js no conoce la cardinalidad del
+  // embed y tipa `uac` como arreglo; en runtime PostgREST devuelve UN objeto
+  // (FK muchos-a-uno), así que se castea a la forma real (mismo patrón que
+  // progreso.ts con sus embeds).
+  const progsData = (progsRes.data ?? []) as unknown as Array<{
+    id: string;
+    categoria: string | null;
+    uac: { codigo: string } | null;
+  }>;
+  const progresiones: DatosSemestre["progresiones"] = progsData.map((p) => ({
+    id: p.id,
+    uacCodigo: p.uac?.codigo ?? "",
+    categoria: p.categoria ?? null,
+  }));
+
+  // (b) Actividades de esas progresiones en UNA query (~decenas de UUIDs en
+  //     el .in, muy por debajo del límite de URL). Solo columnas de identidad
+  //     y agrupación más `tipo` (tiles de recursos): nada de `contenido`
+  //     (jsonb) ni títulos que inflarían la respuesta de cada carga del hub.
+  let actividades: DatosSemestre["actividades"] = [];
+  let errorActividades: unknown = null;
+  if (progresiones.length > 0) {
+    const { data, error } = await sb
+      .from("actividades")
+      .select("id, progresion_id, tipo")
+      .in("progresion_id", progresiones.map((p) => p.id));
+    errorActividades = error;
+    actividades = (data ?? [])
+      .filter((a) => a.progresion_id)
+      .map((a) => ({ id: a.id, progresionId: a.progresion_id, tipo: a.tipo }));
+  }
+
+  const intentos: DatosSemestre["intentos"] = (intentosRes.data ?? []).map((i) => ({
+    actividadId: i.actividad_id,
+    status: i.status,
+    startedAt: i.started_at,
+  }));
+
+  const actsPorProgresion = new Map<string, string[]>();
+  for (const a of actividades) {
+    const lista = actsPorProgresion.get(a.progresionId);
+    if (lista) lista.push(a.id);
+    else actsPorProgresion.set(a.progresionId, [a.id]);
+  }
+
+  const completadas = new Set<string>();
+  for (const i of intentos) {
+    if (i.status === "completed") completadas.add(i.actividadId);
+  }
+
+  return {
+    progresiones,
+    actividades,
+    intentos,
+    actsPorProgresion,
+    completadas,
+    huboError: Boolean(progsRes.error || intentosRes.error || errorActividades),
+  };
+}
+
+/**
+ * Caché en memoria del módulo con TTL corto. Su único objetivo es que las
+ * ~6-7 tarjetas de UAC + el héroe + los tiles de UNA MISMA carga del hub
+ * compartan las 3 queries (antes cada tarjeta lanzaba su propia cascada).
+ * El TTL corto mantiene la frescura entre navegaciones: al volver al hub
+ * después de completar una actividad la caché ya expiró y se refetchea.
+ * Se cachea la PROMESA (no el resultado) para que las llamadas concurrentes
+ * de una misma carga se deduplen aunque la primera aún no haya resuelto.
+ */
+const TTL_DATOS_SEMESTRE_MS = 15_000;
+const cacheDatosSemestre = new Map<
+  string,
+  { creadoEn: number; promesa: Promise<DatosSemestre> }
+>();
+
+/** Vacía la caché consolidada del hub (tests, o tras registrar un intento). */
+export function limpiarCacheDatosSemestre(): void {
+  cacheDatosSemestre.clear();
+}
+
+function descartarSiVigente(clave: string, promesa: Promise<DatosSemestre>): void {
+  if (cacheDatosSemestre.get(clave)?.promesa === promesa) {
+    cacheDatosSemestre.delete(clave);
+  }
+}
+
+function getDatosSemestre(userId: string, semestre: number): Promise<DatosSemestre> {
+  const clave = `${userId}:${semestre}`;
+  const vigente = cacheDatosSemestre.get(clave);
+  if (vigente && Date.now() - vigente.creadoEn < TTL_DATOS_SEMESTRE_MS) {
+    return vigente.promesa;
+  }
+
+  const promesa = fetchDatosUACs(userId, { semestre }).then((datos) => {
+    // Un fallo (red, RLS) no se cachea: la siguiente carga reintenta en vez
+    // de congelar ceros durante todo el TTL.
+    if (datos.huboError) descartarSiVigente(clave, promesa);
+    return datos;
+  });
+  // Rechazo inesperado (throw dentro de supabase-js): tampoco se cachea.
+  promesa.catch(() => descartarSiVigente(clave, promesa));
+  cacheDatosSemestre.set(clave, { creadoEn: Date.now(), promesa });
+  return promesa;
+}
+
 /**
  * Última actividad en progreso del alumno, o la primera no iniciada de su
  * semestre si no hay ninguna en progreso. Alimenta la ContinuarCard del hub.
@@ -63,10 +244,10 @@ export async function getUltimaActividadActivaBrowser(
 ): Promise<ContinuarData | null> {
   const sb = getClient();
 
-  // 1. Intento en progreso más reciente
+  // 1. Intento en progreso más reciente (started_at solo ordena; no se lee)
   const { data: intentoRaw } = await sb
     .from("intentos")
-    .select("id, actividad_id, status, started_at")
+    .select("actividad_id")
     .eq("user_id", userId)
     .eq("status", "in_progress")
     .order("started_at", { ascending: false })
@@ -75,17 +256,19 @@ export async function getUltimaActividadActivaBrowser(
 
   let actividadId: string | null = intentoRaw?.actividad_id ?? null;
 
-  // 2. Si no hay en progreso, primera actividad de la primera progresión del semestre
+  // 2. Si no hay en progreso, primera actividad de la primera progresión del
+  //    semestre (solo se necesitan ids; los .order funcionan sin seleccionar
+  //    la columna)
   if (!actividadId) {
     const { data: uacRows } = await sb
       .from("uac")
-      .select("id, codigo")
+      .select("id")
       .eq("semestre", semestre);
     if (!uacRows || uacRows.length === 0) return null;
 
     const { data: progRows } = await sb
       .from("progresiones")
-      .select("id, numero, uac_id")
+      .select("id")
       .in("uac_id", uacRows.map((u) => u.id))
       .eq("es_placeholder", false)
       .order("numero");
@@ -93,7 +276,7 @@ export async function getUltimaActividadActivaBrowser(
 
     const { data: actRow } = await sb
       .from("actividades")
-      .select("id, codigo")
+      .select("id")
       .in("progresion_id", progRows.map((p) => p.id))
       .order("codigo")
       .limit(1)
@@ -102,10 +285,10 @@ export async function getUltimaActividadActivaBrowser(
     actividadId = actRow.id;
   }
 
-  // 3. Detalles de la actividad
+  // 3. Detalles de la actividad (el id ya lo tenemos en actividadId)
   const { data: act } = await sb
     .from("actividades")
-    .select("id, codigo, titulo, tipo, progresion_id")
+    .select("codigo, titulo, tipo, progresion_id")
     .eq("id", actividadId)
     .maybeSingle();
   if (!act?.progresion_id) return null;
@@ -121,19 +304,19 @@ export async function getUltimaActividadActivaBrowser(
   // 5. UAC
   const { data: uac } = await sb
     .from("uac")
-    .select("id, codigo, nombre")
+    .select("codigo, nombre")
     .eq("id", prog.uac_id)
     .maybeSingle();
   if (!uac) return null;
 
   const uacStatic = getUACPorCodigo(uac.codigo);
 
-  // 6. Contar actividades completadas de esta progresión
+  // 6. Contar actividades completadas de esta progresión (solo ids: el
+  //    resultado se cuenta y se convierte en Set, el orden no importa)
   const { data: allActs } = await sb
     .from("actividades")
-    .select("id, codigo")
-    .eq("progresion_id", prog.id)
-    .order("codigo");
+    .select("id")
+    .eq("progresion_id", prog.id);
 
   const totalActividades = allActs?.length ?? 3;
   const actIds = (allActs ?? []).map((a) => a.id);
@@ -179,62 +362,42 @@ export async function getProgresionesCompletadasDeUAC(
   codigoUAC: string,
   userId: string
 ): Promise<UACProgreso> {
-  const sb = getClient();
-
-  const { data: uacRow } = await sb
-    .from("uac")
-    .select("id")
-    .eq("codigo", codigoUAC)
-    .maybeSingle();
-
-  if (!uacRow) return { completadas: 0, total: 0, ultimaActividad: null };
-
-  const { data: progs } = await sb
-    .from("progresiones")
-    .select("id, categoria")
-    .eq("uac_id", uacRow.id)
-    .eq("es_placeholder", false);
+  // El semestre sale del catálogo estático SOLO para que todas las tarjetas
+  // del hub compartan la misma carga consolidada; los conteos siempre vienen
+  // de la BD. Un código fuera del catálogo cae a una carga puntual sin caché.
+  const semestre = getUACPorCodigo(codigoUAC)?.semestre;
+  const datos =
+    semestre !== undefined
+      ? await getDatosSemestre(userId, semestre)
+      : await fetchDatosUACs(userId, { codigo: codigoUAC });
 
   // Solo cuentan los propósitos oficiales 2025; los complementos no inflan la meta.
-  const oficiales = (progs ?? []).filter((p) => p.categoria !== CATEGORIA_COMPLEMENTO);
+  const oficiales = datos.progresiones.filter(
+    (p) => p.uacCodigo === codigoUAC && p.categoria !== CATEGORIA_COMPLEMENTO
+  );
   const total = oficiales.length;
   if (total === 0) return { completadas: 0, total: 0, ultimaActividad: null };
 
-  const progIds = oficiales.map((p) => p.id);
-
-  const { data: acts } = await sb
-    .from("actividades")
-    .select("id, progresion_id")
-    .in("progresion_id", progIds);
-
-  const actIds = (acts ?? []).map((a) => a.id);
-  if (actIds.length === 0) return { completadas: 0, total, ultimaActividad: null };
-
-  const { data: intentos } = await sb
-    .from("intentos")
-    .select("actividad_id, status, started_at")
-    .eq("user_id", userId)
-    .in("actividad_id", actIds)
-    .order("started_at", { ascending: false });
-
-  const completedSet = new Set<string>();
-  let ultimaActividad: string | null = null;
-
-  for (const i of intentos ?? []) {
-    if (!ultimaActividad) ultimaActividad = i.started_at;
-    if (i.status === "completed") completedSet.add(i.actividad_id);
+  // Actividades de las progresiones oficiales de ESTA UAC.
+  const actIds = new Set<string>();
+  for (const p of oficiales) {
+    for (const id of datos.actsPorProgresion.get(p.id) ?? []) actIds.add(id);
   }
+  if (actIds.size === 0) return { completadas: 0, total, ultimaActividad: null };
 
-  const actsByProg = new Map<string, string[]>();
-  for (const a of acts ?? []) {
-    if (!a.progresion_id) continue;
-    if (!actsByProg.has(a.progresion_id)) actsByProg.set(a.progresion_id, []);
-    actsByProg.get(a.progresion_id)!.push(a.id);
-  }
+  // Los intentos vienen ordenados por started_at desc: el primero que toque
+  // una actividad de esta UAC es la última actividad trabajada.
+  const ultimaActividad =
+    datos.intentos.find((i) => actIds.has(i.actividadId))?.startedAt ?? null;
 
+  // Una progresión cuenta como completada si TODAS sus actividades lo están;
+  // las progresiones sin actividades no cuentan (igual que la cascada previa).
   let completadas = 0;
-  for (const [, actList] of actsByProg) {
-    if (actList.every((id) => completedSet.has(id))) completadas++;
+  for (const p of oficiales) {
+    const acts = datos.actsPorProgresion.get(p.id) ?? [];
+    if (acts.length > 0 && acts.every((id) => datos.completadas.has(id))) {
+      completadas++;
+    }
   }
 
   return { completadas, total, ultimaActividad };
@@ -294,9 +457,10 @@ export async function getProgresionesConEstadoBrowser(
 
   const intentosByActId = new Map<string, "in_progress" | "completed">();
   if (allActIds.length > 0) {
+    // started_at solo ordena (gana el intento más reciente); no se selecciona
     const { data: intentos } = await sb
       .from("intentos")
-      .select("actividad_id, status, started_at")
+      .select("actividad_id, status")
       .eq("user_id", userId)
       .in("actividad_id", allActIds)
       .order("started_at", { ascending: false });
@@ -359,66 +523,27 @@ export async function getProgresoSemestreBrowser(
   userId: string,
   semestre: number
 ): Promise<ProgresoSemestreBrowser> {
-  const sb = getClient();
-
-  const { data: uacRows } = await sb
-    .from("uac")
-    .select("id")
-    .eq("semestre", semestre);
-
-  if (!uacRows || uacRows.length === 0)
-    return { totalProgresiones: 0, progresionesCompletadas: 0, porcentaje: 0 };
-
-  const uacIds = uacRows.map((u) => u.id);
-
-  const { data: progs } = await sb
-    .from("progresiones")
-    .select("id, categoria")
-    .in("uac_id", uacIds)
-    .eq("es_placeholder", false);
+  const datos = await getDatosSemestre(userId, semestre);
 
   // Solo cuentan los propósitos oficiales 2025; los complementos no inflan la meta.
-  const oficiales = (progs ?? []).filter((p) => p.categoria !== CATEGORIA_COMPLEMENTO);
+  const oficiales = datos.progresiones.filter(
+    (p) => p.categoria !== CATEGORIA_COMPLEMENTO
+  );
   const totalProgresiones = oficiales.length;
   if (totalProgresiones === 0)
     return { totalProgresiones: 0, progresionesCompletadas: 0, porcentaje: 0 };
 
-  const progIds = oficiales.map((p) => p.id);
-
-  const { data: allActs } = await sb
-    .from("actividades")
-    .select("id, progresion_id")
-    .in("progresion_id", progIds);
-
-  const actIds = (allActs ?? []).map((a) => a.id);
-  if (actIds.length === 0)
-    return { totalProgresiones, progresionesCompletadas: 0, porcentaje: 0 };
-
-  const { data: completedIntentos } = await sb
-    .from("intentos")
-    .select("actividad_id")
-    .eq("user_id", userId)
-    .eq("status", "completed")
-    .in("actividad_id", actIds);
-
-  const completedActIds = new Set(completedIntentos?.map((i) => i.actividad_id) ?? []);
-
-  const actsByProg = new Map<string, string[]>();
-  for (const act of allActs ?? []) {
-    if (!act.progresion_id) continue;
-    if (!actsByProg.has(act.progresion_id)) actsByProg.set(act.progresion_id, []);
-    actsByProg.get(act.progresion_id)!.push(act.id);
-  }
-
+  // Una progresión cuenta como completada si TODAS sus actividades lo están;
+  // las que no tienen actividades no cuentan (igual que la cascada previa).
   let progresionesCompletadas = 0;
-  for (const [, acts] of actsByProg) {
-    if (acts.every((id) => completedActIds.has(id))) progresionesCompletadas++;
+  for (const p of oficiales) {
+    const acts = datos.actsPorProgresion.get(p.id) ?? [];
+    if (acts.length > 0 && acts.every((id) => datos.completadas.has(id))) {
+      progresionesCompletadas++;
+    }
   }
 
-  const porcentaje =
-    totalProgresiones > 0
-      ? Math.round((progresionesCompletadas / totalProgresiones) * 100)
-      : 0;
+  const porcentaje = Math.round((progresionesCompletadas / totalProgresiones) * 100);
 
   return { totalProgresiones, progresionesCompletadas, porcentaje };
 }
@@ -440,42 +565,19 @@ export async function getProgresoRecursosSemestre(
   userId: string,
   semestre: number
 ): Promise<ProgresoTipo[]> {
-  const sb = getClient();
+  const datos = await getDatosSemestre(userId, semestre);
+  if (datos.actividades.length === 0) return [];
 
-  const { data: uacRows } = await sb
-    .from("uac")
-    .select("id")
-    .eq("semestre", semestre);
-  if (!uacRows || uacRows.length === 0) return [];
-
-  const { data: progs } = await sb
-    .from("progresiones")
-    .select("id")
-    .in("uac_id", uacRows.map((u) => u.id))
-    .eq("es_placeholder", false);
-  if (!progs || progs.length === 0) return [];
-
-  const { data: acts } = await sb
-    .from("actividades")
-    .select("id, tipo")
-    .in("progresion_id", progs.map((p) => p.id));
-  if (!acts || acts.length === 0) return [];
-
-  const { data: completed } = await sb
-    .from("intentos")
-    .select("actividad_id")
-    .eq("user_id", userId)
-    .eq("status", "completed")
-    .in("actividad_id", acts.map((a) => a.id));
-
-  const doneSet = new Set(completed?.map((i) => i.actividad_id) ?? []);
-
+  // A diferencia del avance por UAC, aquí SÍ cuentan los complementos: los
+  // tiles muestran todo lo que el alumno puede abrir (igual que antes).
   const totalByTipo = new Map<string, number>();
   const doneByTipo = new Map<string, number>();
-  for (const a of acts) {
+  for (const a of datos.actividades) {
     const tipo = normalizarTipo(a.tipo);
     totalByTipo.set(tipo, (totalByTipo.get(tipo) ?? 0) + 1);
-    if (doneSet.has(a.id)) doneByTipo.set(tipo, (doneByTipo.get(tipo) ?? 0) + 1);
+    if (datos.completadas.has(a.id)) {
+      doneByTipo.set(tipo, (doneByTipo.get(tipo) ?? 0) + 1);
+    }
   }
 
   return [...totalByTipo.entries()].map(([tipo, total]) => ({
@@ -489,7 +591,6 @@ export interface RecursoActividad {
   id: string;
   titulo: string;
   tipo: string;
-  xp: number;
   uacCodigo: string;
   uacNombre: string;
   progresionId: string;
@@ -527,15 +628,16 @@ export async function getRecursosSemestreBrowser(
 
   const { data: acts } = await sb
     .from("actividades")
-    .select("id, codigo, titulo, tipo, xp, progresion_id")
+    .select("id, codigo, titulo, tipo, progresion_id")
     .in("progresion_id", progs.map((p) => p.id));
   if (!acts || acts.length === 0) return [];
 
   const actIds = acts.map((a) => a.id);
   const estadoByAct = new Map<string, "in_progress" | "completed">();
+  // started_at solo ordena (gana el intento más reciente); no se selecciona
   const { data: intentos } = await sb
     .from("intentos")
-    .select("actividad_id, status, started_at")
+    .select("actividad_id, status")
     .eq("user_id", userId)
     .in("actividad_id", actIds)
     .order("started_at", { ascending: false });
@@ -559,7 +661,6 @@ export async function getRecursosSemestreBrowser(
       id: a.id,
       titulo: a.titulo,
       tipo: a.tipo,
-      xp: a.xp,
       uacCodigo: uac.codigo,
       uacNombre: uac.nombre,
       progresionId: prog.id,
@@ -627,9 +728,10 @@ export async function getLaboratoriosSemestreBrowser(
 
   const actIds = acts.map((a) => a.id);
   const estadoByAct = new Map<string, "in_progress" | "completed">();
+  // started_at solo ordena (gana el intento más reciente); no se selecciona
   const { data: intentos } = await sb
     .from("intentos")
-    .select("actividad_id, status, started_at")
+    .select("actividad_id, status")
     .eq("user_id", userId)
     .in("actividad_id", actIds)
     .order("started_at", { ascending: false });

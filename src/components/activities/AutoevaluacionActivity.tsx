@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { ActividadAutoevaluacion, CallbackProgreso } from '@/types/activities';
 import type { AreaColor } from '@/components/hub/hub-colors';
+import { imagenDeLectura } from '@/lib/contenido/lectura-imagenes';
 
 const FALLBACK_COLOR: AreaColor = { hex: '#A78BFA', rgba: '167,139,250', faIcon: 'fa-circle-dot', gradient: '' };
 const FONT = 'var(--font-epilogue), sans-serif';
@@ -10,14 +11,26 @@ const FONT = 'var(--font-epilogue), sans-serif';
 interface Props {
   actividad: ActividadAutoevaluacion;
   onProgreso?: CallbackProgreso;
+  /** Código de la UAC, para elegir una imagen temática cuando no hay lámina propia. */
+  uacCodigo?: string;
   color?: AreaColor;
 }
 
-export function AutoevaluacionActivity({ actividad, onProgreso, color = FALLBACK_COLOR }: Props) {
+export function AutoevaluacionActivity({ actividad, onProgreso, uacCodigo, color = FALLBACK_COLOR }: Props) {
   const { contenido } = actividad;
   const [respuestas, setRespuestas] = useState<Record<number, number>>({});
   const [reflexion, setReflexion] = useState('');
   const [entregado, setEntregado] = useState(false);
+  const [imgError, setImgError] = useState(false);
+  const [imgTematicaError, setImgTematicaError] = useState(false);
+
+  // Los SVG de placeholder ya no existen en disco; cualquier url que contenga
+  // "placeholder" se trata como "sin lámina" para ir directo a la imagen temática
+  // (evita una petición 404 y el ícono de imagen rota).
+  const urlImagen = contenido.url_imagen ?? '';
+  const tieneImagen = urlImagen.length > 0 && !/placeholder/i.test(urlImagen) && !imgError;
+  // Sin lámina propia → imagen temática con licencia libre acorde a la materia.
+  const imagenTematica = imagenDeLectura(uacCodigo, actividad.titulo);
 
   const totalCriterios = contenido.criterios.length;
   const respondidos = Object.keys(respuestas).length;
@@ -44,6 +57,54 @@ export function AutoevaluacionActivity({ actividad, onProgreso, color = FALLBACK
 
   return (
     <div style={{ maxWidth: 672, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24, fontFamily: FONT }}>
+
+      {/* Imagen principal */}
+      {tieneImagen ? (
+        <div style={{ borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', overflow: 'hidden', background: 'rgba(255,255,255,0.04)' }}>
+          <img
+            src={urlImagen}
+            alt={actividad.titulo}
+            style={{ width: '100%', objectFit: 'contain', maxHeight: 500, display: 'block' }}
+            onError={() => setImgError(true)}
+          />
+        </div>
+      ) : !imgTematicaError ? (
+        <div style={{ borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', overflow: 'hidden', background: 'rgba(255,255,255,0.04)', position: 'relative' }}>
+          <img
+            src={imagenTematica}
+            alt={actividad.titulo}
+            style={{ width: '100%', objectFit: 'cover', height: 224, display: 'block' }}
+            onError={() => setImgTematicaError(true)}
+          />
+          <div
+            style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(to top, rgba(1,17,38,0.55) 0%, rgba(1,17,38,0.10) 40%, transparent 70%)' }}
+          />
+          <p style={{ position: 'absolute', bottom: 12, left: 16, right: 16, margin: 0, fontSize: 12.5, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>
+            {actividad.titulo}
+          </p>
+        </div>
+      ) : (
+        // Fallback honesto si tampoco hay imagen temática en disco: bloque temático sin <img> roto.
+        <div
+          style={{
+            borderRadius: 16,
+            border: `1px solid rgba(${color.rgba},0.25)`,
+            background: `linear-gradient(135deg, rgba(${color.rgba},0.14), rgba(${color.rgba},0.04))`,
+            height: 180,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 10,
+          }}
+        >
+          <i className="fa-solid fa-clipboard-check" style={{ fontSize: 34, color: `rgba(${color.rgba},0.55)` }} />
+          <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.70)', textAlign: 'center', maxWidth: 320 }}>
+            {actividad.titulo}
+          </p>
+        </div>
+      )}
+
       {contenido.instrucciones && (
         <div style={{ borderRadius: 14, border: `1px solid rgba(${color.rgba},0.25)`, background: `rgba(${color.rgba},0.08)`, padding: 16 }}>
           <p style={{ margin: 0, fontSize: 14, color: 'rgba(255,255,255,0.82)', lineHeight: 1.55 }}>{contenido.instrucciones}</p>

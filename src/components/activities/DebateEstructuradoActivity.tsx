@@ -8,6 +8,7 @@ import { useReducedMotion } from '@/lib/motion/hooks';
 import { celebrate } from '@/lib/motion/celebrate';
 import type { ActividadDebateEstructurado, CallbackProgreso } from '@/types/activities';
 import type { AreaColor } from '@/components/hub/hub-colors';
+import { imagenDeLectura } from '@/lib/contenido/lectura-imagenes';
 
 const FALLBACK_COLOR: AreaColor = { hex: '#D97706', rgba: '217,119,6', faIcon: 'fa-comments', gradient: '' };
 
@@ -20,6 +21,8 @@ interface Props {
   color?: AreaColor;
   estado?: 'no_iniciada' | 'en_progreso' | 'completada';
   respuestasIntento?: Record<string, string>;
+  /** Código de la UAC, para elegir una imagen temática cuando no hay lámina propia. */
+  uacCodigo?: string;
 }
 
 function getPosturaColor(i: number, areaHex: string, areaRgba: string) {
@@ -28,7 +31,7 @@ function getPosturaColor(i: number, areaHex: string, areaRgba: string) {
 }
 
 export function DebateEstructuradoActivity({
-  actividad, onProgreso, color = FALLBACK_COLOR, estado, respuestasIntento,
+  actividad, onProgreso, color = FALLBACK_COLOR, estado, respuestasIntento, uacCodigo,
 }: Props) {
   const { contenido } = actividad;
   const reducedMotion = useReducedMotion();
@@ -40,13 +43,31 @@ export function DebateEstructuradoActivity({
     ? Number(respuestasIntento.postura)
     : null;
   const argumentacionInicial = modoRevision ? (respuestasIntento?.argumentacion ?? '') : '';
+  // Estado neutral de revisión: el intento existe pero la entrega guardada no
+  // está disponible (`respuestas` null en BD, datos históricos). Sin postura o
+  // sin argumentación no hay nada que revisar: forzamos posturaSeleccionada a
+  // null para que no se abra el editor vacío con "0 / 80 palabras", y el
+  // banner lo explica en lugar de mostrar "Postura: —".
+  const revisionSinDetalle = modoRevision && (posturaInicial === null || argumentacionInicial.trim() === '');
 
-  const [posturaSeleccionada, setPosturaSeleccionada] = useState<number | null>(posturaInicial);
+  const [posturaSeleccionada, setPosturaSeleccionada] = useState<number | null>(
+    revisionSinDetalle ? null : posturaInicial
+  );
   const [argumentacion, setArgumentacion] = useState(argumentacionInicial);
   const [enviando, setEnviando] = useState(false);
+  const [imgError, setImgError] = useState(false);
+  const [imgTematicaError, setImgTematicaError] = useState(false);
 
   const palabras = argumentacion.trim() === '' ? 0 : argumentacion.trim().split(/\s+/).length;
   const cumpleMinimo = palabras >= minPalabras;
+
+  // Los SVG de placeholder ya no existen en disco; cualquier url que contenga
+  // "placeholder" se trata como "sin lámina" para ir directo a la imagen temática
+  // (evita una petición 404 y el ícono de imagen rota).
+  const urlImagen = contenido.url_imagen ?? '';
+  const tieneImagen = urlImagen.length > 0 && !/placeholder/i.test(urlImagen) && !imgError;
+  // Sin lámina propia → imagen temática con licencia libre acorde a la materia.
+  const imagenTematica = imagenDeLectura(uacCodigo, actividad.titulo);
 
   function handleSeleccionarPostura(i: number) {
     setPosturaSeleccionada(i);
@@ -111,9 +132,58 @@ export function DebateEstructuradoActivity({
         >
           <RotateCcw size={16} style={{ color: '#818CF8', flexShrink: 0 }} />
           <p style={{ fontSize: 13, fontWeight: 700, color: '#818CF8', margin: 0 }}>
-            Revisando tu entrega · Postura: {posturaSeleccionada !== null ? contenido.posturas[posturaSeleccionada] : '—'}
+            {revisionSinDetalle
+              ? 'Entrega registrada — la revisión detallada no está disponible'
+              : <>Revisando tu entrega · Postura: {posturaSeleccionada !== null ? contenido.posturas[posturaSeleccionada] : '—'}</>}
           </p>
         </motion.div>
+      )}
+
+      {/* Imagen de ambientación (3 niveles: propia → temática por UAC → bloque icónico) */}
+      {tieneImagen ? (
+        <div style={{ ...card, overflow: 'hidden' }}>
+          <img
+            src={urlImagen}
+            alt={actividad.titulo}
+            style={{ width: '100%', objectFit: 'contain', maxHeight: 500, display: 'block' }}
+            onError={() => setImgError(true)}
+          />
+        </div>
+      ) : !imgTematicaError ? (
+        <div style={{ ...card, overflow: 'hidden', position: 'relative' }}>
+          <img
+            src={imagenTematica}
+            alt={actividad.titulo}
+            style={{ width: '100%', objectFit: 'cover', height: 224, display: 'block' }}
+            onError={() => setImgTematicaError(true)}
+          />
+          <div
+            style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(to top, rgba(1,17,38,0.55) 0%, rgba(1,17,38,0.10) 40%, transparent 70%)' }}
+          />
+          <p style={{ position: 'absolute', bottom: 12, left: 16, right: 16, margin: 0, fontSize: 12.5, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>
+            {actividad.titulo}
+          </p>
+        </div>
+      ) : (
+        // Fallback honesto si tampoco hay imagen temática en disco: bloque temático sin <img> roto.
+        <div
+          style={{
+            ...card,
+            background: `rgba(${color.rgba}, 0.06)`,
+            borderColor: `rgba(${color.rgba}, 0.20)`,
+            height: 180,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 10,
+          }}
+        >
+          <MessagesSquare size={34} style={{ color: color.hex, opacity: 0.55 }} />
+          <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.70)', textAlign: 'center', maxWidth: 320 }}>
+            {actividad.titulo}
+          </p>
+        </div>
       )}
 
       {/* Hero tema */}

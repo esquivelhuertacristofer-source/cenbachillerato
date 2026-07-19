@@ -247,14 +247,6 @@ export function ActivityCard({ actividad, visualState, uacCodigo, progresionNum,
                 <Icon size={9} />
                 {tipoLabel}
               </span>
-              <span style={{
-                fontSize: 10, fontWeight: 700, color: '#FBBF24',
-                padding: '4px 10px', borderRadius: 999,
-                background: 'rgba(251,191,36,0.08)',
-                border: '1px solid rgba(251,191,36,0.16)',
-              }}>
-                +{actividad.xp} XP
-              </span>
               {isCompletada && (
                 <span style={{
                   display: 'inline-flex', alignItems: 'center', gap: 5,

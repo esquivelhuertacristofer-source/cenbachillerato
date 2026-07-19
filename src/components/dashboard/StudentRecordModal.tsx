@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { X, Trophy, Clock, CheckCircle2, Zap, ShieldCheck } from 'lucide-react';
+import { X, Trophy, Clock, CheckCircle2, Timer, ShieldCheck } from 'lucide-react';
 import { getSupabaseBrowser } from '@/lib/supabase-browser';
 
 interface IntentoItem {
@@ -10,6 +10,7 @@ interface IntentoItem {
   actividad_codigo: string;
   completed_at: string | null;
   score: number | null;
+  tiempo_segundos: number | null;
 }
 
 export default function StudentRecordModal({
@@ -44,7 +45,7 @@ export default function StudentRecordModal({
 
       const { data: rows } = await sb
         .from('intentos')
-        .select('id, actividad_id, completed_at, score')
+        .select('id, actividad_id, completed_at, score, tiempo_segundos')
         .eq('user_id', studentId)
         .eq('status', 'completed')
         .order('completed_at', { ascending: false })
@@ -69,6 +70,7 @@ export default function StudentRecordModal({
             actividad_codigo: act?.codigo ?? r.actividad_id,
             completed_at: r.completed_at,
             score: r.score,
+            tiempo_segundos: r.tiempo_segundos,
           };
         })
       );
@@ -77,8 +79,11 @@ export default function StudentRecordModal({
     void fetchRecord();
   }, [studentId]);
 
-  const totalXP = intentos.reduce((acc, i) => acc + (i.score ?? 0), 0);
-  const avgScore = intentos.length > 0 ? Math.round(totalXP / intentos.length) : 0;
+  const totalScore = intentos.reduce((acc, i) => acc + (i.score ?? 0), 0);
+  const avgScore = intentos.length > 0 ? Math.round(totalScore / intentos.length) : 0;
+  const totalMinutos = Math.round(
+    intentos.reduce((acc, i) => acc + (i.tiempo_segundos ?? 0), 0) / 60
+  );
 
   return (
     <div className="fixed inset-0 z-[10000] flex items-center justify-center p-6">
@@ -119,9 +124,9 @@ export default function StudentRecordModal({
         {/* KPI grid */}
         <div className="grid grid-cols-3 gap-6 mb-12 relative z-10">
           <div className="p-8 bg-white/5 rounded-[30px] border border-white/5">
-            <div className="text-[9px] font-black uppercase tracking-[0.3em] opacity-40 mb-2">Puntos XP</div>
+            <div className="text-[9px] font-black uppercase tracking-[0.3em] opacity-40 mb-2">Tiempo dedicado</div>
             <div className="text-3xl font-black flex items-center gap-3">
-              <Zap className="text-[#D4A574]" /> {totalXP}
+              <Timer className="text-[#D4A574]" /> {totalMinutos}m
             </div>
           </div>
           <div className="p-8 bg-white/5 rounded-[30px] border border-white/5">

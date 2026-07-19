@@ -43,7 +43,6 @@ export function ProgresionClient({
 }: Props) {
   const reducedMotion = useReducedMotion()
   const isCompleta = progresion.estado === 'completada'
-  const xpTotal = actividades.reduce((sum, a) => sum + a.xp, 0)
   const chips = [
     ...(progresion.ejes_articuladores ?? []).slice(0, 2),
     ...(progresion.transversalidades ?? []).slice(0, 1),
@@ -147,7 +146,6 @@ export function ProgresionClient({
         codigo={uacCodigo}
         uacNombre={uacNombre}
         numParsed={numParsed}
-        xpTotal={xpTotal}
         chips={chips}
       />
 
@@ -307,9 +305,6 @@ export function ProgresionClient({
               <div style={{ flex: 1, minWidth: 200 }}>
                 <p style={{ fontSize: 18, fontWeight: 900, color: '#4ADE80', margin: '0 0 4px' }}>
                   ¡Propósito formativo completado!
-                </p>
-                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.50)', margin: 0 }}>
-                  Ganaste <strong style={{ color: '#FBBF24' }}>+{xpTotal} XP</strong> en este propósito formativo.
                 </p>
                 {siguiente && (
                   <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.40)', margin: '8px 0 0', lineHeight: 1.4 }}>

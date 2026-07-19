@@ -2,7 +2,7 @@
 
 import { motion } from 'motion/react'
 import Link from 'next/link'
-import { ArrowLeft, Clock, Zap, BookMarked } from 'lucide-react'
+import { ArrowLeft, Clock, BookMarked } from 'lucide-react'
 import { springs, stagger as staggerTokens } from '@/lib/motion/tokens'
 import { useReducedMotion } from '@/lib/motion/hooks'
 import type { AreaColor } from '@/components/hub/hub-colors'
@@ -14,12 +14,11 @@ interface Props {
   codigo: string
   uacNombre: string
   numParsed: number
-  xpTotal: number
   chips: string[]
 }
 
 export function ProgresionHero({
-  progresion, color, codigo, uacNombre, numParsed, xpTotal, chips,
+  progresion, color, codigo, uacNombre, numParsed, chips,
 }: Props) {
   const reducedMotion = useReducedMotion()
 
@@ -185,18 +184,6 @@ export function ProgresionHero({
             }}>
               <Clock size={14} style={{ opacity: 0.7 }} />
               {progresion.tiempo_estimado_horas}h estimadas
-            </span>
-          )}
-          {xpTotal > 0 && (
-            <span style={{
-              display: 'inline-flex', alignItems: 'center', gap: 7,
-              fontSize: 13, fontWeight: 700, color: '#FBBF24',
-              padding: '8px 14px', borderRadius: 12,
-              background: 'rgba(251,191,36,0.08)',
-              border: '1px solid rgba(251,191,36,0.16)',
-            }}>
-              <Zap size={14} />
-              +{xpTotal} XP
             </span>
           )}
           <span style={{
