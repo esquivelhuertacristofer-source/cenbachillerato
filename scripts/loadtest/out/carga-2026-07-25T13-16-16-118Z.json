@@ -1,0 +1,93 @@
+{
+  "objetivo": "xmcfuwdanlciqdxqtslv.supabase.co",
+  "fecha": "2026-07-25T13:16:16.118Z",
+  "config": {
+    "etapas": [
+      25,
+      50,
+      100,
+      150,
+      200
+    ],
+    "segPorEtapa": 20,
+    "maxClientes": 200,
+    "sloP95": 800,
+    "umbralErrorPct": 5,
+    "conEscrituras": false,
+    "mezcla": {
+      "snapshot": 55,
+      "progresoDetalle": 20,
+      "resumen": 25
+    }
+  },
+  "clientesFirmados": 31,
+  "loginP95Ms": 1443.8344,
+  "etapas": [
+    {
+      "concurrencia": 25,
+      "segundos": 20.460426,
+      "total": 1609,
+      "errores": 0,
+      "errorPct": 0,
+      "throughput": 78.63961385750228,
+      "p95": 1045.3415000000005,
+      "elLagMaxMs": 114.41399999999885,
+      "cortadaPorError": false,
+      "pasa": false
+    },
+    {
+      "concurrencia": 50,
+      "segundos": 20.6748239,
+      "total": 2410,
+      "errores": 0,
+      "errorPct": 0,
+      "throughput": 116.56689370882623,
+      "p95": 1414.823199999999,
+      "elLagMaxMs": 74.11460000000079,
+      "cortadaPorError": false,
+      "pasa": false
+    },
+    {
+      "concurrencia": 100,
+      "segundos": 20.877679599999997,
+      "total": 2256,
+      "errores": 0,
+      "errorPct": 0,
+      "throughput": 108.05798552440666,
+      "p95": 3221.010900000001,
+      "elLagMaxMs": 15.355600000002596,
+      "cortadaPorError": false,
+      "pasa": false
+    },
+    {
+      "concurrencia": 150,
+      "segundos": 21.229162399999986,
+      "total": 2543,
+      "errores": 0,
+      "errorPct": 0,
+      "throughput": 119.78805155308443,
+      "p95": 4304.018400000001,
+      "elLagMaxMs": 42.84010000000126,
+      "cortadaPorError": false,
+      "pasa": false
+    },
+    {
+      "concurrencia": 200,
+      "segundos": 21.83243680000001,
+      "total": 2441,
+      "errores": 0,
+      "errorPct": 0,
+      "throughput": 111.80611776693652,
+      "p95": 6977.486000000004,
+      "elLagMaxMs": 69.32059999999183,
+      "cortadaPorError": false,
+      "pasa": false
+    }
+  ],
+  "veredicto": {
+    "lambdaMax": 0,
+    "capacidad": {},
+    "saturoLoader": false,
+    "alcanzoTecho": false
+  }
+}

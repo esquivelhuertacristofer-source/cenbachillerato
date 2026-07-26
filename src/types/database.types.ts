@@ -378,6 +378,36 @@ export interface Database {
           }
         ];
       };
+      // Snapshot denormalizado del progreso (1 fila/alumno) — caché derivada de
+      // `intentos`, mantenida por trigger SECURITY DEFINER; el alumno solo la lee.
+      // Ver supabase/migrations/25_snapshot_progreso_alumno.sql. Se agrega aquí a
+      // mano (forward-compatible: regenerar los tipos tras aplicar la migración
+      // produce la misma forma) para que el read path fail-open de hub.ts
+      // typechequee ANTES de aplicar la migración.
+      progreso_alumno_snapshot: {
+        Row: {
+          user_id: string;
+          completadas: Json;
+          actualizado_at: string;
+        };
+        Insert: {
+          user_id: string;
+          completadas?: Json;
+          actualizado_at?: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["progreso_alumno_snapshot"]["Insert"]
+        >;
+        Relationships: [
+          {
+            foreignKeyName: "progreso_alumno_snapshot_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: true;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       valoraciones_lab: {
         Row: {
           id: string;

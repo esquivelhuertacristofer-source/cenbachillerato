@@ -248,8 +248,10 @@ export default function LaboratoriosPage() {
         if (cancelled) return;
         setLabs(data);
         setSemestre(prof.semestre);
-      } catch {
+      } catch (e) {
         // Si falla la carga, queda lista vacía en vez de skeleton infinito.
+        // Se registra para que un error de red/permiso no pase inadvertido.
+        console.error("[recursos/laboratorios] carga de labs falló:", e);
       } finally {
         if (!cancelled) setLoading(false);
       }

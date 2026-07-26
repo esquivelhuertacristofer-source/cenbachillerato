@@ -89,8 +89,11 @@ export default function LatestDeliveries({ grupoIds, isDark = true }: LatestDeli
         });
 
         setDeliveries(mapped);
-      } catch {
-        // silent
+      } catch (e) {
+        // Deja el widget vacío en vez de romper el dashboard. Se registra en la
+        // consola del navegador para diagnosticar (un fallo de red o de RLS aquí
+        // no lanza filas, pero un error de fetch sí llega a este catch).
+        console.error("[LatestDeliveries] fetchLatest falló:", e);
       } finally {
         setLoading(false);
       }

@@ -7,6 +7,9 @@ import type { AreaColor } from '@/components/hub/hub-colors';
 const FALLBACK_COLOR: AreaColor = { hex: '#A78BFA', rgba: '167,139,250', faIcon: 'fa-circle-dot', gradient: '' };
 const FONT = 'var(--font-epilogue), sans-serif';
 
+/** Video propio (archivo estático servido por la app) vs. embed externo (YouTube/Vimeo). */
+const esVideoArchivo = (url: string) => url.startsWith('/videos/') || /\.mp4($|\?)/i.test(url);
+
 interface Props {
   actividad: ActividadVideoConPreguntas;
   onProgreso?: CallbackProgreso;
@@ -49,7 +52,15 @@ export function VideoConPreguntasActivity({ actividad, onProgreso, color = FALLB
   return (
     <div style={{ maxWidth: 672, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24, fontFamily: FONT }}>
       <div style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)', background: '#000', aspectRatio: '16 / 9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        {contenido.url_video ? (
+        {contenido.url_video && esVideoArchivo(contenido.url_video) ? (
+          <video
+            src={contenido.url_video}
+            poster={contenido.url_miniatura}
+            controls
+            preload="metadata"
+            style={{ width: '100%', height: '100%' }}
+          />
+        ) : contenido.url_video ? (
           <iframe
             src={contenido.url_video}
             title={contenido.titulo_video}

@@ -212,8 +212,11 @@ export async function marcarFichaLeida(fichaId: string, alumnoId: string): Promi
       { alumno_id: alumnoId, ficha_id: fichaId, ultima_lectura: new Date().toISOString() },
       { onConflict: "alumno_id,ficha_id", ignoreDuplicates: false }
     );
-  } catch {
-    // Silently fail — table may not exist yet
+  } catch (e) {
+    // No bloquea la lectura si falla (p. ej. tabla ausente o RLS): la ficha se
+    // muestra igual. Se registra para no perder el error de vista (RLS mal
+    // configurada devuelve 0 filas SIN lanzar, pero un fallo de red/permiso sí).
+    console.error("[biblioteca] marcarFichaLeida falló:", e);
   }
 }
 

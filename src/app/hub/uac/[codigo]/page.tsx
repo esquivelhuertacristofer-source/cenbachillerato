@@ -96,8 +96,10 @@ export default function UACPage() {
         const progs = await getProgresionesConEstadoBrowser(codigo, prof.userId);
         if (cancelled) return;
         setProgresiones(progs);
-      } catch {
+      } catch (e) {
         // Si falla la carga, queda lista vacía en vez de skeleton infinito.
+        // Se registra para que un error de red/permiso no pase inadvertido.
+        console.error("[hub/uac] carga de progresiones falló:", e);
       } finally {
         if (!cancelled) setLoading(false);
       }

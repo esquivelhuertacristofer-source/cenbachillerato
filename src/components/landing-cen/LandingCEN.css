@@ -9421,3 +9421,364 @@ a.pcards-item:hover {
   border-radius: 50%;
   box-shadow: 0 0 8px rgba(125,211,252,0.85);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Materias Mosaico — carrusel de mosaicos hexagonales: una plataforma CEN a
+   la vez (Bachillerato, Preescolar, Primaria, Secundaria, Labs, Financiera),
+   navegable con flechas o con las pastillas de selección directa.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.materias-section {
+  position: relative;
+  overflow: hidden;
+  padding: 100px 40px;
+  background: linear-gradient(180deg, #F8FAFC 0%, #EEF1F6 55%, #E9EDF4 100%);
+}
+.materias-bg-texture {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(11,37,69,0.035) 1.5px, transparent 1.5px);
+  background-size: 32px 32px;
+  pointer-events: none;
+}
+.materias-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.materias-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 16px;
+}
+.materias-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-epilogue), sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cen-blue);
+}
+.materias-h2 {
+  font-size: clamp(32px, 3.6vw, 52px);
+  font-weight: 900;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+  color: var(--cen-navy);
+  margin: 0;
+  text-wrap: balance;
+}
+.materias-h2 em {
+  font-style: normal;
+  color: var(--cen-blue);
+}
+.materias-sub {
+  font-size: clamp(15px, 1.3vw, 17px);
+  line-height: 1.6;
+  color: rgba(11,37,69,0.62);
+  margin: 0;
+}
+.materias-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(30,64,175,0.08);
+  border: 1px solid rgba(30,64,175,0.16);
+  color: var(--cen-blue);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin-top: 4px;
+}
+
+/* ── Lista de plataformas — recuadros seleccionables en la columna
+   derecha; sustituyen a la barra de pastillas que antes iba arriba del
+   mosaico. Un click cambia de plataforma; el estado activo se marca con
+   fondo navy + check. ── */
+.materias-platform-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+.materias-platform-list .materias-platform-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(11,37,69,0.10);
+  background: #fff;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 4px 10px -7px rgba(11,37,69,0.16);
+  transition: transform 0.2s var(--ease-standard, ease), box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+.materias-platform-list .materias-platform-card:hover {
+  border-color: rgba(30,64,175,0.3);
+  transform: translateX(2px);
+}
+.materias-platform-list .materias-platform-card:focus-visible {
+  outline: 2px solid var(--cen-blue);
+  outline-offset: 2px;
+}
+.materias-platform-list .materias-platform-card--active {
+  background: var(--cen-navy);
+  border-color: var(--cen-navy);
+  box-shadow: 0 10px 22px -10px rgba(11,37,69,0.4);
+}
+.materias-platform-icon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: rgba(30,64,175,0.08);
+  color: var(--cen-blue);
+  font-size: 13px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.materias-platform-card--active .materias-platform-icon {
+  background: rgba(255,255,255,0.16);
+  color: #fff;
+}
+.materias-platform-label {
+  flex: 1;
+  font-family: var(--font-epilogue), sans-serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: rgba(11,37,69,0.75);
+}
+.materias-platform-card--active .materias-platform-label {
+  color: #fff;
+}
+.materias-platform-check {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: rgba(255,255,255,0.85);
+}
+
+.materias-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(280px, 400px);
+  align-items: center;
+  gap: 56px;
+  animation: materias-fade-in 0.35s var(--ease-standard, ease);
+}
+.materias-side {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  min-width: 0;
+}
+@keyframes materias-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .materias-content { animation: none; }
+}
+
+/* ── Mosaico de rombos — teselado soldado arista con arista ──────────────
+   Cada tile es un rombo (diamante, puntas arriba/abajo). Los rombos
+   tapizan el plano sin huecos apilándolos en COLUMNAS: dentro de una
+   columna van a ras (la punta inferior de uno toca la superior del que
+   sigue) y cada columna vecina se monta sobre la anterior con un solape
+   de -0.5*ancho y un desfase vertical de 0.5*alto en las columnas pares
+   — así el rombo desplazado encaja EXACTO en el hueco romboidal que dejan
+   dos rombos apilados. Misma estructura de columnas que el panal anterior;
+   solo cambian la figura (clip-path) y los offsets de encastre.
+   (--hex-accent / --hex-rgba son los tokens de color de acento por área;
+   nombre heredado, se comparten con el panel de detalle.) ── */
+.rombo-grid {
+  --rombo-w: clamp(128px, 12.5vw, 216px);
+  --rombo-h: var(--rombo-w);
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 8px 4px;
+}
+.rombo-col {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+.rombo-col + .rombo-col {
+  margin-left: calc(var(--rombo-w) * -0.5);
+}
+.rombo-col:nth-child(even) {
+  margin-top: calc(var(--rombo-h) * 0.5);
+}
+
+.rombo-slot {
+  position: relative;
+  width: var(--rombo-w);
+  height: var(--rombo-h);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.3s var(--ease-standard, ease);
+}
+.rombo-slot:hover,
+.rombo-slot--active,
+.rombo-slot:focus-visible {
+  transform: scale(1.06);
+  z-index: 2;
+}
+.rombo-slot:focus-visible {
+  outline: 2px solid var(--hex-accent);
+  outline-offset: 4px;
+}
+
+.rombo-tile {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 3px;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  background: linear-gradient(160deg, rgba(255,255,255,0.65) 0%, rgba(var(--hex-rgba), 0.3) 100%);
+  filter: drop-shadow(0 10px 16px rgba(11,37,69,0.22));
+  transition: filter 0.3s ease;
+}
+.rombo-slot:hover .rombo-tile,
+.rombo-slot--active .rombo-tile,
+.rombo-slot:focus-visible .rombo-tile {
+  filter: drop-shadow(0 10px 22px rgba(var(--hex-rgba), 0.65));
+}
+
+.rombo-tile-inner {
+  width: 100%;
+  height: 100%;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  background: linear-gradient(155deg, var(--hex-accent) 0%, color-mix(in srgb, var(--hex-accent) 65%, #0B2545 35%) 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  /* el rombo se estrecha hacia las puntas: el contenido vive en la banda
+     central ancha, con padding lateral generoso para no tocar las aristas */
+  padding: 6px 16%;
+}
+.rombo-icon {
+  font-size: clamp(16px, 1.7vw, 24px);
+  color: #ffffff;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+.rombo-label {
+  font-family: var(--font-epilogue), sans-serif;
+  font-weight: 800;
+  font-size: clamp(10px, 0.95vw, 12px);
+  letter-spacing: -0.01em;
+  color: #ffffff;
+  text-align: center;
+  line-height: 1.12;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  /* como máximo 2 líneas dentro de la banda central del rombo */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── Densidad — plataformas con más de 8 materias achican el rombo base
+   para que 12-40 tiles quepan como muro denso, no disperso. ── */
+.rombo-grid--md { --rombo-w: clamp(104px, 10vw, 172px); }
+.rombo-grid--sm { --rombo-w: clamp(86px, 8.4vw, 138px); }
+.rombo-grid--xs { --rombo-w: clamp(72px, 6.8vw, 110px); }
+
+.rombo-grid--md .rombo-label { font-size: clamp(9px, 0.9vw, 11px); }
+.rombo-grid--sm .rombo-label,
+.rombo-grid--xs .rombo-label { font-size: clamp(7px, 0.75vw, 9px); letter-spacing: -0.005em; }
+
+.rombo-grid--md .rombo-icon { font-size: clamp(14px, 1.5vw, 20px); }
+.rombo-grid--sm .rombo-icon,
+.rombo-grid--xs .rombo-icon { font-size: clamp(11px, 1.2vw, 15px); }
+
+/* ── Panel de detalle (materia activa) ── */
+.materias-detail {
+  position: relative;
+  background: #fff;
+  border-radius: 24px;
+  padding: 36px 32px;
+  width: 100%;
+  box-shadow: 0 24px 48px -22px rgba(11,37,69,0.20);
+  border: 1px solid rgba(11,37,69,0.06);
+  overflow: hidden;
+}
+.materias-detail::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--hex-accent), rgba(var(--hex-rgba), 0.4));
+}
+.materias-detail-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: linear-gradient(155deg, var(--hex-accent) 0%, color-mix(in srgb, var(--hex-accent) 65%, #0B2545 35%) 100%);
+  box-shadow: 0 10px 18px -8px rgba(var(--hex-rgba), 0.55);
+  color: #ffffff;
+  font-size: 22px;
+  margin-bottom: 18px;
+}
+.materias-detail-codigo {
+  display: block;
+  font-family: var(--font-epilogue), sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--hex-accent);
+  margin-bottom: 8px;
+}
+.materias-detail-nombre {
+  font-size: clamp(20px, 2vw, 26px);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--cen-navy);
+  margin: 0 0 14px;
+  text-wrap: balance;
+}
+.materias-detail-desc {
+  font-size: 15px;
+  line-height: 1.65;
+  color: rgba(11,37,69,0.68);
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .materias-content { grid-template-columns: 1fr; gap: 40px; }
+  .rombo-grid { justify-content: center; }
+  .materias-side { align-items: center; text-align: center; max-width: 480px; margin: 0 auto; }
+  .materias-heading { align-items: center; text-align: center; }
+  .materias-platform-list { max-width: 480px; }
+  .materias-detail { max-width: 480px; }
+}
+@media (max-width: 640px) {
+  .materias-section { padding: 72px 20px; }
+  .materias-heading { gap: 12px; }
+  .materias-platform-list { flex-direction: row; flex-wrap: wrap; justify-content: center; }
+  .materias-platform-card { width: auto; padding: 8px 12px; }
+  .materias-platform-label { font-size: 12px; }
+}

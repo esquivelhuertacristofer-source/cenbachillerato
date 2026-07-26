@@ -201,7 +201,7 @@ describe("consolidación de queries del hub", () => {
     expect(intentosQuery?.in).not.toHaveBeenCalled();
     expect(intentosQuery?.eq).toHaveBeenCalledWith("user_id", "u1");
     expect(intentosQuery?.select).toHaveBeenCalledWith(
-      "actividad_id, status, started_at"
+      "actividad_id, status, started_at, tiempo_segundos"
     );
   });
 
@@ -225,7 +225,13 @@ describe("consolidación de queries del hub", () => {
     mockCreateBrowserClient.mockReturnValue(sb);
 
     const r1 = await getProgresoSemestreBrowser("u1", 1);
-    expect(r1).toEqual({ totalProgresiones: 0, progresionesCompletadas: 0, porcentaje: 0 });
+    expect(r1).toEqual({
+      totalProgresiones: 0,
+      progresionesCompletadas: 0,
+      actividadesEstaSemana: 0,
+      minutosEstaSemana: 0,
+      porcentaje: 0,
+    });
     // Sin progresiones no se lanza la query de actividades: 2 requests.
     expect(from).toHaveBeenCalledTimes(2);
 
@@ -245,7 +251,9 @@ describe("getProgresoSemestreBrowser", () => {
     const r = await getProgresoSemestreBrowser("u1", 1);
     // Oficiales: p1, p3, p4 (p2 es complemento). Completada: solo p1.
     // p4 no tiene actividades → no cuenta como completada.
-    expect(r).toEqual({
+    // (Las métricas "esta semana" tienen su propio test determinista abajo; los
+    //  intentos de este escenario son históricos y quedan fuera de la ventana.)
+    expect(r).toMatchObject({
       totalProgresiones: 3,
       progresionesCompletadas: 1,
       porcentaje: 33,
@@ -257,7 +265,43 @@ describe("getProgresoSemestreBrowser", () => {
     mockCreateBrowserClient.mockReturnValue(sb);
 
     const r = await getProgresoSemestreBrowser("u1", 1);
-    expect(r).toEqual({ totalProgresiones: 0, progresionesCompletadas: 0, porcentaje: 0 });
+    expect(r).toEqual({
+      totalProgresiones: 0,
+      progresionesCompletadas: 0,
+      actividadesEstaSemana: 0,
+      minutosEstaSemana: 0,
+      porcentaje: 0,
+    });
+  });
+
+  test("actividadesEstaSemana / minutosEstaSemana: solo completadas OFICIALES desde el domingo", async () => {
+    // Reloj fijo (viernes) para que la ventana "esta semana" (domingo 00:00) sea
+    // determinista sin importar cuándo corra la suite. La semana arranca el
+    // domingo 2026-07-19.
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date("2026-07-24T12:00:00Z"));
+    try {
+      const intentos = [
+        // a2 (p1, oficial) completada esta semana, 30 min → cuenta.
+        { actividad_id: "a2", status: "completed", started_at: "2026-07-20T10:00:00Z", tiempo_segundos: 1800 },
+        // a1 (p1, oficial) completada esta semana, 15 min → cuenta.
+        { actividad_id: "a1", status: "completed", started_at: "2026-07-21T09:00:00Z", tiempo_segundos: 900 },
+        // a4 (p3, oficial) pero in_progress → NO cuenta.
+        { actividad_id: "a4", status: "in_progress", started_at: "2026-07-22T09:00:00Z", tiempo_segundos: 600 },
+        // a3 (p2, complemento) completada esta semana → NO cuenta (no oficial).
+        { actividad_id: "a3", status: "completed", started_at: "2026-07-22T09:00:00Z", tiempo_segundos: 600 },
+        // a1 completada la SEMANA PASADA → NO cuenta (fuera de la ventana).
+        { actividad_id: "a1", status: "completed", started_at: "2026-07-15T09:00:00Z", tiempo_segundos: 9999 },
+      ];
+      const { sb } = makeSb({ progresiones: ok(PROGS), actividades: ok(ACTS), intentos: ok(intentos) });
+      mockCreateBrowserClient.mockReturnValue(sb);
+
+      const r = await getProgresoSemestreBrowser("u1", 1);
+      expect(r.actividadesEstaSemana).toBe(2);
+      expect(r.minutosEstaSemana).toBe(45); // (1800 + 900) / 60
+    } finally {
+      jest.useRealTimers();
+    }
   });
 });
 

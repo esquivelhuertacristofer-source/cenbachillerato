@@ -10,6 +10,7 @@ import './LandingCEN.css';
 import { HeroCEN }             from './HeroCEN';
 import { AlliesBand }          from './AlliesBand';
 import { ProductosSection }    from './ProductosSection';
+import { MateriasMosaicoSection } from './MateriasMosaicoSection';
 import { ProcesoSection }      from './ProcesoSection';
 import { PorQueCEN }           from './PorQueCEN';
 import { TestimoniosSection }  from './TestimoniosSection';
@@ -121,6 +122,7 @@ export default function LandingPageCEN() {
           <HeroCEN />
           <AlliesBand />
           <ProductosSection />
+          <MateriasMosaicoSection />
           <ProcesoSection />
           <PorQueCEN />
           <TestimoniosSection />

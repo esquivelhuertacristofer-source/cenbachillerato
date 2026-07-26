@@ -1,0 +1,58 @@
+{
+  "objetivo": "xmcfuwdanlciqdxqtslv.supabase.co",
+  "fecha": "2026-07-25T13:07:59.101Z",
+  "config": {
+    "etapas": [
+      5,
+      10
+    ],
+    "segPorEtapa": 8,
+    "maxClientes": 25,
+    "sloP95": 800,
+    "umbralErrorPct": 5,
+    "conEscrituras": false,
+    "mezcla": {
+      "snapshot": 55,
+      "progresoDetalle": 20,
+      "resumen": 25
+    }
+  },
+  "clientesFirmados": 25,
+  "loginP95Ms": 1273.7609,
+  "etapas": [
+    {
+      "concurrencia": 5,
+      "segundos": 8.128192499999999,
+      "total": 265,
+      "errores": 0,
+      "errorPct": 0,
+      "throughput": 32.60257431157051,
+      "p95": 540.4871000000003,
+      "elLagMaxMs": 15.037099999999555,
+      "cortadaPorError": false,
+      "pasa": true
+    },
+    {
+      "concurrencia": 10,
+      "segundos": 8.226957500000003,
+      "total": 514,
+      "errores": 0,
+      "errorPct": 0,
+      "throughput": 62.47753194300564,
+      "p95": 455.0012000000006,
+      "elLagMaxMs": 6.618800000000192,
+      "cortadaPorError": false,
+      "pasa": true
+    }
+  ],
+  "veredicto": {
+    "lambdaMax": 62.47753194300564,
+    "capacidad": {
+      "15": 937,
+      "20": 1250,
+      "30": 1874
+    },
+    "saturoLoader": false,
+    "alcanzoTecho": false
+  }
+}

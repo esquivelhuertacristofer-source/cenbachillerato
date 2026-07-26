@@ -1,16 +1,40 @@
-import { redirect } from "next/navigation";
-import { getUser, getProfile } from "@/lib/supabase-helpers";
-import { getProgresoSemestre, getRachaDelAlumno } from "@/lib/queries/hub";
+"use client";
+
+import { useEffect, useState, type CSSProperties } from "react";
+import { useRouter } from "next/navigation";
 import { getRSCColor, TIPO_CONFIG } from "@/components/hub/hub-colors";
 import { ProgresoUACGrid } from "@/components/hub/ProgresoUACGrid";
 import {
-  getProgresoDetallePorUAC,
-  getResumenActividadAlumno,
-} from "@/lib/queries/progreso";
-import type { Metadata } from "next";
+  getCurrentProfile,
+  getProgresoSemestreBrowser,
+  getRachaDelAlumnoBrowser,
+  getProgresoDetallePorUACBrowser,
+  getResumenActividadAlumnoBrowser,
+  type ProgresoSemestreBrowser,
+  type ProgresoUAC,
+  type ResumenActividadAlumno,
+  type RachaData,
+} from "@/lib/queries/hub-browser";
+import { calendarioVacio, statsVacias } from "@/lib/queries/progreso-shared";
 import "./Progreso.css";
 
-export const metadata: Metadata = { title: "Mi Progreso — CEN Bachillerato" };
+// Lever #2 — hidratación en navegador: la página es un Client Component que
+// pinta su armazón (skeleton) al instante y rellena los datos con queries del
+// navegador después. No exporta `metadata` (los Client Components no pueden);
+// el título se fija con document.title en el efecto. La lógica de conteo/
+// derivación es idéntica a la ruta de servidor: vive en hub-browser.ts /
+// progreso-shared.ts, que ambas rutas comparten.
+
+// Formas vacías para fallar-abierto: si una query se rechaza (red/RLS), la
+// página se pinta con ceros en vez de quedar en blanco.
+const PROGRESO_VACIO: ProgresoSemestreBrowser = {
+  totalProgresiones: 0,
+  progresionesCompletadas: 0,
+  actividadesEstaSemana: 0,
+  minutosEstaSemana: 0,
+  porcentaje: 0,
+};
+const RACHA_VACIA: RachaData = { diasConsecutivos: 0, ultimos7Dias: [] };
 
 function timeAgo(dateStr: string): string {
   const diffMin = Math.floor((Date.now() - new Date(dateStr).getTime()) / 60000);
@@ -24,23 +48,144 @@ function timeAgo(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString("es-MX", { day: "numeric", month: "short" });
 }
 
-export default async function ProgresoPage() {
-  const user = await getUser();
-  if (!user) redirect("/log-in");
+// ── Skeleton: mismo esqueleto de layout que el contenido real, sin salto ──
+function ProgresoSkeleton() {
+  return (
+    <div className="prog-page" aria-busy="true" aria-label="Cargando tu progreso">
+      <div className="prog-head">
+        <p className="prog-eyebrow">Dashboard personal</p>
+        <h1 className="prog-title">Mi Progreso</h1>
+      </div>
 
-  const profile = await getProfile(user.id);
-  if (!profile) redirect("/log-in");
+      <section className="prog-hero">
+        <div className="prog-skel-box prog-skel-gauge" />
+        <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
+          <div className="prog-skel-box prog-skel-line" style={{ width: "42%" }} />
+          <div className="prog-skel-box prog-skel-line" style={{ width: "68%", height: 24 }} />
+          <div className="prog-skel-box prog-skel-line" style={{ width: "54%" }} />
+          <div style={{ display: "flex", gap: 14, marginTop: 8, flexWrap: "wrap" }}>
+            <div className="prog-skel-box" style={{ width: 168, height: 58, borderRadius: 14 }} />
+            <div className="prog-skel-box" style={{ width: 168, height: 58, borderRadius: 14 }} />
+          </div>
+        </div>
+      </section>
 
-  const semestre = profile.semestre ?? 1;
+      <div className="prog-block">
+        <h2 className="prog-section-title">Por materia</h2>
+        <div className="prog-uac-grid">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="prog-skel-box prog-skel-uac" />
+          ))}
+        </div>
+      </div>
 
-  const [progreso, rachaData, progresoUAC, resumenActividad] = await Promise.all([
-    getProgresoSemestre(user.id, semestre),
-    getRachaDelAlumno(user.id),
-    getProgresoDetallePorUAC(user.id, semestre),
-    getResumenActividadAlumno(user.id, 15),
-  ]);
-  const { recientes: actividadesRecientes, calendario, stats } = resumenActividad;
+      <div className="prog-2col">
+        <div className="prog-card">
+          <div className="prog-skel-box prog-skel-line" style={{ width: "45%", height: 18, marginBottom: 20 }} />
+          <div className="prog-heat">
+            {Array.from({ length: 30 }).map((_, i) => (
+              <div key={i} className="prog-skel-box prog-heat-cell" />
+            ))}
+          </div>
+        </div>
+      </div>
 
+      <div className="prog-card">
+        <div className="prog-skel-box prog-skel-line" style={{ width: "45%", height: 18, marginBottom: 20 }} />
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="prog-skel-box prog-skel-line" style={{ height: 46 }} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function ProgresoPage() {
+  const router = useRouter();
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [semestre, setSemestre] = useState(1);
+  const [progreso, setProgreso] = useState<ProgresoSemestreBrowser>(PROGRESO_VACIO);
+  const [rachaData, setRachaData] = useState<RachaData>(RACHA_VACIA);
+  const [progresoUAC, setProgresoUAC] = useState<ProgresoUAC[]>([]);
+  const [resumen, setResumen] = useState<ResumenActividadAlumno>({
+    recientes: [],
+    calendario: calendarioVacio(),
+    stats: statsVacias(),
+  });
+
+  useEffect(() => {
+    let cancelled = false;
+    document.title = "Mi Progreso — CEN Bachillerato";
+
+    async function fetchData() {
+      try {
+        const prof = await getCurrentProfile();
+        if (cancelled) return;
+        if (!prof) { router.replace("/log-in"); return; }
+
+        const sem = prof.semestre;
+        setSemestre(sem);
+
+        // allSettled: una query que falle (RLS, red) no tumba la página; cada
+        // sección cae a su forma vacía. Las tres primeras comparten la caché
+        // consolidada del semestre (getDatosSemestre); solo la 4.ª hace sus 3
+        // queries acotadas de recientes/calendario/stats.
+        const [progresoR, rachaR, uacR, resumenR] = await Promise.allSettled([
+          getProgresoSemestreBrowser(prof.userId, sem),
+          getRachaDelAlumnoBrowser(prof.userId, sem),
+          getProgresoDetallePorUACBrowser(prof.userId, sem),
+          getResumenActividadAlumnoBrowser(15),
+        ]);
+
+        if (cancelled) return;
+
+        setProgreso(progresoR.status === "fulfilled" ? progresoR.value : PROGRESO_VACIO);
+        setRachaData(rachaR.status === "fulfilled" ? rachaR.value : RACHA_VACIA);
+        setProgresoUAC(uacR.status === "fulfilled" ? uacR.value : []);
+        if (resumenR.status === "fulfilled") setResumen(resumenR.value);
+      } catch {
+        if (!cancelled) setError(true);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    fetchData();
+    return () => { cancelled = true; };
+  }, [router]);
+
+  if (loading) return <ProgresoSkeleton />;
+
+  if (error) {
+    return (
+      <div className="prog-page" style={{ textAlign: "center", paddingTop: 80 }}>
+        <h2 style={{ marginBottom: 12, color: "#fff" }}>No pudimos cargar tu progreso</h2>
+        <p style={{ opacity: 0.7, marginBottom: 24 }}>
+          Revisa tu conexión e inténtalo de nuevo.
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          style={{
+            padding: "10px 24px",
+            borderRadius: 10,
+            border: "none",
+            background: "#38BDF8",
+            color: "#04142d",
+            fontWeight: 800,
+            cursor: "pointer",
+          }}
+        >
+          Reintentar
+        </button>
+      </div>
+    );
+  }
+
+  const { recientes: actividadesRecientes, calendario, stats } = resumen;
   const { porcentaje, totalProgresiones, progresionesCompletadas, actividadesEstaSemana, minutosEstaSemana } = progreso;
   const { diasConsecutivos } = rachaData;
 
@@ -120,7 +265,7 @@ export default async function ProgresoPage() {
 
           <div className="prog-hero-stats">
             {HERO_STATS.map((item) => (
-              <div key={item.label} className="prog-stat" style={{ "--stat-color": item.color } as React.CSSProperties}>
+              <div key={item.label} className="prog-stat" style={{ "--stat-color": item.color } as CSSProperties}>
                 <div className="prog-stat-ico"><i className={`fa-solid ${item.icon}`} /></div>
                 <div>
                   <div className="prog-stat-val">{item.value}</div>
@@ -210,7 +355,7 @@ export default async function ProgresoPage() {
               const color = getRSCColor(act.rscCodigo);
               const tipoConf = TIPO_CONFIG[act.tipo];
               return (
-                <div key={act.id} className="prog-act" style={{ "--chip-color": color.hex } as React.CSSProperties}>
+                <div key={act.id} className="prog-act" style={{ "--chip-color": color.hex } as CSSProperties}>
                   <div className="prog-act-ico"><i className={`fa-solid ${tipoConf?.faIcon ?? "fa-check"}`} /></div>
                   <div className="prog-act-body">
                     <div className="prog-act-title">{act.titulo}</div>

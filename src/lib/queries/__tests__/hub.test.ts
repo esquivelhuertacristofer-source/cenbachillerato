@@ -20,9 +20,22 @@ jest.mock("@/lib/r2-respuestas", () => ({
   getRespuestas: jest.fn(),
 }));
 
+// Sin binding KV (como en cualquier corrida de Jest), getCachedCatalog cae al
+// productor — su comportamiento de cache MISS, que es justo el path que estas
+// pruebas ejercen. Mockearlo así evita cargar @opennextjs/cloudflare (ESM sin
+// transformar) y deja intacta la lógica de query real del productor.
+// Es función plana a propósito (no jest.fn): el beforeEach corre
+// jest.resetAllMocks(), que borraría la implementación de un jest.fn y haría que
+// devolviera undefined en vez de correr el productor.
+jest.mock("@/lib/catalog-cache", () => ({
+  getCachedCatalog: (_key: string, _ttl: number, producer: () => Promise<unknown>) =>
+    producer(),
+  CATALOG_TTL: { TREE: 43200, CONTENT: 86400 },
+}));
+
 import { getSupabaseServer } from "@/lib/supabase-helpers";
 import { getRespuestas } from "@/lib/r2-respuestas";
-import { getActividadConContenido } from "@/lib/queries/hub";
+import { getActividadConContenido, getProgresionesConEstado } from "@/lib/queries/hub";
 
 const mockGetSupabaseServer = getSupabaseServer as jest.MockedFunction<typeof getSupabaseServer>;
 const mockGetRespuestas = getRespuestas as jest.MockedFunction<typeof getRespuestas>;
@@ -40,7 +53,7 @@ function makeChain(result: { data: unknown; error?: unknown }) {
   const resolved = Promise.resolve({ error: null, ...result });
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const c: Record<string, any> = {};
-  for (const m of ["select", "eq", "order", "limit"]) {
+  for (const m of ["select", "eq", "order", "limit", "in", "gte"]) {
     c[m] = jest.fn(() => c);
   }
   c.single = jest.fn(() => resolved);
@@ -188,5 +201,126 @@ describe("getActividadConContenido — marcador __r2", () => {
     expect(mockGetRespuestas).not.toHaveBeenCalled();
     expect(res?.respuestasIntento).toBeNull();
     expect(res?.estado).toBe("no_iniciada");
+  });
+});
+
+// ── Snapshot de progreso (lever de costo #3) — read path fail-open ─────────────
+//
+// getProgresionesConEstado deriva "qué completó el alumno" de
+// `progreso_alumno_snapshot` (1 lookup por PK) cuando existe, y cae al scan vivo
+// de `intentos` cuando NO (fila ausente / tabla sin crear todavía / error). Estas
+// pruebas fijan las dos garantías del diseño:
+//   1) PARIDAD: snapshot y scan vivo producen EXACTAMENTE el mismo resultado.
+//   2) SEGURO DE DESPLEGAR ANTES DE LA MIGRACIÓN: sin la tabla (error PostgREST)
+//      o sin fila, el hub se comporta igual que hoy (usa `intentos`).
+
+const UAC_PROG = "XX-I";
+const PROG_ROW = {
+  id: "prog-1",
+  numero: 1,
+  titulo: "Propósito 1",
+  descripcion: null,
+  tiempo_estimado_horas: null,
+  ejes_articuladores: null,
+  transversalidades: null,
+};
+const ACTS_PROG = [
+  { id: "act-1", codigo: "XX-I-P01-A1", titulo: "Actividad 1", tipo: "lectura", progresion_id: "prog-1" },
+  { id: "act-2", codigo: "XX-I-P01-A2", titulo: "Actividad 2", tipo: "quiz_multiple_opcion", progresion_id: "prog-1" },
+];
+const STARTED_AT = "2026-01-15T10:00:00.000Z";
+// El alumno completó act-1 (no act-2). El intento vivo y el snapshot describen el
+// MISMO hecho, cada uno en su forma: fila de `intentos` vs entrada {i,s,t}.
+const INTENTO_ACT1 = {
+  id: "int-1",
+  actividad_id: "act-1",
+  status: "completed",
+  started_at: STARTED_AT,
+};
+const SNAPSHOT_ACT1 = { "act-1": { i: "int-1", s: STARTED_AT, t: 120 } };
+
+// snapshotResult: lo que devuelve el maybeSingle sobre progreso_alumno_snapshot.
+//   { data: { completadas } } → snapshot presente (path por PK)
+//   { data: null }            → alumno sin fila (0 completadas) → fallback a intentos
+//   { data: null, error }     → tabla inexistente / error PostgREST → fallback a intentos
+function makeSbProg(snapshotResult: { data: unknown; error?: unknown }) {
+  const uacChain = makeChain({ data: { id: "uac-1" } });
+  const progChain = makeChain({ data: [PROG_ROW] });
+  const actsChain = makeChain({ data: ACTS_PROG });
+  const snapChain = makeChain(snapshotResult);
+  const intentosChain = makeChain({ data: [INTENTO_ACT1] });
+
+  const from = jest.fn((table: string) => {
+    if (table === "uac") return uacChain;
+    if (table === "progresiones") return progChain;
+    if (table === "actividades") return actsChain;
+    if (table === "progreso_alumno_snapshot") return snapChain;
+    if (table === "intentos") return intentosChain;
+    throw new Error(`tabla no mockeada en test: ${table}`);
+  });
+
+  const sb = { from } as unknown as Awaited<ReturnType<typeof getSupabaseServer>>;
+  return { sb, from, snapChain, intentosChain };
+}
+
+describe("getProgresionesConEstado — snapshot vs scan vivo (lever #3)", () => {
+  test("PARIDAD: derivar del snapshot y del scan vivo produce el MISMO resultado", async () => {
+    // Path snapshot
+    const conSnap = makeSbProg({ data: { completadas: SNAPSHOT_ACT1 } });
+    mockGetSupabaseServer.mockResolvedValue(conSnap.sb);
+    const resSnapshot = await getProgresionesConEstado(UAC_PROG, "user-a");
+
+    // Path vivo (snapshot ausente → cae a intentos)
+    const sinSnap = makeSbProg({ data: null });
+    mockGetSupabaseServer.mockResolvedValue(sinSnap.sb);
+    const resVivo = await getProgresionesConEstado(UAC_PROG, "user-a");
+
+    // Ambos describen el mismo hecho (act-1 completada, act-2 no) ⇒ mismo objeto.
+    expect(resSnapshot).toEqual(resVivo);
+
+    // Y el contenido es el esperado (no un empate de dos vacíos).
+    expect(resSnapshot).toHaveLength(1);
+    const prog = resSnapshot[0]!;
+    expect(prog.estado).toBe("en_progreso");
+    expect(prog.actividadesCompletadas).toBe(1);
+    expect(prog.totalActividades).toBe(2);
+    const [a1, a2] = prog.actividades!;
+    expect(a1).toMatchObject({ id: "act-1", estado: "completada", intentoId: "int-1" });
+    expect(a2).toMatchObject({ id: "act-2", estado: "no_iniciada", intentoId: null });
+  });
+
+  test("con snapshot presente NO se consulta `intentos` (1 lookup por PK, no un scan)", async () => {
+    const { sb, from, snapChain } = makeSbProg({ data: { completadas: SNAPSHOT_ACT1 } });
+    mockGetSupabaseServer.mockResolvedValue(sb);
+
+    await getProgresionesConEstado(UAC_PROG, "user-b");
+
+    expect(snapChain.maybeSingle).toHaveBeenCalled();
+    expect(from).not.toHaveBeenCalledWith("intentos");
+  });
+
+  test("sin fila de snapshot (alumno con 0 completadas) → cae al scan vivo de `intentos`", async () => {
+    const { sb, from } = makeSbProg({ data: null });
+    mockGetSupabaseServer.mockResolvedValue(sb);
+
+    const res = await getProgresionesConEstado(UAC_PROG, "user-c");
+
+    expect(from).toHaveBeenCalledWith("intentos");
+    // El scan vivo sigue marcando act-1 como completada (comportamiento previo intacto).
+    expect(res[0]!.actividades![0]).toMatchObject({ id: "act-1", estado: "completada" });
+  });
+
+  test("SEGURO ANTES DE LA MIGRACIÓN: error PostgREST del snapshot (tabla inexistente) → scan vivo", async () => {
+    const { sb, from } = makeSbProg({
+      data: null,
+      error: { message: 'relation "progreso_alumno_snapshot" does not exist' },
+    });
+    mockGetSupabaseServer.mockResolvedValue(sb);
+
+    const res = await getProgresionesConEstado(UAC_PROG, "user-d");
+
+    // Falla abierto: usa `intentos` y el hub se comporta exactamente como hoy.
+    expect(from).toHaveBeenCalledWith("intentos");
+    expect(res[0]!.actividades![0]).toMatchObject({ id: "act-1", estado: "completada" });
   });
 });

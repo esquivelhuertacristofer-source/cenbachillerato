@@ -11,8 +11,30 @@
 import { createBrowserClient } from "@supabase/ssr";
 import { CATEGORIA_COMPLEMENTO } from "@/lib/mccems/categorias";
 import { ORDEN_TIPOS } from "@/lib/mccems/tipos-recurso";
-import { getUACPorCodigo } from "@/lib/mccems/estructura";
-import type { ContinuarData } from "@/lib/queries/hub";
+import { getUACPorCodigo, UAC_BASE } from "@/lib/mccems/estructura";
+import type { ContinuarData, RachaData } from "@/lib/queries/hub";
+import {
+  type SbAny,
+  type ProgresoUAC,
+  type ResumenActividadAlumno,
+  type EstadisticasProgreso,
+  type IntentoRecienteRow,
+  type IntentoCalendarioRow,
+  type StatsRpcPayload,
+  statsVacias,
+  calendarioVacio,
+  fechaInicioVentana30Dias,
+  deriveRecientes,
+  deriveCalendario,
+  esRpcInexistente,
+  normalizarStatsRpc,
+  statsLegacyEnMemoria,
+} from "@/lib/queries/progreso-shared";
+
+// Re-export de los tipos que consume la página /hub/progreso, para que su
+// versión client-side importe todo desde un único módulo browser-safe.
+export type { ProgresoUAC, ResumenActividadAlumno } from "@/lib/queries/progreso-shared";
+export type { RachaData } from "@/lib/queries/hub";
 
 /** Tipos con etiqueta propia. Cualquier otro colapsa en un único "otro". */
 const TIPOS_CONOCIDOS = new Set(ORDEN_TIPOS);
@@ -79,7 +101,13 @@ interface DatosSemestre {
   /** Actividades visibles bajo RLS, sin contenido (solo id/agrupación/tipo). */
   actividades: Array<{ id: string; progresionId: string; tipo: string }>;
   /** TODOS los intentos del usuario, ordenados por started_at desc. */
-  intentos: Array<{ actividadId: string; status: string; startedAt: string }>;
+  intentos: Array<{
+    actividadId: string;
+    status: string;
+    startedAt: string;
+    /** Segundos dedicados (para los minutos de "esta semana" en /hub/progreso). */
+    tiempoSegundos: number | null;
+  }>;
   /** actividad_ids agrupadas por progresión (derivado de `actividades`). */
   actsPorProgresion: Map<string, string[]>;
   /** actividad_ids con al menos un intento completed (derivado de `intentos`). */
@@ -118,10 +146,12 @@ async function fetchDatosUACs(
   //     cruce con las actividades del semestre se hace en memoria. Además de
   //     actividad_id se piden status y started_at porque
   //     UACProgreso.ultimaActividad necesita el intento más reciente de
-  //     CUALQUIER status, no solo completed.
+  //     CUALQUIER status, no solo completed; y tiempo_segundos para los minutos
+  //     de "esta semana" del héroe de /hub/progreso (un entero por fila, egress
+  //     despreciable, sin query extra).
   const intentosQuery = sb
     .from("intentos")
-    .select("actividad_id, status, started_at")
+    .select("actividad_id, status, started_at, tiempo_segundos")
     .eq("user_id", userId)
     .order("started_at", { ascending: false });
 
@@ -164,6 +194,7 @@ async function fetchDatosUACs(
     actividadId: i.actividad_id,
     status: i.status,
     startedAt: i.started_at,
+    tiempoSegundos: i.tiempo_segundos ?? null,
   }));
 
   const actsPorProgresion = new Map<string, string[]>();
@@ -515,6 +546,10 @@ export async function getProgresionesConEstadoBrowser(
 export interface ProgresoSemestreBrowser {
   totalProgresiones: number;
   progresionesCompletadas: number;
+  /** Actividades completadas iniciadas desde el domingo 00:00 (héroe de /hub/progreso). */
+  actividadesEstaSemana: number;
+  /** Minutos de esas actividades (tiempo_segundos / 60, redondeado). */
+  minutosEstaSemana: number;
   porcentaje: number;
 }
 
@@ -531,7 +566,13 @@ export async function getProgresoSemestreBrowser(
   );
   const totalProgresiones = oficiales.length;
   if (totalProgresiones === 0)
-    return { totalProgresiones: 0, progresionesCompletadas: 0, porcentaje: 0 };
+    return {
+      totalProgresiones: 0,
+      progresionesCompletadas: 0,
+      actividadesEstaSemana: 0,
+      minutosEstaSemana: 0,
+      porcentaje: 0,
+    };
 
   // Una progresión cuenta como completada si TODAS sus actividades lo están;
   // las que no tienen actividades no cuentan (igual que la cascada previa).
@@ -545,7 +586,36 @@ export async function getProgresoSemestreBrowser(
 
   const porcentaje = Math.round((progresionesCompletadas / totalProgresiones) * 100);
 
-  return { totalProgresiones, progresionesCompletadas, porcentaje };
+  // ── Stats de "esta semana" (mismo cómputo que getProgresoSemestre en hub.ts):
+  //    intentos completados de actividades de progresiones OFICIALES de este
+  //    semestre, iniciados desde el domingo 00:00 local. tiempo_segundos → min.
+  const inicioSemana = new Date();
+  inicioSemana.setDate(inicioSemana.getDate() - inicioSemana.getDay());
+  inicioSemana.setHours(0, 0, 0, 0);
+
+  const actIdsOficiales = new Set<string>();
+  for (const p of oficiales) {
+    for (const id of datos.actsPorProgresion.get(p.id) ?? []) actIdsOficiales.add(id);
+  }
+
+  let actividadesEstaSemana = 0;
+  let segundosEstaSemana = 0;
+  for (const it of datos.intentos) {
+    if (it.status !== "completed") continue;
+    if (!actIdsOficiales.has(it.actividadId)) continue;
+    if (new Date(it.startedAt) < inicioSemana) continue;
+    actividadesEstaSemana++;
+    segundosEstaSemana += it.tiempoSegundos ?? 0;
+  }
+  const minutosEstaSemana = Math.round(segundosEstaSemana / 60);
+
+  return {
+    totalProgresiones,
+    progresionesCompletadas,
+    actividadesEstaSemana,
+    minutosEstaSemana,
+    porcentaje,
+  };
 }
 
 // ─── Centro de Recursos (acceso por tipo) ───────────────────────────────────
@@ -771,4 +841,250 @@ export async function getLaboratoriosSemestreBrowser(
       a.progresionNumero - b.progresionNumero ||
       a.orden - b.orden
   );
+}
+
+// ─── /hub/progreso (versión client-side, lever #2: hidratación en navegador) ──
+//
+// Las tres funciones siguientes son la contraparte browser de las que
+// alimentan /hub/progreso en servidor (getRachaDelAlumno, getProgresoDetallePorUAC,
+// getResumenActividadAlumno). Reutilizan la misma lógica de derivación que la
+// ruta de servidor (progreso-shared.ts) para tener UNA fuente de verdad.
+//
+// Costo: las dos primeras NO lanzan queries nuevas — derivan de la caché
+// consolidada `getDatosSemestre`, que la propia página ya puebla al llamar a
+// getProgresoSemestreBrowser. La tercera (resumen/stats) sí hace sus 3 queries
+// acotadas (recientes/calendario/RPC), idénticas a las del servidor.
+
+/**
+ * Versión browser de getRachaDelAlumno (hub.ts): racha diaria y últimos 7 días.
+ * Deriva de la caché consolidada (que ya trae TODOS los intentos del usuario,
+ * sin filtro de semestre — igual que el scan del servidor) sin lanzar queries
+ * nuevas. Se cuentan solo los intentos `completed`, reproduciendo la ruta de
+ * snapshot del servidor (migración 25), donde el snapshot solo guarda
+ * completados.
+ */
+export async function getRachaDelAlumnoBrowser(
+  userId: string,
+  semestre: number
+): Promise<RachaData> {
+  const hoy = new Date();
+  const claveDia = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+  // Skeleton de 7 días sin actividad (misma forma que espera la UI) por si la
+  // caché consolidada falló: no inventamos racha sobre datos incompletos.
+  const ultimos7DiasVacio = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(hoy);
+    d.setDate(d.getDate() - (6 - i));
+    return { fecha: claveDia(d), activo: false };
+  });
+
+  const datos = await getDatosSemestre(userId, semestre);
+  if (datos.huboError) {
+    return { diasConsecutivos: 0, ultimos7Dias: ultimos7DiasVacio };
+  }
+
+  const hace30Dias = new Date();
+  hace30Dias.setDate(hace30Dias.getDate() - 30);
+
+  const activeDates = new Set<string>();
+  for (const it of datos.intentos) {
+    if (it.status !== "completed") continue;
+    const d = new Date(it.startedAt);
+    if (d >= hace30Dias) activeDates.add(claveDia(d));
+  }
+
+  // Días consecutivos desde hoy hacia atrás (idéntico a hub.ts).
+  let diasConsecutivos = 0;
+  for (let i = 0; i < 30; i++) {
+    const d = new Date(hoy);
+    d.setDate(d.getDate() - i);
+    if (activeDates.has(claveDia(d))) diasConsecutivos++;
+    else break;
+  }
+
+  const ultimos7Dias = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(hoy);
+    d.setDate(d.getDate() - (6 - i));
+    return { fecha: claveDia(d), activo: activeDates.has(claveDia(d)) };
+  });
+
+  return { diasConsecutivos, ultimos7Dias };
+}
+
+/**
+ * Versión browser de getProgresoDetallePorUAC (progreso.ts): avance por UAC del
+ * semestre. Deriva de la caché consolidada sin lanzar queries nuevas. El
+ * nombre y el recurso (color) de cada UAC salen del catálogo estático UAC_BASE
+ * (el servidor los lee de la tabla `uac`, pero son los mismos valores). El
+ * campo `ultimaActividad` sale del started_at del intento más reciente que
+ * toque la UAC — la grilla (ProgresoUACGrid) no lo pinta, así que su fidelidad
+ * exacta no importa.
+ */
+export async function getProgresoDetallePorUACBrowser(
+  userId: string,
+  semestre: number
+): Promise<ProgresoUAC[]> {
+  const datos = await getDatosSemestre(userId, semestre);
+
+  // Todas las UAC del semestre según el catálogo oficial 2025, ordenadas por
+  // código (igual que el `.order("codigo")` del servidor).
+  const uacsDelSemestre = UAC_BASE.filter((u) => u.semestre === semestre).sort((a, b) =>
+    a.codigo.localeCompare(b.codigo)
+  );
+
+  const results: ProgresoUAC[] = [];
+  for (const uac of uacsDelSemestre) {
+    // Solo propósitos oficiales 2025; los complementos no inflan la meta.
+    const oficiales = datos.progresiones.filter(
+      (p) => p.uacCodigo === uac.codigo && p.categoria !== CATEGORIA_COMPLEMENTO
+    );
+    const total = oficiales.length;
+
+    if (total === 0) {
+      results.push({
+        codigo: uac.codigo,
+        nombre: uac.nombre,
+        rscCodigo: uac.recursoCodigo ?? "RSC-LC",
+        completadas: 0,
+        total: 0,
+        pct: 0,
+        ultimaActividad: null,
+      });
+      continue;
+    }
+
+    // Actividades de las progresiones oficiales de esta UAC.
+    const actIds = new Set<string>();
+    for (const p of oficiales) {
+      for (const id of datos.actsPorProgresion.get(p.id) ?? []) actIds.add(id);
+    }
+
+    // Progresión completada = TODAS sus actividades completadas (igual que servidor).
+    let completadas = 0;
+    for (const p of oficiales) {
+      const acts = datos.actsPorProgresion.get(p.id) ?? [];
+      if (acts.length > 0 && acts.every((id) => datos.completadas.has(id))) {
+        completadas++;
+      }
+    }
+
+    // Intentos ordenados por started_at desc: el primero que toque esta UAC es
+    // el más reciente. (Best-effort; la grilla no consume este campo.)
+    const ultimaActividad =
+      datos.intentos.find((i) => actIds.has(i.actividadId))?.startedAt ?? null;
+
+    results.push({
+      codigo: uac.codigo,
+      nombre: uac.nombre,
+      rscCodigo: uac.recursoCodigo ?? "RSC-LC",
+      completadas,
+      total,
+      pct: total > 0 ? Math.round((completadas / total) * 100) : 0,
+      ultimaActividad,
+    });
+  }
+
+  return results;
+}
+
+// Avisar UNA sola vez por pestaña: el fallback legacy corre en cada carga de
+// /hub/progreso y no queremos un warn por render en la consola del alumno.
+let warnedRpcStatsFaltanteBrowser = false;
+
+/**
+ * Versión browser de getResumenActividadAlumno (progreso.ts): recientes +
+ * heatmap de 30 días + stats agregadas. Mismas 3 queries acotadas que el
+ * servidor (recientes con .limit, calendario de 30 días, RPC resumen_stats_alumno)
+ * y misma lógica de derivación (progreso-shared.ts). Si la RPC aún no existe en
+ * la BD, statsLegacyEnMemoria reproduce el cálculo en memoria (fail-open).
+ */
+export async function getResumenActividadAlumnoBrowser(
+  limiteRecientes = 15
+): Promise<ResumenActividadAlumno> {
+  const vacio: ResumenActividadAlumno = {
+    recientes: [],
+    calendario: calendarioVacio(),
+    stats: statsVacias(),
+  };
+
+  try {
+    // SbAny: la RPC resumen_stats_alumno no está en los tipos generados de la BD.
+    const sba: SbAny = getClient();
+    const desde = fechaInicioVentana30Dias();
+
+    // Las tres consultas no reciben user_id: la RLS de `intentos` limita las
+    // filas al propio alumno con su sesión (y la RPC usa auth.uid() adentro).
+    const [recientesRes, calendarioRes, statsRes] = await Promise.all([
+      sba
+        .from("intentos")
+        .select(`
+          id,
+          completed_at,
+          actividades!actividad_id!inner (
+            titulo,
+            tipo_codigo,
+            progresiones!progresion_id (
+              uac!uac_id ( codigo )
+            )
+          )
+        `)
+        .eq("status", "completed")
+        .not("completed_at", "is", null)
+        .order("completed_at", { ascending: false })
+        .limit(limiteRecientes),
+      sba
+        .from("intentos")
+        .select(`
+          completed_at,
+          actividades!actividad_id!inner (
+            progresiones!progresion_id (
+              uac!uac_id ( codigo )
+            )
+          )
+        `)
+        .eq("status", "completed")
+        .not("completed_at", "is", null)
+        .gte("completed_at", desde)
+        .order("completed_at", { ascending: false }),
+      sba.rpc("resumen_stats_alumno"),
+    ]);
+
+    let stats: EstadisticasProgreso;
+    if (!statsRes.error && statsRes.data) {
+      stats = normalizarStatsRpc(statsRes.data as StatsRpcPayload);
+    } else if (esRpcInexistente(statsRes.error)) {
+      if (!warnedRpcStatsFaltanteBrowser) {
+        warnedRpcStatsFaltanteBrowser = true;
+        console.warn(
+          "[progreso] La RPC resumen_stats_alumno no existe aún en la BD — " +
+            "usando cálculo legacy en memoria. Aplica " +
+            "supabase/migrations/23_rpc_resumen_stats_alumno.sql en el SQL Editor."
+        );
+      }
+      // El fallback necesita user_id (no corre bajo auth.uid()): lo tomamos de
+      // la sesión actual del navegador.
+      const {
+        data: { user },
+      } = await sba.auth.getUser();
+      stats = user ? await statsLegacyEnMemoria(sba, user.id) : statsVacias();
+    } else {
+      stats = statsVacias();
+    }
+
+    const recRows = ((recientesRes.data ?? []) as IntentoRecienteRow[]).filter(
+      (i) => i.actividades && i.completed_at
+    );
+    const calRows = ((calendarioRes.data ?? []) as IntentoCalendarioRow[]).filter(
+      (i) => i.actividades && i.completed_at
+    );
+
+    return {
+      recientes: deriveRecientes(recRows),
+      calendario: deriveCalendario(calRows),
+      stats,
+    };
+  } catch {
+    return vacio;
+  }
 }
