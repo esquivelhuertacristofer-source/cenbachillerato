@@ -69,7 +69,12 @@ declare global {
  * desplegar — así los alumnos no ven catálogo viejo hasta que expire el TTL.
  * (El TTL es solo la red de seguridad si se olvida el bump.)
  */
-const CATALOG_CACHE_VERSION = "v1";
+// v1 → v2 (2026-07-26): se publicaron 258 actividades que estaban en borrador
+// (211 video_con_preguntas + 47 de otros tipos). Los árboles `sem:N:tree` y
+// `uac:X:progtree` se filtran por RLS `estado='publicada'`, así que toda clave
+// cacheada antes de esa publicación lista el catálogo VIEJO y omitiría el
+// contenido nuevo hasta 12 h (TREE) / 24 h (CONTENT). El bump las invalida de golpe.
+const CATALOG_CACHE_VERSION = "v2";
 const PREFIX = `__catalog__:${CATALOG_CACHE_VERSION}:`;
 
 /** TTLs sugeridos (segundos). El catálogo cambia solo al desplegar; el TTL es la red de seguridad. */
