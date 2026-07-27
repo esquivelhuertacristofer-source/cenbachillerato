@@ -29,6 +29,12 @@ const securityHeaders = [
       "img-src 'self' data: blob: https://i.ytimg.com https://img.youtube.com",
       // Supabase REST + Realtime (WSS)
       "connect-src 'self' https://xmcfuwdanlciqdxqtslv.supabase.co wss://xmcfuwdanlciqdxqtslv.supabase.co",
+      // Video de actividades: los 211 mp4 generados (TTS+Remotion) se sirven
+      // desde el bucket público de R2, y `VideoConPreguntasActivity` los monta
+      // en un <video src> nativo (no iframe) cuando la url termina en .mp4.
+      // Sin este `media-src`, CSP cae a `default-src 'self'` y el navegador
+      // bloquea los 211 videos aunque el objeto exista y responda 200 en R2.
+      "media-src 'self' https://pub-94a8196c0c59456a89cf72193424c9d1.r2.dev",
       // Embeds de video YouTube (modo privacy-nocookie) — pestaña Destacados de Laboratorios
       "frame-src https://www.youtube-nocookie.com https://www.youtube.com",
       "frame-ancestors 'none'",

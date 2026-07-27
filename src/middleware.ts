@@ -2,13 +2,22 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { decodeJwtClaims } from "@/lib/jwt-claims";
 
-// Next.js 16 renombró `middleware.ts` a `proxy.ts` (misma función, nueva
-// convención de archivo/export). Este archivo reemplaza al `src/middleware.ts`
-// que quedó borrado tras la migración a Next 16 — sin él, NINGUNA de las dos
-// protecciones de abajo corría en producción: ni el refresco de sesión ni el
-// redirect por must_change_password.
+// ⚠️ NO renombrar este archivo a `proxy.ts`. Next.js 16 deprecó la convención
+// `middleware` en favor de `proxy`, PERO la guía oficial de upgrade es
+// explícita (node_modules/next/dist/docs/01-app/02-guides/upgrading/version-16.md,
+// "middleware to proxy"): «The `edge` runtime is NOT supported in `proxy`. The
+// `proxy` runtime is `nodejs`, and it cannot be configured. If you want to
+// continue using the `edge` runtime, keep using `middleware`.»
+// Nuestro deploy es Cloudflare Workers vía @opennextjs/cloudflare, que ABORTA el
+// build con "Node.js middleware is not currently supported" (exit 1, sin generar
+// worker) en cuanto detecta un middleware de runtime nodejs. Entre 2026-07-14 y
+// 2026-07-26 este archivo vivió como `proxy.ts` y `npm run pages:build` falló
+// todo ese tiempo, dejando el deploy congelado. Todo el código de abajo está
+// escrito para edge a propósito (atob en vez de Buffer, ver paso 3).
+// Cuando Next publique instrucciones de runtime edge para `proxy`, se migra.
 //
-// Responsabilidades:
+// Responsabilidades (sin él, NINGUNA corría en producción):
+//
 //   1. Refrescar la sesión de Supabase en cada request (igual que antes).
 //   2. Forzar /cambiar-password si el usuario tiene must_change_password=true
 //      (igual que antes).
@@ -72,7 +81,7 @@ import { decodeJwtClaims } from "@/lib/jwt-claims";
 // real de las capas de abajo. A cambio, con tokens de 1h, cada usuario paga
 // ~1 getUser() remoto por hora (cuando su token está realmente por expirar)
 // en vez de uno por cada request bajo las rutas protegidas.
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(

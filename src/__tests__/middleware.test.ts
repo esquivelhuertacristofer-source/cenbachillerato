@@ -74,15 +74,15 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
-describe("proxy", () => {
+describe("middleware", () => {
   test("sin sesión -> redirige a /log-in sin llamar a getUser()", async () => {
     const fake = makeFakeSupabase({ session: null });
     mockCreateServerClient.mockReturnValue(
       fake as unknown as ReturnType<typeof createServerClient>
     );
 
-    const { proxy } = await import("@/proxy");
-    const res = await proxy(buildRequest("/hub"));
+    const { middleware } = await import("@/middleware");
+    const res = await middleware(buildRequest("/hub"));
 
     expect(res.status).toBe(307);
     expect(res.headers.get("location")).toContain("/log-in");
@@ -99,8 +99,8 @@ describe("proxy", () => {
       fake as unknown as ReturnType<typeof createServerClient>
     );
 
-    const { proxy } = await import("@/proxy");
-    const res = await proxy(buildRequest("/hub"));
+    const { middleware } = await import("@/middleware");
+    const res = await middleware(buildRequest("/hub"));
 
     // NextResponse.next() no es un redirect: no trae header Location.
     expect(res.headers.get("location")).toBeNull();
@@ -117,8 +117,8 @@ describe("proxy", () => {
       fake as unknown as ReturnType<typeof createServerClient>
     );
 
-    const { proxy } = await import("@/proxy");
-    const res = await proxy(buildRequest("/hub"));
+    const { middleware } = await import("@/middleware");
+    const res = await middleware(buildRequest("/hub"));
 
     expect(res.status).toBe(307);
     expect(res.headers.get("location")).toContain("/cambiar-password");
@@ -135,8 +135,8 @@ describe("proxy", () => {
       fake as unknown as ReturnType<typeof createServerClient>
     );
 
-    const { proxy } = await import("@/proxy");
-    const res = await proxy(buildRequest("/cambiar-password"));
+    const { middleware } = await import("@/middleware");
+    const res = await middleware(buildRequest("/cambiar-password"));
 
     expect(res.headers.get("location")).toBeNull();
   });
@@ -154,8 +154,8 @@ describe("proxy", () => {
       fake as unknown as ReturnType<typeof createServerClient>
     );
 
-    const { proxy } = await import("@/proxy");
-    const res = await proxy(buildRequest("/hub"));
+    const { middleware } = await import("@/middleware");
+    const res = await middleware(buildRequest("/hub"));
 
     expect(fake.auth.getUser).toHaveBeenCalledTimes(1);
     expect(res.status).toBe(307);
@@ -171,8 +171,8 @@ describe("proxy", () => {
       fake as unknown as ReturnType<typeof createServerClient>
     );
 
-    const { proxy } = await import("@/proxy");
-    const res = await proxy(buildRequest("/hub"));
+    const { middleware } = await import("@/middleware");
+    const res = await middleware(buildRequest("/hub"));
 
     expect(fake.auth.getUser).toHaveBeenCalledTimes(1);
     expect(res.status).toBe(307);
@@ -192,8 +192,8 @@ describe("proxy", () => {
       fake as unknown as ReturnType<typeof createServerClient>
     );
 
-    const { proxy } = await import("@/proxy");
-    const res = await proxy(buildRequest("/hub"));
+    const { middleware } = await import("@/middleware");
+    const res = await middleware(buildRequest("/hub"));
 
     expect(fake.auth.getUser).toHaveBeenCalledTimes(1);
     expect(res.headers.get("location")).toBeNull();
