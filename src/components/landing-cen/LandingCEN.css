@@ -9423,27 +9423,39 @@ a.pcards-item:hover {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Materias Mosaico — carrusel de mosaicos hexagonales: una plataforma CEN a
-   la vez (Bachillerato, Preescolar, Primaria, Secundaria, Labs, Financiera),
-   navegable con flechas o con las pastillas de selección directa.
+   Materias — carrusel de fichas, una por plataforma CEN (Bachillerato,
+   Preescolar, Primaria, Secundaria, Labs, Financiera). Cada ficha muestra el
+   desglose real de esa plataforma; se recorre con las flechas, los puntos o
+   arrastrando la pista.
    ═══════════════════════════════════════════════════════════════════════════ */
 .materias-section {
   position: relative;
   overflow: hidden;
   padding: 100px 40px;
-  background: linear-gradient(180deg, #F8FAFC 0%, #EEF1F6 55%, #E9EDF4 100%);
+  /* Un lavado azul un punto más hondo que el resto de la página, y es
+     estructural, no decorativo: las fichas son blancas: hojas de papel. Sobre
+     el #F8FAFC anterior una hoja blanca no tenía contra qué recortarse y se
+     leía como un bloque de texto flotando en la página en vez de como un
+     objeto apoyado en ella. Con este fondo la sombra tiene dónde caer. */
+  background: linear-gradient(180deg, #EFF3F9 0%, #E4EAF4 55%, #DCE4F1 100%);
 }
 .materias-bg-texture {
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(circle, rgba(11,37,69,0.035) 1.5px, transparent 1.5px);
+  background-image: radial-gradient(circle, rgba(11,37,69,0.05) 1.5px, transparent 1.5px);
   background-size: 32px 32px;
   pointer-events: none;
 }
+/* 1280 y no los 1180 del resto de la página: es el ancho que necesita la pista
+   para que quepan dos fichas de 560px MÁS el asomo de la tercera. La sección
+   tiene fondo propio, así que leerse 100px más ancha que sus vecinas no se nota
+   como escalón; lo que sí se notaría es el carrusel partido en dos fichas
+   sueltas. Si alguien vuelve a tocar el ancho de la ficha, este número va con
+   él (ver la nota de `.matc-card`). */
 .materias-inner {
   position: relative;
   z-index: 1;
-  max-width: 1180px;
+  max-width: 1280px;
   margin: 0 auto;
 }
 
@@ -9484,301 +9496,908 @@ a.pcards-item:hover {
   color: rgba(11,37,69,0.62);
   margin: 0;
 }
-.materias-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-radius: 999px;
-  background: rgba(30,64,175,0.08);
-  border: 1px solid rgba(30,64,175,0.16);
-  color: var(--cen-blue);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  margin-top: 4px;
+
+/* ── Carrusel de plataformas (prefijo `matc-`) ────────────────────────────
+   Una ficha por plataforma CEN, en una pista de scroll nativo. El prefijo es
+   nuevo a propósito: este archivo ya arrastra bloques huérfanos `.carousel-*`,
+   `.prod-carousel-*` y `.test-carousel-*` de secciones navy, varios con
+   `!important`, y reusar esos nombres aquí heredaría su paleta oscura. Por lo
+   mismo el bloque va AL FINAL del archivo: entre reglas de igual
+   especificidad gana la última, no la más específica.
+
+   Sin librería de carrusel (no hay ninguna en package.json): la pista es un
+   flex con `overflow-x:auto` + `scroll-snap`, el mismo patrón que ya usa
+   `InfografiasCarousel.css` en el hub. Las flechas y los puntos solo empujan
+   el scroll; si el JS no corre, la sección se sigue pudiendo deslizar.
+
+   La ficha es PAPEL: blanca, con la foto poniendo el color y el azul CEN como
+   tinta y como botón. El porqué —y los tres intentos de fondo de color que se
+   descartaron antes— está escrito junto a `FICHA` en el componente.
+
+   Tokens por ficha, inyectados inline desde el componente:
+     --matc-fondo / --matc-fondo-rgba    el blanco de la ficha. No es el color
+                                         de la plataforma: es el mismo en las
+                                         seis (ver `FICHA`)
+     --matc-tinta                        tinta AA sobre el fondo (contraste.ts)
+     --matc-velo-foto                    el navy del velo de la portada, en
+                                         canales sueltos. Va aparte del fondo
+                                         de la ficha a propósito: un velo hacia
+                                         el blanco desvanecería la foto justo
+                                         donde va el nombre
+     --matc-tinta-foto                   tinta AA sobre el velo (contraste.ts).
+                                         Es la del NOMBRE, no la de la ficha
+     --matc-nivel-foto                   azul claro del rótulo de nivel, sobre
+                                         el velo
+     --matc-realce                       azul CEN como tinta: las cifras, los
+                                         contadores y el lavado de fila
+     --matc-accion / --matc-accion-tinta  azul CEN pleno + su tinta. Único
+                                         relleno saturado fuera de la foto
+     --matc-linea                        el filo de un cabello: la tinta a muy
+                                         poca fuerza. Separa filas SIN dibujar
+                                         una caja por fila
+     --matc-velo                         lo único que sí se rellena (pulgar del
+                                         scroll). Nunca texto encima
+     --matc-desc-op                      cuánto se retira la descripción
+     --matc-sec-op                       cuánto se retira el texto de servicio
+                                         (rótulos, pies de cifra, detalle)
+     --matc-punto-brillo                 fuerza del halo del punto de área: en
+                                         claro se apaga
+     --matc-i                            índice de la ficha (retardo de entrada)
+
+   Y uno por fila, inline en cada `<li>`:
+     --matc-punto                        el hex del área (`Grupo.hex`). Sobre
+                                         papel el punto lee su tono exacto, que
+                                         es justo lo que no se podía hacer
+                                         sobre un fondo de color. */
+
+/* Encabezado: el texto a la izquierda, las flechas alineadas a la derecha. */
+.matc-cab {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  margin-bottom: 34px;
+}
+.matc-cab .materias-heading {
+  max-width: 640px;
 }
 
-/* ── Lista de plataformas — recuadros seleccionables en la columna
-   derecha; sustituyen a la barra de pastillas que antes iba arriba del
-   mosaico. Un click cambia de plataforma; el estado activo se marca con
-   fondo navy + check. ── */
-.materias-platform-list {
+.matc-nav {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  width: 100%;
+  flex: none;
+  gap: 10px;
 }
-.materias-platform-list .materias-platform-card {
+/* Los selectores de botón van calificados con `.landing-cen` a propósito:
+   arriba (línea ~54) hay un reset `.landing-cen button { background:none;
+   color:inherit }` que, a igualdad de peso, le gana a un `.matc-*` suelto y
+   deja las píldoras sin fondo. */
+.landing-cen .matc-nav-btn {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  padding: 12px 14px;
-  border-radius: 14px;
-  border: 1px solid rgba(11,37,69,0.10);
-  background: #fff;
-  color: inherit;
-  text-align: left;
-  cursor: pointer;
-  box-shadow: 0 4px 10px -7px rgba(11,37,69,0.16);
-  transition: transform 0.2s var(--ease-standard, ease), box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
-}
-.materias-platform-list .materias-platform-card:hover {
-  border-color: rgba(30,64,175,0.3);
-  transform: translateX(2px);
-}
-.materias-platform-list .materias-platform-card:focus-visible {
-  outline: 2px solid var(--cen-blue);
-  outline-offset: 2px;
-}
-.materias-platform-list .materias-platform-card--active {
-  background: var(--cen-navy);
-  border-color: var(--cen-navy);
-  box-shadow: 0 10px 22px -10px rgba(11,37,69,0.4);
-}
-.materias-platform-icon {
-  flex-shrink: 0;
-  display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 9px;
-  background: rgba(30,64,175,0.08);
-  color: var(--cen-blue);
-  font-size: 13px;
-  transition: background 0.2s ease, color 0.2s ease;
-}
-.materias-platform-card--active .materias-platform-icon {
-  background: rgba(255,255,255,0.16);
-  color: #fff;
-}
-.materias-platform-label {
-  flex: 1;
-  font-family: var(--font-epilogue), sans-serif;
-  font-size: 13.5px;
-  font-weight: 700;
-  color: rgba(11,37,69,0.75);
-}
-.materias-platform-card--active .materias-platform-label {
-  color: #fff;
-}
-.materias-platform-check {
-  flex-shrink: 0;
-  font-size: 11px;
-  color: rgba(255,255,255,0.85);
-}
-
-.materias-content {
-  display: grid;
-  grid-template-columns: minmax(0, 1.3fr) minmax(280px, 400px);
-  align-items: center;
-  gap: 56px;
-  animation: materias-fade-in 0.35s var(--ease-standard, ease);
-}
-.materias-side {
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
-  min-width: 0;
-}
-@keyframes materias-fade-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .materias-content { animation: none; }
-}
-
-/* ── Mosaico de rombos — teselado soldado arista con arista ──────────────
-   Cada tile es un rombo (diamante, puntas arriba/abajo). Los rombos
-   tapizan el plano sin huecos apilándolos en COLUMNAS: dentro de una
-   columna van a ras (la punta inferior de uno toca la superior del que
-   sigue) y cada columna vecina se monta sobre la anterior con un solape
-   de -0.5*ancho y un desfase vertical de 0.5*alto en las columnas pares
-   — así el rombo desplazado encaja EXACTO en el hueco romboidal que dejan
-   dos rombos apilados. Misma estructura de columnas que el panal anterior;
-   solo cambian la figura (clip-path) y los offsets de encastre.
-   (--hex-accent / --hex-rgba son los tokens de color de acento por área;
-   nombre heredado, se comparten con el panel de detalle.) ── */
-.rombo-grid {
-  --rombo-w: clamp(128px, 12.5vw, 216px);
-  --rombo-h: var(--rombo-w);
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: flex-start;
-  padding: 8px 4px;
-}
-.rombo-col {
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-}
-.rombo-col + .rombo-col {
-  margin-left: calc(var(--rombo-w) * -0.5);
-}
-.rombo-col:nth-child(even) {
-  margin-top: calc(var(--rombo-h) * 0.5);
-}
-
-.rombo-slot {
-  position: relative;
-  width: var(--rombo-w);
-  height: var(--rombo-h);
-  background: none;
-  border: none;
-  padding: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(11,37,69,0.14);
+  background: #fff;
+  color: var(--cen-navy);
+  font-size: 14px;
   cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transition: transform 0.3s var(--ease-standard, ease);
+  box-shadow: 0 8px 16px -12px rgba(11,37,69,0.55);
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s var(--ease-standard, ease);
 }
-.rombo-slot:hover,
-.rombo-slot--active,
-.rombo-slot:focus-visible {
-  transform: scale(1.06);
-  z-index: 2;
+.landing-cen .matc-nav-btn:hover:not(:disabled) {
+  background: var(--cen-navy);
+  border-color: var(--cen-navy);
+  color: #fff;
+  transform: translateY(-2px);
 }
-.rombo-slot:focus-visible {
-  outline: 2px solid var(--hex-accent);
-  outline-offset: 4px;
+.landing-cen .matc-nav-btn:disabled {
+  opacity: 0.32;
+  cursor: default;
+}
+/* `globals.css` pone un anillo celeste + halo y `border-radius:4px` sobre
+   TODO `:focus-visible`; ese radio cuadraría el botón redondo. Se redeclara
+   el foco completo (radio incluido) en cada control del carrusel. */
+.landing-cen .matc-nav-btn:focus-visible {
+  outline: 3px solid #0A1A2F;
+  outline-offset: 2px;
+  border-radius: 50%;
+  box-shadow: none;
 }
 
-.rombo-tile {
+/* Pista. El recorte de la última ficha —lo que anuncia que hay más— sale de
+   que la pista mide lo mismo que `.materias-inner` (1280px) y las fichas no
+   caben justas; no se usa el truco de `width:100vw`, que en Windows incluye
+   la barra de scroll y desborda la página a lo ancho. El padding vertical
+   está para que `overflow-x:auto` (que también recorta en Y) no coma las
+   sombras de las fichas. */
+.matc-track {
+  display: flex;
+  gap: 22px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scroll-padding-left: 6px;
+  padding: 18px 6px 26px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.matc-track::-webkit-scrollbar {
+  display: none;
+}
+/* Región con scroll: sin foco propio no habría forma de recorrerla con el
+   teclado más que saltando de botón en botón (WCAG 2.1.1). */
+.matc-track:focus-visible {
+  outline: 3px solid #0A1A2F;
+  outline-offset: 2px;
+  border-radius: 28px;
+  box-shadow: none;
+}
+
+/* Altura fija, no `min-height`: al abrir el desglose la lista pasa de 4-9
+   grupos a 12-40 materias, y sin tope la ficha estiraba el carrusel a más de
+   2000px dejando el resto de las fichas en color plano. Con altura definida,
+   la lista larga scrollea por dentro y el carrusel no se mueve.
+
+   Ancho 560px: dos fichas completas (560+22+560 = 1142) más 126px de asomo de
+   la tercera dentro de los 1268px útiles de `.materias-inner`. Ese asomo es lo
+   que anuncia que hay más, así que es el número que hay que recalcular si
+   alguien vuelve a ensanchar: el ancho de la ficha y el `max-width` de
+   `.materias-inner` se mueven juntos, o la tercera ficha deja de verse y el
+   carrusel se lee como dos fichas sueltas.
+
+   CUATRO INTENTOS, Y LOS CUATRO FALLARON POR EL MISMO SITIO: EL FONDO. Al
+   principio sólo la ficha de bachillerato iba pintada y las otras cinco eran
+   papel blanco con una losa de color encima: tres materiales sin relación, y
+   por eso "se veían feas" al lado de la primera. Se pintaron las seis a color
+   pleno: se arregló el material y se destapó el problema siguiente —seis
+   colores saturados en fila se leen como seis marcas, no como una familia—. Se
+   pasaron las seis al mismo azul CEN: ya era una familia, y seguía sin gustar,
+   porque 560×880 de color saturado se lee como cartel y a ese tamaño ningún
+   tono se salva. Se probó azul-negro: resolvía el cartel y traía uno peor —el
+   negro no es lenguaje de escuela—.
+
+   Así que manda el papel. Blanco pleno, como una ficha impresa, y se retira del
+   todo para que salgan las tres cosas que sí distinguen a una plataforma de
+   otra: su foto a todo color y a sangre, su nombre montado encima, y sus
+   cifras. El color no se va, cambia de sitio: vive en la fotografía (un tercio
+   de la ficha), en el azul CEN de las cifras y del botón, y en los puntos de
+   área del panel, que sobre blanco leen su tono exacto en vez de una versión
+   teñida por el fondo. Nada aquí está apagado ni pastel: blanco pleno, azul
+   pleno, foto plena. Lo que despega la hoja de la página no es color, es
+   sombra. Por eso tampoco existe `.matc-card--destacada`: las seis son la misma
+   pieza y lo que cambia es lo que llevan dentro.
+
+   No hay padding en la ficha: la foto va a sangre por sí sola y el margen lo
+   pone `.matc-cuerpo`. Los márgenes negativos de la versión anterior existían
+   sólo para deshacer ese padding. */
+.matc-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 min(560px, 86vw);
+  scroll-snap-align: start;
+  height: 880px;
+  border-radius: 26px;
+  /* Un filo de tinta, no de luz: sobre papel el contorno se dibuja con el mismo
+     navy de la sombra a muy poca fuerza. */
+  border: 1px solid rgba(11,37,69,0.10);
+  /* Papel, no color. La única capa encima del blanco es una caída de un punto
+     de valor al pie —el navy al 3.5%, ni siquiera se percibe como tono— y
+     existe sólo para que 880px de blanco plano no se lean como un hueco
+     recortado en la página. Va como velo transparente y no como blanco
+     literal para que siga funcionando si alguien cambia `FICHA.fondo`. */
+  background-color: var(--matc-fondo);
+  background-image:
+    linear-gradient(180deg, rgba(11,37,69,0) 58%, rgba(11,37,69,0.035) 100%);
+  color: var(--matc-tinta);
+  /* Aquí está TODO el trabajo de despegar la ficha: una hoja blanca sobre un
+     lavado azul claro no se distingue por color, se distingue por sombra. Tres
+     capas —contacto, cuerpo y halo— y las tres teñidas del navy de la landing,
+     porque una sombra neutra sobre papel deja cerco gris sucio. */
+  box-shadow:
+    0 1px 2px rgba(11,37,69,0.10),
+    0 18px 34px -20px rgba(11,37,69,0.30),
+    0 40px 78px -40px rgba(11,37,69,0.42);
+  /* la foto va a sangre: sin esto asomaría por las esquinas redondeadas */
+  overflow: hidden;
+  /* el levantamiento cabe en el `padding: 18px … 26px` de la pista; con más
+     recorrido `overflow-x:auto` —que también recorta en Y— se comería la punta
+     de la ficha al pasar el cursor */
+  transition:
+    transform 0.36s var(--ease-decelerate, ease),
+    box-shadow 0.36s var(--ease-decelerate, ease),
+    border-color 0.36s ease,
+    opacity 0.5s var(--ease-decelerate, ease);
+}
+/* Al pasar el cursor la ficha no cambia de color: se levanta y su filo se pone
+   azul. Sobre papel el gesto es el de una hoja que alguien separa del montón
+   —sube y su sombra se abre—, no el del vidrio que atrapa la luz. */
+@media (hover: hover) {
+  .matc-card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(37,99,235,0.34);
+    box-shadow:
+      0 1px 2px rgba(11,37,69,0.10),
+      0 26px 44px -20px rgba(11,37,69,0.34),
+      0 48px 90px -38px rgba(11,37,69,0.48),
+      0 0 0 1px rgba(37,99,235,0.10);
+  }
+}
+
+/* Entrada escalonada: las fichas suben al entrar la sección en pantalla, con el
+   retardo sacado del índice, así el carrusel se reparte de izquierda a derecha
+   en vez de aparecer de golpe. Envuelto en `no-preference` y no anulado después
+   en el bloque `reduce`: quien pide menos movimiento nunca llega a ver el estado
+   oculto, en vez de verlo y que se corrija. */
+@media (prefers-reduced-motion: no-preference) {
+  .matc-card {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+  .matc-card--entra {
+    opacity: 1;
+    transform: none;
+    transition-delay: calc(var(--matc-i, 0) * 90ms);
+  }
+}
+
+/* LA PORTADA. Un tercio de la ficha (280 de 880) es foto, y el nombre va
+   montado encima. Esto es el cambio de fondo del rediseño: antes la foto era
+   una banda decorativa de 160px arriba de una ficha de color, y el nombre vivía
+   en el cuerpo compitiendo con píldoras. Ahora la foto ES la portada y el
+   nombre está donde el ojo cae primero.
+
+   Sin márgenes negativos: la ficha ya no tiene padding. `flex: none` porque
+   sólo el panel cede alto (ver la nota de `.matc-cuerpo`).
+
+   EL RECORTE ES SUYO, no heredado de la ficha. Delegarlo en el `overflow` de
+   `.matc-card` fallaba por dos sitios: la foto al 1.06 mide 296.8px dentro de
+   una banda de 280 y derramaba ~10px de imagen cruda —sin velo— por debajo del
+   canto, sobre el papel blanco, que es donde más se nota; y a los lados
+   sobresalía 15.7px, que sólo quedaban ocultos mientras el navegador acertara a
+   recortar en curva desde un ancestro que en hover va transformado (`translateY
+   (-8px)`) —en cuanto la capa de la foto se compone aparte, esa curva deja de
+   aplicarse y la imagen sale entera del marco—. Con el recorte aquí no hay
+   ancestro de por medio: lo hace el padre directo, que no se transforma nunca.
+
+   25 y no 26 porque la ficha lleva 1px de borde y ésta es la curva interior;
+   sólo arriba, que es donde la banda toca el canto de la ficha. De paso recorta
+   el halo del título, que hasta ahora se salía como una mancha azul difusa
+   sobre el blanco justo debajo de la foto. */
+.matc-media {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  flex: none;
+  height: 280px;
+  overflow: hidden;
+  border-radius: 25px 25px 0 0;
+  /* lo que se ve mientras la foto carga: la ficha un punto más oscura, no un
+     rectángulo blanco parpadeando dentro de otro blanco */
+  background: rgba(var(--matc-velo-foto), 0.06);
+}
+/* Absoluta y no en flujo: el texto de la portada va encima, en el mismo
+   contenedor, y con la imagen en flujo lo empujaría fuera. */
+.matc-media-img {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
-  padding: 3px;
-  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-  background: linear-gradient(160deg, rgba(255,255,255,0.65) 0%, rgba(var(--hex-rgba), 0.3) 100%);
-  filter: drop-shadow(0 10px 16px rgba(11,37,69,0.22));
-  transition: filter 0.3s ease;
+  object-fit: cover;
+  transform-origin: center 40%;
+  transition: transform 0.7s var(--ease-emphasized, ease);
 }
-.rombo-slot:hover .rombo-tile,
-.rombo-slot--active .rombo-tile,
-.rombo-slot:focus-visible .rombo-tile {
-  filter: drop-shadow(0 10px 22px rgba(var(--hex-rgba), 0.65));
+@media (hover: hover) {
+  .matc-card:hover .matc-media-img { transform: scale(1.06); }
 }
-
-.rombo-tile-inner {
-  width: 100%;
-  height: 100%;
-  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-  background: linear-gradient(155deg, var(--hex-accent) 0%, color-mix(in srgb, var(--hex-accent) 65%, #0B2545 35%) 100%);
+/* Viñeta superior, apenas un soplo. Existe para el chip del ícono, que vive en
+   esa esquina y necesita algo contra qué recortarse cuando la foto entra clara
+   por arriba. Muere al 30%, muy por encima del título. */
+.matc-media::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    180deg,
+    rgba(var(--matc-velo-foto), 0.34) 0%,
+    rgba(var(--matc-velo-foto), 0) 30%
+  );
+  pointer-events: none;
+}
+/* El velo del nombre, en NAVY y no en el fondo de la ficha. Es la decisión que
+   sostiene toda la portada sobre una ficha blanca: el velo anterior se fundía
+   con el fondo de la ficha para que la foto se disolviera en ella, pero eso
+   sólo funciona si la ficha es oscura. Sobre papel, un degradado hacia el
+   blanco desvanece la foto justo en la banda donde va el nombre y lo deja sin
+   piso: el título saldría flotando sobre la parte más clara y sucia de la
+   imagen.
+   Así que la foto ya no se disuelve: se oscurece al pie y termina en un canto
+   limpio contra el papel, como termina una fotografía impresa en una hoja. Al
+   78% —donde cae el título— el blanco pasa de 7:1 incluso sobre la foto más
+   clara posible, así que el nombre se lee sobre CUALQUIER imagen, no sólo
+   sobre las seis de hoy.
+   El velo oscurece, no tiñe: la foto conserva su color, que es justo lo que
+   distingue una plataforma de otra. */
+.matc-media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    180deg,
+    rgba(var(--matc-velo-foto), 0) 30%,
+    rgba(var(--matc-velo-foto), 0.42) 56%,
+    rgba(var(--matc-velo-foto), 0.78) 78%,
+    rgba(var(--matc-velo-foto), 0.92) 100%
+  );
+  pointer-events: none;
+}
+/* El bloque de texto de la portada, por encima de los dos pseudos. */
+.matc-portada-txt {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: column;
+  gap: 9px;
+  padding: 0 24px 20px;
+}
+/* Nivel educativo, en azul claro y en versalitas. Es dato nuevo, no adorno:
+   "CEN Primaria" y "CEN Labs" no dicen por sí solos que una es básica y la otra
+   bachillerato. Va ENCIMA del nombre porque se lee como la sección a la que
+   pertenece la plataforma, no como su subtítulo.
+   El azul CEN de las cifras NO sirve aquí: sobre el velo navy sería azul sobre
+   azul oscuro. Por eso el rótulo lleva su propio tono (`--matc-nivel-foto`,
+   6.3:1 sobre el velo), un paso por detrás del blanco del nombre. */
+.matc-nivel {
+  font-family: var(--font-epilogue), sans-serif;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.17em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: var(--matc-nivel-foto);
+  /* la sombra es por la foto, no por la ficha: en el tramo alto del velo el
+     rótulo puede caer sobre un tono claro de la imagen */
+  text-shadow: 0 1px 10px rgba(var(--matc-velo-foto), 0.85);
+}
+/* El nombre, al tamaño que le toca por ser lo primero que se lee. Salta de 27 a
+   36px: sobre la foto tiene todo el ancho de la ficha para él, ya no comparte
+   línea con nada.
+   La tinta es la del VELO y no `inherit`: hereda de la ficha daría la tinta del
+   papel —navy sobre navy, o sea nada—. Ver `--matc-tinta-foto`. */
+.matc-card-titulo {
+  margin: 0;
+  font-family: var(--font-epilogue), sans-serif;
+  font-size: 36px;
+  font-weight: 900;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+  color: var(--matc-tinta-foto);
+  text-wrap: balance;
+  text-shadow: 0 2px 20px rgba(var(--matc-velo-foto), 0.8);
+}
+
+/* El chip del ícono, arriba a la izquierda: papel de la ficha apoyado sobre la
+   foto. Sólido, no de vidrio, y ésa es la parte que importa: un chip
+   traslúcido toma el valor de lo que tiene debajo, y debajo hay una fotografía
+   cualquiera. Sobre una foto oscura el azul CEN caía a 2.6:1 (al 92% seguía en
+   4.3:1) y sobre una clara el chip desaparecía contra la imagen. Blanco pleno
+   es el único fondo que garantiza los 5.17:1 del glifo pase lo que pase en la
+   foto, y de paso repite el material de la ficha sobre la portada en vez de
+   meter una pieza ajena.
+   El z-index lo sube por encima de los dos pseudos de `.matc-media`. */
+.matc-card-icono {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 2;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  /* el rombo se estrecha hacia las puntas: el contenido vive en la banda
-     central ancha, con padding lateral generoso para no tocar las aristas */
-  padding: 6px 16%;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  border: 1px solid rgba(11,37,69,0.08);
+  background: var(--matc-fondo);
+  color: var(--matc-realce);
+  font-size: 15px;
+  /* la sombra es lo que lo separa de una foto clara, ahora que el chip ya no
+     tiene borde de luz */
+  box-shadow: 0 8px 20px -10px rgba(11,37,69,0.65);
+  transition:
+    transform 0.36s var(--ease-emphasized, ease),
+    border-color 0.36s ease;
 }
-.rombo-icon {
-  font-size: clamp(16px, 1.7vw, 24px);
-  color: #ffffff;
-  text-shadow: 0 2px 6px rgba(0,0,0,0.25);
+@media (hover: hover) {
+  .matc-card:hover .matc-card-icono {
+    transform: translateY(-2px);
+    border-color: rgba(37,99,235,0.38);
+  }
 }
-.rombo-label {
+
+/* EL CUERPO. Aquí vive el margen que la ficha ya no tiene, y aquí se apila lo
+   que queda: descripción, cifras y panel, en tres registros separados por un
+   filo de un cabello en vez de por cajas.
+   `flex: none` en la descripción y en las cifras: el panel crece con su
+   contenido (de 4 grupos a 40 materias al abrir el desglose) y si los dos de
+   arriba pudieran encogerse, el panel les robaría el alto y la descripción
+   quedaría cortada a media línea. Sólo el panel cede. */
+.matc-cuerpo {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 22px 24px 24px;
+}
+/* Recortada a 4 líneas: las descripciones van de 90 a 190 caracteres y sin
+   tope la ficha más larga estiraría a las seis, que comparten altura. */
+.matc-card-desc {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  flex: none;
+  overflow: hidden;
+  margin: 0 0 18px;
+  /* Reserva las 3 líneas del recorte aunque el texto traiga 2. Sin esto el
+     panel arranca 21px más arriba en las fichas de descripción corta, y con
+     seis fichas en fila esa diferencia se ve como escalón. Fijándola, los seis
+     paneles ocupan exactamente la misma banda.
+     Son 3 y no 4 porque a 560px de ancho ninguna de las seis descripciones pasa
+     de 3 renglones: la cuarta línea reservada quedaba como hueco muerto debajo
+     del texto de Bachillerato, y esos 21px son justo los que le faltaban a la
+     lista de 9 filas de Financiera para no scrollear.
+     Va en `em` y no en px, y como `height` y no como `min-height`, por una
+     razón concreta: `-webkit-line-clamp` dibuja los puntos suspensivos en la
+     última línea pero NO borra la siguiente —el recorte real lo hace
+     `overflow: hidden` contra el alto de la caja—. Si la caja mide un pelo más
+     que 3 renglones, asoma una tira de la cuarta debajo de los puntos.
+     `1.58em × 3` es exactamente el alto de 3 renglones sea cual sea el
+     font-size, así que no asoma nada ni aquí ni en el bloque de móvil. */
+  height: calc(1.58em * 3);
+  font-size: 13.5px;
+  line-height: 1.58;
+  /* Sobre papel hay margen de sobra para retirarla: la tinta al 78% todavía da
+     8.7:1. Eso es lo que hace que el nombre y las cifras lean como primer
+     plano; sobre el azul pleno del intento anterior no se podía bajar ni un
+     punto sin salirse de AA. El literal es sólo la red por si la variable no
+     llega, y por eso es el valor CONSERVADOR de los dos. */
+  color: inherit;
+  opacity: var(--matc-desc-op, 0.72);
+}
+
+/* LAS CIFRAS. Antes eran tres píldoras grises de 10px donde el número —que es
+   justamente lo que la sección vende: currículo oficial completo— pesaba lo
+   mismo que la palabra de al lado. Aquí el número es titular de 30px en azul
+   CEN y el rótulo su pie en versalitas. Es el mismo dato, dicho como dato, y es
+   el sitio donde el azul de marca entra como TINTA: sobre papel da 5.17:1, y a
+   30px negros pesa lo mismo pero no dice de quién es la plataforma.
+   El filo de arriba separa registro de descripción y registro de cifras sin
+   meter una caja. `flex-wrap` porque Primaria trae tres cifras y sus rótulos
+   son largos. */
+.matc-cifras {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  gap: 10px 28px;
+  /* reserva la banda aunque el rótulo quepa en un renglón, por lo mismo que la
+     descripción reserva sus 4 líneas: los seis paneles tienen que arrancar a la
+     misma altura */
+  min-height: 54px;
+  margin-bottom: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--matc-linea);
+}
+.matc-cifra {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.matc-cifra-num {
   font-family: var(--font-epilogue), sans-serif;
+  font-size: 30px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--matc-realce);
+}
+.matc-cifra-lbl {
+  font-family: var(--font-epilogue), sans-serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  line-height: 1.3;
+  text-transform: uppercase;
+  /* Texto de servicio: va con el token compartido, no con un número suelto.
+     Aquí es donde una ficha clara castiga más que una oscura —a 9.5px en
+     versalitas la tinta al 58% sobre papel se cae de AA—, así que el valor real
+     lo decide `--matc-sec-op` según el fondo. */
+  opacity: var(--matc-sec-op, 0.72);
+}
+
+/* EL PANEL: el desglose real de la plataforma. Ya no es una caja dentro de la
+   ficha —era una losa con contorno de luz sobre otra losa de color— sino un
+   registro más, abierto, separado por el mismo filo de un cabello que separa
+   las cifras. Sobre papel el dato no necesita caja para leerse como zona
+   propia; le basta el filo y el aire (una caja dentro de una hoja blanca sólo
+   dibuja un formulario).
+   Altura flexible (`flex:1` + `min-height:0`) con scroll interno en la lista,
+   porque si la ficha cambiara de tamaño al alternar grupos↔materias,
+   `scroll-snap` reajustaría la pista de un salto. */
+.matc-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  gap: 12px;
+  min-height: 0;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--matc-linea);
+  color: inherit;
+}
+.matc-panel-label {
+  flex: none;
+  font-family: var(--font-epilogue), sans-serif;
+  font-size: 10px;
   font-weight: 800;
-  font-size: clamp(10px, 0.95vw, 12px);
-  letter-spacing: -0.01em;
-  color: #ffffff;
-  text-align: center;
-  line-height: 1.12;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
-  /* como máximo 2 líneas dentro de la banda central del rombo */
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  /* Retirado, pero no tanto como sobre tinta oscura: es el rótulo que dice qué
+     se está listando, no un titular. Aquí estaba el defecto más fácil de dejar
+     pasar al aclarar la ficha —la tinta al 55%, que sobre azul-negro daba ~7:1,
+     sobre blanco cae a 3.9:1 y se sale de AA a 10px—. Por eso el valor sale de
+     `--matc-sec-op` y no de un número escrito aquí: lo decide el fondo. */
+  opacity: var(--matc-sec-op, 0.72);
+}
+
+.matc-lista {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  /* El sobrante se reparte entre las filas, no se queda al fondo. Sólo actúa
+     en las fichas de pocos grupos, que son las únicas donde las filas topan
+     su alto máximo y sobra hueco; en las densas no hay sobrante que repartir
+     y el `gap` se queda en los 5px. */
+  justify-content: space-between;
+  gap: 3px;
+  min-height: 0;
+  margin: 0;
+  /* Los 16px de abajo son la contraparte de la máscara: cuando la lista NO
+     desborda, el desvanecido cae sobre este aire y la última fila se lee
+     entera; cuando sí desborda, al llegar al final del scroll este aire vuelve
+     a quedar debajo del desvanecido y la última fila también se lee entera.
+     El desvanecido sólo muerde texto en el trayecto, que es cuando debe. */
+  padding: 0 2px 16px 0;
+  overflow-y: auto;
+  /* Sin esto la fila que queda a medio salir del recorte se corta a filo
+     seco por la mitad de las letras y se lee como defecto, no como "hay
+     más abajo". El degradado convierte el corte en una señal de scroll. */
+  -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 16px), transparent 100%);
+  mask-image: linear-gradient(180deg, #000 calc(100% - 16px), transparent 100%);
+  /* deliberadamente SIN `overscroll-behavior-y: contain`: en móvil la ficha
+     ocupa casi toda la pantalla, así que casi todo deslizamiento vertical cae
+     sobre la lista; conteniéndolo, al llegar al final el gesto no encadenaba
+     con la página y el usuario quedaba atrapado en la tarjeta. */
+  list-style: none;
+  scrollbar-width: thin;
+  scrollbar-color: var(--matc-velo) transparent;
+}
+/* Filas sin caja. Antes cada fila era una cápsula con fondo y contorno: nueve
+   cajitas apiladas dentro de otra caja dentro de la ficha, tres niveles de
+   marco para decir cuatro palabras. Ahora sólo hay un filo entre fila y fila
+   —el mismo cabello que separa los registros— y el peso lo lleva el texto.
+   Las filas se reparten el alto sobrante en vez de amontonarse arriba: las seis
+   fichas comparten altura pero traen de 4 a 9 grupos. El `min-height` sostiene
+   el caso contrario —las 40 materias de Labs desglosadas— para que no se
+   aplasten y la lista scrollee. */
+.matc-item {
+  display: flex;
+  align-items: center;
+  /* Crece para repartir el sobrante del panel, pero NO encoge (el `0`). Con
+     `1 1 auto` las filas de dos renglones —las de línea de detalle, y en móvil
+     también los nombres largos como "Ciencias Naturales, Experimentales y
+     Tecnología"— se comprimían por debajo de su propio contenido y el texto se
+     salía encima de la fila de abajo. Sin encogimiento, cuando ya no caben la
+     lista scrollea, que es exactamente el escape que se diseñó. */
+  flex: 1 0 auto;
+  gap: 11px;
+  /* Los ~277px útiles de lista tienen que dar para las 9 filas de Financiera
+     —la ficha más densa que no scrollea— sin scroll: 9×26 + 8×3 = 258. */
+  min-height: 26px;
+  /* Y el tope, para el caso contrario: las cuatro fichas de 4 grupos llevan
+     segundo renglón (`.matc-item-detalle`, ~56px de contenido real) y sin tope
+     se estirarían a 66px cada una dejando aire con borde. 4×64 + 9 = 265, justo
+     dentro. El sobrante lo absorbe el `space-between` de la lista como aire
+     entre filas, que sin cajas se lee como respiración y no como hueco. */
+  max-height: 64px;
+  padding: 4px 2px;
+  font-size: 12.5px;
+  line-height: 1.3;
+  transition: transform 0.24s var(--ease-standard, ease), background 0.24s ease;
+}
+.matc-item + .matc-item {
+  border-top: 1px solid var(--matc-linea);
+}
+@media (hover: hover) {
+  .matc-item:hover {
+    transform: translateX(3px);
+    background: color-mix(in srgb, var(--matc-realce) 8%, transparent);
+  }
+}
+/* Aquí es donde el papel paga. El punto lleva el hex real del área (`Grupo.hex`)
+   y sobre blanco lee su tono exacto: el celeste de Biología es ese celeste, no
+   una versión teñida por el fondo. Sobre el azul pleno del primer intento eso
+   era imposible —el celeste desaparecía dentro del celeste de la ficha— y el
+   punto necesitaba un anillo blanco que lo recortara del fondo.
+   El halo sí depende del fondo: sobre azul-negro encendía el punto como un LED,
+   pero sobre papel el mismo halo se lee como tinta corrida, así que en claro se
+   apaga por `--matc-punto-brillo` y al punto le basta su anillo al 15%.
+   El hex llega por `--matc-punto`, inline en cada `<li>`, porque `box-shadow`
+   no puede leer el `background-color` del propio elemento. */
+.matc-item-punto {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--matc-punto);
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--matc-punto) 15%, transparent),
+    0 0 12px 0 color-mix(in srgb, var(--matc-punto) var(--matc-punto-brillo, 55%), transparent);
+}
+.matc-item-txt {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+}
+.matc-item-nombre {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+/* Segundo renglón con las materias reales del grupo. Es lo que le faltaba a
+   las fichas de 4 grupos: repartían el panel en cuatro cajas con un renglón
+   corto en medio, o sea aire con borde, mientras Bachillerato llenaba el suyo
+   con ocho filas de contenido. Las densas (Bachillerato 8, Financiera 9) no lo
+   llevan —ahí no sobra alto y la lista se volvería un muro—; la decisión se
+   toma en el componente, ver `MAX_GRUPOS_CON_DETALLE`.
+   Recortado a dos líneas: los grupos de Preescolar traen hasta 9 materias y
+   sin tope una sola fila se comería el panel. */
+.matc-item-detalle {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  font-size: 10.5px;
+  line-height: 1.35;
+  /* El segundo renglón se retira de verdad por debajo del nombre del grupo en
+     vez de competir con él, pero cuánto lo decide el fondo y no este número:
+     a 10.5px el margen es corto y sobre papel se agota antes. Va con el mismo
+     token que el resto del texto de servicio. */
+  opacity: var(--matc-sec-op, 0.72);
+}
+/* El contador, desnudo. Antes iba en cápsula gris porque flotando contra el
+   borde de una fila de 84px se leía como resto de maquetación; ahora la fila no
+   tiene fondo y el número puede ser lo que es: una cifra en azul CEN, en la
+   misma familia monoespaciada que usa el resto de la plataforma para datos.
+   Va a fuerza plena y sin `opacity` a propósito: el azul sobre papel da 5.17:1,
+   que a 11px es justo lo que hace falta, y bajarlo al 85% —como estaba cuando
+   la ficha era oscura y sobraba margen— lo deja en 3.97:1, fuera de AA. */
+.matc-item-cuenta {
+  flex: none;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--matc-realce);
 }
 
-/* ── Densidad — plataformas con más de 8 materias achican el rombo base
-   para que 12-40 tiles quepan como muro denso, no disperso. ── */
-.rombo-grid--md { --rombo-w: clamp(104px, 10vw, 172px); }
-.rombo-grid--sm { --rombo-w: clamp(86px, 8.4vw, 138px); }
-.rombo-grid--xs { --rombo-w: clamp(72px, 6.8vw, 110px); }
-
-.rombo-grid--md .rombo-label { font-size: clamp(9px, 0.9vw, 11px); }
-.rombo-grid--sm .rombo-label,
-.rombo-grid--xs .rombo-label { font-size: clamp(7px, 0.75vw, 9px); letter-spacing: -0.005em; }
-
-.rombo-grid--md .rombo-icon { font-size: clamp(14px, 1.5vw, 20px); }
-.rombo-grid--sm .rombo-icon,
-.rombo-grid--xs .rombo-icon { font-size: clamp(11px, 1.2vw, 15px); }
-
-/* ── Panel de detalle (materia activa) ── */
-.materias-detail {
-  position: relative;
-  background: #fff;
-  border-radius: 24px;
-  padding: 36px 32px;
-  width: 100%;
-  box-shadow: 0 24px 48px -22px rgba(11,37,69,0.20);
-  border: 1px solid rgba(11,37,69,0.06);
-  overflow: hidden;
-}
-.materias-detail::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, var(--hex-accent), rgba(var(--hex-rgba), 0.4));
-}
-.materias-detail-icon {
+.landing-cen .matc-cta {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: 52px;
-  height: 52px;
-  border-radius: 16px;
-  background: linear-gradient(155deg, var(--hex-accent) 0%, color-mix(in srgb, var(--hex-accent) 65%, #0B2545 35%) 100%);
-  box-shadow: 0 10px 18px -8px rgba(var(--hex-rgba), 0.55);
-  color: #ffffff;
-  font-size: 22px;
-  margin-bottom: 18px;
-}
-.materias-detail-codigo {
-  display: block;
+  align-self: flex-start;
+  flex: none;
+  gap: 8px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 999px;
+  /* El único bloque saturado de la ficha fuera de la foto, y va aquí entero.
+     Ése es el truco de la hoja blanca: cuando el fondo no compite, una sola
+     pieza de color pleno se lee como LA acción, y de paso el azul CEN queda
+     donde la marca quiere que quede —en lo que se toca—. Cuando la ficha era un
+     rectángulo de azul pleno el botón tenía que ser blanco, y siendo blanco
+     sobre azul era la pieza más brillante de todas: pesaba más que el nombre de
+     la plataforma.
+     La tinta la calcula `tintaSobre()`: blanco sobre #2563EB da 5.17:1 (AA). */
+  background: var(--matc-accion);
+  color: var(--matc-accion-tinta);
   font-family: var(--font-epilogue), sans-serif;
-  font-size: 11px;
+  font-size: 12.5px;
   font-weight: 800;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--hex-accent);
-  margin-bottom: 8px;
+  letter-spacing: 0.005em;
+  text-align: left;
+  cursor: pointer;
+  /* la sombra la tiñe el propio azul y no gris: sobre papel una sombra neutra
+     deja cerco sucio bajo el botón, mientras que el halo de su propio color lo
+     despega de la hoja y parece luz del botón */
+  box-shadow: 0 10px 24px -12px rgba(37,99,235,0.95);
+  transition:
+    transform 0.22s var(--ease-standard, ease),
+    box-shadow 0.22s ease;
 }
-.materias-detail-nombre {
-  font-size: clamp(20px, 2vw, 26px);
-  font-weight: 900;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
-  color: var(--cen-navy);
-  margin: 0 0 14px;
-  text-wrap: balance;
+.landing-cen .matc-cta:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 16px 30px -12px rgba(37,99,235,1),
+    /* el anillo va en el propio azul: el celeste que llevaba cuando la ficha era
+       oscura, sobre papel, se lee como un borde descolorido alrededor del botón */
+    0 0 0 1px rgba(37,99,235,0.28);
 }
-.materias-detail-desc {
-  font-size: 15px;
-  line-height: 1.65;
-  color: rgba(11,37,69,0.68);
-  margin: 0;
+/* La flecha se separa de la palabra al pasar el cursor: es el gesto que
+   convierte el botón en "seguir hacia allá" sin escribir nada más. */
+.matc-cta-flecha {
+  transition: transform 0.22s var(--ease-emphasized, ease);
+}
+.landing-cen .matc-cta:hover .matc-cta-flecha {
+  transform: translateX(3px);
+}
+/* la flecha de vuelta (desglose abierto) se mueve al otro lado */
+.landing-cen .matc-cta:hover .fa-arrow-left.matc-cta-flecha {
+  transform: translateX(-3px);
+}
+.landing-cen .matc-cta:focus-visible {
+  outline: 3px solid var(--matc-tinta);
+  outline-offset: 3px;
+  border-radius: 999px;
+  box-shadow: none;
+}
+
+/* Puntos. El botón mide 26px aunque el punto se vea de 9: el área táctil
+   mínima son 24px (WCAG 2.5.8), y un blanco de 9px se falla con el dedo. */
+.matc-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+.landing-cen .matc-dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+.landing-cen .matc-dot::before {
+  content: '';
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: rgba(11,37,69,0.22);
+  transition: width 0.22s var(--ease-standard, ease), background 0.22s ease;
+}
+.landing-cen .matc-dot--activo {
+  width: 42px;
+}
+.landing-cen .matc-dot--activo::before {
+  width: 26px;
+  background: var(--cen-navy);
+}
+.landing-cen .matc-dot:focus-visible {
+  outline: 3px solid #0A1A2F;
+  outline-offset: 0;
+  border-radius: 999px;
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* el `behavior:'smooth'` que pasa el JS se consulta aparte, en el
+     componente; esto cubre el `scroll-behavior` declarado aquí */
+  .matc-track { scroll-behavior: auto; }
+  .landing-cen .matc-nav-btn,
+  .landing-cen .matc-cta,
+  .landing-cen .matc-dot::before,
+  .matc-card,
+  .matc-media-img,
+  .matc-card-icono,
+  .matc-item,
+  .matc-cta-flecha { transition: none; }
+  .landing-cen .matc-nav-btn:hover:not(:disabled),
+  .landing-cen .matc-cta:hover,
+  .matc-card:hover,
+  .matc-card:hover .matc-media-img,
+  .matc-card:hover .matc-card-icono,
+  .matc-item:hover,
+  .landing-cen .matc-cta:hover .matc-cta-flecha,
+  .landing-cen .matc-cta:hover .fa-arrow-left.matc-cta-flecha { transform: none; }
 }
 
 @media (max-width: 900px) {
-  .materias-content { grid-template-columns: 1fr; gap: 40px; }
-  .rombo-grid { justify-content: center; }
-  .materias-side { align-items: center; text-align: center; max-width: 480px; margin: 0 auto; }
-  .materias-heading { align-items: center; text-align: center; }
-  .materias-platform-list { max-width: 480px; }
-  .materias-detail { max-width: 480px; }
+  .matc-cab {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 26px;
+  }
+  .matc-nav { align-self: flex-end; }
 }
 @media (max-width: 640px) {
   .materias-section { padding: 72px 20px; }
   .materias-heading { gap: 12px; }
-  .materias-platform-list { flex-direction: row; flex-wrap: wrap; justify-content: center; }
-  .materias-platform-card { width: auto; padding: 8px 12px; }
-  .materias-platform-label { font-size: 12px; }
+  /* en móvil se desliza con el dedo: sobran las flechas, quedan los puntos */
+  .matc-nav { display: none; }
+  /* Altura acotada: sin tope, la ficha de Bachillerato (8 áreas) crecía a
+     ~830px y no cabía entera en la pantalla. Con el tope la lista scrollea
+     por dentro y la ficha se ve completa de un vistazo. */
+  .matc-card {
+    flex-basis: min(420px, 90vw);
+    height: min(700px, 88vh);
+    min-height: 470px;
+  }
+  /* La foto ya no lleva márgenes negativos: la ficha no tiene padding, sangra
+     sola y el `overflow: hidden` de la ficha le recorta las esquinas. */
+  /* 140 y no 168: en 686px de alto la foto es lo único que puede ceder sin
+     perder información —sigue siendo banda ancha suficiente para leerse como
+     fotografía—, y lo que suelta son filas de lista que el alumno ve sin
+     scrollear. Junto con los 8px que ceden el pie de la descripción y la banda
+     de cifras suman los 20px que le faltaban a la ficha de Bachillerato para
+     mostrar sus 8 áreas enteras: medida a 360×780 la lista pedía 270px y tenía
+     254. Sobre papel el corte se nota más que sobre la ficha oscura —el
+     desvanecido inferior muere en blanco, no en tinta—, así que media fila
+     asomando se lee como defecto y no como "hay más abajo". */
+  .matc-media { height: 140px; }
+  .matc-portada-txt {
+    gap: 7px;
+    padding: 0 18px 15px;
+  }
+  .matc-nivel { font-size: 9.5px; }
+  .matc-card-titulo { font-size: 25px; }
+  .matc-card-icono {
+    top: 12px;
+    left: 12px;
+    width: 38px;
+    height: 38px;
+    border-radius: 13px;
+    font-size: 14px;
+  }
+  .matc-cuerpo { padding: 18px; }
+  /* tres líneas en vez de cuatro: en 700px de alto cada línea que le quito a la
+     descripción es una fila más de lista que se ve sin scrollear */
+  .matc-card-desc {
+    -webkit-line-clamp: 3;
+    margin-bottom: 12px;
+    height: calc(1.58em * 3);
+    font-size: 13px;
+  }
+  .matc-cifras {
+    gap: 8px 22px;
+    /* El mínimo sólo existe para que las fichas de una sola cifra no encojan la
+       banda respecto a las de dos; 40px ya es el alto real de una cifra de 26px
+       con su rótulo, así que bajarlo no aprieta nada, sólo deja de reservar
+       aire que en móvil vale más como fila de lista. */
+    min-height: 40px;
+    margin-bottom: 14px;
+    padding-top: 8px;
+  }
+  .matc-cifra-num { font-size: 26px; }
+  /* El desvanecido baja de 16 a 10px: sigue leyéndose como "hay más abajo" en
+     las listas que sí scrollean (las 32 materias del desglose), y devuelve los
+     6px que le faltaban al segundo renglón de "Ciencias Naturales,
+     Experimentales y Tecnología" para no salir atenuado en la ficha de
+     Bachillerato, que es la única que queda justo en el filo. */
+  .matc-lista {
+    padding-bottom: 10px;
+    -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 10px), transparent 100%);
+    mask-image: linear-gradient(180deg, #000 calc(100% - 10px), transparent 100%);
+  }
 }

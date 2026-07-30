@@ -74,7 +74,12 @@ declare global {
 // `uac:X:progtree` se filtran por RLS `estado='publicada'`, así que toda clave
 // cacheada antes de esa publicación lista el catálogo VIEJO y omitiría el
 // contenido nuevo hasta 12 h (TREE) / 24 h (CONTENT). El bump las invalida de golpe.
-const CATALOG_CACHE_VERSION = "v2";
+// v2 → v3 (2026-07-26): se renombraron 208 actividades de video de `-VID01` a
+// `-A{n}` (scripts/renombrar-codigos-video.ts) porque el `orden` de la RUTA se
+// deriva del sufijo `-A{n}` del código y las filas `-VID01` no eran alcanzables.
+// Los árboles cacheados guardan el `codigo`, así que sin este bump seguirían
+// sirviendo los códigos viejos —y los enlaces rotos— hasta 12 h.
+const CATALOG_CACHE_VERSION = "v3";
 const PREFIX = `__catalog__:${CATALOG_CACHE_VERSION}:`;
 
 /** TTLs sugeridos (segundos). El catálogo cambia solo al desplegar; el TTL es la red de seguridad. */

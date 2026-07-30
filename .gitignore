@@ -58,5 +58,10 @@ _diagnostico-*.log
 # inspección temporal de paquetes (no commitear)
 tmp-inspect/
 
+# salidas generadas por los scripts (reportes, volcados) — se regeneran, no son fuente
+scripts/out/
+# consultas de un solo uso (no commitear)
+scripts/tmp-*
+
 # Material fuente oficial 2025 (PDFs grandes) — solo local, no se despliega
 docs/fuentes-oficiales-2025/
