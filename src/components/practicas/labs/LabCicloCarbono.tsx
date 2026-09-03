@@ -52,7 +52,7 @@ const AZUL = "#38bdf8";
 const ROJO = "#ef4444";
 const NARANJA = "#f59e0b";
 const WARN = "#FF8A3C";
-import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
+import { useEstrellas } from "@/lib/hooks/useEstrellas";
 const RETO_KEY = "cen-carbono-reto";
 
 /** Instrumentos para medir el carbono (3 correctos + 3 distractores). */
@@ -85,14 +85,7 @@ export function LabCicloCarbono({ color }: PracticaLabProps) {
   const [predicho, setPredicho] = useState(false); // resolvió el cálculo del carbono al aire
 
   // récord de estrellas del reto de cálculo (persistido)
-  const [mejorEstrellas, setMejorEstrellas] = useState<number>(() => {
-    if (typeof window === "undefined") return 0;
-    try {
-      return Number(window.localStorage.getItem(RETO_KEY)) || 0;
-    } catch {
-      return 0;
-    }
-  });
+  const { mejorEstrellas, registraEstrellas: guardaEstrellas } = useEstrellas(RETO_KEY);
 
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
   const [drawer, setDrawer] = useState(false);
@@ -140,13 +133,8 @@ export function LabCicloCarbono({ color }: PracticaLabProps) {
 
   const registraEstrellas = useCallback((est: number) => {
     setPredicho(true);
-    setMejorEstrellas((prev) => {
-      const mejor = Math.max(prev, est);
-      try { window.localStorage.setItem(RETO_KEY, String(mejor)); } catch { /* ignore */ }
-      return mejor;
-    });
-    void guardarEstrellas(RETO_KEY, est);
-  }, []);
+    guardaEstrellas(est);
+  }, [guardaEstrellas]);
 
   const acum = useMemo(() => acumAtm(emisiones), [emisiones]);
   const abs = useMemo(() => absorbido(emisiones), [emisiones]);

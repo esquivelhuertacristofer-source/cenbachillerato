@@ -4,8 +4,8 @@
  * Laboratorio — Diversidad cultural, organización social y discriminación
  * Práctica experimental para CS-II-P02-A4 (Ciencias Sociales II).
  *
- * Interactividad máxima: el alumno EXPERIMENTA arrastrando. Tres modos, tres
- * interacciones distintas:
+ * Interactividad máxima. Cuatro modos: los tres de arrastrar/clasificar y, al
+ * final, uno que se escribe («Completa el texto», verbatim de la progresión):
  *  1. «¿Organización social o discriminación?» — clasifica nueve tarjetas entre
  *     las formas de organización social (familia, comunidad, clases, sociedad
  *     civil, movimientos) y las manifestaciones de la discriminación
@@ -13,8 +13,8 @@
  *  2. «Empareja concepto e idea» — arrastra cada concepto clave (OSC,
  *     movimiento social, tequio, capital social, movimiento sindical) a la idea
  *     que lo define, según las retroalimentaciones de A2.
- *  3. «Empareja término y definición» — arrastra cada concepto del glosario a su
- *     definición verbatim (A5).
+ *  3. «Escribe el término» — lee la definición verbatim (A5) y escribe
+ *     de memoria el término del glosario que la nombra.
  *  + Cuestionario de comprensión (V/F verbatim de A4).
  *
  * DOM puro (sin three.js): ligero, accesible (ratón, teclado y táctil mediante
@@ -25,6 +25,12 @@ import { useEffect, useRef, useState } from "react";
 import type { PracticaLabProps } from "../registry";
 import { T, OK, card, Eyebrow } from "./_kit";
 import { LabSfx } from "./lab-audio";
+import { CompletaTexto } from "./_mecanica-huecos";
+import { EscribeTermino } from "./_mecanica-termino";
+import { DIVERSIDAD_DISCRIMINACION_HUECOS } from "./diversidad-discriminacion-huecos";
+import { usePartida, MarcadorPartida } from "./_partida";
+import { FichaTeorica } from "./_ficha";
+import { DIVERSIDAD_DISCRIMINACION_FICHA } from "./diversidad-discriminacion-ficha";
 import {
   TARJETAS,
   CATEGORIA_INFO,
@@ -36,15 +42,16 @@ import {
 } from "./diversidad-discriminacion-data";
 
 const NO = "#FF5E5E";
-import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
+import { useEstrellas } from "@/lib/hooks/useEstrellas";
 const RETO_KEY = "cen-diversidad-discriminacion-reto";
 
-type Modo = "clasificar" | "conceptos" | "glosario";
+type Modo = "clasificar" | "conceptos" | "glosario" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
   { id: "clasificar", label: "¿Organización o discriminación?", icono: "fa-layer-group" },
   { id: "conceptos", label: "Empareja concepto e idea", icono: "fa-link" },
-  { id: "glosario", label: "Empareja término y definición", icono: "fa-book-open" },
+  { id: "glosario", label: "Escribe el término", icono: "fa-keyboard" },
+  { id: "texto", label: "Completa el texto", icono: "fa-pen-to-square" },
 ];
 
 export function LabDiversidadDiscriminacion({ color }: PracticaLabProps) {
@@ -52,7 +59,13 @@ export function LabDiversidadDiscriminacion({ color }: PracticaLabProps) {
   const [modo, setModo] = useState<Modo>("clasificar");
 
   // ── sonido ────────────────────────────────────────────────────────────
+  const partida = usePartida();
   const [sonido, setSonido] = useState(false);
+  const [drawer, setDrawer] = useState(false);
+  // Modo «Completa el texto». El contador sirve de `key`: subirlo remonta
+  // el componente y devuelve todos los huecos en blanco.
+  const [textoDone, setTextoDone] = useState(false);
+  const [textoIntento, setTextoIntento] = useState(0);
   const audioRef = useRef<LabSfx | null>(null);
   useEffect(() => () => audioRef.current?.dispose(), []);
   const toggleSonido = async () => {
@@ -65,9 +78,18 @@ export function LabDiversidadDiscriminacion({ color }: PracticaLabProps) {
       setSonido(false);
     }
   };
+  // Los tres ayudantes son el único punto por el que pasan todos los aciertos
+  // y todos los fallos del laboratorio, así que la partida se lleva aquí.
+  // `sfxOk` no cuenta: marca el fin de un modo, no una respuesta suelta.
   const sfxOk = () => sonido && audioRef.current?.correcto();
-  const sfxNo = () => sonido && audioRef.current?.incorrecto();
-  const sfxPlace = () => sonido && audioRef.current?.blip();
+  const sfxNo = () => {
+    partida.error();
+    return sonido && audioRef.current?.incorrecto();
+  };
+  const sfxPlace = () => {
+    partida.acierto();
+    return sonido && audioRef.current?.blip();
+  };
 
   // ── modo clasificar (organización / discriminación) ─────────────────────
   const [ubicTarj, setUbicTarj] = useState<Record<string, Categoria>>({});
@@ -124,31 +146,14 @@ export function LabDiversidadDiscriminacion({ color }: PracticaLabProps) {
     setSelCon(null);
   };
 
-  // ── modo glosario (empareja término → definición) ──────────────────────
-  const [empGlos, setEmpGlos] = useState<Record<string, boolean>>({});
-  const [selGlos, setSelGlos] = useState<string | null>(null);
-  const [shakeGlos, setShakeGlos] = useState<string | null>(null);
-  const glosLibres = PARES.filter((g) => !empGlos[g.id]).slice().sort((a, b) => a.termino.localeCompare(b.termino, "es"));
-
-  const intentarGlos = (chipId: string, rowId: string) => {
-    if (empGlos[rowId]) return;
-    if (chipId === rowId) {
-      setEmpGlos((e) => ({ ...e, [rowId]: true }));
-      setSelGlos(null);
-      sfxPlace();
-      if (Object.keys(empGlos).length + 1 >= PARES.length) {
-        sfxOk();
-        persistMejor(clasificarDone, conceptosDone, true);
-      }
-    } else {
-      setShakeGlos(rowId);
-      sfxNo();
-      window.setTimeout(() => setShakeGlos(null), 420);
-    }
-  };
+  // ── modo glosario (lee la definición y ESCRIBE el término) ─────────────
+  // El contador hace de `key`: subirlo remonta el componente y deja todas
+  // las tarjetas en blanco.
+  const [glosarioDone, setGlosarioDone] = useState(false);
+  const [glosIntento, setGlosIntento] = useState(0);
   const resetGlosario = () => {
-    setEmpGlos({});
-    setSelGlos(null);
+    setGlosarioDone(false);
+    setGlosIntento((n) => n + 1);
   };
 
   const [quizAprobado, setQuizAprobado] = useState(false);
@@ -156,37 +161,22 @@ export function LabDiversidadDiscriminacion({ color }: PracticaLabProps) {
   // ── progreso / estrellas ──────────────────────────────────────────────
   const clasificarDone = Object.keys(ubicTarj).length >= TARJETAS.length;
   const conceptosDone = Object.keys(empCon).length >= CONCEPTOS.length;
-  const glosarioDone = Object.keys(empGlos).length >= PARES.length;
-  const estrellas = (clasificarDone ? 1 : 0) + (conceptosDone ? 1 : 0) + (glosarioDone ? 1 : 0);
+  const modosHechos = (clasificarDone ? 1 : 0) + (conceptosDone ? 1 : 0) + (glosarioDone ? 1 : 0) + (textoDone ? 1 : 0);
+  // Terminar los 3 modos vale 2★; la tercera se gana con precisión.
+  const estrellas = partida.estrellasCon(modosHechos, 4);
 
-  const [mejor, setMejor] = useState<number>(() => {
-    if (typeof window === "undefined") return 0;
-    try {
-      return Number(window.localStorage.getItem(RETO_KEY)) || 0;
-    } catch {
-      return 0;
-    }
-  });
+  const { mejorEstrellas: mejor, registraEstrellas } = useEstrellas(RETO_KEY);
   const bestEstrellas = Math.max(estrellas, mejor);
 
   const persistMejor = (a: boolean, b: boolean, c: boolean) => {
     const est = (a ? 1 : 0) + (b ? 1 : 0) + (c ? 1 : 0);
-    setMejor((m) => {
-      if (est <= m) return m;
-      try {
-        window.localStorage.setItem(RETO_KEY, String(est));
-      } catch {
-        /* localStorage no disponible */
-      }
-      return est;
-    });
-    void guardarEstrellas(RETO_KEY, est);
+    registraEstrellas(est);
   };
 
   const objetivos = [
     { txt: "Clasifica las 9 tarjetas (organización / discriminación)", done: clasificarDone },
     { txt: "Empareja los 5 conceptos con su idea", done: conceptosDone },
-    { txt: "Empareja los 5 términos del glosario", done: glosarioDone },
+    { txt: "Escribe los 5 términos del glosario", done: glosarioDone },
     { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];
@@ -219,7 +209,11 @@ export function LabDiversidadDiscriminacion({ color }: PracticaLabProps) {
     },
   });
 
-  const resetActual = modo === "clasificar" ? resetClasificar : modo === "conceptos" ? resetConceptos : resetGlosario;
+  const resetTexto = () => {
+    setTextoDone(false);
+    setTextoIntento((n) => n + 1);
+  };
+  const resetActual = modo === "texto" ? resetTexto : modo === "clasificar" ? resetClasificar : modo === "conceptos" ? resetConceptos : resetGlosario;
 
   return (
     <div style={{ color: T.text }}>
@@ -256,6 +250,47 @@ export function LabDiversidadDiscriminacion({ color }: PracticaLabProps) {
         .dd-btn:hover { border-color:${T.lineStrong}; }
         .dd-divider { height:1px; background:${T.line}; margin:18px 0; }
         @media (prefers-reduced-motion: reduce){ .dd-row[data-shake="true"], .dd-bin[data-shake="true"] { animation:none; } }
+
+        /* Cajón de teoría */
+        .dd-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
+          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
+        .dd-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
+        .dd-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
+          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
+          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
+          display:flex; flex-direction:column; }
+        .dd-drawer[data-open="true"] { transform:translateX(0); }
+        .dd-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
+          padding:18px 20px; border-bottom:1px solid ${T.line}; }
+        .dd-drawer-body { overflow-y:auto; padding:20px; flex:1; }
+        .dd-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
+          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+        .dd-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
+        .dd-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
+          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
+          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
+        .dd-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
+        @media (max-width: 640px){ .dd-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
+
+        /* Identidad del tablero */
+        .dd-bin, .dd-row { --tono:188; position:relative;
+          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
+        .dd-bin:nth-of-type(6n+1), .dd-row:nth-of-type(6n+1) { --tono:188; }
+        .dd-bin:nth-of-type(6n+2), .dd-row:nth-of-type(6n+2) { --tono:262; }
+        .dd-bin:nth-of-type(6n+3), .dd-row:nth-of-type(6n+3) { --tono:44; }
+        .dd-bin:nth-of-type(6n+4), .dd-row:nth-of-type(6n+4) { --tono:152; }
+        .dd-bin:nth-of-type(6n+5), .dd-row:nth-of-type(6n+5) { --tono:330; }
+        .dd-bin:nth-of-type(6n+6), .dd-row:nth-of-type(6n+6) { --tono:18; }
+        .dd-bin::before, .dd-row::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
+          background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
+        .dd-bin[data-done="true"], .dd-row[data-done="true"] {
+          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.2) 0%, transparent 68%); }
+        .dd-chip { transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
+        .dd-chip:hover { transform:translateY(-2px); }
+        .dd-chip[data-sel="true"] { transform:translateY(-3px) scale(1.02); }
+        @media (prefers-reduced-motion: reduce){
+          .dd-chip, .dd-chip:hover, .dd-chip[data-sel="true"] { transform:none; transition:none; }
+        }
       `}</style>
 
       {/* selector de modo + toolbar */}
@@ -267,6 +302,10 @@ export function LabDiversidadDiscriminacion({ color }: PracticaLabProps) {
           </button>
         ))}
         <div style={{ flex: 1 }} />
+        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+        <button className="dd-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
+          <i className="fa-solid fa-book-open" />
+        </button>
         <button className="dd-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
           <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
         </button>
@@ -275,10 +314,48 @@ export function LabDiversidadDiscriminacion({ color }: PracticaLabProps) {
         </button>
       </div>
 
+      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
+      <button className="dd-teoria-fab" onClick={() => setDrawer(true)}>
+        <i className="fa-solid fa-book-open" />
+        Teoría
+      </button>
+      <div className="dd-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
+      <aside className="dd-drawer" data-open={drawer} aria-hidden={!drawer}>
+        <div className="dd-drawer-head">
+          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
+            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
+          </div>
+          <button className="dd-close" onClick={() => setDrawer(false)} title="Cerrar">
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
+        <div className="dd-drawer-body">
+          <FichaTeorica data={DIVERSIDAD_DISCRIMINACION_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+        </div>
+      </aside>
+
       <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}>
         {/* ── Columna principal ─────────────────────────────────────────── */}
         <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
           {/* MODO 1 — clasificar */}
+          {/* MODO — completa el texto (fill_blanks verbatim de la progresión) */}
+          {modo === "texto" && (
+            <CompletaTexto
+              key={textoIntento}
+              data={DIVERSIDAD_DISCRIMINACION_HUECOS}
+              accent={accent}
+              rgba={color.rgba}
+              completado={textoDone}
+              onCompletado={() => {
+                setTextoDone(true);
+                sfxOk();
+              }}
+              onAcierto={sfxPlace}
+              onError={sfxNo}
+            />
+          )}
+
           {modo === "clasificar" && (
             <>
               <div style={{ ...card, padding: "18px 22px" }}>
@@ -339,32 +416,21 @@ export function LabDiversidadDiscriminacion({ color }: PracticaLabProps) {
 
           {/* MODO 3 — glosario */}
           {modo === "glosario" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada término a su definición</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: glosarioDone ? OK : T.text3 }}>
-                    {Object.keys(empGlos).length}/{PARES.length}
-                  </span>
-                </div>
-                {glosLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Emparejaste los {PARES.length} términos!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {glosLibres.map((g) => (
-                      <button key={g.id} className="dd-chip" data-sel={selGlos === g.id} onClick={() => setSelGlos((v) => (v === g.id ? null : g.id))} {...dragProps(g.id)}>
-                        <i className="fa-solid fa-tag" style={{ fontSize: 11, color: T.text3 }} />
-                        {g.termino}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <RowsGlosario selGlos={selGlos} shakeGlos={shakeGlos} empGlos={empGlos} onMatch={intentarGlos} dropProps={dropProps} />
-            </>
+            <EscribeTermino
+              key={glosIntento}
+              pares={PARES}
+              accent={accent}
+              rgba={color.rgba}
+              completado={glosarioDone}
+              instrucciones="Lee la definición y escribe el término del glosario que le corresponde."
+              onCompletado={() => {
+                setGlosarioDone(true);
+                sfxOk();
+                persistMejor(clasificarDone, conceptosDone, true);
+              }}
+              onAcierto={sfxPlace}
+              onError={sfxNo}
+            />
           )}
         </div>
 
@@ -397,7 +463,7 @@ export function LabDiversidadDiscriminacion({ color }: PracticaLabProps) {
               </div>
               <div style={{ textAlign: "right", maxWidth: 180 }}>
                 <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45 }}>
-                  {bestEstrellas >= 3 ? "¡Distingues organización social de discriminación con claridad!" : "Completa los tres modos para ganar las estrellas."}
+                  {bestEstrellas >= 3 ? "¡Distingues organización social de discriminación con claridad!" : "Termina los tres modos para ganar 2★; la tercera pide 2 errores o menos."}
                 </div>
               </div>
             </div>
@@ -414,7 +480,7 @@ export function LabDiversidadDiscriminacion({ color }: PracticaLabProps) {
                 <>Las <strong style={{ color: T.text }}>OSC</strong> son organizaciones formales y registradas; los <strong style={{ color: T.text }}>movimientos sociales</strong> son acciones colectivas más flexibles.</>
               )}
               {modo === "glosario" && (
-                <>Lee primero la definición y su ejemplo; luego suelta el término que le corresponde.</>
+                <>Ya no se arrastra: lee la definición y su ejemplo y escribe el término. Si te atoras, la pista te da la inicial y las letras.</>
               )}
             </span>
           </div>
@@ -533,55 +599,6 @@ function RowsConceptos({
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 14, fontWeight: 700, color: done ? "#fff" : T.text2, lineHeight: 1.4 }}>{c.idea}</div>
               <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.4, marginTop: 3 }}>{c.ejemplo}</div>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function RowsGlosario({
-  selGlos,
-  shakeGlos,
-  empGlos,
-  onMatch,
-  dropProps,
-}: {
-  selGlos: string | null;
-  shakeGlos: string | null;
-  empGlos: Record<string, boolean>;
-  onMatch: (chipId: string, rowId: string) => void;
-  dropProps: DropFactory;
-}) {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-      {PARES.map((g) => {
-        const done = empGlos[g.id];
-        return (
-          <div
-            key={g.id}
-            className="dd-row"
-            data-shake={shakeGlos === g.id}
-            data-done={done}
-            onClick={() => !done && selGlos && onMatch(selGlos, g.id)}
-            {...dropProps((id) => onMatch(id, g.id))}
-          >
-            <div className="dd-slot" data-armed={!done && !!selGlos} style={done ? { borderStyle: "solid", borderColor: OK, background: `${OK}1a` } : undefined}>
-              {done ? (
-                <span style={{ animation: "ddPop .25s ease", fontSize: 13, fontWeight: 900, color: "#fff", display: "inline-flex", alignItems: "center", gap: 7 }}>
-                  <i className="fa-solid fa-tag" />
-                  {g.termino}
-                </span>
-              ) : (
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                  <i className="fa-solid fa-arrow-left" style={{ fontSize: 11 }} /> término
-                </span>
-              )}
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 13, color: done ? "#fff" : T.text2, lineHeight: 1.45 }}>{g.definicion}</div>
-              <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.4, marginTop: 3, fontStyle: "italic" }}>{g.ejemplo}</div>
             </div>
           </div>
         );

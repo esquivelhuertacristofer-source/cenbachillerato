@@ -1,9 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { ActividadInfografia, CallbackProgreso } from '@/types/activities';
 import type { AreaColor } from '@/components/hub/hub-colors';
-import { imagenDeLectura } from '@/lib/contenido/lectura-imagenes';
+import { LaminaInfografia } from '@/components/activities/LaminaInfografia';
+import {
+  useRegistrarNarracion,
+  useRegistrarSegmentosVoz,
+} from '@/components/activities/NarracionContext';
+import { segmentosDeInfografia } from '@/lib/voz/segmentos';
 
 const FALLBACK_COLOR: AreaColor = { hex: '#A78BFA', rgba: '167,139,250', faIcon: 'fa-circle-dot', gradient: '' };
 const FONT = 'var(--font-epilogue), sans-serif';
@@ -11,26 +16,46 @@ const FONT = 'var(--font-epilogue), sans-serif';
 interface Props {
   actividad: ActividadInfografia;
   onProgreso?: CallbackProgreso;
-  /** Código de la UAC, para elegir una imagen temática cuando no hay lámina propia. */
+  /**
+   * Código de la UAC. Ya no se usa para elegir imagen —la lámina se dibuja con
+   * los datos de la propia infografía—, pero se conserva en la firma porque
+   * `ActivityRunner` la pasa a todos los tipos por igual.
+   */
   uacCodigo?: string;
   color?: AreaColor;
 }
 
-export function InfografiaActivity({ actividad, onProgreso, uacCodigo, color = FALLBACK_COLOR }: Props) {
+export function InfografiaActivity({ actividad, onProgreso, color = FALLBACK_COLOR }: Props) {
   const { contenido } = actividad;
   const [respuesta, setRespuesta] = useState('');
   const [completado, setCompletado] = useState(false);
   const [glosarioAbierto, setGlosarioAbierto] = useState(false);
   const [imgError, setImgError] = useState(false);
-  const [imgTematicaError, setImgTematicaError] = useState(false);
 
   // Los SVG de placeholder ya no existen en disco; cualquier url que contenga
   // "placeholder" se trata como "sin lámina" para ir directo a la imagen temática
   // (evita una petición 404 y el ícono de imagen rota).
   const urlImagen = contenido.url_imagen ?? '';
   const tieneImagen = urlImagen.length > 0 && !/placeholder/i.test(urlImagen) && !imgError;
-  // Sin lámina propia → imagen temática con licencia libre acorde a la materia.
-  const imagenTematica = imagenDeLectura(uacCodigo, contenido.titulo);
+
+  /* LA INFOGRAFÍA TAMBIÉN SE ESCUCHA.
+     42 de las 240 progresiones no tienen lectura: su pieza expositiva es una
+     infografía o un video. Dejar la infografía sin narrar significaba que en esas
+     progresiones el alumno que depende del audio se quedaba sin el contenido
+     principal.
+     Los trozos se calculan con `segmentosDeInfografia` —la MISMA función que usó
+     el extractor— sobre el MISMO título y los MISMOS puntos clave, para que la
+     clave que se pide aquí sea la del MP3 que se grabó allá. */
+  const segmentosVoz = useMemo(
+    () => segmentosDeInfografia(contenido.titulo, contenido.puntos_clave),
+    [contenido.titulo, contenido.puntos_clave],
+  );
+  useRegistrarSegmentosVoz(segmentosVoz);
+  /* Respaldo para el narrador del navegador (las actividades sin grabación, o
+     un fallo de red al pedir el MP3): la misma prosa, en una sola cadena. */
+  useRegistrarNarracion(
+    useMemo(() => segmentosVoz.map((s) => s.texto).join('. '), [segmentosVoz]),
+  );
 
   const tieneContexto = Boolean(contenido.contexto_mexicano?.trim());
   const tieneGlosario = Array.isArray(contenido.glosario) && contenido.glosario.length > 0;
@@ -59,7 +84,10 @@ export function InfografiaActivity({ actividad, onProgreso, uacCodigo, color = F
   return (
     <div style={{ maxWidth: 672, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24, fontFamily: FONT }}>
 
-      {/* Imagen principal */}
+      {/* Lámina: la propia de la actividad si existe; si no, se DIBUJA con sus datos.
+          Una foto de stock encabezando una infografía de ciclos biogeoquímicos no
+          informa nada; la rejilla de puntos clave sí, y además se lee con lector
+          de pantalla y no puede dar 404. */}
       {tieneImagen ? (
         <div style={{ borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', overflow: 'hidden', background: 'rgba(255,255,255,0.04)' }}>
           <img
@@ -69,41 +97,13 @@ export function InfografiaActivity({ actividad, onProgreso, uacCodigo, color = F
             onError={() => setImgError(true)}
           />
         </div>
-      ) : !imgTematicaError ? (
-        <div style={{ borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', overflow: 'hidden', background: 'rgba(255,255,255,0.04)', position: 'relative' }}>
-          <img
-            src={imagenTematica}
-            alt={contenido.descripcion_accesible ?? contenido.titulo}
-            style={{ width: '100%', objectFit: 'cover', height: 224, display: 'block' }}
-            onError={() => setImgTematicaError(true)}
-          />
-          <div
-            style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(to top, rgba(1,17,38,0.55) 0%, rgba(1,17,38,0.10) 40%, transparent 70%)' }}
-          />
-          <p style={{ position: 'absolute', bottom: 12, left: 16, right: 16, margin: 0, fontSize: 12.5, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>
-            {contenido.titulo}
-          </p>
-        </div>
       ) : (
-        // Fallback honesto si tampoco hay imagen temática en disco: bloque temático sin <img> roto.
-        <div
-          style={{
-            borderRadius: 16,
-            border: `1px solid rgba(${color.rgba},0.25)`,
-            background: `linear-gradient(135deg, rgba(${color.rgba},0.14), rgba(${color.rgba},0.04))`,
-            height: 180,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 10,
-          }}
-        >
-          <i className="fa-solid fa-chart-pie" style={{ fontSize: 34, color: `rgba(${color.rgba},0.55)` }} />
-          <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.70)', textAlign: 'center', maxWidth: 320 }}>
-            {contenido.titulo}
-          </p>
-        </div>
+        <LaminaInfografia
+          titulo={contenido.titulo}
+          puntosClave={contenido.puntos_clave ?? []}
+          fuente={contenido.fuente}
+          color={color}
+        />
       )}
 
       {tieneImagen && contenido.fuente && (

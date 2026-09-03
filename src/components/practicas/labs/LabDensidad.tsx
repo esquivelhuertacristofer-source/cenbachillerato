@@ -22,6 +22,8 @@ import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, OK, NUM, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
 import { LabSfx } from "./lab-audio";
+import { useEstrellas } from "@/lib/hooks/useEstrellas";
+import { useLogros } from "./_partida";
 import { FichaTeorica } from "./_ficha";
 import { DENSIDAD_FICHA } from "./densidad-ficha";
 import { EJERCICIO_A6 } from "./densidad-data";
@@ -280,6 +282,8 @@ const ForceBalance = ({ weightN, buoyancyN, netN, veredictoCol }: { weightN: num
   );
 };
 
+const RETO_KEY = "cen-densidad-reto";
+
 export function LabDensidad({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
   const [liquidoKey, setLiquidoKey] = useState("agua");
@@ -353,6 +357,16 @@ export function LabDensidad({ color }: PracticaLabProps) {
     { txt: "Haz flotar un metal cambiando el líquido", done: !isCustom && (material?.metal ?? 0) > 0.5 && ratio < 1 },
     { txt: "Resuelve el ejercicio de cálculo de densidad", done: ejercicioAprobado },
   ];
+  // Los objetivos se recuerdan (algunos dependían del modo y se desmarcaban
+  // solos) y se convierten en la marca del laboratorio, que antes no se
+  // guardaba en ninguna parte.
+  const { logros: logrosLab, cumplidos: cumplidosLab, total: totalLab } = useLogros(objetivos.map((o) => o.done));
+  const { registraEstrellas } = useEstrellas(RETO_KEY);
+  useEffect(() => {
+    if (cumplidosLab === 0) return;
+    const est = cumplidosLab >= totalLab ? 3 : cumplidosLab >= Math.ceil((totalLab * 2) / 3) ? 2 : 1;
+    registraEstrellas(est);
+  }, [cumplidosLab, totalLab, registraEstrellas]);
 
   const grid2: React.CSSProperties = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 };
 
@@ -724,9 +738,9 @@ export function LabDensidad({ color }: PracticaLabProps) {
           </Eyebrow>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
             {objetivos.map((o, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? C_FLOTA : T.text2 }}>
-                <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-                <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: logrosLab[i] ? C_FLOTA : T.text2 }}>
+                <i className={`fa-solid ${logrosLab[i] ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: logrosLab[i] ? 1 : 0.3 }} />
+                <span style={{ fontWeight: logrosLab[i] ? 700 : 500 }}>{o.txt}</span>
               </div>
             ))}
           </div>

@@ -3,7 +3,9 @@
 import Link from "next/link";
 import type { AreaColor } from "@/components/hub/hub-colors";
 import { HubBreadcrumb } from "@/components/hub/HubBreadcrumb";
+import { mejorImagenDeLab } from "@/lib/practicas/lab-imagenes";
 import { getPractica } from "./registry";
+import { LabImagenProvider } from "./lab-imagen-context";
 
 interface PracticaRunnerProps {
   slug: string;
@@ -30,6 +32,10 @@ export function PracticaRunner({
   actividadTitulo,
 }: PracticaRunnerProps) {
   const practica = getPractica(slug);
+  const tituloPractica = practica?.titulo ?? actividadTitulo;
+  // Sólo tiene sentido si la práctica existe: sin componente no hay laboratorio
+  // del que enseñar una imagen.
+  const imagen = practica ? { src: mejorImagenDeLab(slug), alt: tituloPractica } : null;
 
   return (
     <>
@@ -40,6 +46,7 @@ export function PracticaRunner({
           .prac-nav { padding: 14px 20px !important; }
           .prac-body { padding: 28px 20px 80px !important; }
           .prac-title { font-size: 26px !important; }
+          .prac-cover { width: 86px !important; height: 66px !important; border-radius: 15px !important; }
         }
       `}</style>
 
@@ -110,12 +117,18 @@ export function PracticaRunner({
           {/* Hero content */}
           <div className="prac-hero" style={{ padding: "52px 48px 48px", maxWidth: 1560, margin: "0 auto" }}>
             <div style={{ display: "flex", alignItems: "flex-start", gap: 28 }}>
+              {/* Carátula del laboratorio. Antes había aquí un matraz idéntico
+                  para las 140 prácticas; la imagen propia dice de qué trata
+                  esta antes de leer el título. */}
               <div
+                className="prac-cover"
                 style={{
-                  width: 80,
-                  height: 80,
-                  borderRadius: 22,
+                  width: 128,
+                  height: 96,
+                  borderRadius: 20,
                   flexShrink: 0,
+                  overflow: "hidden",
+                  position: "relative",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -126,7 +139,32 @@ export function PracticaRunner({
                   boxShadow: `0 0 40px rgba(${color.rgba}, 0.12), inset 0 1px 0 rgba(255,255,255,0.06)`,
                 }}
               >
-                <i className="fa-solid fa-flask-vial" />
+                {imagen ? (
+                  <>
+                    <img
+                      src={imagen.src}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                    />
+                    <span
+                      aria-hidden="true"
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        background: `linear-gradient(160deg, transparent 35%, rgba(1,17,38,0.72) 100%)`,
+                      }}
+                    />
+                    <i
+                      className="fa-solid fa-flask-vial"
+                      aria-hidden="true"
+                      style={{ position: "absolute", right: 9, bottom: 7, fontSize: 14, color: "#fff", opacity: 0.9 }}
+                    />
+                  </>
+                ) : (
+                  <i className="fa-solid fa-flask-vial" />
+                )}
               </div>
 
               <div style={{ flex: 1, minWidth: 0 }}>
@@ -160,7 +198,7 @@ export function PracticaRunner({
                     margin: 0,
                   }}
                 >
-                  {practica?.titulo ?? actividadTitulo}
+                  {tituloPractica}
                 </h1>
                 {practica?.descripcion && (
                   <p style={{ fontSize: 14, color: "rgba(255,255,255,0.55)", margin: "12px 0 0", maxWidth: 640, lineHeight: 1.5 }}>
@@ -175,11 +213,13 @@ export function PracticaRunner({
         {/* ── BODY ──────────────────────────────────────────────────── */}
         <div className="prac-body" style={{ maxWidth: 1560, margin: "0 auto", padding: "44px 48px 100px" }}>
           {practica ? (
-            <practica.Component
-              color={color}
-              actividadCodigo={actividadCodigo}
-              actividadTitulo={actividadTitulo}
-            />
+            <LabImagenProvider valor={imagen}>
+              <practica.Component
+                color={color}
+                actividadCodigo={actividadCodigo}
+                actividadTitulo={actividadTitulo}
+              />
+            </LabImagenProvider>
           ) : (
             <div
               style={{

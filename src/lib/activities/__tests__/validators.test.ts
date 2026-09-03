@@ -174,6 +174,36 @@ describe('validarContenidoActividad', () => {
     expect(res.success).toBe(false);
   });
 
+  // ── infografia ───────────────────────────────────────────────────────────────
+  it('valida infografía SIN imagen: la lámina se dibuja con sus puntos clave', () => {
+    // El campo era obligatorio, y por eso 27 de 29 infografías apuntaban a un
+    // placeholder borrado. Una infografía completa no necesita imagen.
+    const res = validarContenidoActividad('infografia', {
+      titulo: 'Deterioro ambiental en México',
+      puntos_clave: ['México pierde unas 92,000 hectáreas de bosque al año.'],
+      fuente: 'CONAFOR, 2023',
+    });
+    expect(res.success).toBe(true);
+  });
+
+  it('sigue aceptando la infografía que sí tiene imagen', () => {
+    const res = validarContenidoActividad('infografia', {
+      titulo: 'Deterioro ambiental en México',
+      url_imagen: '/media/sem3/infografia/CNEYT-III-P06-A1.webp',
+    });
+    expect(res.success).toBe(true);
+  });
+
+  it('rechaza la infografía con url_imagen vacía', () => {
+    // Opcional no es lo mismo que "cualquier cosa": una cadena vacía sigue
+    // siendo un error de escritura, no una decisión de diseño.
+    const res = validarContenidoActividad('infografia', {
+      titulo: 'Deterioro ambiental en México',
+      url_imagen: '',
+    });
+    expect(res.success).toBe(false);
+  });
+
   // ── tipo desconocido ─────────────────────────────────────────────────────────
   it('retorna error para tipo desconocido', () => {
     const res = validarContenidoActividad('tipo_inexistente' as never, {});

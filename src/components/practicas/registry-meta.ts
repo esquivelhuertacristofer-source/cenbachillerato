@@ -590,6 +590,11 @@ export const PRACTICAS_META: Record<string, PracticaMeta> = {
     titulo: "Laboratorio Interactivo — Relaciones de Poder",
     descripcion: "Clasifica ejemplos por categoría de análisis (clase, género, etnia, edad), empareja los conceptos de poder e interseccionalidad con su definición y domina el glosario. Contenido verbatim de Ciencias Sociales II.",
   },
+  "crisis-sociales": {
+    slug: "crisis-sociales",
+    titulo: "Laboratorio Interactivo — Crisis Sociales",
+    descripcion: "Clasifica causas, actores y consecuencias de la crisis de la pandemia de COVID-19, empareja cada actor con su papel y domina el glosario. Contenido verbatim de Ciencias Sociales III.",
+  },
   "politicas-publicas": {
     slug: "politicas-publicas",
     titulo: "Laboratorio Interactivo — Políticas Públicas",

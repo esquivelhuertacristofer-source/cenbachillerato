@@ -25,6 +25,11 @@ import { useEffect, useRef, useState } from "react";
 import type { PracticaLabProps } from "../registry";
 import { T, OK, card, Eyebrow } from "./_kit";
 import { LabSfx } from "./lab-audio";
+import { CompletaTexto } from "./_mecanica-huecos";
+import { CONSTRUCTOR_ALGORITMOS_HUECOS } from "./constructor-algoritmos-huecos";
+import { usePartida, MarcadorPartida } from "./_partida";
+import { FichaTeorica } from "./_ficha";
+import { CONSTRUCTOR_ALGORITMOS_FICHA } from "./constructor-algoritmos-ficha";
 import {
   PROBLEMAS,
   FORMA_INFO,
@@ -39,15 +44,16 @@ import {
 } from "./algoritmos-data";
 
 const NO = "#FF5E5E";
-import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
+import { useEstrellas } from "@/lib/hooks/useEstrellas";
 const RETO_KEY = "cen-algoritmos-reto";
 
-type Modo = "construir" | "operadores" | "estructuras";
+type Modo = "construir" | "operadores" | "estructuras" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
   { id: "construir", label: "Construye el algoritmo", icono: "fa-diagram-project" },
   { id: "operadores", label: "Clasifica operadores", icono: "fa-calculator" },
   { id: "estructuras", label: "Estructuras de control", icono: "fa-code-branch" },
+  { id: "texto", label: "Completa el texto", icono: "fa-pen-to-square" },
 ];
 
 const porTexto = (a: { texto: string }, b: { texto: string }) => a.texto.localeCompare(b.texto, "es");
@@ -57,7 +63,17 @@ export function LabConstructorAlgoritmos({ color }: PracticaLabProps) {
   const [modo, setModo] = useState<Modo>("construir");
 
   // ── sonido ────────────────────────────────────────────────────────────
+  const partida = usePartida();
   const [sonido, setSonido] = useState(false);
+  const [drawer, setDrawer] = useState(false);
+  // Modo «Completa el texto». El contador sirve de `key`: subirlo remonta
+  // el componente y devuelve todos los huecos en blanco.
+  const [textoDone, setTextoDone] = useState(false);
+  const [textoIntento, setTextoIntento] = useState(0);
+  const resetHuecos = () => {
+    setTextoDone(false);
+    setTextoIntento((v) => v + 1);
+  };
   const audioRef = useRef<LabSfx | null>(null);
   useEffect(() => () => audioRef.current?.dispose(), []);
   const toggleSonido = async () => {
@@ -70,9 +86,18 @@ export function LabConstructorAlgoritmos({ color }: PracticaLabProps) {
       setSonido(false);
     }
   };
+  // Los tres ayudantes son el único punto por el que pasan todos los aciertos
+  // y todos los fallos del laboratorio, así que la partida se lleva aquí.
+  // `sfxOk` no cuenta: marca el fin de un modo, no una respuesta suelta.
   const sfxOk = () => sonido && audioRef.current?.correcto();
-  const sfxNo = () => sonido && audioRef.current?.incorrecto();
-  const sfxPlace = () => sonido && audioRef.current?.blip();
+  const sfxNo = () => {
+    partida.error();
+    return sonido && audioRef.current?.incorrecto();
+  };
+  const sfxPlace = () => {
+    partida.acierto();
+    return sonido && audioRef.current?.blip();
+  };
 
   // ── modo Construir ────────────────────────────────────────────────────
   const [probIdx, setProbIdx] = useState(0);
@@ -86,14 +111,7 @@ export function LabConstructorAlgoritmos({ color }: PracticaLabProps) {
   const pasosLibres = problema.pasos.filter((p) => !ordenActual.includes(p.id)).sort(porTexto);
 
   const [estrellas, setEstrellas] = useState(0);
-  const [mejor, setMejor] = useState<number>(() => {
-    if (typeof window === "undefined") return 0;
-    try {
-      return Number(window.localStorage.getItem(RETO_KEY)) || 0;
-    } catch {
-      return 0;
-    }
-  });
+  const { mejorEstrellas: mejor, registraEstrellas } = useEstrellas(RETO_KEY);
 
   const intentarPaso = (pasoId: string) => {
     if (ordenActual.includes(pasoId)) return;
@@ -109,16 +127,7 @@ export function LabConstructorAlgoritmos({ color }: PracticaLabProps) {
         const est = nuevosComp.size;
         setEstrellas(est);
         sfxOk();
-        setMejor((m) => {
-          if (est <= m) return m;
-          try {
-            window.localStorage.setItem(RETO_KEY, String(est));
-          } catch {
-            /* localStorage no disponible */
-          }
-          return est;
-        });
-        void guardarEstrellas(RETO_KEY, est);
+        registraEstrellas(est);
       }
     } else {
       setShakePaso(true);
@@ -187,7 +196,11 @@ export function LabConstructorAlgoritmos({ color }: PracticaLabProps) {
   const construirDone = completados.size >= PROBLEMAS.length;
   const opDone = Object.keys(ubicOp).length >= OPERADORES.length;
   const estrDone = Object.keys(empar).length >= ESCENARIOS.length;
-  const bestEstrellas = Math.max(estrellas, mejor);
+  // Los cuatro modos cuentan, no sólo la construcción: el modo de escribir
+  // es trabajo real y antes no dejaba marca. La regla de precisión propia de
+  // este lab se conserva, y se toma la mejor de las dos.
+  const modosHechos = (construirDone ? 1 : 0) + (opDone ? 1 : 0) + (estrDone ? 1 : 0) + (textoDone ? 1 : 0);
+  const bestEstrellas = Math.max(estrellas, partida.estrellasCon(modosHechos, 4), mejor);
 
   const objetivos = [
     { txt: "Construye los 3 algoritmos", done: construirDone },
@@ -268,6 +281,47 @@ export function LabConstructorAlgoritmos({ color }: PracticaLabProps) {
         .al-prob[data-done="true"] { color:${OK}; border-color:${OK}66; }
         .al-divider { height:1px; background:${T.line}; margin:18px 0; }
         @media (prefers-reduced-motion: reduce){ .al-slot[data-shake="true"], .al-bin[data-shake="true"] { animation:none; } }
+
+        /* Cajón de teoría */
+        .al-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
+          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
+        .al-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
+        .al-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
+          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
+          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
+          display:flex; flex-direction:column; }
+        .al-drawer[data-open="true"] { transform:translateX(0); }
+        .al-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
+          padding:18px 20px; border-bottom:1px solid ${T.line}; }
+        .al-drawer-body { overflow-y:auto; padding:20px; flex:1; }
+        .al-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
+          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+        .al-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
+        .al-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
+          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
+          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
+        .al-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
+        @media (max-width: 640px){ .al-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
+
+        /* Identidad del tablero */
+        .al-bin { --tono:188; position:relative;
+          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
+        .al-bin:nth-of-type(6n+1) { --tono:188; }
+        .al-bin:nth-of-type(6n+2) { --tono:262; }
+        .al-bin:nth-of-type(6n+3) { --tono:44; }
+        .al-bin:nth-of-type(6n+4) { --tono:152; }
+        .al-bin:nth-of-type(6n+5) { --tono:330; }
+        .al-bin:nth-of-type(6n+6) { --tono:18; }
+        .al-bin::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
+          background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
+        .al-bin[data-done="true"] {
+          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.2) 0%, transparent 68%); }
+        .al-chip { transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
+        .al-chip:hover { transform:translateY(-2px); }
+        .al-chip[data-sel="true"] { transform:translateY(-3px) scale(1.02); }
+        @media (prefers-reduced-motion: reduce){
+          .al-chip, .al-chip:hover, .al-chip[data-sel="true"] { transform:none; transition:none; }
+        }
       `}</style>
 
       {/* selector de modo + toolbar */}
@@ -279,21 +333,66 @@ export function LabConstructorAlgoritmos({ color }: PracticaLabProps) {
           </button>
         ))}
         <div style={{ flex: 1 }} />
+        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+        <button className="al-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
+          <i className="fa-solid fa-book-open" />
+        </button>
         <button className="al-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
           <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
         </button>
         <button
           className="al-icobtn"
-          onClick={modo === "construir" ? resetProblema : modo === "operadores" ? resetOp : resetEstr}
+          onClick={modo === "texto" ? resetHuecos : modo === "construir" ? resetProblema : modo === "operadores" ? resetOp : resetEstr}
           title="Reiniciar este modo"
         >
           <i className="fa-solid fa-rotate-left" />
         </button>
       </div>
 
+      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
+      <button className="al-teoria-fab" onClick={() => setDrawer(true)}>
+        <i className="fa-solid fa-book-open" />
+        Teoría
+      </button>
+      <div className="al-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
+      <aside className="al-drawer" data-open={drawer} aria-hidden={!drawer}>
+        <div className="al-drawer-head">
+          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
+            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
+          </div>
+          <button className="al-close" onClick={() => setDrawer(false)} title="Cerrar">
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
+        <div className="al-drawer-body">
+          <FichaTeorica data={CONSTRUCTOR_ALGORITMOS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+        </div>
+      </aside>
+
       <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }} className="al-grid">
         {/* ── Columna principal ─────────────────────────────────────────── */}
         <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
+          {/* MODO — completa el texto (fill_blanks verbatim de la progresión) */}
+          {modo === "texto" && (
+            <CompletaTexto
+              key={textoIntento}
+              data={CONSTRUCTOR_ALGORITMOS_HUECOS}
+              accent={accent}
+              rgba={color.rgba}
+              completado={textoDone}
+              onCompletado={() => {
+                setTextoDone(true);
+                sfxOk();
+                registraEstrellas(
+                  partida.estrellasCon((construirDone ? 1 : 0) + (opDone ? 1 : 0) + (estrDone ? 1 : 0) + 1, 4)
+                );
+              }}
+              onAcierto={sfxPlace}
+              onError={sfxNo}
+            />
+          )}
+
           {modo === "construir" && (
             <ConstruirPanel
               accent={accent}

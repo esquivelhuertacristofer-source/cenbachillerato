@@ -4,8 +4,8 @@
  * Laboratorio — Comparatives: bigger, better, more interesting
  * Práctica experimental para IN-II-P05-A4 (Inglés II).
  *
- * Interactividad máxima: el alumno EXPERIMENTA arrastrando. Tres modos, tres
- * interacciones distintas (forma · regla · uso):
+ * Interactividad máxima. Cuatro modos: los tres de arrastrar/clasificar (forma · regla · uso) y,
+ * al final, uno que se escribe («Completa el texto», verbatim de la progresión):
  *  1. «Build the comparative» — arrastra la FORMA comparativa correcta a cada
  *     adjetivo (taller / bigger / more interesting / better…) evitando los
  *     errores típicos (more tall, gooder, bigger more).
@@ -23,6 +23,11 @@ import { useEffect, useRef, useState } from "react";
 import type { PracticaLabProps } from "../registry";
 import { T, OK, card, Eyebrow } from "./_kit";
 import { LabSfx } from "./lab-audio";
+import { CompletaTexto } from "./_mecanica-huecos";
+import { COMPARATIVOS_INGLES_HUECOS } from "./comparativos-ingles-huecos";
+import { usePartida, MarcadorPartida } from "./_partida";
+import { FichaTeorica } from "./_ficha";
+import { COMPARATIVOS_INGLES_FICHA } from "./comparativos-ingles-ficha";
 import {
   COMPARATIVOS,
   DISTRACTORES_COMP,
@@ -35,15 +40,16 @@ import {
 } from "./comparativos-ingles-data";
 
 const NO = "#FF5E5E";
-import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
+import { useEstrellas } from "@/lib/hooks/useEstrellas";
 const RETO_KEY = "cen-comparativos-ingles-reto";
 
-type Modo = "construir" | "regla" | "oraciones";
+type Modo = "construir" | "regla" | "oraciones" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
   { id: "construir", label: "Build the comparative", icono: "fa-screwdriver-wrench" },
   { id: "regla", label: "-er, more, or irregular?", icono: "fa-table-columns" },
   { id: "oraciones", label: "Complete the comparison", icono: "fa-pen-fancy" },
+  { id: "texto", label: "Complete the text", icono: "fa-pen-to-square" },
 ];
 
 /** Fichas del modo 1: comparativos correctos + distractores que no encajan. */
@@ -57,7 +63,13 @@ export function LabComparativosIngles({ color }: PracticaLabProps) {
   const [modo, setModo] = useState<Modo>("construir");
 
   // ── sonido ────────────────────────────────────────────────────────────
+  const partida = usePartida();
   const [sonido, setSonido] = useState(false);
+  const [drawer, setDrawer] = useState(false);
+  // Modo «Completa el texto». El contador sirve de `key`: subirlo remonta
+  // el componente y devuelve todos los huecos en blanco.
+  const [textoDone, setTextoDone] = useState(false);
+  const [textoIntento, setTextoIntento] = useState(0);
   const audioRef = useRef<LabSfx | null>(null);
   useEffect(() => () => audioRef.current?.dispose(), []);
   const toggleSonido = async () => {
@@ -70,9 +82,18 @@ export function LabComparativosIngles({ color }: PracticaLabProps) {
       setSonido(false);
     }
   };
+  // Los tres ayudantes son el único punto por el que pasan todos los aciertos
+  // y todos los fallos del laboratorio, así que la partida se lleva aquí.
+  // `sfxOk` no cuenta: marca el fin de un modo, no una respuesta suelta.
   const sfxOk = () => sonido && audioRef.current?.correcto();
-  const sfxNo = () => sonido && audioRef.current?.incorrecto();
-  const sfxPlace = () => sonido && audioRef.current?.blip();
+  const sfxNo = () => {
+    partida.error();
+    return sonido && audioRef.current?.incorrecto();
+  };
+  const sfxPlace = () => {
+    partida.acierto();
+    return sonido && audioRef.current?.blip();
+  };
 
   // ── modo Build the comparative (arrastra la forma correcta) ────────────
   const [construido, setConstruido] = useState<Record<string, boolean>>({});
@@ -162,30 +183,16 @@ export function LabComparativosIngles({ color }: PracticaLabProps) {
   const construirDone = Object.keys(construido).length >= COMPARATIVOS.length;
   const reglaDone = Object.keys(ubicado).length >= ADJETIVOS.length;
   const oracionesDone = Object.keys(completado).length >= ORACIONES.length;
-  const estrellas = (construirDone ? 1 : 0) + (reglaDone ? 1 : 0) + (oracionesDone ? 1 : 0);
+  const modosHechos = (construirDone ? 1 : 0) + (reglaDone ? 1 : 0) + (oracionesDone ? 1 : 0) + (textoDone ? 1 : 0);
+  // Terminar los 3 modos vale 2★; la tercera se gana con precisión.
+  const estrellas = partida.estrellasCon(modosHechos, 4);
 
-  const [mejor, setMejor] = useState<number>(() => {
-    if (typeof window === "undefined") return 0;
-    try {
-      return Number(window.localStorage.getItem(RETO_KEY)) || 0;
-    } catch {
-      return 0;
-    }
-  });
+  const { mejorEstrellas: mejor, registraEstrellas } = useEstrellas(RETO_KEY);
   const bestEstrellas = Math.max(estrellas, mejor);
 
   const persistMejor = (a: boolean, b: boolean, c: boolean) => {
     const est = (a ? 1 : 0) + (b ? 1 : 0) + (c ? 1 : 0);
-    setMejor((m) => {
-      if (est <= m) return m;
-      try {
-        window.localStorage.setItem(RETO_KEY, String(est));
-      } catch {
-        /* localStorage no disponible */
-      }
-      return est;
-    });
-    void guardarEstrellas(RETO_KEY, est);
+    registraEstrellas(est);
   };
 
   const objetivos = [
@@ -224,7 +231,11 @@ export function LabComparativosIngles({ color }: PracticaLabProps) {
     },
   });
 
-  const resetActual = modo === "construir" ? resetConstruir : modo === "regla" ? resetRegla : resetOraciones;
+  const resetTexto = () => {
+    setTextoDone(false);
+    setTextoIntento((n) => n + 1);
+  };
+  const resetActual = modo === "texto" ? resetTexto : modo === "construir" ? resetConstruir : modo === "regla" ? resetRegla : resetOraciones;
 
   return (
     <div style={{ color: T.text }}>
@@ -261,6 +272,47 @@ export function LabComparativosIngles({ color }: PracticaLabProps) {
         .cmp-btn:hover { border-color:${T.lineStrong}; }
         .cmp-divider { height:1px; background:${T.line}; margin:18px 0; }
         @media (prefers-reduced-motion: reduce){ .cmp-row[data-shake="true"], .cmp-bin[data-shake="true"] { animation:none; } }
+
+        /* Cajón de teoría */
+        .cmp-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
+          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
+        .cmp-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
+        .cmp-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
+          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
+          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
+          display:flex; flex-direction:column; }
+        .cmp-drawer[data-open="true"] { transform:translateX(0); }
+        .cmp-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
+          padding:18px 20px; border-bottom:1px solid ${T.line}; }
+        .cmp-drawer-body { overflow-y:auto; padding:20px; flex:1; }
+        .cmp-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
+          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+        .cmp-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
+        .cmp-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
+          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
+          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
+        .cmp-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
+        @media (max-width: 640px){ .cmp-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
+
+        /* Identidad del tablero */
+        .cmp-bin, .cmp-row { --tono:188; position:relative;
+          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
+        .cmp-bin:nth-of-type(6n+1), .cmp-row:nth-of-type(6n+1) { --tono:188; }
+        .cmp-bin:nth-of-type(6n+2), .cmp-row:nth-of-type(6n+2) { --tono:262; }
+        .cmp-bin:nth-of-type(6n+3), .cmp-row:nth-of-type(6n+3) { --tono:44; }
+        .cmp-bin:nth-of-type(6n+4), .cmp-row:nth-of-type(6n+4) { --tono:152; }
+        .cmp-bin:nth-of-type(6n+5), .cmp-row:nth-of-type(6n+5) { --tono:330; }
+        .cmp-bin:nth-of-type(6n+6), .cmp-row:nth-of-type(6n+6) { --tono:18; }
+        .cmp-bin::before, .cmp-row::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
+          background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
+        .cmp-bin[data-done="true"], .cmp-row[data-done="true"] {
+          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.2) 0%, transparent 68%); }
+        .cmp-chip { transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
+        .cmp-chip:hover { transform:translateY(-2px); }
+        .cmp-chip[data-sel="true"] { transform:translateY(-3px) scale(1.02); }
+        @media (prefers-reduced-motion: reduce){
+          .cmp-chip, .cmp-chip:hover, .cmp-chip[data-sel="true"] { transform:none; transition:none; }
+        }
       `}</style>
 
       {/* selector de modo + toolbar */}
@@ -272,6 +324,10 @@ export function LabComparativosIngles({ color }: PracticaLabProps) {
           </button>
         ))}
         <div style={{ flex: 1 }} />
+        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+        <button className="cmp-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
+          <i className="fa-solid fa-book-open" />
+        </button>
         <button className="cmp-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
           <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
         </button>
@@ -280,10 +336,48 @@ export function LabComparativosIngles({ color }: PracticaLabProps) {
         </button>
       </div>
 
+      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
+      <button className="cmp-teoria-fab" onClick={() => setDrawer(true)}>
+        <i className="fa-solid fa-book-open" />
+        Teoría
+      </button>
+      <div className="cmp-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
+      <aside className="cmp-drawer" data-open={drawer} aria-hidden={!drawer}>
+        <div className="cmp-drawer-head">
+          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
+            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
+          </div>
+          <button className="cmp-close" onClick={() => setDrawer(false)} title="Cerrar">
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
+        <div className="cmp-drawer-body">
+          <FichaTeorica data={COMPARATIVOS_INGLES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+        </div>
+      </aside>
+
       <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}>
         {/* ── Columna principal ─────────────────────────────────────────── */}
         <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
           {/* MODO 1 — Build the comparative */}
+          {/* MODO — completa el texto (fill_blanks verbatim de la progresión) */}
+          {modo === "texto" && (
+            <CompletaTexto
+              key={textoIntento}
+              data={COMPARATIVOS_INGLES_HUECOS}
+              accent={accent}
+              rgba={color.rgba}
+              completado={textoDone}
+              onCompletado={() => {
+                setTextoDone(true);
+                sfxOk();
+              }}
+              onAcierto={sfxPlace}
+              onError={sfxNo}
+            />
+          )}
+
           {modo === "construir" && (
             <>
               <div style={{ ...card, padding: "18px 22px" }}>
@@ -404,7 +498,7 @@ export function LabComparativosIngles({ color }: PracticaLabProps) {
               </div>
               <div style={{ textAlign: "right", maxWidth: 180 }}>
                 <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45 }}>
-                  {bestEstrellas >= 3 ? "You mastered comparatives in English!" : "Completa los tres modos para ganar las estrellas."}
+                  {bestEstrellas >= 3 ? "You mastered comparatives in English!" : "Termina los tres modos para ganar 2★; la tercera pide 2 errores o menos."}
                 </div>
               </div>
             </div>

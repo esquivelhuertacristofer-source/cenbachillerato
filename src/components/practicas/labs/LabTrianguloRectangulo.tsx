@@ -18,6 +18,8 @@ import { FichaTeorica } from "./_ficha";
 import { TRIANGULO_FICHA } from "./triangulo-rectangulo-ficha";
 import { RetoNumericoCard } from "./_reto-numerico";
 import { LabSfx } from "./lab-audio";
+import { useEstrellas } from "@/lib/hooks/useEstrellas";
+import { useLogros } from "./_partida";
 import {
   calcMed, RAZONES, ESCENARIOS, IDEAS, DATOS,
   D_MIN, D_MAX, D_STEP, D_DEF, ANG_MIN, ANG_MAX, ANG_STEP, ANG_DEF,
@@ -38,6 +40,8 @@ const TrianguloRectanguloScene = dynamic(() => import("./TrianguloRectanguloScen
 const ADY_COL = "#60a5fa";
 const OP_COL = "#34D399";
 const HYP_COL = "#f5d36b";
+
+const RETO_KEY = "cen-triangulo-rectangulo-reto";
 
 export function LabTrianguloRectangulo({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
@@ -114,6 +118,16 @@ export function LabTrianguloRectangulo({ color }: PracticaLabProps) {
     { txt: "Comprueba las tres razones SOH-CAH-TOA en vivo", done: true },
     { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
   ];
+  // Los objetivos se recuerdan (algunos dependían del modo y se desmarcaban
+  // solos) y se convierten en la marca del laboratorio, que antes no se
+  // guardaba en ninguna parte.
+  const { logros: logrosLab, cumplidos: cumplidosLab, total: totalLab } = useLogros(objetivos.map((o) => o.done));
+  const { registraEstrellas } = useEstrellas(RETO_KEY);
+  useEffect(() => {
+    if (cumplidosLab === 0) return;
+    const est = cumplidosLab >= totalLab ? 3 : cumplidosLab >= Math.ceil((totalLab * 2) / 3) ? 2 : 1;
+    registraEstrellas(est);
+  }, [cumplidosLab, totalLab, registraEstrellas]);
 
   // valores de las razones a partir de los lados reales (en metros)
   const razonVal: Record<string, string> = {
@@ -415,9 +429,9 @@ export function LabTrianguloRectangulo({ color }: PracticaLabProps) {
         </Eyebrow>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
           {objetivos.map((o, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? "#4ade80" : T.text2 }}>
-              <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-              <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: logrosLab[i] ? "#4ade80" : T.text2 }}>
+              <i className={`fa-solid ${logrosLab[i] ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: logrosLab[i] ? 1 : 0.3 }} />
+              <span style={{ fontWeight: logrosLab[i] ? 700 : 500 }}>{o.txt}</span>
             </div>
           ))}
         </div>

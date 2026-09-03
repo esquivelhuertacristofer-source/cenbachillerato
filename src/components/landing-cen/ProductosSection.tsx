@@ -152,6 +152,28 @@ export const PRODUCTS: ProductItem[] = [
     ],
   },
   {
+    id: 'tecnologia',
+    name: 'CEN Tecnología',
+    tier: '10 Niv.',
+    badge: 'Primaria a Bachillerato · ISTE · CSTA',
+    description: 'Diez niveles, uno por grado escolar, de 1° de primaria a bachillerato: programación de bloques a Python, ciudadanía digital, datos e inteligencia artificial, con paquetería Office como bloque transversal.',
+    meta: '10 niveles · 1° primaria a bachillerato',
+    icon: 'fa-laptop-code',
+    color: 'linear-gradient(135deg, #155E75 0%, #0891B2 100%)',
+    accent: '#22D3EE',
+    features: ['10 Niveles', 'Bloques → Python', 'IA y Office'],
+    image: '/1.webp',
+    // Provisional: vive en Vercel mientras no tenga dominio propio.
+    href: 'https://tecnia-plataforma.vercel.app/',
+    available: true,
+    external: true,
+    telemetry: [
+      { val: '10',        lbl: 'Niveles por Grado',  icon: 'fa-layer-group' },
+      { val: 'IA',        lbl: 'Desde 3° Primaria',  icon: 'fa-microchip'   },
+      { val: 'ISTE·CSTA', lbl: 'Marcos K-12',        icon: 'fa-certificate' },
+    ],
+  },
+  {
     id: 'robotica',
     name: 'CEN Robótica',
     tier: 'K–12',
@@ -318,7 +340,9 @@ export function ProductosSection() {
 
         <div className="prod-side-label" aria-hidden="true">
           <span className="prod-side-eyebrow">Ecosistema CEN</span>
-          <span className="prod-side-num">08</span>
+          {/* Contado, no escrito a mano: agregar una plataforma no debe dejar
+              este número mintiendo en la landing. */}
+          <span className="prod-side-num">{String(PRODUCTS.length).padStart(2, '0')}</span>
         </div>
 
         <div className="prod-body">
@@ -328,7 +352,9 @@ export function ProductosSection() {
                 <i className="fas fa-layer-group" />
                 Ecosistema CEN
               </span>
-              <span className="prod-heading-count">08 plataformas</span>
+              <span className="prod-heading-count">
+                {String(PRODUCTS.length).padStart(2, '0')} plataformas
+              </span>
             </div>
             <h2 className="prod-heading-h2">
               Plataformas educativas<br />

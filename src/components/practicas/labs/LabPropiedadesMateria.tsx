@@ -19,7 +19,7 @@ import { TRANSFORMACIONES, clasificaBien, QUIZ_COMPRENSION, type TipoCambio } fr
 import { LabSfx } from "./lab-audio";
 import { FichaTeorica } from "./_ficha";
 import { PROPIEDADES_FICHA } from "./propiedades-ficha";
-import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
+import { useEstrellas } from "@/lib/hooks/useEstrellas";
 
 const PropiedadesMateriaScene = dynamic(() => import("./PropiedadesMateriaScene"), {
   ssr: false,
@@ -58,15 +58,7 @@ export function LabPropiedadesMateria({ color }: PracticaLabProps) {
   const [intentadas, setIntentadas] = useState<Set<string>>(() => new Set<string>());
   const [primeros, setPrimeros] = useState<Set<string>>(() => new Set<string>());
   const [estrellas, setEstrellas] = useState(0);
-  const [mejor, setMejor] = useState<number>(() => {
-    if (typeof window === "undefined") return 0;
-    try {
-      const r = window.localStorage.getItem(RETO_KEY);
-      return r ? Number(r) || 0 : 0;
-    } catch {
-      return 0;
-    }
-  });
+  const { mejorEstrellas: mejor, registraEstrellas } = useEstrellas(RETO_KEY);
   // sonido + etiquetas + teoría
   const [sonido, setSonido] = useState(false);
   const [etiquetas, setEtiquetas] = useState(false);
@@ -190,16 +182,7 @@ export function LabPropiedadesMateria({ color }: PracticaLabProps) {
     if (nextAcertadas.size >= TRANSFORMACIONES.length) {
       const est = nextPrimeros.size >= TRANSFORMACIONES.length ? 3 : nextPrimeros.size >= 4 ? 2 : 1;
       setEstrellas(est);
-      setMejor((m) => {
-        if (est <= m) return m;
-        try {
-          window.localStorage.setItem(RETO_KEY, String(est));
-        } catch {
-          /* localStorage no disponible */
-        }
-        return est;
-      });
-      void guardarEstrellas(RETO_KEY, est);
+      registraEstrellas(est);
     }
   };
   const reset = () => {

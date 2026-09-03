@@ -304,6 +304,136 @@ export interface ActividadAutoevaluacion extends ActividadBase {
 
 // ── UNIÓN DISCRIMINADA ────────────────────────────────────────────────────────
 
+// ═══════════════════════════════════════════════════════════════════════════
+// TIPOS DINÁMICOS (migración 26) — se responden moviendo y decidiendo
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ── 13. ORDENAR SECUENCIA ─────────────────────────────────────────────────────
+
+export type CriterioSecuencia = 'cronologia' | 'procedimiento' | 'jerarquia';
+
+export interface PasoSecuencia {
+  texto: string;
+  explicacion?: string;
+  marca?: string;
+}
+
+export interface ContenidoOrdenarSecuencia {
+  instrucciones?: string;
+  /** EN SU ORDEN CORRECTO; la app los baraja al presentarlos. */
+  pasos: PasoSecuencia[];
+  criterio?: CriterioSecuencia;
+  puntaje_minimo_aprobacion?: number;
+  url_imagen?: string;
+}
+
+export interface ActividadOrdenarSecuencia extends ActividadBase {
+  tipo: 'ordenar_secuencia';
+  contenido: ContenidoOrdenarSecuencia;
+}
+
+// ── 14. RELACIONAR COLUMNAS ───────────────────────────────────────────────────
+
+export interface ParejaRelacion {
+  izquierda: string;
+  derecha: string;
+  explicacion?: string;
+}
+
+export interface ContenidoRelacionarColumnas {
+  instrucciones?: string;
+  titulo_izquierda?: string;
+  titulo_derecha?: string;
+  parejas: ParejaRelacion[];
+  distractores?: string[];
+  puntaje_minimo_aprobacion?: number;
+  url_imagen?: string;
+}
+
+export interface ActividadRelacionarColumnas extends ActividadBase {
+  tipo: 'relacionar_columnas';
+  contenido: ContenidoRelacionarColumnas;
+}
+
+// ── 15. CLASIFICAR EN CATEGORÍAS ──────────────────────────────────────────────
+
+export interface CategoriaClasificacion {
+  nombre: string;
+  descripcion?: string;
+}
+
+export interface ElementoClasificable {
+  texto: string;
+  categoria: string;
+  explicacion?: string;
+}
+
+export interface ContenidoClasificarCategorias {
+  instrucciones?: string;
+  categorias: CategoriaClasificacion[];
+  elementos: ElementoClasificable[];
+  puntaje_minimo_aprobacion?: number;
+  url_imagen?: string;
+}
+
+export interface ActividadClasificarCategorias extends ActividadBase {
+  tipo: 'clasificar_categorias';
+  contenido: ContenidoClasificarCategorias;
+}
+
+// ── 16. CASO CON DECISIONES ───────────────────────────────────────────────────
+
+export interface OpcionDecision {
+  texto: string;
+  consecuencia: string;
+  /** 0 = mala, 1 = aceptable, 2 = la mejor. */
+  calidad: number;
+}
+
+export interface EscenaCaso {
+  situacion: string;
+  pregunta: string;
+  opciones: OpcionDecision[];
+}
+
+export interface ContenidoCasoDecision {
+  contexto: string;
+  escenas: EscenaCaso[];
+  cierre_bueno: string;
+  cierre_regular: string;
+  cierre_malo: string;
+  pregunta_reflexion?: string;
+  url_imagen?: string;
+}
+
+export interface ActividadCasoDecision extends ActividadBase {
+  tipo: 'caso_decision';
+  contenido: ContenidoCasoDecision;
+}
+
+// ── 17. RETO CONTRARRELOJ ─────────────────────────────────────────────────────
+
+export interface PreguntaReto {
+  enunciado: string;
+  opciones: string[];
+  respuesta_correcta: number;
+  pista?: string;
+}
+
+export interface ContenidoRetoCronometrado {
+  instrucciones?: string;
+  segundos_por_pregunta?: number;
+  preguntas: PreguntaReto[];
+  puntaje_minimo_aprobacion?: number;
+  url_imagen?: string;
+}
+
+export interface ActividadRetoCronometrado extends ActividadBase {
+  tipo: 'reto_cronometrado';
+  contenido: ContenidoRetoCronometrado;
+}
+
+
 export type Actividad =
   | ActividadLectura
   | ActividadQuizMultipleOpcion
@@ -316,7 +446,12 @@ export type Actividad =
   | ActividadDebateEstructurado
   | ActividadSimulacion
   | ActividadGlosarioInteractivo
-  | ActividadAutoevaluacion;
+  | ActividadAutoevaluacion
+  | ActividadOrdenarSecuencia
+  | ActividadRelacionarColumnas
+  | ActividadClasificarCategorias
+  | ActividadCasoDecision
+  | ActividadRetoCronometrado;
 
 export type TipoActividad = Actividad['tipo'];
 
@@ -333,6 +468,11 @@ export const TIPOS_ACTIVIDAD: Record<TipoActividad, string> = {
   simulacion:            'Simulación',
   glosario_interactivo:  'Glosario interactivo',
   autoevaluacion:        'Autoevaluación',
+  ordenar_secuencia:     'Ordena la secuencia',
+  relacionar_columnas:   'Relaciona columnas',
+  clasificar_categorias: 'Clasifica en categorías',
+  caso_decision:         'Caso con decisiones',
+  reto_cronometrado:     'Reto contrarreloj',
 };
 
 // ── Resultado de intento ──────────────────────────────────────────────────────

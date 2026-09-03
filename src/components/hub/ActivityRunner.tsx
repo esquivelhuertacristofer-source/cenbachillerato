@@ -17,12 +17,19 @@ import { DebateEstructuradoActivity } from "@/components/activities/DebateEstruc
 import { SimulacionActivity } from "@/components/activities/SimulacionActivity";
 import { GlosarioInteractivoActivity } from "@/components/activities/GlosarioInteractivoActivity";
 import { AutoevaluacionActivity } from "@/components/activities/AutoevaluacionActivity";
+import { OrdenarSecuenciaActivity } from "@/components/activities/OrdenarSecuenciaActivity";
+import { RelacionarColumnasActivity } from "@/components/activities/RelacionarColumnasActivity";
+import { ClasificarCategoriasActivity } from "@/components/activities/ClasificarCategoriasActivity";
+import { CasoDecisionActivity } from "@/components/activities/CasoDecisionActivity";
+import { RetoCronometradoActivity } from "@/components/activities/RetoCronometradoActivity";
 import type { ResultadoActividad, ResultadoEntrega } from "@/types/activities";
 import type { AreaColor } from "@/components/hub/hub-colors";
 import type { ActividadConEstado } from "@/lib/queries/hub";
 
 interface ActivityRunnerProps {
   actividadId: string;
+  /** Código legible de la actividad; identifica su grabación de voz. */
+  codigo: string;
   tipo: string;
   titulo: string;
   descripcion: string | null;
@@ -46,6 +53,7 @@ interface ActivityRunnerProps {
 
 export function ActivityRunner({
   actividadId,
+  codigo,
   tipo,
   titulo,
   descripcion,
@@ -155,6 +163,7 @@ export function ActivityRunner({
 
   const shellProps = {
     titulo,
+    codigo,
     tipo,
     color,
     estado,
@@ -281,6 +290,26 @@ export function ActivityRunner({
   } else if (tipo === "autoevaluacion") {
     activity = (
       <AutoevaluacionActivity actividad={{ ...base, tipo: "autoevaluacion", contenido: contenido as never }} onProgreso={handleProgreso} color={color} uacCodigo={uacCodigo} />
+    );
+  } else if (tipo === "ordenar_secuencia") {
+    activity = (
+      <OrdenarSecuenciaActivity actividad={{ ...base, tipo: "ordenar_secuencia", contenido: contenido as never }} onProgreso={handleProgreso} color={color} uacCodigo={uacCodigo} />
+    );
+  } else if (tipo === "relacionar_columnas") {
+    activity = (
+      <RelacionarColumnasActivity actividad={{ ...base, tipo: "relacionar_columnas", contenido: contenido as never }} onProgreso={handleProgreso} color={color} uacCodigo={uacCodigo} />
+    );
+  } else if (tipo === "clasificar_categorias") {
+    activity = (
+      <ClasificarCategoriasActivity actividad={{ ...base, tipo: "clasificar_categorias", contenido: contenido as never }} onProgreso={handleProgreso} color={color} uacCodigo={uacCodigo} />
+    );
+  } else if (tipo === "caso_decision") {
+    activity = (
+      <CasoDecisionActivity actividad={{ ...base, tipo: "caso_decision", contenido: contenido as never }} onProgreso={handleProgreso} color={color} uacCodigo={uacCodigo} />
+    );
+  } else if (tipo === "reto_cronometrado") {
+    activity = (
+      <RetoCronometradoActivity actividad={{ ...base, tipo: "reto_cronometrado", contenido: contenido as never }} onProgreso={handleProgreso} color={color} uacCodigo={uacCodigo} />
     );
   } else {
     activity = (

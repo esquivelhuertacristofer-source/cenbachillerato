@@ -50,7 +50,7 @@ const C_ACC = "#34D399";   // aceleración (positiva)
 const C_BRK = "#f87171";   // aceleración (frenado)
 const WARN = "#FF8A3C";
 
-import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
+import { useEstrellas } from "@/lib/hooks/useEstrellas";
 const RETO_KEY = "cen-mrua-reto";
 
 /** Instrumentos de una prueba de cinemática en campo (3 correctos + 3 distractores). */
@@ -77,15 +77,7 @@ export function LabCinematica({ color }: PracticaLabProps) {
   const [eppListo, setEppListo] = useState(false);
   const [arrastro, setArrastro] = useState(false);
   const [predicho, setPredicho] = useState(false);
-  const [mejorEstrellas, setMejorEstrellas] = useState<number>(() => {
-    if (typeof window === "undefined") return 0;
-    try {
-      const v = window.localStorage.getItem(RETO_KEY);
-      return v ? Number(v) || 0 : 0;
-    } catch {
-      return 0;
-    }
-  });
+  const { mejorEstrellas, registraEstrellas: guardaEstrellas } = useEstrellas(RETO_KEY);
 
   // reto evaluable, teoría (cajón deslizable) y sonido
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
@@ -152,13 +144,8 @@ export function LabCinematica({ color }: PracticaLabProps) {
   }, [sonido]);
   const registraEstrellas = useCallback((estrellas: number) => {
     setPredicho(true);
-    setMejorEstrellas((prev) => {
-      const mejor = Math.max(prev, estrellas);
-      try { window.localStorage.setItem(RETO_KEY, String(mejor)); } catch { /* sin persistencia */ }
-      return mejor;
-    });
-    void guardarEstrellas(RETO_KEY, estrellas);
-  }, []);
+    guardaEstrellas(estrellas);
+  }, [guardaEstrellas]);
 
   const mov = resolver(a1, t1, a2);
   const tCur = Math.min(t, mov.tTotal);

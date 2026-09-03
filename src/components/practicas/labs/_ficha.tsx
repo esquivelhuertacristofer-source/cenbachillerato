@@ -16,6 +16,7 @@
 
 import { useState, type ReactNode } from "react";
 import { T } from "./_kit";
+import { useLabImagen } from "../lab-imagen-context";
 
 /* ── Forma de datos (la llena cada lab, verbatim) ─────────────────────── */
 export interface FichaConcepto {
@@ -65,6 +66,8 @@ export function FichaTeorica({
 }) {
   const [open, setOpen] = useState(defaultOpen);
   const [tab, setTab] = useState<TabKey>("marco");
+  // La carátula del laboratorio, si la ficha se monta dentro de una práctica.
+  const imagen = useLabImagen();
 
   // Solo muestra pestañas con contenido.
   const tabs = TABS.filter((t) => {
@@ -180,6 +183,24 @@ export function FichaTeorica({
           <div role="tabpanel" id={`fc-panel-${tab}`} aria-labelledby={`fc-tab-${tab}`}>
           {tab === "marco" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
+              {imagen && (
+                <figure style={{ margin: "0 0 3px" }}>
+                  <img
+                    src={imagen.src}
+                    alt={imagen.alt}
+                    loading="lazy"
+                    decoding="async"
+                    style={{
+                      width: "100%",
+                      aspectRatio: "16 / 9",
+                      objectFit: "cover",
+                      display: "block",
+                      borderRadius: 13,
+                      border: `1px solid rgba(${rgba},0.28)`,
+                    }}
+                  />
+                </figure>
+              )}
               {data.marcoTeorico.map((p, i) => (
                 <p key={i} style={{ margin: 0, fontSize: 14.5, lineHeight: 1.65, color: T.text2 }}>
                   {p}

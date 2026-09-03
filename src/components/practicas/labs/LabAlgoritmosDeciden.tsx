@@ -6,7 +6,8 @@
  *
  * Tema: los algoritmos de RECOMENDACIÓN que deciden el contenido que vemos
  * (NO los algoritmos de programación). El alumno EXPERIMENTA arrastrando.
- * Tres modos, tres interacciones distintas:
+ * Cuatro modos: tres de clasificar y, al final, uno que se escribe
+ * («Completa el texto», verbatim de la progresión):
  *  1. «¿Qué decide cada algoritmo?» — clasifica cuatro decisiones (verbatim de
  *     la lectura A1) en la plataforma cuyo algoritmo las toma.
  *  2. «Causa y efecto» — empareja cada idea de la lectura con lo que provoca o
@@ -24,6 +25,11 @@ import { useEffect, useRef, useState } from "react";
 import type { PracticaLabProps } from "../registry";
 import { T, OK, card, Eyebrow } from "./_kit";
 import { LabSfx } from "./lab-audio";
+import { CompletaTexto } from "./_mecanica-huecos";
+import { ALGORITMOS_DECIDEN_HUECOS } from "./algoritmos-deciden-huecos";
+import { usePartida, MarcadorPartida } from "./_partida";
+import { FichaTeorica } from "./_ficha";
+import { ALGORITMOS_DECIDEN_FICHA } from "./algoritmos-deciden-ficha";
 import {
   DECISIONES,
   PLATAFORMA_INFO,
@@ -36,15 +42,16 @@ import {
 } from "./algoritmos-deciden-data";
 
 const NO = "#FF5E5E";
-import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
+import { useEstrellas } from "@/lib/hooks/useEstrellas";
 const RETO_KEY = "cen-algoritmos-deciden-reto";
 
-type Modo = "plataformas" | "causa" | "feed";
+type Modo = "plataformas" | "causa" | "feed" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
   { id: "plataformas", label: "¿Qué decide cada algoritmo?", icono: "fa-sliders" },
   { id: "causa", label: "Causa y efecto", icono: "fa-arrows-turn-to-dots" },
   { id: "feed", label: "¿Cómo arma tu feed?", icono: "fa-list-ol" },
+  { id: "texto", label: "Completa el texto", icono: "fa-pen-to-square" },
 ];
 
 export function LabAlgoritmosDeciden({ color }: PracticaLabProps) {
@@ -52,7 +59,13 @@ export function LabAlgoritmosDeciden({ color }: PracticaLabProps) {
   const [modo, setModo] = useState<Modo>("plataformas");
 
   // ── sonido ────────────────────────────────────────────────────────────
+  const partida = usePartida();
   const [sonido, setSonido] = useState(false);
+  const [drawer, setDrawer] = useState(false);
+  // Modo «Completa el texto». El contador sirve de `key`: subirlo remonta
+  // el componente y devuelve todos los huecos en blanco.
+  const [textoDone, setTextoDone] = useState(false);
+  const [textoIntento, setTextoIntento] = useState(0);
   const audioRef = useRef<LabSfx | null>(null);
   useEffect(() => () => audioRef.current?.dispose(), []);
   const toggleSonido = async () => {
@@ -65,9 +78,18 @@ export function LabAlgoritmosDeciden({ color }: PracticaLabProps) {
       setSonido(false);
     }
   };
+  // Los tres ayudantes son el único punto por el que pasan todos los aciertos
+  // y todos los fallos del laboratorio, así que la partida se lleva aquí.
+  // `sfxOk` no cuenta: marca el fin de un modo, no una respuesta suelta.
   const sfxOk = () => sonido && audioRef.current?.correcto();
-  const sfxNo = () => sonido && audioRef.current?.incorrecto();
-  const sfxPlace = () => sonido && audioRef.current?.blip();
+  const sfxNo = () => {
+    partida.error();
+    return sonido && audioRef.current?.incorrecto();
+  };
+  const sfxPlace = () => {
+    partida.acierto();
+    return sonido && audioRef.current?.blip();
+  };
 
   // ── modo plataformas (clasifica cada decisión por plataforma) ──────────
   const [ubicPlat, setUbicPlat] = useState<Record<string, Plataforma>>({});
@@ -159,30 +181,16 @@ export function LabAlgoritmosDeciden({ color }: PracticaLabProps) {
   const platDone = Object.keys(ubicPlat).length >= DECISIONES.length;
   const causaDone = Object.keys(empCausa).length >= PARES_CAUSA.length;
   const feedDone = colocados.length >= PASOS_FEED.length;
-  const estrellas = (platDone ? 1 : 0) + (causaDone ? 1 : 0) + (feedDone ? 1 : 0);
+  const modosHechos = (platDone ? 1 : 0) + (causaDone ? 1 : 0) + (feedDone ? 1 : 0) + (textoDone ? 1 : 0);
+  // Terminar los 3 modos vale 2★; la tercera se gana con precisión.
+  const estrellas = partida.estrellasCon(modosHechos, 4);
 
-  const [mejor, setMejor] = useState<number>(() => {
-    if (typeof window === "undefined") return 0;
-    try {
-      return Number(window.localStorage.getItem(RETO_KEY)) || 0;
-    } catch {
-      return 0;
-    }
-  });
+  const { mejorEstrellas: mejor, registraEstrellas } = useEstrellas(RETO_KEY);
   const bestEstrellas = Math.max(estrellas, mejor);
 
   const persistMejor = (a: boolean, b: boolean, c: boolean) => {
     const est = (a ? 1 : 0) + (b ? 1 : 0) + (c ? 1 : 0);
-    setMejor((m) => {
-      if (est <= m) return m;
-      try {
-        window.localStorage.setItem(RETO_KEY, String(est));
-      } catch {
-        /* localStorage no disponible */
-      }
-      return est;
-    });
-    void guardarEstrellas(RETO_KEY, est);
+    registraEstrellas(est);
   };
 
   const objetivos = [
@@ -221,7 +229,11 @@ export function LabAlgoritmosDeciden({ color }: PracticaLabProps) {
     },
   });
 
-  const resetActual = modo === "plataformas" ? resetPlat : modo === "causa" ? resetCausa : resetFeed;
+  const resetTexto = () => {
+    setTextoDone(false);
+    setTextoIntento((n) => n + 1);
+  };
+  const resetActual = modo === "texto" ? resetTexto : modo === "plataformas" ? resetPlat : modo === "causa" ? resetCausa : resetFeed;
 
   return (
     <div style={{ color: T.text }}>
@@ -258,6 +270,47 @@ export function LabAlgoritmosDeciden({ color }: PracticaLabProps) {
         .algd-btn:hover { border-color:${T.lineStrong}; }
         .algd-divider { height:1px; background:${T.line}; margin:18px 0; }
         @media (prefers-reduced-motion: reduce){ .algd-row[data-shake="true"], .algd-bin[data-shake="true"] { animation:none; } }
+
+        /* Cajón de teoría */
+        .algd-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
+          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
+        .algd-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
+        .algd-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
+          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
+          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
+          display:flex; flex-direction:column; }
+        .algd-drawer[data-open="true"] { transform:translateX(0); }
+        .algd-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
+          padding:18px 20px; border-bottom:1px solid ${T.line}; }
+        .algd-drawer-body { overflow-y:auto; padding:20px; flex:1; }
+        .algd-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
+          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+        .algd-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
+        .algd-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
+          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
+          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
+        .algd-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
+        @media (max-width: 640px){ .algd-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
+
+        /* Identidad del tablero */
+        .algd-bin, .algd-row { --tono:188; position:relative;
+          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
+        .algd-bin:nth-of-type(6n+1), .algd-row:nth-of-type(6n+1) { --tono:188; }
+        .algd-bin:nth-of-type(6n+2), .algd-row:nth-of-type(6n+2) { --tono:262; }
+        .algd-bin:nth-of-type(6n+3), .algd-row:nth-of-type(6n+3) { --tono:44; }
+        .algd-bin:nth-of-type(6n+4), .algd-row:nth-of-type(6n+4) { --tono:152; }
+        .algd-bin:nth-of-type(6n+5), .algd-row:nth-of-type(6n+5) { --tono:330; }
+        .algd-bin:nth-of-type(6n+6), .algd-row:nth-of-type(6n+6) { --tono:18; }
+        .algd-bin::before, .algd-row::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
+          background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
+        .algd-bin[data-done="true"], .algd-row[data-done="true"] {
+          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.2) 0%, transparent 68%); }
+        .algd-chip { transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
+        .algd-chip:hover { transform:translateY(-2px); }
+        .algd-chip[data-sel="true"] { transform:translateY(-3px) scale(1.02); }
+        @media (prefers-reduced-motion: reduce){
+          .algd-chip, .algd-chip:hover, .algd-chip[data-sel="true"] { transform:none; transition:none; }
+        }
       `}</style>
 
       {/* selector de modo + toolbar */}
@@ -269,6 +322,10 @@ export function LabAlgoritmosDeciden({ color }: PracticaLabProps) {
           </button>
         ))}
         <div style={{ flex: 1 }} />
+        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+        <button className="algd-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
+          <i className="fa-solid fa-book-open" />
+        </button>
         <button className="algd-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
           <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
         </button>
@@ -277,10 +334,48 @@ export function LabAlgoritmosDeciden({ color }: PracticaLabProps) {
         </button>
       </div>
 
+      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
+      <button className="algd-teoria-fab" onClick={() => setDrawer(true)}>
+        <i className="fa-solid fa-book-open" />
+        Teoría
+      </button>
+      <div className="algd-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
+      <aside className="algd-drawer" data-open={drawer} aria-hidden={!drawer}>
+        <div className="algd-drawer-head">
+          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
+            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
+          </div>
+          <button className="algd-close" onClick={() => setDrawer(false)} title="Cerrar">
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
+        <div className="algd-drawer-body">
+          <FichaTeorica data={ALGORITMOS_DECIDEN_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+        </div>
+      </aside>
+
       <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}>
         {/* ── Columna principal ─────────────────────────────────────────── */}
         <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
           {/* MODO 1 — plataformas */}
+          {/* MODO — completa el texto (fill_blanks verbatim de la progresión) */}
+          {modo === "texto" && (
+            <CompletaTexto
+              key={textoIntento}
+              data={ALGORITMOS_DECIDEN_HUECOS}
+              accent={accent}
+              rgba={color.rgba}
+              completado={textoDone}
+              onCompletado={() => {
+                setTextoDone(true);
+                sfxOk();
+              }}
+              onAcierto={sfxPlace}
+              onError={sfxNo}
+            />
+          )}
+
           {modo === "plataformas" && (
             <>
               <div style={{ ...card, padding: "18px 22px" }}>
@@ -399,7 +494,7 @@ export function LabAlgoritmosDeciden({ color }: PracticaLabProps) {
               </div>
               <div style={{ textAlign: "right", maxWidth: 180 }}>
                 <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45 }}>
-                  {bestEstrellas >= 3 ? "¡Entiendes cómo el algoritmo decide por ti!" : "Completa los tres modos para ganar las estrellas."}
+                  {bestEstrellas >= 3 ? "¡Entiendes cómo el algoritmo decide por ti!" : "Termina los tres modos para ganar 2★; la tercera pide 2 errores o menos."}
                 </div>
               </div>
             </div>

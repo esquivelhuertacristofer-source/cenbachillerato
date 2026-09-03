@@ -82,6 +82,12 @@ export const TIPO_CONFIG: Record<string, { faIcon: string; label: string; color:
   simulacion:             { faIcon: "fa-flask",           label: "Simulación",         color: "#34D399" },
   glosario_interactivo:   { faIcon: "fa-spell-check",     label: "Glosario",           color: "#7DD3FC" },
   autoevaluacion:         { faIcon: "fa-clipboard-check", label: "Autoevaluación",     color: "#FB923C" },
+  // Tipos dinámicos (migración 26): se responden moviendo y decidiendo.
+  ordenar_secuencia:      { faIcon: "fa-arrow-down-1-9",  label: "Ordena",             color: "#34D399" },
+  relacionar_columnas:    { faIcon: "fa-link",            label: "Relaciona",          color: "#7DD3FC" },
+  clasificar_categorias:  { faIcon: "fa-layer-group",     label: "Clasifica",          color: "#FB923C" },
+  caso_decision:          { faIcon: "fa-route",           label: "Caso",               color: "#F472B6" },
+  reto_cronometrado:      { faIcon: "fa-stopwatch",       label: "Reto",               color: "#FBBF24" },
 };
 
 export function getTipoConfig(tipo: string) {

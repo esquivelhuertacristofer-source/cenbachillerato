@@ -4,8 +4,8 @@
  * Laboratorio — Licencias digitales: ¿libre o privativo?
  * Práctica experimental para CD-I-P02-A2 (Cultura Digital I · licenciamiento).
  *
- * Interactividad máxima: el alumno EXPERIMENTA arrastrando. Tres modos, tres
- * interacciones distintas:
+ * Interactividad máxima. Cuatro modos: los tres de arrastrar/clasificar y, al
+ * final, uno que se escribe («Completa el texto», verbatim de la progresión):
  *  1. «¿Libre o privativo?»  — clasifica seis programas en dos contenedores
  *     (Windows / Office / Photoshop vs GNU/Linux / LibreOffice / Firefox).
  *  2. «Creative Commons»     — empareja cada licencia (CC BY, CC BY-SA,
@@ -22,6 +22,11 @@ import { useEffect, useRef, useState } from "react";
 import type { PracticaLabProps } from "../registry";
 import { T, OK, card, Eyebrow } from "./_kit";
 import { LabSfx } from "./lab-audio";
+import { CompletaTexto } from "./_mecanica-huecos";
+import { LICENCIAS_SOFTWARE_HUECOS } from "./licencias-software-huecos";
+import { usePartida, MarcadorPartida } from "./_partida";
+import { FichaTeorica } from "./_ficha";
+import { LICENCIAS_SOFTWARE_FICHA } from "./licencias-software-ficha";
 import {
   PROGRAMAS,
   TIPO_INFO,
@@ -33,15 +38,16 @@ import {
 } from "./licencias-software-data";
 
 const NO = "#FF5E5E";
-import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
+import { useEstrellas } from "@/lib/hooks/useEstrellas";
 const RETO_KEY = "cen-licencias-software-reto";
 
-type Modo = "clasificar" | "creativecommons" | "libertades";
+type Modo = "clasificar" | "creativecommons" | "libertades" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
   { id: "clasificar", label: "¿Libre o privativo?", icono: "fa-scale-balanced" },
   { id: "creativecommons", label: "Creative Commons", icono: "fa-copyright" },
   { id: "libertades", label: "Las cuatro libertades", icono: "fa-dove" },
+  { id: "texto", label: "Completa el texto", icono: "fa-pen-to-square" },
 ];
 
 const porTexto = (a: { texto: string }, b: { texto: string }) => a.texto.localeCompare(b.texto, "es");
@@ -51,7 +57,13 @@ export function LabLicenciasSoftware({ color }: PracticaLabProps) {
   const [modo, setModo] = useState<Modo>("clasificar");
 
   // ── sonido ────────────────────────────────────────────────────────────
+  const partida = usePartida();
   const [sonido, setSonido] = useState(false);
+  const [drawer, setDrawer] = useState(false);
+  // Modo «Completa el texto». El contador sirve de `key`: subirlo remonta
+  // el componente y devuelve todos los huecos en blanco.
+  const [textoDone, setTextoDone] = useState(false);
+  const [textoIntento, setTextoIntento] = useState(0);
   const audioRef = useRef<LabSfx | null>(null);
   useEffect(() => () => audioRef.current?.dispose(), []);
   const toggleSonido = async () => {
@@ -64,9 +76,18 @@ export function LabLicenciasSoftware({ color }: PracticaLabProps) {
       setSonido(false);
     }
   };
+  // Los tres ayudantes son el único punto por el que pasan todos los aciertos
+  // y todos los fallos del laboratorio, así que la partida se lleva aquí.
+  // `sfxOk` no cuenta: marca el fin de un modo, no una respuesta suelta.
   const sfxOk = () => sonido && audioRef.current?.correcto();
-  const sfxNo = () => sonido && audioRef.current?.incorrecto();
-  const sfxPlace = () => sonido && audioRef.current?.blip();
+  const sfxNo = () => {
+    partida.error();
+    return sonido && audioRef.current?.incorrecto();
+  };
+  const sfxPlace = () => {
+    partida.acierto();
+    return sonido && audioRef.current?.blip();
+  };
 
   // ── modo Clasificar (programa → privativo/libre) ──────────────────────
   const [ubicProg, setUbicProg] = useState<Record<string, TipoLic>>({});
@@ -160,30 +181,16 @@ export function LabLicenciasSoftware({ color }: PracticaLabProps) {
   const clasificarDone = Object.keys(ubicProg).length >= PROGRAMAS.length;
   const ccDone = Object.keys(empCC).length >= LICENCIAS_CC.length;
   const libertadesDone = ordenLib.length >= LIBERTADES.length;
-  const estrellas = (clasificarDone ? 1 : 0) + (ccDone ? 1 : 0) + (libertadesDone ? 1 : 0);
+  const modosHechos = (clasificarDone ? 1 : 0) + (ccDone ? 1 : 0) + (libertadesDone ? 1 : 0) + (textoDone ? 1 : 0);
+  // Terminar los 3 modos vale 2★; la tercera se gana con precisión.
+  const estrellas = partida.estrellasCon(modosHechos, 4);
 
-  const [mejor, setMejor] = useState<number>(() => {
-    if (typeof window === "undefined") return 0;
-    try {
-      return Number(window.localStorage.getItem(RETO_KEY)) || 0;
-    } catch {
-      return 0;
-    }
-  });
+  const { mejorEstrellas: mejor, registraEstrellas } = useEstrellas(RETO_KEY);
   const bestEstrellas = Math.max(estrellas, mejor);
 
   const persistMejor = (a: boolean, b: boolean, c: boolean) => {
     const est = (a ? 1 : 0) + (b ? 1 : 0) + (c ? 1 : 0);
-    setMejor((m) => {
-      if (est <= m) return m;
-      try {
-        window.localStorage.setItem(RETO_KEY, String(est));
-      } catch {
-        /* localStorage no disponible */
-      }
-      return est;
-    });
-    void guardarEstrellas(RETO_KEY, est);
+    registraEstrellas(est);
   };
 
   const objetivos = [
@@ -222,7 +229,11 @@ export function LabLicenciasSoftware({ color }: PracticaLabProps) {
     },
   });
 
-  const resetActual = modo === "clasificar" ? resetProg : modo === "creativecommons" ? resetCC : resetLib;
+  const resetTexto = () => {
+    setTextoDone(false);
+    setTextoIntento((n) => n + 1);
+  };
+  const resetActual = modo === "texto" ? resetTexto : modo === "clasificar" ? resetProg : modo === "creativecommons" ? resetCC : resetLib;
 
   return (
     <div style={{ color: T.text }}>
@@ -263,6 +274,47 @@ export function LabLicenciasSoftware({ color }: PracticaLabProps) {
         .lic-btn:hover { border-color:${T.lineStrong}; }
         .lic-divider { height:1px; background:${T.line}; margin:18px 0; }
         @media (prefers-reduced-motion: reduce){ .lic-bin[data-shake="true"], .lic-row[data-shake="true"], .lic-slot[data-shake="true"] { animation:none; } }
+
+        /* Cajón de teoría */
+        .lic-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
+          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
+        .lic-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
+        .lic-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
+          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
+          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
+          display:flex; flex-direction:column; }
+        .lic-drawer[data-open="true"] { transform:translateX(0); }
+        .lic-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
+          padding:18px 20px; border-bottom:1px solid ${T.line}; }
+        .lic-drawer-body { overflow-y:auto; padding:20px; flex:1; }
+        .lic-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
+          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+        .lic-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
+        .lic-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
+          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
+          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
+        .lic-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
+        @media (max-width: 640px){ .lic-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
+
+        /* Identidad del tablero */
+        .lic-bin, .lic-row { --tono:188; position:relative;
+          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
+        .lic-bin:nth-of-type(6n+1), .lic-row:nth-of-type(6n+1) { --tono:188; }
+        .lic-bin:nth-of-type(6n+2), .lic-row:nth-of-type(6n+2) { --tono:262; }
+        .lic-bin:nth-of-type(6n+3), .lic-row:nth-of-type(6n+3) { --tono:44; }
+        .lic-bin:nth-of-type(6n+4), .lic-row:nth-of-type(6n+4) { --tono:152; }
+        .lic-bin:nth-of-type(6n+5), .lic-row:nth-of-type(6n+5) { --tono:330; }
+        .lic-bin:nth-of-type(6n+6), .lic-row:nth-of-type(6n+6) { --tono:18; }
+        .lic-bin::before, .lic-row::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
+          background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
+        .lic-bin[data-done="true"], .lic-row[data-done="true"] {
+          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.2) 0%, transparent 68%); }
+        .lic-chip { transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
+        .lic-chip:hover { transform:translateY(-2px); }
+        .lic-chip[data-sel="true"] { transform:translateY(-3px) scale(1.02); }
+        @media (prefers-reduced-motion: reduce){
+          .lic-chip, .lic-chip:hover, .lic-chip[data-sel="true"] { transform:none; transition:none; }
+        }
       `}</style>
 
       {/* selector de modo + toolbar */}
@@ -274,6 +326,10 @@ export function LabLicenciasSoftware({ color }: PracticaLabProps) {
           </button>
         ))}
         <div style={{ flex: 1 }} />
+        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+        <button className="lic-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
+          <i className="fa-solid fa-book-open" />
+        </button>
         <button className="lic-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
           <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
         </button>
@@ -282,10 +338,48 @@ export function LabLicenciasSoftware({ color }: PracticaLabProps) {
         </button>
       </div>
 
+      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
+      <button className="lic-teoria-fab" onClick={() => setDrawer(true)}>
+        <i className="fa-solid fa-book-open" />
+        Teoría
+      </button>
+      <div className="lic-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
+      <aside className="lic-drawer" data-open={drawer} aria-hidden={!drawer}>
+        <div className="lic-drawer-head">
+          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
+            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
+          </div>
+          <button className="lic-close" onClick={() => setDrawer(false)} title="Cerrar">
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
+        <div className="lic-drawer-body">
+          <FichaTeorica data={LICENCIAS_SOFTWARE_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+        </div>
+      </aside>
+
       <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}>
         {/* ── Columna principal ─────────────────────────────────────────── */}
         <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
           {/* MODO 1 — clasificar */}
+          {/* MODO — completa el texto (fill_blanks verbatim de la progresión) */}
+          {modo === "texto" && (
+            <CompletaTexto
+              key={textoIntento}
+              data={LICENCIAS_SOFTWARE_HUECOS}
+              accent={accent}
+              rgba={color.rgba}
+              completado={textoDone}
+              onCompletado={() => {
+                setTextoDone(true);
+                sfxOk();
+              }}
+              onAcierto={sfxPlace}
+              onError={sfxNo}
+            />
+          )}
+
           {modo === "clasificar" && (
             <>
               <div style={{ ...card, padding: "18px 22px" }}>
@@ -423,7 +517,7 @@ export function LabLicenciasSoftware({ color }: PracticaLabProps) {
               </div>
               <div style={{ textAlign: "right", maxWidth: 180 }}>
                 <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45 }}>
-                  {bestEstrellas >= 3 ? "¡Dominas las licencias digitales!" : "Completa los tres modos para ganar las estrellas."}
+                  {bestEstrellas >= 3 ? "¡Dominas las licencias digitales!" : "Termina los tres modos para ganar 2★; la tercera pide 2 errores o menos."}
                 </div>
               </div>
             </div>

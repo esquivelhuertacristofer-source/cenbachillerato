@@ -14,6 +14,9 @@ import {
 } from "react";
 
 import { narradorStore } from "@/lib/narrador-prefs";
+import { tieneVozGrabada } from "@/lib/voz/voz-hecha";
+import { rutaVoz } from "@/lib/voz/ruta-voz";
+import type { SegmentoVoz } from "@/lib/voz/segmentos";
 
 /**
  * Narrador nativo del navegador (Web Speech API) para CUALQUIER actividad.
@@ -25,23 +28,56 @@ import { narradorStore } from "@/lib/narrador-prefs";
  *   las actividades tienen narrador funcional sin tocar cada componente.
  * - Si el navegador no soporta `speechSynthesis`, el botón simplemente no se
  *   renderiza (degradación elegante).
+ *
+ * DOS NARRADORES, Y EL BUENO GANA CUANDO EXISTE.
+ *
+ * La Web Speech API es gratis pero la voz que suena es la que esa máquina tenga
+ * instalada: en la laptop de una escuela pública es la SAPI vieja de Windows
+ * —"Microsoft Sabina"—, que suena robótica, y en algún Chromebook no hay
+ * ninguna voz en español. Por eso las lecturas se grabaron una sola vez con
+ * `es-MX-DaliaNeural`, la misma locutora de los 211 videos
+ * (`scripts/narrar-actividades.py`).
+ *
+ * Cuando la actividad está en `voz-hecha.ts` el botón reproduce esos MP3 desde
+ * R2: misma voz en toda la plataforma, en cualquier máquina. Cuando no lo está
+ * —el resto de los tipos de actividad— sigue el narrador del navegador exacto
+ * de antes. El botón nunca desaparece; sólo suena mejor donde hay grabación.
+ *
+ * UN CLIP QUE FALTA NO ROMPE LA FILA: el `error` del <audio> avanza al
+ * siguiente en vez de dejar la lectura colgada a media página.
  */
 
 interface NarracionCtx {
   /** Registra el texto limpio a narrar (null para volver al fallback de pantalla). */
   registrar: (texto: string | null) => void;
+  /** Registra los trozos grabados (clave + texto) de una lectura con voz propia. */
+  registrarSegmentos: (segmentos: SegmentoVoz[] | null) => void;
   /** Ref al contenedor del contenido visible; fallback cuando no hay texto registrado. */
   contentRef: RefObject<HTMLDivElement | null>;
+  /** Código de la actividad (p.ej. "CD-I-P01-A1"); decide si hay voz grabada. */
+  codigo: string | null;
 }
 
 const Ctx = createContext<NarracionCtx | null>(null);
 
-export function NarracionProvider({ children }: { children: ReactNode }) {
+export function NarracionProvider({
+  children,
+  codigo = null,
+}: {
+  children: ReactNode;
+  /** Código de la actividad. Sin él, sólo hay narrador del navegador. */
+  codigo?: string | null;
+}) {
   const textoRef = useRef<string | null>(null);
+  const segmentosRef = useRef<SegmentoVoz[] | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
   const registrar = useCallback((texto: string | null) => {
     textoRef.current = texto;
+  }, []);
+
+  const registrarSegmentos = useCallback((segmentos: SegmentoVoz[] | null) => {
+    segmentosRef.current = segmentos && segmentos.length > 0 ? segmentos : null;
   }, []);
 
   // Al desmontar la actividad (p.ej. navegar a otra), corta cualquier locución.
@@ -54,9 +90,11 @@ export function NarracionProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <Ctx.Provider value={{ registrar, contentRef }}>
+    <Ctx.Provider value={{ registrar, registrarSegmentos, contentRef, codigo }}>
       <NarracionTextoRefContext.Provider value={textoRef}>
-        {children}
+        <NarracionSegmentosRefContext.Provider value={segmentosRef}>
+          {children}
+        </NarracionSegmentosRefContext.Provider>
       </NarracionTextoRefContext.Provider>
     </Ctx.Provider>
   );
@@ -65,6 +103,7 @@ export function NarracionProvider({ children }: { children: ReactNode }) {
 // El botón necesita leer el texto registrado en tiempo de clic (no de render),
 // así que el ref viaja por un contexto aparte para no re-renderizar a nadie.
 const NarracionTextoRefContext = createContext<RefObject<string | null> | null>(null);
+const NarracionSegmentosRefContext = createContext<RefObject<SegmentoVoz[] | null> | null>(null);
 
 /**
  * Hook para que un componente de actividad registre la prosa que debe leerse.
@@ -77,6 +116,22 @@ export function useRegistrarNarracion(texto: string | null | undefined) {
     ctx.registrar(texto && texto.trim() ? texto : null);
     return () => ctx.registrar(null);
   }, [ctx, texto]);
+}
+
+/**
+ * Hook para que una lectura registre sus trozos grabados.
+ *
+ * Los `segmentos` tienen que salir de `segmentosDeLectura(titulo, texto)` con el
+ * MISMO título y el MISMO texto que vio `scripts/extraer-voz-actividades.ts`;
+ * si no, se pediría el MP3 de otro párrafo y la lectura sonaría corrida.
+ */
+export function useRegistrarSegmentosVoz(segmentos: SegmentoVoz[] | null | undefined) {
+  const ctx = useContext(Ctx);
+  useEffect(() => {
+    if (!ctx) return;
+    ctx.registrarSegmentos(segmentos ?? null);
+    return () => ctx.registrarSegmentos(null);
+  }, [ctx, segmentos]);
 }
 
 /** Asigna el `contentRef` del provider a un contenedor (el wrapper de children). */
@@ -224,7 +279,14 @@ const VELOCIDADES = [0.75, 1, 1.25, 1.5, 2] as const;
 export function NarradorControl({ accentHex }: { accentHex: string }) {
   const ctx = useContext(Ctx);
   const textoRef = useContext(NarracionTextoRefContext);
-  const soportado = useSyncExternalStore(SUSCRIBIR_NOOP, leerSoporte, () => false);
+  const segmentosRef = useContext(NarracionSegmentosRefContext);
+  const soporteVoz = useSyncExternalStore(SUSCRIBIR_NOOP, leerSoporte, () => false);
+  const codigo = ctx?.codigo ?? null;
+  /** ¿Esta actividad tiene grabación propia con la voz de la plataforma? */
+  const grabada = tieneVozGrabada(codigo);
+  // Con grabación el botón vale aunque el navegador no traiga sintetizador: el
+  // audio es un <audio>, no la Web Speech API.
+  const soportado = grabada || soporteVoz;
   const voces = useSyncExternalStore(
     vocesStore.subscribe,
     vocesStore.getSnapshot,
@@ -239,15 +301,99 @@ export function NarradorControl({ accentHex }: { accentHex: string }) {
   const [fragmento, setFragmento] = useState<string | null>(null);
   const [ajustes, setAjustes] = useState(false);
 
+  /* ── Reproducción de la voz grabada (MP3 en R2) ──────────────────────────
+     Una cola de claves y UN solo <audio> que las va tocando en orden. Nunca
+     suenan dos a la vez y nada arranca solo: arranca cuando un dedo lo pide. */
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const colaRef = useRef<SegmentoVoz[]>([]);
+  const parandoRef = useRef(false);
+
+  /** Suelta el <audio> al desmontar para no dejar audio sonando al navegar. */
+  useEffect(() => {
+    return () => {
+      const a = audioRef.current;
+      if (a) {
+        a.pause();
+        a.src = "";
+      }
+      colaRef.current = [];
+    };
+  }, []);
+
+  const avanzarClip = useCallback(() => {
+    const a = audioRef.current;
+    if (!a || parandoRef.current) return;
+    const seg = colaRef.current.shift();
+    if (!seg || !codigo) {
+      setEstado("idle");
+      setFragmento(null);
+      return;
+    }
+    a.src = rutaVoz(codigo, seg.clave);
+    a.playbackRate = Math.min(2, Math.max(0.5, prefs.rate));
+    setFragmento(seg.texto);
+    // El navegador sólo deja sonar audio nacido de un gesto; todas las colas
+    // nacen de un clic. Si aun así lo rechaza, se corta en vez de dejar el
+    // subtítulo encendido sobre un silencio.
+    void a.play().catch(() => {
+      colaRef.current = [];
+      setEstado("idle");
+      setFragmento(null);
+    });
+  }, [codigo, prefs.rate]);
+
   const detener = useCallback(() => {
-    if (!soportado) return;
+    if (grabada) {
+      colaRef.current = [];
+      parandoRef.current = true;
+      const a = audioRef.current;
+      if (a) {
+        a.pause();
+        a.currentTime = 0;
+      }
+      parandoRef.current = false;
+      setEstado("idle");
+      setFragmento(null);
+      return;
+    }
+    if (!soporteVoz) return;
     window.speechSynthesis.cancel();
     setEstado("idle");
     setFragmento(null);
-  }, [soportado]);
+  }, [grabada, soporteVoz]);
+
+  // El manejador de `ended` se registra una sola vez, pero `avanzarClip` cambia
+  // cuando cambia la velocidad: se lee del ref para no re-suscribir eventos.
+  const avanzarClipRef = useRef(avanzarClip);
+  useEffect(() => { avanzarClipRef.current = avanzarClip; }, [avanzarClip]);
+
+  const iniciarGrabada = useCallback(() => {
+    const segmentos = segmentosRef?.current;
+    if (!segmentos || segmentos.length === 0 || !codigo) return false;
+    let a = audioRef.current;
+    if (!a) {
+      a = new Audio();
+      a.preload = "auto";
+      // `ended` y `error` comparten manejador a propósito: un MP3 que falta se
+      // salta al siguiente en vez de dejar la lectura colgada a media página.
+      const seguir = () => avanzarClipRef.current();
+      a.addEventListener("ended", seguir);
+      a.addEventListener("error", seguir);
+      audioRef.current = a;
+    }
+    colaRef.current = [...segmentos];
+    a.pause();
+    setEstado("playing");
+    avanzarClip();
+    return true;
+  }, [codigo, segmentosRef, avanzarClip]);
+
 
   const iniciar = useCallback(() => {
-    if (!soportado || !ctx) return;
+    // Con grabación propia gana el MP3; si por lo que sea no hay segmentos
+    // registrados, cae al sintetizador del navegador como cualquier otro tipo.
+    if (grabada && iniciarGrabada()) return;
+    if (!soporteVoz || !ctx) return;
     const registrado = textoRef?.current;
     const fallback = ctx.contentRef.current?.innerText ?? "";
     const fuente = registrado && registrado.trim() ? registrado : fallback;
@@ -282,21 +428,43 @@ export function NarradorControl({ accentHex }: { accentHex: string }) {
       };
       synth.speak(u);
     });
-  }, [soportado, ctx, textoRef, prefs.vozURI, prefs.rate]);
+  }, [grabada, iniciarGrabada, soporteVoz, ctx, textoRef, prefs.vozURI, prefs.rate]);
 
   const alternarReproduccion = useCallback(() => {
     if (!soportado) return;
-    const synth = window.speechSynthesis;
     if (estado === "idle") {
       iniciar();
-    } else if (estado === "playing") {
+      return;
+    }
+    if (grabada) {
+      const a = audioRef.current;
+      if (!a) return;
+      if (estado === "playing") {
+        a.pause();
+        setEstado("paused");
+      } else {
+        void a.play().catch(() => detener());
+        setEstado("playing");
+      }
+      return;
+    }
+    const synth = window.speechSynthesis;
+    if (estado === "playing") {
       synth.pause();
       setEstado("paused");
     } else {
       synth.resume();
       setEstado("playing");
     }
-  }, [soportado, estado, iniciar]);
+  }, [soportado, estado, iniciar, grabada, detener]);
+
+  /* La velocidad del <audio> sí se puede cambiar sin reiniciar (a diferencia de
+     la Web Speech API, donde el `rate` viaja pegado a cada utterance ya
+     encolada). Se aplica en caliente para que el alumno oiga el cambio. */
+  useEffect(() => {
+    const a = audioRef.current;
+    if (grabada && a) a.playbackRate = Math.min(2, Math.max(0.5, prefs.rate));
+  }, [grabada, prefs.rate]);
 
   if (!soportado) return null;
 
@@ -409,6 +577,28 @@ export function NarradorControl({ accentHex }: { accentHex: string }) {
             letterSpacing: "normal",
           }}
         >
+          {grabada ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.72)" }}>
+                Voz
+              </span>
+              <span
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: 8,
+                  fontSize: 12, fontWeight: 700, color: accentHex,
+                  padding: "7px 10px", borderRadius: 8,
+                  background: `${accentHex}18`, border: `1px solid ${accentHex}44`,
+                }}
+              >
+                <i className="fa-solid fa-certificate" style={{ fontSize: 11 }} />
+                Voz de la plataforma
+              </span>
+              <span style={{ fontSize: 10, color: "rgba(255,255,255,0.45)" }}>
+                Esta lectura está grabada con la misma locutora de los videos, así que
+                suena igual en cualquier computadora.
+              </span>
+            </div>
+          ) : (
           <label style={{ display: "flex", flexDirection: "column", gap: 5 }}>
             <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.72)" }}>
               Voz
@@ -445,6 +635,7 @@ export function NarradorControl({ accentHex }: { accentHex: string }) {
               </span>
             ) : null}
           </label>
+          )}
 
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.72)" }}>
@@ -477,7 +668,9 @@ export function NarradorControl({ accentHex }: { accentHex: string }) {
               })}
             </div>
             <span style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>
-              El cambio se aplica al volver a iniciar la lectura.
+              {grabada
+                ? "El cambio se aplica al instante."
+                : "El cambio se aplica al volver a iniciar la lectura."}
             </span>
           </div>
         </div>

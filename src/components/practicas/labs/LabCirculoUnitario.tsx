@@ -42,7 +42,7 @@ const SIN_COL = "#34D399";
 const COS_COL = "#60a5fa";
 const TAN_COL = "#f472b6";
 const WARN = "#FF8A3C";
-import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
+import { useEstrellas } from "@/lib/hooks/useEstrellas";
 const RETO_KEY = "cen-circulo-reto";
 
 /* Instrumentos de trazo (pilar EQUIPARSE) — 3 correctos + 3 distractores. */
@@ -70,10 +70,7 @@ export function LabCirculoUnitario({ color }: PracticaLabProps) {
   const [eppListo, setEppListo] = useState(false);
   const [arrastro, setArrastro] = useState(false);
   const [predicho, setPredicho] = useState(false);
-  const [mejorEstrellas, setMejorEstrellas] = useState<number>(() => {
-    if (typeof window === "undefined") return 0;
-    try { return Number(window.localStorage.getItem(RETO_KEY)) || 0; } catch { return 0; }
-  });
+  const { mejorEstrellas, registraEstrellas: guardaEstrellas } = useEstrellas(RETO_KEY);
 
   // reto evaluable, teoría (cajón deslizable) y sonido
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
@@ -145,13 +142,8 @@ export function LabCirculoUnitario({ color }: PracticaLabProps) {
   // registro del reto de cálculo (estrellas + récord local)
   const registraEstrellas = useCallback((est: number) => {
     setPredicho(true);
-    setMejorEstrellas((prev) => {
-      const mejor = Math.max(prev, est);
-      try { window.localStorage.setItem(RETO_KEY, String(mejor)); } catch { /* ignore */ }
-      return mejor;
-    });
-    void guardarEstrellas(RETO_KEY, est);
-  }, []);
+    guardaEstrellas(est);
+  }, [guardaEstrellas]);
 
   const senStr = exacto ? exacto.sinStr : fmtNum(t.sin);
   const cosStr = exacto ? exacto.cosStr : fmtNum(t.cos);

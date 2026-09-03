@@ -166,6 +166,7 @@ const LabComunicacionMultimodal = dynamic(() => import("./labs/LabComunicacionMu
 const LabDiversidadDiscriminacion = dynamic(() => import("./labs/LabDiversidadDiscriminacion").then((m) => m.LabDiversidadDiscriminacion), { ssr: false, loading: LabCargando });
 const LabRelacionesPoder = dynamic(() => import("./labs/LabRelacionesPoder").then((m) => m.LabRelacionesPoder), { ssr: false, loading: LabCargando });
 const LabPoliticasPublicas = dynamic(() => import("./labs/LabPoliticasPublicas").then((m) => m.LabPoliticasPublicas), { ssr: false, loading: LabCargando });
+const LabCrisisSociales = dynamic(() => import("./labs/LabCrisisSociales").then((m) => m.LabCrisisSociales), { ssr: false, loading: LabCargando });
 const LabGenerosLiterarios = dynamic(() => import("./labs/LabGenerosLiterarios").then((m) => m.LabGenerosLiterarios), { ssr: false, loading: LabCargando });
 const LabPresentPerfectIngles = dynamic(() => import("./labs/LabPresentPerfectIngles").then((m) => m.LabPresentPerfectIngles), { ssr: false, loading: LabCargando });
 const LabSentidoHistorico = dynamic(() => import("./labs/LabSentidoHistorico").then((m) => m.LabSentidoHistorico), { ssr: false, loading: LabCargando });
@@ -329,6 +330,7 @@ export const PRACTICAS: Record<string, PracticaDef> = {
   "diversidad-discriminacion": { ...PRACTICAS_META["diversidad-discriminacion"]!, Component: LabDiversidadDiscriminacion },
   "relaciones-poder": { ...PRACTICAS_META["relaciones-poder"]!, Component: LabRelacionesPoder },
   "politicas-publicas": { ...PRACTICAS_META["politicas-publicas"]!, Component: LabPoliticasPublicas },
+  "crisis-sociales": { ...PRACTICAS_META["crisis-sociales"]!, Component: LabCrisisSociales },
   "generos-literarios": { ...PRACTICAS_META["generos-literarios"]!, Component: LabGenerosLiterarios },
   "present-perfect-ingles": { ...PRACTICAS_META["present-perfect-ingles"]!, Component: LabPresentPerfectIngles },
   "sentido-historico": { ...PRACTICAS_META["sentido-historico"]!, Component: LabSentidoHistorico },

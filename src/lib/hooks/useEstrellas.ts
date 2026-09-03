@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { guardarEstrellas, leerEstrellas } from "@/app/actions/guardarEstrellas";
 
 /**
@@ -32,6 +32,12 @@ export function useEstrellas(retoKey: string) {
     return () => { cancelled = true; };
   }, [retoKey]);
 
+  // La mejor marca que este cliente ya mandó al servidor. Sin esto, un lab que
+  // registra cada vez que el alumno cumple un objetivo dispara una consulta por
+  // objetivo, y todas menos la primera son para que el servidor conteste que ya
+  // tenía algo igual o mejor. Es un ref y no estado: cambiarlo no debe pintar.
+  const enviado = useRef(0);
+
   const registraEstrellas = useCallback(
     (est: number) => {
       setMejorEstrellas((m) => {
@@ -39,7 +45,10 @@ export function useEstrellas(retoKey: string) {
         try { window.localStorage.setItem(retoKey, String(nx)); } catch { /* noop */ }
         return nx;
       });
-      void guardarEstrellas(retoKey, est);
+      if (est > enviado.current) {
+        enviado.current = est;
+        void guardarEstrellas(retoKey, est);
+      }
     },
     [retoKey],
   );

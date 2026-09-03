@@ -63,6 +63,7 @@ export default async function ActividadPage({ params }: Props) {
   return (
     <ActivityRunner
       actividadId={actividad.id}
+      codigo={actividad.codigo}
       tipo={actividad.tipo}
       titulo={actividad.titulo}
       descripcion={actividad.descripcion}

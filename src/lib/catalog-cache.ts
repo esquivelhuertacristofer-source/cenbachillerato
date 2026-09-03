@@ -79,7 +79,7 @@ declare global {
 // deriva del sufijo `-A{n}` del código y las filas `-VID01` no eran alcanzables.
 // Los árboles cacheados guardan el `codigo`, así que sin este bump seguirían
 // sirviendo los códigos viejos —y los enlaces rotos— hasta 12 h.
-const CATALOG_CACHE_VERSION = "v3";
+const CATALOG_CACHE_VERSION = "v5";
 const PREFIX = `__catalog__:${CATALOG_CACHE_VERSION}:`;
 
 /** TTLs sugeridos (segundos). El catálogo cambia solo al desplegar; el TTL es la red de seguridad. */

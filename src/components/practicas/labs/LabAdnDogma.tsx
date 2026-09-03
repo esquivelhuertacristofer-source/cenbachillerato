@@ -67,7 +67,7 @@ const AdnDogmaScene = dynamic(() => import("./AdnDogmaScene"), {
 const CODON_DEMO: string[] = ["AUG", "UUU", "UUC", "GCA", "AAG", "GGU", "UGU", "UAA", "UAG", "UGA"];
 
 /** Registro local del mejor desempeño en el reto de traducción de codones. */
-import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
+import { useEstrellas } from "@/lib/hooks/useEstrellas";
 const RETO_KEY = "cen-adn-reto";
 
 /** Equipo de protección y bioseguridad de un laboratorio de biología molecular. */
@@ -225,11 +225,7 @@ export function LabAdnDogma({ color }: PracticaLabProps) {
   const [arrastro, setArrastro] = useState(false);
   const [predicho, setPredicho] = useState(false);
   const [modosVistos, setModosVistos] = useState<Set<Modo>>(() => new Set<Modo>(["replicacion"]));
-  const [mejorEstrellas, setMejorEstrellas] = useState<number>(() => {
-    if (typeof window === "undefined") return 0;
-    const v = Number(window.localStorage.getItem(RETO_KEY));
-    return Number.isFinite(v) ? v : 0;
-  });
+  const { mejorEstrellas, registraEstrellas: guardaEstrellas } = useEstrellas(RETO_KEY);
 
   const onArrastraPaso = useCallback((p: number) => {
     setPlaying(false);
@@ -241,17 +237,8 @@ export function LabAdnDogma({ color }: PracticaLabProps) {
   }, [sonido]);
   const registraEstrellas = useCallback((estrellas: number) => {
     setPredicho(true);
-    setMejorEstrellas((prev) => {
-      const mejor = Math.max(prev, estrellas);
-      try {
-        window.localStorage.setItem(RETO_KEY, String(mejor));
-      } catch {
-        /* almacenamiento no disponible */
-      }
-      return mejor;
-    });
-    void guardarEstrellas(RETO_KEY, estrellas);
-  }, []);
+    guardaEstrellas(estrellas);
+  }, [guardaEstrellas]);
 
   const toggleSonido = useCallback(async () => {
     if (!audioRef.current) audioRef.current = new LabSfx();

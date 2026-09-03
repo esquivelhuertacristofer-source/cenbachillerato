@@ -28,6 +28,7 @@ import { RetoQuizCard } from "./_reto-quiz";
 import { QUIZ_A2 } from "./ph-escala-data";
 import { EppGate, type EppItem } from "./_epp-gate";
 import { LabSfx } from "./lab-audio";
+import { useLogros } from "./_partida";
 import {
   SUSTANCIAS, COTIDIANAS, sustancia, SUST_DEF,
   ACIDOS, type TipoAcido, phPorGotas, curvaTitulacion, GOTAS_EQ, GOTAS_MAX,
@@ -48,7 +49,7 @@ const PhScene = dynamic(() => import("./PhScene"), {
 type Modo = "medir" | "neutralizar";
 
 const WARN = "#FF8A3C";
-import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
+import { useEstrellas } from "@/lib/hooks/useEstrellas";
 const RETO_KEY = "cen-ph-reto";
 
 /** Equipo de protección personal: en química se manejan ácidos y bases corrosivos. */
@@ -76,10 +77,7 @@ export function LabPh({ color }: PracticaLabProps) {
   const [medido, setMedido] = useState(false);
   const [arrastro, setArrastro] = useState(false);
   const [predicho, setPredicho] = useState(false);
-  const [mejorEstrellas, setMejorEstrellas] = useState<number>(() => {
-    if (typeof window === "undefined") return 0;
-    try { return Number(window.localStorage.getItem(RETO_KEY)) || 0; } catch { return 0; }
-  });
+  const { mejorEstrellas, registraEstrellas: guardaEstrellas } = useEstrellas(RETO_KEY);
   // teoría (cajón deslizable) y sonido
   const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
@@ -136,6 +134,10 @@ export function LabPh({ color }: PracticaLabProps) {
     { txt: "Calcula los iones H⁺ (escala logarítmica)", done: predicho },
     { txt: "Aprueba el cuestionario de la actividad A4", done: ejercicioAprobado },
   ];
+  // Algunos de estos objetivos dependen del modo activo, así que se
+  // desmarcaban solos al cambiar de pestaña: el laboratorio le quitaba al
+  // alumno lo que ya había hecho. `useLogros` recuerda lo cumplido.
+  const { logros } = useLogros(objetivos.map((o) => o.done));
 
   // Concentración relativa de H⁺ respecto al agua pura (potencia de 10).
   const exp = 7 - ph;
@@ -183,13 +185,8 @@ export function LabPh({ color }: PracticaLabProps) {
   // Registro del reto de cálculo (estrellas + récord en localStorage).
   const registraEstrellas = useCallback((est: number) => {
     setPredicho(true);
-    setMejorEstrellas((prev) => {
-      const mejor = Math.max(prev, est);
-      try { window.localStorage.setItem(RETO_KEY, String(mejor)); } catch { /* ignore */ }
-      return mejor;
-    });
-    void guardarEstrellas(RETO_KEY, est);
-  }, []);
+    guardaEstrellas(est);
+  }, [guardaEstrellas]);
 
   const elegirAcido = (id: TipoAcido) => {
     setTitulando(false);
@@ -574,9 +571,9 @@ export function LabPh({ color }: PracticaLabProps) {
         </Eyebrow>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
           {objetivos.map((o, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? "#34D399" : T.text2 }}>
-              <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-              <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: logros[i] ? "#34D399" : T.text2 }}>
+              <i className={`fa-solid ${logros[i] ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: logros[i] ? 1 : 0.3 }} />
+              <span style={{ fontWeight: logros[i] ? 700 : 500 }}>{o.txt}</span>
             </div>
           ))}
         </div>

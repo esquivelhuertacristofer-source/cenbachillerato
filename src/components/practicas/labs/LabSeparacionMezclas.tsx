@@ -42,7 +42,7 @@ import {
   type Llama,
 } from "./destilacion-data";
 import { LabAudio } from "./destilacion-audio";
-import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
+import { useEstrellas } from "@/lib/hooks/useEstrellas";
 
 const DestilacionScene = dynamic(() => import("./DestilacionScene"), {
   ssr: false,
@@ -100,6 +100,11 @@ export function LabSeparacionMezclas({ color }: PracticaLabProps) {
 
   // modo reto: estrellas de la corrida actual + mejor marca por mezcla (persistida)
   const [reto, setReto] = useState<{ estrellas: number; eff: number; rec: number } | null>(null);
+  // La base guarda una sola mejor marca por laboratorio; el mapa de abajo
+  // guarda además la de CADA mezcla, que es local a este equipo. Se conservan
+  // los dos: el hook recupera la marca global entre dispositivos y el mapa
+  // sigue diciendo cuál mezcla ya se dominó aquí.
+  const { mejorEstrellas: mejorGlobal, registraEstrellas } = useEstrellas(RETO_KEY);
   const [mejores, setMejores] = useState<Record<string, number>>(() => {
     if (typeof window === "undefined") return {};
     try {
@@ -169,14 +174,14 @@ export function LabSeparacionMezclas({ color }: PracticaLabProps) {
           }
           return nx;
         });
-        void guardarEstrellas(RETO_KEY, est);
+        registraEstrellas(est);
         setFase("listo");
         return;
       }
       if (mez.contaminaTemp !== undefined && nt > mez.contaminaTemp && volumen > 12) setContaminado(true);
     }, TICK);
     return () => clearInterval(id);
-  }, [fase, llama, mez, mezKey, contaminado, carga]);
+  }, [fase, llama, mez, mezKey, contaminado, carga, registraEstrellas]);
 
   /* ── Acciones ─────────────────────────────────────────────────────────── */
   const colocar = (k: PiezaKey) => {
@@ -282,7 +287,7 @@ export function LabSeparacionMezclas({ color }: PracticaLabProps) {
     { txt: "Obtén destilado", done: logros.has("destilo") },
     { txt: "Mantén el destilado limpio", done: logros.has("limpio") },
     { txt: "Resuelve los cálculos", done: logros.has("calculo") },
-    { txt: "Consigue una destilación de 3★", done: (mejores[mezKey] ?? 0) >= 3 },
+    { txt: "Consigue una destilación de 3★", done: Math.max(mejores[mezKey] ?? 0, mejorGlobal) >= 3 },
   ];
 
   /* ── Explorador secundario (4 métodos) ───────────────────────────────── */

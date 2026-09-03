@@ -6,15 +6,15 @@
  * «Construye hipótesis para cuestionar las interpretaciones del pasado»
  * (análisis de fuentes del siglo XIX mexicano).
  *
- * Interactividad máxima: el alumno EXPERIMENTA arrastrando. Tres modos, tres
- * interacciones distintas:
+ * Interactividad máxima. Cuatro modos: los tres de arrastrar/clasificar y, al
+ * final, uno que se escribe («Completa el texto», verbatim de la progresión):
  *  1. «¿Primaria o secundaria?» — clasifica ocho fuentes según su relación con
  *     los hechos (testimonio directo o interpretación posterior).
  *  2. «Ordena el método» — arrastra los cuatro pasos para formular una hipótesis
  *     a su lugar correcto en la secuencia (observar → contextualizar → formular
  *     → contrastar).
- *  3. «Empareja término y definición» — arrastra cada concepto del glosario a su
- *     definición verbatim (A5).
+ *  3. «Escribe el término» — lee la definición verbatim (A5) y escribe
+ *     de memoria el término del glosario que la nombra.
  *  + Cuestionario de comprensión (V/F verbatim de A4).
  *
  * DOM puro (sin three.js): ligero, accesible (ratón, teclado y táctil mediante
@@ -25,6 +25,12 @@ import { useEffect, useRef, useState } from "react";
 import type { PracticaLabProps } from "../registry";
 import { T, OK, card, Eyebrow } from "./_kit";
 import { LabSfx } from "./lab-audio";
+import { CompletaTexto } from "./_mecanica-huecos";
+import { EscribeTermino } from "./_mecanica-termino";
+import { HIPOTESIS_HISTORICAS_HUECOS } from "./hipotesis-historicas-huecos";
+import { usePartida, MarcadorPartida } from "./_partida";
+import { FichaTeorica } from "./_ficha";
+import { HIPOTESIS_HISTORICAS_FICHA } from "./hipotesis-historicas-ficha";
 import {
   FUENTES,
   TIPO_FUENTE_INFO,
@@ -36,15 +42,16 @@ import {
 } from "./hipotesis-historicas-data";
 
 const NO = "#FF5E5E";
-import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
+import { useEstrellas } from "@/lib/hooks/useEstrellas";
 const RETO_KEY = "cen-hipotesis-historicas-reto";
 
-type Modo = "fuentes" | "metodo" | "glosario";
+type Modo = "fuentes" | "metodo" | "glosario" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
   { id: "fuentes", label: "¿Primaria o secundaria?", icono: "fa-layer-group" },
   { id: "metodo", label: "Ordena el método", icono: "fa-list-ol" },
-  { id: "glosario", label: "Empareja término y definición", icono: "fa-book-open" },
+  { id: "glosario", label: "Escribe el término", icono: "fa-keyboard" },
+  { id: "texto", label: "Completa el texto", icono: "fa-pen-to-square" },
 ];
 
 export function LabHipotesisHistoricas({ color }: PracticaLabProps) {
@@ -52,7 +59,13 @@ export function LabHipotesisHistoricas({ color }: PracticaLabProps) {
   const [modo, setModo] = useState<Modo>("fuentes");
 
   // ── sonido ────────────────────────────────────────────────────────────
+  const partida = usePartida();
   const [sonido, setSonido] = useState(false);
+  const [drawer, setDrawer] = useState(false);
+  // Modo «Completa el texto». El contador sirve de `key`: subirlo remonta
+  // el componente y devuelve todos los huecos en blanco.
+  const [textoDone, setTextoDone] = useState(false);
+  const [textoIntento, setTextoIntento] = useState(0);
   const audioRef = useRef<LabSfx | null>(null);
   useEffect(() => () => audioRef.current?.dispose(), []);
   const toggleSonido = async () => {
@@ -65,9 +78,18 @@ export function LabHipotesisHistoricas({ color }: PracticaLabProps) {
       setSonido(false);
     }
   };
+  // Los tres ayudantes son el único punto por el que pasan todos los aciertos
+  // y todos los fallos del laboratorio, así que la partida se lleva aquí.
+  // `sfxOk` no cuenta: marca el fin de un modo, no una respuesta suelta.
   const sfxOk = () => sonido && audioRef.current?.correcto();
-  const sfxNo = () => sonido && audioRef.current?.incorrecto();
-  const sfxPlace = () => sonido && audioRef.current?.blip();
+  const sfxNo = () => {
+    partida.error();
+    return sonido && audioRef.current?.incorrecto();
+  };
+  const sfxPlace = () => {
+    partida.acierto();
+    return sonido && audioRef.current?.blip();
+  };
 
   // ── modo fuentes (clasifica por tipo de fuente) ────────────────────────
   const [ubicFuente, setUbicFuente] = useState<Record<string, TipoFuente>>({});
@@ -126,31 +148,14 @@ export function LabHipotesisHistoricas({ color }: PracticaLabProps) {
     setSelPaso(null);
   };
 
-  // ── modo glosario (empareja término → definición) ──────────────────────
-  const [empGlos, setEmpGlos] = useState<Record<string, boolean>>({});
-  const [selGlos, setSelGlos] = useState<string | null>(null);
-  const [shakeGlos, setShakeGlos] = useState<string | null>(null);
-  const glosLibres = PARES.filter((g) => !empGlos[g.id]).slice().sort((a, b) => a.termino.localeCompare(b.termino, "es"));
-
-  const intentarGlos = (chipId: string, rowId: string) => {
-    if (empGlos[rowId]) return;
-    if (chipId === rowId) {
-      setEmpGlos((e) => ({ ...e, [rowId]: true }));
-      setSelGlos(null);
-      sfxPlace();
-      if (Object.keys(empGlos).length + 1 >= PARES.length) {
-        sfxOk();
-        persistMejor(fuentesDone, metodoDone, true);
-      }
-    } else {
-      setShakeGlos(rowId);
-      sfxNo();
-      window.setTimeout(() => setShakeGlos(null), 420);
-    }
-  };
+  // ── modo glosario (lee la definición y ESCRIBE el término) ─────────────
+  // El contador hace de `key`: subirlo remonta el componente y deja todas
+  // las tarjetas en blanco.
+  const [glosarioDone, setGlosarioDone] = useState(false);
+  const [glosIntento, setGlosIntento] = useState(0);
   const resetGlosario = () => {
-    setEmpGlos({});
-    setSelGlos(null);
+    setGlosarioDone(false);
+    setGlosIntento((n) => n + 1);
   };
 
   const [quizAprobado, setQuizAprobado] = useState(false);
@@ -158,37 +163,22 @@ export function LabHipotesisHistoricas({ color }: PracticaLabProps) {
   // ── progreso / estrellas ──────────────────────────────────────────────
   const fuentesDone = Object.keys(ubicFuente).length >= FUENTES.length;
   const metodoDone = Object.keys(ubicPaso).length >= PASOS.length;
-  const glosarioDone = Object.keys(empGlos).length >= PARES.length;
-  const estrellas = (fuentesDone ? 1 : 0) + (metodoDone ? 1 : 0) + (glosarioDone ? 1 : 0);
+  const modosHechos = (fuentesDone ? 1 : 0) + (metodoDone ? 1 : 0) + (glosarioDone ? 1 : 0) + (textoDone ? 1 : 0);
+  // Terminar los 3 modos vale 2★; la tercera se gana con precisión.
+  const estrellas = partida.estrellasCon(modosHechos, 4);
 
-  const [mejor, setMejor] = useState<number>(() => {
-    if (typeof window === "undefined") return 0;
-    try {
-      return Number(window.localStorage.getItem(RETO_KEY)) || 0;
-    } catch {
-      return 0;
-    }
-  });
+  const { mejorEstrellas: mejor, registraEstrellas } = useEstrellas(RETO_KEY);
   const bestEstrellas = Math.max(estrellas, mejor);
 
   const persistMejor = (a: boolean, b: boolean, c: boolean) => {
     const est = (a ? 1 : 0) + (b ? 1 : 0) + (c ? 1 : 0);
-    setMejor((m) => {
-      if (est <= m) return m;
-      try {
-        window.localStorage.setItem(RETO_KEY, String(est));
-      } catch {
-        /* localStorage no disponible */
-      }
-      return est;
-    });
-    void guardarEstrellas(RETO_KEY, est);
+    registraEstrellas(est);
   };
 
   const objetivos = [
     { txt: "Clasifica las 8 fuentes en primaria o secundaria", done: fuentesDone },
     { txt: "Ordena los 4 pasos del método histórico", done: metodoDone },
-    { txt: "Empareja los 6 términos del glosario", done: glosarioDone },
+    { txt: "Escribe los 6 términos del glosario", done: glosarioDone },
     { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];
@@ -221,7 +211,11 @@ export function LabHipotesisHistoricas({ color }: PracticaLabProps) {
     },
   });
 
-  const resetActual = modo === "fuentes" ? resetFuentes : modo === "metodo" ? resetMetodo : resetGlosario;
+  const resetTexto = () => {
+    setTextoDone(false);
+    setTextoIntento((n) => n + 1);
+  };
+  const resetActual = modo === "texto" ? resetTexto : modo === "fuentes" ? resetFuentes : modo === "metodo" ? resetMetodo : resetGlosario;
 
   return (
     <div style={{ color: T.text }}>
@@ -258,6 +252,47 @@ export function LabHipotesisHistoricas({ color }: PracticaLabProps) {
         .hh-btn:hover { border-color:${T.lineStrong}; }
         .hh-divider { height:1px; background:${T.line}; margin:18px 0; }
         @media (prefers-reduced-motion: reduce){ .hh-row[data-shake="true"], .hh-bin[data-shake="true"] { animation:none; } }
+
+        /* Cajón de teoría */
+        .hh-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
+          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
+        .hh-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
+        .hh-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
+          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
+          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
+          display:flex; flex-direction:column; }
+        .hh-drawer[data-open="true"] { transform:translateX(0); }
+        .hh-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
+          padding:18px 20px; border-bottom:1px solid ${T.line}; }
+        .hh-drawer-body { overflow-y:auto; padding:20px; flex:1; }
+        .hh-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
+          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+        .hh-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
+        .hh-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
+          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
+          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
+        .hh-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
+        @media (max-width: 640px){ .hh-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
+
+        /* Identidad del tablero */
+        .hh-bin, .hh-row { --tono:188; position:relative;
+          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
+        .hh-bin:nth-of-type(6n+1), .hh-row:nth-of-type(6n+1) { --tono:188; }
+        .hh-bin:nth-of-type(6n+2), .hh-row:nth-of-type(6n+2) { --tono:262; }
+        .hh-bin:nth-of-type(6n+3), .hh-row:nth-of-type(6n+3) { --tono:44; }
+        .hh-bin:nth-of-type(6n+4), .hh-row:nth-of-type(6n+4) { --tono:152; }
+        .hh-bin:nth-of-type(6n+5), .hh-row:nth-of-type(6n+5) { --tono:330; }
+        .hh-bin:nth-of-type(6n+6), .hh-row:nth-of-type(6n+6) { --tono:18; }
+        .hh-bin::before, .hh-row::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
+          background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
+        .hh-bin[data-done="true"], .hh-row[data-done="true"] {
+          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.2) 0%, transparent 68%); }
+        .hh-chip { transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
+        .hh-chip:hover { transform:translateY(-2px); }
+        .hh-chip[data-sel="true"] { transform:translateY(-3px) scale(1.02); }
+        @media (prefers-reduced-motion: reduce){
+          .hh-chip, .hh-chip:hover, .hh-chip[data-sel="true"] { transform:none; transition:none; }
+        }
       `}</style>
 
       {/* selector de modo + toolbar */}
@@ -269,6 +304,10 @@ export function LabHipotesisHistoricas({ color }: PracticaLabProps) {
           </button>
         ))}
         <div style={{ flex: 1 }} />
+        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+        <button className="hh-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
+          <i className="fa-solid fa-book-open" />
+        </button>
         <button className="hh-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
           <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
         </button>
@@ -277,10 +316,48 @@ export function LabHipotesisHistoricas({ color }: PracticaLabProps) {
         </button>
       </div>
 
+      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
+      <button className="hh-teoria-fab" onClick={() => setDrawer(true)}>
+        <i className="fa-solid fa-book-open" />
+        Teoría
+      </button>
+      <div className="hh-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
+      <aside className="hh-drawer" data-open={drawer} aria-hidden={!drawer}>
+        <div className="hh-drawer-head">
+          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
+            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
+          </div>
+          <button className="hh-close" onClick={() => setDrawer(false)} title="Cerrar">
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
+        <div className="hh-drawer-body">
+          <FichaTeorica data={HIPOTESIS_HISTORICAS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+        </div>
+      </aside>
+
       <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}>
         {/* ── Columna principal ─────────────────────────────────────────── */}
         <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
           {/* MODO 1 — fuentes */}
+          {/* MODO — completa el texto (fill_blanks verbatim de la progresión) */}
+          {modo === "texto" && (
+            <CompletaTexto
+              key={textoIntento}
+              data={HIPOTESIS_HISTORICAS_HUECOS}
+              accent={accent}
+              rgba={color.rgba}
+              completado={textoDone}
+              onCompletado={() => {
+                setTextoDone(true);
+                sfxOk();
+              }}
+              onAcierto={sfxPlace}
+              onError={sfxNo}
+            />
+          )}
+
           {modo === "fuentes" && (
             <>
               <div style={{ ...card, padding: "18px 22px" }}>
@@ -341,32 +418,21 @@ export function LabHipotesisHistoricas({ color }: PracticaLabProps) {
 
           {/* MODO 3 — glosario */}
           {modo === "glosario" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada término a su definición</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: glosarioDone ? OK : T.text3 }}>
-                    {Object.keys(empGlos).length}/{PARES.length}
-                  </span>
-                </div>
-                {glosLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Emparejaste los {PARES.length} términos!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {glosLibres.map((g) => (
-                      <button key={g.id} className="hh-chip" data-sel={selGlos === g.id} onClick={() => setSelGlos((s) => (s === g.id ? null : g.id))} {...dragProps(g.id)}>
-                        <i className="fa-solid fa-tag" style={{ fontSize: 11, color: T.text3 }} />
-                        {g.termino}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <RowsGlosario selGlos={selGlos} shakeGlos={shakeGlos} empGlos={empGlos} onMatch={intentarGlos} dropProps={dropProps} />
-            </>
+            <EscribeTermino
+              key={glosIntento}
+              pares={PARES}
+              accent={accent}
+              rgba={color.rgba}
+              completado={glosarioDone}
+              instrucciones="Lee la definición y escribe el término del glosario que le corresponde."
+              onCompletado={() => {
+                setGlosarioDone(true);
+                sfxOk();
+                persistMejor(fuentesDone, metodoDone, true);
+              }}
+              onAcierto={sfxPlace}
+              onError={sfxNo}
+            />
           )}
         </div>
 
@@ -399,7 +465,7 @@ export function LabHipotesisHistoricas({ color }: PracticaLabProps) {
               </div>
               <div style={{ textAlign: "right", maxWidth: 180 }}>
                 <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45 }}>
-                  {bestEstrellas >= 3 ? "¡Formulas hipótesis como un historiador!" : "Completa los tres modos para ganar las estrellas."}
+                  {bestEstrellas >= 3 ? "¡Formulas hipótesis como un historiador!" : "Termina los tres modos para ganar 2★; la tercera pide 2 errores o menos."}
                 </div>
               </div>
             </div>
@@ -416,7 +482,7 @@ export function LabHipotesisHistoricas({ color }: PracticaLabProps) {
                 <>Sigue la secuencia: <strong style={{ color: T.text }}>observar</strong> la fuente, <strong style={{ color: T.text }}>contextualizar</strong>, <strong style={{ color: T.text }}>formular</strong> la hipótesis y <strong style={{ color: T.text }}>contrastar</strong> con otras fuentes.</>
               )}
               {modo === "glosario" && (
-                <>Lee primero la definición y su ejemplo; luego suelta el término que le corresponde.</>
+                <>Ya no se arrastra: lee la definición y su ejemplo y escribe el término. Si te atoras, la pista te da la inicial y las letras.</>
               )}
             </span>
           </div>
@@ -540,55 +606,6 @@ function RowsMetodo({
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 13.5, fontWeight: 700, color: done ? "#fff" : T.text2, lineHeight: 1.4 }}>{p.descripcion}</div>
               <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.4, marginTop: 3, fontStyle: "italic" }}>{p.ejemplo}</div>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function RowsGlosario({
-  selGlos,
-  shakeGlos,
-  empGlos,
-  onMatch,
-  dropProps,
-}: {
-  selGlos: string | null;
-  shakeGlos: string | null;
-  empGlos: Record<string, boolean>;
-  onMatch: (chipId: string, rowId: string) => void;
-  dropProps: DropFactory;
-}) {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-      {PARES.map((g) => {
-        const done = empGlos[g.id];
-        return (
-          <div
-            key={g.id}
-            className="hh-row"
-            data-shake={shakeGlos === g.id}
-            data-done={done}
-            onClick={() => !done && selGlos && onMatch(selGlos, g.id)}
-            {...dropProps((id) => onMatch(id, g.id))}
-          >
-            <div className="hh-slot" data-armed={!done && !!selGlos} style={done ? { borderStyle: "solid", borderColor: OK, background: `${OK}1a` } : undefined}>
-              {done ? (
-                <span style={{ animation: "hhPop .25s ease", fontSize: 13, fontWeight: 900, color: "#fff", display: "inline-flex", alignItems: "center", gap: 7 }}>
-                  <i className="fa-solid fa-tag" />
-                  {g.termino}
-                </span>
-              ) : (
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                  <i className="fa-solid fa-arrow-left" style={{ fontSize: 11 }} /> término
-                </span>
-              )}
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 13, color: done ? "#fff" : T.text2, lineHeight: 1.45 }}>{g.definicion}</div>
-              <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.4, marginTop: 3, fontStyle: "italic" }}>{g.ejemplo}</div>
             </div>
           </div>
         );

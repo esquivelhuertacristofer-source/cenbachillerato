@@ -213,6 +213,8 @@ const LABS_CON_IMAGEN_ESPECIFICA_SEM1 = new Set<string>([
 ]);
 
 const LABS_CON_IMAGEN_ESPECIFICA_SEM3 = new Set<string>([
+  "biomas-ecosistemas",
+  "ciclo-carbono",
   "deforestacion",
   "discriminante",
   "ecuacion-cuadratica",
@@ -235,6 +237,7 @@ const LABS_CON_IMAGEN_ESPECIFICA_SEM3 = new Set<string>([
   "semejanza-triangulos",
   "sistemas-ecuaciones-2x2",
   "subgeneros-narrativos",
+  "subsistemas-terrestres",
   "teorema-pitagoras",
   "volumen-cilindro",
 ]);
@@ -249,6 +252,7 @@ const LABS_CON_IMAGEN_ESPECIFICA_SEM4 = new Set<string>([
   "equilibrio-quimico",
   "funciones-concepto",
   "geometria-analitica",
+  "crisis-sociales",
   "juventudes-politicas",
   "ley-senos-cosenos",
   "modelado-conicas-estimacion",

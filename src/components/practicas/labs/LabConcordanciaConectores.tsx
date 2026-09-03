@@ -4,13 +4,14 @@
  * Laboratorio — Concordancia y conectores: el hilo del texto.
  * Práctica experimental para LC-I-P06-A4 (Lengua y Comunicación I).
  *
- * Interactividad máxima: el alumno EXPERIMENTA arrastrando. Tres modos, tres
- * interacciones distintas:
+ * Interactividad máxima. Cuatro modos: los tres de arrastrar/clasificar y, al
+ * final, uno que se escribe («Completa el texto», verbatim de la progresión):
  *  1. «Repara la concordancia» — arrastra la forma correcta para corregir el
  *     error de concordancia de cada oración.
  *  2. «Conectores en su lugar» — arrastra el conector adecuado al hueco de cada
  *     oración según su sentido (causa, adición, comparación, consecuencia).
- *  3. «Glosario» — empareja cada término con su definición.
+ *  3. «Escribe el término» — lee la definición verbatim (A5) y escribe
+ *     de memoria el término del glosario que la nombra.
  *  + Cuestionario de comprensión.
  *
  * DOM puro (sin three.js): ligero, accesible (ratón, teclado y táctil mediante
@@ -22,6 +23,12 @@ import { useEffect, useRef, useState } from "react";
 import type { PracticaLabProps } from "../registry";
 import { T, OK, card, Eyebrow } from "./_kit";
 import { LabSfx } from "./lab-audio";
+import { CompletaTexto } from "./_mecanica-huecos";
+import { EscribeTermino } from "./_mecanica-termino";
+import { CONCORDANCIA_CONECTORES_HUECOS } from "./concordancia-conectores-huecos";
+import { usePartida, MarcadorPartida } from "./_partida";
+import { FichaTeorica } from "./_ficha";
+import { CONCORDANCIA_CONECTORES_FICHA } from "./concordancia-conectores-ficha";
 import {
   REPARACIONES,
   FRASES,
@@ -31,15 +38,16 @@ import {
 } from "./concordancia-conectores-data";
 
 const NO = "#FF5E5E";
-import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
+import { useEstrellas } from "@/lib/hooks/useEstrellas";
 const RETO_KEY = "cen-concordancia-conectores-reto";
 
-type Modo = "reparar" | "conectores" | "glosario";
+type Modo = "reparar" | "conectores" | "glosario" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
   { id: "reparar", label: "Repara la concordancia", icono: "fa-screwdriver-wrench" },
   { id: "conectores", label: "Conectores en su lugar", icono: "fa-link" },
-  { id: "glosario", label: "Glosario", icono: "fa-book-open" },
+  { id: "glosario", label: "Escribe el término", icono: "fa-keyboard" },
+  { id: "texto", label: "Completa el texto", icono: "fa-pen-to-square" },
 ];
 
 export function LabConcordanciaConectores({ color }: PracticaLabProps) {
@@ -47,7 +55,13 @@ export function LabConcordanciaConectores({ color }: PracticaLabProps) {
   const [modo, setModo] = useState<Modo>("reparar");
 
   // ── sonido ────────────────────────────────────────────────────────────
+  const partida = usePartida();
   const [sonido, setSonido] = useState(false);
+  const [drawer, setDrawer] = useState(false);
+  // Modo «Completa el texto». El contador sirve de `key`: subirlo remonta
+  // el componente y devuelve todos los huecos en blanco.
+  const [textoDone, setTextoDone] = useState(false);
+  const [textoIntento, setTextoIntento] = useState(0);
   const audioRef = useRef<LabSfx | null>(null);
   useEffect(() => () => audioRef.current?.dispose(), []);
   const toggleSonido = async () => {
@@ -60,9 +74,18 @@ export function LabConcordanciaConectores({ color }: PracticaLabProps) {
       setSonido(false);
     }
   };
+  // Los tres ayudantes son el único punto por el que pasan todos los aciertos
+  // y todos los fallos del laboratorio, así que la partida se lleva aquí.
+  // `sfxOk` no cuenta: marca el fin de un modo, no una respuesta suelta.
   const sfxOk = () => sonido && audioRef.current?.correcto();
-  const sfxNo = () => sonido && audioRef.current?.incorrecto();
-  const sfxPlace = () => sonido && audioRef.current?.blip();
+  const sfxNo = () => {
+    partida.error();
+    return sonido && audioRef.current?.incorrecto();
+  };
+  const sfxPlace = () => {
+    partida.acierto();
+    return sonido && audioRef.current?.blip();
+  };
 
   // ── modo Reparar (arrastra la forma correcta) ─────────────────────────
   const [reparado, setReparado] = useState<Record<string, boolean>>({});
@@ -119,30 +142,13 @@ export function LabConcordanciaConectores({ color }: PracticaLabProps) {
   };
 
   // ── modo Glosario (emparejar término → definición) ────────────────────
-  const [empGlos, setEmpGlos] = useState<Record<string, boolean>>({});
-  const [selGlos, setSelGlos] = useState<string | null>(null);
-  const [shakeGlosRow, setShakeGlosRow] = useState<string | null>(null);
-  const glosLibres = GLOSARIO.filter((g) => !empGlos[g.id]).slice().sort((a, b) => a.termino.localeCompare(b.termino, "es"));
-
-  const intentarGlos = (chipId: string, rowId: string) => {
-    if (empGlos[rowId]) return;
-    if (chipId === rowId) {
-      setEmpGlos((e) => ({ ...e, [rowId]: true }));
-      setSelGlos(null);
-      sfxPlace();
-      if (Object.keys(empGlos).length + 1 >= GLOSARIO.length) {
-        sfxOk();
-        persistMejor(reparadoDone, conectoresDone, true);
-      }
-    } else {
-      setShakeGlosRow(rowId);
-      sfxNo();
-      window.setTimeout(() => setShakeGlosRow(null), 420);
-    }
-  };
+  // El contador hace de `key`: subirlo remonta el componente y deja todas
+  // las tarjetas en blanco.
+  const [glosarioDone, setGlosarioDone] = useState(false);
+  const [glosIntento, setGlosIntento] = useState(0);
   const resetGlosario = () => {
-    setEmpGlos({});
-    setSelGlos(null);
+    setGlosarioDone(false);
+    setGlosIntento((n) => n + 1);
   };
 
   const [quizAprobado, setQuizAprobado] = useState(false);
@@ -150,37 +156,22 @@ export function LabConcordanciaConectores({ color }: PracticaLabProps) {
   // ── progreso / estrellas ──────────────────────────────────────────────
   const reparadoDone = Object.keys(reparado).length >= REPARACIONES.length;
   const conectoresDone = Object.keys(colocado).length >= FRASES.length;
-  const glosarioDone = Object.keys(empGlos).length >= GLOSARIO.length;
-  const estrellas = (reparadoDone ? 1 : 0) + (conectoresDone ? 1 : 0) + (glosarioDone ? 1 : 0);
+  const modosHechos = (reparadoDone ? 1 : 0) + (conectoresDone ? 1 : 0) + (glosarioDone ? 1 : 0) + (textoDone ? 1 : 0);
+  // Terminar los 3 modos vale 2★; la tercera se gana con precisión.
+  const estrellas = partida.estrellasCon(modosHechos, 4);
 
-  const [mejor, setMejor] = useState<number>(() => {
-    if (typeof window === "undefined") return 0;
-    try {
-      return Number(window.localStorage.getItem(RETO_KEY)) || 0;
-    } catch {
-      return 0;
-    }
-  });
+  const { mejorEstrellas: mejor, registraEstrellas } = useEstrellas(RETO_KEY);
   const bestEstrellas = Math.max(estrellas, mejor);
 
   const persistMejor = (a: boolean, b: boolean, c: boolean) => {
     const est = (a ? 1 : 0) + (b ? 1 : 0) + (c ? 1 : 0);
-    setMejor((m) => {
-      if (est <= m) return m;
-      try {
-        window.localStorage.setItem(RETO_KEY, String(est));
-      } catch {
-        /* localStorage no disponible */
-      }
-      return est;
-    });
-    void guardarEstrellas(RETO_KEY, est);
+    registraEstrellas(est);
   };
 
   const objetivos = [
     { txt: "Repara las 4 oraciones con error de concordancia", done: reparadoDone },
     { txt: "Coloca los 4 conectores en su lugar", done: conectoresDone },
-    { txt: "Empareja los 5 términos del glosario", done: glosarioDone },
+    { txt: "Escribe los 5 términos del glosario", done: glosarioDone },
     { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];
@@ -213,7 +204,11 @@ export function LabConcordanciaConectores({ color }: PracticaLabProps) {
     },
   });
 
-  const resetActual = modo === "reparar" ? resetReparar : modo === "conectores" ? resetConectores : resetGlosario;
+  const resetTexto = () => {
+    setTextoDone(false);
+    setTextoIntento((n) => n + 1);
+  };
+  const resetActual = modo === "texto" ? resetTexto : modo === "reparar" ? resetReparar : modo === "conectores" ? resetConectores : resetGlosario;
 
   return (
     <div style={{ color: T.text }}>
@@ -248,6 +243,47 @@ export function LabConcordanciaConectores({ color }: PracticaLabProps) {
         .cc-btn:hover { border-color:${T.lineStrong}; }
         .cc-divider { height:1px; background:${T.line}; margin:18px 0; }
         @media (prefers-reduced-motion: reduce){ .cc-row[data-shake="true"] { animation:none; } }
+
+        /* Cajón de teoría */
+        .cc-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
+          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
+        .cc-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
+        .cc-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
+          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
+          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
+          display:flex; flex-direction:column; }
+        .cc-drawer[data-open="true"] { transform:translateX(0); }
+        .cc-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
+          padding:18px 20px; border-bottom:1px solid ${T.line}; }
+        .cc-drawer-body { overflow-y:auto; padding:20px; flex:1; }
+        .cc-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
+          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+        .cc-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
+        .cc-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
+          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
+          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
+        .cc-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
+        @media (max-width: 640px){ .cc-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
+
+        /* Identidad del tablero */
+        .cc-row { --tono:188; position:relative;
+          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
+        .cc-row:nth-of-type(6n+1) { --tono:188; }
+        .cc-row:nth-of-type(6n+2) { --tono:262; }
+        .cc-row:nth-of-type(6n+3) { --tono:44; }
+        .cc-row:nth-of-type(6n+4) { --tono:152; }
+        .cc-row:nth-of-type(6n+5) { --tono:330; }
+        .cc-row:nth-of-type(6n+6) { --tono:18; }
+        .cc-row::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
+          background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
+        .cc-row[data-done="true"] {
+          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.2) 0%, transparent 68%); }
+        .cc-chip { transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
+        .cc-chip:hover { transform:translateY(-2px); }
+        .cc-chip[data-sel="true"] { transform:translateY(-3px) scale(1.02); }
+        @media (prefers-reduced-motion: reduce){
+          .cc-chip, .cc-chip:hover, .cc-chip[data-sel="true"] { transform:none; transition:none; }
+        }
       `}</style>
 
       {/* selector de modo + toolbar */}
@@ -259,6 +295,10 @@ export function LabConcordanciaConectores({ color }: PracticaLabProps) {
           </button>
         ))}
         <div style={{ flex: 1 }} />
+        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+        <button className="cc-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
+          <i className="fa-solid fa-book-open" />
+        </button>
         <button className="cc-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
           <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
         </button>
@@ -267,10 +307,48 @@ export function LabConcordanciaConectores({ color }: PracticaLabProps) {
         </button>
       </div>
 
+      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
+      <button className="cc-teoria-fab" onClick={() => setDrawer(true)}>
+        <i className="fa-solid fa-book-open" />
+        Teoría
+      </button>
+      <div className="cc-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
+      <aside className="cc-drawer" data-open={drawer} aria-hidden={!drawer}>
+        <div className="cc-drawer-head">
+          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
+            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
+          </div>
+          <button className="cc-close" onClick={() => setDrawer(false)} title="Cerrar">
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
+        <div className="cc-drawer-body">
+          <FichaTeorica data={CONCORDANCIA_CONECTORES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+        </div>
+      </aside>
+
       <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}>
         {/* ── Columna principal ─────────────────────────────────────────── */}
         <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
           {/* MODO 1 — reparar concordancia */}
+          {/* MODO — completa el texto (fill_blanks verbatim de la progresión) */}
+          {modo === "texto" && (
+            <CompletaTexto
+              key={textoIntento}
+              data={CONCORDANCIA_CONECTORES_HUECOS}
+              accent={accent}
+              rgba={color.rgba}
+              completado={textoDone}
+              onCompletado={() => {
+                setTextoDone(true);
+                sfxOk();
+              }}
+              onAcierto={sfxPlace}
+              onError={sfxNo}
+            />
+          )}
+
           {modo === "reparar" && (
             <>
               <div style={{ ...card, padding: "18px 22px" }}>
@@ -332,32 +410,21 @@ export function LabConcordanciaConectores({ color }: PracticaLabProps) {
 
           {/* MODO 3 — glosario (emparejar) */}
           {modo === "glosario" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada término hasta su definición</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: glosarioDone ? OK : T.text3 }}>
-                    {Object.keys(empGlos).length}/{GLOSARIO.length}
-                  </span>
-                </div>
-                {glosLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Emparejaste los 5 términos!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {glosLibres.map((g) => (
-                      <button key={g.id} className="cc-chip" data-sel={selGlos === g.id} onClick={() => setSelGlos((s) => (s === g.id ? null : g.id))} {...dragProps(g.id)}>
-                        <i className="fa-solid fa-tag" style={{ fontSize: 12, opacity: 0.7 }} />
-                        {g.termino}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <RowsGlosario selGlos={selGlos} shakeGlosRow={shakeGlosRow} empGlos={empGlos} onMatch={intentarGlos} dropProps={dropProps} />
-            </>
+            <EscribeTermino
+              key={glosIntento}
+              pares={GLOSARIO}
+              accent={accent}
+              rgba={color.rgba}
+              completado={glosarioDone}
+              instrucciones="Lee la definición y escribe el término del glosario que le corresponde."
+              onCompletado={() => {
+                setGlosarioDone(true);
+                sfxOk();
+                persistMejor(reparadoDone, conectoresDone, true);
+              }}
+              onAcierto={sfxPlace}
+              onError={sfxNo}
+            />
           )}
         </div>
 
@@ -390,7 +457,7 @@ export function LabConcordanciaConectores({ color }: PracticaLabProps) {
               </div>
               <div style={{ textAlign: "right", maxWidth: 180 }}>
                 <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45 }}>
-                  {bestEstrellas >= 3 ? "¡Dominas la concordancia y los conectores!" : "Completa los tres modos para ganar las estrellas."}
+                  {bestEstrellas >= 3 ? "¡Dominas la concordancia y los conectores!" : "Termina los tres modos para ganar 2★; la tercera pide 2 errores o menos."}
                 </div>
               </div>
             </div>
@@ -407,7 +474,7 @@ export function LabConcordanciaConectores({ color }: PracticaLabProps) {
                 <><strong style={{ color: T.text }}>porque</strong> = causa · <strong style={{ color: T.text }}>además</strong> = adición · <strong style={{ color: T.text }}>como</strong> = comparación. Lee la frase completa para captar el sentido.</>
               )}
               {modo === "glosario" && (
-                <>Los <strong style={{ color: T.text }}>conectores</strong> son los puentes que unen ideas; la <strong style={{ color: T.text }}>concordancia</strong> es el acuerdo entre las partes de la oración.</>
+                <>Ya no se arrastra: lee la definición y su ejemplo y escribe el término. Si te atoras, la pista te da la inicial y las letras.</>
               )}
             </span>
           </div>
@@ -538,55 +605,6 @@ function RowsConectores({
         <i className="fa-solid fa-circle-info" style={{ color: accent, marginTop: 2 }} />
         <span>La etiqueta de la derecha indica el tipo de relación que debe expresar el conector.</span>
       </div>
-    </div>
-  );
-}
-
-function RowsGlosario({
-  selGlos,
-  shakeGlosRow,
-  empGlos,
-  onMatch,
-  dropProps,
-}: {
-  selGlos: string | null;
-  shakeGlosRow: string | null;
-  empGlos: Record<string, boolean>;
-  onMatch: (chipId: string, rowId: string) => void;
-  dropProps: DropFactory;
-}) {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-      {GLOSARIO.map((g) => {
-        const done = empGlos[g.id];
-        return (
-          <div
-            key={g.id}
-            className="cc-row"
-            data-shake={shakeGlosRow === g.id}
-            data-done={done}
-            onClick={() => !done && selGlos && onMatch(selGlos, g.id)}
-            {...dropProps((id) => onMatch(id, g.id))}
-          >
-            <div className="cc-slot" data-armed={!done && !!selGlos} style={done ? { borderStyle: "solid", borderColor: OK, background: `${OK}1a`, minWidth: 150 } : { minWidth: 150 }}>
-              {done ? (
-                <span style={{ animation: "ccPop .25s ease", fontSize: 13, fontWeight: 900, color: "#fff", display: "inline-flex", alignItems: "center", gap: 7 }}>
-                  <i className="fa-solid fa-tag" />
-                  {g.termino}
-                </span>
-              ) : (
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                  <i className="fa-solid fa-arrow-left" style={{ fontSize: 11 }} /> término
-                </span>
-              )}
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 13, color: done ? "#fff" : T.text2, lineHeight: 1.45 }}>{g.definicion}</div>
-              <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.4, marginTop: 3, fontStyle: "italic" }}>{g.ejemplo}</div>
-            </div>
-          </div>
-        );
-      })}
     </div>
   );
 }

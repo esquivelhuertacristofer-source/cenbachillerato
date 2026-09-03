@@ -137,7 +137,21 @@ export const GlosarioTerminoInfografiaSchema = z.object({
 
 export const ContenidoInfografiaSchema = z.object({
   titulo: z.string().min(1),
-  url_imagen: z.string().min(1, 'La URL de la imagen es requerida'),
+  /**
+   * La imagen es OPCIONAL, y ese cambio tiene una historia.
+   *
+   * Este campo era obligatorio, y por eso 27 de las 29 infografías apuntaban a
+   * `/placeholder/infografia.svg`: un archivo que se borró del disco hace meses.
+   * El esquema exigía una URL y alguien le dio una que no lleva a ningún lado.
+   *
+   * Al limpiar esos marcadores, esas 27 filas quedaron incumpliendo su propio
+   * esquema. La respuesta correcta no era devolverles una URL falsa: es que una
+   * infografía NO NECESITA imagen. `<LaminaInfografia>` la dibuja con sus datos
+   * —título, puntos clave, fuente— y esa lámina reflowea en un teléfono, la lee
+   * un lector de pantalla y no puede dar 404. La imagen es el caso especial, no
+   * el caso normal.
+   */
+  url_imagen: z.string().min(1).optional(),
   descripcion_accesible: z.string().optional(),
   puntos_clave: z.array(z.string()).min(1).optional(),
   fuente: z.string().optional(),
@@ -208,6 +222,128 @@ export const ContenidoAutoevaluacionSchema = z.object({
   url_imagen: z.string().optional(),
 });
 
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TIPOS DINÁMICOS (migración 26)
+//
+// Los doce tipos de arriba se responden leyendo y eligiendo. Estos cinco se
+// responden MOVIENDO cosas y DECIDIENDO, que es donde un alumno de bachillerato
+// deja de leer en diagonal. No sustituyen a los otros: cubren lo que a los
+// otros no les sale —secuencia, correspondencia, criterio de clasificación,
+// consecuencia de una decisión y automatización bajo presión—.
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ── 13. ORDENAR SECUENCIA ─────────────────────────────────────────────────────
+
+export const PasoSecuenciaSchema = z.object({
+  /** El texto de la tarjeta, tal como se arrastra. */
+  texto: z.string().min(1),
+  /** Por qué va en esa posición. Se muestra al revisar. */
+  explicacion: z.string().optional(),
+  /** Etiqueta corta opcional (una fecha, un número de paso). */
+  marca: z.string().optional(),
+});
+
+export const ContenidoOrdenarSecuenciaSchema = z.object({
+  instrucciones: z.string().optional(),
+  /** Los pasos EN SU ORDEN CORRECTO. La app los baraja al presentarlos. */
+  pasos: z.array(PasoSecuenciaSchema).min(3).max(10),
+  /** Qué se está ordenando: "cronologia" cambia el rótulo a antes/después. */
+  criterio: z.enum(['cronologia', 'procedimiento', 'jerarquia']).optional().default('procedimiento'),
+  puntaje_minimo_aprobacion: z.number().int().min(0).max(100).optional().default(70),
+  url_imagen: z.string().optional(),
+});
+
+// ── 14. RELACIONAR COLUMNAS ───────────────────────────────────────────────────
+
+export const ParejaRelacionSchema = z.object({
+  izquierda: z.string().min(1),
+  derecha: z.string().min(1),
+  explicacion: z.string().optional(),
+});
+
+export const ContenidoRelacionarColumnasSchema = z.object({
+  instrucciones: z.string().optional(),
+  titulo_izquierda: z.string().optional(),
+  titulo_derecha: z.string().optional(),
+  parejas: z.array(ParejaRelacionSchema).min(3).max(10),
+  /** Opciones de la derecha que no emparejan con nada (distractores). */
+  distractores: z.array(z.string()).max(4).optional().default([]),
+  puntaje_minimo_aprobacion: z.number().int().min(0).max(100).optional().default(70),
+  url_imagen: z.string().optional(),
+});
+
+// ── 15. CLASIFICAR EN CATEGORÍAS ──────────────────────────────────────────────
+
+export const ElementoClasificableSchema = z.object({
+  texto: z.string().min(1),
+  /** Nombre EXACTO de la categoría a la que pertenece. */
+  categoria: z.string().min(1),
+  explicacion: z.string().optional(),
+});
+
+export const ContenidoClasificarCategoriasSchema = z.object({
+  instrucciones: z.string().optional(),
+  categorias: z.array(z.object({
+    nombre: z.string().min(1),
+    descripcion: z.string().optional(),
+  })).min(2).max(4),
+  elementos: z.array(ElementoClasificableSchema).min(4).max(16),
+  puntaje_minimo_aprobacion: z.number().int().min(0).max(100).optional().default(70),
+  url_imagen: z.string().optional(),
+}).refine(
+  (d) => d.elementos.every((e) => d.categorias.some((c) => c.nombre === e.categoria)),
+  { message: 'Cada elemento debe pertenecer a una categoría declarada' }
+);
+
+// ── 16. CASO CON DECISIONES ───────────────────────────────────────────────────
+
+export const OpcionDecisionSchema = z.object({
+  texto: z.string().min(1),
+  /** Lo que pasa si el alumno elige esto. Es la enseñanza, no un "correcto". */
+  consecuencia: z.string().min(1),
+  /** Cuánto acerca al mejor desenlace: 0 = mala, 1 = aceptable, 2 = la mejor. */
+  calidad: z.number().int().min(0).max(2),
+});
+
+export const EscenaCasoSchema = z.object({
+  situacion: z.string().min(1),
+  pregunta: z.string().min(1),
+  opciones: z.array(OpcionDecisionSchema).min(2).max(4),
+});
+
+export const ContenidoCasoDecisionSchema = z.object({
+  contexto: z.string().min(1),
+  escenas: z.array(EscenaCasoSchema).min(2).max(6),
+  /** Qué se cierra al final, según cómo le fue. */
+  cierre_bueno: z.string().min(1),
+  cierre_regular: z.string().min(1),
+  cierre_malo: z.string().min(1),
+  pregunta_reflexion: z.string().optional(),
+  url_imagen: z.string().optional(),
+});
+
+// ── 17. RETO CONTRARRELOJ ─────────────────────────────────────────────────────
+
+export const PreguntaRetoSchema = z.object({
+  enunciado: z.string().min(1),
+  opciones: z.array(z.string()).min(2).max(4),
+  respuesta_correcta: z.number().int().min(0),
+  pista: z.string().optional(),
+}).refine(
+  (d) => d.respuesta_correcta < d.opciones.length,
+  { message: 'respuesta_correcta debe ser un índice válido dentro de opciones' }
+);
+
+export const ContenidoRetoCronometradoSchema = z.object({
+  instrucciones: z.string().optional(),
+  /** Segundos por pregunta. Corto a propósito: se responde de memoria. */
+  segundos_por_pregunta: z.number().int().min(5).max(60).optional().default(20),
+  preguntas: z.array(PreguntaRetoSchema).min(5).max(20),
+  puntaje_minimo_aprobacion: z.number().int().min(0).max(100).optional().default(60),
+  url_imagen: z.string().optional(),
+});
+
 // ── MAPA DE VALIDADORES ───────────────────────────────────────────────────────
 
 export const VALIDADORES_CONTENIDO = {
@@ -223,6 +359,12 @@ export const VALIDADORES_CONTENIDO = {
   simulacion:           ContenidoSimulacionSchema,
   glosario_interactivo: ContenidoGlosarioInteractivoSchema,
   autoevaluacion:       ContenidoAutoevaluacionSchema,
+  // Tipos dinámicos (migración 26)
+  ordenar_secuencia:      ContenidoOrdenarSecuenciaSchema,
+  relacionar_columnas:    ContenidoRelacionarColumnasSchema,
+  clasificar_categorias:  ContenidoClasificarCategoriasSchema,
+  caso_decision:          ContenidoCasoDecisionSchema,
+  reto_cronometrado:      ContenidoRetoCronometradoSchema,
 } as const;
 
 export type TipoActividadKey = keyof typeof VALIDADORES_CONTENIDO;

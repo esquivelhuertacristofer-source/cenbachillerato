@@ -22,6 +22,8 @@ import { RAZON_PROPORCION_FICHA } from "./razon-proporcion-ficha";
 import { RetoNumericoCard } from "./_reto-numerico";
 import { RETO_A2 } from "./razon-proporcion-data";
 import { LabSfx } from "./lab-audio";
+import { useEstrellas } from "@/lib/hooks/useEstrellas";
+import { useLogros } from "./_partida";
 import { ESCENARIOS, valorY, invariante, yMaxGlobal, type Escenario } from "./proporcion-data";
 
 const ProporcionScene = dynamic(() => import("./ProporcionScene"), {
@@ -38,6 +40,8 @@ const K_COL = "#FFD166"; // color del invariante
 
 const fmt = (n: number) =>
   Number.isInteger(n) ? n.toLocaleString("es-MX") : n.toLocaleString("es-MX", { maximumFractionDigits: 2 });
+
+const RETO_KEY = "cen-razon-proporcion-reto";
 
 export function LabProporcion({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
@@ -113,6 +117,16 @@ export function LabProporcion({ color }: PracticaLabProps) {
     { txt: "Comprueba que el invariante no cambia", done: movioDeslizador && tiposVistos.size >= 2 },
     { txt: "Resuelve el reto de razón y proporción", done: ejercicioAprobado },
   ];
+  // Los objetivos se recuerdan (algunos dependían del modo y se desmarcaban
+  // solos) y se convierten en la marca del laboratorio, que antes no se
+  // guardaba en ninguna parte.
+  const { logros: logrosLab, cumplidos: cumplidosLab, total: totalLab } = useLogros(objetivos.map((o) => o.done));
+  const { registraEstrellas } = useEstrellas(RETO_KEY);
+  useEffect(() => {
+    if (cumplidosLab === 0) return;
+    const est = cumplidosLab >= totalLab ? 3 : cumplidosLab >= Math.ceil((totalLab * 2) / 3) ? 2 : 1;
+    registraEstrellas(est);
+  }, [cumplidosLab, totalLab, registraEstrellas]);
 
   const sceneFallback = (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 28, textAlign: "center" }}>
@@ -347,9 +361,9 @@ export function LabProporcion({ color }: PracticaLabProps) {
           </Eyebrow>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
             {objetivos.map((o, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? OK : T.text2 }}>
-                <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-                <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: logrosLab[i] ? OK : T.text2 }}>
+                <i className={`fa-solid ${logrosLab[i] ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: logrosLab[i] ? 1 : 0.3 }} />
+                <span style={{ fontWeight: logrosLab[i] ? 700 : 500 }}>{o.txt}</span>
               </div>
             ))}
           </div>

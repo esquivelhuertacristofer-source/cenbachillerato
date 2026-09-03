@@ -14,7 +14,11 @@ import { resaltarChildren, type GlosarioCtx } from '@/components/activities/Glos
 import type { ActividadLectura, CallbackProgreso, CalloutLectura } from '@/types/activities';
 import type { AreaColor } from '@/components/hub/hub-colors';
 import { imagenDeLectura } from '@/lib/contenido/lectura-imagenes';
-import { useRegistrarNarracion } from '@/components/activities/NarracionContext';
+import {
+  useRegistrarNarracion,
+  useRegistrarSegmentosVoz,
+} from '@/components/activities/NarracionContext';
+import { segmentosDeLectura } from '@/lib/voz/segmentos';
 
 /** Convierte markdown a texto plano legible en voz alta (sin #, *, enlaces, etc.). */
 function markdownAPlano(md: string): string {
@@ -290,6 +294,17 @@ export function LecturaActivity({
     return [actividad.titulo, cuerpo, extras].filter(Boolean).join('. ');
   }, [actividad.titulo, contenido.texto, contenido.callouts]);
   useRegistrarNarracion(textoNarracion);
+
+  /* Los trozos que ya están grabados con la voz de la plataforma. Se calculan
+     con `segmentosDeLectura` —la MISMA función que usó el extractor— sobre el
+     MISMO título y el MISMO cuerpo, para que la clave que se pide aquí sea la
+     del MP3 que se grabó allá. Los callouts quedan fuera a propósito: no se
+     grabaron, y meterlos correría la numeración de los párrafos. */
+  const segmentosVoz = useMemo(
+    () => segmentosDeLectura(actividad.titulo, contenido.texto ?? ''),
+    [actividad.titulo, contenido.texto],
+  );
+  useRegistrarSegmentosVoz(segmentosVoz);
   const reducedMotion = useReducedMotion();
   const [bodyRef, bodyInView] = useInView<HTMLDivElement>();
 

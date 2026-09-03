@@ -20,6 +20,8 @@ const TIEMPO_MIN: Record<string, number> = {
   ejercicio_matematico: 12, reflexion_escrita: 15, video_con_preguntas: 10,
   infografia: 6, debate_estructurado: 15, simulacion: 10,
   glosario_interactivo: 8, autoevaluacion: 10,
+  ordenar_secuencia: 8, relacionar_columnas: 8, clasificar_categorias: 8,
+  caso_decision: 12, reto_cronometrado: 6,
 };
 
 const ROMAN_TO_N: Record<string, number> = { I: 1, II: 2, III: 3, IV: 4, V: 5, VI: 6 };
@@ -29,6 +31,11 @@ const REFLEXION_Q: Record<string, [string, string]> = {
   ejercicio_matematico: ["¿Cuál fue el paso más difícil del ejercicio?", "¿En qué situación real aplicarías este procedimiento?"],
   simulacion: ["¿Qué variable tuvo más impacto en los resultados?", "¿Qué pasaría si cambiaras los parámetros a sus extremos?"],
   reflexion_escrita: ["¿Cambió tu perspectiva sobre el tema al escribir?", "¿Qué pregunta nueva te surgió al reflexionar?"],
+  ordenar_secuencia: ["¿Qué te ayudó a decidir qué iba primero?", "¿Dónde más te sirve reconocer el orden de un proceso?"],
+  relacionar_columnas: ["¿Qué pareja te costó más y por qué?", "¿Qué tienen en común los conceptos que confundiste?"],
+  clasificar_categorias: ["¿Qué criterio usaste para decidir la categoría?", "¿Qué ficha estuvo a punto de caber en dos categorías?"],
+  caso_decision: ["¿Qué decisión cambiarías si volvieras a empezar?", "¿Qué te hizo elegir como elegiste la primera vez?"],
+  reto_cronometrado: ["¿Qué pregunta te tomó más tiempo del que esperabas?", "¿Qué parte del tema tienes que repasar antes de repetirlo?"],
 };
 const REFLEXION_DEFAULT: [string, string] = [
   "¿Qué fue lo más sorprendente o desafiante de esta actividad?",
@@ -50,6 +57,9 @@ function herramientasPorArea(uacCodigo: string): Herramienta[] {
 
 export interface ActivityShellProps {
   titulo: string;
+  /** Código de la actividad (p.ej. "CD-I-P01-A1"); el narrador lo usa para
+   *  saber si esta lectura tiene grabación con la voz de la plataforma. */
+  codigo?: string | null;
   tipo: string;
   color: AreaColor;
   estado: "no_iniciada" | "en_progreso" | "completada";
@@ -68,6 +78,7 @@ export interface ActivityShellProps {
 
 export function ActivityShell({
   titulo,
+  codigo = null,
   tipo,
   color,
   estado,
@@ -170,7 +181,7 @@ export function ActivityShell({
   });
 
   return (
-    <NarracionProvider>
+    <NarracionProvider codigo={codigo}>
       <style>{`
         .ash-back:hover { color: #fff !important; transform: translateX(-3px); }
         .ash-narrador:hover { background: rgba(255,255,255,0.10) !important; border-color: rgba(255,255,255,0.20) !important; }

@@ -56,7 +56,7 @@ const VERDE = "#34D399";
 const ORO = "#ffd24a";
 const ROJO = "#ff6b6b";
 const WARN = "#FF8A3C";
-import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
+import { useEstrellas } from "@/lib/hooks/useEstrellas";
 const RETO_KEY = "cen-parabola-reto";
 
 /** Instrumentos de medición del topógrafo del tiro (3 correctos + 3 distractores). */
@@ -116,14 +116,7 @@ export function LabParabola({ color }: PracticaLabProps) {
   const [predicho, setPredicho] = useState(false); // resolvió el cálculo del vértice
 
   // récord de estrellas del reto de cálculo (persistido)
-  const [mejorEstrellas, setMejorEstrellas] = useState<number>(() => {
-    if (typeof window === "undefined") return 0;
-    try {
-      return Number(window.localStorage.getItem(RETO_KEY)) || 0;
-    } catch {
-      return 0;
-    }
-  });
+  const { mejorEstrellas, registraEstrellas: guardaEstrellas } = useEstrellas(RETO_KEY);
 
   const bump = () => setResetNonce((n) => n + 1);
 
@@ -156,13 +149,8 @@ export function LabParabola({ color }: PracticaLabProps) {
 
   const registraEstrellas = useCallback((est: number) => {
     setPredicho(true);
-    setMejorEstrellas((prev) => {
-      const mejor = Math.max(prev, est);
-      try { window.localStorage.setItem(RETO_KEY, String(mejor)); } catch { /* ignore */ }
-      return mejor;
-    });
-    void guardarEstrellas(RETO_KEY, est);
-  }, []);
+    guardaEstrellas(est);
+  }, [guardaEstrellas]);
 
   // magnitudes matemáticas (deterministas)
   const vert = useMemo(() => vertice(a, b, c), [a, b, c]);

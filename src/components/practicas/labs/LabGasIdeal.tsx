@@ -55,7 +55,7 @@ const T_COL = "#FF7A45"; // temperatura → cálido
 const V_COL = "#3BA7FF"; // volumen → azul
 const N_COL = "#34D399"; // cantidad → verde
 const WARN = "#FF8A3C";
-import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
+import { useEstrellas } from "@/lib/hooks/useEstrellas";
 const RETO_KEY = "cen-gas-ideal-reto";
 
 export function LabGasIdeal({ color }: PracticaLabProps) {
@@ -84,14 +84,7 @@ export function LabGasIdeal({ color }: PracticaLabProps) {
   const [muestras, setMuestras] = useState<{ V: number; P: number }[]>([]);
 
   // récord de estrellas del reto de cálculo (persistido)
-  const [mejorEstrellas, setMejorEstrellas] = useState<number>(() => {
-    if (typeof window === "undefined") return 0;
-    try {
-      return Number(window.localStorage.getItem(RETO_KEY)) || 0;
-    } catch {
-      return 0;
-    }
-  });
+  const { mejorEstrellas, registraEstrellas: guardaEstrellas } = useEstrellas(RETO_KEY);
 
   // teoría (cajón deslizable) y sonido
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -153,13 +146,8 @@ export function LabGasIdeal({ color }: PracticaLabProps) {
 
   const registraEstrellas = useCallback((est: number) => {
     setPredicho(true);
-    setMejorEstrellas((prev) => {
-      const mejor = Math.max(prev, est);
-      try { window.localStorage.setItem(RETO_KEY, String(mejor)); } catch { /* ignore */ }
-      return mejor;
-    });
-    void guardarEstrellas(RETO_KEY, est);
-  }, []);
+    guardaEstrellas(est);
+  }, [guardaEstrellas]);
 
   // pasos guiados (pilar: seguir pasos)
   const pasos = [

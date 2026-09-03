@@ -58,7 +58,7 @@ const ORO = "#ffd24a";
 const AZUL = "#5fb0ff";
 const MAGENTA = "#f0a6ff";
 
-import { guardarEstrellas } from "@/app/actions/guardarEstrellas";
+import { useEstrellas } from "@/lib/hooks/useEstrellas";
 const RETO_KEY = "cen-normal-reto";
 
 // Pilar EQUIPARSE: en un estudio estadístico el “equipo” es el instrumental para
@@ -104,14 +104,7 @@ export function LabNormal({ color }: PracticaLabProps) {
   const audioRef = useRef<LabSfx | null>(null);
 
   // mejor marca de la predicción (estrellas), persistida en el navegador
-  const [mejorEstrellas, setMejorEstrellas] = useState<number>(() => {
-    if (typeof window === "undefined") return 0;
-    try {
-      return Number(window.localStorage.getItem(RETO_KEY)) || 0;
-    } catch {
-      return 0;
-    }
-  });
+  const { mejorEstrellas, registraEstrellas: guardaEstrellas } = useEstrellas(RETO_KEY);
 
   const toggleSonido = useCallback(async () => {
     if (!audioRef.current) audioRef.current = new LabSfx();
@@ -165,17 +158,8 @@ export function LabNormal({ color }: PracticaLabProps) {
 
   const registraEstrellas = useCallback((est: number) => {
     setPredicho(true);
-    setMejorEstrellas((m) => {
-      const nx = Math.max(m, est);
-      try {
-        window.localStorage.setItem(RETO_KEY, String(nx));
-      } catch {
-        /* almacenamiento no disponible */
-      }
-      return nx;
-    });
-    void guardarEstrellas(RETO_KEY, est);
-  }, []);
+    guardaEstrellas(est);
+  }, [guardaEstrellas]);
 
   const reset = () => {
     const p = presetPorId(presetId);

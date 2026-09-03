@@ -21,6 +21,8 @@ import { T, card, Eyebrow, SceneBoundary } from "./_kit";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { LabSfx } from "./lab-audio";
+import { useEstrellas } from "@/lib/hooks/useEstrellas";
+import { useLogros } from "./_partida";
 import { SELECCION_NATURAL_FICHA } from "./seleccion-natural-ficha";
 import {
   type Modo,
@@ -64,6 +66,8 @@ const SeleccionNaturalScene = dynamic(() => import("./SeleccionNaturalScene"), {
     </div>
   ),
 });
+
+const RETO_KEY = "cen-seleccion-natural-evolucion-3d-reto";
 
 export function LabSeleccionNatural({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
@@ -178,6 +182,16 @@ export function LabSeleccionNatural({ color }: PracticaLabProps) {
     { txt: "Compara los tipos de selección y las evidencias", done: modo === "tipos" || modo === "evidencias" },
     { txt: "Resuelve el reto evaluable de la actividad A4", done: ejercicioAprobado },
   ];
+  // Los objetivos se recuerdan (algunos dependían del modo y se desmarcaban
+  // solos) y se convierten en la marca del laboratorio, que antes no se
+  // guardaba en ninguna parte.
+  const { logros: logrosLab, cumplidos: cumplidosLab, total: totalLab } = useLogros(objetivos.map((o) => o.done));
+  const { registraEstrellas } = useEstrellas(RETO_KEY);
+  useEffect(() => {
+    if (cumplidosLab === 0) return;
+    const est = cumplidosLab >= totalLab ? 3 : cumplidosLab >= Math.ceil((totalLab * 2) / 3) ? 2 : 1;
+    registraEstrellas(est);
+  }, [cumplidosLab, totalLab, registraEstrellas]);
 
   const sceneFallback = (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 28, textAlign: "center" }}>
@@ -606,9 +620,9 @@ export function LabSeleccionNatural({ color }: PracticaLabProps) {
             <Eyebrow><i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />Objetivos</Eyebrow>
             <div style={{ display: "grid", gap: 10 }}>
               {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 12.5, color: o.done ? "#34D399" : T.text2 }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 14, opacity: o.done ? 1 : 0.3 }} />
-                  <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 12.5, color: logrosLab[i] ? "#34D399" : T.text2 }}>
+                  <i className={`fa-solid ${logrosLab[i] ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 14, opacity: logrosLab[i] ? 1 : 0.3 }} />
+                  <span style={{ fontWeight: logrosLab[i] ? 700 : 500 }}>{o.txt}</span>
                 </div>
               ))}
             </div>
