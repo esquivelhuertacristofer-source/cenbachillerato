@@ -13,6 +13,8 @@
  *   · contenido no vacío
  *   · tipo válido en el catálogo tipos_actividad y alineado con tipo_codigo
  *   · si es video_con_preguntas: url_video apuntando a R2 (no al PENDIENTE viejo)
+ *     Y el MP4 respondiendo a un HEAD — que la cadena esté bien escrita no
+ *     prueba que el archivo se haya subido.
  *
  * NO toca `tipo`, `tipo_codigo` ni `contenido`. IDEMPOTENTE: una segunda
  * corrida ve 0 borradores y no escribe.
@@ -79,6 +81,38 @@ async function main() {
     return;
   }
 
+  /**
+   * ¿El MP4 existe de verdad en R2?
+   *
+   * Comprobar que la URL EMPIEZA por el prefijo de R2 sólo demuestra que alguien
+   * escribió bien la cadena. Un video se publica en la base antes de subir el
+   * archivo —es el orden natural: se siembra la fila, se renderiza, se sube— y si
+   * la subida se corta a la mitad, la guarda de prefijo deja pasar una actividad
+   * cuyo video da 404. El alumno lo descubre en el salón, con el proyector puesto.
+   *
+   * Un HEAD por video lo cierra. Cuesta unos segundos y ahorra esa escena.
+   */
+  const videoExiste = new Map<string, boolean>();
+  const urlsVideo = [...new Set(
+    borradores
+      .filter((a) => a.tipo === "video_con_preguntas")
+      .map((a) => String((a.contenido ?? {}).url_video ?? ""))
+      .filter((u) => u.startsWith(R2))
+  )];
+  if (urlsVideo.length > 0) {
+    console.log(`Comprobando ${urlsVideo.length} video(s) en R2...`);
+    await Promise.all(urlsVideo.map(async (u) => {
+      try {
+        const r = await fetch(u, { method: "HEAD" });
+        videoExiste.set(u, r.ok);
+      } catch {
+        videoExiste.set(u, false);
+      }
+    }));
+    const ausentes = urlsVideo.filter((u) => !videoExiste.get(u)).length;
+    console.log(`  presentes ${urlsVideo.length - ausentes} | ausentes ${ausentes}\n`);
+  }
+
   const aptas: Fila[] = [];
   const fuera: string[] = [];
   for (const a of borradores) {
@@ -92,6 +126,7 @@ async function main() {
     if (a.tipo === "video_con_preguntas") {
       const url = String(c.url_video ?? "");
       if (!url.startsWith(R2)) problemas.push(`url_video no apunta a R2: "${url.slice(0, 60)}"`);
+      else if (!videoExiste.get(url)) problemas.push(`el MP4 no está en R2 todavía (HEAD falló): ${url.slice(R2.length)}`);
     }
     if (problemas.length > 0) fuera.push(`  ✗ ${a.codigo} [${a.tipo}] — ${problemas.join("; ")}`);
     else aptas.push(a);

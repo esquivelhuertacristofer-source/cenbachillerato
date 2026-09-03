@@ -40,6 +40,17 @@ const eslintConfig = defineConfig([
       "@typescript-eslint/no-require-imports": "off",
     },
   },
+  {
+    // La extensión .cjs SIGNIFICA CommonJS: en esos archivos `require` no es un
+    // estilo antiguo, es la única forma de importar que existe. La regla estaba
+    // marcando como error la sintaxis correcta del formato, y siete "errores"
+    // que no se pueden arreglar sin romper el archivo enseñan a ignorar el
+    // informe completo. El resto de reglas sigue aplicando.
+    files: ["**/*.cjs"],
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;

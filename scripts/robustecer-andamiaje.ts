@@ -254,7 +254,7 @@ async function main() {
   console.log("Inyectando callouts por UAC...\n");
 
   let actualizadas = 0;
-  let omitidas = actividades.length - sinCallouts.length;
+  const omitidas = actividades.length - sinCallouts.length;
   let errores = 0;
 
   for (let i = 0; i < sinCallouts.length; i++) {
