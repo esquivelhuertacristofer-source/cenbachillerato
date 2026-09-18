@@ -81,7 +81,18 @@ import { decodeJwtClaims } from "@/lib/jwt-claims";
 // real de las capas de abajo. A cambio, con tokens de 1h, cada usuario paga
 // ~1 getUser() remoto por hora (cuando su token está realmente por expirar)
 // en vez de uno por cada request bajo las rutas protegidas.
+// Bots que barren internet buscando WordPress/Joomla/PHP (medido en producción
+// 2026-09-18: /media/system/js/core.js gastó 198 ms de CPU en un isolate frío).
+// Aquí no existe nada de eso; se les responde 404 desde el middleware, que es
+// liviano, en vez de despertar al servidor de Next para renderizar el 404.
+const RUTA_DE_ESCANER =
+  /^\/(wp-|wordpress\/|xmlrpc\.php|media\/system\/|administrator\/|phpmyadmin|\.env|\.git\/)|\.php$/i;
+
 export async function middleware(request: NextRequest) {
+  if (RUTA_DE_ESCANER.test(request.nextUrl.pathname)) {
+    return new NextResponse(null, { status: 404 });
+  }
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -176,5 +187,7 @@ export const config = {
     "/admin/:path*",
     "/dashboard/:path*",
     "/cambiar-password",
+    // Rutas de escáneres (ver RUTA_DE_ESCANER): solo para contestarles 404.
+    "/(wp-.*|wordpress/.*|xmlrpc\\.php|media/system/.*|administrator/.*|phpmyadmin.*|\\.env.*|\\.git/.*|.*\\.php)",
   ],
 };

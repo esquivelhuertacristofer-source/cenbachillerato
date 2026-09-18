@@ -12,7 +12,7 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "postinstall": "node scripts/patch-opennext-turbopack.mjs",
-    "pages:build": "npx @opennextjs/cloudflare build && node scripts/postbuild-turbopack.mjs",
+    "pages:build": "npx @opennextjs/cloudflare build && node scripts/postbuild-turbopack.mjs && node scripts/postbuild-cache-interception.mjs",
     "pages:dev": "npx @opennextjs/cloudflare preview",
     "pages:deploy": "npx @opennextjs/cloudflare deploy"
   },

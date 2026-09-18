@@ -6,8 +6,6 @@ export const metadata: Metadata = {
   title: "Términos de Uso — CEN Bachillerato",
 };
 
-export const revalidate = 3600;
-
 export default function TerminosPage() {
   return (
     <>

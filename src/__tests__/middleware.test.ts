@@ -198,4 +198,24 @@ describe("middleware", () => {
     expect(fake.auth.getUser).toHaveBeenCalledTimes(1);
     expect(res.headers.get("location")).toBeNull();
   });
+
+  test.each(["/wp-login.php", "/wp-includes/js/jquery/jquery.js", "/media/system/js/core.js", "/xmlrpc.php", "/.env", "/index.php"])(
+    "ruta de escáner %s -> 404 sin tocar Supabase",
+    async (ruta) => {
+      const { middleware } = await import("@/middleware");
+      const res = await middleware(buildRequest(ruta));
+
+      expect(res.status).toBe(404);
+      expect(mockCreateServerClient).not.toHaveBeenCalled();
+    }
+  );
+
+  test("una ruta legítima parecida (/media/...) no es tratada como escáner", async () => {
+    const { config } = await import("@/middleware");
+    const escaner = new RegExp(`^${config.matcher[4]}$`);
+
+    expect(escaner.test("/media/sem1/portada.webp")).toBe(false);
+    expect(escaner.test("/hub")).toBe(false);
+    expect(escaner.test("/wp-admin/")).toBe(true);
+  });
 });

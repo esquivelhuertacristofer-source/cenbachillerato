@@ -6,8 +6,6 @@ export const metadata: Metadata = {
   title: "Aviso de Privacidad — CEN Bachillerato",
 };
 
-export const revalidate = 3600;
-
 export default function PrivacidadPage() {
   return (
     <>
