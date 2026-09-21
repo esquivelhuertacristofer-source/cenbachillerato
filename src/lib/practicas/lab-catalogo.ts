@@ -1,10 +1,10 @@
 /**
  * Catálogo de laboratorios — datos puros (slug, título, descripción), SIN
  * componentes three.js. Seguro para importar en páginas de listado sin inflar
- * el bundle. Es un espejo de los metadatos de registry.tsx.
+ * el bundle. Es un espejo de los metadatos de registry-meta.ts.
  *
- * AUTO-GENERADO. Para regenerar tras agregar/renombrar labs:
- *   node scripts/_gen-lab-meta.mjs   (script efímero; recréalo si hace falta)
+ * AUTO-GENERADO. NO EDITAR A MANO. Para regenerar:
+ *   npx tsx scripts/generar-lab-catalogo.ts
  */
 
 export interface LabCatalogoItem {
@@ -14,486 +14,1066 @@ export interface LabCatalogoItem {
 }
 
 export const LAB_CATALOGO: Record<string, LabCatalogoItem> = {
-  "densidad": {
-    slug: "densidad",
-    titulo: "Laboratorio 3D — Densidad y Flotación",
-    descripcion: "Suelta objetos en distintos líquidos y descubre por qué flotan o se hunden según ρ = m / V (principio de Arquímedes).",
+  "adn-dogma-central-3d": {
+    slug: "adn-dogma-central-3d",
+    titulo: "Laboratorio 3D — ADN y Dogma Central",
+    descripcion: "Recorre los tres procesos del dogma central: replicación del ADN, transcripción a ARNm y traducción al ribosoma; usa el código genético exacto.",
   },
-  "estados-materia": {
-    slug: "estados-materia",
-    titulo: "Laboratorio 3D — Estados de la materia",
-    descripcion: "Elige una sustancia y mueve la temperatura: observa cómo las partículas pasan de sólido a líquido y gas según su energía cinética (teoría cinético-molecular).",
+  "agora-ciudadania-3d": {
+    slug: "agora-ciudadania-3d",
+    titulo: "Laboratorio 3D — Ágora: ciudadanía y democracia",
+    descripcion: "Predice quién podía votar desde la Atenas clásica hasta la paridad de género, conduce una asamblea vecinal donde el procedimiento decide quién gana y quién queda fuera, y arma tu intervención en un debate distinguiendo hechos, valores y falacias.",
   },
-  "modelos-atomicos": {
-    slug: "modelos-atomicos",
-    titulo: "Laboratorio 3D — Modelos atómicos",
-    descripcion: "Recorre la evolución del átomo, de Dalton a Schrödinger: arma el núcleo con protones y neutrones reales y observa cómo cambió la idea del átomo con cada nuevo modelo.",
+  "alcance-publicacion-3d": {
+    slug: "alcance-publicacion-3d",
+    titulo: "Laboratorio 3D — Difusión digital: el alcance de una publicación",
+    descripcion: "Publica en una red 3D de 150 cuentas y distingue alcance, impresiones e interacción, diseña una campaña comunitaria accesible con máximo dos canales y frena un rumor que se comparte 70 % más que el dato verificado.",
   },
-  "enlaces-quimicos": {
-    slug: "enlaces-quimicos",
-    titulo: "Laboratorio 3D — Enlaces químicos",
-    descripcion: "Construye moléculas en 3D y descubre por qué los átomos se unen: comparten electrones (covalente) o los transfieren (iónico) según la diferencia de electronegatividad.",
+  "algoritmos-deciden": {
+    slug: "algoritmos-deciden",
+    titulo: "Laboratorio Interactivo — ¿Qué Deciden los Algoritmos?",
+    descripcion: "Clasifica qué decide cada algoritmo, relaciona causa y efecto y reconstruye cómo se arma tu feed. Contenido verbatim de Cultura Digital I.",
   },
-  "conservacion-materia": {
-    slug: "conservacion-materia",
-    titulo: "Laboratorio 3D — Conservación de la materia",
-    descripcion: "Avanza una reacción química y observa cómo los mismos átomos se reacomodan de reactivos a productos: la materia no se crea ni se destruye, solo se transforma (Ley de Lavoisier).",
+  "anatomia-exposicion-oral": {
+    slug: "anatomia-exposicion-oral",
+    titulo: "Laboratorio Interactivo — Anatomía de una exposición oral",
+    descripcion: "Monta el guion pieza por pieza y comprueba qué se rompe cuando falta cada una, reparte los segundos contra el reloj hasta ver cómo el desarrollo se come el cierre, decide el apoyo visual de cada momento y diagnostica cuatro exposiciones ajenas. Contenido verbatim de Lengua y Comunicación I.",
   },
-  "energia-electricidad": {
-    slug: "energia-electricidad",
-    titulo: "Laboratorio 3D — Energía y electricidad",
-    descripcion: "Arma un circuito: cierra el interruptor, sube el voltaje y prueba materiales. Observa cómo la corriente es el flujo de electrones y cómo la energía eléctrica enciende el foco (P = V · I).",
+  "archivo-fuentes-historicas-3d": {
+    slug: "archivo-fuentes-historicas-3d",
+    titulo: "Laboratorio 3D — Archivo de fuentes históricas",
+    descripcion: "Examina con la lupa la procedencia e intención de documentos de la expropiación petrolera de 1938, corrobora afirmaciones con hilos en un tablero de corcho, desenmascara una fuente con anacronismos y corrige una foto histórica descontextualizada antes de armar una interpretación argumentada.",
   },
-  "separacion-mezclas": {
-    slug: "separacion-mezclas",
-    titulo: "Laboratorio 3D — Separación de mezclas",
-    descripcion: "Elige una mezcla y un método de separación (filtración, decantación, destilación o imantación). Descubre que solo separa el método que aprovecha la propiedad física en que difieren sus componentes.",
+  "aula-ingles-interacciones": {
+    slug: "aula-ingles-interacciones",
+    titulo: "Laboratorio Interactivo — In the classroom: el turno adecuado",
+    descripcion: "Elige, en ocho situaciones reales del aula, cuál de tres expresiones en inglés cumple tu intención y le habla a la maestra —el error explica qué comunica de más o de menos—, arma tres intercambios profesor↔alumno donde el orden importa, y clasifica doce expresiones en formal e informal sin tratar lo informal como incorrecto. Contenido verbatim de Inglés I.",
   },
-  "propiedades-materia": {
-    slug: "propiedades-materia",
-    titulo: "Laboratorio 3D — Propiedades y cambios de la materia",
-    descripcion: "Aplica transformaciones a una sustancia (fundir, romper, quemar, oxidar…) y clasifícalas como cambio físico o químico observando la evidencia: ¿sigue siendo la misma sustancia o se formó una nueva?",
+  "balanceo-ecuaciones": {
+    slug: "balanceo-ecuaciones",
+    titulo: "Laboratorio 3D — Balanceo de Ecuaciones",
+    descripcion: "Ajusta los coeficientes de reacciones químicas para conservar la masa; comprueba cada elemento contando átomos a ambos lados de la flecha.",
   },
-  "fracciones-porcentajes": {
-    slug: "fracciones-porcentajes",
-    titulo: "Laboratorio 3D — Fracciones, decimales y porcentajes",
-    descripcion: "Construye una fracción n/d y obsérvala como pastel y barra: lee la misma cantidad de tres formas equivalentes (fracción, decimal y porcentaje), descubre fracciones equivalentes y aplica el porcentaje a una cantidad real (descuento, propina, impuesto).",
+  "bayes-probabilidad-condicional": {
+    slug: "bayes-probabilidad-condicional",
+    titulo: "Laboratorio 3D — Bayes: actualizar creencias con nueva información",
+    descripcion: "Probabilidad condicional en 3D: el espacio muestral que se reduce, árboles con regla del producto e inversión con Bayes, y una prueba diagnóstica con 1 000 personas para calcular el Valor Predictivo Positivo del ejercicio A2.",
   },
-  "potencias-raices": {
-    slug: "potencias-raices",
-    titulo: "Laboratorio 3D — Potencias y raíces",
-    descripcion: "Elige una base y un exponente (² o ³) y mira la potencia construida con cubitos: n² es un cuadrado (área) y n³ un cubo (volumen). Resalta el lado para descubrir la raíz como operación inversa: √(n²)=n y ∛(n³)=n.",
+  "bioetica": {
+    slug: "bioetica",
+    titulo: "Laboratorio Interactivo — Bioética",
+    descripcion: "Clasifica casos según el principio bioético (autonomía, beneficencia, no maleficencia, justicia), empareja conceptos y domina el glosario. Contenido verbatim de Pensamiento Filosófico y Humanidades II.",
+  },
+  "biomas-ecosistemas": {
+    slug: "biomas-ecosistemas",
+    titulo: "Laboratorio 3D — Biomas y Ecosistemas",
+    descripcion: "Viaja por los principales biomas del planeta; ajusta temperatura y precipitación para ver qué bioma emerge y qué especies lo habitan.",
+  },
+  "biomoleculas-cuatro-clases": {
+    slug: "biomoleculas-cuatro-clases",
+    titulo: "Laboratorio 3D — Biomoléculas: Cuatro Clases",
+    descripcion: "Explora los cuatro grandes grupos de biomoléculas (carbohidratos, lípidos, proteínas y ácidos nucleicos); relaciona su estructura con su función biológica.",
+  },
+  "biotecnologia-crispr-3d": {
+    slug: "biotecnologia-crispr-3d",
+    titulo: "Laboratorio 3D — Biotecnología y CRISPR",
+    descripcion: "Opera CRISPR-Cas9 sobre protospacer+PAM (NHEJ knockout vs HDR edición precisa); explora plásmido transgénico e insulina 1982/maíz Bt/arroz dorado; SCNT Dolly.",
+  },
+  "busqueda-confiable": {
+    slug: "busqueda-confiable",
+    titulo: "Laboratorio Interactivo — Búsqueda Confiable",
+    descripcion: "Distingue fuentes confiables de señales de alerta, empareja estrategias de búsqueda con su pregunta clave y domina el glosario. Contenido verbatim de Cultura Digital II.",
+  },
+  "carreras-digitales": {
+    slug: "carreras-digitales",
+    titulo: "Laboratorio Interactivo — Carreras Digitales",
+    descripcion: "Clasifica perfiles profesionales por área, emparéjalos con su función en el mercado y domina el glosario. Contenido verbatim de Cultura Digital III.",
+  },
+  "casa-escuela-objetos-ingles-3d": {
+    slug: "casa-escuela-objetos-ingles-3d",
+    titulo: "Laboratorio 3D — Objects and spaces: describe el aula y la casa",
+    descripcion: "Encuentra objetos en un aula 3D siguiendo instrucciones en inglés, recupera tus cosas en Lost and found describiéndolas por tamaño, forma y color, y acomoda una recámara con preposiciones de lugar y There is / There are.",
+  },
+  "causalidad-historica": {
+    slug: "causalidad-historica",
+    titulo: "Laboratorio Interactivo — Causalidad Histórica",
+    descripcion: "Ordena causas y consecuencias de eventos históricos, clasifica el tipo de causalidad (económica, política, social, cultural) y domina el glosario. Contenido verbatim de Conciencia Histórica I.",
+  },
+  "caverna-conocimiento-3d": {
+    slug: "caverna-conocimiento-3d",
+    titulo: "Laboratorio 3D — La caverna y el conocimiento: sombras, sentidos y certeza",
+    descripcion: "Proyecta sombras desde el fuego de la caverna de Platón y descubre que objetos distintos dan la misma sombra, acompaña al prisionero liberado hasta el Sol, déjate engañar por una habitación de Ames y sube una creencia por la escalera de la certeza.",
+  },
+  "celula-organelos-3d": {
+    slug: "celula-organelos-3d",
+    titulo: "Laboratorio 3D — Célula y Organelos",
+    descripcion: "Explora la célula procariota y eucariota en 3D; identifica organelos (núcleo, mitocondria, retículo, aparato de Golgi) y su función.",
+  },
+  "centro-datos-huella-nube-3d": {
+    slug: "centro-datos-huella-nube-3d",
+    titulo: "Laboratorio 3D — Centros de datos y la huella de la nube",
+    descripcion: "Enfría un centro de datos en un clima como el de Querétaro y compara agua contra electricidad, decide los permisos de tus apps y mira a quién llegan tus datos, y diseña una política para que un trámite en línea no deje fuera a nadie.",
+  },
+  "ciclo-carbono": {
+    slug: "ciclo-carbono",
+    titulo: "Laboratorio 3D — Ciclo del Carbono",
+    descripcion: "Sigue los átomos de carbono a través de la atmósfera, océanos, suelo y seres vivos; observa el impacto de la deforestación y la quema de combustibles.",
+  },
+  "circulo-unitario": {
+    slug: "circulo-unitario",
+    titulo: "Laboratorio 3D — Círculo Unitario",
+    descripcion: "Rota un punto sobre el círculo unitario y lee el seno, coseno y tangente en tiempo real; conecta los valores con la gráfica de las funciones trigonométricas.",
+  },
+  "ciudad-direcciones-ingles-3d": {
+    slug: "ciudad-direcciones-ingles-3d",
+    titulo: "Laboratorio 3D — Directions in town: pide y da indicaciones",
+    descripcion: "Sigue indicaciones en inglés para llevar a Emma por un barrio 3D, escribe rutas que Sam ejecuta al pie de la letra y ubica lugares con next to, across from, between y on the corner of.",
+  },
+  "clasificacion-expresiones-mosaicos": {
+    slug: "clasificacion-expresiones-mosaicos",
+    titulo: "Laboratorio 3D — Clasificación de Expresiones (Mosaicos)",
+    descripcion: "Clasifica monomios, binomios, trinomios y polinomios por su grado y número de términos; ordena y simplifica expresiones semejantes.",
+  },
+  "clima-vestimenta-ingles-3d": {
+    slug: "clima-vestimenta-ingles-3d",
+    titulo: "Laboratorio 3D — People, clothes and weather: la plaza de la colonia",
+    descripcion: "Cambia el clima de la plaza y repórtalo en inglés, viste a una persona según el pronóstico de su ciudad y describe a la gente de la parada sin juzgar su apariencia.",
+  },
+  "comparativos-ingles": {
+    slug: "comparativos-ingles",
+    titulo: "Laboratorio Interactivo — Comparativos en Inglés",
+    descripcion: "Forma comparativos y superlativos de adjetivos cortos y largos, completa oraciones de comparación y domina las reglas de formación. Contenido verbatim de Inglés II.",
+  },
+  "comunicacion-multimodal": {
+    slug: "comunicacion-multimodal",
+    titulo: "Laboratorio Interactivo — Comunicación Multimodal",
+    descripcion: "Clasifica elementos digitales por su modo semiótico (texto, imagen, audio, video), empareja los conceptos de identidad digital y algoritmos con su definición y domina el glosario de la era digital. Contenido verbatim de Cultura Digital III.",
   },
   "concentracion-disolucion": {
     slug: "concentracion-disolucion",
-    titulo: "Laboratorio 3D — Concentración de una disolución (% en masa)",
-    descripcion: "Prepara una disolución: elige un soluto, agrega gramos de soluto y de agua y observa cómo cambia la concentración en % en masa = (masa de soluto / masa de la disolución) × 100. Diluye con más agua y satura la disolución al rebasar la solubilidad del soluto.",
+    titulo: "Laboratorio 3D — Concentración y Dilución",
+    descripcion: "Disuelve soluto en solvente y ajusta la concentración; calcula molaridad y comprende el proceso de dilución con soluciones reales.",
   },
-  "razon-proporcion": {
-    slug: "razon-proporcion",
-    titulo: "Laboratorio 3D — Razón y proporción",
-    descripcion: "Elige un escenario real y mueve el deslizador: observa en una gráfica 3D cómo responde la otra cantidad y descubre qué permanece constante. En la proporción directa la razón Y/X no cambia (recta por el origen); en la inversa el producto X·Y se conserva (hipérbola).",
+  "concordancia-conectores": {
+    slug: "concordancia-conectores",
+    titulo: "Laboratorio Interactivo — Concordancia y Conectores",
+    descripcion: "Completa oraciones con la concordancia correcta (género, número, persona) y elige el conector adecuado (adición, contraste, causalidad); domina el glosario. Contenido verbatim de Lengua y Comunicación I.",
   },
-  "recta-numerica": {
-    slug: "recta-numerica",
-    titulo: "Laboratorio 3D — Recta numérica",
-    descripcion: "Ubica enteros y racionales sobre una recta numérica 3D en un contexto real (termómetro, altitud, dinero): descubre que el signo dice de qué lado del cero está cada número y que su valor absoluto es la distancia al cero. En el modo operar, sumar es un salto a la derecha y restar un salto a la izquierda, así se ve por qué restar es sumar el opuesto.",
+  "conicas-lugares-geometricos": {
+    slug: "conicas-lugares-geometricos",
+    titulo: "Laboratorio 3D — Cónicas: Lugares Geométricos",
+    descripcion: "Corta un cono doble en distintos ángulos para obtener elipse, parábola, hipérbola y circunferencia; relaciona el corte con la ecuación canónica.",
   },
-  "notacion-cientifica": {
-    slug: "notacion-cientifica",
-    titulo: "Laboratorio 3D — Notación científica",
-    descripcion: "Arma un número en notación científica (mantisa × 10ⁿ) y viaja por una torre de escalas reales, del átomo al Sol: descubre que el exponente solo corre el punto decimal (positivo agranda, negativo achica) y que convertir de unidad (m ↔ km ↔ mm) únicamente cambia ese exponente. Del átomo al Sol hay 19 saltos de ×10.",
+  "conjuntos-venn-3d": {
+    slug: "conjuntos-venn-3d",
+    titulo: "Laboratorio 3D — Conjuntos y diagramas de Venn",
+    descripcion: "Mueve elementos entre las zonas de un diagrama de Venn y observa la unión, la intersección, el complemento y la diferencia; construye por separado los dos lados de las leyes de De Morgan y acomoda una encuesta empezando por la intersección.",
   },
-  "valor-posicional": {
-    slug: "valor-posicional",
-    titulo: "Laboratorio 3D — Valor posicional",
-    descripcion: "Arma un número de hasta cuatro cifras con bloques base-10 (cubito, barra, placa y cubo) y descubre por qué el lugar de una cifra decide su valor: cada posición vale 10 veces la de su derecha (unidad → decena → centena → millar). Ve la descomposición cifra × valor del lugar y el papel del cero como marcador de posición.",
-  },
-  "sistemas-ecuaciones-2x2": {
-    slug: "sistemas-ecuaciones-2x2",
-    titulo: "Laboratorio 3D — Sistemas de ecuaciones 2×2",
-    descripcion: "El plano cartesiano es el piso y cada ecuación es una recta: resolver el sistema es hallar dónde se cruzan. Elige una situación real o uno de los tres casos e inclina la segunda recta para descubrir cuándo hay una solución (se cruzan y se levanta una columna), ninguna (paralelas) o infinitas (coincidentes).",
-  },
-  "ecuacion-lineal-balanza": {
-    slug: "ecuacion-lineal-balanza",
-    titulo: "Laboratorio 3D — Ecuación lineal de una variable (la balanza)",
-    descripcion: "Una ecuación a·x + b = c es una balanza en equilibrio: los dos platos pesan lo mismo. Despeja la x aplicando la propiedad de uniformidad —quita las mismas unidades de ambos lados y reparte en partes iguales— y mira cómo la balanza permanece nivelada; si operas en un solo lado, se inclina porque rompiste la igualdad.",
-  },
-  "teorema-pitagoras": {
-    slug: "teorema-pitagoras",
-    titulo: "Laboratorio 3D — Teorema de Pitágoras",
-    descripcion: "Sobre cada lado de un triángulo rectángulo se levanta un cuadrado: el de la hipotenusa (c²) tiene la misma área que la suma de los de los catetos (a² + b²). Mueve los catetos para descubrir por qué a² + b² = c², reconocer ternas pitagóricas (lados enteros) y calcular distancias reales —la escalera, la diagonal de una pantalla o de un terreno, el hilo de un papalote— cuando conoces dos lados.",
-  },
-  "volumen-cilindro": {
-    slug: "volumen-cilindro",
-    titulo: "Laboratorio 3D — Volumen de un cilindro",
-    descripcion: "Un tanque cilíndrico transparente que se llena de líquido: el volumen es el área de la base circular (π·r²) por la altura (h), es decir V = π·r²·h. Mueve el radio, la altura y el nivel de llenado para ver el volumen como discos apilados, leer la capacidad real en litros (1 m³ = 1000 L) en tanques reales —tinaco, cisterna, tambo, silo— y descubrir que, como el radio está al cuadrado, ensanchar el tanque sube el volumen mucho más rápido que hacerlo más alto.",
-  },
-  "factorizacion-area": {
-    slug: "factorizacion-area",
-    titulo: "Laboratorio 3D — Factorización: el modelo de área",
-    descripcion: "Un trinomio x² + bx + c es el área de un rectángulo y factorizarlo es hallar sus dos lados. Con piezas de álgebra (una x², varias x y unidades) construye el rectángulo de lados (x + p)(x + q) y descubre la regla 'suma y producto': b = p + q y c = p·q. Cuando p = q el rectángulo es un cuadrado (trinomio cuadrado perfecto). Incluye un panel con las cuatro técnicas de la actividad: factor común, diferencia de cuadrados, trinomio cuadrado perfecto y trinomio x² + bx + c.",
-  },
-  "ecuacion-lineal-barras": {
-    slug: "ecuacion-lineal-barras",
-    titulo: "Laboratorio 3D — Ecuaciones lineales: el modelo de barras",
-    descripcion: "Plantear un problema en palabras como una ecuación a·x + b = c y resolverlo, hecho visible con un modelo de barras (tape diagram): cada cantidad de la historia es un segmento. La incógnita aporta a·x, la parte fija es la constante b, y el total conocido es la meta c. Mueve la incógnita hasta que la barra llegue justo a la meta y descubre el despeje x = (c − b) / a. Tres problemas verbatim de la actividad: el doble de un número aumentado en 7, el artesano que cobra por hora más materiales fijos, y dos hermanos cuyas edades suman 45. Complementa el laboratorio de la balanza, que enfatiza el equilibrio al despejar.",
-  },
-  "productos-notables-3d": {
-    slug: "productos-notables-3d",
-    titulo: "Laboratorio 3D — Productos notables: área y volumen",
-    descripcion: "Un producto notable no se memoriza, se ve como una figura que se descompone. El binomio al cuadrado (a + b)² es el área de un cuadrado partido en a² + 2ab + b²; el binomio al cubo (a + b)³ es el volumen de un cubo partido en a³ + 3a²b + 3ab² + b³ (ocho piezas imposibles de ver en 2D); los binomios conjugados (a + b)(a − b) son un cuadrado a² al que se le quita un cuadrado b², dando a² − b². Mueve los lados a y b y usa el control de separación para despiezar la figura y descubrir de dónde sale cada término (y por qué los coeficientes son 2 y 3). Acompaña el ejercicio de la plaza cuadrada (x + 5).",
+  "consejos-ingles": {
+    slug: "consejos-ingles",
+    titulo: "Laboratorio Interactivo — Consejos en Inglés",
+    descripcion: "Clasifica oraciones de consejo por su forma, completa recomendaciones y empareja estructuras. Contenido verbatim de Inglés IV.",
   },
   "conservacion-energia-pendulo": {
     slug: "conservacion-energia-pendulo",
-    titulo: "Laboratorio 3D — Conservación de la energía: el péndulo",
-    descripcion: "La energía no se crea ni se destruye, solo se transforma, y un péndulo lo hace visible. Al soltarlo desde lo alto toda su energía es potencial (Ep = m·g·h) y no se mueve; al caer esa energía se vuelve cinética (Ec = ½·m·v²) y abajo la rapidez es máxima; al subir, la cinética regresa a potencial. Sin fricción la suma Ep + Ec se mantiene constante (tres barras en vivo lo muestran); con fricción una parte pasa a calor y el péndulo se detiene, pero la energía total nunca desaparece (Ep + Ec + Calor = E₀). Cambia el ángulo, el largo del hilo, la masa y la gravedad (Tierra, Luna, Marte, Júpiter) y descubre que la rapidez máxima depende de g y de la altura, no de la masa.",
+    titulo: "Laboratorio 3D — Conservación de la Energía (Péndulo)",
+    descripcion: "Suelta un péndulo y observa la transformación continua entre energía potencial y cinética; varía la masa y la altura inicial.",
   },
-  "gas-ideal-piston": {
-    slug: "gas-ideal-piston",
-    titulo: "Laboratorio 3D — Gas ideal: presión, volumen y temperatura",
-    descripcion: "Un gas encerrado en un cilindro con pistón es un sistema cerrado, y este laboratorio hace visible de dónde sale la presión: millones de partículas chocando contra las paredes y el pistón. Sube la temperatura y las partículas se mueven más rápido (v_rms ∝ √T), chocando con más fuerza; baja el volumen con el pistón y el mismo gas choca más seguido; mete más gas (n) y hay más choques. Todo respeta la ecuación de estado PV = nRT (R = 8.314 J/mol·K), que verás en vivo en el manómetro lateral. La energía interna U = 3/2·n·R·T y la primera ley de la termodinámica ΔU = Q − W cierran la idea: la energía interna del gas solo cambia por el calor que entra menos el trabajo que hace al expandirse. Ajusta P, V, T y n y descubre que las cuatro variables están amarradas: no puedes mover una sin que las demás respondan.",
+  "conservacion-materia": {
+    slug: "conservacion-materia",
+    titulo: "Laboratorio 3D — Ley de Conservación de la Materia",
+    descripcion: "Equilibra reacciones químicas en una balanza virtual y comprueba que los átomos se conservan; ajusta coeficientes y observa el efecto en la masa.",
   },
-  "transferencia-calor-mecanismos": {
-    slug: "transferencia-calor-mecanismos",
-    titulo: "Laboratorio 3D — Calor: conducción, convección y radiación",
-    descripcion: "El calor es energía en tránsito que fluye siempre del cuerpo más caliente al más frío, hasta el equilibrio térmico, y este laboratorio hace visibles los tres caminos por los que viaja. En CONDUCCIÓN verás una barra de átomos donde el calor avanza partícula a partícula desde el extremo en contacto con la fuente; cambia el material y compara un metal (cobre, gran conductor) con un aislante (madera): con el aislante el frente de calor apenas avanza. En CONVECCIÓN, un fluido calentado por debajo forma corrientes: el fluido caliente (menos denso) sube y el frío (más denso) baja. En RADIACIÓN, el Sol calienta a la Tierra lanzando ondas electromagnéticas a través del vacío, sin ningún medio material. Ajusta la temperatura de la fuente y observa cómo cambia todo, mientras lees la misma temperatura en las escalas Celsius, Kelvin y Fahrenheit. Recuerda: la temperatura mide el movimiento promedio de las partículas; el calor es la energía que se transfiere entre ellas.",
+  "constructor-algoritmos": {
+    slug: "constructor-algoritmos",
+    titulo: "Laboratorio Interactivo — Constructor de Algoritmos",
+    descripcion: "Ordena los pasos de algoritmos cotidianos y de programación, clasifica instrucciones por tipo de estructura (secuencia, decisión, ciclo) y domina el glosario. Contenido verbatim de Cultura Digital I.",
   },
-  "entropia-segunda-ley": {
-    slug: "entropia-segunda-ley",
-    titulo: "Laboratorio 3D — Entropía y leyes de la termodinámica",
-    descripcion: "La primera ley dice que la energía se conserva, pero no explica por qué los procesos ocurren en un solo sentido; la entropía (S) —medida del desorden, de cómo se dispersa la energía— sí lo explica, y este laboratorio la hace visible con una barra que sube en tiempo real. En MEZCLA DE GASES (2.ª ley) dos gases separados por una pared se mezclan solos al quitarla y jamás se vuelven a separar por sí mismos. En FLUJO DE CALOR (2.ª ley) un cuerpo caliente y uno frío en contacto llegan al equilibrio térmico porque el calor fluye espontáneamente del caliente al frío, nunca al revés. En CRISTAL A 0 K (3.ª ley) al enfriar un cristal perfecto sus partículas se ordenan y su entropía tiende a cero, pero el cero absoluto (−273.15 °C) es inalcanzable: solo puedes acercarte. El panel lateral repasa las tres leyes, la entalpía (H = U + PV) con procesos exotérmicos y endotérmicos, y el cero absoluto. La gran idea: en todo proceso espontáneo la entropía total del universo aumenta; esa es la flecha del tiempo.",
+  "consumo-energetico-hogar-3d": {
+    slug: "consumo-energetico-hogar-3d",
+    titulo: "Laboratorio 3D — Consumo energético e impacto ambiental",
+    descripcion: "Enciende y desconecta los aparatos de una casa mexicana y calcula kWh, recibo escalonado y CO₂; sigue la energía de la planta al foco y convierte tu huella de carbono anual en globos de CO₂ a tamaño real.",
   },
-  "maquina-termica-ciclos": {
-    slug: "maquina-termica-ciclos",
-    titulo: "Laboratorio 3D — Máquinas térmicas: motores y refrigeradores",
-    descripcion: "La primera ley de la termodinámica es la conservación de la energía aplicada al calor (ΔU = Q − W), y este laboratorio la hace visible con dos máquinas que son una el reverso de la otra. En MOTOR DE CALOR el calor fluye solo de un foco caliente a uno frío; en el camino la máquina arranca una parte como trabajo útil (sube en verde) y forzosamente tira el resto al foco frío: por la segunda ley nunca aprovecha todo, su eficiencia máxima es η = 1 − T_f/T_c. En REFRIGERADOR todo va al revés: se gasta trabajo eléctrico (baja en amarillo) para bombear calor del interior frío al exterior caliente (Q_c = Q_f + W), en contra de su flujo natural; su rendimiento es el COP = Q_f/W, que baja cuando afuera hace más calor. El número de partículas de cada chorro es proporcional a la energía, así que la segunda ley se ve: en el motor el chorro de trabajo nunca iguala al de calor que entró. Mueve las temperaturas de los focos —el frío nunca alcanza al caliente— y observa en vivo el balance de energía (η o COP) mientras el volante gira más rápido cuanto mejor rinde la máquina.",
+  "contaminantes-plasticos-3d": {
+    slug: "contaminantes-plasticos-3d",
+    titulo: "Laboratorio 3D — Contaminantes químicos y plásticos",
+    descripcion: "Tira un plástico al mar y mira si flota o se hunde y cómo se rompe en microplásticos; sigue el DDT y el mercurio por la cadena alimenticia hasta tu plato, y decide si un residuo se recicla, se composta, se entierra o llega al río.",
   },
-  "trabajo-potencia-mecanica": {
-    slug: "trabajo-potencia-mecanica",
-    titulo: "Laboratorio 3D — Trabajo y potencia mecánica",
-    descripcion: "En física, el trabajo (W) no es esfuerzo: es la energía que una fuerza transfiere al desplazar un objeto en la dirección de esa fuerza, W = F · d · cos θ (en Joules). Este laboratorio lo hace visible. En TRABAJO una fuerza empuja una caja por el piso y verás la fuerza descomponerse en dos flechas: la verde (F · cos θ), la única que llena la barra de trabajo porque va con el movimiento, y la gris perpendicular (F · sen θ), que no aporta nada. Sube el ángulo θ hacia 90° y descubre por qué el trabajo cae a cero aunque la caja siga avanzando: por eso cargar una mochila sin caminar no realiza trabajo mecánico. En POTENCIA dos máquinas levantan la misma carga a la misma altura —hacen el mismo trabajo (6000 J)— pero compiten en una carrera: la de más potencia llega primero porque la potencia es la rapidez con que se hace el trabajo, P = W / t (en Watts; 1 W = 1 J/s, 1 hp ≈ 746 W). Mueve la potencia de cada máquina y ve en vivo el tiempo que tarda cada una. La gran idea: un motor de 2000 W hace el mismo trabajo que uno de 1000 W, pero en la mitad del tiempo; por eso focos, electrodomésticos y motores se etiquetan en Watts.",
+  "continuidad-tres-condiciones": {
+    slug: "continuidad-tres-condiciones",
+    titulo: "Laboratorio 3D — Continuidad: Tres Condiciones",
+    descripcion: "Verifica las tres condiciones de continuidad en funciones a trozos; identifica discontinuidades removibles, de salto e infinitas.",
   },
-  "inecuaciones-lineales": {
-    slug: "inecuaciones-lineales",
-    titulo: "Laboratorio 3D — Inecuaciones lineales",
-    descripcion: "Una ecuación tiene una solución única —un punto—, pero una inecuación (<, ≤, >, ≥) tiene un conjunto infinito de soluciones, y este laboratorio lo hace visible. En UNA VARIABLE armas a·x + b ⧁ c y la despejas igual que una ecuación, con una sola excepción crítica: pon el coeficiente a en negativo y descubre por qué el signo se invierte (−2x > 6 → x < −3). La solución se pinta como un rayo verde sobre la recta numérica, con punto cerrado (●) si el límite se incluye (≤, ≥) o abierto (○) si no (<, >), y una cuenta viajera se pone verde justo en el tramo solución. En DOS VARIABLES la recta a·x + b·y = c parte el plano en dos y el semiplano solución se eleva como una meseta verde, con la frontera continua (≤/≥) o punteada (</>); un punto que orbita se pone verde dentro de la región. La gran idea: las inecuaciones son el lenguaje de las restricciones reales —salario ≥ mínimo, gastos ≤ ingreso— y la base de la región factible en programación lineal. Acompaña la actividad de PM-II sobre planteo y resolución de inecuaciones lineales.",
+  "convivencia-digital": {
+    slug: "convivencia-digital",
+    titulo: "Laboratorio Interactivo — Identidad y respeto en el ciberespacio",
+    descripcion: "Manda el mismo mensaje por cuatro canales y con cuatro tonos y mide cómo cambia su efecto, cierra un perfil bajando lo que se deduce de ti sin perder presencia, decide ante cuatro casos —broma, rumor, hostigamiento y suplantación— si toca hablar, documentar, bloquear, reportar o pedir ayuda, y reescribe respuestas hostiles en firmes. Contenido verbatim de Cultura Digital I; los casos y el perfil son ilustrativos.",
   },
-  "formas-energia-transformacion": {
-    slug: "formas-energia-transformacion",
-    titulo: "Laboratorio 3D — Formas y transformación de la energía",
-    descripcion: "La energía no se crea ni se destruye: solo se transforma de una forma a otra, y este laboratorio lo hace visible como un río de energía que cambia de color al pasar por cada aparato. Elige un transformador real —planta hidroeléctrica (potencial → cinética → eléctrica), panel solar (luminosa → eléctrica), cuerpo humano (química → movimiento) o foco incandescente (eléctrica → luz)— y mira fluir la energía cambiando de forma mientras una parte se escapa hacia arriba como calor en cada conversión. El grosor del río representa cuánta energía queda: en el foco el río casi desaparece porque solo el 5% sale como luz y el 95% se va en calor (dato verbatim de la actividad). Regula la energía de entrada y comprueba en el balance en vivo que la energía siempre se conserva: entrada = útil + calor disipado. El panel lateral repasa las seis formas de energía (cinética, potencial, térmica, luminosa, eléctrica y química) e identifica la forma presente en casos cotidianos. Acompaña la actividad de CNEYT-II sobre las formas de energía en el mundo cotidiano; complementa —sin repetir— el laboratorio del péndulo, centrado solo en el vaivén cinética↔potencial.",
+  "correlacion-variables-3d": {
+    slug: "correlacion-variables-3d",
+    titulo: "Laboratorio 3D — ¿Están relacionadas? Independencia y correlación",
+    descripcion: "Relación entre variables en 3D: tabla de contingencia en torres con el plano de lo esperado, diagrama de dispersión interactivo con r y rectángulos de productos, y la temperatura como variable oculta que desmonta la correlación entre helado y ahogamientos.",
   },
-  "parabola-trayectoria": {
-    slug: "parabola-trayectoria",
-    titulo: "Laboratorio 3D — Parábolas: la trayectoria de un tiro",
-    descripcion: "Una función cuadrática h(x) = a·x² + b·x + c no es solo álgebra: se dibuja como una parábola, y este laboratorio une lo algebraico con lo geométrico haciendo volar un balón por su trayectoria. Mueve los tres coeficientes y descubre el significado visual de cada uno: la apertura (signo y tamaño de a, que aquí abre hacia abajo como un tiro), la inclinación de salida (b) y la altura inicial (c). En vivo se marcan las cuatro partes de la parábola: el VÉRTICE (x = −b/2a, el punto más alto, con guías punteadas a los ejes), los CEROS o raíces (donde el balón toca el suelo, vía fórmula general), el EJE DE SIMETRÍA (la recta vertical x = x_v que parte la curva en dos mitades espejo) y el DISCRIMINANTE b²−4ac, que anticipa cuántos ceros hay sin resolver. Activa el escenario del gol de la actividad —balón h(x) = −0.04x² + 1.2x, vértice (15, 9), ceros en 0 y 30— y compara la altura del balón en la portería (h(25) = 5 m) con el travesaño (2.44 m) para decidir si pasa por encima o por debajo. Acompaña la actividad de PM-III sobre la representación gráfica de ecuaciones cuadráticas y el análisis de un tiro parabólico.",
+  "cortesia-conversacion-ingles-3d": {
+    slug: "cortesia-conversacion-ingles-3d",
+    titulo: "Laboratorio 3D — Polite conversations: open, keep, close",
+    descripcion: "Conversa en inglés en una cafetería, una fiesta, una videollamada y una clínica: abre, mantén y cierra con cortesía y empatía, ajusta tu registro a quien te escucha y reescribe las líneas descorteses mientras los personajes reaccionan.",
+  },
+  "crisis-sociales": {
+    slug: "crisis-sociales",
+    titulo: "Laboratorio Interactivo — Crisis Sociales",
+    descripcion: "Clasifica causas, actores y consecuencias de la crisis de la pandemia de COVID-19, empareja cada actor con su papel y domina el glosario. Contenido verbatim de Ciencias Sociales III.",
+  },
+  "datos-graficas-estadisticas": {
+    slug: "datos-graficas-estadisticas",
+    titulo: "Laboratorio 3D — Datos y Gráficas Estadísticas",
+    descripcion: "Construye histogramas, polígonos de frecuencia y ojivas a partir de tablas de datos; interpreta la forma de la distribución.",
+  },
+  "dcl-leyes-newton": {
+    slug: "dcl-leyes-newton",
+    titulo: "Laboratorio 3D — Diagrama de Cuerpo Libre y Leyes de Newton",
+    descripcion: "Dibuja DCL en planos horizontal, inclinado y polea; aplica ΣF=ma para calcular aceleración y tensiones. Contenido verbatim de CNEyT V.",
+  },
+  "deforestacion": {
+    slug: "deforestacion",
+    titulo: "Laboratorio 3D — Deforestación y Biodiversidad",
+    descripcion: "Tala árboles virtualmente y mide el impacto en la biodiversidad, el CO₂ atmosférico y la erosión del suelo; compara escenarios de reforestación.",
+  },
+  "densidad": {
+    slug: "densidad",
+    titulo: "Laboratorio 3D — Densidad y Flotación",
+    descripcion: "Suelta objetos en distintos líquidos y observa si flotan o se hunden; mide masa y volumen para calcular la densidad real.",
+  },
+  "derechos-digitales": {
+    slug: "derechos-digitales",
+    titulo: "Laboratorio Interactivo — Mis derechos en el mundo digital",
+    descripcion: "Resuelve cuatro casos decidiendo qué derecho está en juego, qué mecanismo procede y qué deber te toca del otro lado; clasifica ocho solicitudes en su letra de ARCO y audita un aviso de privacidad cláusula por cláusula. Contenido verbatim de Cultura Digital I, con el marco legal vigente (LFPDPPP, DOF 20/03/2025).",
+  },
+  "derivada-secante-tangente": {
+    slug: "derivada-secante-tangente",
+    titulo: "Laboratorio 3D — Derivada: Secante y Tangente",
+    descripcion: "Observa cómo la recta secante se convierte en tangente al acercar el segundo punto; calcula la derivada como límite del cociente diferencial.",
+  },
+  "describir-personas-clima-ingles": {
+    slug: "describir-personas-clima-ingles",
+    titulo: "Laboratorio Interactivo — Describing people: orden del adjetivo, be/have y wearing",
+    descripcion: "Arma frases en inglés con el orden fijo del adjetivo (opinión → tamaño → edad → color → material) y detecta las que suenan imposibles, elige be o have para describir a alguien sin cruzarlos, viste a cuatro personas según el parte meteorológico de Xalapa, Creel, Mérida y La Ventosa justificando con la oración correcta, y escribe is wearing o wears según el marcador de tiempo. Contenido verbatim de Inglés II.",
+  },
+  "descubrimiento-celula-3d": {
+    slug: "descubrimiento-celula-3d",
+    titulo: "Laboratorio 3D — El descubrimiento de la célula: microscopios y teoría celular",
+    descripcion: "Mira la misma muestra con los microscopios de Hooke, Leeuwenhoek, el siglo XIX, el óptico y el electrónico; calcula aumento total y tamaño real, y levanta los tres postulados de la teoría celular con el experimento de Pasteur.",
+  },
+  "deteccion-fake-news": {
+    slug: "deteccion-fake-news",
+    titulo: "Laboratorio Interactivo — Detección de Fake News",
+    descripcion: "Clasifica noticias en verdaderas y falsas según indicadores de credibilidad, empareja estrategias de verificación y domina el glosario de alfabetización mediática. Contenido verbatim de Cultura Digital I.",
+  },
+  "diferencial-linealizacion": {
+    slug: "diferencial-linealizacion",
+    titulo: "Laboratorio 3D — Diferencial y Linealización",
+    descripcion: "Usa el diferencial para aproximar el cambio en una función; compara la aproximación lineal con el valor real y analiza el error de la linealización.",
+  },
+  "dilema-tranvia-etica-3d": {
+    slug: "dilema-tranvia-etica-3d",
+    titulo: "Laboratorio 3D — Dilemas éticos: el tranvía y la balanza de argumentos",
+    descripcion: "Decide y justifica en el dilema del tranvía y sus variantes, arma argumentos en dilemas cotidianos y clasifica por teoría ética o falacia las intervenciones del debate «¿Los fines justifican los medios?».",
+  },
+  "discriminante": {
+    slug: "discriminante",
+    titulo: "Laboratorio 3D — Discriminante",
+    descripcion: "Calcula el discriminante b²-4ac de ecuaciones cuadráticas y predice el número de raíces reales; observa la parábola tocar, cruzar o evitar el eje x.",
+  },
+  "distribucion-normal": {
+    slug: "distribucion-normal",
+    titulo: "Laboratorio 3D — Distribución Normal",
+    descripcion: "Ajusta media y desviación estándar de una campana de Gauss; calcula probabilidades por áreas y aplícalo a datos reales de exámenes.",
+  },
+  "diversidad-discriminacion": {
+    slug: "diversidad-discriminacion",
+    titulo: "Laboratorio Interactivo — Diversidad y Discriminación",
+    descripcion: "Clasifica las formas de organización social y las manifestaciones de la discriminación, empareja los conceptos clave con su definición y domina el glosario. Contenido verbatim de Ciencias Sociales II.",
+  },
+  "division-celular": {
+    slug: "division-celular",
+    titulo: "Laboratorio 3D — División Celular",
+    descripcion: "Observa las fases de la mitosis y la meiosis en animación 3D; identifica cada etapa (profase, metafase, anafase, telofase) y el número de células resultantes.",
+  },
+  "ecuacion-cuadratica": {
+    slug: "ecuacion-cuadratica",
+    titulo: "Laboratorio 3D — Ecuación Cuadrática",
+    descripcion: "Resuelve ecuaciones cuadráticas por factorización, completar cuadrado y la fórmula general; visualiza las raíces como intersecciones con el eje x.",
+  },
+  "ecuacion-lineal-balanza": {
+    slug: "ecuacion-lineal-balanza",
+    titulo: "Laboratorio 3D — Ecuación Lineal (Balanza)",
+    descripcion: "Equilibra una balanza agregando y quitando pesas para resolver ecuaciones lineales; aplica las propiedades de igualdad paso a paso.",
+  },
+  "ecuacion-lineal-barras": {
+    slug: "ecuacion-lineal-barras",
+    titulo: "Laboratorio 3D — Ecuaciones Lineales (Barras)",
+    descripcion: "Modela situaciones con barras de colores para plantear y resolver ecuaciones lineales; traduce el lenguaje cotidiano al algebraico.",
   },
   "ecuacion-recta": {
     slug: "ecuacion-recta",
-    titulo: "Laboratorio 3D — Ecuación de la recta en el plano cartesiano",
-    descripcion: "Una ecuación lineal con dos incógnitas se dibuja como una recta en el plano cartesiano (ejes perpendiculares X y Y, cuatro cuadrantes). Mueve la pendiente m —la inclinación: cuánto sube o baja y por cada paso de 1 en x, con m > 0 que sube, m < 0 que baja y m = 0 horizontal— y la ordenada al origen b —el punto (0, b) donde la recta cruza el eje Y— y descubre que cada punto de la recta es un par (x, y) que cumple la ecuación: por eso una ecuación con dos incógnitas tiene infinitas soluciones. En vivo se marcan la ordenada al origen, la raíz o cruce con X (x = −b/m), el triángulo de pendiente (avance 1, subida m) y las soluciones de coordenadas enteras. Modela un caso real —la tarifa de un taxi de la CDMX, y = 1.07·x + 8.74: banderazo (ordenada) + costo por distancia (pendiente)— para ver el significado de cada número. Acompaña la actividad de PM-III sobre ecuaciones lineales con dos incógnitas y la representación gráfica de la ecuación de la recta.",
+    titulo: "Laboratorio 3D — Ecuación de la Recta",
+    descripcion: "Mueve puntos en el plano cartesiano para construir la ecuación de la recta en sus formas pendiente-intersección, punto-pendiente y general.",
+  },
+  "electromagnetismo-ohm-faraday": {
+    slug: "electromagnetismo-ohm-faraday",
+    titulo: "Laboratorio 3D — Electromagnetismo: Ohm y Faraday",
+    descripcion: "Simula circuitos con ley de Ohm I=V/R, generador Faraday FEM=N·B·A·ω·sen(ωt) y motor eléctrico; presets CFE y caso Metro 150kW@92%. Anclado a ejercicio A2.",
+  },
+  "encuesta-lectora-comunidad": {
+    slug: "encuesta-lectora-comunidad",
+    titulo: "Laboratorio Interactivo — La encuesta lectora de tu comunidad",
+    descripcion: "Decide qué preguntas sirven para investigar a tu comunidad, codifica nueve respuestas reales en tipo de texto y soporte, y lee la gráfica que producen tus propias decisiones. Contenido verbatim de Lengua y Comunicación I.",
+  },
+  "energia-electricidad": {
+    slug: "energia-electricidad",
+    titulo: "Laboratorio 3D — Energía y Electricidad",
+    descripcion: "Arma circuitos con pilas, resistencias y focos; mide voltaje e intensidad para verificar la Ley de Ohm y calcular la potencia consumida.",
+  },
+  "energias-renovables-mexico-3d": {
+    slug: "energias-renovables-mexico-3d",
+    titulo: "Laboratorio 3D — Energías renovables y no renovables en México",
+    descripcion: "Recorre doce centrales reales en un relieve 3D de México para ver que capacidad instalada no es generación, opera una red de sol, viento, baterías y gas durante un día entero y ajusta la mezcla del país para medir sus emisiones y el agotamiento del petróleo.",
+  },
+  "enlaces-quimicos": {
+    slug: "enlaces-quimicos",
+    titulo: "Laboratorio 3D — Enlaces Químicos",
+    descripcion: "Forma moléculas y cristales manipulando átomos; observa cómo los electrones de valencia determinan el tipo de enlace (iónico, covalente, metálico).",
+  },
+  "entropia-segunda-ley": {
+    slug: "entropia-segunda-ley",
+    titulo: "Laboratorio 3D — Entropía y Segunda Ley",
+    descripcion: "Mezcla colores y observa cómo aumenta el desorden; relaciona la dirección espontánea de los procesos con el incremento de entropía.",
+  },
+  "equilibrio-quimico": {
+    slug: "equilibrio-quimico",
+    titulo: "Laboratorio 3D — Equilibrio Químico",
+    descripcion: "Perturba un sistema en equilibrio aplicando el principio de Le Chatelier; varía concentración, temperatura y presión y observa el desplazamiento del equilibrio.",
+  },
+  "espectro-electromagnetico": {
+    slug: "espectro-electromagnetico",
+    titulo: "Laboratorio 3D — Espectro Electromagnético",
+    descripcion: "Recorre el espectro log-f 10⁴–10²² Hz; identifica las 7 bandas, el umbral ionizante y 11 aplicaciones de México (GTM, IFT, IMSS, ININ). Anclado a infografía A1.",
+  },
+  "estadistica-enganosa-3d": {
+    slug: "estadistica-enganosa-3d",
+    titulo: "Laboratorio 3D — Estadísticas que engañan",
+    descripcion: "Ocho trucos de los medios en 3D: eje truncado, íconos que crecen en volumen, escala logarítmica, puntos contra porcentaje, riesgo relativo, bases distintas, media contra mediana y margen de error.",
+  },
+  "estado-mexicano": {
+    slug: "estado-mexicano",
+    titulo: "Laboratorio Interactivo — El Estado Mexicano",
+    descripcion: "Clasifica los poderes del Estado mexicano y sus funciones, empareja los órganos de gobierno con su atribución y domina el glosario constitucional. Contenido verbatim de Ciencias Sociales I.",
+  },
+  "estados-materia": {
+    slug: "estados-materia",
+    titulo: "Laboratorio 3D — Estados de la Materia",
+    descripcion: "Calienta y enfría sustancias para observar los cambios de estado; identifica los puntos de fusión y ebullición en la gráfica.",
+  },
+  "estimacion-fermi-3d": {
+    slug: "estimacion-fermi-3d",
+    titulo: "Laboratorio 3D — Estimación y órdenes de magnitud",
+    descripcion: "Estima cantidades enormes descomponiéndolas en factores y compáralas con datos reales en una regla logarítmica, redondea y trunca viendo a dónde rueda una canica, y caza resultados absurdos en recetas, cuentas y dosis.",
+  },
+  "estructura-reaccion": {
+    slug: "estructura-reaccion",
+    titulo: "Laboratorio 3D — Estructura y Reacción Química",
+    descripcion: "Construye modelos de bola y varilla para comprender cómo la estructura molecular determina la reactividad; identifica los sitios de reacción.",
+  },
+  "estudio-edicion-digital-3d": {
+    slug: "estudio-edicion-digital-3d",
+    titulo: "Laboratorio 3D — Estudio de edición de contenido digital",
+    descripcion: "Abre una imagen hasta sus bits, comprímela con y sin pérdida, arma un cartel legible por capas y ajusta video y audio al peso que permiten los datos y equipos de tu comunidad.",
+  },
+  "etica-produccion-digital": {
+    slug: "etica-produccion-digital",
+    titulo: "Laboratorio Interactivo — Ética y Producción Digital",
+    descripcion: "Clasifica prácticas éticas y no éticas, empareja conceptos con su definición (plagio, deepfake, autoría) y domina el glosario. Contenido verbatim de Cultura Digital II.",
+  },
+  "experiencias-recientes-ingles": {
+    slug: "experiencias-recientes-ingles",
+    titulo: "Laboratorio Interactivo — Have you ever...? Compartir experiencias en inglés",
+    descripcion: "Arma cuatro charlas turno por turno y descubre el salto: la pregunta abre en present perfect, la respuesta corta repite el auxiliar y el seguimiento —cuándo, dónde, con quién— cambia a past simple; coloca ever, never, already, yet y just en su posición exacta, decide entre for y since, y cuenta la misma vivencia con fecha y sin fecha. Contenido verbatim de Inglés III; los personajes son ficticios.",
+  },
+  "exposicion-oral": {
+    slug: "exposicion-oral",
+    titulo: "Laboratorio Interactivo — Exposición Oral",
+    descripcion: "Clasifica escenarios por formato de exposición oral (coloquio, simposio, foro), empareja los conceptos con su definición y domina el glosario. Contenido verbatim de Lengua y Comunicación III.",
+  },
+  "extremos-inflexion": {
+    slug: "extremos-inflexion",
+    titulo: "Laboratorio 3D — Extremos e Inflexión",
+    descripcion: "Encuentra máximos, mínimos y puntos de inflexión usando la primera y segunda derivada; interpreta la concavidad y los cambios de monotonía.",
+  },
+  "factores-produccion": {
+    slug: "factores-produccion",
+    titulo: "Laboratorio Interactivo — Factores de Producción",
+    descripcion: "Clasifica tierra, trabajo, capital y tecnología en ejemplos concretos, empareja cada factor con su retribución y domina el glosario económico. Contenido verbatim de Ciencias Sociales I.",
+  },
+  "factorizacion-area": {
+    slug: "factorizacion-area",
+    titulo: "Laboratorio 3D — Factorización y Área",
+    descripcion: "Descompone rectángulos en factores para visualizar la factorización algebraica; relaciona el área con los factores de un trinomio.",
+  },
+  "falacias-logica": {
+    slug: "falacias-logica",
+    titulo: "Laboratorio Interactivo — Falacias y Lógica",
+    descripcion: "Clasifica argumentos por el tipo de falacia que cometen, distingue razonamientos válidos de falacias y domina el glosario lógico. Contenido verbatim de Pensamiento Filosófico y Humanidades III.",
+  },
+  "figuras-retoricas": {
+    slug: "figuras-retoricas",
+    titulo: "Laboratorio Interactivo — Figuras Retóricas",
+    descripcion: "Arrastra cada figura retórica a su definición y a un verso real, clasifícalas entre figura retórica y forma poética, y comprueba lo aprendido. Contenido verbatim de Lenguaje y Comunicación III.",
+  },
+  "fision-nuclear-etica-3d": {
+    slug: "fision-nuclear-etica-3d",
+    titulo: "Laboratorio 3D — Energía nuclear: fisión y ética",
+    descripcion: "Controla la reacción en cadena de un reactor como el de Laguna Verde, calcula con E = mc² por qué una pastilla de uranio rinde lo que más de una tonelada de carbón, sigue los residuos durante miles de años y descubre que las antenas que conectan a un pueblo también pueden ubicar tu celular.",
+  },
+  "fluidos": {
+    slug: "fluidos",
+    titulo: "Laboratorio 3D — Fluidos",
+    descripcion: "Explora la presión hidrostática, el principio de Arquímedes y el flujo de Bernoulli; mide la presión a distintas profundidades y simula tuberías.",
+  },
+  "formas-energia-transformacion": {
+    slug: "formas-energia-transformacion",
+    titulo: "Laboratorio 3D — Formas de Energía y Transformación",
+    descripcion: "Transforma energía química, eléctrica, mecánica, luminosa y térmica entre sí; cuantifica la eficiencia de cada conversión.",
+  },
+  "fotosintesis": {
+    slug: "fotosintesis",
+    titulo: "Laboratorio 3D — Fotosíntesis",
+    descripcion: "Regula la intensidad de luz y la concentración de CO₂ para maximizar la producción de glucosa; observa la reacción global 6CO₂+6H₂O→C₆H₁₂O₆+6O₂.",
+  },
+  "fracciones-porcentajes": {
+    slug: "fracciones-porcentajes",
+    titulo: "Laboratorio 3D — Fracciones y Porcentajes",
+    descripcion: "Parte pizzas, barras y figuras geométricas para visualizar fracciones equivalentes; convierte entre fracción, decimal y porcentaje.",
+  },
+  "fuentes-historicas": {
+    slug: "fuentes-historicas",
+    titulo: "Laboratorio Interactivo — Fuentes Históricas",
+    descripcion: "Clasifica fuentes primarias y secundarias, empareja cada tipo con sus ventajas y limitaciones, y domina el glosario de la heurística histórica. Contenido verbatim de Conciencia Histórica I.",
+  },
+  "funciones-concepto": {
+    slug: "funciones-concepto",
+    titulo: "Laboratorio 3D — Concepto de Función",
+    descripcion: "Construye relaciones entre conjuntos y determina cuáles son funciones; utiliza la prueba de la línea vertical y evalúa funciones en valores específicos.",
   },
   "funciones-variable-real": {
     slug: "funciones-variable-real",
-    titulo: "Laboratorio 3D — Funciones de variable real y su simetría",
-    descripcion: "Una función de variable real asigna a cada número x un único valor y = f(x); su gráfica es el conjunto de puntos (x, f(x)) en el plano cartesiano. Elige una función de un catálogo (cuadráticas, cúbicas, lineales, valor absoluto, seno y coseno) y léela de un vistazo: marca sus raíces (cruces con el eje X donde f(x) = 0), su intersección con Y (0, f(0)), y sus máximos y mínimos locales (las cumbres y valles donde deja de crecer y empieza a decrecer). Activa «Analizar simetría» para reflejar la curva y descubrir si es PAR —espejo respecto al eje Y, f(−x) = f(x)—, IMPAR —giro de 180° alrededor del origen, f(−x) = −f(x)— o NINGUNA: si hay simetría, el reflejo punteado se encima a la curva; si no, no coincide. Modela cómo distintas funciones describen el cambio en la vida real (la parábola de un clavado en Acapulco, la recta de la tarifa del taxi, la senoidal de la temperatura del día). Acompaña la actividad de PM-V «Cálculo diferencial» sobre funciones de variable real, su representación gráfica, continuidad, crecimiento, decrecimiento, máximos, mínimos y simetrías.",
+    titulo: "Laboratorio 3D — Funciones de Variable Real",
+    descripcion: "Explora funciones lineales, cuadráticas, exponenciales y logarítmicas; modifica parámetros y observa el cambio en la gráfica.",
+  },
+  "galton-probabilidad-frecuencia": {
+    slug: "galton-probabilidad-frecuencia",
+    titulo: "Laboratorio 3D — Azar, frecuencia y probabilidad: el tablero de Galton",
+    descripcion: "Cuenta el espacio muestral de un dado, dos monedas o una baraja para calcular P(A) y su complemento; suelta bolas en un tablero de Galton y compara la frecuencia observada con la curva binomial teórica; repite el experimento miles de veces y mira la ley de los grandes números en acción.",
+  },
+  "gas-ideal-piston": {
+    slug: "gas-ideal-piston",
+    titulo: "Laboratorio 3D — Gas Ideal y Pistón",
+    descripcion: "Comprime y expande un gas en un pistón virtual; verifica las leyes de Boyle, Charles y Gay-Lussac ajustando presión, volumen y temperatura.",
+  },
+  "generos-literarios": {
+    slug: "generos-literarios",
+    titulo: "Laboratorio Interactivo — Géneros Literarios",
+    descripcion: "Clasifica obras y características por género literario (narrativo, lírico, dramático, ensayístico), empareja cada género con su rasgo y domina el glosario. Contenido verbatim de Lengua y Comunicación III.",
+  },
+  "genetica-mendeliana-punnett": {
+    slug: "genetica-mendeliana-punnett",
+    titulo: "Laboratorio 3D — Genética Mendeliana y Cuadro de Punnett",
+    descripcion: "Cruza organismos con distintos genotipos usando el cuadro de Punnett; calcula proporciones fenotípicas para rasgos mono y dihíbridos.",
+  },
+  "geometria-analitica": {
+    slug: "geometria-analitica",
+    titulo: "Laboratorio 3D — Geometría Analítica",
+    descripcion: "Ubica puntos, rectas y circunferencias en el plano cartesiano; calcula distancias, pendientes y ecuaciones de figuras geométricas.",
+  },
+  "gravitacion-universal": {
+    slug: "gravitacion-universal",
+    titulo: "Laboratorio 3D — Gravitación Universal",
+    descripcion: "Calcula la fuerza gravitacional Tierra–Luna F=G·M·m/r², el peso W=m·g en cuatro cuerpos celestes y la órbita geoestacionaria Mexsat T=24h.",
+  },
+  "gustos-opiniones-ingles-3d": {
+    slug: "gustos-opiniones-ingles-3d",
+    titulo: "Laboratorio 3D — Likes and opinions: la feria de gustos",
+    descripcion: "En la feria de gustos de una prepa, entrevista a tus compañeros con Do you like…?, grafica sus respuestas, forma mesas donde todos estén contentos y responde a sus opiniones con tu gusto, una razón y empatía.",
+  },
+  "habilidades-permisos-ingles-3d": {
+    slug: "habilidades-permisos-ingles-3d",
+    titulo: "Laboratorio 3D — Can you…? May I…? El centro comunitario",
+    descripcion: "Entrevista con «Can you…?» a jóvenes que intentan nadar, cocinar o tocar la guitarra frente a ti para formar equipos, pide permiso con la cortesía adecuada a adultos y amigos, y lee los letreros del centro para escribir qué se puede y qué no.",
+  },
+  "habitos-comparaciones-ingles": {
+    slug: "habitos-comparaciones-ingles",
+    titulo: "Laboratorio Interactivo — Habits and comparisons: comparar lo que hacen, eligen o prefieren",
+    descripcion: "Nombra la regla que le toca a cada adjetivo y construye su comparativo y su superlativo esquivando «more easier» y «gooder», lee tablas de datos y elige la única comparación en inglés que esos datos sostienen, arma la igualdad «as … as» y su negación con el comparativo al que equivale, y completa prefer … to, would rather … than y like … better than con la forma de verbo que cada una exige. Contenido verbatim de Inglés III.",
+  },
+  "hardware-software": {
+    slug: "hardware-software",
+    titulo: "Laboratorio Interactivo — Hardware y Software",
+    descripcion: "Clasifica componentes físicos y programas de cómputo, empareja dispositivos con su función y domina el glosario de la arquitectura de computadoras. Contenido verbatim de Cultura Digital I.",
+  },
+  "hecho-opinion-texto": {
+    slug: "hecho-opinion-texto",
+    titulo: "Laboratorio Interactivo — Hecho, idea y opinión",
+    descripcion: "Marca dentro de tres textos reales qué es información verificable, qué es idea del autor y qué es opinión, caza la palabra que delata el juicio y decide si el texto quiere informarte o convencerte. Contenido verbatim de Lengua y Comunicación I.",
+  },
+  "herramientas-colaborativas": {
+    slug: "herramientas-colaborativas",
+    titulo: "Laboratorio Interactivo — Herramientas Colaborativas",
+    descripcion: "Elige la herramienta colaborativa según la tarea, empareja las funciones de la nube y distingue buenas prácticas de errores. Contenido verbatim de Ciudadanía Digital II.",
+  },
+  "hidrosfera-atmosfera-3d": {
+    slug: "hidrosfera-atmosfera-3d",
+    titulo: "Laboratorio 3D — Hidrósfera y atmósfera: capas, composición e intercambio",
+    descripcion: "Sube un globo sonda por las capas de la atmósfera, baja un sensor CTD por un océano estratificado por temperatura y salinidad, y sigue una parcela de aire del Golfo de México a Perote: evaporación, nube, lluvia y calor latente.",
+  },
+  "hipotesis-historicas": {
+    slug: "hipotesis-historicas",
+    titulo: "Laboratorio Interactivo — Hipótesis Históricas",
+    descripcion: "Clasifica fuentes primarias y secundarias, ordena los pasos para formular una hipótesis histórica y domina el glosario del análisis del pasado. Contenido verbatim de Conciencia Histórica II.",
+  },
+  "historia-de-vida-relato": {
+    slug: "historia-de-vida-relato",
+    titulo: "Laboratorio Interactivo — Tu historia de vida como relato",
+    descripcion: "Ordena los seis momentos de una anécdota, separa el suceso del detalle y de la huella, y elige narrador, tiempo verbal y distancia para reescribir la misma escena. Contenido verbatim de Lengua y Comunicación II; el laboratorio no pide ni califica experiencias personales.",
+  },
+  "ideas-clave-subrayado": {
+    slug: "ideas-clave-subrayado",
+    titulo: "Laboratorio Interactivo — Ideas clave: qué subrayar y por qué",
+    descripcion: "Subraya de verdad sobre tres textos con marcadores de idea principal, detalle de apoyo y relleno; arma con lo subrayado el esquema jerárquico de cada texto y diagnostica nueve resúmenes ajenos. Contenido verbatim de Lengua y Comunicación I.",
+  },
+  "inecuaciones-lineales": {
+    slug: "inecuaciones-lineales",
+    titulo: "Laboratorio 3D — Inecuaciones Lineales",
+    descripcion: "Representa inecuaciones en la recta numérica y en el plano; identifica la región solución y aplícalo a problemas de restricciones.",
+  },
+  "innovaciones-ambientales-3d": {
+    slug: "innovaciones-ambientales-3d",
+    titulo: "Laboratorio 3D — Innovaciones tecnológicas para el ambiente",
+    descripcion: "Instala una cosecha de lluvia, un humedal que depura aguas residuales y un manglar restaurado; mide con modelos reales cuánta agua guardas, qué tan limpia sale y cuánto frena la ola, y relaciona cada innovación con el subsistema terrestre que aprovecha.",
+  },
+  "instrucciones-ingles": {
+    slug: "instrucciones-ingles",
+    titulo: "Laboratorio Interactivo — Instructions that work",
+    descripcion: "Da instrucciones en inglés a una máquina que obedece al pie de la letra: si la frase admite otra lectura, hace otra cosa. Di qué dato le falta a la instrucción ambigua, repara una secuencia cuyos pasos están desordenados bajo conectores correctos, y arma preguntas indirectas para pedir que te orienten. Contenido verbatim de Inglés III.",
+  },
+  "jerarquia-operaciones-3d": {
+    slug: "jerarquia-operaciones-3d",
+    titulo: "Laboratorio 3D — Jerarquía de operaciones",
+    descripcion: "Resuelve expresiones en una torre 3D eligiendo qué operación va primero y ve el resultado equivocado de cada error, compara cómo leen distinto una calculadora, una hoja de cálculo y una persona, y usa paréntesis para llegar a una meta en la recta numérica.",
+  },
+  "juventudes-politicas": {
+    slug: "juventudes-politicas",
+    titulo: "Laboratorio Interactivo — Juventudes y Participación Política",
+    descripcion: "Clasifica ejemplos por forma de participación (electoral, comunitaria, cultural, digital), empareja los conceptos con su definición y domina el glosario. Contenido verbatim de Ciencias Sociales III.",
+  },
+  "kit-herramientas-digitales": {
+    slug: "kit-herramientas-digitales",
+    titulo: "Laboratorio Interactivo — Kit de herramientas digitales para estudiar",
+    descripcion: "Elige la categoría de herramienta que resuelve cada encargo escolar y descarta las que no sirven, desempata entre dos herramientas según la necesidad declarada, renombra y archiva un escritorio hecho un desastre y ordena los ocho pasos de un trabajo con la herramienta de cada paso. Contenido verbatim de Cultura Digital I.",
+  },
+  "lectura-critica-postura": {
+    slug: "lectura-critica-postura",
+    titulo: "Laboratorio Interactivo — Leer más allá de lo literal",
+    descripcion: "Trabaja los tres niveles de lectura sobre un mismo texto —literal, inferencial y crítico—, descubre el supuesto que el autor no argumenta pero necesita, distingue criticar el argumento de descalificar a quien lo dice, y toma postura sosteniéndola con dos líneas del texto. Contenido verbatim de Lengua y Comunicación III; los textos que se critican son ilustrativos.",
+  },
+  "lectura-en-voz-alta": {
+    slug: "lectura-en-voz-alta",
+    titulo: "Laboratorio Interactivo — Leer en voz alta",
+    descripcion: "Marca sobre tres textos dónde va la pausa, el énfasis y el cambio de entonación y descubre por qué la puntuación lo pide ahí, ajusta la velocidad y los silencios según a quién va dirigido, y juzga seis lecturas ajenas eligiendo la opinión fundamentada. Contenido verbatim de Lengua y Comunicación I.",
+  },
+  "lectura-escritura-dialogo": {
+    slug: "lectura-escritura-dialogo",
+    titulo: "Laboratorio Interactivo — Leer y escribir: un diálogo",
+    descripcion: "Reconstruye tres circuitos reales en los que leer alimenta lo que escribes y lo escrito cambia cómo vuelves a leer, clasifica doce textos por su función, escribe el glosario de memoria y redacta tu propia reflexión. Contenido verbatim de Lengua y Comunicación I.",
+  },
+  "lenguaje-algebraico-mosaicos": {
+    slug: "lenguaje-algebraico-mosaicos",
+    titulo: "Laboratorio 3D — Lenguaje Algebraico (Mosaicos)",
+    descripcion: "Traduce enunciados a expresiones algebraicas usando mosaicos de colores; identifica variables, coeficientes y términos independientes.",
+  },
+  "ley-senos-cosenos": {
+    slug: "ley-senos-cosenos",
+    titulo: "Laboratorio 3D — Ley de Senos y Cosenos",
+    descripcion: "Resuelve triángulos oblicuángulos usando la Ley de Senos y la Ley del Coseno; aplícalo a problemas de navegación y topografía.",
+  },
+  "licencias-software": {
+    slug: "licencias-software",
+    titulo: "Laboratorio Interactivo — Licencias de Software",
+    descripcion: "Clasifica tipos de licencias (propietaria, libre, Creative Commons), empareja cada licencia con su uso permitido y domina el glosario de derechos digitales. Contenido verbatim de Cultura Digital II.",
+  },
+  "limites-acercamiento": {
+    slug: "limites-acercamiento",
+    titulo: "Laboratorio 3D — Límites por Acercamiento",
+    descripcion: "Acerca el valor de x a un punto desde la izquierda y la derecha para encontrar el límite; identifica límites laterales y determina si el límite existe.",
+  },
+  "logica-compuertas-3d": {
+    slug: "logica-compuertas-3d",
+    titulo: "Laboratorio 3D — Lógica matemática y compuertas: conectivos, tablas de verdad y razonamientos",
+    descripcion: "Enciende un foco con interruptores y compuertas para descubrir cuándo son verdaderos los conectivos, construye tablas de verdad para clasificar tautologías y contingencias, y separa el modus ponens y el tollens de las falacias en cuatro mundos posibles.",
+  },
+  "lugares-recomendaciones-ingles-3d": {
+    slug: "lugares-recomendaciones-ingles-3d",
+    titulo: "Laboratorio 3D — Places to visit: Rincón del Colibrí",
+    descripcion: "Describe con there is, there are y you can las maquetas 3D de un pueblo costero, lee una guía turística en inglés para llevar a cada visitante a su lugar y escribe recomendaciones con su razón que los turistas siguen y califican.",
+  },
+  "maquina-termica-ciclos": {
+    slug: "maquina-termica-ciclos",
+    titulo: "Laboratorio 3D — Máquina Térmica y Ciclos",
+    descripcion: "Opera una máquina de Carnot ajustando las temperaturas del foco caliente y frío; calcula la eficiencia y el trabajo obtenido por ciclo.",
+  },
+  "medidas-dispersion": {
+    slug: "medidas-dispersion",
+    titulo: "Laboratorio 3D — Medidas de Dispersión",
+    descripcion: "Calcula rango, varianza y desviación estándar; compara la dispersión de dos conjuntos de datos con la misma media pero distinta variabilidad.",
+  },
+  "medidas-tendencia-central": {
+    slug: "medidas-tendencia-central",
+    titulo: "Laboratorio 3D — Medidas de Tendencia Central",
+    descripcion: "Calcula media, mediana y moda de conjuntos de datos; observa cómo los valores atípicos afectan cada medida en la gráfica de barras.",
+  },
+  "mercado-necesidades-ingles-3d": {
+    slug: "mercado-necesidades-ingles-3d",
+    titulo: "Laboratorio 3D — Needs and wishes: el tianguis y el centro de acopio",
+    descripcion: "Haz el mandado en un tianguis 3D pidiendo con I'd like y how much / how many sin pasarte del presupuesto, justifica decisiones vecinales con I'd rather… because…, y atiende con empatía a cinco vecinos en el centro de acopio.",
+  },
+  "metabolismo-celular-3d": {
+    slug: "metabolismo-celular-3d",
+    titulo: "Laboratorio 3D — Metabolismo Celular",
+    descripcion: "Sigue el flujo de energía en glucólisis, ciclo de Krebs y fosforilación oxidativa; compara la producción de ATP en cada etapa.",
+  },
+  "metodo-cientifico-medicion-3d": {
+    slug: "metodo-cientifico-medicion-3d",
+    titulo: "Laboratorio 3D — Método científico: el experimento controlado y la medición",
+    descripcion: "Un invernadero en 3D para recorrer el método científico con plantas bajo distintas horas de luz, réplicas que muestran la variación natural y la medición con cinta, regla y calibrador vernier.",
+  },
+  "mexico-en-el-mundo": {
+    slug: "mexico-en-el-mundo",
+    titulo: "Laboratorio Interactivo — México en el Mundo",
+    descripcion: "Ordena cronológicamente los procesos históricos, clasifícalos por siglo y domina el glosario de la historia interconectada. Contenido verbatim de Conciencia Histórica II.",
+  },
+  "modelado-conicas-estimacion": {
+    slug: "modelado-conicas-estimacion",
+    titulo: "Laboratorio 3D — Modelado de Cónicas y Estimación",
+    descripcion: "Ajusta los parámetros de cada cónica para modelar trayectorias de satélites, arcos de puentes y reflectores parabólicos; estima valores con la ecuación.",
+  },
+  "modelos-atomicos": {
+    slug: "modelos-atomicos",
+    titulo: "Laboratorio 3D — Modelos Atómicos",
+    descripcion: "Viaja en el tiempo a través de los modelos de Dalton, Thomson, Rutherford, Bohr y el modelo cuántico; compara sus aportaciones y limitaciones.",
+  },
+  "movimientos-literarios": {
+    slug: "movimientos-literarios",
+    titulo: "Laboratorio Interactivo — Movimientos Literarios",
+    descripcion: "Clasifica textos y características por movimiento literario (Romanticismo, Realismo, Modernismo, Vanguardia), empareja cada movimiento con su época y domina el glosario. Contenido verbatim de Lengua y Comunicación II.",
+  },
+  "mrua-acelerar-frenar": {
+    slug: "mrua-acelerar-frenar",
+    titulo: "Laboratorio 3D — MRUA: Acelerar y Frenar",
+    descripcion: "Simula el movimiento rectilíneo uniformemente acelerado de un automóvil en autopista; traza gráficas x-t, v-t y a-t para el problema Puebla–CDMX verbatim.",
+  },
+  "muestreo-estadistico-3d": {
+    slug: "muestreo-estadistico-3d",
+    titulo: "Laboratorio 3D — Muestreo: cómo elegir una muestra representativa",
+    descripcion: "Una escuela de 800 estudiantes en 3D: muestreo aleatorio simple, sistemático, estratificado y por conglomerados; el sesgo de las encuestas voluntarias y de conveniencia, y 300 muestras repetidas para ver cómo el tamaño angosta el error muestral.",
+  },
+  "mutaciones-3d": {
+    slug: "mutaciones-3d",
+    titulo: "Laboratorio 3D — Mutaciones",
+    descripcion: "Aplica mutaciones puntuales (sustitución/inserción/deleción) sobre β-globina real; explora cromosómicas y mutágenos (UV, ionizante, químico, biológico VPH).",
+  },
+  "narrativas-populares-lengua": {
+    slug: "narrativas-populares-lengua",
+    titulo: "Laboratorio Interactivo — La lengua de las narrativas populares",
+    descripcion: "Marca dentro de tres relatos los rasgos que delatan la tradición oral —fórmulas de apertura y cierre, repetición, diminutivo, voz regional, presente histórico, refrán, discurso directo, hipérbole—, traslada cinco frases del registro oral al escrito midiendo qué se pierde, y reconoce de qué lengua viene cada voz del relato. Contenido verbatim de Lengua y Comunicación II; las voces regionales y de lenguas originarias se tratan como variación legítima, nunca como error.",
+  },
+  "naturaleza-ciencia-3d": {
+    slug: "naturaleza-ciencia-3d",
+    titulo: "Laboratorio 3D — La ciencia como práctica humana: revisión, falsabilidad y autocorrección",
+    descripcion: "Revisa estudios como un par científico y mira si cinco laboratorios los replican, pon a prueba afirmaciones en un banco 3D y sigue cómo la evidencia cambió el consenso sobre las úlceras y la deriva continental.",
+  },
+  "navegacion-segura": {
+    slug: "navegacion-segura",
+    titulo: "Laboratorio Interactivo — Navegación Segura",
+    descripcion: "Clasifica prácticas seguras y riesgosas, empareja cada amenaza con su defensa y domina el glosario de seguridad digital. Contenido verbatim de Cultura Digital I.",
+  },
+  "necesidades-satisfactores": {
+    slug: "necesidades-satisfactores",
+    titulo: "Laboratorio Interactivo — Necesidades y Satisfactores",
+    descripcion: "Clasifica necesidades básicas y satisfactores según Max-Neef, empareja categorías con ejemplos y domina el glosario. Contenido verbatim de Ciencias Sociales I.",
+  },
+  "notacion-cientifica": {
+    slug: "notacion-cientifica",
+    titulo: "Laboratorio 3D — Notación Científica",
+    descripcion: "Convierte números muy grandes y muy pequeños a notación científica; opera con potencias de diez y aplícalo a magnitudes reales del universo.",
+  },
+  "ondas-amplitud-frecuencia": {
+    slug: "ondas-amplitud-frecuencia",
+    titulo: "Laboratorio 3D — Ondas: Amplitud y Frecuencia",
+    descripcion: "Genera ondas mecánicas en tres medios (aire, agua, acero); explora interferencia constructiva/destructiva, ondas estacionarias y efecto Doppler con sirena.",
+  },
+  "operaciones-binomios-mosaicos": {
+    slug: "operaciones-binomios-mosaicos",
+    titulo: "Laboratorio 3D — Operaciones con Monomios y Binomios",
+    descripcion: "Suma, resta y multiplica monomios y binomios con mosaicos de álgebra; visualiza la propiedad distributiva como el área de un rectángulo.",
+  },
+  "optica-lentes-espejos": {
+    slug: "optica-lentes-espejos",
+    titulo: "Laboratorio 3D — Óptica: Lentes y Espejos",
+    descripcion: "Aplica la ecuación de Gauss 1/f=1/dₒ+1/dᵢ en lentes convergentes/divergentes; explora espejos plano/cóncavo/convexo y la ley de Snell con reflexión total.",
+  },
+  "optimizacion-cilindro": {
+    slug: "optimizacion-cilindro",
+    titulo: "Laboratorio 3D — Optimización: Cilindro",
+    descripcion: "Minimiza el material necesario para fabricar una lata cilíndrica con volumen fijo; aplica las condiciones de primer y segundo orden para encontrar el óptimo.",
+  },
+  "organica-visor": {
+    slug: "organica-visor",
+    titulo: "Laboratorio 3D — Química Orgánica (Visor)",
+    descripcion: "Explora modelos 3D de moléculas orgánicas: alcanos, alquenos, alquinos, alcoholes y ácidos carboxílicos; identifica grupos funcionales y su reactividad.",
+  },
+  "origen-vida-3d": {
+    slug: "origen-vida-3d",
+    titulo: "Laboratorio 3D — Origen de la Vida",
+    descripcion: "Recrea el aparato de Miller-Urey 1953 con días 0–7; explora ambientes caldo primordial, hidrotermal y panspermia-Murchison; 5 hipótesis verbatim A1.",
+  },
+  "oxigenacion-atmosfera-3d": {
+    slug: "oxigenacion-atmosfera-3d",
+    titulo: "Laboratorio 3D — La oxigenación de la atmósfera",
+    descripcion: "Sigue el primer O₂ de las cianobacterias hasta el hierro bandeado y el aire, recorre 4,000 millones de años de atmósfera con su capa de ozono, y balancea, quema y clasifica óxidos básicos y ácidos.",
+  },
+  "parabola-trayectoria": {
+    slug: "parabola-trayectoria",
+    titulo: "Laboratorio 3D — Parábola y Trayectoria",
+    descripcion: "Lanza proyectiles y ajusta ángulo y velocidad inicial para trazar la parábola; conecta el movimiento con la ecuación cuadrática y=ax²+bx+c.",
+  },
+  "pasado-simple-ingles": {
+    slug: "pasado-simple-ingles",
+    titulo: "Laboratorio Interactivo — Pasado Simple en Inglés",
+    descripcion: "Clasifica verbos regulares e irregulares en pasado, completa oraciones afirmativas, negativas e interrogativas y domina la conjugación. Contenido verbatim de Inglés II.",
+  },
+  "pasado-viaje-ingles": {
+    slug: "pasado-viaje-ingles",
+    titulo: "Laboratorio Interactivo — A trip to remember: narrar en pasado con detalle",
+    descripcion: "Clasifica dieciséis verbos por la regla de escritura de su pasado (-ed, -d, -ied, consonante doble y la lista irregular), coloca sobre una línea del tiempo el fondo en past continuous y la interrupción en past simple en cinco escenas de lugares reales de México, ordena los seis momentos de una excursión con sus conectores y caza la oración que rompe el tiempo verbal. Contenido verbatim de Inglés IV; los personajes son ficticios.",
+  },
+  "perfil-personal-ingles": {
+    slug: "perfil-personal-ingles",
+    titulo: "Laboratorio Interactivo — About me: información personal en inglés",
+    descripcion: "Coloca cada dato en su campo de un formulario en inglés y descubre por qué el apellido no va en «First name» ni «Mexico» en «Nationality», elige la única respuesta que contesta la pregunta que te hicieron, transforma una misma frase con to be cambiando el sujeto, y pasa de «I am…» a «She is… / His name is…» al presentar a alguien más. Contenido verbatim de Inglés I; los personajes y sus datos son ficticios.",
+  },
+  "personajes-escenarios": {
+    slug: "personajes-escenarios",
+    titulo: "Laboratorio Interactivo — Personajes y Escenarios",
+    descripcion: "Clasifica los elementos de la narrativa (personajes, tiempo, espacio, narrador), empareja cada elemento con su ejemplo y domina el glosario. Contenido verbatim de Lengua y Comunicación II.",
+  },
+  "ph-escala": {
+    slug: "ph-escala",
+    titulo: "Laboratorio 3D — Escala de pH",
+    descripcion: "Mide el pH de distintas soluciones con indicadores y pH-metro virtual; clasifica ácidos y bases y comprende la escala logarítmica del pH.",
+  },
+  "piramide-energia": {
+    slug: "piramide-energia",
+    titulo: "Laboratorio 3D — Pirámide de Energía",
+    descripcion: "Construye pirámides tróficas y observa cómo solo el 10% de la energía pasa de un nivel al siguiente; analiza las consecuencias para las cadenas alimentarias.",
+  },
+  "planes-futuro-ingles-3d": {
+    slug: "planes-futuro-ingles-3d",
+    titulo: "Laboratorio 3D — Plans and purposes: la colonia que planeamos",
+    descripcion: "Decide si cada situación pide be going to, will o present continuous y mira la consecuencia en 3D, planea con fichas proyectos que transforman una colonia con to, so that y because, y escribe tus metas de next week a in five years.",
+  },
+  "politicas-publicas": {
+    slug: "politicas-publicas",
+    titulo: "Laboratorio Interactivo — Políticas Públicas",
+    descripcion: "Ordena las etapas del ciclo de la política pública, empareja los conceptos con su definición y domina el glosario. Contenido verbatim de Ciencias Sociales III.",
+  },
+  "posesivos-ingles": {
+    slug: "posesivos-ingles",
+    titulo: "Laboratorio Interactivo — Posesivos en Inglés",
+    descripcion: "Clasifica los pronombres y adjetivos posesivos, completa oraciones con la forma correcta y domina las estructuras de posesión. Contenido verbatim de Inglés I.",
+  },
+  "potencias-raices": {
+    slug: "potencias-raices",
+    titulo: "Laboratorio 3D — Potencias y Raíces",
+    descripcion: "Construye cubos y cuadrados para relacionar área y volumen con potencias; usa la raíz cuadrada y cúbica para encontrar la longitud del lado.",
+  },
+  "preguntas-pasado-discursos-3d": {
+    slug: "preguntas-pasado-discursos-3d",
+    titulo: "Laboratorio 3D — Preguntas al pasado",
+    descripcion: "Excava capas de tiempo bajo problemáticas actuales de México para formular preguntas históricas, ubica evidencias en una espiral del tiempo nombrando sus relaciones y teje una explicación con muchas voces.",
+  },
+  "present-perfect-ingles": {
+    slug: "present-perfect-ingles",
+    titulo: "Laboratorio Interactivo — Present Perfect en Inglés",
+    descripcion: "Construye el present perfect (have/has + past participle), completa oraciones con ever/never/already/yet/just y domina las estructuras clave. Contenido verbatim de Inglés V.",
+  },
+  "presentaciones-ingles": {
+    slug: "presentaciones-ingles",
+    titulo: "Laboratorio Interactivo — Presentaciones en Inglés",
+    descripcion: "Ordena las partes de una presentación oral en inglés, clasifica frases de apertura y cierre, y domina el vocabulario de presentaciones. Contenido verbatim de Inglés I.",
+  },
+  "procedimientos-narrativos": {
+    slug: "procedimientos-narrativos",
+    titulo: "Laboratorio Interactivo — Procedimientos narrativos",
+    descripcion: "Reconstruye el orden de los hechos de dos relatos y nombra sus analepsis y prolepsis, lee la misma escena en tres voces y reparte qué puede contar cada una, mide resumen, escena, elipsis y pausa contra el reloj de la historia, y convierte el estilo directo en indirecto e indirecto libre pieza por pieza. Contenido verbatim de Lengua y Comunicación II.",
+  },
+  "procesos-ingles": {
+    slug: "procesos-ingles",
+    titulo: "Laboratorio Interactivo — Procesos en Inglés",
+    descripcion: "Order the steps of a process with sequencers, classify question and passive-voice structures, and master the key structures. Contenido verbatim de Inglés V.",
+  },
+  "productos-notables-3d": {
+    slug: "productos-notables-3d",
+    titulo: "Laboratorio 3D — Productos Notables",
+    descripcion: "Expande y factoriza binomios con bloques de álgebra en 3D; visualiza (a+b)², (a-b)² y (a+b)(a-b) como áreas y volúmenes.",
+  },
+  "propagacion-calor": {
+    slug: "propagacion-calor",
+    titulo: "Laboratorio 3D — Propagación del Calor",
+    descripcion: "Compara la conducción de calor en materiales con distinta conductividad térmica; mide la temperatura en función de la distancia y el tiempo.",
+  },
+  "propiedades-materia": {
+    slug: "propiedades-materia",
+    titulo: "Laboratorio 3D — Propiedades de la Materia",
+    descripcion: "Compara propiedades físicas (masa, volumen, densidad, punto de fusión) y propiedades químicas (reactividad, combustibilidad) de distintas sustancias.",
+  },
+  "quimica-organica-industria-3d": {
+    slug: "quimica-organica-industria-3d",
+    titulo: "Laboratorio 3D — Química orgánica en la industria",
+    descripcion: "Sintetiza aspirina, paracetamol, aroma de plátano y bioetanol con moléculas 3D reales, alarga cadenas de PE, PET y nylon y relaciona cada grupo funcional con su producto e industria.",
+  },
+  "razon-proporcion": {
+    slug: "razon-proporcion",
+    titulo: "Laboratorio 3D — Razón y Proporción",
+    descripcion: "Usa recetas, mapas y escalas para explorar la proporcionalidad directa e inversa; ajusta cantidades y observa el cambio en la relación.",
+  },
+  "reaccion-co2": {
+    slug: "reaccion-co2",
+    titulo: "Laboratorio 3D — Reacción CO₂",
+    descripcion: "Mezcla ácido y carbonato para producir CO₂; mide el volumen de gas generado y relaciona la cantidad de reactivo con el rendimiento de la reacción.",
+  },
+  "recta-numerica": {
+    slug: "recta-numerica",
+    titulo: "Laboratorio 3D — Recta Numérica",
+    descripcion: "Ubica enteros, fracciones e irracionales en la recta numérica; compara y ordena números de distintos conjuntos numéricos.",
+  },
+  "redes-troficas": {
+    slug: "redes-troficas",
+    titulo: "Laboratorio 3D — Redes Tróficas",
+    descripcion: "Construye redes alimentarias conectando productores, consumidores y descomponedores; elimina una especie y observa el efecto cascada en la red.",
+  },
+  "redox-combustion": {
+    slug: "redox-combustion",
+    titulo: "Laboratorio 3D — Redox y Combustión",
+    descripcion: "Identifica agente oxidante y reductor en reacciones de óxido-reducción; simula la combustión del metano y analiza los cambios en el número de oxidación.",
+  },
+  "reescritura-taller": {
+    slug: "reescritura-taller",
+    titulo: "Laboratorio Interactivo — Taller de reescritura",
+    descripcion: "Opera tres borradores tachando muletillas, repeticiones y relleno mientras el contador de palabras baja; decide qué operación repara cada defecto (suprimir, sustituir, reordenar, ampliar), aplica marcas de corrector tal cual y descubre que la mejor versión depende del propósito declarado, no de cuál suena mejor. Contenido verbatim de Lengua y Comunicación II.",
+  },
+  "reglas-derivacion": {
+    slug: "reglas-derivacion",
+    titulo: "Laboratorio 3D — Reglas de Derivación",
+    descripcion: "Aplica la regla de la potencia, del producto, del cociente y de la cadena paso a paso; verifica el resultado comparando con la pendiente de la tangente.",
+  },
+  "reglas-ingles": {
+    slug: "reglas-ingles",
+    titulo: "Laboratorio Interactivo — Reglas y Obligaciones en Inglés",
+    descripcion: "Clasifica reglas por su modal (must / mustn't / have to / don't have to), completa enunciados y domina el glosario. Contenido verbatim de Inglés III.",
+  },
+  "relaciones-poder": {
+    slug: "relaciones-poder",
+    titulo: "Laboratorio Interactivo — Relaciones de Poder",
+    descripcion: "Clasifica ejemplos por categoría de análisis (clase, género, etnia, edad), empareja los conceptos de poder e interseccionalidad con su definición y domina el glosario. Contenido verbatim de Ciencias Sociales II.",
+  },
+  "relato-secuencia-ingles-3d": {
+    slug: "relato-secuencia-ingles-3d",
+    titulo: "Laboratorio 3D — Telling a story: secuencia, conectores y coherencia",
+    descripcion: "Ordena, conecta y escribe anécdotas en inglés en un teatrino de viñetas 3D: pasado simple, conectores como first, then, suddenly, while, because y so, y coherencia temporal.",
+  },
+  "resena-critica": {
+    slug: "resena-critica",
+    titulo: "Laboratorio Interactivo — Reseña Crítica",
+    descripcion: "Ordena las partes de una reseña crítica, distingue el resumen del juicio crítico y domina el glosario. Contenido verbatim de Lengua y Comunicación III.",
+  },
+  "respiracion-celular": {
+    slug: "respiracion-celular",
+    titulo: "Laboratorio 3D — Respiración Celular",
+    descripcion: "Sigue la glucosa desde la glucólisis hasta el ciclo de Krebs y la cadena transportadora de electrones; cuantifica el ATP producido en cada etapa.",
+  },
+  "restauracion-ecosistemas-mexico-3d": {
+    slug: "restauracion-ecosistemas-mexico-3d",
+    titulo: "Laboratorio 3D — Conservación y restauración de ecosistemas en México",
+    descripcion: "Diseña con presupuesto limitado un plan para una cuenca con ANP, pago por servicios ambientales, corredores y vedas; restaura un potrero año por año hasta volverlo selva, y diagnostica con datos reales qué funcionó con la vaquita marina, Cabo Pulmo y la mariposa monarca.",
+  },
+  "rutina-diaria-ingles-3d": {
+    slug: "rutina-diaria-ingles-3d",
+    titulo: "Laboratorio 3D — Daily routines: el día de Ana",
+    descripcion: "Ordena y narra en inglés el día de Ana en una maqueta 3D con un sol que recorre el cielo, pon y di la hora en un reloj de manecillas, y cuenta en su calendario semanal para elegir el adverbio de frecuencia.",
+  },
+  "seleccion-natural-evolucion-3d": {
+    slug: "seleccion-natural-evolucion-3d",
+    titulo: "Laboratorio 3D — Selección Natural y Evolución",
+    descripcion: "Simula presiones selectivas sobre poblaciones de distintos fenotipos; observa cómo cambia la frecuencia génica a lo largo de generaciones.",
+  },
+  "semejanza-triangulos": {
+    slug: "semejanza-triangulos",
+    titulo: "Laboratorio 3D — Semejanza de Triángulos",
+    descripcion: "Escala triángulos y verifica los criterios AA, LAL y LLL; calcula lados desconocidos usando proporciones de triángulos semejantes.",
+  },
+  "sentido-historico": {
+    slug: "sentido-historico",
+    titulo: "Laboratorio Interactivo — Sentido Histórico",
+    descripcion: "Clasifica actitudes frente al pasado, empareja fenómenos del presente con su raíz histórica y domina el glosario de la memoria colectiva. Contenido verbatim de Conciencia Histórica II.",
+  },
+  "separacion-mezclas": {
+    slug: "separacion-mezclas",
+    titulo: "Laboratorio 3D — Separación de Mezclas",
+    descripcion: "Aplica destilación, filtración, cristalización y cromatografía para separar componentes de mezclas homogéneas y heterogéneas.",
+  },
+  "sistemas-ecuaciones-2x2": {
+    slug: "sistemas-ecuaciones-2x2",
+    titulo: "Laboratorio 3D — Sistemas de Ecuaciones 2×2",
+    descripcion: "Resuelve sistemas de dos ecuaciones con dos incógnitas por los métodos gráfico, sustitución y eliminación; interpreta la solución como punto de intersección.",
+  },
+  "software-libre-3d": {
+    slug: "software-libre-3d",
+    titulo: "Laboratorio 3D — Software libre y alternativas",
+    descripcion: "Abre la caja de las cuatro libertades con seis licencias reales, rescata archivos de 2007 guardados en formatos abiertos y cerrados, y calcula cuánto cuesta equipar una sala de cómputo con licencias, suscripciones o software libre.",
+  },
+  "subgeneros-narrativos": {
+    slug: "subgeneros-narrativos",
+    titulo: "Laboratorio Interactivo — Subgéneros Narrativos",
+    descripcion: "Clasifica obras y rasgos por subgénero narrativo (suspenso, terror, ciencia ficción, autoficción, neorrealismo urbano, literaturas del Antropoceno), empareja cada subgénero con su rasgo y domina el glosario. Contenido verbatim de Lengua y Comunicación III.",
+  },
+  "subsistemas-terrestres": {
+    slug: "subsistemas-terrestres",
+    titulo: "Laboratorio 3D — Subsistemas Terrestres",
+    descripcion: "Explora la interacción entre geosfera, hidrosfera, atmósfera y biosfera; modifica variables y observa el efecto en cadena sobre los demás subsistemas.",
+  },
+  "taller-descripcion-narracion": {
+    slug: "taller-descripcion-narracion",
+    titulo: "Laboratorio Interactivo — Taller de descripción y narración",
+    descripcion: "Cambia adjetivos genéricos por detalles concretos y mira cómo cambia la imagen, elige la ruta con que se revela una escena, convierte descripciones quietas en sucesos con su conector temporal y rescata frases hundidas por un verbo comodín. Contenido verbatim de Lengua y Comunicación II.",
+  },
+  "taller-parrafos": {
+    slug: "taller-parrafos",
+    titulo: "Laboratorio Interactivo — Taller de Párrafos",
+    descripcion: "Ordena oraciones para construir párrafos coherentes, clasifica los tipos de párrafo (introductorio, de desarrollo, conclusivo) y domina el glosario. Contenido verbatim de Lengua y Comunicación I.",
+  },
+  "tecnicas-conteo-3d": {
+    slug: "tecnicas-conteo-3d",
+    titulo: "Laboratorio 3D — Técnicas de conteo: contar para decidir",
+    descripcion: "Ramifica un árbol del principio multiplicativo, sube a Ana, Beto, Carla, Diego y Eva a un podio o siéntalos en un comité para ver por qué P(n,r) = C(n,r)·r!, y extrae de una urna con y sin reemplazo para distinguir eventos independientes de dependientes.",
+  },
+  "temas-ideas-narrativa": {
+    slug: "temas-ideas-narrativa",
+    titulo: "Laboratorio Interactivo — Tema, idea central y sus hilos",
+    descripcion: "Separa en tres narrativas populares lo que pasa de aquello sobre lo que hacen pensar, elige entre tres temas candidatos el único que el texto sostiene y señala los hilos que lo sostienen, mide el tema demasiado ancho y el demasiado angosto, y empareja seis relatos distintos por el tema que comparten. Contenido verbatim de Lengua y Comunicación II; los relatos son textos ilustrativos escritos para la práctica.",
   },
   "teorema-fundamental-calculo": {
     slug: "teorema-fundamental-calculo",
     titulo: "Laboratorio 3D — Teorema Fundamental del Cálculo",
-    descripcion: "Integrar una función es medir el área bajo su curva, y el Teorema Fundamental del Cálculo conecta esa área con la operación inversa de derivar. Elige una función de un catálogo (velocidad constante, recta v = 2t, parábola, raíz cuadrada, onda senoidal) y explórala en tres modos. En «Área bajo la curva» aproximas ∫₀ᵇ f con rectángulos de Riemann y comparas la suma con la integral exacta F(b) − F(a): sube el número de rectángulos y observa cómo el error baja hacia cero. En «Función de acumulación» ves cómo F(x) = ∫₀ˣ f va acumulando el área a medida que avanza el límite, y compruebas que su altura en b es justo el área sombreada bajo f. En «Conexión derivada↔integral» verificas el corazón del teorema: la pendiente de la función de acumulación F en x = b es exactamente la altura f(b), es decir F′(x) = f(x); derivar la acumulación devuelve la función original. Reproduce el caso de la actividad —la velocidad v(t) = 2t, cuya área bajo la gráfica velocidad–tiempo entre 0 y 4 s es la distancia recorrida ∫₀⁴ 2t dt = [t²]₀⁴ = 16 m— y conecta el área (un triángulo de base 4 y altura 8), la integral y la antiderivada d(t) = t². Modela cómo el área bajo una curva es un total acumulado en la vida real (la distancia bajo una gráfica velocidad–tiempo, el volumen de agua bajo el caudal del Cutzamala, la energía en kWh bajo la potencia que cobra la CFE). Acompaña la actividad de PM-V «Cálculo diferencial» sobre la integral como función inversa de la derivada, el área bajo la curva de una función dentro de un intervalo y su representación gráfica.",
+    descripcion: "Visualiza cómo la integral acumula área bajo la curva y cómo la derivada la deshace; conecta ambas operaciones con el teorema fundamental.",
   },
-  "distribucion-normal": {
-    slug: "distribucion-normal",
-    titulo: "Laboratorio 3D — Distribución normal (campana de Gauss)",
-    descripcion: "La distribución normal es un modelo de probabilidad en forma de campana simétrica que aparece una y otra vez en datos reales, y queda totalmente definida por dos números: la media μ (dónde está el centro) y la desviación estándar σ (qué tan ancha es la campana). Elige un fenómeno real de México —la estatura de adultos (ENSANUT/INEGI, μ = 170 cm y σ = 7 cm), un puntaje tipo PLANEA/PISA (μ = 500, σ = 100) o el coeficiente intelectual (μ = 100, σ = 15)— y explóralo en tres modos. En «Campana» mueves μ y σ y observas cómo la curva se desplaza (μ) y se ensancha o se estrecha (σ), manteniendo siempre área total 1. En «Regla 68-95-99.7» ves las bandas sombreadas que contienen el 68 % de los datos dentro de μ ± 1σ, el 95 % en μ ± 2σ y el 99.7 % en μ ± 3σ. En «Probabilidad / z» eliges un rango [a, b] cuyo área bajo la curva es la probabilidad P(a ≤ X ≤ b), y cada extremo se estandariza con la puntuación z = (x − μ)/σ, que traduce cualquier normal a la normal estándar (μ = 0, σ = 1) para comparar y calcular probabilidades con Φ(z). Reproduce el caso de la actividad —estaturas con μ = 170 cm y σ = 7 cm— y comprueba que entre 163 y 177 cm (μ ± 1σ) cae el 68 % de la población, que P(X < 184) corresponde a z = 2 ⇒ Φ(2) = 97.72 %, y que el 95 % central está en μ ± 2σ = [156, 184] cm. Conecta así las medidas de tendencia central (en una normal perfecta media = mediana = moda = μ) y las medidas de dispersión (varianza σ² y desviación σ). Acompaña la actividad de Pensamiento Matemático VI «Pensamiento estadístico y probabilístico» sobre la distribución normal, las medidas de tendencia central y las medidas de dispersión.",
+  "teorema-pitagoras": {
+    slug: "teorema-pitagoras",
+    titulo: "Laboratorio 3D — Teorema de Pitágoras",
+    descripcion: "Construye cuadrados sobre los lados de triángulos rectángulos para verificar a²+b²=c²; aplícalo para calcular distancias reales.",
   },
-  "medidas-tendencia-central": {
-    slug: "medidas-tendencia-central",
-    titulo: "Laboratorio 3D — Medidas de tendencia central: media, mediana y moda",
-    descripcion: "Las medidas de tendencia central resumen todo un conjunto de datos en un solo número que captura su «centro», y la elección correcta entre media, mediana y moda depende del tipo de variable y de la forma de la distribución. Este laboratorio dibuja cada dato como una esfera apilada sobre la recta numérica (un «dot plot» 3D) y, sobre esa nube, marca tres cosas que puedes orbitar: la MEDIA como el fulcro de una balanza (x̄ = Σx/n, el punto de equilibrio de la distribución), la MEDIANA como un corte que deja la mitad de los datos a cada lado, y la(s) MODA(s) como la(s) columna(s) más alta(s). Carga distintos conjuntos reales de México y observa cómo se mueve cada medida: en «Salarios de 9 empleados» —6 500, 7 200, 7 800, 8 000, 8 500, 9 000, 10 000, 12 000 y 45 000— el sueldo atípico del director (45 000) jala la media hasta 12 666.67, de modo que 8 de 9 personas ganan menos que el promedio, mientras la mediana se queda en 8 500 junto al grueso de los sueldos. Así se hace visible la regla de oro: con valores atípicos o distribuciones sesgadas la MEDIANA representa mejor; en distribuciones simétricas la media es adecuada; y la MODA es la única medida aplicable a variables cualitativas. Reproduce el reto verbatim de la actividad A2 (media = 12 666.67 y mediana = 8 500, ¿cuál representa mejor el salario típico?) y conéctalo con casos reales —el salario mediano de la ENOE frente al promedio, el promedio escolar ponderado por créditos y el INPC del INEGI como media ponderada—. Acompaña la actividad de Pensamiento Matemático VI «Pensamiento estadístico y probabilístico» sobre las medidas de tendencia central.",
+  "terminal-horarios-ingles-3d": {
+    slug: "terminal-horarios-ingles-3d",
+    titulo: "Laboratorio 3D — Where and when? La terminal de autobuses",
+    descripcion: "Pide información en una terminal de autobuses 3D con la palabra interrogativa correcta, responde a viajeros leyendo un tablero de salidas que cambia en vivo y atiende el módulo de información con respuestas cortas y completas.",
   },
-  "medidas-dispersion": {
-    slug: "medidas-dispersion",
-    titulo: "Laboratorio 3D — Medidas de dispersión: rango, varianza y desviación estándar",
-    descripcion: "Dos conjuntos pueden tener exactamente la misma media y aun así repartirse de manera muy distinta: las medidas de dispersión cuantifican qué tan esparcidos están los datos alrededor del centro. Este laboratorio dibuja los datos como un «dot plot» 3D sobre la recta numérica y muestra la dispersión de tres formas que puedes orbitar: el RANGO como el tramo entre el dato mínimo y el máximo (máx − mín), la VARIANZA σ² = Σ(x − x̄)²/n como el promedio de los cuadrados de las distancias a la media, y la DESVIACIÓN ESTÁNDAR σ = √σ² —en las mismas unidades que los datos— dibujada como una banda x̄ ± σ alrededor del centro que se ensancha o se estrecha según los datos. Carga el caso verbatim de la actividad A2: el Grupo A (60, 70, 75, 80, 90) y el Grupo B (73, 74, 75, 76, 77) tienen la MISMA media (x̄ = 75), pero el Grupo A está mucho más disperso; calcula sus desviaciones (−15, −5, 0, 5, 15), elévalas al cuadrado (225, 25, 0, 25, 225), suma 500, divide entre n = 5 para la varianza σ² = 100 y obtén σ = √100 = 10 puntos, frente a una σ ≈ 1.41 del Grupo B. El coeficiente de variación CV = σ/x̄ permite comparar dispersiones de conjuntos con medias distintas. Acompaña la actividad de Pensamiento Matemático VI «Pensamiento estadístico y probabilístico» sobre las medidas de dispersión.",
+  "tiempo-historico": {
+    slug: "tiempo-historico",
+    titulo: "Laboratorio Interactivo — Tiempo Histórico",
+    descripcion: "Clasifica hechos por su duración (Braudel: corta, mediana, larga), ordena la línea del tiempo y domina el glosario. Contenido verbatim de Conciencia Histórica I.",
   },
-  "datos-graficas-estadisticas": {
-    slug: "datos-graficas-estadisticas",
-    titulo: "Laboratorio 3D — Tablas de frecuencia e histogramas",
-    descripcion: "Una lista larga de datos en bruto dice poco; al agruparlos en intervalos de clase y contarlos nace la tabla de frecuencias, y al dibujar esas frecuencias como barras contiguas nace el histograma, que revela de un vistazo la forma de la distribución. Este laboratorio toma un conjunto de datos, lo agrupa en clases y construye el histograma en 3D que puedes orbitar: cada barra cuenta cuántos datos caen en su intervalo y la más alta marca dónde se concentran. Carga el caso verbatim de la actividad A2 —las calificaciones de 20 alumnos: 55, 60, 65, 65, 70, 70, 70, 75, 75, 75, 75, 80, 80, 80, 85, 85, 90, 90, 95, 100— y agrúpalas en 5 intervalos de amplitud 10 (50–59, 60–69, 70–79, 80–89, 90–100) con frecuencias 1, 2, 6, 5, 6 (Σ = 20): el intervalo 70–79 es el más alto y la frecuencia relativa acumulada (la ojiva) avanza 5 % → 15 % → 45 % → 70 % → 100 %, terminando siempre en 100 % porque el último intervalo acumula la totalidad de los datos. Verás también las medidas de tendencia central y de dispersión del mismo conjunto, para leer juntas la forma (histograma), el centro (media, mediana, moda) y la dispersión (rango, σ). Acompaña la actividad de Pensamiento Matemático VI «Pensamiento estadístico y probabilístico» sobre las representaciones gráficas de datos: tablas de frecuencia e histogramas.",
+  "tiempo-libre-ingles": {
+    slug: "tiempo-libre-ingles",
+    titulo: "Laboratorio Interactivo — Tiempo libre y presente simple en inglés",
+    descripcion: "Gira el sujeto para ver aparecer y desaparecer la -s de la tercera persona, clasifica verbos por las tres reglas (-s, -es, y→ies), arma negativas y preguntas con do/does —con el error típico tachado al lado— y coloca los adverbios de frecuencia en su posición. Contenido verbatim de Inglés II.",
   },
-  "piramide-energia": {
-    slug: "piramide-energia",
-    titulo: "Laboratorio 3D — Pirámide de energía y flujo trófico",
-    descripcion: "La energía entra a un ecosistema por los productores (fotosíntesis) y sube por la cadena trófica, pero en cada salto solo se transfiere alrededor del 10% al siguiente nivel; el otro 90% se pierde como calor. Este laboratorio lo hace visible como una pirámide de cuatro niveles —productores (pastos), consumidores primarios (ratones y conejos), secundarios (zorros) y terciarios (águilas)— donde cada piso es más angosto porque dispone de menos energía. Hilos delgados de energía suben de un nivel al siguiente mientras enormes penachos de calor escapan en cada salto, gigantescos en la base. Reproduce el caso de la actividad —10,000 kcal en los productores y eficiencia del 10%— y comprueba el cálculo: 1,000 → 100 → 10 kcal, es decir solo 0.1% de la energía original llega al nivel tope. Mueve la energía inicial y la eficiencia (la 'regla del 10%' es una simplificación didáctica; en ecosistemas reales va del 5% al 20%) y descubre por qué siempre hay muchísimo más pasto que águilas y por qué comer del primer nivel (plantas) es energéticamente más eficiente para el planeta. Acompaña la actividad de CNEYT-III sobre el flujo de energía y el ciclo de materia en los ecosistemas.",
+  "tipos-de-preguntas": {
+    slug: "tipos-de-preguntas",
+    titulo: "Laboratorio Interactivo — Tipos de Preguntas",
+    descripcion: "Clasifica preguntas en cotidianas, científicas y filosóficas, ordénalas en las cinco ramas de la filosofía y profundiza de lo cotidiano a lo filosófico. Contenido verbatim de Pensamiento Filosófico y Humanidades I.",
   },
-  "fotosintesis": {
-    slug: "fotosintesis",
-    titulo: "Laboratorio 3D — Fotosíntesis: la fábrica de vida del planeta",
-    descripcion: "La fotosíntesis convierte energía luminosa en energía química (glucosa), y este laboratorio lo hace visible dentro de un cloroplasto 3D: los reactivos entran —fotones del Sol, CO₂ del aire y H₂O— y de la planta salen los productos, glucosa (C₆H₁₂O₆) y el O₂ que respiramos, según la ecuación verbatim 6 CO₂ + 6 H₂O + luz → C₆H₁₂O₆ + 6 O₂. El proceso ocurre en dos fases: las reacciones de luz en los tilacoides (capturan la luz, producen ATP y NADPH y liberan O₂ al romper el agua por fotólisis) y el ciclo de Calvin en el estroma (usa ese ATP/NADPH para fijar el CO₂ y formar glucosa). Mueve tres factores —intensidad luminosa, concentración de CO₂ y temperatura— y observa en vivo cómo cambia la TASA fotosintética: cada factor satura (pasado cierto punto, más ya casi no ayuda) y la temperatura tiene un óptimo enzimático, de modo que siempre hay un FACTOR LIMITANTE que frena a los demás —por eso en un invernadero con mucha luz pero poco CO₂ lo que acelera el crecimiento es agregar CO₂, no más luz—. El caudal de partículas de cada chorro es proporcional a su factor, así la idea se ve, no solo se calcula. El panel lateral explica por qué las plantas se ven verdes (la clorofila absorbe el rojo y el azul-violeta y refleja el verde), que el O₂ sale del agua y no del CO₂, las tres estrategias de planta (C3, C4 y CAM) y la milpa mexicana (maíz, frijol y calabaza) como sistema que aprovecha al máximo la luz por niveles. NOTA: el modelo de tasa es cualitativo (relativo, en %), pensado para mostrar saturación y factor limitante, no mediciones de una especie concreta. Acompaña la actividad de CNEYT-III sobre la fotosíntesis como proceso fundamental de transformación de energía en los ecosistemas.",
+  "tipos-energia-aplicaciones-3d": {
+    slug: "tipos-energia-aplicaciones-3d",
+    titulo: "Laboratorio 3D — Tipos de energía: de los fenómenos naturales a la tecnología",
+    descripcion: "Arma la cadena de energía de un rayo, la brisa marina, un volcán y la fotosíntesis, pon a trabajar un aerogenerador, una planta geotérmica y un panel frente a una hoja con un diagrama de flujo 3D de pérdidas, y diseña tu propia investigación con datos.",
   },
-  "semejanza-triangulos": {
-    slug: "semejanza-triangulos",
-    titulo: "Laboratorio 3D — Semejanza de triángulos: mido una altura inalcanzable",
-    descripcion: "¿Cómo se mide la altura de una torre sin treparse a ella? Este laboratorio lo resuelve con semejanza de triángulos y medición indirecta: el Sol proyecta rayos PARALELOS sobre una persona (de estatura conocida) y sobre una torre, y cada objeto con su sombra forma un triángulo rectángulo. Como los rayos son paralelos, ambos triángulos comparten el mismo ángulo en la punta de la sombra, así que por el criterio AA son SEMEJANTES y sus lados son proporcionales: altura_objeto / sombra_objeto = altura_referencia / sombra_referencia. De esa proporción se despeja la altura inalcanzable midiendo únicamente sombras y una estatura. La escena dibuja las dos hipotenusas (los rayos del Sol, con fotones viajando), marca el ángulo igual en cada sombra y muestra en vivo las dos sombras, la razón de semejanza k y la altura calculada. Mueve la elevación del Sol y verás algo clave: al bajar el Sol las dos sombras se alargan a la par, pero la proporción —y por tanto k y la altura calculada— NO cambian. Incluye el caso verbatim de la actividad (Sofía mide 1.60 m y proyecta 0.80 m de sombra; la torre del reloj proyecta 12.40 m → la torre mide 24.8 m y k = 15.5; un monumento con sombra de 3.2 m mide 6.4 m) reproducible con un botón. El panel lateral repasa los criterios de semejanza (AA, LLL y LAL proporcionales) y de congruencia (LLL, LAL, ALA), la diferencia entre figuras semejantes (≈) y congruentes (≅), que las áreas crecen con k² y los volúmenes con k³, y la historia de esta técnica milenaria (egipcios y griegos, hoy topografía, arquitectura, mapas a escala y fotografía). NOTA: aquí la matemática es exacta —la altura calculada coincide con la altura real introducida—, lo que demuestra que el método funciona. Acompaña la actividad de PM-III sobre semejanza y congruencia de triángulos aplicadas a la resolución de problemas geométricos.",
-  },
-  "ciclo-carbono": {
-    slug: "ciclo-carbono",
-    titulo: "Laboratorio 3D — El ciclo del carbono: equilibrio y desequilibrio",
-    descripcion: "El carbono no se crea ni se destruye: circula. Este laboratorio coloca a la Tierra en el centro y, a su alrededor, los grandes reservorios de carbono —océano, combustibles fósiles, suelo y litosfera, atmósfera, vegetación y animales—, cada uno dimensionado por cuánto carbono almacena (en gigatoneladas). Entre ellos viajan átomos de carbono por los procesos del ciclo: la fotosíntesis lo saca del aire hacia las plantas, la respiración y la descomposición lo devuelven, los animales lo toman al comer, el océano lo disuelve como sumidero y, lentísimamente (300–1 000 años), queda atrapado como roca y fósiles. En equilibrio, lo que entra a la atmósfera iguala a lo que sale, así que el carbono solo cambia de lugar. Mueve el control de EMISIONES humanas —quema de fósiles y cambio de uso de suelo, ~37 Gt de CO₂ al año hoy (INECC 2022)— y observa en vivo el desequilibrio: el flujo rojo de combustión se dispara, océano y bosques alcanzan a reabsorber un poco más de la mitad (~55 %) y el resto (~45 %, fracción aérea) se ACUMULA en la atmósfera, que se tiñe de azul a naranja-rojo mientras el CO₂ sube unas ~2 ppm al año. Llévalo a 0 y verás el ciclo natural en equilibrio: los átomos siguen circulando, pero la atmósfera se mantiene estable. El panel lateral incluye los tamaños de cada reservorio, los procesos del ciclo, el caso de México verbatim (~750 Mt CO₂eq/año, 25 % por deforestación, los humedales que guardan 3–5× más carbono por hectárea que la selva, el Acuerdo de París y REDD+) y los tiempos comparados de los cuatro ciclos biogeoquímicos (carbono, agua, nitrógeno y fósforo). NOTA: los tamaños de los reservorios y la fracción aérea (~45 %) son aproximados (IPCC); el modelo es cualitativo, pensado para mostrar la idea de equilibrio frente a desequilibrio, no mediciones exactas. Acompaña la actividad de CNEYT-III sobre los ciclos biogeoquímicos del agua, el carbono, el nitrógeno y el fósforo.",
-  },
-  "ecuacion-cuadratica": {
-    slug: "ecuacion-cuadratica",
-    titulo: "Laboratorio 3D — Ecuaciones cuadráticas: tres métodos y el discriminante",
-    descripcion: "Una ecuación cuadrática ax² + bx + c = 0 (con a ≠ 0) puede resolverse de tres maneras —factorización, completar el cuadrado y la fórmula general— y el DISCRIMINANTE Δ = b² − 4ac decide de antemano cuántas soluciones reales tiene: dos si Δ>0, una raíz doble si Δ=0 y ninguna real si Δ<0. Este laboratorio convierte esa idea en imagen: la parábola y = ax²+bx+c es un VALLE y el plano y = 0 es el AGUA, así que las raíces de la ecuación son justo los puntos donde el valle toca el agua. Mueve los coeficientes a (abre, cierra y orienta la parábola), b (desplaza el vértice) y c (sube o baja la curva) y observa en vivo cómo cambian el discriminante, el número de soluciones, las raíces y el vértice. El panel lateral muestra los tres métodos resueltos en tiempo real para los valores actuales: la forma factorizada, la forma de cuadrado completo a(x−h)²+k y la fórmula general con los números sustituidos. Trae cuatro ejemplos guiados (factorización con x²−5x+6, completar el cuadrado con x²+6x+5, raíz doble con x²−4x+4 y sin raíces reales con x²+x+1) y el CASO REAL verbatim de la actividad: el terreno del agricultor cuyo largo mide 5 m más que el doble del ancho y cuya área es 133 m², que lleva a 2w²+5w−133=0 y, descartando la raíz negativa, da un ancho w = 7 m y un largo l = 19 m (7 × 19 = 133 m²). NOTA: todos los cálculos son exactos (aritmética del modelo); la escena 3D es una representación fiel de la parábola y sus raíces. Acompaña la actividad de PM-III sobre resolver ecuaciones cuadráticas en contexto real.",
-  },
-  "subsistemas-terrestres": {
-    slug: "subsistemas-terrestres",
-    titulo: "Laboratorio 3D — Interacciones entre los subsistemas terrestres",
-    descripcion: "La Tierra no es un montón de partes sueltas: es UN solo sistema de cuatro subsistemas que interactúan —atmósfera, hidrosfera, litosfera y biosfera—, de modo que un cambio en uno se propaga a todos. Este laboratorio pone al planeta en 3D con sus cuatro capas a la vista —el interior rocoso (litosfera), el océano que lo envuelve (hidrosfera), los bosques sobre la superficie (biosfera) y la capa de aire que lo rodea (atmósfera)— y deja que el alumno mueva las variables de la simulación: el CO₂ atmosférico (de 280 ppm de 1850 hasta 560), la cobertura vegetal (de bosque intacto a deforestado), la actividad volcánica de la litosfera y la retroalimentación del permafrost. Cada cambio se propaga en vivo por todo el sistema: sube el CO₂ y la atmósfera se tiñe de azul a naranja mientras crece la temperatura media, sube el nivel del mar y se encogen los casquetes polares; baja la cobertura vegetal y cae el sumidero de carbono junto con la lluvia tierra adentro; activa un volcán y verás su pluma inyectar SO₂ (que enfría a corto plazo) y CO₂ que acidifica el océano (baja el pH); enciende el permafrost y, pasado cierto umbral, el deshielo libera metano que amplifica el calentamiento por sí solo —el punto de no retorno—. Trae los seis escenarios guiados de la actividad (referencia 1850, hoy ~420 ppm, deforestación, erupción mayor, permafrost y restauración) y un panel con la composición y escala de cada subsistema y sus interacciones clave. NOTA: el modelo es cualitativo y didáctico —usa números de referencia conocidos (sensibilidad climática ~3 °C por duplicación de CO₂, IPCC; pH preindustrial 8.2) para mostrar la dirección y el orden de las interacciones, no para predecir valores exactos—. Acompaña la actividad de CNEYT-III sobre los subsistemas terrestres y sus interacciones.",
-  },
-  "biomas-ecosistemas": {
-    slug: "biomas-ecosistemas",
-    titulo: "Laboratorio 3D — Biomas de México: el clima dibuja la vida",
-    descripcion: "Un BIOMA es una gran región del planeta definida por su clima, su vegetación dominante y su comunidad de seres vivos —selva, desierto, bosque templado, pastizal, tundra de alta montaña o manglar—. ¿Qué decide cuál se forma en un lugar? Sobre todo el CLIMA: la temperatura media anual y la precipitación. Este laboratorio convierte esa idea en un explorador tipo diagrama de Whittaker: el alumno mueve dos controles —la temperatura (de −5 °C de alta montaña a 30 °C de trópico) y la lluvia (de 0 a 4,000 mm al año)— y, en vivo, un diorama 3D se transforma para mostrar el bioma que emerge: cambia el color del suelo, el tipo y la densidad de la vegetación (coníferas, cactáceas, pastos, selva en pisos, mangle con raíces en el agua), aparece nieve en las cumbres o se inunda la costa del manglar, y el Sol entibia la escena de frío a cálido; mientras tanto cae lluvia o nieve según el clima elegido. Junto al diorama, un diagrama de Whittaker pintado por el propio clasificador muestra dónde cae el punto actual entre todos los biomas. Todo está anclado a ejemplos REALES de México —el país megadiverso con 12 de los 14 biomas terrestres—: la Selva Lacandona de Chiapas (~600,000 ha, jaguar y quetzal), el Desierto Chihuahuense (más de 900 cactáceas, borrego cimarrón), los bosques de Michoacán (santuario de la monarca), los pastizales del altiplano (berrendo), los manglares de Yucatán (flamenco rosa) y el zacatonal alpino del Pico de Orizaba (teporingo), con paneles de megadiversidad y conservación: 10–12% de la biodiversidad mundial, 182 ANP federales, el Sistema Arrecifal Mesoamericano y especies en crisis como la vaquita marina. Trae seis escenarios guiados y un reto: encontrar los siete biomas. NOTA: modelo cualitativo y didáctico —los umbrales de temperatura y precipitación siguen el esquema clásico de Whittaker para mostrar la relación clima→bioma, no para clasificar un sitio con precisión; el manglar depende además de ser costa salobre y aquí se aproxima en el extremo cálido y muy húmedo—. Datos de México verbatim (CONABIO 2023, CONAFOR 2020, SEMARNAT 2022). Acompaña la actividad de CNEYT-III sobre los componentes y características de los principales biomas y ecosistemas.",
-  },
-  "redes-troficas": {
-    slug: "redes-troficas",
-    titulo: "Laboratorio 3D — Redes tróficas y flujo de energía",
-    descripcion: "La energía entra a un ecosistema por el Sol, los PRODUCTORES la fijan por fotosíntesis y de ahí sube por los niveles tróficos —productores → consumidores primarios (herbívoros) → secundarios (carnívoros de 1.er orden) → terciarios (depredadores tope)—, pero la transferencia es ineficiente: la EFICIENCIA ECOLÓGICA es de solo 5–20% (la 'regla del 10%'), así que ~90% de la energía se pierde como CALOR en cada paso (respiración, movimiento, calor corporal, heces). Este laboratorio lo hace visible como una PIRÁMIDE DE ENERGÍA 3D de cuatro niveles que se estrecha hacia arriba: el alumno fija la energía de los productores (en kcal) y la eficiencia ecológica, y ve subir la energía como partículas verdes mientras el calor perdido se escapa en naranja hacia afuera en cada nivel —cuanto menor la eficiencia, menos llega a la cima y más se afila la pirámide—. Los tokens sobre cada plataforma evocan la biomasa (muchos abajo, poquísimos arriba) y los descomponedores (hongos y bacterias) cierran el ciclo de la materia en la base. Todo está anclado a ecosistemas REALES de México que se eligen con un selector —el Mar de Cortés, 'el acuario del mundo' de Cousteau (fitoplancton → sardina → atún → tiburón/orca), el bosque templado (pinos → venado → zorro → puma/águila real) y la Selva Lacandona (árboles → mono/tapir → ocelote → jaguar)— con su cadena trófica y datos de megadiversidad marina: México alberga el 14% de las especies marinas del planeta, y el Mar de Cortés reúne más de 900 especies de peces y 32 de cetáceos. Reproduce el caso clásico (10,000 kcal y 10% de eficiencia → 1,000 → 100 → 10 kcal) y descubre por qué siempre hay muchísimos más herbívoros que depredadores y por qué comer del primer nivel es energéticamente más eficiente. NOTA: modelo didáctico —la 'regla del 10%' es una simplificación reconocida; la eficiencia real varía (5–20%) y las kcal son valores de referencia para mostrar la proporción entre niveles, no medidas de un sitio concreto—. Acompaña la actividad de CNEYT-III sobre el flujo de energía en cadenas y redes tróficas.",
-  },
-  "deforestacion": {
-    slug: "deforestacion",
-    titulo: "Laboratorio 3D — Deforestación y sus efectos",
-    descripcion: "Un bosque no es solo un montón de árboles: presta SERVICIOS ECOSISTÉMICOS que sostienen la vida —fija carbono y lo guarda en madera y suelo, alberga biodiversidad, regula el ciclo del agua dejando que la lluvia se infiltre y sujeta el suelo con sus raíces—. Por eso, cuando se deforesta, todos esos servicios caen a la vez. Este laboratorio convierte esa idea en un predio forestal 3D: el alumno ajusta la COBERTURA FORESTAL (de 100% intacto a 0% talado) y un esfuerzo de RESTAURACIÓN, y elige la CAUSA de la deforestación entre las tres que dominan en México según la CONAFOR (2023) —ganadería extensiva 55%, agricultura de roza-tumba-quema 28% y tala ilegal 17%—. En vivo, los árboles se transforman en tocones, del área talada se eleva humo y CO₂ (fuego naranja si es roza-tumba-quema), aparece ganado en los potreros, la fauna va desapareciendo y el suelo verde se vuelve café y erosionado; al reforestar, el bosque regresa en un verde más claro. Cuatro barras muestran cómo caen los servicios —carbono fijado, biodiversidad (que cae aún más rápido por la fragmentación del hábitat), regulación hídrica y, al revés, la erosión del suelo que aumenta—. Y se hace visible la TRAMPA DE SINERGIAS, el ciclo vicioso de la actividad: menos bosque → menos CO₂ absorbido → más calentamiento → más sequías e incendios → más deforestación. Todo está anclado a México verbatim: ~92,000 ha de bosque y selva perdidas al año, las regiones más golpeadas (Selva Lacandona en Chiapas, Sierra Madre Occidental y la Huasteca), los glaciares del Iztaccíhuatl y el Pico de Orizaba que han perdido >70% de su masa en un siglo, y el derecho a un medio ambiente sano del artículo 4° constitucional (2012). Cierra con las soluciones reales —reforestación comunitaria de las brigadas del CONAFOR, corredores biológicos, agricultura agroecológica y manejo por comunidades indígenas— y cinco escenarios guiados. NOTA: modelo didáctico —los porcentajes de servicios ecosistémicos son relativos a un bosque intacto para mostrar la dirección y proporción de los efectos, no medidas de un sitio concreto; las cifras nacionales son verbatim (CONAFOR 2023)—. Acompaña la actividad de CNEYT-III sobre el deterioro ambiental en sus escalas local, regional y global.",
-  },
-  "discriminante": {
-    slug: "discriminante",
-    titulo: "Laboratorio 3D — El discriminante: naturaleza de las raíces",
-    descripcion: "Antes de resolver toda la fórmula general, el DISCRIMINANTE Δ = b² − 4ac ya revela cuántas soluciones tiene una ecuación cuadrática ax² + bx + c = 0 y de qué tipo son. Este laboratorio lo vuelve visible: el alumno mueve los coeficientes a, b y c y ve, en vivo, la parábola y = ax² + bx + c flotando sobre un plano horizontal que es —literalmente— el PLANO COMPLEJO de las raíces (el eje X es la parte real y el eje Z la parte imaginaria). Cuando Δ > 0 la parábola cruza el eje X en DOS puntos (dos raíces reales distintas, en verde); cuando Δ = 0 lo toca una sola vez, tangente en el vértice (una raíz doble, en ámbar); y cuando Δ < 0 la parábola ya no toca el plano y las dos raíces se DESPEGAN del eje real para subir por el eje imaginario como un par complejo a ± b·i (en rojo) —la visualización hace tangible eso de que 'no hay raíces reales pero sí complejas'—. Una recta horizontal y = k modela la aplicación del cohete de pirotecnia h(t) = −5t² + 30t + 10: al subir la altura objetivo se ve cómo el cohete alcanza esa altura dos veces, una sola (en su altura máxima de 55 m, tangente) o ninguna (no llega a 100 m), que es de nuevo el discriminante en acción. Incluye la fórmula general, la lectura exacta de Δ, las raíces, el vértice y los cruces, cinco escenarios guiados (dos raíces, tangente, sin raíces reales, el cohete y el caso de los 100 m) y un recordatorio de por qué los números complejos importan (el audio de tu celular, la ingeniería eléctrica y la física cuántica). NOTA: el cálculo es exacto (Δ, raíces y vértice salen de la fórmula general, sin aproximación); solo el eje vertical de la escena se reescala para encuadrar la parábola. Acompaña la actividad de PM-III sobre la naturaleza de las raíces de una ecuación cuadrática (el discriminante).",
-  },
-  "circulo-unitario": {
-    slug: "circulo-unitario",
-    titulo: "Laboratorio 3D — El círculo unitario genera las ondas seno y coseno",
-    descripcion: "En el triángulo rectángulo el seno y el coseno solo existen entre 0° y 90°. El CÍRCULO UNITARIO (radio 1, centro en el origen) los libera de esa jaula y los extiende a CUALQUIER ángulo. Este laboratorio lo vuelve visible en 3D: el alumno gira el radio (el ángulo θ) y ve que el punto que recorre el círculo es siempre P = (cos θ, sen θ) —su posición horizontal es el coseno y su altura es el seno—. Al darle PLAY, el punto avanza en el tiempo y, en vez de volver sobre sí mismo, traza una HÉLICE cuyas dos sombras son, exactamente, la onda SENO (en el muro vertical) y la onda COSENO (en el piso): así se ve, de un solo golpe, por qué seno y coseno son funciones periódicas y por qué van desfasadas 90° (cuando una vale 1, la otra vale 0). El triángulo rectángulo inscrito en el círculo hace tangible la identidad pitagórica sen²θ + cos²θ = 1, que no es más que el Teorema de Pitágoras con catetos sen y cos e hipotenusa = radio = 1, y una comprobación numérica en vivo lo confirma en cualquier ángulo. La regla de signos por cuadrante aparece resaltada según dónde esté el punto —Q1 todas positivas, Q2 solo el seno, Q3 solo la tangente, Q4 solo el coseno— y, en los ángulos notables (0°, 30°, 45°, 60°, 90°…), las lecturas muestran los valores EXACTOS cerrados (√3/2, √2/2, 1/2…) junto con la medida en radianes (π/6, π/4, π/3…). Incluye también la tangente como recta sobre el círculo (indefinida en 90° y 270°), siete ángulos clave guiados y conmutadores para mostrar/ocultar la onda coseno, la hélice y la tangente. NOTA: el cálculo es exacto —seno, coseno y tangente salen directamente de las coordenadas del punto en el círculo de radio 1; en los ángulos notables se muestran sus valores cerrados—; la escena usa unidades de pantalla para encuadrar las ondas, pero los valores numéricos de las lecturas siempre son reales. Acompaña la actividad de PM-IV sobre la extensión de las razones trigonométricas a ángulos en el círculo unitario.",
-  },
-  "triangulo-rectangulo": {
-    slug: "triangulo-rectangulo",
-    titulo: "Laboratorio 3D — Mido la altura de un árbol con razones trigonométricas",
-    descripcion: "¿Cómo medir la altura de un árbol, un poste o un edificio sin treparlo? Este laboratorio vuelve tangible la MEDICIÓN INDIRECTA, el corazón de la trigonometría aplicada. El alumno se 'para' a una DISTANCIA d del objeto (lo único que mide en el piso, con una cinta) y apunta un clinómetro para leer el ÁNGULO DE ELEVACIÓN θ hacia la cima. Con esos dos datos la escena 3D arma, en vivo, el TRIÁNGULO RECTÁNGULO de la observación: el cateto adyacente es la distancia d (azul), el cateto opuesto es la altura del objeto por encima de los ojos (verde) y la hipotenusa es la línea de visión hacia la copa (dorada). Como tan θ = opuesto / adyacente y se conoce el adyacente, se despeja el opuesto = d · tan θ y la altura real resulta H = (altura del observador) + d · tan θ —el laboratorio muestra ese cálculo paso a paso, con los números actualizándose mientras se mueven los controles—. Al darle PLAY el ángulo de elevación barre de ida y vuelta y se ve cómo, a mayor ángulo con la misma distancia, mayor altura (la altura crece como la tangente). Refuerza SOH-CAH-TOA (Seno = Opuesto/Hipotenusa, Coseno = Adyacente/Hipotenusa, Tangente = Opuesto/Adyacente) mostrando cada razón con los lados reales en metros, la anatomía del triángulo (catetos, hipotenusa y el ángulo recto donde el árbol toca el suelo) y seis objetos guiados para medir (árbol, poste de luz, edificio, asta bandera, torre y pirámide). Orbitar la cámara hace evidente que el triángulo vive en una escena tridimensional creíble —observador, terreno, distancia y árbol—, no en una hoja plana. NOTA: el cálculo es exacto —los lados y la altura salen directamente de las razones trigonométricas (H = altura del observador + d·tan θ), tomando la altura del observador/clinómetro como 1.6 m y terreno horizontal—; la escena escala el triángulo para encuadrarlo (su forma depende solo del ángulo θ, por triángulos semejantes), pero los valores numéricos de las lecturas siempre son reales. Acompaña la actividad de PM-IV sobre la definición de las razones trigonométricas en triángulos rectángulos y su aplicación en problemas de medición indirecta.",
-  },
-  "ley-senos-cosenos": {
-    slug: "ley-senos-cosenos",
-    titulo: "Laboratorio 3D — Resuelvo un terreno con la Ley de Senos y la Ley de Cosenos",
-    descripcion: "Cuando un triángulo NO tiene ángulo recto (es OBLICUÁNGULO), Pitágoras y SOH-CAH-TOA ya no alcanzan: entran en juego la Ley de Cosenos y la Ley de Senos. Este laboratorio lo vuelve tangible con un TERRENO triangular en 3D que se puede orbitar como un predio real. Un topógrafo quiere el lado que cruza un lago o un barranco —no puede medirlo con cinta—, pero sí puede medir los OTROS DOS lados, a y b, y el ÁNGULO C que forman entre ellos. El alumno mueve esos tres controles y la escena dibuja en vivo el terreno con sus estacas en los vértices A, B y C: los lados a (azul) y b (verde) parten del vértice C, y el lado c desconocido (dorado, con un marcador pulsante) cierra el triángulo enfrente del ángulo C. La LEY DE COSENOS resuelve la incógnita paso a paso —c² = a² + b² − 2ab·cos C, con los números sustituyéndose en vivo— y la LEY DE SENOS (a/sen A = b/sen B = c/sen C) entrega los ángulos restantes A y B, comprobando que A + B + C = 180°. Al darle PLAY el ángulo C barre de ida y vuelta y se ve cómo, con los mismos lados, a mayor ángulo más se 'abre' el triángulo y más largo es el lado opuesto. El laboratorio recalca que la Ley de Cosenos es la GENERALIZACIÓN del Teorema de Pitágoras (cuando C = 90°, cos 90° = 0 y queda c² = a² + b²), muestra el área (½·a·b·sen C) y trae seis situaciones guiadas (terreno, lago, triángulo equilátero, caso casi recto ≈ Pitágoras, ángulo obtuso y ángulo agudo). NOTA: el cálculo es exacto —el lado c sale de la Ley de Cosenos y los ángulos de la Ley de Senos/Cosenos—; la escena centra y escala el terreno para encuadrarlo (su forma depende de a, b y C), pero los valores numéricos de las etiquetas y lecturas siempre son reales. Acompaña la actividad de PM-IV sobre la aplicación de la Ley de Senos y la Ley de Cosenos en la resolución de triángulos oblicuángulos.",
-  },
-  "geometria-analitica": {
-    slug: "geometria-analitica",
-    titulo: "Laboratorio 3D — Mido distancia, punto medio y pendiente entre dos puntos del plano",
-    descripcion: "La geometría analítica une el álgebra con la geometría: cada punto del plano es un par ordenado (x, y) y cada figura tiene una fórmula. Este laboratorio lo vuelve tangible con un PLANO CARTESIANO flotante en 3D —rejilla con ejes X e Y— que se puede orbitar para ver que el plano vive en el espacio, no en una hoja. El alumno coloca dos puntos, P₁(x₁, y₁) y P₂(x₂, y₂), moviendo cuatro controles, y la escena dibuja en vivo: los dos puntos como esferas con sus coordenadas, el SEGMENTO que los une (naranja), el TRIÁNGULO de la recta con sus catetos Δx (avance horizontal, verde) y Δy (subida vertical, morado), y el PUNTO MEDIO M con un marcador pulsante. Con los MISMOS catetos Δx = x₂−x₁ y Δy = y₂−y₁ se construyen las tres respuestas básicas, que el laboratorio resuelve paso a paso con los números actualizándose: la DISTANCIA d = √(Δx² + Δy²) —que no es otra cosa que el Teorema de Pitágoras, con el segmento como hipotenusa—, el PUNTO MEDIO M = ((x₁+x₂)/2, (y₁+y₂)/2) —el promedio de las coordenadas— y la PENDIENTE m = Δy/Δx —la inclinación de la recta—. Al darle PLAY el punto P₂ se desplaza horizontalmente y se ve cómo cambian la distancia y la pendiente a la vez; cuando Δx = 0 la recta queda vertical y la pendiente se vuelve INDEFINIDA (no se puede dividir entre cero), y cuando Δy = 0 es horizontal con pendiente 0. Trae seis situaciones guiadas (diagonal, pendiente 1 a 45°, horizontal, vertical, pendiente negativa y recta empinada) y muestra la inclinación en grados. NOTA: el cálculo es exacto —distancia, punto medio y pendiente salen directamente de sus fórmulas—; el plano se dibuja a escala fija sobre la rejilla, así que las posiciones son reales y los valores numéricos de las etiquetas y lecturas siempre son los exactos. Acompaña la actividad de PM-IV sobre distancia, punto medio y pendiente entre dos puntos en el plano cartesiano.",
-  },
-  "transformaciones-funciones": {
-    slug: "transformaciones-funciones",
-    titulo: "Laboratorio 3D — Grafico y transformo funciones de 1.º y 2.º grado",
-    descripcion: "Una función no solo se grafica: se TRANSFORMA. Este laboratorio lo vuelve tangible con un PLANO CARTESIANO flotante en 3D —rejilla con ejes X e Y— que se puede orbitar, sobre el cual se dibujan dos gráficas a la vez: la función PADRE (y = x² para la cuadrática o y = x para la lineal), tenue y punteada como referencia, y la función TRANSFORMADA en forma de vértice f(x) = a·(x − h)² + k (o a·(x − h) + k en la lineal), resaltada en naranja. El alumno mueve tres controles —a, h y k— y ve en vivo qué hace cada uno: a ESTIRA, COMPRIME o REFLEJA la gráfica (con a < 0 la parábola se voltea y abre hacia abajo, como la trayectoria de un balón); h la TRASLADA en horizontal y k la TRASLADA en vertical, sin deformarla. Dos flechas punteadas muestran el desplazamiento del vértice desde el origen (0, 0) del padre hasta el nuevo vértice (h, k): una horizontal verde (h) y otra vertical morada (k), con sus valores. El vértice/punto ancla se marca con una esfera pulsante etiquetada con sus coordenadas exactas. Un selector permite cambiar entre función CUADRÁTICA (2.º grado, parábola) y LINEAL (1.º grado, recta), y al darle PLAY el parámetro h barre el plano para ver cómo toda la gráfica se desliza de un lado a otro sin cambiar de forma. Trae seis situaciones guiadas (la parábola padre y = x², un balón con a < 0, una parábola trasladada, una estrecha con |a| > 1, la recta padre y = x y una recta inclinada) y un razonamiento paso a paso que va del padre a la transformada. La aplicación central: con a < 0, f(x) = a(x − h)² + k modela la trayectoria de un balón cuyo punto más alto (el vértice) está en (h, k). NOTA: el cálculo es exacto —la gráfica se evalúa punto por punto con la fórmula y el vértice es exactamente (h, k)—; el plano se dibuja a escala fija y la curva se recorta al rango visible, pero los valores numéricos de las etiquetas y lecturas siempre son los exactos. Acompaña la actividad de PM-IV sobre graficar y transformar funciones polinomiales de primer y segundo grado.",
-  },
-  "balanceo-ecuaciones": {
-    slug: "balanceo-ecuaciones",
-    titulo: "Laboratorio 3D — Balanceo de ecuaciones químicas con la ley de conservación de la masa",
-    descripcion: "Balancear una ecuación química es hacer cumplir la LEY DE CONSERVACIÓN DE LA MASA: en una reacción los átomos no se crean ni se destruyen, solo se reacomodan, así que debe haber el mismo número de átomos de cada elemento en los reactivos y en los productos. Este laboratorio lo vuelve tangible con una escena 3D de BOLAS Y BARRAS que se puede orbitar: a la izquierda los reactivos y a la derecha los productos, separados por una flecha de reacción. De cada fórmula se dibujan tantas COPIAS completas de la molécula como indica su COEFICIENTE actual, así que subir un coeficiente hace aparecer una molécula entera más en la escena. El alumno ajusta los coeficientes con controles −/+ (nunca los subíndices, esa es la regla de oro) y ve en vivo cómo los contadores de átomos por elemento —con colores tipo CPK— se igualan: cuando cada elemento cuadra a ambos lados, la flecha se pone VERDE, aparece el sello «Balanceada» y las masas totales de reactivos y productos coinciden. Trae las tres reacciones reales de la actividad: la síntesis del agua (2 H₂ + O₂ → 2 H₂O), la combustión del metano de la estufa (CH₄ + 2 O₂ → CO₂ + 2 H₂O) y la oxidación del hierro o herrumbre (4 Fe + 3 O₂ → 2 Fe₂O₃), cada una con su contexto de la vida real y una pista del método de tanteo. Un botón «Resolver paso a paso» mueve los coeficientes hasta la solución en cámara lenta para ver el razonamiento, y una tabla por elemento muestra IZQ vs DER con ✓/✗. NOTA: el conteo de átomos, la condición de balance y la igualdad de masas (calculada con las masas atómicas en u) son siempre exactos; las moléculas se dibujan como modelos a escala fija —representaciones didácticas, no las distancias de enlace reales—, pero todos los valores numéricos son los exactos. Acompaña la actividad de CNEYT-IV sobre interpretar y balancear ecuaciones químicas aplicando la ley de conservación de la masa.",
-  },
-  "organica-visor": {
-    slug: "organica-visor",
-    titulo: "Laboratorio 3D — Visor molecular de química orgánica: las cuatro familias y sus grupos funcionales",
-    descripcion: "La química orgánica estudia los compuestos del carbono, un átomo que forma 4 enlaces covalentes y se une consigo mismo en cadenas, lo que genera millones de compuestos. Lo que distingue a cada FAMILIA orgánica es su GRUPO FUNCIONAL: el átomo o conjunto de átomos que define sus propiedades y reactividad. Este laboratorio es un visor molecular de BOLAS Y BARRAS que se orbita y gira sobre su propio eje, para explorar las cuatro familias de la progresión con compuestos reales tomados de la lectura. ALCANOS (saturados, solo enlaces simples C–C, CₙH₂ₙ₊₂, poco reactivos): metano CH₄ —el gas natural de la CFE— y el propano C₃H₈ y butano C₄H₁₀ que forman el gas LP de los hogares. ALQUENOS (insaturados, con doble enlace C=C, CₙH₂ₙ, más reactivos): el eteno o etileno C₂H₄ —el compuesto orgánico más producido del mundo, base del polietileno y hormona que madura las frutas— y el propeno C₃H₆. ALCOHOLES (grupo hidroxilo –OH): el etanol C₂H₅OH de las bebidas y el metanol CH₃OH tóxico (regulado por COFEPRIS). ÁCIDOS CARBOXÍLICOS (grupo carboxilo –COOH, ácidos débiles que ceden un H⁺): el ácido acético CH₃COOH del vinagre. Con un solo clic se resalta el grupo funcional de cada molécula (–OH, –COOH o el doble enlace C=C) con un halo de color, y una ficha muestra fórmula, fórmula general, tipo de enlaces, contexto de uso en México y reactividad. NOTA: la composición (número de C, H y O), la fórmula y el grupo funcional son los valores reales de cada compuesto; las moléculas se dibujan con ángulos tetraédricos (sp3, 109.5°) y trigonales planos (sp2, 120°) como representaciones didácticas, no las distancias de enlace exactas. Acompaña la actividad de CNEYT-IV sobre las propiedades y reactividad de los compuestos orgánicos básicos.",
-  },
-  "ph-escala": {
-    slug: "ph-escala",
-    titulo: "Laboratorio 3D — Escala de pH: ácidos, bases y neutralización con indicador de col morada",
-    descripcion: "El pH es una escala de 0 a 14 que resume la concentración de iones hidrógeno de una disolución: ácido si es menor a 7, neutro en 7 (el agua pura a 25 °C) y básico si es mayor a 7. Este laboratorio es un vaso de precipitados virtual con una disolución que se tiñe con el INDICADOR DE COL MORADA (antocianinas): rojo o rosa en medio ácido, morado en neutro y azul o verde en medio básico; al lado, una torre-escala 0–14 con un marcador que sube o baja con el pH. En el modo MEDIR el alumno elige una sustancia y lee su pH y su color: las seis del panel de la simulación —ácido clorhídrico HCl 0.1 M (pH ~1), vinagre o ácido acético 5% (pH ~3), agua destilada (pH 7), bicarbonato de sodio NaHCO₃ (pH ~8.3), hidróxido de sodio NaOH (pH ~12) y cloro doméstico (pH ~13)— más sustancias cotidianas de la lectura: ácido gástrico, jugo de limón, lluvia ácida, café negro, sangre humana y jabón. En el modo NEUTRALIZAR titula un ácido con NaOH gota a gota y ve la curva pH vs gotas: un ÁCIDO FUERTE (HCl) casi no cambia hasta dar un salto brusco a pH 7 en el punto de equivalencia, mientras que un ÁCIDO DÉBIL (vinagre) tiene una región amortiguadora (buffer) y su equivalencia queda en pH mayor a 7. Una tarjeta compara cómo un buffer de bicarbonato —el que mantiene la sangre entre 7.35 y 7.45— resiste el cambio de pH frente al agua pura, y se recuerda que la escala es logarítmica (cada unidad equivale a 10 veces más o menos iones H⁺) y la NOM-127-SSA1-2021 que fija el pH del agua potable entre 6.5 y 8.5. NOTA: los valores de pH son los de la actividad (donde hay rango se usa un valor representativo); el color del indicador es cualitativo y la curva de titulación es un modelo simplificado (ácido 0.1 M en 25 mL, NaOH 0.1 M) con las formas correctas de la fisicoquímica. Acompaña la actividad de CNEYT-IV sobre el concepto de pH y la importancia de ácidos y bases.",
-  },
-  "reaccion-co2": {
-    slug: "reaccion-co2",
-    titulo: "Laboratorio 3D — Reacción vinagre + bicarbonato: diseño un experimento y mido el CO₂",
-    descripcion: "Hacer ciencia no es solo observar: es DISEÑAR un experimento, controlar las variables y medir. Este laboratorio reproduce el experimento casero clásico —vinagre (ácido acético, CH₃COOH) + bicarbonato de sodio (NaHCO₃)— en una escena 3D donde un frasco con vinagre lleva un GLOBO en la boca que se infla con el gas que se produce; su tamaño es, literalmente, la lectura del volumen de CO₂. La reacción es de doble sustitución con desprendimiento de gas, CH₃COOH + NaHCO₃ → CH₃COONa + H₂O + CO₂, y el alumno actúa como científico: elige la VARIABLE INDEPENDIENTE que va a cambiar (los gramos de bicarbonato, la concentración del vinagre 5% o 10%, o su volumen), mantiene las demás como VARIABLES CONTROLADAS, pulsa «¡Reaccionar!» y mide la VARIABLE DEPENDIENTE (el volumen de CO₂ que infla el globo y el tiempo de reacción). Incluye un CONTROL —usar agua en vez de vinagre— que no debe reaccionar, demostrando que el gas proviene del ácido. La gran idea es el REACTIVO LIMITANTE: como la relación molar es 1:1, el CO₂ lo decide el reactivo que se agota primero; por eso, con poco vinagre, echar más y más bicarbonato NO produce más gas (la curva CO₂ vs gramos sube y luego se aplana en el punto estequiométrico), pero subir la concentración del vinagre sí. En vivo se leen los milimoles de ácido y de bicarbonato, cuál es el limitante, cuánto reactivo sobra, el CO₂ en mmol/mL/L y su masa, además de una gráfica CO₂ vs gramos de bicarbonato con el punto exacto marcado. NOTA: el volumen de CO₂ se calcula con estequiometría real (relación 1:1, reactivo limitante y el volumen molar de un gas a 25 °C y 1 atm, 24.45 L/mol); los valores caseros son aproximados (1 cucharada ≈ 14 g, 1 cucharadita ≈ 4 g) y el tiempo de reacción es cualitativo/didáctico (más concentración → más rápido), no una medición; el globo y las burbujas ilustran el gas y su tamaño es proporcional al volumen calculado. Acompaña la actividad de CNEYT-IV sobre diseñar y realizar experimentos sencillos de química con materiales accesibles.",
-  },
-  "conicas-lugares-geometricos": {
-    slug: "conicas-lugares-geometricos",
-    titulo: "Laboratorio 3D — Cónicas: circunferencia y parábola como lugares geométricos",
-    descripcion: "Una cónica no es solo una curva bonita: se DEFINE como un lugar geométrico, el conjunto de todos los puntos del plano que cumplen una condición. Este laboratorio lo vuelve tangible con un PLANO CARTESIANO flotante en 3D —rejilla con ejes X e Y— que se puede orbitar, y un selector para alternar entre las dos cónicas básicas de la progresión. En modo CIRCUNFERENCIA el alumno ajusta el centro (h, k) y el radio r, y ve dibujada la curva (x − h)² + (y − k)² = r² junto con un punto P que la recorre arrastrando su RADIO, que mide siempre exactamente r: ahí se ve, literalmente, que la circunferencia es el lugar geométrico de los puntos que equidistan del centro. Además coloca un PUNTO DE PRUEBA Q con dos controles y el laboratorio compara su distancia al centro con r para clasificarlo —dentro (verde), sobre (amarillo) o fuera (rojo)— paso a paso. En modo PARÁBOLA ajusta el parámetro p (distancia del vértice al foco) y ve la curva x² = 4py con su FOCO (0, p), su DIRECTRIZ y = −p y su VÉRTICE; un punto P recorre la parábola mostrando dos segmentos —al foco (d₁) y a la directriz (d₂)— que SIEMPRE miden lo mismo, porque la parábola es el lugar geométrico de los puntos que equidistan del foco y de la directriz. Un interruptor enciende la PROPIEDAD FOCAL: rayos paralelos al eje que, al rebotar en la curva, convergen todos en el foco —el principio del Gran Telescopio Milimétrico del INAOE (reflector parabólico de 50 m) y de las antenas satelitales domésticas, que colocan el receptor justo en el foco—. Trae ejemplos guiados con valores reales de la actividad: circunferencias con centro (3, −2) r=5, x²+y²=25 y la que sale de completar el cuadrado en x²+y²−4x+6y−3=0 → centro (2, −3) r=4; y parábolas como la antena x²=4(0.25)y. En vivo se leen la ecuación canónica, el centro/radio o el foco/directriz, las dos distancias iguales y el estado del punto Q. NOTA: el cálculo es exacto —la circunferencia es (x−h)²+(y−k)²=r² y la clasificación de Q sale de comparar su distancia al centro con r; la parábola es x²=4py con foco (0, p) y directriz y=−p, y la igualdad d(P, foco)=d(P, directriz) se cumple para cada punto—; el plano se dibuja a escala fija, así que las posiciones son reales y los valores numéricos de las etiquetas y lecturas siempre son los exactos. Acompaña la actividad de PM-IV sobre analizar la circunferencia y la parábola como lugares geométricos en el plano.",
-  },
-  "modelado-conicas-estimacion": {
-    slug: "modelado-conicas-estimacion",
-    titulo: "Laboratorio 3D — Modelado y estimación con secciones cónicas",
-    descripcion: "Las cuatro secciones cónicas —circunferencia, elipse, parábola e hipérbola— son los distintos cortes de un MISMO cono: lo que cambia es el ángulo del plano que lo atraviesa. Este laboratorio lo hace tangible con un cono de doble napa y un plano de corte inclinable que puedes orbitar en 3D: con un control deslizante mueves el ángulo γ y ves cómo el corte pasa de circunferencia (plano horizontal) a elipse (inclinado), a parábola (paralelo a una generatriz) y a hipérbola (cortando las dos napas), rotulando cada cónica con su ecuación canónica. El propósito formativo es MODELAR Y ESTIMAR con ecuaciones de dos variables, así que incluye dos modelos reales verbatim de la actividad evaluable A2: una ANTENA PARABÓLICA y = 0.25·x² —que pasa por (1, 0.25), de donde a = 0.25, y cuya altura a x = 2 es 1 m— con su FOCO en (0, 1) hacia el que convergen los rayos paralelos al eje (por eso las antenas DISH/SKY, los telescopios y los faros son parabólicos); y un MAPA DE COBERTURA x² + y² = 25 (radio 5 km) donde la casa en (3, 4) cumple 3²+4² = 25 = r² y cae justo en el borde del alcance. El reto evaluable pide hallar a, estimar la altura, escribir la ecuación de cobertura y clasificar la casa: los tres pasos del modelado —identificar la cónica, escribir su ecuación con los datos y usarla para estimar—. Todos los cortes y valores se calculan de forma exacta. Acompaña la actividad de Pensamiento Matemático IV «Trigonometría y geometría analítica» sobre la aplicación de las secciones cónicas: modelado y estimación.",
-  },
-  "lenguaje-algebraico-mosaicos": {
-    slug: "lenguaje-algebraico-mosaicos",
-    titulo: "Laboratorio 3D — Lenguaje algebraico con mosaicos",
-    descripcion: "El álgebra empieza cuando una letra reemplaza a un número que no conocemos o que cambia: «el doble de un número, más tres» se escribe 2x + 3. Este laboratorio vuelve TANGIBLE ese lenguaje con mosaicos algebraicos en 3D —x² es un cuadrado de lado x, x una tira y la unidad un cuadrito—, así que cada expresión se ve como una fila de piezas (los términos negativos en rojo). Elige una frase verbal (incluido el área de un lote del INFONAVIT, x·(2x + 5) = 2x² + 5x) y mira cómo se traduce a símbolos y a mosaicos; luego mueve el control de x para EVALUAR la expresión para distintos valores y comprobar, por ejemplo, que 2x + 3 vale 17 cuando x = 7. El mismo visor abre también la clasificación de expresiones y la multiplicación de binomios. El reto evaluable pide traducir y evaluar tres frases —incluido el lote del INFONAVIT que da 102 m² con x = 6—: identificar la incógnita, escribir la expresión y usarla. Acompaña a Pensamiento Matemático II «Introducción al álgebra».",
-  },
-  "clasificacion-expresiones-mosaicos": {
-    slug: "clasificacion-expresiones-mosaicos",
-    titulo: "Laboratorio 3D — Clasificación de expresiones algebraicas",
-    descripcion: "Una expresión algebraica se clasifica por su número de términos: monomio (1), binomio (2), trinomio (3) o polinomio (4 o más), y su grado es el mayor exponente de la variable. Este laboratorio muestra cada expresión como grupos de mosaicos 3D etiquetados —x² cuadrado, x tira, unidad cuadrito— para que se vean los términos separados y se cuente cuántos hay. Elige expresiones de muestra (5x², 3x + 7, x² + 4x − 2, 2x² + 5x + 3 − x) y observa la anatomía del primer término: su coeficiente (cuántas veces se tiene la variable), su variable y su exponente; cuando el coeficiente es 1 no se escribe, porque x² = 1·x². El mismo visor abre también el lenguaje algebraico y la multiplicación de binomios. El reto evaluable pide, sobre x² + 4x − 2, decir cuántos términos tiene (3 → trinomio), su grado (2) y el coeficiente de x² (1). Acompaña a Pensamiento Matemático II «Introducción al álgebra».",
-  },
-  "operaciones-binomios-mosaicos": {
-    slug: "operaciones-binomios-mosaicos",
-    titulo: "Laboratorio 3D — Operaciones con monomios y binomios",
-    descripcion: "Multiplicar dos binomios es lo mismo que calcular el área de un rectángulo de lados (x + a) y (x + b): este laboratorio lo hace visible con el MODELO DE ÁREA de mosaicos en 3D. El rectángulo se reparte en un cuadrado x² (azul), (a + b) tiras x (verdes) y a·b cuadritos unidad (dorados; rojos si el producto es negativo), de modo que se LEE directamente que (x + a)(x + b) = x² + (a + b)x + a·b. Con dos controles deslizantes mueves a y b (de −4 a 4) o eliges productos predefinidos como (x + 3)(x − 2) y ves cómo cambian el coeficiente de x y la constante con los signos: en (x + 3)(x − 2), a + b = 1 y a·b = −6, así que el resultado es x² + x − 6. También recuerda que solo se combinan términos semejantes: 3x² + 2x + 5x² − x = 8x² + x. El mismo visor abre también el lenguaje algebraico y la clasificación. El reto evaluable pide, sobre (x + 3)(x − 2), el coeficiente de x (1), el término independiente (−6) y su valor en x = 5 (24). Acompaña a Pensamiento Matemático II «Introducción al álgebra».",
+  "tipos-graficas": {
+    slug: "tipos-graficas",
+    titulo: "Laboratorio Interactivo — Tipos de Gráficas",
+    descripcion: "Empareja cada gráfica con su propósito, clasifica escenarios de datos por la gráfica apropiada y reconoce trampas visuales. Contenido verbatim de Cultura Digital II.",
   },
   "tipos-reacciones-quimicas": {
     slug: "tipos-reacciones-quimicas",
-    titulo: "Laboratorio 3D — Tipos de reacciones químicas: clasifico y predigo los productos",
-    descripcion: "Una reacción química reorganiza los átomos: rompe unos enlaces y forma otros, pero ningún átomo se crea ni se destruye (ley de conservación de la masa, Lavoisier). Lo que distingue a cada reacción es CÓMO se reacomodan, y por eso se CLASIFICAN en cinco tipos. Este laboratorio es un visor de BOLAS Y BARRAS que se orbita, donde el alumno reproduce la reacción con un control de progreso 0→100%: los MISMOS átomos (esferas con colores tipo CPK) viajan de su posición en los reactivos a su posición en los productos mientras los enlaces viejos se desvanecen y los nuevos aparecen en verde. Se recorren los cinco tipos con reacciones reales y balanceadas de la progresión: SÍNTESIS o combinación (A + B → AB) con la formación del agua 2 H₂ + O₂ → 2 H₂O y de la sal común 2 Na + Cl₂ → 2 NaCl; DESCOMPOSICIÓN (AB → A + B) con la electrólisis del agua 2 H₂O → 2 H₂ + O₂ (hidrógeno verde de la CFE); DESPLAZAMIENTO SIMPLE (A + BC → AC + B) con el hierro que desplaza al cobre Fe + CuSO₄ → FeSO₄ + Cu (metalurgia de Cananea); DOBLE DESPLAZAMIENTO (AB + CD → AD + CB) con la neutralización ácido-base HCl + NaOH → NaCl + H₂O; y COMBUSTIÓN con el gas natural CH₄ + 2 O₂ → CO₂ + 2 H₂O. Un panel de CONSERVACIÓN DE LA MASA cuenta los átomos por elemento y muestra que el total es idéntico antes y después, y un RETO pide clasificar y predecir los productos de cuatro reacciones (Ca + Cl₂, CaCO₃, C₂H₅OH + O₂, Pb(NO₃)₂ + 2 KI), tal como en la actividad. NOTA: las ecuaciones son exactas y están balanceadas y el conteo de átomos por elemento es real (igual en reactivos y productos); el movimiento de los átomos y las distancias entre ellos son una representación didáctica de bolas y barras —para ver cómo se rompen y forman enlaces—, no las geometrías ni las trayectorias reales. Acompaña la actividad de CNEYT-IV sobre clasificar los tipos de reacciones químicas y predecir sus productos.",
+    titulo: "Laboratorio 3D — Tipos de Reacciones Químicas",
+    descripcion: "Clasifica reacciones de síntesis, descomposición, desplazamiento simple y doble, y combustión; identifica reactivos y productos en cada tipo.",
   },
-  "biomoleculas-cuatro-clases": {
-    slug: "biomoleculas-cuatro-clases",
-    titulo: "Laboratorio 3D — Las cuatro biomoléculas de la vida: del monómero al polímero",
-    descripcion: "Toda la materia viva está hecha de cuatro tipos de biomoléculas —carbohidratos, lípidos, proteínas y ácidos nucleicos— y tres de ellas son POLÍMEROS: moléculas grandes formadas por la unión repetida de subunidades pequeñas llamadas monómeros. Este laboratorio es un visor de BOLAS Y BARRAS (esferas con colores tipo CPK; carbono gris, hidrógeno blanco, oxígeno rojo, nitrógeno azul, fósforo naranja) que se orbita, con un selector para las cuatro biomoléculas y un interruptor MONÓMERO ↔ ENSAMBLADO que hace visible la polimerización. En CARBOHIDRATOS la subunidad es la glucosa (C₆H₁₂O₆, un anillo de seis lados con sus –OH); al pasar a ensamblado tres glucosas se unen por enlaces glucosídicos —dibujados en verde— para formar el almidón, liberando una molécula de agua en cada unión (condensación). En PROTEÍNAS la subunidad es el aminoácido (aquí la glicina, C₂H₅NO₂, con su grupo amino –NH₂ y su carboxilo –COOH); el ensamblado los une por enlaces peptídicos en un péptido, de nuevo liberando agua. En ÁCIDOS NUCLEICOS la subunidad es el nucleótido (fosfato + azúcar + base nitrogenada) y el ensamblado es la doble hélice del ADN. Los LÍPIDOS se marcan explícitamente como NO polímeros: se muestran como glicerol (la columna de 3 carbonos con tres –OH) que esterifica tres cadenas de ácido graso para dar un triglicérido. Un panel cuenta los átomos por elemento de la vista actual, el resaltador ilumina la parte característica (el grupo funcional o la base), y se incluye el contexto mexicano verbatim de la infografía: el maíz (64 razas nativas que documenta CONABIO; ~125 kg de tortilla al año por persona), el aguacate (México, primer productor mundial; hasta 15% de grasa), el chapulín (55–77% de proteína, 12 veces menos agua que la res; lo investiga el IPN) y el ADN humano (~3,200 millones de pares de bases, ~2 m extendido; el LANGEBIO-CINVESTAV ha secuenciado más de 15 razas de maíz). Cierra con el RETO de identificar las cuatro biomoléculas en una comida tradicional mexicana (tortilla, aguacate, frijol, chapulín). NOTA: las fórmulas de los monómeros (glucosa C₆H₁₂O₆, glicina C₂H₅NO₂, glicerol C₃H₈O₃) y el conteo de átomos por elemento son valores reales; las geometrías son modelos de bolas y barras didácticos (el almidón y el péptido muestran 3 subunidades, no la cadena completa, y el triglicérido y la doble hélice son esquemas con átomos omitidos para mayor claridad, como se indica en cada nota), no las distancias de enlace ni las estructuras tridimensionales reales. Acompaña la actividad de CNEYT-IV sobre las cuatro biomoléculas de la vida y el concepto de polímero y monómero.",
+  "trabajo-potencia-mecanica": {
+    slug: "trabajo-potencia-mecanica",
+    titulo: "Laboratorio 3D — Trabajo y Potencia Mecánica",
+    descripcion: "Empuja bloques por rampas y poleas para calcular el trabajo (W=Fd cosθ) y la potencia; compara máquinas simples.",
   },
-  "funciones-concepto": {
-    slug: "funciones-concepto",
-    titulo: "Laboratorio 3D — El concepto de función y sus cuatro representaciones",
-    descripcion: "Antes de graficar o transformar una función, hay que entender QUÉ es: una regla que a cada elemento del dominio (las entradas x) le asigna EXACTAMENTE UN elemento del rango (una salida y). Este laboratorio lo vuelve tangible con un PLANO CARTESIANO flotante en 3D —rejilla con ejes X e Y y escala propia por relación, para mostrar valores reales en min/°C, s/m o $— que se puede orbitar, y dos modos. En el modo MÁQUINA el alumno mueve la ENTRADA x con un control y ve cómo una guía sube desde el eje X y otra cruza hacia el eje Y para marcar la SALIDA f(x): el punto (x, f(x)) se resalta y la curva ya recorrida se traza en vivo, de modo que se ve, literalmente, que a cada entrada le corresponde una sola salida. Al mismo tiempo se sincronizan las CUATRO REPRESENTACIONES de la misma función: la TABULAR (la tabla de pares (x, y), con la fila más cercana resaltada), la GRÁFICA (la propia escena 3D), la ALGEBRAICA (la fórmula con la sustitución en vivo, p. ej. T(0) = 90 − 6(0) = 90) y la VERBAL (la regla en palabras). En el modo «¿ES FUNCIÓN?» un plano vertical barre la gráfica aplicando la PRUEBA DE LA LÍNEA VERTICAL: si la corta en un solo punto es función (verde) y si la corta en dos no lo es (rojo); así se contrastan funciones —la recta f(x)=2x+3, el tiro h(t)=−5t²+20t (una parábola SÍ pasa la prueba)— con relaciones que NO son función —la circunferencia x²+y²=25 (que la lectura cita explícitamente) y la parábola acostada x=y²—. La función ancla es el café que se enfría del ejercicio (A2): T(t) = 90 − 6t, con su tabla verbatim (0→90, 2→78, 4→66, 6→54, 8→42 °C), de la que el laboratorio resuelve paso a paso T(10) = 30 °C y cuándo llega a 20 °C (t ≈ 11.67 min). Incluye además los ejemplos reales de la lectura: el precio del Metro de la CDMX como función constante y la temperatura del Pico de Orizaba según la altitud (modelo lineal aproximado, ~6 °C por cada 1000 m). NOTA: el cálculo es exacto —cada salida se evalúa con la fórmula real y la tabla del café son los valores verbatim del enunciado—; el plano se dibuja a escala propia por relación para mostrar valores reales, y los modelos del Metro ($5, tarifa vigente) y del Pico de Orizaba (temperatura base y tasa típicas) se etiquetan como aproximados donde corresponde. Acompaña la actividad de PM-IV sobre comprender el concepto de función y sus representaciones (tabular, gráfica, algebraica y verbal).",
+  "transferencia-calor-mecanismos": {
+    slug: "transferencia-calor-mecanismos",
+    titulo: "Laboratorio 3D — Transferencia de Calor",
+    descripcion: "Observa conducción, convección y radiación en escenarios cotidianos; mide la temperatura en función del tiempo para cada mecanismo.",
   },
-  "limites-acercamiento": {
-    slug: "limites-acercamiento",
-    titulo: "Laboratorio 3D — El límite: a qué se acerca f(x) cuando x→a",
-    descripcion: "El límite es la idea con la que arranca el cálculo: NO importa cuánto vale f en el punto a, sino a qué número se ACERCAN los valores f(x) cuando x se aproxima a a por la izquierda y por la derecha. Este laboratorio lo vuelve tangible con un PLANO CARTESIANO flotante en 3D —rejilla con ejes y escala propia por caso, para mostrar valores reales— que se orbita, y un punto móvil P = (x, f(x)) que el alumno desliza (o anima con ▶) hasta rozar el objetivo: una cruz formada por la vertical x = a y la horizontal y = L. Una tabla de acercamiento muestra, por ambos lados, cómo f(x) se aproxima al mismo número conforme x → a. Recorre los TRES casos verbatim del ejercicio A2 (el auto en la autopista México-Querétaro, s(t) = 3t² + 5t): (a) la velocidad promedio como lim(t→2) s(t)/t = 11 km/h, que se resuelve por SUSTITUCIÓN DIRECTA porque g(t) = s(t)/t = 3t + 5 está definida en t = 2; (b) el caso 0/0 indeterminado lim(x→3) (x²−9)/(x−3) = 6, donde al sustituir x = 3 sale 0/0 (un HUECO, dibujado como un anillo abierto) pero al factorizar x²−9 = (x+3)(x−3) y cancelar el límite sí existe; y (c) el LÍMITE NOTABLE lim(x→0) sen(2x)/x = 2, que usa sen(x)/x → 1 escribiendo sen(2x)/x = 2·[sen(2x)/(2x)], con su hueco en x = 0 y la verificación numérica del enunciado (sen(0.01)/0.01 ≈ 0.99998). Cada caso trae su resolución paso a paso verbatim, la distinción entre el límite (existe) y el valor f(a) (puede no existir), y la idea del límite por la izquierda y por la derecha que deben coincidir. NOTA: el cálculo es EXACTO —f(x), el valor del límite L y las tablas de acercamiento salen de la fórmula real (en el caso notable, en radianes)—; los tres casos y sus pasos son verbatim del enunciado A2; el plano se dibuja a escala propia por caso para mostrar valores reales y el anillo abierto señala exactamente dónde f(a) no existe (0/0). Acompaña la actividad de PM-V sobre el cálculo de límites, del límite básico al 0/0 indeterminado y el límite notable.",
-  },
-  "continuidad-tres-condiciones": {
-    slug: "continuidad-tres-condiciones",
-    titulo: "Laboratorio 3D — Continuidad: las 3 condiciones, los tipos de discontinuidad y el TVI",
-    descripcion: "Una función es CONTINUA en x = a cuando se puede dibujar 'sin levantar el lápiz' en ese punto; formalmente, cuando se cumplen TRES condiciones a la vez: (1) f(a) existe, (2) el límite lim(x→a) f(x) existe (los límites laterales coinciden) y (3) ese límite es igual a f(a). Si falla cualquiera, hay DISCONTINUIDAD. Este laboratorio lo vuelve tangible con un PLANO CARTESIANO flotante en 3D —rejilla con ejes y escala propia por caso, para mostrar valores reales— que se orbita, un punto móvil P = (x, f(x)) que el alumno desliza (o anima con ▶) y un SEMÁFORO que enciende en verde o rojo cada una de las tres condiciones en x = a. El alumno alterna entre cuatro funciones para ver los tres tipos de discontinuidad y un caso continuo de control: (1) EVITABLE —el caso ancla verbatim del A2, f(x) = (x²−4)/(x−2): al sustituir x = 2 sale 0/0 (un HUECO, dibujado como anillo abierto) y f(2) no existe, pero la curva es la recta y = x + 2 y el límite sí existe (= 4); se REPARA definiendo F(2) = 4—; (2) de SALTO —una función a trozos al estilo de las tarifas por bloques de la CFE, cuyos límites laterales existen pero son distintos (2 por la izquierda, 5 por la derecha), así que el límite no existe—; (3) ESENCIAL —f(x) = 1/(x−1), con asíntota vertical: por la izquierda baja a −∞ y por la derecha sube a +∞, ningún límite lateral es finito y no se puede reparar—; y (4) CONTINUA —el polinomio f(x) = x² − 2x + 2, donde las tres condiciones se cumplen y el semáforo se pone todo en verde—. Cada función trae su clasificación, sus límites laterales y su resolución paso a paso verbatim. Un segundo modo activa el TEOREMA DEL VALOR INTERMEDIO sobre g(x) = x³ − x − 1 en [1,2] (verbatim del A2): como g es continua y g(1) = −1 < 0 < 5 = g(2), el TVI garantiza un c ∈ (1,2) con g(c) = 0; el alumno mueve el valor objetivo N entre −1 y 5 y ve que SIEMPRE existe ese c (la raíz, en N = 0, se calcula por bisección sobre la fórmula real). NOTA: el cálculo es EXACTO —f(x), los límites laterales, las tres condiciones y la raíz del TVI salen de la fórmula real—; el caso evitable (x²−4)/(x−2) y el TVI sobre g en [1,2] son verbatim del enunciado A2, mientras que los ejemplos de salto y esencial son DIDÁCTICOS (alineados con la infografía A1); el plano se dibuja a escala propia por caso para mostrar valores reales, el anillo abierto señala dónde el límite no se alcanza y la línea punteada en la esencial marca la asíntota vertical. Acompaña la actividad de PM-V sobre el análisis de la continuidad y la clasificación de discontinuidades.",
-  },
-  "derivada-secante-tangente": {
-    slug: "derivada-secante-tangente",
-    titulo: "Laboratorio 3D — La derivada: la secante que se vuelve tangente (cociente de Newton)",
-    descripcion: "La DERIVADA nace de una idea geométrica simple: el cociente de Newton [f(x+h) − f(x)] / h es la PENDIENTE de la recta SECANTE que pasa por (x, f(x)) y (x+h, f(x+h)); cuando la separación h se hace cada vez más pequeña (h → 0), esa secante se confunde con la recta TANGENTE y su pendiente es la derivada f'(x) = lim(h→0) [f(x+h) − f(x)] / h. Este laboratorio lo vuelve tangible con un PLANO CARTESIANO flotante en 3D —rejilla con ejes y escala propia por caso, para mostrar valores reales— que se orbita: el alumno fija el punto de tangencia a, ve la secante (en ámbar) y la tangente (en verde) sobre la curva, y CIERRA la separación h con un deslizador (o la anima con ▶) hasta que la secante se vuelve tangente; una tabla de acercamiento muestra, por la derecha (h > 0) y por la izquierda (h < 0), cómo la pendiente de la secante converge al mismo número: f'(a). Recorre los casos verbatim del ejercicio A2 'Derivando desde la definición: el cociente de Newton': (c) f(x) = x² —el caso ancla—, cuya derivada es f'(x) = 2x, de modo que en x = 2 la pendiente es m = f'(2) = 4, el punto de tangencia es (2, 4) y la recta tangente, por la forma punto-pendiente y − 4 = 4(x − 2), es y = 4x − 4 (con su verificación 4(2) − 4 = 4 ✓); (a) f(x) = x² + 3x, que aplicando la definición da f'(x) = 2x + 3 (la tangente es horizontal en el vértice x = −3/2); y (b) f(x) = 1/x, cuya derivada f'(x) = −1/x² es siempre negativa (la curva decrece en todo su dominio). Incluye además, como interpretación física verbatim de la lectura A1, el proyectil h(t) = −5t² + 30t: su derivada h'(t) = −10t + 30 es la VELOCIDAD (la secante es la velocidad promedio y la tangente la velocidad instantánea), que vale 20 m/s en t = 1 s y 0 m/s en t = 3 s, justo en la altura máxima. Cada caso trae su derivación paso a paso verbatim, la ecuación de la recta tangente y la lectura de la derivada como límite, como pendiente y como tasa de cambio. NOTA: el cálculo es EXACTO —la derivada f'(x) es simbólica y el cociente de Newton se evalúa con la fórmula real, así que la secante converge numéricamente a la tangente—; los casos x², x² + 3x y 1/x (con la tangente y = 4x − 4 en x = 2) son verbatim del enunciado A2 y el proyectil es la interpretación física verbatim de la lectura A1; el plano se dibuja a escala propia por caso para mostrar valores reales. Acompaña la actividad de PM-V sobre la derivada como límite del cociente diferencial y su interpretación geométrica como pendiente de la recta tangente.",
-  },
-  "reglas-derivacion": {
-    slug: "reglas-derivacion",
-    titulo: "Laboratorio 3D — La función y su derivada: las cuatro reglas",
-    descripcion: "Derivar desde la definición (el cociente de Newton) es exacto pero lento; las REGLAS DE DERIVACIÓN son los atajos que permiten derivar cualquier función rápido. Este laboratorio hace visible qué SIGNIFICA derivar con ellas: en un PLANO CARTESIANO flotante en 3D —rejilla con ejes y escala propia por caso, que se orbita— se dibujan a la vez la curva f (color del caso) y la curva de su DERIVADA f' (en ámbar, punteada), y una sonda x = a que el alumno desliza (o anima con ▶) une las dos: la ALTURA de f' en a es exactamente la PENDIENTE de la recta TANGENTE a f en a (en verde). Así se ve que la derivada no es un número suelto sino una función nueva, y que aplicar las reglas es CONSTRUIR esa curva f'. Recorre los cuatro casos verbatim del ejercicio A2 'Ejercicios de derivación con todas las reglas', cada uno con su regla: (a) POTENCIA, f(x) = 3x⁵ − 2x³ + 7x − 1, derivada término a término con (xⁿ)' = n·xⁿ⁻¹ → 15x⁴ − 6x² + 7; (b) PRODUCTO, g(x) = (x² + 1)(3x − 2), con (f·g)' = f'·g + f·g' → 9x² − 4x + 3; (c) COCIENTE, h(x) = (x² + 1)/(x − 1), con (f/g)' = (f'·g − f·g')/g² → (x² − 2x − 1)/(x − 1)² (se muestra la rama x > 1; la asíntota está en x = 1); y (d) CADENA, k(x) = (2x³ + 1)⁴, derivando de afuera hacia adentro con (f∘u)' = f'(u)·u' → 24x²(2x³ + 1)³. Cada caso trae su regla, su fórmula, la resolución paso a paso verbatim (nombrando la regla y luego el álgebra) y un panel de referencia con las cuatro reglas básicas. Mientras mueves la sonda lees en vivo f(a), la altura de f'(a) y la pendiente de la tangente, y ves que coinciden: donde f' va por encima del eje, f crece; donde va por debajo, f decrece; donde f' cruza el eje, la tangente es horizontal. NOTA: el cálculo es EXACTO —las cuatro derivadas son SIMBÓLICAS (las reglas aplicadas a mano) y la tangente usa la pendiente real f'(a)—; los cuatro casos (potencia, producto, cociente y cadena) son verbatim del enunciado A2; el plano dibuja f y f' a una escala propia por caso para que ambas curvas quepan. Acompaña la actividad de PM-V sobre la derivación con las reglas de potencia, producto, cociente y cadena. Continúa el laboratorio de la derivada como límite, que enfatiza la secante que se vuelve tangente.",
+  "transformaciones-funciones": {
+    slug: "transformaciones-funciones",
+    titulo: "Laboratorio 3D — Transformaciones de Funciones",
+    descripcion: "Aplica traslaciones, reflexiones, dilataciones y compresiones a la gráfica de funciones; relaciona cada transformación algebraica con su efecto visual.",
   },
   "trascendentes-derivacion": {
     slug: "trascendentes-derivacion",
-    titulo: "Laboratorio 3D — Derivadas de funciones trascendentes: trig, exp y log",
-    descripcion: "Las funciones polinómicas se derivan con las reglas de potencia/producto/cociente/cadena; las funciones TRASCENDENTES —seno, coseno, tangente, la exponencial eˣ y el logaritmo ln— tienen sus PROPIAS derivadas básicas, que combinadas con la cadena y el producto permiten derivar casi cualquier expresión. Este laboratorio hace visible qué SIGNIFICA derivarlas: en un PLANO CARTESIANO flotante en 3D —rejilla con ejes y escala propia por caso, que se orbita— se dibujan a la vez la curva f (color del caso) y la curva de su DERIVADA f' (en ámbar, punteada), y una sonda x = a que el alumno desliza (o anima con ▶) une las dos: la ALTURA de f' en a es exactamente la PENDIENTE de la recta TANGENTE a f en a (en verde). Recorre los cuatro casos verbatim del ejercicio A2 'Calculando derivadas de funciones trigonométricas y exponenciales', cada uno con su regla: (a) LINEALIDAD + derivadas básicas, f(x) = 3 sen x − 2 cos x + tan x, derivada término a término con (sen)'=cos, (cos)'=−sen, (tan)'=sec² → 3 cos x + 2 sen x + sec²x; (b) PRODUCTO + CADENA, g(x) = e^(2x)·cos x, con (f·g)' = f'·g + f·g' y (e^(2x))' = 2e^(2x) → e^(2x)(2 cos x − sen x); (c) CADENA en el logaritmo, h(x) = ln(x² + 1), con (ln u)' = u'/u → 2x/(x² + 1); y (d) CADENA trigonométrica, k(x) = sen(x³), derivando de afuera hacia adentro con (sen u)' = cos(u)·u' → 3x² cos(x³). Cada caso trae su regla, su fórmula, la resolución paso a paso verbatim (nombrando la regla y luego el álgebra) y un panel de referencia con las derivadas básicas trascendentes. Mientras mueves la sonda lees en vivo f(a), la altura de f'(a) y la pendiente de la tangente, y ves que coinciden: donde f' va por encima del eje, f crece; donde va por debajo, f decrece; donde f' cruza el eje, la tangente es horizontal. NOTA: el cálculo es EXACTO —las cuatro derivadas son SIMBÓLICAS (las derivadas básicas y las reglas aplicadas a mano) y la tangente usa la pendiente real f'(a)—; los cuatro casos son verbatim del enunciado A2; el plano dibuja f y f' a una escala propia por caso para que ambas curvas quepan, y en la tangente (tan x) el plano se queda dentro de ±1.05 rad para no tocar la asíntota de x = π/2. Acompaña la actividad de PM-V sobre la derivación de funciones trigonométricas, exponenciales y logarítmicas. Continúa el laboratorio de las cuatro reglas de derivación, ampliándolas al universo de las funciones trascendentes.",
+    titulo: "Laboratorio 3D — Derivación de Funciones Trascendentes",
+    descripcion: "Deriva funciones exponenciales, logarítmicas, trigonométricas e inversas; observa la forma de cada derivada y aplícalo a problemas de optimización.",
   },
-  "extremos-inflexion": {
-    slug: "extremos-inflexion",
-    titulo: "Laboratorio 3D — Análisis de una función: máximos, mínimos e inflexión",
-    descripcion: "Derivar no es el final: con la PRIMERA y la SEGUNDA derivada se hace el ANÁLISIS COMPLETO de una función —dónde sube, dónde baja, dónde están sus picos y valles y cómo se curva—. Este laboratorio toma una sola función, f(x) = x³ − 3x² − 9x + 5 (verbatim del ejercicio A2 'Análisis completo de función: encontrando extremos e inflexión'), y la disecciona en un PLANO CARTESIANO flotante en 3D que se orbita: dibuja a la vez la curva f (turquesa), su derivada f' (en ámbar, punteada) y su SEGUNDA derivada f'' (en violeta, punteada), con marcadores fijos en los tres puntos notables —máximo local (−1, 10) en verde, punto de inflexión (1, −6) en violeta y mínimo local (3, −22) en rojo—. Una sonda x = a que el alumno desliza, anima con ▶ o lanza directo a un punto notable lee en vivo las TRES alturas f(a), f'(a) y f''(a) y traza la recta tangente a f (en verde): así se VE que donde f' = 0 la tangente es horizontal (punto crítico) y que el signo de f'' clasifica ese crítico. Recorre el análisis paso a paso verbatim del A2: (a) f'(x) = 3x² − 6x − 9 = 3(x − 3)(x + 1) = 0 → críticos x = −1 y x = 3; (b) criterio de la 2.ª derivada con f''(x) = 6x − 6: f''(−1) = −12 < 0 → MÁXIMO local (−1, 10), f''(3) = 12 > 0 → MÍNIMO local (3, −22); (c) inflexión donde f'' cambia de signo: f''(x) = 0 → x = 1, y como f''(0) = −6 < 0 y f''(2) = 6 > 0 sí cambia → punto de inflexión (1, −6); (d) intervalos: f crece en x < −1 ó x > 3, decrece en −1 < x < 3, es cóncava hacia abajo (∩) en x < 1 y cóncava hacia arriba (∪) en x > 1. La gran idea que el laboratorio hace visible: la altura de f'(x) es la PENDIENTE de f y la altura de f''(x) es la pendiente de f' —leerlas juntas describe TODA la forma de la curva—; donde f' va por encima del eje, f sube, donde va por debajo, f baja, y donde f' cruza el eje hay un pico o un valle que f'' distingue. NOTA: el cálculo es EXACTO —la función y sus dos derivadas son verbatim del enunciado A2 y todos los valores (críticos x = −1 y x = 3, inflexión x = 1, los puntos (−1, 10), (3, −22), (1, −6) y los intervalos) son simbólicos cerrados resueltos a mano—; el plano usa una escala vertical comprimida para que las tres curvas quepan, así que en los bordes f' y f'' salen del recuadro visible (sus cruces por el eje, que es lo importante, quedan centrados). Cierra la secuencia de derivación de PM-V (la derivada como límite → las cuatro reglas → funciones trascendentes) aplicándola al análisis y la optimización de funciones.",
+  "triangulo-rectangulo": {
+    slug: "triangulo-rectangulo",
+    titulo: "Laboratorio 3D — Triángulo Rectángulo",
+    descripcion: "Calcula las razones trigonométricas seno, coseno y tangente en triángulos rectángulos de distintas medidas; aplícalo para medir alturas inaccesibles.",
   },
-  "optimizacion-cilindro": {
-    slug: "optimizacion-cilindro",
-    titulo: "Laboratorio 3D — Optimización con la derivada: la lata de mínimo material",
-    descripcion: "OPTIMIZAR es encontrar el mejor valor posible —un máximo o un mínimo— de una magnitud sujeta a una restricción, y la derivada es la herramienta que lo localiza. Este laboratorio toma el problema verbatim del ejercicio A2 'Resolviendo problemas de optimización en contextos reales' (una empresa de envases como Vitro en Monterrey quiere una caja cilíndrica SIN TAPA de volumen V = 1000 cm³ que use el MÍNIMO material) y lo vuelve manipulable en 3D: a la IZQUIERDA, una LATA cilíndrica abierta cuyo radio r controla el alumno —y cuya altura h se recalcula sola por la restricción V = π r² h = 1000, pasando de alta y delgada a baja y ancha—, con su base circular (ámbar) y su pared lateral (violeta) como el material a minimizar; a la DERECHA, un PLANO CARTESIANO flotante que se orbita con la curva del material total A(r) = π r² + 2000/r (turquesa) y, opcionalmente, su descomposición en base π r² (que CRECE con r) y lateral 2000/r (que BAJA con r), un marcador fijo en el MÍNIMO y una sonda r que traza la recta tangente a A —horizontal justo en el óptimo, porque ahí A'(r) = 0—. El alumno desliza r, lo anima con ▶ o salta directo al óptimo y lee en vivo r, h, el volumen (que se mantiene en 1000) y el material A. Resolución paso a paso verbatim del A2: (1) plantear A = π r² + 2π r h con la restricción V = π r² h = 1000 → h = 1000/(π r²); (2) reducir a una variable: A(r) = π r² + 2000/r; (3) derivar e igualar a cero: A'(r) = 2π r − 2000/r² = 0 → r³ = 1000/π; (4) r = (1000/π)^(1/3) ≈ 6.83 cm; (5) h = 1000/(π r²) ≈ 6.83 cm, es decir h = r, y el material mínimo es A = 3π r² ≈ 439.3 cm². La gran idea que el laboratorio hace visible: el material total se reparte entre una base que crece y una pared que baja, y el mínimo está justo donde el ahorro de una compensa el aumento de la otra —donde la tangente a A(r) se vuelve horizontal—. NOTA: el cálculo es EXACTO —el problema (lata sin tapa, V = 1000 cm³) es verbatim del enunciado A2 y el óptimo es simbólico cerrado: r = (1000/π)^(1/3), h = r y A = 3π r²—; en un cilindro SIN tapa el óptimo cumple h = r (en uno cerrado, con dos tapas, sería h = 2r). La lata 3D usa una escala fija para caber en el recuadro y gira para apreciar que está abierta arriba; las medidas en cm son las reales. Acompaña la actividad de PM-V sobre la resolución de problemas de optimización en contextos reales, y aplica toda la secuencia de derivación al diseño con mínimo costo.",
+  "valor-posicional": {
+    slug: "valor-posicional",
+    titulo: "Laboratorio 3D — Valor Posicional",
+    descripcion: "Descompone números en unidades, decenas, centenas y potencias de diez; convierte entre sistemas decimal, binario y hexadecimal.",
   },
-  "diferencial-linealizacion": {
-    slug: "diferencial-linealizacion",
-    titulo: "Laboratorio 3D — El diferencial: la recta tangente como aproximación",
-    descripcion: "El DIFERENCIAL es la última pieza de PM-V: la idea de que, cerca de un punto base a, la RECTA TANGENTE es casi idéntica a la curva, así que sirve para calcular sin calculadora y para estimar errores de medición. Este laboratorio toma verbatim el ejercicio A2 'Aplicando diferenciales para estimar errores y valores' y lo vuelve manipulable en 3D con DOS MODOS. MODO «Estimar un valor»: un PLANO CARTESIANO flotante que se orbita, con la curva f (turquesa para √x, ámbar para eˣ) y su LINEALIZACIÓN L(x) = f(a) + f'(a)(x − a) —la recta tangente en el punto base, punteada—; el alumno desliza una sonda en x y ve a la vez DOS puntos: el valor REAL f(x) sobre la curva (verde) y el ESTIMADO L(x) sobre la tangente (rosa), con la brecha entre ambos resaltada como ERROR (rojo), más el triángulo del diferencial (cateto dx horizontal y cateto dy = f'(a)·dx vertical). Con el botón «Ir al punto del problema» salta a los casos verbatim: √(9.04) con f(x) = √x en a = 9 → L(x) = 3 + (1/6)(x − 9) → 3.0067 (real ≈ 3.00666, error < 0.0001), y e^(0.1) con f(x) = eˣ en a = 0 → L(x) = 1 + x → 1.1 (real ≈ 1.1052, error < 0.5 %); al alejar x del punto base se VE crecer el error. MODO «Estimar un error»: una ESFERA 3D de radio r con una CÁSCARA translúcida de grosor dr —el diferencial dV = 4π r²·dr es exactamente el volumen de esa cáscara delgada (superficie × grosor)—; con la medida del problema r = 5.0 ± 0.05 cm se obtiene dV = 4π(25)(0.05) = 5π ≈ 15.71 cm³ (el error máximo del volumen) y el error relativo dV/V = 3·dr/r = 3 %. Resolución paso a paso verbatim del A2 en ambos casos. La gran idea que el laboratorio hace visible: el diferencial dy = f'(a)·dx (medido SOBRE la tangente) aproxima el cambio real Δy = f(a + dx) − f(a), y para dx pequeño casi coinciden —por eso L(x) estima f cerca de a y dy propaga la incertidumbre de una medición—; en la esfera, el exponente 3 de r³ amplifica el error (1 % en el radio → 3 % en el volumen). NOTA: el cálculo es EXACTO —las funciones (√x, eˣ) y la esfera son verbatim del enunciado A2, y la linealización L(x) = f(a) + f'(a)(x − a) y el diferencial dV = 4π r²·dr son simbólicos cerrados—; en el modo esfera el grosor dr se dibuja EXAGERADO para que la cáscara sea visible (el valor real ±0.05 cm es minúsculo frente a r = 5 cm), pero los números en cm y cm³ son los reales. Cierra la UAC PM-V (Cálculo Diferencial) enlazando toda la secuencia —límite, derivada, reglas, trascendentes, extremos y optimización— con su aplicación al cálculo aproximado y la propagación de errores.",
+  "variables-poblacion-muestra-3d": {
+    slug: "variables-poblacion-muestra-3d",
+    titulo: "Laboratorio 3D — Estadística: variables, población y muestra",
+    descripcion: "Una máquina clasificadora de variables, el censo de una escuela de 1 500 estudiantes contra encuestas de 20 a 500, y la tabla de frecuencias con intervalos para distinguir la estadística descriptiva de la inferencial.",
   },
-  "dcl-leyes-newton": {
-    slug: "dcl-leyes-newton",
-    titulo: "Laboratorio 3D — Diagrama de cuerpo libre: las leyes de Newton",
-    descripcion: "Un DIAGRAMA DE CUERPO LIBRE aísla un objeto y dibuja TODAS las fuerzas que actúan sobre él; sumadas vectorialmente dan la fuerza neta ΣF, y la 2ª ley de Newton la liga al movimiento: si ΣF = 0 hay EQUILIBRIO (a = 0, reposo o velocidad constante, 1ª ley), y si ΣF ≠ 0 el cuerpo acelera con a = ΣF/m. Este laboratorio toma verbatim el ejercicio A2 'Simulación de fuerzas: diagrama de cuerpo libre interactivo' y lo vuelve manipulable en 3D con TRES ESCENARIOS que el alumno orbita, cada uno con su DCL dibujado como flechas a escala (su largo es proporcional a la fuerza en newtons, así que se comparan entre sí). ESCENARIO «Plano horizontal»: una caja sobre el suelo con peso W = m·g (rojo), normal N = m·g (verde), una fuerza aplicada F (violeta) y la fricción f (naranja) que se le opone; mientras F ≤ f_s,máx = μ_s·N la caja NO arranca (la estática iguala a F), y al superarla aparece la cinética f_k = μ_k·N y la fuerza neta ΣF = F − f_k que la acelera. ESCENARIO «Plano inclinado»: la misma caja sobre una rampa a θ, con el peso descompuesto en su parte perpendicular (la que la superficie sostiene, N = m·g·cosθ < m·g) y su parte a favor del plano (m·g·senθ); la caja desliza cuando m·g·senθ supera f_s,máx, con a = g(senθ − μ_k·cosθ). ESCENARIO «Sistema con polea»: un bloque m₁ sobre una mesa unido por una cuerda que pasa por una polea ideal a una masa colgante m₂; se ve la MISMA tensión T tirando de ambos cuerpos (3ª ley, acción–reacción) y una sola aceleración del sistema a = (m₂·g − μ_k·m₁·g)/(m₁ + m₂), con T = m₁·(a + μ_k·g) = m₂·(g − a). El alumno mueve masa, ángulo, fuerza aplicada y los coeficientes de fricción estática y cinética, anima con ▶ la variable motriz de cada escenario y lee en vivo W, N, f, T, ΣF y a, con un aviso de EQUILIBRIO cuando la fricción estática gana. Las tres preguntas de reflexión verbatim del A2 guían el análisis (qué pasa con a al subir la masa con la misma ΣF; por qué la fricción cinética siempre se opone al movimiento; cómo cambia la normal en el plano inclinado frente al horizontal). NOTA: la física es EXACTA de cálculo cerrado con g = 9.81 m/s², poleas y cuerdas ideales (sin masa ni rozamiento en la polea, cuerda inextensible) y fricción de Coulomb (f_k = μ_k·N, estática hasta f_s,máx = μ_s·N); los tres escenarios y las preguntas son verbatim del enunciado A2. Abre la UAC CNEYT-V haciendo visible, fuerza por fuerza, cómo el diagrama de cuerpo libre traduce una situación real en las leyes de Newton.",
+  "viaje-paquete-internet-3d": {
+    slug: "viaje-paquete-internet-3d",
+    titulo: "Laboratorio 3D — El viaje de un paquete por Internet",
+    descripcion: "Sigue un mensaje partido en paquetes por DNS, routers y el cable submarino MAREA, envía una consulta segura a una IA y verifica su respuesta, y decide la vida útil y el destino final de tu teléfono.",
   },
-  "mrua-acelerar-frenar": {
-    slug: "mrua-acelerar-frenar",
-    titulo: "Laboratorio 3D — Cinemática del MRUA: acelerar y frenar",
-    descripcion: "El MOVIMIENTO RECTILÍNEO UNIFORMEMENTE ACELERADO (MRUA) es aquel en el que la aceleración es constante: la velocidad cambia en partes iguales en tiempos iguales, y todo el movimiento queda descrito por tres ecuaciones —v = v₀ + a·t (velocidad), x = v₀·t + ½·a·t² (posición) y v² = v₀² + 2·a·x (sin el tiempo)—. Este laboratorio toma verbatim el ejercicio A2 (la autopista Puebla–CDMX) y lo vuelve un recorrido en 3D que el alumno reproduce con ▶ o arrastrando la línea de tiempo: un automóvil parte del reposo (v₀ = 0), ACELERA uniformemente a a₁ = 3 m/s² durante t₁ = 10 s —alcanzando v = v₀ + a₁·t₁ = 30 m/s ≈ 108 km/h tras recorrer x = ½·a₁·t₁² = 150 m— y después FRENA con una desaceleración de a₂ = 5 m/s² hasta detenerse, lo que toma t₂ = v/a₂ = 6 s y suma x₂ = v²/(2·a₂) = 90 m, para una distancia total de 240 m. La carretera se reescala automáticamente a la distancia total para verse completa, con hitos en la salida, el fin de la aceleración y el alto total; sobre el auto, una flecha azul muestra la velocidad (su largo ∝ v) y otra la aceleración (verde hacia adelante al acelerar, roja hacia atrás al frenar, con las luces de stop encendidas), mientras una estela marca la distancia ya recorrida. En paralelo se dibujan las TRES REPRESENTACIONES GRÁFICAS del MRUA —posición-tiempo (una parábola que sube y se aplana), velocidad-tiempo (una recta que sube y baja, cuya pendiente es la aceleración y cuya área es la distancia) y aceleración-tiempo (un escalón de +a₁ a −a₂)— todas con una sonda sincronizada al instante actual. El alumno mueve la aceleración a₁, la duración t₁ y el frenado a₂ y ve cómo cambian en vivo la velocidad final, los tiempos y las distancias, comprobando que la distancia de frenado crece con el CUADRADO de la velocidad. NOTA: la cinemática es EXACTA de cálculo cerrado con v₀ = 0; se desprecian la resistencia del aire y el tiempo de reacción, y el frenado es a aceleración constante; los valores y el procedimiento paso a paso son verbatim del enunciado A2. Abre la UAC CNEYT-V conectando el álgebra del MRUA con lo que se ve en la carretera y en las gráficas.",
-  },
-  "gravitacion-universal": {
-    slug: "gravitacion-universal",
-    titulo: "Laboratorio 3D — Gravitación universal: fuerza, peso y órbitas",
-    descripcion: "La LEY DE GRAVITACIÓN UNIVERSAL dice que dos masas se atraen con una fuerza F = G·M·m/r²: proporcional al producto de las masas e inversamente proporcional al CUADRADO de la distancia entre sus centros. Este laboratorio toma verbatim el ejercicio A2 'Cálculos de gravitación: fuerza, peso y órbitas' (sistema Tierra–Luna y satélites Mexsat) y lo vuelve manipulable en 3D con TRES MODOS, uno por inciso. MODO «Fuerza»: la Tierra y la Luna con dos flechas iguales y opuestas (3ª ley de Newton: la atracción es mutua) cuyo largo ∝ la fuerza; el alumno acerca o aleja la Luna y VE caer la fuerza con el inverso del cuadrado —al duplicar la distancia, la fuerza baja a la cuarta parte—, comprobando el caso verbatim F = (6.674×10⁻¹¹)(5.97×10²⁴)(7.34×10²²)/(3.84×10⁸)² ≈ 1.98×10²⁰ N. MODO «Peso»: un astronauta de pie sobre la Luna, Marte, la Tierra o Júpiter, con la flecha del peso W = m·g (azul) y una flecha fantasma del peso terrestre para comparar; al cambiar de cuerpo y de masa se ve que la MASA no cambia (sigue siendo 70 kg) pero el PESO sí —en la Luna 70 kg pesan 113.4 N ≈ 11.6 kg-fuerza, apenas 1/6 que en la Tierra—. MODO «Órbita»: un satélite Mexsat girando alrededor de la Tierra con un punto dorado (una antena) que rota en la superficie cada 24 h; el alumno desliza la altura y reproduce la órbita, y descubre por qué a 35 786 km el período orbital iguala la rotación terrestre (T = 2π·√(r³/GM) = 24 h) y el satélite queda GEOESTACIONARIO —fijo sobre el mismo punto, por eso las antenas de SKY/Dish no necesitan seguimiento—; a otra altura (LEO 400 km → T ≈ 92 min) el satélite se desfasa y cruza el cielo. Lee en vivo distancia, fuerza, masa, gravedad, peso, kg-fuerza, altura, período y rapidez orbital, con el procedimiento paso a paso, las respuestas (a/b/c) y las ideas clave verbatim del A2. NOTA: la física es EXACTA de cálculo cerrado —Gravitación universal (F = G·M·m/r²), peso (W = m·g, con g_Tierra = 9.81 m/s²) y órbita circular con la 3ª ley de Kepler (T = 2π·√(r³/GM), v = √(GM/r))—; los tamaños y distancias del sistema solar NO están a escala real (la Luna está mucho más lejos de lo que cabe en pantalla) y las flechas son proporcionales a sus magnitudes pero acotadas para verse, mientras que el radio de la órbita sí es proporcional al radio terrestre. Los valores, datos y el procedimiento son verbatim del enunciado A2. Conecta la gravitación con el sistema Tierra–Luna, las mareas y los satélites mexicanos.",
-  },
-  "ondas-amplitud-frecuencia": {
-    slug: "ondas-amplitud-frecuencia",
-    titulo: "Laboratorio 3D — Ondas: amplitud, frecuencia y longitud de onda",
-    descripcion: "Una ONDA transporta ENERGÍA sin transportar materia: las partículas del medio solo oscilan en su sitio y lo que viaja es la perturbación, gobernada por la relación fundamental v = λ·f. Este laboratorio convierte verbatim la simulación A2 'Simulación de ondas: amplitud, frecuencia y longitud de onda' en un generador manipulable en 3D con TRES MODOS. MODO «Onda»: el alumno ajusta la amplitud A, la frecuencia f (1–20 Hz) y el medio de propagación (aire 340 m/s, agua 1480 m/s o acero ≈5000 m/s) y VE cómo la longitud de onda obedece a λ = v/f —al DUPLICAR la frecuencia, λ se reduce a la mitad; al cambiar a un medio más rápido, λ crece—, con una regla de λ y otra de A sobre la onda y una esfera blanca trazadora que SOLO sube y baja para evidenciar que el medio no viaja. MODO «Interferencia»: dos ondas iguales se superponen y, deslizando el desfase φ, se pasa de interferencia CONSTRUCTIVA (en fase, se suman: A_res = |2A·cos(φ/2)|) a DESTRUCTIVA (en oposición, se cancelan); un interruptor activa la ONDA ESTACIONARIA —dos ondas en sentidos opuestos— mostrando los NODOS fijos (grises) y los ANTINODOS de máxima oscilación (morados) separados λ/2. MODO «Doppler»: una fuente en movimiento emite frentes de onda circulares que se COMPRIMEN por delante (más frecuencia, tono agudo) y se ESTIRAN por detrás (más grave); el alumno cambia la frecuencia (300–1000 Hz) y la rapidez de la fuente (0–120 m/s) y lee las frecuencias percibidas al acercarse y al alejarse (f′ = f·v/(v∓vs)) —así suena la sirena de una ambulancia al pasar—. Lee en vivo f, v, λ, T, amplitud resultante y las frecuencias Doppler, con el ejemplo resuelto (680 Hz → λ = 0.5 m), las instrucciones, las preguntas de reflexión y las ideas clave verbatim del A2 —incluyendo cómo el SASMEX aprovecha que las ondas sísmicas P (≈8 km/s) llegan antes que las S (≈4 km/s) para alertar a la CDMX—. NOTA: la física es EXACTA de cálculo cerrado (v = λ·f, superposición y efecto Doppler clásico, v_sonido = 340 m/s); la onda en pantalla es ESQUEMÁTICA —la longitud de onda visual está acotada para que quepa (por eso en acero se ve muy larga)— pero los valores numéricos de los paneles son exactos. El enunciado, las instrucciones, el ejemplo y las preguntas son verbatim de la actividad A2. Conecta el movimiento ondulatorio con el sonido, el mar y los terremotos.",
-  },
-  "espectro-electromagnetico": {
-    slug: "espectro-electromagnetico",
-    titulo: "Laboratorio 3D — El espectro electromagnético: de las ondas de radio a los rayos gamma",
-    descripcion: "El espectro electromagnético abarca TODAS las longitudes de onda de la radiación EM —de las ondas de radio (kilómetros) a los rayos gamma (picómetros)— y todas viajan a la misma rapidez: la de la luz, 299 792 km/s. Este laboratorio convierte la infografía A1 'El espectro electromagnético: de las ondas de radio a los rayos gamma' en un explorador manipulable en 3D con TRES MODOS. MODO «Espectro»: el alumno recorre la frecuencia en escala logarítmica (10⁴–10²² Hz) y VE cómo, al subir la frecuencia, la longitud de onda baja (c = λ·f) y la energía del fotón sube (E = h·f), recorriendo las 7 bandas (radio, microondas, infrarrojo, visible, ultravioleta, rayos X y gamma) con su umbral de RADIACIÓN IONIZANTE marcado a partir de los rayos X. MODO «Visible»: acerca la diminuta franja de luz visible (380–700 nm) —del violeta (más energía) al rojo (menos energía)— mostrando el color real, su frecuencia y su energía. MODO «Aplicaciones»: ubica 11 aplicaciones reales de México sobre el espectro (Radio FM, WiFi, horno de microondas, 5G en 3.5 GHz subastado por el IFT en 2023, el GTM del INAOE en el Volcán Sierra Negra, sensores IR de incendios GOES/MODIS, control remoto, OAN de la UNAM en San Pedro Mártir, UV y la capa de ozono de Mario Molina, rayos X del IMSS/ISSSTE y gamma del ININ en braquiterapia), clasificadas en cotidianas, científicas y biomédicas. Lee en vivo f, λ, energía y banda, con el ejemplo resuelto (FM 100 MHz → λ = 3 m), los pasos para explorar, el glosario, el contexto mexicano y las preguntas de reflexión verbatim de la infografía A1 —incluyendo la contribución del GTM al Event Horizon Telescope que en 2019 capturó la primera imagen de un agujero negro (M87*)—. NOTA: la física es EXACTA de cálculo cerrado (c = λ·f y E = h·f, con c = 3×10⁸ m/s y h = 6.626×10⁻³⁴ J·s); la onda y la barra en pantalla son ESQUEMÁTICAS —la longitud de onda visual está comprimida en escala logarítmica para que las 18 décadas del espectro quepan en una sola imagen— pero los valores numéricos de los paneles son exactos. Las ideas clave, el glosario y las preguntas son verbatim de la infografía A1.",
-  },
-  "optica-lentes-espejos": {
-    slug: "optica-lentes-espejos",
-    titulo: "Laboratorio 3D — Óptica geométrica: lentes, espejos y formación de imágenes",
-    descripcion: "La óptica geométrica modela la luz con rayos que viajan en línea recta hasta que una superficie los refleja (espejos) o los refracta (lentes y cambios de medio). Este laboratorio convierte la simulación A2 'Simulación de óptica: lentes, espejos y formación de imágenes' en un banco óptico manipulable en 3D con TRES MODOS. MODO «Lentes»: el alumno coloca un objeto a la distancia dₒ frente a una lente convergente o divergente, traza los dos rayos principales y VE dónde y cómo se forma la imagen —real e invertida cuando el objeto está lejos del foco (cámara), virtual y aumentada cuando está dentro del foco (lupa)—, verificando la ecuación de Gauss 1/f = 1/dₒ + 1/dᵢ y el aumento M = −dᵢ/dₒ. MODO «Espejos»: espejo plano (imagen virtual del mismo tamaño detrás), cóncavo (real e invertida como un telescopio, o virtual aumentada como el espejo de afeitar) y convexo (siempre virtual, menor y con más campo, como el retrovisor); la imagen real se forma del MISMO lado del objeto porque la luz se refleja. MODO «Refracción»: aplica la ley de Snell n₁·sen θ₁ = n₂·sen θ₂ entre dos medios (aire 1.00, agua 1.33, vidrio 1.50, diamante 2.42) variando el ángulo de incidencia, y descubre la reflexión total interna al superar el ángulo crítico θ_c = arcsen(n₂/n₁): el principio de la fibra óptica que usan TELMEX y Totalplay. Lee en vivo f, dₒ, dᵢ, M, los índices n y los ángulos, con el ejemplo resuelto (agua→vidrio 30° → 26.3°, de la lectura A1), los pasos para explorar, el glosario, el contexto mexicano y las preguntas de reflexión verbatim de la simulación A2. NOTA: la física es EXACTA de cálculo cerrado (ecuación de las lentes/espejos delgados de Gauss y ley de Snell); el trazado de rayos en pantalla es ESQUEMÁTICO (construcción paraxial con dos rayos principales, distancias en escala visual y símbolos convencionales de lente/espejo) pero los valores numéricos de los paneles son exactos. Las instrucciones y las preguntas son verbatim de la simulación A2; el ejemplo es la pregunta de comprensión 2 de la lectura A1; las ideas clave y el glosario se basan en la lectura A1.",
-  },
-  "electromagnetismo-ohm-faraday": {
-    slug: "electromagnetismo-ohm-faraday",
-    titulo: "Laboratorio 3D — Electromagnetismo: Ohm, Faraday y motores",
-    descripcion: "La electricidad y el magnetismo son dos caras del mismo fenómeno: con ellos funcionan los circuitos de tu casa, las plantas que generan la luz y los motores que mueven todo. Este laboratorio convierte el ejercicio A2 'Calculando electromagnetismo: Ohm, Faraday y motores' en un banco manipulable en 3D con TRES MODOS. MODO «Circuito»: el alumno conecta una resistencia a la red de CFE (127 V) y, con la ley de Ohm I = V/R y la potencia P = V·I = I²R = V²/R, lee la corriente, la potencia, la energía en kWh y el costo en pesos —con el caso A2 (470 Ω a 120 V durante 8 h a $1.50/kWh → I ≈ 0.255 A, P ≈ 30.6 W, 0.245 kWh, $0.37) y electrodomésticos reales (foco LED, refrigerador, microondas, calentador) modelados como su resistencia equivalente—. MODO «Generador»: una bobina de N vueltas gira en un campo magnético B y produce una FEM alterna por inducción de Faraday FEM = N·B·A·ω·sen(ωt), con ω = 2πf; al subir N, B, el área A o la frecuencia f, el alumno VE crecer la onda senoidal y la FEM máxima y eficaz —el principio de las hidroeléctricas como la presa Chicoasén (Río Grijalva, Chiapas, 2400 MW)—. MODO «Motor»: convierte energía eléctrica en mecánica con eficiencia η (P_mec = η·P_elec) y muestra en barras la potencia útil (verde) frente al calor perdido (rojo), con el caso A2 del Metro CDMX (150 kW al 92 % → 138 kW ≈ 185 hp, 12 kW de pérdida) y la comparación contra un motor de combustión (~35 %). Lee en vivo V, I, P, energía, costo, FEM, ω, P_mec, hp y eficiencia, con los dos ejemplos resueltos verbatim del ejercicio A2, los pasos para explorar, el glosario, el contexto mexicano (Sistema Eléctrico Nacional, transmisión a 400 kV, transformadores) y las preguntas de reflexión basadas en la lectura A1. NOTA: la física es EXACTA de cálculo cerrado (ley de Ohm V = I·R, potencia P = V·I = I²R = V²/R, energía = P·t en kWh, FEM senoidal FEM = N·B·A·ω·sen(ωt) y balance de eficiencia P_mec = η·P_elec); la animación 3D es ESQUEMÁTICA —la rapidez de los electrones, el giro de la bobina/rotor y el brillo de las lámparas usan escalas visuales, y los electrodomésticos se modelan como una resistencia equivalente a la red de CFE— pero los valores numéricos de los paneles son exactos. Los ejemplos resueltos son verbatim del ejercicio A2; las ideas clave, el glosario y el contexto se basan en la lectura A1.",
-  },
-  "genetica-mendeliana-punnett": {
-    slug: "genetica-mendeliana-punnett",
-    titulo: "Laboratorio 3D — Genética mendeliana: el cuadro de Punnett",
-    descripcion: "Las leyes de Mendel explican cómo se heredan los rasgos de padres a hijos, y el cuadro de Punnett es la herramienta para predecir la descendencia. Este laboratorio convierte el ejercicio A2 'Cruce monohíbrido Aa × Aa' en una mesa de cruzamientos manipulable en 3D con TRES MODOS. MODO «Monohíbrido»: el alumno elige el genotipo de cada progenitor (AA, Aa o aa) para un gen —como el color de la flor del guisante de Mendel— y ve llenarse el cuadro de Punnett 2×2 con flores coloreadas por su fenotipo; con el preajuste del ejercicio A2 (Aa × Aa) obtiene la proporción genotípica 1 AA : 2 Aa : 1 aa, la fenotípica 3 : 1 y la probabilidad de homocigoto recesivo P(aa) = 25 %. Incluye la herencia NO mendeliana: dominancia incompleta (boca de dragón roja × blanca → rosa, fenotipo intermedio, proporción 1:2:1) y codominancia (grupo sanguíneo AB, ambos alelos a la vez). MODO «Dihíbrido»: cruza dos genes a la vez (AaBb × AaBb, color y forma de la semilla), llena el cuadro 4×4 de 16 casillas y descubre la proporción fenotípica 9 : 3 : 3 : 1 de la segunda ley de Mendel (surtido independiente). MODO «Ligado al sexo»: cruza el daltonismo (X^D X^d × X^D Y) con cromosomas sexuales en 3D, separa hijas e hijos y calcula por qué el daltonismo afecta más a los hombres (un solo X^d ya los hace daltónicos, una mujer necesita dos). Lee en vivo las probabilidades de cada genotipo y fenotipo, con el ejemplo resuelto verbatim del ejercicio A2 y del glosario A5, los pasos para explorar, el glosario, el contexto de Mendel y las preguntas de reflexión basadas en la lectura A1. NOTA: la genética es EXACTA de conteo cerrado (cada casilla del cuadro de Punnett tiene la misma probabilidad; las proporciones 1:2:1, 3:1 y 9:3:3:1 y los porcentajes de los paneles son exactos); la escena 3D es ESQUEMÁTICA —las flores, semillas y cromosomas son representaciones visuales para distinguir fenotipos y sexos, no están a escala biológica— pero los valores numéricos son exactos. El ejemplo resuelto es verbatim del ejercicio A2 y de la actividad final del glosario A5; las ideas clave, el glosario y el contexto se basan en la lectura A1.",
-  },
-  "celula-organelos-3d": {
-    slug: "celula-organelos-3d",
-    titulo: "Laboratorio 3D — La célula: organelos y funciones",
-    descripcion: "Todos los seres vivos estamos hechos de células, y dentro de ellas los organelos trabajan como los órganos de un cuerpo. Este laboratorio convierte la infografía A1 'Células procariota y eucariota: organelos y funciones' en un visor 3D manipulable con TRES TIPOS DE CÉLULA. MODO «Eucariota animal»: una célula con núcleo (envoltura nuclear doble y 46 cromosomas en el humano), mitocondrias (respiración celular y producción de ATP, con su propio ADN circular), retículo endoplasmático rugoso y liso, aparato de Golgi, lisosomas y ribosomas —sin pared celular—. MODO «Eucariota vegetal»: además de lo anterior, pared celular de celulosa, cloroplastos (fotosíntesis, con grana de tilacoides) y una vacuola central que ocupa hasta el 90 % del volumen. MODO «Procariota»: SIN núcleo —su ADN es una sola molécula circular que flota en el citoplasma (nucleoide)—, ribosomas 70S, membrana y pared, con forma de bastón; es el tipo de célula más antiguo (~3,500 millones de años) y se reproduce por fisión binaria. El alumno gira la cámara y hace clic en cualquier organelo para leer su función verbatim, compara qué estructuras comparten y cuáles son exclusivas con la tabla procariota/eucariota (núcleo, ADN, ribosomas 70S/80S, organelos, tamaño) y dimensiona con la barra de tamaño (procariota 0.5–5 μm frente a eucariota 10–100 μm). Incluye el contexto del ajolote de Xochimilco (Ambystoma mexicanum): la UNAM secuenció su genoma —el mayor conocido, 32,000 millones de pares de bases, 10× el humano— y estudia sus genes de regeneración, mientras quedan menos de 1,000 individuos silvestres. NOTA: las funciones de los organelos son VERBATIM —las del núcleo, mitocondria, cloroplasto, RE y Golgi provienen del glosario A5; las de membrana, pared, ribosomas, lisosomas, vacuola y nucleoide, de la infografía A1—, igual que la tabla comparativa y la barra de tamaño; la célula en 3D es ESQUEMÁTICA: las formas, colores, posiciones y el número de organelos son representaciones visuales (no a escala biológica) para identificarlos y comparar los tres tipos de célula. Las ideas clave, el glosario, el contexto del ajolote y las preguntas para reflexionar son de la lectura A1.",
-  },
-  "metabolismo-celular-3d": {
-    slug: "metabolismo-celular-3d",
-    titulo: "Laboratorio 3D — Metabolismo celular: respiración y fotosíntesis",
-    descripcion: "El metabolismo es el conjunto de reacciones con que la célula obtiene y usa energía. Este laboratorio convierte el ejercicio A2 'ATP total en respiración aerobia' en un visor 3D recorrible paso a paso, con TRES PROCESOS. MODO «Respiración aerobia» (mitocondria, con O₂): sigue 1 molécula de glucosa por la glucólisis (citosol, +2 ATP), el ciclo de Krebs (matriz mitocondrial, +2 ATP) y la cadena transportadora de electrones (membrana interna, +32 ATP); el contador de ATP acumulado demuestra en vivo el ejercicio A2: 2 + 2 + 32 = 36 ATP por glucosa. MODO «Fotosíntesis» (cloroplasto, con luz): la fase lumínica en los tilacoides fotoliza el agua y produce ATP, NADPH y O₂, y el ciclo de Calvin en el estroma fija el CO₂ con la RuBisCO para fabricar glucosa (6CO₂ + 6H₂O + luz → C₆H₁₂O₆ + 6O₂); no rinde ATP neto para la célula, su producto energético es la glucosa. MODO «Fermentación» (citosol, sin O₂): solo glucólisis seguida de fermentación láctica o alcohólica para regenerar NAD⁺ —apenas 2 ATP por glucosa, 18 veces menos que la respiración—. El alumno avanza con ‹ › o haciendo clic en cada etapa de la ruta, gira la mitocondria (con sus crestas) y el cloroplasto (con sus grana de tilacoides), y compara los rendimientos energéticos. Incluye el contexto del SINAP de México (más de 90 millones de hectáreas protegidas, 19 % del territorio, 182 áreas naturales) que depende del equilibrio entre fotosíntesis y respiración. NOTA: el problema, los pasos guía y la respuesta (2 + 2 + 32 = 36 ATP) son VERBATIM del ejercicio A2; las definiciones de las etapas de respiración, fotosíntesis y fermentación son VERBATIM del glosario A5; las ideas clave, el contexto del SINAP y las preguntas para reflexionar son de la lectura A1. El modelo 3D es ESQUEMÁTICO: organelos, nodos de cada etapa, moléculas de la ruta y fichas de ATP son representaciones visuales (no a escala biológica ni con el número real de moléculas) para identificar dónde ocurre cada etapa y cuánta energía produce.",
-  },
-  "seleccion-natural-evolucion-3d": {
-    slug: "seleccion-natural-evolucion-3d",
-    titulo: "Laboratorio 3D — Selección natural y evidencias de la evolución",
-    descripcion: "Explora la evolución por selección natural en tres modos: (1) conejos — cambia el ambiente (pradera, nieve, malpaís volcánico) y la presión depredadora y observa cómo las frecuencias del pelaje claro/oscuro se reorganizan generación a generación (ancla la simulación A2 «Selección natural en conejos»); (2) tipos — selección estabilizadora, direccional y disruptiva remodelando la distribución de un rasgo (glosario A5); (3) evidencias — estructuras homólogas: los mismos huesos (húmero, radio, cúbito, carpos, falanges) en el brazo humano, la aleta de la ballena y el ala del murciélago (lectura A1). Descripción, preguntas de reflexión, postulados, tipos de selección y contexto de la CONABIO son VERBATIM del MCCEMS; el modelo de genética de poblaciones y los esquemas 3D son ESQUEMÁTICOS.",
-  },
-  "adn-dogma-central-3d": {
-    slug: "adn-dogma-central-3d",
-    titulo: "Laboratorio 3D — El dogma central de la biología molecular",
-    descripcion: "Visualiza el flujo de información genética ADN → ARN → proteína sobre una secuencia editable, en tres modos: (1) replicación — la doble hélice se abre (helicasa) y la ADN polimerasa copia cada hebra molde en una nueva complementaria (A-T 2 puentes H, G-C 3 puentes H), obteniendo dos moléculas hijas semiconservativas; (2) transcripción — la ARN polimerasa lee la hebra molde y sintetiza el ARNm base a base, sustituyendo la timina (T) por uracilo (U); (3) traducción — el ribosoma recorre el ARNm codón a codón desde AUG (metionina) hasta el codón de parada (UAA/UAG/UGA), con ARNt que aportan aminoácidos y forman la cadena polipeptídica. La definición del dogma (Crick, 1958), las preguntas, el callout de los virus ARN, el glosario y el contexto del INMEGEN son VERBATIM del MCCEMS; el código genético es la referencia universal estándar (complementariedad, T→U y codón→aminoácido se calculan de forma EXACTA); el modelo 3D es ESQUEMÁTICO.",
-  },
-  "origen-vida-3d": {
-    slug: "origen-vida-3d",
-    titulo: "Laboratorio 3D — El origen de la vida: hipótesis científicas",
-    descripcion: "Recorre las hipótesis abióticas sobre el origen de la vida en tres modos: (1) Miller-Urey — reconstruye el aparato de 1953: el océano del matraz inferior hierve, el vapor sube a la atmósfera primitiva (CH₄, NH₃, H₂, H₂O), una descarga eléctrica entre dos electrodos sintetiza moléculas y los aminoácidos se acumulan en la trampa; con el control de «días» y el interruptor de la chispa el alumno comprueba que sin energía no hay síntesis y que tras una semana Miller obtuvo más de 20 aminoácidos; (2) Ambientes — dioramas de las cunas candidatas: caldo primordial (Oparin-Haldane), ventiladeros hidrotermales y panspermia (meteorito de Murchison); (3) Mundo ARN — una ribozima que almacena información y cataliza (resuelve el dilema ADN-proteína) junto a un coacervado / protocélula. Las cinco hipótesis, la definición de hipótesis abiótica, las preguntas de reflexión y el callout de la CONABIO son VERBATIM de la lectura A1; el glosario y sus ejemplos son VERBATIM del glosario A5; los hechos de «¿sabías que?» provienen de los quizzes A2/A4. El cierre histórico «más de 20 aminoácidos tras una semana» y «70+ aminoácidos en Murchison» son verbatim del glosario A5. El modelo 3D es ESQUEMÁTICO: el aparato, la acumulación de aminoácidos y los dioramas son representaciones ilustrativas del mecanismo, no simulaciones químicas a escala molecular.",
-  },
-  "mutaciones-3d": {
-    slug: "mutaciones-3d",
-    titulo: "Laboratorio 3D — Mutaciones: tipos, causas y consecuencias",
-    descripcion: "Manipula las tres familias de mutaciones en tres modos: (1) Puntuales — sobre el inicio real del gen de la β-globina humana, aplica una sustitución, inserción o deleción y compara en 3D la proteína original con la mutada; el lab calcula con el código genético universal cada efecto: silenciosa (sinónima), de sentido erróneo (missense, el caso de la anemia falciforme GAG→GTG, Glu→Val), sin sentido (nonsense, codón de parada prematuro) y desplazamiento del marco (frameshift por deleción de un nucleótido); (2) Cromosómicas — un cromosoma «modelo» de bandas frente al resultado de deleción, duplicación, inversión, translocación (dos cromosomas) y aneuploidía (trisomía 21, tres copias); (3) Mutágenos — una doble hélice donde la radiación UV forma un dímero de timina entre dos timinas adyacentes (con reparación NER), más la radiación ionizante (rotura de doble cadena), los químicos (aducto, >70 carcinógenos del tabaco) y los biológicos (ADN viral integrado). La lectura A1, las preguntas de reflexión, el glosario A5 con sus ejemplos y los hechos de «¿sabías que?» (quizzes A2/A4) son VERBATIM del MCCEMS 2025; la traducción y el efecto de las mutaciones puntuales se calculan con el código genético estándar; los cromosomas, la hélice y el dímero de timina son representaciones ESQUEMÁTICAS del mecanismo, no modelos a escala molecular. El contexto del INMEGEN es informativo.",
-  },
-  "biotecnologia-crispr-3d": {
-    slug: "biotecnologia-crispr-3d",
-    titulo: "Laboratorio 3D — Biotecnología y bioética: CRISPR, OGM y clonación",
-    descripcion: "Manipula las tres biotecnologías que nombra la infografía A1 en tres modos: (1) CRISPR-Cas9 — una ARN guía (sgRNA) se aparea con la secuencia diana junto al PAM (5′-NGG-3′), la proteína Cas9 realiza el corte de doble cadena ~3 pb antes del PAM y eliges la reparación: NHEJ (deleción/indel → gen inactivado, knockout) o HDR (inserción precisa con plantilla donadora); el lab calcula y compara en 3D la hebra editada en cada caso; (2) Transgénico / OGM — ADN recombinante: un gen foráneo se corta con enzima de restricción, se liga a un plásmido y transforma un hospedero que produce la proteína (insulina humana en E. coli 1982, maíz Bt 1996, arroz dorado 2000); (3) Clonación — transferencia nuclear de células somáticas (Dolly, 1996): reproductiva (clon idéntico al donante) frente a terapéutica (células madre, sin fin reproductivo), con la distinción germinal vs somática. La infografía A1, las preguntas de reflexión, los principios de bioética, los casos críticos (vaquita marina, maíz transgénico y soberanía, embriones de He Jiankui), el glosario A5 con sus ejemplos y los hechos de «¿sabías que?» (quizzes A2/A4) son VERBATIM del MCCEMS 2025; los mecanismos moleculares (CRISPR, ADN recombinante, transferencia nuclear) son representaciones ESQUEMÁTICAS con biología estándar, no modelos a escala. La dimensión ética se conserva como debate, no como mecanismo manipulable. El contexto del LANGEBIO es informativo.",
-  },
-  "fluidos": {
-    slug: "fluidos",
-    titulo: "Laboratorio 3D — El comportamiento de los fluidos: Arquímedes, Pascal y Bernoulli",
-    descripcion: "Los fluidos —líquidos y gases— sostienen un barco, transmiten la fuerza del gato hidráulico y levantan un avión. Este laboratorio convierte el ejercicio A2 'Analizando el comportamiento de los fluidos' en un banco manipulable en 3D con TRES MODOS, uno por cada gran principio del contenido formativo de CNEyT V. MODO «Flotación»: el alumno suelta un cuerpo de densidad y volumen ajustables en agua, agua de mar, aceite, glicerina o mercurio y descubre el principio de Arquímedes —el empuje E = ρ_fluido·V_sumergido·g compite con el peso W = ρ_cuerpo·V·g—; si ρ_cuerpo < ρ_fluido el cuerpo flota con una fracción sumergida exactamente igual a la razón de densidades (un pino de 500 kg/m³ en agua queda 50 % sumergido), y si es mayor se hunde con peso aparente W − E. MODO «Presión»: una sonda baja por el fluido y mide la presión hidrostática P = P_ext + ρ·g·h —que crece linealmente con la profundidad— mientras un émbolo demuestra el principio de Pascal: al aumentar la presión externa, ese incremento se transmite por igual a todos los puntos del fluido (el fundamento del gato y los frenos hidráulicos). MODO «Flujo»: el fluido recorre una tubería que se estrecha y el alumno comprueba la ecuación de continuidad A₁·v₁ = A₂·v₂ (al reducir la sección, el fluido acelera) y el principio de Bernoulli (donde el fluido va más rápido, su presión cae) con los manómetros que bajan en la zona angosta. Lee en vivo empuje, peso, fracción sumergida, presión manométrica y absoluta, velocidades v₁/v₂, caída de presión y número de Reynolds, con el ejemplo resuelto, los pasos para explorar, el glosario (densidad, presión, empuje, viscosidad, tensión superficial, capilaridad) y el contexto mexicano (Sistema Cutzamala, presas hidroeléctricas, gato hidráulico, ductos de PEMEX). NOTA: la física es EXACTA de cálculo cerrado —Arquímedes E = ρ·V·g, hidrostática P = P₀ + ρ·g·h con el principio de Pascal, continuidad A₁·v₁ = A₂·v₂ y Bernoulli P + ½ρv² = constante, con g = 9.81 m/s²—; la escena 3D es ESQUEMÁTICA: el tanque, la sonda, la tubería y las partículas usan una escala visual para ilustrar la velocidad y la presión relativas, pero los valores de los paneles son exactos. El contenido formativo (Pascal, Arquímedes, tensión superficial, capilaridad, continuidad, Bernoulli y viscosidad) es VERBATIM del MCCEMS 2025 (CNEyT V); las densidades y viscosidades son valores de referencia a ~20 °C.",
-  },
-  "division-celular": {
-    slug: "division-celular",
-    titulo: "Laboratorio 3D — División celular: mitosis y meiosis",
-    descripcion: "Toda célula proviene de otra, pero hay dos maneras de dividirse. Este laboratorio convierte el ejercicio A2 'Analizando la división celular' en un visor 3D manipulable, fase por fase, con una célula modelo de 2n = 4 (dos pares de homólogos: un par largo y uno corto, coloreados por origen materno/paterno) y TRES MODOS que cubren el contenido formativo de CNEyT VI·O5. MODO «Mitosis»: el alumno recorre Interfase → Profase → Metafase → Anafase → Telofase → Citocinesis y observa cómo, tras duplicarse el ADN, los cromosomas se condensan en X, se alinean en UNA fila en el ecuador y las cromátidas hermanas se separan a polos opuestos, produciendo 2 células hijas genéticamente IDÉNTICAS a la madre (2n → 2n): el mecanismo del crecimiento, la cicatrización y la regeneración. MODO «Meiosis»: dos divisiones sucesivas —Profase I (con CROSSING OVER, donde los homólogos intercambian tramos de color), Metafase I, Anafase I (separación REDUCCIONAL de homólogos completos), Telofase I, Metafase II, Anafase II (separación de cromátidas hermanas) y Telofase II— que producen 4 células haploides (2n → n) genéticamente DISTINTAS: los gametos y la fuente de la variabilidad genética. MODO «Comparar»: vista estática lado a lado (2 idénticas arriba, 4 diversas abajo) con una tabla que contrasta nº de divisiones, células hijas, ploidía, variación, apareamiento de homólogos, crossing over, función y dónde ocurre. Incluye una calculadora que, para cualquier célula madre 2n que escribas, devuelve las células hijas, los cromosomas por hija y las combinaciones por distribución independiente (2ⁿ) de cada proceso, con el ejemplo resuelto del genoma humano (2n = 46 → mitosis 2 × 46, meiosis 4 × 23, 2²³ = 8 388 608 combinaciones), glosario, ideas clave y contexto mexicano (INCan y el cáncer como mitosis sin control; la megadiversidad de México sostenida en la recombinación). NOTA: los conteos de células hijas, la ploidía resultante, la separación reduccional en Anafase I, la ecuacional en Anafase II y las combinaciones 2ⁿ son EXACTOS (la calculadora los obtiene para cualquier 2n); el modelo 3D usa 2n = 4 y es ESQUEMÁTICO (no a escala): representa el mecanismo del reparto de cromosomas. El propósito y los contenidos formativos (fases e importancia de la mitosis y la meiosis; recombinación genética como factor de biodiversidad; procesos fundamentales de la división celular) son VERBATIM del MCCEMS 2025 (CNEyT VI·O5).",
-  },
-  "propagacion-calor": {
-    slug: "propagacion-calor",
-    titulo: "Laboratorio 3D — Propagación del calor: conducción, convección y radiación",
-    descripcion: "El calor siempre fluye de lo caliente a lo frío, pero no siempre por el mismo camino. Este laboratorio convierte el ejercicio A2 de CNEyT II·O4 en un visor 3D manipulable con CUATRO MODOS que cubren el contenido formativo «Propagación de calor: conducción y convección; transferencia de calor por radiación; conductividad calorífica y capacidad térmica específica». MODO «Conducción»: una barra metálica segmentada se calienta en un extremo con una flama y el alumno ve, fase por fase, cómo la vibración se transmite átomo a átomo formando un gradiente de color (rojo caliente → azul frío) sin que la materia se desplace; gobierna la ley de Fourier Q/t = k·A·ΔT/L. MODO «Convección»: un tanque de fluido calentado por su base muestra las celdas de convección —el fluido caliente sube por el centro y el frío baja por los lados— transportando calor CON la materia (enfriamiento de Newton Q/t = h·A·ΔT). MODO «Radiación»: un cuerpo caliente emite anillos de onda electromagnética que se expanden en todas direcciones y viajan incluso en el vacío (Stefan-Boltzmann Q/t = ε·σ·A·T⁴), como el calor del Sol. MODO «Comparar»: los tres mecanismos lado a lado con una tabla que contrasta cómo viaja el calor, si mueve materia, qué medio necesita, su ecuación y un ejemplo cotidiano. Incluye una calculadora que, eligiendo material (con su conductividad térmica k y capacidad térmica específica c reales: cobre, aluminio, acero, vidrio, agua, concreto, madera, aire), el área, el grosor y el ΔT, devuelve el flujo de conducción Q/t = k·A·ΔT/L, la energía sensible Q = m·c·ΔT y el tiempo de calentamiento, con el ejemplo resuelto de la ventana de vidrio (1.5 m², 6 mm, ΔT 18 °C → 3 600 W). NOTA: el flujo de conducción, la energía sensible y el tiempo son EXACTOS para los valores de k y c reales de cada material; el modelo 3D es ESQUEMÁTICO (no a escala): el gradiente de color, las corrientes y los anillos representan el mecanismo de transporte, no medidas. El propósito y los contenidos formativos son VERBATIM del MCCEMS 2025 (CNEyT II·O4).",
-  },
-  "redox-combustion": {
-    slug: "redox-combustion",
-    titulo: "Laboratorio 3D — Reacciones redox y combustión",
-    descripcion: "En toda reacción de óxido-reducción hay transferencia de electrones: una especie se oxida (pierde e⁻) mientras otra se reduce (gana e⁻). Este laboratorio convierte el ejercicio A2 de CNEyT IV·O5 en un visor 3D manipulable con CUATRO MODOS que cubren el contenido formativo «Reacciones de oxidación-reducción; reacciones de combustión; reacciones redox y de combustión en la naturaleza y la vida cotidiana; su importancia para los seres vivos y la industria». MODO «Óxido-reducción»: una lámina de zinc se sumerge en disolución de Cu²⁺ y el alumno ve, fase por fase, cómo el zinc cede 2 electrones (se oxida, es el reductor) y los iones cobre los ganan (se reducen, son el oxidante) depositándose como cobre metálico —Zn + Cu²⁺ → Zn²⁺ + Cu—. MODO «Combustión»: un combustible mezclado con O₂ se enciende con una chispa y arde con llama, un redox muy rápido y exotérmico que libera calor y luz (CH₄ + 2O₂ → CO₂ + 2H₂O, ΔH = −890 kJ/mol). MODO «Pila galvánica»: la celda de Daniell separa el redox en dos electrodos unidos por un puente salino y un cable; los electrones salen del ánodo de zinc (−) y llegan al cátodo de cobre (+) encendiendo un foco, con E°pila = +1.10 V. MODO «Comparar»: los tres procesos lado a lado con una tabla que contrasta qué ocurre, si es redox, la energía que maneja, su ecuación tipo y un ejemplo cotidiano. Incluye una calculadora que, eligiendo dos pares redox (con sus potenciales estándar de reducción reales: Li⁺/Li −3.04 V … Au³⁺/Au +1.50 V), devuelve E°pila = E°cátodo − E°ánodo y la energía eléctrica W = n·F·E°; y eligiendo un combustible (con su entalpía de combustión real) y los moles, devuelve el calor liberado Q = |ΔH|·n, con el ejemplo resuelto de la pila de Daniell (0.34 − (−0.76) = +1.10 V). NOTA: el potencial de la pila, la energía eléctrica y el calor de combustión son EXACTOS para los potenciales estándar y las entalpías reales de cada especie; el modelo 3D es ESQUEMÁTICO (no a escala): las esferas, los electrones y la llama representan el mecanismo de transferencia de electrones, no medidas. El propósito y los contenidos formativos son VERBATIM del MCCEMS 2025 (CNEyT IV·O5).",
-  },
-  "equilibrio-quimico": {
-    slug: "equilibrio-quimico",
-    titulo: "Laboratorio 3D — Equilibrio químico y reacciones reversibles",
-    descripcion: "Una reacción reversible (⇌) avanza en los dos sentidos a la vez hasta que ambas velocidades se igualan: el equilibrio dinámico. Este laboratorio convierte el ejercicio A2 de CNEyT IV·O3 en un visor 3D manipulable con CUATRO MODOS que cubren el contenido formativo «Reacciones reversibles e irreversibles; constante y ecuación de equilibrio químico; identificación de reacciones reversibles e irreversibles en la naturaleza». MODO «Equilibrio dinámico»: en un recipiente cerrado el N₂O₄ incoloro se rompe en NO₂ pardo —N₂O₄ ⇌ 2 NO₂— y el alumno ve, fase por fase, cómo la velocidad directa baja y la inversa sube hasta igualarse, dejando reactivos y productos coexistiendo (las concentraciones se mantienen, no se detienen las moléculas). MODO «Constante Kc»: el proceso Haber N₂ + 3 H₂ ⇌ 2 NH₃ avanza mientras un medidor muestra cómo el cociente Q sube desde cero y se aproxima a la línea fija de la constante Kc; el equilibrio llega cuando Q = Kc. MODO «Le Châtelier»: un pistón comprime el sistema 2 NO₂ ⇌ N₂O₄ y el equilibrio se desplaza hacia el lado con MENOS moles de gas para contrarrestar la perturbación. MODO «Comparar»: reversible (⇌) frente a irreversible (→) en una tabla que contrasta la flecha, el avance, las velocidades, la constante y ejemplos en la naturaleza. Incluye una calculadora que, eligiendo una reacción (con sus valores reales de Kc y ΔH: N₂O₄/NO₂, H₂+I₂/HI, Haber, ácido acético) y las concentraciones del momento, devuelve el cociente Q = [productos]^coef / [reactivos]^coef, lo compara con Kc para predecir el sentido (Q<Kc → derecha, Q>Kc → izquierda, Q=Kc → equilibrio) y aplica Le Châtelier ante cuatro perturbaciones (agregar reactivo/producto, subir presión, subir temperatura), con el ejemplo resuelto del H₂ + I₂ ⇌ 2 HI (Q = 6.25 < Kc = 50.5 → se desplaza a la derecha). NOTA: el cociente Q, su comparación con Kc y la predicción de Le Châtelier son EXACTOS para los valores tabulados de Kc y ΔH de cada reacción; el modelo 3D es ESQUEMÁTICO (no a escala): las esferas, las barras de velocidad y el medidor representan el mecanismo del equilibrio dinámico, no medidas. El propósito y los contenidos formativos son VERBATIM del MCCEMS 2025 (CNEyT IV·O3).",
-  },
-  "respiracion-celular": {
-    slug: "respiracion-celular",
-    titulo: "Laboratorio 3D — Respiración aerobia y anaerobia",
-    descripcion: "La respiración celular es la combustión controlada de la glucosa que guarda su energía como ATP. Este laboratorio convierte el ejercicio A2 de CNEyT IV·O8 en un visor 3D manipulable con CUATRO MODOS que cubren el contenido formativo «Aspectos químicos de la glucólisis, ciclo de Krebs y cadena transportadora de electrones; aspectos químicos de la fermentación; desarrollos tecnológicos vinculados». MODO «Glucólisis»: en el citoplasma una glucosa de 6 carbonos (C₆H₁₂O₆) se parte en 2 piruvato de 3 carbonos; el alumno ve, fase por fase, cómo primero se invierten 2 ATP y luego se cosechan 4 ATP y 2 NADH, para un saldo NETO de 2 ATP. MODO «Respiración aerobia»: con O₂ disponible el piruvato entra a una mitocondria esquemática —oxidación a acetil-CoA (+CO₂), ciclo de Krebs (+NADH, FADH₂, CO₂) y cadena transportadora donde el O₂ es el ACEPTOR FINAL de electrones y se forma H₂O— para cosechar ~38 ATP por glucosa (C₆H₁₂O₆ + 6 O₂ → 6 CO₂ + 6 H₂O). MODO «Fermentación»: sin O₂ la cadena se detiene; el piruvato acepta los electrones del NADH para regenerar NAD⁺ y producir lactato (músculo) o etanol + CO₂ (levadura), dejando solo los 2 ATP de la glucólisis. MODO «Comparar»: aerobia (≈38 ATP) frente a anaerobia (2 ATP) en una tabla que contrasta oxígeno, lugar, etapas, productos y eficiencia. Incluye una calculadora que, eligiendo la vía (aerobia / fermentación láctica / fermentación alcohólica) y los moles de glucosa, devuelve el balance de ATP, el O₂ consumido, el CO₂ y el H₂O producidos y la eficiencia energética (atp × 30.5 kJ / 2870 kJ), con el desglose de dónde salen los 38 ATP y el ejemplo resuelto de la célula muscular (2 ATP por fermentación vs 38 por aerobia, 19× más; 5 mol de glucosa → 30 mol CO₂ y 30 mol O₂). NOTA: el balance, la estequiometría y la eficiencia son EXACTOS para el rendimiento teórico máximo (38 ATP/glucosa; estimaciones modernas ~30–32); el modelo 3D es ESQUEMÁTICO (no a escala): las esferas, la mitocondria, la cadena de complejos y las monedas de ATP representan el mecanismo, no medidas. El propósito y los contenidos formativos son VERBATIM del MCCEMS 2025 (CNEyT IV·O8).",
-  },
-  "estructura-reaccion": {
-    slug: "estructura-reaccion",
-    titulo: "Laboratorio 3D — Estructura de una reacción química",
-    descripcion: "Una reacción química transforma unas sustancias (los reactivos) en otras nuevas (los productos) reacomodando sus átomos, y la ecuación química es la forma de representarla. Este laboratorio convierte el ejercicio A2 de CNEyT III·O4 en un visor 3D manipulable con TRES MODOS que cubren el contenido formativo «Concepto de reacción química; estructura de una reacción química; ecuación química como forma de representar una reacción; simbología utilizada en fórmulas y reacciones químicas». MODO «Anatomía»: arma la ecuación pieza por pieza —los reactivos a la izquierda, la flecha → («se transforma en», doble ⇌ si es reversible), los productos a la derecha, el signo + que separa sustancias— y resalta la diferencia clave entre el COEFICIENTE (número grande al frente: cuántas moléculas) y el SUBÍNDICE (número pequeño dentro: cuántos átomos por molécula); cada molécula se muestra como un grupo de esferas (un átomo cada una). MODO «Conservación»: con la reacción elegida cuenta los átomos de cada elemento a ambos lados de la flecha (coeficiente × subíndice) y, con un panel de barras, comprueba la Ley de Lavoisier: los mismos átomos que entran salen, solo reacomodados (la ecuación está balanceada cuando cada elemento coincide). MODO «Simbología»: una galería con el significado de →, ⇌, +, el coeficiente, el subíndice, los estados (s) sólido, (l) líquido, (g) gas, (ac) acuoso, el calor Δ y las flechas ↑ (gas) / ↓ (precipitado). Incluye una calculadora que, eligiendo entre seis reacciones reales (combustión del metano, síntesis del agua, fotosíntesis, formación de amoniaco, neutralización ácido-base y descomposición del agua oxigenada), devuelve la tabla de conteo de átomos por elemento en reactivos y productos, el total de átomos a cada lado, si la materia se conserva, el tipo de reacción y si es reversible, con el ejemplo resuelto de la combustión del metano (CH₄ + 2 O₂ → CO₂ + 2 H₂O: C 1=1, H 4=4, O 4=4 → balanceada). NOTA: las fórmulas, los coeficientes y el conteo de átomos son EXACTOS (todas las reacciones del catálogo están balanceadas); el modelo 3D es ESQUEMÁTICO (no a escala): cada esfera es un átomo y cada molécula un grupo de esferas, sin reflejar los ángulos ni las distancias reales de enlace. El propósito y los contenidos formativos son VERBATIM del MCCEMS 2025 (CNEyT III·O4).",
+  "volumen-cilindro": {
+    slug: "volumen-cilindro",
+    titulo: "Laboratorio 3D — Volumen del Cilindro",
+    descripcion: "Ajusta el radio y la altura de cilindros para explorar V=πr²h; compara volúmenes de recipientes cotidianos y calcula capacidades.",
   },
 };
 
-/** Nombre limpio del lab (sin el prefijo "Laboratorio 3D — "). */
+/** Nombre limpio del lab, sin el prefijo del tipo de laboratorio. */
 export function nombreLab(slug: string): string {
   const t = LAB_CATALOGO[slug]?.titulo;
-  if (!t) return slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-  return t.replace(/^Laboratorio 3D\s*[—-]\s*/u, "").trim();
+  if (!t) return slug.replace(/-/g, " ").replace(/w/g, (c) => c.toUpperCase());
+  return t.replace(/^Laboratorio(s+w+)?s*[—-]s*/u, "").trim();
 }
