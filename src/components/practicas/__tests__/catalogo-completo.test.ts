@@ -13,11 +13,29 @@
  *   npx tsx scripts/generar-lab-catalogo.ts
  *   npx tsx scripts/generar-lab-ubicacion.ts
  */
+import { readFileSync, existsSync } from "fs";
+import { resolve } from "path";
 import { PRACTICAS_META } from "../registry-meta";
 import { LAB_CATALOGO, nombreLab } from "@/lib/practicas/lab-catalogo";
 import { LAB_UBICACION } from "@/lib/practicas/lab-ubicacion.generated";
 
 const slugs = Object.keys(PRACTICAS_META);
+
+const RAIZ = process.cwd();
+const REGISTRY = readFileSync(resolve(RAIZ, "src/components/practicas/registry.tsx"), "utf8");
+
+/** slug → archivo del componente, leídos del registry. */
+function archivoDe(slug: string): string | null {
+  const rutas = new Map<string, string>();
+  for (const m of REGISTRY.matchAll(/const\s+(\w+)\s*=\s*dynamic\(\s*\(\)\s*=>\s*import\(\s*["']\.\/labs\/([\w./-]+)["']/g)) {
+    if (m[1] && m[2]) rutas.set(m[1], m[2]);
+  }
+  const bloque = REGISTRY.slice(REGISTRY.indexOf("export const PRACTICAS"));
+  for (const m of bloque.matchAll(/^\s+"?([a-z0-9_-]+)"?:\s*\{[^}]*Component:\s*(\w+)/gm)) {
+    if (m[1] === slug) return (m[2] && rutas.get(m[2])) ?? null;
+  }
+  return null;
+}
 
 describe("espejos del registro de laboratorios", () => {
   it("hay laboratorios que comprobar", () => {
@@ -49,6 +67,16 @@ describe("espejos del registro de laboratorios", () => {
     // exactamente lo que el alumno no debe leer nunca.
     const feos = slugs.filter((s) => nombreLab(s) === s.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()));
     expect(feos).toEqual([]);
+  });
+
+  it("cada laboratorio resuelve a un componente que existe en disco", () => {
+    // Sin esto, la tarjeta se pinta y el enlace abre una pantalla vacía: el
+    // laboratorio "se ve" en el listado y no existe al entrar.
+    const rotos = slugs.filter((s) => {
+      const archivo = archivoDe(s);
+      return !archivo || !existsSync(resolve(RAIZ, "src/components/practicas/labs", `${archivo}.tsx`));
+    });
+    expect(rotos).toEqual([]);
   });
 
   it("la ubicación, cuando existe, apunta a una UAC con forma de código", () => {
