@@ -1,0 +1,5250 @@
+[
+  {
+    "idioma": "en",
+    "clave": "en/1bz61vwmlxb-153",
+    "texto": "…and then we went to the museum. It was so cool! Really? That sounds great! Yeah! And after that, we went to a really good taco place, and… Bye. Oh… bye?",
+    "labs": [
+      "cortesia-conversacion-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1ehmcn981e0-28",
+    "texto": "a beautiful long white dress",
+    "labs": [
+      "describir-personas-clima-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/13ml9xcx4af-16",
+    "texto": "a big red jacket",
+    "labs": [
+      "describir-personas-clima-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/24ivjgbxu7c-32",
+    "texto": "a comfortable new cotton T-shirt",
+    "labs": [
+      "describir-personas-clima-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/17cjzxcmvy9-23",
+    "texto": "a small yellow umbrella",
+    "labs": [
+      "describir-personas-clima-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1xhqa69qsds-41",
+    "texto": "Add half a teaspoon of salt to the water.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1uk9l0wdynm-46",
+    "texto": "After that, I walked twenty minutes to school.",
+    "labs": [
+      "relato-secuencia-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1thw14r6c6y-29",
+    "texto": "an old brown leather backpack",
+    "labs": [
+      "describir-personas-clima-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1azdy0318uy-22",
+    "texto": "Ana and Luis are tall.",
+    "labs": [
+      "describir-personas-clima-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2dfqhajiz8d-38",
+    "texto": "Ana goes to the gym as often as Sofía.",
+    "labs": [
+      "habitos-comparaciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/7b3sx90ng1-41",
+    "texto": "Ana goes to the gym more often than Luis.",
+    "labs": [
+      "habitos-comparaciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/24bjnupv9lp-43",
+    "texto": "And I have lived in Guadalajara since 2021.",
+    "labs": [
+      "experiencias-recientes-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/281mv20puhk-6",
+    "texto": "apples",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/at90urx3zc-37",
+    "texto": "Are there any lockers for my luggage?",
+    "labs": [
+      "terminal-horarios-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/qa9yvrj54g-176",
+    "texto": "At my school in Puebla, we have a science fair every year, and— Stop! Let me talk now. Oh… sorry. Go ahead. My school has a science fair too! It's in May. Really? That's great!",
+    "labs": [
+      "cortesia-conversacion-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1dye81n7at6-30",
+    "texto": "Bake the bread for 25 minutes.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/vu465fd4sg-31",
+    "texto": "Be quiet, the baby is sleeping.",
+    "labs": [
+      "rutina-diaria-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/ey5n8ushkd-5",
+    "texto": "bread",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/c904zu7vqt-92",
+    "texto": "By the end of the semester, I hope to pass all my subjects so that my family can feel proud.",
+    "labs": [
+      "planes-futuro-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/70maszzdc5-57",
+    "texto": "By the end of the year, we plan to have planted 50 trees.",
+    "labs": [
+      "planes-futuro-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1eh43gru0as-14",
+    "texto": "Can I come in?",
+    "labs": [
+      "aula-ingles-interacciones"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1pm4zjiykdw-22",
+    "texto": "Can I open the window?",
+    "labs": [
+      "habilidades-permisos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1j8zhtreffk-21",
+    "texto": "Can I use your phone?",
+    "labs": [
+      "habilidades-permisos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/17aoo8ub8s5-27",
+    "texto": "Can you cook? — Yes, I can.",
+    "labs": [
+      "habilidades-permisos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/14euxfraut8-28",
+    "texto": "Can you repeat that, please?",
+    "labs": [
+      "aula-ingles-interacciones"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2fi81pzldcl-6",
+    "texto": "chairs",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/ef2nahkatg-17",
+    "texto": "Click the button.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1ugchh3nkwg-38",
+    "texto": "Click the search box in the file list.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/r0b7wz9smm-6",
+    "texto": "coffee",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1sh9e6saubh-58",
+    "texto": "Coffee at Café Luna is as expensive as coffee at Café Sol.",
+    "labs": [
+      "habitos-comparaciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/9zbai76u76-36",
+    "texto": "Could you help me with this, please?",
+    "labs": [
+      "aula-ingles-interacciones"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2d3d5c0x60q-30",
+    "texto": "Could you repeat that, please?",
+    "labs": [
+      "aula-ingles-interacciones"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/3vovum0nwi-33",
+    "texto": "Cut the onion with a sharp knife.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/8c2lkboubq-82",
+    "texto": "Cycling is faster than walking, and the subway is the fastest option of the three.",
+    "labs": [
+      "habitos-comparaciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1war3wt0bcc-42",
+    "texto": "Daniela reads the most books of the three.",
+    "labs": [
+      "habitos-comparaciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1qn5tzfsu4y-4",
+    "texto": "days",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/g9co92jjun-48",
+    "texto": "Diego wants to drink a soda in the computer lab.",
+    "labs": [
+      "habilidades-permisos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1auqhoxez5r-20",
+    "texto": "Do you like drawing?",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/176mb6b1z0d-20",
+    "texto": "Do you like karaoke?",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/16y4b08e5y-27",
+    "texto": "Do you like playing soccer?",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/kyzugbhrqx-32",
+    "texto": "Do you like playing video games?",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1ah7rlqn4be-20",
+    "texto": "Do you like reading?",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1azeauv3pj5-32",
+    "texto": "Do you like soccer? — Yes, I do.",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/iopqi7wkwl-23",
+    "texto": "Do you like spicy food?",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/147f9kinom2-19",
+    "texto": "Do you read comics?",
+    "labs": [
+      "tiempo-libre-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/y5inigb2cu-24",
+    "texto": "Does he watch TV series?",
+    "labs": [
+      "tiempo-libre-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2dwmglmlel5-30",
+    "texto": "Does your brother play soccer?",
+    "labs": [
+      "tiempo-libre-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/20sweqmc6uf-55",
+    "texto": "Don't worry, Mom. I am going to call you when I arrive.",
+    "labs": [
+      "planes-futuro-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/298gsg6y8ct-51",
+    "texto": "Doña Lupe is a visitor. She wants to use the Wi-Fi.",
+    "labs": [
+      "habilidades-permisos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/paqpen5twy-58",
+    "texto": "Doña Lupe, you're carrying a lot of bags! I will help you.",
+    "labs": [
+      "planes-futuro-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/23lffvpxlg2-4",
+    "texto": "eggs",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/ya8ki71nzx-88",
+    "texto": "Emiliano and Abril were taking photos of the chinampas when a mariachi boat came closer.",
+    "labs": [
+      "pasado-viaje-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/27955xvgmrz-38",
+    "texto": "Excuse me, how do I get to the market?",
+    "labs": [
+      "ciudad-direcciones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2fwq2dcnmdu-29",
+    "texto": "Excuse me, I have a question.",
+    "labs": [
+      "aula-ingles-interacciones"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/4q5qpvewm4-43",
+    "texto": "Excuse me, is the bus to Puebla still here?",
+    "labs": [
+      "terminal-horarios-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/18zciow86nh-44",
+    "texto": "Excuse me, is the bus to Querétaro boarding?",
+    "labs": [
+      "terminal-horarios-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1vag6iqsmtl-36",
+    "texto": "Excuse me, is there a gym near here?",
+    "labs": [
+      "ciudad-direcciones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2gd52yrwghq-51",
+    "texto": "Excuse me, what time does the bus to Pachuca leave?",
+    "labs": [
+      "terminal-horarios-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1fkeqfuqeq-35",
+    "texto": "Excuse me, where are the restrooms?",
+    "labs": [
+      "terminal-horarios-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1902pmlimf4-31",
+    "texto": "Excuse me, where is the bakery?",
+    "labs": [
+      "ciudad-direcciones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1uy6fldc8vs-10",
+    "texto": "Excuse me.",
+    "labs": [
+      "aula-ingles-interacciones"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/sz1xews3ak-45",
+    "texto": "Finally, I promised myself to set two alarms.",
+    "labs": [
+      "relato-secuencia-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/oys780gjik-28",
+    "texto": "Find the big black backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/12kg0mqcwu7-28",
+    "texto": "Find the big black notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1fd75gdeaf1-27",
+    "texto": "Find the big blue backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/192v87d0rn0-27",
+    "texto": "Find the big blue notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1pjeibpd710-28",
+    "texto": "Find the big green backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/13zk8g6d3xd-28",
+    "texto": "Find the big green notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/qxhue18klp-29",
+    "texto": "Find the big orange backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/10m9zd8r1vp-29",
+    "texto": "Find the big orange notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1f9lt7h6em5-29",
+    "texto": "Find the big purple backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/25jit5fh4cu-29",
+    "texto": "Find the big purple notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1al64af40c4-35",
+    "texto": "Find the big rectangular black box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/lm7gnwza2r-35",
+    "texto": "Find the big rectangular green box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/296v5koi5kz-36",
+    "texto": "Find the big rectangular purple box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/lbktmd212w-33",
+    "texto": "Find the big rectangular red box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/43mnh1mu8q-36",
+    "texto": "Find the big rectangular yellow box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/adxfjn9z70-26",
+    "texto": "Find the big red backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/f48wuxx206-26",
+    "texto": "Find the big red notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1gm0n6yzkym-29",
+    "texto": "Find the big round green box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1pee3b820rs-30",
+    "texto": "Find the big round orange box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/fwl4zzsyd1-32",
+    "texto": "Find the big round orange clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/vg73x1xd5a-27",
+    "texto": "Find the big round red box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/5k5cjhsxfd-32",
+    "texto": "Find the big round yellow clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1wx8ekke7nj-31",
+    "texto": "Find the big square blue clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/29epom99r08-30",
+    "texto": "Find the big square green box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/nm74du4nos-31",
+    "texto": "Find the big square orange box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/22ci4ollbmb-31",
+    "texto": "Find the big square purple box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/15opzcuxfnd-33",
+    "texto": "Find the big square purple clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/ndvemgkm1t-28",
+    "texto": "Find the big square red box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1xxk5aizfbr-30",
+    "texto": "Find the big square red clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1xu1tr0yr31-35",
+    "texto": "Find the big triangular blue clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2edxh6goivn-34",
+    "texto": "Find the big triangular green box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1jyraviln7n-35",
+    "texto": "Find the big triangular orange box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/qg267mv52y-35",
+    "texto": "Find the big triangular purple box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/8tz601adzm-37",
+    "texto": "Find the big triangular purple clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/6i51y3k9eh-36",
+    "texto": "Find the big triangular white clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1q26jyi7429-28",
+    "texto": "Find the big white backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/n9j5vhvs6v-28",
+    "texto": "Find the big white notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/20lmllfkyvi-29",
+    "texto": "Find the big yellow backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/angysg3vjr-29",
+    "texto": "Find the big yellow notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/26vektblraf-26",
+    "texto": "Find the long blue pencil.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/xoi90usbcp-27",
+    "texto": "Find the long green pencil.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/a003xqyl6u-28",
+    "texto": "Find the long orange pencil.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/hjg5jaxpu6-28",
+    "texto": "Find the long purple pencil.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1uvha5rjjfm-25",
+    "texto": "Find the long red pencil.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/19aszagi8q6-28",
+    "texto": "Find the long yellow pencil.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1wnwl9hztul-27",
+    "texto": "Find the short blue pencil.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1dqbn9tdio1-28",
+    "texto": "Find the short green pencil.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/15sauk5vbv4-29",
+    "texto": "Find the short orange pencil.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/27mxrsyqbjf-29",
+    "texto": "Find the short purple pencil.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1hha25wy0nr-26",
+    "texto": "Find the short red pencil.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/281lecctklh-29",
+    "texto": "Find the short yellow pencil.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1yifsjvyujg-30",
+    "texto": "Find the small black backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2awd9q75skn-30",
+    "texto": "Find the small black notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/20y6i6r0hnw-29",
+    "texto": "Find the small blue backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/vfpcfl5byp-29",
+    "texto": "Find the small blue notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2cgircvgjr-30",
+    "texto": "Find the small green backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/14lanp9o0qm-30",
+    "texto": "Find the small green notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1vw6p0f3476-31",
+    "texto": "Find the small orange backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/p5oi1cefxc-31",
+    "texto": "Find the small orange notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/148cy67e05f-31",
+    "texto": "Find the small purple backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/gqtha73lqk-31",
+    "texto": "Find the small purple notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1dakdm2f6t-37",
+    "texto": "Find the small rectangular white box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/22tu2c08gqe-28",
+    "texto": "Find the small red backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/246ozekqkdy-28",
+    "texto": "Find the small red notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/ixye6lcpva-34",
+    "texto": "Find the small round orange clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/hquidjo7tv-31",
+    "texto": "Find the small round red clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/6zxrqrjfe8-31",
+    "texto": "Find the small round white box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1etw1d2hyix-33",
+    "texto": "Find the small round white clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1vp8i5zxigk-33",
+    "texto": "Find the small square blue clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/8apaztaek3-33",
+    "texto": "Find the small square orange box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/23f1sli0esa-33",
+    "texto": "Find the small square purple box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/19d6nx2mz5z-30",
+    "texto": "Find the small square red box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/28q15d62vyp-32",
+    "texto": "Find the small square red clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/w29i4a1epy-33",
+    "texto": "Find the small square yellow box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/13p5z9kvrrx-35",
+    "texto": "Find the small square yellow clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/ihlahzynym-38",
+    "texto": "Find the small triangular black clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/d28fx05817-35",
+    "texto": "Find the small triangular blue box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/hfazkvz60b-36",
+    "texto": "Find the small triangular green box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1acyo13iv53-38",
+    "texto": "Find the small triangular green clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/18u5ovymeyu-37",
+    "texto": "Find the small triangular orange box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/5kwcccu2aw-39",
+    "texto": "Find the small triangular orange clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/13r0kg7eclb-38",
+    "texto": "Find the small triangular white clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1mpee38n4cv-30",
+    "texto": "Find the small white backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2a1vavgp358-30",
+    "texto": "Find the small white notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/gdj1fqskvc-31",
+    "texto": "Find the small yellow backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1eqkmd7nelu-31",
+    "texto": "Find the small yellow notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/p1hvv5zt1l-51",
+    "texto": "First, I woke up late because my alarm didn't ring.",
+    "labs": [
+      "relato-secuencia-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2159gdrrj26-44",
+    "texto": "First, mix the ingredients. Then, heat them.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/21ftynzfhz6-38",
+    "texto": "First, we ate tamales and drank atole.",
+    "labs": [
+      "relato-secuencia-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1l92c3fxl64-7",
+    "texto": "friends",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1x89q9yo4o3-194",
+    "texto": "Good afternoon. How can I help you? Hi. I have an appointment with Dr. Pérez at four o'clock. Thank you. Please have a seat. The doctor will see you in ten minutes. Ugh, ten minutes? Whatever. …",
+    "labs": [
+      "cortesia-conversacion-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1t5pee81ue0-54",
+    "texto": "Good morning, everyone. Hand in your homework, please.",
+    "labs": [
+      "aula-ingles-interacciones"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/j57thff8tj-81",
+    "texto": "Good morning, Toluca! It is cold and foggy this morning. It is 3 degrees Celsius.",
+    "labs": [
+      "clima-vestimenta-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1zdu00lm1bm-112",
+    "texto": "Good morning! What can I get you? Give me a quesadilla. …Okay. Here you go. Thank you! Have a nice day. You too!",
+    "labs": [
+      "cortesia-conversacion-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/vjizg3ytoi-41",
+    "texto": "Great! The purple backpack is on the bed.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/t19rj6btat-86",
+    "texto": "Guadalajara is bigger than Colima, but Mexico City is the biggest city in the country.",
+    "labs": [
+      "habitos-comparaciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1tjclk86o6e-21",
+    "texto": "Hand in your homework",
+    "labs": [
+      "aula-ingles-interacciones"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/26xhtotlqhe-20",
+    "texto": "Have you been there?",
+    "labs": [
+      "experiencias-recientes-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1pol4kajro9-47",
+    "texto": "Have you ever cooked a big meal? — Yes, I have!",
+    "labs": [
+      "experiencias-recientes-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/umcinf1x3g-31",
+    "texto": "Have you ever tried chapulines?",
+    "labs": [
+      "experiencias-recientes-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/3gje7f9yor-55",
+    "texto": "Have you ever tried Thai food? — I have never tried it.",
+    "labs": [
+      "experiencias-recientes-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/zvis2dhlbi-31",
+    "texto": "Have you ever visited a cenote?",
+    "labs": [
+      "experiencias-recientes-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/wgfi9zagps-42",
+    "texto": "Have you finished the English project yet?",
+    "labs": [
+      "experiencias-recientes-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/nt5dlto6gx-25",
+    "texto": "Have you seen this movie?",
+    "labs": [
+      "experiencias-recientes-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/121wwifk1yp-34",
+    "texto": "He does his homework after school.",
+    "labs": [
+      "rutina-diaria-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1lwp2gkvt4a-18",
+    "texto": "He has brown eyes.",
+    "labs": [
+      "describir-personas-clima-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/zzx1be1oa9-19",
+    "texto": "He is 16 years old.",
+    "labs": [
+      "perfil-personal-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1p7g6nzc4di-12",
+    "texto": "He is Mateo.",
+    "labs": [
+      "perfil-personal-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1qjj4qdb1np-22",
+    "texto": "He is not from Puebla.",
+    "labs": [
+      "perfil-personal-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1xupg35uya-47",
+    "texto": "He is wearing a windbreaker because it's windy.",
+    "labs": [
+      "describir-personas-clima-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/gxfza2b98g-12",
+    "texto": "He is young.",
+    "labs": [
+      "describir-personas-clima-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/44u9wq84we-32",
+    "texto": "He never misses a football game.",
+    "labs": [
+      "tiempo-libre-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1fj54sq8r6p-139",
+    "texto": "Hello, I'm Emiliano. I love spicy food because it is delicious. Playing soccer? I don't mind it. I don't like reading because it is boring.",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2bgs9sorneo-153",
+    "texto": "Hello, I'm Emiliano. I really like karaoke because it is fun. I like playing video games because it is fun. I don't like drawing because it is difficult.",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/16fq7a03tp6-155",
+    "texto": "Hello! My name is Luis. I don't like reading because it is boring. I like spicy food because it is delicious. I love playing soccer because it is exciting.",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/gk1ovhyuna-23",
+    "texto": "Hello? Can you hear me?",
+    "labs": [
+      "cortesia-conversacion-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/a4uscuzxss-18",
+    "texto": "Help me with this.",
+    "labs": [
+      "aula-ingles-interacciones"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1rbau889qxh-41",
+    "texto": "Here it is. Excuse me, I have a question.",
+    "labs": [
+      "aula-ingles-interacciones"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1s9a9e0b3zc-148",
+    "texto": "Hey, I'm Jorge. I love playing video games because it is exciting. I hate drawing because it is difficult. I don't like karaoke because it is noisy.",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2bzqk4lwowz-148",
+    "texto": "Hey, I'm Jorge. I really like playing soccer because it is exciting. I hate reading because it is boring. I love spicy food because it is delicious.",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/zk83eswv62-4",
+    "texto": "Hey!",
+    "labs": [
+      "aula-ingles-interacciones"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2aqu0r2z26o-140",
+    "texto": "Hi, I'm Ana. I don't like playing video games because it is boring. I like drawing because it is relaxing. I love karaoke because it is fun.",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/27dfcaxs5ee-152",
+    "texto": "Hi, I'm Ana. I like playing soccer because it is fun. I really like reading because it is interesting. I hate spicy food because it is too spicy for me.",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/6hmqir0uti-141",
+    "texto": "Hi, my name is Daniela. I really like drawing because it is relaxing. Karaoke? I don't mind it. I like playing video games because it is fun.",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1cujr80qkov-152",
+    "texto": "Hi, my name is Daniela. Reading? I don't mind it. I really like spicy food because it is delicious. I don't like playing soccer because it is difficult.",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/15h5h1d0k3h-43",
+    "texto": "Hi! Can I help you? What does it look like?",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1fxorc1qsrd-146",
+    "texto": "Hi! I'm Paola. I like spicy food because it is delicious. I hate playing soccer because it is difficult. I love reading because it is interesting.",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1v9ea0j7m70-39",
+    "texto": "Hi! I'm Sofía. I'm Mrs. Torres's niece.",
+    "labs": [
+      "cortesia-conversacion-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2gluqgvai7p-181",
+    "texto": "Hi! Sorry, I'm not in a good mood today. Hi, Emily! What's wrong? My dog is sick. We took him to the vet this morning. Oh. So, what's the weather like there? Um… it's cold, I guess.",
+    "labs": [
+      "cortesia-conversacion-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/elu7hc8b9l-45",
+    "texto": "Hi! What time does the bus to Veracruz leave?",
+    "labs": [
+      "terminal-horarios-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1jbiil4cjjm-45",
+    "texto": "His email address is mateo.herrera@correo.mx.",
+    "labs": [
+      "perfil-personal-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1hwsaike6lc-26",
+    "texto": "His name is Mateo Herrera.",
+    "labs": [
+      "perfil-personal-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2f1i0qtewdq-93",
+    "texto": "History is more interesting than I expected, and it is the most interesting class of my week.",
+    "labs": [
+      "habitos-comparaciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1t4ewls771t-33",
+    "texto": "How can I get to the bus station?",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1h6y2lengou-31",
+    "texto": "How do I turn on the projector?",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1uhorqznba2-36",
+    "texto": "How do you say 'apuntes' in English?",
+    "labs": [
+      "aula-ingles-interacciones"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/7rbd62h8oh-34",
+    "texto": "How do you say 'tarea' in English?",
+    "labs": [
+      "aula-ingles-interacciones"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1z2g1oche06-34",
+    "texto": "How long have you studied English?",
+    "labs": [
+      "experiencias-recientes-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/27sehysx17t-34",
+    "texto": "How long is the trip to Querétaro?",
+    "labs": [
+      "terminal-horarios-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/17hmxap8hul-31",
+    "texto": "How many apples? How much milk?",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1b4l6fr5a8l-25",
+    "texto": "How many books do we get?",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1fo1fuxv87v-30",
+    "texto": "How many families can it help?",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/3s0lwkqqt8-35",
+    "texto": "How many liters of water do we get?",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/aefs6gaykj-32",
+    "texto": "How many oranges would you like?",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1ytwdvtpldg-22",
+    "texto": "How much does it cost?",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1gs29yl16x8-32",
+    "texto": "How much is a ticket to Pachuca?",
+    "labs": [
+      "terminal-horarios-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/6d9cbgfv2l-32",
+    "texto": "How much is it? — It's 20 pesos.",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/jn1b06ebac-26",
+    "texto": "How much money do we need?",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/16ph739ohpm-41",
+    "texto": "How much time does it take to give shade?",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1kf5ffmnexj-16",
+    "texto": "How old are you?",
+    "labs": [
+      "perfil-personal-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1lfp5bfesaj-42",
+    "texto": "I am seeing the dentist tomorrow at 4 p.m.",
+    "labs": [
+      "planes-futuro-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1v20n5vzw4r-37",
+    "texto": "I am studying for the exam right now.",
+    "labs": [
+      "rutina-diaria-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1gn1130ojj-11",
+    "texto": "I can swim.",
+    "labs": [
+      "habilidades-permisos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1om7u80jzyw-26",
+    "texto": "I can swim. I can't drive.",
+    "labs": [
+      "habilidades-permisos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1asgldq8m63-22",
+    "texto": "I disagree, because...",
+    "labs": [
+      "aula-ingles-interacciones"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/uvwklocw3k-15",
+    "texto": "I don't get it.",
+    "labs": [
+      "aula-ingles-interacciones"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/176g24qq6l1-61",
+    "texto": "I don't know yet. Maybe I will take an English course online.",
+    "labs": [
+      "planes-futuro-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/se59q7mtge-20",
+    "texto": "I don't like coffee.",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1lwrm3fuw27-32",
+    "texto": "I don't like math. It is boring.",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2ei1pegnev9-16",
+    "texto": "I don't mind it.",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/3fvzyrtavm-18",
+    "texto": "I don't mind math.",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/oyqls5jux3-19",
+    "texto": "I don't understand.",
+    "labs": [
+      "aula-ingles-interacciones"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/29nfap4ymqc-46",
+    "texto": "I found it in the school library last Tuesday.",
+    "labs": [
+      "experiencias-recientes-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/13r8o0snoda-17",
+    "texto": "I get up at 6:30.",
+    "labs": [
+      "rutina-diaria-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/8ejpai3ld4-48",
+    "texto": "I got to class late, but the teacher understood.",
+    "labs": [
+      "relato-secuencia-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2iuv0bzqiw-65",
+    "texto": "I hate spicy food. It's too spicy for me! Do you like spicy food?",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/28ud3knqar0-15",
+    "texto": "I hate spiders.",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1k0ef251edk-57",
+    "texto": "I have already done my homework. / She hasn't called yet.",
+    "labs": [
+      "experiencias-recientes-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1ea6n9ogjct-40",
+    "texto": "I have already written the introduction.",
+    "labs": [
+      "experiencias-recientes-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/v8x33ufcuw-41",
+    "texto": "I have always lived in this neighborhood.",
+    "labs": [
+      "experiencias-recientes-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/kpvve0xt4y-15",
+    "texto": "I have glasses.",
+    "labs": [
+      "describir-personas-clima-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/uzvv8u6cmh-25",
+    "texto": "I have just started mine.",
+    "labs": [
+      "experiencias-recientes-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/200funzukbb-29",
+    "texto": "I have never been to Yucatán.",
+    "labs": [
+      "experiencias-recientes-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/m16rwzeztk-39",
+    "texto": "I have studied English for three years.",
+    "labs": [
+      "experiencias-recientes-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/108dw3a97ar-42",
+    "texto": "I have travelled to Oaxaca with my family.",
+    "labs": [
+      "experiencias-recientes-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1jqneg6m5e2-33",
+    "texto": "I have visited Teotihuacan twice.",
+    "labs": [
+      "experiencias-recientes-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/dhaflp2v25-44",
+    "texto": "I hope to study abroad when I finish school.",
+    "labs": [
+      "planes-futuro-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1ai0i81s9kb-28",
+    "texto": "I like it because it is fun.",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/149bkkru7or-13",
+    "texto": "I like music.",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/20qbxq5ay2r-34",
+    "texto": "I like music. I don't like coffee.",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/jnpy68148u-22",
+    "texto": "I like playing soccer.",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1rxr6mjis57-15",
+    "texto": "I like reading.",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1ou15yr43rb-36",
+    "texto": "I like running better than swimming.",
+    "labs": [
+      "habitos-comparaciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1e2691j3cbs-65",
+    "texto": "I lost my job last week, and I can't buy enough food for my kids.",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/v9vpjfxcnm-68",
+    "texto": "I love art, but I have a bad knee, so I can't climb a lot of stairs.",
+    "labs": [
+      "lugares-recomendaciones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/z6tcwh4s7m-12",
+    "texto": "I love math!",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1x1j634dxhz-13",
+    "texto": "I love pizza.",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/7zgxmst1rv-29",
+    "texto": "I love pizza. I hate spiders.",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/jev2df1aar-82",
+    "texto": "I love playing video games! They are so exciting. Do you like playing video games?",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/13lcbh2hgyz-68",
+    "texto": "I love taking photos of landscapes, but I don't like crowded places.",
+    "labs": [
+      "lugares-recomendaciones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/x04a38zoit-34",
+    "texto": "I love the ocean and water sports.",
+    "labs": [
+      "lugares-recomendaciones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/270avya0s7r-52",
+    "texto": "I love trying local food, but I'm on a tight budget.",
+    "labs": [
+      "lugares-recomendaciones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/fbqbg5k9q1-31",
+    "texto": "I prefer cooking to eating out.",
+    "labs": [
+      "habitos-comparaciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1w222s6sm2b-65",
+    "texto": "I really like drawing. It's relaxing. What's your favorite hobby?",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/156sqx5xr9t-17",
+    "texto": "I study at night.",
+    "labs": [
+      "habilidades-permisos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/29440i9gb1p-26",
+    "texto": "I study English every day.",
+    "labs": [
+      "rutina-diaria-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/s6phiz2n0a-35",
+    "texto": "I take the bus to school every day.",
+    "labs": [
+      "rutina-diaria-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1oj416xkr1e-43",
+    "texto": "I tried them last year at a fair in Oaxaca.",
+    "labs": [
+      "experiencias-recientes-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/j4x5igv2d2-70",
+    "texto": "I use a wheelchair, and I want to learn about the history of the town.",
+    "labs": [
+      "lugares-recomendaciones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1hj71zkip1m-23",
+    "texto": "I went with my cousins.",
+    "labs": [
+      "experiencias-recientes-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/b7vo0982k6-26",
+    "texto": "I'd like a glass of juice.",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1962zzm57dv-28",
+    "texto": "I'd like a sandwich, please.",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/18c1nj8up8x-27",
+    "texto": "I'd like to go to the park.",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/bo623kq5do-22",
+    "texto": "I'm afraid I disagree.",
+    "labs": [
+      "aula-ingles-interacciones"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1hpuxky2qy0-53",
+    "texto": "I'm afraid I have to go now. Have a nice day, Carlos.",
+    "labs": [
+      "cortesia-conversacion-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2cdpzklurx4-58",
+    "texto": "I'm afraid I have to go now. Have a nice day, Ms. Ramírez.",
+    "labs": [
+      "cortesia-conversacion-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/vewstx93ow-45",
+    "texto": "I'm afraid I have to go now. Have a nice day.",
+    "labs": [
+      "cortesia-conversacion-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/5f2gx38v0t-44",
+    "texto": "I'm afraid I have to go now. See you around!",
+    "labs": [
+      "cortesia-conversacion-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2c4o67hc7sr-39",
+    "texto": "I'm afraid I have to go now. Take care!",
+    "labs": [
+      "cortesia-conversacion-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1wjtrznm8xf-76",
+    "texto": "I'm going to join the clean-up day because it matters for our neighbourhood.",
+    "labs": [
+      "planes-futuro-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1hmr76eessi-58",
+    "texto": "I'm going to volunteer at the community garden next month.",
+    "labs": [
+      "planes-futuro-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/nljducxkpk-70",
+    "texto": "I'm really interested in ancient history, and I love walking outdoors.",
+    "labs": [
+      "lugares-recomendaciones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/5zja147ssw-30",
+    "texto": "I'm sorry, I don't understand.",
+    "labs": [
+      "aula-ingles-interacciones"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/17nfrtblwtv-85",
+    "texto": "In five years, I'm going to be a nurse because I want to help people in my community.",
+    "labs": [
+      "planes-futuro-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/103akj6q6r7-54",
+    "texto": "In the end, we all made music together until midnight.",
+    "labs": [
+      "relato-secuencia-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/w75omwq7g7-11",
+    "texto": "information",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/19gpr45vvkx-34",
+    "texto": "Is the bus to Guadalajara on time?",
+    "labs": [
+      "terminal-horarios-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/y694ue4eaf-29",
+    "texto": "Is the bus to Toluca on time?",
+    "labs": [
+      "terminal-horarios-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/19o28lewlr3-43",
+    "texto": "Is there a bus to Guadalajara before 12:30?",
+    "labs": [
+      "terminal-horarios-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1xj0ynnmz31-36",
+    "texto": "Is there a pharmacy in the terminal?",
+    "labs": [
+      "terminal-horarios-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1p5hpm2uzzi-30",
+    "texto": "Is there a pharmacy near here?",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/24ssx5tfvca-54",
+    "texto": "It is cloudy and it is warm. It is 26 degrees Celsius.",
+    "labs": [
+      "clima-vestimenta-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2cmwcn3kpk6-78",
+    "texto": "It is cloudy in Mexico City and it is raining. It is cool: 17 degrees Celsius.",
+    "labs": [
+      "clima-vestimenta-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1axjapu89cp-53",
+    "texto": "It is foggy and it is warm. It is 26 degrees Celsius.",
+    "labs": [
+      "clima-vestimenta-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/ynxh6zmjpr-55",
+    "texto": "It is raining and it is warm. It is 26 degrees Celsius.",
+    "labs": [
+      "clima-vestimenta-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/6hro1o7si1-94",
+    "texto": "It is rainy in Chiapas today. It is raining all afternoon, but it is warm: 24 degrees Celsius.",
+    "labs": [
+      "clima-vestimenta-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1a1frt9ln49-54",
+    "texto": "It is snowing and it is cold. It is 0 degrees Celsius.",
+    "labs": [
+      "clima-vestimenta-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1xs3jomne0i-77",
+    "texto": "It is snowing in Chihuahua tonight! It is very cold: minus 3 degrees Celsius.",
+    "labs": [
+      "clima-vestimenta-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/bgstetr6c7-53",
+    "texto": "It is sunny and it is warm. It is 26 degrees Celsius.",
+    "labs": [
+      "clima-vestimenta-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/14sondyfzjr-59",
+    "texto": "It is sunny in Cancún today. It is hot: 31 degrees Celsius.",
+    "labs": [
+      "clima-vestimenta-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/17zpp177om8-71",
+    "texto": "It is very hot and sunny in Hermosillo today. It is 40 degrees Celsius.",
+    "labs": [
+      "clima-vestimenta-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/n2s9da7w31-53",
+    "texto": "It is windy and it is warm. It is 26 degrees Celsius.",
+    "labs": [
+      "clima-vestimenta-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1nexcd8ak9w-27",
+    "texto": "It was a wonderful evening.",
+    "labs": [
+      "relato-secuencia-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1pxongd7lxx-57",
+    "texto": "It's five o'clock in the afternoon. Renata wants to swim.",
+    "labs": [
+      "habilidades-permisos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/26dwd64igw7-181",
+    "texto": "It's not far from here. Take the second street on the right. Go straight for one block. The pharmacy is on your left, between the church and the supermarket. I hope you feel better!",
+    "labs": [
+      "ciudad-direcciones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/n5a999cj19-56",
+    "texto": "It's seven o'clock in the evening. Ximena wants to swim.",
+    "labs": [
+      "habilidades-permisos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/12uahcodfw3-72",
+    "texto": "It's very cold at night, and my little sisters don't have warm blankets.",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1iewaddabps-46",
+    "texto": "It's very hot in here. I will open the window.",
+    "labs": [
+      "planes-futuro-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1hqaq8td65a-53",
+    "texto": "Itzel wants to borrow a guitar. She asks the teacher.",
+    "labs": [
+      "habilidades-permisos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1ehjt6zasf6-5",
+    "texto": "juice",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/144zwkrkn7i-362",
+    "texto": "Last December, our school organized a trip to Teotihuacán. First, we woke up at five in the morning and took the bus. When we arrived, our guide told us about the history of the pyramids. After that, we walked along the Avenue of the Dead for two kilometers. While we were eating our lunch, it suddenly started to rain. Finally, we returned home tired but happy.",
+    "labs": [
+      "pasado-viaje-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/eznpdn15x0-46",
+    "texto": "Last Saturday, I went to visit my grandmother.",
+    "labs": [
+      "relato-secuencia-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/uswgnodk5l-137",
+    "texto": "Last year, my family and I traveled (viajamos) to Oaxaca for Día de Muertos. It was an unforgettable experience that I will never forget.",
+    "labs": [
+      "pasado-viaje-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/9724j01aop-17",
+    "texto": "Listen and repeat",
+    "labs": [
+      "aula-ingles-interacciones"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1ojskp3o72a-52",
+    "texto": "Look at those dark clouds! It is going to rain soon.",
+    "labs": [
+      "planes-futuro-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/3aoc17ucux-26",
+    "texto": "Look! It is raining again.",
+    "labs": [
+      "rutina-diaria-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/x01disarm9-4",
+    "texto": "love",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/7k6djzbbi8-44",
+    "texto": "Luis does not go to the gym as often as Ana.",
+    "labs": [
+      "habitos-comparaciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2qou1a0pme-32",
+    "texto": "Luis is never late for practice.",
+    "labs": [
+      "tiempo-libre-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/27opwokrb0p-58",
+    "texto": "Mateo is hungry. He wants to eat his lunch in the kitchen.",
+    "labs": [
+      "habilidades-permisos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/13qm8minh8r-72",
+    "texto": "Mateo likes tea better than coffee, but today he'd rather have a coffee.",
+    "labs": [
+      "habitos-comparaciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1c4gxozrkoe-40",
+    "texto": "Mateo wants to eat chips in the library.",
+    "labs": [
+      "habilidades-permisos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/14w6h18az77-14",
+    "texto": "May I come in?",
+    "labs": [
+      "aula-ingles-interacciones"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/73k7soynv0-25",
+    "texto": "May I go to the bathroom?",
+    "labs": [
+      "aula-ingles-interacciones"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/ttc0qec028-29",
+    "texto": "Mérida is hotter than Toluca.",
+    "labs": [
+      "habitos-comparaciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/9ykgddhvuz-4",
+    "texto": "milk",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/dfgpl5j7p6-5",
+    "texto": "money",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1t4ot81r13-47",
+    "texto": "My back hurts, and I can't carry my water home.",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1q2ekl1qxs9-37",
+    "texto": "My brother takes pictures everywhere.",
+    "labs": [
+      "tiempo-libre-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1gws8cqeu9h-40",
+    "texto": "My brother works at a workshop in Lerma.",
+    "labs": [
+      "rutina-diaria-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/11lgvjvhi1a-27",
+    "texto": "My cousins have curly hair.",
+    "labs": [
+      "describir-personas-clima-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1dqrjpmimlv-42",
+    "texto": "My dog can swim, but it can't climb trees.",
+    "labs": [
+      "habilidades-permisos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2dntxuw7xqy-50",
+    "texto": "My family moved here when my mother got a new job.",
+    "labs": [
+      "experiencias-recientes-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/22px6zw5p1o-74",
+    "texto": "My favorite sport is soccer. It's so exciting! What's your favorite sport?",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1bgad3t0z04-32",
+    "texto": "My sister doesn't study English.",
+    "labs": [
+      "tiempo-libre-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/14gpp3mkj49-32",
+    "texto": "My sister prefers tea to coffee.",
+    "labs": [
+      "habitos-comparaciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1k7wm4s0izf-49",
+    "texto": "My sister usually studies English in the evening.",
+    "labs": [
+      "tiempo-libre-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/55o3r5cgn9-18",
+    "texto": "new white sneakers",
+    "labs": [
+      "describir-personas-clima-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2miqnkya3g-87",
+    "texto": "Next month, I'm planning to join the school soccer team because I want to stay healthy.",
+    "labs": [
+      "planes-futuro-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2c566qsq1qz-97",
+    "texto": "Next week, I'm going to study for the entrance exam so that I can get into the university I want.",
+    "labs": [
+      "planes-futuro-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1wwom4sfuls-75",
+    "texto": "Next year, I think I'll look for a part-time job to save money for college.",
+    "labs": [
+      "planes-futuro-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/166wi79lr98-7",
+    "texto": "No way!",
+    "labs": [
+      "aula-ingles-interacciones"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2wxmq913gd-30",
+    "texto": "No, I haven't finished it yet.",
+    "labs": [
+      "experiencias-recientes-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/3c46g71jmp-14",
+    "texto": "No, I haven't.",
+    "labs": [
+      "experiencias-recientes-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/215f7qcpjn3-234",
+    "texto": "No, it isn't. It's only a five-minute walk from here. Go straight for two blocks. Turn left at the bank. Go straight for one more block. The health center is on your right, on the corner of Reforma Avenue and Juárez Street. Good luck!",
+    "labs": [
+      "ciudad-direcciones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/vq23yds95d-171",
+    "texto": "Of course. Turn right at Independencia Avenue. Cross Hidalgo Street. The library is on your left, on the corner of Independencia Avenue and Hidalgo Street. You're welcome!",
+    "labs": [
+      "ciudad-direcciones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1p9p78avpfe-95",
+    "texto": "On Saturday there are three groups with two places each. Put every friend in a group they like.",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/15w8ph6t740-16",
+    "texto": "Open the button.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/24q0xmrbe50-37",
+    "texto": "Open the search box in the file list.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/28j1jzklfi6-25",
+    "texto": "Open your book to page...",
+    "labs": [
+      "aula-ingles-interacciones"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/118ijsm3x74-7",
+    "texto": "oranges",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/azqxxtamk0-36",
+    "texto": "Our school library needs more books.",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/3y83o21zpw-53",
+    "texto": "Our school needs books. Many students don't have any.",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/13j8k6qqo53-48",
+    "texto": "Our son is five years old, and he loves animals.",
+    "labs": [
+      "lugares-recomendaciones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2391tzzp7ro-40",
+    "texto": "Our street has no water two days a week.",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/3dcurkyikv-6",
+    "texto": "people",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2dqgsj33k3t-47",
+    "texto": "Phone A has a longer battery life than Phone B.",
+    "labs": [
+      "habitos-comparaciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1lfvagnxv0d-37",
+    "texto": "Press \"Assignments\" in the file list.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/uvr43z0qhd-20",
+    "texto": "Press \"Assignments\".",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/wctbj4hry7-39",
+    "texto": "Press the blue button in the file list.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/19ong6sy5a3-22",
+    "texto": "Press the blue button.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/cen8inec6i-34",
+    "texto": "Press the button in the file list.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/yysn9vknt1-17",
+    "texto": "Press the button.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/luhrsk7ka4-32",
+    "texto": "Press the file in the file list.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/258fttp0ayu-53",
+    "texto": "Press the file named \"Tarea 3.docx\" in the file list.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/rv3kjxx0nu-36",
+    "texto": "Press the file named \"Tarea 3.docx\".",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1d0yirh9qs8-15",
+    "texto": "Press the file.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/29f1o61sda1-40",
+    "texto": "Press the green button in the file list.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1t2pbanhlrg-36",
+    "texto": "Press the green button on the right.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2715l9ygslx-23",
+    "texto": "Press the green button.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1glcp478mki-39",
+    "texto": "Press the menu option in the file list.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2d7fluhqwq6-22",
+    "texto": "Press the menu option.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1wr39sw5vzd-38",
+    "texto": "Press the red button in the file list.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/214yu00xh4p-21",
+    "texto": "Press the red button.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/b3fmzbcnda-49",
+    "texto": "Press the search box at the bottom of the screen.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/w687ugqwr1-38",
+    "texto": "Press the search box at the top right.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/4paf2xnf62-38",
+    "texto": "Press the search box in the file list.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/wv3u4nvj9-38",
+    "texto": "Press the search box in the left menu.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/x064zhv7gs-21",
+    "texto": "Press the search box.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1b4jilx7htj-51",
+    "texto": "Put the big blue ball between the bed and the desk.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1sef48r3ls5-44",
+    "texto": "Put the big blue ball in front of the shelf.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/nkx3epens5-33",
+    "texto": "Put the big blue ball on the bed.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/17a2otne1qj-37",
+    "texto": "Put the big blue ball under the desk.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/ghgo1s3z2l-49",
+    "texto": "Put the black shoes between the bed and the desk.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1h2usfdspqc-37",
+    "texto": "Put the black shoes next to the door.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1b16zrevobx-34",
+    "texto": "Put the black shoes under the bed.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/25983xb6hkp-35",
+    "texto": "Put the black shoes under the desk.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/zgb9gaz2hz-32",
+    "texto": "Put the folder on the top shelf.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2274ykc4wh0-48",
+    "texto": "Put the green lamp between the bed and the desk.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/12qm7zcaczs-36",
+    "texto": "Put the green lamp next to the door.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1j8zwdvcr0q-31",
+    "texto": "Put the green lamp on the desk.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2fx20n0p7jq-32",
+    "texto": "Put the green lamp on the shelf.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/70lqi53lg8-53",
+    "texto": "Put the purple backpack between the bed and the desk.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1g126b9j92c-46",
+    "texto": "Put the purple backpack in front of the shelf.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/257up2tgpth-41",
+    "texto": "Put the purple backpack next to the door.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/45a88fmkkl-35",
+    "texto": "Put the purple backpack on the bed.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1uwur5d5umz-34",
+    "texto": "Put the small red ball in the box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1m62201bcbs-34",
+    "texto": "Put the small red ball on the bed.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/q9cx30vv4f-36",
+    "texto": "Put the small red ball on the shelf.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/y63bgbu7m7-37",
+    "texto": "Put the small red ball under the bed.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/4obnb0h6ro-38",
+    "texto": "Put the small red ball under the desk.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1wi2d0rqog3-32",
+    "texto": "Put the yellow books in the box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/p4jqrgpen5-33",
+    "texto": "Put the yellow books on the desk.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1v50k46n85w-34",
+    "texto": "Put the yellow books on the shelf.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/26hu4g2xmct-4",
+    "texto": "rice",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/14cbyec3lea-31",
+    "texto": "Route 1 is faster than Route 2.",
+    "labs": [
+      "habitos-comparaciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/ty2e785ffl-34",
+    "texto": "Route 2 is not as fast as Route 1.",
+    "labs": [
+      "habitos-comparaciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1rc3lp74p2k-10",
+    "texto": "sandwiches",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/le7eizh51z-15",
+    "texto": "Say that again.",
+    "labs": [
+      "aula-ingles-interacciones"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/273givt57qz-18",
+    "texto": "Select the button.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1s2wrb6lvn2-39",
+    "texto": "Select the search box in the file list.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/16r9p4isct4-29",
+    "texto": "She always dances at parties.",
+    "labs": [
+      "tiempo-libre-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/15xd37vitud-25",
+    "texto": "She always has breakfast.",
+    "labs": [
+      "rutina-diaria-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1cxzxpze988-24",
+    "texto": "She can play the guitar.",
+    "labs": [
+      "habilidades-permisos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/15e44ietjjx-30",
+    "texto": "She can speak three languages.",
+    "labs": [
+      "habilidades-permisos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2fivkhvyv4b-24",
+    "texto": "She doesn't play tennis.",
+    "labs": [
+      "tiempo-libre-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1mga285nqh1-18",
+    "texto": "She gets up early.",
+    "labs": [
+      "rutina-diaria-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2g1fif8sapp-23",
+    "texto": "She has long dark hair.",
+    "labs": [
+      "describir-personas-clima-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/26js90b24bi-86",
+    "texto": "She is tall and slim. She has long curly black hair. She is wearing a yellow raincoat.",
+    "labs": [
+      "clima-vestimenta-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2fxpjqacbl0-12",
+    "texto": "She is tall.",
+    "labs": [
+      "describir-personas-clima-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/194m8l754yf-33",
+    "texto": "She usually studies after dinner.",
+    "labs": [
+      "rutina-diaria-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1nomlsyjfds-78",
+    "texto": "Sofía got accepted! She is going to study nursing at the university next year.",
+    "labs": [
+      "planes-futuro-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/b9ujnegfgg-74",
+    "texto": "Sofía was drawing the Danzantes in her notebook when her phone rang twice.",
+    "labs": [
+      "pasado-viaje-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1k7pbp7d5jj-44",
+    "texto": "Some families in the neighborhood need food.",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1xj7eszqvh5-30",
+    "texto": "Sorry I'm late. May I come in?",
+    "labs": [
+      "aula-ingles-interacciones"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1iggpiv9kct-8",
+    "texto": "students",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2wd8xce2h3-54",
+    "texto": "Suddenly, we saw our neighbors arriving with a guitar.",
+    "labs": [
+      "relato-secuencia-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/24z3xcsd11x-157",
+    "texto": "Sure! It's very close. Go straight for one block. Turn right onto Independencia Avenue. The school is on your right, across from the park. You can't miss it.",
+    "labs": [
+      "ciudad-direcciones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/12jjsuwx0j-17",
+    "texto": "Sure. What is it?",
+    "labs": [
+      "aula-ingles-interacciones"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1ob8qs4f5t-86",
+    "texto": "Tadeo was listening to the municipal band when a street parade passed in front of him.",
+    "labs": [
+      "pasado-viaje-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2bsqwg97pie-30",
+    "texto": "That's the big black backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/8npi3bgy2a-30",
+    "texto": "That's the big black notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/20vmqnl4md2-29",
+    "texto": "That's the big blue backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/eym8rk4etv-29",
+    "texto": "That's the big blue notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/msae924nmr-30",
+    "texto": "That's the big green backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1x6mm9m9uc4-30",
+    "texto": "That's the big green notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/qu6ad9nd7h-31",
+    "texto": "That's the big orange backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1bu6tpfxbit-31",
+    "texto": "That's the big orange notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1ffev0a2ko4-31",
+    "texto": "That's the big purple backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1w89xi8ug7a-31",
+    "texto": "That's the big purple notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/uvaruy8okm-37",
+    "texto": "That's the big rectangular green box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1shqg85i04c-38",
+    "texto": "That's the big rectangular orange box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/bpjf7ajizc-35",
+    "texto": "That's the big rectangular red box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1x1jqojd1pb-28",
+    "texto": "That's the big red backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/htrzdgs4p8-28",
+    "texto": "That's the big red notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/jowvylx97s-31",
+    "texto": "That's the big round black box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/muz12qe0wj-30",
+    "texto": "That's the big round blue box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/l8rif94mnp-32",
+    "texto": "That's the big round blue clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/yzdz0dw3gw-31",
+    "texto": "That's the big round green box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/40ky2q1i7o-34",
+    "texto": "That's the big round orange clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2ayozw9rwhy-32",
+    "texto": "That's the big round purple box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/214fmhfm4fg-34",
+    "texto": "That's the big round purple clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/20y037030c1-33",
+    "texto": "That's the big round white clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/6frp26lscs-32",
+    "texto": "That's the big round yellow box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/ur7ixcs44u-34",
+    "texto": "That's the big square black clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/13m1iit6hlx-31",
+    "texto": "That's the big square blue box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/h5m0ykdn5j-33",
+    "texto": "That's the big square blue clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/ze5ipeh6kh-32",
+    "texto": "That's the big square green box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/p6xvf8yzgg-33",
+    "texto": "That's the big square orange box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1bpgj9xntmy-35",
+    "texto": "That's the big square orange clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1tkvyera2bo-33",
+    "texto": "That's the big square purple box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1sj7actwfql-32",
+    "texto": "That's the big square red clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/dccudzhyol-32",
+    "texto": "That's the big square white box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/7xezs7sje5-33",
+    "texto": "That's the big square yellow box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/t700oqv4fj-35",
+    "texto": "That's the big square yellow clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/19z2ya1ydtw-36",
+    "texto": "That's the big triangular black box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1jv8fpw4zan-38",
+    "texto": "That's the big triangular black clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1rskx3e5geo-35",
+    "texto": "That's the big triangular blue box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2e9yhgo158-37",
+    "texto": "That's the big triangular blue clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/148hvo4jdif-36",
+    "texto": "That's the big triangular green box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/t7ldzwnyap-38",
+    "texto": "That's the big triangular green clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1sj74fnur2d-37",
+    "texto": "That's the big triangular orange box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/27k5nynflg4-39",
+    "texto": "That's the big triangular orange clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1bf0vo16um4-37",
+    "texto": "That's the big triangular purple box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1ytqfaf3oa8-39",
+    "texto": "That's the big triangular purple clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2ans7imrnoy-36",
+    "texto": "That's the big triangular red clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/gdb4x6gskc-36",
+    "texto": "That's the big triangular white box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2bwdro21x50-38",
+    "texto": "That's the big triangular white clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1tmhqegh377-37",
+    "texto": "That's the big triangular yellow box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1bse9s2undl-30",
+    "texto": "That's the big white backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1og3o1sczgr-30",
+    "texto": "That's the big white notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/wswznohpo0-31",
+    "texto": "That's the big yellow backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2chl9z6jaoj-31",
+    "texto": "That's the big yellow notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1nh1ks5f4eb-28",
+    "texto": "That's the long blue pencil.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/zngjw57lny-29",
+    "texto": "That's the long green pencil.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/16spgjpte9m-30",
+    "texto": "That's the long orange pencil.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/140wq0auwf7-30",
+    "texto": "That's the long purple pencil.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/tbdys6duy7-27",
+    "texto": "That's the long red pencil.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/13rrhksm7op-30",
+    "texto": "That's the long yellow pencil.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1u9opf4qfrj-29",
+    "texto": "That's the short blue pencil.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1jno6ci5r22-30",
+    "texto": "That's the short green pencil.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1q6okco6yf4-31",
+    "texto": "That's the short orange pencil.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/hyj4rjob82-31",
+    "texto": "That's the short purple pencil.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/qb6rzsv7fh-28",
+    "texto": "That's the short red pencil.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/153tfyo7t5i-31",
+    "texto": "That's the short yellow pencil.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2e0avskx9i6-32",
+    "texto": "That's the small black backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/24oi7tg3bxh-32",
+    "texto": "That's the small black notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1j5vi3uxy3h-31",
+    "texto": "That's the small blue backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/pvde84907x-31",
+    "texto": "That's the small blue notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1x1pomks37s-32",
+    "texto": "That's the small green backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1sh9dbpkryf-32",
+    "texto": "That's the small green notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1f23fp2acp8-33",
+    "texto": "That's the small orange backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1vt0blytztl-33",
+    "texto": "That's the small orange notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/dzq8pogpru-33",
+    "texto": "That's the small purple backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1pma8nlq230-33",
+    "texto": "That's the small purple notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1i5kojyp2co-39",
+    "texto": "That's the small rectangular black box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/s8qq6k4ld8-39",
+    "texto": "That's the small rectangular green box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1mcdtpqckfn-40",
+    "texto": "That's the small rectangular orange box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/pv80p5onoc-37",
+    "texto": "That's the small rectangular red box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/ky0q3hk53k-39",
+    "texto": "That's the small rectangular white box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/b2tl14uamf-40",
+    "texto": "That's the small rectangular yellow box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/vhejs8c73w-30",
+    "texto": "That's the small red backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/7k55s3p9bz-30",
+    "texto": "That's the small red notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1ahqagc64ne-35",
+    "texto": "That's the small round black clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2f6eo2meui4-32",
+    "texto": "That's the small round blue box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1ft43et8k3g-34",
+    "texto": "That's the small round blue clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/17hwze2b6mt-35",
+    "texto": "That's the small round green clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1f5tyaskxp5-36",
+    "texto": "That's the small round orange clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2t2pjs8r30-34",
+    "texto": "That's the small round purple box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/no55cxo9f9-31",
+    "texto": "That's the small round red box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2bunawaj338-33",
+    "texto": "That's the small round red clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1mpzayu2vov-35",
+    "texto": "That's the small round white clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1aazo7uh5s1-34",
+    "texto": "That's the small round yellow box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1qihrj0xlfk-36",
+    "texto": "That's the small round yellow clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/ajqsvxjht2-36",
+    "texto": "That's the small square black clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1y33ojypl97-33",
+    "texto": "That's the small square blue box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/j0fizanmyk-35",
+    "texto": "That's the small square blue clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2vrcjwwfi0-34",
+    "texto": "That's the small square green box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/23cbptnqdqn-35",
+    "texto": "That's the small square orange box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1dppschbu72-37",
+    "texto": "That's the small square orange clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/7exc2gnjpt-35",
+    "texto": "That's the small square purple box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/37w0d0cckz-34",
+    "texto": "That's the small square red clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/p8iyvy1i60-38",
+    "texto": "That's the small triangular black box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/d2kqznuipk-40",
+    "texto": "That's the small triangular black clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/vynu8548w6-37",
+    "texto": "That's the small triangular blue box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/18zzgdj4vtq-39",
+    "texto": "That's the small triangular blue clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1y8i31cizgp-38",
+    "texto": "That's the small triangular green box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1bh0emgds4u-41",
+    "texto": "That's the small triangular orange clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/7h1wjw4npp-39",
+    "texto": "That's the small triangular purple box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/8y5wedfllr-41",
+    "texto": "That's the small triangular purple clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/29qz0f1zbim-38",
+    "texto": "That's the small triangular red clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1a0jyzsqz0d-38",
+    "texto": "That's the small triangular white box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1bwli9alhf-40",
+    "texto": "That's the small triangular white clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/21yk7ogxjbt-39",
+    "texto": "That's the small triangular yellow box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1xof4oxww1-32",
+    "texto": "That's the small white backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/lfpsomsey2-32",
+    "texto": "That's the small white notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1yosgpvmjmf-33",
+    "texto": "That's the small yellow backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/29rccgkq3yf-33",
+    "texto": "That's the small yellow notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1n82qxdnza0-66",
+    "texto": "The apartment is above the store. The basement is below the lobby.",
+    "labs": [
+      "lugares-recomendaciones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/pkcb9boa3s-49",
+    "texto": "The bank is between the hotel and the restaurant.",
+    "labs": [
+      "lugares-recomendaciones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2dbvhtk6yid-31",
+    "texto": "The bus is as fast as the bike.",
+    "labs": [
+      "habitos-comparaciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/13xlrz1fcx0-318",
+    "texto": "The Main Square is the heart of Rincón del Colibrí. There is an old church, and there is a kiosk in the middle of the square. On Sunday evenings, there is live music in the kiosk, and it's free. The square is flat, so it's easy to visit in a wheelchair or with a stroller. It's a good place to eat ice cream and relax.",
+    "labs": [
+      "lugares-recomendaciones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/esibp31duy-40",
+    "texto": "The park next to the market needs shade.",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/25pw4qxt8ww-46",
+    "texto": "The parking lot is behind the shopping center.",
+    "labs": [
+      "lugares-recomendaciones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1iti4tqt94o-35",
+    "texto": "The pharmacy is next to the bakery.",
+    "labs": [
+      "lugares-recomendaciones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/mps865ut7f-32",
+    "texto": "The school is opposite the park.",
+    "labs": [
+      "lugares-recomendaciones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2cwfbrwskk-57",
+    "texto": "The storm flooded our house. Everything is wet and dirty.",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/7n9aekiw7v-32",
+    "texto": "The teacher has short gray hair.",
+    "labs": [
+      "describir-personas-clima-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/9bucn6vaxg-39",
+    "texto": "The tianguis is always busy on Sundays.",
+    "labs": [
+      "tiempo-libre-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/sfa28w88f-44",
+    "texto": "Then she told me old stories about our town.",
+    "labs": [
+      "relato-secuencia-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/16b2b7z2q4l-46",
+    "texto": "Then, I ran to the bus stop without breakfast.",
+    "labs": [
+      "relato-secuencia-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2g6664x8shl-43",
+    "texto": "There are three parks in this neighborhood.",
+    "labs": [
+      "lugares-recomendaciones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/grqc8ov9yk-89",
+    "texto": "There are three tables at recess and two seats at each table. Everyone wants to have fun!",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1dewblbvoh2-43",
+    "texto": "There is a fountain in front of the school.",
+    "labs": [
+      "lugares-recomendaciones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1nrsvossrmw-39",
+    "texto": "There is a library on the second floor.",
+    "labs": [
+      "lugares-recomendaciones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/15iak4ado1e-56",
+    "texto": "There is a pharmacy on the corner of Juárez and Hidalgo.",
+    "labs": [
+      "lugares-recomendaciones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1g7td46kv1z-46",
+    "texto": "They are building a new library at the school.",
+    "labs": [
+      "rutina-diaria-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1msg92zks55-16",
+    "texto": "They can't cook.",
+    "labs": [
+      "habilidades-permisos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1io3alrhqp2-26",
+    "texto": "They don't go to the park.",
+    "labs": [
+      "tiempo-libre-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/qwzlyb911p-33",
+    "texto": "They listen to music in the park.",
+    "labs": [
+      "tiempo-libre-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/wupzdqb8bt-32",
+    "texto": "They sometimes go to the cinema.",
+    "labs": [
+      "tiempo-libre-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/22wdivm705m-77",
+    "texto": "This exercise is easier than the last one; it is the easiest one in the unit.",
+    "labs": [
+      "habitos-comparaciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1d7lk3nwxq-83",
+    "texto": "This taquería is better than the one downtown — it is the best in the neighborhood.",
+    "labs": [
+      "habitos-comparaciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/12y2ul9t9u9-40",
+    "texto": "Today I'd rather walk than take the bus.",
+    "labs": [
+      "habitos-comparaciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/16fbvvxj36h-53",
+    "texto": "Tomás wants to ride his bike on the basketball court.",
+    "labs": [
+      "habilidades-permisos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/29vib2nelt-75",
+    "texto": "Traffic today is worse than yesterday; Friday is the worst day of the week.",
+    "labs": [
+      "habitos-comparaciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1rllliiu93a-16",
+    "texto": "Type the button.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/13yxn11vzbz-37",
+    "texto": "Type the search box in the file list.",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/mlbojckre9-72",
+    "texto": "Walking is healthier than driving, and cycling is the healthiest option.",
+    "labs": [
+      "habitos-comparaciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/fvac4t57w5-5",
+    "texto": "water",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/27jv0jfvl1z-35",
+    "texto": "Water boils at 100 °C at sea level.",
+    "labs": [
+      "rutina-diaria-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1t15cmvqrhf-21",
+    "texto": "Water is uncountable.",
+    "labs": [
+      "mercado-necesidades-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/gigykvpxtb-86",
+    "texto": "We bought the paint last week. We are going to paint a mural on this wall on Saturday.",
+    "labs": [
+      "planes-futuro-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1tw4v410k6l-47",
+    "texto": "We could start a recycling programme at school.",
+    "labs": [
+      "planes-futuro-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/z8t70j8plp-23",
+    "texto": "We have breakfast at 7.",
+    "labs": [
+      "rutina-diaria-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1impe979hos-26",
+    "texto": "We have English on Monday.",
+    "labs": [
+      "habilidades-permisos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/ac8mb2nbgx-50",
+    "texto": "We have taken a photo of the Popocatépetl volcano.",
+    "labs": [
+      "experiencias-recientes-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1ocoqcl5kk9-47",
+    "texto": "We need someone who can cook and speak Nahuatl.",
+    "labs": [
+      "habilidades-permisos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/8ir9radw2e-72",
+    "texto": "We need someone who can play the guitar and someone who can edit videos.",
+    "labs": [
+      "habilidades-permisos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1m4a37x93w1-65",
+    "texto": "We need someone who can swim and someone who can play basketball.",
+    "labs": [
+      "habilidades-permisos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/ao45vaeyhj-35",
+    "texto": "We often play football in the park.",
+    "labs": [
+      "tiempo-libre-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1qsfuenqouw-41",
+    "texto": "We say 'notes'. Listen and repeat: notes.",
+    "labs": [
+      "aula-ingles-interacciones"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1lm865svho7-52",
+    "texto": "We took a photo of the Popocatépetl volcano in July.",
+    "labs": [
+      "experiencias-recientes-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/167928pdhuy-55",
+    "texto": "We're planning to organise a book drive for the school.",
+    "labs": [
+      "planes-futuro-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/jh4po8tg89-15",
+    "texto": "What do you do?",
+    "labs": [
+      "perfil-personal-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/15rro9ysqy7-57",
+    "texto": "What do you think of karaoke? I really like it! It's fun.",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1r1s9yvmegz-70",
+    "texto": "What do you think of reading? I think it's great! It's so interesting.",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2mksuzob9o-28",
+    "texto": "What does 'assignment' mean?",
+    "labs": [
+      "aula-ingles-interacciones"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/ncpjhpos60-44",
+    "texto": "What time does the bus from Veracruz arrive?",
+    "labs": [
+      "terminal-horarios-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1gpqexqhhkb-31",
+    "texto": "What time does the museum open?",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1w0q0bv6g9s-20",
+    "texto": "What's your address?",
+    "labs": [
+      "perfil-personal-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1fc3srzz3lf-26",
+    "texto": "What's your email address?",
+    "labs": [
+      "perfil-personal-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1hb6tdye1al-17",
+    "texto": "What's your name?",
+    "labs": [
+      "perfil-personal-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1l24g5gtbja-24",
+    "texto": "What's your nationality?",
+    "labs": [
+      "perfil-personal-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2ae5m78jzz-25",
+    "texto": "What's your phone number?",
+    "labs": [
+      "perfil-personal-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1ata67j09xj-22",
+    "texto": "When did you try them?",
+    "labs": [
+      "experiencias-recientes-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2cr2w17c14j-41",
+    "texto": "When I arrived, the bus had already left.",
+    "labs": [
+      "relato-secuencia-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1vxwgmpdc2w-39",
+    "texto": "When is the lost and found office open?",
+    "labs": [
+      "terminal-horarios-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1uwy672dnkn-19",
+    "texto": "Where are you from?",
+    "labs": [
+      "perfil-personal-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/17wc5iwhyww-35",
+    "texto": "Where did you find the information?",
+    "labs": [
+      "experiencias-recientes-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/16vxktxz5yw-24",
+    "texto": "Where does the bus stop?",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/vw7bmqgeea-21",
+    "texto": "Where is the library?",
+    "labs": [
+      "instrucciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/23zkr5xhw2g-26",
+    "texto": "Which bus leaves at 10:55?",
+    "labs": [
+      "terminal-horarios-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/842eeczz2s-45",
+    "texto": "Which gate does the bus to Oaxaca leave from?",
+    "labs": [
+      "terminal-horarios-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/u0hho71vl-72",
+    "texto": "While we were looking for a free table, my brother found the mole stand.",
+    "labs": [
+      "pasado-viaje-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2er9x8inqsp-71",
+    "texto": "While we were walking along the Avenue of the Dead, it started to rain.",
+    "labs": [
+      "pasado-viaje-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/jyzb7u5fsc-20",
+    "texto": "Who did you go with?",
+    "labs": [
+      "experiencias-recientes-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/8b0cjpngpz-22",
+    "texto": "Why did you move here?",
+    "labs": [
+      "experiencias-recientes-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/xgeqv6ffjq-13",
+    "texto": "Work in pairs",
+    "labs": [
+      "aula-ingles-interacciones"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2bm7bqp4kvk-37",
+    "texto": "Would you rather go out or stay home?",
+    "labs": [
+      "habitos-comparaciones-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/k0bb9nbnmj-22",
+    "texto": "Write in your notebook",
+    "labs": [
+      "aula-ingles-interacciones"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2g5q2x6haxy-30",
+    "texto": "Yes, come in. Please sit down.",
+    "labs": [
+      "aula-ingles-interacciones"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/pv6pyd7cf7-12",
+    "texto": "Yes, I have.",
+    "labs": [
+      "experiencias-recientes-ingles"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/qwcf6g62us-22",
+    "texto": "Yes, I really like it!",
+    "labs": [
+      "gustos-opiniones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1wh3rp866n6-149",
+    "texto": "Yes, there is. It's on Reforma Avenue. Go straight ahead for two blocks. Turn left at the traffic light. The hotel is on your right. Enjoy your stay!",
+    "labs": [
+      "ciudad-direcciones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/m9f8p6n9s7-35",
+    "texto": "Yes! That's the big black backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/267i60dgiga-34",
+    "texto": "Yes! That's the big blue notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/20ivr6okn4l-35",
+    "texto": "Yes! That's the big green notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2bbx8ifiiu6-36",
+    "texto": "Yes! That's the big orange backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1l6xrn5zkw3-36",
+    "texto": "Yes! That's the big purple backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/28czc21d34y-37",
+    "texto": "Yes! That's the big square red clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/44rjx8uwjc-41",
+    "texto": "Yes! That's the big triangular green box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/2g7j0rnsyx0-44",
+    "texto": "Yes! That's the big triangular purple clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/oyaqkywm9m-35",
+    "texto": "Yes! That's the big white notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/eea7fmrruh-33",
+    "texto": "Yes! That's the long blue pencil.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/m9xg6rlja7-35",
+    "texto": "Yes! That's the long orange pencil.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1vd8590srdh-34",
+    "texto": "Yes! That's the short blue pencil.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1askkxrarn4-35",
+    "texto": "Yes! That's the short green pencil.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/f85zmg9a7l-36",
+    "texto": "Yes! That's the short orange pencil.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1yrqg4878qo-36",
+    "texto": "Yes! That's the short yellow pencil.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/15odl9mgvj5-37",
+    "texto": "Yes! That's the small black backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1mvcuq1byy0-37",
+    "texto": "Yes! That's the small green notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/u7l26h4y2c-38",
+    "texto": "Yes! That's the small purple backpack.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/4wh9zfo6vk-38",
+    "texto": "Yes! That's the small purple notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/5xf8bjuvrp-44",
+    "texto": "Yes! That's the small rectangular white box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/agl1eb250a-35",
+    "texto": "Yes! That's the small red notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1l4az0k79ci-40",
+    "texto": "Yes! That's the small square blue clock.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/e9enwv5yd-40",
+    "texto": "Yes! That's the small square yellow box.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/ziu6rb0p09-37",
+    "texto": "Yes! That's the small white notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/p8e6ghbtqa-38",
+    "texto": "Yes! That's the small yellow notebook.",
+    "labs": [
+      "casa-escuela-objetos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/ka39enklp4-58",
+    "texto": "You can find fresh fruit at the market next to the church.",
+    "labs": [
+      "lugares-recomendaciones-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/14remvnzrds-32",
+    "texto": "You can leave class early today.",
+    "labs": [
+      "habilidades-permisos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/1gerk82eqat-20",
+    "texto": "You can't park here.",
+    "labs": [
+      "habilidades-permisos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "en",
+    "clave": "en/ulodmglbev-37",
+    "texto": "You can't use your phone in the exam.",
+    "labs": [
+      "habilidades-permisos-ingles-3d"
+    ]
+  },
+  {
+    "idioma": "es",
+    "clave": "es/2301luj98bo-215",
+    "texto": "El Metro de la Ciudad de México abrió su primera línea en 1969 Desde entonces mueve a millones de personas cada día y por eso aparece en casi cualquier conversación sobre la ciudad Cuántas líneas crees que tiene hoy",
+    "labs": [
+      "lectura-en-voz-alta"
+    ]
+  },
+  {
+    "idioma": "es",
+    "clave": "es/1krjdp8a61e-220",
+    "texto": "El Metro de la Ciudad de México abrió su primera línea en 1969. Desde entonces mueve a millones de personas cada día, y por eso aparece en casi cualquier conversación sobre la ciudad. ¿Cuántas líneas crees que tiene hoy?",
+    "labs": [
+      "lectura-en-voz-alta"
+    ]
+  },
+  {
+    "idioma": "es",
+    "clave": "es/1sblhq4b1k0-104",
+    "texto": "El patio se quedó sin nadie. La higuera guarda la sombra de la tarde. Alguien apaga la luz de la cocina.",
+    "labs": [
+      "lectura-en-voz-alta"
+    ]
+  },
+  {
+    "idioma": "es",
+    "clave": "es/1zbjz32fbny-171",
+    "texto": "La lluvia llegó de golpe sin avisar Tapó los techos las bardas el ruido de los coches Qué silencio tan raro deja el agua cuando cae Después nada solo el goteo de la azotea",
+    "labs": [
+      "lectura-en-voz-alta"
+    ]
+  },
+  {
+    "idioma": "es",
+    "clave": "es/6javlnxjq7-181",
+    "texto": "La lluvia llegó de golpe, sin avisar. Tapó los techos, las bardas, el ruido de los coches. ¡Qué silencio tan raro deja el agua cuando cae! Después, nada: solo el goteo de la azotea.",
+    "labs": [
+      "lectura-en-voz-alta"
+    ]
+  },
+  {
+    "idioma": "es",
+    "clave": "es/1oicuqyy43l-165",
+    "texto": "La Secretaría de Salud informó que la campaña de vacunación continuará el sábado en los doce centros de salud del municipio, de nueve de la mañana a dos de la tarde.",
+    "labs": [
+      "lectura-en-voz-alta"
+    ]
+  },
+  {
+    "idioma": "es",
+    "clave": "es/ms6oil9ilc-100",
+    "texto": "Mantén la calma. Salir por la puerta más cercana. No usar el elevador. Reunirse en el patio central.",
+    "labs": [
+      "lectura-en-voz-alta"
+    ]
+  },
+  {
+    "idioma": "es",
+    "clave": "es/ov68jo8jf-182",
+    "texto": "Mi abuela preguntó desde la cocina ya terminaste Le dije que todavía no sin levantar la vista del cuaderno Ella se asomó leyó por encima de mi hombro y me dijo una sola palabra léelo",
+    "labs": [
+      "lectura-en-voz-alta"
+    ]
+  },
+  {
+    "idioma": "es",
+    "clave": "es/2clbs8fmchy-190",
+    "texto": "Mi abuela preguntó desde la cocina: ¿ya terminaste? Le dije que todavía no, sin levantar la vista del cuaderno. Ella se asomó, leyó por encima de mi hombro y me dijo una sola palabra: léelo.",
+    "labs": [
+      "lectura-en-voz-alta"
+    ]
+  },
+  {
+    "idioma": "es",
+    "clave": "es/nmzsjsi0y9-118",
+    "texto": "Vierte el líquido en el vaso de precipitados. Espera a que deje de burbujear. Anota la temperatura antes de continuar.",
+    "labs": [
+      "lectura-en-voz-alta"
+    ]
+  }
+]

@@ -13,7 +13,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, card, Eyebrow, SceneBoundary, OK } from "./_kit";
+import { T, card, Eyebrow, SceneBoundary } from "./_kit";
 import { FichaTeorica } from "./_ficha";
 import { RESPIRACION_FICHA } from "./respiracion-celular-ficha";
 import { RetoNumericoCard } from "./_reto-numerico";
@@ -46,6 +46,11 @@ import {
   DATOS,
   HECHOS,
 } from "./respiracion-data";
+
+import { TableroObjetivos } from "./_objetivos";
+
+/** Clave de la mejor marca de este laboratorio. */
+const RETO_KEY = "cen-respiracion-celular-reto";
 
 const RespiracionScene = dynamic(() => import("./RespiracionScene"), {
   ssr: false,
@@ -567,20 +572,17 @@ export function LabRespiracion({ color }: PracticaLabProps) {
           <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
           Objetivos
         </Eyebrow>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-          {[
+        <TableroObjetivos
+          retoKey={RETO_KEY}
+          accent={accent}
+          objetivos={[
             { txt: "Observa las cuatro fases de la glucólisis en el modo Glucólisis", done: modo !== "glucolisis" || paso > 0 },
             { txt: "Recorre las etapas de Krebs y cadena transportadora (Aerobia)", done: modo === "aerobia" || modo === "comparar" },
             { txt: "Compara aerobia vs fermentación en el modo Comparar", done: modo === "comparar" },
             { txt: "Usa la calculadora para ver el balance de ATP, O₂ y CO₂", done: molGlucosa !== 5 || rutaId !== "aerobia" },
             { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
-          ].map((o, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? OK : T.text2 }}>
-              <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-              <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-            </div>
-          ))}
-        </div>
+          ]}
+        />
       </div>
 
       {/* ── Reto evaluable: el ejercicio verbatim del ancla A2 ────────────── */}

@@ -35,6 +35,11 @@ import {
   fmt0, fmtFrec, fmtLambda, fmtEnergia, colorVisible,
 } from "./espectro-data";
 
+import { TableroObjetivos } from "./_objetivos";
+
+/** Clave de la mejor marca de este laboratorio. */
+const RETO_KEY = "cen-espectro-electromagnetico-reto";
+
 const EspectroScene = dynamic(() => import("./EspectroScene"), {
   ssr: false,
   loading: () => (
@@ -493,20 +498,18 @@ export function LabEspectro({ color }: PracticaLabProps) {
           <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
           Objetivos
         </Eyebrow>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-          {[
-            { txt: "Recorre el espectro de radio a rayos gamma (c = λ·f)", done: true },
-            { txt: "Identifica el umbral de radiación ionizante (rayos X y gamma)", done: true },
-            { txt: "Explora la franja visible (380–700 nm) y sus colores", done: true },
-            { txt: "Ubica aplicaciones reales de México en el espectro", done: true },
+        <TableroObjetivos
+          retoKey={RETO_KEY}
+          accent={accent}
+          objetivos={[
+            { txt: "Recorre el espectro moviendo la frecuencia (c = λ·f)", done: logF !== LOGF_DEF },
+            { txt: "Llega a las ondas de radio o microondas, en el extremo de baja frecuencia", done: pt.banda.id === "radio" || pt.banda.id === "micro" },
+            { txt: "Cruza el umbral: alcanza radiación ionizante (rayos X o gamma)", done: pt.ionizante },
+            { txt: "Explora la franja visible (380–700 nm) y sus colores", done: modo === "visible" },
+            { txt: "Ubica aplicaciones reales de México en el espectro", done: modo === "aplicaciones" },
             { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
-          ].map((o, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? "#34D399" : T.text2 }}>
-              <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-              <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-            </div>
-          ))}
-        </div>
+          ]}
+        />
       </div>
 
       {/* ── Reto evaluable: el quiz verbatim del ancla ───────────────── */}

@@ -1,0 +1,155 @@
+[
+  {
+    "slug": "exposicion-oral",
+    "items": [
+      { "clave": "coloquio", "escena": "A clay round table with four figures seated facing one another, each holding a small card" },
+      { "clave": "simposio", "escena": "A clay stage with three figures standing in a row behind a long table, facing an audience" },
+      { "clave": "foro", "escena": "A clay circle of open benches with one figure standing in the middle and hands raised all around" },
+      { "clave": "planeacion-logistica", "escena": "A clay board with a floor plan, a clock, a box of materials and coloured pins" },
+      { "clave": "ejecucion", "escena": "A clay figure standing at a lectern speaking, with a screen behind it" },
+      { "clave": "seguimiento-y-retroalimentacion", "escena": "A clay clipboard with a checklist lying beside a small mirror and a stack of notes" }
+    ]
+  },
+  {
+    "slug": "extremos-inflexion",
+    "items": [
+      { "clave": "punto-critico", "escena": "A clay rolling hill landscape with small flat plates set at each summit and each valley bottom" },
+      { "clave": "prueba-de-la-primera-derivada", "escena": "A clay hill with an arrow rising along the left slope and falling along the right, a flag planted at the top" },
+      { "clave": "prueba-de-la-segunda-derivada", "escena": "A clay cup holding a ball at its bottom beside an upturned cup with a ball balanced on top" },
+      { "clave": "concavidad", "escena": "A clay coffee cup standing upright beside the same cup turned upside down" },
+      { "clave": "punto-de-inflexion", "escena": "A clay S curved ribbon with a bead at the exact point where it stops bending one way and starts bending the other" },
+      { "clave": "analisis-completo-de-una-funcion", "escena": "A clay curve on a board with beads at its crossings, flags at its peaks and a marker where its bend changes" }
+    ]
+  },
+  {
+    "slug": "factores-produccion",
+    "items": [
+      { "clave": "factores-de-produccion", "escena": "A clay workbench holding a patch of soil, a hand tool, a stack of coins, a plan sheet and an hourglass" },
+      { "clave": "distribucion", "escena": "A clay pie cut into very uneven slices being handed out to figures of different sizes" },
+      { "clave": "intercambio-desigual", "escena": "A clay seesaw with a small crate going one way and a big crate the other, tilting heavily" },
+      { "clave": "economia-informal", "escena": "A clay street stall under a tarpaulin selling fruit beside a proper shopfront" },
+      { "clave": "trabajo-no-remunerado", "escena": "A clay figure sweeping and holding a child at home, with an empty pay envelope on the table" }
+    ]
+  },
+  {
+    "slug": "factorizacion-area",
+    "items": [
+      { "clave": "factorizar", "escena": "A clay rectangle separated into a side strip and a side column that exactly build it back" },
+      { "clave": "factor-comun", "escena": "Three clay stacks of tiles with one identical tile pulled out of each into a shared pile" },
+      { "clave": "diferencia-de-cuadrados", "escena": "A clay large square with a smaller square cut from one corner, the remaining L shape rearranged into a rectangle" },
+      { "clave": "trinomio-cuadrado-perfecto", "escena": "A clay square built from one big square tile, two equal strips and one small unit tile" },
+      { "clave": "trinomio-x-bx-c", "escena": "A clay rectangle assembled from one square tile, several strips and a block of small unit cubes" },
+      { "clave": "porcentaje", "escena": "A clay grid of one hundred small squares with twenty of them raised and coloured" }
+    ]
+  },
+  {
+    "slug": "falacias-logica",
+    "items": [
+      { "clave": "abduccion", "escena": "A clay magnifying glass held over a single footprint, with a model of the likeliest boot standing beside it" },
+      { "clave": "premisa", "escena": "Two clay blocks set as the base of a small arch" },
+      { "clave": "conclusion", "escena": "A clay keystone block being set at the top of an arch built on two base blocks" },
+      { "clave": "argumento-valido", "escena": "A clay arch standing firmly, every block fitting the next exactly" },
+      { "clave": "ad-hominem", "escena": "A clay figure throwing a ball at another figure instead of at the target board behind it" },
+      { "clave": "hombre-de-paja", "escena": "A clay straw dummy being knocked over while the real figure stands untouched beside it" },
+      { "clave": "pendiente-resbaladiza", "escena": "A clay ball rolling down a long greased slope toward a cliff edge at the bottom" },
+      { "clave": "apelacion-a-la-autoridad", "escena": "A clay figure in a tall hat pointing at a blank plaque while the evidence table behind it stands empty" },
+      { "clave": "falsa-dicotomia", "escena": "A clay fork in the road with two clear paths and several other paths hidden under a cloth" },
+      { "clave": "proposicion", "escena": "A single clay card standing upright on a table with one plain face turned up" },
+      { "clave": "silogismo", "escena": "Three clay blocks in a small tower: two below and one resting across both" },
+      { "clave": "deduccion", "escena": "A clay funnel with a wide mouth taking in a broad flow and letting out a single bead" },
+      { "clave": "induccion", "escena": "A clay tray of several identical beads with one bigger bead being formed above them" },
+      { "clave": "falacia", "escena": "A clay arch with one block replaced by a crumbling piece, the whole arch sagging" },
+      { "clave": "tabla-de-verdad", "escena": "A clay grid tray with a small switch in every cell, each one flipped up or down" }
+    ]
+  },
+  {
+    "slug": "figuras-retoricas",
+    "items": [
+      { "clave": "metafora", "escena": "A clay heart shaped stone resting in the palm of an open hand" },
+      { "clave": "hiperbaton", "escena": "A clay row of blocks with two of them swapped out of their natural order" },
+      { "clave": "hiperbole", "escena": "A tiny clay water drop beside an enormous clay drop of the same shape many times bigger" },
+      { "clave": "ironia", "escena": "A clay theatre mask smiling on one side and frowning on the other, held up by a hand" },
+      { "clave": "prosopopeya", "escena": "A clay tree with a face and two arms, holding a watering can" },
+      { "clave": "rima-y-metrica", "escena": "A clay row of identical beads grouped in equal measures with a small bell at the end of each group" }
+    ]
+  },
+  {
+    "slug": "fision-nuclear-etica-3d",
+    "items": [
+      { "clave": "factor-de-multiplicacion-k", "escena": "A clay chain of splitting beads: one becomes two, two become four, spreading across a tray" },
+      { "clave": "moderador-y-coeficiente-de-vacios", "escena": "A clay tank of water with a bead slowing as it passes through, and graphite blocks stacked beside it" },
+      { "clave": "neutrones-retardados", "escena": "A clay hourglass beside a burst of beads, with a few beads trickling out late" },
+      { "clave": "calor-residual", "escena": "A clay reactor vessel switched off but still glowing warm, with a cooling water pipe running into it" },
+      { "clave": "defecto-de-masa", "escena": "A clay balance with a heavy block on one pan and its broken pieces on the other, slightly lighter, a spark escaping between them" },
+      { "clave": "vida-media", "escena": "A clay pile of beads halving three times along a bench: full, half, quarter, eighth" },
+      { "clave": "radiacion-ionizante-y-no-ionizante", "escena": "A clay atom losing an electron to a sharp beam beside another atom merely warmed by a soft wave" },
+      { "clave": "alcance-de-una-antena", "escena": "Two clay antennas: a tall one with wide gentle rings around it and a small one with tight short rings" }
+    ]
+  },
+  {
+    "slug": "fluidos",
+    "items": [
+      { "clave": "fluido", "escena": "A clay liquid poured into three differently shaped containers, taking the shape of each one" },
+      { "clave": "densidad-masa-volumen", "escena": "Two clay blocks of exactly the same size on a balance, one much heavier than the other" },
+      { "clave": "principio-de-arquimedes", "escena": "A clay block lowered into a brimming tub, the spilled water caught in a cup resting on a scale" },
+      { "clave": "presion-hidrostatica", "escena": "A tall clay tank with three holes down its side, the lowest jet shooting out farthest" },
+      { "clave": "principio-de-pascal", "escena": "A clay hydraulic jack with a small piston pressed down and a big piston lifting a car" },
+      { "clave": "ecuacion-de-continuidad", "escena": "A clay pipe narrowing in the middle with the flow speeding up through the neck" },
+      { "clave": "principio-de-bernoulli", "escena": "A clay wing shape with air streaming faster over its curved top, lifting it upward" },
+      { "clave": "tension-superficial", "escena": "A clay water strider standing on a water surface that dimples gently under its feet" },
+      { "clave": "capilaridad", "escena": "Three clay glass tubes of different widths standing in a dish of water, the thinnest holding the highest column" },
+      { "clave": "viscosidad", "escena": "Two clay jars tipped over: honey crawling slowly out of one and water running fast out of the other" },
+      { "clave": "densidad", "escena": "A clay cube floating at the surface of a tank beside another cube sunk to the bottom" },
+      { "clave": "presion-p", "escena": "A clay thumb pressing flat on a board beside a fingertip pushing a pin into the same surface" }
+    ]
+  },
+  {
+    "slug": "formas-energia-transformacion",
+    "items": [
+      { "clave": "energia", "escena": "A clay battery, a coiled spring, a small flame and a wave arranged together on one tray" },
+      { "clave": "conservacion-de-la-energia", "escena": "A clay sealed track where a ball rolls down one side and rises to the same height on the other" },
+      { "clave": "energia-cinetica", "escena": "A clay ball rolling fast across a table with motion lines trailing behind it" },
+      { "clave": "energia-potencial", "escena": "A clay book resting on a high shelf with a dotted line marking the drop to the floor" },
+      { "clave": "transformadores-de-energia", "escena": "A clay dam with falling water turning a turbine that lights a small bulb" },
+      { "clave": "energia-quimica", "escena": "A clay battery cut open showing tiny coiled springs stored between its layers" },
+      { "clave": "joule-j", "escena": "A single clay unit block standing alone on a measuring plate" }
+    ]
+  },
+  {
+    "slug": "fotosintesis",
+    "items": [
+      { "clave": "fotosintesis", "escena": "A clay leaf in sunlight with a grey puff entering one side and a clear bubble and a sugar cube leaving the other" },
+      { "clave": "cloroplasto", "escena": "A clay green oval cut open showing stacks of flat discs suspended in a clear gel" },
+      { "clave": "reacciones-de-luz", "escena": "A clay stack of green discs struck by sunlight, releasing bubbles and glowing beads" },
+      { "clave": "ciclo-de-calvin", "escena": "A clay carousel turning in the gel around the green discs, taking in grey puffs and dropping out a sugar cube" },
+      { "clave": "clorofila", "escena": "A clay green pigment drop absorbing a red and a blue beam and bouncing a green beam back" },
+      { "clave": "factor-limitante", "escena": "A clay barrel made of staves of different heights, the water filling only up to the shortest stave" },
+      { "clave": "plantas-c3", "escena": "A clay leaf cross section with one gathering chamber taking in a grey puff" },
+      { "clave": "plantas-c4", "escena": "A clay leaf cross section with an outer chamber passing a grey puff on to an inner chamber" },
+      { "clave": "plantas-cam", "escena": "A clay cactus with its surface pores shut in daylight and open under a night sky" },
+      { "clave": "fotolisis-del-agua", "escena": "A clay water drop split by a beam of light, releasing a bubble of gas" }
+    ]
+  },
+  {
+    "slug": "fracciones-porcentajes",
+    "items": [
+      { "clave": "fraccion", "escena": "A clay pizza cut into eight equal slices with three of them lifted onto a plate" },
+      { "clave": "decimal", "escena": "A clay bar divided into ten equal parts with a few of them raised above the rest" },
+      { "clave": "porcentaje", "escena": "A clay grid of one hundred small squares with twenty five of them coloured" },
+      { "clave": "fraccion-equivalente", "escena": "Two clay bars of the same length, one split into two parts and the other into four, the halves matching exactly" },
+      { "clave": "simplificacion", "escena": "A clay bar of six pieces being regrouped into three larger pieces of the same total length" },
+      { "clave": "denominador-comun", "escena": "Two clay bars split into thirds and quarters, both resliced into twelve matching pieces" }
+    ]
+  },
+  {
+    "slug": "fuentes-historicas",
+    "items": [
+      { "clave": "fuente-primaria", "escena": "A clay handwritten letter with a wax seal lying on a desk beside an object from the same period" },
+      { "clave": "fuente-secundaria", "escena": "A clay modern book open on a desk with a stack of old documents beside it" },
+      { "clave": "sesgo-historico", "escena": "A clay pair of tinted spectacles resting on top of an old document" },
+      { "clave": "fiabilidad-de-una-fuente", "escena": "A clay document on one pan of a balance with a small weight of evidence on the other" },
+      { "clave": "contraste-de-fuentes", "escena": "Three clay documents laid side by side on a table with a magnifying glass moving between them" },
+      { "clave": "fuente-iconografica", "escena": "A clay framed painting, a photograph and a folded map spread across a table" }
+    ]
+  }
+]

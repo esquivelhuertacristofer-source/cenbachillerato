@@ -32,6 +32,10 @@ import {
   fmtNum2, fmtInt, fmtPar, ecCircunferencia, ecParabFoco, ecParabAbierta,
   type EscenarioCirc, type EscenarioParab,
 } from "./conicas-data";
+import { TableroObjetivos } from "./_objetivos";
+
+/** Clave de la mejor marca de este laboratorio. */
+const RETO_KEY = "cen-conicas-lugares-geometricos-reto";
 
 const ConicasScene = dynamic(() => import("./ConicasScene"), {
   ssr: false,
@@ -426,12 +430,19 @@ export function LabConicas({ color }: PracticaLabProps) {
       <div style={{ ...card, padding: "18px 22px", marginTop: 22 }}>
         <Eyebrow>
           <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-          Objetivo evaluable
+          Objetivos
         </Eyebrow>
-        <div style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: ejercicioAprobado ? "#34D399" : T.text2 }}>
-          <i className={`fa-solid ${ejercicioAprobado ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: ejercicioAprobado ? 1 : 0.3 }} />
-          <span style={{ fontWeight: ejercicioAprobado ? 700 : 500 }}>Resuelve el reto evaluable de la actividad A2</span>
-        </div>
+        <TableroObjetivos
+          retoKey={RETO_KEY}
+          accent={accent}
+          objetivos={[
+            { txt: "Mueve el centro (h, k) de la circunferencia y mira cómo cambia su ecuación", done: h !== H_DEF || k !== K_DEF },
+            { txt: "Cambia el radio y comprueba que todos los puntos siguen equidistando del centro", done: r !== R_DEF },
+            { txt: "Pasa a la parábola y localiza su foco y su directriz", done: modo === "parabola" },
+            { txt: "Mueve el punto Q sobre la curva y compara sus dos distancias", done: qx !== QX_DEF || qy !== QY_DEF },
+            { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
+          ]}
+        />
       </div>
 
       {/* ── Lecturas + ideas clave ─────────────────────────────────── */}

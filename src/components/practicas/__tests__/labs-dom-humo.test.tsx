@@ -1,7 +1,7 @@
 /**
  * BANCO DE HUMO DE LOS LABORATORIOS DOM.
  *
- * Los 46 laboratorios no-STEM son DOM puro, así que se pueden montar y OPERAR
+ * Los 70 laboratorios no-STEM son DOM puro, así que se pueden montar y OPERAR
  * en jsdom. Hasta ahora nadie los había ejecutado nunca en una prueba: el único
  * control era abrirlos a mano. Esto los recorre a todos y, por cada uno:
  *
@@ -88,8 +88,8 @@ function huella(cont: HTMLElement): string {
 }
 
 describe("laboratorios DOM: se montan y responden", () => {
-  it("el banco cubre los 46 laboratorios DOM", () => {
-    expect(DOM.length).toBe(46);
+  it("el banco cubre los 70 laboratorios DOM", () => {
+    expect(DOM.length).toBe(70);
   });
 
   describe.each(DOM.map((l) => [l.slug, l.archivo] as const))("%s", (slug, archivo) => {
@@ -145,14 +145,14 @@ describe("laboratorios DOM: se montan y responden", () => {
 });
 
 describe("el modo «Completa el texto»", () => {
-  // 45 de las 46 progresiones tenían un `fill_blanks` publicado que ningún
-  // laboratorio usaba. `estado-mexicano` es la única sin él: su texto se
-  // escribió a mano sobre la lectura CS-I-P01-A1, tapando las palabras que la
-  // propia lectura pregunta. Ninguno se queda fuera.
+  // 45 de las 46 progresiones de la primera hornada tenían un `fill_blanks`
+  // publicado que ningún laboratorio usaba. `estado-mexicano` es la única sin
+  // él: su texto se escribió a mano sobre la lectura CS-I-P01-A1, tapando las
+  // palabras que la propia lectura pregunta. Ninguno se queda fuera.
   const ESPERADOS = DOM;
 
-  it("lo llevan los 46 laboratorios DOM", () => {
-    expect(ESPERADOS.length).toBe(46);
+  it("lo llevan los 70 laboratorios DOM", () => {
+    expect(ESPERADOS.length).toBe(70);
   });
 
   it.each(ESPERADOS.map((l) => [l.slug, l.archivo] as const))(
@@ -163,8 +163,17 @@ describe("el modo «Completa el texto»", () => {
       expect(src).toMatch(/<CompletaTexto\b/);
       expect(src).toMatch(/id: "texto", label: "(Completa el texto|Complete the text)"/);
       // El reinicio de la barra tiene que alcanzarlo, o el alumno se queda
-      // con los huecos ya resueltos y sin forma de volver a intentarlo.
-      expect(src).toMatch(/modo === "texto" \? reset(Texto|Huecos)\b/);
+      // con los huecos ya resueltos y sin forma de volver a intentarlo. Se
+      // comprueba la PROPIEDAD, no una forma de escribirla: el despachador que
+      // mira el modo tiene que poder llegar al reinicio de los huecos, con su
+      // propia rama o como caída final de la cadena.
+      // Se miran TODAS las expresiones que despachan por modo, no la primera:
+      // unos laboratorios lo declaran (`const reiniciarModo = modo === …`) y
+      // otros lo cablean en el propio botón (`onClick={modo === … }`).
+      const despachadores = [...src.matchAll(/(?:const \w+ =|onClick=\{)\s*(?:\n\s*)?modo === "[\s\S]*?(?:;|\}\n)/g)].map((m) => m[0]);
+      const despachador = despachadores.find((d) => /\b(reset|reiniciar)(Texto|Huecos)\b/.test(d));
+      expect(despachador).toBeDefined();
+      expect(despachador!).toMatch(/\b(reset|reiniciar)(Texto|Huecos)\b/);
     }
   );
 });
@@ -193,7 +202,7 @@ describe("el modo «Escribe el término»", () => {
       readFileSync(resolve(LABS_DIR, `${a}.tsx`), "utf8").includes("const glosLibres = ")
     );
     expect(conArrastre.sort()).toEqual(ESTRUCTURAS_EN_INGLES.sort());
-    expect(CONVERTIDOS.length).toBe(28);
+    expect(CONVERTIDOS.length).toBe(42);
   });
 
   it.each(CONVERTIDOS)("%s: el glosario ya no se arrastra", (archivo) => {
@@ -206,8 +215,9 @@ describe("el modo «Escribe el término»", () => {
     // Con límites de palabra: `siglosLibres` (los siglos de méxico-en-el-mundo)
     // contiene «glosLibres» y no tiene nada que ver con el glosario.
     expect(src).not.toMatch(/\bempGlos\b|\bselGlos\b|\bshakeGlos\b|\bRowsGlosario\b|\bglosLibres\b/);
-    // Y el modo sigue contando para las estrellas y para el reinicio.
-    expect(src).toMatch(/\(glosarioDone \? 1 : 0\)/);
+    // Y el modo sigue contando para las estrellas y para el reinicio: con el
+    // recuento a mano de siempre, o como objetivo del `TableroObjetivos`.
+    expect(src).toMatch(/\(glosarioDone \? 1 : 0\)|done: glosarioDone/);
     expect(src).toMatch(/const resetGlosario = \(\) => \{/);
   });
 });

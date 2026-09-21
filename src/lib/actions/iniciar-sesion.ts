@@ -63,11 +63,40 @@ export async function iniciarSesion(input: IniciarSesionInput): Promise<IniciarS
     console.error('[iniciarSesion] no se pudo registrar consentimiento:', consentError.message);
   }
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', data.user.id)
-    .single();
+  /*
+   * EL TOKEN «DEL FUTURO», Y POR QUÉ AQUÍ ERA PEOR QUE UN ERROR (8-sep-2026).
+   *
+   * En 1 de cada ~60 accesos medidos, el reloj del servidor que FIRMA el token
+   * va unas décimas por delante del que SIRVE los datos, y PostgREST rechaza un
+   * token recién emitido: «JWT issued at future».
+   *
+   * Aquí el `error` no se miraba y `role` caía a `'student'`. O sea que una
+   * maestra que pillara ese desfase NO veía un error: entraba, y entraba COMO
+   * ALUMNA — a la clase de otro, sin su panel y sin sus grupos, con todo el
+   * aspecto de estar funcionando. Un fallo silencioso que devuelve el rol
+   * equivocado es peor que uno ruidoso que no deja pasar.
+   *
+   * Dos cambios: se reintenta una vez tras esperar más de lo que dura la deriva
+   * observada, y si aun así no se puede leer el rol NO se inventa uno. Se pide
+   * volver a intentarlo, que es honesto y cuesta cinco segundos.
+   *
+   * `PGRST116` es «no hay ninguna fila», que no es un fallo de reloj: esa cuenta
+   * de verdad no tiene perfil, y para ella el valor por omisión sigue valiendo.
+   */
+  const leerRol = () =>
+    supabase.from('profiles').select('role').eq('id', data.user.id).single();
+
+  let { data: profile, error: profileError } = await leerRol();
+
+  if (profileError && /issued at future|JWSInvalidSignature|PGRST301/i.test(profileError.message ?? '')) {
+    await new Promise((listo) => setTimeout(listo, 1200));
+    ({ data: profile, error: profileError } = await leerRol());
+  }
+
+  if (profileError && profileError.code !== 'PGRST116') {
+    console.error('[iniciarSesion] no se pudo leer el rol:', profileError.message);
+    return { error: 'No se pudo cargar tu perfil. Vuelve a intentarlo en unos segundos.' };
+  }
 
   const role = profile?.role ?? 'student';
   return { ok: true, rol: role };

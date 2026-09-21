@@ -1,0 +1,153 @@
+[
+  {
+    "slug": "subgeneros-narrativos",
+    "items": [
+      { "clave": "suspenso", "escena": "A clay door left slightly ajar with a long shadow stretching out from it" },
+      { "clave": "terror", "escena": "A clay empty rocking chair moving by itself in a dark room" },
+      { "clave": "ciencia-ficcion", "escena": "A clay city skyline with a rocket rising and a small robot in the foreground" },
+      { "clave": "autoficcion", "escena": "A clay mirror whose reflection differs slightly from the figure standing before it" },
+      { "clave": "neorrealismo-urbano", "escena": "A clay city corner at dusk with a lone figure and a closed shop shutter" },
+      { "clave": "literaturas-del-antropoceno", "escena": "A clay tree growing up through the cracks of an abandoned concrete slab" }
+    ]
+  },
+  {
+    "slug": "subsistemas-terrestres",
+    "items": [
+      { "clave": "atmosfera", "escena": "A clay Earth globe wrapped in thin layered shells of blue" },
+      { "clave": "hidrosfera", "escena": "A clay Earth globe with oceans, a glacier cap and a small winding river" },
+      { "clave": "litosfera", "escena": "A clay Earth globe cut open to show a cracked rocky shell of plates" },
+      { "clave": "biosfera", "escena": "A clay Earth globe covered in tiny plants, animals and corals" },
+      { "clave": "efecto-invernadero-natural", "escena": "A clay Earth under a glass dome holding warmth in, with a thermometer inside" },
+      { "clave": "interaccion-entre-subsistemas", "escena": "A clay globe with four arrows looping between air, water, rock and living things" }
+    ]
+  },
+  {
+    "slug": "taller-parrafos",
+    "items": [
+      { "clave": "parrafo", "escena": "A clay block of stacked ribbon lines forming one solid unit on a page" },
+      { "clave": "oracion-tematica", "escena": "A clay ribbon line at the top of a block, raised above all the others" },
+      { "clave": "parrafo-descriptivo", "escena": "A clay page with one small detailed object modelled on top of it" },
+      { "clave": "parrafo-narrativo", "escena": "A clay page with three little scenes in a row along it" },
+      { "clave": "parrafo-argumentativo", "escena": "A clay page with a small arch built on it, blocks supporting a keystone" }
+    ]
+  },
+  {
+    "slug": "tecnicas-conteo-3d",
+    "items": [
+      { "clave": "importa-el-orden", "escena": "Two clay trays: one with figures on numbered podium places and one with the same figures as a plain team" },
+      { "clave": "p-n-r-como-producto-de-etapas", "escena": "Three clay podium places being filled one by one from a shrinking pool of figures" },
+      { "clave": "c-n-r-p-n-r-r", "escena": "A clay group of three figures shown in several orders, then swept together into one team tray" },
+      { "clave": "regla-del-producto", "escena": "Two clay dice thrown side by side with a grid of all their possible outcomes" },
+      { "clave": "dependencia-sin-reemplazo", "escena": "A clay bag of marbles with one taken out and set aside, the bag now visibly emptier" },
+      { "clave": "arbol-de-probabilidades", "escena": "A clay branching tree of channels with a small weight marked on every branch" }
+    ]
+  },
+  {
+    "slug": "teorema-fundamental-calculo",
+    "items": [
+      { "clave": "integral-definida", "escena": "A clay curve with the region beneath it between two posts filled in solid" },
+      { "clave": "sumas-de-riemann", "escena": "A clay curve with a row of thin rectangles standing under it, almost filling the area" },
+      { "clave": "antiderivada-primitiva", "escena": "Two clay curves stacked on a board with an arrow from the lower one building the upper one" },
+      { "clave": "funcion-de-acumulacion", "escena": "A clay tank filling as water flows in, with a gauge rising on its side" },
+      { "clave": "teorema-fundamental-del-calculo", "escena": "A clay bridge joining two banks, one holding a filled area and the other a pair of gauges" },
+      { "clave": "operaciones-inversas", "escena": "Two clay arrows curving in opposite directions between two blocks" },
+      { "clave": "area-bajo-la-curva", "escena": "A clay curve with the space under it filled with coloured sand between two posts" },
+      { "clave": "suma-de-riemann", "escena": "A clay curve with four wide rectangles beneath it leaving visible gaps at the top" },
+      { "clave": "acumulacion-de-cambios-continuos", "escena": "A clay jug filling from a tap whose flow keeps changing, with the level rising" },
+      { "clave": "variable-de-integracion", "escena": "A clay row of identical thin slices standing under a curve, none of them named" },
+      { "clave": "limites-de-integracion", "escena": "A clay curve with two posts planted at the ends of the filled region" }
+    ]
+  },
+  {
+    "slug": "teorema-pitagoras",
+    "items": [
+      { "clave": "teorema-de-pitagoras", "escena": "A clay right triangle with a square built on each side, the two small ones exactly filling the large one" },
+      { "clave": "hipotenusa-c", "escena": "A clay right triangle with its longest slanted side raised above the rest" },
+      { "clave": "cateto-a-b", "escena": "A clay right triangle with its two short sides meeting at a square corner" },
+      { "clave": "triple-pitagorico", "escena": "A clay knotted rope loop of three, four and five segments pulled taut into a right triangle" },
+      { "clave": "reciproco-del-teorema-de-pitagoras", "escena": "A clay triangle being checked with a square corner tool that fits it exactly" },
+      { "clave": "aplicacion-distancia-entre-puntos", "escena": "A clay grid with two beads joined by a slanted string and a right triangle formed beneath it" },
+      { "clave": "hipotenusa", "escena": "A clay right triangle standing with a ruler laid along its longest side" },
+      { "clave": "cateto", "escena": "A clay right triangle with a ruler laid along one of its short sides" }
+    ]
+  },
+  {
+    "slug": "terminal-horarios-ingles-3d",
+    "items": [
+      { "clave": "una-palabra-interrogativa-por-dato", "escena": "A clay information desk with a clock, a map, a coin and an hourglass on it" },
+      { "clave": "preguntas-con-to-be", "escena": "A clay figure in a terminal pointing toward a café across the hall" },
+      { "clave": "preguntas-con-does-verbo-base", "escena": "A clay figure looking up at a departures board as a bus pulls out behind" },
+      { "clave": "is-there-are-there", "escena": "A clay terminal wall with a cash machine and a row of lockers beside it" },
+      { "clave": "preguntas-indirectas-mas-corteses", "escena": "A clay figure leaning politely toward a desk clerk who points down a corridor" },
+      { "clave": "leer-un-tablero", "escena": "A clay departures board with rows of blank slots and small marks in the last column" },
+      { "clave": "respuestas-cortas-y-completas", "escena": "A clay clock, a calendar page and a bench beside a café on one base" }
+    ]
+  },
+  {
+    "slug": "tiempo-historico",
+    "items": [
+      { "clave": "cronologia", "escena": "A clay timeline rod with dated pegs along it and a layered rock core beside it" },
+      { "clave": "cosmogonia", "escena": "A clay stack of four worlds one above another with a sun at the very top" },
+      { "clave": "memoria-colectiva", "escena": "A clay community gathered around a shared photo album on a table" },
+      { "clave": "historia-oral", "escena": "A clay elder speaking into a recorder held by a younger figure" },
+      { "clave": "anacyclosis", "escena": "A clay ring of six thrones, each one tipping over into the next around the circle" },
+      { "clave": "tiempo-cronologico", "escena": "A clay ruler of years stretched straight across a table" },
+      { "clave": "tiempo-ciclico", "escena": "A clay wheel of four seasons turning on a peg" },
+      { "clave": "tiempo-subjetivo", "escena": "A clay clock whose face stretches in one place and squeezes together in another" },
+      { "clave": "calendario", "escena": "A clay round stone calendar divided into months with a sun at its centre" },
+      { "clave": "duracion-historica-braudel", "escena": "A clay cross section with deep slow layers, a middle band and quick ripples at the surface" },
+      { "clave": "anacronismo", "escena": "A clay old market scene with a modern phone lying on one of the stalls" }
+    ]
+  },
+  {
+    "slug": "tipos-de-preguntas",
+    "items": [
+      { "clave": "pregunta-filosofica", "escena": "A clay ordinary cup on a table with a magnifying glass revealing depth beneath it" },
+      { "clave": "pregunta-ontologica", "escena": "A clay figure studying its own solid shape standing on a pedestal" },
+      { "clave": "pregunta-epistemologica", "escena": "A clay figure looking at an object through a lens and then at the lens itself" },
+      { "clave": "pregunta-etica", "escena": "A clay balance between two paths with a figure standing at the pivot" },
+      { "clave": "validez-de-una-pregunta", "escena": "A clay key fitting cleanly into a lock beside a bent key that will not go in" }
+    ]
+  },
+  {
+    "slug": "tipos-energia-aplicaciones-3d",
+    "items": [
+      { "clave": "cadena-de-transformaciones", "escena": "A clay row of five linked devices each driving the next: a lamp, a heater, a fan, a generator and a bulb" },
+      { "clave": "eficiencia", "escena": "A clay funnel where most of the flow reaches the cup while the rest escapes as haze" },
+      { "clave": "potencia-del-viento", "escena": "A clay wind turbine with three wind arrows of increasing size and far larger outputs beside each" },
+      { "clave": "limite-de-una-maquina-termica", "escena": "A clay steam turbine between a hot boiler and a cold condenser with a capped gauge" },
+      { "clave": "fotosintesis-contra-celda-solar", "escena": "A clay maize plant and a solar panel side by side under the same sun, each with its own small output jar" },
+      { "clave": "conduccion-termica", "escena": "A clay copper rod and a steel rod in the same flame, the copper one already warm at its far end" }
+    ]
+  },
+  {
+    "slug": "tipos-graficas",
+    "items": [
+      { "clave": "variable-cuantitativa", "escena": "A clay ruler and a thermometer beside a tray of sorted coloured tokens" },
+      { "clave": "correlacion", "escena": "A clay board of beads scattered along a rising trend with a stick laid through them" },
+      { "clave": "escala-logaritmica", "escena": "A clay ladder with its rungs spaced ten times further apart at every step" },
+      { "clave": "percentil", "escena": "A clay row of many figures ordered by height with a marker planted near the tall end" },
+      { "clave": "outlier", "escena": "A clay cluster of beads with one bead far off alone at the edge of the board" },
+      { "clave": "medida-de-tendencia-central", "escena": "A clay seesaw balanced level with a flag on the middle block" },
+      { "clave": "media-promedio", "escena": "Uneven clay sand piles being levelled into equal heights by a flat board" },
+      { "clave": "medida-de-dispersion", "escena": "Two clay trays of beads, one clustered and one scattered, with a measuring stick between them" },
+      { "clave": "representacion-grafica", "escena": "A clay board with bars, a pie disc and a line chart standing side by side" },
+      { "clave": "software-estadistico-libre", "escena": "A clay laptop with an open padlock on its lid and charts on its screen" }
+    ]
+  },
+  {
+    "slug": "tipos-reacciones-quimicas",
+    "items": [
+      { "clave": "reaccion-de-sintesis", "escena": "Two clay spheres coming together to form a single joined model" },
+      { "clave": "reaccion-de-descomposicion", "escena": "A clay joined model splitting apart into two separate pieces" },
+      { "clave": "desplazamiento-simple", "escena": "A clay sphere pushing another out of a joined pair and taking its place" },
+      { "clave": "doble-desplazamiento", "escena": "Two clay pairs of spheres swapping partners across a bench" },
+      { "clave": "combustion", "escena": "A clay gas burner with a clean blue flame under a pot" },
+      { "clave": "ley-de-conservacion-de-la-masa", "escena": "A clay balance with a sealed jar on each pan reacting inside, the beam still level" },
+      { "clave": "reaccion-de-desplazamiento-simple", "escena": "A clay metal strip pushing another metal out of a blue solution" },
+      { "clave": "reaccion-de-doble-desplazamiento", "escena": "Two clay solutions poured together, swapping partners and dropping a solid" },
+      { "clave": "reaccion-de-combustion", "escena": "A clay drop of fuel burning with heat waves and light around it" },
+      { "clave": "precipitado", "escena": "A clay beaker of clear liquid with a white solid settling at the bottom" }
+    ]
+  }
+]

@@ -28,6 +28,11 @@ import { RetoNumericoCard } from "./_reto-numerico";
 import { RETO_A2 } from "./balanceo-ecuaciones-data";
 import { LabSfx } from "./lab-audio";
 
+import { TableroObjetivos } from "./_objetivos";
+
+/** Clave de la mejor marca de este laboratorio. */
+const RETO_KEY = "cen-balanceo-ecuaciones-reto";
+
 const BalanceoScene = dynamic(() => import("./BalanceoScene"), {
   ssr: false,
   loading: () => (
@@ -448,19 +453,16 @@ export function LabBalanceo({ color }: PracticaLabProps) {
           <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
           Objetivos
         </Eyebrow>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-          {[
+        <TableroObjetivos
+          retoKey={RETO_KEY}
+          accent={accent}
+          objetivos={[
             { txt: "Balancea la ecuación de H₂ + O₂ → H₂O", done: bal.balanceada && idx === 0 },
             { txt: "Balancea la combustión CH₄ + O₂ → CO₂ + H₂O", done: bal.balanceada && idx === 1 },
             { txt: "Balancea la herrumbre Fe + O₂ → Fe₂O₃", done: bal.balanceada && idx === 2 },
             { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
-          ].map((o, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? "#34D399" : T.text2 }}>
-              <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-              <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-            </div>
-          ))}
-        </div>
+          ]}
+        />
       </div>
 
       {/* nota de honestidad del modelo */}

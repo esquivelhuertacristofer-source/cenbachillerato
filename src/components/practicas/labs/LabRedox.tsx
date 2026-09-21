@@ -156,10 +156,10 @@ export function LabRedox({ color }: PracticaLabProps) {
   );
 
   const objetivos = [
-    { txt: "Explora el modo Óxido-reducción", done: false },
-    { txt: "Explora el modo Combustión", done: false },
-    { txt: "Explora el modo Pila galvánica", done: false },
-    { txt: "Usa la calculadora de E°pila y Q", done: false },
+    { txt: "Explora el modo Óxido-reducción y sigue el viaje de los electrones", done: modo === "redox" && paso > 0 },
+    { txt: "Explora el modo Combustión", done: modo === "combustion" },
+    { txt: "Explora el modo Pila galvánica", done: modo === "pila" },
+    { txt: "Cambia el par del cátodo en la calculadora de E°pila", done: catSimbolo !== "Cu²⁺/Cu" },
     { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
   ];
   // Los objetivos se recuerdan (algunos dependían del modo y se desmarcaban

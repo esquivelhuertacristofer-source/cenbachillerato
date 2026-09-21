@@ -1,0 +1,22 @@
+[
+  {
+    "slug": "describir-personas-clima-ingles",
+    "items": [
+      { "clave": "orden-del-adjetivo", "escena": "Five small rounded clay slots in a straight row on a rail, leading to a fat clay jacket hanging at the end" },
+      { "clave": "adjetivo-de-opinion", "escena": "A small clay heart tile resting in the very first slot of a clay rail, the other slots empty" },
+      { "clave": "adjetivo-de-material", "escena": "Three small clay swatch tiles on a rail showing woven wool, smooth leather and ribbed denim textures" },
+      { "clave": "verbo-be", "escena": "A short chunky clay connector block joining a clay figure to a clay height marker beside it" },
+      { "clave": "verbo-have", "escena": "A clay figure holding out an open hand with a small modelled clay object resting on the palm" },
+      { "clave": "present-continuous", "escena": "A clay figure mid-stride with a clay clock beside it whose hands are blurred into a thick ring" },
+      { "clave": "present-simple", "escena": "A clay figure standing still beside three identical small clay suns arranged in a repeating row" },
+      { "clave": "adjetivos-de-clima", "escena": "A clay weather dial with four modelled quarters: a sun, a cloud, raindrops and a gust of wind" },
+      { "clave": "descripcion-respetuosa", "escena": "A clay figure described by three small clay tags floating beside it: a height marker, a lock of hair and a pair of glasses" },
+      { "clave": "have-has", "escena": "Two clay figures side by side, each holding a small clay object, one hand larger than the other" },
+      { "clave": "is-wearing", "escena": "A clay figure with a fat clay coat placed onto it right now by a clay hand still holding the collar" },
+      { "clave": "his-her-their", "escena": "Three small clay name tags on a rail, each tied by a thread to a different clay figure" },
+      { "clave": "weather", "escena": "A clay sky panel with a sun on one side, a rain cloud on the other and a thin clay horizon line between them" },
+      { "clave": "seasons", "escena": "A clay wheel divided into four quarters, each holding a small modelled tree: bare, budding, full and dropping leaves" },
+      { "clave": "raincoat", "escena": "A fat clay hooded coat hanging on a peg with three clay raindrops resting on its shoulders" }
+    ]
+  }
+]

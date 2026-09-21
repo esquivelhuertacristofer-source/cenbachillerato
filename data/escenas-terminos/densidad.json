@@ -1,0 +1,41 @@
+{
+  "slug": "densidad",
+  "items": [
+    {
+      "clave": "materia",
+      "escena": "Three everyday objects grouped on a clay tabletop: a rounded grey stone, a short glass of blue water and a red apple, all modelled in clay"
+    },
+    {
+      "clave": "cuerpo",
+      "escena": "One single rounded clay cube resting alone in the middle of a clay tabletop, with a soft contact shadow and nothing else around it"
+    },
+    {
+      "clave": "masa",
+      "escena": "A clay two-pan balance scale on a table: a small dark metal cube sits on the left pan and three round stacked weights on the right pan, the beam perfectly level"
+    },
+    {
+      "clave": "peso",
+      "escena": "A clay spring scale hanging from a hook, stretched downward by a heavy round ball, with a thick rounded clay arrow beside it pointing straight down to the ground"
+    },
+    {
+      "clave": "volumen",
+      "escena": "A tall clay measuring cylinder half filled with blue water standing next to a small stack of four little clay cubes on a table"
+    },
+    {
+      "clave": "densidad",
+      "escena": "Two clay cubes of exactly the same size side by side on a balance: the left one pale and airy tilts the beam up, the right one dark and compact pushes its pan down"
+    },
+    {
+      "clave": "masa-y-volumen",
+      "escena": "A clay wooden block on a table with a clay ruler lying along its edge and a small round weight resting on top of it"
+    },
+    {
+      "clave": "flotacion",
+      "escena": "A clear clay glass of blue water seen from the side: a light wooden block floats on the surface while a small grey metal ball rests at the bottom"
+    },
+    {
+      "clave": "peso-y-empuje",
+      "escena": "A clay block half submerged in a clear tank of blue water, with a thick red clay arrow pointing down from the block and a thick blue clay arrow pointing up from beneath it"
+    }
+  ]
+}

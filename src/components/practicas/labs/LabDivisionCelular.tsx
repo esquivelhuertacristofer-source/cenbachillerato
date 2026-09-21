@@ -149,8 +149,9 @@ export function LabDivisionCelular({ color }: PracticaLabProps) {
     : `Fase ${idx + 1}/${totalFases} — ${escena.nombre}. ${escena.desc}`;
 
   const objetivos = [
-    { txt: "Recorre las fases de la mitosis y de la meiosis", done: true },
-    { txt: "Usa la calculadora para comparar mitosis vs. meiosis (cualquier 2n)", done: true },
+    { txt: "Recorre las fases de la mitosis", done: modo === "mitosis" && paso > 0 },
+    { txt: "Recorre las fases de la meiosis y busca el crossing over", done: modo === "meiosis" && paso > 0 },
+    { txt: "Usa la calculadora con otro número de cromosomas (2n distinto de 46)", done: cel2n !== 46 },
     { txt: "Abre la teoría y revisa el glosario de la actividad", done: drawer },
     { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
   ];

@@ -1,0 +1,19 @@
+[
+  {
+    "slug": "anatomia-exposicion-oral",
+    "items": [
+      { "clave": "gancho-de-apertura", "escena": "A clay fishing hook dangling just above a row of three small clay listeners who are all leaning toward it" },
+      { "clave": "tema-y-proposito", "escena": "A clay target disc on a stand with a single clay arrow already stuck in its centre" },
+      { "clave": "punto-de-desarrollo", "escena": "Three clay pillars of equal height standing in a row, each holding up one corner of a flat clay slab" },
+      { "clave": "reparto-del-tiempo", "escena": "A chunky clay stopwatch whose dial is divided into four coloured wedges, one much larger than the others" },
+      { "clave": "turno-de-preguntas", "escena": "A clay figure standing beside an easel while a seated clay listener raises one hand, a small question-mark shape above them" },
+      { "clave": "ensayo", "escena": "A clay figure practising in front of a tall clay mirror, holding small note cards, with a stopwatch on the floor" },
+      { "clave": "planeacion", "escena": "A clay desk with small numbered clay cards being laid out in order by a clay hand, a pencil resting beside them" },
+      { "clave": "introduccion", "escena": "A clay doorway standing open at the start of a short clay path, with a small welcome mat before it" },
+      { "clave": "desarrollo", "escena": "A clay staircase of three broad steps climbing between two small pillars" },
+      { "clave": "conclusion", "escena": "A clay ribbon tied into a neat bow around a small stack of clay cards" },
+      { "clave": "apoyo-visual", "escena": "A chunky clay easel holding one large clay picture board, a small clay figure gesturing toward it" },
+      { "clave": "contacto-visual", "escena": "A clay speaker figure facing three seated clay listeners, thin clay threads running from its eyes to each of theirs" }
+    ]
+  }
+]

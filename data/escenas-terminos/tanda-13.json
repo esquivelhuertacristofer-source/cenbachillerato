@@ -1,0 +1,162 @@
+[
+  {
+    "slug": "procesos-ingles",
+    "items": [
+      { "clave": "what-s-the-process-for", "escena": "A clay row of stepping stones with a hand pointing at the first one" },
+      { "clave": "how-does-work", "escena": "A clay machine with its cover lifted showing the gears turning inside" },
+      { "clave": "could-you-explain", "escena": "A clay figure gesturing with an open hand toward a small diagram board held by another" },
+      { "clave": "first-second-finally-the-first-step-is-to", "escena": "Three clay stepping stones in a line with an arrow running across them" },
+      { "clave": "it-is-used-to-it-is-designed-to", "escena": "A clay screwdriver lying beside the screw it fits exactly" },
+      { "clave": "as-far-as-i-know-in-my-understanding", "escena": "A clay lamp lighting part of a map while the rest stays in shadow" }
+    ]
+  },
+  {
+    "slug": "productos-notables-3d",
+    "items": [
+      { "clave": "binomio-al-cuadrado-suma", "escena": "A clay square divided into a big square, two equal strips and a small square" },
+      { "clave": "binomio-al-cuadrado-resta", "escena": "A clay big square with two strips removed and a small square set back into the corner" },
+      { "clave": "binomios-conjugados", "escena": "A clay large square with a small square cut out, the leftover pieces rearranged into a rectangle" },
+      { "clave": "binomio-al-cubo-suma", "escena": "A clay cube cut into eight blocks: one large cube, three slabs, three bars and one small cube" },
+      { "clave": "propiedad-distributiva", "escena": "A clay grid where every row block meets every column block in its own cell" },
+      { "clave": "trinomio", "escena": "Three clay tiles of different shapes lined up on a board" },
+      { "clave": "polinomio", "escena": "Four clay tiles of different shapes lined up on a board" },
+      { "clave": "producto-notable", "escena": "A clay stamp pressing a familiar repeating pattern into a tray of soft clay" },
+      { "clave": "diferencia-de-cuadrados", "escena": "Two clay squares of different sizes, one nested inside the other, the leftover frame lifted away" }
+    ]
+  },
+  {
+    "slug": "propagacion-calor",
+    "items": [
+      { "clave": "calor-vs-temperatura", "escena": "A clay thermometer in a small cup beside a much bigger tub with the same reading, heat flowing between them" },
+      { "clave": "conduccion", "escena": "A clay metal spoon standing in a hot pot with heat creeping up its handle" },
+      { "clave": "conveccion", "escena": "A clay pot of water with warm currents rising in the middle and cool ones sinking at the sides" },
+      { "clave": "radiacion", "escena": "A clay sun beaming heat across empty space to a small stone" },
+      { "clave": "conductividad-termica-k", "escena": "A clay copper rod and a wooden rod both held in a flame, only the copper one warm at its far end" },
+      { "clave": "capacidad-termica-especifica-c", "escena": "A clay pot of water and a pan of oil over identical flames, the oil already steaming" },
+      { "clave": "calor", "escena": "A clay hot block touching a cold block with waves flowing from one into the other" },
+      { "clave": "temperatura", "escena": "A clay thermometer standing in a mug of steaming liquid" },
+      { "clave": "equilibrio-termico", "escena": "Two clay blocks touching, each with a thermometer now reading exactly the same" },
+      { "clave": "ley-de-fourier", "escena": "A clay bar between a hot plate and a cold plate with arrows flowing along its length" },
+      { "clave": "ley-de-stefan-boltzmann", "escena": "A clay glowing hot iron radiating far more heat than a barely warm one beside it" }
+    ]
+  },
+  {
+    "slug": "propiedades-materia",
+    "items": [
+      { "clave": "propiedad-fisica", "escena": "A clay block being measured with a ruler, a scale and a thermometer, unchanged by any of them" },
+      { "clave": "propiedad-quimica", "escena": "A clay strip of rusting metal and a burning match on the same tray" },
+      { "clave": "cambio-fisico", "escena": "A clay ice cube melting into a puddle of water on a plate" },
+      { "clave": "cambio-quimico", "escena": "A clay log burning down to ash with smoke rising above it" },
+      { "clave": "evidencia-de-reaccion", "escena": "A clay beaker with bubbles rising, a changed colour and warm haze above it" },
+      { "clave": "materia", "escena": "A clay stone, a jug of water and an inflated balloon on one tray" },
+      { "clave": "cuerpo", "escena": "A single shaped clay object resting alone on a table" },
+      { "clave": "masa", "escena": "A clay block sitting on a kitchen scale" },
+      { "clave": "peso", "escena": "A clay block hanging from a spring scale" },
+      { "clave": "volumen", "escena": "A clay block submerged in a measuring jug with the water level clearly risen" },
+      { "clave": "densidad", "escena": "Two clay blocks of exactly the same size on a balance, one of them much heavier" }
+    ]
+  },
+  {
+    "slug": "quimica-organica-industria-3d",
+    "items": [
+      { "clave": "grupo-funcional", "escena": "A clay molecule model with one distinctive cluster standing out at its end" },
+      { "clave": "acetilacion", "escena": "A small clay cluster being transferred onto a molecule with tongs" },
+      { "clave": "esterificacion-de-fischer", "escena": "A clay reaction vessel joining two molecules and releasing a water drop, a double headed arrow beside it" },
+      { "clave": "reactivo-limitante-y-economia-atomica", "escena": "A clay assembly line where one supply bin runs empty first and the line stops" },
+      { "clave": "adicion-y-condensacion", "escena": "Two clay chains forming: one linking cleanly, the other dropping a water drop at every link" },
+      { "clave": "ecuacion-de-carothers", "escena": "A clay chain grown very long as almost every link joined, with a few loose pieces left over" }
+    ]
+  },
+  {
+    "slug": "razon-proporcion",
+    "items": [
+      { "clave": "razon", "escena": "Two clay stacks of blocks side by side compared by a measuring stick" },
+      { "clave": "proporcion", "escena": "Two pairs of clay stacks on a table, each pair in exactly the same relative sizes" },
+      { "clave": "proporcionalidad-directa", "escena": "A clay ramp where every step up on one side raises the other side by the same amount" },
+      { "clave": "proporcionalidad-inversa", "escena": "A clay seesaw where one side rises exactly as much as the other falls" },
+      { "clave": "constante-de-proporcionalidad-k", "escena": "A single clay block used as the same measure between three different pairs of stacks" },
+      { "clave": "regla-de-tres", "escena": "A clay grid of four cells with three filled by blocks and the last being completed" }
+    ]
+  },
+  {
+    "slug": "reaccion-co2",
+    "items": [
+      { "clave": "reaccion-acido-base", "escena": "A clay bottle of vinegar and a spoon of baking soda foaming over in a jar" },
+      { "clave": "reactivo-limitante", "escena": "A clay jar where the baking soda has run out while vinegar still pours in and nothing foams" },
+      { "clave": "hipotesis-falsable", "escena": "A clay card standing on an easel with a test setup aimed straight at it" },
+      { "clave": "variable-controlada", "escena": "Three clay jars identical in every way except for one single detail" },
+      { "clave": "indicador-natural-de-ph", "escena": "A clay purple cabbage leaf beside three glasses turned pink, purple and green" },
+      { "clave": "variable-independiente", "escena": "A clay hand turning one dial on a bench where all the other dials are fixed" },
+      { "clave": "variable-dependiente", "escena": "A clay gauge needle moving on its own as a dial beside it is turned" },
+      { "clave": "hipotesis", "escena": "A clay card on an easel with an arrow pointing to an experiment set up on the bench" },
+      { "clave": "grupo-control", "escena": "Two clay jars side by side, one given the treatment and the other left plain" },
+      { "clave": "equipo-de-proteccion-personal-epp", "escena": "A clay lab coat, goggles, gloves and a mask laid out on a bench" }
+    ]
+  },
+  {
+    "slug": "recta-numerica",
+    "items": [
+      { "clave": "numeros-naturales-n", "escena": "A clay row of counting stones set along a line from one upward" },
+      { "clave": "numeros-enteros-z", "escena": "A clay line with a peg at its centre and stones set out on both sides of it" },
+      { "clave": "numeros-racionales-q", "escena": "A clay line with a bead placed between two whole number pegs and a sliced pie beside it" },
+      { "clave": "opuesto-a", "escena": "A clay line with two beads at the same distance either side of a central peg" },
+      { "clave": "valor-absoluto-a", "escena": "A clay measuring tape running from a centre peg out to a bead, the same length in either direction" },
+      { "clave": "regla-de-los-signos", "escena": "Two clay minus shaped tokens on a table combining into one plus shaped token" }
+    ]
+  },
+  {
+    "slug": "redes-troficas",
+    "items": [
+      { "clave": "red-trofica", "escena": "A clay web of threads joining plants, insects, birds and a fox on one board" },
+      { "clave": "productores-autotrofos", "escena": "A clay row of plants and algae in sunlight at the base of a stepped platform" },
+      { "clave": "eficiencia-ecologica", "escena": "A clay funnel where a large pile of tokens at the top becomes a small pile below" },
+      { "clave": "regla-del-10", "escena": "A clay stepped platform where each level holds a tenth of the tokens of the level below" },
+      { "clave": "descomponedores", "escena": "A clay patch of mushrooms and bacteria breaking a fallen leaf into dark soil" },
+      { "clave": "productor-autotrofo", "escena": "A clay plant standing in sunlight with its roots in the soil" },
+      { "clave": "consumidor-primario", "escena": "A clay rabbit eating grass" },
+      { "clave": "consumidor-secundario", "escena": "A clay snake beside a mouse on the ground" },
+      { "clave": "descomponedor", "escena": "A clay mushroom growing out of a pile of decaying leaves" }
+    ]
+  },
+  {
+    "slug": "redox-combustion",
+    "items": [
+      { "clave": "oxido-reduccion-redox", "escena": "Two clay spheres passing a tiny bead from one to the other" },
+      { "clave": "oxidacion", "escena": "A clay sphere releasing a tiny bead and stepping up one rung of a small ladder" },
+      { "clave": "reduccion", "escena": "A clay sphere catching a tiny bead and stepping down one rung of a small ladder" },
+      { "clave": "regla-opera", "escena": "Two clay spheres on a board with a bead clearly leaving one and joining the other" },
+      { "clave": "numero-de-oxidacion", "escena": "A clay sphere resting on a notched ladder, moved up by one rung" },
+      { "clave": "combustion-completa-vs-incompleta", "escena": "Two clay burners: one with a clean blue flame and one with a smoky yellow flame leaving soot" },
+      { "clave": "potencial-estandar-de-reduccion-e", "escena": "A clay voltmeter connected between two metal strips standing in a beaker" },
+      { "clave": "entalpia-de-combustion-h", "escena": "A clay burning drop of fuel with heat waves rising into a measuring jar above it" },
+      { "clave": "agente-reductor", "escena": "A clay zinc strip giving up beads into a blue solution and visibly thinning" },
+      { "clave": "agente-oxidante", "escena": "A clay oxygen bubble taking beads from a burning strip" },
+      { "clave": "combustion", "escena": "A clay gas stove burner with a clean blue flame under a pot" },
+      { "clave": "reaccion-exotermica", "escena": "A clay beaker giving off heat waves with a hand pulling back from it" },
+      { "clave": "pila-galvanica", "escena": "A clay two beaker cell joined by a salt bridge with a small bulb glowing between them" }
+    ]
+  },
+  {
+    "slug": "reglas-derivacion",
+    "items": [
+      { "clave": "regla-de-la-potencia", "escena": "A clay tower of stacked cubes with one whole layer taken off and set down in front" },
+      { "clave": "linealidad-de-la-derivada", "escena": "Two clay machines side by side each processing its own block, both results landing in one tray" },
+      { "clave": "regla-del-producto", "escena": "Two clay blocks joined together with two separate arrows leaving them into one tray" },
+      { "clave": "regla-del-cociente", "escena": "A clay fraction of two blocks with a cross of arrows between the top and the bottom" },
+      { "clave": "regla-de-la-cadena", "escena": "Two clay gears meshed together, turning one makes the other turn" },
+      { "clave": "regla-de-la-suma-y-diferencia", "escena": "Two clay blocks side by side, each with its own arrow into a single tray" },
+      { "clave": "regla-de-la-constante-multiplicativa", "escena": "A clay block with three identical copies beside it and the multiplying factor stepping outside the machine" }
+    ]
+  },
+  {
+    "slug": "reglas-ingles",
+    "items": [
+      { "clave": "must-mustn-t", "escena": "A clay barrier bar across a path with a helmet hanging on a hook beside it" },
+      { "clave": "have-to-has-to", "escena": "A clay clock on a wall with a figure hurrying through a doorway beneath it" },
+      { "clave": "don-t-have-to-doesn-t-have-to", "escena": "A clay coat left hanging on a hook as a figure walks out on a mild day" },
+      { "clave": "rules-at-school", "escena": "A clay classroom with a clock, tidy desks and a figure raising its hand" },
+      { "clave": "chores-at-home", "escena": "A clay sink of dishes, a rubbish bag and a neatly made bed" },
+      { "clave": "community-responsibilities", "escena": "A clay pair of recycling bins on a clean street with a figure sweeping beside them" }
+    ]
+  }
+]

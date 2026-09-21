@@ -1,0 +1,40 @@
+[
+  {
+    "slug": "pasado-viaje-ingles",
+    "items": [
+      { "clave": "past-simple", "escena": "A chunky clay pin pushed into one single point of a long clay timeline bar" },
+      { "clave": "verbo-regular", "escena": "Four identical fat clay verb blocks in a row, each with the same small tile clipped flush to its end" },
+      { "clave": "verbo-irregular", "escena": "A clay verb block that changes shape halfway along its length, unlike the identical blocks beside it" },
+      { "clave": "regla-ied", "escena": "A clay hand pulling the last letter tile off a verb block and setting a wider double tile in its place" },
+      { "clave": "consonante-doble", "escena": "A clay verb block with its final letter tile duplicated, two identical tiles side by side before the ending" },
+      { "clave": "past-continuous", "escena": "A wide clay band stretched across the middle stretch of a clay timeline bar, its ends tapering" },
+      { "clave": "accion-de-fondo", "escena": "A long smooth clay band running behind a small clay scene, unbroken from edge to edge" },
+      { "clave": "interrupcion", "escena": "A chunky clay lightning bolt stabbing down through the middle of a smooth clay band" },
+      { "clave": "conector-de-secuencia", "escena": "Four small clay step tiles laid in a row, each joined to the next by a short thick clay link" },
+      { "clave": "expresion-de-tiempo", "escena": "A small clay calendar leaf pinned to a clay timeline bar with a thin clay nail" },
+      { "clave": "it-was-the-first-time", "escena": "A clay ribbon of footprints where only the very first print is pressed deep and the rest are faint" },
+      { "clave": "time-expressions", "escena": "Three small clay calendar leaves of different sizes resting in a row on a clay shelf" },
+      { "clave": "while-when", "escena": "A clay band and a clay lightning bolt crossing each other at right angles on a base" },
+      { "clave": "detail-expressions", "escena": "A clay photo card with three tiny modelled details raised from its surface: a hat, a cup and a bird" }
+    ]
+  },
+  {
+    "slug": "experiencias-recientes-ingles",
+    "items": [
+      { "clave": "have-you-ever", "escena": "A wide clay speech bubble stretched over an entire clay timeline bar from end to end" },
+      { "clave": "yes-i-have", "escena": "A small clay card standing on a base with a raised clay check mark, a tiny matching card echoing it behind" },
+      { "clave": "el-salto-al-pasado", "escena": "A clay figure stepping off a wide clay band onto a single chunky clay pin stuck in the timeline" },
+      { "clave": "experiencia-sin-fecha", "escena": "A clay timeline bar with a wide band over it and no pin anywhere along its length" },
+      { "clave": "hecho-con-fecha", "escena": "A clay timeline bar with one chunky clay pin driven into it and a small calendar leaf on the pin" },
+      { "clave": "just", "escena": "A chunky clay pin driven into a clay timeline bar right beside its end dot, almost touching it" },
+      { "clave": "for-since", "escena": "A clay band starting at one pin and stretching to the end dot of a clay timeline bar" },
+      { "clave": "participio-irregular", "escena": "A clay verb block whose far end has been replaced by a differently shaped piece, the seam visible" },
+      { "clave": "have-has-past-participle", "escena": "Two clay blocks clicked together in a row, a short auxiliary block in front of a longer one" },
+      { "clave": "past-participle", "escena": "A single clay block resting alone with a distinctly shaped end, no auxiliary beside it" },
+      { "clave": "ever-never", "escena": "A clay timeline bar with one wide band over its whole length and a small crossed-out tile beside it" },
+      { "clave": "already-yet", "escena": "A clay checklist card with the first box filled by a raised clay mark and the second box left empty" },
+      { "clave": "with-whom-with-my-family", "escena": "Four small clay figures standing close together on one shared base" },
+      { "clave": "have-you-i-have", "escena": "Two clay figures facing each other, one holding a question-mark sculpture and the other a matching speech bubble" }
+    ]
+  }
+]

@@ -16,7 +16,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, OK, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { T, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
 import { FichaTeorica } from "./_ficha";
 import { LIMITES_FICHA } from "./limites-acercamiento-ficha";
 import { RetoNumericoCard } from "./_reto-numerico";
@@ -27,6 +27,13 @@ import {
   IDEAS, DATOS, fmt1, fmt2, fmt3,
   CASO_DEF, LADO_DEF, type CasoId, type Lado,
 } from "./limites-data";
+
+import { TableroObjetivos } from "./_objetivos";
+
+
+/** Clave de la mejor marca de este laboratorio. */
+const RETO_KEY = "cen-limites-acercamiento-reto";
+
 
 const LimitesScene = dynamic(() => import("./LimitesScene"), {
   ssr: false,
@@ -388,20 +395,17 @@ export function LabLimites({ color }: PracticaLabProps) {
           <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
           Objetivos
         </Eyebrow>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-          {(
-            [
-              { txt: "Acerca x al punto a y observa hacia dónde va f(x)", done: false },
-              { txt: "Explora los tres casos: sustitución, 0/0 y límite notable", done: false },
+        <TableroObjetivos
+          retoKey={RETO_KEY}
+          accent={accent}
+          objetivos={[
+              { txt: "Acerca x al punto a y observa hacia dónde va f(x)", done: xPos !== caso(casoId).xDef },
+              { txt: "Acércate por los dos lados: por la izquierda y por la derecha", done: lado !== LADO_DEF },
+              { txt: "Llega al caso indeterminado 0/0 y factoriza", done: casoId === "indeterminada" },
+              { txt: "Llega al límite notable sen(x)/x → 1", done: casoId === "notable" },
               { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
-            ] as { txt: string; done: boolean }[]
-          ).map((o, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? OK : T.text2 }}>
-              <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-              <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-            </div>
-          ))}
-        </div>
+          ]}
+        />
       </div>
 
       {/* ── Lecturas + ideas clave ─────────────────────────────────── */}

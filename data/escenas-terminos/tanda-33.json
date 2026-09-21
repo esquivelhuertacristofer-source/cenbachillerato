@@ -1,0 +1,35 @@
+[
+  {
+    "slug": "tiempo-libre-ingles",
+    "items": [
+      { "clave": "simple-present", "escena": "A clay clock face with its hands removed lying flat beside a chunky clay verb block, three identical small clay suns arranged in a repeating row behind them" },
+      { "clave": "third-person-s", "escena": "A single small clay figure standing apart from a group, a thumb-sized clay tile clipped onto the end of a fat clay verb block in front of it" },
+      { "clave": "add-es", "escena": "A fat clay verb block with a slightly wider clay tile clipped to its end, the joint between them thicker than on the block beside it" },
+      { "clave": "y-ies", "escena": "A clay letter tile being pulled off the end of a verb block by a clay hand while a wider double tile waits to take its place" },
+      { "clave": "base-form", "escena": "A plain fat clay verb block resting alone on a base with a clean flat end and nothing clipped to it" },
+      { "clave": "frequency-adverbs", "escena": "A clay dial with five notched positions from empty to full, a small clay label tag being slid into a gap between two word blocks beside it" },
+      { "clave": "don-t-doesn-t", "escena": "A chunky clay bar laid across a clay sentence rail, blocking the verb block behind it" },
+      { "clave": "do-does", "escena": "A clay question-mark sculpture standing at the front of a clay sentence rail, the blocks behind it reordered around it" },
+      { "clave": "short-answers", "escena": "Two small clay cards standing side by side on a base, one with a raised clay check mark and the other with a raised clay cross" },
+      { "clave": "hobby", "escena": "A clay shelf holding a small guitar, a football and a paintbrush modelled in clay, side by side" },
+      { "clave": "to-hang-out", "escena": "Three clay figures sitting together on a low clay park bench with nothing in their hands" },
+      { "clave": "to-play-video-games", "escena": "A chunky clay game controller held in two clay hands in front of a small clay screen" }
+    ]
+  },
+  {
+    "slug": "perfil-personal-ingles",
+    "items": [
+      { "clave": "first-name", "escena": "A fat clay form board with eight empty slots, a small clay name tile pressed into the very first slot" },
+      { "clave": "last-name", "escena": "A fat clay form board with a small clay tile pressed into the second slot while the first slot stays filled" },
+      { "clave": "nationality", "escena": "A small clay tile stamped with a tiny clay flag, held above a form slot by a clay hand" },
+      { "clave": "occupation", "escena": "Three small clay tiles on a counter, each carrying a modelled tool: a chalk board, a wrench and a stethoscope" },
+      { "clave": "verb-to-be", "escena": "A short chunky clay connector block joining a small clay figure to a clay label tile, holding them together" },
+      { "clave": "negative-form", "escena": "A clay sentence rail with a short clay wedge block inserted right after the connector, pushing the label away" },
+      { "clave": "yes-no-question", "escena": "A clay sentence rail whose first two blocks have been swapped, a clay question-mark sculpture standing at its end" },
+      { "clave": "third-person", "escena": "A clay figure pointing away from itself toward a second clay figure standing on a separate small base" },
+      { "clave": "age", "escena": "A clay birthday candle standing upright on a small clay cake, unlit" },
+      { "clave": "address", "escena": "A small clay house with a clay mailbox on a post at its gate, an envelope resting in the box" },
+      { "clave": "email-address", "escena": "A chunky clay envelope with a small clay at-sign shape modelled on its face" }
+    ]
+  }
+]

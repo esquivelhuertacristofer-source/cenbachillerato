@@ -1,0 +1,164 @@
+[
+  {
+    "slug": "parabola-trayectoria",
+    "items": [
+      { "clave": "apertura-parametro-a", "escena": "Three clay arcs on a board: one opening upward, one opening downward and one much narrower than the rest" },
+      { "clave": "vertice", "escena": "A clay parabolic arc with a bead resting at its very lowest point" },
+      { "clave": "eje-de-simetria", "escena": "A clay parabolic arc with a straight rod down its middle splitting it into mirrored halves" },
+      { "clave": "ceros-raices", "escena": "A clay parabolic arc crossing a flat bar with beads marking both crossings" },
+      { "clave": "discriminante", "escena": "Three clay arcs over a flat bar: one crossing it twice, one just touching it, one floating clear above it" },
+      { "clave": "formula-general", "escena": "A clay machine with a crank taking three blocks in at the top and dropping two beads out below" },
+      { "clave": "funcion-cuadratica", "escena": "A clay U shaped curve standing upright on a grid board" },
+      { "clave": "parabola", "escena": "A clay ball thrown in an arc over a field, its path traced by a line of small beads" },
+      { "clave": "vertice-de-la-parabola", "escena": "A clay thrown ball at the very top of its arc with a flag planted beneath it" },
+      { "clave": "ceros-raices-de-la-funcion", "escena": "A clay arc of beads rising from the ground and landing back on it, both ends marked with pegs" },
+      { "clave": "interseccion-con-el-eje-y", "escena": "A clay arc meeting a vertical bar with a bead at the point where they meet" }
+    ]
+  },
+  {
+    "slug": "pasado-simple-ingles",
+    "items": [
+      { "clave": "regular-verbs-ed", "escena": "A clay stamp pressing the same identical mark onto a row of cards" },
+      { "clave": "irregular-verbs", "escena": "A clay row of cards each carrying a completely differently shaped mark" },
+      { "clave": "didn-t-verb-base", "escena": "A clay action card with a bar crossed over it" },
+      { "clave": "did", "escena": "A clay card with a hook shaped handle standing in front of an action card" },
+      { "clave": "yesterday-last-week-ago", "escena": "A clay calendar with its previous pages torn off and lying beside it" },
+      { "clave": "this-week-recently", "escena": "A clay calendar open on the current week with a few days marked" }
+    ]
+  },
+  {
+    "slug": "personajes-escenarios",
+    "items": [
+      { "clave": "arquetipo", "escena": "A clay rack of masks: a hero, a villain, a mentor and a jester" },
+      { "clave": "narrador", "escena": "A clay figure standing outside a small stage, pointing at the scene inside it" },
+      { "clave": "caciquismo", "escena": "A large clay figure seated on a chair above a village, holding all its keys" },
+      { "clave": "testimonio", "escena": "A clay recorder on a table with several figures speaking into it in turn" },
+      { "clave": "canon-literario", "escena": "A clay bookshelf with a few books raised onto a pedestal shelf above the rest" },
+      { "clave": "caracterizacion", "escena": "A clay figure being modelled by hands with small objects around it showing its traits" },
+      { "clave": "protagonista", "escena": "A clay figure standing lit at the centre of a small stage" },
+      { "clave": "antagonista", "escena": "A clay figure blocking a doorway in front of another figure" },
+      { "clave": "personaje-secundario", "escena": "A clay figure standing slightly behind and to one side of a central figure" },
+      { "clave": "escenario", "escena": "A clay stage set with a house, a tree and a road, with no figures on it at all" }
+    ]
+  },
+  {
+    "slug": "ph-escala",
+    "items": [
+      { "clave": "ph", "escena": "A clay strip graded from red through green to blue with a drop falling onto it" },
+      { "clave": "acido", "escena": "A clay lemon cut open beside a glass of vinegar" },
+      { "clave": "base-alcali", "escena": "A clay bar of soap standing beside a box of baking soda" },
+      { "clave": "neutralizacion", "escena": "A clay beaker where a red liquid and a blue liquid are poured together and turn green" },
+      { "clave": "buffer-solucion-tampon", "escena": "A clay beaker with a spring inside it resisting a hand pressing down" },
+      { "clave": "indicador-natural-de-ph", "escena": "A clay purple cabbage leaf beside three glasses turned pink, purple and green" },
+      { "clave": "acido-de-arrhenius", "escena": "A clay molecule releasing a tiny bright bead into a glass of water" },
+      { "clave": "base-de-arrhenius", "escena": "A clay molecule releasing a small paired cluster into a glass of water" },
+      { "clave": "indicador-de-ph", "escena": "A clay paper strip dipped into a glass and coming out a different colour" }
+    ]
+  },
+  {
+    "slug": "piramide-energia",
+    "items": [
+      { "clave": "productores-autotrofos", "escena": "A clay row of plants and algae in sunlight along the base of a stepped platform" },
+      { "clave": "eficiencia-ecologica", "escena": "A clay funnel where a big pile of tokens at the top becomes a small pile at the bottom" },
+      { "clave": "regla-del-10", "escena": "A clay stepped platform where each level holds a tenth of the tokens of the level below it" },
+      { "clave": "piramide-de-energia", "escena": "A clay stepped pyramid with a wide base of plants and a single predator at its narrow top" },
+      { "clave": "red-trofica", "escena": "A clay web of threads joining plants, insects, birds and a fox on one board" },
+      { "clave": "descomponedores", "escena": "A clay patch of mushrooms and bacteria breaking a fallen leaf down into dark soil" },
+      { "clave": "productor-autotrofo", "escena": "A clay plant standing in sunlight with its roots in the soil" },
+      { "clave": "consumidor-primario", "escena": "A clay rabbit eating grass" },
+      { "clave": "consumidor-secundario", "escena": "A clay snake beside a mouse on the ground" },
+      { "clave": "descomponedor", "escena": "A clay mushroom growing out of a pile of decaying leaves" }
+    ]
+  },
+  {
+    "slug": "planes-futuro-ingles-3d",
+    "items": [
+      { "clave": "be-going-to-planes-y-evidencia", "escena": "A clay packed suitcase standing by a door with dark clouds gathering outside the window" },
+      { "clave": "will-decisiones-promesas-y-opiniones", "escena": "A clay hand reaching out to open a window in a hot room" },
+      { "clave": "present-continuous-para-acuerdos-a4", "escena": "A clay calendar with a dentist appointment pinned at one specific hour" },
+      { "clave": "proponer-y-planear-en-grupo", "escena": "A group of clay figures around a table with a plan sheet and brooms ready beside them" },
+      { "clave": "explicar-el-proposito", "escena": "A clay arrow running from brooms and paint cans to a clean park with children playing" },
+      { "clave": "intenciones-y-deseos-a5", "escena": "A clay figure looking toward a distant mountain with a small map in hand" },
+      { "clave": "expresiones-de-tiempo-a1", "escena": "A clay calendar and a clock on a shelf with arrows pointing forward" }
+    ]
+  },
+  {
+    "slug": "politicas-publicas",
+    "items": [
+      { "clave": "agenda-gubernamental", "escena": "A clay desk with a short row of folders on it and many more folders stacked unopened on the floor" },
+      { "clave": "presupuesto-de-egresos", "escena": "A clay pile of coins being divided into separate portions across a table" },
+      { "clave": "pobreza-multidimensional", "escena": "A clay figure standing beneath several empty shelves holding nothing" },
+      { "clave": "federalismo", "escena": "A clay set of nested platforms: a national one holding state ones, holding town ones" },
+      { "clave": "politica-publica", "escena": "A clay hole in a road being filled in by a team with tools" },
+      { "clave": "ciclo-de-politica-publica", "escena": "A clay ring of five small stations with an arrow curving back to the first" },
+      { "clave": "participacion-ciudadana", "escena": "A clay group of figures around a public table with one of them adding a card" },
+      { "clave": "contraloria-social", "escena": "A clay group of neighbours with a clipboard inspecting a half built public works site" },
+      { "clave": "evaluacion-de-impacto", "escena": "Two clay village scenes on one base, before and after, with a measuring stick between them" },
+      { "clave": "equidad-en-politicas-publicas", "escena": "Three clay figures of different heights each given a box of the right size to see over a fence" }
+    ]
+  },
+  {
+    "slug": "posesivos-ingles",
+    "items": [
+      { "clave": "saxon-genitive-s", "escena": "A clay backpack with a name tag tied to its strap" },
+      { "clave": "my-your-his-her", "escena": "Two clay figures each holding their own cup" },
+      { "clave": "our-their", "escena": "A clay group of figures holding one large shared basket between them" },
+      { "clave": "mine-yours-hers", "escena": "Two clay hands pointing at two cups on a table, one cup each" },
+      { "clave": "whose", "escena": "A clay lost jacket on a bench with two figures standing over it" },
+      { "clave": "to-belong-to", "escena": "A clay key being fitted into the one lock it matches" }
+    ]
+  },
+  {
+    "slug": "potencias-raices",
+    "items": [
+      { "clave": "potencia-a", "escena": "A clay cube built from stacked layers of smaller cubes" },
+      { "clave": "base", "escena": "A single clay cube standing on a plate with copies of itself waiting behind it" },
+      { "clave": "exponente", "escena": "A clay tower growing taller as identical cubes are stacked onto it" },
+      { "clave": "exponente-negativo", "escena": "A clay cube beside a pie cut into equal parts with one slice separated out" },
+      { "clave": "radicacion", "escena": "A clay square of tiles with a ruler measuring one of its sides" },
+      { "clave": "radicando", "escena": "A clay square of tiles resting under a bracket shaped frame" },
+      { "clave": "indice-de-la-raiz", "escena": "A clay cube and a flat square side by side beneath two differently sized bracket frames" }
+    ]
+  },
+  {
+    "slug": "preguntas-pasado-discursos-3d",
+    "items": [
+      { "clave": "pregunta-historica-fertil", "escena": "A clay open door in a wall with a wide landscape of scenes visible beyond it" },
+      { "clave": "pregunta-cerrada", "escena": "A small clay hatch in a wall just big enough to show a single card" },
+      { "clave": "anacronismo", "escena": "A clay medieval scene with a modern wristwatch on one figure's arm" },
+      { "clave": "cambio-y-permanencia", "escena": "Two clay versions of the same street a century apart, one building unchanged in both" },
+      { "clave": "siglo", "escena": "A clay ruler of a hundred notches with the first and the last clearly marked" },
+      { "clave": "diversidad-de-discursos", "escena": "A clay object at the centre of a table with several figures around it, each holding a different lens" }
+    ]
+  },
+  {
+    "slug": "present-perfect-ingles",
+    "items": [
+      { "clave": "career", "escena": "A clay winding path climbing past several small buildings toward a flag" },
+      { "clave": "field-of-study", "escena": "A clay plot of ground marked off with stakes, with a book planted in its middle" },
+      { "clave": "experience", "escena": "A clay pair of worn boots beside a well used backpack" },
+      { "clave": "achievement", "escena": "A clay medal resting on a small pedestal" },
+      { "clave": "volunteer-work", "escena": "A clay group of figures painting a community wall together" },
+      { "clave": "internship", "escena": "A clay young figure at a desk beside an older figure, both working" },
+      { "clave": "skill", "escena": "A clay hand using a tool with precision on a workbench" },
+      { "clave": "opportunity", "escena": "A clay open door with light coming through it and a figure at the threshold" },
+      { "clave": "when-i-was-i", "escena": "A small clay figure beside a grown figure, joined by a timeline ribbon" },
+      { "clave": "i-have-always-been-interested-in", "escena": "A clay thread running unbroken from a child's toy to an adult's tool" },
+      { "clave": "this-experience-taught-me", "escena": "A clay open book growing out of a worn backpack" },
+      { "clave": "first-then-after-that-finally", "escena": "Four clay stepping stones in a row with an arrow running along them" },
+      { "clave": "that-is-why-i-decided-to", "escena": "A clay fork in a path with footprints turning down one of the branches" },
+      { "clave": "it-was-a-challenging-rewarding-eye-opening-exper", "escena": "A clay steep hill just climbed, with a wide view opening out at the top" }
+    ]
+  },
+  {
+    "slug": "presentaciones-ingles",
+    "items": [
+      { "clave": "hello-hi", "escena": "A clay hand raised in a wave toward another figure" },
+      { "clave": "nice-to-meet-you", "escena": "Two clay figures shaking hands for the first time" },
+      { "clave": "this-is", "escena": "A clay figure presenting a second figure to a third with an open hand" },
+      { "clave": "good-morning", "escena": "A clay sunrise over a doorway with a figure stepping out of it" },
+      { "clave": "goodbye-bye", "escena": "A clay figure waving from a doorway as another walks away" },
+      { "clave": "to-be-am-is-are", "escena": "Three clay figures standing in a row, each wearing a plain badge" }
+    ]
+  }
+]

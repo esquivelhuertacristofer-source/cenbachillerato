@@ -1,0 +1,22 @@
+[
+  {
+    "slug": "narrativas-populares-lengua",
+    "items": [
+      { "clave": "formula-de-apertura", "escena": "A clay doorway standing alone on a base, its door swung half open, with a small clay speech bubble resting on the threshold like a welcome mat" },
+      { "clave": "formula-de-cierre", "escena": "A clay curtain drawn shut across a small stage, a tiny clay speech bubble left lying on the boards in front of it" },
+      { "clave": "repeticion-y-paralelismo", "escena": "Four identical chunky clay footprints pressed in a straight line across a flat clay path, each one exactly the same shape" },
+      { "clave": "diminutivo-afectivo", "escena": "A large clay hand cupped gently around a small clay cup, the cup unchanged in size but wrapped in a soft clay ribbon" },
+      { "clave": "nahuatlismo", "escena": "A clay word tile carved with a small stepped pyramid glyph, resting on top of a plain modern clay page" },
+      { "clave": "presente-historico", "escena": "A clay clock whose hand points straight up, standing inside an open clay book with an old sepia scene modelled on the page behind it" },
+      { "clave": "dicho-o-refran", "escena": "A small clay plaque with two short raised lines of text on it, hanging from a nail on an adobe wall" },
+      { "clave": "discurso-directo", "escena": "A clay figure with a speech bubble attached straight to its mouth, two chunky clay quotation marks standing like posts on either side" },
+      { "clave": "registro", "escena": "A clay dial with a pointer between two labelled end stops, one end a rough stool and the other end a polished lectern" },
+      { "clave": "narrativa-popular", "escena": "A ring of six small clay figures sitting around a low fire, one open clay book floating just above the flame" },
+      { "clave": "oralidad", "escena": "A clay mouth on a stand releasing a long ribbon of speech that passes through three clay ears set in a row" },
+      { "clave": "mito", "escena": "A clay world-egg cracking open on an altar, a small sun and a small mountain rising out of the crack" },
+      { "clave": "leyenda", "escena": "A clay village well at night with a wisp of clay mist rising from it and one small clay figure peering over the rim" },
+      { "clave": "creepypasta", "escena": "A clay smartphone standing upright in the dark, its screen a plain grey page of text with one thin clay shadow hand reaching around the frame" },
+      { "clave": "registro-oral", "escena": "Two clay figures leaning close on a doorstep, a loose wobbly clay speech ribbon passing between them with no page in sight" }
+    ]
+  }
+]

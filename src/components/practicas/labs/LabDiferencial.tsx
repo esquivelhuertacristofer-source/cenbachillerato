@@ -146,8 +146,10 @@ export function LabDiferencial({ color }: PracticaLabProps) {
   };
 
   const objetivos = [
-    { txt: "Mueve el punto x para explorar la linealización", done: false },
-    { txt: "Activa el modo Estimar un error (esfera)", done: false },
+    { txt: "Mueve el punto x y compara la curva con su recta tangente", done: modo === "valor" && xPos !== 12 },
+    { txt: "Cambia de caso (raíz, exponencial…) y repite la linealización", done: casoId !== "raiz" },
+    { txt: "Activa el modo Estimar un error (esfera) y mueve el radio", done: modo !== "valor" },
+    { txt: "Cambia la incertidumbre dr y observa cómo se propaga al volumen", done: dr !== DR_BASE },
     { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
   ];
   // Los objetivos se recuerdan (algunos dependían del modo y se desmarcaban

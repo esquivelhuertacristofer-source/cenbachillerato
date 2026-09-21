@@ -1,0 +1,19 @@
+[
+  {
+    "slug": "derechos-digitales",
+    "items": [
+      { "clave": "dato-personal", "escena": "A small clay portrait tile resting inside a rounded clay shield on a counter" },
+      { "clave": "datos-sensibles", "escena": "A clay strongbox with its lid ajar, a small clay heart and a tiny clay medical cross glowing softly inside" },
+      { "clave": "derechos-arco", "escena": "Four plain clay letter-boxes standing in a row on a counter, a fat clay envelope poised in front of the first one" },
+      { "clave": "responsable-del-tratamiento", "escena": "A clay figure standing behind a counter with both hands resting on a closed clay filing box" },
+      { "clave": "aviso-de-privacidad", "escena": "A long clay document scroll unrolled on a desk with three of its paragraph bars raised above the surface" },
+      { "clave": "proporcionalidad", "escena": "A clay balance scale with one small clay cube on each pan, both pans exactly level" },
+      { "clave": "consentimiento", "escena": "A clay hand pressing an open clay stamp down onto a document, the stamp face blank" },
+      { "clave": "decision-automatizada", "escena": "A chunky clay machine with a slot: a clay file card goes in one side and a stamped clay verdict tile drops out the other, with no clay figure anywhere near it" },
+      { "clave": "derecho-a-la-privacidad", "escena": "A clay house with one window shuttered by a small clay panel while the rest of the facade stays open" },
+      { "clave": "proteccion-de-datos-personales", "escena": "A clay filing box closed with a chunky clay padlock, a small portrait tile visible through a slot in its lid" },
+      { "clave": "derecho-al-olvido", "escena": "A clay hand lifting a file card out of a clay drawer, leaving a clean empty slot in the row" },
+      { "clave": "libertad-de-expresion-digital", "escena": "A clay megaphone resting on an open clay platform with a ribbon of speech rising freely from it" }
+    ]
+  }
+]

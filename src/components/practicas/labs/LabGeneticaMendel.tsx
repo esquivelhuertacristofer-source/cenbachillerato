@@ -31,6 +31,10 @@ import {
   PROBLEMA, INSTRUCCIONES, PREGUNTAS, IDEAS, DATOS, GLOSARIO,
   EJEMPLO_A2, EJEMPLO_LIG, fmtPct, RETO_A2,
 } from "./genetica-mendel-data";
+import { TableroObjetivos } from "./_objetivos";
+
+/** Clave de la mejor marca de este laboratorio. */
+const RETO_KEY = "cen-genetica-mendeliana-punnett-reto";
 
 const GeneticaMendelScene = dynamic(() => import("./GeneticaMendelScene"), {
   ssr: false,
@@ -529,6 +533,25 @@ export function LabGeneticaMendel({ color }: PracticaLabProps) {
         <span>
           Genética <strong>exacta</strong> de conteo cerrado: el cuadro de Punnett combina los gametos de cada progenitor y cada casilla tiene la misma probabilidad. Las proporciones (1:2:1 genotípica, 3:1 fenotípica, 9:3:3:1 dihíbrida) y los porcentajes de los paneles son <strong>exactos</strong>. La escena 3D es <strong>esquemática</strong>: las flores, las semillas y los cromosomas son representaciones visuales (no a escala biológica) para distinguir los fenotipos y los sexos. El ejemplo resuelto es verbatim del ejercicio A2 y de la actividad final del glosario A5; las ideas clave, el glosario y el contexto se basan en la lectura A1; las preguntas para reflexionar se derivan de ese mismo contenido.
         </span>
+      </div>
+
+      {/* ── Objetivos ─────────────────────────────────────────────── */}
+      <div style={{ ...card, padding: "18px 22px", marginTop: 22 }}>
+        <Eyebrow>
+          <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
+          Objetivos
+        </Eyebrow>
+        <TableroObjetivos
+          retoKey={RETO_KEY}
+          accent={accent}
+          objetivos={[
+            { txt: "Arma un cruce monohíbrido y lee la proporción 3:1 en el cuadro de Punnett", done: modo === "monohibrido" },
+            { txt: "Cambia la herencia a incompleta o codominancia y mira cómo cambia el fenotipo", done: herencia !== "completa" },
+            { txt: "Pasa al cruce dihíbrido y encuentra la proporción 9:3:3:1", done: modo === "dihibrido" },
+            { txt: "Explora la herencia ligada al sexo (daltonismo)", done: modo === "ligado" },
+            { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
+          ]}
+        />
       </div>
 
       {/* ── Reto evaluable: el ejercicio verbatim del ancla A2 ────────── */}

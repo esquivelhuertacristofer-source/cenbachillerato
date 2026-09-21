@@ -113,9 +113,10 @@ export function LabLeySenosCosenos({ color }: PracticaLabProps) {
   const bump = () => setResetNonce((n) => n + 1);
 
   const objetivos = [
-    { txt: "Ajusta los lados a y b para explorar el triángulo", done: false },
-    { txt: "Prueba un ángulo C mayor de 90° (triángulo obtuso)", done: false },
-    { txt: "Carga el escenario «Casi recto» y comprueba Pitágoras", done: false },
+    { txt: "Ajusta los lados a y b para explorar el triángulo", done: a !== A_DEF || b !== B_DEF },
+    { txt: "Prueba un ángulo C mayor de 90° (triángulo obtuso)", done: angC > 90 },
+    { txt: "Prueba un ángulo C menor de 90° (triángulo acutángulo)", done: angC < 90 },
+    { txt: "Deja C en 90°: la Ley de Cosenos se vuelve Pitágoras", done: Math.abs(angC - 90) < 0.5 },
     { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
   ];
   // Los objetivos se recuerdan (algunos dependían del modo y se desmarcaban

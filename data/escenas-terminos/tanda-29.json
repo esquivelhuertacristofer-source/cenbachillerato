@@ -1,0 +1,20 @@
+[
+  {
+    "slug": "kit-herramientas-digitales",
+    "items": [
+      { "clave": "categoria-de-herramienta", "escena": "A clay wall rack with four labelled clay bins, each holding a different chunky clay tool: a pencil, a ruler, a clock and a magnifying glass" },
+      { "clave": "necesidad-declarada", "escena": "A small clay balance scale with a clay note card on one pan tipping it decisively toward one of two clay tool blocks" },
+      { "clave": "buscador-academico", "escena": "A clay magnifying glass held over a small stack of clay books with a graduation cap resting on the top one" },
+      { "clave": "fuente-primaria", "escena": "A clay spring of water rising from a rock into a basin, with a clay document resting at the source itself" },
+      { "clave": "convencion-de-nombres", "escena": "Four identical clay file cards on a rail, each with the same three raised bars in the same positions, like a repeating pattern" },
+      { "clave": "version", "escena": "Three clay document slabs stacked with slight offsets so all three edges show, each one a little thicker than the one below" },
+      { "clave": "respaldo", "escena": "One clay document on a desk and an identical clay document inside a closed clay safe beside it, a chunky arrow linking them" },
+      { "clave": "flujo-de-trabajo", "escena": "Five small clay step tiles laid in a row on a desk, linked in order by a thin clay ribbon of arrows" },
+      { "clave": "procesador-de-texto", "escena": "A clay page standing upright with ruled lines and a chunky clay cursor bar blinking at the end of one line" },
+      { "clave": "hoja-de-calculo", "escena": "A clay grid of small square cells on a board, three cells holding chunky clay counters and one cell holding a clay plus sign" },
+      { "clave": "presentacion-electronica", "escena": "A clay projection screen on a stand showing one big clay shape, with three small clay slide cards lined up below it" },
+      { "clave": "respaldo-backup", "escena": "Two identical clay hard-drive blocks side by side on a shelf, joined by a thick clay cable looping between them" },
+      { "clave": "plagio", "escena": "A clay page being traced over another clay page on a light table, the top page missing the small clay tag that the bottom one carries" }
+    ]
+  }
+]

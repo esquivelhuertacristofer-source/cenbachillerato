@@ -55,6 +55,10 @@ import {
   FUENTE,
   QUIZ_A2,
 } from "./mutaciones-data";
+import { TableroObjetivos } from "./_objetivos";
+
+/** Clave de la mejor marca de este laboratorio. */
+const RETO_KEY = "cen-mutaciones-3d-reto";
 
 const MutacionesScene = dynamic(() => import("./MutacionesScene"), {
   ssr: false,
@@ -535,6 +539,26 @@ export function LabMutaciones({ color }: PracticaLabProps) {
         <span>
           La lectura A1, las preguntas de reflexión, el glosario A5 (con sus ejemplos) y los hechos de «¿sabías que?» (quizzes A2/A4) son <strong>verbatim</strong> del MCCEMS 2025. En el modo de mutaciones puntuales, la secuencia, la traducción a aminoácidos y el efecto de cada mutación se <strong>calculan</strong> sobre el inicio real del gen de la β-globina humana usando el código genético universal estándar. Los cromosomas de bandas, la doble hélice y el dímero de timina son representaciones <strong>esquemáticas</strong> del mecanismo, no modelos a escala molecular. El contexto del INMEGEN es informativo. Fuente: {FUENTE}
         </span>
+      </div>
+
+      {/* ── Objetivos ─────────────────────────────────────────────── */}
+      <div style={{ ...card, padding: "18px 22px", marginTop: 22 }}>
+        <Eyebrow>
+          <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
+          Objetivos
+        </Eyebrow>
+        <TableroObjetivos
+          retoKey={RETO_KEY}
+          accent={accent}
+          objetivos={[
+            { txt: "Aplica una mutación puntual y compara la proteína original con la mutada", done: modo === "puntuales" && clasePuntual !== "ninguna" },
+            { txt: "Provoca un corrimiento del marco de lectura (frameshift)", done: clasePuntual === "frameshift" },
+            { txt: "Explora las mutaciones cromosómicas (deleción, inversión, trisomía…)", done: modo === "cromosomicas" },
+            { txt: "Prueba los mutágenos: UV, radiación ionizante, químico y biológico", done: modo === "mutagenos" && tipoMutageno !== "uv" },
+            { txt: "Repara el daño del ADN con el sistema NER", done: reparar },
+            { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
+          ]}
+        />
       </div>
 
       {/* ── Reto evaluable: el quiz verbatim de la actividad A2 ──────── */}

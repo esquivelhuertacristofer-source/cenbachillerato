@@ -131,11 +131,21 @@ describe("persistencia de estrellas de los laboratorios", () => {
   });
 
   it("todo laboratorio con reto persistido usa el hook useEstrellas", () => {
+    // Directamente, o a través de `TableroObjetivos`, que es quien lo usa por
+    // los laboratorios cuya marca sale de la lista de objetivos.
     const sinHook = shells.filter((f) => {
       const src = readFileSync(resolve(LABS_DIR, f), "utf8");
-      return src.includes("RETO_KEY") && !src.includes("useEstrellas");
+      return src.includes("RETO_KEY") && !src.includes("useEstrellas") && !src.includes("TableroObjetivos");
     });
     expect(sinHook).toEqual([]);
+  });
+
+  it("ningún objetivo de laboratorio está fijado a true o a false", () => {
+    // Un objetivo con `done: true` se ve cumplido antes de tocar nada y regala
+    // estrellas; uno con `done: false` no se puede cumplir nunca. En los dos
+    // casos el tablero miente sobre lo que el alumno hizo.
+    const fijos = shells.filter((f) => /done:\s*(true|false)\s*[,}]/.test(readFileSync(resolve(LABS_DIR, f), "utf8")));
+    expect(fijos).toEqual([]);
   });
 });
 

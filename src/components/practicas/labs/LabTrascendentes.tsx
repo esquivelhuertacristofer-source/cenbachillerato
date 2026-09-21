@@ -134,7 +134,8 @@ export function LabTrascendentes({ color }: PracticaLabProps) {
   const objetivos = [
     { txt: "Elige una función y observa su derivada en la escena", done: funcId !== FUNC_DEF || aPos !== func(FUNC_DEF).aDef },
     { txt: "Mueve la sonda x = a y comprueba pendiente = altura de f'", done: aPos !== func(funcId).aDef },
-    { txt: "Explora las cuatro reglas (trig, producto, cadena, logaritmo)", done: false },
+    { txt: "Prueba la regla del producto y la de la cadena", done: funcId === "expprod" || funcId === "senocadena" },
+    { txt: "Prueba la derivada del logaritmo", done: funcId === "logaritmo" },
     { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
   ];
   // Los objetivos se recuerdan (algunos dependían del modo y se desmarcaban

@@ -189,6 +189,76 @@ const LabTiempoHistorico = dynamic(() => import("./labs/LabTiempoHistorico").the
 const LabReglasIngles = dynamic(() => import("./labs/LabReglasIngles").then((m) => m.LabReglasIngles), { ssr: false, loading: LabCargando });
 const LabTiposDePreguntas = dynamic(() => import("./labs/LabTiposDePreguntas").then((m) => m.LabTiposDePreguntas), { ssr: false, loading: LabCargando });
 const LabHerramientasColaborativas = dynamic(() => import("./labs/LabHerramientasColaborativas").then((m) => m.LabHerramientasColaborativas), { ssr: false, loading: LabCargando });
+const LabGaltonProbabilidad = dynamic(() => import("./labs/LabGaltonProbabilidad").then((m) => m.LabGaltonProbabilidad), { ssr: false, loading: LabCargando });
+const LabConjuntosVenn = dynamic(() => import("./labs/LabConjuntosVenn").then((m) => m.LabConjuntosVenn), { ssr: false, loading: LabCargando });
+const LabTecnicasConteo = dynamic(() => import("./labs/LabTecnicasConteo").then((m) => m.LabTecnicasConteo), { ssr: false, loading: LabCargando });
+const LabBayesCondicional = dynamic(() => import("./labs/LabBayesCondicional").then((m) => m.LabBayesCondicional), { ssr: false, loading: LabCargando });
+const LabCorrelacionVariables = dynamic(() => import("./labs/LabCorrelacionVariables").then((m) => m.LabCorrelacionVariables), { ssr: false, loading: LabCargando });
+const LabMuestreoEstadistico = dynamic(() => import("./labs/LabMuestreoEstadistico").then((m) => m.LabMuestreoEstadistico), { ssr: false, loading: LabCargando });
+const LabEstadisticaEnganosa = dynamic(() => import("./labs/LabEstadisticaEnganosa").then((m) => m.LabEstadisticaEnganosa), { ssr: false, loading: LabCargando });
+const LabVariablesEstadistica = dynamic(() => import("./labs/LabVariablesEstadistica").then((m) => m.LabVariablesEstadistica), { ssr: false, loading: LabCargando });
+const LabMetodoCientifico = dynamic(() => import("./labs/LabMetodoCientifico").then((m) => m.LabMetodoCientifico), { ssr: false, loading: LabCargando });
+const LabNaturalezaCiencia = dynamic(() => import("./labs/LabNaturalezaCiencia").then((m) => m.LabNaturalezaCiencia), { ssr: false, loading: LabCargando });
+const LabTiposEnergia = dynamic(() => import("./labs/LabTiposEnergia").then((m) => m.LabTiposEnergia), { ssr: false, loading: LabCargando });
+const LabConsumoEnergetico = dynamic(() => import("./labs/LabConsumoEnergetico").then((m) => m.LabConsumoEnergetico), { ssr: false, loading: LabCargando });
+const LabRenovablesMexico = dynamic(() => import("./labs/LabRenovablesMexico").then((m) => m.LabRenovablesMexico), { ssr: false, loading: LabCargando });
+const LabHidrosferaAtmosfera = dynamic(() => import("./labs/LabHidrosferaAtmosfera").then((m) => m.LabHidrosferaAtmosfera), { ssr: false, loading: LabCargando });
+const LabOxigenacionAtmosfera = dynamic(() => import("./labs/LabOxigenacionAtmosfera").then((m) => m.LabOxigenacionAtmosfera), { ssr: false, loading: LabCargando });
+const LabInnovacionesAmbientales = dynamic(() => import("./labs/LabInnovacionesAmbientales").then((m) => m.LabInnovacionesAmbientales), { ssr: false, loading: LabCargando });
+const LabOrganicaIndustria = dynamic(() => import("./labs/LabOrganicaIndustria").then((m) => m.LabOrganicaIndustria), { ssr: false, loading: LabCargando });
+const LabContaminantesPlasticos = dynamic(() => import("./labs/LabContaminantesPlasticos").then((m) => m.LabContaminantesPlasticos), { ssr: false, loading: LabCargando });
+const LabDescubrimientoCelula = dynamic(() => import("./labs/LabDescubrimientoCelula").then((m) => m.LabDescubrimientoCelula), { ssr: false, loading: LabCargando });
+const LabFisionNuclear = dynamic(() => import("./labs/LabFisionNuclear").then((m) => m.LabFisionNuclear), { ssr: false, loading: LabCargando });
+const LabRestauracionEcosistemas = dynamic(() => import("./labs/LabRestauracionEcosistemas").then((m) => m.LabRestauracionEcosistemas), { ssr: false, loading: LabCargando });
+const LabLogicaCompuertas = dynamic(() => import("./labs/LabLogicaCompuertas").then((m) => m.LabLogicaCompuertas), { ssr: false, loading: LabCargando });
+const LabJerarquiaOperaciones = dynamic(() => import("./labs/LabJerarquiaOperaciones").then((m) => m.LabJerarquiaOperaciones), { ssr: false, loading: LabCargando });
+const LabEstimacionFermi = dynamic(() => import("./labs/LabEstimacionFermi").then((m) => m.LabEstimacionFermi), { ssr: false, loading: LabCargando });
+const LabPaqueteInternet = dynamic(() => import("./labs/LabPaqueteInternet").then((m) => m.LabPaqueteInternet), { ssr: false, loading: LabCargando });
+const LabCentroDatos = dynamic(() => import("./labs/LabCentroDatos").then((m) => m.LabCentroDatos), { ssr: false, loading: LabCargando });
+const LabSoftwareLibre = dynamic(() => import("./labs/LabSoftwareLibre").then((m) => m.LabSoftwareLibre), { ssr: false, loading: LabCargando });
+const LabEstudioEdicion = dynamic(() => import("./labs/LabEstudioEdicion").then((m) => m.LabEstudioEdicion), { ssr: false, loading: LabCargando });
+const LabAlcancePublicacion = dynamic(() => import("./labs/LabAlcancePublicacion").then((m) => m.LabAlcancePublicacion), { ssr: false, loading: LabCargando });
+const LabCasaObjetosIngles = dynamic(() => import("./labs/LabCasaObjetosIngles").then((m) => m.LabCasaObjetosIngles), { ssr: false, loading: LabCargando });
+const LabClimaVestimentaIngles = dynamic(() => import("./labs/LabClimaVestimentaIngles").then((m) => m.LabClimaVestimentaIngles), { ssr: false, loading: LabCargando });
+const LabRutinaDiariaIngles = dynamic(() => import("./labs/LabRutinaDiariaIngles").then((m) => m.LabRutinaDiariaIngles), { ssr: false, loading: LabCargando });
+const LabCiudadDireccionesIngles = dynamic(() => import("./labs/LabCiudadDireccionesIngles").then((m) => m.LabCiudadDireccionesIngles), { ssr: false, loading: LabCargando });
+const LabRelatoSecuenciaIngles = dynamic(() => import("./labs/LabRelatoSecuenciaIngles").then((m) => m.LabRelatoSecuenciaIngles), { ssr: false, loading: LabCargando });
+const LabPlanesFuturoIngles = dynamic(() => import("./labs/LabPlanesFuturoIngles").then((m) => m.LabPlanesFuturoIngles), { ssr: false, loading: LabCargando });
+const LabHabilidadesPermisosIngles = dynamic(() => import("./labs/LabHabilidadesPermisosIngles").then((m) => m.LabHabilidadesPermisosIngles), { ssr: false, loading: LabCargando });
+const LabCortesiaConversacionIngles = dynamic(() => import("./labs/LabCortesiaConversacionIngles").then((m) => m.LabCortesiaConversacionIngles), { ssr: false, loading: LabCargando });
+const LabMercadoNecesidadesIngles = dynamic(() => import("./labs/LabMercadoNecesidadesIngles").then((m) => m.LabMercadoNecesidadesIngles), { ssr: false, loading: LabCargando });
+const LabTerminalHorariosIngles = dynamic(() => import("./labs/LabTerminalHorariosIngles").then((m) => m.LabTerminalHorariosIngles), { ssr: false, loading: LabCargando });
+const LabLugaresRecomendacionesIngles = dynamic(() => import("./labs/LabLugaresRecomendacionesIngles").then((m) => m.LabLugaresRecomendacionesIngles), { ssr: false, loading: LabCargando });
+const LabGustosOpinionesIngles = dynamic(() => import("./labs/LabGustosOpinionesIngles").then((m) => m.LabGustosOpinionesIngles), { ssr: false, loading: LabCargando });
+const LabDilemaTranvia = dynamic(() => import("./labs/LabDilemaTranvia").then((m) => m.LabDilemaTranvia), { ssr: false, loading: LabCargando });
+const LabCavernaConocimiento = dynamic(() => import("./labs/LabCavernaConocimiento").then((m) => m.LabCavernaConocimiento), { ssr: false, loading: LabCargando });
+const LabArchivoFuentes = dynamic(() => import("./labs/LabArchivoFuentes").then((m) => m.LabArchivoFuentes), { ssr: false, loading: LabCargando });
+const LabPreguntasPasado = dynamic(() => import("./labs/LabPreguntasPasado").then((m) => m.LabPreguntasPasado), { ssr: false, loading: LabCargando });
+const LabAgoraCiudadania = dynamic(() => import("./labs/LabAgoraCiudadania").then((m) => m.LabAgoraCiudadania), { ssr: false, loading: LabCargando });
+const LabLecturaEscritura = dynamic(() => import("./labs/LabLecturaEscritura").then((m) => m.LabLecturaEscritura), { ssr: false, loading: LabCargando });
+const LabEncuestaLectora = dynamic(() => import("./labs/LabEncuestaLectora").then((m) => m.LabEncuestaLectora), { ssr: false, loading: LabCargando });
+const LabHechoOpinion = dynamic(() => import("./labs/LabHechoOpinion").then((m) => m.LabHechoOpinion), { ssr: false, loading: LabCargando });
+const LabIdeasClave = dynamic(() => import("./labs/LabIdeasClave").then((m) => m.LabIdeasClave), { ssr: false, loading: LabCargando });
+const LabLecturaVozAlta = dynamic(() => import("./labs/LabLecturaVozAlta").then((m) => m.LabLecturaVozAlta), { ssr: false, loading: LabCargando });
+const LabAnatomiaExposicion = dynamic(() => import("./labs/LabAnatomiaExposicion").then((m) => m.LabAnatomiaExposicion), { ssr: false, loading: LabCargando });
+const LabHistoriaDeVida = dynamic(() => import("./labs/LabHistoriaDeVida").then((m) => m.LabHistoriaDeVida), { ssr: false, loading: LabCargando });
+const LabDescripcionNarracion = dynamic(() => import("./labs/LabDescripcionNarracion").then((m) => m.LabDescripcionNarracion), { ssr: false, loading: LabCargando });
+const LabNarrativasPopulares = dynamic(() => import("./labs/LabNarrativasPopulares").then((m) => m.LabNarrativasPopulares), { ssr: false, loading: LabCargando });
+const LabTemasIdeas = dynamic(() => import("./labs/LabTemasIdeas").then((m) => m.LabTemasIdeas), { ssr: false, loading: LabCargando });
+const LabReescritura = dynamic(() => import("./labs/LabReescritura").then((m) => m.LabReescritura), { ssr: false, loading: LabCargando });
+const LabProcedimientosNarrativos = dynamic(() => import("./labs/LabProcedimientosNarrativos").then((m) => m.LabProcedimientosNarrativos), { ssr: false, loading: LabCargando });
+const LabDerechosDigitales = dynamic(() => import("./labs/LabDerechosDigitales").then((m) => m.LabDerechosDigitales), { ssr: false, loading: LabCargando });
+const LabConvivenciaDigital = dynamic(() => import("./labs/LabConvivenciaDigital").then((m) => m.LabConvivenciaDigital), { ssr: false, loading: LabCargando });
+const LabKitHerramientas = dynamic(() => import("./labs/LabKitHerramientas").then((m) => m.LabKitHerramientas), { ssr: false, loading: LabCargando });
+const LabLecturaCritica = dynamic(() => import("./labs/LabLecturaCritica").then((m) => m.LabLecturaCritica), { ssr: false, loading: LabCargando });
+const LabAulaIngles = dynamic(() => import("./labs/LabAulaIngles").then((m) => m.LabAulaIngles), { ssr: false, loading: LabCargando });
+const LabPerfilPersonalIngles = dynamic(() => import("./labs/LabPerfilPersonalIngles").then((m) => m.LabPerfilPersonalIngles), { ssr: false, loading: LabCargando });
+const LabTiempoLibreIngles = dynamic(() => import("./labs/LabTiempoLibreIngles").then((m) => m.LabTiempoLibreIngles), { ssr: false, loading: LabCargando });
+const LabDescribirPersonasClima = dynamic(() => import("./labs/LabDescribirPersonasClima").then((m) => m.LabDescribirPersonasClima), { ssr: false, loading: LabCargando });
+const LabExperienciasRecientes = dynamic(() => import("./labs/LabExperienciasRecientes").then((m) => m.LabExperienciasRecientes), { ssr: false, loading: LabCargando });
+const LabHabitosComparaciones = dynamic(() => import("./labs/LabHabitosComparaciones").then((m) => m.LabHabitosComparaciones), { ssr: false, loading: LabCargando });
+const LabInstruccionesIngles = dynamic(() => import("./labs/LabInstruccionesIngles").then((m) => m.LabInstruccionesIngles), { ssr: false, loading: LabCargando });
+const LabPasadoViajeIngles = dynamic(() => import("./labs/LabPasadoViajeIngles").then((m) => m.LabPasadoViajeIngles), { ssr: false, loading: LabCargando });
 
 /** Props que recibe cada componente de laboratorio. */
 export interface PracticaLabProps {
@@ -212,6 +282,30 @@ export interface PracticaDef {
 }
 
 export const PRACTICAS: Record<string, PracticaDef> = {
+  "pasado-viaje-ingles": { ...PRACTICAS_META["pasado-viaje-ingles"]!, Component: LabPasadoViajeIngles },
+  "instrucciones-ingles": { ...PRACTICAS_META["instrucciones-ingles"]!, Component: LabInstruccionesIngles },
+  "habitos-comparaciones-ingles": { ...PRACTICAS_META["habitos-comparaciones-ingles"]!, Component: LabHabitosComparaciones },
+  "experiencias-recientes-ingles": { ...PRACTICAS_META["experiencias-recientes-ingles"]!, Component: LabExperienciasRecientes },
+  "describir-personas-clima-ingles": { ...PRACTICAS_META["describir-personas-clima-ingles"]!, Component: LabDescribirPersonasClima },
+  "tiempo-libre-ingles": { ...PRACTICAS_META["tiempo-libre-ingles"]!, Component: LabTiempoLibreIngles },
+  "perfil-personal-ingles": { ...PRACTICAS_META["perfil-personal-ingles"]!, Component: LabPerfilPersonalIngles },
+  "aula-ingles-interacciones": { ...PRACTICAS_META["aula-ingles-interacciones"]!, Component: LabAulaIngles },
+  "lectura-critica-postura": { ...PRACTICAS_META["lectura-critica-postura"]!, Component: LabLecturaCritica },
+  "kit-herramientas-digitales": { ...PRACTICAS_META["kit-herramientas-digitales"]!, Component: LabKitHerramientas },
+  "convivencia-digital": { ...PRACTICAS_META["convivencia-digital"]!, Component: LabConvivenciaDigital },
+  "derechos-digitales": { ...PRACTICAS_META["derechos-digitales"]!, Component: LabDerechosDigitales },
+  "procedimientos-narrativos": { ...PRACTICAS_META["procedimientos-narrativos"]!, Component: LabProcedimientosNarrativos },
+  "reescritura-taller": { ...PRACTICAS_META["reescritura-taller"]!, Component: LabReescritura },
+  "temas-ideas-narrativa": { ...PRACTICAS_META["temas-ideas-narrativa"]!, Component: LabTemasIdeas },
+  "narrativas-populares-lengua": { ...PRACTICAS_META["narrativas-populares-lengua"]!, Component: LabNarrativasPopulares },
+  "taller-descripcion-narracion": { ...PRACTICAS_META["taller-descripcion-narracion"]!, Component: LabDescripcionNarracion },
+  "historia-de-vida-relato": { ...PRACTICAS_META["historia-de-vida-relato"]!, Component: LabHistoriaDeVida },
+  "anatomia-exposicion-oral": { ...PRACTICAS_META["anatomia-exposicion-oral"]!, Component: LabAnatomiaExposicion },
+  "lectura-en-voz-alta": { ...PRACTICAS_META["lectura-en-voz-alta"]!, Component: LabLecturaVozAlta },
+  "ideas-clave-subrayado": { ...PRACTICAS_META["ideas-clave-subrayado"]!, Component: LabIdeasClave },
+  "hecho-opinion-texto": { ...PRACTICAS_META["hecho-opinion-texto"]!, Component: LabHechoOpinion },
+  "encuesta-lectora-comunidad": { ...PRACTICAS_META["encuesta-lectora-comunidad"]!, Component: LabEncuestaLectora },
+  "lectura-escritura-dialogo": { ...PRACTICAS_META["lectura-escritura-dialogo"]!, Component: LabLecturaEscritura },
   densidad: { ...PRACTICAS_META["densidad"]!, Component: LabDensidad },
   "estados-materia": { ...PRACTICAS_META["estados-materia"]!, Component: LabEstadosMateria },
   "modelos-atomicos": { ...PRACTICAS_META["modelos-atomicos"]!, Component: LabModelosAtomicos },
@@ -353,6 +447,52 @@ export const PRACTICAS: Record<string, PracticaDef> = {
   "reglas-ingles": { ...PRACTICAS_META["reglas-ingles"]!, Component: LabReglasIngles },
   "tipos-de-preguntas": { ...PRACTICAS_META["tipos-de-preguntas"]!, Component: LabTiposDePreguntas },
   "herramientas-colaborativas": { ...PRACTICAS_META["herramientas-colaborativas"]!, Component: LabHerramientasColaborativas },
+  "galton-probabilidad-frecuencia": { ...PRACTICAS_META["galton-probabilidad-frecuencia"]!, Component: LabGaltonProbabilidad },
+  "conjuntos-venn-3d": { ...PRACTICAS_META["conjuntos-venn-3d"]!, Component: LabConjuntosVenn },
+  "tecnicas-conteo-3d": { ...PRACTICAS_META["tecnicas-conteo-3d"]!, Component: LabTecnicasConteo },
+  "bayes-probabilidad-condicional": { ...PRACTICAS_META["bayes-probabilidad-condicional"]!, Component: LabBayesCondicional },
+  "correlacion-variables-3d": { ...PRACTICAS_META["correlacion-variables-3d"]!, Component: LabCorrelacionVariables },
+  "muestreo-estadistico-3d": { ...PRACTICAS_META["muestreo-estadistico-3d"]!, Component: LabMuestreoEstadistico },
+  "estadistica-enganosa-3d": { ...PRACTICAS_META["estadistica-enganosa-3d"]!, Component: LabEstadisticaEnganosa },
+  "variables-poblacion-muestra-3d": { ...PRACTICAS_META["variables-poblacion-muestra-3d"]!, Component: LabVariablesEstadistica },
+  "metodo-cientifico-medicion-3d": { ...PRACTICAS_META["metodo-cientifico-medicion-3d"]!, Component: LabMetodoCientifico },
+  "naturaleza-ciencia-3d": { ...PRACTICAS_META["naturaleza-ciencia-3d"]!, Component: LabNaturalezaCiencia },
+  "tipos-energia-aplicaciones-3d": { ...PRACTICAS_META["tipos-energia-aplicaciones-3d"]!, Component: LabTiposEnergia },
+  "consumo-energetico-hogar-3d": { ...PRACTICAS_META["consumo-energetico-hogar-3d"]!, Component: LabConsumoEnergetico },
+  "energias-renovables-mexico-3d": { ...PRACTICAS_META["energias-renovables-mexico-3d"]!, Component: LabRenovablesMexico },
+  "hidrosfera-atmosfera-3d": { ...PRACTICAS_META["hidrosfera-atmosfera-3d"]!, Component: LabHidrosferaAtmosfera },
+  "oxigenacion-atmosfera-3d": { ...PRACTICAS_META["oxigenacion-atmosfera-3d"]!, Component: LabOxigenacionAtmosfera },
+  "innovaciones-ambientales-3d": { ...PRACTICAS_META["innovaciones-ambientales-3d"]!, Component: LabInnovacionesAmbientales },
+  "quimica-organica-industria-3d": { ...PRACTICAS_META["quimica-organica-industria-3d"]!, Component: LabOrganicaIndustria },
+  "contaminantes-plasticos-3d": { ...PRACTICAS_META["contaminantes-plasticos-3d"]!, Component: LabContaminantesPlasticos },
+  "descubrimiento-celula-3d": { ...PRACTICAS_META["descubrimiento-celula-3d"]!, Component: LabDescubrimientoCelula },
+  "fision-nuclear-etica-3d": { ...PRACTICAS_META["fision-nuclear-etica-3d"]!, Component: LabFisionNuclear },
+  "restauracion-ecosistemas-mexico-3d": { ...PRACTICAS_META["restauracion-ecosistemas-mexico-3d"]!, Component: LabRestauracionEcosistemas },
+  "logica-compuertas-3d": { ...PRACTICAS_META["logica-compuertas-3d"]!, Component: LabLogicaCompuertas },
+  "jerarquia-operaciones-3d": { ...PRACTICAS_META["jerarquia-operaciones-3d"]!, Component: LabJerarquiaOperaciones },
+  "estimacion-fermi-3d": { ...PRACTICAS_META["estimacion-fermi-3d"]!, Component: LabEstimacionFermi },
+  "viaje-paquete-internet-3d": { ...PRACTICAS_META["viaje-paquete-internet-3d"]!, Component: LabPaqueteInternet },
+  "centro-datos-huella-nube-3d": { ...PRACTICAS_META["centro-datos-huella-nube-3d"]!, Component: LabCentroDatos },
+  "software-libre-3d": { ...PRACTICAS_META["software-libre-3d"]!, Component: LabSoftwareLibre },
+  "estudio-edicion-digital-3d": { ...PRACTICAS_META["estudio-edicion-digital-3d"]!, Component: LabEstudioEdicion },
+  "alcance-publicacion-3d": { ...PRACTICAS_META["alcance-publicacion-3d"]!, Component: LabAlcancePublicacion },
+  "casa-escuela-objetos-ingles-3d": { ...PRACTICAS_META["casa-escuela-objetos-ingles-3d"]!, Component: LabCasaObjetosIngles },
+  "clima-vestimenta-ingles-3d": { ...PRACTICAS_META["clima-vestimenta-ingles-3d"]!, Component: LabClimaVestimentaIngles },
+  "rutina-diaria-ingles-3d": { ...PRACTICAS_META["rutina-diaria-ingles-3d"]!, Component: LabRutinaDiariaIngles },
+  "ciudad-direcciones-ingles-3d": { ...PRACTICAS_META["ciudad-direcciones-ingles-3d"]!, Component: LabCiudadDireccionesIngles },
+  "relato-secuencia-ingles-3d": { ...PRACTICAS_META["relato-secuencia-ingles-3d"]!, Component: LabRelatoSecuenciaIngles },
+  "planes-futuro-ingles-3d": { ...PRACTICAS_META["planes-futuro-ingles-3d"]!, Component: LabPlanesFuturoIngles },
+  "habilidades-permisos-ingles-3d": { ...PRACTICAS_META["habilidades-permisos-ingles-3d"]!, Component: LabHabilidadesPermisosIngles },
+  "cortesia-conversacion-ingles-3d": { ...PRACTICAS_META["cortesia-conversacion-ingles-3d"]!, Component: LabCortesiaConversacionIngles },
+  "mercado-necesidades-ingles-3d": { ...PRACTICAS_META["mercado-necesidades-ingles-3d"]!, Component: LabMercadoNecesidadesIngles },
+  "terminal-horarios-ingles-3d": { ...PRACTICAS_META["terminal-horarios-ingles-3d"]!, Component: LabTerminalHorariosIngles },
+  "lugares-recomendaciones-ingles-3d": { ...PRACTICAS_META["lugares-recomendaciones-ingles-3d"]!, Component: LabLugaresRecomendacionesIngles },
+  "gustos-opiniones-ingles-3d": { ...PRACTICAS_META["gustos-opiniones-ingles-3d"]!, Component: LabGustosOpinionesIngles },
+  "dilema-tranvia-etica-3d": { ...PRACTICAS_META["dilema-tranvia-etica-3d"]!, Component: LabDilemaTranvia },
+  "caverna-conocimiento-3d": { ...PRACTICAS_META["caverna-conocimiento-3d"]!, Component: LabCavernaConocimiento },
+  "archivo-fuentes-historicas-3d": { ...PRACTICAS_META["archivo-fuentes-historicas-3d"]!, Component: LabArchivoFuentes },
+  "preguntas-pasado-discursos-3d": { ...PRACTICAS_META["preguntas-pasado-discursos-3d"]!, Component: LabPreguntasPasado },
+  "agora-ciudadania-3d": { ...PRACTICAS_META["agora-ciudadania-3d"]!, Component: LabAgoraCiudadania },
 };
 
 /** Devuelve la práctica registrada para un slug, o null si no existe. */

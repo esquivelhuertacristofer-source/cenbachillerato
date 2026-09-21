@@ -1,0 +1,40 @@
+[
+  {
+    "slug": "reescritura-taller",
+    "items": [
+      { "clave": "reescritura", "escena": "A clay page on a desk with a second, cleaner clay page laid half over it, a stubby red clay pencil resting across both" },
+      { "clave": "amplificacion", "escena": "A short clay sentence bar on a base with three small clay detail blocks being slotted into gaps along its length, making it longer" },
+      { "clave": "condensacion", "escena": "A clay press squeezing a tall stack of clay text lines down into one short thick bar beneath it" },
+      { "clave": "voz-narrativa", "escena": "A clay page standing upright with a small clay mouth modelled into its surface, a thin ribbon of speech curling from it" },
+      { "clave": "sustitucion-lexica", "escena": "A clay hand lifting a dull grey blank tile out of a rail of blank clay tiles with no writing or letters on them, while a bright amber blank tile waits beside the empty slot" },
+      { "clave": "proposito-comunicativo", "escena": "A clay page on a stand with a small clay arrow leaving it and landing dead centre on a round target disc" },
+      { "clave": "muletilla", "escena": "A rail of chunky blank clay tiles with no writing or letters on any of them, where three identical small grey tiles repeat between the larger coloured ones, the grey ones exactly the same shape as each other" },
+      { "clave": "marca-de-corrector", "escena": "A clay page with a chunky red clay proofreading symbol pressed into the margin, a small caret wedge pointing between two words" },
+      { "clave": "distancia-temporal", "escena": "Two clay calendar blocks standing apart on a base, a chunky clay measuring bar stretched between them" },
+      { "clave": "conector-textual", "escena": "Two clay paragraph slabs on a table joined by a short thick clay bridge piece clicked between them" },
+      { "clave": "trama", "escena": "A clay thread running across a board through five small clay knots, each knot a raised bead on the line" },
+      { "clave": "conflicto", "escena": "Two clay figures pulling opposite ends of one thick clay rope, the rope taut between them" },
+      { "clave": "tipo-de-narracion", "escena": "Three clay storybooks standing side by side on a shelf, each with a differently shaped emblem modelled on its cover" },
+      { "clave": "tono-narrativo", "escena": "A clay page lit by a small clay lamp whose shade is tinted amber, staining the page in a warm wash" }
+    ]
+  },
+  {
+    "slug": "procedimientos-narrativos",
+    "items": [
+      { "clave": "historia-y-discurso", "escena": "Two rows of clay cards on a table, the top row in a straight numbered line and the bottom row the same cards shuffled, with clay ribbons crossing between the rows" },
+      { "clave": "analepsis", "escena": "A clay timeline bar running left to right with one chunky clay arrow looping backwards under it to an earlier card" },
+      { "clave": "prolepsis", "escena": "A clay timeline bar with one chunky clay arrow leaping forwards over it and landing on a card further along" },
+      { "clave": "elipsis", "escena": "A clay timeline bar with a clean gap cut out of its middle, three small clay dots resting in the empty space" },
+      { "clave": "pausa-descriptiva", "escena": "A clay clock lying stopped on its side while a long clay page of text unrolls past it across the table" },
+      { "clave": "focalizacion", "escena": "A clay funnel over a small scene, narrowing what passes through it into a single clay eye below" },
+      { "clave": "narrador-omnisciente", "escena": "A clay eye floating above a small clay house whose roof is lifted off, showing the rooms and figures inside" },
+      { "clave": "estilo-indirecto-libre", "escena": "A clay figure with a thought cloud whose outline dissolves into the page of clay text beneath it, no quotation marks anywhere" },
+      { "clave": "procedimiento-narrativo", "escena": "A clay toolbox open on a desk holding small modelled tools shaped like an arrow, a clock and a speech bubble" },
+      { "clave": "texto-colaborativo", "escena": "Four clay hands reaching in from the edges of one shared clay page, each adding a line to it" },
+      { "clave": "dialogo-entre-pares", "escena": "Two clay figures seated facing each other at the same height, a speech ribbon passing both ways between them" },
+      { "clave": "retroalimentacion", "escena": "A clay page passing to a second clay figure who returns it with a small clay note card clipped to its edge, joined by a looping arrow" },
+      { "clave": "final-abierto", "escena": "A clay book whose last page ends in a doorway standing ajar, with no wall beyond it" },
+      { "clave": "narrador-testigo", "escena": "A clay figure standing at the edge of a scene with a small clay eye on its chest, watching two other figures act in the middle" }
+    ]
+  }
+]

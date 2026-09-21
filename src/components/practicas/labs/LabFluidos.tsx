@@ -126,9 +126,11 @@ export function LabFluidos({ color }: PracticaLabProps) {
   const modoCol = modoActual.col;
 
   const objetivos = [
-    { txt: "Explora el modo Flotación (Arquímedes)", done: false },
-    { txt: "Explora el modo Presión (Pascal / hidrostática)", done: false },
-    { txt: "Explora el modo Flujo (continuidad y Bernoulli)", done: false },
+    { txt: "Explora el modo Flotación (Arquímedes)", done: modo === "flotacion" && rhoObj !== RHO_OBJ_DEF },
+    { txt: "Explora el modo Presión (Pascal / hidrostática)", done: modo === "presion" },
+    { txt: "Baja a más profundidad y mira cómo sube la presión", done: prof !== PROF_DEF },
+    { txt: "Explora el modo Flujo (continuidad y Bernoulli)", done: modo === "flujo" },
+    { txt: "Estrecha la tubería y comprueba que el fluido acelera", done: razon !== RAZON_DEF },
     { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
   ];
   // Los objetivos se recuerdan (algunos dependían del modo y se desmarcaban

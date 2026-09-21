@@ -37,6 +37,11 @@ import {
   fmt2, fmtAng, fmtDist, fmtAumento,
 } from "./optica-data";
 
+import { TableroObjetivos } from "./_objetivos";
+
+/** Clave de la mejor marca de este laboratorio. */
+const RETO_KEY = "cen-optica-lentes-espejos-reto";
+
 const OpticaScene = dynamic(() => import("./OpticaScene"), {
   ssr: false,
   loading: () => (
@@ -493,19 +498,18 @@ export function LabOptica({ color }: PracticaLabProps) {
           <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
           Objetivos
         </Eyebrow>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-          {[
-            { txt: "Explora los tres modos: lentes, espejos y refracción", done: false },
-            { txt: "Verifica la ecuación de Gauss 1/f = 1/dₒ + 1/dᵢ", done: false },
-            { txt: "Supera el ángulo crítico y observa reflexión total interna", done: false },
+        <TableroObjetivos
+          retoKey={RETO_KEY}
+          accent={accent}
+          objetivos={[
+            { txt: "Verifica la ecuación de Gauss moviendo el objeto ante la lente", done: modo === "lentes" && doLente !== DO_LENTE_DEF },
+            { txt: "Prueba la lente divergente y compara con la convergente", done: tipoLente !== "convergente" },
+            { txt: "Explora los espejos: plano, cóncavo y convexo", done: modo === "espejos" },
+            { txt: "Pasa al modo refracción y dobla el rayo con la ley de Snell", done: modo === "refraccion" },
+            { txt: "Supera el ángulo crítico y observa la reflexión total interna", done: snell.reflexionTotal === true },
             { txt: "Resuelve el reto evaluable de la actividad", done: ejercicioAprobado },
-          ].map((o, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? "#34D399" : T.text2 }}>
-              <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-              <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-            </div>
-          ))}
-        </div>
+          ]}
+        />
       </div>
 
       {/* ── Lecturas + ideas clave ─────────────────────────────────── */}

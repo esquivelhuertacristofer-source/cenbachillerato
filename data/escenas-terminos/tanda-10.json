@@ -1,0 +1,168 @@
+[
+  {
+    "slug": "maquina-termica-ciclos",
+    "items": [
+      { "clave": "termodinamica", "escena": "A clay steam engine on a bench with a flame beneath it and a piston pushing a wheel" },
+      { "clave": "primera-ley-u-q-w", "escena": "A clay cylinder with heat arrows entering at its base and a block being lifted by the piston above" },
+      { "clave": "segunda-ley-y-entropia-s", "escena": "A clay tower of blocks collapsing into a scattered heap that will never rebuild itself" },
+      { "clave": "motor-de-combustion-interna", "escena": "A clay engine cut open showing a piston, a spark and a turning crankshaft" },
+      { "clave": "refrigerador", "escena": "A clay fridge cut open with heat being pumped from a cold inner shelf out to warm coils at the back" },
+      { "clave": "trabajo-mecanico-w", "escena": "A clay hand pushing a crate along a floor with an arrow marking the distance moved" },
+      { "clave": "fuerza-f", "escena": "A clay hand pressing a spring flat against a block" },
+      { "clave": "friccion", "escena": "A clay block dragged over rough ground with scuff marks and heat haze behind it" },
+      { "clave": "calor", "escena": "A clay hot block touching a cold block with waves flowing from one into the other" }
+    ]
+  },
+  {
+    "slug": "medidas-dispersion",
+    "items": [
+      { "clave": "media-aritmetica-x", "escena": "A clay seesaw balanced on a single pivot with blocks of different sizes spread along its plank" },
+      { "clave": "mediana", "escena": "A row of clay blocks ordered from short to tall with a small flag planted on the middle one" },
+      { "clave": "moda", "escena": "A row of clay blocks where one shape repeats far more often than the others, that one raised above the rest" },
+      { "clave": "valor-atipico-outlier", "escena": "A clay seesaw with one very heavy block far out on one end, tipping the whole plank steeply" },
+      { "clave": "media-ponderada", "escena": "A clay balance beam with blocks of different sizes each hung from a different point along it" },
+      { "clave": "dispersion-rango-varianza", "escena": "Two clay boards of beads side by side: one a tight cluster at the centre, the other spread wide" },
+      { "clave": "media-aritmetica-promedio", "escena": "A row of uneven clay sand piles being levelled into equal heights by a flat board" },
+      { "clave": "sesgo-y-resistencia-de-medidas", "escena": "A clay seesaw tipped by a heavy block at one end, with a sturdy post beside it that has not moved" },
+      { "clave": "medidas-en-datos-agrupados", "escena": "A row of clay bins each holding a stack of beads, with a small marker standing at the middle of each bin" }
+    ]
+  },
+  {
+    "slug": "medidas-tendencia-central",
+    "items": [
+      { "clave": "media-aritmetica-x", "escena": "A clay seesaw balanced on one pivot with blocks of different sizes spread along the plank" },
+      { "clave": "mediana", "escena": "A row of clay blocks sorted from short to tall with a flag planted on the middle one" },
+      { "clave": "moda", "escena": "A row of clay blocks with one shape repeating far more than the rest, raised above the others" },
+      { "clave": "valor-atipico-outlier", "escena": "A clay seesaw tipped steeply by one very heavy block far out at one end" },
+      { "clave": "media-ponderada", "escena": "A clay balance beam with differently sized blocks hung at different points along it" },
+      { "clave": "dispersion-rango-varianza", "escena": "Two clay trays of beads: one clustered tightly at the centre, one scattered to the edges" },
+      { "clave": "media-aritmetica-promedio", "escena": "Uneven clay sand piles being levelled into equal heights by a flat board" },
+      { "clave": "sesgo-y-resistencia-de-medidas", "escena": "A clay seesaw dragged down by a heavy block while a firm post beside it stays put" },
+      { "clave": "medidas-en-datos-agrupados", "escena": "A row of clay bins each holding a stack of beads with a marker at the middle of each bin" }
+    ]
+  },
+  {
+    "slug": "mercado-necesidades-ingles-3d",
+    "items": [
+      { "clave": "would-like-a1", "escena": "A clay hand politely offering a glass of water on a small tray" },
+      { "clave": "would-rather-ampliacion", "escena": "A clay figure choosing a small sapling over a plastic toy on a table" },
+      { "clave": "how-much-how-many-a1", "escena": "A clay jug of water standing beside a basket of five apples on a counter" },
+      { "clave": "incontables-con-medida-ampliacion", "escena": "A clay sack of rice on a scale beside a bottle of milk and a measured glass of juice" },
+      { "clave": "some-any-ampliacion", "escena": "A clay bunch of bananas being offered on a plate beside an empty basket" },
+      { "clave": "elegir-y-justificar", "escena": "A clay box of donated books on a table with an arrow pointing to a small stack of coins" }
+    ]
+  },
+  {
+    "slug": "metabolismo-celular-3d",
+    "items": [
+      { "clave": "metabolismo-celular", "escena": "A clay cell cut open with small machines working inside and energy tokens moving between them" },
+      { "clave": "respiracion-aerobia", "escena": "A clay bean shaped pod with a sugar cube and an air bubble going in and many energy tokens coming out" },
+      { "clave": "fotosintesis", "escena": "A clay green oval taking in light, a water drop and a grey puff, giving out a sugar cube and a bubble" },
+      { "clave": "fermentacion", "escena": "A clay sealed jar of dough rising with bubbles and only two energy tokens beside it" },
+      { "clave": "atp", "escena": "A clay coin shaped token with three small beads on its edge, one of them being snapped off" },
+      { "clave": "glucolisis", "escena": "A clay sugar cube split into two smaller pieces on the cell floor with two energy tokens beside them" },
+      { "clave": "ciclo-de-krebs-ciclo-del-acido-citrico", "escena": "A clay carousel turning inside a bean shaped pod, releasing grey puffs and glowing beads" },
+      { "clave": "cadena-de-transporte-de-electrones-y-fosforilaci", "escena": "A clay row of pumps along a folded membrane pushing beads to one side, with a turbine at the end" },
+      { "clave": "fase-luminica-de-la-fotosintesis", "escena": "A clay stack of flat green discs struck by sunlight, splitting a water drop and releasing a bubble" },
+      { "clave": "ciclo-de-calvin-fase-oscura-fase-de-fijacion-de-", "escena": "A clay carousel turning in a clear gel, taking in grey puffs and building a sugar cube" }
+    ]
+  },
+  {
+    "slug": "metodo-cientifico-medicion-3d",
+    "items": [
+      { "clave": "experimento-controlado", "escena": "Two clay plant pots side by side, identical except that only one stands under a lamp" },
+      { "clave": "variable-confusora", "escena": "Two clay pots that differ in both light and water, with a puzzled hand hovering between them" },
+      { "clave": "replicas-y-variacion", "escena": "Five clay seedlings of slightly different heights in a row with a ruler measuring each one" },
+      { "clave": "replicacion", "escena": "Two separate clay benches with the same experiment set up on each by different hands" },
+      { "clave": "resolucion-e-incertidumbre", "escena": "A clay ruler with fine notches beside a ruler with coarse notches, both measuring the same stick" },
+      { "clave": "conversion-en-el-si", "escena": "A clay metre stick with a hundred small unit cubes laid out along its length" }
+    ]
+  },
+  {
+    "slug": "mexico-en-el-mundo",
+    "items": [
+      { "clave": "historia-conectada", "escena": "A clay globe with threads running between several continents and meeting at one port" },
+      { "clave": "imperialismo", "escena": "A large clay boot standing on a small map plaque while crates are carried away from it" },
+      { "clave": "ajuste-estructural", "escena": "A clay building being cut down in size while a belt is tightened around its middle" },
+      { "clave": "nearshoring", "escena": "Two clay factories on either side of a short bridge with crates crossing between them" },
+      { "clave": "moratoria-de-pagos", "escena": "A clay payment window shuttered closed with a stack of unpaid notes left on the counter" },
+      { "clave": "multicausalidad-historica", "escena": "Several clay threads coming from different directions and tied into a single knot on a board" },
+      { "clave": "historia-global-e-interconexion", "escena": "A clay globe with a small scene on each continent, all joined together by threads" },
+      { "clave": "revoluciones-atlanticas", "escena": "A clay ocean between two coasts with flags rising on both sides and a ship crossing between them" },
+      { "clave": "imperialismo-y-dependencia", "escena": "A clay chain from a small map plaque to a large one, crates moving one way and coins the other" },
+      { "clave": "guerra-fria-y-america-latina", "escena": "Two clay giants facing each other with a small country caught in the space between them" },
+      { "clave": "periodizacion-historica", "escena": "A clay timeline rod divided into coloured segments by raised markers" }
+    ]
+  },
+  {
+    "slug": "modelado-conicas-estimacion",
+    "items": [
+      { "clave": "seccion-conica", "escena": "A clay double cone sliced by a flat plane with the cut curve lifted away above it" },
+      { "clave": "generatriz", "escena": "A clay cone with straight sticks running from its apex down to the rim all the way around" },
+      { "clave": "foco-de-la-parabola", "escena": "A clay dish antenna with parallel beams gathering at a single small bead in front of it" },
+      { "clave": "modelar", "escena": "A clay curve being bent to match the outline of a small bridge model" },
+      { "clave": "estimar", "escena": "A clay curve on a board with a bead being placed where a measurement is predicted" },
+      { "clave": "parabola", "escena": "A clay satellite dish standing on a base showing its curved profile" },
+      { "clave": "elipse", "escena": "A clay oval track with two pins inside it and a loop of string stretched around them" },
+      { "clave": "circunferencia", "escena": "A clay ring drawn around an antenna tower on a map board" },
+      { "clave": "hiperbola", "escena": "A clay pair of opposing open curves on a board with a focus pin inside each" },
+      { "clave": "foco", "escena": "A clay bead pinned at the point where all the beams meet inside a curve" },
+      { "clave": "radio", "escena": "A clay stick pinned at the centre of a ring and reaching exactly to its edge" }
+    ]
+  },
+  {
+    "slug": "modelos-atomicos",
+    "items": [
+      { "clave": "atomo", "escena": "A clay sphere with a dense core and small beads circling around it" },
+      { "clave": "nucleo", "escena": "A clay dense cluster of red and grey spheres at the centre of an otherwise empty shell" },
+      { "clave": "numero-atomico-z", "escena": "A clay core with a row of red spheres being counted out on the bench beside it" },
+      { "clave": "electrones-de-valencia", "escena": "A clay atom model with an outer ring holding a few small beads" },
+      { "clave": "evolucion-de-los-modelos", "escena": "Five clay atom models in a row on a shelf, from a plain solid ball to a soft fuzzy cloud" },
+      { "clave": "numero-de-masa-a", "escena": "A clay core on a scale with its red and grey spheres counted together" },
+      { "clave": "isotopo", "escena": "Two clay cores with the same red spheres but different numbers of grey ones" },
+      { "clave": "modelo-de-dalton", "escena": "A plain clay solid ball resting alone on a stand" },
+      { "clave": "modelo-de-bohr", "escena": "A clay core with beads running on distinct circular tracks around it" },
+      { "clave": "modelo-de-schrodinger", "escena": "A clay core surrounded by a soft fuzzy cloud instead of tracks" }
+    ]
+  },
+  {
+    "slug": "movimientos-literarios",
+    "items": [
+      { "clave": "neoclasicismo", "escena": "A clay column and a perfectly symmetrical facade with a ruler and compass lying beside them" },
+      { "clave": "naturalismo", "escena": "A clay microscope standing over a small street scene with a figure in it" },
+      { "clave": "barroco", "escena": "A clay ornate twisted column heavy with carved detail" },
+      { "clave": "romanticismo", "escena": "A lone clay figure standing on a cliff before a stormy sky" },
+      { "clave": "realismo", "escena": "A plain clay kitchen scene with a mirror propped beside it" },
+      { "clave": "modernismo", "escena": "A clay swan on a still pond beside a jewelled fan" },
+      { "clave": "vanguardias", "escena": "A clay canvas broken into scattered fragments floating apart from each other" },
+      { "clave": "realismo-magico", "escena": "A clay village house with a small figure floating calmly above its roof" }
+    ]
+  },
+  {
+    "slug": "mrua-acelerar-frenar",
+    "items": [
+      { "clave": "cinematica", "escena": "A clay toy car on a ruler track with a stopwatch standing beside it" },
+      { "clave": "mru-movimiento-rectilineo-uniforme", "escena": "A clay car on a straight track with evenly spaced marks left behind it" },
+      { "clave": "mrua-movimiento-rectilineo-uniformemente-acelera", "escena": "A clay car on a straight track with the marks behind it spaced wider and wider apart" },
+      { "clave": "aceleracion-constante-a", "escena": "A clay ramp with a ball gaining speed, its motion lines growing longer as it descends" },
+      { "clave": "distancia-de-frenado", "escena": "Two clay cars braking, the faster one leaving skid marks four times longer than the other" },
+      { "clave": "caida-libre", "escena": "A clay ball falling beside a vertical ruler with its marked positions spaced wider and wider" },
+      { "clave": "movimiento-rectilineo-uniforme-mru", "escena": "A clay car cruising on a straight highway with a steady speedometer needle" },
+      { "clave": "movimiento-rectilineo-uniformemente-acelerado-mr", "escena": "A clay car pulling away from a standstill with the speedometer needle climbing" },
+      { "clave": "velocidad-media", "escena": "A clay runner on a track with a ribbon stretched from start to finish and a stopwatch beside it" },
+      { "clave": "grafica-posicion-tiempo-x-t", "escena": "A clay board with a straight rising stick beside another board with a curving rising ribbon" },
+      { "clave": "grafica-velocidad-tiempo-v-t", "escena": "A clay board with a flat horizontal stick beside another with a tilted stick and a shaded area beneath it" }
+    ]
+  },
+  {
+    "slug": "muestreo-estadistico-3d",
+    "items": [
+      { "clave": "parametro-y-estimacion", "escena": "A clay jar of many mixed beads beside a small scoop holding a handful of the same mix" },
+      { "clave": "fraccion-de-muestreo", "escena": "Three clay bins of different sizes, each with the same fraction scooped out of it" },
+      { "clave": "intervalo-sistematico", "escena": "A clay line of beads with every fifth one being lifted out by a small hand" },
+      { "clave": "margen-de-error-al-95", "escena": "A clay bead with a soft cushion of uncertainty around it, the cushion shrinking as more beads are added" },
+      { "clave": "distribucion-muestral", "escena": "Many clay scoops emptied into a row of slots, forming a bell shaped pile" },
+      { "clave": "sesgo-de-seleccion", "escena": "A clay scoop dipping only into the top layer of a jar whose contents are separated into two colours" }
+    ]
+  }
+]

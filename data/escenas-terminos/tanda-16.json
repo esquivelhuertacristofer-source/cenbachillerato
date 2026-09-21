@@ -1,0 +1,375 @@
+[
+  {
+    "slug": "trabajo-potencia-mecanica",
+    "items": [
+      {
+        "clave": "trabajo-w",
+        "escena": "A clay hand pushing a crate along the floor with an arrow marking the distance it moved"
+      },
+      {
+        "clave": "potencia-p",
+        "escena": "Two clay figures carrying identical boxes up stairs, one with a stopwatch showing half the time"
+      },
+      {
+        "clave": "angulo",
+        "escena": "A clay crate pulled by a rope at a slant with a wedge marking the angle to the floor"
+      },
+      {
+        "clave": "joule-j",
+        "escena": "A single clay unit block resting on a measuring plate"
+      },
+      {
+        "clave": "watt-w",
+        "escena": "A clay unit block dropping onto a plate beside a ticking stopwatch"
+      },
+      {
+        "clave": "energia-mecanica",
+        "escena": "A clay ball halfway down a ramp with motion lines behind it and a dotted line to the floor"
+      },
+      {
+        "clave": "energia-cinetica-ec",
+        "escena": "A clay ball rolling fast across a table with motion lines behind it"
+      },
+      {
+        "clave": "energia-potencial-ep",
+        "escena": "A clay flowerpot resting on a high shelf with a dotted line down to the floor"
+      },
+      {
+        "clave": "velocidad-v",
+        "escena": "A clay car on a road with a long arrow ahead of it and a speedometer beside"
+      },
+      {
+        "clave": "gravedad-g",
+        "escena": "A clay apple falling toward the ground with arrows pointing down beside it"
+      }
+    ]
+  },
+  {
+    "slug": "transferencia-calor-mecanismos",
+    "items": [
+      {
+        "clave": "temperatura",
+        "escena": "A clay thermometer standing in a mug of steaming liquid"
+      },
+      {
+        "clave": "calor",
+        "escena": "A clay hot block touching a cold block with waves flowing from one into the other"
+      },
+      {
+        "clave": "conduccion",
+        "escena": "A clay metal spoon in a hot pot with heat creeping up along its handle"
+      },
+      {
+        "clave": "conveccion",
+        "escena": "A clay pot of water with warm currents rising in the middle and cool ones sinking at the sides"
+      },
+      {
+        "clave": "radiacion",
+        "escena": "A clay sun beaming heat across empty space to a small stone"
+      },
+      {
+        "clave": "equilibrio-termico",
+        "escena": "Two clay blocks touching, each with a thermometer reading exactly the same"
+      }
+    ]
+  },
+  {
+    "slug": "transformaciones-funciones",
+    "items": [
+      {
+        "clave": "funcion-lineal-f-x-mx-b",
+        "escena": "A clay straight stick laid across a grid board at a tilt"
+      },
+      {
+        "clave": "funcion-cuadratica-f-x-ax-bx-c",
+        "escena": "A clay U shaped curve standing upright on a grid board"
+      },
+      {
+        "clave": "desplazamiento-vertical",
+        "escena": "A clay curve on a board being lifted straight upward by a hand, its shape unchanged"
+      },
+      {
+        "clave": "desplazamiento-horizontal",
+        "escena": "A clay curve being slid sideways along a board, its shape unchanged"
+      },
+      {
+        "clave": "reflexion-respecto-al-eje-x",
+        "escena": "A clay curve flipped upside down below a horizontal bar, mirroring the one above it"
+      },
+      {
+        "clave": "escalamiento-vertical",
+        "escena": "A clay curve being stretched taller by two hands pulling from above and below"
+      },
+      {
+        "clave": "forma-vertice-de-la-parabola",
+        "escena": "A clay U curve with a pin at its lowest point and two rulers measuring its offset"
+      },
+      {
+        "clave": "funcion-lineal-primer-grado",
+        "escena": "A clay ramp on a grid board with a small step block at its base"
+      },
+      {
+        "clave": "pendiente-de-una-recta",
+        "escena": "A clay tilted stick on a grid with blocks counting its rise and its run"
+      },
+      {
+        "clave": "funcion-cuadratica-segundo-grado",
+        "escena": "A clay parabola on a grid board opening upward with a bead at its lowest point"
+      },
+      {
+        "clave": "desplazamiento-vertical-y-horizontal",
+        "escena": "A clay curve moved both up and sideways on a board with a faint outline left where it was"
+      },
+      {
+        "clave": "reflexion-y-dilatacion",
+        "escena": "A clay curve flipped below a bar with a second copy stretched taller beside it"
+      }
+    ]
+  },
+  {
+    "slug": "trascendentes-derivacion",
+    "items": [
+      {
+        "clave": "derivada-de-sen-x",
+        "escena": "A clay wave ribbon with a second wave beside it shifted a quarter turn along"
+      },
+      {
+        "clave": "derivada-de-cos-x",
+        "escena": "A clay wave ribbon with a mirrored wave lying below it"
+      },
+      {
+        "clave": "derivada-de-tan-x",
+        "escena": "A clay steep curve rising between two vertical posts"
+      },
+      {
+        "clave": "derivada-de-e",
+        "escena": "A clay steeply rising curve with an identical copy laid exactly on top of it"
+      },
+      {
+        "clave": "derivada-de-ln-x",
+        "escena": "A clay slowly rising curve beside a curve diving toward a horizontal bar"
+      },
+      {
+        "clave": "regla-de-la-cadena",
+        "escena": "Two clay gears meshed together, turning one makes the other turn"
+      },
+      {
+        "clave": "derivadas-de-seno-y-coseno",
+        "escena": "Two clay wave ribbons side by side, one shifted a quarter turn from the other"
+      },
+      {
+        "clave": "derivada-de-la-tangente",
+        "escena": "A clay steep curve between two posts with a stick touching it at one point"
+      },
+      {
+        "clave": "derivadas-de-secante-cosecante-y-cotangente",
+        "escena": "Three clay curves on one board, each rising away from its own vertical post"
+      },
+      {
+        "clave": "derivada-de-la-exponencial-natural-e",
+        "escena": "A clay curve growing steeply with an identical curve traced over the top of it"
+      },
+      {
+        "clave": "derivada-de-a-base-arbitraria",
+        "escena": "Two clay rising curves of different steepness with a small scaling block between them"
+      },
+      {
+        "clave": "derivada-del-logaritmo",
+        "escena": "A clay gently rising curve with small sticks showing its slope flattening as it goes"
+      }
+    ]
+  },
+  {
+    "slug": "triangulo-rectangulo",
+    "items": [
+      {
+        "clave": "triangulo-rectangulo",
+        "escena": "A clay triangle with a square corner block fitted exactly into one of its angles"
+      },
+      {
+        "clave": "cateto-opuesto",
+        "escena": "A clay right triangle with the side facing a marked angle raised above the others"
+      },
+      {
+        "clave": "cateto-adyacente",
+        "escena": "A clay right triangle with the side touching the marked angle raised above the others"
+      },
+      {
+        "clave": "hipotenusa",
+        "escena": "A clay right triangle with a ruler laid along its longest slanted side"
+      },
+      {
+        "clave": "sohcahtoa",
+        "escena": "A clay right triangle with three small ratio cards leaning against its sides"
+      },
+      {
+        "clave": "angulo-de-elevacion",
+        "escena": "A clay figure with a sighting tube aimed at a treetop, a wedge marking the angle from the ground"
+      },
+      {
+        "clave": "medicion-indirecta",
+        "escena": "A clay surveyor with a tripod measuring a tall building using a tape along the ground"
+      },
+      {
+        "clave": "identidad-fundamental",
+        "escena": "A clay right triangle inside a ring with squares on both short sides filling the long one"
+      },
+      {
+        "clave": "seno-sen",
+        "escena": "A clay right triangle with a thread joining the side opposite the marked angle to the slanted side"
+      },
+      {
+        "clave": "coseno-cos",
+        "escena": "A clay right triangle with a thread joining the side beside the marked angle to the slanted side"
+      },
+      {
+        "clave": "tangente-tan",
+        "escena": "A clay right triangle with a thread joining its two short sides"
+      },
+      {
+        "clave": "angulos-notables-30-45-60",
+        "escena": "Three clay set squares laid out on a table, each at a different fixed angle"
+      },
+      {
+        "clave": "identidad-pitagorica-trigonometrica",
+        "escena": "A clay right triangle inside a unit ring with a square block built on each of its two short sides"
+      }
+    ]
+  },
+  {
+    "slug": "valor-posicional",
+    "items": [
+      {
+        "clave": "sistema-posicional",
+        "escena": "A clay abacus row where the same bead clearly counts for more in each column to the left"
+      },
+      {
+        "clave": "sistema-indoarabigo",
+        "escena": "A clay row of ten differently shaped tokens on a wooden tray"
+      },
+      {
+        "clave": "el-cero-0",
+        "escena": "A clay hollow shell shaped token holding an empty place in a row of beads"
+      },
+      {
+        "clave": "valor-posicional",
+        "escena": "A clay set of place blocks: a unit cube, a rod of ten, a flat of a hundred and a big cube"
+      },
+      {
+        "clave": "base-10-decimal",
+        "escena": "Ten clay cubes forming a rod, ten rods forming a flat and ten flats forming a big cube"
+      },
+      {
+        "clave": "abaco",
+        "escena": "A clay abacus frame with beads strung along its rods"
+      }
+    ]
+  },
+  {
+    "slug": "variables-poblacion-muestra-3d",
+    "items": [
+      {
+        "clave": "cualitativa-o-cuantitativa",
+        "escena": "A clay tray of coloured tokens beside a tray of measured rods"
+      },
+      {
+        "clave": "nominal-u-ordinal",
+        "escena": "A clay row of unsorted colour tokens beside a row of tokens ordered by increasing size"
+      },
+      {
+        "clave": "discreta-o-continua",
+        "escena": "A clay handful of whole marbles beside a measuring jug of poured water"
+      },
+      {
+        "clave": "parametro-y-estadistico",
+        "escena": "A clay large jar with one fixed marked level beside several small scoops at varying levels"
+      },
+      {
+        "clave": "frecuencia-absoluta-y-relativa",
+        "escena": "A clay row of stacked tokens beside the same stacks shown as slices of one pie"
+      },
+      {
+        "clave": "intervalo-al-95",
+        "escena": "A clay bead with a soft bracket of uncertainty set on either side of it"
+      }
+    ]
+  },
+  {
+    "slug": "viaje-paquete-internet-3d",
+    "items": [
+      {
+        "clave": "paquete",
+        "escena": "A small clay parcel with an address label and a number tag on its lid"
+      },
+      {
+        "clave": "dns-y-direccion-ip",
+        "escena": "A clay directory book open beside a house with a numbered plate on its door"
+      },
+      {
+        "clave": "enrutamiento",
+        "escena": "A clay network of posts with a parcel taking an alternate path around a broken link"
+      },
+      {
+        "clave": "latencia",
+        "escena": "A clay parcel racing along a fibre line with a stopwatch at each end"
+      },
+      {
+        "clave": "https-y-phishing",
+        "escena": "A clay sealed parcel inside a locked tube beside a lookalike parcel with a false seal"
+      },
+      {
+        "clave": "huella-de-fabricacion",
+        "escena": "A clay phone on a scale with most of the weight coming from a factory standing behind it"
+      }
+    ]
+  },
+  {
+    "slug": "volumen-cilindro",
+    "items": [
+      {
+        "clave": "perimetro",
+        "escena": "A clay string laid around the outline of a shape and then stretched out straight beside it"
+      },
+      {
+        "clave": "area",
+        "escena": "A clay shape covered completely with small square tiles"
+      },
+      {
+        "clave": "volumen",
+        "escena": "A clay box filled with small cubes stacked right up to the brim"
+      },
+      {
+        "clave": "pi",
+        "escena": "A clay circle with a string from its rim laid straight beside three diameters and a small remainder"
+      },
+      {
+        "clave": "hectarea-ha",
+        "escena": "A clay square field with a fence around it and a tiny figure at one corner for scale"
+      },
+      {
+        "clave": "perimetro-de-poligonos",
+        "escena": "A clay rectangle with a measuring tape running around all four of its sides"
+      },
+      {
+        "clave": "area-de-figuras-planas",
+        "escena": "A clay triangle, a rectangle and a circle each tiled with small squares"
+      },
+      {
+        "clave": "circunferencia-y-circulo",
+        "escena": "A clay ring with a string laid around its rim beside the same disc filled with tiles"
+      },
+      {
+        "clave": "volumen-de-prismas-y-cilindros",
+        "escena": "A clay cylinder and a rectangular prism side by side, each filled with stacked layers"
+      },
+      {
+        "clave": "volumen-de-piramide-y-cono",
+        "escena": "A clay cone being emptied three times to fill a cylinder of the same base and height"
+      },
+      {
+        "clave": "volumen-de-la-esfera",
+        "escena": "A clay sphere sitting inside a cylinder of the same diameter with water measured around it"
+      }
+    ]
+  }
+]

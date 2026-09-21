@@ -1,0 +1,166 @@
+[
+  {
+    "slug": "funciones-concepto",
+    "items": [
+      { "clave": "funcion", "escena": "A clay machine with a funnel on top: one ball goes in and exactly one ball comes out the chute below" },
+      { "clave": "dominio", "escena": "A clay tray of balls waiting at the mouth of a machine funnel" },
+      { "clave": "rango-o-codominio", "escena": "A clay tray of balls collected under the output chute of a machine" },
+      { "clave": "prueba-de-la-linea-vertical", "escena": "A clay curve on a board with a straight vertical rod sliding across it, touching it at just one point" },
+      { "clave": "representacion-tabular", "escena": "A clay grid tray with pairs of beads placed side by side in two columns" },
+      { "clave": "representacion-grafica", "escena": "A clay board with beads placed all along a smooth curve" },
+      { "clave": "representacion-algebraica", "escena": "A clay machine with a set of gears visible behind a small window in its side" },
+      { "clave": "representacion-verbal", "escena": "A clay speech bubble resting on a table beside a small machine" },
+      { "clave": "codominio-y-rango-imagen", "escena": "Two clay trays under a chute: a large mostly empty one and a smaller one holding the balls that actually fell" },
+      { "clave": "notacion-f-x-y-evaluacion", "escena": "A clay machine with one particular ball being dropped into the funnel and one ball landing in the tray below" }
+    ]
+  },
+  {
+    "slug": "funciones-variable-real",
+    "items": [
+      { "clave": "funcion-de-variable-real", "escena": "A clay number line feeding into a machine that drops a bead onto a second number line" },
+      { "clave": "grafica-de-una-funcion", "escena": "A clay board with a smooth curve traced out by many small beads" },
+      { "clave": "raices-o-ceros", "escena": "A clay curve crossing a horizontal bar with beads marking each crossing" },
+      { "clave": "interseccion-con-y", "escena": "A clay curve crossing a vertical bar with a single bead at the crossing" },
+      { "clave": "crecimiento-y-decrecimiento", "escena": "A clay hill path with an arrow climbing one side and descending the other" },
+      { "clave": "funcion-par", "escena": "A clay curve on a board that is a perfect mirror image on both sides of a vertical bar" },
+      { "clave": "funcion-impar", "escena": "A clay curve that matches itself when the board is turned half way around a central peg" },
+      { "clave": "raiz-o-cero", "escena": "A clay curve touching a horizontal bar at a single bead" },
+      { "clave": "interseccion-con-el-eje-y", "escena": "A clay curve meeting a vertical bar with a bead marking exactly where they meet" },
+      { "clave": "crecimiento-decrecimiento", "escena": "A clay staircase that rises and then falls, with a small figure walking along it" },
+      { "clave": "maximo-local", "escena": "A clay hilltop with a small flag planted at its very top" },
+      { "clave": "minimo-local", "escena": "A clay valley with a bead resting at its lowest point" },
+      { "clave": "continuidad", "escena": "A clay ribbon drawn across a board in one unbroken stroke" }
+    ]
+  },
+  {
+    "slug": "galton-probabilidad-frecuencia",
+    "items": [
+      { "clave": "experimento-aleatorio", "escena": "A clay die tumbling out of a cup onto a table" },
+      { "clave": "regla-de-laplace", "escena": "A clay tray with six identical compartments, just one of them holding a bead" },
+      { "clave": "frecuencia-relativa", "escena": "A clay row of tally marks beside a jar of beads being counted out" },
+      { "clave": "ley-de-los-grandes-numeros", "escena": "A clay jar filling with beads, the level settling toward a marked line as it fills" },
+      { "clave": "distribucion-binomial", "escena": "A clay pin board with balls falling through pegs into slots below, piling into a bell shape" },
+      { "clave": "equiprobabilidad", "escena": "A clay spinner divided into equal wedges with a needle pinned at its centre" }
+    ]
+  },
+  {
+    "slug": "gas-ideal-piston",
+    "items": [
+      { "clave": "sistema-termodinamico", "escena": "A clay cylinder with a piston standing on a bench, a dotted boundary marked on the bench around it" },
+      { "clave": "variables-de-estado", "escena": "A clay cylinder with a pressure gauge on top, a measuring scale up its side and a thermometer in its wall" },
+      { "clave": "gas-ideal", "escena": "A clear clay box full of small spheres bouncing off the walls, never sticking to each other" },
+      { "clave": "equivalencia-calor-trabajo", "escena": "A clay falling weight turning a paddle inside a water tank, warm haze rising from the surface" },
+      { "clave": "primera-ley-de-la-termodinamica", "escena": "A clay cylinder with heat entering at its base and the piston pushing a block upward" },
+      { "clave": "principio-cero", "escena": "Three clay blocks touching in a row, each with an identical thermometer reading the same" },
+      { "clave": "energia-interna-u", "escena": "A clay jar cut open showing spheres vibrating in place with small springs between them" },
+      { "clave": "primera-ley", "escena": "A clay sealed box with sand poured between two compartments, the total level unchanged" }
+    ]
+  },
+  {
+    "slug": "generos-literarios",
+    "items": [
+      { "clave": "novela", "escena": "A thick clay book standing open with many pages and tiny figures acting on them" },
+      { "clave": "cuento", "escena": "A thin clay booklet open to a single scene with two small figures on it" },
+      { "clave": "poesia", "escena": "A clay page with short ribbon lines across it and a small lyre resting beside it" },
+      { "clave": "drama", "escena": "A clay theatre stage with curtains drawn back and two masks lying on the boards" },
+      { "clave": "ensayo", "escena": "A clay desk with a single sheet, a pen and a magnifying glass resting over it" },
+      { "clave": "narrador", "escena": "A clay figure standing beside an open book, pointing into the scene on its page" }
+    ]
+  },
+  {
+    "slug": "genetica-mendeliana-punnett",
+    "items": [
+      { "clave": "alelos-locus-homocigoto-y-heterocigoto", "escena": "Two clay rods side by side with a marked slot at the same position, each slot holding a bead of the same or a different colour" },
+      { "clave": "primera-ley-de-mendel-segregacion", "escena": "A clay cell splitting in two, one bead of each pair going into each new cell" },
+      { "clave": "segunda-ley-de-mendel-distribucion-independiente", "escena": "Two clay pairs of rods separating into new cells in every possible combination" },
+      { "clave": "cruce-monohibrido-aa-aa", "escena": "A clay grid of four squares with a pair of beads placed in each square" },
+      { "clave": "dominancia-incompleta-y-codominancia", "escena": "Three clay flowers in a row: one red, one pink and one speckled red and white" },
+      { "clave": "herencia-ligada-al-sexo", "escena": "Two clay rods of different lengths paired together, the shorter one missing a slot" },
+      { "clave": "alelos-y-locus-genico", "escena": "A clay rod with one marked notch holding a bead of one of two colours" },
+      { "clave": "segunda-ley-de-mendel-surtido-independiente", "escena": "Two pairs of clay beads being shuffled into four trays in all possible combinations" },
+      { "clave": "herencia-poligenica", "escena": "A row of clay figures of gradually increasing height forming a smooth range" }
+    ]
+  },
+  {
+    "slug": "geometria-analitica",
+    "items": [
+      { "clave": "geometria-analitica", "escena": "A clay grid board with a triangle laid on it and a compass and ruler resting beside it" },
+      { "clave": "formula-de-distancia", "escena": "A clay right triangle on a grid board with beads at the two ends of its slanted side" },
+      { "clave": "punto-medio", "escena": "A clay stick between two beads with a third bead resting at its exact centre" },
+      { "clave": "pendiente-m", "escena": "A clay ramp on a grid board with a step block measuring its rise and a longer block its run" },
+      { "clave": "rectas-paralelas", "escena": "Two clay sticks on a grid board at exactly the same tilt, never meeting" },
+      { "clave": "rectas-perpendiculares", "escena": "Two clay sticks crossing on a grid board at a perfect square corner" },
+      { "clave": "formula-de-la-distancia", "escena": "A clay measuring string stretched between two beads on a grid with the right triangle formed beneath it" },
+      { "clave": "pendiente-de-la-recta", "escena": "A clay stick tilted across a grid board with small blocks counting its rise and its run" },
+      { "clave": "forma-pendiente-intercepto", "escena": "A clay stick crossing a vertical bar at a bead and tilting away at a set slope" },
+      { "clave": "forma-punto-pendiente", "escena": "A clay stick pinned through a single bead on a grid board, set at a fixed tilt" },
+      { "clave": "rectas-paralelas-y-perpendiculares", "escena": "Three clay sticks on a grid board: two at the same tilt and one crossing them at a square corner" }
+    ]
+  },
+  {
+    "slug": "gravitacion-universal",
+    "items": [
+      { "clave": "ley-de-gravitacion-universal", "escena": "Two clay spheres on a board pulled toward each other by a taut thread stretched between them" },
+      { "clave": "constante-de-gravitacion-g", "escena": "A clay torsion balance with two small spheres hanging on a fine wire beside two large spheres" },
+      { "clave": "peso-w-y-masa-m", "escena": "A clay block on a kitchen scale beside the same block hanging from a spring scale on rocky ground" },
+      { "clave": "orbita-geoestacionaria", "escena": "A clay Earth globe with a small satellite hovering over one point of its equator, joined by a dotted line" },
+      { "clave": "leyes-de-kepler", "escena": "A clay elliptical track around a bright sphere with a small planet on it and two equal wedges marked out" },
+      { "clave": "ley-del-inverso-del-cuadrado", "escena": "A clay lamp shining onto three screens at increasing distances, the patch of light spreading and dimming" },
+      { "clave": "ley-de-gravitacion-universal-newton", "escena": "A clay apple falling from a tree beside a small moon circling a globe" },
+      { "clave": "primera-ley-de-kepler-orbitas-elipticas", "escena": "A clay elliptical track with a bright sphere set at one of its two focus pins" },
+      { "clave": "segunda-ley-de-kepler-areas-iguales", "escena": "A clay elliptical track with two equal wedge slices marked, one long and narrow and one short and wide" },
+      { "clave": "tercera-ley-de-kepler-periodos-y-distancias", "escena": "Three clay planets on tracks of increasing size, each with a larger stopwatch standing beside it" },
+      { "clave": "velocidad-de-escape", "escena": "A clay rocket leaving a globe along a straight path, breaking out of a dotted well drawn around it" },
+      { "clave": "gravedad-en-la-superficie-g", "escena": "Three clay balls dropped above three different planets, each one falling at a different rate" }
+    ]
+  },
+  {
+    "slug": "gustos-opiniones-ingles-3d",
+    "items": [
+      { "clave": "like-sustantivo-o-ing", "escena": "A clay hand holding a football beside a small music note resting on a table" },
+      { "clave": "grados-de-gusto", "escena": "A clay row of five face cards, from a broad smile at one end to a deep frown at the other" },
+      { "clave": "i-don-t-mind", "escena": "A clay figure shrugging evenly between two plates, choosing neither one" },
+      { "clave": "preguntas", "escena": "A clay figure with a speech bubble leaning toward another figure across a table" },
+      { "clave": "respuestas-cortas", "escena": "Two clay tokens on a table, one with a raised thumb up and the other with a thumb down" },
+      { "clave": "tercera-persona", "escena": "A clay figure pointing across the table at a third figure" },
+      { "clave": "resumir-una-encuesta", "escena": "A clay board with three small figures stacked in one column and a single figure in another" },
+      { "clave": "because", "escena": "Two clay blocks joined by a small arrow, a cause on one side and its result on the other" },
+      { "clave": "empatia", "escena": "A clay figure nodding warmly toward another figure that looks downcast" },
+      { "clave": "favorite", "escena": "A clay basketball on a small pedestal with a star shaped token resting beside it" }
+    ]
+  },
+  {
+    "slug": "habilidades-permisos-ingles-3d",
+    "items": [
+      { "clave": "can-para-habilidad", "escena": "A clay figure swimming confidently across a small pool" },
+      { "clave": "can-para-permiso", "escena": "A clay hand holding out a phone to another open hand" },
+      { "clave": "can-no-cambia", "escena": "Three clay figures of different sizes each holding an identical token" },
+      { "clave": "preguntas-y-respuestas-cortas", "escena": "Two clay figures facing each other, one with an open palm asking and the other nodding" },
+      { "clave": "negativa", "escena": "A clay barrier bar lowered across a small path" },
+      { "clave": "cortesia-al-pedir-permiso", "escena": "A clay student raising a hand toward a teacher standing at a desk" },
+      { "clave": "responder-a-un-permiso", "escena": "A clay hand opening a gate so a small figure can pass through" },
+      { "clave": "letreros", "escena": "A clay signboard on a post carrying a plain crossed out shape" },
+      { "clave": "play-speak-y-el-articulo-the", "escena": "A clay basketball, a guitar and a small globe arranged together on a table" }
+    ]
+  },
+  {
+    "slug": "hardware-software",
+    "items": [
+      { "clave": "hardware", "escena": "A clay computer opened up to show a circuit board, a fan and a drive inside" },
+      { "clave": "software", "escena": "A clay stack of punched instruction cards feeding into a computer" },
+      { "clave": "software-libre", "escena": "A clay open box of tools with hands freely taking pieces out and adding new ones" },
+      { "clave": "licencia-gpl", "escena": "A clay document with an open padlock and a chain linking it to an identical copy of itself" },
+      { "clave": "creative-commons", "escena": "A clay shelf of works with small tokens hanging from each, some open and some limited" }
+    ]
+  },
+  {
+    "slug": "herramientas-colaborativas",
+    "items": [
+      { "clave": "ticcad", "escena": "A clay desk with a laptop, a tablet, a book and a headset arranged together" },
+      { "clave": "buscar-informacion", "escena": "A clay magnifying glass over an open laptop with a pile of cards beside it" },
+      { "clave": "discriminar-informacion", "escena": "A clay sieve sorting good beads into a cup while dust falls away below" },
+      { "clave": "gestionar-informacion", "escena": "A set of plain clay folders being filed neatly into a small cabinet" },
+      { "clave": "acceso-libre", "escena": "A clay gate standing open at the entrance to a library shelf, with no barrier in the way" }
+    ]
+  }
+]

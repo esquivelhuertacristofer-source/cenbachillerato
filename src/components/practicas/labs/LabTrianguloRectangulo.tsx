@@ -114,8 +114,12 @@ export function LabTrianguloRectangulo({ color }: PracticaLabProps) {
 
   const objetivos = [
     { txt: "Ajusta la distancia d y el ángulo de elevación θ", done: d !== D_DEF || angDeg !== ANG_DEF },
-    { txt: "Prueba un escenario guiado (árbol, edificio, torre…)", done: false },
-    { txt: "Comprueba las tres razones SOH-CAH-TOA en vivo", done: true },
+    {
+      txt: "Prueba un escenario guiado (árbol, edificio, torre…)",
+      done: ESCENARIOS.some((e) => Math.abs(m.d - e.d) < 0.5 && Math.abs(m.angDeg - e.angDeg) < 0.5),
+    },
+    { txt: "Enciende la hipotenusa: la línea de visión hasta lo alto del objeto", done: mostrarHip },
+    { txt: "Deja correr la medición automática y observa cómo cambia la altura", done: reproduciendo },
     { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
   ];
   // Los objetivos se recuerdan (algunos dependían del modo y se desmarcaban

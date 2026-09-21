@@ -1,0 +1,152 @@
+/* =========================================================================
+   Expedición — contenedor de los laboratorios.
+   Mismo lenguaje que las Aventuras de NEM Básica (portada, capítulos, telón,
+   guía y cuaderno), con la identidad de CEN Bachillerato: fondo navy y el
+   color del área como acento. Las animaciones respetan prefers-reduced-motion.
+   ========================================================================= */
+
+.exp-raiz {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: #fff;
+  background: var(--exp-fondo, #011126);
+  font-family: var(--font-epilogue), "Plus Jakarta Sans", sans-serif;
+}
+
+/* ── Fondo pintado con la carátula ───────────────────────────────────── */
+.exp-fondo {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transform: scale(1.06);
+  animation: exp-deriva 26s ease-in-out infinite alternate;
+  transition: opacity 0.7s ease;
+}
+.exp-velo {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, var(--exp-fondo) 0%, color-mix(in oklab, var(--exp-fondo) 82%, transparent) 42%, color-mix(in oklab, var(--exp-fondo) 18%, transparent) 78%),
+    linear-gradient(0deg, var(--exp-fondo) 0%, transparent 46%);
+}
+@keyframes exp-deriva {
+  from { transform: scale(1.06) translate3d(-1%, 0, 0); }
+  to   { transform: scale(1.12) translate3d(1%, -1.5%, 0); }
+}
+
+/* ── Entradas ─────────────────────────────────────────────────────────── */
+.exp-entrar { animation: exp-entrar 0.62s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes exp-entrar {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+.exp-telon-num { animation: exp-telon 0.9s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes exp-telon {
+  from { opacity: 0; transform: scale(0.82); letter-spacing: 0.2em; }
+  to   { opacity: 0.92; transform: none; letter-spacing: 0; }
+}
+.exp-pop { animation: exp-pop 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+@keyframes exp-pop {
+  from { transform: scale(0.8); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+.exp-tiembla { animation: exp-tiembla 0.36s ease; }
+@keyframes exp-tiembla {
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-3px); }
+}
+
+/* ── Piezas ───────────────────────────────────────────────────────────── */
+.exp-boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 26px;
+  border: none;
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  color: #04121f;
+  background: var(--exp-acento);
+  box-shadow: 0 14px 30px -14px var(--exp-acento);
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.18s ease, filter 0.18s ease;
+}
+.exp-boton:hover { transform: translateY(-2px); filter: brightness(1.06); }
+.exp-boton:active { transform: translateY(0) scale(0.98); }
+
+.exp-boton-sec {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 12.5px;
+  font-weight: 800;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+.exp-boton-sec:hover { background: rgba(255, 255, 255, 0.12); color: #fff; }
+
+.exp-ceja {
+  font-size: 10.5px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--exp-acento);
+}
+
+.exp-papel {
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.045);
+  backdrop-filter: blur(12px);
+}
+
+/* Tarjeta de concepto que se voltea al descubrirla. */
+.exp-carta { perspective: 900px; }
+.exp-carta-int {
+  position: relative;
+  width: 100%;
+  min-height: 132px;
+  transform-style: preserve-3d;
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.exp-carta[data-abierta="true"] .exp-carta-int { transform: rotateY(180deg); }
+.exp-cara {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border-radius: 18px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  text-align: left;
+}
+.exp-cara-atras { transform: rotateY(180deg); overflow: auto; }
+
+.exp-scroll { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.22) transparent; }
+.exp-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+.exp-scroll::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 99px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .exp-fondo, .exp-entrar, .exp-telon-num, .exp-pop, .exp-tiembla { animation: none !important; }
+  .exp-carta-int { transition: none; }
+}

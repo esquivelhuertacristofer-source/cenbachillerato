@@ -1,0 +1,58 @@
+[
+  {
+    "slug": "lectura-escritura-dialogo",
+    "items": [
+      { "clave": "circuito-del-sentido", "escena": "An open clay book and a small clay notebook facing each other on a desk, joined by two thick clay arrows that curve from one to the other forming a closed loop" },
+      { "clave": "imaginar-mundos", "escena": "An open clay book lying flat with a tiny clay island, a boat and a small mountain rising out of its pages" },
+      { "clave": "capacidad-critica", "escena": "A clay magnifying glass held over a printed clay page, with a small clay question-mark sculpture standing beside it" },
+      { "clave": "procesar-emociones", "escena": "A clay figure sitting on the floor writing in a small notebook, a soft clay heart resting on the page beside the pencil" },
+      { "clave": "transformar-la-realidad", "escena": "A clay letter pinned to a neighbourhood notice board while below it a clay street lamp switches on over a small house" },
+      { "clave": "lectura-en-voz-alta", "escena": "A clay figure standing with an open book, three small clay listeners seated on the floor in front of it" },
+      { "clave": "escritura", "escena": "A chunky clay pencil resting on a half-written clay page, its lines modelled as raised ridges" },
+      { "clave": "lectura", "escena": "A pair of clay hands holding an open book up at reading height, a small clay lamp glowing behind it" },
+      { "clave": "empatia", "escena": "Two clay figures facing each other, one leaning forward with an open hand, a soft clay bridge connecting their chests" },
+      { "clave": "practica-social", "escena": "Five clay figures around a shared table, each holding a page, passing one sheet from hand to hand" },
+      { "clave": "codigo-alfabetico", "escena": "A row of small blank clay letter tiles on a rail, each tile paired with a tiny clay sound-wave ripple above it" },
+      { "clave": "borrador", "escena": "A crumpled clay page beside a flatter corrected page, with a clay eraser and pencil resting between them" }
+    ]
+  },
+  {
+    "slug": "encuesta-lectora-comunidad",
+    "items": [
+      { "clave": "comunidad-escolar", "escena": "A small clay schoolyard with six clay figures of different heights standing in a loose circle around a tree" },
+      { "clave": "habito-lector", "escena": "A clay calendar block with a tiny book placed on top of several of its day tiles, forming a repeating pattern" },
+      { "clave": "encuesta", "escena": "A clay clipboard with a checklist of blank boxes, held out toward a small clay figure who is raising one hand" },
+      { "clave": "pregunta-abierta", "escena": "A wide clay speech bubble with an open mouth-shaped gap in one side, empty inside and ready to be filled" },
+      { "clave": "pregunta-inducida", "escena": "A clay speech bubble on a tilted see-saw, weighed down on one side by a small clay thumb-up token" },
+      { "clave": "pregunta-ambigua", "escena": "A clay signpost whose two arms point in opposite directions, both blank, with a small fog cloud around its base" },
+      { "clave": "tabular-respuestas", "escena": "A clay tray divided into a grid of small compartments, a clay hand dropping counters one by one into different cells" },
+      { "clave": "frecuencia", "escena": "A row of clay counters stacked into five columns of different heights on a flat base" },
+      { "clave": "muestra", "escena": "A small clay scoop holding six figures lifted out of a large clay crowd of identical figures below" },
+      { "clave": "texto-informativo", "escena": "A folded clay newspaper lying flat with a small clay chart printed on its front page" },
+      { "clave": "texto-narrativo", "escena": "An open clay storybook with three tiny clay scene vignettes standing up from its pages in a row" },
+      { "clave": "texto-digital", "escena": "A clay smartphone standing upright showing a page of ruled clay text lines on its screen" },
+      { "clave": "soporte", "escena": "Three clay objects side by side carrying the same page of text: a sheet of paper, a phone screen and a wall poster" },
+      { "clave": "formato", "escena": "Three clay documents of different shapes on a table: a tall column, a wide spread and a small folded card" },
+      { "clave": "escucha-activa", "escena": "A clay figure leaning in with one hand cupped behind its ear while another clay figure speaks, a small notebook open between them" }
+    ]
+  },
+  {
+    "slug": "hecho-opinion-texto",
+    "items": [
+      { "clave": "informacion-verificable", "escena": "A clay ruler and a small clay stopwatch lying on a printed page, with a clay checkmark token resting on the measured line" },
+      { "clave": "idea", "escena": "A clay light bulb rising out of an open book, with a thin clay thread linking it back to a line on the page" },
+      { "clave": "opinion", "escena": "A clay speech bubble resting on one pan of a small balance scale, tipping it to one side" },
+      { "clave": "lectura-critica", "escena": "A clay magnifying glass lying across a printed clay page, one paragraph slightly raised under the lens" },
+      { "clave": "proposito-del-texto", "escena": "A clay page on a stand with a small clay arrow leaving it and striking a target disc beside it" },
+      { "clave": "marca-de-valoracion", "escena": "A row of clay word tiles on a rail, one tile painted bright amber and raised above the others" },
+      { "clave": "evidencia", "escena": "A clay document pinned under a small clay weight, beside a photograph and a measuring tape on the same table" },
+      { "clave": "persuasion", "escena": "A clay megaphone aimed at a small clay figure who is leaning slightly toward it" },
+      { "clave": "verificar", "escena": "Two clay pages side by side with a clay magnifying glass bridging them, a checkmark token on the overlap" },
+      { "clave": "interpretacion", "escena": "One clay page on a stand casting two differently shaped shadows on the wall behind it" },
+      { "clave": "juicio-de-valor", "escena": "A clay gavel resting on a small block beside a page, with a star-shaped clay token on the page" },
+      { "clave": "nota-informativa", "escena": "A folded clay newspaper with a plain headline bar and a small photograph block on its front page" },
+      { "clave": "columna-de-opinion", "escena": "A narrow clay newspaper column with a small round portrait badge at its top" },
+      { "clave": "sesgo", "escena": "A clay lens tinted amber held over a plain grey clay page, staining the page beneath it" }
+    ]
+  }
+]

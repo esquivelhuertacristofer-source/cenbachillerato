@@ -34,6 +34,11 @@ import {
   fmt0, fmt1, fmtVol, type PuntoG,
 } from "./co2-data";
 
+import { TableroObjetivos } from "./_objetivos";
+
+/** Clave de la mejor marca de este laboratorio. */
+const RETO_KEY = "cen-reaccion-co2-reto";
+
 const Co2Scene = dynamic(() => import("./Co2Scene"), {
   ssr: false,
   loading: () => (
@@ -434,19 +439,16 @@ export function LabCo2({ color }: PracticaLabProps) {
           <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
           Objetivos
         </Eyebrow>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-          {[
+        <TableroObjetivos
+          retoKey={RETO_KEY}
+          accent={accent}
+          objetivos={[
             { txt: "Diseña el experimento eligiendo una variable independiente", done: progreso > 0 },
             { txt: "Activa el control con agua para comprobar el origen del CO₂", done: control },
             { txt: "Observa el reactivo limitante en la reacción", done: progreso >= 1 && hayReaccion },
             { txt: "Aprueba el cuestionario de la actividad A4", done: ejercicioAprobado },
-          ].map((o, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? "#34D399" : T.text2 }}>
-              <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-              <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-            </div>
-          ))}
-        </div>
+          ]}
+        />
       </div>
 
       {/* ── Datos + ideas clave ────────────────────────────────────── */}

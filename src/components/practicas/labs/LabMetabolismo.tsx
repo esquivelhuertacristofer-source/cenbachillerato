@@ -27,6 +27,10 @@ import {
   PROBLEMA_ATP, RESPUESTA_ATP, DESGLOSE_ATP, RETO_A2,
   PROBLEMA, INSTRUCCIONES, PREGUNTAS, IDEAS, GLOSARIO, CONTEXTO, FUENTE, DATOS,
 } from "./metabolismo-data";
+import { TableroObjetivos } from "./_objetivos";
+
+/** Clave de la mejor marca de este laboratorio. */
+const RETO_KEY = "cen-metabolismo-celular-3d-reto";
 
 const MetabolismoScene = dynamic(() => import("./MetabolismoScene"), {
   ssr: false,
@@ -527,10 +531,22 @@ export function LabMetabolismo({ color }: PracticaLabProps) {
         </span>
       </div>
 
-      {/* Objetivo evaluable */}
-      <div style={{ marginTop: 18, display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: ejercicioAprobado ? "#86efac" : T.text2 }}>
-        <i className={`fa-solid ${ejercicioAprobado ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: ejercicioAprobado ? 1 : 0.3, color: ejercicioAprobado ? "#86efac" : undefined }} />
-        <span style={{ fontWeight: ejercicioAprobado ? 700 : 500 }}>Resuelve el reto evaluable de la actividad A2</span>
+      {/* ── Objetivos ─────────────────────────────────────────────── */}
+      <div style={{ ...card, padding: "18px 22px", marginTop: 22 }}>
+        <Eyebrow>
+          <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
+          Objetivos
+        </Eyebrow>
+        <TableroObjetivos
+          retoKey={RETO_KEY}
+          accent={accent}
+          objetivos={[
+          { txt: "Recorre las etapas de la respiración aerobia", done: proceso === "respiracion" && idx > 0 },
+          { txt: "Pasa a la fotosíntesis y sigue la luz hasta la glucosa", done: proceso === "fotosintesis" },
+          { txt: "Compara con la fermentación: sin oxígeno, solo 2 ATP", done: proceso === "fermentacion" },
+          { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
+          ]}
+        />
       </div>
 
       {/* ── Reto evaluable: el ejercicio verbatim del ancla A2 ────────── */}

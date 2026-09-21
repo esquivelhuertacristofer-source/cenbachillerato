@@ -49,6 +49,10 @@ import {
   INSTRUCCIONES,
   IDEAS,
 } from "./origen-vida-data";
+import { TableroObjetivos } from "./_objetivos";
+
+/** Clave de la mejor marca de este laboratorio. */
+const RETO_KEY = "cen-origen-vida-3d-reto";
 
 const OrigenVidaScene = dynamic(() => import("./OrigenVidaScene"), {
   ssr: false,
@@ -563,6 +567,25 @@ export function LabOrigenVida({ color }: PracticaLabProps) {
         <span>
           Las cinco hipótesis, la definición de hipótesis abiótica, las preguntas de reflexión y el contexto de la CONABIO son <strong>verbatim</strong> de la lectura A1 (etiqueta «LECTURA A1»); el glosario y sus ejemplos son verbatim del glosario A5; los datos de «¿sabías que?» provienen de los quizzes A2/A4. El experimento de Miller-Urey está reconstruido de forma <strong>esquemática</strong>: el aparato (matraces, electrodos, condensador y trampa), la acumulación de aminoácidos y los dioramas de los ambientes son representaciones <strong>ilustrativas</strong> del mecanismo, no simulaciones químicas a escala molecular. La cifra «más de 20 aminoácidos tras una semana» es el resultado histórico verbatim del glosario A5. Fuente: {FUENTE}
         </span>
+      </div>
+
+      {/* ── Objetivos ─────────────────────────────────────────────── */}
+      <div style={{ ...card, padding: "18px 22px", marginTop: 22 }}>
+        <Eyebrow>
+          <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
+          Objetivos
+        </Eyebrow>
+        <TableroObjetivos
+          retoKey={RETO_KEY}
+          accent={accent}
+          objetivos={[
+            { txt: "Haz correr el experimento de Miller-Urey hasta ver aminoácidos", done: modo === "miller" && dias > 0 },
+            { txt: "Apaga la chispa: sin energía no hay síntesis", done: modo === "miller" && !chispa },
+            { txt: "Compara los ambientes: caldo, ventilas hidrotermales y panspermia", done: modo === "ambientes" && ambiente !== "caldo" },
+            { txt: "Explora el mundo ARN: una molécula que guarda y cataliza", done: modo === "mundoarn" },
+            { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
+          ]}
+        />
       </div>
 
       {/* ── Reto evaluable: el quiz verbatim de la actividad A2 ──────────── */}

@@ -1,0 +1,154 @@
+[
+  {
+    "slug": "conicas-lugares-geometricos",
+    "items": [
+      { "clave": "lugar-geometrico", "escena": "A clay board with many small pins all placed at exactly the same distance from a central post, forming a ring" },
+      { "clave": "circunferencia", "escena": "A clay compass pinned at a centre point, drawing a ring in a tray of sand" },
+      { "clave": "parabola", "escena": "A clay curved dish standing on a board with a bead at its focus and a straight bar lying below it" },
+      { "clave": "foco", "escena": "A clay curved dish with straight beams bouncing off its surface and gathering into one glowing bead" },
+      { "clave": "directriz", "escena": "A clay curve on a board with a straight bar below it and two equal measuring sticks running from one point of the curve to the bar and to a bead" },
+      { "clave": "circunferencia-lugar-geometrico", "escena": "A ring of clay pebbles all the same distance from a central peg on a sand board" },
+      { "clave": "forma-general-de-la-circunferencia", "escena": "A clay square with one missing corner block being pressed into place, a ring resting beside it" },
+      { "clave": "parabola-como-lugar-geometrico", "escena": "A clay parabolic curve with a bead at its focus and equal measuring sticks reaching to the curve and to a straight bar" },
+      { "clave": "vertice-y-eje-de-simetria-de-la-parabola", "escena": "A clay curved dish standing with a straight rod through its centre splitting it into two mirrored halves" },
+      { "clave": "interceptos-de-conicas", "escena": "A clay curve crossing a raised cross of bars, with small beads marking each crossing point" },
+      { "clave": "seccion-conica", "escena": "A clay double cone sliced by a flat plane, the cut surface lifted slightly away to show the curve" }
+    ]
+  },
+  {
+    "slug": "conjuntos-venn-3d",
+    "items": [
+      { "clave": "las-cuatro-zonas-de-un-venn", "escena": "Two overlapping clay rings on a tray dividing it into four zones, each zone a different colour with marbles resting in it" },
+      { "clave": "o-frente-a-y", "escena": "Two boards side by side, each with two overlapping clay rings: the left has marbles filling both rings, the right has marbles only in the overlap" },
+      { "clave": "complemento-relativo-al-universal", "escena": "A clay ring inside a large square tray, with marbles filling the tray everywhere except inside the ring" },
+      { "clave": "principio-de-inclusion-exclusion", "escena": "Two overlapping clay rings with a hand lifting one pile of marbles out of the shared overlap" },
+      { "clave": "conjuntos-disjuntos", "escena": "Two clay rings set far apart on a board, each holding its own marbles with no overlap" },
+      { "clave": "leyes-de-de-morgan", "escena": "Two overlapping clay rings on a tray with a lid flipping over them, turning the filled area into the empty one" }
+    ]
+  },
+  {
+    "slug": "consejos-ingles",
+    "items": [
+      { "clave": "you-should-shouldn-t-infinitive", "escena": "A clay hand pointing firmly at one of two paths on a small board" },
+      { "clave": "if-i-were-you-i-would", "escena": "Two clay figures facing each other, one of them wearing the other's hat" },
+      { "clave": "have-you-thought-about-verb-ing", "escena": "A clay figure resting its chin on its hand beside a small thought bubble with a gear inside" },
+      { "clave": "why-don-t-you-verb", "escena": "Two clay figures side by side on a bench, one gently nudging the other toward an open door" },
+      { "clave": "what-do-you-think-i-should-do", "escena": "A clay figure standing at a fork in a road with open upturned hands, a second figure beside it" },
+      { "clave": "that-must-be-tough-i-understand", "escena": "A clay hand resting gently on another figure's shoulder" }
+    ]
+  },
+  {
+    "slug": "conservacion-energia-pendulo",
+    "items": [
+      { "clave": "ley-de-conservacion-de-la-energia", "escena": "A clay pendulum swinging inside a sealed glass dome, reaching the same height on both sides" },
+      { "clave": "energia-cinetica", "escena": "A clay pendulum bob rushing through the lowest point of its swing with motion lines trailing behind it" },
+      { "clave": "energia-potencial-gravitatoria", "escena": "A clay pendulum bob held still at the top of its swing with a dotted line showing the drop below" },
+      { "clave": "energia-termica", "escena": "A clay block sliding on a rough surface with tiny sparks and warm haze at the point of contact" },
+      { "clave": "eficiencia-energetica", "escena": "Two clay bulbs side by side, one glowing brightly and clean, the other dim with heat haze around it" },
+      { "clave": "transformacion-de-energia", "escena": "A clay windmill turning a shaft that lights a small bulb at the other end" },
+      { "clave": "transferencia-de-energia", "escena": "A clay cradle of hanging balls, the left one striking and the right one swinging out" },
+      { "clave": "conservacion-de-la-energia", "escena": "A clay ball rolling down one side of a smooth valley and rising to exactly the same height on the other side" },
+      { "clave": "energia-total", "escena": "A clay jar holding a fixed level of coloured sand, part of it shifted from one side of the jar to the other" }
+    ]
+  },
+  {
+    "slug": "consumo-energetico-hogar-3d",
+    "items": [
+      { "clave": "potencia-y-energia", "escena": "A clay tap pouring water into a jug with a stopwatch standing beside the jug" },
+      { "clave": "kilowatt-hora-kwh", "escena": "A clay electricity meter dial on a wall with a small jug filling beneath it" },
+      { "clave": "tarifa-domestica-escalonada", "escena": "A clay staircase of three steps with a stack of coins on each, the last stack three times taller than the first" },
+      { "clave": "consumo-fantasma-modo-espera", "escena": "A clay television switched off but still plugged in, a tiny red pilot light glowing and a faint drip falling from the cable" },
+      { "clave": "factor-de-emision-del-sen", "escena": "A clay power pylon with a small grey puff rising above each of its cables" },
+      { "clave": "perdidas-de-la-red", "escena": "A clay power line with heat haze along the cable and a small leak of light dripping from a transformer" },
+      { "clave": "eficiencia-en-cadena", "escena": "A clay chain of three funnels each pouring into the next, spilling more at every step" },
+      { "clave": "co-equivalente", "escena": "A clay balance with several grey puffs of different sizes on one pan and a single standard grey block on the other" }
+    ]
+  },
+  {
+    "slug": "contaminantes-plasticos-3d",
+    "items": [
+      { "clave": "densidad-y-flotacion", "escena": "A clay tank of seawater with plastic pellets floating on the surface and a stone sunk at the bottom" },
+      { "clave": "fragmentarse-no-es-degradarse", "escena": "A clay plastic bottle breaking into smaller and smaller pieces along a table, every piece still the same bright colour" },
+      { "clave": "clases-de-tamano", "escena": "Four clay plastic fragments in a row along a ruler board, each one far smaller than the last" },
+      { "clave": "bioacumulacion-frente-a-biomagnificacion", "escena": "Three clay fish stacked in a chain, a small one, a bigger one and a large tuna, each with more dark specks inside than the last" },
+      { "clave": "ingesta-semanal-tolerable", "escena": "A clay plate with a fish fillet on a kitchen scale beside a weekly pill organiser" },
+      { "clave": "compostaje-industrial", "escena": "A clay compost bin with steam rising from warm dark material and a thermometer pushed into it" }
+    ]
+  },
+  {
+    "slug": "continuidad-tres-condiciones",
+    "items": [
+      { "clave": "continuidad-en-un-punto-3-condiciones", "escena": "A clay bridge whose two halves meet perfectly, with a solid block filling the joint between them" },
+      { "clave": "discontinuidad-de-salto", "escena": "A clay road that suddenly steps up to a higher level, leaving an open gap between the two parts" },
+      { "clave": "teorema-del-valor-intermedio-tvi", "escena": "A clay ribbon rising from below a bar to above it, crossing the bar at one point marked with a bead" },
+      { "clave": "funcion-a-trozos", "escena": "A clay road made of three straight segments at different slopes joined end to end" },
+      { "clave": "asintota-vertical", "escena": "A clay curve rising steeply beside a tall straight post, getting closer and closer without touching it" },
+      { "clave": "continuidad-en-un-punto", "escena": "A clay ribbon running smoothly over a bead with no break at the bead" },
+      { "clave": "discontinuidad-evitable-removible", "escena": "A clay ribbon with a single bead lifted out of it leaving a small hole, a hand holding the bead just above" },
+      { "clave": "discontinuidad-esencial-infinita", "escena": "A clay curve shooting upward off the edge of a board beside a vertical post" },
+      { "clave": "continuidad-en-un-intervalo", "escena": "A clay ribbon running unbroken from one post to another across a board" }
+    ]
+  },
+  {
+    "slug": "correlacion-variables-3d",
+    "items": [
+      { "clave": "frecuencia-esperada", "escena": "A clay grid tray with marbles spread evenly in proportion across all of its cells" },
+      { "clave": "comparar-proporciones", "escena": "Two clay jars of very different sizes, each filled to the same fraction with coloured sand" },
+      { "clave": "productos-x-x-y-y", "escena": "A clay board split into four quadrants by a raised cross, with beads scattered mostly in two opposite quadrants" },
+      { "clave": "recta-de-minimos-cuadrados", "escena": "A clay board with a cloud of beads and a straight stick laid through them, tiny threads joining each bead to the stick" },
+      { "clave": "variable-oculta", "escena": "A clay puppet stage where two figures move, with strings rising from both to a single hand above" },
+      { "clave": "correlacion-parcial", "escena": "A clay board of beads with one coloured layer lifted away, leaving the beads scattered without any pattern" }
+    ]
+  },
+  {
+    "slug": "cortesia-conversacion-ingles-3d",
+    "items": [
+      { "clave": "abrir-mantener-cerrar", "escena": "Three clay doors in a row: one swinging open, one held open by a wedge, one gently closing" },
+      { "clave": "backchannels", "escena": "Two clay figures talking, with small nodding tokens popping up in the air between them" },
+      { "clave": "turn-taking", "escena": "Two clay figures passing a small baton back and forth between them" },
+      { "clave": "empatia", "escena": "A clay figure leaning toward another with a hand on its shoulder and a soft glow between them" },
+      { "clave": "registro-formal-e-informal", "escena": "Two clay figures shaking hands formally beside two other figures bumping fists" },
+      { "clave": "cerrar-sin-cortar", "escena": "Two clay figures waving as one steps away along a path, still turned back toward the other" }
+    ]
+  },
+  {
+    "slug": "crisis-sociales",
+    "items": [
+      { "clave": "crisis-social", "escena": "A clay bridge between two groups of small figures with a wide crack splitting its middle" },
+      { "clave": "causa-estructural", "escena": "A clay house with a cracked, sinking foundation buried in layered soil" },
+      { "clave": "escala-de-analisis", "escena": "Three clay maps nested on a table: a single street, a city and a whole country" },
+      { "clave": "actor-social", "escena": "A clay figure standing on a small platform holding a tool in one hand and a flag in the other" },
+      { "clave": "violencia-estructural", "escena": "A clay staircase where some figures climb easily while others face a blank wall with no steps" },
+      { "clave": "perspectiva-multiescalar", "escena": "A stack of three translucent clay map layers held together by a pin and seen all at once" }
+    ]
+  },
+  {
+    "slug": "datos-graficas-estadisticas",
+    "items": [
+      { "clave": "media-aritmetica-x", "escena": "A clay seesaw balanced on a single pivot with blocks of different sizes spread along its plank" },
+      { "clave": "mediana", "escena": "A row of clay blocks ordered from short to tall with a small flag planted on the middle one" },
+      { "clave": "moda", "escena": "A row of clay blocks where one shape repeats far more often than the others, that repeated one raised above the rest" },
+      { "clave": "valor-atipico-outlier", "escena": "A clay seesaw with one very heavy block far out on one end, tipping the whole plank steeply" },
+      { "clave": "media-ponderada", "escena": "A clay balance beam with blocks of different sizes each hung from a different point along it" },
+      { "clave": "dispersion-rango-varianza", "escena": "Two clay boards of beads side by side: one a tight cluster at the centre, the other spread wide across the board" },
+      { "clave": "media-aritmetica-promedio", "escena": "A row of uneven clay sand piles being levelled into equal heights by a flat board" },
+      { "clave": "sesgo-y-resistencia-de-medidas", "escena": "A clay seesaw tipped by a heavy block at one end, with a sturdy post beside it that has not moved" },
+      { "clave": "medidas-en-datos-agrupados", "escena": "A row of clay bins each holding a stack of beads, with a small marker standing at the middle of each bin" }
+    ]
+  },
+  {
+    "slug": "dcl-leyes-newton",
+    "items": [
+      { "clave": "primera-ley-de-newton-inercia", "escena": "A clay cup on a table with the tablecloth just pulled away beneath it, the cup still standing in place" },
+      { "clave": "segunda-ley-de-newton-f-ma", "escena": "Two clay carts pushed by identical hands, the small one racing ahead of the heavy one" },
+      { "clave": "tercera-ley-de-newton-accion-reaccion", "escena": "Two clay figures on skateboards pushing off each other and sliding apart" },
+      { "clave": "diagrama-de-cuerpo-libre-dcl", "escena": "A clay block alone on a board with four sticks poking out of it: downward, upward, sideways and along the surface" },
+      { "clave": "friccion-estatica-y-cinetica", "escena": "Two clay crates on a floor: one with a taut rope but not moving, the other already sliding with scuff marks behind it" },
+      { "clave": "inercia", "escena": "A clay bus braking hard with its small passengers all leaning forward inside" },
+      { "clave": "fuerza-neta-resultante", "escena": "A clay box with two ropes pulled in opposite directions, one clearly stronger, and a single thick arrow showing the result" },
+      { "clave": "tercera-ley-de-newton-accion-y-reaccion", "escena": "A clay swimmer pushing off a pool wall and gliding away from it" },
+      { "clave": "peso-y-masa", "escena": "A clay block resting on a kitchen scale beside an identical block hanging from a spring scale" },
+      { "clave": "friccion-rozamiento", "escena": "A clay block sliding down a rough ramp with scuff marks and tiny dust puffs behind it" }
+    ]
+  }
+]

@@ -1,0 +1,114 @@
+[
+  {
+    "slug": "algoritmos-deciden",
+    "items": [
+      { "clave": "algoritmo", "escena": "A row of four numbered clay stepping stones leading to a small clay flag, with a tiny robot figure standing on the first stone" },
+      { "clave": "diagrama-de-flujo", "escena": "Clay shapes connected on a table: a rounded start pill, a square box, a diamond and a final pill, linked by thin clay arrows" },
+      { "clave": "identidad-digital", "escena": "A clay smartphone standing upright with a small portrait badge on its screen and three little clay id cards fanned out beside it" },
+      { "clave": "credenciales-de-acceso", "escena": "A clay padlock with a tiny key beside a small card showing a row of raised round dots, resting on a table" }
+    ]
+  },
+  {
+    "slug": "concentracion-disolucion",
+    "items": [
+      { "clave": "disolucion", "escena": "A clay glass of blue water with a spoon stirring inside and tiny white grains swirling as they dissolve" },
+      { "clave": "concentracion-en-masa", "escena": "Two clay beakers side by side on a small kitchen scale, the left one pale blue and the right one deep blue" },
+      { "clave": "diluida-concentrada-saturada", "escena": "Three clay glasses in a row: the first pale with a few grains, the second darker, the third with a heap of undissolved grains at the bottom" },
+      { "clave": "solubilidad", "escena": "A clay beaker over a small flame holding a mound of white grains half dissolved, with a thermometer leaning inside" },
+      { "clave": "elemento", "escena": "A single clay cube built from identical small spheres, all exactly the same colour, resting on a table" },
+      { "clave": "compuesto", "escena": "Two clay spheres of different colours joined by a short rod, standing together on a small round base" },
+      { "clave": "soluto-disolvente", "escena": "A clay spoon pouring white grains in a thin stream into a clear glass of water" },
+      { "clave": "concentracion", "escena": "Three clay test tubes in a wooden rack, each one a deeper shade of blue than the one before" },
+      { "clave": "grupo-y-periodo", "escena": "A clay grid of small coloured tiles like a periodic table, with one column and one row raised slightly above the rest" }
+    ]
+  },
+  {
+    "slug": "concordancia-conectores",
+    "items": [
+      { "clave": "concordancia", "escena": "Two clay puzzle pieces fitting together perfectly on a table, one with a round tab and one with the matching socket" },
+      { "clave": "conector", "escena": "Two clay blocks on a table joined by a short curved clay bridge" },
+      { "clave": "conector-causal", "escena": "A falling clay domino on the left knocking a small ball on the right, with a curved clay arrow linking them" },
+      { "clave": "conector-comparativo", "escena": "A clay balance scale holding two identical round fruits, one on each pan, perfectly level" },
+      { "clave": "conector-de-adicion", "escena": "A stack of three clay blocks with a fourth block held above by a small clay hand, about to be placed on top" }
+    ]
+  },
+  {
+    "slug": "conservacion-materia",
+    "items": [
+      { "clave": "ley-de-conservacion-de-la-materia", "escena": "A clay balance scale with a sealed glass jar on each pan: the left jar holds separate coloured clay pieces, the right jar the same pieces fused into one lump, and the beam stays perfectly level" },
+      { "clave": "cambio-fisico", "escena": "A clay ice cube half melted into a puddle of water on a warm metal tray" },
+      { "clave": "cambio-quimico", "escena": "A clay log burning with an orange flame, turning into grey ash with a curl of smoke above" },
+      { "clave": "reactivos-y-productos", "escena": "Two small clay bowls of coloured powder on the left, a thick clay arrow in the middle, and one bowl of a new colour on the right" },
+      { "clave": "impacto-ambiental", "escena": "A clay landfill mound with a plastic bottle and a bag sticking out, grey smoke drifting over a small green field" },
+      { "clave": "microplastico", "escena": "A clay hand holding a magnifying glass over beach sand, revealing tiny coloured plastic specks" },
+      { "clave": "gases-de-efecto-invernadero", "escena": "A clay Earth globe wrapped in a translucent grey blanket, with small heat arrows bouncing back down" },
+      { "clave": "sustentabilidad", "escena": "A clay tree with a small watering can at its base and a circular clay arrow looping around it" }
+    ]
+  },
+  {
+    "slug": "constructor-algoritmos",
+    "items": [
+      { "clave": "dato", "escena": "A single small clay tile lying alone in the middle of a table" },
+      { "clave": "variable", "escena": "A clay box with an open lid and a ribbon label, with a small ball hovering above ready to drop inside" },
+      { "clave": "constante", "escena": "A clay box sealed shut with a stone visible through a small window, anchored to the table" },
+      { "clave": "operador", "escena": "Three clay symbol tiles resting on a table: a plus sign, a greater-than sign and a small gear" },
+      { "clave": "estructura-de-control", "escena": "A clay path that splits into two branches and then loops back, with a tiny figure standing at the fork" }
+    ]
+  },
+  {
+    "slug": "energia-electricidad",
+    "items": [
+      { "clave": "naturaleza-corpuscular", "escena": "A clay cube broken open to show it is made of tiny round spheres packed tightly inside" },
+      { "clave": "corriente-electrica", "escena": "A clay copper wire with small round spheres moving along it in single file toward a lit bulb" },
+      { "clave": "conductor-vs-aislante", "escena": "Two clay wires side by side: the left bare copper with spheres flowing along it, the right wrapped in thick rubber with the spheres stopped" },
+      { "clave": "semiconductor", "escena": "A small clay silicon chip on a table with a tiny switch beside it, half lit" },
+      { "clave": "transformacion-de-energia", "escena": "A clay battery joined by wires to a glowing bulb, with a thick clay arrow curving from one to the other" },
+      { "clave": "carga-electrica", "escena": "Two clay spheres on a table leaning toward each other, one with a raised plus sign and the other with a raised minus sign" },
+      { "clave": "conductor", "escena": "A coil of clay copper wire on a table with small spheres running through it" },
+      { "clave": "aislante", "escena": "A thick clay rubber glove and a plastic handled tool lying together on a table" }
+    ]
+  },
+  {
+    "slug": "enlaces-quimicos",
+    "items": [
+      { "clave": "electron-de-valencia", "escena": "A clay atom model: a central sphere with one ring around it holding three small spheres on the outer ring" },
+      { "clave": "ion-cation-anion", "escena": "Three clay spheres in a row: a neutral grey one, one with a raised plus sign, one with a raised minus sign" },
+      { "clave": "enlace-ionico", "escena": "Two clay spheres, the left one handing a tiny sphere to the right one, now marked plus and minus and pulled together" },
+      { "clave": "enlace-covalente", "escena": "Two clay spheres overlapping slightly, with two tiny spheres shared in the overlap between them" },
+      { "clave": "electronegatividad-en", "escena": "A clay tug of war: two spheres pulling one tiny sphere on a rope, the right sphere clearly winning" },
+      { "clave": "ion", "escena": "A single clay sphere with one tiny sphere flying away from it, leaving a raised plus mark behind" },
+      { "clave": "cation-anion", "escena": "Two clay spheres on a small seesaw, the left with a raised plus sign and the right with a raised minus sign" },
+      { "clave": "molecula", "escena": "Three clay spheres joined by short rods in a bent shape, like a water molecule on a base" },
+      { "clave": "isotopo", "escena": "Two clay atom cores side by side: the same number of red spheres in each, but a different number of grey ones" },
+      { "clave": "electronegatividad", "escena": "A clay horseshoe magnet pulling a small sphere away from a smaller weaker magnet" },
+      { "clave": "enlace-ionico-covalente-metalico", "escena": "Three tiny clay scenes on one long base: two spheres where one gives a dot away, two spheres sharing dots, and a cluster of spheres floating in a pool of loose dots" }
+    ]
+  },
+  {
+    "slug": "estado-mexicano",
+    "items": [
+      { "clave": "estado", "escena": "A clay map plaque with a small government building, a group of tiny figures and a flag standing on it" },
+      { "clave": "division-de-poderes", "escena": "Three clay columns of equal height on one base, each topped with a different object: a gavel, a pen and a ballot box" },
+      { "clave": "monopolio-legitimo-de-la-fuerza", "escena": "A clay shield and a small badge resting on a stone block, with a police cap beside them" },
+      { "clave": "institucion", "escena": "A clay building with columns and a raised seal on its facade, standing on a wide base" },
+      { "clave": "impunidad", "escena": "A clay gavel lying on its side in the dust beside an open empty jail cell door" },
+      { "clave": "captura-del-estado", "escena": "A clay government building with thick strings attached to its roof, held from above by a large hand" }
+    ]
+  },
+  {
+    "slug": "estados-materia",
+    "items": [
+      { "clave": "estado-de-agregacion", "escena": "Three clay containers in a row holding the same blue spheres: tightly packed, loosely rolling, and spread far apart floating" },
+      { "clave": "energia-cinetica-de-las-particulas", "escena": "A clay jar full of small spheres with motion streaks around them and a small flame underneath" },
+      { "clave": "cambio-de-estado", "escena": "A clay ice block, a puddle of water and a wisp of steam arranged left to right on a warm plate" },
+      { "clave": "fusion-y-vaporizacion", "escena": "A clay pot over a flame with ice cubes melting inside and steam rising from the surface" },
+      { "clave": "sublimacion", "escena": "A clay block of dry ice on a table with white mist pouring down its sides and no liquid underneath" },
+      { "clave": "punto-de-fusion-y-ebullicion", "escena": "A clay thermometer standing beside a pot of bubbling water, its column risen to the top" },
+      { "clave": "teoria-cinetica-molecular", "escena": "A clear clay box full of small spheres bouncing off the walls, with short motion lines behind them" },
+      { "clave": "energia-cinetica", "escena": "A clay ball rolling fast down a ramp with motion lines trailing behind it" },
+      { "clave": "energia-potencial", "escena": "A clay ball resting at the very top of a ramp, held still, with a dotted clay line showing the drop below" },
+      { "clave": "energia-interna", "escena": "A clay jar cut open showing spheres vibrating in place and linked to each other by tiny springs" },
+      { "clave": "temperatura", "escena": "A clay thermometer standing next to a small cup with steam curling above it" }
+    ]
+  }
+]

@@ -33,6 +33,11 @@ import {
   FUNC_DEF, H_MIN, H_MAX, H_DEF, H_STEP, type FuncId,
 } from "./derivada-data";
 
+import { TableroObjetivos } from "./_objetivos";
+
+/** Clave de la mejor marca de este laboratorio. */
+const RETO_KEY = "cen-derivada-secante-tangente-reto";
+
 const DerivadaScene = dynamic(() => import("./DerivadaScene"), {
   ssr: false,
   loading: () => (
@@ -371,20 +376,17 @@ export function LabDerivada({ color }: PracticaLabProps) {
           <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
           Objetivos
         </Eyebrow>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-          {[
+        <TableroObjetivos
+          retoKey={RETO_KEY}
+          accent={accent}
+          objetivos={[
             { txt: "Reduce h hacia 0 y observa la secante → tangente", done: hSep <= 0.15 },
             { txt: "Explora las 4 funciones disponibles", done: funcId !== FUNC_DEF },
             { txt: "Activa la animación h→0 (botón play)", done: playing },
             { txt: "Observa el caso verbatim A2 (c): x², x=2, y=4x−4", done: esVerbatimTangente },
             { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
-          ].map((o, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? "#34D399" : T.text2 }}>
-              <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-              <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-            </div>
-          ))}
-        </div>
+          ]}
+        />
       </div>
 
       {/* ── Lecturas + ideas clave ─────────────────────────────────── */}

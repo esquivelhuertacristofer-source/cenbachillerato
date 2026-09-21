@@ -1,0 +1,21 @@
+[
+  {
+    "slug": "taller-descripcion-narracion",
+    "items": [
+      { "clave": "detalle-concreto", "escena": "A clay magnifying glass held over a small white adobe wall, revealing a tiny lemon tree with individual modelled leaves beside a window" },
+      { "clave": "adjetivo-generico", "escena": "A soft grey clay blob with no features sitting on a plain plinth, its edges blurred and smooth" },
+      { "clave": "juicio-abstracto", "escena": "A clay thumbs-up token resting on a pedestal in front of an empty clay picture frame" },
+      { "clave": "ruta-de-la-mirada", "escena": "A clay landscape tile with a chunky clay arrow spiralling inward from its wide edge to a tiny object at the centre" },
+      { "clave": "suceso", "escena": "A clay chair caught mid-fall beside a table, one leg already off the ground" },
+      { "clave": "conector-temporal", "escena": "Two small clay scene boxes joined by a short chunky clay bridge with a tiny hourglass resting on it" },
+      { "clave": "verbo-comodin", "escena": "A strip of clay word bricks with one grey featureless brick being lifted out by a small clay hook, a tiny anchor hanging from it" },
+      { "clave": "narrador-omnisciente", "escena": "A clay eye floating above an open clay dollhouse, seeing into all of its rooms at once" },
+      { "clave": "organizacion-de-ideas", "escena": "Clay cards being sorted into three neat stacks on a desk by a clay hand, a jumbled pile still waiting beside them" },
+      { "clave": "sentido-comunicativo", "escena": "A clay letter travelling along a thin clay thread from one small figure to another across a table" },
+      { "clave": "borrador", "escena": "A crumpled clay page beside a flatter corrected page, with a clay eraser and a pencil resting between them" },
+      { "clave": "texto-descriptivo", "escena": "A clay picture frame standing on a desk holding a still scene: a cup, a chair and a window, all modelled in detail" },
+      { "clave": "texto-narrativo", "escena": "Three small clay scene boxes in a row joined by chunky clay arrows, each showing a later moment of the same action" },
+      { "clave": "plan-narrativo", "escena": "A clay sheet on a desk with five small numbered clay tiles laid across it in order, a pencil resting at one end" }
+    ]
+  }
+]

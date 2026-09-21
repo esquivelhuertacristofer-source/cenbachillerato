@@ -29,6 +29,11 @@ import {
   fmt0, type CausaKey, QUIZ_A2,
 } from "./deforestacion-data";
 
+import { TableroObjetivos } from "./_objetivos";
+
+/** Clave de la mejor marca de este laboratorio. */
+const RETO_KEY = "cen-deforestacion-reto";
+
 const DeforestacionScene = dynamic(() => import("./DeforestacionScene"), {
   ssr: false,
   loading: () => (
@@ -424,20 +429,17 @@ export function LabDeforestacion({ color }: PracticaLabProps) {
           <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
           Objetivos
         </Eyebrow>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-          {[
+        <TableroObjetivos
+          retoKey={RETO_KEY}
+          accent={accent}
+          objetivos={[
             { txt: "Ajusta la cobertura forestal y observa cómo caen los servicios ecosistémicos", done: cobertura < COB_DEFAULT },
             { txt: "Activa la restauración y comprueba cómo se recuperan los servicios", done: restauracion > REF_DEFAULT },
             { txt: "Cambia la causa de la deforestación para comparar sus efectos", done: causa !== "ganaderia" },
             { txt: "Explora los tres escenarios guiados de la trampa de sinergias", done: resetNonce >= 3 },
             { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
-          ].map((o, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? "#34D399" : T.text2 }}>
-              <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-              <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-            </div>
-          ))}
-        </div>
+          ]}
+        />
       </div>
 
       {/* nota de honestidad del modelo */}

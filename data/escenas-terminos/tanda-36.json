@@ -1,0 +1,20 @@
+[
+  {
+    "slug": "habitos-comparaciones-ingles",
+    "items": [
+      { "clave": "comparative", "escena": "Two clay steps of different heights side by side, a small clay figure standing on each one" },
+      { "clave": "superlative", "escena": "A three-step clay staircase with a small clay crown resting on the top step" },
+      { "clave": "short-adjective", "escena": "A stubby clay block with a small tile clipped directly onto its end, the joint flush" },
+      { "clave": "long-adjective", "escena": "A long clay block with a separate small clay word tile standing in front of it, not touching" },
+      { "clave": "adjective-in-y", "escena": "A clay block whose final letter tile is being swapped by a clay hand for a wider double tile" },
+      { "clave": "irregular-forms", "escena": "Three clay blocks of completely different shapes standing in a row where the others are identical" },
+      { "clave": "as-as", "escena": "A clay balance scale with two identical clay cubes, one on each pan, perfectly level" },
+      { "clave": "not-as-as", "escena": "A clay balance scale with two clay cubes of different sizes, one pan clearly lower" },
+      { "clave": "prefer-to", "escena": "A clay hand reaching past one clay cup to pick up the clay cup behind it" },
+      { "clave": "would-rather-than", "escena": "A clay figure at a fork in a clay path, one foot already on the left branch" },
+      { "clave": "the-best-the-worst", "escena": "Three clay podium blocks in a row, a small clay crown on the tallest and a cracked tile at the foot of the shortest" },
+      { "clave": "like-verb-ing", "escena": "A small clay heart resting on top of a clay figure caught mid-stride, running" },
+      { "clave": "would-rather", "escena": "A clay figure standing between two clay doors, one hand already on the left handle" }
+    ]
+  }
+]

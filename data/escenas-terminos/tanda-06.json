@@ -1,0 +1,166 @@
+[
+  {
+    "slug": "ecuacion-lineal-barras",
+    "items": [
+      { "clave": "ecuacion-lineal", "escena": "A clay tape bar made of one long wrapped block and a short block, lying beside a second bar of the same total length" },
+      { "clave": "incognita-x", "escena": "A single clay block wrapped in plain paper sitting on a tape bar" },
+      { "clave": "coeficiente-a", "escena": "Three identical clay wrapped blocks lined up end to end forming one longer bar" },
+      { "clave": "termino-independiente-b", "escena": "A clay tape bar made of one wrapped block with a stack of small unit cubes at its end" },
+      { "clave": "despejar", "escena": "A clay hand lifting small unit cubes off both ends of a matched pair of tape bars" },
+      { "clave": "verificacion", "escena": "A clay tape bar being measured against a second bar with a ruler, matching exactly" },
+      { "clave": "operaciones-inversas", "escena": "Two clay arrows curving in opposite directions around a block, one bringing a cube in and one taking it away" },
+      { "clave": "incognita", "escena": "A clay block wrapped in plain paper with no markings, sitting alone on a tape bar" },
+      { "clave": "solucion", "escena": "A clay wrapped block opened up to show the exact stack of unit cubes inside it" }
+    ]
+  },
+  {
+    "slug": "ecuacion-recta",
+    "items": [
+      { "clave": "ecuacion-lineal-con-dos-incognitas", "escena": "A clay board with two perpendicular bars and a long straight stick laid diagonally across them" },
+      { "clave": "pendiente-m", "escena": "A clay ramp on a board with a small step block measuring its rise and a longer block measuring its run" },
+      { "clave": "ordenada-al-origen-b", "escena": "A clay straight stick crossing a vertical bar, with a bead marking exactly where it crosses" },
+      { "clave": "plano-cartesiano", "escena": "A clay board with two perpendicular bars crossing at a central peg, dividing it into four quarters" },
+      { "clave": "solucion-de-la-ecuacion", "escena": "A clay straight stick on a board with many beads placed all along its length" },
+      { "clave": "par-ordenado-x-y", "escena": "A clay board with one bead placed where a horizontal step and a vertical step meet" },
+      { "clave": "raiz-cero-de-la-recta", "escena": "A clay straight stick crossing a horizontal bar with a bead at the crossing point" }
+    ]
+  },
+  {
+    "slug": "electromagnetismo-ohm-faraday",
+    "items": [
+      { "clave": "ley-de-ohm-v-i-r", "escena": "A clay water circuit on a bench: a raised tank, a narrowed pipe section and a paddle wheel turning slowly" },
+      { "clave": "potencia-electrica-p-v-r", "escena": "A clay resistor glowing warm in a small circuit with heat haze rising from it" },
+      { "clave": "induccion-electromagnetica-faraday-1831", "escena": "A clay magnet being pushed through a coil of wire, lighting a small bulb at the end" },
+      { "clave": "motor-electrico-fuerza-de-lorentz", "escena": "A clay wire loop spinning on an axle between two magnet blocks" },
+      { "clave": "transformador-v-v-n-n", "escena": "A clay iron ring with a coil of many thin turns on one side and a coil of few thick turns on the other" },
+      { "clave": "ley-de-coulomb-f-k-q-q-r", "escena": "Two clay charged spheres on stands pushing apart with a stretched spring between them" },
+      { "clave": "ley-de-faraday-induccion-electromagnetica", "escena": "A clay coil with a magnet moving beside it and a needle gauge swinging over" },
+      { "clave": "motor-electrico", "escena": "A clay motor cut open to show a coil spinning on an axle between magnets, driving a small fan" },
+      { "clave": "generador-electrico-alternador", "escena": "A clay hand crank turning a coil between magnets and lighting a bulb" },
+      { "clave": "transformador-electrico", "escena": "A clay pole transformer can on a power line with thick cables entering and thin cables leaving" },
+      { "clave": "campo-magnetico-y-corriente-electrica", "escena": "A clay wire standing through a board with iron filings arranged in rings around it" },
+      { "clave": "tecnologias-cotidianas-del-electromagnetismo", "escena": "A clay tray holding a wireless charging pad, a transport card, an induction hob and a small speaker" }
+    ]
+  },
+  {
+    "slug": "energias-renovables-mexico-3d",
+    "items": [
+      { "clave": "renovable-no-es-lo-mismo-que-limpia", "escena": "Two overlapping clay trays on a bench with four small power plant models being sorted between them" },
+      { "clave": "factor-de-planta", "escena": "A clay jar filled only partway up standing beside a completely full jar of the same size" },
+      { "clave": "intermitencia", "escena": "A clay solar panel and a wind turbine on one base with a day and night dial turning beside them" },
+      { "clave": "almacenamiento-y-respaldo", "escena": "A clay battery bank charging from a solar panel at midday with a gas plant standing ready behind it" },
+      { "clave": "emisiones-de-ciclo-de-vida", "escena": "A clay wind turbine on a base with small grey puffs rising from a factory, a truck and a crane behind it" },
+      { "clave": "declive-de-un-yacimiento", "escena": "A clay oil derrick over a shrinking underground pocket, with a deeper new derrick being built beside it" }
+    ]
+  },
+  {
+    "slug": "entropia-segunda-ley",
+    "items": [
+      { "clave": "primera-ley", "escena": "A clay sealed box with coloured sand poured from one compartment into another, the total level unchanged" },
+      { "clave": "entalpia-h-u-pv", "escena": "A clay flask on a bench with a piston pressing above it and heat waves rising from its base" },
+      { "clave": "entropia-s", "escena": "Two clay trays: one with blocks stacked neatly, the other with the same blocks scattered all over" },
+      { "clave": "segunda-ley", "escena": "A clay hot block and a cold block touching, with heat waves flowing only from the hot one to the cold one" },
+      { "clave": "tercera-ley-y-cero-absoluto", "escena": "A clay crystal cube resting perfectly still on a frozen plate with frost gathered around it" },
+      { "clave": "entalpia-h", "escena": "A clay beaker on a hot plate with a lid pressing down and warm haze escaping the rim" },
+      { "clave": "proceso-exotermico", "escena": "A clay beaker with heat waves pouring out of it and a hand pulling back from the warmth" },
+      { "clave": "proceso-endotermico", "escena": "A clay beaker frosting over while drawing heat inward from the warm bench around it" },
+      { "clave": "cero-absoluto", "escena": "A clay thermometer with its column at the very bottom, encased in thick frost" }
+    ]
+  },
+  {
+    "slug": "equilibrio-quimico",
+    "items": [
+      { "clave": "reaccion-irreversible", "escena": "A clay match burned down to ash on a dish, the ash unable to become a match again" },
+      { "clave": "reaccion-reversible", "escena": "A clay pair of swinging doors between two rooms of coloured spheres, open both ways" },
+      { "clave": "equilibrio-dinamico", "escena": "A clay staircase with figures climbing up and down at the same rate, the crowd on each floor unchanged" },
+      { "clave": "constante-de-equilibrio-kc", "escena": "A clay balance holding two groups of spheres at a fixed tilt, locked in place by a pin" },
+      { "clave": "cociente-de-reaccion-q", "escena": "A clay balance tilted to one side with an arrow showing which way it must move to level out" },
+      { "clave": "principio-de-le-chatelier", "escena": "A clay balance being pressed down on one side while a hand shifts weight to the other to restore it" },
+      { "clave": "equilibrio-quimico", "escena": "A clay sealed soda bottle with bubbles rising and dissolving again at the same rate" },
+      { "clave": "reaccion-endotermica-exotermica", "escena": "Two clay flasks on a bench: one frosted and drawing heat in, the other warm and giving heat off" },
+      { "clave": "catalizador", "escena": "A clay hill with a tunnel bored straight through it and a ball rolling through instead of over the top" },
+      { "clave": "proceso-haber-bosch", "escena": "A clay high pressure vessel with thick bolts, a pipe running from it to a sack of fertiliser" }
+    ]
+  },
+  {
+    "slug": "espectro-electromagnetico",
+    "items": [
+      { "clave": "c-f", "escena": "A clay ribbon wave stretched long and loose on the left and squeezed tight on the right, both travelling at the same speed" },
+      { "clave": "e-h-f", "escena": "Three clay waves of increasing tightness, each carrying a bigger glowing bead" },
+      { "clave": "radiacion-ionizante", "escena": "A clay atom model with one electron being knocked out of its ring by a sharp beam" },
+      { "clave": "espectro-radioelectrico", "escena": "A clay band divided into slots along its length with a small antenna standing in each slot" },
+      { "clave": "gtm-inaoe", "escena": "A large clay dish antenna standing on a volcano summit under a night sky" },
+      { "clave": "espectro-electromagnetico", "escena": "A long clay strip of waves running from very long and loose at one end to extremely tight at the other" },
+      { "clave": "ondas-de-radio-y-microondas", "escena": "A clay radio tower beside a microwave oven on a bench, long loose waves spreading from both" },
+      { "clave": "infrarrojo-ir", "escena": "A clay remote control lying beside a warm mug with soft heat waves rising from it" },
+      { "clave": "luz-visible", "escena": "A clay prism splitting a white beam into a rainbow band across a table" },
+      { "clave": "ultravioleta-uv-y-rayos-x", "escena": "A clay hand under a lamp beside a chest radiograph plate glowing on a light box" },
+      { "clave": "rayos-gamma", "escena": "A clay lead container with very thick walls and a sharp beam escaping through a narrow slit" }
+    ]
+  },
+  {
+    "slug": "estadistica-enganosa-3d",
+    "items": [
+      { "clave": "cambio-real-y-cambio-aparente", "escena": "Two clay bar charts of the same heights, one standing on the table top and the other on a raised shelf" },
+      { "clave": "escalar-en-tres-dimensiones", "escena": "Two clay cubes on a table, the larger one twice the side of the smaller and dwarfing it in bulk" },
+      { "clave": "escala-logaritmica", "escena": "A clay ladder whose rungs are spaced ten times further apart at every step" },
+      { "clave": "puntos-porcentuales", "escena": "Two clay pie discs with slightly different slices and a small wedge measured out between them" },
+      { "clave": "riesgo-relativo-y-absoluto", "escena": "A clay tray packed with tiny white beads with just two of them coloured red" },
+      { "clave": "media-y-mediana", "escena": "A clay seesaw dragged down by one huge block, next to a row of ordered blocks with a flag on the middle one" },
+      { "clave": "margen-de-error-y-empate-tecnico", "escena": "Two clay bars of nearly equal height, each with a soft fuzzy cushion on top that overlaps the other" }
+    ]
+  },
+  {
+    "slug": "estimacion-fermi-3d",
+    "items": [
+      { "clave": "descomponer-en-factores", "escena": "A large clay block on a tray broken into three smaller blocks lined up in a row" },
+      { "clave": "error-en-ordenes-de-magnitud", "escena": "Two clay jars side by side, one ten times the size of the other, with a ruler standing between them" },
+      { "clave": "rango-de-incertidumbre", "escena": "A clay bar with two sliding brackets marking a low and a high end around a central bead" },
+      { "clave": "regla-del-5", "escena": "A clay ball resting exactly on the middle of a step, tipping toward the higher step above" },
+      { "clave": "compensacion-de-errores", "escena": "A clay balance where one pan is nudged up and the other nudged down, ending perfectly level" },
+      { "clave": "tres-errores-tipicos", "escena": "Three clay mishaps on one bench: a bead slipped out of place, two mismatched measuring cups, and a reversed arrow" }
+    ]
+  },
+  {
+    "slug": "estructura-reaccion",
+    "items": [
+      { "clave": "reaccion-quimica", "escena": "Two clay molecule models coming apart, their spheres rejoining into new shapes on the bench" },
+      { "clave": "ecuacion-quimica", "escena": "A clay bench with molecule models on the left, a thick arrow in the middle and different models on the right" },
+      { "clave": "coeficiente", "escena": "A clay block standing on the bench in front of two identical molecule models" },
+      { "clave": "subindice", "escena": "A clay molecule with two identical spheres fused tightly to one central sphere" },
+      { "clave": "ley-de-conservacion-de-la-materia-lavoisier", "escena": "A sealed clay flask on a balance with its contents reacting inside while the needle does not move" },
+      { "clave": "ecuacion-balanceada", "escena": "A clay balance with the same count of each coloured sphere on both pans, resting level" },
+      { "clave": "estados-de-agregacion-s-l-g-ac", "escena": "Four clay vessels in a row: an ice block, a beaker of liquid, a balloon of gas and a glass of dissolved crystals" },
+      { "clave": "reaccion-reversible", "escena": "A thick clay double headed arrow lying between two groups of molecule models on a bench" },
+      { "clave": "reactivos", "escena": "Two clay molecule models on the left side of a thick clay arrow" },
+      { "clave": "productos", "escena": "Two clay molecule models on the right side of a thick clay arrow" },
+      { "clave": "flecha-de-reaccion", "escena": "A single thick clay arrow lying across a bench between two empty trays" },
+      { "clave": "ley-de-conservacion-de-la-materia", "escena": "A clay balance with a sealed jar on each pan holding the same spheres joined differently, resting level" },
+      { "clave": "estado-de-agregacion-s-l-g-ac", "escena": "Four clay containers on a bench: a solid block, a beaker of liquid, a balloon of gas and a jar of dissolved crystals" }
+    ]
+  },
+  {
+    "slug": "estudio-edicion-digital-3d",
+    "items": [
+      { "clave": "pixel-y-resolucion", "escena": "A clay mosaic of small square tiles forming a simple picture, with one tile lifted out of the grid" },
+      { "clave": "profundidad-de-color", "escena": "Three clay paint palettes side by side with two wells, then a few, then very many wells of colour" },
+      { "clave": "peso-sin-comprimir", "escena": "A clay stack of square tiles on a kitchen scale with the pointer swung far around" },
+      { "clave": "compresion-sin-perdida", "escena": "A clay folded paper accordion squeezed flat and then opened back to its exact original shape" },
+      { "clave": "compresion-con-perdida", "escena": "A clay sponge squeezed small with a few crumbs falling away that cannot be put back" },
+      { "clave": "capas-y-opacidad", "escena": "Three translucent clay sheets stacked on a light box, the top one half see through" },
+      { "clave": "contraste-legible", "escena": "Two clay cards side by side, one with a dark shape on a pale ground and the other with a pale shape on a pale ground" },
+      { "clave": "tasa-de-bits", "escena": "A clay pipe with beads flowing through it into a bucket, a stopwatch standing beside it" },
+      { "clave": "muestreo-y-nyquist", "escena": "A clay wave with evenly spaced pins standing along it, each one measuring the wave height at that point" }
+    ]
+  },
+  {
+    "slug": "etica-produccion-digital",
+    "items": [
+      { "clave": "pagina-web", "escena": "A clay browser window frame standing on a base holding a photo, a block of texture and a chain link inside" },
+      { "clave": "wordpress", "escena": "A clay website being built from prefabricated blocks slotted into a standing frame" },
+      { "clave": "blogspot-blogger", "escena": "A clay notebook standing open inside a browser window frame with a pencil lying beside it" },
+      { "clave": "difusion", "escena": "A clay megaphone with ripples spreading outward to a ring of small figures" },
+      { "clave": "perspectiva-etica-y-critica", "escena": "A clay document being checked under a magnifying glass beside a small tag tied on a string" }
+    ]
+  }
+]

@@ -1,0 +1,16 @@
+[
+  {
+    "slug": "ideas-clave-subrayado",
+    "items": [
+      { "clave": "idea-principal", "escena": "A clay page with one thick raised line at the top of a paragraph, painted bright green, while the lines below it stay plain and flat" },
+      { "clave": "idea-secundaria", "escena": "A clay page where one green line at the top has two thinner amber lines branching down from it on short clay stems" },
+      { "clave": "oracion-tematica", "escena": "A clay paragraph block whose very first line is lifted slightly above the rest like a lid, with a small clay flag planted on it" },
+      { "clave": "detalle-de-apoyo", "escena": "A small clay pillar holding up one end of a raised clay plank, with two tiny blocks stacked under it as props" },
+      { "clave": "palabra-clave", "escena": "A row of clay word tiles on a rail with one tile pulled forward and standing taller than the rest, a small key shape resting on it" },
+      { "clave": "subrayado", "escena": "A chunky green clay highlighter resting mid-stroke across a printed clay page, leaving a thick painted band over one line" },
+      { "clave": "resumen", "escena": "A tall stack of clay pages beside a single short clay card, joined by a clay funnel narrowing from the stack to the card" },
+      { "clave": "mapa-conceptual", "escena": "Three rounded clay cards stacked in a tree, the largest on top, joined by chunky clay branches to two smaller ones below" },
+      { "clave": "elemento-paratextual", "escena": "A clay book lying open with a title bar, a small photo block and a folded corner tab modelled around the edges of the page, the body lines left plain" }
+    ]
+  }
+]

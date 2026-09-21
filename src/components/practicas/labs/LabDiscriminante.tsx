@@ -27,6 +27,11 @@ import {
 } from "./discriminante-data";
 import { LabSfx } from "./lab-audio";
 
+import { TableroObjetivos } from "./_objetivos";
+
+/** Clave de la mejor marca de este laboratorio. */
+const RETO_KEY = "cen-discriminante-reto";
+
 const DiscriminanteScene = dynamic(() => import("./DiscriminanteScene"), {
   ssr: false,
   loading: () => (
@@ -431,20 +436,18 @@ export function LabDiscriminante({ color }: PracticaLabProps) {
           <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
           Objetivos
         </Eyebrow>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-          {[
-            { txt: "Mueve los coeficientes a, b, c y observa el cambio en Δ", done: true },
-            { txt: "Explora los tres casos del discriminante (Δ>0, Δ=0, Δ<0)", done: true },
-            { txt: "Visualiza los cruces de la parábola con el eje x", done: true },
-            { txt: "Aplica el discriminante al modelo del cohete h(t) = −5t² + 30t + 10", done: true },
+        <TableroObjetivos
+          retoKey={RETO_KEY}
+          accent={accent}
+          objetivos={[
+            { txt: "Mueve los coeficientes a, b y c y observa cómo cambia Δ", done: a !== A_DEF || b !== B_DEF || c !== C_DEF },
+            { txt: "Consigue Δ > 0: dos raíces y dos cruces con el eje x", done: calc.caso === "dos" },
+            { txt: "Consigue Δ = 0: una raíz doble, la parábola toca el eje", done: calc.caso === "una" },
+            { txt: "Consigue Δ < 0: ninguna raíz real (raíces complejas)", done: calc.caso === "ninguna" },
+            { txt: "Mueve la altura objetivo k en el modelo del cohete h(t) = −5t² + 30t + 10", done: k !== K_DEF },
             { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
-          ].map((o, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? "#34D399" : T.text2 }}>
-              <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-              <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-            </div>
-          ))}
-        </div>
+          ]}
+        />
       </div>
 
       {/* ── Reto evaluable: ejercicio verbatim del ancla A2 ───────────────── */}

@@ -1,0 +1,157 @@
+[
+  {
+    "slug": "mutaciones-3d",
+    "items": [
+      { "clave": "mutacion", "escena": "A clay twisted ladder with one rung replaced by a differently coloured block" },
+      { "clave": "sustitucion-insercion-y-delecion", "escena": "Three clay strips of blocks: one with a block swapped, one with a block added, one with a block removed and the rest shifted along" },
+      { "clave": "aneuploidia", "escena": "A clay tray of paired rods with one position holding three rods instead of two" },
+      { "clave": "mutageno", "escena": "A clay lamp beam, a cigarette and a virus particle arranged around a twisted ladder" },
+      { "clave": "germinal-vs-somatica", "escena": "Two clay scenes on one base: an adult figure with one marked patch, and a line of three figures all marked" },
+      { "clave": "variabilidad-genetica", "escena": "A clay row of beetles of many different colours resting on a branch" },
+      { "clave": "mutacion-genica-puntual", "escena": "A clay strip of three block groups with a single block swapped in the middle group" },
+      { "clave": "mutacion-cromosomica", "escena": "Four clay banded rods in a row: one missing a band, one with a band doubled, one reversed and one swapped with another" },
+      { "clave": "mutagenos-fisicos-quimicos-y-biologicos", "escena": "Three agents on a clay bench: a lamp beam, a dark chemical drop and a virus particle" },
+      { "clave": "reparacion-del-adn", "escena": "A clay twisted ladder with a damaged rung being cut out and replaced by a tiny machine" },
+      { "clave": "mutaciones-germinales-vs-somaticas", "escena": "A glowing clay egg cell on one side and an adult figure with a marked patch on the other" },
+      { "clave": "variabilidad-genetica-y-evolucion", "escena": "A clay row of moths from pale to dark on a tree trunk with a bird perched nearby" }
+    ]
+  },
+  {
+    "slug": "naturaleza-ciencia-3d",
+    "items": [
+      { "clave": "conocimiento-provisional", "escena": "A clay map on a table being redrawn in one corner with a pencil and an eraser" },
+      { "clave": "criterios-de-un-buen-estudio", "escena": "A clay checklist board with four items and a small token set beside each one" },
+      { "clave": "replicacion-independiente", "escena": "Three clay benches with the same setup being run by different hands" },
+      { "clave": "asimetria-de-la-falsacion", "escena": "A clay row of white swans with a single black swan standing at the end" },
+      { "clave": "hipotesis-ad-hoc", "escena": "A clay dragon outline made of wire with patches added everywhere it was tested" },
+      { "clave": "punto-de-ebullicion-y-presion", "escena": "A clay pot boiling on a mountain top with a thermometer reading lower than the one down at sea level" }
+    ]
+  },
+  {
+    "slug": "navegacion-segura",
+    "items": [
+      { "clave": "phishing", "escena": "A clay fishing hook baited with a fake letter dangling over a keyboard" },
+      { "clave": "desinformacion", "escena": "A clay rumour passing along a row of figures, changing shape at every step" },
+      { "clave": "vigilancia-digital", "escena": "A clay eye peering through a phone screen at a small figure below" },
+      { "clave": "seguridad-digital", "escena": "A clay shield with a padlock standing in front of a laptop" },
+      { "clave": "proteccion-de-datos", "escena": "A clay strongbox holding small personal cards with its lid closing over them" }
+    ]
+  },
+  {
+    "slug": "necesidades-satisfactores",
+    "items": [
+      { "clave": "necesidad", "escena": "A clay empty plate and an empty cup on a bare table" },
+      { "clave": "satisfactor", "escena": "A clay plate of food and a full cup being set down on the same table" },
+      { "clave": "necesidades-vitales", "escena": "A clay tray holding bread, a water jug, a small house and a book" },
+      { "clave": "bienestar-social", "escena": "A clay neighbourhood with a clinic, a school, a park and small figures moving between them" },
+      { "clave": "enfoque-de-derechos", "escena": "A clay shelf where identical cards sit within reach of every figure standing before it" }
+    ]
+  },
+  {
+    "slug": "notacion-cientifica",
+    "items": [
+      { "clave": "sistema-internacional-si", "escena": "A clay shelf with seven different measuring instruments standing in a row" },
+      { "clave": "prefijos-del-si", "escena": "A clay set of measuring jars, each one ten times larger than the one before" },
+      { "clave": "notacion-cientifica", "escena": "A clay long row of round zeros being folded up into one small compact block" },
+      { "clave": "conversion-de-unidades", "escena": "A clay funnel turning a pile of large blocks into a pile of small cubes" },
+      { "clave": "magnitud", "escena": "A clay ruler, a scale and a stopwatch laid out together on a bench" },
+      { "clave": "exponente", "escena": "A clay slider moving a single bead along a row of round zeros" }
+    ]
+  },
+  {
+    "slug": "ondas-amplitud-frecuencia",
+    "items": [
+      { "clave": "onda", "escena": "A clay rope shaken into travelling humps with a bead on it bobbing in place" },
+      { "clave": "amplitud-a", "escena": "Two clay wave ribbons side by side, one with tall humps and one with shallow humps" },
+      { "clave": "frecuencia-f-y-periodo-t", "escena": "A clay wave with a stopwatch measuring one full hump and a counter standing beside it" },
+      { "clave": "longitud-de-onda", "escena": "A clay wave ribbon with a measuring stick laid between two crests" },
+      { "clave": "velocidad-de-propagacion-v-f", "escena": "A clay wave travelling along a rope with an arrow marking how fast the crest moves" },
+      { "clave": "efecto-doppler", "escena": "A clay ambulance driving past with waves bunched up ahead of it and stretched out behind" },
+      { "clave": "frecuencia-f", "escena": "A clay wave with a counter clicking once at every crest" },
+      { "clave": "periodo-t", "escena": "A clay pendulum with a stopwatch measuring one full swing" },
+      { "clave": "ondas-transversales-y-longitudinales", "escena": "A clay rope shaken up and down beside a clay spring pushed back and forth" }
+    ]
+  },
+  {
+    "slug": "operaciones-binomios-mosaicos",
+    "items": [
+      { "clave": "variable", "escena": "A single clay rectangular tile standing on its edge on a board, longer than it is wide" },
+      { "clave": "coeficiente", "escena": "Three identical clay rectangular tiles stacked in a neat row on a board" },
+      { "clave": "termino-semejante", "escena": "Two identical clay tiles side by side with a differently shaped tile pushed aside" },
+      { "clave": "grado", "escena": "A clay cube, a flat square tile and a small unit cube lined up in descending size" },
+      { "clave": "modelo-de-area", "escena": "A clay rectangle divided into a grid of large squares, long strips and small unit tiles" },
+      { "clave": "monomio", "escena": "One clay tile alone in the middle of a wooden board" },
+      { "clave": "binomio", "escena": "Two clay tiles of different shapes side by side on a board" },
+      { "clave": "trinomio", "escena": "Three clay tiles of different shapes lined up on a board" },
+      { "clave": "polinomio", "escena": "Four clay tiles of different shapes lined up on a board" },
+      { "clave": "distributiva", "escena": "A clay rectangle split into two parts with a hand sliding one part away from the other" },
+      { "clave": "terminos-semejantes", "escena": "Two piles of clay tiles: identical squares in one and identical long strips in the other" }
+    ]
+  },
+  {
+    "slug": "optica-lentes-espejos",
+    "items": [
+      { "clave": "reflexion-de-la-luz", "escena": "A clay mirror with a beam striking it and bouncing away at exactly the same angle" },
+      { "clave": "refraccion-y-ley-de-snell", "escena": "A clay beam bending as it enters a block of glass standing in a tank of water" },
+      { "clave": "reflexion-total-interna", "escena": "A clay beam inside a glass block bouncing off the inner surface instead of leaving it" },
+      { "clave": "ecuacion-de-gauss-lentes", "escena": "A clay lens on a bench with an object on one side and its inverted image on the other, rulers measuring both" },
+      { "clave": "dispersion", "escena": "A clay prism splitting a white beam into a fan of rainbow colours" },
+      { "clave": "refraccion-de-la-luz", "escena": "A clay straw appearing bent exactly where it enters a glass of water" },
+      { "clave": "indice-de-refraccion-n", "escena": "Three clay blocks of air, water and glass with a beam bending more sharply in each" },
+      { "clave": "dispersion-de-la-luz", "escena": "A clay prism with a violet beam bending more sharply than a red one beside it" },
+      { "clave": "lentes-convergentes-y-divergentes", "escena": "Two clay lenses side by side, one gathering beams to a point and the other spreading them apart" }
+    ]
+  },
+  {
+    "slug": "optimizacion-cilindro",
+    "items": [
+      { "clave": "funcion-objetivo", "escena": "A clay dial with a needle being pushed toward its highest mark" },
+      { "clave": "restriccion", "escena": "A clay box of fixed size with a shape being fitted carefully inside it" },
+      { "clave": "punto-critico", "escena": "A clay hilltop with a flat plate laid exactly on its summit" },
+      { "clave": "segunda-derivada-y-verificacion", "escena": "A clay cup with a ball resting at its bottom beside an upturned cup with a ball balanced on top" },
+      { "clave": "cilindro-sin-tapa", "escena": "A clay open topped can on a bench with a ruler showing its height equal to its radius" },
+      { "clave": "procedimiento-de-optimizacion", "escena": "A clay staircase of four steps with a different tool on each, leading up to a small flag" },
+      { "clave": "optimizacion-en-geometria", "escena": "A clay loop of string being shaped into the largest possible enclosed area on a board" },
+      { "clave": "optimizacion-en-economia", "escena": "A clay balance between a stack of coins earned and a stack of coins spent, with a peak marker above" },
+      { "clave": "teorema-del-valor-extremo", "escena": "A clay ribbon stretched between two posts with beads marking its highest and lowest points" }
+    ]
+  },
+  {
+    "slug": "organica-visor",
+    "items": [
+      { "clave": "quimica-organica", "escena": "A clay carbon sphere with four rods sticking out, joined into a chain, a branch and a ring" },
+      { "clave": "alcano", "escena": "A clay chain of carbon spheres joined by single rods with small hydrogen beads all around" },
+      { "clave": "alqueno", "escena": "A clay chain with two of its spheres joined by a double rod in the middle" },
+      { "clave": "alcohol", "escena": "A clay carbon chain with a small red and white pair attached at one end, a bottle standing beside it" },
+      { "clave": "acido-carboxilico", "escena": "A clay chain ending in a cluster of red spheres beside a vinegar bottle and a lemon" },
+      { "clave": "grupo-funcional", "escena": "A clay molecule model with one distinctive cluster standing out at its end" },
+      { "clave": "hidrocarburo", "escena": "A clay model made only of dark spheres and small white beads, beside a drop of fuel" }
+    ]
+  },
+  {
+    "slug": "origen-vida-3d",
+    "items": [
+      { "clave": "hipotesis-abioticas", "escena": "A clay bench with mineral rocks on one side and simple organic models forming on the other" },
+      { "clave": "caldo-primordial-oparin-haldane", "escena": "A clay primitive ocean under a dark sky with lightning striking and a volcano smoking" },
+      { "clave": "experimento-de-miller-urey-1953", "escena": "A clay glass apparatus of connected flasks with sparking electrodes above and a flask of broth below" },
+      { "clave": "ventiladeros-hidrotermales", "escena": "A clay deep sea chimney venting dark mineral smoke on the ocean floor" },
+      { "clave": "mundo-arn", "escena": "A clay single ribbon strand folded into a shape that is also cutting another strand" },
+      { "clave": "panspermia", "escena": "A clay meteorite resting in a fresh crater with small organic models scattered around it" },
+      { "clave": "generacion-espontanea-refutada", "escena": "A clay swan necked flask of clear broth beside an open flask gone cloudy" },
+      { "clave": "hipotesis-de-oparin-haldane-sopa-primordial", "escena": "A clay warm shallow sea under lightning with small molecules gathering in the water" },
+      { "clave": "coacervados-y-protocelulas", "escena": "A clay cluster of droplets in water, each holding molecules inside a thin skin" },
+      { "clave": "hipotesis-del-mundo-de-arn", "escena": "A clay ribbon strand acting at once as a stored coil and as a working tool" }
+    ]
+  },
+  {
+    "slug": "oxigenacion-atmosfera-3d",
+    "items": [
+      { "clave": "sumideros-de-oxigeno", "escena": "A clay sea with rusting iron flakes sinking and volcanic gases bubbling, swallowing the oxygen bubbles" },
+      { "clave": "formaciones-de-hierro-bandeado", "escena": "A clay rock slab with alternating dark red and pale bands" },
+      { "clave": "gran-evento-de-oxidacion", "escena": "A clay Earth with its sky turning from hazy brown to clear blue along a dividing line" },
+      { "clave": "estromatolitos", "escena": "A clay dome of layered rock rising in shallow water with bubbles at its surface" },
+      { "clave": "escudo-de-ozono", "escena": "A clay Earth wrapped in a thin high shell that blocks most of a harsh beam" },
+      { "clave": "respiracion-aerobia", "escena": "A clay bean shaped pod with a sugar cube and an air bubble going in and a large pile of energy tokens coming out" }
+    ]
+  }
+]

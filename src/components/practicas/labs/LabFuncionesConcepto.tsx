@@ -28,6 +28,11 @@ import {
 } from "./funciones-concepto-data";
 import { LabSfx } from "./lab-audio";
 
+import { TableroObjetivos } from "./_objetivos";
+
+/** Clave de la mejor marca de este laboratorio. */
+const RETO_KEY = "cen-funciones-concepto-reto";
+
 const FuncionesConceptoScene = dynamic(() => import("./FuncionesConceptoScene"), {
   ssr: false,
   loading: () => (
@@ -503,20 +508,17 @@ export function LabFuncionesConcepto({ color }: PracticaLabProps) {
           <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
           Objetivos
         </Eyebrow>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-          {[
-            { txt: "Mueve la entrada x y observa la única salida f(x)", done: true },
-            { txt: "Aplica la prueba de la línea vertical en modo ¿Es función?", done: true },
-            { txt: "Distingue una relación que sí es función de una que no lo es", done: true },
-            { txt: "Explora las 4 representaciones (tabular, gráfica, algebraica, verbal)", done: true },
+        <TableroObjetivos
+          retoKey={RETO_KEY}
+          accent={accent}
+          objetivos={[
+            { txt: "Mueve la entrada x y observa la única salida f(x)", done: xPos !== r.xDef },
+            { txt: "Aplica la prueba de la línea vertical en modo ¿Es función?", done: modo === "test" },
+            { txt: "Encuentra una relación que NO es función (la recta vertical la corta dos veces)", done: modo === "test" && !r.esFuncion },
+            { txt: "Compara al menos dos relaciones distintas", done: relId !== REL_DEF },
             { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
-          ].map((o, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? "#34D399" : T.text2 }}>
-              <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-              <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-            </div>
-          ))}
-        </div>
+          ]}
+        />
       </div>
 
       {/* ── Reto evaluable: el ejercicio verbatim del ancla A2 ────────────── */}

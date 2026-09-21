@@ -1,0 +1,20 @@
+[
+  {
+    "slug": "aula-ingles-interacciones",
+    "items": [
+      { "clave": "classroom-language", "escena": "A chunky clay blackboard with three fat clay speech bubbles resting on its ledge, a small clay teacher figure beside it" },
+      { "clave": "pedir-permiso", "escena": "A small clay student figure at a classroom door with one hand raised, the door standing half open in front of it" },
+      { "clave": "aclarar-una-duda", "escena": "A clay figure holding up a small clay question-mark sculpture toward an open clay book on a desk" },
+      { "clave": "seguir-instrucciones", "escena": "Three small clay step tiles on a desk with a clay hand placing a pencil exactly on the third one" },
+      { "clave": "registro-formal", "escena": "A clay figure standing straight in front of a clay lectern, a neat clay speech bubble rising with squared edges" },
+      { "clave": "registro-informal", "escena": "Two clay figures leaning on a low clay wall side by side, a loose wobbly clay speech bubble passing between them" },
+      { "clave": "turno-de-habla", "escena": "Two clay figures facing each other with a single fat clay speech bubble resting on a small clay baton being handed over" },
+      { "clave": "may-i", "escena": "A small clay hand raised beside a closed clay door, a tiny clay key resting on the floor below it" },
+      { "clave": "i-don-t-understand", "escena": "A clay figure with a small clay fog cloud modelled over its head, an open book in its hands" },
+      { "clave": "can-you-repeat-that-please", "escena": "A clay speech bubble with a second identical bubble stacked just behind it, joined by a small clay loop arrow" },
+      { "clave": "work-in-pairs", "escena": "Two clay figures seated at one small clay desk sharing a single open notebook between them" },
+      { "clave": "hand-in-your-homework", "escena": "A clay hand placing a sheet of clay paper onto a neat stack in a shallow clay tray on a teacher's desk" },
+      { "clave": "i-agree-i-disagree", "escena": "Two small clay cards standing on a base, one with a raised clay check mark and the other with a raised clay cross, a figure beside each" }
+    ]
+  }
+]

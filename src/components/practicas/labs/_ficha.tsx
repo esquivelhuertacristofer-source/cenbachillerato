@@ -17,6 +17,7 @@
 import { useState, type ReactNode } from "react";
 import { T } from "./_kit";
 import { useLabImagen } from "../lab-imagen-context";
+import { useDentroDeExpedicion } from "../expedicion/expedicion-context";
 
 /* ── Forma de datos (la llena cada lab, verbatim) ─────────────────────── */
 export interface FichaConcepto {
@@ -64,7 +65,10 @@ export function FichaTeorica({
   rgba: string; // "r,g,b" del color de la UAC
   defaultOpen?: boolean;
 }) {
-  const [open, setOpen] = useState(defaultOpen);
+  // Dentro de una expedición la teoría ya se recorrió en el capítulo 1: aquí
+  // queda plegada, como material de consulta mientras se experimenta.
+  const enExpedicion = useDentroDeExpedicion();
+  const [open, setOpen] = useState(defaultOpen && !enExpedicion);
   const [tab, setTab] = useState<TabKey>("marco");
   // La carátula del laboratorio, si la ficha se monta dentro de una práctica.
   const imagen = useLabImagen();
@@ -135,7 +139,7 @@ export function FichaTeorica({
         <span style={{ flex: 1, minWidth: 0 }}>
           <span style={{ display: "block", fontSize: 16.5, fontWeight: 900, color: T.text, lineHeight: 1.15 }}>Ficha teórica</span>
           <span style={{ display: "block", fontSize: 12.5, color: T.text2, marginTop: 3 }}>
-            Marco teórico, objetivos, materiales, conceptos y glosario · <span style={{ color: accent, fontWeight: 700 }}>{data.ancla}</span>
+            {enExpedicion ? "Consulta la teoría sin salir del laboratorio" : "Marco teórico, objetivos, materiales, conceptos y glosario"} · <span style={{ color: accent, fontWeight: 700 }}>{data.ancla}</span>
           </span>
         </span>
         <span style={{ fontSize: 12, fontWeight: 800, color: T.text3, display: "inline-flex", alignItems: "center", gap: 8 }}>

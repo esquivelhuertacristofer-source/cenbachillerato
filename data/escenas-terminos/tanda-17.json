@@ -1,0 +1,193 @@
+[
+  {
+    "slug": "agora-ciudadania-3d",
+    "items": [
+      { "clave": "ciudadania-formal", "escena": "A clay identity card lying on a desk beside a small clay official stamp and an ink pad" },
+      { "clave": "ciudadania-sustantiva", "escena": "A clay figure walking up a small ramp toward an open clay doorway, with a wheelchair ramp and a handrail beside the steps" },
+      { "clave": "sufragio", "escena": "A clay hand dropping a folded paper slip into a clear clay ballot box with a slot on top" },
+      { "clave": "derecho-de-peticion", "escena": "A small clay figure handing a rolled document across a clay counter to a seated clerk figure" },
+      { "clave": "ciudadania-digital", "escena": "A clay smartphone held by a small clay hand, with a tiny clay shield and a speech bubble floating above the screen" },
+      { "clave": "participacion", "escena": "Five clay figures seated in a circle around a low round clay table, one standing with a raised hand" }
+    ]
+  },
+  {
+    "slug": "alcance-publicacion-3d",
+    "items": [
+      { "clave": "perspectiva-de-genero", "escena": "A clay balance scale with two clay figures of equal size, one on each pan, resting perfectly level" },
+      { "clave": "brecha-digital-de-genero", "escena": "Two clay hills separated by a gap, a clay figure with a laptop on the tall hill and another figure with empty hands on the low one" },
+      { "clave": "contenido-digital-de-calidad", "escena": "A clay laptop on a desk with a small clay magnifying glass and a stack of three tidy clay reference cards beside it" },
+      { "clave": "accesibilidad-digital", "escena": "A clay screen showing a caption bar at the bottom, with a clay ear shape and a clay eye shape modelled beside it" },
+      { "clave": "transformacion-social-digital", "escena": "A clay megaphone on a pedestal with ripples of clay circles spreading outward and small clay figures standing in the ripples" },
+      { "clave": "lenguaje-incluyente", "escena": "Three clay speech bubbles of different shapes joined by a clay ribbon, with three small clay figures of different heights beneath them" }
+    ]
+  },
+  {
+    "slug": "archivo-fuentes-historicas-3d",
+    "items": [
+      { "clave": "corroboracion-de-fuentes", "escena": "Two clay documents lying side by side on a table with a clay magnifying glass resting across both of them" },
+      { "clave": "evidencia-historica", "escena": "A clay clay-pot shard, a rolled parchment and a small framed portrait arranged together on a museum plinth" },
+      { "clave": "analisis-documental", "escena": "An aged clay letter spread flat on a desk beside clay tweezers, a magnifying glass and a small notebook" },
+      { "clave": "corroboracion-cruzada-cross-checking", "escena": "Four clay objects — a scroll, a painted vase, a photograph and a bone — arranged around a central clay lens, linked by thin clay threads" },
+      { "clave": "validacion-de-evidencias", "escena": "A clay document on a balance scale pan, weighed against a small clay seal, with a checkmark-shaped clay token nearby" },
+      { "clave": "suspension-del-juicio-historiografico", "escena": "A clay gavel resting on its side next to an open folder of documents, with a small clay question-mark sculpture beside it" }
+    ]
+  },
+  {
+    "slug": "bayes-probabilidad-condicional",
+    "items": [
+      { "clave": "regla-de-la-suma-general", "escena": "Two overlapping clay rings on a table, one dusty blue and one sage green, with a few small clay beads sitting in the shared overlap" },
+      { "clave": "regla-del-producto-eventos-independientes", "escena": "Two clay coins mid-flip above a table, each casting its own soft shadow, side by side and unconnected" },
+      { "clave": "probabilidad-condicional-p-a-b", "escena": "A clay funnel narrowing a stream of small clay beads down into a smaller cup below it" },
+      { "clave": "eventos-independientes-vs-dependientes", "escena": "On the left two separate clay dice; on the right two clay marbles being drawn from one bag by a small clay hand" },
+      { "clave": "diagrama-de-arbol", "escena": "A small clay tree sculpture with a thick trunk splitting into two branches and each branch splitting again into two twigs, each twig ending in a tiny bead" },
+      { "clave": "eventos-mutuamente-excluyentes", "escena": "Two clay rings placed apart on a table with no overlap, a small clay bead resting inside each one" }
+    ]
+  },
+  {
+    "slug": "casa-escuela-objetos-ingles-3d",
+    "items": [
+      { "clave": "desk", "escena": "A single clay school desk with a sloped top and a small chair tucked under it" },
+      { "clave": "backpack", "escena": "A chunky blue clay backpack standing upright with two straps and a front pocket" },
+      { "clave": "round-square", "escena": "A round clay wall clock and a square clay picture frame standing side by side" },
+      { "clave": "big-small", "escena": "A large clay table and a tiny clay table of the same shape standing next to each other" },
+      { "clave": "board", "escena": "A clay classroom board mounted on a wall with a small ledge holding a stick of chalk" }
+    ]
+  },
+  {
+    "slug": "caverna-conocimiento-3d",
+    "items": [
+      { "clave": "epistemologia", "escena": "A clay head sculpture opened like a lid, with a small clay lantern glowing inside it" },
+      { "clave": "percepcion", "escena": "A clay eye, a clay ear and a clay hand arranged in a row, each linked by a thin clay thread to a small central sphere" },
+      { "clave": "razon", "escena": "A clay figure seated with its chin on its fist, a small clay gear turning above its head" },
+      { "clave": "verdad", "escena": "A clay key fitting exactly into a clay keyhole plate lying flat on a table" },
+      { "clave": "posverdad", "escena": "A clay heart sculpture sitting heavily on one pan of a balance scale, lifting a small clay fact-brick on the other pan" }
+    ]
+  },
+  {
+    "slug": "centro-datos-huella-nube-3d",
+    "items": [
+      { "clave": "colonialismo-de-datos", "escena": "A large clay server tower drawing thin clay threads out of a cluster of tiny clay houses arranged below it" },
+      { "clave": "mercantilizacion-de-la-atencion", "escena": "A clay eye sitting on a market scale pan, with a small clay price tag hanging from the scale arm" },
+      { "clave": "dependencia-tecnologica", "escena": "A small clay figure standing on a platform held up by a single thick cable running off to a large distant clay server block" },
+      { "clave": "brecha-digital", "escena": "Two clay plateaus separated by a ravine, a clay antenna tower on one side and a bare hilltop on the other" }
+    ]
+  },
+  {
+    "slug": "ciudad-direcciones-ingles-3d",
+    "items": [
+      { "clave": "go-straight", "escena": "A straight clay street running forward between two rows of small clay buildings, with a clay arrow lying flat on the road pointing ahead" },
+      { "clave": "turn-left-turn-right", "escena": "A clay street corner with two bent clay arrows on the asphalt, one curving left and one curving right" },
+      { "clave": "next-to-across-from", "escena": "Two small clay buildings side by side and a third clay building facing them from the opposite side of a narrow street" },
+      { "clave": "into-across", "escena": "A clay figure stepping through a doorway of a small clay building while another clay figure walks over a striped crossing" },
+      { "clave": "places-in-town", "escena": "Four tiny clay buildings arranged in a row: a park with a tree, a hospital block, a market stall and a bus shelter" },
+      { "clave": "by-bus-on-foot", "escena": "A chunky clay city bus beside a pair of small clay walking shoes on the pavement" }
+    ]
+  },
+  {
+    "slug": "clima-vestimenta-ingles-3d",
+    "items": [
+      { "clave": "tall-short", "escena": "Two clay figures standing side by side, one clearly taller than the other" },
+      { "clave": "curly-straight-wavy", "escena": "Three clay heads in a row with three different hair shapes: tight curls, flat straight strands and soft waves" },
+      { "clave": "to-wear", "escena": "A clay figure wearing a blue shirt, standing beside a small clay coat rack with a jacket hanging on it" },
+      { "clave": "sunny-cloudy-rainy", "escena": "Three small clay weather tokens in a row: a sun, a cloud and a cloud with raindrops hanging below it" },
+      { "clave": "it-is-raining-snowing", "escena": "A clay cloud above a small clay house, dropping raindrops on one side and soft snowflakes on the other" },
+      { "clave": "to-have-has", "escena": "A clay head with large green eyes, beside a tiny clay hand holding a small mirror" }
+    ]
+  },
+  {
+    "slug": "conjuntos-venn-3d",
+    "items": [
+      { "clave": "conjunto", "escena": "A shallow clay bowl holding five small clay shapes of different colours" },
+      { "clave": "elemento-pertenencia", "escena": "A clay hand placing one small bead inside a shallow clay ring, while another bead rests outside the ring" },
+      { "clave": "subconjunto", "escena": "A small clay ring resting entirely inside a larger clay ring, with beads inside the small one" },
+      { "clave": "conjunto-vacio", "escena": "A single empty clay ring on a plain table, nothing inside it" },
+      { "clave": "conjunto-universal-u", "escena": "A large clay rectangular tray holding several smaller clay rings, each with a few beads inside" },
+      { "clave": "union", "escena": "Two overlapping clay rings filled edge to edge with beads across both rings and their overlap" }
+    ]
+  },
+  {
+    "slug": "consumo-energetico-hogar-3d",
+    "items": [
+      { "clave": "consumo-energetico", "escena": "A small clay house with a chunky clay electricity meter mounted on its outside wall, its dial slightly turned" },
+      { "clave": "eficiencia-energetica", "escena": "Two clay light bulbs side by side, a small slim one and a large bulky one, both glowing equally bright" },
+      { "clave": "impacto-ambiental", "escena": "A clay factory chimney releasing a soft clay plume that drifts over a small clay tree and a pond" },
+      { "clave": "sustentabilidad", "escena": "A clay seedling in cupped clay hands, with a small clay sun above and a little clay water drop beside it" }
+    ]
+  },
+  {
+    "slug": "contaminantes-plasticos-3d",
+    "items": [
+      { "clave": "microplastico", "escena": "A clay water glass filled with clear resin holding dozens of tiny coloured clay flecks suspended inside it" },
+      { "clave": "contaminante-organico-persistente-cop", "escena": "A sealed clay drum lying on cracked clay ground, unchanged while small clay plants grow crooked around it" },
+      { "clave": "bioacumulacion", "escena": "Three clay fish of increasing size stacked in a stepped row, each holding more dark clay specks inside its pale body" },
+      { "clave": "metal-pesado", "escena": "A heavy grey clay cube sinking into a shallow clay dish of water, pressing a deep dent into the surface" },
+      { "clave": "economia-circular", "escena": "Three clay objects — a bottle, a flake and a new bottle — arranged in a closed ring with clay arrows between them" },
+      { "clave": "fotodegradacion-de-plasticos", "escena": "A clay sun above a clay bottle lying on sand, the bottle cracking into progressively smaller clay fragments toward one end" }
+    ]
+  },
+  {
+    "slug": "correlacion-variables-3d",
+    "items": [
+      { "clave": "variable-cualitativa", "escena": "Three clay bins on a shelf, each holding clay tokens of a single colour: red in one, blue in another, green in the third" },
+      { "clave": "variable-cuantitativa", "escena": "A clay ruler lying flat with a small clay measuring cup and a clay weight resting beside it" },
+      { "clave": "tabla-de-contingencia", "escena": "A clay tray divided into four square compartments in a two-by-two grid, each holding a different number of small beads" },
+      { "clave": "independencia", "escena": "Two identical clay jars side by side, each holding the same mix of red and blue beads in the same proportion" },
+      { "clave": "asociacion", "escena": "Two clay jars side by side, one mostly red beads and the other mostly blue beads, clearly different mixes" },
+      { "clave": "diagrama-de-dispersion", "escena": "A clay board with dozens of small pins scattered across it, loosely following a rising diagonal band" }
+    ]
+  },
+  {
+    "slug": "cortesia-conversacion-ingles-3d",
+    "items": [
+      { "clave": "how-have-you-been", "escena": "Two clay figures meeting on a street corner, one with an open raised hand, both leaning slightly toward each other" },
+      { "clave": "excuse-me-could-i", "escena": "A clay figure with one hand gently raised, standing beside a seated clay figure at a desk who is turning to look up" },
+      { "clave": "backchannels-really-that-s-great", "escena": "A clay figure nodding with a small round speech bubble above its head, facing another clay figure who is talking" },
+      { "clave": "by-the-way", "escena": "Two clay speech bubbles joined by a small clay side branch that curves off to one side" },
+      { "clave": "anyway-i-should-get-going", "escena": "A clay figure standing up from a chair with a bag already on its shoulder, one foot turned toward the door" },
+      { "clave": "it-was-nice-great-talking-to-you", "escena": "Two clay figures shaking hands warmly, each with a small hand raised in a wave" }
+    ]
+  },
+  {
+    "slug": "descubrimiento-celula-3d",
+    "items": [
+      { "clave": "celula", "escena": "A single rounded clay cell with a soft outer membrane and a darker sphere nested inside it, resting on a glass slide" },
+      { "clave": "microscopio", "escena": "A chunky clay microscope with a tilted eyepiece, a round stage and a small mirror underneath" },
+      { "clave": "robert-hooke", "escena": "A thin slice of clay cork under a brass clay microscope, its surface modelled as a honeycomb of tiny empty chambers" },
+      { "clave": "anton-van-leeuwenhoek", "escena": "A small handheld clay lens plate held up beside a clay drop of pond water with tiny wriggling clay shapes inside it" },
+      { "clave": "matthias-schleiden", "escena": "A clay plant leaf on a slide, its surface modelled as a tight mosaic of small rounded cells" },
+      { "clave": "theodor-schwann", "escena": "A clay slice of animal tissue on a slide, its surface modelled as rounded overlapping cells, beside a small clay frog figure" }
+    ]
+  },
+  {
+    "slug": "dilema-tranvia-etica-3d",
+    "items": [
+      { "clave": "etica", "escena": "A clay compass with its needle steady, resting on an open clay book" },
+      { "clave": "moral", "escena": "A cluster of small clay houses around a shared courtyard, with a clay stone tablet standing at its centre" },
+      { "clave": "justicia", "escena": "A clay balance scale in perfect equilibrium, a small clay figure standing on each pan" },
+      { "clave": "libertad", "escena": "A clay bird lifting off from an open clay hand, an unlatched small cage door behind it" },
+      { "clave": "dilema-moral", "escena": "A clay path splitting into two equal branches, a small clay figure standing exactly at the fork" }
+    ]
+  },
+  {
+    "slug": "energias-renovables-mexico-3d",
+    "items": [
+      { "clave": "matriz-energetica", "escena": "A clay pie-shaped disc split into wedges of different colours, with a tiny wind turbine, a solar panel and a fuel drum standing on separate wedges" },
+      { "clave": "energia-geotermica", "escena": "A cutaway clay hillside with a pipe drilled into glowing orange rock, steam rising from a small plant at the surface" },
+      { "clave": "capacidad-instalada", "escena": "A row of five identical clay wind turbines on a ridge, with a chunky clay gauge dial standing beside them" },
+      { "clave": "soberania-energetica", "escena": "A clay dam and power plant inside a low clay boundary wall, with a small national flag pole beside it" },
+      { "clave": "esg-environmental-social-governance", "escena": "Three clay tokens arranged in a triangle on a desk: a leaf, a group of small figures and a small columned building" },
+      { "clave": "energia-renovable", "escena": "A clay landscape with a wind turbine, a solar panel and a small waterfall, all feeding thin clay cables toward a single post" }
+    ]
+  },
+  {
+    "slug": "estadistica-enganosa-3d",
+    "items": [
+      { "clave": "correlacion-vs-causalidad", "escena": "Two clay bars rising together side by side, with a broken clay arrow lying on the table between them" },
+      { "clave": "riesgo-relativo-vs-riesgo-absoluto", "escena": "A large clay magnifying glass held over two nearly identical tiny clay cubes, making one look far bigger" },
+      { "clave": "manipulacion-grafica", "escena": "A clay bar chart whose baseline plank has been sawn off and propped up, so short bars look tall" },
+      { "clave": "tamano-y-representatividad-de-la-muestra", "escena": "A tiny clay scoop holding three beads beside a large clay bowl holding hundreds of mixed beads" },
+      { "clave": "afirmaciones-sin-contexto-y-cherry-picking", "escena": "A clay hand plucking one bright cherry from a branch while the rest of the fruit lies ignored on the table below" },
+      { "clave": "preguntas-para-evaluar-una-estadistica", "escena": "A clay clipboard on a desk with a magnifying glass resting on it and three small clay question-mark sculptures standing in a row beside it" }
+    ]
+  }
+]

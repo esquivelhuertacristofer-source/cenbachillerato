@@ -1,0 +1,165 @@
+[
+  {
+    "slug": "deforestacion",
+    "items": [
+      { "clave": "deterioro-ambiental", "escena": "A clay landscape split into three strips: a smoking factory, a field of bare stumps and a cracked dry riverbed" },
+      { "clave": "servicios-ecosistemicos", "escena": "A clay forest hillside with a clear stream running out of it, a nest in a branch and thick roots gripping the slope" },
+      { "clave": "trampa-de-sinergias", "escena": "A clay ring of arrows joining a bare hillside, a hot sun and a small fire, each feeding the next" },
+      { "clave": "ganaderia-extensiva", "escena": "A clay pasture with cows grazing beside a line of freshly cut stumps at the forest edge" },
+      { "clave": "bioacumulacion-y-biomagnificacion", "escena": "Three clay animals stacked in a chain, each one holding more dark specks inside than the one below" },
+      { "clave": "cambio-climatico-antropogenico", "escena": "A clay Earth globe with a thermometer stuck into it and small factory chimneys around its base" },
+      { "clave": "deforestacion", "escena": "A clay hillside half covered in trees and half reduced to bare stumps, with an axe leaning at the boundary" },
+      { "clave": "lluvia-acida", "escena": "A clay cloud raining onto a forest with curling leaves and a stone statue with a pitted surface" },
+      { "clave": "biomagnificacion", "escena": "A clay pyramid of animals from small at the base to large at the top, the dark specks inside growing denser toward the top" },
+      { "clave": "eutrofizacion", "escena": "A clay pond thick with green scum, a fish floating at the surface and a fertiliser sack spilling at the bank" },
+      { "clave": "huella-de-carbono", "escena": "A large clay footprint pressed into the ground made of tiny grey puffs, with a car and a house standing inside it" }
+    ]
+  },
+  {
+    "slug": "derivada-secante-tangente",
+    "items": [
+      { "clave": "cociente-diferencial-incremental", "escena": "A clay curve on a board with a straight stick crossing it at two beads and two small blocks measuring the rise and the run" },
+      { "clave": "derivada-en-un-punto", "escena": "A clay curve with a single straight stick balanced so it touches at one bead only" },
+      { "clave": "funcion-derivada-f-x", "escena": "A clay curve on the upper half of a board and a second curve below it, with thin sticks linking matching points" },
+      { "clave": "recta-tangente", "escena": "A clay curve with a straight stick resting on it, touching at exactly one bead" },
+      { "clave": "recta-secante-vs-recta-tangente", "escena": "A clay curve with three sticks laid across it, each crossing at closer beads until the last one just touches" },
+      { "clave": "no-derivabilidad", "escena": "A clay ribbon with a sharp pointed kink in the middle where no straight stick can rest flat" }
+    ]
+  },
+  {
+    "slug": "descubrimiento-celula-3d",
+    "items": [
+      { "clave": "aumento-total", "escena": "A clay microscope with two lenses stacked in its barrel and a tiny speck shown enlarged on a card beside it" },
+      { "clave": "tamano-real", "escena": "A clay ruler lying beside a small glass slide with a tiny dot marked on it" },
+      { "clave": "resolucion", "escena": "Two clay cards side by side, one showing two clearly separate dots and the other showing them blurred into one" },
+      { "clave": "limite-de-difraccion-abbe-1873", "escena": "A clay lens over two dots set very close together, merging into one no matter how large the lens" },
+      { "clave": "aumento-vacio", "escena": "A clay projector throwing a blurred blob onto a screen, much bigger but no clearer" },
+      { "clave": "microscopio-electronico", "escena": "A tall clay column machine with a beam running down its centre and a sharp image card beside it" },
+      { "clave": "generacion-espontanea", "escena": "A clay swan necked flask of clear broth on a bench beside an open flask clouded with growth" }
+    ]
+  },
+  {
+    "slug": "deteccion-fake-news",
+    "items": [
+      { "clave": "ciberetnografia", "escena": "A clay notebook and magnifying glass resting on a laptop that shows a small group of figures" },
+      { "clave": "analisis-de-contenido-en-linea", "escena": "A clay stack of printed screenshots being sorted into separate trays by a small hand" },
+      { "clave": "grupo-focal", "escena": "Five clay figures seated in a small circle with a recorder standing in the middle" },
+      { "clave": "entrevista", "escena": "Two clay figures facing each other across a table with a microphone and a notepad between them" },
+      { "clave": "licencia-permisiva", "escena": "A clay open padlock resting on a document while a hand freely lifts a copy of it away" }
+    ]
+  },
+  {
+    "slug": "diferencial-linealizacion",
+    "items": [
+      { "clave": "diferencial-dy", "escena": "A clay curve with a straight stick resting tangent to it and a small step block measuring along the stick" },
+      { "clave": "incremento-real-y", "escena": "A clay curve with two beads on it and a vertical block measuring the true rise between them" },
+      { "clave": "linealizacion-l-x", "escena": "A clay curve with a straight stick laid along it near one bead, the two almost overlapping there" },
+      { "clave": "punto-base-a", "escena": "A clay curve with a single marked bead and a stick pinned exactly at that bead" },
+      { "clave": "propagacion-del-error", "escena": "A clay funnel where a small wobble at the narrow top becomes a wide swing at the bottom" },
+      { "clave": "error-de-la-aproximacion-lineal", "escena": "A clay curve and a straight stick beside it, with a thin wedge of space between them widening away from the touch point" },
+      { "clave": "linealizacion-aproximacion-lineal", "escena": "A clay curve with a straight ruler resting on it at one point, matching it closely just nearby" },
+      { "clave": "error-en-la-aproximacion-lineal", "escena": "A clay gap between a curve and a straight stick, measured by a tiny wedge block set into it" },
+      { "clave": "aplicacion-estimacion-de-raices-y-potencias", "escena": "A clay square tile beside a slightly larger square, with a thin strip block added to bridge the difference" },
+      { "clave": "diferencial-en-contextos-de-error", "escena": "A clay measuring tape on a plank with a small uncertainty block at its end and a much bigger block on the result side" }
+    ]
+  },
+  {
+    "slug": "dilema-tranvia-etica-3d",
+    "items": [
+      { "clave": "experimento-mental", "escena": "A clay model railway on a table with a lever, exactly one piece removed and set aside on the bench" },
+      { "clave": "prever-frente-a-usar", "escena": "Two clay scenes on one base: a lever being pulled from a distance, and a hand pushing a figure directly" },
+      { "clave": "doctrina-del-doble-efecto", "escena": "A clay lamp casting two shadows from one object, one bright patch and one dark patch" },
+      { "clave": "utilitarismo-de-actos-y-de-reglas", "escena": "A clay balance weighing a single small act on one pan and a whole thick rulebook on the other" },
+      { "clave": "hechos-y-valores", "escena": "A clay stone tablet lying beside a small heart on a table" },
+      { "clave": "falacia", "escena": "A clay chair with one leg made of a bent straw, looking solid but unable to stand" }
+    ]
+  },
+  {
+    "slug": "discriminante",
+    "items": [
+      { "clave": "formula-general-cuadratica", "escena": "A clay machine with a funnel taking three blocks in at the top and dropping two beads out at the bottom" },
+      { "clave": "discriminante", "escena": "A clay dial with three marked positions and a small window showing a bead inside" },
+      { "clave": "0-dos-raices-reales-distintas", "escena": "A clay arch curve crossing a flat bar at two clearly separated beads" },
+      { "clave": "0-raiz-doble-real-repetida", "escena": "A clay arch curve just touching a flat bar at a single bead" },
+      { "clave": "0-sin-raices-reales", "escena": "A clay arch curve floating entirely above a flat bar, never touching it" },
+      { "clave": "numeros-complejos-cuando-0", "escena": "A clay board with a flat bar and a second bar rising out of the plane, a bead floating off the flat line" },
+      { "clave": "raiz-doble", "escena": "A clay parabola resting exactly on a flat bar with one bead at the point where they touch" },
+      { "clave": "uso-practico-del-discriminante", "escena": "A clay sorting tray with three slots and a curve shaped card being dropped into one of them" }
+    ]
+  },
+  {
+    "slug": "distribucion-normal",
+    "items": [
+      { "clave": "distribucion-normal-campana-de-gauss", "escena": "A clay bell shaped mound of sand on a board, tall at the middle and thinning to nothing at the edges" },
+      { "clave": "media", "escena": "A clay bell shaped mound with a post planted exactly at its peak" },
+      { "clave": "desviacion-estandar", "escena": "Two clay bell shaped mounds side by side, one narrow and tall, the other wide and low" },
+      { "clave": "regla-empirica-68-95-99-7", "escena": "A clay bell shaped mound divided by three pairs of posts set at widening distances from the centre" },
+      { "clave": "area-probabilidad", "escena": "A clay bell shaped mound with the slice between two posts lifted out and set on the table beside it" },
+      { "clave": "puntuacion-z", "escena": "A clay bell shaped mound with a ruler laid across its base measuring outward from the centre in equal steps" },
+      { "clave": "distribucion-normal", "escena": "A clay bell shaped curve standing upright on a board, perfectly symmetric on both sides" },
+      { "clave": "varianza", "escena": "A clay board with beads spread out from a centre post, each joined to it by a small square block" },
+      { "clave": "normal-estandar", "escena": "A clay bell shaped mound centred on a post with identical unit blocks marking each step outward" },
+      { "clave": "medidas-de-tendencia-central", "escena": "A clay bell shaped mound with three different markers all planted at the same point on its peak" },
+      { "clave": "medidas-de-dispersion", "escena": "Two clay trays of beads, one tightly packed and one scattered wide, with a measuring stick lying between them" }
+    ]
+  },
+  {
+    "slug": "diversidad-discriminacion",
+    "items": [
+      { "clave": "estratificacion-social", "escena": "A clay pyramid of stacked layers with small figures standing on each level, fewer and fewer toward the top" },
+      { "clave": "coeficiente-de-gini", "escena": "A clay board with a sagging cord below a straight diagonal stick, the gap between them filled with a coloured wedge" },
+      { "clave": "sociedad-civil", "escena": "A clay group of small figures gathered around a shared table standing between a government building and a shop" },
+      { "clave": "corporativismo", "escena": "A clay hand reaching down from above holding strings attached to three neatly arranged groups of figures" },
+      { "clave": "movimiento-social", "escena": "A clay crowd of figures marching together carrying one long banner" },
+      { "clave": "organizacion-comunitaria", "escena": "A clay group of neighbours together raising a shared roof over a small courtyard" },
+      { "clave": "diversidad-cultural", "escena": "A clay table set with different dishes, instruments and woven textiles from several traditions" },
+      { "clave": "discriminacion", "escena": "A clay queue of figures where one is held back by a barrier while the others pass through" },
+      { "clave": "racismo", "escena": "Two clay doors side by side, one open and one shut, with figures of different colours sorted between them" },
+      { "clave": "exclusion-social", "escena": "A clay ring of figures holding hands with one figure left standing outside the circle" }
+    ]
+  },
+  {
+    "slug": "division-celular",
+    "items": [
+      { "clave": "mitosis", "escena": "A clay round cell on a glass slide splitting into two identical smaller cells" },
+      { "clave": "meiosis", "escena": "A clay round cell splitting twice in a row into four smaller cells, each a slightly different colour mix" },
+      { "clave": "ploidia-2n-y-n", "escena": "Two clay trays: one holding rods arranged in matched pairs, the other holding single rods" },
+      { "clave": "crossing-over", "escena": "Two clay rods lying across each other, swapping a coloured segment at the point where they cross" },
+      { "clave": "division-reduccional-vs-ecuacional", "escena": "Two clay scenes on one base: whole paired rods being pulled apart, and single rods being split lengthwise" },
+      { "clave": "recombinacion-y-biodiversidad", "escena": "A row of four clay cells, each holding a different mix of coloured segments" },
+      { "clave": "cromosoma", "escena": "A clay X shaped rod standing on a base, coiled tightly from a long thread" },
+      { "clave": "cromatida-hermana", "escena": "A clay X shaped rod whose two identical halves are joined at a middle pinch" },
+      { "clave": "cromosomas-homologos", "escena": "Two clay X shaped rods of the same size standing side by side, one in each of two colours" },
+      { "clave": "diploide-2n", "escena": "A clay tray holding rods arranged neatly in matched pairs" },
+      { "clave": "haploide-n", "escena": "A clay tray holding single rods with no pairs among them" },
+      { "clave": "recombinacion-genetica", "escena": "Two clay rods exchanging coloured segments and ending up with new mixed patterns" },
+      { "clave": "gameto", "escena": "A small clay cell with a tail beside a larger round cell on a glass slide" }
+    ]
+  },
+  {
+    "slug": "ecuacion-cuadratica",
+    "items": [
+      { "clave": "ecuacion-cuadratica", "escena": "A clay arch curve standing on a board above a flat bar" },
+      { "clave": "discriminante", "escena": "A clay keyhole plate with three differently shaped keys lying beside it" },
+      { "clave": "factorizacion", "escena": "A clay rectangle split cleanly into two pieces that match its sides exactly" },
+      { "clave": "completar-el-cuadrado", "escena": "A clay square with one corner block missing and a hand fitting the last block into place" },
+      { "clave": "formula-general-cuadratica", "escena": "A clay machine with a crank: three blocks go into the funnel and two beads roll out below" },
+      { "clave": "raiz-doble", "escena": "A clay arch resting exactly on a flat bar with a single bead at the touching point" },
+      { "clave": "raices-soluciones-de-la-ecuacion", "escena": "A clay arch crossing a flat bar with a bead marking each of the two crossings" },
+      { "clave": "verificacion-de-una-raiz", "escena": "A clay balance with a bead being placed on one pan, bringing it perfectly level with the other" }
+    ]
+  },
+  {
+    "slug": "ecuacion-lineal-balanza",
+    "items": [
+      { "clave": "propiedad-reflexiva", "escena": "A clay balance with the same object on both pans, resting perfectly level" },
+      { "clave": "propiedad-simetrica", "escena": "A clay balance with its two objects being swapped between the pans, still level" },
+      { "clave": "propiedad-transitiva", "escena": "Three clay balances in a row, each one level, chaining the first object through to the third" },
+      { "clave": "propiedad-de-uniformidad", "escena": "A clay balance with an identical block being added to both pans at once, staying level" },
+      { "clave": "igualdad", "escena": "A clay balance with four small cubes on one pan and three cubes plus one on the other, resting level" },
+      { "clave": "identidad", "escena": "A clay square made of four coloured pieces beside the same pieces rearranged, both filling the same frame" },
+      { "clave": "ecuacion", "escena": "A clay balance with a closed covered box on one pan and loose cubes on the other, resting level" },
+      { "clave": "incognita", "escena": "A clay covered box with its lid closed, sitting alone on one pan of a balance" }
+    ]
+  }
+]

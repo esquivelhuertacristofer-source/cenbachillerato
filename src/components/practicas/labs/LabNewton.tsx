@@ -31,6 +31,11 @@ import {
   type Modo,
 } from "./newton-data";
 
+import { TableroObjetivos } from "./_objetivos";
+
+/** Clave de la mejor marca de este laboratorio. */
+const RETO_KEY = "cen-dcl-leyes-newton-reto";
+
 const NewtonScene = dynamic(() => import("./NewtonScene"), {
   ssr: false,
   loading: () => (
@@ -480,19 +485,17 @@ export function LabNewton({ color }: PracticaLabProps) {
           <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
           Objetivos
         </Eyebrow>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-          {[
-            { txt: "Identifica las fuerzas en el diagrama de cuerpo libre", done: true },
-            { txt: "Explora los 3 escenarios: horizontal, inclinado y polea", done: ESCENARIOS.every((e) => e.modo === modo || true) },
-            { txt: "Observa cuándo ΣF = 0 (equilibrio) y cuándo ΣF ≠ 0 (a = ΣF/m)", done: d.mueve },
+        <TableroObjetivos
+          retoKey={RETO_KEY}
+          accent={accent}
+          objetivos={[
+            { txt: "Analiza el plano inclinado: el peso se reparte en dos componentes", done: modo === "inclinado" },
+            { txt: "Pasa al plano horizontal y al sistema de polea", done: modo === "horizontal" || modo === "polea" },
+            { txt: "Consigue el equilibrio: ΣF = 0 y el cuerpo no acelera", done: !d.mueve },
+            { txt: "Rompe el equilibrio: ΣF ≠ 0 y aparece la aceleración a = ΣF/m", done: d.mueve },
             { txt: "Resuelve el reto evaluable de la actividad", done: ejercicioAprobado },
-          ].map((o, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? "#34D399" : T.text2 }}>
-              <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-              <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-            </div>
-          ))}
-        </div>
+          ]}
+        />
       </div>
 
       {/* ── Reto evaluable: el quiz verbatim del ancla A3 ────────────── */}

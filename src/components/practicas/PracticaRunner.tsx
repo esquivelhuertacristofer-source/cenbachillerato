@@ -5,7 +5,7 @@ import type { AreaColor } from "@/components/hub/hub-colors";
 import { HubBreadcrumb } from "@/components/hub/HubBreadcrumb";
 import { mejorImagenDeLab } from "@/lib/practicas/lab-imagenes";
 import { getPractica } from "./registry";
-import { LabImagenProvider } from "./lab-imagen-context";
+import { ExpedicionPractica } from "./expedicion/ExpedicionPractica";
 
 interface PracticaRunnerProps {
   slug: string;
@@ -36,6 +36,23 @@ export function PracticaRunner({
   // Sólo tiene sentido si la práctica existe: sin componente no hay laboratorio
   // del que enseñar una imagen.
   const imagen = practica ? { src: mejorImagenDeLab(slug), alt: tituloPractica } : null;
+
+  // Con laboratorio: la práctica se abre como EXPEDICIÓN (portada, capítulos y
+  // cierre alrededor del mismo laboratorio de siempre). El armazón de abajo se
+  // conserva para las actividades cuyo laboratorio todavía no existe.
+  if (practica) {
+    return (
+      <ExpedicionPractica
+        slug={slug}
+        color={color}
+        backHref={backHref}
+        uacNombre={uacNombre}
+        uacCodigo={uacCodigo}
+        actividadCodigo={actividadCodigo}
+        actividadTitulo={actividadTitulo}
+      />
+    );
+  }
 
   return (
     <>
@@ -200,11 +217,7 @@ export function PracticaRunner({
                 >
                   {tituloPractica}
                 </h1>
-                {practica?.descripcion && (
-                  <p style={{ fontSize: 14, color: "rgba(255,255,255,0.55)", margin: "12px 0 0", maxWidth: 640, lineHeight: 1.5 }}>
-                    {practica.descripcion}
-                  </p>
-                )}
+
               </div>
             </div>
           </div>
@@ -212,35 +225,25 @@ export function PracticaRunner({
 
         {/* ── BODY ──────────────────────────────────────────────────── */}
         <div className="prac-body" style={{ maxWidth: 1560, margin: "0 auto", padding: "44px 48px 100px" }}>
-          {practica ? (
-            <LabImagenProvider valor={imagen}>
-              <practica.Component
-                color={color}
-                actividadCodigo={actividadCodigo}
-                actividadTitulo={actividadTitulo}
-              />
-            </LabImagenProvider>
-          ) : (
-            <div
-              style={{
-                borderRadius: 20,
-                border: "1px solid rgba(255,255,255,0.08)",
-                background: "rgba(255,255,255,0.04)",
-                padding: "48px 32px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                textAlign: "center",
-                gap: 12,
-              }}
-            >
-              <i className="fa-solid fa-flask-vial" style={{ fontSize: 40, color: "rgba(255,255,255,0.18)" }} />
-              <p style={{ fontSize: 15, fontWeight: 700, color: "#fff", margin: 0 }}>Práctica próximamente</p>
-              <p style={{ fontSize: 13, color: "rgba(255,255,255,0.50)", margin: 0, maxWidth: 380 }}>
-                Esta práctica experimental aún no está disponible. Vuelve pronto.
-              </p>
-            </div>
-          )}
+          <div
+            style={{
+              borderRadius: 20,
+              border: "1px solid rgba(255,255,255,0.08)",
+              background: "rgba(255,255,255,0.04)",
+              padding: "48px 32px",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              textAlign: "center",
+              gap: 12,
+            }}
+          >
+            <i className="fa-solid fa-flask-vial" style={{ fontSize: 40, color: "rgba(255,255,255,0.18)" }} />
+            <p style={{ fontSize: 15, fontWeight: 700, color: "#fff", margin: 0 }}>Práctica próximamente</p>
+            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.50)", margin: 0, maxWidth: 380 }}>
+              Esta práctica experimental aún no está disponible. Vuelve pronto.
+            </p>
+          </div>
         </div>
       </div>
     </>

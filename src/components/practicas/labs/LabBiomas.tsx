@@ -27,6 +27,10 @@ import { BIOMAS_FICHA } from "./biomas-ecosistemas-ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { QUIZ_A2 } from "./biomas-ecosistemas-data";
 import { LabSfx } from "./lab-audio";
+import { TableroObjetivos } from "./_objetivos";
+
+/** Clave de la mejor marca de este laboratorio. */
+const RETO_KEY = "cen-biomas-ecosistemas-reto";
 
 const BiomasScene = dynamic(() => import("./BiomasScene"), {
   ssr: false,
@@ -399,9 +403,18 @@ export function LabBiomas({ color }: PracticaLabProps) {
               );
             })}
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 12, fontSize: 13, color: ejercicioAprobado ? OK : T.text3, fontWeight: ejercicioAprobado ? 700 : 500 }}>
-            <i className={`fa-solid ${ejercicioAprobado ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 14, opacity: ejercicioAprobado ? 1 : 0.35 }} />
-            Resuelve el reto evaluable de la actividad A2
+          <div style={{ marginTop: 14 }}>
+            <TableroObjetivos
+              retoKey={RETO_KEY}
+              accent={accent}
+              objetivos={[
+              { txt: "Mueve la temperatura y mira cómo cambia el bioma", done: temp !== TEMP_DEFAULT },
+              { txt: "Mueve la precipitación y encuentra un bioma seco", done: precip !== PRECIP_DEFAULT },
+              { txt: "Descubre al menos cuatro de los siete biomas", done: Object.keys(vistos).length >= 4 },
+              { txt: "Descubre los siete biomas", done: Object.keys(vistos).length >= BIOMAS_LISTA.length },
+              { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
+              ]}
+            />
           </div>
         </div>
       </div>

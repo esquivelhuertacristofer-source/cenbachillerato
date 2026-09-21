@@ -1,0 +1,21 @@
+[
+  {
+    "slug": "lectura-en-voz-alta",
+    "items": [
+      { "clave": "diccion", "escena": "A clay mouth modelled in cross-section with the tongue and lips shaped precisely, a single crisp clay sound-ring leaving it" },
+      { "clave": "entonacion", "escena": "A curved clay ribbon rising and falling in a wave above a line of printed clay text" },
+      { "clave": "ritmo", "escena": "A chunky clay metronome with its arm tilted to one side, standing on a desk beside an open page" },
+      { "clave": "pausa", "escena": "A printed clay line of text interrupted by a thick vertical clay bar standing between two words" },
+      { "clave": "enfasis", "escena": "A line of clay word blocks with one word modelled as a fat glowing amber block raised above the rest" },
+      { "clave": "elemento-paralinguistico", "escena": "A clay figure mid-speech with one hand raised and eyebrows lifted, a faint clay sound-ring around its head" },
+      { "clave": "escucha-activa", "escena": "A clay listener leaning forward with one hand cupped behind the ear, facing a clay reader holding a sheet" },
+      { "clave": "opinion-fundamentada", "escena": "A clay speech bubble resting on a small clay plinth built from three stacked brick blocks" },
+      { "clave": "fraseo", "escena": "A clay ribbon of text divided into three separate clay segments laid end to end with small gaps between them" },
+      { "clave": "volumen", "escena": "A clay dial with a pointer turned up, beside two clay sound-rings, one small and one wide" },
+      { "clave": "tono", "escena": "Two clay tuning forks of different sizes standing upright side by side on a plain base" },
+      { "clave": "proyeccion", "escena": "A clay figure with a cupped hand beside its mouth, wide clay sound-rings reaching three small listeners at the far side of a room" },
+      { "clave": "inflexion", "escena": "A clay arrow curving sharply upward at the end of a printed clay line of text" },
+      { "clave": "muletilla", "escena": "A line of clay word blocks with three identical small grey pebbles wedged repeatedly between them" }
+    ]
+  }
+]

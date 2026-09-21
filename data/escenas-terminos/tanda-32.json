@@ -1,0 +1,21 @@
+[
+  {
+    "slug": "convivencia-digital",
+    "items": [
+      { "clave": "identidad-digital", "escena": "A small clay profile card standing upright on a desk, a rounded clay portrait tile set into its face" },
+      { "clave": "huella-digital", "escena": "A trail of chunky clay footprints crossing a flat clay screen and continuing off its edge" },
+      { "clave": "empatia-digital", "escena": "Two clay figures on opposite sides of a clay screen, a soft clay bridge passing through the screen between their chests" },
+      { "clave": "desequilibrio-de-poder", "escena": "A clay see-saw with one large clay figure seated low on one end and a small clay figure lifted high on the other" },
+      { "clave": "respuesta-proporcional", "escena": "A clay balance scale with a small clay weight on one pan matched exactly by a small clay tool on the other" },
+      { "clave": "mensaje-firme", "escena": "A clay speech bubble standing upright and rigid on a solid clay base, its edges clean and square" },
+      { "clave": "suplantacion-de-identidad", "escena": "A clay figure holding a flat clay mask of another face in front of its own head" },
+      { "clave": "evidencia-digital", "escena": "A clay smartphone lying flat beside a small stack of clay screenshot cards held down by a clay clip" },
+      { "clave": "diversidad-digital", "escena": "Six clay figures of different heights, shapes and colours standing in a ring around one shared clay screen" },
+      { "clave": "comunicacion-inclusiva", "escena": "A clay ramp and a clay stair side by side leading up to the same small clay platform, a figure arriving by each" },
+      { "clave": "ciberacoso", "escena": "A small clay figure seated alone under three identical clay speech bubbles crowding in from above" },
+      { "clave": "netiqueta", "escena": "A clay signpost beside a clay screen with three small blank clay rule plaques stacked on its post" },
+      { "clave": "discurso-de-odio", "escena": "A chunky clay speech bubble with sharp spikes modelled along its lower edge, resting over a cracked clay tile" },
+      { "clave": "anonimato", "escena": "A clay figure standing behind a plain blank clay panel, only its shadow reaching the floor in front" }
+    ]
+  }
+]

@@ -31,6 +31,11 @@ import {
   FUNC_DEF, type FuncId,
 } from "./reglas-data";
 
+import { TableroObjetivos } from "./_objetivos";
+
+/** Clave de la mejor marca de este laboratorio. */
+const RETO_KEY = "cen-reglas-derivacion-reto";
+
 const ReglasScene = dynamic(() => import("./ReglasScene"), {
   ssr: false,
   loading: () => (
@@ -397,19 +402,16 @@ export function LabReglas({ color }: PracticaLabProps) {
           <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
           Objetivos
         </Eyebrow>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-          {[
+        <TableroObjetivos
+          retoKey={RETO_KEY}
+          accent={accent}
+          objetivos={[
             { txt: "Explora las cuatro funciones del A2 en la escena 3D", done: funcId !== FUNC_DEF },
             { txt: "Observa cómo la altura de f' iguala la pendiente de la tangente", done: aPos !== func(FUNC_DEF).aDef },
             { txt: "Barre la sonda con la animación (botón play)", done: playing },
             { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
-          ].map((o, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? "#4ade80" : T.text2 }}>
-              <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-              <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-            </div>
-          ))}
-        </div>
+          ]}
+        />
       </div>
 
       {/* nota de honestidad del modelo */}

@@ -26,6 +26,10 @@ import {
   COMPARACION, TAMANOS,
   PROBLEMA, INSTRUCCIONES, PREGUNTAS, IDEAS, GLOSARIO, CONTEXTO, FUENTE, DATOS, QUIZ_A2,
 } from "./celula-data";
+import { TableroObjetivos } from "./_objetivos";
+
+/** Clave de la mejor marca de este laboratorio. */
+const RETO_KEY = "cen-celula-organelos-3d-reto";
 
 const CelulaScene = dynamic(() => import("./CelulaScene"), {
   ssr: false,
@@ -441,6 +445,24 @@ export function LabCelula({ color }: PracticaLabProps) {
         <span>
           Las funciones de cada organelo son <strong>verbatim</strong>: las del núcleo, mitocondria, cloroplasto, RE y Golgi provienen del glosario A5 (etiqueta «GLOSARIO A5»); las de membrana, pared, ribosomas, lisosomas, vacuola y nucleoide se basan en la infografía A1 (etiqueta «INFOGRAFÍA A1»). La tabla comparativa procariota/eucariota y la barra de tamaño son verbatim de A5 y A1. La célula en 3D es <strong>esquemática</strong>: las formas, los colores y las posiciones de los organelos son representaciones visuales (no a escala ni con número real de organelos) para identificarlos y comparar los tres tipos de célula. Las ideas clave, el glosario, el contexto del ajolote y las preguntas para reflexionar son de la lectura A1. Fuente: {FUENTE}
         </span>
+      </div>
+
+      {/* ── Objetivos ─────────────────────────────────────────────── */}
+      <div style={{ ...card, padding: "18px 22px", marginTop: 22 }}>
+        <Eyebrow>
+          <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
+          Objetivos
+        </Eyebrow>
+        <TableroObjetivos
+          retoKey={RETO_KEY}
+          accent={accent}
+          objetivos={[
+            { txt: "Recorre los organelos de la célula animal", done: modo === "animal" && selected !== "nucleo" },
+            { txt: "Pasa a la célula vegetal y busca el cloroplasto y la pared celular", done: modo === "vegetal" },
+            { txt: "Compara con la procariota: sin núcleo y con ADN circular", done: modo === "procariota" },
+            { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
+          ]}
+        />
       </div>
 
       {/* ── Reto evaluable: el quiz verbatim del ancla A2 ────────────── */}

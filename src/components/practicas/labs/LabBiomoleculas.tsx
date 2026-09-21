@@ -31,6 +31,13 @@ import { BIOMOLECULAS_FICHA } from "./biomoleculas-cuatro-clases-ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { LabSfx } from "./lab-audio";
 
+import { TableroObjetivos } from "./_objetivos";
+
+
+/** Clave de la mejor marca de este laboratorio. */
+const RETO_KEY = "cen-biomoleculas-cuatro-clases-reto";
+
+
 const BiomoleculasScene = dynamic(() => import("./BiomoleculasScene"), {
   ssr: false,
   loading: () => (
@@ -381,14 +388,11 @@ export function LabBiomoleculas({ color }: PracticaLabProps) {
               <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
               Objetivos
             </Eyebrow>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? "#34D399" : T.text2 }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-                  <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-                </div>
-              ))}
-            </div>
+            <TableroObjetivos
+              retoKey={RETO_KEY}
+              accent={accent}
+              objetivos={objetivos}
+            />
           </div>
         );
       })()}

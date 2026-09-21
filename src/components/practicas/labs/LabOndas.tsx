@@ -35,6 +35,11 @@ import {
   fmt0, fmt1, fmt2, fmtLambda,
 } from "./ondas-data";
 
+import { TableroObjetivos } from "./_objetivos";
+
+/** Clave de la mejor marca de este laboratorio. */
+const RETO_KEY = "cen-ondas-amplitud-frecuencia-reto";
+
 const OndasScene = dynamic(() => import("./OndasScene"), {
   ssr: false,
   loading: () => (
@@ -512,20 +517,17 @@ export function LabOndas({ color }: PracticaLabProps) {
           <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
           Objetivos
         </Eyebrow>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-          {[
+        <TableroObjetivos
+          retoKey={RETO_KEY}
+          accent={accent}
+          objetivos={[
             { txt: "Explora el modo Onda: sube la frecuencia y observa cómo baja λ", done: f !== F_DEF },
             { txt: "Experimenta con interferencia constructiva y destructiva", done: modo === "interferencia" },
             { txt: "Activa la onda estacionaria y localiza los nodos", done: estacionaria },
             { txt: "Observa el Efecto Doppler con la fuente en movimiento", done: modo === "doppler" },
             { txt: "Resuelve el reto evaluable de la actividad", done: ejercicioAprobado },
-          ].map((o, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? "#34D399" : T.text2 }}>
-              <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-              <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-            </div>
-          ))}
-        </div>
+          ]}
+        />
       </div>
 
       {/* nota de honestidad del modelo */}

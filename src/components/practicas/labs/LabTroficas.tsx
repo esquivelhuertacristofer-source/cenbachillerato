@@ -28,6 +28,11 @@ import {
   fmt0, fmtKcal, type NivelKey,
 } from "./troficas-data";
 
+import { TableroObjetivos } from "./_objetivos";
+
+/** Clave de la mejor marca de este laboratorio. */
+const RETO_KEY = "cen-redes-troficas-reto";
+
 const TroficasScene = dynamic(() => import("./TroficasScene"), {
   ssr: false,
   loading: () => (
@@ -390,19 +395,16 @@ export function LabTroficas({ color }: PracticaLabProps) {
           <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
           Objetivos
         </Eyebrow>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-          {[
+        <TableroObjetivos
+          retoKey={RETO_KEY}
+          accent={accent}
+          objetivos={[
             { txt: "Ajusta la energía inicial y observa el flujo en la pirámide", done: energia !== ENERGIA_DEFAULT },
             { txt: "Modifica la eficiencia ecológica y compara niveles", done: eficiencia !== EF_DEFAULT },
             { txt: "Explora al menos dos ecosistemas mexicanos", done: ecoIdx > 0 },
             { txt: "Resuelve el reto evaluable de la actividad A4", done: ejercicioAprobado },
-          ].map((o, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? "#34D399" : T.text2 }}>
-              <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-              <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-            </div>
-          ))}
-        </div>
+          ]}
+        />
       </div>
 
       {/* nota de honestidad del modelo */}

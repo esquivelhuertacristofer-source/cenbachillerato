@@ -104,9 +104,11 @@ export function CompletaTexto({
   // El banco muestra TODAS las respuestas revueltas, incluidas las ya
   // colocadas: ocultarlas iría delatando cuál falta.
   const palabras = useMemo(() => {
-    const xs = data.huecos.map((h) => h.respuesta);
+    // Sin repetidos: una respuesta que aparece en varios huecos («big» ×3) es
+    // una sola ficha (y una key única para React).
+    const xs = [...new Set(data.huecos.map((h) => h.respuesta))];
     // Orden estable por texto: barajar en cada render movería las fichas solo.
-    return [...xs].sort((a, b) => a.localeCompare(b, "es"));
+    return xs.sort((a, b) => a.localeCompare(b, "es"));
   }, [data.huecos]);
 
   function comprobar(i: number, valor: string) {

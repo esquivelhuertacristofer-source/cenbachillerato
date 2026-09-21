@@ -60,7 +60,9 @@ describe("objetivos de los laboratorios", () => {
     "%s: la marca del alumno se guarda en alguna parte",
     (archivo) => {
       const src = leer(archivo);
-      expect(src).toContain("useEstrellas");
+      // Directamente, o a través de `TableroObjetivos`, que es quien lo usa
+      // por los laboratorios cuya marca sale de la lista de objetivos.
+      expect(src.includes("useEstrellas") || src.includes("TableroObjetivos")).toBe(true);
     }
   );
 });

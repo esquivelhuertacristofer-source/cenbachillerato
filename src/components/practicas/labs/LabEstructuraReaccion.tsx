@@ -13,7 +13,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, OK, card, Eyebrow, SceneBoundary } from "./_kit";
+import { T, card, Eyebrow, SceneBoundary } from "./_kit";
 import { FichaTeorica } from "./_ficha";
 import { ESTRUCTURA_REACCION_FICHA } from "./estructura-reaccion-ficha";
 import { RetoNumericoCard } from "./_reto-numerico";
@@ -42,6 +42,11 @@ import {
   HECHOS,
   RETO_A2,
 } from "./estructura-reaccion-data";
+
+import { TableroObjetivos } from "./_objetivos";
+
+/** Clave de la mejor marca de este laboratorio. */
+const RETO_KEY = "cen-estructura-reaccion-reto";
 
 const EstructuraReaccionScene = dynamic(() => import("./EstructuraReaccionScene"), {
   ssr: false,
@@ -541,20 +546,18 @@ export function LabEstructuraReaccion({ color }: PracticaLabProps) {
           <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
           Objetivos
         </Eyebrow>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-          {[
-            { txt: "Explora los tres modos del laboratorio 3D (Anatomía, Conservación, Simbología)", done: true },
-            { txt: "Identifica reactivos, flecha y productos en la ecuación del metano", done: true },
-            { txt: "Distingue coeficiente (número grande) de subíndice (número pequeño)", done: true },
-            { txt: "Verifica la conservación de la materia contando átomos a ambos lados", done: true },
+        <TableroObjetivos
+          retoKey={RETO_KEY}
+          accent={accent}
+          objetivos={[
+            { txt: "Identifica reactivos, flecha y productos en la anatomía de la ecuación", done: modo === "anatomia" },
+            { txt: "Verifica la conservación de la materia contando átomos a ambos lados", done: modo === "conservacion" },
+            { txt: "Distingue coeficiente (número grande) de subíndice (número pequeño)", done: modo === "simbologia" },
+            { txt: "Recorre la reacción paso a paso", done: paso > 0 },
+            { txt: "Compara con otra reacción además de la combustión del metano", done: reaccionId !== "combustion-metano" },
             { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
-          ].map((o, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? OK : T.text2 }}>
-              <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-              <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-            </div>
-          ))}
-        </div>
+          ]}
+        />
       </div>
 
       {/* ── Reto evaluable: el ejercicio verbatim del ancla A2 ─────── */}

@@ -27,6 +27,10 @@ import {
   fmtNum2, fmtNum1, fmtCoord, fmtPar, type Escenario, type Modo,
   RETO_A2,
 } from "./transformaciones-funciones-data";
+import { TableroObjetivos } from "./_objetivos";
+
+/** Clave de la mejor marca de este laboratorio. */
+const RETO_KEY = "cen-transformaciones-funciones-reto";
 
 const TransformacionesFuncionesScene = dynamic(() => import("./TransformacionesFuncionesScene"), {
   ssr: false,
@@ -424,17 +428,18 @@ export function LabTransformacionesFunciones({ color }: PracticaLabProps) {
           <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
           Objetivos
         </Eyebrow>
-        {[
-          { txt: "Identifica la función padre (y = x² o y = x) y sus transformaciones", done: resetNonce > 0 },
-          { txt: "Modifica a, h y k para ver el efecto de cada transformación", done: resetNonce > 1 },
-          { txt: "Aplica al menos un escenario guiado (balón, recta, etc.)", done: resetNonce > 0 },
-          { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
-        ].map((o, i) => (
-          <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? "#4ade80" : T.text2, marginTop: 10 }}>
-            <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-            <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-          </div>
-        ))}
+        <TableroObjetivos
+          retoKey={RETO_KEY}
+          accent={accent}
+          objetivos={[
+            { txt: "Muestra la función padre y compárala con la transformada", done: mostrarPadre },
+            { txt: "Desplaza la gráfica hacia arriba o hacia abajo (cambia k)", done: k !== K_DEF },
+            { txt: "Desplázala a los lados (cambia h) y cuida el signo", done: h !== H_DEF },
+            { txt: "Estira, comprime o refleja la gráfica (cambia a)", done: a !== A_DEF },
+            { txt: "Cambia entre la función lineal y la cuadrática", done: modo !== MODO_DEF },
+            { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
+          ]}
+        />
       </div>
 
       {/* nota de honestidad del modelo */}

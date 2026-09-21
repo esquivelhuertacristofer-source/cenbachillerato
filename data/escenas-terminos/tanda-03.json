@@ -1,0 +1,157 @@
+[
+  {
+    "slug": "casa-escuela-objetos-ingles-3d",
+    "items": [
+      { "clave": "adjetivo-antes-del-sustantivo", "escena": "A clay red book lying flat on a desk with a small red paint swatch card standing in front of it" },
+      { "clave": "orden-de-los-adjetivos", "escena": "Three clay objects lined up on a shelf: a small round blue clock, a large square green box and a tall thin yellow lamp" },
+      { "clave": "a-an", "escena": "A clay box and an orange sitting side by side on a table, the orange resting on top of a smaller open box" },
+      { "clave": "there-is-there-are", "escena": "A clay desk with one lamp standing on the left side and two stacked books on the right side" },
+      { "clave": "preposiciones-de-lugar", "escena": "A clay desk with a ball on top of it, another ball underneath it, and a third ball wedged between two books" },
+      { "clave": "sustantivo-o-adjetivo-de-forma", "escena": "Three clay shapes on a table: a round plate, a triangular ruler and a rectangular picture frame" }
+    ]
+  },
+  {
+    "slug": "causalidad-historica",
+    "items": [
+      { "clave": "causalidad-historica", "escena": "A clay row of dominoes where one has just knocked over the next, with a thick arrow running along them" },
+      { "clave": "multicausalidad", "escena": "Several clay threads coming from different directions and tied into one knot at the centre of a board" },
+      { "clave": "causa-estructural", "escena": "A clay building shown in cross section with deep thick foundations buried in layered ground" },
+      { "clave": "causa-coyuntural", "escena": "A clay match flame touching a pile of dry straw that has clearly been stacked there a long time" },
+      { "clave": "consecuencia-historica", "escena": "A clay stone dropped into a still pool, with rings spreading outward to the far edge" },
+      { "clave": "agencia-historica", "escena": "A clay figure pushing a large gear that turns a row of smaller gears beside it" }
+    ]
+  },
+  {
+    "slug": "caverna-conocimiento-3d",
+    "items": [
+      { "clave": "opinion-doxa-y-conocimiento-episteme", "escena": "A clay wall with a flickering shadow cast on the left and the solid object that casts it standing on the right" },
+      { "clave": "la-alegoria-de-la-caverna", "escena": "A clay cave cross section with seated figures facing a shadow wall, a fire behind them and a small bright opening at the top" },
+      { "clave": "la-linea-dividida", "escena": "A clay staircase of four steps rising out of a dim cave into bright light, each step a lighter tone than the last" },
+      { "clave": "una-apariencia-muchas-causas", "escena": "A clay square shadow on a wall with three different objects standing behind it: a cube, a cylinder and a pyramid" },
+      { "clave": "percepcion-y-supuestos", "escena": "A clay room built crooked on purpose, with two figures of the same size looking very different inside it" },
+      { "clave": "creencia-verdadera-justificada", "escena": "Three clay discs overlapping at the centre of a table, with a small gem resting where all three meet" },
+      { "clave": "fuentes-del-conocimiento", "escena": "Four clay objects laid out on a table: an eye, a gear, a speech bubble and a small stamped seal" },
+      { "clave": "teorias-de-la-verdad", "escena": "Three clay objects in a row: a key fitting a lock, a stack of blocks fitting together, and a hammer driving a nail" }
+    ]
+  },
+  {
+    "slug": "celula-organelos-3d",
+    "items": [
+      { "clave": "organelo", "escena": "A clay cell cut open like a house cross section, with a different small machine working in each room" },
+      { "clave": "nucleo-celular", "escena": "A clay round pod with a double shell holding a coiled thread inside, small pores dotted through its wall" },
+      { "clave": "mitocondria", "escena": "A clay bean shaped pod cut open to show folded inner walls, with a small glowing battery inside" },
+      { "clave": "endosimbiosis", "escena": "A large clay blob with a smaller bean shaped blob living comfortably inside it" },
+      { "clave": "fision-binaria", "escena": "A clay round cell pinched in the middle, splitting into two identical halves" },
+      { "clave": "cloroplasto", "escena": "A clay green oval pod cut open to show stacks of flat green discs inside" },
+      { "clave": "reticulo-endoplasmatico-re", "escena": "A clay folded maze of membranes wrapped around a round pod, dotted with tiny beads on one half and smooth on the other" },
+      { "clave": "aparato-de-golgi", "escena": "A clay stack of flattened sacs with small bubbles budding off one end" },
+      { "clave": "diferencias-clave-procariota-vs-eucariota", "escena": "Two clay cells side by side cut open: a small simple one with a loose coiled thread, and a large one with a walled core and many small machines" }
+    ]
+  },
+  {
+    "slug": "centro-datos-huella-nube-3d",
+    "items": [
+      { "clave": "pue-eficacia-en-el-uso-de-la-energia", "escena": "A clay server rack fed by two pipes: a thick one going into the rack and a thinner one going to fans and coolers beside it" },
+      { "clave": "consumo-de-agua-wue", "escena": "A clay cooling tower with a plume of white vapour rising from it and a measuring jug of water beside its base" },
+      { "clave": "intercambio-agua-energia", "escena": "A clay seesaw with a water drop on one side and an electrical plug on the other" },
+      { "clave": "minimo-privilegio", "escena": "A clay ring crowded with keys, and a hand taking just one key toward a single door" },
+      { "clave": "reidentificacion-por-ubicacion", "escena": "A clay city map board with four pins stuck in it and a single small figure standing where the pins converge" },
+      { "clave": "aviso-de-privacidad-y-derechos-arco", "escena": "A clay folder closed with a shield shaped clasp, beside a panel of four small buttons" },
+      { "clave": "brecha-de-acceso-y-de-uso", "escena": "Two clay houses side by side: one with a strong antenna and a glowing window, the other with a broken antenna and a dark window" },
+      { "clave": "servicio-solo-en-linea", "escena": "A clay government counter shuttered closed, with a lone glowing computer screen beside it and a figure waiting" }
+    ]
+  },
+  {
+    "slug": "ciclo-carbono",
+    "items": [
+      { "clave": "ciclo-biogeoquimico", "escena": "A clay loop of arrows joining a tree, a cloud, a patch of soil and a pond on one round base" },
+      { "clave": "fotosintesis", "escena": "A clay leaf with sunlight falling on it, a grey puff entering one side and a clear bubble leaving the other" },
+      { "clave": "respiracion-celular", "escena": "A clay bean shaped pod with a sugar cube going in one side and a grey puff and a water drop coming out the other" },
+      { "clave": "sumidero-de-carbono", "escena": "A clay forest standing over a deep dark reservoir, with grey puffs being drawn down into it" },
+      { "clave": "eutrofizacion", "escena": "A clay pond covered in thick green scum with a fish floating still at the surface" },
+      { "clave": "descomponedor", "escena": "A clay fallen log covered in mushrooms, crumbling into dark soil beneath it" },
+      { "clave": "evapotranspiracion", "escena": "A clay tree beside a pond with fine vapour rising from both its leaves and the water surface" },
+      { "clave": "fijacion-de-nitrogeno", "escena": "A clay plant root with small round nodules along it and tiny blue puffs entering the nodules" },
+      { "clave": "denitrificacion", "escena": "A clay patch of wet soil releasing small blue bubbles upward into the air" },
+      { "clave": "ciclo-del-fosforo", "escena": "A clay loop running from a cracked rock to soil, to a plant, to an animal and back to the rock" }
+    ]
+  },
+  {
+    "slug": "circulo-unitario",
+    "items": [
+      { "clave": "circulo-unitario", "escena": "A clay ring on a board with a single straight stick from its centre to the rim and a small bead where the stick meets the ring" },
+      { "clave": "seno-sen", "escena": "A clay ring with a bead on its rim and a vertical drop line running from the bead down to the horizontal bar" },
+      { "clave": "coseno-cos", "escena": "A clay ring with a bead on its rim and a horizontal line running from the bead across to the vertical bar" },
+      { "clave": "tangente-tan", "escena": "A clay ring with a straight stick touching it at a single point and rising steeply away from it" },
+      { "clave": "identidad-pitagorica", "escena": "A clay right triangle set inside a ring, with a square block built on each of its three sides" },
+      { "clave": "angulo-de-referencia", "escena": "A clay ring with a stick pointing up to the left and a small wedge filling the gap between the stick and the nearest bar" },
+      { "clave": "radian", "escena": "A clay ring with one arc segment lifted off the rim, exactly as long as the radius stick lying beside it" },
+      { "clave": "analisis-de-fourier", "escena": "A clay wavy ribbon on a table being separated into three simpler wavy ribbons stacked below it" },
+      { "clave": "angulo-en-posicion-estandar", "escena": "A clay protractor board with a stick pinned at the centre lying flat and a second stick swung upward from it" },
+      { "clave": "signo-por-cuadrante-regla-acts", "escena": "A clay disc split into four quarters by a raised cross, each quarter a different colour" },
+      { "clave": "valores-en-los-ejes-angulos-cuadrantales", "escena": "A clay ring with four beads set exactly at the top, bottom, left and right points of a raised cross" },
+      { "clave": "periodo-de-seno-y-coseno", "escena": "A clay wavy ribbon repeating the same hump three times along the length of a table" }
+    ]
+  },
+  {
+    "slug": "ciudad-direcciones-ingles-3d",
+    "items": [
+      { "clave": "imperativo", "escena": "A clay hand pointing straight ahead down a small street with a tiny figure walking that way" },
+      { "clave": "left-y-right-son-de-quien-camina", "escena": "A clay street corner with a small figure standing on it, arms held out, one arm turning toward its own left" },
+      { "clave": "referencias-landmarks", "escena": "A clay street corner with a bank building on it and a tiny figure turning right at that corner" },
+      { "clave": "next-to-across-from-between", "escena": "A clay street with three buildings: two side by side, one facing them across the road, and a small one wedged between two others" },
+      { "clave": "on-the-corner-of-and", "escena": "A clay crossroads with a small health centre standing on one of its corners" },
+      { "clave": "preguntas-corteses", "escena": "A clay figure with a speech bubble asking another figure, who points away down the street" }
+    ]
+  },
+  {
+    "slug": "clasificacion-expresiones-mosaicos",
+    "items": [
+      { "clave": "variable", "escena": "A single clay rectangular tile standing on its edge, longer than it is wide, alone on a table" },
+      { "clave": "coeficiente", "escena": "Three identical clay rectangular tiles stacked neatly in a row on a board" },
+      { "clave": "termino-semejante", "escena": "Two identical clay tiles placed side by side, with a differently shaped tile pushed off to one side" },
+      { "clave": "grado", "escena": "A clay cube, a flat square tile and a small unit cube lined up on a board, descending in size" },
+      { "clave": "modelo-de-area", "escena": "A clay rectangle on a board divided into a grid of large squares, long strips and small unit tiles" },
+      { "clave": "monomio", "escena": "One clay tile alone in the middle of a wooden board" },
+      { "clave": "binomio", "escena": "Two clay tiles of different shapes placed side by side on a board" },
+      { "clave": "trinomio", "escena": "Three clay tiles of different shapes lined up on a board" },
+      { "clave": "polinomio", "escena": "Four clay tiles of different shapes lined up on a board" },
+      { "clave": "distributiva", "escena": "A clay rectangle split by a line into two parts, with a hand sliding one part away from the other" },
+      { "clave": "terminos-semejantes", "escena": "Two piles of clay tiles on a board: identical square tiles in one pile and identical long strips in the other" }
+    ]
+  },
+  {
+    "slug": "clima-vestimenta-ingles-3d",
+    "items": [
+      { "clave": "it-is-adjetivo", "escena": "A clay window with rain falling outside it and a small sun peeking out from behind the clouds" },
+      { "clave": "adjetivo-o-sustantivo", "escena": "A clay cloud with raindrops on the left and a bright clay sun on the right, both on one base" },
+      { "clave": "present-continuous", "escena": "A clay figure in a raincoat walking through falling rain, splashing through a puddle" },
+      { "clave": "be-have-y-wear", "escena": "A tall clay figure with curly hair wearing boots, standing on a small base" },
+      { "clave": "orden-y-articulos", "escena": "A clay pair of jeans, a pair of boots and a pair of glasses laid out neatly on a bed" },
+      { "clave": "describir-sin-juzgar", "escena": "A clay group of different figures standing together on one base, one of them in a wheelchair" },
+      { "clave": "c-y-f", "escena": "Two clay thermometers standing side by side with differently spaced notches along their scales" }
+    ]
+  },
+  {
+    "slug": "comparativos-ingles",
+    "items": [
+      { "clave": "er-than", "escena": "Two clay pencils lying side by side on a table, one clearly longer than the other" },
+      { "clave": "more-adjective-than", "escena": "Two clay gift boxes side by side, one plain and one much more elaborately decorated" },
+      { "clave": "than", "escena": "Two clay objects on a table joined by a small clay bridge piece between them" },
+      { "clave": "better-worse", "escena": "Two clay apples on a plate, one shiny and firm, the other bruised and soft" },
+      { "clave": "cheaper-more-expensive", "escena": "Two clay shopping bags on a counter, a small one and a large one, each with a blank tag hanging from it" },
+      { "clave": "i-prefer", "escena": "A clay hand reaching for one of two cups on a tray, choosing the left one" }
+    ]
+  },
+  {
+    "slug": "comunicacion-multimodal",
+    "items": [
+      { "clave": "comunicacion-multimodal", "escena": "A clay poster board holding a photo, a speaker, a film strip and a swatch of colour all together" },
+      { "clave": "modo-semiotico", "escena": "Five clay tokens on a table: a photo, a speaker, a film strip, a colour swatch and a pointing hand" },
+      { "clave": "identidad-digital", "escena": "A clay phone with a small portrait badge on its screen and a trail of tiny footprints leading away from it" },
+      { "clave": "burbuja-de-filtro-filter-bubble", "escena": "A clay figure inside a transparent bubble with only a few identical items floating inside and many different ones outside" },
+      { "clave": "narrativa-digital-y-construccion-de-realidad", "escena": "A clay film strip curling out of a projector and forming a small landscape in front of it" },
+      { "clave": "analisis-critico-de-medios-digitales", "escena": "A clay magnifying glass held over a phone screen, revealing hidden gears behind the image" }
+    ]
+  }
+]

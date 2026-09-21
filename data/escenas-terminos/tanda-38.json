@@ -1,0 +1,20 @@
+[
+  {
+    "slug": "instrucciones-ingles",
+    "items": [
+      { "clave": "imperative", "escena": "A chunky clay hand pointing straight at a single fat clay button on a panel, the other buttons untouched" },
+      { "clave": "negative-imperative", "escena": "A clay hand held flat above a fat clay button with a small clay bar lying across the button face" },
+      { "clave": "sequence-connectors", "escena": "Five small clay step tiles in a straight row, each joined to the next by a short thick clay link" },
+      { "clave": "precise-instruction", "escena": "A clay arrow landing exactly on one small marked clay tile among ten identical tiles on a board" },
+      { "clave": "ambiguous-instruction", "escena": "A clay arrow splitting into three thin branches, each ending on a different identical clay tile" },
+      { "clave": "indirect-question", "escena": "A clay question-mark sculpture standing behind a small clay figure instead of in front of it" },
+      { "clave": "make-sure-to", "escena": "A clay checklist card with a raised clay check mark pressed firmly into its last empty box" },
+      { "clave": "imperative-affirmative", "escena": "A clay finger pressing a fat green clay button down into its panel" },
+      { "clave": "imperative-negative", "escena": "A fat red clay button covered by a flat clay plate resting over it" },
+      { "clave": "first-then", "escena": "Two clay step tiles side by side, the first slightly raised and linked to the second by a short arrow" },
+      { "clave": "after-that-next", "escena": "Three clay step tiles in a row with the middle two joined by a thicker clay link than the outer ones" },
+      { "clave": "finally", "escena": "A row of clay step tiles ending in a taller tile with a small clay flag planted on top" },
+      { "clave": "instructions-vocabulary", "escena": "A clay tray holding small modelled tools in a row: a spoon, a pot, a switch and a pencil" }
+    ]
+  }
+]

@@ -1,0 +1,21 @@
+[
+  {
+    "slug": "lectura-critica-postura",
+    "items": [
+      { "clave": "lectura-literal", "escena": "A stubby clay magnifying glass resting directly on one raised line of an open clay page, the line lifted slightly under the lens" },
+      { "clave": "lectura-inferencial", "escena": "An open clay page with a fat translucent clay bubble floating above it, tied to two separate lines of the page by thin clay threads" },
+      { "clave": "lectura-critica", "escena": "A small clay balance scale standing on top of an open clay book, weighing the book's own page on one of its pans" },
+      { "clave": "supuesto-implicito", "escena": "Two clay stone blocks set apart on a base with a hidden clay slab bridging the gap underneath, barely visible from above" },
+      { "clave": "interes-del-emisor", "escena": "A clay figure holding out a document with one hand while the other hand rests on a small clay coin box behind its back" },
+      { "clave": "ataque-a-la-persona", "escena": "A clay arrow flying past an open clay page without touching it and striking a small clay figure standing behind" },
+      { "clave": "postura-con-evidencia", "escena": "A small clay flag planted upright in a clay page, held steady by two thin clay threads knotted to two lifted lines of the text" },
+      { "clave": "opinion-sin-sustento", "escena": "A small clay flag lying fallen on a clay page, its two threads hanging loose and knotted to nothing" },
+      { "clave": "sentido-global", "escena": "A whole clay book seen from above with a single wide clay ring drawn around all its open pages" },
+      { "clave": "intencion-del-autor", "escena": "A clay hand behind a page pushing a small clay arrow through it toward a target disc on the far side" },
+      { "clave": "parafrasis", "escena": "Two clay pages side by side with differently shaped raised lines, joined by a chunky clay equals sign between them" },
+      { "clave": "postura-critica", "escena": "A clay figure standing firm beside an open clay page, one hand resting on a small planted clay flag" },
+      { "clave": "conocimientos-previos", "escena": "A clay shelf of small closed books behind a reader's open page, one shelf book glowing faintly amber" },
+      { "clave": "inferencia", "escena": "Two clay footprints pressed into clay ground with a clay figure modelled faintly between them, unfinished" }
+    ]
+  }
+]

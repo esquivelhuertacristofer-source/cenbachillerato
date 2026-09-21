@@ -188,3 +188,89 @@ describe("iniciarSesion — éxito", () => {
     expect(res).toEqual({ ok: true, rol: "teacher" });
   });
 });
+
+// ── el token «del futuro» ────────────────────────────────────────────────────
+//
+// El 8-sep-2026, probando las 253 cuentas de las escuelas reales, 1 de cada ~60
+// accesos falló con «JWT issued at future»: el reloj del servidor de Supabase
+// que firma el token va unas décimas por delante del que sirve los datos, y
+// PostgREST rechaza un token recién emitido.
+//
+// Aquí ese error no se miraba y `role` caía a 'student'. O sea que una maestra
+// que pillara el desfase no veía ningún error: entraba COMO ALUMNA. Un fallo
+// silencioso que devuelve el rol equivocado es peor que uno que no deja pasar.
+
+/** Una cadena de consulta que devuelve, en orden, lo que se le diga. */
+function cadenaEnSecuencia(...respuestas: Array<{ data: unknown; error: unknown }>) {
+  let n = 0;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const c: Record<string, any> = {};
+  for (const m of ["select", "eq"]) c[m] = jest.fn(() => c);
+  c.single = jest.fn(() => Promise.resolve(respuestas[Math.min(n++, respuestas.length - 1)]));
+  c.veces = () => n;
+  return c;
+}
+
+function sbConPerfilEnSecuencia(...respuestas: Array<{ data: unknown; error: unknown }>) {
+  const perfil = cadenaEnSecuencia(...respuestas);
+  const from = jest.fn((tabla: string) => {
+    if (tabla === "user_consents") return { insert: jest.fn().mockResolvedValue({ error: null }) };
+    if (tabla === "profiles") return perfil;
+    throw new Error(`tabla no mockeada en test: ${tabla}`);
+  });
+  const sb = {
+    auth: {
+      signInWithPassword: jest.fn().mockResolvedValue({ data: { user: { id: "user-1" } }, error: null }),
+    },
+    from,
+  } as unknown as Awaited<ReturnType<typeof getSupabaseServer>>;
+  return { sb, perfil };
+}
+
+describe("iniciarSesion — desfase de reloj al leer el rol", () => {
+  test("reintenta una vez y la maestra entra COMO MAESTRA, no como alumna", async () => {
+    const { sb, perfil } = sbConPerfilEnSecuencia(
+      { data: null, error: { message: "JWT issued at future", code: "PGRST301" } },
+      { data: { role: "teacher" }, error: null },
+    );
+    mockGetSupabaseServer.mockResolvedValue(sb);
+    const res = await iniciarSesion(INPUT_VALIDO);
+    expect(res).toEqual({ ok: true, rol: "teacher" });
+    expect(perfil.veces()).toBe(2);
+  });
+
+  test("si el desfase persiste NO se inventa el rol: pide reintentar", async () => {
+    const { sb, perfil } = sbConPerfilEnSecuencia({
+      data: null,
+      error: { message: "JWT issued at future", code: "PGRST301" },
+    });
+    mockGetSupabaseServer.mockResolvedValue(sb);
+    const res = await iniciarSesion(INPUT_VALIDO);
+    expect(res).toEqual({
+      error: "No se pudo cargar tu perfil. Vuelve a intentarlo en unos segundos.",
+    });
+    expect(perfil.veces()).toBe(2);
+  });
+
+  test("un error que no es de reloj no se reintenta ni se disfraza de alumno", async () => {
+    const { sb, perfil } = sbConPerfilEnSecuencia({
+      data: null,
+      error: { message: "permission denied for table profiles", code: "42501" },
+    });
+    mockGetSupabaseServer.mockResolvedValue(sb);
+    const res = await iniciarSesion(INPUT_VALIDO);
+    expect("error" in res).toBe(true);
+    expect(perfil.veces()).toBe(1);
+  });
+
+  test("una cuenta que de verdad no tiene perfil sigue entrando como 'student'", async () => {
+    const { sb, perfil } = sbConPerfilEnSecuencia({
+      data: null,
+      error: { message: "JSON object requested, multiple (or no) rows returned", code: "PGRST116" },
+    });
+    mockGetSupabaseServer.mockResolvedValue(sb);
+    const res = await iniciarSesion(INPUT_VALIDO);
+    expect(res).toEqual({ ok: true, rol: "student" });
+    expect(perfil.veces()).toBe(1);
+  });
+});

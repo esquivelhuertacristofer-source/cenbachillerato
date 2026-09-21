@@ -8,7 +8,8 @@
  *   A  ficha teórica en cajón   → import de `./_ficha` + `{algo}-ficha.ts` en disco
  *   B  tarjeta evaluable        → RetoQuizCard | RetoNumericoCard | QuizCard | CalcCard…
  *   C1 sonido                   → LabSfx (lab-audio) o módulo de audio propio
- *   C2 reto/estrellas           → useEstrellas o localStorage con reto/mejor/estrellas
+ *   C2 reto/estrellas           → useEstrellas (directo o vía TableroObjetivos) o
+ *                                 localStorage con reto/mejor/estrellas
  *   C3 etiquetas conmutables    → estado `etiquetas`
  *   IMG carátula                → public/media/semN/labs/<slug>.webp o LAB_TEMA
  *
@@ -152,6 +153,8 @@ export function inventario(): FilaLab[] {
       // y que el archivo habla de reto/estrellas.
       estrellas:
         /useEstrellas/.test(src) ||
+        // El tablero de objetivos usa `useEstrellas` por el laboratorio.
+        /TableroObjetivos/.test(src) ||
         (/localStorage/.test(src) && /RETO_KEY|MEJOR_KEY|estrellas|Estrellas/.test(src)),
       etiquetas: /\betiquetas\b/.test(src),
       imagen: caratulaPropia(slug) || Boolean(temas[slug]),

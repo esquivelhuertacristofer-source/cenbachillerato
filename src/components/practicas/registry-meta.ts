@@ -5,6 +5,126 @@ export interface PracticaMeta {
 }
 
 export const PRACTICAS_META: Record<string, PracticaMeta> = {
+  "pasado-viaje-ingles": {
+    slug: "pasado-viaje-ingles",
+    titulo: "Laboratorio Interactivo — A trip to remember: narrar en pasado con detalle",
+    descripcion: "Clasifica dieciséis verbos por la regla de escritura de su pasado (-ed, -d, -ied, consonante doble y la lista irregular), coloca sobre una línea del tiempo el fondo en past continuous y la interrupción en past simple en cinco escenas de lugares reales de México, ordena los seis momentos de una excursión con sus conectores y caza la oración que rompe el tiempo verbal. Contenido verbatim de Inglés IV; los personajes son ficticios.",
+  },
+  "instrucciones-ingles": {
+    slug: "instrucciones-ingles",
+    titulo: "Laboratorio Interactivo — Instructions that work",
+    descripcion: "Da instrucciones en inglés a una máquina que obedece al pie de la letra: si la frase admite otra lectura, hace otra cosa. Di qué dato le falta a la instrucción ambigua, repara una secuencia cuyos pasos están desordenados bajo conectores correctos, y arma preguntas indirectas para pedir que te orienten. Contenido verbatim de Inglés III.",
+  },
+  "habitos-comparaciones-ingles": {
+    slug: "habitos-comparaciones-ingles",
+    titulo: "Laboratorio Interactivo — Habits and comparisons: comparar lo que hacen, eligen o prefieren",
+    descripcion: "Nombra la regla que le toca a cada adjetivo y construye su comparativo y su superlativo esquivando «more easier» y «gooder», lee tablas de datos y elige la única comparación en inglés que esos datos sostienen, arma la igualdad «as … as» y su negación con el comparativo al que equivale, y completa prefer … to, would rather … than y like … better than con la forma de verbo que cada una exige. Contenido verbatim de Inglés III.",
+  },
+  "experiencias-recientes-ingles": {
+    slug: "experiencias-recientes-ingles",
+    titulo: "Laboratorio Interactivo — Have you ever...? Compartir experiencias en inglés",
+    descripcion: "Arma cuatro charlas turno por turno y descubre el salto: la pregunta abre en present perfect, la respuesta corta repite el auxiliar y el seguimiento —cuándo, dónde, con quién— cambia a past simple; coloca ever, never, already, yet y just en su posición exacta, decide entre for y since, y cuenta la misma vivencia con fecha y sin fecha. Contenido verbatim de Inglés III; los personajes son ficticios.",
+  },
+  "describir-personas-clima-ingles": {
+    slug: "describir-personas-clima-ingles",
+    titulo: "Laboratorio Interactivo — Describing people: orden del adjetivo, be/have y wearing",
+    descripcion: "Arma frases en inglés con el orden fijo del adjetivo (opinión → tamaño → edad → color → material) y detecta las que suenan imposibles, elige be o have para describir a alguien sin cruzarlos, viste a cuatro personas según el parte meteorológico de Xalapa, Creel, Mérida y La Ventosa justificando con la oración correcta, y escribe is wearing o wears según el marcador de tiempo. Contenido verbatim de Inglés II.",
+  },
+  "tiempo-libre-ingles": {
+    slug: "tiempo-libre-ingles",
+    titulo: "Laboratorio Interactivo — Tiempo libre y presente simple en inglés",
+    descripcion: "Gira el sujeto para ver aparecer y desaparecer la -s de la tercera persona, clasifica verbos por las tres reglas (-s, -es, y→ies), arma negativas y preguntas con do/does —con el error típico tachado al lado— y coloca los adverbios de frecuencia en su posición. Contenido verbatim de Inglés II.",
+  },
+  "perfil-personal-ingles": {
+    slug: "perfil-personal-ingles",
+    titulo: "Laboratorio Interactivo — About me: información personal en inglés",
+    descripcion: "Coloca cada dato en su campo de un formulario en inglés y descubre por qué el apellido no va en «First name» ni «Mexico» en «Nationality», elige la única respuesta que contesta la pregunta que te hicieron, transforma una misma frase con to be cambiando el sujeto, y pasa de «I am…» a «She is… / His name is…» al presentar a alguien más. Contenido verbatim de Inglés I; los personajes y sus datos son ficticios.",
+  },
+  "aula-ingles-interacciones": {
+    slug: "aula-ingles-interacciones",
+    titulo: "Laboratorio Interactivo — In the classroom: el turno adecuado",
+    descripcion: "Elige, en ocho situaciones reales del aula, cuál de tres expresiones en inglés cumple tu intención y le habla a la maestra —el error explica qué comunica de más o de menos—, arma tres intercambios profesor↔alumno donde el orden importa, y clasifica doce expresiones en formal e informal sin tratar lo informal como incorrecto. Contenido verbatim de Inglés I.",
+  },
+  "lectura-critica-postura": {
+    slug: "lectura-critica-postura",
+    titulo: "Laboratorio Interactivo — Leer más allá de lo literal",
+    descripcion: "Trabaja los tres niveles de lectura sobre un mismo texto —literal, inferencial y crítico—, descubre el supuesto que el autor no argumenta pero necesita, distingue criticar el argumento de descalificar a quien lo dice, y toma postura sosteniéndola con dos líneas del texto. Contenido verbatim de Lengua y Comunicación III; los textos que se critican son ilustrativos.",
+  },
+  "kit-herramientas-digitales": {
+    slug: "kit-herramientas-digitales",
+    titulo: "Laboratorio Interactivo — Kit de herramientas digitales para estudiar",
+    descripcion: "Elige la categoría de herramienta que resuelve cada encargo escolar y descarta las que no sirven, desempata entre dos herramientas según la necesidad declarada, renombra y archiva un escritorio hecho un desastre y ordena los ocho pasos de un trabajo con la herramienta de cada paso. Contenido verbatim de Cultura Digital I.",
+  },
+  "convivencia-digital": {
+    slug: "convivencia-digital",
+    titulo: "Laboratorio Interactivo — Identidad y respeto en el ciberespacio",
+    descripcion: "Manda el mismo mensaje por cuatro canales y con cuatro tonos y mide cómo cambia su efecto, cierra un perfil bajando lo que se deduce de ti sin perder presencia, decide ante cuatro casos —broma, rumor, hostigamiento y suplantación— si toca hablar, documentar, bloquear, reportar o pedir ayuda, y reescribe respuestas hostiles en firmes. Contenido verbatim de Cultura Digital I; los casos y el perfil son ilustrativos.",
+  },
+  "derechos-digitales": {
+    slug: "derechos-digitales",
+    titulo: "Laboratorio Interactivo — Mis derechos en el mundo digital",
+    descripcion: "Resuelve cuatro casos decidiendo qué derecho está en juego, qué mecanismo procede y qué deber te toca del otro lado; clasifica ocho solicitudes en su letra de ARCO y audita un aviso de privacidad cláusula por cláusula. Contenido verbatim de Cultura Digital I, con el marco legal vigente (LFPDPPP, DOF 20/03/2025).",
+  },
+  "procedimientos-narrativos": {
+    slug: "procedimientos-narrativos",
+    titulo: "Laboratorio Interactivo — Procedimientos narrativos",
+    descripcion: "Reconstruye el orden de los hechos de dos relatos y nombra sus analepsis y prolepsis, lee la misma escena en tres voces y reparte qué puede contar cada una, mide resumen, escena, elipsis y pausa contra el reloj de la historia, y convierte el estilo directo en indirecto e indirecto libre pieza por pieza. Contenido verbatim de Lengua y Comunicación II.",
+  },
+  "reescritura-taller": {
+    slug: "reescritura-taller",
+    titulo: "Laboratorio Interactivo — Taller de reescritura",
+    descripcion: "Opera tres borradores tachando muletillas, repeticiones y relleno mientras el contador de palabras baja; decide qué operación repara cada defecto (suprimir, sustituir, reordenar, ampliar), aplica marcas de corrector tal cual y descubre que la mejor versión depende del propósito declarado, no de cuál suena mejor. Contenido verbatim de Lengua y Comunicación II.",
+  },
+  "temas-ideas-narrativa": {
+    slug: "temas-ideas-narrativa",
+    titulo: "Laboratorio Interactivo — Tema, idea central y sus hilos",
+    descripcion: "Separa en tres narrativas populares lo que pasa de aquello sobre lo que hacen pensar, elige entre tres temas candidatos el único que el texto sostiene y señala los hilos que lo sostienen, mide el tema demasiado ancho y el demasiado angosto, y empareja seis relatos distintos por el tema que comparten. Contenido verbatim de Lengua y Comunicación II; los relatos son textos ilustrativos escritos para la práctica.",
+  },
+  "narrativas-populares-lengua": {
+    slug: "narrativas-populares-lengua",
+    titulo: "Laboratorio Interactivo — La lengua de las narrativas populares",
+    descripcion: "Marca dentro de tres relatos los rasgos que delatan la tradición oral —fórmulas de apertura y cierre, repetición, diminutivo, voz regional, presente histórico, refrán, discurso directo, hipérbole—, traslada cinco frases del registro oral al escrito midiendo qué se pierde, y reconoce de qué lengua viene cada voz del relato. Contenido verbatim de Lengua y Comunicación II; las voces regionales y de lenguas originarias se tratan como variación legítima, nunca como error.",
+  },
+  "taller-descripcion-narracion": {
+    slug: "taller-descripcion-narracion",
+    titulo: "Laboratorio Interactivo — Taller de descripción y narración",
+    descripcion: "Cambia adjetivos genéricos por detalles concretos y mira cómo cambia la imagen, elige la ruta con que se revela una escena, convierte descripciones quietas en sucesos con su conector temporal y rescata frases hundidas por un verbo comodín. Contenido verbatim de Lengua y Comunicación II.",
+  },
+  "historia-de-vida-relato": {
+    slug: "historia-de-vida-relato",
+    titulo: "Laboratorio Interactivo — Tu historia de vida como relato",
+    descripcion: "Ordena los seis momentos de una anécdota, separa el suceso del detalle y de la huella, y elige narrador, tiempo verbal y distancia para reescribir la misma escena. Contenido verbatim de Lengua y Comunicación II; el laboratorio no pide ni califica experiencias personales.",
+  },
+  "anatomia-exposicion-oral": {
+    slug: "anatomia-exposicion-oral",
+    titulo: "Laboratorio Interactivo — Anatomía de una exposición oral",
+    descripcion: "Monta el guion pieza por pieza y comprueba qué se rompe cuando falta cada una, reparte los segundos contra el reloj hasta ver cómo el desarrollo se come el cierre, decide el apoyo visual de cada momento y diagnostica cuatro exposiciones ajenas. Contenido verbatim de Lengua y Comunicación I.",
+  },
+  "lectura-en-voz-alta": {
+    slug: "lectura-en-voz-alta",
+    titulo: "Laboratorio Interactivo — Leer en voz alta",
+    descripcion: "Marca sobre tres textos dónde va la pausa, el énfasis y el cambio de entonación y descubre por qué la puntuación lo pide ahí, ajusta la velocidad y los silencios según a quién va dirigido, y juzga seis lecturas ajenas eligiendo la opinión fundamentada. Contenido verbatim de Lengua y Comunicación I.",
+  },
+  "ideas-clave-subrayado": {
+    slug: "ideas-clave-subrayado",
+    titulo: "Laboratorio Interactivo — Ideas clave: qué subrayar y por qué",
+    descripcion: "Subraya de verdad sobre tres textos con marcadores de idea principal, detalle de apoyo y relleno; arma con lo subrayado el esquema jerárquico de cada texto y diagnostica nueve resúmenes ajenos. Contenido verbatim de Lengua y Comunicación I.",
+  },
+  "hecho-opinion-texto": {
+    slug: "hecho-opinion-texto",
+    titulo: "Laboratorio Interactivo — Hecho, idea y opinión",
+    descripcion: "Marca dentro de tres textos reales qué es información verificable, qué es idea del autor y qué es opinión, caza la palabra que delata el juicio y decide si el texto quiere informarte o convencerte. Contenido verbatim de Lengua y Comunicación I.",
+  },
+  "encuesta-lectora-comunidad": {
+    slug: "encuesta-lectora-comunidad",
+    titulo: "Laboratorio Interactivo — La encuesta lectora de tu comunidad",
+    descripcion: "Decide qué preguntas sirven para investigar a tu comunidad, codifica nueve respuestas reales en tipo de texto y soporte, y lee la gráfica que producen tus propias decisiones. Contenido verbatim de Lengua y Comunicación I.",
+  },
+  "lectura-escritura-dialogo": {
+    slug: "lectura-escritura-dialogo",
+    titulo: "Laboratorio Interactivo — Leer y escribir: un diálogo",
+    descripcion: "Reconstruye tres circuitos reales en los que leer alimenta lo que escribes y lo escrito cambia cómo vuelves a leer, clasifica doce textos por su función, escribe el glosario de memoria y redacta tu propia reflexión. Contenido verbatim de Lengua y Comunicación I.",
+  },
   densidad: {
     slug: "densidad",
     titulo: "Laboratorio 3D — Densidad y Flotación",
@@ -709,5 +829,235 @@ export const PRACTICAS_META: Record<string, PracticaMeta> = {
     slug: "herramientas-colaborativas",
     titulo: "Laboratorio Interactivo — Herramientas Colaborativas",
     descripcion: "Elige la herramienta colaborativa según la tarea, empareja las funciones de la nube y distingue buenas prácticas de errores. Contenido verbatim de Ciudadanía Digital II.",
+  },
+  "galton-probabilidad-frecuencia": {
+    slug: "galton-probabilidad-frecuencia",
+    titulo: "Laboratorio 3D — Azar, frecuencia y probabilidad: el tablero de Galton",
+    descripcion: "Cuenta el espacio muestral de un dado, dos monedas o una baraja para calcular P(A) y su complemento; suelta bolas en un tablero de Galton y compara la frecuencia observada con la curva binomial teórica; repite el experimento miles de veces y mira la ley de los grandes números en acción.",
+  },
+  "conjuntos-venn-3d": {
+    slug: "conjuntos-venn-3d",
+    titulo: "Laboratorio 3D — Conjuntos y diagramas de Venn",
+    descripcion: "Mueve elementos entre las zonas de un diagrama de Venn y observa la unión, la intersección, el complemento y la diferencia; construye por separado los dos lados de las leyes de De Morgan y acomoda una encuesta empezando por la intersección.",
+  },
+  "tecnicas-conteo-3d": {
+    slug: "tecnicas-conteo-3d",
+    titulo: "Laboratorio 3D — Técnicas de conteo: contar para decidir",
+    descripcion: "Ramifica un árbol del principio multiplicativo, sube a Ana, Beto, Carla, Diego y Eva a un podio o siéntalos en un comité para ver por qué P(n,r) = C(n,r)·r!, y extrae de una urna con y sin reemplazo para distinguir eventos independientes de dependientes.",
+  },
+  "bayes-probabilidad-condicional": {
+    slug: "bayes-probabilidad-condicional",
+    titulo: "Laboratorio 3D — Bayes: actualizar creencias con nueva información",
+    descripcion: "Probabilidad condicional en 3D: el espacio muestral que se reduce, árboles con regla del producto e inversión con Bayes, y una prueba diagnóstica con 1 000 personas para calcular el Valor Predictivo Positivo del ejercicio A2.",
+  },
+  "correlacion-variables-3d": {
+    slug: "correlacion-variables-3d",
+    titulo: "Laboratorio 3D — ¿Están relacionadas? Independencia y correlación",
+    descripcion: "Relación entre variables en 3D: tabla de contingencia en torres con el plano de lo esperado, diagrama de dispersión interactivo con r y rectángulos de productos, y la temperatura como variable oculta que desmonta la correlación entre helado y ahogamientos.",
+  },
+  "muestreo-estadistico-3d": {
+    slug: "muestreo-estadistico-3d",
+    titulo: "Laboratorio 3D — Muestreo: cómo elegir una muestra representativa",
+    descripcion: "Una escuela de 800 estudiantes en 3D: muestreo aleatorio simple, sistemático, estratificado y por conglomerados; el sesgo de las encuestas voluntarias y de conveniencia, y 300 muestras repetidas para ver cómo el tamaño angosta el error muestral.",
+  },
+  "estadistica-enganosa-3d": {
+    slug: "estadistica-enganosa-3d",
+    titulo: "Laboratorio 3D — Estadísticas que engañan",
+    descripcion: "Ocho trucos de los medios en 3D: eje truncado, íconos que crecen en volumen, escala logarítmica, puntos contra porcentaje, riesgo relativo, bases distintas, media contra mediana y margen de error.",
+  },
+  "variables-poblacion-muestra-3d": {
+    slug: "variables-poblacion-muestra-3d",
+    titulo: "Laboratorio 3D — Estadística: variables, población y muestra",
+    descripcion: "Una máquina clasificadora de variables, el censo de una escuela de 1 500 estudiantes contra encuestas de 20 a 500, y la tabla de frecuencias con intervalos para distinguir la estadística descriptiva de la inferencial.",
+  },
+  "metodo-cientifico-medicion-3d": {
+    slug: "metodo-cientifico-medicion-3d",
+    titulo: "Laboratorio 3D — Método científico: el experimento controlado y la medición",
+    descripcion: "Un invernadero en 3D para recorrer el método científico con plantas bajo distintas horas de luz, réplicas que muestran la variación natural y la medición con cinta, regla y calibrador vernier.",
+  },
+  "naturaleza-ciencia-3d": {
+    slug: "naturaleza-ciencia-3d",
+    titulo: "Laboratorio 3D — La ciencia como práctica humana: revisión, falsabilidad y autocorrección",
+    descripcion: "Revisa estudios como un par científico y mira si cinco laboratorios los replican, pon a prueba afirmaciones en un banco 3D y sigue cómo la evidencia cambió el consenso sobre las úlceras y la deriva continental.",
+  },
+  "tipos-energia-aplicaciones-3d": {
+    slug: "tipos-energia-aplicaciones-3d",
+    titulo: "Laboratorio 3D — Tipos de energía: de los fenómenos naturales a la tecnología",
+    descripcion: "Arma la cadena de energía de un rayo, la brisa marina, un volcán y la fotosíntesis, pon a trabajar un aerogenerador, una planta geotérmica y un panel frente a una hoja con un diagrama de flujo 3D de pérdidas, y diseña tu propia investigación con datos.",
+  },
+  "consumo-energetico-hogar-3d": {
+    slug: "consumo-energetico-hogar-3d",
+    titulo: "Laboratorio 3D — Consumo energético e impacto ambiental",
+    descripcion: "Enciende y desconecta los aparatos de una casa mexicana y calcula kWh, recibo escalonado y CO₂; sigue la energía de la planta al foco y convierte tu huella de carbono anual en globos de CO₂ a tamaño real.",
+  },
+  "energias-renovables-mexico-3d": {
+    slug: "energias-renovables-mexico-3d",
+    titulo: "Laboratorio 3D — Energías renovables y no renovables en México",
+    descripcion: "Recorre doce centrales reales en un relieve 3D de México para ver que capacidad instalada no es generación, opera una red de sol, viento, baterías y gas durante un día entero y ajusta la mezcla del país para medir sus emisiones y el agotamiento del petróleo.",
+  },
+  "hidrosfera-atmosfera-3d": {
+    slug: "hidrosfera-atmosfera-3d",
+    titulo: "Laboratorio 3D — Hidrósfera y atmósfera: capas, composición e intercambio",
+    descripcion: "Sube un globo sonda por las capas de la atmósfera, baja un sensor CTD por un océano estratificado por temperatura y salinidad, y sigue una parcela de aire del Golfo de México a Perote: evaporación, nube, lluvia y calor latente.",
+  },
+  "oxigenacion-atmosfera-3d": {
+    slug: "oxigenacion-atmosfera-3d",
+    titulo: "Laboratorio 3D — La oxigenación de la atmósfera",
+    descripcion: "Sigue el primer O₂ de las cianobacterias hasta el hierro bandeado y el aire, recorre 4,000 millones de años de atmósfera con su capa de ozono, y balancea, quema y clasifica óxidos básicos y ácidos.",
+  },
+  "innovaciones-ambientales-3d": {
+    slug: "innovaciones-ambientales-3d",
+    titulo: "Laboratorio 3D — Innovaciones tecnológicas para el ambiente",
+    descripcion: "Instala una cosecha de lluvia, un humedal que depura aguas residuales y un manglar restaurado; mide con modelos reales cuánta agua guardas, qué tan limpia sale y cuánto frena la ola, y relaciona cada innovación con el subsistema terrestre que aprovecha.",
+  },
+  "quimica-organica-industria-3d": {
+    slug: "quimica-organica-industria-3d",
+    titulo: "Laboratorio 3D — Química orgánica en la industria",
+    descripcion: "Sintetiza aspirina, paracetamol, aroma de plátano y bioetanol con moléculas 3D reales, alarga cadenas de PE, PET y nylon y relaciona cada grupo funcional con su producto e industria.",
+  },
+  "contaminantes-plasticos-3d": {
+    slug: "contaminantes-plasticos-3d",
+    titulo: "Laboratorio 3D — Contaminantes químicos y plásticos",
+    descripcion: "Tira un plástico al mar y mira si flota o se hunde y cómo se rompe en microplásticos; sigue el DDT y el mercurio por la cadena alimenticia hasta tu plato, y decide si un residuo se recicla, se composta, se entierra o llega al río.",
+  },
+  "descubrimiento-celula-3d": {
+    slug: "descubrimiento-celula-3d",
+    titulo: "Laboratorio 3D — El descubrimiento de la célula: microscopios y teoría celular",
+    descripcion: "Mira la misma muestra con los microscopios de Hooke, Leeuwenhoek, el siglo XIX, el óptico y el electrónico; calcula aumento total y tamaño real, y levanta los tres postulados de la teoría celular con el experimento de Pasteur.",
+  },
+  "fision-nuclear-etica-3d": {
+    slug: "fision-nuclear-etica-3d",
+    titulo: "Laboratorio 3D — Energía nuclear: fisión y ética",
+    descripcion: "Controla la reacción en cadena de un reactor como el de Laguna Verde, calcula con E = mc² por qué una pastilla de uranio rinde lo que más de una tonelada de carbón, sigue los residuos durante miles de años y descubre que las antenas que conectan a un pueblo también pueden ubicar tu celular.",
+  },
+  "restauracion-ecosistemas-mexico-3d": {
+    slug: "restauracion-ecosistemas-mexico-3d",
+    titulo: "Laboratorio 3D — Conservación y restauración de ecosistemas en México",
+    descripcion: "Diseña con presupuesto limitado un plan para una cuenca con ANP, pago por servicios ambientales, corredores y vedas; restaura un potrero año por año hasta volverlo selva, y diagnostica con datos reales qué funcionó con la vaquita marina, Cabo Pulmo y la mariposa monarca.",
+  },
+  "logica-compuertas-3d": {
+    slug: "logica-compuertas-3d",
+    titulo: "Laboratorio 3D — Lógica matemática y compuertas: conectivos, tablas de verdad y razonamientos",
+    descripcion: "Enciende un foco con interruptores y compuertas para descubrir cuándo son verdaderos los conectivos, construye tablas de verdad para clasificar tautologías y contingencias, y separa el modus ponens y el tollens de las falacias en cuatro mundos posibles.",
+  },
+  "jerarquia-operaciones-3d": {
+    slug: "jerarquia-operaciones-3d",
+    titulo: "Laboratorio 3D — Jerarquía de operaciones",
+    descripcion: "Resuelve expresiones en una torre 3D eligiendo qué operación va primero y ve el resultado equivocado de cada error, compara cómo leen distinto una calculadora, una hoja de cálculo y una persona, y usa paréntesis para llegar a una meta en la recta numérica.",
+  },
+  "estimacion-fermi-3d": {
+    slug: "estimacion-fermi-3d",
+    titulo: "Laboratorio 3D — Estimación y órdenes de magnitud",
+    descripcion: "Estima cantidades enormes descomponiéndolas en factores y compáralas con datos reales en una regla logarítmica, redondea y trunca viendo a dónde rueda una canica, y caza resultados absurdos en recetas, cuentas y dosis.",
+  },
+  "viaje-paquete-internet-3d": {
+    slug: "viaje-paquete-internet-3d",
+    titulo: "Laboratorio 3D — El viaje de un paquete por Internet",
+    descripcion: "Sigue un mensaje partido en paquetes por DNS, routers y el cable submarino MAREA, envía una consulta segura a una IA y verifica su respuesta, y decide la vida útil y el destino final de tu teléfono.",
+  },
+  "centro-datos-huella-nube-3d": {
+    slug: "centro-datos-huella-nube-3d",
+    titulo: "Laboratorio 3D — Centros de datos y la huella de la nube",
+    descripcion: "Enfría un centro de datos en un clima como el de Querétaro y compara agua contra electricidad, decide los permisos de tus apps y mira a quién llegan tus datos, y diseña una política para que un trámite en línea no deje fuera a nadie.",
+  },
+  "software-libre-3d": {
+    slug: "software-libre-3d",
+    titulo: "Laboratorio 3D — Software libre y alternativas",
+    descripcion: "Abre la caja de las cuatro libertades con seis licencias reales, rescata archivos de 2007 guardados en formatos abiertos y cerrados, y calcula cuánto cuesta equipar una sala de cómputo con licencias, suscripciones o software libre.",
+  },
+  "estudio-edicion-digital-3d": {
+    slug: "estudio-edicion-digital-3d",
+    titulo: "Laboratorio 3D — Estudio de edición de contenido digital",
+    descripcion: "Abre una imagen hasta sus bits, comprímela con y sin pérdida, arma un cartel legible por capas y ajusta video y audio al peso que permiten los datos y equipos de tu comunidad.",
+  },
+  "alcance-publicacion-3d": {
+    slug: "alcance-publicacion-3d",
+    titulo: "Laboratorio 3D — Difusión digital: el alcance de una publicación",
+    descripcion: "Publica en una red 3D de 150 cuentas y distingue alcance, impresiones e interacción, diseña una campaña comunitaria accesible con máximo dos canales y frena un rumor que se comparte 70 % más que el dato verificado.",
+  },
+  "casa-escuela-objetos-ingles-3d": {
+    slug: "casa-escuela-objetos-ingles-3d",
+    titulo: "Laboratorio 3D — Objects and spaces: describe el aula y la casa",
+    descripcion: "Encuentra objetos en un aula 3D siguiendo instrucciones en inglés, recupera tus cosas en Lost and found describiéndolas por tamaño, forma y color, y acomoda una recámara con preposiciones de lugar y There is / There are.",
+  },
+  "clima-vestimenta-ingles-3d": {
+    slug: "clima-vestimenta-ingles-3d",
+    titulo: "Laboratorio 3D — People, clothes and weather: la plaza de la colonia",
+    descripcion: "Cambia el clima de la plaza y repórtalo en inglés, viste a una persona según el pronóstico de su ciudad y describe a la gente de la parada sin juzgar su apariencia.",
+  },
+  "rutina-diaria-ingles-3d": {
+    slug: "rutina-diaria-ingles-3d",
+    titulo: "Laboratorio 3D — Daily routines: el día de Ana",
+    descripcion: "Ordena y narra en inglés el día de Ana en una maqueta 3D con un sol que recorre el cielo, pon y di la hora en un reloj de manecillas, y cuenta en su calendario semanal para elegir el adverbio de frecuencia.",
+  },
+  "ciudad-direcciones-ingles-3d": {
+    slug: "ciudad-direcciones-ingles-3d",
+    titulo: "Laboratorio 3D — Directions in town: pide y da indicaciones",
+    descripcion: "Sigue indicaciones en inglés para llevar a Emma por un barrio 3D, escribe rutas que Sam ejecuta al pie de la letra y ubica lugares con next to, across from, between y on the corner of.",
+  },
+  "relato-secuencia-ingles-3d": {
+    slug: "relato-secuencia-ingles-3d",
+    titulo: "Laboratorio 3D — Telling a story: secuencia, conectores y coherencia",
+    descripcion: "Ordena, conecta y escribe anécdotas en inglés en un teatrino de viñetas 3D: pasado simple, conectores como first, then, suddenly, while, because y so, y coherencia temporal.",
+  },
+  "planes-futuro-ingles-3d": {
+    slug: "planes-futuro-ingles-3d",
+    titulo: "Laboratorio 3D — Plans and purposes: la colonia que planeamos",
+    descripcion: "Decide si cada situación pide be going to, will o present continuous y mira la consecuencia en 3D, planea con fichas proyectos que transforman una colonia con to, so that y because, y escribe tus metas de next week a in five years.",
+  },
+  "habilidades-permisos-ingles-3d": {
+    slug: "habilidades-permisos-ingles-3d",
+    titulo: "Laboratorio 3D — Can you…? May I…? El centro comunitario",
+    descripcion: "Entrevista con «Can you…?» a jóvenes que intentan nadar, cocinar o tocar la guitarra frente a ti para formar equipos, pide permiso con la cortesía adecuada a adultos y amigos, y lee los letreros del centro para escribir qué se puede y qué no.",
+  },
+  "cortesia-conversacion-ingles-3d": {
+    slug: "cortesia-conversacion-ingles-3d",
+    titulo: "Laboratorio 3D — Polite conversations: open, keep, close",
+    descripcion: "Conversa en inglés en una cafetería, una fiesta, una videollamada y una clínica: abre, mantén y cierra con cortesía y empatía, ajusta tu registro a quien te escucha y reescribe las líneas descorteses mientras los personajes reaccionan.",
+  },
+  "mercado-necesidades-ingles-3d": {
+    slug: "mercado-necesidades-ingles-3d",
+    titulo: "Laboratorio 3D — Needs and wishes: el tianguis y el centro de acopio",
+    descripcion: "Haz el mandado en un tianguis 3D pidiendo con I'd like y how much / how many sin pasarte del presupuesto, justifica decisiones vecinales con I'd rather… because…, y atiende con empatía a cinco vecinos en el centro de acopio.",
+  },
+  "terminal-horarios-ingles-3d": {
+    slug: "terminal-horarios-ingles-3d",
+    titulo: "Laboratorio 3D — Where and when? La terminal de autobuses",
+    descripcion: "Pide información en una terminal de autobuses 3D con la palabra interrogativa correcta, responde a viajeros leyendo un tablero de salidas que cambia en vivo y atiende el módulo de información con respuestas cortas y completas.",
+  },
+  "lugares-recomendaciones-ingles-3d": {
+    slug: "lugares-recomendaciones-ingles-3d",
+    titulo: "Laboratorio 3D — Places to visit: Rincón del Colibrí",
+    descripcion: "Describe con there is, there are y you can las maquetas 3D de un pueblo costero, lee una guía turística en inglés para llevar a cada visitante a su lugar y escribe recomendaciones con su razón que los turistas siguen y califican.",
+  },
+  "gustos-opiniones-ingles-3d": {
+    slug: "gustos-opiniones-ingles-3d",
+    titulo: "Laboratorio 3D — Likes and opinions: la feria de gustos",
+    descripcion: "En la feria de gustos de una prepa, entrevista a tus compañeros con Do you like…?, grafica sus respuestas, forma mesas donde todos estén contentos y responde a sus opiniones con tu gusto, una razón y empatía.",
+  },
+  "dilema-tranvia-etica-3d": {
+    slug: "dilema-tranvia-etica-3d",
+    titulo: "Laboratorio 3D — Dilemas éticos: el tranvía y la balanza de argumentos",
+    descripcion: "Decide y justifica en el dilema del tranvía y sus variantes, arma argumentos en dilemas cotidianos y clasifica por teoría ética o falacia las intervenciones del debate «¿Los fines justifican los medios?».",
+  },
+  "caverna-conocimiento-3d": {
+    slug: "caverna-conocimiento-3d",
+    titulo: "Laboratorio 3D — La caverna y el conocimiento: sombras, sentidos y certeza",
+    descripcion: "Proyecta sombras desde el fuego de la caverna de Platón y descubre que objetos distintos dan la misma sombra, acompaña al prisionero liberado hasta el Sol, déjate engañar por una habitación de Ames y sube una creencia por la escalera de la certeza.",
+  },
+  "archivo-fuentes-historicas-3d": {
+    slug: "archivo-fuentes-historicas-3d",
+    titulo: "Laboratorio 3D — Archivo de fuentes históricas",
+    descripcion: "Examina con la lupa la procedencia e intención de documentos de la expropiación petrolera de 1938, corrobora afirmaciones con hilos en un tablero de corcho, desenmascara una fuente con anacronismos y corrige una foto histórica descontextualizada antes de armar una interpretación argumentada.",
+  },
+  "preguntas-pasado-discursos-3d": {
+    slug: "preguntas-pasado-discursos-3d",
+    titulo: "Laboratorio 3D — Preguntas al pasado",
+    descripcion: "Excava capas de tiempo bajo problemáticas actuales de México para formular preguntas históricas, ubica evidencias en una espiral del tiempo nombrando sus relaciones y teje una explicación con muchas voces.",
+  },
+  "agora-ciudadania-3d": {
+    slug: "agora-ciudadania-3d",
+    titulo: "Laboratorio 3D — Ágora: ciudadanía y democracia",
+    descripcion: "Predice quién podía votar desde la Atenas clásica hasta la paridad de género, conduce una asamblea vecinal donde el procedimiento decide quién gana y quién queda fuera, y arma tu intervención en un debate distinguiendo hechos, valores y falacias.",
   },
 };

@@ -28,6 +28,11 @@ import { RetoQuizCard } from "./_reto-quiz";
 import { QUIZ_A2 } from "./organica-visor-data";
 import { LabSfx } from "./lab-audio";
 
+import { TableroObjetivos } from "./_objetivos";
+
+/** Clave de la mejor marca de este laboratorio. */
+const RETO_KEY = "cen-organica-visor-reto";
+
 const OrganicaScene = dynamic(() => import("./OrganicaScene"), {
   ssr: false,
   loading: () => (
@@ -360,19 +365,16 @@ export function LabOrganica({ color }: PracticaLabProps) {
           <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
           Objetivos
         </Eyebrow>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-          {[
+        <TableroObjetivos
+          retoKey={RETO_KEY}
+          accent={accent}
+          objetivos={[
             { txt: "Explora las cuatro familias orgánicas", done: FAMILIAS.every((f) => f.id === comp.familia || compuestosDe(f.id).length > 0) && comp.familia !== COMP_DEF.split("-")[0] },
             { txt: "Identifica un grupo funcional resaltado", done: resaltarFG },
             { txt: "Observa un alqueno (doble enlace C=C)", done: comp.familia === "alqueno" },
             { txt: "Aprueba el cuestionario de la actividad A2", done: ejercicioAprobado },
-          ].map((o, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? "#34D399" : T.text2 }}>
-              <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-              <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-            </div>
-          ))}
-        </div>
+          ]}
+        />
       </div>
 
       {/* ── Reto evaluable: el quiz verbatim del ancla ───────────────── */}

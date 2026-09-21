@@ -13,7 +13,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, OK, card, Eyebrow, SceneBoundary } from "./_kit";
+import { T, card, Eyebrow, SceneBoundary } from "./_kit";
 import { FichaTeorica } from "./_ficha";
 import { RetoNumericoCard } from "./_reto-numerico";
 import { LabSfx } from "./lab-audio";
@@ -44,6 +44,10 @@ import {
   DATOS,
   HECHOS,
 } from "./calor-data";
+import { TableroObjetivos } from "./_objetivos";
+
+/** Clave de la mejor marca de este laboratorio. */
+const RETO_KEY = "cen-propagacion-calor-reto";
 
 const CalorScene = dynamic(() => import("./CalorScene"), {
   ssr: false,
@@ -135,8 +139,6 @@ export function LabCalor({ color }: PracticaLabProps) {
   const flujo = conduccion(mat.k, areaM2, dT, largoM); // W
   const energia = calorSensible(m, mat.c, dT); // J
   const tCal = tiempoCalentar(m, mat.c, dT, flujo); // s
-
-  const objetivo = { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado };
 
   const sceneFallback = (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 28, textAlign: "center" }}>
@@ -520,11 +522,19 @@ export function LabCalor({ color }: PracticaLabProps) {
           </ul>
 
           <div style={{ marginTop: 16, paddingTop: 14, borderTop: `1px solid ${T.line}` }}>
-            <Eyebrow><i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />Objetivo</Eyebrow>
-            <div style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13, color: objetivo.done ? OK : T.text2, marginTop: 4 }}>
-              <i className={`fa-solid ${objetivo.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: objetivo.done ? 1 : 0.3 }} />
-              <span style={{ fontWeight: objetivo.done ? 700 : 500 }}>{objetivo.txt}</span>
-            </div>
+            <Eyebrow><i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />Objetivos</Eyebrow>
+            <TableroObjetivos
+              retoKey={RETO_KEY}
+              accent={accent}
+              objetivos={[
+              { txt: "Sigue la conducción: el calor avanza partícula a partícula", done: modo === "conduccion" && paso > 0 },
+              { txt: "Cambia el material y compara qué tan rápido conduce", done: matNombre !== "Cobre" },
+              { txt: "Observa la convección: el fluido caliente sube y el frío baja", done: modo === "conveccion" },
+              { txt: "Observa la radiación: viaja sin necesidad de medio", done: modo === "radiacion" },
+              { txt: "Compara los tres mecanismos uno al lado del otro", done: modo === "comparar" },
+              { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
+              ]}
+            />
           </div>
         </div>
       </div>

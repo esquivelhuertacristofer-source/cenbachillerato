@@ -21,7 +21,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, OK, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { T, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
 import { FichaTeorica } from "./_ficha";
 import { ELECTROMAGNETISMO_FICHA } from "./electromagnetismo-ohm-faraday-ficha";
 import { RetoNumericoCard } from "./_reto-numerico";
@@ -38,6 +38,11 @@ import {
   PROBLEMA, INSTRUCCIONES, PREGUNTAS, IDEAS, DATOS, GLOSARIO, EJEMPLO_A, EJEMPLO_B,
   fmt2, fmt3, fmtV, fmtA, fmtR, fmtW, fmtKw, fmtKwh, fmtMXN, fmtPct, fmtHz, fmtHp,
 } from "./electromagnetismo-data";
+
+import { TableroObjetivos } from "./_objetivos";
+
+/** Clave de la mejor marca de este laboratorio. */
+const RETO_KEY = "cen-electromagnetismo-ohm-faraday-reto";
 
 const ElectromagnetismoScene = dynamic(() => import("./ElectromagnetismoScene"), {
   ssr: false,
@@ -553,19 +558,17 @@ export function LabElectromagnetismo({ color }: PracticaLabProps) {
           <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
           Objetivos
         </Eyebrow>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-          {[
-            { txt: "Explora el modo Circuito y ajusta V y R", done: false },
-            { txt: "Explora el modo Generador (FEM de Faraday)", done: false },
-            { txt: "Explora el modo Motor y varía la eficiencia", done: false },
+        <TableroObjetivos
+          retoKey={RETO_KEY}
+          accent={accent}
+          objetivos={[
+            { txt: "Explora el modo Circuito y ajusta V y R", done: modo === "circuito" && (V !== V_DEF || R !== R_DEF) },
+            { txt: "Explora el modo Generador (FEM de Faraday)", done: modo === "generador" },
+            { txt: "Cambia las vueltas N o el campo B y observa la FEM inducida", done: N !== N_DEF || B !== B_DEF },
+            { txt: "Explora el modo Motor y varía la eficiencia", done: modo === "motor" },
             { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
-          ].map((o, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? OK : T.text2 }}>
-              <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-              <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-            </div>
-          ))}
-        </div>
+          ]}
+        />
       </div>
 
       {/* ── Reto evaluable: el ejercicio verbatim del ancla A2 ────────────── */}

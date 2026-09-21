@@ -31,6 +31,11 @@ import {
   MODO_DEF, FUNC_DEF, type Modo, type FuncId,
 } from "./continuidad-data";
 
+import { TableroObjetivos } from "./_objetivos";
+
+/** Clave de la mejor marca de este laboratorio. */
+const RETO_KEY = "cen-continuidad-tres-condiciones-reto";
+
 const ContinuidadScene = dynamic(() => import("./ContinuidadScene"), {
   ssr: false,
   loading: () => (
@@ -491,19 +496,18 @@ export function LabContinuidad({ color }: PracticaLabProps) {
           <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
           Objetivos
         </Eyebrow>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-          {[
-            { txt: "Mueve x y observa las 3 condiciones de continuidad en acción", done: true },
-            { txt: "Identifica y clasifica una discontinuidad evitable, de salto y esencial", done: true },
-            { txt: "Verifica el TVI: g(1) < 0 < g(2) garantiza raíz en (1,2)", done: true },
+        <TableroObjetivos
+          retoKey={RETO_KEY}
+          accent={accent}
+          objetivos={[
+            { txt: "Mueve x y observa las 3 condiciones de continuidad en acción", done: xPos !== f.xDef },
+            { txt: "Examina la discontinuidad evitable (el hueco que se puede tapar)", done: modo === "continuidad" && funcId === "evitable" },
+            { txt: "Examina la discontinuidad de salto y la esencial (asíntota)", done: funcId === "salto" || funcId === "esencial" },
+            { txt: "Compara con una función continua en todo su dominio", done: funcId === "continua" },
+            { txt: "Verifica el TVI: g(1) < 0 < g(2) garantiza raíz en (1,2)", done: modo === "tvi" },
             { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
-          ].map((o, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? "#34D399" : T.text2 }}>
-              <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-              <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-            </div>
-          ))}
-        </div>
+          ]}
+        />
       </div>
 
       {/* ── Lecturas + ideas clave ─────────────────────────────────── */}

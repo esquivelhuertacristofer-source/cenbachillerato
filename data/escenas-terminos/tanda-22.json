@@ -1,0 +1,19 @@
+[
+  {
+    "slug": "historia-de-vida-relato",
+    "items": [
+      { "clave": "detonante", "escena": "A clay domino standing upright being tipped by a small clay finger, with a line of dominoes waiting behind it" },
+      { "clave": "giro", "escena": "A clay path running straight and then bending sharply to one side, with a small clay marker planted exactly at the bend" },
+      { "clave": "huella", "escena": "A single clay footprint pressed deep into soft clay ground, with a tiny green shoot growing out of it" },
+      { "clave": "suceso", "escena": "A clay alarm clock knocked over on a table beside a spilled cup, caught in the moment it happened" },
+      { "clave": "voz-narrativa", "escena": "Two clay figures facing the same small clay scene, one standing inside it and one watching from outside a low frame" },
+      { "clave": "tiempo-verbal", "escena": "A clay hourglass lying between two small clay scene boxes, one dim and one brightly lit" },
+      { "clave": "narracion", "escena": "Three small clay scene boxes in a row joined by chunky clay arrows, each showing a different moment of the same action" },
+      { "clave": "descripcion", "escena": "A single clay scene box under a magnifying glass, its small details — a cup, a chair, a window — modelled in sharp relief" },
+      { "clave": "idea-prioritaria", "escena": "A stack of clay cards with the top one lifted above the rest on a small pedestal" },
+      { "clave": "idea-secundaria", "escena": "One raised clay card with two smaller cards hanging below it on short clay stems" },
+      { "clave": "ficcion-y-realidad", "escena": "A clay photograph and a clay storybook lying side by side on a table, overlapping slightly at one corner" },
+      { "clave": "huella-personal", "escena": "A clay hand pressing into soft clay and lifting away, leaving a clear print that keeps its shape" }
+    ]
+  }
+]

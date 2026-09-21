@@ -27,6 +27,11 @@ import {
 } from "./geometria-analitica-data";
 import { LabSfx } from "./lab-audio";
 
+import { TableroObjetivos } from "./_objetivos";
+
+/** Clave de la mejor marca de este laboratorio. */
+const RETO_KEY = "cen-geometria-analitica-reto";
+
 const GeometriaAnaliticaScene = dynamic(() => import("./GeometriaAnaliticaScene"), {
   ssr: false,
   loading: () => (
@@ -406,20 +411,18 @@ export function LabGeometriaAnalitica({ color }: PracticaLabProps) {
           <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
           Objetivos
         </Eyebrow>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-          {[
-            { txt: "Mueve P₁ y P₂ sobre el plano cartesiano", done: true },
-            { txt: "Observa la distancia como hipotenusa (Pitágoras)", done: true },
-            { txt: "Identifica el punto medio entre dos puntos", done: true },
-            { txt: "Calcula e interpreta la pendiente de la recta", done: true },
+        <TableroObjetivos
+          retoKey={RETO_KEY}
+          accent={accent}
+          objetivos={[
+            { txt: "Mueve P₁ y P₂ sobre el plano cartesiano", done: x1 !== X1_DEF || y1 !== Y1_DEF || x2 !== X2_DEF || y2 !== Y2_DEF },
+            { txt: "Mira el triángulo rectángulo: la distancia es su hipotenusa (Pitágoras)", done: mostrarTriangulo },
+            { txt: "Consigue una recta horizontal (Δy = 0, pendiente m = 0)", done: Math.abs(g.dy) < 0.05 },
+            { txt: "Consigue una recta vertical (Δx = 0, pendiente indefinida)", done: !g.pendienteDef },
+            { txt: "Deja correr el barrido automático y sigue cómo cambian d, M y m", done: reproduciendo },
             { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
-          ].map((o, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? "#4ADE80" : T.text2 }}>
-              <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-              <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-            </div>
-          ))}
-        </div>
+          ]}
+        />
       </div>
 
       {/* nota de honestidad del modelo */}

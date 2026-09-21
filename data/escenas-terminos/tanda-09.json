@@ -1,0 +1,152 @@
+[
+  {
+    "slug": "hidrosfera-atmosfera-3d",
+    "items": [
+      { "clave": "presion-y-altura", "escena": "A clay column of stacked air layers above a mountain, with a pressure gauge at sea level and another at the summit" },
+      { "clave": "punto-de-ebullicion", "escena": "A clay pot of bubbling water on a mountain top with a thermometer reading lower than the one by the coast" },
+      { "clave": "inversion-termica-de-la-estratosfera", "escena": "A clay cross section of the sky with a warm glowing band sitting high above a cold band" },
+      { "clave": "termoclina-haloclina-y-picnoclina", "escena": "A tall clay glass column of ocean water with sharply separated layers of different shades" },
+      { "clave": "densidad-del-agua-de-mar", "escena": "A clay tank with warm bright water floating over cold dark salty water, a clear boundary between them" },
+      { "clave": "nivel-de-condensacion", "escena": "A clay column of rising air with a flat cloud base forming at the exact height where it cools" },
+      { "clave": "calor-latente", "escena": "A clay pot of evaporating water with heat arrows leaving it and a cloud above returning the same arrows" },
+      { "clave": "sombra-orografica", "escena": "A clay mountain with rain falling on one flank and dry cracked ground on the other" }
+    ]
+  },
+  {
+    "slug": "hipotesis-historicas",
+    "items": [
+      { "clave": "hipotesis-historica", "escena": "A clay card standing on a small easel with a pile of documents waiting beside it to support or topple it" },
+      { "clave": "fuente-primaria", "escena": "A clay sealed letter and an old tool lying together on an archive desk" },
+      { "clave": "fuente-secundaria", "escena": "A clay modern book resting on top of a stack of much older documents" },
+      { "clave": "critica-de-fuentes-heuristica", "escena": "A clay document under a magnifying glass with a jeweller's loupe and a lamp beside it" },
+      { "clave": "evidencia-historica", "escena": "A clay tray of small objects and papers gathered as proof beside a standing card" },
+      { "clave": "corroboracion-y-triangulacion-de-fuentes", "escena": "Three clay documents placed at the corners of a triangle with threads meeting at its centre" }
+    ]
+  },
+  {
+    "slug": "inecuaciones-lineales",
+    "items": [
+      { "clave": "inecuacion", "escena": "A clay balance tilted clearly to one side, heavier on the left" },
+      { "clave": "conjunto-solucion", "escena": "A clay number rod with a long shaded strip of beads running from one point onward" },
+      { "clave": "semiplano", "escena": "A clay board split by a straight stick with all the beads gathered on one side of it" },
+      { "clave": "region-factible", "escena": "A clay board where three sticks cut out a small polygon, filled with beads" },
+      { "clave": "programacion-lineal", "escena": "A clay polygon region on a board with a flag planted at one of its corners" },
+      { "clave": "inversion-del-signo", "escena": "A clay seesaw flipped upside down, the heavier side now at the other end" },
+      { "clave": "desigualdad", "escena": "A clay balance with three cubes on one pan and five on the other, clearly tipped" },
+      { "clave": "recta-numerica", "escena": "A clay straight rod with evenly spaced notches and one bead marked on it" },
+      { "clave": "intervalo", "escena": "A clay rod with two bracket clips on it and the whole segment between them raised" }
+    ]
+  },
+  {
+    "slug": "innovaciones-ambientales-3d",
+    "items": [
+      { "clave": "coeficiente-de-escurrimiento-ce", "escena": "A clay roof with rain falling on it and only part of the water reaching a cistern through a gutter" },
+      { "clave": "regimen-de-lluvias", "escena": "A clay row of twelve small rain gauges, four of them nearly full and the rest almost empty" },
+      { "clave": "dbo", "escena": "A clay jar of murky water with tiny oxygen bubbles being drawn out and counted in a cup" },
+      { "clave": "tiempo-de-residencia-hidraulica", "escena": "A clay pond with a float drifting slowly from its inlet to its outlet, a stopwatch standing beside it" },
+      { "clave": "nom-003-semarnat-1997", "escena": "A clay tap pouring clear treated water into a park irrigation channel with a test tube beside it" },
+      { "clave": "zonacion-del-manglar", "escena": "A clay coastal strip with stilt rooted trees at the water edge, pencil roots in the middle and shrubs inland" },
+      { "clave": "carbono-azul", "escena": "A clay mangrove with dark rich mud beneath it holding buried grey puffs" },
+      { "clave": "solucion-basada-en-la-naturaleza", "escena": "A clay coastline protected by a living belt of mangroves instead of a concrete wall" }
+    ]
+  },
+  {
+    "slug": "jerarquia-operaciones-3d",
+    "items": [
+      { "clave": "orden-de-la-jerarquia", "escena": "A clay staircase of four steps with a different small tool resting on each step" },
+      { "clave": "mismo-nivel-de-izquierda-a-derecha", "escena": "Two clay tokens on a shelf with an arrow sweeping across them from left to right" },
+      { "clave": "arbol-de-operaciones", "escena": "A clay branching tree of blocks where each fork joins two blocks into one above them" },
+      { "clave": "el-exponente-y-el-signo", "escena": "Two clay cubes side by side, one wrapped inside a bracket ring and the other standing outside it" },
+      { "clave": "no-se-reparten", "escena": "A clay square built from one whole block beside two smaller squares that clearly do not add up to it" },
+      { "clave": "restar-es-sumar-el-opuesto", "escena": "A clay block and its mirrored opposite block cancelling each other on a balance" },
+      { "clave": "ambiguedad", "escena": "A clay path forking into two routes that end at two different blocks" }
+    ]
+  },
+  {
+    "slug": "juventudes-politicas",
+    "items": [
+      { "clave": "sujeto-historico", "escena": "A clay young figure standing with a hand on a large turning wheel" },
+      { "clave": "agencia-juvenil", "escena": "A clay young figure building a small structure out of blocks by its own choice" },
+      { "clave": "construccion-social-de-la-juventud", "escena": "A clay figure being shaped inside a mould held by several hands around it" },
+      { "clave": "participacion-politica-juvenil", "escena": "A clay young figure dropping a ballot into a box beside others holding a banner" },
+      { "clave": "activismo-digital", "escena": "A clay phone with ripples spreading outward to a crowd of small figures" },
+      { "clave": "diversidad-juvenil", "escena": "A group of clay young figures of different heights, clothes and features standing together" }
+    ]
+  },
+  {
+    "slug": "lenguaje-algebraico-mosaicos",
+    "items": [
+      { "clave": "variable", "escena": "A single clay rectangular tile standing on its edge, longer than it is wide, alone on a board" },
+      { "clave": "coeficiente", "escena": "Three identical clay rectangular tiles stacked neatly in a row on a board" },
+      { "clave": "termino-semejante", "escena": "Two identical clay tiles placed side by side with a differently shaped tile pushed off to one side" },
+      { "clave": "grado", "escena": "A clay cube, a flat square tile and a small unit cube lined up on a board, descending in size" },
+      { "clave": "modelo-de-area", "escena": "A clay rectangle on a board divided into a grid of large squares, long strips and small unit tiles" },
+      { "clave": "monomio", "escena": "One clay tile alone in the middle of a wooden board" },
+      { "clave": "binomio", "escena": "Two clay tiles of different shapes placed side by side on a board" },
+      { "clave": "trinomio", "escena": "Three clay tiles of different shapes lined up on a board" },
+      { "clave": "polinomio", "escena": "Four clay tiles of different shapes lined up on a board" },
+      { "clave": "distributiva", "escena": "A clay rectangle split by a line into two parts, with a hand sliding one part away from the other" },
+      { "clave": "terminos-semejantes", "escena": "Two piles of clay tiles on a board: identical square tiles in one and identical long strips in the other" }
+    ]
+  },
+  {
+    "slug": "ley-senos-cosenos",
+    "items": [
+      { "clave": "triangulo-oblicuangulo", "escena": "A clay triangle on a board with no square corner anywhere, one of its angles clearly wide" },
+      { "clave": "ley-de-senos", "escena": "A clay triangle with each side tied by a coloured thread to the angle opposite it" },
+      { "clave": "ley-de-cosenos", "escena": "A clay triangle with square blocks built on two of its sides and a wedge cut away from the third" },
+      { "clave": "caso-lal", "escena": "A clay triangle made of two sticks joined at a fixed hinge angle, with the third side being measured" },
+      { "clave": "caso-lll", "escena": "A clay triangle built from three fixed sticks with a protractor measuring one of its corners" },
+      { "clave": "triangulacion-topografia", "escena": "Two clay surveyor tripods at separate points in a field, both sighting a distant tower" },
+      { "clave": "caso-lal-ley-de-cosenos", "escena": "A clay hinge holding two sticks at a set angle with a measuring tape closing the triangle" },
+      { "clave": "caso-lll-ley-de-cosenos", "escena": "Three clay sticks locked into a rigid triangle with a protractor set at one corner" },
+      { "clave": "caso-ambiguo-ley-de-senos", "escena": "A clay stick swinging from a pivot and touching the base line at two different points" }
+    ]
+  },
+  {
+    "slug": "licencias-software",
+    "items": [
+      { "clave": "licencia-privativa", "escena": "A clay program box wrapped in chains with a closed padlock on it" },
+      { "clave": "licencia-libre", "escena": "A clay program box standing open with hands freely copying its contents" },
+      { "clave": "navegador", "escena": "A clay window frame standing on a base with a globe visible through it" },
+      { "clave": "sistema-operativo", "escena": "A clay base platform holding up several small program boxes and resting on the machine below" },
+      { "clave": "unidad-de-medida-digital", "escena": "A clay set of nested measuring cups of increasing size arranged on a shelf" }
+    ]
+  },
+  {
+    "slug": "limites-acercamiento",
+    "items": [
+      { "clave": "limite-de-una-funcion", "escena": "A clay ball rolling along a track toward a marked post, getting closer and closer without arriving" },
+      { "clave": "sustitucion-directa", "escena": "A clay bead dropped straight into a slot on a curve, landing exactly on it" },
+      { "clave": "forma-indeterminada-0-0", "escena": "Two empty clay trays stacked as a fraction with a puzzled hand hovering above them" },
+      { "clave": "limite-notable-lim-x-0-sen-x-x-1", "escena": "A clay arc and a straight chord almost perfectly overlapping across a very small wedge" },
+      { "clave": "limite-al-infinito", "escena": "A clay track running away into the distance with a curve flattening toward a level rail" },
+      { "clave": "asintota-horizontal", "escena": "A clay curve flattening out toward a long horizontal bar it never quite touches" },
+      { "clave": "limites-laterales", "escena": "A clay bead approached by two small figures, one walking in from the left and one from the right" },
+      { "clave": "limite-trigonometrico-fundamental", "escena": "A tiny clay wedge of a circle where the arc and the straight chord look identical" }
+    ]
+  },
+  {
+    "slug": "logica-compuertas-3d",
+    "items": [
+      { "clave": "tabla-de-verdad", "escena": "A clay grid tray with a small switch in every cell, each one set up or down" },
+      { "clave": "el-condicional-como-compuerta", "escena": "A clay circuit board with an inverter feeding one input of a two input gate" },
+      { "clave": "formas-del-condicional", "escena": "Four clay arrows on a board pointing in different directions between two blocks" },
+      { "clave": "leyes-de-de-morgan", "escena": "A clay pair of switches with a cover flipping over them, turning one gate into the other" },
+      { "clave": "razonamiento-valido", "escena": "A clay chain of three links holding firm under a hanging weight" },
+      { "clave": "falacias-formales", "escena": "A clay chain with one link left open and the weight slipping through it" }
+    ]
+  },
+  {
+    "slug": "lugares-recomendaciones-ingles-3d",
+    "items": [
+      { "clave": "there-is-there-are-it-has", "escena": "A clay town square with one fountain in the middle and six benches around it" },
+      { "clave": "contar-lo-que-describes", "escena": "A clay row of six identical benches lined up in a park" },
+      { "clave": "can-para-posibilidad-y-can-t-para-reglas", "escena": "A clay natural pool with a figure swimming and a fenced rock with a barrier across it" },
+      { "clave": "preposiciones-de-lugar", "escena": "A clay building with a ramp in front of it, a tree beside it and a bench between two lamps" },
+      { "clave": "pisos-en-ingles-de-ee-uu", "escena": "A clay building cut open showing a ground level and one level above it, a small figure on each" },
+      { "clave": "recomendar", "escena": "A clay figure pointing a visitor toward a market stall while holding a small map" },
+      { "clave": "una-razon-que-sirva", "escena": "A clay card joined by an arrow to a small scene of a beach" }
+    ]
+  }
+]

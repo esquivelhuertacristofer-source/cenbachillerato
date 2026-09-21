@@ -1,0 +1,165 @@
+[
+  {
+    "slug": "adn-dogma-central-3d",
+    "items": [
+      { "clave": "dogma-central", "escena": "A clay conveyor belt with three stations in a row: a twisted ladder, a single ribbon strand, and a folded bead chain, joined by thick arrows pointing one way" },
+      { "clave": "replicacion", "escena": "A clay twisted ladder unzipping down the middle, each half growing a new matching half beside it" },
+      { "clave": "transcripcion", "escena": "A clay double helix inside a round membrane, with a single orange ribbon strand copied off it sliding out through a pore" },
+      { "clave": "traduccion", "escena": "A clay ribbon strand threading through a two lobed blob while a chain of coloured beads grows out the other side" },
+      { "clave": "codon-de-inicio-y-de-parada", "escena": "A clay ribbon strip lying flat with a green flag block at its left end and a solid red block at its right end" },
+      { "clave": "proteinas", "escena": "A clay chain of coloured beads folded into a compact knot resting on a plate beside a loose straight strand" },
+      { "clave": "estructura-de-la-doble-helice-del-adn", "escena": "A clay twisted ladder standing upright, its rungs made of paired coloured blocks that click together" },
+      { "clave": "replicacion-del-adn-semiconservativa", "escena": "Two clay twisted ladders side by side, each built from one dull grey strand and one bright new strand" },
+      { "clave": "codigo-genetico-y-codones", "escena": "A clay ribbon divided into groups of three coloured blocks, each group sitting under a different small bead" },
+      { "clave": "dogma-central-de-la-biologia-molecular", "escena": "Three clay objects in a row joined by thick arrows: a twisted ladder, a single ribbon, and a folded bead chain" }
+    ]
+  },
+  {
+    "slug": "agora-ciudadania-3d",
+    "items": [
+      { "clave": "ciudadania-formal-y-sustantiva", "escena": "Two clay doors side by side: the left one shut with a padlock, the right one open with a ramp and a tiny figure walking in" },
+      { "clave": "articulo-34-constitucional-vigente", "escena": "A clay open book on a wooden stand with a ribbon marker, a small folded flag beside it and a tiny figure reading" },
+      { "clave": "voto-directo-e-indirecto", "escena": "Two clay scenes on one base: on the left a figure drops a ball straight into a box, on the right the figure hands the ball to a middle figure who drops it in" },
+      { "clave": "ampliacion-del-sufragio-en-mexico", "escena": "A clay queue of many different small figures at a ballot box, with a ramp added at the front of the line" },
+      { "clave": "paridad-de-genero", "escena": "A clay balance scale resting perfectly level with the same number of small figures standing on each pan" },
+      { "clave": "democracia-procedimental-y-sustantiva", "escena": "A clay ballot box on the left and on the right a round table where figures of different heights all sit at the same level on stools" },
+      { "clave": "mayoria-umbral-consenso-y-consulta", "escena": "Four clay tokens on a table: a tall stack of discs, a stack with a raised bar above it, a closed ring of joined hands, and a small card with a folded corner" },
+      { "clave": "hecho-valor-y-falacia", "escena": "Three clay cards standing on a table: a stone tablet, a small heart, and a cracked card with a bent arrow on it" }
+    ]
+  },
+  {
+    "slug": "alcance-publicacion-3d",
+    "items": [
+      { "clave": "alcance", "escena": "A clay phone lying at the centre of a table with a ring of small distinct figures around it, each one lit once" },
+      { "clave": "impresiones", "escena": "A clay poster on a wall with a row of tally marks below it and the same figure walking past it twice" },
+      { "clave": "interaccion-y-tasa-de-interaccion", "escena": "A clay phone with a raised thumb, a speech bubble and a curved share arrow popping out of its screen" },
+      { "clave": "indicador-de-impacto", "escena": "A clay street corner cleaned up with a bin and small figures using it, a phone lying forgotten to one side" },
+      { "clave": "cascada-de-difusion", "escena": "A clay chain of falling dominoes that branches into two, then four, spreading outward across the table" },
+      { "clave": "nodo-influyente", "escena": "A clay web of small spheres connected by threads, with one larger glowing sphere at the centre holding many threads" },
+      { "clave": "audiencia-objetivo", "escena": "A clay target board with a single arrow in the bullseye and a small group of figures standing behind it" },
+      { "clave": "friccion-contra-la-desinformacion", "escena": "A clay share arrow slowed by a speed bump with a small warning triangle standing in its path" }
+    ]
+  },
+  {
+    "slug": "archivo-fuentes-historicas-3d",
+    "items": [
+      { "clave": "procedencia", "escena": "A clay letter with a red wax seal lying beside a stamped envelope and a small dated tag hanging from a string" },
+      { "clave": "intencionalidad", "escena": "A clay poster on an easel with a megaphone on one side and a private folded letter on the other" },
+      { "clave": "contexto", "escena": "A clay document in the middle of a table surrounded by old objects: an oil lamp, a quill and a coin" },
+      { "clave": "anacronismo-en-una-fuente", "escena": "A clay parchment scroll on a desk with a modern wristwatch lying on top of it, clearly out of place" },
+      { "clave": "confiabilidad-relativa-a-la-pregunta", "escena": "A clay document on a table under two magnifying glasses, one showing it sharp and the other showing it blurred" },
+      { "clave": "uso-etico-de-la-informacion", "escena": "A clay document with a small quotation tag tied to it by a string and a careful hand resting beside it" }
+    ]
+  },
+  {
+    "slug": "balanceo-ecuaciones",
+    "items": [
+      { "clave": "ley-de-conservacion-de-la-masa", "escena": "A clay balance scale with clusters of coloured spheres on both pans, arranged differently but the same in number, resting perfectly level" },
+      { "clave": "coeficiente-estequiometrico", "escena": "A clay block standing on the table in front of a group of joined spheres, clearly separate from them" },
+      { "clave": "subindice", "escena": "A clay molecule of joined spheres with a tiny block fused into its base, welded in place" },
+      { "clave": "balanceo-por-tanteo-inspeccion", "escena": "A clay seesaw with coloured spheres being added one by one to the lighter side by a small hand" },
+      { "clave": "estequiometria", "escena": "A clay measuring set on a bench: two small cups of spheres being poured into a mixing bowl in exact proportion" },
+      { "clave": "ecuacion-quimica", "escena": "Two clay molecule models on the left, a thick clay arrow in the middle, and two different molecule models on the right" },
+      { "clave": "reactivo", "escena": "Two clay molecule models sitting on the left side of a thick clay arrow on a table" },
+      { "clave": "producto", "escena": "One clay molecule model sitting alone on the right side of a thick clay arrow on a table" },
+      { "clave": "balanceo-por-tanteo", "escena": "A clay balance scale being levelled by a small hand adding identical spheres to the lighter pan" }
+    ]
+  },
+  {
+    "slug": "bayes-probabilidad-condicional",
+    "items": [
+      { "clave": "espacio-muestral-reducido", "escena": "Two overlapping clay rings on a table, with all the marbles outside the right ring swept into a pile off to the side" },
+      { "clave": "p-a-b-frente-a-p-b-a", "escena": "Two clay pie discs side by side with the same size slice raised on each, but the discs themselves are different sizes" },
+      { "clave": "probabilidad-total", "escena": "A clay tree of channels splitting into two branches, with marbles rolling down both and landing in one shared basket" },
+      { "clave": "teorema-de-bayes", "escena": "A thick clay arrow bent back on itself in a U shape, with a marble travelling from one cup around to the other" },
+      { "clave": "sensibilidad-y-especificidad", "escena": "A clay sorting machine with two chutes, sending round marbles down one side and square blocks down the other" },
+      { "clave": "valor-predictivo-positivo", "escena": "A clay pile of many white marbles with a few red ones mixed in, and a magnet lifting a small handful above it" }
+    ]
+  },
+  {
+    "slug": "bioetica",
+    "items": [
+      { "clave": "bioetica", "escena": "A clay balance scale with a small green sprout on one pan and a laboratory flask on the other" },
+      { "clave": "inteligencia-artificial", "escena": "A clay robot head and a clay human head resting on the same table, facing each other" },
+      { "clave": "postura-etica", "escena": "A clay figure standing firmly at a fork in a path, one arm raised pointing down one branch" },
+      { "clave": "filosofia-de-la-animalidad", "escena": "A clay human hand and a clay animal paw resting side by side on a table" },
+      { "clave": "problema-medioambiental", "escena": "A clay factory chimney with grey smoke on one side and a wilting bare tree on the other" }
+    ]
+  },
+  {
+    "slug": "biomas-ecosistemas",
+    "items": [
+      { "clave": "bioma", "escena": "A clay diorama strip with three zones blending into one another: desert dunes, green forest and a snowy peak" },
+      { "clave": "ecosistema", "escena": "A clay pond diorama on a round base with reeds, a frog, a fish and small stones" },
+      { "clave": "especie-endemica", "escena": "A small clay island base with one unique brightly coloured animal standing alone on it" },
+      { "clave": "anp-area-natural-protegida", "escena": "A clay patch of forest enclosed by a low fence, with a small sign post and a ranger hut at the gate" },
+      { "clave": "servicio-ecosistemico", "escena": "A clay forest with a clear stream running out of it into a cupped pair of hands" },
+      { "clave": "biodiversidad", "escena": "A clay shelf holding many different small animals and plants, every one of them distinct" },
+      { "clave": "pais-megadiverso", "escena": "A clay map plaque crowded with many different tiny animals and plants standing across it" },
+      { "clave": "componente-abiotico", "escena": "A clay arrangement on a table: a small sun, a water drop, a rock and a mound of soil" },
+      { "clave": "componente-biotico", "escena": "A clay arrangement on a table: a small tree, a deer, a mushroom and a beetle" },
+      { "clave": "sucesion-ecologica", "escena": "Four clay stages in a row on one long base: bare rock, a cushion of moss, low shrubs, and a full tree" }
+    ]
+  },
+  {
+    "slug": "biomoleculas-cuatro-clases",
+    "items": [
+      { "clave": "biomolecula", "escena": "Four clay models on one tray: a ring of beads, an oily droplet, a folded bead chain and a twisted ladder" },
+      { "clave": "monomero-y-polimero", "escena": "A single clay bead alone on the left of a table and a long chain of identical beads on the right" },
+      { "clave": "enlace-peptidico", "escena": "Two clay beads joined by a short bridge, with a tiny water drop falling away from the joint" },
+      { "clave": "enlace-glucosidico", "escena": "Two clay ring shapes joined by a short bridge, with a tiny water drop falling away from the joint" },
+      { "clave": "funcion-de-los-acidos-nucleicos", "escena": "A clay twisted ladder locked in a small vault on the left, and a ribbon carrying a bead to a round machine on the right" },
+      { "clave": "carbohidrato-glucido", "escena": "A clay stack of tortillas on a plate beside a ring of joined clay beads" },
+      { "clave": "lipido", "escena": "A clay droplet of golden oil on a plate with half an avocado beside it" },
+      { "clave": "proteina", "escena": "A clay chain of coloured beads folded into a compact shape on a plate beside an egg" },
+      { "clave": "acido-nucleico", "escena": "A clay twisted ladder standing on a base with a single ribbon strand lying beside it" },
+      { "clave": "aminoacido", "escena": "A single clay bead with three small tabs sticking out of it, two at the sides and one on top" },
+      { "clave": "nucleotido", "escena": "A clay piece made of three stacked parts: a flat hexagon, a small ring and a round knob" },
+      { "clave": "polimero", "escena": "A long clay chain of identical linked beads coiling across a table" },
+      { "clave": "enzima", "escena": "A clay blob with a notch holding a matching block that is splitting into two pieces inside the notch" },
+      { "clave": "nixtamalizacion", "escena": "A clay pot of maize kernels simmering in white limewater over a small flame" },
+      { "clave": "fosfolipido", "escena": "A clay piece with a round head and two wavy tails, standing in a row with others that form a double wall" }
+    ]
+  },
+  {
+    "slug": "biotecnologia-crispr-3d",
+    "items": [
+      { "clave": "biotecnologia-moderna", "escena": "A clay laboratory bench with a flask of bubbling culture, a small plant in a glass jar and a petri dish" },
+      { "clave": "crispr-cas9", "escena": "A clay blob shaped like scissors guided by a thin ribbon, snipping a twisted ladder at one rung" },
+      { "clave": "transgenico-ogm", "escena": "A clay ring of beads with one bright foreign bead being pressed into it, a small corn cob beside it" },
+      { "clave": "clonacion", "escena": "Two identical clay sheep standing side by side on one base" },
+      { "clave": "bioetica", "escena": "A clay balance scale with a twisted ladder on one pan and a small heart on the other" },
+      { "clave": "edicion-germinal-vs-somatica", "escena": "Two clay scenes on one base: a single adult figure with one glowing dot, and a line of three figures all glowing" },
+      { "clave": "organismos-geneticamente-modificados-ogm-transge", "escena": "A clay plant in a pot with a small glowing bead set among its roots and a syringe lying beside it" },
+      { "clave": "principios-de-bioetica", "escena": "Four clay pillars of equal height on one base, each topped with a different simple shape" },
+      { "clave": "edicion-de-linea-germinal-vs-somatica", "escena": "A glowing clay embryo sphere on the left and a clay adult figure on the right with one glowing patch on its arm" },
+      { "clave": "bioprospeccion-y-propiedad-intelectual-en-biotec", "escena": "A clay jungle plant in a glass jar with a padlock chained around it and a stamped document beside it" }
+    ]
+  },
+  {
+    "slug": "busqueda-confiable",
+    "items": [
+      { "clave": "trabajo-colaborativo-digital", "escena": "Three clay hands coming from different directions, each placing a block onto one shared board" },
+      { "clave": "cryptpad", "escena": "A clay notebook with a padlock clasp, open on a table with two pencils writing on its page" },
+      { "clave": "riseup-pad", "escena": "A clay sheet of paper on a table with three pencils of different colours writing on it at once" },
+      { "clave": "transversalidad", "escena": "A clay board where three coloured threads from different corners all meet at one central pin" },
+      { "clave": "edicion-en-tiempo-real", "escena": "A clay document with three small coloured markers moving across it at the same time" }
+    ]
+  },
+  {
+    "slug": "carreras-digitales",
+    "items": [
+      { "clave": "nearshoring", "escena": "Two clay map plaques side by side joined by a short bridge, with a small laptop standing on each" },
+      { "clave": "stack-tecnologico", "escena": "A neat stack of four clay blocks of different colours, each carrying a simple raised symbol" },
+      { "clave": "ux-user-experience", "escena": "A clay path of smooth stepping stones leading a tiny figure straight to a phone, with nothing in the way" },
+      { "clave": "bootcamp", "escena": "A clay backpack, a laptop and a stopwatch on a bench with a short ladder leaning beside them" },
+      { "clave": "ciencia-de-datos", "escena": "A clay pile of small tiles being sorted by a small hand into a neat rising bar chart" },
+      { "clave": "sector-tic-tecnologias-de-la-informacion-y-comun", "escena": "A clay cluster of small buildings connected by cables with an antenna standing on top" },
+      { "clave": "diseno-ux-ui", "escena": "A clay phone screen with chunky buttons and sliders arranged neatly, a pencil and ruler lying beside it" },
+      { "clave": "ciencia-de-datos-data-science", "escena": "A clay telescope on a tripod pointed at a mound of small tiles, revealing a clear rising line" },
+      { "clave": "ciberseguridad", "escena": "A clay shield standing in front of a small server tower, with a padlock at the centre of the shield" },
+      { "clave": "brecha-de-genero-en-stem", "escena": "A clay staircase crowded with figures on the lower steps and only a few at the top, with a ramp being built alongside" },
+      { "clave": "trayectoria-formativa-no-lineal", "escena": "A clay winding path with side branches and small rest stops, climbing up to a little flag" }
+    ]
+  }
+]
