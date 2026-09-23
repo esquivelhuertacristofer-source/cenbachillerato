@@ -43,7 +43,7 @@ import {
 
 const NO = "#FF5E5E";
 import { useEstrellas } from "@/lib/hooks/useEstrellas";
-import { VinetaTermino } from "./_vineta";
+import { FondoTermino, VinetaTermino } from "./_vineta";
 const RETO_KEY = "cen-hipotesis-historicas-reto";
 
 type Modo = "fuentes" | "metodo" | "glosario" | "texto";
@@ -556,8 +556,11 @@ function BinsFuentes({
             className="hh-bin"
             data-shake={shakeFuente === bin}
             onClick={() => selFuente && onMatch(selFuente, bin)}
+            style={{ position: "relative", isolation: "isolate" }}
             {...dropProps((id) => onMatch(id, bin))}
           >
+            {/* La ilustración del concepto llenando la caja vacía. */}
+            <FondoTermino termino={info.titulo} />
             <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
               <VinetaTermino termino={info.titulo} color={T.text2} icono={info.icono} tam={29} radio={8} />
               <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>

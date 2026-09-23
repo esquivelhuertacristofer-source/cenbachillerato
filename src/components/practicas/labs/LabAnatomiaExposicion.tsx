@@ -60,7 +60,7 @@ import {
   type EscenarioTiempo,
   type PiezaGuion,
 } from "./anatomia-exposicion-data";
-import { VinetaTermino } from "./_vineta";
+import { FondoTermino, VinetaTermino } from "./_vineta";
 
 const NO = "#FF5E5E";
 const RETO_KEY = "cen-anatomia-exposicion-oral-reto";
@@ -986,8 +986,11 @@ function GuionPanel({
               data-shake={shakeParte === parte}
               data-done={armada}
               onClick={() => esperaAqui && onZona()}
-              {...dropProps((id) => onDropZona(id))}
+              style={{ position: "relative", isolation: "isolate" }}
+            {...dropProps((id) => onDropZona(id))}
             >
+            {/* La ilustración del concepto llenando la caja vacía. */}
+            <FondoTermino termino={info.titulo} />
               <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
                 <VinetaTermino termino={info.titulo} color={T.text2} icono={info.icono} tam={29} radio={8} />
                 <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>

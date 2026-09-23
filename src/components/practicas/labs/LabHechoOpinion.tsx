@@ -60,7 +60,7 @@ import {
   type TextoAnalizable,
   type Marca,
 } from "./hecho-opinion-data";
-import { VinetaTermino } from "./_vineta";
+import { FondoTermino, VinetaTermino } from "./_vineta";
 
 const NO = "#FF5E5E";
 const RETO_KEY = "cen-hecho-opinion-reto";
@@ -924,12 +924,13 @@ function ColumnasClasificar({
             className="hop-bin"
             data-shake={shakeBin === bin}
             onClick={() => selEnun && onMatch(selEnun, bin)}
-            style={{
-              borderColor: `${info.color}44`,
+            style={{ position: "relative", isolation: "isolate", borderColor: `${info.color}44`,
               backgroundImage: `radial-gradient(120% 90% at 0% 0%, ${info.color}1a 0%, transparent 62%)`,
             }}
             {...dropProps((id) => onMatch(id, bin))}
           >
+            {/* La ilustración del concepto llenando la caja vacía. */}
+            <FondoTermino termino={info.titulo} />
             <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
               <VinetaTermino termino={info.titulo} color={info.color} icono={info.icono} tam={29} radio={8} />
               <span style={{ fontSize: 13.5, fontWeight: 900, color: "#fff" }}>{info.titulo}</span>

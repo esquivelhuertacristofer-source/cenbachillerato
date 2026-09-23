@@ -61,7 +61,7 @@ import {
   type Auxiliar,
   type Transformacion,
 } from "./tiempo-libre-ingles-data";
-import { VinetaTermino } from "./_vineta";
+import { FondoTermino, VinetaTermino } from "./_vineta";
 
 const NO = "#FF5E5E";
 const RETO_KEY = "cen-tiempo-libre-ingles-reto";
@@ -942,8 +942,11 @@ function BinsRegla({
                 onMatch(selVerbo, bin);
               }
             }}
+            style={{ position: "relative", isolation: "isolate" }}
             {...dropProps((id) => onMatch(id, bin))}
           >
+            {/* La ilustración del concepto llenando la caja vacía. */}
+            <FondoTermino termino={info.titulo} />
             <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
               <VinetaTermino termino={info.titulo} color={T.text2} icono={info.icono} tam={31} radio={9} />
               <span style={{ fontSize: 14.5, fontWeight: 900, color: "#fff" }}>{info.titulo}</span>

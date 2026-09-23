@@ -105,3 +105,69 @@ export function useTieneVineta(termino: string): boolean {
   const lab = useLabImagen();
   return Boolean(lab?.slug && imagenDeTermino(lab.slug, termino));
 }
+
+/**
+ * LA MISMA ILUSTRACIÓN, DE FONDO, LLENANDO LA ZONA DE DESTINO.
+ *
+ * Una cubeta de clasificar mide 230 px de alto y al abrir el laboratorio solo
+ * tiene dentro un título, una línea de definición y un «Arrastra aquí…» en
+ * gris. Más de la mitad de esa altura, multiplicada por cinco cubetas, era
+ * rectángulo oscuro vacío: el bloque de espacio muerto más grande de la
+ * pantalla, y lo primero que se ve antes de tocar nada.
+ *
+ * Aquí va la ilustración del concepto, grande y muy tenue. No compite con el
+ * texto, y a medida que el alumno suelta tarjetas se va tapando sola.
+ *
+ * EL APILAMIENTO ES LO QUE HACE QUE ESTO FUNCIONE O SE VEA FATAL:
+ *
+ *  - con `z-index: 0` la marca taparía el contenido, porque un elemento
+ *    posicionado pinta POR ENCIMA del contenido en flujo aunque vaya antes;
+ *  - con `z-index: -1` a secas se iría por DETRÁS del fondo de la propia caja
+ *    —una caja `position: relative` sin z-index no crea contexto de apilamiento
+ *    y el -1 la atraviesa— y desaparecería.
+ *
+ * Por eso la caja lleva `isolation: isolate` (la pone el codemod junto con
+ * `position: relative`; las dos son neutras para la maquetación): crea el
+ * contexto, y dentro de él el -1 queda encima del fondo y debajo del texto.
+ */
+export function FondoTermino({ termino, opacidad = 0.17 }: { termino: string; opacidad?: number }) {
+  const lab = useLabImagen();
+  const src = lab?.slug ? imagenDeTermino(lab.slug, termino) : null;
+  const [rota, setRota] = useState(false);
+  if (!src || rota) return null;
+
+  return (
+    <img
+      src={src}
+      alt=""
+      aria-hidden
+      loading="lazy"
+      decoding="async"
+      onError={() => setRota(true)}
+      style={{
+        position: "absolute",
+        /* DENTRO DE LA CAJA, sin desbordar. Con desplazamientos negativos la
+         * ilustración asomaba por fuera del borde redondeado: la caja no
+         * recorta, y ponerle `overflow: hidden` recortaría también cosas que sí
+         * tienen que salir. */
+        right: "3%",
+        bottom: "3%",
+        width: "52%",
+        maxHeight: "70%",
+        objectFit: "contain",
+        opacity: opacidad,
+        filter: "saturate(.7)",
+        /* LA MÁSCARA ES LO QUE LA CONVIERTE EN ILUSTRACIÓN Y NO EN MANCHA.
+         * Estas plastilinas están renderizadas sobre un fondo claro opaco: a
+         * baja opacidad sobre una tarjeta oscura, ese fondo no se lee como una
+         * foto, se lee como un rectángulo gris pegado en la esquina. El
+         * degradado radial desvanece los bordes y solo queda la figura. */
+        maskImage: "radial-gradient(closest-side, #000 42%, transparent 88%)",
+        WebkitMaskImage: "radial-gradient(closest-side, #000 42%, transparent 88%)",
+        pointerEvents: "none",
+        userSelect: "none",
+        zIndex: -1,
+      }}
+    />
+  );
+}

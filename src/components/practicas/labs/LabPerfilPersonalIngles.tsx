@@ -73,7 +73,7 @@ import {
   type RondaToBe,
   type RanuraTipo,
 } from "./perfil-personal-ingles-data";
-import { VinetaTermino } from "./_vineta";
+import { FondoTermino, VinetaTermino } from "./_vineta";
 
 const NO = "#FF5E5E";
 const RETO_KEY = "cen-perfil-personal-ingles-reto";
@@ -957,8 +957,11 @@ function FormularioPanel({
               onClick={() => {
                 if (!dato && selDato) onSoltar(c.id, selDato);
               }}
-              {...dropProps((id) => onSoltar(c.id, id))}
+              style={{ position: "relative", isolation: "isolate" }}
+            {...dropProps((id) => onSoltar(c.id, id))}
             >
+            {/* La ilustración del concepto llenando la caja vacía. */}
+            <FondoTermino termino={c.label} />
               <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
                 <VinetaTermino termino={c.label} color={dato ? OK : accent} icono={c.icono} tam={29} radio={8} />
                 <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff" }}>{c.label}</span>
