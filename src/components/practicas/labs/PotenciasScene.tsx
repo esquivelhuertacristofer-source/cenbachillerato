@@ -69,12 +69,17 @@ function Bloque({ base, exponente, resaltarLado, accent }: { base: number; expon
       {cubos.map((c) => (
         <mesh key={c.key} position={c.pos} castShadow receiveShadow>
           <boxGeometry args={[C, C, C]} />
-          <meshStandardMaterial
+          {/* Con emisión alta y sin barniz los cubitos se fundían en una
+              mancha de color: no se distinguía dónde acaba uno y empieza otro. */}
+          <meshPhysicalMaterial
             color={c.lado ? LADO : accent}
             emissive={c.lado ? LADO : accent}
-            emissiveIntensity={c.lado ? 0.5 : 0.18}
-            roughness={0.35}
+            emissiveIntensity={c.lado ? 0.42 : 0.1}
+            roughness={0.3}
             metalness={0.2}
+            clearcoat={0.85}
+            clearcoatRoughness={0.22}
+            envMapIntensity={1.2}
           />
         </mesh>
       ))}
@@ -90,11 +95,14 @@ export default function PotenciasScene(props: PotenciasSceneProps) {
       shadows
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
-      camera={{ position: [5.5, 4.5, 7.5], fov: 42 }}
+      /* La cámara estaba a 10.4 de un bloque que, en 3², mide 2 unidades: el
+         objeto salía diminuto en una mesa enorme y la escena parecía vacía. A
+         6.9 el caso grande (6³ ≈ 4 u) sigue entrando entero. */
+      camera={{ position: [3.7, 3.0, 5.0], fov: 42 }}
     >
-      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
-      {/* La altura sale de donde esta escena ya ponía su sombra de
-          contacto: es donde su autor decidió que estaba el piso. */}
+      {/* Suelo, luz de tres puntos y entorno que reflejar. La altura sale
+          de donde esta escena ya ponía su sombra de contacto, que es donde
+          su autor decidió que estaba el piso. */}
       <Escenario acento={props.accent} suelo={-(props.exponente === 3 ? (n - 1) / 2 : 0) * S - C * 0.6} />
 
 
@@ -105,7 +113,7 @@ export default function PotenciasScene(props: PotenciasSceneProps) {
 
       <OrbitControls
         enablePan={false}
-        minDistance={5}
+        minDistance={4}
         maxDistance={22}
         minPolarAngle={Math.PI / 7}
         maxPolarAngle={Math.PI / 1.9}

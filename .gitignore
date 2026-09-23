@@ -65,3 +65,9 @@ scripts/tmp-*
 
 # Material fuente oficial 2025 (PDFs grandes) — solo local, no se despliega
 docs/fuentes-oficiales-2025/
+
+# Capturas de trabajo de scripts/mirar-labs.mjs — material de medicion, no de repo
+scripts/.capturas-labs/
+scripts/.tablero/
+scripts/.rescate/
+scripts/.verif/

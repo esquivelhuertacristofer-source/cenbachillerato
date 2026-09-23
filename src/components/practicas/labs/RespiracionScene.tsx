@@ -18,12 +18,13 @@
  */
 
 import * as THREE from "three";
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Html, Stars } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { type Modo, type Escena } from "./respiracion-data";
 import { Escenario } from "./_escenario";
+import { CurvaTubo } from "./_tablero";
 
 type Pt = [number, number, number];
 
@@ -183,21 +184,33 @@ function Glucolisis({ frac, playing }: { frac: number; playing: boolean }) {
   );
 }
 
-/* Membrana / contorno ovalado para representar un compartimento */
+/* Membrana / compartimento.
+ *
+ * ERA UN PELO DE UN PÍXEL. `lineBasicMaterial` no recibe luz, no proyecta
+ * sombra y mide lo mismo de cerca que de lejos: el citoplasma se leía como un
+ * óvalo dibujado encima de la escena, no como el interior de una célula. Ahora
+ * el contorno tiene cuerpo (tubo) y el compartimento tiene relleno, que es lo
+ * que hace que las moléculas se vean DENTRO de algo y no flotando. */
 function Membrana({ label, color, rx, ry }: { label: string; color: string; rx: number; ry: number }) {
-  const pts: Pt[] = [];
-  const N = 64;
-  for (let i = 0; i <= N; i++) {
-    const a = (i / N) * Math.PI * 2;
-    pts.push([Math.cos(a) * rx, Math.sin(a) * ry, 0]);
-  }
-  const geo = new THREE.BufferGeometry().setFromPoints(pts.map((p) => new THREE.Vector3(...p)));
+  const pts = useMemo<Pt[]>(() => {
+    const N = 96;
+    const out: Pt[] = [];
+    for (let i = 0; i <= N; i++) {
+      const a = (i / N) * Math.PI * 2;
+      out.push([Math.cos(a) * rx, Math.sin(a) * ry, 0]);
+    }
+    return out;
+  }, [rx, ry]);
+
   return (
     <group>
-      <lineLoop>
-        <primitive object={geo} attach="geometry" />
-        <lineBasicMaterial color={color} transparent opacity={0.5} />
-      </lineLoop>
+      {/* El interior: muy tenue, detrás de todo, para dar profundidad sin
+          robarle protagonismo a lo que ocurre dentro. */}
+      <mesh position={[0, 0, -0.35]} scale={[rx, ry, 1]}>
+        <circleGeometry args={[1, 96]} />
+        <meshBasicMaterial color={color} transparent opacity={0.07} depthWrite={false} />
+      </mesh>
+      <CurvaTubo puntos={pts} color={color} grosor={0.055} brillo={0.55} />
       <Etiqueta pos={[0, ry + 0.45, 0]} color={`${color}aa`} df={16}>
         {label}
       </Etiqueta>

@@ -28,6 +28,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Html, Line, Stars } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
+import { PanelGrafica } from "./_tablero";
 import {
   type Modo, BANDAS, resolverEM, resolverVisible, aplicacionPorId, APLICACIONES,
   colorVisible, bandaPorFrecuencia, CAT_COLOR,
@@ -422,6 +423,15 @@ function Contenido({ modo, logF, nm, aplId, playing, accent, resetNonce }: Espec
       <Escenario acento={accent} mesa={false} niebla={false} />
 
       <Stars radius={70} depth={30} count={1200} factor={3} saturation={0} fade speed={0.5} />
+
+      {/* TABLERO DE FONDO.
+          Las bandas del espectro son `meshBasicMaterial` a propósito: el color
+          ES el dato (380–700 nm reales) y cualquier luz lo falsearía. Por eso
+          no se pueden «iluminar» para que dejen de verse planas. Lo que sí se
+          puede es montarlas sobre algo: con el tablero detrás, el conjunto se
+          lee como un instrumento colgado y no como un dibujo flotando, y los
+          colores siguen siendo exactamente los que son. */}
+      <PanelGrafica ancho={2 * X + 1.6} alto={7.4} frente={-0.42} />
 
       <group key={`${modo}-${resetNonce}`}>
         {modo === "espectro" && <EscenaEspectro logF={logF} playing={playing} />}

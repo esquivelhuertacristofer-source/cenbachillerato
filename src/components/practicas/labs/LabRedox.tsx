@@ -225,10 +225,10 @@ export function LabRedox({ color }: PracticaLabProps) {
           justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
         .ex-icobtn-rx[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
         .ex-icobtn-rx:hover { background:rgba(255,255,255,0.12); }
-        .ex-teoria-fab { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); cursor:pointer; display:inline-flex; align-items:center; gap:9px;
+        .ex-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
           padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
           background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .ex-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateX(-50%) translateY(-1px); }
+        .ex-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
       `}</style>
 
       {/* Selector de modo */}

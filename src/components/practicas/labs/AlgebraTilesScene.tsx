@@ -95,7 +95,19 @@ function Tile({
   return (
     <group ref={ref} position={[pos[0], 0, pos[1]]}>
       <RoundedBox args={[w - 0.08, TILE_H, d - 0.08]} radius={0.06} smoothness={3} position={[0, TILE_H / 2, 0]}>
-        <meshStandardMaterial color={color} metalness={0.18} roughness={0.42} emissive={color} emissiveIntensity={0.14} toneMapped={false} />
+        {/* `toneMapped={false}` sacaba el mosaico del tono de la escena: salía
+            como color plano, sin responder a la luz, y el conjunto se leía como
+            un diagrama en vez de como piezas sobre una mesa. */}
+        <meshPhysicalMaterial
+          color={color}
+          metalness={0.18}
+          roughness={0.38}
+          emissive={color}
+          emissiveIntensity={0.1}
+          clearcoat={0.8}
+          clearcoatRoughness={0.25}
+          envMapIntensity={1.15}
+        />
       </RoundedBox>
       {label && (
         <Html position={[0, TILE_H + 0.02, 0]} center distanceFactor={13} pointerEvents="none">
@@ -254,7 +266,9 @@ export default function AlgebraTilesScene(props: AlgebraTilesSceneProps) {
       shadows
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
-      camera={{ position: [0, 9, 11], fov: 42 }}
+      /* Desde [0,9,11] la vista era casi cenital y los mosaicos perdían su
+         canto. Bajando la cámara se ve que son piezas con grosor. */
+      camera={{ position: [0, 6.4, 12.2], fov: 42 }}
     >
       <Contenido {...props} />
     </Canvas>

@@ -380,10 +380,10 @@ export function LabSeleccionNatural({ color }: PracticaLabProps) {
         .sn-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
           background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
         .sn-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .sn-teoria-fab { position:absolute; bottom:54px; left:50%; transform:translateX(-50%); cursor:pointer; display:inline-flex; align-items:center; gap:9px;
+        .sn-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
           padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
           background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:2; }
-        .sn-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateX(-50%) translateY(-1px); }
+        .sn-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
       `}</style>
 
       {/* Selector de modo */}
