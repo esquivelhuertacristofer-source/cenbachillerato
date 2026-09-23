@@ -2,7 +2,7 @@
 
 import { headers } from 'next/headers';
 import { getSupabaseServer } from '@/lib/supabase-helpers';
-import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
+import { checkRateLimit, getClientIp, ipParaInet } from '@/lib/rate-limit';
 import { IniciarSesionSchema, type IniciarSesionInput } from '@/lib/schemas/iniciar-sesion.schema';
 
 // Antes, el login corría enteramente en el navegador (signInWithPassword +
@@ -55,9 +55,13 @@ export async function iniciarSesion(input: IniciarSesionInput): Promise<IniciarS
     // sin request context disponible — no debería ocurrir en un Server Action
   }
 
+  // La columna es `inet`: el centinela `ip-desconocida` que devuelve
+  // `getClientIp` sin cabecera de Cloudflare no es una direccion y tumbaba el
+  // insert completo, asi que no se guardaba ninguno de los dos consentimientos.
+  const ipInet = ipParaInet(ip);
   const { error: consentError } = await supabase.from('user_consents').insert([
-    { user_id: data.user.id, document_type: 'privacy', document_version: '1.0', ip_address: ip, user_agent: userAgent },
-    { user_id: data.user.id, document_type: 'terms', document_version: '1.0', ip_address: ip, user_agent: userAgent },
+    { user_id: data.user.id, document_type: 'privacy', document_version: '1.0', ip_address: ipInet, user_agent: userAgent },
+    { user_id: data.user.id, document_type: 'terms', document_version: '1.0', ip_address: ipInet, user_agent: userAgent },
   ]);
   if (consentError) {
     console.error('[iniciarSesion] no se pudo registrar consentimiento:', consentError.message);

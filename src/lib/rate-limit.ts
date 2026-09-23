@@ -36,6 +36,24 @@ declare global {
 const FALLBACK_IP = "ip-desconocida";
 
 /**
+ * La direccion tal y como la acepta una columna `inet`, o `null`.
+ *
+ * `getClientIp` devuelve el centinela `ip-desconocida` cuando no hay cabecera
+ * `cf-connecting-ip`: `next start` en local, Jest, cualquier entorno que no sea
+ * Cloudflare. Como CLAVE de rate-limit el centinela vale; como DIRECCION no lo
+ * es, y Postgres rechaza con «invalid input syntax for type inet» el insert
+ * ENTERO en el que aparece.
+ *
+ * Eso es lo que estaba pasando en cada acceso: el registro de consentimiento no
+ * guardaba una fila con la direccion mal, no guardaba NINGUNA de las dos
+ * (privacidad y terminos). `ip_address` admite null, y un consentimiento sin
+ * direccion es mejor que ningun consentimiento.
+ */
+export function ipParaInet(ip: string): string | null {
+  return ip === FALLBACK_IP ? null : ip;
+}
+
+/**
  * Selecciona el binding nativo según el prefijo de la key. Los prefijos son exactamente
  * los que usan los llamadores actuales: `login:${ip}` (iniciar-sesion.ts) y
  * `entregar-actividad:${user.id}` (entregar-actividad.ts). Una key con prefijo

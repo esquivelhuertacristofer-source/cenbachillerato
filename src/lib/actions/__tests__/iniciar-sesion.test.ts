@@ -15,6 +15,15 @@ jest.mock("@/lib/supabase-helpers", () => ({
 jest.mock("@/lib/rate-limit", () => ({
   checkRateLimit: jest.fn(),
   getClientIp: jest.fn(),
+  /*
+   * `ipParaInet` va con su logica REAL, no como `jest.fn()`.
+   *
+   * Es una funcion pura de una linea y lo que decide es si el consentimiento se
+   * guarda o se pierde: con un doble que devuelve `undefined` las pruebas de
+   * abajo pasarian sin comprobar nada. Y el modulo entero esta doblado porque
+   * `checkRateLimit`/`getClientIp` solo corren dentro de un runtime de Workers.
+   */
+  ipParaInet: (ip: string) => (ip === "ip-desconocida" ? null : ip),
 }));
 
 jest.mock("next/headers", () => ({
@@ -165,8 +174,31 @@ describe("iniciarSesion — éxito", () => {
 
     expect(res).toEqual({ ok: true, rol: "admin" });
     expect(consentInsert).toHaveBeenCalledWith([
-      expect.objectContaining({ user_id: "user-42", document_type: "privacy", document_version: "1.0" }),
-      expect.objectContaining({ user_id: "user-42", document_type: "terms", document_version: "1.0" }),
+      expect.objectContaining({ user_id: "user-42", document_type: "privacy", document_version: "1.0", ip_address: "203.0.113.5" }),
+      expect.objectContaining({ user_id: "user-42", document_type: "terms", document_version: "1.0", ip_address: "203.0.113.5" }),
+    ]);
+  });
+
+  /*
+   * EL CENTINELA NO ES UNA DIRECCION, Y SE LLEVABA POR DELANTE LAS DOS FILAS.
+   *
+   * `getClientIp` devuelve `ip-desconocida` cuando no hay cabecera
+   * `cf-connecting-ip`. Esa cadena vale como clave de rate-limit, pero
+   * `user_consents.ip_address` es de tipo `inet`: Postgres rechazaba el insert
+   * completo con «invalid input syntax for type inet» y no se guardaba NI el
+   * consentimiento de privacidad NI el de terminos. La columna admite null.
+   */
+  test("sin cabecera de Cloudflare la direccion va como null, y el consentimiento SI se guarda", async () => {
+    mockGetClientIp.mockResolvedValue("ip-desconocida");
+    const { sb, consentInsert } = makeSb({ user: { id: "user-13" }, profile: { role: "student" } });
+    mockGetSupabaseServer.mockResolvedValue(sb);
+
+    const res = await iniciarSesion(INPUT_VALIDO);
+
+    expect(res).toEqual({ ok: true, rol: "student" });
+    expect(consentInsert).toHaveBeenCalledWith([
+      expect.objectContaining({ document_type: "privacy", ip_address: null }),
+      expect.objectContaining({ document_type: "terms", ip_address: null }),
     ]);
   });
 
