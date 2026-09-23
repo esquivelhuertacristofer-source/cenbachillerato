@@ -24,6 +24,7 @@ import { OrbitControls } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { ELEMS, type Elem, type RAtom, type RBond, type V } from "./reacciones-tipos-data";
 import { Escenario } from "./_escenario";
+import { ATOMO } from "./_vidrio";
 
 export interface ReaccionesTiposSceneProps {
   reaccionId: string;
@@ -57,7 +58,7 @@ function Atomo({ el, pos }: { el: Elem; pos: V }) {
   return (
     <mesh position={pos} castShadow receiveShadow>
       <sphereGeometry args={[e.radio, 32, 32]} />
-      <meshStandardMaterial color={e.color} emissive={e.color} emissiveIntensity={0.12} roughness={0.34} metalness={0.18} />
+      <meshPhysicalMaterial {...ATOMO} color={e.color} emissive={e.color} emissiveIntensity={0.12} />
     </mesh>
   );
 }

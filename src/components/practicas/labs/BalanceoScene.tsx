@@ -22,6 +22,7 @@ import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { ELEMS_B, MOLS_B, type Elem, type Especie } from "./balanceo-data";
 import { Escenario } from "./_escenario";
+import { ATOMO } from "./_vidrio";
 
 export interface BalanceoSceneProps {
   reaccionKey: string;
@@ -83,7 +84,7 @@ function Atomo({ el, pos, boost }: { el: Elem; pos: Pt; boost: number }) {
   return (
     <mesh position={pos} castShadow receiveShadow>
       <sphereGeometry args={[e.radio, 28, 28]} />
-      <meshStandardMaterial color={e.color} emissive={e.color} emissiveIntensity={0.1 + boost} roughness={0.34} metalness={0.14} />
+      <meshPhysicalMaterial {...ATOMO} color={e.color} emissive={e.color} emissiveIntensity={0.1 + boost} />
     </mesh>
   );
 }

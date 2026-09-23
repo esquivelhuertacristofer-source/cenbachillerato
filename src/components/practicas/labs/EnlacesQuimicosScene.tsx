@@ -19,6 +19,7 @@ import { OrbitControls } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { ELEMS, type AtomoMol, type EnlaceMol, type ElementoQuim } from "./enlaces-data";
 import { Escenario } from "./_escenario";
+import { ATOMO } from "./_vidrio";
 
 export interface EnlacesSceneProps {
   molKey: string;
@@ -39,7 +40,7 @@ function AtomoMesh({ el, pos }: { el: ElementoQuim; pos: [number, number, number
   return (
     <mesh position={pos} castShadow receiveShadow>
       <sphereGeometry args={[e.radio, 32, 32]} />
-      <meshStandardMaterial color={e.color} emissive={e.color} emissiveIntensity={0.1} roughness={0.32} metalness={0.12} />
+      <meshPhysicalMaterial {...ATOMO} color={e.color} emissive={e.color} emissiveIntensity={0.1} />
     </mesh>
   );
 }

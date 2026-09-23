@@ -107,6 +107,32 @@ export const METAL = {
 } as const;
 
 /**
+ * Un átomo de modelo molecular: esfera pulida, no bola de plastilina.
+ *
+ * Veinticuatro escenas dibujan átomos con `meshStandardMaterial` mate. Eso
+ * estaba bien cuando no había nada que reflejar; con el `Environment` del
+ * escenario puesto, lo que le falta es el BARNIZ — la película brillante que
+ * tienen los modelos moleculares de verdad y que es lo que hace que una
+ * esfera se lea como un objeto y no como un círculo de color.
+ *
+ * `clearcoat` va aparte de `roughness`: el cuerpo del átomo sigue siendo mate
+ * y encima lleva una capa lisa. Si en vez de eso se bajara la rugosidad, la
+ * esfera entera se volvería un espejo y perdería su color.
+ *
+ * Se usa extendiéndolo, para conservar el color y el brillo propio que cada
+ * escena ya calcula:
+ *
+ *   <meshPhysicalMaterial {...ATOMO} color={e.color} emissive={e.color} />
+ */
+export const ATOMO = {
+  roughness: 0.34,
+  metalness: 0.12,
+  clearcoat: 1,
+  clearcoatRoughness: 0.18,
+  envMapIntensity: 1.35,
+} as const;
+
+/**
  * Un líquido dentro de vidrio. OPACO, y no es un descuido.
  *
  * ═══════════════════════════════════════════════════════════════════════════

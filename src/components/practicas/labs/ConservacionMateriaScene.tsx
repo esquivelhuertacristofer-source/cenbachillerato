@@ -19,6 +19,7 @@ import { OrbitControls } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { ELEMS_R, type MovAtom, type MovBond, type Elem } from "./reacciones-data";
 import { Escenario } from "./_escenario";
+import { ATOMO } from "./_vidrio";
 
 export interface ConservacionSceneProps {
   reaccionKey: string;
@@ -58,7 +59,7 @@ function AtomoMesh({ el, pos }: { el: Elem; pos: [number, number, number] }) {
   return (
     <mesh position={pos} castShadow receiveShadow>
       <sphereGeometry args={[e.radio, 28, 28]} />
-      <meshStandardMaterial color={e.color} emissive={e.color} emissiveIntensity={0.12} roughness={0.32} metalness={0.12} />
+      <meshPhysicalMaterial {...ATOMO} color={e.color} emissive={e.color} emissiveIntensity={0.12} />
     </mesh>
   );
 }
