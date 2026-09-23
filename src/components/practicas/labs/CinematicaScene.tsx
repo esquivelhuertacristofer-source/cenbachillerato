@@ -52,9 +52,15 @@ type Pt = [number, number, number];
 const C_VEL = "#7dd3fc";    // velocidad
 const C_ACC = "#34D399";    // aceleración (fase 1, acelerando)
 const C_BRK = "#f87171";    // aceleración negativa (fase 2, frenando)
-const ASFALTO = "#0c1f2e";
+const ASFALTO = "#1d2936";   // ver nota de LA CARRETERA INVISIBLE
 const RAYA = "#dfe9f5";
-const DESIERTO = "#10202c";
+/* LA CARRETERA ERA INVISIBLE.
+ * El asfalto (#0c1f2e) y el desierto (#10202c) estaban a un pelo del fondo del
+ * escenario (#050e1c): el terreno existía y no se veía NADA de él, así que la
+ * escena quedaba en unas rayas blancas flotando en negro. Y un desierto, de
+ * todos los sitios, tiene color. Suben lo justo para separarse del fondo sin
+ * romper el tono oscuro del resto de la plataforma. */
+const DESIERTO = "#3a3324";
 
 const SCENE_LEN = 18;       // largo de la carretera en unidades de escena
 const X0 = -SCENE_LEN / 2;  // x de la salida
@@ -269,10 +275,13 @@ function Contenido({ a1, t1, a2, t, accent, resetNonce, arrastrable, onScrub, on
 
   return (
     <>
-      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
-      {/* La altura sale de donde esta escena ya ponía su sombra de
-          contacto: es donde su autor decidió que estaba el piso. */}
-      <Escenario acento={accent} suelo={Y_ROAD - 0.02} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. La altura sale
+          de donde esta escena ya ponía su sombra de contacto, que es donde
+          su autor decidió que estaba el piso. */}
+      {/* Sin mesa: esta escena ya trae su terreno (desierto + asfalto) y la del
+          escenario se colaba entre los dos planos. Se queda con la luz de tres
+          puntos y el entorno, que es lo que le faltaba. */}
+      <Escenario acento={accent} mesa={false} />
 
 
       <group key={resetNonce}>

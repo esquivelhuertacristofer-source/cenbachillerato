@@ -22,10 +22,11 @@
 import * as THREE from "three";
 import { useMemo, useRef, type ReactNode } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Html, Line } from "@react-three/drei";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { type Modo, type UrnaDef, ETAPAS, PERSONAS, hojasDelArbol } from "./tecnicas-conteo-data";
 import { Escenario } from "./_escenario";
+import { CurvaTubo } from "./_tablero";
 
 export interface ConteoSceneProps {
   modo: Modo;
@@ -167,7 +168,17 @@ function EscenaArbol({ opciones, accent }: { opciones: number[]; accent: string 
 
   return (
     <group position={[-0.1, -0.05, 0]}>
-      {aristas.length > 0 && <Line points={aristas} segments color="#64748b" lineWidth={1.6} transparent opacity={0.8} />}
+      {/* LAS RAMAS TIENEN CUERPO.
+          Con `<Line>` eran trazos de 1,6 PÍXELES: no reciben luz, no proyectan
+          sombra y miden lo mismo de cerca que de lejos, así que el árbol se
+          leía como un dibujo pegado encima de la escena. `aristas` viene por
+          pares (padre, hijo), de ahí el salto de dos en dos. */}
+      {Array.from({ length: Math.floor(aristas.length / 2) }, (_, i) => {
+        const desde = aristas[i * 2];
+        const hasta = aristas[i * 2 + 1];
+        if (!desde || !hasta) return null;
+        return <CurvaTubo key={`rama-${i}`} puntos={[desde, hasta]} color="#64748b" grosor={0.028} brillo={0.4} />;
+      })}
 
       {nodos.map((n) => {
         const esHoja = n.prof === opciones.length;

@@ -287,13 +287,21 @@ function NubeProbabilidad({ shells }: { shells: number[] }) {
 function EsferaDalton({ color }: { color: string }) {
   return (
     <group>
+      {/* LA REJILLA SOBRABA. Estaba para sugerir que es una esfera, pero es
+          justo lo que hacía que el átomo de Dalton se viera como un gráfico de
+          hace treinta años. Y contradice el modelo: Dalton propuso una bola
+          MACIZA E INDIVISIBLE, sin estructura interna — una bola de billar.
+          Con barniz y algo que reflejar, la esfera se lee sola. */}
       <mesh castShadow>
-        <sphereGeometry args={[1.35, 48, 48]} />
-        <meshStandardMaterial color={color} roughness={0.55} metalness={0.15} />
-      </mesh>
-      <mesh>
-        <sphereGeometry args={[1.355, 24, 18]} />
-        <meshBasicMaterial color="#ffffff" wireframe transparent opacity={0.08} />
+        <sphereGeometry args={[1.35, 64, 64]} />
+        <meshPhysicalMaterial
+          color={color}
+          roughness={0.3}
+          metalness={0.12}
+          clearcoat={1}
+          clearcoatRoughness={0.16}
+          envMapIntensity={1.3}
+        />
       </mesh>
     </group>
   );
@@ -391,9 +399,9 @@ export default function ModelosAtomicosScene(props: AtomoSceneProps) {
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
       camera={{ position: [0, 1.4, 6.4], fov: 45 }}
     >
-      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
-      {/* La altura sale de donde esta escena ya ponía su sombra de
-          contacto: es donde su autor decidió que estaba el piso. */}
+      {/* Suelo, luz de tres puntos y entorno que reflejar. La altura sale
+          de donde esta escena ya ponía su sombra de contacto, que es donde
+          su autor decidió que estaba el piso. */}
       <Escenario acento={props.accent} suelo={-2.6} />
 
 

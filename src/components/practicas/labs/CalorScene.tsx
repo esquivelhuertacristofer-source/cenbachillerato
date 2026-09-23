@@ -19,7 +19,7 @@
 import * as THREE from "three";
 import { useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Html, Stars } from "@react-three/drei";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { type Modo, type Escena } from "./calor-data";
 import { Escenario } from "./_escenario";
@@ -319,9 +319,8 @@ function Contenido({ modo, escena, playing, modoColor, resetNonce }: CalorSceneP
       {/* Sin altura: esta escena no tenía sombra de la que leerla, así
           que el escenario la MIDE de la propia escena al montarse, en
           vez de que alguien la adivine. */}
-      <Escenario acento="#38bdf8" mesa={false} niebla={false} />
+      <Escenario acento="#38bdf8" />
       <directionalLight position={[-6, 4, -4]} intensity={0.5} color={modoColor} />
-      <Stars radius={80} depth={40} count={1000} factor={3} fade speed={0.4} />
 
       <group ref={giro} key={`${modo}-${resetNonce}`}>
         {modo === "conduccion" && <BarraConduccion frac={escena.frac} playing={playing} />}

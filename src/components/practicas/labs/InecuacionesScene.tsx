@@ -116,19 +116,19 @@ function RectaNumerica({ a, b, c, op, accent: _accent, pausado }: {
     <group position={[0, 0.1, 0]}>
       {/* eje */}
       <mesh>
-        <boxGeometry args={[halfW * 2 + 0.6, 0.06, 0.06]} />
-        <meshStandardMaterial color="#9fb2c8" metalness={0.3} roughness={0.4} />
+        <boxGeometry args={[halfW * 2 + 0.6, 0.15, 0.15]} />
+        <meshPhysicalMaterial color="#9fb2c8" metalness={0.45} roughness={0.32} clearcoat={0.7} envMapIntensity={1.2} />
       </mesh>
       <PuntaX color="#9fb2c8" x={halfW + 0.36} />
       <mesh position={[-(halfW + 0.36), 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-        <coneGeometry args={[0.16, 0.35, 18]} />
+        <coneGeometry args={[0.21, 0.44, 22]} />
         <meshStandardMaterial color="#9fb2c8" emissive="#9fb2c8" emissiveIntensity={0.4} />
       </mesh>
 
       {/* marcas */}
       {ticks.map((t) => (
         <mesh key={t} position={[t * U_R, 0, 0]}>
-          <boxGeometry args={[0.025, t % 2 === 0 ? 0.26 : 0.16, 0.025]} />
+          <boxGeometry args={[0.055, t % 2 === 0 ? 0.3 : 0.19, 0.055]} />
           <meshStandardMaterial color="#5b7088" />
         </mesh>
       ))}
@@ -140,7 +140,7 @@ function RectaNumerica({ a, b, c, op, accent: _accent, pausado }: {
 
       {/* rayo solución */}
       <mesh position={[rayMid, 0.16, 0]}>
-        <boxGeometry args={[rayLen, 0.1, 0.1]} />
+        <boxGeometry args={[rayLen, 0.2, 0.2]} />
         <meshStandardMaterial color={VERDE} emissive={VERDE} emissiveIntensity={0.8} transparent opacity={0.92} />
       </mesh>
       <PuntaX color="#34d399" x={edge + dir * 0.18} size={0.18} />
@@ -345,9 +345,9 @@ function Contenido(props: InecuacionesSceneProps) {
 
   return (
     <>
-      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
-      {/* La altura sale de donde esta escena ya ponía su sombra de
-          contacto: es donde su autor decidió que estaba el piso. */}
+      {/* Suelo, luz de tres puntos y entorno que reflejar. La altura sale
+          de donde esta escena ya ponía su sombra de contacto, que es donde
+          su autor decidió que estaba el piso. */}
       <Escenario acento={accent} suelo={-0.5} />
 
 

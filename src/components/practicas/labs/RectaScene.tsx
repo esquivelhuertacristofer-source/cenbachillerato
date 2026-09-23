@@ -127,25 +127,25 @@ export default function RectaScene(props: RectaSceneProps) {
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
       camera={{ position: [0, 3.6, 13], fov: 42 }}
     >
-      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
-      {/* La altura sale de donde esta escena ya ponía su sombra de
-          contacto: es donde su autor decidió que estaba el piso. */}
+      {/* Suelo, luz de tres puntos y entorno que reflejar. La altura sale
+          de donde esta escena ya ponía su sombra de contacto, que es donde
+          su autor decidió que estaba el piso. */}
       <Escenario acento={accent} suelo={-0.45} />
 
 
       <group key={`${modo}-${props.resetNonce}`}>
         {/* Eje principal */}
         <mesh>
-          <boxGeometry args={[HALF * 2, 0.08, 0.08]} />
-          <meshStandardMaterial color="#8aa2b6" emissive="#8aa2b6" emissiveIntensity={0.25} />
+          <boxGeometry args={[HALF * 2, 0.17, 0.17]} />
+          <meshPhysicalMaterial color="#8aa2b6" emissive="#8aa2b6" emissiveIntensity={0.18} roughness={0.32} metalness={0.45} clearcoat={0.7} envMapIntensity={1.2} />
         </mesh>
         {/* Puntas de flecha del eje */}
         <mesh position={[HALF + 0.18, 0, 0]} rotation={[0, 0, -Math.PI / 2]}>
-          <coneGeometry args={[0.14, 0.36, 20]} />
+          <coneGeometry args={[0.2, 0.46, 24]} />
           <meshStandardMaterial color="#8aa2b6" emissive="#8aa2b6" emissiveIntensity={0.3} />
         </mesh>
         <mesh position={[-HALF - 0.18, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-          <coneGeometry args={[0.14, 0.36, 20]} />
+          <coneGeometry args={[0.2, 0.46, 24]} />
           <meshStandardMaterial color="#8aa2b6" emissive="#8aa2b6" emissiveIntensity={0.3} />
         </mesh>
 
@@ -158,7 +158,7 @@ export default function RectaScene(props: RectaSceneProps) {
           return (
             <group key={i} position={[posX(i), 0, 0]}>
               <mesh>
-                <boxGeometry args={[esCero ? 0.07 : 0.045, alto, 0.045]} />
+                <boxGeometry args={[esCero ? 0.12 : 0.075, alto, 0.075]} />
                 <meshStandardMaterial color={col} emissive={col} emissiveIntensity={esCero ? 0.4 : 0.2} />
               </mesh>
               {(esCero || esCinco) && (

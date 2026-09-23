@@ -133,9 +133,9 @@ function Contenido({ molId, atoms, bonds, accent, fgColor, resaltarFG, girar, au
   const sig = `${molId}-${resetNonce}`;
   return (
     <>
-      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
-      {/* La altura sale de donde esta escena ya ponía su sombra de
-          contacto: es donde su autor decidió que estaba el piso. */}
+      {/* Suelo, luz de tres puntos y entorno que reflejar. La altura sale
+          de donde esta escena ya ponía su sombra de contacto, que es donde
+          su autor decidió que estaba el piso. */}
       <Escenario acento={accent} suelo={-2.6} />
 
 
@@ -166,7 +166,10 @@ function Contenido({ molId, atoms, bonds, accent, fgColor, resaltarFG, girar, au
 
 export default function OrganicaScene(props: OrganicaSceneProps) {
   return (
-    <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={{ position: [0, 1.2, 8], fov: 46 }}>
+    <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={{ position: [0, 1.0, 6], fov: 46 }}>
+      {/* A 8 unidades, una molécula pequeña como el metano ocupaba menos de un
+          tercio del alto y la escena parecía vacía. A 6 sigue cabiendo entera
+          una cadena larga, y `maxDistance` deja alejarse si hace falta. */}
       <Contenido {...props} />
     </Canvas>
   );

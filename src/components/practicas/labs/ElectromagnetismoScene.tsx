@@ -24,7 +24,7 @@
 import * as THREE from "three";
 import { useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Html, Line, Stars } from "@react-three/drei";
+import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
 import { CurvaTubo } from "./_tablero";
@@ -405,9 +405,8 @@ function Contenido(props: ElectromagnetismoSceneProps) {
       {/* Sin altura: esta escena no tenía sombra de la que leerla, así
           que el escenario la MIDE de la propia escena al montarse, en
           vez de que alguien la adivine. */}
-      <Escenario acento={accent} mesa={false} niebla={false} />
+      <Escenario acento={accent} />
 
-      <Stars radius={70} depth={30} count={900} factor={3} saturation={0} fade speed={0.5} />
 
       <group key={`${modo}-${resetNonce}`}>
         {modo === "circuito" && <EscenaCircuito V={props.V} R={props.R} playing={playing} accent={accent} />}

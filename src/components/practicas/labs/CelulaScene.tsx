@@ -197,6 +197,47 @@ const ALTURA: Record<Forma, number> = {
   re: 1.0, golgi: 0.95, ribosomas: 0.6, lisosoma: 0.7, vacuola: 1.75, nucleoide: 1.2,
 };
 
+/**
+ * Dónde va el rótulo de un organelo.
+ *
+ * Salían TODOS rectos hacia arriba y se montaban unos sobre otros: «Retículo
+ * endoplasmático» se comía «Núcleo celular» y no se leía ninguno de los dos.
+ *
+ * Abrirlos en abanico no bastó, porque lo que colisiona no es el punto sino el
+ * ANCHO DEL TEXTO, y «Retículo endoplasmático» es largo. Así que ahora cada
+ * rótulo se va al borde, a un anillo alrededor de la célula, conservando la
+ * dirección de su organelo. Dos rótulos solo pueden chocar si sus organelos
+ * están en el mismo ángulo, y en los tres repartos (animal, vegetal,
+ * procariota) no lo están.
+ *
+ * El anillo es una ELIPSE, no un círculo: la cámara deja ~5.9 de ancho visible
+ * y solo ~3.8 de alto, y en un círculo de radio único los rótulos de arriba y
+ * abajo se salían del cuadro.
+ *
+ * El organelo del centro (el núcleo) no tiene dirección hacia la que salir,
+ * así que sube POR ENCIMA del anillo. Dejarlo a media altura no bastaba: los
+ * rótulos del anillo entre 90° y 150° están a esa misma altura y, siendo
+ * anchos, llegaban hasta él igualmente.
+ *
+ * Devuelve una posición RELATIVA al organelo, porque la etiqueta cuelga de su
+ * grupo, que ya está colocado en `pos`.
+ */
+const ANILLO_X = 4.5;
+const ANILLO_Y = 2.9;
+const ALTO_CENTRO = 3.0;   // el del centro, por encima del anillo pero dentro del cuadro
+
+function posEtiqueta(pos: Pt): Pt {
+  const r = Math.hypot(pos[0], pos[1]);
+  /* A ANILLO_Y + 1.15 se salía por arriba del cuadro: la cámara solo deja ver
+     hasta y ≈ 3.8. Este alto despeja el rótulo más alto del anillo (que en los
+     tres repartos no pasa de ~2.0) y sigue entrando en pantalla. */
+  if (r < 0.35) return [0, ALTO_CENTRO - pos[1], 0];
+  const ang = Math.atan2(pos[1], pos[0]);
+  const bx = Math.cos(ang) * ANILLO_X;
+  const by = Math.sin(ang) * ANILLO_Y;
+  return [bx - pos[0], by - pos[1], -pos[2]];
+}
+
 /* ── Organelo interno clicable ────────────────────────────────────────────── */
 function Organelo({ id, pos, escala, selected, playing, onSelect }: {
   id: string; pos: Pt; escala: number; selected: boolean; playing: boolean; onSelect: (id: string) => void;
@@ -221,7 +262,7 @@ function Organelo({ id, pos, escala, selected, playing, onSelect }: {
       >
         <FormaMesh forma={def.forma} color={def.color} emis={emis} />
       </group>
-      <Etiqueta pos={[0, ALTURA[def.forma], 0]} df={selected ? 11 : 13} fuerte={selected} col={selected ? def.color : T.text2}>
+      <Etiqueta pos={posEtiqueta(pos)} df={selected ? 12 : 8.5} fuerte={selected} col={selected ? def.color : T.text2}>
         {selected ? def.nombre : def.nombre.replace(" (RE)", "").replace(" (nucleoide)", "")}
       </Etiqueta>
     </group>
