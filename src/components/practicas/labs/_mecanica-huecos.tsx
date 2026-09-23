@@ -27,6 +27,7 @@
 
 import { useMemo, useRef, useState } from "react";
 import { T, OK } from "./_kit";
+import { VinetaTermino } from "./_vineta";
 
 const NO = "#FF5E5E";
 
@@ -154,7 +155,9 @@ export function CompletaTexto({
           padding:0 2px; transition:color .15s; }
         .mh-pista:hover { color:${accent}; }
         .mh-word { cursor:pointer; border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text};
-          border-radius:10px; padding:7px 13px; font-size:13px; font-weight:700; transition:all .14s; }
+          border-radius:10px; padding:6px 12px; font-size:13px; font-weight:700; transition:all .14s;
+          /* En fila con su viñeta: el botón dejó de ser solo texto. */
+          display:inline-flex; align-items:center; gap:8px; }
         .mh-word:hover { border-color:${accent}; background:rgba(${rgba},0.14); }
         @media (prefers-reduced-motion: reduce){ .mh-in[data-e="mal"] { animation:none; } }
       `}</style>
@@ -273,6 +276,10 @@ export function CompletaTexto({
                 refs.current[i]?.focus();
               }}
             >
+              {/* La palabra con su ilustración cuando existe: el banco ya
+                  enseña la palabra, así que la imagen no filtra nada y
+                  convierte una lista de texto en algo que se mira. */}
+              <VinetaTermino termino={p} color={accent} tam={22} radio={6} />
               {p}
             </button>
           ))}

@@ -140,7 +140,9 @@ export function EscribeTermino({
         .mt-mini { cursor:pointer; border:none; background:transparent; color:${T.text3}; font-size:13px; padding:0 4px; transition:color .15s; }
         .mt-mini:hover { color:${accent}; }
         .mt-word { cursor:pointer; border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text};
-          border-radius:10px; padding:7px 13px; font-size:13px; font-weight:700; transition:all .14s; }
+          border-radius:10px; padding:6px 12px; font-size:13px; font-weight:700; transition:all .14s;
+          /* En fila con su viñeta: el botón dejó de ser solo texto. */
+          display:inline-flex; align-items:center; gap:8px; }
         .mt-word:hover { border-color:${accent}; background:rgba(${rgba},0.14); }
         @media (prefers-reduced-motion: reduce){ .mt-in[data-e="mal"] { animation:none; } }
       `}</style>
@@ -241,6 +243,9 @@ export function EscribeTermino({
                 refs.current[i]?.focus();
               }}
             >
+              {/* Aquí la viñeta tampoco filtra: el banco es precisamente la
+                  lista de términos, y quien lo abre ya los está viendo. */}
+              <VinetaTermino termino={t} color={accent} tam={22} radio={6} />
               {t}
             </button>
           ))}
