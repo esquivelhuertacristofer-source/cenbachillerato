@@ -15,8 +15,9 @@
 import * as THREE from "three";
 import { useEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Edges } from "@react-three/drei";
+import { OrbitControls, Edges } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Escenario } from "./_escenario";
 
 export type Fase = "solido" | "liquido" | "gas";
 
@@ -257,22 +258,12 @@ export default function EstadosMateriaScene(props: EstadosSceneProps) {
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
       camera={{ position: [4, 2.6, 5], fov: 42 }}
     >
-      <color attach="background" args={["#03101f"]} />
-      <fog attach="fog" args={["#03101f", 13, 24]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={props.accent} suelo={-BOX.hy - 0.06} />
 
-      <ambientLight intensity={0.5} />
-      <directionalLight
-        position={[4, 8, 4]}
-        intensity={2.4}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-near={1}
-        shadow-camera-far={24}
-        shadow-bias={-0.0004}
-      />
       <pointLight position={[-4, 3, -3]} intensity={20} color={`#${heat.getHexString()}`} />
-      <pointLight position={[3, 1, 4]} intensity={10} color="#ffffff" />
 
       <group position={[0, -0.4, 0]}>
         <Pedestal />
@@ -289,15 +280,9 @@ export default function EstadosMateriaScene(props: EstadosSceneProps) {
           pScale={props.pScale}
           cohesion={props.cohesion}
         />
-        <ContactShadows position={[0, -BOX.hy - 0.06, 0]} opacity={0.4} scale={8} blur={2.8} far={4.5} color="#2a3f57" />
       </group>
 
       {/* Reflejos de estudio sin assets externos */}
-      <Environment resolution={256}>
-        <Lightformer intensity={2.2} position={[0, 5, 2]} scale={[9, 4, 1]} color="#ffffff" />
-        <Lightformer intensity={1.5} position={[-5, 2, -2]} scale={[5, 5, 1]} color={props.accent} />
-        <Lightformer intensity={1.1} position={[5, 1, 3]} scale={[4, 4, 1]} color="#bfe8ff" />
-      </Environment>
 
       <OrbitControls
         enablePan={false}

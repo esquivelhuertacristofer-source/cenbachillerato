@@ -19,9 +19,10 @@
 import * as THREE from "three";
 import { useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Environment, Lightformer, Html, Stars } from "@react-three/drei";
+import { OrbitControls, Html, Stars } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { type Modo, type Escena } from "./calor-data";
+import { Escenario } from "./_escenario";
 
 type Pt = [number, number, number];
 
@@ -103,7 +104,6 @@ function BarraConduccion({ frac, playing }: { frac: number; playing: boolean }) 
           <coneGeometry args={[0.34, 1.1, 18]} />
           <meshStandardMaterial color="#fb923c" emissive="#f97316" emissiveIntensity={1.4} roughness={0.5} transparent opacity={0.92} />
         </mesh>
-        <pointLight position={[0, 0.3, 0]} intensity={3} distance={6} color="#fb923c" />
       </group>
       <Html position={[startX - 0.9, -1.3, 0]} center distanceFactor={12} style={{ pointerEvents: "none" }}>
         <div style={pillStyle("#fb923c")}>Foco de calor</div>
@@ -315,10 +315,11 @@ function Contenido({ modo, escena, playing, modoColor, resetNonce }: CalorSceneP
 
   return (
     <>
-      <color attach="background" args={["#040912"]} />
-      <fog attach="fog" args={["#040912", 22, 52]} />
-      <ambientLight intensity={0.55} />
-      <directionalLight position={[6, 9, 6]} intensity={1.3} castShadow shadow-mapSize={[1024, 1024]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* Sin altura: esta escena no tenía sombra de la que leerla, así
+          que el escenario la MIDE de la propia escena al montarse, en
+          vez de que alguien la adivine. */}
+      <Escenario acento="#38bdf8" mesa={false} niebla={false} />
       <directionalLight position={[-6, 4, -4]} intensity={0.5} color={modoColor} />
       <Stars radius={80} depth={40} count={1000} factor={3} fade speed={0.4} />
 
@@ -347,10 +348,6 @@ function Contenido({ modo, escena, playing, modoColor, resetNonce }: CalorSceneP
         )}
       </group>
 
-      <Environment resolution={128}>
-        <Lightformer form="rect" intensity={1.0} position={[0, 6, 4]} scale={9} color="#bcd4ff" />
-        <Lightformer form="rect" intensity={0.7} position={[6, 0, -4]} scale={7} color={modoColor} />
-      </Environment>
       <OrbitControls enablePan={false} minDistance={6} maxDistance={36} autoRotate={false} />
       <EffectComposer>
         <Bloom intensity={0.55} luminanceThreshold={0.2} mipmapBlur />

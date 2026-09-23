@@ -14,9 +14,16 @@
 import * as THREE from "three";
 import { useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer } from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import type { MetodoKey } from "./separacion-data";
+import { VIDRIO, perfilVaso } from "./_vidrio";
+import { Escenario } from "./_escenario";
+
+/* El vaso mide 2,3 de alto y 1,18 de radio en la boca: el perfil respeta esas
+ * medidas para que lo que ya estaba colocado alrededor -las particulas, la
+ * herramienta del metodo- siga encajando donde estaba. */
+const PERFIL_VASO = perfilVaso(1.12, 2.3);
 
 export interface CompVisual {
   key: string;
@@ -78,23 +85,23 @@ interface Particula {
 }
 
 /* ── Vaso de precipitados (vidrio) ─────────────────────────────────────── */
+/**
+ * El vaso entero en una pieza torneada.
+ *
+ * Antes eran tres mallas —pared abierta, un disco de fondo y un toro de
+ * borde— con `meshStandardMaterial` y `opacity: 0.16`. Eso no es vidrio: es
+ * plástico traslúcido, y el fondo se veía como un disco pegado dentro porque
+ * no tenía continuidad con la pared.
+ *
+ * `perfilVaso` trae la silueta con su pico y su base redondeada, y `VIDRIO`
+ * el material físico. Ver `_vidrio.tsx` para el porqué de cada ajuste.
+ */
 function Vaso({ x }: { x: number }) {
   return (
-    <group position={[x, -0.45, 0]}>
-      {/* pared */}
-      <mesh>
-        <cylinderGeometry args={[1.18, 1.05, 2.3, 40, 1, true]} />
-        <meshStandardMaterial color={GLASS} transparent opacity={0.16} roughness={0.05} metalness={0.1} side={THREE.DoubleSide} depthWrite={false} />
-      </mesh>
-      {/* fondo */}
-      <mesh position={[0, -1.12, 0]}>
-        <cylinderGeometry args={[1.05, 1.05, 0.08, 40]} />
-        <meshStandardMaterial color={GLASS} transparent opacity={0.28} roughness={0.1} metalness={0.1} />
-      </mesh>
-      {/* borde */}
-      <mesh position={[0, 1.15, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[1.18, 0.04, 12, 40]} />
-        <meshStandardMaterial color="#cfe0ee" transparent opacity={0.4} roughness={0.1} />
+    <group position={[x, -1.6, 0]}>
+      <mesh castShadow>
+        <latheGeometry args={[PERFIL_VASO, 56]} />
+        <meshPhysicalMaterial {...VIDRIO} />
       </mesh>
     </group>
   );
@@ -219,22 +226,11 @@ export default function SeparacionMezclasScene(props: SeparacionSceneProps) {
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
       camera={{ position: [0, 1.4, 11.5], fov: 44 }}
     >
-      <color attach="background" args={["#03101f"]} />
-      <fog attach="fog" args={["#03101f", 17, 40]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. La altura sale
+          de donde esta escena ya ponía su sombra de contacto, que es donde
+          su autor decidió que estaba el piso. */}
+      <Escenario acento={props.accent} suelo={-1.75} />
 
-      <ambientLight intensity={0.55} />
-      <directionalLight
-        position={[5, 9, 5]}
-        intensity={2.0}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-near={1}
-        shadow-camera-far={30}
-        shadow-bias={-0.0004}
-      />
-      <pointLight position={[-6, 3, 3]} intensity={14} color={props.accent} />
-      <pointLight position={[5, 1, 5]} intensity={8} color="#ffffff" />
 
       <group key={`${props.mezclaKey}-${props.metodoKey}-${props.resetNonce}`}>
         <Vaso x={LEFT_X} />
@@ -242,14 +238,8 @@ export default function SeparacionMezclasScene(props: SeparacionSceneProps) {
         <Vaso x={RIGHT_X} />
         <Herramienta metodo={props.metodoKey} />
         <Particulas particulas={particulas} funciona={props.funciona} progreso={props.progreso} />
-        <ContactShadows position={[0, -1.75, 0]} opacity={0.34} scale={18} blur={3} far={6} color="#2a3f57" />
       </group>
 
-      <Environment resolution={256}>
-        <Lightformer intensity={2.0} position={[0, 5, 2]} scale={[10, 4, 1]} color="#ffffff" />
-        <Lightformer intensity={1.4} position={[-6, 2, -2]} scale={[6, 6, 1]} color={props.accent} />
-        <Lightformer intensity={1.1} position={[6, 1, 3]} scale={[5, 5, 1]} color="#bfe8ff" />
-      </Environment>
 
       <OrbitControls
         enablePan={false}

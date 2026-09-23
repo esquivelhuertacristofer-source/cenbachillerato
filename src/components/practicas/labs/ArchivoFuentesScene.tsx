@@ -26,6 +26,7 @@ import { useEffect, useMemo, useRef, type ReactNode } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Environment, Lightformer, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { PanelGrafica } from "./_tablero";
 import {
   type SoporteId,
   type ZonaId,
@@ -938,10 +939,7 @@ function SalaArchivo({ lampara = true }: { lampara?: boolean }) {
   return (
     <group>
       {/* Pared y repisas */}
-      <mesh position={[0, 2.6, -3.4]} receiveShadow>
-        <planeGeometry args={[18, 9]} />
-        <meshStandardMaterial color="#1f1712" roughness={1} />
-      </mesh>
+      <PanelGrafica ancho={18} alto={9} />
       {[0.7, 2.45].map((y) => (
         <mesh key={y} position={[0, y, -3.0]} receiveShadow castShadow>
           <boxGeometry args={[13.6, 0.08, 0.8]} />
@@ -1344,10 +1342,7 @@ function EscenaTablero(p: { afirmacionId: string; hilos: Hilos; fuenteSel: Fuent
 
   return (
     <group>
-      <mesh position={[0, 0, -0.3]} receiveShadow>
-        <planeGeometry args={[30, 16]} />
-        <meshStandardMaterial color="#1c1410" roughness={1} />
-      </mesh>
+      <PanelGrafica ancho={30} alto={16} />
       <mesh position={[0, 0, -0.06]} receiveShadow>
         <boxGeometry args={[10.8, 6.6, 0.12]} />
         <meshStandardMaterial color="#b3845a" roughness={1} />

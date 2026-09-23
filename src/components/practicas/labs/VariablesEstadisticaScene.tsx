@@ -21,8 +21,9 @@
 import * as THREE from "three";
 import { useEffect, useMemo, useRef, type ReactNode } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Environment, Lightformer, Html, RoundedBox } from "@react-three/drei";
+import { OrbitControls, Html, RoundedBox } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Escenario } from "./_escenario";
 import {
   type Modo,
   type TipoVar,
@@ -523,15 +524,12 @@ export default function VariablesEstadisticaScene(p: VariablesSceneProps) {
   const cam = CAMARAS[modo];
   return (
     <Canvas key={`${modo}-${resetNonce}`} shadows dpr={[1, 1.75]} camera={{ position: cam.pos, fov: 42 }} gl={{ antialias: true }}>
-      <color attach="background" args={["#040a16"]} />
-      <fog attach="fog" args={["#040a16", 18, 40]} />
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[4, 9, 6]} intensity={1.1} castShadow shadow-mapSize={[1024, 1024]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* Sin altura: esta escena no tenía sombra de la que leerla, así
+          que el escenario la MIDE de la propia escena al montarse, en
+          vez de que alguien la adivine. */}
+      <Escenario acento={p.accent} />
       <pointLight position={[-6, 2, 5]} intensity={0.4} color={modoColor} />
-      <Environment resolution={128}>
-        <Lightformer form="rect" intensity={1.5} position={[0, 5, -6]} scale={[10, 6, 1]} color="#93c5fd" />
-        <Lightformer form="rect" intensity={0.8} position={[-6, 0, 4]} scale={[6, 6, 1]} color={modoColor} />
-      </Environment>
 
       {modo === "variables" && <EscenaMaquina tarjeta={p.tarjeta} envio={p.envio} conteos={p.conteos} modoColor={modoColor} />}
       {modo === "poblacion" && <EscenaPoblacion censoNonce={p.censoNonce} censado={p.censado} seleccion={p.seleccion} modoColor={modoColor} />}

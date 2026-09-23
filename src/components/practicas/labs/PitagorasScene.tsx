@@ -18,6 +18,7 @@ import { OrbitControls, ContactShadows, Environment, Lightformer, Line, Html } f
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { BufferGeometry, Float32BufferAttribute, DoubleSide } from "three";
 import { hipotenusa, esTerna, fmtNum } from "./pitagoras-data";
+import { CurvaTubo } from "./_tablero";
 
 export interface PitagorasSceneProps {
   a: number; // cateto horizontal
@@ -181,7 +182,7 @@ export default function PitagorasScene(props: PitagorasSceneProps) {
         <mesh geometry={L.triGeom}>
           <meshBasicMaterial color="#bfe8ff" transparent opacity={0.16} side={DoubleSide} />
         </mesh>
-        <Line points={L.triLine} color="#eaf4ff" lineWidth={3.5} />
+        <CurvaTubo puntos={L.triLine} color="#eaf4ff" grosor={0.063} />
         <Line points={L.anguloRecto} color="#eaf4ff" lineWidth={2} transparent opacity={0.85} />
 
         {/* Etiquetas de área */}

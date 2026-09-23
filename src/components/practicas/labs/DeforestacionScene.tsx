@@ -15,8 +15,9 @@
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Html } from "@react-three/drei";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Escenario } from "./_escenario";
 import {
   coberturaEfectiva,
   causaDe,
@@ -364,18 +365,11 @@ function Contenido({
 }: DeforestacionSceneProps) {
   return (
     <>
-      <color attach="background" args={["#06140f"]} />
-      <fog attach="fog" args={["#06140f", 14, 30]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={accent} suelo={0.01} />
 
-      <ambientLight intensity={0.55} />
-      <directionalLight
-        position={[6, 9, 4]}
-        intensity={1.5}
-        castShadow
-        shadow-mapSize={[1024, 1024]}
-        shadow-camera-far={30}
-      />
-      <pointLight position={[-5, 4, -4]} intensity={0.5} color={accent} />
 
       <group key={`${resetNonce}`}>
         <Predio
@@ -387,15 +381,7 @@ function Contenido({
         />
       </group>
 
-      <ContactShadows position={[0, 0.01, 0]} opacity={0.45} scale={16} blur={2.4} far={6} />
 
-      <Environment resolution={128}>
-        <group>
-          <Lightformer intensity={1.6} position={[0, 6, 2]} scale={8} color="#eaf7ef" />
-          <Lightformer intensity={0.8} position={[5, 2, 1]} scale={5} color="#bfe6cf" />
-          <Lightformer intensity={0.6} position={[-5, 1, -2]} scale={5} color="#9fd9ff" />
-        </group>
-      </Environment>
 
       <OrbitControls
         makeDefault

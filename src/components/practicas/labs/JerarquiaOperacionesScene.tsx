@@ -21,8 +21,9 @@
 import * as THREE from "three";
 import { useEffect, useMemo, useRef, type ReactNode } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Environment, Lightformer, Html } from "@react-three/drei";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Escenario } from "./_escenario";
 import {
   type Modo,
   type Nodo,
@@ -968,15 +969,12 @@ export default function JerarquiaOperacionesScene(p: JerarquiaSceneProps) {
 
   return (
     <Canvas key={`${vista}-${p.exprId}-${p.verArbol}-${p.casoId}-${resetNonce}`} shadows dpr={[1, 1.75]} camera={{ position: encuadre.pos, fov: 42 }} gl={{ antialias: true }}>
-      <color attach="background" args={[FONDO]} />
-      <fog attach="fog" args={[FONDO, 22, 48]} />
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[4, 9, 8]} intensity={1.1} castShadow shadow-mapSize={[1024, 1024]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* Sin altura: esta escena no tenía sombra de la que leerla, así
+          que el escenario la MIDE de la propia escena al montarse, en
+          vez de que alguien la adivine. */}
+      <Escenario acento="#38bdf8" fondo={FONDO} />
       <pointLight position={[-6, 3, 6]} intensity={0.45} color={modoColor} />
-      <Environment resolution={128}>
-        <Lightformer form="rect" intensity={1.4} position={[0, 5, 6]} scale={[10, 6, 1]} color="#bfdbfe" />
-        <Lightformer form="rect" intensity={0.8} position={[-6, 0, 4]} scale={[6, 6, 1]} color={modoColor} />
-      </Environment>
       <Pizarron color={modoColor} z={vista === "razon" ? -2.2 : -1.6} />
 
       {vista === "pasos" && !p.verArbol && <EscenaPasos exprId={p.exprId} elegidos={p.elegidos} errorId={p.errorId} errorTexto={p.errorTexto} onElegir={p.onElegir} modoColor={modoColor} />}

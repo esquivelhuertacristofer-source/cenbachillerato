@@ -19,8 +19,10 @@
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Line, Html } from "@react-three/drei";
+import { OrbitControls, ContactShadows, Line, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Escenario } from "./_escenario";
+import { CurvaTubo, PanelGrafica } from "./_tablero";
 import {
   ALPHA_DEG,
   CONO_H,
@@ -92,10 +94,7 @@ function PlanoDeCorte({ gammaDeg, pausado }: { gammaDeg: number; pausado: boolea
 
   return (
     <group ref={ref} position={centro} quaternion={quat}>
-      <mesh>
-        <planeGeometry args={[9.5, 9.5]} />
-        <meshStandardMaterial color={AZUL} transparent opacity={0.16} side={THREE.DoubleSide} metalness={0.1} roughness={0.7} toneMapped={false} />
-      </mesh>
+      <PanelGrafica ancho={9.5} alto={9.5} />
       {/* borde del plano */}
       <Line points={[[-4.75, -4.75, 0], [4.75, -4.75, 0], [4.75, 4.75, 0], [-4.75, 4.75, 0], [-4.75, -4.75, 0]]} color={AZUL} lineWidth={1.4} />
     </group>
@@ -123,14 +122,13 @@ function Seccion({ gammaDeg, accent, pausado }: { gammaDeg: number; accent: stri
       <PlanoDeCorte gammaDeg={gammaDeg} pausado={pausado} />
       {/* curva de intersección — el resultado estrella */}
       {segmentos.map((seg, i) => (
-        <Line key={`seg${i}`} points={seg} color={clase.color} lineWidth={4} />
+        <CurvaTubo key={`seg${i}`} puntos={seg} color={clase.color} grosor={0.072} />
       ))}
       <Html position={etiquetaPos} center distanceFactor={16} pointerEvents="none">
         <div style={{ color: clase.color, fontSize: 12, fontWeight: 900, textShadow: "0 2px 8px #000", whiteSpace: "nowrap" }}>
           {clase.nombre}
         </div>
       </Html>
-      <ContactShadows position={[0, -CONO_H - 0.1, 0]} opacity={0.22} scale={16} blur={2.6} far={8} />
     </group>
   );
 }
@@ -180,7 +178,7 @@ function Antena({ pausado }: { pausado: boolean }) {
   return (
     <group position={[0, -1.6, 0]}>
       {/* curva de la antena */}
-      <Line points={curva} color={ORO} lineWidth={5} />
+      <CurvaTubo puntos={curva} color={ORO} grosor={0.09} />
       {/* eje de simetría */}
       <Line points={[[0, 0, 0], [0, (focoY + 1) * PAR_S, 0]]} color="#3a5572" lineWidth={1} dashed dashSize={0.16} gapSize={0.12} />
 
@@ -279,7 +277,7 @@ function Cobertura({ pausado }: { pausado: boolean }) {
         <meshBasicMaterial color={AZUL} transparent opacity={0.1} side={THREE.DoubleSide} toneMapped={false} />
       </mesh>
       {/* borde x²+y²=25 */}
-      <Line points={circulo} color={AZUL} lineWidth={3} />
+      <CurvaTubo puntos={circulo} color={AZUL} grosor={0.054} />
 
       {/* ejes */}
       <Line points={[[-r * COB_S - 0.6, 0, 0], [r * COB_S + 0.6, 0, 0]]} color={EJE} lineWidth={1.2} />
@@ -346,21 +344,11 @@ function Contenido(props: ModeladoConicasSceneProps) {
   const { accent, autoRotate, resetNonce, modo, gammaDeg, pausado } = props;
   return (
     <>
-      <color attach="background" args={["#03101f"]} />
-      <fog attach="fog" args={["#03101f", 26, 60]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={accent} suelo={-CONO_H - 0.1} />
 
-      <ambientLight intensity={0.62} />
-      <directionalLight
-        position={[5, 10, 8]}
-        intensity={1.25}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-near={1}
-        shadow-camera-far={42}
-        shadow-bias={-0.0004}
-      />
-      <pointLight position={[0, 2, 9]} intensity={1.8} color="#ffffff" />
 
       <group key={`${resetNonce}`}>
         {modo === "seccion" && <Seccion gammaDeg={gammaDeg} accent={accent} pausado={pausado} />}
@@ -368,11 +356,6 @@ function Contenido(props: ModeladoConicasSceneProps) {
         {modo === "circunferencia" && <Cobertura pausado={pausado} />}
       </group>
 
-      <Environment resolution={256}>
-        <Lightformer intensity={1.4} position={[0, 7, 6]} scale={[16, 5, 1]} color="#ffffff" />
-        <Lightformer intensity={1.0} position={[-9, 3, 2]} scale={[5, 6, 1]} color={accent} />
-        <Lightformer intensity={1.0} position={[9, 2, 4]} scale={[4, 5, 1]} color="#bfe8ff" />
-      </Environment>
 
       <OrbitControls
         enablePan={false}

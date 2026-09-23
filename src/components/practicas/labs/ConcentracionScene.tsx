@@ -18,8 +18,10 @@
 import { useMemo } from "react";
 import * as THREE from "three";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer } from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { VIDRIO_FINO, perfilVaso, perfilLiquido } from "./_vidrio";
+import { Escenario } from "./_escenario";
 
 export interface ConcentracionSceneProps {
   /** Nivel del líquido (0..1) según el agua agregada. */
@@ -48,33 +50,30 @@ function prand(i: number, salt: number): number {
   return x - Math.floor(x);
 }
 
-/** Vaso de precipitados: paredes de vidrio + base + pico. */
+/**
+ * Vaso de precipitados, en una sola pieza torneada con su pico y su base.
+ *
+ * Eran tres mallas sueltas —pared abierta, disco de base, toro de borde— y la
+ * pared llevaba `transmission: 0.9` Y `opacity: 0.16` a la vez, que se anulan
+ * (ver `_vidrio.tsx`).
+ *
+ * AQUÍ EL VIDRIO ES `VIDRIO_FINO` A PROPÓSITO, no por ahorrar. Este vaso tiene
+ * dentro una disolución teñida con partículas de soluto suspendidas, y a
+ * través de un material con `transmission` sólo se ve lo OPACO: con el vidrio
+ * bueno, el líquido desaparecería y las partículas quedarían flotando en el
+ * aire. Lo que el alumno vino a mirar es la disolución, así que manda ella.
+ */
+const PERFIL_VASO = perfilVaso(VASO_R, VASO_H);
+/** Alto total del perfil, para traducir alturas de liquido a fracciones. */
+const ALTO_PERFIL = Math.max(...PERFIL_VASO.map((p) => p.y));
+
 function Vaso() {
   return (
-    <group>
-      {/* paredes de vidrio (cilindro abierto) */}
-      <mesh>
-        <cylinderGeometry args={[VASO_R, VASO_R, VASO_H, 56, 1, true]} />
-        <meshPhysicalMaterial
-          color="#cfe8ff"
-          transparent
-          opacity={0.16}
-          roughness={0.08}
-          metalness={0}
-          transmission={0.9}
-          thickness={0.5}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
-      {/* base */}
-      <mesh position={[0, FONDO_Y, 0]}>
-        <cylinderGeometry args={[VASO_R, VASO_R, 0.12, 56]} />
-        <meshPhysicalMaterial color="#cfe8ff" transparent opacity={0.28} roughness={0.1} transmission={0.7} thickness={0.6} />
-      </mesh>
-      {/* aro superior (borde) */}
-      <mesh position={[0, VASO_H / 2, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[VASO_R, 0.035, 12, 56]} />
-        <meshStandardMaterial color="#dff0ff" roughness={0.3} metalness={0.3} emissive="#9fd0ff" emissiveIntensity={0.2} />
+    /* El perfil arranca en la base; el vaso estaba centrado en el origen. */
+    <group position={[0, FONDO_Y, 0]}>
+      <mesh castShadow receiveShadow>
+        <latheGeometry args={[PERFIL_VASO, 56]} />
+        <meshPhysicalMaterial {...VIDRIO_FINO} />
       </mesh>
     </group>
   );
@@ -83,8 +82,14 @@ function Vaso() {
 /** Líquido teñido + partículas de soluto disueltas. */
 function Liquido({ nivel, solutoColor, intensidad }: { nivel: number; solutoColor: string; intensidad: number }) {
   const H = Math.max(0.25, nivel * (VASO_H - 0.3)); // altura del líquido
-  const topY = FONDO_Y + 0.06 + H;
-  const centerY = FONDO_Y + 0.06 + H / 2;
+
+  /* El perfil del vaso cortado a la altura del líquido. `perfilLiquido` pide
+   * la fracción del perfil, no una altura: el líquido llega a 0,06 + H
+   * contando desde la base, y el perfil entero mide `ALTO_PERFIL`. */
+  const perfilNivel = useMemo(
+    () => perfilLiquido(PERFIL_VASO, (0.06 + H) / ALTO_PERFIL, 0.05),
+    [H],
+  );
 
   // color: del agua casi clara al color del soluto, según la intensidad
   const color = useMemo(() => {
@@ -108,16 +113,19 @@ function Liquido({ nivel, solutoColor, intensidad }: { nivel: number; solutoColo
 
   return (
     <group>
-      {/* volumen del líquido */}
-      <mesh position={[0, centerY, 0]}>
-        <cylinderGeometry args={[VASO_R - 0.04, VASO_R - 0.04, H, 56]} />
-        <meshPhysicalMaterial color={color} transparent opacity={0.62} roughness={0.18} transmission={0.55} thickness={1.2} ior={1.33} />
+      {/* Volumen del líquido, con la FORMA DEL VASO y no un cilindro metido
+          dentro: se corta el mismo perfil a la altura que toca. Es lo que
+          delata a un vaso de precipitados de maqueta, porque el líquido
+          verdadero se apoya en la base redondeada.
+          Sigue siendo translúcido —sin `transmission`— para que se vean las
+          partículas de soluto suspendidas. */}
+      <mesh position={[0, FONDO_Y, 0]}>
+        <latheGeometry args={[perfilNivel, 56]} />
+        <meshPhysicalMaterial color={color} transparent opacity={0.62} roughness={0.18} ior={1.33} />
       </mesh>
-      {/* superficie (menisco) */}
-      <mesh position={[0, topY, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[VASO_R - 0.05, 56]} />
-        <meshStandardMaterial color={color} transparent opacity={0.5} roughness={0.12} metalness={0.1} emissive={color} emissiveIntensity={0.18} side={THREE.DoubleSide} />
-      </mesh>
+      {/* El menisco NO lleva disco propio: `perfilLiquido` ya cierra el torno
+          por arriba, y el disco peleaba en profundidad con esa tapa — salia un
+          abanico de rayas que giraba con la camara. */}
       {/* partículas de soluto disuelto */}
       {particulas.map((p) => (
         <mesh key={p.key} position={p.pos}>
@@ -173,35 +181,18 @@ export default function ConcentracionScene(props: ConcentracionSceneProps) {
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
       camera={{ position: [0, 1.9, 7.4], fov: 42 }}
     >
-      <color attach="background" args={["#03101f"]} />
-      <fog attach="fog" args={["#03101f", 16, 40]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. La altura sale
+          de donde esta escena ya ponía su sombra de contacto, que es donde
+          su autor decidió que estaba el piso. */}
+      <Escenario acento={props.accent} suelo={FONDO_Y - 0.08} />
 
-      <ambientLight intensity={0.62} />
-      <directionalLight
-        position={[5, 9, 6]}
-        intensity={2.0}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-near={1}
-        shadow-camera-far={32}
-        shadow-bias={-0.0004}
-      />
-      <pointLight position={[-6, 3, 4]} intensity={10} color={props.accent} />
-      <pointLight position={[5, 1, 5]} intensity={6} color="#ffffff" />
 
       <group key={props.resetNonce}>
         <Vaso />
         <Liquido nivel={nivel} solutoColor={props.solutoColor} intensidad={intensidad} />
         {props.saturada && <Cristales excedenteFrac={excedenteFrac} solutoColor={props.solutoColor} />}
-        <ContactShadows position={[0, FONDO_Y - 0.08, 0]} opacity={0.36} scale={9} blur={3} far={6} color="#2a3f57" />
       </group>
 
-      <Environment resolution={256}>
-        <Lightformer intensity={2.0} position={[0, 5, 2]} scale={[10, 4, 1]} color="#ffffff" />
-        <Lightformer intensity={1.4} position={[-6, 2, -2]} scale={[6, 6, 1]} color={props.accent} />
-        <Lightformer intensity={1.1} position={[6, 1, 3]} scale={[5, 5, 1]} color="#bfe8ff" />
-      </Environment>
 
       <OrbitControls
         enablePan={false}

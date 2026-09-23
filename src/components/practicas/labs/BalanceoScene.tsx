@@ -18,9 +18,10 @@
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Html } from "@react-three/drei";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { ELEMS_B, MOLS_B, type Elem, type Especie } from "./balanceo-data";
+import { Escenario } from "./_escenario";
 
 export interface BalanceoSceneProps {
   reaccionKey: string;
@@ -178,26 +179,18 @@ function Contenido({ reactivos, productos, coefReact, coefProd, balanceada, acce
 
   return (
     <>
-      <color attach="background" args={["#041018"]} />
-      <fog attach="fog" args={["#041018", 24, 64]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={accent} suelo={-4.6} />
 
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[5, 10, 8]} intensity={1.9} castShadow shadow-mapSize={[2048, 2048]} shadow-camera-far={40} shadow-bias={-0.0004} />
-      <pointLight position={[-6, 4, 4]} intensity={12} color={accent} />
-      <pointLight position={[6, 2, 5]} intensity={8} color="#ffffff" />
 
       <group key={sig} position={[0, 0.2, 0]}>
         <LadoMesh side={izq} boost={boost} />
         <LadoMesh side={der} boost={boost} />
         <Flecha balanceada={balanceada} />
-        <ContactShadows position={[0, -4.6, 0]} opacity={0.32} scale={22} blur={2.8} far={8} color="#16314a" />
       </group>
 
-      <Environment resolution={256}>
-        <Lightformer intensity={1.9} position={[0, 6, 4]} scale={[12, 4, 1]} color="#ffffff" />
-        <Lightformer intensity={1.3} position={[-7, 2, -2]} scale={[6, 6, 1]} color={accent} />
-        <Lightformer intensity={1.0} position={[7, 1, 3]} scale={[5, 5, 1]} color="#bfe8ff" />
-      </Environment>
 
       <OrbitControls
         makeDefault

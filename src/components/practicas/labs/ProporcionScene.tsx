@@ -16,9 +16,11 @@
 
 import { useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Line } from "@react-three/drei";
+import { OrbitControls, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import type { Tipo } from "./proporcion-data";
+import { Escenario } from "./_escenario";
+import { CurvaTubo } from "./_tablero";
 
 export interface ProporcionSceneProps {
   tipo: Tipo;
@@ -96,22 +98,12 @@ export default function ProporcionScene(props: ProporcionSceneProps) {
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
       camera={{ position: [1.5, 1.2, 13.5], fov: 40 }}
     >
-      <color attach="background" args={["#03101f"]} />
-      <fog attach="fog" args={["#03101f", 20, 46]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* Sin altura: esta escena no tenía sombra de la que leerla, así
+          que el escenario la MIDE de la propia escena al montarse, en
+          vez de que alguien la adivine. */}
+      <Escenario acento={accent} />
 
-      <ambientLight intensity={0.6} />
-      <directionalLight
-        position={[5, 9, 7]}
-        intensity={1.8}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-near={1}
-        shadow-camera-far={36}
-        shadow-bias={-0.0004}
-      />
-      <pointLight position={[-7, 3, 5]} intensity={10} color={accent} />
-      <pointLight position={[6, 1, 5]} intensity={6} color="#ffffff" />
 
       {/* Todo el graficador, centrado en el origen del mundo */}
       <group key={`${tipo}-${props.resetNonce}`} position={[-W / 2, -H / 2, 0]}>
@@ -145,7 +137,7 @@ export default function ProporcionScene(props: ProporcionSceneProps) {
         </mesh>
 
         {/* Curva de la proporción */}
-        <Line points={curva} color={accent} lineWidth={4} />
+        <CurvaTubo puntos={curva} color={accent} grosor={0.072} />
 
         {/* Guías punteadas a los ejes */}
         <Line points={guiaX} color={K_COL} lineWidth={2} dashed dashSize={0.22} gapSize={0.14} transparent opacity={0.85} />
@@ -167,14 +159,8 @@ export default function ProporcionScene(props: ProporcionSceneProps) {
           <meshStandardMaterial color={K_COL} emissive={K_COL} emissiveIntensity={0.6} />
         </mesh>
 
-        <ContactShadows position={[W / 2, -0.1, 1.2]} rotation={[Math.PI / 2, 0, 0]} opacity={0.22} scale={20} blur={3} far={6} color="#16263a" />
       </group>
 
-      <Environment resolution={256}>
-        <Lightformer intensity={2.0} position={[0, 5, 2]} scale={[10, 4, 1]} color="#ffffff" />
-        <Lightformer intensity={1.4} position={[-6, 2, -2]} scale={[6, 6, 1]} color={accent} />
-        <Lightformer intensity={1.1} position={[6, 1, 3]} scale={[5, 5, 1]} color="#bfe8ff" />
-      </Environment>
 
       <OrbitControls
         enablePan={false}

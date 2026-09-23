@@ -21,8 +21,9 @@
 import * as THREE from "three";
 import { useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Environment, Lightformer, Html, Stars } from "@react-three/drei";
+import { OrbitControls, Html, Stars } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Escenario } from "./_escenario";
 import {
   type Modo,
   type Escena,
@@ -337,10 +338,11 @@ function Contenido({ modo, escena, reaccion, playing, modoColor, resetNonce }: E
   void playing;
   return (
     <>
-      <color attach="background" args={["#040b12"]} />
-      <fog attach="fog" args={["#040b12", 26, 70]} />
-      <ambientLight intensity={0.65} />
-      <directionalLight position={[6, 9, 6]} intensity={1.3} castShadow shadow-mapSize={[1024, 1024]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* Sin altura: esta escena no tenía sombra de la que leerla, así
+          que el escenario la MIDE de la propia escena al montarse, en
+          vez de que alguien la adivine. */}
+      <Escenario acento="#38bdf8" mesa={false} niebla={false} />
       <directionalLight position={[-6, 4, -4]} intensity={0.5} color={modoColor} />
       <Stars radius={80} depth={40} count={900} factor={3} fade speed={0.4} />
 
@@ -370,10 +372,6 @@ function Contenido({ modo, escena, reaccion, playing, modoColor, resetNonce }: E
         )}
       </group>
 
-      <Environment resolution={128}>
-        <Lightformer form="rect" intensity={1.0} position={[0, 6, 4]} scale={10} color="#bcd4ff" />
-        <Lightformer form="rect" intensity={0.7} position={[6, 0, -4]} scale={7} color={modoColor} />
-      </Environment>
       <OrbitControls enablePan={false} minDistance={8} maxDistance={48} autoRotate={false} />
       <EffectComposer>
         <Bloom intensity={0.5} luminanceThreshold={0.3} mipmapBlur />

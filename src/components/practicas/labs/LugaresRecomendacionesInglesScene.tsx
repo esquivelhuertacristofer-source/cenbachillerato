@@ -21,9 +21,10 @@
 import * as THREE from "three";
 import { useMemo, useRef, useState, type ReactNode } from "react";
 import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
-import { OrbitControls, Environment, Lightformer, Html } from "@react-three/drei";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { LUGARES, VISITANTES_GUIA, TURISTAS, lugar, mulberry32, type LugarId, type Lugar, type Pt, type Reaccion, type TipoOracion } from "./lugares-recomendaciones-ingles-data";
+import { Escenario } from "./_escenario";
 
 export type VistaLugares = "describir" | "guia" | "recomendar";
 
@@ -1622,16 +1623,13 @@ export default function LugaresRecomendacionesInglesScene(p: LugaresSceneProps) 
 
   return (
     <Canvas key={`${vista}-${resetNonce}`} shadows dpr={[1, 1.75]} camera={{ position: cam.pos, fov: 42 }} gl={{ antialias: true }}>
-      <color attach="background" args={[cam.fondo]} />
-      <fog attach="fog" args={[cam.fondo, 34, 70]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* Sin altura: esta escena no tenía sombra de la que leerla, así
+          que el escenario la MIDE de la propia escena al montarse, en
+          vez de que alguien la adivine. */}
+      <Escenario acento="#38bdf8" />
       <hemisphereLight args={["#e0f2fe", "#3f3a2a", 0.55]} />
-      <ambientLight intensity={0.35} />
-      <directionalLight position={[7, 16, 10]} intensity={1.45} castShadow shadow-mapSize={[2048, 2048]} shadow-camera-left={-17} shadow-camera-right={17} shadow-camera-top={14} shadow-camera-bottom={-14} shadow-bias={-0.0004} />
       <pointLight position={[-8, 5, 7]} intensity={0.5} color={modoColor} />
-      <Environment resolution={128}>
-        <Lightformer form="rect" intensity={1.3} position={[0, 6, -8]} scale={[14, 6, 1]} color="#bae6fd" />
-        <Lightformer form="rect" intensity={0.6} position={[-8, 2, 5]} scale={[6, 6, 1]} color={modoColor} />
-      </Environment>
 
       {vista === "describir" && (
         <EscenaDescribir

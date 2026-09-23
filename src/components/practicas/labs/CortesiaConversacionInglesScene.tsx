@@ -26,9 +26,10 @@
 import * as THREE from "three";
 import { useMemo, useRef, type ReactNode } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Environment, Lightformer, Html } from "@react-three/drei";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { type Modo, type Escenario, type PersonajeId, type Emocion, type Etapa, type Aspecto, PERSONAJES, EMOCION_DEF, ETAPA_DEF, BANDA_DEF } from "./cortesia-conversacion-ingles-data";
+import { Escenario as EscenarioLab } from "./_escenario";
 
 type Pt = [number, number, number];
 
@@ -925,7 +926,6 @@ function Videollamada() {
         <mesh geometry={G.cono} position={[-0.95, 1.55, -2.7]} scale={[0.2, 0.2, 0.2]}>
           <meshStandardMaterial color="#fef3c7" emissive="#fde68a" emissiveIntensity={0.9} />
         </mesh>
-        <pointLight position={[0.2, 2.2, -1.2]} intensity={2.2} distance={4.5} color="#fff1d6" />
       </group>
     </group>
   );
@@ -1209,26 +1209,13 @@ export default function CortesiaConversacionInglesScene(p: CortesiaSceneProps) {
 
   return (
     <Canvas key={`${vista}-${escenario}-${npc}-${resetNonce}`} shadows dpr={[1, 1.75]} camera={{ position: d.cam, fov: 42 }} gl={{ antialias: true }}>
-      <color attach="background" args={["#0b1220"]} />
-      <fog attach="fog" args={["#0b1220", 12, 26]} />
-      <ambientLight intensity={0.55} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* Sin altura: esta escena no tenía sombra de la que leerla, así
+          que el escenario la MIDE de la propia escena al montarse, en
+          vez de que alguien la adivine. */}
+      <EscenarioLab acento="#38bdf8" />
       <hemisphereLight args={["#fff7ed", "#334155", 0.35]} />
-      <directionalLight
-        position={[3.5, 6.5, 5]}
-        intensity={1.35}
-        castShadow
-        shadow-mapSize={[2048, 2048]}
-        shadow-camera-left={-6}
-        shadow-camera-right={6}
-        shadow-camera-top={6}
-        shadow-camera-bottom={-6}
-        shadow-bias={-0.0005}
-      />
       <pointLight position={[-3, 2.6, 2.5]} intensity={0.18} color={modoColor} />
-      <Environment resolution={128}>
-        <Lightformer form="rect" intensity={1.2} position={[0, 5, -4]} scale={[10, 4, 1]} color="#fde68a" />
-        <Lightformer form="rect" intensity={0.6} position={[-6, 2, 5]} scale={[6, 5, 1]} color={modoColor} />
-      </Environment>
 
       {escenario === "cafeteria" && <Cafeteria mostrador={npc === "lupita"} />}
       {escenario === "fiesta" && <Fiesta />}

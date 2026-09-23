@@ -26,8 +26,10 @@
 import * as THREE from "three";
 import { useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Html, Line } from "@react-three/drei";
+import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Escenario } from "./_escenario";
+import { CurvaTubo } from "./_tablero";
 import {
   type Modo, calcCirc, calcParab, curvaCirc, curvaParab, puntoParab, distanciasParab,
   PARAB_HALF, fmtNum2, fmtPar,
@@ -153,14 +155,14 @@ function EscenaCirc({ h, k, r, qx, qy, fase, accent }: {
   return (
     <group>
       {/* la curva */}
-      <Line points={curva} color={accent} lineWidth={4} />
+      <CurvaTubo puntos={curva} color={accent} grosor={0.072} />
       {/* centro */}
       <Marcador p={C} color={CENTRO_COL} radio={0.13} />
       <Etiqueta pos={[C[0], C[1] - 0.42, 0.05]} color={CENTRO_COL} size={12} bg="rgba(6,16,31,0.9)">
         <strong>C</strong>&nbsp;{fmtPar(h, k)}
       </Etiqueta>
       {/* radio: centro → P (siempre = r) */}
-      <Line points={[C, P]} color={RADIO_COL} lineWidth={3.4} />
+      <CurvaTubo puntos={[C, P]} color={RADIO_COL} grosor={0.061} />
       <Etiqueta pos={[(C[0] + P[0]) / 2, (C[1] + P[1]) / 2 + 0.32, 0.05]} color={RADIO_COL} size={11.5}>
         r = {fmtNum2(r)}
       </Etiqueta>
@@ -219,7 +221,7 @@ function EscenaParab({ p, fase, mostrarFocal, accent }: {
       ))}
 
       {/* la curva */}
-      <Line points={curva} color={accent} lineWidth={4} />
+      <CurvaTubo puntos={curva} color={accent} grosor={0.072} />
 
       {/* vértice */}
       <Marcador p={V} color={VERT_COL} radio={0.12} />
@@ -234,11 +236,11 @@ function EscenaParab({ p, fase, mostrarFocal, accent }: {
       </Etiqueta>
 
       {/* las dos distancias iguales: P→foco y P→directriz */}
-      <Line points={[P, F]} color={DFOCO_COL} lineWidth={3.2} />
+      <CurvaTubo puntos={[P, F]} color={DFOCO_COL} grosor={0.058} />
       <Etiqueta pos={[(P[0] + F[0]) / 2 + 0.3, (P[1] + F[1]) / 2, 0.06]} color={DFOCO_COL} size={11}>
         d₁ = {fmtNum2(d.aFoco)}
       </Etiqueta>
-      <Line points={[P, foot]} color={DDIR_COL} lineWidth={3.2} />
+      <CurvaTubo puntos={[P, foot]} color={DDIR_COL} grosor={0.058} />
       <Etiqueta pos={[(P[0] + foot[0]) / 2 - 0.45, (P[1] + foot[1]) / 2, 0.06]} color={DDIR_COL} size={11}>
         d₂ = {fmtNum2(d.aDirectriz)}
       </Etiqueta>
@@ -251,12 +253,11 @@ function EscenaParab({ p, fase, mostrarFocal, accent }: {
 function Contenido({ modo, h, k, r, qx, qy, p, fase, mostrarFocal, accent, autoRotate, pausado, resetNonce }: ConicasSceneProps) {
   return (
     <>
-      <color attach="background" args={["#08131f"]} />
-      <fog attach="fog" args={["#08131f", 22, 60]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={accent} suelo={-G * U - 0.4} />
 
-      <ambientLight intensity={0.7} />
-      <directionalLight position={[5, 9, 11]} intensity={1.3} castShadow shadow-mapSize={[1024, 1024]} shadow-camera-far={40} />
-      <pointLight position={[-6, 4, 6]} intensity={0.4} color={accent} />
 
       <group key={`${modo}-${resetNonce}`}>
         <Rejilla />
@@ -266,15 +267,7 @@ function Contenido({ modo, h, k, r, qx, qy, p, fase, mostrarFocal, accent, autoR
           : <EscenaParab p={p} fase={fase} mostrarFocal={mostrarFocal} accent={accent} />}
       </group>
 
-      <ContactShadows position={[0, -G * U - 0.4, 0]} opacity={0.3} scale={22} blur={2.6} far={9} />
 
-      <Environment resolution={128}>
-        <group>
-          <Lightformer intensity={1.3} position={[0, 6, 8]} scale={10} color="#eaf1ff" />
-          <Lightformer intensity={0.7} position={[6, 2, 5]} scale={6} color="#cfe0ff" />
-          <Lightformer intensity={0.5} position={[-6, 3, 4]} scale={6} color="#bfe6c4" />
-        </group>
-      </Environment>
 
       <OrbitControls
         makeDefault

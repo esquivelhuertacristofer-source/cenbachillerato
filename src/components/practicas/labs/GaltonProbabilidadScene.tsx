@@ -29,8 +29,10 @@
 import * as THREE from "three";
 import { useMemo, useRef, type ReactNode } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Environment, Lightformer, Html, Line } from "@react-three/drei";
+import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Escenario } from "./_escenario";
+import { CurvaTubo } from "./_tablero";
 import {
   type Modo,
   type ExperimentoDef,
@@ -496,7 +498,7 @@ function EscenaConvergencia({ traza, probTeorica, accent, modoColor }: { traza: 
       </Etiqueta>
 
       {/* Traza de la frecuencia relativa */}
-      {puntos.length >= 2 && <Line points={puntos} color={accent} lineWidth={3} />}
+      {puntos.length >= 2 && <CurvaTubo puntos={puntos} color={accent} grosor={0.054} />}
 
       {/* Punto actual */}
       {ultimo && (
@@ -547,17 +549,14 @@ export default function GaltonProbabilidadScene(props: GaltonSceneProps) {
 
   return (
     <Canvas key={`${modo}-${resetNonce}`} shadows dpr={[1, 1.75]} camera={{ position: cam.position, fov: cam.fov }} gl={{ antialias: true }}>
-      <color attach="background" args={["#040a16"]} />
-      <fog attach="fog" args={["#040a16", 14, 34]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* Sin altura: esta escena no tenía sombra de la que leerla, así
+          que el escenario la MIDE de la propia escena al montarse, en
+          vez de que alguien la adivine. */}
+      <Escenario acento={accent} />
 
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[5, 8, 6]} intensity={1.15} castShadow shadow-mapSize={[1024, 1024]} />
       <pointLight position={[-6, -3, 4]} intensity={0.5} color={modoColor} />
 
-      <Environment resolution={128}>
-        <Lightformer form="rect" intensity={1.6} position={[0, 5, -6]} scale={[10, 6, 1]} color="#93c5fd" />
-        <Lightformer form="rect" intensity={0.9} position={[-6, 0, 4]} scale={[6, 6, 1]} color={modoColor} />
-      </Environment>
 
       {modo === "laplace" && <EscenaLaplace exp={exp} evento={evento} accent={accent} playing={playing} />}
       {modo === "galton" && (

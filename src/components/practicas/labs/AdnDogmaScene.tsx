@@ -18,8 +18,10 @@
 import * as THREE from "three";
 import { useRef, useState, type ReactNode } from "react";
 import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
-import { OrbitControls, Environment, Lightformer, Html, Line, Stars } from "@react-three/drei";
+import { OrbitControls, Html, Line, Stars } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Escenario } from "./_escenario";
+import { CurvaTubo } from "./_tablero";
 import {
   type Modo,
   type Base,
@@ -129,7 +131,7 @@ function Puentes({ a, b, n, activo }: { a: Pt; b: Pt; n: number; activo?: boolea
 /* ── Línea de esqueleto fosfato-desoxirribosa ─────────────────────────── */
 function Backbone({ pts, color }: { pts: Pt[]; color: string }) {
   if (pts.length < 2) return null;
-  return <Line points={pts} color={color} lineWidth={3} transparent opacity={0.55} />;
+  return <CurvaTubo puntos={pts} color={color} grosor={0.054} />;
 }
 
 /* ── MODO replicación: la doble hélice se abre y se duplica ───────────── */
@@ -495,10 +497,11 @@ function Contenido(props: AdnDogmaSceneProps) {
 
   return (
     <>
-      <color attach="background" args={["#040912"]} />
-      <fog attach="fog" args={["#040912", 18, 40]} />
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[6, 9, 6]} intensity={1.5} castShadow shadow-mapSize={[1024, 1024]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* Sin altura: esta escena no tenía sombra de la que leerla, así
+          que el escenario la MIDE de la propia escena al montarse, en
+          vez de que alguien la adivine. */}
+      <Escenario acento={accent} mesa={false} niebla={false} />
       <directionalLight position={[-6, 4, -4]} intensity={0.5} color={modoColor} />
       <Stars radius={70} depth={30} count={1100} factor={3} fade speed={0.5} />
       <NucleotidosLibres />
@@ -520,10 +523,6 @@ function Contenido(props: AdnDogmaSceneProps) {
         />
       )}
 
-      <Environment resolution={128}>
-        <Lightformer form="rect" intensity={1.1} position={[0, 6, 4]} scale={8} color="#bcd4ff" />
-        <Lightformer form="rect" intensity={0.7} position={[5, 0, -4]} scale={6} color={modoColor} />
-      </Environment>
       <OrbitControls enablePan={false} enabled={!dragging} minDistance={7} maxDistance={28} autoRotate={false} />
       <EffectComposer>
         <Bloom intensity={0.55} luminanceThreshold={0.2} mipmapBlur />

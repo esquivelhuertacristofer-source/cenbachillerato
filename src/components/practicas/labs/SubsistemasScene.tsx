@@ -21,9 +21,10 @@
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Html } from "@react-three/drei";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { calcularEstado, CO2_MAX, CO2_REF } from "./subsistemas-data";
+import { Escenario } from "./_escenario";
 
 export interface SubsistemasSceneProps {
   co2: number;
@@ -199,7 +200,6 @@ function Planeta(props: SubsistemasSceneProps) {
 
   return (
     <group>
-      <ContactShadows position={[0, -3.1, 0]} opacity={0.3} scale={16} blur={2.6} far={8} />
 
       {/* grupo que rota lentamente: litosfera + océano + biosfera + casquetes + volcán */}
       <group ref={planeta}>
@@ -288,32 +288,16 @@ function Contenido(props: SubsistemasSceneProps) {
   const { accent, autoRotate, resetNonce } = props;
   return (
     <>
-      <color attach="background" args={["#03101f"]} />
-      <fog attach="fog" args={["#03101f", 22, 56]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={accent} suelo={-3.1} />
 
-      <ambientLight intensity={0.55} />
-      <directionalLight
-        position={[-5.0, 4.0, 2.4]}
-        intensity={1.5}
-        color="#fff2cc"
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-near={1}
-        shadow-camera-far={40}
-        shadow-bias={-0.0004}
-      />
-      <pointLight position={[6, 2, 6]} intensity={0.4} color={accent} />
 
       <group key={`${resetNonce}`}>
         <Planeta {...props} />
       </group>
 
-      <Environment resolution={256}>
-        <Lightformer intensity={1.2} position={[0, 8, 4]} scale={[14, 4, 1]} color="#ffffff" />
-        <Lightformer intensity={0.8} position={[-8, 2, -2]} scale={[5, 6, 1]} color={accent} />
-        <Lightformer intensity={0.8} position={[8, 1, 5]} scale={[5, 5, 1]} color="#bfe8ff" />
-      </Environment>
 
       <OrbitControls
         enablePan={false}

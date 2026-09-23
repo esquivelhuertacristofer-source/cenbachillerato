@@ -19,9 +19,11 @@
 import * as THREE from "three";
 import { useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Html, Line } from "@react-three/drei";
+import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { RESERVORIOS, FLUJOS, EMIS_MAX, EMIS_MIN } from "./carbono-data";
+import { Escenario } from "./_escenario";
+import { CurvaTubo } from "./_tablero";
 
 export interface CicloCarbonoSceneProps {
   emisiones: number;
@@ -170,7 +172,7 @@ function PalancaEmisiones({ emisiones, arrastrable, onEmisionesChange, onGrab, o
   return (
     <group position={[LEVER_X, 0, LEVER_Z]}>
       {/* riel */}
-      <Line points={[[0, Y_BOT, 0], [0, Y_TOP, 0]]} color="#5b7286" lineWidth={3} />
+      <CurvaTubo puntos={[[0, Y_BOT, 0], [0, Y_TOP, 0]]} color="#5b7286" grosor={0.054} />
       <mesh position={[0, Y_TOP, 0]}>
         <sphereGeometry args={[0.07, 12, 12]} />
         <meshBasicMaterial color="#ff5a36" />
@@ -293,7 +295,6 @@ function Mundo({ emisiones, pausado, arrastrable, onEmisionesChange, onGrab, onD
   return (
     <group>
       {/* suelo de apoyo (sombra) */}
-      <ContactShadows position={[0, -4.2, 0]} opacity={0.32} scale={20} blur={2.6} far={9} />
 
       <Tierra tint={tint} />
 
@@ -355,22 +356,11 @@ function Contenido(props: CicloCarbonoSceneProps) {
   const [dragging, setDragging] = useState(false);
   return (
     <>
-      <color attach="background" args={["#03101f"]} />
-      <fog attach="fog" args={["#03101f", 24, 60]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={accent} suelo={-4.2} />
 
-      <ambientLight intensity={0.55} />
-      <directionalLight
-        position={[-5.2, 4.4, 2.2]}
-        intensity={1.5}
-        color="#fff2cc"
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-near={1}
-        shadow-camera-far={40}
-        shadow-bias={-0.0004}
-      />
-      <pointLight position={[6, 2, 6]} intensity={0.4} color={accent} />
 
       <group key={`${resetNonce}`}>
         <Mundo
@@ -383,11 +373,6 @@ function Contenido(props: CicloCarbonoSceneProps) {
         />
       </group>
 
-      <Environment resolution={256}>
-        <Lightformer intensity={1.2} position={[0, 8, 4]} scale={[14, 4, 1]} color="#ffffff" />
-        <Lightformer intensity={0.8} position={[-8, 2, -2]} scale={[5, 6, 1]} color={accent} />
-        <Lightformer intensity={0.8} position={[8, 1, 5]} scale={[5, 5, 1]} color="#bfe8ff" />
-      </Environment>
 
       <OrbitControls
         enablePan={false}

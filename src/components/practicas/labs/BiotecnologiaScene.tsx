@@ -23,9 +23,10 @@
 import * as THREE from "three";
 import { useRef, type ReactNode } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Environment, Lightformer, Html, Line, Stars } from "@react-three/drei";
+import { OrbitControls, Html, Line, Stars } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { type Base, BASE_COLOR } from "./adn-dogma-data";
+import { Escenario } from "./_escenario";
 import {
   type Modo,
   type Pt,
@@ -449,19 +450,16 @@ function Contenido(props: BiotecnologiaSceneProps) {
 
   return (
     <>
-      <color attach="background" args={["#040912"]} />
-      <fog attach="fog" args={["#040912", 18, 48]} />
-      <ambientLight intensity={0.66} />
-      <directionalLight position={[6, 9, 6]} intensity={1.4} castShadow shadow-mapSize={[1024, 1024]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* Sin altura: esta escena no tenía sombra de la que leerla, así
+          que el escenario la MIDE de la propia escena al montarse, en
+          vez de que alguien la adivine. */}
+      <Escenario acento={props.accent} mesa={false} niebla={false} />
       <directionalLight position={[-6, 4, -4]} intensity={0.5} color={modoColor} />
       <Stars radius={70} depth={30} count={900} factor={3} fade speed={0.4} />
 
       <group ref={giro} key={`${modo}-${resetNonce}`}>{mundo}</group>
 
-      <Environment resolution={128}>
-        <Lightformer form="rect" intensity={1.1} position={[0, 6, 4]} scale={8} color="#bcd4ff" />
-        <Lightformer form="rect" intensity={0.7} position={[5, 0, -4]} scale={6} color={modoColor} />
-      </Environment>
       <OrbitControls enablePan={false} minDistance={7} maxDistance={30} autoRotate={false} />
       <EffectComposer>
         <Bloom intensity={0.55} luminanceThreshold={0.22} mipmapBlur />

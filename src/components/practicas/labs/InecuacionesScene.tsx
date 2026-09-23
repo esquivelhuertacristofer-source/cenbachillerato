@@ -22,8 +22,9 @@
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Edges, Html, Line } from "@react-three/drei";
+import { OrbitControls, ContactShadows, Edges, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Escenario } from "./_escenario";
 import {
   type ModoKey,
   type Op,
@@ -174,7 +175,6 @@ function RectaNumerica({ a, b, c, op, accent: _accent, pausado }: {
         <div ref={htmlRef} style={{ marginTop: -46, fontSize: 12.5, fontWeight: 800, fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", textShadow: "0 2px 8px #000" }} />
       </Html>
 
-      <ContactShadows position={[0, -0.5, 0]} opacity={0.32} scale={14} blur={2.4} far={4} />
     </group>
   );
 }
@@ -345,21 +345,11 @@ function Contenido(props: InecuacionesSceneProps) {
 
   return (
     <>
-      <color attach="background" args={["#03101f"]} />
-      <fog attach="fog" args={["#03101f", 20, 42]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={accent} suelo={-0.5} />
 
-      <ambientLight intensity={0.55} />
-      <directionalLight
-        position={[4, 9, 6]}
-        intensity={1.5}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-near={1}
-        shadow-camera-far={30}
-        shadow-bias={-0.0004}
-      />
-      <pointLight position={[0, 5, 4]} intensity={5} color="#ffffff" />
 
       <group key={`${modo}-${resetNonce}`}>
         {modo === "recta" ? (
@@ -369,11 +359,6 @@ function Contenido(props: InecuacionesSceneProps) {
         )}
       </group>
 
-      <Environment resolution={256}>
-        <Lightformer intensity={1.6} position={[0, 6, 2]} scale={[12, 4, 1]} color="#ffffff" />
-        <Lightformer intensity={1.1} position={[-7, 3, -2]} scale={[5, 6, 1]} color={accent} />
-        <Lightformer intensity={1.0} position={[7, 2, 4]} scale={[4, 5, 1]} color="#bfe8ff" />
-      </Environment>
 
       <OrbitControls
         enablePan={false}

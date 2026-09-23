@@ -22,9 +22,10 @@
 import * as THREE from "three";
 import { useMemo, useRef, type ReactNode } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Environment, Lightformer, Html, Line } from "@react-three/drei";
+import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { type Modo, type UrnaDef, ETAPAS, PERSONAS, hojasDelArbol } from "./tecnicas-conteo-data";
+import { Escenario } from "./_escenario";
 
 export interface ConteoSceneProps {
   modo: Modo;
@@ -455,15 +456,12 @@ export default function TecnicasConteoScene(props: ConteoSceneProps) {
 
   return (
     <Canvas key={`${modo}-${resetNonce}`} shadows dpr={[1, 1.75]} camera={{ position: camara, fov: 42 }} gl={{ antialias: true }}>
-      <color attach="background" args={["#040a16"]} />
-      <fog attach="fog" args={["#040a16", 15, 34]} />
-      <ambientLight intensity={0.55} />
-      <directionalLight position={[4, 8, 6]} intensity={1.15} castShadow shadow-mapSize={[1024, 1024]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* Sin altura: esta escena no tenía sombra de la que leerla, así
+          que el escenario la MIDE de la propia escena al montarse, en
+          vez de que alguien la adivine. */}
+      <Escenario acento={accent} />
       <pointLight position={[-6, -2, 5]} intensity={0.45} color={modoColor} />
-      <Environment resolution={128}>
-        <Lightformer form="rect" intensity={1.5} position={[0, 5, -6]} scale={[10, 6, 1]} color="#93c5fd" />
-        <Lightformer form="rect" intensity={0.8} position={[-6, 0, 4]} scale={[6, 6, 1]} color={modoColor} />
-      </Environment>
 
       {modo === "multiplicativo" && <EscenaArbol opciones={opciones} accent={accent} />}
       {modo === "orden" && <EscenaOrden r={r} importaOrden={importaOrden} arreglo={arreglo} modoColor={modoColor} />}

@@ -26,8 +26,10 @@
 import * as THREE from "three";
 import { useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Environment, Lightformer, Html, Line, Stars } from "@react-three/drei";
+import { OrbitControls, Html, Line, Stars } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Escenario } from "./_escenario";
+import { CurvaTubo } from "./_tablero";
 import {
   type Modo, type TipoLente, type TipoEspejo,
   resolverGauss, resolverSnell, medioPorId,
@@ -175,11 +177,11 @@ function SimboloLente({ tipo, color }: { tipo: TipoLente; color: string }) {
   const a = 0.28;
   return (
     <group>
-      <Line points={[[0, bot, 0], [0, top, 0]] as Pt[]} color={color} lineWidth={3} transparent opacity={0.92} />
+      <CurvaTubo puntos={[[0, bot, 0], [0, top, 0]] as Pt[]} color={color} grosor={0.054} />
       {/* punta superior */}
-      <Line points={[[-a, top + (conv ? -a : a) * 0 - (conv ? a : -a), 0], [0, top, 0], [a, top - (conv ? a : -a), 0]] as Pt[]} color={color} lineWidth={3} transparent opacity={0.92} />
+      <CurvaTubo puntos={[[-a, top + (conv ? -a : a) * 0 - (conv ? a : -a), 0], [0, top, 0], [a, top - (conv ? a : -a), 0]] as Pt[]} color={color} grosor={0.054} />
       {/* punta inferior */}
-      <Line points={[[-a, bot + (conv ? a : -a), 0], [0, bot, 0], [a, bot + (conv ? a : -a), 0]] as Pt[]} color={color} lineWidth={3} transparent opacity={0.92} />
+      <CurvaTubo puntos={[[-a, bot + (conv ? a : -a), 0], [0, bot, 0], [a, bot + (conv ? a : -a), 0]] as Pt[]} color={color} grosor={0.054} />
       {/* cuerpo translúcido */}
       <mesh position={[0, 0, -0.02]}>
         <planeGeometry args={[0.5, (top - bot)]} />
@@ -202,7 +204,7 @@ function SimboloEspejo({ tipo, color }: { tipo: TipoEspejo; color: string }) {
   }
   return (
     <group>
-      <Line points={pts} color={color} lineWidth={3} transparent opacity={0.95} />
+      <CurvaTubo puntos={pts} color={color} grosor={0.054} />
       {/* rayado del reverso */}
       {Array.from({ length: 9 }, (_, i) => {
         const y = -h + (2 * h * (i + 0.5)) / 9;
@@ -345,11 +347,11 @@ function EscenaRefraccion({ medio1, medio2, thetaInc, playing }: { medio1: strin
       </Html>
 
       {/* rayo incidente */}
-      <Line points={[A, O] as Pt[]} color="#fde047" lineWidth={3} transparent opacity={0.95} />
+      <CurvaTubo puntos={[A, O] as Pt[]} color="#fde047" grosor={0.054} />
       {/* rayo reflejado (tenue, salvo reflexión total) */}
       <Line points={[O, reflE] as Pt[]} color="#fbbf24" lineWidth={s.reflexionTotal ? 3 : 1.6} transparent opacity={s.reflexionTotal ? 0.95 : 0.4} dashed={!s.reflexionTotal} dashSize={0.16} gapSize={0.12} />
       {/* rayo refractado */}
-      {refrE && <Line points={[O, refrE] as Pt[]} color={m2.color} lineWidth={3} transparent opacity={0.95} />}
+      {refrE && <CurvaTubo puntos={[O, refrE] as Pt[]} color={m2.color} grosor={0.054} />}
 
       {/* arcos de ángulo */}
       <Line points={arc(0, -t1, 1.3)} color="#fde047" lineWidth={1.5} transparent opacity={0.8} />
@@ -386,7 +388,7 @@ function EscenaRefraccion({ medio1, medio2, thetaInc, playing }: { medio1: strin
 }
 
 /* ── Wrappers de modo con su título ───────────────────────────────────────── */
-function ModoLente({ tipoLente, fLente, doLente, playing, accent }: Pick<OpticaSceneProps, "tipoLente" | "fLente" | "doLente" | "playing" | "accent">) {
+function ModoLente({ tipoLente, fLente, doLente, playing }: Pick<OpticaSceneProps, "tipoLente" | "fLente" | "doLente" | "playing" | "accent">) {
   const f = tipoLente === "convergente" ? Math.abs(fLente) : -Math.abs(fLente);
   const r = resolverGauss(f, doLente, H_OBJ);
   const col = tipoLente === "convergente" ? "#a78bfa" : "#f472b6";
@@ -398,12 +400,11 @@ function ModoLente({ tipoLente, fLente, doLente, playing, accent }: Pick<OpticaS
         color={col}
       />
       <EscenaImagen esLente f={f} do_={doLente} color={col} playing={playing} />
-      <pointLight position={[0, 0, 6]} intensity={0.4} color={accent} />
     </group>
   );
 }
 
-function ModoEspejo({ tipoEspejo, fEspejo, doEspejo, playing, accent }: Pick<OpticaSceneProps, "tipoEspejo" | "fEspejo" | "doEspejo" | "playing" | "accent">) {
+function ModoEspejo({ tipoEspejo, fEspejo, doEspejo, playing }: Pick<OpticaSceneProps, "tipoEspejo" | "fEspejo" | "doEspejo" | "playing" | "accent">) {
   const f = tipoEspejo === "plano" ? Infinity : tipoEspejo === "concavo" ? Math.abs(fEspejo) : -Math.abs(fEspejo);
   const r = resolverGauss(f, doEspejo, H_OBJ);
   const col = "#5eead4";
@@ -416,7 +417,6 @@ function ModoEspejo({ tipoEspejo, fEspejo, doEspejo, playing, accent }: Pick<Opt
       />
       <SimboloEspejo tipo={tipoEspejo} color={col} />
       <EscenaImagen esLente={false} f={f} do_={doEspejo} color="#a78bfa" playing={playing} />
-      <pointLight position={[0, 0, 6]} intensity={0.4} color={accent} />
     </group>
   );
 }
@@ -426,12 +426,12 @@ function Contenido(props: OpticaSceneProps) {
   const { modo, accent, resetNonce, playing } = props;
   return (
     <>
-      <color attach="background" args={["#040a16"]} />
-      <fog attach="fog" args={["#040a16", 26, 75]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* Sin altura: esta escena no tenía sombra de la que leerla, así
+          que el escenario la MIDE de la propia escena al montarse, en
+          vez de que alguien la adivine. */}
+      <Escenario acento={accent} mesa={false} niebla={false} />
 
-      <ambientLight intensity={0.75} />
-      <directionalLight position={[5, 8, 8]} intensity={1.1} />
-      <pointLight position={[-8, 4, 7]} intensity={0.45} color={accent} />
       <Stars radius={70} depth={30} count={900} factor={3} saturation={0} fade speed={0.5} />
 
       <group key={`${modo}-${resetNonce}`}>
@@ -440,13 +440,6 @@ function Contenido(props: OpticaSceneProps) {
         {modo === "refraccion" && <EscenaRefraccion medio1={props.medio1} medio2={props.medio2} thetaInc={props.thetaInc} playing={playing} />}
       </group>
 
-      <Environment resolution={128}>
-        <group>
-          <Lightformer intensity={1.1} position={[0, 7, 8]} scale={14} color="#eaf1ff" />
-          <Lightformer intensity={0.6} position={[8, 3, 5]} scale={7} color="#cfe0ff" />
-          <Lightformer intensity={0.6} position={[-8, 3, 4]} scale={7} color="#dcd5ff" />
-        </group>
-      </Environment>
 
       <OrbitControls
         makeDefault

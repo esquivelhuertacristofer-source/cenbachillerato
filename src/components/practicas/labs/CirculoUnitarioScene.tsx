@@ -23,9 +23,11 @@
 import * as THREE from "three";
 import { useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Html, Line } from "@react-three/drei";
+import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { calcTrig, fmtNum2 } from "./circulo-unitario-data";
+import { Escenario } from "./_escenario";
+import { CurvaTubo } from "./_tablero";
 
 export interface CirculoUnitarioSceneProps {
   thetaDeg: number;
@@ -226,16 +228,16 @@ function Escena({
 
       {/* ── Triángulo rectángulo dentro del círculo ── */}
       {/* cateto coseno (horizontal) */}
-      <Line points={[[0, 0, 0], g.foot]} color={COS_COL} lineWidth={4} />
+      <CurvaTubo puntos={[[0, 0, 0], g.foot]} color={COS_COL} grosor={0.072} />
       {/* cateto seno (vertical = altura) */}
-      <Line points={[g.foot, g.P]} color={SIN_COL} lineWidth={4} />
+      <CurvaTubo puntos={[g.foot, g.P]} color={SIN_COL} grosor={0.072} />
       {/* radio = hipotenusa */}
       <Line points={[[0, 0, 0], g.P]} color="#eaf1ff" lineWidth={2.6} />
       {/* arco del ángulo θ */}
       <Line points={g.arcPts} color="#fbbf24" lineWidth={2.4} />
 
       {/* ── Onda SENO (muro vertical x = 0) ── */}
-      <Line points={g.sinePts} color={SIN_COL} lineWidth={3.4} />
+      <CurvaTubo puntos={g.sinePts} color={SIN_COL} grosor={0.061} />
       <Line points={[g.P, g.sineTip]} color={SIN_COL} lineWidth={1.2} dashed dashSize={0.16} gapSize={0.12} />
       <mesh position={g.sineTip}>
         <sphereGeometry args={[0.12, 16, 16]} />
@@ -245,7 +247,7 @@ function Escena({
       {/* ── Onda COSENO (piso y = 0) ── */}
       {mostrarCos && (
         <>
-          <Line points={g.cosPts} color={COS_COL} lineWidth={3.4} />
+          <CurvaTubo puntos={g.cosPts} color={COS_COL} grosor={0.061} />
           <Line points={[g.foot, g.cosTip]} color={COS_COL} lineWidth={1.2} dashed dashSize={0.16} gapSize={0.12} />
           <mesh position={g.cosTip}>
             <sphereGeometry args={[0.12, 16, 16]} />
@@ -263,7 +265,7 @@ function Escena({
       {g.tanVis && (
         <>
           <Line points={[[0, 0, 0], g.tanVis.T]} color={TAN_COL} lineWidth={1.4} dashed dashSize={0.16} gapSize={0.12} />
-          <Line points={[[g.tanVis.side, 0, 0], g.tanVis.T]} color={TAN_COL} lineWidth={3.4} />
+          <CurvaTubo puntos={[[g.tanVis.side, 0, 0], g.tanVis.T]} color={TAN_COL} grosor={0.061} />
           <Etiqueta pos={[g.tanVis.side + (g.tanVis.side > 0 ? 0.55 : -0.55), g.tanVis.T[1] * 0.5, 0]} color={TAN_COL} size={11}>
             tan θ
           </Etiqueta>
@@ -334,12 +336,11 @@ function Contenido({ thetaDeg, accent, mostrarCos, mostrarHelice, mostrarTan, au
   const [dragging, setDragging] = useState(false);
   return (
     <>
-      <color attach="background" args={["#06101f"]} />
-      <fog attach="fog" args={["#06101f", 16, 36]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={accent} suelo={-2.9} />
 
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[5, 9, 6]} intensity={1.4} castShadow shadow-mapSize={[1024, 1024]} shadow-camera-far={30} />
-      <pointLight position={[-6, 4, -4]} intensity={0.5} color={accent} />
 
       <group key={`${resetNonce}`}>
         <Escena
@@ -350,15 +351,7 @@ function Contenido({ thetaDeg, accent, mostrarCos, mostrarHelice, mostrarTan, au
         />
       </group>
 
-      <ContactShadows position={[0, -2.9, 0]} opacity={0.32} scale={20} blur={2.6} far={6} />
 
-      <Environment resolution={128}>
-        <group>
-          <Lightformer intensity={1.5} position={[0, 6, 2]} scale={9} color="#eaf1ff" />
-          <Lightformer intensity={0.8} position={[5, 2, 1]} scale={5} color="#cfe0ff" />
-          <Lightformer intensity={0.6} position={[-5, 1, -2]} scale={5} color="#bfa9ff" />
-        </group>
-      </Environment>
 
       <OrbitControls
         makeDefault

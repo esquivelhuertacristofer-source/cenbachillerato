@@ -23,8 +23,10 @@
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Html, Line } from "@react-three/drei";
+import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Escenario } from "./_escenario";
+import { CurvaTubo } from "./_tablero";
 import {
   func, evalFunc, deriv, muestrear, tangente, clipRecta,
   fmt2, type FuncId, type Vista, type Curva,
@@ -179,7 +181,7 @@ function SondaActiva({ funcId, v, aPos }: { funcId: FuncId; v: Vista; aPos: numb
 
       {/* recta TANGENTE a f en P (su pendiente es f'(a)) */}
       {tanSeg.length === 2 && (
-        <Line points={[tanSeg[0]!, tanSeg[1]!]} color={TAN_COL} lineWidth={3.2} />
+        <CurvaTubo puntos={[tanSeg[0]!, tanSeg[1]!]} color={TAN_COL} grosor={0.058} />
       )}
 
       {/* enlace vertical P ↔ D: la altura de D = pendiente de la tangente en P */}
@@ -228,12 +230,11 @@ function Contenido({ funcId, aPos, accent, resetNonce }: TrascendentesSceneProps
 
   return (
     <>
-      <color attach="background" args={["#08131f"]} />
-      <fog attach="fog" args={["#08131f", 22, 60]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={accent} suelo={-BY - 0.5} />
 
-      <ambientLight intensity={0.7} />
-      <directionalLight position={[5, 9, 11]} intensity={1.3} castShadow shadow-mapSize={[1024, 1024]} shadow-camera-far={40} />
-      <pointLight position={[-6, 4, 6]} intensity={0.5} color={accent} />
 
       <group key={`${funcId}-${resetNonce}`}>
         <Plano v={v} />
@@ -242,15 +243,7 @@ function Contenido({ funcId, aPos, accent, resetNonce }: TrascendentesSceneProps
         <SondaActiva funcId={funcId} v={v} aPos={aPos} />
       </group>
 
-      <ContactShadows position={[0, -BY - 0.5, 0]} opacity={0.3} scale={24} blur={2.6} far={9} />
 
-      <Environment resolution={128}>
-        <group>
-          <Lightformer intensity={1.3} position={[0, 6, 8]} scale={10} color="#eaf1ff" />
-          <Lightformer intensity={0.7} position={[6, 2, 5]} scale={6} color="#cfe0ff" />
-          <Lightformer intensity={0.5} position={[-6, 3, 4]} scale={6} color="#ffd9b3" />
-        </group>
-      </Environment>
 
       <OrbitControls
         makeDefault

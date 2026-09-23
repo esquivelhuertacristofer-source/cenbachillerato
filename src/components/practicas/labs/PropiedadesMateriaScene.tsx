@@ -38,6 +38,7 @@ import {
 } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette, SMAA } from "@react-three/postprocessing";
 import type { Modo, Emision } from "./propiedades-data";
+import { VIDRIO, perfilVaso } from "./_vidrio";
 
 export interface PropiedadesSceneProps {
   transKey: string;
@@ -259,41 +260,24 @@ function Vaho({ progreso }: { progreso: number }) {
 }
 
 /* ── Vaso de precipitado de vidrio (borosilicato con transmisión) ──────── */
+/**
+ * Una sola pieza torneada. Eran cuatro mallas —pared, fondo, labio y un pico
+ * hecho con una CAJA girada— y eso último se notaba: el vierteaguas parecía
+ * una pestaña pegada, porque lo era.
+ *
+ * `perfilVaso` trae el pico en la propia silueta, así que al girarla sale con
+ * el vaso y con su curva. `depthWrite: false` de la pared también se va: era
+ * lo que dejaba que la muestra de dentro se dibujara por delante del cristal
+ * según desde dónde se mirara.
+ */
+const PERFIL_VASO = perfilVaso(BK_R, BK_H);
+
 function Vaso() {
   return (
-    <group>
-      {/* pared cilíndrica */}
-      <mesh position={[0, BK_BOT + BK_H / 2, 0]}>
-        <cylinderGeometry args={[BK_R, BK_R * 0.96, BK_H, 56, 1, true]} />
-        <meshPhysicalMaterial
-          color={GLASS}
-          roughness={0.05}
-          metalness={0}
-          transmission={1}
-          thickness={0.5}
-          ior={1.47}
-          transparent
-          opacity={1}
-          side={THREE.DoubleSide}
-          depthWrite={false}
-          clearcoat={1}
-          clearcoatRoughness={0.05}
-        />
-      </mesh>
-      {/* fondo */}
-      <mesh position={[0, BK_BOT + 0.04, 0]} receiveShadow>
-        <cylinderGeometry args={[BK_R * 0.96, BK_R * 0.96, 0.08, 56]} />
-        <meshPhysicalMaterial color={GLASS} roughness={0.06} metalness={0} transmission={0.95} thickness={0.6} ior={1.47} transparent opacity={1} side={THREE.DoubleSide} />
-      </mesh>
-      {/* labio superior */}
-      <mesh position={[0, BK_BOT + BK_H, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[BK_R, 0.035, 14, 56]} />
-        <meshPhysicalMaterial color="#eaf6ff" roughness={0.08} metalness={0} transmission={0.9} thickness={0.3} ior={1.47} transparent opacity={0.9} />
-      </mesh>
-      {/* vierteaguas (pico) */}
-      <mesh position={[BK_R - 0.02, BK_BOT + BK_H - 0.02, 0]} rotation={[0, 0, -0.5]}>
-        <boxGeometry args={[0.16, 0.06, 0.18]} />
-        <meshPhysicalMaterial color="#eaf6ff" roughness={0.08} metalness={0} transmission={0.9} thickness={0.3} ior={1.47} transparent opacity={0.85} />
+    <group position={[0, BK_BOT, 0]}>
+      <mesh castShadow receiveShadow>
+        <latheGeometry args={[PERFIL_VASO, 56]} />
+        <meshPhysicalMaterial {...VIDRIO} color={GLASS} ior={1.47} />
       </mesh>
     </group>
   );

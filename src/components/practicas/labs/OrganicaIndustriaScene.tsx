@@ -21,8 +21,9 @@
 import * as THREE from "three";
 import { useMemo, useRef, type ReactNode } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Environment, Lightformer, Html, ContactShadows } from "@react-three/drei";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Escenario } from "./_escenario";
 import {
   type Modo,
   type ReaccionId,
@@ -1267,21 +1268,15 @@ export default function OrganicaIndustriaScene(p: OrganicaIndustriaSceneProps) {
 
   return (
     <Canvas key={`${vista}-${resetNonce}`} shadows dpr={[1, 1.75]} camera={{ position: cam.pos, fov: 42 }} gl={{ antialias: true }}>
-      <color attach="background" args={["#040a16"]} />
-      <fog attach="fog" args={["#040a16", 20, 42]} />
-      <ambientLight intensity={0.55} />
-      <directionalLight position={[4, 9, 7]} intensity={1.35} castShadow shadow-mapSize={[1024, 1024]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento="#38bdf8" suelo={-3.28} />
       <pointLight position={[-6, 3, 5]} intensity={18} color={modoColor} />
-      <pointLight position={[6, 2, 6]} intensity={10} color="#ffffff" />
-      <Environment resolution={128}>
-        <Lightformer form="rect" intensity={1.6} position={[0, 5, 6]} scale={[10, 5, 1]} color="#ffffff" />
-        <Lightformer form="rect" intensity={0.9} position={[-6, 1, -2]} scale={[6, 6, 1]} color={modoColor} />
-      </Environment>
 
       {vista === "sintesis" && <EscenaSintesis key={p.reaccion} reaccion={p.reaccion} corrida={p.corrida} fase={p.fase} modoColor={modoColor} />}
       {vista === "polimeros" && <EscenaPolimeros key={p.polimero} polimero={p.polimero} unidades={p.unidades} nivel={p.nivel} extraEtq={p.extraEtq} modoColor={modoColor} />}
       {vista === "productos" && <EscenaProductos productoId={p.productoId} resaltar={p.resaltar} resaltarOk={p.resaltarOk} clasificados={p.clasificados} modoColor={modoColor} />}
-      <ContactShadows position={[0, -3.28, 0]} opacity={0.35} scale={22} blur={2.4} far={8} color="#000000" />
 
       <OrbitControls makeDefault enablePan={false} enableZoom minDistance={5} maxDistance={24} maxPolarAngle={Math.PI * 0.52} minPolarAngle={Math.PI * 0.12} target={cam.target} />
       <EffectComposer>

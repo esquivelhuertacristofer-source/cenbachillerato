@@ -23,8 +23,9 @@
 import * as THREE from "three";
 import { useMemo, useRef, type ReactNode } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Environment, Lightformer, Html } from "@react-three/drei";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Escenario } from "./_escenario";
 import {
   type Modo,
   type Exposicion,
@@ -865,15 +866,12 @@ export default function AlcancePublicacionScene(p: AlcanceSceneProps) {
 
   return (
     <Canvas key={`${vista}-${resetNonce}`} shadows dpr={[1, 1.75]} camera={{ position: cam.pos, fov: 44 }} gl={{ antialias: true }}>
-      <color attach="background" args={["#040a16"]} />
-      <fog attach="fog" args={["#040a16", 20, 42]} />
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[4, 10, 6]} intensity={1.1} castShadow shadow-mapSize={[1024, 1024]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* Sin altura: esta escena no tenía sombra de la que leerla, así
+          que el escenario la MIDE de la propia escena al montarse, en
+          vez de que alguien la adivine. */}
+      <Escenario acento="#38bdf8" />
       <pointLight position={[-6, 4, 5]} intensity={0.45} color={modoColor} />
-      <Environment resolution={128}>
-        <Lightformer form="rect" intensity={1.4} position={[0, 5, -6]} scale={[10, 6, 1]} color="#93c5fd" />
-        <Lightformer form="rect" intensity={0.8} position={[-6, 0, 4]} scale={[6, 6, 1]} color={modoColor} />
-      </Environment>
 
       {vista === "cascada" && <RedDifusion variante="cascada" eventos={p.eventosCascada} nonce={p.nonceCascada} origenes={[p.origenNodo]} fuente={-1} modoColor={modoColor} />}
       {vista === "rumor" && <RedDifusion variante="rumor" eventos={p.eventosRumor} nonce={p.nonceRumor} origenes={RUMOR.origenes} fuente={p.fuenteNodo} modoColor={modoColor} />}

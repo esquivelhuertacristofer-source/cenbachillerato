@@ -21,9 +21,10 @@
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Html } from "@react-three/drei";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { factorLuz, factorCO2, tasa } from "./fotosintesis-data";
+import { Escenario } from "./_escenario";
 
 export interface FotosintesisSceneProps {
   luz: number;
@@ -215,7 +216,6 @@ function Mundo({ luz, co2, temp, accent: _accent, pausado }: { luz: number; co2:
       <MolLabel pos={[o2Fin[0] + 0.3, o2Fin[1] + 0.4, o2Fin[2]]} color={O2_COL} icon="fa-arrow-up" txt="6 O₂" />
       <MolLabel pos={[gluFin[0] + 0.6, gluFin[1] + 0.2, gluFin[2]]} color={GLU} icon="fa-arrow-down" txt="C₆H₁₂O₆" />
 
-      <ContactShadows position={[0, -1.93, 0]} opacity={0.32} scale={11} blur={2.6} far={6} />
     </group>
   );
 }
@@ -249,32 +249,16 @@ function Contenido(props: FotosintesisSceneProps) {
   const { luz, co2, temp, accent, pausado, autoRotate, resetNonce } = props;
   return (
     <>
-      <color attach="background" args={["#041520"]} />
-      <fog attach="fog" args={["#041520", 18, 42]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={accent} suelo={-1.93} />
 
-      <ambientLight intensity={0.5} />
-      <directionalLight
-        position={[-4.6, 6, 3]}
-        intensity={1.5}
-        color={SOL}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-near={1}
-        shadow-camera-far={30}
-        shadow-bias={-0.0004}
-      />
-      <pointLight position={[4, 3, 4]} intensity={1.6} color="#bfe8ff" />
 
       <group key={`${resetNonce}`}>
         <Mundo luz={luz} co2={co2} temp={temp} accent={accent} pausado={pausado} />
       </group>
 
-      <Environment resolution={256}>
-        <Lightformer intensity={1.3} position={[0, 8, 3]} scale={[12, 4, 1]} color="#ffffff" />
-        <Lightformer intensity={1.0} position={[-8, 3, -2]} scale={[5, 6, 1]} color={SOL} />
-        <Lightformer intensity={1.0} position={[8, 2, 4]} scale={[4, 5, 1]} color="#bfe8ff" />
-      </Environment>
 
       <OrbitControls
         enablePan={false}

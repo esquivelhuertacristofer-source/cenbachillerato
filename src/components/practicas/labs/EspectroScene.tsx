@@ -25,8 +25,9 @@
 import * as THREE from "three";
 import { useEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Environment, Lightformer, Html, Line, Stars } from "@react-three/drei";
+import { OrbitControls, Html, Line, Stars } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Escenario } from "./_escenario";
 import {
   type Modo, BANDAS, resolverEM, resolverVisible, aplicacionPorId, APLICACIONES,
   colorVisible, bandaPorFrecuencia, CAT_COLOR,
@@ -414,12 +415,12 @@ function EscenaAplicaciones({ aplId, playing }: Pick<EspectroSceneProps, "aplId"
 function Contenido({ modo, logF, nm, aplId, playing, accent, resetNonce }: EspectroSceneProps) {
   return (
     <>
-      <color attach="background" args={["#040a16"]} />
-      <fog attach="fog" args={["#040a16", 26, 75]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* Sin altura: esta escena no tenía sombra de la que leerla, así
+          que el escenario la MIDE de la propia escena al montarse, en
+          vez de que alguien la adivine. */}
+      <Escenario acento={accent} mesa={false} niebla={false} />
 
-      <ambientLight intensity={0.7} />
-      <directionalLight position={[5, 8, 8]} intensity={1.15} />
-      <pointLight position={[-8, 4, 7]} intensity={0.5} color={accent} />
       <Stars radius={70} depth={30} count={1200} factor={3} saturation={0} fade speed={0.5} />
 
       <group key={`${modo}-${resetNonce}`}>
@@ -428,13 +429,6 @@ function Contenido({ modo, logF, nm, aplId, playing, accent, resetNonce }: Espec
         {modo === "aplicaciones" && <EscenaAplicaciones aplId={aplId} playing={playing} />}
       </group>
 
-      <Environment resolution={128}>
-        <group>
-          <Lightformer intensity={1.1} position={[0, 7, 8]} scale={14} color="#eaf1ff" />
-          <Lightformer intensity={0.6} position={[8, 3, 5]} scale={7} color="#cfe0ff" />
-          <Lightformer intensity={0.6} position={[-8, 3, 4]} scale={7} color="#dcd5ff" />
-        </group>
-      </Environment>
 
       <OrbitControls
         makeDefault

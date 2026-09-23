@@ -18,8 +18,9 @@
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Edges, Html } from "@react-three/drei";
+import { OrbitControls, Edges, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Escenario } from "./_escenario";
 import {
   type FormaKey,
   getForma,
@@ -244,7 +245,6 @@ function Cadena({ transformadorKey, entrada, accent, pausado }: {
         <meshStandardMaterial color={TERMICA_COL} emissive={TERMICA_COL} emissiveIntensity={0.9} transparent opacity={0.8} toneMapped={false} />
       </instancedMesh>
 
-      <ContactShadows position={[0, TRACK_Y - 0.2, 0]} opacity={0.34} scale={trackLen + 4} blur={2.4} far={5} />
     </group>
   );
 }
@@ -267,31 +267,16 @@ function Contenido(props: EnergiaFormasSceneProps) {
   const { transformadorKey, entrada, accent, pausado, autoRotate, resetNonce } = props;
   return (
     <>
-      <color attach="background" args={["#03101f"]} />
-      <fog attach="fog" args={["#03101f", 22, 46]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={accent} suelo={TRACK_Y - 0.2} />
 
-      <ambientLight intensity={0.55} />
-      <directionalLight
-        position={[4, 10, 6]}
-        intensity={1.4}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-near={1}
-        shadow-camera-far={32}
-        shadow-bias={-0.0004}
-      />
-      <pointLight position={[0, 5, 4]} intensity={4} color="#ffffff" />
 
       <group key={`${transformadorKey}-${resetNonce}`}>
         <Cadena transformadorKey={transformadorKey} entrada={entrada} accent={accent} pausado={pausado} />
       </group>
 
-      <Environment resolution={256}>
-        <Lightformer intensity={1.5} position={[0, 6, 2]} scale={[14, 4, 1]} color="#ffffff" />
-        <Lightformer intensity={1.0} position={[-8, 3, -2]} scale={[5, 6, 1]} color={accent} />
-        <Lightformer intensity={1.0} position={[8, 2, 4]} scale={[4, 5, 1]} color="#bfe8ff" />
-      </Environment>
 
       <OrbitControls
         enablePan={false}

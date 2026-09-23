@@ -17,9 +17,10 @@
 
 import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Html, RoundedBox } from "@react-three/drei";
+import { OrbitControls, Html, RoundedBox } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import type { Group } from "three";
+import { Escenario } from "./_escenario";
 
 export interface BalanzaSceneProps {
   /** Valor real de x (lo conoce la simulación para inclinar el brazo; el alumno lo descubre). */
@@ -216,22 +217,11 @@ export default function BalanzaScene(props: BalanzaSceneProps) {
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
       camera={{ position: [0, 2.6, 9.2], fov: 42 }}
     >
-      <color attach="background" args={["#03101f"]} />
-      <fog attach="fog" args={["#03101f", 16, 40]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={accent} suelo={0} />
 
-      <ambientLight intensity={0.6} />
-      <directionalLight
-        position={[5, 10, 6]}
-        intensity={1.7}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-near={1}
-        shadow-camera-far={36}
-        shadow-bias={-0.0004}
-      />
-      <pointLight position={[-7, 4, 5]} intensity={8} color={accent} />
-      <pointLight position={[6, 3, -4]} intensity={5} color="#bfe8ff" />
 
       <group key={`${props.resetNonce}`}>
         {/* base */}
@@ -252,14 +242,8 @@ export default function BalanzaScene(props: BalanzaSceneProps) {
 
         <Brazo {...props} />
 
-        <ContactShadows position={[0, 0, 0]} opacity={0.32} scale={14} blur={2.6} far={6} color="#020c1c" />
       </group>
 
-      <Environment resolution={256}>
-        <Lightformer intensity={2.0} position={[0, 6, 2]} scale={[10, 4, 1]} color="#ffffff" />
-        <Lightformer intensity={1.4} position={[-6, 3, -2]} scale={[6, 6, 1]} color={accent} />
-        <Lightformer intensity={1.1} position={[6, 2, 3]} scale={[5, 5, 1]} color="#bfe8ff" />
-      </Environment>
 
       <OrbitControls
         enablePan={false}

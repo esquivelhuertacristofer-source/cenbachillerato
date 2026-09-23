@@ -25,6 +25,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, ContactShadows, Environment, Lightformer, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { calcMed, fmtM, fmtDeg, D_MIN, D_MAX, type Medicion } from "./triangulo-rectangulo-data";
+import { CurvaTubo } from "./_tablero";
 
 export interface TrianguloRectanguloSceneProps {
   d: number;
@@ -198,9 +199,9 @@ function Escena({ g, accent, mostrarHip }: { g: Geo; accent: string; mostrarHip:
 
       {/* ── Triángulo rectángulo ── */}
       {/* cateto adyacente (distancia) */}
-      <Line points={[g.E, g.Ph]} color={ADY_COL} lineWidth={4} />
+      <CurvaTubo puntos={[g.E, g.Ph]} color={ADY_COL} grosor={0.072} />
       {/* cateto opuesto (altura sobre los ojos) */}
-      <Line points={[g.Ph, g.Top]} color={OP_COL} lineWidth={4} />
+      <CurvaTubo puntos={[g.Ph, g.Top]} color={OP_COL} grosor={0.072} />
       {/* hipotenusa = línea de visión */}
       {mostrarHip && (
         <Line points={[g.E, g.Top]} color={HYP_COL} lineWidth={2.6} dashed dashSize={0.001} gapSize={0} />

@@ -23,9 +23,11 @@
 import * as THREE from "three";
 import { useRef, type ReactNode } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Environment, Lightformer, Html, Line, Stars } from "@react-three/drei";
+import { OrbitControls, Html, Line, Stars } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { type Base, BASE_COLOR } from "./adn-dogma-data";
+import { Escenario } from "./_escenario";
+import { CurvaTubo } from "./_tablero";
 import {
   type Modo,
   type Pt,
@@ -353,7 +355,7 @@ function RayoUV({ on }: { on: boolean }) {
   return (
     <group>
       <group ref={g}>
-        <Line points={pts} color="#c4b5fd" lineWidth={3.5} />
+        <CurvaTubo puntos={pts} color="#c4b5fd" grosor={0.063} />
       </group>
       <pointLight ref={lt} position={[HRAD, yTT, 0.4]} color="#a78bfa" intensity={0.3} distance={7} />
     </group>
@@ -496,7 +498,7 @@ function ChispaRotura({ y, playing }: { y: number; playing: boolean }) {
   const pts: Pt[] = [[HRAD - 0.3, y + 0.3, 0], [HRAD + 0.1, y, 0.2], [HRAD - 0.2, y - 0.3, -0.1]];
   return (
     <group ref={g}>
-      <Line points={pts} color="#fecaca" lineWidth={3} />
+      <CurvaTubo puntos={pts} color="#fecaca" grosor={0.054} />
       <pointLight position={[HRAD, y, 0]} color="#f87171" intensity={playing ? 2 : 0.6} distance={4} />
     </group>
   );
@@ -539,19 +541,16 @@ function Contenido(props: MutacionesSceneProps) {
 
   return (
     <>
-      <color attach="background" args={["#040912"]} />
-      <fog attach="fog" args={["#040912", 18, 46]} />
-      <ambientLight intensity={0.65} />
-      <directionalLight position={[6, 9, 6]} intensity={1.4} castShadow shadow-mapSize={[1024, 1024]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* Sin altura: esta escena no tenía sombra de la que leerla, así
+          que el escenario la MIDE de la propia escena al montarse, en
+          vez de que alguien la adivine. */}
+      <Escenario acento={props.accent} mesa={false} niebla={false} />
       <directionalLight position={[-6, 4, -4]} intensity={0.5} color={modoColor} />
       <Stars radius={70} depth={30} count={900} factor={3} fade speed={0.4} />
 
       <group ref={giro} key={`${modo}-${resetNonce}`}>{mundo}</group>
 
-      <Environment resolution={128}>
-        <Lightformer form="rect" intensity={1.1} position={[0, 6, 4]} scale={8} color="#bcd4ff" />
-        <Lightformer form="rect" intensity={0.7} position={[5, 0, -4]} scale={6} color={modoColor} />
-      </Environment>
       <OrbitControls enablePan={false} minDistance={6} maxDistance={28} autoRotate={false} />
       <EffectComposer>
         <Bloom intensity={0.55} luminanceThreshold={0.22} mipmapBlur />

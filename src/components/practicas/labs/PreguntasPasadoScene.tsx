@@ -20,8 +20,9 @@
 import * as THREE from "three";
 import { useMemo, useRef, type ReactNode } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Environment, Lightformer, Html } from "@react-three/drei";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Escenario } from "./_escenario";
 import {
   type Modo,
   type ProblemaId,
@@ -677,7 +678,6 @@ function EscenaExcavar({ problemaId, profundidad, estratoSel, modoColor }: { pro
           <sphereGeometry args={[0.05, 12, 10]} />
           <meshBasicMaterial color="#fef3c7" />
         </mesh>
-        <pointLight position={[0.1, 0.7, 0.3]} intensity={1.6} distance={2.6} color="#fde68a" />
       </group>
     </group>
   );
@@ -1058,15 +1058,12 @@ export default function PreguntasPasadoScene(p: PreguntasPasadoSceneProps) {
 
   return (
     <Canvas key={`${vista}-${resetNonce}`} shadows dpr={[1, 1.75]} camera={{ position: cam.pos, fov: 42 }} gl={{ antialias: true }}>
-      <color attach="background" args={[vista === "voces" ? "#070611" : "#040a16"]} />
-      <fog attach="fog" args={[vista === "voces" ? "#070611" : "#040a16", 16, 38]} />
-      <ambientLight intensity={vista === "voces" ? 0.35 : 0.6} />
-      <directionalLight position={[4, 9, 6]} intensity={vista === "voces" ? 0.55 : 1.15} castShadow shadow-mapSize={[1024, 1024]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* Sin altura: esta escena no tenía sombra de la que leerla, así
+          que el escenario la MIDE de la propia escena al montarse, en
+          vez de que alguien la adivine. */}
+      <Escenario acento="#38bdf8" />
       <pointLight position={[-6, 3, 5]} intensity={0.4} color={modoColor} />
-      <Environment resolution={128}>
-        <Lightformer form="rect" intensity={1.4} position={[0, 5, -6]} scale={[10, 6, 1]} color="#fde68a" />
-        <Lightformer form="rect" intensity={0.7} position={[-6, 0, 4]} scale={[6, 6, 1]} color={modoColor} />
-      </Environment>
 
       {vista === "excavar" && <EscenaExcavar problemaId={p.problemaId} profundidad={p.profundidad} estratoSel={p.estratoSel} modoColor={modoColor} />}
       {vista === "espiral" && <EscenaEspiral ubicadas={p.ubicadas} evidenciaActual={p.evidenciaActual} vinculoId={p.vinculoId} vinculoResuelto={p.vinculoResuelto} modoColor={modoColor} />}

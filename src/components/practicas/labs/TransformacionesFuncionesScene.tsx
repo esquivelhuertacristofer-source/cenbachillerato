@@ -21,9 +21,11 @@
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Html, Line } from "@react-three/drei";
+import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { calcFuncion, evalF, evalPadre, fmtPar, type Funcion, type Modo } from "./transformaciones-funciones-data";
+import { Escenario } from "./_escenario";
+import { CurvaTubo } from "./_tablero";
 
 export interface TransformacionesFuncionesSceneProps {
   modo: Modo;
@@ -178,7 +180,7 @@ function Escena({ geo, accent: _accent, mostrarPadre }: { geo: Geo; accent: stri
 
       {/* función transformada */}
       {geo.transformada.length > 1 && (
-        <Line points={geo.transformada} color={CURVE_COL} lineWidth={5} />
+        <CurvaTubo puntos={geo.transformada} color={CURVE_COL} grosor={0.09} />
       )}
 
       {/* vértice / punto ancla */}
@@ -205,26 +207,17 @@ function Contenido({ modo, a, h, k, accent, mostrarPadre, autoRotate, pausado, r
 
   return (
     <>
-      <color attach="background" args={["#08131f"]} />
-      <fog attach="fog" args={["#08131f", 22, 60]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={accent} suelo={-G * U - 0.4} />
 
-      <ambientLight intensity={0.7} />
-      <directionalLight position={[5, 9, 11]} intensity={1.3} castShadow shadow-mapSize={[1024, 1024]} shadow-camera-far={40} />
-      <pointLight position={[-6, 4, 6]} intensity={0.4} color={accent} />
 
       <group key={`${resetNonce}`}>
         <Escena geo={geo} accent={accent} mostrarPadre={mostrarPadre} />
       </group>
 
-      <ContactShadows position={[0, -G * U - 0.4, 0]} opacity={0.3} scale={24} blur={2.6} far={9} />
 
-      <Environment resolution={128}>
-        <group>
-          <Lightformer intensity={1.3} position={[0, 6, 8]} scale={10} color="#eaf1ff" />
-          <Lightformer intensity={0.7} position={[6, 2, 5]} scale={6} color="#cfe0ff" />
-          <Lightformer intensity={0.5} position={[-6, 3, 4]} scale={6} color="#ffd9b3" />
-        </group>
-      </Environment>
 
       <OrbitControls
         makeDefault

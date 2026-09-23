@@ -19,8 +19,9 @@
 import * as THREE from "three";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Edges, Html } from "@react-three/drei";
+import { OrbitControls, Edges, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Escenario } from "./_escenario";
 import {
   presion,
   velocidadRel,
@@ -394,22 +395,12 @@ function Contenido(props: GasIdealSceneProps) {
 
   return (
     <>
-      <color attach="background" args={["#03101f"]} />
-      <fog attach="fog" args={["#03101f", 14, 30]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={accent} suelo={-0.06} />
 
-      <ambientLight intensity={0.55} />
-      <directionalLight
-        position={[4, 10, 6]}
-        intensity={2.0}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-near={1}
-        shadow-camera-far={28}
-        shadow-bias={-0.0004}
-      />
       <pointLight position={[-5, 4, -3]} intensity={16} color={`#${heat.getHexString()}`} />
-      <pointLight position={[4, 2, 5]} intensity={8} color="#ffffff" />
 
       <group key={`${resetNonce}`} position={[-0.5, -1.5, 0]}>
         {/* Pedestal */}
@@ -437,14 +428,8 @@ function Contenido(props: GasIdealSceneProps) {
           </div>
         </Html>
 
-        <ContactShadows position={[0, -0.06, 0]} opacity={0.36} scale={10} blur={2.6} far={5} color="#020c1c" />
       </group>
 
-      <Environment resolution={256}>
-        <Lightformer intensity={2.2} position={[0, 6, 2]} scale={[10, 4, 1]} color="#ffffff" />
-        <Lightformer intensity={1.5} position={[-6, 3, -2]} scale={[5, 6, 1]} color={accent} />
-        <Lightformer intensity={1.1} position={[6, 2, 4]} scale={[4, 5, 1]} color="#bfe8ff" />
-      </Environment>
 
       <OrbitControls
         enabled={!dragging}

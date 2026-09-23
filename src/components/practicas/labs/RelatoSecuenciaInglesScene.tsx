@@ -24,6 +24,7 @@ import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, Environment, Lightformer, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { type EscenaId, type Modo, type ItemConectar, ITEMS, RELACION_DEF, EVENTO_INICIAL } from "./relato-secuencia-ingles-data";
+import { PanelGrafica } from "./_tablero";
 
 export type EstadoVineta = "normal" | "sel" | "activo" | "ok" | "error" | "pendiente" | "hecho";
 
@@ -1075,10 +1076,7 @@ function Teatrino({ escenas, estados, rotulos, activa, foco, burbuja, modoColor,
   return (
     <group>
       {/* Telón y repisas */}
-      <mesh position={[0, 1, -1.75]} receiveShadow>
-        <planeGeometry args={[30, 16]} />
-        <meshStandardMaterial color="#3f0a1d" roughness={0.95} />
-      </mesh>
+      <PanelGrafica ancho={30} alto={16} />
       {pliegues.map((x) => (
         <mesh key={x} geometry={G_CIL} position={[x, 1, -1.62]} scale={[0.16, 16, 0.16]}>
           <meshStandardMaterial color="#5b0f2a" roughness={0.9} />

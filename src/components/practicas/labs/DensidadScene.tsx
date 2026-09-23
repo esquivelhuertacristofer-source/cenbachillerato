@@ -14,16 +14,9 @@
 import * as THREE from "three";
 import { useEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import {
-  OrbitControls,
-  ContactShadows,
-  Environment,
-  Lightformer,
-  Html,
-  Sparkles,
-  Edges,
-} from "@react-three/drei";
+import { OrbitControls, Html, Sparkles, Edges } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Escenario } from "./_escenario";
 
 export interface DensidadSceneProps {
   liquidDensity: number;
@@ -429,22 +422,11 @@ export default function DensidadScene(props: DensidadSceneProps) {
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
       camera={{ position: [4, 3, 5], fov: 42 }}
     >
-      <color attach="background" args={["#03101f"]} />
-      <fog attach="fog" args={["#03101f", 13, 24]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={props.accent} suelo={-0.04} />
 
-      <ambientLight intensity={0.55} />
-      <directionalLight
-        position={[4, 8, 4]}
-        intensity={2.6}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-near={1}
-        shadow-camera-far={24}
-        shadow-bias={-0.0004}
-      />
-      <pointLight position={[-4, 3, -3]} intensity={22} color={props.accent} />
-      <pointLight position={[3, 1, 4]} intensity={11} color="#ffffff" />
 
       <group position={[0, -1.2, 0]}>
         <Pedestal />
@@ -463,15 +445,9 @@ export default function DensidadScene(props: DensidadSceneProps) {
           buoyancyN={props.buoyancyN}
           dropNonce={props.dropNonce}
         />
-        <ContactShadows position={[0, -0.04, 0]} opacity={0.4} scale={9} blur={2.8} far={4.5} color="#2a3f57" />
       </group>
 
       {/* Reflejos de estudio sin assets externos */}
-      <Environment resolution={256}>
-        <Lightformer intensity={2.4} position={[0, 5, 2]} scale={[9, 4, 1]} color="#ffffff" />
-        <Lightformer intensity={1.5} position={[-5, 2, -2]} scale={[5, 5, 1]} color={props.accent} />
-        <Lightformer intensity={1.1} position={[5, 1, 3]} scale={[4, 4, 1]} color="#bfe8ff" />
-      </Environment>
 
       <OrbitControls
         enablePan={false}

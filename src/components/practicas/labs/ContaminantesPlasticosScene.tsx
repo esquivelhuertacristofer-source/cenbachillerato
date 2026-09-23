@@ -19,8 +19,9 @@
 import * as THREE from "three";
 import { useMemo, useRef, type ReactNode } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Environment, Lightformer, Html } from "@react-three/drei";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Escenario } from "./_escenario";
 import {
   type Modo,
   type ResinaId,
@@ -1216,15 +1217,12 @@ export default function ContaminantesPlasticosScene(p: ContaminantesSceneProps) 
 
   return (
     <Canvas key={`${vista}-${resetNonce}`} shadows dpr={[1, 1.75]} camera={{ position: cam.pos, fov: 42 }} gl={{ antialias: true }}>
-      <color attach="background" args={["#040a16"]} />
-      <fog attach="fog" args={["#040a16", 20, 42]} />
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[-4, 9, 6]} intensity={1.2} castShadow shadow-mapSize={[1024, 1024]} shadow-bias={-0.0006} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* Sin altura: esta escena no tenía sombra de la que leerla, así
+          que el escenario la MIDE de la propia escena al montarse, en
+          vez de que alguien la adivine. */}
+      <Escenario acento="#38bdf8" />
       <pointLight position={[6, 3, 5]} intensity={0.45} color={modoColor} />
-      <Environment resolution={128}>
-        <Lightformer form="rect" intensity={1.5} position={[0, 5, -6]} scale={[10, 6, 1]} color="#93c5fd" />
-        <Lightformer form="rect" intensity={0.8} position={[-6, 0, 4]} scale={[6, 6, 1]} color={modoColor} />
-      </Environment>
 
       {vista === "oceano" && <EscenaOceano resinaId={p.resinaId} lugar={p.lugar} tirado={p.tirado} tAnios={p.tAnios} bio={p.bio} redNonce={p.redNonce} modoColor={modoColor} />}
       {vista === "cadena" && <EscenaCadena contamId={p.contamId} paso={p.paso} edadAtun={p.edadAtun} ingesta={p.ingesta} modoColor={modoColor} />}

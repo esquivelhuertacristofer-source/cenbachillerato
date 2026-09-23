@@ -22,8 +22,9 @@
 import * as THREE from "three";
 import { useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Html, Line, Stars } from "@react-three/drei";
+import { OrbitControls, Html, Line, Stars } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Escenario } from "./_escenario";
 import {
   type Modo, resolverFuerza, resolverPeso, resolverOrbita, cuerpoPorId,
   F_DEF, R_TIERRA, T_TIERRA_H, sci, fmt0, fmt1, fmt2, fmtKm,
@@ -362,12 +363,11 @@ function EscenaOrbita({ alt, t, accent }: { alt: number; t: number; accent: stri
 function Contenido({ modo, r, cuerpoId, m, alt, t, accent, resetNonce }: GravitacionSceneProps) {
   return (
     <>
-      <color attach="background" args={["#040a16"]} />
-      <fog attach="fog" args={["#040a16", 26, 70]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={accent} suelo={-0.05} mesa={false} niebla={false} />
 
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[7, 9, 6]} intensity={1.5} castShadow shadow-mapSize={[1024, 1024]} shadow-camera-far={50} />
-      <pointLight position={[-9, 4, 7]} intensity={0.6} color={accent} />
       <Stars radius={70} depth={30} count={1400} factor={3} saturation={0} fade speed={0.6} />
 
       <group key={`${modo}-${resetNonce}`}>
@@ -376,17 +376,7 @@ function Contenido({ modo, r, cuerpoId, m, alt, t, accent, resetNonce }: Gravita
         {modo === "orbita" && <EscenaOrbita alt={alt} t={t} accent={accent} />}
       </group>
 
-      {modo === "peso" && (
-        <ContactShadows position={[0, -0.05, 0]} opacity={0.35} scale={16} blur={2.6} far={8} />
-      )}
 
-      <Environment resolution={128}>
-        <group>
-          <Lightformer intensity={1.2} position={[0, 7, 8]} scale={14} color="#eaf1ff" />
-          <Lightformer intensity={0.7} position={[8, 3, 5]} scale={7} color="#cfe0ff" />
-          <Lightformer intensity={0.6} position={[-8, 3, 4]} scale={7} color="#dcd5ff" />
-        </group>
-      </Environment>
 
       <OrbitControls
         makeDefault

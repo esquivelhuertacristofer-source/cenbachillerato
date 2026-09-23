@@ -20,9 +20,11 @@
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Html, Line } from "@react-three/drei";
+import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { evalY, resolver, vertice, discriminante, fmt } from "./cuadratica-data";
+import { Escenario } from "./_escenario";
+import { CurvaTubo } from "./_tablero";
 
 export interface CuadraticaSceneProps {
   a: number;
@@ -139,7 +141,6 @@ function Mundo({ a, b, c, accent, pausado }: {
 
   return (
     <group>
-      <ContactShadows position={[0, -H / 2 - 0.6, 0]} opacity={0.28} scale={20} blur={2.6} far={9} />
 
       {/* Agua (plano y = 0) */}
       <mesh position={[0, y0w, 0]} rotation={[-Math.PI / 2, 0, 0]}>
@@ -162,7 +163,7 @@ function Mundo({ a, b, c, accent, pausado }: {
         <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.32} transparent opacity={0.5} side={THREE.DoubleSide} roughness={0.45} metalness={0.15} />
       </mesh>
       {/* borde frontal brillante de la curva */}
-      <Line points={curva} color={accent} lineWidth={3.2} />
+      <CurvaTubo puntos={curva} color={accent} grosor={0.058} />
 
       {/* Raíces: donde el valle toca el agua */}
       {raicesW.map((rt, i) => (
@@ -219,32 +220,16 @@ function Contenido(props: CuadraticaSceneProps) {
   const { a, b, c, accent, pausado, autoRotate, resetNonce } = props;
   return (
     <>
-      <color attach="background" args={["#03101f"]} />
-      <fog attach="fog" args={["#03101f", 26, 64]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={accent} suelo={-H / 2 - 0.6} />
 
-      <ambientLight intensity={0.6} />
-      <directionalLight
-        position={[6, 9, 7]}
-        intensity={1.4}
-        color="#fff2cc"
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-near={1}
-        shadow-camera-far={40}
-        shadow-bias={-0.0004}
-      />
-      <pointLight position={[-6, 2, 6]} intensity={0.4} color={accent} />
 
       <group key={`${resetNonce}`}>
         <Mundo a={a} b={b} c={c} accent={accent} pausado={pausado} />
       </group>
 
-      <Environment resolution={256}>
-        <Lightformer intensity={1.2} position={[0, 8, 4]} scale={[14, 4, 1]} color="#ffffff" />
-        <Lightformer intensity={0.8} position={[-8, 2, -2]} scale={[5, 6, 1]} color={accent} />
-        <Lightformer intensity={0.8} position={[8, 1, 5]} scale={[5, 5, 1]} color="#bfe8ff" />
-      </Environment>
 
       <OrbitControls
         enablePan={false}

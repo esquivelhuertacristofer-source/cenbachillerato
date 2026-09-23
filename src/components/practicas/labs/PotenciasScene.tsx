@@ -16,9 +16,10 @@
 
 import { useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer } from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import type { Exponente } from "./potencias-data";
+import { Escenario } from "./_escenario";
 
 export interface PotenciasSceneProps {
   base: number;
@@ -91,33 +92,16 @@ export default function PotenciasScene(props: PotenciasSceneProps) {
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
       camera={{ position: [5.5, 4.5, 7.5], fov: 42 }}
     >
-      <color attach="background" args={["#03101f"]} />
-      <fog attach="fog" args={["#03101f", 16, 40]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={props.accent} suelo={-(props.exponente === 3 ? (n - 1) / 2 : 0) * S - C * 0.6} />
 
-      <ambientLight intensity={0.6} />
-      <directionalLight
-        position={[6, 10, 6]}
-        intensity={2.0}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-near={1}
-        shadow-camera-far={32}
-        shadow-bias={-0.0004}
-      />
-      <pointLight position={[-6, 3, 4]} intensity={11} color={props.accent} />
-      <pointLight position={[5, 1, 5]} intensity={7} color="#ffffff" />
 
       <group key={`${n}-${props.exponente}-${props.resetNonce}`}>
         <Bloque base={n} exponente={props.exponente} resaltarLado={props.resaltarLado} accent={props.accent} />
-        <ContactShadows position={[0, -(props.exponente === 3 ? (n - 1) / 2 : 0) * S - C * 0.6, 0]} opacity={0.34} scale={18} blur={3} far={7} color="#2a3f57" />
       </group>
 
-      <Environment resolution={256}>
-        <Lightformer intensity={2.0} position={[0, 5, 2]} scale={[10, 4, 1]} color="#ffffff" />
-        <Lightformer intensity={1.4} position={[-6, 2, -2]} scale={[6, 6, 1]} color={props.accent} />
-        <Lightformer intensity={1.1} position={[6, 1, 3]} scale={[5, 5, 1]} color="#bfe8ff" />
-      </Environment>
 
       <OrbitControls
         enablePan={false}

@@ -24,8 +24,10 @@
 import * as THREE from "three";
 import { useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Environment, Lightformer, Html, Line, Stars } from "@react-three/drei";
+import { OrbitControls, Html, Line, Stars } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Escenario } from "./_escenario";
+import { CurvaTubo } from "./_tablero";
 import {
   type Modo,
   resolverCircuito, resolverGenerador, resolverMotor,
@@ -185,15 +187,15 @@ function EscenaCircuito({ V, R, playing, accent }: { V: number; R: number; playi
       <Titulo texto="Circuito — ley de Ohm" sub={`V = ${fmtV(V)} · R = ${fmtR(R)} · I = ${fmtA(c.I)} · P = ${fmtW(c.P)}`} color={accent} />
 
       {/* cable */}
-      <Line points={path} color="#94a3b8" lineWidth={3} />
+      <CurvaTubo puntos={path} color="#94a3b8" grosor={0.054} />
 
       {/* fuente (batería / red CFE) sobre el lado izquierdo */}
       <group position={[-WX, 0, 0]}>
         <mesh><boxGeometry args={[0.55, 1.5, 0.3]} /><meshStandardMaterial color="#1e293b" /></mesh>
         {/* bornes */}
-        <Line points={[[-0.18, 0.55, 0.2], [0.18, 0.55, 0.2]] as Pt[]} color="#f87171" lineWidth={4} />
-        <Line points={[[0, 0.45, 0.2], [0, 0.65, 0.2]] as Pt[]} color="#f87171" lineWidth={4} />
-        <Line points={[[-0.12, -0.55, 0.2], [0.12, -0.55, 0.2]] as Pt[]} color="#60a5fa" lineWidth={4} />
+        <CurvaTubo puntos={[[-0.18, 0.55, 0.2], [0.18, 0.55, 0.2]] as Pt[]} color="#f87171" grosor={0.072} />
+        <CurvaTubo puntos={[[0, 0.45, 0.2], [0, 0.65, 0.2]] as Pt[]} color="#f87171" grosor={0.072} />
+        <CurvaTubo puntos={[[-0.12, -0.55, 0.2], [0.12, -0.55, 0.2]] as Pt[]} color="#60a5fa" grosor={0.072} />
         <Etiqueta pos={[-1.05, 0, 0]} texto={`${fmtV(V)}`} color="#fbbf24" mono />
         <Html position={[-1.05, -0.7, 0]} center distanceFactor={17} pointerEvents="none">
           <div style={{ fontSize: 9, fontWeight: 800, color: "rgba(220,232,255,0.7)", fontFamily: "system-ui, sans-serif" }}>red CFE</div>
@@ -201,7 +203,7 @@ function EscenaCircuito({ V, R, playing, accent }: { V: number; R: number; playi
       </group>
 
       {/* resistencia */}
-      <Line points={zig} color="#fbbf24" lineWidth={4} />
+      <CurvaTubo puntos={zig} color="#fbbf24" grosor={0.072} />
       <Etiqueta pos={[WX + 1.1, 0, 0]} texto={`R = ${fmtR(R)}`} color="#fbbf24" mono />
 
       {/* lámpara en la esquina superior derecha */}
@@ -231,7 +233,7 @@ function BobinaGiratoria({ N, color, speed, playing }: { N: number; color: strin
     <group ref={ref}>
       {Array.from({ length: turns }, (_, i) => {
         const z = (i - (turns - 1) / 2) * 0.14;
-        return <Line key={i} points={loop.map((p) => [p[0], p[1], z] as Pt)} color={color} lineWidth={3} transparent opacity={0.92} />;
+        return <CurvaTubo key={i} puntos={loop.map((p) => [p[0], p[1], z] as Pt)} color={color} grosor={0.054} />;
       })}
       {/* eje de giro */}
       <mesh rotation={[0, 0, Math.PI / 2]}><cylinderGeometry args={[0.05, 0.05, 4.4, 10]} /><meshStandardMaterial color="#cbd5e1" /></mesh>
@@ -365,7 +367,7 @@ function EscenaMotor({ pElec, efic, playing, accent }: { pElec: number; efic: nu
         <Etiqueta pos={[0, 1.3, 0]} texto={`P_elec = ${fmtKw(pElec)}`} color="#fbbf24" mono />
       </group>
       {/* cable de entrada */}
-      <Line points={[[-3.7, 0.4, 0], [-1.2, 0.4, 0]] as Pt[]} color="#fbbf24" lineWidth={3} />
+      <CurvaTubo puntos={[[-3.7, 0.4, 0], [-1.2, 0.4, 0]] as Pt[]} color="#fbbf24" grosor={0.054} />
 
       {/* rotor en su carcasa entre polos */}
       <group position={[0.4, 0.4, 0]}>
@@ -375,7 +377,7 @@ function EscenaMotor({ pElec, efic, playing, accent }: { pElec: number; efic: nu
       </group>
 
       {/* salida mecánica */}
-      <Line points={[[2.0, 0.4, 0], [3.8, 0.4, 0]] as Pt[]} color={VERDE} lineWidth={3} />
+      <CurvaTubo puntos={[[2.0, 0.4, 0], [3.8, 0.4, 0]] as Pt[]} color={VERDE} grosor={0.054} />
       <Etiqueta pos={[4.4, 0.9, 0]} texto={`P_mec = ${fmtKw(m.pMec)}`} color={VERDE} mono />
       <Etiqueta pos={[4.4, 0.2, 0]} texto={`${m.hp.toFixed(0)} hp`} color={VERDE} mono />
 
@@ -399,12 +401,12 @@ function Contenido(props: ElectromagnetismoSceneProps) {
   const { modo, accent, resetNonce, playing } = props;
   return (
     <>
-      <color attach="background" args={["#040a16"]} />
-      <fog attach="fog" args={["#040a16", 28, 80]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* Sin altura: esta escena no tenía sombra de la que leerla, así
+          que el escenario la MIDE de la propia escena al montarse, en
+          vez de que alguien la adivine. */}
+      <Escenario acento={accent} mesa={false} niebla={false} />
 
-      <ambientLight intensity={0.8} />
-      <directionalLight position={[5, 8, 8]} intensity={1.05} />
-      <pointLight position={[-8, 4, 7]} intensity={0.45} color={accent} />
       <Stars radius={70} depth={30} count={900} factor={3} saturation={0} fade speed={0.5} />
 
       <group key={`${modo}-${resetNonce}`}>
@@ -413,13 +415,6 @@ function Contenido(props: ElectromagnetismoSceneProps) {
         {modo === "motor" && <EscenaMotor pElec={props.pElec} efic={props.efic} playing={playing} accent={accent} />}
       </group>
 
-      <Environment resolution={128}>
-        <group>
-          <Lightformer intensity={1.1} position={[0, 7, 8]} scale={14} color="#eaf1ff" />
-          <Lightformer intensity={0.6} position={[8, 3, 5]} scale={7} color="#cfe0ff" />
-          <Lightformer intensity={0.6} position={[-8, 3, 4]} scale={7} color="#dcd5ff" />
-        </group>
-      </Environment>
 
       <OrbitControls
         makeDefault

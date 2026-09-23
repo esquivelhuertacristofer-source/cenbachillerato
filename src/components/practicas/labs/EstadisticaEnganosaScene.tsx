@@ -26,6 +26,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Environment, Lightformer, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import type { Line2 } from "three-stdlib";
+import { CurvaTubo } from "./_tablero";
 import {
   type Vista,
   type CasoBarras,
@@ -214,7 +215,7 @@ function EscenaTruncado({ caso, ejeMin, modoColor }: { caso: CasoBarras; ejeMin:
       })}
       {truncado && (
         <>
-          <Line points={zig} color={BAJA} lineWidth={3} />
+          <CurvaTubo puntos={zig} color={BAJA} grosor={0.054} />
           <Etiqueta pos={[-0.75, H_BARRAS + 0.42, 0]} col={`${BAJA}aa`} df={9}>
             <i className="fa-solid fa-scissors" style={{ color: BAJA }} />
             El eje empieza en {fmtValor(caso, ejeMin, decEje)}
@@ -390,7 +391,7 @@ function Curva({ curva, log }: { curva: (typeof CURVAS)[number]; log: boolean })
     listo.current = true;
   });
 
-  return <Line ref={ref} points={inicial} color={curva.color} lineWidth={4} />;
+  return <CurvaTubo puntos={inicial} color={curva.color} grosor={0.072} />;
 }
 
 function EscenaLog({ log, modoColor }: { log: boolean; modoColor: string }) {

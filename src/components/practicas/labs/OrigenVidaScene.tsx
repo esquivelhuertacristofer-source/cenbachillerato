@@ -20,10 +20,13 @@
  */
 
 import * as THREE from "three";
-import { useRef, type ReactNode } from "react";
+import { useMemo, useRef, type ReactNode } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Environment, Lightformer, Html, Line, Stars } from "@react-three/drei";
+import { OrbitControls, Html, Stars } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { VIDRIO_FINO, perfilMatrazBola } from "./_vidrio";
+import { Escenario } from "./_escenario";
+import { CurvaTubo } from "./_tablero";
 import {
   type Modo,
   type Ambiente,
@@ -71,22 +74,37 @@ function Tubo({ a, b, r = 0.16, color = "#bfe6ff", opacity = 0.22 }: { a: Pt; b:
   return (
     <mesh position={pos} quaternion={quat}>
       <cylinderGeometry args={[r, r, len, 18, 1, true]} />
-      <meshStandardMaterial color={color} transparent opacity={opacity} roughness={0.12} metalness={0.05} side={THREE.DoubleSide} depthWrite={false} />
+      {/* Reflejo de barniz: es lo que hace que un tubo fino se lea como
+          cristal y no como un cilindro de plastico coloreado. */}
+      <meshPhysicalMaterial color={color} transparent opacity={opacity} roughness={0.1} metalness={0} clearcoat={1} clearcoatRoughness={0.1} envMapIntensity={1.2} side={THREE.DoubleSide} depthWrite={false} />
     </mesh>
   );
 }
 
-/* ── Matraz de vidrio (esfera + cuello) ───────────────────────────────── */
+/* ── Matraz de vidrio (una sola pieza soplada) ────────────────────────── */
+/**
+ * El aparato de Miller-Urey de 1953 son dos matraces de balón conectados, y
+ * aquí cada uno eran una ESFERA y un CILINDRO pegados: se veía la juntura
+ * justo donde el matraz de verdad tiene su hombro curvo, que es la parte que
+ * lo hace reconocible en la fotografía del experimento.
+ *
+ * `perfilMatrazBola` da la silueta entera —balón, hombro, cuello y labio— y
+ * `latheGeometry` la gira. Sale una pieza con menos triángulos que las dos que
+ * sustituye.
+ *
+ * Vidrio de mezcla y no `transmission`: dentro hay burbujas y agua
+ * translúcidas, y a través de un material con transmisión sólo se ve lo opaco
+ * (la regla está en `_vidrio.tsx`). El matraz saldría lleno de nada.
+ */
 function Matraz({ pos, r, tint = "#bfe6ff" }: { pos: Pt; r: number; tint?: string }) {
+  /* El perfil nace en el centro de la esfera, igual que la esfera que había:
+   * el grupo no se mueve y todo lo de dentro sigue donde estaba. */
+  const perfil = useMemo(() => perfilMatrazBola(r, 1.05, r * 0.32), [r]);
   return (
     <group position={pos}>
-      <mesh>
-        <sphereGeometry args={[r, 32, 32]} />
-        <meshStandardMaterial color={tint} transparent opacity={0.12} roughness={0.08} metalness={0.05} side={THREE.DoubleSide} depthWrite={false} />
-      </mesh>
-      <mesh position={[0, r + 0.35, 0]}>
-        <cylinderGeometry args={[r * 0.32, r * 0.32, 0.7, 18, 1, true]} />
-        <meshStandardMaterial color={tint} transparent opacity={0.16} roughness={0.08} side={THREE.DoubleSide} depthWrite={false} />
+      <mesh castShadow>
+        <latheGeometry args={[perfil, 48]} />
+        <meshPhysicalMaterial {...VIDRIO_FINO} color={tint} opacity={0.2} />
       </mesh>
     </group>
   );
@@ -151,7 +169,7 @@ function Chispa({ on }: { on: boolean }) {
   return (
     <group>
       <group ref={g}>
-        <Line points={pts} color="#dbeafe" lineWidth={3.5} />
+        <CurvaTubo puntos={pts} color="#dbeafe" grosor={0.063} />
       </group>
       <pointLight ref={lt} position={[0, 2.6, 0]} color="#7dd3fc" intensity={0} distance={7} />
     </group>
@@ -305,7 +323,7 @@ function Rayo({ playing }: { playing: boolean }) {
   ];
   return (
     <group ref={g}>
-      <Line points={pts} color="#fef08a" lineWidth={4} />
+      <CurvaTubo puntos={pts} color="#fef08a" grosor={0.072} />
       <pointLight position={[-1.3, 2.4, 0]} color="#fde047" intensity={playing ? 2.5 : 0} distance={8} />
     </group>
   );
@@ -507,7 +525,7 @@ function MundoArn({ playing }: { playing: boolean }) {
       </group>
 
       {/* ribozima */}
-      <Line points={path} color="#c084fc" lineWidth={3} transparent opacity={0.6} />
+      <CurvaTubo puntos={path} color="#c084fc" grosor={0.054} />
       {beads}
       {/* sitio catalítico: dos sustratos que se unen */}
       <ReaccionRibozima playing={playing} />
@@ -561,19 +579,16 @@ function Contenido(props: OrigenVidaSceneProps) {
 
   return (
     <>
-      <color attach="background" args={["#040912"]} />
-      <fog attach="fog" args={["#040912", 16, 42]} />
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[6, 9, 6]} intensity={1.4} castShadow shadow-mapSize={[1024, 1024]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* Sin altura: esta escena no tenía sombra de la que leerla, así
+          que el escenario la MIDE de la propia escena al montarse, en
+          vez de que alguien la adivine. */}
+      <Escenario acento={props.accent} mesa={false} niebla={false} />
       <directionalLight position={[-6, 4, -4]} intensity={0.5} color={modoColor} />
       <Stars radius={70} depth={30} count={1100} factor={3} fade speed={0.5} />
 
       <group ref={giro} key={`${modo}-${ambiente}-${resetNonce}`}>{mundo}</group>
 
-      <Environment resolution={128}>
-        <Lightformer form="rect" intensity={1.1} position={[0, 6, 4]} scale={8} color="#bcd4ff" />
-        <Lightformer form="rect" intensity={0.7} position={[5, 0, -4]} scale={6} color={modoColor} />
-      </Environment>
       <OrbitControls enablePan={false} minDistance={7} maxDistance={30} autoRotate={false} />
       <EffectComposer>
         <Bloom intensity={0.6} luminanceThreshold={0.2} mipmapBlur />

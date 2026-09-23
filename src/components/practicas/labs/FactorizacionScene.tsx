@@ -18,6 +18,7 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls, ContactShadows, Environment, Lightformer, Line, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { XLEN, desarrolla } from "./factorizacion-data";
+import { CurvaTubo } from "./_tablero";
 
 export interface FactorizacionSceneProps {
   p: number;
@@ -152,8 +153,8 @@ export default function FactorizacionScene(props: FactorizacionSceneProps) {
 
         {/* Contorno del rectángulo y guías de los lados */}
         <Line points={M.outline} color="#eaf4ff" lineWidth={2} transparent opacity={0.5} />
-        <Line points={M.ladoAncho} color={accent} lineWidth={3.5} />
-        <Line points={M.ladoAlto} color={TEAL} lineWidth={3.5} />
+        <CurvaTubo puntos={M.ladoAncho} color={accent} grosor={0.063} />
+        <CurvaTubo puntos={M.ladoAlto} color={TEAL} grosor={0.063} />
 
         {/* Etiqueta del lado ancho = x + p */}
         <Html center position={M.labAncho} distanceFactor={13} pointerEvents="none">

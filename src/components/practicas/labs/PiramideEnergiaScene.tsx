@@ -18,9 +18,10 @@
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Edges, Html } from "@react-three/drei";
+import { OrbitControls, Edges, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { NIVELES, N_NIVELES, flujo, fmtKcal, fmtPct } from "./piramide-energia-data";
+import { Escenario } from "./_escenario";
 
 export interface PiramideEnergiaSceneProps {
   e0: number;
@@ -203,7 +204,6 @@ function Piramide({ e0, eficPct, accent, pausado }: { e0: number; eficPct: numbe
         </div>
       </Html>
 
-      <ContactShadows position={[0, 0.0, 0]} opacity={0.34} scale={W_BASE * 2.4} blur={2.4} far={6} />
     </group>
   );
 }
@@ -226,31 +226,16 @@ function Contenido(props: PiramideEnergiaSceneProps) {
   const { e0, eficPct, accent, pausado, autoRotate, resetNonce } = props;
   return (
     <>
-      <color attach="background" args={["#03101f"]} />
-      <fog attach="fog" args={["#03101f", 22, 48]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={accent} suelo={0.0} />
 
-      <ambientLight intensity={0.55} />
-      <directionalLight
-        position={[6, 12, 6]}
-        intensity={1.4}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-near={1}
-        shadow-camera-far={36}
-        shadow-bias={-0.0004}
-      />
-      <pointLight position={[-5, 6, 4]} intensity={2.6} color="#ffd24a" />
 
       <group key={`${resetNonce}`}>
         <Piramide e0={e0} eficPct={eficPct} accent={accent} pausado={pausado} />
       </group>
 
-      <Environment resolution={256}>
-        <Lightformer intensity={1.4} position={[0, 8, 3]} scale={[12, 4, 1]} color="#ffffff" />
-        <Lightformer intensity={1.0} position={[-8, 3, -2]} scale={[5, 6, 1]} color={accent} />
-        <Lightformer intensity={1.0} position={[8, 2, 4]} scale={[4, 5, 1]} color="#bfe8ff" />
-      </Environment>
 
       <OrbitControls
         enablePan={false}

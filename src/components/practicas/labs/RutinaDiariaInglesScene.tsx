@@ -20,9 +20,10 @@
 import * as THREE from "three";
 import { useMemo, useRef, type ReactNode, type RefObject } from "react";
 import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
-import { OrbitControls, Environment, Lightformer, Html } from "@react-three/drei";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { type Adverbio, ACCIONES, HABITOS, ESCALA, DIAS_SEMANA, cuentaDias, porcentaje, adverbiosAceptados, horaDigital, hora12Texto, preguntaFrecuencia } from "./rutina-diaria-ingles-data";
+import { Escenario } from "./_escenario";
 
 export type VistaRutina = "dia" | "hora" | "frecuencia";
 
@@ -294,8 +295,6 @@ function CicloDia({ tiempoRef, paso }: { tiempoRef: RefObject<number>; paso: num
   });
   return (
     <>
-      <ambientLight ref={amb} intensity={0.5} />
-      <directionalLight ref={dir} position={[4, 9, 6]} intensity={1.1} castShadow shadow-mapSize={[1024, 1024]} shadow-camera-left={-11} shadow-camera-right={11} shadow-camera-top={9} shadow-camera-bottom={-9} />
       <mesh ref={sol} geometry={ESFERA} scale={0.85}>
         <meshBasicMaterial color="#ffe6a3" toneMapped={false} />
         <mesh geometry={ESFERA} scale={1.9}>
@@ -1198,8 +1197,11 @@ export default function RutinaDiariaInglesScene(p: RutinaSceneProps) {
 
   return (
     <Canvas key={`${vista}-${resetNonce}`} shadows dpr={[1, 1.75]} camera={{ position: cam.pos, fov: 42 }} gl={{ antialias: true }}>
-      <color attach="background" args={[vista === "dia" ? "#050b1a" : "#040a16"]} />
-      <fog attach="fog" args={[vista === "dia" ? "#050b1a" : "#040a16", 24, 48]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* Sin altura: esta escena no tenía sombra de la que leerla, así
+          que el escenario la MIDE de la propia escena al montarse, en
+          vez de que alguien la adivine. */}
+      <Escenario acento="#38bdf8" />
       {vista !== "dia" && (
         <>
           <ambientLight intensity={0.6} />
@@ -1207,10 +1209,6 @@ export default function RutinaDiariaInglesScene(p: RutinaSceneProps) {
           <pointLight position={[-6, 3, 5]} intensity={0.5} color={modoColor} />
         </>
       )}
-      <Environment resolution={128}>
-        <Lightformer form="rect" intensity={1.3} position={[0, 5, -6]} scale={[10, 6, 1]} color="#93c5fd" />
-        <Lightformer form="rect" intensity={0.7} position={[-6, 0, 4]} scale={[6, 6, 1]} color={modoColor} />
-      </Environment>
 
       {vista === "dia" && <EscenaDia colocados={p.colocados} paso={p.paso} burbuja={p.burbuja} modoColor={modoColor} />}
       {vista === "hora" && (

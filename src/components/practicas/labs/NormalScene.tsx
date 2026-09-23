@@ -20,8 +20,10 @@
 import * as THREE from "three";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Line, Html } from "@react-three/drei";
+import { OrbitControls, Line, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Escenario } from "./_escenario";
+import { CurvaTubo } from "./_tablero";
 import {
   presetPorId,
   curvaNormal,
@@ -399,7 +401,7 @@ function Plano({ presetId, accent, modo, mu, sigma, a, b, pausado, arrastrable, 
       )}
 
       {/* la campana f(x) */}
-      <Line points={curva.map(([x, y]) => w3(x, y, 0.06))} color={accent} lineWidth={4} />
+      <CurvaTubo puntos={curva.map(([x, y]) => w3(x, y, 0.06))} color={accent} grosor={0.072} />
 
       {/* punto viajero */}
       {curva.length >= 2 && (
@@ -442,7 +444,6 @@ function Plano({ presetId, accent, modo, mu, sigma, a, b, pausado, arrastrable, 
         </>
       )}
 
-      <ContactShadows position={[0, OY - 0.4, 0]} opacity={0.26} scale={BOARD_W + 6} blur={2.4} far={6} />
     </group>
   );
 }
@@ -466,21 +467,11 @@ function Contenido(props: NormalSceneProps) {
   const [dragging, setDragging] = useState(false);
   return (
     <>
-      <color attach="background" args={["#03101f"]} />
-      <fog attach="fog" args={["#03101f", 26, 54]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={accent} suelo={-BOARD_H / 2 - 0.4} />
 
-      <ambientLight intensity={0.6} />
-      <directionalLight
-        position={[4, 8, 9]}
-        intensity={1.3}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-near={1}
-        shadow-camera-far={36}
-        shadow-bias={-0.0004}
-      />
-      <pointLight position={[0, 0, 8]} intensity={2.4} color="#ffffff" />
 
       <group key={`${resetNonce}`}>
         <Plano
@@ -490,11 +481,6 @@ function Contenido(props: NormalSceneProps) {
         />
       </group>
 
-      <Environment resolution={256}>
-        <Lightformer intensity={1.4} position={[0, 7, 6]} scale={[16, 5, 1]} color="#ffffff" />
-        <Lightformer intensity={1.0} position={[-9, 3, 2]} scale={[5, 6, 1]} color={accent} />
-        <Lightformer intensity={1.0} position={[9, 2, 4]} scale={[4, 5, 1]} color="#bfe8ff" />
-      </Environment>
 
       <OrbitControls
         enablePan={false}

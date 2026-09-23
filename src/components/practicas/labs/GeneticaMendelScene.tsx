@@ -14,9 +14,10 @@
 import * as THREE from "three";
 import { useRef, type ReactNode } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Environment, Lightformer, Html, Stars } from "@react-three/drei";
+import { OrbitControls, Html, Stars } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { T, OK } from "./_kit";
+import { Escenario } from "./_escenario";
 import {
   type Modo, type Geno1, type GenoDi, type GenoMadre, type GenoPadre, type Herencia,
   resolverMono, resolverDi, resolverLig, HERENCIAS, FENO_DI,
@@ -300,10 +301,11 @@ function Contenido(props: GeneticaMendelSceneProps) {
   const { modo, playing, accent, resetNonce } = props;
   return (
     <>
-      <color attach="background" args={["#040912"]} />
-      <fog attach="fog" args={["#040912", 16, 34]} />
-      <ambientLight intensity={0.55} />
-      <directionalLight position={[6, 8, 10]} intensity={1.1} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* Sin altura: esta escena no tenía sombra de la que leerla, así
+          que el escenario la MIDE de la propia escena al montarse, en
+          vez de que alguien la adivine. */}
+      <Escenario acento={accent} mesa={false} niebla={false} />
       <directionalLight position={[-8, -4, 4]} intensity={0.35} color={accent} />
       <Stars radius={80} depth={40} count={1400} factor={3} saturation={0} fade speed={0.6} />
 
@@ -319,10 +321,6 @@ function Contenido(props: GeneticaMendelSceneProps) {
         )}
       </group>
 
-      <Environment resolution={128}>
-        <Lightformer form="rect" intensity={1.2} position={[0, 4, 6]} scale={[10, 6, 1]} color="#bcd4ff" />
-        <Lightformer form="rect" intensity={0.7} position={[-6, 0, 4]} scale={[6, 6, 1]} color={accent} />
-      </Environment>
 
       <OrbitControls
         makeDefault

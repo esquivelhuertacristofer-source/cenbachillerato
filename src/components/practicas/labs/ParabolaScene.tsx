@@ -25,8 +25,10 @@ import * as THREE from "three";
 import { useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import type { ThreeEvent } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Line, Html } from "@react-three/drei";
+import { OrbitControls, Line, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Escenario } from "./_escenario";
+import { CurvaTubo } from "./_tablero";
 import {
   evalH, vertice, raices, aterrizaje, GOL, fmtNum,
   B_MIN, B_MAX, B_STEP, C_MIN, C_MAX, C_STEP,
@@ -253,7 +255,7 @@ function Trayectoria({ a, b, c, showGol, accent, pausado, arrastrable, onVertice
       </points>
 
       {/* curva (parábola) */}
-      <Line points={curva} color={accent} lineWidth={4} />
+      <CurvaTubo puntos={curva} color={accent} grosor={0.072} />
 
       {/* vértice + guías */}
       {vertVisible && (
@@ -363,7 +365,6 @@ function Trayectoria({ a, b, c, showGol, accent, pausado, arrastrable, onVertice
         <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.35} metalness={0.1} roughness={0.4} />
       </mesh>
 
-      <ContactShadows position={[0, 0.01, 0]} opacity={0.32} scale={SCENE_W + 6} blur={2.4} far={6} />
     </group>
   );
 }
@@ -387,21 +388,11 @@ function Contenido(props: ParabolaSceneProps) {
   const [dragging, setDragging] = useState(false);
   return (
     <>
-      <color attach="background" args={["#03101f"]} />
-      <fog attach="fog" args={["#03101f", 24, 50]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={accent} suelo={0.01} />
 
-      <ambientLight intensity={0.55} />
-      <directionalLight
-        position={[5, 11, 7]}
-        intensity={1.4}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-near={1}
-        shadow-camera-far={34}
-        shadow-bias={-0.0004}
-      />
-      <pointLight position={[0, 6, 5]} intensity={3.5} color="#ffffff" />
 
       <group key={`${resetNonce}`}>
         <Trayectoria
@@ -411,11 +402,6 @@ function Contenido(props: ParabolaSceneProps) {
         />
       </group>
 
-      <Environment resolution={256}>
-        <Lightformer intensity={1.5} position={[0, 7, 3]} scale={[15, 4, 1]} color="#ffffff" />
-        <Lightformer intensity={1.0} position={[-9, 3, -2]} scale={[5, 6, 1]} color={accent} />
-        <Lightformer intensity={1.0} position={[9, 2, 4]} scale={[4, 5, 1]} color="#bfe8ff" />
-      </Environment>
 
       <OrbitControls
         enabled={!dragging}

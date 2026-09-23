@@ -14,8 +14,9 @@
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer } from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Escenario } from "./_escenario";
 
 export interface ElectricidadSceneProps {
   conduce: boolean;
@@ -232,21 +233,11 @@ export default function EnergiaElectricidadScene(props: ElectricidadSceneProps) 
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
       camera={{ position: [0, 0.3, 11], fov: 44 }}
     >
-      <color attach="background" args={["#03101f"]} />
-      <fog attach="fog" args={["#03101f", 16, 38]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={props.accent} suelo={-3.4} />
 
-      <ambientLight intensity={0.5} />
-      <directionalLight
-        position={[4, 8, 6]}
-        intensity={1.9}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-near={1}
-        shadow-camera-far={30}
-        shadow-bias={-0.0004}
-      />
-      <pointLight position={[-6, 3, 3]} intensity={14} color={props.accent} />
 
       <group key={`${props.resetNonce}`}>
         {/* Cables (con huecos para el interruptor y el material) */}
@@ -271,14 +262,8 @@ export default function EnergiaElectricidadScene(props: ElectricidadSceneProps) 
         <MaterialPrueba color={props.materialColor} conductor={props.materialConductor} />
         <ElectronesFlujo conduce={props.conduce} voltaje={props.voltaje} />
 
-        <ContactShadows position={[0, -3.4, 0]} opacity={0.32} scale={16} blur={3} far={6} color="#2a3f57" />
       </group>
 
-      <Environment resolution={256}>
-        <Lightformer intensity={1.9} position={[0, 5, 2]} scale={[10, 4, 1]} color="#ffffff" />
-        <Lightformer intensity={1.3} position={[-6, 2, -2]} scale={[6, 6, 1]} color={props.accent} />
-        <Lightformer intensity={1.0} position={[6, 1, 3]} scale={[5, 5, 1]} color="#bfe8ff" />
-      </Environment>
 
       <OrbitControls
         enablePan={false}

@@ -14,9 +14,10 @@
 
 import { useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Line, Html } from "@react-three/drei";
+import { OrbitControls, Line, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { N_MIN, N_MAX, logPos, REFERENCIAS, fmtA } from "./notacion-data";
+import { Escenario } from "./_escenario";
 
 export interface NotacionSceneProps {
   a: number;
@@ -76,22 +77,11 @@ export default function NotacionScene(props: NotacionSceneProps) {
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
       camera={{ position: [7.5, 1.5, 13.5], fov: 42 }}
     >
-      <color attach="background" args={["#03101f"]} />
-      <fog attach="fog" args={["#03101f", 24, 52]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={accent} suelo={-H / 2 - 0.5} />
 
-      <ambientLight intensity={0.6} />
-      <directionalLight
-        position={[5, 9, 7]}
-        intensity={1.7}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-near={1}
-        shadow-camera-far={40}
-        shadow-bias={-0.0004}
-      />
-      <pointLight position={[-7, 4, 5]} intensity={9} color={accent} />
-      <pointLight position={[6, -3, 5]} intensity={5} color="#bfe8ff" />
 
       <group key={props.resetNonce}>
         {/* Eje vertical de la torre */}
@@ -161,14 +151,8 @@ export default function NotacionScene(props: NotacionSceneProps) {
           </Chip>
         </group>
 
-        <ContactShadows position={[0, -H / 2 - 0.5, 0]} opacity={0.22} scale={16} blur={3} far={6} color="#16263a" />
       </group>
 
-      <Environment resolution={256}>
-        <Lightformer intensity={2.0} position={[0, 6, 3]} scale={[10, 5, 1]} color="#ffffff" />
-        <Lightformer intensity={1.3} position={[-7, 0, -2]} scale={[5, 10, 1]} color={accent} />
-        <Lightformer intensity={1.0} position={[7, -2, 3]} scale={[5, 8, 1]} color="#bfe8ff" />
-      </Environment>
 
       <OrbitControls
         enablePan={false}

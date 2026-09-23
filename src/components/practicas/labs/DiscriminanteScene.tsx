@@ -22,9 +22,10 @@
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Html, Line } from "@react-three/drei";
+import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { calcDiscriminante, calcAltura, CASOS, type Caso } from "./discriminante-data";
+import { Escenario } from "./_escenario";
 
 export interface DiscriminanteSceneProps {
   a: number;
@@ -312,26 +313,17 @@ function Grafica({ a, b, c, k, accent, pausado }: Omit<DiscriminanteSceneProps, 
 function Contenido({ a, b, c, k, accent, pausado, autoRotate, resetNonce }: DiscriminanteSceneProps) {
   return (
     <>
-      <color attach="background" args={["#06101f"]} />
-      <fog attach="fog" args={["#06101f", 16, 34]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={accent} suelo={-3.4} />
 
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[5, 9, 6]} intensity={1.4} castShadow shadow-mapSize={[1024, 1024]} shadow-camera-far={30} />
-      <pointLight position={[-6, 4, -4]} intensity={0.5} color={accent} />
 
       <group key={`${resetNonce}`}>
         <Grafica a={a} b={b} c={c} k={k} accent={accent} pausado={pausado} />
       </group>
 
-      <ContactShadows position={[0, -3.4, 0]} opacity={0.35} scale={18} blur={2.6} far={6} />
 
-      <Environment resolution={128}>
-        <group>
-          <Lightformer intensity={1.5} position={[0, 6, 2]} scale={9} color="#eaf1ff" />
-          <Lightformer intensity={0.8} position={[5, 2, 1]} scale={5} color="#cfe0ff" />
-          <Lightformer intensity={0.6} position={[-5, 1, -2]} scale={5} color="#bfa9ff" />
-        </group>
-      </Environment>
 
       <OrbitControls
         makeDefault

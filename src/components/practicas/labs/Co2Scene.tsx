@@ -17,8 +17,9 @@
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer } from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Escenario } from "./_escenario";
 
 export interface Co2SceneProps {
   volCO2mL: number; // volumen final de CO₂ (mL)
@@ -199,26 +200,18 @@ function Contenido({ volCO2mL, progreso, reaccionando, colorGlobo, accent, reset
   const sig = `${resetNonce}`;
   return (
     <>
-      <color attach="background" args={["#04111c"]} />
-      <fog attach="fog" args={["#04111c", 16, 44]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={accent} suelo={-H_BOT / 2 - 0.05} />
 
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[5, 9, 7]} intensity={1.9} castShadow shadow-mapSize={[2048, 2048]} shadow-camera-far={30} shadow-bias={-0.0004} />
-      <pointLight position={[-5, 3, 4]} intensity={8} color={accent} />
-      <pointLight position={[4, 2, 5]} intensity={6} color="#ffffff" />
 
       <group key={sig} position={[0, -0.4, 0]}>
         <Frasco />
         <Burbujas activo={reaccionando} />
         <Globo volCO2mL={volCO2mL} progreso={progreso} colorGlobo={colorGlobo} />
-        <ContactShadows position={[0, -H_BOT / 2 - 0.05, 0]} opacity={0.34} scale={12} blur={2.6} far={6} color="#10283e" />
       </group>
 
-      <Environment resolution={256}>
-        <Lightformer intensity={1.9} position={[0, 5, 4]} scale={[10, 4, 1]} color="#ffffff" />
-        <Lightformer intensity={1.3} position={[-6, 2, -2]} scale={[5, 5, 1]} color={accent} />
-        <Lightformer intensity={1.0} position={[6, 1, 3]} scale={[4, 4, 1]} color="#bfe8ff" />
-      </Environment>
 
       <OrbitControls makeDefault enablePan={false} minDistance={5} maxDistance={16} minPolarAngle={Math.PI / 6} maxPolarAngle={Math.PI / 1.7} target={[0, 0.6, 0]} />
 

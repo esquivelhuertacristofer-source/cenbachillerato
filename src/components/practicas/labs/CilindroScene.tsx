@@ -17,6 +17,7 @@ import { OrbitControls, ContactShadows, Environment, Lightformer, Line, Html } f
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { DoubleSide } from "three";
 import { litros, fmtNum } from "./cilindro-data";
+import { CurvaTubo } from "./_tablero";
 
 export interface CilindroSceneProps {
   r: number; // radio en metros
@@ -142,7 +143,7 @@ export default function CilindroScene(props: CilindroSceneProps) {
         <Line points={L.baseCirc} color={accent} lineWidth={2.5} />
 
         {/* Guías de medida */}
-        <Line points={L.lineaRadio} color={accent} lineWidth={3} />
+        <CurvaTubo puntos={L.lineaRadio} color={accent} grosor={0.054} />
         <Line points={L.lineaAltura} color="#cfe2f5" lineWidth={2.5} />
         <Line points={L.topAltura} color="#cfe2f5" lineWidth={2.5} />
         <Line points={L.botAltura} color="#cfe2f5" lineWidth={2.5} />

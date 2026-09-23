@@ -19,9 +19,10 @@
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Html } from "@react-three/drei";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { biomaDe, BIOMAS, TEMP_MIN, TEMP_MAX, PRECIP_MAX, type Bioma } from "./biomas-data";
+import { Escenario } from "./_escenario";
 
 export interface BiomasSceneProps {
   temp: number;
@@ -262,7 +263,6 @@ function Diorama(props: BiomasSceneProps) {
 
   return (
     <group>
-      <ContactShadows position={[0, -0.22, 0]} opacity={0.4} scale={12} blur={2.4} far={6} />
 
       <group ref={disco}>
         {/* SUELO del diorama */}
@@ -338,32 +338,16 @@ function Contenido(props: BiomasSceneProps) {
   const { accent, autoRotate, resetNonce } = props;
   return (
     <>
-      <color attach="background" args={["#06182c"]} />
-      <fog attach="fog" args={["#06182c", 16, 42]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={accent} suelo={-0.22} />
 
-      <ambientLight intensity={0.6} />
-      <directionalLight
-        position={[-4.6, 4.4, 2.2]}
-        intensity={1.6}
-        color="#fff2cc"
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-near={1}
-        shadow-camera-far={30}
-        shadow-bias={-0.0004}
-      />
-      <pointLight position={[5, 2, 5]} intensity={0.4} color={accent} />
 
       <group key={`${resetNonce}`}>
         <Diorama {...props} />
       </group>
 
-      <Environment resolution={256}>
-        <Lightformer intensity={1.1} position={[0, 8, 4]} scale={[12, 4, 1]} color="#ffffff" />
-        <Lightformer intensity={0.7} position={[-8, 2, -2]} scale={[5, 6, 1]} color={accent} />
-        <Lightformer intensity={0.7} position={[8, 1, 5]} scale={[5, 5, 1]} color="#bfe8ff" />
-      </Environment>
 
       <OrbitControls
         enablePan={false}

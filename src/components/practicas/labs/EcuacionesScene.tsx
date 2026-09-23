@@ -18,6 +18,7 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls, ContactShadows, Environment, Lightformer, Line, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { total, fmtNum } from "./ecuaciones-data";
+import { CurvaTubo } from "./_tablero";
 
 export interface EcuacionesSceneProps {
   a: number;
@@ -185,7 +186,7 @@ export default function EcuacionesScene(props: EcuacionesSceneProps) {
         </Html>
 
         {/* Marcador del fin actual de la barra */}
-        <Line points={M.endLine} color={accent} lineWidth={3} />
+        <CurvaTubo puntos={M.endLine} color={accent} grosor={0.054} />
         <Html center position={M.labEnd} distanceFactor={15} pointerEvents="none">
           <div style={{ fontWeight: 900, fontSize: 15, color: M.resuelto ? "#34D399" : accent, textShadow: "0 2px 12px rgba(0,0,0,0.9)", whiteSpace: "nowrap", background: "rgba(2,12,28,0.55)", padding: "2px 9px", borderRadius: 7 }}>
             {fmtNum(totalActual)} {M.resuelto ? "✓" : ""}

@@ -22,8 +22,10 @@
 import * as THREE from "three";
 import { useEffect, useMemo, useRef, type ReactNode, type RefObject } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Environment, Lightformer, Html, Line } from "@react-three/drei";
+import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Escenario } from "./_escenario";
+import { CurvaTubo } from "./_tablero";
 import {
   type ZonaId,
   type ViajeParcela,
@@ -476,7 +478,7 @@ function EscenaAtmosfera({ zKm, vuelo, modoColor }: { zKm: number; vuelo: "suelo
           <meshBasicMaterial color="#1e293b" />
         </mesh>
       ))}
-      <Line points={PERFIL_T} color="#fb923c" lineWidth={3} />
+      <CurvaTubo puntos={PERFIL_T} color="#fb923c" grosor={0.054} />
       <mesh ref={puntoT} position={[xTemp(e.tC), yAtm(zKm), 0.05]}>
         <sphereGeometry args={[0.09, 16, 12]} />
         <meshBasicMaterial color="#fff7ed" toneMapped={false} />
@@ -1134,15 +1136,12 @@ export default function HidrosferaAtmosferaScene(p: HidrosferaAtmosferaSceneProp
 
   return (
     <Canvas key={`${vista}-${resetNonce}`} shadows dpr={[1, 1.75]} camera={{ position: cam.pos, fov: 42 }} gl={{ antialias: true }}>
-      <color attach="background" args={["#040a16"]} />
-      <fog attach="fog" args={["#040a16", 26, 60]} />
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[4, 9, 6]} intensity={1.15} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* Sin altura: esta escena no tenía sombra de la que leerla, así
+          que el escenario la MIDE de la propia escena al montarse, en
+          vez de que alguien la adivine. */}
+      <Escenario acento="#38bdf8" />
       <pointLight position={[-6, 3, 5]} intensity={0.4} color={modoColor} />
-      <Environment resolution={128}>
-        <Lightformer form="rect" intensity={1.5} position={[0, 5, -6]} scale={[10, 6, 1]} color="#93c5fd" />
-        <Lightformer form="rect" intensity={0.8} position={[-6, 0, 4]} scale={[6, 6, 1]} color={modoColor} />
-      </Environment>
 
       {vista === "atmosfera" && <EscenaAtmosfera zKm={p.zKm} vuelo={p.vuelo} modoColor={modoColor} />}
       {vista === "oceano" && <EscenaOceano zonaId={p.zonaId} profCTD={p.profCTD} masaT={p.masaT} masaS={p.masaS} masaNonce={p.masaNonce} hieloNonce={p.hieloNonce} />}

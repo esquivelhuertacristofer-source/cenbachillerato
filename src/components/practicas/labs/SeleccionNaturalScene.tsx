@@ -20,9 +20,10 @@
 import * as THREE from "three";
 import { useRef, type ReactNode } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Environment, Lightformer, Html, Stars } from "@react-three/drei";
+import { OrbitControls, Html, Stars } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { T } from "./_kit";
+import { Escenario } from "./_escenario";
 import {
   type Modo,
   type Pt,
@@ -282,10 +283,11 @@ function Contenido(props: SeleccionNaturalSceneProps) {
   const bg = modo === "conejos" ? cielo : "#040912";
   return (
     <>
-      <color attach="background" args={[bg]} />
-      <fog attach="fog" args={[bg, 18, 46]} />
-      <ambientLight intensity={0.62} />
-      <directionalLight position={[6, 10, 8]} intensity={1.15} castShadow />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* Sin altura: esta escena no tenía sombra de la que leerla, así
+          que el escenario la MIDE de la propia escena al montarse, en
+          vez de que alguien la adivine. */}
+      <Escenario acento={accent} fondo={bg} mesa={false} niebla={false} />
       <directionalLight position={[-8, 4, -6]} intensity={0.4} color={accent} />
       {modo !== "conejos" && <Stars radius={80} depth={40} count={1100} factor={3} saturation={0} fade speed={0.5} />}
 
@@ -295,10 +297,6 @@ function Contenido(props: SeleccionNaturalSceneProps) {
         {modo === "evidencias" && <MundoEvidencias animalSel={animalSel} playing={playing} />}
       </group>
 
-      <Environment resolution={128}>
-        <Lightformer form="rect" intensity={1.2} position={[0, 5, 6]} scale={[12, 6, 1]} color="#bcd4ff" />
-        <Lightformer form="rect" intensity={0.7} position={[-6, 1, 4]} scale={[6, 6, 1]} color={accent} />
-      </Environment>
 
       <OrbitControls
         makeDefault

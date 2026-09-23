@@ -17,9 +17,10 @@
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer } from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { ELEMS_O, type Elem, type AtomLocal, type BondLocal } from "./organica-data";
+import { Escenario } from "./_escenario";
 
 export interface OrganicaSceneProps {
   molId: string;
@@ -132,24 +133,16 @@ function Contenido({ molId, atoms, bonds, accent, fgColor, resaltarFG, girar, au
   const sig = `${molId}-${resetNonce}`;
   return (
     <>
-      <color attach="background" args={["#041018"]} />
-      <fog attach="fog" args={["#041018", 14, 40]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={accent} suelo={-2.6} />
 
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[5, 9, 7]} intensity={1.9} castShadow shadow-mapSize={[2048, 2048]} shadow-camera-far={30} shadow-bias={-0.0004} />
-      <pointLight position={[-5, 3, 4]} intensity={9} color={accent} />
-      <pointLight position={[5, 2, 5]} intensity={6} color="#ffffff" />
 
       <group key={sig} position={[0, 0.1, 0]}>
         <Molecula atoms={atoms} bonds={bonds} resaltarFG={resaltarFG} fgColor={fgColor} girar={girar} />
-        <ContactShadows position={[0, -2.6, 0]} opacity={0.3} scale={14} blur={2.6} far={6} color="#16314a" />
       </group>
 
-      <Environment resolution={256}>
-        <Lightformer intensity={1.9} position={[0, 5, 4]} scale={[10, 4, 1]} color="#ffffff" />
-        <Lightformer intensity={1.3} position={[-6, 2, -2]} scale={[5, 5, 1]} color={accent} />
-        <Lightformer intensity={1.0} position={[6, 1, 3]} scale={[4, 4, 1]} color="#bfe8ff" />
-      </Environment>
 
       <OrbitControls
         makeDefault

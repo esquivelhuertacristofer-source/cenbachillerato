@@ -22,6 +22,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, ContactShadows, Environment, Lightformer, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { calcTri, fmtM, fmtDeg, type Triangulo } from "./ley-senos-cosenos-data";
+import { CurvaTubo } from "./_tablero";
 
 export interface LeySenosCosenosSceneProps {
   a: number;
@@ -201,14 +202,14 @@ function Escena({ g, accent, mostrarAngulos }: { g: Geo; accent: string; mostrar
 
       {/* ── Lados del triángulo ── */}
       {/* lado b: C→A */}
-      <Line points={[g.C, g.A]} color={B_COL} lineWidth={4} />
+      <CurvaTubo puntos={[g.C, g.A]} color={B_COL} grosor={0.072} />
       {/* lado a: C→B */}
-      <Line points={[g.C, g.B]} color={A_COL} lineWidth={4} />
+      <CurvaTubo puntos={[g.C, g.B]} color={A_COL} grosor={0.072} />
       {/* lado c (incógnita): A→B */}
-      <Line points={[g.A, g.B]} color={C_COL} lineWidth={5} />
+      <CurvaTubo puntos={[g.A, g.B]} color={C_COL} grosor={0.09} />
 
       {/* ── Arcos de ángulos ── */}
-      <Line points={g.arcC} color={ANGC_COL} lineWidth={3} />
+      <CurvaTubo puntos={g.arcC} color={ANGC_COL} grosor={0.054} />
       {mostrarAngulos && <Line points={g.arcA} color={ANG_COL} lineWidth={2.2} />}
       {mostrarAngulos && <Line points={g.arcB} color={ANG_COL} lineWidth={2.2} />}
 

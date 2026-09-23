@@ -15,9 +15,10 @@
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer } from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { ELEMS, type AtomoMol, type EnlaceMol, type ElementoQuim } from "./enlaces-data";
+import { Escenario } from "./_escenario";
 
 export interface EnlacesSceneProps {
   molKey: string;
@@ -161,33 +162,16 @@ export default function EnlacesQuimicosScene(props: EnlacesSceneProps) {
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
       camera={{ position: [0, 1.1, 5.4], fov: 45 }}
     >
-      <color attach="background" args={["#03101f"]} />
-      <fog attach="fog" args={["#03101f", 12, 24]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={props.accent} suelo={-2.2} />
 
-      <ambientLight intensity={0.55} />
-      <directionalLight
-        position={[4, 8, 4]}
-        intensity={2.2}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-near={1}
-        shadow-camera-far={24}
-        shadow-bias={-0.0004}
-      />
-      <pointLight position={[-4, 3, -3]} intensity={16} color={props.accent} />
-      <pointLight position={[3, 1, 4]} intensity={9} color="#ffffff" />
 
       <group position={[0, 0.15, 0]} key={key}>
         {props.ionico ? <Ionico atoms={props.atoms} /> : <Covalente atoms={props.atoms} bonds={props.bonds} />}
-        <ContactShadows position={[0, -2.2, 0]} opacity={0.34} scale={9} blur={2.8} far={5} color="#2a3f57" />
       </group>
 
-      <Environment resolution={256}>
-        <Lightformer intensity={2.0} position={[0, 5, 2]} scale={[9, 4, 1]} color="#ffffff" />
-        <Lightformer intensity={1.4} position={[-5, 2, -2]} scale={[5, 5, 1]} color={props.accent} />
-        <Lightformer intensity={1.1} position={[5, 1, 3]} scale={[4, 4, 1]} color="#bfe8ff" />
-      </Environment>
 
       <OrbitControls
         enablePan={false}

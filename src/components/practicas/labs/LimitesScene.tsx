@@ -22,8 +22,10 @@
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Html, Line } from "@react-three/drei";
+import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Escenario } from "./_escenario";
+import { CurvaTubo } from "./_tablero";
 import {
   caso, evalCaso, muestrear, conUnidad, cercania,
   type CasoId, type Vista,
@@ -128,7 +130,7 @@ function Curva({ casoId, v, color }: { casoId: CasoId; v: Vista; color: string }
   return (
     <>
       {polis.map((pts, i) =>
-        pts.length > 1 ? <Line key={i} points={pts} color={color} lineWidth={4.5} /> : null,
+        pts.length > 1 ? <CurvaTubo key={i} puntos={pts} color={color} grosor={0.081} /> : null,
       )}
     </>
   );
@@ -177,7 +179,7 @@ function Objetivo({ casoId, v }: { casoId: CasoId; v: Vista }) {
       {dentroX && dentroY && (
         c.hueco ? (
           <>
-            <Line points={anillo} color={HOLE_COL} lineWidth={3} />
+            <CurvaTubo puntos={anillo} color={HOLE_COL} grosor={0.054} />
             <Etiqueta pos={[S(c.a, c.L)[0] + 0.25, S(c.a, c.L)[1] + 0.5, 0.05]} color={HOLE_COL} size={11} bg="rgba(6,16,31,0.92)">
               f({c.a.toLocaleString("es-MX", { maximumFractionDigits: 1 })}) no existe (0/0)
             </Etiqueta>
@@ -247,12 +249,11 @@ function Contenido({ casoId, xPos, accent, resetNonce }: LimitesSceneProps) {
 
   return (
     <>
-      <color attach="background" args={["#08131f"]} />
-      <fog attach="fog" args={["#08131f", 22, 60]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={accent} suelo={-BY - 0.5} />
 
-      <ambientLight intensity={0.7} />
-      <directionalLight position={[5, 9, 11]} intensity={1.3} castShadow shadow-mapSize={[1024, 1024]} shadow-camera-far={40} />
-      <pointLight position={[-6, 4, 6]} intensity={0.5} color={accent} />
 
       <group key={`${casoId}-${resetNonce}`}>
         <Plano v={v} />
@@ -261,15 +262,7 @@ function Contenido({ casoId, xPos, accent, resetNonce }: LimitesSceneProps) {
         <Movil casoId={casoId} v={v} xPos={xPos} />
       </group>
 
-      <ContactShadows position={[0, -BY - 0.5, 0]} opacity={0.3} scale={24} blur={2.6} far={9} />
 
-      <Environment resolution={128}>
-        <group>
-          <Lightformer intensity={1.3} position={[0, 6, 8]} scale={10} color="#eaf1ff" />
-          <Lightformer intensity={0.7} position={[6, 2, 5]} scale={6} color="#cfe0ff" />
-          <Lightformer intensity={0.5} position={[-6, 3, 4]} scale={6} color="#ffd9b3" />
-        </group>
-      </Environment>
 
       <OrbitControls
         makeDefault

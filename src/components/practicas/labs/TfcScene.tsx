@@ -20,8 +20,10 @@
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Line, Html } from "@react-three/drei";
+import { OrbitControls, Line, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Escenario } from "./_escenario";
+import { CurvaTubo } from "./_tablero";
 import {
   funcionPorId,
   curvaF,
@@ -216,7 +218,7 @@ function Plano({ funcionId, accent, modo, b, n, pausado }: {
         })}
 
       {/* la curva y = f(x) */}
-      <Line points={curva.map(([x, y]) => w3(x, y, 0.03))} color={accent} lineWidth={4} />
+      <CurvaTubo puntos={curva.map(([x, y]) => w3(x, y, 0.03))} color={accent} grosor={0.072} />
       <Html position={w3(XMAX, fn.f(XMAX), 0.03)} center distanceFactor={14} pointerEvents="none">
         <div style={{ color: accent, fontSize: 11, fontWeight: 900, textShadow: "0 2px 8px #000", whiteSpace: "nowrap" }}>
           f(x)
@@ -226,7 +228,7 @@ function Plano({ funcionId, accent, modo, b, n, pausado }: {
       {/* la función de acumulación F(x) = ∫₀ˣ f */}
       {mostrarAcum && (
         <>
-          <Line points={acum.map(([x, y]) => w3(x, y, 0.04))} color={VERDE} lineWidth={3.5} />
+          <CurvaTubo puntos={acum.map(([x, y]) => w3(x, y, 0.04))} color={VERDE} grosor={0.063} />
           <Html position={w3(XMAX, integralExacta(fn, A_FIJO, XMAX), 0.04)} center distanceFactor={14} pointerEvents="none">
             <div style={{ color: VERDE, fontSize: 11, fontWeight: 900, textShadow: "0 2px 8px #000", whiteSpace: "nowrap" }}>
               F(x)=∫₀ˣf
@@ -274,7 +276,7 @@ function Plano({ funcionId, accent, modo, b, n, pausado }: {
       {/* recta tangente a F en b: su pendiente es f(b) — el TFC (modo conexión) */}
       {modo === "conexion" && (
         <>
-          <Line points={tangente} color={ORO} lineWidth={3} />
+          <CurvaTubo puntos={tangente} color={ORO} grosor={0.054} />
           <Html position={w3(b, Fb, 0.09)} center distanceFactor={13} pointerEvents="none">
             <div style={{ background: "rgba(2,12,28,0.88)", border: `1px solid ${ORO}77`, borderRadius: 8, padding: "3px 8px", whiteSpace: "nowrap", marginTop: -34 }}>
               <span style={{ color: ORO, fontSize: 10.5, fontWeight: 900 }}>F′(b) = {fmtNum(fb, 2)} = f(b)</span>
@@ -300,7 +302,6 @@ function Plano({ funcionId, accent, modo, b, n, pausado }: {
         </mesh>
       )}
 
-      <ContactShadows position={[0, OY - 0.4, 0]} opacity={0.26} scale={BOARD_W + 6} blur={2.4} far={6} />
     </group>
   );
 }
@@ -323,31 +324,16 @@ function Contenido(props: TfcSceneProps) {
   const { funcionId, accent, modo, b, n, pausado, autoRotate, resetNonce } = props;
   return (
     <>
-      <color attach="background" args={["#03101f"]} />
-      <fog attach="fog" args={["#03101f", 26, 54]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={accent} suelo={OY - 0.4} />
 
-      <ambientLight intensity={0.6} />
-      <directionalLight
-        position={[4, 8, 9]}
-        intensity={1.3}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-near={1}
-        shadow-camera-far={36}
-        shadow-bias={-0.0004}
-      />
-      <pointLight position={[0, 0, 8]} intensity={2.4} color="#ffffff" />
 
       <group key={`${resetNonce}`}>
         <Plano funcionId={funcionId} accent={accent} modo={modo} b={b} n={n} pausado={pausado} />
       </group>
 
-      <Environment resolution={256}>
-        <Lightformer intensity={1.4} position={[0, 7, 6]} scale={[16, 5, 1]} color="#ffffff" />
-        <Lightformer intensity={1.0} position={[-9, 3, 2]} scale={[5, 6, 1]} color={accent} />
-        <Lightformer intensity={1.0} position={[9, 2, 4]} scale={[4, 5, 1]} color="#bfe8ff" />
-      </Environment>
 
       <OrbitControls
         enablePan={false}

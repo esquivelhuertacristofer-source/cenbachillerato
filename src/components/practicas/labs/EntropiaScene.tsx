@@ -22,8 +22,9 @@
 import * as THREE from "three";
 import { useMemo, useRef, type RefObject } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Edges, Html } from "@react-three/drei";
+import { OrbitControls, ContactShadows, Edges, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Escenario } from "./_escenario";
 import {
   type ProcesoKey,
   T_CRISTAL_MAX,
@@ -240,7 +241,6 @@ function Mezcla({ activo, accent, pausado, sRef }: {
         </div>
       </Html>
 
-      <ContactShadows position={[0, M_CY - M_HY - 0.05, 0]} opacity={0.28} scale={9} blur={2.6} far={5} color="#020c1c" />
     </group>
   );
 }
@@ -468,22 +468,12 @@ function Contenido(props: EntropiaSceneProps) {
 
   return (
     <>
-      <color attach="background" args={["#03101f"]} />
-      <fog attach="fog" args={["#03101f", 16, 34]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={accent} suelo={M_CY - M_HY - 0.05} />
 
-      <ambientLight intensity={0.5} />
-      <directionalLight
-        position={[4, 9, 6]}
-        intensity={1.7}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-near={1}
-        shadow-camera-far={28}
-        shadow-bias={-0.0004}
-      />
       <pointLight position={[-5, 4, 3]} intensity={10} color={`#${heat.getHexString()}`} />
-      <pointLight position={[5, 3, 4]} intensity={6} color="#ffffff" />
 
       <group key={`${proceso}-${resetNonce}`}>
         {proceso === "mezcla" && (
@@ -498,11 +488,6 @@ function Contenido(props: EntropiaSceneProps) {
         <BarraEntropia sRef={sRef} accent={accent} />
       </group>
 
-      <Environment resolution={256}>
-        <Lightformer intensity={1.8} position={[0, 6, 2]} scale={[10, 4, 1]} color="#ffffff" />
-        <Lightformer intensity={1.3} position={[-6, 3, -2]} scale={[5, 6, 1]} color={accent} />
-        <Lightformer intensity={1.0} position={[6, 2, 4]} scale={[4, 5, 1]} color="#bfe8ff" />
-      </Environment>
 
       <OrbitControls
         enablePan={false}

@@ -20,9 +20,11 @@
 import * as THREE from "three";
 import { useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Html } from "@react-three/drei";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { colorCol } from "./ph-data";
+import { VIDRIO, VIDRIO_FINO, perfilVaso, perfilLiquido } from "./_vidrio";
+import { Escenario, calidadEscena } from "./_escenario";
 
 export interface PhSceneProps {
   ph: number;
@@ -64,63 +66,67 @@ const _hit = new THREE.Vector3();
 const _obj = new THREE.Object3D();
 
 /* ── Vaso de precipitados (cristal) + líquido coloreado ──────────────────── */
-function Vaso({ colorLiquido }: { colorLiquido: string }) {
-  const hLiquido = H_VASO * NIVEL;
-  const yLiquido = -H_VASO / 2 + hLiquido / 2;
-  const ySup = -H_VASO / 2 + hLiquido; // superficie del líquido
+/**
+ * El vaso era tres piezas —pared abierta, disco de fondo, toro de borde— con
+ * `transmission: 0.92` Y ADEMÁS `transparent` con `opacity: 0.32`. Esas dos
+ * cosas se anulan: la transmisión hace que el cristal refracte y reflexione, y
+ * la opacidad lo funde con el fondo y le quita justo esos reflejos. Quedaba un
+ * cilindro de humo con un disco pegado dentro.
+ *
+ * Ahora es una sola pieza torneada con el perfil real del vaso —su pico y su
+ * base redondeada— y el vidrio físico de `_vidrio.tsx`. Las medidas no cambian:
+ * `R_VASO` y `H_VASO` siguen mandando, así que la bureta, las gotas y las
+ * burbujas siguen cayendo donde caían.
+ */
+const PERFIL_VASO = perfilVaso(R_VASO, H_VASO);
+/** El líquido con la forma del vaso, no un cilindro metido dentro. */
+const PERFIL_LIQUIDO = perfilLiquido(PERFIL_VASO, NIVEL, 0.06);
+const Y_SUP_LIQUIDO = Math.max(...PERFIL_LIQUIDO.map((p) => p.y));
+const R_SUP_LIQUIDO = Math.max(...PERFIL_LIQUIDO.map((p) => p.x));
 
+function Vaso({ colorLiquido }: { colorLiquido: string }) {
   return (
-    <group>
-      {/* Pared de cristal (cilindro abierto) */}
-      <mesh>
-        <cylinderGeometry args={[R_VASO, R_VASO, H_VASO, 48, 1, true]} />
-        <meshPhysicalMaterial
-          color="#dff1ff"
-          roughness={0.08}
-          metalness={0}
-          transmission={0.92}
-          thickness={0.4}
-          ior={1.46}
-          transparent
-          opacity={0.32}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
-      {/* Fondo del vaso */}
-      <mesh position={[0, -H_VASO / 2 + 0.03, 0]} receiveShadow>
-        <cylinderGeometry args={[R_VASO, R_VASO, 0.06, 48]} />
-        <meshPhysicalMaterial color="#cfe6f7" roughness={0.1} transmission={0.7} transparent opacity={0.45} />
-      </mesh>
-      {/* Borde superior */}
-      <mesh position={[0, H_VASO / 2, 0]}>
-        <torusGeometry args={[R_VASO, 0.04, 12, 48]} />
-        <meshStandardMaterial color="#eaf6ff" roughness={0.2} metalness={0.1} transparent opacity={0.5} />
+    /* El perfil arranca en y=0 (la base); el vaso seguía centrado en el origen. */
+    <group position={[0, -H_VASO / 2, 0]}>
+      <mesh castShadow receiveShadow>
+        <latheGeometry args={[PERFIL_VASO, 56]} />
+        <meshPhysicalMaterial {...VIDRIO} />
       </mesh>
 
       {/* Líquido — OPACO: un material con transmisión (la pared de cristal) solo
           deja ver los objetos opacos que tiene detrás; si el líquido fuera
           transparente, el cristal no lo "vería" y el vaso saldría vacío. */}
-      <mesh position={[0, yLiquido, 0]} castShadow>
-        <cylinderGeometry args={[R_VASO - 0.06, R_VASO - 0.06, hLiquido, 48]} />
+      {/* El brillo propio va BAJO. Con `emissiveIntensity` alto el líquido se
+          ilumina a sí mismo por igual en toda su superficie, se le van los
+          medios tonos y queda un bloque de color plano —era exactamente lo que
+          pasaba—. Bajándolo, quien lo modela es la luz del estudio: aparece el
+          lado iluminado, el lado en sombra y el volumen. */}
+      <mesh castShadow>
+        <latheGeometry args={[PERFIL_LIQUIDO, 56]} />
         <meshStandardMaterial
           color={colorLiquido}
           emissive={colorLiquido}
-          emissiveIntensity={0.35}
-          roughness={0.25}
-          metalness={0.05}
+          emissiveIntensity={0.1}
+          roughness={0.34}
+          metalness={0}
         />
       </mesh>
-      {/* Superficie (menisco brillante) */}
-      <mesh position={[0, ySup, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[R_VASO - 0.06, 48]} />
-        <meshStandardMaterial
+      {/* Superficie del líquido. `toneMapped={false}` la sacaba del mapeo de
+          tonos de la escena: se veía plana y más clara que el resto, como una
+          tapa de plástico. Ahora recibe la luz como todo lo demás y el reflejo
+          del entorno hace el menisco. */}
+      <mesh position={[0, Y_SUP_LIQUIDO + 0.005, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[R_SUP_LIQUIDO, 48]} />
+        <meshPhysicalMaterial
           color={colorLiquido}
           emissive={colorLiquido}
-          emissiveIntensity={0.6}
-          roughness={0.15}
-          metalness={0.1}
+          emissiveIntensity={0.14}
+          roughness={0.12}
+          metalness={0}
+          clearcoat={1}
+          clearcoatRoughness={0.06}
+          envMapIntensity={1.3}
           side={THREE.DoubleSide}
-          toneMapped={false}
         />
       </mesh>
     </group>
@@ -135,7 +141,7 @@ function Gotero() {
       {/* cuerpo del gotero */}
       <mesh position={[0, 0.5, 0]}>
         <cylinderGeometry args={[0.16, 0.16, 1.0, 20]} />
-        <meshStandardMaterial color="#e6f2ff" roughness={0.25} metalness={0.1} transparent opacity={0.55} />
+        <meshPhysicalMaterial {...VIDRIO_FINO} />
       </mesh>
       {/* punta */}
       <mesh position={[0, -0.18, 0]}>
@@ -294,7 +300,11 @@ function BuretaArrastrable({
       {/* cuerpo de la bureta (cristal) */}
       <mesh position={[0, (Y_TOP + Y_BOT) / 2, 0.02]}>
         <cylinderGeometry args={[0.14, 0.14, Y_TOP - Y_BOT + 0.4, 24, 1, true]} />
-        <meshPhysicalMaterial color="#dff1ff" roughness={0.1} transmission={0.9} thickness={0.3} transparent opacity={0.3} side={THREE.DoubleSide} />
+        {/* La bureta se ARRASTRA: se repinta en cada cuadro mientras el alumno
+            la mueve, así que aquí va el vidrio barato —reflejo sí, refracción
+            no—. De lejos y en movimiento no se distingue, y no cuesta un
+            re-render de la escena entera por cuadro. */}
+        <meshPhysicalMaterial {...VIDRIO_FINO} />
       </mesh>
       {/* perilla arrastrable */}
       <group
@@ -367,19 +377,40 @@ function EscalaPh({ ph }: { ph: number }) {
   });
 
   return (
-    <group position={[x, 0, 0]}>
-      {/* marco */}
-      <mesh position={[0, 0, -0.06]}>
-        <boxGeometry args={[0.62, alto + 0.12, 0.04]} />
-        <meshStandardMaterial color="#0a1626" roughness={0.6} metalness={0.2} />
+    /* La escala FLOTABA: su base quedaba por debajo de la mesa y se leía como
+     * una calcomanía pegada al aire. Ahora es un instrumento que se apoya —pie,
+     * poste y panel—, subido para que el pie toque la mesa. */
+    <group position={[x, -H_VASO / 2 + 0.12 - y0, 0]}>
+      {/* pie sobre la mesa */}
+      <mesh position={[0, y0 - 0.06, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.5, 0.58, 0.12, 32]} />
+        <meshStandardMaterial color="#8d9bad" roughness={0.3} metalness={0.9} envMapIntensity={1.2} />
       </mesh>
-      {/* bandas */}
+      {/* poste trasero, para que el panel no nazca de la nada */}
+      <mesh position={[0, 0, -0.16]} castShadow>
+        <cylinderGeometry args={[0.055, 0.055, alto + 0.1, 16]} />
+        <meshStandardMaterial color="#8d9bad" roughness={0.3} metalness={0.9} envMapIntensity={1.2} />
+      </mesh>
+      {/* marco con FONDO de verdad: 0,04 de grosor no proyecta sombra ni
+          atrapa un reflejo, y sin eso un panel no parece un objeto. */}
+      <mesh position={[0, 0, -0.07]} castShadow receiveShadow>
+        <boxGeometry args={[0.74, alto + 0.2, 0.14]} />
+        <meshStandardMaterial color="#16283d" roughness={0.45} metalness={0.55} envMapIntensity={1.1} />
+      </mesh>
+      {/* bandas: sin `toneMapped={false}`, que las sacaba de la luz de la
+          escena y las dejaba planas como un GIF de los noventa. */}
       {bandas.map((b, i) => (
-        <mesh key={i} position={[0, b.y, 0]}>
-          <boxGeometry args={[0.5, b.h, 0.06]} />
-          <meshStandardMaterial color={b.color} emissive={b.color} emissiveIntensity={0.25} roughness={0.4} toneMapped={false} />
+        <mesh key={i} position={[0, b.y, 0.02]} castShadow>
+          <boxGeometry args={[0.56, b.h, 0.1]} />
+          <meshStandardMaterial color={b.color} emissive={b.color} emissiveIntensity={0.16} roughness={0.42} metalness={0.05} envMapIntensity={1.1} />
         </mesh>
       ))}
+      {/* cubierta de cristal sobre las bandas: el reflejo que cruza el panel
+          es lo que lo convierte en un instrumento y no en una imagen. */}
+      <mesh position={[0, 0, 0.09]}>
+        <boxGeometry args={[0.6, alto - 0.02, 0.02]} />
+        <meshPhysicalMaterial {...VIDRIO_FINO} opacity={0.16} />
+      </mesh>
       {/* marcador (flecha) a la altura del pH actual */}
       <group ref={marca} position={[0, yMarca, 0.12]}>
         <mesh rotation={[0, 0, Math.PI / 2]} position={[-0.52, 0, 0]}>
@@ -398,18 +429,20 @@ function EscalaPh({ ph }: { ph: number }) {
 /* ── Contenido (descendiente del Canvas) ─────────────────────────────────── */
 function Contenido({ ph, colorLiquido, accent, modo, goteando, gotas, gotasMax, resetNonce, arrastrable = false, onGotasChange, onGrab }: PhSceneProps) {
   const sig = `${modo}-${resetNonce}`;
+  /* Que aguanta este equipo. Se mide una vez: no cambia a mitad de sesion. */
+  const calidad = useMemo(() => calidadEscena(), []);
   const [dragging, setDragging] = useState(false);
   const vertiendo = modo === "neutralizar" && (goteando || dragging);
 
   return (
     <>
-      <color attach="background" args={["#04111c"]} />
-      <fog attach="fog" args={["#04111c", 16, 44]} />
-
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[5, 9, 7]} intensity={1.9} castShadow shadow-mapSize={[2048, 2048]} shadow-camera-far={30} shadow-bias={-0.0004} />
-      <pointLight position={[-5, 3, 4]} intensity={8} color={accent} />
-      <pointLight position={[4, 2, 5]} intensity={6} color="#ffffff" />
+      {/* Esta escena tenía luz, entorno y post-proceso, y aun así el vaso
+          parecía un icono recortado: le faltaba SUELO. Sin una superficie
+          debajo el ojo no sabe a qué distancia está nada, y el reflejo de la
+          mesa devuelve el vaso por abajo, que es la pista de realidad más
+          barata que hay. El suelo va a la altura de la base del vaso
+          (−H_VASO/2 dentro de un grupo subido 0,2). */}
+      <Escenario acento={accent} suelo={-H_VASO / 2 + 0.2} calidad={calidad} />
 
       <group key={sig} position={[-0.6, 0.2, 0]}>
         <Vaso colorLiquido={colorLiquido} />
@@ -421,7 +454,6 @@ function Contenido({ ph, colorLiquido, accent, modo, goteando, gotas, gotasMax, 
           </>
         )}
         <EscalaPh ph={ph} />
-        <ContactShadows position={[0, -H_VASO / 2 - 0.05, 0]} opacity={0.34} scale={12} blur={2.6} far={6} color="#10283e" />
       </group>
 
       {modo === "neutralizar" && (
@@ -435,12 +467,6 @@ function Contenido({ ph, colorLiquido, accent, modo, goteando, gotas, gotasMax, 
           onDraggingChange={setDragging}
         />
       )}
-
-      <Environment resolution={256}>
-        <Lightformer intensity={1.9} position={[0, 5, 4]} scale={[10, 4, 1]} color="#ffffff" />
-        <Lightformer intensity={1.3} position={[-6, 2, -2]} scale={[5, 5, 1]} color={accent} />
-        <Lightformer intensity={1.0} position={[6, 1, 3]} scale={[4, 4, 1]} color="#bfe8ff" />
-      </Environment>
 
       <OrbitControls
         makeDefault

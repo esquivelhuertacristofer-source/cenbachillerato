@@ -18,9 +18,11 @@
 
 import { useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Line, Html } from "@react-three/drei";
+import { OrbitControls, Line, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { RANGO, type Modo, type Operacion, fmtNum } from "./recta-data";
+import { Escenario } from "./_escenario";
+import { CurvaTubo } from "./_tablero";
 
 export interface RectaSceneProps {
   modo: Modo;
@@ -125,22 +127,11 @@ export default function RectaScene(props: RectaSceneProps) {
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
       camera={{ position: [0, 3.6, 13], fov: 42 }}
     >
-      <color attach="background" args={["#03101f"]} />
-      <fog attach="fog" args={["#03101f", 22, 48]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={accent} suelo={-0.45} />
 
-      <ambientLight intensity={0.62} />
-      <directionalLight
-        position={[4, 9, 7]}
-        intensity={1.7}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-near={1}
-        shadow-camera-far={36}
-        shadow-bias={-0.0004}
-      />
-      <pointLight position={[-7, 3, 5]} intensity={9} color={accent} />
-      <pointLight position={[6, 2, 5]} intensity={5} color="#ffffff" />
 
       <group key={`${modo}-${props.resetNonce}`}>
         {/* Eje principal */}
@@ -182,7 +173,7 @@ export default function RectaScene(props: RectaSceneProps) {
         {/* ── Valor absoluto: segmento del 0 hasta a ──────────────── */}
         {modo === "ubicar" && showAbsoluto && a !== 0 && (
           <>
-            <Line points={[[0, 0.16, 0], [xa, 0.16, 0]]} color={ABS_COL} lineWidth={6} />
+            <CurvaTubo puntos={[[0, 0.16, 0], [xa, 0.16, 0]]} color={ABS_COL} grosor={0.09} />
             <Chip pos={[xa / 2, 0.62, 0]} color="#9a7b16">
               |{fmtNum(a)}| = {fmtNum(Math.abs(a))}
             </Chip>
@@ -226,7 +217,7 @@ export default function RectaScene(props: RectaSceneProps) {
             </group>
 
             {/* arco del salto */}
-            {arco.length > 1 && <Line points={arco} color={ABS_COL} lineWidth={4} />}
+            {arco.length > 1 && <CurvaTubo puntos={arco} color={ABS_COL} grosor={0.072} />}
             {flecha && (
               <mesh position={flecha.pos} rotation={[0, 0, flecha.rot]}>
                 <coneGeometry args={[0.16, 0.4, 20]} />
@@ -258,14 +249,8 @@ export default function RectaScene(props: RectaSceneProps) {
           </Chip>
         </group>
 
-        <ContactShadows position={[0, -0.45, 0.6]} opacity={0.24} scale={26} blur={3} far={6} color="#16263a" />
       </group>
 
-      <Environment resolution={256}>
-        <Lightformer intensity={2.0} position={[0, 5, 2]} scale={[12, 4, 1]} color="#ffffff" />
-        <Lightformer intensity={1.3} position={[-7, 2, -2]} scale={[6, 6, 1]} color={accent} />
-        <Lightformer intensity={1.0} position={[7, 1, 3]} scale={[5, 5, 1]} color="#bfe8ff" />
-      </Environment>
 
       <OrbitControls
         enablePan={false}

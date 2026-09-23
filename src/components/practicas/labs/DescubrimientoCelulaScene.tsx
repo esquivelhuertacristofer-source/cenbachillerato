@@ -24,6 +24,7 @@ import { useMemo, useRef, type ReactNode } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Environment, Lightformer, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { VIDRIO_FINO } from "./_vidrio";
 import {
   type InstrumentoId,
   type MuestraId,
@@ -905,7 +906,7 @@ function OjoModelo() {
         </mesh>
         <mesh position={[0.45, 0, 0]}>
           <sphereGeometry args={[0.3, 24, 18]} />
-          <meshStandardMaterial color="#e0f2fe" transparent opacity={0.25} roughness={0.05} />
+          <meshPhysicalMaterial {...VIDRIO_FINO} opacity={0.25} roughness={0.05} />
         </mesh>
       </group>
       {/* línea de visión */}
@@ -1733,7 +1734,7 @@ function Matraz({ x, tipo, fase }: { x: number; tipo: "recto" | "cisne"; fase: F
         {/* vidrio */}
         <mesh>
           <sphereGeometry args={[R_MATRAZ, 36, 28]} />
-          <meshStandardMaterial color="#e0f2fe" transparent opacity={0.18} roughness={0.05} depthWrite={false} />
+          <meshPhysicalMaterial {...VIDRIO_FINO} opacity={0.18} roughness={0.05} depthWrite={false} />
         </mesh>
         {/* caldo */}
         <mesh>
@@ -1752,23 +1753,23 @@ function Matraz({ x, tipo, fase }: { x: number; tipo: "recto" | "cisne"; fase: F
         {tipo === "recto" ? (
           <mesh position={[0, R_MATRAZ + 0.45, 0]}>
             <cylinderGeometry args={[0.07, 0.08, 1.0, 16, 1, true]} />
-            <meshStandardMaterial color="#e0f2fe" transparent opacity={0.3} roughness={0.05} side={THREE.DoubleSide} depthWrite={false} />
+            <meshPhysicalMaterial {...VIDRIO_FINO} opacity={0.3} roughness={0.05} side={THREE.DoubleSide} depthWrite={false} />
           </mesh>
         ) : roto ? (
           <>
             <mesh position={[0, R_MATRAZ + 0.14, 0]}>
               <cylinderGeometry args={[0.065, 0.07, 0.5, 16, 1, true]} />
-              <meshStandardMaterial color="#e0f2fe" transparent opacity={0.3} roughness={0.05} side={THREE.DoubleSide} depthWrite={false} />
+              <meshPhysicalMaterial {...VIDRIO_FINO} opacity={0.3} roughness={0.05} side={THREE.DoubleSide} depthWrite={false} />
             </mesh>
             <group position={[0.9, -Y_MATRAZ + 0.76, 0.35]} rotation={[Math.PI / 2, 0, 0.5]} scale={0.8}>
               <mesh geometry={GEO_CISNE}>
-                <meshStandardMaterial color="#e0f2fe" transparent opacity={0.35} roughness={0.05} depthWrite={false} />
+                <meshPhysicalMaterial {...VIDRIO_FINO} opacity={0.35} roughness={0.05} depthWrite={false} />
               </mesh>
             </group>
           </>
         ) : (
           <mesh geometry={GEO_CISNE} position={[0, R_MATRAZ, 0]}>
-            <meshStandardMaterial color="#e0f2fe" transparent opacity={0.32} roughness={0.05} depthWrite={false} />
+            <meshPhysicalMaterial {...VIDRIO_FINO} opacity={0.32} roughness={0.05} depthWrite={false} />
           </mesh>
         )}
         <instancedMesh ref={atrapado} args={[undefined, undefined, 18]} frustumCulled={false}>

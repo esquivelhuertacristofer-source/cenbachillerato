@@ -16,9 +16,11 @@
 
 import { useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Line } from "@react-three/drei";
+import { OrbitControls, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { segmentoVisible, dentro, type Ventana, type Solucion } from "./sistemas-data";
+import { Escenario } from "./_escenario";
+import { CurvaTubo } from "./_tablero";
 
 export interface SistemasSceneProps {
   win: Ventana;
@@ -137,21 +139,11 @@ export default function SistemasScene(props: SistemasSceneProps) {
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
       camera={{ position: [0.2, 7.6, 11], fov: 42 }}
     >
-      <color attach="background" args={["#03101f"]} />
-      <fog attach="fog" args={["#03101f", 18, 44]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={accent} suelo={-0.02} />
 
-      <ambientLight intensity={0.6} />
-      <directionalLight
-        position={[5, 10, 6]}
-        intensity={1.7}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-near={1}
-        shadow-camera-far={36}
-        shadow-bias={-0.0004}
-      />
-      <pointLight position={[-7, 4, 5]} intensity={9} color={accent} />
       <pointLight position={[6, 3, -4]} intensity={6} color={R2_COL} />
 
       <group key={`${props.resetNonce}`}>
@@ -176,14 +168,14 @@ export default function SistemasScene(props: SistemasSceneProps) {
         ))}
 
         {/* Recta 1 */}
-        {seg.r1 && <Line points={seg.r1} color={accent} lineWidth={5} />}
+        {seg.r1 && <CurvaTubo puntos={seg.r1} color={accent} grosor={0.09} />}
         {/* Recta 2 */}
-        {seg.r2 && <Line points={seg.r2} color={R2_COL} lineWidth={5} />}
+        {seg.r2 && <CurvaTubo puntos={seg.r2} color={R2_COL} grosor={0.09} />}
 
         {/* Cresta de solución (rectas coincidentes → infinitas soluciones) */}
         {cresta && (
           <>
-            <Line points={cresta} color={SOL_COL} lineWidth={9} transparent opacity={0.9} />
+            <CurvaTubo puntos={cresta} color={SOL_COL} grosor={0.09} />
             <Line points={cresta} color="#ffffff" lineWidth={2.5} />
           </>
         )}
@@ -214,14 +206,8 @@ export default function SistemasScene(props: SistemasSceneProps) {
           </group>
         )}
 
-        <ContactShadows position={[0, -0.02, 0]} opacity={0.28} scale={16} blur={3} far={6} color="#020c1c" />
       </group>
 
-      <Environment resolution={256}>
-        <Lightformer intensity={2.0} position={[0, 6, 2]} scale={[10, 4, 1]} color="#ffffff" />
-        <Lightformer intensity={1.4} position={[-6, 3, -2]} scale={[6, 6, 1]} color={accent} />
-        <Lightformer intensity={1.1} position={[6, 2, 3]} scale={[5, 5, 1]} color="#bfe8ff" />
-      </Environment>
 
       <OrbitControls
         enablePan={false}

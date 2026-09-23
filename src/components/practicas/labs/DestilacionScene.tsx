@@ -24,6 +24,7 @@ import { OrbitControls, ContactShadows, Environment, Lightformer, Html } from "@
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import type { PiezaKey, Fase, Accidente, Llama } from "./destilacion-data";
 import { CAP } from "./destilacion-data";
+import { VIDRIO, VIDRIO_FINO, perfilMatrazBola, perfilErlenmeyer } from "./_vidrio";
 
 export interface DestilacionSceneProps {
   piezas: Record<PiezaKey, boolean>;
@@ -61,6 +62,17 @@ const COND_B = new THREE.Vector3(1.9, -0.5, 0);
 const COLLECTOR = { x: 2.25, top: -0.55 };
 
 const damp = THREE.MathUtils.damp;
+
+/**
+ * El perfil del matraz, calculado una sola vez.
+ *
+ * `alturaCuello` está elegida para que la boca caiga en `NECK_TOP`: el perfil
+ * tiene su origen en el CENTRO del balón, así que el cuello sube desde el
+ * hombro y el conjunto se coloca luego en `FLASK.y`.
+ */
+const PERFIL_MATRAZ = perfilMatrazBola(FLASK.r, 1.22, 0.17);
+/** El colector: un erlenmeyer, que es lo que se usa para recoger destilado. */
+const PERFIL_COLECTOR = perfilErlenmeyer(0.78, 1.35, 0.2);
 
 /* ── Cilindro orientado entre dos puntos (tubos, brazos, refrigerante) ──── */
 function Tubo({
@@ -123,21 +135,20 @@ function Aparece({ show, children }: { show: boolean; children: React.ReactNode 
 }
 
 /* ── Vidrio reutilizable ───────────────────────────────────────────────── */
-function vidrio(opacity = 0.18) {
-  return (
-    <meshPhysicalMaterial
-      color={GLASS}
-      transparent
-      opacity={opacity}
-      roughness={0.06}
-      metalness={0}
-      transmission={0.6}
-      thickness={0.4}
-      ior={1.4}
-      side={THREE.DoubleSide}
-      depthWrite={false}
-    />
-  );
+/**
+ * Antes esto mezclaba `transmission` con `transparent` + `opacity: 0.18`, y
+ * por eso el matraz parecía humo en vez de vidrio: `transmission` es
+ * transparencia física —la luz atraviesa y se refracta, y la pieza conserva
+ * sus reflejos— mientras que `opacity` funde el objeto con el fondo y le
+ * quita justamente esos reflejos. Juntas dejan lo peor de cada una.
+ *
+ * Ahora sale de `_vidrio.tsx`, que es el kit que usan las demás escenas.
+ * `fino` deja la versión barata para las piezas secundarias: `transmission`
+ * obliga a la tarjeta a repintar lo que hay detrás de cada pieza, y en una
+ * portátil de escuela eso se nota.
+ */
+function vidrio(fino = false) {
+  return <meshPhysicalMaterial {...(fino ? VIDRIO_FINO : VIDRIO)} />;
 }
 
 /* ── Soporte universal ─────────────────────────────────────────────────── */
@@ -266,15 +277,16 @@ function Burbujas({ color, cx, top, bottom, r }: { color: string; cx: number; to
 function Matraz({ frac, color, hirviendo, residuo, residuoSolido }: { frac: number; color: string; hirviendo: boolean; residuo: boolean; residuoSolido: boolean }) {
   return (
     <group>
-      {/* balón */}
-      <mesh position={[FLASK.x, FLASK.y, 0]}>
-        <sphereGeometry args={[FLASK.r, 40, 32]} />
-        {vidrio(0.16)}
-      </mesh>
-      {/* cuello */}
-      <mesh position={[FLASK.x, (FLASK.y + FLASK.r + NECK_TOP) / 2, 0]}>
-        <cylinderGeometry args={[0.17, 0.2, NECK_TOP - (FLASK.y + FLASK.r) + 0.2, 24, 1, true]} />
-        {vidrio(0.2)}
+      {/* El matraz entero: balón y cuello en UNA pieza torneada.
+        *
+        * Antes eran una esfera y un cilindro pegados, y se veía la juntura:
+        * un matraz de destilación real no tiene esa arista, sale del cuello y
+        * se ensancha en una sola curva. `latheGeometry` gira el perfil 360° y
+        * resuelve el hombro con la misma malla —y con menos triángulos que
+        * las dos primitivas que sustituye—. */}
+      <mesh position={[FLASK.x, FLASK.y, 0]} castShadow>
+        <latheGeometry args={[PERFIL_MATRAZ, 64]} />
+        {vidrio()}
       </mesh>
       {/* brazo lateral hacia el refrigerante */}
       <Tubo a={new THREE.Vector3(FLASK.x, NECK_TOP - 0.35, 0)} b={COND_A.clone()} r={0.12} opacity={0.24} />
@@ -303,7 +315,7 @@ function Termometro({ temp, show }: { temp: number; show: boolean }) {
       {/* tubo */}
       <mesh position={[0, (bottomY + topY) / 2, 0]}>
         <cylinderGeometry args={[0.055, 0.055, topY - bottomY, 16]} />
-        {vidrio(0.28)}
+        {vidrio(true)}
       </mesh>
       {/* bulbo */}
       <mesh position={[0, bottomY, 0]}>
@@ -490,20 +502,14 @@ function Colector({ frac, color }: { frac: number; color: string }) {
   const f = Math.max(0, Math.min(1, frac));
   return (
     <group position={[COLLECTOR.x, 0, 0]}>
-      {/* cuerpo cónico */}
-      <mesh position={[0, baseY + bodyH / 2, 0]}>
-        <cylinderGeometry args={[0.32, 0.72, bodyH, 32, 1, true]} />
-        {vidrio(0.18)}
-      </mesh>
-      {/* fondo */}
-      <mesh position={[0, baseY, 0]}>
-        <circleGeometry args={[0.72, 32]} />
-        <meshStandardMaterial color={GLASS} transparent opacity={0.25} side={THREE.DoubleSide} roughness={0.1} />
-      </mesh>
-      {/* cuello */}
-      <mesh position={[0, baseY + bodyH + 0.18, 0]}>
-        <cylinderGeometry args={[0.16, 0.18, 0.36, 20, 1, true]} />
-        {vidrio(0.22)}
+      {/* El erlenmeyer entero: cuerpo, fondo y cuello en una sola pieza.
+        *
+        * Antes eran tres mallas —un cono abierto, un círculo suelto de fondo
+        * y otro cono para el cuello—, y el fondo se veía como un disco pegado
+        * porque no tenía continuidad con la pared. */}
+      <mesh position={[0, baseY, 0]} castShadow>
+        <latheGeometry args={[PERFIL_COLECTOR, 56]} />
+        {vidrio()}
       </mesh>
       {/* destilado */}
       {f > 0.001 && (

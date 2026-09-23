@@ -25,9 +25,11 @@
 import * as THREE from "three";
 import { useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Html, Line } from "@react-three/drei";
+import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { resolver, estadoEn, tiempoEnX, fmt0, fmt1 } from "./cinematica-data";
+import { Escenario } from "./_escenario";
+import { CurvaTubo } from "./_tablero";
 
 export interface CinematicaSceneProps {
   a1: number;
@@ -267,12 +269,11 @@ function Contenido({ a1, t1, a2, t, accent, resetNonce, arrastrable, onScrub, on
 
   return (
     <>
-      <color attach="background" args={["#08131f"]} />
-      <fog attach="fog" args={["#08131f", 22, 60]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={accent} suelo={Y_ROAD - 0.02} />
 
-      <ambientLight intensity={0.72} />
-      <directionalLight position={[6, 10, 6]} intensity={1.25} castShadow shadow-mapSize={[1024, 1024]} shadow-camera-far={40} />
-      <pointLight position={[-8, 5, 6]} intensity={0.5} color={accent} />
 
       <group key={resetNonce}>
         {/* desierto / terreno */}
@@ -296,13 +297,7 @@ function Contenido({ a1, t1, a2, t, accent, resetNonce, arrastrable, onScrub, on
 
         {/* estela: distancia ya recorrida */}
         {est.x > 0.01 && (
-          <Line
-            points={[[X0, Y_ROAD + 0.04, 0], [carX, Y_ROAD + 0.04, 0]]}
-            color={frenando ? C_BRK : C_ACC}
-            lineWidth={5}
-            transparent
-            opacity={0.85}
-          />
+          <CurvaTubo puntos={[[X0, Y_ROAD + 0.04, 0], [carX, Y_ROAD + 0.04, 0]]} color={frenando ? C_BRK : C_ACC} grosor={0.09} />
         )}
 
         {/* hitos */}
@@ -370,15 +365,7 @@ function Contenido({ a1, t1, a2, t, accent, resetNonce, arrastrable, onScrub, on
         </group>
       </group>
 
-      <ContactShadows position={[0, Y_ROAD - 0.02, 0]} opacity={0.3} scale={SCENE_LEN + 6} blur={2.4} far={6} />
 
-      <Environment resolution={128}>
-        <group>
-          <Lightformer intensity={1.3} position={[0, 7, 8]} scale={14} color="#eaf1ff" />
-          <Lightformer intensity={0.7} position={[8, 3, 5]} scale={7} color="#cfe0ff" />
-          <Lightformer intensity={0.5} position={[-8, 3, 4]} scale={7} color="#e9d5ff" />
-        </group>
-      </Environment>
 
       <OrbitControls
         makeDefault

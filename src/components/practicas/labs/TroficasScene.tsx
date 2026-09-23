@@ -18,9 +18,10 @@
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Html } from "@react-three/drei";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { calcularNiveles, NIVELES, DESCOMPONEDORES, fmtKcal, type NivelCalc } from "./troficas-data";
+import { Escenario } from "./_escenario";
 
 export interface TroficasSceneProps {
   energia: number;
@@ -214,7 +215,6 @@ function Piramide(props: TroficasSceneProps) {
 
   return (
     <group>
-      <ContactShadows position={[0, -0.02, 0]} opacity={0.45} scale={11} blur={2.4} far={6} />
 
       <group ref={grupo}>
         {/* suelo */}
@@ -274,32 +274,16 @@ function Contenido(props: TroficasSceneProps) {
   const { accent, autoRotate, resetNonce } = props;
   return (
     <>
-      <color attach="background" args={["#06182c"]} />
-      <fog attach="fog" args={["#06182c", 16, 44]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
+      {/* La altura sale de donde esta escena ya ponía su sombra de
+          contacto: es donde su autor decidió que estaba el piso. */}
+      <Escenario acento={accent} suelo={-0.02} />
 
-      <ambientLight intensity={0.55} />
-      <directionalLight
-        position={[2, 8, 4]}
-        intensity={1.5}
-        color="#fff2cc"
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-near={1}
-        shadow-camera-far={30}
-        shadow-bias={-0.0004}
-      />
-      <pointLight position={[-5, 3, 5]} intensity={0.45} color={accent} />
 
       <group key={`${resetNonce}`}>
         <Piramide {...props} />
       </group>
 
-      <Environment resolution={256}>
-        <Lightformer intensity={1.1} position={[0, 8, 4]} scale={[12, 4, 1]} color="#ffffff" />
-        <Lightformer intensity={0.7} position={[-8, 2, -2]} scale={[5, 6, 1]} color={accent} />
-        <Lightformer intensity={0.7} position={[8, 1, 5]} scale={[5, 5, 1]} color="#bfe8ff" />
-      </Environment>
 
       <OrbitControls
         enablePan={false}

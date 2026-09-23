@@ -17,8 +17,10 @@
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Line, Html } from "@react-three/drei";
+import { OrbitControls, Line, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Escenario } from "./_escenario";
+import { PanelGrafica, CurvaTubo, EjeVarilla, MarcasEje } from "./_tablero";
 import {
   funcionPorId,
   segmentosCurva,
@@ -94,22 +96,16 @@ function Plano({ funcionId, accent, showSimetria, showRasgos, pausado }: {
     }
   });
 
-  // marcas de unidades sobre los ejes (−H..H)
-  const ticks = useMemo(() => {
-    const t: number[] = [];
-    for (let i = -H; i <= H; i++) if (i !== 0) t.push(i);
-    return t;
-  }, []);
-
   const iyVisible = Math.abs(iy) <= H;
 
   return (
     <group>
-      {/* tablero del plano */}
-      <mesh position={[0, 0, -0.06]} receiveShadow>
-        <planeGeometry args={[2 * H + 1.4, 2 * H + 1.4]} />
-        <meshStandardMaterial color="#07182c" metalness={0.05} roughness={0.95} />
-      </mesh>
+      {/* El tablero, con grosor y marco.
+          Era un `planeGeometry`: sin canto, al girar la cámara desaparecía, y
+          mientras tanto nada decía dónde acababa el plano cartesiano. Con
+          borde iluminado y sombra sobre la mesa se lee como un instrumento y
+          no como un fondo que se corta sin avisar. */}
+      <PanelGrafica ancho={2 * H + 1.4} alto={2 * H + 1.4} />
 
       {/* rejilla del plano cartesiano */}
       <gridHelper
@@ -118,33 +114,21 @@ function Plano({ funcionId, accent, showSimetria, showRasgos, pausado }: {
         position={[0, 0, -0.04]}
       />
 
-      {/* eje X */}
-      <Line points={[[-H - 0.4, 0, 0], [H + 0.5, 0, 0]]} color={EJE} lineWidth={2} />
-      <mesh position={[H + 0.6, 0, 0]} rotation={[0, 0, -Math.PI / 2]}>
-        <coneGeometry args={[0.13, 0.34, 16]} />
-        <meshStandardMaterial color={EJE} />
-      </mesh>
+      {/* eje X: varilla con punta, una sola pieza que recibe luz */}
+      <EjeVarilla desde={[-H - 0.4, 0, 0]} hasta={[H + 0.5, 0, 0]} color={EJE} />
       <Html position={[H + 0.95, 0.05, 0]} center distanceFactor={15} pointerEvents="none">
         <div style={{ color: EJE, fontSize: 12, fontWeight: 900 }}>X</div>
       </Html>
 
       {/* eje Y */}
-      <Line points={[[0, -H - 0.4, 0], [0, H + 0.5, 0]]} color={EJE} lineWidth={2} />
-      <mesh position={[0, H + 0.6, 0]}>
-        <coneGeometry args={[0.13, 0.34, 16]} />
-        <meshStandardMaterial color={EJE} />
-      </mesh>
+      <EjeVarilla desde={[0, -H - 0.4, 0]} hasta={[0, H + 0.5, 0]} color={EJE} />
       <Html position={[0.05, H + 0.95, 0]} center distanceFactor={15} pointerEvents="none">
         <div style={{ color: EJE, fontSize: 12, fontWeight: 900 }}>Y</div>
       </Html>
 
-      {/* marcas de unidad */}
-      {ticks.map((i) => (
-        <group key={`tx${i}`}>
-          <Line points={[[i, -0.1, 0], [i, 0.1, 0]]} color={EJE} lineWidth={1} />
-          <Line points={[[-0.1, i, 0], [0.1, i, 0]]} color={EJE} lineWidth={1} />
-        </group>
-      ))}
+      {/* marcas de unidad, como geometria y no como rayitas pintadas */}
+      <MarcasEje desde={-H} hasta={H} eje="x" color={EJE} />
+      <MarcasEje desde={-H} hasta={H} eje="y" color={EJE} />
       <Html position={[-0.32, -0.34, 0]} center distanceFactor={16} pointerEvents="none">
         <div style={{ color: EJE, fontSize: 10, fontWeight: 700 }}>0</div>
       </Html>
@@ -163,14 +147,14 @@ function Plano({ funcionId, accent, showSimetria, showRasgos, pausado }: {
           />
         ))}
 
-      {/* la curva y = f(x) */}
+      {/* La curva y = f(x), con cuerpo.
+          `<Line lineWidth>` es grosor EN PÍXELES: mide lo mismo de cerca que
+          de lejos, no recibe luz ni proyecta sombra, y por eso una parábola
+          bien calculada se veía pegada al fondo como una calcomanía. El tubo
+          ocupa espacio: tiene lado iluminado y lado en sombra, y se acerca
+          cuando la cámara se acerca. Las matemáticas no cambian. */}
       {segs.map((seg, i) => (
-        <Line
-          key={`cur${i}`}
-          points={seg.map(([x, y]) => [x, y, 0.02] as [number, number, number])}
-          color={accent}
-          lineWidth={4}
-        />
+        <CurvaTubo key={`cur${i}`} puntos={seg} color={accent} grosor={0.075} brillo={0.55} z={0.06} />
       ))}
 
       {/* eje de simetría / centro */}
@@ -244,7 +228,6 @@ function Plano({ funcionId, accent, showSimetria, showRasgos, pausado }: {
         </mesh>
       )}
 
-      <ContactShadows position={[0, 0, -0.05]} opacity={0.28} scale={2 * H + 6} blur={2.4} far={6} />
     </group>
   );
 }
@@ -267,31 +250,16 @@ function Contenido(props: FuncionesSceneProps) {
   const { funcionId, accent, showSimetria, showRasgos, pausado, autoRotate, resetNonce } = props;
   return (
     <>
-      <color attach="background" args={["#03101f"]} />
-      <fog attach="fog" args={["#03101f", 26, 54]} />
+      {/* Suelo, luz de tres puntos y entorno que reflejar. La altura sale
+          de donde esta escena ya ponía su sombra de contacto, que es donde
+          su autor decidió que estaba el piso. */}
+      <Escenario acento={accent} suelo={0} />
 
-      <ambientLight intensity={0.6} />
-      <directionalLight
-        position={[4, 8, 9]}
-        intensity={1.3}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-near={1}
-        shadow-camera-far={36}
-        shadow-bias={-0.0004}
-      />
-      <pointLight position={[0, 0, 8]} intensity={2.4} color="#ffffff" />
 
       <group key={`${resetNonce}`}>
         <Plano funcionId={funcionId} accent={accent} showSimetria={showSimetria} showRasgos={showRasgos} pausado={pausado} />
       </group>
 
-      <Environment resolution={256}>
-        <Lightformer intensity={1.4} position={[0, 7, 6]} scale={[16, 5, 1]} color="#ffffff" />
-        <Lightformer intensity={1.0} position={[-9, 3, 2]} scale={[5, 6, 1]} color={accent} />
-        <Lightformer intensity={1.0} position={[9, 2, 4]} scale={[4, 5, 1]} color="#bfe8ff" />
-      </Environment>
 
       <OrbitControls
         enablePan={false}
