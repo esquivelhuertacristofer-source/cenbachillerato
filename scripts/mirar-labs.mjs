@@ -43,7 +43,12 @@ function slugsPedidos() {
   const args = process.argv.slice(2).filter((a) => !a.startsWith('-'));
   if (args.length) return args;
   const reg = readFileSync(join(AQUI, '../src/components/practicas/registry.tsx'), 'utf8');
-  return [...reg.matchAll(/^\s*"([a-z0-9-]+)":\s*\{\s*\.\.\.PRACTICAS_META/gm)].map((m) => m[1]);
+  /* Las comillas de la clave son OPCIONALES. Exigiéndolas, la sonda se saltaba
+   * en silencio todos los laboratorios cuya clave es un identificador válido
+   * —`densidad:`, `fluidos:`, `fotosintesis:`— y el barrido «de los 211»
+   * visitaba 205. Un laboratorio no probado no da error: simplemente no sale
+   * en la lista, y eso se lee igual que «todo bien». */
+  return [...reg.matchAll(/^\s*"?([a-z0-9-]+)"?:\s*\{\s*\.\.\.PRACTICAS_META/gm)].map((m) => m[1]);
 }
 
 mkdirSync(SALIDA, { recursive: true });
@@ -77,35 +82,72 @@ async function pasarCompuertaSeguridad() {
   await p.waitForTimeout(600);
 }
 
+/**
+ * De la portada al lienzo.
+ *
+ * El camino tiene más escalones de los que parece: portada de la Expedición →
+ * «Empezar» → portada del capítulo 1 → «Empezar» → las viñetas de «TOCAR PARA
+ * DESCUBRIR» → «Capítulo 2: Laboratorio» → portada del capítulo 2 →
+ * «Empezar» → y ahí sí, el laboratorio.
+ *
+ * Dos cosas que hicieron fallar a la versión anterior en siete laboratorios:
+ *
+ *  - Marcaba las viñetas como «ya tocadas» con una bandera, y como hay DOS
+ *    portadas antes del capítulo 1, cuando por fin aparecían ya estaba puesta:
+ *    nunca las tocaba y se quedaba a un paso del final.
+ *
+ *  - LAS VIÑETAS CONSERVAN SU RÓTULO. Una vez descubiertas siguen diciendo
+ *    «TOCAR PARA DESCUBRIR», así que quitar la bandera sin más convierte el
+ *    recorrido en un bucle infinito: tocar, volver a encontrarlas, tocar. Se
+ *    limitan las rondas y, sobre todo, DESPUÉS DE TOCARLAS SE SIGUE BUSCANDO
+ *    el botón que avanza en la misma vuelta, en vez de empezar otra.
+ *
+ *  - Después de la última viñeta, el «CAPÍTULO COMPLETADO» entra con
+ *    animación: hay que esperarlo o parece que no hay por dónde seguir.
+ */
 async function hastaElLienzo() {
-  let tocadas = false;
-  for (let i = 0; i < 18; i++) {
+  /* Una ronda por capítulo con viñetas, y una de margen. */
+  let rondas = 0;
+  for (let i = 0; i < 22; i++) {
     if (await p.locator('canvas').count()) break;
+
     const tar = p.locator('button:has-text("TOCAR PARA DESCUBRIR")');
-    if (!tocadas && (await tar.count())) {
-      tocadas = true;
-      const n = await tar.count();
+    const n = await tar.count();
+    if (n && rondas < 3) {
+      rondas++;
       for (let k = 0; k < n; k++) {
         await tar.nth(k).click({ timeout: 4000 }).catch(() => {});
-        await p.waitForTimeout(200);
+        await p.waitForTimeout(180);
       }
-      continue;
+      await p.waitForTimeout(1400);
     }
+
+    /* EL ORDEN LO ES TODO, y esto costó dos rondas de averiguarlo.
+     *
+     * El «Empezar» de la portada anterior SIGUE EN EL DOM cuando ya se pasó
+     * de pantalla —sólo está fuera de vista— y para Playwright eso es
+     * visible: tiene caja y no está oculto. Buscándolo primero, la sonda lo
+     * pulsaba una y otra vez hasta agotar las vueltas, con el botón bueno
+     * delante y sin tocarlo.
+     *
+     * Así que primero va el que AVANZA DE CAPÍTULO, que además es
+     * inconfundible: la pestaña del encabezado dice «2» o «2 Laboratorio»,
+     * nunca «Capítulo 2». */
     const candidatos = [
+      'button:has-text("Capítulo 2")',
+      'button:has-text("Capítulo 3")',
       'button:has-text("Empezar")',
       'button:has-text("Siguiente")',
-      'button:has-text("Capítulo 2:")',
-      'button:has-text("Capítulo 3:")',
       'button:has-text("Continuar")',
     ];
     let bt = null;
     for (const sel of candidatos) {
       const l = p.locator(sel).first();
-      if (await l.count()) { bt = l; break; }
+      if ((await l.count()) && (await l.isVisible().catch(() => false))) { bt = l; break; }
     }
     if (!bt) break;
     await bt.click({ timeout: 6000 }).catch(() => {});
-    await p.waitForTimeout(1100);
+    await p.waitForTimeout(1200);
   }
   await pasarCompuertaSeguridad();
 }
@@ -121,10 +163,15 @@ for (const slug of slugsPedidos()) {
     errores.push(`[navegacion] ${String(e).slice(0, 160)}`);
   }
 
-  const lienzos = await p.locator('canvas').count();
   /* El Environment y el pase de transmisión tardan unos cuadros en resolverse;
    * sin esta espera se fotografía una escena a medio iluminar. */
   await p.waitForTimeout(4500);
+
+  /* Los lienzos SE CUENTAN DESPUÉS DE ESPERAR. Contándolos antes, un
+   * laboratorio cuyo `<Canvas>` llega por importación diferida salía con
+   * «lienzos: 0» aunque la captura —tomada después— lo enseñaba pintado. El
+   * informe acusaba a la escena de un defecto de la sonda. */
+  const lienzos = await p.locator('canvas').count();
 
   const archivo = join(SALIDA, `${slug}.png`);
   if (lienzos) {
