@@ -44,6 +44,7 @@ import {
 
 const NO = "#FF5E5E";
 import { useEstrellas } from "@/lib/hooks/useEstrellas";
+import { VinetaTermino } from "./_vineta";
 const RETO_KEY = "cen-falacias-logica-reto";
 
 type Modo = "falacias" | "validez" | "glosario" | "texto";
@@ -557,7 +558,7 @@ function BinsFalacias({
             {...dropProps((id) => onMatch(id, bin))}
           >
             <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
-              <i className={`fa-solid ${info.icono}`} style={{ color: T.text2 }} />
+              <VinetaTermino termino={info.titulo} color={T.text2} icono={info.icono} tam={29} radio={8} />
               <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
             </div>
             <div style={{ fontSize: 11, color: T.text3, marginBottom: 12, lineHeight: 1.4 }}>{info.subtitulo}</div>
@@ -608,7 +609,7 @@ function BinsValidez({
             {...dropProps((id) => onMatch(id, bin))}
           >
             <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
-              <i className={`fa-solid ${info.icono}`} style={{ color: bin === "valido" ? OK : "#FF5E5E" }} />
+              <VinetaTermino termino={info.titulo} color={bin === "valido" ? OK : "#FF5E5E"} icono={info.icono} tam={29} radio={8} />
               <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
             </div>
             <div style={{ fontSize: 11, color: T.text3, marginBottom: 12, lineHeight: 1.4 }}>{info.subtitulo}</div>

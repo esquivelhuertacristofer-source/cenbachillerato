@@ -22,6 +22,7 @@
 import { useMemo, useRef, useState } from "react";
 import { T, OK } from "./_kit";
 import { normaliza } from "./_mecanica-huecos";
+import { VinetaTermino } from "./_vineta";
 
 const NO = "#FF5E5E";
 
@@ -127,7 +128,8 @@ export function EscribeTermino({
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       <style>{`
         .mt-card { border-radius:15px; border:1px solid ${T.line}; background:${T.glass};
-          padding:15px 18px; display:flex; flex-direction:column; gap:10px; transition:border-color .16s, background .16s; }
+          padding:15px 18px; display:flex; align-items:flex-start; gap:15px; transition:border-color .16s, background .16s; }
+        .mt-cuerpo { flex:1; min-width:0; display:flex; flex-direction:column; gap:10px; }
         .mt-card[data-e="bien"] { border-color:${OK}55; background:${OK}0f; }
         .mt-in { border-radius:9px; border:1.5px solid ${T.lineStrong}; background:${T.inset}; color:#fff;
           font-size:14.5px; font-weight:700; padding:7px 12px; font-family:inherit; transition:all .15s; outline:none; min-width:180px; }
@@ -152,6 +154,11 @@ export function EscribeTermino({
 
       {pares.map((p, i) => (
         <div key={p.id} className="mt-card" data-e={estados[i]}>
+          {/* La ilustración del término, VELADA mientras no se acierta: es la
+              respuesta, y nítida resolvería el ejercicio sin leer la
+              definición. Al acertar se aclara: pasa de pista a premio. */}
+          <VinetaTermino termino={p.termino} color={accent} tam={72} radio={14} velada={estados[i] !== "bien"} />
+          <div className="mt-cuerpo">
           <div style={{ fontSize: 14.5, lineHeight: 1.5, color: T.text2 }}>{p.definicion}</div>
           {p.ejemplo && (
             <div style={{ fontSize: 12.5, lineHeight: 1.5, color: T.text3, fontStyle: "italic" }}>
@@ -201,6 +208,7 @@ export function EscribeTermino({
                 <i className="fa-solid fa-circle-check" /> {p.termino}
               </span>
             )}
+          </div>
           </div>
         </div>
       ))}

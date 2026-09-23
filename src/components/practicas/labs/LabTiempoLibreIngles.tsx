@@ -61,6 +61,7 @@ import {
   type Auxiliar,
   type Transformacion,
 } from "./tiempo-libre-ingles-data";
+import { VinetaTermino } from "./_vineta";
 
 const NO = "#FF5E5E";
 const RETO_KEY = "cen-tiempo-libre-ingles-reto";
@@ -944,7 +945,7 @@ function BinsRegla({
             {...dropProps((id) => onMatch(id, bin))}
           >
             <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
-              <i className={`fa-solid ${info.icono}`} style={{ color: T.text2 }} />
+              <VinetaTermino termino={info.titulo} color={T.text2} icono={info.icono} tam={31} radio={9} />
               <span style={{ fontSize: 14.5, fontWeight: 900, color: "#fff" }}>{info.titulo}</span>
             </div>
             <div style={{ fontSize: 11.5, color: T.text3, marginBottom: 4 }}>{info.subtitulo}</div>

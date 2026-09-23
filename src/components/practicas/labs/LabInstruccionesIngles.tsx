@@ -71,6 +71,7 @@ import {
   type ResultadoSim,
 } from "./instrucciones-ingles-data";
 import { useEstrellas } from "@/lib/hooks/useEstrellas";
+import { VinetaTermino } from "./_vineta";
 
 const NO = "#FF5E5E";
 const AMBAR = "#FFC75A";
@@ -1174,7 +1175,7 @@ function BloqueProcedimiento({
   return (
     <div style={{ ...card, padding: "18px 22px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: 6, flexWrap: "wrap" }}>
-        <i className={`fa-solid ${proc.icono}`} style={{ color: accent, fontSize: 16 }} />
+        <VinetaTermino termino={proc.titulo} color={accent} icono={proc.icono} tam={35} radio={10} />
         <span style={{ fontSize: 15, fontWeight: 900, color: "#fff" }}>{proc.titulo}</span>
         <div style={{ flex: 1 }} />
         <span style={{ fontSize: 12.5, fontWeight: 800, color: listo ? OK : T.text3 }}>

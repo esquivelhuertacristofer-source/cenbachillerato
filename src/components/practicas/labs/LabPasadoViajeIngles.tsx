@@ -80,6 +80,7 @@ import {
   type EscenaFondo,
   type FichaVerbo,
 } from "./pasado-viaje-data";
+import { VinetaTermino } from "./_vineta";
 
 const NO = "#FF5E5E";
 const RETO_KEY = "cen-pasado-viaje-reto";
@@ -589,7 +590,7 @@ export function LabPasadoViajeIngles({ color }: PracticaLabProps) {
                       }}
                     >
                       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 9 }}>
-                        <i className={`fa-solid ${info.icono}`} style={{ color: info.color, fontSize: 13 }} />
+                        <VinetaTermino termino={info.titulo} color={info.color} icono={info.icono} tam={29} radio={8} />
                         <span style={{ fontSize: 12.5, fontWeight: 900, color: "#fff" }}>{info.titulo}</span>
                       </div>
                       <div style={{ fontSize: 11, color: T.text3, marginBottom: 10, fontStyle: "italic" }}>{info.ejemplo}</div>

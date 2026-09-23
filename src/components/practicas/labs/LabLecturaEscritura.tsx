@@ -55,6 +55,7 @@ import {
   COMPRENSION_A1,
   type Funcion,
 } from "./lectura-escritura-data";
+import { VinetaTermino } from "./_vineta";
 
 const NO = "#FF5E5E";
 const RETO_KEY = "cen-lectura-escritura-dialogo-reto";
@@ -814,7 +815,7 @@ function CircuitoPanel({
                       <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, background: `${info.color}33`, color: "#fff" }}>
                         {i + 1}
                       </span>
-                      <i className={`fa-solid ${info.icono}`} style={{ color: info.color, fontSize: 13 }} />
+                      <VinetaTermino termino={info.label} color={info.color} icono={info.icono} tam={29} radio={8} />
                       <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: "0.05em", color: info.color, textTransform: "uppercase" }}>{info.label}</span>
                     </div>
                     <div style={{ fontSize: 13, lineHeight: 1.55, color: "#fff" }}>{paso.texto}</div>

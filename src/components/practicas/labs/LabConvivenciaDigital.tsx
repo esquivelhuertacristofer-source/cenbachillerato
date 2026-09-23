@@ -77,6 +77,7 @@ import {
   type ContextoId,
   type SenalId,
 } from "./convivencia-digital-data";
+import { VinetaTermino } from "./_vineta";
 
 const NO = "#FF5E5E";
 const RETO_KEY = "cen-convivencia-digital-reto";
@@ -649,7 +650,7 @@ export function LabConvivenciaDigital({ color }: PracticaLabProps) {
               {/* la vista previa y el efecto */}
               <div style={{ ...card, padding: "20px 22px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-                  <i className={`fa-solid ${canalInfo.icono}`} style={{ color: canalInfo.color }} />
+                  <VinetaTermino termino={canalInfo.titulo} color={canalInfo.color} icono={canalInfo.icono} tam={29} radio={8} />
                   <span style={{ fontSize: 13.5, fontWeight: 900 }}>{canalInfo.titulo}</span>
                   <span style={{ fontSize: 11.5, color: T.text3 }}>· lo leen: {canalInfo.audiencia}</span>
                 </div>
@@ -784,7 +785,7 @@ export function LabConvivenciaDigital({ color }: PracticaLabProps) {
                 return (
                   <div key={el.id} style={{ ...card, padding: "16px 20px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-                      <i className={`fa-solid ${el.icono}`} style={{ color: accent, fontSize: 15 }} />
+                      <VinetaTermino termino={el.titulo} color={accent} icono={el.icono} tam={33} radio={9} />
                       <span style={{ fontSize: 14.5, fontWeight: 900 }}>{el.titulo}</span>
                     </div>
                     <div style={{ fontSize: 12.5, color: T.text3, marginTop: 5, lineHeight: 1.5 }}>{el.detalle}</div>

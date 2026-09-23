@@ -31,6 +31,7 @@ import { QUIZ_A2 } from "./tipos-reacciones-quimicas-data";
 import { LabSfx } from "./lab-audio";
 import { useEstrellas } from "@/lib/hooks/useEstrellas";
 import { useLogros } from "./_partida";
+import { VinetaTermino } from "./_vineta";
 
 const ReaccionesTiposScene = dynamic(() => import("./ReaccionesTiposScene"), {
   ssr: false,
@@ -232,7 +233,7 @@ export function LabReaccionesTipos({ color }: PracticaLabProps) {
             {/* Badge tipo + fase */}
             <div style={{ position: "absolute", top: 58, left: 16, display: "flex", gap: 8 }}>
               <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${tc}88`, backdropFilter: "blur(10px)" }}>
-                <i className={`fa-solid ${tipo.icono}`} style={{ color: tc, fontSize: 12 }} />
+                <VinetaTermino termino={tipo.label} color={tc} icono={tipo.icono} tam={26} radio={7} />
                 <span style={{ fontSize: 11.5, fontWeight: 900, color: tc }}>{tipo.label}</span>
               </div>
               <div style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "6px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${faseColor}66`, backdropFilter: "blur(10px)" }}>

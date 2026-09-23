@@ -30,6 +30,7 @@ export function VinetaTermino({
   icono,
   tam = 44,
   radio = 11,
+  velada = false,
 }: {
   /** El término tal cual lo escribe el laboratorio; se normaliza al buscar. */
   termino: string;
@@ -39,6 +40,19 @@ export function VinetaTermino({
   icono?: string;
   tam?: number;
   radio?: number;
+  /**
+   * Tapada hasta que el alumno acierte.
+   *
+   * En «Escribe el término» la ilustración ES la respuesta: una plastilina de
+   * un anzuelo con un sobre delante de la definición de «phishing» resuelve el
+   * ejercicio sin leerlo. Velada se ve que hay algo, se intuye la forma y el
+   * color, y al acertar se aclara: la imagen pasa de pista a premio.
+   *
+   * Sin viñeta no se dibuja NADA en este modo —ni el icono de reserva—, para
+   * que una tarjeta sin foto no acabe enseñando un icono nítido mientras las
+   * demás están borrosas.
+   */
+  velada?: boolean;
 }) {
   const lab = useLabImagen();
   const src = lab?.slug ? imagenDeTermino(lab.slug, termino) : null;
@@ -48,7 +62,7 @@ export function VinetaTermino({
   const [rota, setRota] = useState(false);
 
   if (!src || rota) {
-    if (!icono) return null;
+    if (!icono || velada) return null;
     const clase = icono.startsWith("fa-") ? icono : `fa-${icono}`;
     return (
       <i
@@ -78,6 +92,9 @@ export function VinetaTermino({
         /* Sin fondo propio, una ilustración con transparencia se funde con la
          * tarjeta y se pierde el recorte. */
         background: "#0a1524",
+        filter: velada ? "blur(7px) saturate(.45) brightness(.8)" : "none",
+        transform: velada ? "scale(.94)" : "scale(1)",
+        transition: "filter .5s ease, transform .5s cubic-bezier(.34,1.3,.64,1)",
       }}
     />
   );

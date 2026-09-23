@@ -79,6 +79,7 @@ import {
   type PuntoTexto,
   type Elemento,
 } from "./lectura-voz-alta-data";
+import { VinetaTermino } from "./_vineta";
 
 const NO = "#FF5E5E";
 const RETO_KEY = "cen-lectura-en-voz-alta-reto";
@@ -517,7 +518,7 @@ export function LabLecturaVozAlta({ color }: PracticaLabProps) {
               <div style={{ ...card, padding: "20px 24px 22px" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 6 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <i className={`fa-solid ${texto.icono}`} style={{ color: accent, fontSize: 15 }} />
+                    <VinetaTermino termino={texto.titulo} color={accent} icono={texto.icono} tam={33} radio={9} />
                     <span style={{ fontSize: 16, fontWeight: 900 }}>{texto.titulo}</span>
                     <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: T.text3 }}>{texto.genero}</span>
                   </div>

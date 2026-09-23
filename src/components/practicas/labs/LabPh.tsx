@@ -50,6 +50,7 @@ type Modo = "medir" | "neutralizar";
 
 const WARN = "#FF8A3C";
 import { useEstrellas } from "@/lib/hooks/useEstrellas";
+import { VinetaTermino } from "./_vineta";
 const RETO_KEY = "cen-ph-reto";
 
 /** Equipo de protección personal: en química se manejan ácidos y bases corrosivos. */
@@ -868,7 +869,7 @@ function BarraBuffer({ b }: { b: typeof BUFFER[number] }) {
   return (
     <div>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
-        <i className={`fa-solid ${b.icono}`} style={{ color: T.text2, fontSize: 12, width: 16, textAlign: "center" }} />
+        <VinetaTermino termino={b.nombre} color={T.text2} icono={b.icono} tam={26} radio={7} />
         <span style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}>{b.nombre}</span>
         <span style={{ marginLeft: "auto", fontSize: 11, fontWeight: 800, color: delta > 1 ? "#FB7185" : "#34D399", fontFamily: "ui-monospace, monospace" }}>
           ΔpH {delta.toFixed(1)}

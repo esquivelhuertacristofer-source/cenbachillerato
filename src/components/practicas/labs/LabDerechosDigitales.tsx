@@ -61,6 +61,7 @@ import {
   type CasoDigital,
   type Letra,
 } from "./derechos-digitales-data";
+import { VinetaTermino } from "./_vineta";
 
 const NO = "#FF5E5E";
 const RETO_KEY = "cen-derechos-digitales-reto";
@@ -1065,7 +1066,7 @@ function ArcoPanel({
           {REGLAS_SOLICITUD.map((r) => (
             <div key={r.titulo} style={{ borderRadius: 12, border: `1px solid ${T.line}`, background: T.inset, padding: "12px 14px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 6 }}>
-                <i className={`fa-solid ${r.icono}`} style={{ color: accent, fontSize: 13 }} />
+                <VinetaTermino termino={r.titulo} color={accent} icono={r.icono} tam={29} radio={8} />
                 <span style={{ fontSize: 12.5, fontWeight: 800, color: T.text }}>{r.titulo}</span>
               </div>
               <p style={{ margin: 0, fontSize: 12, color: T.text2, lineHeight: 1.5 }}>{r.detalle}</p>

@@ -41,6 +41,7 @@ import {
 
 const NO = "#FF5E5E";
 import { useEstrellas } from "@/lib/hooks/useEstrellas";
+import { VinetaTermino } from "./_vineta";
 const RETO_KEY = "cen-posesivos-ingles-reto";
 
 type Modo = "genitivo" | "oraciones" | "clasifica" | "texto";
@@ -682,7 +683,7 @@ function BinsClasifica({
             {...dropProps((id) => onMatch(id, bin))}
           >
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-              <i className={`fa-solid ${info.icono}`} style={{ color: T.text2 }} />
+              <VinetaTermino termino={info.titulo} color={T.text2} icono={info.icono} tam={31} radio={9} />
               <span style={{ fontSize: 14, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
             </div>
             <div style={{ fontSize: 11.5, color: T.text3, marginBottom: 4 }}>{info.subtitulo}</div>

@@ -110,7 +110,14 @@ for (const slug of process.argv.slice(2)) {
       };
     })()`);
 
-  await p.waitForTimeout(500);
+  /* La zona suele caer por debajo del pliegue, y una captura que no la enseña
+   * no demuestra que se haya encendido. Se acerca ANTES de fotografiar, sin
+   * tocar el arrastre: `scrollIntoView` no dispara `dragleave`. */
+  await p.evaluate(() => {
+    const z = document.querySelector('[data-sobre="true"]');
+    if (z) z.scrollIntoView({ block: 'center' });
+  });
+  await p.waitForTimeout(600);
   await p.screenshot({ path: join(SALIDA, `${slug}.png`) });
   const nuevos = errores.slice(antes);
   const bien = estado.tarjeta === 'true' && estado.zona === 'true';

@@ -73,6 +73,7 @@ import {
   type RondaToBe,
   type RanuraTipo,
 } from "./perfil-personal-ingles-data";
+import { VinetaTermino } from "./_vineta";
 
 const NO = "#FF5E5E";
 const RETO_KEY = "cen-perfil-personal-ingles-reto";
@@ -959,7 +960,7 @@ function FormularioPanel({
               {...dropProps((id) => onSoltar(c.id, id))}
             >
               <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
-                <i className={`fa-solid ${c.icono}`} style={{ color: dato ? OK : accent, fontSize: 13 }} />
+                <VinetaTermino termino={c.label} color={dato ? OK : accent} icono={c.icono} tam={29} radio={8} />
                 <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff" }}>{c.label}</span>
               </div>
               <span style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.4 }}>{c.ayuda}</span>

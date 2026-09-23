@@ -60,6 +60,7 @@ import {
   type TextoAnalizable,
   type Marca,
 } from "./hecho-opinion-data";
+import { VinetaTermino } from "./_vineta";
 
 const NO = "#FF5E5E";
 const RETO_KEY = "cen-hecho-opinion-reto";
@@ -490,7 +491,7 @@ export function LabHechoOpinion({ color }: PracticaLabProps) {
               <div style={{ ...card, padding: "20px 24px 22px" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 6 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <i className={`fa-solid ${texto.icono}`} style={{ color: accent, fontSize: 15 }} />
+                    <VinetaTermino termino={texto.titulo} color={accent} icono={texto.icono} tam={33} radio={9} />
                     <span style={{ fontSize: 16, fontWeight: 900 }}>{texto.titulo}</span>
                     <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: T.text3 }}>{texto.genero}</span>
                   </div>
@@ -930,7 +931,7 @@ function ColumnasClasificar({
             {...dropProps((id) => onMatch(id, bin))}
           >
             <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
-              <i className={`fa-solid ${info.icono}`} style={{ color: info.color }} />
+              <VinetaTermino termino={info.titulo} color={info.color} icono={info.icono} tam={29} radio={8} />
               <span style={{ fontSize: 13.5, fontWeight: 900, color: "#fff" }}>{info.titulo}</span>
             </div>
             <div style={{ fontSize: 11, color: T.text3, marginBottom: 12, lineHeight: 1.45 }}>{info.descripcion}</div>
