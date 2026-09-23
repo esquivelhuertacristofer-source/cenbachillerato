@@ -209,6 +209,15 @@ export function LabComparativosIngles({ color }: PracticaLabProps) {
     onDragStart: (e: React.DragEvent) => {
       e.dataTransfer.setData("text/plain", id);
       e.dataTransfer.effectAllowed = "move";
+      // El hueco que deja la tarjeta mientras viaja. Por atributo y no por
+      // estado: un render por cada gesto de arrastre se nota con 20 tarjetas.
+      e.currentTarget.setAttribute("data-arrastrando", "true");
+    },
+    onDragEnd: (e: React.DragEvent) => {
+      // También cuando se suelta FUERA de cualquier zona; si no, la tarjeta se
+      // queda medio borrada para siempre.
+      e.currentTarget.removeAttribute("data-arrastrando");
+      document.querySelectorAll('[data-sobre="true"]').forEach((z) => z.removeAttribute("data-sobre"));
     },
   });
   const dropProps = (onDrop: (id: string) => void) => ({
@@ -216,8 +225,20 @@ export function LabComparativosIngles({ color }: PracticaLabProps) {
       e.preventDefault();
       e.dataTransfer.dropEffect = "move";
     },
+    onDragEnter: (e: React.DragEvent) => {
+      e.preventDefault();
+      e.currentTarget.setAttribute("data-sobre", "true");
+    },
+    onDragLeave: (e: React.DragEvent) => {
+      // `dragleave` salta también al pasar sobre un HIJO de la zona. Apagar sin
+      // comprobar deja la zona parpadeando mientras mueves la mano por dentro.
+      const r = e.currentTarget.getBoundingClientRect();
+      const fuera = e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+      if (fuera) e.currentTarget.removeAttribute("data-sobre");
+    },
     onDrop: (e: React.DragEvent) => {
       e.preventDefault();
+      e.currentTarget.removeAttribute("data-sobre");
       const id = e.dataTransfer.getData("text/plain");
       if (id) onDrop(id);
     },

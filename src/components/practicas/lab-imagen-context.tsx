@@ -24,6 +24,18 @@ export interface LabImagen {
   src: string;
   /** Texto alternativo: el título de la práctica. */
   alt: string;
+  /**
+   * El slug de la práctica.
+   *
+   * Hace falta para las VIÑETAS DE CADA TÉRMINO, que viven en
+   * `public/media/labs-terminos/<slug>/<clave>.webp`. Viaja por aquí por el
+   * mismo motivo que la carátula: lo conoce el contenedor, y pasarlo a mano
+   * serían más de doscientas ediciones para el mismo dato.
+   *
+   * Opcional para no romper a quien ya construía este valor sin él; sin slug,
+   * las viñetas simplemente no se dibujan y queda el icono de siempre.
+   */
+  slug?: string;
 }
 
 const LabImagenContext = createContext<LabImagen | null>(null);

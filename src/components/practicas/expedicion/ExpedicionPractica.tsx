@@ -19,6 +19,7 @@ import dynamic from "next/dynamic";
 import type { AreaColor } from "@/components/hub/hub-colors";
 import { mejorImagenDeLab } from "@/lib/practicas/lab-imagenes";
 import { LabImagenProvider } from "../lab-imagen-context";
+import { EstiloArrastre } from "../labs/_arrastre";
 import { getPractica } from "../registry";
 
 const Expedicion = dynamic(() => import("./Expedicion").then((m) => m.Expedicion), { ssr: false });
@@ -50,7 +51,12 @@ export function ExpedicionPractica({
   const Lab = practica.Component;
 
   return (
-    <LabImagenProvider valor={{ src: imagen, alt: practica.titulo }}>
+    <LabImagenProvider valor={{ src: imagen, alt: practica.titulo, slug }}>
+      {/* El vocabulario de movimiento del arrastre, una sola vez para los 211:
+          la tarjeta que se lleva en la mano, la zona que se enciende debajo y
+          el golpe de entrada al soltar. Va aquí y no en cada laboratorio
+          porque es el único sitio por el que pasan todos. */}
+      <EstiloArrastre />
       <Expedicion
         slug={slug}
         titulo={practica.titulo}

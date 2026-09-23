@@ -17,6 +17,7 @@
 import { useState, type ReactNode } from "react";
 import { T } from "./_kit";
 import { useLabImagen } from "../lab-imagen-context";
+import { VinetaTermino } from "./_vineta";
 import { useDentroDeExpedicion } from "../expedicion/expedicion-context";
 
 /* ── Forma de datos (la llena cada lab, verbatim) ─────────────────────── */
@@ -299,17 +300,26 @@ export function FichaTeorica({
           {(tab === "conceptos" || tab === "glosario") && (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {(tab === "conceptos" ? data.conceptos : data.glosario).map((c, i) => (
+                /* Cada concepto con su ilustración. Ya existían —una por
+                   término, generadas para la Expedición— y aquí dentro no se
+                   veía ninguna: la ficha era una lista de párrafos. */
                 <div
                   key={i}
                   style={{
+                    display: "flex",
+                    gap: 13,
+                    alignItems: "flex-start",
                     borderRadius: 12,
                     border: `1px solid ${T.line}`,
                     background: T.inset,
                     padding: "13px 16px",
                   }}
                 >
-                  <span style={{ display: "inline-block", fontSize: 14, fontWeight: 900, color: accent, marginBottom: 4 }}>{c.termino}</span>
-                  <p style={{ margin: 0, fontSize: 13.5, lineHeight: 1.55, color: T.text2 }}>{c.definicion}</p>
+                  <VinetaTermino termino={c.termino} color={accent} tam={52} radio={12} />
+                  <div style={{ minWidth: 0 }}>
+                    <span style={{ display: "inline-block", fontSize: 14, fontWeight: 900, color: accent, marginBottom: 4 }}>{c.termino}</span>
+                    <p style={{ margin: 0, fontSize: 13.5, lineHeight: 1.55, color: T.text2 }}>{c.definicion}</p>
+                  </div>
                 </div>
               ))}
             </div>

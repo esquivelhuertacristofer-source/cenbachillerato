@@ -35,7 +35,7 @@ export function PracticaRunner({
   const tituloPractica = practica?.titulo ?? actividadTitulo;
   // Sólo tiene sentido si la práctica existe: sin componente no hay laboratorio
   // del que enseñar una imagen.
-  const imagen = practica ? { src: mejorImagenDeLab(slug), alt: tituloPractica } : null;
+  const imagen = practica ? { src: mejorImagenDeLab(slug), alt: tituloPractica, slug } : null;
 
   // Con laboratorio: la práctica se abre como EXPEDICIÓN (portada, capítulos y
   // cierre alrededor del mismo laboratorio de siempre). El armazón de abajo se

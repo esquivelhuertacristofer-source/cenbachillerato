@@ -352,6 +352,15 @@ export function LabLecturaCritica({ color }: PracticaLabProps) {
     onDragStart: (e: React.DragEvent) => {
       e.dataTransfer.setData("text/plain", id);
       e.dataTransfer.effectAllowed = "move";
+      // El hueco que deja la tarjeta mientras viaja. Por atributo y no por
+      // estado: un render por cada gesto de arrastre se nota con 20 tarjetas.
+      e.currentTarget.setAttribute("data-arrastrando", "true");
+    },
+    onDragEnd: (e: React.DragEvent) => {
+      // También cuando se suelta FUERA de cualquier zona; si no, la tarjeta se
+      // queda medio borrada para siempre.
+      e.currentTarget.removeAttribute("data-arrastrando");
+      document.querySelectorAll('[data-sobre="true"]').forEach((z) => z.removeAttribute("data-sobre"));
     },
   });
   /**
