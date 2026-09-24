@@ -774,7 +774,15 @@ export function LabModelosAtomicos({ color }: PracticaLabProps) {
             <div
               style={{
                 position: "absolute",
-                bottom: 14,
+                /* POR ENCIMA DEL BOTÓN DE «TEORÍA», NO DEBAJO.
+                 *
+                 * El botón flotante se movió a esta misma esquina
+                 * (`bottom:16 right:16`, 99×44) para que dejara de taparle el
+                 * texto al narrador, y aquí pasó a tapar esta lectura: del
+                 * «25 °C / 298 K» solo asomaba el «25». 14 + 44 de botón + 10
+                 * de aire. Sigue alineada a la derecha con él, así que las dos
+                 * se leen como una columna. */
+                bottom: 68,
                 right: 16,
                 textAlign: "right",
                 pointerEvents: "none",

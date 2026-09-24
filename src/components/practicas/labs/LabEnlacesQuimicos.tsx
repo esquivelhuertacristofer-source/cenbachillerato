@@ -302,7 +302,7 @@ export function LabEnlacesQuimicos({ color }: PracticaLabProps) {
             </div>
 
             {/* Tipo de enlace (esquina inferior derecha) */}
-            <div style={{ position: "absolute", bottom: 14, right: 16, textAlign: "right", pointerEvents: "none", background: "rgba(2,12,28,0.6)", padding: "8px 14px", borderRadius: 13, backdropFilter: "blur(6px)", border: `1px solid ${catColor}55` }}>
+            <div style={{ position: "absolute", bottom: 68, right: 16, textAlign: "right", pointerEvents: "none", background: "rgba(2,12,28,0.6)", padding: "8px 14px", borderRadius: 13, backdropFilter: "blur(6px)", border: `1px solid ${catColor}55` }}>
               <div style={{ fontSize: 10, color: T.text3, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" }}>Tipo de enlace</div>
               <div style={{ fontSize: 16, fontWeight: 900, color: catColor, marginTop: 2, textShadow: `0 0 14px ${catColor}66` }}>{CAT_LABEL[mol.categoria]}</div>
             </div>

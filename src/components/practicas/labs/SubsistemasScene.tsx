@@ -21,7 +21,7 @@
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Html } from "@react-three/drei";
+import { OrbitControls, Html, Stars } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { calcularEstado, CO2_MAX, CO2_REF } from "./subsistemas-data";
 import { Escenario } from "./_escenario";
@@ -250,8 +250,16 @@ function Planeta(props: SubsistemasSceneProps) {
       {/* etiquetas de los cuatro subsistemas */}
       <Etiqueta pos={[0, 3.0, 0]} color="#7cc4ff" icono="fa-wind" nombre="Atmósfera" dato={`${Math.round(co2)} ppm CO₂`} />
       <Etiqueta pos={[3.0, 0.4, 0.6]} color="#3aa0ff" icono="fa-water" nombre="Hidrosfera" dato={`pH ${est.ph.toFixed(2)}`} />
-      <Etiqueta pos={[-2.9, -1.0, 0.8]} color="#c2895a" icono="fa-mountain" nombre="Litosfera" dato={volc > 0 ? "volcán activo" : "estable"} />
-      <Etiqueta pos={[0.4, -0.3, 3.0]} color="#34D399" icono="fa-leaf" nombre="Biosfera" dato={`${Math.round(veg)}% cobertura`} />
+      {/* LAS CUATRO, SEPARADAS EN PANTALLA Y NO SOLO EN EL MUNDO.
+       *
+       * «Biosfera» estaba en [0.4, −0.3, 3.0]: casi centrada y muy adelantada
+       * hacia la cámara, así que se proyectaba justo encima de «Litosfera» y le
+       * tapaba el dato —se leía «Litosfera» y debajo media palabra—. Dos puntos
+       * separados en 3D pueden caer pegados en la imagen; lo que hay que
+       * separar es donde ATERRIZAN. Litosfera baja a la izquierda y Biosfera al
+       * frente-derecha, cada una en su cuadrante. */}
+      <Etiqueta pos={[-3.3, -1.7, 0.6]} color="#c2895a" icono="fa-mountain" nombre="Litosfera" dato={volc > 0 ? "volcán activo" : "estable"} />
+      <Etiqueta pos={[2.1, -2.4, 2.2]} color="#34D399" icono="fa-leaf" nombre="Biosfera" dato={`${Math.round(veg)}% cobertura`} />
 
       {/* Sol como motor energético */}
       <group position={[-5.0, 4.0, 2.4]}>
@@ -288,10 +296,22 @@ function Contenido(props: SubsistemasSceneProps) {
   const { accent, autoRotate, resetNonce } = props;
   return (
     <>
-      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
-      {/* La altura sale de donde esta escena ya ponía su sombra de
-          contacto: es donde su autor decidió que estaba el piso. */}
-      <Escenario acento={accent} suelo={-3.1} />
+      {/* AQUÍ NO HAY SUELO: ESTO ES EL ESPACIO.
+       *
+       * La campaña de calidad 3D le puso mesa a 112 escenas porque la falta de
+       * suelo era la causa real de que se vieran planas, y la altura se dedujo
+       * de donde cada escena ya ponía su sombra de contacto. En casi todas
+       * acierta —una molécula, un matraz y una balanza se leen como objetos
+       * sobre un banco de laboratorio—, pero aquí el objeto es la Tierra: un
+       * plano gris debajo del planeta, con su sombra proyectada, es un error de
+       * física, no de gusto.
+       *
+       * Se conserva la luz y el entorno de `Escenario` —que es lo que da el
+       * volumen— y se quitan la mesa y la niebla, igual que en
+       * `GravitacionScene`. Las estrellas ponen el fondo que antes ponía el
+       * suelo: sin ellas la escena se queda flotando en un vacío liso. */}
+      <Escenario acento={accent} suelo={-3.1} mesa={false} niebla={false} />
+      <Stars radius={70} depth={30} count={1400} factor={3} saturation={0} fade speed={0.6} />
 
 
       <group key={`${resetNonce}`}>

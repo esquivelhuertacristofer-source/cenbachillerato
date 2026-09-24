@@ -34,6 +34,37 @@ type P3 = [number, number, number];
 
 const posY = (logv: number) => ((logv - N_MIN) / RANGE) * H - H / 2;
 
+/**
+ * EN QUÉ COLUMNA VA LA ETIQUETA DE CADA REFERENCIA.
+ *
+ * Las doce referencias van a su altura VERDADERA, y eso no se toca: en esta
+ * torre la altura ES la magnitud, moverlas para que quepan sería mentir. Pero
+ * la escala logarítmica las junta mucho en los tramos poblados —la Luna está a
+ * 10^6.54 y la Tierra a 10^7.11, que son 0,57 décadas: unos 15 px en pantalla
+ * para un rótulo de 28 px de alto—, y se leían unas encima de otras: «La
+ * Tierra» tapando «La Luna», «Ballena azul» sobre «Una persona» sobre «Una
+ * mano», «Bacteria» sobre «Virus».
+ *
+ * Lo que colisiona es el ANCHO del texto, no el punto; así que la separación va
+ * en horizontal. Cuando dos quedan más cerca que `SEPARACION`, la segunda salta
+ * a la columna de al lado, y vuelve a la primera en cuanto hay hueco. La altura
+ * de todas sigue siendo exactamente la suya.
+ */
+const SEPARACION = 0.62; // en unidades del mundo, ~un rótulo de alto
+const CARRIL: number[] = (() => {
+  const orden = REFERENCIAS.map((r, i) => ({ i, y: posY(logPos(r.a, r.n)) })).sort((p, q) => p.y - q.y);
+  const carriles: number[] = new Array(REFERENCIAS.length).fill(0);
+  let ultimaY = -Infinity;
+  let ultimoCarril = 1;
+  for (const { i, y } of orden) {
+    const carril = y - ultimaY < SEPARACION ? 1 - ultimoCarril : 0;
+    carriles[i] = carril;
+    ultimaY = y;
+    ultimoCarril = carril;
+  }
+  return carriles;
+})();
+
 function Chip({ pos, color, df = 16, children }: { pos: P3; color: string; df?: number; children: React.ReactNode }) {
   return (
     <Html position={pos} center distanceFactor={df} zIndexRange={[10, 0]}>
@@ -77,9 +108,9 @@ export default function NotacionScene(props: NotacionSceneProps) {
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
       camera={{ position: [7.5, 1.5, 13.5], fov: 42 }}
     >
-      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
-      {/* La altura sale de donde esta escena ya ponía su sombra de
-          contacto: es donde su autor decidió que estaba el piso. */}
+      {/* Suelo, luz de tres puntos y entorno que reflejar. La altura sale
+          de donde esta escena ya ponía su sombra de contacto, que es donde
+          su autor decidió que estaba el piso. */}
       <Escenario acento={accent} suelo={-H / 2 - 0.5} />
 
 
@@ -116,7 +147,7 @@ export default function NotacionScene(props: NotacionSceneProps) {
         })}
 
         {/* Referencias reales a su altura verdadera */}
-        {REFERENCIAS.map((r) => {
+        {REFERENCIAS.map((r, i) => {
           const y = posY(logPos(r.a, r.n));
           const activo = r.n === n;
           return (
@@ -125,7 +156,7 @@ export default function NotacionScene(props: NotacionSceneProps) {
                 <sphereGeometry args={[0.07, 16, 16]} />
                 <meshStandardMaterial color={activo ? accent : "#6f8aa3"} emissive={activo ? accent : "#6f8aa3"} emissiveIntensity={activo ? 0.7 : 0.3} />
               </mesh>
-              <Chip pos={[1.55, 0, 0]} color={activo ? accent : "#142231"} df={17}>
+              <Chip pos={[1.55 + CARRIL[i]! * 3.3, 0, 0]} color={activo ? accent : "#142231"} df={17}>
                 <i className={`fa-solid ${r.icono}`} style={{ marginRight: 6, opacity: 0.9 }} />
                 {r.nombre}
               </Chip>
