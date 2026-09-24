@@ -42,6 +42,8 @@ function makeChain(result: { data: unknown; error?: unknown }) {
     c[m] = jest.fn(() => c);
   }
   c.maybeSingle = jest.fn(() => resolved);
+  /* `soloAlumnoPuedeEntregar` termina en `.single()`, no en `.maybeSingle()`. */
+  c.single = jest.fn(() => resolved);
   c.then = resolved.then.bind(resolved);
   return c;
 }
@@ -49,16 +51,24 @@ function makeChain(result: { data: unknown; error?: unknown }) {
 function makeSb(opts: {
   actividad?: { id: string; estado: string } | null;
   insertError?: { code?: string; message?: string } | null;
+  /** Rol de quien entrega: solo `student` puede. Ver `soloAlumnoPuedeEntregar`. */
+  rol?: string | null;
+  rolError?: unknown;
 }) {
   const actChain = makeChain({ data: opts.actividad === undefined ? { id: "act-1", estado: "publicada" } : opts.actividad });
+  const perfilChain = makeChain({
+    data: opts.rolError ? null : { role: opts.rol === undefined ? "student" : opts.rol },
+    error: opts.rolError ?? null,
+  });
   const insert = jest.fn(() => Promise.resolve({ error: opts.insertError ?? null }));
   const from = jest.fn((table: string) => {
     if (table === "actividades") return actChain;
+    if (table === "profiles") return perfilChain;
     if (table === "intentos") return { insert };
     throw new Error(`tabla no mockeada en test: ${table}`);
   });
   const sb = { from } as unknown as Awaited<ReturnType<typeof getSupabaseServer>>;
-  return { sb, from, insert, actChain };
+  return { sb, from, insert, actChain, perfilChain };
 }
 
 const UUID_ACTIVIDAD = "11111111-1111-4111-8111-111111111111";
@@ -225,5 +235,47 @@ describe("entregarActividad — wrapper", () => {
     expect(insert).toHaveBeenCalledWith(
       expect.objectContaining({ user_id: USER_ID, actividad_id: UUID_ACTIVIDAD, score: 90 })
     );
+  });
+});
+
+// ── soloAlumnoPuedeEntregar — el docente mira, no entrega ───────────────────
+
+describe("entregarActividad — solo el alumno entrega", () => {
+  test("un docente en vista previa no guarda intento", async () => {
+    mockGetUser.mockResolvedValue({ id: USER_ID } as never);
+    mockCheckRateLimit.mockResolvedValue({ allowed: true });
+    const { sb, insert } = makeSb({ rol: "teacher" });
+    mockGetSupabaseServer.mockResolvedValue(sb);
+
+    const res = await entregarActividad(UUID_ACTIVIDAD, { puntaje: 90 });
+
+    expect(res).toEqual({
+      error: "Estás viendo la actividad como docente: no se guarda ninguna entrega.",
+    });
+    expect(insert).not.toHaveBeenCalled();
+  });
+
+  test("si el perfil no se puede leer, no se adivina: tampoco entrega", async () => {
+    mockGetUser.mockResolvedValue({ id: USER_ID } as never);
+    mockCheckRateLimit.mockResolvedValue({ allowed: true });
+    const { sb, insert } = makeSb({ rolError: { message: "boom" } });
+    mockGetSupabaseServer.mockResolvedValue(sb);
+
+    const res = await entregarActividad(UUID_ACTIVIDAD, { puntaje: 90 });
+
+    expect(res).toEqual({ error: "No se pudo verificar tu cuenta. Vuelve a entrar." });
+    expect(insert).not.toHaveBeenCalled();
+  });
+
+  test("el alumno sigue entregando igual que siempre", async () => {
+    mockGetUser.mockResolvedValue({ id: USER_ID } as never);
+    mockCheckRateLimit.mockResolvedValue({ allowed: true });
+    const { sb, insert } = makeSb({ rol: "student" });
+    mockGetSupabaseServer.mockResolvedValue(sb);
+
+    const res = await entregarActividad(UUID_ACTIVIDAD, { puntaje: 90 });
+
+    expect(res).toEqual({ ok: true });
+    expect(insert).toHaveBeenCalled();
   });
 });

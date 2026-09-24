@@ -15,12 +15,13 @@ import type {
 export async function getUACsConCompletionGrupo(grupoId: string, docenteId: string): Promise<UACCompletionData[]> {
   const sb = await getSupabaseServer();
 
-  const { data: grupo } = await sb
-    .from("grupos")
-    .select("semestre")
-    .eq("id", grupoId)
-    .eq("id_docente", docenteId)
-    .maybeSingle();
+  /* El grupo (que es además la comprobación de que es SUYO) y su padrón no
+     dependen el uno del otro: se piden a la vez. Lo que sigue sí encadena,
+     porque cada paso necesita los ids del anterior. */
+  const [{ data: grupo }, { data: relaciones }] = await Promise.all([
+    sb.from("grupos").select("semestre").eq("id", grupoId).eq("id_docente", docenteId).maybeSingle(),
+    sb.from("alumnos_grupos").select("id_alumno").eq("id_grupo", grupoId),
+  ]);
 
   if (!grupo) return [];
 
@@ -31,11 +32,6 @@ export async function getUACsConCompletionGrupo(grupoId: string, docenteId: stri
     .order("orden", { ascending: true });
 
   if (!uacs || uacs.length === 0) return [];
-
-  const { data: relaciones } = await sb
-    .from("alumnos_grupos")
-    .select("id_alumno")
-    .eq("id_grupo", grupoId);
 
   const totalAlumnos = relaciones?.length ?? 0;
   const alumnoIds = relaciones?.map((r) => r.id_alumno) ?? [];

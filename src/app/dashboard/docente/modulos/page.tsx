@@ -2,8 +2,10 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import Sidebar from '@/components/dashboard/Sidebar';
 import { UAC_BASE } from '@/lib/mccems/estructura';
+import { PLANTEAMIENTO_CODES } from '@/data/planteamiento/hub-index';
 import {
   BookOpen,
   ChevronRight,
@@ -230,10 +232,32 @@ export default function ModulosPage() {
                             <p className="text-[9px] font-black uppercase tracking-widest text-white/20 mb-1">Semestre</p>
                             <p className="text-4xl font-black text-white leading-none">{uac.semestre}°</p>
                           </div>
-                          <button className="px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl active:scale-95 bg-white text-[#011C40] hover:bg-[#D4A574] hover:text-white">
-                            Ver UAC
-                            <ChevronRight className="inline w-4 h-4 ml-2" />
-                          </button>
+                          {/* Este boton no llevaba a ningun sitio: no tenia `onClick`. Ahora
+                              abre el planteamiento de ESA UAC, y cuando una UAC todavia no
+                              tiene planteamiento escrito se dice, en vez de ofrecer un boton
+                              que no responde. */}
+                          {/* La que pedían las maestras: abrir la materia tal como la ve
+                              su grupo. Va al hub del alumno, que desde hoy deja entrar al
+                              docente en vista previa y no le guarda nada. */}
+                          <Link
+                            href={`/hub/uac/${encodeURIComponent(uac.codigo)}`}
+                            className="px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border border-white/15 text-white/70 hover:border-[#7DD3FC]/50 hover:text-[#7DD3FC] active:scale-95"
+                          >
+                            Ver como alumno
+                          </Link>
+                          {PLANTEAMIENTO_CODES.includes(uac.codigo) ? (
+                            <Link
+                              href={`/dashboard/docente/planteamiento?uac=${encodeURIComponent(uac.codigo)}`}
+                              className="px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl active:scale-95 bg-white text-[#011C40] hover:bg-[#D4A574] hover:text-white"
+                            >
+                              Ver UAC
+                              <ChevronRight className="inline w-4 h-4 ml-2" />
+                            </Link>
+                          ) : (
+                            <span className="px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-white/10 text-white/30">
+                              Sin planteamiento aún
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>

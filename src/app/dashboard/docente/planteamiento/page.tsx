@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import type { ProgresionPlan } from '@/lib/schemas/planteamiento.schema';
 import {
   Search,
@@ -137,8 +138,29 @@ function buildTheme(dark: boolean) {
 
 // ── Main Page ──────────────────────────────────────────────────────────────
 
+/*
+ * `?uac=CODIGO` es como llega quien pulsa «Ver UAC» en Modulos CEN.
+ *
+ * `useSearchParams()` obliga a un <Suspense> alrededor —sin el, el build de una
+ * pagina de cliente prerenderizada falla—, y por eso la pagina de verdad vive en
+ * el componente de abajo. Se lee UNA vez, como valor inicial: a partir de ahi
+ * manda el selector, no la URL.
+ */
 export default function PlanteamientoPage() {
-  const [selectedUAC, setSelectedUAC]           = useState(FIRST_UAC?.codigo ?? 'LC-I');
+  return (
+    <Suspense fallback={null}>
+      <PlanteamientoContenido />
+    </Suspense>
+  );
+}
+
+function PlanteamientoContenido() {
+  const uacPedida = useSearchParams().get('uac');
+  const [selectedUAC, setSelectedUAC]           = useState(
+    uacPedida && PLANTEAMIENTO_CODES.includes(uacPedida)
+      ? uacPedida
+      : (FIRST_UAC?.codigo ?? 'LC-I'),
+  );
   const [selectedProgCode, setSelectedProgCode] = useState<string | null>(null);
   const [activeTab, setActiveTab]               = useState<ContentTab>('estrategia');
   const [searchQuery, setSearchQuery]           = useState('');

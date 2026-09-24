@@ -1,6 +1,6 @@
 'use client';
 
-import Sidebar from '@/components/dashboard/Sidebar';
+import Sidebar, { type GrupoDelDocente } from '@/components/dashboard/Sidebar';
 import WelcomeBanner from '@/components/dashboard/WelcomeBanner';
 import MetricCards from '@/components/dashboard/MetricCards';
 import LatestDeliveries from '@/components/dashboard/LatestDeliveries';
@@ -24,6 +24,8 @@ interface DashboardContentProps {
   totalGrupos: number;
   totalActividadesCompletadas: number;
   primerGrupo?: { id: string; nombre: string; semestre: number };
+  /** Todos los grupos del docente: de aqui salen los dos selectores del lateral. */
+  grupos?: GrupoDelDocente[];
   semestre: number;
   grupoIds: string[];
   topList: TopAlumnoItem[];
@@ -36,6 +38,7 @@ export function DashboardContent({
   totalGrupos,
   totalActividadesCompletadas,
   primerGrupo,
+  grupos = [],
   semestre,
   grupoIds,
   topList,
@@ -69,6 +72,8 @@ export function DashboardContent({
         teacherName={teacherName}
         grupoNombre={primerGrupo?.nombre}
         currentSemestre={semestre as 1 | 2 | 3 | 4 | 5 | 6}
+        grupos={grupos}
+        grupoActivoId={primerGrupo?.id}
       />
 
       {/* Main sin ml — el slot del sidebar ya lo posiciona en x=260px */}

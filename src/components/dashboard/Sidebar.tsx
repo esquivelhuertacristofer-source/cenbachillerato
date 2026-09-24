@@ -12,6 +12,7 @@ import {
   ChevronDown,
   Library,
 } from 'lucide-react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, LayoutGroup } from 'motion/react';
@@ -29,18 +30,48 @@ const navItems = [
 const SEMESTRES = [1, 2, 3, 4, 5, 6] as const;
 type Semestre = (typeof SEMESTRES)[number];
 
+export type GrupoDelDocente = { id: string; nombre: string; semestre: number };
+
+/*
+ * NADA QUE NO SE PUEDA PULSAR (2026-09-22).
+ *
+ * Aquí había seis botones de semestre y un «Grupo activo» con su flechita de
+ * desplegable. Los seis llamaban a `onSemestreChange`, que era opcional y que
+ * NINGUNA página pasaba —ni `DashboardContent`, que es quien pinta el panel—,
+ * y el de grupo no tenía `onClick` siquiera. Se pintaban, se iluminaban al
+ * pasar el ratón y no hacían absolutamente nada, en todas las escuelas.
+ *
+ * Una maestra de Froebel lo reportó como «la pantalla está congelada», y es
+ * exactamente lo que parece: pulsas lo que la interfaz te ofrece y no pasa
+ * nada, así que lo que se rompió no es el botón, es la confianza en el resto
+ * de la pantalla.
+ *
+ * Ahora los dos controles salen de `grupos` —los grupos donde el docente es
+ * titular— y cambian de grupo de verdad, por `?grupo=<id>`. Y si sólo hay un
+ * grupo, o ninguno, no se pinta el control: se pinta el dato. Un semestre que
+ * el docente no da no es una opción, y una opción única no es una elección.
+ */
 export default function Sidebar({
   teacherName,
   grupoNombre,
   currentSemestre = 1,
-  onSemestreChange,
+  grupos = [],
+  grupoActivoId,
 }: {
   teacherName?: string;
   grupoNombre?: string;
   currentSemestre?: Semestre;
-  onSemestreChange?: (s: Semestre) => void;
+  grupos?: GrupoDelDocente[];
+  grupoActivoId?: string;
 }) {
   const pathname = usePathname();
+  const [abierto, setAbierto] = useState(false);
+
+  /* Un grupo por semestre, el primero: el selector de semestre es un atajo al
+     grupo de ese semestre, no una dimensión aparte. */
+  const grupoDeSemestre = new Map<number, GrupoDelDocente>();
+  for (const g of grupos) if (!grupoDeSemestre.has(g.semestre)) grupoDeSemestre.set(g.semestre, g);
+  const semestresQueDa = SEMESTRES.filter((s) => grupoDeSemestre.has(s));
 
   return (
     <aside
@@ -72,43 +103,87 @@ export default function Sidebar({
         </Link>
       </div>
 
-      {/* Semestre Selector */}
+      {/* Semestre: botones SOLO si el docente da mas de un semestre */}
       <div className="relative z-10 px-[18px] pt-4 mb-5">
         <p className="text-white/28 text-[9.5px] font-extrabold uppercase tracking-[0.16em] mb-2 px-0.5">Semestre activo</p>
-        <div className="bg-white/[0.04] p-1.5 rounded-2xl border border-white/[0.08] grid grid-cols-3 gap-1">
-          {SEMESTRES.map((s) => (
-            <button
-              key={s}
-              onClick={() => onSemestreChange?.(s)}
-              className={`py-2 rounded-xl text-[11px] font-extrabold transition-all duration-200 ${
-                currentSemestre === s
-                  ? 'bg-gradient-to-br from-[#E5C295] to-[#D4A574] text-[#3a2410] shadow-[0_6px_14px_rgba(212,165,116,0.30)]'
-                  : 'text-white/35 hover:text-white/70 hover:bg-white/[0.04]'
-              }`}
-            >
-              {s}°
-            </button>
-          ))}
-        </div>
+        {semestresQueDa.length > 1 ? (
+          <div className="bg-white/[0.04] p-1.5 rounded-2xl border border-white/[0.08] grid grid-cols-3 gap-1">
+            {semestresQueDa.map((s) => (
+              <Link
+                key={s}
+                href={`/dashboard/docente?grupo=${grupoDeSemestre.get(s)!.id}`}
+                aria-current={currentSemestre === s ? 'true' : undefined}
+                className={`py-2 rounded-xl text-[11px] font-extrabold text-center transition-all duration-200 ${
+                  currentSemestre === s
+                    ? 'bg-gradient-to-br from-[#E5C295] to-[#D4A574] text-[#3a2410] shadow-[0_6px_14px_rgba(212,165,116,0.30)]'
+                    : 'text-white/35 hover:text-white/70 hover:bg-white/[0.04]'
+                }`}
+              >
+                {s}°
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="bg-white/[0.04] px-3.5 py-2.5 rounded-2xl border border-white/[0.08]">
+            <p className="text-white font-bold text-[13px] tracking-tight">{currentSemestre}° semestre</p>
+          </div>
+        )}
       </div>
 
-      {/* Active Group Badge */}
-      <div className="relative z-10 px-[18px] mb-5">
-        <button className="w-full flex items-center gap-3 rounded-2xl bg-white/[0.03] border border-white/[0.08] px-3.5 py-3 group transition-all duration-200 hover:bg-white/[0.06] hover:border-white/[0.14] text-left">
-          <div className="relative h-[34px] w-[34px] shrink-0 rounded-[10px] bg-gradient-to-br from-[#E5C295] to-[#b8895a] flex items-center justify-center text-[#3a2410] shadow-[0_4px_12px_rgba(212,165,116,0.35)]">
-            <Zap className="w-4 h-4" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-white/40 text-[9px] font-extrabold uppercase tracking-[0.14em] leading-none mb-1">Grupo activo</p>
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-white font-bold text-[13px] truncate tracking-tight">
-                {grupoNombre || `Semestre ${currentSemestre}`}
-              </p>
-              <ChevronDown className="w-3.5 h-3.5 text-white/25 group-hover:text-white/70 transition-colors shrink-0" />
+      {/* Grupo activo: desplegable de verdad si hay mas de uno; si no, el dato y ya */}
+      {grupoNombre && (
+        <div className="relative z-10 px-[18px] mb-5">
+          {grupos.length > 1 ? (
+            <>
+              <button
+                type="button"
+                onClick={() => setAbierto((v) => !v)}
+                aria-expanded={abierto}
+                className="w-full flex items-center gap-3 rounded-2xl bg-white/[0.03] border border-white/[0.08] px-3.5 py-3 group transition-all duration-200 hover:bg-white/[0.06] hover:border-white/[0.14] text-left"
+              >
+                <div className="relative h-[34px] w-[34px] shrink-0 rounded-[10px] bg-gradient-to-br from-[#E5C295] to-[#b8895a] flex items-center justify-center text-[#3a2410] shadow-[0_4px_12px_rgba(212,165,116,0.35)]">
+                  <Zap className="w-4 h-4" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-white/40 text-[9px] font-extrabold uppercase tracking-[0.14em] leading-none mb-1">Grupo activo</p>
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-white font-bold text-[13px] truncate tracking-tight">{grupoNombre}</p>
+                    <ChevronDown className={`w-3.5 h-3.5 text-white/25 group-hover:text-white/70 transition-transform shrink-0 ${abierto ? 'rotate-180' : ''}`} />
+                  </div>
+                </div>
+              </button>
+              {abierto && (
+                <ul className="mt-1.5 rounded-2xl bg-[#011C40] border border-white/[0.08] overflow-hidden">
+                  {grupos.map((g) => (
+                    <li key={g.id}>
+                      <Link
+                        href={`/dashboard/docente?grupo=${g.id}`}
+                        onClick={() => setAbierto(false)}
+                        aria-current={g.id === grupoActivoId ? 'true' : undefined}
+                        className={`block px-3.5 py-2.5 text-[12.5px] font-bold truncate transition-colors ${
+                          g.id === grupoActivoId ? 'text-[#E5C295] bg-white/[0.06]' : 'text-white/60 hover:text-white hover:bg-white/[0.04]'
+                        }`}
+                      >
+                        {g.nombre}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
+          ) : (
+            <div className="w-full flex items-center gap-3 rounded-2xl bg-white/[0.03] border border-white/[0.08] px-3.5 py-3">
+              <div className="relative h-[34px] w-[34px] shrink-0 rounded-[10px] bg-gradient-to-br from-[#E5C295] to-[#b8895a] flex items-center justify-center text-[#3a2410] shadow-[0_4px_12px_rgba(212,165,116,0.35)]">
+                <Zap className="w-4 h-4" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-white/40 text-[9px] font-extrabold uppercase tracking-[0.14em] leading-none mb-1">Grupo activo</p>
+                <p className="text-white font-bold text-[13px] truncate tracking-tight">{grupoNombre}</p>
+              </div>
             </div>
-          </div>
-        </button>
-      </div>
+          )}
+        </div>
+      )}
 
       {/* Primary Navigation */}
       <nav className="relative z-10 flex-1 px-2.5 flex flex-col gap-[3px]">

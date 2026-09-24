@@ -117,6 +117,35 @@ export async function procesarEntregaValidada(
   return { ok: true };
 }
 
+/*
+ * SOLO UN ALUMNO ENTREGA (2026-09-22).
+ *
+ * Desde hoy el docente puede abrir el hub para ver las actividades como las ve
+ * su grupo (`src/app/hub/layout.tsx`). Nada aquí lo impedía: esta acción solo
+ * pedía sesión, así que un maestro que resolviera un quiz «de prueba» habría
+ * escrito un intento suyo en la tabla, y quien mire esa tabla mañana no tiene
+ * forma de saber que era una prueba.
+ *
+ * Se comprueba el ROL en `profiles`, no la ruta ni un parámetro del cliente: la
+ * acción es invocable directamente y lo que la pantalla diga no la protege.
+ * Devuelve el mismo `{ error }` que el resto, que la interfaz ya sabe enseñar.
+ *
+ * Se llama UNA vez por petición —no por actividad—, para que el lote no pague
+ * una consulta por item.
+ */
+export async function soloAlumnoPuedeEntregar(
+  sb: Awaited<ReturnType<typeof getSupabaseServer>>,
+  userId: string
+): Promise<{ ok: true } | { error: string }> {
+  const { data, error } = await sb.from("profiles").select("role").eq("id", userId).single();
+  /* Si no se puede leer el perfil no se adivina: no entregar es lo reversible. */
+  if (error || !data) return { error: "No se pudo verificar tu cuenta. Vuelve a entrar." };
+  if (data.role !== "student") {
+    return { error: "Estás viendo la actividad como docente: no se guarda ninguna entrega." };
+  }
+  return { ok: true };
+}
+
 export async function entregarActividad(
   actividadId: string,
   resultado: {
@@ -137,5 +166,8 @@ export async function entregarActividad(
   }
 
   const sb = await getSupabaseServer();
+  const permiso = await soloAlumnoPuedeEntregar(sb, user.id);
+  if ("error" in permiso) return permiso;
+
   return procesarEntregaValidada(sb, user.id, actividadId, resultado);
 }

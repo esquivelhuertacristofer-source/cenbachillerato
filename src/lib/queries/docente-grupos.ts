@@ -188,18 +188,26 @@ export async function getAlumnosConProgreso(
 /** Top N alumnos del docente por score acumulado de intentos completados */
 export async function getTopAlumnosDocente(
   docenteId: string,
-  limit = 5
+  limit = 5,
+  /*
+   * Los grupos del docente, si quien llama ya los tiene (el panel los pide para
+   * sus métricas justo antes). Ahorra una ida y vuelta a Supabase, que desde
+   * Cloudflare cuesta más que la consulta en sí. Sin ellos se piden aquí, como
+   * siempre: quien no los tenga no se entera del cambio.
+   */
+  gruposConocidos?: string[]
 ): Promise<TopAlumno[]> {
   const sb = await getSupabaseServer();
 
-  const { data: grupos } = await sb
-    .from('grupos')
-    .select('id')
-    .eq('id_docente', docenteId);
-
-  if (!grupos || grupos.length === 0) return [];
-
-  const grupoIds = grupos.map((g) => g.id);
+  let grupoIds = gruposConocidos;
+  if (!grupoIds) {
+    const { data: grupos } = await sb
+      .from('grupos')
+      .select('id')
+      .eq('id_docente', docenteId);
+    grupoIds = grupos?.map((g) => g.id) ?? [];
+  }
+  if (grupoIds.length === 0) return [];
 
   const { data: relaciones } = await sb
     .from('alumnos_grupos')
@@ -209,16 +217,12 @@ export async function getTopAlumnosDocente(
   const alumnoIds = [...new Set(relaciones?.map((r) => r.id_alumno) ?? [])];
   if (alumnoIds.length === 0) return [];
 
-  const { data: profiles } = await sb
-    .from('profiles')
-    .select('id, full_name, email')
-    .in('id', alumnoIds);
-
-  const { data: intentos } = await sb
-    .from('intentos')
-    .select('user_id, score')
-    .in('user_id', alumnoIds)
-    .eq('status', 'completed');
+  /* Perfiles e intentos solo dependen de `alumnoIds`: en serie eran dos esperas
+     por nada. */
+  const [{ data: profiles }, { data: intentos }] = await Promise.all([
+    sb.from('profiles').select('id, full_name, email').in('id', alumnoIds),
+    sb.from('intentos').select('user_id, score').in('user_id', alumnoIds).eq('status', 'completed'),
+  ]);
 
   const statsPorAlumno = new Map<string, { count: number; scoreSum: number }>();
   for (const i of intentos ?? []) {

@@ -20,17 +20,19 @@ jest.mock("@/lib/rate-limit", () => ({
 
 jest.mock("@/lib/actions/entregar-actividad", () => ({
   procesarEntregaValidada: jest.fn(),
+  soloAlumnoPuedeEntregar: jest.fn(),
 }));
 
 import { getSupabaseServer, getUser } from "@/lib/supabase-helpers";
 import { checkRateLimit } from "@/lib/rate-limit";
-import { procesarEntregaValidada } from "@/lib/actions/entregar-actividad";
+import { procesarEntregaValidada, soloAlumnoPuedeEntregar } from "@/lib/actions/entregar-actividad";
 import { entregarActividadesBatch } from "@/lib/actions/entregar-actividades-batch";
 
 const mockGetSupabaseServer = getSupabaseServer as jest.MockedFunction<typeof getSupabaseServer>;
 const mockGetUser = getUser as jest.MockedFunction<typeof getUser>;
 const mockCheckRateLimit = checkRateLimit as jest.MockedFunction<typeof checkRateLimit>;
 const mockProcesar = procesarEntregaValidada as jest.MockedFunction<typeof procesarEntregaValidada>;
+const mockPermiso = soloAlumnoPuedeEntregar as jest.MockedFunction<typeof soloAlumnoPuedeEntregar>;
 
 const USER_ID = "22222222-2222-4222-8222-222222222222";
 const ACT_1 = "11111111-1111-4111-8111-111111111111";
@@ -42,6 +44,7 @@ beforeEach(() => {
   mockGetUser.mockResolvedValue({ id: USER_ID } as never);
   mockCheckRateLimit.mockResolvedValue({ allowed: true });
   mockGetSupabaseServer.mockResolvedValue(SB_FAKE);
+  mockPermiso.mockResolvedValue({ ok: true });
 });
 
 describe("entregarActividadesBatch — auth y rate limit", () => {
@@ -141,5 +144,20 @@ describe("entregarActividadesBatch — orquestación por ítem", () => {
         { actividadId: ACT_2, ok: true },
       ],
     });
+  });
+});
+
+describe("entregarActividadesBatch — solo el alumno entrega", () => {
+  test("docente en vista previa: se corta el lote entero, una sola comprobación", async () => {
+    mockPermiso.mockResolvedValue({ error: "Estás viendo la actividad como docente: no se guarda ninguna entrega." });
+
+    const res = await entregarActividadesBatch([
+      { actividadId: ACT_1, resultado: {} },
+      { actividadId: ACT_2, resultado: {} },
+    ]);
+
+    expect(res).toEqual({ error: "Estás viendo la actividad como docente: no se guarda ninguna entrega." });
+    expect(mockProcesar).not.toHaveBeenCalled();
+    expect(mockPermiso).toHaveBeenCalledTimes(1);
   });
 });

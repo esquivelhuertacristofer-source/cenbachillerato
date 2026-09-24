@@ -42,10 +42,23 @@ export default function ProgresionTimeline({
   const reducedMotion = useReducedMotion();
   const [listRef, inView] = useInView<HTMLDivElement>();
 
-  function getStatus(prog: Progresion, index: number): "locked" | "available" | "completed" {
-    if (prog.estado === "completada") return "completed";
-    if (index > 0 && progresiones[index - 1]!.estado === "no_iniciada") return "locked";
-    return "available";
+  /*
+   * SIN CANDADO (2026-09-22).
+   *
+   * Aquí una progresión se pintaba «BLOQUEADA» mientras la anterior estuviera
+   * sin empezar. **Nunca impidió nada**: ni `/hub/uac/[codigo]/progresion/[id]`
+   * ni la pantalla de actividad comprueban el orden, así que la dirección se
+   * abría igual. Lo único que hacía era esconder el temario.
+   *
+   * Y a quien más estorbaba era al docente, que desde hoy entra en vista previa
+   * con cero avance: veía su materia con una progresión abierta y el resto
+   * apagado, que es justo lo contrario de lo que necesita para preparar su clase.
+   *
+   * `ProgresionCard` conserva el estado `locked` porque es suyo y alguien puede
+   * quererlo mañana; sencillamente ya nadie se lo pasa.
+   */
+  function getStatus(prog: Progresion): "locked" | "available" | "completed" {
+    return prog.estado === "completada" ? "completed" : "available";
   }
 
   return (
@@ -86,7 +99,7 @@ export default function ProgresionTimeline({
             descripcion={prog.descripcion}
             ejesArticuladores={prog.ejes_articuladores}
             actividades={prog.actividades}
-            status={getStatus(prog, i)}
+            status={getStatus(prog)}
             isLast={i === progresiones.length - 1}
             accentColor={accentColor}
             accentRgb={accentRgb}

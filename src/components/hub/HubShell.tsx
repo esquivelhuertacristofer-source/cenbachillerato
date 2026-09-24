@@ -21,6 +21,8 @@ interface DiaRacha {
 
 interface HubShellProps {
   profile: ShellProfile;
+  /** El docente entra aquí a mirar: se le avisa y no se le deja entregar. */
+  vistaPrevia?: boolean;
   racha: number;
   ultimos7Dias: DiaRacha[];
   continuar: ContinuarData | null;
@@ -414,7 +416,7 @@ function SidebarContent({
   );
 }
 
-export function HubShell({ profile, racha, ultimos7Dias, continuar, children }: HubShellProps) {
+export function HubShell({ profile, vistaPrevia = false, racha, ultimos7Dias, continuar, children }: HubShellProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -466,6 +468,26 @@ export function HubShell({ profile, racha, ultimos7Dias, continuar, children }: 
             <span style={{ fontSize: 13, fontWeight: 700, color: "#FB923C" }}>🔥 {racha}</span>
           )}
         </div>
+
+        {/* Un docente tiene que saber SIEMPRE que lo que ve no cuenta como suyo:
+            si no, resuelve una actividad, no se guarda, y cree que falla. */}
+        {vistaPrevia && (
+          <div
+            role="status"
+            style={{
+              display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap",
+              margin: "12px 16px 0", padding: "10px 14px", borderRadius: 12,
+              background: "rgba(212,165,116,0.12)", border: "1px solid rgba(212,165,116,0.35)",
+              color: "#E5C295", fontSize: 13, fontWeight: 700,
+            }}
+          >
+            <i className="fa-solid fa-eye" />
+            <span>Vista de alumno. Estás viendo el contenido tal como lo ve tu grupo; nada de lo que hagas aquí se guarda.</span>
+            <Link href="/dashboard/docente" style={{ marginLeft: "auto", color: "#E5C295", textDecoration: "underline" }}>
+              Volver a mi panel
+            </Link>
+          </div>
+        )}
 
         {children}
       </div>

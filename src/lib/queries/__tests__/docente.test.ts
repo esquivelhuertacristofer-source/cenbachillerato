@@ -276,10 +276,13 @@ describe("getUACsConCompletionGrupo", () => {
 
   test("UAC con semestre del grupo, sin alumnos → estado sin-datos", async () => {
     let call = 0;
+    /* En el ORDEN en que se piden. El grupo y su padrón salen juntos (Promise.all),
+       y por eso `alumnos_grupos` va antes que `uac` desde 2026-09-22: lo que sigue
+       sí encadena porque necesita los ids del paso anterior. */
     const responses = [
       { data: { semestre: 3 }, error: null },   // grupo
-      { data: [{ id: "u1", codigo: "UAC-III-01", nombre: "UAC Test", semestre: 3, total_progresiones: 2 }], error: null }, // uacs
       { data: [], error: null },                  // alumnos_grupos (sin alumnos)
+      { data: [{ id: "u1", codigo: "UAC-III-01", nombre: "UAC Test", semestre: 3, total_progresiones: 2 }], error: null }, // uacs
       { data: [{ id: "p1" }], error: null },     // progresiones
       { data: [{ id: "act1" }], error: null },   // actividades
     ];

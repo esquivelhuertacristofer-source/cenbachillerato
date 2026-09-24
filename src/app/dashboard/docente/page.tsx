@@ -14,7 +14,16 @@ export const metadata: Metadata = {
   title: "Dashboard Docente — CEN Bachillerato",
 };
 
-export default async function DocenteDashboardPage() {
+/*
+ * `?grupo=<id>` es lo que pulsa el docente en el lateral. Se comprueba contra SUS
+ * grupos antes de usarlo: un id pegado a mano no puede abrirle el panel de otro.
+ * Sin parametro, o con uno que no es suyo, se cae al primero, como toda la vida.
+ */
+export default async function DocenteDashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ grupo?: string }>;
+}) {
   const user = await getUser();
   if (!user) redirect("/log-in");
 
@@ -26,21 +35,25 @@ export default async function DocenteDashboardPage() {
 
   const metricas = await getMetricasDocente(user.id);
   const grupoIds = metricas.grupos.map((g) => g.id);
-  const primerGrupo = metricas.grupos[0];
+  const { grupo: grupoPedido } = await searchParams;
+  const primerGrupo =
+    metricas.grupos.find((g) => g.id === grupoPedido) ?? metricas.grupos[0];
   const semestre = primerGrupo?.semestre ?? 1;
 
-  // Avance global del primer grupo
-  let pctAvance = 0;
-  if (primerGrupo) {
-    const uacs = await getUACsConCompletionGrupo(primerGrupo.id, user.id);
-    if (uacs.length > 0) {
-      pctAvance = Math.round(
-        uacs.reduce((s, u) => s + u.pct_completion, 0) / uacs.length
-      );
-    }
-  }
+  /*
+   * El avance del grupo y el cuadro de honor no se necesitan el uno al otro, y
+   * en serie eran dos cadenas de consultas esperándose. Van a la vez, y a la
+   * segunda se le pasan los grupos que ya tenemos para que no los vuelva a pedir.
+   */
+  const [uacs, topList] = await Promise.all([
+    primerGrupo ? getUACsConCompletionGrupo(primerGrupo.id, user.id) : Promise.resolve([]),
+    getTopAlumnosDocente(user.id, 5, grupoIds),
+  ]);
 
-  const topList = await getTopAlumnosDocente(user.id, 5);
+  // Avance global del grupo activo
+  const pctAvance = uacs.length > 0
+    ? Math.round(uacs.reduce((s, u) => s + u.pct_completion, 0) / uacs.length)
+    : 0;
   const totalActividadesCompletadas = topList.reduce(
     (s, a) => s + a.actividades_completadas,
     0
@@ -79,6 +92,7 @@ export default async function DocenteDashboardPage() {
         nombre: primerGrupo.nombre,
         semestre: primerGrupo.semestre,
       } : undefined}
+      grupos={metricas.grupos.map((g) => ({ id: g.id, nombre: g.nombre, semestre: g.semestre }))}
       semestre={semestre}
       grupoIds={grupoIds}
       topList={topList}

@@ -2,7 +2,7 @@
 
 import { getSupabaseServer, getUser } from "@/lib/supabase-helpers";
 import { checkRateLimit } from "@/lib/rate-limit";
-import { procesarEntregaValidada } from "@/lib/actions/entregar-actividad";
+import { procesarEntregaValidada, soloAlumnoPuedeEntregar } from "@/lib/actions/entregar-actividad";
 
 /**
  * Tope de entregas por lote. `syncQueue.flush` (sync-queue.ts) solo llama a
@@ -65,6 +65,9 @@ export async function entregarActividadesBatch(
   }
 
   const sb = await getSupabaseServer();
+  /* Una vez para todo el lote: ver `soloAlumnoPuedeEntregar`. */
+  const permiso = await soloAlumnoPuedeEntregar(sb, user.id);
+  if ("error" in permiso) return permiso;
 
   const resultados: ResultadoEntregaBatch[] = [];
   for (const entrega of entregas) {
