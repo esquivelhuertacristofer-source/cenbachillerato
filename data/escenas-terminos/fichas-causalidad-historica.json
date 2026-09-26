@@ -1,0 +1,15 @@
+{
+  "slug": "causalidad-historica",
+  "items": [
+    { "texto": "El asesinato del archiduque Francisco Fernando en Sarajevo (1914)", "escena": "An old open-top clay motor car on a cobblestone street with a plumed hat lying on its seat and a newspaper blowing in the wind" },
+    { "texto": "La Constitución de 1917 tras la Revolución Mexicana", "escena": "An old clay parchment document with a golden seal resting on a table next to a wide sombrero" },
+    { "texto": "La desigualdad colonial y las ideas de la Ilustración antes de la Independencia", "escena": "A clay candle lamp lighting an open book on one side and a tilted balance scale with coins on the other side" },
+    { "texto": "La formación de una identidad nacional tras la Revolución Mexicana", "escena": "A colourful clay mural being painted on a wall by a clay painter with brushes, showing farmers and corn" },
+    { "texto": "La invasión napoleónica a España y la crisis de la monarquía", "escena": "A clay royal crown tipped over on a velvet cushion next to a bicorne hat of a general" },
+    { "texto": "La reforma agraria y el Estado mexicano posrevolucionario", "escena": "A clay farmer receiving a rolled deed paper for a green field divided into plots" },
+    { "texto": "Consecuencia", "escena": "A row of clay dominoes that has already fallen, the last one lying flat" },
+    { "texto": "La Revolución estalló solo porque Madero la convocó", "escena": "A single clay domino standing alone with nothing before or after it" },
+    { "texto": "Monocausal (error)", "escena": "One single thin clay rope holding up a heavy boulder, about to snap" },
+    { "texto": "Multicausal (correcto)", "escena": "Many clay ropes of different colours braided together holding up a heavy boulder firmly" }
+  ]
+}

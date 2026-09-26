@@ -1,0 +1,69 @@
+{
+  "slug": "navegacion-segura",
+  "items": [
+    {
+      "texto": "Abrir enlaces de remitentes desconocidos con URLs con errores de ortografía",
+      "escena": "A clay finger about to tap a link chain inside an opened email envelope on a clay smartphone"
+    },
+    {
+      "texto": "Activar la autenticación de dos factores (2FA)",
+      "escena": "A clay door with two different locks, a key in the first lock and a small clay smartphone showing a glowing shield plugged into the second lock"
+    },
+    {
+      "texto": "Buscar la misma información en varios medios confiables",
+      "escena": "A clay figure holding a magnifying glass over three different open newspapers laid side by side on a table"
+    },
+    {
+      "texto": "Compartir tu CURP o domicilio sin necesidad",
+      "escena": "A clay figure typing on a smartphone with a small house and a blank ID card floating into the screen"
+    },
+    {
+      "texto": "Compartir una noticia de inmediato si parece importante",
+      "escena": "A clay finger pressing a round share button on a smartphone that shows a newspaper card"
+    },
+    {
+      "texto": "Conectarte a una WiFi pública sin protección",
+      "escena": "A clay laptop on a cafe table connected to a wifi signal fan coming from the cafe ceiling, a coffee cup beside it"
+    },
+    {
+      "texto": "Mantener actualizado tu sistema operativo",
+      "escena": "A clay laptop receiving a glowing new shield piece that slots into its screen like a puzzle, a small clay wrench beside it"
+    },
+    {
+      "texto": "Revisar los permisos que das a las apps",
+      "escena": "A clay smartphone with little switches next to icons of a camera, a microphone and a map pin, a clay finger turning one switch off"
+    },
+    {
+      "texto": "Usar contraseñas fuertes y diferentes para cada cuenta",
+      "escena": "A ring of different clay keys, each key with a unique complex shape and a different colour"
+    },
+    {
+      "texto": "Usar la misma contraseña sencilla en todas tus cuentas",
+      "escena": "One single plain clay key opening a row of five different clay doors at the same time"
+    },
+    {
+      "texto": "Usar una VPN en redes públicas",
+      "escena": "A clay laptop sending its data through a sturdy clay tunnel pipe that passes safely under a crowded public cafe"
+    },
+    {
+      "texto": "Práctica segura",
+      "escena": "A big green clay shield with a smooth check mark shape on it"
+    },
+    {
+      "texto": "Práctica riesgosa",
+      "escena": "A clay warning triangle with an exclamation shape standing next to a broken padlock"
+    },
+    {
+      "texto": "Desinformación",
+      "escena": "A clay newspaper with a crooked twisted headline area and a long clay Pinocchio nose poking out from the paper"
+    },
+    {
+      "texto": "Phishing",
+      "escena": "A clay fishing hook with a bait shaped like an email envelope dangling in front of a curious clay fish"
+    },
+    {
+      "texto": "Vigilancia digital",
+      "escena": "A big clay eye peering through a laptop screen at a small clay figure sitting in front of it"
+    }
+  ]
+}

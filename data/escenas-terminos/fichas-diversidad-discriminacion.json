@@ -1,0 +1,21 @@
+{
+  "slug": "diversidad-discriminacion",
+  "items": [
+    { "texto": "El racismo", "escena": "A clay figure of darker skin standing alone outside a door that a group is closing on them" },
+    { "texto": "La comunidad y el barrio (asamblea, sistema de cargos, tequio)", "escena": "Clay neighbours gathered in a village plaza with a kiosk, sitting in a circle for an assembly" },
+    { "texto": "La dominación", "escena": "A big clay figure standing on a platform above smaller figures who look down" },
+    { "texto": "La exclusión", "escena": "A circle of clay figures holding hands with one figure left outside the circle" },
+    { "texto": "La familia y el hogar", "escena": "A clay family of grandparents, parents and children around a kitchen table in a small house" },
+    { "texto": "La sociedad civil organizada (OSC, sindicatos)", "escena": "Clay volunteers in matching vests carrying a blank banner together" },
+    { "texto": "La subordinación", "escena": "A small clay figure carrying a heavy load while a big figure points and gives orders" },
+    { "texto": "Las clases sociales", "escena": "A clay three storey building with a fancy top floor, a middle floor and a crowded ground floor" },
+    { "texto": "Los movimientos sociales", "escena": "A crowd of clay people marching together with blank banners and raised fists" },
+    { "texto": "Forma de organización social", "escena": "A clay circle of chairs around a small table with a notebook in a community hall" },
+    { "texto": "Manifestación de discriminación", "escena": "A clay sign on a door with a crossed out figure, a sad clay person standing in front of it" },
+    { "texto": "Capital social", "escena": "A clay figure in the centre connected by strings to many friends around them" },
+    { "texto": "Movimiento sindical", "escena": "Clay workers in overalls and helmets standing together shoulder to shoulder with a blank banner" },
+    { "texto": "Movimiento social", "escena": "A crowd of clay people marching together with blank banners" },
+    { "texto": "Organización de la sociedad civil (OSC)", "escena": "Clay volunteers in matching vests handing out boxes of food from a small community office" },
+    { "texto": "Tequio", "escena": "Clay villagers working together with shovels and wheelbarrows to build a stone path in a mountain village" }
+  ]
+}

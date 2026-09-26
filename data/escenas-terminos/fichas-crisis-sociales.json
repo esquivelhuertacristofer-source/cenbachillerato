@@ -1,0 +1,14 @@
+{
+  "slug": "crisis-sociales",
+  "items": [
+    { "texto": "El hacinamiento en colonias populares impidió el confinamiento", "escena": "A tiny crowded clay house with many family members squeezed inside and at the windows" },
+    { "texto": "Los organismos internacionales (OPS, OMS, UNICEF)", "escena": "A clay globe with small health workers from many places carrying boxes of vaccines toward it" },
+    { "texto": "Un sistema de salud público fragmentado (IMSS, ISSSTE e INSABI)", "escena": "Three separate clay clinic buildings with a crack in the ground between them and a long line of patients" },
+    { "texto": "Una de las tasas de exceso de mortalidad más altas del mundo durante 2020-2021", "escena": "A sombre clay scene of candles burning in a row in front of a wall with small flowers" },
+    { "texto": "Consecuencia", "escena": "A row of clay dominoes that has already fallen, the last one lying flat" },
+    { "texto": "El Estado mexicano", "escena": "A clay government palace with a flag and a hospital cross banner hanging from its balcony" },
+    { "texto": "El sector empresarial", "escena": "A clay factory and an office tower with workers wearing face masks at the door" },
+    { "texto": "La sociedad civil", "escena": "Clay volunteers in aprons handing out food bags and face masks to neighbours" },
+    { "texto": "Los organismos internacionales", "escena": "A clay globe with small flags of many colours around it and a vaccine box on top" }
+  ]
+}

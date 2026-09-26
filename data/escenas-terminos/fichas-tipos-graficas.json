@@ -1,0 +1,18 @@
+{
+  "slug": "tipos-graficas",
+  "items": [
+    { "texto": "Gráfica circular (pastel)", "escena": "A round clay pie cut into four coloured slices of different sizes, one slice slightly pulled out" },
+    { "texto": "Gráfica de área", "escena": "A clay chart with stacked coloured hills filling the space under wavy lines" },
+    { "texto": "Gráfica de barras", "escena": "A row of five clay bars of different heights and colours standing on a base" },
+    { "texto": "Gráfica de dispersión (scatter plot)", "escena": "A clay board with many small coloured dots scattered in a rising cloud from bottom left to top right" },
+    { "texto": "Gráfica de línea", "escena": "A clay board with a thick coloured line going up and down across it like a mountain path" },
+    { "texto": "Comparar el mix de generación eléctrica por fuente a lo largo del tiempo", "escena": "Clay solar panels, a wind turbine and a factory chimney standing on stacked coloured layers" },
+    { "texto": "Mostrar la evolución del PIB de México entre 2000 y 2023", "escena": "A clay staircase of coins rising over time with a small arrow climbing up" },
+    { "texto": "Relacionar los años de escolaridad con el salario promedio mensual en México", "escena": "A clay stack of books next to a stack of coins, both rising together side by side" },
+    { "texto": "Barras", "escena": "A row of five clay bars of different heights and colours standing on a base" },
+    { "texto": "Línea", "escena": "A clay board with a thick coloured line going up and down across it like a mountain path" },
+    { "texto": "Circular (pastel)", "escena": "A round clay pie cut into four coloured slices of different sizes, one slice slightly pulled out" },
+    { "texto": "Dispersión", "escena": "A clay board with many small coloured dots scattered in a rising cloud from bottom left to top right" },
+    { "texto": "Área", "escena": "A clay chart with stacked coloured hills filling the space under wavy lines" }
+  ]
+}

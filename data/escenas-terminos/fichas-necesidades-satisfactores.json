@@ -1,0 +1,18 @@
+{
+  "slug": "necesidades-satisfactores",
+  "items": [
+    { "texto": "El acceso a educación y a un ingreso suficiente", "escena": "A clay backpack with books next to a small clay wallet with coins" },
+    { "texto": "El acceso a servicios de salud cuando se enferma una persona", "escena": "A clay doctor with a stethoscope checking a child sitting on a clinic bed" },
+    { "texto": "El agua potable como medio de hidratación", "escena": "A clay glass of clean water being filled from a tap, a few drops splashing" },
+    { "texto": "El alimento que cubre la necesidad de nutrición", "escena": "A clay plate with rice, beans, vegetables and a tortilla next to an apple" },
+    { "texto": "La necesidad de alimentarse", "escena": "A hungry little clay figure holding an empty bowl with a spoon" },
+    { "texto": "La necesidad de educación", "escena": "A clay child looking curiously at a closed book on a desk" },
+    { "texto": "La necesidad de hidratación", "escena": "A thirsty clay figure under a hot sun holding an empty cup" },
+    { "texto": "La necesidad de salud", "escena": "A sick clay child in bed with a thermometer in the mouth" },
+    { "texto": "La necesidad de vivienda", "escena": "A clay family standing in the rain holding a small blanket over their heads" },
+    { "texto": "Educación", "escena": "A stack of clay books with a graduation cap on top and a pencil" },
+    { "texto": "Hidratación", "escena": "A clay glass of clear water with a water drop shape floating above it" },
+    { "texto": "Nutrición", "escena": "A clay bowl of colourful fruit and vegetables: an apple, carrots, a banana and a green leaf" },
+    { "texto": "Salud", "escena": "A clay stethoscope wrapped around a red heart shape" }
+  ]
+}

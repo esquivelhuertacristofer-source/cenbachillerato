@@ -1,0 +1,22 @@
+{
+  "slug": "algoritmos-deciden",
+  "items": [
+    { "texto": "Decide en qué orden aparecen los resultados de búsqueda.", "escena": "A clay robot arm arranging a vertical stack of small result cards on a laptop screen, moving one card to the top" },
+    { "texto": "Decide qué publicaciones aparecen primero en tu feed.", "escena": "A clay robot hand picking one photo card from a pile and placing it at the top of a clay smartphone feed" },
+    { "texto": "Decide qué video te recomienda a continuación.", "escena": "A clay robot pointing to the next video card in a row of video thumbnails with a play triangle" },
+    { "texto": "YouTube", "escena": "A clay television-shaped screen with a big rounded play triangle and a row of small video thumbnails below it" },
+    { "texto": "Instagram", "escena": "A clay smartphone showing a square grid of small colourful clay photos, a tiny camera on the side" },
+    { "texto": "TikTok", "escena": "A clay smartphone held vertically showing a short vertical video of a dancing clay figure, with a small music note floating nearby" },
+    { "texto": "Google", "escena": "A clay laptop with a long rounded search bar in the centre of a white page and a big clay magnifying glass" },
+    { "texto": "Amplificar la desinformación y la polarización", "escena": "A clay megaphone blasting a small twisted newspaper to a crowd split into two groups glaring at each other" },
+    { "texto": "Burbuja de filtro", "escena": "A clay figure sitting inside a transparent soap bubble surrounded only by identical copies of the same picture" },
+    { "texto": "Buscar información de fuentes diversas", "escena": "A clay figure collecting different coloured books, newspapers and a radio into a basket" },
+    { "texto": "Contenido que genera reacciones emocionales fuertes", "escena": "A clay smartphone with bursting angry and surprised clay emoji faces popping out of it" },
+    { "texto": "Maximizar el tiempo que pasas en la plataforma", "escena": "A clay figure glued to a smartphone while an hourglass beside them has its sand pouring very fast" },
+    { "texto": "Aprende sus preferencias", "escena": "A clay robot with a notepad watching a clay figure pressing heart buttons on a phone, taking notes" },
+    { "texto": "Arma tu feed", "escena": "A clay robot building a tall tower of photo cards on a smartphone like building blocks" },
+    { "texto": "Mides lo que el usuario hace", "escena": "A clay robot holding a stopwatch and a ruler next to a clay figure scrolling on a phone" },
+    { "texto": "Persigue su objetivo", "escena": "A small clay robot running toward a target board with an arrow in the bullseye" },
+    { "texto": "Prioriza lo más emocional", "escena": "A clay robot lifting a bright red heart-shaped card to the top of a pile of grey cards" }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "slug": "constructor-algoritmos",
+  "items": [
+    { "texto": "Inicio", "escena": "A rounded green clay start flag planted on a small hill at the beginning of a winding clay path" },
+    { "texto": "Fin", "escena": "A black and white checkered clay finish flag at the end of a winding clay path" },
+    { "texto": "Leer el número n", "escena": "A clay hand dropping a round clay token into the slot of a friendly little clay machine" },
+    { "texto": "Calcular el residuo de n ÷ 2", "escena": "Seven clay marbles being split into two equal rows of three, with one single marble left over on its own" },
+    { "texto": "¿El residuo es igual a 0?", "escena": "A clay diamond-shaped road sign at a fork in a clay path, one road going left and one road going right" },
+    { "texto": "Sí → mostrar «Es par»", "escena": "Clay marbles arranged in perfect pairs, two by two, with no marble left over, a green light glowing above" },
+    { "texto": "No → mostrar «Es impar»", "escena": "Clay marbles arranged in pairs with one single lonely marble left at the end, an orange light glowing above" },
+    { "texto": "Secuencial: las instrucciones se ejecutan una tras otra.", "escena": "A straight row of clay dominoes falling one after another in order" },
+    { "texto": "Condicional: toma un camino según una condición («si… entonces…»).", "escena": "A clay path splitting into two roads at a signpost, a tiny clay figure standing at the fork deciding" },
+    { "texto": "Repetitiva: repite acciones mientras se cumpla una condición.", "escena": "A small clay train running round and round a circular clay track" },
+    { "texto": "Saludar, pedir el nombre y despedirse, en ese orden.", "escena": "Three small clay scenes in a row: a figure waving hello, the same figure holding out a blank name card, the same figure waving goodbye" },
+    { "texto": "Si la calificación es ≥ 6, mostrar «Aprobado».", "escena": "A clay exam paper on a desk with a big green clay tick mark stamped on it and a little celebrating clay student" },
+    { "texto": "Mientras queden mensajes sin leer, abrir el siguiente.", "escena": "A clay mailbox with a stack of envelopes, a clay hand opening them one after another, opened ones piling up on the side" }
+  ]
+}

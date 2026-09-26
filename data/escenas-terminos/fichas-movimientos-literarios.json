@@ -1,0 +1,20 @@
+{
+  "slug": "movimientos-literarios",
+  "items": [
+    { "texto": "Benito Pérez Galdós, «Fortunata y Jacinta»", "escena": "A clay nineteenth century Madrid street with balconies, shops and people in period dress" },
+    { "texto": "Gabriel García Márquez, «Cien años de soledad»", "escena": "A small clay tropical village with almond trees and a cloud of yellow butterflies flying over it" },
+    { "texto": "Gustavo Adolfo Bécquer, «Rimas y leyendas»", "escena": "A clay swallow bird flying near a balcony with climbing flowers under a moonlit sky" },
+    { "texto": "Ignacio Manuel Altamirano, «El Zarco»", "escena": "A clay rider on horseback with a silver-studded outfit riding through a green valley" },
+    { "texto": "Manuel Gutiérrez Nájera, «Revista Azul» (1894)", "escena": "An elegant blue clay magazine with a gold ornament lying on a velvet table next to a feather" },
+    { "texto": "Manuel Maples Arce, «Manifiesto Estridentista» (1921)", "escena": "A clay city with radio antennas, electric sparks and a zigzag lightning bolt poster" },
+    { "texto": "Rubén Darío, «Azul…»", "escena": "A clay white swan gliding on a blue lake with gold ornaments floating in the air" },
+    { "texto": "Sor Juana Inés de la Cruz, «Hombres necios que acusáis»", "escena": "A clay nun in a white and black habit writing with a quill at a desk full of books" },
+    { "texto": "Sor Juana Inés de la Cruz, «Primero Sueño» (1692)", "escena": "A clay nun asleep at a desk full of books while a dream of stars and planets rises above her" },
+    { "texto": "Vicente Huidobro y el Creacionismo", "escena": "A clay figure painting a new star in the sky with a giant paintbrush" },
+    { "texto": "Barroco", "escena": "A golden ornate clay picture frame with swirling curls and cherubs" },
+    { "texto": "Modernismo", "escena": "A clay white swan on a blue lake with gold ornaments" },
+    { "texto": "Realismo", "escena": "A clay ordinary nineteenth century street with shops and people walking" },
+    { "texto": "Realismo mágico", "escena": "A clay village where an old woman floats gently above her rocking chair and yellow butterflies circle" },
+    { "texto": "Romanticismo", "escena": "A clay figure on a cliff looking at a stormy sea with a moon and flying swallows" }
+  ]
+}

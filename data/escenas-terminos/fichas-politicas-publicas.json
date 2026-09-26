@@ -1,0 +1,16 @@
+{
+  "slug": "politicas-publicas",
+  "items": [
+    { "texto": "Adopción de la política", "escena": "A clay hand stamping an approval seal on a scroll on a government desk" },
+    { "texto": "Diseño de alternativas", "escena": "Three clay blueprint sheets with different drawings of a bridge laid side by side on a table" },
+    { "texto": "Evaluación", "escena": "A clay clipboard with a checklist and a magnifying glass over a small bar chart" },
+    { "texto": "Identificación del problema", "escena": "A clay figure pointing a flashlight at a big pothole in a street" },
+    { "texto": "Implementación", "escena": "Clay workers with helmets filling a pothole and fixing a street" },
+    { "texto": "Ciclo de política pública", "escena": "Five small clay icons arranged in a circle connected by curved arrows: a magnifying glass, a blueprint, a stamp, a helmet and a checklist" },
+    { "texto": "Contraloría social", "escena": "A group of clay citizens with a magnifying glass looking at a construction site" },
+    { "texto": "Equidad en políticas públicas", "escena": "Three clay figures of different heights standing on boxes of different sizes so all can see over a fence" },
+    { "texto": "Evaluación de impacto", "escena": "A before and after clay scene: a dry cracked field on the left and a green field on the right" },
+    { "texto": "Participación ciudadana", "escena": "Clay citizens raising their hands in a town meeting in a plaza" },
+    { "texto": "Política pública", "escena": "A clay government building with a scroll and arrows pointing to a school, a clinic and a park" }
+  ]
+}

@@ -353,6 +353,7 @@ export function LabProcedimientosNarrativos({ color }: PracticaLabProps) {
     },
   });
   const dropProps = (onDrop: (id: string) => void) => ({
+    "data-zona": "true" as const,
     onDragOver: (e: React.DragEvent) => {
       e.preventDefault();
       e.dataTransfer.dropEffect = "move";

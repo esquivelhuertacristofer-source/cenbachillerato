@@ -1,0 +1,18 @@
+{
+  "slug": "tiempo-historico",
+  "items": [
+    { "texto": "El clima y la geografía de una región", "escena": "A clay landscape of mountains, a river valley and clouds that has stayed the same for ages, a slow tortoise walking by" },
+    { "texto": "Las coyunturas que duran años o décadas", "escena": "A clay calendar with many pages being flipped by the wind next to a growing young tree" },
+    { "texto": "Las estructuras lentas que apenas cambian", "escena": "An ancient clay mountain with a very slow glacier and a huge old tree with deep roots" },
+    { "texto": "Un evento histórico concreto", "escena": "A single clay lightning bolt striking a small hill, a camera flash moment" },
+    { "texto": "Una batalla", "escena": "Two clay armies of toy soldiers facing each other on a green field with small flags" },
+    { "texto": "Una crisis económica", "escena": "A clay line chart arrow crashing down toward a broken piggy bank" },
+    { "texto": "Larga duración", "escena": "A clay mountain range with a very slow turtle crawling across it" },
+    { "texto": "Mediana duración", "escena": "A clay tree growing from a sapling to a tall tree in three steps" },
+    { "texto": "Tiempo corto", "escena": "A clay firework bursting quickly in the night sky" },
+    { "texto": "Caída de México-Tenochtitlan", "escena": "A clay model of an ancient island city with pyramid temples on a lake, some smoke rising from it" },
+    { "texto": "Constitución", "escena": "An old clay parchment scroll with a golden seal and a quill resting on a table" },
+    { "texto": "Independencia", "escena": "A clay bronze church bell ringing in a small tower at dawn" },
+    { "texto": "Revolución", "escena": "A clay revolutionary rider on horseback with a wide sombrero riding across a desert" }
+  ]
+}

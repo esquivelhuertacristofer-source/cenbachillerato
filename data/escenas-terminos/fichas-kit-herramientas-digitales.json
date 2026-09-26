@@ -1,0 +1,17 @@
+{
+  "slug": "kit-herramientas-digitales",
+  "items": [
+    { "texto": "Química", "escena": "A clay folder in soft green with a small round-bottom flask and a molecule model of three balls sitting on top of it" },
+    { "texto": "Matemáticas", "escena": "A clay folder in soft blue with a clay ruler, a triangle set square and a compass resting on top of it" },
+    { "texto": "Historia", "escena": "A clay folder in terracotta with a small old scroll and a tiny pyramid model resting on top of it" },
+    { "texto": "Cultura Digital", "escena": "A clay folder in lilac with a tiny clay laptop and a small mouse resting on top of it" },
+    { "texto": "Apuntar las indicaciones que dictó el profesor", "escena": "A clay student writing in an open notebook while a clay teacher in front of a blackboard speaks, small speech bubbles floating toward the notebook" },
+    { "texto": "Buscar artículos y libros confiables sobre el tema", "escena": "A clay laptop with a search bar shape and a small stack of books with a green check badge coming out of the screen" },
+    { "texto": "Calcular los resultados de la encuesta que aplicaron", "escena": "A clay clipboard with tick boxes next to a laptop showing a spreadsheet and a round pie chart" },
+    { "texto": "Escribir el borrador entre los tres", "escena": "Three small clay students gathered around one laptop typing together on the same page" },
+    { "texto": "Guardar una copia fuera de tu computadora", "escena": "A clay laptop sending a small folder up along a dotted line into a soft white clay cloud above it" },
+    { "texto": "Preparar el apoyo visual para exponerlo", "escena": "A clay easel with a big slide card showing a simple picture and a bar chart, a clay student holding a pointer next to it" },
+    { "texto": "Registrar autor, título, año y liga de cada fuente", "escena": "A neat clay index card box with small filled cards standing in a row, a book and a link chain lying next to it" },
+    { "texto": "Repartir las semanas hasta la fecha de entrega", "escena": "A clay wall calendar with weeks marked in different colours and a small red flag on the final delivery day" }
+  ]
+}

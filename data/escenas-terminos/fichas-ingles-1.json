@@ -1,0 +1,129 @@
+[
+  {
+    "slug": "pasado-viaje-ingles",
+    "items": [
+      { "texto": "arrive", "escena": "A clay traveller with a suitcase stepping off a bus at a small station, waving" },
+      { "texto": "go", "escena": "A clay figure walking forward along a road with a big arrow on the ground pointing ahead" },
+      { "texto": "study", "escena": "A clay student at a desk reading an open book with a lamp and a notebook" },
+      { "texto": "stop", "escena": "A clay bicycle braking in front of a red octagon-shaped stop sign without letters" },
+      { "texto": "visit", "escena": "A clay figure knocking on the door of a small house holding a bunch of flowers" },
+      { "texto": "buy", "escena": "A clay hand giving coins to a shopkeeper in exchange for a paper bag of fruit" },
+      { "texto": "carry", "escena": "A clay figure carrying a big heavy box in both arms" },
+      { "texto": "decorate", "escena": "A clay figure hanging colourful paper flag garlands across a room" },
+      { "texto": "plan", "escena": "A clay figure drawing a route with a pencil on a big map spread on a table" },
+      { "texto": "see", "escena": "A clay figure looking through binoculars at a distant pyramid" },
+      { "texto": "try", "escena": "A clay figure tasting a spoonful of soup from a bowl with curious eyes" },
+      { "texto": "walk", "escena": "A clay figure walking along a stone path with a small backpack" },
+      { "texto": "shop", "escena": "A clay figure pushing a shopping cart past shelves of groceries" },
+      { "texto": "taste", "escena": "A clay figure tasting a taco with closed happy eyes" },
+      { "texto": "take", "escena": "A clay hand taking a photograph with a small camera" },
+      { "texto": "play", "escena": "Two clay children kicking a soccer ball in a park" },
+      { "texto": "our guide told us about the history of the pyramids.", "escena": "A clay tour guide pointing at a big pyramid while a group of students listens" },
+      { "texto": "we returned home tired but happy.", "escena": "Tired but smiling clay students sitting in a bus at sunset with backpacks" },
+      { "texto": "our school organized a trip to Teotihuacán.", "escena": "A clay school bus parked in front of the Pyramid of the Sun with students getting out" },
+      { "texto": "it suddenly started to rain.", "escena": "Clay students running with backpacks over their heads under a sudden rain cloud near a pyramid" },
+      { "texto": "we woke up at five in the morning and took the bus.", "escena": "A sleepy clay student turning off an alarm clock in the dark with a bus waiting outside the window" },
+      { "texto": "we walked along the Avenue of the Dead for two kilometers.", "escena": "Clay students walking along a long wide stone avenue lined with ancient platforms toward a pyramid" }
+    ]
+  },
+  {
+    "slug": "present-perfect-ingles",
+    "items": [
+      { "texto": "Have you ever done volunteer work?", "escena": "Clay volunteers in matching vests planting trees and handing out food boxes" },
+      { "texto": "I have always been interested in medicine.", "escena": "A clay student with a toy stethoscope listening to a teddy bear's heart" },
+      { "texto": "I have enjoyed working with computers since I was a child.", "escena": "A small clay child happily typing on a big old computer" },
+      { "texto": "I have never been to a science fair.", "escena": "A clay student peeking through a window at a science fair with volcano models and posters" },
+      { "texto": "I have visited a hospital before.", "escena": "A clay figure standing at the entrance of a hospital with a red cross" },
+      { "texto": "I visited a hospital last year.", "escena": "A clay figure walking into a hospital with a calendar page from last year floating beside" },
+      { "texto": "Last year, I participated in a science fair at my school.", "escena": "A clay student presenting a volcano model on a table at a school science fair" },
+      { "texto": "She has already finished the internship.", "escena": "A clay young woman holding a certificate and waving goodbye at an office door" },
+      { "texto": "When I was in middle school, I discovered my passion for technology.", "escena": "A clay teenager opening a computer and looking amazed at the glowing circuits inside" },
+      { "texto": "When I was in secondary school, I did my first chemistry experiment.", "escena": "A clay student with safety goggles pouring a coloured liquid into a flask that bubbles" },
+      { "texto": "Present perfect", "escena": "A clay line from a point in the past reaching right up to a figure standing today" },
+      { "texto": "Past simple", "escena": "A clay calendar with one past day circled and closed like a finished box" },
+      { "texto": "First... Then... After that... Finally...", "escena": "Four clay stepping stones in a row leading to a flag" },
+      { "texto": "It was a challenging / rewarding / eye-opening experience.", "escena": "A clay climber reaching a mountain top with a flag and a bright view" },
+      { "texto": "That is why I decided to...", "escena": "A clay figure at a crossroads choosing one path with a confident step" },
+      { "texto": "This experience taught me...", "escena": "A clay figure holding a glowing lightbulb after climbing stairs" }
+    ]
+  },
+  {
+    "slug": "pasado-simple-ingles",
+    "items": [
+      { "texto": "buy", "escena": "A clay hand giving coins to a shopkeeper in exchange for a paper bag of fruit" },
+      { "texto": "clean", "escena": "A clay figure mopping a shiny floor with a bucket beside" },
+      { "texto": "eat", "escena": "A clay figure eating a bowl of soup with a spoon at a table" },
+      { "texto": "go", "escena": "A clay figure walking forward along a road with a big arrow on the ground pointing ahead" },
+      { "texto": "have", "escena": "A clay child happily holding a new puppy in both arms" },
+      { "texto": "make", "escena": "A clay figure making a cake, pouring batter into a pan" },
+      { "texto": "play", "escena": "Two clay children kicking a soccer ball in a park" },
+      { "texto": "rest", "escena": "A clay figure lying in a hammock between two trees with closed eyes" },
+      { "texto": "see", "escena": "A clay figure looking through binoculars at a distant mountain" },
+      { "texto": "study", "escena": "A clay student at a desk reading an open book with a lamp and a notebook" },
+      { "texto": "talk", "escena": "Two clay friends talking on a bench with speech bubbles" },
+      { "texto": "walk", "escena": "A clay figure walking a small dog on a leash in a park" },
+      { "texto": "Regular (-ed)", "escena": "A neat row of identical clay bricks each with the same small tail piece attached" },
+      { "texto": "Irregular", "escena": "A row of clay puzzle pieces of all different odd shapes" }
+    ]
+  },
+  {
+    "slug": "comparativos-ingles",
+    "items": [
+      { "texto": "bad", "escena": "A clay rotten apple with a worm peeking out" },
+      { "texto": "beautiful", "escena": "A clay garden with colourful flowers and a butterfly" },
+      { "texto": "big", "escena": "A huge clay elephant standing next to a tiny mouse" },
+      { "texto": "cheap", "escena": "A clay pencil with a small single coin beside it" },
+      { "texto": "expensive", "escena": "A clay diamond ring on a velvet cushion next to a big pile of gold coins" },
+      { "texto": "far", "escena": "A clay figure looking at a tiny house far away on the horizon at the end of a long road" },
+      { "texto": "fast", "escena": "A clay cheetah running with speed lines behind it" },
+      { "texto": "good", "escena": "A clay thumbs up next to a shiny red apple" },
+      { "texto": "intelligent", "escena": "A clay owl with glasses reading a book" },
+      { "texto": "interesting", "escena": "A clay figure staring fascinated at a glowing open book" },
+      { "texto": "tall", "escena": "A clay giraffe standing next to a small tree" },
+      { "texto": "more + adj + than", "escena": "Two clay towers of different heights with an arrow from the short one to the tall one" },
+      { "texto": "Irregular", "escena": "A row of clay puzzle pieces of all different odd shapes" }
+    ]
+  },
+  {
+    "slug": "consejos-ingles",
+    "items": [
+      { "texto": "Don't skip breakfast.", "escena": "A clay breakfast plate with eggs, fruit and a glass of milk on a kitchen table in the morning" },
+      { "texto": "Eat more fruit and vegetables.", "escena": "A clay bowl of apples, bananas, carrots and broccoli" },
+      { "texto": "He shouldn't use his phone during class.", "escena": "A clay boy hiding a phone under a classroom desk while a teacher writes on the board" },
+      { "texto": "She should study a little every day.", "escena": "A clay girl reading a book at a desk with a calendar marked every day" },
+      { "texto": "Study for at least 30 minutes every day.", "escena": "A clay student studying with a small timer clock next to the book" },
+      { "texto": "You should drink more water.", "escena": "A clay figure drinking from a big glass of water with a water bottle nearby" },
+      { "texto": "You should talk to your teacher if you have a problem.", "escena": "A clay student talking to a kind teacher at her desk after class" },
+      { "texto": "You shouldn't eat too much junk food.", "escena": "A clay pile of burgers, fries and soda with a sad tummy figure beside" },
+      { "texto": "You shouldn't stay up all night before an exam.", "escena": "A tired clay student awake at a desk at night with a moon in the window and piles of books" },
+      { "texto": "Have you thought about + verb-ing?", "escena": "Two clay friends talking, one with a lightbulb above their head" },
+      { "texto": "If I were you, I would...", "escena": "A clay figure putting a hand on a friend's shoulder and pointing ahead" },
+      { "texto": "That must be tough / I understand", "escena": "A clay figure giving a comforting hug to a sad friend" },
+      { "texto": "What do you think I should do?", "escena": "A clay figure with a question shape above asking a friend for help" },
+      { "texto": "Why don't you + verb?", "escena": "A clay figure offering a friend a map and pointing to a path" }
+    ]
+  },
+  {
+    "slug": "presentaciones-ingles",
+    "items": [
+      { "texto": "Valeria", "escena": "A friendly clay teenage girl with a ponytail and a school backpack waving hello" },
+      { "texto": "I", "escena": "A clay figure pointing at their own chest with a smile" },
+      { "texto": "You", "escena": "A clay figure pointing forward at the viewer" },
+      { "texto": "He", "escena": "A clay boy standing alone with a cap, a hand pointing at him from the side" },
+      { "texto": "She", "escena": "A clay girl standing alone with a ponytail, a hand pointing at her from the side" },
+      { "texto": "It", "escena": "A clay dog sitting alone, a hand pointing at it from the side" },
+      { "texto": "We", "escena": "A group of clay friends with arms around each other including the one in front pointing at the group" },
+      { "texto": "They", "escena": "A group of three clay figures standing together, a hand pointing at them from the side" },
+      { "texto": "Good afternoon", "escena": "A clay sun high in the sky over a school at lunchtime with a figure waving" },
+      { "texto": "Good evening", "escena": "A clay orange sunset with a figure waving next to a lit street lamp" },
+      { "texto": "Good morning", "escena": "A clay sunrise over hills with a figure stretching and waving" },
+      { "texto": "Goodbye", "escena": "A clay figure waving goodbye at a door with a backpack" },
+      { "texto": "Hello", "escena": "Two clay figures waving at each other with big smiles" },
+      { "texto": "My name is…", "escena": "A clay figure holding a blank name tag on their chest and smiling" },
+      { "texto": "Nice to meet you", "escena": "Two clay figures shaking hands with smiles" },
+      { "texto": "See you later", "escena": "A clay figure waving while walking away with a clock in the sky" },
+      { "texto": "See you tomorrow", "escena": "A clay figure waving goodnight under a moon with a sun peeking behind a hill" },
+      { "texto": "This is…", "escena": "A clay figure introducing a friend with an open hand gesture" }
+    ]
+  }
+]

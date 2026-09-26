@@ -1,0 +1,31 @@
+{
+  "slug": "hardware-software",
+  "items": [
+    { "texto": "SOCKET DEL PROCESADOR", "escena": "Close view of a clay computer motherboard with one empty square socket in the middle full of tiny pin holes, a small square clay processor chip hovering just above it ready to drop in" },
+    { "texto": "RANURAS DE MEMORIA", "escena": "A clay computer motherboard with two long thin parallel slots, a long green clay memory stick with small black chips sliding down into one of the slots" },
+    { "texto": "BAHÍA DE ALMACENAMIENTO", "escena": "An open clay computer case seen from the side showing an empty rectangular metal bay, a flat clay storage drive being slid into the bay by a clay hand" },
+    { "texto": "RANURA DE EXPANSIÓN", "escena": "A clay motherboard with one long horizontal slot, a wide clay expansion card with a small fan being pushed down into the slot" },
+    { "texto": "Procesador (CPU)", "escena": "A single square clay computer processor chip with a shiny metal top and a grid of tiny gold pins underneath, resting on a clay table" },
+    { "texto": "Memoria RAM", "escena": "A long thin green clay memory stick with a row of small black rectangular chips and a gold contact edge along the bottom, lying on a clay table" },
+    { "texto": "Almacenamiento (SSD)", "escena": "A flat slim rectangular clay solid state drive in dark blue with a small label-free sticker area, lying on a clay table next to a tiny clay folder" },
+    { "texto": "Tarjeta gráfica (GPU)", "escena": "A chunky clay graphics card with two round fans on its side and a small rainbow glow, lying on a clay table" },
+    { "texto": "Pantalla", "escena": "A clay smartphone standing upright with its bright screen showing a colourful blank landscape wallpaper, a finger about to touch the glass" },
+    { "texto": "Cámara", "escena": "The back of a clay smartphone with a cluster of three round camera lenses and a small flash, a tiny clay flower in front of it being photographed" },
+    { "texto": "Micrófono", "escena": "The bottom edge of a clay smartphone with a row of tiny microphone holes, small curved clay sound waves floating into them from a speaking clay mouth" },
+    { "texto": "Disco / SSD", "escena": "A slim rectangular clay storage drive with a stack of tiny clay photos and folders flowing into it like a drawer being filled" },
+    { "texto": "Sistema operativo (Android, iOS, Windows, Linux)", "escena": "A clay smartphone and a clay laptop side by side, both screens showing a neat grid of plain coloured app squares, as if the same organiser runs both devices" },
+    { "texto": "WhatsApp (aplicación)", "escena": "A clay smartphone showing a chat conversation made of rounded green and white speech bubbles without any text, a tiny clay paper plane flying out of it" },
+    { "texto": "YouTube (aplicación)", "escena": "A clay smartphone held sideways showing a video of a mountain landscape with a large rounded play triangle in the centre" },
+    { "texto": "Calculadora (aplicación)", "escena": "A clay smartphone showing a calculator made of a grid of round coloured buttons, a clay finger pressing one of them" },
+    { "texto": "Controladores (drivers)", "escena": "A small clay printer connected by a cable to a clay laptop, with a tiny clay translator figure in the middle of the cable passing a gear from one device to the other" },
+    { "texto": "Navegador web (aplicación)", "escena": "A clay laptop whose screen shows a window with several rounded tabs at the top and a small clay globe of the Earth in the centre of the page" },
+    { "texto": "Hardware", "escena": "The physical parts of a computer spread on a clay table: a processor chip, a memory stick, a small fan, a cable and a screwdriver, everything you can touch" },
+    { "texto": "Software", "escena": "A clay laptop with glowing colourful app squares and small gears floating out of its screen like light, nothing physical in the air, only glowing shapes" },
+    { "texto": "Tiene poca RAM o un procesador lento.", "escena": "A small tired clay computer carrying a heavy pile of boxes on its back, sweating, with a tiny slow snail sitting on top of the pile" },
+    { "texto": "El almacenamiento permanente está saturado de archivos.", "escena": "A clay drawer so overstuffed with tiny clay photos and folders that it cannot close, papers spilling out over the edge" },
+    { "texto": "Esa app usa más el procesador y otros recursos.", "escena": "A clay smartphone with one big greedy app square in the centre eating a pile of tiny batteries and gears with a wide open mouth" },
+    { "texto": "El celular \"se traba\" al abrir muchas apps a la vez.", "escena": "A clay smartphone with a traffic jam of many small coloured app squares stuck in a crowded line across its screen" },
+    { "texto": "Ya no puedes guardar fotos: aparece \"almacenamiento lleno\".", "escena": "A clay smartphone with a camera trying to push one more tiny clay photo into a jar that is already full to the brim with photos" },
+    { "texto": "Una app concreta agota la batería mucho más rápido.", "escena": "A clay smartphone with a red almost empty battery icon shape, one app square drinking from the battery through a long straw" }
+  ]
+}

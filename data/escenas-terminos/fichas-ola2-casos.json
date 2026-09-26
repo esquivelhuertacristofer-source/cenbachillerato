@@ -1,0 +1,438 @@
+[
+  {
+    "slug": "taller-descripcion-narracion",
+    "items": [
+      {
+        "texto": "La casa de la abuela",
+        "escena": "A small whitewashed clay adobe house with a lemon tree covering the kitchen window and a wooden door"
+      },
+      {
+        "texto": "El pasillo del mercado",
+        "escena": "A clay market aisle with bunches of fresh cilantro, baskets of chiles and a small charcoal grill smoking"
+      },
+      {
+        "texto": "Las manos de don Ernesto",
+        "escena": "Two weathered clay hands of an old craftsman with cracked fingertips holding a trowel with white lime"
+      },
+      {
+        "texto": "El camión de las seis",
+        "escena": "An old crowded clay city bus at dawn with people standing and the back door tied shut with a rope"
+      },
+      {
+        "texto": "La lluvia sobre la lámina",
+        "escena": "Heavy clay rain drops bouncing on a corrugated metal roof of a small house"
+      },
+      {
+        "texto": "El sobre de la convocatoria",
+        "escena": "A clay hand half opening a big official envelope on a kitchen table"
+      },
+      {
+        "texto": "El patio de la escuela a las siete",
+        "escena": "An empty clay school yard in the early morning with a faded basketball court, three purple jacaranda trees and a concrete bench"
+      },
+      {
+        "texto": "La fonda de la esquina",
+        "escena": "A tiny clay eatery in an old garage with six tables, a standing fan and a plastic curtain to the kitchen"
+      },
+      {
+        "texto": "La parada del camión bajo la lluvia",
+        "escena": "Four clay people squeezed under a small metal roof at a bus stop in heavy rain, one holding a shopping bag over their head"
+      },
+      {
+        "texto": "La tienda de la esquina",
+        "escena": "A small clay corner grocery shop with a faded red blank sign and a half open metal shutter"
+      },
+      {
+        "texto": "El salón de segundo",
+        "escena": "A clay classroom with blue plastic desks with scratched armrests and the lights off during a storm"
+      },
+      {
+        "texto": "La cancha de la unidad",
+        "escena": "A clay neighbourhood basketball court with a white backboard with an orange rim, a cracked floor and a ball rolling away"
+      },
+      {
+        "texto": "La sala de espera",
+        "escena": "A clay clinic waiting room with metal chairs with beige seats and a nurse at an open door"
+      },
+      {
+        "texto": "La azotea",
+        "escena": "A clay rooftop with black water tanks, a clothesline and a white sheet flying away in the wind"
+      },
+      {
+        "texto": "El frenón",
+        "escena": "A clay city bus braking suddenly, a lady's handbag falling into the aisle"
+      },
+      {
+        "texto": "La fila del trámite",
+        "escena": "A long clay line of people waiting in the sun outside an office window"
+      },
+      {
+        "texto": "El tío en la puerta",
+        "escena": "A quiet clay man standing in a doorway holding his hat in his hands"
+      },
+      {
+        "texto": "La gotera del pasillo",
+        "escena": "Water dripping from a clay ceiling in a hallway into a bucket placed by a janitor"
+      },
+      {
+        "texto": "El final del partido",
+        "escena": "A clay boy hugging a soccer ball to his chest on an empty field after the game"
+      }
+    ]
+  },
+  {
+    "slug": "convivencia-digital",
+    "items": [
+      {
+        "texto": "Los apuntes que no volvieron",
+        "escena": "A clay notebook lent from one student's hand to another, with an empty spot on the desk where it used to be"
+      },
+      {
+        "texto": "El aviso que todos necesitan",
+        "escena": "A clay smartphone with a class group chat and a pinned bell notification shape"
+      },
+      {
+        "texto": "El límite de la madrugada",
+        "escena": "A clay smartphone buzzing on a nightstand at night next to a sleeping teenager and a clock"
+      },
+      {
+        "texto": "La colecta que debe correr",
+        "escena": "A clay jar with a few coins being passed around a group of classmates"
+      },
+      {
+        "texto": "La broma que hirió",
+        "escena": "A clay smartphone showing a laughing emoji reply, a teenager looking at the phone quietly"
+      },
+      {
+        "texto": "El rumor que se reenvía",
+        "escena": "A clay speech bubble being forwarded from phone to phone in a long chain"
+      },
+      {
+        "texto": "El hostigamiento que no para",
+        "escena": "A clay smartphone flooded with many notification bubbles stacking up"
+      },
+      {
+        "texto": "La cuenta que no es tuya",
+        "escena": "A clay smartphone showing a profile with a copied photo, a real teenager comparing it with their own phone"
+      },
+      {
+        "texto": "El equipo que no entrega",
+        "escena": "A clay poster project with only one of four parts finished and a wall calendar with one day circled in red"
+      },
+      {
+        "texto": "El comentario en tu foto",
+        "escena": "A clay smartphone showing a photo with a comment bubble underneath"
+      },
+      {
+        "texto": "A quien reenvía el rumor",
+        "escena": "A clay teenager holding a phone about to press a forward arrow button"
+      }
+    ]
+  },
+  {
+    "slug": "derechos-digitales",
+    "items": [
+      {
+        "texto": "La foto en el anuncio",
+        "escena": "A clay billboard advertisement showing a photo of a teenager, the same teenager looking up at it from the street"
+      },
+      {
+        "texto": "La app que pide la agenda entera",
+        "escena": "A clay smartphone app with a big hand reaching into a contact list book"
+      },
+      {
+        "texto": "La cuenta escolar que rastrea la ubicación",
+        "escena": "A clay school laptop with a map pin following a small figure walking home"
+      },
+      {
+        "texto": "El dato borrado que reaparece",
+        "escena": "A clay paper card thrown into a trash bin popping back out again"
+      }
+    ]
+  },
+  {
+    "slug": "describir-personas-clima-ingles",
+    "items": [
+      {
+        "texto": "jacket",
+        "escena": "A clay denim jacket hanging on a hanger"
+      },
+      {
+        "texto": "dress",
+        "escena": "A clay summer dress with small flowers on a hanger"
+      },
+      {
+        "texto": "backpack",
+        "escena": "A colourful clay school backpack with pockets"
+      },
+      {
+        "texto": "T-shirt",
+        "escena": "A plain clay green T-shirt folded on a table"
+      },
+      {
+        "texto": "sneakers",
+        "escena": "A pair of clay sneakers with white laces"
+      },
+      {
+        "texto": "umbrella",
+        "escena": "An open red clay umbrella with rain drops falling on it"
+      },
+      {
+        "texto": "Xalapa",
+        "escena": "A misty green clay mountain town with coffee plants and red tile roofs in light drizzle"
+      },
+      {
+        "texto": "Creel",
+        "escena": "A cold clay pine forest town in the mountains with snow and a wooden cabin"
+      },
+      {
+        "texto": "Mérida",
+        "escena": "A hot sunny clay colonial plaza with pastel coloured buildings and palm trees"
+      },
+      {
+        "texto": "La Ventosa",
+        "escena": "A windy clay plain with tall white wind turbines and bending grass"
+      }
+    ]
+  },
+  {
+    "slug": "encuesta-lectora-comunidad",
+    "items": [
+      {
+        "texto": "Arma la encuesta",
+        "escena": "A clay clipboard with a questionnaire of tick boxes and a pencil"
+      },
+      {
+        "texto": "Levanta los datos",
+        "escena": "A clay student asking a neighbour questions at a door while holding a clipboard"
+      },
+      {
+        "texto": "Lee la gráfica",
+        "escena": "A clay bar chart on a poster with a magnifying glass over the tallest bar"
+      },
+      {
+        "texto": "Completa el texto",
+        "escena": "A clay page with some blank gaps being filled in with a pencil"
+      }
+    ]
+  },
+  {
+    "slug": "constructor-algoritmos",
+    "items": [
+      {
+        "texto": "¿Par o impar?",
+        "escena": "Clay marbles arranged in pairs with one lonely marble left at the end"
+      },
+      {
+        "texto": "El mayor de dos números",
+        "escena": "Two clay towers of stacked blocks side by side, one clearly taller"
+      },
+      {
+        "texto": "¿Aprobado o reprobado?",
+        "escena": "A clay exam paper on a desk and a small balance deciding between two sides"
+      }
+    ]
+  },
+  {
+    "slug": "hecho-opinion-texto",
+    "items": [
+      {
+        "texto": "Anuncio publicitario",
+        "escena": "A clay billboard showing a big shiny product bottle and sparkles"
+      }
+    ]
+  },
+  {
+    "slug": "ideas-clave-subrayado",
+    "items": [
+      {
+        "texto": "El maíz que nos hizo",
+        "escena": "A clay corn plant growing out of an open book"
+      },
+      {
+        "texto": "El Metro que mueve a la ciudad",
+        "escena": "A clay orange subway train coming out of a tunnel into a busy station"
+      },
+      {
+        "texto": "Sesenta segundos de aviso",
+        "escena": "A clay loudspeaker on a pole blaring an alarm next to a stopwatch, people walking calmly outside a building"
+      }
+    ]
+  },
+  {
+    "slug": "lectura-critica-postura",
+    "items": [
+      {
+        "texto": "Boletín escolar",
+        "escena": "A clay school bulletin sheet pinned to a cork board in a hallway"
+      },
+      {
+        "texto": "Carta abierta",
+        "escena": "A clay open letter held up in a town plaza for everyone to read"
+      },
+      {
+        "texto": "Entrada de blog",
+        "escena": "A clay laptop showing a blog page with a photo and paragraphs"
+      }
+    ]
+  },
+  {
+    "slug": "lectura-en-voz-alta",
+    "items": [
+      {
+        "texto": "Nota informativa",
+        "escena": "A clay newspaper column with a small photo and a headline area"
+      },
+      {
+        "texto": "Texto literario",
+        "escena": "A clay open storybook with a small castle rising from the pages"
+      },
+      {
+        "texto": "Relato con diálogo",
+        "escena": "A clay open book with two speech bubbles floating above it"
+      },
+      {
+        "texto": "Boletín de radio",
+        "escena": "A clay radio studio microphone with an on air lamp glowing"
+      },
+      {
+        "texto": "Tres versos",
+        "escena": "A clay page with three short lines and a small flower"
+      },
+      {
+        "texto": "Paso de laboratorio",
+        "escena": "A clay lab bench with a flask, a dropper and a step card"
+      },
+      {
+        "texto": "Aviso de protección civil",
+        "escena": "A clay emergency meeting point sign with a green arrow and a group of people gathered calmly"
+      }
+    ]
+  },
+  {
+    "slug": "lectura-escritura-dialogo",
+    "items": [
+      {
+        "texto": "La calle sin alumbrado",
+        "escena": "A dark clay street at night with a broken street lamp and two neighbours with flashlights"
+      },
+      {
+        "texto": "El diario de una semana difícil",
+        "escena": "A clay open diary on a bed with a small raincloud shape above it"
+      },
+      {
+        "texto": "La exposición sobre tu comunidad",
+        "escena": "A clay student presenting a poster with a drawing of their neighbourhood to classmates"
+      }
+    ]
+  },
+  {
+    "slug": "narrativas-populares-lengua",
+    "items": [
+      {
+        "texto": "La viejita de la milpa",
+        "escena": "A little old clay woman with a shawl walking between tall corn plants in a milpa"
+      },
+      {
+        "texto": "El que se rió del tecolote",
+        "escena": "A clay young man laughing at a big round owl perched on a branch at night"
+      },
+      {
+        "texto": "La luz del tianguis",
+        "escena": "A clay night market with striped awnings and a mysterious glowing light floating between the stalls"
+      },
+      {
+        "texto": "La fórmula de oídas",
+        "escena": "A clay grandmother whispering a story into a child's ear by a fire"
+      },
+      {
+        "texto": "La repetición que mide el camino",
+        "escena": "A clay dirt path with the same stone marker repeated along it, a walker going past each one"
+      },
+      {
+        "texto": "La voz del personaje",
+        "escena": "A clay storyteller with a speech bubble shaped like a mask"
+      },
+      {
+        "texto": "El refrán que cierra",
+        "escena": "A clay grandfather with a finger raised, closing a big storybook with a smile"
+      },
+      {
+        "texto": "El diminutivo que acerca",
+        "escena": "A clay tiny cup of hot chocolate held gently in two hands"
+      }
+    ]
+  },
+  {
+    "slug": "pasado-viaje-ingles",
+    "items": [
+      {
+        "texto": "Calzada de los Muertos",
+        "escena": "A long wide clay stone avenue lined with ancient platforms leading to a big pyramid"
+      },
+      {
+        "texto": "Zócalo de Oaxaca de Juárez (Oaxaca)",
+        "escena": "A clay colonial plaza with a kiosk, big laurel trees and a green stone cathedral"
+      },
+      {
+        "texto": "Canales de Xochimilco (Ciudad de México)",
+        "escena": "Colourful clay trajinera boats with painted arches floating on a green canal"
+      },
+      {
+        "texto": "Mercado 20 de Noviembre",
+        "escena": "A clay busy market hall with grills of meat smoking and stalls of chocolate and bread"
+      },
+      {
+        "texto": "Monte Albán (Oaxaca)",
+        "escena": "Clay ancient stone platforms and pyramids on a flat mountain top with valleys around"
+      }
+    ]
+  },
+  {
+    "slug": "reescritura-taller",
+    "items": [
+      {
+        "texto": "Aviso vecinal",
+        "escena": "A clay paper notice taped to a building entrance door"
+      },
+      {
+        "texto": "Diario de viaje",
+        "escena": "A clay travel diary with a map, a ticket and a pressed flower tucked inside"
+      },
+      {
+        "texto": "Reporte escolar",
+        "escena": "A clay school report folder with a chart and a pencil on a desk"
+      }
+    ]
+  },
+  {
+    "slug": "taller-parrafos",
+    "items": [
+      {
+        "texto": "Leer todos los días",
+        "escena": "A clay teenager reading a book on a bench with a calendar showing every day ticked"
+      },
+      {
+        "texto": "Cuidar el agua",
+        "escena": "A clay hand closing a dripping tap over a sink"
+      }
+    ]
+  },
+  {
+    "slug": "temas-ideas-narrativa",
+    "items": [
+      {
+        "texto": "La olla de la barranca",
+        "escena": "A clay pot of gold coins hidden under a rock at the bottom of a steep ravine"
+      },
+      {
+        "texto": "La silla de doña Chole",
+        "escena": "An old clay wooden chair with a woven seat on a porch at sunset"
+      },
+      {
+        "texto": "El que cruzó el río dos veces",
+        "escena": "A clay figure wading across a river with a bundle on the shoulder, footprints on both banks"
+      }
+    ]
+  }
+]

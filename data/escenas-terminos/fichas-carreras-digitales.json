@@ -1,0 +1,18 @@
+{
+  "slug": "carreras-digitales",
+  "items": [
+    { "texto": "Administrador de nube (cloud)", "escena": "A clay figure standing on a soft white cloud next to a row of small server towers with blinking lights" },
+    { "texto": "Científico de datos", "escena": "A clay scientist in a lab coat looking at a big floating bar chart and scatter dots through a magnifying glass" },
+    { "texto": "Community Manager", "escena": "A clay figure juggling small speech bubbles and heart shapes while holding a smartphone" },
+    { "texto": "Desarrollador de software (frontend/backend/fullstack)", "escena": "A clay programmer at a desk with two monitors showing coloured blocks stacked like building bricks" },
+    { "texto": "Desarrollador de software", "escena": "A clay programmer at a desk with two monitors showing coloured blocks stacked like building bricks" },
+    { "texto": "Diseñador UX/UI", "escena": "A clay designer arranging colourful rounded buttons and app screens on a tablet with a stylus" },
+    { "texto": "Especialista en ciberseguridad", "escena": "A clay guard with a shield standing in front of a laptop, blocking a small clay virus bug" },
+    { "texto": "Especialista en inteligencia artificial", "escena": "A clay figure teaching a friendly little clay robot with a blackboard of simple shapes" },
+    { "texto": "Especialista en marketing digital", "escena": "A clay figure with a megaphone next to a smartphone with a rising arrow chart" },
+    { "texto": "Datos e inteligencia artificial", "escena": "A friendly clay robot holding a glowing bar chart" },
+    { "texto": "Seguridad e infraestructura", "escena": "A clay server tower protected by a big clay shield and a padlock" },
+    { "texto": "Desarrollo y diseño de producto", "escena": "A clay workbench with a smartphone prototype, a pencil sketch and coloured building blocks" },
+    { "texto": "Comunicación y marketing digital", "escena": "A clay megaphone with speech bubbles and heart shapes flying out of it" }
+  ]
+}

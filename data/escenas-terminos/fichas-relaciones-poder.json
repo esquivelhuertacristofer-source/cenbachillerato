@@ -1,0 +1,20 @@
+{
+  "slug": "relaciones-poder",
+  "items": [
+    { "texto": "El 22% de la población en pobreza frente al 1.7% de clase alta (CONEVAL 2022)", "escena": "A tall clay tower of coins with one small figure on top, next to a crowd of many small figures standing on the ground" },
+    { "texto": "La brecha salarial por género", "escena": "Two clay figures, a man and a woman, holding stacks of coins where the woman's stack is clearly shorter" },
+    { "texto": "La discriminación por razones de edad", "escena": "An elderly clay figure with a cane being ignored at a job counter while a young figure is served" },
+    { "texto": "La menor cobertura de servicios de salud y educación en comunidades indígenas", "escena": "A small clay village in the mountains with a long winding road to a distant clinic and school" },
+    { "texto": "Las poblaciones indígenas con menor acceso a salud y educación de calidad", "escena": "A clay indigenous family in embroidered clothes looking at a closed clinic door far away" },
+    { "texto": "Clase social", "escena": "A clay staircase with small figures on different steps, some at the top and many at the bottom" },
+    { "texto": "Género", "escena": "Two clay figures, a woman and a man, standing side by side on a balance scale" },
+    { "texto": "Etnia", "escena": "Diverse clay figures in different traditional clothing and skin tones standing together" },
+    { "texto": "Edad", "escena": "A row of clay figures from a baby to a child to an adult to an elderly person with a cane" },
+    { "texto": "Capital cultural (Bourdieu)", "escena": "A clay figure carrying a backpack full of books, a violin and a museum ticket" },
+    { "texto": "Capital social (Bourdieu)", "escena": "A clay figure in the centre connected by strings to many friends around them" },
+    { "texto": "Clasismo", "escena": "A clay figure in fancy clothes turning their back on a figure in work clothes" },
+    { "texto": "Interseccionalidad", "escena": "Three coloured clay roads crossing at one intersection with a small figure standing in the middle" },
+    { "texto": "Patriarcado", "escena": "A clay pyramid of blocks with a large male figure on top and smaller female figures at the bottom" },
+    { "texto": "Poder (Weber)", "escena": "A clay hand holding strings that move a small group of figures below it" }
+  ]
+}

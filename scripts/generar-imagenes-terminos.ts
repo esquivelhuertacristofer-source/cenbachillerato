@@ -26,6 +26,7 @@
 import { resolve, join } from "path";
 import { existsSync, mkdirSync, readdirSync, readFileSync } from "fs";
 import sharp from "sharp";
+import { claveDeTermino } from "../src/lib/practicas/terminos-imagen";
 
 const HOST = "http://127.0.0.1:8188";
 const UNET = "krea2TurboOfficialComfy_krea2TurboFp8.safetensors";
@@ -52,8 +53,14 @@ const ESTILO = [
   "No text, no letters, no numbers, no watermark, no logos, no signage, no UI.",
 ].join(" ");
 
-interface Item { clave: string; escena: string }
-interface Ficha { slug: string; items: Item[] }
+/**
+ * `texto` es lo que el alumno LEE en la ficha o en la zona («GNU/Linux»,
+ * «Software privativo»). La clave se saca de ahí con la MISMA función que usa
+ * la app para buscar la imagen: escrita a mano, una tilde o el corte de 48
+ * caracteres bastan para que la imagen exista y nunca se pinte.
+ */
+interface Item { clave?: string; texto?: string; escena: string }
+interface Ficha { slug: string; items: (Item & { clave: string })[] }
 
 interface Grafo { [k: string]: { class_type: string; inputs: Record<string, unknown> } }
 
@@ -127,9 +134,17 @@ function fichas(): Ficha[] {
   if (!existsSync(ENTRADA)) return [];
   const salida: Ficha[] = [];
   for (const f of readdirSync(ENTRADA).filter((f) => f.endsWith(".json"))) {
-    const dato = JSON.parse(readFileSync(join(ENTRADA, f), "utf8")) as Ficha | Ficha[];
-    if (Array.isArray(dato)) salida.push(...dato);
-    else salida.push(dato);
+    const dato = JSON.parse(readFileSync(join(ENTRADA, f), "utf8")) as
+      | { slug: string; items: Item[] }
+      | { slug: string; items: Item[] }[];
+    for (const d of Array.isArray(dato) ? dato : [dato]) {
+      salida.push({
+        slug: d.slug,
+        items: d.items
+          .map((it) => ({ ...it, clave: it.clave ?? (it.texto ? claveDeTermino(it.texto) : "") }))
+          .filter((it) => it.clave),
+      });
+    }
   }
   return salida;
 }

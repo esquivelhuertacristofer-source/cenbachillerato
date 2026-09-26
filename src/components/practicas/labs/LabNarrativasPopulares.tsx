@@ -324,6 +324,7 @@ export function LabNarrativasPopulares({ color }: PracticaLabProps) {
       const id = e.dataTransfer.getData("text/plain");
       if (id) onDrop(id);
     },
+    "data-zona": "true" as const,
     role: "button" as const,
     tabIndex: 0,
     onKeyDown: (e: React.KeyboardEvent) => {

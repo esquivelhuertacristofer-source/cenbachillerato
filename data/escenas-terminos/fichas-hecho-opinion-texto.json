@@ -1,0 +1,14 @@
+{
+  "slug": "hecho-opinion-texto",
+  "items": [
+    { "texto": "México tiene 32 entidades federativas.", "escena": "A clay relief map of Mexico divided into many coloured puzzle pieces" },
+    { "texto": "El sismo del 19 de septiembre de 2017 tuvo magnitud 7.1.", "escena": "A clay seismograph machine drawing a big zigzag line on a paper roll" },
+    { "texto": "La biblioteca de la escuela abre de 8 a 14 horas.", "escena": "A clay school library door open with a wall clock above and shelves of books inside" },
+    { "texto": "El aumento de bibliotecas públicas explica la mejora en los hábitos de lectura.", "escena": "A clay library building with an arrow pointing to a stack of books rising higher" },
+    { "texto": "La migración transformó la economía de las comunidades del occidente del país.", "escena": "A clay figure with a suitcase walking along a road between two small towns" },
+    { "texto": "Leer novelas es mucho más valioso que ver series.", "escena": "A clay figure holding a book up proudly while pushing a television aside" },
+    { "texto": "La mejor música mexicana es la de los años setenta.", "escena": "A clay vinyl record player with a spinning record and a guitar leaning next to it" },
+    { "texto": "Deberíamos dedicar más horas de clase a la escritura.", "escena": "A clay student writing in a notebook while a teacher points at a clock" },
+    { "texto": "Información", "escena": "A clay folder with papers, a chart and a magnifying glass" }
+  ]
+}

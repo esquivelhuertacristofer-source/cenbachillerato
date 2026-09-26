@@ -1,0 +1,13 @@
+{
+  "slug": "sentido-historico",
+  "items": [
+    { "texto": "Presentismo", "escena": "A modern clay figure with a smartphone pointing at an old portrait from centuries ago and frowning" },
+    { "texto": "Memoria acrítica", "escena": "A clay statue on a pedestal being polished to shine while its cracks are covered with a cloth" },
+    { "texto": "El reparto agrario posrevolucionario", "escena": "A clay field divided into neat plots with small fences, farmers each receiving a rolled deed" },
+    { "texto": "La Conquista de México (1519-1521)", "escena": "Clay sailing ships with white sails arriving near a coast with pyramid temples in the jungle" },
+    { "texto": "La herencia del período prehispánico", "escena": "Clay corn cobs, a clay grinding stone with a tortilla and a small pyramid in the background" },
+    { "texto": "La memoria colectiva del mismo evento de 1492", "escena": "Two groups of clay figures looking at the same small caravel ship from opposite shores" },
+    { "texto": "La Revolución y el liberalismo del siglo XIX", "escena": "An old clay parchment of laws next to a wide sombrero and an old rifle-free cartridge belt hanging on a chair" },
+    { "texto": "Presidios y minería frente a encomiendas y haciendas", "escena": "A small clay adobe fort and a mine entrance on one side, a big hacienda house with fields on the other side" }
+  ]
+}

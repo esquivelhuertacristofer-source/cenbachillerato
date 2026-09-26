@@ -1,0 +1,23 @@
+{
+  "slug": "generos-literarios",
+  "items": [
+    { "texto": "«El aleph» de Jorge Luis Borges (cuento)", "escena": "A clay dark cellar staircase with one tiny glowing sphere on a step that contains swirling stars and worlds" },
+    { "texto": "«El laberinto de la soledad» de Octavio Paz", "escena": "A lonely clay figure standing in the centre of a big stone maze, looking up at the sky" },
+    { "texto": "«El laberinto de la soledad»: reflexión con voz propia", "escena": "A clay figure writing in a notebook while sitting in the middle of a stone maze" },
+    { "texto": "«La casa de Bernarda Alba» de Federico García Lorca", "escena": "A white clay Spanish house with closed shutters and five black dresses hanging on a line in the courtyard" },
+    { "texto": "«Pedro Páramo» de Juan Rulfo (novela)", "escena": "A dusty deserted clay village with empty adobe houses under a hot sun and faint whispers of wind" },
+    { "texto": "«Veinte poemas de amor y una canción desesperada» de Neruda", "escena": "A clay open book of poems on a rock by the sea at night with a red rose and stars" },
+    { "texto": "La crónica, entre lo real y lo literario", "escena": "A clay journalist notebook with a pencil on a cafe table overlooking a busy street" },
+    { "texto": "Un poema en verso libre, sin rima ni métrica fija", "escena": "Clay paper birds flying freely out of an open notebook" },
+    { "texto": "Una comedia: conflictos que terminan en armonía", "escena": "A clay stage with two characters hugging and a smiling theatre mask above" },
+    { "texto": "Una tragedia: conflictos que terminan en pérdida", "escena": "A clay stage with a fallen crown and a crying theatre mask above" },
+    { "texto": "Género narrativo", "escena": "A clay open storybook with a small castle and a road coming out of its pages" },
+    { "texto": "Género lírico", "escena": "A clay lyre harp with a red heart and floating musical notes" },
+    { "texto": "Género dramático", "escena": "A clay theatre stage with red curtains and two masks, one smiling and one crying" },
+    { "texto": "Género ensayístico", "escena": "A clay desk with a lamp, an open notebook and a thinker's pen with a lightbulb above" },
+    { "texto": "Dramático", "escena": "A clay theatre stage with red curtains and two masks, one smiling and one crying" },
+    { "texto": "Ensayístico", "escena": "A clay desk with a lamp, an open notebook and a thinker's pen with a lightbulb above" },
+    { "texto": "Lírico", "escena": "A clay lyre harp with a red heart and floating musical notes" },
+    { "texto": "Narrativo", "escena": "A clay open storybook with a small castle and a road coming out of its pages" }
+  ]
+}

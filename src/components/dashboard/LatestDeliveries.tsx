@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { getSupabaseBrowser } from '@/lib/supabase-browser';
 import { Activity, Clock, CheckCircle2, ArrowUpRight, Zap, Sparkles } from 'lucide-react';
 import StudentRecordModal from './StudentRecordModal';
@@ -172,11 +173,19 @@ export default function LatestDeliveries({ grupoIds, isDark = true }: LatestDeli
             </p>
           </div>
         </div>
-        <button className={`flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] transition-colors group/audit ${
-          isDark ? 'text-[#7DD3FC] hover:text-white' : 'text-[#011C40]/40 hover:text-[#D4A574]'
-        }`}>
-          Audit <ArrowUpRight className="w-4 h-4 group-hover/audit:translate-x-1 group-hover/audit:-translate-y-1 transition-transform" />
-        </button>
+        {/* ERA UN <button> SIN onClick: se iluminaba al pasar el ratón y no
+          * llevaba a ninguna parte —el mismo defecto que el docente reportó en
+          * «Ver UAC»—. El destino natural de «Últimas Entregas» es el detalle
+          * de las entregas, que ya existe. De paso, en castellano como el resto
+          * del panel. */}
+        <Link
+          href="/dashboard/docente/reportes"
+          className={`flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] transition-colors group/audit ${
+            isDark ? 'text-[#7DD3FC] hover:text-white' : 'text-[#011C40]/40 hover:text-[#D4A574]'
+          }`}
+        >
+          Reportes <ArrowUpRight className="w-4 h-4 group-hover/audit:translate-x-1 group-hover/audit:-translate-y-1 transition-transform" />
+        </Link>
       </div>
 
       <div className="space-y-10 flex-1 relative z-10">

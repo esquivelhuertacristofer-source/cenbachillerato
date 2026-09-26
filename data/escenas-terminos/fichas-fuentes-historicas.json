@@ -1,0 +1,19 @@
+{
+  "slug": "fuentes-historicas",
+  "items": [
+    { "texto": "El Diario de Cristóbal Colón (1492)", "escena": "An old leather clay diary open on a ship's wooden deck next to a quill, with a small caravel ship with white sails in the background" },
+    { "texto": "El libro «México a través de los siglos» de Vicente Riva Palacio", "escena": "A set of five thick old clay books with worn leather spines standing on a wooden shelf" },
+    { "texto": "Un artículo académico sobre la Revolución Francesa publicado en 2010", "escena": "A modern clay journal magazine lying open on a desk next to a small model of a tricolour flag and a laptop" },
+    { "texto": "Un libro publicado en 2020 que analiza documentos coloniales", "escena": "A new shiny clay book open next to a rolled old parchment with a wax seal and a magnifying glass" },
+    { "texto": "Una base de datos que reúne artículos de historia", "escena": "A clay laptop with a tall neat stack of small article cards rising from the screen like a filing cabinet" },
+    { "texto": "Una bibliografía que recopila libros sobre la Independencia", "escena": "A long clay list scroll unrolled next to a small pile of books and a tiny bell" },
+    { "texto": "Una carta escrita por un soldado durante la Revolución Mexicana", "escena": "A yellowed folded clay letter next to a wide sombrero and an old pencil stub" },
+    { "texto": "Una fotografía de la Revolución Mexicana del archivo Casasola (1910-1920)", "escena": "An old sepia clay photograph in a cardboard frame showing riders on horseback with wide hats" },
+    { "texto": "Fuente terciaria", "escena": "A clay encyclopedia volume open on a lectern with small cards summarising other books around it" },
+    { "texto": "Audiencia", "escena": "A group of seated clay figures looking up at a speaker on a stage" },
+    { "texto": "Autoría", "escena": "A clay hand holding a quill signing the bottom of an old parchment" },
+    { "texto": "Contexto", "escena": "A small old clay letter placed in the middle of a map with a tiny town, a calendar page and people around it" },
+    { "texto": "Fecha", "escena": "An old clay calendar page next to an hourglass and a quill" },
+    { "texto": "Intención", "escena": "A clay figure aiming an arrow at a target while holding a letter under one arm" }
+  ]
+}

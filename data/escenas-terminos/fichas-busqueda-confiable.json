@@ -1,0 +1,17 @@
+{
+  "slug": "busqueda-confiable",
+  "items": [
+    { "texto": "Buscar las citas y referencias que el texto usa y poder verificarlas", "escena": "A clay page with thin strings running from its lines to a small pile of books, a magnifying glass following one string" },
+    { "texto": "Contenido generado expresamente para desinformar", "escena": "A clay machine printing out crooked twisted newspapers on a conveyor belt" },
+    { "texto": "El texto usa lenguaje alarmista o extremo", "escena": "A clay newspaper with a loud siren on top and exclamation-shaped sparks flying off it" },
+    { "texto": "Un blog personal sin verificación ni autor identificado", "escena": "A clay laptop showing a page whose author photo is only a grey shadow silhouette with a question mark" },
+    { "texto": "Un titular sensacionalista del tipo «¡INCREÍBLE! El gobierno oculta que...»", "escena": "A clay newspaper with giant exclamation marks bursting from it and a clay figure with wide shocked eyes" },
+    { "texto": "Estrategia de búsqueda confiable", "escena": "A clay compass on top of an open book with a magnifying glass beside it" },
+    { "texto": "Señal de alerta", "escena": "A clay warning triangle with an exclamation shape and a blinking orange light on top" },
+    { "texto": "Busca citas y referencias", "escena": "A clay magnifying glass over the footnotes of an open book with small numbered bookmarks sticking out" },
+    { "texto": "Evalúa el tono", "escena": "A clay dial meter with a needle moving from a calm blue side to an angry red side, a page beside it" },
+    { "texto": "Lateral reading", "escena": "A clay figure with a laptop in the middle and several side windows open around it, comparing them" },
+    { "texto": "Revisa la fecha", "escena": "A clay calendar page next to an old yellowed newspaper with a magnifying glass on top" },
+    { "texto": "Verifica el dominio y la autoría", "escena": "A clay browser address bar being checked by a magnifying glass, and an author name badge with a green check" }
+  ]
+}

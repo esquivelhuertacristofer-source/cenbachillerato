@@ -1,0 +1,29 @@
+{
+  "slug": "licencias-software",
+  "items": [
+    { "texto": "Software privativo", "escena": "A sturdy clay strongbox safe with a heavy round padlock on its door; through a small barred window in the door you can glimpse colourful gears inside that nobody can reach" },
+    { "texto": "Software libre", "escena": "A wide-open clay toolbox full of colourful gears and cogs, one clay hand lifting a single orange gear out of it to look at it closely" },
+
+    { "texto": "Windows", "escena": "A clay desktop computer monitor on a small desk, its screen showing four overlapping plain coloured rectangles like open windows, a clay keyboard and mouse in front" },
+    { "texto": "Microsoft Office", "escena": "A clay laptop on a desk with three plain floating sheets hovering above it: a lined text page, a spreadsheet grid and a slide with a simple bar chart" },
+    { "texto": "Adobe Photoshop", "escena": "A clay graphics tablet with a stylus pen retouching a portrait photo shown on a clay monitor, small dabs of coloured paint around the stylus tip" },
+    { "texto": "GNU/Linux", "escena": "A chubby friendly black and white clay penguin with an orange beak sitting beside a small clay computer tower, one flipper resting on it" },
+    { "texto": "LibreOffice", "escena": "Clay office documents spread out on a wooden desk around a pencil: a lined text page, a spreadsheet grid sheet and a round pie chart card" },
+    { "texto": "Firefox", "escena": "A small curled-up orange clay fox with a fluffy tail sitting beside a round clay globe of the Earth with blue oceans and green continents" },
+
+    { "texto": "CC BY", "escena": "A clay painting of a hill and sun in a wooden frame, with a small blank ribbon name tag pinned to the corner of the frame and a clay hand pointing at the tag" },
+    { "texto": "CC BY-SA", "escena": "Two identical clay paintings of a hill and sun in wooden frames standing side by side, both carrying the same small blank ribbon badge on their corner" },
+    { "texto": "CC BY-NC", "escena": "A clay painting of a hill and sun in a wooden frame next to a large golden clay coin crossed out by a thick red clay bar" },
+    { "texto": "CC BY-NC-ND", "escena": "A clay painting of a hill and sun sealed inside a closed glass display case, a large golden clay coin crossed out by a thick red clay bar lying beside it" },
+
+    { "texto": "Puedes usar el contenido siempre que des crédito al autor.", "escena": "A small clay artist figure holding a paintbrush receiving a big golden clay ribbon medal from a clay hand, a framed painting beside the artist" },
+    { "texto": "Puedes usar si das crédito y compartes igual (con la misma licencia).", "escena": "Three clay figures standing in a row passing identical small framed paintings from hand to hand, each painting wearing the same small ribbon badge" },
+    { "texto": "Solo para uso no comercial, dando crédito al autor.", "escena": "A clay classroom desk with a framed painting propped on it being admired by two small clay students, while a clay cash register at the side is closed with a red bar across it" },
+    { "texto": "Solo puedes descargar y compartir tal cual: sin modificar ni usar comercialmente (la más restrictiva).", "escena": "A framed clay painting sealed inside a glass box with a padlock, a clay pair of scissors and a clay paint pot set aside behind a small red barrier" },
+
+    { "texto": "Usar el programa para cualquier propósito.", "escena": "One clay laptop surrounded by tiny clay scenes of its uses: a small school desk, a kitchen table with a recipe card and a tiny workshop bench with tools" },
+    { "texto": "Estudiar cómo funciona y adaptarlo (requiere el código fuente).", "escena": "A clay computer tower with its side panel removed showing colourful gears and cogs inside, a big clay magnifying glass held over the gears" },
+    { "texto": "Distribuir copias para ayudar a otras personas.", "escena": "A clay hand handing out three identical small clay USB memory sticks to three smiling little clay figures standing in a row" },
+    { "texto": "Mejorar el programa y publicar las mejoras para que toda la comunidad se beneficie.", "escena": "A clay figure fitting a shiny new golden gear into a big friendly clay machine while a small crowd of clay figures around it cheer with raised arms" }
+  ]
+}

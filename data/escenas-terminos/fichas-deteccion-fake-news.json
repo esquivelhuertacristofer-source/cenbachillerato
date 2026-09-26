@@ -1,0 +1,65 @@
+{
+  "slug": "deteccion-fake-news",
+  "items": [
+    {
+      "texto": "Contrastar la noticia con varios medios serios antes de difundirla",
+      "escena": "A clay figure comparing three different newspapers laid in a row with a magnifying glass"
+    },
+    {
+      "texto": "Hacer búsqueda inversa de una imagen antes de compartirla",
+      "escena": "A clay photo being dropped into a magnifying glass funnel that shows the same photo in older frames below"
+    },
+    {
+      "texto": "Un artículo creado solo para generar clics y publicidad",
+      "escena": "A clay fishing rod with a shiny newspaper as bait and a pile of clay coins below it"
+    },
+    {
+      "texto": "Un contenido difundido masivamente que nadie se ha detenido a verificar",
+      "escena": "A clay newspaper copied into a huge cascade of identical papers flying out of many phones"
+    },
+    {
+      "texto": "Un titular impactante y sensacionalista que no aparece en ningún medio serio",
+      "escena": "A lonely clay newspaper with a loud siren standing apart from a neat row of serious newspapers"
+    },
+    {
+      "texto": "Una corrección publicada por fact-checkers como Verificado o AFP Factual",
+      "escena": "A clay newspaper page with a small correction note card clipped to its corner"
+    },
+    {
+      "texto": "Una fotografía que, al hacer búsqueda inversa, fue usada antes en otro contexto",
+      "escena": "A clay photo of a flooded street pinned to an old yellowed newspaper page from years ago"
+    },
+    {
+      "texto": "Una nota que cita una fuente verificable y un comunicado oficial",
+      "escena": "A clay newspaper page linked by a string to an official-looking envelope with a wax seal"
+    },
+    {
+      "texto": "Una nota que no cita ninguna fuente verificable ni comunicado oficial",
+      "escena": "A clay newspaper page with a dangling cut string and nothing attached to its end"
+    },
+    {
+      "texto": "Señal de alerta",
+      "escena": "A clay warning triangle with an exclamation shape and a blinking orange light on top"
+    },
+    {
+      "texto": "Práctica de verificación",
+      "escena": "A clay figure with a magnifying glass and a checklist clipboard with green tick marks"
+    },
+    {
+      "texto": "Buscar la fuente original",
+      "escena": "A clay figure following a trail of footprints back to a small wellspring where a scroll comes out"
+    },
+    {
+      "texto": "Búsqueda inversa de imágenes",
+      "escena": "A clay photo going into a magnifying glass and coming out as a stack of matching photos"
+    },
+    {
+      "texto": "Desconfiar de los titulares sensacionalistas",
+      "escena": "A clay figure raising a hand like a stop sign in front of a newspaper with exploding exclamation marks"
+    },
+    {
+      "texto": "Fact-checking",
+      "escena": "A clay magnifying glass over a newspaper with small green check marks and red cross marks next to its lines"
+    }
+  ]
+}

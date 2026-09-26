@@ -1,0 +1,31 @@
+{
+  "slug": "tipos-de-preguntas",
+  "items": [
+    { "texto": "¿A qué temperatura hierve el agua?", "escena": "A clay pot of water bubbling on a stove with a clay thermometer dipped into it" },
+    { "texto": "¿Cómo sabemos lo que sabemos?", "escena": "A thoughtful clay figure looking into a mirror that reflects a smaller figure holding a book" },
+    { "texto": "¿Cómo se forman las estrellas?", "escena": "A swirling clay cloud of purple gas in dark space with a small bright star glowing at its centre" },
+    { "texto": "¿Cómo se forman los terremotos?", "escena": "A clay cutaway of the ground with two rock plates pushing against each other and a small house shaking on top" },
+    { "texto": "¿Cuánto cuesta este producto?", "escena": "A clay shopping basket with an apple and a blank price tag hanging from its handle" },
+    { "texto": "¿Cuántos habitantes tiene México?", "escena": "A clay map of Mexico covered with many tiny clay people" },
+    { "texto": "¿Dónde está el baño?", "escena": "A clay hallway with a small door and a clay figure looking around with a questioning shrug" },
+    { "texto": "¿Por qué se propagan los virus?", "escena": "Round spiky clay virus particles floating between two people, one sneezing" },
+    { "texto": "¿Qué debemos hacer ante la injusticia?", "escena": "A clay figure stepping in to protect a smaller figure from a big bully figure" },
+    { "texto": "¿Qué existe realmente?", "escena": "A clay figure reaching toward a floating translucent cube that is half solid and half fading into mist" },
+    { "texto": "¿Qué hace legítimo a un gobierno?", "escena": "A clay crowd dropping ballots into a box in front of a government palace" },
+    { "texto": "¿Qué hora es?", "escena": "A clay alarm clock on a nightstand with a sleepy figure reaching for it" },
+    { "texto": "Cotidiana", "escena": "A clay kitchen table with a coffee cup, keys and a bus ticket" },
+    { "texto": "Científica", "escena": "A clay microscope next to test tubes in a rack" },
+    { "texto": "Filosófica", "escena": "A clay thinker figure sitting on a rock with chin resting on a hand under a starry sky" },
+    { "texto": "¿Es real el mundo o solo una apariencia?", "escena": "A clay figure in a cave watching shadows of animals projected on the wall by a fire behind them" },
+    { "texto": "¿Podemos conocer realmente la realidad o solo nuestras percepciones de ella?", "escena": "A clay figure wearing coloured glasses looking at a tree that appears in different colours" },
+    { "texto": "¿Qué debemos hacer?", "escena": "A clay figure at a crossroads with two signposts pointing different ways" },
+    { "texto": "¿Qué es lo bello?", "escena": "A clay figure looking at a sunset over the sea next to a flower and a painting on an easel" },
+    { "texto": "Ontología", "escena": "A clay floating cube, sphere and pyramid glowing softly in empty space" },
+    { "texto": "Epistemología", "escena": "A clay magnifying glass looking at an open book with a lightbulb above it" },
+    { "texto": "Ética", "escena": "A clay balance scale holding a red heart on one side and a small figure on the other" },
+    { "texto": "Estética", "escena": "A clay easel with a painting, a vase of flowers and a violin" },
+    { "texto": "Filosofía política", "escena": "A clay town assembly in a plaza with people debating around a table" },
+    { "texto": "¿Es verdad esta noticia?", "escena": "A clay newspaper under a magnifying glass with a question mark shape floating above" },
+    { "texto": "¿Quién ganó la competencia?", "escena": "A clay podium with three steps and a golden trophy on the top step" }
+  ]
+}

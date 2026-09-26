@@ -1,0 +1,13 @@
+{
+  "slug": "lectura-critica-postura",
+  "items": [
+    { "texto": "¿Cuántos retardos se registraron en el primer bimestre de este año?", "escena": "A clay school attendance clipboard next to a wall clock and a student running late through a door" },
+    { "texto": "¿Qué quiere el boletín que el lector concluya al mencionar a los maestros?", "escena": "A clay school bulletin paper held up by a hand with an arrow pointing toward a teacher figure" },
+    { "texto": "¿La línea 4 queda probada por lo que el texto muestra?", "escena": "A clay page with one line highlighted and a magnifying glass over it, a balance scale beside" },
+    { "texto": "Literal", "escena": "A clay page with a finger pointing directly at one line of text" },
+    { "texto": "Inferencial", "escena": "A clay detective with a magnifying glass looking at footprints on a page" },
+    { "texto": "Crítico", "escena": "A clay figure weighing a newspaper on a balance scale with raised eyebrows" },
+    { "texto": "Critica el argumento", "escena": "A clay figure examining a tower of blocks and pointing at a weak block near the bottom" },
+    { "texto": "Descalifica al emisor", "escena": "A clay figure pointing and mocking a speaker instead of looking at the speaker's paper" }
+  ]
+}

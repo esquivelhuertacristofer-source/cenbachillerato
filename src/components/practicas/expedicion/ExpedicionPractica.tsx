@@ -23,6 +23,10 @@ import { EstiloArrastre } from "../labs/_arrastre";
 import { getPractica } from "../registry";
 
 const Expedicion = dynamic(() => import("./Expedicion").then((m) => m.Expedicion), { ssr: false });
+/* Solo en el navegador: arrastra el indice de las viñetas (miles de claves) y
+ * en el servidor no hay nada que ilustrar. Importado directo, entraria en el
+ * Worker, que tiene tope de 3 MiB. */
+const IlustrarFichas = dynamic(() => import("../labs/_ilustrar-fichas").then((m) => m.IlustrarFichas), { ssr: false });
 
 export interface ExpedicionPracticaProps {
   slug: string;
@@ -57,6 +61,8 @@ export function ExpedicionPractica({
           el golpe de entrada al soltar. Va aquí y no en cada laboratorio
           porque es el único sitio por el que pasan todos. */}
       <EstiloArrastre />
+      {/* El dibujo de cada ficha y cada zona: lo que se TOCA, no solo el glosario. */}
+      <IlustrarFichas slug={slug} />
       <Expedicion
         slug={slug}
         titulo={practica.titulo}

@@ -1,0 +1,109 @@
+[
+  {
+    "slug": "procesos-ingles",
+    "items": [
+      { "texto": "As a result, the water is safe for drinking.", "escena": "A clay child happily drinking a glass of clear sparkling water" },
+      { "texto": "Finally, a small amount of chlorine is added to kill bacteria and viruses.", "escena": "A clay dropper adding one drop into a clear water tank while tiny clay germs fade away" },
+      { "texto": "First, water is collected from a natural source, such as a river or a well.", "escena": "A clay bucket being pulled up from a stone well next to a flowing river" },
+      { "texto": "A small amount of chlorine is added to kill bacteria.", "escena": "A clay dropper adding one drop into a clear water tank while tiny clay germs fade away" },
+      { "texto": "Activated charcoal is used because it has a very large surface area.", "escena": "A clay close up of a black porous charcoal chunk full of tiny holes like a sponge" },
+      { "texto": "Can you explain the process of water purification?", "escena": "A clay student raising a hand next to a diagram of a water tank with arrows" },
+      { "texto": "Could you explain the difference between hardware and software?", "escena": "A clay computer chip on one side and a glowing app window on the other side" },
+      { "texto": "How does a simple water purification system work?", "escena": "A clay stack of layers in a clear bottle: gravel, sand and black charcoal with water dripping through" },
+      { "texto": "Large particles are removed using a basic filter.", "escena": "A clay mesh strainer catching leaves and small stones from muddy water" },
+      { "texto": "What are the steps to apply to a university program?", "escena": "A clay staircase leading up to a university building with columns" },
+      { "texto": "What happens when people drink unpurified water?", "escena": "A clay figure holding its stomach next to a glass of cloudy brown water" },
+      { "texto": "Why do we need to add chlorine to the water?", "escena": "A clay dropper bottle next to a water tank with a question shape floating above" },
+      { "texto": "Why is it important to use activated charcoal?", "escena": "A clay black charcoal chunk in a clear bottle filter with a question shape above" },
+      { "texto": "As far as I know... / In my understanding...", "escena": "A clay figure thinking with a hand on the chin and a small lightbulb above" },
+      { "texto": "Could you explain...?", "escena": "A clay student raising a hand politely in class" },
+      { "texto": "First... Second... Finally...", "escena": "Three clay stepping stones in a row leading to a flag" },
+      { "texto": "How does... work?", "escena": "A clay figure looking at spinning gears inside a machine" },
+      { "texto": "It is used to... / It is designed to...", "escena": "A clay toolbox with a hammer, a screwdriver and a wrench laid out" },
+      { "texto": "What's the process for...?", "escena": "A clay conveyor belt with boxes moving through three machines" }
+    ]
+  },
+  {
+    "slug": "aula-ingles-interacciones",
+    "items": [
+      { "texto": "Can I come in?", "escena": "A clay student knocking on an open classroom door and peeking in" },
+      { "texto": "Could you help me with this, please?", "escena": "A clay student politely showing a notebook to a teacher at her desk" },
+      { "texto": "Could you repeat that, please?", "escena": "A clay student cupping a hand to their ear toward the teacher" },
+      { "texto": "Excuse me.", "escena": "A clay student gently raising a hand to get attention in a hallway" },
+      { "texto": "Help me with this.", "escena": "A clay student pushing a notebook toward a classmate with a frown" },
+      { "texto": "Hey!", "escena": "A clay teenager shouting and waving across a school yard to a friend" },
+      { "texto": "I don't get it.", "escena": "A clay student scratching their head looking at a board with a confused face" },
+      { "texto": "I'm afraid I disagree.", "escena": "A clay student politely shaking their head with an open palm in a discussion" },
+      { "texto": "I'm sorry, I don't understand.", "escena": "A clay student with an apologetic smile and a shrug holding a book" },
+      { "texto": "May I come in?", "escena": "A clay student standing politely at a classroom door with a slight bow" },
+      { "texto": "No way!", "escena": "A clay teenager with wide surprised eyes and hands on cheeks" },
+      { "texto": "Say that again.", "escena": "A clay teenager leaning toward a friend with one ear forward" },
+      { "texto": "A un compañero", "escena": "Two clay teenage classmates chatting casually at their desks" },
+      { "texto": "A la maestra", "escena": "A clay student speaking politely to a teacher standing at the blackboard" }
+    ]
+  },
+  {
+    "slug": "posesivos-ingles",
+    "items": [
+      { "texto": "my", "escena": "A clay child hugging a teddy bear and pointing at their own chest" },
+      { "texto": "your", "escena": "A clay hand offering a red backpack toward the viewer" },
+      { "texto": "his", "escena": "A clay boy holding his soccer ball, a hand pointing at the boy" },
+      { "texto": "her", "escena": "A clay girl holding her book, a hand pointing at the girl" },
+      { "texto": "our", "escena": "A clay group of friends standing in front of their shared small clubhouse" },
+      { "texto": "Our", "escena": "A clay group of friends standing in front of their shared small clubhouse" },
+      { "texto": "their", "escena": "A clay family standing beside their car, a hand pointing at the family" },
+      { "texto": "mine", "escena": "A clay child holding a red kite close and pointing at their own chest" },
+      { "texto": "yours", "escena": "A clay hand giving a wrapped gift box toward the viewer" },
+      { "texto": "hers", "escena": "A clay bicycle next to a girl who holds its handlebar" },
+      { "texto": "ours", "escena": "A clay garden with a group of friends standing proudly around it" },
+      { "texto": "theirs", "escena": "A clay dog sitting beside a family that is pointing at it" },
+      { "texto": "Whose", "escena": "A clay lost backpack on a bench with a question shape floating above it" },
+      { "texto": "Adjetivo posesivo", "escena": "A clay name tag attached by a string to a backpack" },
+      { "texto": "Pronombre posesivo", "escena": "A clay hand holding a key tag hanging alone without anything attached" }
+    ]
+  },
+  {
+    "slug": "reglas-ingles",
+    "items": [
+      { "texto": "chores at home", "escena": "A clay teenager washing dishes at a kitchen sink with a broom leaning nearby" },
+      { "texto": "community responsibilities", "escena": "Clay neighbours picking up litter in a park with bags and gloves" },
+      { "texto": "rules at school", "escena": "A clay school with a uniform on a hanger, a bell and a clock at the entrance" },
+      { "texto": "must / mustn't", "escena": "A clay green checkmark sign and a red crossed circle sign side by side" },
+      { "texto": "have to / has to", "escena": "A clay student carrying a backpack toward a school at the ringing of a bell" },
+      { "texto": "don't have to / doesn't have to", "escena": "A clay student relaxing in a hammock on a sunny weekend" }
+    ]
+  },
+  {
+    "slug": "tiempo-libre-ingles",
+    "items": [
+      { "texto": "play", "escena": "Two clay children kicking a soccer ball in a park" },
+      { "texto": "read", "escena": "A clay teenager reading a book on a beanbag" },
+      { "texto": "love", "escena": "A clay figure hugging a big red heart" },
+      { "texto": "enjoy", "escena": "A clay figure smiling with closed eyes eating ice cream in the sun" },
+      { "texto": "watch", "escena": "Clay friends on a sofa watching a television screen with popcorn" },
+      { "texto": "go", "escena": "A clay figure walking forward along a road with a big arrow on the ground pointing ahead" },
+      { "texto": "do", "escena": "A clay figure doing a puzzle on a table" },
+      { "texto": "miss", "escena": "A clay figure looking sadly at a photo of a friend" },
+      { "texto": "study", "escena": "A clay student at a desk reading an open book with a lamp and a notebook" },
+      { "texto": "fly", "escena": "A clay kite flying high in a blue sky held by a child" },
+      { "texto": "carry", "escena": "A clay figure carrying a big heavy box in both arms" },
+      { "texto": "cry", "escena": "A clay child crying with big tears and a dropped ice cream on the ground" }
+    ]
+  },
+  {
+    "slug": "perfil-personal-ingles",
+    "items": [
+      { "texto": "Mateo", "escena": "A friendly clay teenage boy with short dark hair and a school uniform waving" },
+      { "texto": "Mexican", "escena": "A clay flag of Mexico with green, white and red stripes on a small pole" },
+      { "texto": "Mexico", "escena": "A clay relief map of Mexico with mountains and blue seas around" },
+      { "texto": "Student", "escena": "A clay teenager with a backpack and books walking into a school" }
+    ]
+  },
+  {
+    "slug": "describir-personas-clima-ingles",
+    "items": [
+      { "texto": "big", "escena": "A huge clay elephant standing next to a tiny mouse" },
+      { "texto": "red", "escena": "A shiny red clay apple next to a red balloon" }
+    ]
+  }
+]

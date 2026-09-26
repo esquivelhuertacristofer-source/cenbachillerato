@@ -1,0 +1,22 @@
+{
+  "slug": "comunicacion-multimodal",
+  "items": [
+    { "texto": "El texto superpuesto que aparece sobre un video de TikTok", "escena": "A vertical clay smartphone video of a dancing figure with a blank rounded caption bar floating over it" },
+    { "texto": "La música de fondo de un video de TikTok", "escena": "A vertical clay smartphone video with colourful music notes flowing out of its speaker" },
+    { "texto": "Las etiquetas y estadísticas escritas de una infografía", "escena": "A clay poster with a bar chart and small blank label tags pinned to each bar" },
+    { "texto": "Los íconos y colores de una infografía", "escena": "A clay poster covered in simple round icons of a house, a tree and a heart in bright colours" },
+    { "texto": "Un deepfake: imagen en movimiento manipulada con IA", "escena": "A clay figure holding up a mask of another person's face in front of a video camera" },
+    { "texto": "Un mensaje de voz de WhatsApp reenviado sin verificar", "escena": "A clay smartphone with a sound wave bubble being forwarded by arrows to many other phones" },
+    { "texto": "Un Reel de Instagram con imagen en movimiento", "escena": "A vertical clay smartphone showing a short clip of a skateboarder with motion lines" },
+    { "texto": "Una fotografía editada que se difunde sobre un grupo social", "escena": "A clay photograph being cut and glued back together wrongly with scissors and a glue stick" },
+    { "texto": "Texto", "escena": "A clay page with neat lines of writing and a pencil" },
+    { "texto": "Imagen", "escena": "A clay picture frame with a landscape of a mountain and sun" },
+    { "texto": "Audio", "escena": "Clay headphones with colourful sound waves around them" },
+    { "texto": "Video", "escena": "A clay video camera with a small reel of film beside it" },
+    { "texto": "Algoritmo de recomendación", "escena": "A clay robot picking one video card from a pile and handing it to a figure holding a phone" },
+    { "texto": "Análisis crítico de medios digitales", "escena": "A clay figure examining a smartphone screen with a big magnifying glass" },
+    { "texto": "Burbuja de filtro", "escena": "A clay figure sitting inside a transparent soap bubble surrounded only by identical copies of the same picture" },
+    { "texto": "Deepfake", "escena": "A clay figure holding up a mask of another person's face in front of their own face, a video camera recording them" },
+    { "texto": "Identidad digital", "escena": "A clay figure looking into a smartphone that shows their own avatar with a profile frame" }
+  ]
+}
