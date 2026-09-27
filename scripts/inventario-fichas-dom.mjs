@@ -46,7 +46,7 @@ const leer = () => p.evaluate(() => {
   const conImg = (e) => !!e.querySelector('img');
 
   const fichas = [...document.querySelectorAll('[draggable="true"], [data-sel], button[data-done]')]
-    .filter(vis).map((e) => ({ t: texto(e), img: conImg(e) })).filter((f) => f.t && f.t.length < 80);
+    .filter(vis).map((e) => ({ t: texto(e), img: conImg(e) })).filter((f) => f.t && f.t.length < 400);
 
   /* Una zona se reconoce por su invitación a soltar; su nombre es la primera
    * línea del contenedor que la envuelve y que ya no es solo la invitación. */
