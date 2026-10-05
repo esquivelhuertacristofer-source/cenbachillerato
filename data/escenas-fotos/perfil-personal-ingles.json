@@ -1,0 +1,8 @@
+{
+  "slug": "perfil-personal-ingles",
+  "items": [
+    { "clave": "mostrador-inscripcion", "formato": "16:9", "estilo": "ilustracion", "escena": "Mostrador de inscripciones de una escuela de verano con una computadora, una bandeja de gafetes vacíos y un hombre amable de camisa azul sentado detrás sonriendo, una joven de espaldas de pie frente al mostrador" },
+    { "clave": "registrador-teclado", "formato": "16:9", "estilo": "ilustracion", "escena": "Primer plano de un hombre de camisa azul tecleando en una computadora de escritorio con expresión atenta, taza de café junto al teclado, oficina escolar luminosa" },
+    { "clave": "pantalla-formulario", "formato": "16:9", "estilo": "ilustracion", "escena": "Monitor de computadora sobre un escritorio mostrando un formulario con seis renglones en blanco y un botón verde, una mano sobre el ratón" }
+  ]
+}

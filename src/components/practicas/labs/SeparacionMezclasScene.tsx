@@ -12,11 +12,11 @@
  */
 
 import * as THREE from "three";
-import { useMemo } from "react";
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { useMemo, useRef } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
-import type { MetodoKey } from "./separacion-data";
+import { METODOS, type MetodoKey } from "./separacion-data";
 import { VIDRIO, perfilVaso } from "./_vidrio";
 import { Escenario } from "./_escenario";
 
@@ -201,6 +201,31 @@ function Particulas({ particulas, funciona, progreso }: { particulas: Particula[
   );
 }
 
+/* ── Etiqueta (drei <Html>, nunca <Text>): ≥ 14 px, sobre lo que nombra ─── */
+function Etiqueta({ pos, color, children }: { pos: [number, number, number]; color: string; children: React.ReactNode }) {
+  return (
+    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
+      <div style={{ whiteSpace: "nowrap", padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.88)", border: `1.5px solid ${color}`, color, fontWeight: 900, fontSize: 15, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)" }}>
+        {children}
+      </div>
+    </Html>
+  );
+}
+
+/* ── Encuadre: en pantallas angostas se abre el campo para que quepan los 3 vasos ── */
+function AjusteCamara() {
+  const fov = useRef(44);
+  useFrame(({ camera, size }) => {
+    const objetivo = size.width < 640 ? 66 : 44;
+    if (fov.current !== objetivo && "fov" in camera) {
+      fov.current = objetivo;
+      (camera as THREE.PerspectiveCamera).fov = objetivo;
+      camera.updateProjectionMatrix();
+    }
+  });
+  return null;
+}
+
 /* ── Escena completa ───────────────────────────────────────────────────── */
 export default function SeparacionMezclasScene(props: SeparacionSceneProps) {
   const particulas = useMemo<Particula[]>(() => {
@@ -224,12 +249,13 @@ export default function SeparacionMezclasScene(props: SeparacionSceneProps) {
       shadows
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
-      camera={{ position: [0, 1.4, 11.5], fov: 44 }}
+      camera={{ position: [0, 1.4, 12.5], fov: 44 }}
     >
       {/* Suelo, luz de tres puntos y entorno que reflejar. La altura sale
           de donde esta escena ya ponía su sombra de contacto, que es donde
           su autor decidió que estaba el piso. */}
       <Escenario acento={props.accent} suelo={-1.75} />
+      <AjusteCamara />
 
 
       <group key={`${props.mezclaKey}-${props.metodoKey}-${props.resetNonce}`}>
@@ -238,16 +264,24 @@ export default function SeparacionMezclasScene(props: SeparacionSceneProps) {
         <Vaso x={RIGHT_X} />
         <Herramienta metodo={props.metodoKey} />
         <Particulas particulas={particulas} funciona={props.funciona} progreso={props.progreso} />
+
+        {/* Tres etiquetas: los dos destinos y el método (que da el veredicto al terminar). */}
+        <Etiqueta pos={[LEFT_X, 0.95, 0]} color={props.comps[0].color}>{props.comps[0].nombre}</Etiqueta>
+        <Etiqueta pos={[RIGHT_X, 0.95, 0]} color={props.comps[1].color}>{props.comps[1].nombre}</Etiqueta>
+        <Etiqueta pos={[0, 3.55, 0]} color={props.progreso >= 1 ? (props.funciona ? "#34D399" : "#FF5E5E") : "#8AB4FF"}>
+          {METODOS.find((m) => m.key === props.metodoKey)?.nombre ?? ""}
+          {props.progreso >= 1 ? (props.funciona ? " · separa ✓" : " · no separa ✗") : ""}
+        </Etiqueta>
       </group>
 
 
       <OrbitControls
         enablePan={false}
-        minDistance={7}
+        minDistance={8}
         maxDistance={20}
         minPolarAngle={Math.PI / 6}
         maxPolarAngle={Math.PI / 1.9}
-        target={[0, -0.2, 0]}
+        target={[0, 0.5, 0]}
         autoRotate={props.autoRotate}
         autoRotateSpeed={0.4}
       />

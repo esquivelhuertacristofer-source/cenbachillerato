@@ -15,8 +15,8 @@
  * de los bloques se calcula con useMemo a partir de las props.
  */
 
-import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, RoundedBox } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import type { Group } from "three";
@@ -107,11 +107,11 @@ function Plato({
           <meshBasicMaterial color="#ffffff" transparent opacity={0.18} />
         </mesh>
         {/* etiqueta del lado */}
-        <Html center position={[0, -0.5, 0]} distanceFactor={9} pointerEvents="none">
+        <Html center position={[0, -0.55, 0]} pointerEvents="none" zIndexRange={[20, 0]}>
           <div
             style={{
               fontWeight: 900,
-              fontSize: 30,
+              fontSize: 22,
               color: labelCol,
               fontVariantNumeric: "tabular-nums",
               textShadow: "0 2px 12px rgba(0,0,0,0.8)",
@@ -140,8 +140,8 @@ function CajaX({ pos, accent, phase }: { pos: XY; accent: string; phase: number 
       <RoundedBox args={[XW, XH, XW]} radius={0.07} smoothness={4} castShadow>
         <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.5} metalness={0.3} roughness={0.35} />
       </RoundedBox>
-      <Html center position={[0, 0, XW / 2 + 0.01]} distanceFactor={8} pointerEvents="none">
-        <div style={{ fontWeight: 900, fontSize: 30, color: "#fff", textShadow: "0 1px 6px rgba(0,0,0,0.7)" }}>x</div>
+      <Html center position={[0, 0, XW / 2 + 0.01]} pointerEvents="none" zIndexRange={[10, 0]}>
+        <div style={{ fontWeight: 900, fontSize: 18, color: "#fff", textShadow: "0 1px 6px rgba(0,0,0,0.7)" }}>x</div>
       </Html>
     </group>
   );
@@ -155,6 +155,19 @@ function Unidad({ pos }: { pos: XY }) {
       <meshStandardMaterial color={UNIT_COL} metalness={0.2} roughness={0.55} />
     </mesh>
   );
+}
+
+/** Aleja la cámara en pantallas angostas para que quepan los dos platos. */
+function Encuadre() {
+  const camera = useThree((st) => st.camera);
+  const size = useThree((st) => st.size);
+  const aspect = size.width / Math.max(1, size.height);
+  const z = Math.min(16, Math.max(9.6, 9.6 / Math.min(1.4, aspect) * 0.95 + (size.width < 640 ? 1 : 0)));
+  useEffect(() => {
+    camera.position.set(0, 2.9, z);
+    camera.updateProjectionMatrix();
+  }, [camera, z]);
+  return null;
 }
 
 function Brazo(props: BalanzaSceneProps) {
@@ -215,12 +228,13 @@ export default function BalanzaScene(props: BalanzaSceneProps) {
       shadows
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
-      camera={{ position: [0, 2.6, 9.2], fov: 42 }}
+      camera={{ position: [0, 2.9, 10], fov: 42 }}
     >
       {/* Suelo, luz de tres puntos y entorno que reflejar. */}
       {/* La altura sale de donde esta escena ya ponía su sombra de
           contacto: es donde su autor decidió que estaba el piso. */}
       <Escenario acento={accent} suelo={0} />
+      <Encuadre />
 
 
       <group key={`${props.resetNonce}`}>
@@ -248,10 +262,10 @@ export default function BalanzaScene(props: BalanzaSceneProps) {
       <OrbitControls
         enablePan={false}
         minDistance={6.5}
-        maxDistance={16}
+        maxDistance={18}
         minPolarAngle={Math.PI / 7}
         maxPolarAngle={Math.PI / 2.05}
-        target={[0, 2, 0]}
+        target={[0, 1.7, 0]}
         autoRotate={props.autoRotate}
         autoRotateSpeed={0.4}
       />

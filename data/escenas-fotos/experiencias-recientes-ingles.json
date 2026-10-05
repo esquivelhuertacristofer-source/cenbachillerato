@@ -1,0 +1,10 @@
+{
+  "slug": "experiencias-recientes-ingles",
+  "items": [
+    { "clave": "mercado-oaxaca", "formato": "16:9", "estilo": "ilustracion", "escena": "Puesto de mercado tradicional mexicano con canastos de mimbre llenos de productos secos y especias, toldo de colores y una vendedora sonriendo detrás del mostrador" },
+    { "clave": "selva-cenote", "formato": "16:9", "estilo": "ilustracion", "escena": "Un cenote de aguas turquesa dentro de una cueva abierta con raíces de árboles colgando y rayos de luz que entran desde arriba, sin personas" },
+    { "clave": "bosque-monarcas", "formato": "16:9", "estilo": "ilustracion", "escena": "Bosque de oyamel en la montaña con miles de mariposas naranjas posadas en los troncos y volando entre los rayos de sol" },
+    { "clave": "aula-ingles", "formato": "16:9", "estilo": "ilustracion", "escena": "Salón de clases de preparatoria con pupitres, un pizarrón verde sin texto, mapas y una ventana con luz de la mañana, estudiantes sentados de espaldas" },
+    { "clave": "calle-puebla", "formato": "16:9", "estilo": "ilustracion", "escena": "Calle colonial de una ciudad mexicana con casas de colores, balcones con macetas y una cúpula de iglesia de azulejos al fondo" }
+  ]
+}

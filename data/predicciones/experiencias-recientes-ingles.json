@@ -1,0 +1,12 @@
+{
+  "escena": "La maestra Rivas del club de viajes te entrevista y anota tu vida en una línea de tiempo.",
+  "pregunta": "Ella pregunta «Have you ever tried chapulines?» y tú dices «Yes, I did». ¿Qué anota?",
+  "opciones": [
+    { "id": "a", "texto": "Un alfiler a los 12 años", "icono": "fa-thumbtack" },
+    { "id": "b", "texto": "Un «?»: no te entendió", "icono": "fa-circle-question" },
+    { "id": "c", "texto": "Que nunca los probaste", "icono": "fa-ban" }
+  ],
+  "correcta": "b",
+  "porque": "Una pregunta con «Have you ever…» se contesta con el mismo auxiliar: «Yes, I have». «Yes, I did» mezcla present perfect con past simple, y la maestra no sabe qué ubicar.",
+  "comoComprobarlo": "En «La entrevista del club», abre la primera pregunta, elige la respuesta que empieza con «Yes, I did» y mira el carril de Chapulines."
+}

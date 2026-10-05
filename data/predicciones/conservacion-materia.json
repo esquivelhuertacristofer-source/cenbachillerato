@@ -1,0 +1,12 @@
+{
+  "escena": "Una balanza con átomos de metano y oxígeno en un plato y los productos de la combustión en el otro.",
+  "pregunta": "Si la combustión ocurre con el sistema abierto, ¿qué hace la balanza?",
+  "opciones": [
+    { "id": "a", "texto": "Sigue nivelada siempre", "icono": "fa-equals" },
+    { "id": "b", "texto": "Baja del lado de los reactivos", "icono": "fa-arrow-down" },
+    { "id": "c", "texto": "Baja del lado de los productos", "icono": "fa-arrow-down-long" }
+  ],
+  "correcta": "b",
+  "porque": "La masa no desaparece, pero el CO₂ y el vapor de agua salen del plato. Lo que queda pesa menos, y por eso la balanza se inclina hacia los reactivos.",
+  "comoComprobarlo": "Activa el icono del viento para abrir el sistema y avanza la reacción hasta el final; luego compara con el sistema cerrado."
+}

@@ -1,0 +1,12 @@
+{
+  "escena": "Un triángulo rectángulo con un cuadrado dibujado sobre cada uno de sus tres lados.",
+  "pregunta": "Alargas un cateto. ¿Qué pasa con el cuadrado de la hipotenusa?",
+  "opciones": [
+    { "id": "a", "texto": "Se queda igual", "icono": "fa-equals" },
+    { "id": "b", "texto": "También crece", "icono": "fa-up-right-and-down-left-from-center" },
+    { "id": "c", "texto": "Se hace más pequeño", "icono": "fa-down-left-and-up-right-to-center" }
+  ],
+  "correcta": "b",
+  "porque": "El área de la hipotenusa siempre vale la suma de las áreas de los catetos. Si un cateto crece, su cuadrado crece, y la hipotenusa también para seguir cumpliendo a² + b² = c².",
+  "comoComprobarlo": "Mueve el deslizador del cateto a y compara el valor de c² con la suma a² + b² en la escena."
+}

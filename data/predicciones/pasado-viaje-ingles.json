@@ -1,0 +1,24 @@
+{
+  "escena": "Una línea del tiempo con dos figuras sobre un eje",
+  "pregunta": "En la línea del tiempo, ¿cómo se dibuja un verbo en past continuous como «were walking»?",
+  "opciones": [
+    {
+      "id": "a",
+      "texto": "Como una banda larga",
+      "icono": "fa-grip-lines"
+    },
+    {
+      "id": "b",
+      "texto": "Como un rayo breve que corta",
+      "icono": "fa-bolt"
+    },
+    {
+      "id": "c",
+      "texto": "Como un punto al final del relato",
+      "icono": "fa-circle"
+    }
+  ],
+  "correcta": "a",
+  "porque": "El past continuous describe lo que ya estaba pasando y duraba un rato. El hecho puntual que lo interrumpe va en past simple y se dibuja como rayo.",
+  "comoComprobarlo": "En «Background & interruption» elige «were walking» como fondo y luego «walked»; compara lo que dibuja la línea."
+}

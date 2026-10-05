@@ -17,8 +17,8 @@
 
 import { useMemo } from "react";
 import * as THREE from "three";
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { Canvas, useThree } from "@react-three/fiber";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { VIDRIO_FINO, perfilVaso, perfilLiquido } from "./_vidrio";
 import { Escenario } from "./_escenario";
@@ -37,12 +37,46 @@ export interface ConcentracionSceneProps {
   accent: string;
   autoRotate: boolean;
   resetNonce: number;
+  /** Rótulos en la escena (máx. 4 a la vez). */
+  rotulos: { agua: string; soluto: string; sinDisolver: string | null; pct: string };
 }
 
 const TAU = Math.PI * 2;
 const VASO_R = 1.5; // radio interior del vaso
 const VASO_H = 3.2; // altura del vaso
 const FONDO_Y = -VASO_H / 2; // y del fondo interior
+
+/** Etiqueta en la punta de lo que nombra, con desplazamiento fijo hacia un lado. */
+function Etiqueta({ pos, color, lado, children }: { pos: [number, number, number]; color: string; lado: "left" | "right" | "up"; children: React.ReactNode }) {
+  const tr = lado === "left" ? "translate(-58%,0)" : lado === "right" ? "translate(58%,0)" : "translate(0,-70%)";
+  return (
+    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
+      <div style={{ transform: tr }}>
+        <div style={{ whiteSpace: "nowrap", padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.88)", border: `1.5px solid ${color}`, color, fontWeight: 900, fontSize: 15, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)" }}>
+          {children}
+        </div>
+      </div>
+    </Html>
+  );
+}
+
+/** Rótulos: agua (superficie), soluto disuelto, cristales sin disolver y % arriba. */
+function Rotulos({ nivel, solutoColor, rotulos, saturada }: { nivel: number; solutoColor: string; rotulos: ConcentracionSceneProps["rotulos"]; saturada: boolean }) {
+  const ancho = useThree((st) => st.size.width);
+  const H = Math.max(0.25, nivel * (VASO_H - 0.3));
+  const ySup = FONDO_Y + 0.06 + H;
+  const angosto = ancho < 640;
+  return (
+    <group>
+      <Etiqueta pos={[0, FONDO_Y + VASO_H + 0.1, 0]} color="#ffffff" lado="up">{rotulos.pct}</Etiqueta>
+      {!angosto && <Etiqueta pos={[VASO_R, ySup, 0]} color="#5BC8FF" lado="right">{rotulos.agua}</Etiqueta>}
+      {!angosto && <Etiqueta pos={[-VASO_R, FONDO_Y + 0.5 + (ySup - FONDO_Y) * 0.4, 0]} color={solutoColor} lado="left">{rotulos.soluto}</Etiqueta>}
+      {!angosto && saturada && rotulos.sinDisolver && (
+        <Etiqueta pos={[VASO_R * 0.6, FONDO_Y + 0.2, 0]} color="#FF8A3C" lado="right">{rotulos.sinDisolver}</Etiqueta>
+      )}
+    </group>
+  );
+}
 
 /** Hash determinista en [0,1) — evita Math.random en el render. */
 function prand(i: number, salt: number): number {
@@ -179,7 +213,7 @@ export default function ConcentracionScene(props: ConcentracionSceneProps) {
       shadows
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
-      camera={{ position: [0, 1.9, 7.4], fov: 42 }}
+      camera={{ position: [0, 1.7, 8.2], fov: 42 }}
     >
       {/* Suelo, luz de tres puntos y entorno que reflejar. La altura sale
           de donde esta escena ya ponía su sombra de contacto, que es donde
@@ -192,7 +226,7 @@ export default function ConcentracionScene(props: ConcentracionSceneProps) {
         <Liquido nivel={nivel} solutoColor={props.solutoColor} intensidad={intensidad} />
         {props.saturada && <Cristales excedenteFrac={excedenteFrac} solutoColor={props.solutoColor} />}
       </group>
-
+      <Rotulos nivel={nivel} solutoColor={props.solutoColor} rotulos={props.rotulos} saturada={props.saturada} />
 
       <OrbitControls
         enablePan={false}
@@ -200,7 +234,7 @@ export default function ConcentracionScene(props: ConcentracionSceneProps) {
         maxDistance={20}
         minPolarAngle={Math.PI / 7}
         maxPolarAngle={Math.PI / 1.95}
-        target={[0, 0, 0]}
+        target={[0, -0.35, 0]}
         autoRotate={props.autoRotate}
         autoRotateSpeed={0.45}
       />

@@ -15,8 +15,8 @@
  */
 
 import { useMemo } from "react";
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { Canvas, useThree } from "@react-three/fiber";
+import { OrbitControls, PerspectiveCamera, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import type { Exponente } from "./potencias-data";
 import { Escenario } from "./_escenario";
@@ -87,37 +87,63 @@ function Bloque({ base, exponente, resaltarLado, accent }: { base: number; expon
   );
 }
 
-export default function PotenciasScene(props: PotenciasSceneProps) {
-  const n = useMemo(() => Math.max(1, Math.min(6, Math.round(props.base))), [props.base]);
+/* ── Etiqueta: ≥ 14 px, en la punta de lo que nombra ─────────────────────── */
+function Etiqueta({ pos, texto, color }: { pos: [number, number, number]; texto: string; color: string }) {
+  return (
+    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
+      <div style={{ whiteSpace: "nowrap", padding: "3px 10px", borderRadius: 8, background: "rgba(4,10,22,0.88)", border: `1.5px solid ${color}`, color, fontWeight: 900, fontSize: 15, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)" }}>
+        {texto}
+      </div>
+    </Html>
+  );
+}
+
+const DIR: [number, number, number] = [0.536, 0.435, 0.725]; // dirección de la cámara (unitaria)
+
+/* ── Contenido: el encuadre sigue el tamaño del bloque y la banda libre entre
+ *    la barra de arriba (~64 px) y la misión de abajo (~150 px) ────────────── */
+function Contenido({ n, props }: { n: number; props: PotenciasSceneProps }) {
+  const { width, height } = useThree((st) => st.size);
+  const e = props.exponente;
+  const offY = e === 3 ? (n - 1) / 2 : 0;
+  const frac = Math.min(0.8, Math.max(0.38, (height - 214) / height));
+  // Hasta 4 el encuadre es fijo (así se ve crecer el bloque); de 5 en adelante se aleja.
+  const V = Math.max(n, 4) * S * 1.6;
+  const distV = V / (frac * 0.9) / 0.768;
+  const distH = V / ((width / height) * 0.9 * 0.768);
+  const dist = Math.min(22, Math.max(6, distV, distH));
+  const ty = -(43 / height) * 0.768 * dist;
+  const cam: [number, number, number] = [DIR[0] * dist, DIR[1] * dist + ty, DIR[2] * dist];
+  const etiquetas = width >= 640;
+  const off = (n - 1) / 2;
 
   return (
-    <Canvas
-      shadows
-      dpr={[1, 2]}
-      gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
-      /* La cámara estaba a 10.4 de un bloque que, en 3², mide 2 unidades: el
-         objeto salía diminuto en una mesa enorme y la escena parecía vacía. A
-         6.9 el caso grande (6³ ≈ 4 u) sigue entrando entero. */
-      camera={{ position: [3.7, 3.0, 5.0], fov: 42 }}
-    >
+    <>
+      <PerspectiveCamera makeDefault fov={42} position={cam} />
       {/* Suelo, luz de tres puntos y entorno que reflejar. La altura sale
           de donde esta escena ya ponía su sombra de contacto, que es donde
           su autor decidió que estaba el piso. */}
-      <Escenario acento={props.accent} suelo={-(props.exponente === 3 ? (n - 1) / 2 : 0) * S - C * 0.6} />
+      <Escenario acento={props.accent} suelo={-offY * S - C * 0.6} />
 
-
-      <group key={`${n}-${props.exponente}-${props.resetNonce}`}>
-        <Bloque base={n} exponente={props.exponente} resaltarLado={props.resaltarLado} accent={props.accent} />
+      <group key={`${n}-${e}-${props.resetNonce}`}>
+        <Bloque base={n} exponente={e} resaltarLado={props.resaltarLado} accent={props.accent} />
       </group>
 
+      {etiquetas && (
+        <>
+          <Etiqueta pos={[0, offY * S + C / 2 + 0.55, 0]} texto={`${n}${e === 2 ? "²" : "³"} = ${e === 2 ? n * n : n * n * n} cubitos`} color={props.accent} />
+          {props.resaltarLado && <Etiqueta pos={[0, -offY * S - C / 2 - 0.1, off * S + C / 2 + 0.55]} texto={`lado = ${n}`} color={LADO} />}
+        </>
+      )}
 
       <OrbitControls
+        makeDefault
         enablePan={false}
         minDistance={4}
-        maxDistance={22}
+        maxDistance={26}
         minPolarAngle={Math.PI / 7}
         maxPolarAngle={Math.PI / 1.9}
-        target={[0, 0, 0]}
+        target={[0, ty, 0]}
         autoRotate={props.autoRotate}
         autoRotateSpeed={0.45}
       />
@@ -126,6 +152,16 @@ export default function PotenciasScene(props: PotenciasSceneProps) {
         <Bloom intensity={0.42} luminanceThreshold={0.68} luminanceSmoothing={0.3} mipmapBlur radius={0.62} />
         <Vignette eskil={false} offset={0.28} darkness={0.42} />
       </EffectComposer>
+    </>
+  );
+}
+
+export default function PotenciasScene(props: PotenciasSceneProps) {
+  const n = useMemo(() => Math.max(1, Math.min(6, Math.round(props.base))), [props.base]);
+
+  return (
+    <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}>
+      <Contenido n={n} props={props} />
     </Canvas>
   );
 }

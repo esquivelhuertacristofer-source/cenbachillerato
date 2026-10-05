@@ -1,0 +1,24 @@
+{
+  "escena": "Una pantalla escolar con tres botones de colores",
+  "pregunta": "Si ordenas «Click the button.» sin más datos, ¿qué botón pulsa la máquina?",
+  "opciones": [
+    {
+      "id": "a",
+      "texto": "El primero que lee: el rojo",
+      "icono": "fa-hand-pointer"
+    },
+    {
+      "id": "b",
+      "texto": "El que tú imaginabas al escribir",
+      "icono": "fa-brain"
+    },
+    {
+      "id": "c",
+      "texto": "Ninguno, antes te pide más datos",
+      "icono": "fa-ban"
+    }
+  ],
+  "correcta": "a",
+  "porque": "La máquina obedece al pie de la letra. Si tu frase alcanza a varios elementos, toma el primero que lee, aunque sea el de borrar.",
+  "comoComprobarlo": "En «Da la instrucción» elige Click y «the button», sin detalle, y pulsa Ejecutar; luego agrega un color."
+}

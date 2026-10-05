@@ -19,7 +19,7 @@
 
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, ContactShadows, Environment, Lightformer, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import type { PiezaKey, Fase, Accidente, Llama } from "./destilacion-data";
@@ -328,11 +328,11 @@ function Termometro({ temp, show }: { temp: number; show: boolean }) {
         <meshStandardMaterial color={hot ? "#FF3B3B" : "#FF5E5E"} emissive={hot ? "#FF3B3B" : "#FF5E5E"} emissiveIntensity={hot ? 0.6 : 0.25} roughness={0.2} />
       </mesh>
       {show && (
-        <Html position={[0.18, topY - 0.05, 0]} center={false} style={{ pointerEvents: "none" }} distanceFactor={9}>
+        <Html position={[0.18, topY - 0.05, 0]} center={false} style={{ pointerEvents: "none" }} zIndexRange={[30, 0]}>
           <div
             style={{
               whiteSpace: "nowrap",
-              fontSize: 13,
+              fontSize: 15,
               fontWeight: 900,
               color: hot ? "#FF6B6B" : "#fff",
               background: "rgba(2,12,28,0.7)",
@@ -474,11 +474,11 @@ function Vaho({ activo, color }: { activo: boolean; color: string }) {
 /* ── Etiqueta flotante con el nombre de una pieza ───────────────────────── */
 function Etiqueta({ pos, texto, accent }: { pos: [number, number, number]; texto: string; accent: string }) {
   return (
-    <Html position={pos} center distanceFactor={11} style={{ pointerEvents: "none" }} zIndexRange={[40, 0]}>
+    <Html position={pos} center style={{ pointerEvents: "none" }} zIndexRange={[40, 0]}>
       <div
         style={{
           whiteSpace: "nowrap",
-          fontSize: 12,
+          fontSize: 14,
           fontWeight: 800,
           color: "#fff",
           background: "rgba(2,12,28,0.8)",
@@ -678,6 +678,20 @@ function Mesa() {
   );
 }
 
+/* ── Aviso de mesa vacía (se oculta en pantallas angostas: el panel ya lo dice) ── */
+function MesaVacia({ visible }: { visible: boolean }) {
+  const { size } = useThree();
+  if (!visible || size.width < 640) return null;
+  return (
+    <Html center position={[0, 0.2, 0]} style={{ pointerEvents: "none" }}>
+      <div style={{ textAlign: "center", fontFamily: "system-ui, sans-serif", color: "rgba(255,255,255,0.7)", width: 300 }}>
+        <div style={{ fontSize: 17, fontWeight: 800 }}>Tu mesa de laboratorio está vacía</div>
+        <div style={{ fontSize: 14, color: "rgba(255,255,255,0.5)", marginTop: 6 }}>Arma el equipo desde el panel de Controles</div>
+      </div>
+    </Html>
+  );
+}
+
 /* ── Escena ────────────────────────────────────────────────────────────── */
 export default function DestilacionScene(props: DestilacionSceneProps) {
   const frac = props.volumen / CAP;
@@ -685,7 +699,7 @@ export default function DestilacionScene(props: DestilacionSceneProps) {
   const algoArmado = props.piezas.soporte || props.piezas.matraz;
 
   return (
-    <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={{ position: [0, 0.4, 12], fov: 40 }}>
+    <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={{ position: [0, 0.4, 11.4], fov: 40 }}>
       <color attach="background" args={["#03101f"]} />
       <fog attach="fog" args={["#03101f", 16, 42]} />
 
@@ -737,8 +751,6 @@ export default function DestilacionScene(props: DestilacionSceneProps) {
 
         {props.etiquetas && (
           <group>
-            {props.piezas.soporte && <Etiqueta pos={[STAND_X, 2.2, 0]} texto="Soporte universal" accent={props.accent} />}
-            {props.piezas.mechero && <Etiqueta pos={[FLASK.x, TABLE_Y + 0.9, 0]} texto="Mechero Bunsen" accent={props.accent} />}
             {props.piezas.matraz && <Etiqueta pos={[FLASK.x - 1.1, FLASK.y, 0]} texto="Matraz de destilación" accent={props.accent} />}
             {props.piezas.refrigerante && <Etiqueta pos={[0.7, 0.95, 0]} texto="Refrigerante" accent={props.accent} />}
             {props.piezas.colector && <Etiqueta pos={[COLLECTOR.x + 0.7, COLLECTOR.top - 0.4, 0]} texto="Matraz colector" accent={props.accent} />}
@@ -748,21 +760,7 @@ export default function DestilacionScene(props: DestilacionSceneProps) {
         <ContactShadows position={[0, TABLE_Y + 0.02, 0]} opacity={0.4} scale={22} blur={2.6} far={6} color="#1a2840" />
       </group>
 
-      {!algoArmado && props.mostrarVacia !== false && (
-        <Html center position={[0, 0.2, 0]} style={{ pointerEvents: "none" }}>
-          <div
-            style={{
-              textAlign: "center",
-              fontFamily: "system-ui, sans-serif",
-              color: "rgba(255,255,255,0.62)",
-              width: 320,
-            }}
-          >
-            <div style={{ fontSize: 16, fontWeight: 800 }}>Tu mesa de laboratorio está vacía</div>
-            <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginTop: 6 }}>Usa la barra de abajo para armar el equipo de destilación</div>
-          </div>
-        </Html>
-      )}
+      <MesaVacia visible={!algoArmado && props.mostrarVacia !== false} />
 
       <Environment resolution={256}>
         <Lightformer intensity={1.9} position={[0, 5, 2]} scale={[10, 4, 1]} color="#ffffff" />
@@ -776,13 +774,13 @@ export default function DestilacionScene(props: DestilacionSceneProps) {
         enableDamping
         dampingFactor={0.08}
         rotateSpeed={0.6}
-        minDistance={8.5}
+        minDistance={8}
         maxDistance={15}
         minPolarAngle={Math.PI / 3.2}
         maxPolarAngle={Math.PI / 1.92}
         minAzimuthAngle={-Math.PI / 3}
         maxAzimuthAngle={Math.PI / 3}
-        target={[-0.3, -0.1, 0]}
+        target={[-0.3, -0.4, 0]}
         autoRotate={props.autoRotate}
         autoRotateSpeed={0.4}
       />

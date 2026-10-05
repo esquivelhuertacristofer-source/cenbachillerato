@@ -11,8 +11,8 @@
  * reglas del React Compiler.
  */
 
-import { useMemo } from "react";
-import { Canvas } from "@react-three/fiber";
+import { useEffect, useMemo } from "react";
+import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls, ContactShadows, Environment, Lightformer, Line, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { DoubleSide } from "three";
@@ -41,6 +41,19 @@ function circulo(radius: number, y: number, n = 64): P3[] {
     pts.push([Math.cos(t) * radius, y, Math.sin(t) * radius]);
   }
   return pts;
+}
+
+/** Ajusta la distancia de la cámara al ancho disponible (el celular es angosto). */
+function Encuadre() {
+  const camera = useThree((st) => st.camera);
+  const size = useThree((st) => st.size);
+  const aspect = size.width / Math.max(1, size.height);
+  const k = Math.max(1, 1.1 / Math.min(1.1, aspect)) * (size.width < 640 ? 1.05 : 1);
+  useEffect(() => {
+    camera.position.set(6.2 * k, 5 * k, 8.4 * k);
+    camera.updateProjectionMatrix();
+  }, [camera, k]);
+  return null;
 }
 
 export default function CilindroScene(props: CilindroSceneProps) {
@@ -86,6 +99,7 @@ export default function CilindroScene(props: CilindroSceneProps) {
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
       camera={{ position: [6.2, 5, 8.4], fov: 42 }}
     >
+      <Encuadre />
       <color attach="background" args={["#03101f"]} />
       <fog attach="fog" args={["#03101f", 20, 50]} />
 
@@ -148,19 +162,19 @@ export default function CilindroScene(props: CilindroSceneProps) {
         <Line points={L.topAltura} color="#cfe2f5" lineWidth={2.5} />
         <Line points={L.botAltura} color="#cfe2f5" lineWidth={2.5} />
 
-        <Html center position={L.labRadio} distanceFactor={12} pointerEvents="none">
-          <div style={{ fontWeight: 900, fontSize: 19, color: accent, textShadow: "0 2px 12px rgba(0,0,0,0.9)", whiteSpace: "nowrap" }}>
+        <Html center position={L.labRadio} pointerEvents="none" zIndexRange={[20, 0]}>
+          <div style={{ fontWeight: 900, fontSize: 18, color: accent, textShadow: "0 2px 12px rgba(0,0,0,0.9)", whiteSpace: "nowrap" }}>
             r = {fmtNum(r)} m
           </div>
         </Html>
-        <Html center position={L.labAltura} distanceFactor={12} pointerEvents="none">
-          <div style={{ fontWeight: 900, fontSize: 19, color: "#eaf4ff", textShadow: "0 2px 12px rgba(0,0,0,0.9)", whiteSpace: "nowrap" }}>
+        <Html center position={L.labAltura} pointerEvents="none" zIndexRange={[20, 0]}>
+          <div style={{ fontWeight: 900, fontSize: 18, color: "#eaf4ff", textShadow: "0 2px 12px rgba(0,0,0,0.9)", whiteSpace: "nowrap" }}>
             h = {fmtNum(h)} m
           </div>
         </Html>
         {L.wWater > 0.18 && (
-          <Html center position={L.labAgua} distanceFactor={13} pointerEvents="none">
-            <div style={{ fontWeight: 800, fontSize: 15, color: "#eaf4ff", textShadow: "0 2px 10px rgba(0,0,0,0.9)", whiteSpace: "nowrap", background: "rgba(2,12,28,0.5)", padding: "2px 8px", borderRadius: 7 }}>
+          <Html center position={L.labAgua} pointerEvents="none" zIndexRange={[10, 0]}>
+            <div style={{ fontWeight: 800, fontSize: 16, color: "#eaf4ff", textShadow: "0 2px 10px rgba(0,0,0,0.9)", whiteSpace: "nowrap", background: "rgba(2,12,28,0.5)", padding: "2px 8px", borderRadius: 7 }}>
               {fmtNum(Lagua, 0)} L
             </div>
           </Html>
@@ -178,10 +192,10 @@ export default function CilindroScene(props: CilindroSceneProps) {
       <OrbitControls
         enablePan={false}
         minDistance={7}
-        maxDistance={22}
+        maxDistance={28}
         minPolarAngle={Math.PI / 8}
         maxPolarAngle={Math.PI / 2.05}
-        target={[0, L.midY, 0]}
+        target={[0, L.midY - 0.5, 0]}
         autoRotate={props.autoRotate}
         autoRotateSpeed={0.4}
       />

@@ -4,34 +4,37 @@
  * Laboratorio 3D — Enlaces químicos (¿por qué los átomos se unen?).
  * Práctica experimental para CNEYT-I-P10-A1.
  *
- * El estudiante elige una MOLÉCULA y la ve en 3D (modelo de barras y esferas).
- * Descubre que los átomos se unen para ganar estabilidad (regla del octeto) y
- * que el TIPO de enlace lo decide la diferencia de electronegatividad (ΔEN):
- *   · ΔEN < 0.4  → covalente no polar (comparten por igual)
- *   · 0.4 – 1.7  → covalente polar (comparten desigual)
+ * EXPERIMENTO CENTRAL: «Tu enlace». El estudiante ELIGE dos elementos y ve en 3D qué
+ * enlace forman. Descubre que los átomos se unen para ganar estabilidad (regla del
+ * octeto) y que el TIPO de enlace lo decide la diferencia de electronegatividad (ΔEN):
+ *   · ΔEN < 0.4  → covalente no polar (comparten por igual: la nube queda al centro)
+ *   · 0.4 – 1.7  → covalente polar (comparten desigual: la nube se carga hacia uno)
  *   · ΔEN ≥ 1.7  → iónico (un átomo cede su electrón al otro)
+ * También puede recorrer moléculas reales (agua, sal, metano…).
  *
- * Diseño coherente con los demás laboratorios; fallback 2D si no hay WebGL.
+ * Fallback 2D si no hay WebGL.
  */
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, NUM, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { T, NUM, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, Dato, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { ENLACES_QUIMICOS_FICHA } from "./enlaces-quimicos-ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { QUIZ_A2 } from "./enlaces-quimicos-data";
 import { LabSfx } from "./lab-audio";
-import { useEstrellas } from "@/lib/hooks/useEstrellas";
-import { useLogros } from "./_partida";
 import {
   MOLECULAS,
   ELEMS,
   CAT_COLOR,
   CAT_LABEL,
+  categoriaPorEN,
   deltaEN,
+  type Categoria,
   type ElementoQuim,
+  type Molecula,
 } from "./enlaces-data";
 
 const EnlacesQuimicosScene = dynamic(() => import("./EnlacesQuimicosScene"), {
@@ -39,19 +42,21 @@ const EnlacesQuimicosScene = dynamic(() => import("./EnlacesQuimicosScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-flask-vial fa-bounce" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Preparando el laboratorio 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Preparando el laboratorio 3D…</span>
     </div>
   ),
 });
 
 const fmt = (n: number, dec = 0) => n.toLocaleString("es-MX", { minimumFractionDigits: dec, maximumFractionDigits: dec });
 
+const ELEMENTOS_LISTA = Object.keys(ELEMS) as ElementoQuim[];
+
 /* ── Componentes de UI (fuera del render: estado estable) ─────────────── */
 
 const ElemDot = ({ el }: { el: ElementoQuim }) => {
   const e = ELEMS[el];
   return (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 12, color: T.text2, fontWeight: 600 }}>
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 14, color: "#dce6f5", fontWeight: 700 }}>
       <span style={{ width: 13, height: 13, borderRadius: "50%", background: e.color, border: "1px solid rgba(255,255,255,0.25)", boxShadow: `0 0 8px -2px ${e.color}` }} />
       {el} <span style={{ color: T.text3, fontWeight: 500 }}>· EN {e.en}</span>
     </span>
@@ -73,43 +78,44 @@ const MolChip = ({ active, formula, nombre, cat, onClick }: { active: boolean; f
   >
     <span style={{ position: "absolute", top: 7, right: 8, width: 7, height: 7, borderRadius: "50%", background: cat }} />
     <span style={{ fontSize: 17, fontWeight: 900, color: active ? "#fff" : T.text, lineHeight: 1.1 }}>{formula}</span>
-    <span style={{ fontSize: 10.5, color: T.text3, lineHeight: 1.1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "100%" }}>{nombre}</span>
+    <span style={{ fontSize: 14, color: T.text3, lineHeight: 1.1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "100%" }}>{nombre}</span>
   </button>
 );
 
-/* ── Escala de electronegatividad: dónde cae este enlace ──────────────── */
+/* ── Escala de electronegatividad: dónde cae este enlace. EL medidor del experimento ── */
 const MAX_EN = 3.3;
-const EscalaEN = ({ delta, catColor }: { delta: number; catColor: string }) => {
+const EscalaEN = ({ delta, catColor, compacto = false }: { delta: number; catColor: string; compacto?: boolean }) => {
   const pct = Math.min(100, (delta / MAX_EN) * 100);
   const z1 = (0.4 / MAX_EN) * 100;
   const z2 = (1.7 / MAX_EN) * 100;
   return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 10 }}>
-        <Eyebrow>Diferencia de electronegatividad (ΔEN)</Eyebrow>
-        <span style={{ fontSize: 16, fontWeight: 900, color: catColor, ...NUM, textShadow: `0 0 14px ${catColor}66` }}>{fmt(delta, 2)}</span>
+    <div style={{ display: "grid", gap: 8 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8 }}>
+        <span style={{ fontSize: 14, fontWeight: 800, color: compacto ? "#dce6f5" : T.text3, letterSpacing: compacto ? 0 : ".04em" }}>
+          {compacto ? "ΔEN" : "Diferencia de electronegatividad (ΔEN)"}
+        </span>
+        <span style={{ fontSize: 18, fontWeight: 900, color: catColor, ...NUM, textShadow: `0 0 14px ${catColor}66` }}>{fmt(delta, 2)}</span>
       </div>
       <div style={{ position: "relative", height: 16, borderRadius: 999, overflow: "hidden", display: "flex", border: `1px solid ${T.line}` }}>
         <div style={{ width: `${z1}%`, background: `${CAT_COLOR["no-polar"]}55` }} />
         <div style={{ width: `${z2 - z1}%`, background: `${CAT_COLOR["polar"]}55` }} />
         <div style={{ flex: 1, background: `${CAT_COLOR["ionico"]}55` }} />
-        {/* marcador */}
         <div
           style={{
             position: "absolute",
-            top: -3,
+            top: 0,
             left: `calc(${pct}% - 2px)`,
             width: 4,
-            height: 22,
+            height: "100%",
             borderRadius: 2,
             background: "#fff",
             boxShadow: `0 0 10px 1px ${catColor}`,
-            transition: "left 0.4s ease",
+            transition: "left 0.35s ease",
           }}
         />
       </div>
-      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 7, fontSize: 10.5, fontWeight: 700, color: T.text3 }}>
-        <span style={{ color: CAT_COLOR["no-polar"] }}>No polar</span>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, fontWeight: 700, color: T.text3 }}>
+        <span style={{ color: CAT_COLOR["no-polar"] }}>{compacto ? "No pol." : "No polar"}</span>
         <span style={{ color: CAT_COLOR["polar"] }}>Polar</span>
         <span style={{ color: CAT_COLOR["ionico"] }}>Iónico</span>
       </div>
@@ -123,17 +129,61 @@ const EXPLICA: Record<string, string> = {
   ionico: "La diferencia es tan grande (ΔEN ≥ 1.7) que un átomo CEDE su electrón al otro. Se forman iones de carga opuesta que se atraen: enlace iónico.",
 };
 
+/** Arma la pareja que elige el alumno como una molécula diatómica (el menos electronegativo primero). */
+function armarPar(a: ElementoQuim, b: ElementoQuim): Molecula {
+  const [lo, hi] = ELEMS[a].en <= ELEMS[b].en ? [a, b] : [b, a];
+  const delta = deltaEN([lo, hi]);
+  const cat = categoriaPorEN(delta);
+  const ionico = cat === "ionico";
+  const sep = ionico ? 2.0 : (ELEMS[lo].radio + ELEMS[hi].radio) * 1.45;
+  const orden: 1 | 2 | 3 = lo === hi ? (lo === "O" ? 2 : lo === "N" ? 3 : 1) : 1;
+  return {
+    key: `par-${lo}-${hi}`,
+    formula: lo === hi ? `${lo}₂` : `${lo}–${hi}`,
+    nombre: lo === hi ? ELEMS[lo].nombre : `${ELEMS[lo].nombre} + ${ELEMS[hi].nombre}`,
+    categoria: cat,
+    geometria: ionico ? "Par iónico" : "Diatómica (lineal)",
+    descripcion: EXPLICA[cat]!,
+    atoms: [
+      { el: lo, pos: [-sep / 2, 0, 0] },
+      { el: hi, pos: [sep / 2, 0, 0] },
+    ],
+    bonds: ionico ? [] : [{ a: 0, b: 1, orden }],
+    ionico,
+    par: [lo, hi],
+  };
+}
+
+const CSS_EQ = `
+.ex-mol { position:relative; cursor:pointer; border-radius:12px; border:1px solid ${T.line}; background:${T.glass};
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; padding:13px 6px 10px; transition:all .14s ease; min-width:0; }
+.ex-mol:hover { border-color:${T.lineStrong}; background:${T.glassSoft}; }
+.ex-step { cursor:pointer; flex:1; display:flex; align-items:center; justify-content:center; gap:8px; padding:10px;
+  border-radius:11px; border:1px solid ${T.line}; background:${T.inset}; color:${T.text2}; font-size:14px; font-weight:700; transition:all .15s; }
+.ex-step:hover:not(:disabled) { color:#fff; border-color:${T.lineStrong}; }
+.ex-step:disabled { opacity:0.35; cursor:not-allowed; }
+.eq-el { cursor:pointer; border-radius:12px; border:1px solid ${T.line}; background:${T.glass}; color:${T.text};
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; padding:9px 4px; min-width:0; transition:all .14s ease; }
+.eq-el:hover:not(:disabled) { border-color:${T.lineStrong}; background:${T.glassSoft}; }
+.eq-el:disabled { opacity:0.3; cursor:not-allowed; }
+.eq-el strong { font-size:18px; font-weight:900; line-height:1; }
+.eq-el span { font-size:14px; color:${T.text3}; font-variant-numeric:tabular-nums; }
+`;
+
 const RETO_KEY = "cen-enlaces-quimicos-reto";
 
 export function LabEnlacesQuimicos({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
+  const [modo, setModo] = useState<"par" | "mol">("par");
   const [molKey, setMolKey] = useState("H2O");
+  const [elA, setElA] = useState<ElementoQuim>("H");
+  const [elB, setElB] = useState<ElementoQuim>("Cl");
+  const [parTocado, setParTocado] = useState(false);
+  const [catsPar, setCatsPar] = useState<Set<Categoria>>(() => new Set<Categoria>());
   const [autoRotate, setAutoRotate] = useState(true);
   const [resetNonce, setResetNonce] = useState(0);
   const [visitados, setVisitados] = useState<Set<string>>(() => new Set<string>(["H2O"]));
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
-  // teoría (cajón deslizable) y sonido
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
 
@@ -156,8 +206,10 @@ export function LabEnlacesQuimicos({ color }: PracticaLabProps) {
     };
   }, []);
 
-  const mol = MOLECULAS.find((m) => m.key === molKey)!;
+  const molCatalogo = MOLECULAS.find((m) => m.key === molKey)!;
   const idx = MOLECULAS.findIndex((m) => m.key === molKey);
+  const pareja = useMemo(() => armarPar(elA, elB), [elA, elB]);
+  const mol: Molecula = modo === "par" ? pareja : molCatalogo;
   const delta = deltaEN(mol.par);
   const catColor = CAT_COLOR[mol.categoria];
   const elementos = Array.from(new Set(mol.atoms.map((a) => a.el)));
@@ -177,24 +229,45 @@ export function LabEnlacesQuimicos({ color }: PracticaLabProps) {
     irAMol(MOLECULAS[i]!.key);
   };
 
-  const catsVisitadas = new Set(Array.from(visitados).map((k) => MOLECULAS.find((m) => m.key === k)!.categoria));
+  // Elegir un elemento de la pareja: recuerda qué tipos de enlace ya armó el alumno.
+  const elegir = (lado: "A" | "B", el: ElementoQuim) => {
+    const a = lado === "A" ? el : elA;
+    const b = lado === "B" ? el : elB;
+    if (a === "Na" && b === "Na") return; // dos sodios no forman una molécula (metálico)
+    if (lado === "A") setElA(el);
+    else setElB(el);
+    setParTocado(true);
+    setCatsPar((prev) => {
+      const c = armarPar(a, b).categoria;
+      if (prev.has(c)) return prev;
+      const next = new Set(prev);
+      next.add(c);
+      return next;
+    });
+    if (sonido) audioRef.current?.blip();
+  };
+
+  const cambiarModo = (m: "par" | "mol") => {
+    setModo(m);
+    if (m === "par") {
+      setCatsPar((prev) => (prev.has(pareja.categoria) ? prev : new Set(prev).add(pareja.categoria)));
+    }
+    if (sonido) audioRef.current?.blip();
+  };
+
+  const catsVisitadas = new Set<Categoria>([
+    ...Array.from(visitados).map((k) => MOLECULAS.find((m) => m.key === k)!.categoria),
+    ...Array.from(catsPar),
+  ]);
   const objetivos = [
+    { txt: "En «Tu enlace», elige dos elementos y mira cómo cambia la ΔEN", done: parTocado },
+    { txt: "Combina elementos hasta pasar ΔEN 1.7: el electrón se transfiere (iónico)", done: catsPar.has("ionico") },
     { txt: "Construye un enlace covalente no polar", done: catsVisitadas.has("no-polar") },
     { txt: "Construye un enlace covalente polar", done: catsVisitadas.has("polar") },
     { txt: "Observa un enlace iónico (transferencia)", done: catsVisitadas.has("ionico") },
     { txt: "Recorre al menos 5 moléculas", done: visitados.size >= 5 },
     { txt: "Resuelve el reto de enlaces químicos", done: ejercicioAprobado },
   ];
-  // Los objetivos se recuerdan (algunos dependían del modo y se desmarcaban
-  // solos) y se convierten en la marca del laboratorio, que antes no se
-  // guardaba en ninguna parte.
-  const { logros: logrosLab, cumplidos: cumplidosLab, total: totalLab } = useLogros(objetivos.map((o) => o.done));
-  const { registraEstrellas } = useEstrellas(RETO_KEY);
-  useEffect(() => {
-    if (cumplidosLab === 0) return;
-    const est = cumplidosLab >= totalLab ? 3 : cumplidosLab >= Math.ceil((totalLab * 2) / 3) ? 2 : 1;
-    registraEstrellas(est);
-  }, [cumplidosLab, totalLab, registraEstrellas]);
 
   const sceneFallback = (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 28, textAlign: "center" }}>
@@ -202,252 +275,193 @@ export function LabEnlacesQuimicos({ color }: PracticaLabProps) {
         <i className="fa-solid fa-atom" />
       </div>
       <div style={{ fontSize: 24, fontWeight: 900, color: T.text }}>{mol.formula}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 360, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 360, lineHeight: 1.5 }}>
         Tu equipo no puede mostrar la vista 3D, pero el experimento sigue: <strong style={{ color: T.text }}>{mol.nombre}</strong> — {mol.descripcion}
       </div>
     </div>
   );
 
-  return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes exPulse { 0%,100%{ box-shadow:0 0 0 0 var(--exc); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .ex-live-dot { animation: exPulse 1.6s ease-in-out infinite; }
-        .ex-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(300px,26vw,380px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .ex-grid { grid-template-columns: 1fr; } }
-        .ex-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .ex-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .ex-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .ex-divider { height:1px; background:${T.line}; margin:18px 0; }
-        .ex-mol { position:relative; cursor:pointer; border-radius:12px; border:1px solid ${T.line}; background:${T.glass};
-          display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; padding:13px 6px 10px; transition:all .14s ease; min-width:0; }
-        .ex-mol:hover { border-color:${T.lineStrong}; background:${T.glassSoft}; }
-        .ex-step { cursor:pointer; flex:1; display:flex; align-items:center; justify-content:center; gap:8px; padding:10px;
-          border-radius:11px; border:1px solid ${T.line}; background:${T.inset}; color:${T.text2}; font-size:13px; font-weight:700; transition:all .15s; }
-        .ex-step:hover:not(:disabled) { color:#fff; border-color:${T.lineStrong}; }
-        .ex-step:disabled { opacity:0.35; cursor:not-allowed; }
-        @media (max-width: 1000px){ .ex-bottom { grid-template-columns: 1fr !important; } }
+  const lectura = <>{mol.formula}: ΔEN {fmt(delta, 2)} → {CAT_LABEL[mol.categoria].toLowerCase()}</>;
 
-        /* Cajón de teoría */
-        .ex-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .ex-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .ex-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .ex-drawer[data-open="true"] { transform:translateX(0); }
-        .ex-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .ex-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .ex-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .ex-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .ex-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .ex-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      <div className="ex-grid">
-        {/* ── Columna visor ──────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(460px, 66vh, 780px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 50% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06182f 0%,#020d1d 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
+  const selectorElementos = (lado: "A" | "B", actual: ElementoQuim, otro: ElementoQuim) => (
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0,1fr))", gap: 8 }}>
+      {ELEMENTOS_LISTA.map((el) => {
+        const on = el === actual;
+        const bloqueado = el === "Na" && otro === "Na";
+        return (
+          <button
+            key={el}
+            className="eq-el"
+            disabled={bloqueado}
+            title={`${ELEMS[el].nombre} · EN ${ELEMS[el].en}${bloqueado ? " (dos sodios no forman una molécula)" : ""}`}
+            aria-pressed={on}
+            onClick={() => elegir(lado, el)}
+            style={on ? { borderColor: ELEMS[el].color, background: `${ELEMS[el].color}26`, boxShadow: `0 0 16px -5px ${ELEMS[el].color}` } : undefined}
           >
-            <SceneBoundary fallback={sceneFallback}>
-              <EnlacesQuimicosScene
-                molKey={mol.key}
-                atoms={mol.atoms}
-                bonds={mol.bonds}
-                ionico={mol.ionico}
-                accent={accent}
-                autoRotate={autoRotate}
-                resetNonce={resetNonce}
-              />
-            </SceneBoundary>
-
-            {/* Cinta EN VIVO + molécula */}
-            <div style={{ position: "absolute", top: 14, left: 16, display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(2,12,28,0.74)", border: `1px solid ${catColor}66`, backdropFilter: "blur(10px)" }}>
-              <span className="ex-live-dot" style={{ ["--exc" as string]: `${catColor}aa`, width: 9, height: 9, borderRadius: "50%", background: catColor }} />
-              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3 }}>EN VIVO</span>
-              <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)" }} />
-              <span style={{ fontSize: 14, fontWeight: 900, color: T.text }}>{mol.formula}</span>
-              <span style={{ fontSize: 12, fontWeight: 600, color: T.text3 }}>{mol.nombre}</span>
-            </div>
-
-            {/* Toolbar */}
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(2,12,28,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="ex-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="ex-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="ex-icobtn" data-on={autoRotate} onClick={() => setAutoRotate((v) => !v)} title="Girar automáticamente">
-                <i className="fa-solid fa-arrows-rotate" />
-              </button>
-              <button className="ex-icobtn" onClick={() => setResetNonce((n) => n + 1)} title="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            {/* Tipo de enlace (esquina inferior derecha) */}
-            <div style={{ position: "absolute", bottom: 68, right: 16, textAlign: "right", pointerEvents: "none", background: "rgba(2,12,28,0.6)", padding: "8px 14px", borderRadius: 13, backdropFilter: "blur(6px)", border: `1px solid ${catColor}55` }}>
-              <div style={{ fontSize: 10, color: T.text3, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" }}>Tipo de enlace</div>
-              <div style={{ fontSize: 16, fontWeight: 900, color: catColor, marginTop: 2, textShadow: `0 0 14px ${catColor}66` }}>{CAT_LABEL[mol.categoria]}</div>
-            </div>
-
-            {/* Leyenda de átomos */}
-            <div style={{ position: "absolute", bottom: 14, left: 16, display: "flex", gap: 14, flexWrap: "wrap", maxWidth: "55%", pointerEvents: "none", background: "rgba(2,12,28,0.6)", padding: "7px 13px", borderRadius: 14, backdropFilter: "blur(6px)" }}>
-              {elementos.map((el) => (
-                <ElemDot key={el} el={el} />
-              ))}
-            </div>
-
-            {/* Botón flotante de Teoría */}
-            <button className="ex-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-          </div>
-
-          {/* Lectura: escala EN + por qué se unen */}
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <EscalaEN delta={delta} catColor={catColor} />
-            <div className="ex-divider" />
-            <Eyebrow>¿Por qué se unen?</Eyebrow>
-            <p style={{ margin: 0, fontSize: 13, color: T.text2, lineHeight: 1.55 }}>{EXPLICA[mol.categoria]}</p>
-          </div>
-        </div>
-
-        {/* ── Columna controles ──────────────────────────────────── */}
-        <div style={{ ...card, padding: "22px 22px 24px" }}>
-          {/* Molécula actual */}
-          <Eyebrow>Molécula actual</Eyebrow>
-          <div style={{ borderRadius: 14, border: `1px solid ${catColor}55`, background: `${catColor}14`, padding: "16px 18px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-              <div style={{ width: 54, height: 54, flexShrink: 0, borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 900, color: "#fff", background: catColor, boxShadow: `0 8px 22px -6px ${catColor}` }}>
-                {mol.formula}
-              </div>
-              <div style={{ minWidth: 0 }}>
-                <div style={{ fontSize: 18, fontWeight: 900, color: T.text, lineHeight: 1.1 }}>{mol.nombre}</div>
-                <div style={{ fontSize: 12, color: catColor, fontWeight: 700, marginTop: 2 }}>{CAT_LABEL[mol.categoria]}</div>
-              </div>
-            </div>
-            <p style={{ margin: "12px 0 0", fontSize: 12.5, color: T.text2, lineHeight: 1.5 }}>{mol.descripcion}</p>
-          </div>
-
-          {/* Pasos */}
-          <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-            <button className="ex-step" onClick={() => paso(-1)} disabled={idx === 0}>
-              <i className="fa-solid fa-arrow-left" /> Anterior
-            </button>
-            <button className="ex-step" onClick={() => paso(1)} disabled={idx === MOLECULAS.length - 1}>
-              Siguiente <i className="fa-solid fa-arrow-right" />
-            </button>
-          </div>
-
-          <div className="ex-divider" />
-
-          {/* Selector de moléculas */}
-          <Eyebrow>Elige una molécula</Eyebrow>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
-            {MOLECULAS.map((m) => (
-              <MolChip key={m.key} active={m.key === molKey} formula={m.formula} nombre={m.nombre} cat={CAT_COLOR[m.categoria]} onClick={() => irAMol(m.key)} />
-            ))}
-          </div>
-
-          <div className="ex-divider" />
-
-          {/* Lecturas */}
-          <Eyebrow>Datos del enlace</Eyebrow>
-          <div style={{ display: "flex", borderRadius: 13, background: T.inset, border: `1px solid ${T.line}` }}>
-            <Readout label="Átomos" value={fmt(mol.atoms.length)} />
-            <div style={{ width: 1, background: T.line }} />
-            <Readout label={mol.ionico ? "Iones" : "Enlaces"} value={fmt(mol.ionico ? mol.atoms.length : mol.bonds.length)} />
-            <div style={{ width: 1, background: T.line }} />
-            <Readout label="ΔEN" value={fmt(delta, 2)} col={catColor} />
-          </div>
-
-          {/* Geometría */}
-          <div style={{ marginTop: 12, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", borderRadius: 13, background: T.inset, border: `1px solid ${T.line}` }}>
-            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.08em", color: T.text3, textTransform: "uppercase" }}>Geometría</span>
-            <span style={{ fontSize: 13.5, fontWeight: 700, color: T.text }}>{mol.geometria}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Objetivos + pista ──────────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="ex-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-            Objetivos
-          </Eyebrow>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-            {objetivos.map((o, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: logrosLab[i] ? "#34D399" : T.text2 }}>
-                <i className={`fa-solid ${logrosLab[i] ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: logrosLab[i] ? 1 : 0.3 }} />
-                <span style={{ fontWeight: logrosLab[i] ? 700 : 500 }}>{o.txt}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div style={{ borderRadius: 18, padding: "18px 20px", border: `1px solid rgba(${color.rgba},0.3)`, background: `rgba(${color.rgba},0.08)`, fontSize: 13.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 13 }}>
-          <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 17, marginTop: 1 }} />
-          <span>
-            Los átomos se unen para alcanzar <strong style={{ color: T.text }}>estabilidad</strong> (regla del octeto): pueden{" "}
-            <strong style={{ color: T.text }}>compartir</strong> electrones (covalente) o <strong style={{ color: T.text }}>transferirlos</strong> (iónico). La{" "}
-            <strong style={{ color: T.text }}>ΔEN</strong> decide cuál ocurre.
-          </span>
-        </div>
-      </div>
-
-      {/* ── Reto evaluable: el quiz verbatim del ancla ───────────────── */}
-      <RetoQuizCard
-        quiz={QUIZ_A2}
-        accent={accent}
-        rgba={color.rgba}
-        aprobado={ejercicioAprobado}
-        onAprobado={() => setEjercicioAprobado(true)}
-        playSfx={
-          sonido
-            ? (ok) => {
-                if (ok) audioRef.current?.correcto();
-                else audioRef.current?.incorrecto();
-              }
-            : undefined
-        }
-        playPick={sonido ? () => audioRef.current?.blip() : undefined}
-      />
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <div className="ex-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="ex-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="ex-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="ex-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
+            <strong style={{ color: on ? "#fff" : T.text }}>{el}</strong>
+            <span>EN {ELEMS[el].en}</span>
           </button>
-        </div>
-        <div className="ex-drawer-body">
-          <FichaTeorica data={ENLACES_QUIMICOS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
+        );
+      })}
     </div>
+  );
+
+  return (
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <>
+          <style>{CSS_EQ}</style>
+          <SceneBoundary fallback={sceneFallback}>
+            <EnlacesQuimicosScene
+              molKey={mol.key}
+              atoms={mol.atoms}
+              bonds={mol.bonds}
+              ionico={mol.ionico}
+              categoria={mol.categoria}
+              accent={accent}
+              autoRotate={autoRotate}
+              resetNonce={resetNonce}
+            />
+          </SceneBoundary>
+        </>
+      }
+      modos={{
+        opciones: [
+          { id: "par", etiqueta: "Tu enlace", icono: "fa-link" },
+          { id: "mol", etiqueta: "Moléculas", icono: "fa-flask" },
+        ],
+        valor: modo,
+        cambiar: (id) => cambiarModo(id as "par" | "mol"),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-arrows-rotate" titulo="Girar automáticamente" activo={autoRotate} onClick={() => setAutoRotate((v) => !v)} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={() => setResetNonce((n) => n + 1)} />
+        </>
+      }
+      leyenda={
+        <div style={{ width: 200, display: "grid", gap: 8 }}>
+          <EscalaEN delta={delta} catColor={catColor} compacto />
+          <div style={{ display: "grid", gap: 2 }}>
+            {elementos.map((el) => (
+              <ElemDot key={el} el={el} />
+            ))}
+          </div>
+        </div>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Controles",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              {modo === "par" ? (
+                <Bloque titulo="Elige los dos átomos" icono="fa-link">
+                  <div style={{ fontSize: 14, fontWeight: 800, color: T.text3 }}>ÁTOMO A</div>
+                  {selectorElementos("A", elA, elB)}
+                  <div style={{ fontSize: 14, fontWeight: 800, color: T.text3 }}>ÁTOMO B</div>
+                  {selectorElementos("B", elB, elA)}
+                </Bloque>
+              ) : (
+                <Bloque titulo="Elige una molécula" icono="fa-flask">
+                  <div style={{ borderRadius: 14, border: `1px solid ${catColor}55`, background: `${catColor}14`, padding: "14px 16px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                      <div style={{ minWidth: 54, height: 54, padding: "0 8px", flexShrink: 0, borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 19, fontWeight: 900, color: "#fff", background: catColor, boxShadow: `0 8px 22px -6px ${catColor}` }}>
+                        {mol.formula}
+                      </div>
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontSize: 18, fontWeight: 900, color: T.text, lineHeight: 1.1 }}>{mol.nombre}</div>
+                        <div style={{ fontSize: 14, color: catColor, fontWeight: 700, marginTop: 2 }}>{CAT_LABEL[mol.categoria]}</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button className="ex-step" onClick={() => paso(-1)} disabled={idx === 0}>
+                      <i className="fa-solid fa-arrow-left" /> Anterior
+                    </button>
+                    <button className="ex-step" onClick={() => paso(1)} disabled={idx === MOLECULAS.length - 1}>
+                      Siguiente <i className="fa-solid fa-arrow-right" />
+                    </button>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 96px), 1fr))", gap: 8 }}>
+                    {MOLECULAS.map((m) => (
+                      <MolChip key={m.key} active={m.key === molKey} formula={m.formula} nombre={m.nombre} cat={CAT_COLOR[m.categoria]} onClick={() => irAMol(m.key)} />
+                    ))}
+                  </div>
+                </Bloque>
+              )}
+
+              <Bloque titulo="¿Qué enlace se forma?" icono="fa-scale-balanced">
+                <EscalaEN delta={delta} catColor={catColor} />
+                <p style={{ margin: 0, padding: "10px 12px", borderRadius: 12, border: `1px solid ${catColor}55`, background: `${catColor}12`, color: T.text2 }}>
+                  <strong style={{ color: catColor }}>{CAT_LABEL[mol.categoria]}.</strong> {EXPLICA[mol.categoria]}
+                </p>
+              </Bloque>
+
+              <Bloque titulo="Datos del enlace" icono="fa-gauge-high">
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                  <Dato label="Átomos" value={fmt(mol.atoms.length)} />
+                  <Dato label={mol.ionico ? "Iones" : "Enlaces"} value={fmt(mol.ionico ? mol.atoms.length : mol.bonds.length)} />
+                  <Dato label="ΔEN" value={fmt(delta, 2)} col={catColor} />
+                  <Dato label="Geometría" value={mol.geometria} />
+                </div>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <RetoQuizCard
+              quiz={QUIZ_A2}
+              accent={accent}
+              rgba={color.rgba}
+              aprobado={ejercicioAprobado}
+              onAprobado={() => setEjercicioAprobado(true)}
+              playSfx={sonido ? (ok) => { if (ok) audioRef.current?.correcto(); else audioRef.current?.incorrecto(); } : undefined}
+              playPick={sonido ? () => audioRef.current?.blip() : undefined}
+            />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="¿Por qué se unen?" icono="fa-lightbulb">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  Los átomos se unen para alcanzar <strong style={{ color: "#fff" }}>estabilidad</strong> (regla del octeto): pueden{" "}
+                  <strong style={{ color: "#fff" }}>compartir</strong> electrones (covalente) o <strong style={{ color: "#fff" }}>transferirlos</strong> (iónico). La{" "}
+                  <strong style={{ color: "#fff" }}>ΔEN</strong> decide cuál ocurre.
+                </p>
+              </Bloque>
+              <Bloque titulo="Los tres tipos de enlace" icono="fa-link">
+                {(["no-polar", "polar", "ionico"] as Categoria[]).map((c) => (
+                  <p key={c} style={{ margin: 0, color: T.text2 }}>
+                    <strong style={{ color: CAT_COLOR[c] }}>{CAT_LABEL[c]}.</strong> {EXPLICA[c]}
+                  </p>
+                ))}
+              </Bloque>
+              <Bloque titulo={`Molécula actual: ${mol.nombre}`} icono="fa-atom">
+                <p style={{ margin: 0, color: T.text2 }}>{mol.descripcion}</p>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={ENLACES_QUIMICOS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }

@@ -1,0 +1,12 @@
+{
+  "escena": "Una olla con agua sobre una estufa, con el fuego prendido y burbujas subiendo.",
+  "pregunta": "El agua ya hierve y sigues calentando. ¿Qué pasa con su temperatura?",
+  "opciones": [
+    { "id": "a", "texto": "Sigue subiendo, cada vez más rápido", "icono": "fa-temperature-arrow-up" },
+    { "id": "b", "texto": "Se queda quieta mientras hierve", "icono": "fa-equals" },
+    { "id": "c", "texto": "Baja porque se evapora el agua", "icono": "fa-temperature-arrow-down" }
+  ],
+  "correcta": "b",
+  "porque": "Mientras hierve, el calor se usa para romper las fuerzas entre las partículas y pasarlas a gas, no para acelerarlas. Por eso la temperatura se mantiene en 100 °C hasta que todo se evapora.",
+  "comoComprobarlo": "Con el agua, mueve el deslizador de calor hasta la zona sombreada de ebullición y mira la temperatura y la curva."
+}

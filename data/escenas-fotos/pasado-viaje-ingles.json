@@ -1,0 +1,13 @@
+{
+  "slug": "pasado-viaje-ingles",
+  "items": [
+    { "clave": "teotihuacan-calzada", "formato": "16:9", "estilo": "foto", "escena": "Amplia avenida de piedra entre basamentos de pirámides prehispánicas bajo cielo nublado, un grupo de estudiantes con mochilas caminando a lo lejos" },
+    { "clave": "zocalo-oaxaca", "formato": "16:9", "estilo": "foto", "escena": "Plaza con laureles y kiosco al atardecer, un joven sentado en una banca mientras una banda de música toca al fondo" },
+    { "clave": "xochimilco-trajinera", "formato": "16:9", "estilo": "foto", "escena": "Trajinera de colores sobre un canal con chinampas verdes, dos jóvenes sentados con teléfonos tomando fotos" },
+    { "clave": "mercado-oaxaca", "formato": "16:9", "estilo": "foto", "escena": "Pasillo de mercado mexicano con humo de brasas, mesas largas de madera y una familia buscando dónde sentarse" },
+    { "clave": "monte-alban", "formato": "16:9", "estilo": "foto", "escena": "Plataforma de piedra de una zona arqueológica en una montaña, una joven sentada dibujando en un cuaderno" },
+    { "clave": "camion-madrugada", "formato": "16:9", "estilo": "ilustracion", "escena": "Autobús escolar amarillo en una carretera al amanecer con cielo naranja, estudiantes somnolientos subiendo con mochilas" },
+    { "clave": "guia-piramides", "formato": "16:9", "estilo": "foto", "escena": "Guía de turistas con sombrero señalando una pirámide de piedra frente a un grupo de estudiantes que escucha" },
+    { "clave": "lluvia-comida", "formato": "16:9", "estilo": "foto", "escena": "Grupo de estudiantes comiendo bajo un árbol cuando empiezan a caer gotas de lluvia, cielo gris, cajas de comida abiertas" }
+  ]
+}

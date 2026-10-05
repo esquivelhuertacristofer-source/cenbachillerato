@@ -1,0 +1,12 @@
+{
+  "escena": "Un cubo armado con 2×2×2 cubitos, es decir 2³ = 8 cubitos, con el modo «Al cubo» activo.",
+  "pregunta": "Si duplicas el lado de 2 a 4, ¿cuántas veces más cubitos tiene el cubo?",
+  "opciones": [
+    { "id": "a", "texto": "Solo el doble (×2)", "icono": "fa-xmark" },
+    { "id": "b", "texto": "Cuatro veces más (×4)", "icono": "fa-square" },
+    { "id": "c", "texto": "Ocho veces más (×8)", "icono": "fa-cube" }
+  ],
+  "correcta": "c",
+  "porque": "El volumen depende del lado multiplicado tres veces: 4³ = 64 y 2³ = 8, así que 64 ÷ 8 = 8. Duplicar el lado multiplica el volumen por 2³.",
+  "comoComprobarlo": "Elige «Al cubo», deja la base en 2 y pulsa «Duplicar el lado»; compara los cubitos antes y después."
+}

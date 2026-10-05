@@ -1,0 +1,12 @@
+{
+  "escena": "Un pastel y una barra muestran 1/2, con un poste amarillo de referencia en la mitad de la barra.",
+  "pregunta": "Si cambias a 3/6, ¿hasta dónde llena la barra respecto al poste?",
+  "opciones": [
+    { "id": "a", "texto": "Se queda corta del poste", "icono": "fa-arrow-left" },
+    { "id": "b", "texto": "Llega justo al poste", "icono": "fa-equals" },
+    { "id": "c", "texto": "Pasa más allá del poste", "icono": "fa-arrow-right" }
+  ],
+  "correcta": "b",
+  "porque": "3/6 se simplifica a 1/2: son fracciones equivalentes, así que representan la misma parte del entero aunque estén repartidas en más rebanadas.",
+  "comoComprobarlo": "Fija 1/2 como referencia, elige denominador 6 y sube el numerador hasta 3."
+}

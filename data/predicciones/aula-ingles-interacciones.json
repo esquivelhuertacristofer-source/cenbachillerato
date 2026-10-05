@@ -1,0 +1,12 @@
+{
+  "escena": "Una maestra de inglés da una instrucción y no alcanzaste a oírla",
+  "pregunta": "Si pides repetir con «I don't like it», ¿qué hace la maestra en la clase simulada?",
+  "opciones": [
+    { "id": "a", "texto": "Repite la instrucción despacio", "icono": "fa-rotate-right" },
+    { "id": "b", "texto": "Cree que no te gusta la tarea", "icono": "fa-thumbs-down" },
+    { "id": "c", "texto": "Te pide que lo repitas", "icono": "fa-comment-dots" }
+  ],
+  "correcta": "b",
+  "porque": "«I don't like it» expresa gusto, no falta de comprensión. La maestra entiende otra cosa, salta el libro y tú pierdes minutos de clase.",
+  "comoComprobarlo": "En «Vive la clase» llega al momento de la página doce y elige primero la respuesta con «I don't like it»; mira el pizarrón."
+}

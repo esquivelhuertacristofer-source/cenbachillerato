@@ -1,0 +1,12 @@
+{
+  "escena": "Una torre vertical de escalas, del átomo al Sol, con una esfera brillante en 1.7 × 10^0 m y una tira de dígitos.",
+  "pregunta": "Si subes el exponente de 0 a 3, ¿qué pasa con la esfera y el número?",
+  "opciones": [
+    { "id": "a", "texto": "Sube tres peldaños y el número vale mil veces más", "icono": "fa-arrow-up" },
+    { "id": "b", "texto": "Baja tres peldaños y el número se hace más pequeño", "icono": "fa-arrow-down" },
+    { "id": "c", "texto": "Se queda en su lugar y solo cambia el color", "icono": "fa-equals" }
+  ],
+  "correcta": "a",
+  "porque": "Cada unidad del exponente multiplica por 10. Tres unidades son ×10×10×10 = ×1 000, así que el punto decimal se corre tres lugares a la derecha.",
+  "comoComprobarlo": "Deja la mantisa en 1.7 y mueve el deslizador del exponente de 0 a 3, mirando la tira de dígitos."
+}

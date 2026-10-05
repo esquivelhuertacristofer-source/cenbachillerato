@@ -14,10 +14,10 @@
 
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
-import { ELEMS, type AtomoMol, type EnlaceMol, type ElementoQuim } from "./enlaces-data";
+import { ELEMS, CAT_COLOR, type AtomoMol, type EnlaceMol, type ElementoQuim, type Categoria } from "./enlaces-data";
 import { Escenario } from "./_escenario";
 import { ATOMO } from "./_vidrio";
 
@@ -26,6 +26,8 @@ export interface EnlacesSceneProps {
   atoms: AtomoMol[];
   bonds: EnlaceMol[];
   ionico: boolean;
+  /** Tipo de enlace: decide las cargas parciales (δ) que se rotulan. */
+  categoria: Categoria;
   accent: string;
   autoRotate: boolean;
   resetNonce: number;
@@ -152,6 +154,69 @@ function Ionico({ atoms }: { atoms: AtomoMol[] }) {
   );
 }
 
+/* ── Nube de electrones compartidos (diatómicas covalentes) ────────────
+ * Se desplaza hacia el átomo más electronegativo: cuanto mayor la ΔEN, más
+ * se carga hacia él (enlace polar). Con ΔEN = 0 queda justo al centro. */
+function NubeCompartida({ atoms }: { atoms: AtomoMol[] }) {
+  const a0 = atoms[0]!, a1 = atoms[1]!;
+  const dx = a1.pos[0] - a0.pos[0];
+  const dist = Math.abs(dx) || 1;
+  const sign = dx >= 0 ? 1 : -1;
+  const shift = ((ELEMS[a1.el].en - ELEMS[a0.el].en) / 2.6) * dist * 0.5 * sign;
+  const cx = (a0.pos[0] + a1.pos[0]) / 2 + shift;
+  return (
+    <mesh position={[cx, (a0.pos[1] + a1.pos[1]) / 2, (a0.pos[2] + a1.pos[2]) / 2]} scale={[dist * 0.62 + 0.45, 0.55, 0.55]}>
+      <sphereGeometry args={[1, 32, 24]} />
+      <meshBasicMaterial color={ELECTRON_COLOR} transparent opacity={0.3} depthWrite={false} />
+    </mesh>
+  );
+}
+
+/* Etiqueta fija en px (nunca <Text>: cuelga Turbopack). Se oculta en pantallas angostas. */
+function Etiqueta({ pos, color, children }: { pos: [number, number, number]; color: string; children: React.ReactNode }) {
+  const ancho = useThree((st) => st.size.width);
+  if (ancho < 640) return null;
+  return (
+    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
+      <div style={{ transform: "translate(0,-70%)" }}>
+        <div style={{
+          whiteSpace: "nowrap", padding: "3px 10px", borderRadius: 8, background: "rgba(4,10,22,0.88)",
+          border: `1.5px solid ${color}`, color, fontWeight: 900, fontSize: 15,
+          fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)",
+        }}>
+          {children}
+        </div>
+      </div>
+    </Html>
+  );
+}
+
+/* Rótulos sobre los átomos: símbolo y, según el enlace, carga (iónico) o carga parcial δ (polar). */
+function Rotulos({ atoms, ionico, categoria }: { atoms: AtomoMol[]; ionico: boolean; categoria: Categoria }) {
+  const ens = atoms.map((a) => ELEMS[a.el].en);
+  const enMax = Math.max(...ens), enMin = Math.min(...ens);
+  const visibles = atoms.length <= 4 ? atoms.map((a, i) => ({ a, i })) : [{ a: atoms[0]!, i: 0 }];
+  return (
+    <>
+      {visibles.map(({ a, i }) => {
+        const en = ELEMS[a.el].en;
+        let txt = a.el as string;
+        let col = "#e6eefb";
+        if (ionico) {
+          txt = `${a.el}${en === enMin ? "⁺" : "⁻"}`;
+          col = en === enMin ? "#F87171" : "#60A5FA";
+        } else if (categoria === "polar" && enMax !== enMin) {
+          if (en === enMax) { txt = `${a.el} δ−`; col = "#60A5FA"; }
+          else if (en === enMin) { txt = `${a.el} δ+`; col = "#F87171"; }
+        } else {
+          col = CAT_COLOR[categoria];
+        }
+        return <Etiqueta key={i} pos={[a.pos[0], a.pos[1] + ELEMS[a.el].radio + (ionico ? 0.95 : 0.35), a.pos[2]]} color={col}>{txt}</Etiqueta>;
+      })}
+    </>
+  );
+}
+
 /* ── Escena completa ─────────────────────────────────────────────────── */
 export default function EnlacesQuimicosScene(props: EnlacesSceneProps) {
   const key = `${props.molKey}-${props.resetNonce}`;
@@ -161,7 +226,7 @@ export default function EnlacesQuimicosScene(props: EnlacesSceneProps) {
       shadows
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
-      camera={{ position: [0, 1.1, 5.4], fov: 45 }}
+      camera={{ position: [0, 1.2, 6.4], fov: 45 }}
     >
       {/* Suelo, luz de tres puntos y entorno que reflejar. */}
       {/* La altura sale de donde esta escena ya ponía su sombra de
@@ -171,16 +236,18 @@ export default function EnlacesQuimicosScene(props: EnlacesSceneProps) {
 
       <group position={[0, 0.15, 0]} key={key}>
         {props.ionico ? <Ionico atoms={props.atoms} /> : <Covalente atoms={props.atoms} bonds={props.bonds} />}
+        {!props.ionico && props.atoms.length === 2 && <NubeCompartida atoms={props.atoms} />}
+        <Rotulos atoms={props.atoms} ionico={props.ionico} categoria={props.categoria} />
       </group>
 
 
       <OrbitControls
         enablePan={false}
-        minDistance={3}
+        minDistance={4}
         maxDistance={11}
         minPolarAngle={Math.PI / 7}
         maxPolarAngle={Math.PI / 1.9}
-        target={[0, 0, 0]}
+        target={[0, -0.2, 0]}
         autoRotate={props.autoRotate}
         autoRotateSpeed={0.5}
       />

@@ -14,7 +14,7 @@
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
 
@@ -25,6 +25,9 @@ export interface ElectricidadSceneProps {
   brillo: number; // 0..1
   materialColor: string;
   materialConductor: boolean;
+  materialNombre: string;
+  corrienteA: number;
+  potenciaW: number;
   accent: string;
   autoRotate: boolean;
   resetNonce: number;
@@ -224,6 +227,51 @@ function MaterialPrueba({ color, conductor }: { color: string; conductor: boolea
   );
 }
 
+/* ── Etiqueta (drei <Html>, nunca <Text>): ≥ 14 px, en la pieza que nombra ── */
+const fmtN = (n: number, d = 1) => n.toLocaleString("es-MX", { minimumFractionDigits: d, maximumFractionDigits: d });
+
+function Etiqueta({ pos, color, children }: { pos: [number, number, number]; color: string; children: React.ReactNode }) {
+  return (
+    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
+      <div style={{ whiteSpace: "nowrap", padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.88)", border: `1.5px solid ${color}`, color, fontWeight: 900, fontSize: 15, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)" }}>
+        {children}
+      </div>
+    </Html>
+  );
+}
+
+/* ── Medidor de potencia: una columna que se llena con el brillo ─────────── */
+function MedidorPotencia({ brillo }: { brillo: number }) {
+  const alto = 1.5;
+  const h = Math.max(0.02, alto * brillo);
+  return (
+    <group position={[1.35, 2.1, 0]}>
+      <mesh position={[0, alto / 2 - 0.3, 0]}>
+        <boxGeometry args={[0.26, alto, 0.2]} />
+        <meshStandardMaterial color="#1b2330" roughness={0.6} />
+      </mesh>
+      <mesh position={[0, -0.3 + h / 2, 0.06]}>
+        <boxGeometry args={[0.16, h, 0.12]} />
+        <meshStandardMaterial color={FOCO_ON} emissive={FOCO_ON} emissiveIntensity={brillo > 0.001 ? 0.9 : 0} />
+      </mesh>
+    </group>
+  );
+}
+
+/* ── Encuadre: en pantallas angostas se abre el campo para que quepa el lazo ── */
+function AjusteCamara() {
+  const fov = useRef(44);
+  useFrame(({ camera, size }) => {
+    const objetivo = size.width < 640 ? 62 : 44;
+    if (fov.current !== objetivo && "fov" in camera) {
+      fov.current = objetivo;
+      (camera as THREE.PerspectiveCamera).fov = objetivo;
+      camera.updateProjectionMatrix();
+    }
+  });
+  return null;
+}
+
 /* ── Escena completa ───────────────────────────────────────────────────── */
 export default function EnergiaElectricidadScene(props: ElectricidadSceneProps) {
   return (
@@ -231,12 +279,13 @@ export default function EnergiaElectricidadScene(props: ElectricidadSceneProps) 
       shadows
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
-      camera={{ position: [0, 0.3, 11], fov: 44 }}
+      camera={{ position: [0, 0, 12.5], fov: 44 }}
     >
       {/* Suelo, luz de tres puntos y entorno que reflejar. */}
       {/* La altura sale de donde esta escena ya ponía su sombra de
           contacto: es donde su autor decidió que estaba el piso. */}
       <Escenario acento={props.accent} suelo={-3.4} />
+      <AjusteCamara />
 
 
       <group key={`${props.resetNonce}`}>
@@ -261,17 +310,25 @@ export default function EnergiaElectricidadScene(props: ElectricidadSceneProps) 
         <Interruptor closed={props.switchClosed} />
         <MaterialPrueba color={props.materialColor} conductor={props.materialConductor} />
         <ElectronesFlujo conduce={props.conduce} voltaje={props.voltaje} />
+        <MedidorPotencia brillo={props.brillo} />
+
+        <Etiqueta pos={[0, -2.95, 0]} color="#FF6B5E">Pila {fmtN(props.voltaje)} V</Etiqueta>
+        <Etiqueta pos={[0, 3.2, 0]} color={FOCO_ON}>
+          {props.conduce ? `Foco ${fmtN(props.potenciaW)} W · ${fmtN(props.corrienteA, 2)} A` : "Foco apagado"}
+        </Etiqueta>
+        <Etiqueta pos={[4.45, 0, 0]} color={props.switchClosed ? "#FFC24D" : "#aeb6c0"}>{props.switchClosed ? "Cerrado" : "Abierto"}</Etiqueta>
+        <Etiqueta pos={[-4.55, 0, 0]} color={props.materialConductor ? "#34D399" : "#FF5E5E"}>{props.materialNombre}</Etiqueta>
 
       </group>
 
 
       <OrbitControls
         enablePan={false}
-        minDistance={7}
+        minDistance={8}
         maxDistance={18}
         minPolarAngle={Math.PI / 3.4}
         maxPolarAngle={Math.PI / 1.8}
-        target={[0, 0, 0]}
+        target={[0, -0.4, 0]}
         autoRotate={props.autoRotate}
         autoRotateSpeed={0.4}
       />

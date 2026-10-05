@@ -76,7 +76,7 @@ Referencias ya hechas (léelas antes de empezar, son el patrón a copiar):
   ningún botón lanza error.
 - `tablero-labs.test.ts`: si el lab tiene la marca `/* Identidad del tablero */`, todas sus reglas CSS válidas y
   `prefers-reduced-motion` DESPUÉS de la marca, antes del cierre de la plantilla.
-- `fichas-labs.test.tsx`: estrellas persistidas; ningún objetivo fijado a `true`/`false` literal.
+- `fichas-labs.test.tsx` y `logros-labs.test.ts`: estrellas persistidas (usar `<LabShell` cuenta; NO agregues comentarios para engañar al grep); ningún objetivo fijado a `true`/`false` literal.
 - Verifica SOLO con `npx eslint <tus archivos>` y, para DOM,
   `npx jest src/components/practicas/__tests__/labs-dom-humo.test.tsx -t <slug>`. NO corras `tsc`, `next build`
   ni `next dev` (lo hace el coordinador una vez por tanda; la PC es compartida).

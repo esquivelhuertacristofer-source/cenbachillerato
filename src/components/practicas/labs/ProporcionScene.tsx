@@ -15,8 +15,8 @@
  */
 
 import { useMemo } from "react";
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls, Line } from "@react-three/drei";
+import { Canvas, useThree } from "@react-three/fiber";
+import { OrbitControls, Line, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import type { Tipo } from "./proporcion-data";
 import { Escenario } from "./_escenario";
@@ -33,6 +33,22 @@ export interface ProporcionSceneProps {
   accent: string;
   autoRotate: boolean;
   resetNonce: number;
+  /** Rótulos (máx. 4): nombres de los ejes, el punto P y el invariante. */
+  rotulos: { x: string; y: string; p: string; k: string };
+}
+
+/** Etiqueta en la punta de lo que nombra, con desplazamiento fijo. */
+function Etiqueta({ pos, color, lado, children }: { pos: P3; color: string; lado: "left" | "right" | "up" | "down"; children: React.ReactNode }) {
+  const tr = lado === "left" ? "translate(-58%,0)" : lado === "right" ? "translate(58%,0)" : lado === "up" ? "translate(0,-70%)" : "translate(0,70%)";
+  return (
+    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
+      <div style={{ transform: tr }}>
+        <div style={{ whiteSpace: "nowrap", padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.88)", border: `1.5px solid ${color}`, color, fontWeight: 900, fontSize: 15, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)" }}>
+          {children}
+        </div>
+      </div>
+    </Html>
+  );
 }
 
 const W = 8; // ancho del plano (eje X)
@@ -41,8 +57,12 @@ const K_COL = "#FFD166"; // color del invariante (razón / producto)
 
 type P3 = [number, number, number];
 
-export default function ProporcionScene(props: ProporcionSceneProps) {
-  const { tipo, x, y, k, xMin, xMax, yMax, accent } = props;
+function Contenido(props: ProporcionSceneProps) {
+  const { tipo, x, y, k, xMin, xMax, yMax, accent, rotulos } = props;
+  const { width, height } = useThree((st) => st.size);
+  const angosto = width < 640;
+  // El graficador mide 8 de ancho: en pantallas angostas se reduce para que quepa.
+  const escala = Math.min(1, ((width / height) * 9.8) / 9.2);
 
   const nx = useMemo(() => (vx: number) => (vx / xMax) * W, [xMax]);
   const ny = useMemo(() => (vy: number) => (yMax > 0 ? (vy / yMax) * H : 0), [yMax]);
@@ -91,13 +111,13 @@ export default function ProporcionScene(props: ProporcionSceneProps) {
   const guiaX: P3[] = [[px, 0, 0], [px, py, 0]];
   const guiaY: P3[] = [[0, py, 0], [px, py, 0]];
 
+  // Punto de la curva donde va el rótulo del invariante (sin encimarse con P).
+  const fk = tipo === "directa" ? 0.3 : 0.75;
+  const kx = xMin + (xMax - xMin) * fk;
+  const kPos: P3 = [nx(kx), ny(tipo === "directa" ? k * kx : k / kx), 0];
+
   return (
-    <Canvas
-      shadows
-      dpr={[1, 2]}
-      gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
-      camera={{ position: [1.5, 1.2, 13.5], fov: 40 }}
-    >
+    <>
       {/* Suelo, luz de tres puntos y entorno que reflejar. */}
       {/* Sin altura: esta escena no tenía sombra de la que leerla, así
           que el escenario la MIDE de la propia escena al montarse, en
@@ -106,7 +126,7 @@ export default function ProporcionScene(props: ProporcionSceneProps) {
 
 
       {/* Todo el graficador, centrado en el origen del mundo */}
-      <group key={`${tipo}-${props.resetNonce}`} position={[-W / 2, -H / 2, 0]}>
+      <group key={`${tipo}-${props.resetNonce}`} position={[(-W / 2) * escala, (-H / 2) * escala + 0.35, 0]} scale={escala}>
         {/* Cuadrícula de fondo */}
         {grid.map((l, i) => (
           <Line key={`g${i}`} points={l} color="#1d3147" lineWidth={1} transparent opacity={0.55} />
@@ -159,8 +179,12 @@ export default function ProporcionScene(props: ProporcionSceneProps) {
           <meshStandardMaterial color={K_COL} emissive={K_COL} emissiveIntensity={0.6} />
         </mesh>
 
+        {/* Rótulos */}
+        <Etiqueta pos={[px, py, 0]} color="#ffffff" lado="up">{rotulos.p}</Etiqueta>
+        <Etiqueta pos={kPos} color={K_COL} lado={tipo === "directa" ? "left" : "up"}>{rotulos.k}</Etiqueta>
+        {!angosto && <Etiqueta pos={[W, 0, 0]} color="#9fb3c8" lado="down">{rotulos.x}</Etiqueta>}
+        {!angosto && <Etiqueta pos={[0, H, 0]} color="#9fb3c8" lado="up">{rotulos.y}</Etiqueta>}
       </group>
-
 
       <OrbitControls
         enablePan={false}
@@ -177,6 +201,19 @@ export default function ProporcionScene(props: ProporcionSceneProps) {
         <Bloom intensity={0.46} luminanceThreshold={0.65} luminanceSmoothing={0.3} mipmapBlur radius={0.64} />
         <Vignette eskil={false} offset={0.28} darkness={0.42} />
       </EffectComposer>
+    </>
+  );
+}
+
+export default function ProporcionScene(props: ProporcionSceneProps) {
+  return (
+    <Canvas
+      shadows
+      dpr={[1, 2]}
+      gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
+      camera={{ position: [1.5, 1.2, 13.5], fov: 40 }}
+    >
+      <Contenido {...props} />
     </Canvas>
   );
 }

@@ -1,0 +1,12 @@
+{
+  "escena": "Ana necesita llegar rápido al museo y tú le contestas con una oración en inglés.",
+  "pregunta": "Dices «The subway is the most fast way». ¿Qué hace Ana?",
+  "opciones": [
+    { "id": "a", "texto": "Toma el metro, te entiende igual", "icono": "fa-train-subway" },
+    { "id": "b", "texto": "No te entiende y toma el camión", "icono": "fa-bus" },
+    { "id": "c", "texto": "Se va en bicicleta", "icono": "fa-bicycle" }
+  ],
+  "correcta": "b",
+  "porque": "«fast» es de una sílaba y su superlativo es the fastest. Una oración mal armada confunde a quien escucha, y con prisa elige lo primero que pasa.",
+  "comoComprobarlo": "En «El sábado de Ana», elige esa oración en la primera situación y mira a qué barra señala Ana."
+}

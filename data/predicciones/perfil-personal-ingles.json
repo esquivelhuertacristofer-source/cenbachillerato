@@ -1,0 +1,12 @@
+{
+  "escena": "Un mostrador de inscripción a un curso de verano en inglés",
+  "pregunta": "Si Sofía contesta «I am Mexico» a «What's your nationality?», ¿qué teclea el registrador?",
+  "opciones": [
+    { "id": "a", "texto": "Mexican, corregido por su cuenta", "icono": "fa-wand-magic-sparkles" },
+    { "id": "b", "texto": "Mexico, tal como lo oyó", "icono": "fa-keyboard" },
+    { "id": "c", "texto": "Deja el campo en blanco", "icono": "fa-ban" }
+  ],
+  "correcta": "b",
+  "porque": "El registrador anota lo que oye, no lo que quisiste decir. «Mexico» es el país, no la nacionalidad, así que el campo queda con un dato equivocado.",
+  "comoComprobarlo": "En «En el mostrador» llega al turno de Nationality y elige primero la respuesta con Mexico; mira la ficha."
+}

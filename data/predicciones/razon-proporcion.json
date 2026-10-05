@@ -1,0 +1,12 @@
+{
+  "escena": "Una gráfica 3D donde un punto se mueve al cambiar los albañiles, con un medidor que muestra X por Y.",
+  "pregunta": "En la proporción inversa, si duplicas los albañiles, ¿qué pasa con X × Y?",
+  "opciones": [
+    { "id": "a", "texto": "Se duplica también", "icono": "fa-arrow-up" },
+    { "id": "b", "texto": "Se reduce a la mitad", "icono": "fa-arrow-down" },
+    { "id": "c", "texto": "Se queda igual", "icono": "fa-equals" }
+  ],
+  "correcta": "c",
+  "porque": "Al duplicar a los albañiles, los días se reducen a la mitad. Uno sube y el otro baja justo lo necesario, así que el producto sigue siendo constante.",
+  "comoComprobarlo": "Elige Inversa y Albañiles; mueve el deslizador de albañiles y vigila el cuadro dorado con X × Y."
+}

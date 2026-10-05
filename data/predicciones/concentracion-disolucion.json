@@ -1,0 +1,12 @@
+{
+  "escena": "Un vaso con 100 g de agua y sal de mesa, con una barra que marca cuánta sal cabe.",
+  "pregunta": "Sigues agregando sal al agua. ¿Qué pasa con el porcentaje al rebasar el límite?",
+  "opciones": [
+    { "id": "a", "texto": "Sigue subiendo sin parar", "icono": "fa-arrow-trend-up" },
+    { "id": "b", "texto": "Se queda fijo y la sal cae al fondo", "icono": "fa-arrows-left-right" },
+    { "id": "c", "texto": "Empieza a bajar", "icono": "fa-arrow-trend-down" }
+  ],
+  "correcta": "b",
+  "porque": "El agua solo disuelve una cantidad máxima de sal. Lo que sobra no entra en la disolución, queda como cristales, y el porcentaje ya no aumenta.",
+  "comoComprobarlo": "Con sal y 100 g de agua, mueve el deslizador de soluto hacia la derecha y observa el porcentaje y el fondo del vaso."
+}

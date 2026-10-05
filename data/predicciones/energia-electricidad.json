@@ -1,0 +1,12 @@
+{
+  "escena": "Un circuito con pila, interruptor cerrado, un conductor y un foco con un medidor de potencia al lado.",
+  "pregunta": "Si cambias la pila de 3 V a 9 V, ¿cuánto crece la potencia del foco?",
+  "opciones": [
+    { "id": "a", "texto": "Crece 3 veces", "icono": "fa-3" },
+    { "id": "b", "texto": "Crece 9 veces", "icono": "fa-bolt" },
+    { "id": "c", "texto": "Crece 2 veces", "icono": "fa-2" }
+  ],
+  "correcta": "b",
+  "porque": "Con más voltaje circula más corriente (I = V/R) y además cada electrón lleva más energía. Como P = V·I, la potencia crece con el cuadrado del voltaje.",
+  "comoComprobarlo": "Cierra el interruptor con cobre, elige 3 V y anota los watts; luego elige 9 V y compara la lectura del foco."
+}

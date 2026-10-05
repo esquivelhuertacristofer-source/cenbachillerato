@@ -14,8 +14,8 @@
 
 import * as THREE from "three";
 import { useEffect, useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Edges } from "@react-three/drei";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { OrbitControls, Edges, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
 
@@ -34,6 +34,31 @@ export interface EstadosSceneProps {
   roughness: number; // acabado de la superficie
   pScale: number; // tamaño relativo de partícula (mayor en sustancias densas)
   cohesion: number; // 0..1 — cohesión del líquido (mercurio se agrupa, gases no)
+  /** Etiqueta sobre el recipiente: qué hacen las partículas ahora. */
+  etiqueta: string;
+  /** Color de la etiqueta (el del estado). */
+  etiquetaCol: string;
+  /** Herramienta que está actuando sobre la sustancia (calor/frío) o null. */
+  aplicando: "calor" | "frio" | null;
+}
+
+/* Etiqueta fija en px (nunca <Text>: cuelga Turbopack). Se oculta en pantallas angostas. */
+function Etiqueta({ pos, color, children, abajo = false }: { pos: [number, number, number]; color: string; children: React.ReactNode; abajo?: boolean }) {
+  const ancho = useThree((st) => st.size.width);
+  if (ancho < 640) return null;
+  return (
+    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
+      <div style={{ transform: abajo ? "translate(0,70%)" : "translate(0,-70%)" }}>
+        <div style={{
+          whiteSpace: "nowrap", padding: "3px 10px", borderRadius: 8, background: "rgba(4,10,22,0.88)",
+          border: `1.5px solid ${color}`, color, fontWeight: 900, fontSize: 15,
+          fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)",
+        }}>
+          {children}
+        </div>
+      </div>
+    </Html>
+  );
 }
 
 // Recipiente (semiejes en unidades de mundo)
@@ -256,7 +281,7 @@ export default function EstadosMateriaScene(props: EstadosSceneProps) {
       shadows
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
-      camera={{ position: [4, 2.6, 5], fov: 42 }}
+      camera={{ position: [4.4, 2.9, 5.7], fov: 42 }}
     >
       {/* Suelo, luz de tres puntos y entorno que reflejar. */}
       {/* La altura sale de donde esta escena ya ponía su sombra de
@@ -282,15 +307,20 @@ export default function EstadosMateriaScene(props: EstadosSceneProps) {
         />
       </group>
 
-      {/* Reflejos de estudio sin assets externos */}
+      <Etiqueta pos={[0, BOX.hy - 0.4, 0]} color={props.etiquetaCol}>{props.etiqueta}</Etiqueta>
+      {props.aplicando && (
+        <Etiqueta pos={[0, -BOX.hy - 0.4, 0]} color={props.aplicando === "calor" ? "#FB923C" : "#60A5FA"} abajo>
+          {props.aplicando === "calor" ? "Mechero: entra calor" : "Hielo seco: sale calor"}
+        </Etiqueta>
+      )}
 
       <OrbitControls
         enablePan={false}
-        minDistance={3.5}
+        minDistance={4.5}
         maxDistance={10}
         minPolarAngle={Math.PI / 6}
         maxPolarAngle={Math.PI / 2.05}
-        target={[0, 0, 0]}
+        target={[0, -0.3, 0]}
         autoRotate={props.autoRotate}
         autoRotateSpeed={0.45}
       />

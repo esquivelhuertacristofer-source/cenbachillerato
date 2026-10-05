@@ -1,0 +1,12 @@
+{
+  "escena": "Dos rectas sobre el piso se cruzan en una columna dorada; la 2ª recta tiene pendiente −0.5 y la 1ª, −1.",
+  "pregunta": "Si pones la pendiente m₂ en −1, igual que la 1ª recta, ¿qué pasa con la columna?",
+  "opciones": [
+    { "id": "a", "texto": "Se queda en el mismo punto", "icono": "fa-location-dot" },
+    { "id": "b", "texto": "Desaparece: las rectas ya no se cruzan", "icono": "fa-eye-slash" },
+    { "id": "c", "texto": "Se hace más alta", "icono": "fa-arrow-up" }
+  ],
+  "correcta": "b",
+  "porque": "Con la misma pendiente las rectas quedan paralelas y nunca se cortan. Sin punto de cruce no hay solución, así que no hay dónde levantar la columna.",
+  "comoComprobarlo": "Con Gallinas y conejos, mueve el deslizador m₂ hasta −1 y mira el piso."
+}

@@ -17,10 +17,12 @@
  */
 
 import { useMemo } from "react";
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Edges, Html } from "@react-three/drei";
+import { Canvas, useThree } from "@react-three/fiber";
+import { useState } from "react";
+import { OrbitControls, Edges, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { LUGARES, type Digitos } from "./valor-data";
+import { Escenario } from "./_escenario";
 
 export interface ValorPosicionalSceneProps {
   digitos: Digitos;
@@ -37,10 +39,10 @@ const COL = Object.fromEntries(LUGARES.map((l) => [l.key, l.color])) as Record<k
 
 /** Centros X de cada columna y altura de la etiqueta. */
 const ZONA: Record<keyof Digitos, number> = {
-  millares: -6.4,
-  centenas: -2.0,
-  decenas: 2.2,
-  unidades: 5.8,
+  millares: -5.4,
+  centenas: -1.9,
+  decenas: 1.7,
+  unidades: 4.9,
 };
 
 /**
@@ -76,7 +78,7 @@ function Block({ nx, ny, nz, position, color }: { nx: number; ny: number; nz: nu
     <group position={position}>
       <mesh castShadow receiveShadow>
         <boxGeometry args={[wx, wy, wz]} />
-        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.16} roughness={0.45} metalness={0.12} transparent opacity={0.9} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.16} roughness={0.45} metalness={0.12} transparent opacity={0.92} />
         <Edges threshold={15} color="#eaf2fa" />
       </mesh>
       {grid.length > 0 && (
@@ -91,26 +93,48 @@ function Block({ nx, ny, nz, position, color }: { nx: number; ny: number; nz: nu
   );
 }
 
-function Chip({ pos, color, df = 18, children }: { pos: P3; color: string; df?: number; children: React.ReactNode }) {
+function Chip({ pos, color, children }: { pos: P3; color: string; children: React.ReactNode }) {
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[10, 0]}>
+    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
       <div
         style={{
           whiteSpace: "nowrap",
-          fontWeight: 800,
-          fontSize: 12,
+          fontWeight: 900,
+          fontSize: 14,
+          fontFamily: "system-ui, sans-serif",
           color: "#fff",
-          background: `${color}e6`,
+          background: "rgba(4,10,22,0.88)",
           padding: "4px 10px",
           borderRadius: 9,
-          border: "1px solid rgba(255,255,255,0.35)",
-          boxShadow: "0 2px 10px rgba(0,0,0,0.5)",
+          border: `1.5px solid ${color}`,
+          boxShadow: "0 4px 16px rgba(0,0,0,0.5)",
           textAlign: "center",
         }}
       >
         {children}
       </div>
     </Html>
+  );
+}
+
+/** Una etiqueta por columna (se ocultan en pantallas angostas: la info está en el panel). */
+function Etiquetas({ digitos }: { digitos: Digitos }) {
+  const angosto = useThree((st) => st.size.width) < 640;
+  if (angosto) return null;
+  return (
+    <>
+      {LUGARES.map((l) => {
+        const cifra = digitos[l.key];
+        return (
+          <Chip key={l.key} pos={[ZONA[l.key], 4.3, 0]} color={l.color}>
+            <span style={{ display: "block", fontSize: 14, color: l.color }}>{l.nombre}</span>
+            <span style={{ display: "block", fontSize: 14 }}>
+              {cifra} × {l.valor} = {(cifra * l.valor).toLocaleString("es-MX")}
+            </span>
+          </Chip>
+        );
+      })}
+    </>
   );
 }
 
@@ -146,81 +170,48 @@ export default function ValorPosicionalScene(props: ValorPosicionalSceneProps) {
     return out;
   }, [digitos]);
 
+  const [camZ] = useState(() => (typeof window !== "undefined" && window.innerWidth < 640 ? 24 : 15.5));
+  const unid = digitos.unidades;
+
   return (
     <Canvas
       shadows
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
-      camera={{ position: [2, 7.5, 17], fov: 42 }}
+      camera={{ position: [1.5, 6.5, camZ], fov: 42 }}
     >
-      <color attach="background" args={["#03101f"]} />
-      <fog attach="fog" args={["#03101f", 26, 60]} />
-
-      <ambientLight intensity={0.6} />
-      <directionalLight
-        position={[6, 11, 8]}
-        intensity={1.7}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-near={1}
-        shadow-camera-far={50}
-        shadow-camera-left={-14}
-        shadow-camera-right={14}
-        shadow-camera-top={14}
-        shadow-camera-bottom={-14}
-        shadow-bias={-0.0004}
-      />
-      <pointLight position={[-9, 5, 6]} intensity={9} color={accent} />
-      <pointLight position={[8, -2, 6]} intensity={5} color="#bfe8ff" />
+      <Escenario acento={accent} suelo={0} />
 
       <group key={props.resetNonce}>
-        {/* Plataforma base */}
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-0.4, -0.01, 0]} receiveShadow>
-          <planeGeometry args={[26, 16]} />
-          <meshStandardMaterial color="#08192c" roughness={0.95} metalness={0.05} />
-        </mesh>
-
         {bloques.map((b) => (
           <Block key={b.key} nx={b.nx} ny={b.ny} nz={b.nz} position={b.position} color={b.color} />
         ))}
 
-        {/* Etiqueta por columna: nombre · cifra × valor = aporte */}
-        {LUGARES.map((l) => {
-          const cifra = digitos[l.key];
-          const aporte = cifra * l.valor;
-          return (
-            <Chip key={l.key} pos={[ZONA[l.key], 3.7, 0]} color={cifra > 0 ? l.color : "#16263a"} df={20}>
-              <span style={{ display: "block", fontSize: 10, opacity: 0.85, letterSpacing: "0.06em", textTransform: "uppercase" }}>{l.nombre}</span>
-              <span style={{ display: "block", fontSize: 14, fontWeight: 900 }}>
-                {cifra} × {l.valor.toLocaleString("es-MX")} = {aporte.toLocaleString("es-MX")}
-              </span>
-            </Chip>
-          );
-        })}
+        {/* Medidor del canje: la altura de UNA barra (10 cubitos) junto a las unidades.
+            Cuando los cubitos la llenan, ya se pueden cambiar por una decena. */}
+        <mesh position={[ZONA.unidades + 0.55, (10 * U) / 2, 0]}>
+          <boxGeometry args={[U * 1.15, 10 * U, U * 1.15]} />
+          <meshStandardMaterial color="#cfe0ee" transparent opacity={unid >= 9 ? 0.22 : 0.1} depthWrite={false} />
+          <Edges threshold={15} color={unid >= 9 ? "#fde68a" : "#8aa2b6"} />
+        </mesh>
 
-        <ContactShadows position={[-0.4, 0, 0]} opacity={0.32} scale={26} blur={2.6} far={7} color="#020a16" />
+        <Etiquetas digitos={digitos} />
       </group>
 
-      <Environment resolution={256}>
-        <Lightformer intensity={2.0} position={[0, 7, 4]} scale={[12, 5, 1]} color="#ffffff" />
-        <Lightformer intensity={1.3} position={[-9, 0, -2]} scale={[6, 10, 1]} color={accent} />
-        <Lightformer intensity={1.0} position={[9, -2, 4]} scale={[6, 8, 1]} color="#bfe8ff" />
-      </Environment>
-
       <OrbitControls
+        makeDefault
         enablePan={false}
         minDistance={10}
         maxDistance={30}
         minPolarAngle={Math.PI / 8}
         maxPolarAngle={Math.PI / 2.1}
-        target={[-0.4, 1.5, 0]}
+        target={[-0.2, 1.4, 0]}
         autoRotate={props.autoRotate}
         autoRotateSpeed={0.4}
       />
 
       <EffectComposer enableNormalPass={false}>
-        <Bloom intensity={0.5} luminanceThreshold={0.6} luminanceSmoothing={0.3} mipmapBlur radius={0.66} />
+        <Bloom intensity={0.4} luminanceThreshold={0.75} luminanceSmoothing={0.3} mipmapBlur radius={0.66} />
         <Vignette eskil={false} offset={0.28} darkness={0.42} />
       </EffectComposer>
     </Canvas>

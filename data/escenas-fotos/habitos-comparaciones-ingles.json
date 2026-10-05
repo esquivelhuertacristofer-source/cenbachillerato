@@ -1,0 +1,10 @@
+{
+  "slug": "habitos-comparaciones-ingles",
+  "items": [
+    { "clave": "ruta-museo", "formato": "16:9", "estilo": "ilustracion", "escena": "Calle de una ciudad mexicana al mediodía con la entrada de una estación de metro, una ciclovía con una bicicleta estacionada y una parada de autobús, un museo de fachada de piedra al fondo" },
+    { "clave": "tienda-telefonos", "formato": "16:9", "estilo": "ilustracion", "escena": "Mostrador de una tienda de electrónica con dos teléfonos inteligentes distintos sobre soportes de madera, una joven mirándolos con las manos en los bolsillos" },
+    { "clave": "dos-cafes", "formato": "16:9", "estilo": "ilustracion", "escena": "Una calle con dos cafeterías frente a frente, una con toldo amarillo cerca y otra con toldo azul más lejos al fondo, mesas pequeñas en la banqueta" },
+    { "clave": "esquina-cine", "formato": "16:9", "estilo": "ilustracion", "escena": "Esquina de calle con banqueta amplia, un taxi blanco estacionado junto a la acera y un cine con marquesina apagada a lo lejos" },
+    { "clave": "gimnasio-club", "formato": "16:9", "estilo": "ilustracion", "escena": "Interior luminoso de un gimnasio escolar con pesas, una caminadora y tres jóvenes distintos entrenando en áreas separadas" }
+  ]
+}

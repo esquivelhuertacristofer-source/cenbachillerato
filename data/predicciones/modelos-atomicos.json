@@ -1,0 +1,12 @@
+{
+  "escena": "Un átomo de carbono armado con 6 protones, 6 neutrones y 6 electrones, en equilibrio.",
+  "pregunta": "Le agregas un protón más, sin tocar los electrones. ¿Qué pasa?",
+  "opciones": [
+    { "id": "a", "texto": "Sigue siendo carbono, solo más pesado", "icono": "fa-weight-hanging" },
+    { "id": "b", "texto": "Cambia de elemento y queda positivo", "icono": "fa-plus" },
+    { "id": "c", "texto": "Sigue siendo carbono, pero neutro", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "El número de protones define al elemento: con 7 ya es nitrógeno. Y como ahora hay un protón de más que electrones, la carga neta es +1 y el átomo se vuelve un catión.",
+  "comoComprobarlo": "En «Construir átomo», pon 6 protones, 6 neutrones y 6 electrones; luego añade un protón y mira el elemento y la balanza."
+}

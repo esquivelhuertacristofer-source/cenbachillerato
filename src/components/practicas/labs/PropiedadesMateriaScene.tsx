@@ -26,7 +26,7 @@
 
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import {
   OrbitControls,
   ContactShadows,
@@ -388,18 +388,18 @@ function Mechero({ flama, progreso, accent }: { flama: boolean; progreso: number
 /* ── Etiquetas flotantes opcionales (drei Html con z-index bajo) ────────── */
 function Etiqueta({ pos, texto, accent }: { pos: [number, number, number]; texto: string; accent: string }) {
   return (
-    <Html position={pos} center distanceFactor={11} zIndexRange={[40, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[40, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "inline-flex",
           alignItems: "center",
           gap: 6,
-          padding: "4px 10px",
+          padding: "5px 12px",
           borderRadius: 999,
           background: "rgba(2,12,28,0.82)",
           border: `1px solid ${accent}88`,
           color: "#fff",
-          fontSize: 12,
+          fontSize: 14,
           fontWeight: 800,
           whiteSpace: "nowrap",
           fontFamily: "system-ui, sans-serif",
@@ -413,6 +413,19 @@ function Etiqueta({ pos, texto, accent }: { pos: [number, number, number]; texto
   );
 }
 
+/** Máx. 3 etiquetas, en la punta de lo que nombran; en pantallas angostas no se muestran. */
+function Etiquetas({ props }: { props: PropiedadesSceneProps }) {
+  const ancho = useThree((st) => st.size.width);
+  if (!props.etiquetas || ancho < 640) return null;
+  return (
+    <>
+      {props.sustancia && <Etiqueta pos={[0, BK_BOT + BK_H + 0.35, 0]} texto={props.sustancia} accent={props.accent} />}
+      {props.flama && <Etiqueta pos={[1.7, FLOOR_Y + 0.9, 0]} texto="Mechero Bunsen" accent="#FF8A3C" />}
+      <Etiqueta pos={[-1.9, GAUZE_Y, 0]} texto="Trípode + rejilla" accent="#9fb4cc" />
+    </>
+  );
+}
+
 /* ── Escena completa ───────────────────────────────────────────────────── */
 export default function PropiedadesMateriaScene(props: PropiedadesSceneProps) {
   return (
@@ -420,7 +433,7 @@ export default function PropiedadesMateriaScene(props: PropiedadesSceneProps) {
       shadows
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
-      camera={{ position: [0, 1.5, 11], fov: 42 }}
+      camera={{ position: [0, 1.4, 9], fov: 42 }}
     >
       <color attach="background" args={["#040e1c"]} />
       <fog attach="fog" args={["#040e1c", 16, 40]} />
@@ -467,13 +480,7 @@ export default function PropiedadesMateriaScene(props: PropiedadesSceneProps) {
         {props.flama && props.emite === "humo" && <Brasas progreso={props.progreso} />}
         {props.modo === "gas" && <Vaho progreso={props.progreso} />}
         <Vaso />
-        {props.etiquetas && (
-          <>
-            {props.sustancia && <Etiqueta pos={[0, BK_BOT + BK_H + 0.5, 0]} texto={props.sustancia} accent={props.accent} />}
-            {props.flama && <Etiqueta pos={[1.3, FLOOR_Y + 0.9, 0]} texto="Mechero Bunsen" accent="#FF8A3C" />}
-            <Etiqueta pos={[-1.35, GAUZE_Y, 0]} texto="Trípode + rejilla" accent="#9fb4cc" />
-          </>
-        )}
+        <Etiquetas props={props} />
         <ContactShadows position={[0, FLOOR_Y + 0.02, 0]} opacity={0.4} scale={18} blur={2.6} far={7} color="#020912" />
       </group>
 
@@ -489,11 +496,11 @@ export default function PropiedadesMateriaScene(props: PropiedadesSceneProps) {
 
       <OrbitControls
         enablePan={false}
-        minDistance={6}
-        maxDistance={18}
+        minDistance={5}
+        maxDistance={16}
         minPolarAngle={Math.PI / 7}
         maxPolarAngle={Math.PI / 2.05}
-        target={[0, -0.1, 0]}
+        target={[0, -0.4, 0]}
         autoRotate={props.autoRotate}
         autoRotateSpeed={0.45}
       />

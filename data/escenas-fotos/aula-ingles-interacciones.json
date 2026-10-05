@@ -1,0 +1,9 @@
+{
+  "slug": "aula-ingles-interacciones",
+  "items": [
+    { "clave": "salon-puerta", "formato": "16:9", "estilo": "ilustracion", "escena": "Puerta abierta de un salón de clases visto desde el pasillo, adentro una maestra junto al pizarrón y varios estudiantes sentados en sus bancas, una mochila en el piso del pasillo" },
+    { "clave": "pizarron-pagina", "formato": "16:9", "estilo": "ilustracion", "escena": "Pizarrón verde de un salón con una línea de garabatos sin letras legibles, una maestra señalando con una regla y libros abiertos sobre las bancas en primer plano" },
+    { "clave": "pasillo-bano", "formato": "16:9", "estilo": "ilustracion", "escena": "Pasillo escolar vacío y luminoso con una puerta de salón entreabierta al fondo y un pase de salida de madera colgado en un gancho junto a la puerta" },
+    { "clave": "mano-levantada", "formato": "16:9", "estilo": "ilustracion", "escena": "Estudiantes sentados en filas en un salón, una joven levantando la mano con una sonrisa mientras la maestra de pie la mira desde el frente" }
+  ]
+}

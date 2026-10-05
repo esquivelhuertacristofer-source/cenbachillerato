@@ -11,20 +11,21 @@
  *   · 1 solución   (rectas que se cruzan)        → se levanta una columna,
  *   · sin solución (rectas paralelas)            → nada se levanta,
  *   · infinitas    (rectas coincidentes)         → toda la recta brilla.
+ * Experimento central: la pendiente m₂ se acerca a m₁ y el cruce se aleja hasta
+ * desaparecer; un medidor muestra la diferencia de pendientes (D = 0 ⇒ sin cruce).
  * Pensamiento Matemático II — Introducción al Álgebra (MCCEMS 2025).
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, NUM, OK, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { T, NUM, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { SISTEMAS_FICHA } from "./sistemas-ecuaciones-2x2-ficha";
 import { RetoNumericoCard } from "./_reto-numerico";
 import { RETO_A2 } from "./sistemas-ecuaciones-2x2-data";
 import { LabSfx } from "./lab-audio";
-import { useEstrellas } from "@/lib/hooks/useEstrellas";
-import { useLogros } from "./_partida";
 import {
   ESCENARIOS,
   pendiente,
@@ -46,7 +47,7 @@ const SistemasScene = dynamic(() => import("./SistemasScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-diagram-project fa-bounce" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Preparando el laboratorio 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Preparando el laboratorio 3D…</span>
     </div>
   ),
 });
@@ -58,6 +59,16 @@ const CASO_ICON: Record<Caso, string> = {
   unica: "fa-circle-dot",
   paralelas: "fa-equals",
   coincidentes: "fa-clone",
+};
+
+/** Nombre corto de cada escenario para la barra de modos. */
+const CORTO: Record<string, string> = {
+  granja: "Gallinas",
+  dulces: "Paletas",
+  monedas: "Monedas",
+  "caso-unica": "Se cruzan",
+  "caso-paralelas": "Paralelas",
+  "caso-coincidentes": "Coincidentes",
 };
 
 /** y = m·x + i en texto legible. */
@@ -78,12 +89,12 @@ export function LabSistemas({ color }: PracticaLabProps) {
   const esc = useMemo<Escenario>(() => ESCENARIOS.find((e) => e.key === escKey) ?? ESCENARIOS[0]!, [escKey]);
 
   const [m2, setM2] = useState(pendiente(ESCENARIOS[0]!.r2));
-  const [autoRotate, setAutoRotate] = useState(true);
+  const [autoRotate, setAutoRotate] = useState(false);
   const [resetNonce, setResetNonce] = useState(0);
+  const [playing, setPlaying] = useState(false);
 
-  // reto evaluable, teoría (cajón deslizable) y sonido
+  // reto evaluable y sonido
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
 
@@ -108,7 +119,7 @@ export function LabSistemas({ color }: PracticaLabProps) {
 
   // seguimiento de objetivos
   const [movioPendiente, setMovioPendiente] = useState(false);
-  const [, setEligioReal] = useState(false);
+  const [rompioCruce, setRompioCruce] = useState(false);
   const [casosVistos, setCasosVistos] = useState<Set<Caso>>(() => new Set<Caso>([ESCENARIOS[0]!.casoBase]));
 
   const m1 = useMemo(() => pendiente(esc.r1), [esc]);
@@ -121,11 +132,13 @@ export function LabSistemas({ color }: PracticaLabProps) {
   const registrarCaso = (c: Caso) =>
     setCasosVistos((prev) => (prev.has(c) ? prev : new Set(prev).add(c)));
 
-  const elegir = (e: Escenario) => {
+  const elegir = (key: string) => {
+    const e = ESCENARIOS.find((x) => x.key === key);
+    if (!e) return;
+    setPlaying(false);
     setEscKey(e.key);
     const nm2 = pendiente(e.r2);
     setM2(nm2);
-    if (e.grupo === "real") setEligioReal(true);
     registrarCaso(resolver(pendiente(e.r1), ordenada(e.r1), nm2, ordenada(e.r2)).caso);
   };
 
@@ -133,10 +146,39 @@ export function LabSistemas({ color }: PracticaLabProps) {
     setM2(v);
     setMovioPendiente(true);
     if (sonido) audioRef.current?.blip();
-    registrarCaso(resolver(m1, i1, v, i2).caso);
+    const c = resolver(m1, i1, v, i2).caso;
+    if (c !== "unica") setRompioCruce(true);
+    registrarCaso(c);
   };
 
+  // Barrido automático de la pendiente de la 2ª recta (de ida y vuelta).
+  useEffect(() => {
+    if (!playing) return;
+    let raf = 0;
+    let last = 0;
+    let dir = 1;
+    let v = m2Base;
+    const tick = (ts: number) => {
+      if (last === 0) last = ts;
+      const dt = Math.min((ts - last) / 1000, 0.05);
+      last = ts;
+      v += dir * dt * (PEND_MAX - PEND_MIN) * 0.12;
+      if (v >= PEND_MAX) { v = PEND_MAX; dir = -1; }
+      else if (v <= PEND_MIN) { v = PEND_MIN; dir = 1; }
+      const q = Math.round(v / PEND_STEP) * PEND_STEP;
+      setM2(q);
+      setMovioPendiente(true);
+      const c = resolver(m1, i1, q, i2).caso;
+      if (c !== "unica") setRompioCruce(true);
+      setCasosVistos((prev) => (prev.has(c) ? prev : new Set(prev).add(c)));
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [playing, m1, i1, i2, m2Base]);
+
   const reset = () => {
+    setPlaying(false);
     setM2(m2Base);
     setResetNonce((n) => n + 1);
   };
@@ -145,24 +187,16 @@ export function LabSistemas({ color }: PracticaLabProps) {
   const solVisible = sol.caso === "unica" && sol.x != null && sol.y != null && dentro(sol.x, sol.y, esc.ventana);
 
   const colorCaso = sol.caso === "unica" ? SOL_COL : sol.caso === "coincidentes" ? SOL_COL : R2_COL;
+  const dif = Math.abs(m1 - m2);
 
   const objetivos = [
     { txt: "Inclina la segunda recta y observa el cruce", done: movioPendiente },
+    { txt: "Iguala m₂ a la pendiente de la 1ª recta: el cruce desaparece", done: rompioCruce },
     { txt: "Encuentra una solución única (se cruzan)", done: casosVistos.has("unica") },
     { txt: "Logra rectas paralelas (sin solución)", done: casosVistos.has("paralelas") },
     { txt: "Logra rectas coincidentes (infinitas)", done: casosVistos.has("coincidentes") },
     { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
   ];
-  // Los objetivos se recuerdan (algunos dependían del modo y se desmarcaban
-  // solos) y se convierten en la marca del laboratorio, que antes no se
-  // guardaba en ninguna parte.
-  const { logros: logrosLab, cumplidos: cumplidosLab, total: totalLab } = useLogros(objetivos.map((o) => o.done));
-  const { registraEstrellas } = useEstrellas(RETO_KEY);
-  useEffect(() => {
-    if (cumplidosLab === 0) return;
-    const est = cumplidosLab >= totalLab ? 3 : cumplidosLab >= Math.ceil((totalLab * 2) / 3) ? 2 : 1;
-    registraEstrellas(est);
-  }, [cumplidosLab, totalLab, registraEstrellas]);
 
   const sceneFallback = (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 28, textAlign: "center" }}>
@@ -170,7 +204,7 @@ export function LabSistemas({ color }: PracticaLabProps) {
         <i className={`fa-solid ${esc.icono}`} />
       </div>
       <div style={{ fontSize: 20, fontWeight: 900, color: T.text }}>{CASO_LABEL[sol.caso]}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 380, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 380, lineHeight: 1.5 }}>
         Tu equipo no puede mostrar la vista 3D, pero la idea sigue: dos rectas en el plano.{" "}
         {sol.caso === "unica" && sol.x != null && sol.y != null ? (
           <>Se cruzan en <strong style={{ color: SOL_COL, ...NUM }}>({fmtNum(sol.x)}, {fmtNum(sol.y)})</strong>.</>
@@ -183,310 +217,161 @@ export function LabSistemas({ color }: PracticaLabProps) {
     </div>
   );
 
+  const lecturaCorta =
+    sol.caso === "unica" && sol.x != null && sol.y != null ? (
+      <>Se cruzan en ({fmtNum(sol.x)}, {fmtNum(sol.y)}){solVisible ? "" : " (fuera de la vista)"}</>
+    ) : sol.caso === "paralelas" ? (
+      <>Paralelas: nunca se cruzan, sin solución</>
+    ) : (
+      <>Misma recta: infinitas soluciones</>
+    );
+
+  const etiqueta2 = modificada ? rectaStr(m2, i2) : eqStr(esc.r2);
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes exPulse { 0%,100%{ box-shadow:0 0 0 0 var(--exc); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .ex-live-dot { animation: exPulse 1.6s ease-in-out infinite; }
-        .ex-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(300px,26vw,380px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .ex-grid { grid-template-columns: 1fr; } }
-        .ex-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .ex-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .ex-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .ex-divider { height:1px; background:${T.line}; margin:18px 0; }
-        .ex-esc { cursor:pointer; text-align:left; border-radius:12px; border:1px solid ${T.line}; background:${T.glass}; color:${T.text2};
-          padding:11px 13px; transition:all .14s ease; display:flex; align-items:center; gap:11px; width:100%; }
-        .ex-esc:hover { border-color:${T.lineStrong}; background:${T.glassSoft}; color:#fff; }
-        .ex-esc[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-        .ex-slider { -webkit-appearance:none; appearance:none; width:100%; height:7px; border-radius:999px; background:${T.lineStrong}; outline:none; cursor:pointer; }
-        .ex-slider::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:21px; height:21px; border-radius:50%; background:#fff; border:3px solid ${R2_COL}; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.4); }
-        .ex-slider::-moz-range-thumb { width:21px; height:21px; border-radius:50%; background:#fff; border:3px solid ${R2_COL}; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.4); }
-        @media (max-width: 1000px){ .ex-bottom { grid-template-columns: 1fr !important; } }
-
-        /* Cajón de teoría */
-        .ex-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .ex-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .ex-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .ex-drawer[data-open="true"] { transform:translateX(0); }
-        .ex-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .ex-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .ex-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .ex-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .ex-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .ex-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      <div className="ex-grid">
-        {/* ── Columna visor ──────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(460px, 66vh, 780px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 50% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06182f 0%,#020d1d 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <SistemasScene
+            win={esc.ventana}
+            l1={{ m: m1, i: i1 }}
+            l2={{ m: m2, i: i2 }}
+            sol={sol}
+            accent={accent}
+            autoRotate={autoRotate}
+            resetNonce={resetNonce}
+            etiquetas={{
+              r1: eqStr(esc.r1),
+              r2: etiqueta2,
+              cruce: sol.caso === "unica" && sol.x != null && sol.y != null ? `(${fmtNum(sol.x)}, ${fmtNum(sol.y)})` : undefined,
             }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <SistemasScene
-                win={esc.ventana}
-                l1={{ m: m1, i: i1 }}
-                l2={{ m: m2, i: i2 }}
-                sol={sol}
-                accent={accent}
-                autoRotate={autoRotate}
-                resetNonce={resetNonce}
-              />
-            </SceneBoundary>
-
-            {/* Cinta EN VIVO con el caso */}
-            <div style={{ position: "absolute", top: 14, left: 16, display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(2,12,28,0.74)", border: `1px solid ${colorCaso}66`, backdropFilter: "blur(10px)" }}>
-              <span className="ex-live-dot" style={{ ["--exc" as string]: `${colorCaso}aa`, width: 9, height: 9, borderRadius: "50%", background: colorCaso }} />
-              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3 }}>EN VIVO</span>
-              <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)" }} />
-              <span style={{ fontSize: 13.5, fontWeight: 900, color: colorCaso, ...NUM }}>
-                {CASO_LABEL[sol.caso]}
-                {sol.caso === "unica" && sol.x != null && sol.y != null ? ` · (${fmtNum(sol.x)}, ${fmtNum(sol.y)})` : ""}
-              </span>
-            </div>
-
-            {/* Leyenda de las dos rectas */}
-            <div style={{ position: "absolute", bottom: 16, left: 18, display: "flex", gap: 16, fontSize: 11.5, fontWeight: 800, letterSpacing: "0.03em", pointerEvents: "none", ...NUM }}>
-              <span style={{ color: accent }}>
-                <i className="fa-solid fa-minus" style={{ marginRight: 6 }} />
-                {eqStr(esc.r1)}
-              </span>
-              <span style={{ color: R2_COL }}>
-                <i className="fa-solid fa-minus" style={{ marginRight: 6 }} />
-                {modificada ? rectaStr(m2, i2) : eqStr(esc.r2)}
-              </span>
-            </div>
-
-            {/* Toolbar */}
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(2,12,28,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="ex-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="ex-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="ex-icobtn" data-on={autoRotate} onClick={() => setAutoRotate((v) => !v)} title="Girar automáticamente">
-                <i className="fa-solid fa-arrows-rotate" />
-              </button>
-              <button className="ex-icobtn" onClick={reset} title="Reiniciar la 2ª recta">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            {/* Botón flotante de Teoría */}
-            <button className="ex-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
+          />
+        </SceneBoundary>
+      }
+      modos={{
+        opciones: ESCENARIOS.map((e) => ({ id: e.key, etiqueta: CORTO[e.key] ?? e.titulo, icono: e.icono })),
+        valor: escKey,
+        cambiar: elegir,
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono={playing ? "fa-pause" : "fa-play"} titulo={playing ? "Pausar" : "Barrer la pendiente de la 2ª recta"} activo={playing} onClick={() => setPlaying((p) => !p)} />
+          <BotonHerramienta icono="fa-arrows-rotate" titulo="Girar automáticamente" activo={autoRotate} onClick={() => setAutoRotate((v) => !v)} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar la 2ª recta" onClick={reset} />
+        </>
+      }
+      leyenda={
+        <>
+          <div style={{ fontSize: 14, fontWeight: 800, color: T.text2 }}>Diferencia de pendientes</div>
+          <div style={{ width: 180, height: 10, borderRadius: 6, background: "rgba(255,255,255,0.12)", overflow: "hidden" }}>
+            <div style={{ width: `${Math.min(100, (dif / 6) * 100)}%`, height: "100%", background: dif < 1e-9 ? R2_COL : SOL_COL, transition: "width 120ms linear" }} />
           </div>
-
-          {/* Deslizador: inclinar la 2ª recta */}
-          <div style={{ ...card, padding: "18px 22px 20px" }}>
-            <Eyebrow>
-              <i className={`fa-solid ${esc.icono}`} style={{ marginRight: 8, color: accent }} />
-              {esc.titulo}
-            </Eyebrow>
-            <div style={{ fontSize: 13.5, color: T.text2, lineHeight: 1.5, marginBottom: 16 }}>{esc.contexto}</div>
-
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 9 }}>
-              <span style={{ fontSize: 13, fontWeight: 800, color: T.text }}>
-                Inclinación de la <span style={{ color: R2_COL }}>2ª recta</span> (pendiente m₂)
-              </span>
-              <span style={{ fontSize: 18, fontWeight: 900, color: R2_COL, ...NUM }}>{fmtNum(m2)}</span>
-            </div>
-            <input
-              className="ex-slider"
-              type="range"
-              min={PEND_MIN}
-              max={PEND_MAX}
-              step={PEND_STEP}
-              value={m2}
-              onChange={(e) => moverPendiente(Number(e.target.value))}
-            />
-            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, fontSize: 11, color: T.text3, ...NUM }}>
-              <span>{fmtNum(PEND_MIN)}</span>
-              <span>
-                pendiente de la 1ª recta: <strong style={{ color: accent }}>{fmtNum(m1)}</strong>
-              </span>
-              <span>{fmtNum(PEND_MAX)}</span>
-            </div>
-
-            <div style={{ display: "flex", borderRadius: 13, background: T.inset, border: `1px solid ${T.line}`, marginTop: 16 }}>
-              <Readout label="Caso" value={CASO_LABEL[sol.caso]} col={colorCaso} size={15} />
-              <div style={{ width: 1, background: T.line }} />
-              <Readout label="x" value={solVisible && sol.x != null ? fmtNum(sol.x) : "—"} col={accent} />
-              <div style={{ width: 1, background: T.line }} />
-              <Readout label="y" value={solVisible && sol.y != null ? fmtNum(sol.y) : "—"} col={R2_COL} />
-            </div>
-
-            {sol.caso === "unica" && !solVisible && (
-              <div style={{ marginTop: 12, fontSize: 12.5, color: T.text2 }}>
-                <i className="fa-solid fa-arrows-left-right-to-line" style={{ marginRight: 7, color: SOL_COL }} />
-                Hay una solución, pero el cruce queda fuera de la vista. Acerca la pendiente m₂ a la de la otra recta para verlo entrar (y luego desaparecer al volverse paralelas).
-              </div>
-            )}
+          <div style={{ fontSize: 14, fontWeight: 900, color: colorCaso, maxWidth: 190 }}>
+            {dif < 1e-9 ? "m₁ = m₂: no hay cruce único" : `|m₁ − m₂| = ${fmtNum(dif)}: se cruzan`}
           </div>
+        </>
+      }
+      lectura={lecturaCorta}
+      objetivos={objetivos}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Controles",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              <Bloque titulo={esc.titulo} icono={esc.icono}>
+                <p style={{ margin: 0, color: T.text2 }}>{esc.contexto}</p>
+                <Deslizador
+                  label="Pendiente m₂ de la 2ª recta" icon="fa-chart-line" colr={R2_COL} valor={fmtNum(m2)}
+                  min={PEND_MIN} max={PEND_MAX} step={PEND_STEP} value={m2}
+                  onChange={(v) => { setPlaying(false); moverPendiente(v); }}
+                  hintL={fmtNum(PEND_MIN)} hintR={fmtNum(PEND_MAX)}
+                />
+                <p style={{ margin: 0, color: T.text2 }}>
+                  Pendiente de la 1ª recta: <strong style={{ color: accent }}>{fmtNum(m1)}</strong>. Acerca m₂ a ese valor y mira cómo el cruce se aleja.
+                </p>
+              </Bloque>
 
-          {/* Qué está pasando */}
-          <div style={{ ...card, padding: "18px 22px 20px" }}>
-            <Eyebrow>Qué significa el cruce</Eyebrow>
-            <div style={{ fontSize: 13.5, color: T.text2, lineHeight: 1.55 }}>
-              {sol.caso === "unica" ? (
-                <>
-                  Las dos rectas tienen <strong style={{ color: T.text }}>pendientes distintas</strong>, así que se cruzan en un solo punto. Ese punto{" "}
-                  {solVisible && sol.x != null && sol.y != null ? (
-                    <>
-                      <strong style={{ color: SOL_COL, ...NUM }}>({fmtNum(sol.x)}, {fmtNum(sol.y)})</strong>
-                    </>
-                  ) : null}{" "}
-                  es el único par (x, y) que cumple <strong>las dos ecuaciones a la vez</strong>: la <strong style={{ color: SOL_COL }}>solución única</strong>.
-                </>
-              ) : sol.caso === "paralelas" ? (
-                <>
-                  Las rectas tienen la <strong style={{ color: T.text }}>misma pendiente</strong> pero distinta altura: son <strong style={{ color: R2_COL }}>paralelas</strong> y nunca se tocan. No existe ningún (x, y) que cumpla ambas: el sistema <strong>no tiene solución</strong>.
-                </>
-              ) : (
-                <>
-                  Las dos ecuaciones describen <strong style={{ color: T.text }}>la misma recta</strong> (una es múltiplo de la otra): son <strong style={{ color: SOL_COL }}>coincidentes</strong>. Cualquier punto de la recta cumple ambas, por eso hay <strong>infinitas soluciones</strong>.
-                </>
-              )}
-            </div>
-            <div style={{ marginTop: 16, borderRadius: 13, border: `1px solid ${colorCaso}55`, background: `${colorCaso}14`, padding: "13px 16px", display: "flex", gap: 12, alignItems: "center" }}>
-              <i className={`fa-solid ${CASO_ICON[sol.caso]}`} style={{ color: colorCaso, fontSize: 18 }} />
-              <div style={{ fontSize: 14.5, fontWeight: 800, color: T.text }}>
-                {esc.porque}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* ── Columna controles ──────────────────────────────────── */}
-        <div style={{ ...card, padding: "22px 22px 24px" }}>
-          <Eyebrow>Situaciones reales</Eyebrow>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {ESCENARIOS.filter((e) => e.grupo === "real").map((e) => (
-              <button key={e.key} className="ex-esc" data-on={e.key === escKey} onClick={() => elegir(e)}>
-                <i className={`fa-solid ${e.icono}`} style={{ fontSize: 16, width: 20, textAlign: "center", color: e.key === escKey ? accent : T.text3 }} />
-                <span style={{ fontSize: 13.5, fontWeight: 700 }}>{e.titulo}</span>
-              </button>
-            ))}
-          </div>
-
-          <div className="ex-divider" />
-
-          <Eyebrow>Los tres casos</Eyebrow>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {ESCENARIOS.filter((e) => e.grupo === "caso").map((e) => (
-              <button key={e.key} className="ex-esc" data-on={e.key === escKey} onClick={() => elegir(e)}>
-                <i className={`fa-solid ${e.icono}`} style={{ fontSize: 16, width: 20, textAlign: "center", color: e.key === escKey ? accent : T.text3 }} />
-                <span style={{ fontSize: 13.5, fontWeight: 700 }}>{e.titulo}</span>
-              </button>
-            ))}
-          </div>
-
-          <div className="ex-divider" />
-
-          <Eyebrow>Métodos para resolverlo</Eyebrow>
-          <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.5, display: "flex", flexDirection: "column", gap: 9 }}>
-            <div><strong style={{ color: T.text }}>Gráfico:</strong> dibujar las dos rectas y leer el punto donde se cruzan (lo que haces aquí).</div>
-            <div><strong style={{ color: T.text }}>Sustitución:</strong> despejar una variable en una ecuación y meterla en la otra.</div>
-            <div><strong style={{ color: T.text }}>Igualación:</strong> despejar la misma variable en ambas e igualar los resultados.</div>
-            <div><strong style={{ color: T.text }}>Eliminación:</strong> sumar o restar las ecuaciones para cancelar una variable.</div>
-          </div>
-
-          <div className="ex-divider" />
-
-          <Eyebrow>Marcador</Eyebrow>
-          <div style={{ display: "flex", borderRadius: 13, background: T.inset, border: `1px solid ${T.line}` }}>
-            <Readout label="Casos vistos" value={`${casosVistos.size}/3`} col={accent} size={15} />
-            <div style={{ width: 1, background: T.line }} />
-            <Readout label="Recta 2" value={modificada ? "Modificada" : "Original"} col={R2_COL} size={15} />
-          </div>
-
-          <div style={{ marginTop: 14, fontSize: 12.5, color: T.text2, lineHeight: 1.5 }}>
-            <i className="fa-solid fa-circle-info" style={{ marginRight: 7, color: accent }} />
-            Mueve la pendiente m₂ hasta igualar la de la <strong style={{ color: accent }}>1ª recta</strong> ({fmtNum(m1)}): verás cómo la solución se va al infinito y las rectas quedan paralelas o coincidentes.
-          </div>
-        </div>
-      </div>
-
-      {/* ── Objetivos + pista ──────────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="ex-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-            Objetivos
-          </Eyebrow>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-            {objetivos.map((o, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: logrosLab[i] ? OK : T.text2 }}>
-                <i className={`fa-solid ${logrosLab[i] ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: logrosLab[i] ? 1 : 0.3 }} />
-                <span style={{ fontWeight: logrosLab[i] ? 700 : 500 }}>{o.txt}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div style={{ borderRadius: 18, padding: "18px 20px", border: `1px solid rgba(${color.rgba},0.3)`, background: `rgba(${color.rgba},0.08)`, fontSize: 13.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 13 }}>
-          <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 17, marginTop: 1 }} />
-          <span>
-            Resolver un sistema 2×2 es <strong style={{ color: T.text }}>buscar dónde se cruzan dos rectas</strong>. Según cómo se acomoden hay tres finales: se cruzan{" "}
-            <strong style={{ color: SOL_COL }}>(1 solución)</strong>, van paralelas{" "}
-            <strong style={{ color: R2_COL }}>(ninguna)</strong> o son la misma recta{" "}
-            <strong style={{ color: SOL_COL }}>(infinitas)</strong>.
-          </span>
-        </div>
-      </div>
-
-      {/* ── Reto evaluable: el ejercicio verbatim del ancla A2 ────────── */}
-      <RetoNumericoCard
-        reto={RETO_A2}
-        accent={accent}
-        aprobado={ejercicioAprobado}
-        onAprobado={() => setEjercicioAprobado(true)}
-        playSfx={
-          sonido
-            ? (ok) => {
-                if (ok) audioRef.current?.correcto();
-                else audioRef.current?.incorrecto();
+              <Bloque titulo="La solución" icono="fa-crosshairs">
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                  <Dato label="Caso" value={CASO_LABEL[sol.caso]} col={colorCaso} />
+                  <Dato label="Recta 2" value={modificada ? "Modificada" : "Original"} col={R2_COL} />
+                  <Dato label={esc.xNombre} value={solVisible && sol.x != null ? fmtNum(sol.x) : "—"} col={accent} />
+                  <Dato label={esc.yNombre} value={solVisible && sol.y != null ? fmtNum(sol.y) : "—"} col={R2_COL} />
+                </div>
+                <p style={{ margin: 0, padding: "10px 12px", borderRadius: 12, border: `1px solid ${colorCaso}55`, background: `${colorCaso}14`, color: T.text }}>
+                  <i className={`fa-solid ${CASO_ICON[sol.caso]}`} style={{ color: colorCaso, marginRight: 8 }} aria-hidden />
+                  {sol.caso === "unica" ? (
+                    <>Pendientes <strong>distintas</strong>: las rectas se cruzan en un solo punto, la <strong style={{ color: SOL_COL }}>solución única</strong>.</>
+                  ) : sol.caso === "paralelas" ? (
+                    <>Misma pendiente, distinta altura: <strong style={{ color: R2_COL }}>paralelas</strong>. Ningún (x, y) cumple las dos: <strong>sin solución</strong>.</>
+                  ) : (
+                    <>Es <strong style={{ color: SOL_COL }}>la misma recta</strong>: cualquier punto cumple las dos, hay <strong>infinitas soluciones</strong>.</>
+                  )}
+                </p>
+                {sol.caso === "unica" && !solVisible && (
+                  <p style={{ margin: 0, color: T.text2 }}>
+                    <i className="fa-solid fa-arrows-left-right-to-line" style={{ marginRight: 7, color: SOL_COL }} aria-hidden />
+                    Hay solución, pero el cruce queda fuera de la vista. Acerca m₂ a m₁ para verlo entrar y luego desaparecer.
+                  </p>
+                )}
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <RetoNumericoCard
+              reto={RETO_A2}
+              accent={accent}
+              aprobado={ejercicioAprobado}
+              onAprobado={() => setEjercicioAprobado(true)}
+              playSfx={
+                sonido
+                  ? (ok) => {
+                      if (ok) audioRef.current?.correcto();
+                      else audioRef.current?.incorrecto();
+                    }
+                  : undefined
               }
-            : undefined
-        }
-      />
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <div className="ex-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="ex-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="ex-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="ex-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="ex-drawer-body">
-          <FichaTeorica data={SISTEMAS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+            />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Qué es resolver un sistema" icono="fa-lightbulb">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  Resolver un sistema 2×2 es <strong style={{ color: T.text }}>buscar dónde se cruzan dos rectas</strong>. Hay tres finales: se cruzan <strong style={{ color: SOL_COL }}>(1 solución)</strong>, van paralelas <strong style={{ color: R2_COL }}>(ninguna)</strong> o son la misma recta <strong style={{ color: SOL_COL }}>(infinitas)</strong>.
+                </p>
+                <p style={{ margin: 0, color: T.text2 }}>{esc.porque}</p>
+              </Bloque>
+              <Bloque titulo="Métodos para resolverlo" icono="fa-list-check">
+                <div style={{ display: "grid", gap: 8, color: T.text2 }}>
+                  <div><strong style={{ color: T.text }}>Gráfico:</strong> dibujar las dos rectas y leer el punto donde se cruzan (lo que haces aquí).</div>
+                  <div><strong style={{ color: T.text }}>Sustitución:</strong> despejar una variable en una ecuación y meterla en la otra.</div>
+                  <div><strong style={{ color: T.text }}>Igualación:</strong> despejar la misma variable en ambas e igualar los resultados.</div>
+                  <div><strong style={{ color: T.text }}>Eliminación:</strong> sumar o restar las ecuaciones para cancelar una variable.</div>
+                </div>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={SISTEMAS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }

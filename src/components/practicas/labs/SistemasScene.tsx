@@ -14,9 +14,9 @@
  * → cumple las reglas del React Compiler.
  */
 
-import { useMemo } from "react";
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls, Line } from "@react-three/drei";
+import { useMemo, useState } from "react";
+import { Canvas, useThree } from "@react-three/fiber";
+import { OrbitControls, Line, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { segmentoVisible, dentro, type Ventana, type Solucion } from "./sistemas-data";
 import { Escenario } from "./_escenario";
@@ -30,6 +30,8 @@ export interface SistemasSceneProps {
   accent: string; // color de la recta 1 (color del área)
   autoRotate: boolean;
   resetNonce: number;
+  /** Texto de cada ecuación para rotular su recta. */
+  etiquetas?: { r1: string; r2: string; cruce?: string };
 }
 
 const W = 9; // ancho del piso (eje X de datos)
@@ -40,6 +42,40 @@ const SOL_COL = "#FFD166"; // solución / cruce (ámbar)
 const AXIS_COL = "#7d96ad";
 
 type P3 = [number, number, number];
+
+function Etiqueta({ pos, color, children }: { pos: P3; color: string; children: React.ReactNode }) {
+  return (
+    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
+      <div
+        style={{
+          whiteSpace: "nowrap", padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.88)",
+          border: `1.5px solid ${color}`, color, fontWeight: 900, fontSize: 14, fontFamily: "system-ui, sans-serif",
+          boxShadow: "0 4px 16px rgba(0,0,0,0.5)",
+        }}
+      >
+        {children}
+      </div>
+    </Html>
+  );
+}
+
+/** Rótulos de las rectas y del cruce (se ocultan en pantallas angostas: la info está en el panel). */
+function Rotulos({ seg, cruce, etiquetas, accent }: {
+  seg: { r1: P3[] | null; r2: P3[] | null };
+  cruce: P3 | null;
+  etiquetas?: SistemasSceneProps["etiquetas"];
+  accent: string;
+}) {
+  const angosto = useThree((st) => st.size.width) < 640;
+  if (angosto || !etiquetas) return null;
+  return (
+    <>
+      {seg.r1 && <Etiqueta pos={[seg.r1[0]![0], 0.5, seg.r1[0]![2]]} color={accent}>{etiquetas.r1}</Etiqueta>}
+      {seg.r2 && <Etiqueta pos={[seg.r2[1]![0], 0.5, seg.r2[1]![2]]} color={R2_COL}>{etiquetas.r2}</Etiqueta>}
+      {cruce && etiquetas.cruce && <Etiqueta pos={[cruce[0], HP + 0.8, cruce[2]]} color={SOL_COL}>{etiquetas.cruce}</Etiqueta>}
+    </>
+  );
+}
 
 export default function SistemasScene(props: SistemasSceneProps) {
   const { win, l1, l2, sol, accent } = props;
@@ -132,12 +168,14 @@ export default function SistemasScene(props: SistemasSceneProps) {
     ];
   }, [sol, l1, win, nx, nz]);
 
+  const [camZ] = useState(() => (typeof window !== "undefined" && window.innerWidth < 640 ? 17 : 12.2));
+
   return (
     <Canvas
       shadows
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
-      camera={{ position: [0.2, 7.6, 11], fov: 42 }}
+      camera={{ position: [0.2, camZ * 0.68, camZ], fov: 42 }}
     >
       {/* Suelo, luz de tres puntos y entorno que reflejar. */}
       {/* La altura sale de donde esta escena ya ponía su sombra de
@@ -159,7 +197,7 @@ export default function SistemasScene(props: SistemasSceneProps) {
 
         {/* Cuadrícula */}
         {grid.map((l, idx) => (
-          <Line key={`g${idx}`} points={l} color="#1d3147" lineWidth={1} transparent opacity={0.6} />
+          <Line key={`g${idx}`} points={l} color="#2c4663" lineWidth={1} transparent opacity={0.7} />
         ))}
 
         {/* Ejes */}
@@ -206,16 +244,17 @@ export default function SistemasScene(props: SistemasSceneProps) {
           </group>
         )}
 
+        <Rotulos seg={seg} cruce={cruce} etiquetas={props.etiquetas} accent={accent} />
       </group>
 
-
       <OrbitControls
+        makeDefault
         enablePan={false}
-        minDistance={8}
+        minDistance={9}
         maxDistance={22}
         minPolarAngle={Math.PI / 7}
         maxPolarAngle={Math.PI / 2.15}
-        target={[0, 0.6, 0]}
+        target={[0, -0.2, 0.3]}
         autoRotate={props.autoRotate}
         autoRotateSpeed={0.4}
       />

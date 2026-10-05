@@ -1,0 +1,12 @@
+{
+  "escena": "Una recta numérica 3D con una bolita que se desliza y un reflejo punteado al otro lado del cero.",
+  "pregunta": "Si mueves la bolita a −4, ¿dónde cae su opuesto?",
+  "opciones": [
+    { "id": "a", "texto": "En −4, en el mismo lugar", "icono": "fa-location-dot" },
+    { "id": "b", "texto": "En 4, del otro lado del cero", "icono": "fa-left-right" },
+    { "id": "c", "texto": "En 0, sobre el origen", "icono": "fa-bullseye" }
+  ],
+  "correcta": "b",
+  "porque": "El opuesto está a la misma distancia del cero, pero del lado contrario. Por eso −4 y 4 son un espejo uno del otro, y su valor absoluto es el mismo.",
+  "comoComprobarlo": "En Ubicar, activa el botón Opuesto y desliza el número hasta −4; luego mira dónde se coloca el punto cian."
+}

@@ -1,0 +1,12 @@
+{
+  "escena": "Un clavo de hierro dentro de un vaso de precipitado sobre un mechero, listo para transformarse.",
+  "pregunta": "Al avanzar la oxidación del clavo, ¿qué pasa con la sustancia original?",
+  "opciones": [
+    { "id": "a", "texto": "Permanece igual, solo cambia su aspecto", "icono": "fa-equals" },
+    { "id": "b", "texto": "Se va convirtiendo en otra", "icono": "fa-arrow-right-arrow-left" },
+    { "id": "c", "texto": "Aumenta porque se le suma óxido", "icono": "fa-arrow-up" }
+  ],
+  "correcta": "b",
+  "porque": "En la oxidación el hierro reacciona con el oxígeno y forma óxido, una sustancia distinta. Por eso la barra de sustancia original baja mientras sube la de sustancia nueva.",
+  "comoComprobarlo": "Elige «Oxidar hierro», arrastra el avance de 0 a 100 % y vigila las dos barras."
+}

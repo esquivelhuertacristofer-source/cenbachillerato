@@ -1,0 +1,12 @@
+{
+  "escena": "Una balanza con una mochila y 3 kg de libros en un plato, y 8 kg en el otro, nivelada.",
+  "pregunta": "Quitas 1 kg solo del plato izquierdo. ¿Qué hace la balanza?",
+  "opciones": [
+    { "id": "a", "texto": "Sigue nivelada", "icono": "fa-equals" },
+    { "id": "b", "texto": "Se inclina hacia la derecha", "icono": "fa-arrow-right" },
+    { "id": "c", "texto": "Se inclina hacia la izquierda", "icono": "fa-arrow-left" }
+  ],
+  "correcta": "b",
+  "porque": "Al quitar peso de un solo lado, el plato izquierdo pesa menos que el derecho y sube. Se rompe la igualdad; por eso lo que haces de un lado debes hacerlo del otro.",
+  "comoComprobarlo": "Pulsa «Quitar 1 solo a la izquierda» y observa el brazo y el medidor de la escena."
+}

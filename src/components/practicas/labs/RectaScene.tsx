@@ -17,7 +17,7 @@
  */
 
 import { useMemo } from "react";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls, Line, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { RANGO, type Modo, type Operacion, fmtNum } from "./recta-data";
@@ -47,14 +47,16 @@ type P3 = [number, number, number];
 
 const posX = (v: number) => v * UNIT;
 
-function Chip({ pos, color, children, df = 11 }: { pos: P3; color: string; children: React.ReactNode; df?: number }) {
+/** Rótulo en la punta de lo que nombra: tamaño fijo en píxeles (≥ 14 px). */
+function Chip({ pos, color, children }: { pos: P3; color: string; children: React.ReactNode }) {
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[10, 0]}>
+    <Html position={pos} center pointerEvents="none" zIndexRange={[10, 0]}>
       <div
         style={{
           whiteSpace: "nowrap",
           fontWeight: 900,
-          fontSize: 12,
+          fontSize: 15,
+          fontFamily: "system-ui, sans-serif",
           color: "#fff",
           background: `${color}e6`,
           padding: "3px 9px",
@@ -69,8 +71,21 @@ function Chip({ pos, color, children, df = 11 }: { pos: P3; color: string; child
   );
 }
 
-export default function RectaScene(props: RectaSceneProps) {
+/** Número de la escala (sin caja): es el eje, no una etiqueta con nombre. */
+function Tick({ pos, children }: { pos: P3; children: React.ReactNode }) {
+  return (
+    <Html position={pos} center pointerEvents="none" zIndexRange={[5, 0]}>
+      <div style={{ fontWeight: 800, fontSize: 14, fontFamily: "system-ui, sans-serif", color: "#cfe0ee", textShadow: "0 1px 4px rgba(0,0,0,0.9)" }}>{children}</div>
+    </Html>
+  );
+}
+
+function Contenido(props: RectaSceneProps) {
   const { modo, a, b, op, resultado, showOpuesto, showAbsoluto, unidad, accent } = props;
+  const { width, height } = useThree((st) => st.size);
+  const angosto = width < 640;
+  // La recta mide 2·HALF + flechas: en escenarios angostos se reduce para que quepa.
+  const escala = Math.min(1, ((width / height) * 9.3) / (HALF * 2 + 2));
 
   const enteros = useMemo(() => {
     const out: number[] = [];
@@ -121,19 +136,14 @@ export default function RectaScene(props: RectaSceneProps) {
   }, [modo, showOpuesto, a, xa, xo]);
 
   return (
-    <Canvas
-      shadows
-      dpr={[1, 2]}
-      gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
-      camera={{ position: [0, 3.6, 13], fov: 42 }}
-    >
+    <>
       {/* Suelo, luz de tres puntos y entorno que reflejar. La altura sale
           de donde esta escena ya ponía su sombra de contacto, que es donde
           su autor decidió que estaba el piso. */}
       <Escenario acento={accent} suelo={-0.45} />
 
 
-      <group key={`${modo}-${props.resetNonce}`}>
+      <group key={`${modo}-${props.resetNonce}`} scale={escala}>
         {/* Eje principal */}
         <mesh>
           <boxGeometry args={[HALF * 2, 0.17, 0.17]} />
@@ -162,9 +172,7 @@ export default function RectaScene(props: RectaSceneProps) {
                 <meshStandardMaterial color={col} emissive={col} emissiveIntensity={esCero ? 0.4 : 0.2} />
               </mesh>
               {(esCero || esCinco) && (
-                <Chip pos={[0, -0.72, 0]} color={esCero ? "#1b3147" : "#16263a"} df={13}>
-                  {i}
-                </Chip>
+                <Tick pos={[0, -0.72, 0]}>{i}</Tick>
               )}
             </group>
           );
@@ -224,9 +232,11 @@ export default function RectaScene(props: RectaSceneProps) {
                 <meshStandardMaterial color={ABS_COL} emissive={ABS_COL} emissiveIntensity={0.6} />
               </mesh>
             )}
-            <Chip pos={[(xa + xr) / 2, 1.5 + Math.min(2.2, Math.abs(xr - xa) * 0.22) + 0.5, 0]} color="#9a7b16">
-              {sumando ? "+" : "−"} {fmtNum(b)}  ({sumando ? "derecha" : "izquierda"})
-            </Chip>
+            {!angosto && (
+              <Chip pos={[(xa + xr) / 2, 1.5 + Math.min(2.2, Math.abs(xr - xa) * 0.22) + 0.5, 0]} color="#9a7b16">
+                {sumando ? "+" : "−"} {fmtNum(b)}  ({sumando ? "derecha" : "izquierda"})
+              </Chip>
+            )}
           </>
         )}
 
@@ -244,7 +254,7 @@ export default function RectaScene(props: RectaSceneProps) {
             <cylinderGeometry args={[0.13, 0.13, 0.1, 24]} />
             <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.6} />
           </mesh>
-          <Chip pos={[0, 1.4, 0]} color={accent}>
+          <Chip pos={[0, 1.65, 0]} color={accent}>
             {modo === "operar" ? "resultado " : ""}{fmtNum(modo === "operar" ? resultado : a)}{unidad ? ` ${unidad}` : ""}
           </Chip>
         </group>
@@ -258,7 +268,7 @@ export default function RectaScene(props: RectaSceneProps) {
         maxDistance={22}
         minPolarAngle={Math.PI / 7}
         maxPolarAngle={Math.PI / 1.9}
-        target={[0, 0.4, 0]}
+        target={[0, -0.3, 0]}
         autoRotate={props.autoRotate}
         autoRotateSpeed={0.4}
       />
@@ -267,6 +277,19 @@ export default function RectaScene(props: RectaSceneProps) {
         <Bloom intensity={0.46} luminanceThreshold={0.62} luminanceSmoothing={0.3} mipmapBlur radius={0.64} />
         <Vignette eskil={false} offset={0.28} darkness={0.42} />
       </EffectComposer>
+    </>
+  );
+}
+
+export default function RectaScene(props: RectaSceneProps) {
+  return (
+    <Canvas
+      shadows
+      dpr={[1, 2]}
+      gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
+      camera={{ position: [0, 3.6, 13], fov: 42 }}
+    >
+      <Contenido {...props} />
     </Canvas>
   );
 }

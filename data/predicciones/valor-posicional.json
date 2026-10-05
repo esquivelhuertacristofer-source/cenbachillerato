@@ -1,0 +1,12 @@
+{
+  "escena": "Cubitos, barras, placas y cubos base-10 en cuatro columnas, con un marco del tamaño de una barra junto a las unidades.",
+  "pregunta": "Si agregas un cubito más a las 9 unidades, ¿qué ocurre con los bloques?",
+  "opciones": [
+    { "id": "a", "texto": "Hay 10 cubitos sueltos en la columna", "icono": "fa-cubes" },
+    { "id": "b", "texto": "Los cubitos se cambian por 1 barra de decenas", "icono": "fa-grip-lines-vertical" },
+    { "id": "c", "texto": "Los cubitos desaparecen sin dejar nada", "icono": "fa-eraser" }
+  ],
+  "correcta": "b",
+  "porque": "Diez unidades forman una decena: la columna de unidades queda en 0 y aparece una barra en decenas. Cada posición vale 10 veces la de su derecha.",
+  "comoComprobarlo": "Sube las unidades con el botón más hasta 9 y presiona una vez más."
+}

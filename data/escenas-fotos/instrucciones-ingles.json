@@ -1,0 +1,13 @@
+{
+  "slug": "instrucciones-ingles",
+  "items": [
+    { "clave": "proc-jamaica", "formato": "16:9", "estilo": "foto", "escena": "Jarra de vidrio con agua de jamaica roja y hielo junto a una olla y flores de jamaica secas sobre una mesa de cocina" },
+    { "clave": "proc-tarea", "formato": "16:9", "estilo": "foto", "escena": "Estudiante sentado frente a una laptop en un salón de clases, con cuaderno y mochila sobre el escritorio" },
+    { "clave": "ind-q1", "formato": "16:9", "estilo": "foto", "escena": "Pasillo de una escuela desconocida con un estudiante que se acerca a una persona de la oficina de administración" },
+    { "clave": "ind-q2", "formato": "16:9", "estilo": "foto", "escena": "Calle de ciudad con una joven turista con mapa en la mano preguntando algo a una señora que camina" },
+    { "clave": "ind-q3", "formato": "16:9", "estilo": "foto", "escena": "Parada de camión urbano en una esquina con un joven esperando y un letrero de poste sin texto" },
+    { "clave": "ind-q4", "formato": "16:9", "estilo": "foto", "escena": "Joven en una sala con un teléfono en la mano llamando por teléfono con la fachada de un museo al fondo de la ventana" },
+    { "clave": "ind-q5", "formato": "16:9", "estilo": "foto", "escena": "Salón de clases con un proyector apagado en el techo y una estudiante pidiendo ayuda a la maestra junto al escritorio" },
+    { "clave": "ind-q6", "formato": "16:9", "estilo": "foto", "escena": "Dueño de una tiendita de colonia detrás del mostrador mientras una persona se asoma a la puerta a preguntarle algo" }
+  ]
+}

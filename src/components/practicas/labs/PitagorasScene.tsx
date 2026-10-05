@@ -12,8 +12,8 @@
  * reglas del React Compiler.
  */
 
-import { useMemo } from "react";
-import { Canvas } from "@react-three/fiber";
+import { useEffect, useMemo } from "react";
+import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls, ContactShadows, Environment, Lightformer, Line, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { BufferGeometry, Float32BufferAttribute, DoubleSide } from "three";
@@ -34,6 +34,19 @@ const TARGET = 8.6; // tamaño objetivo de la figura en el mundo
 const TH = 0.16; // grosor de las losas
 
 type P3 = [number, number, number];
+
+/** Ajusta la distancia de la cámara al ancho disponible (el celular es angosto). */
+function Encuadre() {
+  const camera = useThree((st) => st.camera);
+  const size = useThree((st) => st.size);
+  const aspect = size.width / Math.max(1, size.height);
+  const k = Math.max(1, 1.15 / Math.min(1.15, aspect)) * (size.width < 640 ? 1.1 : 1);
+  useEffect(() => {
+    camera.position.set(0, 10.2 * k, 12.4 * k);
+    camera.updateProjectionMatrix();
+  }, [camera, k]);
+  return null;
+}
 
 export default function PitagorasScene(props: PitagorasSceneProps) {
   const { a, b, accent } = props;
@@ -125,8 +138,9 @@ export default function PitagorasScene(props: PitagorasSceneProps) {
       shadows
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
-      camera={{ position: [0, 9.2, 11], fov: 42 }}
+      camera={{ position: [0, 10.2, 12.4], fov: 42 }}
     >
+      <Encuadre />
       <color attach="background" args={["#03101f"]} />
       <fog attach="fog" args={["#03101f", 20, 48]} />
 
@@ -186,35 +200,22 @@ export default function PitagorasScene(props: PitagorasSceneProps) {
         <Line points={L.anguloRecto} color="#eaf4ff" lineWidth={2} transparent opacity={0.85} />
 
         {/* Etiquetas de área */}
-        <Html center position={L.labA} distanceFactor={10} pointerEvents="none">
-          <div style={{ fontWeight: 900, fontSize: 24, color: accent, textShadow: "0 2px 12px rgba(0,0,0,0.85)", whiteSpace: "nowrap" }}>
-            a² = {a2}
+        <Html center position={L.labA} pointerEvents="none" zIndexRange={[20, 0]}>
+          <div style={{ fontWeight: 900, fontSize: 18, color: accent, textShadow: "0 2px 12px rgba(0,0,0,0.85)", whiteSpace: "nowrap" }}>
+            a = {a} → a² = {a2}
           </div>
         </Html>
-        <Html center position={L.labB} distanceFactor={10} pointerEvents="none">
-          <div style={{ fontWeight: 900, fontSize: 24, color: B_COL, textShadow: "0 2px 12px rgba(0,0,0,0.85)", whiteSpace: "nowrap" }}>
-            b² = {b2}
+        <Html center position={L.labB} pointerEvents="none" zIndexRange={[20, 0]}>
+          <div style={{ fontWeight: 900, fontSize: 18, color: B_COL, textShadow: "0 2px 12px rgba(0,0,0,0.85)", whiteSpace: "nowrap" }}>
+            b = {b} → b² = {b2}
           </div>
         </Html>
-        <Html center position={L.labC} distanceFactor={10} pointerEvents="none">
+        <Html center position={L.labC} pointerEvents="none" zIndexRange={[20, 0]}>
           <div style={{ textAlign: "center", textShadow: "0 2px 12px rgba(0,0,0,0.9)", whiteSpace: "nowrap" }}>
-            <div style={{ fontWeight: 900, fontSize: 24, color: C_COL }}>c² = {c2}</div>
+            <div style={{ fontWeight: 900, fontSize: 18, color: C_COL }}>c = {fmtNum(L.c)} → c² = {c2}</div>
             <div style={{ fontWeight: 800, fontSize: 14, color: "#ffffff", opacity: 0.85, ...{ fontVariantNumeric: "tabular-nums" } }}>
               {a2} + {b2} = {c2}
             </div>
-          </div>
-        </Html>
-
-        {/* Etiquetas de longitud de los lados */}
-        <Html center position={L.ladoA} distanceFactor={14} pointerEvents="none">
-          <div style={{ fontWeight: 800, fontSize: 17, color: accent, textShadow: "0 1px 8px rgba(0,0,0,0.9)" }}>a = {a}</div>
-        </Html>
-        <Html center position={L.ladoB} distanceFactor={14} pointerEvents="none">
-          <div style={{ fontWeight: 800, fontSize: 17, color: B_COL, textShadow: "0 1px 8px rgba(0,0,0,0.9)" }}>b = {b}</div>
-        </Html>
-        <Html center position={L.ladoC} distanceFactor={14} pointerEvents="none">
-          <div style={{ fontWeight: 800, fontSize: 17, color: C_COL, textShadow: "0 1px 8px rgba(0,0,0,0.9)", whiteSpace: "nowrap" }}>
-            c = {fmtNum(L.c)}
           </div>
         </Html>
 
@@ -230,10 +231,10 @@ export default function PitagorasScene(props: PitagorasSceneProps) {
       <OrbitControls
         enablePan={false}
         minDistance={9}
-        maxDistance={24}
+        maxDistance={30}
         minPolarAngle={Math.PI / 8}
         maxPolarAngle={Math.PI / 2.2}
-        target={[0, 0, 0]}
+        target={[0, 0, 1.1]}
         autoRotate={props.autoRotate}
         autoRotateSpeed={0.4}
       />

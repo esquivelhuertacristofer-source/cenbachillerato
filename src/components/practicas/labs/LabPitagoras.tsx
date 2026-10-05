@@ -15,14 +15,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, NUM, OK, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { T, NUM, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { PITAGORAS_FICHA } from "./teorema-pitagoras-ficha";
 import { RetoNumericoCard } from "./_reto-numerico";
 import { RETO_A2 } from "./teorema-pitagoras-data";
 import { LabSfx } from "./lab-audio";
-import { useEstrellas } from "@/lib/hooks/useEstrellas";
-import { useLogros } from "./_partida";
 import {
   ESCENARIOS,
   CAT_MIN,
@@ -56,12 +55,11 @@ export function LabPitagoras({ color }: PracticaLabProps) {
 
   const [a, setA] = useState(ESCENARIOS[0]!.a);
   const [b, setB] = useState(ESCENARIOS[0]!.b);
-  const [autoRotate, setAutoRotate] = useState(true);
+  const [autoRotate, setAutoRotate] = useState(false);
   const [resetNonce, setResetNonce] = useState(0);
 
-  // reto evaluable, teoría (cajón deslizable) y sonido
+  // reto evaluable y sonido
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
 
@@ -126,7 +124,6 @@ export function LabPitagoras({ color }: PracticaLabProps) {
   };
 
   const estadoColor = terna ? C_COL : accent;
-  const estadoTxt = terna ? "Terna pitagórica" : "Hipotenusa con decimales";
 
   const objetivos = [
     { txt: "Mueve un cateto y observa cómo cambia c²", done: movioCateto },
@@ -135,16 +132,6 @@ export function LabPitagoras({ color }: PracticaLabProps) {
     { txt: "Explora 3 situaciones reales", done: explorados.size >= 3 },
     { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
   ];
-  // Los objetivos se recuerdan (algunos dependían del modo y se desmarcaban
-  // solos) y se convierten en la marca del laboratorio, que antes no se
-  // guardaba en ninguna parte.
-  const { logros: logrosLab, cumplidos: cumplidosLab, total: totalLab } = useLogros(objetivos.map((o) => o.done));
-  const { registraEstrellas } = useEstrellas(RETO_KEY);
-  useEffect(() => {
-    if (cumplidosLab === 0) return;
-    const est = cumplidosLab >= totalLab ? 3 : cumplidosLab >= Math.ceil((totalLab * 2) / 3) ? 2 : 1;
-    registraEstrellas(est);
-  }, [cumplidosLab, totalLab, registraEstrellas]);
 
   const sceneFallback = (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 28, textAlign: "center" }}>
@@ -152,300 +139,142 @@ export function LabPitagoras({ color }: PracticaLabProps) {
         <i className={`fa-solid ${esc.icono}`} />
       </div>
       <div style={{ fontSize: 20, fontWeight: 900, color: T.text, ...NUM }}>{`${a}² + ${b}² = ${c2}`}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 380, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 380, lineHeight: 1.5 }}>
         Tu equipo no puede mostrar la vista 3D, pero la idea sigue: con catetos{" "}
         <strong>{a}</strong> y <strong>{b}</strong>, la hipotenusa mide <strong>{fmtNum(c)} {esc.unidad}</strong> porque a² + b² = c².
       </div>
     </div>
   );
 
+  // Medidor: las áreas de los catetos (apiladas) frente al área de la hipotenusa.
+  const barraA = (a2 / c2) * 100;
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes exPulse { 0%,100%{ box-shadow:0 0 0 0 var(--exc); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .ex-live-dot { animation: exPulse 1.6s ease-in-out infinite; }
-        .ex-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(300px,26vw,380px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .ex-grid { grid-template-columns: 1fr; } }
-        .ex-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .ex-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .ex-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .ex-divider { height:1px; background:${T.line}; margin:18px 0; }
-        .ex-esc { cursor:pointer; text-align:left; border-radius:12px; border:1px solid ${T.line}; background:${T.glass}; color:${T.text2};
-          padding:11px 13px; transition:all .14s ease; display:flex; align-items:center; gap:11px; width:100%; }
-        .ex-esc:hover { border-color:${T.lineStrong}; background:${T.glassSoft}; color:#fff; }
-        .ex-esc[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-        .ex-range { -webkit-appearance:none; appearance:none; width:100%; height:6px; border-radius:999px; outline:none;
-          background:linear-gradient(90deg, var(--exc) 0%, var(--exc) var(--exfill), rgba(255,255,255,0.12) var(--exfill), rgba(255,255,255,0.12) 100%); }
-        .ex-range::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:20px; height:20px; border-radius:50%;
-          background:#fff; border:3px solid var(--exc); cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.4); }
-        .ex-range::-moz-range-thumb { width:20px; height:20px; border-radius:50%; background:#fff; border:3px solid var(--exc); cursor:pointer; }
-        @media (max-width: 1000px){ .ex-bottom { grid-template-columns: 1fr !important; } }
-
-        /* Cajón de teoría */
-        .ex-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .ex-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .ex-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .ex-drawer[data-open="true"] { transform:translateX(0); }
-        .ex-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .ex-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .ex-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .ex-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .ex-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .ex-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      <div className="ex-grid">
-        {/* ── Columna visor ──────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(460px, 66vh, 780px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 50% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06182f 0%,#020d1d 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <PitagorasScene a={a} b={b} accent={accent} autoRotate={autoRotate} resetNonce={resetNonce} />
-            </SceneBoundary>
-
-            {/* Cinta EN VIVO */}
-            <div style={{ position: "absolute", top: 14, left: 16, display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(2,12,28,0.74)", border: `1px solid ${estadoColor}66`, backdropFilter: "blur(10px)" }}>
-              <span className="ex-live-dot" style={{ ["--exc" as string]: `${estadoColor}aa`, width: 9, height: 9, borderRadius: "50%", background: estadoColor }} />
-              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3 }}>EN VIVO</span>
-              <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)" }} />
-              <span style={{ fontSize: 13.5, fontWeight: 900, color: estadoColor, ...NUM }}>{estadoTxt}</span>
-            </div>
-
-            {/* Ecuación actual */}
-            <div style={{ position: "absolute", bottom: 16, left: 18, display: "flex", gap: 8, alignItems: "baseline", fontSize: 18, fontWeight: 900, pointerEvents: "none", ...NUM }}>
-              <span style={{ color: accent }}>{a}²</span>
-              <span style={{ color: T.text3 }}>+</span>
-              <span style={{ color: B_COL }}>{b}²</span>
-              <span style={{ color: T.text3 }}>=</span>
-              <span style={{ color: C_COL }}>{c2}</span>
-              <span style={{ color: T.text3, fontSize: 14, fontWeight: 700 }}>→ c = {fmtNum(c)} {esc.unidad}</span>
-            </div>
-
-            {/* Toolbar */}
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(2,12,28,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="ex-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="ex-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="ex-icobtn" data-on={autoRotate} onClick={() => setAutoRotate((v) => !v)} title="Girar automáticamente">
-                <i className="fa-solid fa-arrows-rotate" />
-              </button>
-              <button className="ex-icobtn" onClick={reset} title="Volver al escenario">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            {/* Botón flotante de Teoría */}
-            <button className="ex-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <PitagorasScene a={a} b={b} accent={accent} autoRotate={autoRotate} resetNonce={resetNonce} />
+        </SceneBoundary>
+      }
+      modos={{
+        opciones: ESCENARIOS.map((e) => ({ id: e.key, etiqueta: e.titulo, icono: e.icono })),
+        valor: escKey,
+        cambiar: (id) => {
+          const e = ESCENARIOS.find((x) => x.key === id);
+          if (e) cargar(e);
+        },
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-arrows-rotate" titulo="Girar automáticamente" activo={autoRotate} onClick={() => setAutoRotate((v) => !v)} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Volver al escenario" onClick={reset} />
+        </>
+      }
+      leyenda={
+        <div style={{ width: 176, display: "grid", gap: 6 }}>
+          <div style={{ fontSize: 14, fontWeight: 800, color: T.text }}>Áreas</div>
+          <div style={{ display: "flex", height: 12, borderRadius: 6, overflow: "hidden", background: "rgba(255,255,255,0.1)" }}>
+            <div style={{ width: `${barraA}%`, background: accent, transition: "width 150ms" }} />
+            <div style={{ flex: 1, background: B_COL, transition: "width 150ms" }} />
           </div>
-
-          {/* Deslizadores de catetos */}
-          <div style={{ ...card, padding: "18px 22px 20px" }}>
-            <Eyebrow>
-              <i className={`fa-solid ${esc.icono}`} style={{ marginRight: 8, color: accent }} />
-              {esc.titulo}
-            </Eyebrow>
-            <div style={{ fontSize: 13.5, color: T.text2, lineHeight: 1.5, marginBottom: 18 }}>{esc.contexto}</div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-              <div>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 9 }}>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: accent }}>
-                    Cateto a · {esc.aNombre}
-                  </span>
-                  <span style={{ fontSize: 15, fontWeight: 900, color: accent, ...NUM }}>{a} {esc.unidad}</span>
+          <div style={{ fontSize: 14, color: T.text2, ...NUM }}>a² + b² = {c2}</div>
+          <div style={{ height: 12, borderRadius: 6, background: C_COL }} />
+          <div style={{ fontSize: 14, color: C_COL, fontWeight: 800, ...NUM }}>c² = {c2}</div>
+        </div>
+      }
+      lectura={
+        <>
+          <span style={{ color: accent, ...NUM }}>{a}²</span> + <span style={{ color: B_COL, ...NUM }}>{b}²</span> = <span style={{ color: C_COL, ...NUM }}>{c2}</span> → c = {fmtNum(c)} {esc.unidad}
+        </>
+      }
+      objetivos={objetivos}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Controles",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              <Bloque titulo={esc.titulo} icono={esc.icono}>
+                <p style={{ margin: 0, color: T.text2 }}>{esc.contexto}</p>
+                <Deslizador label={`Cateto a · ${esc.aNombre}`} colr={accent} valor={`${a} ${esc.unidad}`} min={CAT_MIN} max={CAT_MAX} step={CAT_STEP} value={a} onChange={cambiarA} />
+                <Deslizador label={`Cateto b · ${esc.bNombre}`} colr={B_COL} valor={`${b} ${esc.unidad}`} min={CAT_MIN} max={CAT_MAX} step={CAT_STEP} value={b} onChange={cambiarB} />
+              </Bloque>
+              <Bloque titulo="Las áreas ahora" icono="fa-vector-square">
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                  <Dato label="a²" value={String(a2)} col={accent} />
+                  <Dato label="b²" value={String(b2)} col={B_COL} />
+                  <Dato label="c² = a² + b²" value={String(c2)} col={C_COL} />
+                  <Dato label={`c (${esc.cNombre})`} value={`${fmtNum(c)} ${esc.unidad}`} col={terna ? C_COL : "#c8d6e6"} />
+                  <Dato label="Explorados" value={`${explorados.size}/${ESCENARIOS.length}`} col={accent} />
+                  <Dato label="Triángulo" value={terna ? "Lados enteros" : "Con decimales"} col={terna ? C_COL : "#c8d6e6"} />
                 </div>
-                <input
-                  type="range"
-                  className="ex-range"
-                  min={CAT_MIN}
-                  max={CAT_MAX}
-                  step={CAT_STEP}
-                  value={a}
-                  onChange={(e) => cambiarA(Number(e.target.value))}
-                  style={{ ["--exc" as string]: accent, ["--exfill" as string]: `${((a - CAT_MIN) / (CAT_MAX - CAT_MIN)) * 100}%` }}
-                />
-              </div>
-
-              <div>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 9 }}>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: B_COL }}>
-                    Cateto b · {esc.bNombre}
-                  </span>
-                  <span style={{ fontSize: 15, fontWeight: 900, color: B_COL, ...NUM }}>{b} {esc.unidad}</span>
-                </div>
-                <input
-                  type="range"
-                  className="ex-range"
-                  min={CAT_MIN}
-                  max={CAT_MAX}
-                  step={CAT_STEP}
-                  value={b}
-                  onChange={(e) => cambiarB(Number(e.target.value))}
-                  style={{ ["--exc" as string]: B_COL, ["--exfill" as string]: `${((b - CAT_MIN) / (CAT_MAX - CAT_MIN)) * 100}%` }}
-                />
-              </div>
-            </div>
-
-            <div style={{ display: "flex", borderRadius: 13, background: T.inset, border: `1px solid ${T.line}`, marginTop: 18 }}>
-              <Readout label="a²" value={String(a2)} col={accent} size={16} />
-              <div style={{ width: 1, background: T.line }} />
-              <Readout label="b²" value={String(b2)} col={B_COL} size={16} />
-              <div style={{ width: 1, background: T.line }} />
-              <Readout label="c² = a² + b²" value={String(c2)} col={C_COL} size={16} />
-              <div style={{ width: 1, background: T.line }} />
-              <Readout label={`c (${esc.cNombre})`} value={`${fmtNum(c)} ${esc.unidad}`} col={terna ? C_COL : "#c8d6e6"} size={15} />
-            </div>
-
-            <div style={{ marginTop: 14, borderRadius: 13, border: `1px solid ${estadoColor}55`, background: `${estadoColor}14`, padding: "12px 15px", display: "flex", gap: 12, alignItems: "center" }}>
-              <i className={`fa-solid ${terna ? "fa-star" : "fa-square-root-variable"}`} style={{ color: estadoColor, fontSize: 17 }} />
-              <div style={{ fontSize: 13.5, fontWeight: 700, color: T.text, lineHeight: 1.45 }}>
-                {terna
-                  ? `Los tres lados son enteros: ${a}, ${b} y ${fmtNum(c)} forman una terna pitagórica.`
-                  : `La hipotenusa es c = √${c2} = ${fmtNum(c)} ${esc.unidad}: no todos los triángulos rectángulos tienen lados enteros.`}
-              </div>
-            </div>
-          </div>
-
-          {/* Por qué */}
-          <div style={{ ...card, padding: "18px 22px 20px" }}>
-            <Eyebrow>Por qué funciona</Eyebrow>
-            <div style={{ fontSize: 13.5, color: T.text2, lineHeight: 1.55 }}>
-              El cuadrado dorado de la hipotenusa contiene exactamente <strong style={{ color: T.text }}>tantos cuadritos</strong> como los dos cuadrados de los catetos juntos. Cuéntalos: el área del grande (<strong style={{ color: C_COL }}>c²</strong>) es igual a la suma de las áreas de los chicos (<strong style={{ color: accent }}>a²</strong> + <strong style={{ color: B_COL }}>b²</strong>). Por eso, si conoces dos lados de un triángulo rectángulo, puedes calcular el tercero: <strong style={{ color: T.text }}>c = √(a² + b²)</strong>.
-            </div>
-            <div style={{ marginTop: 14, borderRadius: 13, border: `1px solid ${accent}44`, background: `rgba(${color.rgba},0.10)`, padding: "13px 16px", display: "flex", gap: 12, alignItems: "center" }}>
-              <i className="fa-solid fa-down-left-and-up-right-to-center" style={{ color: accent, fontSize: 18 }} />
-              <div style={{ fontSize: 14, fontWeight: 700, color: T.text, lineHeight: 1.4 }}>{esc.porque}</div>
-            </div>
-          </div>
-        </div>
-
-        {/* ── Columna controles ──────────────────────────────────── */}
-        <div style={{ ...card, padding: "22px 22px 24px" }}>
-          <Eyebrow>Elige una situación real</Eyebrow>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {ESCENARIOS.map((e) => {
-              const on = e.key === escKey;
-              const hecho = explorados.has(e.key);
-              const ce = hipotenusa(e.a, e.b);
-              return (
-                <button key={e.key} className="ex-esc" data-on={on} onClick={() => cargar(e)}>
-                  <i className={`fa-solid ${e.icono}`} style={{ fontSize: 16, width: 20, textAlign: "center", color: on ? accent : T.text3 }} />
-                  <span style={{ fontSize: 13.5, fontWeight: 700, flex: 1 }}>{e.titulo}</span>
-                  <span style={{ fontSize: 12, fontWeight: 800, color: T.text3, ...NUM }}>
-                    {e.a},{e.b}→{fmtNum(ce)}
-                  </span>
-                  {hecho && <i className="fa-solid fa-circle-check" style={{ color: OK, fontSize: 13 }} />}
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="ex-divider" />
-
-          <Eyebrow>Cómo calcular un lado</Eyebrow>
-          <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.5, display: "flex", flexDirection: "column", gap: 9 }}>
-            <div><strong style={{ color: T.text }}>1.</strong> Identifica el ángulo recto: sus dos lados son los <strong>catetos</strong> (a y b).</div>
-            <div><strong style={{ color: T.text }}>2.</strong> El lado frente al ángulo recto es la <strong>hipotenusa</strong> (c), siempre el más largo.</div>
-            <div><strong style={{ color: T.text }}>3.</strong> Eleva al cuadrado, suma y saca raíz: <strong style={{ color: T.text }}>c = √(a² + b²)</strong>.</div>
-          </div>
-
-          <div className="ex-divider" />
-
-          <Eyebrow>Marcador</Eyebrow>
-          <div style={{ display: "flex", borderRadius: 13, background: T.inset, border: `1px solid ${T.line}` }}>
-            <Readout label="Explorados" value={`${explorados.size}/${ESCENARIOS.length}`} col={accent} size={15} />
-            <div style={{ width: 1, background: T.line }} />
-            <Readout label="Triángulo" value={terna ? "Lados enteros" : "Con decimales"} col={terna ? C_COL : T.text3} size={14} />
-          </div>
-
-          <div style={{ marginTop: 14, fontSize: 12.5, color: T.text2, lineHeight: 1.5 }}>
-            <i className="fa-solid fa-circle-info" style={{ marginRight: 7, color: accent }} />
-            Una <strong style={{ color: C_COL }}>terna pitagórica</strong> (como 3-4-5 o 5-12-13) es un triángulo rectángulo con los tres lados enteros. Son raras: la mayoría dan hipotenusa con decimales.
-          </div>
-        </div>
-      </div>
-
-      {/* ── Objetivos + pista ──────────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="ex-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-            Objetivos
-          </Eyebrow>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-            {objetivos.map((o, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: logrosLab[i] ? OK : T.text2 }}>
-                <i className={`fa-solid ${logrosLab[i] ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: logrosLab[i] ? 1 : 0.3 }} />
-                <span style={{ fontWeight: logrosLab[i] ? 700 : 500 }}>{o.txt}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div style={{ borderRadius: 18, padding: "18px 20px", border: `1px solid rgba(${color.rgba},0.3)`, background: `rgba(${color.rgba},0.08)`, fontSize: 13.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 13 }}>
-          <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 17, marginTop: 1 }} />
-          <span>
-            El Teorema de Pitágoras convierte dos medidas que sí puedes tomar (los <strong style={{ color: T.text }}>catetos</strong>) en una que no siempre alcanzas a medir: la <strong style={{ color: C_COL }}>distancia en diagonal</strong>.
-          </span>
-        </div>
-      </div>
-
-      {/* ── Reto evaluable: el ejercicio verbatim del ancla A2 ────────── */}
-      <RetoNumericoCard
-        reto={RETO_A2}
-        accent={accent}
-        aprobado={ejercicioAprobado}
-        onAprobado={() => setEjercicioAprobado(true)}
-        playSfx={
-          sonido
-            ? (ok) => {
-                if (ok) audioRef.current?.correcto();
-                else audioRef.current?.incorrecto();
+                <p style={{ margin: 0, padding: "10px 12px", borderRadius: 12, border: `1px solid ${estadoColor}55`, background: `${estadoColor}14`, fontWeight: 700 }}>
+                  <i className={`fa-solid ${terna ? "fa-star" : "fa-square-root-variable"}`} style={{ color: estadoColor, marginRight: 8 }} aria-hidden />
+                  {terna
+                    ? `Los tres lados son enteros: ${a}, ${b} y ${fmtNum(c)} forman una terna pitagórica.`
+                    : `La hipotenusa es c = √${c2} = ${fmtNum(c)} ${esc.unidad}: no todos los triángulos rectángulos tienen lados enteros.`}
+                </p>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <RetoNumericoCard
+              reto={RETO_A2}
+              accent={accent}
+              aprobado={ejercicioAprobado}
+              onAprobado={() => setEjercicioAprobado(true)}
+              playSfx={
+                sonido
+                  ? (ok) => {
+                      if (ok) audioRef.current?.correcto();
+                      else audioRef.current?.incorrecto();
+                    }
+                  : undefined
               }
-            : undefined
-        }
-      />
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <div className="ex-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="ex-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="ex-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="ex-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="ex-drawer-body">
-          <FichaTeorica data={PITAGORAS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+            />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Por qué funciona" icono="fa-down-left-and-up-right-to-center">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  El cuadrado dorado de la hipotenusa contiene exactamente <strong style={{ color: T.text }}>tantos cuadritos</strong> como los dos cuadrados de los catetos juntos. Cuéntalos: el área del grande (<strong style={{ color: C_COL }}>c²</strong>) es igual a la suma de las áreas de los chicos (<strong style={{ color: accent }}>a²</strong> + <strong style={{ color: B_COL }}>b²</strong>). Por eso, si conoces dos lados de un triángulo rectángulo, puedes calcular el tercero: <strong style={{ color: T.text }}>c = √(a² + b²)</strong>.
+                </p>
+                <p style={{ margin: 0, padding: "10px 12px", borderRadius: 12, border: `1px solid ${accent}44`, background: `rgba(${color.rgba},0.10)`, fontWeight: 700 }}>{esc.porque}</p>
+              </Bloque>
+              <Bloque titulo="Cómo calcular un lado" icono="fa-list-ol">
+                <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  <li>Identifica el ángulo recto: sus dos lados son los <strong>catetos</strong> (a y b).</li>
+                  <li>El lado frente al ángulo recto es la <strong>hipotenusa</strong> (c), siempre el más largo.</li>
+                  <li>Eleva al cuadrado, suma y saca raíz: <strong style={{ color: T.text }}>c = √(a² + b²)</strong>.</li>
+                </ol>
+              </Bloque>
+              <Bloque titulo="Ternas pitagóricas" icono="fa-star">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  Una <strong style={{ color: C_COL }}>terna pitagórica</strong> (como 3-4-5 o 5-12-13) es un triángulo rectángulo con los tres lados enteros. Son raras: la mayoría dan hipotenusa con decimales. El Teorema de Pitágoras convierte dos medidas que sí puedes tomar (los catetos) en una que no siempre alcanzas a medir: la <strong style={{ color: T.text }}>distancia en diagonal</strong>.
+                </p>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={PITAGORAS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }

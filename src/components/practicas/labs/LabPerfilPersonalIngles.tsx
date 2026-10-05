@@ -45,7 +45,7 @@ import { LabSfx } from "./lab-audio";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { EscribeTermino } from "./_mecanica-termino";
 import { usePartida, MarcadorPartida } from "./_partida";
-import { TableroObjetivos } from "./_objetivos";
+import { LabShell, Bloque, BotonHerramienta, Dato } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { PERFIL_PERSONAL_FICHA } from "./perfil-personal-ingles-ficha";
@@ -73,14 +73,17 @@ import {
   type RondaToBe,
   type RanuraTipo,
 } from "./perfil-personal-ingles-data";
+import { TURNOS_MOSTRADOR, type AnimoRegistrador } from "./perfil-personal-ingles-sim";
 import { FondoTermino, VinetaTermino } from "./_vineta";
 
 const NO = "#FF5E5E";
 const RETO_KEY = "cen-perfil-personal-ingles-reto";
+const RUTA_SIM = "/media/labs-sim/perfil-personal-ingles";
 
-type Modo = "formulario" | "preguntas" | "tobe" | "tercera" | "glosario" | "texto";
+type Modo = "mostrador" | "formulario" | "preguntas" | "tobe" | "tercera" | "glosario" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
+  { id: "mostrador", label: "En el mostrador", icono: "fa-id-card" },
   { id: "formulario", label: "Llena el formulario", icono: "fa-rectangle-list" },
   { id: "preguntas", label: "Pregunta y respuesta", icono: "fa-comments" },
   { id: "tobe", label: "To be en su sitio", icono: "fa-equals" },
@@ -101,12 +104,11 @@ function BotonEscuchar({ txt, accent }: { txt: string; accent: string }) {
 
 export function LabPerfilPersonalIngles({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
-  const [modo, setModo] = useState<Modo>("formulario");
+  const [modo, setModo] = useState<Modo>("mostrador");
 
   // ── sonido y partida ──────────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   useEffect(() => () => audioRef.current?.dispose(), []);
   // `callarLab()` ya se traga sus propios fallos: no hace falta envolverlo.
@@ -338,8 +340,46 @@ export function LabPerfilPersonalIngles({ color }: PracticaLabProps) {
   // ── reto evaluable (A4) ───────────────────────────────────────────────
   const [quizAprobado, setQuizAprobado] = useState(false);
 
+  // ── modo 0: en el mostrador (simulador) ───────────────────────────────
+  const [mIdx, setMIdx] = useState(0);
+  const [mProbados, setMProbados] = useState<Record<string, number[]>>({});
+  const [mOk, setMOk] = useState<Record<string, number>>({});
+  const turnoM = TURNOS_MOSTRADOR[mIdx] ?? TURNOS_MOSTRADOR[0]!;
+  const mCorrectos = Object.keys(mOk).length;
+  const mDone = mCorrectos >= TURNOS_MOSTRADOR.length;
+  const mALaPrimera = TURNOS_MOSTRADOR.filter((t) => mOk[t.id] !== undefined && (mProbados[t.id]?.length ?? 0) === 1).length;
+  const mFalloVisto = TURNOS_MOSTRADOR.some((t) => (mProbados[t.id] ?? []).some((i) => !t.opciones[i]!.ok));
+
+  const elegirMostrador = (i: number) => {
+    const op = turnoM.opciones[i];
+    if (!op || mOk[turnoM.id] !== undefined) return;
+    if ((mProbados[turnoM.id] ?? []).includes(i)) return;
+    setMProbados((prev) => ({ ...prev, [turnoM.id]: [...(prev[turnoM.id] ?? []), i] }));
+    if (op.ok) {
+      const siguiente = { ...mOk, [turnoM.id]: i };
+      setMOk(siguiente);
+      sfxPlace();
+      if (Object.keys(siguiente).length >= TURNOS_MOSTRADOR.length) sfxOk();
+    } else {
+      sfxNo();
+    }
+  };
+  const irMostrador = (i: number) => {
+    const n = TURNOS_MOSTRADOR.length;
+    setMIdx(((i % n) + n) % n);
+  };
+  const resetMostrador = () => {
+    setMIdx(0);
+    setMProbados({});
+    setMOk({});
+    setPie(null);
+  };
+
   // ── objetivos de la sesión ────────────────────────────────────────────
   const objetivos = [
+    { txt: "En el mostrador, equivócate a propósito una vez y mira qué teclea el registrador", done: mFalloVisto },
+    { txt: "Atiende los 6 turnos del mostrador hasta dejar la ficha correcta", done: mDone },
+    { txt: "Deja la ficha con al menos 5 de 6 campos a la primera", done: mALaPrimera >= 5 },
     { txt: "Coloca los 8 datos en su campo del formulario", done: formDone },
     { txt: "Separa Nationality (Mexican) de Country (Mexico)", done: natPaisDone },
     { txt: "Contesta las 8 rondas de «Pregunta y respuesta»", done: preguntasDone },
@@ -354,7 +394,9 @@ export function LabPerfilPersonalIngles({ color }: PracticaLabProps) {
   ];
 
   const resetActual =
-    modo === "formulario"
+    modo === "mostrador"
+      ? resetMostrador
+      : modo === "formulario"
       ? resetFormulario
       : modo === "preguntas"
         ? resetPreguntas
@@ -416,178 +458,127 @@ export function LabPerfilPersonalIngles({ color }: PracticaLabProps) {
     },
   });
 
+  const pieExplicacion = (
+    <div
+      role="status"
+      aria-live="polite"
+      style={{
+        borderRadius: 14,
+        border: `1px solid ${pie ? (pie.ok ? `${OK}55` : `${NO}55`) : T.line}`,
+        background: pie ? (pie.ok ? `${OK}12` : `${NO}12`) : T.glass,
+        padding: "13px 16px",
+        fontSize: 14,
+        lineHeight: 1.55,
+        color: T.text2,
+        display: "flex",
+        gap: 12,
+        alignItems: "flex-start",
+        transition: "all .2s",
+      }}
+    >
+      <i
+        className={`fa-solid ${pie ? (pie.ok ? "fa-circle-check" : "fa-circle-exclamation") : "fa-comment-dots"}`}
+        style={{ color: pie ? (pie.ok ? OK : NO) : T.text3, fontSize: 15, marginTop: 2 }}
+      />
+      <span>
+        {pie ? pie.txt : "Aquí aparece el porqué de cada decisión: qué campo, qué pregunta o qué regla del verbo to be se te escapó."}
+      </span>
+    </div>
+  );
+
+  const pista =
+    modo === "mostrador" ? (
+      <>
+        El registrador teclea <strong style={{ color: T.text }}>lo que entiende</strong>, no lo que quisiste decir. Equivócate a
+        propósito una vez y mira la ficha: así se ve el costo de un «I have 17 years» o de contestar otra pregunta.
+      </>
+    ) : modo === "formulario" ? (
+      <>
+        <strong style={{ color: T.text }}>First name</strong> es el nombre de pila y <strong style={{ color: T.text }}>Last name</strong>{" "}
+        el apellido: en inglés van en ese orden.
+      </>
+    ) : modo === "preguntas" ? (
+      <>
+        Las cuatro opciones son inglés correcto; <strong style={{ color: T.text }}>tres contestan otra pregunta</strong>. Lee la
+        pregunta dos veces.
+      </>
+    ) : modo === "tobe" ? (
+      <>
+        El verbo <strong style={{ color: T.text }}>cambia con el sujeto</strong> (I am, he/she is, you/we/they are) y en la pregunta{" "}
+        <strong style={{ color: T.text }}>se adelanta al sujeto</strong>.
+      </>
+    ) : modo === "tercera" ? (
+      <>
+        <strong style={{ color: T.text }}>He / She</strong> son el sujeto; <strong style={{ color: T.text }}>His / Her</strong> son «su».
+        Cambia de personaje: todo lo que dependía de él o de ella cambia contigo.
+      </>
+    ) : modo === "glosario" ? (
+      <>Recordar la etiqueta enseña más que reconocerla. Si te atoras, usa la pista o abre el banco de términos.</>
+    ) : (
+      <>
+        Lee la ficha completa antes de escribir: el contexto decide la palabra. <strong style={{ color: T.text }}>Enter</strong> comprueba
+        cada hueco.
+      </>
+    );
+
+  const lectura =
+    modo === "mostrador" ? (
+      <>
+        Turno {Math.min(mIdx + 1, TURNOS_MOSTRADOR.length)}/{TURNOS_MOSTRADOR.length} · ficha correcta: {mCorrectos}/
+        {TURNOS_MOSTRADOR.length}
+      </>
+    ) : modo === "formulario" ? (
+      <>
+        Campos colocados: {Object.keys(asignado).length}/{CAMPOS_FORMULARIO.length}
+      </>
+    ) : modo === "preguntas" ? (
+      <>
+        Rondas resueltas: {Object.keys(qOk).length}/{RONDAS_PREGUNTA.length}
+      </>
+    ) : modo === "tobe" ? (
+      <>
+        Oraciones armadas: {RONDAS_TOBE.filter((r) => tbListo(r)).length}/{RONDAS_TOBE.length}
+      </>
+    ) : modo === "tercera" ? (
+      <>Presenta a {personaje.firstName} en tercera persona</>
+    ) : (
+      <>Repaso de la ficha de inscripción</>
+    );
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes prfShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
-        .prf-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 16px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .prf-tab:hover { border-color:${T.lineStrong}; color:#fff; }
-        .prf-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-        .prf-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
-          font-size:14px; border:1px solid ${T.line}; background:${T.glass}; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .prf-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
-        .prf-icobtn:hover { background:rgba(255,255,255,0.12); }
-
-        .prf-card { border-radius:16px; border:1.5px solid ${T.line}; background:${T.glass}; padding:16px 18px; transition:all .16s; }
-        .prf-card[data-done="true"] { border-color:${OK}66; }
-
-        /* Fichas de dato del formulario */
-        .prf-chip { cursor:grab; display:inline-flex; align-items:center; gap:9px; padding:9px 14px; border-radius:11px;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:13.5px; font-weight:700;
-          transition:all .14s; user-select:none; font-family:inherit; }
-        .prf-chip:hover:not(:disabled) { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); transform:translateY(-2px); }
-        .prf-chip[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.22); box-shadow:0 0 16px -5px ${accent}; transform:translateY(-3px); }
-        .prf-chip:disabled { opacity:.32; cursor:default; }
-        .prf-chip:active:not(:disabled) { cursor:grabbing; }
-
-        /* Campo del formulario */
-        .prf-campo { border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:11px 14px;
-          display:flex; flex-direction:column; gap:7px; transition:all .16s; }
-        .prf-campo[data-armed="true"] { border-color:${accent}; background:rgba(${color.rgba},0.09); cursor:pointer; }
-        .prf-campo[data-shake="true"] { animation:prfShake .4s; border-color:${NO}; }
-        .prf-campo[data-ok="true"] { border-color:${OK}66; background:${OK}10; }
-        .prf-slot { min-height:38px; border-radius:9px; border:1.5px dashed ${T.lineStrong}; background:${T.inset};
-          display:flex; align-items:center; padding:0 12px; font-size:13.5px; font-weight:700; color:${T.text3}; }
-        .prf-slot[data-ok="true"] { border-style:solid; border-color:${OK}; color:#fff; background:${OK}14; }
-
-        /* Opciones (respuestas, piezas, palabras) */
-        .prf-op { cursor:pointer; display:flex; align-items:flex-start; gap:11px; width:100%; text-align:left; border-radius:12px;
-          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:600; padding:11px 14px;
-          line-height:1.45; transition:all .14s; font-family:inherit; }
-        .prf-op:hover:not(:disabled) { border-color:${T.lineStrong}; color:#fff; }
-        .prf-op:disabled { cursor:default; }
-        .prf-op[data-ok="true"] { border-color:${OK}; background:${OK}1c; color:#fff; }
-        .prf-op[data-bad="true"] { border-color:${NO}; background:${NO}16; }
-
-        /* Piezas del constructor de oraciones */
-        .prf-pieza { cursor:pointer; border-radius:10px; border:1.5px solid ${T.lineStrong}; background:${T.glassSoft};
-          color:#fff; font-size:15px; font-weight:800; padding:9px 15px; transition:all .14s; font-family:inherit; }
-        .prf-pieza:hover:not(:disabled) { border-color:${accent}; background:rgba(${color.rgba},0.18); transform:translateY(-2px); }
-        .prf-pieza:disabled { opacity:.3; cursor:default; }
-        .prf-pieza[data-shake="true"] { animation:prfShake .4s; border-color:${NO}; background:${NO}18; }
-
-        .prf-linea { border-radius:13px; border:1.5px dashed ${T.lineStrong}; background:${T.inset}; min-height:56px;
-          padding:10px 14px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; transition:all .16s; }
-        .prf-linea[data-ok="true"] { border-style:solid; border-color:${OK}; background:${OK}10; }
-        .prf-palabra { font-size:16px; font-weight:800; color:#fff; }
-
-        /* Ranuras de la tercera persona */
-        .prf-ranura { display:inline-flex; align-items:center; gap:6px; border-radius:9px; border:1.5px dashed ${T.lineStrong};
-          background:${T.inset}; padding:2px 9px; font-size:15px; font-weight:800; color:${T.text3}; transition:all .16s; }
-        .prf-ranura[data-ok="true"] { border-style:solid; border-color:${OK}; color:${OK}; background:${OK}14; }
-        .prf-ranura[data-shake="true"] { animation:prfShake .4s; border-color:${NO}; }
-
-        .prf-mini { cursor:pointer; padding:7px 13px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass};
-          color:${T.text2}; font-size:12.5px; font-weight:800; transition:all .14s; font-family:inherit; }
-        .prf-mini:hover:not(:disabled) { border-color:${T.lineStrong}; color:#fff; }
-        .prf-mini:disabled { opacity:.45; cursor:not-allowed; }
-        .prf-mini[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; }
-        .prf-mini[data-done="true"] { color:${OK}; border-color:${OK}66; }
-
-        .prf-vf { cursor:pointer; padding:8px 16px; border-radius:10px; border:1.5px solid ${T.line}; background:${T.glass};
-          color:${T.text2}; font-size:12.5px; font-weight:800; transition:all .14s; font-family:inherit; }
-        .prf-vf:hover:not(:disabled) { border-color:${T.lineStrong}; color:#fff; }
-        .prf-vf:disabled { cursor:default; opacity:.85; }
-        .prf-vf[data-on="true"] { border-color:${OK}; background:${OK}1f; color:#fff; }
-        .prf-vf[data-bad="true"] { border-color:${NO}; background:${NO}1f; color:#fff; }
-
-        .prf-side { position:sticky; top:10px; }
-        .prf-apoyo { display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:16px; align-items:start; margin-top:18px; }
-        @media (max-width: 900px){
-          .prf-grid { grid-template-columns:minmax(0,1fr) !important; }
-          .prf-side { position:static; }
-          .prf-tab { padding:9px 12px; font-size:12.5px; gap:7px; }
-        }
-
-        /* Cajón de teoría */
-        .prf-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .prf-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .prf-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .prf-drawer[data-open="true"] { transform:translateX(0); }
-        .prf-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .prf-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .prf-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .prf-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .prf-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .prf-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .prf-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
-
-        /* Identidad del tablero: cada tarjeta lleva su franja de color */
-        .prf-campo, .prf-card { --tono:196; position:relative;
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.10) 0%, transparent 62%); }
-        .prf-campo:nth-of-type(6n+1), .prf-card:nth-of-type(6n+1) { --tono:196; }
-        .prf-campo:nth-of-type(6n+2), .prf-card:nth-of-type(6n+2) { --tono:268; }
-        .prf-campo:nth-of-type(6n+3), .prf-card:nth-of-type(6n+3) { --tono:42; }
-        .prf-campo:nth-of-type(6n+4), .prf-card:nth-of-type(6n+4) { --tono:150; }
-        .prf-campo:nth-of-type(6n+5), .prf-card:nth-of-type(6n+5) { --tono:328; }
-        .prf-campo:nth-of-type(6n+6), .prf-card:nth-of-type(6n+6) { --tono:16; }
-        .prf-campo::before, .prf-card::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
-          background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
-
-        @media (prefers-reduced-motion: reduce){
-          .prf-campo[data-shake="true"], .prf-pieza[data-shake="true"], .prf-ranura[data-shake="true"] { animation:none; }
-          .prf-chip, .prf-chip:hover, .prf-chip[data-sel="true"], .prf-pieza:hover { transform:none; transition:none; }
-        }
-      `}</style>
-
-      {/* ── Barra de modos y herramientas ─────────────────────────────── */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="prf-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-      </div>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 10, flexWrap: "wrap", marginBottom: 16 }}>
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="prf-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="prf-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="prf-icobtn" onClick={resetActual} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
-
-      {/* ── Cajón de teoría ───────────────────────────────────────────── */}
-      <button className="prf-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="prf-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="prf-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="prf-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="prf-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="prf-drawer-body">
-          <FichaTeorica data={PERFIL_PERSONAL_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div
-        className="prf-grid"
-        style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}
-      >
-        {/* ── Columna principal ───────────────────────────────────────── */}
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      dom
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })),
+        valor: modo,
+        cambiar: (id) => setModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={resetActual} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      escena={
         <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
+          <style>{css(accent, color.rgba)}</style>
+
+          {modo === "mostrador" && (
+            <MostradorPanel
+              accent={accent}
+              indice={mIdx}
+              probados={mProbados}
+              resueltos={mOk}
+              onElegir={elegirMostrador}
+              onIr={irMostrador}
+            />
+          )}
+
           {modo === "formulario" && (
             <FormularioPanel
               accent={accent}
@@ -683,192 +674,360 @@ export function LabPerfilPersonalIngles({ color }: PracticaLabProps) {
             />
           )}
 
-          {/* Pie: la última explicación, siempre a la vista */}
-          <div
-            role="status"
-            aria-live="polite"
-            style={{
-              borderRadius: 14,
-              border: `1px solid ${pie ? (pie.ok ? `${OK}55` : `${NO}55`) : T.line}`,
-              background: pie ? (pie.ok ? `${OK}12` : `${NO}12`) : T.glass,
-              padding: "13px 16px",
-              fontSize: 13,
-              lineHeight: 1.55,
-              color: T.text2,
-              display: "flex",
-              gap: 12,
-              alignItems: "flex-start",
-              transition: "all .2s",
-            }}
-          >
-            <i
-              className={`fa-solid ${pie ? (pie.ok ? "fa-circle-check" : "fa-circle-exclamation") : "fa-comment-dots"}`}
-              style={{ color: pie ? (pie.ok ? OK : NO) : T.text3, fontSize: 15, marginTop: 2 }}
-            />
-            <span>
-              {pie
-                ? pie.txt
-                : "Aquí aparece la explicación de cada decisión: por qué ese dato va en ese campo, a qué pregunta contesta en realidad la respuesta que elegiste y qué regla del verbo to be se te escapó."}
-            </span>
-          </div>
+          {modo !== "mostrador" && pieExplicacion}
         </div>
+      }
+      pestanas={[
+        {
+          id: "cuaderno",
+          etiqueta: "Cuaderno",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Tu partida" icono="fa-star">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8 }}>
+                  <Dato label="Mostrador" value={`${mCorrectos}/${TURNOS_MOSTRADOR.length}`} col={mDone ? OK : undefined} />
+                  <Dato label="A la primera" value={`${mALaPrimera}/${TURNOS_MOSTRADOR.length}`} />
+                  <Dato label="Formulario" value={`${Object.keys(asignado).length}/${CAMPOS_FORMULARIO.length}`} col={formDone ? OK : undefined} />
+                  <Dato label="Preguntas" value={`${Object.keys(qOk).length}/${RONDAS_PREGUNTA.length}`} col={preguntasDone ? OK : undefined} />
+                </div>
+              </Bloque>
+              <Bloque titulo="Pista de este modo" icono="fa-lightbulb">
+                <p style={{ margin: 0, color: T.text2 }}>{pista}</p>
+              </Bloque>
+              <Bloque titulo="Tus datos no se escriben aquí" icono="fa-shield-halved">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  Todo el laboratorio trabaja sobre personajes ficticios. Saber llenar un formulario en inglés incluye saber cuándo
+                  no llenarlo: teléfono, domicilio y fecha de nacimiento no se dan a cualquier sitio (criterio de A7).
+                </p>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <>
+              <HechosCard accent={accent} respuestas={hechos} onResponder={responderHecho} />
+              <RetoQuizCard
+                quiz={RETO_QUIZ}
+                accent={accent}
+                rgba={color.rgba}
+                aprobado={quizAprobado}
+                onAprobado={() => setQuizAprobado(true)}
+                playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined}
+                mensajeAprobado="Ya puedes dar y pedir información personal en inglés sin confundir los campos."
+              />
+            </>
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book",
+          contenido: (
+            <>
+              <Bloque titulo="La tarea que viene · A3" icono="fa-pen-nib">
+                <p style={{ margin: 0, color: T.text2 }}>{CONSIGNA_A3.prompt}</p>
+                {CONSIGNA_A3.pistas.map((p, i) => (
+                  <p key={i} style={{ margin: 0, color: T.text2 }}>
+                    <i className="fa-solid fa-angle-right" style={{ color: accent, marginRight: 8 }} />
+                    {p}
+                  </p>
+                ))}
+              </Bloque>
+              <Bloque titulo="Lectura A1 · para pensar" icono="fa-book-open-reader">
+                {COMPRENSION_A1.map((c, i) => (
+                  <details key={i} style={{ borderRadius: 11, border: `1px solid ${T.line}`, background: T.inset, padding: "10px 13px" }}>
+                    <summary style={{ cursor: "pointer", fontWeight: 700, color: T.text2, lineHeight: 1.45 }}>{c.pregunta}</summary>
+                    <p style={{ margin: "9px 0 0", color: T.text3 }}>{c.guia}</p>
+                  </details>
+                ))}
+              </Bloque>
+              <Bloque titulo="Qué es verbatim" icono="fa-quote-right">
+                <p style={{ margin: 0, color: T.text3 }}>
+                  <strong style={{ color: T.text2 }}>Verbatim de IN-I-P04:</strong> la lectura A1 «About me» con sus preguntas, el texto con
+                  huecos (A2), la consigna de A3, el reto de cinco reactivos (A4), los cuatro enunciados verdadero/falso (A5) y el glosario
+                  (A6). <strong style={{ color: T.text2 }}>Escrito para este laboratorio:</strong> las fichas de Sofía Ramírez Torres y
+                  Mateo Herrera Solís, el mostrador, las rondas de pregunta y respuesta, las transformaciones de to be y las oraciones
+                  de tercera persona. Personas, domicilios, teléfonos y correos son <strong style={{ color: T.text2 }}>ficticios</strong>;
+                  Ana García y sus datos son los de la actividad A2. Inglés estadounidense estándar.
+                </p>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={PERFIL_PERSONAL_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
+  );
+}
 
-        {/* ── Columna lateral ─────────────────────────────────────────── */}
-        <div className="prf-side" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos de la sesión
-            </Eyebrow>
-            <TableroObjetivos objetivos={objetivos} retoKey={RETO_KEY} accent={accent} />
-          </div>
-
-          <div
-            style={{
-              borderRadius: 18,
-              padding: "16px 18px",
-              border: `1px solid rgba(${color.rgba},0.3)`,
-              background: `rgba(${color.rgba},0.08)`,
-              fontSize: 13,
-              color: T.text2,
-              lineHeight: 1.55,
-              display: "flex",
-              gap: 12,
-            }}
-          >
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              {modo === "formulario" && (
-                <>
-                  Antes de soltar un dato, léele la etiqueta al campo: <strong style={{ color: T.text }}>First name</strong> pide el
-                  nombre de pila y <strong style={{ color: T.text }}>Last name</strong> el apellido. En inglés van en ese orden, al
-                  revés de como los decimos en español.
-                </>
-              )}
-              {modo === "preguntas" && (
-                <>
-                  Las cuatro opciones son inglés correcto. La trampa no es la gramática: es que{" "}
-                  <strong style={{ color: T.text }}>tres de ellas contestan otra pregunta</strong>. Lee la pregunta dos veces antes
-                  de elegir.
-                </>
-              )}
-              {modo === "tobe" && (
-                <>
-                  Dos reglas y ya está: el verbo <strong style={{ color: T.text }}>cambia con el sujeto</strong> (I am, he/she is,
-                  you/we/they are) y en la pregunta{" "}
-                  <strong style={{ color: T.text }}>se adelanta al sujeto</strong> (You are… → Are you…?). Con to be nunca se usa
-                  do o don&apos;t.
-                </>
-              )}
-              {modo === "tercera" && (
-                <>
-                  <strong style={{ color: T.text }}>He / She</strong> son el sujeto; <strong style={{ color: T.text }}>His / Her</strong>{" "}
-                  son «su». Por eso se dice «His name is Mateo» y nunca «He name is». Cambia de personaje arriba: todo lo que
-                  dependía de él o de ella tiene que cambiar contigo.
-                </>
-              )}
-              {modo === "glosario" && (
-                <>
-                  Recordar la etiqueta es más difícil —y enseña más— que reconocerla entre opciones. Si te atoras, usa la pista o
-                  abre el <strong style={{ color: T.text }}>banco de términos</strong>.
-                </>
-              )}
-              {modo === "texto" && (
-                <>
-                  Lee la ficha completa antes de escribir: el contexto decide la palabra. Pulsa{" "}
-                  <strong style={{ color: T.text }}>Enter</strong> para comprobar cada hueco.
-                </>
-              )}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Banda de consulta, a todo lo ancho ─────────────────────────── */}
-      <div className="prf-apoyo">
-        <div style={{ ...card, padding: "18px 20px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-pen-nib" style={{ marginRight: 8, color: accent }} />
-            La tarea que viene · A3
-          </Eyebrow>
-          <p style={{ margin: "0 0 12px", fontSize: 12.5, color: T.text2, lineHeight: 1.6 }}>{CONSIGNA_A3.prompt}</p>
-          <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-            {CONSIGNA_A3.pistas.map((p, i) => (
-              <div key={i} style={{ display: "flex", gap: 9, fontSize: 12, color: T.text3, lineHeight: 1.45 }}>
-                <i className="fa-solid fa-angle-right" style={{ color: accent, marginTop: 3, fontSize: 10 }} />
-                <span>{p}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div style={{ ...card, padding: "18px 20px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-book-open-reader" style={{ marginRight: 8, color: accent }} />
-            Lectura A1 · para pensar
-          </Eyebrow>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {COMPRENSION_A1.map((c, i) => (
-              <details key={i} style={{ borderRadius: 11, border: `1px solid ${T.line}`, background: T.inset, padding: "10px 13px" }}>
-                <summary style={{ cursor: "pointer", fontSize: 13, fontWeight: 700, color: T.text2, lineHeight: 1.45 }}>
-                  {c.pregunta}
-                </summary>
-                <p style={{ margin: "9px 0 0", fontSize: 12.5, color: T.text3, lineHeight: 1.5 }}>{c.guia}</p>
-              </details>
-            ))}
-          </div>
-        </div>
-
-        <div
-          style={{
-            borderRadius: 18,
-            padding: "16px 18px",
-            border: `1px solid ${T.line}`,
-            background: T.glass,
-            fontSize: 12.5,
-            color: T.text2,
-            lineHeight: 1.55,
-            display: "flex",
-            gap: 12,
-          }}
-        >
-          <i className="fa-solid fa-shield-halved" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-          <span>
-            <strong style={{ color: T.text }}>Tus datos no se escriben aquí.</strong> Todo este laboratorio trabaja sobre personajes
-            ficticios. Saber llenar un formulario en inglés incluye saber cuándo no llenarlo: el teléfono, el domicilio y la fecha
-            de nacimiento son datos que no se dan a cualquier sitio. Es el último criterio de la autoevaluación A7.
-          </span>
-        </div>
-      </div>
-
-      <HechosCard accent={accent} respuestas={hechos} onResponder={responderHecho} />
-
-      <RetoQuizCard
-        quiz={RETO_QUIZ}
-        accent={accent}
-        rgba={color.rgba}
-        aprobado={quizAprobado}
-        onAprobado={() => setQuizAprobado(true)}
-        playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined}
-        mensajeAprobado="Ya puedes dar y pedir información personal en inglés sin confundir los campos."
-      />
-
-      {/* Nota al pie: qué es verbatim y qué es de este laboratorio */}
-      <p style={{ margin: "20px 2px 0", fontSize: 11.5, lineHeight: 1.6, color: T.text3 }}>
-        <i className="fa-solid fa-quote-right" style={{ marginRight: 7, opacity: 0.7 }} />
-        <strong style={{ color: T.text2 }}>Verbatim de la progresión IN-I-P04:</strong> la lectura A1 «About me» con sus preguntas
-        de comprensión, el texto con huecos y sus pistas (A2), la consigna y las pistas de la reflexión escrita (A3), el reto
-        evaluable de cinco reactivos con su retroalimentación (A4), los cuatro enunciados verdadero/falso (A5) y el glosario con su
-        actividad final (A6).{" "}
-        <strong style={{ color: T.text2 }}>Escrito para este laboratorio:</strong> las fichas de Sofía Ramírez Torres y Mateo
-        Herrera Solís, las ocho rondas de «Pregunta y respuesta», las seis transformaciones del verbo to be y las cinco oraciones
-        de tercera persona. Las personas, los domicilios, los teléfonos y los correos son{" "}
-        <strong style={{ color: T.text2 }}>ficticios</strong> y no corresponden a nadie real; Ana García, su teléfono y su domicilio
-        son los que la propia actividad A2 trae. El inglés de todas las oraciones es inglés estadounidense estándar.
-      </p>
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Imagen de escena: gradiente + icono detrás, la foto encima si existe
+ * ═══════════════════════════════════════════════════════════════════════════ */
+function EscenaImg({ clave, icono }: { clave: string; icono: string }) {
+  const [fallo, setFallo] = useState(false);
+  return (
+    <div className="prf-img" aria-hidden>
+      <i className={`fa-solid ${icono}`} />
+      {!fallo && (
+        <img src={`${RUTA_SIM}/${clave}.webp`} alt="" loading="lazy" onError={() => setFallo(true)} />
+      )}
     </div>
   );
 }
+
+const ANIMO_ICONO: Record<AnimoRegistrador, { icono: string; col: string }> = {
+  feliz: { icono: "fa-face-smile", col: OK },
+  duda: { icono: "fa-face-meh", col: "#FFC75A" },
+  confuso: { icono: "fa-face-frown-open", col: NO },
+};
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Modo 0 — En el mostrador (simulador: la ficha refleja lo que dices)
+ * ═══════════════════════════════════════════════════════════════════════════ */
+function MostradorPanel({
+  accent,
+  indice,
+  probados,
+  resueltos,
+  onElegir,
+  onIr,
+}: {
+  accent: string;
+  indice: number;
+  probados: Record<string, number[]>;
+  resueltos: Record<string, number>;
+  onElegir: (i: number) => void;
+  onIr: (i: number) => void;
+}) {
+  const turno = TURNOS_MOSTRADOR[indice] ?? TURNOS_MOSTRADOR[0]!;
+  const intentos = probados[turno.id] ?? [];
+  const resuelto = resueltos[turno.id] !== undefined;
+  const ultimo = intentos.length > 0 ? turno.opciones[intentos[intentos.length - 1]!] : undefined;
+  const hechos = TURNOS_MOSTRADOR.filter((t) => resueltos[t.id] !== undefined).length;
+  const todos = hechos >= TURNOS_MOSTRADOR.length;
+  const animo = ultimo ? ANIMO_ICONO[ultimo.animo] : { icono: "fa-user-tie", col: accent };
+
+  return (
+    <>
+      <div className="prf-card" data-done={resuelto} style={{ padding: "16px 18px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
+          <Eyebrow>
+            Mostrador de inscripción · turno {indice + 1} de {TURNOS_MOSTRADOR.length}
+          </Eyebrow>
+          <span style={{ fontSize: 14, fontWeight: 800, color: todos ? OK : T.text3, ...NUM }}>
+            {hechos}/{TURNOS_MOSTRADOR.length}
+          </span>
+        </div>
+
+        <EscenaImg clave={turno.imagen} icono="fa-building-columns" />
+
+        <div className="prf-habla">
+          <span className="prf-cara" style={{ color: animo.col, borderColor: animo.col }}>
+            <i className={`fa-solid ${animo.icono}`} />
+          </span>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div style={{ fontSize: 14, fontWeight: 800, color: T.text3 }}>Mr. Hale, registrador</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+              <p style={{ margin: 0, fontSize: 19, lineHeight: 1.4, color: "#fff", fontWeight: 800 }}>{turno.pregunta}</p>
+              <BotonEscuchar txt={turno.pregunta} accent={accent} />
+            </div>
+            <p style={{ margin: "5px 0 0", fontSize: 14, color: T.text3 }}>{turno.traduccion}</p>
+          </div>
+        </div>
+
+        {ultimo && (
+          <div className="prf-reac" data-ok={ultimo.ok}>
+            <strong style={{ color: ultimo.ok ? OK : NO }}>«{ultimo.reaccion}»</strong> {ultimo.porque}
+          </div>
+        )}
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <Eyebrow>Sofía responde: elige qué dice</Eyebrow>
+        {turno.opciones.map((op, i) => {
+          const probada = intentos.includes(i);
+          const buena = resuelto && resueltos[turno.id] === i;
+          const mala = probada && !op.ok;
+          return (
+            <button
+              key={op.texto}
+              type="button"
+              className="prf-op"
+              data-ok={buena}
+              data-bad={mala}
+              disabled={resuelto || probada}
+              onClick={() => onElegir(i)}
+            >
+              <i
+                className={`fa-solid ${buena ? "fa-circle-check" : mala ? "fa-circle-xmark" : "fa-comment"}`}
+                style={{ fontSize: 14, marginTop: 3, color: buena ? OK : mala ? NO : T.text3, opacity: buena || mala ? 1 : 0.5 }}
+              />
+              <span style={{ flex: 1 }}>{op.texto}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="prf-card" style={{ padding: "16px 18px" }}>
+        <Eyebrow>Application form · lo que teclea el registrador</Eyebrow>
+        <div className="prf-ficha">
+          {TURNOS_MOSTRADOR.map((t) => {
+            const ok = resueltos[t.id];
+            const ints = probados[t.id] ?? [];
+            const op = ok !== undefined ? t.opciones[ok] : ints.length > 0 ? t.opciones[ints[ints.length - 1]!] : undefined;
+            const estado = ok !== undefined ? "ok" : op ? "mal" : "vacio";
+            return (
+              <div key={t.id} className="prf-fila" data-estado={estado}>
+                <span>{t.campo}</span>
+                <strong>{op ? op.escrito : "—"}</strong>
+              </div>
+            );
+          })}
+        </div>
+        <p style={{ margin: "10px 0 0", fontSize: 14, color: todos ? OK : T.text3, fontWeight: 700 }}>
+          {todos
+            ? `Ficha aceptada: ${TURNOS_MOSTRADOR.filter((t) => (probados[t.id]?.length ?? 0) === 1).length} de ${TURNOS_MOSTRADOR.length} campos a la primera. Simulación con datos inventados.`
+            : "Rojo = el registrador entendió otra cosa. Verde = dato correcto. Simulación con datos inventados."}
+        </p>
+      </div>
+
+      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+        <button className="prf-mini" onClick={() => onIr(indice - 1)} title="Turno anterior">
+          <i className="fa-solid fa-angle-left" style={{ marginRight: 7 }} />
+          Anterior
+        </button>
+        {TURNOS_MOSTRADOR.map((t, i) => (
+          <button
+            key={t.id}
+            className="prf-mini"
+            data-on={i === indice}
+            data-done={resueltos[t.id] !== undefined}
+            onClick={() => onIr(i)}
+            title={t.campo}
+            style={{ minWidth: 40 }}
+          >
+            {resueltos[t.id] !== undefined ? <i className="fa-solid fa-check" /> : i + 1}
+          </button>
+        ))}
+        <button className="prf-mini" onClick={() => onIr(indice + 1)} title="Siguiente turno">
+          Siguiente
+          <i className="fa-solid fa-angle-right" style={{ marginLeft: 7 }} />
+        </button>
+      </div>
+    </>
+  );
+}
+
+const css = (accent: string, rgba: string) => `
+        @keyframes prfShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
+        .prf-card { border-radius:16px; border:1.5px solid ${T.line}; background:${T.glass}; padding:16px 18px; transition:all .16s; }
+        .prf-card[data-done="true"] { border-color:${OK}66; }
+
+        /* Fichas de dato del formulario */
+        .prf-chip { cursor:grab; display:inline-flex; align-items:center; gap:9px; padding:9px 14px; border-radius:11px;
+          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:14px; font-weight:700;
+          transition:all .14s; user-select:none; font-family:inherit; }
+        .prf-chip:hover:not(:disabled) { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); transform:translateY(-2px); }
+        .prf-chip[data-sel="true"] { border-color:${accent}; background:rgba(${rgba},0.22); box-shadow:0 0 16px -5px ${accent}; transform:translateY(-3px); }
+        .prf-chip:disabled { opacity:.32; cursor:default; }
+        .prf-chip:active:not(:disabled) { cursor:grabbing; }
+
+        /* Campo del formulario */
+        .prf-campo { border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:11px 14px;
+          display:flex; flex-direction:column; gap:7px; transition:all .16s; }
+        .prf-campo[data-armed="true"] { border-color:${accent}; background:rgba(${rgba},0.09); cursor:pointer; }
+        .prf-campo[data-shake="true"] { animation:prfShake .4s; border-color:${NO}; }
+        .prf-campo[data-ok="true"] { border-color:${OK}66; background:${OK}10; }
+        .prf-slot { min-height:38px; border-radius:9px; border:1.5px dashed ${T.lineStrong}; background:${T.inset};
+          display:flex; align-items:center; padding:0 12px; font-size:14px; font-weight:700; color:${T.text3}; }
+        .prf-slot[data-ok="true"] { border-style:solid; border-color:${OK}; color:#fff; background:${OK}14; }
+
+        /* Opciones (respuestas, piezas, palabras) */
+        .prf-op { cursor:pointer; display:flex; align-items:flex-start; gap:11px; width:100%; text-align:left; border-radius:12px;
+          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:600; padding:11px 14px;
+          line-height:1.45; transition:all .14s; font-family:inherit; }
+        .prf-op:hover:not(:disabled) { border-color:${T.lineStrong}; color:#fff; }
+        .prf-op:disabled { cursor:default; }
+        .prf-op[data-ok="true"] { border-color:${OK}; background:${OK}1c; color:#fff; }
+        .prf-op[data-bad="true"] { border-color:${NO}; background:${NO}16; }
+
+        /* Piezas del constructor de oraciones */
+        .prf-pieza { cursor:pointer; border-radius:10px; border:1.5px solid ${T.lineStrong}; background:${T.glassSoft};
+          color:#fff; font-size:15px; font-weight:800; padding:9px 15px; transition:all .14s; font-family:inherit; }
+        .prf-pieza:hover:not(:disabled) { border-color:${accent}; background:rgba(${rgba},0.18); transform:translateY(-2px); }
+        .prf-pieza:disabled { opacity:.3; cursor:default; }
+        .prf-pieza[data-shake="true"] { animation:prfShake .4s; border-color:${NO}; background:${NO}18; }
+
+        .prf-linea { border-radius:13px; border:1.5px dashed ${T.lineStrong}; background:${T.inset}; min-height:56px;
+          padding:10px 14px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; transition:all .16s; }
+        .prf-linea[data-ok="true"] { border-style:solid; border-color:${OK}; background:${OK}10; }
+        .prf-palabra { font-size:16px; font-weight:800; color:#fff; }
+
+        /* Ranuras de la tercera persona */
+        .prf-ranura { display:inline-flex; align-items:center; gap:6px; border-radius:9px; border:1.5px dashed ${T.lineStrong};
+          background:${T.inset}; padding:2px 9px; font-size:15px; font-weight:800; color:${T.text3}; transition:all .16s; }
+        .prf-ranura[data-ok="true"] { border-style:solid; border-color:${OK}; color:${OK}; background:${OK}14; }
+        .prf-ranura[data-shake="true"] { animation:prfShake .4s; border-color:${NO}; }
+
+        .prf-mini { cursor:pointer; padding:7px 13px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass};
+          color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; font-family:inherit; }
+        .prf-mini:hover:not(:disabled) { border-color:${T.lineStrong}; color:#fff; }
+        .prf-mini:disabled { opacity:.45; cursor:not-allowed; }
+        .prf-mini[data-on="true"] { border-color:${accent}; background:rgba(${rgba},0.16); color:#fff; }
+        .prf-mini[data-done="true"] { color:${OK}; border-color:${OK}66; }
+
+        .prf-vf { cursor:pointer; padding:8px 16px; border-radius:10px; border:1.5px solid ${T.line}; background:${T.glass};
+          color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; font-family:inherit; }
+        .prf-vf:hover:not(:disabled) { border-color:${T.lineStrong}; color:#fff; }
+        .prf-vf:disabled { cursor:default; opacity:.85; }
+        .prf-vf[data-on="true"] { border-color:${OK}; background:${OK}1f; color:#fff; }
+        .prf-vf[data-bad="true"] { border-color:${NO}; background:${NO}1f; color:#fff; }
+
+        .prf-img { position:relative; width:100%; aspect-ratio:16/6; max-height:170px; border-radius:14px; overflow:hidden;
+          display:flex; align-items:center; justify-content:center; margin-bottom:12px;
+          background:linear-gradient(135deg, rgba(${rgba},0.28) 0%, rgba(8,19,31,0.9) 100%); border:1px solid ${T.line}; }
+        .prf-img i { font-size:44px; color:rgba(255,255,255,0.22); }
+        .prf-img img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+        .prf-habla { display:flex; gap:14px; align-items:flex-start; }
+        .prf-cara { flex-shrink:0; width:52px; height:52px; border-radius:50%; border:2px solid; display:flex; align-items:center;
+          justify-content:center; font-size:28px; background:${T.inset}; transition:all .2s; }
+        .prf-reac { margin-top:14px; border-radius:13px; border:1px solid ${NO}55; background:${NO}12; padding:12px 15px;
+          font-size:14px; line-height:1.55; color:${T.text2}; }
+        .prf-reac[data-ok="true"] { border-color:${OK}55; background:${OK}12; }
+        .prf-ficha { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap:8px; margin-top:12px; }
+        .prf-fila { display:grid; gap:2px; border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset}; padding:9px 12px; min-width:0; }
+        .prf-fila span { font-size:14px; font-weight:800; color:${T.text3}; }
+        .prf-fila strong { font-size:15px; font-weight:800; color:${T.text3}; overflow-wrap:anywhere; }
+        .prf-fila[data-estado="ok"] { border-style:solid; border-color:${OK}; background:${OK}12; }
+        .prf-fila[data-estado="ok"] strong { color:#fff; }
+        .prf-fila[data-estado="mal"] { border-style:solid; border-color:${NO}; background:${NO}14; }
+        .prf-fila[data-estado="mal"] strong { color:${NO}; }
+
+        /* Identidad del tablero: cada tarjeta lleva su franja de color */
+        .prf-campo, .prf-card { --tono:196; position:relative;
+          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.10) 0%, transparent 62%); }
+        .prf-campo:nth-of-type(6n+1), .prf-card:nth-of-type(6n+1) { --tono:196; }
+        .prf-campo:nth-of-type(6n+2), .prf-card:nth-of-type(6n+2) { --tono:268; }
+        .prf-campo:nth-of-type(6n+3), .prf-card:nth-of-type(6n+3) { --tono:42; }
+        .prf-campo:nth-of-type(6n+4), .prf-card:nth-of-type(6n+4) { --tono:150; }
+        .prf-campo:nth-of-type(6n+5), .prf-card:nth-of-type(6n+5) { --tono:328; }
+        .prf-campo:nth-of-type(6n+6), .prf-card:nth-of-type(6n+6) { --tono:16; }
+        .prf-campo::before, .prf-card::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
+          background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
+
+        @media (prefers-reduced-motion: reduce){
+          .prf-campo[data-shake="true"], .prf-pieza[data-shake="true"], .prf-ranura[data-shake="true"] { animation:none; }
+          .prf-chip, .prf-chip:hover, .prf-chip[data-sel="true"], .prf-pieza:hover { transform:none; transition:none; }
+        }
+`;
 
 /* ═══════════════════════════════════════════════════════════════════════════
  * Tipos de los ayudantes de arrastre (los paneles los reciben como props)
@@ -914,7 +1073,7 @@ function FormularioPanel({
       <div style={{ ...card, padding: "18px 22px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
           <Eyebrow>Summer course application form · los datos que dicta Mateo</Eyebrow>
-          <span style={{ fontSize: 12.5, fontWeight: 800, color: puestos >= CAMPOS_FORMULARIO.length ? OK : T.text3, ...NUM }}>
+          <span style={{ fontSize: 14, fontWeight: 800, color: puestos >= CAMPOS_FORMULARIO.length ? OK : T.text3, ...NUM }}>
             {puestos}/{CAMPOS_FORMULARIO.length} campos
           </span>
         </div>
@@ -936,7 +1095,7 @@ function FormularioPanel({
                 onClick={() => onSelDato(d.id)}
                 {...dragProps(d.id)}
               >
-                <i className="fa-solid fa-grip-vertical" style={{ fontSize: 11, color: T.text3 }} />
+                <i className="fa-solid fa-grip-vertical" style={{ fontSize: 14, color: T.text3 }} />
                 {d.valor}
               </button>
             );
@@ -944,7 +1103,7 @@ function FormularioPanel({
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 12 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 260px), 1fr))", gap: 12 }}>
         {CAMPOS_FORMULARIO.map((c) => {
           const datoId = asignado[c.id];
           const dato = datoId ? DATOS_FICHA.find((d) => d.id === datoId) : undefined;
@@ -965,9 +1124,9 @@ function FormularioPanel({
             <FondoTermino termino={c.label} />
               <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
                 <VinetaTermino termino={c.label} color={dato ? OK : accent} icono={c.icono} tam={29} radio={8} />
-                <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff" }}>{c.label}</span>
+                <span style={{ fontSize: 14, fontWeight: 800, color: "#fff" }}>{c.label}</span>
               </div>
-              <span style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.4 }}>{c.ayuda}</span>
+              <span style={{ fontSize: 14, color: T.text3, lineHeight: 1.4 }}>{c.ayuda}</span>
               <div className="prf-slot" data-ok={dato !== undefined}>
                 {dato ? dato.valor : "—"}
               </div>
@@ -1008,7 +1167,7 @@ function PreguntasPanel({
           <Eyebrow>
             Ronda {indice + 1} de {RONDAS_PREGUNTA.length} · alguien te pregunta
           </Eyebrow>
-          <span style={{ fontSize: 12.5, fontWeight: 800, color: hechas >= RONDAS_PREGUNTA.length ? OK : T.text3, ...NUM }}>
+          <span style={{ fontSize: 14, fontWeight: 800, color: hechas >= RONDAS_PREGUNTA.length ? OK : T.text3, ...NUM }}>
             {hechas}/{RONDAS_PREGUNTA.length}
           </span>
         </div>
@@ -1017,7 +1176,7 @@ function PreguntasPanel({
           <p style={{ margin: 0, fontSize: 21, lineHeight: 1.4, color: "#fff", fontWeight: 800 }}>{ronda.pregunta}</p>
           <BotonEscuchar txt={ronda.pregunta} accent={accent} />
         </div>
-        <p style={{ margin: "7px 0 0", fontSize: 12.5, color: T.text3 }}>{ronda.traduccion}</p>
+        <p style={{ margin: "7px 0 0", fontSize: 14, color: T.text3 }}>{ronda.traduccion}</p>
 
         {resuelta && (
           <div
@@ -1027,7 +1186,7 @@ function PreguntasPanel({
               border: `1px solid ${OK}55`,
               background: `${OK}12`,
               padding: "12px 15px",
-              fontSize: 13,
+              fontSize: 14,
               lineHeight: 1.55,
               color: T.text2,
             }}
@@ -1057,12 +1216,12 @@ function PreguntasPanel({
             >
               <i
                 className={`fa-solid ${buena ? "fa-circle-check" : mala ? "fa-circle-xmark" : "fa-circle"}`}
-                style={{ fontSize: 13, marginTop: 3, color: buena ? OK : mala ? NO : T.text3, opacity: buena || mala ? 1 : 0.35 }}
+                style={{ fontSize: 14, marginTop: 3, color: buena ? OK : mala ? NO : T.text3, opacity: buena || mala ? 1 : 0.35 }}
               />
               <span style={{ flex: 1 }}>
                 {op.texto}
                 {mala && !buena && (
-                  <span style={{ display: "block", fontSize: 12, color: T.text3, marginTop: 4, fontWeight: 600 }}>
+                  <span style={{ display: "block", fontSize: 14, color: T.text3, marginTop: 4, fontWeight: 600 }}>
                     Contesta a: {op.contesta}
                   </span>
                 )}
@@ -1150,22 +1309,22 @@ function TobePanel({
                 borderRadius: 999,
                 border: `1px solid rgba(255,255,255,0.14)`,
                 padding: "4px 12px",
-                fontSize: 11.5,
+                fontSize: 14,
                 fontWeight: 800,
                 color: accent,
               }}
             >
-              <i className={`fa-solid ${info.icono}`} style={{ fontSize: 10 }} />
+              <i className={`fa-solid ${info.icono}`} style={{ fontSize: 14 }} />
               {info.label}
             </span>
-            <span style={{ fontSize: 12.5, fontWeight: 800, color: hechas >= RONDAS_TOBE.length ? OK : T.text3, ...NUM }}>
+            <span style={{ fontSize: 14, fontWeight: 800, color: hechas >= RONDAS_TOBE.length ? OK : T.text3, ...NUM }}>
               {hechas}/{RONDAS_TOBE.length}
             </span>
           </span>
         </div>
 
         {ronda.partida !== "—" && (
-          <div style={{ fontSize: 13, color: T.text3, marginBottom: 10 }}>
+          <div style={{ fontSize: 14, color: T.text3, marginBottom: 10 }}>
             <i className="fa-solid fa-arrow-turn-down" style={{ marginRight: 9, transform: "rotate(-90deg)" }} />
             Partes de: <strong style={{ color: T.text2, fontWeight: 700 }}>{ronda.partida}</strong>
           </div>
@@ -1175,7 +1334,7 @@ function TobePanel({
 
         <div className="prf-linea" data-ok={completa}>
           {armado.length === 0 ? (
-            <span style={{ fontSize: 13, color: T.text3 }}>Toca las piezas en el orden correcto…</span>
+            <span style={{ fontSize: 14, color: T.text3 }}>Toca las piezas en el orden correcto…</span>
           ) : (
             armado.map((p, i) => (
               <span key={`${p}-${i}`} className="prf-palabra">
@@ -1202,7 +1361,7 @@ function TobePanel({
               border: `1px solid ${OK}55`,
               background: `${OK}12`,
               padding: "12px 15px",
-              fontSize: 13,
+              fontSize: 14,
               lineHeight: 1.55,
               color: T.text2,
             }}
@@ -1284,7 +1443,7 @@ function TerceraPanel({
       <div style={{ ...card, padding: "18px 22px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
           <Eyebrow>La ficha de tu compañera o compañero · preséntala en inglés</Eyebrow>
-          <span style={{ fontSize: 12.5, fontWeight: 800, color: listas >= ORACIONES_TERCERA.length ? OK : T.text3, ...NUM }}>
+          <span style={{ fontSize: 14, fontWeight: 800, color: listas >= ORACIONES_TERCERA.length ? OK : T.text3, ...NUM }}>
             {listas}/{ORACIONES_TERCERA.length}
           </span>
         </div>
@@ -1305,7 +1464,7 @@ function TerceraPanel({
             background: T.inset,
             padding: "14px 17px",
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 170px), 1fr))",
             gap: "9px 18px",
           }}
         >
@@ -1318,13 +1477,13 @@ function TerceraPanel({
             ["Email address", personaje.email],
           ].map(([k, v]) => (
             <div key={k}>
-              <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.08em", color: T.text3, textTransform: "uppercase" }}>{k}</div>
-              <div style={{ fontSize: 13.5, fontWeight: 700, color: "#fff", marginTop: 2, wordBreak: "break-word" }}>{v}</div>
+              <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: "0.08em", color: T.text3, textTransform: "uppercase" }}>{k}</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "#fff", marginTop: 2, wordBreak: "break-word" }}>{v}</div>
             </div>
           ))}
         </div>
 
-        <p style={{ margin: "14px 0 0", fontSize: 13, lineHeight: 1.6, color: T.text2 }}>
+        <p style={{ margin: "14px 0 0", fontSize: 14, lineHeight: 1.6, color: T.text2 }}>
           {personaje.firstName} habla de sí {personaje.pronombre === "She" ? "misma" : "mismo"}. Tú tienes que presentar
           {personaje.pronombre === "She" ? "la" : "lo"} a alguien más: elige en cada hueco la palabra que hace falta al pasar a la
           tercera persona.
@@ -1339,8 +1498,8 @@ function TerceraPanel({
             .join("");
           return (
             <div key={o.id} className="prf-card" data-done={completa} style={{ padding: "15px 18px" }}>
-              <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 9 }}>
-                <i className="fa-solid fa-quote-left" style={{ fontSize: 10, marginRight: 8, color: accent }} />
+              <div style={{ fontSize: 14, color: T.text3, marginBottom: 9 }}>
+                <i className="fa-solid fa-quote-left" style={{ fontSize: 14, marginRight: 8, color: accent }} />
                 {personaje.firstName} dice: <strong style={{ color: T.text2, fontWeight: 700 }}>{rellena(o.primera, personaje)}</strong>
               </div>
 
@@ -1363,7 +1522,7 @@ function TerceraPanel({
 
               {completa ? (
                 <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", marginTop: 10 }}>
-                  <span style={{ fontSize: 12.5, color: T.text2 }}>
+                  <span style={{ fontSize: 14, color: T.text2 }}>
                     <i className="fa-solid fa-circle-check" style={{ color: OK, marginRight: 8 }} />
                     {rellena(o.traduccion, personaje)}
                   </span>
@@ -1374,7 +1533,7 @@ function TerceraPanel({
                   {o.ranuras.map((tipo, k) =>
                     elegidas[clave(o.id, k)] !== undefined ? null : (
                       <div key={k} style={{ display: "flex", alignItems: "center", gap: 9, flexWrap: "wrap" }}>
-                        <span style={{ fontSize: 11.5, fontWeight: 800, color: T.text3, minWidth: 74 }}>Hueco {k + 1}</span>
+                        <span style={{ fontSize: 14, fontWeight: 800, color: T.text3, minWidth: 74 }}>Hueco {k + 1}</span>
                         {(OPCIONES_RANURA[tipo] ?? []).map((palabra) => (
                           <button
                             key={palabra}
@@ -1420,7 +1579,7 @@ function HechosCard({
           <i className="fa-solid fa-scale-unbalanced" style={{ marginRight: 8, color: accent }} />
           True or False · About me (A5, verbatim)
         </Eyebrow>
-        <span style={{ fontSize: 12.5, fontWeight: 800, color: aciertos >= HECHOS.length ? OK : T.text3, ...NUM }}>
+        <span style={{ fontSize: 14, fontWeight: 800, color: aciertos >= HECHOS.length ? OK : T.text3, ...NUM }}>
           {aciertos}/{HECHOS.length}
         </span>
       </div>
@@ -1445,9 +1604,9 @@ function HechosCard({
               }}
             >
               <div style={{ flex: 1, minWidth: 240 }}>
-                <div style={{ fontSize: 13.5, fontWeight: 700, color: T.text, lineHeight: 1.5 }}>{h.enunciado}</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: T.text, lineHeight: 1.5 }}>{h.enunciado}</div>
                 {r !== null && r !== undefined && (
-                  <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.5, marginTop: 7 }}>
+                  <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5, marginTop: 7 }}>
                     <i
                       className={`fa-solid ${resuelto ? "fa-circle-check" : "fa-circle-exclamation"}`}
                       style={{ color: resuelto ? OK : NO, marginRight: 8 }}

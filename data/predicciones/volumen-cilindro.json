@@ -1,0 +1,12 @@
+{
+  "escena": "Un tanque cilíndrico transparente que se llena de agua, con su radio y altura marcados.",
+  "pregunta": "Duplicas el radio del tanque sin cambiar su altura. ¿Cuánto crece el volumen?",
+  "opciones": [
+    { "id": "a", "texto": "El doble", "icono": "fa-xmark" },
+    { "id": "b", "texto": "Cuatro veces más", "icono": "fa-up-right-and-down-left-from-center" },
+    { "id": "c", "texto": "Ocho veces más", "icono": "fa-cubes" }
+  ],
+  "correcta": "b",
+  "porque": "El radio va al cuadrado en V = π·r²·h. Al duplicarlo, la base se hace 2² = 4 veces mayor y la altura sigue igual, así que cada disco apilado es cuatro veces más grande.",
+  "comoComprobarlo": "Mueve el deslizador del radio al doble y mira el contador «Capacidad vs. tanque original» sobre la escena."
+}

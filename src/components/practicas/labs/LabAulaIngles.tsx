@@ -39,7 +39,7 @@ import { LabSfx } from "./lab-audio";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { AULA_INGLES_HUECOS } from "./aula-ingles-huecos";
 import { usePartida, MarcadorPartida } from "./_partida";
-import { TableroObjetivos } from "./_objetivos";
+import { LabShell, Bloque, BotonHerramienta, Dato } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { AULA_INGLES_FICHA } from "./aula-ingles-ficha";
@@ -59,15 +59,18 @@ import {
   type Quien,
 } from "./aula-ingles-data";
 import { VinetaTermino } from "./_vineta";
+import { MOMENTOS_CLASE, MINUTOS_CLASE, MINUTOS_POR_ERROR } from "./aula-ingles-sim";
 
 const NO = "#FF5E5E";
 const RETO_KEY = "cen-aula-ingles-interacciones-reto";
 const META_PRIMERAS = 5;
 const META_ESCUCHAS = 5;
+const RUTA_SIM = "/media/labs-sim/aula-ingles-interacciones";
 
-type Modo = "turno" | "intercambio" | "registro" | "texto";
+type Modo = "clase" | "turno" | "intercambio" | "registro" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
+  { id: "clase", label: "Vive la clase", icono: "fa-chalkboard-user" },
   { id: "turno", label: "Elige el turno adecuado", icono: "fa-comments" },
   { id: "intercambio", label: "Arma el intercambio", icono: "fa-arrow-down-up-across-line" },
   { id: "registro", label: "Formal o informal", icono: "fa-user-group" },
@@ -239,8 +242,7 @@ function EscenaAula({
 
 export function LabAulaIngles({ color }: PracticaLabProps) {
   const accent = color.hex;
-  const [modo, setModo] = useState<Modo>("turno");
-  const [drawer, setDrawer] = useState(false);
+  const [modo, setModo] = useState<Modo>("clase");
   const [teoriaVista, setTeoriaVista] = useState(false);
   const [escuchados, setEscuchados] = useState(0);
   const partida = usePartida();
@@ -386,6 +388,43 @@ export function LabAulaIngles({ color }: PracticaLabProps) {
     setTextoIntento((n) => n + 1);
   };
 
+  /* ── MODO 0 · Vive la clase (simulador) ───────────────────────────────── */
+  const [cIdx, setCIdx] = useState(0);
+  const [cProbados, setCProbados] = useState<Record<string, number[]>>({});
+  const [cOk, setCOk] = useState<Record<string, number>>({});
+  const momentoActual = MOMENTOS_CLASE[Math.min(cIdx, MOMENTOS_CLASE.length - 1)]!;
+  const cCorrectos = Object.keys(cOk).length;
+  const claseDone = cCorrectos >= MOMENTOS_CLASE.length;
+  const cErrores = MOMENTOS_CLASE.reduce(
+    (n, m) => n + (cProbados[m.id] ?? []).filter((i) => !m.opciones[i]!.ok).length,
+    0
+  );
+  const minutosQuedan = Math.max(0, MINUTOS_CLASE - cErrores * MINUTOS_POR_ERROR);
+  const cultimaOp = (() => {
+    const ints = cProbados[momentoActual.id] ?? [];
+    return ints.length > 0 ? momentoActual.opciones[ints[ints.length - 1]!] : undefined;
+  })();
+
+  const elegirClase = (i: number) => {
+    const op = momentoActual.opciones[i];
+    if (!op || cOk[momentoActual.id] !== undefined) return;
+    if ((cProbados[momentoActual.id] ?? []).includes(i)) return;
+    setCProbados((p) => ({ ...p, [momentoActual.id]: [...(p[momentoActual.id] ?? []), i] }));
+    if (op.ok) {
+      setCOk((o) => ({ ...o, [momentoActual.id]: i }));
+      sfxBien();
+      if (cCorrectos + 1 >= MOMENTOS_CLASE.length) sfxOk();
+    } else {
+      sfxNo();
+    }
+  };
+  const irClase = (i: number) => setCIdx(Math.max(0, Math.min(MOMENTOS_CLASE.length - 1, i)));
+  const resetClase = () => {
+    setCIdx(0);
+    setCProbados({});
+    setCOk({});
+  };
+
   /* ── reto evaluable ───────────────────────────────────────────────────── */
   const [quizAprobado, setQuizAprobado] = useState(false);
 
@@ -397,6 +436,9 @@ export function LabAulaIngles({ color }: PracticaLabProps) {
   const todoHecho = turnoDone && intercambioDone && registroDone && textoDone && quizAprobado;
 
   const objetivos = [
+    { txt: "En «Vive la clase», elige una respuesta equivocada y mira cómo cambia el pizarrón", done: cErrores > 0 },
+    { txt: `Atiende los ${MOMENTOS_CLASE.length} momentos de la clase`, done: claseDone },
+    { txt: "Termina la clase con 14 minutos o más (máximo 3 malentendidos)", done: claseDone && minutosQuedan >= 14 },
     { txt: `Elige el turno adecuado en las ${SITUACIONES.length} situaciones`, done: turnoDone },
     { txt: `Acierta a la primera en ${META_PRIMERAS} situaciones o más`, done: primeras >= META_PRIMERAS },
     { txt: "Resuelve una situación de cada foco (permiso, duda, palabra, cortesía, opinión)", done: focosResueltos.size >= 5 },
@@ -410,12 +452,7 @@ export function LabAulaIngles({ color }: PracticaLabProps) {
     { txt: "Termina la sesión con 2 errores o menos", done: todoHecho && partida.errores <= 2 },
   ];
 
-  const abrirTeoria = () => {
-    setDrawer(true);
-    setTeoriaVista(true);
-  };
-
-  const resetActual = modo === "turno" ? resetTurno : modo === "intercambio" ? resetIntercambio : modo === "registro" ? resetRegistro : resetTexto;
+  const resetActual = modo === "clase" ? resetClase : modo === "turno" ? resetTurno : modo === "intercambio" ? resetIntercambio : modo === "registro" ? resetRegistro : resetTexto;
 
   /* ── lo que se ve en la escena según el modo ──────────────────────────── */
   const ultimaElegida = elegidasActual[elegidasActual.length - 1] ?? -1;
@@ -425,7 +462,14 @@ export function LabAulaIngles({ color }: PracticaLabProps) {
   const fichaSel = selFicha ? FICHAS_REGISTRO.find((f) => f.id === selFicha) ?? null : null;
 
   const escena =
-    modo === "turno"
+    modo === "clase"
+      ? {
+          pizarron: cultimaOp ? cultimaOp.pizarron : momentoActual.pizarronInicial,
+          hablante: "teacher" as Quien | null,
+          burbuja: cultimaOp ? cultimaOp.maestra : momentoActual.maestraInicia,
+          traduccion: (cultimaOp ? null : momentoActual.maestraEs) as string | null,
+        }
+      : modo === "turno"
       ? { pizarron: FOCO_INFO[sitActual.foco].titulo, hablante: "student" as Quien | null, burbuja: burbujaTurno, traduccion: null as string | null }
       : modo === "intercambio"
         ? { pizarron: dlgActual.titulo, hablante: (turnoPuesto?.quien ?? null) as Quien | null, burbuja: turnoPuesto?.texto ?? null, traduccion: turnoPuesto?.es ?? null }
@@ -433,25 +477,86 @@ export function LabAulaIngles({ color }: PracticaLabProps) {
           ? { pizarron: "Formal or informal?", hablante: (fichaSel ? "student" : null) as Quien | null, burbuja: fichaSel?.texto ?? null, traduccion: null as string | null }
           : { pizarron: "What do we say in class?", hablante: null as Quien | null, burbuja: null as string | null, traduccion: null as string | null };
 
+
+  const pistaModo =
+    modo === "clase" ? (
+      <>
+        Lo que dices cambia lo que pasa: la maestra reacciona y el pizarrón muestra lo que <strong style={{ color: T.text }}>quedó</strong>. Cada
+        malentendido cuesta 2 minutos de clase.
+      </>
+    ) : modo === "turno" ? (
+      <>
+        Las tres opciones son inglés correcto. Lee <strong style={{ color: T.text }}>qué dice cada una</strong> y quédate con la que cumple tu
+        intención y le habla a la maestra.
+      </>
+    ) : modo === "intercambio" ? (
+      <>
+        El orden es la gramática de la conversación: <strong style={{ color: T.text }}>Excuse me</strong> abre el turno, la pregunta va antes de
+        la respuesta y <strong style={{ color: T.text }}>Sorry</strong> se disculpa por lo que ya pasó.
+      </>
+    ) : modo === "registro" ? (
+      <>
+        Cuatro marcas: <strong style={{ color: T.text }}>please</strong>, la pregunta con <strong style={{ color: T.text }}>could / may</strong>,{" "}
+        <strong style={{ color: T.text }}>excuse me</strong> en vez de <em>hey</em>, y las formas completas.
+      </>
+    ) : (
+      <>
+        Es el diálogo de la actividad <strong style={{ color: T.text }}>A2</strong>, tal cual. Escribe la palabra que falta; no se distinguen
+        mayúsculas.
+      </>
+    );
+
+  const lectura =
+    modo === "clase" ? (
+      <>
+        Minutos de clase: {minutosQuedan}/{MINUTOS_CLASE} · momento {Math.min(cIdx + 1, MOMENTOS_CLASE.length)}/{MOMENTOS_CLASE.length}
+      </>
+    ) : modo === "turno" ? (
+      <>
+        Situaciones resueltas: {Object.keys(resueltas).length}/{SITUACIONES.length}
+      </>
+    ) : modo === "intercambio" ? (
+      <>
+        Turnos colocados: {puestos}/{dlgActual.turnos.length}
+      </>
+    ) : modo === "registro" ? (
+      <>
+        Expresiones clasificadas: {Object.keys(ubicadas).length}/{FICHAS_REGISTRO.length}
+      </>
+    ) : (
+      <>Diálogo de la clase, con huecos</>
+    );
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      dom
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })),
+        valor: modo,
+        cambiar: (id) => setModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={resetActual} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      escena={
+        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
+          <style>{`
         @keyframes aulShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
         @keyframes aulPop { 0%{transform:scale(.7);opacity:0;} 100%{transform:scale(1);opacity:1;} }
-        .aul-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 16px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .aul-tab:hover { border-color:${T.lineStrong}; color:#fff; }
-        .aul-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-        .aul-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
-          font-size:14px; border:1px solid ${T.line}; background:${T.glass}; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .aul-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
-        .aul-icobtn:hover { background:rgba(255,255,255,0.12); }
         .aul-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:10px 16px;
-          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:13px; font-weight:800; transition:all .14s; }
+          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:14px; font-weight:800; transition:all .14s; }
         .aul-btn:hover:not(:disabled) { border-color:${accent}; }
         .aul-btn:disabled { opacity:.38; cursor:not-allowed; }
         .aul-escuchar { cursor:pointer; display:inline-flex; align-items:center; gap:6px; padding:5px 11px; border-radius:999px;
-          border:1px solid rgba(${color.rgba},0.4); background:rgba(${color.rgba},0.12); color:#fff; font-size:11.5px; font-weight:800; transition:all .14s; }
+          border:1px solid rgba(${color.rgba},0.4); background:rgba(${color.rgba},0.12); color:#fff; font-size:14px; font-weight:800; transition:all .14s; }
         .aul-escuchar:hover { background:rgba(${color.rgba},0.26); }
         .aul-divider { height:1px; background:${T.line}; margin:16px 0; }
 
@@ -478,13 +583,13 @@ export function LabAulaIngles({ color }: PracticaLabProps) {
         @media (max-width: 640px){ .aul-ventana, .aul-reloj { display:none; } .aul-pupitre:nth-child(n+4) { display:none; } }
         .aul-persona { display:flex; flex-direction:column; align-items:center; gap:5px; flex-shrink:0; opacity:.62; transition:opacity .2s; }
         .aul-persona[data-on="true"] { opacity:1; }
-        .aul-etq { font-size:10.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:${T.text3}; }
+        .aul-etq { font-size:14px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:${T.text3}; }
         .aul-burbuja-zona { flex:1; min-width:0; display:flex; justify-content:center; align-items:flex-end; padding-bottom:22px; }
         .aul-burbuja { max-width:100%; border-radius:16px; border:1.5px solid ${T.lineStrong}; background:rgba(2,12,28,0.82);
           padding:12px 17px; display:flex; flex-direction:column; gap:4px; text-align:center; animation:aulPop .22s ease; }
         .aul-burbuja-vacia { color:${T.text3}; font-size:16px; padding:10px 17px; }
         .aul-burbuja-en { font-size:15.5px; font-weight:800; color:#fff; line-height:1.4; }
-        .aul-burbuja-es { font-size:12px; color:${T.text3}; font-style:italic; }
+        .aul-burbuja-es { font-size:14px; color:${T.text3}; font-style:italic; }
 
         /* Opciones de turno */
         .aul-opt { cursor:pointer; display:flex; align-items:flex-start; gap:12px; width:100%; text-align:left;
@@ -495,15 +600,15 @@ export function LabAulaIngles({ color }: PracticaLabProps) {
         .aul-opt[data-ok="true"] { border-color:${OK}; background:${OK}1c; color:#fff; }
         .aul-opt[data-bad="true"] { border-color:${NO}; background:${NO}16; color:#fff; }
         .aul-letra { flex-shrink:0; width:26px; height:26px; border-radius:8px; display:flex; align-items:center; justify-content:center;
-          font-size:12px; font-weight:900; border:1px solid ${T.line}; color:${T.text3}; }
+          font-size:14px; font-weight:900; border:1px solid ${T.line}; color:${T.text3}; }
 
         /* Turnos del intercambio */
         .aul-turno { cursor:pointer; display:flex; align-items:flex-start; gap:11px; text-align:left; width:100%;
           border-radius:14px; border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff;
-          font-size:13.5px; font-weight:700; padding:12px 15px; transition:all .14s; line-height:1.45; }
+          font-size:14px; font-weight:700; padding:12px 15px; transition:all .14s; line-height:1.45; }
         .aul-turno:hover { border-color:${accent}; background:rgba(${color.rgba},0.14); }
         .aul-turno[data-shake="true"] { animation:aulShake .4s; border-color:${NO}; }
-        .aul-quien { flex-shrink:0; font-size:10px; font-weight:900; letter-spacing:.08em; text-transform:uppercase;
+        .aul-quien { flex-shrink:0; font-size:14px; font-weight:900; letter-spacing:.08em; text-transform:uppercase;
           padding:3px 8px; border-radius:999px; border:1px solid ${T.line}; color:${T.text3}; }
         .aul-hilo { display:flex; flex-direction:column; gap:10px; }
         .aul-msg { border-radius:15px; padding:11px 15px; max-width:86%; animation:aulPop .22s ease; line-height:1.45; }
@@ -521,27 +626,23 @@ export function LabAulaIngles({ color }: PracticaLabProps) {
         .aul-row { border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:13px 16px; transition:all .16s; }
         .aul-row[data-done="true"] { border-color:${OK}55; background:${OK}0d; }
 
-        /* Cajón de teoría */
-        .aul-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .aul-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .aul-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .aul-drawer[data-open="true"] { transform:translateX(0); }
-        .aul-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .aul-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .aul-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .aul-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .aul-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .aul-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .aul-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
         @media (max-width: 860px){ .aul-piso { flex-wrap:wrap; justify-content:center; } .aul-burbuja-zona { order:-1; width:100%; padding-bottom:10px; } }
+
+        .aul-img { position:relative; width:100%; aspect-ratio:16/6; max-height:150px; border-radius:14px; overflow:hidden;
+          display:flex; align-items:center; justify-content:center; margin-bottom:12px;
+          background:linear-gradient(135deg, rgba(${color.rgba},0.28) 0%, rgba(8,19,31,0.9) 100%); border:1px solid ${T.line}; }
+        .aul-img i { font-size:42px; color:rgba(255,255,255,0.22); }
+        .aul-img img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+        .aul-reloj-barra { display:grid; grid-template-columns:1fr auto; gap:6px 12px; align-items:center; padding:12px 16px; border-radius:14px;
+          border:1px solid ${T.line}; background:${T.glass}; font-size:14px; font-weight:800; color:${T.text2}; }
+        .aul-reloj-barra strong { font-size:17px; color:#fff; font-variant-numeric:tabular-nums; }
+        .aul-reloj-barra[data-bajo="true"] strong { color:#FFC75A; }
+        .aul-barra { grid-column:1 / -1; height:8px; border-radius:99px; background:rgba(255,255,255,0.12); overflow:hidden; }
+        .aul-barra > div { height:100%; border-radius:99px; background:${OK}; transition:width .4s ease, background .3s; }
+        .aul-reloj-barra[data-bajo="true"] .aul-barra > div { background:#FFC75A; }
+        .aul-reac { margin-top:14px; border-radius:13px; border:1px solid ${NO}55; background:${NO}12; padding:12px 15px;
+          font-size:14px; line-height:1.55; color:${T.text2}; }
+        .aul-reac[data-ok="true"] { border-color:${OK}55; background:${OK}12; }
 
         /* Identidad del tablero */
         .aul-bin, .aul-row { --tono:188; position:relative;
@@ -563,52 +664,6 @@ export function LabAulaIngles({ color }: PracticaLabProps) {
           .aul-turno[data-shake="true"], .aul-bin[data-shake="true"], .aul-burbuja, .aul-msg { animation:none; }
         }
       `}</style>
-
-      {/* selector de modo + barra */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="aul-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="aul-icobtn" data-on={drawer} onClick={abrirTeoria} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="aul-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="aul-icobtn" onClick={resetActual} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
-
-      {/* Cajón de teoría */}
-      <button className="aul-teoria-fab" onClick={abrirTeoria}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="aul-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="aul-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="aul-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="aul-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="aul-drawer-body">
-          <FichaTeorica data={AULA_INGLES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}>
-        {/* ── columna principal ───────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
           <EscenaAula
             pizarron={escena.pizarron}
             hablante={escena.hablante}
@@ -618,6 +673,19 @@ export function LabAulaIngles({ color }: PracticaLabProps) {
             rgba={color.rgba}
           />
 
+          {modo === "clase" && (
+            <ClasePanel
+              accent={accent}
+              indice={cIdx}
+              probados={cProbados}
+              resueltos={cOk}
+              minutos={minutosQuedan}
+              onElegir={elegirClase}
+              onIr={irClase}
+              onEscucha={contarEscucha}
+            />
+          )}
+
           {/* MODO 1 — Elige el turno adecuado */}
           {modo === "turno" && (
             <>
@@ -626,13 +694,13 @@ export function LabAulaIngles({ color }: PracticaLabProps) {
                   <Eyebrow>
                     Situación {sitIdx + 1} de {SITUACIONES.length} · {FOCO_INFO[sitActual.foco].titulo}
                   </Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: turnoDone ? OK : T.text3 }}>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: turnoDone ? OK : T.text3 }}>
                     {Object.keys(resueltas).length}/{SITUACIONES.length} resueltas
                   </span>
                 </div>
 
                 <div style={{ fontSize: 15, color: T.text, lineHeight: 1.55, fontWeight: 700 }}>{sitActual.situacion}</div>
-                <div style={{ fontSize: 13, color: T.text2, lineHeight: 1.5, marginTop: 7, display: "flex", gap: 9 }}>
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5, marginTop: 7, display: "flex", gap: 9 }}>
                   <i className="fa-solid fa-bullseye" style={{ color: accent, marginTop: 3 }} />
                   <span>
                     Lo que quieres lograr: <strong style={{ color: T.text }}>{sitActual.intencion}</strong>
@@ -671,7 +739,7 @@ export function LabAulaIngles({ color }: PracticaLabProps) {
                             style={{
                               marginTop: 8,
                               marginLeft: 38,
-                              fontSize: 12.5,
+                              fontSize: 14,
                               color: T.text2,
                               lineHeight: 1.5,
                               borderRadius: 10,
@@ -697,7 +765,7 @@ export function LabAulaIngles({ color }: PracticaLabProps) {
                       border: `1px solid rgba(${color.rgba},0.34)`,
                       background: `rgba(${color.rgba},0.1)`,
                       padding: "13px 16px",
-                      fontSize: 13.5,
+                      fontSize: 14,
                       color: T.text2,
                       lineHeight: 1.55,
                       display: "flex",
@@ -733,7 +801,7 @@ export function LabAulaIngles({ color }: PracticaLabProps) {
                           height: 26,
                           borderRadius: 8,
                           cursor: "pointer",
-                          fontSize: 11,
+                          fontSize: 14,
                           fontWeight: 900,
                           border: `1.5px solid ${i === sitIdx ? accent : T.line}`,
                           background: resueltas[s.id] ? `${OK}22` : T.glass,
@@ -757,22 +825,22 @@ export function LabAulaIngles({ color }: PracticaLabProps) {
                   <Eyebrow>
                     {dlgActual.titulo} · intercambio {dlgIdx + 1} de {INTERCAMBIOS.length}
                   </Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: puestos >= dlgActual.turnos.length ? OK : T.text3 }}>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: puestos >= dlgActual.turnos.length ? OK : T.text3 }}>
                     {puestos}/{dlgActual.turnos.length} turnos
                   </span>
                 </div>
-                <div style={{ fontSize: 13.5, color: T.text2, lineHeight: 1.55, marginBottom: 14 }}>{dlgActual.contexto}</div>
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55, marginBottom: 14 }}>{dlgActual.contexto}</div>
 
                 <div className="aul-hilo">
                   {dlgActual.turnos.slice(0, puestos).map((t, i) => (
                     <div key={t.id} className="aul-msg" data-quien={t.quien}>
                       <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4, flexWrap: "wrap" }}>
                         <span className="aul-quien">{t.quien === "teacher" ? "Teacher" : "You"}</span>
-                        <span style={{ fontSize: 10.5, color: T.text3, fontWeight: 800 }}>#{i + 1}</span>
+                        <span style={{ fontSize: 14, color: T.text3, fontWeight: 800 }}>#{i + 1}</span>
                         <BotonEscuchar texto={t.texto} onPlay={contarEscucha} />
                       </div>
                       <div style={{ fontSize: 14.5, fontWeight: 700, color: "#fff" }}>{t.texto}</div>
-                      <div style={{ fontSize: 12, color: T.text3, fontStyle: "italic", marginTop: 3 }}>{t.es}</div>
+                      <div style={{ fontSize: 14, color: T.text3, fontStyle: "italic", marginTop: 3 }}>{t.es}</div>
                     </div>
                   ))}
                   {puestos < dlgActual.turnos.length && (
@@ -782,7 +850,7 @@ export function LabAulaIngles({ color }: PracticaLabProps) {
                         borderRadius: 12,
                         border: `1.5px dashed ${T.lineStrong}`,
                         padding: "9px 16px",
-                        fontSize: 12.5,
+                        fontSize: 14,
                         color: T.text3,
                         fontWeight: 700,
                       }}
@@ -801,7 +869,7 @@ export function LabAulaIngles({ color }: PracticaLabProps) {
                       border: `1px solid ${NO}55`,
                       background: `${NO}12`,
                       padding: "11px 14px",
-                      fontSize: 12.5,
+                      fontSize: 14,
                       color: T.text2,
                       lineHeight: 1.5,
                       display: "flex",
@@ -821,7 +889,7 @@ export function LabAulaIngles({ color }: PracticaLabProps) {
                       border: `1px solid ${OK}55`,
                       background: `${OK}12`,
                       padding: "11px 14px",
-                      fontSize: 13,
+                      fontSize: 14,
                       color: T.text2,
                       lineHeight: 1.5,
                       display: "flex",
@@ -883,16 +951,16 @@ export function LabAulaIngles({ color }: PracticaLabProps) {
               <div style={{ ...card, padding: "18px 22px" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
                   <Eyebrow>Arrastra o toca cada expresión y suéltala en su columna</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: registroDone ? OK : T.text3 }}>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: registroDone ? OK : T.text3 }}>
                     {Object.keys(ubicadas).length}/{FICHAS_REGISTRO.length}
                   </span>
                 </div>
-                <div style={{ fontSize: 12.5, color: T.text3, lineHeight: 1.5, marginBottom: 14 }}>
+                <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.5, marginBottom: 14 }}>
                   Las doce son inglés correcto. <strong style={{ color: T.text2 }}>Informal no significa mal dicho</strong>: significa que es para un compañero. Lo
                   que cambia es la marca de cortesía.
                 </div>
                 {libresRegistro.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+                  <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
                     <i className="fa-solid fa-circle-check" /> ¡Clasificaste las {FICHAS_REGISTRO.length} expresiones!
                   </div>
                 ) : (
@@ -922,7 +990,7 @@ export function LabAulaIngles({ color }: PracticaLabProps) {
                       border: `1px solid ${T.line}`,
                       background: T.inset,
                       padding: "11px 14px",
-                      fontSize: 12.5,
+                      fontSize: 14,
                       color: T.text2,
                       lineHeight: 1.5,
                       display: "flex",
@@ -935,7 +1003,7 @@ export function LabAulaIngles({ color }: PracticaLabProps) {
                 )}
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: 12 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 230px), 1fr))", gap: 12 }}>
                 {(["informal", "formal"] as Registro[]).map((bin) => {
                   const info = REGISTRO_INFO[bin];
                   const dentro = FICHAS_REGISTRO.filter((f) => ubicadas[f.id] === bin);
@@ -966,12 +1034,12 @@ export function LabAulaIngles({ color }: PracticaLabProps) {
                     >
                       <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
                         <VinetaTermino termino={info.titulo} color={T.text2} icono={info.icono} tam={29} radio={8} />
-                        <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
+                        <span style={{ fontSize: 14, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
                       </div>
-                      <div style={{ fontSize: 11.5, color: T.text3, marginBottom: 12, lineHeight: 1.45 }}>{info.subtitulo}</div>
+                      <div style={{ fontSize: 14, color: T.text3, marginBottom: 12, lineHeight: 1.45 }}>{info.subtitulo}</div>
                       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                         {dentro.length === 0 ? (
-                          <div style={{ fontSize: 12, color: T.text3, opacity: 0.6, padding: "8px 0" }}>Suelta aquí…</div>
+                          <div style={{ fontSize: 14, color: T.text3, opacity: 0.6, padding: "8px 0" }}>Suelta aquí…</div>
                         ) : (
                           dentro.map((f) => (
                             <span
@@ -985,12 +1053,12 @@ export function LabAulaIngles({ color }: PracticaLabProps) {
                                 borderRadius: 11,
                                 background: `${OK}1a`,
                                 border: `1px solid ${OK}55`,
-                                fontSize: 13,
+                                fontSize: 14,
                                 fontWeight: 700,
                                 color: "#fff",
                               }}
                             >
-                              <i className="fa-solid fa-check" style={{ fontSize: 10, color: OK }} />
+                              <i className="fa-solid fa-check" style={{ fontSize: 14, color: OK }} />
                               <span style={{ flex: 1 }}>{f.texto}</span>
                               <BotonEscuchar texto={f.texto} onPlay={contarEscucha} />
                             </span>
@@ -1009,23 +1077,23 @@ export function LabAulaIngles({ color }: PracticaLabProps) {
                     const listo = ubicadas[`${p.id}-informal`] !== undefined && ubicadas[`${p.id}-formal`] !== undefined;
                     return (
                       <div key={p.id} className="aul-row" data-done={listo}>
-                        <div style={{ fontSize: 12, color: T.text3, fontWeight: 800, letterSpacing: ".03em" }}>{p.intencion}</div>
+                        <div style={{ fontSize: 14, color: T.text3, fontWeight: 800, letterSpacing: ".03em" }}>{p.intencion}</div>
                         {listo ? (
                           <>
                             <div style={{ display: "flex", gap: 14, flexWrap: "wrap", marginTop: 7 }}>
                               <span style={{ fontSize: 14, fontWeight: 800, color: "#fff" }}>
-                                <i className="fa-solid fa-user-group" style={{ fontSize: 11, color: T.text3, marginRight: 8 }} />
+                                <i className="fa-solid fa-user-group" style={{ fontSize: 14, color: T.text3, marginRight: 8 }} />
                                 {p.informal}
                               </span>
                               <span style={{ fontSize: 14, fontWeight: 800, color: accent }}>
-                                <i className="fa-solid fa-chalkboard-user" style={{ fontSize: 11, color: T.text3, marginRight: 8 }} />
+                                <i className="fa-solid fa-chalkboard-user" style={{ fontSize: 14, color: T.text3, marginRight: 8 }} />
                                 {p.formal}
                               </span>
                             </div>
-                            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.5, marginTop: 6 }}>{p.cambio}</div>
+                            <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5, marginTop: 6 }}>{p.cambio}</div>
                           </>
                         ) : (
-                          <div style={{ fontSize: 12.5, color: T.text3, marginTop: 6, fontStyle: "italic" }}>
+                          <div style={{ fontSize: 14, color: T.text3, marginTop: 6, fontStyle: "italic" }}>
                             Coloca las dos versiones de esta intención para ver qué las separa.
                           </div>
                         )}
@@ -1054,176 +1122,238 @@ export function LabAulaIngles({ color }: PracticaLabProps) {
             />
           )}
         </div>
-
-        {/* ── columna lateral ─────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos de la sesión
-            </Eyebrow>
-            <TableroObjetivos objetivos={objetivos} retoKey={RETO_KEY} accent={accent} />
-          </div>
-
-          <div
-            style={{
-              borderRadius: 18,
-              padding: "16px 18px",
-              border: `1px solid rgba(${color.rgba},0.3)`,
-              background: `rgba(${color.rgba},0.08)`,
-              fontSize: 13,
-              color: T.text2,
-              lineHeight: 1.55,
-              display: "flex",
-              gap: 12,
-            }}
-          >
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              {modo === "turno" && (
-                <>
-                  Las tres opciones son inglés correcto. No busques la que «suena bien»: lee <strong style={{ color: T.text }}>qué dice cada una</strong> y quédate
-                  con la que cumple tu intención y le habla a la maestra.
-                </>
-              )}
-              {modo === "intercambio" && (
-                <>
-                  El orden es la gramática de la conversación: <strong style={{ color: T.text }}>Excuse me</strong> abre el turno, la pregunta va antes de la
-                  respuesta y <strong style={{ color: T.text }}>Sorry</strong> se disculpa por lo que ya pasó.
-                </>
-              )}
-              {modo === "registro" && (
-                <>
-                  Fíjate en cuatro marcas: <strong style={{ color: T.text }}>please</strong>, la pregunta con{" "}
-                  <strong style={{ color: T.text }}>could / may</strong> en lugar del imperativo, <strong style={{ color: T.text }}>excuse me</strong> en vez de{" "}
-                  <em>hey</em>, y las formas completas en vez de las coloquiales.
-                </>
-              )}
-              {modo === "texto" && (
-                <>
-                  Este es el diálogo de la actividad <strong style={{ color: T.text }}>A2</strong>, tal cual. Escribe la palabra que falta; no se distinguen
-                  mayúsculas.
-                </>
-              )}
-            </span>
-          </div>
-
-          {/* Instrucciones del maestro (verbatim A1) */}
-          <div style={{ ...card, padding: "18px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-chalkboard-user" style={{ marginRight: 8, color: accent }} />
-              Lo que dice el maestro
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              {INSTRUCCIONES_A1.map((x) => (
-                <div key={x.en} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13.5, fontWeight: 800, color: "#fff", lineHeight: 1.35 }}>{x.en}</div>
-                    <div style={{ fontSize: 12, color: T.text3, fontStyle: "italic", lineHeight: 1.35, marginTop: 2 }}>{x.es}</div>
+      }
+      pestanas={[
+        {
+          id: "cuaderno",
+          etiqueta: "Cuaderno",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Tu partida" icono="fa-star">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8 }}>
+                  <Dato label="Minutos" value={`${minutosQuedan}/${MINUTOS_CLASE}`} col={minutosQuedan < 14 ? "#FFC75A" : undefined} />
+                  <Dato label="Clase" value={`${cCorrectos}/${MOMENTOS_CLASE.length}`} col={claseDone ? OK : undefined} />
+                  <Dato label="Situaciones" value={`${Object.keys(resueltas).length}/${SITUACIONES.length}`} col={turnoDone ? OK : undefined} />
+                  <Dato label="Escuchadas" value={`${escuchados}/${META_ESCUCHAS}`} col={escuchados >= META_ESCUCHAS ? OK : undefined} />
+                </div>
+              </Bloque>
+              <Bloque titulo="Pista de este modo" icono="fa-lightbulb">
+                <p style={{ margin: 0, color: T.text2 }}>{pistaModo}</p>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <RetoQuizCard
+              quiz={QUIZ_A4}
+              accent={accent}
+              rgba={color.rgba}
+              aprobado={quizAprobado}
+              onAprobado={() => setQuizAprobado(true)}
+              playSfx={(ok) => (ok ? sfxOk() : sfxNo())}
+              mensajeAprobado="Ya sabes qué decir en clase y a quién decírselo."
+            />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book",
+          contenido: (
+            <>
+              <Bloque titulo="Lo que dice el maestro" icono="fa-chalkboard-user">
+                {INSTRUCCIONES_A1.map((x) => (
+                  <div key={x.en} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 800, color: "#fff", lineHeight: 1.35 }}>{x.en}</div>
+                      <div style={{ color: T.text3, fontStyle: "italic", lineHeight: 1.35, marginTop: 2 }}>{x.es}</div>
+                    </div>
+                    <BotonEscuchar texto={x.en} onPlay={contarEscucha} />
                   </div>
-                  <BotonEscuchar texto={x.en} onPlay={contarEscucha} />
-                </div>
-              ))}
-            </div>
-          </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Hechos comprobados (A5)" icono="fa-circle-check">
+                {HECHOS_A5.map((h) => (
+                  <div key={h.enunciado} style={{ color: T.text2, lineHeight: 1.5 }}>
+                    <strong style={{ color: h.respuesta ? OK : NO, marginRight: 8 }}>{h.respuesta ? "TRUE" : "FALSE"}</strong>
+                    {h.enunciado}
+                    <div style={{ color: T.text3, marginTop: 3, fontStyle: "italic" }}>{h.retro}</div>
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Comprensión de la lectura A1" icono="fa-circle-question">
+                {PREGUNTAS_A1.map((p) => (
+                  <div key={p.pregunta} style={{ color: T.text2, lineHeight: 1.5 }}>
+                    <strong style={{ color: T.text }}>{p.pregunta}</strong>
+                    <div style={{ marginTop: 3, color: T.text3 }}>{p.respuesta}</div>
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo={`Lectura A1 · ${AULA_INGLES_FICHA.ancla}`} icono="fa-book-open-reader">
+                {LECTURA_A1.map((p, i) => (
+                  <p key={i} style={{ margin: 0, color: T.text2, lineHeight: 1.65 }}>
+                    {p}
+                  </p>
+                ))}
+                <button type="button" className="aul-btn" disabled={teoriaVista} onClick={() => setTeoriaVista(true)}>
+                  <i className={`fa-solid ${teoriaVista ? "fa-circle-check" : "fa-eye"}`} />
+                  {teoriaVista ? "Lectura revisada" : "Marcar lectura como revisada"}
+                </button>
+              </Bloque>
+              <Bloque titulo="Nota de la práctica" icono="fa-quote-left">
+                <p style={{ margin: 0, color: T.text2 }}>{NOTA_PRACTICA}</p>
+                <p style={{ margin: 0, color: T.text3 }}>
+                  Verbatim de IN-I-P02: la lectura (A1), el diálogo con huecos (A2), el quiz evaluable (A4), los hechos verdadero/falso (A5) y el
+                  glosario (A6). Las ocho situaciones, los tres intercambios, los seis pares formal/informal y la clase simulada son material nuevo
+                  escrito para esta práctica; los nombres (Ana) y la maestra son ficticios. Fuente: {AULA_INGLES_FICHA.fuente}.
+                </p>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={AULA_INGLES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
+  );
+}
 
-          {/* Hechos verbatim A5 */}
-          <div style={{ ...card, padding: "18px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-circle-check" style={{ marginRight: 8, color: accent }} />
-              Hechos comprobados (A5)
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-              {HECHOS_A5.map((h) => (
-                <div key={h.enunciado} style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.5 }}>
-                  <span
-                    style={{
-                      display: "inline-block",
-                      marginRight: 8,
-                      padding: "1px 7px",
-                      borderRadius: 6,
-                      fontSize: 10,
-                      fontWeight: 900,
-                      color: h.respuesta ? OK : NO,
-                      border: `1px solid ${h.respuesta ? OK : NO}66`,
-                      background: `${h.respuesta ? OK : NO}14`,
-                    }}
-                  >
-                    {h.respuesta ? "TRUE" : "FALSE"}
-                  </span>
-                  {h.enunciado}
-                  <div style={{ fontSize: 11.5, color: T.text3, marginTop: 3, fontStyle: "italic" }}>{h.retro}</div>
-                </div>
-              ))}
-            </div>
-          </div>
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Imagen de escena: gradiente + icono detrás, la ilustración encima si existe
+ * ═══════════════════════════════════════════════════════════════════════════ */
+function EscenaImg({ clave, icono }: { clave: string; icono: string }) {
+  const [fallo, setFallo] = useState(false);
+  return (
+    <div className="aul-img" aria-hidden>
+      <i className={`fa-solid ${icono}`} />
+      {!fallo && <img src={`${RUTA_SIM}/${clave}.webp`} alt="" loading="lazy" onError={() => setFallo(true)} />}
+    </div>
+  );
+}
 
-          {/* Preguntas de comprensión (A1) */}
-          <div style={{ ...card, padding: "18px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />
-              Comprensión de la lectura A1
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-              {PREGUNTAS_A1.map((p) => (
-                <div key={p.pregunta} style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.5 }}>
-                  <strong style={{ color: T.text }}>{p.pregunta}</strong>
-                  <div style={{ marginTop: 3, color: T.text3 }}>{p.respuesta}</div>
-                </div>
-              ))}
-            </div>
-          </div>
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Modo 0 — Vive la clase (simulador: lo que dices cambia el pizarrón)
+ * ═══════════════════════════════════════════════════════════════════════════ */
+function ClasePanel({
+  accent,
+  indice,
+  probados,
+  resueltos,
+  minutos,
+  onElegir,
+  onIr,
+  onEscucha,
+}: {
+  accent: string;
+  indice: number;
+  probados: Record<string, number[]>;
+  resueltos: Record<string, number>;
+  minutos: number;
+  onElegir: (i: number) => void;
+  onIr: (i: number) => void;
+  onEscucha: () => void;
+}) {
+  const momento = MOMENTOS_CLASE[indice] ?? MOMENTOS_CLASE[0]!;
+  const intentos = probados[momento.id] ?? [];
+  const resuelto = resueltos[momento.id] !== undefined;
+  const ultimo = intentos.length > 0 ? momento.opciones[intentos[intentos.length - 1]!] : undefined;
+  const hechos = MOMENTOS_CLASE.filter((m) => resueltos[m.id] !== undefined).length;
+  const bajo = minutos < 14;
 
-          {/* Nota verbatim de cierre */}
-          <div
+  return (
+    <>
+      <div className="aul-reloj-barra" data-bajo={bajo}>
+        <span>
+          <i className="fa-regular fa-clock" /> Minutos de clase
+        </span>
+        <strong>
+          {minutos} / {MINUTOS_CLASE}
+        </strong>
+        <div className="aul-barra">
+          <div style={{ width: `${(minutos / MINUTOS_CLASE) * 100}%` }} />
+        </div>
+      </div>
+
+      <div style={{ ...card, padding: "16px 18px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
+          <Eyebrow>
+            Momento {indice + 1} de {MOMENTOS_CLASE.length} · {momento.titulo}
+          </Eyebrow>
+          <span style={{ fontSize: 14, fontWeight: 800, color: hechos >= MOMENTOS_CLASE.length ? OK : T.text3 }}>
+            {hechos}/{MOMENTOS_CLASE.length}
+          </span>
+        </div>
+        <EscenaImg clave={momento.imagen} icono={momento.icono} />
+        <div style={{ fontSize: 15, color: T.text, lineHeight: 1.55, fontWeight: 700 }}>{momento.situacion}</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginTop: 8 }}>
+          <span style={{ fontSize: 14, color: T.text2 }}>
+            <strong style={{ color: "#fff" }}>Teacher:</strong> {momento.maestraInicia}
+          </span>
+          <BotonEscuchar texto={momento.maestraInicia} onPlay={onEscucha} />
+        </div>
+        <div style={{ fontSize: 14, color: T.text3, fontStyle: "italic", marginTop: 3 }}>{momento.maestraEs}</div>
+
+        {ultimo && (
+          <div className="aul-reac" data-ok={ultimo.ok}>
+            <strong style={{ color: ultimo.ok ? OK : NO }}>«{ultimo.maestra}»</strong> {ultimo.porque}
+          </div>
+        )}
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <Eyebrow>¿Qué dices? Elige tu respuesta</Eyebrow>
+        {momento.opciones.map((op, i) => {
+          const probada = intentos.includes(i);
+          const buena = resuelto && resueltos[momento.id] === i;
+          const mala = probada && !op.ok;
+          return (
+            <button key={op.texto} className="aul-opt" data-ok={buena} data-bad={mala} disabled={resuelto || probada} onClick={() => onElegir(i)}>
+              <span className="aul-letra">
+                {buena ? <i className="fa-solid fa-check" /> : mala ? <i className="fa-solid fa-xmark" /> : String.fromCharCode(65 + i)}
+              </span>
+              <span style={{ flex: 1, lineHeight: 1.4 }}>{op.texto}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+        <button className="aul-btn" onClick={() => onIr(indice - 1)} disabled={indice === 0}>
+          <i className="fa-solid fa-arrow-left" /> Anterior
+        </button>
+        {MOMENTOS_CLASE.map((m, i) => (
+          <button
+            key={m.id}
+            className="aul-btn"
+            title={m.titulo}
+            aria-label={`Ir al momento ${i + 1}`}
+            onClick={() => onIr(i)}
             style={{
-              borderRadius: 18,
-              padding: "16px 18px",
-              border: `1px solid ${T.line}`,
-              background: T.glass,
-              fontSize: 12.5,
-              color: T.text2,
-              lineHeight: 1.55,
-              display: "flex",
-              gap: 12,
+              minWidth: 44,
+              padding: "10px 12px",
+              ...(i === indice ? { borderColor: accent, color: "#fff" } : {}),
+              ...(resueltos[m.id] !== undefined ? { color: OK } : {}),
             }}
           >
-            <i className="fa-solid fa-quote-left" style={{ color: accent, fontSize: 15, marginTop: 2 }} />
-            <span>{NOTA_PRACTICA}</span>
-          </div>
-        </div>
+            {resueltos[m.id] !== undefined ? <i className="fa-solid fa-check" /> : i + 1}
+          </button>
+        ))}
+        <button
+          className="aul-btn"
+          style={resuelto ? { background: accent, color: "#04121f", borderColor: accent } : undefined}
+          onClick={() => onIr(indice + 1)}
+          disabled={indice >= MOMENTOS_CLASE.length - 1}
+        >
+          Siguiente <i className="fa-solid fa-arrow-right" />
+        </button>
       </div>
-
-      <RetoQuizCard
-        quiz={QUIZ_A4}
-        accent={accent}
-        rgba={color.rgba}
-        aprobado={quizAprobado}
-        onAprobado={() => setQuizAprobado(true)}
-        playSfx={(ok) => (ok ? sfxOk() : sfxNo())}
-        mensajeAprobado="Ya sabes qué decir en clase y a quién decírselo."
-      />
-
-      {/* Lectura A1 completa + nota al pie */}
-      <div style={{ ...card, padding: "20px 24px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-book-open-reader" style={{ marginRight: 8, color: accent }} />
-          Lectura A1 · {AULA_INGLES_FICHA.ancla}
-        </Eyebrow>
-        <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-          {LECTURA_A1.map((p, i) => (
-            <p key={i} style={{ margin: 0, fontSize: 13.5, color: T.text2, lineHeight: 1.65 }}>
-              {p}
-            </p>
-          ))}
-        </div>
-        <div className="aul-divider" />
-        <p style={{ margin: 0, fontSize: 11.5, color: T.text3, lineHeight: 1.6 }}>
-          Verbatim de la progresión IN-I-P02: la lectura (A1), el diálogo con huecos (A2), el quiz evaluable (A4), los hechos verdadero/falso (A5) y el glosario
-          (A6). Las ocho situaciones, los tres intercambios y los seis pares formal/informal son material nuevo escrito para esta práctica con las mismas
-          funciones y frases de la lectura; los nombres (Ana) son ficticios. Fuente: {AULA_INGLES_FICHA.fuente}.
-        </p>
-      </div>
-    </div>
+    </>
   );
 }

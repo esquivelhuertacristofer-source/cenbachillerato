@@ -36,18 +36,27 @@
  * capacidades de las personas.
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { PracticaLabProps } from "../registry";
-import { T, OK, NUM, card, Eyebrow } from "./_kit";
+import { T, OK, NUM, card } from "./_kit";
+import { LabShell, Bloque, BotonHerramienta, Dato } from "./_shell";
+import { useEstrellas } from "@/lib/hooks/useEstrellas";
 import { hablarLab, callarLab } from "./lab-voz";
 import { LabSfx } from "./lab-audio";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { usePartida, MarcadorPartida } from "./_partida";
-import { TableroObjetivos } from "./_objetivos";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { HABITOS_COMPARACIONES_FICHA } from "./habitos-comparaciones-ficha";
 import { HABITOS_COMPARACIONES_HUECOS } from "./habitos-comparaciones-huecos";
+import {
+  SITUACIONES,
+  TOPE_MINUTOS,
+  TOPE_PESOS,
+  calcularPlan,
+  estrellasDelPlan,
+  type PlanSim,
+} from "./habitos-comparaciones-sim";
 import {
   REGLAS,
   ESCALERA,
@@ -73,9 +82,10 @@ import {
 const NO = "#FF5E5E";
 const RETO_KEY = "cen-habitos-comparaciones-ingles-reto";
 
-type Modo = "escalera" | "datos" | "igualdad" | "preferencias" | "texto";
+type Modo = "simulador" | "escalera" | "datos" | "igualdad" | "preferencias" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
+  { id: "simulador", label: "El sábado de Ana", icono: "fa-comments" },
   { id: "escalera", label: "La escalera del adjetivo", icono: "fa-stairs" },
   { id: "datos", label: "Los datos mandan", icono: "fa-table" },
   { id: "igualdad", label: "as … as", icono: "fa-equals" },
@@ -101,12 +111,12 @@ function frasePreferencia(ronda: RondaPreferencia, elegidas: Record<string, stri
 
 export function LabHabitosComparaciones({ color }: PracticaLabProps) {
   const accent = color.hex;
-  const [modo, setModo] = useState<Modo>("escalera");
+  const [modo, setModo] = useState<Modo>("simulador");
 
   // ── sonido, partida y teoría ──────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
+  const { mejorEstrellas: mejor, registraEstrellas } = useEstrellas(RETO_KEY);
   const audioRef = useRef<LabSfx | null>(null);
   useEffect(() => () => audioRef.current?.dispose(), []);
   // `callarLab()` ya se traga sus propios fallos: no hace falta envolverlo.
@@ -355,8 +365,44 @@ export function LabHabitosComparaciones({ color }: PracticaLabProps) {
   // ── reto evaluable (A3) ───────────────────────────────────────────────
   const [quizAprobado, setQuizAprobado] = useState(false);
 
+  // ── simulador: «El sábado de Ana» ─────────────────────────────────────
+  const [simIdx, setSimIdx] = useState(0);
+  const [simElegidas, setSimElegidas] = useState<Record<string, number>>({});
+  const plan = calcularPlan(simElegidas);
+  const simDone = plan.hechas >= SITUACIONES.length;
+  const planCabe = simDone && plan.minutos <= TOPE_MINUTOS && plan.pesos <= TOPE_PESOS;
+  const estrellasSim = estrellasDelPlan(plan);
+  const bestEstrellas = Math.max(estrellasSim, mejor);
+
+  const elegirOracion = (iOracion: number) => {
+    const s = SITUACIONES[simIdx]!;
+    if (simElegidas[s.id] !== undefined) return;
+    const o = s.oraciones[iOracion];
+    if (!o) return;
+    const siguiente = { ...simElegidas, [s.id]: iOracion };
+    setSimElegidas(siguiente);
+    if (o.clase === "ok") sfxSi();
+    else sfxNo();
+    const p = calcularPlan(siguiente);
+    if (p.hechas >= SITUACIONES.length) {
+      registraEstrellas(estrellasDelPlan(p));
+      sfxOk();
+    }
+  };
+  const irSim = (i: number) => {
+    const n = SITUACIONES.length;
+    setSimIdx(((i % n) + n) % n);
+  };
+  const resetSim = () => {
+    setSimIdx(0);
+    setSimElegidas({});
+    partida.reiniciar();
+  };
+
   // ── objetivos de la sesión ────────────────────────────────────────────
   const objetivos = [
+    { txt: "Ayuda a Ana en las 5 situaciones del sábado", done: simDone },
+    { txt: `Que el plan quepa en ${TOPE_MINUTOS} min y $${TOPE_PESOS.toLocaleString("en-US")}`, done: planCabe },
     { txt: `Nombra la regla de los ${ESCALERA.length} adjetivos`, done: reglasDone },
     { txt: "Construye sus comparativos y superlativos", done: escaleraDone },
     { txt: `Resuelve las ${TARJETAS.length} tarjetas de datos`, done: datosDone },
@@ -371,8 +417,10 @@ export function LabHabitosComparaciones({ color }: PracticaLabProps) {
   ];
 
   const resetActual =
-    modo === "escalera"
-      ? resetEscalera
+    modo === "simulador"
+      ? resetSim
+      : modo === "escalera"
+        ? resetEscalera
       : modo === "datos"
         ? resetDatos
         : modo === "igualdad"
@@ -381,18 +429,79 @@ export function LabHabitosComparaciones({ color }: PracticaLabProps) {
             ? resetPref
             : resetTexto;
 
+  const pieEstado = (
+    <div
+      role="status"
+      aria-live="polite"
+      style={{
+        borderRadius: 14,
+        border: `1px solid ${pie ? (pie.ok ? `${OK}55` : `${NO}55`) : T.line}`,
+        background: pie ? (pie.ok ? `${OK}12` : `${NO}12`) : T.glass,
+        padding: "13px 16px",
+        fontSize: 14.5,
+        lineHeight: 1.55,
+        color: T.text2,
+        display: "flex",
+        gap: 12,
+        alignItems: "flex-start",
+        transition: "all .2s",
+      }}
+    >
+      <i
+        className={`fa-solid ${pie ? (pie.ok ? "fa-circle-check" : "fa-circle-exclamation") : "fa-comment-dots"}`}
+        style={{ color: pie ? (pie.ok ? OK : NO) : T.text3, fontSize: 16, marginTop: 2 }}
+      />
+      <span>{pie ? pie.txt : "Aquí aparece por qué cada decisión estuvo bien o mal."}</span>
+    </div>
+  );
+
+  const lectura =
+    modo === "simulador" ? (
+      <>
+        {plan.minutos}/{TOPE_MINUTOS} min · ${plan.pesos.toLocaleString("en-US")}/${TOPE_PESOS.toLocaleString("en-US")} · Ana te entendió {plan.entendidas}/{plan.hechas}
+      </>
+    ) : (
+      <>Cada decisión se explica abajo</>
+    );
+
+  const consejo =
+    modo === "escalera" ? (
+      <>Una sílaba: <strong style={{ color: T.text }}>-er / the -est</strong>. Dos o más: <strong style={{ color: T.text }}>more / the most</strong>. Nunca las dos: «more easier» no existe.</>
+    ) : modo === "datos" ? (
+      <>Las cuatro oraciones están bien escritas, pero <strong style={{ color: T.text }}>tres dicen algo que la tabla no dice</strong>. El superlativo solo vale con tres cosas o más.</>
+    ) : modo === "igualdad" ? (
+      <>Entre los dos <strong style={{ color: T.text }}>as</strong> el adjetivo va en forma base: as fast as. <strong style={{ color: T.text }}>not as … as</strong> deja a la primera cosa por debajo.</>
+    ) : modo === "preferencias" ? (
+      <><strong style={{ color: T.text }}>prefer … to</strong> (nunca «than»), <strong style={{ color: T.text }}>would rather + verbo base + than + verbo base</strong> y <strong style={{ color: T.text }}>like … better than</strong>.</>
+    ) : modo === "texto" ? (
+      <>Lee el párrafo entero antes de escribir: el contexto decide la forma. Pulsa <strong style={{ color: T.text }}>Enter</strong> para comprobar cada hueco.</>
+    ) : (
+      <>Lo que dices manda: una oración mal armada confunde a Ana, y una bien armada pero falsa la lleva al lugar equivocado.</>
+    );
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      dom
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })),
+        valor: modo,
+        cambiar: (id) => setModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={resetActual} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      escena={
+        <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
+          <style>{`
         @keyframes hcpShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
-        .hcp-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 16px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:800; transition:all .14s; font-family:inherit; }
-        .hcp-tab:hover { border-color:${T.lineStrong}; color:#fff; }
-        .hcp-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-        .hcp-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
-          font-size:14px; border:1px solid ${T.line}; background:${T.glass}; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .hcp-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
-        .hcp-icobtn:hover { background:rgba(255,255,255,0.12); }
 
         .hcp-card { border-radius:16px; border:1.5px solid ${T.line}; background:${T.glass}; padding:16px 18px; transition:all .16s; }
         .hcp-card[data-done="true"] { border-color:${OK}66; }
@@ -400,7 +509,7 @@ export function LabHabitosComparaciones({ color }: PracticaLabProps) {
         /* Navegador de rondas */
         .hcp-dots { display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
         .hcp-dot { cursor:pointer; width:30px; height:30px; border-radius:9px; border:1.5px solid ${T.line}; background:${T.glass};
-          color:${T.text3}; font-size:12px; font-weight:800; transition:all .14s; font-family:inherit; font-variant-numeric:tabular-nums; }
+          color:${T.text3}; font-size:14px; font-weight:800; transition:all .14s; font-family:inherit; font-variant-numeric:tabular-nums; }
         .hcp-dot:hover { border-color:${T.lineStrong}; color:#fff; }
         .hcp-dot[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.2); color:#fff; }
         .hcp-dot[data-done="true"] { border-color:${OK}88; color:${OK}; }
@@ -452,49 +561,58 @@ export function LabHabitosComparaciones({ color }: PracticaLabProps) {
         /* Tabla de datos */
         .hcp-col { border-radius:14px; border:1.5px solid ${T.line}; background:${T.inset}; padding:13px 15px; min-width:0; }
         .hcp-fila { display:flex; align-items:baseline; justify-content:space-between; gap:12px; padding:5px 0;
-          border-bottom:1px solid ${T.line}; font-size:13px; }
+          border-bottom:1px solid ${T.line}; font-size:14px; }
         .hcp-fila:last-child { border-bottom:none; }
 
         .hcp-mini { cursor:pointer; padding:7px 13px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass};
-          color:${T.text2}; font-size:12.5px; font-weight:800; transition:all .14s; font-family:inherit; }
+          color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; font-family:inherit; }
         .hcp-mini:hover:not(:disabled) { border-color:${T.lineStrong}; color:#fff; }
         .hcp-mini:disabled { opacity:.45; cursor:not-allowed; }
 
         .hcp-vf { cursor:pointer; padding:8px 16px; border-radius:10px; border:1.5px solid ${T.line}; background:${T.glass};
-          color:${T.text2}; font-size:12.5px; font-weight:800; transition:all .14s; font-family:inherit; }
+          color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; font-family:inherit; }
         .hcp-vf:hover:not(:disabled) { border-color:${T.lineStrong}; color:#fff; }
         .hcp-vf:disabled { cursor:default; opacity:.85; }
         .hcp-vf[data-on="true"] { border-color:${OK}; background:${OK}1f; color:#fff; }
         .hcp-vf[data-bad="true"] { border-color:${NO}; background:${NO}1f; color:#fff; }
 
-        .hcp-side { position:sticky; top:10px; }
-        .hcp-apoyo { display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:16px; align-items:start; margin-top:18px; }
-        @media (max-width: 900px){
-          .hcp-grid { grid-template-columns:minmax(0,1fr) !important; }
-          .hcp-side { position:static; }
-          .hcp-tab { padding:9px 12px; font-size:12.5px; gap:7px; }
-        }
-
-        /* Cajón de teoría */
-        .hcp-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .hcp-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .hcp-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .hcp-drawer[data-open="true"] { transform:translateX(0); }
-        .hcp-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .hcp-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .hcp-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .hcp-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .hcp-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .hcp-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .hcp-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
+        /* Simulador «El sábado de Ana» */
+        .hsim-foto { position:relative; aspect-ratio:16/9; max-height:210px; width:100%; border-radius:14px; overflow:hidden;
+          display:flex; align-items:center; justify-content:center; border:1px solid ${T.line}; }
+        .hsim-foto > i { font-size:54px; color:rgba(255,255,255,0.28); }
+        .hsim-foto > img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+        .hsim-foto-titulo { position:absolute; left:10px; bottom:10px; right:10px; padding:6px 12px; border-radius:10px; width:fit-content; max-width:calc(100% - 20px);
+          background:rgba(2,12,28,0.78); color:#fff; font-size:15px; font-weight:800; }
+        .hsim-barra { position:relative; display:grid; grid-template-columns:minmax(84px,auto) minmax(0,1fr) auto; align-items:center; gap:10px;
+          padding:8px 10px; border-radius:11px; border:1.5px solid transparent; transition:all .2s; }
+        .hsim-barra[data-elegida="true"] { border-color:${accent}; background:rgba(${color.rgba},0.12); }
+        .hsim-barra-et { font-size:14.5px; font-weight:800; color:#fff; }
+        .hsim-barra-et i { color:${accent}; margin-right:4px; }
+        .hsim-barra-pista { height:16px; border-radius:8px; background:${T.inset}; overflow:hidden; display:block; }
+        .hsim-barra-fill { display:block; height:100%; border-radius:8px; background:linear-gradient(90deg, rgba(${color.rgba},0.55), ${accent}); transition:width .4s; }
+        .hsim-barra-val { font-size:14.5px; font-weight:800; color:#fff; font-variant-numeric:tabular-nums; }
+        .hsim-ana { position:absolute; right:10px; top:-11px; padding:2px 10px; border-radius:999px; background:${accent}; color:#021022; font-size:14px; font-weight:900; animation:hsimPop .3s; }
+        @keyframes hsimPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
+        .hsim-burbuja { display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:12px 14px; border-radius:14px; background:${T.inset}; border:1px solid ${T.line}; }
+        .hsim-cara { font-size:34px; color:${accent}; transition:color .2s; }
+        .hsim-porque { border-radius:12px; padding:12px 14px; font-size:14.5px; line-height:1.55; color:${T.text2}; border:1px solid ${NO}55; background:${NO}12; }
+        .hsim-porque[data-ok="true"] { border-color:${OK}55; background:${OK}12; }
+        .hsim-porque strong { color:#fff; }
+        .hsim-medidores { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap:12px; }
+        .hsim-medidor { display:flex; flex-direction:column; gap:6px; min-width:0; }
+        .hsim-medidor-cab { display:flex; align-items:baseline; justify-content:space-between; gap:8px; flex-wrap:wrap; font-size:14px; color:${T.text2}; font-weight:700; }
+        .hsim-medidor-cab strong { font-variant-numeric:tabular-nums; }
+        .hsim-pista { position:relative; height:16px; border-radius:8px; background:${T.inset}; overflow:hidden; }
+        .hsim-relleno { height:100%; border-radius:8px; transition:width .4s, background .3s; }
+        .hsim-tope { position:absolute; top:0; bottom:0; left:66.667%; width:3px; background:#fff; opacity:.85; }
+        .hsim-punto { width:18px; height:18px; border-radius:50%; border:2px solid ${T.lineStrong}; background:transparent; }
+        .hsim-punto[data-estado="si"] { background:${OK}; border-color:${OK}; }
+        .hsim-punto[data-estado="no"] { background:${NO}; border-color:${NO}; }
+        .hsim-final { display:flex; align-items:center; gap:14px; flex-wrap:wrap; padding:12px 14px; border-radius:12px; border:1px solid ${NO}55; background:${NO}10;
+          font-size:14.5px; line-height:1.5; color:${T.text2}; }
+        .hsim-final[data-ok="true"] { border-color:${OK}55; background:${OK}10; }
+        .hsim-final span { flex:1 1 200px; min-width:0; }
+        @media (prefers-reduced-motion: reduce){ .hsim-ana { animation:none; } .hsim-barra-fill, .hsim-relleno { transition:none; } }
 
         /* Identidad del tablero: cada tarjeta lleva su franja de color */
         .hcp-card, .hcp-col { --tono:196; position:relative;
@@ -510,59 +628,14 @@ export function LabHabitosComparaciones({ color }: PracticaLabProps) {
 
         @media (prefers-reduced-motion: reduce){
           .hcp-chip[data-shake="true"], .hcp-regla[data-shake="true"] { animation:none; }
-          .hcp-chip:hover, .hcp-teoria-fab:hover { transform:none; }
+          .hcp-chip:hover { transform:none; }
         }
-      `}</style>
+          `}</style>
 
-      {/* ── Barra de modos y herramientas ─────────────────────────────── */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} type="button" className="hcp-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-      </div>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 10, flexWrap: "wrap", marginBottom: 16 }}>
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button type="button" className="hcp-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button type="button" className="hcp-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button type="button" className="hcp-icobtn" onClick={resetActual} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
+          {modo === "simulador" && (
+            <SimPanel accent={accent} rgba={color.rgba} indice={simIdx} elegidas={simElegidas} plan={plan} onIr={irSim} onElegir={elegirOracion} />
+          )}
 
-      {/* ── Cajón de teoría ───────────────────────────────────────────── */}
-      <button type="button" className="hcp-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="hcp-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="hcp-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="hcp-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button type="button" className="hcp-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="hcp-drawer-body">
-          <FichaTeorica data={HABITOS_COMPARACIONES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div
-        className="hcp-grid"
-        style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}
-      >
-        {/* ── Columna principal ───────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
           {modo === "escalera" && (
             <EscaleraPanel
               accent={accent}
@@ -620,203 +693,339 @@ export function LabHabitosComparaciones({ color }: PracticaLabProps) {
             />
           )}
 
-          {/* Pie: la última explicación, siempre a la vista */}
-          <div
-            role="status"
-            aria-live="polite"
-            style={{
-              borderRadius: 14,
-              border: `1px solid ${pie ? (pie.ok ? `${OK}55` : `${NO}55`) : T.line}`,
-              background: pie ? (pie.ok ? `${OK}12` : `${NO}12`) : T.glass,
-              padding: "13px 16px",
-              fontSize: 13,
-              lineHeight: 1.55,
-              color: T.text2,
-              display: "flex",
-              gap: 12,
-              alignItems: "flex-start",
-              transition: "all .2s",
-            }}
-          >
-            <i
-              className={`fa-solid ${pie ? (pie.ok ? "fa-circle-check" : "fa-circle-exclamation") : "fa-comment-dots"}`}
-              style={{ color: pie ? (pie.ok ? OK : NO) : T.text3, fontSize: 15, marginTop: 2 }}
-            />
-            <span>
-              {pie
-                ? pie.txt
-                : "Aquí aparece la explicación de cada decisión: por qué a ese adjetivo le toca esa regla, qué dice en realidad la tabla de datos y qué palabra exige detrás cada estructura de preferencia."}
-            </span>
-          </div>
+          {modo !== "simulador" && pieEstado}
         </div>
-
-        {/* ── Columna lateral ─────────────────────────────────────────── */}
-        <div className="hcp-side" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos de la sesión
-            </Eyebrow>
-            <TableroObjetivos objetivos={objetivos} retoKey={RETO_KEY} accent={accent} />
-          </div>
-
-          <div
-            style={{
-              borderRadius: 18,
-              padding: "16px 18px",
-              border: `1px solid rgba(${color.rgba},0.3)`,
-              background: `rgba(${color.rgba},0.08)`,
-              fontSize: 13,
-              color: T.text2,
-              lineHeight: 1.55,
-              display: "flex",
-              gap: 12,
-            }}
-          >
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              {modo === "escalera" && (
-                <>
-                  Cuenta las sílabas antes de elegir. Una sola sílaba lleva{" "}
-                  <strong style={{ color: T.text }}>-er / the -est</strong>; dos o más, <strong style={{ color: T.text }}>more / the most</strong>.
-                  Lo que nunca se hace es juntar las dos reglas: <strong style={{ color: T.text }}>«more easier» no existe</strong>.
-                </>
-              )}
-              {modo === "datos" && (
-                <>
-                  Las cuatro oraciones están bien escritas. La trampa es otra:{" "}
-                  <strong style={{ color: T.text }}>tres de ellas dicen algo que la tabla no dice</strong>. Y ojo con el superlativo: solo vale
-                  cuando hay tres cosas o más.
-                </>
-              )}
-              {modo === "igualdad" && (
-                <>
-                  Entre los dos <strong style={{ color: T.text }}>as</strong> el adjetivo va en su{" "}
-                  <strong style={{ color: T.text }}>forma base</strong>: as fast as, nunca «as faster as». Y{" "}
-                  <strong style={{ color: T.text }}>not as … as</strong> deja a la primera cosa por debajo de la segunda.
-                </>
-              )}
-              {modo === "preferencias" && (
-                <>
-                  Cada estructura exige algo distinto detrás:{" "}
-                  <strong style={{ color: T.text }}>prefer … to</strong> (nunca «than»),{" "}
-                  <strong style={{ color: T.text }}>would rather + verbo base + than + verbo base</strong> (sin «to» y sin «-ing») y{" "}
-                  <strong style={{ color: T.text }}>like … better than</strong>.
-                </>
-              )}
-              {modo === "texto" && (
-                <>
-                  Lee el párrafo entero antes de escribir: el contexto decide la forma. Pulsa{" "}
-                  <strong style={{ color: T.text }}>Enter</strong> para comprobar cada hueco, y usa el banco de palabras si te atoras.
-                </>
-              )}
-            </span>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-gauge-high" style={{ marginRight: 8, color: accent }} />
-              Escala de frecuencia · A1
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              {ESCALA_FRECUENCIA.map((f) => (
-                <div key={f.adverbio} style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 10, fontSize: 12.5 }}>
-                  <span style={{ fontWeight: 800, color: T.text }}>{f.adverbio}</span>
-                  <span style={{ color: T.text3, flex: 1, textAlign: "right" }}>{f.es}</span>
-                  <span style={{ color: accent, fontWeight: 800, ...NUM, minWidth: 42, textAlign: "right" }}>{f.pct}</span>
+      }
+      pestanas={[
+        {
+          id: "cuaderno",
+          etiqueta: "Cuaderno",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Tu partida" icono="fa-star">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8 }}>
+                  <Dato label="Minutos" value={`${plan.minutos}/${TOPE_MINUTOS}`} col={plan.minutos > TOPE_MINUTOS ? NO : undefined} />
+                  <Dato label="Pesos" value={`$${plan.pesos.toLocaleString("en-US")}`} col={plan.pesos > TOPE_PESOS ? NO : undefined} />
+                  <Dato label="Ana te entendió" value={`${plan.entendidas}/${SITUACIONES.length}`} />
+                  <Dato label="Oraciones exactas" value={`${plan.buenas}/${SITUACIONES.length}`} col={plan.buenas >= SITUACIONES.length ? OK : undefined} />
                 </div>
-              ))}
+                <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                  <div style={{ display: "flex", gap: 4 }}>
+                    {[1, 2, 3].map((n) => (
+                      <i key={n} className="fa-solid fa-star" style={{ fontSize: 20, color: n <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
+                    ))}
+                  </div>
+                  <span style={{ fontSize: 14, color: T.text2, lineHeight: 1.45, flex: "1 1 160px" }}>
+                    1★ terminar el sábado · 2★ que quepa en tiempo y dinero · 3★ con las cinco oraciones exactas.
+                  </span>
+                </div>
+              </Bloque>
+              <Bloque titulo="Pista del modo" icono="fa-lightbulb">
+                <p style={{ margin: 0, color: T.text2 }}>{consejo}</p>
+              </Bloque>
+              {SITUACIONES.map((s, i) => {
+                const k = simElegidas[s.id];
+                const o = k !== undefined ? s.oraciones[k] : undefined;
+                return (
+                  <Bloque key={s.id} titulo={`${i + 1}. ${s.titulo}`} icono={o ? (o.clase === "ok" ? "fa-circle-check" : "fa-circle-xmark") : "fa-folder-open"}>
+                    {o ? (
+                      <p style={{ margin: 0, color: T.text2 }}>
+                        <strong style={{ color: T.text }}>«{o.texto}»</strong> {o.porque}
+                      </p>
+                    ) : (
+                      <p style={{ margin: 0, color: T.text3 }}>Sin decidir todavía. Ábrela en «El sábado de Ana».</p>
+                    )}
+                  </Bloque>
+                );
+              })}
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <>
+              <RetoQuizCard
+                quiz={RETO_QUIZ}
+                accent={accent}
+                rgba={color.rgba}
+                aprobado={quizAprobado}
+                onAprobado={() => setQuizAprobado(true)}
+                playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined}
+                mensajeAprobado="Ya puedes comparar hábitos, precios y preferencias en inglés sin mezclar las reglas."
+              />
+              <HechosCard accent={accent} respuestas={hechos} onResponder={responderHecho} />
+            </>
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book",
+          contenido: (
+            <>
+              <Bloque titulo="Escala de frecuencia · A1" icono="fa-gauge-high">
+                {ESCALA_FRECUENCIA.map((f) => (
+                  <div key={f.adverbio} style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 10, fontSize: 14 }}>
+                    <span style={{ fontWeight: 800, color: T.text }}>{f.adverbio}</span>
+                    <span style={{ color: T.text3, flex: 1, textAlign: "right" }}>{f.es}</span>
+                    <span style={{ color: accent, fontWeight: 800, ...NUM, minWidth: 42, textAlign: "right" }}>{f.pct}</span>
+                  </div>
+                ))}
+                <p style={{ margin: 0, color: T.text2 }}>
+                  De consulta: aquí la frecuencia se usa como dato que se compara («Ana goes to the gym more often than Luis»).
+                </p>
+              </Bloque>
+              <Bloque titulo="La tarea que viene · A5" icono="fa-pen-nib">
+                <p style={{ margin: 0, color: T.text2 }}>{ACTIVIDAD_FINAL_A5}</p>
+                {CRITERIOS_A7.map((c, i) => (
+                  <p key={i} style={{ margin: 0, color: T.text2 }}>
+                    <i className="fa-solid fa-angle-right" style={{ color: accent, marginRight: 8 }} />
+                    {c}
+                  </p>
+                ))}
+              </Bloque>
+              <Bloque titulo="Lectura A1 · para pensar" icono="fa-book-open-reader">
+                {COMPRENSION_A1.map((c, i) => (
+                  <details key={i} style={{ borderRadius: 11, border: `1px solid ${T.line}`, background: T.inset, padding: "10px 13px" }}>
+                    <summary style={{ cursor: "pointer", fontWeight: 700, color: T.text2, lineHeight: 1.45 }}>{c.pregunta}</summary>
+                    <p style={{ margin: "9px 0 0", color: T.text3 }}>{c.guia}</p>
+                  </details>
+                ))}
+              </Bloque>
+              <Bloque titulo="Se comparan hábitos y datos, no personas" icono="fa-scale-balanced">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  En todo el laboratorio lo que se pone lado a lado son rutas, precios, climas, frecuencias y libros leídos: cosas que una tabla puede
+                  sostener. Comparar cuerpos o capacidades de compañeros con esta gramática no es practicar inglés, es otra cosa.
+                </p>
+              </Bloque>
+              <Bloque titulo="Qué es verbatim y qué es de este laboratorio" icono="fa-quote-right">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  <strong style={{ color: T.text }}>Verbatim de la progresión IN-III-P04:</strong> la lectura A1 «Habits and Comparisons in English» con
+                  sus cuatro preguntas de comprensión y su escala de adverbios de frecuencia, el texto con huecos y sus pistas (A2), el reto evaluable
+                  de cinco reactivos con su retroalimentación (A3), los cinco enunciados verdadero/falso (A4), el glosario y la actividad final (A5),
+                  las oraciones de A6 y los criterios de la autoevaluación (A7).{" "}
+                  <strong style={{ color: T.text }}>Escrito para este laboratorio:</strong> «El sábado de Ana» (simulación), las siete escaleras de
+                  adjetivos con su mazo de trampas, las seis tarjetas de datos, las seis oraciones de «as … as» y las seis estructuras de preferencia.
+                  Las personas (Ana, Luis, Mateo, Sofía, Daniela), las rutas, los teléfonos y las cafeterías son{" "}
+                  <strong style={{ color: T.text }}>ficticios</strong>, y sus precios y tiempos, de simulación. Las cifras de clima de Mérida y
+                  Toluca están redondeadas a partir de las normales climatológicas y sirven para comparar dos ciudades, no como dato de reporte.
+                  El inglés de todas las oraciones es inglés estadounidense estándar.
+                </p>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={HABITOS_COMPARACIONES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Eyebrow local (14 px) y modo 0 — «El sábado de Ana» (simulador)
+ * ═══════════════════════════════════════════════════════════════════════════ */
+function Eyebrow({ children }: { children: ReactNode }) {
+  return (
+    <p style={{ fontSize: 14, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: T.text3, margin: "0 0 13px" }}>{children}</p>
+  );
+}
+
+const RUTA_FOTOS = "/media/labs-sim/habitos-comparaciones-ingles";
+
+function Medidor({ etiqueta, valor, tope, formato, icono }: { etiqueta: string; valor: number; tope: number; formato: (n: number) => string; icono: string }) {
+  const pasa = valor > tope;
+  const ancho = Math.min(100, (valor / (tope * 1.5)) * 100);
+  return (
+    <div className="hsim-medidor" data-pasa={pasa}>
+      <div className="hsim-medidor-cab">
+        <span>
+          <i className={`fa-solid ${icono}`} aria-hidden /> {etiqueta}
+        </span>
+        <strong style={{ color: pasa ? NO : "#fff" }}>
+          {formato(valor)} / {formato(tope)}
+        </strong>
+      </div>
+      <div className="hsim-pista">
+        <div className="hsim-relleno" style={{ width: `${ancho}%`, background: pasa ? NO : OK }} />
+        <div className="hsim-tope" />
+      </div>
+      {pasa && <span style={{ fontSize: 14, color: NO, fontWeight: 700 }}>Te pasaste del tope.</span>}
+    </div>
+  );
+}
+
+function SimPanel({
+  accent,
+  rgba,
+  indice,
+  elegidas,
+  plan,
+  onIr,
+  onElegir,
+}: {
+  accent: string;
+  rgba: string;
+  indice: number;
+  elegidas: Record<string, number>;
+  plan: PlanSim;
+  onIr: (i: number) => void;
+  onElegir: (i: number) => void;
+}) {
+  const s = SITUACIONES[indice] ?? SITUACIONES[0]!;
+  const k = elegidas[s.id];
+  const o = k !== undefined ? s.oraciones[k] : undefined;
+  const maximo = Math.max(...s.barras.map((b) => b.valor));
+  const fin = plan.hechas >= SITUACIONES.length;
+  const estrellas = estrellasDelPlan(plan);
+  const cara = !o ? "fa-face-smile" : o.clase === "gramatica" ? "fa-face-dizzy" : "fa-face-smile";
+  const formatoValor = (n: number) => (s.unidad === "$" ? `$${n.toLocaleString("en-US")}` : `${n} ${s.unidad}`);
+
+  return (
+    <>
+      <div style={{ ...card, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 12 }}>
+        <Rondas
+          total={SITUACIONES.length}
+          indice={indice}
+          hechas={SITUACIONES.map((x) => elegidas[x.id] !== undefined)}
+          etiqueta="situaciones"
+          onIr={onIr}
+        />
+
+        <div className="hsim-foto" style={{ background: `linear-gradient(135deg, rgba(${rgba},0.34), rgba(2,12,28,0.92))` }}>
+          <i className={`fa-solid ${s.icono}`} aria-hidden />
+          <img
+            src={`${RUTA_FOTOS}/${s.foto}.webp`}
+            alt=""
+            loading="lazy"
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+            }}
+          />
+          <span className="hsim-foto-titulo">{s.titulo}</span>
+        </div>
+        <p style={{ margin: 0, fontSize: 15, lineHeight: 1.5, color: T.text2 }}>{s.contexto}</p>
+      </div>
+
+      {/* La gráfica: lo que dice la tabla */}
+      <div style={{ ...card, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
+        <Eyebrow>
+          <i className="fa-solid fa-chart-simple" style={{ marginRight: 8, color: accent }} />
+          {s.medida} · simulación
+        </Eyebrow>
+        {s.barras.map((b, i) => {
+          const elegida = o !== undefined && o.elige === i;
+          return (
+            <div key={b.etiqueta} className="hsim-barra" data-elegida={elegida}>
+              <span className="hsim-barra-et">
+                <i className={`fa-solid ${b.icono}`} aria-hidden /> {b.etiqueta}
+              </span>
+              <span className="hsim-barra-pista">
+                <span className="hsim-barra-fill" style={{ width: `${(b.valor / maximo) * 100}%` }} />
+              </span>
+              <span className="hsim-barra-val">{formatoValor(b.valor)}</span>
+              {elegida && (
+                <span className="hsim-ana" title="Ana eligió esta opción">
+                  <i className="fa-solid fa-person-dress" aria-hidden /> Ana
+                </span>
+              )}
             </div>
-            <p style={{ margin: "12px 0 0", fontSize: 11.5, color: T.text3, lineHeight: 1.5 }}>
-              Aquí está de consulta: en este laboratorio la frecuencia se usa como <strong style={{ color: T.text2 }}>dato que se compara</strong>{" "}
-              («Ana goes to the gym more often than Luis»).
+          );
+        })}
+      </div>
+
+      {/* Ana pregunta; tú contestas con una oración */}
+      <div style={{ ...card, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 12 }}>
+        <div className="hsim-burbuja">
+          <i className={`fa-solid ${cara} hsim-cara`} aria-hidden />
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <strong style={{ color: T.text, fontSize: 14 }}>Ana</strong>
+            <p style={{ margin: "2px 0 0", fontSize: 16, lineHeight: 1.45, color: "#fff", fontWeight: 700 }}>
+              «{o ? o.ana : s.pregunta}»
             </p>
           </div>
+          <BotonEscuchar txt={o ? o.ana : s.pregunta} accent={accent} />
         </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+          <span style={{ fontSize: 14, fontWeight: 800, color: T.text }}>{o ? "Dijiste:" : "Elige lo que le contestas a Ana:"}</span>
+          {s.oraciones.map((x, i) => (
+            <button
+              key={x.texto}
+              type="button"
+              className="hcp-op"
+              disabled={o !== undefined}
+              data-ok={k === i && x.clase === "ok"}
+              data-bad={k === i && x.clase !== "ok"}
+              onClick={() => onElegir(i)}
+            >
+              <i className={`fa-solid ${k === i ? (x.clase === "ok" ? "fa-circle-check" : "fa-circle-xmark") : "fa-comment"}`} style={{ marginTop: 3 }} aria-hidden />
+              <span>{x.texto}</span>
+            </button>
+          ))}
+        </div>
+
+        {o && (
+          <div className="hsim-porque" data-ok={o.clase === "ok"}>
+            <strong>
+              {o.clase === "ok" ? "Bien armada y cierta." : o.clase === "gramatica" ? "Mal armada: Ana no te entendió." : "Bien armada, pero la gráfica dice otra cosa."}
+            </strong>{" "}
+            {o.porque}
+          </div>
+        )}
+        {o && indice < SITUACIONES.length - 1 && (
+          <button type="button" className="hcp-mini" style={{ alignSelf: "flex-end" }} onClick={() => onIr(indice + 1)}>
+            Siguiente situación <i className="fa-solid fa-arrow-right" style={{ marginLeft: 6 }} aria-hidden />
+          </button>
+        )}
       </div>
 
-      {/* ── Banda de consulta, a todo lo ancho ─────────────────────────── */}
-      <div className="hcp-apoyo">
-        <div style={{ ...card, padding: "18px 20px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-pen-nib" style={{ marginRight: 8, color: accent }} />
-            La tarea que viene · A5
-          </Eyebrow>
-          <p style={{ margin: "0 0 12px", fontSize: 12.5, color: T.text2, lineHeight: 1.6 }}>{ACTIVIDAD_FINAL_A5}</p>
-          <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-            {CRITERIOS_A7.map((c, i) => (
-              <div key={i} style={{ display: "flex", gap: 9, fontSize: 12, color: T.text3, lineHeight: 1.45 }}>
-                <i className="fa-solid fa-angle-right" style={{ color: accent, marginTop: 3, fontSize: 10 }} />
-                <span>{c}</span>
-              </div>
-            ))}
-          </div>
+      {/* El plan del sábado: la consecuencia acumulada */}
+      <div style={{ ...card, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 12 }}>
+        <Eyebrow>
+          <i className="fa-solid fa-calendar-day" style={{ marginRight: 8, color: accent }} />
+          El plan del sábado
+        </Eyebrow>
+        <div className="hsim-medidores">
+          <Medidor etiqueta="Tiempo en traslados" valor={plan.minutos} tope={TOPE_MINUTOS} formato={(n) => `${n} min`} icono="fa-clock" />
+          <Medidor etiqueta="Dinero gastado" valor={plan.pesos} tope={TOPE_PESOS} formato={(n) => `$${n.toLocaleString("en-US")}`} icono="fa-coins" />
         </div>
-
-        <div style={{ ...card, padding: "18px 20px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-book-open-reader" style={{ marginRight: 8, color: accent }} />
-            Lectura A1 · para pensar
-          </Eyebrow>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {COMPRENSION_A1.map((c, i) => (
-              <details key={i} style={{ borderRadius: 11, border: `1px solid ${T.line}`, background: T.inset, padding: "10px 13px" }}>
-                <summary style={{ cursor: "pointer", fontSize: 13, fontWeight: 700, color: T.text2, lineHeight: 1.45 }}>{c.pregunta}</summary>
-                <p style={{ margin: "9px 0 0", fontSize: 12.5, color: T.text3, lineHeight: 1.5 }}>{c.guia}</p>
-              </details>
-            ))}
-          </div>
-        </div>
-
-        <div
-          style={{
-            borderRadius: 18,
-            padding: "16px 18px",
-            border: `1px solid ${T.line}`,
-            background: T.glass,
-            fontSize: 12.5,
-            color: T.text2,
-            lineHeight: 1.55,
-            display: "flex",
-            gap: 12,
-          }}
-        >
-          <i className="fa-solid fa-scale-balanced" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-          <span>
-            <strong style={{ color: T.text }}>Se comparan hábitos y datos, no personas.</strong> En todo el laboratorio lo que se pone lado a lado
-            son rutas, precios, climas, frecuencias y libros leídos: cosas que una tabla puede sostener. Comparar cuerpos o capacidades de
-            compañeros con esta gramática no es practicar inglés, es otra cosa.
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", fontSize: 14, color: T.text2 }}>
+          <span style={{ fontWeight: 800, color: T.text }}>Ana te entendió</span>
+          {SITUACIONES.map((x) => {
+            const j = elegidas[x.id];
+            const oo = j !== undefined ? x.oraciones[j] : undefined;
+            const estado = !oo ? "" : oo.clase === "gramatica" ? "no" : "si";
+            return <span key={x.id} className="hsim-punto" data-estado={estado} title={x.titulo} />;
+          })}
+          <span style={{ ...NUM, fontWeight: 800 }}>
+            {plan.entendidas}/{plan.hechas}
           </span>
         </div>
+        {fin && (
+          <div className="hsim-final" data-ok={estrellas >= 2}>
+            <div style={{ display: "flex", gap: 4 }}>
+              {[1, 2, 3].map((n) => (
+                <i key={n} className="fa-solid fa-star" style={{ fontSize: 20, color: n <= estrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
+              ))}
+            </div>
+            <span>
+              {estrellas === 3
+                ? "Plan perfecto: cinco oraciones exactas y todo cabe en el tope. Pulsa reiniciar para probar el otro camino del cine."
+                : estrellas === 2
+                  ? "El plan cabe, pero alguna oración falló. Reinicia y cámbiala para ver cómo cambia lo que hace Ana."
+                  : "El sábado se pasó de tiempo o de dinero. Cada oración mal dicha o falsa tuvo un costo: reinicia y mira cuál."}
+            </span>
+          </div>
+        )}
       </div>
-
-      <HechosCard accent={accent} respuestas={hechos} onResponder={responderHecho} />
-
-      <RetoQuizCard
-        quiz={RETO_QUIZ}
-        accent={accent}
-        rgba={color.rgba}
-        aprobado={quizAprobado}
-        onAprobado={() => setQuizAprobado(true)}
-        playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined}
-        mensajeAprobado="Ya puedes comparar hábitos, precios y preferencias en inglés sin mezclar las reglas."
-      />
-
-      {/* Nota al pie: qué es verbatim y qué es de este laboratorio */}
-      <p style={{ margin: "20px 2px 0", fontSize: 11.5, lineHeight: 1.6, color: T.text3 }}>
-        <i className="fa-solid fa-quote-right" style={{ marginRight: 7, opacity: 0.7 }} />
-        <strong style={{ color: T.text2 }}>Verbatim de la progresión IN-III-P04:</strong> la lectura A1 «Habits and Comparisons in English» con
-        sus cuatro preguntas de comprensión y su escala de adverbios de frecuencia, el texto con huecos y sus pistas (A2), el reto evaluable de
-        cinco reactivos con su retroalimentación (A3), los cinco enunciados verdadero/falso (A4), el glosario y la actividad final (A5), las
-        oraciones de A6 y los criterios de la autoevaluación (A7).{" "}
-        <strong style={{ color: T.text2 }}>Escrito para este laboratorio:</strong> las siete escaleras de adjetivos con su mazo de trampas, las
-        seis tarjetas de datos, las seis oraciones de «as … as» y las seis estructuras de preferencia. Las personas (Ana, Luis, Mateo, Sofía,
-        Daniela), las rutas, los teléfonos y las cafeterías son <strong style={{ color: T.text2 }}>ficticios</strong>, y sus precios,
-        ilustrativos. Las cifras de clima de Mérida y Toluca están <strong style={{ color: T.text2 }}>redondeadas</strong> a partir de las
-        normales climatológicas y sirven para comparar dos ciudades, no como dato de reporte. El inglés de todas las oraciones es inglés
-        estadounidense estándar.
-      </p>
-    </div>
+    </>
   );
 }
 
@@ -860,7 +1069,7 @@ function Rondas({
           <i className="fa-solid fa-chevron-right" />
         </button>
       </div>
-      <span style={{ fontSize: 12.5, fontWeight: 800, color: cuantas >= total ? OK : T.text3, ...NUM }}>
+      <span style={{ fontSize: 14, fontWeight: 800, color: cuantas >= total ? OK : T.text3, ...NUM }}>
         {cuantas}/{total} {etiqueta}
       </span>
     </div>
@@ -913,7 +1122,7 @@ function EscaleraPanel({
           <span style={{ fontSize: 15, color: T.text2, fontWeight: 600 }}>{e.es}</span>
           <span
             style={{
-              fontSize: 12,
+              fontSize: 14,
               fontWeight: 800,
               color: T.text3,
               border: `1px solid ${T.line}`,
@@ -928,17 +1137,17 @@ function EscaleraPanel({
         {/* Los tres peldaños */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 11 }}>
           <div className="hcp-peldano" data-ok="true">
-            <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: "0.08em", color: T.text3, textTransform: "uppercase" }}>Base</span>
+            <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: "0.08em", color: T.text3, textTransform: "uppercase" }}>Base</span>
             <span style={{ fontSize: 19, fontWeight: 800, color: "#fff" }}>{e.adjetivo}</span>
           </div>
           <div className="hcp-peldano" data-ok={cOk !== undefined}>
-            <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: "0.08em", color: T.text3, textTransform: "uppercase" }}>
+            <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: "0.08em", color: T.text3, textTransform: "uppercase" }}>
               Comparative (+ than)
             </span>
             <span style={{ fontSize: 19, fontWeight: 800, color: cOk ? OK : T.text3 }}>{cOk ?? "—"}</span>
           </div>
           <div className="hcp-peldano" data-ok={sOk !== undefined}>
-            <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: "0.08em", color: T.text3, textTransform: "uppercase" }}>
+            <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: "0.08em", color: T.text3, textTransform: "uppercase" }}>
               Superlative
             </span>
             <span style={{ fontSize: 19, fontWeight: 800, color: sOk ? OK : T.text3 }}>{sOk ?? "—"}</span>
@@ -959,7 +1168,7 @@ function EscaleraPanel({
               justifyContent: "center",
               background: rOk ? `${OK}22` : `${accent}22`,
               color: rOk ? OK : accent,
-              fontSize: 12,
+              fontSize: 14,
               fontWeight: 900,
             }}
           >
@@ -979,10 +1188,10 @@ function EscaleraPanel({
               onClick={() => onRegla(r.id)}
             >
               <span style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 800 }}>
-                <i className={`fa-solid ${r.icono}`} style={{ fontSize: 12, color: rOk && r.id === e.regla ? OK : accent }} />
+                <i className={`fa-solid ${r.icono}`} style={{ fontSize: 14, color: rOk && r.id === e.regla ? OK : accent }} />
                 {r.etiqueta}
               </span>
-              <span style={{ fontSize: 11.5, color: T.text3 }}>{r.detalle}</span>
+              <span style={{ fontSize: 14, color: T.text3 }}>{r.detalle}</span>
             </button>
           ))}
         </div>
@@ -1002,7 +1211,7 @@ function EscaleraPanel({
                 justifyContent: "center",
                 background: cOk ? `${OK}22` : `${accent}22`,
                 color: cOk ? OK : accent,
-                fontSize: 12,
+                fontSize: 14,
                 fontWeight: 900,
               }}
             >
@@ -1042,7 +1251,7 @@ function EscaleraPanel({
                 justifyContent: "center",
                 background: sOk ? `${OK}22` : `${accent}22`,
                 color: sOk ? OK : accent,
-                fontSize: 12,
+                fontSize: 14,
                 fontWeight: 900,
               }}
             >
@@ -1112,7 +1321,7 @@ function DatosPanel({
           <span style={{ fontSize: 20, fontWeight: 900, color: "#fff" }}>{t.titulo}</span>
           <span
             style={{
-              fontSize: 11.5,
+              fontSize: 14,
               fontWeight: 800,
               color: t.cuantas >= 3 ? OK : accent,
               border: `1px solid ${t.cuantas >= 3 ? `${OK}66` : `${accent}66`}`,
@@ -1123,7 +1332,7 @@ function DatosPanel({
             {t.cuantas} cosas comparadas → {t.cuantas >= 3 ? "cabe el superlativo" : "solo comparativo"}
           </span>
         </div>
-        <p style={{ margin: 0, fontSize: 13.5, color: T.text2, lineHeight: 1.55 }}>{t.contexto}</p>
+        <p style={{ margin: 0, fontSize: 14, color: T.text2, lineHeight: 1.55 }}>{t.contexto}</p>
 
         <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fit, minmax(190px, 1fr))`, gap: 11 }}>
           {t.columnas.map((c) => (
@@ -1138,7 +1347,7 @@ function DatosPanel({
             </div>
           ))}
         </div>
-        <span style={{ fontSize: 11, color: T.text3 }}>
+        <span style={{ fontSize: 14, color: T.text3 }}>
           <i className="fa-solid fa-circle-info" style={{ marginRight: 6, opacity: 0.7 }} />
           {t.nota}
         </span>
@@ -1227,7 +1436,7 @@ function IgualdadPanel({
         <div style={{ display: "flex", alignItems: "center", gap: 11, flexWrap: "wrap" }}>
           <span
             style={{
-              fontSize: 11.5,
+              fontSize: 14,
               fontWeight: 800,
               color: r.negativa ? NO : accent,
               border: `1px solid ${r.negativa ? `${NO}66` : `${accent}66`}`,
@@ -1237,18 +1446,18 @@ function IgualdadPanel({
           >
             {r.negativa ? "not as … as" : "as … as"}
           </span>
-          <span style={{ fontSize: 12.5, color: T.text3, fontWeight: 700, ...NUM }}>{r.datos}</span>
+          <span style={{ fontSize: 14, color: T.text3, fontWeight: 700, ...NUM }}>{r.datos}</span>
         </div>
 
         <p style={{ margin: 0, fontSize: 16, color: "#fff", fontWeight: 700, lineHeight: 1.5 }}>{r.intencion}</p>
-        <p style={{ margin: 0, fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>
+        <p style={{ margin: 0, fontSize: 14, color: T.text2, lineHeight: 1.55 }}>
           Toca las piezas <strong style={{ color: T.text }}>en el orden correcto</strong> para decirlo en inglés. Hay piezas que sobran: son las
           que casi todo el mundo usa por costumbre.
         </p>
 
         <div className="hcp-linea" data-ok={lista}>
           {armado.length === 0 ? (
-            <span style={{ fontSize: 13.5, color: T.text3 }}>Empieza por el sujeto…</span>
+            <span style={{ fontSize: 14, color: T.text3 }}>Empieza por el sujeto…</span>
           ) : (
             armado.map((p, i) => (
               <span key={`${p}-${i}`} className="hcp-palabra">
@@ -1281,7 +1490,7 @@ function IgualdadPanel({
           </button>
           {lista && <BotonEscuchar txt={frase} accent={accent} />}
           {lista && (
-            <span style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 800, color: OK }}>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 800, color: OK }}>
               <i className="fa-solid fa-circle-check" /> Oración armada
             </span>
           )}
@@ -1322,7 +1531,7 @@ function IgualdadPanel({
             <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
             La regla
           </Eyebrow>
-          <p style={{ margin: 0, fontSize: 13.5, color: T.text2, lineHeight: 1.6 }}>{r.regla}</p>
+          <p style={{ margin: 0, fontSize: 14, color: T.text2, lineHeight: 1.6 }}>{r.regla}</p>
         </div>
       )}
     </>
@@ -1366,7 +1575,7 @@ function PreferenciasPanel({
         <span
           style={{
             alignSelf: "flex-start",
-            fontSize: 11.5,
+            fontSize: 14,
             fontWeight: 800,
             color: accent,
             border: `1px solid ${accent}66`,
@@ -1406,7 +1615,7 @@ function PreferenciasPanel({
 
         {ranuraActiva && (
           <div>
-            <p style={{ margin: "0 0 10px", fontSize: 12.5, color: T.text2, fontWeight: 700 }}>
+            <p style={{ margin: "0 0 10px", fontSize: 14, color: T.text2, fontWeight: 700 }}>
               Hueco {activa + 1} de {r.ranuras.length}: ¿qué va aquí?
             </p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 9 }}>
@@ -1428,7 +1637,7 @@ function PreferenciasPanel({
         {completa && (
           <div style={{ display: "flex", alignItems: "center", gap: 11, flexWrap: "wrap" }}>
             <BotonEscuchar txt={frasePreferencia(r, elegidas)} accent={accent} />
-            <span style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 800, color: OK }}>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 800, color: OK }}>
               <i className="fa-solid fa-circle-check" /> Estructura completa
             </span>
           </div>
@@ -1441,7 +1650,7 @@ function PreferenciasPanel({
             <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
             La regla
           </Eyebrow>
-          <p style={{ margin: 0, fontSize: 13.5, color: T.text2, lineHeight: 1.6 }}>{r.regla}</p>
+          <p style={{ margin: 0, fontSize: 14, color: T.text2, lineHeight: 1.6 }}>{r.regla}</p>
         </div>
       )}
     </>
@@ -1484,7 +1693,7 @@ function HechosCard({
                 transition: "all .18s",
               }}
             >
-              <span style={{ fontSize: 13.5, color: T.text2, lineHeight: 1.5 }}>{h.enunciado}</span>
+              <span style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>{h.enunciado}</span>
               <div style={{ display: "flex", alignItems: "center", gap: 9, flexWrap: "wrap" }}>
                 <button
                   type="button"
@@ -1506,7 +1715,7 @@ function HechosCard({
                 >
                   Falso
                 </button>
-                {acertada && <span style={{ fontSize: 12.5, color: OK, fontWeight: 700 }}>{h.retro}</span>}
+                {acertada && <span style={{ fontSize: 14, color: OK, fontWeight: 700 }}>{h.retro}</span>}
               </div>
             </div>
           );

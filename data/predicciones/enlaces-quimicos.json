@@ -1,0 +1,12 @@
+{
+  "escena": "Dos átomos se acercan para unirse. Uno es sodio y el otro es cloro.",
+  "pregunta": "Sodio y cloro tienen una ΔEN enorme. ¿Qué pasa con los electrones?",
+  "opciones": [
+    { "id": "a", "texto": "Los comparten por igual", "icono": "fa-handshake" },
+    { "id": "b", "texto": "El sodio cede uno al cloro", "icono": "fa-right-left" },
+    { "id": "c", "texto": "Los dos los pierden", "icono": "fa-circle-xmark" }
+  ],
+  "correcta": "b",
+  "porque": "Con una ΔEN de 1.7 o más, el átomo más electronegativo arranca el electrón al otro. Así se forman Na⁺ y Cl⁻, iones de carga opuesta que se atraen: enlace iónico.",
+  "comoComprobarlo": "En «Tu enlace», elige Na como átomo A y Cl como átomo B, y mira la escala de ΔEN y el electrón en la escena."
+}

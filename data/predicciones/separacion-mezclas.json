@@ -1,0 +1,12 @@
+{
+  "escena": "Tres vasos: en el central hay agua con sal; sobre él se coloca la herramienta de un método de separación.",
+  "pregunta": "Para sacar la sal del agua salada, ¿qué método la separa?",
+  "opciones": [
+    { "id": "a", "texto": "Filtración", "icono": "fa-filter" },
+    { "id": "b", "texto": "Destilación", "icono": "fa-fire" },
+    { "id": "c", "texto": "Decantación", "icono": "fa-flask" }
+  ],
+  "correcta": "b",
+  "porque": "La sal está disuelta: sus partículas pasan por el filtro y no se asientan. El agua hierve y se evapora a 100 °C, la sal no, y así se separan.",
+  "comoComprobarlo": "Elige «Agua salada», prueba cada método con el botón Separar y mira en cuál las partículas viajan a sus vasos."
+}

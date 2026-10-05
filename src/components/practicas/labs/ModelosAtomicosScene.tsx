@@ -17,8 +17,8 @@
 
 import * as THREE from "three";
 import { useEffect, useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
 
@@ -387,6 +387,25 @@ function Atomo({ modelo, protones, neutrones, electrones, shells, elementColor }
   );
 }
 
+/* Etiqueta fija en px (nunca <Text>: cuelga Turbopack). Se oculta en pantallas angostas. */
+function Etiqueta({ pos, color, children, lado = "up" }: { pos: [number, number, number]; color: string; children: React.ReactNode; lado?: "up" | "right" }) {
+  const ancho = useThree((st) => st.size.width);
+  if (ancho < 640) return null;
+  return (
+    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
+      <div style={{ transform: lado === "up" ? "translate(0,-70%)" : "translate(62%,0)" }}>
+        <div style={{
+          whiteSpace: "nowrap", padding: "3px 10px", borderRadius: 8, background: "rgba(4,10,22,0.88)",
+          border: `1.5px solid ${color}`, color, fontWeight: 900, fontSize: 15,
+          fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)",
+        }}>
+          {children}
+        </div>
+      </div>
+    </Html>
+  );
+}
+
 /* ── Escena completa ─────────────────────────────────────────────────── */
 export default function ModelosAtomicosScene(props: AtomoSceneProps) {
   // resetNonce: remonta el átomo para reiniciar las posiciones de las partículas.
@@ -397,7 +416,7 @@ export default function ModelosAtomicosScene(props: AtomoSceneProps) {
       shadows
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
-      camera={{ position: [0, 1.4, 6.4], fov: 45 }}
+      camera={{ position: [0, 1.6, 8], fov: 45 }}
     >
       {/* Suelo, luz de tres puntos y entorno que reflejar. La altura sale
           de donde esta escena ya ponía su sombra de contacto, que es donde
@@ -416,15 +435,23 @@ export default function ModelosAtomicosScene(props: AtomoSceneProps) {
         />
       </group>
 
-      {/* Reflejos de estudio sin assets externos */}
+      {/* Etiquetas: máx. 2 a la vez, en la punta de lo que nombran */}
+      {props.modelo === "dalton" && <Etiqueta pos={[0, 1.55, 0]} color="#94A3B8">Esfera maciza: sin partes</Etiqueta>}
+      {props.modelo === "thomson" && <Etiqueta pos={[0, 1.65, 0]} color="#F59E0B">Esfera + con electrones</Etiqueta>}
+      {props.modelo !== "dalton" && props.modelo !== "thomson" && props.protones + props.neutrones > 0 && (
+        <Etiqueta pos={[0, 0.1 + 0.3 + 0.05 * Math.cbrt(props.protones + props.neutrones), 0]} color="#FF6B6B">Núcleo (+)</Etiqueta>
+      )}
+      {props.modelo === "bohr" && props.electrones > 0 && <Etiqueta pos={[R0, 0.1, 0]} color="#5BC8FF" lado="right">Capa n = 1</Etiqueta>}
+      {props.modelo === "rutherford" && props.electrones > 0 && <Etiqueta pos={[0, 2.5, 0]} color="#5BC8FF">Órbitas sin definir</Etiqueta>}
+      {props.modelo === "schrodinger" && props.electrones > 0 && <Etiqueta pos={[0, 2.3, 0]} color="#34D399">Nube de probabilidad</Etiqueta>}
 
       <OrbitControls
         enablePan={false}
-        minDistance={3.5}
+        minDistance={4.5}
         maxDistance={12}
         minPolarAngle={Math.PI / 7}
         maxPolarAngle={Math.PI / 1.9}
-        target={[0, 0, 0]}
+        target={[0, -0.25, 0]}
         autoRotate={props.autoRotate}
         autoRotateSpeed={0.5}
       />

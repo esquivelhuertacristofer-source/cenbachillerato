@@ -62,7 +62,8 @@ describe("objetivos de los laboratorios", () => {
       const src = leer(archivo);
       // Directamente, o a través de `TableroObjetivos`, que es quien lo usa
       // por los laboratorios cuya marca sale de la lista de objetivos.
-      expect(src.includes("useEstrellas") || src.includes("TableroObjetivos")).toBe(true);
+      // …o a través de `LabShell`, que monta `TableroObjetivos` en su pestaña de misiones.
+      expect(src.includes("useEstrellas") || src.includes("TableroObjetivos") || src.includes("<LabShell")).toBe(true);
     }
   );
 });
