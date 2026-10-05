@@ -1,0 +1,10 @@
+{
+  "slug": "carreras-digitales",
+  "items": [
+    { "clave": "ximena", "formato": "16:9", "estilo": "ilustracion", "escena": "Ilustración plana de una estudiante de bachillerato de piel morena con cabello largo oscuro, mochila al hombro y una libreta de dibujo bajo el brazo, sonriendo, fondo azul claro liso, sin texto" },
+    { "clave": "aula-computo", "formato": "16:9", "estilo": "foto", "escena": "Aula de cómputo de una escuela pública mexicana con filas de computadoras apagadas y sillas, luz de la mañana por las ventanas, vacía, sin letreros" },
+    { "clave": "mesa-trabajo", "formato": "16:9", "estilo": "foto", "escena": "Mesa grande de trabajo en equipo con laptops cerradas, tazas, cuadernos y notas adhesivas de colores en blanco, vista desde arriba, luz natural" },
+    { "clave": "pasillo-campus", "formato": "16:9", "estilo": "foto", "escena": "Pasillo exterior de un campus universitario con árboles, jóvenes caminando vistos de espaldas y luz de media mañana, sin letreros" },
+    { "clave": "ventana-atardecer", "formato": "16:9", "estilo": "foto", "escena": "Joven estudiante vista de espaldas frente a una ventana grande mirando una ciudad mexicana al atardecer, luz dorada, cielo naranja" }
+  ]
+}

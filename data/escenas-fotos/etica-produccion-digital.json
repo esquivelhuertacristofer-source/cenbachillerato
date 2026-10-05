@@ -1,0 +1,12 @@
+{
+  "slug": "etica-produccion-digital",
+  "items": [
+    { "clave": "estudio-grabacion", "formato": "16:9", "estilo": "foto", "escena": "Dos adolescentes mexicanos vistos de espaldas montando una cámara sobre un tripié en el patio de una escuela, junto a una fuente de agua, luz de tarde, sin letreros" },
+    { "clave": "mesa-audio", "formato": "16:9", "estilo": "foto", "escena": "Mesa de un salón con unos audífonos grandes, un micrófono pequeño y una laptop cerrada, luz cálida de ventana, sin texto" },
+    { "clave": "fotos-impresas", "formato": "16:9", "estilo": "foto", "escena": "Varias fotografías impresas de paisajes con ríos y llaves de agua esparcidas sobre una mesa de madera, vistas desde arriba, sin letras" },
+    { "clave": "patio-grupo", "formato": "16:9", "estilo": "foto", "escena": "Grupo de adolescentes con uniforme escolar visto de lejos y de espaldas conversando en un patio con árboles, rostros no visibles" },
+    { "clave": "rostro-puntos", "formato": "16:9", "estilo": "ilustracion", "escena": "Ilustración de una silueta de cabeza humana de perfil formada por puntos de luz azul sobre fondo oscuro liso, estilo digital limpio" },
+    { "clave": "libreta-apuntes", "formato": "16:9", "estilo": "foto", "escena": "Libreta abierta con garabatos y dibujos de gotas de agua, un lápiz y una calculadora sobre un escritorio escolar, sin palabras legibles" },
+    { "clave": "micro-escenario", "formato": "16:9", "estilo": "foto", "escena": "Escenario pequeño de un auditorio escolar con un micrófono en su pedestal y cortinas rojas, vacío, luz tenue" }
+  ]
+}

@@ -17,7 +17,7 @@
  */
 
 import * as THREE from "three";
-import { createContext, useContext, useLayoutEffect, useMemo, useRef, type ReactNode, type RefObject } from "react";
+import { useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Environment, Lightformer, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
@@ -59,6 +59,8 @@ export interface CiudadSceneProps {
   resetNonce: number;
   camSeguir: boolean;
   ayudaLados: boolean;
+  /** Rotula TODOS los lugares y calles (si no, solo los 3 lugares y la calle más cercanos). */
+  verNombres?: boolean;
   // seguir / dar
   puntos: Punto[];
   animKey: number;
@@ -82,16 +84,10 @@ const suave = (dt: number, porCuadro: number) => 1 - Math.pow(1 - porCuadro, Mat
 const OK = "#34d399";
 const NO = "#fb923c";
 
-/**
- * Escala de las etiquetas. En la vista de mapa (0) tienen tamaño fijo en pantalla, para que
- * las lejanas se lean igual que las cercanas; con la cámara cerca se escalan con la distancia.
- */
-const EscalaEtiquetas = createContext(1);
-
-function Etiqueta({ pos, children, df = 14, col, fs = 12, z = 20 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number; z?: number }) {
-  const escala = useContext(EscalaEtiquetas);
+/** Etiqueta de tamaño fijo en pantalla (≥ 14 px): se lee igual de cerca y de lejos. */
+function Etiqueta({ pos, children, col, fs = 14, z = 20 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number; z?: number }) {
   return (
-    <Html position={pos} center eps={-1} distanceFactor={escala === 0 ? undefined : df * escala} zIndexRange={[z, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center eps={-1} zIndexRange={[z, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -102,7 +98,7 @@ function Etiqueta({ pos, children, df = 14, col, fs = 12, z = 20 }: { pos: Pt; c
           background: "rgba(4,10,22,0.86)",
           border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`,
           color: "#fff",
-          fontSize: fs,
+          fontSize: Math.max(14, fs),
           fontWeight: 800,
           whiteSpace: "nowrap",
           boxShadow: "0 6px 18px -8px #000",
@@ -114,20 +110,21 @@ function Etiqueta({ pos, children, df = 14, col, fs = 12, z = 20 }: { pos: Pt; c
   );
 }
 
-function Burbuja({ pos, texto, col = "#0f172a", df = 12 }: { pos: Pt; texto: string; col?: string; df?: number }) {
-  const escala = useContext(EscalaEtiquetas);
+function Burbuja({ pos, texto, col = "#0f172a" }: { pos: Pt; texto: string; col?: string; df?: number }) {
+  // En pantallas angostas la burbuja se estrecha (la misma frase sigue en la lectura del panel).
+  const angosta = useThree((st) => st.size.width) < 640;
   return (
-    <Html position={pos} center eps={-1} distanceFactor={escala === 0 ? undefined : df * escala} zIndexRange={[escala === 0 ? 10 : 40, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center eps={-1} zIndexRange={[40, 0]} style={{ pointerEvents: "none" }}>
       <div style={{ transform: "translateY(-50%)", display: "flex", flexDirection: "column", alignItems: "center" }}>
         <div
           style={{
-            maxWidth: 230,
+            maxWidth: angosta ? 170 : 230,
             width: "max-content",
             padding: "7px 12px",
             borderRadius: 12,
             background: "#fff",
             color: col,
-            fontSize: 13,
+            fontSize: 14,
             fontWeight: 800,
             lineHeight: 1.35,
             textAlign: "center",
@@ -140,6 +137,13 @@ function Burbuja({ pos, texto, col = "#0f172a", df = 12 }: { pos: Pt; texto: str
       </div>
     </Html>
   );
+}
+
+/** Qué nombres se rotulan: por defecto solo lo que rodea al personaje (máx. 4). */
+interface Nombres {
+  todos: boolean;
+  lugares: ReadonlySet<string>;
+  calle: string | null;
 }
 
 /* ════════════════════════════════════════════════════════════════════════
@@ -343,7 +347,7 @@ function alturaEtiqueta(l: Lugar): number {
   return alto + 0.45 + (l.frente % 2 === 0 ? (l.cx === 1 ? 1.9 : l.id === "church" ? 3.3 : 0) : (2 - l.cz) * 0.5);
 }
 
-function Edificio({ l, resaltado, sinEtiqueta }: { l: Lugar; resaltado: boolean; sinEtiqueta: boolean }) {
+function Edificio({ l, resaltado, sinEtiqueta, rotular }: { l: Lugar; resaltado: boolean; sinEtiqueta: boolean; rotular: boolean }) {
   const [x, z] = centroLote(l.bx, l.bz, l.cx, l.cz);
   const [fx, fz] = DIRS[l.frente]!;
   const w = CELDA * 0.86;
@@ -443,8 +447,8 @@ function Edificio({ l, resaltado, sinEtiqueta }: { l: Lugar; resaltado: boolean;
           <meshStandardMaterial color="#2563eb" roughness={0.5} />
         </mesh>
       )}
-      {!sinEtiqueta && (
-      <Etiqueta pos={[0, alturaEtiqueta(l), 0]} col={`${l.color}${resaltado ? "" : "aa"}`} fs={resaltado ? 12.5 : 10.5} df={14} z={resaltado ? 30 : 20}>
+      {!sinEtiqueta && (rotular || resaltado) && (
+      <Etiqueta pos={[0, alturaEtiqueta(l), 0]} col={`${l.color}${resaltado ? "" : "aa"}`} z={resaltado ? 30 : 20}>
         <i className={`fa-solid ${l.icono}`} style={{ color: l.color }} />
         {l.en}
       </Etiqueta>
@@ -535,7 +539,7 @@ function Arboles({ pts, escala = 1 }: { pts: Pt[]; escala?: number }) {
   );
 }
 
-function Parque() {
+function Parque({ rotular }: { rotular: boolean }) {
   const [cx, cz] = centroReferente("park");
   return (
     <group>
@@ -572,10 +576,12 @@ function Parque() {
         <meshStandardMaterial color="#15803d" roughness={0.6} />
       </mesh>
       <Arboles pts={TRONCOS_PARQUE} />
-      <Etiqueta pos={[cx, 1.75, cz]} col="#4ade80aa" fs={10.5} df={14}>
-        <i className="fa-solid fa-tree" style={{ color: "#4ade80" }} />
-        park
-      </Etiqueta>
+      {rotular && (
+        <Etiqueta pos={[cx, 1.75, cz]} col="#4ade80aa">
+          <i className="fa-solid fa-tree" style={{ color: "#4ade80" }} />
+          park
+        </Etiqueta>
+      )}
     </group>
   );
 }
@@ -601,7 +607,7 @@ function ParadaAutobus({ resaltado, etiqueta }: { resaltado: boolean; etiqueta: 
         <meshStandardMaterial color="#2563eb" emissive="#2563eb" emissiveIntensity={resaltado ? 1.2 : 0.4} side={THREE.DoubleSide} />
       </mesh>
       {(etiqueta || resaltado) && (
-      <Etiqueta pos={[-0.35, 0.3, -0.45]} col={resaltado ? "#60a5fa" : "#60a5faaa"} fs={resaltado ? 12.5 : 10} df={14} z={resaltado ? 30 : 20}>
+      <Etiqueta pos={[-0.35, 0.3, -0.45]} col={resaltado ? "#60a5fa" : "#60a5faaa"} z={resaltado ? 30 : 20}>
         <i className="fa-solid fa-bus" style={{ color: "#60a5fa" }} />
         bus stop
       </Etiqueta>
@@ -610,7 +616,7 @@ function ParadaAutobus({ resaltado, etiqueta }: { resaltado: boolean; etiqueta: 
   );
 }
 
-function Letreros({ ambosExtremos }: { ambosExtremos: boolean }) {
+function Letreros({ ambosExtremos, rotular }: { ambosExtremos: boolean; rotular: (id: string) => boolean }) {
   const lejos = LIMITE + 1.5;
   return (
     <>
@@ -624,10 +630,12 @@ function Letreros({ ambosExtremos }: { ambosExtremos: boolean }) {
               <cylinderGeometry args={[0.025, 0.025, 0.8, 6]} />
               <meshStandardMaterial color="#94a3b8" />
             </mesh>
-            <Etiqueta pos={[p[0], 1.0, p[2]]} col="#16a34a" fs={10.5} df={14}>
-              <span style={{ color: "#86efac", fontSize: 10 }}>{c.eje === "v" ? "↕" : "↔"}</span>
-              {c.corto}
-            </Etiqueta>
+            {rotular(c.id) && (
+              <Etiqueta pos={[p[0], 1.0, p[2]]} col="#16a34a">
+                <span style={{ color: "#86efac" }}>{c.eje === "v" ? "↕" : "↔"}</span>
+                {c.corto}
+              </Etiqueta>
+            )}
           </group>
         ));
       })}
@@ -640,15 +648,13 @@ function Letreros({ ambosExtremos }: { ambosExtremos: boolean }) {
           <coneGeometry args={[0.2, 0.7, 3]} />
           <meshStandardMaterial color="#ef4444" emissive="#ef4444" emissiveIntensity={0.6} />
         </mesh>
-        <Etiqueta pos={[0, 0.9, -0.2]} col="#ef4444" fs={12} df={16}>
-          N
-        </Etiqueta>
       </group>
     </>
   );
 }
 
-function Barrio({ resaltar, cerca, sinEtiqueta }: { resaltar: Referente[]; cerca: boolean; sinEtiqueta: Referente | null }) {
+function Barrio({ resaltar, cerca, sinEtiqueta, nombres }: { resaltar: Referente[]; cerca: boolean; sinEtiqueta: Referente | null; nombres: Nombres }) {
+  const rotulaLugar = (id: string) => nombres.todos || nombres.lugares.has(id);
   return (
     <group>
       <mesh position={[0, -0.06, 0]} receiveShadow>
@@ -674,15 +680,15 @@ function Barrio({ resaltar, cerca, sinEtiqueta }: { resaltar: Referente[]; cerca
       })}
       <Casas />
       {LUGARES.map((l) => (
-        <Edificio key={l.id} l={l} resaltado={resaltar.includes(l.id)} sinEtiqueta={sinEtiqueta === l.id} />
+        <Edificio key={l.id} l={l} resaltado={resaltar.includes(l.id)} sinEtiqueta={sinEtiqueta === l.id} rotular={rotulaLugar(l.id)} />
       ))}
-      <Parque />
-      <ParadaAutobus resaltado={resaltar.includes("busstop")} etiqueta={cerca} />
+      <Parque rotular={rotulaLugar("park")} />
+      <ParadaAutobus resaltado={resaltar.includes("busstop")} etiqueta={rotulaLugar("busstop")} />
       {SEMAFOROS.map(([x, z], k) => (
         <Semaforo key={k} x={x} z={z} fase={k * 3} />
       ))}
       <Arboles pts={ARBOLES_FUERA} escala={1.3} />
-      <Letreros ambosExtremos={cerca} />
+      <Letreros ambosExtremos={cerca} rotular={(id) => nombres.todos || nombres.calle === id} />
     </group>
   );
 }
@@ -833,15 +839,15 @@ function Caminante({
       </mesh>
       {ayudaLados && (
         <>
-          <Etiqueta pos={[0.62, 0.55, 0]} col="#fbbf24" fs={11} df={11} z={25}>
+          <Etiqueta pos={[0.62, 0.55, 0]} col="#fbbf24" z={25}>
             left
           </Etiqueta>
-          <Etiqueta pos={[-0.62, 0.55, 0]} col="#22d3ee" fs={11} df={11} z={25}>
+          <Etiqueta pos={[-0.62, 0.55, 0]} col="#22d3ee" z={25}>
             right
           </Etiqueta>
         </>
       )}
-      {burbuja ? <Burbuja pos={[0, 1.35, 0]} texto={burbuja} /> : <Etiqueta pos={[0, 1.25, 0]} col={color} fs={11} df={13} z={25}>{nombre}</Etiqueta>}
+      {burbuja ? <Burbuja pos={[0, 1.35, 0]} texto={burbuja} /> : <Etiqueta pos={[0, 1.25, 0]} col={color} z={25}>{nombre}</Etiqueta>}
     </group>
   );
 }
@@ -899,7 +905,7 @@ function Baliza({ x, z, color, texto, yTexto = 4.6 }: { x: number; z: number; co
         <meshBasicMaterial color={color} transparent opacity={0.18} side={THREE.DoubleSide} depthWrite={false} />
       </mesh>
       {texto && (
-        <Etiqueta pos={[0, yTexto, 0]} col={color} fs={11.5} df={14} z={35}>
+        <Etiqueta pos={[0, yTexto, 0]} col={color} z={35}>
           <i className="fa-solid fa-location-dot" style={{ color }} />
           {texto}
         </Etiqueta>
@@ -917,12 +923,45 @@ function MarcaInicio({ e, color }: { e: Estado; color: string }) {
         <ringGeometry args={[0.95, 1.05, 40]} />
         <meshBasicMaterial color={color} transparent opacity={0.7} />
       </mesh>
-      <Etiqueta pos={[-DIRS[e.h]![1] * 1.4, 0.3, DIRS[e.h]![0] * 1.4]} col={color} fs={10.5} df={16}>
+      <Etiqueta pos={[-DIRS[e.h]![1] * 1.4, 0.3, DIRS[e.h]![0] * 1.4]} col={color}>
         <i className="fa-solid fa-flag" style={{ color }} />
         START
       </Etiqueta>
     </group>
   );
+}
+
+/**
+ * Elige qué nombres mostrar: los 3 lugares y la calle más cercanos al personaje
+ * (o al lugar por el que se pregunta). Máximo 4 rótulos del barrio a la vez.
+ */
+function useNombresCercanos(grupoRef: RefObject<THREE.Group | null>, foco: Referente, vista: VistaCiudad): { lugares: ReadonlySet<string>; calle: string | null } {
+  const [clave, setClave] = useState("");
+  const ultimo = useRef(0);
+  useFrame(({ clock }) => {
+    if (clock.elapsedTime - ultimo.current < 0.3) return;
+    ultimo.current = clock.elapsedTime;
+    let px = 0;
+    let pz = 0;
+    if (vista === "donde") [px, pz] = centroReferente(foco);
+    else if (grupoRef.current) {
+      px = grupoRef.current.position.x;
+      pz = grupoRef.current.position.z;
+    }
+    const cand = [...LUGARES.map((l) => l.id as string), "park", "busstop"]
+      .map((id) => {
+        const [x, z] = centroReferente(id as Referente);
+        return { id, d: Math.hypot(x - px, z - pz) };
+      })
+      .sort((a, b) => a.d - b.d)
+      .slice(0, 3)
+      .map((c) => c.id);
+    const cercana = [...CALLES].sort((a, b) => Math.abs((a.eje === "v" ? px : pz) - nodoW(a.idx)) - Math.abs((b.eje === "v" ? px : pz) - nodoW(b.idx)))[0]!;
+    const nueva = `${cand.join(",")}|${cercana.id}`;
+    if (nueva !== clave) setClave(nueva);
+  });
+  const [ls, c] = clave.split("|");
+  return useMemo(() => ({ lugares: new Set((ls ?? "").split(",").filter(Boolean)), calle: c || null }), [ls, c]);
 }
 
 /** Devuelve la cámara a la vista de mapa al salir de la cámara que sigue al personaje. */
@@ -990,11 +1029,11 @@ function EscenaDonde({ foco, pregunta, respuesta, relaciones, esquina, modoColor
       <Baliza x={fx} z={fz} color={modoColor} />
       <group position={[px + lat[0] * 0.45, 0.14, pz + lat[1] * 0.45]} rotation={[0, Math.atan2(-lat[0], -lat[1]), 0]}>
         <Cuerpo color="#a78bfa" />
-        {pregunta && <Burbuja pos={[0, 2.25, 0]} texto={pregunta} df={7} />}
+        {pregunta && <Burbuja pos={[0, 2.25, 0]} texto={pregunta} />}
       </group>
       <group position={[px - lat[0] * 0.45, 0.14, pz - lat[1] * 0.45]} rotation={[0, Math.atan2(lat[0], lat[1]), 0]}>
         <Cuerpo color="#f472b6" />
-        {respuesta && <Burbuja pos={[0, 1.15, 0]} texto={respuesta} col="#1e1b4b" df={7} />}
+        {respuesta && <Burbuja pos={[0, 1.15, 0]} texto={respuesta} col="#1e1b4b" />}
       </group>
       {relaciones.map((r, k) => {
         const [rx, rz] = centroReferente(r.ref);
@@ -1016,13 +1055,13 @@ function EscenaDonde({ foco, pregunta, respuesta, relaciones, esquina, modoColor
             <ringGeometry args={[0.9, 1.05, 40]} />
             <meshBasicMaterial color={esquina.ok ? OK : NO} transparent opacity={0.9} />
           </mesh>
-          <Etiqueta pos={[nodoEsq[0], 0.5, nodoEsq[1]]} col={esquina.ok ? OK : NO} fs={11} df={12} z={30}>
+          <Etiqueta pos={[nodoEsq[0], 0.5, nodoEsq[1]]} col={esquina.ok ? OK : NO} z={30}>
             {calle(esquina.calles[0]).corto} & {calle(esquina.calles[1]).corto}
           </Etiqueta>
         </group>
       )}
       {esquina && !nodoEsq && (
-        <Etiqueta pos={[fx, 2.8, fz]} col={NO} fs={11} df={12} z={30}>
+        <Etiqueta pos={[fx, 2.8, fz]} col={NO} z={30}>
           Esas dos calles no se cruzan
         </Etiqueta>
       )}
@@ -1032,27 +1071,21 @@ function EscenaDonde({ foco, pregunta, respuesta, relaciones, esquina, modoColor
 
 /* ── Escena ───────────────────────────────────────────────────────────── */
 
-export default function CiudadDireccionesInglesScene(p: CiudadSceneProps) {
-  const { vista, modoColor, resetNonce, camSeguir } = p;
+function Contenido(p: CiudadSceneProps & { cam: { pos: Pt; target: Pt } }) {
+  const { vista, modoColor, camSeguir, cam, foco } = p;
   const grupoRef = useRef<THREE.Group>(null);
   const llegadosRef = useRef(0);
-  const foco = p.foco;
-  const cam = useMemo((): { pos: Pt; target: Pt } => {
-    if (vista === "donde") {
-      const [fx, fz] = centroReferente(foco);
-      return { pos: [fx + 1.2, 8.2, fz + 8.8], target: [fx, 0.4, fz + 0.6] };
-    }
-    return { pos: [0, 22.5, 20.5], target: [0, 0, 2.6] };
-  }, [vista, foco]);
   const resaltar = useMemo<Referente[]>(() => {
     if (vista === "donde") return [foco, ...p.relaciones.map((r) => r.ref)];
     return [];
   }, [vista, foco, p.relaciones]);
   const seguirActivo = vista !== "donde" && camSeguir;
   const destinoXZ = p.destino ? centroReferente(p.destino) : null;
+  const cercanos = useNombresCercanos(grupoRef, foco, vista);
+  const nombres: Nombres = { todos: !!p.verNombres, lugares: cercanos.lugares, calle: cercanos.calle };
 
   return (
-    <Canvas key={`${vista}-${vista === "donde" ? foco : ""}-${resetNonce}`} shadows dpr={[1, 1.75]} camera={{ position: cam.pos, fov: 42 }} gl={{ antialias: true }}>
+    <>
       <color attach="background" args={["#08121f"]} />
       <fog attach="fog" args={["#08121f", 30, 62]} />
       <ambientLight intensity={0.6} />
@@ -1073,8 +1106,7 @@ export default function CiudadDireccionesInglesScene(p: CiudadSceneProps) {
         <Lightformer form="rect" intensity={0.7} position={[-8, 1, 6]} scale={[8, 6, 1]} color={modoColor} />
       </Environment>
 
-      <EscalaEtiquetas.Provider value={seguirActivo ? 0.3 : vista === "donde" ? 1 : 0}>
-      <Barrio resaltar={resaltar} cerca={vista === "donde" || seguirActivo} sinEtiqueta={vista !== "donde" && !seguirActivo ? p.destino : null} />
+      <Barrio resaltar={resaltar} cerca={vista === "donde" || seguirActivo} sinEtiqueta={vista !== "donde" && !seguirActivo ? p.destino : null} nombres={nombres} />
 
       {vista !== "donde" && (
         <>
@@ -1085,7 +1117,6 @@ export default function CiudadDireccionesInglesScene(p: CiudadSceneProps) {
           {seguirActivo && <CamaraSeguidora grupoRef={grupoRef} />}
         </>
       )}
-      </EscalaEtiquetas.Provider>
       {vista === "donde" && <EscenaDonde foco={foco} pregunta={p.pregunta} respuesta={p.respuesta} relaciones={p.relaciones} esquina={p.esquina} modoColor={modoColor} />}
 
       {!seguirActivo && <CamaraInicial pos={cam.pos} target={cam.target} />}
@@ -1096,7 +1127,25 @@ export default function CiudadDireccionesInglesScene(p: CiudadSceneProps) {
         <Bloom intensity={0.35} luminanceThreshold={0.7} luminanceSmoothing={0.85} mipmapBlur />
         <Vignette eskil={false} offset={0.2} darkness={0.6} />
       </EffectComposer>
-    </Canvas>
+    </>
   );
 }
 
+export default function CiudadDireccionesInglesScene(p: CiudadSceneProps) {
+  const { vista, resetNonce, foco } = p;
+  // El objetivo queda un poco por debajo del centro del contenido: así el barrio
+  // sube y queda entre la barra de arriba y la misión de abajo.
+  const cam = useMemo((): { pos: Pt; target: Pt } => {
+    if (vista === "donde") {
+      const [fx, fz] = centroReferente(foco);
+      return { pos: [fx + 1.2, 8.2, fz + 8.8], target: [fx, -0.2, fz + 0.9] };
+    }
+    return { pos: [0, 22.5, 20.5], target: [0, 0, 3.4] };
+  }, [vista, foco]);
+
+  return (
+    <Canvas key={`${vista}-${vista === "donde" ? foco : ""}-${resetNonce}`} shadows dpr={[1, 1.75]} camera={{ position: cam.pos, fov: 42 }} gl={{ antialias: true }}>
+      <Contenido {...p} cam={cam} />
+    </Canvas>
+  );
+}

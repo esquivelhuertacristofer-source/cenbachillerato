@@ -1,0 +1,12 @@
+{
+  "escena": "Produces un video escolar en seis pasos. En cada uno puedes tomar un atajo o un camino responsable, y luego publicas.",
+  "pregunta": "¿Qué versión conserva más vistas después de publicar: la de los atajos o la responsable?",
+  "opciones": [
+    { "id": "a", "texto": "La de los atajos: sube con más vistas", "icono": "fa-bolt" },
+    { "id": "b", "texto": "La responsable: no pierde vistas", "icono": "fa-shield-halved" },
+    { "id": "c", "texto": "Quedan iguales: las vistas no cambian", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "El atajo suma vistas al principio, pero deja riesgos que se cobran: bajas, quejas y etiquetas de falso. La versión responsable crece menos de golpe, pero nadie se la quita.",
+  "comoComprobarlo": "En «Estudio Lumbre» elige la opción llamativa en los seis pasos, publica y anota las vistas; luego produce otra versión con las demás opciones y compara."
+}

@@ -1,0 +1,12 @@
+{
+  "slug": "juventudes-politicas",
+  "items": [
+    { "clave": "centro-juvenil", "formato": "16:9", "estilo": "ilustracion", "escena": "Fachada de un centro juvenil de barrio de un piso, con una cancha techada al lado, algunos jóvenes sentados en la banqueta conversando, una calle con árboles y un terreno vacío contiguo" },
+    { "clave": "asamblea-patio", "formato": "16:9", "estilo": "ilustracion", "escena": "Asamblea al aire libre en el patio de un centro juvenil: jóvenes y vecinos de varias edades sentados en círculo sobre sillas de plástico, una joven de pie hablando con las manos abiertas" },
+    { "clave": "mural-calle", "formato": "16:9", "estilo": "ilustracion", "escena": "Jóvenes pintando un mural colorido de manos y árboles en una barda larga de calle con andamios de madera y botes de pintura en el suelo, sin letras ni palabras en el mural" },
+    { "clave": "jovenes-celular", "formato": "16:9", "estilo": "ilustracion", "escena": "Grupo de jóvenes sentados en la banqueta de una plaza mirando juntos las pantallas de sus celulares, uno de ellos mostrando algo a los demás, atardecer en el parque" },
+    { "clave": "cabildo-sala", "formato": "16:9", "estilo": "ilustracion", "escena": "Sala de cabildo de un ayuntamiento pequeño con una mesa en forma de herradura, varias personas adultas sentadas y un grupo de jóvenes de pie al fondo observando, luz de ventanas altas" },
+    { "clave": "celebracion", "formato": "16:9", "estilo": "ilustracion", "escena": "Jóvenes y vecinos celebrando afuera de un centro juvenil con los brazos en alto, serpentinas de papel en el aire y un cielo despejado" },
+    { "clave": "demolicion", "formato": "16:9", "estilo": "ilustracion", "escena": "Máquina excavadora amarilla junto a un edificio bajo medio derrumbado, escombros y polvo, un grupo pequeño de jóvenes mirando desde detrás de una cinta de precaución" }
+  ]
+}

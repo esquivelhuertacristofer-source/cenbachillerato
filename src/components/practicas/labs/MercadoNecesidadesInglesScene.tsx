@@ -20,11 +20,18 @@
  */
 
 import * as THREE from "three";
-import { useEffect, useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
+import { useEffect, useMemo, useRef, type ComponentProps, type ReactNode } from "react";
+import { Canvas, useFrame, type ThreeEvent, useThree } from "@react-three/fiber";
 import { OrbitControls, Environment, Lightformer, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { type ProductoId, type Lado, type Caja, type Insumo, PRODUCTOS, PUESTO, PRESUPUESTO, DILEMAS, INSUMOS, VECINOS, itemDe, subtotal, OFERTAS } from "./mercado-necesidades-ingles-data";
+
+/** Html que se oculta en pantallas angostas: lo que dice ya está en el panel y en la lectura. */
+function HtmlAncho(props: ComponentProps<typeof Html>) {
+  const angosto = useThree((st) => st.size.width < 640);
+  if (angosto) return null;
+  return <Html {...props} />;
+}
 
 export type VistaMercado = "mercado" | "elegir" | "acopio";
 export type FaseAcopio = "empatia" | "oferta" | "caja" | "listo";
@@ -113,7 +120,7 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12, fondo = "rgba(4,10,22,
           background: fondo,
           border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`,
           color: "#fff",
-          fontSize: fs,
+          fontSize: Math.max(fs, 14),
           fontWeight: 800,
           whiteSpace: "nowrap",
           boxShadow: "0 6px 18px -8px #000",
@@ -128,7 +135,7 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12, fondo = "rgba(4,10,22,
 function Burbuja({ pos, children, df = 10, ancho = 240, borde = "#ffffff", fs = 13, oscura = false }: { pos: Pt; children: ReactNode; df?: number; ancho?: number; borde?: string; fs?: number; oscura?: boolean }) {
   const fondo = oscura ? "#0b1628" : "#ffffff";
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[30, 0]} style={{ pointerEvents: "none" }}>
+    <HtmlAncho position={pos} center distanceFactor={df} zIndexRange={[30, 0]} style={{ pointerEvents: "none" }}>
       <div style={{ position: "relative", width: ancho, display: "flex", justifyContent: "center" }}>
         <div
           style={{
@@ -137,7 +144,7 @@ function Burbuja({ pos, children, df = 10, ancho = 240, borde = "#ffffff", fs = 
             background: fondo,
             border: `2px solid ${borde}`,
             color: oscura ? "#fff" : "#0f172a",
-            fontSize: fs,
+            fontSize: Math.max(fs, 14),
             fontWeight: 800,
             lineHeight: 1.3,
             textAlign: "center",
@@ -148,7 +155,7 @@ function Burbuja({ pos, children, df = 10, ancho = 240, borde = "#ffffff", fs = 
         </div>
         <div style={{ position: "absolute", bottom: -7, left: "50%", marginLeft: -7, width: 14, height: 14, background: fondo, transform: "rotate(45deg)", borderRight: `2px solid ${borde}`, borderBottom: `2px solid ${borde}` }} />
       </div>
-    </Html>
+    </HtmlAncho>
   );
 }
 
@@ -393,11 +400,11 @@ function ProductoPuesto({ id, i, sel, comprado, activo, enLista, onPick, modoCol
             opacity: comprado ? 0.55 : 1,
           }}
         >
-          <div style={{ fontSize: 13, fontWeight: 900, lineHeight: 1.15 }}>
+          <div style={{ fontSize: 14, fontWeight: 900, lineHeight: 1.15 }}>
             {comprado && <span style={{ color: "#059669", marginRight: 4 }}>✓</span>}
             {p.en}
           </div>
-          <div style={{ fontSize: 11, fontWeight: 800, color: enLista ? "#b45309" : "#57534e", lineHeight: 1.15 }}>{p.letrero}</div>
+          <div style={{ fontSize: 14, fontWeight: 800, color: enLista ? "#b45309" : "#57534e", lineHeight: 1.15 }}>{p.letrero}</div>
         </div>
       </Html>
     </group>
@@ -573,8 +580,8 @@ function EscenaMercado({ comprados, seleccionado, elegible, dichoVendedor, dicho
           <Caja3 p={[0, 0, 0]} s={[0.5, 0.02, 0.25]} c={pagado ? "#bbf7d0" : "#a7f3d0"} sombra={false} />
         </group>
         <Html position={[0, 1.17, 0.06]} center distanceFactor={8} zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
-          <div style={{ width: 176, padding: "6px 8px", color: "#f8fafc", fontFamily: "ui-monospace, monospace", fontSize: 11, lineHeight: 1.35 }}>
-            <div style={{ fontWeight: 900, fontSize: 11.5, borderBottom: "1px dashed rgba(255,255,255,0.4)", marginBottom: 3, display: "flex", justifyContent: "space-between" }}>
+          <div style={{ width: 176, padding: "6px 8px", color: "#f8fafc", fontFamily: "ui-monospace, monospace", fontSize: 14, lineHeight: 1.35 }}>
+            <div style={{ fontWeight: 900, fontSize: 14, borderBottom: "1px dashed rgba(255,255,255,0.4)", marginBottom: 3, display: "flex", justifyContent: "space-between" }}>
               <span>TICKET</span>
               <span style={{ color: "#fde68a" }}>budget ${PRESUPUESTO}</span>
             </div>
@@ -849,7 +856,7 @@ function Plataforma({ lado, dIdx, revel, elegida, resuelto, activo, onLado, modo
         <ringGeometry args={[1.62, 1.8, 64]} />
         <meshBasicMaterial ref={aro} color={esta && resuelto ? OK : modoColor} transparent opacity={0} toneMapped={false} />
       </mesh>
-      <Html position={[0, 3.15, 0]} center distanceFactor={10} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+      <HtmlAncho position={[0, 3.15, 0]} center distanceFactor={10} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
         <div style={{ width: 210, display: "flex", flexDirection: "column", alignItems: "center", gap: 5, opacity: otra ? 0.55 : 1 }}>
           <div style={{ padding: "5px 12px", borderRadius: 999, background: "rgba(4,10,22,0.9)", border: `2px solid ${col}`, color: "#fff", fontSize: 14, fontWeight: 900, whiteSpace: "nowrap" }}>
             <span style={{ color: esta ? col : modoColor, marginRight: 6 }}>{lado}</span>
@@ -858,18 +865,18 @@ function Plataforma({ lado, dIdx, revel, elegida, resuelto, activo, onLado, modo
           </div>
           {([0, 1] as const).map((k) =>
             revel[k] ? (
-              <div key={k} style={{ padding: "3px 9px", borderRadius: 8, background: "rgba(255,250,240,0.95)", color: "#1c1917", fontSize: 11.5, fontWeight: 800, textAlign: "center", lineHeight: 1.25, boxShadow: "0 6px 14px -8px #000" }}>
+              <div key={k} style={{ padding: "3px 9px", borderRadius: 8, background: "rgba(255,250,240,0.95)", color: "#1c1917", fontSize: 14, fontWeight: 800, textAlign: "center", lineHeight: 1.25, boxShadow: "0 6px 14px -8px #000" }}>
                 {op.datos[k]}
               </div>
             ) : (
-              <div key={k} style={{ padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.7)", border: "1px dashed rgba(255,255,255,0.35)", color: "rgba(255,255,255,0.65)", fontSize: 11, fontWeight: 800 }}>
+              <div key={k} style={{ padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.7)", border: "1px dashed rgba(255,255,255,0.35)", color: "rgba(255,255,255,0.65)", fontSize: 14, fontWeight: 800 }}>
                 {d.preguntas[k as 0 | 1].partes[0]}___{d.preguntas[k as 0 | 1].partes[1]}
               </div>
             ),
           )}
-          <div style={{ padding: "2px 8px", borderRadius: 7, background: "rgba(4,10,22,0.75)", color: "#e0f2fe", fontSize: 10.5, fontWeight: 700 }}>{op.rasgo}</div>
+          <div style={{ padding: "2px 8px", borderRadius: 7, background: "rgba(4,10,22,0.75)", color: "#e0f2fe", fontSize: 14, fontWeight: 700 }}>{op.rasgo}</div>
         </div>
-      </Html>
+      </HtmlAncho>
     </group>
   );
 }
@@ -897,15 +904,15 @@ function EscenaElegir({ dilemaIdx, reveladas, elegida, resuelto, oracion, estado
         ))}
         <Caja3 p={[0, 1.75, 0]} s={[3.4, 1.5, 0.1]} c="#b08457" />
         <Caja3 p={[0, 1.75, -0.02]} s={[3.56, 1.66, 0.08]} c="#78350f" />
-        <Html position={[0, 1.78, 0.08]} center distanceFactor={9} zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
+        <HtmlAncho position={[0, 1.78, 0.08]} center distanceFactor={9} zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
           <div style={{ width: 250, padding: "10px 12px", background: "#fffbeb", borderRadius: 4, boxShadow: "0 8px 18px -8px #000", textAlign: "center", transform: "rotate(-1.5deg)" }}>
-            <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: "0.12em", color: "#b45309" }}>COMMUNITY MEETING · NEED {dilemaIdx + 1}/4</div>
+            <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.12em", color: "#b45309" }}>COMMUNITY MEETING · NEED {dilemaIdx + 1}/4</div>
             <div style={{ fontSize: 15.5, fontWeight: 900, color: "#1c1917", lineHeight: 1.25, marginTop: 5 }}>
               <i className={`fa-solid ${d.icono}`} style={{ color: "#0369a1", marginRight: 7 }} />
               {d.necesidad}
             </div>
           </div>
-        </Html>
+        </HtmlAncho>
       </group>
       {/* Vecinos de la asamblea */}
       {[
@@ -932,12 +939,12 @@ function EscenaElegir({ dilemaIdx, reveladas, elegida, resuelto, oracion, estado
         {elegida ? `You chose ${elegida}` : "A or B?"}
       </Etiqueta>
       {(oracion || elegida) && (
-        <Html position={[0, 4.35, -2.9]} center distanceFactor={10} zIndexRange={[25, 0]} style={{ pointerEvents: "none" }}>
+        <HtmlAncho position={[0, 4.35, -2.9]} center distanceFactor={10} zIndexRange={[25, 0]} style={{ pointerEvents: "none" }}>
           <div style={{ whiteSpace: "nowrap", padding: "8px 16px", borderRadius: 14, background: "rgba(4,10,22,0.9)", border: `2px solid ${colOracion}`, color: oracion ? "#fff" : "rgba(255,255,255,0.55)", fontSize: 16, fontWeight: 900, boxShadow: `0 0 26px -8px ${colOracion}` }}>
             {estadoOracion === "ok" && <i className="fa-solid fa-circle-check" style={{ color: OK, marginRight: 8 }} />}
             {oracion || "I'd rather… because…"}
           </div>
-        </Html>
+        </HtmlAncho>
       )}
     </group>
   );
@@ -1066,7 +1073,7 @@ function CajaEntregada({ idx, nombre }: { idx: number; nombre: string }) {
         <meshBasicMaterial color="#e11d48" />
       </mesh>
       <Html position={[0, -0.12, 0.33]} center distanceFactor={9} zIndexRange={[16, 0]} style={{ pointerEvents: "none" }}>
-        <div style={{ padding: "1px 6px", borderRadius: 5, background: "rgba(255,250,240,0.95)", color: "#1c1917", fontSize: 10, fontWeight: 900, whiteSpace: "nowrap" }}>{nombre}</div>
+        <div style={{ padding: "1px 6px", borderRadius: 5, background: "rgba(255,250,240,0.95)", color: "#1c1917", fontSize: 14, fontWeight: 900, whiteSpace: "nowrap" }}>{nombre}</div>
       </Html>
     </group>
   );
@@ -1121,12 +1128,12 @@ function EscenaAcopio({ vecinoIdx, fase, dichoTu, caja, estadoCaja, entregados, 
       ))}
       <Caja3 p={[0, 1.7, -3.35]} s={[13, 3.4, 0.14]} c="#e7e5e4" />
       <Caja3 p={[-6.43, 1.7, -0.9]} s={[0.14, 3.4, 5]} c="#d6d3d1" />
-      <Html position={[0, 3.05, -3.25]} center distanceFactor={10} zIndexRange={[12, 0]} style={{ pointerEvents: "none" }}>
+      <HtmlAncho position={[0, 3.05, -3.25]} center distanceFactor={10} zIndexRange={[12, 0]} style={{ pointerEvents: "none" }}>
         <div style={{ padding: "6px 18px", borderRadius: 8, background: "#0f766e", color: "#fff", fontWeight: 900, fontSize: 15, whiteSpace: "nowrap", boxShadow: "0 8px 20px -10px #000", border: "2px solid #99f6e4" }}>
           <i className="fa-solid fa-hand-holding-heart" style={{ marginRight: 8, color: "#fbcfe8" }} />
           COMMUNITY HELP CENTER · Centro de acopio Las Flores
         </div>
-      </Html>
+      </HtmlAncho>
       <EstanteInsumos x={-2.9} insumos={["rice", "beans", "water"]} />
       <EstanteInsumos x={0.35} insumos={["blankets", "books", "soap"]} />
       {INSUMOS.map((x, k) => (
@@ -1189,9 +1196,9 @@ function EscenaAcopio({ vecinoIdx, fase, dichoTu, caja, estadoCaja, entregados, 
 export default function MercadoNecesidadesInglesScene(p: MercadoSceneProps) {
   const { vista, modoColor, resetNonce } = p;
   const cam = useMemo((): { pos: Pt; target: Pt; min: number; max: number } => {
-    if (vista === "mercado") return { pos: [0, 4.3, 9.6], target: [0, 1.25, 0.3], min: 4, max: 17 };
-    if (vista === "elegir") return { pos: [0, 5.4, 11.6], target: [0, 1.5, -0.2], min: 5, max: 19 };
-    return { pos: [0, 4.9, 8.0], target: [0, 1.0, -0.1], min: 4, max: 16 };
+    if (vista === "mercado") return { pos: [0, 4.6, 10.6], target: [0, 0.7, 0.3], min: 4, max: 17 };
+    if (vista === "elegir") return { pos: [0, 5.6, 12.6], target: [0, 0.9, -0.2], min: 5, max: 19 };
+    return { pos: [0, 5.0, 9.0], target: [0, 0.45, -0.1], min: 4, max: 16 };
   }, [vista]);
 
   return (

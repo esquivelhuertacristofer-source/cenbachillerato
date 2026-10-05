@@ -21,7 +21,7 @@
 
 import * as THREE from "three";
 import { useEffect, useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
+import { Canvas, useFrame, type ThreeEvent, useThree } from "@react-three/fiber";
 import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
@@ -100,9 +100,12 @@ const suave = (dt: number, porCuadro: number) => 1 - Math.pow(1 - porCuadro, Mat
 const OK = "#34d399";
 const NO = "#f87171";
 
-function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number }) {
+/** Etiqueta de tamaño fijo (≥ 14 px). `corta` = se queda también en pantallas angostas. */
+function Etiqueta({ pos, children, col, corta = false }: { pos: Pt; children: ReactNode; col?: string; corta?: boolean }) {
+  const ancho = useThree((s) => s.size.width);
+  if (!corta && ancho < 640) return null;
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -113,7 +116,7 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children:
           background: "rgba(4,10,22,0.86)",
           border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`,
           color: "#fff",
-          fontSize: fs,
+          fontSize: 14,
           fontWeight: 800,
           whiteSpace: "nowrap",
           boxShadow: "0 6px 18px -8px #000",
@@ -121,6 +124,17 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children:
       >
         {children}
       </div>
+    </Html>
+  );
+}
+
+/** Html de tamaño fijo; se oculta en pantallas angostas salvo que sea `corta`. */
+function Rotulo({ pos, children, corta = false }: { pos: Pt; children: ReactNode; corta?: boolean }) {
+  const ancho = useThree((s) => s.size.width);
+  if (!corta && ancho < 640) return null;
+  return (
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+      {children}
     </Html>
   );
 }
@@ -212,18 +226,18 @@ function PilaBits({ bits, codigos, pos }: { bits: Bits; codigos: number[]; pos: 
   const alto = Math.max(...reparto);
   return (
     <group position={pos}>
-      <Html position={[0, 0.16 + alto * PASO + 0.55, 0]} center distanceFactor={8} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+      <Rotulo pos={[0, 0.16 + alto * PASO + 0.55, 0]}>
         <div style={{ padding: "6px 11px", borderRadius: 10, background: "rgba(4,10,22,0.88)", border: "1px solid rgba(253,224,71,0.5)", display: "grid", gap: 2, whiteSpace: "nowrap", fontFamily: "ui-monospace, monospace" }}>
           {reparto.map((n, c) => {
             const cod = codigos[c] ?? 0;
             return (
-              <div key={c} style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}>
+              <div key={c} style={{ fontSize: 14, fontWeight: 800, color: "#fff" }}>
                 <span style={{ color: bits === 1 ? "#f8fafc" : CANAL_COL[c] }}>{bits === 1 ? "bit" : CANAL_ETQ[c]}</span> {cod.toString(2).padStart(n, "0")} <span style={{ color: "#94a3b8" }}>= {bits === 1 ? (cod ? "blanco" : "negro") : cod}</span>
               </div>
             );
           })}
         </div>
-      </Html>
+      </Rotulo>
       <mesh position={[0, -0.05, 0]}>
         <cylinderGeometry args={[1.25, 1.35, 0.1, 40]} />
         <meshStandardMaterial color="#13223a" roughness={0.7} metalness={0.3} />
@@ -242,9 +256,6 @@ function PilaBits({ bits, codigos, pos }: { bits: Bits; codigos: number[]; pos: 
                 </mesh>
               );
             })}
-            <Html position={[0, -0.02, 0.36]} center distanceFactor={8} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-              <div style={{ fontSize: 13, fontWeight: 900, color: col, textShadow: "0 1px 4px #000" }}>{bits === 1 ? "1 bit" : CANAL_ETQ[c]}</div>
-            </Html>
           </group>
         );
       })}
@@ -307,14 +318,10 @@ function VistaImagen({ p }: { p: EstudioEdicionSceneProps }) {
             </mesh>
           ))}
         </group>
-        <Etiqueta pos={[0, -0.05, alto / 2 + 0.55]} df={10} col={`${modoColor}aa`} fs={12}>
-          <i className="fa-solid fa-border-all" style={{ color: modoColor }} />
-          {w} × {h} píxeles · 1 prisma = 1 píxel · altura = brillo
-        </Etiqueta>
       </group>
       <Barra a={[X_TABLERO + sx, hSel + 0.05, sz]} b={[xPila - 1.1, 0.35, 0]} r={0.018} color="#fde047" opacity={0.7} />
       <PilaBits bits={p.bits} codigos={p.codigos} pos={[xPila, 0, 0]} />
-      <Etiqueta pos={[xPila, -0.1, 1.55]} df={10} fs={11} col="#fde04799">
+      <Etiqueta pos={[xPila, -0.1, 1.55]} col="#fde04799" corta>
         <i className="fa-solid fa-crosshairs" style={{ color: "#fde047" }} />
         Píxel ({selX}, {selY}) · {p.bits} {p.bits === 1 ? "bit" : "bits"}
       </Etiqueta>
@@ -430,7 +437,7 @@ function CapaPlano({ id, idx, est, textura, modoColor }: { id: CapaId; idx: numb
       <mesh geometry={CAJA} position={[PLANO_W / 2, 0, 0]} scale={[g, PLANO_H + g, g]}>
         <meshBasicMaterial color={borde} toneMapped={false} />
       </mesh>
-      <Html position={[0, PLANO_H / 2 + 0.2 + idx * 0.24, 0]} center distanceFactor={7} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+      <Rotulo pos={[0, PLANO_H / 2 + 0.25 + idx * 0.4, 0]} corta>
         <div
           style={{
             display: "flex",
@@ -441,17 +448,17 @@ function CapaPlano({ id, idx, est, textura, modoColor }: { id: CapaId; idx: numb
             background: "rgba(4,10,22,0.88)",
             border: `1px solid ${borde}`,
             color: est.visible ? "#fff" : "#94a3b8",
-            fontSize: 10.5,
+            fontSize: 14,
             fontWeight: 800,
             whiteSpace: "nowrap",
           }}
         >
-          <span style={{ fontSize: 10, color: modoColor }}>{idx + 1}</span>
+          <span style={{ fontSize: 14, color: modoColor }}>{idx + 1}</span>
           <i className={`fa-solid ${def.icono}`} style={{ color: borde }} />
           {def.etq}
           <span style={{ color: "#94a3b8" }}>{est.visible ? `${Math.round(est.valor * 100)} %` : "oculta"}</span>
         </div>
-      </Html>
+      </Rotulo>
     </group>
   );
 }
@@ -535,12 +542,6 @@ function VistaCapas({ p }: { p: EstudioEdicionSceneProps }) {
           <CapaPlano key={id} id={id} idx={idx} est={est[id]} textura={texturaCapa(id)} modoColor={p.modoColor} />
         ))}
         <Barra a={[PLANO_W / 2 + 0.25, -PLANO_H / 2, -0.2]} b={[PLANO_W / 2 + 0.25, -PLANO_H / 2, 3 * 0.85 + 0.2]} r={0.015} color={p.modoColor} opacity={0.6} />
-        <Etiqueta pos={[PLANO_W / 2 + 0.25, -PLANO_H / 2 - 0.3, 3 * 0.85 + 0.35]} df={9} fs={10.5} col={`${p.modoColor}aa`}>
-          arriba ↑
-        </Etiqueta>
-        <Etiqueta pos={[PLANO_W / 2 + 0.25, -PLANO_H / 2 - 0.3, -0.35]} df={9} fs={10.5}>
-          abajo
-        </Etiqueta>
       </group>
 
       {/* Vista previa: el cartel compuesto */}
@@ -585,10 +586,6 @@ function VistaCapas({ p }: { p: EstudioEdicionSceneProps }) {
             );
           })()}
         </group>
-        <Etiqueta pos={[0, PLANO_H / 2 + 0.38, 0]} df={9} fs={12} col={`${colAA}aa`}>
-          <i className={`fa-solid ${okAA ? "fa-circle-check" : "fa-triangle-exclamation"}`} style={{ color: colAA }} />
-          Vista previa · contraste {num(Math.min(p.contraste, 21), 2)}:1
-        </Etiqueta>
       </group>
     </group>
   );
@@ -687,7 +684,7 @@ function TiraCuadros({ tex, fps, modoColor }: { tex: THREE.Texture; fps: number;
         <planeGeometry args={[1.6, CUADRO_H + 0.6]} />
         <meshBasicMaterial color="#040a16" transparent opacity={0.85} />
       </mesh>
-      <Etiqueta pos={[0, CUADRO_H / 2 + 0.62, 0.1]} df={10} fs={11.5} col={`${modoColor}aa`}>
+      <Etiqueta pos={[0, CUADRO_H / 2 + 0.62, 0.1]} col={`${modoColor}aa`}>
         <i className="fa-solid fa-film" style={{ color: modoColor }} />
         {fps} cuadros cada segundo · aquí, en cámara lenta 10×
       </Etiqueta>
@@ -751,12 +748,12 @@ function TorreDatos({ bytes, maxBytes, unidadMin, pos, modoColor }: { bytes: num
             <boxGeometry args={[1.45, 0.02, 1.45]} />
             <meshBasicMaterial color="#fca5a5" transparent opacity={0.45} toneMapped={false} depthWrite={false} />
           </mesh>
-          <Etiqueta pos={[-1.35, 0, 0]} df={9} fs={10.5} col="#fca5a5aa">
+          <Etiqueta pos={[-1.35, 0, 0]} col="#fca5a5aa">
             límite {bytesTxt(maxBytes!)}
           </Etiqueta>
         </group>
       )}
-      <Etiqueta pos={[0, hTorre + 0.5, 0]} df={9} fs={12} col={`${bytes <= (maxBytes ?? Infinity) ? OK : NO}aa`}>
+      <Etiqueta pos={[0, hTorre + 0.5, 0]} col={`${bytes <= (maxBytes ?? Infinity) ? OK : NO}aa`} corta>
         <i className="fa-solid fa-database" style={{ color: bytes <= (maxBytes ?? Infinity) ? OK : NO }} />
         {bytesTxt(bytes)}
         <span style={{ color: "#94a3b8", fontWeight: 700 }}>· 1 cubo = {bytesTxt(unidad)}</span>
@@ -827,7 +824,7 @@ function VistaVideo({ p }: { p: EstudioEdicionSceneProps }) {
           </mesh>
         </group>
       )}
-      <Etiqueta pos={[2.8, 0.12, 2.3]} df={9} fs={11.5} col={`${cal.color}aa`}>
+      <Etiqueta pos={[2.8, 0.12, 2.3]} col={`${cal.color}aa`}>
         <i className="fa-solid fa-display" style={{ color: cal.color }} />
         {r.id} · {num(r.w)} × {num(r.h)} · {cal.etq.toLowerCase()}
       </Etiqueta>
@@ -935,10 +932,6 @@ function VistaAudio({ p }: { p: EstudioEdicionSceneProps }) {
       <instancedMesh ref={puntas} args={[ESFERA, undefined, MAX_MUESTRAS]} frustumCulled={false}>
         <meshStandardMaterial color="#fef3c7" emissive={colM} emissiveIntensity={0.9} />
       </instancedMesh>
-      <Etiqueta pos={[(ONDA_X0 + ONDA_X1) / 2, ONDA_Y + 1.55, 0]} df={10} fs={11.5} col={`${colM}aa`}>
-        <i className="fa-solid fa-wave-square" style={{ color: colM }} />
-        2 ms de sonido · {n} muestras{pcm ? ` · ${p.bitsAudio} bits = ${num(2 ** p.bitsAudio)} niveles` : " (fuente a 44.1 kHz)"}
-      </Etiqueta>
 
       {/* Espectro con la pared de Nyquist */}
       <group position={[0, 0, 1.6]}>
@@ -954,9 +947,6 @@ function VistaAudio({ p }: { p: EstudioEdicionSceneProps }) {
               <mesh geometry={CAJA} position={[0, h / 2 + 0.02, 0]} scale={[0.14, h, 0.14]}>
                 <meshStandardMaterial color={col} emissive={col} emissiveIntensity={dentro ? 0.5 : 0.15} transparent opacity={dentro ? 1 : 0.45} />
               </mesh>
-              <Etiqueta pos={[0, h + 0.26, 0]} df={9} fs={9.5} col={`${col}99`}>
-                {c.etq}
-              </Etiqueta>
             </group>
           );
         })}
@@ -964,11 +954,8 @@ function VistaAudio({ p }: { p: EstudioEdicionSceneProps }) {
           <boxGeometry args={[0.03, 1.4, 0.7]} />
           <meshBasicMaterial color="#fde047" transparent opacity={0.55} toneMapped={false} depthWrite={false} />
         </mesh>
-        <Etiqueta pos={[fX(nyq), 1.62, 0]} df={9} fs={10.5} col="#fde047aa">
+        <Etiqueta pos={[fX(nyq), 1.62, 0]} col="#fde047aa" corta>
           Nyquist: {String(nyq / 1000)} kHz
-        </Etiqueta>
-        <Etiqueta pos={[(ONDA_X0 + ONDA_X1) / 2, -0.05, 0.5]} df={9} fs={10}>
-          Espectro de la señal · 0 Hz → 24 kHz
         </Etiqueta>
       </group>
 
@@ -995,10 +982,10 @@ function VistaAudio({ p }: { p: EstudioEdicionSceneProps }) {
 export default function EstudioEdicionScene(p: EstudioEdicionSceneProps) {
   const { vista, modoColor, resetNonce } = p;
   const cam = useMemo((): { pos: Pt; target: Pt } => {
-    if (vista === "imagen") return { pos: [1.0, 7.4, 7.6], target: [0.6, -0.4, 0.25] };
-    if (vista === "capas") return { pos: [0.4, 1.2, 8.4], target: [0.3, 0.1, 0] };
-    if (vista === "video") return { pos: [0, 3.0, 9.4], target: [0, 0.75, 0] };
-    return { pos: [-0.3, 2.9, 9.2], target: [-0.3, 0.7, 0] };
+    if (vista === "imagen") return { pos: [1.0, 7.4, 7.6], target: [0.6, -1.2, 0.25] };
+    if (vista === "capas") return { pos: [0.4, 1.2, 8.4], target: [0.3, -0.6, 0] };
+    if (vista === "video") return { pos: [0, 3.0, 9.4], target: [0, 0.0, 0] };
+    return { pos: [-0.3, 2.9, 9.2], target: [-0.3, -0.1, 0] };
   }, [vista]);
 
   return (

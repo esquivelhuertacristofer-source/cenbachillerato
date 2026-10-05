@@ -1,0 +1,12 @@
+{
+  "escena": "Una plaza con cielo y termómetro. Puedes cambiar el clima (sunny, rainy, snowing…) y la temperatura con un deslizador.",
+  "pregunta": "Eliges «snowing» y subes la temperatura al máximo. ¿Hasta dónde llega el termómetro?",
+  "opciones": [
+    { "id": "a", "texto": "Hasta 40 °C, como con sol", "icono": "fa-sun" },
+    { "id": "b", "texto": "Solo unos pocos grados sobre 0 °C", "icono": "fa-temperature-low" },
+    { "id": "c", "texto": "Hasta 20 °C, pero cae menos nieve", "icono": "fa-cloud" }
+  ],
+  "correcta": "b",
+  "porque": "La nieve solo cae con el aire cerca o por debajo de 0 °C. Por eso, con «snowing» el termómetro del laboratorio se detiene en 2 °C.",
+  "comoComprobarlo": "En «What's the weather like?» elige snowing y arrastra el deslizador de temperatura hasta el extremo derecho; mira el valor y la escena."
+}

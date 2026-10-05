@@ -1,0 +1,12 @@
+{
+  "escena": "Ximena cursa cuatro semestres y en cada uno elige una actividad. Un radar de seis habilidades crece y los perfiles digitales se iluminan.",
+  "pregunta": "Ximena solo elige actividades de programación. ¿Se ilumina el perfil de Desarrollo de software?",
+  "opciones": [
+    { "id": "a", "texto": "Sí: con programar mucho basta", "icono": "fa-code" },
+    { "id": "b", "texto": "No: también le falta trabajo en equipo", "icono": "fa-people-group" },
+    { "id": "c", "texto": "No: le falta diseño visual", "icono": "fa-pen-ruler" }
+  ],
+  "correcta": "b",
+  "porque": "Un perfil pide varias habilidades a la vez. Programar mucho sube un eje del radar, pero desarrollo también exige equipo y criterio: sin ese nivel, el perfil sigue bloqueado.",
+  "comoComprobarlo": "En «Ruta de Ximena» elige en cada semestre la actividad de programación o de datos, toca el perfil de Desarrollo de software y compara el radar con su contorno punteado."
+}

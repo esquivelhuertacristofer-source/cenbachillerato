@@ -1,0 +1,11 @@
+{
+  "slug": "procesos-ingles",
+  "items": [
+    { "clave": "cocina-inicio", "formato": "16:9", "estilo": "ilustracion", "escena": "Cocina sencilla vista de frente: una joven con delantal junto a la estufa, una olla vacía sobre el fogón, una taza de barro en la barra y una jarra de leche cerrada junto a una lata de cacao sin etiqueta" },
+    { "clave": "bebida-lista", "formato": "16:9", "estilo": "ilustracion", "escena": "Cocina cálida con una taza de barro humeante de chocolate caliente sobre la barra, una olla limpia en la estufa y una joven con delantal sonriendo al fondo" },
+    { "clave": "cocina-derrame", "formato": "16:9", "estilo": "ilustracion", "escena": "Cocina con un charco de leche y polvo café esparcido sobre la barra, una olla ennegrecida en la estufa y una joven con delantal mirando con las manos en la cabeza" },
+    { "clave": "taller-inicio", "formato": "16:9", "estilo": "ilustracion", "escena": "Taller de bicicletas ordenado: una bicicleta volteada sobre el asiento y el manubrio, una llave inglesa, una bomba de aire y una caja de herramientas abierta sobre un banco de trabajo, un joven con overol de pie junto a ella" },
+    { "clave": "bici-lista", "formato": "16:9", "estilo": "ilustracion", "escena": "Taller luminoso con una bicicleta de pie sobre sus dos ruedas, llantas bien infladas, y un joven con overol que levanta el pulgar junto a ella" },
+    { "clave": "taller-desorden", "formato": "16:9", "estilo": "ilustracion", "escena": "Taller con una bicicleta caída de lado en el suelo, una rueda rodando lejos, herramientas desparramadas y un joven con overol rascándose la cabeza" }
+  ]
+}

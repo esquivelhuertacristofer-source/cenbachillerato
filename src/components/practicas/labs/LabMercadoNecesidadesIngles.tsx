@@ -21,12 +21,13 @@
  *      escribir una oferta de ayuda y armar la caja con lo que pide el vecino.
  */
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import React, { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, NUM, OK, card, Eyebrow, SceneBoundary } from "./_kit";
 import { hablarLab, callarLab, puedeHablarLab } from "./lab-voz";
 import { FichaTeorica } from "./_ficha";
+import { LabShell, Bloque, BotonHerramienta } from "./_shell";
 import { RetoQuizCard } from "./_reto-quiz";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { LabSfx } from "./lab-audio";
@@ -99,7 +100,7 @@ const MercadoScene = dynamic(() => import("./MercadoNecesidadesInglesScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-basket-shopping fa-fade" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Montando el tianguis en 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Montando el tianguis en 3D…</span>
     </div>
   ),
 });
@@ -199,18 +200,18 @@ function ConteoCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: str
           Countable or uncountable? How much or how many?
         </Eyebrow>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 10.5, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
           {[1, 2, 3].map((k) => (
-            <i key={k} className="fa-solid fa-star" style={{ fontSize: 13, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
+            <i key={k} className="fa-solid fa-star" style={{ fontSize: 14, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
           ))}
         </div>
       </div>
-      <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5, marginBottom: 12 }}>
+      <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5, marginBottom: 12 }}>
         Los sustantivos salen de la lectura A1, el quiz A2, el glosario A5 y el diálogo A6. Decide si se cuentan (how many) o no (how much). Cero errores = 3 estrellas.
       </div>
       {resuelto === null ? (
         <>
-          <div style={{ fontSize: 11, color: T.text3, fontWeight: 800, marginBottom: 6 }}>
+          <div style={{ fontSize: 14, color: T.text3, fontWeight: 800, marginBottom: 6 }}>
             Sustantivo {pos + 1} de {ronda.length}
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
@@ -225,15 +226,15 @@ function ConteoCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: str
               ] as const
             ).map(([id, etq, desc, ic, col]) => (
               <button key={id} className="mn-opt mn-conteo" data-on="true" onClick={() => responder(id)} style={{ ["--mnc" as string]: col, textAlign: "left" }}>
-                <div style={{ fontSize: 12.5 }}>
+                <div style={{ fontSize: 14 }}>
                   <i className={`fa-solid ${ic}`} style={{ marginRight: 8 }} />
                   {etq}
                 </div>
-                <div style={{ fontSize: 10.5, color: T.text3, fontWeight: 700, marginTop: 3 }}>{desc}</div>
+                <div style={{ fontSize: 14, color: T.text3, fontWeight: 700, marginTop: 3 }}>{desc}</div>
               </button>
             ))}
           </div>
-          {aviso && <div style={{ marginTop: 10, fontSize: 12, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
+          {aviso && <div style={{ marginTop: 10, fontSize: 14, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
         </>
       ) : (
         <div style={{ padding: "12px 14px", borderRadius: 11, border: `1px solid ${OK}55`, background: "rgba(52,211,153,0.08)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
@@ -241,9 +242,9 @@ function ConteoCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: str
             {[1, 2, 3].map((k) => (
               <i key={k} className="fa-solid fa-star" style={{ fontSize: 15, color: k <= resuelto ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
             ))}
-            <span style={{ fontSize: 12.5, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
+            <span style={{ fontSize: 14, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
           </span>
-          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 12.5, fontWeight: 900 }}>
+          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 14, fontWeight: 900 }}>
             <i className="fa-solid fa-shuffle" style={{ marginRight: 8 }} />
             Otra ronda
           </button>
@@ -277,10 +278,10 @@ function TuTurnoCard({ accent, logrado, onLogrado, playSfx }: { accent: string; 
         <i className="fa-solid fa-pen-nib" style={{ marginRight: 8, color: accent }} />
         Tu turno: What My Community Needs (A3)
       </Eyebrow>
-      <div style={{ fontSize: 13, color: "#fff", fontWeight: 700, lineHeight: 1.5 }}>{A3.prompt}</div>
+      <div style={{ fontSize: 14, color: "#fff", fontWeight: 700, lineHeight: 1.5 }}>{A3.prompt}</div>
       <ul style={{ margin: "8px 0 12px", paddingLeft: 18, display: "grid", gap: 3 }}>
         {A3.pistas.map((p) => (
-          <li key={p} style={{ fontSize: 12, color: T.text2 }}>
+          <li key={p} style={{ fontSize: 14, color: T.text2 }}>
             {p}
           </li>
         ))}
@@ -299,7 +300,7 @@ function TuTurnoCard({ accent, logrado, onLogrado, playSfx }: { accent: string; 
       />
       <div style={{ display: "grid", gap: 5, marginTop: 10 }}>
         {criterios.map((c) => (
-          <div key={c.t} style={{ display: "flex", gap: 8, alignItems: "flex-start", fontSize: 12, color: c.ok ? OK : revisado ? WARN : T.text2, lineHeight: 1.4 }}>
+          <div key={c.t} style={{ display: "flex", gap: 8, alignItems: "flex-start", fontSize: 14, color: c.ok ? OK : revisado ? WARN : T.text2, lineHeight: 1.4 }}>
             <i className={`fa-solid ${c.ok ? "fa-circle-check" : revisado ? "fa-circle-exclamation" : "fa-circle"}`} style={{ marginTop: 2 }} />
             {c.t}
           </div>
@@ -310,9 +311,9 @@ function TuTurnoCard({ accent, logrado, onLogrado, playSfx }: { accent: string; 
           <i className="fa-solid fa-spell-check" style={{ marginRight: 8 }} />
           Revisar mi texto
         </button>
-        {revisado && <span style={{ fontSize: 12, color: todo ? OK : WARN, fontWeight: 800 }}>{todo ? "¡Listo! Tu texto cumple los criterios que se pueden revisar automáticamente." : "Todavía falta algo: revisa los puntos en naranja."}</span>}
+        {revisado && <span style={{ fontSize: 14, color: todo ? OK : WARN, fontWeight: 800 }}>{todo ? "¡Listo! Tu texto cumple los criterios que se pueden revisar automáticamente." : "Todavía falta algo: revisa los puntos en naranja."}</span>}
       </div>
-      <div style={{ fontSize: 11, color: T.text3, marginTop: 10, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text3, marginTop: 10, lineHeight: 1.5 }}>
         Criterios de la actividad: {A3.criterios.join(" · ")}. La revisión automática es orientativa: cuenta palabras, busca «would like», cantidades y una razón, y detecta errores comunes de much / many; tu docente evalúa la claridad y el contenido.
       </div>
     </div>
@@ -328,11 +329,11 @@ function AutoevaluacionCard({ accent }: { accent: string }) {
         <i className="fa-solid fa-clipboard-check" style={{ marginRight: 8, color: accent }} />
         Autoevaluación (A7)
       </Eyebrow>
-      <div style={{ fontSize: 12, color: T.text2, marginBottom: 10 }}>{A7.instrucciones}</div>
+      <div style={{ fontSize: 14, color: T.text2, marginBottom: 10 }}>{A7.instrucciones}</div>
       <div style={{ display: "grid", gap: 10 }}>
         {A7.criterios.map((c, i) => (
           <div key={c}>
-            <div style={{ fontSize: 12, color: "#fff", fontWeight: 700, marginBottom: 5 }}>{c}</div>
+            <div style={{ fontSize: 14, color: "#fff", fontWeight: 700, marginBottom: 5 }}>{c}</div>
             <div className="mn-opts">
               {A7.escala.map((e) => (
                 <button
@@ -341,7 +342,7 @@ function AutoevaluacionCard({ accent }: { accent: string }) {
                   data-on={nivel[i] === e.valor}
                   title={e.descripcion}
                   onClick={() => setNivel((xs) => xs.map((x, k) => (k === i ? e.valor : x)))}
-                  style={{ ["--mnc" as string]: accent, padding: "6px 9px", fontSize: 11, background: nivel[i] === e.valor ? `${accent}22` : "transparent" }}
+                  style={{ ["--mnc" as string]: accent, padding: "6px 9px", fontSize: 14, background: nivel[i] === e.valor ? `${accent}22` : "transparent" }}
                 >
                   {e.valor} · {e.etiqueta}
                 </button>
@@ -350,7 +351,7 @@ function AutoevaluacionCard({ accent }: { accent: string }) {
           </div>
         ))}
       </div>
-      <div style={{ fontSize: 11.5, color: T.text2, marginTop: 10 }}>
+      <div style={{ fontSize: 14, color: T.text2, marginTop: 10 }}>
         <strong style={{ color: "#fff" }}>Reflexión:</strong> {A7.reflexion}
       </div>
     </div>
@@ -383,6 +384,8 @@ export function LabMercadoNecesidadesIngles({ color }: PracticaLabProps) {
   const [montoTxt, setMontoTxt] = useState("");
   const [montoRes, setMontoRes] = useState<Revision | null>(null);
   const [pagado, setPagado] = useState(false);
+  // Reacción visible del vendedor cuando la frase del alumno no es correcta.
+  const [confuso, setConfuso] = useState<string | null>(null);
 
   // ── Choose and explain
   const [dIdx, setDIdx] = useState(0);
@@ -414,7 +417,6 @@ export function LabMercadoNecesidadesIngles({ color }: PracticaLabProps) {
 
   // ── Comunes
   const [resetNonce, setResetNonce] = useState(0);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   const { mejorEstrellas, registraEstrellas: guardaEstrellas } = useEstrellas(RETO_KEY);
@@ -473,6 +475,8 @@ export function LabMercadoNecesidadesIngles({ color }: PracticaLabProps) {
   else if (faseMercado === "monto") dichoVendedor = TOTAL_EN;
   else dichoVendedor = CAMBIO_EN;
 
+  if (confuso) dichoVendedor = confuso;
+
   const elegirProducto = (id: ProductoId) => {
     if (faseMercado !== "lista" || comprados.includes(id) || !itemDe(id)) return;
     setSel(id);
@@ -481,6 +485,7 @@ export function LabMercadoNecesidadesIngles({ color }: PracticaLabProps) {
     setPedidoTxt("");
     setPedidoRes(null);
     setDichoCliente(null);
+    setConfuso(null);
     blip();
   };
   const elegirMM = (x: "much" | "many") => {
@@ -488,6 +493,7 @@ export function LabMercadoNecesidadesIngles({ color }: PracticaLabProps) {
     const r = revisaMuchMany(item, x);
     setAvisoMM(r);
     sfx(r.ok);
+    setConfuso(r.ok ? null : "Sorry? How many, or how much?");
     if (r.ok) setMmOk(true);
   };
   const comprobarPedido = () => {
@@ -495,6 +501,7 @@ export function LabMercadoNecesidadesIngles({ color }: PracticaLabProps) {
     const r = revisaPedido(item, pedidoTxt);
     setPedidoRes(r);
     sfx(r.ok);
+    setConfuso(r.ok ? null : "Sorry? Can you say that again, please?");
     if (!r.ok) return;
     const nx = [...comprados, item.prod];
     setComprados(nx);
@@ -512,6 +519,7 @@ export function LabMercadoNecesidadesIngles({ color }: PracticaLabProps) {
     const r = explicaOferta(oferta, ans);
     setOfertaRes(r);
     sfx(r.ok);
+    setConfuso(r.ok ? null : "Are you sure? Let me check the ticket.");
     if (!r.ok) return;
     if (ans === "yes") setOfertasAcept((xs) => [...xs, oferta.prod]);
     setDichoCliente(ans === "yes" ? "Yes, please." : "No, thank you.");
@@ -521,6 +529,7 @@ export function LabMercadoNecesidadesIngles({ color }: PracticaLabProps) {
     const r = revisaPreguntaPrecio(precioTxt);
     setPrecioRes(r);
     sfx(r.ok);
+    setConfuso(r.ok ? null : "Sorry? What do you want to know?");
     if (r.ok) {
       setPreguntado(true);
       setDichoCliente(capitaliza(precioTxt));
@@ -530,12 +539,14 @@ export function LabMercadoNecesidadesIngles({ color }: PracticaLabProps) {
     const r = revisaMonto(montoTxt);
     setMontoRes(r);
     sfx(r.ok);
+    setConfuso(r.ok ? null : "Hmm, that is not the total.");
     if (r.ok) {
       setPagado(true);
       setDichoCliente(`Here you are: ${PRESUPUESTO} pesos.`);
     }
   };
   const reiniciarMercado = () => {
+    setConfuso(null);
     setComprados([]);
     setSel(null);
     setMmOk(false);
@@ -673,6 +684,7 @@ export function LabMercadoNecesidadesIngles({ color }: PracticaLabProps) {
   /* ── Objetivos ─────────────────────────────────────────────────────── */
   const nRev = DILEMAS.filter((d) => reveladas[d.id]?.[0] && reveladas[d.id]?.[1]).length;
   const objetivos: { t: string; done: boolean }[] = [
+    { t: "Elegir much o many en la pregunta de Don Beto y ver cómo reacciona", done: comprados.length > 0 || mmOk },
     { t: "Pedir los cinco productos de la lista: how much / how many y «I'd like…»", done: comprados.length === LISTA.length },
     { t: "Decidir las ofertas «Would you like some…?» según el presupuesto, preguntar «How much is it?» y pagar", done: pagado },
     { t: "Descubrir los datos de las cuatro necesidades preguntando con how much / how many", done: nRev === DILEMAS.length },
@@ -733,13 +745,13 @@ export function LabMercadoNecesidadesIngles({ color }: PracticaLabProps) {
         <i className={`fa-solid ${def.icono}`} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{def.etq}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y la retroalimentación siguen aquí. {typeof pie === "string" ? pie : ""}</div>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y la retroalimentación siguen aquí. {typeof pie === "string" ? pie : ""}</div>
     </div>
   );
 
-  const sub = (txt: string) => <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
+  const sub = (txt: string) => <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
   const nota = (txt: ReactNode, col: string, icono = "fa-circle-info") => (
-    <div style={{ marginTop: 10, fontSize: 12, lineHeight: 1.55, color: col }}>
+    <div style={{ marginTop: 10, fontSize: 14, lineHeight: 1.55, color: col }}>
       <i className={`fa-solid ${icono}`} style={{ marginRight: 7 }} />
       {txt}
     </div>
@@ -751,19 +763,19 @@ export function LabMercadoNecesidadesIngles({ color }: PracticaLabProps) {
     control = (
       <>
         <div className="mn-nota-lista">
-          <div style={{ fontSize: 10.5, fontWeight: 900, letterSpacing: "0.1em", color: "#92400e", marginBottom: 6 }}>
+          <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.1em", color: "#92400e", marginBottom: 6 }}>
             <i className="fa-solid fa-receipt" style={{ marginRight: 6 }} />
             LA LISTA DE DOÑA CARMEN · billete de ${PRESUPUESTO}
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: "3px 12px" }}>
             {LISTA.map((it) => (
-              <div key={it.prod} style={{ fontSize: 13.5, fontWeight: 800, color: comprados.includes(it.prod) ? "#15803d" : "#1c1917", textDecoration: comprados.includes(it.prod) ? "line-through" : "none" }}>
+              <div key={it.prod} style={{ fontSize: 14, fontWeight: 800, color: comprados.includes(it.prod) ? "#15803d" : "#1c1917", textDecoration: comprados.includes(it.prod) ? "line-through" : "none" }}>
                 {comprados.includes(it.prod) ? "✓ " : "☐ "}
                 {it.listaEs}
               </div>
             ))}
           </div>
-          <div style={{ fontSize: 12, color: "#57534e", fontStyle: "italic", marginTop: 6 }}>{NOTA_LISTA}</div>
+          <div style={{ fontSize: 14, color: "#57534e", fontStyle: "italic", marginTop: 6 }}>{NOTA_LISTA}</div>
         </div>
         {faseMercado === "lista" && (
           <>
@@ -826,7 +838,7 @@ export function LabMercadoNecesidadesIngles({ color }: PracticaLabProps) {
               <div style={{ fontSize: 15, color: "#f9a8d4", fontWeight: 800 }}>Don Beto: «{oferta.pregunta}»</div>
               <BotonEscuchar texto={oferta.pregunta} col="#f472b6" />
             </div>
-            <div style={{ fontSize: 12, color: T.text2, marginTop: 6, ...NUM }}>
+            <div style={{ fontSize: 14, color: T.text2, marginTop: 6, ...NUM }}>
               Llevas en el ticket: {LISTA.map((it) => `${it.listaEs} $${subtotal(it)}`).join(" · ")}
               {ofertasAcept.length ? ` · ${ofertasAcept.map((id) => `${PRODUCTOS[id].es} $${OFERTAS.find((o) => o.prod === id)?.precio}`).join(" · ")}` : ""}
             </div>
@@ -918,7 +930,7 @@ export function LabMercadoNecesidadesIngles({ color }: PracticaLabProps) {
           <div style={{ fontSize: 15, color: "#fff", fontWeight: 900 }}>{dil.necesidad}</div>
           <BotonEscuchar texto={dil.necesidad} col={modoCol} />
         </div>
-        <div style={{ fontSize: 12, color: T.text3, marginTop: 3 }}>{dil.es}</div>
+        <div style={{ fontSize: 14, color: T.text3, marginTop: 3 }}>{dil.es}</div>
         {sub("1 · Pregunta antes de decidir")}
         {dil.preguntas.map((q, k) => {
           const hecha = rev[k];
@@ -951,16 +963,16 @@ export function LabMercadoNecesidadesIngles({ color }: PracticaLabProps) {
             <div className="mn-comparar">
               {dil.opciones.map((o) => (
                 <button key={o.lado} className="mn-opt mn-lado" data-on={elegida === o.lado} disabled={resuelto} onClick={() => elegirLado(o.lado)} style={{ ["--mnc" as string]: elegida === o.lado ? modoCol : "rgba(255,255,255,0.3)", textAlign: "left", background: elegida === o.lado ? `${modoCol}1f` : "transparent" }}>
-                  <div style={{ fontSize: 13, fontWeight: 900 }}>
+                  <div style={{ fontSize: 14, fontWeight: 900 }}>
                     {o.lado} · {o.verbo}
                   </div>
-                  <div style={{ fontSize: 11, color: T.text3, fontWeight: 700, margin: "2px 0 4px" }}>{o.es}</div>
+                  <div style={{ fontSize: 14, color: T.text3, fontWeight: 700, margin: "2px 0 4px" }}>{o.es}</div>
                   {o.datos.map((x) => (
-                    <div key={x} style={{ fontSize: 11.5, color: T.text2, fontWeight: 700 }}>
+                    <div key={x} style={{ fontSize: 14, color: T.text2, fontWeight: 700 }}>
                       • {x}
                     </div>
                   ))}
-                  <div style={{ fontSize: 11.5, color: "#bae6fd", fontWeight: 700 }}>• {o.rasgo}</div>
+                  <div style={{ fontSize: 14, color: "#bae6fd", fontWeight: 700 }}>• {o.rasgo}</div>
                 </button>
               ))}
             </div>
@@ -979,7 +991,7 @@ export function LabMercadoNecesidadesIngles({ color }: PracticaLabProps) {
                   </button>
                 ))
               ) : (
-                <span style={{ fontSize: 12.5, color: T.text3 }}>Tu oración aparece aquí y sobre el tablero 3D. Toca una ficha colocada para quitarla.</span>
+                <span style={{ fontSize: 14, color: T.text3 }}>Tu oración aparece aquí y sobre el tablero 3D. Toca una ficha colocada para quitarla.</span>
               )}
             </div>
             {!resuelto && (
@@ -1032,7 +1044,7 @@ export function LabMercadoNecesidadesIngles({ color }: PracticaLabProps) {
           </div>
           <BotonEscuchar texto={vec.dice} col={vec.camisa} />
         </div>
-        <div style={{ fontSize: 12, color: T.text3, marginTop: 3 }}>
+        <div style={{ fontSize: 14, color: T.text3, marginTop: 3 }}>
           {vec.quien} · {vec.es}
         </div>
         {sub("1 · Responde con empatía")}
@@ -1081,7 +1093,7 @@ export function LabMercadoNecesidadesIngles({ color }: PracticaLabProps) {
             {INSUMOS.map((x) => (
               <div key={x.id} className="mn-insumo">
                 <i className={`fa-solid ${x.icono}`} style={{ color: x.color, width: 16 }} />
-                <span style={{ flex: 1, fontSize: 12, fontWeight: 800, color: "#fff" }}>{x.en}</span>
+                <span style={{ flex: 1, fontSize: 14, fontWeight: 800, color: "#fff" }}>{x.en}</span>
                 <button className="mn-paso" aria-label={`Quitar ${x.en}`} onClick={() => cambiarCaja(x.id, -1)} disabled={faseAcopio !== "caja" || caja[x.id] === 0}>
                   −
                 </button>
@@ -1111,30 +1123,118 @@ export function LabMercadoNecesidadesIngles({ color }: PracticaLabProps) {
     );
   }
 
+  const corto = (t: string) => {
+    const w = t.trim().split(/\s+/);
+    return w.length > 10 ? `${w.slice(0, 10).join(" ")}…` : t;
+  };
+  const lectura =
+    modo === "mercado"
+      ? `Don Beto: «${corto(dichoVendedor)}»`
+      : modo === "elegir"
+        ? oracion
+          ? `«${corto(oracion)}»`
+          : `Necesidad ${dIdx + 1} de ${DILEMAS.length}: ${elegida ? `eliges ${elegida}` : "¿A o B?"}`
+        : dichoTu
+          ? `${vec.nombre}: «${corto(dichoTu)}»`
+          : `${vec.nombre} te escucha`;
+
+  const teoria = (
+    <>
+      <Bloque titulo="What would you like? How can I help?" icono="fa-hand-holding-heart">
+        <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
+      </Bloque>
+      <Bloque titulo="Cómo usar el laboratorio" icono="fa-list-ol">
+        <div style={{ display: "grid", gap: 8 }}>
+          {INSTRUCCIONES.map((p, i) => (
+            <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+              <div style={{ width: 24, height: 24, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
+              <div style={{ fontSize: 14, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
+            </div>
+          ))}
+        </div>
+      </Bloque>
+      <Bloque titulo="Lectura A1" icono="fa-book-open">
+        <div style={{ fontSize: 14, color: "#fff", fontWeight: 800, lineHeight: 1.4 }}>{TITULO_A1}</div>
+        {LECTURA_A1.map((p, i) => (
+          <div key={i} style={{ fontSize: 14, color: i === 1 || i === 2 ? "#fff" : T.text2, lineHeight: 1.55, whiteSpace: "pre-line" }}>
+            {p}
+          </div>
+        ))}
+        <div style={{ fontSize: 14, fontWeight: 900, color: T.text3 }}>COMPRENSIÓN</div>
+        {PREGUNTAS_A1.map((x) => (
+          <details key={x.pregunta} className="mn-guia">
+            <summary>{x.pregunta}</summary>
+            <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.45, marginTop: 4, paddingLeft: 12 }}>{x.respuesta}</div>
+          </details>
+        ))}
+      </Bloque>
+      <Bloque titulo="Hechos (verdadero o falso, A4)" icono="fa-circle-question">
+        <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
+          {HECHOS.map((h, i) => (
+            <li key={i} style={{ fontSize: 14, color: T.text2, lineHeight: 1.45 }}>
+              {h}
+            </li>
+          ))}
+        </ul>
+      </Bloque>
+      <Bloque titulo="Glosario (A5)" icono="fa-book">
+        {GLOSARIO.map((gi, i) => (
+          <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
+            <span style={{ fontSize: 14, fontWeight: 900, color: accent }}>{gi.termino}. </span>
+            <span style={{ fontSize: 14, color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
+            <span style={{ fontSize: 14, color: T.text3, marginLeft: 6 }}>#{gi.etiqueta}</span>
+            <div style={{ fontSize: 14, color: "#fff", lineHeight: 1.4, marginTop: 4, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+              <span>
+                <i className="fa-solid fa-quote-left" style={{ marginRight: 6, color: accent }} />
+                {gi.ejemplo}
+              </span>
+              <BotonEscuchar texto={gi.ejemplo} col={accent} />
+            </div>
+          </div>
+        ))}
+        <div style={{ fontSize: 14, color: T.text2 }}>
+          <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A5}
+        </div>
+      </Bloque>
+      <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+        <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
+          {IDEAS.map((x, i) => (
+            <li key={i} style={{ fontSize: 14, color: T.text2, lineHeight: 1.45 }}>
+              {x}
+            </li>
+          ))}
+        </ul>
+      </Bloque>
+      <Bloque titulo="Autoevaluación" icono="fa-clipboard-check">
+        <AutoevaluacionCard accent={accent} />
+      </Bloque>
+      <Bloque titulo="Ficha teórica" icono="fa-book-open">
+        <FichaTeorica data={MERCADO_NECESIDADES_INGLES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+      </Bloque>
+      <Bloque titulo="Fuentes y aclaraciones" icono="fa-circle-info">
+        <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
+          Son <strong>verbatim</strong> del material de la plataforma: la lectura A1 con sus preguntas (sin la nota sobre el INEGI, que pertenece a otra asignatura), el quiz A2, la consigna, pistas y criterios de A3, los
+          hechos A4, el glosario A5, el diálogo A6 (sin el espacio que dejaba el hueco antes de «?»), la autoevaluación A7 y la frase de empatía del video A8; los sustantivos de las estrellas vienen de A1, A2, A5 y A6. Son{" "}
+          <strong>ilustrativos</strong>: Doña Carmen, Don Beto, los cinco vecinos, la colonia Las Flores y su centro de acopio (personas y lugares ficticios); los precios del tianguis, redondeados y del orden de un tianguis
+          del centro de México en 2025 (cambian por región y temporada); y las cifras de los cuatro dilemas de la asamblea (costos, libros, años de sombra, familias y litros), elegidas para que la comparación sea clara, no
+          cotizaciones reales. «Would rather», las medidas de los incontables, some / any y las fórmulas para ofrecer ayuda son ampliación del laboratorio. Fuente: {FUENTE}
+        </div>
+      </Bloque>
+    </>
+  );
+
   return (
-    <div style={{ color: T.text }}>
+    <>
       <style>{`
-        @keyframes mnPulse { 0%,100%{ box-shadow:0 0 0 0 var(--mnd); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .mn-live-dot { animation: mnPulse 1.6s ease-in-out infinite; }
         @keyframes mnShake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);} }
-        @media (prefers-reduced-motion: reduce){ .mn-live-dot { animation:none; } .mn-in[data-e="mal"], .mn-linea[data-e="mal"] { animation:none !important; } }
-        .mn-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .mn-grid { grid-template-columns: 1fr; } }
-        .mn-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .mn-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .mn-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .mn-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .mn-tab { cursor:pointer; border:1px solid var(--mnc); border-radius:12px; padding:11px 8px; text-align:center; background:transparent; transition:all .15s; color:#fff; }
-        .mn-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
-        .mn-tab:hover { background:rgba(255,255,255,0.06); }
+        @media (prefers-reduced-motion: reduce){ .mn-in[data-e="mal"], .mn-linea[data-e="mal"] { animation:none !important; } }
         .mn-opts { display:flex; flex-wrap:wrap; gap:7px; align-items:center; }
-        .mn-opt { cursor:pointer; border:1px solid var(--mnc); border-radius:10px; padding:9px 12px; font-size:12px; font-weight:800; color:#fff; background:transparent; transition:all .15s; font-family:inherit; }
+        .mn-opt { cursor:pointer; border:1px solid var(--mnc); border-radius:10px; padding:9px 12px; font-size:14px; font-weight:800; color:#fff; background:transparent; transition:all .15s; font-family:inherit; }
         .mn-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.78); }
         .mn-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
         .mn-opt:disabled { cursor:default; }
         .mn-opt:disabled[data-on="false"] { opacity:0.55; }
-        .mn-escuchar { cursor:pointer; border:1px solid var(--mnc); border-radius:999px; padding:5px 11px; font-size:11px; font-weight:800; color:#fff; background:rgba(4,10,22,0.45); transition:all .15s; }
+        .mn-escuchar { cursor:pointer; border:1px solid var(--mnc); border-radius:999px; padding:5px 11px; font-size:14px; font-weight:800; color:#fff; background:rgba(4,10,22,0.45); transition:all .15s; }
         .mn-escuchar:hover { background:rgba(255,255,255,0.08); }
         .mn-in { border-radius:9px; border:1.5px solid ${T.lineStrong}; background:${T.inset}; color:#fff; font-size:15px; font-weight:700; padding:8px 11px; font-family:inherit; outline:none; transition:all .15s; }
         .mn-in:focus { border-color:${accent}; box-shadow:0 0 0 3px rgba(${color.rgba},0.18); }
@@ -1148,7 +1248,7 @@ export function LabMercadoNecesidadesIngles({ color }: PracticaLabProps) {
         .mn-linea { min-height:48px; display:flex; flex-wrap:wrap; gap:7px; align-items:center; padding:9px 11px; border-radius:12px; border:1.5px dashed rgba(255,255,255,0.2); background:rgba(4,10,22,0.45); }
         .mn-linea[data-e="bien"] { border-style:solid; border-color:${OK}; }
         .mn-linea[data-e="mal"] { border-style:solid; border-color:${WARN}; animation:mnShake .35s; }
-        .mn-ficha { cursor:pointer; border:1.5px solid rgba(255,255,255,0.22); border-radius:9px; padding:7px 11px; font-size:13px; font-weight:800; color:#fff; background:rgba(255,255,255,0.05); transition:all .14s; font-family:inherit; }
+        .mn-ficha { cursor:pointer; border:1.5px solid rgba(255,255,255,0.22); border-radius:9px; padding:7px 11px; font-size:14px; font-weight:800; color:#fff; background:rgba(255,255,255,0.05); transition:all .14s; font-family:inherit; }
         .mn-ficha[data-tipo="inicio"] { border-color:#38bdf888; color:#bae6fd; }
         .mn-ficha[data-tipo="because"] { border-color:#fbbf2488; color:#fde68a; }
         .mn-ficha[data-tipo="razon"] { border-color:#34d39988; color:#bbf7d0; }
@@ -1162,303 +1262,102 @@ export function LabMercadoNecesidadesIngles({ color }: PracticaLabProps) {
         .mn-paso:hover:not(:disabled) { border-color:${accent}; }
         .mn-area { width:100%; box-sizing:border-box; border-radius:12px; border:1.5px solid ${T.lineStrong}; background:${T.inset}; color:#fff; font-size:14px; line-height:1.55; padding:12px 14px; font-family:inherit; outline:none; resize:vertical; }
         .mn-area:focus { border-color:var(--mnc); }
-        .mn-opt:focus-visible, .mn-tab:focus-visible, .mn-icobtn:focus-visible, .mn-ficha:focus-visible, .mn-escuchar:focus-visible, .mn-paso:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
-        @media (max-width: 1000px){ .mn-bottom { grid-template-columns: 1fr !important; } }
-        .mn-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .mn-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .mn-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61; background:linear-gradient(180deg,#06121e 0%,#040a16 100%);
-          border-left:1px solid rgba(${color.rgba},0.32); box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1); display:flex; flex-direction:column; }
-        .mn-drawer[data-open="true"] { transform:translateX(0); }
-        .mn-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .mn-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .mn-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .mn-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .mn-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:11px 16px; border-radius:999px;
-          border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800; background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
-        .mn-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        .mn-guia summary { cursor:pointer; color:${accent}; font-size:11.5px; font-weight:800; }
-      `}</style>
-
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="mn-tabs">
-          {MODOS.map((m) => {
-            const dd = MODOS_DEF[m];
-            const col = `#${dd.color.replace("#", "")}`;
-            const on = m === modo;
-            return (
-              <button key={m} className="mn-tab" data-on={on} onClick={() => cambiarModo(m)} style={{ ["--mnc" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? col : "inherit" }}>
-                  <i className={`fa-solid ${dd.icono}`} />
+        .mn-opt:focus-visible, .mn-ficha:focus-visible, .mn-escuchar:focus-visible, .mn-paso:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
+        .mn-guia summary { cursor:pointer; color:${accent}; font-size:14px; font-weight:800; }
+      
+        .mn-ahora { padding:10px 12px; border-radius:12px; margin-bottom:12px; font-size:14px; line-height:1.45; color:#eaf0fb; border:1px solid color-mix(in srgb, var(--mnc) 40%, transparent); background:rgba(4,10,22,0.45); }
+`}</style>
+      <LabShell
+        accent={accent}
+        rgba={color.rgba}
+        retoKey={RETO_KEY}
+        escena={
+          <SceneBoundary fallback={sceneFallback}>
+            <MercadoScene
+              vista={vista}
+              modoColor={modoCol}
+              resetNonce={resetNonce}
+              comprados={comprados}
+              seleccionado={sel}
+              elegible={faseMercado === "lista"}
+              dichoVendedor={dichoVendedor}
+              dichoCliente={dichoCliente}
+              ofertaIdx={faseMercado === "ofertas" ? ofertaIdx : -1}
+              ofertasAceptadas={ofertasAcept}
+              totalVisible={preguntado}
+              pagado={pagado}
+              onProducto={elegirProducto}
+              dilemaIdx={dIdx}
+              reveladas={rev}
+              elegida={elegida}
+              resuelto={resuelto}
+              oracion={oracion}
+              estadoOracion={resuelto ? "ok" : revE ? (revE.length ? "mal" : "ok") : null}
+              onLado={elegirLado}
+              vecinoIdx={vIdx}
+              fase={faseAcopio}
+              dichoTu={dichoTu}
+              caja={caja}
+              estadoCaja={cajaRes ? (cajaRes.length ? "mal" : "ok") : null}
+              entregados={entregados}
+            />
+          </SceneBoundary>
+        }
+        modos={{
+          opciones: MODOS.map((m) => ({ id: m, etiqueta: MODOS_DEF[m].etq, icono: MODOS_DEF[m].icono })),
+          valor: modo,
+          cambiar: (id) => cambiarModo(id as Modo),
+        }}
+        herramientas={
+          <>
+            <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+            <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+          </>
+        }
+        leyenda={<span style={{ fontWeight: 800, fontFamily: "ui-monospace, monospace" }}>{chipVivo}</span>}
+        lectura={lectura}
+        objetivos={objetivos.map((o) => ({ txt: o.t, done: o.done }))}
+        pestanas={[
+          {
+            id: "controles",
+            etiqueta: "Controles",
+            icono: "fa-sliders",
+            contenido: (
+              <>
+                <div className="mn-ahora" style={{ ["--mnc" as string]: modoCol }}>
+                  <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 8 }} />
+                  {pie}
                 </div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{dd.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{dd.subtitulo}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="mn-grid">
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(460px, 62vh, 700px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <MercadoScene
-                vista={vista}
-                modoColor={modoCol}
-                resetNonce={resetNonce}
-                comprados={comprados}
-                seleccionado={sel}
-                elegible={faseMercado === "lista"}
-                dichoVendedor={dichoVendedor}
-                dichoCliente={dichoCliente}
-                ofertaIdx={faseMercado === "ofertas" ? ofertaIdx : -1}
-                ofertasAceptadas={ofertasAcept}
-                totalVisible={preguntado}
-                pagado={pagado}
-                onProducto={elegirProducto}
-                dilemaIdx={dIdx}
-                reveladas={rev}
-                elegida={elegida}
-                resuelto={resuelto}
-                oracion={oracion}
-                estadoOracion={resuelto ? "ok" : revE ? (revE.length ? "mal" : "ok") : null}
-                onLado={elegirLado}
-                vecinoIdx={vIdx}
-                fase={faseAcopio}
-                dichoTu={dichoTu}
-                caja={caja}
-                estadoCaja={cajaRes ? (cajaRes.length ? "mal" : "ok") : null}
-                entregados={entregados}
-              />
-            </SceneBoundary>
-
-            <div style={{ position: "absolute", top: 14, left: 16, right: 150, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, pointerEvents: "none" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)", maxWidth: "100%" }}>
-                <span className="mn-live-dot" style={{ ["--mnd" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol, flexShrink: 0 }} />
-                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3, flexShrink: 0 }}>EN VIVO</span>
-                <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)", flexShrink: 0 }} />
-                <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", ...NUM }}>{chipVivo}</span>
-              </div>
-            </div>
-
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="mn-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría" aria-label="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="mn-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"} aria-label={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="mn-icobtn" onClick={reiniciar} title="Reiniciar" aria-label="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 132px 14px 18px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                {def.etq} — {def.subtitulo}
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6, ...NUM }}>{pie}</div>
-            </div>
-
-            <button className="mn-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-          </div>
-
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-              Controles — {def.etq}
-            </Eyebrow>
-            <div style={{ marginTop: 4 }}>{control}</div>
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-hand-holding-heart" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>What would you like? How can I help?</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #7dd3fc55", background: "rgba(125,211,252,0.07)" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book-open" style={{ marginRight: 8, color: "#7dd3fc" }} />
-              Lectura A1
-            </Eyebrow>
-            <div style={{ fontSize: 13, color: "#fff", fontWeight: 800, lineHeight: 1.4, marginBottom: 10 }}>{TITULO_A1}</div>
-            <div style={{ display: "grid", gap: 9, marginBottom: 12 }}>
-              {LECTURA_A1.map((p, i) => (
-                <div key={i} style={{ fontSize: 12, color: i === 1 || i === 2 ? "#fff" : T.text2, lineHeight: 1.55, whiteSpace: "pre-line" }}>
-                  {p}
+                {control}
+              </>
+            ),
+          },
+          {
+            id: "reto",
+            etiqueta: "Reto",
+            icono: "fa-star",
+            contenido: (
+              <>
+                <ConteoCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
+                <div style={{ marginTop: 22 }}>
+                  <RetoQuizCard quiz={QUIZ_A2} accent={accent} rgba={color.rgba} aprobado={quizOk} onAprobado={() => setQuizOk(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Ya usas would like, how much y how many." />
                 </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", marginBottom: 8 }}>COMPRENSIÓN</div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {PREGUNTAS_A1.map((x) => (
-                <details key={x.pregunta} className="mn-guia">
-                  <summary>{x.pregunta}</summary>
-                  <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.45, marginTop: 4, paddingLeft: 12 }}>{x.respuesta}</div>
-                </details>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />
-              Cómo usar el laboratorio
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-                Objetivos de la sesión
-              </Eyebrow>
-              <span style={{ fontSize: 11, fontWeight: 800, color: objetivos.every((o) => o.done) ? OK : T.text3 }}>
-                {objetivos.filter((o) => o.done).length}/{objetivos.length}
-              </span>
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ marginTop: 2, fontSize: 13, color: o.done ? OK : "rgba(255,255,255,0.22)" }} />
-                  <span style={{ fontSize: 12, color: o.done ? "#fff" : T.text2, lineHeight: 1.4 }}>{o.t}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="mn-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />
-            Hechos (verdadero o falso, A4)
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-            {HECHOS.map((h, i) => (
-              <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
-                {h}
-              </li>
-            ))}
-          </ul>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />
-              Glosario (A5)
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {GLOSARIO.map((gi, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{gi.termino}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
-                  <span style={{ fontSize: 10, color: T.text3, marginLeft: 6 }}>#{gi.etiqueta}</span>
-                  <div style={{ fontSize: 11.5, color: "#fff", lineHeight: 1.4, marginTop: 4, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                    <span>
-                      <i className="fa-solid fa-quote-left" style={{ marginRight: 6, color: accent }} />
-                      {gi.ejemplo}
-                    </span>
-                    <BotonEscuchar texto={gi.ejemplo} col={accent} />
+                <div style={{ ...card, padding: "20px 20px 22px", marginTop: 22 }}>
+                  <Eyebrow>
+                    <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
+                    Completa el diálogo (A6)
+                  </Eyebrow>
+                  <div style={{ marginTop: 12 }}>
+                    <CompletaTexto data={HUECOS_A6} accent={accent} rgba={color.rgba} completado={textoA6} onCompletado={() => { setTextoA6(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
                   </div>
                 </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11.5, color: T.text2, marginTop: 10 }}>
-              <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A5}
-            </div>
-          </div>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
-          <div style={{ ...card, padding: "18px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-              Ideas clave
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-              {IDEAS.map((x, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  {x}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <AutoevaluacionCard accent={accent} />
-        </div>
-      </div>
-
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          Son <strong>verbatim</strong> del material de la plataforma: la lectura A1 con sus preguntas (sin la nota sobre el INEGI, que pertenece a otra asignatura), el quiz A2, la consigna, pistas y criterios de A3, los
-          hechos A4, el glosario A5, el diálogo A6 (sin el espacio que dejaba el hueco antes de «?»), la autoevaluación A7 y la frase de empatía del video A8; los sustantivos de las estrellas vienen de A1, A2, A5 y A6. Son{" "}
-          <strong>ilustrativos</strong>: Doña Carmen, Don Beto, los cinco vecinos, la colonia Las Flores y su centro de acopio (personas y lugares ficticios); los precios del tianguis, redondeados y del orden de un tianguis
-          del centro de México en 2025 (cambian por región y temporada); y las cifras de los cuatro dilemas de la asamblea (costos, libros, años de sombra, familias y litros), elegidas para que la comparación sea clara, no
-          cotizaciones reales. «Would rather», las medidas de los incontables, some / any y las fórmulas para ofrecer ayuda son ampliación del laboratorio. Fuente: {FUENTE}
-        </span>
-      </div>
-
-      <ConteoCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
-
-      <div style={{ marginTop: 22 }}>
-        <RetoQuizCard quiz={QUIZ_A2} accent={accent} rgba={color.rgba} aprobado={quizOk} onAprobado={() => setQuizOk(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Ya usas would like, how much y how many." />
-      </div>
-
-      <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
-          Completa el diálogo (A6)
-        </Eyebrow>
-        <div style={{ marginTop: 12 }}>
-          <CompletaTexto data={HUECOS_A6} accent={accent} rgba={color.rgba} completado={textoA6} onCompletado={() => { setTextoA6(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
-        </div>
-      </div>
-
-      <TuTurnoCard accent={accent} logrado={a3Ok} onLogrado={() => setA3Ok(true)} playSfx={sfx} />
-
-      <div className="mn-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="mn-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="mn-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="mn-close" onClick={() => setDrawer(false)} title="Cerrar" aria-label="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="mn-drawer-body">
-          <FichaTeorica data={MERCADO_NECESIDADES_INGLES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+                <TuTurnoCard accent={accent} logrado={a3Ok} onLogrado={() => setA3Ok(true)} playSfx={sfx} />
+              </>
+            ),
+          },
+          { id: "teoria", etiqueta: "Teoría", icono: "fa-book-open", contenido: teoria },
+        ]}
+      />
+    </>
   );
 }

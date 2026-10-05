@@ -1,27 +1,35 @@
-﻿"use client";
+"use client";
 
 /**
  * Laboratorio — Las juventudes como sujetos políticos
  * Práctica experimental para CS-III-P03-A4 (Ciencias Sociales III).
  *
- * Interactividad máxima. Cuatro modos: los tres de arrastrar/clasificar y, al
- * final, uno que se escribe («Completa el texto», verbatim de la progresión):
- *  1. «¿Electoral, comunitaria, cultural o digital?» — clasifica ocho ejemplos
- *     según la forma de participación política juvenil que ilustran.
- *  2. «Empareja concepto y definición» — arrastra cada concepto clave (agencia
- *     política, sujeto histórico, participación cultural y comunitaria, Art. 35)
- *     a su definición verbatim (A2).
- *  3. «Escribe el término» — lee la definición verbatim (A5) y escribe
- *     de memoria el término del glosario que la nombra.
- *  + Cuestionario de comprensión (V/F verbatim de A4).
+ * EXPERIMENTO CENTRAL: «Colectivo en acción». El Colectivo Raíces Jóvenes de
+ * un municipio FICTICIO (Santa Marta del Llano) quiere salvar su único centro
+ * juvenil de ser demolido. En 4 semanas el alumno elige formas de participación
+ * (asamblea, brigada, mural, festival, redes, consulta, candidatura) y ve cómo se
+ * mueven tres indicadores (alcance, incidencia, legitimidad; valores de
+ * simulación), cómo reacciona la autoridad y qué decide el cabildo. Combinar
+ * formas, construir legitimidad antes de lo formal y articular lo digital con lo
+ * presencial funciona; repetir una sola forma, no. La lógica vive en
+ * `juventudes-politicas-sim.ts`.
  *
- * DOM puro (sin three.js): ligero, accesible (ratón, teclado y táctil mediante
- * clic-para-seleccionar / clic-para-colocar). Contenido VERBATIM de CS-III·P03.
+ * Modos (los de siempre se conservan; las misiones y las estrellas dependen de
+ * ellos):
+ *  0. «Colectivo en acción» — el simulador.
+ *  1. «¿Electoral, comunitaria, cultural o digital?» — clasifica ocho ejemplos.
+ *  2. «Empareja concepto y definición» — conceptos clave de A2, verbatim.
+ *  3. «Escribe el término» — glosario A5, verbatim.
+ *  4. «Completa el texto» — fill_blanks verbatim.
+ *  + Reto: cuestionario V/F verbatim de A4. Teoría: ficha y datos verbatim.
+ *
+ * DOM puro (sin three.js). Contenido VERBATIM de CS-III·P03.
  */
 
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import type { PracticaLabProps } from "../registry";
-import { T, OK, card, Eyebrow } from "./_kit";
+import { T, OK, Eyebrow } from "./_kit";
+import { LabShell, Bloque, Mesa, BotonHerramienta } from "./_shell";
 import { LabSfx } from "./lab-audio";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { EscribeTermino } from "./_mecanica-termino";
@@ -38,15 +46,35 @@ import {
   DATO_JUVENTUDES,
   type Categoria,
 } from "./juventudes-politicas-data";
+import {
+  ACCIONES,
+  ENERGIA,
+  INICIO,
+  POSTURAS,
+  SEMANAS,
+  UMBRAL_APRUEBA,
+  UMBRAL_NEGOCIA,
+  accionDe,
+  cabildo,
+  energiaGastada,
+  formasUsadas,
+  simular,
+  type Efecto,
+  type Resultado,
+  type Sesion,
+} from "./juventudes-politicas-sim";
 
 const NO = "#FF5E5E";
+const AMBAR = "#FFC75A";
 import { useEstrellas } from "@/lib/hooks/useEstrellas";
 import { FondoTermino, VinetaTermino } from "./_vineta";
 const RETO_KEY = "cen-juventudes-politicas-reto";
+const RUTA_SIM = "/media/labs-sim/juventudes-politicas";
 
-type Modo = "clasificar" | "conceptos" | "glosario" | "texto";
+type Modo = "sim" | "clasificar" | "conceptos" | "glosario" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
+  { id: "sim", label: "Colectivo en acción", icono: "fa-people-group" },
   { id: "clasificar", label: "¿Electoral, comunitaria, cultural o digital?", icono: "fa-layer-group" },
   { id: "conceptos", label: "Empareja concepto y definición", icono: "fa-diagram-project" },
   { id: "glosario", label: "Escribe el término", icono: "fa-keyboard" },
@@ -55,12 +83,11 @@ const MODOS: { id: Modo; label: string; icono: string }[] = [
 
 export function LabJuventudesPoliticas({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
-  const [modo, setModo] = useState<Modo>("clasificar");
+  const [modo, setModo] = useState<Modo>("sim");
 
   // ── sonido ────────────────────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   // Modo «Completa el texto». El contador sirve de `key`: subirlo remonta
   // el componente y devuelve todos los huecos en blanco.
   const [textoDone, setTextoDone] = useState(false);
@@ -89,6 +116,46 @@ export function LabJuventudesPoliticas({ color }: PracticaLabProps) {
     partida.acierto();
     return sonido && audioRef.current?.blip();
   };
+
+  // ── modo Simulador (el colectivo, 4 semanas) ───────────────────────────
+  const [semanas, setSemanas] = useState<string[][]>([[]]);
+  const [cerradas, setCerradas] = useState(0);
+  const resultado: Resultado = simular(semanas, cerradas);
+  const terminado = cerradas >= SEMANAS;
+  const sesion: Sesion | null = terminado ? cabildo(resultado.ind) : null;
+  const actual = semanas[cerradas] ?? [];
+  const energiaLibre = ENERGIA - energiaGastada(actual);
+
+  const elegirAccion = (id: string) => {
+    if (terminado) return;
+    if (accionDe(id).costo > energiaLibre) return;
+    const nuevo = semanas.map((s, i) => (i === cerradas ? [...s, id] : s));
+    const r = simular(nuevo, cerradas);
+    const ef = r.efectos[cerradas]?.[r.efectos[cerradas]!.length - 1];
+    setSemanas(nuevo);
+    if (ef?.bueno) sfxPlace();
+    else sfxNo();
+  };
+  const deshacer = () => {
+    if (terminado || actual.length === 0) return;
+    setSemanas((s) => s.map((x, i) => (i === cerradas ? x.slice(0, -1) : x)));
+  };
+  const terminarSemana = () => {
+    if (terminado || actual.length === 0) return;
+    const sig = cerradas + 1;
+    setCerradas(sig);
+    if (sig < SEMANAS) setSemanas((s) => [...s, []]);
+    else {
+      const fin = cabildo(simular(semanas, sig).ind);
+      if (fin.voto === "aprueba") sfxOk();
+    }
+  };
+  const resetSim = () => {
+    setSemanas([[]]);
+    setCerradas(0);
+  };
+  const formasDone = formasUsadas(semanas) >= 3;
+  const cabildoOk = sesion?.voto === "aprueba";
 
   // ── modo clasificar (por forma de participación) ───────────────────────
   const [ubicEj, setUbicEj] = useState<Record<string, Categoria>>({});
@@ -173,6 +240,8 @@ export function LabJuventudesPoliticas({ color }: PracticaLabProps) {
   };
 
   const objetivos = [
+    { txt: "Combina al menos 3 formas de participación en tu campaña", done: formasDone },
+    { txt: "Logra que el cabildo conserve el centro juvenil", done: cabildoOk },
     { txt: "Clasifica los 8 ejemplos por forma de participación", done: clasificarDone },
     { txt: "Empareja los 5 conceptos con su definición", done: conceptosDone },
     { txt: "Escribe los 6 términos del glosario", done: glosarioDone },
@@ -234,288 +303,512 @@ export function LabJuventudesPoliticas({ color }: PracticaLabProps) {
     setTextoDone(false);
     setTextoIntento((n) => n + 1);
   };
-  const resetActual = modo === "texto" ? resetTexto : modo === "clasificar" ? resetClasificar : modo === "conceptos" ? resetConceptos : resetGlosario;
+  const resetActual = modo === "texto" ? resetTexto : modo === "sim" ? resetSim : modo === "clasificar" ? resetClasificar : modo === "conceptos" ? resetConceptos : resetGlosario;
+
+  const lectura =
+    modo === "sim"
+      ? terminado
+        ? `Sesión de cabildo: ${sesion!.voto === "aprueba" ? "se conserva" : sesion!.voto === "negocia" ? "acuerdo parcial" : "se demuele"}`
+        : `Semana ${cerradas + 1} de ${SEMANAS} · energía ${energiaLibre}/${ENERGIA} · autoridad ${resultado.postura.toLowerCase()}`
+      : `${modosHechos}/4 modos · ${bestEstrellas}★`;
+
+  const escena = (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
+      <style>{ESTILOS(accent, color.rgba)}</style>
+
+      {/* MODO — completa el texto (fill_blanks verbatim de la progresión) */}
+      {modo === "texto" && (
+        <CompletaTexto
+          key={textoIntento}
+          data={JUVENTUDES_POLITICAS_HUECOS}
+          accent={accent}
+          rgba={color.rgba}
+          completado={textoDone}
+          onCompletado={() => {
+            setTextoDone(true);
+            sfxOk();
+          }}
+          onAcierto={sfxPlace}
+          onError={sfxNo}
+        />
+      )}
+
+      {/* MODO 0 — Colectivo en acción */}
+      {modo === "sim" && (
+        <SimColectivo
+          accent={accent}
+          semanas={semanas}
+          cerradas={cerradas}
+          resultado={resultado}
+          sesion={sesion}
+          energiaLibre={energiaLibre}
+          onAccion={elegirAccion}
+          onDeshacer={deshacer}
+          onTerminar={terminarSemana}
+          onReiniciar={resetSim}
+        />
+      )}
+
+      {/* MODO 1 — clasificar */}
+      {modo === "clasificar" && (
+        <Mesa>
+          <div className="jp-panel">
+            <div className="jp-cab">
+              <Eyebrow>Arrastra cada ejemplo a su forma de participación</Eyebrow>
+              <span style={{ fontSize: 14, fontWeight: 800, color: clasificarDone ? OK : T.text3 }}>
+                {Object.keys(ubicEj).length}/{EJEMPLOS.length}
+              </span>
+            </div>
+            {ejLibres.length === 0 ? (
+              <div className="jp-ok">
+                <i className="fa-solid fa-circle-check" /> ¡Clasificaste los {EJEMPLOS.length} ejemplos!
+              </div>
+            ) : (
+              <div className="jp-chips">
+                {ejLibres.map((e) => (
+                  <button key={e.id} className="jp-chip" data-sel={selEj === e.id} onClick={() => setSelEj((v) => (v === e.id ? null : e.id))} {...dragProps(e.id)}>
+                    {e.texto}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <BinsCategorias selEj={selEj} shakeEj={shakeEj} ubicEj={ubicEj} onMatch={intentarEj} dropProps={dropProps} />
+        </Mesa>
+      )}
+
+      {/* MODO 2 — conceptos */}
+      {modo === "conceptos" && (
+        <Mesa>
+          <div className="jp-panel">
+            <div className="jp-cab">
+              <Eyebrow>Arrastra cada concepto a su definición</Eyebrow>
+              <span style={{ fontSize: 14, fontWeight: 800, color: conceptosDone ? OK : T.text3 }}>
+                {Object.keys(empCon).length}/{CONCEPTOS.length}
+              </span>
+            </div>
+            {conLibres.length === 0 ? (
+              <div className="jp-ok">
+                <i className="fa-solid fa-circle-check" /> ¡Emparejaste los {CONCEPTOS.length} conceptos!
+              </div>
+            ) : (
+              <div className="jp-chips">
+                {conLibres.map((c) => (
+                  <button key={c.id} className="jp-chip" data-sel={selCon === c.id} onClick={() => setSelCon((v) => (v === c.id ? null : c.id))} {...dragProps(c.id)}>
+                    <i className="fa-solid fa-diagram-project" style={{ fontSize: 14, color: T.text3 }} />
+                    {c.concepto}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <RowsConceptos selCon={selCon} shakeCon={shakeCon} empCon={empCon} onMatch={intentarCon} dropProps={dropProps} />
+        </Mesa>
+      )}
+
+      {/* MODO 3 — glosario */}
+      {modo === "glosario" && (
+        <EscribeTermino
+          key={glosIntento}
+          pares={PARES}
+          accent={accent}
+          rgba={color.rgba}
+          completado={glosarioDone}
+          instrucciones="Lee la definición y escribe el término del glosario que le corresponde."
+          onCompletado={() => {
+            setGlosarioDone(true);
+            sfxOk();
+            persistMejor(clasificarDone, conceptosDone, true);
+          }}
+          onAcierto={sfxPlace}
+          onError={sfxNo}
+        />
+      )}
+    </div>
+  );
+
+  const pistaDe: Record<Modo, React.ReactNode> = {
+    sim: (
+      <>
+        Primero construye <strong style={{ color: T.text }}>legitimidad</strong> con el barrio; después lo formal (consulta, candidatura) pesa. Las redes funcionan cuando se <strong style={{ color: T.text }}>articulan con acciones presenciales</strong>, y repetir una sola forma rinde cada vez menos.
+      </>
+    ),
+    clasificar: (
+      <>
+        La participación política juvenil no se agota en el voto: también es <strong style={{ color: T.text }}>comunitaria</strong>, <strong style={{ color: T.text }}>cultural</strong> y <strong style={{ color: T.text }}>digital</strong>. Las y los jóvenes son ciudadanos de hoy, no solo del mañana.
+      </>
+    ),
+    conceptos: (
+      <>
+        La <strong style={{ color: T.text }}>agencia política</strong> es actuar con propósito en la esfera pública; ser <strong style={{ color: T.text }}>sujeto histórico</strong> es producir historia, no recibirla pasivamente.
+      </>
+    ),
+    glosario: <>Ya no se arrastra: lee la definición y su ejemplo y escribe el término. Si te atoras, la pista te da la inicial y las letras.</>,
+    texto: <>Escribe la palabra que falta en cada hueco del texto.</>,
+  };
 
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes jpShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
-        @keyframes jpPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
-        .jp-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 16px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .jp-tab:hover { border-color:${T.lineStrong}; color:#fff; }
-        .jp-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-        .jp-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
-          font-size:14px; border:1px solid ${T.line}; background:${T.glass}; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .jp-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
-        .jp-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .jp-chip { cursor:grab; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 16px; border-radius:14px;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:13.5px; font-weight:700; transition:all .14s; user-select:none; max-width:360px; text-align:left; line-height:1.4; }
-        .jp-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); }
-        .jp-chip[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.2); box-shadow:0 0 16px -5px ${accent}; }
-        .jp-chip:active { cursor:grabbing; }
-        .jp-row { border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:14px 16px; transition:all .16s; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
-        .jp-row[data-shake="true"] { animation:jpShake .4s; border-color:${NO}; }
-        .jp-row[data-done="true"] { border-color:${OK}66; background:${OK}0f; }
-        .jp-slot { flex-shrink:0; min-width:210px; min-height:42px; border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset};
-          display:inline-flex; align-items:center; justify-content:center; color:${T.text3}; font-size:12.5px; transition:all .16s; cursor:pointer; padding:4px 10px; }
-        .jp-slot[data-armed="true"] { border-color:${accent}; background:rgba(${color.rgba},0.1); }
-        .jp-bin { border-radius:15px; border:1.5px solid ${T.line}; background:${T.glass}; padding:16px; transition:all .16s; min-height:230px; }
-        .jp-bin[data-shake="true"] { animation:jpShake .4s; border-color:${NO}; }
-        .jp-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
-          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
-        .jp-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
-        .jp-q:disabled{ cursor:default; }
-        .jp-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
-          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .jp-btn:hover { border-color:${T.lineStrong}; }
-        .jp-divider { height:1px; background:${T.line}; margin:18px 0; }
-        @media (prefers-reduced-motion: reduce){ .jp-row[data-shake="true"], .jp-bin[data-shake="true"] { animation:none; } }
-
-        /* Cajón de teoría */
-        .jp-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .jp-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .jp-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .jp-drawer[data-open="true"] { transform:translateX(0); }
-        .jp-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .jp-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .jp-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .jp-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .jp-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .jp-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .jp-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
-
-        /* Identidad del tablero */
-        .jp-bin, .jp-row { --tono:188; position:relative;
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
-        .jp-bin:nth-of-type(6n+1), .jp-row:nth-of-type(6n+1) { --tono:188; }
-        .jp-bin:nth-of-type(6n+2), .jp-row:nth-of-type(6n+2) { --tono:262; }
-        .jp-bin:nth-of-type(6n+3), .jp-row:nth-of-type(6n+3) { --tono:44; }
-        .jp-bin:nth-of-type(6n+4), .jp-row:nth-of-type(6n+4) { --tono:152; }
-        .jp-bin:nth-of-type(6n+5), .jp-row:nth-of-type(6n+5) { --tono:330; }
-        .jp-bin:nth-of-type(6n+6), .jp-row:nth-of-type(6n+6) { --tono:18; }
-        .jp-bin::before, .jp-row::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
-          background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
-        .jp-bin[data-done="true"], .jp-row[data-done="true"] {
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.2) 0%, transparent 68%); }
-        .jp-chip { transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
-        .jp-chip:hover { transform:translateY(-2px); }
-        .jp-chip[data-sel="true"] { transform:translateY(-3px) scale(1.02); }
-        @media (prefers-reduced-motion: reduce){
-          .jp-chip, .jp-chip:hover, .jp-chip[data-sel="true"] { transform:none; transition:none; }
-        }
-      `}</style>
-
-      {/* selector de modo + toolbar */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="jp-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="jp-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="jp-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="jp-icobtn" onClick={resetActual} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <button className="jp-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="jp-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="jp-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="jp-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="jp-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="jp-drawer-body">
-          <FichaTeorica data={JUVENTUDES_POLITICAS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}>
-        {/* ── Columna principal ─────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
-          {/* MODO 1 — clasificar */}
-          {/* MODO — completa el texto (fill_blanks verbatim de la progresión) */}
-          {modo === "texto" && (
-            <CompletaTexto
-              key={textoIntento}
-              data={JUVENTUDES_POLITICAS_HUECOS}
-              accent={accent}
-              rgba={color.rgba}
-              completado={textoDone}
-              onCompletado={() => {
-                setTextoDone(true);
-                sfxOk();
-              }}
-              onAcierto={sfxPlace}
-              onError={sfxNo}
-            />
-          )}
-
-          {modo === "clasificar" && (
+    <LabShell
+      dom
+      accent={accent}
+      rgba={color.rgba}
+      escena={escena}
+      modos={{ opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })), valor: modo, cambiar: (id) => setModo(id as Modo) }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo={modo === "sim" ? "Reiniciar la campaña" : "Reiniciar este modo"} onClick={resetActual} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      retoKey={RETO_KEY}
+      pestanas={[
+        {
+          id: "pistas",
+          etiqueta: "Pistas",
+          icono: "fa-lightbulb",
+          contenido: (
             <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada ejemplo a su forma de participación</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: clasificarDone ? OK : T.text3 }}>
-                    {Object.keys(ubicEj).length}/{EJEMPLOS.length}
-                  </span>
-                </div>
-                {ejLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Clasificaste los {EJEMPLOS.length} ejemplos!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {ejLibres.map((e) => (
-                      <button key={e.id} className="jp-chip" data-sel={selEj === e.id} onClick={() => setSelEj((v) => (v === e.id ? null : e.id))} {...dragProps(e.id)}>
-                        {e.texto}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <BinsCategorias selEj={selEj} shakeEj={shakeEj} ubicEj={ubicEj} onMatch={intentarEj} dropProps={dropProps} />
-            </>
-          )}
-
-          {/* MODO 2 — conceptos */}
-          {modo === "conceptos" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada concepto a su definición</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: conceptosDone ? OK : T.text3 }}>
-                    {Object.keys(empCon).length}/{CONCEPTOS.length}
-                  </span>
-                </div>
-                {conLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Emparejaste los {CONCEPTOS.length} conceptos!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {conLibres.map((c) => (
-                      <button key={c.id} className="jp-chip" data-sel={selCon === c.id} onClick={() => setSelCon((v) => (v === c.id ? null : c.id))} {...dragProps(c.id)}>
-                        <i className="fa-solid fa-diagram-project" style={{ fontSize: 11, color: T.text3 }} />
-                        {c.concepto}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <RowsConceptos selCon={selCon} shakeCon={shakeCon} empCon={empCon} onMatch={intentarCon} dropProps={dropProps} />
-            </>
-          )}
-
-          {/* MODO 3 — glosario */}
-          {modo === "glosario" && (
-            <EscribeTermino
-              key={glosIntento}
-              pares={PARES}
-              accent={accent}
-              rgba={color.rgba}
-              completado={glosarioDone}
-              instrucciones="Lee la definición y escribe el término del glosario que le corresponde."
-              onCompletado={() => {
-                setGlosarioDone(true);
-                sfxOk();
-                persistMejor(clasificarDone, conceptosDone, true);
-              }}
-              onAcierto={sfxPlace}
-              onError={sfxNo}
-            />
-          )}
-        </div>
-
-        {/* ── Columna lateral ───────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? OK : T.text2 }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-                  <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="jp-divider" />
-
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", color: T.text3, textTransform: "uppercase" }}>Puntuación</div>
-                <div style={{ display: "flex", gap: 4, marginTop: 5 }}>
+              <Bloque titulo="Tu partida" icono="fa-gauge-high">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+                <div style={{ display: "flex", gap: 4 }}>
                   {[1, 2, 3].map((s) => (
-                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 18, color: s <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
+                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 20, color: s <= bestEstrellas ? AMBAR : "rgba(255,255,255,0.16)" }} />
                   ))}
                 </div>
-              </div>
-              <div style={{ textAlign: "right", maxWidth: 180 }}>
-                <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45 }}>
-                  {bestEstrellas >= 3 ? "¡Reconoces a las juventudes como sujetos políticos!" : "Termina los tres modos para ganar 2★; la tercera pide 2 errores o menos."}
+                <div style={{ fontSize: 14, color: T.text2 }}>
+                  {bestEstrellas >= 3 ? "¡Reconoces a las juventudes como sujetos políticos!" : "Termina los modos de clasificar, emparejar y escribir para ganar estrellas; la tercera pide 2 errores o menos."}
                 </div>
-              </div>
-            </div>
-          </div>
+              </Bloque>
+              <Bloque titulo="Pista de este modo" icono="fa-lightbulb">
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55 }}>{pistaDe[modo]}</div>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-clipboard-question",
+          contenido: <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />,
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Teoría de la práctica" icono="fa-book-open">
+                <FichaTeorica data={JUVENTUDES_POLITICAS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <Bloque titulo="Formas de participación" icono="fa-layer-group">
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {(Object.keys(CATEGORIA_INFO) as Categoria[]).map((c) => (
+                    <div key={c} style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                      <strong style={{ color: T.text }}>{CATEGORIA_INFO[c].titulo}.</strong> {CATEGORIA_INFO[c].subtitulo}
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+              <Bloque titulo="Conceptos clave" icono="fa-diagram-project">
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {CONCEPTOS.map((c) => (
+                    <div key={c.id} style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                      <strong style={{ color: T.text }}>{c.concepto}.</strong> {c.definicion}
+                      <div style={{ fontStyle: "italic", color: T.text3, marginTop: 2 }}>{c.ejemplo}</div>
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+              <Bloque titulo="Dato" icono="fa-circle-info">
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55 }}>{DATO_JUVENTUDES}</div>
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
+  );
+}
 
-          {/* pista del modo actual */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid rgba(${color.rgba},0.3)`, background: `rgba(${color.rgba},0.08)`, fontSize: 13, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              {modo === "clasificar" && (
-                <>La participación política juvenil no se agota en el voto: también es <strong style={{ color: T.text }}>comunitaria</strong>, <strong style={{ color: T.text }}>cultural</strong> y <strong style={{ color: T.text }}>digital</strong>. Las y los jóvenes son ciudadanos de hoy, no solo del mañana.</>
-              )}
-              {modo === "conceptos" && (
-                <>La <strong style={{ color: T.text }}>agencia política</strong> es actuar con propósito en la esfera pública; ser <strong style={{ color: T.text }}>sujeto histórico</strong> es producir historia, no recibirla pasivamente.</>
-              )}
-              {modo === "glosario" && (
-                <>Ya no se arrastra: lee la definición y su ejemplo y escribe el término. Si te atoras, la pista te da la inicial y las letras.</>
-              )}
-            </span>
-          </div>
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Estilos
+ * ═══════════════════════════════════════════════════════════════════════════ */
+const ESTILOS = (accent: string, rgba: string) => `
+  @keyframes jpShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
+  @keyframes jpPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
+  .jp-panel { border-radius:16px; border:1px solid ${T.line}; background:${T.glass}; padding:14px 16px; display:flex; flex-direction:column; gap:10px; min-width:0; }
+  .jp-cab { display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+  .jp-cab p { margin:0; }
+  .jp-nota { font-size:14px; color:${T.text3}; line-height:1.5; }
+  .jp-ok { font-size:14px; color:${OK}; font-weight:700; display:flex; align-items:center; gap:9px; }
+  .jp-chips { display:flex; flex-wrap:wrap; gap:10px; }
+  .jp-chip { cursor:grab; display:inline-flex; align-items:center; justify-content:flex-start; gap:8px; padding:11px 14px; border-radius:14px;
+    border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:14px; font-weight:700; user-select:none; max-width:100%; text-align:left; line-height:1.4;
+    transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
+  .jp-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); transform:translateY(-2px); }
+  .jp-chip[data-sel="true"] { border-color:${accent}; background:rgba(${rgba},0.2); box-shadow:0 0 16px -5px ${accent}; transform:translateY(-3px) scale(1.02); }
+  .jp-chip:active { cursor:grabbing; }
+  .jp-chip[data-arrastrando="true"] { opacity:.4; }
+  .jp-row { border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:12px 14px; transition:all .16s; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .jp-row[data-shake="true"] { animation:jpShake .4s; border-color:${NO}; }
+  .jp-row[data-done="true"] { border-color:${OK}66; background:${OK}0f; }
+  .jp-row[data-sobre="true"], .jp-bin[data-sobre="true"] { border-color:${accent}; background:rgba(${rgba},0.12); }
+  .jp-slot { flex:0 1 200px; min-width:0; min-height:42px; border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset};
+    display:inline-flex; align-items:center; justify-content:center; color:${T.text3}; font-size:14px; transition:all .16s; cursor:pointer; padding:4px 10px; text-align:center; }
+  .jp-slot[data-armed="true"] { border-color:${accent}; background:rgba(${rgba},0.1); }
+  .jp-bins { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap:12px; }
+  .jp-bin { position:relative; isolation:isolate; border-radius:15px; border:1.5px solid ${T.line}; background:${T.glass}; padding:14px; transition:all .16s; min-height:150px; }
+  .jp-bin[data-shake="true"] { animation:jpShake .4s; border-color:${NO}; }
+  .jp-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
+    border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
+  .jp-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
+  .jp-q:disabled{ cursor:default; }
+  .jp-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 16px;
+    border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:14px; font-weight:800; transition:all .14s; }
+  .jp-btn:hover:not(:disabled) { border-color:${T.lineStrong}; }
+  .jp-btn:disabled { opacity:.45; cursor:not-allowed; }
+  .jp-btn-main { background:${accent}; color:#04121f; border-color:transparent; }
 
-          {/* dato verbatim */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid ${T.line}`, background: T.glass, fontSize: 12.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-circle-info" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>{DATO_JUVENTUDES}</span>
-          </div>
+  /* Simulador */
+  .jp-foto { position:relative; overflow:hidden; border-radius:16px; border:1px solid ${T.line}; aspect-ratio:16/9; max-height:220px; width:100%;
+    background:linear-gradient(135deg, rgba(${rgba},0.28) 0%, rgba(8,19,31,0.9) 100%); display:flex; align-items:center; justify-content:center; }
+  .jp-foto > i { font-size:54px; color:rgba(255,255,255,0.22); }
+  .jp-foto img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .jp-pie { position:absolute; left:10px; right:10px; bottom:10px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:space-between;
+    padding:9px 12px; border-radius:12px; background:rgba(4,10,22,0.82); border:1px solid ${T.line}; backdrop-filter:blur(6px); font-size:14px; font-weight:700; color:#fff; }
+  .jp-meds { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 170px), 1fr)); gap:10px; }
+  .jp-med { display:grid; gap:6px; padding:10px 12px; border-radius:12px; border:1px solid ${T.line}; background:${T.inset}; min-width:0; }
+  .jp-med > div:first-child { display:flex; justify-content:space-between; gap:8px; font-size:14px; font-weight:800; color:${T.text2}; }
+  .jp-barra { height:12px; border-radius:7px; background:rgba(255,255,255,0.08); overflow:hidden; border:1px solid ${T.line}; }
+  .jp-barra > i { display:block; height:100%; border-radius:7px; transition:width .7s cubic-bezier(.2,.8,.2,1); }
+  .jp-posturas { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 120px), 1fr)); gap:6px; }
+  .jp-post { padding:8px 6px; border-radius:10px; border:1.5px solid ${T.line}; background:${T.inset}; font-size:14px; font-weight:800; color:${T.text3}; text-align:center; transition:all .3s; }
+  .jp-post[data-on="true"] { color:#04121f; background:${accent}; border-color:transparent; }
+  .jp-acciones { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap:10px; }
+  .jp-accion { cursor:pointer; display:flex; flex-direction:column; gap:6px; text-align:left; padding:12px 14px; border-radius:14px; border:1.5px solid ${T.line}; background:${T.glassSoft};
+    color:#fff; font-size:14px; line-height:1.4; transition:all .14s; min-width:0; }
+  .jp-accion:hover:not(:disabled) { border-color:${accent}; background:rgba(${rgba},0.14); transform:translateY(-2px); }
+  .jp-accion:disabled { opacity:.45; cursor:not-allowed; }
+  .jp-accion h5 { margin:0; font-size:15px; font-weight:800; }
+  .jp-tag { display:inline-flex; align-items:center; gap:6px; font-size:14px; font-weight:700; padding:2px 9px; border-radius:8px; border:1px solid ${T.line}; background:${T.inset}; color:${T.text2}; }
+  .jp-efecto { display:grid; gap:4px; padding:10px 12px; border-radius:12px; font-size:14px; line-height:1.45; animation:jpPop .25s ease; }
+  .jp-energia { display:inline-flex; gap:5px; }
+  .jp-energia i { width:16px; height:16px; border-radius:50%; background:rgba(255,255,255,0.14); display:block; }
+  .jp-energia i[data-on="true"] { background:${AMBAR}; }
+  @media (prefers-reduced-motion: reduce){
+    .jp-row[data-shake="true"], .jp-bin[data-shake="true"] { animation:none; }
+    .jp-chip, .jp-chip:hover, .jp-chip[data-sel="true"], .jp-accion:hover:not(:disabled) { transform:none; transition:none; }
+    .jp-efecto { animation:none; }
+    .jp-barra > i { transition:none; }
+  }
+`;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Simulador «Colectivo en acción»
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+function Foto({ clave, icono, children }: { clave: string; icono: string; children?: React.ReactNode }) {
+  const [falla, setFalla] = useState<string | null>(null);
+  return (
+    <div className="jp-foto">
+      <i className={`fa-solid ${icono}`} aria-hidden />
+      {falla !== clave && <img key={clave} src={`${RUTA_SIM}/${clave}.webp`} alt="" loading="lazy" onError={() => setFalla(clave)} />}
+      {children}
+    </div>
+  );
+}
+
+const FOTO_FORMA: Record<Categoria, string> = {
+  comunitaria: "asamblea-patio",
+  cultural: "mural-calle",
+  digital: "jovenes-celular",
+  electoral: "cabildo-sala",
+};
+
+function signo(n: number) {
+  return n > 0 ? `+${n}` : n < 0 ? `−${Math.abs(n)}` : "0";
+}
+
+function Medida({ etiqueta, valor, icono, bueno }: { etiqueta: string; valor: number; icono: string; bueno: string }) {
+  return (
+    <div className="jp-med">
+      <div>
+        <span>
+          <i className={`fa-solid ${icono}`} aria-hidden style={{ marginRight: 7, color: bueno }} />
+          {etiqueta}
+        </span>
+        <strong style={{ color: "#fff", fontVariantNumeric: "tabular-nums" }}>{valor}</strong>
+      </div>
+      <div className="jp-barra" role="img" aria-label={`${etiqueta}: ${valor} de 100`}>
+        <i style={{ width: `${valor}%`, background: bueno }} />
+      </div>
+    </div>
+  );
+}
+
+function FilaEfecto({ e }: { e: Efecto }) {
+  const nombre = e.accion === "articulacion" ? "Articulación de formas" : accionDe(e.accion).nombre;
+  const d = e.delta;
+  return (
+    <div className="jp-efecto" style={{ background: e.bueno ? `${OK}12` : `${NO}12`, border: `1px solid ${e.bueno ? OK : NO}55`, color: T.text2 }}>
+      <strong style={{ color: e.bueno ? OK : NO }}>
+        {nombre} · alcance {signo(d.alcance)} · incidencia {signo(d.incidencia)} · legitimidad {signo(d.legitimidad)}
+      </strong>
+      <span>{e.nota}</span>
+    </div>
+  );
+}
+
+function SimColectivo({
+  accent,
+  semanas,
+  cerradas,
+  resultado,
+  sesion,
+  energiaLibre,
+  onAccion,
+  onDeshacer,
+  onTerminar,
+  onReiniciar,
+}: {
+  accent: string;
+  semanas: string[][];
+  cerradas: number;
+  resultado: Resultado;
+  sesion: Sesion | null;
+  energiaLibre: number;
+  onAccion: (id: string) => void;
+  onDeshacer: () => void;
+  onTerminar: () => void;
+  onReiniciar: () => void;
+}) {
+  const terminado = cerradas >= SEMANAS;
+  const actual = semanas[cerradas] ?? [];
+  const ult = actual.length > 0 ? actual[actual.length - 1] : cerradas > 0 ? semanas[cerradas - 1]?.[semanas[cerradas - 1]!.length - 1] : undefined;
+  const clave = sesion
+    ? sesion.voto === "aprueba" ? "celebracion" : sesion.voto === "rechaza" ? "demolicion" : "cabildo-sala"
+    : ult ? FOTO_FORMA[accionDe(ult).forma] : "centro-juvenil";
+  const vista = terminado ? SEMANAS - 1 : actual.length === 0 && cerradas > 0 ? cerradas - 1 : cerradas;
+  const efectos = resultado.efectos[vista] ?? [];
+  const reaccion = resultado.reacciones[resultado.reacciones.length - 1];
+  const ind = resultado.ind;
+  const verde = (v: number) => (v >= 55 ? OK : v >= 30 ? AMBAR : NO);
+  const usos: Record<string, number> = {};
+  for (const s of semanas) for (const id of s) usos[id] = (usos[id] ?? 0) + 1;
+
+  return (
+    <>
+      <div className="jp-panel">
+        <Eyebrow>Colectivo Raíces Jóvenes · Santa Marta del Llano (municipio ficticio)</Eyebrow>
+        <div className="jp-nota">
+          Un estacionamiento reemplazará al único centro juvenil del municipio. Tienen {SEMANAS} semanas para lograr que el cabildo lo conserve. Cada semana cuentas con {ENERGIA} puntos de energía. Todas las cifras son valores de simulación.
         </div>
       </div>
 
-      <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />
-    </div>
+      <Foto clave={clave} icono="fa-people-roof">
+        <div className="jp-pie">
+          <span>{terminado ? "Sesión de cabildo" : `Semana ${cerradas + 1} de ${SEMANAS}`}</span>
+          <span className="jp-energia" role="img" aria-label={`Energía restante: ${energiaLibre} de ${ENERGIA}`}>
+            {Array.from({ length: ENERGIA }, (_, i) => (
+              <i key={i} data-on={!terminado && i < energiaLibre} />
+            ))}
+          </span>
+        </div>
+      </Foto>
+
+      <div className="jp-panel">
+        <div className="jp-cab">
+          <Eyebrow>Indicadores del colectivo · simulación</Eyebrow>
+          <span className="jp-tag">
+            <i className="fa-solid fa-flask" aria-hidden /> inicio: {INICIO.alcance} · {INICIO.incidencia} · {INICIO.legitimidad}
+          </span>
+        </div>
+        <div className="jp-meds">
+          <Medida etiqueta="Alcance" valor={ind.alcance} icono="fa-bullhorn" bueno={verde(ind.alcance)} />
+          <Medida etiqueta="Incidencia" valor={ind.incidencia} icono="fa-landmark" bueno={verde(ind.incidencia)} />
+          <Medida etiqueta="Legitimidad" valor={ind.legitimidad} icono="fa-handshake" bueno={verde(ind.legitimidad)} />
+        </div>
+        <div className="jp-posturas" role="img" aria-label={`Postura de la autoridad: ${resultado.postura}`}>
+          {POSTURAS.map((p) => (
+            <div key={p} className="jp-post" data-on={p === resultado.postura}>
+              {p}
+            </div>
+          ))}
+        </div>
+        {reaccion && (
+          <div className="jp-nota">
+            <i className="fa-solid fa-building-columns" aria-hidden style={{ color: accent, marginRight: 8 }} />
+            <strong style={{ color: T.text2 }}>Alcaldía, semana {reaccion.semana}:</strong> {reaccion.texto}
+          </div>
+        )}
+      </div>
+
+      {!terminado && (
+        <div className="jp-panel">
+          <div className="jp-cab">
+            <Eyebrow>Elige cómo participa el colectivo esta semana</Eyebrow>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <button className="jp-btn" onClick={onDeshacer} disabled={actual.length === 0}>
+                <i className="fa-solid fa-rotate-left" aria-hidden /> Deshacer
+              </button>
+              <button className="jp-btn jp-btn-main" onClick={onTerminar} disabled={actual.length === 0}>
+                <i className="fa-solid fa-calendar-check" aria-hidden /> Terminar la semana
+              </button>
+            </div>
+          </div>
+          <div className="jp-acciones">
+            {ACCIONES.map((a) => {
+              const sin = a.costo > energiaLibre;
+              return (
+                <button key={a.id} className="jp-accion" disabled={sin} onClick={() => onAccion(a.id)}>
+                  <h5>
+                    <i className={`fa-solid ${a.icono}`} aria-hidden style={{ marginRight: 8, color: accent }} />
+                    {a.nombre}
+                  </h5>
+                  <span style={{ color: T.text2 }}>{a.descripcion}</span>
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                    <span className="jp-tag">{CATEGORIA_INFO[a.forma].titulo}</span>
+                    <span className="jp-tag">
+                      <i className="fa-solid fa-bolt" aria-hidden /> {a.costo}
+                    </span>
+                    {usos[a.id] ? <span className="jp-tag">hecha ×{usos[a.id]}</span> : null}
+                  </div>
+                  {sin && <span style={{ color: AMBAR }}>No alcanza la energía de la semana.</span>}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {terminado && sesion && (
+        <div className="jp-panel" style={{ borderColor: `${sesion.voto === "aprueba" ? OK : sesion.voto === "negocia" ? AMBAR : NO}88` }}>
+          <div style={{ fontSize: 15, fontWeight: 800, color: sesion.voto === "aprueba" ? OK : sesion.voto === "negocia" ? AMBAR : NO }}>
+            <i className={`fa-solid ${sesion.voto === "aprueba" ? "fa-trophy" : "fa-gavel"}`} aria-hidden style={{ marginRight: 8 }} />
+            {sesion.texto}
+          </div>
+          <div className="jp-nota">
+            Puntaje de la sesión: {sesion.puntaje} (simulación). Se conserva el centro con {UMBRAL_APRUEBA} o más; hay acuerdo parcial con {UMBRAL_NEGOCIA} o más. Pesa más la incidencia (55 %), luego la legitimidad (30 %) y por último el alcance (15 %).
+          </div>
+          <button className="jp-btn jp-btn-main" onClick={onReiniciar}>
+            <i className="fa-solid fa-rotate-left" aria-hidden /> Probar otra estrategia
+          </button>
+        </div>
+      )}
+
+      {efectos.length > 0 && (
+        <div className="jp-panel">
+          <Eyebrow>Qué pasó y por qué · semana {vista + 1}</Eyebrow>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {efectos.map((e, i) => (
+              <FilaEfecto key={`${e.accion}-${i}`} e={e} />
+            ))}
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -543,33 +836,26 @@ function BinsCategorias({
 }) {
   const bins: Categoria[] = ["electoral", "comunitaria", "cultural", "digital"];
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12 }}>
+    <div className="jp-bins">
       {bins.map((bin) => {
         const info = CATEGORIA_INFO[bin];
         const dentro = EJEMPLOS.filter((e) => ubicEj[e.id] === bin);
         return (
-          <div
-            key={bin}
-            className="jp-bin"
-            data-shake={shakeEj === bin}
-            onClick={() => selEj && onMatch(selEj, bin)}
-            style={{ position: "relative", isolation: "isolate" }}
-            {...dropProps((id) => onMatch(id, bin))}
-          >
+          <div key={bin} className="jp-bin" data-shake={shakeEj === bin} onClick={() => selEj && onMatch(selEj, bin)} {...dropProps((id) => onMatch(id, bin))}>
             {/* La ilustración del concepto llenando la caja vacía. */}
             <FondoTermino termino={info.titulo} />
             <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
               <VinetaTermino termino={info.titulo} color={T.text2} icono={info.icono} tam={29} radio={8} />
-              <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
+              <span style={{ fontSize: 14, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
             </div>
-            <div style={{ fontSize: 11, color: T.text3, marginBottom: 12, lineHeight: 1.4 }}>{info.subtitulo}</div>
+            <div style={{ fontSize: 14, color: T.text3, marginBottom: 10, lineHeight: 1.4 }}>{info.subtitulo}</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {dentro.length === 0 ? (
-                <div style={{ fontSize: 12, color: T.text3, opacity: 0.6, padding: "8px 0" }}>Arrastra aquí…</div>
+                <div style={{ fontSize: 14, color: T.text3, opacity: 0.7, padding: "6px 0" }}>Arrastra aquí…</div>
               ) : (
                 dentro.map((e) => (
-                  <span key={e.id} style={{ animation: "jpPop .25s ease", display: "inline-flex", alignItems: "flex-start", gap: 7, padding: "8px 12px", borderRadius: 11, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 12.5, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>
-                    <i className="fa-solid fa-check" style={{ fontSize: 10, color: OK, marginTop: 3 }} />
+                  <span key={e.id} style={{ animation: "jpPop .25s ease", display: "inline-flex", alignItems: "flex-start", gap: 7, padding: "8px 12px", borderRadius: 11, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 14, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>
+                    <i className="fa-solid fa-check" style={{ fontSize: 14, color: OK, marginTop: 2 }} />
                     {e.texto}
                   </span>
                 ))
@@ -596,7 +882,7 @@ function RowsConceptos({
   dropProps: DropFactory;
 }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 11, minWidth: 0 }}>
       {CONCEPTOS.map((c) => {
         const done = empCon[c.id];
         return (
@@ -610,19 +896,19 @@ function RowsConceptos({
           >
             <div className="jp-slot" data-armed={!done && !!selCon} style={done ? { borderStyle: "solid", borderColor: OK, background: `${OK}1a` } : undefined}>
               {done ? (
-                <span style={{ animation: "jpPop .25s ease", fontSize: 13, fontWeight: 900, color: "#fff", display: "inline-flex", alignItems: "center", gap: 7 }}>
+                <span style={{ animation: "jpPop .25s ease", fontSize: 14, fontWeight: 900, color: "#fff", display: "inline-flex", alignItems: "center", gap: 7 }}>
                   <i className="fa-solid fa-diagram-project" />
                   {c.concepto}
                 </span>
               ) : (
                 <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                  <i className="fa-solid fa-arrow-left" style={{ fontSize: 11 }} /> concepto
+                  <i className="fa-solid fa-arrow-left" style={{ fontSize: 14 }} /> concepto
                 </span>
               )}
             </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ flex: "1 1 200px", minWidth: 0 }}>
               <div style={{ fontSize: 14, color: done ? "#fff" : T.text2, lineHeight: 1.45 }}>{c.definicion}</div>
-              <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.4, marginTop: 3, fontStyle: "italic" }}>{c.ejemplo}</div>
+              <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.4, marginTop: 3, fontStyle: "italic" }}>{c.ejemplo}</div>
             </div>
           </div>
         );
@@ -671,19 +957,19 @@ function QuizCard({
   };
 
   return (
-    <div style={{ ...card, padding: "20px 24px 24px", marginTop: 22 }}>
+    <div>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4, flexWrap: "wrap" }}>
         <Eyebrow>
           <i className="fa-solid fa-clipboard-question" style={{ marginRight: 8, color: accent }} />
           Comprueba lo aprendido
         </Eyebrow>
         {aprobado && (
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 12, fontWeight: 800, color: OK }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 14, fontWeight: 800, color: OK }}>
             <i className="fa-solid fa-circle-check" /> Aprobado
           </span>
         )}
       </div>
-      <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
         Cinco afirmaciones sobre la agencia juvenil, las formas de participación y el papel de las juventudes en la historia. Decide si son verdaderas o falsas y pulsa «Comprobar».
       </div>
 
@@ -692,11 +978,11 @@ function QuizCard({
           const elegida = resp[qi];
           return (
             <div key={qi}>
-              <div style={{ fontSize: 14.5, fontWeight: 800, color: T.text, marginBottom: 11, display: "flex", gap: 10 }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: T.text, marginBottom: 11, display: "flex", gap: 10 }}>
                 <span style={{ color: accent }}>{qi + 1}.</span>
                 <span>{q.pregunta}</span>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 140px), 1fr))", gap: 9 }}>
                 {q.opciones.map((op, oi) => {
                   const sel = elegida === oi;
                   const esCorrecta = oi === q.correcta;
@@ -718,7 +1004,7 @@ function QuizCard({
                   }
                   return (
                     <button key={oi} className="jp-q" onClick={() => elegir(qi, oi)} disabled={comprobado} style={{ borderColor: borde, background: fondo, color: colorTxt }}>
-                      <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
+                      <span style={{ width: 26, height: 26, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
                         {comprobado && esCorrecta ? <i className="fa-solid fa-check" /> : comprobado && sel ? <i className="fa-solid fa-xmark" /> : String.fromCharCode(65 + oi)}
                       </span>
                       <span style={{ flex: 1, lineHeight: 1.35 }}>{op}</span>
@@ -727,7 +1013,7 @@ function QuizCard({
                 })}
               </div>
               {comprobado && (
-                <div style={{ marginTop: 9, fontSize: 12.5, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
+                <div style={{ marginTop: 9, fontSize: 14, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
                   <i className="fa-solid fa-circle-info" style={{ color: accent, marginTop: 2 }} />
                   <span>{q.retro}</span>
                 </div>
@@ -750,7 +1036,7 @@ function QuizCard({
           </button>
         )}
         {comprobado && (
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 13.5, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 14, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
             <i className={`fa-solid ${aprobadoAhora ? "fa-trophy" : "fa-circle-half-stroke"}`} />
             {aciertos} / {total} correctas
             {!aprobadoAhora && <span style={{ color: T.text3, fontWeight: 600 }}>· revisa las marcadas e inténtalo de nuevo</span>}

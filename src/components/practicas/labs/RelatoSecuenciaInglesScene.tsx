@@ -19,8 +19,8 @@
  */
 
 import * as THREE from "three";
-import { createContext, useContext, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
-import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
+import { createContext, useContext, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
+import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, Environment, Lightformer, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { type EscenaId, type Modo, type ItemConectar, ITEMS, RELACION_DEF, EVENTO_INICIAL } from "./relato-secuencia-ingles-data";
@@ -46,6 +46,8 @@ export interface RelatoSceneProps {
   onVineta?: (slot: number) => void;
   // Línea del tiempo
   hechos: number;
+  /** Oración actual con el conector que el alumno tiene elegido (aún sin comprobar): se dibuja su relación. */
+  previa?: ItemConectar | null;
 }
 
 type Pt = [number, number, number];
@@ -96,11 +98,11 @@ function Esf({ p, s, c, emis, rough = 0.6 }: { p: Pt; s: number | Pt; c: string;
 /** Si una viñeta queda fuera de foco, sus etiquetas se ocultan para no tapar la escena enfocada. */
 const EtiquetasCtx = createContext(true);
 
-function Chip({ p, children, col, fs = 11, df = 8 }: { p: Pt; children: ReactNode; col?: string; fs?: number; df?: number }) {
+function Chip({ p, children, col, fs = 14 }: { p: Pt; children: ReactNode; col?: string; fs?: number; df?: number }) {
   const visible = useContext(EtiquetasCtx);
   if (!visible) return null;
   return (
-    <Html position={p} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={p} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -111,7 +113,7 @@ function Chip({ p, children, col, fs = 11, df = 8 }: { p: Pt; children: ReactNod
           background: "rgba(4,10,22,0.86)",
           border: `1px solid ${col ?? "rgba(255,255,255,0.25)"}`,
           color: "#fff",
-          fontSize: fs,
+          fontSize: Math.max(14, fs),
           fontWeight: 800,
           whiteSpace: "nowrap",
           boxShadow: "0 6px 16px -8px #000",
@@ -956,6 +958,7 @@ const COLOR_ESTADO: Record<EstadoVineta, string> = {
 
 function Vineta({ escena, slot, n, estado, rotulo, activo, burbuja, modoColor, onVineta, hayFoco, enfocada }: { escena: EscenaId; slot: number; n: number; estado: EstadoVineta; rotulo: string; activo: boolean; burbuja: string | null; modoColor: string; onVineta?: (slot: number) => void; hayFoco: boolean; enfocada: boolean }) {
   const grupo = useRef<THREE.Group>(null);
+  const angosta = useThree((st) => st.size.width) < 640;
   const [tx, ty] = slotPos(slot, n);
   const [inicial] = useState<Pt>(() => [tx, ty, 0]);
   const tema = TEMA[escena];
@@ -1001,7 +1004,7 @@ function Vineta({ escena, slot, n, estado, rotulo, activo, burbuja, modoColor, o
       </group>
       {tema.noche && <pointLight position={[0, 1.6, 0.6]} intensity={0.6} distance={3} color="#a5b4fc" />}
       {(!hayFoco || enfocada) && (
-      <Html position={[-W / 2 + 0.22, H - 0.12, D / 2]} center distanceFactor={9} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+      <Html position={[-W / 2 + 0.22, H - 0.12, D / 2]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
         <div
           style={{
             width: 26,
@@ -1021,8 +1024,8 @@ function Vineta({ escena, slot, n, estado, rotulo, activo, burbuja, modoColor, o
         </div>
       </Html>
       )}
-      {!hayFoco && (
-      <Html position={[0, -0.34, D / 2]} center distanceFactor={9} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+      {!hayFoco && (estado === "sel" || estado === "error") && (
+      <Html position={[0, -0.34, D / 2]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
         <div
           style={{
             display: "flex",
@@ -1033,28 +1036,27 @@ function Vineta({ escena, slot, n, estado, rotulo, activo, burbuja, modoColor, o
             background: "rgba(4,10,22,0.88)",
             border: `1px solid ${brilla ? marco : "rgba(255,255,255,0.18)"}`,
             color: "#fff",
-            fontSize: 12,
+            fontSize: 14,
             fontWeight: 800,
             whiteSpace: "nowrap",
           }}
         >
-          {estado === "ok" && <i className="fa-solid fa-circle-check" style={{ color: OK }} />}
           {estado === "error" && <i className="fa-solid fa-circle-xmark" style={{ color: NO }} />}
           {rotulo}
         </div>
       </Html>
       )}
       {activo && burbuja && (
-        <Html position={[0, H + 0.66, 0.4]} center distanceFactor={8} zIndexRange={[30, 0]} style={{ pointerEvents: "none" }}>
+        <Html position={[0, H + 0.66, 0.4]} center zIndexRange={[30, 0]} style={{ pointerEvents: "none" }}>
           <div
             style={{
-              width: 300,
+              width: angosta ? 200 : 300,
               padding: "9px 14px",
               borderRadius: 14,
               background: estado === "error" ? "#fee2e2" : "#ffffff",
               border: `2px solid ${estado === "error" ? NO : modoColor}`,
               color: "#0f172a",
-              fontSize: 15,
+              fontSize: angosta ? 14 : 15,
               fontWeight: 800,
               lineHeight: 1.35,
               textAlign: "center",
@@ -1145,7 +1147,8 @@ function Tubo({ x0, x1, y, col, crece = 0 }: { x0: number; x1: number; y: number
   );
 }
 
-function FichaEvento({ e, it, texto, icono }: { e: number; it: ItemConectar | null; texto: string; icono: string }) {
+function FichaEvento({ e, it, texto, icono, nueva }: { e: number; it: ItemConectar | null; texto: string; icono: string; nueva: boolean }) {
+  const angosta = useThree((st) => st.size.width) < 640;
   const rel = it ? RELACION_DEF[it.relacion] : null;
   const col = rel?.color ?? "#94a3b8";
   const x = X(e);
@@ -1192,14 +1195,15 @@ function FichaEvento({ e, it, texto, icono }: { e: number; it: ItemConectar | nu
         <Caja p={[0, yCentro, 0]} s={[ancho, alto, 0.14]} c="#0f172a" rough={0.5} />
         {pin && <Cil p={[0, 0.5, 0.2]} r={0.025} h={0.44} c={col} emis={col} />}
         <Caja p={[0, yCentro, 0.075]} s={[ancho - 0.08, alto - 0.08, 0.01]} c={col} emis={col} rough={0.4} />
-        <Html position={[0, yCentro, 0.12]} center distanceFactor={8} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-          <div style={{ width: pin ? 135 : 150, textAlign: "center", color: "#04121f", fontSize: pin ? 12 : 13, fontWeight: 900, lineHeight: 1.2 }}>
-            <i className={`fa-solid ${icono}`} style={{ fontSize: 17, display: "block", marginBottom: 4 }} />
-            {texto}
+        {/* Solo la ficha nueva lleva texto y conector (máx. 4 rótulos); las demás se leen por su icono. */}
+        <Html position={[0, yCentro, 0.12]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+          <div style={{ width: angosta ? 110 : 150, textAlign: "center", color: "#04121f", fontSize: 14, fontWeight: 900, lineHeight: 1.2 }}>
+            <i className={`fa-solid ${icono}`} style={{ fontSize: 18, display: "block", marginBottom: nueva ? 4 : 0 }} />
+            {nueva && !angosta ? texto : null}
           </div>
         </Html>
-        {it && (
-          <Chip p={[0, yCentro + alto / 2 + 0.28, 0]} col={col} fs={12} df={8}>
+        {it && nueva && (
+          <Chip p={[0, yCentro + alto / 2 + 0.28, 0]} col={col}>
             <i className={`fa-solid ${rel!.icono}`} style={{ color: col }} />
             {it.conector} · {rel!.etq.toLowerCase()}
           </Chip>
@@ -1228,10 +1232,12 @@ function FichaEvento({ e, it, texto, icono }: { e: number; it: ItemConectar | nu
       {it?.relacion === "despues" && (
         <>
           <Flecha x0={-PASO_X + 0.85} x1={-0.85} y={0.62} col={col} discontinua />
-          <Chip p={[-PASO_X / 2, 1.0, 0]} col={col} fs={11}>
+          {nueva && (
+          <Chip p={[-PASO_X / 2, 1.0, 0]} col={col}>
             <i className="fa-solid fa-clock" style={{ color: col }} />
             later
           </Chip>
+          )}
         </>
       )}
       {it?.relacion === "consecuencia" && (
@@ -1245,41 +1251,44 @@ function FichaEvento({ e, it, texto, icono }: { e: number; it: ItemConectar | nu
       {it?.relacion === "causa" && (
         <>
           <Caja p={[-1.25, 0.3, 0.5]} s={[1.45, 0.44, 0.08]} c="#831843" emis="#831843" />
-          <Html position={[-1.25, 0.3, 0.56]} center distanceFactor={8} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-            <div style={{ width: 130, textAlign: "center", color: "#fff", fontSize: 10.5, fontWeight: 900, lineHeight: 1.2 }}>
-              {it.fondo}
-              <div style={{ fontSize: 9.5, color: "#fbcfe8" }}>causa · ocurrió antes</div>
+          {nueva && (
+          <Html position={[-1.25, 0.3, 0.56]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+            <div style={{ width: angosta ? 120 : 150, textAlign: "center", color: "#fff", fontSize: 14, fontWeight: 900, lineHeight: 1.2 }}>
+              {it.fondo ?? "la causa"}
+              <div style={{ fontSize: 14, color: "#fbcfe8" }}>causa · ocurrió antes</div>
             </div>
           </Html>
+          )}
           <Flecha x0={-0.52} x1={-0.12} y={0.3} z={0.5} col={col} />
         </>
       )}
       {it?.relacion === "mientras" && (
         <>
           <Tubo x0={-PASO_X - 0.7} x1={1.0} y={0.28} col={col} />
-          <Chip p={[-PASO_X / 2, 0.02, 0.5]} col={col} fs={11}>
+          {nueva && (
+          <Chip p={[-PASO_X / 2, 0.02, 0.5]} col={col}>
             <i className="fa-solid fa-spinner" style={{ color: col }} />
-            {it.fondo} (in progress)
+            {it.fondo ?? "…"} (in progress)
           </Chip>
+          )}
         </>
       )}
       {it?.relacion === "interrupcion" && (
         <>
           <Tubo x0={-1.3} x1={-0.02} y={0.28} col={col} crece={0.8} />
-          <Chip p={[-0.75, 0.02, 0.5]} col={col} fs={11}>
-            {it.fondo}…
-          </Chip>
-          <Chip p={[0.4, 0.28, 0.5]} col="#facc15" fs={11}>
-            <i className="fa-solid fa-bolt" style={{ color: "#facc15" }} />
-            when
-          </Chip>
+          {nueva && (
+            <Chip p={[0.4, 0.28, 0.5]} col="#facc15">
+              <i className="fa-solid fa-bolt" style={{ color: "#facc15" }} />
+              when
+            </Chip>
+          )}
         </>
       )}
     </group>
   );
 }
 
-function LineaTiempo({ hechos, modoColor }: { hechos: number; modoColor: string }) {
+function LineaTiempo({ hechos, modoColor, previa }: { hechos: number; modoColor: string; previa: ItemConectar | null }) {
   const total = ITEMS.length;
   const caminante = useRef<THREE.Group>(null);
   const vel = useRef(0);
@@ -1303,14 +1312,16 @@ function LineaTiempo({ hechos, modoColor }: { hechos: number; modoColor: string 
       {Array.from({ length: total + 1 }, (_, e) => (
         <Caja key={e} p={[X(e), 0.01, 0.95]} s={[0.05, 0.02, 0.3]} c={e <= hechos ? modoColor : "#475569"} emis={e <= hechos ? modoColor : undefined} />
       ))}
-      <FichaEvento e={0} it={null} texto={EVENTO_INICIAL.evento} icono={EVENTO_INICIAL.icono} />
+      <FichaEvento e={0} it={null} texto={EVENTO_INICIAL.evento} icono={EVENTO_INICIAL.icono} nueva={hechos === 0 && !previa} />
       {ITEMS.slice(0, hechos).map((it, i) => (
-        <FichaEvento key={it.id} e={i + 1} it={it} texto={it.evento} icono={it.icono} />
+        <FichaEvento key={it.id} e={i + 1} it={it} texto={it.evento} icono={it.icono} nueva={i + 1 === hechos && !previa} />
       ))}
-      {hechos < total && (
+      {/* El conector que el alumno acaba de tocar: la ficha entra como ESE conector la dibuja. */}
+      {hechos < total && previa && <FichaEvento key={`previa-${previa.conector}`} e={hechos + 1} it={previa} texto={previa.evento} icono={previa.icono} nueva />}
+      {hechos < total && !previa && (
         <group position={[X(hechos + 1), 0, 0]}>
           <Caja p={[0, 0.62, 0]} s={[1.7, 1.0, 0.1]} c="#334155" op={0.35} />
-          <Chip p={[0, 1.42, 0.1]} col={`${modoColor}aa`} fs={13}>
+          <Chip p={[0, 1.42, 0.1]} col={`${modoColor}aa`}>
             <i className="fa-solid fa-circle-question" style={{ color: modoColor }} />
             ¿qué pasó después?
           </Chip>
@@ -1348,6 +1359,18 @@ function CamaraGuiada({ pos, target, clave }: { pos: Pt; target: Pt; clave: stri
   return null;
 }
 
+/** En pantallas angostas se aleja la cámara (zoom) para que quepa el ancho. */
+function AjusteAngosto({ zoom }: { zoom: number }) {
+  const leer = useThree((st) => st.get);
+  const ancho = useThree((st) => st.size.width);
+  useLayoutEffect(() => {
+    const c = leer().camera as THREE.PerspectiveCamera;
+    c.zoom = ancho < 640 ? zoom : 1;
+    c.updateProjectionMatrix();
+  }, [leer, ancho, zoom]);
+  return null;
+}
+
 /* ── Escena ───────────────────────────────────────────────────────────── */
 
 export default function RelatoSecuenciaInglesScene(p: RelatoSceneProps) {
@@ -1356,18 +1379,19 @@ export default function RelatoSecuenciaInglesScene(p: RelatoSceneProps) {
   const filas = Math.ceil(Math.max(1, n) / 3);
   const yMedio = -1.0 + H / 2 - 0.1;
   const general = useMemo((): { pos: Pt; target: Pt } => {
-    if (vista === "conectar") return { pos: [-0.2, 3.3, 8.0], target: [-0.4, 0.65, 0] };
-    return { pos: [0, yMedio + 1.6, filas > 1 ? 11.4 : 8.4], target: [0, yMedio, 0] };
+    // El objetivo queda por debajo del centro del contenido: así el teatrino sube entre la barra y la misión.
+    if (vista === "conectar") return { pos: [-0.2, 2.5, 6.6], target: [-0.4, 0.45, 0] };
+    return { pos: [0, yMedio + 0.9, filas > 1 ? 11.4 : 8.4], target: [0, yMedio - 0.7, 0] };
   }, [vista, filas, yMedio]);
 
   let guia: { pos: Pt; target: Pt; clave: string } = { ...general, clave: `general-${clave}` };
   if (vista !== "conectar" && p.foco !== null) {
     const [x, y] = slotPos(p.foco, n);
-    guia = { pos: [x * 0.9, y + 1.6, 7.3], target: [x, y + 1.35, 0], clave: `foco-${p.foco}-${clave}` };
+    guia = { pos: [x * 0.9, y + 1.15, 7.3], target: [x, y + 0.75, 0], clave: `foco-${p.foco}-${clave}` };
   }
   if (vista === "conectar") {
     const xf = X(Math.min(p.hechos, ITEMS.length));
-    guia = { pos: [xf - 0.2, 3.3, 8.0], target: [xf - 0.4, 0.65, 0], clave: `linea-${p.hechos}` };
+    guia = { pos: [xf + 0.9, 2.5, 6.6], target: [xf + 0.7, 0.45, 0], clave: `linea-${p.hechos}` };
   }
 
   return (
@@ -1383,10 +1407,11 @@ export default function RelatoSecuenciaInglesScene(p: RelatoSceneProps) {
       </Environment>
 
       {vista === "conectar" ? (
-        <LineaTiempo hechos={p.hechos} modoColor={modoColor} />
+        <LineaTiempo hechos={p.hechos} modoColor={modoColor} previa={p.previa ?? null} />
       ) : (
         <Teatrino escenas={p.escenas} estados={p.estados} rotulos={p.rotulos} activa={p.activa} foco={p.foco} burbuja={p.burbuja} modoColor={modoColor} onVineta={p.onVineta} />
       )}
+      <AjusteAngosto zoom={vista === "conectar" ? 0.8 : p.foco !== null ? 0.88 : 0.66} />
       <CamaraGuiada pos={guia.pos} target={guia.target} clave={guia.clave} />
 
       <OrbitControls makeDefault enablePan={false} enableZoom minDistance={3} maxDistance={18} maxPolarAngle={Math.PI * 0.56} minPolarAngle={Math.PI * 0.2} minAzimuthAngle={-Math.PI * 0.35} maxAzimuthAngle={Math.PI * 0.35} target={general.target} />

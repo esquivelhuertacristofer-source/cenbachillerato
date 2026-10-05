@@ -19,12 +19,13 @@
  *      viaja al lugar y reacciona según encaje con sus intereses.
  */
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import React, { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, NUM, OK, card, Eyebrow, SceneBoundary } from "./_kit";
+import { T, OK, card, Eyebrow, SceneBoundary } from "./_kit";
 import { hablarLab, callarLab, puedeHablarLab } from "./lab-voz";
 import { FichaTeorica } from "./_ficha";
+import { LabShell, Bloque, BotonHerramienta } from "./_shell";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { RetoQuizCard } from "./_reto-quiz";
 import { LabSfx } from "./lab-audio";
@@ -94,7 +95,7 @@ const LugaresScene = dynamic(() => import("./LugaresRecomendacionesInglesScene")
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-map-location-dot fa-fade" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Cargando Rincón del Colibrí en 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Cargando Rincón del Colibrí en 3D…</span>
     </div>
   ),
 });
@@ -171,16 +172,16 @@ function RelacionaCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: 
           Relaciona los conceptos clave (A9)
         </Eyebrow>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 10.5, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
           {[1, 2, 3].map((k) => (
-            <i key={k} className="fa-solid fa-star" style={{ fontSize: 13, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
+            <i key={k} className="fa-solid fa-star" style={{ fontSize: 14, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
           ))}
         </div>
       </div>
-      <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5, marginBottom: 12 }}>{INSTRUCCIONES_A9}</div>
+      <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5, marginBottom: 12 }}>{INSTRUCCIONES_A9}</div>
       {resuelto === null ? (
         <>
-          <div style={{ fontSize: 11, color: T.text3, fontWeight: 800, marginBottom: 6 }}>
+          <div style={{ fontSize: 14, color: T.text3, fontWeight: 800, marginBottom: 6 }}>
             Concepto {pos + 1} de {ronda.orden.length} · cero errores = 3 estrellas
           </div>
           <div style={{ fontSize: 17, color: "#fff", fontWeight: 900, lineHeight: 1.45, marginBottom: 12 }}>{pareja.izquierda}</div>
@@ -191,7 +192,7 @@ function RelacionaCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: 
               </button>
             ))}
           </div>
-          {aviso && <div style={{ marginTop: 10, fontSize: 12, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
+          {aviso && <div style={{ marginTop: 10, fontSize: 14, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
         </>
       ) : (
         <div style={{ padding: "12px 14px", borderRadius: 11, border: `1px solid ${OK}55`, background: "rgba(52,211,153,0.08)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
@@ -199,9 +200,9 @@ function RelacionaCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: 
             {[1, 2, 3].map((k) => (
               <i key={k} className="fa-solid fa-star" style={{ fontSize: 15, color: k <= resuelto ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
             ))}
-            <span style={{ fontSize: 12.5, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
+            <span style={{ fontSize: 14, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
           </span>
-          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 12.5, fontWeight: 900 }}>
+          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 14, fontWeight: 900 }}>
             <i className="fa-solid fa-shuffle" style={{ marginRight: 8 }} />
             Otra ronda
           </button>
@@ -235,8 +236,8 @@ function TuTurnoCard({ accent, logrado, onLogrado, playSfx }: { accent: string; 
         <i className="fa-solid fa-pen-nib" style={{ marginRight: 8, color: accent }} />
         Tu turno: un lugar de tu comunidad (A5)
       </Eyebrow>
-      <div style={{ fontSize: 13, color: "#fff", fontWeight: 700, lineHeight: 1.5 }}>{A5_CONSIGNA}</div>
-      <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5, margin: "6px 0 12px" }}>
+      <div style={{ fontSize: 14, color: "#fff", fontWeight: 700, lineHeight: 1.5 }}>{A5_CONSIGNA}</div>
+      <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5, margin: "6px 0 12px" }}>
         Idea (A1): {ACTIVIDAD_A1}
       </div>
       <textarea
@@ -253,7 +254,7 @@ function TuTurnoCard({ accent, logrado, onLogrado, playSfx }: { accent: string; 
       />
       <div style={{ display: "grid", gap: 5, marginTop: 10 }}>
         {criterios.map((c) => (
-          <div key={c.t} style={{ display: "flex", gap: 8, alignItems: "flex-start", fontSize: 12, color: c.ok ? OK : revisado ? WARN : T.text2, lineHeight: 1.4 }}>
+          <div key={c.t} style={{ display: "flex", gap: 8, alignItems: "flex-start", fontSize: 14, color: c.ok ? OK : revisado ? WARN : T.text2, lineHeight: 1.4 }}>
             <i className={`fa-solid ${c.ok ? "fa-circle-check" : revisado ? "fa-circle-exclamation" : "fa-circle"}`} style={{ marginTop: 2 }} />
             {c.t}
           </div>
@@ -264,9 +265,9 @@ function TuTurnoCard({ accent, logrado, onLogrado, playSfx }: { accent: string; 
           <i className="fa-solid fa-spell-check" style={{ marginRight: 8 }} />
           Revisar mi texto
         </button>
-        {revisado && <span style={{ fontSize: 12, color: todo ? OK : WARN, fontWeight: 800 }}>{todo ? "¡Listo! Tu texto cumple los criterios que se pueden revisar automáticamente." : "Todavía falta algo: revisa los puntos en naranja."}</span>}
+        {revisado && <span style={{ fontSize: 14, color: todo ? OK : WARN, fontWeight: 800 }}>{todo ? "¡Listo! Tu texto cumple los criterios que se pueden revisar automáticamente." : "Todavía falta algo: revisa los puntos en naranja."}</span>}
       </div>
-      <div style={{ fontSize: 11, color: T.text3, marginTop: 10, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text3, marginTop: 10, lineHeight: 1.5 }}>
         La revisión automática es orientativa: cuenta palabras, there is / there are, preposiciones de lugar y recomendaciones con you should, y detecta errores frecuentes. Tu docente evalúa si la descripción es clara y
         si el lugar existe en tu comunidad.
       </div>
@@ -283,11 +284,11 @@ function AutoevaluacionCard({ accent }: { accent: string }) {
         <i className="fa-solid fa-clipboard-check" style={{ marginRight: 8, color: accent }} />
         Autoevaluación (A7)
       </Eyebrow>
-      <div style={{ fontSize: 12.5, color: T.text2, marginBottom: 12 }}>{A7.instrucciones}</div>
+      <div style={{ fontSize: 14, color: T.text2, marginBottom: 12 }}>{A7.instrucciones}</div>
       <div style={{ display: "grid", gap: 12 }}>
         {A7.criterios.map((c, i) => (
           <div key={c}>
-            <div style={{ fontSize: 13, color: "#fff", fontWeight: 700, marginBottom: 6 }}>{c}</div>
+            <div style={{ fontSize: 14, color: "#fff", fontWeight: 700, marginBottom: 6 }}>{c}</div>
             <div className="lr-opts">
               {A7.escala.map((e) => (
                 <button
@@ -305,7 +306,7 @@ function AutoevaluacionCard({ accent }: { accent: string }) {
           </div>
         ))}
       </div>
-      <div style={{ fontSize: 12, color: T.text2, marginTop: 12 }}>
+      <div style={{ fontSize: 14, color: T.text2, marginTop: 12 }}>
         <strong style={{ color: "#fff" }}>Reflexión final:</strong> {A7.reflexion}
       </div>
     </div>
@@ -357,7 +358,6 @@ export function LabLugaresRecomendacionesIngles({ color }: PracticaLabProps) {
 
   // ── Comunes
   const [resetNonce, setResetNonce] = useState(0);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   const { mejorEstrellas, registraEstrellas: guardaEstrellas } = useEstrellas(RETO_KEY);
@@ -609,13 +609,13 @@ export function LabLugaresRecomendacionesIngles({ color }: PracticaLabProps) {
         <i className={`fa-solid ${def.icono}`} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{def.etq}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y la retroalimentación siguen aquí. {typeof pie === "string" ? pie : ""}</div>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y la retroalimentación siguen aquí. {typeof pie === "string" ? pie : ""}</div>
     </div>
   );
 
-  const sub = (txt: string) => <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
+  const sub = (txt: string) => <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
   const nota = (txt: ReactNode, col: string, icono = "fa-circle-info") => (
-    <div style={{ marginTop: 10, fontSize: 12, lineHeight: 1.55, color: col }}>
+    <div style={{ marginTop: 10, fontSize: 14, lineHeight: 1.55, color: col }}>
       <i className={`fa-solid ${icono}`} style={{ marginRight: 7 }} />
       {txt}
     </div>
@@ -625,11 +625,11 @@ export function LabLugaresRecomendacionesIngles({ color }: PracticaLabProps) {
     <div style={{ display: "grid", gap: 8 }}>
       {LUGARES.map((x) => (
         <div key={x.id} style={{ padding: "8px 11px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${x.color}33` }}>
-          <div style={{ fontSize: 12, fontWeight: 900, color: x.color, marginBottom: 3 }}>
+          <div style={{ fontSize: 14, fontWeight: 900, color: x.color, marginBottom: 3 }}>
             <i className={`fa-solid ${x.icono}`} style={{ marginRight: 6 }} />
             {x.nombre}
           </div>
-          <div style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{x.guia.join(" ")}</div>
+          <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.45 }}>{x.guia.join(" ")}</div>
         </div>
       ))}
     </div>
@@ -699,7 +699,7 @@ export function LabLugaresRecomendacionesIngles({ color }: PracticaLabProps) {
         {esCan && nota("Con You can / You can't dices qué se puede hacer; la ubicación va con There is / There are / It has.", T.text3)}
 
         <div className="lr-linea" data-e={rev ? rev.estado : ""} style={{ marginTop: 14 }}>
-          {borrador ? <span style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>{borrador}</span> : <span style={{ fontSize: 12.5, color: T.text3 }}>Tu oración aparece aquí y sobre la maqueta.</span>}
+          {borrador ? <span style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>{borrador}</span> : <span style={{ fontSize: 14, color: T.text3 }}>Tu oración aparece aquí y sobre la maqueta.</span>}
         </div>
         <div className="lr-opts" style={{ marginTop: 10 }}>
           <button className="lr-opt lr-comprobar" data-on="true" onClick={comprobarOracion} disabled={!ap} style={{ ["--lrc" as string]: modoCol, background: `${modoCol}1f` }}>
@@ -716,13 +716,13 @@ export function LabLugaresRecomendacionesIngles({ color }: PracticaLabProps) {
         {entrada.oraciones.length > 0 && (
           <div style={{ marginTop: 14, padding: "11px 13px", borderRadius: 12, background: "rgba(4,10,22,0.45)", border: `1px solid ${l.color}44` }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, flexWrap: "wrap", marginBottom: 6 }}>
-              <span style={{ fontSize: 11, fontWeight: 900, color: l.color, letterSpacing: "0.06em" }}>
+              <span style={{ fontSize: 14, fontWeight: 900, color: l.color, letterSpacing: "0.06em" }}>
                 <i className="fa-solid fa-book-atlas" style={{ marginRight: 6 }} />
                 TU ENTRADA DE LA GUÍA · {l.nombre.toUpperCase()}
               </span>
               <BotonEscuchar texto={entrada.oraciones.join(" ")} col={l.color} />
             </div>
-            <div style={{ fontSize: 13, color: "#fff", lineHeight: 1.55 }}>{entrada.oraciones.join(" ")}</div>
+            <div style={{ fontSize: 14, color: "#fff", lineHeight: 1.55 }}>{entrada.oraciones.join(" ")}</div>
           </div>
         )}
         {nota(
@@ -754,7 +754,7 @@ export function LabLugaresRecomendacionesIngles({ color }: PracticaLabProps) {
           </div>
           <details className="lr-guia" style={{ marginTop: 6 }}>
             <summary>Ver en español</summary>
-            <div style={{ fontSize: 12, color: T.text2, marginTop: 4 }}>{v.es}</div>
+            <div style={{ fontSize: 14, color: T.text2, marginTop: 4 }}>{v.es}</div>
           </details>
         </div>
 
@@ -780,8 +780,8 @@ export function LabLugaresRecomendacionesIngles({ color }: PracticaLabProps) {
             {lugarTab.guia.map((o) => {
               const cita = juicio?.cita === o && elegido === lugarTab.id;
               return (
-                <div key={o} style={{ fontSize: 13, lineHeight: 1.5, color: cita ? (juicio?.ok ? OK : WARN) : "#e2e8f0", fontWeight: cita ? 800 : 500 }}>
-                  <i className="fa-solid fa-angle-right" style={{ marginRight: 7, color: cita ? (juicio?.ok ? OK : WARN) : lugarTab.color, fontSize: 11 }} />
+                <div key={o} style={{ fontSize: 14, lineHeight: 1.5, color: cita ? (juicio?.ok ? OK : WARN) : "#e2e8f0", fontWeight: cita ? 800 : 500 }}>
+                  <i className="fa-solid fa-angle-right" style={{ marginRight: 7, color: cita ? (juicio?.ok ? OK : WARN) : lugarTab.color, fontSize: 14 }} />
                   {o}
                 </div>
               );
@@ -798,7 +798,7 @@ export function LabLugaresRecomendacionesIngles({ color }: PracticaLabProps) {
 
         <div style={{ opacity: resueltoGuia ? 1 : 0.4, pointerEvents: resueltoGuia ? "auto" : "none" }}>
           {sub("2 · ¿Qué oración de la guía lo prueba?")}
-          <div style={{ fontSize: 12.5, color: T.text2, marginBottom: 8 }}>{v.preguntaEvidencia}</div>
+          <div style={{ fontSize: 14, color: T.text2, marginBottom: 8 }}>{v.preguntaEvidencia}</div>
           <div style={{ display: "grid", gap: 6 }}>
             {(resueltoGuia ? lugar(resueltoGuia).guia : []).map((o, k) => {
               const bien = evidOk.has(v.id) && resueltoGuia !== null && evidenciasValidas(v, resueltoGuia).includes(k);
@@ -845,9 +845,9 @@ export function LabLugaresRecomendacionesIngles({ color }: PracticaLabProps) {
           </div>
           <details className="lr-guia" style={{ marginTop: 6 }}>
             <summary>Ver en español</summary>
-            <div style={{ fontSize: 12, color: T.text2, marginTop: 4 }}>{t.es}</div>
+            <div style={{ fontSize: 14, color: T.text2, marginTop: 4 }}>{t.es}</div>
           </details>
-          {felices[t.id] && <div style={{ fontSize: 12, color: OK, marginTop: 6, fontWeight: 800 }}>Ya disfruta {lugar(felices[t.id]!).es}. Puedes probar otra recomendación.</div>}
+          {felices[t.id] && <div style={{ fontSize: 14, color: OK, marginTop: 6, fontWeight: 800 }}>Ya disfruta {lugar(felices[t.id]!).es}. Puedes probar otra recomendación.</div>}
         </div>
         {sub(`Tu recomendación para ${t.nombre}`)}
         <textarea
@@ -887,7 +887,7 @@ export function LabLugaresRecomendacionesIngles({ color }: PracticaLabProps) {
         {revRec && revRec.estado === "mal" && (
           <div style={{ marginTop: 10, display: "grid", gap: 5 }}>
             {revRec.errores.map((e) => (
-              <div key={e} style={{ fontSize: 12, color: WARN, lineHeight: 1.5 }}>
+              <div key={e} style={{ fontSize: 14, color: WARN, lineHeight: 1.5 }}>
                 <i className="fa-solid fa-lightbulb" style={{ marginRight: 7 }} />
                 {e}
               </div>
@@ -904,7 +904,7 @@ export function LabLugaresRecomendacionesIngles({ color }: PracticaLabProps) {
         </details>
         <details className="lr-guia" style={{ marginTop: 8 }}>
           <summary>Ver ejemplos de recomendación</summary>
-          <div style={{ fontSize: 12.5, color: T.text2, marginTop: 6, display: "grid", gap: 4 }}>
+          <div style={{ fontSize: 14, color: T.text2, marginTop: 6, display: "grid", gap: 4 }}>
             <span>«You should visit the waterfall because you can swim in the natural pool.»</span>
             <span>«I recommend the museum. There is an elevator, and you can see a big mural.»</span>
             <span>«Don&apos;t miss the viewpoint! It&apos;s a quiet place to watch the sunset.»</span>
@@ -921,37 +921,130 @@ export function LabLugaresRecomendacionesIngles({ color }: PracticaLabProps) {
     );
   }
 
+  const corto = (s: string) => {
+    const w = s.trim().split(/\s+/);
+    return w.length > 10 ? `${w.slice(0, 10).join(" ")}…` : s;
+  };
+  const lectura =
+    modo === "describir"
+      ? rev
+        ? `${rev.titulo}: ${rev.estado === "mal" ? "revisa la maqueta" : corto(rev.oracion)}`
+        : borrador
+          ? `«${corto(borrador)}»`
+          : `${l.nombre}: arma una oración`
+      : modo === "guia"
+        ? juicio
+          ? `${lugar(elegido!).nombre}: ${juicio.ok ? "¡sí cumple!" : "no cumple todo"}`
+          : `${v.nombre} espera tu recomendación`
+        : visita
+          ? `${lugar(visita.lugar).nombre}: «${corto(visita.j.linea)}»`
+          : `${t.nombre} espera tu recomendación`;
+
+  const teoria = (
+    <>
+      <Bloque titulo="What can I do here?" icono="fa-map-location-dot">
+        <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
+      </Bloque>
+      <Bloque titulo="Cómo usar el laboratorio" icono="fa-list-ol">
+        <div style={{ display: "grid", gap: 8 }}>
+          {INSTRUCCIONES.map((p, i) => (
+            <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+              <div style={{ width: 24, height: 24, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
+              <div style={{ fontSize: 14, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
+            </div>
+          ))}
+        </div>
+      </Bloque>
+      <Bloque titulo="Guía rápida (glosario A5)" icono="fa-book-open">
+        {GLOSARIO_A5.map((g) => (
+          <div key={g.termino} style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+            <strong style={{ color: "#fff" }}>{g.termino}</strong> — {g.definicion}
+            <div style={{ color: "#bae6fd", marginTop: 2 }}>
+              <i className="fa-solid fa-quote-left" style={{ marginRight: 6 }} />
+              {g.ejemplo}
+            </div>
+          </div>
+        ))}
+        <div style={{ fontSize: 14, fontWeight: 900, color: T.text3 }}>PARA PENSAR (VIDEO A8)</div>
+        <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>{PREGUNTA_ABIERTA_A8}</div>
+      </Bloque>
+      <Bloque titulo="Hechos (verdadero o falso, A3 y A4)" icono="fa-circle-question">
+        <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
+          {[...HECHOS_A3, ...HECHOS_A4].map((h, i) => (
+            <li key={i} style={{ fontSize: 14, color: T.text2, lineHeight: 1.45 }}>
+              <strong style={{ color: h.respuesta ? OK : WARN }}>{h.respuesta ? "Verdadero" : "Falso"}:</strong> «{h.enunciado}» {h.retro}
+            </li>
+          ))}
+        </ul>
+      </Bloque>
+      <Bloque titulo={`Glosario (A1 · ${TITULO_A1})`} icono="fa-book">
+        {GLOSARIO_A1.map((gi, i) => (
+          <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
+            <span style={{ fontSize: 14, fontWeight: 900, color: accent }}>{gi.termino}. </span>
+            <span style={{ fontSize: 14, color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
+            <div style={{ fontSize: 14, color: "#fff", lineHeight: 1.4, marginTop: 4, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+              <span>
+                <i className="fa-solid fa-quote-left" style={{ marginRight: 6, color: accent }} />
+                {gi.ejemplo}
+              </span>
+              <BotonEscuchar texto={gi.ejemplo} col={accent} />
+            </div>
+          </div>
+        ))}
+        <div style={{ fontSize: 14, color: T.text2 }}>
+          <strong style={{ color: "#fff" }}>Actividad (A1):</strong> {ACTIVIDAD_A1}
+        </div>
+      </Bloque>
+      <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+        <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
+          {IDEAS.map((x, i) => (
+            <li key={i} style={{ fontSize: 14, color: T.text2, lineHeight: 1.45 }}>
+              {x}
+            </li>
+          ))}
+        </ul>
+      </Bloque>
+      <Bloque titulo="Autoevaluación (A7)" icono="fa-clipboard-check">
+        <AutoevaluacionCard accent={accent} />
+      </Bloque>
+      <Bloque titulo="Ficha teórica" icono="fa-book-open">
+        <FichaTeorica data={LUGARES_RECOMENDACIONES_INGLES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+      </Bloque>
+      <Bloque titulo="Fuentes y aclaraciones" icono="fa-circle-info">
+        <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
+          Son <strong>verbatim</strong> del material de la plataforma: los glosarios A1 y A5 (con los que se arma el marco teórico, porque la progresión no tiene lectura), los textos A2 y A6, los hechos A3 y A4, la autoevaluación
+          A7, las preguntas del video A8 (su retroalimentación y el mínimo de 100 % son del laboratorio), los conceptos de A9 y la consigna de «Tu turno» (actividad final de A5). En el hueco 2 de A2 el laboratorio también
+          acepta «opposite», que la definición del glosario A1 hace igual de válida. Son <strong>ilustrativos y ficticios</strong>: el pueblo de Rincón del Colibrí, sus siete lugares, la guía turística, los precios (30 y
+          40 pesos), los 200 y 300 escalones, los horarios y todas las personas. La temporada de tortugas y los campamentos tortugueros sí existen en las costas de México, pero este campamento es inventado. En
+          «Describe the place» cada oración se revisa contra las piezas de la maqueta; en «Recommend it» la revisión es automática y tolerante (mayúsculas, puntuación, contracciones): se aceptan en ámbar las formas
+          correctas pero menos naturales para recomendar («You can visit…», «Visit the…», «You must…») y solo cuenta como error el inglés incorrecto o una razón falsa. Fuente: {FUENTE}
+        </div>
+      </Bloque>
+    </>
+  );
+
   return (
-    <div style={{ color: T.text }}>
+    <>
       <style>{`
-        @keyframes lrPulse { 0%,100%{ box-shadow:0 0 0 0 var(--lrd); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .lr-live-dot { animation: lrPulse 1.6s ease-in-out infinite; }
         @keyframes lrShake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);} }
-        @media (prefers-reduced-motion: reduce){ .lr-live-dot { animation:none; } .lr-area[data-e="mal"], .lr-linea[data-e="mal"] { animation:none !important; } }
-        .lr-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .lr-grid { grid-template-columns: 1fr; } }
-        .lr-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .lr-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .lr-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .lr-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
+        @media (prefers-reduced-motion: reduce){ .lr-area[data-e="mal"], .lr-linea[data-e="mal"] { animation:none !important; } }
         .lr-tab-modo { cursor:pointer; border:1px solid var(--lrc); border-radius:12px; padding:11px 8px; text-align:center; background:transparent; transition:all .15s; color:#fff; }
         .lr-tab-modo[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
         .lr-tab-modo:hover { background:rgba(255,255,255,0.06); }
         .lr-opts { display:flex; flex-wrap:wrap; gap:7px; align-items:center; }
-        .lr-opt { cursor:pointer; border:1px solid var(--lrc); border-radius:10px; padding:9px 12px; font-size:12px; font-weight:800; color:#fff; background:transparent; transition:all .15s; line-height:1.35; }
+        .lr-opt { cursor:pointer; border:1px solid var(--lrc); border-radius:10px; padding:9px 12px; font-size:14px; font-weight:800; color:#fff; background:transparent; transition:all .15s; line-height:1.35; }
         .lr-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.78); }
         .lr-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
         .lr-opt:disabled { cursor:default; }
         .lr-opt:disabled[data-on="false"] { opacity:0.5; }
-        .lr-escuchar { cursor:pointer; border:1px solid var(--lrc); border-radius:999px; padding:5px 11px; font-size:11px; font-weight:800; color:#fff; background:rgba(4,10,22,0.45); transition:all .15s; }
+        .lr-escuchar { cursor:pointer; border:1px solid var(--lrc); border-radius:999px; padding:5px 11px; font-size:14px; font-weight:800; color:#fff; background:rgba(4,10,22,0.45); transition:all .15s; }
         .lr-escuchar:hover { background:rgba(255,255,255,0.08); }
-        .lr-pill { display:inline-flex; align-items:center; padding:4px 10px; border-radius:999px; border:1px solid var(--lrc); font-size:11px; font-weight:800; }
+        .lr-pill { display:inline-flex; align-items:center; padding:4px 10px; border-radius:999px; border:1px solid var(--lrc); font-size:14px; font-weight:800; }
         .lr-linea { min-height:48px; display:flex; flex-wrap:wrap; gap:7px; align-items:center; padding:9px 13px; border-radius:12px; border:1.5px dashed rgba(255,255,255,0.2); background:rgba(4,10,22,0.45); }
         .lr-linea[data-e="ok"] { border-style:solid; border-color:${OK}; }
         .lr-linea[data-e="valida"] { border-style:solid; border-color:${AMBAR}; }
         .lr-linea[data-e="mal"] { border-style:solid; border-color:${WARN}; animation:lrShake .35s; }
-        .lr-ficha { cursor:pointer; border:1.5px solid rgba(255,255,255,0.22); border-radius:9px; padding:7px 11px; font-size:13px; font-weight:800; color:#fff; background:rgba(255,255,255,0.05); transition:all .14s; }
+        .lr-ficha { cursor:pointer; border:1.5px solid rgba(255,255,255,0.22); border-radius:9px; padding:7px 11px; font-size:14px; font-weight:800; color:#fff; background:rgba(255,255,255,0.05); transition:all .14s; }
         .lr-ap { border-color:#38bdf888; color:#bae6fd; }
         .lr-ficha[data-tipo="s"] { border-color:#f472b688; color:#fbcfe8; }
         .lr-ficha[data-tipo="a"] { border-color:#34d39988; color:#bbf7d0; }
@@ -965,323 +1058,128 @@ export function LabLugaresRecomendacionesIngles({ color }: PracticaLabProps) {
         .lr-area[data-e="valida"] { border-color:${AMBAR}; }
         .lr-area[data-e="mal"] { border-color:${WARN}; animation:lrShake .35s; }
         .lr-opt:focus-visible, .lr-tab-modo:focus-visible, .lr-icobtn:focus-visible, .lr-ficha:focus-visible, .lr-escuchar:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
-        @media (max-width: 1000px){ .lr-bottom { grid-template-columns: 1fr !important; } }
-        .lr-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .lr-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .lr-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61; background:linear-gradient(180deg,#06121e 0%,#040a16 100%);
-          border-left:1px solid rgba(${color.rgba},0.32); box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1); display:flex; flex-direction:column; }
-        .lr-drawer[data-open="true"] { transform:translateX(0); }
-        .lr-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .lr-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .lr-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .lr-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .lr-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:11px 16px; border-radius:999px;
-          border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800; background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
-        .lr-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        .lr-guia summary { cursor:pointer; color:${accent}; font-size:11.5px; font-weight:800; }
-      `}</style>
-
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="lr-tabs">
-          {MODOS.map((m) => {
-            const dd = MODOS_DEF[m];
-            const col = `#${dd.color.replace("#", "")}`;
-            const on = m === modo;
-            return (
-              <button key={m} className="lr-tab-modo" data-on={on} onClick={() => cambiarModo(m)} style={{ ["--lrc" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? col : "inherit" }}>
-                  <i className={`fa-solid ${dd.icono}`} />
+        .lr-guia summary { cursor:pointer; color:${accent}; font-size:14px; font-weight:800; }
+      
+        .lr-ahora { padding:10px 12px; border-radius:12px; margin-bottom:12px; font-size:14px; line-height:1.45; color:#eaf0fb; border:1px solid color-mix(in srgb, var(--lrc) 40%, transparent); background:rgba(4,10,22,0.45); }
+`}</style>
+      <LabShell
+        accent={accent}
+        rgba={color.rgba}
+        retoKey={RETO_KEY}
+        escena={
+          <SceneBoundary fallback={sceneFallback}>
+            <LugaresScene
+              vista={vista}
+              modoColor={modoCol}
+              resetNonce={resetNonce}
+              errorNonce={errorNonce}
+              lugarIdx={lugarIdx}
+              resalta={rev?.resalta ?? null}
+              resaltaEstado={rev?.estado ?? null}
+              resaltaNonce={revNonce}
+              oracion={rev ? rev.oracion : borrador}
+              hechos={entrada.tipos}
+              visitaIdx={visitaIdx}
+              guiaElegido={elegido}
+              guiaOk={juicio ? juicio.ok : null}
+              guiaResueltos={guiaResueltos}
+              guiaTab={guiaTab}
+              viajeNonce={viajeNonce}
+              onTocarLugar={tocarLugar}
+              turistaIdx={turistaIdx}
+              destino={visita?.lugar ?? null}
+              reaccion={visita?.j.reaccion ?? null}
+              lineaReaccion={visita?.j.linea ?? ""}
+              felices={felices}
+            />
+          </SceneBoundary>
+        }
+        modos={{
+          opciones: MODOS.map((m) => ({ id: m, etiqueta: MODOS_DEF[m].etq, icono: MODOS_DEF[m].icono })),
+          valor: modo,
+          cambiar: (id) => cambiarModo(id as Modo),
+        }}
+        herramientas={
+          <>
+            <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+            <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+          </>
+        }
+        leyenda={<span style={{ fontWeight: 800, fontFamily: "ui-monospace, monospace" }}>{chipVivo}</span>}
+        lectura={lectura}
+        objetivos={objetivos.map((o) => ({ txt: o.t, done: o.done }))}
+        pestanas={[
+          {
+            id: "controles",
+            etiqueta: "Controles",
+            icono: "fa-sliders",
+            contenido: (
+              <>
+                <div className="lr-ahora" style={{ ["--lrc" as string]: modoCol }}>
+                  <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 8 }} />
+                  {pie}
                 </div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{dd.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{dd.subtitulo}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="lr-grid">
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 60vh, 680px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <LugaresScene
-                vista={vista}
-                modoColor={modoCol}
-                resetNonce={resetNonce}
-                errorNonce={errorNonce}
-                lugarIdx={lugarIdx}
-                resalta={rev?.resalta ?? null}
-                resaltaEstado={rev?.estado ?? null}
-                resaltaNonce={revNonce}
-                oracion={rev ? rev.oracion : borrador}
-                hechos={entrada.tipos}
-                visitaIdx={visitaIdx}
-                guiaElegido={elegido}
-                guiaOk={juicio ? juicio.ok : null}
-                guiaResueltos={guiaResueltos}
-                guiaTab={guiaTab}
-                viajeNonce={viajeNonce}
-                onTocarLugar={tocarLugar}
-                turistaIdx={turistaIdx}
-                destino={visita?.lugar ?? null}
-                reaccion={visita?.j.reaccion ?? null}
-                lineaReaccion={visita?.j.linea ?? ""}
-                felices={felices}
-              />
-            </SceneBoundary>
-
-            <div style={{ position: "absolute", top: 14, left: 16, right: 150, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, pointerEvents: "none" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)", maxWidth: "100%" }}>
-                <span className="lr-live-dot" style={{ ["--lrd" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol, flexShrink: 0 }} />
-                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3, flexShrink: 0 }}>EN VIVO</span>
-                <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)", flexShrink: 0 }} />
-                <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", ...NUM }}>{chipVivo}</span>
-              </div>
-            </div>
-
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="lr-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría" aria-label="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="lr-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"} aria-label={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="lr-icobtn" onClick={reiniciar} title="Reiniciar" aria-label="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 132px 14px 18px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                {def.etq} — {def.subtitulo}
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6, ...NUM }}>{pie}</div>
-            </div>
-
-            <button className="lr-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-          </div>
-
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-              Controles — {def.etq}
-            </Eyebrow>
-            <div style={{ marginTop: 4 }}>{control}</div>
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-map-location-dot" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>What can I do here?</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #7dd3fc55", background: "rgba(125,211,252,0.07)" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book-open" style={{ marginRight: 8, color: "#7dd3fc" }} />
-              Guía rápida (glosario A5)
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {GLOSARIO_A5.map((g) => (
-                <div key={g.termino} style={{ fontSize: 12, color: T.text2, lineHeight: 1.5 }}>
-                  <strong style={{ color: "#fff" }}>{g.termino}</strong> — {g.definicion}
-                  <div style={{ color: "#bae6fd", marginTop: 2 }}>
-                    <i className="fa-solid fa-quote-left" style={{ marginRight: 6, fontSize: 10 }} />
-                    {g.ejemplo}
+                {control}
+              </>
+            ),
+          },
+          {
+            id: "reto",
+            etiqueta: "Reto",
+            icono: "fa-star",
+            contenido: (
+              <>
+                <RelacionaCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
+                <div style={{ marginTop: 22 }}>
+                  <RetoQuizCard quiz={QUIZ_A8} accent={accent} rgba={color.rgba} aprobado={quizOk} onAprobado={() => setQuizOk(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Sabes cómo recomendar y qué incluir al describir un lugar." />
+                </div>
+                <div style={{ ...card, padding: "20px 20px 22px", marginTop: 22 }}>
+                  <Eyebrow>
+                    <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
+                    Completa el texto (A2)
+                  </Eyebrow>
+                  <div style={{ marginTop: 12 }}>
+                    <CompletaTexto
+                      data={HUECOS_A2}
+                      accent={accent}
+                      rgba={color.rgba}
+                      completado={textoA2}
+                      onCompletado={() => {
+                        setTextoA2(true);
+                        sfx(true);
+                      }}
+                      onAcierto={blip}
+                      onError={() => sfx(false)}
+                    />
                   </div>
                 </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", margin: "14px 0 6px" }}>PARA PENSAR (VIDEO A8)</div>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5 }}>{PREGUNTA_ABIERTA_A8}</div>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />
-              Cómo usar el laboratorio
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-                Objetivos de la sesión
-              </Eyebrow>
-              <span style={{ fontSize: 11, fontWeight: 800, color: objetivos.every((o) => o.done) ? OK : T.text3 }}>
-                {objetivos.filter((o) => o.done).length}/{objetivos.length}
-              </span>
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ marginTop: 2, fontSize: 13, color: o.done ? OK : "rgba(255,255,255,0.22)" }} />
-                  <span style={{ fontSize: 12, color: o.done ? "#fff" : T.text2, lineHeight: 1.4 }}>{o.t}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="lr-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />
-            Hechos (verdadero o falso, A3 y A4)
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-            {[...HECHOS_A3, ...HECHOS_A4].map((h, i) => (
-              <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
-                <strong style={{ color: h.respuesta ? OK : WARN }}>{h.respuesta ? "Verdadero" : "Falso"}:</strong> «{h.enunciado}» {h.retro}
-              </li>
-            ))}
-          </ul>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />
-              Glosario (A1 · {TITULO_A1})
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {GLOSARIO_A1.map((gi, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{gi.termino}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
-                  <div style={{ fontSize: 11.5, color: "#fff", lineHeight: 1.4, marginTop: 4, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                    <span>
-                      <i className="fa-solid fa-quote-left" style={{ marginRight: 6, color: accent }} />
-                      {gi.ejemplo}
-                    </span>
-                    <BotonEscuchar texto={gi.ejemplo} col={accent} />
+                <div style={{ ...card, padding: "20px 20px 22px", marginTop: 22 }}>
+                  <Eyebrow>
+                    <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
+                    Completa el texto (A6)
+                  </Eyebrow>
+                  <div style={{ marginTop: 12 }}>
+                    <CompletaTexto
+                      data={HUECOS_A6}
+                      accent={accent}
+                      rgba={color.rgba}
+                      completado={textoA6}
+                      onCompletado={() => {
+                        setTextoA6(true);
+                        sfx(true);
+                      }}
+                      onAcierto={blip}
+                      onError={() => sfx(false)}
+                    />
                   </div>
                 </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11.5, color: T.text2, marginTop: 10 }}>
-              <strong style={{ color: "#fff" }}>Actividad (A1):</strong> {ACTIVIDAD_A1}
-            </div>
-          </div>
-        </div>
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-            Ideas clave
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-            {IDEAS.map((x, i) => (
-              <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                {x}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          Son <strong>verbatim</strong> del material de la plataforma: los glosarios A1 y A5 (con los que se arma el marco teórico, porque la progresión no tiene lectura), los textos A2 y A6, los hechos A3 y A4, la autoevaluación
-          A7, las preguntas del video A8 (su retroalimentación y el mínimo de 100 % son del laboratorio), los conceptos de A9 y la consigna de «Tu turno» (actividad final de A5). En el hueco 2 de A2 el laboratorio también
-          acepta «opposite», que la definición del glosario A1 hace igual de válida. Son <strong>ilustrativos y ficticios</strong>: el pueblo de Rincón del Colibrí, sus siete lugares, la guía turística, los precios (30 y
-          40 pesos), los 200 y 300 escalones, los horarios y todas las personas. La temporada de tortugas y los campamentos tortugueros sí existen en las costas de México, pero este campamento es inventado. En
-          «Describe the place» cada oración se revisa contra las piezas de la maqueta; en «Recommend it» la revisión es automática y tolerante (mayúsculas, puntuación, contracciones): se aceptan en ámbar las formas
-          correctas pero menos naturales para recomendar («You can visit…», «Visit the…», «You must…») y solo cuenta como error el inglés incorrecto o una razón falsa. Fuente: {FUENTE}
-        </span>
-      </div>
-
-      <RelacionaCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
-
-      <RetoQuizCard quiz={QUIZ_A8} accent={accent} rgba={color.rgba} aprobado={quizOk} onAprobado={() => setQuizOk(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Sabes cómo recomendar y qué incluir al describir un lugar." />
-
-      <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
-          Completa el texto (A2)
-        </Eyebrow>
-        <div style={{ marginTop: 12 }}>
-          <CompletaTexto
-            data={HUECOS_A2}
-            accent={accent}
-            rgba={color.rgba}
-            completado={textoA2}
-            onCompletado={() => {
-              setTextoA2(true);
-              sfx(true);
-            }}
-            onAcierto={blip}
-            onError={() => sfx(false)}
-          />
-        </div>
-      </div>
-
-      <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
-          Completa el texto (A6)
-        </Eyebrow>
-        <div style={{ marginTop: 12 }}>
-          <CompletaTexto
-            data={HUECOS_A6}
-            accent={accent}
-            rgba={color.rgba}
-            completado={textoA6}
-            onCompletado={() => {
-              setTextoA6(true);
-              sfx(true);
-            }}
-            onAcierto={blip}
-            onError={() => sfx(false)}
-          />
-        </div>
-      </div>
-
-      <TuTurnoCard accent={accent} logrado={a5Ok} onLogrado={() => setA5Ok(true)} playSfx={sfx} />
-
-      <AutoevaluacionCard accent={accent} />
-
-      <div className="lr-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="lr-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="lr-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="lr-close" onClick={() => setDrawer(false)} title="Cerrar" aria-label="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="lr-drawer-body">
-          <FichaTeorica data={LUGARES_RECOMENDACIONES_INGLES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+                <TuTurnoCard accent={accent} logrado={a5Ok} onLogrado={() => setA5Ok(true)} playSfx={sfx} />
+              </>
+            ),
+          },
+          { id: "teoria", etiqueta: "Teoría", icono: "fa-book-open", contenido: teoria },
+        ]}
+      />
+    </>
   );
 }

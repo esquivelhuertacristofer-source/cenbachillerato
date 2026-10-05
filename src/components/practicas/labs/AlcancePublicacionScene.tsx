@@ -22,7 +22,7 @@
 
 import * as THREE from "three";
 import { useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
@@ -76,9 +76,9 @@ type Pt = [number, number, number];
 const OK = "#34d399";
 const GRIS = "#3b4a60";
 
-function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number }) {
+function Etiqueta({ pos, children, col, fs = 14 }: { pos: Pt; children: ReactNode; col?: string; fs?: number }) {
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -162,6 +162,7 @@ function RedDifusion({
   fuente: number;
   modoColor: string;
 }) {
+  const estrecho = useThree((s) => s.size.width) < 640;
   const nodos = useRef<THREE.InstancedMesh>(null);
   const pulsos = useRef<THREE.InstancedMesh>(null);
   const lineas = useRef<THREE.LineSegments>(null);
@@ -357,10 +358,6 @@ function RedDifusion({
               <cylinderGeometry args={[1.62, 1.7, 0.08, 6]} />
               <meshStandardMaterial color={g.color} roughness={0.6} transparent opacity={0.22} />
             </mesh>
-            <Etiqueta pos={[cx * 6.05, -0.1, cz * 6.05]} df={12} fs={11} col={`${g.color}99`}>
-              <i className={`fa-solid ${g.icono}`} style={{ color: g.color }} />
-              {g.etq}
-            </Etiqueta>
           </group>
         );
       })}
@@ -373,11 +370,10 @@ function RedDifusion({
       <instancedMesh ref={initPulsos} args={[GEO_PULSO, undefined, MAX_PULSOS]} frustumCulled={false}>
         <meshBasicMaterial toneMapped={false} />
       </instancedMesh>
-      {etiquetasNodo.map((e) => {
+      {etiquetasNodo.filter((e) => origenes.includes(e.id) || e.id === fuente).map((e) => {
         const p = RED.nodos[e.id]!.pos;
-        const on = origenes.includes(e.id) || e.id === fuente;
         return (
-          <Etiqueta key={e.id} pos={[p[0], p[1] + RADIO_NODO[e.id]! + 0.42, p[2]]} df={10} fs={on ? 12 : 10.5} col={on ? `${e.col}` : "rgba(255,255,255,0.2)"}>
+          <Etiqueta key={e.id} pos={[p[0], p[1] + RADIO_NODO[e.id]! + 0.42, p[2]]} col={e.col}>
             <i className={`fa-solid ${e.icono}`} style={{ color: e.col }} />
             {e.etq}
             <span style={{ color: "rgba(255,255,255,0.55)", fontWeight: 700 }}>· {RED.vecinos[e.id]!.length}</span>
@@ -407,10 +403,11 @@ function RedDifusion({
             </mesh>
           );
         })}
-        <Html position={[0, 3.5, 0]} center distanceFactor={12} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+        {!estrecho && (
+        <Html position={[0, 3.5, 0]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
           <div style={{ display: "grid", gap: 3, padding: "7px 11px", borderRadius: 10, background: "rgba(4,10,22,0.88)", border: "1px solid rgba(255,255,255,0.2)", whiteSpace: "nowrap" }}>
             {columnas.map((c, k) => (
-              <div key={c.etq} style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 11, fontWeight: 800, color: "#fff" }}>
+              <div key={c.etq} style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 14, fontWeight: 800, color: "#fff" }}>
                 <span style={{ width: 9, height: 9, borderRadius: 2, background: c.col }} />
                 {c.etq}
                 <span
@@ -425,6 +422,7 @@ function RedDifusion({
             ))}
           </div>
         </Html>
+        )}
       </group>
     </group>
   );
@@ -637,6 +635,12 @@ function EscenaCampana({
     [canales, acc],
   );
 
+  // Máx. 4 etiquetas a la vez: canales elegidos + grupos (primero la audiencia del caso).
+  const etiquetasSeg = useMemo(() => {
+    const orden = [...SEGMENTOS].sort((x, y) => Number(audienciaCaso.includes(y.id)) - Number(audienciaCaso.includes(x.id)));
+    return orden.slice(0, Math.max(1, 4 - canales.length)).map((s) => s.id);
+  }, [audienciaCaso, canales]);
+
   // Arcos canal → grupo
   const arcos = useMemo(() => {
     const lista: { curva: THREE.QuadraticBezierCurve3; geo: THREE.TubeGeometry; color: string; fuerza: number }[] = [];
@@ -764,12 +768,12 @@ function EscenaCampana({
         );
       })}
       {CANALES.map((c, k) => {
-        const on = canales.includes(c.id);
+        if (!canales.includes(c.id)) return null;
         const [x, , z] = posCanal(k);
         return (
-          <Etiqueta key={c.id} pos={[x * 1.5, 0.3, z * 1.5]} df={11} fs={on ? 11.5 : 10} col={on ? c.color : "rgba(255,255,255,0.14)"}>
-            <i className={c.icono.startsWith("fa-brands") ? c.icono : `fa-solid ${c.icono}`} style={{ color: on ? c.color : "#94a3b8" }} />
-            <span style={{ color: on ? "#fff" : "rgba(255,255,255,0.6)" }}>{c.corto}</span>
+          <Etiqueta key={c.id} pos={[x * 1.5, 0.3, z * 1.5]} col={c.color}>
+            <i className={c.icono.startsWith("fa-brands") ? c.icono : `fa-solid ${c.icono}`} style={{ color: c.color }} />
+            {c.corto}
           </Etiqueta>
         );
       })}
@@ -795,14 +799,15 @@ function EscenaCampana({
             <group position={[bx, 0.07, bz]} rotation={[0, -angSeg(k) - Math.PI / 2, 0]}>
               <Edificio id={s.id} color={s.color} />
             </group>
-            <Etiqueta pos={[bx * 1.1, 1.75, bz * 1.1]} df={11} fs={11} col={objetivo ? s.color : "rgba(255,255,255,0.18)"}>
-              <i className={`fa-solid ${s.icono}`} style={{ color: s.color }} />
-              {s.etq}
-              {objetivo && <span style={{ fontSize: 9, letterSpacing: "0.08em", color: s.color }}>AUDIENCIA</span>}
-              {lanzada && (
-                <span style={{ color: c.general >= 0.7 ? OK : c.general >= 0.4 ? "#fbbf24" : "#f87171", fontVariantNumeric: "tabular-nums" }}>{num(c.general * 100)} %</span>
-              )}
-            </Etiqueta>
+            {etiquetasSeg.includes(s.id) && (
+              <Etiqueta pos={[bx * 1.1, 1.75, bz * 1.1]} col={s.color}>
+                <i className={`fa-solid ${s.icono}`} style={{ color: s.color }} />
+                {s.etq}
+                {lanzada && (
+                  <span style={{ color: c.general >= 0.7 ? OK : c.general >= 0.4 ? "#fbbf24" : "#f87171", fontVariantNumeric: "tabular-nums" }}>{num(c.general * 100)} %</span>
+                )}
+              </Etiqueta>
+            )}
             {/* Persona ciega (bastón) y persona sorda */}
             {(() => {
               const [x8, , z8] = posFigura(k, 5);
@@ -815,16 +820,14 @@ function EscenaCampana({
                   </mesh>
                   {lanzada && (
                     <>
-                      <Html position={[x8, 0.98, z8]} center distanceFactor={11} zIndexRange={[16, 0]} style={{ pointerEvents: "none" }}>
-                        <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, borderRadius: 99, background: "rgba(4,10,22,0.88)", border: `1.5px solid ${c.ciegas >= 0.5 ? OK : "#f87171"}` }}>
-                          <i className="fa-solid fa-eye-low-vision" style={{ fontSize: 11, color: c.ciegas >= 0.5 ? OK : "#f87171" }} />
-                        </span>
-                      </Html>
-                      <Html position={[x9, 0.98, z9]} center distanceFactor={11} zIndexRange={[16, 0]} style={{ pointerEvents: "none" }}>
-                        <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, borderRadius: 99, background: "rgba(4,10,22,0.88)", border: `1.5px solid ${c.sordas >= 0.5 ? OK : "#f87171"}` }}>
-                          <i className="fa-solid fa-ear-deaf" style={{ fontSize: 11, color: c.sordas >= 0.5 ? OK : "#f87171" }} />
-                        </span>
-                      </Html>
+                      <mesh position={[x8, 0.03, z8]} rotation={[-Math.PI / 2, 0, 0]}>
+                        <ringGeometry args={[0.2, 0.27, 20]} />
+                        <meshBasicMaterial color={c.ciegas >= 0.5 ? OK : "#f87171"} />
+                      </mesh>
+                      <mesh position={[x9, 0.03, z9]} rotation={[-Math.PI / 2, 0, 0]}>
+                        <ringGeometry args={[0.2, 0.27, 20]} />
+                        <meshBasicMaterial color={c.sordas >= 0.5 ? OK : "#f87171"} />
+                      </mesh>
                     </>
                   )}
                 </>
@@ -860,8 +863,8 @@ function EscenaCampana({
 export default function AlcancePublicacionScene(p: AlcanceSceneProps) {
   const { vista, modoColor, resetNonce } = p;
   const cam = useMemo((): { pos: Pt; target: Pt } => {
-    if (vista === "campana") return { pos: [0, 11.2, 12.4], target: [0, -0.6, 0.6] };
-    return { pos: [2.4, 10.4, 13.0], target: [1.8, -0.7, -0.2] };
+    if (vista === "campana") return { pos: [0, 12.6, 13.8], target: [0, -1.1, 0.6] };
+    return { pos: [2.4, 11.6, 14.6], target: [1.8, -1.1, -0.2] };
   }, [vista]);
 
   return (

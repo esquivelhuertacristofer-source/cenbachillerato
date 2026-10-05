@@ -23,10 +23,11 @@
  * laboratorio, cuestionario del video A8 y completa el texto A6.
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, NUM, OK, card, Eyebrow, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { RetoNumericoCard } from "./_reto-numerico";
@@ -69,6 +70,7 @@ import {
   luminancia,
   RES_VIDEO,
   FPS,
+  COMPONENTES,
   TASAS_VIDEO,
   AUDIO_VIDEO_KBPS,
   CALIDAD_DEF,
@@ -108,7 +110,7 @@ const EstudioScene = dynamic(() => import("./EstudioEdicionScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-photo-film fa-fade" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Encendiendo el estudio de edición en 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Encendiendo el estudio de edición en 3D…</span>
     </div>
   ),
 });
@@ -161,15 +163,15 @@ function FormatoCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: st
           ¿Con pérdida o sin pérdida?
         </Eyebrow>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 10.5, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
           {[1, 2, 3].map((k) => (
-            <i key={k} className="fa-solid fa-star" style={{ fontSize: 13, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
+            <i key={k} className="fa-solid fa-star" style={{ fontSize: 14, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
           ))}
         </div>
       </div>
       {resuelto === null ? (
         <>
-          <div style={{ fontSize: 11, color: T.text3, fontWeight: 800, marginBottom: 6 }}>
+          <div style={{ fontSize: 14, color: T.text3, fontWeight: 800, marginBottom: 6 }}>
             Caso {pos + 1} de {ronda.length} · ¿cómo conviene comprimir este archivo?
           </div>
           <div style={{ fontSize: 15, color: "#fff", fontWeight: 800, lineHeight: 1.45, marginBottom: 12 }}>«{actual.texto}»</div>
@@ -183,7 +185,7 @@ function FormatoCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: st
               Con pérdida (JPEG, MP3, AAC, MP4)
             </button>
           </div>
-          {aviso && <div style={{ marginTop: 10, fontSize: 12, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
+          {aviso && <div style={{ marginTop: 10, fontSize: 14, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
         </>
       ) : (
         <div style={{ padding: "12px 14px", borderRadius: 11, border: `1px solid ${OK}55`, background: "rgba(52,211,153,0.08)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
@@ -191,9 +193,9 @@ function FormatoCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: st
             {[1, 2, 3].map((k) => (
               <i key={k} className="fa-solid fa-star" style={{ fontSize: 15, color: k <= resuelto ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
             ))}
-            <span style={{ fontSize: 12.5, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
+            <span style={{ fontSize: 14, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
           </span>
-          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 12.5, fontWeight: 900 }}>
+          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 14, fontWeight: 900 }}>
             <i className="fa-solid fa-shuffle" style={{ marginRight: 8 }} />
             Otra ronda
           </button>
@@ -261,7 +263,6 @@ export function LabEstudioEdicion({ color }: PracticaLabProps) {
 
   // ── Comunes
   const [resetNonce, setResetNonce] = useState(0);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   const { mejorEstrellas, registraEstrellas: guardaEstrellas } = useEstrellas(RETO_KEY);
@@ -450,6 +451,7 @@ export function LabEstudioEdicion({ color }: PracticaLabProps) {
 
   /* ── Objetivos ─────────────────────────────────────────────────────── */
   const objetivos: { t: string; done: boolean }[] = [
+    { t: "Elige la foto y guárdala sin pérdida (RLE): ¿el archivo se encoge o crece?", done: rleHecho.has("foto") },
     { t: "Ver la foto con 1 bit de color y con la resolución más baja (16 × 12)", done: vio1bit && vioBaja },
     { t: "Comprimir sin pérdida la foto y el logotipo, y comparar cuánto se reduce cada uno", done: rleHecho.size === IMAGENES.length },
     { t: `Comprimir la foto de 64 × 48 con pérdida a calidad ${Q_BLOQUES} o menos y ver los bloques de 8 × 8`, done: vioBloques },
@@ -505,25 +507,20 @@ export function LabEstudioEdicion({ color }: PracticaLabProps) {
         <i className={`fa-solid ${def.icono}`} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{def.etq}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los resultados siguen aquí. {pie}</div>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los resultados siguen aquí. {pie}</div>
     </div>
   );
 
-  const sub_ = (txt: string) => <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
+  const sub_ = (txt: string) => <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
   const nota = (txt: ReactNode, col: string, icono = "fa-circle-info") => (
-    <div style={{ marginTop: 10, fontSize: 12, lineHeight: 1.55, color: col }}>
+    <div style={{ marginTop: 10, fontSize: 14, lineHeight: 1.55, color: col }}>
       <i className={`fa-solid ${icono}`} style={{ marginRight: 7 }} />
       {txt}
     </div>
   );
-  const dato = (etq: string, val: ReactNode, col = "#fff") => (
-    <div style={{ padding: "8px 10px", borderRadius: 10, background: "rgba(4,10,22,0.45)", border: `1px solid ${T.line}` }}>
-      <div style={{ fontSize: 9.5, fontWeight: 900, color: T.text3, letterSpacing: "0.06em", textTransform: "uppercase" }}>{etq}</div>
-      <div style={{ fontSize: 13.5, fontWeight: 900, color: col, marginTop: 3, ...NUM }}>{val}</div>
-    </div>
-  );
+  const dato = (etq: string, val: string, col = "#fff") => <Dato label={etq} value={val} col={col} />;
   const requisito = (ok: boolean, txt: string) => (
-    <div style={{ display: "flex", gap: 8, alignItems: "flex-start", fontSize: 12, color: ok ? "#d1fae5" : "#fed7aa", lineHeight: 1.45 }}>
+    <div style={{ display: "flex", gap: 8, alignItems: "flex-start", fontSize: 14, color: ok ? "#d1fae5" : "#fed7aa", lineHeight: 1.45 }}>
       <i className={`fa-solid ${ok ? "fa-circle-check" : "fa-circle-xmark"}`} style={{ marginTop: 2, color: ok ? OK : WARN }} />
       {txt}
     </div>
@@ -564,7 +561,7 @@ export function LabEstudioEdicion({ color }: PracticaLabProps) {
             </button>
           ))}
         </div>
-        <div style={{ fontSize: 11.5, color: T.text3, marginTop: 6 }}>{IMAGENES.find((x) => x.id === imgId)!.detalle}</div>
+        <div style={{ fontSize: 14, color: T.text3, marginTop: 6 }}>{IMAGENES.find((x) => x.id === imgId)!.detalle}</div>
 
         {sub_("1 · Resolución")}
         <div className="ed-opts">
@@ -583,7 +580,7 @@ export function LabEstudioEdicion({ color }: PracticaLabProps) {
             </button>
           ))}
         </div>
-        <div style={{ fontSize: 11.5, color: T.text3, marginTop: 6 }}>
+        <div style={{ fontSize: 14, color: T.text3, marginTop: 6 }}>
           {comp === "conPerdida" ? "La compresión tipo JPEG trabaja siempre con 24 bits (8 por canal)." : `${PROFUNDIDADES.find((p) => p.bits === bits)!.detalle} · 2^${bits} = ${num(2 ** bits)}`}
         </div>
 
@@ -596,13 +593,11 @@ export function LabEstudioEdicion({ color }: PracticaLabProps) {
             </button>
           ))}
         </div>
-        <div style={{ fontSize: 11.5, color: T.text3, marginTop: 6 }}>{COMPRESIONES.find((c) => c.id === comp)!.detalle}</div>
+        <div style={{ fontSize: 14, color: T.text3, marginTop: 6 }}>{COMPRESIONES.find((c) => c.id === comp)!.detalle}</div>
         {comp === "conPerdida" && (
-          <label style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 12 }}>
-            <span style={{ fontSize: 11.5, fontWeight: 800, color: T.text2, width: 58 }}>Calidad</span>
-            <input type="range" aria-label="Calidad de la compresión con pérdida" className="ed-range" min={5} max={95} step={5} value={calidad} onChange={(e) => aplicarImagen({ calidad: Number(e.target.value) })} style={{ ["--edc" as string]: modoCol }} />
-            <span style={{ width: 34, textAlign: "right", fontSize: 13, color: "#fff", fontWeight: 800, ...NUM }}>{calidad}</span>
-          </label>
+          <div style={{ marginTop: 12 }}>
+            <Deslizador label="Calidad" icon="fa-sliders" colr={modoCol} valor={String(calidad)} min={5} max={95} step={5} value={calidad} onChange={(v) => aplicarImagen({ calidad: v })} hintL="más pequeño, más bloques" hintR="más grande, más fiel" />
+          </div>
         )}
 
         <div className="ed-datos" style={{ marginTop: 14 }}>
@@ -613,7 +608,7 @@ export function LabEstudioEdicion({ color }: PracticaLabProps) {
           {dato("Fidelidad (PSNR)", Number.isFinite(proc.psnr) ? `${num(proc.psnr, 1)} dB` : "idéntica", Number.isFinite(proc.psnr) ? "#fde68a" : OK)}
           {dato("Colores distintos", num(proc.colores))}
         </div>
-        <div style={{ fontSize: 12, color: T.text2, marginTop: 10, lineHeight: 1.5, ...NUM }}>
+        <div style={{ fontSize: 14, color: T.text2, marginTop: 10, lineHeight: 1.5, ...NUM }}>
           {proc.w} × {proc.h} × {proc.bitsEfectivos} ÷ 8 = <strong style={{ color: "#fff" }}>{num(crudo)} B</strong>. A tamaño real, con los mismos bits:{" "}
           {FOTOS_REALES.map((f, k) => (
             <span key={f.etq}>
@@ -641,7 +636,7 @@ export function LabEstudioEdicion({ color }: PracticaLabProps) {
               <i className="fa-solid fa-caret-down" />
             </button>
           </div>
-          <div style={{ flex: 1, minWidth: 180, fontSize: 12, color: T.text2, lineHeight: 1.55, ...NUM }}>
+          <div style={{ flex: 1, minWidth: 0, fontSize: 14, color: T.text2, lineHeight: 1.55, ...NUM }}>
             <div>
               Píxel ({selX}, {selY}) · original RGB <strong style={{ color: "#fff" }}>{rgbTxt(origSel)}</strong>
             </div>
@@ -666,7 +661,7 @@ export function LabEstudioEdicion({ color }: PracticaLabProps) {
     const okC = evalC.contraste >= CONTRASTE_AA;
     control = (
       <>
-        <div style={{ fontSize: 11.5, color: T.text3, marginBottom: 8 }}>Como en cualquier editor, la lista va de arriba (se ve encima) hacia abajo.</div>
+        <div style={{ fontSize: 14, color: T.text3, marginBottom: 8 }}>Como en cualquier editor, la lista va de arriba (se ve encima) hacia abajo.</div>
         <div style={{ display: "grid", gap: 8 }}>
           {arribaAbajo.map((id) => {
             const d = CAPA_DEF[id];
@@ -675,9 +670,9 @@ export function LabEstudioEdicion({ color }: PracticaLabProps) {
             return (
               <div key={id} className="ed-capa" data-vis={vis} style={{ ["--edc" as string]: d.color }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ width: 20, height: 20, borderRadius: 6, background: `${d.color}33`, color: d.color, fontSize: 10.5, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", ...NUM }}>{i + 1}</span>
+                  <span style={{ width: 20, height: 20, borderRadius: 6, background: `${d.color}33`, color: d.color, fontSize: 14, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", ...NUM }}>{i + 1}</span>
                   <i className={`fa-solid ${d.icono}`} style={{ color: d.color, width: 14 }} />
-                  <span style={{ flex: 1, fontSize: 12.5, fontWeight: 900, color: vis ? "#fff" : T.text3 }}>{d.etq}</span>
+                  <span style={{ flex: 1, fontSize: 14, fontWeight: 900, color: vis ? "#fff" : T.text3 }}>{d.etq}</span>
                   <button className="ed-mini ed-ojo" aria-label={`${vis ? "Ocultar" : "Mostrar"} ${d.etq}`} onClick={() => alternar(id)}>
                     <i className={`fa-solid ${vis ? "fa-eye" : "fa-eye-slash"}`} />
                   </button>
@@ -688,11 +683,9 @@ export function LabEstudioEdicion({ color }: PracticaLabProps) {
                     <i className="fa-solid fa-arrow-down" />
                   </button>
                 </div>
-                <label style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 7 }}>
-                  <span style={{ fontSize: 10.5, fontWeight: 800, color: T.text3, width: 64 }}>{id === "ajuste" ? "Oscurece" : "Opacidad"}</span>
-                  <input type="range" aria-label={`${id === "ajuste" ? "Oscurecimiento" : "Opacidad"} de ${d.etq} (%)`} className="ed-range" min={0} max={100} step={5} value={Math.round(valor[id] * 100)} onChange={(e) => cambiarValor(id, Number(e.target.value) / 100)} style={{ ["--edc" as string]: d.color }} />
-                  <span style={{ width: 40, textAlign: "right", fontSize: 12, color: "#fff", fontWeight: 800, ...NUM }}>{Math.round(valor[id] * 100)} %</span>
-                </label>
+                <div style={{ marginTop: 6 }}>
+                  <Deslizador label={id === "ajuste" ? "Oscurece" : "Opacidad"} colr={d.color} valor={`${Math.round(valor[id] * 100)} %`} min={0} max={100} step={5} value={Math.round(valor[id] * 100)} onChange={(v) => cambiarValor(id, v / 100)} />
+                </div>
               </div>
             );
           })}
@@ -720,7 +713,7 @@ export function LabEstudioEdicion({ color }: PracticaLabProps) {
           {dato("Contraste mínimo", `${num(Math.min(evalC.contraste, 21), 2)}:1`, okC ? OK : WARN)}
           {dato("Meta para texto normal", `≥ ${CONTRASTE_AA}:1`)}
         </div>
-        <div style={{ fontSize: 12, color: T.text2, marginTop: 8, lineHeight: 1.55, ...NUM }}>
+        <div style={{ fontSize: 14, color: T.text2, marginTop: 8, lineHeight: 1.55, ...NUM }}>
           Peor punto de la zona del texto: fondo RGB {rgbTxt(evalC.peorFondo)} con L = {num(pl, 3)} y letras RGB {rgbTxt(evalC.peorTexto)} con L = {num(pt, 3)} → ({num(Math.max(pl, pt), 3)} + 0.05) ÷ ({num(Math.min(pl, pt), 3)} + 0.05) ={" "}
           <strong style={{ color: okC ? OK : WARN }}>{num(Math.min(evalC.contraste, 21), 2)}:1</strong>.
           {visible.banda && orden.indexOf("banda") > orden.indexOf("foto") && ` Con la banda al ${Math.round(valor.banda * 100)} %: C = ${num(valor.banda, 2)} · negro + ${num(1 - valor.banda, 2)} · fondo.`}
@@ -766,7 +759,7 @@ export function LabEstudioEdicion({ color }: PracticaLabProps) {
                 </button>
               ))}
             </div>
-            <div style={{ fontSize: 12, color: T.text2, marginTop: 8, lineHeight: 1.5 }}>{destinoV.contexto}</div>
+            <div style={{ fontSize: 14, color: T.text2, marginTop: 8, lineHeight: 1.5 }}>{destinoV.contexto}</div>
 
             {sub_("Resolución")}
             <div className="ed-opts">
@@ -784,16 +777,10 @@ export function LabEstudioEdicion({ color }: PracticaLabProps) {
                 </button>
               ))}
             </div>
-            <label style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 14 }}>
-              <span style={{ fontSize: 11.5, fontWeight: 800, color: T.text2, width: 86 }}>Tasa de video</span>
-              <input type="range" aria-label="Tasa de bits del video (paso)" className="ed-range" min={0} max={TASAS_VIDEO.length - 1} step={1} value={tasaIdx} onChange={(e) => setTasaIdx(Number(e.target.value))} style={{ ["--edc" as string]: modoCol }} />
-              <span style={{ width: 78, textAlign: "right", fontSize: 13, color: "#fff", fontWeight: 800, ...NUM }}>{String(mbps)} Mbps</span>
-            </label>
-            <label style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 10 }}>
-              <span style={{ fontSize: 11.5, fontWeight: 800, color: T.text2, width: 86 }}>Duración</span>
-              <input type="range" aria-label="Duración del video (s)" className="ed-range" min={10} max={600} step={5} value={durV} onChange={(e) => setDurV(Number(e.target.value))} style={{ ["--edc" as string]: modoCol }} />
-              <span style={{ width: 78, textAlign: "right", fontSize: 13, color: "#fff", fontWeight: 800, ...NUM }}>{durV} s</span>
-            </label>
+            <div style={{ marginTop: 14 }}>
+              <Deslizador label="Tasa de video" icon="fa-gauge-high" colr={modoCol} valor={`${String(mbps)} Mbps`} min={0} max={TASAS_VIDEO.length - 1} step={1} value={tasaIdx} onChange={setTasaIdx} hintL="menos bits, se ve peor" hintR="más bits, pesa más" />
+              <Deslizador label="Duración" icon="fa-clock" colr={modoCol} valor={`${durV} s`} min={10} max={600} step={5} value={durV} onChange={setDurV} />
+            </div>
 
             <div className="ed-datos" style={{ marginTop: 14 }}>
               {dato("Peso del archivo", bytesTxt(calcV.bytes), calcV.cumple.peso ? OK : WARN)}
@@ -801,7 +788,7 @@ export function LabEstudioEdicion({ color }: PracticaLabProps) {
               {dato("Compresión del códec", `${num(calcV.factorCompresion, 0)} veces`)}
               {dato(destV === "celular" ? "Descargas con 1 GB" : "Del límite FAT32", destV === "celular" ? `${num(calcV.vecesPaquete)} veces` : `${num(calcV.fraccionContenedor * 100, 1)} %`)}
             </div>
-            <div style={{ fontSize: 12, color: T.text2, marginTop: 10, lineHeight: 1.55, ...NUM }}>
+            <div style={{ fontSize: 14, color: T.text2, marginTop: 10, lineHeight: 1.55, ...NUM }}>
               Sin comprimir: {num(rv.w)} × {num(rv.h)} × 24 × {fps} = {num(calcV.crudoBps)} bit/s → en {durV} s serían <strong style={{ color: "#fff" }}>{bytesTxt(Math.round((calcV.crudoBps * durV) / 8))}</strong>. Comprimido: ({num(calcV.bpsVideo)} + {num(AUDIO_VIDEO_KBPS * 1000)}) bit/s × {durV} s ÷ 8 ={" "}
               <strong style={{ color: "#fff" }}>{num(calcV.bytes)} B</strong>. Tasa recomendada para {rv.id} a {fps} fps: {num(calcV.recomendada, calcV.recomendada % 1 ? 1 : 0)} Mbps.
             </div>
@@ -837,7 +824,7 @@ export function LabEstudioEdicion({ color }: PracticaLabProps) {
                 </button>
               ))}
             </div>
-            <div style={{ fontSize: 12, color: T.text2, marginTop: 8, lineHeight: 1.5 }}>{destinoA.contexto}</div>
+            <div style={{ fontSize: 14, color: T.text2, marginTop: 8, lineHeight: 1.5 }}>{destinoA.contexto}</div>
             {sub_("Formato")}
             <div className="ed-opts">
               {(["pcm", "comprimido"] as FormatoAudio[]).map((f) => (
@@ -882,13 +869,21 @@ export function LabEstudioEdicion({ color }: PracticaLabProps) {
                 </div>
               </>
             )}
+            {formato === "pcm" && (
+              <div style={{ marginTop: 12, color: COMPONENTES.some((c) => c.hz >= frec / 2) ? "#fed7aa" : OK, fontWeight: 700 }}>
+                <i className={`fa-solid ${COMPONENTES.some((c) => c.hz >= frec / 2) ? "fa-triangle-exclamation" : "fa-circle-check"}`} style={{ marginRight: 7 }} />
+                {COMPONENTES.some((c) => c.hz >= frec / 2)
+                  ? `Con ${String(frec / 1000)} kHz de muestreo se pierden: ${COMPONENTES.filter((c) => c.hz >= frec / 2).map((c) => c.etq).join(", ")}. Quedan en rojo en la escena.`
+                  : `Con ${String(frec / 1000)} kHz de muestreo caben todos los componentes de la voz.`}
+              </div>
+            )}
             <div className="ed-datos" style={{ marginTop: 14 }}>
               {dato(`Peso (${destinoA.minutos} min)`, bytesTxt(calcA.bytes), calcA.cumple.peso ? OK : WARN)}
               {dato("Tasa", `${num(calcA.bps / 1000, calcA.bps % 1000 ? 1 : 0)} kbps`)}
               {dato("Frecuencia más aguda", `${String(calcA.frecuenciaMax / 1000)} kHz`)}
               {dato("Rango dinámico", calcA.snrDb !== null ? `${num(calcA.snrDb, 1)} dB` : "—")}
             </div>
-            <div style={{ fontSize: 12, color: T.text2, marginTop: 10, lineHeight: 1.55, ...NUM }}>
+            <div style={{ fontSize: 14, color: T.text2, marginTop: 10, lineHeight: 1.55, ...NUM }}>
               {formato === "pcm" ? (
                 <>
                   {num(frec)} muestras/s × {bitsA} bits × {canales} {canales === 1 ? "canal" : "canales"} = {num(calcA.bps)} bit/s; × {destinoA.minutos * 60} s ÷ 8 = <strong style={{ color: "#fff" }}>{num(calcA.bytes)} B</strong>. Con {bitsA} bits hay {num(2 ** bitsA)} niveles y el rango
@@ -925,364 +920,235 @@ export function LabEstudioEdicion({ color }: PracticaLabProps) {
     );
   }
 
+  const css = `
+    .ed-opts { display:flex; flex-wrap:wrap; gap:8px; }
+    .ed-opt { cursor:pointer; border:1px solid var(--edc); border-radius:10px; padding:10px 12px; font-size:14px; font-weight:800; color:#fff; background:transparent; transition:all .15s; }
+    .ed-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.72); }
+    .ed-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
+    .ed-opt:disabled { cursor:default; }
+    .ed-toggle { width:100%; cursor:pointer; border:1px solid var(--edc); border-radius:11px; padding:12px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:14px; font-weight:900; text-align:left; transition:all .15s; }
+    .ed-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
+    .ed-datos { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:8px; }
+    .ed-mini { cursor:pointer; width:40px; height:40px; border-radius:8px; border:1px solid ${T.line}; background:rgba(4,10,22,0.45); color:#fff; font-size:14px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+    .ed-mini:hover:not(:disabled) { border-color:${accent}; background:rgba(${color.rgba},0.16); }
+    .ed-mini:disabled { opacity:0.3; cursor:default; }
+    .ed-cruz { display:grid; grid-template-areas: ". a ." "i . d" ". b ."; grid-template-columns: repeat(3,40px); grid-template-rows: repeat(3,40px); gap:3px; }
+    .ed-capa { padding:9px 11px; border-radius:11px; border:1px solid var(--edc); background:rgba(4,10,22,0.42); transition:all .15s; }
+    .ed-capa[data-vis="false"] { border-color:rgba(255,255,255,0.12); opacity:0.75; }
+    .ed-opt:focus-visible, .ed-toggle:focus-visible, .ed-mini:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
+  `;
+
+  const caja = (borde: string, fondo: string): React.CSSProperties => ({ borderRadius: 14, padding: "14px 16px", border: `1px solid ${borde}`, background: fondo });
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes edPulse { 0%,100%{ box-shadow:0 0 0 0 var(--edd); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .ed-live-dot { animation: edPulse 1.6s ease-in-out infinite; }
-        @media (prefers-reduced-motion: reduce){ .ed-live-dot { animation:none; } }
-        .ed-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .ed-grid { grid-template-columns: 1fr; } }
-        .ed-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .ed-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .ed-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .ed-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .ed-tab { cursor:pointer; border:1px solid var(--edc); border-radius:12px; padding:11px 8px; text-align:center; background:transparent; transition:all .15s; color:#fff; }
-        .ed-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
-        .ed-tab:hover { background:rgba(255,255,255,0.06); }
-        .ed-opts { display:flex; flex-wrap:wrap; gap:7px; }
-        .ed-opt { cursor:pointer; border:1px solid var(--edc); border-radius:10px; padding:9px 12px; font-size:12px; font-weight:800; color:#fff; background:transparent; transition:all .15s; }
-        .ed-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.72); }
-        .ed-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
-        .ed-opt:disabled { cursor:default; }
-        .ed-toggle { width:100%; cursor:pointer; border:1px solid var(--edc); border-radius:11px; padding:11px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:12.5px; font-weight:900; text-align:left; transition:all .15s; }
-        .ed-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
-        .ed-range { flex:1; min-width:0; accent-color: var(--edc); }
-        .ed-datos { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:7px; }
-        .ed-mini { cursor:pointer; width:30px; height:30px; border-radius:8px; border:1px solid ${T.line}; background:rgba(4,10,22,0.45); color:#fff; font-size:12px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .ed-mini:hover:not(:disabled) { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .ed-mini:disabled { opacity:0.3; cursor:default; }
-        .ed-cruz { display:grid; grid-template-areas: ". a ." "i . d" ". b ."; grid-template-columns: repeat(3,30px); grid-template-rows: repeat(3,30px); gap:3px; }
-        .ed-capa { padding:9px 11px; border-radius:11px; border:1px solid var(--edc); background:rgba(4,10,22,0.42); transition:all .15s; }
-        .ed-capa[data-vis="false"] { border-color:rgba(255,255,255,0.12); opacity:0.75; }
-        .ed-opt:focus-visible, .ed-tab:focus-visible, .ed-toggle:focus-visible, .ed-icobtn:focus-visible, .ed-range:focus-visible, .ed-mini:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
-        @media (max-width: 1000px){ .ed-bottom { grid-template-columns: 1fr !important; } }
-        .ed-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .ed-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .ed-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61; background:linear-gradient(180deg,#06121e 0%,#040a16 100%);
-          border-left:1px solid rgba(${color.rgba},0.32); box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1); display:flex; flex-direction:column; }
-        .ed-drawer[data-open="true"] { transform:translateX(0); }
-        .ed-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .ed-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .ed-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .ed-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .ed-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:11px 16px; border-radius:999px;
-          border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800; background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
-        .ed-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="ed-tabs">
-          {MODOS.map((m) => {
-            const d = MODOS_DEF[m];
-            const col = `#${d.color.replace("#", "")}`;
-            const on = m === modo;
-            return (
-              <button key={m} className="ed-tab" data-on={on} onClick={() => cambiarModo(m)} style={{ ["--edc" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? col : "inherit" }}>
-                  <i className={`fa-solid ${d.icono}`} />
-                </div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{d.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{d.subtitulo}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="ed-grid">
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 58vh, 660px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <EstudioScene
-                vista={vista}
-                modoColor={modoCol}
-                resetNonce={resetNonce}
-                imgW={proc.w}
-                imgH={proc.h}
-                imgPx={proc.px}
-                bloques={comp === "conPerdida"}
-                selX={selX}
-                selY={selY}
-                bits={proc.bitsEfectivos}
-                codigos={codigos}
-                onPixel={onPixel}
-                orden={orden}
-                visibleFoto={visible.foto}
-                visibleAjuste={visible.ajuste}
-                visibleBanda={visible.banda}
-                visibleTexto={visible.texto}
-                valorFoto={valor.foto}
-                valorAjuste={valor.ajuste}
-                valorBanda={valor.banda}
-                valorTexto={valor.texto}
-                colorTexto={colorTexto}
-                contraste={evalC.contraste}
-                destinoVideo={destV}
-                resVideoIdx={resV}
-                fps={fps}
-                calidad={calcV.calidad}
-                bytesVideo={calcV.bytes}
-                maxBytesVideo={destinoV.maxBytes}
-                formato={formato}
-                frecuencia={frec}
-                bitsAudio={bitsA}
-                bytesAudio={calcA.bytes}
-                maxBytesAudio={destinoA.maxBytes}
-              />
-            </SceneBoundary>
-
-            <div style={{ position: "absolute", top: 14, left: 16, right: 150, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, pointerEvents: "none" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)", maxWidth: "100%" }}>
-                <span className="ed-live-dot" style={{ ["--edd" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol, flexShrink: 0 }} />
-                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3, flexShrink: 0 }}>EN VIVO</span>
-                <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)", flexShrink: 0 }} />
-                <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", ...NUM }}>{chipVivo}</span>
-              </div>
-            </div>
-
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="ed-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría" aria-label="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="ed-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"} aria-label={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="ed-icobtn" onClick={reiniciar} title="Reiniciar" aria-label="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 132px 14px 18px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                {def.etq} — {modo === "medios" ? (sub === "video" ? "Video: peso, datos y destino" : "Audio: muestreo, bits y destino") : def.subtitulo}
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6, ...NUM }}>{pie}</div>
-            </div>
-
-            <button className="ed-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-          </div>
-
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-              Controles — {def.etq}
-            </Eyebrow>
-            <div style={{ marginTop: 12 }}>{control}</div>
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-photo-film" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>Difunde tu proyecto con lo que hay</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #c4b5fd55", background: "rgba(196,181,253,0.07)" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-people-roof" style={{ marginRight: 8, color: "#c4b5fd" }} />
-              Simulación A2 (inspiración)
-            </Eyebrow>
-            <div style={{ fontSize: 13, color: "#fff", fontWeight: 800, lineHeight: 1.4, marginBottom: 8 }}>{SIMULACION_A2.titulo}</div>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{SIMULACION_A2.descripcion}</div>
-            <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", margin: "12px 0 6px" }}>VARIABLES QUE ESTE LABORATORIO EXPLORA</div>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 6 }}>
-              {SIMULACION_A2.variables.map((v, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  {v}
-                </li>
-              ))}
-            </ul>
-            <div style={{ fontSize: 12, color: "#e9d5ff", lineHeight: 1.5, marginTop: 10, fontStyle: "italic" }}>{SIMULACION_A2.reflexion}</div>
-          </div>
-
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #7dd3fc55", background: "rgba(125,211,252,0.07)" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book-open" style={{ marginRight: 8, color: "#7dd3fc" }} />
-              Lectura A1
-            </Eyebrow>
-            <div style={{ fontSize: 13, color: "#fff", fontWeight: 800, lineHeight: 1.4, marginBottom: 10 }}>{TITULO_A1}</div>
-            <div style={{ display: "grid", gap: 9, marginBottom: 12 }}>
-              {LECTURA_A1.map((p, i) => (
-                <div key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>
-                  {p}
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", marginBottom: 8 }}>PARA REFLEXIONAR</div>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {PREGUNTAS.map((q, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  {q}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />
-              Cómo usar el laboratorio
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-                Objetivos de la sesión
-              </Eyebrow>
-              <span className="ed-objetivos-cuenta" style={{ fontSize: 11, fontWeight: 800, color: objetivos.every((o) => o.done) ? OK : T.text3 }}>
-                {objetivos.filter((o) => o.done).length}/{objetivos.length}
-              </span>
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ marginTop: 2, fontSize: 13, color: o.done ? OK : "rgba(255,255,255,0.22)" }} />
-                  <span style={{ fontSize: 12, color: o.done ? "#fff" : T.text2, lineHeight: 1.4 }}>{o.t}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="ed-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <div style={{ padding: "14px 16px", borderRadius: 12, border: `1px solid ${accent}33`, background: `rgba(${color.rgba},0.07)` }}>
-            <Eyebrow>
-              <i className="fa-solid fa-landmark" style={{ marginRight: 8, color: accent }} />
-              Importante (lectura A1)
-            </Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{RECUADRO_A1}</div>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />
-              Hechos (quiz A4)
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {HECHOS.map((h, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
-                  {h}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />
-              Glosario (A5)
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {GLOSARIO.map((gi, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{gi.termino}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
-                  <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.4, marginTop: 4 }}>
-                    <i className="fa-solid fa-people-group" style={{ marginRight: 6, color: accent }} />
-                    {gi.ejemplo}
+    <>
+      <style>{css}</style>
+      <LabShell
+        accent={accent}
+        rgba={color.rgba}
+        retoKey={RETO_KEY}
+        escena={
+          <SceneBoundary fallback={sceneFallback}>
+            <EstudioScene
+              vista={vista}
+              modoColor={modoCol}
+              resetNonce={resetNonce}
+              imgW={proc.w}
+              imgH={proc.h}
+              imgPx={proc.px}
+              bloques={comp === "conPerdida"}
+              selX={selX}
+              selY={selY}
+              bits={proc.bitsEfectivos}
+              codigos={codigos}
+              onPixel={onPixel}
+              orden={orden}
+              visibleFoto={visible.foto}
+              visibleAjuste={visible.ajuste}
+              visibleBanda={visible.banda}
+              visibleTexto={visible.texto}
+              valorFoto={valor.foto}
+              valorAjuste={valor.ajuste}
+              valorBanda={valor.banda}
+              valorTexto={valor.texto}
+              colorTexto={colorTexto}
+              contraste={evalC.contraste}
+              destinoVideo={destV}
+              resVideoIdx={resV}
+              fps={fps}
+              calidad={calcV.calidad}
+              bytesVideo={calcV.bytes}
+              maxBytesVideo={destinoV.maxBytes}
+              formato={formato}
+              frecuencia={frec}
+              bitsAudio={bitsA}
+              bytesAudio={calcA.bytes}
+              maxBytesAudio={destinoA.maxBytes}
+            />
+          </SceneBoundary>
+        }
+        modos={{
+          opciones: MODOS.map((m) => ({ id: m, etiqueta: MODOS_DEF[m].etq, icono: MODOS_DEF[m].icono })),
+          valor: modo,
+          cambiar: (id) => cambiarModo(id as Modo),
+        }}
+        herramientas={
+          <>
+            <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+            <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+          </>
+        }
+        lectura={chipVivo}
+        objetivos={objetivos.map((o) => ({ txt: o.t, done: o.done }))}
+        pestanas={[
+          {
+            id: "controles",
+            etiqueta: "Controles",
+            icono: "fa-sliders",
+            contenido: (
+              <Bloque titulo={`${def.etq} — ${modo === "medios" ? (sub === "video" ? "Video: peso, datos y destino" : "Audio: muestreo, bits y destino") : def.subtitulo}`} icono={def.icono}>
+                <div style={{ color: T.text2, ...NUM }}>{pie}</div>
+                {control}
+              </Bloque>
+            ),
+          },
+          {
+            id: "reto",
+            etiqueta: "Reto",
+            icono: "fa-trophy",
+            contenido: (
+              <>
+                <FormatoCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
+                <RetoNumericoCard reto={RETO_VIDEO} accent={accent} aprobado={retoOk} onAprobado={() => setRetoOk(true)} playSfx={sfx} />
+                <RetoQuizCard quiz={QUIZ_A8} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Sabes qué se necesita para crear contenido digital." />
+                <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
+                  <Eyebrow>
+                    <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
+                    Completa el texto (A6)
+                  </Eyebrow>
+                  <div style={{ marginTop: 12 }}>
+                    <CompletaTexto
+                      data={HUECOS_A6}
+                      accent={accent}
+                      rgba={color.rgba}
+                      completado={textoOk}
+                      onCompletado={() => {
+                        setTextoOk(true);
+                        sfx(true);
+                      }}
+                      onAcierto={blip}
+                      onError={() => sfx(false)}
+                    />
                   </div>
                 </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11.5, color: T.text2, marginTop: 10 }}>
-              <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A5}
-            </div>
-          </div>
-        </div>
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-            Ideas clave
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-            {IDEAS.map((x, i) => (
-              <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                {x}
-              </li>
-            ))}
-          </ul>
-          <div style={{ marginTop: 16, padding: "12px 14px", borderRadius: 12, border: `1px solid ${T.line}`, background: "rgba(4,10,22,0.4)" }}>
-            <div style={{ fontSize: 10.5, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", marginBottom: 6 }}>PREGUNTA DEL VIDEO A8</div>
-            <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.5 }}>{PREGUNTA_ABIERTA_A8}</div>
-            <div style={{ fontSize: 10.5, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", margin: "12px 0 6px" }}>PARA CERRAR (AUTOEVALUACIÓN A7)</div>
-            <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.5 }}>{REFLEXION_A7}</div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          La lectura A1 con sus preguntas y su recuadro, la descripción de la simulación A2, los hechos del quiz A4, el glosario A5, el texto A6, la reflexión A7 y las preguntas del video A8 son <strong>verbatim</strong> del material de
-          la plataforma; la retroalimentación del cuestionario A8 y el reto de cálculo son del laboratorio. La foto y el logotipo son <strong>imágenes sintéticas</strong>, y los cálculos se hacen de verdad sobre ellas: peso = ancho × alto × bits ÷ 8,
-          compresión RLE contada byte a byte y compresión con la DCT y las tablas de cuantización de JPEG (ITU-T T.81, escaladas como libjpeg, sin submuestreo de color). El contraste usa la fórmula de las WCAG 2.x. Las tasas recomendadas de
-          video son las de la guía de subida de YouTube; los límites de cada destino (15 MB, 10 MB, calidad mínima) y el criterio «aceptable» (al menos la mitad de la tasa recomendada) son <strong>criterios ilustrativos</strong>, igual que
-          los bloques dibujados en los cuadros del video. Unidades del SI: 1 MB = 10⁶ bytes. Fuente: {FUENTE}
-        </span>
-      </div>
-
-      <FormatoCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
-
-      <RetoNumericoCard reto={RETO_VIDEO} accent={accent} aprobado={retoOk} onAprobado={() => setRetoOk(true)} playSfx={sfx} />
-
-      <RetoQuizCard quiz={QUIZ_A8} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Sabes qué se necesita para crear contenido digital." />
-
-      <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
-          Completa el texto (A6)
-        </Eyebrow>
-        <div style={{ marginTop: 12 }}>
-          <CompletaTexto data={HUECOS_A6} accent={accent} rgba={color.rgba} completado={textoOk} onCompletado={() => { setTextoOk(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
-        </div>
-      </div>
-
-      <div className="ed-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="ed-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="ed-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="ed-close" onClick={() => setDrawer(false)} title="Cerrar" aria-label="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="ed-drawer-body">
-          <FichaTeorica data={ESTUDIO_EDICION_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+              </>
+            ),
+          },
+          {
+            id: "teoria",
+            etiqueta: "Teoría",
+            icono: "fa-book-open",
+            contenido: (
+              <>
+                <Bloque titulo="Difunde tu proyecto con lo que hay" icono="fa-photo-film">
+                  <div style={{ color: T.text2 }}>{PROBLEMA}</div>
+                </Bloque>
+                <Bloque titulo="Lectura A1" icono="fa-book-open">
+                  <div style={caja("#7dd3fc55", "rgba(125,211,252,0.07)")}>
+                    <div style={{ color: "#fff", fontWeight: 800, marginBottom: 10 }}>{TITULO_A1}</div>
+                    <div style={{ display: "grid", gap: 9 }}>
+                      {LECTURA_A1.map((p, i) => (
+                        <div key={i} style={{ color: T.text2 }}>{p}</div>
+                      ))}
+                    </div>
+                  </div>
+                  <div style={{ fontSize: 14, fontWeight: 900, color: T.text3, letterSpacing: "0.08em" }}>PARA REFLEXIONAR</div>
+                  <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 8, color: T.text2 }}>
+                    {PREGUNTAS.map((q, i) => (
+                      <li key={i}>{q}</li>
+                    ))}
+                  </ul>
+                </Bloque>
+                <Bloque titulo="Simulación A2 (inspiración)" icono="fa-people-roof">
+                  <div style={caja("#c4b5fd55", "rgba(196,181,253,0.07)")}>
+                    <div style={{ color: "#fff", fontWeight: 800, marginBottom: 8 }}>{SIMULACION_A2.titulo}</div>
+                    <div style={{ color: T.text2 }}>{SIMULACION_A2.descripcion}</div>
+                    <div style={{ fontSize: 14, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", margin: "12px 0 6px" }}>VARIABLES QUE ESTE LABORATORIO EXPLORA</div>
+                    <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 6, color: T.text2 }}>
+                      {SIMULACION_A2.variables.map((v, i) => (
+                        <li key={i}>{v}</li>
+                      ))}
+                    </ul>
+                    <div style={{ color: "#e9d5ff", marginTop: 10, fontStyle: "italic" }}>{SIMULACION_A2.reflexion}</div>
+                  </div>
+                </Bloque>
+                <Bloque titulo="Cómo usar el laboratorio" icono="fa-list-ol">
+                  <div style={{ display: "grid", gap: 9 }}>
+                    {INSTRUCCIONES.map((p, i) => (
+                      <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
+                        <div style={{ width: 24, height: 24, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
+                        <div style={{ color: "#fff", minWidth: 0 }}>{p}</div>
+                      </div>
+                    ))}
+                  </div>
+                </Bloque>
+                <Bloque titulo="Importante (lectura A1)" icono="fa-landmark">
+                  <div style={caja(`${accent}33`, `rgba(${color.rgba},0.07)`)}>
+                    <div style={{ color: T.text2 }}>{RECUADRO_A1}</div>
+                  </div>
+                </Bloque>
+                <Bloque titulo="Hechos (quiz A4)" icono="fa-circle-question">
+                  <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 8, color: T.text2 }}>
+                    {HECHOS.map((h, i) => (
+                      <li key={i}>{h}</li>
+                    ))}
+                  </ul>
+                </Bloque>
+                <Bloque titulo="Glosario (A5)" icono="fa-book">
+                  <div style={{ display: "grid", gap: 8 }}>
+                    {GLOSARIO.map((gi, i) => (
+                      <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
+                        <span style={{ fontWeight: 900, color: accent }}>{gi.termino}. </span>
+                        <span style={{ color: T.text2 }}>{gi.definicion}</span>
+                        <div style={{ color: T.text3, marginTop: 4 }}>
+                          <i className="fa-solid fa-people-group" style={{ marginRight: 6, color: accent }} />
+                          {gi.ejemplo}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ color: T.text2 }}>
+                    <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A5}
+                  </div>
+                </Bloque>
+                <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                  <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 9, color: T.text2 }}>
+                    {IDEAS.map((x, i) => (
+                      <li key={i}>{x}</li>
+                    ))}
+                  </ul>
+                  <div style={caja(T.line, "rgba(4,10,22,0.4)")}>
+                    <div style={{ fontSize: 14, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", marginBottom: 6 }}>PREGUNTA DEL VIDEO A8</div>
+                    <div style={{ color: "#fff" }}>{PREGUNTA_ABIERTA_A8}</div>
+                    <div style={{ fontSize: 14, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", margin: "12px 0 6px" }}>PARA CERRAR (AUTOEVALUACIÓN A7)</div>
+                    <div style={{ color: "#fff" }}>{REFLEXION_A7}</div>
+                  </div>
+                </Bloque>
+                <Bloque titulo="Ficha teórica" icono="fa-book">
+                  <FichaTeorica data={ESTUDIO_EDICION_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+                </Bloque>
+                <p style={{ marginTop: 18, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
+                  La lectura A1 con sus preguntas y su recuadro, la descripción de la simulación A2, los hechos del quiz A4, el glosario A5, el texto A6, la reflexión A7 y las preguntas del video A8 son <strong>verbatim</strong> del material de
+                  la plataforma; la retroalimentación del cuestionario A8 y el reto de cálculo son del laboratorio. La foto y el logotipo son <strong>imágenes sintéticas</strong>, y los cálculos se hacen de verdad sobre ellas: peso = ancho × alto × bits ÷ 8,
+                  compresión RLE contada byte a byte y compresión con la DCT y las tablas de cuantización de JPEG (ITU-T T.81, escaladas como libjpeg, sin submuestreo de color). El contraste usa la fórmula de las WCAG 2.x. Las tasas recomendadas de
+                  video son las de la guía de subida de YouTube; los límites de cada destino (15 MB, 10 MB, calidad mínima) y el criterio «aceptable» (al menos la mitad de la tasa recomendada) son <strong>criterios ilustrativos</strong>, igual que
+                  los bloques dibujados en los cuadros del video. Unidades del SI: 1 MB = 10⁶ bytes. Fuente: {FUENTE}
+                </p>
+              </>
+            ),
+          },
+        ]}
+      />
+    </>
   );
 }

@@ -21,8 +21,8 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { createContext, useContext, useMemo, useRef, type ReactNode } from "react";
+import { Canvas, useThree, useFrame } from "@react-three/fiber";
 import { OrbitControls, Environment, Lightformer, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import {
@@ -82,6 +82,8 @@ export interface PaqueteSceneProps {
   destinoFinal: DestinoFinalId | null;
   destinoNonce: number;
   lote: number;
+  /** Muestra las etiquetas secundarias. */
+  detalles: boolean;
 }
 
 type Pt = [number, number, number];
@@ -91,7 +93,13 @@ const OK = "#34d399";
 const NO = "#f87171";
 const AMARILLO = "#fbbf24";
 
-function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number }) {
+/** Las etiquetas secundarias (`sec`) solo se ven con «Ver detalles»; en el celular se ocultan (esa información está en el panel). */
+const DetallesCtx = createContext(false);
+
+function Etiqueta({ pos, children, df = 10, col, fs = 14, sec = false }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number; sec?: boolean }) {
+  const detalles = useContext(DetallesCtx);
+  const angosto = useThree((st) => st.size.width) < 640;
+  if (sec && (!detalles || angosto)) return null;
   return (
     <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
@@ -546,21 +554,21 @@ function EscenaViaje({
         const alto = n.tipo === "isp" ? 2.15 : n.tipo === "casa" ? 1.35 : n.tipo === "datos" ? 1.15 : 0.85;
         const corto = n.id === "casa" ? "Tu casa" : n.id === "isp" ? "Proveedor" : n.id === "bil" ? "Bilbao" : n.id === "ash" ? "Ashburn" : n.etq;
         return (
-          <Etiqueta key={n.id} pos={[n.pos[0], alto, n.pos[2]]} df={esDest ? 11 : 12.5} fs={esDest ? 12 : 10.5} col={esDest ? `${modoColor}cc` : undefined}>
+          <Etiqueta key={n.id} sec={!(esDest || n.id === "casa")} pos={[n.pos[0], alto, n.pos[2]]} df={esDest ? 11 : 12.5} fs={14} col={esDest ? `${modoColor}cc` : undefined}>
             {n.tipo === "datos" && <i className="fa-solid fa-server" style={{ color: esDest ? modoColor : "#94a3b8" }} />}
             {corto}
           </Etiqueta>
         );
       })}
-      <Etiqueta pos={[POS_DNS[0], 0.02, POS_DNS[2] + 0.62]} df={11.5} fs={10.5} col={dnsResuelto ? `${AMARILLO}aa` : undefined}>
+      <Etiqueta pos={[POS_DNS[0], 0.02, POS_DNS[2] + 0.62]} df={11.5} fs={14} col={dnsResuelto ? `${AMARILLO}aa` : undefined}>
         <i className="fa-solid fa-address-book" style={{ color: AMARILLO }} />
         {dnsResuelto ? `DNS: ${dest.dominio} → ${dest.ip}` : "Servidor DNS"}
       </Etiqueta>
-      <Etiqueta pos={[3.65, -0.45, 2.9]} df={12} fs={10.5} col="#0891b2aa">
+      <Etiqueta sec pos={[3.65, -0.45, 2.9]} df={12} fs={14} col="#0891b2aa">
         <i className="fa-solid fa-water" style={{ color: "#67e8f9" }} />
         Cable submarino MAREA · 6 600 km
       </Etiqueta>
-      <Etiqueta pos={[3.65, 0.2, -2.3]} df={13} fs={10}>
+      <Etiqueta sec pos={[3.65, 0.2, -2.3]} df={13} fs={14}>
         Océano Atlántico (distancias no a escala)
       </Etiqueta>
 
@@ -643,6 +651,7 @@ function OndasWifi({ pos, color }: { pos: Pt; color: string }) {
 }
 
 function PantallaEspia({ nonce, retraso, cifrado, texto, cifra, dominio }: { nonce: number; retraso: number; cifrado: boolean; texto: string; cifra: string; dominio: string }) {
+  const angosto = useThree((st) => st.size.width) < 640;
   const espera = useRef<HTMLDivElement>(null);
   const captura = useRef<HTMLDivElement>(null);
   const visto = useRef(nonce);
@@ -658,24 +667,25 @@ function PantallaEspia({ nonce, retraso, cifrado, texto, cifra, dominio }: { non
     if (captura.current) captura.current.style.display = ya ? "block" : "none";
   });
   const col = cifrado ? OK : NO;
+  if (angosto) return null;
   return (
     <Html position={[-6.0, 2.95, -0.9]} center distanceFactor={10} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-      <div style={{ width: 230, borderRadius: 10, overflow: "hidden", border: `1px solid ${col}88`, background: "rgba(2,6,14,0.94)", boxShadow: "0 10px 24px -10px #000" }}>
-        <div style={{ padding: "5px 9px", fontSize: 10, fontWeight: 900, color: "#fff", background: "rgba(127,29,29,0.55)", letterSpacing: "0.04em" }}>
+      <div style={{ width: 270, borderRadius: 10, overflow: "hidden", border: `1px solid ${col}88`, background: "rgba(2,6,14,0.94)", boxShadow: "0 10px 24px -10px #000" }}>
+        <div style={{ padding: "5px 9px", fontSize: 14, fontWeight: 900, color: "#fff", background: "rgba(127,29,29,0.55)", letterSpacing: "0.04em" }}>
           <i className="fa-solid fa-user-secret" style={{ marginRight: 6 }} />
           LO QUE CAPTURA EL ESPÍA
         </div>
-        <div ref={espera} style={{ padding: "8px 10px", fontSize: 10.5, color: "#94a3b8", fontFamily: "ui-monospace, monospace" }}>
+        <div ref={espera} style={{ padding: "8px 10px", fontSize: 14, color: "#94a3b8", fontFamily: "ui-monospace, monospace" }}>
           Escuchando la wifi del café…
         </div>
         <div ref={captura} style={{ display: "none", padding: "7px 10px 9px", fontFamily: "ui-monospace, monospace" }}>
-          <div style={{ fontSize: 9.5, color: "#94a3b8", marginBottom: 4 }}>destino: {dominio}</div>
+          <div style={{ fontSize: 14, color: "#94a3b8", marginBottom: 4 }}>destino: {dominio}</div>
           {cifrado ? (
-            <div style={{ fontSize: 9.5, color: OK, whiteSpace: "pre", lineHeight: 1.35 }}>{cifra}</div>
+            <div style={{ fontSize: 14, color: OK, whiteSpace: "pre", lineHeight: 1.35 }}>{cifra}</div>
           ) : (
-            <div style={{ fontSize: 10, color: "#fecaca", lineHeight: 1.4, whiteSpace: "normal" }}>{texto || "(mensaje vacío)"}</div>
+            <div style={{ fontSize: 14, color: "#fecaca", lineHeight: 1.4, whiteSpace: "normal" }}>{texto || "(mensaje vacío)"}</div>
           )}
-          <div style={{ fontSize: 9.5, fontWeight: 900, color: col, marginTop: 5 }}>{cifrado ? "HTTPS: solo bytes cifrados" : "HTTP: texto legible"}</div>
+          <div style={{ fontSize: 14, fontWeight: 900, color: col, marginTop: 5 }}>{cifrado ? "HTTPS: solo bytes cifrados" : "HTTP: texto legible"}</div>
         </div>
       </div>
     </Html>
@@ -797,7 +807,7 @@ function EscenaConsulta({
         <meshStandardMaterial color="#111827" />
       </mesh>
       <OndasWifi pos={[POS_ROUTER[0], POS_ROUTER[1] - 0.2, POS_ROUTER[2]]} color="#38bdf8" />
-      <Etiqueta pos={[POS_ROUTER[0] + 0.1, POS_ROUTER[1] + 0.45, POS_ROUTER[2]]} df={11} fs={10.5}>
+      <Etiqueta sec pos={[POS_ROUTER[0] + 0.1, POS_ROUTER[1] + 0.45, POS_ROUTER[2]]} df={11} fs={14}>
         <i className="fa-solid fa-wifi" style={{ color: "#38bdf8" }} />
         Wifi pública del café
       </Etiqueta>
@@ -808,14 +818,14 @@ function EscenaConsulta({
         <icosahedronGeometry args={[0.42, 1]} />
         <meshStandardMaterial color="#1e3a8a" emissive="#3b82f6" emissiveIntensity={0.35} wireframe />
       </mesh>
-      <Etiqueta pos={[POS_NUBE[0], POS_NUBE[1] + 0.72, POS_NUBE[2]]} df={11} fs={10.5}>
+      <Etiqueta sec pos={[POS_NUBE[0], POS_NUBE[1] + 0.72, POS_NUBE[2]]} df={11} fs={14}>
         <i className="fa-solid fa-globe" style={{ color: "#93c5fd" }} />
         Internet
       </Etiqueta>
 
       {/* Servidores */}
       <CentroDatos pos={POS_LEGIT} color={modoColor} destacado={sitio === "legitimo"} />
-      <Etiqueta pos={[POS_LEGIT[0] - 0.35, 1.2, POS_LEGIT[2]]} df={11} fs={10.5} col={sitio === "legitimo" ? `${modoColor}cc` : undefined}>
+      <Etiqueta pos={[POS_LEGIT[0] - 0.35, 1.2, POS_LEGIT[2]]} df={11} fs={14} col={sitio === "legitimo" ? `${modoColor}cc` : undefined}>
         <i className="fa-solid fa-robot" style={{ color: modoColor }} />
         tutor-ia.ejemplo.mx · 198.51.100.7
       </Etiqueta>
@@ -829,7 +839,7 @@ function EscenaConsulta({
           <meshStandardMaterial ref={alarma} color={NO} emissive={NO} emissiveIntensity={1} toneMapped={false} />
         </mesh>
       </group>
-      <Etiqueta pos={[POS_FALSO[0] + 0.45, 2.35, POS_FALSO[2]]} df={11} fs={10.5} col={s && !s.legitimo ? `${NO}cc` : undefined}>
+      <Etiqueta pos={[POS_FALSO[0] + 0.45, 2.35, POS_FALSO[2]]} df={11} fs={14} col={s && !s.legitimo ? `${NO}cc` : undefined}>
         <i className="fa-solid fa-skull-crossbones" style={{ color: NO }} />
         Sitio de phishing · 203.0.113.66
       </Etiqueta>
@@ -846,7 +856,7 @@ function EscenaConsulta({
       {AFIRMACIONES_IA.map((a, i) => (
         <Tarjeta key={a.id} i={i} verificada={verificadas.includes(a.id)} decision={decisiones[a.id]} correcta={a.correcta} />
       ))}
-      <Etiqueta pos={[X_BANDA + 1.9, 0.05, Z_BANDA + 0.72]} df={11} fs={10.5} col={declarado ? `${OK}cc` : undefined}>
+      <Etiqueta pos={[X_BANDA + 1.9, 0.05, Z_BANDA + 0.72]} df={11} fs={14} col={declarado ? `${OK}cc` : undefined}>
         <i className={`fa-solid ${declarado ? "fa-file-circle-check" : "fa-magnifying-glass"}`} style={{ color: declarado ? OK : AMARILLO }} />
         {declarado ? "Uso de IA declarado en tu trabajo" : "Verificación de la respuesta"}
       </Etiqueta>
@@ -945,16 +955,16 @@ function TelefonoDesarmado() {
           </>,
         )}
       </group>
-      <Etiqueta pos={[1.2, 2.4, 0]} df={11} fs={10.5}>
+      <Etiqueta sec pos={[1.2, 2.4, 0]} df={11} fs={14}>
         Pantalla
       </Etiqueta>
-      <Etiqueta pos={[1.6, 1.85, 0]} df={11} fs={10.5}>
+      <Etiqueta pos={[1.6, 1.85, 0]} df={11} fs={14}>
         Tarjeta: cobre, plata, oro, paladio
       </Etiqueta>
-      <Etiqueta pos={[1.3, 1.3, 0]} df={11} fs={10.5}>
+      <Etiqueta pos={[1.3, 1.3, 0]} df={11} fs={14}>
         Batería de litio
       </Etiqueta>
-      <Etiqueta pos={[1.1, 0.75, 0]} df={11} fs={10.5}>
+      <Etiqueta sec pos={[1.1, 0.75, 0]} df={11} fs={14}>
         Carcasa
       </Etiqueta>
     </group>
@@ -1001,7 +1011,7 @@ function ColumnaHuella({ anios, modoColor }: { anios: number; modoColor: string 
         <meshBasicMaterial color="#e2e8f0" wireframe transparent opacity={0.25} />
       </mesh>
       <group ref={etq} position={[0, 0.2 + hUso + hInicial + 0.32, 0]}>
-        <Etiqueta pos={[0, 0, 0]} df={10} fs={12.5} col={`${modoColor}aa`}>
+        <Etiqueta pos={[0, 0, 0]} df={10} fs={14} col={`${modoColor}aa`}>
           <i className="fa-solid fa-smog" style={{ color: "#cbd5e1" }} />
           <span ref={lectura}>{num(huellaAnual(anios).total, 1)} kg CO₂e por año</span>
         </Etiqueta>
@@ -1013,7 +1023,7 @@ function ColumnaHuella({ anios, modoColor }: { anios: number; modoColor: string 
           <meshStandardMaterial color={k < anios ? modoColor : "#1e293b"} emissive={k < anios ? modoColor : "#000"} emissiveIntensity={k < anios ? 0.6 : 0} />
         </mesh>
       ))}
-      <Etiqueta pos={[0.9, -0.2, 1.45]} df={11} fs={10.5}>
+      <Etiqueta sec pos={[0.9, -0.2, 1.45]} df={11} fs={14}>
         <span style={{ color: "#cbd5e1" }}>■ fabricación repartida</span>
         <span style={{ color: AMARILLO }}>■ carga</span>
         <span style={{ color: "#94a3b8" }}>▢ cada {ANIOS_BASE} años</span>· {anios} {anios === 1 ? "año" : "años"} de uso
@@ -1234,15 +1244,15 @@ function EscenaDispositivo({ anios, destinoFinal, destinoNonce, lote, modoColor 
       <Basura activo={destinoFinal === "basura"} nonce={destinoNonce} />
       <Reciclaje activo={destinoFinal === "reciclaje"} nonce={destinoNonce} lote={lote} modoColor={modoColor} />
       <TelefonoViajero destino={destinoFinal} nonce={destinoNonce} />
-      <Etiqueta pos={[DESTINOS_POS.cajon[0], 1.4, DESTINOS_POS.cajon[2]]} df={11} fs={10.5} col={destinoFinal === "cajon" ? `${AMARILLO}cc` : undefined}>
+      <Etiqueta pos={[DESTINOS_POS.cajon[0], 1.4, DESTINOS_POS.cajon[2]]} df={11} fs={14} col={destinoFinal === "cajon" ? `${AMARILLO}cc` : undefined}>
         <i className="fa-solid fa-box-archive" style={{ color: AMARILLO }} />
         Cajón
       </Etiqueta>
-      <Etiqueta pos={[DESTINOS_POS.basura[0], 1.4, DESTINOS_POS.basura[2]]} df={11} fs={10.5} col={destinoFinal === "basura" ? `${NO}cc` : undefined}>
+      <Etiqueta pos={[DESTINOS_POS.basura[0], 1.4, DESTINOS_POS.basura[2]]} df={11} fs={14} col={destinoFinal === "basura" ? `${NO}cc` : undefined}>
         <i className="fa-solid fa-trash-can" style={{ color: NO }} />
         Basura común
       </Etiqueta>
-      <Etiqueta pos={[DESTINOS_POS.reciclaje[0] - 0.9, 1.25, DESTINOS_POS.reciclaje[2]]} df={11} fs={10.5} col={destinoFinal === "reciclaje" ? `${OK}cc` : undefined}>
+      <Etiqueta pos={[DESTINOS_POS.reciclaje[0] - 0.9, 1.25, DESTINOS_POS.reciclaje[2]]} df={11} fs={14} col={destinoFinal === "reciclaje" ? `${OK}cc` : undefined}>
         <i className="fa-solid fa-recycle" style={{ color: OK }} />
         Reciclaje formal
       </Etiqueta>
@@ -1255,13 +1265,14 @@ function EscenaDispositivo({ anios, destinoFinal, destinoNonce, lote, modoColor 
 export default function PaqueteInternetScene(p: PaqueteSceneProps) {
   const { vista, modoColor, resetNonce } = p;
   const cam = useMemo((): { pos: Pt; target: Pt } => {
-    if (vista === "viaje") return { pos: [0.2, 11.2, 9.4], target: [0.2, -0.9, 0.6] };
-    if (vista === "consulta") return { pos: [-0.6, 6.6, 11.6], target: [-0.5, 0.2, 0.3] };
-    return { pos: [0.4, 5.6, 10.8], target: [0.4, 0.4, 0.0] };
+    if (vista === "viaje") return { pos: [0.2, 10.5, 9.4], target: [0.2, -1.6, 0.6] };
+    if (vista === "consulta") return { pos: [-0.6, 5.9, 11.6], target: [-0.5, -0.5, 0.3] };
+    return { pos: [0.4, 4.9, 10.8], target: [0.4, -0.3, 0.0] };
   }, [vista]);
 
   return (
     <Canvas key={`${vista}-${resetNonce}`} shadows dpr={[1, 1.75]} camera={{ position: cam.pos, fov: 42 }} gl={{ antialias: true }}>
+      <DetallesCtx.Provider value={p.detalles}>
       <color attach="background" args={["#040a16"]} />
       <fog attach="fog" args={["#040a16", 20, 42]} />
       <ambientLight intensity={0.55} />
@@ -1304,6 +1315,7 @@ export default function PaqueteInternetScene(p: PaqueteSceneProps) {
         <Bloom intensity={0.35} luminanceThreshold={0.62} luminanceSmoothing={0.85} mipmapBlur />
         <Vignette eskil={false} offset={0.18} darkness={0.6} />
       </EffectComposer>
+      </DetallesCtx.Provider>
     </Canvas>
   );
 }

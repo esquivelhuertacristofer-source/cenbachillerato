@@ -19,8 +19,8 @@
  */
 
 import * as THREE from "three";
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, Environment, Lightformer, Html, RoundedBox } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import {
@@ -73,9 +73,9 @@ const OK = "#34d399";
 const WARN = "#fb923c";
 const hex = (c: ColorId) => COLORES[c].hex;
 
-function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number }) {
+function Etiqueta({ pos, children, col, fs = 14 }: { pos: Pt; children: ReactNode; col?: string; fs?: number }) {
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -466,14 +466,9 @@ function ObjetoClicable({
         <meshBasicMaterial transparent opacity={0} depthWrite={false} side={THREE.DoubleSide} toneMapped={false} />
       </mesh>
       <ModeloObjeto o={o} />
-      {estado === "hallado" && (
-        <Html position={[0, pared ? r + 0.12 : r * 1.6 + 0.2, 0]} center distanceFactor={10} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-          <div style={{ width: 22, height: 22, borderRadius: 999, background: OK, color: "#04121f", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 900, boxShadow: "0 4px 12px -4px #000" }}>✓</div>
-        </Html>
-      )}
       {numero !== null && (
-        <Html position={pared ? [r + 0.24, 0, 0.1] : o.noun === "pencil" ? [r + 0.12, 0.12, 0] : [0, r * 1.4 + 0.12, 0]} center distanceFactor={10} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-          <div data-co-num={numero} data-co-desc={nucleo(rasgosDe(o))} style={{ minWidth: 22, padding: "2px 6px", borderRadius: 7, background: "rgba(4,10,22,0.88)", border: "1px solid rgba(255,255,255,0.45)", color: "#fff", fontSize: 12, fontWeight: 900, textAlign: "center" }}>
+        <Html position={pared ? [r + 0.24, 0, 0.1] : o.noun === "pencil" ? [r + 0.12, 0.12, 0] : [0, r * 1.4 + 0.12, 0]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+          <div data-co-num={numero} data-co-desc={nucleo(rasgosDe(o))} style={{ minWidth: 22, padding: "2px 6px", borderRadius: 7, background: "rgba(4,10,22,0.88)", border: "1px solid rgba(255,255,255,0.45)", color: "#fff", fontSize: 14, fontWeight: 900, textAlign: "center" }}>
             {numero}
           </div>
         </Html>
@@ -828,7 +823,36 @@ function Persona({ pos, color, piel = "#e7b58f", pelo = "#2b1d14" }: { pos: Pt; 
   );
 }
 
+/** Casillas alternas del piso: una sola malla instanciada (63 casillas). */
+function Damero({ cols, rows, x0, z0, y, color }: { cols: number; rows: number; x0: number; z0: number; y: number; color: string }) {
+  const ref = useRef<THREE.InstancedMesh>(null);
+  useLayoutEffect(() => {
+    const m = ref.current;
+    if (!m) return;
+    const o = new THREE.Object3D();
+    let n = 0;
+    for (let i = 0; i < cols; i++) {
+      for (let j = 0; j < rows; j++) {
+        if ((i + j) % 2 !== 0) continue;
+        o.position.set(x0 + i, y, z0 + j);
+        o.rotation.set(-Math.PI / 2, 0, 0);
+        o.updateMatrix();
+        m.setMatrixAt(n++, o.matrix);
+      }
+    }
+    m.count = n;
+    m.instanceMatrix.needsUpdate = true;
+  }, [cols, rows, x0, z0, y]);
+  return (
+    <instancedMesh ref={ref} args={[undefined, undefined, cols * rows]} frustumCulled={false}>
+      <planeGeometry args={[1, 1]} />
+      <meshStandardMaterial color={color} roughness={0.9} />
+    </instancedMesh>
+  );
+}
+
 function ObjetosPerdidos({ estante, tuyoId, coinciden, equivocadoId, recuperados, burbuja, modoColor }: { estante: Objeto[]; tuyoId: string | null; coinciden: string[]; equivocadoId: string | null; recuperados: string[]; burbuja: string; modoColor: string }) {
+  const estrecho = useThree((s) => s.size.width) < 640;
   const flecha = useRef<THREE.Group>(null);
   const tuyo = estante.find((o) => o.id === tuyoId) ?? null;
   const pt = tuyo ? posCubo(tuyo.slot) : null;
@@ -841,16 +865,7 @@ function ObjetosPerdidos({ estante, tuyoId, coinciden, equivocadoId, recuperados
         <boxGeometry args={[14, 0.1, 9]} />
         <Clay color="#a7b1bf" />
       </mesh>
-      {Array.from({ length: 14 }, (_, i) =>
-        Array.from({ length: 9 }, (_, j) =>
-          (i + j) % 2 === 0 ? (
-            <mesh key={`${i}-${j}`} position={[-6.5 + i, 0.003, -3.5 + j]} rotation={[-Math.PI / 2, 0, 0]}>
-              <planeGeometry args={[1, 1]} />
-              <meshStandardMaterial color="#c3cad5" roughness={0.9} />
-            </mesh>
-          ) : null,
-        ),
-      )}
+      <Damero cols={14} rows={9} x0={-6.5} z0={-3.5} y={0.003} color="#c3cad5" />
       <mesh position={[0, 2.8, -2.35]} receiveShadow>
         <boxGeometry args={[14, 5.8, 0.2]} />
         <Clay color="#d3dbe6" />
@@ -903,8 +918,8 @@ function ObjetosPerdidos({ estante, tuyoId, coinciden, equivocadoId, recuperados
               <meshStandardMaterial color="#f472b6" emissive="#f472b6" emissiveIntensity={0.9} toneMapped={false} />
             </mesh>
           </group>
-          <Html position={[0.46, 0.02, 0]} center distanceFactor={10} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-            <div data-co-tuyo={tuyo ? nucleo(rasgosDe(tuyo)) : ""} style={{ padding: "3px 8px", borderRadius: 7, background: "#f472b6", color: "#1e1b2e", fontSize: 11, fontWeight: 900, whiteSpace: "nowrap" }}>Tu objeto</div>
+          <Html position={[0.46, 0.02, 0]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+            <div data-co-tuyo={tuyo ? nucleo(rasgosDe(tuyo)) : ""} style={{ padding: "3px 8px", borderRadius: 7, background: "#f472b6", color: "#1e1b2e", fontSize: 14, fontWeight: 900, whiteSpace: "nowrap" }}>Tu objeto</div>
           </Html>
         </group>
       )}
@@ -920,7 +935,8 @@ function ObjetosPerdidos({ estante, tuyoId, coinciden, equivocadoId, recuperados
       <group position={[-4.25, 0.3, 0.35]} scale={1.25}>
         <Persona pos={[0, 0, 0]} color="#0f766e" />
       </group>
-      <Html position={[-4.25, 3.05, 0.35]} distanceFactor={10} zIndexRange={[20, 0]} style={{ pointerEvents: "none", transform: "translate(-30%, -100%)" }}>
+      {!estrecho && (
+      <Html position={[-4.25, 3.05, 0.35]} zIndexRange={[20, 0]} style={{ pointerEvents: "none", transform: "translate(-30%, -100%)" }}>
         <div
           style={{
             width: 190,
@@ -928,7 +944,7 @@ function ObjetosPerdidos({ estante, tuyoId, coinciden, equivocadoId, recuperados
             borderRadius: 13,
             background: "#ffffff",
             color: "#0f172a",
-            fontSize: 12.5,
+            fontSize: 14,
             fontWeight: 800,
             lineHeight: 1.35,
             boxShadow: "0 8px 20px -8px #000",
@@ -937,6 +953,7 @@ function ObjetosPerdidos({ estante, tuyoId, coinciden, equivocadoId, recuperados
           {burbuja}
         </div>
       </Html>
+      )}
     </group>
   );
 }
@@ -1126,17 +1143,17 @@ function Marcador({ s, numero, activo, onPick }: { s: SpotId; numero: number; ac
         <cylinderGeometry args={[0.4, 0.4, 0.6, 16]} />
         <meshBasicMaterial transparent opacity={0} depthWrite={false} />
       </mesh>
-      <Html position={[0.36, 0.1, 0.36]} center distanceFactor={10} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+      <Html position={[0.36, 0.1, 0.36]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
         <div
           data-co-spot={numero}
           style={{
-            width: 22,
-            height: 22,
+            width: 26,
+            height: 26,
             borderRadius: 999,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: 12,
+            fontSize: 14,
             fontWeight: 900,
             background: activo ? "#fbbf24" : "rgba(4,10,22,0.85)",
             color: activo ? "#1e1b2e" : "#fff",
@@ -1308,7 +1325,7 @@ function Recamara({ ubic, seleccion, intento, marcaFrase, onPickMovible, onPickS
         <Movible key={m} m={m} spotActual={ubic[m]} seleccionado={seleccion === m} intento={intento} onPick={onPickMovible} />
       ))}
       {marcaFrase && (
-        <Etiqueta pos={[SPOT_POS[marcaFrase.spot].p[0], SPOT_POS[marcaFrase.spot].p[1] + (SPOT_POS[marcaFrase.spot].p[1] > 0.2 ? 1.0 : 0.72), SPOT_POS[marcaFrase.spot].p[2]]} df={10} col={marcaFrase.ok ? OK : WARN} fs={12}>
+        <Etiqueta pos={[SPOT_POS[marcaFrase.spot].p[0], SPOT_POS[marcaFrase.spot].p[1] + (SPOT_POS[marcaFrase.spot].p[1] > 0.2 ? 1.0 : 0.72), SPOT_POS[marcaFrase.spot].p[2]]} col={marcaFrase.ok ? OK : WARN} >
           <span style={{ color: marcaFrase.ok ? OK : WARN }}>{marcaFrase.ok ? "✓" : "✗"}</span>
           {marcaFrase.texto}
         </Etiqueta>
@@ -1322,9 +1339,9 @@ function Recamara({ ubic, seleccion, intento, marcaFrase, onPickMovible, onPickS
 export default function CasaObjetosInglesScene(p: CasaSceneProps) {
   const { vista, modoColor, resetNonce } = p;
   const cam = useMemo((): { pos: Pt; target: Pt; min: number; max: number } => {
-    if (vista === "buscar") return { pos: [0, 5.0, 9.9], target: [0, 1.45, -1.2], min: 4, max: 17 };
-    if (vista === "perdidos") return { pos: [-0.6, 3.3, 11.2], target: [-0.6, 2.35, -0.8], min: 4, max: 17 };
-    return { pos: [0.5, 6.2, 9.4], target: [0, 0.55, -0.7], min: 4, max: 16 };
+    if (vista === "buscar") return { pos: [0, 5.2, 11.2], target: [0, 1.0, -1.2], min: 4, max: 17 };
+    if (vista === "perdidos") return { pos: [-0.6, 3.5, 12.4], target: [-0.6, 1.9, -0.8], min: 4, max: 17 };
+    return { pos: [0.5, 6.4, 10.6], target: [0, 0.1, -0.7], min: 4, max: 16 };
   }, [vista]);
 
   return (

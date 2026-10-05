@@ -1,0 +1,12 @@
+{
+  "escena": "Un salón lleno de canicas azules y una regla logarítmica que marca tu estimación. Cada factor tiene un deslizador.",
+  "pregunta": "Si el diámetro de la canica se duplica, ¿cuántas canicas caben en el salón?",
+  "opciones": [
+    { "id": "a", "texto": "La mitad", "icono": "fa-divide" },
+    { "id": "b", "texto": "Ocho veces menos", "icono": "fa-cube" },
+    { "id": "c", "texto": "Cuatro veces menos", "icono": "fa-square" }
+  ],
+  "correcta": "b",
+  "porque": "El volumen de una esfera crece con el cubo del diámetro: al duplicarlo, cada canica ocupa 2³ = 8 veces más espacio. Caben ocho veces menos, y tu estimación baja casi un orden de magnitud.",
+  "comoComprobarlo": "En «Problemas de Fermi» elige «Canicas en un salón», anota tu estimación y mueve el deslizador del diámetro al doble. Compara la regla logarítmica."
+}

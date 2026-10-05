@@ -1,28 +1,33 @@
-﻿"use client";
+"use client";
 
 /**
  * Laboratorio — Asking and answering about processes in English
  * Práctica experimental para IN-V-P03-A4 (Inglés V · A2+/B1).
  *
- * Interactividad máxima. Cuatro modos: los tres de arrastrar/clasificar y, al
- * final, uno que se escribe («Completa el texto», verbatim de la progresión):
- *  1. «Order the process» — ordena con conectores de procedimiento (First →
- *     Then → After that → Finally → As a result) los cinco eslabones del
- *     sistema de purificación de agua de la entrevista de A1.
- *  2. «Classify the structure» — clasifica diez estructuras en inglés según su
- *     función: preguntar por un proceso, por una razón, pedir una explicación o
- *     describir con voz pasiva (A1 + A5).
- *  3. «Match structure and meaning» — empareja cada estructura del glosario A5
- *     con su definición verbatim.
- *  + Cuestionario de comprensión (True/False verbatim de A4).
+ * EXPERIMENTO CENTRAL: «Give instructions». Un personaje FICTICIO (Marta en la
+ * cocina, Tomás en el taller) sigue AL PIE DE LA LETRA las instrucciones en
+ * inglés que elige el alumno (conectores First/Then/After that/Finally,
+ * imperativos). Si el orden, el conector o la forma verbal fallan, el resultado
+ * se ve mal (derrames, olla quemada, entrega incompleta) y se explica la regla
+ * en español. Al terminar, el informe se redacta en voz pasiva. La lógica vive
+ * en `procesos-ingles-sim.ts`; la «calidad» es un valor de simulación.
  *
- * DOM puro (sin three.js): ligero, accesible (ratón, teclado y táctil mediante
- * clic-para-seleccionar / clic-para-colocar). Contenido VERBATIM de IN-V·P03.
+ * Modos (los cuatro de siempre se conservan, en `Mesa`, porque las misiones y
+ * las estrellas dependen de ellos):
+ *  0. «Give instructions» — el simulador.
+ *  1. «Order the process» — ordena los cinco eslabones del sistema de agua (A1).
+ *  2. «Classify the structure» — clasifica diez estructuras por su función.
+ *  3. «Match structure and meaning» — empareja el glosario A5.
+ *  4. «Complete the text» — escribir (fill_blanks verbatim).
+ *  + Reto: cuestionario V/F verbatim de A4. Teoría: ficha y datos verbatim.
+ *
+ * DOM puro (sin three.js). Contenido VERBATIM de IN-V·P03.
  */
 
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import type { PracticaLabProps } from "../registry";
-import { T, OK, card, Eyebrow } from "./_kit";
+import { T, OK, Eyebrow } from "./_kit";
+import { LabShell, Bloque, Mesa, BotonHerramienta } from "./_shell";
 import { LabSfx } from "./lab-audio";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { PROCESOS_INGLES_HUECOS } from "./procesos-ingles-huecos";
@@ -38,15 +43,31 @@ import {
   DATO_PROCESOS,
   type Funcion,
 } from "./procesos-ingles-data";
+import {
+  RECETAS,
+  recetaDe,
+  estadoInicial,
+  opcionesPaso,
+  elegirPaso,
+  opcionesInforme,
+  elegirInforme,
+  type Estado,
+  type Opcion,
+  type OpcionInforme,
+  type Receta,
+} from "./procesos-ingles-sim";
 
 const NO = "#FF5E5E";
+const AMBAR = "#FFC75A";
 import { useEstrellas } from "@/lib/hooks/useEstrellas";
 import { FondoTermino, VinetaTermino } from "./_vineta";
 const RETO_KEY = "cen-procesos-ingles-reto";
+const RUTA_SIM = "/media/labs-sim/procesos-ingles";
 
-type Modo = "orden" | "clasifica" | "glosario" | "texto";
+type Modo = "sim" | "orden" | "clasifica" | "glosario" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
+  { id: "sim", label: "Give instructions", icono: "fa-person-chalkboard" },
   { id: "orden", label: "Order the process", icono: "fa-arrow-down-up-across-line" },
   { id: "clasifica", label: "Classify the structure", icono: "fa-table-columns" },
   { id: "glosario", label: "Match structure and meaning", icono: "fa-book-open" },
@@ -55,12 +76,11 @@ const MODOS: { id: Modo; label: string; icono: string }[] = [
 
 export function LabProcesosIngles({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
-  const [modo, setModo] = useState<Modo>("orden");
+  const [modo, setModo] = useState<Modo>("sim");
 
   // ── sonido ────────────────────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   // Modo «Completa el texto». El contador sirve de `key`: subirlo remonta
   // el componente y devuelve todos los huecos en blanco.
   const [textoDone, setTextoDone] = useState(false);
@@ -89,6 +109,29 @@ export function LabProcesosIngles({ color }: PracticaLabProps) {
     partida.acierto();
     return sonido && audioRef.current?.blip();
   };
+
+  // ── modo Simulador (Marta / Tomás siguen las instrucciones) ────────────
+  const [sim, setSim] = useState<Estado>(() => estadoInicial(RECETAS[0]!.id));
+  const receta = recetaDe(sim.receta);
+  const dioPaso = (o: Opcion) => {
+    const nx = elegirPaso(receta, sim, o);
+    setSim(nx);
+    if (o.tipo === "bien") {
+      sfxPlace();
+      if (nx.final === "bien") sfxOk();
+    } else {
+      sfxNo();
+    }
+  };
+  const dioInforme = (o: OpcionInforme) => {
+    setSim(elegirInforme(sim, o));
+    if (o.correcta) sfxPlace();
+    else sfxNo();
+  };
+  const cambiarReceta = (id: string) => setSim(estadoInicial(id));
+  const resetSim = () => setSim(estadoInicial(sim.receta));
+  const simDone = sim.final === "bien";
+  const informeDone = sim.final === "bien" && sim.informe >= receta.pasos.length && sim.informeFallas === 0;
 
   // ── modo Orden (ordena secuencialmente los pasos) ──────────────────────
   const [ordenPos, setOrdenPos] = useState(0);
@@ -192,6 +235,8 @@ export function LabProcesosIngles({ color }: PracticaLabProps) {
   };
 
   const objetivos = [
+    { txt: "Dale instrucciones a Marta o a Tomás hasta terminar su proceso", done: simDone },
+    { txt: "Redacta el informe del proceso en voz pasiva sin fallas", done: informeDone },
     { txt: "Ordena los 5 pasos del proceso con sus conectores", done: ordenDone },
     { txt: "Clasifica las 10 estructuras por su función", done: clasificaDone },
     { txt: "Empareja las 6 estructuras del glosario", done: glosarioDone },
@@ -253,310 +298,459 @@ export function LabProcesosIngles({ color }: PracticaLabProps) {
     setTextoDone(false);
     setTextoIntento((n) => n + 1);
   };
-  const resetActual = modo === "texto" ? resetTexto : modo === "orden" ? resetOrden : modo === "clasifica" ? resetClasifica : resetGlosario;
+  const resetActual = modo === "texto" ? resetTexto : modo === "sim" ? resetSim : modo === "orden" ? resetOrden : modo === "clasifica" ? resetClasifica : resetGlosario;
+
+  const lectura =
+    modo === "sim"
+      ? sim.final === "no"
+        ? `${receta.personaje}: paso ${Math.min(sim.paso + 1, receta.pasos.length)} de ${receta.pasos.length} · calidad ${sim.calidad}`
+        : `Proceso terminado · calidad ${sim.calidad} (simulación)`
+      : `${modosHechos}/4 modos · ${bestEstrellas}★`;
+
+  const escena = (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
+      <style>{ESTILOS(accent, color.rgba)}</style>
+
+      {/* MODO — completa el texto (fill_blanks verbatim de la progresión) */}
+      {modo === "texto" && (
+        <CompletaTexto
+          key={textoIntento}
+          data={PROCESOS_INGLES_HUECOS}
+          accent={accent}
+          rgba={color.rgba}
+          completado={textoDone}
+          onCompletado={() => {
+            setTextoDone(true);
+            sfxOk();
+          }}
+          onAcierto={sfxPlace}
+          onError={sfxNo}
+        />
+      )}
+
+      {/* MODO 0 — Give instructions */}
+      {modo === "sim" && (
+        <SimInstrucciones accent={accent} receta={receta} estado={sim} onReceta={cambiarReceta} onPaso={dioPaso} onInforme={dioInforme} onReiniciar={resetSim} />
+      )}
+
+      {/* MODO 1 — Order the process */}
+      {modo === "orden" && (
+        <Mesa>
+          <div className="prc-panel">
+            <div className="prc-cab">
+              <Eyebrow>Order the water purification process</Eyebrow>
+              <span style={{ fontSize: 14, fontWeight: 800, color: ordenDone ? OK : T.text3 }}>
+                {ordenPos}/{PASOS.length}
+              </span>
+            </div>
+            <div className="prc-nota">
+              Arrastra el <strong style={{ color: T.text2 }}>siguiente paso</strong> al hueco activo, siguiendo los conectores: First → Then → After that → Finally → As a result.
+            </div>
+            {ordenLibres.length === 0 ? (
+              <div className="prc-ok">
+                <i className="fa-solid fa-circle-check" /> ¡Reconstruiste el proceso completo!
+              </div>
+            ) : (
+              <div className="prc-chips">
+                {ordenLibres.map((p) => (
+                  <button key={p.id} className="prc-chip" data-sel={selO === p.id} onClick={() => setSelO((s) => (s === p.id ? null : p.id))} {...dragProps(p.id)}>
+                    {p.texto}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <ProcesoOrden selO={selO} shakeO={shakeO} ordenPos={ordenPos} onMatch={intentarOrden} dropProps={dropProps} />
+        </Mesa>
+      )}
+
+      {/* MODO 2 — Classify the structure */}
+      {modo === "clasifica" && (
+        <Mesa>
+          <div className="prc-panel">
+            <div className="prc-cab">
+              <Eyebrow>Arrastra cada estructura a su función</Eyebrow>
+              <span style={{ fontSize: 14, fontWeight: 800, color: clasificaDone ? OK : T.text3 }}>
+                {Object.keys(ubicadoC).length}/{ESTRUCTURAS.length}
+              </span>
+            </div>
+            <div className="prc-nota">
+              ¿La frase pregunta por un <strong style={{ color: T.text2 }}>proceso</strong>, por una <strong style={{ color: T.text2 }}>razón</strong>, pide una <strong style={{ color: T.text2 }}>explicación</strong> o describe con <strong style={{ color: T.text2 }}>voz pasiva</strong>?
+            </div>
+            {clasificaLibres.length === 0 ? (
+              <div className="prc-ok">
+                <i className="fa-solid fa-circle-check" /> ¡Clasificaste las {ESTRUCTURAS.length} estructuras!
+              </div>
+            ) : (
+              <div className="prc-chips">
+                {clasificaLibres.map((x) => (
+                  <button key={x.id} className="prc-chip" data-sel={selC === x.id} onClick={() => setSelC((s) => (s === x.id ? null : x.id))} {...dragProps(x.id)}>
+                    {x.texto}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <BinsFuncion selC={selC} shakeC={shakeC} ubicadoC={ubicadoC} onMatch={intentarClasifica} dropProps={dropProps} />
+        </Mesa>
+      )}
+
+      {/* MODO 3 — Glosario */}
+      {modo === "glosario" && (
+        <Mesa>
+          <div className="prc-panel">
+            <div className="prc-cab">
+              <Eyebrow>Arrastra cada estructura a su definición</Eyebrow>
+              <span style={{ fontSize: 14, fontWeight: 800, color: glosarioDone ? OK : T.text3 }}>
+                {Object.keys(empGlos).length}/{PARES.length}
+              </span>
+            </div>
+            {glosLibres.length === 0 ? (
+              <div className="prc-ok">
+                <i className="fa-solid fa-circle-check" /> ¡Emparejaste las 6 estructuras!
+              </div>
+            ) : (
+              <div className="prc-chips">
+                {glosLibres.map((g) => (
+                  <button key={g.id} className="prc-chip" data-sel={selGlos === g.id} onClick={() => setSelGlos((s) => (s === g.id ? null : g.id))} {...dragProps(g.id)}>
+                    <i className="fa-solid fa-quote-left" style={{ fontSize: 14, color: T.text3 }} />
+                    {g.termino}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <RowsGlosario selGlos={selGlos} shakeGlos={shakeGlos} empGlos={empGlos} onMatch={intentarGlos} dropProps={dropProps} />
+        </Mesa>
+      )}
+    </div>
+  );
+
+  const pistaDe: Record<Modo, React.ReactNode> = {
+    sim: (
+      <>
+        Las instrucciones usan el verbo en forma base: <strong style={{ color: T.text }}>Pour milk</strong>, no «pouring» ni «to pour». Los conectores van en orden: <strong style={{ color: T.text }}>First, Then, After that, Finally</strong>. Y el informe del proceso va en voz pasiva.
+      </>
+    ),
+    orden: (
+      <>
+        Los conectores marcan el orden: <strong style={{ color: T.text }}>First</strong> (primero), <strong style={{ color: T.text }}>Then</strong> (luego), <strong style={{ color: T.text }}>After that</strong> (después), <strong style={{ color: T.text }}>Finally</strong> (finalmente) y <strong style={{ color: T.text }}>As a result</strong> (como resultado).
+      </>
+    ),
+    clasifica: (
+      <>
+        <strong style={{ color: T.text }}>How/What</strong> preguntan por el proceso; <strong style={{ color: T.text }}>Why</strong> por la razón; <strong style={{ color: T.text }}>Can/Could you explain</strong> piden una explicación; <strong style={{ color: T.text }}>is/are + participio</strong> es voz pasiva.
+      </>
+    ),
+    glosario: <>Lee primero la definición y su ejemplo; luego suelta la estructura en inglés que le corresponde.</>,
+    texto: <>Escribe la palabra o estructura que falta en cada hueco.</>,
+  };
 
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes prcShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
-        @keyframes prcPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
-        .prc-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 16px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .prc-tab:hover { border-color:${T.lineStrong}; color:#fff; }
-        .prc-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-        .prc-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
-          font-size:14px; border:1px solid ${T.line}; background:${T.glass}; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .prc-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
-        .prc-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .prc-chip { cursor:grab; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 16px; border-radius:14px;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:13.5px; font-weight:700; transition:all .14s; user-select:none; max-width:380px; text-align:left; line-height:1.4; }
-        .prc-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); }
-        .prc-chip[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.2); box-shadow:0 0 16px -5px ${accent}; }
-        .prc-chip:active { cursor:grabbing; }
-        .prc-row { border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:14px 16px; transition:all .16s; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
-        .prc-row[data-shake="true"] { animation:prcShake .4s; border-color:${NO}; }
-        .prc-row[data-done="true"] { border-color:${OK}66; background:${OK}0f; }
-        .prc-slot { flex-shrink:0; min-width:180px; min-height:42px; border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset};
-          display:inline-flex; align-items:center; justify-content:center; color:${T.text3}; font-size:12.5px; transition:all .16s; cursor:pointer; padding:4px 10px; }
-        .prc-slot[data-armed="true"] { border-color:${accent}; background:rgba(${color.rgba},0.1); }
-        .prc-bin { border-radius:15px; border:1.5px solid ${T.line}; background:${T.glass}; padding:15px; transition:all .16s; min-height:200px; }
-        .prc-bin[data-shake="true"] { animation:prcShake .4s; border-color:${NO}; }
-        .prc-fslot { border-radius:13px; border:1.5px dashed ${T.lineStrong}; background:${T.inset}; padding:14px 16px; transition:all .16s;
-          display:flex; align-items:center; gap:12px; color:${T.text3}; font-size:13.5px; cursor:pointer; }
-        .prc-fslot[data-armed="true"] { border-color:${accent}; background:rgba(${color.rgba},0.1); color:#fff; }
-        .prc-fslot[data-shake="true"] { animation:prcShake .4s; border-color:${NO}; }
-        .prc-step { border-radius:13px; border:1.5px solid ${OK}66; background:${OK}0f; padding:13px 16px; display:flex; align-items:flex-start; gap:12px; animation:prcPop .25s ease; }
-        .prc-locked { border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:13px 16px; display:flex; align-items:center; gap:12px; opacity:0.45; }
-        .prc-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
-          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
-        .prc-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
-        .prc-q:disabled{ cursor:default; }
-        .prc-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
-          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .prc-btn:hover { border-color:${T.lineStrong}; }
-        .prc-divider { height:1px; background:${T.line}; margin:18px 0; }
-        @media (prefers-reduced-motion: reduce){ .prc-row[data-shake="true"], .prc-bin[data-shake="true"], .prc-fslot[data-shake="true"] { animation:none; } }
-
-        /* Cajón de teoría */
-        .prc-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .prc-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .prc-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .prc-drawer[data-open="true"] { transform:translateX(0); }
-        .prc-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .prc-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .prc-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .prc-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .prc-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .prc-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .prc-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
-
-        /* Identidad del tablero */
-        .prc-bin, .prc-row { --tono:188; position:relative;
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
-        .prc-bin:nth-of-type(6n+1), .prc-row:nth-of-type(6n+1) { --tono:188; }
-        .prc-bin:nth-of-type(6n+2), .prc-row:nth-of-type(6n+2) { --tono:262; }
-        .prc-bin:nth-of-type(6n+3), .prc-row:nth-of-type(6n+3) { --tono:44; }
-        .prc-bin:nth-of-type(6n+4), .prc-row:nth-of-type(6n+4) { --tono:152; }
-        .prc-bin:nth-of-type(6n+5), .prc-row:nth-of-type(6n+5) { --tono:330; }
-        .prc-bin:nth-of-type(6n+6), .prc-row:nth-of-type(6n+6) { --tono:18; }
-        .prc-bin::before, .prc-row::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
-          background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
-        .prc-bin[data-done="true"], .prc-row[data-done="true"] {
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.2) 0%, transparent 68%); }
-        .prc-chip { transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
-        .prc-chip:hover { transform:translateY(-2px); }
-        .prc-chip[data-sel="true"] { transform:translateY(-3px) scale(1.02); }
-        @media (prefers-reduced-motion: reduce){
-          .prc-chip, .prc-chip:hover, .prc-chip[data-sel="true"] { transform:none; transition:none; }
-        }
-      `}</style>
-
-      {/* selector de modo + toolbar */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="prc-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="prc-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="prc-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="prc-icobtn" onClick={resetActual} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <button className="prc-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="prc-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="prc-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="prc-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="prc-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="prc-drawer-body">
-          <FichaTeorica data={PROCESOS_INGLES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}>
-        {/* ── Columna principal ─────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
-          {/* MODO 1 — Order the process */}
-          {/* MODO — completa el texto (fill_blanks verbatim de la progresión) */}
-          {modo === "texto" && (
-            <CompletaTexto
-              key={textoIntento}
-              data={PROCESOS_INGLES_HUECOS}
-              accent={accent}
-              rgba={color.rgba}
-              completado={textoDone}
-              onCompletado={() => {
-                setTextoDone(true);
-                sfxOk();
-              }}
-              onAcierto={sfxPlace}
-              onError={sfxNo}
-            />
-          )}
-
-          {modo === "orden" && (
+    <LabShell
+      dom
+      accent={accent}
+      rgba={color.rgba}
+      escena={escena}
+      modos={{ opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })), valor: modo, cambiar: (id) => setModo(id as Modo) }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo={modo === "sim" ? "Reiniciar la simulación" : "Reiniciar este modo"} onClick={resetActual} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      retoKey={RETO_KEY}
+      pestanas={[
+        {
+          id: "pistas",
+          etiqueta: "Pistas",
+          icono: "fa-lightbulb",
+          contenido: (
             <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Order the water purification process</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: ordenDone ? OK : T.text3 }}>
-                    {ordenPos}/{PASOS.length}
-                  </span>
-                </div>
-                <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 14, lineHeight: 1.5 }}>
-                  Arrastra el <strong style={{ color: T.text2 }}>siguiente paso</strong> al hueco activo, siguiendo los conectores: First → Then → After that → Finally → As a result.
-                </div>
-                {ordenLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Reconstruiste el proceso completo!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {ordenLibres.map((p) => (
-                      <button key={p.id} className="prc-chip" data-sel={selO === p.id} onClick={() => setSelO((s) => (s === p.id ? null : p.id))} {...dragProps(p.id)}>
-                        {p.texto}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <ProcesoOrden selO={selO} shakeO={shakeO} ordenPos={ordenPos} onMatch={intentarOrden} dropProps={dropProps} />
-            </>
-          )}
-
-          {/* MODO 2 — Classify the structure */}
-          {modo === "clasifica" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada estructura a su función</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: clasificaDone ? OK : T.text3 }}>
-                    {Object.keys(ubicadoC).length}/{ESTRUCTURAS.length}
-                  </span>
-                </div>
-                <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 14, lineHeight: 1.5 }}>
-                  ¿La frase pregunta por un <strong style={{ color: T.text2 }}>proceso</strong>, por una <strong style={{ color: T.text2 }}>razón</strong>, pide una <strong style={{ color: T.text2 }}>explicación</strong> o describe con <strong style={{ color: T.text2 }}>voz pasiva</strong>?
-                </div>
-                {clasificaLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Clasificaste las {ESTRUCTURAS.length} estructuras!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {clasificaLibres.map((x) => (
-                      <button key={x.id} className="prc-chip" data-sel={selC === x.id} onClick={() => setSelC((s) => (s === x.id ? null : x.id))} {...dragProps(x.id)}>
-                        {x.texto}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <BinsFuncion selC={selC} shakeC={shakeC} ubicadoC={ubicadoC} onMatch={intentarClasifica} dropProps={dropProps} />
-            </>
-          )}
-
-          {/* MODO 3 — Glosario */}
-          {modo === "glosario" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada estructura a su definición</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: glosarioDone ? OK : T.text3 }}>
-                    {Object.keys(empGlos).length}/{PARES.length}
-                  </span>
-                </div>
-                {glosLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Emparejaste las 6 estructuras!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {glosLibres.map((g) => (
-                      <button key={g.id} className="prc-chip" data-sel={selGlos === g.id} onClick={() => setSelGlos((s) => (s === g.id ? null : g.id))} {...dragProps(g.id)}>
-                        <i className="fa-solid fa-quote-left" style={{ fontSize: 11, color: T.text3 }} />
-                        {g.termino}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <RowsGlosario selGlos={selGlos} shakeGlos={shakeGlos} empGlos={empGlos} onMatch={intentarGlos} dropProps={dropProps} />
-            </>
-          )}
-        </div>
-
-        {/* ── Columna lateral ───────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? OK : T.text2 }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-                  <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="prc-divider" />
-
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", color: T.text3, textTransform: "uppercase" }}>Puntuación</div>
-                <div style={{ display: "flex", gap: 4, marginTop: 5 }}>
+              <Bloque titulo="Tu partida" icono="fa-gauge-high">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+                <div style={{ display: "flex", gap: 4 }}>
                   {[1, 2, 3].map((s) => (
-                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 18, color: s <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
+                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 20, color: s <= bestEstrellas ? AMBAR : "rgba(255,255,255,0.16)" }} />
                   ))}
                 </div>
-              </div>
-              <div style={{ textAlign: "right", maxWidth: 180 }}>
-                <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45 }}>
-                  {bestEstrellas >= 3 ? "¡Ya describes procesos en inglés con soltura!" : "Termina los tres modos para ganar 2★; la tercera pide 2 errores o menos."}
+                <div style={{ fontSize: 14, color: T.text2 }}>
+                  {bestEstrellas >= 3 ? "¡Ya describes procesos en inglés con soltura!" : "Termina los modos de ordenar, clasificar y emparejar para ganar estrellas; la tercera pide 2 errores o menos."}
                 </div>
+              </Bloque>
+              <Bloque titulo="Pista de este modo" icono="fa-lightbulb">
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55 }}>{pistaDe[modo]}</div>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-clipboard-question",
+          contenido: <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />,
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Teoría de la práctica" icono="fa-book-open">
+                <FichaTeorica data={PROCESOS_INGLES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <Bloque titulo="Estructuras clave" icono="fa-link">
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {PARES.map((p) => (
+                    <div key={p.id} style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                      <strong style={{ color: T.text }}>{p.termino}</strong> {p.definicion}
+                      <div style={{ fontStyle: "italic", color: T.text3, marginTop: 2 }}>{p.ejemplo}</div>
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+              <Bloque titulo="Dato" icono="fa-circle-info">
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55 }}>{DATO_PROCESOS}</div>
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Estilos
+ * ═══════════════════════════════════════════════════════════════════════════ */
+const ESTILOS = (accent: string, rgba: string) => `
+  @keyframes prcShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
+  @keyframes prcPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
+  .prc-panel { border-radius:16px; border:1px solid ${T.line}; background:${T.glass}; padding:14px 16px; display:flex; flex-direction:column; gap:10px; min-width:0; }
+  .prc-cab { display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+  .prc-cab p { margin:0; }
+  .prc-nota { font-size:14px; color:${T.text3}; line-height:1.5; }
+  .prc-ok { font-size:14px; color:${OK}; font-weight:700; display:flex; align-items:center; gap:9px; }
+  .prc-chips { display:flex; flex-wrap:wrap; gap:10px; }
+  .prc-chip { cursor:grab; display:inline-flex; align-items:center; justify-content:flex-start; gap:8px; padding:11px 14px; border-radius:14px;
+    border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:14px; font-weight:700; user-select:none; max-width:100%; text-align:left; line-height:1.4;
+    transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
+  .prc-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); transform:translateY(-2px); }
+  .prc-chip[data-sel="true"] { border-color:${accent}; background:rgba(${rgba},0.2); box-shadow:0 0 16px -5px ${accent}; transform:translateY(-3px) scale(1.02); }
+  .prc-chip:active { cursor:grabbing; }
+  .prc-chip[data-arrastrando="true"] { opacity:.4; }
+  .prc-row { border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:12px 14px; transition:all .16s; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .prc-row[data-shake="true"] { animation:prcShake .4s; border-color:${NO}; }
+  .prc-row[data-done="true"] { border-color:${OK}66; background:${OK}0f; }
+  .prc-row[data-sobre="true"], .prc-fslot[data-sobre="true"], .prc-bin[data-sobre="true"] { border-color:${accent}; background:rgba(${rgba},0.12); }
+  .prc-slot { flex:0 1 190px; min-width:0; min-height:42px; border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset};
+    display:inline-flex; align-items:center; justify-content:center; color:${T.text3}; font-size:14px; transition:all .16s; cursor:pointer; padding:4px 10px; text-align:center; }
+  .prc-slot[data-armed="true"] { border-color:${accent}; background:rgba(${rgba},0.1); }
+  .prc-bins { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap:12px; }
+  .prc-bin { position:relative; isolation:isolate; border-radius:15px; border:1.5px solid ${T.line}; background:${T.glass}; padding:14px; transition:all .16s; min-height:150px; }
+  .prc-bin[data-shake="true"] { animation:prcShake .4s; border-color:${NO}; }
+  .prc-fslot { border-radius:13px; border:1.5px dashed ${T.lineStrong}; background:${T.inset}; padding:12px 14px; transition:all .16s;
+    display:flex; align-items:center; gap:12px; color:${T.text3}; font-size:14px; cursor:pointer; }
+  .prc-fslot[data-armed="true"] { border-color:${accent}; background:rgba(${rgba},0.1); color:#fff; }
+  .prc-fslot[data-shake="true"] { animation:prcShake .4s; border-color:${NO}; }
+  .prc-step { border-radius:13px; border:1.5px solid ${OK}66; background:${OK}0f; padding:12px 14px; display:flex; align-items:flex-start; gap:12px; animation:prcPop .25s ease; }
+  .prc-locked { border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:12px 14px; display:flex; align-items:center; gap:12px; opacity:0.5; }
+  .prc-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
+    border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
+  .prc-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
+  .prc-q:disabled{ cursor:default; }
+  .prc-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 16px;
+    border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:14px; font-weight:800; transition:all .14s; }
+  .prc-btn:hover:not(:disabled) { border-color:${T.lineStrong}; }
+  .prc-btn:disabled { opacity:.45; cursor:not-allowed; }
+  .prc-btn[data-on="true"] { border-color:${accent}; background:rgba(${rgba},0.18); }
+
+  /* Simulador */
+  .prc-foto { position:relative; overflow:hidden; border-radius:16px; border:1px solid ${T.line}; aspect-ratio:16/9; max-height:240px; width:100%;
+    background:linear-gradient(135deg, rgba(${rgba},0.28) 0%, rgba(8,19,31,0.9) 100%); display:flex; align-items:center; justify-content:center; }
+  .prc-foto > i { font-size:54px; color:rgba(255,255,255,0.22); }
+  .prc-foto img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .prc-voz { position:absolute; left:10px; right:10px; bottom:10px; display:flex; gap:10px; align-items:flex-start; padding:10px 12px; border-radius:12px;
+    background:rgba(4,10,22,0.82); border:1px solid ${T.line}; backdrop-filter:blur(6px); font-size:14px; line-height:1.4; color:#fff; }
+  .prc-voz[data-ok="false"] { border-color:${NO}99; }
+  .prc-voz[data-ok="true"] { border-color:${OK}88; }
+  .prc-pasos { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 110px), 1fr)); gap:8px; }
+  .prc-paso { display:flex; flex-direction:column; align-items:center; gap:6px; padding:10px 6px; border-radius:12px; border:1.5px solid ${T.line}; background:${T.inset};
+    font-size:14px; font-weight:800; color:${T.text3}; text-align:center; min-width:0; }
+  .prc-paso i { font-size:20px; }
+  .prc-paso[data-hecho="true"] { color:#fff; animation:prcPop .3s ease; }
+  .prc-barra { height:12px; border-radius:7px; background:${T.inset}; overflow:hidden; border:1px solid ${T.line}; }
+  .prc-barra > i { display:block; height:100%; border-radius:7px; transition:width .6s cubic-bezier(.2,.8,.2,1), background .6s; }
+  .prc-opts { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap:10px; }
+  .prc-opt { cursor:pointer; text-align:left; padding:12px 14px; border-radius:13px; border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff;
+    font-size:15px; font-weight:700; line-height:1.4; transition:all .14s; min-width:0; }
+  .prc-opt:hover { border-color:${accent}; background:rgba(${rgba},0.14); transform:translateY(-2px); }
+  .prc-retro { display:flex; flex-direction:column; gap:6px; padding:12px 14px; border-radius:13px; font-size:14px; line-height:1.5; animation:prcPop .25s ease; }
+  @media (prefers-reduced-motion: reduce){
+    .prc-row[data-shake="true"], .prc-bin[data-shake="true"], .prc-fslot[data-shake="true"] { animation:none; }
+    .prc-chip, .prc-chip:hover, .prc-chip[data-sel="true"], .prc-opt:hover { transform:none; transition:none; }
+    .prc-paso[data-hecho="true"], .prc-retro, .prc-step { animation:none; }
+    .prc-barra > i { transition:none; }
+  }
+`;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Simulador «Give instructions»
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+/** Foto de la escena con respaldo: degradado + icono detrás; si falla, se oculta. */
+function Foto({ clave, icono, children }: { clave: string; icono: string; children?: React.ReactNode }) {
+  const [falla, setFalla] = useState<string | null>(null);
+  return (
+    <div className="prc-foto">
+      <i className={`fa-solid ${icono}`} aria-hidden />
+      {falla !== clave && <img key={clave} src={`${RUTA_SIM}/${clave}.webp`} alt="" loading="lazy" onError={() => setFalla(clave)} />}
+      {children}
+    </div>
+  );
+}
+
+function SimInstrucciones({
+  accent,
+  receta,
+  estado,
+  onReceta,
+  onPaso,
+  onInforme,
+  onReiniciar,
+}: {
+  accent: string;
+  receta: Receta;
+  estado: Estado;
+  onReceta: (id: string) => void;
+  onPaso: (o: Opcion) => void;
+  onInforme: (o: OpcionInforme) => void;
+  onReiniciar: () => void;
+}) {
+  const n = receta.pasos.length;
+  const enInforme = estado.final === "bien" && estado.informe < n;
+  const cerrado = estado.final === "bien" && estado.informe >= n;
+  const mala = estado.ultimo && !estado.ultimo.ok;
+  const clave =
+    estado.final === "bien"
+      ? receta.id === "chocolate" ? "bebida-lista" : "bici-lista"
+      : mala
+        ? receta.id === "chocolate" ? "cocina-derrame" : "taller-desorden"
+        : receta.id === "chocolate" ? "cocina-inicio" : "taller-inicio";
+  const colCal = estado.calidad >= 70 ? OK : estado.calidad >= 40 ? AMBAR : NO;
+  const voz = estado.ultimo ? estado.ultimo.efecto : receta.meta;
+
+  return (
+    <>
+      <div className="prc-panel">
+        <Eyebrow>Elige el proceso · simulación con personajes ficticios</Eyebrow>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {RECETAS.map((r) => (
+            <button key={r.id} className="prc-btn" data-on={r.id === receta.id} onClick={() => onReceta(r.id)}>
+              <i className={`fa-solid ${r.icono}`} aria-hidden /> {r.nombre} · {r.personaje}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <Foto clave={clave} icono={receta.icono}>
+        <div className="prc-voz" data-ok={estado.ultimo ? String(estado.ultimo.ok) : undefined} role="status">
+          <i className={`fa-solid ${estado.ultimo ? (estado.ultimo.ok ? "fa-circle-check" : "fa-triangle-exclamation") : "fa-comment"}`} aria-hidden style={{ color: estado.ultimo ? (estado.ultimo.ok ? OK : NO) : accent, marginTop: 3 }} />
+          <span>
+            <strong>{receta.personaje}:</strong> {voz}
+          </span>
+        </div>
+      </Foto>
+
+      <div className="prc-panel">
+        <div className="prc-pasos" role="list" aria-label="Pasos del proceso">
+          {receta.pasos.map((p, i) => {
+            const hecho = i < estado.paso;
+            return (
+              <div key={p.id} role="listitem" className="prc-paso" data-hecho={hecho} style={hecho ? { borderColor: p.color, background: `${p.color}22` } : undefined}>
+                <i className={`fa-solid ${hecho ? p.icono : "fa-circle-question"}`} aria-hidden style={{ color: hecho ? p.color : T.text3 }} />
+                <span>{hecho ? p.conector : `Paso ${i + 1}`}</span>
               </div>
-            </div>
+            );
+          })}
+        </div>
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, color: T.text2, flexWrap: "wrap", gap: 6 }}>
+            <span>Calidad del resultado · simulación</span>
+            <strong style={{ color: colCal }}>{estado.calidad}/100{estado.manchas > 0 ? ` · ${estado.manchas} desastre${estado.manchas > 1 ? "s" : ""}` : ""}</strong>
           </div>
-
-          {/* pista del modo actual */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid rgba(${color.rgba},0.3)`, background: `rgba(${color.rgba},0.08)`, fontSize: 13, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              {modo === "orden" && (
-                <>Los conectores marcan el orden: <strong style={{ color: T.text }}>First</strong> (primero), <strong style={{ color: T.text }}>Then</strong> (luego), <strong style={{ color: T.text }}>After that</strong> (después), <strong style={{ color: T.text }}>Finally</strong> (finalmente) y <strong style={{ color: T.text }}>As a result</strong> (como resultado).</>
-              )}
-              {modo === "clasifica" && (
-                <><strong style={{ color: T.text }}>How/What</strong> preguntan por el proceso; <strong style={{ color: T.text }}>Why</strong> por la razón; <strong style={{ color: T.text }}>Can/Could you explain</strong> piden una explicación; <strong style={{ color: T.text }}>is/are + participio</strong> es voz pasiva.</>
-              )}
-              {modo === "glosario" && (
-                <>Lee primero la definición y su ejemplo; luego suelta la estructura en inglés que le corresponde.</>
-              )}
-            </span>
-          </div>
-
-          {/* dato verbatim */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid ${T.line}`, background: T.glass, fontSize: 12.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-circle-info" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>{DATO_PROCESOS}</span>
+          <div className="prc-barra" role="img" aria-label={`Calidad ${estado.calidad} de 100`}>
+            <i style={{ width: `${estado.calidad}%`, background: colCal }} />
           </div>
         </div>
       </div>
 
-      <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />
-    </div>
+      {estado.final === "no" && (
+        <div className="prc-panel">
+          <Eyebrow>
+            What do you tell {receta.personaje}? · paso {estado.paso + 1} de {n}
+          </Eyebrow>
+          <div className="prc-nota">Elige la instrucción correcta: con su conector, en el orden del proceso y con la forma verbal de una orden.</div>
+          <div className="prc-opts">
+            {opcionesPaso(receta, estado).map((o) => (
+              <button key={`${estado.turno}-${o.id}`} className="prc-opt" onClick={() => onPaso(o)}>
+                {o.texto}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {estado.final === "temprano" && (
+        <div className="prc-panel" style={{ borderColor: `${NO}88` }}>
+          <div style={{ fontSize: 15, fontWeight: 800, color: NO }}>
+            <i className="fa-solid fa-circle-xmark" aria-hidden /> {receta.personaje} entregó el proceso incompleto.
+          </div>
+          <button className="prc-btn" onClick={onReiniciar}>
+            <i className="fa-solid fa-rotate-left" aria-hidden /> Try again
+          </button>
+        </div>
+      )}
+
+      {enInforme && (
+        <div className="prc-panel">
+          <Eyebrow>
+            Write the report · {estado.informe + 1} de {n}
+          </Eyebrow>
+          <div className="prc-nota">
+            El proceso quedó listo. Ahora describe lo que se hizo <strong style={{ color: T.text2 }}>en voz pasiva</strong>: elige la frase correcta para este paso («{receta.pasos[estado.informe]!.esp}»).
+          </div>
+          <div className="prc-opts">
+            {opcionesInforme(receta, estado.informe, estado.turno).map((o) => (
+              <button key={`${estado.turno}-${o.id}`} className="prc-opt" onClick={() => onInforme(o)}>
+                {o.texto}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {cerrado && (
+        <div className="prc-panel" style={{ borderColor: `${OK}88` }}>
+          <div style={{ fontSize: 15, fontWeight: 800, color: OK }}>
+            <i className="fa-solid fa-trophy" aria-hidden /> {receta.resultado}
+          </div>
+          <div className="prc-nota">{receta.resultadoEsp} Informe en voz pasiva: {estado.informeFallas === 0 ? "sin fallas." : `${estado.informeFallas} corrección(es).`}</div>
+          <button className="prc-btn" onClick={() => onReceta(receta.id === RECETAS[0]!.id ? RECETAS[1]!.id : RECETAS[0]!.id)}>
+            <i className="fa-solid fa-forward" aria-hidden /> Try the other process
+          </button>
+        </div>
+      )}
+
+      {estado.ultimo && (
+        <div className="prc-retro" style={{ background: estado.ultimo.ok ? `${OK}12` : `${NO}12`, border: `1px solid ${estado.ultimo.ok ? OK : NO}55`, color: T.text2 }}>
+          <strong style={{ color: estado.ultimo.ok ? OK : NO }}>{estado.ultimo.ok ? "Bien hecho" : "Por qué salió mal"}</strong>
+          <span>{estado.ultimo.regla}</span>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -583,10 +777,10 @@ function ProcesoOrden({
   dropProps: DropFactory;
 }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 10, minWidth: 0 }}>
       {PASOS.map((p, i) => {
         const num = (
-          <span style={{ width: 28, height: 28, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 900, border: `1.5px solid ${T.lineStrong}`, color: T.text2 }}>
+          <span style={{ width: 28, height: 28, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, border: `1.5px solid ${T.lineStrong}`, color: T.text2 }}>
             {i + 1}
           </span>
         );
@@ -594,14 +788,14 @@ function ProcesoOrden({
           // ya colocado
           return (
             <div key={p.id} className="prc-step">
-              <span style={{ width: 28, height: 28, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 900, background: OK, color: "#04121f", marginTop: 1 }}>
+              <span style={{ width: 28, height: 28, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, background: OK, color: "#04121f", marginTop: 1 }}>
                 {i + 1}
               </span>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 14, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>{p.texto}</div>
-                <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.4, marginTop: 3 }}>{p.traduccion}</div>
+                <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.4, marginTop: 3 }}>{p.traduccion}</div>
               </div>
-              <span style={{ fontSize: 10.5, fontWeight: 800, color: OK, border: `1px solid ${OK}55`, borderRadius: 6, padding: "3px 9px", textTransform: "uppercase", letterSpacing: "0.04em", flexShrink: 0 }}>
+              <span style={{ fontSize: 14, fontWeight: 800, color: OK, border: `1px solid ${OK}55`, borderRadius: 6, padding: "3px 9px", flexShrink: 0 }}>
                 {p.conector}
               </span>
             </div>
@@ -620,7 +814,7 @@ function ProcesoOrden({
             >
               {num}
               <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 9 }}>
-                <i className="fa-solid fa-arrow-down" style={{ fontSize: 12 }} />
+                <i className="fa-solid fa-arrow-down" style={{ fontSize: 14 }} />
                 <span style={{ fontWeight: 700 }}>Drop the next step here</span>
               </div>
             </div>
@@ -630,8 +824,8 @@ function ProcesoOrden({
         return (
           <div key={p.id} className="prc-locked">
             {num}
-            <span style={{ fontSize: 13, color: T.text3 }}>
-              <i className="fa-solid fa-lock" style={{ marginRight: 8, fontSize: 11 }} />
+            <span style={{ fontSize: 14, color: T.text3 }}>
+              <i className="fa-solid fa-lock" style={{ marginRight: 8, fontSize: 14 }} />
               Step {i + 1}
             </span>
           </div>
@@ -656,33 +850,26 @@ function BinsFuncion({
 }) {
   const bins: Funcion[] = ["proceso", "razon", "explicacion", "pasiva"];
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
+    <div className="prc-bins">
       {bins.map((bin) => {
         const info = FUNCION_INFO[bin];
         const dentro = ESTRUCTURAS.filter((x) => ubicadoC[x.id] === bin);
         return (
-          <div
-            key={bin}
-            className="prc-bin"
-            data-shake={shakeC === bin}
-            onClick={() => selC && onMatch(selC, bin)}
-            style={{ position: "relative", isolation: "isolate" }}
-            {...dropProps((id) => onMatch(id, bin))}
-          >
+          <div key={bin} className="prc-bin" data-shake={shakeC === bin} onClick={() => selC && onMatch(selC, bin)} {...dropProps((id) => onMatch(id, bin))}>
             {/* La ilustración del concepto llenando la caja vacía. */}
             <FondoTermino termino={info.titulo} />
             <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
               <VinetaTermino termino={info.titulo} color={T.text2} icono={info.icono} tam={29} radio={8} />
-              <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
+              <span style={{ fontSize: 14, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
             </div>
-            <div style={{ fontSize: 11, color: T.text3, marginBottom: 12, lineHeight: 1.4 }}>{info.subtitulo}</div>
+            <div style={{ fontSize: 14, color: T.text3, marginBottom: 10, lineHeight: 1.4 }}>{info.subtitulo}</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {dentro.length === 0 ? (
-                <div style={{ fontSize: 12, color: T.text3, opacity: 0.6, padding: "8px 0" }}>Drop here…</div>
+                <div style={{ fontSize: 14, color: T.text3, opacity: 0.7, padding: "6px 0" }}>Drop here…</div>
               ) : (
                 dentro.map((x) => (
-                  <span key={x.id} style={{ animation: "prcPop .25s ease", display: "inline-flex", alignItems: "flex-start", gap: 7, padding: "8px 12px", borderRadius: 11, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 12.5, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>
-                    <i className="fa-solid fa-check" style={{ fontSize: 10, color: OK, marginTop: 3 }} />
+                  <span key={x.id} style={{ animation: "prcPop .25s ease", display: "inline-flex", alignItems: "flex-start", gap: 7, padding: "8px 12px", borderRadius: 11, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 14, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>
+                    <i className="fa-solid fa-check" style={{ fontSize: 14, color: OK, marginTop: 2 }} />
                     {x.texto}
                   </span>
                 ))
@@ -709,7 +896,7 @@ function RowsGlosario({
   dropProps: DropFactory;
 }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 11, minWidth: 0 }}>
       {PARES.map((g) => {
         const done = empGlos[g.id];
         return (
@@ -723,19 +910,19 @@ function RowsGlosario({
           >
             <div className="prc-slot" data-armed={!done && !!selGlos} style={done ? { borderStyle: "solid", borderColor: OK, background: `${OK}1a` } : undefined}>
               {done ? (
-                <span style={{ animation: "prcPop .25s ease", fontSize: 13, fontWeight: 900, color: "#fff", display: "inline-flex", alignItems: "center", gap: 7 }}>
+                <span style={{ animation: "prcPop .25s ease", fontSize: 14, fontWeight: 900, color: "#fff", display: "inline-flex", alignItems: "center", gap: 7 }}>
                   <i className="fa-solid fa-quote-left" />
                   {g.termino}
                 </span>
               ) : (
                 <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                  <i className="fa-solid fa-arrow-left" style={{ fontSize: 11 }} /> structure
+                  <i className="fa-solid fa-arrow-left" style={{ fontSize: 14 }} /> structure
                 </span>
               )}
             </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 13, color: done ? "#fff" : T.text2, lineHeight: 1.45 }}>{g.definicion}</div>
-              <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.4, marginTop: 3, fontStyle: "italic" }}>{g.ejemplo}</div>
+            <div style={{ flex: "1 1 200px", minWidth: 0 }}>
+              <div style={{ fontSize: 14, color: done ? "#fff" : T.text2, lineHeight: 1.45 }}>{g.definicion}</div>
+              <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.4, marginTop: 3, fontStyle: "italic" }}>{g.ejemplo}</div>
             </div>
           </div>
         );
@@ -784,19 +971,19 @@ function QuizCard({
   };
 
   return (
-    <div style={{ ...card, padding: "20px 24px 24px", marginTop: 22 }}>
+    <div>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4, flexWrap: "wrap" }}>
         <Eyebrow>
           <i className="fa-solid fa-clipboard-question" style={{ marginRight: 8, color: accent }} />
           Comprueba lo aprendido
         </Eyebrow>
         {aprobado && (
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 12, fontWeight: 800, color: OK }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 14, fontWeight: 800, color: OK }}>
             <i className="fa-solid fa-circle-check" /> Aprobado
           </span>
         )}
       </div>
-      <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
         Cinco afirmaciones sobre cómo formular y responder preguntas en inglés acerca de procesos. Decide si son verdaderas o falsas y pulsa «Comprobar».
       </div>
 
@@ -805,11 +992,11 @@ function QuizCard({
           const elegida = resp[qi];
           return (
             <div key={qi}>
-              <div style={{ fontSize: 14.5, fontWeight: 800, color: T.text, marginBottom: 11, display: "flex", gap: 10 }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: T.text, marginBottom: 11, display: "flex", gap: 10 }}>
                 <span style={{ color: accent }}>{qi + 1}.</span>
                 <span>{q.pregunta}</span>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 140px), 1fr))", gap: 9 }}>
                 {q.opciones.map((op, oi) => {
                   const sel = elegida === oi;
                   const esCorrecta = oi === q.correcta;
@@ -831,7 +1018,7 @@ function QuizCard({
                   }
                   return (
                     <button key={oi} className="prc-q" onClick={() => elegir(qi, oi)} disabled={comprobado} style={{ borderColor: borde, background: fondo, color: colorTxt }}>
-                      <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
+                      <span style={{ width: 26, height: 26, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
                         {comprobado && esCorrecta ? <i className="fa-solid fa-check" /> : comprobado && sel ? <i className="fa-solid fa-xmark" /> : String.fromCharCode(65 + oi)}
                       </span>
                       <span style={{ flex: 1, lineHeight: 1.35 }}>{op}</span>
@@ -840,7 +1027,7 @@ function QuizCard({
                 })}
               </div>
               {comprobado && (
-                <div style={{ marginTop: 9, fontSize: 12.5, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
+                <div style={{ marginTop: 9, fontSize: 14, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
                   <i className="fa-solid fa-circle-info" style={{ color: accent, marginTop: 2 }} />
                   <span>{q.retro}</span>
                 </div>
@@ -863,7 +1050,7 @@ function QuizCard({
           </button>
         )}
         {comprobado && (
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 13.5, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 14, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
             <i className={`fa-solid ${aprobadoAhora ? "fa-trophy" : "fa-circle-half-stroke"}`} />
             {aciertos} / {total} correctas
             {!aprobadoAhora && <span style={{ color: T.text3, fontWeight: 600 }}>· revisa las marcadas e inténtalo de nuevo</span>}

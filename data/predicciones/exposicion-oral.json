@@ -1,0 +1,12 @@
+{
+  "escena": "Planeas una charla para un grupo ficticio de 28 estudiantes y una curva muestra su atención minuto a minuto.",
+  "pregunta": "¿Qué hace caer más la atención del grupo en los argumentos?",
+  "opciones": [
+    { "id": "a", "texto": "Diapositivas llenas de texto leído", "icono": "fa-align-justify" },
+    { "id": "b", "texto": "Hablar a unas 120 palabras por minuto", "icono": "fa-gauge" },
+    { "id": "c", "texto": "Mostrar una imagen con una sola cifra", "icono": "fa-chart-pie" }
+  ],
+  "correcta": "a",
+  "porque": "Si el público lee la diapositiva, deja de escucharte y la exposición se vuelve una lectura en voz alta. Los apoyos deben complementar lo que dices, no repetirlo ni sustituirlo.",
+  "comoComprobarlo": "En «Apoyos» alterna entre las tres opciones y observa cómo cambia la curva en los momentos de Argumento 1, 2 y 3."
+}

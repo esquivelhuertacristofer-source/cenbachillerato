@@ -1,0 +1,12 @@
+{
+  "escena": "Un barrio en cuadrícula donde Sam sigue al pie de la letra la ruta que escribes",
+  "pregunta": "Escribes «Turn left» donde la ruta pedía «Turn right». ¿Qué hace Sam?",
+  "opciones": [
+    { "id": "a", "texto": "Corrige el giro y llega al destino", "icono": "fa-wand-magic-sparkles" },
+    { "id": "b", "texto": "Gira a su izquierda y se aleja", "icono": "fa-arrow-turn-up" },
+    { "id": "c", "texto": "Se queda quieto en la esquina", "icono": "fa-hand" }
+  ],
+  "correcta": "b",
+  "porque": "Sam no interpreta lo que querías decir: ejecuta cada indicación tal cual. Con «Turn left» gira a su izquierda y camina por otra calle, así que no llega.",
+  "comoComprobarlo": "En Give directions, elige la tarea 1, escribe su ruta cambiando «Turn right» por «Turn left» y pulsa «Que Sam siga tus indicaciones»."
+}

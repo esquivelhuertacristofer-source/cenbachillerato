@@ -22,7 +22,7 @@
 
 import * as THREE from "three";
 import { useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Environment, Lightformer, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import {
@@ -79,9 +79,12 @@ export interface CentroDatosSceneProps {
 type Pt = [number, number, number];
 
 
-function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number }) {
+/** Etiquetas de tamaño fijo (≥ 14 px). `corta` = se queda también en pantallas angostas. */
+function Etiqueta({ pos, children, col, corta = false }: { pos: Pt; children: ReactNode; col?: string; corta?: boolean }) {
+  const ancho = useThree((s) => s.size.width);
+  if (!corta && ancho < 640) return null;
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -92,7 +95,7 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children:
           background: "rgba(4,10,22,0.86)",
           border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`,
           color: "#fff",
-          fontSize: fs,
+          fontSize: 14,
           fontWeight: 800,
           whiteSpace: "nowrap",
           boxShadow: "0 6px 18px -8px #000",
@@ -100,6 +103,17 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children:
       >
         {children}
       </div>
+    </Html>
+  );
+}
+
+/** Html de tamaño fijo que se oculta en pantallas angostas (la info ya está en el panel). */
+function Rotulo({ pos, children, corta = false }: { pos: Pt; children: ReactNode; corta?: boolean }) {
+  const ancho = useThree((s) => s.size.width);
+  if (!corta && ancho < 640) return null;
+  return (
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+      {children}
     </Html>
   );
 }
@@ -254,13 +268,9 @@ function SalaServidores({ itMW, tSet, modoColor }: { itMW: number; tSet: number;
       <instancedMesh ref={caliente} args={[GEO_ESFERA, undefined, N_CALIENTE]} frustumCulled={false}>
         <meshBasicMaterial color={calor ? "#ef4444" : "#fb923c"} transparent opacity={0.8} toneMapped={false} />
       </instancedMesh>
-      <Etiqueta pos={[-2.2, 0.08, 2.75]} df={11} col={calor ? "#ef4444aa" : `${modoColor}aa`} fs={11}>
+      <Etiqueta pos={[-2.2, 0.08, 2.75]} col={calor ? "#ef4444aa" : `${modoColor}aa`}>
         <i className="fa-solid fa-temperature-arrow-down" style={{ color: calor ? "#fca5a5" : "#7dd3fc" }} />
         Pasillo frío: {tSet} °C{calor ? " · fuera del rango recomendado" : ""}
-      </Etiqueta>
-      <Etiqueta pos={[-2.2, 3.15, -1.4]} df={11} fs={10.5} col="#fb923caa">
-        <i className="fa-solid fa-temperature-arrow-up" style={{ color: "#fdba74" }} />
-        Aire caliente ≈ {tSet + 12} °C hacia el enfriamiento
       </Etiqueta>
     </group>
   );
@@ -437,13 +447,9 @@ function PatioEnfriamiento({ tipo, tExt, tSet, itMW }: { tipo: Enfriamiento; tEx
           <meshStandardMaterial color="#0284c7" emissive="#0369a1" emissiveIntensity={0.3} transparent opacity={0.85} />
         </mesh>
       </group>
-      <Etiqueta pos={[X_PATIO + 0.3, 3.3, 0.2]} df={10} col="#38bdf8aa" fs={12}>
+      <Etiqueta pos={[X_PATIO + 0.3, 3.3, 0.2]} col="#38bdf8aa">
         <i className={`fa-solid ${ENFRIAMIENTO_DEF[tipo].icono}`} style={{ color: "#7dd3fc" }} />
         {ENFRIAMIENTO_DEF[tipo].corto} · {est.regimen === "libre" ? "enfriamiento libre" : est.regimen === "evaporativo" ? "evaporando agua" : est.regimen === "mixto" ? "apoyo del compresor" : "compresor"} · afuera {tExt} °C
-      </Etiqueta>
-      <Etiqueta pos={[X_PATIO + 2.45, 1.95, 1.55]} df={10} col="#0ea5e9aa" fs={11}>
-        <i className="fa-solid fa-droplet" style={{ color: "#38bdf8" }} />
-        {num(aguaM3h, 1)} m³/h
       </Etiqueta>
     </group>
   );
@@ -492,7 +498,7 @@ function LineaElectrica({ itMW, pue }: { itMW: number; pue: number }) {
       <instancedMesh ref={puntos} args={[GEO_ESFERA, undefined, N]} frustumCulled={false}>
         <meshBasicMaterial color="#facc15" toneMapped={false} />
       </instancedMesh>
-      <Etiqueta pos={[POSTE_B[0] + 1.1, POSTE_B[1] + 0.75, POSTE_B[2]]} df={10} col="#facc15aa" fs={11}>
+      <Etiqueta pos={[POSTE_B[0] + 1.1, POSTE_B[1] + 0.75, POSTE_B[2]]} col="#facc15aa">
         <i className="fa-solid fa-bolt" style={{ color: "#facc15" }} />
         {num(itMW * pue, 1)} MW de la red
       </Etiqueta>
@@ -520,7 +526,7 @@ function EscenaCentro({ tipo, tExt, tSet, itMW, modoColor }: { tipo: Enfriamient
         <sphereGeometry args={[0.6, 24, 16]} />
         <meshBasicMaterial color={colSol} toneMapped={false} />
       </mesh>
-      <Etiqueta pos={[-1.4, 4.3, -1.6]} df={9} col={`${modoColor}aa`} fs={15}>
+      <Etiqueta pos={[-1.4, 4.3, -1.6]} col={`${modoColor}aa`} corta>
         <i className="fa-solid fa-gauge-high" style={{ color: modoColor }} />
         PUE ahora: {num(pue, 2)}
       </Etiqueta>
@@ -569,13 +575,6 @@ function Edificio({ d }: { d: Destino }) {
             <boxGeometry args={[2.2, 1.1, 0.08]} />
             <meshStandardMaterial color={col} emissive={col} emissiveIntensity={0.55} />
           </mesh>
-          <Html position={[0, 2.35, 0.16]} center distanceFactor={9} zIndexRange={[10, 0]} style={{ pointerEvents: "none" }}>
-            <div style={{ width: 120, textAlign: "center", color: "#3b0a24", fontSize: 11, fontWeight: 900, lineHeight: 1.15 }}>
-              SE SUBASTA
-              <br />
-              TU ATENCIÓN
-            </div>
-          </Html>
           {[-0.8, 0.8].map((dx) => (
             <mesh key={dx} position={[dx, 1.85, 0.1]}>
               <cylinderGeometry args={[0.03, 0.03, 0.3, 6]} />
@@ -622,7 +621,7 @@ function EscenaHuella({ permisos, appSel, diaNonce, modoColor }: { permisos: Rec
   const obj = useMemo(() => new THREE.Object3D(), []);
   const col = useMemo(() => new THREE.Color(), []);
   const activo = diaNonce > 0;
-  const app = APPS[appSel];
+
 
   useFrame((_, dt) => {
     if (activo) t.current += dt;
@@ -729,23 +728,16 @@ function EscenaHuella({ permisos, appSel, diaNonce, modoColor }: { permisos: Rec
             </mesh>
           );
         })}
-        <Html position={[0, 0.72, 0.08]} center distanceFactor={7} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-          <div style={{ width: 150, textAlign: "center", color: "#fff", lineHeight: 1.2 }}>
+        <Rotulo pos={[0, 0.72, 0.08]} corta>
+          <div style={{ width: 120, textAlign: "center", color: "#fff", lineHeight: 1.2 }}>
             <div style={{ fontSize: 26, fontWeight: 900, fontVariantNumeric: "tabular-nums" }}>
               <span ref={reloj}>07:00</span>
             </div>
-            <div style={{ fontSize: 10, color: "#c7d2fe", fontWeight: 700, minHeight: 13 }}>
+            <div style={{ fontSize: 14, color: "#c7d2fe", fontWeight: 700, minHeight: 18 }}>
               <span ref={momento}>Listo para vivir el día</span>
             </div>
           </div>
-        </Html>
-        <Html position={[0, -0.72, 0.08]} center distanceFactor={7} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-          <div style={{ width: 150, textAlign: "center", color: "#fff", fontSize: 11.5, fontWeight: 800, lineHeight: 1.3 }}>
-            <i className={`fa-solid ${app.icono}`} style={{ color: app.color, fontSize: 16 }} />
-            <div style={{ marginTop: 3 }}>{app.etq}</div>
-            <div style={{ fontSize: 10, color: "#c7d2fe", marginTop: 1 }}>Sede: {app.sede}</div>
-          </div>
-        </Html>
+        </Rotulo>
       </group>
       {DESTINOS.map((d) => {
         const [x, , z] = POS_DESTINO[d];
@@ -753,18 +745,18 @@ function EscenaHuella({ permisos, appSel, diaNonce, modoColor }: { permisos: Rec
         return (
           <group key={d}>
             <Edificio d={d} />
-            <Html position={[x, d === "anunciantes" ? 3.55 : 2.95, z]} center distanceFactor={10} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+            <Rotulo pos={[x, d === "anunciantes" ? 3.55 : 2.95, z]} corta>
               <div style={{ padding: "6px 11px", borderRadius: 12, background: "rgba(4,10,22,0.88)", border: `1px solid ${def.color}aa`, color: "#fff", textAlign: "center", whiteSpace: "nowrap" }}>
-                <div style={{ fontSize: 11, fontWeight: 800 }}>
+                <div style={{ fontSize: 14, fontWeight: 800 }}>
                   <i className={`fa-solid ${def.icono}`} style={{ color: def.color, marginRight: 6 }} />
                   {def.etq}
                 </div>
                 <div style={{ fontSize: 16, fontWeight: 900, fontVariantNumeric: "tabular-nums" }}>
                   <span ref={refCuenta(d)}>0</span>
-                  <span style={{ fontSize: 10, fontWeight: 700, color: "#94a3b8" }}> paquetes</span>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: "#94a3b8" }}> paq.</span>
                 </div>
               </div>
-            </Html>
+            </Rotulo>
           </group>
         );
       })}
@@ -941,15 +933,6 @@ function EscenaBrecha({ politicas, lanzado, modoColor }: { politicas: Politica[]
           <boxGeometry args={[0.1, 0.5, 0.1]} />
           <meshStandardMaterial color="#64748b" />
         </mesh>
-        <Html position={[0, 2.35, 0.26]} center distanceFactor={9} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-          <div style={{ width: 210, textAlign: "center", color: "#1c1917", background: modoColor, borderRadius: 10, padding: "7px 10px", boxShadow: `0 0 24px -4px ${modoColor}`, fontSize: 13, fontWeight: 900, lineHeight: 1.25 }}>
-            <i className="fa-solid fa-laptop" style={{ marginRight: 6 }} />
-            Registro {tiene("ventanilla") ? "en línea o en ventanilla" : "solo en línea"}
-            <div style={{ fontSize: 10.5, fontWeight: 800 }}>
-              {tiene("celular") ? "funciona en celular" : "requiere computadora"} · plazo {tiene("plazo") ? "30" : "5"} días
-            </div>
-          </div>
-        </Html>
       </group>
       <mesh ref={pulso} position={[0, 0.05, -2.6]} rotation={[-Math.PI / 2, 0, 0]}>
         <ringGeometry args={[0.95, 1, 64]} />
@@ -971,9 +954,6 @@ function EscenaBrecha({ politicas, lanzado, modoColor }: { politicas: Politica[]
             <boxGeometry args={[1.5, 0.14, 1.0]} />
             <meshStandardMaterial color="#b91c1c" roughness={0.6} />
           </mesh>
-          <Etiqueta pos={[0, 1.45, 0]} df={10} fs={10.5} col="#e5e7ebaa">
-            <i className="fa-solid fa-building-columns" /> Ventanilla
-          </Etiqueta>
         </group>
       )}
       {tiene("plazo") && (
@@ -986,9 +966,6 @@ function EscenaBrecha({ politicas, lanzado, modoColor }: { politicas: Politica[]
             <boxGeometry args={[0.8, 0.18, 0.02]} />
             <meshStandardMaterial color="#dc2626" />
           </mesh>
-          <Etiqueta pos={[0, 0.6, 0.1]} df={9} fs={12}>
-            30 días
-          </Etiqueta>
         </group>
       )}
       {tiene("celular") && (
@@ -1028,16 +1005,16 @@ function EscenaBrecha({ politicas, lanzado, modoColor }: { politicas: Politica[]
                 </mesh>
               </group>
             )}
-            <Html position={[x, 2.45, z - 0.5]} center distanceFactor={10} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+            <Rotulo pos={[x, 2.45, z - 0.5]} corta>
               <div style={{ padding: "5px 10px", borderRadius: 12, background: "rgba(4,10,22,0.88)", border: `1px solid ${lanzado ? (meta >= 0.75 ? "#34d399" : "#f87171") : "rgba(255,255,255,0.25)"}`, color: "#fff", textAlign: "center", whiteSpace: "nowrap" }}>
-                <div style={{ fontSize: 11, fontWeight: 800 }}>
+                <div style={{ fontSize: 14, fontWeight: 800 }}>
                   <i className={`fa-solid ${grupo.icono}`} style={{ marginRight: 6, color: modoColor }} />
                   {grupo.etq}
                 </div>
-                <div style={{ fontSize: 10, color: "#cbd5e1" }}>usa internet: {num(grupo.acceso * 100, 1)} %</div>
+                <div style={{ fontSize: 14, color: "#cbd5e1" }}>usa internet: {num(grupo.acceso * 100, 1)} %</div>
                 {lanzado && <div style={{ fontSize: 14, fontWeight: 900, color: meta >= 0.75 ? "#6ee7b7" : "#fca5a5", fontVariantNumeric: "tabular-nums" }}>completó: {num(meta * 100, 0)} %</div>}
               </div>
-            </Html>
+            </Rotulo>
           </group>
         );
       })}
@@ -1056,9 +1033,9 @@ function EscenaBrecha({ politicas, lanzado, modoColor }: { politicas: Politica[]
 export default function CentroDatosScene(p: CentroDatosSceneProps) {
   const { vista, modoColor, resetNonce } = p;
   const cam = useMemo((): { pos: Pt; target: Pt } => {
-    if (vista === "centro") return { pos: [1.2, 9.2, 12.6], target: [0.4, -0.2, 0] };
-    if (vista === "huella") return { pos: [0, 5.2, 11.2], target: [0, 0.7, -1.6] };
-    return { pos: [0, 9.4, 10.8], target: [0, -0.6, 0.4] };
+    if (vista === "centro") return { pos: [1.2, 9.6, 13.6], target: [0.4, -1.1, 0] };
+    if (vista === "huella") return { pos: [0, 5.2, 11.2], target: [0, -0.1, -1.6] };
+    return { pos: [0, 9.8, 11.6], target: [0, -1.4, 0.4] };
   }, [vista]);
 
   return (

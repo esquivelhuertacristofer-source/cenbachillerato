@@ -1,0 +1,12 @@
+{
+  "escena": "Una línea del tiempo donde cada evento entra según el conector que elijas",
+  "pregunta": "En la primera oración eliges «Suddenly» en vez de «First». ¿Cómo entra la ficha?",
+  "opciones": [
+    { "id": "a", "texto": "Se desliza desde la izquierda, sin sorpresa", "icono": "fa-arrow-right" },
+    { "id": "b", "texto": "Cae desde arriba con un destello", "icono": "fa-bolt" },
+    { "id": "c", "texto": "Aparece tras una barra de causa", "icono": "fa-link" }
+  ],
+  "correcta": "b",
+  "porque": "«Suddenly» marca algo inesperado, y la línea lo dibuja como una caída con destello. «First» solo abre la secuencia y por eso la ficha se desliza con calma.",
+  "comoComprobarlo": "En Connect the events, toca primero «Suddenly», luego «First» en la misma oración, y mira cómo entra la ficha cada vez."
+}

@@ -1,27 +1,35 @@
-﻿"use client";
+"use client";
 
 /**
  * Laboratorio — El sentido histórico: por qué el pasado importa en el presente
  * Práctica experimental para CH-II-P03 (Conciencia Histórica II):
  * «El sentido histórico, la memoria colectiva y la relación pasado-presente».
  *
- * Interactividad máxima. Cuatro modos: los tres de arrastrar/clasificar y, al
- * final, uno que se escribe («Completa el texto», verbatim de la progresión):
- *  1. «¿Qué forma de mirar el pasado?» — clasifica ocho casos en sentido
- *     histórico, presentismo o memoria acrítica (la actitud frente al pasado).
- *  2. «Del pasado al presente» — empareja cada fenómeno actual de México con el
- *     proceso histórico que lo explica (relación pasado-presente verbatim A1/A4).
- *  3. «Escribe el término» — lee la definición verbatim (A5) y escribe
- *     de memoria el término del glosario que la nombra.
- *  + Cuestionario de comprensión (V/F verbatim de A4).
+ * EXPERIMENTO CENTRAL: «Museo del pueblo». San Telmo es un pueblo FICTICIO
+ * (simulación) que arma la línea del tiempo de su museo comunitario. El alumno
+ * toma una situación del presente (tarjeta con imagen) y la CUELGA del proceso
+ * del pasado que la explica: el hilo se enciende, su arco crece según cuánta
+ * duración acumulada tiene ese proceso y el medidor de «comprensión del
+ * presente» sube. Si cuelga mal, el museo explica qué situación sí explica
+ * ese proceso (datos verbatim de A1/A4, ver `sentido-historico-sim.ts`).
  *
- * DOM puro (sin three.js): ligero, accesible (ratón, teclado y táctil mediante
- * clic-para-seleccionar / clic-para-colocar). Contenido VERBATIM de CH-II·P03.
+ * Cuatro modos, montados en el esqueleto `LabShell`:
+ *  1. «Museo del pueblo» — el simulador (relación pasado-presente A1/A4).
+ *  2. «¿Qué forma de mirar el pasado?» — clasifica ocho casos en sentido
+ *     histórico, presentismo o memoria acrítica (dentro de `Mesa`).
+ *  3. «Escribe el término» — definición verbatim (A5) → escribe el término.
+ *  4. «Completa el texto» — fill_blanks verbatim de la progresión.
+ *  + Cuestionario de comprensión (V/F verbatim de A4) en la pestaña Reto.
+ *
+ * DOM puro (sin three.js). Contenido VERBATIM de CH-II·P03; la teoría vive en
+ * la pestaña «Teoría». Las imágenes salen de /media/labs-sim/sentido-historico
+ * y, si aún no existen, se ve el degradado con su ícono.
  */
 
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import type { PracticaLabProps } from "../registry";
-import { T, OK, card, Eyebrow } from "./_kit";
+import { T, OK, card } from "./_kit";
+import { LabShell, Bloque, Mesa, Dato, BotonHerramienta } from "./_shell";
 import { LabSfx } from "./lab-audio";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { EscribeTermino } from "./_mecanica-termino";
@@ -38,29 +46,52 @@ import {
   DATO_SENTIDO,
   type TipoMirada,
 } from "./sentido-historico-data";
+import { LINEA, POS_HOY, evaluarConexion, comprension, arcoHilo, type Conexiones, type Retro } from "./sentido-historico-sim";
 
 const NO = "#FF5E5E";
+const AMBAR = "#FFC75A";
 import { useEstrellas } from "@/lib/hooks/useEstrellas";
 import { FondoTermino, VinetaTermino } from "./_vineta";
 const RETO_KEY = "cen-sentido-historico-reto";
+const RUTA_FOTOS = "/media/labs-sim/sentido-historico";
 
-type Modo = "miradas" | "raices" | "glosario" | "texto";
+type Modo = "museo" | "miradas" | "glosario" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
+  { id: "museo", label: "Museo del pueblo", icono: "fa-timeline" },
   { id: "miradas", label: "¿Qué forma de mirar el pasado?", icono: "fa-eye" },
-  { id: "raices", label: "Del pasado al presente", icono: "fa-timeline" },
   { id: "glosario", label: "Escribe el término", icono: "fa-keyboard" },
   { id: "texto", label: "Completa el texto", icono: "fa-pen-to-square" },
 ];
 
+/** Imagen y ícono de cada situación del presente (la clave es el id de `RAICES`). */
+const ESCENA: Record<string, { foto: string; icono: string }> = {
+  "ra-tierra": { foto: "parcelas-valle", icono: "fa-wheat-awn" },
+  "ra-castas": { foto: "mercado-pueblo", icono: "fa-people-group" },
+  "ra-constitucion": { foto: "libro-escritorio", icono: "fa-book" },
+  "ra-norte-sur": { foto: "dos-caminos", icono: "fa-road" },
+  "ra-lenguas": { foto: "portal-conversacion", icono: "fa-comments" },
+  "ra-12oct": { foto: "plaza-estatua", icono: "fa-monument" },
+};
+
+/** Imagen con reserva: degradado + ícono detrás; si el webp no existe, se oculta. */
+function Foto({ clave, icono, className }: { clave: string; icono: string; className?: string }) {
+  const [falla, setFalla] = useState(false);
+  return (
+    <span className={`sh-foto ${className ?? ""}`}>
+      <i className={`fa-solid ${icono}`} aria-hidden />
+      {!falla && <img src={`${RUTA_FOTOS}/${clave}.webp`} alt="" loading="lazy" onError={() => setFalla(true)} />}
+    </span>
+  );
+}
+
 export function LabSentidoHistorico({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
-  const [modo, setModo] = useState<Modo>("miradas");
+  const [modo, setModo] = useState<Modo>("museo");
 
   // ── sonido ────────────────────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   // Modo «Completa el texto». El contador sirve de `key`: subirlo remonta
   // el componente y devuelve todos los huecos en blanco.
   const [textoDone, setTextoDone] = useState(false);
@@ -118,31 +149,40 @@ export function LabSentidoHistorico({ color }: PracticaLabProps) {
     setSelMirada(null);
   };
 
-  // ── modo raíces (empareja fenómeno presente → raíz histórica) ──────────
-  const [empRaiz, setEmpRaiz] = useState<Record<string, boolean>>({});
-  const [selRaiz, setSelRaiz] = useState<string | null>(null);
-  const [shakeRaiz, setShakeRaiz] = useState<string | null>(null);
-  const raicesLibres = RAICES.filter((r) => !empRaiz[r.id]).slice().sort((a, b) => a.raiz.localeCompare(b.raiz, "es"));
+  // ── modo museo (simulador: cuelga cada situación de su raíz) ───────────
+  const [conex, setConex] = useState<Conexiones>({});
+  const [selPres, setSelPres] = useState<string | null>(null);
+  const [retro, setRetro] = useState<Retro | null>(null);
+  const [shakeNodo, setShakeNodo] = useState<string | null>(null);
+  const nConex = Object.keys(conex).length;
+  const { pct, nivel } = comprension(nConex, RAICES.length);
 
-  const intentarRaiz = (chipId: string, rowId: string) => {
-    if (empRaiz[rowId]) return;
-    if (chipId === rowId) {
-      setEmpRaiz((e) => ({ ...e, [rowId]: true }));
-      setSelRaiz(null);
+  const colgarEnNodo = (raizId: string) => {
+    if (!selPres) {
+      setRetro({ ok: false, texto: "Primero toca una situación del pueblo y luego el proceso del pasado que la explica." });
+      return;
+    }
+    if (conex[selPres]) return;
+    const r = evaluarConexion(selPres, raizId);
+    setRetro(r);
+    if (r.ok) {
+      setConex((e) => ({ ...e, [selPres]: true }));
+      setSelPres(null);
       sfxPlace();
-      if (Object.keys(empRaiz).length + 1 >= RAICES.length) {
+      if (nConex + 1 >= RAICES.length) {
         sfxOk();
         persistMejor(miradasDone, true, glosarioDone);
       }
     } else {
-      setShakeRaiz(rowId);
+      setShakeNodo(raizId);
       sfxNo();
-      window.setTimeout(() => setShakeRaiz(null), 420);
+      window.setTimeout(() => setShakeNodo(null), 420);
     }
   };
-  const resetRaices = () => {
-    setEmpRaiz({});
-    setSelRaiz(null);
+  const resetMuseo = () => {
+    setConex({});
+    setSelPres(null);
+    setRetro(null);
   };
 
   // ── modo glosario (lee la definición y ESCRIBE el término) ─────────────
@@ -159,7 +199,7 @@ export function LabSentidoHistorico({ color }: PracticaLabProps) {
 
   // ── progreso / estrellas ──────────────────────────────────────────────
   const miradasDone = Object.keys(ubicMirada).length >= CASOS.length;
-  const raicesDone = Object.keys(empRaiz).length >= RAICES.length;
+  const raicesDone = nConex >= RAICES.length;
   const modosHechos = (miradasDone ? 1 : 0) + (raicesDone ? 1 : 0) + (glosarioDone ? 1 : 0) + (textoDone ? 1 : 0);
   // Terminar los 3 modos vale 2★; la tercera se gana con precisión.
   const estrellas = partida.estrellasCon(modosHechos, 4);
@@ -173,8 +213,9 @@ export function LabSentidoHistorico({ color }: PracticaLabProps) {
   };
 
   const objetivos = [
-    { txt: "Clasifica los 8 casos por su forma de mirar el pasado", done: miradasDone },
+    { txt: "Cuelga 3 situaciones del pueblo de su raíz y mira subir el medidor", done: nConex >= 3 },
     { txt: "Empareja los 6 fenómenos con su raíz histórica", done: raicesDone },
+    { txt: "Clasifica los 8 casos por su forma de mirar el pasado", done: miradasDone },
     { txt: "Escribe los 6 términos del glosario", done: glosarioDone },
     { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
@@ -234,295 +275,382 @@ export function LabSentidoHistorico({ color }: PracticaLabProps) {
     setTextoDone(false);
     setTextoIntento((n) => n + 1);
   };
-  const resetActual = modo === "texto" ? resetTexto : modo === "miradas" ? resetMiradas : modo === "raices" ? resetRaices : resetGlosario;
+  const resetActual = modo === "texto" ? resetTexto : modo === "miradas" ? resetMiradas : modo === "museo" ? resetMuseo : resetGlosario;
+
+  const pistaDe: Record<Modo, string> = {
+    museo: "Elige una situación del pueblo y pregúntate cómo llegó a ser lo que es: el pasado no es accidente ni destino, deja huellas de larga duración. Cuanto más antiguo el proceso, más alto el arco del hilo.",
+    miradas: "El sentido histórico contextualiza antes de juzgar; el presentismo juzga el pasado con los valores de hoy; la memoria acrítica repite la versión oficial sin cuestionarla.",
+    glosario: "Lee la definición y su ejemplo y escribe el término. Si te atoras, la pista te da la inicial y las letras.",
+    texto: "Escribe la palabra que falta en cada hueco del texto.",
+  };
+
+  const lectura =
+    modo === "museo"
+      ? `Comprensión del presente: ${pct} % · ${nivel}`
+      : modo === "miradas"
+        ? `${Object.keys(ubicMirada).length}/${CASOS.length} casos clasificados`
+        : `${modosHechos}/4 modos · ${bestEstrellas}★`;
+
+  const ANCHO = 700;
+  const Y_EJE = 138;
+  const xDe = (pos: number) => 40 + pos * (ANCHO - 80);
+  const pendientes = RAICES.filter((r) => !conex[r.id]);
+
+  const escena = (
+    <div className="sh-escena">
+      <style>{ESTILOS(accent, color.rgba)}</style>
+
+      {modo === "museo" && (
+        <Mesa>
+          {/* Banco: las situaciones del pueblo que aún no tienen raíz */}
+          <div className="sh-banco">
+            <div className="sh-titulo">
+              <span>Situaciones del pueblo</span>
+              <strong data-ok={raicesDone}>{nConex}/{RAICES.length}</strong>
+            </div>
+            {pendientes.length === 0 ? (
+              <div className="sh-listo">
+                <i className="fa-solid fa-circle-check" aria-hidden /> ¡Todas las situaciones de San Telmo tienen raíz en la línea!
+              </div>
+            ) : (
+              <div className="sh-cartas">
+                {pendientes.map((r) => (
+                  <button
+                    key={r.id}
+                    type="button"
+                    className="sh-carta"
+                    data-sel={selPres === r.id}
+                    onClick={() => {
+                      setSelPres((s) => (s === r.id ? null : r.id));
+                      setRetro(null);
+                    }}
+                  >
+                    <Foto clave={ESCENA[r.id]!.foto} icono={ESCENA[r.id]!.icono} />
+                    <span>{r.presente}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Destino: la línea del tiempo del museo */}
+          <div className="sh-destino">
+            <div className="sh-cabecera">
+              <Foto clave="pueblo-atardecer" icono="fa-house-flag" className="sh-hero" />
+              <div className="sh-cabecera-txt">
+                <strong>Museo comunitario de San Telmo</strong>
+                <span>Pueblo ficticio · simulación</span>
+              </div>
+            </div>
+
+            <svg viewBox={`0 0 ${ANCHO} 160`} className="sh-linea" role="img" aria-label="Línea del tiempo del museo, de lo más antiguo a hoy">
+              <line x1={30} y1={Y_EJE} x2={ANCHO - 30} y2={Y_EJE} stroke="rgba(255,255,255,0.28)" strokeWidth={4} strokeLinecap="round" />
+              {LINEA.map((n) =>
+                conex[n.id] ? <path key={`a-${n.id}`} className="sh-hilo" d={arcoHilo(n.pos, ANCHO, Y_EJE)} fill="none" stroke={OK} strokeWidth={5} strokeLinecap="round" /> : null
+              )}
+              {LINEA.map((n, i) => (
+                <g key={n.id}>
+                  <circle cx={xDe(n.pos)} cy={Y_EJE} r={21} fill={conex[n.id] ? OK : "#10243a"} stroke={conex[n.id] ? OK : "rgba(255,255,255,0.45)"} strokeWidth={3} />
+                  <text x={xDe(n.pos)} y={Y_EJE + 9} textAnchor="middle" fontSize={26} fontWeight={900} fill={conex[n.id] ? "#04121f" : "#fff"}>{i + 1}</text>
+                </g>
+              ))}
+              <circle cx={xDe(POS_HOY)} cy={Y_EJE} r={24} fill={accent} stroke="#fff" strokeWidth={3} />
+              <text x={xDe(POS_HOY)} y={Y_EJE + 9} textAnchor="middle" fontSize={22} fontWeight={900} fill="#04121f">Hoy</text>
+            </svg>
+
+            <div className="sh-medidor-fila">
+              <span>Comprensión del presente</span>
+              <strong>{pct} %</strong>
+            </div>
+            <div className="sh-medidor" role="meter" aria-label="Comprensión del presente" aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct}>
+              <div className="sh-medidor-fill" style={{ width: `${pct}%` }} />
+            </div>
+
+            <div className="sh-titulo">
+              <span>{selPres ? "Ahora toca el proceso del pasado que la explica" : "Procesos del pasado, del más antiguo al más reciente"}</span>
+            </div>
+            <div className="sh-nodos">
+              {LINEA.map((n, i) => {
+                const r = RAICES.find((x) => x.id === n.id)!;
+                const hecho = !!conex[n.id];
+                return (
+                  <button
+                    key={n.id}
+                    type="button"
+                    className="sh-nodo"
+                    data-done={hecho}
+                    data-shake={shakeNodo === n.id}
+                    data-armed={!!selPres && !hecho}
+                    onClick={() => colgarEnNodo(n.id)}
+                  >
+                    <span className="sh-num">{i + 1}</span>
+                    <span className="sh-nodo-txt">
+                      <small>{n.epoca}</small>
+                      <b>{r.raiz}</b>
+                      {hecho && (
+                        <em>
+                          <i className="fa-solid fa-link" aria-hidden /> {r.presente}
+                        </em>
+                      )}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="sh-retro" data-ok={retro?.ok ?? undefined} role="status">
+              <i className={`fa-solid ${retro ? (retro.ok ? "fa-circle-check" : "fa-circle-xmark") : "fa-lightbulb"}`} aria-hidden />
+              <span>{retro ? retro.texto : "Toca una tarjeta del pueblo y cuélgala del proceso que la explica."}</span>
+            </div>
+          </div>
+        </Mesa>
+      )}
+
+      {modo === "miradas" && (
+        <Mesa>
+          <div className="sh-banco">
+            <div className="sh-titulo">
+              <span>Arrastra cada caso a su forma de mirar el pasado</span>
+              <strong data-ok={miradasDone}>{Object.keys(ubicMirada).length}/{CASOS.length}</strong>
+            </div>
+            {miradasLibres.length === 0 ? (
+              <div className="sh-listo">
+                <i className="fa-solid fa-circle-check" aria-hidden /> ¡Clasificaste los {CASOS.length} casos!
+              </div>
+            ) : (
+              miradasLibres.map((c) => (
+                <button key={c.id} type="button" className="sh-chip" data-sel={selMirada === c.id} onClick={() => setSelMirada((s) => (s === c.id ? null : c.id))} {...dragProps(c.id)}>
+                  {c.texto}
+                </button>
+              ))
+            )}
+          </div>
+          <BinsMiradas selMirada={selMirada} shakeMirada={shakeMirada} ubicMirada={ubicMirada} onMatch={intentarMirada} dropProps={dropProps} />
+        </Mesa>
+      )}
+
+      {/* MODO — glosario */}
+      {modo === "glosario" && (
+        <EscribeTermino
+          key={glosIntento}
+          pares={PARES}
+          accent={accent}
+          rgba={color.rgba}
+          completado={glosarioDone}
+          instrucciones="Lee la definición y escribe el término del glosario que le corresponde."
+          onCompletado={() => {
+            setGlosarioDone(true);
+            sfxOk();
+            persistMejor(miradasDone, raicesDone, true);
+          }}
+          onAcierto={sfxPlace}
+          onError={sfxNo}
+        />
+      )}
+
+      {/* MODO — completa el texto (fill_blanks verbatim de la progresión) */}
+      {modo === "texto" && (
+        <CompletaTexto
+          key={textoIntento}
+          data={SENTIDO_HISTORICO_HUECOS}
+          accent={accent}
+          rgba={color.rgba}
+          completado={textoDone}
+          onCompletado={() => {
+            setTextoDone(true);
+            sfxOk();
+          }}
+          onAcierto={sfxPlace}
+          onError={sfxNo}
+        />
+      )}
+    </div>
+  );
 
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes shShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
-        @keyframes shPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
-        .sh-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 16px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .sh-tab:hover { border-color:${T.lineStrong}; color:#fff; }
-        .sh-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-        .sh-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
-          font-size:14px; border:1px solid ${T.line}; background:${T.glass}; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .sh-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
-        .sh-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .sh-chip { cursor:grab; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 16px; border-radius:14px;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:13.5px; font-weight:700; transition:all .14s; user-select:none; max-width:360px; text-align:left; line-height:1.4; }
-        .sh-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); }
-        .sh-chip[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.2); box-shadow:0 0 16px -5px ${accent}; }
-        .sh-chip:active { cursor:grabbing; }
-        .sh-row { border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:14px 16px; transition:all .16s; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
-        .sh-row[data-shake="true"] { animation:shShake .4s; border-color:${NO}; }
-        .sh-row[data-done="true"] { border-color:${OK}66; background:${OK}0f; }
-        .sh-slot { flex-shrink:0; min-width:170px; min-height:42px; border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset};
-          display:inline-flex; align-items:center; justify-content:center; color:${T.text3}; font-size:12.5px; transition:all .16s; cursor:pointer; padding:4px 10px; }
-        .sh-slot[data-armed="true"] { border-color:${accent}; background:rgba(${color.rgba},0.1); }
-        .sh-bin { border-radius:15px; border:1.5px solid ${T.line}; background:${T.glass}; padding:16px; transition:all .16s; min-height:230px; }
-        .sh-bin[data-shake="true"] { animation:shShake .4s; border-color:${NO}; }
-        .sh-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
-          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
-        .sh-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
-        .sh-q:disabled{ cursor:default; }
-        .sh-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
-          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .sh-btn:hover { border-color:${T.lineStrong}; }
-        .sh-divider { height:1px; background:${T.line}; margin:18px 0; }
-        @media (prefers-reduced-motion: reduce){ .sh-row[data-shake="true"], .sh-bin[data-shake="true"] { animation:none; } }
-
-        /* Cajón de teoría */
-        .sh-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .sh-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .sh-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .sh-drawer[data-open="true"] { transform:translateX(0); }
-        .sh-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .sh-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .sh-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .sh-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .sh-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .sh-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .sh-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
-
-        /* Identidad del tablero */
-        .sh-bin, .sh-row { --tono:188; position:relative;
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
-        .sh-bin:nth-of-type(6n+1), .sh-row:nth-of-type(6n+1) { --tono:188; }
-        .sh-bin:nth-of-type(6n+2), .sh-row:nth-of-type(6n+2) { --tono:262; }
-        .sh-bin:nth-of-type(6n+3), .sh-row:nth-of-type(6n+3) { --tono:44; }
-        .sh-bin:nth-of-type(6n+4), .sh-row:nth-of-type(6n+4) { --tono:152; }
-        .sh-bin:nth-of-type(6n+5), .sh-row:nth-of-type(6n+5) { --tono:330; }
-        .sh-bin:nth-of-type(6n+6), .sh-row:nth-of-type(6n+6) { --tono:18; }
-        .sh-bin::before, .sh-row::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
-          background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
-        .sh-bin[data-done="true"], .sh-row[data-done="true"] {
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.2) 0%, transparent 68%); }
-        .sh-chip { transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
-        .sh-chip:hover { transform:translateY(-2px); }
-        .sh-chip[data-sel="true"] { transform:translateY(-3px) scale(1.02); }
-        @media (prefers-reduced-motion: reduce){
-          .sh-chip, .sh-chip:hover, .sh-chip[data-sel="true"] { transform:none; transition:none; }
-        }
-      `}</style>
-
-      {/* selector de modo + toolbar */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="sh-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="sh-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="sh-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="sh-icobtn" onClick={resetActual} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <button className="sh-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="sh-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="sh-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="sh-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="sh-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="sh-drawer-body">
-          <FichaTeorica data={SENTIDO_HISTORICO_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}>
-        {/* ── Columna principal ─────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
-          {/* MODO 1 — miradas */}
-          {/* MODO — completa el texto (fill_blanks verbatim de la progresión) */}
-          {modo === "texto" && (
-            <CompletaTexto
-              key={textoIntento}
-              data={SENTIDO_HISTORICO_HUECOS}
-              accent={accent}
-              rgba={color.rgba}
-              completado={textoDone}
-              onCompletado={() => {
-                setTextoDone(true);
-                sfxOk();
-              }}
-              onAcierto={sfxPlace}
-              onError={sfxNo}
-            />
-          )}
-
-          {modo === "miradas" && (
+    <LabShell
+      dom
+      accent={accent}
+      rgba={color.rgba}
+      escena={escena}
+      modos={{ opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })), valor: modo, cambiar: (id) => setModo(id as Modo) }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={resetActual} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      retoKey={RETO_KEY}
+      pestanas={[
+        {
+          id: "pistas",
+          etiqueta: "Pistas",
+          icono: "fa-lightbulb",
+          contenido: (
             <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada caso a la forma de mirar el pasado</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: miradasDone ? OK : T.text3 }}>
-                    {Object.keys(ubicMirada).length}/{CASOS.length}
-                  </span>
-                </div>
-                {miradasLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Clasificaste los {CASOS.length} casos!
+              <Bloque titulo="Pista de este modo" icono="fa-lightbulb">
+                <div style={{ fontSize: 15, color: T.text2, lineHeight: 1.5 }}>{pistaDe[modo]}</div>
+              </Bloque>
+              {modo === "museo" && (
+                <Bloque titulo="Tu museo" icono="fa-gauge-high">
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 10 }}>
+                    <Dato label="Situaciones con raíz" value={`${nConex}/${RAICES.length}`} col={raicesDone ? OK : undefined} />
+                    <Dato label="Comprensión" value={`${pct} %`} col={accent} />
                   </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {miradasLibres.map((c) => (
-                      <button key={c.id} className="sh-chip" data-sel={selMirada === c.id} onClick={() => setSelMirada((s) => (s === c.id ? null : c.id))} {...dragProps(c.id)}>
-                        {c.texto}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <BinsMiradas selMirada={selMirada} shakeMirada={shakeMirada} ubicMirada={ubicMirada} onMatch={intentarMirada} dropProps={dropProps} />
-            </>
-          )}
-
-          {/* MODO 2 — raíces */}
-          {modo === "raices" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada raíz histórica al fenómeno que explica</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: raicesDone ? OK : T.text3 }}>
-                    {Object.keys(empRaiz).length}/{RAICES.length}
-                  </span>
-                </div>
-                {raicesLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Conectaste los {RAICES.length} fenómenos con su raíz!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {raicesLibres.map((r) => (
-                      <button key={r.id} className="sh-chip" data-sel={selRaiz === r.id} onClick={() => setSelRaiz((s) => (s === r.id ? null : r.id))} {...dragProps(r.id)}>
-                        <i className="fa-solid fa-clock-rotate-left" style={{ fontSize: 11, color: T.text3 }} />
-                        {r.raiz}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <RowsRaices selRaiz={selRaiz} shakeRaiz={shakeRaiz} empRaiz={empRaiz} onMatch={intentarRaiz} dropProps={dropProps} />
-            </>
-          )}
-
-          {/* MODO 3 — glosario */}
-          {modo === "glosario" && (
-            <EscribeTermino
-              key={glosIntento}
-              pares={PARES}
-              accent={accent}
-              rgba={color.rgba}
-              completado={glosarioDone}
-              instrucciones="Lee la definición y escribe el término del glosario que le corresponde."
-              onCompletado={() => {
-                setGlosarioDone(true);
-                sfxOk();
-                persistMejor(miradasDone, raicesDone, true);
-              }}
-              onAcierto={sfxPlace}
-              onError={sfxNo}
-            />
-          )}
-        </div>
-
-        {/* ── Columna lateral ───────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? OK : T.text2 }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-                  <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="sh-divider" />
-
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", color: T.text3, textTransform: "uppercase" }}>Puntuación</div>
-                <div style={{ display: "flex", gap: 4, marginTop: 5 }}>
+                </Bloque>
+              )}
+              <Bloque titulo="Tu partida" icono="fa-star">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+                <div style={{ display: "flex", gap: 4 }}>
                   {[1, 2, 3].map((s) => (
-                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 18, color: s <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
+                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 22, color: s <= bestEstrellas ? AMBAR : "rgba(255,255,255,0.16)" }} />
                   ))}
                 </div>
-              </div>
-              <div style={{ textAlign: "right", maxWidth: 180 }}>
-                <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45 }}>
+                <div style={{ fontSize: 15, color: T.text2, lineHeight: 1.5 }}>
                   {bestEstrellas >= 3 ? "¡Miras el presente con sentido histórico!" : "Termina los tres modos para ganar 2★; la tercera pide 2 errores o menos."}
                 </div>
-              </div>
-            </div>
-          </div>
-
-          {/* pista del modo actual */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid rgba(${color.rgba},0.3)`, background: `rgba(${color.rgba},0.08)`, fontSize: 13, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              {modo === "miradas" && (
-                <>El <strong style={{ color: T.text }}>sentido histórico</strong> contextualiza antes de juzgar; el <strong style={{ color: T.text }}>presentismo</strong> juzga el pasado con los valores de hoy; la <strong style={{ color: T.text }}>memoria acrítica</strong> repite la versión oficial sin cuestionarla.</>
-              )}
-              {modo === "raices" && (
-                <>Ante cada fenómeno del presente pregúntate <strong style={{ color: T.text }}>cómo llegó a ser lo que es</strong>: el pasado no es accidente ni destino, deja huellas de <strong style={{ color: T.text }}>larga duración</strong>.</>
-              )}
-              {modo === "glosario" && (
-                <>Ya no se arrastra: lee la definición y su ejemplo y escribe el término. Si te atoras, la pista te da la inicial y las letras.</>
-              )}
-            </span>
-          </div>
-
-          {/* dato verbatim */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid ${T.line}`, background: T.glass, fontSize: 12.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-circle-info" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>{DATO_SENTIDO}</span>
-          </div>
-        </div>
-      </div>
-
-      <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />
-    </div>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-clipboard-question",
+          contenido: <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />,
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Teoría de la práctica" icono="fa-book-open">
+                <FichaTeorica data={SENTIDO_HISTORICO_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <Bloque titulo="Tres formas de mirar el pasado" icono="fa-eye">
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {(Object.keys(TIPO_MIRADA_INFO) as TipoMirada[]).map((k) => (
+                    <div key={k} style={{ fontSize: 15, color: T.text2, lineHeight: 1.5 }}>
+                      <strong style={{ color: T.text }}>{TIPO_MIRADA_INFO[k].titulo}.</strong> {TIPO_MIRADA_INFO[k].subtitulo}
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+              <Bloque titulo="Del pasado al presente" icono="fa-timeline">
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {RAICES.map((r) => (
+                    <div key={r.id} style={{ fontSize: 15, color: T.text2, lineHeight: 1.5 }}>
+                      <strong style={{ color: T.text }}>{r.presente}</strong> ← {r.raiz}.
+                      <div style={{ fontStyle: "italic", color: T.text3, marginTop: 2 }}>{r.ejemplo}</div>
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+              <Bloque titulo="Conceptos clave" icono="fa-link">
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {PARES.map((p) => (
+                    <div key={p.id} style={{ fontSize: 15, color: T.text2, lineHeight: 1.5 }}>
+                      <strong style={{ color: T.text }}>{p.termino}.</strong> {p.definicion}
+                      <div style={{ fontStyle: "italic", color: T.text3, marginTop: 2 }}>{p.ejemplo}</div>
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+              <Bloque titulo="Dato" icono="fa-circle-info">
+                <div style={{ fontSize: 15, color: T.text2, lineHeight: 1.55 }}>{DATO_SENTIDO}</div>
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
- * Paneles de cada modo (componentes hijos: reciben los manejadores como props,
- * así el linter no rastrea el acceso al ref de audio hasta el render del map).
+ * Estilos
  * ═══════════════════════════════════════════════════════════════════════════ */
+const ESTILOS = (accent: string, rgba: string) => `
+  @keyframes shShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
+  @keyframes shPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
+  @keyframes shHilo { from { stroke-dashoffset:900; } to { stroke-dashoffset:0; } }
+  .sh-escena { display:grid; gap:14px; min-width:0; }
+  .sh-banco, .sh-destino { display:flex; flex-direction:column; gap:10px; min-width:0; }
+  .sh-titulo { display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:14px; font-weight:800; color:${T.text2}; line-height:1.35; }
+  .sh-titulo strong { color:${T.text3}; white-space:nowrap; }
+  .sh-titulo strong[data-ok="true"] { color:${OK}; }
+  .sh-listo { display:flex; align-items:center; gap:9px; font-size:15px; font-weight:700; color:${OK}; }
+  .sh-cartas { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap:9px; }
+  .sh-carta { cursor:pointer; display:flex; flex-direction:column; gap:8px; padding:8px; border-radius:14px; border:1.5px solid ${T.line};
+    background:${T.glassSoft}; color:#fff; font-size:14px; font-weight:700; line-height:1.3; text-align:left; transition:all .14s; min-width:0; }
+  .sh-carta:hover { border-color:${T.lineStrong}; }
+  .sh-carta[data-sel="true"] { border-color:${accent}; background:rgba(${rgba},0.2); box-shadow:0 0 16px -5px ${accent}; }
+  .sh-foto { position:relative; display:grid; place-items:center; aspect-ratio:16/10; width:100%; border-radius:10px; overflow:hidden;
+    background:linear-gradient(135deg, rgba(${rgba},0.38), rgba(10,28,48,0.9)); color:rgba(255,255,255,0.75); font-size:26px; }
+  .sh-foto img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .sh-hero { aspect-ratio:auto; height:84px; border-radius:14px; }
+  .sh-cabecera { position:relative; }
+  .sh-cabecera-txt { position:absolute; left:0; right:0; bottom:0; padding:22px 14px 10px; display:grid; gap:2px;
+    background:linear-gradient(0deg, rgba(3,8,18,0.85), transparent); border-radius:0 0 14px 14px; }
+  .sh-cabecera-txt strong { font-size:16px; font-weight:900; color:#fff; }
+  .sh-cabecera-txt span { font-size:14px; color:${T.text2}; }
+  .sh-linea { width:100%; height:auto; display:block; }
+  .sh-hilo { stroke-dasharray:900; animation:shHilo .9s ease-out; }
+  .sh-medidor-fila { display:flex; justify-content:space-between; gap:10px; font-size:14px; font-weight:800; color:${T.text2}; }
+  .sh-medidor-fila strong { color:#fff; font-variant-numeric:tabular-nums; }
+  .sh-medidor { height:14px; border-radius:99px; background:rgba(255,255,255,0.12); overflow:hidden; }
+  .sh-medidor-fill { height:100%; border-radius:99px; background:linear-gradient(90deg, ${accent}, ${OK}); transition:width .6s ease; }
+  .sh-nodos { display:grid; gap:8px; }
+  .sh-nodo { cursor:pointer; display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:13px; border:1.5px solid ${T.line};
+    background:${T.glass}; color:#fff; text-align:left; font-size:14px; line-height:1.3; transition:all .14s; min-width:0; }
+  .sh-nodo[data-armed="true"] { border-color:${accent}; background:rgba(${rgba},0.1); }
+  .sh-nodo[data-done="true"] { border-color:${OK}66; background:${OK}14; cursor:default; }
+  .sh-nodo[data-shake="true"] { animation:shShake .4s; border-color:${NO}; }
+  .sh-num { flex-shrink:0; width:30px; height:30px; border-radius:50%; display:grid; place-items:center; font-size:15px; font-weight:900;
+    background:rgba(255,255,255,0.12); }
+  .sh-nodo[data-done="true"] .sh-num { background:${OK}; color:#04121f; }
+  .sh-nodo-txt { display:grid; gap:2px; min-width:0; }
+  .sh-nodo-txt small { font-size:14px; font-weight:800; color:${T.text3}; }
+  .sh-nodo-txt b { font-size:15px; font-weight:800; }
+  .sh-nodo-txt em { font-size:14px; font-style:normal; color:${OK}; }
+  .sh-retro { display:flex; gap:10px; align-items:flex-start; padding:11px 13px; border-radius:13px; border:1px solid ${T.line};
+    background:${T.inset}; font-size:14px; line-height:1.45; color:${T.text2}; }
+  .sh-retro i { margin-top:3px; color:${accent}; }
+  .sh-retro[data-ok="true"] { border-color:${OK}66; background:${OK}12; color:#fff; }
+  .sh-retro[data-ok="true"] i { color:${OK}; }
+  .sh-retro[data-ok="false"] { border-color:${NO}66; background:${NO}12; color:#fff; }
+  .sh-retro[data-ok="false"] i { color:${NO}; }
+  .sh-chip { cursor:grab; display:flex; align-items:center; gap:8px; padding:11px 14px; border-radius:14px; width:100%;
+    border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:14px; font-weight:700; transition:all .14s; user-select:none; text-align:left; line-height:1.4; }
+  .sh-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); }
+  .sh-chip[data-sel="true"] { border-color:${accent}; background:rgba(${rgba},0.2); box-shadow:0 0 16px -5px ${accent}; }
+  .sh-chip[data-arrastrando="true"] { opacity:.45; }
+  .sh-chip:active { cursor:grabbing; }
+  .sh-bin { position:relative; border-radius:15px; border:1.5px solid ${T.line}; background:${T.glass}; padding:14px; transition:all .16s; min-height:150px; }
+  .sh-bin[data-sobre="true"] { border-color:${accent}; background:rgba(${rgba},0.12); }
+  .sh-bin[data-shake="true"] { animation:shShake .4s; border-color:${NO}; }
+  .sh-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
+    border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
+  .sh-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
+  .sh-q:disabled{ cursor:default; }
+  .sh-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
+    border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:14px; font-weight:800; transition:all .14s; }
+  .sh-btn:hover { border-color:${T.lineStrong}; }
+  @media (prefers-reduced-motion: reduce){
+    .sh-nodo[data-shake="true"], .sh-bin[data-shake="true"], .sh-hilo { animation:none; }
+    .sh-medidor-fill { transition:none; }
+  }
+`;
+
+/* Rótulo pequeño de las tarjetas (14 px, no 11). */
+const Ceja = ({ children }: { children: React.ReactNode }) => (
+  <p style={{ fontSize: 14, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", color: T.text3, margin: "0 0 12px" }}>{children}</p>
+);
+
+/* ═══ Paneles de cada modo ═══ */
 type DropFactory = (onDrop: (id: string) => void) => {
   onDragOver: (e: React.DragEvent) => void;
   onDrop: (e: React.DragEvent) => void;
@@ -543,7 +671,7 @@ function BinsMiradas({
 }) {
   const bins: TipoMirada[] = ["sentido", "presentismo", "acritica"];
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 200px), 1fr))", gap: 12 }}>
       {bins.map((bin) => {
         const info = TIPO_MIRADA_INFO[bin];
         const dentro = CASOS.filter((c) => ubicMirada[c.id] === bin);
@@ -560,69 +688,20 @@ function BinsMiradas({
             <FondoTermino termino={info.titulo} />
             <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
               <VinetaTermino termino={info.titulo} color={bin === "sentido" ? OK : bin === "presentismo" ? NO : T.text2} icono={info.icono} tam={29} radio={8} />
-              <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
+              <span style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
             </div>
-            <div style={{ fontSize: 11, color: T.text3, marginBottom: 12, lineHeight: 1.4 }}>{info.subtitulo}</div>
+            <div style={{ fontSize: 14, color: T.text3, marginBottom: 12, lineHeight: 1.4 }}>{info.subtitulo}</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {dentro.length === 0 ? (
-                <div style={{ fontSize: 12, color: T.text3, opacity: 0.6, padding: "8px 0" }}>Arrastra aquí…</div>
+                <div style={{ fontSize: 14, color: T.text3, opacity: 0.6, padding: "8px 0" }}>Arrastra aquí…</div>
               ) : (
                 dentro.map((c) => (
-                  <span key={c.id} style={{ animation: "shPop .25s ease", display: "inline-flex", alignItems: "flex-start", gap: 7, padding: "8px 12px", borderRadius: 11, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 12.5, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>
+                  <span key={c.id} style={{ animation: "shPop .25s ease", display: "inline-flex", alignItems: "flex-start", gap: 7, padding: "8px 12px", borderRadius: 11, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 14, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>
                     <i className="fa-solid fa-check" style={{ fontSize: 10, color: OK, marginTop: 3 }} />
                     {c.texto}
                   </span>
                 ))
               )}
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function RowsRaices({
-  selRaiz,
-  shakeRaiz,
-  empRaiz,
-  onMatch,
-  dropProps,
-}: {
-  selRaiz: string | null;
-  shakeRaiz: string | null;
-  empRaiz: Record<string, boolean>;
-  onMatch: (chipId: string, rowId: string) => void;
-  dropProps: DropFactory;
-}) {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-      {RAICES.map((r) => {
-        const done = empRaiz[r.id];
-        return (
-          <div
-            key={r.id}
-            className="sh-row"
-            data-shake={shakeRaiz === r.id}
-            data-done={done}
-            onClick={() => !done && selRaiz && onMatch(selRaiz, r.id)}
-            {...dropProps((id) => onMatch(id, r.id))}
-          >
-            <div className="sh-slot" data-armed={!done && !!selRaiz} style={done ? { borderStyle: "solid", borderColor: OK, background: `${OK}1a` } : undefined}>
-              {done ? (
-                <span style={{ animation: "shPop .25s ease", fontSize: 13, fontWeight: 900, color: "#fff", display: "inline-flex", alignItems: "center", gap: 7 }}>
-                  <i className="fa-solid fa-clock-rotate-left" />
-                  {r.raiz}
-                </span>
-              ) : (
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                  <i className="fa-solid fa-arrow-left" style={{ fontSize: 11 }} /> raíz
-                </span>
-              )}
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 14, fontWeight: 700, color: done ? "#fff" : T.text2, lineHeight: 1.4 }}>{r.presente}</div>
-              <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.4, marginTop: 3 }}>{r.ejemplo}</div>
             </div>
           </div>
         );
@@ -671,19 +750,19 @@ function QuizCard({
   };
 
   return (
-    <div style={{ ...card, padding: "20px 24px 24px", marginTop: 22 }}>
+    <div style={{ ...card, padding: "4px 0 8px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4, flexWrap: "wrap" }}>
-        <Eyebrow>
+        <Ceja>
           <i className="fa-solid fa-clipboard-question" style={{ marginRight: 8, color: accent }} />
           Comprueba lo aprendido
-        </Eyebrow>
+        </Ceja>
         {aprobado && (
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 12, fontWeight: 800, color: OK }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 14, fontWeight: 800, color: OK }}>
             <i className="fa-solid fa-circle-check" /> Aprobado
           </span>
         )}
       </div>
-      <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
         Cinco afirmaciones sobre el sentido histórico, la memoria colectiva y la relación entre el pasado y el presente. Decide si son verdaderas o falsas y pulsa «Comprobar».
       </div>
 
@@ -696,7 +775,7 @@ function QuizCard({
                 <span style={{ color: accent }}>{qi + 1}.</span>
                 <span>{q.pregunta}</span>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 200px), 1fr))", gap: 9 }}>
                 {q.opciones.map((op, oi) => {
                   const sel = elegida === oi;
                   const esCorrecta = oi === q.correcta;
@@ -718,7 +797,7 @@ function QuizCard({
                   }
                   return (
                     <button key={oi} className="sh-q" onClick={() => elegir(qi, oi)} disabled={comprobado} style={{ borderColor: borde, background: fondo, color: colorTxt }}>
-                      <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
+                      <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
                         {comprobado && esCorrecta ? <i className="fa-solid fa-check" /> : comprobado && sel ? <i className="fa-solid fa-xmark" /> : String.fromCharCode(65 + oi)}
                       </span>
                       <span style={{ flex: 1, lineHeight: 1.35 }}>{op}</span>
@@ -727,7 +806,7 @@ function QuizCard({
                 })}
               </div>
               {comprobado && (
-                <div style={{ marginTop: 9, fontSize: 12.5, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
+                <div style={{ marginTop: 9, fontSize: 14, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
                   <i className="fa-solid fa-circle-info" style={{ color: accent, marginTop: 2 }} />
                   <span>{q.retro}</span>
                 </div>
@@ -750,7 +829,7 @@ function QuizCard({
           </button>
         )}
         {comprobado && (
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 13.5, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 15, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
             <i className={`fa-solid ${aprobadoAhora ? "fa-trophy" : "fa-circle-half-stroke"}`} />
             {aciertos} / {total} correctas
             {!aprobadoAhora && <span style={{ color: T.text3, fontWeight: 600 }}>· revisa las marcadas e inténtalo de nuevo</span>}

@@ -88,7 +88,7 @@ function Etiqueta({ pos, children, col, fs = 11, z = 20 }: { pos: Pt; children: 
           background: "rgba(4,10,22,0.86)",
           border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`,
           color: "#fff",
-          fontSize: fs,
+          fontSize: Math.max(fs, 14),
           fontWeight: 800,
           whiteSpace: "nowrap",
           boxShadow: "0 6px 18px -8px #000",
@@ -101,6 +101,9 @@ function Etiqueta({ pos, children, col, fs = 11, z = 20 }: { pos: Pt; children: 
 }
 
 function Burbuja({ pos, texto, col = "#0f172a", fondo = "#fff", ancho = 240 }: { pos: Pt; texto: string; col?: string; fondo?: string; ancho?: number }) {
+  // En pantallas angostas el diálogo ya está en la lectura y en el panel.
+  const angosto = useThree((st) => st.size.width < 640);
+  if (angosto) return null;
   return (
     <Html position={pos} center eps={-1} zIndexRange={[40, 0]} style={{ pointerEvents: "none" }}>
       <div style={{ transform: "translateY(-50%)", display: "flex", flexDirection: "column", alignItems: "center" }}>
@@ -112,7 +115,7 @@ function Burbuja({ pos, texto, col = "#0f172a", fondo = "#fff", ancho = 240 }: {
             borderRadius: 12,
             background: fondo,
             color: col,
-            fontSize: 12.5,
+            fontSize: 14,
             fontWeight: 800,
             lineHeight: 1.35,
             textAlign: "center",
@@ -914,9 +917,9 @@ function focoXZ(id: LugarId): [number, number] {
 /* ── Escena ───────────────────────────────────────────────────────────── */
 
 const CAMARAS: Record<Modo, { pos: Pt; target: Pt; min: number; max: number }> = {
-  preguntar: { pos: [0, 16, 23], target: [0, 0.2, 0.4], min: 6, max: 40 },
-  tablero: { pos: [0, 2.3, 6.4], target: [0, 3.5, -6], min: 4, max: 20 },
-  informacion: { pos: [0, 27.5, 11.5], target: [0, 0, 1.0], min: 8, max: 40 },
+  preguntar: { pos: [0, 16, 23], target: [0, 0.2, 1.8], min: 6, max: 40 },
+  tablero: { pos: [0, 2.3, 6.4], target: [0, 3.0, -6], min: 4, max: 20 },
+  informacion: { pos: [0, 27.5, 11.5], target: [0, 0, 2.4], min: 8, max: 40 },
 };
 
 export default function TerminalHorariosInglesScene(p: TerminalSceneProps) {
@@ -956,7 +959,7 @@ export default function TerminalHorariosInglesScene(p: TerminalSceneProps) {
       <Edificio />
       <SalaEspera />
       {LUGARES.filter((l) => l.local).map((l) => (
-        <Local key={l.id} l={l} resaltado={p.foco?.lugar === l.id} colorRes={colFoco} conEtiqueta={conEtiquetas} />
+        <Local key={l.id} l={l} resaltado={p.foco?.lugar === l.id} colorRes={colFoco} conEtiqueta={conEtiquetas && (vista === "informacion" || p.foco?.lugar === l.id)} />
       ))}
       <ModuloInfo resaltado={p.foco?.lugar === "info"} colorRes={colFoco} conEtiqueta={conEtiquetas && vista !== "preguntar"} />
       <Tablero tipo="salidas" t={t} x={-3.5} resIdx={idxSal} resOk={!!p.filaSalida?.ok} />
@@ -965,10 +968,12 @@ export default function TerminalHorariosInglesScene(p: TerminalSceneProps) {
       {GATES_X.map((gx, i) => (
         <group key={gx}>
           <Caja p={[gx, 2.55, Z_FONDO + 0.12]} s={[1.3, 0.42, 0.08]} color={gatesFocoIdx === i + 1 ? OK : "#1e293b"} e={gatesFocoIdx === i + 1 ? 0.9 : 0} />
-          <Etiqueta pos={[gx, vista === "tablero" ? 2.55 : 3.0, Z_FONDO + 0.3]} col={gatesFocoIdx === i + 1 ? OK : "#cbd5e1aa"} fs={vista === "tablero" ? 12 : 10} z={15}>
-            <i className="fa-solid fa-door-open" style={{ color: "#cbd5e1" }} />
-            Gate {i + 1}
-          </Etiqueta>
+          {gatesFocoIdx === i + 1 && (
+            <Etiqueta pos={[gx, vista === "tablero" ? 2.55 : 3.0, Z_FONDO + 0.3]} col={OK} fs={14} z={15}>
+              <i className="fa-solid fa-door-open" style={{ color: "#cbd5e1" }} />
+              Gate {i + 1}
+            </Etiqueta>
+          )}
         </group>
       ))}
       {SALIDAS.map((s) => (

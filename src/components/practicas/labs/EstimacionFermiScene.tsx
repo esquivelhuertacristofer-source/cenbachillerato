@@ -20,8 +20,8 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { createContext, useContext, useMemo, useRef, type ReactNode } from "react";
+import { Canvas, useThree, useFrame } from "@react-three/fiber";
 import { OrbitControls, Environment, Lightformer, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import {
@@ -70,6 +70,8 @@ export interface EstimacionSceneProps {
   casoId: string;
   estimacionAlumno: number | null;
   dictaminado: boolean;
+  /** Muestra las etiquetas secundarias. */
+  detalles: boolean;
 }
 
 type Pt = [number, number, number];
@@ -79,7 +81,13 @@ const OK = "#34d399";
 const NO = "#f87171";
 const ORO = "#fbbf24";
 
-function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number }) {
+/** Las etiquetas secundarias (`sec`) solo se ven con «Ver detalles»; en el celular se ocultan (esa información está en el panel). */
+const DetallesCtx = createContext(false);
+
+function Etiqueta({ pos, children, df = 10, col, fs = 14, sec = false }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number; sec?: boolean }) {
+  const detalles = useContext(DetallesCtx);
+  const angosto = useThree((st) => st.size.width) < 640;
+  if (sec && (!detalles || angosto)) return null;
   return (
     <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
@@ -241,7 +249,7 @@ function ReglaLog({ centro, estimacion, rango, real, modoColor }: { centro: numb
           <cylinderGeometry args={[0.015, 0.015, 0.35, 8]} />
           <meshBasicMaterial color={modoColor} />
         </mesh>
-        <Etiqueta pos={[0, 0.42, 0]} df={10} col={`${modoColor}aa`} fs={11}>
+        <Etiqueta pos={[0, 0.42, 0]} df={10} col={`${modoColor}aa`} fs={14}>
           Tu estimación · {cantidad(estimacion)}
         </Etiqueta>
       </group>
@@ -251,13 +259,13 @@ function ReglaLog({ centro, estimacion, rango, real, modoColor }: { centro: numb
           <meshStandardMaterial color={ORO} emissive={ORO} emissiveIntensity={0.7} metalness={0.6} roughness={0.25} />
         </mesh>
         {real !== null && (
-          <Etiqueta pos={[0, 1.12, -0.3]} df={10} col={`${ORO}aa`} fs={11}>
+          <Etiqueta pos={[0, 1.12, -0.3]} df={10} col={`${ORO}aa`} fs={14}>
             <i className="fa-solid fa-flag-checkered" style={{ color: ORO }} />
             Dato real · {cantidad(real)}
           </Etiqueta>
         )}
       </group>
-      <Etiqueta pos={[-5.6, 0.2, 0]} df={11} fs={10}>
+      <Etiqueta sec pos={[-5.6, 0.2, 0]} df={11} fs={14}>
         ×10 por tramo
       </Etiqueta>
     </group>
@@ -384,16 +392,16 @@ function EscenaSalon({ valores, modoColor }: { valores: number[]; modoColor: str
         <lineSegments geometry={G_ARISTAS} position={[0, Hs / 2, 0]} scale={[W, Hs, D]}>
           <lineBasicMaterial color="#e2e8f0" transparent opacity={0.7} />
         </lineSegments>
-        <Etiqueta pos={[0, Hs + 0.05, D / 2 + 0.05]} df={10} fs={11}>
+        <Etiqueta sec pos={[0, Hs + 0.05, D / 2 + 0.05]} df={10} fs={14}>
           largo {num(L, 1)} m
         </Etiqueta>
-        <Etiqueta pos={[W / 2 + 0.45, 0, 0]} df={10} fs={11}>
+        <Etiqueta sec pos={[W / 2 + 0.45, 0, 0]} df={10} fs={14}>
           ancho {num(A, 1)} m
         </Etiqueta>
-        <Etiqueta pos={[-W / 2 - 0.55, Hs / 2, D / 2]} df={10} fs={11}>
+        <Etiqueta sec pos={[-W / 2 - 0.55, Hs / 2, D / 2]} df={10} fs={14}>
           alto {num(H, 1)} m
         </Etiqueta>
-        <Etiqueta pos={[0, Hs + 0.45, -D / 2]} df={10} col={`${modoColor}aa`} fs={11.5}>
+        <Etiqueta pos={[0, Hs + 0.45, -D / 2]} df={10} col={`${modoColor}aa`} fs={14}>
           <i className="fa-solid fa-cube" style={{ color: modoColor }} />
           {num(L * A * H, 1)} m³ = {num(L * A * H * 1000, 0)} L · <span ref={lectura}>0 m³ completos llenos</span>
         </Etiqueta>
@@ -415,10 +423,10 @@ function EscenaSalon({ valores, modoColor }: { valores: number[]; modoColor: str
           <boxGeometry args={[LADO_LITRO, LADO_LITRO, LADO_LITRO]} />
           <meshStandardMaterial color="#e0f2fe" transparent opacity={0.08} depthWrite={false} />
         </mesh>
-        <Etiqueta pos={[0, LADO_LITRO + 0.45, 0]} df={10} col={`${modoColor}aa`} fs={11}>
+        <Etiqueta pos={[0, LADO_LITRO + 0.45, 0]} df={10} col={`${modoColor}aa`} fs={14}>
           <i className="fa-solid fa-magnifying-glass-plus" style={{ color: modoColor }} />1 L (10 cm por lado) ≈ {num(porLitro, 0)} canicas
         </Etiqueta>
-        <Etiqueta pos={[0, -0.35, LADO_LITRO / 2 + 0.3]} df={11} fs={10}>
+        <Etiqueta sec pos={[0, -0.35, LADO_LITRO / 2 + 0.3]} df={11} fs={14}>
           canica de {num(d, 1)} cm · ocupan {Math.round(phi * 100)} %
           {nE ** 3 < porLitro * 0.8 ? ` · dibujadas ${num(nE ** 3)}` : ""}
         </Etiqueta>
@@ -516,7 +524,7 @@ function EscenaCostal({ valores }: { valores: number[] }) {
             <meshStandardMaterial color="#8a6a3c" roughness={1} />
           </mesh>
         ))}
-        <Etiqueta pos={[0, -0.25, 1.6]} df={10} fs={11}>
+        <Etiqueta pos={[0, -0.25, 1.6]} df={10} fs={14}>
           <i className="fa-solid fa-sack-xmark" style={{ color: "#f2c230" }} />
           Costal de {num(kg)} kg = {num(kg * 1000)} g
         </Etiqueta>
@@ -545,7 +553,7 @@ function EscenaCostal({ valores }: { valores: number[] }) {
         <instancedMesh ref={plato} args={[G_GRANO, undefined, N_GRANOS_PLATO]} castShadow frustumCulled={false}>
           <meshStandardMaterial color="#f2c230" roughness={0.55} />
         </instancedMesh>
-        <Etiqueta pos={[0, 1.35, 0]} df={10} fs={11}>
+        <Etiqueta pos={[0, 1.35, 0]} df={10} fs={14}>
           <i className="fa-solid fa-scale-balanced" style={{ color: "#f2c230" }} />
           100 granos = {num(m * 100, 1)} g
         </Etiqueta>
@@ -582,12 +590,12 @@ function EscenaCostal({ valores }: { valores: number[] }) {
             </mesh>
           </group>
         </group>
-        <Etiqueta pos={[0, 1.0, 0.3]} df={10} fs={10.5}>
+        <Etiqueta sec pos={[0, 1.0, 0.3]} df={10} fs={14}>
           1 grano de {num(m, 2)} g · ampliado ×10
         </Etiqueta>
       </group>
 
-      <Etiqueta pos={[0.2, 4.1, -1.2]} df={10} col="#f2c230aa" fs={12}>
+      <Etiqueta pos={[0.2, 4.1, -1.2]} df={10} col="#f2c230aa" fs={14}>
         {num(kg * 1000)} g ÷ {num(m, 2)} g = {cantidad(granos)} granos
       </Etiqueta>
     </group>
@@ -695,7 +703,7 @@ function EscenaAgua({ valores, modoColor }: { valores: number[]; modoColor: stri
           <sphereGeometry args={[Math.max(0.04, anchoTorre * 0.08), 12, 10]} />
           <meshStandardMaterial color={NO} emissive={NO} emissiveIntensity={1.5} />
         </mesh>
-        <Etiqueta pos={[-anchoTorre / 2 - 1.3, hTorre + hAntena * 0.6, 0]} df={10} fs={10.5}>
+        <Etiqueta sec pos={[-anchoTorre / 2 - 1.3, hTorre + hAntena * 0.6, 0]} df={10} fs={14}>
           <i className="fa-solid fa-building" style={{ color: "#cbd5e1" }} />
           Torre Latinoamericana · 182 m
         </Etiqueta>
@@ -709,7 +717,7 @@ function EscenaAgua({ valores, modoColor }: { valores: number[]; modoColor: stri
       <lineSegments ref={contorno} geometry={G_ARISTAS}>
         <lineBasicMaterial color="#bae6fd" />
       </lineSegments>
-      <Etiqueta pos={[0.4 + (lado * k) / 2, lado * k + 0.5, 0]} df={10} col={`${modoColor}aa`} fs={11.5}>
+      <Etiqueta pos={[0.4 + (lado * k) / 2, lado * k + 0.5, 0]} df={10} col={`${modoColor}aa`} fs={14}>
         <i className="fa-solid fa-droplet" style={{ color: "#38bdf8" }} />
         {cantidad(V)} L = cubo de {num(lado, 0)} m de lado
       </Etiqueta>
@@ -732,11 +740,11 @@ function EscenaAgua({ valores, modoColor }: { valores: number[]; modoColor: stri
             </group>
           );
         })}
-        <Etiqueta pos={[1.55, -0.2, 0.45]} df={11} fs={10}>
+        <Etiqueta sec pos={[1.55, -0.2, 0.45]} df={11} fs={14}>
           cada figura = 1 millón de habitantes
         </Etiqueta>
       </group>
-      <Etiqueta pos={[3.6, 0.2, 2.4]} df={10} fs={10.5}>
+      <Etiqueta sec pos={[3.6, 0.2, 2.4]} df={10} fs={14}>
         {num(millones, 1)} M × {num(litros, 0)} L × {num(fugas, 2)}
       </Etiqueta>
     </group>
@@ -852,7 +860,7 @@ function EscenaNumero({ numeroId, metodo, soltado, prediccion, modoColor }: { nu
           </group>
         );
       })}
-      <Etiqueta pos={[0, -1.05, 0.8]} df={10} col="#f472b6aa" fs={10.5}>
+      <Etiqueta sec pos={[0, -1.05, 0.8]} df={10} col="#f472b6aa" fs={14}>
         mitad · {num((abajo + arriba) / 2, d + 1)}
       </Etiqueta>
       <mesh ref={canica} castShadow>
@@ -860,7 +868,7 @@ function EscenaNumero({ numeroId, metodo, soltado, prediccion, modoColor }: { nu
         <meshStandardMaterial color={modoColor} metalness={0.35} roughness={0.08} emissive={modoColor} emissiveIntensity={0.2} />
       </mesh>
       {!soltado && (
-        <Etiqueta pos={[-PISTA_W / 2 + t0 * PISTA_W, alturaPista(forma, t0) + 1.0, 0]} df={9} col={`${modoColor}aa`} fs={13}>
+        <Etiqueta pos={[-PISTA_W / 2 + t0 * PISTA_W, alturaPista(forma, t0) + 1.0, 0]} df={9} col={`${modoColor}aa`} fs={14}>
           {num(e.valor, e.dec)}
         </Etiqueta>
       )}
@@ -882,7 +890,7 @@ function EscenaNumero({ numeroId, metodo, soltado, prediccion, modoColor }: { nu
             </group>
           ))}
         </group>
-        <Etiqueta pos={[0, 0.75, 0]} df={10} fs={11}>
+        <Etiqueta pos={[0, 0.75, 0]} df={10} fs={14}>
           {metodo === "redondear" ? "Redondear" : "Truncar"} {e.lugar} · las cifras rojas sobran
         </Etiqueta>
         {soltado && (
@@ -971,7 +979,7 @@ function EscenaOperacion({ operacionId, elegidoA, elegidoB, modoColor }: { opera
         </mesh>
       ))}
       {franjas.some((f) => f.tipo === "sobra") && (
-        <Etiqueta pos={[3.6, 0.3, 2.9]} df={10} col="#fb923caa" fs={10.5}>
+        <Etiqueta sec pos={[3.6, 0.3, 2.9]} df={10} col="#fb923caa" fs={14}>
           <span style={{ width: 10, height: 10, borderRadius: 3, background: "#fb923c", display: "inline-block" }} />
           sobra: la estimación cuenta de más
         </Etiqueta>
@@ -985,13 +993,13 @@ function EscenaOperacion({ operacionId, elegidoA, elegidoB, modoColor }: { opera
       <lineSegments ref={bordes} geometry={G_ARISTAS}>
         <lineBasicMaterial color={modoColor} />
       </lineSegments>
-      <Etiqueta pos={[-4 + W0 / 2, 0.1, -2.3 + Math.max(D0, elegidoA * sz) + 0.45]} df={10} fs={11.5}>
+      <Etiqueta pos={[-4 + W0 / 2, 0.1, -2.3 + Math.max(D0, elegidoA * sz) + 0.45]} df={10} fs={14}>
         {o.etqB}: {num(o.b, o.decB)} → <span style={{ color: modoColor }}>{num(elegidoB, o.decB)}</span>
       </Etiqueta>
-      <Etiqueta pos={[-4 - 0.35, 0.1, -2.3 + D0 / 2]} df={10} fs={11.5}>
+      <Etiqueta pos={[-4 - 0.35, 0.1, -2.3 + D0 / 2]} df={10} fs={14}>
         {o.etqA}: {num(o.a, o.decA)} → <span style={{ color: modoColor }}>{num(elegidoA, o.decA)}</span>
       </Etiqueta>
-      <Etiqueta pos={[1.6, 2.2, -1.2]} df={9} col={`${err < 0.05 ? OK : ORO}aa`} fs={13}>
+      <Etiqueta pos={[1.6, 2.2, -1.2]} df={9} col={`${err < 0.05 ? OK : ORO}aa`} fs={14}>
         <span style={{ color: "#cbd5e1" }}>exacto {num(exacto, o.decB)}</span>
         <span style={{ color: modoColor }}>estimado {num(estimado, o.decB)}</span>
         <span style={{ color: err < 0.05 ? OK : ORO }}>error {num(err * 100, 1)} %</span>
@@ -1062,12 +1070,12 @@ function Pila({ caso, valor, x, visible, etq, col }: { caso: string; valor: numb
         <meshStandardMaterial color={geo.color} roughness={0.45} metalness={c.objeto === "moneda" ? 0.8 : 0.05} transparent={c.objeto === "vaso"} opacity={c.objeto === "vaso" ? 0.7 : 1} />
       </instancedMesh>
       {visible && valor !== null && (
-        <Etiqueta pos={[0, Math.min(alto, 5) + 0.55, 0]} df={10} col={`${col}aa`} fs={12}>
+        <Etiqueta pos={[0, Math.min(alto, 5) + 0.55, 0]} df={10} col={`${col}aa`} fs={14}>
           {etq}
         </Etiqueta>
       )}
       {visible && n > CAP_OBJETOS && (
-        <Etiqueta pos={[0, Math.min(alto, 5) + 1.05, 0]} df={10} col={`${NO}aa`} fs={10.5}>
+        <Etiqueta sec pos={[0, Math.min(alto, 5) + 1.05, 0]} df={10} col={`${NO}aa`} fs={14}>
           <i className="fa-solid fa-triangle-exclamation" style={{ color: NO }} />
           no caben: faltan {cantidad(n - CAP_OBJETOS)} objetos más
         </Etiqueta>
@@ -1123,7 +1131,7 @@ function Medidor({ razon, modoColor, dictaminado, error }: { razon: number | nul
         <sphereGeometry args={[0.1, 16, 12]} />
         <meshStandardMaterial color={modoColor} metalness={0.6} roughness={0.3} />
       </mesh>
-      <Etiqueta pos={[0, -0.55, 0.1]} df={10} col={`${dictaminado ? (error === "ninguno" ? OK : NO) : modoColor}aa`} fs={11.5}>
+      <Etiqueta pos={[0, -0.55, 0.1]} df={10} col={`${dictaminado ? (error === "ninguno" ? OK : NO) : modoColor}aa`} fs={14}>
         {razon === null
           ? "Escribe tu estimación"
           : razon > 0.9 && razon < 1.1
@@ -1148,12 +1156,12 @@ function EscenaRazonable({ casoId, estimacionAlumno, dictaminado, modoColor }: {
       <Pila caso={casoId} valor={estimacionAlumno} x={-3.3} visible={estimacionAlumno !== null} etq={`Tu estimación · ${estimacionAlumno !== null ? fmt(estimacionAlumno) : ""}`} col={modoColor} />
       <Pila caso={casoId} valor={c.dado} x={3.3} visible etq={`Resultado dado · ${c.dadoTexto}`} col={dictaminado ? (c.error === "ninguno" ? OK : NO) : "#e2e8f0"} />
       <Medidor razon={razon} modoColor={modoColor} dictaminado={dictaminado} error={c.error} />
-      <Etiqueta pos={[0, 1.3, -1.6]} df={10} fs={10.5}>
+      <Etiqueta sec pos={[0, 1.3, -1.6]} df={10} fs={14}>
         <i className={`fa-solid ${c.icono}`} style={{ color: modoColor }} />
         cada objeto = {c.etqObjeto}
       </Etiqueta>
       {dictaminado && (
-        <Etiqueta pos={[0, 0.6, 2.6]} df={10} col={`${OK}aa`} fs={12}>
+        <Etiqueta pos={[0, 0.6, 2.6]} df={10} col={`${OK}aa`} fs={14}>
           <i className="fa-solid fa-calculator" style={{ color: OK }} />
           Cuenta exacta: {fmt(c.exacto)}
         </Etiqueta>
@@ -1169,20 +1177,21 @@ export default function EstimacionFermiScene(p: EstimacionSceneProps) {
   const sub = vista === "fermi" ? p.problemaId : vista === "redondeo" ? p.subRedondeo : "casos";
   const cam = useMemo((): { pos: Pt; target: Pt } => {
     if (vista === "fermi") {
-      if (sub === "agua") return { pos: [1.0, 5.6, 13.6], target: [0, 0.5, 0.6] };
-      if (sub === "costal") return { pos: [0.8, 6.2, 12.6], target: [0.4, -0.1, 0.6] };
-      return { pos: [2.0, 6.8, 12.8], target: [0.4, -0.3, 0.6] };
+      if (sub === "agua") return { pos: [1.0, 4.9, 13.6], target: [0, -0.2, 0.6] };
+      if (sub === "costal") return { pos: [0.8, 5.5, 12.6], target: [0.4, -0.8, 0.6] };
+      return { pos: [2.0, 6.1, 12.8], target: [0.4, -1.0, 0.6] };
     }
     if (vista === "redondeo") {
-      if (sub === "operacion") return { pos: [0, 6.4, 9.8], target: [0, -0.4, 0.4] };
-      return { pos: [0, 2.6, 11.2], target: [0, 0.7, 0] };
+      if (sub === "operacion") return { pos: [0, 5.7, 9.8], target: [0, -1.1, 0.4] };
+      return { pos: [0, 1.9, 11.2], target: [0, 0.0, 0] };
     }
-    return { pos: [0, 4.6, 11.4], target: [0, 1.0, 0] };
+    return { pos: [0, 3.9, 11.4], target: [0, 0.3, 0] };
   }, [vista, sub]);
   const problema = PROBLEMAS.find((x) => x.id === p.problemaId) ?? PROBLEMAS[0]!;
 
   return (
     <Canvas key={`${vista}-${sub}-${resetNonce}`} shadows dpr={[1, 1.75]} camera={{ position: cam.pos, fov: 42 }} gl={{ antialias: true }}>
+      <DetallesCtx.Provider value={p.detalles}>
       <color attach="background" args={["#040a16"]} />
       <fog attach="fog" args={["#040a16", 20, 44]} />
       <ambientLight intensity={0.55} />
@@ -1210,6 +1219,7 @@ export default function EstimacionFermiScene(p: EstimacionSceneProps) {
         <Bloom intensity={0.3} luminanceThreshold={0.62} luminanceSmoothing={0.85} mipmapBlur />
         <Vignette eskil={false} offset={0.18} darkness={0.65} />
       </EffectComposer>
+      </DetallesCtx.Provider>
     </Canvas>
   );
 }

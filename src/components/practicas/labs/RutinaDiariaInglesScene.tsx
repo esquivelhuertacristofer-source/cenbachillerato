@@ -18,8 +18,8 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef, type ReactNode, type RefObject } from "react";
-import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
+import { useLayoutEffect, useMemo, useRef, type ReactNode, type RefObject } from "react";
+import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { type Adverbio, ACCIONES, HABITOS, ESCALA, DIAS_SEMANA, cuentaDias, porcentaje, adverbiosAceptados, horaDigital, hora12Texto, preguntaFrecuencia } from "./rutina-diaria-ingles-data";
@@ -38,6 +38,8 @@ export interface RutinaSceneProps {
   paso: number;
   /** Oración que dice la burbuja de Ana. */
   burbuja: string | null;
+  /** La burbuja de Ana muestra un intento con la forma equivocada. */
+  burbujaMal?: boolean;
   // What time…?
   relojMin: number;
   pm: boolean;
@@ -76,9 +78,9 @@ function Caja({ p, s, c, rough = 0.75, metal = 0, sombra = true, rotY = 0, emis 
   );
 }
 
-function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number }) {
+function Etiqueta({ pos, children, col, fs = 14 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number }) {
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -89,7 +91,7 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children:
           background: "rgba(4,10,22,0.86)",
           border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`,
           color: "#fff",
-          fontSize: fs,
+          fontSize: Math.max(14, fs),
           fontWeight: 800,
           whiteSpace: "nowrap",
           boxShadow: "0 6px 18px -8px #000",
@@ -101,27 +103,31 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children:
   );
 }
 
-function Burbuja({ pos, children, df = 10, ancho = 230, borde = "#ffffff", fs = 13 }: { pos: Pt; children: ReactNode; df?: number; ancho?: number; borde?: string; fs?: number }) {
+function Burbuja({ pos, children, ancho = 230, borde = "#ffffff", fs = 14, mal = false }: { pos: Pt; children: ReactNode; df?: number; ancho?: number; borde?: string; fs?: number; mal?: boolean }) {
+  const angosta = useThree((st) => st.size.width) < 640;
+  const w = angosta ? Math.min(ancho, 170) : ancho;
+  const b = mal ? "#fb923c" : borde;
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[30, 0]} style={{ pointerEvents: "none" }}>
-      <div style={{ position: "relative", width: ancho, display: "flex", justifyContent: "center" }}>
+    <Html position={pos} center zIndexRange={[30, 0]} style={{ pointerEvents: "none" }}>
+      <div style={{ position: "relative", width: w, display: "flex", justifyContent: "center" }}>
         <div
           style={{
             padding: "8px 12px",
             borderRadius: 14,
-            background: "#ffffff",
-            border: `2px solid ${borde}`,
-            color: "#0f172a",
-            fontSize: fs,
+            background: mal ? "#fff1e6" : "#ffffff",
+            border: `2px solid ${b}`,
+            color: mal ? "#9a3412" : "#0f172a",
+            fontSize: Math.max(14, fs),
             fontWeight: 800,
             lineHeight: 1.3,
             textAlign: "center",
             boxShadow: "0 10px 24px -10px #000",
           }}
         >
+          {mal && <i className="fa-solid fa-circle-xmark" style={{ marginRight: 6 }} />}
           {children}
         </div>
-        <div style={{ position: "absolute", bottom: -7, left: "50%", marginLeft: -7, width: 14, height: 14, background: "#fff", transform: "rotate(45deg)", borderRight: `2px solid ${borde}`, borderBottom: `2px solid ${borde}` }} />
+        <div style={{ position: "absolute", bottom: -7, left: "50%", marginLeft: -7, width: 14, height: 14, background: mal ? "#fff1e6" : "#fff", transform: "rotate(45deg)", borderRight: `2px solid ${b}`, borderBottom: `2px solid ${b}` }} />
       </div>
     </Html>
   );
@@ -184,6 +190,10 @@ function poseDe(paso: number): Pose {
   const a = ACCIONES[paso]!;
   if (a.id === "wake") return POSE_DESPIERTA;
   return POSES[a.lugar] ?? POSE_DORMIDA;
+}
+
+function lugarDe(paso: number): string {
+  return paso < 0 || paso >= N ? "cama" : ACCIONES[paso]!.lugar;
 }
 
 function horaObjetivo(paso: number): number {
@@ -521,10 +531,12 @@ function Barrio({ tiempoRef, paso }: { tiempoRef: RefObject<number>; paso: numbe
         <Caja p={[0, 1.38, -0.05]} s={[1.7, 0.06, 0.7]} c="#0ea5e9" />
         <Caja p={[0, 0.7, -0.38]} s={[1.5, 1.1, 0.03]} c="#bae6fd" rough={0.1} />
         <Caja p={[0, 0.35, -0.2]} s={[1.1, 0.06, 0.3]} c="#78716c" />
-        <Etiqueta pos={[0, 1.75, -0.05]} df={11} fs={11} col="#0ea5e9aa">
-          <i className="fa-solid fa-bus" style={{ color: "#38bdf8" }} />
-          Bus stop
-        </Etiqueta>
+        {lugarDe(paso) === "parada" && (
+          <Etiqueta pos={[0, 1.75, -0.05]} col="#0ea5e9aa">
+            <i className="fa-solid fa-bus" style={{ color: "#38bdf8" }} />
+            Bus stop
+          </Etiqueta>
+        )}
       </group>
       {/* Escuela */}
       <group position={[4.9, 0, -2.75]}>
@@ -540,10 +552,12 @@ function Barrio({ tiempoRef, paso }: { tiempoRef: RefObject<number>; paso: numbe
           )),
         )}
         <Caja p={[0, 0.6, 1.07]} s={[0.8, 1.2, 0.04]} c="#7c2d12" />
-        <Etiqueta pos={[0, 2.9, 1.1]} df={11} fs={12} col="#fbbf24aa">
-          <i className="fa-solid fa-school" style={{ color: "#fbbf24" }} />
-          High School
-        </Etiqueta>
+        {lugarDe(paso) === "escuela" && (
+          <Etiqueta pos={[0, 2.9, 1.1]} col="#fbbf24aa">
+            <i className="fa-solid fa-school" style={{ color: "#fbbf24" }} />
+            High School
+          </Etiqueta>
+        )}
       </group>
       <Caja p={[4.9, 0.04, -0.6]} s={[4.6, 0.08, 2.2]} c="#a8a29e" sombra={false} />
       {actual === "classes" &&
@@ -618,11 +632,13 @@ function RielDia({ colocados, paso, modoColor }: { colocados: number; paso: numb
       {ACCIONES.map((a, i) => {
         const puesto = i < colocados;
         const hecho = paso > i;
+        // Solo la casilla activa lleva etiqueta: las demás se leen por color.
+        if (i !== objetivo) return null;
         return (
-          <Html key={a.id} position={[X_SLOT(i), 0.55, Z_RIEL + 0.1]} center distanceFactor={11} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+          <Html key={a.id} position={[X_SLOT(i), 0.55, Z_RIEL + 0.1]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
             <div
               style={{
-                width: 64,
+                width: 76,
                 padding: "4px 0",
                 borderRadius: 9,
                 textAlign: "center",
@@ -635,14 +651,14 @@ function RielDia({ colocados, paso, modoColor }: { colocados: number; paso: numb
             >
               {puesto ? (
                 <>
-                  <i className={`fa-solid ${hecho ? "fa-check" : a.icono}`} style={{ fontSize: 13, color: hecho ? OK : modoColor }} />
-                  <div style={{ fontSize: 11, marginTop: 2 }}>
+                  <i className={`fa-solid ${hecho ? "fa-check" : a.icono}`} style={{ fontSize: 15, color: hecho ? OK : modoColor }} />
+                  <div style={{ fontSize: 14, marginTop: 2 }}>
                     {a.horaA1 ? "" : "≈"}
                     {hora12Texto(a.min % 720)}
                   </div>
                 </>
               ) : (
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", padding: "4px 0" }}>{i + 1}</div>
+                <div style={{ fontSize: 14, color: "rgba(255,255,255,0.7)", padding: "4px 0" }}>{i + 1}</div>
               )}
             </div>
           </Html>
@@ -658,7 +674,7 @@ function RielDia({ colocados, paso, modoColor }: { colocados: number; paso: numb
   );
 }
 
-function Ana({ paso, burbuja, modoColor }: { paso: number; burbuja: string | null; modoColor: string }) {
+function Ana({ paso, burbuja, burbujaMal, modoColor }: { paso: number; burbuja: string | null; burbujaMal: boolean; modoColor: string }) {
   const raiz = useRef<THREE.Group>(null);
   const cuerpo = useRef<THREE.Group>(null);
   const mochila = useRef<THREE.Mesh>(null);
@@ -687,6 +703,8 @@ function Ana({ paso, burbuja, modoColor }: { paso: number; burbuja: string | nul
     const oy = pose.tipo === "sentada" && dist < 0.4 ? 0.28 : 0;
     c.position.y += (oy - c.position.y) * suave(dt, 0.12);
     c.scale.y = 1 + Math.sin(clock.elapsedTime * (dormida ? 1.4 : 2.2)) * 0.012;
+    // Forma equivocada: Ana niega con la cabeza; con la correcta, vuelve al frente.
+    c.rotation.z += ((burbujaMal ? Math.sin(clock.elapsedTime * 14) * 0.16 : 0) - c.rotation.z) * suave(dt, 0.25);
     if (mochila.current) mochila.current.visible = actual === "bus" || actual === "classes";
   });
   return (
@@ -698,20 +716,17 @@ function Ana({ paso, burbuja, modoColor }: { paso: number; burbuja: string | nul
         </mesh>
       </group>
       {burbuja ? (
-        <Burbuja pos={[0, dormida ? 1.3 : 2.15, 0]} borde={modoColor} df={11} ancho={250}>
+        <Burbuja pos={[0, dormida ? 1.3 : 2.15, 0]} borde={modoColor} ancho={250} mal={burbujaMal}>
           {burbuja}
         </Burbuja>
       ) : (
         dormida && (
-          <Etiqueta pos={[0.35, 0.75, 0]} df={11} fs={12} col="#a5b4fcaa">
+          <Etiqueta pos={[0.35, 0.75, 0]} col="#a5b4fcaa">
             <i className="fa-solid fa-moon" style={{ color: "#a5b4fc" }} />
             Zzz…
           </Etiqueta>
         )
       )}
-      <Etiqueta pos={[0, dormida ? -0.25 : -0.12, 0.45]} df={12} fs={10} col="#f472b6aa">
-        Ana
-      </Etiqueta>
     </group>
   );
 }
@@ -749,7 +764,7 @@ function Fondo() {
   );
 }
 
-function EscenaDia({ colocados, paso, burbuja, modoColor }: { colocados: number; paso: number; burbuja: string | null; modoColor: string }) {
+function EscenaDia({ colocados, paso, burbuja, burbujaMal, modoColor }: { colocados: number; paso: number; burbuja: string | null; burbujaMal: boolean; modoColor: string }) {
   const tiempoRef = useRef(horaObjetivo(paso));
   return (
     <group position={[0, -1.2, -0.4]}>
@@ -757,14 +772,16 @@ function EscenaDia({ colocados, paso, burbuja, modoColor }: { colocados: number;
       <Caja p={[0, -0.22, 0.95]} s={[16.4, 0.4, 11]} c="#35573c" rough={1} />
       <Fondo />
       <Casa tiempoRef={tiempoRef} paso={paso} />
-      <Etiqueta pos={[-7.0, 1.95, -3.2]} df={11} fs={12} col="#f472b6aa">
-        <i className="fa-solid fa-house" style={{ color: "#f9a8d4" }} />
-        Home
-      </Etiqueta>
+      {["cama", "regadera", "mesa", "escritorio", "sala"].includes(lugarDe(paso)) && (
+        <Etiqueta pos={[-7.0, 1.95, -3.2]} col="#f472b6aa">
+          <i className="fa-solid fa-house" style={{ color: "#f9a8d4" }} />
+          Home
+        </Etiqueta>
+      )}
       <Barrio tiempoRef={tiempoRef} paso={paso} />
       <Camion paso={paso} />
       <RielDia colocados={colocados} paso={paso} modoColor={modoColor} />
-      <Ana paso={paso} burbuja={burbuja} modoColor={modoColor} />
+      <Ana paso={paso} burbuja={burbuja} burbujaMal={burbujaMal} modoColor={modoColor} />
     </group>
   );
 }
@@ -775,6 +792,32 @@ function EscenaDia({ colocados, paso, burbuja, modoColor }: { colocados: number;
 
 const R_RELOJ = 2.0;
 const Y_RELOJ = 3.25;
+
+/** Las 60 marcas del reloj en UNA sola malla instanciada. */
+function MarcasReloj() {
+  const ref = useRef<THREE.InstancedMesh>(null);
+  useLayoutEffect(() => {
+    const m = ref.current;
+    if (!m) return;
+    const o = new THREE.Object3D();
+    for (let k = 0; k < 60; k++) {
+      const a = (k / 60) * Math.PI * 2;
+      const hora = k % 5 === 0;
+      const r = R_RELOJ - (hora ? 0.16 : 0.1);
+      o.position.set(Math.sin(a) * r, Math.cos(a) * r, 0.05);
+      o.rotation.set(0, 0, -a);
+      o.scale.set(hora ? 0.05 : 0.02, hora ? 0.2 : 0.09, 0.01);
+      o.updateMatrix();
+      m.setMatrixAt(k, o.matrix);
+    }
+    m.instanceMatrix.needsUpdate = true;
+  }, []);
+  return (
+    <instancedMesh ref={ref} args={[CAJA, undefined, 60]}>
+      <meshBasicMaterial color="#0f172a" />
+    </instancedMesh>
+  );
+}
 
 function Reloj({ relojMin, arrastrable, onMinuto, mostrarDigital, pm, modoColor }: { relojMin: number; arrastrable: boolean; onMinuto?: (m: number) => void; mostrarDigital: boolean; pm: boolean; modoColor: string }) {
   const horaria = useRef<THREE.Group>(null);
@@ -827,41 +870,22 @@ function Reloj({ relojMin, arrastrable, onMinuto, mostrarDigital, pm, modoColor 
         <circleGeometry args={[R_RELOJ - 0.05, 48, Math.PI / 2, Math.PI]} />
         <meshBasicMaterial color="#fb923c" transparent opacity={0.16} depthWrite={false} />
       </mesh>
-      {Array.from({ length: 60 }, (_, k) => {
-        const a = (k / 60) * Math.PI * 2;
-        const hora = k % 5 === 0;
-        const r = R_RELOJ - (hora ? 0.16 : 0.1);
-        return (
-          <mesh key={k} position={[Math.sin(a) * r, Math.cos(a) * r, 0.05]} rotation={[0, 0, -a]} geometry={CAJA} scale={[hora ? 0.05 : 0.02, hora ? 0.2 : 0.09, 0.01]}>
-            <meshBasicMaterial color="#0f172a" />
-          </mesh>
-        );
-      })}
+      <MarcasReloj />
       {Array.from({ length: 12 }, (_, k) => {
         const n = k === 0 ? 12 : k;
         const a = (k / 12) * Math.PI * 2;
         return (
-          <Html key={k} position={[Math.sin(a) * (R_RELOJ - 0.52), Math.cos(a) * (R_RELOJ - 0.52), 0.06]} center distanceFactor={9} zIndexRange={[10, 0]} style={{ pointerEvents: "none" }}>
-            <div style={{ fontSize: 22, fontWeight: 900, color: "#0f172a", fontFamily: "ui-sans-serif, system-ui" }}>{n}</div>
+          <Html key={k} position={[Math.sin(a) * (R_RELOJ - 0.52), Math.cos(a) * (R_RELOJ - 0.52), 0.06]} center zIndexRange={[10, 0]} style={{ pointerEvents: "none" }}>
+            <div style={{ fontSize: 18, fontWeight: 900, color: "#0f172a", fontFamily: "ui-sans-serif, system-ui" }}>{n}</div>
           </Html>
         );
       })}
-      <Html position={[0.78, -0.55, 0.06]} center distanceFactor={9} zIndexRange={[10, 0]} style={{ pointerEvents: "none" }}>
-        <div style={{ fontSize: 13, fontWeight: 900, color: "#0369a1", letterSpacing: "0.08em" }}>PAST</div>
+      <Html position={[0.78, -0.55, 0.06]} center zIndexRange={[10, 0]} style={{ pointerEvents: "none" }}>
+        <div style={{ fontSize: 14, fontWeight: 900, color: "#0369a1", letterSpacing: "0.08em" }}>PAST</div>
       </Html>
-      <Html position={[-0.78, -0.55, 0.06]} center distanceFactor={9} zIndexRange={[10, 0]} style={{ pointerEvents: "none" }}>
-        <div style={{ fontSize: 13, fontWeight: 900, color: "#c2410c", letterSpacing: "0.08em" }}>TO</div>
+      <Html position={[-0.78, -0.55, 0.06]} center zIndexRange={[10, 0]} style={{ pointerEvents: "none" }}>
+        <div style={{ fontSize: 14, fontWeight: 900, color: "#c2410c", letterSpacing: "0.08em" }}>TO</div>
       </Html>
-      {/* Etiquetas de los cuartos fuera del bisel */}
-      <Etiqueta pos={[0, R_RELOJ + 0.55, 0.1]} df={10} fs={11}>
-        o&apos;clock
-      </Etiqueta>
-      <Etiqueta pos={[R_RELOJ + 1.05, 0, 0.1]} df={10} fs={11} col="#38bdf8aa">
-        a quarter past
-      </Etiqueta>
-      <Etiqueta pos={[-R_RELOJ - 1.0, 0, 0.1]} df={10} fs={11} col="#fb923caa">
-        a quarter to
-      </Etiqueta>
       {/* Manecillas */}
       <group ref={horaria} position={[0, 0, 0.09]}>
         <mesh position={[0, 0.5, 0]} geometry={CAJA} scale={[0.13, 1.15, 0.03]}>
@@ -911,7 +935,7 @@ function Reloj({ relojMin, arrastrable, onMinuto, mostrarDigital, pm, modoColor 
         <Caja key={x} p={[x, -R_RELOJ - 0.18, -0.12]} s={[0.35, 0.3, 0.45]} c="#1e293b" metal={0.5} rough={0.35} />
       ))}
       {mostrarDigital && (
-        <Etiqueta pos={[0, -R_RELOJ - 0.75, 0.5]} df={9} fs={15} col={`${OK}aa`}>
+        <Etiqueta pos={[0, -R_RELOJ - 0.75, 0.5]} fs={16} col={`${OK}aa`}>
           <i className="fa-solid fa-circle-check" style={{ color: OK }} />
           {hora12Texto(relojMin)} {pm ? "p.m." : "a.m."}
         </Etiqueta>
@@ -962,35 +986,23 @@ function EscenaHora(p: Pick<RutinaSceneProps, "relojMin" | "pm" | "pregunta" | "
       <group position={[-4.5, 0, 0.9]} rotation={[0, 0.45, 0]} scale={1.5}>
         <Figura camisa="#22c55e" cabello="#111827" />
       </group>
-      <Etiqueta pos={[-5.55, 1.0, 1.0]} df={10} fs={12} col="#22c55eaa">
-        Luis
-      </Etiqueta>
       {p.pregunta && (
-        <Burbuja pos={[-4.5, 2.6, 0.9]} df={10} borde="#22c55e" ancho={220}>
+        <Burbuja pos={[-4.5, 2.6, 0.9]} borde="#22c55e" ancho={220}>
           {p.pregunta}
         </Burbuja>
       )}
       <group position={[4.5, 0, 0.9]} rotation={[0, -0.45, 0]} scale={1.5}>
         <Figura camisa="#f472b6" coleta />
       </group>
-      <Etiqueta pos={[5.55, 1.0, 1.0]} df={10} fs={12} col="#f472b6aa">
-        Ana
-      </Etiqueta>
       {p.respuesta && (
-        <Burbuja pos={[4.5, 2.6, 0.9]} df={10} borde="#f472b6" ancho={220}>
+        <Burbuja pos={[4.5, 2.6, 0.9]} borde="#f472b6" ancho={220}>
           {p.respuesta}
         </Burbuja>
       )}
       {p.contexto && (
-        <Etiqueta pos={[4.5, 3.75, 0.9]} df={10} fs={11} col="#f472b6aa">
+        <Etiqueta pos={[4.5, 3.75, 0.9]} col="#f472b6aa">
           <i className={`fa-solid ${p.contextoIcono ?? "fa-person"}`} style={{ color: "#f472b6" }} />
           {p.contexto}
-        </Etiqueta>
-      )}
-      {p.arrastrable && !p.mostrarDigital && (
-        <Etiqueta pos={[0, 0.35, 0.4]} df={10} fs={11} col={`${p.modoColor}aa`}>
-          <i className="fa-solid fa-hand-pointer" style={{ color: p.modoColor }} />
-          Arrastra el minutero (azul) alrededor del reloj
         </Etiqueta>
       )}
     </group>
@@ -1008,50 +1020,88 @@ const Y0_ESC = 0.75;
 const Y1_ESC = 5.35;
 const yPct = (p: number) => Y0_ESC + ((Y1_ESC - Y0_ESC) * p) / 100;
 
-function FilaHabito({ r, sel, contado, hecho }: { r: number; sel: boolean; contado: boolean; hecho: boolean }) {
-  const h = HABITOS[r]!;
-  const fichas = useRef<THREE.Group>(null);
-  const dias = h.dias.map((v, c) => ({ v, c })).filter((d) => d.v === 1);
-  useFrame(({ clock }, dt) => {
-    const g = fichas.current;
-    if (!g) return;
-    const ciclo = Math.floor(clock.elapsedTime * 2.2) % (dias.length + 2);
-    g.children.forEach((ch, j) => {
-      const s = sel && !contado && j === ciclo ? 1.4 : sel ? 1.12 : 1;
-      const k = suave(dt, 0.2);
-      ch.scale.x += (s - ch.scale.x) * k;
-      ch.scale.y += (s - ch.scale.y) * k;
-      ch.scale.z += (s - ch.scale.z) * k;
-      ch.position.z = sel ? 0.18 : 0.06;
+/** Casillas (49) y fichas de color (≈33) del calendario: dos mallas instanciadas. */
+const FICHAS_CAL = HABITOS.flatMap((h, r) => h.dias.map((v, c) => ({ r, c, v })).filter((d) => d.v === 1).map((d, j) => ({ ...d, j, n: h.dias.reduce((a, b) => a + b, 0) })));
+
+function Calendario({ habitoIdx, contado }: { habitoIdx: number; contado: boolean }) {
+  const casillas = useRef<THREE.InstancedMesh>(null);
+  const fichas = useRef<THREE.InstancedMesh>(null);
+  const escalas = useRef<Float32Array>(new Float32Array(FICHAS_CAL.length).fill(1));
+  const obj = useMemo(() => new THREE.Object3D(), []);
+  const col = useMemo(() => new THREE.Color(), []);
+  // Casillas: posiciones fijas; el color cambia con la fila elegida.
+  useLayoutEffect(() => {
+    const m = casillas.current;
+    if (!m) return;
+    for (let r = 0; r < HABITOS.length; r++)
+      for (let c = 0; c < 7; c++) {
+        obj.position.set(X_COL(c), Y_FILA(r), -0.02);
+        obj.rotation.set(0, 0, 0);
+        obj.scale.set(0.74, 0.62, 0.05);
+        obj.updateMatrix();
+        m.setMatrixAt(r * 7 + c, obj.matrix);
+        m.setColorAt(r * 7 + c, col.set(r === habitoIdx ? "#334155" : "#1e293b"));
+      }
+    m.instanceMatrix.needsUpdate = true;
+    if (m.instanceColor) m.instanceColor.needsUpdate = true;
+  }, [habitoIdx, obj, col]);
+  useLayoutEffect(() => {
+    const m = fichas.current;
+    if (!m) return;
+    FICHAS_CAL.forEach((f, i) => {
+      const h = HABITOS[f.r]!;
+      m.setColorAt(i, col.set(h.color).multiplyScalar(f.r === habitoIdx ? 1.15 : 0.6));
     });
+    if (m.instanceColor) m.instanceColor.needsUpdate = true;
+  }, [habitoIdx, col]);
+  useFrame(({ clock }, dt) => {
+    const m = fichas.current;
+    if (!m) return;
+    const k = suave(dt, 0.2);
+    const base = Math.floor(clock.elapsedTime * 2.2);
+    FICHAS_CAL.forEach((f, i) => {
+      const sel = f.r === habitoIdx;
+      // Al elegir un hábito, sus fichas parpadean una a una: «cuéntalas».
+      const ciclo = base % (f.n + 2);
+      const s = sel && !contado && f.j === ciclo ? 1.4 : sel ? 1.12 : 1;
+      escalas.current[i]! += (s - escalas.current[i]!) * k;
+      const e = escalas.current[i]!;
+      obj.position.set(X_COL(f.c), Y_FILA(f.r), sel ? 0.18 : 0.06);
+      obj.rotation.set(Math.PI / 2, 0, 0);
+      obj.scale.set(0.22 * e, 0.04 * e, 0.22 * e);
+      obj.updateMatrix();
+      m.setMatrixAt(i, obj.matrix);
+    });
+    m.instanceMatrix.needsUpdate = true;
   });
   return (
+    <>
+      <instancedMesh ref={casillas} args={[CAJA, undefined, HABITOS.length * 7]}>
+        <meshStandardMaterial roughness={0.8} />
+      </instancedMesh>
+      <instancedMesh ref={fichas} args={[CILINDRO, undefined, FICHAS_CAL.length]} frustumCulled={false}>
+        <meshStandardMaterial roughness={0.35} emissive="#ffffff" emissiveIntensity={0.1} />
+      </instancedMesh>
+    </>
+  );
+}
+
+function FilaHabito({ r, sel, contado, hecho }: { r: number; sel: boolean; contado: boolean; hecho: boolean }) {
+  const h = HABITOS[r]!;
+  return (
     <group position={[0, Y_FILA(r), 0]}>
-      {DIAS_SEMANA.map((_, c) => (
-        <mesh key={c} position={[X_COL(c), 0, -0.02]} geometry={CAJA} scale={[0.74, 0.62, 0.05]}>
-          <meshStandardMaterial color={sel ? "#334155" : "#1e293b"} roughness={0.8} />
-        </mesh>
-      ))}
-      <group ref={fichas}>
-        {dias.map((d) => (
-          <mesh key={d.c} position={[X_COL(d.c), 0, 0.06]} rotation={[Math.PI / 2, 0, 0]}>
-            <cylinderGeometry args={[0.22, 0.22, 0.08, 28]} />
-            <meshStandardMaterial color={h.color} emissive={h.color} emissiveIntensity={sel ? 0.55 : 0.12} roughness={0.35} />
-          </mesh>
-        ))}
-      </group>
-      <Html position={[X_COL(0) - 0.95, 0, 0.1]} center distanceFactor={10} zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
+      <Html position={[X_COL(0) - 0.95, 0, 0.1]} center zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
         <div style={{ width: 34, height: 34, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", background: sel ? h.color : "rgba(4,10,22,0.8)", border: `1px solid ${h.color}`, color: sel ? "#04121f" : h.color, fontSize: 16 }}>
           <i className={`fa-solid ${h.icono}`} />
         </div>
       </Html>
       {sel && (
-        <Etiqueta pos={[X_COL(6) + 0.95, 0, 0.2]} df={10} fs={13} col={`${h.color}cc`}>
+        <Etiqueta pos={[X_COL(6) + 0.95, 0, 0.2]} fs={14} col={`${h.color}cc`}>
           {contado ? `${cuentaDias(h)}/7` : "?/7"}
         </Etiqueta>
       )}
       {!sel && hecho && (
-        <Html position={[X_COL(6) + 0.75, 0, 0.1]} center distanceFactor={10} zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
+        <Html position={[X_COL(6) + 0.75, 0, 0.1]} center zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
           <i className="fa-solid fa-circle-check" style={{ color: OK, fontSize: 16 }} />
         </Html>
       )}
@@ -1066,6 +1116,7 @@ function EscenaFrecuencia({ habitoIdx, contado, oracion, estadoOracion, adverbio
   const resalte = useRef<THREE.Mesh>(null);
   const pct = porcentaje(h);
   const aceptados = adverbiosAceptados(h);
+  const angosta = useThree((st) => st.size.width) < 640;
   useFrame(({ clock }, dt) => {
     const k = suave(dt, 0.08);
     if (resalte.current) resalte.current.position.y += (Y_FILA(habitoIdx) - resalte.current.position.y) * k;
@@ -1092,26 +1143,28 @@ function EscenaFrecuencia({ habitoIdx, contado, oracion, estadoOracion, adverbio
       <mesh ref={resalte} position={[-0.3, Y_FILA(habitoIdx), -0.1]} geometry={CAJA} scale={[7.1, 0.7, 0.04]}>
         <meshStandardMaterial color={h.color} emissive={h.color} emissiveIntensity={0.35} transparent opacity={0.35} />
       </mesh>
+      <Calendario habitoIdx={habitoIdx} contado={contado} />
       {DIAS_SEMANA.map((d, c) => (
-        <Html key={d} position={[X_COL(c), 5.7, 0.05]} center distanceFactor={10} zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
-          <div style={{ fontSize: 13, fontWeight: 900, color: c >= 5 ? "#fca5a5" : "#e2e8f0", letterSpacing: "0.04em" }}>{d}</div>
+        <Html key={d} position={[X_COL(c), 5.7, 0.05]} center zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
+          <div style={{ fontSize: 14, fontWeight: 900, color: c >= 5 ? "#fca5a5" : "#e2e8f0", letterSpacing: "0.04em" }}>{angosta ? d.charAt(0) : d}</div>
         </Html>
       ))}
       {HABITOS.map((x, r) => (
         <FilaHabito key={x.id} r={r} sel={r === habitoIdx} contado={contado && r === habitoIdx} hecho={hechosFrec.includes(x.id)} />
       ))}
       {/* Oración que arma el alumno */}
-      <Html position={[0.9, 7.0, 0]} center distanceFactor={10} zIndexRange={[25, 0]} style={{ pointerEvents: "none" }}>
+      <Html position={[0.9, 7.0, 0]} center zIndexRange={[25, 0]} style={{ pointerEvents: "none" }}>
         <div
           style={{
-            maxWidth: 560,
-            whiteSpace: "nowrap",
+            maxWidth: angosta ? 300 : 560,
+            whiteSpace: angosta ? "normal" : "nowrap",
+            textAlign: "center",
             padding: "9px 18px",
             borderRadius: 14,
             background: "rgba(4,10,22,0.9)",
             border: `2px solid ${colOracion}`,
             color: oracion ? "#fff" : "rgba(255,255,255,0.5)",
-            fontSize: 17,
+            fontSize: angosta ? 15 : 17,
             fontWeight: 900,
             boxShadow: `0 0 26px -8px ${colOracion}`,
           }}
@@ -1136,7 +1189,7 @@ function EscenaFrecuencia({ habitoIdx, contado, oracion, estadoOracion, adverbio
             <mesh geometry={CAJA} scale={[0.6, 0.04, 0.26]}>
               <meshStandardMaterial color={elegido ? col : "#94a3b8"} emissive={elegido ? col : "#000000"} emissiveIntensity={elegido ? 0.8 : 0} />
             </mesh>
-            <Html position={[0.45, 0, 0]} distanceFactor={10} zIndexRange={[15, 0]} style={{ pointerEvents: "none", transform: "translateY(-50%)" }}>
+            <Html position={[0.45, 0, 0]} zIndexRange={[15, 0]} style={{ pointerEvents: "none", transform: "translateY(-50%)" }}>
               <div
                 style={{
                   display: "flex",
@@ -1148,12 +1201,12 @@ function EscenaFrecuencia({ habitoIdx, contado, oracion, estadoOracion, adverbio
                   background: elegido ? "rgba(4,10,22,0.92)" : "rgba(4,10,22,0.6)",
                   border: `1px solid ${col}`,
                   color: "#fff",
-                  fontSize: 12,
+                  fontSize: 14,
                   fontWeight: 800,
                 }}
               >
                 {e.adv}
-                <span style={{ color: "rgba(255,255,255,0.55)", fontWeight: 700 }}>{e.pct} %</span>
+                {!angosta && <span style={{ color: "rgba(255,255,255,0.65)", fontWeight: 700 }}>{e.pct} %</span>}
               </div>
             </Html>
           </group>
@@ -1165,7 +1218,7 @@ function EscenaFrecuencia({ habitoIdx, contado, oracion, estadoOracion, adverbio
           <meshStandardMaterial color={h.color} emissive={h.color} emissiveIntensity={0.7} />
         </mesh>
       </group>
-      <Etiqueta pos={[X_ESCALA + 0.2, 0.05, 0.4]} df={10} fs={11}>
+      <Etiqueta pos={[X_ESCALA + 0.2, 0.05, 0.4]}>
         <i className="fa-solid fa-chart-simple" style={{ color: modoColor }} />
         {contado ? `${cuentaDias(h)}/7 ≈ ${pct} %` : "How often?"}
       </Etiqueta>
@@ -1173,16 +1226,25 @@ function EscenaFrecuencia({ habitoIdx, contado, oracion, estadoOracion, adverbio
       <group position={[-5.1, 0, 1.3]} rotation={[0, 0.5, 0]} scale={1.45}>
         <Figura camisa="#f472b6" coleta />
       </group>
-      <Html position={[-5.1, 2.4, 1.3]} center distanceFactor={10} zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
+      <Html position={[-5.1, 2.4, 1.3]} center zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
         <div style={{ width: 44, height: 44, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", background: "#fff", border: `2px solid ${h.color}`, color: h.color, fontSize: 20 }}>
           <i className={`fa-solid ${h.icono}`} />
         </div>
       </Html>
-      <Etiqueta pos={[-5.1, 3.0, 1.3]} df={10} fs={11} col="#f472b6aa">
-        Ana&apos;s week
-      </Etiqueta>
     </group>
   );
+}
+
+/** En pantallas angostas se aleja la cámara (zoom) para que quepa todo el ancho. */
+function AjusteAngosto({ zoom }: { zoom: number }) {
+  const leer = useThree((st) => st.get);
+  const ancho = useThree((st) => st.size.width);
+  useLayoutEffect(() => {
+    const c = leer().camera as THREE.PerspectiveCamera;
+    c.zoom = ancho < 640 ? zoom : 1;
+    c.updateProjectionMatrix();
+  }, [leer, ancho, zoom]);
+  return null;
 }
 
 /* ── Escena ───────────────────────────────────────────────────────────── */
@@ -1190,9 +1252,11 @@ function EscenaFrecuencia({ habitoIdx, contado, oracion, estadoOracion, adverbio
 export default function RutinaDiariaInglesScene(p: RutinaSceneProps) {
   const { vista, modoColor, resetNonce } = p;
   const cam = useMemo((): { pos: Pt; target: Pt } => {
-    if (vista === "dia") return { pos: [0, 10.2, 13.6], target: [0, -0.6, 0.6] };
-    if (vista === "hora") return { pos: [0, 2.6, 11.4], target: [0, 1.7, 0] };
-    return { pos: [0.2, 3.1, 13.6], target: [0.2, 2.35, 0] };
+    // El objetivo queda un poco por debajo del centro del contenido: así la
+    // escena sube entre la barra de arriba y la misión de abajo.
+    if (vista === "dia") return { pos: [0, 10.2, 13.6], target: [0, -1.1, 0.6] };
+    if (vista === "hora") return { pos: [0, 2.4, 11.4], target: [0, 1.35, 0] };
+    return { pos: [0.2, 2.8, 13.6], target: [0.2, 1.9, 0] };
   }, [vista]);
 
   return (
@@ -1202,6 +1266,7 @@ export default function RutinaDiariaInglesScene(p: RutinaSceneProps) {
           que el escenario la MIDE de la propia escena al montarse, en
           vez de que alguien la adivine. */}
       <Escenario acento="#38bdf8" />
+      <AjusteAngosto zoom={vista === "hora" ? 0.55 : 0.6} />
       {vista !== "dia" && (
         <>
           <ambientLight intensity={0.6} />
@@ -1210,7 +1275,7 @@ export default function RutinaDiariaInglesScene(p: RutinaSceneProps) {
         </>
       )}
 
-      {vista === "dia" && <EscenaDia colocados={p.colocados} paso={p.paso} burbuja={p.burbuja} modoColor={modoColor} />}
+      {vista === "dia" && <EscenaDia colocados={p.colocados} paso={p.paso} burbuja={p.burbuja} burbujaMal={!!p.burbujaMal} modoColor={modoColor} />}
       {vista === "hora" && (
         <EscenaHora
           relojMin={p.relojMin}

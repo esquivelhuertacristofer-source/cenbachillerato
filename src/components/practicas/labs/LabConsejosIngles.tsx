@@ -4,6 +4,11 @@
  * Laboratorio — Advice in English: should, shouldn't and imperatives
  * Práctica experimental para IN-IV-P04-A1 (Inglés IV — A2+).
  *
+ * Modo principal: simulador «Helpline». Cuatro amigos ficticios piden consejo; el
+ * alumno arma la respuesta (saludo + forma + acción) y ve cómo cambia su ánimo:
+ * una forma incorrecta («should to») los confunde, un consejo que perjudica los
+ * empeora y «must» suena a orden. Los modos de arrastre se conservan, en <Mesa>.
+ *
  * Interactividad máxima. Cuatro modos: los tres de arrastrar/clasificar (forma · uso · estructura) y,
  * al final, uno que se escribe («Completa el texto», verbatim de la progresión):
  *  1. «Should, shouldn't or imperative?» — clasifica nueve oraciones de consejo
@@ -27,6 +32,21 @@ import { CompletaTexto } from "./_mecanica-huecos";
 import { CONSEJOS_INGLES_HUECOS } from "./consejos-ingles-huecos";
 import { usePartida, MarcadorPartida } from "./_partida";
 import { FichaTeorica } from "./_ficha";
+import { LabShell, Bloque, Mesa, Dato, BotonHerramienta } from "./_shell";
+import {
+  ADOLESCENTES,
+  FRASES,
+  OPENERS,
+  ANIMO_INICIO,
+  ANIMO_META,
+  armarTexto,
+  evaluar,
+  aplicarAnimo,
+  caraDe,
+  type FraseId,
+  type OpenerId,
+  type Resultado,
+} from "./consejos-ingles-sim";
 import { CONSEJOS_INGLES_FICHA } from "./consejos-ingles-ficha";
 import {
   ORACIONES,
@@ -44,9 +64,10 @@ import { useEstrellas } from "@/lib/hooks/useEstrellas";
 import { FondoTermino, VinetaTermino } from "./_vineta";
 const RETO_KEY = "cen-consejos-ingles-reto";
 
-type Modo = "clasificar" | "completar" | "glosario" | "texto";
+type Modo = "helpline" | "clasificar" | "completar" | "glosario" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
+  { id: "helpline", label: "Helpline", icono: "fa-comments" },
   { id: "clasificar", label: "Should, shouldn't or imperative?", icono: "fa-layer-group" },
   { id: "completar", label: "Complete the advice", icono: "fa-pen-fancy" },
   { id: "glosario", label: "Match the structure", icono: "fa-book-open" },
@@ -61,12 +82,11 @@ const FICHAS_HUECO: { id: string; label: string }[] = [
 
 export function LabConsejosIngles({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
-  const [modo, setModo] = useState<Modo>("clasificar");
+  const [modo, setModo] = useState<Modo>("helpline");
 
   // ── sonido ────────────────────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   // Modo «Completa el texto». El contador sirve de `key`: subirlo remonta
   // el componente y devuelve todos los huecos en blanco.
   const [textoDone, setTextoDone] = useState(false);
@@ -91,10 +111,31 @@ export function LabConsejosIngles({ color }: PracticaLabProps) {
     partida.error();
     return sonido && audioRef.current?.incorrecto();
   };
+  const sfxSim = (ok: boolean) => sonido && (ok ? audioRef.current?.blip() : audioRef.current?.incorrecto());
   const sfxPlace = () => {
     partida.acierto();
     return sonido && audioRef.current?.blip();
   };
+
+  // ── modo Helpline (simulador) ──────────────────────────────────────────
+  const [animos, setAnimos] = useState<Record<string, number>>(() => Object.fromEntries(ADOLESCENTES.map((a) => [a.id, ANIMO_INICIO])));
+  const [resueltos, setResueltos] = useState<string[]>([]);
+  const [empaticaOk, setEmpaticaOk] = useState(false);
+  const [simKey, setSimKey] = useState(0);
+  const enviar = (tid: string, r: Resultado) => {
+    sfxSim(r.veredicto === "bien");
+    const nuevo = aplicarAnimo(animos[tid] ?? ANIMO_INICIO, r.delta);
+    setAnimos((a) => ({ ...a, [tid]: nuevo }));
+    if (nuevo >= ANIMO_META) setResueltos((v) => (v.includes(tid) ? v : [...v, tid]));
+    if (r.veredicto === "bien" && r.empatica) setEmpaticaOk(true);
+  };
+  const resetSim = () => {
+    setAnimos(Object.fromEntries(ADOLESCENTES.map((a) => [a.id, ANIMO_INICIO])));
+    setResueltos([]);
+    setEmpaticaOk(false);
+    setSimKey((n) => n + 1);
+  };
+  const simDone = resueltos.length >= ADOLESCENTES.length;
 
   // ── modo Should, shouldn't or imperative? (clasifica por forma) ────────
   const [ubicado, setUbicado] = useState<Record<string, Forma>>({});
@@ -197,6 +238,8 @@ export function LabConsejosIngles({ color }: PracticaLabProps) {
   };
 
   const objetivos = [
+    { txt: "Ayuda a los 4 amigos: lleva el ánimo de cada uno a 80 o más", done: simDone },
+    { txt: "Da un buen consejo con una forma empática (Why don't you, Have you thought about o If I were you)", done: empaticaOk },
     { txt: "Clasifica las 9 oraciones por su forma (should / shouldn't / imperative)", done: clasificarDone },
     { txt: "Completa los 4 huecos de los consejos en contexto", done: completarDone },
     { txt: "Empareja las 6 estructuras del glosario", done: glosarioDone },
@@ -258,15 +301,23 @@ export function LabConsejosIngles({ color }: PracticaLabProps) {
     setTextoDone(false);
     setTextoIntento((n) => n + 1);
   };
-  const resetActual = modo === "texto" ? resetTexto : modo === "clasificar" ? resetClasificar : modo === "completar" ? resetCompletar : resetGlosario;
+  const resetActual = modo === "helpline" ? resetSim : modo === "texto" ? resetTexto : modo === "clasificar" ? resetClasificar : modo === "completar" ? resetCompletar : resetGlosario;
 
-  return (
-    <div style={{ color: T.text }}>
+  const pistaDe: Record<Modo, string> = {
+    helpline: "Arma el consejo con tres piezas: saludo, forma y acción. Mira la cara y la barra de ánimo: se mueve distinto si la forma es incorrecta, si el consejo perjudica o si suena como una orden.",
+    clasificar: "Should + verbo base recomienda una acción; shouldn't + verbo base aconseja en contra; el imperativo da una instrucción directa (con o sin Don't).",
+    completar: "Recuerda: should y shouldn't van con el verbo base SIN to. Los distractores (should to, must, shoulds, musn't) no encajan en ningún hueco.",
+    glosario: "Lee la definición y su ejemplo; luego suelta la estructura que le corresponde para dar o pedir un consejo con empatía.",
+    texto: "Escribe la palabra que falta en cada hueco del texto.",
+  };
+
+  const escena = (
+    <div style={{ color: T.text, display: "grid", gap: 16, minWidth: 0 }}>
       <style>{`
         @keyframes advShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
         @keyframes advPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
         .adv-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 16px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:800; transition:all .14s; }
+          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; }
         .adv-tab:hover { border-color:${T.lineStrong}; color:#fff; }
         .adv-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
         .adv-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
@@ -274,7 +325,7 @@ export function LabConsejosIngles({ color }: PracticaLabProps) {
         .adv-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
         .adv-icobtn:hover { background:rgba(255,255,255,0.12); }
         .adv-chip { cursor:grab; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 16px; border-radius:14px;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:13.5px; font-weight:700; transition:all .14s; user-select:none; max-width:360px; text-align:left; line-height:1.4; }
+          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:14px; font-weight:700; transition:all .14s; user-select:none; max-width:100%; text-align:left; line-height:1.4; }
         .adv-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); }
         .adv-chip[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.2); box-shadow:0 0 16px -5px ${accent}; }
         .adv-chip:active { cursor:grabbing; }
@@ -287,41 +338,25 @@ export function LabConsejosIngles({ color }: PracticaLabProps) {
         .adv-row[data-shake="true"] { animation:advShake .4s; border-color:${NO}; }
         .adv-row[data-done="true"] { border-color:${OK}66; background:${OK}0f; }
         .adv-slot { flex-shrink:0; min-width:96px; min-height:42px; border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset};
-          display:inline-flex; align-items:center; justify-content:center; color:${T.text3}; font-size:12.5px; transition:all .16s; cursor:pointer; padding:4px 10px; }
+          display:inline-flex; align-items:center; justify-content:center; color:${T.text3}; font-size:14px; transition:all .16s; cursor:pointer; padding:4px 10px; }
         .adv-slot[data-armed="true"] { border-color:${accent}; background:rgba(${color.rgba},0.1); }
         .adv-bin { border-radius:15px; border:1.5px solid ${T.line}; background:${T.glass}; padding:16px; transition:all .16s; min-height:240px; }
         .adv-bin[data-shake="true"] { animation:advShake .4s; border-color:${NO}; }
         .adv-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
-          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
+          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
         .adv-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
         .adv-q:disabled{ cursor:default; }
         .adv-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
-          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:13.5px; font-weight:800; transition:all .14s; }
+          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:14px; font-weight:800; transition:all .14s; }
         .adv-btn:hover { border-color:${T.lineStrong}; }
         .adv-divider { height:1px; background:${T.line}; margin:18px 0; }
         @media (prefers-reduced-motion: reduce){ .adv-row[data-shake="true"], .adv-bin[data-shake="true"] { animation:none; } }
 
-        /* Cajón de teoría */
-        .adv-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .adv-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .adv-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .adv-drawer[data-open="true"] { transform:translateX(0); }
-        .adv-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .adv-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .adv-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .adv-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .adv-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .adv-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .adv-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
-
+        .adv-teen { cursor:pointer; display:grid; gap:6px; padding:8px; border-radius:14px; border:1.5px solid ${T.line}; background:${T.glass}; color:#fff; text-align:left; transition:all .14s; min-width:0; }
+        .adv-teen:hover { border-color:${T.lineStrong}; }
+        .adv-teen[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); box-shadow:0 0 16px -6px ${accent}; }
+        .adv-bubble { padding:11px 14px; border-radius:14px; border:1.5px solid ${T.line}; background:${T.inset}; font-size:15px; line-height:1.5; color:#fff; }
+        .adv-paso { font-size:14px; font-weight:900; color:${T.text2}; margin-bottom:6px; }
         /* Identidad del tablero */
         .adv-bin, .adv-row { --tono:188; position:relative;
           background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
@@ -343,80 +378,44 @@ export function LabConsejosIngles({ color }: PracticaLabProps) {
         }
       `}</style>
 
-      {/* selector de modo + toolbar */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="adv-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="adv-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="adv-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="adv-icobtn" onClick={resetActual} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
+      {modo === "helpline" && (
+        <Helpline
+          key={simKey}
+          accent={accent}
+          rgba={color.rgba}
+          animos={animos}
+          resueltos={resueltos}
+          onEnviar={enviar}
+        />
+      )}
 
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <button className="adv-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="adv-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="adv-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="adv-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="adv-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="adv-drawer-body">
-          <FichaTeorica data={CONSEJOS_INGLES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}>
-        {/* ── Columna principal ─────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
-          {/* MODO 1 — Should, shouldn't or imperative? */}
-          {/* MODO — completa el texto (fill_blanks verbatim de la progresión) */}
-          {modo === "texto" && (
-            <CompletaTexto
-              key={textoIntento}
-              data={CONSEJOS_INGLES_HUECOS}
-              accent={accent}
-              rgba={color.rgba}
-              completado={textoDone}
-              onCompletado={() => {
-                setTextoDone(true);
-                sfxOk();
-              }}
-              onAcierto={sfxPlace}
-              onError={sfxNo}
-            />
-          )}
+      {modo === "texto" && (
+        <CompletaTexto
+          key={textoIntento}
+          data={CONSEJOS_INGLES_HUECOS}
+          accent={accent}
+          rgba={color.rgba}
+          completado={textoDone}
+          onCompletado={() => {
+            setTextoDone(true);
+            sfxOk();
+          }}
+          onAcierto={sfxPlace}
+          onError={sfxNo}
+        />
+      )}
 
           {modo === "clasificar" && (
-            <>
+            <Mesa>
               <div style={{ ...card, padding: "18px 22px" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
                   <Eyebrow>Arrastra cada consejo a su forma</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: clasificarDone ? OK : T.text3 }}>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: clasificarDone ? OK : T.text3 }}>
                     {Object.keys(ubicado).length}/{ORACIONES.length}
                   </span>
                 </div>
                 {oracionesLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+                  <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
                     <i className="fa-solid fa-circle-check" /> ¡Clasificaste las {ORACIONES.length} oraciones!
                   </div>
                 ) : (
@@ -431,24 +430,24 @@ export function LabConsejosIngles({ color }: PracticaLabProps) {
               </div>
 
               <BinsClasificar selOracion={selOracion} shakeBin={shakeBin} ubicado={ubicado} onMatch={intentarClasificar} dropProps={dropProps} />
-            </>
+            </Mesa>
           )}
 
           {/* MODO 2 — Complete the advice */}
           {modo === "completar" && (
-            <>
+            <Mesa>
               <div style={{ ...card, padding: "18px 22px" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6, flexWrap: "wrap", gap: 8 }}>
                   <Eyebrow>Arrastra la forma correcta a cada hueco</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: completarDone ? OK : T.text3 }}>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: completarDone ? OK : T.text3 }}>
                     {Object.keys(completado).length}/{HUECOS.length}
                   </span>
                 </div>
-                <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 14, lineHeight: 1.5 }}>
+                <div style={{ fontSize: 14, color: T.text3, marginBottom: 14, lineHeight: 1.5 }}>
                   Cuidado: hay formas <strong style={{ color: T.text2 }}>incorrectas</strong> (should to, must, shoulds, musn&apos;t) que no encajan en ningún hueco.
                 </div>
                 {fichasLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+                  <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
                     <i className="fa-solid fa-circle-check" /> ¡Completaste los {HUECOS.length} huecos!
                   </div>
                 ) : (
@@ -463,28 +462,28 @@ export function LabConsejosIngles({ color }: PracticaLabProps) {
               </div>
 
               <RowsCompletar selFicha={selFicha} shakeHueco={shakeHueco} completado={completado} onMatch={intentarCompletar} dropProps={dropProps} />
-            </>
+            </Mesa>
           )}
 
           {/* MODO 3 — Match the structure */}
           {modo === "glosario" && (
-            <>
+            <Mesa>
               <div style={{ ...card, padding: "18px 22px" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
                   <Eyebrow>Arrastra cada estructura a su definición</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: glosarioDone ? OK : T.text3 }}>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: glosarioDone ? OK : T.text3 }}>
                     {Object.keys(empGlos).length}/{PARES.length}
                   </span>
                 </div>
                 {glosLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+                  <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
                     <i className="fa-solid fa-circle-check" /> ¡Emparejaste las {PARES.length} estructuras!
                   </div>
                 ) : (
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
                     {glosLibres.map((g) => (
                       <button key={g.id} className="adv-chip" data-sel={selGlos === g.id} onClick={() => setSelGlos((s) => (s === g.id ? null : g.id))} {...dragProps(g.id)}>
-                        <i className="fa-solid fa-quote-left" style={{ fontSize: 11, color: T.text3 }} />
+                        <i className="fa-solid fa-quote-left" style={{ fontSize: 14, color: T.text3 }} />
                         {g.termino}
                       </button>
                     ))}
@@ -493,73 +492,276 @@ export function LabConsejosIngles({ color }: PracticaLabProps) {
               </div>
 
               <RowsGlosario selGlos={selGlos} shakeGlos={shakeGlos} empGlos={empGlos} onMatch={intentarGlos} dropProps={dropProps} />
-            </>
+            </Mesa>
           )}
-        </div>
+    </div>
+  );
 
-        {/* ── Columna lateral ───────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? OK : T.text2 }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-                  <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-                </div>
-              ))}
-            </div>
+  const lectura = modo === "helpline" ? `${resueltos.length}/${ADOLESCENTES.length} amigos ayudados` : `${modosHechos}/4 modos · ${bestEstrellas}★`;
 
-            <div className="adv-divider" />
-
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", color: T.text3, textTransform: "uppercase" }}>Puntuación</div>
-                <div style={{ display: "flex", gap: 4, marginTop: 5 }}>
-                  {[1, 2, 3].map((s) => (
-                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 18, color: s <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
+  return (
+    <LabShell
+      dom
+      accent={accent}
+      rgba={color.rgba}
+      escena={escena}
+      modos={{ opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })), valor: modo, cambiar: (id) => setModo(id as Modo) }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={resetActual} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      retoKey={RETO_KEY}
+      pestanas={[
+        {
+          id: "cuaderno",
+          etiqueta: "Cuaderno",
+          icono: "fa-comments",
+          contenido: (
+            <>
+              <Bloque titulo="Ánimo de cada amigo (simulación)" icono="fa-face-smile">
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 10 }}>
+                  {ADOLESCENTES.map((t) => (
+                    <Dato key={t.id} label={t.nombre} value={`${animos[t.id]}`} col={caraDe(animos[t.id] ?? 0).color} />
                   ))}
                 </div>
-              </div>
-              <div style={{ textAlign: "right", maxWidth: 180 }}>
-                <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45 }}>
-                  {bestEstrellas >= 3 ? "You can give advice like a pro!" : "Termina los tres modos para ganar 2★; la tercera pide 2 errores o menos."}
+                <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
+                  Con {ANIMO_META} puntos o más, el amigo se siente bien. Los puntos son una simulación, no una medida real.
                 </div>
-              </div>
-            </div>
-          </div>
+              </Bloque>
+              <Bloque titulo="Tu partida" icono="fa-gauge-high">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+                <div style={{ display: "flex", gap: 4 }}>
+                  {[1, 2, 3].map((s) => (
+                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 20, color: s <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
+                  ))}
+                </div>
+                <div style={{ fontSize: 14, color: T.text2 }}>
+                  {bestEstrellas >= 3 ? "You can give advice like a pro!" : "Termina los tres modos de refuerzo para ganar 2★; la tercera pide 2 errores o menos."}
+                </div>
+              </Bloque>
+              <Bloque titulo="Pista de este modo" icono="fa-lightbulb">
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>{pistaDe[modo]}</div>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-clipboard-question",
+          contenido: <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />,
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Teoría de la práctica" icono="fa-book-open">
+                <FichaTeorica data={CONSEJOS_INGLES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <Bloque titulo="Las tres formas" icono="fa-layer-group">
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {(Object.keys(FORMA_INFO) as Forma[]).map((f) => (
+                    <div key={f} style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                      <strong style={{ color: T.text }}>{FORMA_INFO[f].titulo}.</strong> {FORMA_INFO[f].subtitulo}
+                      <div style={{ fontStyle: "italic", color: T.text3, marginTop: 2 }}>{FORMA_INFO[f].ejemplo}</div>
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+              <Bloque titulo="Estructuras para dar y pedir consejos" icono="fa-link">
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {PARES.map((p) => (
+                    <div key={p.id} style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                      <strong style={{ color: T.text }}>{p.termino}.</strong> {p.definicion}
+                      <div style={{ fontStyle: "italic", color: T.text3, marginTop: 2 }}>{p.ejemplo}</div>
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+              <Bloque titulo="Dato" icono="fa-circle-info">
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55 }}>{DATO_CONSEJOS}</div>
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
+  );
+}
 
-          {/* pista del modo actual */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid rgba(${color.rgba},0.3)`, background: `rgba(${color.rgba},0.08)`, fontSize: 13, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              {modo === "clasificar" && (
-                <><strong style={{ color: T.text }}>Should</strong> + verbo base recomienda una acción; <strong style={{ color: T.text }}>shouldn&apos;t</strong> + verbo base aconseja en contra; el <strong style={{ color: T.text }}>imperativo</strong> da una instrucción directa (con o sin <strong style={{ color: T.text }}>Don&apos;t</strong>).</>
-              )}
-              {modo === "completar" && (
-                <>Recuerda: <strong style={{ color: T.text }}>should</strong> y <strong style={{ color: T.text }}>shouldn&apos;t</strong> van con el verbo base SIN <strong style={{ color: T.text }}>to</strong>; el imperativo negativo empieza por <strong style={{ color: T.text }}>Don&apos;t</strong>.</>
-              )}
-              {modo === "glosario" && (
-                <>Lee la definición y su ejemplo; luego suelta la estructura que le corresponde para dar o pedir un consejo con empatía.</>
-              )}
-            </span>
-          </div>
+/* ═══════════════════════════════════════════════════════════════════════════
+ * SIMULADOR «Helpline»: cuatro amigos ficticios piden consejo; el alumno arma
+ * la respuesta (saludo + forma + acción) y ve cómo cambia el ánimo.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+const RUTA_SIM = "/media/labs-sim/consejos-ingles";
 
-          {/* dato verbatim */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid ${T.line}`, background: T.glass, fontSize: 12.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-circle-info" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>{DATO_CONSEJOS}</span>
-          </div>
-        </div>
-      </div>
-
-      <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />
+function FotoSim({ clave, icono, color, alto }: { clave: string; icono: string; color: string; alto: number }) {
+  const [fallo, setFallo] = useState(false);
+  return (
+    <div style={{ position: "relative", height: alto, borderRadius: 12, overflow: "hidden", background: `linear-gradient(135deg, ${color}55, #0b2233)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <i className={`fa-solid ${icono}`} aria-hidden style={{ fontSize: Math.round(alto / 3), color: `${color}bb` }} />
+      {!fallo && (
+        <img src={`${RUTA_SIM}/${clave}.webp`} alt="" loading="lazy" onError={() => setFallo(true)} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+      )}
     </div>
   );
 }
+
+function Helpline({
+  accent,
+  rgba,
+  animos,
+  resueltos,
+  onEnviar,
+}: {
+  accent: string;
+  rgba: string;
+  animos: Record<string, number>;
+  resueltos: string[];
+  onEnviar: (tid: string, r: Resultado) => void;
+}) {
+  const [tid, setTid] = useState(ADOLESCENTES[0]!.id);
+  const [opener, setOpener] = useState<OpenerId>("none");
+  const [fraseId, setFraseId] = useState<FraseId | null>(null);
+  const [accionId, setAccionId] = useState<string | null>(null);
+  const [res, setRes] = useState<Resultado | null>(null);
+
+  const t = ADOLESCENTES.find((x) => x.id === tid)!;
+  const frase = FRASES.find((f) => f.id === fraseId) ?? null;
+  const accion = t.acciones.find((a) => a.id === accionId) ?? null;
+  const animo = animos[tid] ?? ANIMO_INICIO;
+  const cara = caraDe(animo);
+  const vista = frase && accion ? armarTexto(opener, frase, accion) : "…";
+
+  const elegirAdolescente = (id: string) => {
+    setTid(id);
+    setOpener("none");
+    setFraseId(null);
+    setAccionId(null);
+    setRes(null);
+  };
+  const enviar = () => {
+    if (!frase || !accion) return;
+    const r = evaluar(accion, frase, opener);
+    setRes(r);
+    onEnviar(tid, r);
+  };
+  const colorVeredicto = res ? (res.veredicto === "bien" ? OK : res.veredicto === "fuerte" ? "#FBBF24" : NO) : T.text3;
+
+  return (
+    <div style={{ display: "grid", gap: 14, minWidth: 0 }}>
+      {/* Los cuatro amigos */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 130px), 1fr))", gap: 10 }}>
+        {ADOLESCENTES.map((a) => {
+          const an = animos[a.id] ?? ANIMO_INICIO;
+          const c = caraDe(an);
+          return (
+            <button key={a.id} type="button" className="adv-teen" data-on={a.id === tid} onClick={() => elegirAdolescente(a.id)} aria-pressed={a.id === tid}>
+              <FotoSim clave={a.imagen} icono={a.icono} color={accent} alto={64} />
+              <span style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 6, fontSize: 14, fontWeight: 800 }}>
+                <span>{a.nombre}</span>
+                {resueltos.includes(a.id) ? <i className="fa-solid fa-circle-check" aria-hidden style={{ color: OK }} /> : <i className={`fa-solid ${c.icono}`} aria-hidden style={{ color: c.color }} />}
+              </span>
+              <span style={{ height: 6, borderRadius: 99, background: "rgba(255,255,255,0.14)", overflow: "hidden" }}>
+                <span style={{ display: "block", width: `${an}%`, height: "100%", background: c.color, transition: "width .6s ease, background .6s ease" }} />
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* El mensaje */}
+      <div style={{ ...card, padding: 16, display: "grid", gap: 12 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr)", gap: 12 }}>
+          <FotoSim key={t.imagen} clave={t.imagen} icono={t.icono} color={cara.color} alto={110} />
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <i className={`fa-solid ${cara.icono}`} aria-hidden style={{ fontSize: 34, color: cara.color, transition: "color .5s ease" }} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, fontWeight: 800, color: cara.color }}>
+                <span>{t.nombre}, {t.edad} · {cara.texto}</span>
+                <span style={{ fontFamily: "ui-monospace, monospace" }}>{animo}</span>
+              </div>
+              <div style={{ height: 10, borderRadius: 99, background: "rgba(255,255,255,0.14)", overflow: "hidden", marginTop: 5 }}>
+                <div style={{ width: `${animo}%`, height: "100%", background: cara.color, borderRadius: 99, transition: "width .6s ease, background .6s ease" }} />
+              </div>
+            </div>
+          </div>
+          <div className="adv-bubble" style={{ borderColor: `${cara.color}88` }}>
+            <strong style={{ color: cara.color }}>{t.nombre}: </strong>
+            “{t.mensaje}”
+          </div>
+        </div>
+
+        {/* Armar el consejo */}
+        <div style={{ display: "grid", gap: 12 }}>
+          <div>
+            <div className="adv-paso">1 · Empieza con… (opcional)</div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {OPENERS.map((o) => (
+                <button key={o.id} type="button" className="adv-chip-sm" data-sel={opener === o.id} aria-pressed={opener === o.id} onClick={() => setOpener(o.id)}>
+                  {o.texto}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <div className="adv-paso">2 · Forma de consejo</div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {FRASES.map((f) => (
+                <button key={f.id} type="button" className="adv-chip-sm" data-sel={fraseId === f.id} aria-pressed={fraseId === f.id} onClick={() => setFraseId(f.id)}>
+                  {f.etiqueta}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <div className="adv-paso">3 · ¿Qué le aconsejas sobre esto?</div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {t.acciones.map((a) => (
+                <button key={a.id} type="button" className="adv-chip-sm" data-sel={accionId === a.id} aria-pressed={accionId === a.id} onClick={() => setAccionId(a.id)}>
+                  {a.base}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="adv-bubble" style={{ borderColor: `rgba(${rgba},0.6)` }}>
+            <strong style={{ color: accent }}>Tú: </strong>
+            {opener === "none" ? "" : `${OPENERS.find((o) => o.id === opener)!.texto} `}
+            {vista}
+          </div>
+          <button type="button" className="adv-btn" disabled={!frase || !accion} onClick={enviar} style={{ background: accent, color: "#04121f", border: "none", justifySelf: "start", opacity: frase && accion ? 1 : 0.45 }}>
+            <i className="fa-solid fa-paper-plane" aria-hidden /> Enviar consejo
+          </button>
+        </div>
+      </div>
+
+      {/* La reacción */}
+      {res && (
+        <div style={{ ...card, padding: 16, display: "grid", gap: 10, borderColor: `${colorVeredicto}88` }} role="status">
+          <div className="adv-bubble" style={{ borderColor: `${colorVeredicto}88` }}>
+            <strong style={{ color: colorVeredicto }}>{t.nombre}: </strong>
+            “{res.reaccion}”
+          </div>
+          <div style={{ fontSize: 14, fontWeight: 900, color: colorVeredicto }}>
+            Ánimo {res.delta > 0 ? `+${res.delta}` : res.delta}
+            {res.veredicto === "bien" ? " · buen consejo" : res.veredicto === "confuso" ? " · forma confusa" : res.veredicto === "fuerte" ? " · suena a orden" : " · consejo que perjudica"}
+          </div>
+          <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55 }}>
+            <i className="fa-solid fa-circle-info" aria-hidden style={{ color: accent, marginRight: 8 }} />
+            {res.explica}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 
 /* ═══════════════════════════════════════════════════════════════════════════
  * Paneles de cada modo (componentes hijos: reciben los manejadores como props,
@@ -602,17 +804,17 @@ function BinsClasificar({
             <FondoTermino termino={info.titulo} />
             <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
               <VinetaTermino termino={info.titulo} color={T.text2} icono={info.icono} tam={29} radio={8} />
-              <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
+              <span style={{ fontSize: 14, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
             </div>
-            <div style={{ fontSize: 11, color: T.text3, marginBottom: 4, lineHeight: 1.4 }}>{info.subtitulo}</div>
-            <div style={{ fontSize: 10.5, color: T.text3, fontStyle: "italic", marginBottom: 12 }}>{info.ejemplo}</div>
+            <div style={{ fontSize: 14, color: T.text3, marginBottom: 4, lineHeight: 1.4 }}>{info.subtitulo}</div>
+            <div style={{ fontSize: 14, color: T.text3, fontStyle: "italic", marginBottom: 12 }}>{info.ejemplo}</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {dentro.length === 0 ? (
-                <div style={{ fontSize: 12, color: T.text3, opacity: 0.6, padding: "8px 0" }}>Arrastra aquí…</div>
+                <div style={{ fontSize: 14, color: T.text3, opacity: 0.6, padding: "8px 0" }}>Arrastra aquí…</div>
               ) : (
                 dentro.map((o) => (
-                  <span key={o.id} style={{ animation: "advPop .25s ease", display: "inline-flex", alignItems: "flex-start", gap: 7, padding: "8px 12px", borderRadius: 11, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 12.5, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>
-                    <i className="fa-solid fa-check" style={{ fontSize: 10, color: OK, marginTop: 3 }} />
+                  <span key={o.id} style={{ animation: "advPop .25s ease", display: "inline-flex", alignItems: "flex-start", gap: 7, padding: "8px 12px", borderRadius: 11, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 14, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>
+                    <i className="fa-solid fa-check" style={{ fontSize: 14, color: OK, marginTop: 3 }} />
                     {o.texto}
                   </span>
                 ))
@@ -657,13 +859,13 @@ function RowsCompletar({
                 <span style={{ animation: "advPop .25s ease", fontWeight: 900, color: OK }}>{h.resp}</span>
               ) : (
                 <span className="adv-slot" data-armed={!!selFicha} style={{ minWidth: 96 }}>
-                  <i className="fa-solid fa-arrow-down" style={{ fontSize: 11 }} />
+                  <i className="fa-solid fa-arrow-down" style={{ fontSize: 14 }} />
                 </span>
               )}
               <span>{h.despues}</span>
             </div>
             {!done && (
-              <span style={{ fontSize: 11, color: T.text3, fontStyle: "italic", flexShrink: 0, maxWidth: 220, lineHeight: 1.4 }}>{h.pista}</span>
+              <span style={{ fontSize: 14, color: T.text3, fontStyle: "italic", flexShrink: 0, maxWidth: 220, lineHeight: 1.4 }}>{h.pista}</span>
             )}
           </div>
         );
@@ -700,19 +902,19 @@ function RowsGlosario({
           >
             <div className="adv-slot" data-armed={!done && !!selGlos} style={{ minWidth: 200, ...(done ? { borderStyle: "solid", borderColor: OK, background: `${OK}1a` } : {}) }}>
               {done ? (
-                <span style={{ animation: "advPop .25s ease", fontSize: 12.5, fontWeight: 900, color: "#fff", display: "inline-flex", alignItems: "center", gap: 7, lineHeight: 1.35 }}>
+                <span style={{ animation: "advPop .25s ease", fontSize: 14, fontWeight: 900, color: "#fff", display: "inline-flex", alignItems: "center", gap: 7, lineHeight: 1.35 }}>
                   <i className="fa-solid fa-quote-left" />
                   {g.termino}
                 </span>
               ) : (
                 <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                  <i className="fa-solid fa-arrow-left" style={{ fontSize: 11 }} /> estructura
+                  <i className="fa-solid fa-arrow-left" style={{ fontSize: 14 }} /> estructura
                 </span>
               )}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 13, color: done ? "#fff" : T.text2, lineHeight: 1.45 }}>{g.definicion}</div>
-              <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.4, marginTop: 3, fontStyle: "italic" }}>{g.ejemplo}</div>
+              <div style={{ fontSize: 14, color: done ? "#fff" : T.text2, lineHeight: 1.45 }}>{g.definicion}</div>
+              <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.4, marginTop: 3, fontStyle: "italic" }}>{g.ejemplo}</div>
             </div>
           </div>
         );
@@ -768,12 +970,12 @@ function QuizCard({
           Comprueba lo aprendido
         </Eyebrow>
         {aprobado && (
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 12, fontWeight: 800, color: OK }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 14, fontWeight: 800, color: OK }}>
             <i className="fa-solid fa-circle-check" /> Aprobado
           </span>
         )}
       </div>
-      <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
         Siete afirmaciones sobre cómo dar y pedir consejos en inglés (should, shouldn&apos;t e imperativos). Decide si son verdaderas o falsas y pulsa «Comprobar».
       </div>
 
@@ -808,7 +1010,7 @@ function QuizCard({
                   }
                   return (
                     <button key={oi} className="adv-q" onClick={() => elegir(qi, oi)} disabled={comprobado} style={{ borderColor: borde, background: fondo, color: colorTxt }}>
-                      <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
+                      <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
                         {comprobado && esCorrecta ? <i className="fa-solid fa-check" /> : comprobado && sel ? <i className="fa-solid fa-xmark" /> : String.fromCharCode(65 + oi)}
                       </span>
                       <span style={{ flex: 1, lineHeight: 1.35 }}>{op}</span>
@@ -817,7 +1019,7 @@ function QuizCard({
                 })}
               </div>
               {comprobado && (
-                <div style={{ marginTop: 9, fontSize: 12.5, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
+                <div style={{ marginTop: 9, fontSize: 14, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
                   <i className="fa-solid fa-circle-info" style={{ color: accent, marginTop: 2 }} />
                   <span>{q.retro}</span>
                 </div>
@@ -840,7 +1042,7 @@ function QuizCard({
           </button>
         )}
         {comprobado && (
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 13.5, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 14, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
             <i className={`fa-solid ${aprobadoAhora ? "fa-trophy" : "fa-circle-half-stroke"}`} />
             {aciertos} / {total} correctas
             {!aprobadoAhora && <span style={{ color: T.text3, fontWeight: 600 }}>· revisa las marcadas e inténtalo de nuevo</span>}

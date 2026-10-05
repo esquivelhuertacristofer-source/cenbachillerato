@@ -1,0 +1,12 @@
+{
+  "escena": "Una torre de pasos con la expresión 2 + 3 × 4: cada operación es un botón y, al tocarla, baja un renglón.",
+  "pregunta": "En 2 + 3 × 4, ¿qué pasa si tocas primero la suma?",
+  "opciones": [
+    { "id": "a", "texto": "Sale 14, igual que de la otra forma", "icono": "fa-equals" },
+    { "id": "b", "texto": "Sale 20: la torre marca que no toca", "icono": "fa-triangle-exclamation" },
+    { "id": "c", "texto": "No pasa nada, el botón no responde", "icono": "fa-ban" }
+  ],
+  "correcta": "b",
+  "porque": "La multiplicación tiene mayor jerarquía y va antes que la suma. Si sumas primero haces 5 × 4 = 20, un resultado equivocado; lo correcto es 3 × 4 = 12 y luego 2 + 12 = 14.",
+  "comoComprobarlo": "En «Torre de pasos» elige la expresión 2 + 3 × 4 y toca el signo + antes que el ×; lee el aviso y el resultado que aparece."
+}

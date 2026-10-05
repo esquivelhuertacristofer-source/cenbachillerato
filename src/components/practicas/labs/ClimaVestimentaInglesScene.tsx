@@ -19,7 +19,7 @@
 
 import * as THREE from "three";
 import { useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import {
@@ -69,9 +69,9 @@ const suave = (dt: number, porCuadro: number) => 1 - Math.pow(1 - porCuadro, Mat
 const OK = "#34d399";
 const NO = "#fb923c";
 
-function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number }) {
+function Etiqueta({ pos, children, col, fs = 14 }: { pos: Pt; children: ReactNode; col?: string; fs?: number }) {
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -96,7 +96,7 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children:
 
 function Burbuja({ pos, texto, col }: { pos: Pt; texto: string; col: string }) {
   return (
-    <Html position={pos} center distanceFactor={7} zIndexRange={[22, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[22, 0]} style={{ pointerEvents: "none" }}>
       <div style={{ position: "relative", padding: "8px 14px", borderRadius: 14, background: "#fff", color: "#0f172a", fontSize: 15, fontWeight: 900, whiteSpace: "nowrap", border: `3px solid ${col}`, boxShadow: "0 10px 24px -10px #000", fontFamily: "ui-rounded, system-ui, sans-serif" }}>
         {texto}
         <div style={{ position: "absolute", left: "50%", bottom: -9, width: 14, height: 14, marginLeft: -7, background: "#fff", borderRight: `3px solid ${col}`, borderBottom: `3px solid ${col}`, transform: "rotate(45deg)" }} />
@@ -1002,7 +1002,7 @@ function Plaza({ condicion, tempC, modoColor }: { condicion: Condicion; tempC: n
             <meshBasicMaterial color="#0f172a" />
           </mesh>
         ))}
-        <Etiqueta pos={[0, 3.05, 0]} df={10} col={`${modoColor}cc`} fs={15}>
+        <Etiqueta pos={[0, 3.05, 0]} col={`${modoColor}cc`} fs={16}>
           <i className="fa-solid fa-temperature-half" style={{ color: "#f87171" }} />
           <span ref={lectura}>
             {signo(tempC)} °C · {aFahrenheit(tempC)} °F
@@ -1028,6 +1028,7 @@ const BURBUJA: Record<"ok" | "frio" | "calor" | "mojado", { txt: string; col: st
 };
 
 function Banqueta({ pronosticoId, atuendo, revisado, okAtuendo, problema, modoColor }: { pronosticoId: string; atuendo: Atuendo; revisado: boolean; okAtuendo: boolean; problema: Problema; modoColor: string }) {
+  const estrecho = useThree((s) => s.size.width) < 640;
   const f = PRONOSTICOS.find((x) => x.id === pronosticoId) ?? PRONOSTICOS[0]!;
   const quien = personaPorId(f.personaId);
   const ropa: PiezaHex[] = [atuendo.top, atuendo.bottom, atuendo.shoes, ...atuendo.extras].filter((x): x is PrendaId => x !== null).map((id) => ({ id, hex: PRENDA_DEF[id].col }));
@@ -1162,10 +1163,12 @@ function Banqueta({ pronosticoId, atuendo, revisado, okAtuendo, problema, modoCo
         <mesh geometry={G.cil} position={[0, 0.9, 0]} scale={[0.04, 1.8, 0.04]}>
           <meshStandardMaterial color="#1f2937" />
         </mesh>
-        <Etiqueta pos={[0, 2.05, 0]} df={8} col={`${modoColor}cc`} fs={13}>
-          <i className="fa-solid fa-location-dot" style={{ color: modoColor }} />
-          {f.lugar.split(",")[0]} · {signo(f.tempC)} °C · {aFahrenheit(f.tempC)} °F
-        </Etiqueta>
+        {!estrecho && (
+          <Etiqueta pos={[0, 2.05, 0]} col={`${modoColor}cc`}>
+            <i className="fa-solid fa-location-dot" style={{ color: modoColor }} />
+            {f.lugar.split(",")[0]} · {signo(f.tempC)} °C · {aFahrenheit(f.tempC)} °F
+          </Etiqueta>
+        )}
       </group>
       {/* La persona */}
       <group ref={cuerpo} position={[0, 0.13, -0.9]}>
@@ -1245,10 +1248,6 @@ function Parada({ orden, seleccion, seleccionOk, describir, onElegirPersona, mod
           <boxGeometry args={[0.6, 0.6, 0.05]} />
           <meshStandardMaterial color="#1d4ed8" roughness={0.4} />
         </mesh>
-        <Etiqueta pos={[0, 2.35, 0.1]} df={9} fs={12} col="#93c5fdaa">
-          <i className="fa-solid fa-bus" style={{ color: "#93c5fd" }} />
-          Parada
-        </Etiqueta>
       </group>
       <group ref={aros}>
         {orden.map((id, k) => {
@@ -1288,7 +1287,7 @@ function Parada({ orden, seleccion, seleccionOk, describir, onElegirPersona, mod
               <cylinderGeometry args={[0.42, 0.42, 2.1, 12]} />
               <meshBasicMaterial transparent opacity={0} depthWrite={false} />
             </mesh>
-            <Etiqueta pos={[x, alto + 0.28, 0.25]} df={8} fs={13} col={on ? (id === describir ? modoColor : seleccionOk ? OK : NO) : "rgba(255,255,255,0.3)"}>
+            <Etiqueta pos={[x, alto + 0.28, 0.25]} col={on ? (id === describir ? modoColor : seleccionOk ? OK : NO) : "rgba(255,255,255,0.3)"}>
               {id === describir ? <i className="fa-solid fa-pen" style={{ color: modoColor }} /> : null}
               {k + 1}
             </Etiqueta>
@@ -1308,9 +1307,9 @@ const AREA_PARADA: Area = { suelo: 0.11, cx: 0, cz: 2, w: 16, d: 8, h: 7 };
 export default function ClimaVestimentaInglesScene(p: ClimaVestimentaSceneProps) {
   const { vista, modoColor, resetNonce } = p;
   const cam = useMemo((): { pos: Pt; target: Pt; min: number; max: number } => {
-    if (vista === "clima") return { pos: [0, 5.2, 13.2], target: [0, 1.7, 0], min: 5, max: 24 };
-    if (vista === "vestir") return { pos: [0.4, 2.1, 6.4], target: [0, 1.25, 0.2], min: 3, max: 12 };
-    return { pos: [0, 1.85, 7.5], target: [0, 1.1, 0.2], min: 3.5, max: 15 };
+    if (vista === "clima") return { pos: [0, 5.4, 14.6], target: [0, 1.2, 0], min: 5, max: 24 };
+    if (vista === "vestir") return { pos: [0.4, 2.2, 7.6], target: [0, 0.95, 0.2], min: 3, max: 12 };
+    return { pos: [0, 1.9, 8.6], target: [0, 0.8, 0.2], min: 3.5, max: 15 };
   }, [vista]);
   const f = PRONOSTICOS.find((x) => x.id === p.pronosticoId) ?? PRONOSTICOS[0]!;
   const condicion: Condicion = vista === "clima" ? p.condicion : vista === "vestir" ? f.condicion : "cloudy";

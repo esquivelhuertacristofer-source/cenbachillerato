@@ -19,10 +19,11 @@
  *      suscripciones para ver qué pasa con los archivos.
  */
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import React, { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, NUM, OK, card, Eyebrow, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { CompletaTexto } from "./_mecanica-huecos";
@@ -91,7 +92,7 @@ const SoftwareScene = dynamic(() => import("./SoftwareLibreScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-box-open fa-fade" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Cargando la caja de las libertades en 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Cargando la caja de las libertades en 3D…</span>
     </div>
   ),
 });
@@ -155,15 +156,15 @@ function LibreGratisCard({ accent, rgba, mejor, onResultado, playSfx }: { accent
           ¿Libre, gratis o de pago?
         </Eyebrow>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 10.5, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
           {[1, 2, 3].map((k) => (
-            <i key={k} className="fa-solid fa-star" style={{ fontSize: 13, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
+            <i key={k} className="fa-solid fa-star" style={{ fontSize: 14, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
           ))}
         </div>
       </div>
       {resuelto === null ? (
         <>
-          <div style={{ fontSize: 11, color: T.text3, fontWeight: 800, marginBottom: 6 }}>
+          <div style={{ fontSize: 14, color: T.text3, fontWeight: 800, marginBottom: 6 }}>
             Programa {pos + 1} de {ronda.length} · ¿en qué categoría va?
           </div>
           <div style={{ fontSize: 17, color: "#fff", fontWeight: 900, lineHeight: 1.4, marginBottom: 12 }} className="sl-programa">
@@ -177,7 +178,7 @@ function LibreGratisCard({ accent, rgba, mejor, onResultado, playSfx }: { accent
               </button>
             ))}
           </div>
-          {aviso && <div style={{ marginTop: 10, fontSize: 12, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
+          {aviso && <div style={{ marginTop: 10, fontSize: 14, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
         </>
       ) : (
         <div style={{ padding: "12px 14px", borderRadius: 11, border: `1px solid ${OK}55`, background: "rgba(52,211,153,0.08)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
@@ -185,14 +186,64 @@ function LibreGratisCard({ accent, rgba, mejor, onResultado, playSfx }: { accent
             {[1, 2, 3].map((k) => (
               <i key={k} className="fa-solid fa-star" style={{ fontSize: 15, color: k <= resuelto ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
             ))}
-            <span style={{ fontSize: 12.5, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
+            <span style={{ fontSize: 14, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
           </span>
-          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 12.5, fontWeight: 900 }}>
+          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 14, fontWeight: 900 }}>
             <i className="fa-solid fa-shuffle" style={{ marginRight: 8 }} />
             Otra ronda
           </button>
         </div>
       )}
+    </div>
+  );
+}
+
+/* ── Gráfica: costo acumulado de ofimática por año (compra vs suscripción vs libre) ── */
+function GraficaCosto({ equipos, anios }: { equipos: number; anios: number }) {
+  const W = 340;
+  const H = 200;
+  const PL = 10;
+  const PR = 10;
+  const PT = 22;
+  const PB = 40;
+  const compra = OFI_COMPRA.unico * equipos * TC_MXN;
+  const suscA = (t: number) => OFI_SUSC.mensual * 12 * t * equipos * TC_MXN;
+  const ymax = Math.max(compra, suscA(ANIOS_MAX)) * 1.05;
+  const x = (t: number) => PL + (t / ANIOS_MAX) * (W - PL - PR);
+  const y = (v: number) => H - PB - (v / ymax) * (H - PB - PT);
+  const cruce = OFI_COMPRA.unico / (OFI_SUSC.mensual * 12);
+  const cSusc = RUTA_DEF.suscripcion.color;
+  const cCompra = RUTA_DEF.compra.color;
+  const cLibre = RUTA_DEF.libre.color;
+  const vSusc = suscA(anios);
+  const suscGana = vSusc > compra;
+  return (
+    <div>
+      <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="Costo acumulado de ofimática por año" style={{ display: "block", maxWidth: "100%" }}>
+        <line x1={PL} y1={y(0)} x2={W - PR} y2={y(0)} stroke="rgba(255,255,255,0.25)" />
+        <line x1={PL} y1={y(compra)} x2={W - PR} y2={y(compra)} stroke={cCompra} strokeWidth={3} />
+        <line x1={x(0)} y1={y(0)} x2={x(ANIOS_MAX)} y2={y(suscA(ANIOS_MAX))} stroke={cSusc} strokeWidth={3} />
+        <line x1={PL} y1={y(0) - 2} x2={W - PR} y2={y(0) - 2} stroke={cLibre} strokeWidth={3} strokeDasharray="6 4" />
+        <circle cx={x(cruce)} cy={y(compra)} r={6} fill="#fff" stroke="#04121f" strokeWidth={2} />
+        <line x1={x(anios)} y1={PT - 6} x2={x(anios)} y2={y(0)} stroke="rgba(255,255,255,0.6)" strokeDasharray="4 4" />
+        <circle cx={x(anios)} cy={y(vSusc)} r={6} fill={cSusc} stroke="#fff" strokeWidth={2} />
+        <text x={x(anios) + (anios > ANIOS_MAX / 2 ? -8 : 8)} y={Math.max(PT, y(vSusc) - 10)} textAnchor={anios > ANIOS_MAX / 2 ? "end" : "start"} fill="#fff" fontSize={14} fontWeight={800}>
+          ${num(vSusc)}
+        </text>
+        <text x={PL} y={H - 8} fill="#94a3b8" fontSize={14}>0</text>
+        <text x={W - PR} y={H - 8} fill="#94a3b8" fontSize={14} textAnchor="end">{ANIOS_MAX} años</text>
+        <text x={x(anios)} y={H - 22} fill="#fff" fontSize={14} fontWeight={800} textAnchor="middle">{anios} {anios === 1 ? "año" : "años"}</text>
+      </svg>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 14px", color: T.text2 }}>
+        <span><span style={{ display: "inline-block", width: 14, height: 4, background: cCompra, marginRight: 6, verticalAlign: "middle" }} />Comprar (una vez)</span>
+        <span><span style={{ display: "inline-block", width: 14, height: 4, background: cSusc, marginRight: 6, verticalAlign: "middle" }} />Suscripción</span>
+        <span><span style={{ display: "inline-block", width: 14, height: 4, background: cLibre, marginRight: 6, verticalAlign: "middle" }} />Libre</span>
+      </div>
+      <div style={{ marginTop: 8, color: suscGana ? "#fbbf24" : OK, fontWeight: 700 }}>
+        {suscGana
+          ? `A ${anios} ${anios === 1 ? "año" : "años"} la suscripción ya costó más que comprar. Se cruzan en el mes ${MES_EQUILIBRIO}.`
+          : `A ${anios} ${anios === 1 ? "año" : "años"} la suscripción aún es más barata que comprar. Se cruzan en el mes ${MES_EQUILIBRIO}: sigue subiendo los años.`}
+      </div>
     </div>
   );
 }
@@ -237,7 +288,6 @@ export function LabSoftwareLibre({ color }: PracticaLabProps) {
 
   // ── Comunes
   const [resetNonce, setResetNonce] = useState(0);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   const timers = useRef<number[]>([]);
@@ -422,6 +472,7 @@ export function LabSoftwareLibre({ color }: PracticaLabProps) {
     { t: `Clasificar bien de quién dependen ${OBJ_CLASIFICADOS} formatos`, done: clasificadosOk >= OBJ_CLASIFICADOS },
     { t: "Rescatar con software libre un archivo de formato cerrado", done: rescate },
     { t: "Armar un archivo escolar que llegue íntegro a 2026", done: archivoIntegro },
+    { t: "En la sala, mueve los años hasta pasar el cruce de Office: ¿cuándo deja de ser barata la suscripción?", done: modo === "costos" && anios >= 2 },
     { t: "Predecir qué cuesta más a 5 años y comprobarlo en la sala", done: prediccionComprobada },
     { t: "Dejar de pagar las suscripciones y ver qué pasa con los archivos", done: vioSinPago },
     { t: "Clasificar programas y ganar estrellas", done: clasifico },
@@ -454,13 +505,13 @@ export function LabSoftwareLibre({ color }: PracticaLabProps) {
         <i className={`fa-solid ${def.icono}`} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{def.etq}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los resultados siguen aquí. {pie}</div>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los resultados siguen aquí. {pie}</div>
     </div>
   );
 
-  const sub = (txt: string) => <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
+  const sub = (txt: string) => <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
   const nota = (txt: ReactNode, col: string, icono = "fa-circle-info") => (
-    <div style={{ marginTop: 10, fontSize: 12, lineHeight: 1.55, color: col }}>
+    <div style={{ marginTop: 10, fontSize: 14, lineHeight: 1.55, color: col }}>
       <i className={`fa-solid ${icono}`} style={{ marginRight: 7 }} />
       {txt}
     </div>
@@ -480,10 +531,10 @@ export function LabSoftwareLibre({ color }: PracticaLabProps) {
           ))}
         </div>
         <div style={{ marginTop: 12, padding: "12px 14px", borderRadius: 12, background: "rgba(248,250,252,0.05)", border: `1px solid ${T.line}` }}>
-          <div style={{ fontSize: 13.5, color: "#fff", fontWeight: 900 }}>
-            {lic.etq} <span style={{ color: lic.color, fontWeight: 800, fontSize: 12 }}>· {revelada ? lic.tipo : "tipo oculto hasta abrir"}</span>
+          <div style={{ fontSize: 14, color: "#fff", fontWeight: 900 }}>
+            {lic.etq} <span style={{ color: lic.color, fontWeight: 800, fontSize: 14 }}>· {revelada ? lic.tipo : "tipo oculto hasta abrir"}</span>
           </div>
-          <div style={{ fontSize: 12, color: T.text2, marginTop: 4, lineHeight: 1.45 }}>
+          <div style={{ fontSize: 14, color: T.text2, marginTop: 4, lineHeight: 1.45 }}>
             Ejemplo real: <strong style={{ color: "#fff" }}>{lic.ejemplo}</strong> · {lic.precioDetalle}
           </div>
         </div>
@@ -518,7 +569,7 @@ export function LabSoftwareLibre({ color }: PracticaLabProps) {
                 const real = lic.libertades[i]!;
                 const bien = real === pred[i];
                 return (
-                  <div key={L.n} style={{ fontSize: 11.5, lineHeight: 1.45, color: T.text2, padding: "7px 10px", borderRadius: 9, background: "rgba(4,10,22,0.45)", border: `1px solid ${bien ? `${OK}44` : `${WARN}55`}` }}>
+                  <div key={L.n} style={{ fontSize: 14, lineHeight: 1.45, color: T.text2, padding: "7px 10px", borderRadius: 9, background: "rgba(4,10,22,0.45)", border: `1px solid ${bien ? `${OK}44` : `${WARN}55`}` }}>
                     <strong style={{ color: real ? OK : "#f87171" }}>
                       <i className={`fa-solid ${real ? "fa-lock-open" : "fa-lock"}`} style={{ marginRight: 6 }} />
                       {L.n} · {L.corto}:
@@ -559,7 +610,7 @@ export function LabSoftwareLibre({ color }: PracticaLabProps) {
               <button key={e.id} className="sl-opt sl-ent" data-on={e.id === entregable} onClick={() => elegirEntregable(e.id)} style={{ ["--slc" as string]: modoCol, background: e.id === entregable ? `${modoCol}1f` : "transparent" }}>
                 <i className={`fa-solid ${e.icono}`} style={{ marginRight: 7 }} />
                 {e.etq}
-                {res && <i className="fa-solid fa-circle" style={{ marginLeft: 7, fontSize: 8, color: RESULTADO_DEF[res].color }} />}
+                {res && <i className="fa-solid fa-circle" style={{ marginLeft: 7, fontSize: 14, color: RESULTADO_DEF[res].color }} />}
               </button>
             );
           })}
@@ -574,7 +625,7 @@ export function LabSoftwareLibre({ color }: PracticaLabProps) {
             </button>
           ))}
         </div>
-        <div style={{ fontSize: 11.5, color: T.text3, marginTop: 6 }}>
+        <div style={{ fontSize: 14, color: T.text3, marginTop: 6 }}>
           Guardado con <strong style={{ color: T.text2 }}>{fmt.original}</strong>.
         </div>
         {sub("2 · ¿De quién depende poder abrirlo?")}
@@ -586,7 +637,7 @@ export function LabSoftwareLibre({ color }: PracticaLabProps) {
               <button key={d.id} className="sl-opt sl-dep" data-on={on || (!!miPred && d.id === fmt.dependencia)} onClick={() => predecirDep(d.id)} disabled={!!miPred} style={{ ["--slc" as string]: col, background: on ? `${col}1f` : "transparent", textAlign: "left" }}>
                 <i className={`fa-solid ${d.icono}`} style={{ marginRight: 8, color: d.color }} />
                 {d.etq}
-                <div style={{ fontSize: 11, fontWeight: 600, color: T.text3, marginTop: 3 }}>{d.explica}</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: T.text3, marginTop: 3 }}>{d.explica}</div>
               </button>
             );
           })}
@@ -601,8 +652,8 @@ export function LabSoftwareLibre({ color }: PracticaLabProps) {
           <>
             <div style={{ display: "grid", gap: 6, marginTop: 10 }}>
               {fmt.lectores.map((l) => (
-                <div key={l.programa} style={{ display: "flex", gap: 9, alignItems: "flex-start", fontSize: 11.5, color: T.text2, lineHeight: 1.4, padding: "7px 10px", borderRadius: 9, background: "rgba(4,10,22,0.45)", border: `1px solid ${RESULTADO_DEF[l.resultado].color}44` }}>
-                  <i className="fa-solid fa-circle" style={{ fontSize: 8, marginTop: 5, color: RESULTADO_DEF[l.resultado].color }} />
+                <div key={l.programa} style={{ display: "flex", gap: 9, alignItems: "flex-start", fontSize: 14, color: T.text2, lineHeight: 1.4, padding: "7px 10px", borderRadius: 9, background: "rgba(4,10,22,0.45)", border: `1px solid ${RESULTADO_DEF[l.resultado].color}44` }}>
+                  <i className="fa-solid fa-circle" style={{ fontSize: 14, marginTop: 5, color: RESULTADO_DEF[l.resultado].color }} />
                   <span>
                     <strong style={{ color: "#fff" }}>{l.programa}</strong>
                     {l.libre && <span style={{ color: OK, fontWeight: 800 }}> (libre)</span>} — <span style={{ color: RESULTADO_DEF[l.resultado].color }}>{RESULTADO_DEF[l.resultado].etq}</span>. {l.nota}
@@ -614,7 +665,7 @@ export function LabSoftwareLibre({ color }: PracticaLabProps) {
             {nota(fmt.explica, RESULTADO_DEF[fmt.resultado].color, fmt.resultado === "integro" ? "fa-circle-check" : "fa-triangle-exclamation")}
           </>
         )}
-        <div style={{ marginTop: 12, fontSize: 11.5, color: T.text2, ...NUM }}>
+        <div style={{ marginTop: 12, fontSize: 14, color: T.text2, ...NUM }}>
           Formatos bien clasificados: <strong style={{ color: "#fff" }}>{clasificadosOk}</strong> de {FORMATOS.length} · archivo escolar:{" "}
           {ENTREGABLES.map((e) => {
             const fid = archivo[e.id];
@@ -632,7 +683,7 @@ export function LabSoftwareLibre({ color }: PracticaLabProps) {
     control = (
       <>
         {sub(`Antes de calcular · ${PRED_EQUIPOS} equipos durante ${PRED_ANIOS} años`)}
-        <div style={{ fontSize: 12.5, color: "#fff", fontWeight: 800, marginBottom: 8, lineHeight: 1.45 }}>¿Qué cuesta más en ofimática: comprar {OFI_COMPRA.producto} o suscribirse a {OFI_SUSC.producto}?</div>
+        <div style={{ fontSize: 14, color: "#fff", fontWeight: 800, marginBottom: 8, lineHeight: 1.45 }}>¿Qué cuesta más en ofimática: comprar {OFI_COMPRA.producto} o suscribirse a {OFI_SUSC.producto}?</div>
         <div className="sl-opts">
           {PRED_OPCIONES.map((o) => {
             const on = predCosto === o.id;
@@ -662,18 +713,10 @@ export function LabSoftwareLibre({ color }: PracticaLabProps) {
           </>
         )}
         {sub("La sala")}
-        <label style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <i className="fa-solid fa-desktop" style={{ color: modoCol, width: 16 }} />
-          <input type="range" aria-label="Número de equipos" className="sl-range" min={EQ_MIN} max={EQ_MAX} step={5} value={equipos} onChange={(e) => setEquipos(Number(e.target.value))} style={{ ["--slc" as string]: modoCol }} />
-          <span style={{ width: 86, textAlign: "right", fontSize: 13, color: "#fff", fontWeight: 800, ...NUM }}>{equipos} equipos</span>
-        </label>
-        <label style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 8 }}>
-          <i className="fa-solid fa-calendar" style={{ color: modoCol, width: 16 }} />
-          <input type="range" aria-label="Años de uso" className="sl-range" min={1} max={ANIOS_MAX} step={1} value={anios} onChange={(e) => setAnios(Number(e.target.value))} style={{ ["--slc" as string]: modoCol }} />
-          <span style={{ width: 86, textAlign: "right", fontSize: 13, color: "#fff", fontWeight: 800, ...NUM }}>
-            {anios} {anios === 1 ? "año" : "años"}
-          </span>
-        </label>
+        <Deslizador label="Número de equipos" icon="fa-desktop" colr={modoCol} valor={`${equipos} equipos`} min={EQ_MIN} max={EQ_MAX} step={5} value={equipos} onChange={setEquipos} />
+        <Deslizador label="Años de uso" icon="fa-calendar" colr={modoCol} valor={`${anios} ${anios === 1 ? "año" : "años"}`} min={1} max={ANIOS_MAX} step={1} value={anios} onChange={setAnios} />
+        {sub("Ofimática: lo que llevas gastado, año tras año")}
+        <GraficaCosto equipos={equipos} anios={anios} />
         {NECESIDADES.map((n, k) => {
           const o = opcionDe(n.id);
           return (
@@ -691,366 +734,230 @@ export function LabSoftwareLibre({ color }: PracticaLabProps) {
                   );
                 })}
               </div>
-              <div style={{ fontSize: 11, color: T.text3, marginTop: 5, lineHeight: 1.45 }}>{o.precio}</div>
+              <div style={{ fontSize: 14, color: T.text3, marginTop: 5, lineHeight: 1.45 }}>{o.precio}</div>
               {sinPago && nota(o.sinPago, o.ruta === "suscripcion" ? "#f87171" : OK, o.ruta === "suscripcion" ? "fa-lock" : "fa-circle-check")}
             </div>
           );
         })}
-        <div style={{ marginTop: 14, padding: "12px 14px", borderRadius: 12, border: `1px solid ${modoCol}55`, background: "rgba(4,10,22,0.45)", ...NUM }}>
-          <div style={{ fontSize: 11, color: T.text3, fontWeight: 800 }}>TOTAL EN LICENCIAS</div>
-          <div style={{ fontSize: 22, color: "#fff", fontWeight: 900 }}>${num(totalMXN)} MXN</div>
-          <div style={{ fontSize: 11, color: T.text3 }}>≈ US${num(totalMXN / TC_MXN)} · tipo de cambio ilustrativo de {num(TC_MXN, 2)} pesos por dólar</div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8, marginTop: 14 }}>
+          <Dato label="Total en licencias" value={`$${num(totalMXN)} MXN`} col="#fff" />
+          <Dato label="Con software libre" value={`$${num(libreTotalMXN)} MXN`} col={OK} />
         </div>
+        <div style={{ color: T.text3, marginTop: 6 }}>≈ US${num(totalMXN / TC_MXN)} · tipo de cambio ilustrativo de {num(TC_MXN, 2)} pesos por dólar</div>
         <button className="sl-toggle sl-pago" onClick={alternarPago} style={{ marginTop: 10, ["--slc" as string]: sinPago ? OK : "#f87171" }}>
           <i className={`fa-solid ${sinPago ? "fa-credit-card" : "fa-ban"}`} style={{ marginRight: 9, color: sinPago ? OK : "#f87171" }} />
           {sinPago ? "Volver a pagar" : "Dejar de pagar las suscripciones"}
         </button>
         {sinPago && !haySusc && nota("Elige al menos una suscripción para ver el efecto de dejar de pagar.", "#fbbf24")}
-        <div style={{ marginTop: 10, fontSize: 11, color: T.text3, lineHeight: 1.5 }}>
+        <div style={{ marginTop: 10, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
           Precios de lista en EUA, uno por equipo. Muchas empresas ofrecen licencias educativas gratuitas o con descuento, pero suelen terminar cuando dejas la escuela. El software libre no cobra licencias; la capacitación y el soporte técnico cuestan en cualquier ruta.
         </div>
       </>
     );
   }
 
+  const css = `
+    .sl-opts { display:flex; flex-wrap:wrap; gap:8px; }
+    .sl-puertas { display:grid; gap:8px; }
+    .sl-opt { cursor:pointer; border:1px solid var(--slc); border-radius:10px; padding:10px 12px; font-size:14px; font-weight:800; color:#fff; background:transparent; transition:all .15s; }
+    .sl-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.72); }
+    .sl-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
+    .sl-opt:disabled { cursor:default; }
+    .sl-opt:disabled[data-on="false"] { opacity:0.55; }
+    .sl-toggle { width:100%; cursor:pointer; border:1px solid var(--slc); border-radius:11px; padding:12px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:14px; font-weight:900; text-align:left; transition:all .15s; }
+    .sl-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
+    .sl-toggle:disabled { cursor:default; opacity:0.6; }
+    .sl-opt:focus-visible, .sl-toggle:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
+  `;
+
+  const caja = (borde: string, fondo: string): React.CSSProperties => ({ borderRadius: 14, padding: "14px 16px", border: `1px solid ${borde}`, background: fondo });
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes slPulse { 0%,100%{ box-shadow:0 0 0 0 var(--sld); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .sl-live-dot { animation: slPulse 1.6s ease-in-out infinite; }
-        @media (prefers-reduced-motion: reduce){ .sl-live-dot { animation:none; } }
-        .sl-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .sl-grid { grid-template-columns: 1fr; } }
-        .sl-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .sl-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .sl-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .sl-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .sl-tab { cursor:pointer; border:1px solid var(--slc); border-radius:12px; padding:11px 8px; text-align:center; background:transparent; transition:all .15s; color:#fff; }
-        .sl-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
-        .sl-tab:hover { background:rgba(255,255,255,0.06); }
-        .sl-opts { display:flex; flex-wrap:wrap; gap:7px; }
-        .sl-puertas { display:grid; gap:7px; }
-        .sl-opt { cursor:pointer; border:1px solid var(--slc); border-radius:10px; padding:9px 12px; font-size:12px; font-weight:800; color:#fff; background:transparent; transition:all .15s; }
-        .sl-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.72); }
-        .sl-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
-        .sl-opt:disabled { cursor:default; }
-        .sl-opt:disabled[data-on="false"] { opacity:0.55; }
-        .sl-toggle { width:100%; cursor:pointer; border:1px solid var(--slc); border-radius:11px; padding:11px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:12.5px; font-weight:900; text-align:left; transition:all .15s; }
-        .sl-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
-        .sl-toggle:disabled { cursor:default; opacity:0.6; }
-        .sl-range { flex:1; accent-color: var(--slc); }
-        .sl-opt:focus-visible, .sl-tab:focus-visible, .sl-toggle:focus-visible, .sl-icobtn:focus-visible, .sl-range:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
-        @media (max-width: 1000px){ .sl-bottom { grid-template-columns: 1fr !important; } }
-        .sl-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .sl-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .sl-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61; background:linear-gradient(180deg,#06121e 0%,#040a16 100%);
-          border-left:1px solid rgba(${color.rgba},0.32); box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1); display:flex; flex-direction:column; }
-        .sl-drawer[data-open="true"] { transform:translateX(0); }
-        .sl-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .sl-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .sl-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .sl-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .sl-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:11px 16px; border-radius:999px;
-          border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800; background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
-        .sl-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="sl-tabs">
-          {MODOS.map((m) => {
-            const d = MODOS_DEF[m];
-            const col = `#${d.color.replace("#", "")}`;
-            const on = m === modo;
-            return (
-              <button key={m} className="sl-tab" data-on={on} onClick={() => cambiarModo(m)} style={{ ["--slc" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? col : "inherit" }}>
-                  <i className={`fa-solid ${d.icono}`} />
-                </div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{d.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{d.subtitulo}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="sl-grid">
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 58vh, 660px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <SoftwareScene
-                vista={modo}
-                modoColor={modoCol}
-                resetNonce={resetNonce}
-                licenciaId={licId}
-                prediccion={pred}
-                revelada={revelada}
-                derivada={derivada}
-                formatoId={formatoId}
-                fase={fase}
-                archivo={archivo}
-                equipos={equipos}
-                anios={anios}
-                rutas={rutas}
-                sinPago={sinPago}
-              />
-            </SceneBoundary>
-
-            <div style={{ position: "absolute", top: 14, left: 16, right: 150, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, pointerEvents: "none" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)", maxWidth: "100%" }}>
-                <span className="sl-live-dot" style={{ ["--sld" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol, flexShrink: 0 }} />
-                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3, flexShrink: 0 }}>EN VIVO</span>
-                <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)", flexShrink: 0 }} />
-                <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", ...NUM }}>{chipVivo}</span>
-              </div>
-            </div>
-
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="sl-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría" aria-label="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="sl-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"} aria-label={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="sl-icobtn" onClick={reiniciar} title="Reiniciar" aria-label="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 132px 14px 18px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                {def.etq} — {def.subtitulo}
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6, ...NUM }}>{pie}</div>
-            </div>
-
-            <button className="sl-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-          </div>
-
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-              Controles — {def.etq}
-            </Eyebrow>
-            <div style={{ marginTop: 12 }}>{control}</div>
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-lock-open" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>¿Qué programas instala tu escuela?</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #7dd3fc55", background: "rgba(125,211,252,0.07)" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book-open" style={{ marginRight: 8, color: "#7dd3fc" }} />
-              Lectura A1
-            </Eyebrow>
-            <div style={{ fontSize: 13, color: "#fff", fontWeight: 800, lineHeight: 1.4, marginBottom: 10 }}>{TITULO_A1}</div>
-            <div style={{ display: "grid", gap: 9, marginBottom: 12 }}>
-              {LECTURA_A1.map((p, i) => (
-                <div key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>
-                  {p}
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", marginBottom: 8 }}>PARA REFLEXIONAR</div>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {PREGUNTAS.map((q, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  {q}
-                </li>
-              ))}
-              <li style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                <strong style={{ color: "#fff" }}>Reflexión A3:</strong> {REFLEXION_A3}
-              </li>
-            </ul>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />
-              Cómo usar el laboratorio
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-                Objetivos de la sesión
-              </Eyebrow>
-              <span className="sl-obj-cuenta" style={{ fontSize: 11, fontWeight: 800, color: objetivos.every((o) => o.done) ? OK : T.text3 }}>
-                {objetivos.filter((o) => o.done).length}/{objetivos.length}
-              </span>
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ marginTop: 2, fontSize: 13, color: o.done ? OK : "rgba(255,255,255,0.22)" }} />
-                  <span style={{ fontSize: 12, color: o.done ? "#fff" : T.text2, lineHeight: 1.4 }}>{o.t}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="sl-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <div style={{ padding: "14px 16px", borderRadius: 12, border: `1px solid ${accent}33`, background: `rgba(${color.rgba},0.07)` }}>
-            <Eyebrow>
-              <i className="fa-solid fa-map" style={{ marginRight: 8, color: accent }} />
-              Mapa de alternativas libres
-            </Eyebrow>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(210px,1fr))", gap: 8 }}>
-              {[
-                ["Windows / macOS", "GNU/Linux (Ubuntu, Debian, Linux Mint)"],
-                ["Microsoft Office", "LibreOffice (Writer, Calc, Impress)"],
-                ["Adobe Photoshop", "GIMP · Krita"],
-                ["Adobe Illustrator / CorelDRAW", "Inkscape"],
-                ["Autodesk Maya / 3ds Max", "Blender"],
-                ["Google Chrome", "Firefox"],
-              ].map(([priv, libre]) => (
-                <div key={priv} style={{ fontSize: 11.5, lineHeight: 1.4, padding: "8px 10px", borderRadius: 9, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <div style={{ color: T.text3 }}>{priv}</div>
-                  <div style={{ color: "#fff", fontWeight: 800 }}>
-                    <i className="fa-solid fa-arrow-right" style={{ marginRight: 6, color: OK }} />
-                    {libre}
+    <>
+      <style>{css}</style>
+      <LabShell
+        accent={accent}
+        rgba={color.rgba}
+        retoKey={RETO_KEY}
+        escena={
+          <SceneBoundary fallback={sceneFallback}>
+            <SoftwareScene
+              vista={modo}
+              modoColor={modoCol}
+              resetNonce={resetNonce}
+              licenciaId={licId}
+              prediccion={pred}
+              revelada={revelada}
+              derivada={derivada}
+              formatoId={formatoId}
+              fase={fase}
+              archivo={archivo}
+              equipos={equipos}
+              anios={anios}
+              rutas={rutas}
+              sinPago={sinPago}
+            />
+          </SceneBoundary>
+        }
+        modos={{
+          opciones: MODOS.map((m) => ({ id: m, etiqueta: MODOS_DEF[m].etq, icono: MODOS_DEF[m].icono })),
+          valor: modo,
+          cambiar: (id) => cambiarModo(id as Modo),
+        }}
+        herramientas={
+          <>
+            <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+            <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+          </>
+        }
+        lectura={chipVivo}
+        objetivos={objetivos.map((o) => ({ txt: o.t, done: o.done }))}
+        pestanas={[
+          {
+            id: "controles",
+            etiqueta: "Controles",
+            icono: "fa-sliders",
+            contenido: (
+              <Bloque titulo={`${def.etq} — ${def.subtitulo}`} icono={def.icono}>
+                <div style={{ color: T.text2, ...NUM }}>{pie}</div>
+                {control}
+              </Bloque>
+            ),
+          },
+          {
+            id: "reto",
+            etiqueta: "Reto",
+            icono: "fa-trophy",
+            contenido: (
+              <>
+                <LibreGratisCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
+                <RetoQuizCard quiz={QUIZ_A2} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Conoces las libertades del software libre." />
+                <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
+                  <Eyebrow>
+                    <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
+                    Completa el texto (A6)
+                  </Eyebrow>
+                  <div style={{ marginTop: 12 }}>
+                    <CompletaTexto
+                      data={HUECOS_A6}
+                      accent={accent}
+                      rgba={color.rgba}
+                      completado={textoOk}
+                      onCompletado={() => {
+                        setTextoOk(true);
+                        sfx(true);
+                      }}
+                      onAcierto={blip}
+                      onError={() => sfx(false)}
+                    />
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />
-              Hechos (quiz A4)
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {HECHOS.map((h, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
-                  {h}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />
-              Glosario (A5)
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {GLOSARIO.map((gi, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{gi.termino}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
-                  <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.4, marginTop: 4 }}>
-                    <i className="fa-solid fa-laptop-code" style={{ marginRight: 6, color: accent }} />
-                    {gi.ejemplo}
+              </>
+            ),
+          },
+          {
+            id: "teoria",
+            etiqueta: "Teoría",
+            icono: "fa-book-open",
+            contenido: (
+              <>
+                <Bloque titulo="¿Qué programas instala tu escuela?" icono="fa-lock-open">
+                  <div style={{ color: T.text2 }}>{PROBLEMA}</div>
+                </Bloque>
+                <Bloque titulo="Lectura A1" icono="fa-book-open">
+                  <div style={caja("#7dd3fc55", "rgba(125,211,252,0.07)")}>
+                    <div style={{ color: "#fff", fontWeight: 800, marginBottom: 10 }}>{TITULO_A1}</div>
+                    <div style={{ display: "grid", gap: 9 }}>
+                      {LECTURA_A1.map((p, i) => (
+                        <div key={i} style={{ color: T.text2 }}>{p}</div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11.5, color: T.text2, marginTop: 10 }}>
-              <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A5}
-            </div>
-          </div>
-        </div>
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-            Ideas clave
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-            {IDEAS.map((x, i) => (
-              <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                {x}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          La lectura A1 con sus preguntas, la reflexión A3, los hechos del quiz A4, el glosario A5, la pregunta del video A8, el quiz A2 y el texto A6 son <strong>verbatim</strong> del material de la plataforma. Las
-          seis licencias, los programas de ejemplo, los formatos y lo que pasó con sus programas son <strong>reales</strong> (textos de las licencias, estándares ISO/W3C, avisos de Adobe, Apple y Microsoft). Lo que
-          cada lector logra abrir resume el comportamiento típico; un archivo concreto puede variar. Los precios son de lista en EUA con su año; el tipo de cambio y «un usuario por equipo» son <strong>ilustrativos</strong>, y
-          no incluyen descuentos educativos. Fuente: {FUENTE}
-        </span>
-      </div>
-
-      <LibreGratisCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
-
-      <RetoQuizCard quiz={QUIZ_A2} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Conoces las libertades del software libre." />
-
-      <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
-          Completa el texto (A6)
-        </Eyebrow>
-        <div style={{ marginTop: 12 }}>
-          <CompletaTexto
-            data={HUECOS_A6}
-            accent={accent}
-            rgba={color.rgba}
-            completado={textoOk}
-            onCompletado={() => {
-              setTextoOk(true);
-              sfx(true);
-            }}
-            onAcierto={blip}
-            onError={() => sfx(false)}
-          />
-        </div>
-      </div>
-
-      <div className="sl-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="sl-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="sl-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="sl-close" onClick={() => setDrawer(false)} title="Cerrar" aria-label="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="sl-drawer-body">
-          <FichaTeorica data={SOFTWARE_LIBRE_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+                  <div style={{ fontSize: 14, fontWeight: 900, color: T.text3, letterSpacing: "0.08em" }}>PARA REFLEXIONAR</div>
+                  <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 8, color: T.text2 }}>
+                    {PREGUNTAS.map((q, i) => (
+                      <li key={i}>{q}</li>
+                    ))}
+                    <li>
+                      <strong style={{ color: "#fff" }}>Reflexión A3:</strong> {REFLEXION_A3}
+                    </li>
+                  </ul>
+                </Bloque>
+                <Bloque titulo="Cómo usar el laboratorio" icono="fa-list-ol">
+                  <div style={{ display: "grid", gap: 9 }}>
+                    {INSTRUCCIONES.map((p, i) => (
+                      <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
+                        <div style={{ width: 24, height: 24, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
+                        <div style={{ color: "#fff", minWidth: 0 }}>{p}</div>
+                      </div>
+                    ))}
+                  </div>
+                </Bloque>
+                <Bloque titulo="Mapa de alternativas libres" icono="fa-map">
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(min(100%,210px),1fr))", gap: 8 }}>
+                    {[
+                      ["Windows / macOS", "GNU/Linux (Ubuntu, Debian, Linux Mint)"],
+                      ["Microsoft Office", "LibreOffice (Writer, Calc, Impress)"],
+                      ["Adobe Photoshop", "GIMP · Krita"],
+                      ["Adobe Illustrator / CorelDRAW", "Inkscape"],
+                      ["Autodesk Maya / 3ds Max", "Blender"],
+                      ["Google Chrome", "Firefox"],
+                    ].map(([priv, libre]) => (
+                      <div key={priv} style={{ lineHeight: 1.4, padding: "8px 10px", borderRadius: 9, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
+                        <div style={{ color: T.text3 }}>{priv}</div>
+                        <div style={{ color: "#fff", fontWeight: 800 }}>
+                          <i className="fa-solid fa-arrow-right" style={{ marginRight: 6, color: OK }} />
+                          {libre}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Bloque>
+                <Bloque titulo="Hechos (quiz A4)" icono="fa-circle-question">
+                  <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 8, color: T.text2 }}>
+                    {HECHOS.map((h, i) => (
+                      <li key={i}>{h}</li>
+                    ))}
+                  </ul>
+                </Bloque>
+                <Bloque titulo="Glosario (A5)" icono="fa-book">
+                  <div style={{ display: "grid", gap: 8 }}>
+                    {GLOSARIO.map((gi, i) => (
+                      <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
+                        <span style={{ fontWeight: 900, color: accent }}>{gi.termino}. </span>
+                        <span style={{ color: T.text2 }}>{gi.definicion}</span>
+                        <div style={{ color: T.text3, marginTop: 4 }}>
+                          <i className="fa-solid fa-laptop-code" style={{ marginRight: 6, color: accent }} />
+                          {gi.ejemplo}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ color: T.text2 }}>
+                    <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A5}
+                  </div>
+                </Bloque>
+                <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                  <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 9, color: T.text2 }}>
+                    {IDEAS.map((x, i) => (
+                      <li key={i}>{x}</li>
+                    ))}
+                  </ul>
+                </Bloque>
+                <Bloque titulo="Ficha teórica" icono="fa-book">
+                  <FichaTeorica data={SOFTWARE_LIBRE_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+                </Bloque>
+                <p style={{ marginTop: 18, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
+                  La lectura A1 con sus preguntas, la reflexión A3, los hechos del quiz A4, el glosario A5, la pregunta del video A8, el quiz A2 y el texto A6 son <strong>verbatim</strong> del material de la plataforma. Las
+                  seis licencias, los programas de ejemplo, los formatos y lo que pasó con sus programas son <strong>reales</strong> (textos de las licencias, estándares ISO/W3C, avisos de Adobe, Apple y Microsoft). Lo que
+                  cada lector logra abrir resume el comportamiento típico; un archivo concreto puede variar. Los precios son de lista en EUA con su año; el tipo de cambio y «un usuario por equipo» son <strong>ilustrativos</strong>, y
+                  no incluyen descuentos educativos. Fuente: {FUENTE}
+                </p>
+              </>
+            ),
+          },
+        ]}
+      />
+    </>
   );
 }

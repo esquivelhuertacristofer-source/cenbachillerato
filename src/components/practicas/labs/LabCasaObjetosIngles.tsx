@@ -23,6 +23,7 @@ import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, OK, card, Eyebrow, SceneBoundary } from "./_kit";
 import { hablarLab, callarLab } from "./lab-voz";
+import { LabShell, Bloque, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { CompletaTexto } from "./_mecanica-huecos";
@@ -99,7 +100,7 @@ const CasaScene = dynamic(() => import("./CasaObjetosInglesScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-couch fa-fade" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Cargando el aula y la casa en 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Cargando el aula y la casa en 3D…</span>
     </div>
   ),
 });
@@ -164,15 +165,15 @@ function ClasificaCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: 
           Size, shape or color?
         </Eyebrow>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 10.5, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
           {[1, 2, 3].map((k) => (
-            <i key={k} className="fa-solid fa-star" style={{ fontSize: 13, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
+            <i key={k} className="fa-solid fa-star" style={{ fontSize: 14, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
           ))}
         </div>
       </div>
       {resuelto === null ? (
         <>
-          <div style={{ fontSize: 11, color: T.text3, fontWeight: 800, marginBottom: 6 }}>Palabra {pos + 1} de {ronda.length} · ¿qué indica esta palabra?</div>
+          <div style={{ fontSize: 14, color: T.text3, fontWeight: 800, marginBottom: 6 }}>Palabra {pos + 1} de {ronda.length} · ¿qué indica esta palabra?</div>
           <div className="co-palabra" style={{ fontSize: 26, color: "#fff", fontWeight: 900, lineHeight: 1.2, marginBottom: 12, letterSpacing: "0.02em" }}>
             {actual.w}
           </div>
@@ -184,7 +185,7 @@ function ClasificaCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: 
               </button>
             ))}
           </div>
-          {aviso && <div style={{ marginTop: 10, fontSize: 12, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
+          {aviso && <div style={{ marginTop: 10, fontSize: 14, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
         </>
       ) : (
         <div style={{ padding: "12px 14px", borderRadius: 11, border: `1px solid ${OK}55`, background: "rgba(52,211,153,0.08)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
@@ -192,9 +193,9 @@ function ClasificaCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: 
             {[1, 2, 3].map((k) => (
               <i key={k} className="fa-solid fa-star" style={{ fontSize: 15, color: k <= resuelto ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
             ))}
-            <span style={{ fontSize: 12.5, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
+            <span style={{ fontSize: 14, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
           </span>
-          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 12.5, fontWeight: 900 }}>
+          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 14, fontWeight: 900 }}>
             <i className="fa-solid fa-shuffle" style={{ marginRight: 8 }} />
             Otra ronda
           </button>
@@ -219,30 +220,30 @@ function TuTurno({ accent }: { accent: string }) {
         <i className="fa-solid fa-pen-nib" style={{ marginRight: 8, color: accent }} />
         Tu turno (A3) · Describo mi espacio en inglés
       </Eyebrow>
-      <div style={{ fontSize: 13, color: T.text2, lineHeight: 1.55 }}>{A3.prompt}</div>
+      <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55 }}>{A3.prompt}</div>
       <ul style={{ margin: "10px 0 0", paddingLeft: 16, display: "grid", gap: 4 }}>
         {A3.pistas.map((p, i) => (
-          <li key={i} style={{ fontSize: 12, color: T.text3, lineHeight: 1.45 }}>
+          <li key={i} style={{ fontSize: 14, color: T.text3, lineHeight: 1.45 }}>
             {p}
           </li>
         ))}
       </ul>
       <textarea className="co-area" value={texto} onChange={(e) => setTexto(e.target.value)} rows={6} placeholder="In my room there is a big blue bed. There are two small white lamps next to it…" aria-label="Tu descripción (A3)" />
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginTop: 8, fontSize: 12 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginTop: 8, fontSize: 14 }}>
         <span style={{ color: col, fontWeight: 800 }}>
           {n} palabras · mínimo {A3.min}, máximo {A3.max}
         </span>
         <span style={{ color: T.text3 }}>Vocabulario del tema que usaste: {tema.length ? tema.join(", ") : "—"}</span>
       </div>
-      <div style={{ marginTop: 12, fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em" }}>CRITERIOS DE EVALUACIÓN</div>
+      <div style={{ marginTop: 12, fontSize: 14, fontWeight: 900, color: T.text3, letterSpacing: "0.08em" }}>CRITERIOS DE EVALUACIÓN</div>
       <ul style={{ margin: "6px 0 0", paddingLeft: 16, display: "grid", gap: 4 }}>
         {A3.criterios.map((c, i) => (
-          <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
+          <li key={i} style={{ fontSize: 14, color: T.text2, lineHeight: 1.45 }}>
             {c}
           </li>
         ))}
       </ul>
-      <div style={{ marginTop: 8, fontSize: 11, color: T.text3 }}>Esta escritura la revisa tu docente; el contador solo te ayuda a medir la extensión.</div>
+      <div style={{ marginTop: 8, fontSize: 14, color: T.text3 }}>Esta escritura la revisa tu docente; el contador solo te ayuda a medir la extensión.</div>
     </div>
   );
 }
@@ -256,11 +257,11 @@ function Autoevaluacion({ accent, rgba }: { accent: string; rgba: string }) {
         <i className="fa-solid fa-list-check" style={{ marginRight: 8, color: accent }} />
         Self-check (A7)
       </Eyebrow>
-      <div style={{ fontSize: 12.5, color: T.text2, marginBottom: 12 }}>{A7.instrucciones}</div>
+      <div style={{ fontSize: 14, color: T.text2, marginBottom: 12 }}>{A7.instrucciones}</div>
       <div style={{ display: "grid", gap: 12 }}>
         {A7.criterios.map((c, i) => (
           <div key={i}>
-            <div style={{ fontSize: 12.5, color: "#fff", fontWeight: 800, marginBottom: 6 }}>{c}</div>
+            <div style={{ fontSize: 14, color: "#fff", fontWeight: 800, marginBottom: 6 }}>{c}</div>
             <div className="co-opts">
               {A7.escala.map((e) => {
                 const on = niveles[i] === e.valor;
@@ -281,7 +282,7 @@ function Autoevaluacion({ accent, rgba }: { accent: string; rgba: string }) {
           </div>
         ))}
       </div>
-      <div style={{ marginTop: 12, fontSize: 12, color: T.text3 }}>
+      <div style={{ marginTop: 12, fontSize: 14, color: T.text3 }}>
         <strong style={{ color: T.text2 }}>Reflexión final:</strong> {A7.reflexion}
       </div>
     </div>
@@ -344,7 +345,6 @@ export function LabCasaObjetosIngles({ color }: PracticaLabProps) {
 
   // ── Comunes
   const [resetNonce, setResetNonce] = useState(0);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   const { mejorEstrellas, registraEstrellas: guardaEstrellas } = useEstrellas(RETO_KEY);
@@ -607,24 +607,22 @@ export function LabCasaObjetosIngles({ color }: PracticaLabProps) {
   };
 
   /* ── Objetivos ─────────────────────────────────────────────────────── */
-  const objetivos: { t: string; done: boolean }[] = [
-    { t: "Encontrar 6 objetos del aula siguiendo la instrucción en inglés", done: totalHallados >= PASOS_BUSCAR },
-    { t: "Terminar una ronda de Find it sin errores", done: rondaPerfecta },
-    { t: "Recuperar 3 objetos perdidos describiéndolos en inglés", done: totalRecuperados >= 3 },
-    { t: "Ver que una descripción incompleta coincide con varios objetos", done: vioAmbigua },
-    { t: "Seguir las 5 instrucciones para acomodar la recámara", done: instrHechas },
-    { t: `Escribir ${FRASES_META} oraciones con There is / There are que el cuarto confirme`, done: frases.length >= FRASES_META },
-    { t: "Usar «There are» con un plural correcto", done: usoAre },
-    { t: "Clasificar palabras y ganar estrellas", done: identifico },
-    { t: "Aprobar el quiz evaluable (A4)", done: quizAprobado },
-    { t: "Completar el texto (A2)", done: textoOk },
+  const objetivos: { txt: string; done: boolean }[] = [
+    { txt: "Encontrar 6 objetos del aula siguiendo la instrucción en inglés", done: totalHallados >= PASOS_BUSCAR },
+    { txt: "Terminar una ronda de Find it sin errores", done: rondaPerfecta },
+    { txt: "Recuperar 3 objetos perdidos describiéndolos en inglés", done: totalRecuperados >= 3 },
+    { txt: "Ver que una descripción incompleta coincide con varios objetos", done: vioAmbigua },
+    { txt: "Seguir las 5 instrucciones para acomodar la recámara", done: instrHechas },
+    { txt: `Escribir ${FRASES_META} oraciones con There is / There are que el cuarto confirme`, done: frases.length >= FRASES_META },
+    { txt: "Usar «There are» con un plural correcto", done: usoAre },
+    { txt: "Clasificar palabras y ganar estrellas", done: identifico },
+    { txt: "Aprobar el quiz evaluable (A4)", done: quizAprobado },
+    { txt: "Completar el texto (A2)", done: textoOk },
   ];
 
   /* ── Visor ─────────────────────────────────────────────────────────── */
-  let chipVivo = "";
   let pie: ReactNode = "";
   if (modo === "buscar") {
-    chipVivo = rondaTerminada ? `ronda completa · ${erroresRonda} ${erroresRonda === 1 ? "error" : "errores"}` : `find it ${paso + 1}/${ronda.length} · ${hallados.length} encontrados`;
     pie = buscado ? (
       <>
         <strong style={{ color: "#fff" }}>«{instruccionBuscar(buscado)}»</strong> Haz clic en el objeto del aula. {avisoBuscar && !avisoBuscar.ok && avisoBuscar.errores[0]}
@@ -633,14 +631,12 @@ export function LabCasaObjetosIngles({ color }: PracticaLabProps) {
       "¡Encontraste los seis! Pide otra ronda: el aula se vuelve a acomodar con otros colores, formas y tamaños."
     );
   } else if (modo === "perdidos") {
-    chipVivo = tuyo ? `objeto ${idxTuyo + 1}/4 · ${coinciden.length > 0 ? `${coinciden.length} coinciden` : `${recuperados.length} recuperados`}` : "4 objetos recuperados";
     pie = (
       <>
-        <strong style={{ color: "#fff" }}>Encargado: «{burbuja}»</strong> {tuyo ? "Describe en inglés el objeto que señala la flecha." : "Recuperaste todo. Pide otra ronda."}
+        <strong style={{ color: "#fff" }}>Encargado: «{burbuja}»</strong> {tuyo ? "Describe en inglés el objeto que señala la flecha. Amarillo: coincide con lo que dijiste; naranja: el encargado encontró otro." : "Recuperaste todo. Pide otra ronda."}
       </>
     );
   } else {
-    chipVivo = libre ? `${frases.length} ${frases.length === 1 ? "oración confirmada" : "oraciones confirmadas"}` : `instrucción ${pasoA + 1}/${PASOS_ACOMODAR}${sel ? ` · ${nombreMovible(sel)}` : ""}`;
     pie = insActual ? (
       <>
         <strong style={{ color: "#fff" }}>«{instruccionEn(insActual)}»</strong> {sel ? "Ahora haz clic en el lugar numerado." : "Haz clic en el objeto y luego en el lugar."}
@@ -656,17 +652,17 @@ export function LabCasaObjetosIngles({ color }: PracticaLabProps) {
         <i className={`fa-solid ${def.icono}`} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{def.etq}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles siguen aquí.</div>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles siguen aquí.</div>
     </div>
   );
 
-  const sub = (txt: string) => <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
+  const sub = (txt: string) => <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
 
   const respuesta = (r: Resp | null) =>
     r && (
       <div className="co-resp" data-ok={r.ok} style={{ marginTop: 12, padding: "11px 13px", borderRadius: 12, border: `1px solid ${r.ok ? OK : WARN}55`, background: r.ok ? "rgba(52,211,153,0.07)" : "rgba(255,138,60,0.07)" }}>
         {r.titulo && (
-          <div style={{ fontSize: 12.5, fontWeight: 900, color: r.ok ? OK : WARN }}>
+          <div style={{ fontSize: 14, fontWeight: 900, color: r.ok ? OK : WARN }}>
             <i className={`fa-solid ${r.ok ? "fa-circle-check" : "fa-circle-exclamation"}`} style={{ marginRight: 7 }} />
             {r.titulo}
           </div>
@@ -680,12 +676,12 @@ export function LabCasaObjetosIngles({ color }: PracticaLabProps) {
           </div>
         )}
         {r.errores.filter(Boolean).map((e, i) => (
-          <div key={`e${i}`} style={{ marginTop: 6, fontSize: 12, color: "#fed7aa", lineHeight: 1.5 }}>
+          <div key={`e${i}`} style={{ marginTop: 6, fontSize: 14, color: "#fed7aa", lineHeight: 1.5 }}>
             {e}
           </div>
         ))}
         {r.notas.map((n, i) => (
-          <div key={`n${i}`} style={{ marginTop: 6, fontSize: 11.5, color: T.text2, lineHeight: 1.5 }}>
+          <div key={`n${i}`} style={{ marginTop: 6, fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
             <i className="fa-solid fa-lightbulb" style={{ marginRight: 6, color: "#fbbf24" }} />
             {n}
           </div>
@@ -704,7 +700,7 @@ export function LabCasaObjetosIngles({ color }: PracticaLabProps) {
               <span key={id} title={`Objeto ${i + 1}`} style={{ width: 26, height: 8, borderRadius: 4, background: i < paso ? OK : i === paso ? modoCol : "rgba(255,255,255,0.14)" }} />
             ))}
           </div>
-          <span style={{ fontSize: 11.5, color: T.text3, fontWeight: 800 }}>Errores en la ronda: {erroresRonda}</span>
+          <span style={{ fontSize: 14, color: T.text3, fontWeight: 800 }}>Errores en la ronda: {erroresRonda}</span>
         </div>
         {sub("La instrucción")}
         {buscado ? (
@@ -716,12 +712,12 @@ export function LabCasaObjetosIngles({ color }: PracticaLabProps) {
             <Escuchar texto={instruccionBuscar(buscado)} col={modoCol} />
           </div>
         ) : (
-          <div style={{ fontSize: 13, color: OK, fontWeight: 800 }}>
+          <div style={{ fontSize: 14, color: OK, fontWeight: 800 }}>
             <i className="fa-solid fa-trophy" style={{ marginRight: 8 }} />
             Ronda completa {erroresRonda === 0 ? "sin errores" : `con ${erroresRonda} ${erroresRonda === 1 ? "error" : "errores"}`}.
           </div>
         )}
-        <div style={{ marginTop: 8, fontSize: 11.5, color: T.text3, lineHeight: 1.5 }}>Haz clic en el objeto dentro del aula. Puedes girar la cámara y acercarte con la rueda del ratón.</div>
+        <div style={{ marginTop: 8, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>Haz clic en el objeto dentro del aula. Puedes girar la cámara y acercarte con la rueda del ratón.</div>
         {respuesta(avisoBuscar)}
         {sub("Sin ratón: elige por número")}
         <button className="co-toggle" onClick={() => setNumeros((v) => !v)} data-on={numeros} style={{ ["--coc" as string]: modoCol }}>
@@ -750,7 +746,7 @@ export function LabCasaObjetosIngles({ color }: PracticaLabProps) {
       <>
         <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
           {estante.tuyos.map((id, i) => (
-            <span key={id} style={{ fontSize: 11, fontWeight: 900, padding: "4px 9px", borderRadius: 999, border: `1px solid ${recuperados.includes(id) ? OK : i === idxTuyo ? modoCol : "rgba(255,255,255,0.14)"}`, color: recuperados.includes(id) ? OK : i === idxTuyo ? "#fff" : T.text3 }}>
+            <span key={id} style={{ fontSize: 14, fontWeight: 900, padding: "4px 9px", borderRadius: 999, border: `1px solid ${recuperados.includes(id) ? OK : i === idxTuyo ? modoCol : "rgba(255,255,255,0.14)"}`, color: recuperados.includes(id) ? OK : i === idxTuyo ? "#fff" : T.text3 }}>
               {recuperados.includes(id) && <i className="fa-solid fa-check" style={{ marginRight: 5 }} />}
               Objeto {i + 1}
             </span>
@@ -785,7 +781,7 @@ export function LabCasaObjetosIngles({ color }: PracticaLabProps) {
                 Decir
               </button>
             </div>
-            <div style={{ marginTop: 8, fontSize: 11.5, color: T.text3, lineHeight: 1.5 }}>
+            <div style={{ marginTop: 8, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
               Estructura: <strong style={{ color: T.text2 }}>It&apos;s a + tamaño + forma + color + objeto.</strong> Objetos del estante: lunch box, pencil case, backpack, ball, notebook. Mayúsculas, puntos y «it&apos;s / it is» dan igual.
             </div>
             <button className="co-link" onClick={() => setPista((v) => !v)}>
@@ -794,7 +790,7 @@ export function LabCasaObjetosIngles({ color }: PracticaLabProps) {
             </button>
           </>
         ) : (
-          <div style={{ marginTop: 12, fontSize: 13, color: OK, fontWeight: 800 }}>
+          <div style={{ marginTop: 12, fontSize: 14, color: OK, fontWeight: 800 }}>
             <i className="fa-solid fa-trophy" style={{ marginRight: 8 }} />
             Recuperaste tus cuatro objetos.
           </div>
@@ -821,12 +817,12 @@ export function LabCasaObjetosIngles({ color }: PracticaLabProps) {
             <Escuchar texto={instruccionEn(insActual)} col={modoCol} />
           </div>
         ) : (
-          <div style={{ fontSize: 12.5, color: OK, fontWeight: 800 }}>
+          <div style={{ fontSize: 14, color: OK, fontWeight: 800 }}>
             <i className="fa-solid fa-circle-check" style={{ marginRight: 8 }} />
             Seguiste las cinco instrucciones.
           </div>
         )}
-        <div style={{ marginTop: 10, fontSize: 11, color: T.text3, fontWeight: 800 }}>1 · Elige el objeto</div>
+        <div style={{ marginTop: 10, fontSize: 14, color: T.text3, fontWeight: 800 }}>1 · Elige el objeto</div>
         <div className="co-opts" style={{ marginTop: 6 }}>
           {MOVIBLES.map((m) => (
             <button key={m} className="co-opt co-mov" data-on={sel === m} onClick={() => pickMovible(m)} style={{ ["--coc" as string]: "#fbbf24", background: sel === m ? "rgba(251,191,36,0.16)" : "transparent" }}>
@@ -834,7 +830,7 @@ export function LabCasaObjetosIngles({ color }: PracticaLabProps) {
             </button>
           ))}
         </div>
-        <div style={{ marginTop: 10, fontSize: 11, color: T.text3, fontWeight: 800 }}>2 · Elige el lugar (los números del cuarto)</div>
+        <div style={{ marginTop: 10, fontSize: 14, color: T.text3, fontWeight: 800 }}>2 · Elige el lugar (los números del cuarto)</div>
         <div className="co-opts" style={{ marginTop: 6 }}>
           {SPOTS_MARCADOS.map((s, i) => (
             <button key={s} className="co-opt co-spot" data-on={sel !== null} onClick={() => colocar(s)} aria-label={`Lugar ${i + 1}`} style={{ ["--coc" as string]: modoCol, minWidth: 40 }}>
@@ -845,10 +841,10 @@ export function LabCasaObjetosIngles({ color }: PracticaLabProps) {
         {respuesta(avisoA)}
 
         {sub(`Parte B · describe el cuarto (${frases.length}/${FRASES_META})`)}
-        <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.5, marginBottom: 8 }}>Toca las fichas en orden o escribe la oración. El cuarto comprueba si es verdad.</div>
+        <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.5, marginBottom: 8 }}>Toca las fichas en orden o escribe la oración. El cuarto comprueba si es verdad.</div>
         {FICHAS_HAY.map((g) => (
           <div key={g.grupo} style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", marginBottom: 6 }}>
-            <span style={{ width: 78, fontSize: 9.5, fontWeight: 900, color: T.text3, letterSpacing: "0.06em", textTransform: "uppercase" }}>{g.grupo}</span>
+            <span style={{ width: 78, fontSize: 14, fontWeight: 900, color: T.text3, letterSpacing: "0.06em", textTransform: "uppercase" }}>{g.grupo}</span>
             {g.fichas.map((f) => (
               <button key={f} className="co-ficha" onClick={() => ponerFicha(f)}>
                 {f}
@@ -888,7 +884,7 @@ export function LabCasaObjetosIngles({ color }: PracticaLabProps) {
         {frases.length > 0 && (
           <div style={{ marginTop: 10, display: "grid", gap: 5 }}>
             {frases.map((f) => (
-              <div key={f} style={{ fontSize: 12.5, color: "#fff", display: "flex", alignItems: "center", gap: 7 }}>
+              <div key={f} style={{ fontSize: 14, color: "#fff", display: "flex", alignItems: "center", gap: 7 }}>
                 <i className="fa-solid fa-circle-check" style={{ color: OK }} />
                 {f}
               </div>
@@ -905,349 +901,214 @@ export function LabCasaObjetosIngles({ color }: PracticaLabProps) {
     );
   }
 
+  /* Lectura corta sobre la escena (≤ 10 palabras). */
+  let lectura: ReactNode;
+  if (modo === "buscar") {
+    lectura = buscado ? `«${instruccionBuscar(buscado)}»` : "¡Ronda completa! Pide otra en el panel";
+  } else if (modo === "perdidos") {
+    lectura = tuyo ? "Describe en inglés el objeto de la flecha" : "Recuperaste los cuatro objetos";
+  } else {
+    lectura = insActual ? `«${instruccionEn(insActual)}»` : `${frases.length} de ${FRASES_META} oraciones confirmadas`;
+  }
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes coPulse { 0%,100%{ box-shadow:0 0 0 0 var(--cod); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .co-live-dot { animation: coPulse 1.6s ease-in-out infinite; }
-        @media (prefers-reduced-motion: reduce){ .co-live-dot { animation:none; } }
-        .co-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .co-grid { grid-template-columns: 1fr; } }
-        .co-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .co-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .co-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .co-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .co-tab { cursor:pointer; border:1px solid var(--coc); border-radius:12px; padding:11px 8px; text-align:center; background:transparent; transition:all .15s; color:#fff; }
-        .co-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
-        .co-tab:hover { background:rgba(255,255,255,0.06); }
-        .co-opts { display:flex; flex-wrap:wrap; gap:7px; }
-        .co-opt { cursor:pointer; border:1px solid var(--coc); border-radius:10px; padding:9px 12px; font-size:12px; font-weight:800; color:#fff; background:transparent; transition:all .15s; }
-        .co-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.78); }
-        .co-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
-        .co-opt:disabled { cursor:default; opacity:0.5; }
-        .co-toggle { width:100%; cursor:pointer; border:1px solid var(--coc); border-radius:11px; padding:10px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:12.5px; font-weight:900; text-align:left; transition:all .15s; }
-        .co-toggle:hover { background:rgba(255,255,255,0.07); }
-        .co-listen { cursor:pointer; flex-shrink:0; width:32px; height:32px; border-radius:9px; border:1px solid var(--coc); background:transparent; color:var(--coc); font-size:13px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .co-listen:hover { background:rgba(255,255,255,0.1); }
-        .co-in { flex:1; min-width:0; border-radius:10px; border:1.5px solid ${T.lineStrong}; background:${T.inset}; color:#fff; font-size:14.5px; font-weight:700; padding:10px 12px; font-family:inherit; outline:none; transition:all .15s; }
-        .co-in:focus { border-color:${accent}; box-shadow:0 0 0 3px rgba(${color.rgba},0.18); }
-        .co-area { width:100%; margin-top:12px; border-radius:12px; border:1.5px solid ${T.lineStrong}; background:${T.inset}; color:#fff; font-size:13.5px; line-height:1.55; padding:11px 13px; font-family:inherit; outline:none; resize:vertical; box-sizing:border-box; }
-        .co-area:focus { border-color:${accent}; }
-        .co-go { cursor:pointer; flex-shrink:0; border:none; border-radius:10px; padding:0 15px; background:var(--coc); color:#1e1b2e; font-size:13px; font-weight:900; transition:all .15s; }
-        .co-go:disabled { opacity:0.4; cursor:not-allowed; }
-        .co-go:hover:not(:disabled) { filter:brightness(1.08); }
-        .co-ficha { cursor:pointer; border:1px solid rgba(255,255,255,0.16); border-radius:8px; padding:5px 9px; font-size:12px; font-weight:800; color:#fff; background:rgba(4,10,22,0.45); transition:all .12s; }
-        .co-ficha:hover { border-color:#fbbf24; background:rgba(251,191,36,0.12); }
-        .co-link { cursor:pointer; border:none; background:transparent; color:${T.text3}; font-size:11.5px; font-weight:800; padding:8px 0 0; text-align:left; }
-        .co-link:hover { color:#fff; }
-        .co-opt:focus-visible, .co-tab:focus-visible, .co-toggle:focus-visible, .co-icobtn:focus-visible, .co-listen:focus-visible, .co-go:focus-visible, .co-ficha:focus-visible, .co-link:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
-        @media (max-width: 1000px){ .co-bottom { grid-template-columns: 1fr !important; } }
-        .co-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .co-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .co-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61; background:linear-gradient(180deg,#06121e 0%,#040a16 100%);
-          border-left:1px solid rgba(${color.rgba},0.32); box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1); display:flex; flex-direction:column; }
-        .co-drawer[data-open="true"] { transform:translateX(0); }
-        .co-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .co-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .co-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .co-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .co-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:11px 16px; border-radius:999px;
-          border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800; background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
-        .co-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        .co-guia summary { cursor:pointer; list-style:none; }
-        .co-guia summary::-webkit-details-marker { display:none; }
-      `}</style>
-
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="co-tabs">
-          {MODOS.map((m) => {
-            const d = MODOS_DEF[m];
-            const col = `#${d.color.replace("#", "")}`;
-            const on = m === modo;
-            return (
-              <button key={m} className="co-tab" data-on={on} onClick={() => cambiarModo(m)} style={{ ["--coc" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? col : "inherit" }}>
-                  <i className={`fa-solid ${d.icono}`} />
-                </div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{d.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{d.subtitulo}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="co-grid">
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(460px, 60vh, 680px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <CasaScene
-                vista={modo}
-                modoColor={modoCol}
-                resetNonce={resetNonce}
-                aula={aula}
-                halladosAula={hallados}
-                falloAula={fallo}
-                numerosAula={numeros}
-                onPickAula={elegirAula}
-                estante={estante.objetos}
-                tuyoId={tuyoId}
-                coinciden={coinciden}
-                equivocadoId={equivocado}
-                recuperados={recuperados}
-                burbuja={burbuja}
-                ubic={ubic}
-                seleccion={sel}
-                intento={intento}
-                marcaFrase={marcaFrase}
-                onPickMovible={pickMovible}
-                onPickSpot={colocar}
-              />
-            </SceneBoundary>
-
-            <div style={{ position: "absolute", top: 14, left: 16, right: 150, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, pointerEvents: "none" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)", maxWidth: "100%" }}>
-                <span className="co-live-dot" style={{ ["--cod" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol, flexShrink: 0 }} />
-                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3, flexShrink: 0 }}>EN VIVO</span>
-                <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)", flexShrink: 0 }} />
-                <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{chipVivo}</span>
-              </div>
-            </div>
-
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="co-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría" aria-label="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="co-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"} aria-label={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="co-icobtn" onClick={reiniciar} title="Reiniciar" aria-label="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 132px 14px 18px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                {def.etq} — {def.subtitulo}
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6 }}>{pie}</div>
-            </div>
-
-            <button className="co-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-          </div>
-
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-              Controles — {def.etq}
-            </Eyebrow>
-            <div style={{ marginTop: 12 }}>{control}</div>
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-house-chimney" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>What does it look like? Where is it?</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #7dd3fc55", background: "rgba(125,211,252,0.07)" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book-open" style={{ marginRight: 8, color: "#7dd3fc" }} />
-              Lectura A1
-            </Eyebrow>
-            <div style={{ fontSize: 13, color: "#fff", fontWeight: 800, lineHeight: 1.4, marginBottom: 10 }}>{TITULO_A1}</div>
-            <div style={{ display: "grid", gap: 9, marginBottom: 12 }}>
-              {LECTURA_A1.map((p, i) => (
-                <div key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>
-                  {p}
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11.5, color: "#fde68a", lineHeight: 1.5, padding: "9px 11px", borderRadius: 10, background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.25)", marginBottom: 12 }}>
-              <i className="fa-solid fa-circle-info" style={{ marginRight: 6 }} />
-              {NOTA_ORDEN}
-            </div>
-            <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", marginBottom: 8 }}>PARA REFLEXIONAR</div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {PREGUNTAS_A1.map((q, i) => (
-                <details key={i} className="co-guia">
-                  <summary style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                    <i className="fa-solid fa-circle-question" style={{ marginRight: 6, color: "#7dd3fc" }} />
-                    {q.pregunta}
-                  </summary>
-                  <div style={{ fontSize: 11.5, color: T.text3, marginTop: 4, paddingLeft: 20 }}>Respuesta guía: {q.guia}</div>
-                </details>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />
-              Cómo usar el laboratorio
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-                Objetivos de la sesión
-              </Eyebrow>
-              <span className="co-objetivos" style={{ fontSize: 11, fontWeight: 800, color: objetivos.every((o) => o.done) ? OK : T.text3 }}>
-                {objetivos.filter((o) => o.done).length}/{objetivos.length}
-              </span>
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} className="co-obj" data-done={o.done} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ marginTop: 2, fontSize: 13, color: o.done ? OK : "rgba(255,255,255,0.22)" }} />
-                  <span style={{ fontSize: 12, color: o.done ? "#fff" : T.text2, lineHeight: 1.4 }}>{o.t}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="co-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />
-            Hechos (verdadero o falso, A5)
-          </Eyebrow>
-          <div style={{ display: "grid", gap: 8 }}>
-            {HECHOS.map((h, i) => (
-              <div key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45, display: "flex", gap: 8 }}>
-                <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 900, padding: "2px 7px", borderRadius: 6, height: "fit-content", color: "#04121f", background: h.verdadero ? OK : WARN }}>{h.verdadero ? "V" : "F"}</span>
-                <span>
-                  «{h.enunciado}» <span style={{ color: T.text3 }}>{h.retro}</span>
-                </span>
-              </div>
-            ))}
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />
-              Glossary (A6)
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))" }}>
-              {GLOSARIO.map((g, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                    <span style={{ fontSize: 12.5, fontWeight: 900, color: accent }}>{g.termino}</span>
-                    <span style={{ fontSize: 9.5, fontWeight: 800, color: T.text3, border: `1px solid ${T.line}`, borderRadius: 6, padding: "1px 6px" }}>{g.etiqueta}</span>
-                  </div>
-                  <div style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45, marginTop: 3 }}>{g.definicion}</div>
-                  <div style={{ fontSize: 11.5, color: "#fff", lineHeight: 1.4, marginTop: 4, display: "flex", alignItems: "center", gap: 6 }}>
-                    <i className="fa-solid fa-quote-left" style={{ color: accent, fontSize: 9 }} />
-                    {g.ejemplo}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11.5, color: T.text2, marginTop: 10 }}>
-              <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A6}
-            </div>
-          </div>
-        </div>
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-            Ideas clave
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-            {IDEAS.map((x, i) => (
-              <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                {x}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          La lectura A1 con sus preguntas, el texto A2, la consigna A3, el quiz A4, los hechos A5, el glosario A6 y la autoevaluación A7 son <strong>verbatim</strong> del material de la
-          plataforma. El aula, el estante de objetos perdidos, la recámara, los objetos con sus colores y tamaños y todas las instrucciones son <strong>ilustrativos</strong> y se generan al
-          azar; las oraciones en inglés siguen el inglés estadounidense estándar. El orden tamaño → forma → color es el de las gramáticas de referencia (Cambridge Dictionary, «Adjectives:
-          order»); la lectura A1 propone color antes de forma, que se acepta con una nota. Fuente: {FUENTE}
-        </span>
-      </div>
-
-      <ClasificaCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
-
-      <RetoQuizCard quiz={QUIZ_A4} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Ya describes objetos en inglés." />
-
-      <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
-          Completa el texto (A2) · Describe it!
-        </Eyebrow>
-        <div style={{ marginTop: 12 }}>
-          <CompletaTexto
-            data={HUECOS_A2}
-            accent={accent}
-            rgba={color.rgba}
-            completado={textoOk}
-            onCompletado={() => {
-              setTextoOk(true);
-              sfx(true);
-            }}
-            onAcierto={blip}
-            onError={() => sfx(false)}
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <CasaScene
+            vista={modo}
+            modoColor={modoCol}
+            resetNonce={resetNonce}
+            aula={aula}
+            halladosAula={hallados}
+            falloAula={fallo}
+            numerosAula={numeros}
+            onPickAula={elegirAula}
+            estante={estante.objetos}
+            tuyoId={tuyoId}
+            coinciden={coinciden}
+            equivocadoId={equivocado}
+            recuperados={recuperados}
+            burbuja={burbuja}
+            ubic={ubic}
+            seleccion={sel}
+            intento={intento}
+            marcaFrase={marcaFrase}
+            onPickMovible={pickMovible}
+            onPickSpot={colocar}
           />
-        </div>
-      </div>
-
-      <TuTurno accent={accent} />
-      <Autoevaluacion accent={accent} rgba={color.rgba} />
-
-      <div className="co-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="co-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="co-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="co-close" onClick={() => setDrawer(false)} title="Cerrar" aria-label="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="co-drawer-body">
-          <FichaTeorica data={CASA_OBJETOS_INGLES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+        </SceneBoundary>
+      }
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m, etiqueta: MODOS_DEF[m].etq, icono: MODOS_DEF[m].icono })),
+        valor: modo,
+        cambiar: (id) => cambiarModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Cuaderno",
+          icono: "fa-pen-to-square",
+          contenido: (
+            <>
+              <style>{cssCo(accent, color.rgba)}</style>
+              <Bloque titulo={`${def.etq}: qué hacer`} icono={def.icono}>
+                <p style={{ margin: 0, color: T.text2 }}>{pie}</p>
+              </Bloque>
+              <Bloque titulo="Controles" icono="fa-sliders">
+                {control}
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <>
+              <ClasificaCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
+              <RetoQuizCard quiz={QUIZ_A4} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Ya describes objetos en inglés." />
+              <div style={{ ...card, padding: "20px 18px 22px", marginTop: 22 }}>
+                <Eyebrow>
+                  <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
+                  Completa el texto (A2) · Describe it!
+                </Eyebrow>
+                <div style={{ marginTop: 12 }}>
+                  <CompletaTexto
+                    data={HUECOS_A2}
+                    accent={accent}
+                    rgba={color.rgba}
+                    completado={textoOk}
+                    onCompletado={() => {
+                      setTextoOk(true);
+                      sfx(true);
+                    }}
+                    onAcierto={blip}
+                    onError={() => sfx(false)}
+                  />
+                </div>
+              </div>
+              <TuTurno accent={accent} />
+              <Autoevaluacion accent={accent} rgba={color.rgba} />
+            </>
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="What does it look like? Where is it?" icono="fa-house-chimney">
+                <p style={{ margin: 0, color: T.text2 }}>{PROBLEMA}</p>
+              </Bloque>
+              <Bloque titulo="Lectura A1" icono="fa-book-open">
+                <strong style={{ color: "#fff" }}>{TITULO_A1}</strong>
+                {LECTURA_A1.map((p, i) => (
+                  <p key={i} style={{ margin: 0, color: T.text2 }}>{p}</p>
+                ))}
+                <div style={{ color: "#fde68a", padding: "9px 11px", borderRadius: 10, background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.25)" }}>
+                  <i className="fa-solid fa-circle-info" style={{ marginRight: 6 }} />
+                  {NOTA_ORDEN}
+                </div>
+              </Bloque>
+              <Bloque titulo="Para reflexionar" icono="fa-circle-question">
+                {PREGUNTAS_A1.map((q, i) => (
+                  <details key={i} className="co-guia">
+                    <summary style={{ color: T.text2 }}>
+                      <i className="fa-solid fa-circle-question" style={{ marginRight: 6, color: "#7dd3fc" }} />
+                      {q.pregunta}
+                    </summary>
+                    <div style={{ color: T.text3, marginTop: 4, paddingLeft: 20 }}>Respuesta guía: {q.guia}</div>
+                  </details>
+                ))}
+              </Bloque>
+              <Bloque titulo="Cómo usar el laboratorio" icono="fa-list-ol">
+                <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8 }}>
+                  {INSTRUCCIONES.map((p, i) => <li key={i}>{p}</li>)}
+                </ol>
+              </Bloque>
+              <Bloque titulo="Hechos (verdadero o falso, A5)" icono="fa-circle-question">
+                {HECHOS.map((hh, i) => (
+                  <div key={i} style={{ color: T.text2, display: "flex", gap: 8 }}>
+                    <span style={{ flexShrink: 0, fontSize: 14, fontWeight: 900, padding: "2px 7px", borderRadius: 6, height: "fit-content", color: "#04121f", background: hh.verdadero ? OK : WARN }}>{hh.verdadero ? "V" : "F"}</span>
+                    <span>
+                      «{hh.enunciado}» <span style={{ color: T.text3 }}>{hh.retro}</span>
+                    </span>
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Glossary (A6)" icono="fa-book">
+                {GLOSARIO.map((g, i) => (
+                  <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <span style={{ fontWeight: 900, color: accent }}>{g.termino}</span>
+                      <span style={{ fontSize: 14, fontWeight: 800, color: T.text3, border: `1px solid ${T.line}`, borderRadius: 6, padding: "1px 6px" }}>{g.etiqueta}</span>
+                    </div>
+                    <div style={{ color: T.text2, marginTop: 3 }}>{g.definicion}</div>
+                    <div style={{ color: "#fff", marginTop: 4 }}>
+                      <i className="fa-solid fa-quote-left" style={{ color: accent, marginRight: 6 }} />
+                      {g.ejemplo}
+                    </div>
+                  </div>
+                ))}
+                <p style={{ margin: 0, color: T.text2 }}>
+                  <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A6}
+                </p>
+              </Bloque>
+              <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {IDEAS.map((x, i) => <li key={i}>{x}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={CASA_OBJETOS_INGLES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ marginTop: 18, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
+                La lectura A1 con sus preguntas, el texto A2, la consigna A3, el quiz A4, los hechos A5, el glosario A6 y la autoevaluación A7 son <strong>verbatim</strong> del material de la plataforma. El aula, el estante de objetos perdidos, la recámara, los objetos con sus colores y tamaños y todas las instrucciones son <strong>ilustrativos</strong> y se generan al azar; las oraciones en inglés siguen el inglés estadounidense estándar. El orden tamaño → forma → color es el de las gramáticas de referencia (Cambridge Dictionary, «Adjectives: order»); la lectura A1 propone color antes de forma, que se acepta con una nota. Fuente: {FUENTE}
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }
+
+const cssCo = (accent: string, rgba: string) => `
+  .co-opts { display:flex; flex-wrap:wrap; gap:8px; }
+  .co-opt { cursor:pointer; border:1px solid var(--coc); border-radius:10px; padding:10px 12px; font-size:14px; font-weight:800; color:#fff; background:transparent; transition:all .15s; text-align:left; }
+  .co-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.78); }
+  .co-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
+  .co-opt:disabled { cursor:default; opacity:0.5; }
+  .co-toggle { width:100%; cursor:pointer; border:1px solid var(--coc); border-radius:11px; padding:10px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:14px; font-weight:900; text-align:left; transition:all .15s; }
+  .co-toggle:hover { background:rgba(255,255,255,0.07); }
+  .co-listen { cursor:pointer; flex-shrink:0; width:36px; height:36px; border-radius:9px; border:1px solid var(--coc); background:transparent; color:var(--coc); font-size:14px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+  .co-listen:hover { background:rgba(255,255,255,0.1); }
+  .co-in { flex:1; min-width:0; border-radius:10px; border:1.5px solid ${T.lineStrong}; background:${T.inset}; color:#fff; font-size:16px; font-weight:700; padding:10px 12px; font-family:inherit; outline:none; transition:all .15s; }
+  .co-in:focus { border-color:${accent}; box-shadow:0 0 0 3px rgba(${rgba},0.18); }
+  .co-area { width:100%; margin-top:12px; border-radius:12px; border:1.5px solid ${T.lineStrong}; background:${T.inset}; color:#fff; font-size:15px; line-height:1.55; padding:11px 13px; font-family:inherit; outline:none; resize:vertical; box-sizing:border-box; }
+  .co-area:focus { border-color:${accent}; }
+  .co-go { cursor:pointer; flex-shrink:0; border:none; border-radius:10px; padding:0 15px; background:var(--coc); color:#1e1b2e; font-size:14px; font-weight:900; transition:all .15s; }
+  .co-go:disabled { opacity:0.4; cursor:not-allowed; }
+  .co-go:hover:not(:disabled) { filter:brightness(1.08); }
+  .co-ficha { cursor:pointer; border:1px solid rgba(255,255,255,0.16); border-radius:8px; padding:6px 10px; font-size:14px; font-weight:800; color:#fff; background:rgba(4,10,22,0.45); transition:all .12s; }
+  .co-ficha:hover { border-color:#fbbf24; background:rgba(251,191,36,0.12); }
+  .co-link { cursor:pointer; border:none; background:transparent; color:${T.text3}; font-size:14px; font-weight:800; padding:8px 0 0; text-align:left; }
+  .co-link:hover { color:#fff; }
+  .co-opt:focus-visible, .co-toggle:focus-visible, .co-listen:focus-visible, .co-go:focus-visible, .co-ficha:focus-visible, .co-link:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
+  .co-guia summary { cursor:pointer; list-style:none; }
+  .co-guia summary::-webkit-details-marker { display:none; }
+`;

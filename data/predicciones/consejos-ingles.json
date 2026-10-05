@@ -1,0 +1,12 @@
+{
+  "escena": "Cuatro amigos ficticios piden consejo. Armas la respuesta con un saludo, una forma (should, Don't, Why don't you…) y una acción, y su cara y su barra de ánimo reaccionan.",
+  "pregunta": "Diego dice que se salta el desayuno. ¿Qué pasa si le dices «You should skip breakfast»?",
+  "opciones": [
+    { "id": "a", "texto": "Su ánimo sube porque le diste una orden clara", "icono": "fa-arrow-up" },
+    { "id": "b", "texto": "Baja: le recomendaste algo que lo perjudica", "icono": "fa-arrow-down" },
+    { "id": "c", "texto": "No cambia: la gramática es correcta", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "La forma «should + verbo» está bien, pero recomendaste justo lo que le hace daño. Para lo que no conviene hay que aconsejar en contra: You shouldn't… o Don't…",
+  "comoComprobarlo": "En «Helpline» elige a Diego, la forma «You should + verb» y la acción «skip breakfast»; envía y compara su ánimo con «You shouldn't + verb»."
+}

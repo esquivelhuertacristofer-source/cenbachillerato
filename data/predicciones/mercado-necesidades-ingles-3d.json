@@ -1,0 +1,12 @@
+{
+  "escena": "En el tianguis, Don Beto pregunta «How ___ rice would you like?» y tú debes elegir much o many",
+  "pregunta": "Si eliges «many» para el arroz, ¿qué pasa con Don Beto en el tianguis?",
+  "opciones": [
+    { "id": "a", "texto": "Te da el arroz grano por grano", "icono": "fa-bowl-rice" },
+    { "id": "b", "texto": "Se confunde y no avanza", "icono": "fa-circle-question" },
+    { "id": "c", "texto": "Acepta y sigues con tu pedido", "icono": "fa-thumbs-up" }
+  ],
+  "correcta": "b",
+  "porque": "Rice es incontable: se mide en kilos, no se cuenta. «How many» solo va con sustantivos contables como eggs u oranges, así que el vendedor se confunde.",
+  "comoComprobarlo": "Elige el arroz en el puesto, toca «many» y mira el globo de Don Beto; luego prueba «much» y compara."
+}

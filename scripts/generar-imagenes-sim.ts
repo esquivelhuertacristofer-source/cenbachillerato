@@ -55,7 +55,7 @@ async function generar(texto: string, id: string, seed: number, w: number, h: nu
   const envio = await fetch(`${HOST}/prompt`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ prompt: grafo(texto, `sim-${id}`, seed, w, h) }) });
   if (!envio.ok) throw new Error(`ComfyUI rechazó el grafo (${envio.status})`);
   const { prompt_id } = (await envio.json()) as { prompt_id: string };
-  for (let i = 0; i < 400; i++) {
+  for (let i = 0; i < 2400; i++) {
     await dormir(500);
     const hist = (await (await fetch(`${HOST}/history/${prompt_id}`)).json()) as Record<string, { status?: { status_str?: string }; outputs?: Record<string, { images?: Array<{ filename: string; subfolder?: string; type?: string }> }> }>;
     const r = hist[prompt_id];

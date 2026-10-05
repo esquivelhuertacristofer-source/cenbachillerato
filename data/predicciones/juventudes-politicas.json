@@ -1,0 +1,12 @@
+{
+  "escena": "El Colectivo Raíces Jóvenes quiere salvar su centro juvenil y tiene cuatro semanas para convencer al cabildo.",
+  "pregunta": "Si en la primera semana solo lanzan un hashtag, ¿qué pasa con su incidencia?",
+  "opciones": [
+    { "id": "a", "texto": "Sube mucho, porque llega a más gente", "icono": "fa-arrow-trend-up" },
+    { "id": "b", "texto": "Casi no se mueve", "icono": "fa-minus" },
+    { "id": "c", "texto": "Se duplica por la presión", "icono": "fa-bolt" }
+  ],
+  "correcta": "b",
+  "porque": "Las redes aumentan el alcance, pero sin acciones en persona detrás no obligan a la autoridad a decidir. El activismo digital rinde más cuando se articula con movilización concreta.",
+  "comoComprobarlo": "En «Colectivo en acción», elige solo la campaña de redes en la semana 1 y observa la barra de incidencia; luego reinicia y haz antes una asamblea."
+}

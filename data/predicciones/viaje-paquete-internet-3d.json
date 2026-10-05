@@ -1,0 +1,12 @@
+{
+  "escena": "Una red con tu casa, routers y servidores. Eliges qué archivo envías y a qué servidor, y los paquetes viajan por la ruta.",
+  "pregunta": "Mandas una foto de 3 MB. ¿Cuántos paquetes de red hacen falta?",
+  "opciones": [
+    { "id": "a", "texto": "Uno solo, la foto va completa", "icono": "fa-image" },
+    { "id": "b", "texto": "Unos dos mil paquetes pequeños", "icono": "fa-boxes-stacked" },
+    { "id": "c", "texto": "Unos tres millones, uno por byte", "icono": "fa-infinity" }
+  ],
+  "correcta": "b",
+  "porque": "Cada paquete lleva como máximo 1 460 bytes de datos (de 1 500 totales, 40 son encabezados). Entonces 3 000 000 ÷ 1 460, redondeado hacia arriba, da 2 055 paquetes.",
+  "comoComprobarlo": "En «El viaje del paquete» elige «Foto del celular», escribe tu predicción en el cuadro y presiona Enviar; compara con el conteo final."
+}

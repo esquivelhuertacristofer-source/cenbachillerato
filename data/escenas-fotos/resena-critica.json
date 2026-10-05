@@ -1,0 +1,10 @@
+{
+  "slug": "resena-critica",
+  "items": [
+    { "clave": "portada", "formato": "1:1", "estilo": "ilustracion", "escena": "Portada de libro ilustrada sin ninguna letra: una calle de pueblo en la sierra en invierno con un jacarandá sin hojas y una ventana iluminada en una casa de adobe, tonos azules fríos y un toque morado" },
+    { "clave": "lector-dani", "formato": "1:1", "estilo": "ilustracion", "escena": "Retrato ilustrado de un estudiante de bachillerato de unos 17 años con mochila y audífonos al cuello, sentado en una banca de biblioteca con un libro cerrado en las manos, expresión curiosa" },
+    { "clave": "lector-ibarra", "formato": "1:1", "estilo": "ilustracion", "escena": "Retrato ilustrado de una maestra de unos 50 años con lentes y cabello recogido, sentada ante un escritorio con una pila de libros y una taza de café, mirada atenta y serena" },
+    { "clave": "lector-memo", "formato": "1:1", "estilo": "ilustracion", "escena": "Retrato ilustrado de un joven de 18 años con gorra y sudadera que se tapa un ojo con la mano y espía entre los dedos mientras sostiene un libro, ambiente de pasillo escolar" },
+    { "clave": "mesa-lectura", "formato": "16:9", "estilo": "ilustracion", "escena": "Mesa de biblioteca escolar con varios libros apilados, una lámpara de lectura encendida, una libreta abierta con un lápiz y una ventana con luz de tarde al fondo" }
+  ]
+}

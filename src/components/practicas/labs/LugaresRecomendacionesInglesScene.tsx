@@ -19,12 +19,19 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef, useState, type ReactNode } from "react";
-import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
+import { useMemo, useRef, useState, type ComponentProps, type ReactNode } from "react";
+import { Canvas, useFrame, type ThreeEvent, useThree } from "@react-three/fiber";
 import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { LUGARES, VISITANTES_GUIA, TURISTAS, lugar, mulberry32, type LugarId, type Lugar, type Pt, type Reaccion, type TipoOracion } from "./lugares-recomendaciones-ingles-data";
 import { Escenario } from "./_escenario";
+
+/** Html que se oculta en pantallas angostas: lo que dice ya está en el panel y en la lectura. */
+function HtmlAncho(props: ComponentProps<typeof Html>) {
+  const angosto = useThree((st) => st.size.width < 640);
+  if (angosto) return null;
+  return <Html {...props} />;
+}
 
 export type VistaLugares = "describir" | "guia" | "recomendar";
 
@@ -135,7 +142,7 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children:
           background: "rgba(4,10,22,0.86)",
           border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`,
           color: "#fff",
-          fontSize: fs,
+          fontSize: Math.max(fs, 14),
           fontWeight: 800,
           whiteSpace: "nowrap",
           boxShadow: "0 6px 18px -8px #000",
@@ -150,7 +157,7 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children:
 /** Globo de diálogo con ancho máximo (texto en varias líneas). */
 function Globo({ pos, children, col, df = 10, fs = 13, ancho = 300 }: { pos: Pt; children: ReactNode; col: string; df?: number; fs?: number; ancho?: number }) {
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[30, 0]} style={{ pointerEvents: "none" }}>
+    <HtmlAncho position={pos} center distanceFactor={df} zIndexRange={[30, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           width: "max-content",
@@ -169,7 +176,7 @@ function Globo({ pos, children, col, df = 10, fs = 13, ancho = 300 }: { pos: Pt;
       >
         {children}
       </div>
-    </Html>
+    </HtmlAncho>
   );
 }
 
@@ -182,7 +189,7 @@ function Letrero({ p, texto, detalle, col = "#fef08a", rotY = 0, alto = 0.62 }: 
       <M geo={CAJA} p={[0, alto + 0.08, 0.037]} s={[0.4, 0.035, 0.005]} c="#b91c1c" sombra={false} />
       {detalle && (
         <Html position={[0, alto + 0.34, 0.05]} center distanceFactor={6.5} zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
-          <div style={{ padding: "2px 7px", borderRadius: 5, background: "#fef3c7", border: "1.5px solid #b91c1c", color: "#7f1d1d", fontSize: 11, fontWeight: 900, whiteSpace: "nowrap", letterSpacing: "0.03em" }}>{texto}</div>
+          <div style={{ padding: "2px 7px", borderRadius: 5, background: "#fef3c7", border: "1.5px solid #b91c1c", color: "#7f1d1d", fontSize: 14, fontWeight: 900, whiteSpace: "nowrap", letterSpacing: "0.03em" }}>{texto}</div>
         </Html>
       )}
     </group>
@@ -500,10 +507,10 @@ function DMercado({ detalle }: DioramaProps) {
         {detalle && (
           <>
             <Html position={[0, 1.6, 0.16]} center distanceFactor={6.5} zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
-              <div style={{ color: "#9d174d", fontSize: 12, fontWeight: 900, whiteSpace: "nowrap", letterSpacing: "0.06em" }}>CRAFTS MARKET</div>
+              <div style={{ color: "#9d174d", fontSize: 14, fontWeight: 900, whiteSpace: "nowrap", letterSpacing: "0.06em" }}>CRAFTS MARKET</div>
             </Html>
             <Html position={[0.66, 1.36, 0.16]} center distanceFactor={6.5} zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
-              <div style={{ padding: "1px 6px", borderRadius: 4, background: "#fef3c7", border: "1.5px solid #b91c1c", color: "#7f1d1d", fontSize: 10, fontWeight: 900, whiteSpace: "nowrap" }}>CASH ONLY</div>
+              <div style={{ padding: "1px 6px", borderRadius: 4, background: "#fef3c7", border: "1.5px solid #b91c1c", color: "#7f1d1d", fontSize: 14, fontWeight: 900, whiteSpace: "nowrap" }}>CASH ONLY</div>
             </Html>
           </>
         )}
@@ -564,7 +571,7 @@ function DMuseo({ detalle }: DioramaProps) {
       <M geo={CAJA} p={posDe(l, "sign")[0]!} s={[0.92, 0.22, 0.04]} c="#312e81" />
       {detalle && (
         <Html position={[0, 1.6, 1.0]} center distanceFactor={6.5} zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
-          <div style={{ color: "#fde68a", fontSize: 11, fontWeight: 900, letterSpacing: "0.12em", whiteSpace: "nowrap" }}>MUSEUM</div>
+          <div style={{ color: "#fde68a", fontSize: 14, fontWeight: 900, letterSpacing: "0.12em", whiteSpace: "nowrap" }}>MUSEUM</div>
         </Html>
       )}
       {/* Rampa enfrente de la entrada */}
@@ -1140,19 +1147,19 @@ function EscenaDescribir({ lugarIdx, resalta, resaltaEstado, resaltaNonce, oraci
         <D detalle />
         {resalta && resaltaEstado && <Marcas key={`${resalta}-${resaltaNonce}`} l={l} clave={resalta} estado={resaltaEstado} nonce={resaltaNonce} />}
       </group>
-      <Html position={[0, 0.25, 4.35]} center distanceFactor={10} zIndexRange={[25, 0]} style={{ pointerEvents: "none" }}>
+      <HtmlAncho position={[0, 0.25, 4.35]} center distanceFactor={10} zIndexRange={[25, 0]} style={{ pointerEvents: "none" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 14px", borderRadius: 12, background: "rgba(4,10,22,0.9)", border: `1.5px solid ${l.color}`, color: "#fff", whiteSpace: "nowrap" }}>
           <i className={`fa-solid ${l.icono}`} style={{ color: l.color, fontSize: 16 }} />
           <span style={{ fontSize: 15, fontWeight: 900 }}>{l.nombre}</span>
           <span style={{ width: 1, height: 16, background: "rgba(255,255,255,0.2)" }} />
           {(["sg", "pl", "can"] as TipoOracion[]).map((t) => (
-            <span key={t} style={{ fontSize: 11.5, fontWeight: 800, color: hechos.includes(t) ? OK : "rgba(255,255,255,0.45)" }}>
-              <i className={`fa-solid ${hechos.includes(t) ? "fa-circle-check" : "fa-circle"}`} style={{ marginRight: 4, fontSize: 10 }} />
+            <span key={t} style={{ fontSize: 14, fontWeight: 800, color: hechos.includes(t) ? OK : "rgba(255,255,255,0.45)" }}>
+              <i className={`fa-solid ${hechos.includes(t) ? "fa-circle-check" : "fa-circle"}`} style={{ marginRight: 4, fontSize: 14 }} />
               {t === "sg" ? "There is" : t === "pl" ? "There are" : "You can"}
             </span>
           ))}
         </div>
-      </Html>
+      </HtmlAncho>
       {oracion && (
         <Globo pos={[0, 4.35, -1.2]} col={colOracion} df={10} fs={17} ancho={560}>
           <i className={`fa-solid ${resaltaEstado === "ok" ? "fa-circle-check" : resaltaEstado === "valida" ? "fa-circle-info" : resaltaEstado === "mal" ? "fa-circle-xmark" : "fa-pen"}`} style={{ color: colOracion, marginRight: 8 }} />
@@ -1242,7 +1249,7 @@ function Calle({ a, b, w = 0.62, c = "#9c8b72" }: { a: [number, number]; b: [num
   return <M geo={CAJA} p={[(a[0] + b[0]) / 2, 0.012, (a[1] + b[1]) / 2]} s={[w, 0.024, len + w]} r={[0, Math.atan2(b[0] - a[0], b[1] - a[1]), 0]} c={c} sombra={false} />;
 }
 
-function Mapa({ tocar, marcado, marcadoCol, resueltos, dfPin = 16, sinPin = null }: { tocar?: (id: LugarId) => void; marcado: LugarId | null; marcadoCol: string; resueltos: LugarId[]; dfPin?: number; sinPin?: LugarId | null }) {
+function Mapa({ tocar, marcado, marcadoCol, resueltos, dfPin = 16, sinPin = null, pines = null }: { tocar?: (id: LugarId) => void; marcado: LugarId | null; marcadoCol: string; resueltos: LugarId[]; dfPin?: number; sinPin?: LugarId | null; pines?: LugarId[] | null }) {
   const mar = useRef<THREE.MeshStandardMaterial>(null);
   const aro = useRef<THREE.Mesh>(null);
   useFrame(({ clock }) => {
@@ -1295,7 +1302,7 @@ function Mapa({ tocar, marcado, marcadoCol, resueltos, dfPin = 16, sinPin = null
           <Figura ropa="#0ea5e9" pelo="#111827" />
         </group>
       </group>
-      <Etiqueta pos={[-4.75, 1.2, 3.75]} df={14} fs={11} col="#22d3eeaa">
+      <Etiqueta pos={[-4.75, 1.2, 3.75]} df={14} fs={14} col="#22d3eeaa">
         <i className="fa-solid fa-circle-info" style={{ color: "#22d3ee" }} />
         Tourist Info
       </Etiqueta>
@@ -1340,8 +1347,8 @@ function Mapa({ tocar, marcado, marcadoCol, resueltos, dfPin = 16, sinPin = null
             >
               <meshBasicMaterial transparent opacity={0} depthWrite={false} />
             </mesh>
-            {sinPin !== l.id && (
-              <Etiqueta pos={[l.mapa[0], alto, l.mapa[1] - 0.4]} df={dfPin} fs={12} col={`${hecho ? OK : l.color}aa`}>
+            {sinPin !== l.id && (pines === null || pines.includes(l.id)) && (
+              <Etiqueta pos={[l.mapa[0], alto, l.mapa[1] - 0.4]} df={dfPin} fs={14} col={`${hecho ? OK : l.color}aa`}>
                 <i className={`fa-solid ${hecho ? "fa-circle-check" : l.icono}`} style={{ color: hecho ? OK : l.color }} />
                 {l.nombre}
               </Etiqueta>
@@ -1463,7 +1470,7 @@ function Viajero({ id, ropa, pelo, acc, texto, col, icono, salta, df = 11 }: { i
         <Persona ropa={ropa} pelo={pelo} acc={acc} />
       </group>
       {llegado && (
-        <Globo pos={[0, 1.45, 0]} col={col} df={df} fs={13} ancho={280}>
+        <Globo pos={[0, 1.45, 0]} col={col} df={df} fs={14} ancho={280}>
           <i className={`fa-solid ${icono}`} style={{ color: col, marginRight: 7 }} />
           {texto}
         </Globo>
@@ -1495,7 +1502,7 @@ function EscenaGuia({ visitaIdx, guiaElegido, guiaOk, guiaResueltos, guiaTab, vi
   const col = guiaOk === null ? modoColor : guiaOk ? OK : WARN;
   return (
     <group>
-      <Mapa tocar={onTocarLugar} marcado={guiaElegido ?? guiaTab} marcadoCol={guiaElegido ? col : `${modoColor}`} resueltos={resueltos} />
+      <Mapa tocar={onTocarLugar} marcado={guiaElegido ?? guiaTab} marcadoCol={guiaElegido ? col : `${modoColor}`} resueltos={resueltos} pines={[guiaElegido ?? guiaTab]} />
       {VISITANTES_GUIA.map((x, i) => {
         const dest = guiaResueltos[x.id];
         if (!dest || i === visitaIdx) return null;
@@ -1523,7 +1530,7 @@ function EscenaGuia({ visitaIdx, guiaElegido, guiaOk, guiaResueltos, guiaTab, vi
           <group scale={0.62}>
             <Persona ropa={v.ropa} acc={v.accesorio} />
           </group>
-          <Globo pos={[0, 1.55, 0]} col={modoColor} df={11} fs={13} ancho={300}>
+          <Globo pos={[0, 1.55, 0]} col={modoColor} df={11} fs={14} ancho={300}>
             <span style={{ color: modoColor }}>{v.nombre}:</span> «{v.pide}»
           </Globo>
         </group>
@@ -1565,7 +1572,7 @@ function EscenaRecomendar({ turistaIdx, destino, reaccion, lineaReaccion, felice
   const fila = TURISTAS.filter((x, i) => i !== turistaIdx && !felices[x.id]).map((x) => ({ key: x.id, ropa: x.ropa, pelo: x.pelo, acc: x.accesorio as Accesorio }));
   const col = reaccion === "feliz" ? OK : reaccion === "meh" ? AMBAR : reaccion === "triste" ? WARN : modoColor;
   const cam = useMemo((): { pos: Pt; target: Pt; clave: string } => {
-    if (!destino) return { pos: [-1.6, 6.2, 11.2], target: [-2.0, 0.9, 2.6], clave: `base-${turistaIdx}` };
+    if (!destino) return { pos: [-1.6, 6.2, 11.2], target: [-2.0, 0.4, 2.6], clave: `base-${turistaIdx}` };
     const l = lugar(destino);
     const alto = destino === "mirador" || destino === "cascada" ? 1.4 : 0.6;
     return { pos: [l.mapa[0] + 0.8, 8.4 + alto, l.mapa[1] + 9.4], target: [l.mapa[0], alto, l.mapa[1]], clave: `${destino}-${turistaIdx}-${viajeNonce}` };
@@ -1573,7 +1580,7 @@ function EscenaRecomendar({ turistaIdx, destino, reaccion, lineaReaccion, felice
   return (
     <group>
       <CamaraGuiada pos={cam.pos} target={cam.target} clave={cam.clave} />
-      <Mapa marcado={destino} marcadoCol={col} resueltos={resueltos} dfPin={10} sinPin={destino} />
+      <Mapa marcado={destino} marcadoCol={col} resueltos={resueltos} dfPin={10} sinPin={destino} pines={[]} />
       {TURISTAS.map((x, i) => {
         const dest = felices[x.id];
         if (!dest || i === turistaIdx) return null;
@@ -1602,7 +1609,7 @@ function EscenaRecomendar({ turistaIdx, destino, reaccion, lineaReaccion, felice
           <group scale={0.62}>
             <Persona ropa={t.ropa} pelo={t.pelo} acc={t.accesorio as Accesorio} />
           </group>
-          <Globo pos={[0, 1.55, 0]} col={modoColor} df={9} fs={13} ancho={300}>
+          <Globo pos={[0, 1.55, 0]} col={modoColor} df={9} fs={14} ancho={300}>
             <span style={{ color: modoColor }}>{t.nombre}:</span> «{t.dice}»
           </Globo>
         </group>
@@ -1616,9 +1623,9 @@ function EscenaRecomendar({ turistaIdx, destino, reaccion, lineaReaccion, felice
 export default function LugaresRecomendacionesInglesScene(p: LugaresSceneProps) {
   const { vista, modoColor, resetNonce } = p;
   const cam = useMemo((): { pos: Pt; target: Pt; fondo: string } => {
-    if (vista === "describir") return { pos: [0, 8.9, 8.2], target: [0, 0.9, -0.1], fondo: "#0b1a2c" };
-    if (vista === "guia") return { pos: [0, 19.5, 17.5], target: [0, 0, -0.2], fondo: "#0a1a2e" };
-    return { pos: [-1.6, 6.2, 11.2], target: [-2.0, 0.9, 2.6], fondo: "#0c1628" };
+    if (vista === "describir") return { pos: [0, 8.9, 8.2], target: [0, 0.3, -0.1], fondo: "#0b1a2c" };
+    if (vista === "guia") return { pos: [0, 19.5, 17.5], target: [0, 0, 0.9], fondo: "#0a1a2e" };
+    return { pos: [-1.6, 6.2, 11.2], target: [-2.0, 0.4, 2.6], fondo: "#0c1628" };
   }, [vista]);
 
   return (

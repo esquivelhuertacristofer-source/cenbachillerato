@@ -21,6 +21,7 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, NUM, OK, card, Eyebrow, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { CompletaTexto } from "./_mecanica-huecos";
@@ -96,7 +97,7 @@ const AlcanceScene = dynamic(() => import("./AlcancePublicacionScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-share-nodes fa-fade" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Cargando la red de la comunidad en 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Cargando la red de la comunidad en 3D…</span>
     </div>
   ),
 });
@@ -150,15 +151,15 @@ function MetricaCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: st
           ¿Qué mide este dato?
         </Eyebrow>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 10.5, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
           {[1, 2, 3].map((k) => (
-            <i key={k} className="fa-solid fa-star" style={{ fontSize: 13, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
+            <i key={k} className="fa-solid fa-star" style={{ fontSize: 14, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
           ))}
         </div>
       </div>
       {resuelto === null ? (
         <>
-          <div style={{ fontSize: 11, color: T.text3, fontWeight: 800, marginBottom: 6 }}>
+          <div style={{ fontSize: 14, color: T.text3, fontWeight: 800, marginBottom: 6 }}>
             Dato {pos + 1} de {ronda.length} · ¿es alcance, impresiones, interacción o impacto?
           </div>
           <div style={{ fontSize: 15, color: "#fff", fontWeight: 800, lineHeight: 1.45, marginBottom: 12 }}>«{actual.texto}»</div>
@@ -170,7 +171,7 @@ function MetricaCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: st
               </button>
             ))}
           </div>
-          {aviso && <div style={{ marginTop: 10, fontSize: 12, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
+          {aviso && <div style={{ marginTop: 10, fontSize: 14, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
         </>
       ) : (
         <div style={{ padding: "12px 14px", borderRadius: 11, border: `1px solid ${OK}55`, background: "rgba(52,211,153,0.08)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
@@ -178,9 +179,9 @@ function MetricaCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: st
             {[1, 2, 3].map((k) => (
               <i key={k} className="fa-solid fa-star" style={{ fontSize: 15, color: k <= resuelto ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
             ))}
-            <span style={{ fontSize: 12.5, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
+            <span style={{ fontSize: 14, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
           </span>
-          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 12.5, fontWeight: 900 }}>
+          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 14, fontWeight: 900 }}>
             <i className="fa-solid fa-shuffle" style={{ marginRight: 8 }} />
             Otra ronda
           </button>
@@ -195,12 +196,12 @@ function Barra({ etq, valor, max, col, sufijo, meta }: { etq: string; valor: num
   const f = Math.max(0, Math.min(1, valor / max));
   return (
     <div style={{ display: "grid", gridTemplateColumns: "minmax(0,150px) 1fr 64px", alignItems: "center", gap: 10 }}>
-      <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.25 }}>{etq}</span>
+      <span style={{ fontSize: 14, color: T.text2, lineHeight: 1.25 }}>{etq}</span>
       <div style={{ position: "relative", height: 10, borderRadius: 99, background: "rgba(255,255,255,0.07)", overflow: "hidden" }}>
         <div style={{ position: "absolute", inset: 0, width: `${f * 100}%`, background: col, borderRadius: 99, transition: "width .25s" }} />
         {meta !== undefined && <div style={{ position: "absolute", top: -2, bottom: -2, left: `${(meta / max) * 100}%`, width: 2, background: "#fff", opacity: 0.7 }} />}
       </div>
-      <span style={{ fontSize: 12, fontWeight: 900, color: "#fff", textAlign: "right", ...NUM }}>
+      <span style={{ fontSize: 14, fontWeight: 900, color: "#fff", textAlign: "right", ...NUM }}>
         {sufijo === "%" ? `${num(valor)} %` : num(valor)}
       </span>
     </div>
@@ -262,7 +263,6 @@ export function LabAlcancePublicacion({ color }: PracticaLabProps) {
 
   // ── Comunes
   const [resetNonce, setResetNonce] = useState(0);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   const intervalos = useRef<{ cascada: number | null; rumor: number | null }>({ cascada: null, rumor: null });
@@ -501,48 +501,43 @@ export function LabAlcancePublicacion({ color }: PracticaLabProps) {
   };
 
   /* ── Objetivos ─────────────────────────────────────────────────────── */
-  const objetivos: { t: string; done: boolean }[] = [
-    { t: "Publicar desde dos cuentas de origen distintas y comparar su alcance", done: origenesProbados.size >= 2 },
-    { t: `Llegar a más de la mitad de la comunidad (alcance de ${META_ALCANCE} cuentas o más)`, done: mitad },
-    { t: "Calcular la tasa de interacción de una publicación", done: tasaOk },
-    { t: "Diseñar una campaña con la audiencia correcta que llegue al 70 % con máximo dos canales", done: campanaOk },
-    { t: "Hacer que la campaña llegue también al 50 % de las personas ciegas y sordas de la audiencia", done: accesibleOk },
-    { t: "Elegir dos indicadores de impacto (no de vanidad)", done: indicadoresOk },
-    { t: "Soltar el rumor sin desmentido ni frenos y ver hasta dónde llega", done: vioSinFreno },
-    { t: "Lograr que el dato verificado llegue a más personas que el rumor", done: frenado },
-    { t: "Clasificar datos por lo que miden y ganar estrellas", done: clasifico },
-    { t: "Aprobar el verdadero o falso (A4)", done: quizAprobado },
-    { t: "Completar el texto (A6)", done: textoOk },
+  const objetivos: { txt: string; done: boolean }[] = [
+    { txt: "Publica desde una cuenta y mira cómo la cascada se propaga por la red", done: cascada !== null },
+    { txt: "Publicar desde dos cuentas de origen distintas y comparar su alcance", done: origenesProbados.size >= 2 },
+    { txt: `Llegar a más de la mitad de la comunidad (alcance de ${META_ALCANCE} cuentas o más)`, done: mitad },
+    { txt: "Calcular la tasa de interacción de una publicación", done: tasaOk },
+    { txt: "Diseñar una campaña con la audiencia correcta que llegue al 70 % con máximo dos canales", done: campanaOk },
+    { txt: "Hacer que la campaña llegue también al 50 % de las personas ciegas y sordas de la audiencia", done: accesibleOk },
+    { txt: "Elegir dos indicadores de impacto (no de vanidad)", done: indicadoresOk },
+    { txt: "Soltar el rumor sin desmentido ni frenos y ver hasta dónde llega", done: vioSinFreno },
+    { txt: "Lograr que el dato verificado llegue a más personas que el rumor", done: frenado },
+    { txt: "Clasificar datos por lo que miden y ganar estrellas", done: clasifico },
+    { txt: "Aprobar el verdadero o falso (A4)", done: quizAprobado },
+    { txt: "Completar el texto (A6)", done: textoOk },
   ];
 
   /* ── Visor ─────────────────────────────────────────────────────────── */
-  let chipVivo = "";
   let pie: ReactNode = "";
   if (modo === "cascada") {
     if (vivo && cascada) {
-      chipVivo = corriendoCascada ? `oleada ${Math.max(1, vivo.oleada)} · alcance ${vivo.alcance} · impresiones ${vivo.impresiones}` : `alcance ${cascada.alcance} de ${N_HABITANTES + 2} · ${pct(cascada.alcance / 149)}`;
       pie = corriendoCascada
         ? `Cada pulso es una impresión: la publicación aparece en la pantalla de un contacto conectado. Azul = la vio, amarillo = reaccionó, verde = la compartió y la mostró a sus contactos.`
         : `La cascada se apagó en ${cascada.oleadas} ${cascada.oleadas === 1 ? "oleada" : "oleadas"}: ${cascada.alcance} cuentas distintas la vieron (alcance), apareció ${cascada.impresiones} veces (impresiones) y hubo ${cascada.reacciones} interacciones. ${cascada.impresiones > cascada.alcance ? `Hay ${cascada.impresiones - cascada.alcance} impresiones repetidas: personas que la vieron de más de un contacto.` : ""}`;
     } else {
-      chipVivo = `${origenDef.etq.toLowerCase()} · ${formatoDef.etq.toLowerCase()} · ${horaEtq(hora)}`;
       pie = `${origenDef.nota} A las ${horaEtq(hora)} está conectado ${pct(ACTIVIDAD_HORA[hora] ?? 0)} de la comunidad (curva ilustrativa). Lanza la publicación para ver la cascada.`;
     }
   } else if (modo === "campana") {
-    chipVivo = lanzada ? `${caso.etq.toLowerCase()} · llega a ${pct(cobGeneral)} de la audiencia` : `${caso.etq.toLowerCase()} · ${canales.length}/${MAX_CANALES} canales`;
     pie = lanzada
       ? `Los arcos más gruesos son los canales que más llegan a cada grupo. Las personas iluminadas reciben y entienden el mensaje; los íconos marcan si llega a la persona ciega y a la persona sorda de cada grupo.`
       : `${caso.planteamiento} Marca la audiencia, elige máximo dos canales y la accesibilidad; después lanza la campaña.`;
   } else {
     if (rumor && vivoRumor) {
-      chipVivo = `creen el rumor ${vivoRumor.cree} · dato verificado ${vivoRumor.dato}`;
       pie = corriendoRumor
         ? "Rojo = recibió primero el rumor y lo cree. Cian = recibió primero el dato verificado. Morado = creyó el rumor y el desmentido lo corrigió."
         : rumor.dato > rumor.cree
           ? `El dato verificado llegó a ${rumor.dato} personas y el rumor se quedó en ${rumor.cree}. Quien ya conoce el dato no reenvía el rumor: cada persona informada es un corte en la cadena.`
           : `El rumor ganó: ${rumor.cree} personas lo creen y el dato llegó a ${rumor.dato}. ${configRumor?.fuente === "ninguna" ? "Nadie lo desmintió." : "Prueba desmentir antes, desde una fuente con más contactos, o activa algún freno."}`;
     } else {
-      chipVivo = `rumor listo · ${fuenteDef.etq.toLowerCase()}`;
       pie = `${RUMOR.texto} Circula en tres grupos de WhatsApp. En el modelo se comparte ${num((FACTOR_FALSO - 1) * 100)} % más que el dato verificado, como encontraron Vosoughi, Roy y Aral (2018).`;
     }
   }
@@ -553,13 +548,13 @@ export function LabAlcancePublicacion({ color }: PracticaLabProps) {
         <i className={`fa-solid ${def.icono}`} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{def.etq}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los resultados siguen aquí. {pie}</div>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los resultados siguen aquí. {pie}</div>
     </div>
   );
 
-  const sub = (txt: string) => <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
+  const sub = (txt: string) => <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
   const nota = (txt: ReactNode, col: string, icono = "fa-circle-info") => (
-    <div style={{ marginTop: 10, fontSize: 12, lineHeight: 1.55, color: col }}>
+    <div style={{ marginTop: 10, fontSize: 14, lineHeight: 1.55, color: col }}>
       <i className={`fa-solid ${icono}`} style={{ marginRight: 7 }} />
       {txt}
     </div>
@@ -580,7 +575,7 @@ export function LabAlcancePublicacion({ color }: PracticaLabProps) {
             </button>
           ))}
         </div>
-        <div style={{ fontSize: 11.5, color: T.text3, marginTop: 6 }}>{origenDef.nota}</div>
+        <div style={{ fontSize: 14, color: T.text3, marginTop: 6 }}>{origenDef.nota}</div>
         {sub("2 · Formato")}
         <div className="ap-opts">
           {FORMATOS.map((f) => (
@@ -590,14 +585,14 @@ export function LabAlcancePublicacion({ color }: PracticaLabProps) {
             </button>
           ))}
         </div>
-        <div style={{ fontSize: 11.5, color: T.text3, marginTop: 6 }}>
+        <div style={{ fontSize: 14, color: T.text3, marginTop: 6 }}>
           {formatoDef.nota} En el modelo, de cada 100 personas que la ven, {num(formatoDef.comparte * 100 * (llamado ? LLAMADO : 1), 1)} la comparten y {num(formatoDef.reacciona * 100)} reaccionan.
         </div>
         {sub("3 · Hora de publicación")}
         <label style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <i className="fa-solid fa-clock" style={{ color: "#fbbf24" }} />
           <input type="range" aria-label="Hora de publicación (h)" className="ap-range" min={0} max={23} step={1} value={hora} disabled={corriendoCascada} onChange={(e) => setHora(Number(e.target.value))} style={{ ["--apc" as string]: "#fbbf24" }} />
-          <span style={{ width: 118, textAlign: "right", fontSize: 12.5, color: "#fff", fontWeight: 800, ...NUM }}>
+          <span style={{ width: 118, textAlign: "right", fontSize: 14, color: "#fff", fontWeight: 800, ...NUM }}>
             {horaEtq(hora)} · {pct(ACTIVIDAD_HORA[hora] ?? 0)} en línea
           </span>
         </label>
@@ -624,7 +619,7 @@ export function LabAlcancePublicacion({ color }: PracticaLabProps) {
               <Barra etq="Interacciones" valor={vivo.reacciones} max={300} col="#fbbf24" />
               <Barra etq="De ellas, compartidos" valor={vivo.compartidos} max={300} col={OK} />
             </div>
-            <div style={{ fontSize: 10.5, color: T.text3, marginTop: 6 }}>La línea blanca marca la meta: {META_ALCANCE} cuentas, la mitad de la red.</div>
+            <div style={{ fontSize: 14, color: T.text3, marginTop: 6 }}>La línea blanca marca la meta: {META_ALCANCE} cuentas, la mitad de la red.</div>
           </>
         )}
         {terminadaCascada && cascada && (
@@ -642,10 +637,10 @@ export function LabAlcancePublicacion({ color }: PracticaLabProps) {
             )}
             {sub("Calcula la tasa de interacción por alcance")}
             {cascada.alcance === 0 ? (
-              <div style={{ fontSize: 12, color: T.text3 }}>Con alcance 0 no hay tasa que calcular: publica de nuevo.</div>
+              <div style={{ fontSize: 14, color: T.text3 }}>Con alcance 0 no hay tasa que calcular: publica de nuevo.</div>
             ) : (
               <>
-                <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5, ...NUM }}>
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5, ...NUM }}>
                   Tasa = interacciones ÷ alcance × 100 = {cascada.reacciones} ÷ {cascada.alcance} × 100 = ¿?
                 </div>
                 <div style={{ display: "flex", gap: 8, marginTop: 8, alignItems: "center", flexWrap: "wrap" }}>
@@ -723,9 +718,9 @@ export function LabAlcancePublicacion({ color }: PracticaLabProps) {
           ))}
         </div>
         <div style={{ marginTop: 10, padding: "11px 13px", borderRadius: 12, background: "rgba(248,250,252,0.05)", border: `1px solid ${T.line}` }}>
-          <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: "0.08em", color: modoCol, marginBottom: 4 }}>CASO · {caso.tema.toUpperCase()}</div>
-          <div style={{ fontSize: 12.5, color: "#fff", lineHeight: 1.5 }}>{caso.planteamiento}</div>
-          <div style={{ fontSize: 10.5, color: T.text3, marginTop: 5 }}>{caso.fuente}</div>
+          <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: modoCol, marginBottom: 4 }}>CASO · {caso.tema.toUpperCase()}</div>
+          <div style={{ fontSize: 14, color: "#fff", lineHeight: 1.5 }}>{caso.planteamiento}</div>
+          <div style={{ fontSize: 14, color: T.text3, marginTop: 5 }}>{caso.fuente}</div>
         </div>
 
         {sub("1 · Audiencia objetivo: ¿a quiénes va dirigida?")}
@@ -749,7 +744,7 @@ export function LabAlcancePublicacion({ color }: PracticaLabProps) {
               <button key={c.id} className="ap-opt ap-canal" data-on={on} onClick={() => toggleCanal(c.id)} style={{ ["--apc" as string]: c.color, background: on ? `${c.color}22` : "transparent", textAlign: "left" }}>
                 <i className={c.icono.startsWith("fa-brands") ? c.icono : `fa-solid ${c.icono}`} style={{ marginRight: 8, color: c.color, width: 16 }} />
                 {c.etq}
-                <span style={{ display: "block", fontSize: 10.5, fontWeight: 600, color: T.text3, marginTop: 3, marginLeft: 24 }}>{c.nota}</span>
+                <span style={{ display: "block", fontSize: 14, fontWeight: 600, color: T.text3, marginTop: 3, marginLeft: 24 }}>{c.nota}</span>
               </button>
             );
           })}
@@ -765,7 +760,7 @@ export function LabAlcancePublicacion({ color }: PracticaLabProps) {
                 <i className={`fa-solid ${on ? "fa-square-check" : "fa-square"}`} style={{ marginRight: 9, color: on ? OK : T.text3 }} />
                 <i className={`fa-solid ${a.icono}`} style={{ marginRight: 7, color: "#c4b5fd" }} />
                 {a.etq}
-                {on && <span style={{ display: "block", fontSize: 10.5, fontWeight: 600, color: T.text2, marginTop: 3, marginLeft: 44 }}>{a.explica}</span>}
+                {on && <span style={{ display: "block", fontSize: 14, fontWeight: 600, color: T.text2, marginTop: 3, marginLeft: 44 }}>{a.explica}</span>}
               </button>
             );
           })}
@@ -781,7 +776,7 @@ export function LabAlcancePublicacion({ color }: PracticaLabProps) {
               <button key={ind.id} className="ap-opt ap-indicador" data-on={on} onClick={() => toggleIndicador(ind.id)} style={{ ["--apc" as string]: col, background: on ? `${col}1c` : "transparent", textAlign: "left" }}>
                 {ind.etq}
                 {evaluado && (
-                  <span style={{ display: "block", fontSize: 10.5, fontWeight: 700, color: col, marginTop: 3 }}>
+                  <span style={{ display: "block", fontSize: 14, fontWeight: 700, color: col, marginTop: 3 }}>
                     {ind.tipo === "impacto" ? "Impacto" : ind.tipo === "alcance" ? "Alcance, no impacto" : "Métrica de vanidad"}: {ind.porque}
                   </span>
                 )}
@@ -844,7 +839,7 @@ export function LabAlcancePublicacion({ color }: PracticaLabProps) {
                 WARN,
                 "fa-ear-deaf",
               )}
-            <div style={{ marginTop: 10, fontSize: 11, color: T.text3, lineHeight: 1.5 }}>Coberturas ilustrativas por canal y grupo en una comunidad de 1 000 personas; si eliges dos canales, se combinan suponiendo que son independientes.</div>
+            <div style={{ marginTop: 10, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>Coberturas ilustrativas por canal y grupo en una comunidad de 1 000 personas; si eliges dos canales, se combinan suponiendo que son independientes.</div>
           </>
         )}
       </>
@@ -853,10 +848,10 @@ export function LabAlcancePublicacion({ color }: PracticaLabProps) {
     control = (
       <>
         <div style={{ padding: "11px 13px", borderRadius: 12, background: "rgba(244,63,94,0.08)", border: "1px solid rgba(244,63,94,0.35)" }}>
-          <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: "0.08em", color: "#fb7185", marginBottom: 4 }}>EL RUMOR</div>
-          <div style={{ fontSize: 13, color: "#fff", fontWeight: 800, lineHeight: 1.45 }}>{RUMOR.texto}</div>
-          <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: "0.08em", color: "#22d3ee", margin: "10px 0 4px" }}>EL DATO VERIFICADO</div>
-          <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.45 }}>{RUMOR.dato}</div>
+          <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: "#fb7185", marginBottom: 4 }}>EL RUMOR</div>
+          <div style={{ fontSize: 14, color: "#fff", fontWeight: 800, lineHeight: 1.45 }}>{RUMOR.texto}</div>
+          <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: "#22d3ee", margin: "10px 0 4px" }}>EL DATO VERIFICADO</div>
+          <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.45 }}>{RUMOR.dato}</div>
         </div>
 
         {sub("1 · ¿Quién lo desmiente?")}
@@ -868,7 +863,7 @@ export function LabAlcancePublicacion({ color }: PracticaLabProps) {
             </button>
           ))}
         </div>
-        <div style={{ fontSize: 11.5, color: T.text3, marginTop: 6 }}>{fuenteDef.nota}</div>
+        <div style={{ fontSize: 14, color: T.text3, marginTop: 6 }}>{fuenteDef.nota}</div>
 
         {fuente !== "ninguna" && (
           <>
@@ -876,7 +871,7 @@ export function LabAlcancePublicacion({ color }: PracticaLabProps) {
             <label style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <i className="fa-solid fa-hourglass-half" style={{ color: "#22d3ee" }} />
               <input type="range" aria-label="Retraso del desmentido (oleadas)" className="ap-range" min={1} max={6} step={1} value={retraso} disabled={corriendoRumor} onChange={(e) => setRetraso(Number(e.target.value))} style={{ ["--apc" as string]: "#22d3ee" }} />
-              <span style={{ width: 118, textAlign: "right", fontSize: 12.5, color: "#fff", fontWeight: 800, ...NUM }}>
+              <span style={{ width: 118, textAlign: "right", fontSize: 14, color: "#fff", fontWeight: 800, ...NUM }}>
                 {retraso} {retraso === 1 ? "oleada" : "oleadas"} después
               </span>
             </label>
@@ -888,14 +883,14 @@ export function LabAlcancePublicacion({ color }: PracticaLabProps) {
           <button className="ap-toggle ap-freno" data-on={pausa} disabled={corriendoRumor} onClick={() => { setPausa((v) => !v); blip(); }} style={{ ["--apc" as string]: pausa ? OK : "rgba(255,255,255,0.14)" }}>
             <i className={`fa-solid ${pausa ? "fa-square-check" : "fa-square"}`} style={{ marginRight: 9, color: pausa ? OK : T.text3 }} />
             Pausa para verificar antes de reenviar
-            <span style={{ display: "block", fontSize: 10.5, fontWeight: 600, color: T.text3, marginTop: 3, marginLeft: 22 }}>
+            <span style={{ display: "block", fontSize: 14, fontWeight: 600, color: T.text3, marginTop: 3, marginLeft: 22 }}>
               La comunidad aprendió a preguntar «¿quién lo dice? ¿dónde más se publica?». En el modelo, reduce {num((1 - EFECTO_PAUSA) * 100)} % los reenvíos del rumor (valor ilustrativo).
             </span>
           </button>
           <button className="ap-toggle ap-freno" data-on={limite} disabled={corriendoRumor} onClick={() => { setLimite((v) => !v); blip(); }} style={{ ["--apc" as string]: limite ? OK : "rgba(255,255,255,0.14)" }}>
             <i className={`fa-solid ${limite ? "fa-square-check" : "fa-square"}`} style={{ marginRight: 9, color: limite ? OK : T.text3 }} />
             Límite de reenvío de mensajes «reenviados muchas veces»
-            <span style={{ display: "block", fontSize: 10.5, fontWeight: 600, color: T.text3, marginTop: 3, marginLeft: 22 }}>
+            <span style={{ display: "block", fontSize: 14, fontWeight: 600, color: T.text3, marginTop: 3, marginLeft: 22 }}>
               Como el que WhatsApp aplicó en 2020: tras {SALTOS_LIMITE} reenvíos, solo a un chat a la vez. La cadena ya llega muy reenviada. Aplica a todos los mensajes, también al dato.
             </span>
           </button>
@@ -932,7 +927,7 @@ export function LabAlcancePublicacion({ color }: PracticaLabProps) {
                     />
                   ))}
                 </svg>
-                <div style={{ fontSize: 10.5, color: T.text3, marginTop: 2 }}>Personas por oleada: rojo, rumor; cian, dato verificado.</div>
+                <div style={{ fontSize: 14, color: T.text3, marginTop: 2 }}>Personas por oleada: rojo, rumor; cian, dato verificado.</div>
                 {nota(
                   rumor.dato > rumor.cree
                     ? `Frenaste el rumor. ${configRumor?.pausa ? "La pausa para verificar bajó sus reenvíos. " : ""}${configRumor?.limite ? "El límite cortó la cadena que ya venía muy reenviada. " : ""}${configRumor && configRumor.fuente !== "ninguna" ? `Desmentir desde «${FUENTES.find((f) => f.id === configRumor.fuente)!.etq.toLowerCase()}» ` : ""}sirvió porque quien recibe primero el dato ya no reenvía el rumor.`
@@ -946,354 +941,212 @@ export function LabAlcancePublicacion({ color }: PracticaLabProps) {
             )}
           </>
         )}
-        <div style={{ marginTop: 10, fontSize: 11, color: T.text3, lineHeight: 1.5 }}>
+        <div style={{ marginTop: 10, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
           Probabilidades ilustrativas. Lo real: lo falso tuvo 70 % más probabilidad de compartirse (Vosoughi, Roy y Aral, Science, 2018) y WhatsApp reportó 70 % menos reenvíos de los mensajes muy reenviados tras su límite de 2020.
         </div>
       </>
     );
   }
 
+  const itemsLeyenda: [string, string][] =
+    modo === "cascada"
+      ? [["#3b4a60", "Aún no la ve"], ["#60a5fa", "La vio"], ["#fbbf24", "Reaccionó"], [OK, "La compartió"]]
+      : modo === "rumor"
+        ? [["#3b4a60", "Sin enterarse"], ["#f43f5e", "Cree el rumor"], ["#22d3ee", "Recibió el dato"], ["#a78bfa", "Se corrigió"]]
+        : [["#475569", "No le llega"], [accent, "Le llega y entiende"]];
+  const leyenda = (
+    <>
+      {itemsLeyenda.map(([c, t]) => (
+        <div key={t} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 800, color: "#dbe4f3" }}>
+          <span style={{ width: 12, height: 12, borderRadius: "50%", background: c, flexShrink: 0 }} />
+          {t}
+        </div>
+      ))}
+    </>
+  );
+
+  /* Lectura corta sobre la escena (≤ 10 palabras). */
+  let lectura: ReactNode;
+  if (modo === "cascada") {
+    lectura =
+      cascada && vivo
+        ? corriendoCascada
+          ? `Alcance ${vivo.alcance} · impresiones ${vivo.impresiones}`
+          : `Llegó a ${cascada.alcance} de ${N_HABITANTES + 2} cuentas (${pct(cascada.alcance / 149)})`
+        : `${origenDef.etq} · ${formatoDef.etq} · ${horaEtq(hora)}: publica y mira`;
+  } else if (modo === "campana") {
+    lectura = lanzada ? `Llega a ${pct(cobGeneral)} de la audiencia` : `${canales.length} de ${MAX_CANALES} canales elegidos`;
+  } else {
+    lectura = rumor && vivoRumor ? `Rumor ${vivoRumor.cree} · dato verificado ${vivoRumor.dato}` : `Desmentido: ${fuenteDef.etq.toLowerCase()}`;
+  }
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes apPulse { 0%,100%{ box-shadow:0 0 0 0 var(--apd); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .ap-live-dot { animation: apPulse 1.6s ease-in-out infinite; }
-        @media (prefers-reduced-motion: reduce){ .ap-live-dot { animation:none; } }
-        .ap-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .ap-grid { grid-template-columns: 1fr; } }
-        .ap-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .ap-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .ap-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .ap-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .ap-tab { cursor:pointer; border:1px solid var(--apc); border-radius:12px; padding:11px 8px; text-align:center; background:transparent; transition:all .15s; color:#fff; }
-        .ap-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
-        .ap-tab:hover { background:rgba(255,255,255,0.06); }
-        .ap-opts { display:flex; flex-wrap:wrap; gap:7px; }
-        .ap-opt { cursor:pointer; border:1px solid var(--apc); border-radius:10px; padding:9px 12px; font-size:12px; font-weight:800; color:#fff; background:transparent; transition:all .15s; }
-        .ap-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.72); }
-        .ap-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
-        .ap-opt:disabled { cursor:default; opacity:0.6; }
-        .ap-toggle { width:100%; cursor:pointer; border:1px solid var(--apc); border-radius:11px; padding:10px 13px; background:rgba(4,10,22,0.4); color:#fff; font-size:12px; font-weight:800; text-align:left; transition:all .15s; }
-        .ap-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
-        .ap-toggle:disabled { cursor:default; opacity:0.6; }
-        .ap-lanzar { width:100%; cursor:pointer; border:none; border-radius:12px; padding:13px 16px; background:var(--apc); color:#04121f; font-size:13.5px; font-weight:900; transition:all .15s; }
-        .ap-lanzar:hover:not(:disabled) { filter:brightness(1.1); }
-        .ap-lanzar:disabled { cursor:default; opacity:0.55; }
-        .ap-range { flex:1; accent-color: var(--apc); min-width:0; }
-        .ap-horas { display:flex; align-items:flex-end; gap:2px; height:26px; margin-top:6px; padding:0 2px; }
-        .ap-horas span { flex:1; border-radius:2px 2px 0 0; min-height:2px; }
-        .ap-input { width:110px; padding:9px 11px; border-radius:10px; border:1px solid; background:rgba(4,10,22,0.5); color:#fff; font-size:14px; font-weight:800; font-variant-numeric: tabular-nums; }
-        .ap-tabla-wrap { overflow-x:auto; }
-        .ap-tabla { width:100%; border-collapse:collapse; font-size:11.5px; font-variant-numeric: tabular-nums; }
-        .ap-tabla th { text-align:left; color:${T.text3}; font-weight:800; padding:5px 6px; border-bottom:1px solid ${T.line}; white-space:nowrap; }
-        .ap-tabla td { color:${T.text2}; padding:6px; border-bottom:1px solid rgba(255,255,255,0.05); }
-        .ap-serie { width:100%; height:auto; margin-top:12px; border-radius:10px; background:rgba(4,10,22,0.45); border:1px solid ${T.line}; }
-        .ap-opt:focus-visible, .ap-tab:focus-visible, .ap-toggle:focus-visible, .ap-icobtn:focus-visible, .ap-range:focus-visible, .ap-lanzar:focus-visible, .ap-input:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
-        @media (max-width: 1000px){ .ap-bottom { grid-template-columns: 1fr !important; } }
-        .ap-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .ap-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .ap-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61; background:linear-gradient(180deg,#06121e 0%,#040a16 100%);
-          border-left:1px solid rgba(${color.rgba},0.32); box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1); display:flex; flex-direction:column; }
-        .ap-drawer[data-open="true"] { transform:translateX(0); }
-        .ap-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .ap-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .ap-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .ap-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .ap-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:11px 16px; border-radius:999px;
-          border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800; background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
-        .ap-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        .ap-leyenda { position:absolute; top:62px; left:16px; display:flex; flex-direction:column; gap:5px; padding:9px 11px; border-radius:12px; background:rgba(4,10,22,0.72); border:1px solid ${T.line}; backdrop-filter:blur(8px); pointer-events:none; }
-        .ap-leyenda span { display:flex; align-items:center; gap:7px; font-size:10.5px; font-weight:800; color:#dbe4f3; }
-        .ap-leyenda i { width:9px; height:9px; border-radius:50%; display:inline-block; }
-      `}</style>
-
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="ap-tabs">
-          {MODOS.map((m) => {
-            const d = MODOS_DEF[m];
-            const col = `#${d.color.replace("#", "")}`;
-            const on = m === modo;
-            return (
-              <button key={m} className="ap-tab" data-on={on} onClick={() => cambiarModo(m)} style={{ ["--apc" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? col : "inherit" }}>
-                  <i className={`fa-solid ${d.icono}`} />
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <AlcanceScene
+            vista={modo}
+            modoColor={modoCol}
+            resetNonce={resetNonce}
+            origenNodo={origenDef.nodo}
+            eventosCascada={cascada?.eventos ?? null}
+            nonceCascada={nonceCascada}
+            audienciaCaso={caso.audiencia}
+            canales={canales}
+            accesos={accesos}
+            lanzada={lanzada}
+            nonceCampana={nonceCampana}
+            fuenteNodo={fuenteDef.nodo}
+            eventosRumor={rumor?.eventos ?? null}
+            nonceRumor={nonceRumor}
+          />
+        </SceneBoundary>
+      }
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m, etiqueta: MODOS_DEF[m].etq, icono: MODOS_DEF[m].icono })),
+        valor: modo,
+        cambiar: (id) => cambiarModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+        </>
+      }
+      leyenda={leyenda}
+      lectura={lectura}
+      objetivos={objetivos}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Controles",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              <style>{CSS_AP}</style>
+              <Bloque titulo={`${def.etq}: qué estás viendo`} icono={def.icono}>
+                <p style={{ margin: 0, color: T.text2, ...NUM }}>{pie}</p>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 16px" }}>{leyenda}</div>
+              </Bloque>
+              <Bloque titulo="Controles" icono="fa-sliders">
+                {control}
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <>
+              <MetricaCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
+              <RetoQuizCard quiz={QUIZ_A4} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Sabes qué hace inclusivo y de calidad a un contenido." />
+              <div style={{ ...card, padding: "20px 18px 22px", marginTop: 22 }}>
+                <Eyebrow>
+                  <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
+                  Completa el texto (A6)
+                </Eyebrow>
+                <div style={{ marginTop: 12 }}>
+                  <CompletaTexto data={HUECOS_A6} accent={accent} rgba={color.rgba} completado={textoOk} onCompletado={() => { setTextoOk(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
                 </div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{d.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{d.subtitulo}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="ap-grid">
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(460px, 60vh, 680px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <AlcanceScene
-                vista={modo}
-                modoColor={modoCol}
-                resetNonce={resetNonce}
-                origenNodo={origenDef.nodo}
-                eventosCascada={cascada?.eventos ?? null}
-                nonceCascada={nonceCascada}
-                audienciaCaso={caso.audiencia}
-                canales={canales}
-                accesos={accesos}
-                lanzada={lanzada}
-                nonceCampana={nonceCampana}
-                fuenteNodo={fuenteDef.nodo}
-                eventosRumor={rumor?.eventos ?? null}
-                nonceRumor={nonceRumor}
-              />
-            </SceneBoundary>
-
-            <div style={{ position: "absolute", top: 14, left: 16, right: 150, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, pointerEvents: "none" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)", maxWidth: "100%" }}>
-                <span className="ap-live-dot" style={{ ["--apd" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol, flexShrink: 0 }} />
-                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3, flexShrink: 0 }}>EN VIVO</span>
-                <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)", flexShrink: 0 }} />
-                <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", ...NUM }}>{chipVivo}</span>
               </div>
-            </div>
-
-            {modo !== "campana" && (
-              <div className="ap-leyenda">
-                {modo === "cascada" ? (
-                  <>
-                    <span><i style={{ background: "#3b4a60" }} />Aún no la ve</span>
-                    <span><i style={{ background: "#60a5fa" }} />La vio</span>
-                    <span><i style={{ background: "#fbbf24" }} />Reaccionó</span>
-                    <span><i style={{ background: OK }} />La compartió</span>
-                  </>
-                ) : (
-                  <>
-                    <span><i style={{ background: "#3b4a60" }} />Sin enterarse</span>
-                    <span><i style={{ background: "#f43f5e" }} />Cree el rumor</span>
-                    <span><i style={{ background: "#22d3ee" }} />Recibió el dato</span>
-                    <span><i style={{ background: "#a78bfa" }} />Se corrigió</span>
-                  </>
-                )}
-              </div>
-            )}
-
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="ap-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría" aria-label="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="ap-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"} aria-label={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="ap-icobtn" onClick={reiniciar} title="Reiniciar" aria-label="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 132px 14px 18px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                {def.etq} — {def.subtitulo}
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6, ...NUM }}>{pie}</div>
-            </div>
-
-            <button className="ap-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-          </div>
-
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-              Controles — {def.etq}
-            </Eyebrow>
-            <div style={{ marginTop: 4 }}>{control}</div>
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-bullhorn" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>¿Publicar es comunicar?</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #c4b5fd55", background: "rgba(196,181,253,0.07)" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-people-arrows" style={{ marginRight: 8, color: "#c4b5fd" }} />
-              Simulación A2
-            </Eyebrow>
-            <div style={{ fontSize: 13, color: "#fff", fontWeight: 800, lineHeight: 1.4, marginBottom: 10 }}>{SIMULACION_A2.titulo}</div>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55, marginBottom: 12 }}>{SIMULACION_A2.descripcion}</div>
-            <ol style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 7 }}>
-              {SIMULACION_A2.instrucciones.map((q, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
-                  {q}
-                </li>
-              ))}
-            </ol>
-            <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.45, marginTop: 10, fontStyle: "italic" }}>
-              En el modo Campaña comunitaria practicas los pasos 1, 2 y 4 y la accesibilidad; el mensaje (paso 3) y los obstáculos (paso 5) se trabajan en la actividad.
-            </div>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />
-              Cómo usar el laboratorio
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-                Objetivos de la sesión
-              </Eyebrow>
-              <span className="ap-conteo" style={{ fontSize: 11, fontWeight: 800, color: objetivos.every((o) => o.done) ? OK : T.text3 }}>
-                {objetivos.filter((o) => o.done).length}/{objetivos.length}
-              </span>
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} className="ap-objetivo" data-done={o.done} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ marginTop: 2, fontSize: 13, color: o.done ? OK : "rgba(255,255,255,0.22)" }} />
-                  <span style={{ fontSize: 12, color: o.done ? "#fff" : T.text2, lineHeight: 1.4 }}>{o.t}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="ap-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <div style={{ padding: "14px 16px", borderRadius: 12, border: `1px solid ${accent}33`, background: `rgba(${color.rgba},0.07)` }}>
-            <Eyebrow>
-              <i className="fa-solid fa-landmark" style={{ marginRight: 8, color: accent }} />
-              Propósito y contenidos de la progresión
-            </Eyebrow>
-            <div style={{ fontSize: 12.5, color: "#fff", fontWeight: 800, lineHeight: 1.5 }}>{PROPOSITO}</div>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55, marginTop: 8 }}>{CONTENIDOS_PROGRESION}</div>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-comments" style={{ marginRight: 8, color: accent }} />
-              Para reflexionar (simulación A2, reflexión A3 y video A8)
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {[...SIMULACION_A2.preguntas, REFLEXION_A3, VIDEO_A8.abierta].map((h, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
-                  {h}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />
-              Glosario (A5)
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {GLOSARIO.map((gi, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{gi.termino}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
-                  <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.4, marginTop: 4 }}>
-                    <i className="fa-solid fa-quote-left" style={{ marginRight: 6, color: accent }} />
-                    {gi.ejemplo}
+            </>
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="¿Publicar es comunicar?" icono="fa-bullhorn">
+                <p style={{ margin: 0, color: T.text2 }}>{PROBLEMA}</p>
+              </Bloque>
+              <Bloque titulo="Cómo usar el laboratorio" icono="fa-list-ol">
+                <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8 }}>
+                  {INSTRUCCIONES.map((p, i) => <li key={i}>{p}</li>)}
+                </ol>
+              </Bloque>
+              <Bloque titulo="Simulación A2" icono="fa-people-arrows">
+                <strong style={{ color: "#fff" }}>{SIMULACION_A2.titulo}</strong>
+                <p style={{ margin: 0, color: T.text2 }}>{SIMULACION_A2.descripcion}</p>
+                <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {SIMULACION_A2.instrucciones.map((q, i) => <li key={i}>{q}</li>)}
+                </ol>
+                <p style={{ margin: 0, color: T.text3, fontStyle: "italic" }}>
+                  En el modo Campaña comunitaria practicas los pasos 1, 2 y 4 y la accesibilidad; el mensaje (paso 3) y los obstáculos (paso 5) se trabajan en la actividad.
+                </p>
+              </Bloque>
+              <Bloque titulo="Propósito y contenidos" icono="fa-landmark">
+                <strong style={{ color: "#fff" }}>{PROPOSITO}</strong>
+                <p style={{ margin: 0, color: T.text2 }}>{CONTENIDOS_PROGRESION}</p>
+              </Bloque>
+              <Bloque titulo="Para reflexionar (A2, A3 y video A8)" icono="fa-comments">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {[...SIMULACION_A2.preguntas, REFLEXION_A3, VIDEO_A8.abierta].map((h, i) => <li key={i}>{h}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Glosario (A5)" icono="fa-book">
+                {GLOSARIO.map((gi, i) => (
+                  <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
+                    <span style={{ fontWeight: 900, color: accent }}>{gi.termino}. </span>
+                    <span style={{ color: T.text2 }}>{gi.definicion}</span>
+                    <div style={{ color: T.text3, marginTop: 4 }}>
+                      <i className="fa-solid fa-quote-left" style={{ marginRight: 6, color: accent }} />
+                      {gi.ejemplo}
+                    </div>
                   </div>
+                ))}
+                <p style={{ margin: 0, color: T.text2 }}>
+                  <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A5}
+                </p>
+              </Bloque>
+              <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {IDEAS.map((x, i) => <li key={i}>{x}</li>)}
+                </ul>
+                <div style={{ padding: "10px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}`, color: T.text2 }}>
+                  <strong style={{ color: T.text3 }}>Del video A8: </strong>«{VIDEO_A8.vf}»
                 </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11.5, color: T.text2, marginTop: 10, lineHeight: 1.5 }}>
-              <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A5}
-            </div>
-          </div>
-        </div>
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-            Ideas clave
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-            {IDEAS.map((x, i) => (
-              <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                {x}
-              </li>
-            ))}
-          </ul>
-          <div style={{ marginTop: 14, padding: "10px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-            <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, marginBottom: 4 }}>DEL VIDEO A8</div>
-            <div style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>«{VIDEO_A8.vf}»</div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          Son <strong>verbatim</strong> del material de la plataforma: el propósito y los contenidos de la progresión, la simulación A2 (su caso de robótica, instrucciones y preguntas), la reflexión A3, el verdadero o falso A4, el glosario A5, el
-          texto A6 y las preguntas del video A8. Es <strong>modelo ilustrativo</strong>: la red de 150 cuentas, la curva de conexión por hora, las probabilidades de ver, reaccionar y compartir, la cobertura de cada canal por grupo, el efecto de la
-          accesibilidad y de la pausa para verificar; los casos de dengue y de acopio son didácticos. Son <strong>datos reales</strong>: uso de internet 83.1 % (86.9 % urbano, 68.5 % rural; INEGI, ENDUTIH 2024), 6 179 890 personas con
-          discapacidad (INEGI, Censo 2020), el 70 % de ventaja de lo falso (Vosoughi, Roy y Aral, 2018), el límite de reenvíos de WhatsApp (2020) y el contraste 4.5:1 de WCAG 2.2. Fuente: {FUENTE}
-        </span>
-      </div>
-
-      <MetricaCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
-
-      <RetoQuizCard quiz={QUIZ_A4} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Sabes qué hace inclusivo y de calidad a un contenido." />
-
-      <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
-          Completa el texto (A6)
-        </Eyebrow>
-        <div style={{ marginTop: 12 }}>
-          <CompletaTexto data={HUECOS_A6} accent={accent} rgba={color.rgba} completado={textoOk} onCompletado={() => { setTextoOk(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
-        </div>
-      </div>
-
-      <div className="ap-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="ap-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="ap-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="ap-close" onClick={() => setDrawer(false)} title="Cerrar" aria-label="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="ap-drawer-body">
-          <FichaTeorica data={ALCANCE_PUBLICACION_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={ALCANCE_PUBLICACION_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ marginTop: 18, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
+                Son <strong>verbatim</strong> del material de la plataforma: el propósito y los contenidos de la progresión, la simulación A2, la reflexión A3, el verdadero o falso A4, el glosario A5, el texto A6 y las preguntas del video A8. Es <strong>modelo ilustrativo</strong>: la red de 150 cuentas, la curva de conexión por hora, las probabilidades de ver, reaccionar y compartir, la cobertura de cada canal por grupo y el efecto de la accesibilidad y de la pausa para verificar; los casos de dengue y de acopio son didácticos. Son <strong>datos reales</strong>: uso de internet 83.1 % (86.9 % urbano, 68.5 % rural; INEGI, ENDUTIH 2024), 6 179 890 personas con discapacidad (INEGI, Censo 2020), el 70 % de ventaja de lo falso (Vosoughi, Roy y Aral, 2018), el límite de reenvíos de WhatsApp (2020) y el contraste 4.5:1 de WCAG 2.2. Fuente: {FUENTE}
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }
 
+const CSS_AP = `
+  .ap-opts { display:flex; flex-wrap:wrap; gap:8px; }
+  .ap-opt { cursor:pointer; border:1px solid var(--apc); border-radius:10px; padding:10px 12px; font-size:14px; font-weight:800; color:#fff; background:transparent; transition:all .15s; text-align:left; }
+  .ap-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.72); }
+  .ap-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
+  .ap-opt:disabled { cursor:default; opacity:0.6; }
+  .ap-toggle { width:100%; cursor:pointer; border:1px solid var(--apc); border-radius:11px; padding:10px 13px; background:rgba(4,10,22,0.4); color:#fff; font-size:14px; font-weight:800; text-align:left; transition:all .15s; }
+  .ap-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
+  .ap-toggle:disabled { cursor:default; opacity:0.6; }
+  .ap-lanzar { width:100%; cursor:pointer; border:none; border-radius:12px; padding:13px 16px; background:var(--apc); color:#04121f; font-size:15px; font-weight:900; transition:all .15s; }
+  .ap-lanzar:hover:not(:disabled) { filter:brightness(1.1); }
+  .ap-lanzar:disabled { cursor:default; opacity:0.55; }
+  .ap-range { flex:1; accent-color: var(--apc); min-width:0; }
+  .ap-horas { display:flex; align-items:flex-end; gap:2px; height:26px; margin-top:6px; padding:0 2px; }
+  .ap-horas span { flex:1; border-radius:2px 2px 0 0; min-height:2px; }
+  .ap-input { width:110px; padding:9px 11px; border-radius:10px; border:1px solid; background:rgba(4,10,22,0.5); color:#fff; font-size:16px; font-weight:800; font-variant-numeric: tabular-nums; }
+  .ap-tabla-wrap { overflow-x:auto; }
+  .ap-tabla { width:100%; border-collapse:collapse; font-size:14px; font-variant-numeric: tabular-nums; }
+  .ap-tabla th { text-align:left; color:${T.text3}; font-weight:800; padding:5px 6px; border-bottom:1px solid ${T.line}; white-space:nowrap; }
+  .ap-tabla td { color:${T.text2}; padding:6px; border-bottom:1px solid rgba(255,255,255,0.05); }
+  .ap-serie { width:100%; height:auto; margin-top:12px; border-radius:10px; background:rgba(4,10,22,0.45); border:1px solid ${T.line}; }
+  .ap-opt:focus-visible, .ap-toggle:focus-visible, .ap-range:focus-visible, .ap-lanzar:focus-visible, .ap-input:focus-visible { outline:2px solid #fff; outline-offset:2px; }
+`;

@@ -20,7 +20,7 @@
 
 import * as THREE from "three";
 import { useEffect, useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
@@ -81,7 +81,14 @@ const NO = "#f87171";
 const OKC = "#34d399";
 const FONDO = "#050b17";
 
-function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number }) {
+/** Pantalla angosta (celular): los rótulos anchos se ocultan, esa información ya está en el panel. */
+function useAngosto() {
+  return useThree((st) => st.size.width) < 640;
+}
+
+function Etiqueta({ pos, children, df = 10, col, fs = 14, siempre = false }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number; siempre?: boolean }) {
+  const angosto = useAngosto();
+  if (angosto && !siempre) return null;
   return (
     <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
@@ -360,6 +367,7 @@ function Escalera({ pos, activa }: { pos: Pt; activa: Categoria | null }) {
 }
 
 function EscenaPasos({ exprId, elegidos, errorId, errorTexto, onElegir, modoColor }: { exprId: string; elegidos: string[]; errorId: string | null; errorTexto: string | null; onElegir: (id: string) => void; modoColor: string }) {
+  const angosto = useAngosto();
   const expr = EXPRESIONES.find((e) => e.id === exprId) ?? EXPRESIONES[0]!;
   const arbol0 = useMemo(() => leer(expr.texto), [expr.texto]);
   const pasos = useMemo(() => reproducir(arbol0, elegidos), [arbol0, elegidos]);
@@ -375,7 +383,7 @@ function EscenaPasos({ exprId, elegidos, errorId, errorTexto, onElegir, modoColo
   return (
     <group>
       <Escalera pos={[xEsc, -Math.min(alto / 2, 2.2) + 0.2, 0]} activa={ultimaCat} />
-      <Etiqueta pos={[xEsc + 2.9, -Math.min(alto / 2, 2.2) + 0.35, 0.6]} df={10} fs={11} col={`${modoColor}88`}>
+      <Etiqueta pos={[xEsc + 2.9, -Math.min(alto / 2, 2.2) + 0.35, 0.6]} df={10} fs={14} col={`${modoColor}88`}>
         <i className="fa-solid fa-stairs" style={{ color: modoColor }} />
         Escalera de la jerarquía
       </Etiqueta>
@@ -398,6 +406,7 @@ function EscenaPasos({ exprId, elegidos, errorId, errorTexto, onElegir, modoColo
         );
       })}
       {pasos.map((p, k) => {
+        const esUltimo = k === pasos.length - 1;
         const fa = fichasDe(p.antes).fichas;
         const fb = fichasDe(p.despues).fichas;
         const a0 = fa[p.tramo[0]]!;
@@ -409,16 +418,18 @@ function EscenaPasos({ exprId, elegidos, errorId, errorTexto, onElegir, modoColo
         return (
           <group key={`e-${exprId}-${k}`}>
             <Embudo x0={a0.x - a0.w / 2} x1={a1.x + a1.w / 2} yA={yA} rx0={r.x - r.w / 2} rx1={r.x + r.w / 2} yB={yB} color={col} />
+            {esUltimo && !angosto && (
             <Html position={[anchoMax / 2 + 0.55, (yA + yB) / 2, 0]} distanceFactor={10} zIndexRange={[14, 0]} style={{ pointerEvents: "none" }}>
-              <div style={{ transform: "translateY(-50%)", display: "flex", alignItems: "center", gap: 7, padding: "4px 10px", borderRadius: 9, background: "rgba(4,10,22,0.82)", border: `1px solid ${col}99`, color: "#fff", fontSize: 13, fontWeight: 800, whiteSpace: "nowrap" }}>
+              <div style={{ transform: "translateY(-50%)", display: "flex", alignItems: "center", gap: 7, padding: "4px 10px", borderRadius: 9, background: "rgba(4,10,22,0.82)", border: `1px solid ${col}99`, color: "#fff", fontSize: 14, fontWeight: 800, whiteSpace: "nowrap" }}>
                 <span style={{ width: 18, height: 18, borderRadius: 5, background: col, color: "#0b1220", fontSize: 11, fontWeight: 900, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>{k + 1}</span>
                 {p.texto}
               </div>
             </Html>
+            )}
           </group>
         );
       })}
-      {errorId && errorTexto && !terminado && (
+      {errorId && errorTexto && !terminado && !angosto && (
         <Html position={[0, y0 - (filas.length - 1) * FILA_H - FILA_H * 0.95, 0.2]} center distanceFactor={10} zIndexRange={[22, 0]} style={{ pointerEvents: "none" }}>
           <div style={{ padding: "7px 14px", borderRadius: 11, background: "rgba(69,10,10,0.9)", border: `1.5px dashed ${NO}`, color: "#fecaca", fontSize: 15, fontWeight: 900, whiteSpace: "nowrap", boxShadow: "0 8px 22px -10px #000" }}>
             <i className="fa-solid fa-xmark" style={{ marginRight: 8, color: NO }} />
@@ -427,13 +438,13 @@ function EscenaPasos({ exprId, elegidos, errorId, errorTexto, onElegir, modoColo
         </Html>
       )}
       {terminado && (
-        <Etiqueta pos={[0, y0 - (filas.length - 1) * FILA_H - 0.78, 0.3]} df={10} fs={13} col={`${OKC}aa`}>
+        <Etiqueta siempre pos={[0, y0 - (filas.length - 1) * FILA_H - 0.78, 0.3]} df={10} fs={14} col={`${OKC}aa`}>
           <i className="fa-solid fa-circle-check" style={{ color: OKC }} />
           Resultado en {pasos.length} {pasos.length === 1 ? "paso" : "pasos"}
         </Etiqueta>
       )}
       {!terminado && !errorId && (
-        <Etiqueta pos={[0, y0 - (filas.length - 1) * FILA_H + 0.72, 0.2]} df={10} fs={11} col={`${modoColor}88`}>
+        <Etiqueta pos={[0, y0 - (filas.length - 1) * FILA_H + 0.72, 0.2]} df={10} fs={14} col={`${modoColor}88`}>
           <i className="fa-solid fa-hand-pointer" style={{ color: modoColor }} />
           ¿Qué operación va primero?
         </Etiqueta>
@@ -644,7 +655,7 @@ function EscenaArbolPasos({ exprId, elegidos, onElegir, modoColor }: { exprId: s
   return (
     <group>
       <ArbolVista arbol={actual} pos={[0, -alto / 2 - 0.2, 0]} clave={exprId} onElegir={onElegir} />
-      <Etiqueta pos={[0, -alto / 2 - 1.05, 0.3]} df={10} fs={12} col={`${modoColor}88`}>
+      <Etiqueta pos={[0, -alto / 2 - 1.05, 0.3]} df={10} fs={14} col={`${modoColor}88`}>
         <i className="fa-solid fa-diagram-project" style={{ color: modoColor }} />
         {actual.k === "num" ? `Resultado: ${fmtQ(actual.v, actual.dec)}` : "Cada operación espera a que sus dos lados sean números"}
       </Etiqueta>
@@ -792,11 +803,11 @@ function EscenaRazon({ casoId, pasoAuto, revelado }: { casoId: string; pasoAuto:
             {revelado ? (
               <ArbolVista arbol={l.arbol} pos={[0, -0.6, -0.2]} escala={escala} siguienteId={l.sig} clave={`${casoId}-${l.lado}-${repaso ? "r" : "a"}`} />
             ) : (
-              <Etiqueta pos={[0, 0.3, 0]} df={10} fs={30} col="rgba(251,146,60,0.5)">
+              <Etiqueta siempre pos={[0, 0.3, 0]} df={10} fs={30} col="rgba(251,146,60,0.5)">
                 ?
               </Etiqueta>
             )}
-            <Etiqueta pos={[0, revelado ? -0.6 + l.alto * escala + 0.75 : 1.6, 0]} df={10} fs={13} col={listo ? (bien ? `${OKC}aa` : `${NO}aa`) : "rgba(255,255,255,0.3)"}>
+            <Etiqueta siempre pos={[0, revelado ? -0.6 + l.alto * escala + 0.75 : 1.6, 0]} df={10} fs={14} col={listo ? (bien ? `${OKC}aa` : `${NO}aa`) : "rgba(255,255,255,0.3)"}>
               <i className={`fa-solid ${l.maq.aparato === "hoja" ? "fa-table" : l.maq.aparato === "cuaderno" ? "fa-book-open" : "fa-calculator"}`} style={{ color: "#fdba74" }} />
               {l.maq.etq}
               {listo && <i className={`fa-solid ${bien ? "fa-circle-check" : "fa-circle-xmark"}`} style={{ color: bien ? OKC : NO }} />}
@@ -804,18 +815,18 @@ function EscenaRazon({ casoId, pasoAuto, revelado }: { casoId: string; pasoAuto:
           </group>
         );
       })}
-      <Etiqueta pos={[0, 3.2, 0]} df={10} fs={15} col="#fb923caa">
+      <Etiqueta siempre pos={[0, 3.2, 0]} df={10} fs={15} col="#fb923caa">
         <i className="fa-solid fa-scale-unbalanced" style={{ color: "#fb923c" }} />
         {caso.expresion}
       </Etiqueta>
       {!revelado && (
-        <Etiqueta pos={[0, -0.6, 0.5]} df={10} fs={12} col="#fb923c88">
+        <Etiqueta pos={[0, -0.6, 0.5]} df={10} fs={14} col="#fb923c88">
           <i className="fa-solid fa-circle-question" style={{ color: "#fb923c" }} />
           Predice en el panel; después verás el árbol que arma cada una
         </Etiqueta>
       )}
       {repaso && (
-        <Etiqueta pos={[0, -0.9, 0.5]} df={10} fs={12} col="#fb923c88">
+        <Etiqueta pos={[0, -0.9, 0.5]} df={10} fs={14} col="#fb923c88">
           <i className="fa-solid fa-diagram-project" style={{ color: "#fb923c" }} />
           Mismos símbolos, árboles distintos
         </Etiqueta>
@@ -956,15 +967,15 @@ export default function JerarquiaOperacionesScene(p: JerarquiaSceneProps) {
       const ancho = fichasDe(a0).ancho + 7.6;
       const alto = n * FILA_H + 3.4;
       const dist = Math.max(8.2, ancho * 0.92, alto * 1.5);
-      return { pos: [-1.2, 0.5, dist] as Pt, target: [-1.2, -0.5, 0] as Pt };
+      return { pos: [-1.2, -0.1, dist] as Pt, target: [-1.2, -1.1, 0] as Pt };
     }
     if (vista === "pasos") {
       const lay = layoutArbol(a0);
       const dist = Math.max(8.5, lay.ancho * 1.25 + 3, lay.alto * 2.1 + 3);
-      return { pos: [0, 0.8, dist] as Pt, target: [0, 0, 0] as Pt };
+      return { pos: [0, 0.2, dist] as Pt, target: [0, -0.6, 0] as Pt };
     }
-    if (vista === "razon") return { pos: [0, 0.6, 13.2] as Pt, target: [0, -0.1, 0] as Pt };
-    return { pos: [0, 0.6, 12.2] as Pt, target: [0, -0.4, 0] as Pt };
+    if (vista === "razon") return { pos: [0, 0.0, 13.2] as Pt, target: [0, -0.7, 0] as Pt };
+    return { pos: [0, 0.0, 12.2] as Pt, target: [0, -1.0, 0] as Pt };
   }, [vista, p.verArbol, expr.texto]);
 
   return (

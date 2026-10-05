@@ -1,0 +1,12 @@
+{
+  "escena": "El museo comunitario de un pueblo ficticio con una línea del tiempo y la tarjeta «distribución de la tierra»",
+  "pregunta": "Cuelgas la distribución de la tierra de la Conquista, no del reparto agrario. ¿Qué pasa?",
+  "opciones": [
+    { "id": "a", "texto": "Sube igual: cualquier pasado sirve", "icono": "fa-arrow-trend-up" },
+    { "id": "b", "texto": "No se enciende; dice por qué", "icono": "fa-link-slash" },
+    { "id": "c", "texto": "La tarjeta desaparece del pueblo", "icono": "fa-eraser" }
+  ],
+  "correcta": "b",
+  "porque": "El sentido histórico no es culpar a cualquier pasado: cada situación se explica por el proceso que la formó. El museo rechaza el vínculo y señala qué fenómeno sí explica esa raíz.",
+  "comoComprobarlo": "Toca la tarjeta de la tierra y luego el número de la Conquista; después prueba con el proceso posterior a la Revolución y compara el medidor."
+}

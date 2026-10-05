@@ -1,0 +1,12 @@
+{
+  "slug": "mexico-en-el-mundo",
+  "items": [
+    { "clave": "reforma-puerto", "formato": "16:9", "estilo": "ilustracion", "escena": "Puerto del siglo XIX al amanecer con varios buques de vela y vapor anclados frente a un muelle de piedra, estibadores moviendo cajas de madera y una neblina ligera sobre el agua" },
+    { "clave": "porfiriato-tren", "formato": "16:9", "estilo": "ilustracion", "escena": "Locomotora de vapor del siglo XIX avanzando por una vía recién tendida en un valle árido con cactus, obreros con sombrero colocando durmientes y una columna de humo blanco" },
+    { "clave": "revolucion-telegrafo", "formato": "16:9", "estilo": "ilustracion", "escena": "Oficina de telégrafos de 1917 con un operador sentado ante un aparato de manivela, tiras de papel cayendo sobre el escritorio y cables saliendo por una ventana alta" },
+    { "clave": "milagro-obras", "formato": "16:9", "estilo": "foto", "escena": "Obras de una avenida ancha de concreto en una ciudad de mediados del siglo XX, grúas, andamios de madera, camiones de volteo y edificios modernistas a medio construir bajo un cielo despejado" },
+    { "clave": "deuda-mesa", "formato": "16:9", "estilo": "foto", "escena": "Sala de juntas con una larga mesa de madera cubierta de carpetas cerradas y vasos de agua, sillas vacías alrededor y una ventana grande con rascacielos al fondo" },
+    { "clave": "tlcan-frontera", "formato": "16:9", "estilo": "foto", "escena": "Fila de tráileres de carga esperando en un cruce fronterizo por carretera, casetas de revisión sin letreros, camiones con cajas blancas y una llanura seca al atardecer" },
+    { "clave": "tmec-nave", "formato": "16:9", "estilo": "foto", "escena": "Interior de una nave industrial moderna con brazos robóticos ensamblando piezas metálicas, operarios con casco y chaleco observando y contenedores apilados al fondo" }
+  ]
+}

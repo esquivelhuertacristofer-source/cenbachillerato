@@ -22,6 +22,8 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, NUM, OK, card, Eyebrow, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, BotonHerramienta } from "./_shell";
+import type { ObjetivoLab } from "./_objetivos";
 import { hablarLab, callarLab, puedeHablarLab } from "./lab-voz";
 import { FichaTeorica } from "./_ficha";
 import { CompletaTexto } from "./_mecanica-huecos";
@@ -88,7 +90,7 @@ const RutinaScene = dynamic(() => import("./RutinaDiariaInglesScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-sun fa-fade" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Cargando el barrio de Ana en 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Cargando el barrio de Ana en 3D…</span>
     </div>
   ),
 });
@@ -153,16 +155,16 @@ function TiempoCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: str
           Present Simple or Present Continuous? (A10)
         </Eyebrow>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 10.5, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
           {[1, 2, 3].map((k) => (
-            <i key={k} className="fa-solid fa-star" style={{ fontSize: 13, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
+            <i key={k} className="fa-solid fa-star" style={{ fontSize: 14, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
           ))}
         </div>
       </div>
-      <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5, marginBottom: 12 }}>{INSTRUCCIONES_A10}</div>
+      <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5, marginBottom: 12 }}>{INSTRUCCIONES_A10}</div>
       {resuelto === null ? (
         <>
-          <div style={{ fontSize: 11, color: T.text3, fontWeight: 800, marginBottom: 6 }}>
+          <div style={{ fontSize: 14, color: T.text3, fontWeight: 800, marginBottom: 6 }}>
             Oración {pos + 1} de {ronda.length} · ¿rutina o algo que pasa ahora?
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
@@ -172,15 +174,15 @@ function TiempoCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: str
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {CATEGORIAS_A10.map((c, k) => (
               <button key={c.nombre} className="rd-opt rd-a10" data-on="true" onClick={() => responder(c.nombre)} style={{ ["--rdc" as string]: k === 0 ? OK : "#38bdf8", textAlign: "left" }}>
-                <div style={{ fontSize: 12.5 }}>
+                <div style={{ fontSize: 14 }}>
                   <i className={`fa-solid ${k === 0 ? "fa-repeat" : "fa-person-running"}`} style={{ marginRight: 8 }} />
                   {c.nombre}
                 </div>
-                <div style={{ fontSize: 10.5, color: T.text3, fontWeight: 700, marginTop: 3 }}>{c.descripcion}</div>
+                <div style={{ fontSize: 14, color: T.text3, fontWeight: 700, marginTop: 3 }}>{c.descripcion}</div>
               </button>
             ))}
           </div>
-          {aviso && <div style={{ marginTop: 10, fontSize: 12, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
+          {aviso && <div style={{ marginTop: 10, fontSize: 14, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
         </>
       ) : (
         <div style={{ padding: "12px 14px", borderRadius: 11, border: `1px solid ${OK}55`, background: "rgba(52,211,153,0.08)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
@@ -188,9 +190,9 @@ function TiempoCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: str
             {[1, 2, 3].map((k) => (
               <i key={k} className="fa-solid fa-star" style={{ fontSize: 15, color: k <= resuelto ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
             ))}
-            <span style={{ fontSize: 12.5, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
+            <span style={{ fontSize: 14, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
           </span>
-          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 12.5, fontWeight: 900 }}>
+          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 14, fontWeight: 900 }}>
             <i className="fa-solid fa-shuffle" style={{ marginRight: 8 }} />
             Otra ronda
           </button>
@@ -223,10 +225,10 @@ function TuTurnoCard({ accent, logrado, onLogrado, playSfx }: { accent: string; 
         <i className="fa-solid fa-pen-nib" style={{ marginRight: 8, color: accent }} />
         Tu turno: Writing About My Daily Routine (A3)
       </Eyebrow>
-      <div style={{ fontSize: 13, color: "#fff", fontWeight: 700, lineHeight: 1.5 }}>{A3.prompt}</div>
+      <div style={{ fontSize: 14, color: "#fff", fontWeight: 700, lineHeight: 1.5 }}>{A3.prompt}</div>
       <ul style={{ margin: "8px 0 12px", paddingLeft: 18, display: "grid", gap: 3 }}>
         {A3.pistas.map((p) => (
-          <li key={p} style={{ fontSize: 12, color: T.text2 }}>
+          <li key={p} style={{ fontSize: 14, color: T.text2 }}>
             {p}
           </li>
         ))}
@@ -245,7 +247,7 @@ function TuTurnoCard({ accent, logrado, onLogrado, playSfx }: { accent: string; 
       />
       <div style={{ display: "grid", gap: 5, marginTop: 10 }}>
         {criterios.map((c) => (
-          <div key={c.t} style={{ display: "flex", gap: 8, alignItems: "flex-start", fontSize: 12, color: c.ok ? OK : revisado ? WARN : T.text2, lineHeight: 1.4 }}>
+          <div key={c.t} style={{ display: "flex", gap: 8, alignItems: "flex-start", fontSize: 14, color: c.ok ? OK : revisado ? WARN : T.text2, lineHeight: 1.4 }}>
             <i className={`fa-solid ${c.ok ? "fa-circle-check" : revisado ? "fa-circle-exclamation" : "fa-circle"}`} style={{ marginTop: 2 }} />
             {c.t}
           </div>
@@ -256,9 +258,9 @@ function TuTurnoCard({ accent, logrado, onLogrado, playSfx }: { accent: string; 
           <i className="fa-solid fa-spell-check" style={{ marginRight: 8 }} />
           Revisar mi texto
         </button>
-        {revisado && <span style={{ fontSize: 12, color: todo ? OK : WARN, fontWeight: 800 }}>{todo ? "¡Listo! Tu texto cumple los criterios que se pueden revisar automáticamente." : "Todavía falta algo: revisa los puntos en naranja."}</span>}
+        {revisado && <span style={{ fontSize: 14, color: todo ? OK : WARN, fontWeight: 800 }}>{todo ? "¡Listo! Tu texto cumple los criterios que se pueden revisar automáticamente." : "Todavía falta algo: revisa los puntos en naranja."}</span>}
       </div>
-      <div style={{ fontSize: 11, color: T.text3, marginTop: 10, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text3, marginTop: 10, lineHeight: 1.5 }}>
         Criterios de la actividad: {A3.criterios.join(" · ")}. La revisión automática es orientativa: cuenta palabras, horas y adverbios, y detecta «I + verbo con -s»; tu docente evalúa la claridad y el contenido.
       </div>
     </div>
@@ -283,6 +285,8 @@ export function LabRutinaDiariaIngles({ color }: PracticaLabProps) {
   const [avanzando, setAvanzando] = useState(false);
   const [logroOrden, setLogroOrden] = useState(false);
   const [logroNarrado, setLogroNarrado] = useState(false);
+  const [intentoMal, setIntentoMal] = useState<string | null>(null);
+  const [vioError, setVioError] = useState(false);
   const genDia = useRef(0);
 
   // ── What time…?
@@ -318,7 +322,6 @@ export function LabRutinaDiariaIngles({ color }: PracticaLabProps) {
 
   // ── Comunes
   const [resetNonce, setResetNonce] = useState(0);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   const timers = useRef<number[]>([]);
@@ -403,6 +406,7 @@ export function LabRutinaDiariaIngles({ color }: PracticaLabProps) {
       return nx;
     });
     if (revs) setRevs((rs) => (rs ? rs.map((r, i) => (i === k ? null : r)) : rs));
+    setIntentoMal(null);
   };
 
   const comprobarVerbos = () => {
@@ -411,7 +415,13 @@ export function LabRutinaDiariaIngles({ color }: PracticaLabProps) {
     const ok = r.every((x) => x === null);
     setRevs(r);
     sfx(ok);
-    if (!ok) return;
+    if (!ok) {
+      // La forma equivocada se VE: Ana dice justo lo que escribiste, en rojo, y niega con la cabeza.
+      setIntentoMal(accion.partes.map((parte, i) => parte + (i < accion.huecos.length ? (escritos[i]?.trim() || "…") : "")).join(""));
+      setVioError(true);
+      return;
+    }
+    setIntentoMal(null);
     setBurbuja(oracionCompleta(accion));
     setAvanzando(true);
     const gen = genDia.current;
@@ -435,6 +445,7 @@ export function LabRutinaDiariaIngles({ color }: PracticaLabProps) {
     setEscritos([]);
     setRevs(null);
     setBurbuja(null);
+    setIntentoMal(null);
     setAvanzando(false);
   };
 
@@ -577,19 +588,21 @@ export function LabRutinaDiariaIngles({ color }: PracticaLabProps) {
   };
 
   /* ── Objetivos ─────────────────────────────────────────────────────── */
-  const objetivos: { t: string; done: boolean }[] = [
-    { t: "Ordenar las 9 acciones del día de Ana como en la lectura A1", done: logroOrden },
-    { t: "Narrar el día completo escribiendo cada verbo en Present Simple", done: logroNarrado },
-    { t: "Elegir do o does en las cinco preguntas «What time…?»", done: auxOk.size === PREGUNTAS_HORA.length },
-    { t: "Poner el reloj (hora y a.m. / p.m.) para las cinco respuestas", done: relojOk.size === PREGUNTAS_HORA.length },
-    { t: "Decir con palabras las cinco horas que marca el reloj", done: decirOk.size === DECIR_HORA.length },
-    { t: "Decir una hora con «to» (cuánto falta para la hora siguiente)", done: usoTo },
-    { t: "Contar los días y armar la oración de frecuencia de los siete hábitos", done: frecOk.size === HABITOS.length },
-    { t: "Colocar el adverbio después de «is» (she is never late)", done: beOk },
-    { t: "Clasificar las oraciones de A10 y ganar estrellas", done: identifico },
-    { t: "Aprobar el verdadero o falso (A4)", done: quizA4 },
-    { t: "Completar los textos A2 y A6", done: textoA2 && textoA6 },
-    { t: "Escribir tu propia rutina (A3) y pasar la revisión", done: a3Ok },
+  const objetivos: ObjetivoLab[] = [
+    { txt: "Ordenar las 9 acciones del día de Ana como en la lectura A1", done: logroOrden },
+    // Misión nueva (experimento central): equivocar la forma a propósito y ver la reacción de Ana.
+    { txt: "Escribe un verbo mal a propósito (ej. «she wake up») y mira cómo reacciona Ana", done: vioError || logroNarrado },
+    { txt: "Narrar el día completo escribiendo cada verbo en Present Simple", done: logroNarrado },
+    { txt: "Elegir do o does en las cinco preguntas «What time…?»", done: auxOk.size === PREGUNTAS_HORA.length },
+    { txt: "Poner el reloj (hora y a.m. / p.m.) para las cinco respuestas", done: relojOk.size === PREGUNTAS_HORA.length },
+    { txt: "Decir con palabras las cinco horas que marca el reloj", done: decirOk.size === DECIR_HORA.length },
+    { txt: "Decir una hora con «to» (cuánto falta para la hora siguiente)", done: usoTo },
+    { txt: "Contar los días y armar la oración de frecuencia de los siete hábitos", done: frecOk.size === HABITOS.length },
+    { txt: "Colocar el adverbio después de «is» (she is never late)", done: beOk },
+    { txt: "Clasificar las oraciones de A10 y ganar estrellas", done: identifico },
+    { txt: "Aprobar el verdadero o falso (A4)", done: quizA4 },
+    { txt: "Completar los textos A2 y A6", done: textoA2 && textoA6 },
+    { txt: "Escribir tu propia rutina (A3) y pasar la revisión", done: a3Ok },
   ];
 
   /* ── Visor ─────────────────────────────────────────────────────────── */
@@ -636,13 +649,13 @@ export function LabRutinaDiariaIngles({ color }: PracticaLabProps) {
         <i className={`fa-solid ${def.icono}`} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{def.etq}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y la retroalimentación siguen aquí. {typeof pie === "string" ? pie : ""}</div>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y la retroalimentación siguen aquí. {typeof pie === "string" ? pie : ""}</div>
     </div>
   );
 
-  const sub = (txt: string) => <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
+  const sub = (txt: string) => <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
   const nota = (txt: ReactNode, col: string, icono = "fa-circle-info") => (
-    <div style={{ marginTop: 10, fontSize: 12, lineHeight: 1.55, color: col }}>
+    <div style={{ marginTop: 10, fontSize: 14, lineHeight: 1.55, color: col }}>
       <i className={`fa-solid ${icono}`} style={{ marginRight: 7 }} />
       {txt}
     </div>
@@ -678,7 +691,7 @@ export function LabRutinaDiariaIngles({ color }: PracticaLabProps) {
                     {horaDigital(accion.min)}
                     {accion.horaA1 ? " · hora de la lectura A1" : " · hora ilustrativa"}
                   </span>
-                  <span style={{ fontSize: 11.5, color: T.text3 }}>{accion.es}</span>
+                  <span style={{ fontSize: 14, color: T.text3 }}>{accion.es}</span>
                 </div>
                 <div style={{ fontSize: 16, color: "#fff", fontWeight: 700, lineHeight: 2.3 }}>
                   {accion.partes.map((parte, i) => (
@@ -703,7 +716,7 @@ export function LabRutinaDiariaIngles({ color }: PracticaLabProps) {
                             spellCheck={false}
                             style={{ width: Math.max(96, accion.huecos[i]!.base.length * 12 + 40) }}
                           />
-                          <span style={{ fontSize: 12, color: T.text3, margin: "0 4px" }}>({accion.huecos[i]!.base})</span>
+                          <span style={{ fontSize: 14, color: T.text3, margin: "0 4px" }}>({accion.huecos[i]!.base})</span>
                         </span>
                       )}
                     </span>
@@ -723,7 +736,7 @@ export function LabRutinaDiariaIngles({ color }: PracticaLabProps) {
               <div style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(52,211,153,0.07)", border: `1px solid ${OK}55` }}>
                 <div style={{ display: "grid", gap: 4 }}>
                   {ACCIONES.map((a) => (
-                    <div key={a.id} style={{ fontSize: 13, color: "#fff", lineHeight: 1.45 }}>
+                    <div key={a.id} style={{ fontSize: 14, color: "#fff", lineHeight: 1.45 }}>
                       <span style={{ color: T.text3, display: "inline-block", width: 78, ...NUM }}>{horaDigital(a.min)}</span>
                       {oracionCompleta(a)}
                     </div>
@@ -827,7 +840,7 @@ export function LabRutinaDiariaIngles({ color }: PracticaLabProps) {
                   Comprobar el reloj
                 </button>
               </div>
-              <div style={{ fontSize: 11, color: T.text3, marginTop: 8 }}>También puedes arrastrar el minutero azul directamente sobre el reloj 3D.</div>
+              <div style={{ fontSize: 14, color: T.text3, marginTop: 8 }}>También puedes arrastrar el minutero azul directamente sobre el reloj 3D.</div>
               {relojRes && nota(relojRes.msg, relojRes.ok ? OK : WARN, relojRes.ok ? "fa-circle-check" : "fa-lightbulb")}
               {relojRes?.ok && qIdx < PREGUNTAS_HORA.length - 1 && (
                 <div className="rd-opts" style={{ marginTop: 10 }}>
@@ -931,7 +944,7 @@ export function LabRutinaDiariaIngles({ color }: PracticaLabProps) {
                 </button>
               ))
             ) : (
-              <span style={{ fontSize: 12.5, color: T.text3 }}>Tu oración aparece aquí y en el pizarrón 3D. Toca una ficha colocada para quitarla.</span>
+              <span style={{ fontSize: 14, color: T.text3 }}>Tu oración aparece aquí y en el pizarrón 3D. Toca una ficha colocada para quitarla.</span>
             )}
           </div>
           <div className="rd-opts rd-banco" style={{ marginTop: 10 }}>
@@ -966,53 +979,41 @@ export function LabRutinaDiariaIngles({ color }: PracticaLabProps) {
           {!frecResuelta && frecOk.has(hab.id) && nota("Ya resolviste este hábito; puedes armarlo de otra forma válida.", T.text3)}
         </div>
         <div style={{ marginTop: 14, padding: "10px 12px", borderRadius: 10, background: "rgba(4,10,22,0.45)", border: `1px solid ${T.line}` }}>
-          <div style={{ fontSize: 10, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", marginBottom: 4 }}>LECTURA IN-III-P04-A1</div>
+          <div style={{ fontSize: 14, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", marginBottom: 4 }}>LECTURA IN-III-P04-A1</div>
           {POSICION_IN3.map((l) => (
-            <div key={l} style={{ fontSize: 12, color: T.text2, lineHeight: 1.5 }}>
+            <div key={l} style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
               {l}
             </div>
           ))}
-          <div style={{ fontSize: 11.5, color: T.text3, marginTop: 4 }}>{ESCALA.map((e) => `${e.adv} (${e.es}) ${e.pct} %`).join(" · ")}</div>
+          <div style={{ fontSize: 14, color: T.text3, marginTop: 4 }}>{ESCALA.map((e) => `${e.adv} (${e.es}) ${e.pct} %`).join(" · ")}</div>
         </div>
       </>
     );
   }
 
   return (
-    <div style={{ color: T.text }}>
+    <>
       <style>{`
-        @keyframes rdPulse { 0%,100%{ box-shadow:0 0 0 0 var(--rdd); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .rd-live-dot { animation: rdPulse 1.6s ease-in-out infinite; }
         @keyframes rdShake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);} }
-        @media (prefers-reduced-motion: reduce){ .rd-live-dot { animation:none; } .rd-in[data-e="mal"], .rd-linea[data-e="mal"] { animation:none !important; } }
-        .rd-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .rd-grid { grid-template-columns: 1fr; } }
-        .rd-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .rd-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .rd-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .rd-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .rd-tab { cursor:pointer; border:1px solid var(--rdc); border-radius:12px; padding:11px 8px; text-align:center; background:transparent; transition:all .15s; color:#fff; }
-        .rd-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
-        .rd-tab:hover { background:rgba(255,255,255,0.06); }
-        .rd-opts { display:flex; flex-wrap:wrap; gap:7px; align-items:center; }
-        .rd-opt { cursor:pointer; border:1px solid var(--rdc); border-radius:10px; padding:9px 12px; font-size:12px; font-weight:800; color:#fff; background:transparent; transition:all .15s; }
+        @media (prefers-reduced-motion: reduce){ .rd-in[data-e="mal"], .rd-linea[data-e="mal"] { animation:none !important; } }
+        .rd-opts { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+        .rd-opt { cursor:pointer; border:1px solid var(--rdc); border-radius:10px; padding:9px 12px; font-size:14px; font-weight:800; color:#fff; background:transparent; transition:all .15s; }
         .rd-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.78); }
         .rd-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
         .rd-opt:disabled { cursor:default; }
         .rd-opt:disabled[data-on="false"] { opacity:0.55; }
-        .rd-escuchar { cursor:pointer; border:1px solid var(--rdc); border-radius:999px; padding:5px 11px; font-size:11px; font-weight:800; color:#fff; background:rgba(4,10,22,0.45); transition:all .15s; }
+        .rd-escuchar { cursor:pointer; border:1px solid var(--rdc); border-radius:999px; padding:6px 12px; font-size:14px; font-weight:800; color:#fff; background:rgba(4,10,22,0.45); transition:all .15s; }
         .rd-escuchar:hover { background:rgba(255,255,255,0.08); }
-        .rd-pill { display:inline-flex; align-items:center; padding:4px 10px; border-radius:999px; border:1px solid var(--rdc); color:#fff; font-size:11.5px; font-weight:800; font-variant-numeric:tabular-nums; }
-        .rd-in { border-radius:9px; border:1.5px solid ${T.lineStrong}; background:${T.inset}; color:#fff; font-size:15px; font-weight:700; padding:5px 10px; font-family:inherit; outline:none; transition:all .15s; }
+        .rd-pill { display:inline-flex; align-items:center; padding:4px 10px; border-radius:999px; border:1px solid var(--rdc); color:#fff; font-size:14px; font-weight:800; font-variant-numeric:tabular-nums; }
+        .rd-in { border-radius:9px; border:1.5px solid ${T.lineStrong}; background:${T.inset}; color:#fff; font-size:15px; font-weight:700; padding:5px 10px; font-family:inherit; outline:none; transition:all .15s; max-width:100%; }
         .rd-in:focus { border-color:${accent}; box-shadow:0 0 0 3px rgba(${color.rgba},0.18); }
         .rd-in[data-e="bien"] { border-color:${OK}; background:${OK}1a; color:${OK}; }
         .rd-in[data-e="mal"] { border-color:${WARN}; background:${WARN}14; animation:rdShake .35s; }
-        .rd-range { flex:1; accent-color: var(--rdc); }
-        .rd-linea { min-height:48px; display:flex; flex-wrap:wrap; gap:7px; align-items:center; padding:9px 11px; border-radius:12px; border:1.5px dashed rgba(255,255,255,0.2); background:rgba(4,10,22,0.45); }
+        .rd-range { flex:1; min-width:0; accent-color: var(--rdc); }
+        .rd-linea { min-height:48px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:9px 11px; border-radius:12px; border:1.5px dashed rgba(255,255,255,0.2); background:rgba(4,10,22,0.45); }
         .rd-linea[data-e="bien"] { border-style:solid; border-color:${OK}; }
         .rd-linea[data-e="mal"] { border-style:solid; border-color:${WARN}; animation:rdShake .35s; }
-        .rd-ficha { cursor:pointer; border:1.5px solid rgba(255,255,255,0.22); border-radius:9px; padding:7px 11px; font-size:13px; font-weight:800; color:#fff; background:rgba(255,255,255,0.05); transition:all .14s; }
+        .rd-ficha { cursor:pointer; border:1.5px solid rgba(255,255,255,0.22); border-radius:9px; padding:7px 11px; font-size:14px; font-weight:800; color:#fff; background:rgba(255,255,255,0.05); transition:all .14s; }
         .rd-ficha[data-adv="true"] { border-color:#a78bfa88; color:#ddd6fe; }
         .rd-ficha:hover:not(:disabled) { border-color:${accent}; background:rgba(${color.rgba},0.14); }
         .rd-ficha:disabled { opacity:0.3; cursor:default; }
@@ -1020,291 +1021,196 @@ export function LabRutinaDiariaIngles({ color }: PracticaLabProps) {
         .rd-puesta:disabled { opacity:1; }
         .rd-area { width:100%; box-sizing:border-box; border-radius:12px; border:1.5px solid ${T.lineStrong}; background:${T.inset}; color:#fff; font-size:14px; line-height:1.55; padding:12px 14px; font-family:inherit; outline:none; resize:vertical; }
         .rd-area:focus { border-color:var(--rdc); }
-        .rd-opt:focus-visible, .rd-tab:focus-visible, .rd-icobtn:focus-visible, .rd-range:focus-visible, .rd-ficha:focus-visible, .rd-escuchar:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
-        @media (max-width: 1000px){ .rd-bottom { grid-template-columns: 1fr !important; } }
-        .rd-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .rd-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .rd-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61; background:linear-gradient(180deg,#06121e 0%,#040a16 100%);
-          border-left:1px solid rgba(${color.rgba},0.32); box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1); display:flex; flex-direction:column; }
-        .rd-drawer[data-open="true"] { transform:translateX(0); }
-        .rd-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .rd-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .rd-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .rd-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .rd-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:11px 16px; border-radius:999px;
-          border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800; background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
-        .rd-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        .rd-guia summary { cursor:pointer; color:${accent}; font-size:11.5px; font-weight:800; }
+        .rd-opt:focus-visible, .rd-ficha:focus-visible, .rd-escuchar:focus-visible, .rd-range:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
+        .rd-guia summary { cursor:pointer; color:${accent}; font-size:14px; font-weight:800; }
       `}</style>
+      <LabShell
+        accent={accent}
+        rgba={color.rgba}
+        retoKey={RETO_KEY}
+        escena={
+          <SceneBoundary fallback={sceneFallback}>
+            <RutinaScene
+              vista={vista}
+              modoColor={modoCol}
+              resetNonce={resetNonce}
+              colocados={orden.length}
+              paso={paso}
+              burbuja={burbuja ?? intentoMal}
+              burbujaMal={!burbuja && !!intentoMal}
+              relojMin={modo === "hora" && subHora === "decir" ? d.min % 720 : reloj}
+              pm={modo === "hora" && subHora === "decir" ? d.min >= 720 : pm}
+              pregunta={subHora === "preguntar" ? preguntaTxt : horaRes?.ok ? "Thanks!" : "What time is it?"}
+              respuesta={subHora === "preguntar" ? (auxResuelto ? q.respuesta : null) : horaRes?.ok ? `It's ${horaTxt.trim().replace(/^(it'?s|it is)\s+/i, "").replace(/[.!]+$/, "")}.` : null}
+              contexto={subHora === "decir" ? d.contexto.replace(" What time is it?", "") : null}
+              contextoIcono={subHora === "decir" ? (["fa-shower", "fa-mug-hot", "fa-school", "fa-book", "fa-tv"][dIdx] ?? null) : null}
+              mostrarDigital={subHora === "preguntar" ? !!relojRes?.ok : !!horaRes?.ok}
+              arrastrable={modo === "hora" && subHora === "preguntar" && auxResuelto}
+              onMinuto={alArrastrar}
+              habitoIdx={habIdx}
+              contado={contado}
+              oracion={oracion}
+              estadoOracion={revFrec ? (revFrec.length ? "mal" : "ok") : null}
+              adverbio={advElegido}
+              hechosFrec={[...frecOk]}
+            />
+          </SceneBoundary>
+        }
+        modos={{
+          opciones: MODOS.map((m) => ({ id: m, etiqueta: MODOS_DEF[m].etq, icono: MODOS_DEF[m].icono })),
+          valor: modo,
+          cambiar: (id) => cambiarModo(id as Modo),
+        }}
+        herramientas={
+          <>
+            <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+            <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+          </>
+        }
+        leyenda={
+          <>
+            <span style={{ color: "#fff", fontWeight: 800 }}>
+              <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 8 }} />
+              {def.etq}
+            </span>
+            <span style={{ color: T.text2 }}>{def.subtitulo}</span>
+          </>
+        }
+        lectura={chipVivo}
+        objetivos={objetivos}
+        pestanas={[
+          {
+            id: "controles",
+            etiqueta: "Cuaderno",
+            icono: "fa-pen",
+            contenido: (
+              <>
+                <Bloque titulo={`${def.etq} · lo que pasa`} icono={def.icono}>
+                  <div style={{ ...NUM, color: "#e6eefb", lineHeight: 1.5, padding: "10px 12px", borderRadius: 12, border: `1px solid ${modoCol}55`, background: `${modoCol}12` }}>{pie}</div>
+                </Bloque>
+                <Bloque titulo="Controles" icono="fa-sliders">
+                  {control}
+                </Bloque>
+              </>
+            ),
+          },
+          {
+            id: "reto",
+            etiqueta: "Reto",
+            icono: "fa-trophy",
+            contenido: (
+              <>
+                <TiempoCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
 
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="rd-tabs">
-          {MODOS.map((m) => {
-            const dd = MODOS_DEF[m];
-            const col = `#${dd.color.replace("#", "")}`;
-            const on = m === modo;
-            return (
-              <button key={m} className="rd-tab" data-on={on} onClick={() => cambiarModo(m)} style={{ ["--rdc" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? col : "inherit" }}>
-                  <i className={`fa-solid ${dd.icono}`} />
-                </div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{dd.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{dd.subtitulo}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+                <RetoQuizCard quiz={QUIZ_A4} accent={accent} rgba={color.rgba} aprobado={quizA4} onAprobado={() => setQuizA4(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Dominas el presente simple y los adverbios de frecuencia." />
 
-      <div className="rd-grid">
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 60vh, 680px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <RutinaScene
-                vista={vista}
-                modoColor={modoCol}
-                resetNonce={resetNonce}
-                colocados={orden.length}
-                paso={paso}
-                burbuja={burbuja}
-                relojMin={modo === "hora" && subHora === "decir" ? d.min % 720 : reloj}
-                pm={modo === "hora" && subHora === "decir" ? d.min >= 720 : pm}
-                pregunta={subHora === "preguntar" ? preguntaTxt : horaRes?.ok ? "Thanks!" : "What time is it?"}
-                respuesta={subHora === "preguntar" ? (auxResuelto ? q.respuesta : null) : horaRes?.ok ? `It's ${horaTxt.trim().replace(/^(it'?s|it is)\s+/i, "").replace(/[.!]+$/, "")}.` : null}
-                contexto={subHora === "decir" ? d.contexto.replace(" What time is it?", "") : null}
-                contextoIcono={subHora === "decir" ? (["fa-shower", "fa-mug-hot", "fa-school", "fa-book", "fa-tv"][dIdx] ?? null) : null}
-                mostrarDigital={subHora === "preguntar" ? !!relojRes?.ok : !!horaRes?.ok}
-                arrastrable={modo === "hora" && subHora === "preguntar" && auxResuelto}
-                onMinuto={alArrastrar}
-                habitoIdx={habIdx}
-                contado={contado}
-                oracion={oracion}
-                estadoOracion={revFrec ? (revFrec.length ? "mal" : "ok") : null}
-                adverbio={advElegido}
-                hechosFrec={[...frecOk]}
-              />
-            </SceneBoundary>
-
-            <div style={{ position: "absolute", top: 14, left: 16, right: 150, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, pointerEvents: "none" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)", maxWidth: "100%" }}>
-                <span className="rd-live-dot" style={{ ["--rdd" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol, flexShrink: 0 }} />
-                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3, flexShrink: 0 }}>EN VIVO</span>
-                <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)", flexShrink: 0 }} />
-                <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", ...NUM }}>{chipVivo}</span>
-              </div>
-            </div>
-
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="rd-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría" aria-label="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="rd-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"} aria-label={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="rd-icobtn" onClick={reiniciar} title="Reiniciar" aria-label="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 132px 14px 18px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                {def.etq} — {def.subtitulo}
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6, ...NUM }}>{pie}</div>
-            </div>
-
-            <button className="rd-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-          </div>
-
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-              Controles — {def.etq}
-            </Eyebrow>
-            <div style={{ marginTop: 4 }}>{control}</div>
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-sun" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>What do you do every day?</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #7dd3fc55", background: "rgba(125,211,252,0.07)" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book-open" style={{ marginRight: 8, color: "#7dd3fc" }} />
-              Lectura A1
-            </Eyebrow>
-            <div style={{ fontSize: 13, color: "#fff", fontWeight: 800, lineHeight: 1.4, marginBottom: 10 }}>{TITULO_A1}</div>
-            <div style={{ display: "grid", gap: 9, marginBottom: 12 }}>
-              {LECTURA_A1.map((p, i) => (
-                <div key={i} style={{ fontSize: 12, color: i === 2 ? "#fff" : T.text2, lineHeight: 1.55 }}>
-                  {p}
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", marginBottom: 8 }}>COMPRENSIÓN</div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {PREGUNTAS_A1.map((x) => (
-                <details key={x.pregunta} className="rd-guia">
-                  <summary>{x.pregunta}</summary>
-                  <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.45, marginTop: 4, paddingLeft: 12 }}>{x.respuesta}</div>
-                </details>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />
-              Cómo usar el laboratorio
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-                Objetivos de la sesión
-              </Eyebrow>
-              <span style={{ fontSize: 11, fontWeight: 800, color: objetivos.every((o) => o.done) ? OK : T.text3 }}>
-                {objetivos.filter((o) => o.done).length}/{objetivos.length}
-              </span>
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ marginTop: 2, fontSize: 13, color: o.done ? OK : "rgba(255,255,255,0.22)" }} />
-                  <span style={{ fontSize: 12, color: o.done ? "#fff" : T.text2, lineHeight: 1.4 }}>{o.t}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="rd-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <div>
-            <Eyebrow>
-              <i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />
-              Glosario (A5)
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {GLOSARIO.map((gi, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{gi.termino}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
-                  <div style={{ fontSize: 11.5, color: "#fff", lineHeight: 1.4, marginTop: 4, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                    <span>
-                      <i className="fa-solid fa-quote-left" style={{ marginRight: 6, color: accent }} />
-                      {gi.ejemplo}
-                    </span>
-                    <BotonEscuchar texto={gi.ejemplo} col={accent} />
+                <div style={{ ...card, padding: "18px 16px 20px", marginTop: 22 }}>
+                  <Eyebrow>
+                    <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
+                    Completa el texto (A2)
+                  </Eyebrow>
+                  <div style={{ marginTop: 12 }}>
+                    <CompletaTexto data={HUECOS_A2} accent={accent} rgba={color.rgba} completado={textoA2} onCompletado={() => { setTextoA2(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
                   </div>
                 </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11.5, color: T.text2, marginTop: 10 }}>
-              <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A5}
-            </div>
-          </div>
-        </div>
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-            Ideas clave
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-            {IDEAS.map((x, i) => (
-              <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                {x}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
 
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          Son <strong>verbatim</strong> del material de la plataforma: la lectura A1 con sus preguntas, los textos A2 y A6, la consigna, pistas y criterios de A3, los hechos A4, el glosario A5 y las
-          oraciones de A10; la escala y la posición de los adverbios vienen de la lectura IN-III-P04-A1. Llamamos Ana a la estudiante de la lectura A1 (el nombre es el de A2 y A6, cuyo horario es
-          un poco distinto). Son <strong>ilustrativos</strong>: las horas que la lectura no fecha (marcadas con ≈), las horas del reloj, el calendario semanal de Ana, los personajes (Ana y Luis) y el
-          barrio; el recorrido del sol es esquemático, no astronómico. Los porcentajes de la escala son aproximados, por eso a veces valen dos adverbios. Dos oraciones del día están en primera persona
-          («I») para contrastar la -s. Fuente: {FUENTE}
-        </span>
-      </div>
+                <div style={{ ...card, padding: "18px 16px 20px", marginTop: 22 }}>
+                  <Eyebrow>
+                    <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
+                    Completa el texto (A6)
+                  </Eyebrow>
+                  <div style={{ marginTop: 12 }}>
+                    <CompletaTexto data={HUECOS_A6} accent={accent} rgba={color.rgba} completado={textoA6} onCompletado={() => { setTextoA6(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
+                  </div>
+                </div>
 
-      <TiempoCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
+                <TuTurnoCard accent={accent} logrado={a3Ok} onLogrado={() => setA3Ok(true)} playSfx={sfx} />
+              </>
+            ),
+          },
+          {
+            id: "teoria",
+            etiqueta: "Teoría",
+            icono: "fa-book-open",
+            contenido: (
+              <>
+                <Bloque titulo="What do you do every day?" icono="fa-sun">
+                  <div style={{ color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
+                </Bloque>
 
-      <RetoQuizCard quiz={QUIZ_A4} accent={accent} rgba={color.rgba} aprobado={quizA4} onAprobado={() => setQuizA4(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Dominas el presente simple y los adverbios de frecuencia." />
+                <Bloque titulo="Lectura A1" icono="fa-book-open">
+                  <div style={{ color: "#fff", fontWeight: 800, lineHeight: 1.4 }}>{TITULO_A1}</div>
+                  <div style={{ display: "grid", gap: 9 }}>
+                    {LECTURA_A1.map((p, i) => (
+                      <div key={i} style={{ color: i === 2 ? "#fff" : T.text2, lineHeight: 1.55 }}>
+                        {p}
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ fontSize: 14, fontWeight: 900, color: T.text3, letterSpacing: "0.08em" }}>COMPRENSIÓN</div>
+                  <div style={{ display: "grid", gap: 8 }}>
+                    {PREGUNTAS_A1.map((x) => (
+                      <details key={x.pregunta} className="rd-guia">
+                        <summary>{x.pregunta}</summary>
+                        <div style={{ color: T.text2, lineHeight: 1.45, marginTop: 4, paddingLeft: 12 }}>{x.respuesta}</div>
+                      </details>
+                    ))}
+                  </div>
+                </Bloque>
 
-      <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
-          Completa el texto (A2)
-        </Eyebrow>
-        <div style={{ marginTop: 12 }}>
-          <CompletaTexto data={HUECOS_A2} accent={accent} rgba={color.rgba} completado={textoA2} onCompletado={() => { setTextoA2(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
-        </div>
-      </div>
+                <Bloque titulo="Cómo usar el laboratorio" icono="fa-list-ol">
+                  <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8 }}>
+                    {INSTRUCCIONES.map((p, i) => (
+                      <li key={i}>{p}</li>
+                    ))}
+                  </ol>
+                </Bloque>
 
-      <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
-          Completa el texto (A6)
-        </Eyebrow>
-        <div style={{ marginTop: 12 }}>
-          <CompletaTexto data={HUECOS_A6} accent={accent} rgba={color.rgba} completado={textoA6} onCompletado={() => { setTextoA6(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
-        </div>
-      </div>
+                <Bloque titulo="Glosario (A5)" icono="fa-book">
+                  <div style={{ display: "grid", gap: 8 }}>
+                    {GLOSARIO.map((gi, i) => (
+                      <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
+                        <span style={{ fontWeight: 900, color: accent }}>{gi.termino}. </span>
+                        <span style={{ color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
+                        <div style={{ color: "#fff", lineHeight: 1.4, marginTop: 4, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                          <span>
+                            <i className="fa-solid fa-quote-left" style={{ marginRight: 6, color: accent }} />
+                            {gi.ejemplo}
+                          </span>
+                          <BotonEscuchar texto={gi.ejemplo} col={accent} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ color: T.text2 }}>
+                    <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A5}
+                  </div>
+                </Bloque>
 
-      <TuTurnoCard accent={accent} logrado={a3Ok} onLogrado={() => setA3Ok(true)} playSfx={sfx} />
+                <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                  <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 9, color: T.text2, lineHeight: 1.45 }}>
+                    {IDEAS.map((x, i) => (
+                      <li key={i}>{x}</li>
+                    ))}
+                  </ul>
+                </Bloque>
 
-      <div className="rd-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="rd-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="rd-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="rd-close" onClick={() => setDrawer(false)} title="Cerrar" aria-label="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="rd-drawer-body">
-          <FichaTeorica data={RUTINA_DIARIA_INGLES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+                <Bloque titulo="Qué es verbatim y qué es ilustrativo" icono="fa-circle-info">
+                  <div style={{ color: T.text3, lineHeight: 1.5 }}>
+                    Son <strong>verbatim</strong> del material de la plataforma: la lectura A1 con sus preguntas, los textos A2 y A6, la consigna, pistas y criterios de A3, los hechos A4, el glosario A5 y las
+                    oraciones de A10; la escala y la posición de los adverbios vienen de la lectura IN-III-P04-A1. Llamamos Ana a la estudiante de la lectura A1 (el nombre es el de A2 y A6, cuyo horario es
+                    un poco distinto). Son <strong>ilustrativos</strong>: las horas que la lectura no fecha (marcadas con ≈), las horas del reloj, el calendario semanal de Ana, los personajes (Ana y Luis) y el
+                    barrio; el recorrido del sol es esquemático, no astronómico. Los porcentajes de la escala son aproximados, por eso a veces valen dos adverbios. Dos oraciones del día están en primera persona
+                    («I») para contrastar la -s. Fuente: {FUENTE}
+                  </div>
+                </Bloque>
+
+                <FichaTeorica data={RUTINA_DIARIA_INGLES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </>
+            ),
+          },
+        ]}
+      />
+    </>
   );
 }

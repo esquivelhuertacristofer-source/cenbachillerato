@@ -1,0 +1,12 @@
+{
+  "escena": "Una red de 150 cuentas en seis grupos. Publicas desde una cuenta y los mensajes viajan por las conexiones.",
+  "pregunta": "Publicas lo mismo desde tu cuenta (11 contactos) y desde la página de la escuela. ¿Cuál llega a más gente?",
+  "opciones": [
+    { "id": "a", "texto": "Tu cuenta: tus amigos lo comparten más", "icono": "fa-user" },
+    { "id": "b", "texto": "La escuela: tiene más contactos", "icono": "fa-school" },
+    { "id": "c", "texto": "Llegan igual: el contenido es el mismo", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "El alcance depende de cuántas personas ve el mensaje al inicio. Una cuenta con muchos contactos de distintos grupos arranca la cascada con ventaja; una con pocos contactos se queda en su grupo.",
+  "comoComprobarlo": "En «Cascada de compartidos» elige tu cuenta, publica y anota el alcance; luego elige la página de la escuela y publica con el mismo formato y hora."
+}

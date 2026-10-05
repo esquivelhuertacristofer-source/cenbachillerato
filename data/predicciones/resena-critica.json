@@ -1,0 +1,12 @@
+{
+  "escena": "Armas una reseña de una novela inventada eligiendo una frase para cada parte, mientras tres lectores reaccionan.",
+  "pregunta": "En la valoración, ¿qué frase sube más la credibilidad de la reseña?",
+  "opciones": [
+    { "id": "a", "texto": "La más tajante: «obra maestra, y punto»", "icono": "fa-bolt" },
+    { "id": "b", "texto": "La que argumenta qué funciona y qué falla", "icono": "fa-scale-balanced" },
+    { "id": "c", "texto": "La que cuenta cuánto disfrutó quien reseña", "icono": "fa-face-smile" }
+  ],
+  "correcta": "b",
+  "porque": "Un juicio convence cuando señala un recurso de la obra, explica su efecto y reconoce un defecto. La opinión sin razones o centrada en el gusto personal no da al lector nada que verificar.",
+  "comoComprobarlo": "En «Valoración argumentada» elige cada frase, una por una, y observa el medidor de credibilidad y la cara de la Prof. Ibarra."
+}

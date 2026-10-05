@@ -1,0 +1,12 @@
+{
+  "escena": "Una sala de cómputo con 30 equipos. Una moneda por cada gasto: Office de pago único contra Microsoft 365 por suscripción mensual.",
+  "pregunta": "Pasas la sala de 1 a 5 años de uso. ¿Qué pasa con el costo de la suscripción frente a comprar?",
+  "opciones": [
+    { "id": "a", "texto": "La suscripción siempre es más barata porque se paga por mes", "icono": "fa-arrow-trend-down" },
+    { "id": "b", "texto": "Se cruzan: barata al inicio, la suscripción termina cara", "icono": "fa-arrows-left-right" },
+    { "id": "c", "texto": "La compra sale más barata desde el primer año, siempre", "icono": "fa-key" }
+  ],
+  "correcta": "b",
+  "porque": "Comprar se paga una sola vez; la suscripción suma cada mes. Al principio se paga menos, pero alrededor del mes 18 la suma alcanza al pago único y después lo rebasa.",
+  "comoComprobarlo": "En «Equipa la sala» elige Ofimática, deja 30 equipos y mueve el deslizador de años de 1 a 5 mirando la gráfica y el total."
+}

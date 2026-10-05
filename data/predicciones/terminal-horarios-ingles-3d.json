@@ -1,0 +1,12 @@
+{
+  "escena": "Lucy llega al módulo de información de la terminal y necesita saber dónde están los baños",
+  "pregunta": "Si le escribes a Rosa «Excuse me, where are the restrooms?», ¿qué hace Lucy en la terminal?",
+  "opciones": [
+    { "id": "a", "texto": "Se queda esperando frente al módulo de información", "icono": "fa-hourglass-half" },
+    { "id": "b", "texto": "Camina a los baños y se iluminan", "icono": "fa-restroom" },
+    { "id": "c", "texto": "Corre a la salida de los taxis", "icono": "fa-taxi" }
+  ],
+  "correcta": "b",
+  "porque": "Where pide un lugar y la pregunta está bien formada, así que Rosa contesta con la ubicación. Lucy recibe el dato, camina hacia allá y el local queda resaltado.",
+  "comoComprobarlo": "En «Ask the right question» elige el dato 1, escribe esa pregunta y pulsa Preguntar a Rosa; luego cámbiala a «What time…» y compara."
+}

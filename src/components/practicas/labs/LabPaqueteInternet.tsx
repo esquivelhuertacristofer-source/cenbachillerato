@@ -22,8 +22,10 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, NUM, OK, card, Eyebrow, SceneBoundary, Readout } from "./_kit";
+import { T, NUM, OK, card, Eyebrow, SceneBoundary } from "./_kit";
 import { FichaTeorica } from "./_ficha";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
+import type { ObjetivoLab } from "./_objetivos";
 import { RetoQuizCard } from "./_reto-quiz";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { LabSfx } from "./lab-audio";
@@ -110,7 +112,7 @@ const PaqueteScene = dynamic(() => import("./PaqueteInternetScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-network-wired fa-fade" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Conectando la red en 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Conectando la red en 3D…</span>
     </div>
   ),
 });
@@ -169,15 +171,15 @@ function AparatosCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: s
           ¿Reparar, reutilizar o reciclar?
         </Eyebrow>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 10.5, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
           {[1, 2, 3].map((k) => (
-            <i key={k} className="fa-solid fa-star" style={{ fontSize: 13, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
+            <i key={k} className="fa-solid fa-star" style={{ fontSize: 14, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
           ))}
         </div>
       </div>
       {resuelto === null ? (
         <>
-          <div style={{ fontSize: 11, color: T.text3, fontWeight: 800, marginBottom: 6 }}>
+          <div style={{ fontSize: 14, color: T.text3, fontWeight: 800, marginBottom: 6 }}>
             Aparato {pos + 1} de {ronda.length} · en lugar de tirarlo, ¿qué conviene hacer? (actividad A5)
           </div>
           <div style={{ fontSize: 15, color: "#fff", fontWeight: 800, lineHeight: 1.45, marginBottom: 12 }}>{actual.texto}</div>
@@ -189,8 +191,8 @@ function AparatosCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: s
               </button>
             ))}
           </div>
-          {aviso && <div style={{ marginTop: 10, fontSize: 12, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
-          <div style={{ marginTop: 10, fontSize: 11, color: T.text3, lineHeight: 1.45 }}>Criterio: si falla una pieza reemplazable, se repara; si funciona y ya no lo usas, se reutiliza; si no tiene arreglo o es peligroso, se recicla.</div>
+          {aviso && <div style={{ marginTop: 10, fontSize: 14, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
+          <div style={{ marginTop: 10, fontSize: 14, color: T.text3, lineHeight: 1.45 }}>Criterio: si falla una pieza reemplazable, se repara; si funciona y ya no lo usas, se reutiliza; si no tiene arreglo o es peligroso, se recicla.</div>
         </>
       ) : (
         <div style={{ padding: "12px 14px", borderRadius: 11, border: `1px solid ${OK}55`, background: "rgba(52,211,153,0.08)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
@@ -198,9 +200,9 @@ function AparatosCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: s
             {[1, 2, 3].map((k) => (
               <i key={k} className="fa-solid fa-star" style={{ fontSize: 15, color: k <= resuelto ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
             ))}
-            <span style={{ fontSize: 12.5, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
+            <span style={{ fontSize: 14, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
           </span>
-          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 12.5, fontWeight: 900 }}>
+          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 14, fontWeight: 900 }}>
             <i className="fa-solid fa-shuffle" style={{ marginRight: 8 }} />
             Otra ronda
           </button>
@@ -225,6 +227,23 @@ interface EnvioIA {
   incluidos: FragmentoId[];
   cifrado: boolean;
 }
+
+
+/* ── Estilos propios (la pantalla la da LabShell) ── */
+const estilos = (accent: string) => `
+  .pi-opts { display:flex; flex-wrap:wrap; gap:8px; }
+  .pi-opt { cursor:pointer; border:1px solid var(--pic); border-radius:10px; padding:10px 12px; font-size:14px; font-weight:800; color:#fff; background:transparent; transition:all .15s; line-height:1.4; }
+  .pi-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.72); }
+  .pi-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
+  .pi-opt:disabled { cursor:default; }
+  .pi-opt:disabled[data-on="false"] { opacity:0.55; }
+  .pi-toggle { width:100%; cursor:pointer; border:1px solid var(--pic); border-radius:11px; padding:12px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:14px; font-weight:900; text-align:left; transition:all .15s; }
+  .pi-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
+  .pi-toggle:disabled { cursor:default; opacity:0.7; }
+  .pi-input { width:min(100%, 160px); box-sizing:border-box; padding:9px 12px; border-radius:10px; border:1px solid ${T.lineStrong}; background:rgba(4,10,22,0.55); color:#fff; font-size:16px; font-weight:800; }
+  .pi-input:focus { outline:2px solid ${accent}; outline-offset:1px; }
+  .pi-opt:focus-visible, .pi-toggle:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
+`;
 
 /* ════════════════════════════════════════════════════════════════════════
  * Shell
@@ -281,8 +300,8 @@ export function LabPaqueteInternet({ color }: PracticaLabProps) {
 
   // ── Comunes
   const [resetNonce, setResetNonce] = useState(0);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
+  const [detalles, setDetalles] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   const timers = useRef<number[]>([]);
   const { mejorEstrellas, registraEstrellas: guardaEstrellas } = useEstrellas(RETO_KEY);
@@ -526,19 +545,19 @@ export function LabPaqueteInternet({ color }: PracticaLabProps) {
   };
 
   /* ── Objetivos ─────────────────────────────────────────────────────── */
-  const objetivos: { t: string; done: boolean }[] = [
-    { t: "Enviar un archivo: el DNS traduce el nombre y el mensaje viaja en paquetes", done: envioHecho },
-    { t: "Predecir los paquetes de un envío con un error menor al 10 %", done: prediccionOk },
-    { t: "Cruzar el Atlántico por el cable submarino y comparar la latencia", done: cruzoOceano },
-    { t: "Cortar un enlace y ver a los paquetes tomar otra ruta", done: vioRodeo },
-    { t: "Ver lo que captura el espía de la wifi cuando la conexión no va cifrada", done: vioHttp },
-    { t: "Enviar tu consulta al sitio legítimo, con HTTPS y sin datos personales", done: envioSeguro },
-    { t: "Verificar la respuesta de la IA, descartar lo inventado y declarar su uso", done: iaResponsable },
-    { t: "Reducir al menos 40 % la huella anual del teléfono alargando su vida", done: redujo },
-    { t: "Llevar el teléfono al reciclaje formal y ver qué metales se recuperan", done: reciclo },
-    { t: "Clasificar aparatos (reparar, reutilizar o reciclar) y ganar estrellas", done: clasifico },
-    { t: "Aprobar el quiz evaluable (A2)", done: quizAprobado },
-    { t: "Completar el texto (A6)", done: textoOk },
+  const objetivos: ObjetivoLab[] = [
+    { txt: "Enviar un archivo: el DNS traduce el nombre y el mensaje viaja en paquetes", done: envioHecho },
+    { txt: "Predecir los paquetes de un envío con un error menor al 10 %", done: prediccionOk },
+    { txt: "Cruzar el Atlántico por el cable submarino y comparar la latencia", done: cruzoOceano },
+    { txt: "Cortar un enlace y ver a los paquetes tomar otra ruta", done: vioRodeo },
+    { txt: "Ver lo que captura el espía de la wifi cuando la conexión no va cifrada", done: vioHttp },
+    { txt: "Enviar tu consulta al sitio legítimo, con HTTPS y sin datos personales", done: envioSeguro },
+    { txt: "Verificar la respuesta de la IA, descartar lo inventado y declarar su uso", done: iaResponsable },
+    { txt: "Reducir al menos 40 % la huella anual del teléfono alargando su vida", done: redujo },
+    { txt: "Llevar el teléfono al reciclaje formal y ver qué metales se recuperan", done: reciclo },
+    { txt: "Clasificar aparatos (reparar, reutilizar o reciclar) y ganar estrellas", done: clasifico },
+    { txt: "Aprobar el quiz evaluable (A2)", done: quizAprobado },
+    { txt: "Completar el texto (A6)", done: textoOk },
   ];
 
   /* ── Visor ─────────────────────────────────────────────────────────── */
@@ -596,21 +615,21 @@ export function LabPaqueteInternet({ color }: PracticaLabProps) {
         <i className={`fa-solid ${def.icono}`} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{def.etq}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los resultados siguen aquí. {pie}</div>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los resultados siguen aquí. {pie}</div>
     </div>
   );
 
-  const sub = (txt: string) => <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
+  const sub = (txt: string) => <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
   const nota = (txt: ReactNode, col: string, icono = "fa-circle-info") => (
-    <div style={{ marginTop: 10, fontSize: 12, lineHeight: 1.55, color: col }}>
+    <div style={{ marginTop: 10, fontSize: 14, lineHeight: 1.55, color: col }}>
       <i className={`fa-solid ${icono}`} style={{ marginRight: 7 }} />
       {txt}
     </div>
   );
   const lecturas = (items: { label: string; value: string; unit?: string; col?: string }[]) => (
-    <div className="pi-lecturas" style={{ marginTop: 10 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8, marginTop: 10 }}>
       {items.map((x) => (
-        <Readout key={x.label} label={x.label} value={x.value} unit={x.unit} col={x.col} size={16} />
+        <Dato key={x.label} label={x.label} value={x.unit ? `${x.value} ${x.unit}` : x.value} col={x.col} />
       ))}
     </div>
   );
@@ -632,7 +651,7 @@ export function LabPaqueteInternet({ color }: PracticaLabProps) {
             </button>
           ))}
         </div>
-        <div style={{ fontSize: 11, color: T.text3, marginTop: 6 }}>{contenido.nota}</div>
+        <div style={{ fontSize: 14, color: T.text3, marginTop: 6 }}>{contenido.nota}</div>
         {sub("2 · ¿A qué servidor?")}
         <div className="pi-opts">
           {DESTINOS.map((d) => (
@@ -642,7 +661,7 @@ export function LabPaqueteInternet({ color }: PracticaLabProps) {
             </button>
           ))}
         </div>
-        <div style={{ fontSize: 11, color: T.text3, marginTop: 6 }}>{destino.servicio}.</div>
+        <div style={{ fontSize: 14, color: T.text3, marginTop: 6 }}>{destino.servicio}.</div>
         {sub("3 · ¿Por qué red sale?")}
         <div className="pi-opts">
           {REDES.map((r) => (
@@ -653,12 +672,12 @@ export function LabPaqueteInternet({ color }: PracticaLabProps) {
           ))}
         </div>
         {sub("4 · Predice: ¿cuántos paquetes hacen falta?")}
-        <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5, ...NUM }}>
+        <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5, ...NUM }}>
           {tamano(contenido.bytes)} = {num(contenido.bytes)} bytes. Cada paquete mide hasta {num(MTU)} bytes, pero {num(MTU - CARGA_UTIL)} son encabezados IP y TCP: caben {num(CARGA_UTIL)} bytes de datos.
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 8, flexWrap: "wrap" }}>
           <input className="pi-input" type="text" inputMode="numeric" aria-label="Predicción de paquetes" placeholder="p. ej. 2000" value={prediccion} onChange={(e) => setPrediccion(e.target.value)} disabled={enviando} style={{ ...NUM }} />
-          <span style={{ fontSize: 12, color: T.text3 }}>paquetes</span>
+          <span style={{ fontSize: 14, color: T.text3 }}>paquetes</span>
         </div>
         <button className="pi-toggle pi-enviar" onClick={enviar} disabled={enviando || !ruta} style={{ marginTop: 12, ["--pic" as string]: modoCol }}>
           <i className={`fa-solid ${enviando ? "fa-spinner fa-spin" : "fa-paper-plane"}`} style={{ marginRight: 9, color: modoCol }} />
@@ -674,7 +693,7 @@ export function LabPaqueteInternet({ color }: PracticaLabProps) {
               { label: "Energía de red", value: energia(huellaEnvio.wh) },
               { label: "CO₂e", value: carbono(huellaEnvio.gCO2) },
             ])}
-            <div style={{ fontSize: 12, color: T.text2, marginTop: 8, lineHeight: 1.55, ...NUM }}>
+            <div style={{ fontSize: 14, color: T.text2, marginTop: 8, lineHeight: 1.55, ...NUM }}>
               Paquetes = ⌈{num(envCont.bytes)} ÷ {num(CARGA_UTIL)}⌉ = <strong style={{ color: "#fff" }}>{num(realEnv)}</strong>. Latencia = {num(envio.km)} km ÷ {num(V_FIBRA_KM_S)} km/s ={" "}
               <strong style={{ color: "#fff" }}>{num(latenciaMs(envio.km), 1)} ms</strong>. Energía = {dos(envCont.bytes / 1e9)} GB × {REDES.find((r) => r.id === envio.red)!.kwhPorGb} kWh/GB; CO₂e con {FACTOR_CO2_KG_KWH} kg/kWh (red eléctrica de México, 2024).
             </div>
@@ -713,7 +732,7 @@ export function LabPaqueteInternet({ color }: PracticaLabProps) {
               "fa-route",
             )
           : nota("No queda ningún camino hacia ese servidor: la red quedó partida. Reconecta algún enlace.", WARN, "fa-triangle-exclamation")}
-        <div style={{ marginTop: 10, fontSize: 11, color: T.text3, lineHeight: 1.5 }}>
+        <div style={{ marginTop: 10, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
           Distancias terrestres en línea recta entre ciudades (la fibra real es más larga, y los routers agregan retardo). El cable MAREA mide {num(ENLACES.find((e) => e.id === "marea")!.km ?? 0)} km. La energía por GB es un promedio de orden de magnitud.
         </div>
       </>
@@ -727,11 +746,11 @@ export function LabPaqueteInternet({ color }: PracticaLabProps) {
           {SITIOS.map((s) => (
             <button key={s.id} className="pi-opt pi-sitio" data-on={s.id === sitio} onClick={() => elegirSitio(s.id)} disabled={enviandoIA} style={{ ["--pic" as string]: modoCol, background: s.id === sitio ? `${modoCol}1f` : "transparent", textAlign: "left" }}>
               <i className={`fa-solid ${s.https ? "fa-lock" : "fa-lock-open"}`} style={{ marginRight: 9, color: s.https ? OK : WARN }} />
-              <span style={{ fontFamily: "ui-monospace, monospace", fontSize: 12.5 }}>{s.url}</span>
+              <span style={{ fontFamily: "ui-monospace, monospace", fontSize: 14 }}>{s.url}</span>
             </button>
           ))}
         </div>
-        <div style={{ fontSize: 11, color: T.text3, marginTop: 6 }}>Tu escuela te dio la dirección tutor-ia.ejemplo.mx. Lee cada dominio completo, de derecha a izquierda. (Direcciones ficticias.)</div>
+        <div style={{ fontSize: 14, color: T.text3, marginTop: 6 }}>Tu escuela te dio la dirección tutor-ia.ejemplo.mx. Lee cada dominio completo, de derecha a izquierda. (Direcciones ficticias.)</div>
         {sub("2 · Tu mensaje: toca un fragmento para quitarlo o incluirlo")}
         <div style={{ display: "grid", gap: 7 }}>
           {FRAGMENTOS.map((f) => {
@@ -791,11 +810,11 @@ export function LabPaqueteInternet({ color }: PracticaLabProps) {
                 const bien = d ? (d === "usar") === a.correcta : null;
                 return (
                   <div key={a.id} className="pi-afirm" style={{ padding: "10px 12px", borderRadius: 11, border: `1px solid ${bien === null ? T.line : bien ? `${OK}66` : `${WARN}66`}`, background: "rgba(4,10,22,0.45)" }}>
-                    <div style={{ fontSize: 12.5, color: "#fff", lineHeight: 1.45 }}>
+                    <div style={{ fontSize: 14, color: "#fff", lineHeight: 1.45 }}>
                       <strong style={{ color: modoCol }}>{i + 1}.</strong> {a.texto}
                     </div>
                     {ver && (
-                      <div style={{ fontSize: 11.5, color: a.correcta ? "#86efac" : "#fca5a5", lineHeight: 1.45, marginTop: 6 }}>
+                      <div style={{ fontSize: 14, color: a.correcta ? "#86efac" : "#fca5a5", lineHeight: 1.45, marginTop: 6 }}>
                         <i className="fa-solid fa-magnifying-glass" style={{ marginRight: 6 }} />
                         {a.verificacion} <span style={{ color: T.text3 }}>({a.fuente})</span>
                       </div>
@@ -814,8 +833,8 @@ export function LabPaqueteInternet({ color }: PracticaLabProps) {
                         Descartar
                       </button>
                     </div>
-                    {d && !ver && <div style={{ fontSize: 11, color: WARN, marginTop: 6 }}>Decidiste sin verificar: comprueba antes de confiar.</div>}
-                    {bien === false && <div style={{ fontSize: 11, color: WARN, marginTop: 6 }}>{a.correcta ? "Esta afirmación es correcta: puedes usarla citando la fuente." : "Esta afirmación no es cierta: no debe ir en tu trabajo."}</div>}
+                    {d && !ver && <div style={{ fontSize: 14, color: WARN, marginTop: 6 }}>Decidiste sin verificar: comprueba antes de confiar.</div>}
+                    {bien === false && <div style={{ fontSize: 14, color: WARN, marginTop: 6 }}>{a.correcta ? "Esta afirmación es correcta: puedes usarla citando la fuente." : "Esta afirmación no es cierta: no debe ir en tu trabajo."}</div>}
                   </div>
                 );
               })}
@@ -840,20 +859,14 @@ export function LabPaqueteInternet({ color }: PracticaLabProps) {
             {iaResponsable && nota(`Uso responsable completo: verificaste las cinco afirmaciones, descartaste las dos falsas y declaraste el uso de IA${erroresIA > 0 ? ` (con ${erroresIA} ${erroresIA === 1 ? "decisión corregida" : "decisiones corregidas"})` : ""}.`, OK, "fa-award")}
           </>
         )}
-        {!respuesta && mensaje && sitioDef && faseIA === "listo" && <div style={{ marginTop: 10, fontSize: 11, color: T.text3, lineHeight: 1.45 }}>Tu mensaje: «{mensaje}»</div>}
+        {!respuesta && mensaje && sitioDef && faseIA === "listo" && <div style={{ marginTop: 10, fontSize: 14, color: T.text3, lineHeight: 1.45 }}>Tu mensaje: «{mensaje}»</div>}
       </>
     );
   } else {
     control = (
       <>
         {sub("1 · ¿Cuántos años usas el teléfono?")}
-        <label style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <i className="fa-solid fa-calendar" style={{ color: modoCol }} />
-          <input type="range" aria-label="Años de uso del teléfono (años)" className="pi-range" min={1} max={ANIOS_MAX} step={1} value={anios} onChange={(e) => cambiarAnios(Number(e.target.value))} style={{ ["--pic" as string]: modoCol }} />
-          <span style={{ width: 64, textAlign: "right", fontSize: 13, color: "#fff", fontWeight: 800, ...NUM }}>
-            {anios} {anios === 1 ? "año" : "años"}
-          </span>
-        </label>
+        <Deslizador label="Años de uso" icon="fa-calendar" colr={modoCol} valor={`${anios} ${anios === 1 ? "año" : "años"}`} min={1} max={ANIOS_MAX} step={1} value={anios} onChange={cambiarAnios} hintL="1 año" hintR={`${ANIOS_MAX} años`} />
         <button className="pi-toggle pi-reparar" onClick={reparar} disabled={reparado || anios >= ANIOS_MAX} style={{ marginTop: 10, ["--pic" as string]: "#38bdf8" }}>
           <i className="fa-solid fa-screwdriver-wrench" style={{ marginRight: 9, color: "#38bdf8" }} />
           {reparado ? "Batería cambiada: +2 años de uso" : "Reparar: cambiar la batería gastada (+2 años)"}
@@ -864,7 +877,7 @@ export function LabPaqueteInternet({ color }: PracticaLabProps) {
           { label: "Total / año", value: num(huella.total, 1), unit: "kg CO₂e", col: modoCol },
           { label: `vs. ${ANIOS_BASE} años`, value: `${reduccion >= 0 ? "−" : "+"}${num(Math.abs(reduccion) * 100, 0)}`, unit: "%", col: reduccion >= 0.4 ? OK : reduccion < 0 ? WARN : undefined },
         ])}
-        <div style={{ fontSize: 12, color: T.text2, marginTop: 8, lineHeight: 1.55, ...NUM }}>
+        <div style={{ fontSize: 14, color: T.text2, marginTop: 8, lineHeight: 1.55, ...NUM }}>
           Huella por año = {CO2_FABRICACION_KG} kg ÷ {anios} + {KWH_CARGA_ANIO} kWh × {FACTOR_CO2_KG_KWH} kg/kWh = <strong style={{ color: "#fff" }}>{num(huella.total, 2)} kg CO₂e</strong>
         </div>
         {reduccion >= 0.4
@@ -891,7 +904,7 @@ export function LabPaqueteInternet({ color }: PracticaLabProps) {
               ))}
             </div>
             {lecturas(METALES.map((m) => ({ label: m.etq, value: masa(metales[m.id]), col: m.color })))}
-            <div style={{ marginTop: 8, fontSize: 11, color: T.text3, lineHeight: 1.5 }}>EPA de EE. UU.: por cada millón de celulares reciclados se recuperan unas 35 274 lb de cobre, 772 lb de plata, 75 lb de oro y 33 lb de paladio.</div>
+            <div style={{ marginTop: 8, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>EPA de EE. UU.: por cada millón de celulares reciclados se recuperan unas 35 274 lb de cobre, 772 lb de plata, 75 lb de oro y 33 lb de paladio.</div>
           </>
         )}
         {nota(
@@ -904,346 +917,184 @@ export function LabPaqueteInternet({ color }: PracticaLabProps) {
   }
 
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes piPulse { 0%,100%{ box-shadow:0 0 0 0 var(--pid); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .pi-live-dot { animation: piPulse 1.6s ease-in-out infinite; }
-        @media (prefers-reduced-motion: reduce){ .pi-live-dot { animation:none; } }
-        .pi-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .pi-grid { grid-template-columns: 1fr; } }
-        .pi-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .pi-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .pi-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .pi-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .pi-tab { cursor:pointer; border:1px solid var(--pic); border-radius:12px; padding:11px 8px; text-align:center; background:transparent; transition:all .15s; color:#fff; }
-        .pi-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
-        .pi-tab:hover { background:rgba(255,255,255,0.06); }
-        .pi-opts { display:flex; flex-wrap:wrap; gap:7px; }
-        .pi-opt { cursor:pointer; border:1px solid var(--pic); border-radius:10px; padding:9px 12px; font-size:12px; font-weight:800; color:#fff; background:transparent; transition:all .15s; line-height:1.4; }
-        .pi-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.72); }
-        .pi-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
-        .pi-opt:disabled { cursor:default; }
-        .pi-opt:disabled[data-on="false"] { opacity:0.55; }
-        .pi-toggle { width:100%; cursor:pointer; border:1px solid var(--pic); border-radius:11px; padding:11px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:12.5px; font-weight:900; text-align:left; transition:all .15s; }
-        .pi-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
-        .pi-toggle:disabled { cursor:default; opacity:0.7; }
-        .pi-range { flex:1; accent-color: var(--pic); }
-        .pi-input { width:140px; padding:9px 12px; border-radius:10px; border:1px solid ${T.lineStrong}; background:rgba(4,10,22,0.55); color:#fff; font-size:14px; font-weight:800; }
-        .pi-input:focus { outline:2px solid ${accent}; outline-offset:1px; }
-        .pi-lecturas { display:grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); border-radius:12px; border:1px solid ${T.line}; background:rgba(4,10,22,0.4); }
-        .pi-opt:focus-visible, .pi-tab:focus-visible, .pi-toggle:focus-visible, .pi-icobtn:focus-visible, .pi-range:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
-        @media (max-width: 1000px){ .pi-bottom { grid-template-columns: 1fr !important; } }
-        .pi-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .pi-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .pi-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61; background:linear-gradient(180deg,#06121e 0%,#040a16 100%);
-          border-left:1px solid rgba(${color.rgba},0.32); box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1); display:flex; flex-direction:column; }
-        .pi-drawer[data-open="true"] { transform:translateX(0); }
-        .pi-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .pi-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .pi-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .pi-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .pi-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:11px 16px; border-radius:999px;
-          border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800; background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
-        .pi-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="pi-tabs">
-          {MODOS.map((m) => {
-            const d = MODOS_DEF[m];
-            const col = `#${d.color.replace("#", "")}`;
-            const on = m === modo;
-            return (
-              <button key={m} className="pi-tab" data-on={on} onClick={() => cambiarModo(m)} style={{ ["--pic" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? col : "inherit" }}>
-                  <i className={`fa-solid ${d.icono}`} />
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <>
+          <style>{estilos(accent)}</style>
+          <SceneBoundary fallback={sceneFallback}>
+            <PaqueteScene
+              vista={vista}
+              modoColor={modoCol}
+              resetNonce={resetNonce}
+              destino={destinoId}
+              rutaClave={ruta ? ruta.nodos.join(">") : ""}
+              cortados={cortados}
+              envioNonce={envioNonce}
+              conDns={envio?.conDns ?? false}
+              paquetesVisibles={Math.min(24, envCont ? paquetesDe(envCont.bytes) : 1)}
+              dnsResuelto={resueltos.includes(destinoId)}
+              sitio={sitio}
+              iaNonce={iaNonce}
+              iaCifrado={envioIA?.cifrado ?? true}
+              espiaTexto={mensajeEnviado}
+              espiaCifrado={cifradoDe(mensajeEnviado || "vacio", 40)}
+              verificadas={verificadas}
+              decisiones={decisiones}
+              declarado={declaracionOk}
+              anios={anios}
+              destinoFinal={destinoFinal}
+              destinoNonce={destinoNonce}
+              lote={lote}
+              detalles={detalles}
+            />
+          </SceneBoundary>
+        </>
+      }
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m, etiqueta: MODOS_DEF[m].etq, icono: MODOS_DEF[m].icono })),
+        valor: modo,
+        cambiar: (id) => cambiarModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono="fa-tags" titulo={detalles ? "Ocultar detalles" : "Ver detalles"} activo={detalles} onClick={() => setDetalles((d) => !d)} />
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+        </>
+      }
+      lectura={chipVivo}
+      objetivos={objetivos}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Controles",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              <Bloque titulo={def.etq} icono={def.icono}>
+                {control}
+              </Bloque>
+              <Bloque titulo="Lo que pasa" icono="fa-comment-dots">
+                <p style={{ margin: 0, color: "#eaf0fb", ...NUM }}>{pie}</p>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <>
+              <AparatosCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
+              <RetoQuizCard quiz={QUIZ_A2} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Usas la tecnología con responsabilidad." />
+              <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
+                <Eyebrow>
+                  <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
+                  Completa el texto (A6)
+                </Eyebrow>
+                <div style={{ marginTop: 12 }}>
+                  <CompletaTexto data={HUECOS_A6} accent={accent} rgba={color.rgba} completado={textoOk} onCompletado={() => { setTextoOk(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
                 </div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{d.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{d.subtitulo}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="pi-grid">
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 58vh, 660px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <PaqueteScene
-                vista={vista}
-                modoColor={modoCol}
-                resetNonce={resetNonce}
-                destino={destinoId}
-                rutaClave={ruta ? ruta.nodos.join(">") : ""}
-                cortados={cortados}
-                envioNonce={envioNonce}
-                conDns={envio?.conDns ?? false}
-                paquetesVisibles={Math.min(24, envCont ? paquetesDe(envCont.bytes) : 1)}
-                dnsResuelto={resueltos.includes(destinoId)}
-                sitio={sitio}
-                iaNonce={iaNonce}
-                iaCifrado={envioIA?.cifrado ?? true}
-                espiaTexto={mensajeEnviado}
-                espiaCifrado={cifradoDe(mensajeEnviado || "vacio", 40)}
-                verificadas={verificadas}
-                decisiones={decisiones}
-                declarado={declaracionOk}
-                anios={anios}
-                destinoFinal={destinoFinal}
-                destinoNonce={destinoNonce}
-                lote={lote}
-              />
-            </SceneBoundary>
-
-            <div style={{ position: "absolute", top: 14, left: 16, right: 150, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, pointerEvents: "none" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)", maxWidth: "100%" }}>
-                <span className="pi-live-dot" style={{ ["--pid" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol, flexShrink: 0 }} />
-                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3, flexShrink: 0 }}>EN VIVO</span>
-                <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)", flexShrink: 0 }} />
-                <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", ...NUM }}>{chipVivo}</span>
               </div>
-            </div>
-
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="pi-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría" aria-label="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="pi-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"} aria-label={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="pi-icobtn" onClick={reiniciar} title="Reiniciar" aria-label="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 132px 14px 18px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                {def.etq} — {def.subtitulo}
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6, ...NUM }}>{pie}</div>
-            </div>
-
-            <button className="pi-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-          </div>
-
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-              Controles — {def.etq}
-            </Eyebrow>
-            <div style={{ marginTop: -4 }}>{control}</div>
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-network-wired" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>¿Qué pasa cuando presionas «Enviar»?</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #7dd3fc55", background: "rgba(125,211,252,0.07)" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book-open" style={{ marginRight: 8, color: "#7dd3fc" }} />
-              Lectura A1
-            </Eyebrow>
-            <div style={{ fontSize: 13, color: "#fff", fontWeight: 800, lineHeight: 1.4, marginBottom: 10 }}>{TITULO_A1}</div>
-            <div style={{ display: "grid", gap: 9, marginBottom: 12 }}>
-              {LECTURA_A1.map((p, i) => (
-                <div key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>
-                  {p}
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", marginBottom: 8 }}>PARA REFLEXIONAR</div>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {PREGUNTAS.map((q, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  {q.pregunta}
-                  <details style={{ marginTop: 3 }}>
-                    <summary style={{ cursor: "pointer", fontSize: 11, color: T.text3 }}>Respuesta guía</summary>
-                    <span style={{ fontSize: 11.5, color: "#bae6fd" }}>{q.guia}</span>
-                  </details>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />
-              Cómo usar el laboratorio
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-                Objetivos de la sesión
-              </Eyebrow>
-              <span style={{ fontSize: 11, fontWeight: 800, color: objetivos.every((o) => o.done) ? OK : T.text3 }}>
-                {objetivos.filter((o) => o.done).length}/{objetivos.length}
-              </span>
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ marginTop: 2, fontSize: 13, color: o.done ? OK : "rgba(255,255,255,0.22)" }} />
-                  <span style={{ fontSize: 12, color: o.done ? "#fff" : T.text2, lineHeight: 1.4 }}>{o.t}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="pi-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <div>
-            <Eyebrow>
-              <i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />
-              Hechos (quiz A4)
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {HECHOS.map((h, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
-                  {h}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />
-              Glosario (A5)
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {GLOSARIO.map((gi, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{gi.termino}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
-                  <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.4, marginTop: 4 }}>
-                    <i className="fa-solid fa-lightbulb" style={{ marginRight: 6, color: accent }} />
-                    {gi.ejemplo}
+            </>
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="¿Qué pasa cuando presionas «Enviar»?" icono="fa-network-wired">
+                <p style={{ margin: 0, color: T.text2 }}>{PROBLEMA}</p>
+              </Bloque>
+              <Bloque titulo="Lectura A1" icono="fa-book-open">
+                <div style={{ color: "#fff", fontWeight: 800 }}>{TITULO_A1}</div>
+                {LECTURA_A1.map((p, i) => (
+                  <p key={i} style={{ margin: 0, color: T.text2 }}>{p}</p>
+                ))}
+                <div style={{ fontSize: 14, fontWeight: 900, color: T.text3, letterSpacing: "0.08em" }}>PARA REFLEXIONAR</div>
+                <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 8, color: T.text2 }}>
+                  {PREGUNTAS.map((q, i) => (
+                    <li key={i}>
+                      {q.pregunta}
+                      <details style={{ marginTop: 3 }}>
+                        <summary style={{ cursor: "pointer", color: T.text3 }}>Respuesta guía</summary>
+                        <span style={{ color: "#bae6fd" }}>{q.guia}</span>
+                      </details>
+                    </li>
+                  ))}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Cómo usar el laboratorio" icono="fa-list-ol">
+                {INSTRUCCIONES.map((p, i) => (
+                  <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
+                    <div style={{ width: 24, height: 24, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
+                    <div style={{ color: "#fff", minWidth: 0 }}>{p}</div>
                   </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 9, color: T.text2 }}>
+                  {IDEAS.map((x, i) => (
+                    <li key={i}>{x}</li>
+                  ))}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Hechos (quiz A4)" icono="fa-circle-question">
+                <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 8, color: T.text2 }}>
+                  {HECHOS.map((h, i) => (
+                    <li key={i}>{h}</li>
+                  ))}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Glosario (A5)" icono="fa-book">
+                {GLOSARIO.map((gi, i) => (
+                  <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
+                    <span style={{ fontWeight: 900, color: accent }}>{gi.termino}. </span>
+                    <span style={{ color: T.text2 }}>{gi.definicion}</span>
+                    <div style={{ color: T.text3, marginTop: 4 }}>
+                      <i className="fa-solid fa-lightbulb" style={{ marginRight: 6, color: accent }} />
+                      {gi.ejemplo}
+                    </div>
+                  </div>
+                ))}
+                <div style={{ color: T.text2 }}>
+                  <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A5}
                 </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11.5, color: T.text2, marginTop: 10 }}>
-              <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A5}
-            </div>
-          </div>
-          <div style={{ marginTop: 16, padding: "14px 16px", borderRadius: 12, border: `1px solid ${accent}33`, background: `rgba(${color.rgba},0.07)` }}>
-            <Eyebrow>
-              <i className="fa-solid fa-pen-to-square" style={{ marginRight: 8, color: accent }} />
-              Reflexión (A3)
-            </Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{REFLEXION_A3}</div>
-          </div>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "18px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-              Ideas clave
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-              {IDEAS.map((x, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  {x}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div style={{ ...card, padding: "18px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-clipboard-check" style={{ marginRight: 8, color: accent }} />
-              Autoevaluación (A7)
-            </Eyebrow>
-            <div style={{ fontSize: 11.5, color: T.text3, marginBottom: 8 }}>
-              {AUTOEVAL_A7.instrucciones} Escala: {AUTOEVAL_A7.escala.join(" · ")}.
-            </div>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 7 }}>
-              {AUTOEVAL_A7.criterios.map((c, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  {c}
-                </li>
-              ))}
-            </ul>
-            <div style={{ fontSize: 12, color: "#fff", marginTop: 10, lineHeight: 1.45 }}>{AUTOEVAL_A7.reflexionFinal}</div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          La lectura A1 con sus preguntas, la reflexión A3, los hechos del quiz A4, el glosario A5, la autoevaluación A7, el quiz A2 y el texto A6 son <strong>verbatim</strong> del material de la plataforma. Son{" "}
-          <strong>cálculos exactos</strong> del modelo: los paquetes (MTU de 1 500 bytes con 40 de encabezados IP y TCP), la latencia mínima con la luz a 200 000 km/s en la fibra, las distancias en línea recta entre ciudades y los metales recuperables (EPA). Son{" "}
-          <strong>ilustrativos, de orden de magnitud</strong>: los tamaños de los archivos (salvo el video HD, ≈ 3 GB/h según Netflix), la energía de red por GB (IEA, Kamiya 2020: 0.1–0.2 kWh/GB para 4G; Aslan et al. 2018 para redes fijas), los 50 kg de CO₂e de
-          fabricar un teléfono (informes ambientales de fabricantes, 2023) y los 5 kWh anuales de carga. El factor de emisión es el oficial del Sistema Eléctrico Nacional 2024 (0.444 t CO₂e/MWh). La red está simplificada y fuera de escala; los dominios, direcciones IP (rangos de documentación), el estudio
-          «Ramírez y Soto (2021)» y los datos personales son ficticios. Cable MAREA: Virginia Beach–Bilbao, 6 600 km (2017). Basura electrónica: Global E-waste Monitor 2024. Fuente del contenido: {FUENTE}
-        </span>
-      </div>
-
-      <AparatosCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
-
-      <RetoQuizCard quiz={QUIZ_A2} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Usas la tecnología con responsabilidad." />
-
-      <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
-          Completa el texto (A6)
-        </Eyebrow>
-        <div style={{ marginTop: 12 }}>
-          <CompletaTexto data={HUECOS_A6} accent={accent} rgba={color.rgba} completado={textoOk} onCompletado={() => { setTextoOk(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
-        </div>
-      </div>
-
-      <div className="pi-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="pi-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="pi-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="pi-close" onClick={() => setDrawer(false)} title="Cerrar" aria-label="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="pi-drawer-body">
-          <FichaTeorica data={PAQUETE_INTERNET_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+              </Bloque>
+              <Bloque titulo="Reflexión (A3)" icono="fa-pen-to-square">
+                <p style={{ margin: 0, color: T.text2 }}>{REFLEXION_A3}</p>
+              </Bloque>
+              <Bloque titulo="Autoevaluación (A7)" icono="fa-clipboard-check">
+                <p style={{ margin: 0, color: T.text3 }}>
+                  {AUTOEVAL_A7.instrucciones} Escala: {AUTOEVAL_A7.escala.join(" · ")}.
+                </p>
+                <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 7, color: T.text2 }}>
+                  {AUTOEVAL_A7.criterios.map((c, i) => (
+                    <li key={i}>{c}</li>
+                  ))}
+                </ul>
+                <p style={{ margin: 0, color: "#fff" }}>{AUTOEVAL_A7.reflexionFinal}</p>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={PAQUETE_INTERNET_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ marginTop: 18, fontSize: 14, color: T.text3 }}>
+                La lectura A1 con sus preguntas, la reflexión A3, los hechos del quiz A4, el glosario A5, la autoevaluación A7, el quiz A2 y el texto A6 son <strong>verbatim</strong> del material de la plataforma. Son{" "}
+                <strong>cálculos exactos</strong> del modelo: los paquetes (MTU de 1 500 bytes con 40 de encabezados IP y TCP), la latencia mínima con la luz a 200 000 km/s en la fibra, las distancias en línea recta entre ciudades y los metales recuperables (EPA). Son{" "}
+                <strong>ilustrativos, de orden de magnitud</strong>: los tamaños de los archivos (salvo el video HD, ≈ 3 GB/h según Netflix), la energía de red por GB (IEA, Kamiya 2020: 0.1–0.2 kWh/GB para 4G; Aslan et al. 2018 para redes fijas), los 50 kg de CO₂e de
+                fabricar un teléfono (informes ambientales de fabricantes, 2023) y los 5 kWh anuales de carga. El factor de emisión es el oficial del Sistema Eléctrico Nacional 2024 (0.444 t CO₂e/MWh). La red está simplificada y fuera de escala; los dominios, direcciones IP (rangos de documentación), el estudio
+                «Ramírez y Soto (2021)» y los datos personales son ficticios. Cable MAREA: Virginia Beach–Bilbao, 6 600 km (2017). Basura electrónica: Global E-waste Monitor 2024. Fuente del contenido: {FUENTE}
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }

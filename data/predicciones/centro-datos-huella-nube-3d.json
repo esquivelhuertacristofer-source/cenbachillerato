@@ -1,0 +1,12 @@
+{
+  "escena": "Un campus de servidores de 30 MW enfriado con aire exterior y agua evaporada. Un deslizador fija la temperatura del pasillo frío.",
+  "pregunta": "Subes el pasillo frío de 18 a 26 °C, aún en rango seguro. ¿Qué pasa con el agua al año?",
+  "opciones": [
+    { "id": "a", "texto": "Sube: servidores más calientes exigen más agua", "icono": "fa-arrow-trend-up" },
+    { "id": "b", "texto": "Baja mucho: el aire de afuera alcanza más horas", "icono": "fa-droplet-slash" },
+    { "id": "c", "texto": "Casi no cambia: el agua no depende de ese ajuste", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "Con el pasillo más tibio, el aire exterior basta durante más horas del año y se evapora menos agua. Pasar de 18 a 26 °C la reduce cerca de 90 %, y el PUE también baja.",
+  "comoComprobarlo": "Elige «Aire exterior + evaporación», mueve el deslizador del pasillo frío de 18 a 26 °C y observa «Agua al año» en el panel."
+}

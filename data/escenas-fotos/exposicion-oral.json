@@ -1,0 +1,7 @@
+{
+  "slug": "exposicion-oral",
+  "items": [
+    { "clave": "salon-grupo", "formato": "16:9", "estilo": "ilustracion", "escena": "Salón de clases de bachillerato visto desde el fondo, unas treinta personas jóvenes sentadas en filas de bancas mirando hacia el frente, un pizarrón verde vacío y una pantalla de proyector apagada, luz de la mañana por las ventanas" },
+    { "clave": "tarima", "formato": "1:1", "estilo": "ilustracion", "escena": "Frente de un salón con un pequeño estrado de madera, un proyector colgado del techo apuntando a una pared blanca vacía y un atril con una libreta cerrada" }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "escena": "El calendario semanal de Ana, con una escala de frecuencia de 0 % a 100 %",
+  "pregunta": "Ana come comida rápida solo un día de la semana. ¿Dónde se detiene la barra?",
+  "opciones": [
+    { "id": "a", "texto": "En «sometimes», la mitad de la escala", "icono": "fa-chart-simple" },
+    { "id": "b", "texto": "En «rarely», cerca de la base", "icono": "fa-arrow-down" },
+    { "id": "c", "texto": "En «never», justo en cero", "icono": "fa-ban" }
+  ],
+  "correcta": "b",
+  "porque": "Un día de siete es cerca de 14 %. Eso queda junto a «rarely» (20 %) y lejos de «never» (0 %), que significa ningún día, y de «sometimes» (50 %).",
+  "comoComprobarlo": "En «How often?» elige el hábito de la comida rápida, cuenta sus fichas de color y mira hasta dónde sube la barra."
+}

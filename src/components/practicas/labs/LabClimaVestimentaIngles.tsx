@@ -23,6 +23,7 @@ import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, NUM, OK, card, Eyebrow, SceneBoundary } from "./_kit";
 import { hablarLab, callarLab } from "./lab-voz";
+import { LabShell, Bloque, BotonHerramienta, Deslizador } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { CompletaTexto } from "./_mecanica-huecos";
@@ -97,7 +98,7 @@ const ClimaScene = dynamic(() => import("./ClimaVestimentaInglesScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-cloud-sun-rain fa-fade" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Cargando la plaza de la colonia en 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Cargando la plaza de la colonia en 3D…</span>
     </div>
   ),
 });
@@ -152,15 +153,15 @@ function DescribeCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: s
           ¿Describe o juzga?
         </Eyebrow>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 10.5, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
           {[1, 2, 3].map((k) => (
-            <i key={k} className="fa-solid fa-star" style={{ fontSize: 13, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
+            <i key={k} className="fa-solid fa-star" style={{ fontSize: 14, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
           ))}
         </div>
       </div>
       {resuelto === null ? (
         <>
-          <div style={{ fontSize: 11, color: T.text3, fontWeight: 800, marginBottom: 6 }}>
+          <div style={{ fontSize: 14, color: T.text3, fontWeight: 800, marginBottom: 6 }}>
             Oración {pos + 1} de {ronda.length} · ¿dice algo que se observa o da una opinión sobre la persona?
           </div>
           <div style={{ fontSize: 16, color: "#fff", fontWeight: 800, lineHeight: 1.45, marginBottom: 12 }}>«{actual.texto}»</div>
@@ -174,7 +175,7 @@ function DescribeCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: s
               Juzga: es una opinión
             </button>
           </div>
-          {aviso && <div style={{ marginTop: 10, fontSize: 12, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
+          {aviso && <div style={{ marginTop: 10, fontSize: 14, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
         </>
       ) : (
         <div style={{ padding: "12px 14px", borderRadius: 11, border: `1px solid ${OK}55`, background: "rgba(52,211,153,0.08)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
@@ -182,9 +183,9 @@ function DescribeCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: s
             {[1, 2, 3].map((k) => (
               <i key={k} className="fa-solid fa-star" style={{ fontSize: 15, color: k <= resuelto ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
             ))}
-            <span style={{ fontSize: 12.5, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
+            <span style={{ fontSize: 14, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
           </span>
-          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 12.5, fontWeight: 900 }}>
+          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 14, fontWeight: 900 }}>
             <i className="fa-solid fa-shuffle" style={{ marginRight: 8 }} />
             Otra ronda
           </button>
@@ -239,7 +240,6 @@ export function LabClimaVestimentaIngles({ color }: PracticaLabProps) {
 
   // ── Comunes
   const [resetNonce, setResetNonce] = useState(0);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   const { mejorEstrellas, registraEstrellas: guardaEstrellas } = useEstrellas(RETO_KEY);
@@ -436,42 +436,36 @@ export function LabClimaVestimentaIngles({ color }: PracticaLabProps) {
   };
 
   /* ── Objetivos ─────────────────────────────────────────────────────── */
-  const objetivos: { t: string; done: boolean }[] = [
-    { t: "Ver la plaza con los seis tipos de clima", done: vistos.size === CONDICIONES.length },
-    { t: "Escribir en inglés tres reportes del clima correctos", done: reportesOk >= 3 },
-    { t: "Vestir bien a alguien para frío, para lluvia y para calor", done: categorias.size === 3 },
-    { t: "Armar la oración «… is wearing … because it is …»", done: oracionOk },
-    { t: "Identificar a las seis personas por su descripción", done: identificadas.size === PERSONAS.length },
-    { t: "Escribir la descripción correcta y respetuosa de dos personas", done: descritas.size >= 2 },
-    { t: "Clasificar oraciones en «describe» o «juzga» y ganar estrellas", done: clasifico },
-    { t: "Aprobar el quiz evaluable (A4)", done: quizAprobado },
-    { t: "Completar el texto (A2)", done: textoOk },
+  const objetivos: { txt: string; done: boolean }[] = [
+    { txt: "Ver la plaza con los seis tipos de clima", done: vistos.size === CONDICIONES.length },
+    { txt: "Escribir en inglés tres reportes del clima correctos", done: reportesOk >= 3 },
+    { txt: "Vestir bien a alguien para frío, para lluvia y para calor", done: categorias.size === 3 },
+    { txt: "Armar la oración «… is wearing … because it is …»", done: oracionOk },
+    { txt: "Identificar a las seis personas por su descripción", done: identificadas.size === PERSONAS.length },
+    { txt: "Escribir la descripción correcta y respetuosa de dos personas", done: descritas.size >= 2 },
+    { txt: "Clasificar oraciones en «describe» o «juzga» y ganar estrellas", done: clasifico },
+    { txt: "Aprobar el quiz evaluable (A4)", done: quizAprobado },
+    { txt: "Completar el texto (A2)", done: textoOk },
   ];
 
   /* ── Visor ─────────────────────────────────────────────────────────── */
   const vista: VistaClima = modo;
-  let chipVivo = "";
   let pie = "";
   if (modo === "clima") {
     if (retoActivo) {
-      chipVivo = `reto del reportero · ${signo(reporte.tempC)} °C · ${reportesOk}/3`;
       pie = resClima?.ok ? `Correct! ${fraseClima(reporte.condicion, reporte.tempC)}` : "Mira el cielo y el termómetro de la plaza y escribe cómo está el clima en inglés: It is … and it is …";
     } else {
-      chipVivo = `${condicion} · ${palabraTemp(tempC)} · ${signo(tempC)} °C / ${aFahrenheit(tempC)} °F`;
       pie = `${fraseClima(condicion, tempC)} — En español: ${ES_CONDICION[condicion]} y ${ES_TEMP[palabraTemp(tempC)]}.`;
     }
   } else if (modo === "vestir") {
-    chipVivo = `${f.lugar.split(",")[0]!.toLowerCase()} · ${signo(f.tempC)} °C · ${revisado ? (resAtuendo.ok ? "atuendo adecuado" : "atuendo inadecuado") : `vistiendo a ${quien.nombre}`}`;
     pie = revisado
       ? resAtuendo.ok
         ? `${quien.nombre} sale a la calle cómod${quien.pron === "she" ? "a" : "o"}: la ropa va con el pronóstico. Ahora arma la oración.`
         : `${quien.nombre} sale a la calle y ${resAtuendo.problema === "mojado" ? "se moja" : resAtuendo.problema === "calor" ? "se acalora" : "tiembla de frío"}. ${[...resAtuendo.prendas.filter((p) => p.estado === "mal").map((p) => p.razon), ...resAtuendo.faltan.map((x) => x.texto)][0] ?? ""}`
       : `«${f.texto}» Elige la ropa de ${quien.nombre} y revisa el atuendo.`;
   } else if (enTuTurno) {
-    chipVivo = `your turn · describiendo a ${dq.nombre} (${dq.pron})`;
     pie = `Escribe cómo es ${dq.nombre} y qué lleva puesto. Describe lo que se ve: estatura, cabello, ropa. Sin opiniones.`;
   } else {
-    chipVivo = `who is it? · descripción ${ronda + 1} de ${RONDAS_QUIEN.length}${seleccion ? ` · elegiste la n.º ${ORDEN_PARADA.indexOf(seleccion) + 1}` : ""}`;
     pie = `«${rq.texto}»`;
   }
 
@@ -481,13 +475,13 @@ export function LabClimaVestimentaIngles({ color }: PracticaLabProps) {
         <i className={`fa-solid ${def.icono}`} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{def.etq}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los resultados siguen aquí. {pie}</div>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los resultados siguen aquí. {pie}</div>
     </div>
   );
 
-  const sub = (txt: string) => <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
+  const sub = (txt: string) => <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
   const nota = (txt: ReactNode, col: string, icono = "fa-circle-info") => (
-    <div style={{ marginTop: 10, fontSize: 12, lineHeight: 1.55, color: col }}>
+    <div style={{ marginTop: 10, fontSize: 14, lineHeight: 1.55, color: col }}>
       <i className={`fa-solid ${icono}`} style={{ marginRight: 7 }} />
       {txt}
     </div>
@@ -509,7 +503,7 @@ export function LabClimaVestimentaIngles({ color }: PracticaLabProps) {
   );
   const listaAvisos = (xs: Aviso[]) =>
     xs.map((a, i) => (
-      <div key={i} style={{ marginTop: 8, fontSize: 12, lineHeight: 1.5, color: a.tipo === "error" ? WARN : "#7dd3fc", display: "flex", gap: 7 }}>
+      <div key={i} style={{ marginTop: 8, fontSize: 14, lineHeight: 1.5, color: a.tipo === "error" ? WARN : "#7dd3fc", display: "flex", gap: 7 }}>
         <i className={`fa-solid ${a.tipo === "error" ? "fa-triangle-exclamation" : "fa-lightbulb"}`} style={{ marginTop: 3 }} />
         <span>{a.texto}</span>
       </div>
@@ -530,24 +524,9 @@ export function LabClimaVestimentaIngles({ color }: PracticaLabProps) {
             </button>
           ))}
         </div>
-        <label style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 12, opacity: retoActivo ? 0.45 : 1 }}>
-          <i className="fa-solid fa-temperature-half" style={{ color: "#f87171" }} />
-          <input
-            type="range"
-            aria-label="Temperatura de la plaza (°C)"
-            className="cv-range"
-            min={T_MIN}
-            max={condicion === "snowing" ? T_MAX_NIEVE : T_MAX}
-            step={1}
-            value={tempC}
-            disabled={retoActivo}
-            onChange={(e) => setTempC(Number(e.target.value))}
-            style={{ ["--cvc" as string]: TEMP_DEF[palabraTemp(tempC)].col }}
-          />
-          <span style={{ width: 118, textAlign: "right", fontSize: 13, color: "#fff", fontWeight: 800, ...NUM }}>
-            {signo(tempC)} °C · {aFahrenheit(tempC)} °F
-          </span>
-        </label>
+        <div style={{ marginTop: 14, opacity: retoActivo ? 0.45 : 1, pointerEvents: retoActivo ? "none" : "auto" }}>
+          <Deslizador label="temperatura de la plaza" icon="fa-temperature-half" colr={TEMP_DEF[palabraTemp(tempC)].col} valor={`${signo(tempC)} °C · ${aFahrenheit(tempC)} °F`} min={T_MIN} max={condicion === "snowing" ? T_MAX_NIEVE : T_MAX} step={1} value={tempC} onChange={setTempC} hintL="frío" hintR="calor" />
+        </div>
         {condicion === "snowing" && !retoActivo && nota("La nieve solo cae con el aire cerca o por debajo de 0 °C: con nieve el termómetro no pasa de 2 °C.", T.text3, "fa-snowflake")}
         <div className="cv-escala">
           {(Object.keys(TEMP_DEF) as PalabraTemp[]).map((k) => (
@@ -563,7 +542,7 @@ export function LabClimaVestimentaIngles({ color }: PracticaLabProps) {
         {sub("2 · Reto del reportero: escribe tú el clima")}
         {!retoActivo ? (
           <>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5 }}>La plaza cambiará a un clima al azar. Sin ver las palabras, escribe en inglés cómo está el cielo y la temperatura (por ejemplo: It&apos;s cloudy and cool).</div>
+            <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>La plaza cambiará a un clima al azar. Sin ver las palabras, escribe en inglés cómo está el cielo y la temperatura (por ejemplo: It&apos;s cloudy and cool).</div>
             <div className="cv-opts" style={{ marginTop: 10 }}>
               <button className="cv-toggle" onClick={empezarReto} style={{ ["--cvc" as string]: accent }}>
                 <i className="fa-solid fa-microphone-lines" style={{ marginRight: 9, color: accent }} />
@@ -573,7 +552,7 @@ export function LabClimaVestimentaIngles({ color }: PracticaLabProps) {
           </>
         ) : (
           <>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5, marginBottom: 8 }}>
+            <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5, marginBottom: 8 }}>
               Reporte en vivo desde la plaza. El termómetro marca <strong style={{ color: "#fff", ...NUM }}>{signo(reporte.tempC)} °C</strong>. What&apos;s the weather like?
             </div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -633,7 +612,7 @@ export function LabClimaVestimentaIngles({ color }: PracticaLabProps) {
         </div>
         {sub(`El pronóstico · ${f.lugar}, ${f.cuando}`)}
         {ingles(f.texto)}
-        <div style={{ fontSize: 12, color: T.text2, marginTop: 8, lineHeight: 1.5 }}>
+        <div style={{ fontSize: 14, color: T.text2, marginTop: 8, lineHeight: 1.5 }}>
           Viste a <strong style={{ color: "#fff" }}>{quien.nombre}</strong> <span lang="en">({quien.pron})</span>. Elige una prenda de arriba, una de abajo y calzado; los complementos son opcionales.
         </div>
         {(["top", "bottom", "shoes", "extra"] as const).map((r) => (
@@ -663,7 +642,7 @@ export function LabClimaVestimentaIngles({ color }: PracticaLabProps) {
           <>
             <div style={{ display: "grid", gap: 6, marginTop: 10 }}>
               {resAtuendo.prendas.map((p) => (
-                <div key={p.id} style={{ display: "flex", gap: 8, fontSize: 12, lineHeight: 1.45, color: T.text2 }}>
+                <div key={p.id} style={{ display: "flex", gap: 8, fontSize: 14, lineHeight: 1.45, color: T.text2 }}>
                   <i className={`fa-solid ${p.estado === "bien" ? "fa-circle-check" : p.estado === "mal" ? "fa-circle-xmark" : "fa-circle-minus"}`} style={{ marginTop: 3, color: p.estado === "bien" ? OK : p.estado === "mal" ? WARN : "#fbbf24" }} />
                   <span>
                     <strong style={{ color: "#fff" }} lang="en">
@@ -674,7 +653,7 @@ export function LabClimaVestimentaIngles({ color }: PracticaLabProps) {
                 </div>
               ))}
               {resAtuendo.faltan.map((x, i) => (
-                <div key={i} style={{ display: "flex", gap: 8, fontSize: 12, lineHeight: 1.45, color: WARN }}>
+                <div key={i} style={{ display: "flex", gap: 8, fontSize: 14, lineHeight: 1.45, color: WARN }}>
                   <i className="fa-solid fa-triangle-exclamation" style={{ marginTop: 3 }} />
                   <span>{x.texto}</span>
                 </div>
@@ -684,11 +663,11 @@ export function LabClimaVestimentaIngles({ color }: PracticaLabProps) {
             {resAtuendo.ok && (
               <>
                 {sub("3 · Arma la oración con fichas")}
-                <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5, marginBottom: 8 }}>
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5, marginBottom: 8 }}>
                   Di qué lleva puesto {quien.nombre} y por qué. Toca las fichas en orden; toca una colocada para quitarla. Hay fichas que sobran.
                 </div>
                 <div className="cv-linea" aria-label="Tu oración">
-                  {puestas.length === 0 && <span style={{ color: T.text3, fontSize: 12 }}>Tu oración aparece aquí…</span>}
+                  {puestas.length === 0 && <span style={{ color: T.text3, fontSize: 14 }}>Tu oración aparece aquí…</span>}
                   {puestas.map((p) => (
                     <button key={p.k} className="cv-ficha cv-puesta" onClick={() => { setPuestas((xs) => xs.filter((x) => x.k !== p.k)); setAvisosOracion(null); }} disabled={avisosOracion?.length === 0} lang="en">
                       {p.w}
@@ -725,7 +704,7 @@ export function LabClimaVestimentaIngles({ color }: PracticaLabProps) {
             )}
           </>
         )}
-        <div style={{ marginTop: 12, fontSize: 11, color: T.text3, lineHeight: 1.5 }}>Las temperaturas de los pronósticos son valores típicos ilustrativos de cada ciudad y temporada, no mediciones de un día real.</div>
+        <div style={{ marginTop: 12, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>Las temperaturas de los pronósticos son valores típicos ilustrativos de cada ciudad y temporada, no mediciones de un día real.</div>
       </>
     );
   } else {
@@ -745,7 +724,7 @@ export function LabClimaVestimentaIngles({ color }: PracticaLabProps) {
           <>
             {sub(`Descripción ${ronda + 1} de ${RONDAS_QUIEN.length}`)}
             {ingles(rq.texto)}
-            <div style={{ fontSize: 12, color: T.text2, marginTop: 8 }}>Toca a la persona en la escena o elige su número:</div>
+            <div style={{ fontSize: 14, color: T.text2, marginTop: 8 }}>Toca a la persona en la escena o elige su número:</div>
             <div className="cv-opts" style={{ marginTop: 8 }}>
               {ORDEN_PARADA.map((id, k) => {
                 const on = seleccion === id;
@@ -792,7 +771,7 @@ export function LabClimaVestimentaIngles({ color }: PracticaLabProps) {
                 );
               })}
             </div>
-            <div style={{ fontSize: 12.5, color: T.text2, marginTop: 10, lineHeight: 1.5 }}>
+            <div style={{ fontSize: 14, color: T.text2, marginTop: 10, lineHeight: 1.5 }}>
               Describe en inglés a la persona {ORDEN_PARADA.indexOf(dq.id) + 1}: <strong style={{ color: "#fff" }}>{dq.nombre}</strong> <span lang="en">({dq.pron})</span>. Menciona al menos tres rasgos, entre ellos su cabello y su ropa.
             </div>
             <textarea
@@ -834,365 +813,218 @@ export function LabClimaVestimentaIngles({ color }: PracticaLabProps) {
             {sub("Pistas (escritura A3)")}
             <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 4 }}>
               {PISTAS_A3.map((p, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }} lang="en">
+                <li key={i} style={{ fontSize: 14, color: T.text2, lineHeight: 1.45 }} lang="en">
                   {p}
                 </li>
               ))}
             </ul>
-            <div style={{ fontSize: 11.5, color: T.text3, marginTop: 8, lineHeight: 1.5 }}>{REFLEXION_A3}</div>
+            <div style={{ fontSize: 14, color: T.text3, marginTop: 8, lineHeight: 1.5 }}>{REFLEXION_A3}</div>
           </>
         )}
-        <div style={{ marginTop: 12, fontSize: 11, color: T.text3, lineHeight: 1.5 }}>Las seis personas son ficticias. Desde la parada no se distingue el color de ojos, así que no cuenta a favor ni en contra.</div>
+        <div style={{ marginTop: 12, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>Las seis personas son ficticias. Desde la parada no se distingue el color de ojos, así que no cuenta a favor ni en contra.</div>
       </>
     );
   }
 
+  /* Lectura corta sobre la escena (≤ 10 palabras). */
+  let lectura: ReactNode;
+  if (modo === "clima") {
+    lectura = retoActivo ? `Termómetro: ${signo(reporte.tempC)} °C. Escribe el clima en inglés` : fraseClima(condicion, tempC);
+  } else if (modo === "vestir") {
+    lectura = revisado ? (resAtuendo.ok ? `${quien.nombre} va cómod${quien.pron === "she" ? "a" : "o"}: arma la oración` : resAtuendo.problema === "mojado" ? `${quien.nombre} se moja` : resAtuendo.problema === "calor" ? `${quien.nombre} se acalora` : `${quien.nombre} tiembla de frío`) : `${f.lugar.split(",")[0]} · ${signo(f.tempC)} °C: viste a ${quien.nombre}`;
+  } else {
+    lectura = enTuTurno ? `Describe a ${dq.nombre} en inglés` : "Lee la descripción y toca a la persona";
+  }
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes cvPulse { 0%,100%{ box-shadow:0 0 0 0 var(--cvd); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .cv-live-dot { animation: cvPulse 1.6s ease-in-out infinite; }
-        @media (prefers-reduced-motion: reduce){ .cv-live-dot { animation:none; } }
-        .cv-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .cv-grid { grid-template-columns: 1fr; } }
-        .cv-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .cv-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .cv-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .cv-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .cv-tab { cursor:pointer; border:1px solid var(--cvc); border-radius:12px; padding:11px 8px; text-align:center; background:transparent; transition:all .15s; color:#fff; }
-        .cv-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
-        .cv-tab:hover { background:rgba(255,255,255,0.06); }
-        .cv-tabs2 { display:grid; grid-template-columns: 1fr 1fr; gap:7px; }
-        .cv-opts { display:flex; flex-wrap:wrap; gap:7px; }
-        .cv-opt { cursor:pointer; border:1px solid var(--cvc); border-radius:10px; padding:9px 12px; font-size:12px; font-weight:800; color:#fff; background:transparent; transition:all .15s; display:inline-flex; align-items:center; }
-        .cv-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.72); }
-        .cv-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
-        .cv-opt:disabled { cursor:default; opacity:0.55; }
-        .cv-dot { width:10px; height:10px; border-radius:50%; margin-right:7px; border:1px solid rgba(255,255,255,0.35); flex-shrink:0; }
-        .cv-toggle { width:100%; cursor:pointer; border:1px solid var(--cvc); border-radius:11px; padding:11px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:12.5px; font-weight:900; text-align:left; transition:all .15s; }
-        .cv-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
-        .cv-toggle:disabled { cursor:default; opacity:0.6; }
-        .cv-range { flex:1; accent-color: var(--cvc); }
-        .cv-escala { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-top:12px; }
-        .cv-escala > div { border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:7px 6px; text-align:center; display:flex; flex-direction:column; gap:2px; transition:all .15s; }
-        .cv-escala > div[data-on="true"] { border-color:var(--cvc); background:rgba(255,255,255,0.06); box-shadow:0 0 14px -6px var(--cvc); }
-        .cv-escala strong { font-size:13px; color:var(--cvc); }
-        .cv-escala span { font-size:10.5px; color:rgba(255,255,255,0.7); }
-        .cv-escala small { font-size:9.5px; color:rgba(255,255,255,0.45); }
-        .cv-input { flex:1; min-width:180px; border-radius:10px; border:1.5px solid ${T.lineStrong}; background:${T.inset}; color:#fff; font-size:14px; font-weight:700; padding:9px 12px; font-family:inherit; outline:none; transition:all .15s; }
-        .cv-input:focus { border-color:${accent}; box-shadow:0 0 0 3px rgba(${color.rgba},0.18); }
-        .cv-area { width:100%; margin-top:8px; resize:vertical; line-height:1.5; box-sizing:border-box; }
-        .cv-listen { cursor:pointer; flex-shrink:0; border:1px solid rgba(255,255,255,0.18); border-radius:9px; padding:6px 10px; font-size:11px; font-weight:800; color:#e0f2fe; background:rgba(56,189,248,0.1); transition:all .15s; }
-        .cv-listen:hover { background:rgba(56,189,248,0.22); }
-        .cv-linea { min-height:46px; display:flex; flex-wrap:wrap; align-items:center; gap:6px; padding:8px 10px; border-radius:12px; border:1.5px dashed ${modoCol}77; background:rgba(4,10,22,0.45); }
-        .cv-ficha { cursor:pointer; border-radius:9px; padding:7px 11px; font-size:13px; font-weight:800; font-family:ui-rounded, system-ui, sans-serif; transition:all .12s; }
-        .cv-libre { border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.05); color:#fff; }
-        .cv-libre:hover:not(:disabled) { border-color:${modoCol}; background:${modoCol}22; transform:translateY(-1px); }
-        .cv-puesta { border:1px solid ${modoCol}; background:${modoCol}26; color:#fff; }
-        .cv-ficha:disabled { cursor:default; opacity:0.8; }
-        .cv-chip { display:inline-flex; align-items:center; font-size:11.5px; font-weight:800; padding:4px 9px; border-radius:999px; border:1px solid var(--cvc); color:var(--cvc); background:rgba(52,211,153,0.08); }
-        .cv-opt:focus-visible, .cv-tab:focus-visible, .cv-toggle:focus-visible, .cv-icobtn:focus-visible, .cv-range:focus-visible, .cv-ficha:focus-visible, .cv-listen:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
-        @media (max-width: 1000px){ .cv-bottom { grid-template-columns: 1fr !important; } }
-        .cv-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .cv-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .cv-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61; background:linear-gradient(180deg,#06121e 0%,#040a16 100%);
-          border-left:1px solid rgba(${color.rgba},0.32); box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1); display:flex; flex-direction:column; }
-        .cv-drawer[data-open="true"] { transform:translateX(0); }
-        .cv-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .cv-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .cv-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .cv-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .cv-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:11px 16px; border-radius:999px;
-          border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800; background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
-        .cv-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        .cv-guia summary { cursor:pointer; font-size:11px; color:rgba(255,255,255,0.45); font-weight:800; margin-top:3px; }
-      `}</style>
-
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="cv-tabs">
-          {MODOS.map((m) => {
-            const d = MODOS_DEF[m];
-            const col = `#${d.color.replace("#", "")}`;
-            const on = m === modo;
-            return (
-              <button key={m} className="cv-tab" data-on={on} onClick={() => cambiarModo(m)} style={{ ["--cvc" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? col : "inherit" }}>
-                  <i className={`fa-solid ${d.icono}`} />
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <ClimaScene
+            vista={vista}
+            modoColor={modoCol}
+            resetNonce={resetNonce}
+            condicion={condEscena}
+            tempC={tempEscena}
+            pronosticoId={f.id}
+            atuendo={atuendo}
+            revisado={revisado}
+            okAtuendo={resAtuendo.ok}
+            problema={resAtuendo.problema}
+            orden={ORDEN_PARADA}
+            seleccion={enTuTurno ? null : seleccion}
+            seleccionOk={acierto}
+            describir={enTuTurno ? describirId : null}
+            onElegirPersona={elegirPersona}
+          />
+        </SceneBoundary>
+      }
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m, etiqueta: MODOS_DEF[m].etq, icono: MODOS_DEF[m].icono })),
+        valor: modo,
+        cambiar: (id) => cambiarModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Cuaderno",
+          icono: "fa-pen-to-square",
+          contenido: (
+            <>
+              <style>{cssCv(accent, color.rgba, modoCol)}</style>
+              <Bloque titulo={`${def.etq}: qué estás viendo`} icono={def.icono}>
+                <p style={{ margin: 0, color: T.text2, ...NUM }}>{pie}</p>
+              </Bloque>
+              <Bloque titulo="Controles" icono="fa-sliders">
+                {control}
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <>
+              <DescribeCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
+              <RetoQuizCard quiz={QUIZ_A4} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Ya describes personas, ropa y clima en inglés." />
+              <div style={{ ...card, padding: "20px 18px 22px", marginTop: 22 }}>
+                <Eyebrow>
+                  <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
+                  Completa el texto (A2)
+                </Eyebrow>
+                <div style={{ marginTop: 12 }}>
+                  <CompletaTexto data={HUECOS_A2} accent={accent} rgba={color.rgba} completado={textoOk} onCompletado={() => { setTextoOk(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
                 </div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }} lang="en">
-                  {d.etq}
-                </div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{d.subtitulo}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="cv-grid">
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 58vh, 660px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <ClimaScene
-                vista={vista}
-                modoColor={modoCol}
-                resetNonce={resetNonce}
-                condicion={condEscena}
-                tempC={tempEscena}
-                pronosticoId={f.id}
-                atuendo={atuendo}
-                revisado={revisado}
-                okAtuendo={resAtuendo.ok}
-                problema={resAtuendo.problema}
-                orden={ORDEN_PARADA}
-                seleccion={enTuTurno ? null : seleccion}
-                seleccionOk={acierto}
-                describir={enTuTurno ? describirId : null}
-                onElegirPersona={elegirPersona}
-              />
-            </SceneBoundary>
-
-            <div style={{ position: "absolute", top: 14, left: 16, right: 150, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, pointerEvents: "none" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.78)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)", maxWidth: "100%" }}>
-                <span className="cv-live-dot" style={{ ["--cvd" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol, flexShrink: 0 }} />
-                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3, flexShrink: 0 }}>EN VIVO</span>
-                <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)", flexShrink: 0 }} />
-                <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", ...NUM }}>{chipVivo}</span>
               </div>
-            </div>
-
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.78)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="cv-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría" aria-label="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="cv-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"} aria-label={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="cv-icobtn" onClick={reiniciar} title="Reiniciar" aria-label="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "34px 132px 14px 18px", background: "linear-gradient(0deg, rgba(3,8,18,0.94) 0%, rgba(3,8,18,0.6) 60%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                <span lang="en">{def.etq}</span> — {def.subtitulo}
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6, ...NUM }}>{pie}</div>
-            </div>
-
-            <button className="cv-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-          </div>
-
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-              Controles — {def.etq}
-            </Eyebrow>
-            <div style={{ marginTop: 4 }}>{control}</div>
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-people-roof" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>La parada de la colonia</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #7dd3fc55", background: "rgba(125,211,252,0.07)" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book-open" style={{ marginRight: 8, color: "#7dd3fc" }} />
-              Lectura A1
-            </Eyebrow>
-            <div style={{ fontSize: 13, color: "#fff", fontWeight: 800, lineHeight: 1.4, marginBottom: 10 }}>{TITULO_A1}</div>
-            <div style={{ display: "grid", gap: 9, marginBottom: 12 }}>
-              {LECTURA_A1.map((p, i) => (
-                <div key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.55, whiteSpace: "pre-line" }}>
-                  {p}
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", marginBottom: 8 }}>PREGUNTAS DE COMPRENSIÓN</div>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {PREGUNTAS_A1.map((q, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  {q.pregunta}
-                  <details className="cv-guia">
-                    <summary>Respuesta guía</summary>
-                    <span style={{ fontSize: 12, color: "#fff" }} lang="en">
-                      {q.guia}
-                    </span>
-                  </details>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />
-              Cómo usar el laboratorio
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-                Objetivos de la sesión
-              </Eyebrow>
-              <span style={{ fontSize: 11, fontWeight: 800, color: objetivos.every((o) => o.done) ? OK : T.text3 }}>
-                {objetivos.filter((o) => o.done).length}/{objetivos.length}
-              </span>
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ marginTop: 2, fontSize: 13, color: o.done ? OK : "rgba(255,255,255,0.22)" }} />
-                  <span style={{ fontSize: 12, color: o.done ? "#fff" : T.text2, lineHeight: 1.4 }}>{o.t}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="cv-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <div style={{ padding: "14px 16px", borderRadius: 12, border: `1px solid ${accent}33`, background: `rgba(${color.rgba},0.07)` }}>
-            <Eyebrow>
-              <i className="fa-solid fa-map-location-dot" style={{ marginRight: 8, color: accent }} />
-              Infografía IN-II-P04-A1 (Inglés II)
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {IDEAS_IN2.map((x, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.5 }}>
-                  {x}
-                </li>
-              ))}
-            </ul>
-            <div style={{ fontSize: 11.5, color: T.text3, marginTop: 10, lineHeight: 1.5 }}>
-              Oraciones modelo del mapa: <span lang="en" style={{ color: "#fff" }}>{MODELO_IN2.join(" · ")}</span>
-            </div>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />
-              Hechos (verdadero o falso A5)
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {HECHOS.map((h, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
-                  <strong style={{ color: h.respuesta ? OK : WARN }}>{h.respuesta ? "Verdadero" : "Falso"}:</strong> {h.enunciado} <span style={{ color: T.text3 }}>{h.retro}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />
-              Glosario (A6)
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {GLOSARIO.map((gi, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }} lang="en">
-                    {gi.termino}.{" "}
-                  </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
-                  <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.4, marginTop: 4 }} lang="en">
-                    <i className="fa-solid fa-quote-left" style={{ marginRight: 6, color: accent }} />
-                    {gi.ejemplo}
+            </>
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="La parada de la colonia" icono="fa-people-roof">
+                <p style={{ margin: 0, color: T.text2 }}>{PROBLEMA}</p>
+              </Bloque>
+              <Bloque titulo="Lectura A1" icono="fa-book-open">
+                <strong style={{ color: "#fff" }}>{TITULO_A1}</strong>
+                {LECTURA_A1.map((p, i) => (
+                  <p key={i} style={{ margin: 0, color: T.text2, whiteSpace: "pre-line" }}>{p}</p>
+                ))}
+              </Bloque>
+              <Bloque titulo="Preguntas de comprensión" icono="fa-circle-question">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {PREGUNTAS_A1.map((q, i) => (
+                    <li key={i}>
+                      {q.pregunta}
+                      <details className="cv-guia">
+                        <summary>Respuesta guía</summary>
+                        <span style={{ color: "#fff" }} lang="en">{q.guia}</span>
+                      </details>
+                    </li>
+                  ))}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Cómo usar el laboratorio" icono="fa-list-ol">
+                <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8 }}>
+                  {INSTRUCCIONES.map((p, i) => <li key={i}>{p}</li>)}
+                </ol>
+              </Bloque>
+              <Bloque titulo="Infografía IN-II-P04-A1 (Inglés II)" icono="fa-map-location-dot">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {IDEAS_IN2.map((x, i) => <li key={i}>{x}</li>)}
+                </ul>
+                <p style={{ margin: 0, color: T.text3 }}>
+                  Oraciones modelo del mapa: <span lang="en" style={{ color: "#fff" }}>{MODELO_IN2.join(" · ")}</span>
+                </p>
+              </Bloque>
+              <Bloque titulo="Hechos (verdadero o falso A5)" icono="fa-circle-question">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {HECHOS.map((hh, i) => (
+                    <li key={i}>
+                      <strong style={{ color: hh.respuesta ? OK : WARN }}>{hh.respuesta ? "Verdadero" : "Falso"}:</strong> {hh.enunciado} <span style={{ color: T.text3 }}>{hh.retro}</span>
+                    </li>
+                  ))}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Glosario (A6)" icono="fa-book">
+                {GLOSARIO.map((gi, i) => (
+                  <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
+                    <span style={{ fontWeight: 900, color: accent }} lang="en">{gi.termino}. </span>
+                    <span style={{ color: T.text2 }}>{gi.definicion}</span>
+                    <div style={{ color: T.text3, marginTop: 4 }} lang="en">
+                      <i className="fa-solid fa-quote-left" style={{ marginRight: 6, color: accent }} />
+                      {gi.ejemplo}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11.5, color: T.text2, marginTop: 10 }}>
-              <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A6}
-            </div>
-          </div>
-        </div>
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-            Ideas clave
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-            {IDEAS.map((x, i) => (
-              <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                {x}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          La lectura A1 con sus preguntas, el quiz A4, el texto A2, los hechos A5, el glosario A6 y las pistas de escritura A3 son <strong>verbatim</strong> de IN-I-P06; los extractos y las oraciones
-          modelo de la infografía IN-II-P04-A1 también. Las seis personas, la colonia y sus nombres son <strong>ficticios</strong>. Las temperaturas de los pronósticos son valores típicos{" "}
-          <strong>ilustrativos</strong> de cada ciudad y temporada, y los rangos hot / warm / cool / cold son una convención del laboratorio: el inglés no fija grados exactos. La revisión automática de
-          lo que escribes reconoce el vocabulario de la progresión; si una oración correcta no se acepta, consúltala con tu docente. Fuente: {FUENTE}
-        </span>
-      </div>
-
-      <DescribeCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
-
-      <RetoQuizCard quiz={QUIZ_A4} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Ya describes personas, ropa y clima en inglés." />
-
-      <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
-          Completa el texto (A2)
-        </Eyebrow>
-        <div style={{ marginTop: 12 }}>
-          <CompletaTexto data={HUECOS_A2} accent={accent} rgba={color.rgba} completado={textoOk} onCompletado={() => { setTextoOk(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
-        </div>
-      </div>
-
-      <div className="cv-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="cv-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="cv-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="cv-close" onClick={() => setDrawer(false)} title="Cerrar" aria-label="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="cv-drawer-body">
-          <FichaTeorica data={CLIMA_VESTIMENTA_INGLES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+                ))}
+                <p style={{ margin: 0, color: T.text2 }}>
+                  <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A6}
+                </p>
+              </Bloque>
+              <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {IDEAS.map((x, i) => <li key={i}>{x}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={CLIMA_VESTIMENTA_INGLES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ marginTop: 18, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
+                La lectura A1 con sus preguntas, el quiz A4, el texto A2, los hechos A5, el glosario A6 y las pistas de escritura A3 son <strong>verbatim</strong> de IN-I-P06; los extractos y las oraciones modelo de la infografía IN-II-P04-A1 también. Las seis personas, la colonia y sus nombres son <strong>ficticios</strong>. Las temperaturas de los pronósticos son valores típicos <strong>ilustrativos</strong> de cada ciudad y temporada, y los rangos hot / warm / cool / cold son una convención del laboratorio: el inglés no fija grados exactos. La revisión automática de lo que escribes reconoce el vocabulario de la progresión; si una oración correcta no se acepta, consúltala con tu docente. Fuente: {FUENTE}
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }
+
+const cssCv = (accent: string, rgba: string, modoCol: string) => `
+  .cv-tabs2 { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:8px; }
+  .cv-opts { display:flex; flex-wrap:wrap; gap:8px; }
+  .cv-opt { cursor:pointer; border:1px solid var(--cvc); border-radius:10px; padding:10px 12px; font-size:14px; font-weight:800; color:#fff; background:transparent; transition:all .15s; display:inline-flex; align-items:center; text-align:left; }
+  .cv-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.72); }
+  .cv-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
+  .cv-opt:disabled { cursor:default; opacity:0.55; }
+  .cv-dot { width:12px; height:12px; border-radius:50%; margin-right:7px; border:1px solid rgba(255,255,255,0.35); flex-shrink:0; }
+  .cv-toggle { width:100%; cursor:pointer; border:1px solid var(--cvc); border-radius:11px; padding:11px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:14px; font-weight:900; text-align:left; transition:all .15s; }
+  .cv-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
+  .cv-toggle:disabled { cursor:default; opacity:0.6; }
+  .cv-escala { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; margin-top:12px; }
+  .cv-escala > div { border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:8px 8px; text-align:center; display:flex; flex-direction:column; gap:2px; transition:all .15s; }
+  .cv-escala > div[data-on="true"] { border-color:var(--cvc); background:rgba(255,255,255,0.06); box-shadow:0 0 14px -6px var(--cvc); }
+  .cv-escala strong { font-size:15px; color:var(--cvc); }
+  .cv-escala span { font-size:14px; color:rgba(255,255,255,0.7); }
+  .cv-escala small { font-size:14px; color:rgba(255,255,255,0.5); }
+  .cv-input { flex:1; min-width:180px; border-radius:10px; border:1.5px solid ${T.lineStrong}; background:${T.inset}; color:#fff; font-size:16px; font-weight:700; padding:9px 12px; font-family:inherit; outline:none; transition:all .15s; }
+  .cv-input:focus { border-color:${accent}; box-shadow:0 0 0 3px rgba(${rgba},0.18); }
+  .cv-area { width:100%; margin-top:8px; resize:vertical; line-height:1.5; box-sizing:border-box; }
+  .cv-listen { cursor:pointer; flex-shrink:0; border:1px solid rgba(255,255,255,0.18); border-radius:9px; padding:8px 10px; font-size:14px; font-weight:800; color:#e0f2fe; background:rgba(56,189,248,0.1); transition:all .15s; }
+  .cv-listen:hover { background:rgba(56,189,248,0.22); }
+  .cv-linea { min-height:46px; display:flex; flex-wrap:wrap; align-items:center; gap:6px; padding:8px 10px; border-radius:12px; border:1.5px dashed ${modoCol}77; background:rgba(4,10,22,0.45); }
+  .cv-ficha { cursor:pointer; border-radius:9px; padding:8px 11px; font-size:14px; font-weight:800; font-family:ui-rounded, system-ui, sans-serif; transition:all .12s; }
+  .cv-libre { border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.05); color:#fff; }
+  .cv-libre:hover:not(:disabled) { border-color:${modoCol}; background:${modoCol}22; transform:translateY(-1px); }
+  .cv-puesta { border:1px solid ${modoCol}; background:${modoCol}26; color:#fff; }
+  .cv-ficha:disabled { cursor:default; opacity:0.8; }
+  .cv-chip { display:inline-flex; align-items:center; font-size:14px; font-weight:800; padding:4px 9px; border-radius:999px; border:1px solid var(--cvc); color:var(--cvc); background:rgba(52,211,153,0.08); }
+  .cv-opt:focus-visible, .cv-toggle:focus-visible, .cv-ficha:focus-visible, .cv-listen:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
+  .cv-guia summary { cursor:pointer; font-size:14px; color:rgba(255,255,255,0.55); font-weight:800; margin-top:3px; }
+`;

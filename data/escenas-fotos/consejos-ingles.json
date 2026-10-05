@@ -1,0 +1,9 @@
+{
+  "slug": "consejos-ingles",
+  "items": [
+    { "clave": "ana-escritorio", "formato": "1:1", "estilo": "ilustracion", "escena": "Adolescente de pelo largo sentada de noche ante un escritorio con pilas de libros y una lámpara encendida, la cabeza apoyada en una mano y una expresión preocupada" },
+    { "clave": "diego-cocina", "formato": "1:1", "estilo": "ilustracion", "escena": "Adolescente con la mochila puesta bostezando sentado a la mesa de una cocina por la mañana, con ojeras y los brazos caídos sobre la mesa" },
+    { "clave": "valeria-salon", "formato": "1:1", "estilo": "ilustracion", "escena": "Adolescente sentada en su banca de un salón de clases mirando hacia abajo con una mano a medio levantar, compañeros y una maestra al fondo" },
+    { "clave": "mateo-tarea", "formato": "1:1", "estilo": "ilustracion", "escena": "Adolescente rodeado de montones de cuadernos y una laptop abierta sobre su cama, con las manos en la cabeza y expresión agobiada" }
+  ]
+}

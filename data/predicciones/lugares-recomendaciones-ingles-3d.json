@@ -1,0 +1,12 @@
+{
+  "escena": "Lucía ama fotografiar paisajes, pero no soporta los lugares llenos de gente; tú le recomiendas el mercado de artesanías",
+  "pregunta": "Si le escribes «You should visit the market because you can buy crafts», ¿cómo reacciona Lucía?",
+  "opciones": [
+    { "id": "a", "texto": "Feliz, porque puede tomar fotos", "icono": "fa-face-smile" },
+    { "id": "b", "texto": "Se queja de que hay demasiada gente", "icono": "fa-people-group" },
+    { "id": "c", "texto": "Se encoge de hombros, sin opinar", "icono": "fa-face-meh" }
+  ],
+  "correcta": "b",
+  "porque": "Tu oración está bien escrita, pero la reacción depende del lugar: el mercado siempre está concurrido y Lucía quería evitarlo. Una recomendación correcta en inglés no basta, debe encajar con lo que busca.",
+  "comoComprobarlo": "En «Recommend it» elige a Lucía, escribe esa recomendación y pulsa Recomendar; después cambia el lugar por the viewpoint y compara."
+}

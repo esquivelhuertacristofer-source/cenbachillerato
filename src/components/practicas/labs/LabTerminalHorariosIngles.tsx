@@ -19,12 +19,13 @@
  *      completas que se validan contra el plano 3D y la hoja del módulo.
  */
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import React, { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, OK, card, Eyebrow, SceneBoundary } from "./_kit";
 import { hablarLab, callarLab } from "./lab-voz";
 import { FichaTeorica } from "./_ficha";
+import { LabShell, Bloque, BotonHerramienta } from "./_shell";
 import { RetoQuizCard } from "./_reto-quiz";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { LabSfx } from "./lab-audio";
@@ -97,7 +98,7 @@ const TerminalScene = dynamic(() => import("./TerminalHorariosInglesScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-bus fa-fade" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Cargando la terminal en 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Cargando la terminal en 3D…</span>
     </div>
   ),
 });
@@ -158,15 +159,15 @@ function PreguntaCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: s
           ¿Qué se preguntó?
         </Eyebrow>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 10.5, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
           {[1, 2, 3].map((k) => (
-            <i key={k} className="fa-solid fa-star" style={{ fontSize: 13, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
+            <i key={k} className="fa-solid fa-star" style={{ fontSize: 14, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
           ))}
         </div>
       </div>
       {resuelto === null ? (
         <>
-          <div style={{ fontSize: 11, color: T.text3, fontWeight: 800, marginBottom: 6 }}>Respuesta {pos + 1} de {ronda.length} · ¿con qué palabra interrogativa empezaba la pregunta?</div>
+          <div style={{ fontSize: 14, color: T.text3, fontWeight: 800, marginBottom: 6 }}>Respuesta {pos + 1} de {ronda.length} · ¿con qué palabra interrogativa empezaba la pregunta?</div>
           <div className="th-estrella-item" style={{ fontSize: 16, color: "#fff", fontWeight: 800, lineHeight: 1.45, marginBottom: 12 }}>
             «{actual.respuesta}»
           </div>
@@ -177,7 +178,7 @@ function PreguntaCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: s
               </button>
             ))}
           </div>
-          {aviso && <div style={{ marginTop: 10, fontSize: 12, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
+          {aviso && <div style={{ marginTop: 10, fontSize: 14, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
         </>
       ) : (
         <div style={{ padding: "12px 14px", borderRadius: 11, border: `1px solid ${OK}55`, background: "rgba(52,211,153,0.08)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
@@ -185,9 +186,9 @@ function PreguntaCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: s
             {[1, 2, 3].map((k) => (
               <i key={k} className="fa-solid fa-star" style={{ fontSize: 15, color: k <= resuelto ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
             ))}
-            <span style={{ fontSize: 12.5, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
+            <span style={{ fontSize: 14, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
           </span>
-          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 12.5, fontWeight: 900 }}>
+          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 14, fontWeight: 900 }}>
             <i className="fa-solid fa-shuffle" style={{ marginRight: 8 }} />
             Otra ronda
           </button>
@@ -253,7 +254,6 @@ export function LabTerminalHorariosIngles({ color }: PracticaLabProps) {
 
   // ── Comunes
   const [resetNonce, setResetNonce] = useState(0);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const [sinVoz, setSinVoz] = useState(false);
   const [guiaA1, setGuiaA1] = useState(false);
@@ -485,13 +485,13 @@ export function LabTerminalHorariosIngles({ color }: PracticaLabProps) {
         <i className={`fa-solid ${def.icono}`} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{def.etq}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los resultados siguen aquí. {pie}</div>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los resultados siguen aquí. {pie}</div>
     </div>
   );
 
-  const sub = (txt: string) => <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
+  const sub = (txt: string) => <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
   const nota = (txt: ReactNode, col: string, icono = "fa-circle-info") => (
-    <div style={{ marginTop: 10, fontSize: 12, lineHeight: 1.55, color: col }}>
+    <div style={{ marginTop: 10, fontSize: 14, lineHeight: 1.55, color: col }}>
       <i className={`fa-solid ${icono}`} style={{ marginRight: 7 }} />
       {txt}
     </div>
@@ -547,7 +547,7 @@ export function LabTerminalHorariosIngles({ color }: PracticaLabProps) {
               Necesito saber <strong style={{ color: "#fff" }}>{nec.pide}</strong>.
             </span>
           </div>
-          <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45 }}>
+          <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.45 }}>
             <i className="fa-solid fa-language" style={{ marginRight: 6 }} />
             Vocabulario: {nec.vocab}
           </div>
@@ -591,7 +591,7 @@ export function LabTerminalHorariosIngles({ color }: PracticaLabProps) {
                 {f}
               </button>
             ))}
-            <div style={{ fontSize: 11, color: T.text3, width: "100%" }}>Las fichas escriben en el cuadro; puedes corregir a mano. No todas sirven.</div>
+            <div style={{ fontSize: 14, color: T.text3, width: "100%" }}>Las fichas escriben en el cuadro; puedes corregir a mano. No todas sirven.</div>
           </div>
         )}
         {resM1 && (
@@ -778,7 +778,7 @@ export function LabTerminalHorariosIngles({ color }: PracticaLabProps) {
               {pistaOn ? "Ocultar pista" : "Pista"}
             </button>
           </div>
-          {pistaOn && <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5 }}>{vis.pista}</div>}
+          {pistaOn && <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>{vis.pista}</div>}
         </div>
         {sub("Tu respuesta en inglés (Enter para responder)")}
         <input
@@ -842,406 +842,289 @@ export function LabTerminalHorariosIngles({ color }: PracticaLabProps) {
         </div>
         {sub("Pantalla del módulo")}
         {pantallaModulo}
-        <div style={{ fontSize: 11, color: T.text3, marginTop: 6 }}>Las ubicaciones no están en la hoja: búscalas en el plano 3D. La pantalla usa el mismo reloj que Read the board.</div>
+        <div style={{ fontSize: 14, color: T.text3, marginTop: 6 }}>Las ubicaciones no están en la hoja: búscalas en el plano 3D. La pantalla usa el mismo reloj que Read the board.</div>
       </>
     );
   }
 
-  return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes thPulse { 0%,100%{ box-shadow:0 0 0 0 var(--thd); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .th-live-dot { animation: thPulse 1.6s ease-in-out infinite; }
-        @media (prefers-reduced-motion: reduce){ .th-live-dot { animation:none; } }
-        .th-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .th-grid { grid-template-columns: 1fr; } }
-        .th-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .th-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .th-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .th-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .th-tab { cursor:pointer; border:1px solid var(--thc); border-radius:12px; padding:11px 8px; text-align:center; background:transparent; transition:all .15s; color:#fff; }
-        .th-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
-        .th-tab:hover { background:rgba(255,255,255,0.06); }
-        .th-opts { display:flex; flex-wrap:wrap; gap:7px; align-items:center; }
-        .th-opt { cursor:pointer; border:1px solid var(--thc); border-radius:10px; padding:9px 12px; font-size:12px; font-weight:800; color:#fff; background:transparent; transition:all .15s; }
-        .th-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.72); }
-        .th-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
-        .th-opt:disabled { cursor:default; opacity:0.5; }
-        .th-toggle { width:100%; cursor:pointer; border:1px solid var(--thc); border-radius:11px; padding:11px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:12.5px; font-weight:900; text-align:left; transition:all .15s; }
-        .th-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
-        .th-toggle:disabled { cursor:default; opacity:0.5; }
-        .th-toggle-sm { cursor:pointer; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:7px 11px; font-size:11.5px; font-weight:800; color:rgba(255,255,255,0.75); background:transparent; transition:all .15s; }
-        .th-toggle-sm[data-on="true"] { border-color:${accent}; color:#fff; background:rgba(${color.rgba},0.14); }
-        .th-toggle-sm:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
-        .th-toggle-sm:disabled { opacity:0.45; cursor:default; }
-        .th-dialogo { padding:12px 14px; border-radius:12px; background:rgba(248,250,252,0.05); border:1px solid ${T.line}; display:grid; gap:8px; }
-        .th-linea { display:flex; gap:10px; align-items:flex-start; font-size:13px; color:#fff; line-height:1.5; font-weight:700; }
-        .th-quien { flex-shrink:0; font-size:10px; font-weight:900; color:#04121f; padding:3px 7px; border-radius:6px; margin-top:2px; letter-spacing:0.04em; }
-        .th-voz { cursor:pointer; border:1px solid rgba(255,255,255,0.18); border-radius:999px; padding:5px 11px; font-size:11px; font-weight:800; color:#e0f2fe; background:rgba(56,189,248,0.1); }
-        .th-voz:hover { background:rgba(56,189,248,0.2); }
-        .th-input { width:100%; box-sizing:border-box; border-radius:11px; border:1.5px solid ${T.lineStrong}; background:${T.inset}; color:#fff; font-size:15px; font-weight:700; padding:10px 12px; font-family:inherit; outline:none; }
-        .th-input:focus { border-color:${modoCol}; box-shadow:0 0 0 3px ${modoCol}2e; }
-        .th-input:disabled { opacity:0.6; }
-        .th-banco { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
-        .th-ficha { cursor:pointer; border:1.5px solid ${T.lineStrong}; background:rgba(56,189,248,0.1); color:#fff; border-radius:9px; padding:6px 11px; font-size:12.5px; font-weight:800; }
-        .th-ficha:hover { border-color:#38bdf8; }
-        .th-frase { cursor:pointer; border:1px solid ${T.line}; background:${T.glass}; color:#fff; border-radius:9px; padding:6px 10px; font-size:12px; font-weight:700; }
-        .th-frase:hover:not(:disabled) { border-color:#a78bfa; background:rgba(167,139,250,0.12); }
-        .th-frase:disabled { opacity:0.45; cursor:default; }
-        .th-chip { font-size:11px; font-weight:800; padding:5px 9px; border-radius:999px; border:1px solid ${T.line}; color:${T.text3}; }
-        .th-chip[data-on="true"] { border-color:${OK}; color:${OK}; background:rgba(52,211,153,0.08); }
-        .th-rosa { color:#dbeafe; }
-        .th-reloj { display:flex; flex-wrap:wrap; gap:7px; align-items:center; }
-        .th-hora { font-family:ui-monospace, monospace; font-size:24px; font-weight:900; color:#fbbf24; padding:4px 12px; border-radius:10px; background:#04070c; border:1px solid #f59e0b55; }
-        .th-resp-tab { cursor:pointer; text-align:left; border:1px solid ${T.line}; border-radius:10px; padding:10px 13px; font-size:13.5px; font-weight:800; color:#fff; background:${T.glass}; transition:all .14s; }
-        .th-resp-tab:hover:not(:disabled) { border-color:var(--thc); background:rgba(255,255,255,0.06); }
-        .th-resp-tab[data-el="true"] { border-color:var(--thc); background:rgba(255,255,255,0.07); box-shadow:0 0 0 1px var(--thc) inset; }
-        .th-resp-tab:disabled { cursor:default; }
-        .th-vocab { display:flex; flex-wrap:wrap; gap:6px; }
-        .th-vocab span { font-size:11.5px; color:${T.text2}; padding:4px 8px; border-radius:8px; background:rgba(4,10,22,0.45); border:1px solid ${T.line}; }
-        .th-vocab strong { color:#fcd34d; }
-        .th-aviso { font-size:11.5px; line-height:1.45; padding:7px 10px; border-radius:9px; background:rgba(120,53,15,0.25); border:1px solid #f59e0b44; }
-        .th-hoja { border-radius:12px; border:1px solid ${T.line}; background:rgba(248,250,252,0.04); padding:10px 12px; display:grid; gap:5px; }
-        .th-hoja-tit { font-size:10px; font-weight:900; letter-spacing:0.08em; text-transform:uppercase; color:#c4b5fd; margin-top:4px; }
-        .th-hoja-fila { display:flex; justify-content:space-between; gap:10px; font-size:12px; color:#fff; font-weight:700; }
-        .th-hoja-fila span:last-child { color:${T.text2}; font-weight:600; text-align:right; }
-        .th-hoja-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(130px,1fr)); gap:4px 10px; font-size:12px; color:${T.text2}; }
-        .th-hoja-grid strong { color:#fff; }
-        .th-mini { border-radius:10px; background:#04070c; border:1px solid #1e293b; padding:8px 10px; font-family:ui-monospace, monospace; font-size:12px; }
-        .th-mini-head { display:flex; justify-content:space-between; font-weight:900; color:#fff; border-bottom:2px solid #f59e0b; padding-bottom:4px; margin-bottom:4px; }
-        .th-mini-fila { display:grid; grid-template-columns: 48px 1fr 26px minmax(0,1.2fr); gap:6px; color:#fcd34d; font-weight:800; padding:2px 0; }
-        .th-opt:focus-visible, .th-tab:focus-visible, .th-toggle:focus-visible, .th-icobtn:focus-visible, .th-ficha:focus-visible, .th-frase:focus-visible, .th-toggle-sm:focus-visible, .th-voz:focus-visible, .th-resp-tab:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
-        @media (max-width: 1000px){ .th-bottom { grid-template-columns: 1fr !important; } }
-        .th-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .th-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .th-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61; background:linear-gradient(180deg,#06121e 0%,#040a16 100%);
-          border-left:1px solid rgba(${color.rgba},0.32); box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1); display:flex; flex-direction:column; }
-        .th-drawer[data-open="true"] { transform:translateX(0); }
-        .th-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .th-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .th-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .th-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .th-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:11px 16px; border-radius:999px;
-          border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800; background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
-        .th-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
+  const corto = (s: string) => {
+    const w = s.trim().split(/\s+/);
+    return w.length > 10 ? `${w.slice(0, 10).join(" ")}…` : s;
+  };
+  const lectura =
+    modo === "preguntar"
+      ? resM1
+        ? `Rosa: «${corto(resM1.respuesta)}»`
+        : `Lucy necesita saber ${nec.pide}`
+      : modo === "tablero"
+        ? aviso
+          ? `Altavoz: «${corto(aviso.texto)}»`
+          : `${pt.quien} espera tu respuesta · ${fmtHora(t)}`
+        : fbInfo
+          ? `${vis.nombre} oyó: «${corto(fbInfo.dicho)}»`
+          : `${vis.nombre} está en el módulo`;
 
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="th-tabs">
-          {MODOS.map((m) => {
-            const d = MODOS_DEF[m];
-            const col = `#${d.color.replace("#", "")}`;
-            const on = m === modo;
-            return (
-              <button key={m} className="th-tab" data-on={on} onClick={() => cambiarModo(m)} style={{ ["--thc" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? col : "inherit" }}>
-                  <i className={`fa-solid ${d.icono}`} />
-                </div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{d.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{d.subtitulo}</div>
-              </button>
-            );
-          })}
+  const teoria = (
+    <>
+      <Bloque titulo={`Excuse me, what time…? — ${NOMBRE_TERMINAL}`} icono="fa-bus">
+        <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
+      </Bloque>
+      <Bloque titulo="Cómo usar el laboratorio" icono="fa-list-ol">
+        <div style={{ display: "grid", gap: 8 }}>
+          {INSTRUCCIONES.map((p, i) => (
+            <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+              <div style={{ width: 24, height: 24, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
+              <div style={{ fontSize: 14, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
+            </div>
+          ))}
         </div>
-      </div>
-
-      <div className="th-grid">
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(460px, 62vh, 700px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <TerminalScene
-                vista={modo}
-                modoColor={modoCol}
-                resetNonce={resetNonce}
-                t={t}
-                visitante={visitante}
-                empleada={empleada}
-                foco={foco}
-                filaSalida={filaSalida}
-                filaLlegada={filaLlegada}
-              />
-            </SceneBoundary>
-
-            <div style={{ position: "absolute", top: 14, left: 16, right: 150, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, pointerEvents: "none" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)", maxWidth: "100%" }}>
-                <span className="th-live-dot" style={{ ["--thd" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol, flexShrink: 0 }} />
-                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3, flexShrink: 0 }}>EN VIVO</span>
-                <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)", flexShrink: 0 }} />
-                <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{chipVivo}</span>
+      </Bloque>
+      <Bloque titulo="Lectura A1" icono="fa-book-open">
+        <div style={{ fontSize: 14, color: "#fff", fontWeight: 800, lineHeight: 1.4 }}>{TITULO_A1}</div>
+        {LECTURA_A1.map((p, i) => (
+          <div key={i} style={{ fontSize: 14, color: T.text2, lineHeight: 1.55 }}>
+            {p}
+          </div>
+        ))}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+          <div style={{ fontSize: 14, fontWeight: 900, color: T.text3 }}>PARA REFLEXIONAR</div>
+          <button className="th-toggle-sm" data-on={guiaA1} onClick={() => setGuiaA1((v) => !v)}>
+            {guiaA1 ? "Ocultar respuestas" : "Ver respuestas guía"}
+          </button>
+        </div>
+        <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
+          {PREGUNTAS_A1.map((q, i) => (
+            <li key={i} style={{ fontSize: 14, color: T.text2, lineHeight: 1.45 }}>
+              {q.pregunta}
+              {guiaA1 && <span style={{ display: "block", color: "#bae6fd", fontWeight: 700, marginTop: 2 }}>{q.guia}</span>}
+            </li>
+          ))}
+        </ul>
+      </Bloque>
+      <Bloque titulo="Hechos (verdadero o falso, A5)" icono="fa-scale-balanced">
+        {HECHOS_A5.map((h, i) => (
+          <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
+            <span style={{ flexShrink: 0, fontSize: 14, fontWeight: 900, padding: "3px 8px", borderRadius: 6, color: "#04121f", background: h.respuesta ? OK : WARN }}>{h.respuesta ? "VERDADERO" : "FALSO"}</span>
+            <span style={{ fontSize: 14, color: "#fff", lineHeight: 1.45 }}>
+              {h.enunciado} <span style={{ color: T.text3 }}>{h.retro}</span>
+            </span>
+          </div>
+        ))}
+      </Bloque>
+      <Bloque titulo="Glosario (A6)" icono="fa-book">
+        <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 230px), 1fr))" }}>
+          {GLOSARIO.map((gi, i) => (
+            <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
+              <span style={{ fontSize: 14, fontWeight: 900, color: accent }}>{gi.termino}. </span>
+              <span style={{ fontSize: 14, color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
+              <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.4, marginTop: 4 }}>
+                <i className="fa-solid fa-quote-left" style={{ marginRight: 6, color: accent }} />
+                {gi.ejemplo}
               </div>
-              {aviso && modo === "tablero" && (
-                <div className="th-pa" style={{ display: "inline-flex", alignItems: "flex-start", gap: 9, maxWidth: 560, padding: "7px 13px", borderRadius: 12, background: "rgba(120,53,15,0.9)", border: "1px solid #fbbf24", color: "#fff7ed", fontSize: 12.5, fontWeight: 800, lineHeight: 1.35 }}>
-                  <i className="fa-solid fa-bullhorn" style={{ color: "#fbbf24", marginTop: 2 }} />
-                  <span>{aviso.texto}</span>
-                </div>
-              )}
             </div>
-
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="th-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría" aria-label="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="th-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"} aria-label={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="th-icobtn" onClick={reiniciar} title="Reiniciar" aria-label="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 132px 14px 18px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                {def.etq} — {def.subtitulo}
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6 }}>{pie}</div>
-            </div>
-
-            <button className="th-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-          </div>
-
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-              Controles — {def.etq}
-            </Eyebrow>
-            <div style={{ marginTop: 12 }}>{control}</div>
-          </div>
+          ))}
         </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-bus" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>Excuse me, what time…? — {NOMBRE_TERMINAL}</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #7dd3fc55", background: "rgba(125,211,252,0.07)" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book-open" style={{ marginRight: 8, color: "#7dd3fc" }} />
-              Lectura A1
-            </Eyebrow>
-            <div style={{ fontSize: 13, color: "#fff", fontWeight: 800, lineHeight: 1.4, marginBottom: 10 }}>{TITULO_A1}</div>
-            <div style={{ display: "grid", gap: 9, marginBottom: 12, maxHeight: 360, overflowY: "auto", paddingRight: 6 }}>
-              {LECTURA_A1.map((p, i) => (
-                <div key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>
-                  {p}
-                </div>
-              ))}
-            </div>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 8 }}>
-              <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em" }}>PARA REFLEXIONAR</div>
-              <button className="th-toggle-sm" data-on={guiaA1} onClick={() => setGuiaA1((v) => !v)}>
-                {guiaA1 ? "Ocultar respuestas" : "Ver respuestas guía"}
-              </button>
-            </div>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {PREGUNTAS_A1.map((q, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  {q.pregunta}
-                  {guiaA1 && <span style={{ display: "block", color: "#bae6fd", fontWeight: 700, marginTop: 2 }}>{q.guia}</span>}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />
-              Cómo usar el laboratorio
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-                Objetivos de la sesión
-              </Eyebrow>
-              <span className="th-contador" style={{ fontSize: 11, fontWeight: 800, color: objetivos.every((o) => o.done) ? OK : T.text3 }}>
-                {objetivos.filter((o) => o.done).length}/{objetivos.length}
-              </span>
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ marginTop: 2, fontSize: 13, color: o.done ? OK : "rgba(255,255,255,0.22)" }} />
-                  <span style={{ fontSize: 12, color: o.done ? "#fff" : T.text2, lineHeight: 1.4 }}>{o.t}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+        <div style={{ fontSize: 14, color: T.text2 }}>
+          <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A6}
         </div>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="th-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <div>
-            <Eyebrow>
-              <i className="fa-solid fa-scale-balanced" style={{ marginRight: 8, color: accent }} />
-              Hechos (verdadero o falso, A5)
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {HECHOS_A5.map((h, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ flexShrink: 0, fontSize: 10.5, fontWeight: 900, padding: "3px 8px", borderRadius: 6, color: "#04121f", background: h.respuesta ? OK : WARN }}>{h.respuesta ? "VERDADERO" : "FALSO"}</span>
-                  <span style={{ fontSize: 12, color: "#fff", lineHeight: 1.45 }}>
-                    {h.enunciado} <span style={{ color: T.text3 }}>{h.retro}</span>
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />
-              Glosario (A6)
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))" }}>
-              {GLOSARIO.map((gi, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{gi.termino}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
-                  <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.4, marginTop: 4 }}>
-                    <i className="fa-solid fa-quote-left" style={{ marginRight: 6, color: accent }} />
-                    {gi.ejemplo}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11.5, color: T.text2, marginTop: 10 }}>
-              <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A6}
-            </div>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-pen-nib" style={{ marginRight: 8, color: accent }} />
-              Tu turno fuera del laboratorio (A3 y video A8)
-            </Eyebrow>
-            <div style={{ fontSize: 12.5, color: "#fff", fontWeight: 800, marginBottom: 4 }}>{A3.titulo}</div>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{A3.prompt}</div>
-            <ul style={{ margin: "8px 0 0", paddingLeft: 16, display: "grid", gap: 5 }}>
-              {A3.pistas.map((p, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
-                  {p}
-                </li>
-              ))}
-            </ul>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55, marginTop: 8 }}>
-              <strong style={{ color: "#fff" }}>Video A8:</strong> {ABIERTA_A8}
-            </div>
-          </div>
+      </Bloque>
+      <Bloque titulo="Tu turno fuera del laboratorio (A3 y video A8)" icono="fa-pen-nib">
+        <div style={{ fontSize: 14, color: "#fff", fontWeight: 800 }}>{A3.titulo}</div>
+        <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55 }}>{A3.prompt}</div>
+        <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 5 }}>
+          {A3.pistas.map((p, i) => (
+            <li key={i} style={{ fontSize: 14, color: T.text2, lineHeight: 1.45 }}>
+              {p}
+            </li>
+          ))}
+        </ul>
+        <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55 }}>
+          <strong style={{ color: "#fff" }}>Video A8:</strong> {ABIERTA_A8}
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "18px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-              Ideas clave
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-              {IDEAS.map((x, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  {x}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div style={{ ...card, padding: "18px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-list-check" style={{ marginRight: 8, color: accent }} />
-              ¿Cómo voy? (autoevaluación A7)
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 7 }}>
-              {AUTOEVALUACION_A7.map((x, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  {x}
-                </li>
-              ))}
-            </ul>
-            <div style={{ fontSize: 11.5, color: T.text2, marginTop: 8, fontStyle: "italic" }}>{REFLEXION_A7}</div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
+      </Bloque>
+      <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+        <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
+          {IDEAS.map((x, i) => (
+            <li key={i} style={{ fontSize: 14, color: T.text2, lineHeight: 1.45 }}>
+              {x}
+            </li>
+          ))}
+        </ul>
+      </Bloque>
+      <Bloque titulo="¿Cómo voy? (autoevaluación A7)" icono="fa-list-check">
+        <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 7 }}>
+          {AUTOEVALUACION_A7.map((x, i) => (
+            <li key={i} style={{ fontSize: 14, color: T.text2, lineHeight: 1.45 }}>
+              {x}
+            </li>
+          ))}
+        </ul>
+        <div style={{ fontSize: 14, color: T.text2, fontStyle: "italic" }}>{REFLEXION_A7}</div>
+      </Bloque>
+      <Bloque titulo="Ficha teórica" icono="fa-book-open">
+        <FichaTeorica data={TERMINAL_HORARIOS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+      </Bloque>
+      <Bloque titulo="Fuentes y aclaraciones" icono="fa-circle-info">
+        <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
           La lectura A1 con sus preguntas y respuestas guía, el quiz A4, los hechos A5, el glosario A6, la escritura A3, la autoevaluación A7, las preguntas del video A8 y el texto A2 son{" "}
           <strong>verbatim</strong> de la plataforma, con dos salvedades: las retroalimentaciones de las dos preguntas del video A8 son del laboratorio (la actividad no las trae), y en el
           texto A2 la pregunta «___ time is it?» se cambió por «___ time is the exam?», porque a «What time is it?» se responde «It is 2:30 pm», sin at. La {NOMBRE_TERMINAL}, sus
           locales, las personas y las situaciones son <strong>ficticias</strong>; los destinos son ciudades reales, pero horarios, andenes, retrasos, precios y servicios son{" "}
           <strong>ilustrativos</strong> (precios del orden de un boleto de primera clase desde la Ciudad de México en 2025; duraciones aproximadas por carretera). Las oraciones en inglés del
           laboratorio siguen el inglés estadounidense estándar. Fuente: {FUENTE}
-        </span>
-      </div>
-
-      <PreguntaCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
-
-      <RetoQuizCard quiz={QUIZ} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Ya sabes pedir ubicaciones y horarios en inglés." />
-
-      <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
-          Completa el texto (A2)
-        </Eyebrow>
-        <div style={{ marginTop: 12 }}>
-          <CompletaTexto
-            data={HUECOS_A2}
-            accent={accent}
-            rgba={color.rgba}
-            completado={textoOk}
-            onCompletado={() => {
-              setTextoOk(true);
-              sfx(true);
-            }}
-            onAcierto={blip}
-            onError={() => sfx(false)}
-          />
         </div>
-      </div>
+      </Bloque>
+    </>
+  );
 
-      <div className="th-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="th-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="th-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="th-close" onClick={() => setDrawer(false)} title="Cerrar" aria-label="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="th-drawer-body">
-          <FichaTeorica data={TERMINAL_HORARIOS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+  return (
+    <>
+      <style>{`
+        @media (prefers-reduced-motion: reduce){ }
+        .th-opts { display:flex; flex-wrap:wrap; gap:7px; align-items:center; }
+        .th-opt { cursor:pointer; border:1px solid var(--thc); border-radius:10px; padding:9px 12px; font-size:14px; font-weight:800; color:#fff; background:transparent; transition:all .15s; }
+        .th-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.72); }
+        .th-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
+        .th-opt:disabled { cursor:default; opacity:0.5; }
+        .th-toggle { width:100%; cursor:pointer; border:1px solid var(--thc); border-radius:11px; padding:11px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:14px; font-weight:900; text-align:left; transition:all .15s; }
+        .th-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
+        .th-toggle:disabled { cursor:default; opacity:0.5; }
+        .th-toggle-sm { cursor:pointer; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:7px 11px; font-size:14px; font-weight:800; color:rgba(255,255,255,0.75); background:transparent; transition:all .15s; }
+        .th-toggle-sm[data-on="true"] { border-color:${accent}; color:#fff; background:rgba(${color.rgba},0.14); }
+        .th-toggle-sm:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
+        .th-toggle-sm:disabled { opacity:0.45; cursor:default; }
+        .th-dialogo { padding:12px 14px; border-radius:12px; background:rgba(248,250,252,0.05); border:1px solid ${T.line}; display:grid; gap:8px; }
+        .th-linea { display:flex; gap:10px; align-items:flex-start; font-size:14px; color:#fff; line-height:1.5; font-weight:700; }
+        .th-quien { flex-shrink:0; font-size:14px; font-weight:900; color:#04121f; padding:3px 7px; border-radius:6px; margin-top:2px; letter-spacing:0.04em; }
+        .th-voz { cursor:pointer; border:1px solid rgba(255,255,255,0.18); border-radius:999px; padding:5px 11px; font-size:14px; font-weight:800; color:#e0f2fe; background:rgba(56,189,248,0.1); }
+        .th-voz:hover { background:rgba(56,189,248,0.2); }
+        .th-input { width:100%; box-sizing:border-box; border-radius:11px; border:1.5px solid ${T.lineStrong}; background:${T.inset}; color:#fff; font-size:15px; font-weight:700; padding:10px 12px; font-family:inherit; outline:none; }
+        .th-input:focus { border-color:${modoCol}; box-shadow:0 0 0 3px ${modoCol}2e; }
+        .th-input:disabled { opacity:0.6; }
+        .th-banco { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+        .th-ficha { cursor:pointer; border:1.5px solid ${T.lineStrong}; background:rgba(56,189,248,0.1); color:#fff; border-radius:9px; padding:6px 11px; font-size:14px; font-weight:800; }
+        .th-ficha:hover { border-color:#38bdf8; }
+        .th-frase { cursor:pointer; border:1px solid ${T.line}; background:${T.glass}; color:#fff; border-radius:9px; padding:6px 10px; font-size:14px; font-weight:700; }
+        .th-frase:hover:not(:disabled) { border-color:#a78bfa; background:rgba(167,139,250,0.12); }
+        .th-frase:disabled { opacity:0.45; cursor:default; }
+        .th-chip { font-size:14px; font-weight:800; padding:5px 9px; border-radius:999px; border:1px solid ${T.line}; color:${T.text3}; }
+        .th-chip[data-on="true"] { border-color:${OK}; color:${OK}; background:rgba(52,211,153,0.08); }
+        .th-rosa { color:#dbeafe; }
+        .th-reloj { display:flex; flex-wrap:wrap; gap:7px; align-items:center; }
+        .th-hora { font-family:ui-monospace, monospace; font-size:24px; font-weight:900; color:#fbbf24; padding:4px 12px; border-radius:10px; background:#04070c; border:1px solid #f59e0b55; }
+        .th-resp-tab { cursor:pointer; text-align:left; border:1px solid ${T.line}; border-radius:10px; padding:10px 13px; font-size:14px; font-weight:800; color:#fff; background:${T.glass}; transition:all .14s; }
+        .th-resp-tab:hover:not(:disabled) { border-color:var(--thc); background:rgba(255,255,255,0.06); }
+        .th-resp-tab[data-el="true"] { border-color:var(--thc); background:rgba(255,255,255,0.07); box-shadow:0 0 0 1px var(--thc) inset; }
+        .th-resp-tab:disabled { cursor:default; }
+        .th-vocab { display:flex; flex-wrap:wrap; gap:6px; }
+        .th-vocab span { font-size:14px; color:${T.text2}; padding:4px 8px; border-radius:8px; background:rgba(4,10,22,0.45); border:1px solid ${T.line}; }
+        .th-vocab strong { color:#fcd34d; }
+        .th-aviso { font-size:14px; line-height:1.45; padding:7px 10px; border-radius:9px; background:rgba(120,53,15,0.25); border:1px solid #f59e0b44; }
+        .th-hoja { border-radius:12px; border:1px solid ${T.line}; background:rgba(248,250,252,0.04); padding:10px 12px; display:grid; gap:5px; }
+        .th-hoja-tit { font-size:14px; font-weight:900; letter-spacing:0.08em; text-transform:uppercase; color:#c4b5fd; margin-top:4px; }
+        .th-hoja-fila { display:flex; justify-content:space-between; gap:10px; font-size:14px; color:#fff; font-weight:700; }
+        .th-hoja-fila span:last-child { color:${T.text2}; font-weight:600; text-align:right; }
+        .th-hoja-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(130px,1fr)); gap:4px 10px; font-size:14px; color:${T.text2}; }
+        .th-hoja-grid strong { color:#fff; }
+        .th-mini { border-radius:10px; background:#04070c; border:1px solid #1e293b; padding:8px 10px; font-family:ui-monospace, monospace; font-size:14px; }
+        .th-mini-head { display:flex; justify-content:space-between; font-weight:900; color:#fff; border-bottom:2px solid #f59e0b; padding-bottom:4px; margin-bottom:4px; }
+        .th-mini-fila { display:grid; grid-template-columns: 48px 1fr 26px minmax(0,1.2fr); gap:6px; color:#fcd34d; font-weight:800; padding:2px 0; }
+        .th-opt:focus-visible, .th-tab:focus-visible, .th-toggle:focus-visible, .th-icobtn:focus-visible, .th-ficha:focus-visible, .th-frase:focus-visible, .th-toggle-sm:focus-visible, .th-voz:focus-visible, .th-resp-tab:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
+      
+        .th-ahora { padding:10px 12px; border-radius:12px; margin-bottom:12px; font-size:14px; line-height:1.45; color:#eaf0fb; border:1px solid color-mix(in srgb, var(--thc) 40%, transparent); background:rgba(4,10,22,0.45); }
+        .th-pa { padding:10px 12px; border-radius:12px; margin-bottom:12px; font-size:14px; font-weight:800; line-height:1.4; background:rgba(120,53,15,0.55); border:1px solid #fbbf24; color:#fff7ed; }
+      
+`}</style>
+      <LabShell
+        accent={accent}
+        rgba={color.rgba}
+        retoKey={RETO_KEY}
+        escena={
+          <SceneBoundary fallback={sceneFallback}>
+            <TerminalScene
+              vista={modo}
+              modoColor={modoCol}
+              resetNonce={resetNonce}
+              t={t}
+              visitante={visitante}
+              empleada={empleada}
+              foco={foco}
+              filaSalida={filaSalida}
+              filaLlegada={filaLlegada}
+            />
+          </SceneBoundary>
+        }
+        modos={{
+          opciones: MODOS.map((m) => ({ id: m, etiqueta: MODOS_DEF[m].etq, icono: MODOS_DEF[m].icono })),
+          valor: modo,
+          cambiar: (id) => cambiarModo(id as Modo),
+        }}
+        herramientas={
+          <>
+            <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+            <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+          </>
+        }
+        leyenda={<span style={{ fontWeight: 800, fontFamily: "ui-monospace, monospace" }}>{chipVivo}</span>}
+        lectura={lectura}
+        objetivos={objetivos.map((o) => ({ txt: o.t, done: o.done }))}
+        pestanas={[
+          {
+            id: "controles",
+            etiqueta: "Controles",
+            icono: "fa-sliders",
+            contenido: (
+              <>
+                <div className="th-ahora" style={{ ["--thc" as string]: modoCol }}>
+                  <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 8 }} />
+                  {pie}
+                </div>
+                {aviso && modo === "tablero" && (
+                  <div className="th-pa">
+                    <i className="fa-solid fa-bullhorn" style={{ color: "#fbbf24", marginRight: 8 }} />
+                    {aviso.texto}
+                  </div>
+                )}
+                {control}
+              </>
+            ),
+          },
+          {
+            id: "reto",
+            etiqueta: "Reto",
+            icono: "fa-star",
+            contenido: (
+              <>
+                <PreguntaCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
+                <div style={{ marginTop: 22 }}>
+                  <RetoQuizCard quiz={QUIZ} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Ya sabes pedir ubicaciones y horarios en inglés." />
+                </div>
+                <div style={{ ...card, padding: "20px 20px 22px", marginTop: 22 }}>
+                  <Eyebrow>
+                    <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
+                    Completa el texto (A2)
+                  </Eyebrow>
+                  <div style={{ marginTop: 12 }}>
+                    <CompletaTexto
+                      data={HUECOS_A2}
+                      accent={accent}
+                      rgba={color.rgba}
+                      completado={textoOk}
+                      onCompletado={() => {
+                        setTextoOk(true);
+                        sfx(true);
+                      }}
+                      onAcierto={blip}
+                      onError={() => sfx(false)}
+                    />
+                  </div>
+                </div>
+              </>
+            ),
+          },
+          { id: "teoria", etiqueta: "Teoría", icono: "fa-book-open", contenido: teoria },
+        ]}
+      />
+    </>
   );
 }
-

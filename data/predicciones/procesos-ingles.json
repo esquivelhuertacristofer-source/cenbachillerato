@@ -1,0 +1,12 @@
+{
+  "escena": "Marta está en la cocina y hará exactamente lo que le digas, paso a paso, para preparar chocolate caliente.",
+  "pregunta": "Si empiezas con «Finally, pour milk into a pot», ¿qué hace Marta?",
+  "opciones": [
+    { "id": "a", "texto": "Espera a que le des los demás pasos", "icono": "fa-hourglass-half" },
+    { "id": "b", "texto": "Entrega la bebida incompleta", "icono": "fa-mug-hot" },
+    { "id": "c", "texto": "Empieza todo de nuevo", "icono": "fa-rotate-left" }
+  ],
+  "correcta": "b",
+  "porque": "«Finally» anuncia el último paso. Quien escucha cree que ya terminaron y entrega lo que tenga, aunque falten pasos. Por eso el conector debe ir en su lugar.",
+  "comoComprobarlo": "En «Give instructions», en el paso 1, elige la frase que empieza con «Finally» y mira la calidad y lo que dice Marta."
+}

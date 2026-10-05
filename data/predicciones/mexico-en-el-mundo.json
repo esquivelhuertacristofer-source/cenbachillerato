@@ -1,0 +1,12 @@
+{
+  "escena": "Un mapa de rutas parte de México hacia seis socios; tres medidores marcan comercio, autonomía y estabilidad. En cada episodio eliges una de tres decisiones.",
+  "pregunta": "En el episodio del ferrocarril, ¿qué pasa si das todas las concesiones a un solo inversionista?",
+  "opciones": [
+    { "id": "a", "texto": "El comercio sube, pero la autonomía baja", "icono": "fa-arrow-trend-down" },
+    { "id": "b", "texto": "Suben a la vez el comercio y la autonomía", "icono": "fa-arrow-trend-up" },
+    { "id": "c", "texto": "Los medidores casi no se mueven", "icono": "fa-equals" }
+  ],
+  "correcta": "a",
+  "porque": "Un solo socio trae mucha inversión y comercio, pero concentra las rutas en él. Esa dependencia económica estrecha el margen para decidir, como en el Porfiriato.",
+  "comoComprobarlo": "Abre «Cancillería», ve al episodio 1876–1911 y compara los medidores y el grosor de las rutas entre dar las concesiones a uno o repartirlas."
+}

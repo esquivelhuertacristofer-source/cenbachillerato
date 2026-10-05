@@ -24,7 +24,7 @@
 
 import * as THREE from "three";
 import { useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Environment, Lightformer, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import {
@@ -80,13 +80,12 @@ type Pt = [number, number, number];
 const suave = (dt: number, porCuadro: number) => 1 - Math.pow(1 - porCuadro, Math.min(dt, 0.25) * 60);
 const OK = "#34d399";
 const NO = "#f87171";
-/** drei <Html> solo reaplica su escala cuando la etiqueta se mueve en pantalla; con este factor la etiqueta mide casi lo mismo escalada o sin escalar. */
-const DF = 0.62;
-const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
-
-function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number }) {
+/** Etiqueta de tamaño fijo (≥ 14 px). `corta` = se queda también en pantallas angostas. */
+function Etiqueta({ pos, children, col, corta = false }: { pos: Pt; children: ReactNode; col?: string; corta?: boolean }) {
+  const ancho = useThree((s) => s.size.width);
+  if (!corta && ancho < 640) return null;
   return (
-    <Html position={pos} center distanceFactor={df * DF} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -97,7 +96,7 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children:
           background: "rgba(4,10,22,0.86)",
           border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`,
           color: "#fff",
-          fontSize: fs,
+          fontSize: 14,
           fontWeight: 800,
           whiteSpace: "nowrap",
           boxShadow: "0 6px 18px -8px #000",
@@ -108,6 +107,19 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children:
     </Html>
   );
 }
+
+/** Html de tamaño fijo; se oculta en pantallas angostas salvo que sea `corta`. */
+function Rotulo({ pos, children, corta = false }: { pos: Pt; children: ReactNode; corta?: boolean }) {
+  const ancho = useThree((s) => s.size.width);
+  if (!corta && ancho < 640) return null;
+  return (
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+      {children}
+    </Html>
+  );
+}
+
+const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 
 /* ════════════════════════════════════════════════════════════════════════
  * 1. LA CAJA DE LAS LIBERTADES
@@ -192,7 +204,7 @@ function Compartimento({ i, abre, revelada, predicha, conEtiqueta, colorLic }: {
         </mesh>
       </group>
       {conEtiqueta && (
-        <Html position={[x < 0 ? -0.32 : 0.32, z < 0 ? 2.5 : 1.9, 0]} center distanceFactor={12 * DF} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+        <Rotulo pos={[x < 0 ? -0.32 : 0.32, z < 0 ? 2.5 : 1.9, 0]} corta>
           <div
             style={{
               display: "flex",
@@ -203,7 +215,7 @@ function Compartimento({ i, abre, revelada, predicha, conEtiqueta, colorLic }: {
               background: "rgba(4,10,22,0.88)",
               border: `1px solid ${revelada ? (bienPredicho ? OK : NO) : predicha ? "#7dd3fc" : "rgba(255,255,255,0.22)"}`,
               color: "#fff",
-              fontSize: 11.5,
+              fontSize: 14,
               fontWeight: 800,
               whiteSpace: "nowrap",
             }}
@@ -213,10 +225,10 @@ function Compartimento({ i, abre, revelada, predicha, conEtiqueta, colorLic }: {
             {revelada ? (
               <i className={`fa-solid ${abre ? "fa-lock-open" : "fa-lock"}`} style={{ color: abre ? OK : NO, marginLeft: 2 }} />
             ) : (
-              predicha !== null && <i className={`fa-solid ${predicha ? "fa-lock-open" : "fa-lock"}`} style={{ color: predicha ? "#7dd3fc" : "#64748b", marginLeft: 2, fontSize: 10 }} />
+              predicha !== null && <i className={`fa-solid ${predicha ? "fa-lock-open" : "fa-lock"}`} style={{ color: predicha ? "#7dd3fc" : "#64748b", marginLeft: 2, fontSize: 14 }} />
             )}
           </div>
-        </Html>
+        </Rotulo>
       )}
     </group>
   );
@@ -306,7 +318,7 @@ function Servidor() {
         <boxGeometry args={[1, 1, 1]} />
         <meshStandardMaterial color="#c084fc" emissive="#c084fc" emissiveIntensity={1} />
       </instancedMesh>
-      <Etiqueta pos={[0, 2.3, 0]} df={9} col="#c084fcaa" fs={11}>
+      <Etiqueta pos={[0, 2.3, 0]} col="#c084fcaa">
         <i className="fa-solid fa-server" style={{ color: "#c084fc" }} />
         Servidor del proveedor: aquí vive el programa
       </Etiqueta>
@@ -314,7 +326,7 @@ function Servidor() {
   );
 }
 
-function Proyector({ entrega, color }: { entrega: "fuente" | "binario" | "servidor"; color: string }) {
+function Proyector({ entrega }: { entrega: "fuente" | "binario" | "servidor"; color: string }) {
   const haz = useRef<THREE.Mesh>(null);
   useFrame(({ clock }) => {
     if (haz.current) (haz.current.material as THREE.MeshBasicMaterial).opacity = 0.1 + 0.04 * Math.sin(clock.elapsedTime * 3);
@@ -335,14 +347,14 @@ function Proyector({ entrega, color }: { entrega: "fuente" | "binario" | "servid
         <cylinderGeometry args={[0.9, 0.22, 1.6, 24, 1, true]} />
         <meshBasicMaterial color={colPanel} transparent opacity={0.12} side={THREE.DoubleSide} depthWrite={false} />
       </mesh>
-      <Html position={[0, 2.45, 0]} center distanceFactor={9 * DF} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+      <Rotulo pos={[0, 2.45, 0]}>
         <div style={{ width: 272, borderRadius: 12, background: "rgba(4,10,22,0.92)", border: `1px solid ${colPanel}`, boxShadow: `0 0 26px -6px ${colPanel}`, overflow: "hidden" }}>
-          <div style={{ padding: "6px 10px", fontSize: 11, fontWeight: 900, color: "#fff", borderBottom: `1px solid ${colPanel}55`, display: "flex", gap: 6, alignItems: "center" }}>
+          <div style={{ padding: "6px 10px", fontSize: 14, fontWeight: 900, color: "#fff", borderBottom: `1px solid ${colPanel}55`, display: "flex", gap: 6, alignItems: "center" }}>
             <i className={`fa-solid ${def.icono}`} style={{ color: colPanel }} />
             Lo que recibes: {def.etq.toLowerCase()}
           </div>
           {entrega === "fuente" && (
-            <pre style={{ margin: 0, padding: "8px 10px", fontSize: 10, lineHeight: 1.45, color: "#d1fae5", fontFamily: "ui-monospace, monospace", whiteSpace: "pre" }}>
+            <pre style={{ margin: 0, padding: "8px 10px", fontSize: 14, lineHeight: 1.45, color: "#d1fae5", fontFamily: "ui-monospace, monospace", whiteSpace: "pre" }}>
               {CODIGO_EJEMPLO.map((l, k) => (
                 <div key={k}>
                   <span style={{ color: "#64748b", marginRight: 8 }}>{k + 1}</span>
@@ -352,23 +364,20 @@ function Proyector({ entrega, color }: { entrega: "fuente" | "binario" | "servid
             </pre>
           )}
           {entrega === "binario" && (
-            <pre style={{ margin: 0, padding: "8px 10px", fontSize: 10.5, lineHeight: 1.35, color: "#fdba74", fontFamily: "ui-monospace, monospace", letterSpacing: "0.06em" }}>
+            <pre style={{ margin: 0, padding: "8px 10px", fontSize: 14, lineHeight: 1.35, color: "#fdba74", fontFamily: "ui-monospace, monospace", letterSpacing: "0.06em" }}>
               {BINARIO.map((l, k) => (
                 <div key={k}>{l}</div>
               ))}
             </pre>
           )}
           {entrega === "servidor" && (
-            <div style={{ padding: "18px 10px", textAlign: "center", color: "#e9d5ff", fontSize: 12, fontWeight: 800 }}>
+            <div style={{ padding: "18px 10px", textAlign: "center", color: "#e9d5ff", fontSize: 14, fontWeight: 800 }}>
               <i className="fa-solid fa-cloud" style={{ fontSize: 22, color: "#c084fc", display: "block", marginBottom: 6 }} />
               Nada se instala: solo ves la página
             </div>
           )}
         </div>
-      </Html>
-      <Etiqueta pos={[0, 0.02, 0.75]} df={10} col={`${color}88`} fs={10}>
-        Proyector de lo que te entregan
-      </Etiqueta>
+      </Rotulo>
     </group>
   );
 }
@@ -388,14 +397,6 @@ function EscenaLicencias({ licenciaId, prediccion, revelada, derivada }: { licen
         <meshBasicMaterial color={lic.color} transparent opacity={0.5} />
       </mesh>
       <Caja key={`main-${licenciaId}`} x={0} entrada={false} escala={1} colorLic={lic.color} abiertas={lic.libertades} predichas={prediccion} revelada={revelada} hueca={lic.entrega === "servidor"} conEtiquetas />
-      <Etiqueta pos={[0, -0.02, 1.75]} df={10} col={`${lic.color}aa`} fs={12}>
-        <i className="fa-solid fa-scroll" style={{ color: lic.color }} />
-        {lic.etq} · {lic.ejemplo}
-        <span style={{ marginLeft: 4, padding: "1px 7px", borderRadius: 7, fontSize: 10.5, background: lic.precio === "gratis" ? "#78350f" : "#1e3a8a", color: lic.precio === "gratis" ? "#fde68a" : "#bfdbfe" }}>
-          <i className="fa-solid fa-tag" style={{ marginRight: 4 }} />
-          {lic.precio}
-        </span>
-      </Etiqueta>
       <Proyector entrega={lic.entrega} color={lic.color} />
       {lic.entrega === "servidor" && <Servidor />}
       {conDerivada && (
@@ -403,10 +404,6 @@ function EscenaLicencias({ licenciaId, prediccion, revelada, derivada }: { licen
           <group position={[0, 0, 0.6]}>
             <Caja key={`der-${licenciaId}`} x={2.45} entrada escala={0.62} colorLic={colDer} abiertas={[0, 1, 2, 3].map(() => !!lic.derivada?.libre)} predichas={null} revelada hueca={false} conEtiquetas={false} />
           </group>
-          <Etiqueta pos={[2.45, 1.35, 0.6]} df={13} col={`${colDer}aa`} fs={11}>
-            <i className={`fa-solid ${lic.derivada?.libre ? "fa-code-branch" : "fa-building-lock"}`} style={{ color: colDer }} />
-            {lic.derivada?.libre ? "Versión modificada: sigue siendo libre" : "Versión modificada: la empresa la cerró"}
-          </Etiqueta>
           <mesh position={[1.62, 0.45, 0.5]} rotation={[0, 0, -Math.PI / 2]}>
             <coneGeometry args={[0.16, 0.36, 16]} />
             <meshStandardMaterial color={colDer} emissive={colDer} emissiveIntensity={0.6} />
@@ -545,7 +542,7 @@ function Lector({ idx, programa, libre, resultado, activo }: { idx: number; prog
         <cylinderGeometry args={[0.035, 0.035, largo, 10, 1, true]} />
         <meshBasicMaterial color={colRes} transparent opacity={0.8} />
       </mesh>
-      <Html position={[pos[0], ALTO_MONITOR + 0.72, pos[2]]} center distanceFactor={13 * DF} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+      <Rotulo pos={[pos[0], ALTO_MONITOR + 0.72, pos[2]]}>
         <div
           style={{
             padding: "4px 10px",
@@ -553,7 +550,7 @@ function Lector({ idx, programa, libre, resultado, activo }: { idx: number; prog
             background: "rgba(4,10,22,0.88)",
             border: `1px solid ${activo ? colRes : "rgba(255,255,255,0.22)"}`,
             color: "#fff",
-            fontSize: 11,
+            fontSize: 14,
             fontWeight: 800,
             whiteSpace: "nowrap",
             textAlign: "center",
@@ -561,11 +558,11 @@ function Lector({ idx, programa, libre, resultado, activo }: { idx: number; prog
         >
           <div>
             {programa}
-            {libre && <span style={{ marginLeft: 6, fontSize: 9, padding: "1px 5px", borderRadius: 6, background: "#065f46", color: "#a7f3d0" }}>LIBRE</span>}
+            {libre && <span style={{ marginLeft: 6, fontSize: 14, padding: "1px 5px", borderRadius: 6, background: "#065f46", color: "#a7f3d0" }}>LIBRE</span>}
           </div>
-          {activo && <div style={{ fontSize: 10, color: colRes, marginTop: 2 }}>{RESULTADO_DEF[resultado].etq}</div>}
+          {activo && <div style={{ fontSize: 14, color: colRes, marginTop: 2 }}>{RESULTADO_DEF[resultado].etq}</div>}
         </div>
-      </Html>
+      </Rotulo>
     </>
   );
 }
@@ -645,14 +642,14 @@ function EscenaFormatos({ formatoId, fase, archivo, modoColor }: { formatoId: Fo
         </mesh>
       </group>
       {/* Contador de años en el frente del pedestal */}
-      <Html position={[0, 0.25, 1.25]} center distanceFactor={9 * DF} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+      <Rotulo pos={[0, 0.25, 1.25]} corta>
         <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 12px", borderRadius: 8, background: "#020617", border: `1px solid ${modoColor}`, color: modoColor, fontSize: 18, fontWeight: 900, fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", boxShadow: `0 0 18px -4px ${modoColor}` }}>
-          <i className="fa-solid fa-hourglass-half" style={{ fontSize: 13 }} />
+          <i className="fa-solid fa-hourglass-half" style={{ fontSize: 14 }} />
           <span ref={anio}>{ANIO_GUARDADO}</span>
           <span style={{ color: "#fff", fontSize: 15 }}>· {f.ext}</span>
-          {abierta && <span style={{ fontSize: 11, color: colRes }}>{RESULTADO_DEF[f.resultado].etq.toLowerCase()}</span>}
+          {abierta && <span style={{ fontSize: 14, color: colRes }}>{RESULTADO_DEF[f.resultado].etq.toLowerCase()}</span>}
         </div>
-      </Html>
+      </Rotulo>
       {f.lectores.map((l, idx) => (
         <Lector key={`${f.id}-${idx}`} idx={idx} programa={l.programa} libre={l.libre} resultado={l.resultado} activo={abierta} />
       ))}
@@ -684,7 +681,7 @@ function EscenaFormatos({ formatoId, fase, archivo, modoColor }: { formatoId: Fo
             </group>
           );
         })}
-        <Etiqueta pos={[0, 2.4, 0]} df={10} col={`${modoColor}88`} fs={10.5}>
+        <Etiqueta pos={[0, 2.4, 0]} col={`${modoColor}88`}>
           <i className="fa-solid fa-box-archive" style={{ color: modoColor }} />
           Archivo escolar
         </Etiqueta>
@@ -825,14 +822,6 @@ function EscenaCostos({ equipos, anios, rutas, sinPago, modoColor }: { equipos: 
         <boxGeometry args={[3.2, 0.9, 0.04]} />
         <meshStandardMaterial color="#f1f5f9" roughness={0.6} />
       </mesh>
-      <Html position={[X_SALA, 1.15, -2.2]} center distanceFactor={10 * DF} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-        <div style={{ textAlign: "center", color: "#0f172a", fontWeight: 900, fontSize: 13, whiteSpace: "nowrap" }}>
-          Sala de cómputo
-          <div style={{ fontSize: 11, fontWeight: 800, color: "#334155" }}>
-            {equipos} equipos · {anios} {anios === 1 ? "año" : "años"}
-          </div>
-        </div>
-      </Html>
       <instancedMesh ref={mesas} args={[undefined, undefined, EQ_MAX]} castShadow receiveShadow frustumCulled={false}>
         <boxGeometry args={[0.62, 0.44, 0.44]} />
         <meshStandardMaterial color="#8b6b4a" roughness={0.7} />
@@ -868,25 +857,22 @@ function EscenaCostos({ equipos, anios, rutas, sinPago, modoColor }: { equipos: 
               <cylinderGeometry args={[0.42, 0.44, 0.06, 32]} />
               <meshStandardMaterial color={col} emissive={col} emissiveIntensity={0.35} />
             </mesh>
-            <Html position={[X_PILAS[k]!, 0.2 + nMonedas[k]! * 0.075 + 0.4, Z_PILAS[k]!]} center distanceFactor={14 * DF} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-              <div style={{ padding: "4px 9px", borderRadius: 9, background: "rgba(4,10,22,0.88)", border: `1px solid ${col}`, color: "#fff", fontSize: 10.5, fontWeight: 800, whiteSpace: "nowrap", textAlign: "center" }}>
+            <Rotulo pos={[X_PILAS[k]!, 0.2 + nMonedas[k]! * 0.075 + 0.4, Z_PILAS[k]!]}>
+              <div style={{ padding: "4px 9px", borderRadius: 9, background: "rgba(4,10,22,0.88)", border: `1px solid ${col}`, color: "#fff", fontSize: 14, fontWeight: 800, whiteSpace: "nowrap", textAlign: "center" }}>
                 <div style={{ color: col }}>
                   <i className={`fa-solid ${n.icono}`} style={{ marginRight: 5 }} />
                   {n.etq}
                 </div>
-                <div style={{ fontSize: 9.5, color: "#cbd5e1" }}>{o.producto}</div>
+                <div style={{ fontSize: 14, color: "#cbd5e1" }}>{o.producto}</div>
                 <div style={{ fontFamily: "ui-monospace, monospace" }}>${num(costos[k]!)}</div>
               </div>
-            </Html>
+            </Rotulo>
           </group>
         );
       })}
-      <Etiqueta pos={[3.2, 3.55, -2.2]} df={10} col={`${modoColor}aa`} fs={13}>
+      <Etiqueta pos={[3.2, 3.55, -2.2]} col={`${modoColor}aa`} corta>
         <i className="fa-solid fa-coins" style={{ color: "#fbbf24" }} />
         Total en licencias: ${num(total)} MXN
-      </Etiqueta>
-      <Etiqueta pos={[3.2, 3.1, -2.2]} df={11} fs={10}>
-        1 moneda = ${num(moneda)} MXN
       </Etiqueta>
     </group>
   );
@@ -897,9 +883,9 @@ function EscenaCostos({ equipos, anios, rutas, sinPago, modoColor }: { equipos: 
 export default function SoftwareLibreScene(p: SoftwareLibreSceneProps) {
   const { vista, modoColor, resetNonce } = p;
   const cam = useMemo((): { pos: Pt; target: Pt } => {
-    if (vista === "licencias") return { pos: [0, 4.1, 7.6], target: [0.2, 0.15, 0] };
-    if (vista === "formatos") return { pos: [0.4, 3.6, 8.4], target: [-0.3, 0.5, -0.6] };
-    return { pos: [0.9, 6.6, 8.4], target: [0.9, -0.4, 0] };
+    if (vista === "licencias") return { pos: [0, 4.1, 7.6], target: [0.2, -0.45, 0] };
+    if (vista === "formatos") return { pos: [0.4, 3.6, 8.4], target: [-0.3, -0.2, -0.6] };
+    return { pos: [0.9, 6.6, 8.4], target: [0.9, -1.2, 0] };
   }, [vista]);
 
   return (

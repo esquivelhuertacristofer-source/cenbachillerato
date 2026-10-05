@@ -1,0 +1,12 @@
+{
+  "escena": "La ventanilla de objetos perdidos: un estante con 3 mochilas, 4 loncheras, 4 estuches y 3 pelotas de distintos tamaños y colores.",
+  "pregunta": "Dices solo «It's a backpack», sin tamaño ni color. ¿Qué pasa en el estante?",
+  "opciones": [
+    { "id": "a", "texto": "Se ilumina solo tu mochila", "icono": "fa-bullseye" },
+    { "id": "b", "texto": "Se iluminan varias y el encargado pide más datos", "icono": "fa-layer-group" },
+    { "id": "c", "texto": "No se ilumina nada", "icono": "fa-ban" }
+  ],
+  "correcta": "b",
+  "porque": "Con solo el sustantivo coinciden todas las mochilas del estante. Para señalar una hace falta sumar rasgos: tamaño, forma y color, en ese orden en inglés.",
+  "comoComprobarlo": "En «Lost and found», escribe «It's a backpack» y pulsa Decir; después agrega un color y vuelve a decirlo."
+}

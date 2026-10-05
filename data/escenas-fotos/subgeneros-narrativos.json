@@ -1,0 +1,13 @@
+{
+  "slug": "subgeneros-narrativos",
+  "items": [
+    { "clave": "mesa-editor", "formato": "16:9", "estilo": "foto", "escena": "Fotografía cenital de un escritorio de editor con hojas de manuscrito sin texto legible, un lápiz rojo, una taza de café y una lámpara de escritorio encendida" },
+    { "clave": "sobre-llave", "formato": "16:9", "estilo": "foto", "escena": "Fotografía de un sobre de papel kraft cerrado sobre una mesa de madera con una llave antigua de metal a su lado, luz lateral suave, sin texto ni sellos" },
+    { "clave": "anden-noche", "formato": "16:9", "estilo": "foto", "escena": "Fotografía de un andén de estación de tren vacío de noche con una sola lámpara encendida, rieles que se pierden en la oscuridad y una banca de madera" },
+    { "clave": "casa-pasillos", "formato": "16:9", "estilo": "foto", "escena": "Fotografía del interior de una casa vieja con un pasillo largo, puertas entreabiertas, papel tapiz desgastado y luz tenue que entra por una ventana polvorienta" },
+    { "clave": "ciudad-flotante", "formato": "16:9", "estilo": "ilustracion", "escena": "Ilustración futurista de una ciudad de torres luminosas flotando sobre las nubes al atardecer, con puentes aéreos y pequeñas naves entre los edificios" },
+    { "clave": "escritorio-cuarto", "formato": "16:9", "estilo": "foto", "escena": "Fotografía de un cuarto pequeño con un escritorio junto a la ventana, una laptop abierta, libretas apiladas, una pared con fotografías familiares y una planta" },
+    { "clave": "vecindad-periferia", "formato": "16:9", "estilo": "foto", "escena": "Fotografía de un patio de vecindad en la periferia de una ciudad mexicana con ropa tendida, una combi estacionada en la calle y puestos de tianguis al fondo" },
+    { "clave": "pueblo-costero", "formato": "16:9", "estilo": "foto", "escena": "Fotografía de un pueblo costero con casas de madera sobre pilotes y el mar entrando por una calle inundada hasta la mitad de las puertas, cielo nublado" }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "escena": "Una mesa de editor con un cuento sin género y cuatro ranuras de convenciones; solo está elegido el escenario",
+  "pregunta": "Eliges «una ciudad flotante en el año 2160» como único escenario. ¿Qué subgénero lidera el medidor?",
+  "opciones": [
+    { "id": "a", "texto": "Terror, por lo extraño del lugar", "icono": "fa-ghost" },
+    { "id": "b", "texto": "Ciencia ficción", "icono": "fa-rocket" },
+    { "id": "c", "texto": "Autoficción, por la voz narrativa", "icono": "fa-pen-fancy" }
+  ],
+  "correcta": "b",
+  "porque": "Imaginar futuros y sociedades alternativas es la convención central de la ciencia ficción. Un escenario así empuja al lector hacia ese subgénero aunque aún falten personaje, conflicto y tono.",
+  "comoComprobarlo": "Abre la Mesa del editor, elige solo el escenario de la ciudad flotante y mira cuál barra del lector simulado crece más."
+}

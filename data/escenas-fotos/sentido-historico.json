@@ -1,0 +1,12 @@
+{
+  "slug": "sentido-historico",
+  "items": [
+    { "clave": "pueblo-atardecer", "formato": "16:9", "estilo": "ilustracion", "escena": "Ilustración cálida de un pueblo mexicano pequeño al atardecer: casas de adobe, una iglesia modesta, milpas alrededor y cerros al fondo, sin personas en primer plano" },
+    { "clave": "parcelas-valle", "formato": "16:9", "estilo": "foto", "escena": "Fotografía aérea de un valle agrícola de México con parcelas de cultivo de formas y tamaños muy distintos, algunas grandes y otras diminutas, separadas por cercas y caminos de tierra" },
+    { "clave": "mercado-pueblo", "formato": "16:9", "estilo": "foto", "escena": "Fotografía de un mercado de pueblo mexicano un día soleado con puestos de fruta y telas de colores, personas de distintas edades comprando y conversando" },
+    { "clave": "libro-escritorio", "formato": "16:9", "estilo": "foto", "escena": "Fotografía de un libro grueso y cerrado con pasta oscura sobre un escritorio de madera junto a una ventana con luz natural y una pluma antigua, sin texto visible" },
+    { "clave": "dos-caminos", "formato": "16:9", "estilo": "foto", "escena": "Composición dividida en dos mitades: a la izquierda una carretera recta atravesando un desierto con cactus y cielo seco, a la derecha un camino de terracería entre vegetación húmeda y verde densa" },
+    { "clave": "portal-conversacion", "formato": "16:9", "estilo": "foto", "escena": "Fotografía de varias mujeres mayores sentadas en el portal de una casa de pueblo conversando animadas y tejiendo, con plantas en macetas alrededor" },
+    { "clave": "plaza-estatua", "formato": "16:9", "estilo": "foto", "escena": "Fotografía de una plaza pública de ciudad mexicana con una estatua de bronce sobre pedestal rodeada de andamios, y gente mirándola con curiosidad desde distintos lados" }
+  ]
+}

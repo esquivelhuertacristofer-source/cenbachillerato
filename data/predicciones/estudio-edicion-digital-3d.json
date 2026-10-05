@@ -1,0 +1,12 @@
+{
+  "escena": "Una foto de cámara de 64 × 48 píxeles y un logotipo de colores planos, cada uno armado con prismas, uno por píxel.",
+  "pregunta": "Guardas la foto con compresión sin pérdida (RLE). ¿Qué pasa con el peso del archivo?",
+  "opciones": [
+    { "id": "a", "texto": "Baja a menos de la mitad, como pasa con el logotipo", "icono": "fa-compress" },
+    { "id": "b", "texto": "Crece: casi ningún píxel se repite", "icono": "fa-expand" },
+    { "id": "c", "texto": "Queda igual: sin pérdida no cambia el peso", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "RLE guarda cada racha de píxeles iguales como una pareja (cuántos, qué color). El grano de la cámara casi no repite colores: cada racha mide un píxel y el conteo añade un byte, así que pesa más.",
+  "comoComprobarlo": "Elige la foto, déjala a 24 bits en 64 × 48 y cambia «Guardar el archivo» a sin pérdida. Compara con el logotipo."
+}
