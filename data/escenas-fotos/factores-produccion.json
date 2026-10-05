@@ -1,0 +1,11 @@
+{
+  "slug": "factores-produccion",
+  "items": [
+    { "clave": "tortilleria", "formato": "16:9", "estilo": "ilustracion", "escena": "Fachada de una tortillería de barrio con toldo de colores, mostrador de madera con tortillas calientes envueltas en un trapo y una fila de clientes, sin letreros ni texto" },
+    { "clave": "maiz", "formato": "16:9", "estilo": "foto", "escena": "Milpa al amanecer con mazorcas de maíz maduras y un costal de granos amarillos en primer plano" },
+    { "clave": "manos", "formato": "16:9", "estilo": "foto", "escena": "Manos de una persona formando y volteando tortillas sobre un comal de barro caliente" },
+    { "clave": "maquina", "formato": "16:9", "estilo": "foto", "escena": "Máquina tortilladora de acero inoxidable con banda transportadora de la que salen tortillas recién hechas" },
+    { "clave": "planeacion", "formato": "16:9", "estilo": "ilustracion", "escena": "Mesa de trabajo con un calendario de pared sin números legibles, cajas de masa ordenadas por turnos y un pizarrón con flechas y dibujos de tortillas, sin letras" },
+    { "clave": "tomates", "formato": "16:9", "estilo": "foto", "escena": "Cajas de tomates rojos recién cosechados apiladas en un campo agrícola con un camión de carga al fondo" }
+  ]
+}

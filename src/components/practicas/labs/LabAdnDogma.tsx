@@ -20,6 +20,7 @@ import { useState, useEffect, useRef, useCallback, type ReactNode } from "react"
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, card, Eyebrow, SceneBoundary, OK, NUM } from "./_kit";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { EppGate, type EppItem } from "./_epp-gate";
@@ -37,7 +38,7 @@ import {
   hebraMolde,
   transcribir,
   traducir,
-  enzimasDe,
+  ENZIMAS,
   CODON_TABLE,
   PROBLEMA,
   DEFINICION_DOGMA,
@@ -58,7 +59,7 @@ const AdnDogmaScene = dynamic(() => import("./AdnDogmaScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-dna fa-fade" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Cargando el dogma central en 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Cargando el dogma central en 3D…</span>
     </div>
   ),
 });
@@ -142,19 +143,19 @@ function PrediccionCodonCard({
   };
 
   return (
-    <div style={{ ...card, padding: "20px 22px", marginTop: 22, border: `1px solid ${accent}55`, background: `rgba(${rgba},0.06)` }}>
+    <div style={{ ...card, padding: "20px 22px", border: `1px solid ${accent}55`, background: `rgba(${rgba},0.06)` }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 12 }}>
         <Eyebrow><i className="fa-solid fa-calculator" style={{ marginRight: 8, color: accent }} />Reto de cálculo — traduce el codón</Eyebrow>
-        <span style={{ fontSize: 11, fontWeight: 800, color: "#fbbf24" }}>
+        <span style={{ fontSize: 14, fontWeight: 800, color: "#fbbf24" }}>
           Mejor: {mejor > 0 ? "★".repeat(mejor) + "☆".repeat(3 - mejor) : "—"}
         </span>
       </div>
-      <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55, marginBottom: 14 }}>
+      <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55, marginBottom: 14 }}>
         Aplica el <strong>código genético</strong>: toma el siguiente codón del ARNm y predice qué aminoácido produce <em>antes</em> de que el ribosoma lo lea. Escribe la abreviatura de 3 letras (p. ej. <strong>Met</strong>, <strong>Pro</strong>) o <strong>Stop</strong> si es codón de parada.
       </div>
 
       {!hayCodones ? (
-        <div style={{ fontSize: 12, color: T.text3, lineHeight: 1.5, padding: "12px 14px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
+        <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.5, padding: "12px 14px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
           <i className="fa-solid fa-triangle-exclamation" style={{ color: "#fbbf24", marginRight: 7 }} />
           Elige o escribe una secuencia que contenga el codón de inicio <strong>AUG</strong> para generar codones traducibles.
         </div>
@@ -192,7 +193,7 @@ function PrediccionCodonCard({
                 </div>
               )}
               {msg && (
-                <div style={{ marginTop: 12, padding: "11px 14px", borderRadius: 10, fontSize: 12.5, lineHeight: 1.5, border: `1px solid ${msg.tipo === "ok" ? OK : "#fbbf24"}55`, background: msg.tipo === "ok" ? `${OK}14` : "rgba(251,191,36,0.08)", color: "#eaf0fb" }}>
+                <div style={{ marginTop: 12, padding: "11px 14px", borderRadius: 10, fontSize: 14, lineHeight: 1.5, border: `1px solid ${msg.tipo === "ok" ? OK : "#fbbf24"}55`, background: msg.tipo === "ok" ? `${OK}14` : "rgba(251,191,36,0.08)", color: "#eaf0fb" }}>
                   <i className={`fa-solid ${msg.tipo === "ok" ? "fa-circle-check" : "fa-circle-info"}`} style={{ color: msg.tipo === "ok" ? OK : "#fbbf24", marginRight: 8 }} />
                   {msg.texto}
                 </div>
@@ -211,12 +212,14 @@ export function LabAdnDogma({ color }: PracticaLabProps) {
   const [modo, setModo] = useState<Modo>("replicacion");
   const [presetId, setPresetId] = useState<string>("glosario");
   const [seq, setSeq] = useState<string>(secuenciaPorId("glosario").codificante);
+  // secuencia «original» contra la que se compara cada mutación
+  const [original, setOriginal] = useState<string>(secuenciaPorId("glosario").codificante);
+  const [mutado, setMutado] = useState(false);
   const [progreso, setProgreso] = useState<number>(0);
   const [playing, setPlaying] = useState<boolean>(true);
   const [resetNonce, setResetNonce] = useState(0);
-  // reto evaluable (B), teoría (cajón deslizable, A) y sonido (C)
+  // reto evaluable (B) y sonido (C)
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
 
@@ -294,8 +297,10 @@ export function LabAdnDogma({ color }: PracticaLabProps) {
     bump();
   };
   const elegirPreset = (id: string) => {
+    const nueva = secuenciaPorId(id).codificante;
     setPresetId(id);
-    setSeq(secuenciaPorId(id).codificante);
+    setSeq(nueva);
+    setOriginal(nueva);
     setProgreso(0);
     setPlaying(true);
     bump();
@@ -307,42 +312,69 @@ export function LabAdnDogma({ color }: PracticaLabProps) {
     setPlaying(true);
     bump();
   };
+  /** Clic en una letra: A → T → G → C → A (mutación puntual). */
+  const mutarBase = (i: number) => {
+    const ciclo = ["A", "T", "G", "C"];
+    const actual = codificante[i] ?? "A";
+    const siguiente = ciclo[(ciclo.indexOf(actual) + 1) % 4] as string;
+    setSeq(codificante.slice(0, i) + siguiente + codificante.slice(i + 1));
+    setPresetId("");
+    setMutado(true);
+    setProgreso(0);
+    setPlaying(true);
+    bump();
+    if (sonido) audioRef.current?.blip();
+  };
+  const restaurar = () => {
+    setSeq(original);
+    setPresetId(SECUENCIAS.find((s) => s.codificante === original)?.id ?? "");
+    setProgreso(0);
+    setPlaying(true);
+    bump();
+  };
 
   // proteína legible (abreviaturas hasta el codón de parada exclusive)
   const proteina = codones.filter((c) => !c.paro).map((c) => c.amino.abr);
   const ultimoCodon = codones[Math.min(paso, codones.length) - 1];
   const preset = presetId ? secuenciaPorId(presetId) : null;
 
+  // proteína de la secuencia original, para medir el efecto de la mutación
+  const codonesOrig = traducir(transcribir(original));
+  const proteinaOrig = codonesOrig.filter((c) => !c.paro).map((c) => c.amino.abr);
+  const cambioSeq = codificante !== original;
+  const termina = codones.length > 0 && codones[codones.length - 1]!.paro;
+  const paroPrematuro = mutado && cambioSeq && termina && proteina.length < proteinaOrig.length;
+  const efecto: { col: string; txt: string } | null = !cambioSeq
+    ? null
+    : codones.length === 0
+      ? { col: "#fb7185", txt: "Sin AUG no hay inicio de traducción: la célula no fabrica esta proteína." }
+      : paroPrematuro
+        ? { col: "#fb7185", txt: `Codón de paro prematuro: la proteína se corta en ${proteina.length} aminoácidos (antes eran ${proteinaOrig.length}).` }
+        : proteina.join("-") === proteinaOrig.join("-")
+          ? { col: "#86efac", txt: "Mutación silenciosa: cambió el ADN pero la proteína es la misma (el código genético es degenerado)." }
+          : { col: "#fbbf24", txt: "Mutación de sentido erróneo o de longitud distinta: la proteína cambió." };
+
   // codones simplificados para el reto de cálculo (codón → aminoácido)
   const codonesReto = codones.map((c) => ({ codon: c.codon, abr: c.amino.abr, paro: c.paro }));
 
-  // pilar 2 — pasos guiados (seguir pasos)
   const explorados = modosVistos.size >= 3;
-  const pasos: { t: string; done: boolean }[] = [
-    { t: "Equípate con el instrumental de bioseguridad", done: eppListo },
-    { t: "Arrastra la maquinaria (helicasa / polimerasa / ribosoma) sobre la cadena", done: arrastro },
-    { t: "Recorre los 3 procesos: replicación, transcripción y traducción", done: explorados },
-    { t: "Predice un aminoácido y gana estrellas en el reto de cálculo", done: predicho },
-  ];
-  const pasoActivo = pasos.findIndex((p) => !p.done);
-
-  // objetivos de la sesión
-  const objetivos: { t: string; done: boolean }[] = [
-    { t: "Equiparme con guantes, bata y gafas de seguridad", done: eppListo },
-    { t: "Manipular en 3D la maquinaria del dogma central arrastrándola", done: arrastro },
-    { t: "Observar los tres procesos: ADN→ADN, ADN→ARNm y ARNm→proteína", done: explorados },
-    { t: "Editar o elegir una secuencia de ADN distinta", done: presetId !== "glosario" },
-    { t: "Traducir un codón a su aminoácido con la tabla del código genético", done: predicho },
-    { t: "Aprobar el reto evaluable (verdadero/falso del A2)", done: ejercicioAprobado },
+  const objetivos = [
+    { txt: "Equiparme con guantes, bata y gafas de seguridad", done: eppListo },
+    { txt: "Haz clic en una letra del ADN para cambiar esa base: ¿cambia la proteína?", done: mutado },
+    { txt: "Provoca un codón de paro prematuro y mira cómo se acorta la proteína", done: paroPrematuro },
+    { txt: "Manipular en 3D la maquinaria del dogma central arrastrándola", done: arrastro },
+    { txt: "Observar los tres procesos: ADN→ADN, ADN→ARNm y ARNm→proteína", done: explorados },
+    { txt: "Editar o elegir una secuencia de ADN distinta", done: presetId !== "glosario" },
+    { txt: "Traducir un codón a su aminoácido con la tabla del código genético", done: predicho },
+    { txt: "Aprobar el reto evaluable (verdadero/falso del A2)", done: ejercicioAprobado },
   ];
 
-  // pie del visor
-  const pie: string =
+  const lectura: ReactNode =
     modo === "replicacion"
-      ? `La helicasa abre la doble hélice y la ADN polimerasa copia ${paso}/${total} pares — A se aparea con T (2 puentes H) y G con C (3 puentes H).`
+      ? <>Copiadas {paso}/{total} bases · A–T, G–C</>
       : modo === "transcripcion"
-        ? `La ARN polimerasa lee la hebra molde y sintetiza el ARNm: ${paso}/${total} bases (la timina T se reemplaza por uracilo U).`
-        : `El ribosoma traduce el ARNm codón a codón: ${paso}/${total} codones leídos${ultimoCodon ? ` · último: ${ultimoCodon.codon} → ${ultimoCodon.amino.abr}` : ""}.`;
+        ? <>ARNm: {paso}/{total} bases · T pasa a U</>
+        : <>{paso}/{total} codones{ultimoCodon ? ` · ${ultimoCodon.codon} → ${ultimoCodon.paro ? "paro" : ultimoCodon.amino.abr}` : ""}</>;
 
   const sceneFallback = (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 28, textAlign: "center" }}>
@@ -350,7 +382,7 @@ export function LabAdnDogma({ color }: PracticaLabProps) {
         <i className={`fa-solid ${def.icono}`} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{def.etq}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>
         Tu equipo no puede mostrar la escena en 3D, pero la información sigue aquí. {DEFINICION_DOGMA}
       </div>
     </div>
@@ -359,7 +391,7 @@ export function LabAdnDogma({ color }: PracticaLabProps) {
   /* ── Tira de bases monoespaciada (valor JSX, no componente) ──────────── */
   const tira = (cadena: string, etiqueta: string, activos: (i: number) => boolean, tenue?: (i: number) => boolean): ReactNode => (
     <div style={{ marginBottom: 10 }}>
-      <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, marginBottom: 4, textTransform: "uppercase" }}>{etiqueta}</div>
+      <div style={{ fontSize: 13, fontWeight: 900, letterSpacing: "0.06em", color: T.text3, marginBottom: 4, textTransform: "uppercase" }}>{etiqueta}</div>
       <div className="ad-strip">
         {cadena.split("").map((b, i) => (
           <span
@@ -378,34 +410,30 @@ export function LabAdnDogma({ color }: PracticaLabProps) {
       </div>
     </div>
   );
+  const nota = (col: string, children: ReactNode) => (
+    <p style={{ margin: 0, padding: "10px 12px", borderRadius: 12, border: `1px solid ${col}44`, background: `${col}14`, lineHeight: 1.5 }}>{children}</p>
+  );
 
-  /* ── Panel de control específico del modo ──────────────────────────── */
-  let control: ReactNode = null;
+  /* ── Hebras del modo activo ───────────────────────────────────────────── */
+  let hebras: ReactNode;
   if (modo === "replicacion") {
-    control = (
+    hebras = (
       <>
         {tira(codificante, "Hebra codificante (sentido) 5'→3'", (i) => i === paso, (i) => i > paso)}
         {tira(molde, "Hebra molde (antiparalela) 3'→5'", (i) => i === paso, (i) => i > paso)}
-        <div style={{ marginTop: 6, padding: "11px 13px", borderRadius: 11, border: `1px solid ${modoCol}44`, background: `${modoCol}12`, fontSize: 12, color: "#eaf0fb", lineHeight: 1.5 }}>
-          <i className="fa-solid fa-circle-info" style={{ color: modoCol, marginRight: 8 }} />
-          Replicación <strong>semiconservativa</strong>: tras copiar las {total} bases obtienes dos moléculas hijas idénticas, cada una con una hebra parental y una nueva.
-          {paso >= total && <strong style={{ color: "#86efac" }}> {" "}✓ {paso}/{total} copiadas.</strong>}
-        </div>
+        {nota(modoCol, <>Replicación <strong>semiconservativa</strong>: tras copiar las {total} bases obtienes dos moléculas hijas idénticas, cada una con una hebra parental y una nueva.{paso >= total && <strong style={{ color: "#86efac" }}> ✓ {paso}/{total} copiadas.</strong>}</>)}
       </>
     );
   } else if (modo === "transcripcion") {
-    control = (
+    hebras = (
       <>
         {tira(molde, "Hebra molde del ADN 3'→5'", (i) => i === paso, (i) => i > paso)}
         {tira(arnm, "ARN mensajero 5'→3' (T → U)", (i) => i < paso, (i) => i >= paso)}
-        <div style={{ marginTop: 6, padding: "11px 13px", borderRadius: 11, border: `1px solid ${modoCol}44`, background: `${modoCol}12`, fontSize: 12, color: "#eaf0fb", lineHeight: 1.5 }}>
-          <i className="fa-solid fa-circle-info" style={{ color: modoCol, marginRight: 8 }} />
-          La ARN polimerasa sintetiza el ARNm complementario a la hebra molde; la <strong>timina (T)</strong> del ADN se sustituye por <strong>uracilo (U)</strong> en el ARN.
-        </div>
+        {nota(modoCol, <>La ARN polimerasa sintetiza el ARNm complementario a la hebra molde; la <strong>timina (T)</strong> del ADN se sustituye por <strong>uracilo (U)</strong> en el ARN.</>)}
       </>
     );
   } else {
-    control = (
+    hebras = (
       <>
         {tira(arnm, "ARN mensajero 5'→3'", (i) => {
           const c = codones[paso - 1];
@@ -413,152 +441,219 @@ export function LabAdnDogma({ color }: PracticaLabProps) {
           const start = arnm.indexOf("AUG");
           return i >= start + (paso - 1) * 3 && i < start + paso * 3;
         })}
-        <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "4px 0", textTransform: "uppercase" }}>Proteína (aminoácidos)</div>
+        <div style={{ fontSize: 13, fontWeight: 900, letterSpacing: "0.06em", color: T.text3, margin: "4px 0", textTransform: "uppercase" }}>Proteína (aminoácidos)</div>
         <div className="ad-chips">
           {codones.map((c, i) => {
             const leido = i < paso;
             return (
               <span key={i} className="ad-chip" data-on={leido} style={{ borderColor: leido ? c.amino.color : "rgba(255,255,255,0.12)", background: leido ? `${c.amino.color}1e` : "transparent", color: leido ? "#fff" : T.text3 }}>
-                <span style={{ fontFamily: "ui-monospace,monospace", fontSize: 10, opacity: 0.8 }}>{c.codon}</span>
+                <span style={{ fontFamily: "ui-monospace,monospace", fontSize: 14, opacity: 0.8 }}>{c.codon}</span>
                 <strong style={{ color: leido ? c.amino.color : T.text3 }}>{c.paro ? "STOP" : c.amino.abr}</strong>
               </span>
             );
           })}
-          {codones.length === 0 && <span style={{ fontSize: 11.5, color: T.text3 }}>La secuencia no contiene el codón de inicio AUG.</span>}
+          {codones.length === 0 && <span style={{ color: T.text3 }}>La secuencia no contiene el codón de inicio AUG.</span>}
         </div>
-        <div style={{ marginTop: 10, padding: "11px 13px", borderRadius: 11, border: `1px solid ${modoCol}44`, background: `${modoCol}12`, fontSize: 12, color: "#eaf0fb", lineHeight: 1.5 }}>
-          <i className="fa-solid fa-circle-info" style={{ color: modoCol, marginRight: 8 }} />
-          El ribosoma empieza en <strong>AUG (metionina)</strong> y se detiene en el primer codón de parada (UAA, UAG o UGA). Proteína: <strong style={{ color: "#86efac" }}>{proteina.length > 0 ? proteina.join("-") : "—"}</strong>.
-        </div>
+        <div style={{ height: 10 }} />
+        {nota(modoCol, <>El ribosoma empieza en <strong>AUG (metionina)</strong> y se detiene en el primer codón de parada (UAA, UAG o UGA). Proteína: <strong style={{ color: "#86efac" }}>{proteina.length > 0 ? proteina.join("-") : "—"}</strong>.</>)}
       </>
     );
   }
 
+  const controles: ReactNode = (
+    <>
+      <Bloque titulo="Muta el ADN" icono="fa-dna">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0,1fr))", gap: 8 }}>
+          {SECUENCIAS.map((s) => {
+            const on = s.id === presetId;
+            return (
+              <button key={s.id} type="button" onClick={() => elegirPreset(s.id)}
+                style={{ cursor: "pointer", textAlign: "center", fontSize: 14, fontWeight: 800, lineHeight: 1.2, padding: "10px 6px", borderRadius: 11, border: `1px solid ${on ? modoCol : "rgba(255,255,255,0.14)"}`, background: on ? `${modoCol}26` : "transparent", color: on ? "#fff" : T.text2 }}>
+                <div style={{ fontSize: 17, marginBottom: 3, color: on ? modoCol : "inherit" }}><i className={`fa-solid ${s.icono}`} aria-hidden /></div>
+                {s.etq}
+              </button>
+            );
+          })}
+        </div>
+        <div style={{ color: T.text2 }}>
+          <i className="fa-solid fa-hand-pointer" style={{ color: modoCol, marginRight: 7 }} aria-hidden />
+          Toca una letra para cambiar esa base (A → T → G → C).
+        </div>
+        <div className="ad-strip" role="group" aria-label="Bases de la hebra codificante">
+          {codificante.split("").map((b, i) => {
+            const distinta = (original[i] ?? b) !== b || codificante.length !== original.length;
+            return (
+              <button key={i} type="button" className="ad-mut" onClick={() => mutarBase(i)}
+                aria-label={`Base ${i + 1}: ${b}. Cambiar`} data-mut={distinta && (original[i] ?? b) !== b}
+                style={{ color: BASE_COLOR[b as Base] ?? "#fff", borderColor: BASE_COLOR[b as Base] ?? "#fff" }}>
+                {b}
+              </button>
+            );
+          })}
+        </div>
+        <input className="ad-seq" value={codificante} onChange={(e) => editarSeq(e.target.value)} spellCheck={false} maxLength={30} aria-label="Secuencia de ADN" placeholder="ESCRIBE TU ADN (A, T, G, C)" style={{ ["--adc" as string]: modoCol }} />
+        {preset && <div style={{ color: T.text2 }}><i className="fa-solid fa-circle-info" style={{ color: modoCol, marginRight: 7 }} aria-hidden />{preset.nota}</div>}
+        {cambioSeq && (
+          <button type="button" onClick={restaurar}
+            style={{ cursor: "pointer", fontSize: 14, fontWeight: 800, color: "#fff", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 10, padding: "10px 14px" }}>
+            <i className="fa-solid fa-rotate-left" style={{ marginRight: 8 }} aria-hidden />Restaurar la secuencia original
+          </button>
+        )}
+      </Bloque>
+
+      <Bloque titulo="Qué le pasa a la proteína" icono="fa-cubes-stacked">
+        <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr)", gap: 8 }}>
+          <Dato label="Original" value={proteinaOrig.length > 0 ? proteinaOrig.join("-") : "—"} />
+          <Dato label="Con tu ADN" value={proteina.length > 0 ? proteina.join("-") : "—"} col={efecto?.col ?? modoCol} />
+        </div>
+        {efecto
+          ? nota(efecto.col, <>{efecto.txt}</>)
+          : <p style={{ margin: 0, color: T.text2 }}>Cambia una base y compara: este es el efecto de una mutación puntual.</p>}
+      </Bloque>
+
+      <Bloque titulo="Avance del proceso" icono="fa-forward-step">
+        <Deslizador label={modo === "traduccion" ? "Codones leídos" : "Bases procesadas"} icon="fa-ruler-horizontal" colr={modoCol}
+          valor={`${paso} / ${total}`} min={0} max={Math.max(1, total)} step={1} value={paso}
+          onChange={(v) => { setPlaying(false); setProgreso(v); }} hintL="inicio" hintR="final" />
+        <div style={{ color: T.text2 }}>
+          <i className="fa-solid fa-hand-pointer" style={{ marginRight: 8, color: modoCol }} aria-hidden />
+          También puedes <strong style={{ color: "#fff" }}>arrastrar la perilla brillante</strong> en la escena 3D.
+        </div>
+      </Bloque>
+
+      <Bloque titulo={`Moléculas — ${def.etq}`} icono={def.icono}>
+        {hebras}
+      </Bloque>
+    </>
+  );
+
+  const teoria: ReactNode = (
+    <>
+      <Bloque titulo="El visor del dogma central" icono="fa-dna">
+        <p style={{ margin: 0, color: T.text2 }}>{PROBLEMA}</p>
+      </Bloque>
+      <Bloque titulo="Lectura A1 — Dogma central (Crick, 1958)" icono="fa-book-open">
+        <p style={{ margin: 0, color: T.text2 }}>{DEFINICION_DOGMA}</p>
+        <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+          {PREGUNTAS.map((q, i) => <li key={i}>{q}</li>)}
+        </ul>
+      </Bloque>
+      <Bloque titulo="Maquinaria" icono="fa-gears">
+        {ENZIMAS.map((e) => (
+          <div key={e.nombre} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+            <i className={`fa-solid ${e.icono}`} style={{ color: accent, marginTop: 4 }} aria-hidden />
+            <div>
+              <strong>{e.nombre}</strong>
+              <div style={{ color: T.text2 }}>{e.funcion}</div>
+            </div>
+          </div>
+        ))}
+      </Bloque>
+      <Bloque titulo="Código genético (muestra)" icono="fa-table-cells">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 130px), 1fr))", gap: 7 }}>
+          {CODON_DEMO.map((cod) => {
+            const a = CODON_TABLE[cod];
+            if (!a) return null;
+            const paro = a.abr === "Stop";
+            return (
+              <div key={cod} style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 10px", borderRadius: 9, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
+                <span style={{ fontFamily: "ui-monospace,monospace", fontWeight: 900, color: a.color }}>{cod}</span>
+                <i className="fa-solid fa-arrow-right" style={{ fontSize: 12, color: T.text3 }} aria-hidden />
+                <span style={{ fontWeight: 800, color: paro ? "#f87171" : "#fff" }}>{paro ? "Paro" : a.abr}</span>
+              </div>
+            );
+          })}
+        </div>
+        <p style={{ margin: 0, color: T.text3 }}>64 codones (4³) codifican 20 aminoácidos (código degenerado) más 3 de parada. AUG marca el inicio.</p>
+      </Bloque>
+      <Bloque titulo="Cómo usar el laboratorio" icono="fa-list-ol">
+        <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8 }}>
+          {INSTRUCCIONES.map((p, i) => <li key={i}>{p}</li>)}
+        </ol>
+      </Bloque>
+      <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+        <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+          {IDEAS.map((x, i) => <li key={i}>{x}</li>)}
+        </ul>
+      </Bloque>
+      <Bloque titulo="Datos del genoma" icono="fa-magnifying-glass-chart">
+        {DATOS.map((dd, i) => (
+          <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+            <i className={`fa-solid ${dd.icono}`} style={{ color: accent, marginTop: 4 }} aria-hidden />
+            <div>
+              <strong style={{ fontFamily: "ui-monospace, monospace" }}>{dd.valor}</strong>
+              <div style={{ color: T.text2 }}>{dd.texto}</div>
+            </div>
+          </div>
+        ))}
+      </Bloque>
+      <Bloque titulo="Excepción: los virus ARN" icono="fa-virus">
+        <p style={{ margin: 0, color: T.text2 }}>{CALLOUT_VIRUS}</p>
+      </Bloque>
+      <Bloque titulo="México: medicina genómica" icono="fa-location-dot">
+        <p style={{ margin: 0, color: T.text2 }}>{CONTEXTO}</p>
+      </Bloque>
+      <Bloque titulo="¿Sabías que? (quizzes A2/A4)" icono="fa-circle-question">
+        <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+          {HECHOS.map((h, i) => <li key={i}>{h}</li>)}
+        </ul>
+      </Bloque>
+      <Bloque titulo="Glosario (A5)" icono="fa-book">
+        {GLOSARIO.map((g, i) => (
+          <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}`, color: T.text2 }}>
+            <strong style={{ color: accent }}>{g.termino}. </strong>{g.definicion}
+            <div style={{ color: T.text3, marginTop: 4 }}><i className="fa-solid fa-flask" style={{ marginRight: 6, color: accent }} aria-hidden />{g.ejemplo}</div>
+          </div>
+        ))}
+      </Bloque>
+      <Bloque titulo="Ficha teórica" icono="fa-book">
+        <FichaTeorica data={ADN_DOGMA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+      </Bloque>
+      <p style={{ marginTop: 18, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
+        La definición del dogma central, las preguntas de reflexión, el callout de los virus ARN y el contexto del INMEGEN son <strong>verbatim</strong> de la lectura A1; el glosario y sus ejemplos son verbatim del glosario A5; los datos de «¿sabías que?» provienen de los quizzes A2/A4. El <strong>código genético</strong> (tabla de codones) es la referencia universal estándar: para cualquier secuencia que escribas, la complementariedad (A-T, G-C), la transcripción (T→U) y la traducción (codón→aminoácido) se calculan de forma <strong>exacta</strong>. El modelo 3D de la doble hélice, las enzimas, el ribosoma y los ARNt es <strong>esquemático</strong> (no a escala atómica): representa el mecanismo del flujo de información, no una estructura molecular medida. Fuente: {FUENTE}
+      </p>
+    </>
+  );
+
   return (
-    <div style={{ color: T.text }}>
+    <>
       <style>{`
-        @keyframes adPulse { 0%,100%{ box-shadow:0 0 0 0 var(--add); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .ad-live-dot { animation: adPulse 1.6s ease-in-out infinite; }
-        .ad-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .ad-grid { grid-template-columns: 1fr; } }
-        .ad-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .ad-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .ad-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .ad-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .ad-tab { cursor:pointer; border:1px solid var(--adc); border-radius:12px; padding:11px 8px; text-align:center;
-          background:transparent; transition:all .15s; color:#fff; }
-        .ad-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
-        .ad-tab:hover { background:rgba(255,255,255,0.06); }
-        .ad-strip { display:flex; flex-wrap:wrap; gap:3px; }
-        .ad-base { font-family:ui-monospace,monospace; font-size:14px; font-weight:900; width:22px; height:26px;
+        .ad-strip { display:flex; flex-wrap:wrap; gap:4px; }
+        .ad-base { font-family:ui-monospace,monospace; font-size:15px; font-weight:900; width:24px; height:28px;
           display:flex; align-items:center; justify-content:center; border-radius:6px; border:1.5px solid transparent;
           background:rgba(4,10,22,0.45); transition:all .12s; }
         .ad-base[data-on="true"] { transform:translateY(-2px); background:rgba(255,255,255,0.06); }
+        .ad-mut { cursor:pointer; font-family:ui-monospace,monospace; font-size:17px; font-weight:900; width:36px; height:42px;
+          display:flex; align-items:center; justify-content:center; border-radius:9px; border:1.5px solid;
+          background:rgba(4,10,22,0.55); transition:transform .12s, background .12s; }
+        .ad-mut:hover { transform:translateY(-2px); background:rgba(255,255,255,0.1); }
+        .ad-mut[data-mut="true"] { box-shadow:0 0 0 3px rgba(251,113,133,0.75); }
         .ad-chips { display:flex; flex-wrap:wrap; gap:6px; }
         .ad-chip { display:inline-flex; flex-direction:column; align-items:center; gap:1px; padding:5px 9px; border-radius:9px;
-          border:1px solid; font-size:11.5px; font-weight:900; transition:all .12s; }
-        .ad-range { width:100%; accent-color: var(--adc); cursor:pointer; }
-        .ad-seq { width:100%; box-sizing:border-box; font-family:ui-monospace,monospace; font-size:14px; font-weight:800;
+          border:1px solid; font-size:14px; font-weight:900; transition:all .12s; }
+        .ad-seq { width:100%; box-sizing:border-box; font-family:ui-monospace,monospace; font-size:15px; font-weight:800;
           letter-spacing:0.12em; color:#fff; background:rgba(4,10,22,0.55); border:1px solid var(--adc); border-radius:10px;
           padding:10px 12px; outline:none; text-transform:uppercase; }
-        @media (max-width: 1000px){ .ad-bottom { grid-template-columns: 1fr !important; } }
-
-        /* Cajón de teoría */
-        .ad-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .ad-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .ad-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06121e 0%,#040a16 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .ad-drawer[data-open="true"] { transform:translateX(0); }
-        .ad-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .ad-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .ad-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .ad-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .ad-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .ad-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-
-        /* Pasos guiados */
-        .ad-steps { display:grid; grid-template-columns: repeat(4,1fr); gap:8px; }
-        @media (max-width: 760px){ .ad-steps { grid-template-columns: 1fr 1fr; } }
-        .ad-step { display:flex; gap:9px; align-items:flex-start; padding:10px 12px; border-radius:12px;
-          border:1px solid ${T.line}; background:rgba(4,10,22,0.4); transition:all .15s; }
-        .ad-step[data-on="true"] { border-color:${OK}66; background:${OK}12; }
-        .ad-step[data-active="true"] { border-color:${accent}; background:rgba(${color.rgba},0.12); }
-        .ad-step-n { width:22px; height:22px; flex-shrink:0; border-radius:50%; display:flex; align-items:center;
-          justify-content:center; font-size:11px; font-weight:900; color:#04121f; background:rgba(255,255,255,0.45); }
-        .ad-step[data-on="true"] .ad-step-n { background:${OK}; }
-        .ad-step[data-active="true"] .ad-step-n { background:${accent}; }
-        .ad-step-tx { font-size:11.5px; font-weight:700; color:#dce6f5; line-height:1.35; }
+        .ad-gate { position:absolute; inset:0; z-index:20; overflow-y:auto; }
+        .ad-gate > div { position:relative !important; inset:auto !important; min-height:100%; }
 
         /* Reto de cálculo */
         .ad-calc-in { flex:1; min-width:130px; box-sizing:border-box; font-family:ui-monospace,monospace; font-size:15px;
           font-weight:800; color:#fff; background:rgba(4,10,22,0.55); border:1px solid var(--adc); border-radius:10px;
           padding:10px 12px; outline:none; }
-        .ad-calc-btn { cursor:pointer; border-radius:10px; padding:10px 16px; font-size:13px; font-weight:800;
+        .ad-calc-btn { cursor:pointer; border-radius:10px; padding:10px 16px; font-size:14px; font-weight:800;
           border:1px solid transparent; transition:all .15s; }
         .ad-calc-primary { color:#04121f; background:var(--adc); }
         .ad-calc-primary:hover { filter:brightness(1.08); }
         .ad-calc-ghost { color:#fff; background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.16); }
         .ad-calc-ghost:hover { background:rgba(255,255,255,0.12); }
       `}</style>
-
-      {/* Selector de modo */}
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="ad-tabs">
-          {MODOS.map((m) => {
-            const d = MODOS_DEF[m];
-            const col = `#${d.color.replace("#", "")}`;
-            const on = m === modo;
-            return (
-              <button key={m} className="ad-tab" data-on={on} onClick={() => cambiarModo(m)} style={{ ["--adc" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? col : "inherit" }}><i className={`fa-solid ${d.icono}`} /></div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{d.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{d.subtitulo}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Pasos guiados (pilar: seguir pasos) */}
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 11 }}>
-          <Eyebrow><i className="fa-solid fa-shoe-prints" style={{ marginRight: 8, color: accent }} />Sigue estos pasos</Eyebrow>
-          <span style={{ fontSize: 11, fontWeight: 800, color: pasoActivo === -1 ? OK : T.text3 }}>
-            {pasoActivo === -1 ? "✓ Completaste el recorrido" : `${pasos.filter((p) => p.done).length}/${pasos.length}`}
-          </span>
-        </div>
-        <div className="ad-steps">
-          {pasos.map((p, i) => (
-            <div key={i} className="ad-step" data-on={p.done} data-active={i === pasoActivo}>
-              <div className="ad-step-n">{p.done ? <i className="fa-solid fa-check" /> : i + 1}</div>
-              <div className="ad-step-tx">{p.t}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="ad-grid">
-        {/* ── Columna visor ──────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 58vh, 660px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
+      <LabShell
+        accent={accent}
+        rgba={color.rgba}
+        retoKey={RETO_KEY}
+        escena={
+          <>
             <SceneBoundary fallback={sceneFallback}>
               <AdnDogmaScene
                 modo={modo}
@@ -580,331 +675,82 @@ export function LabAdnDogma({ color }: PracticaLabProps) {
 
             {/* Pilar: equiparse — pórtico de bioseguridad */}
             {!eppListo && (
-              <EppGate
-                accent={accent}
-                rgba={color.rgba}
-                items={INSTRUMENTOS}
-                titulo="Antes de entrar al laboratorio de biología molecular"
-                subtitulo="Selecciona el equipo de protección y bioseguridad correcto."
-                verbo="equipo de bioseguridad"
-                onEntrar={() => {
-                  setEppListo(true);
-                  if (sonido) audioRef.current?.blip();
-                }}
-              />
-            )}
-
-            {/* Cinta EN VIVO */}
-            <div style={{ position: "absolute", top: 14, left: 16, display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)" }}>
-              <span className="ad-live-dot" style={{ ["--add" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol }} />
-              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3 }}>EN VIVO</span>
-              <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)" }} />
-              <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{def.etq.toUpperCase()}</span>
-            </div>
-
-            {/* Toolbar */}
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="ad-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="ad-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="ad-icobtn" onClick={() => { setPlaying(false); setProgreso((p) => Math.max(0, p - 1)); }} title="Paso atrás">
-                <i className="fa-solid fa-backward-step" />
-              </button>
-              <button className="ad-icobtn" data-on={playing} onClick={() => setPlaying((p) => !p)} title={playing ? "Pausar" : "Reanudar"}>
-                <i className={`fa-solid ${playing ? "fa-pause" : "fa-play"}`} />
-              </button>
-              <button className="ad-icobtn" onClick={() => { setPlaying(false); setProgreso((p) => Math.min(total, p + 1)); }} title="Paso adelante">
-                <i className="fa-solid fa-forward-step" />
-              </button>
-              <button className="ad-icobtn" onClick={reiniciar} title="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            {/* Pie: lectura en vivo */}
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 18px 14px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                {def.etq} — {def.subtitulo}
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6 }}>{pie}</div>
-            </div>
-
-            {/* Botón flotante de Teoría */}
-            <button className="ad-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-          </div>
-
-          {/* Panel de control del modo */}
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-                Controles — {def.etq}
-              </Eyebrow>
-              <span style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: "#7dd3fc", border: "1px solid #7dd3fc55", borderRadius: 6, padding: "3px 7px" }}>
-                LECTURA A1
-              </span>
-            </div>
-
-            {/* Secuencia: presets + edición */}
-            <Eyebrow><i className="fa-solid fa-pen-to-square" style={{ marginRight: 8, color: modoCol }} />Secuencia de ADN (codificante)</Eyebrow>
-            <div className="ad-tabs" style={{ marginBottom: 10 }}>
-              {SECUENCIAS.map((s) => {
-                const on = s.id === presetId;
-                return (
-                  <button key={s.id} className="ad-tab" data-on={on} onClick={() => elegirPreset(s.id)} style={{ ["--adc" as string]: modoCol, background: on ? `${modoCol}1f` : "transparent" }}>
-                    <div style={{ fontSize: 14, marginBottom: 3, color: on ? modoCol : "inherit" }}><i className={`fa-solid ${s.icono}`} /></div>
-                    <div style={{ fontSize: 10.5, fontWeight: 900, lineHeight: 1.15 }}>{s.etq}</div>
-                  </button>
-                );
-              })}
-            </div>
-            <input className="ad-seq" value={codificante} onChange={(e) => editarSeq(e.target.value)} spellCheck={false} maxLength={30} placeholder="ESCRIBE TU ADN (A, T, G, C)" style={{ ["--adc" as string]: modoCol, marginBottom: preset ? 8 : 14 }} />
-            {preset && (
-              <div style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45, marginBottom: 14 }}>
-                <i className="fa-solid fa-circle-info" style={{ color: modoCol, marginRight: 7 }} />{preset.nota}
+              <div className="ad-gate">
+                <EppGate
+                  accent={accent}
+                  rgba={color.rgba}
+                  items={INSTRUMENTOS}
+                  titulo="Antes de entrar al laboratorio de biología molecular"
+                  subtitulo="Selecciona el equipo de protección y bioseguridad correcto."
+                  verbo="equipo de bioseguridad"
+                  onEntrar={() => {
+                    setEppListo(true);
+                    if (sonido) audioRef.current?.blip();
+                  }}
+                />
               </div>
             )}
-
-            {/* progreso */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 7 }}>
-              <span style={{ fontSize: 11, fontWeight: 900, letterSpacing: "0.1em", color: T.text3 }}>{modo === "traduccion" ? "CODONES" : "BASES"}</span>
-              <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{paso} / {total}</span>
-            </div>
-            <input type="range" min={0} max={total} value={paso} onChange={(e) => { setPlaying(false); setProgreso(Number(e.target.value)); }} className="ad-range" style={{ ["--adc" as string]: modoCol, marginBottom: 10 }} />
-            <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.45, marginBottom: 16, display: "flex", gap: 8, alignItems: "flex-start" }}>
-              <i className="fa-solid fa-hand-pointer" style={{ marginTop: 1, color: modoCol }} />
-              <span>También puedes <strong style={{ color: "#fff" }}>arrastrar la perilla brillante</strong> en la escena 3D para mover la maquinaria base por base.</span>
-            </div>
-
-            {control}
-          </div>
-        </div>
-
-        {/* ── Columna lateral ────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          {/* Descripción del laboratorio */}
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-dna" />
+          </>
+        }
+        modos={{
+          opciones: MODOS.map((m) => ({ id: m, etiqueta: MODOS_DEF[m].etq, icono: MODOS_DEF[m].icono })),
+          valor: modo,
+          cambiar: (id) => cambiarModo(id as Modo),
+        }}
+        herramientas={
+          <>
+            <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+            <BotonHerramienta icono="fa-backward-step" titulo="Paso atrás" onClick={() => { setPlaying(false); setProgreso((p) => Math.max(0, p - 1)); }} />
+            <BotonHerramienta icono={playing ? "fa-pause" : "fa-play"} titulo={playing ? "Pausar" : "Reanudar"} activo={playing} onClick={() => setPlaying((p) => !p)} />
+            <BotonHerramienta icono="fa-forward-step" titulo="Paso adelante" onClick={() => { setPlaying(false); setProgreso((p) => Math.min(total, p + 1)); }} />
+            <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+          </>
+        }
+        lectura={lectura}
+        objetivos={objetivos}
+        pestanas={[
+          { id: "controles", etiqueta: "Controles", icono: "fa-sliders", contenido: controles },
+          {
+            id: "reto",
+            etiqueta: "Reto",
+            icono: "fa-trophy",
+            contenido: (
+              <div style={{ display: "grid", gap: 16 }}>
+                <PrediccionCodonCard
+                  accent={accent}
+                  rgba={color.rgba}
+                  codones={codonesReto}
+                  paso={paso}
+                  mejor={mejorEstrellas}
+                  onResultado={registraEstrellas}
+                  playSfx={(ok) => {
+                    if (!sonido) return;
+                    if (ok) audioRef.current?.correcto();
+                    else audioRef.current?.incorrecto();
+                  }}
+                  playPick={() => {
+                    if (sonido) audioRef.current?.blip();
+                  }}
+                />
+                <RetoQuizCard
+                  quiz={QUIZ_A2}
+                  accent={accent}
+                  rgba={color.rgba}
+                  aprobado={ejercicioAprobado}
+                  onAprobado={() => setEjercicioAprobado(true)}
+                  playSfx={() => {
+                    if (sonido) audioRef.current?.correcto();
+                  }}
+                  playPick={() => {
+                    if (sonido) audioRef.current?.blip();
+                  }}
+                />
               </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>El visor del dogma central</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          {/* Ancla A1 — definición del dogma */}
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #7dd3fc55", background: "rgba(125,211,252,0.07)" }}>
-            <Eyebrow><i className="fa-solid fa-book-open" style={{ marginRight: 8, color: "#7dd3fc" }} />Lectura A1 — Dogma central (Crick, 1958)</Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55, marginBottom: 12 }}>{DEFINICION_DOGMA}</div>
-            <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", marginBottom: 8 }}>PARA REFLEXIONAR</div>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {PREGUNTAS.map((q, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>{q}</li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Maquinaria del modo */}
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow><i className="fa-solid fa-gears" style={{ marginRight: 8, color: accent }} />Maquinaria — {def.etq}</Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {enzimasDe(modo).map((e) => (
-                <div key={e.nombre} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${modoCol}25` }}>
-                  <div style={{ width: 26, height: 26, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: modoCol, background: `${modoCol}1e`, flexShrink: 0 }}>
-                    <i className={`fa-solid ${e.icono}`} />
-                  </div>
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: 12.5, fontWeight: 900, color: "#fff" }}>{e.nombre}</div>
-                    <div style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.4 }}>{e.funcion}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Mini-tabla del código genético */}
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow><i className="fa-solid fa-table-cells" style={{ marginRight: 8, color: accent }} />Código genético (muestra)</Eyebrow>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 7 }}>
-              {CODON_DEMO.map((cod) => {
-                const a = CODON_TABLE[cod];
-                if (!a) return null;
-                const paro = a.abr === "Stop";
-                return (
-                  <div key={cod} style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 10px", borderRadius: 9, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                    <span style={{ fontFamily: "ui-monospace,monospace", fontSize: 12, fontWeight: 900, color: a.color }}>{cod}</span>
-                    <i className="fa-solid fa-arrow-right" style={{ fontSize: 9, color: T.text3 }} />
-                    <span style={{ fontSize: 11.5, fontWeight: 800, color: paro ? "#f87171" : "#fff" }}>{paro ? "Paro" : a.abr}</span>
-                  </div>
-                );
-              })}
-            </div>
-            <div style={{ fontSize: 10.5, color: T.text3, lineHeight: 1.4, marginTop: 9 }}>64 codones (4³) codifican 20 aminoácidos (código degenerado) más 3 de parada. AUG marca el inicio.</div>
-          </div>
-
-          {/* Cómo usar */}
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow><i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />Cómo usar el laboratorio</Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Objetivos de la sesión */}
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <Eyebrow><i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />Objetivos de la sesión</Eyebrow>
-              <span style={{ fontSize: 11, fontWeight: 800, color: objetivos.every((o) => o.done) ? OK : T.text3 }}>
-                {objetivos.filter((o) => o.done).length}/{objetivos.length}
-              </span>
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ marginTop: 2, fontSize: 13, color: o.done ? OK : "rgba(255,255,255,0.22)" }} />
-                  <span style={{ fontSize: 12, color: o.done ? "#fff" : T.text2, lineHeight: 1.4, textDecoration: o.done ? "none" : "none" }}>{o.t}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Datos + ideas clave ────────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="ad-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow><i className="fa-solid fa-magnifying-glass-chart" style={{ marginRight: 8, color: accent }} />Datos del genoma</Eyebrow>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
-            {DATOS.map((dd, i) => (
-              <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "10px 12px", borderRadius: 10, background: T.glass, border: `1px solid ${T.line}` }}>
-                <div style={{ width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: accent, background: `rgba(${color.rgba},0.16)`, flexShrink: 0 }}>
-                  <i className={`fa-solid ${dd.icono}`} />
-                </div>
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{dd.valor}</div>
-                  <div style={{ fontSize: 11, color: T.text2, lineHeight: 1.4 }}>{dd.texto}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Callout: virus ARN */}
-          <div style={{ marginTop: 16, padding: "14px 16px", borderRadius: 12, border: "1px solid #fb718155", background: "rgba(251,113,129,0.07)" }}>
-            <Eyebrow><i className="fa-solid fa-virus" style={{ marginRight: 8, color: "#fb7185" }} />Excepción: los virus ARN</Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{CALLOUT_VIRUS}</div>
-          </div>
-
-          {/* Contexto mexicano: INMEGEN */}
-          <div style={{ marginTop: 16, padding: "14px 16px", borderRadius: 12, border: `1px solid ${accent}33`, background: `rgba(${color.rgba},0.07)` }}>
-            <Eyebrow><i className="fa-solid fa-location-dot" style={{ marginRight: 8, color: accent }} />México: medicina genómica</Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{CONTEXTO}</div>
-          </div>
-
-          {/* ¿Sabías que? */}
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow><i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />¿Sabías que? (quizzes A2/A4)</Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {HECHOS.map((h, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{h}</li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Glosario */}
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow><i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />Glosario (A5)</Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {GLOSARIO.map((g, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{g.termino}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{g.definicion}</span>
-                  <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.4, marginTop: 4 }}><i className="fa-solid fa-flask" style={{ marginRight: 6, color: accent }} />{g.ejemplo}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow><i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />Ideas clave</Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-            {IDEAS.map((x, i) => (
-              <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>{x}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      {/* nota de honestidad del modelo */}
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          La definición del dogma central, las preguntas de reflexión, el callout de los virus ARN y el contexto del INMEGEN son <strong>verbatim</strong> de la lectura A1 (etiqueta «LECTURA A1»); el glosario y sus ejemplos son verbatim del glosario A5; los datos de «¿sabías que?» provienen de los quizzes A2/A4. El <strong>código genético</strong> (tabla de codones) es la referencia universal estándar: para cualquier secuencia que escribas, la complementariedad (A-T, G-C), la transcripción (T→U) y la traducción (codón→aminoácido) se calculan de forma <strong>exacta</strong>. El modelo 3D de la doble hélice, las enzimas, el ribosoma y los ARNt es <strong>esquemático</strong> (no a escala atómica): representa el mecanismo del flujo de información, no una estructura molecular medida. Fuente: {FUENTE}
-        </span>
-      </div>
-
-      {/* ── Reto de cálculo: traducir codón → aminoácido (estrellas) ─────── */}
-      <PrediccionCodonCard
-        accent={accent}
-        rgba={color.rgba}
-        codones={codonesReto}
-        paso={paso}
-        mejor={mejorEstrellas}
-        onResultado={registraEstrellas}
-        playSfx={(ok) => {
-          if (!sonido) return;
-          if (ok) audioRef.current?.correcto();
-          else audioRef.current?.incorrecto();
-        }}
-        playPick={() => {
-          if (sonido) audioRef.current?.blip();
-        }}
+            ),
+          },
+          { id: "teoria", etiqueta: "Teoría", icono: "fa-book-open", contenido: teoria },
+        ]}
       />
-
-      {/* ── Reto evaluable (B): el quiz V/F verbatim del A2 ──────────────── */}
-      <RetoQuizCard
-        quiz={QUIZ_A2}
-        accent={accent}
-        rgba={color.rgba}
-        aprobado={ejercicioAprobado}
-        onAprobado={() => setEjercicioAprobado(true)}
-        playSfx={() => {
-          if (sonido) audioRef.current?.correcto();
-        }}
-        playPick={() => {
-          if (sonido) audioRef.current?.blip();
-        }}
-      />
-
-      {/* ── Cajón de teoría (A) ──────────────────────────────────────────── */}
-      <div className="ad-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="ad-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="ad-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="ad-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="ad-drawer-body">
-          <FichaTeorica data={ADN_DOGMA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+    </>
   );
 }

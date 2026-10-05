@@ -21,8 +21,8 @@
 
 import * as THREE from "three";
 import { useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Html, Stars } from "@react-three/drei";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { OrbitControls, PerspectiveCamera, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { VIDRIO_FINO, perfilMatrazBola } from "./_vidrio";
 import { Escenario } from "./_escenario";
@@ -58,10 +58,13 @@ function seg(a: Pt, b: Pt): { pos: Pt; quat: [number, number, number, number]; l
 }
 
 /* ── Etiqueta flotante (Html) ─────────────────────────────────────────── */
-function Etiqueta({ pos, children, df = 11, col }: { pos: Pt; children: ReactNode; df?: number; col?: string }) {
+function Etiqueta({ pos, children, col }: { pos: Pt; children: ReactNode; col?: string }) {
+  const ancho = useThree((st) => st.size.width);
+  // En pantallas angostas la información ya está en el panel.
+  if (ancho < 640) return null;
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 11px", borderRadius: 999, background: "rgba(4,10,22,0.82)", border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`, color: "#fff", fontSize: 12, fontWeight: 800, whiteSpace: "nowrap", boxShadow: "0 6px 18px -8px #000" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 11px", borderRadius: 999, background: "rgba(4,10,22,0.82)", border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`, color: "#fff", fontSize: 14, fontWeight: 800, whiteSpace: "nowrap", boxShadow: "0 6px 18px -8px #000" }}>
         {children}
       </div>
     </Html>
@@ -294,16 +297,13 @@ function MundoMiller({ chispa, nAmino, playing }: { chispa: boolean; nAmino: num
       <Chispa on={chispa && playing} />
 
       <Etiqueta pos={[0, 4.4, 0]} col="#38bdf8aa">
-        <i className="fa-solid fa-wind" style={{ color: "#7dd3fc" }} /> Atmósfera primitiva · CH₄ · NH₃ · H₂ · H₂O
+        <i className="fa-solid fa-wind" style={{ color: "#7dd3fc" }} /> Atmósfera primitiva
       </Etiqueta>
       <Etiqueta pos={[0, 1.9, 0]} col={chispa ? "#fbbf24aa" : "#64748baa"}>
         <i className="fa-solid fa-bolt" style={{ color: chispa ? "#fbbf24" : "#64748b" }} /> {chispa ? "Descarga eléctrica" : "Sin energía"}
       </Etiqueta>
       <Etiqueta pos={[-2.4, -3.6, 0]} col="#7dd3fcaa">
         <i className="fa-solid fa-fire-flame-simple" style={{ color: "#fb923c" }} /> Océano en ebullición
-      </Etiqueta>
-      <Etiqueta pos={[3.5, -0.2, 0]} col="#38bdf8aa">
-        <i className="fa-solid fa-droplet" style={{ color: "#7dd3fc" }} /> Condensador
       </Etiqueta>
       <Etiqueta pos={[2.4, -2.9, 0]} col="#34d399aa">
         <i className="fa-solid fa-vial-circle-check" style={{ color: "#34d399" }} /> Trampa · {nAmino > 0 ? "aminoácidos" : "vacía"}
@@ -358,8 +358,7 @@ function DioramaCaldo({ playing }: { playing: boolean }) {
       <Etiqueta pos={[0, 2.6, 0]} col="#fbbf24aa">
         <i className="fa-solid fa-water" style={{ color: "#fbbf24" }} /> Caldo primordial (Oparin-Haldane)
       </Etiqueta>
-      <Etiqueta pos={[-1.3, 4.6, 0]} col="#fde047aa">Energía: relámpagos y volcanes</Etiqueta>
-    </group>
+          </group>
   );
 }
 
@@ -412,8 +411,7 @@ function DioramaHidrotermal({ playing }: { playing: boolean }) {
       <Etiqueta pos={[0, 2.6, 0]} col="#fb7185aa">
         <i className="fa-solid fa-fire" style={{ color: "#fb7185" }} /> Ventiladeros hidrotermales
       </Etiqueta>
-      <Etiqueta pos={[0, 1.7, 0]} col="#fda4afaa">Minerales + gradientes de T y pH · sin atmósfera reductora</Etiqueta>
-    </group>
+          </group>
   );
 }
 
@@ -463,7 +461,7 @@ function DioramaPanspermia({ playing }: { playing: boolean }) {
       </mesh>
       <Meteoro playing={playing} />
       <Etiqueta pos={[0, 3.2, 0]} col="#818cf8aa">
-        <i className="fa-solid fa-meteor" style={{ color: "#818cf8" }} /> Panspermia · meteorito de Murchison (1969)
+        <i className="fa-solid fa-meteor" style={{ color: "#818cf8" }} /> Panspermia · Murchison (1969)
       </Etiqueta>
       <Etiqueta pos={[2.2, 0.4, 0]} col="#60a5faaa">Tierra primitiva</Etiqueta>
     </group>
@@ -530,7 +528,7 @@ function MundoArn({ playing }: { playing: boolean }) {
       {/* sitio catalítico: dos sustratos que se unen */}
       <ReaccionRibozima playing={playing} />
       <Etiqueta pos={[-2.2, 1.9, 0]} col="#a855f7aa">
-        <i className="fa-solid fa-dna" style={{ color: "#c084fc" }} /> ARN: información + catálisis (ribozima)
+        <i className="fa-solid fa-dna" style={{ color: "#c084fc" }} /> Ribozima (ARN)
       </Etiqueta>
     </group>
   );
@@ -568,6 +566,17 @@ function Contenido(props: OrigenVidaSceneProps) {
     if (giro.current && playing && modo !== "miller") giro.current.rotation.y += dt * 0.12;
   });
 
+  // Encuadre: el contenido ocupa ~55 % del alto y cabe a lo ancho, entre la
+  // barra de arriba y la misión de abajo (que se lleva más espacio: sube ~7 %).
+  const size = useThree((st) => st.size);
+  const tanF = Math.tan((46 / 2) * (Math.PI / 180));
+  const alto = modo === "miller" ? 9.5 : modo === "ambientes" ? 7.5 : 6.5;
+  const ancho = modo === "miller" ? 9 : modo === "ambientes" ? 9 : 8.5;
+  const aspecto = Math.max(0.3, size.width / Math.max(1, size.height));
+  const dist = Math.min(40, Math.max(10, alto / (0.55 * 2 * tanF), ancho / (0.88 * 2 * tanF * aspecto)));
+  const ty0 = modo === "miller" ? 0.3 : modo === "ambientes" ? 0.6 : 0.2;
+  const ty = ty0 - 0.07 * 2 * dist * tanF;
+
   const mundo: ReactNode =
     modo === "miller" ? (
       <MundoMiller chispa={chispa} nAmino={nAmino} playing={playing} />
@@ -585,11 +594,11 @@ function Contenido(props: OrigenVidaSceneProps) {
           vez de que alguien la adivine. */}
       <Escenario acento={props.accent} mesa={false} niebla={false} />
       <directionalLight position={[-6, 4, -4]} intensity={0.5} color={modoColor} />
-      <Stars radius={70} depth={30} count={1100} factor={3} fade speed={0.5} />
 
       <group ref={giro} key={`${modo}-${ambiente}-${resetNonce}`}>{mundo}</group>
 
-      <OrbitControls enablePan={false} minDistance={7} maxDistance={30} autoRotate={false} />
+      <PerspectiveCamera makeDefault fov={46} position={[0, ty + dist * 0.06, dist]} />
+      <OrbitControls enablePan={false} target={[0, ty, 0]} minDistance={7} maxDistance={50} autoRotate={false} />
       <EffectComposer>
         <Bloom intensity={0.6} luminanceThreshold={0.2} mipmapBlur />
         <Vignette eskil={false} offset={0.18} darkness={0.72} />
@@ -599,9 +608,8 @@ function Contenido(props: OrigenVidaSceneProps) {
 }
 
 export default function OrigenVidaScene(props: OrigenVidaSceneProps) {
-  const cam: Pt = props.modo === "miller" ? [0, 0.4, 13] : props.modo === "ambientes" ? [0, 1.4, 13] : [0, 0.6, 12];
   return (
-    <Canvas key={props.modo} shadows dpr={[1, 2]} camera={{ position: cam, fov: 46 }} gl={{ antialias: true }} style={{ width: "100%", height: "100%" }}>
+    <Canvas key={props.modo} shadows dpr={[1, 2]} gl={{ antialias: true }} style={{ width: "100%", height: "100%" }}>
       <Contenido {...props} />
     </Canvas>
   );

@@ -1,0 +1,12 @@
+{
+  "escena": "Una exposición con ocho piezas y una línea del tiempo de seis movimientos",
+  "pregunta": "Si colocas el «Soneto del vitral» en el Modernismo, ¿cuántos rasgos del Modernismo se encienden?",
+  "opciones": [
+    { "id": "a", "texto": "Los tres, porque suena muy musical", "icono": "fa-music" },
+    { "id": "b", "texto": "Solo uno de los tres", "icono": "fa-lightbulb" },
+    { "id": "c", "texto": "Ninguno de los tres", "icono": "fa-ban" }
+  ],
+  "correcta": "b",
+  "porque": "El soneto tiene musicalidad, rasgo modernista, pero su lenguaje ornamental y su desengaño son del Barroco. Pesan más los rasgos barrocos, así que ahí encaja mejor.",
+  "comoComprobarlo": "En «Curaduría» elige el «Soneto del vitral», toca la banda del Modernismo y cuenta los rasgos encendidos."
+}

@@ -1,0 +1,12 @@
+{
+  "escena": "Un archivo con ocho fuentes sobre una crecida ficticia y una línea de tiempo del caso",
+  "pregunta": "Marcas «Confiable» al periódico que defiende a la autoridad, junto a la carta y el libro. ¿Qué pasa en la línea de tiempo?",
+  "opciones": [
+    { "id": "a", "texto": "Todo queda más corroborado", "icono": "fa-circle-check" },
+    { "id": "b", "texto": "Aparecen hechos en disputa", "icono": "fa-code-compare" },
+    { "id": "c", "texto": "No cambia nada", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "El periódico tiene un interés y contradice a la carta, al objeto y a la fotografía. Al creerle, la línea de tiempo se divide: confiar sin revisar la intención abre disputas.",
+  "comoComprobarlo": "Juzga la carta, el libro y el periódico como «Confiable» y compara la línea de tiempo con la del caso sin el periódico."
+}

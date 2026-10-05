@@ -1,0 +1,12 @@
+{
+  "escena": "Un cilindro con gas pardo NO₂ y moléculas de N₂O₄ en equilibrio, con un pistón que puedes bajar.",
+  "pregunta": "Aprietas el pistón y el gas se comprime. ¿Qué hacen las moléculas?",
+  "opciones": [
+    { "id": "a", "texto": "Se separan más en NO₂ pardo", "icono": "fa-arrows-left-right" },
+    { "id": "b", "texto": "Se unen en N₂O₄", "icono": "fa-link" },
+    { "id": "c", "texto": "Nada: la presión no importa", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "Al comprimir, el sistema se opone al aumento de presión y favorece el lado con menos moles de gas. Dos NO₂ forman un N₂O₄, así que las moléculas se unen y el pardo se aclara.",
+  "comoComprobarlo": "En el modo Le Châtelier sube el deslizador de presión poco a poco y observa cómo cambian las moléculas del cilindro."
+}

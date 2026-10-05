@@ -1,0 +1,13 @@
+{
+  "slug": "causalidad-historica",
+  "items": [
+    { "clave": "hacienda-peones", "formato": "16:9", "estilo": "foto", "escena": "Fotografía antigua sepia de una hacienda mexicana de principios del siglo XX: peones con sombrero trabajando un campo de maguey bajo el sol y una casa grande de patrón al fondo" },
+    { "clave": "sillon-poder", "formato": "16:9", "estilo": "foto", "escena": "Fotografía antigua sepia de un salón de gobierno de principios del siglo XX con un sillón presidencial vacío al centro, columnas y militares de uniforme de pie a los lados" },
+    { "clave": "calle-contraste", "formato": "16:9", "estilo": "foto", "escena": "Fotografía antigua sepia de una calle de ciudad mexicana hacia 1900: a un lado una familia elegante bajando de un carruaje y al otro niños descalzos con ropa remendada" },
+    { "clave": "jinetes-amanecer", "formato": "16:9", "estilo": "foto", "escena": "Fotografía antigua sepia de hombres a caballo y a pie con sombrero y carrilleras reunidos al amanecer en un camino de tierra, mirando hacia el horizonte" },
+    { "clave": "asamblea-teatro", "formato": "16:9", "estilo": "foto", "escena": "Fotografía antigua sepia de una asamblea de hombres con traje de principios del siglo XX sentados en un teatro con palcos, firmando documentos sobre mesas largas" },
+    { "clave": "campesinos-medicion", "formato": "16:9", "estilo": "foto", "escena": "Fotografía antigua sepia de campesinos mexicanos midiendo un terreno con cuerdas en un campo abierto mientras varias familias con herramientas observan de pie" },
+    { "clave": "calle-1914", "formato": "16:9", "estilo": "foto", "escena": "Fotografía antigua sepia de una calle europea de 1914 con multitud, un automóvil descubierto de época detenido y policías con uniforme alrededor" },
+    { "clave": "tropas-1808", "formato": "16:9", "estilo": "ilustracion", "escena": "Grabado ilustrado de principios del siglo XIX con soldados europeos de uniforme azul y sombrero de dos picos marchando con tambores por una calle empedrada de una ciudad española" }
+  ]
+}

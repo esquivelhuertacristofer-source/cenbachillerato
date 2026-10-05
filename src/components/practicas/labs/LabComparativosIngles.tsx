@@ -1,74 +1,66 @@
-﻿"use client";
+"use client";
 
 /**
- * Laboratorio — Comparatives: bigger, better, more interesting
+ * Laboratorio — Comparatives: Lucía va de compras (simulador)
  * Práctica experimental para IN-II-P05-A4 (Inglés II).
  *
- * Interactividad máxima. Cuatro modos: los tres de arrastrar/clasificar (forma · regla · uso) y,
- * al final, uno que se escribe («Completa el texto», verbatim de la progresión):
- *  1. «Build the comparative» — arrastra la FORMA comparativa correcta a cada
- *     adjetivo (taller / bigger / more interesting / better…) evitando los
- *     errores típicos (more tall, gooder, bigger more).
- *  2. «-er, more, or irregular?» — clasifica once adjetivos en tres columnas
- *     según cómo forman su comparativo (la REGLA).
- *  3. «Complete the comparison» — arrastra el comparativo al hueco de seis
- *     oraciones verbatim (el USO en contexto).
- *  + Cuestionario de comprensión (V/F verbatim de A4).
+ * El alumno no ordena adjetivos: DECIDE. Lucía (personaje FICTICIO) tiene que
+ * elegir entre dos opciones en cuatro compras (teléfono, autobús, película,
+ * paseo). Cada opción trae barras con sus datos (valores de juego,
+ * «simulación»). El alumno arma una comparación en inglés —«Zeta is cheaper
+ * than Orbi»— y Lucía reacciona:
+ *  · forma que no existe («more cheap», «gooder») → no entiende y se le explica
+ *    por qué en español;
+ *  · forma correcta pero frase falsa → se le pide mirar las barras;
+ *  · frase verdadera pero de otra cosa → Lucía sigue sin poder decidir;
+ *  · frase correcta, verdadera y sobre lo que ella pidió → compra.
+ * Las consecuencias salen de `comparativos-ingles-sim.ts`.
  *
- * DOM puro (sin three.js): ligero, accesible (ratón, teclado y táctil mediante
- * clic-para-seleccionar / clic-para-colocar). Contenido VERBATIM de IN-II·P05.
+ * Modos: «Lucía va de compras» (simulador) y «Complete the text» (se escribe).
+ * La teoría verbatim (comparativos, adjetivos por regla, oraciones, dato) vive
+ * en la pestaña «Teoría». DOM puro (sin three.js).
  */
 
 import { useEffect, useRef, useState } from "react";
 import type { PracticaLabProps } from "../registry";
-import { T, OK, card, Eyebrow } from "./_kit";
+import { T, OK } from "./_kit";
+import { LabShell, Bloque, BotonHerramienta } from "./_shell";
 import { LabSfx } from "./lab-audio";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { COMPARATIVOS_INGLES_HUECOS } from "./comparativos-ingles-huecos";
 import { usePartida, MarcadorPartida } from "./_partida";
 import { FichaTeorica } from "./_ficha";
 import { COMPARATIVOS_INGLES_FICHA } from "./comparativos-ingles-ficha";
-import {
-  COMPARATIVOS,
-  DISTRACTORES_COMP,
-  ADJETIVOS,
-  ORACIONES,
-  REGLA_INFO,
-  QUIZ,
-  DATO_COMPARATIVOS,
-  type TipoRegla,
-} from "./comparativos-ingles-data";
+import { COMPARATIVOS, ADJETIVOS, ORACIONES, REGLA_INFO, QUIZ, DATO_COMPARATIVOS, type TipoRegla } from "./comparativos-ingles-data";
+import { RONDAS, evaluar, fichasDe, opcionDe, otraDe, type OpcionCompra, type Resultado, type Ronda } from "./comparativos-ingles-sim";
+import { useEstrellas } from "@/lib/hooks/useEstrellas";
 
 const NO = "#FF5E5E";
-import { useEstrellas } from "@/lib/hooks/useEstrellas";
-import { FondoTermino, VinetaTermino } from "./_vineta";
+const AMBAR = "#FFC75A";
 const RETO_KEY = "cen-comparativos-ingles-reto";
+const RUTA_SIM = "/media/labs-sim/comparativos-ingles";
 
-type Modo = "construir" | "regla" | "oraciones" | "texto";
+type Modo = "compras" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
-  { id: "construir", label: "Build the comparative", icono: "fa-screwdriver-wrench" },
-  { id: "regla", label: "-er, more, or irregular?", icono: "fa-table-columns" },
-  { id: "oraciones", label: "Complete the comparison", icono: "fa-pen-fancy" },
+  { id: "compras", label: "Lucía va de compras", icono: "fa-cart-shopping" },
   { id: "texto", label: "Complete the text", icono: "fa-pen-to-square" },
 ];
 
-/** Fichas del modo 1: comparativos correctos + distractores que no encajan. */
-const FICHAS_CONSTRUIR: { id: string; label: string }[] = [
-  ...COMPARATIVOS.map((c) => ({ id: c.id, label: c.comparativo })),
-  ...DISTRACTORES_COMP.map((d, i) => ({ id: `xd-${i}`, label: d })),
-];
+const TONO: Record<Resultado["veredicto"], { color: string; icono: string }> = {
+  bien: { color: OK, icono: "fa-face-grin-stars" },
+  gramatica: { color: NO, icono: "fa-face-frown" },
+  falsa: { color: AMBAR, icono: "fa-face-meh" },
+  fuera: { color: AMBAR, icono: "fa-face-surprise" },
+};
 
 export function LabComparativosIngles({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
-  const [modo, setModo] = useState<Modo>("construir");
+  const [modo, setModo] = useState<Modo>("compras");
 
   // ── sonido ────────────────────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
-  // Modo «Completa el texto». El contador sirve de `key`: subirlo remonta
-  // el componente y devuelve todos los huecos en blanco.
   const [textoDone, setTextoDone] = useState(false);
   const [textoIntento, setTextoIntento] = useState(0);
   const audioRef = useRef<LabSfx | null>(null);
@@ -83,9 +75,6 @@ export function LabComparativosIngles({ color }: PracticaLabProps) {
       setSonido(false);
     }
   };
-  // Los tres ayudantes son el único punto por el que pasan todos los aciertos
-  // y todos los fallos del laboratorio, así que la partida se lleva aquí.
-  // `sfxOk` no cuenta: marca el fin de un modo, no una respuesta suelta.
   const sfxOk = () => sonido && audioRef.current?.correcto();
   const sfxNo = () => {
     partida.error();
@@ -95,636 +84,430 @@ export function LabComparativosIngles({ color }: PracticaLabProps) {
     partida.acierto();
     return sonido && audioRef.current?.blip();
   };
+  const sfxClick = () => sonido && audioRef.current?.blip();
 
-  // ── modo Build the comparative (arrastra la forma correcta) ────────────
-  const [construido, setConstruido] = useState<Record<string, boolean>>({});
-  const [selConstr, setSelConstr] = useState<string | null>(null);
-  const [shakeConstr, setShakeConstr] = useState<string | null>(null);
-  const fichasLibres = FICHAS_CONSTRUIR.filter((f) => !construido[f.id]).slice().sort((a, b) => a.label.localeCompare(b.label, "en"));
+  // ── estado del simulador ──────────────────────────────────────────────
+  const [rondaIdx, setRondaIdx] = useState(0);
+  const [sujeto, setSujeto] = useState<string | null>(null);
+  const [forma, setForma] = useState<string | null>(null);
+  const [reac, setReac] = useState<Resultado | null>(null);
+  /** compra resuelta: id de ronda → id de la opción que eligió Lucía. */
+  const [hechas, setHechas] = useState<Record<string, string>>({});
+  /** comparativos válidos y verdaderos que el alumno ya dijo. */
+  const [usadas, setUsadas] = useState<string[]>([]);
+  const [tipos, setTipos] = useState<TipoRegla[]>([]);
 
-  const intentarConstruir = (chipId: string, rowId: string) => {
-    if (construido[rowId]) return;
-    if (chipId === rowId) {
-      setConstruido((e) => ({ ...e, [rowId]: true }));
-      setSelConstr(null);
-      sfxPlace();
-      if (Object.keys(construido).length + 1 >= COMPARATIVOS.length) {
-        sfxOk();
-        persistMejor(true, reglaDone, oracionesDone);
+  const ronda = RONDAS[rondaIdx]!;
+  const hecha = hechas[ronda.id];
+
+  const resetSim = () => {
+    setRondaIdx(0);
+    setSujeto(null);
+    setForma(null);
+    setReac(null);
+    setHechas({});
+    setUsadas([]);
+    setTipos([]);
+    partida.reiniciar();
+    setModo("compras");
+  };
+  const resetTexto = () => {
+    setTextoDone(false);
+    setTextoIntento((n) => n + 1);
+  };
+  const resetActual = modo === "texto" ? resetTexto : resetSim;
+
+  const irARonda = (i: number) => {
+    sfxClick();
+    setRondaIdx(i);
+    setSujeto(null);
+    setForma(null);
+    setReac(null);
+  };
+
+  const decir = () => {
+    if (!sujeto || !forma) return;
+    const res = evaluar(ronda, sujeto, forma);
+    setReac(res);
+    const cuenta = !hecha;
+    if (res.veredicto === "bien") {
+      if (cuenta) {
+        sfxPlace();
+        setHechas((h) => ({ ...h, [ronda.id]: res.ganadora ?? "" }));
       }
+    } else if (res.veredicto === "gramatica" || res.veredicto === "falsa") {
+      if (cuenta) sfxNo();
     } else {
-      setShakeConstr(rowId);
-      sfxNo();
-      window.setTimeout(() => setShakeConstr(null), 420);
+      sfxClick();
     }
-  };
-  const resetConstruir = () => {
-    setConstruido({});
-    setSelConstr(null);
-  };
-
-  // ── modo -er/more/irregular (clasifica por regla) ──────────────────────
-  const [ubicado, setUbicado] = useState<Record<string, TipoRegla>>({});
-  const [selAdj, setSelAdj] = useState<string | null>(null);
-  const [shakeBin, setShakeBin] = useState<TipoRegla | null>(null);
-  const adjLibres = ADJETIVOS.filter((a) => !ubicado[a.id]).slice().sort((a, b) => a.palabra.localeCompare(b.palabra, "en"));
-
-  const intentarRegla = (adjId: string, bin: TipoRegla) => {
-    if (ubicado[adjId]) return;
-    const a = ADJETIVOS.find((x) => x.id === adjId);
-    if (a && a.tipo === bin) {
-      setUbicado((e) => ({ ...e, [adjId]: bin }));
-      setSelAdj(null);
-      sfxPlace();
-      if (Object.keys(ubicado).length + 1 >= ADJETIVOS.length) {
-        sfxOk();
-        persistMejor(construirDone, true, oracionesDone);
-      }
-    } else {
-      setShakeBin(bin);
-      sfxNo();
-      window.setTimeout(() => setShakeBin(null), 420);
+    if ((res.veredicto === "bien" || res.veredicto === "fuera") && res.forma && res.tipo) {
+      const fm = res.forma;
+      const tp = res.tipo;
+      setUsadas((u) => (u.includes(fm) ? u : [...u, fm]));
+      setTipos((t) => (t.includes(tp) ? t : [...t, tp]));
     }
-  };
-  const resetRegla = () => {
-    setUbicado({});
-    setSelAdj(null);
-  };
-
-  // ── modo Complete the comparison (arrastra al hueco) ───────────────────
-  const [completado, setCompletado] = useState<Record<string, boolean>>({});
-  const [selOra, setSelOra] = useState<string | null>(null);
-  const [shakeOra, setShakeOra] = useState<string | null>(null);
-  const oraLibres = ORACIONES.filter((o) => !completado[o.id]).slice().sort((a, b) => a.resp.localeCompare(b.resp, "en"));
-
-  const intentarOra = (chipId: string, rowId: string) => {
-    if (completado[rowId]) return;
-    if (chipId === rowId) {
-      setCompletado((e) => ({ ...e, [rowId]: true }));
-      setSelOra(null);
-      sfxPlace();
-      if (Object.keys(completado).length + 1 >= ORACIONES.length) {
-        sfxOk();
-        persistMejor(construirDone, reglaDone, true);
-      }
-    } else {
-      setShakeOra(rowId);
-      sfxNo();
-      window.setTimeout(() => setShakeOra(null), 420);
-    }
-  };
-  const resetOraciones = () => {
-    setCompletado({});
-    setSelOra(null);
   };
 
   const [quizAprobado, setQuizAprobado] = useState(false);
 
   // ── progreso / estrellas ──────────────────────────────────────────────
-  const construirDone = Object.keys(construido).length >= COMPARATIVOS.length;
-  const reglaDone = Object.keys(ubicado).length >= ADJETIVOS.length;
-  const oracionesDone = Object.keys(completado).length >= ORACIONES.length;
-  const modosHechos = (construirDone ? 1 : 0) + (reglaDone ? 1 : 0) + (oracionesDone ? 1 : 0) + (textoDone ? 1 : 0);
-  // Terminar los 3 modos vale 2★; la tercera se gana con precisión.
-  const estrellas = partida.estrellasCon(modosHechos, 4);
+  const comprasHechas = Object.keys(hechas).length;
+  const simDone = comprasHechas >= RONDAS.length;
+  const modosHechos = (simDone ? 1 : 0) + (textoDone ? 1 : 0);
+  // Terminar los dos modos vale 2★; la tercera se gana con precisión.
+  const estrellas = partida.estrellasCon(modosHechos, 2);
 
   const { mejorEstrellas: mejor, registraEstrellas } = useEstrellas(RETO_KEY);
   const bestEstrellas = Math.max(estrellas, mejor);
-
-  const persistMejor = (a: boolean, b: boolean, c: boolean) => {
-    const est = (a ? 1 : 0) + (b ? 1 : 0) + (c ? 1 : 0);
-    registraEstrellas(est);
-  };
+  useEffect(() => {
+    if (estrellas > 0) registraEstrellas(estrellas);
+  }, [estrellas, registraEstrellas]);
 
   const objetivos = [
-    { txt: "Forma los 6 comparativos con la palabra correcta", done: construirDone },
-    { txt: "Clasifica los 11 adjetivos por su regla", done: reglaDone },
-    { txt: "Completa las 6 comparaciones en contexto", done: oracionesDone },
-    { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
+    { txt: "Forma 6 comparativos distintos y verdaderos", done: usadas.length >= 6 },
+    { txt: "Usa los tres tipos: -er, more e irregular", done: tipos.length >= 3 },
+    { txt: "Convence a Lucía en las 4 compras", done: simDone },
+    { txt: "Consigue 3★ (simulador y texto, con pocos errores)", done: bestEstrellas >= 3 },
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];
 
-  // arrastre nativo
-  const dragProps = (id: string) => ({
-    draggable: true,
-    onDragStart: (e: React.DragEvent) => {
-      e.dataTransfer.setData("text/plain", id);
-      e.dataTransfer.effectAllowed = "move";
-      // El hueco que deja la tarjeta mientras viaja. Por atributo y no por
-      // estado: un render por cada gesto de arrastre se nota con 20 tarjetas.
-      e.currentTarget.setAttribute("data-arrastrando", "true");
-    },
-    onDragEnd: (e: React.DragEvent) => {
-      // También cuando se suelta FUERA de cualquier zona; si no, la tarjeta se
-      // queda medio borrada para siempre.
-      e.currentTarget.removeAttribute("data-arrastrando");
-      document.querySelectorAll('[data-sobre="true"]').forEach((z) => z.removeAttribute("data-sobre"));
-    },
-  });
-  const dropProps = (onDrop: (id: string) => void) => ({
-    onDragOver: (e: React.DragEvent) => {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = "move";
-    },
-    onDragEnter: (e: React.DragEvent) => {
-      e.preventDefault();
-      e.currentTarget.setAttribute("data-sobre", "true");
-    },
-    onDragLeave: (e: React.DragEvent) => {
-      // `dragleave` salta también al pasar sobre un HIJO de la zona. Apagar sin
-      // comprobar deja la zona parpadeando mientras mueves la mano por dentro.
-      const r = e.currentTarget.getBoundingClientRect();
-      const fuera = e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
-      if (fuera) e.currentTarget.removeAttribute("data-sobre");
-    },
-    onDrop: (e: React.DragEvent) => {
-      e.preventDefault();
-      e.currentTarget.removeAttribute("data-sobre");
-      const id = e.dataTransfer.getData("text/plain");
-      if (id) onDrop(id);
-    },
-    "data-zona": "true" as const,
-    role: "button" as const,
-    tabIndex: 0,
-    onKeyDown: (e: React.KeyboardEvent) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        (e.currentTarget as HTMLElement).click();
-      }
-    },
-  });
+  const lectura =
+    modo === "compras"
+      ? `${comprasHechas}/${RONDAS.length} compras · ${bestEstrellas}★`
+      : `${textoDone ? "Texto completo" : "Escribe cada hueco"} · ${bestEstrellas}★`;
 
-  const resetTexto = () => {
-    setTextoDone(false);
-    setTextoIntento((n) => n + 1);
-  };
-  const resetActual = modo === "texto" ? resetTexto : modo === "construir" ? resetConstruir : modo === "regla" ? resetRegla : resetOraciones;
+  // ── escena ────────────────────────────────────────────────────────────
+  const escena = (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
+      <style>{ESTILOS(accent, color.rgba)}</style>
 
-  return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes cmpShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
-        @keyframes cmpPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
-        .cmp-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 16px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .cmp-tab:hover { border-color:${T.lineStrong}; color:#fff; }
-        .cmp-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-        .cmp-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
-          font-size:14px; border:1px solid ${T.line}; background:${T.glass}; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .cmp-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
-        .cmp-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .cmp-chip { cursor:grab; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 16px; border-radius:999px;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:14px; font-weight:800; transition:all .14s; user-select:none; }
-        .cmp-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); }
-        .cmp-chip[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.2); box-shadow:0 0 16px -5px ${accent}; }
-        .cmp-chip:active { cursor:grabbing; }
-        .cmp-row { border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:14px 16px; transition:all .16s; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
-        .cmp-row[data-shake="true"] { animation:cmpShake .4s; border-color:${NO}; }
-        .cmp-row[data-done="true"] { border-color:${OK}66; background:${OK}0f; }
-        .cmp-slot { flex-shrink:0; min-width:88px; min-height:42px; border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset};
-          display:inline-flex; align-items:center; justify-content:center; color:${T.text3}; font-size:12.5px; transition:all .16s; cursor:pointer; padding:4px 10px; }
-        .cmp-slot[data-armed="true"] { border-color:${accent}; background:rgba(${color.rgba},0.1); }
-        .cmp-bin { border-radius:15px; border:1.5px solid ${T.line}; background:${T.glass}; padding:16px; transition:all .16s; min-height:200px; }
-        .cmp-bin[data-shake="true"] { animation:cmpShake .4s; border-color:${NO}; }
-        .cmp-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
-          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
-        .cmp-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
-        .cmp-q:disabled{ cursor:default; }
-        .cmp-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
-          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .cmp-btn:hover { border-color:${T.lineStrong}; }
-        .cmp-divider { height:1px; background:${T.line}; margin:18px 0; }
-        @media (prefers-reduced-motion: reduce){ .cmp-row[data-shake="true"], .cmp-bin[data-shake="true"] { animation:none; } }
-
-        /* Cajón de teoría */
-        .cmp-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .cmp-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .cmp-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .cmp-drawer[data-open="true"] { transform:translateX(0); }
-        .cmp-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .cmp-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .cmp-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .cmp-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .cmp-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .cmp-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .cmp-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
-
-        /* Identidad del tablero */
-        .cmp-bin, .cmp-row { --tono:188; position:relative;
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
-        .cmp-bin:nth-of-type(6n+1), .cmp-row:nth-of-type(6n+1) { --tono:188; }
-        .cmp-bin:nth-of-type(6n+2), .cmp-row:nth-of-type(6n+2) { --tono:262; }
-        .cmp-bin:nth-of-type(6n+3), .cmp-row:nth-of-type(6n+3) { --tono:44; }
-        .cmp-bin:nth-of-type(6n+4), .cmp-row:nth-of-type(6n+4) { --tono:152; }
-        .cmp-bin:nth-of-type(6n+5), .cmp-row:nth-of-type(6n+5) { --tono:330; }
-        .cmp-bin:nth-of-type(6n+6), .cmp-row:nth-of-type(6n+6) { --tono:18; }
-        .cmp-bin::before, .cmp-row::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
-          background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
-        .cmp-bin[data-done="true"], .cmp-row[data-done="true"] {
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.2) 0%, transparent 68%); }
-        .cmp-chip { transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
-        .cmp-chip:hover { transform:translateY(-2px); }
-        .cmp-chip[data-sel="true"] { transform:translateY(-3px) scale(1.02); }
-        @media (prefers-reduced-motion: reduce){
-          .cmp-chip, .cmp-chip:hover, .cmp-chip[data-sel="true"] { transform:none; transition:none; }
-        }
-      `}</style>
-
-      {/* selector de modo + toolbar */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="cmp-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="cmp-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="cmp-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="cmp-icobtn" onClick={resetActual} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <button className="cmp-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="cmp-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="cmp-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="cmp-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
+      {modo === "compras" && (
+        <>
+          <div className="cmp-pasos" role="tablist" aria-label="Compras de Lucía">
+            {RONDAS.map((r, i) => (
+              <button key={r.id} type="button" role="tab" aria-selected={i === rondaIdx} className="cmp-paso" data-on={i === rondaIdx} data-done={!!hechas[r.id]} onClick={() => irARonda(i)}>
+                <i className={`fa-solid ${hechas[r.id] ? "fa-circle-check" : r.icono}`} aria-hidden />
+                {i + 1} {r.titulo}
+              </button>
+            ))}
           </div>
-          <button className="cmp-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="cmp-drawer-body">
-          <FichaTeorica data={COMPARATIVOS_INGLES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
 
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}>
-        {/* ── Columna principal ─────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
-          {/* MODO 1 — Build the comparative */}
-          {/* MODO — completa el texto (fill_blanks verbatim de la progresión) */}
-          {modo === "texto" && (
-            <CompletaTexto
-              key={textoIntento}
-              data={COMPARATIVOS_INGLES_HUECOS}
-              accent={accent}
-              rgba={color.rgba}
-              completado={textoDone}
-              onCompletado={() => {
-                setTextoDone(true);
-                sfxOk();
-              }}
-              onAcierto={sfxPlace}
-              onError={sfxNo}
-            />
-          )}
+          <Lucia ronda={ronda} reac={reac} />
 
-          {modo === "construir" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra la forma comparativa correcta a cada adjetivo</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: construirDone ? OK : T.text3 }}>
-                    {Object.keys(construido).length}/{COMPARATIVOS.length}
-                  </span>
-                </div>
-                <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 14, lineHeight: 1.5 }}>
-                  Cuidado: hay formas <strong style={{ color: T.text2 }}>incorrectas</strong> (more tall, gooder…) que no encajan en ninguna fila.
-                </div>
-                {fichasLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Formaste los 6 comparativos!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {fichasLibres.map((f) => (
-                      <button key={f.id} className="cmp-chip" data-sel={selConstr === f.id} onClick={() => setSelConstr((s) => (s === f.id ? null : f.id))} {...dragProps(f.id)}>
-                        {f.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+          <div className="cmp-opciones">
+            {ronda.opciones.map((o, i) => (
+              <TarjetaOpcion
+                key={o.id}
+                ronda={ronda}
+                opcion={o}
+                tono={i}
+                elegida={sujeto === o.id}
+                compra={hecha === o.id}
+                onElegir={() => {
+                  sfxClick();
+                  setSujeto(o.id);
+                }}
+              />
+            ))}
+          </div>
 
-              <RowsConstruir selConstr={selConstr} shakeConstr={shakeConstr} construido={construido} onMatch={intentarConstruir} dropProps={dropProps} />
-            </>
-          )}
-
-          {/* MODO 2 — -er, more, or irregular? */}
-          {modo === "regla" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada adjetivo a su regla de comparativo</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: reglaDone ? OK : T.text3 }}>
-                    {Object.keys(ubicado).length}/{ADJETIVOS.length}
-                  </span>
-                </div>
-                {adjLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Clasificaste los 11 adjetivos!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {adjLibres.map((a) => (
-                      <button key={a.id} className="cmp-chip" data-sel={selAdj === a.id} onClick={() => setSelAdj((s) => (s === a.id ? null : a.id))} {...dragProps(a.id)}>
-                        {a.palabra}
-                        <span style={{ fontSize: 10.5, fontWeight: 600, color: T.text3 }}>{a.es}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <BinsRegla selAdj={selAdj} shakeBin={shakeBin} ubicado={ubicado} onMatch={intentarRegla} dropProps={dropProps} />
-            </>
-          )}
-
-          {/* MODO 3 — Complete the comparison */}
-          {modo === "oraciones" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra el comparativo adecuado a cada hueco</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: oracionesDone ? OK : T.text3 }}>
-                    {Object.keys(completado).length}/{ORACIONES.length}
-                  </span>
-                </div>
-                {oraLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Completaste las 6 comparaciones!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {oraLibres.map((o) => (
-                      <button key={o.id} className="cmp-chip" data-sel={selOra === o.id} onClick={() => setSelOra((s) => (s === o.id ? null : o.id))} {...dragProps(o.id)}>
-                        {o.resp}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <RowsOraciones selOra={selOra} shakeOra={shakeOra} completado={completado} onMatch={intentarOra} dropProps={dropProps} />
-            </>
-          )}
-        </div>
-
-        {/* ── Columna lateral ───────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? OK : T.text2 }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-                  <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-                </div>
+          <div className="cmp-constructor">
+            <div className="cmp-frase" aria-live="polite">
+              <strong>{sujeto ? opcionDe(ronda, sujeto).corto : "…"}</strong>
+              <span>is</span>
+              <strong className="cmp-hueco" data-lleno={!!forma}>{forma ?? "____"}</strong>
+              <span>than</span>
+              <strong>{sujeto ? otraDe(ronda, sujeto).corto : "…"}</strong>
+            </div>
+            <div className="cmp-fichas" role="group" aria-label="Elige el comparativo">
+              {fichasDe(ronda).map((f) => (
+                <button
+                  key={f}
+                  type="button"
+                  className="cmp-ficha"
+                  data-sel={forma === f}
+                  onClick={() => {
+                    sfxClick();
+                    setForma(f);
+                  }}
+                >
+                  {f}
+                </button>
               ))}
             </div>
+            <div className="cmp-acciones">
+              <button type="button" className="cmp-decir" disabled={!sujeto || !forma} onClick={decir}>
+                <i className="fa-solid fa-comment-dots" aria-hidden /> Say it to Lucía
+              </button>
+              {hecha && rondaIdx < RONDAS.length - 1 && (
+                <button type="button" className="cmp-sig" onClick={() => irARonda(rondaIdx + 1)}>
+                  Next purchase <i className="fa-solid fa-arrow-right" aria-hidden />
+                </button>
+              )}
+            </div>
+            {!sujeto && <div className="cmp-nota">Primero toca la tarjeta de quien va al inicio de la frase.</div>}
+          </div>
+        </>
+      )}
 
-            <div className="cmp-divider" />
+      {modo === "texto" && (
+        <CompletaTexto
+          key={textoIntento}
+          data={COMPARATIVOS_INGLES_HUECOS}
+          accent={accent}
+          rgba={color.rgba}
+          completado={textoDone}
+          onCompletado={() => {
+            setTextoDone(true);
+            sfxOk();
+          }}
+          onAcierto={sfxPlace}
+          onError={sfxNo}
+        />
+      )}
+    </div>
+  );
 
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", color: T.text3, textTransform: "uppercase" }}>Puntuación</div>
-                <div style={{ display: "flex", gap: 4, marginTop: 5 }}>
+  const pistaDe: Record<Modo, string> = {
+    compras: "Mira las barras y di una comparación VERDADERA sobre lo que Lucía pidió. Adjetivo corto → -er (cheaper); largo → more (more expensive); good, bad y far son irregulares.",
+    texto: "Escribe la palabra que falta en cada hueco del texto.",
+  };
+
+  return (
+    <LabShell
+      dom
+      accent={accent}
+      rgba={color.rgba}
+      escena={escena}
+      modos={{ opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })), valor: modo, cambiar: (id) => setModo(id as Modo) }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo={modo === "texto" ? "Reiniciar este modo" : "Reiniciar las compras"} onClick={resetActual} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      retoKey={RETO_KEY}
+      pestanas={[
+        {
+          id: "pistas",
+          etiqueta: "Pistas",
+          icono: "fa-lightbulb",
+          contenido: (
+            <>
+              <Bloque titulo="Tu partida" icono="fa-gauge-high">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+                <div style={{ display: "flex", gap: 4 }}>
                   {[1, 2, 3].map((s) => (
-                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 18, color: s <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
+                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 20, color: s <= bestEstrellas ? AMBAR : "rgba(255,255,255,0.16)" }} />
                   ))}
                 </div>
-              </div>
-              <div style={{ textAlign: "right", maxWidth: 180 }}>
-                <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45 }}>
-                  {bestEstrellas >= 3 ? "You mastered comparatives in English!" : "Termina los tres modos para ganar 2★; la tercera pide 2 errores o menos."}
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                  {bestEstrellas >= 3 ? "You mastered comparatives in English!" : "Termina las 4 compras y el texto para ganar 2★; la tercera pide 2 errores o menos."}
                 </div>
-              </div>
-            </div>
-          </div>
-
-          {/* pista del modo actual */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid rgba(${color.rgba},0.3)`, background: `rgba(${color.rgba},0.08)`, fontSize: 13, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              {modo === "construir" && (
-                <>Adjetivo corto + <strong style={{ color: T.text }}>-er</strong> (tall → <strong style={{ color: T.text }}>taller</strong>); largo → <strong style={{ color: T.text }}>more</strong> (more interesting). Nunca los dos juntos.</>
-              )}
-              {modo === "regla" && (
-                <>1 sílaba → <strong style={{ color: T.text }}>-er</strong>. 2+ sílabas → <strong style={{ color: T.text }}>more</strong>. <strong style={{ color: T.text }}>good / bad / far</strong> son irregulares.</>
-              )}
-              {modo === "oraciones" && (
-                <>Toda comparación lleva <strong style={{ color: T.text }}>than</strong>: A is <strong style={{ color: T.text }}>taller than</strong> B. Elige la forma correcta según el adjetivo.</>
-              )}
-            </span>
-          </div>
-
-          {/* dato verbatim */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid ${T.line}`, background: T.glass, fontSize: 12.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-circle-info" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>{DATO_COMPARATIVOS}</span>
-          </div>
-        </div>
-      </div>
-
-      <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />
-    </div>
+              </Bloque>
+              <Bloque titulo="Pista de este modo" icono="fa-lightbulb">
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>{pistaDe[modo]}</div>
+              </Bloque>
+              <Bloque titulo="Comparaciones que ya dijiste" icono="fa-comments">
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                  {usadas.length === 0 ? "Aún ninguna. Cada una que sea correcta y verdadera aparece aquí." : usadas.join(" · ")}
+                </div>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-clipboard-question",
+          contenido: <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />,
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Teoría de la práctica" icono="fa-book-open">
+                <FichaTeorica data={COMPARATIVOS_INGLES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <Bloque titulo="Seis comparativos y su regla" icono="fa-screwdriver-wrench">
+                <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+                  {COMPARATIVOS.map((c) => (
+                    <div key={c.id} style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                      <strong style={{ color: T.text }}>
+                        {c.adjetivo} → {c.comparativo} than
+                      </strong>{" "}
+                      ({c.es}). {c.regla}
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+              <Bloque titulo="Adjetivos según su regla" icono="fa-table-columns">
+                <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+                  {(["er", "more", "irregular"] as TipoRegla[]).map((t) => (
+                    <div key={t} style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                      <strong style={{ color: T.text }}>
+                        {REGLA_INFO[t].titulo} · {REGLA_INFO[t].subtitulo}.
+                      </strong>{" "}
+                      {ADJETIVOS.filter((a) => a.tipo === t)
+                        .map((a) => `${a.palabra} (${a.es})`)
+                        .join(", ")}
+                      . <em style={{ color: T.text3 }}>{REGLA_INFO[t].ejemplo}</em>
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+              <Bloque titulo="Comparaciones en contexto" icono="fa-pen-fancy">
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {ORACIONES.map((o) => (
+                    <div key={o.id} style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                      {o.antes} <strong style={{ color: OK }}>{o.resp}</strong> {o.despues} <em style={{ color: T.text3 }}>({o.nota})</em>
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+              <Bloque titulo="Dato" icono="fa-circle-info">
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55 }}>{DATO_COMPARATIVOS}</div>
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
- * Paneles de cada modo (componentes hijos: reciben los manejadores como props,
- * así el linter no rastrea el acceso al ref de audio hasta el render del map).
+ * Piezas de la escena
  * ═══════════════════════════════════════════════════════════════════════════ */
-type DropFactory = (onDrop: (id: string) => void) => {
-  onDragOver: (e: React.DragEvent) => void;
-  onDrop: (e: React.DragEvent) => void;
-};
 
-function RowsConstruir({
-  selConstr,
-  shakeConstr,
-  construido,
-  onMatch,
-  dropProps,
-}: {
-  selConstr: string | null;
-  shakeConstr: string | null;
-  construido: Record<string, boolean>;
-  onMatch: (chipId: string, rowId: string) => void;
-  dropProps: DropFactory;
-}) {
+function Lucia({ ronda, reac }: { ronda: Ronda; reac: Resultado | null }) {
+  const tono = reac ? TONO[reac.veredicto] : { color: "rgba(255,255,255,0.7)", icono: "fa-face-smile" };
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-      {COMPARATIVOS.map((c) => {
-        const done = construido[c.id];
-        return (
-          <div
-            key={c.id}
-            className="cmp-row"
-            data-shake={shakeConstr === c.id}
-            data-done={done}
-            onClick={() => !done && selConstr && onMatch(selConstr, c.id)}
-            {...dropProps((id) => onMatch(id, c.id))}
-          >
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 11.5, color: T.text3, marginBottom: 5 }}>{c.es}</div>
-              <div style={{ fontSize: 15.5, color: done ? "#fff" : T.text2, lineHeight: 1.4, display: "inline-flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                <span style={{ fontWeight: 700 }}>{c.adjetivo}</span>
-                <i className="fa-solid fa-arrow-right-long" style={{ fontSize: 12, color: T.text3 }} />
-                {done ? (
-                  <span style={{ animation: "cmpPop .25s ease", fontWeight: 900, color: OK }}>{c.comparativo}</span>
-                ) : (
-                  <span className="cmp-slot" data-armed={!!selConstr}>
-                    <i className="fa-solid fa-arrow-down" style={{ fontSize: 11 }} />
-                  </span>
-                )}
-                <span style={{ color: T.text3 }}>than</span>
-              </div>
-            </div>
-            <span style={{ fontSize: 10.5, fontWeight: 800, color: T.text3, border: `1px solid ${T.line}`, borderRadius: 6, padding: "2px 8px", textTransform: "uppercase", letterSpacing: "0.04em", flexShrink: 0 }}>
-              {c.tipo === "er" ? "-er" : c.tipo === "more" ? "more" : "irregular"}
+    <div className="cmp-lucia" role="status">
+      <div className="cmp-avatar" style={{ borderColor: tono.color, color: tono.color }}>
+        <i className={`fa-solid ${tono.icono}`} aria-hidden />
+      </div>
+      <div className="cmp-burbuja" style={{ borderColor: reac ? `${tono.color}88` : undefined }}>
+        <div className="cmp-nombre">Lucía</div>
+        <div className="cmp-ing">{reac ? reac.ingles : ronda.lucia}</div>
+        <div className="cmp-es">{reac ? reac.es : ronda.luciaEs}</div>
+      </div>
+    </div>
+  );
+}
+
+function Foto({ clave, icono, tono }: { clave: string; icono: string; tono: number }) {
+  const [fallo, setFallo] = useState(false);
+  const hue = tono === 0 ? 190 : 330;
+  return (
+    <div className="cmp-foto" style={{ background: `linear-gradient(135deg, hsl(${hue} 55% 26%), hsl(${hue + 40} 50% 14%))` }}>
+      <i className={`fa-solid ${icono}`} aria-hidden />
+      {!fallo && <img src={`${RUTA_SIM}/${clave}.webp`} alt="" loading="lazy" onError={() => setFallo(true)} />}
+    </div>
+  );
+}
+
+function TarjetaOpcion({ ronda, opcion, tono, elegida, compra, onElegir }: { ronda: Ronda; opcion: OpcionCompra; tono: number; elegida: boolean; compra: boolean; onElegir: () => void }) {
+  const otra = otraDe(ronda, opcion.id);
+  return (
+    <button type="button" className="cmp-op" data-sel={elegida} data-compra={compra} onClick={onElegir} aria-pressed={elegida}>
+      <Foto clave={opcion.clave} icono={opcion.icono} tono={tono} />
+      <div className="cmp-op-cuerpo">
+        <div className="cmp-op-titulo">
+          <strong>{opcion.corto}</strong>
+          <span>{opcion.que}</span>
+          {compra && (
+            <span className="cmp-elegida">
+              <i className="fa-solid fa-cart-shopping" aria-hidden /> Lucía lo compra
             </span>
-            {done && (
-              <div style={{ flexBasis: "100%", fontSize: 12, color: T.text3, lineHeight: 1.45, display: "flex", gap: 8 }}>
-                <i className="fa-solid fa-circle-check" style={{ color: OK, marginTop: 2 }} />
-                <span>{c.regla}</span>
+          )}
+        </div>
+        {ronda.atributos.map((a) => {
+          const v = opcion.valores[a.id] ?? 0;
+          const max = Math.max(v, otra.valores[a.id] ?? 0) || 1;
+          return (
+            <div key={a.id} className="cmp-barra">
+              <div className="cmp-barra-top">
+                <span>{a.nombre}</span>
+                <strong>{a.unidad === "$" ? `$${v.toLocaleString("en-US")}` : `${v} ${a.unidad}`}</strong>
               </div>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function BinsRegla({
-  selAdj,
-  shakeBin,
-  ubicado,
-  onMatch,
-  dropProps,
-}: {
-  selAdj: string | null;
-  shakeBin: TipoRegla | null;
-  ubicado: Record<string, TipoRegla>;
-  onMatch: (adjId: string, bin: TipoRegla) => void;
-  dropProps: DropFactory;
-}) {
-  const bins: TipoRegla[] = ["er", "more", "irregular"];
-  return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
-      {bins.map((bin) => {
-        const info = REGLA_INFO[bin];
-        const dentro = ADJETIVOS.filter((a) => ubicado[a.id] === bin);
-        return (
-          <div
-            key={bin}
-            className="cmp-bin"
-            data-shake={shakeBin === bin}
-            onClick={() => selAdj && onMatch(selAdj, bin)}
-            style={{ position: "relative", isolation: "isolate" }}
-            {...dropProps((id) => onMatch(id, bin))}
-          >
-            {/* La ilustración del concepto llenando la caja vacía. */}
-            <FondoTermino termino={info.titulo} />
-            <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
-              <VinetaTermino termino={info.titulo} color={T.text2} icono={info.icono} tam={29} radio={8} />
-              <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
+              <div className="cmp-pista">
+                <div className="cmp-relleno" style={{ width: `${Math.max(6, (v / max) * 100)}%` }} />
+              </div>
             </div>
-            <div style={{ fontSize: 11, color: T.text3, marginBottom: 4 }}>{info.subtitulo}</div>
-            <div style={{ fontSize: 10.5, color: T.text3, fontStyle: "italic", marginBottom: 12 }}>{info.ejemplo}</div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-              {dentro.length === 0 ? (
-                <div style={{ fontSize: 12, color: T.text3, opacity: 0.6, padding: "8px 0" }}>Arrastra aquí…</div>
-              ) : (
-                dentro.map((a) => (
-                  <span key={a.id} style={{ animation: "cmpPop .25s ease", display: "inline-flex", alignItems: "center", gap: 7, padding: "8px 13px", borderRadius: 999, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 13.5, fontWeight: 800, color: "#fff" }}>
-                    {a.palabra}
-                  </span>
-                ))
-              )}
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function RowsOraciones({
-  selOra,
-  shakeOra,
-  completado,
-  onMatch,
-  dropProps,
-}: {
-  selOra: string | null;
-  shakeOra: string | null;
-  completado: Record<string, boolean>;
-  onMatch: (chipId: string, rowId: string) => void;
-  dropProps: DropFactory;
-}) {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-      {ORACIONES.map((o) => {
-        const done = completado[o.id];
-        return (
-          <div
-            key={o.id}
-            className="cmp-row"
-            data-shake={shakeOra === o.id}
-            data-done={done}
-            onClick={() => !done && selOra && onMatch(selOra, o.id)}
-            {...dropProps((id) => onMatch(id, o.id))}
-          >
-            <div style={{ fontSize: 14.5, color: done ? "#fff" : T.text2, lineHeight: 1.6, display: "inline-flex", alignItems: "center", gap: 7, flexWrap: "wrap", flex: 1, minWidth: 0 }}>
-              <span>{o.antes}</span>
-              {done ? (
-                <span style={{ animation: "cmpPop .25s ease", fontWeight: 900, color: OK }}>{o.resp}</span>
-              ) : (
-                <span className="cmp-slot" data-armed={!!selOra} style={{ minWidth: 96 }}>
-                  <i className="fa-solid fa-arrow-down" style={{ fontSize: 11 }} />
-                </span>
-              )}
-              <span>{o.despues}</span>
-            </div>
-            {!done && (
-              <span style={{ fontSize: 11, color: T.text3, fontStyle: "italic", flexShrink: 0 }}>{o.nota}</span>
-            )}
-          </div>
-        );
-      })}
-    </div>
+          );
+        })}
+      </div>
+    </button>
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
- * Cuestionario de comprensión
+ * Estilos
+ * ═══════════════════════════════════════════════════════════════════════════ */
+const ESTILOS = (accent: string, rgba: string) => `
+  .cmp-pasos { display:flex; flex-wrap:wrap; gap:8px; }
+  .cmp-paso { cursor:pointer; display:inline-flex; align-items:center; gap:8px; padding:9px 14px; border-radius:11px; font-size:14px; font-weight:800;
+    border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; }
+  .cmp-paso[data-on="true"] { border-color:${accent}; background:rgba(${rgba},0.18); color:#fff; }
+  .cmp-paso[data-done="true"] i { color:${OK}; }
+  .cmp-lucia { display:flex; gap:12px; align-items:flex-start; }
+  .cmp-avatar { flex-shrink:0; width:52px; height:52px; border-radius:50%; border:2px solid; display:flex; align-items:center; justify-content:center;
+    font-size:26px; background:rgba(2,12,28,0.6); transition:all .2s; }
+  .cmp-burbuja { flex:1; min-width:0; padding:11px 14px; border-radius:6px 16px 16px 16px; border:1.5px solid ${T.line}; background:${T.glass}; display:grid; gap:4px; }
+  .cmp-nombre { font-size:13px; font-weight:900; letter-spacing:.1em; text-transform:uppercase; color:${T.text3}; }
+  .cmp-ing { font-size:16px; font-weight:800; color:#fff; line-height:1.35; }
+  .cmp-es { font-size:14px; color:${T.text2}; line-height:1.45; }
+  .cmp-opciones { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap:12px; }
+  .cmp-op { cursor:pointer; text-align:left; display:flex; flex-direction:column; border-radius:16px; border:1.5px solid ${T.line}; background:${T.glass}; color:#fff;
+    padding:0; overflow:hidden; transition:border-color .15s, box-shadow .15s; min-width:0; font:inherit; }
+  .cmp-op:hover { border-color:${T.lineStrong}; }
+  .cmp-op[data-sel="true"] { border-color:${accent}; box-shadow:0 0 0 3px rgba(${rgba},0.22); }
+  .cmp-op[data-compra="true"] { border-color:${OK}; background:${OK}14; }
+  .cmp-foto { position:relative; aspect-ratio:16/9; display:flex; align-items:center; justify-content:center; font-size:38px; color:rgba(255,255,255,0.35); overflow:hidden; }
+  .cmp-foto img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .cmp-op-cuerpo { padding:12px 14px 14px; display:grid; gap:10px; }
+  .cmp-op-titulo { display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 10px; }
+  .cmp-op-titulo strong { font-size:18px; }
+  .cmp-op-titulo span { font-size:14px; color:${T.text2}; }
+  .cmp-op-titulo .cmp-elegida { color:${OK}; font-weight:800; }
+  .cmp-barra { display:grid; gap:4px; }
+  .cmp-barra-top { display:flex; justify-content:space-between; gap:8px; font-size:14px; color:${T.text2}; }
+  .cmp-barra-top strong { color:#fff; font-variant-numeric:tabular-nums; }
+  .cmp-pista { height:10px; border-radius:99px; background:rgba(255,255,255,0.1); overflow:hidden; }
+  .cmp-relleno { height:100%; border-radius:99px; background:linear-gradient(90deg, ${accent}, rgba(${rgba},0.55)); transition:width .4s ease; }
+  .cmp-constructor { display:grid; gap:12px; padding:14px; border-radius:16px; border:1.5px solid ${T.line}; background:${T.inset}; }
+  .cmp-frase { display:flex; flex-wrap:wrap; align-items:baseline; gap:8px; font-size:20px; color:#fff; }
+  .cmp-frase span { color:${T.text2}; }
+  .cmp-hueco { padding:0 10px; border-radius:8px; border:1.5px dashed ${T.lineStrong}; color:${T.text3}; }
+  .cmp-hueco[data-lleno="true"] { border-style:solid; border-color:${accent}; color:#fff; background:rgba(${rgba},0.16); }
+  .cmp-fichas { display:flex; flex-wrap:wrap; gap:8px; }
+  .cmp-ficha { cursor:pointer; min-height:44px; padding:10px 16px; border-radius:999px; border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff;
+    font-size:15px; font-weight:800; transition:all .14s; }
+  .cmp-ficha:hover { border-color:${T.lineStrong}; }
+  .cmp-ficha[data-sel="true"] { border-color:${accent}; background:rgba(${rgba},0.22); box-shadow:0 0 14px -5px ${accent}; }
+  .cmp-acciones { display:flex; flex-wrap:wrap; gap:10px; }
+  .cmp-decir, .cmp-sig { cursor:pointer; min-height:44px; display:inline-flex; align-items:center; gap:9px; padding:10px 18px; border-radius:11px; font-size:15px; font-weight:900; border:none; }
+  .cmp-decir { background:${accent}; color:#04121f; }
+  .cmp-decir:disabled { opacity:.4; cursor:not-allowed; }
+  .cmp-sig { background:${OK}22; color:${OK}; border:1.5px solid ${OK}88; }
+  .cmp-nota { font-size:14px; color:${T.text3}; }
+  .cmp-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px; border:1.5px solid ${T.line}; background:${T.glass};
+    color:${T.text2}; font-size:14px; font-weight:600; text-align:left; width:100%; }
+  .cmp-q:hover:not(:disabled) { border-color:${T.lineStrong}; color:#fff; }
+  .cmp-q:disabled { cursor:default; }
+  .cmp-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px; border-radius:11px; border:1.5px solid ${T.line};
+    background:${T.inset}; color:${T.text}; font-size:14px; font-weight:800; }
+  .cmp-btn:disabled { opacity:.4; cursor:not-allowed; }
+  @media (prefers-reduced-motion: reduce){ .cmp-relleno, .cmp-avatar { transition:none; } }
+`;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Cuestionario de comprensión (pestaña Reto)
  * ═══════════════════════════════════════════════════════════════════════════ */
 function QuizCard({
   accent,
@@ -763,73 +546,67 @@ function QuizCard({
   };
 
   return (
-    <div style={{ ...card, padding: "20px 24px 24px", marginTop: 22 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4, flexWrap: "wrap" }}>
-        <Eyebrow>
-          <i className="fa-solid fa-clipboard-question" style={{ marginRight: 8, color: accent }} />
-          Comprueba lo aprendido
-        </Eyebrow>
-        {aprobado && (
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 12, fontWeight: 800, color: OK }}>
-            <i className="fa-solid fa-circle-check" /> Aprobado
-          </span>
-        )}
-      </div>
-      <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
-        Cinco afirmaciones sobre los comparativos. Decide si son verdaderas o falsas y pulsa «Comprobar».
-      </div>
+    <div style={{ display: "grid", gap: 16 }}>
+      <Bloque titulo="Comprueba lo aprendido" icono="fa-clipboard-question">
+        <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+          Cinco afirmaciones sobre los comparativos. Decide si son verdaderas o falsas y pulsa «Comprobar».
+          {aprobado && (
+            <span style={{ marginLeft: 8, color: OK, fontWeight: 800 }}>
+              <i className="fa-solid fa-circle-check" /> Aprobado
+            </span>
+          )}
+        </div>
+      </Bloque>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
-        {QUIZ.map((q, qi) => {
-          const elegida = resp[qi];
-          return (
-            <div key={qi}>
-              <div style={{ fontSize: 14.5, fontWeight: 800, color: T.text, marginBottom: 11, display: "flex", gap: 10 }}>
-                <span style={{ color: accent }}>{qi + 1}.</span>
-                <span>{q.pregunta}</span>
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
-                {q.opciones.map((op, oi) => {
-                  const sel = elegida === oi;
-                  const esCorrecta = oi === q.correcta;
-                  let borde = T.line;
-                  let fondo = T.glass;
-                  let colorTxt = T.text2;
-                  if (comprobado && esCorrecta) {
-                    borde = OK;
-                    fondo = `${OK}1c`;
-                    colorTxt = "#fff";
-                  } else if (comprobado && sel && !esCorrecta) {
-                    borde = NO;
-                    fondo = `${NO}1c`;
-                    colorTxt = "#fff";
-                  } else if (!comprobado && sel) {
-                    borde = accent;
-                    fondo = `rgba(${rgba},0.16)`;
-                    colorTxt = "#fff";
-                  }
-                  return (
-                    <button key={oi} className="cmp-q" onClick={() => elegir(qi, oi)} disabled={comprobado} style={{ borderColor: borde, background: fondo, color: colorTxt }}>
-                      <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
-                        {comprobado && esCorrecta ? <i className="fa-solid fa-check" /> : comprobado && sel ? <i className="fa-solid fa-xmark" /> : String.fromCharCode(65 + oi)}
-                      </span>
-                      <span style={{ flex: 1, lineHeight: 1.35 }}>{op}</span>
-                    </button>
-                  );
-                })}
-              </div>
-              {comprobado && (
-                <div style={{ marginTop: 9, fontSize: 12.5, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
-                  <i className="fa-solid fa-circle-info" style={{ color: accent, marginTop: 2 }} />
-                  <span>{q.retro}</span>
-                </div>
-              )}
+      {QUIZ.map((q, qi) => {
+        const elegida = resp[qi];
+        return (
+          <div key={qi}>
+            <div style={{ fontSize: 15, fontWeight: 800, color: T.text, marginBottom: 10, display: "flex", gap: 10 }}>
+              <span style={{ color: accent }}>{qi + 1}.</span>
+              <span>{q.pregunta}</span>
             </div>
-          );
-        })}
-      </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 140px), 1fr))", gap: 9 }}>
+              {q.opciones.map((op, oi) => {
+                const sel = elegida === oi;
+                const esCorrecta = oi === q.correcta;
+                let borde = T.line;
+                let fondo = T.glass;
+                let colorTxt = T.text2;
+                if (comprobado && esCorrecta) {
+                  borde = OK;
+                  fondo = `${OK}1c`;
+                  colorTxt = "#fff";
+                } else if (comprobado && sel && !esCorrecta) {
+                  borde = NO;
+                  fondo = `${NO}1c`;
+                  colorTxt = "#fff";
+                } else if (!comprobado && sel) {
+                  borde = accent;
+                  fondo = `rgba(${rgba},0.16)`;
+                  colorTxt = "#fff";
+                }
+                return (
+                  <button key={oi} className="cmp-q" onClick={() => elegir(qi, oi)} disabled={comprobado} style={{ borderColor: borde, background: fondo, color: colorTxt }}>
+                    <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
+                      {comprobado && esCorrecta ? <i className="fa-solid fa-check" /> : comprobado && sel ? <i className="fa-solid fa-xmark" /> : String.fromCharCode(65 + oi)}
+                    </span>
+                    <span style={{ flex: 1, lineHeight: 1.35 }}>{op}</span>
+                  </button>
+                );
+              })}
+            </div>
+            {comprobado && (
+              <div style={{ marginTop: 9, fontSize: 14, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
+                <i className="fa-solid fa-circle-info" style={{ color: accent, marginTop: 3 }} />
+                <span>{q.retro}</span>
+              </div>
+            )}
+          </div>
+        );
+      })}
 
-      <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 22, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
         {!comprobado ? (
           <button className="cmp-btn" style={{ background: accent, color: "#04121f", border: "none" }} onClick={comprobar} disabled={!todas}>
             <i className="fa-solid fa-list-check" />
@@ -842,10 +619,10 @@ function QuizCard({
           </button>
         )}
         {comprobado && (
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 13.5, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 14px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 14, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
             <i className={`fa-solid ${aprobadoAhora ? "fa-trophy" : "fa-circle-half-stroke"}`} />
             {aciertos} / {total} correctas
-            {!aprobadoAhora && <span style={{ color: T.text3, fontWeight: 600 }}>· revisa las marcadas e inténtalo de nuevo</span>}
+            {!aprobadoAhora && <span style={{ color: T.text3, fontWeight: 600 }}>· revisa las marcadas</span>}
           </div>
         )}
       </div>

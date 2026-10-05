@@ -1,0 +1,12 @@
+{
+  "escena": "Un gen de 18 bases que se traduce en cinco aminoácidos: Met-Ala-Lis-Gli-Cis. Cada letra del ADN se puede cambiar con un toque.",
+  "pregunta": "Una mutación pone un codón de paro a la mitad del gen. ¿Cómo queda la proteína?",
+  "opciones": [
+    { "id": "a", "texto": "Igual de larga, con un aminoácido distinto", "icono": "fa-arrows-left-right" },
+    { "id": "b", "texto": "Más corta: la traducción se detiene", "icono": "fa-scissors" },
+    { "id": "c", "texto": "Igual, la célula corrige el ARN", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "El ribosoma lee codón a codón y se detiene al llegar a UAA, UAG o UGA. Si el paro aparece antes, la cadena se corta y la proteína queda incompleta.",
+  "comoComprobarlo": "Elige «Péptido corto», toca la primera letra del tercer codón (la A de AAG) hasta formar TAG y compara la proteína original con la tuya."
+}

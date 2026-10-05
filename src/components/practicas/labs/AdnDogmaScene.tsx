@@ -18,7 +18,7 @@
 import * as THREE from "three";
 import { useRef, useState, type ReactNode } from "react";
 import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
-import { OrbitControls, Html, Line, Stars } from "@react-three/drei";
+import { OrbitControls, PerspectiveCamera, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
 import { CurvaTubo } from "./_tablero";
@@ -78,14 +78,40 @@ function seg(a: Pt, b: Pt): { pos: Pt; quat: [number, number, number, number]; l
 const charAt = (s: string, i: number): Base => (s[i] ?? "A") as Base;
 
 /* ── Etiqueta flotante (Html) ─────────────────────────────────────────── */
-function Etiqueta({ pos, children, df = 11, col }: { pos: Pt; children: ReactNode; df?: number; col?: string }) {
+function Etiqueta({ pos, children, col }: { pos: Pt; children: ReactNode; col?: string }) {
+  const ancho = useThree((st) => st.size.width);
+  // En pantallas angostas la información ya está en el panel.
+  if (ancho < 640) return null;
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 11px", borderRadius: 999, background: "rgba(4,10,22,0.82)", border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`, color: "#fff", fontSize: 12, fontWeight: 800, whiteSpace: "nowrap", boxShadow: "0 6px 18px -8px #000" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 11px", borderRadius: 999, background: "rgba(4,10,22,0.82)", border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`, color: "#fff", fontSize: 14, fontWeight: 800, whiteSpace: "nowrap", boxShadow: "0 6px 18px -8px #000" }}>
         {children}
       </div>
     </Html>
   );
+}
+
+/* Letra de cada base como textura de lienzo (un sprite, no un <Html> por base). */
+const _texLetra = new Map<string, THREE.CanvasTexture>();
+function letraTex(letra: string): THREE.CanvasTexture {
+  let t = _texLetra.get(letra);
+  if (!t) {
+    const c = document.createElement("canvas");
+    c.width = 64;
+    c.height = 64;
+    const g = c.getContext("2d");
+    if (g) {
+      g.font = "900 52px ui-monospace, monospace";
+      g.textAlign = "center";
+      g.textBaseline = "middle";
+      g.fillStyle = "#04121f";
+      g.fillText(letra, 32, 36);
+    }
+    t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    _texLetra.set(letra, t);
+  }
+  return t;
 }
 
 /* ── Un nucleótido: esfera coloreada por base + letra ─────────────────── */
@@ -103,9 +129,9 @@ function Nucleo({ pos, base, activo, tenue }: { pos: Pt; base: Base; activo?: bo
         <sphereGeometry args={[0.32, 24, 24]} />
         <meshStandardMaterial color={col} emissive={col} emissiveIntensity={activo ? 0.9 : 0.28} transparent opacity={tenue ? 0.4 : 1} roughness={0.35} metalness={0.1} />
       </mesh>
-      <Html center position={[0, 0, 0.34]} distanceFactor={7} zIndexRange={[10, 0]} style={{ pointerEvents: "none" }}>
-        <span style={{ fontFamily: "ui-monospace, monospace", fontWeight: 900, fontSize: 22, lineHeight: 1, color: "#04121f", opacity: tenue ? 0.5 : 1, userSelect: "none" }}>{base}</span>
-      </Html>
+      <sprite position={[0, 0, 0.36]} scale={[0.52, 0.52, 1]}>
+        <spriteMaterial map={letraTex(base)} transparent opacity={tenue ? 0.5 : 1} depthWrite={false} />
+      </sprite>
     </group>
   );
 }
@@ -373,7 +399,7 @@ function NucleotidosLibres() {
   return (
     <instancedMesh ref={ref} args={[undefined, undefined, PART_N]}>
       <sphereGeometry args={[1, 10, 10]} />
-      <meshStandardMaterial transparent opacity={0.5} emissiveIntensity={0.6} toneMapped={false} />
+      <meshStandardMaterial transparent opacity={0.5} emissiveIntensity={0.6} />
     </instancedMesh>
   );
 }
@@ -434,7 +460,7 @@ function Arrastrador({
       {/* perilla visible */}
       <mesh ref={knob}>
         <sphereGeometry args={[0.34, 22, 22]} />
-        <meshStandardMaterial color="#ffffff" emissive={accent} emissiveIntensity={0.85} toneMapped={false} />
+        <meshStandardMaterial color="#ffffff" emissive={accent} emissiveIntensity={0.85} />
       </mesh>
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[0.6, 0.05, 12, 32]} />
@@ -486,6 +512,17 @@ function Contenido(props: AdnDogmaSceneProps) {
   const x0 = -((arnm.length - 1) * PASO) / 2;
   const start = Math.max(0, arnm.indexOf(CODON_INICIO));
 
+  // Encuadre: el contenido ocupa ~55 % del alto y cabe a lo ancho, entre la
+  // barra de arriba y la misión de abajo (que se lleva más espacio: sube ~7 %).
+  const size = useThree((st) => st.size);
+  const nB = codificante.length;
+  const tanF = Math.tan((46 / 2) * (Math.PI / 180));
+  const alto = modo === "traduccion" ? 7.5 : nB * PASO + 3.5;
+  const ancho = modo === "traduccion" ? nB * PASO + 4 : modo === "replicacion" ? 10 : 8.5;
+  const aspecto = Math.max(0.3, size.width / Math.max(1, size.height));
+  const dist = Math.min(60, Math.max(10, alto / (0.55 * 2 * tanF), ancho / (0.88 * 2 * tanF * aspecto)));
+  const ty = -0.07 * 2 * dist * tanF;
+
   const mundo: ReactNode =
     modo === "replicacion" ? (
       <MundoReplicacion codificante={codificante} molde={molde} progreso={progreso} />
@@ -503,7 +540,6 @@ function Contenido(props: AdnDogmaSceneProps) {
           vez de que alguien la adivine. */}
       <Escenario acento={accent} mesa={false} niebla={false} />
       <directionalLight position={[-6, 4, -4]} intensity={0.5} color={modoColor} />
-      <Stars radius={70} depth={30} count={1100} factor={3} fade speed={0.5} />
       <NucleotidosLibres />
 
       <group ref={giro} key={`${modo}-${resetNonce}`}>{mundo}</group>
@@ -523,7 +559,8 @@ function Contenido(props: AdnDogmaSceneProps) {
         />
       )}
 
-      <OrbitControls enablePan={false} enabled={!dragging} minDistance={7} maxDistance={28} autoRotate={false} />
+      <PerspectiveCamera makeDefault fov={46} position={[0, ty + dist * 0.06, dist]} />
+      <OrbitControls enablePan={false} enabled={!dragging} target={[0, ty, 0]} minDistance={7} maxDistance={70} autoRotate={false} />
       <EffectComposer>
         <Bloom intensity={0.55} luminanceThreshold={0.2} mipmapBlur />
         <Vignette eskil={false} offset={0.18} darkness={0.72} />
@@ -533,10 +570,8 @@ function Contenido(props: AdnDogmaSceneProps) {
 }
 
 export default function AdnDogmaScene(props: AdnDogmaSceneProps) {
-  const cam: Pt =
-    props.modo === "traduccion" ? [0, 2.5, 15] : props.modo === "transcripcion" ? [3, 1, 16] : [0, 1, 15];
   return (
-    <Canvas key={props.modo} shadows dpr={[1, 2]} camera={{ position: cam, fov: 46 }} gl={{ antialias: true }} style={{ width: "100%", height: "100%" }}>
+    <Canvas key={props.modo} shadows dpr={[1, 2]} gl={{ antialias: true }} style={{ width: "100%", height: "100%" }}>
       <Contenido {...props} />
     </Canvas>
   );

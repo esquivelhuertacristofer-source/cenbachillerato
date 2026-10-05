@@ -1,0 +1,12 @@
+{
+  "escena": "Lucía elige un teléfono: el Zeta cuesta $3,200 y el Orbi $6,900",
+  "pregunta": "Dices «Zeta is more cheap than Orbi». ¿Qué hace Lucía?",
+  "opciones": [
+    { "id": "a", "texto": "Compra el Zeta sin dudar", "icono": "fa-cart-shopping" },
+    { "id": "b", "texto": "Se confunde: la forma no existe", "icono": "fa-face-frown" },
+    { "id": "c", "texto": "Compra el Orbi porque es más caro", "icono": "fa-mobile-screen-button" }
+  ],
+  "correcta": "b",
+  "porque": "«Cheap» es un adjetivo corto: su comparativo lleva -er («cheaper»), no «more». Con una forma que no existe, Lucía no entiende y no compra nada.",
+  "comoComprobarlo": "En la compra del teléfono toca la tarjeta Zeta, elige la ficha «more cheap» y pulsa «Say it to Lucía»."
+}

@@ -1,0 +1,12 @@
+{
+  "escena": "Tortillería ficticia con 2 trabajadores, 1 máquina, 60 kg de maíz y organización nivel 1",
+  "pregunta": "Contratas más trabajadores, pero no compras más maíz ni más máquinas. ¿Qué pasa con la producción?",
+  "opciones": [
+    { "id": "a", "texto": "Crece igual que el personal", "icono": "fa-arrow-trend-up" },
+    { "id": "b", "texto": "Casi no cambia", "icono": "fa-equals" },
+    { "id": "c", "texto": "Baja porque se estorban", "icono": "fa-arrow-trend-down" }
+  ],
+  "correcta": "b",
+  "porque": "La producción la fija el factor más escaso. Sin más maíz ni máquinas, las manos extra no tienen con qué trabajar; solo suben los salarios y baja la ganancia.",
+  "comoComprobarlo": "Sube los trabajadores con el deslizador y observa las barras de capacidad y la ganancia de hoy."
+}

@@ -1,0 +1,12 @@
+{
+  "escena": "Una hebra de ADN con su secuencia diana, la ARN guía encima y la proteína Cas9 lista para cortar.",
+  "pregunta": "Deslizas la ARN guía dos bases fuera de la diana y pulsas «Cortar». ¿Qué hace Cas9?",
+  "opciones": [
+    { "id": "a", "texto": "Corta igual, con un pequeño error", "icono": "fa-scissors" },
+    { "id": "b", "texto": "No corta: la guía ya no encaja", "icono": "fa-ban" },
+    { "id": "c", "texto": "Corta en otro lugar del ADN", "icono": "fa-location-crosshairs" }
+  ],
+  "correcta": "b",
+  "porque": "Cas9 solo corta donde la guía se aparea con todas sus bases y hay un PAM detrás. Si se desliza, la mayoría de las bases no encajan y la proteína no actúa: así se evitan cortes en lugares equivocados.",
+  "comoComprobarlo": "Mueve el deslizador «Posición de la guía» a +2 o −2, pulsa «Cortar con Cas9» y observa cuántas bases de la guía quedan en rojo."
+}

@@ -14,10 +14,11 @@
  *  (3) evidencias  — homología: mismos huesos en humano, ballena y murciélago.
  */
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import React, { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, card, Eyebrow, SceneBoundary } from "./_kit";
+import { T, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { LabSfx } from "./lab-audio";
@@ -62,7 +63,7 @@ const SeleccionNaturalScene = dynamic(() => import("./SeleccionNaturalScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-paw fa-fade" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Cargando la selección natural en 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Cargando la selección natural en 3D…</span>
     </div>
   ),
 });
@@ -81,8 +82,7 @@ export function LabSeleccionNatural({ color }: PracticaLabProps) {
   const [playing, setPlaying] = useState<boolean>(true);
   const [resetNonce, setResetNonce] = useState(0);
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
-  // teoría (cajón deslizable) y sonido
-  const [drawer, setDrawer] = useState(false);
+  // sonido
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
 
@@ -167,16 +167,10 @@ export function LabSeleccionNatural({ color }: PracticaLabProps) {
   const morfoDominante = cur.fClaro > cur.fOscuro ? "claro" : "oscuro";
   const camuflado = amb.favorece;
 
-  // texto del pie del visor
-  const pie: string =
-    modo === "conejos"
-      ? `${amb.etq} · depredación ${pred.etq.toLowerCase()} · gen ${genActual}/${maxGen} — pelaje ${camuflado} favorecido: ${camuflado === "claro" ? pctClaro : pctOscuro}% de la población`
-      : modo === "tipos"
-        ? `Selección ${tipo.etq.toLowerCase()} · generación ${genActual}/${maxGen} — la distribución del rasgo se reforma según la aptitud`
-        : `Homología: brazo humano, aleta de ballena y ala de murciélago comparten los mismos huesos (ancestro amniota común)`;
-
   // ── Objetivos guiados (se marcan en vivo) ──────────────────────────
   const objetivos = [
+    { txt: "Elige el Campo nevado y deja correr 6 generaciones: ¿qué pelaje queda?", done: modo === "conejos" && ambienteId === "nieve" && genActual >= 6 },
+    { txt: "Sube la presión depredadora a Alta y compara qué tan rápido cambia la población", done: modo === "conejos" && predacionId === "alta" && genActual >= 4 },
     { txt: "Recorre los tres modos del visor de la evolución", done: modo === "evidencias" },
     { txt: "Avanza generaciones y observa cambiar las frecuencias alélicas", done: genActual >= 1 },
     { txt: "Compara los tipos de selección y las evidencias", done: modo === "tipos" || modo === "evidencias" },
@@ -185,499 +179,309 @@ export function LabSeleccionNatural({ color }: PracticaLabProps) {
   // Los objetivos se recuerdan (algunos dependían del modo y se desmarcaban
   // solos) y se convierten en la marca del laboratorio, que antes no se
   // guardaba en ninguna parte.
-  const { logros: logrosLab, cumplidos: cumplidosLab, total: totalLab } = useLogros(objetivos.map((o) => o.done));
+  const { cumplidos: cumplidosLab, total: totalLab } = useLogros(objetivos.map((o) => o.done));
   const { registraEstrellas } = useEstrellas(RETO_KEY);
   useEffect(() => {
     if (cumplidosLab === 0) return;
     const est = cumplidosLab >= totalLab ? 3 : cumplidosLab >= Math.ceil((totalLab * 2) / 3) ? 2 : 1;
     registraEstrellas(est);
   }, [cumplidosLab, totalLab, registraEstrellas]);
-
   const sceneFallback = (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 28, textAlign: "center" }}>
       <div style={{ width: 74, height: 74, borderRadius: 20, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30, color: "#04121f", background: accent, boxShadow: `0 10px 30px -6px ${accent}` }}>
         <i className={`fa-solid ${def.icono}`} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{def.etq}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>
         Tu equipo no puede mostrar la escena en 3D, pero la información sigue aquí. {modo === "conejos" ? A2_DESCRIPCION : modo === "tipos" ? tipo.definicion : HOMOLOGAS_DEF}
       </div>
     </div>
   );
 
-  /* ── Panel de control específico del modo (valor calculado, no componente) ── */
-  let control: ReactNode = null;
-  if (modo === "conejos") {
-    control = (
-      <>
-        {/* ambiente */}
-        <Eyebrow><i className="fa-solid fa-globe" style={{ marginRight: 8, color: modoCol }} />Ambiente</Eyebrow>
-        <div className="sn-row3" style={{ marginBottom: 14 }}>
-          {AMBIENTES.map((a) => {
-            const on = a.id === ambienteId;
-            return (
-              <button key={a.id} className="sn-tab" data-on={on} onClick={() => cambiarAmbiente(a.id)} style={{ ["--snc" as string]: modoCol, background: on ? `${modoCol}1f` : "transparent" }}>
-                <div style={{ fontSize: 16, marginBottom: 3, color: on ? modoCol : "inherit" }}><i className={`fa-solid ${a.icono}`} /></div>
-                <div style={{ fontSize: 11.5, fontWeight: 900 }}>{a.etq}</div>
-              </button>
-            );
-          })}
-        </div>
-        {/* predación */}
-        <Eyebrow><i className="fa-solid fa-crow" style={{ marginRight: 8, color: modoCol }} />Presión depredadora</Eyebrow>
-        <div className="sn-row3" style={{ marginBottom: 16 }}>
-          {PREDACION.map((p) => {
-            const on = p.id === predacionId;
-            return (
-              <button key={p.id} className="sn-tab" data-on={on} onClick={() => cambiarPredacion(p.id)} style={{ ["--snc" as string]: modoCol, background: on ? `${modoCol}1f` : "transparent" }}>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{p.etq}</div>
-                <div style={{ fontSize: 9.5, color: T.text3, marginTop: 2 }}>{p.predadores} depred.</div>
-              </button>
-            );
-          })}
-        </div>
-        {/* generaciones */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 7 }}>
-          <span style={{ fontSize: 11, fontWeight: 900, letterSpacing: "0.1em", color: T.text3 }}>GENERACIÓN</span>
-          <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{genActual} / {maxGen}</span>
-        </div>
-        <input type="range" min={0} max={maxGen} value={genActual} onChange={(e) => { setPlaying(false); setGen(Number(e.target.value)); }} className="sn-range" style={{ ["--snc" as string]: modoCol }} />
+  // lectura en vivo (≤10 palabras)
+  const lectura: ReactNode =
+    modo === "conejos"
+      ? <>Gen {genActual}/{maxGen} · claros {pctClaro}% · oscuros {pctOscuro}%</>
+      : modo === "tipos"
+        ? <>Selección {tipo.etq.toLowerCase()} · generación {genActual}/{maxGen}</>
+        : <>Mismos huesos en humano, ballena y murciélago</>;
 
-        {/* lecturas */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 10, marginTop: 14 }}>
-          <div className="sn-read">
-            <div className="sn-read-l">Pelaje oscuro</div>
-            <div className="sn-read-v" style={{ color: "#c9a98a" }}>{pctOscuro}%</div>
-          </div>
-          <div className="sn-read">
-            <div className="sn-read-l">Pelaje claro</div>
-            <div className="sn-read-v" style={{ color: "#e9eef4" }}>{pctClaro}%</div>
-          </div>
-          <div className="sn-read">
-            <div className="sn-read-l">Alelo D (osc.)</div>
-            <div className="sn-read-v" style={{ color: modoCol }}>{pctD}%</div>
-          </div>
-          <div className="sn-read">
-            <div className="sn-read-l">Aptitud media</div>
-            <div className="sn-read-v" style={{ color: "#fbbf24" }}>{cur.wbar.toFixed(2)}</div>
-          </div>
-        </div>
+  // selección de tipo: porcentaje del rasgo en cada tercio de la distribución
+  const nBarras = barras.length;
+  const tercio = (a: number, b: number) => Math.round(barras.slice(a, b).reduce((x, y) => x + y, 0));
+  const pPeq = tercio(0, Math.floor(nBarras / 3));
+  const pMed = tercio(Math.floor(nBarras / 3), Math.ceil((nBarras * 2) / 3));
+  const pGra = tercio(Math.ceil((nBarras * 2) / 3), nBarras);
 
-        {/* veredicto */}
-        <div style={{ marginTop: 14, padding: "12px 14px", borderRadius: 12, border: `1px solid ${modoCol}44`, background: `${modoCol}12`, fontSize: 12, color: "#eaf0fb", lineHeight: 1.5 }}>
-          <i className="fa-solid fa-circle-info" style={{ color: modoCol, marginRight: 8 }} />
-          En {amb.etq.toLowerCase()} se camufla el pelaje <strong>{camuflado}</strong>. Tras {genActual} generaciones, el morfo predominante es el <strong>{morfoDominante}</strong> ({morfoDominante === "claro" ? pctClaro : pctOscuro}%).
-        </div>
-      </>
-    );
-  } else if (modo === "tipos") {
-    control = (
-      <>
-        <Eyebrow><i className="fa-solid fa-chart-column" style={{ marginRight: 8, color: modoCol }} />Tipo de selección</Eyebrow>
-        <div className="sn-row3" style={{ marginBottom: 16 }}>
-          {TIPOS_SEL.map((tp) => {
-            const on = tp.id === tipoId;
-            const c = `#${tp.color.replace("#", "")}`;
-            return (
-              <button key={tp.id} className="sn-tab" data-on={on} onClick={() => cambiarTipo(tp.id)} style={{ ["--snc" as string]: c, background: on ? `${c}1f` : "transparent" }}>
-                <div style={{ fontSize: 15, marginBottom: 3, color: on ? c : "inherit" }}><i className={`fa-solid ${tp.icono}`} /></div>
-                <div style={{ fontSize: 11, fontWeight: 900 }}>{tp.etq}</div>
-              </button>
-            );
-          })}
-        </div>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 7 }}>
-          <span style={{ fontSize: 11, fontWeight: 900, letterSpacing: "0.1em", color: T.text3 }}>GENERACIÓN</span>
-          <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{genActual} / {maxGen}</span>
-        </div>
-        <input type="range" min={0} max={maxGen} value={genActual} onChange={(e) => { setPlaying(false); setGen(Number(e.target.value)); }} className="sn-range" style={{ ["--snc" as string]: modoCol }} />
+  const sel = (on: boolean, col: string): React.CSSProperties => ({
+    cursor: "pointer", textAlign: "center", fontSize: 14, fontWeight: 800, lineHeight: 1.25, padding: "10px 6px", borderRadius: 11,
+    border: `1px solid ${on ? col : "rgba(255,255,255,0.14)"}`, background: on ? `${col}26` : "transparent", color: on ? "#fff" : T.text2,
+  });
+  const rejilla3: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(3, minmax(0,1fr))", gap: 8 };
+  const nota = (col: string, children: ReactNode) => (
+    <p style={{ margin: 0, padding: "10px 12px", borderRadius: 12, border: `1px solid ${col}44`, background: `${col}14` }}>{children}</p>
+  );
 
-        <div style={{ marginTop: 16, padding: "14px 16px", borderRadius: 12, border: `1px solid ${modoCol}44`, background: `${modoCol}12` }}>
-          <div style={{ fontSize: 12.5, fontWeight: 900, color: modoCol, marginBottom: 6 }}>
-            <i className={`fa-solid ${tipo.icono}`} style={{ marginRight: 8 }} />{tipo.etq}
-          </div>
-          <div style={{ fontSize: 12, color: "#eaf0fb", lineHeight: 1.5, marginBottom: 8 }}>
-            Selección {tipo.definicion}.
-          </div>
-          <div style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.5, paddingTop: 8, borderTop: `1px solid ${T.line}` }}>
-            <i className="fa-solid fa-flask" style={{ color: modoCol, marginRight: 7 }} />{tipo.ejemplo}
-          </div>
-        </div>
-      </>
-    );
-  } else {
-    control = (
-      <>
-        <Eyebrow><i className="fa-solid fa-bone" style={{ marginRight: 8, color: modoCol }} />Extremidad a resaltar</Eyebrow>
-        <div className="sn-row3" style={{ marginBottom: 16 }}>
-          {ANIMALES.map((a) => {
-            const on = a.id === animalId;
-            return (
-              <button key={a.id} className="sn-tab" data-on={on} onClick={() => setAnimalId(a.id)} style={{ ["--snc" as string]: modoCol, background: on ? `${modoCol}1f` : "transparent" }}>
-                <div style={{ fontSize: 15, marginBottom: 3, color: on ? modoCol : "inherit" }}><i className={`fa-solid ${a.icono}`} /></div>
-                <div style={{ fontSize: 10.5, fontWeight: 900, lineHeight: 1.15 }}>{a.etq}</div>
-              </button>
-            );
-          })}
-        </div>
-        {/* leyenda de huesos */}
-        <Eyebrow><i className="fa-solid fa-palette" style={{ marginRight: 8, color: modoCol }} />Mismos huesos, mismo color</Eyebrow>
-        <div style={{ display: "grid", gap: 7, marginBottom: 14 }}>
-          {HUESOS_LEYENDA.map((h) => (
-            <div key={h.tipo} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 11.5 }}>
-              <span style={{ width: 14, height: 14, borderRadius: 4, background: h.color, flexShrink: 0, boxShadow: `0 0 8px ${h.color}88` }} />
-              <span style={{ fontWeight: 900, color: "#fff" }}>{h.tipo}</span>
-              <span style={{ color: T.text3 }}>· {h.nota}</span>
-            </div>
-          ))}
-        </div>
-        {/* animal seleccionado */}
-        <div style={{ padding: "13px 15px", borderRadius: 12, border: `1px solid ${modoCol}44`, background: `${modoCol}12` }}>
-          <div style={{ fontSize: 12.5, fontWeight: 900, color: modoCol, marginBottom: 4 }}>
-            <i className={`fa-solid ${animal.icono}`} style={{ marginRight: 8 }} />{animal.etq} <span style={{ color: T.text3, fontWeight: 600 }}>· {animal.funcion}</span>
-          </div>
-          <div style={{ fontSize: 12, color: "#eaf0fb", lineHeight: 1.5 }}>{animal.descripcion}</div>
-        </div>
-      </>
-    );
-  }
-
-  return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes snPulse { 0%,100%{ box-shadow:0 0 0 0 var(--snd); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .sn-live-dot { animation: snPulse 1.6s ease-in-out infinite; }
-        .sn-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .sn-grid { grid-template-columns: 1fr; } }
-        .sn-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .sn-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .sn-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .sn-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .sn-tab { cursor:pointer; border:1px solid var(--snc); border-radius:12px; padding:11px 8px; text-align:center;
-          background:transparent; transition:all .15s; color:#fff; }
-        .sn-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
-        .sn-tab:hover { background:rgba(255,255,255,0.06); }
-        .sn-row3 { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .sn-read { padding:10px 8px; border-radius:11px; border:1px solid rgba(255,255,255,0.10); background:rgba(4,10,22,0.4); text-align:center; }
-        .sn-read-l { font-size:9.5px; font-weight:800; letter-spacing:0.06em; color:rgba(255,255,255,0.42); text-transform:uppercase; }
-        .sn-read-v { font-size:20px; font-weight:900; font-family:ui-monospace,monospace; margin-top:3px; }
-        .sn-range { width:100%; accent-color: var(--snc); cursor:pointer; }
-        @media (max-width: 1000px){ .sn-bottom { grid-template-columns: 1fr !important; } }
-
-        /* Cajón de teoría */
-        .sn-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .sn-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .sn-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06121e 0%,#040a16 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .sn-drawer[data-open="true"] { transform:translateX(0); }
-        .sn-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .sn-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .sn-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .sn-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .sn-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:2; }
-        .sn-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      {/* Selector de modo */}
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="sn-tabs">
-          {MODOS.map((m) => {
-            const d = MODOS_DEF[m];
-            const col = `#${d.color.replace("#", "")}`;
-            const on = m === modo;
-            return (
-              <button key={m} className="sn-tab" data-on={on} onClick={() => cambiarModo(m)} style={{ ["--snc" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? col : "inherit" }}><i className={`fa-solid ${d.icono}`} /></div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{d.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{d.subtitulo}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="sn-grid">
-        {/* ── Columna visor ──────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 58vh, 660px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <SeleccionNaturalScene
-                modo={modo}
-                terreno={amb.terreno}
-                cielo={amb.cielo}
-                fClaro={cur.fClaro}
-                predadores={pred.predadores}
-                barras={barras}
-                fitness={fit}
-                tipoColor={`#${tipo.color.replace("#", "")}`}
-                animalSel={animalId}
-                playing={playing}
-                accent={accent}
-                resetNonce={resetNonce}
-                gen={genActual}
-              />
-            </SceneBoundary>
-
-            {/* Cinta EN VIVO */}
-            <div style={{ position: "absolute", top: 14, left: 16, display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)" }}>
-              <span className="sn-live-dot" style={{ ["--snd" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol }} />
-              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3 }}>EN VIVO</span>
-              <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)" }} />
-              <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{def.etq.toUpperCase()}</span>
-            </div>
-
-            {/* Toolbar */}
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="sn-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="sn-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="sn-icobtn" data-on={playing} onClick={() => setPlaying((p) => !p)} title={playing ? "Pausar" : "Reanudar"}>
-                <i className={`fa-solid ${playing ? "fa-pause" : "fa-play"}`} />
-              </button>
-              <button className="sn-icobtn" onClick={reiniciar} title="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            {/* Botón flotante de Teoría */}
-            <button className="sn-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-
-            {/* Pie: lectura en vivo */}
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 18px 14px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                {def.etq} — {def.subtitulo}
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6 }}>{pie}</div>
-            </div>
-          </div>
-
-          {/* Panel de control del modo */}
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-                Controles — {def.etq}
-              </Eyebrow>
-              <span style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: def.fuente === "A2" ? "#fcd34d" : def.fuente === "A5" ? "#86efac" : "#7dd3fc", border: `1px solid ${def.fuente === "A2" ? "#fcd34d55" : def.fuente === "A5" ? "#86efac55" : "#7dd3fc55"}`, borderRadius: 6, padding: "3px 7px" }}>
-                {def.fuente === "A2" ? "SIMULACIÓN A2" : def.fuente === "A5" ? "GLOSARIO A5" : "LECTURA A1"}
-              </span>
-            </div>
-            {control}
-          </div>
-        </div>
-
-        {/* ── Columna lateral ────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          {/* Descripción del laboratorio */}
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-dna" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>El visor de la evolución</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          {/* Ancla por modo */}
-          {modo === "conejos" && (
-            <>
-              <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #fcd34d55", background: "rgba(252,211,77,0.07)" }}>
-                <Eyebrow><i className="fa-solid fa-flask-vial" style={{ marginRight: 8, color: "#fcd34d" }} />Simulación A2 — Selección natural en conejos</Eyebrow>
-                <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55, marginBottom: 12 }}>{A2_DESCRIPCION}</div>
-                <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", marginBottom: 8 }}>PARA REFLEXIONAR</div>
-                <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-                  {PREGUNTAS_A2.map((q, i) => (
-                    <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>{q}</li>
-                  ))}
-                </ul>
-              </div>
-              <div style={{ ...card, padding: "18px 20px 20px" }}>
-                <Eyebrow><i className="fa-solid fa-list-check" style={{ marginRight: 8, color: accent }} />Los 4 postulados de Darwin</Eyebrow>
-                <div style={{ display: "grid", gap: 9 }}>
-                  {POSTULADOS.map((p) => (
-                    <div key={p.n} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                      <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{p.n}</div>
-                      <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p.texto}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </>
-          )}
-          {modo === "tipos" && (
-            <div style={{ ...card, padding: "18px 20px 20px" }}>
-              <Eyebrow><i className="fa-solid fa-layer-group" style={{ marginRight: 8, color: accent }} />Tres tipos de selección (A5)</Eyebrow>
-              <div style={{ display: "grid", gap: 10 }}>
-                {TIPOS_SEL.map((tp) => {
-                  const c = `#${tp.color.replace("#", "")}`;
-                  return (
-                    <div key={tp.id} style={{ padding: "11px 13px", borderRadius: 11, background: tp.id === tipoId ? `${c}14` : "rgba(4,10,22,0.4)", border: `1px solid ${tp.id === tipoId ? `${c}55` : T.line}` }}>
-                      <div style={{ fontSize: 12.5, fontWeight: 900, color: c, marginBottom: 3 }}><i className={`fa-solid ${tp.icono}`} style={{ marginRight: 7 }} />{tp.etq}</div>
-                      <div style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>Selección {tp.definicion}.</div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-          {modo === "evidencias" && (
-            <div style={{ ...card, padding: "18px 20px 20px" }}>
-              <Eyebrow><i className="fa-solid fa-code-branch" style={{ marginRight: 8, color: accent }} />Homólogas vs. análogas (A5)</Eyebrow>
-              <div style={{ padding: "11px 13px", borderRadius: 11, background: `${modoCol}12`, border: `1px solid ${modoCol}44`, marginBottom: 10 }}>
-                <div style={{ fontSize: 12, color: "#eaf0fb", lineHeight: 1.5 }}>{HOMOLOGAS_DEF}</div>
-              </div>
-              <div style={{ padding: "11px 13px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5 }}>{ANALOGAS_DEF}</div>
-              </div>
-              <div style={{ marginTop: 12, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderRadius: 11, background: `rgba(${color.rgba},0.12)`, border: `1px solid ${accent}44` }}>
-                <span style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}>ADN humano–chimpancé</span>
-                <span style={{ fontSize: 20, fontWeight: 900, color: accent, fontFamily: "ui-monospace, monospace" }}>~98.7%</span>
-              </div>
-            </div>
-          )}
-
-          {/* Cómo usar */}
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow><i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />Cómo usar el laboratorio</Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
-                </div>
+  const controles: ReactNode = (
+    <>
+      {modo === "conejos" && (
+        <>
+          <Bloque titulo="Ambiente: ¿dónde viven?" icono="fa-globe">
+            <div style={rejilla3}>
+              {AMBIENTES.map((a) => (
+                <button key={a.id} type="button" onClick={() => cambiarAmbiente(a.id)} style={sel(a.id === ambienteId, modoCol)}>
+                  <div style={{ fontSize: 17, marginBottom: 3, color: a.id === ambienteId ? modoCol : "inherit" }}><i className={`fa-solid ${a.icono}`} aria-hidden /></div>
+                  {a.etq}
+                </button>
               ))}
             </div>
-          </div>
-        </div>
-      </div>
+            <p style={{ margin: 0, color: T.text2 }}>{amb.descripcion}</p>
+          </Bloque>
+          <Bloque titulo="Presión depredadora" icono="fa-crow">
+            <div style={rejilla3}>
+              {PREDACION.map((p) => (
+                <button key={p.id} type="button" onClick={() => cambiarPredacion(p.id)} style={sel(p.id === predacionId, modoCol)}>
+                  {p.etq}
+                  <div style={{ fontSize: 14, color: T.text3, fontWeight: 600 }}>{p.predadores} {p.predadores === 1 ? "ave" : "aves"}</div>
+                </button>
+              ))}
+            </div>
+          </Bloque>
+          <Bloque titulo="Tiempo" icono="fa-hourglass-half">
+            <Deslizador label="Generación" icon="fa-clock" colr={modoCol} valor={`${genActual} / ${maxGen}`} min={0} max={maxGen} step={1} value={genActual}
+              onChange={(v) => { setPlaying(false); setGen(v); }} hintL="hoy" hintR={`${maxGen} generaciones después`} />
+          </Bloque>
+          <Bloque titulo="Qué pasa con la población" icono="fa-chart-line">
+            <ChartFrecuencias traj={traj} gen={genActual} />
+            <div style={{ display: "flex", gap: 16, flexWrap: "wrap", color: T.text2 }}>
+              <span><span aria-hidden style={{ display: "inline-block", width: 14, height: 4, borderRadius: 2, background: "#e9eef4", marginRight: 6, verticalAlign: "middle" }} />claros</span>
+              <span><span aria-hidden style={{ display: "inline-block", width: 14, height: 4, borderRadius: 2, background: "#c9a98a", marginRight: 6, verticalAlign: "middle" }} />oscuros</span>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+              <Dato label="Pelaje oscuro" value={`${pctOscuro}%`} col="#c9a98a" />
+              <Dato label="Pelaje claro" value={`${pctClaro}%`} col="#e9eef4" />
+              <Dato label="Alelo D (osc.)" value={`${pctD}%`} col={modoCol} />
+              <Dato label="Aptitud media" value={cur.wbar.toFixed(2)} col="#fbbf24" />
+            </div>
+            {nota(modoCol, <>En {amb.etq.toLowerCase()} se camufla el pelaje <strong>{camuflado}</strong>: los depredadores ven mejor al otro y se lo comen. Tras {genActual} generaciones predomina el <strong>{morfoDominante}</strong> ({morfoDominante === "claro" ? pctClaro : pctOscuro}%).</>)}
+          </Bloque>
+        </>
+      )}
 
-      {/* ── Lecturas + ideas clave ─────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="sn-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow><i className="fa-solid fa-magnifying-glass-chart" style={{ marginRight: 8, color: accent }} />Datos y evidencias</Eyebrow>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
-            {DATOS.map((dd, i) => (
-              <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "10px 12px", borderRadius: 10, background: T.glass, border: `1px solid ${T.line}` }}>
-                <div style={{ width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: accent, background: `rgba(${color.rgba},0.16)`, flexShrink: 0 }}>
-                  <i className={`fa-solid ${dd.icono}`} />
-                </div>
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{dd.valor}</div>
-                  <div style={{ fontSize: 11, color: T.text2, lineHeight: 1.4 }}>{dd.texto}</div>
-                </div>
+      {modo === "tipos" && (
+        <>
+          <Bloque titulo="Tipo de selección" icono="fa-chart-column">
+            <div style={rejilla3}>
+              {TIPOS_SEL.map((tp) => {
+                const c = `#${tp.color.replace("#", "")}`;
+                return (
+                  <button key={tp.id} type="button" onClick={() => cambiarTipo(tp.id)} style={sel(tp.id === tipoId, c)}>
+                    <div style={{ fontSize: 17, marginBottom: 3, color: tp.id === tipoId ? c : "inherit" }}><i className={`fa-solid ${tp.icono}`} aria-hidden /></div>
+                    {tp.etq}
+                  </button>
+                );
+              })}
+            </div>
+            {nota(modoCol, <><strong style={{ color: modoCol }}>{tipo.etq}.</strong> Selección {tipo.definicion}. <span style={{ color: T.text2 }}>{tipo.ejemplo}</span></>)}
+          </Bloque>
+          <Bloque titulo="Tiempo" icono="fa-hourglass-half">
+            <Deslizador label="Generación" icon="fa-clock" colr={modoCol} valor={`${genActual} / ${maxGen}`} min={0} max={maxGen} step={1} value={genActual}
+              onChange={(v) => { setPlaying(false); setGen(v); }} hintL="población inicial" hintR={`${maxGen} generaciones`} />
+          </Bloque>
+          <Bloque titulo="Dónde está el rasgo" icono="fa-gauge-high">
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+              <Dato label="Rasgo pequeño" value={`${pPeq}%`} />
+              <Dato label="Rasgo mediano" value={`${pMed}%`} col={modoCol} />
+              <Dato label="Rasgo grande" value={`${pGra}%`} />
+            </div>
+            <p style={{ margin: 0, color: T.text2 }}>Las barras altas y brillantes son las más aptas; la esfera marca la aptitud de cada una.</p>
+          </Bloque>
+        </>
+      )}
+
+      {modo === "evidencias" && (
+        <>
+          <Bloque titulo="Extremidad a resaltar" icono="fa-bone">
+            <div style={rejilla3}>
+              {ANIMALES.map((a) => (
+                <button key={a.id} type="button" onClick={() => setAnimalId(a.id)} style={sel(a.id === animalId, modoCol)}>
+                  <div style={{ fontSize: 17, marginBottom: 3, color: a.id === animalId ? modoCol : "inherit" }}><i className={`fa-solid ${a.icono}`} aria-hidden /></div>
+                  {a.etq}
+                </button>
+              ))}
+            </div>
+            {nota(modoCol, <><strong style={{ color: modoCol }}>{animal.etq}</strong> <span style={{ color: T.text3 }}>· {animal.funcion}</span><br />{animal.descripcion}</>)}
+          </Bloque>
+          <Bloque titulo="Mismos huesos, mismo color" icono="fa-palette">
+            {HUESOS_LEYENDA.map((h) => (
+              <div key={h.tipo} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span aria-hidden style={{ width: 16, height: 16, borderRadius: 4, background: h.color, flexShrink: 0, boxShadow: `0 0 8px ${h.color}88` }} />
+                <span style={{ fontWeight: 900, color: "#fff" }}>{h.tipo}</span>
+                <span style={{ color: T.text3 }}>· {h.nota}</span>
               </div>
             ))}
-          </div>
+          </Bloque>
+        </>
+      )}
+    </>
+  );
 
-          {/* Contexto mexicano: CONABIO */}
-          <div style={{ marginTop: 16, padding: "14px 16px", borderRadius: 12, border: `1px solid ${accent}33`, background: `rgba(${color.rgba},0.07)` }}>
-            <Eyebrow><i className="fa-solid fa-location-dot" style={{ marginRight: 8, color: accent }} />México: un país megadiverso</Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{CONTEXTO}</div>
-          </div>
-
-          {/* Glosario */}
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow><i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />Glosario</Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {GLOSARIO.map((g, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{g.termino}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{g.definicion}</span>
-                </div>
-              ))}
+  const teoria: ReactNode = (
+    <>
+      <Bloque titulo="El visor de la evolución" icono="fa-dna">
+        <p style={{ margin: 0, color: T.text2 }}>{PROBLEMA}</p>
+      </Bloque>
+      <Bloque titulo="Simulación A2 — Selección natural en conejos" icono="fa-flask-vial">
+        <p style={{ margin: 0, color: T.text2 }}>{A2_DESCRIPCION}</p>
+        <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+          {PREGUNTAS_A2.map((q, i) => <li key={i}>{q}</li>)}
+        </ul>
+      </Bloque>
+      <Bloque titulo="Los 4 postulados de Darwin" icono="fa-list-check">
+        <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+          {POSTULADOS.map((p) => <li key={p.n}>{p.texto}</li>)}
+        </ol>
+      </Bloque>
+      <Bloque titulo="Tres tipos de selección (A5)" icono="fa-layer-group">
+        {TIPOS_SEL.map((tp) => {
+          const c = `#${tp.color.replace("#", "")}`;
+          return (
+            <p key={tp.id} style={{ margin: 0, padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}`, color: T.text2 }}>
+              <strong style={{ color: c }}>{tp.etq}. </strong>Selección {tp.definicion}.
+            </p>
+          );
+        })}
+      </Bloque>
+      <Bloque titulo="Homólogas vs. análogas (A5)" icono="fa-code-branch">
+        <p style={{ margin: 0, color: T.text2 }}>{HOMOLOGAS_DEF}</p>
+        <p style={{ margin: 0, color: T.text2 }}>{ANALOGAS_DEF}</p>
+        <Dato label="ADN humano–chimpancé" value="~98.7%" col={accent} />
+      </Bloque>
+      <Bloque titulo="Cómo usar el laboratorio" icono="fa-list-ol">
+        <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8 }}>
+          {INSTRUCCIONES.map((p, i) => <li key={i}>{p}</li>)}
+        </ol>
+      </Bloque>
+      <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+        <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+          {IDEAS.map((x, i) => <li key={i}>{x}</li>)}
+        </ul>
+      </Bloque>
+      <Bloque titulo="Datos y evidencias" icono="fa-magnifying-glass-chart">
+        {DATOS.map((dd, i) => (
+          <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+            <i className={`fa-solid ${dd.icono}`} style={{ color: accent, marginTop: 4 }} aria-hidden />
+            <div>
+              <strong style={{ fontFamily: "ui-monospace, monospace" }}>{dd.valor}</strong>
+              <div style={{ color: T.text2 }}>{dd.texto}</div>
             </div>
           </div>
-        </div>
+        ))}
+      </Bloque>
+      <Bloque titulo="México: un país megadiverso" icono="fa-location-dot">
+        <p style={{ margin: 0, color: T.text2 }}>{CONTEXTO}</p>
+      </Bloque>
+      <Bloque titulo="Glosario" icono="fa-book">
+        {GLOSARIO.map((g, i) => (
+          <p key={i} style={{ margin: 0, padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}`, color: T.text2 }}>
+            <strong style={{ color: accent }}>{g.termino}. </strong>{g.definicion}
+          </p>
+        ))}
+      </Bloque>
+      <Bloque titulo="Ficha teórica" icono="fa-book">
+        <FichaTeorica data={SELECCION_NATURAL_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+      </Bloque>
+      <p style={{ marginTop: 18, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
+        La descripción y las preguntas de reflexión del modo «conejos» son <strong>verbatim</strong> de la simulación A2. Los tres tipos de selección y el glosario son verbatim del glosario A5; los cuatro postulados, las evidencias (homología, ~98.7% de ADN compartido con el chimpancé) y el contexto de la CONABIO son verbatim de la lectura A1. El modelo 3D es <strong>esquemático</strong>: las frecuencias alélicas siguen un modelo de un gen con dos alelos (D dominante oscuro, d recesivo claro) y selección sobre el fenotipo con el coeficiente <i>s</i> de la presión elegida; los conejos, los depredadores, las barras del rasgo y los huesos son representaciones visuales (no a escala) para entender el mecanismo, no medidas reales de una población concreta. Fuente: {FUENTE}
+      </p>
+    </>
+  );
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "18px 22px" }}>
-            <Eyebrow><i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />Objetivos</Eyebrow>
-            <div style={{ display: "grid", gap: 10 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 12.5, color: logrosLab[i] ? "#34D399" : T.text2 }}>
-                  <i className={`fa-solid ${logrosLab[i] ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 14, opacity: logrosLab[i] ? 1 : 0.3 }} />
-                  <span style={{ fontWeight: logrosLab[i] ? 700 : 500 }}>{o.txt}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+  return (
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <SeleccionNaturalScene
+            modo={modo}
+            terreno={amb.terreno}
+            cielo={amb.cielo}
+            fClaro={cur.fClaro}
+            predadores={pred.predadores}
+            barras={barras}
+            fitness={fit}
+            tipoColor={`#${tipo.color.replace("#", "")}`}
+            animalSel={animalId}
+            playing={playing}
+            accent={accent}
+            resetNonce={resetNonce}
+            gen={genActual}
+          />
+        </SceneBoundary>
+      }
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m, etiqueta: MODOS_DEF[m].etq, icono: MODOS_DEF[m].icono })),
+        valor: modo,
+        cambiar: (id) => cambiarModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono={playing ? "fa-pause" : "fa-play"} titulo={playing ? "Pausar" : "Reanudar"} activo={playing} onClick={() => setPlaying((p) => !p)} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      pestanas={[
+        { id: "controles", etiqueta: "Controles", icono: "fa-sliders", contenido: controles },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <RetoQuizCard
+              quiz={QUIZ_A2}
+              accent={accent}
+              rgba={color.rgba}
+              aprobado={ejercicioAprobado}
+              onAprobado={() => setEjercicioAprobado(true)}
+              playSfx={() => {
+                if (sonido) audioRef.current?.correcto();
+              }}
+              playPick={() => {
+                if (sonido) audioRef.current?.blip();
+              }}
+            />
+          ),
+        },
+        { id: "teoria", etiqueta: "Teoría", icono: "fa-book-open", contenido: teoria },
+      ]}
+    />
+  );
+}
 
-          <div style={{ ...card, padding: "18px 22px" }}>
-            <Eyebrow><i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />Ideas clave</Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-              {IDEAS.map((x, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>{x}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      {/* nota de honestidad del modelo */}
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          La descripción y las preguntas de reflexión del modo «conejos» son <strong>verbatim</strong> de la simulación A2 (etiqueta «SIMULACIÓN A2»). Los tres tipos de selección y el glosario son verbatim del glosario A5 (etiqueta «GLOSARIO A5»); los cuatro postulados, las evidencias (homología, ~98.7% de ADN compartido con el chimpancé) y el contexto de la CONABIO son verbatim de la lectura A1 (etiqueta «LECTURA A1»). El modelo 3D es <strong>esquemático</strong>: las frecuencias alélicas siguen un modelo de un gen con dos alelos (D dominante oscuro, d recesivo claro) y selección sobre el fenotipo con el coeficiente <i>s</i> de la presión elegida; los conejos, los depredadores, las barras del rasgo y los huesos son representaciones visuales (no a escala) para entender el mecanismo, no medidas reales de una población concreta. Fuente: {FUENTE}
-        </span>
-      </div>
-
-      {/* ── Reto evaluable: el quiz V/F verbatim de A4 ───────────────── */}
-      <RetoQuizCard
-        quiz={QUIZ_A2}
-        accent={accent}
-        rgba={color.rgba}
-        aprobado={ejercicioAprobado}
-        onAprobado={() => setEjercicioAprobado(true)}
-        playSfx={() => {
-          if (sonido) audioRef.current?.correcto();
-        }}
-        playPick={() => {
-          if (sonido) audioRef.current?.blip();
-        }}
-      />
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <div className="sn-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="sn-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="sn-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="sn-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="sn-drawer-body">
-          <FichaTeorica data={SELECCION_NATURAL_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+/* ── Gráfica: frecuencia de cada pelaje a lo largo de las generaciones ──── */
+function ChartFrecuencias({ traj, gen }: { traj: { fClaro: number; fOscuro: number }[]; gen: number }) {
+  const W = 300;
+  const H = 120;
+  const n = Math.max(1, traj.length - 1);
+  const x = (i: number) => 8 + (i / n) * (W - 16);
+  const y = (f: number) => H - 8 - f * (H - 16);
+  const linea = (k: "fClaro" | "fOscuro") => traj.map((g, i) => `${i === 0 ? "M" : "L"}${x(i).toFixed(1)},${y(g[k]).toFixed(1)}`).join(" ");
+  const cur = traj[Math.min(gen, n)] ?? traj[0]!;
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto", borderRadius: 12, background: "rgba(2,12,28,0.5)", border: `1px solid ${T.line}` }} role="img" aria-label="Porcentaje de conejos claros y oscuros por generación">
+      {[0.25, 0.5, 0.75].map((f) => (
+        <line key={f} x1={8} x2={W - 8} y1={y(f)} y2={y(f)} stroke="rgba(255,255,255,0.1)" strokeDasharray="3 4" />
+      ))}
+      <path d={linea("fClaro")} fill="none" stroke="#e9eef4" strokeWidth={3} strokeLinejoin="round" />
+      <path d={linea("fOscuro")} fill="none" stroke="#c9a98a" strokeWidth={3} strokeLinejoin="round" />
+      <line x1={x(gen)} x2={x(gen)} y1={6} y2={H - 6} stroke="#fcd34d" strokeWidth={2} />
+      <circle cx={x(gen)} cy={y(cur.fClaro)} r={5} fill="#e9eef4" stroke="#04121f" strokeWidth={1.5} />
+      <circle cx={x(gen)} cy={y(cur.fOscuro)} r={5} fill="#c9a98a" stroke="#04121f" strokeWidth={1.5} />
+    </svg>
   );
 }

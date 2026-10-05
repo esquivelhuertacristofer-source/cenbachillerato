@@ -19,8 +19,8 @@
  */
 
 import * as THREE from "three";
-import { useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import React, { useRef } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { type Modo, type Escena } from "./equilibrio-data";
@@ -34,6 +34,16 @@ export interface EquilibrioSceneProps {
   playing: boolean;
   modoColor: string;
   resetNonce: number;
+  /** Presión sobre el pistón 0..1 (modo Le Châtelier). */
+  presion: number;
+  /** Posición de Q en la escala log respecto a Kc (0.5 = Q igual a Kc), modo constante. */
+  qPos: number;
+  /** Fracción de producto en la mezcla (modo constante). */
+  prodFrac: number;
+  ecuacionTxt: string;
+  /** Texto del sentido de avance (p. ej. «Q < Kc → derecha»). */
+  sentidoTxt: string;
+  sentidoCol: string;
 }
 
 const AZUL = new THREE.Color("#3b82f6"); // N₂O₄ / N
@@ -50,16 +60,16 @@ function pillStyle(color: string): React.CSSProperties {
     background: "rgba(4,10,22,0.82)",
     border: `1px solid ${color}`,
     color: "#fff",
-    fontSize: 11,
+    fontSize: 14,
     fontWeight: 800,
     whiteSpace: "nowrap",
     boxShadow: "0 6px 18px -8px #000",
   };
 }
 
-function Etiqueta({ pos, color, children, df = 14 }: { pos: Pt; color: string; children: React.ReactNode; df?: number }) {
+function Etiqueta({ pos, color, children }: { pos: Pt; color: string; children: React.ReactNode }) {
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div style={pillStyle(color)}>{children}</div>
     </Html>
   );
@@ -85,6 +95,7 @@ function Caja({ s = 4 }: { s?: number }) {
 const N_MOL = 14;
 
 function Reversible({ frac, playing }: { frac: number; playing: boolean }) {
+  const ancho = useThree((st) => st.size.width);
   const slots = useRef<(THREE.Group | null)[]>([]);
   const izq = useRef<(THREE.Mesh | null)[]>([]);
   const der = useRef<(THREE.Mesh | null)[]>([]);
@@ -215,7 +226,7 @@ function Reversible({ frac, playing }: { frac: number; playing: boolean }) {
       </group>
       <Etiqueta pos={[-3.5, 2.4, 0]} color="#fb923c">v directa →</Etiqueta>
       <Etiqueta pos={[3.5, 2.4, 0]} color="#38bdf8">← v inversa</Etiqueta>
-      <Etiqueta pos={[0, 3.1, 0]} color="#fb923c">N₂O₄ ⇌ 2 NO₂</Etiqueta>
+      {ancho >= 640 && <Etiqueta pos={[0, 3.1, 0]} color="#fb923c">N₂O₄ ⇌ 2 NO₂</Etiqueta>}
     </group>
   );
 }
@@ -223,7 +234,9 @@ function Reversible({ frac, playing }: { frac: number; playing: boolean }) {
 /* ── CONSTANTE: proceso Haber con medidor Q vs Kc ─────────────────────────── */
 const N_HAB = 12;
 
-function Constante({ frac, playing }: { frac: number; playing: boolean }) {
+function Constante({ qPos, prodFrac, playing, ecuacionTxt, sentidoTxt, sentidoCol }: { qPos: number; prodFrac: number; playing: boolean; ecuacionTxt: string; sentidoTxt: string; sentidoCol: string }) {
+  const ancho = useThree((st) => st.size.width);
+  const qActual = useRef(0.5);
   const mols = useRef<(THREE.Group | null)[]>([]);
   const aguja = useRef<THREE.Mesh>(null);
   const t = useRef(0);
@@ -239,7 +252,7 @@ function Constante({ frac, playing }: { frac: number; playing: boolean }) {
   useFrame((_, dt) => {
     if (playing) t.current += dt;
     // a frac sube, parte de las moléculas "se convierten" en NH₃ (se encogen y reaparecen)
-    const conv = 0.5 * frac;
+    const conv = clamp01(prodFrac); // la mezcla refleja las concentraciones elegidas
     for (let i = 0; i < N_HAB; i++) {
       const g = mols.current[i];
       const b = base.current[i] ?? [0, 0, 0];
@@ -253,9 +266,10 @@ function Constante({ frac, playing }: { frac: number; playing: boolean }) {
       }
     }
     // medidor: Q sube de 0 a Kc conforme frac → 1. La aguja recorre la barra.
+    // medidor: la línea de Kc queda fija al centro; la aguja sube si Q > Kc y baja si Q < Kc
+    qActual.current += (clamp01(qPos) - qActual.current) * Math.min(1, dt * 5);
     if (aguja.current) {
-      const y = -2.6 + frac * 5.0; // de abajo (Q=0) a la línea Kc (arriba)
-      aguja.current.position.y = y;
+      aguja.current.position.y = (qActual.current - 0.5) * 5.0;
     }
   });
 
@@ -290,20 +304,21 @@ function Constante({ frac, playing }: { frac: number; playing: boolean }) {
           <boxGeometry args={[0.18, 5.2, 0.18]} />
           <meshStandardMaterial color="#1e293b" />
         </mesh>
-        {/* línea fija de Kc (arriba) */}
-        <mesh position={[0, 2.4, 0]}>
+        {/* línea fija de Kc (al centro) */}
+        <mesh position={[0, 0, 0]}>
           <boxGeometry args={[0.9, 0.1, 0.4]} />
           <meshStandardMaterial color="#34d399" emissive="#34d399" emissiveIntensity={0.7} />
         </mesh>
         {/* aguja de Q */}
-        <mesh ref={aguja} position={[0, -2.6, 0]}>
+        <mesh ref={aguja} position={[0, 0, 0]}>
           <boxGeometry args={[0.7, 0.16, 0.4]} />
           <meshStandardMaterial color="#fbbf24" emissive="#fbbf24" emissiveIntensity={0.8} />
+          <Etiqueta pos={[1.0, 0, 0]} color="#fbbf24">Q</Etiqueta>
         </mesh>
-        <Etiqueta pos={[0, 2.9, 0]} color="#34d399">Kc</Etiqueta>
-        <Etiqueta pos={[1.5, 0, 0]} color="#fbbf24">Q</Etiqueta>
+        <Etiqueta pos={[-1.0, 0, 0]} color="#34d399">Kc</Etiqueta>
       </group>
-      <Etiqueta pos={[0, 3.1, 0]} color="#38bdf8">N₂ + 3 H₂ ⇌ 2 NH₃</Etiqueta>
+      <Etiqueta pos={[0, -3.1, 0]} color={sentidoCol}>{sentidoTxt}</Etiqueta>
+      {ancho >= 640 && <Etiqueta pos={[0, 3.1, 0]} color="#38bdf8">{ecuacionTxt}</Etiqueta>}
     </group>
   );
 }
@@ -311,7 +326,9 @@ function Constante({ frac, playing }: { frac: number; playing: boolean }) {
 /* ── LE CHÂTELIER: pistón que comprime 2 NO₂ ⇌ N₂O₄ ───────────────────────── */
 const N_LC = 12;
 
-function LeChatelier({ frac, playing }: { frac: number; playing: boolean }) {
+function LeChatelier({ presion, playing }: { presion: number; playing: boolean }) {
+  const ancho = useThree((st) => st.size.width);
+  const pActual = useRef(0);
   const piston = useRef<THREE.Group>(null);
   const slots = useRef<(THREE.Group | null)[]>([]);
   const izq = useRef<(THREE.Mesh | null)[]>([]);
@@ -331,9 +348,11 @@ function LeChatelier({ frac, playing }: { frac: number; playing: boolean }) {
 
   useFrame((_, dt) => {
     if (playing) t.current += dt;
-    // frac 0→0.5: el pistón baja (comprime). 0.5→1: el sistema responde uniendo NO₂→N₂O₄.
-    const compresion = clamp01(frac / 0.5);
-    const respuesta = clamp01((frac - 0.5) / 0.5);
+    // el pistón baja con la presión elegida (comprime) y el sistema responde uniendo NO₂ → N₂O₄
+    // (el lado con menos moles de gas), con un pequeño retraso.
+    pActual.current += (clamp01(presion) - pActual.current) * Math.min(1, dt * 3);
+    const compresion = pActual.current;
+    const respuesta = clamp01((pActual.current - 0.15) / 0.85);
     if (piston.current) {
       piston.current.position.y = 2.2 - compresion * 1.0;
     }
@@ -436,7 +455,7 @@ function LeChatelier({ frac, playing }: { frac: number; playing: boolean }) {
           </mesh>
         </group>
       ))}
-      <Etiqueta pos={[0, -3.0, 0]} color="#a78bfa">2 NO₂ ⇌ N₂O₄ (menos moles →)</Etiqueta>
+      {ancho >= 640 && <Etiqueta pos={[0, -3.1, 0]} color="#a78bfa">N₂O₄ ⇌ 2 NO₂: la presión favorece N₂O₄</Etiqueta>}
     </group>
   );
 }
@@ -505,9 +524,18 @@ function Reaccionita({ irreversible, playing }: { irreversible: boolean; playing
   );
 }
 
-function Contenido({ modo, escena, playing, modoColor, resetNonce }: EquilibrioSceneProps) {
+function Contenido({ modo, escena, playing, modoColor, resetNonce, presion, qPos, prodFrac, ecuacionTxt, sentidoTxt, sentidoCol }: EquilibrioSceneProps) {
+  const ancho = useThree((st) => st.size.width);
   const giro = useRef<THREE.Group>(null);
-  useFrame((_, dt) => {
+  const anchoVisto = useRef(0);
+  useFrame(({ camera, size }, dt) => {
+    // En vertical (celular) la cámara se aleja para que quepa la escena.
+    if (anchoVisto.current !== size.width) {
+      anchoVisto.current = size.width;
+      const asp = size.width / Math.max(1, size.height);
+      const base = modo === "comparar" ? 17 : 13;
+      camera.position.setLength(base * Math.max(1, 1.3 / asp));
+    }
     if (giro.current && playing && modo !== "comparar" && modo !== "lechatelier") {
       giro.current.rotation.y += dt * 0.08;
     }
@@ -524,21 +552,21 @@ function Contenido({ modo, escena, playing, modoColor, resetNonce }: EquilibrioS
 
       <group ref={giro} key={`${modo}-${resetNonce}`}>
         {modo === "reversible" && <Reversible frac={escena.frac} playing={playing} />}
-        {modo === "constante" && <Constante frac={escena.frac} playing={playing} />}
-        {modo === "lechatelier" && <LeChatelier frac={escena.frac} playing={playing} />}
+        {modo === "constante" && <Constante qPos={qPos} prodFrac={prodFrac} playing={playing} ecuacionTxt={ecuacionTxt} sentidoTxt={sentidoTxt} sentidoCol={sentidoCol} />}
+        {modo === "lechatelier" && <LeChatelier presion={presion} playing={playing} />}
 
         {modo === "comparar" && (
           <>
             <group position={[-4.0, 0, 0]}>
               <Reaccionita irreversible={false} playing={playing} />
             </group>
-            <Etiqueta pos={[-4.0, 2.7, 0]} color="#34d399aa">Reversible ⇌ (equilibrio)</Etiqueta>
+            {ancho >= 640 && <Etiqueta pos={[-4.0, 2.7, 0]} color="#34d399aa">Reversible ⇌ (equilibrio)</Etiqueta>}
             <Line points={[[-4.6, -2.4, 0], [-3.4, -2.4, 0]]} color="#34d399" lineWidth={2} />
 
             <group position={[4.0, 0, 0]}>
               <Reaccionita irreversible playing={playing} />
             </group>
-            <Etiqueta pos={[4.0, 2.7, 0]} color="#fb923caa">Irreversible → (se agota)</Etiqueta>
+            {ancho >= 640 && <Etiqueta pos={[4.0, 2.7, 0]} color="#fb923caa">Irreversible → (se agota)</Etiqueta>}
             <Line points={[[3.4, -2.4, 0], [4.6, -2.4, 0]]} color="#fb923c" lineWidth={2} />
           </>
         )}
@@ -556,10 +584,10 @@ function Contenido({ modo, escena, playing, modoColor, resetNonce }: EquilibrioS
 export default function EquilibrioScene(props: EquilibrioSceneProps) {
   const cam: Pt =
     props.modo === "comparar"
-      ? [0, 1.0, 16]
+      ? [0, 1.0, 17]
       : props.modo === "lechatelier"
-        ? [0, 0.6, 12]
-        : [0, 0.8, 12];
+        ? [0, 0.6, 13]
+        : [0, 0.8, 13];
   return (
     <Canvas key={props.modo} shadows dpr={[1, 2]} camera={{ position: cam, fov: 50 }} gl={{ antialias: true }} style={{ width: "100%", height: "100%" }}>
       <Contenido {...props} />

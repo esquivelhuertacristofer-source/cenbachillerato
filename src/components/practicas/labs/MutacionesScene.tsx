@@ -22,8 +22,8 @@
 
 import * as THREE from "three";
 import { useRef, type ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Html, Line, Stars } from "@react-three/drei";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { type Base, BASE_COLOR } from "./adn-dogma-data";
 import { Escenario } from "./_escenario";
@@ -66,11 +66,46 @@ function seg(a: Pt, b: Pt): { pos: Pt; quat: [number, number, number, number]; l
   return { pos: [mid.x, mid.y, mid.z], quat: [q.x, q.y, q.z, q.w], len };
 }
 
-/* ── Etiqueta flotante (Html) ─────────────────────────────────────────── */
-function Etiqueta({ pos, children, df = 10, col }: { pos: Pt; children: ReactNode; df?: number; col?: string }) {
+/* ── Encuadre: la escena se ajusta al escenario, entre la barra y la misión ─ */
+const CAM_Z = 12;
+const CAM_FOV = 46;
+const RESERVA_ARRIBA = 64;
+const RESERVA_ABAJO = 150;
+interface Caja { x0: number; x1: number; y0: number; y1: number }
+
+function planEncuadre(caja: Caja, W: number, H: number) {
+  const visH = 2 * CAM_Z * Math.tan(((CAM_FOV / 2) * Math.PI) / 180);
+  const wpp = visH / Math.max(1, H);
+  const uH = Math.max(H * 0.4, H - RESERVA_ARRIBA - RESERVA_ABAJO) * wpp;
+  const uW = Math.max(W * 0.5, W - 24) * wpp;
+  const subir = ((RESERVA_ABAJO - RESERVA_ARRIBA) / 2) * wpp;
+  const s = Math.min(uW / (caja.x1 - caja.x0), uH / (caja.y1 - caja.y0), 1.5);
+  return { s, x: -((caja.x0 + caja.x1) / 2) * s, y: -((caja.y0 + caja.y1) / 2) * s + subir };
+}
+
+/** ¿Pantalla angosta? Entonces los rótulos anchos se ocultan (la info está en el panel). */
+function useAngosta() {
+  return useThree((s) => s.size.width) < 640;
+}
+
+/* ── Barra sólida entre dos puntos (en lugar de líneas de 1 px) ───────── */
+function Barra({ a, b, r = 0.045, color }: { a: Pt; b: Pt; r?: number; color: string }) {
+  const { pos, quat, len } = seg(a, b);
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 11px", borderRadius: 999, background: "rgba(4,10,22,0.82)", border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`, color: "#fff", fontSize: 12, fontWeight: 800, whiteSpace: "nowrap", boxShadow: "0 6px 18px -8px #000" }}>
+    <mesh position={pos} quaternion={quat}>
+      <cylinderGeometry args={[r, r, len, 8]} />
+      <meshStandardMaterial color={color} roughness={0.5} metalness={0.1} />
+    </mesh>
+  );
+}
+
+/* ── Etiqueta flotante (Html, tamaño fijo en píxeles) ─────────────────── */
+function Etiqueta({ pos, children, col, ancha = false }: { pos: Pt; children: ReactNode; df?: number; col?: string; ancha?: boolean }) {
+  const angosta = useAngosta();
+  if (ancha && angosta) return null;
+  return (
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 11px", borderRadius: 999, background: "rgba(4,10,22,0.82)", border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`, color: "#fff", fontSize: 14, fontWeight: 800, whiteSpace: "nowrap", boxShadow: "0 6px 18px -8px #000" }}>
         {children}
       </div>
     </Html>
@@ -78,10 +113,10 @@ function Etiqueta({ pos, children, df = 10, col }: { pos: Pt; children: ReactNod
 }
 
 /* ── Texto pequeño anclado a un punto (sin fondo) ─────────────────────── */
-function Letra({ pos, children, df = 8, col = "#e2e8f0", size = 14 }: { pos: Pt; children: ReactNode; df?: number; col?: string; size?: number }) {
+function Letra({ pos, children, col = "#e2e8f0", size = 14 }: { pos: Pt; children: ReactNode; df?: number; col?: string; size?: number }) {
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
-      <div style={{ color: col, fontSize: size, fontWeight: 900, whiteSpace: "nowrap", textShadow: "0 2px 6px #000" }}>{children}</div>
+    <Html position={pos} center zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
+      <div style={{ color: col, fontSize: Math.max(14, size), fontWeight: 900, whiteSpace: "nowrap", textShadow: "0 2px 6px #000" }}>{children}</div>
     </Html>
   );
 }
@@ -91,7 +126,7 @@ function Letra({ pos, children, df = 8, col = "#e2e8f0", size = 14 }: { pos: Pt;
  * ════════════════════════════════════════════════════════════════════════ */
 
 /** Tesela de un nucleótido del ARNm; pulsa si es el sitio mutado. */
-function NucTile({ x, base, mutado, playing }: { x: number; base: string; mutado: boolean; playing: boolean }) {
+function NucTile({ x, base, mutado, playing, letra }: { x: number; base: string; mutado: boolean; playing: boolean; letra: boolean }) {
   const ref = useRef<THREE.Mesh>(null);
   const col = BASE_COLOR[base as Base] ?? "#94a3b8";
   useFrame((s) => {
@@ -112,8 +147,8 @@ function NucTile({ x, base, mutado, playing }: { x: number; base: string; mutado
         <boxGeometry args={[0.42, 0.42, 0.42]} />
         <meshStandardMaterial color={col} emissive={col} emissiveIntensity={0.3} roughness={0.4} />
       </mesh>
-      <Letra pos={[0, 0, 0.3]} df={7} size={15} col="#04121f">{base}</Letra>
-      {mutado && <Letra pos={[0, 0.55, 0]} df={9} col="#fca5a5" size={12}>▲</Letra>}
+      {letra && <Letra pos={[0, 0, 0.3]} size={15} col="#04121f">{base}</Letra>}
+      {mutado && <Letra pos={[0, 0.55, 0]} col="#fca5a5" size={12}>▲</Letra>}
     </group>
   );
 }
@@ -137,7 +172,7 @@ function AminoBead({ x, y, color, abr, paro, resaltar, faint, playing }: { x: nu
           <boxGeometry args={[0.36, 0.36, 0.36]} />
           <meshStandardMaterial color="#ef4444" emissive="#b91c1c" emissiveIntensity={0.6} />
         </mesh>
-        <Letra pos={[0, -0.5, 0]} df={9} col="#fca5a5" size={11}>STOP</Letra>
+        <Letra pos={[0, -0.5, 0]} col="#fca5a5" size={11}>STOP</Letra>
       </group>
     );
   }
@@ -147,13 +182,14 @@ function AminoBead({ x, y, color, abr, paro, resaltar, faint, playing }: { x: nu
         <sphereGeometry args={[0.26, 20, 20]} />
         <meshStandardMaterial color={color} emissive={color} emissiveIntensity={resaltar ? 0.7 : 0.35} roughness={0.4} transparent opacity={faint ? 0.25 : 1} />
       </mesh>
-      <Letra pos={[0, -0.5, 0]} df={9} col={faint ? "#475569" : "#e2e8f0"} size={11}>{abr}</Letra>
-      {resaltar && <Letra pos={[0, 0.6, 0]} df={9} col="#fde047" size={12}>★</Letra>}
+      <Letra pos={[0, -0.5, 0]} col={faint ? "#475569" : "#e2e8f0"} size={11}>{abr}</Letra>
+      {resaltar && <Letra pos={[0, 0.6, 0]} col="#fde047" size={12}>★</Letra>}
     </group>
   );
 }
 
 function MundoPuntuales({ analisis, playing }: { analisis: AnalisisPuntual; playing: boolean }) {
+  const angosta = useAngosta();
   const { arnmOriginal, arnmMutado, protOriginal, protMutada, cambioIdx, def } = analisis;
 
   // primer nucleótido distinto entre ARNm original y mutado
@@ -166,7 +202,7 @@ function MundoPuntuales({ analisis, playing }: { analisis: AnalisisPuntual; play
   const step = 0.5;
   const startX = -((arnmMutado.length - 1) * step) / 2;
   const tiles = [...arnmMutado].map((b, i) => (
-    <NucTile key={i} x={startX + i * step} base={b} mutado={i === nucDif && def.id !== "ninguna"} playing={playing} />
+    <NucTile key={i} x={startX + i * step} base={b} mutado={i === nucDif && def.id !== "ninguna"} playing={playing} letra={!(angosta && arnmMutado.length > 14)} />
   ));
 
   // cadenas de aminoácidos
@@ -195,13 +231,13 @@ function MundoPuntuales({ analisis, playing }: { analisis: AnalisisPuntual; play
   const enlacesMut: ReactNode[] = [];
   for (let i = 0; i < protMutada.length - 1; i++) {
     enlacesMut.push(
-      <Line key={`lm${i}`} points={[[startMut + i * bstep, -1.6, 0], [startMut + (i + 1) * bstep, -1.6, 0]]} color="#64748b" lineWidth={2} />,
+      <Barra key={`lm${i}`} a={[startMut + i * bstep, -1.6, 0]} b={[startMut + (i + 1) * bstep, -1.6, 0]} r={0.06} color="#64748b" />,
     );
   }
   const enlacesOrig: ReactNode[] = [];
   for (let i = 0; i < protOriginal.length - 1; i++) {
     enlacesOrig.push(
-      <Line key={`lo${i}`} points={[[startOrig + i * bstep, 0.55, 0], [startOrig + (i + 1) * bstep, 0.55, 0]]} color="#64748b" lineWidth={2} />,
+      <Barra key={`lo${i}`} a={[startOrig + i * bstep, 0.55, 0]} b={[startOrig + (i + 1) * bstep, 0.55, 0]} r={0.06} color="#64748b" />,
     );
   }
 
@@ -214,12 +250,12 @@ function MundoPuntuales({ analisis, playing }: { analisis: AnalisisPuntual; play
 
       {enlacesOrig}
       {cadenaOrig}
-      <Etiqueta pos={[startOrig - 0.9, 0.55, 0]} col="#34d399aa" df={11}>Original</Etiqueta>
+      <Etiqueta pos={[startOrig - 0.9, 0.55, 0]} col="#34d399aa">Original</Etiqueta>
 
       {enlacesMut}
       {cadenaMut}
       {perdidos}
-      <Etiqueta pos={[Math.min(startMut, startOrig) - 0.9, -1.6, 0]} col={def.id === "silenciosa" ? "#34d399aa" : "#f87171aa"} df={11}>
+      <Etiqueta pos={[Math.min(startMut, startOrig) - 0.9, -1.6, 0]} col={def.id === "silenciosa" ? "#34d399aa" : "#f87171aa"}>
         {def.id === "ninguna" ? "Proteína" : "Mutada"}
       </Etiqueta>
     </group>
@@ -253,7 +289,7 @@ function Cromosoma({ x, bandas, marca, label, labelCol }: { x: number; bandas: B
         <meshStandardMaterial color="#e2e8f0" metalness={0.4} roughness={0.5} />
       </mesh>
       {items}
-      <Etiqueta pos={[x, total / 2 + 0.55, 0]} col={labelCol} df={11}>{label}</Etiqueta>
+      <Etiqueta pos={[x, total / 2 + 0.55, 0]} col={labelCol}>{label}</Etiqueta>
     </group>
   );
 }
@@ -271,7 +307,7 @@ function BandaBox({ x, y, h, color, gen, resaltar }: { x: number; y: number; h: 
         <boxGeometry args={[0.9, h * 0.86, 0.5]} />
         <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.25} roughness={0.45} />
       </mesh>
-      <Letra pos={[0, 0, 0.32]} df={8} size={13} col="#04121f">{gen}</Letra>
+      <Letra pos={[0, 0, 0.32]} size={13} col="#04121f">{gen}</Letra>
     </group>
   );
 }
@@ -287,7 +323,7 @@ function MundoCromosomicas({ resultado, def }: { resultado: ResultadoCromo; def:
         {xs.map((x, i) => (
           <Cromosoma key={i} x={x} bandas={ref} marca={[]} label={`Copia ${i + 1}`} labelCol="#a855f7aa" />
         ))}
-        <Etiqueta pos={[0, 2.7, 0]} col="#a855f7aa">
+        <Etiqueta pos={[0, 2.7, 0]} col="#a855f7aa" ancha>
           <i className="fa-solid fa-1" style={{ color: "#c084fc" }} /> Trisomía 21 · 3 cromosomas (no disyunción)
         </Etiqueta>
       </group>
@@ -300,7 +336,7 @@ function MundoCromosomicas({ resultado, def }: { resultado: ResultadoCromo; def:
         <Cromosoma x={-2.4} bandas={ref} marca={[]} label="Normal" labelCol="#38bdf8aa" />
         <Cromosoma x={0} bandas={resultado.principal} marca={resultado.marca} label="Cromosoma 1" labelCol="#60a5faaa" />
         <Cromosoma x={2.4} bandas={resultado.secundario} marca={[2, 3]} label="Cromosoma 2" labelCol="#60a5faaa" />
-        <Etiqueta pos={[0, 2.9, 0]} col="#60a5faaa">
+        <Etiqueta pos={[0, 2.9, 0]} col="#60a5faaa" ancha>
           <i className="fa-solid fa-right-left" style={{ color: "#93c5fd" }} /> Translocación: D-E pasan a otro cromosoma
         </Etiqueta>
       </group>
@@ -312,7 +348,7 @@ function MundoCromosomicas({ resultado, def }: { resultado: ResultadoCromo; def:
     <group>
       <Cromosoma x={-1.6} bandas={ref} marca={[]} label="Normal" labelCol="#38bdf8aa" />
       <Cromosoma x={1.6} bandas={resultado.principal} marca={resultado.marca} label={def.etq} labelCol={`${def.color}aa`} />
-      <Etiqueta pos={[0, 2.9, 0]} col={`${def.color}aa`}>
+      <Etiqueta pos={[0, 2.9, 0]} col={`${def.color}aa`} ancha>
         <i className={`fa-solid ${def.icono}`} style={{ color: def.color }} /> {def.etq}
       </Etiqueta>
     </group>
@@ -399,15 +435,15 @@ function MundoMutagenos({ mutageno, dimero, reparar, playing }: { mutageno: Muta
     // radiación ionizante: rotura de doble cadena en el centro
     const roto = mutageno.id === "ionizante" && i === 3;
     if (!roto) {
-      bbL.push(<Line key={`bl${i}`} points={[izq[i]!, izq[i + 1]!]} color="#7dd3fc" lineWidth={2.5} />);
-      bbR.push(<Line key={`br${i}`} points={[der[i]!, der[i + 1]!]} color="#7dd3fc" lineWidth={2.5} />);
+      bbL.push(<Barra key={`bl${i}`} a={izq[i]!} b={izq[i + 1]!} r={0.06} color="#7dd3fc" />);
+      bbR.push(<Barra key={`br${i}`} a={der[i]!} b={der[i + 1]!} r={0.06} color="#7dd3fc" />);
     }
   }
 
   // rungs (pares de bases)
   const rungs: ReactNode[] = [];
   for (let i = 0; i < n; i++) {
-    rungs.push(<Line key={`g${i}`} points={[izq[i]!, der[i]!]} color="#334155" lineWidth={1.6} />);
+    rungs.push(<Barra key={`g${i}`} a={izq[i]!} b={der[i]!} r={0.04} color="#475569" />);
   }
 
   return (
@@ -420,7 +456,7 @@ function MundoMutagenos({ mutageno, dimero, reparar, playing }: { mutageno: Muta
       {/* dímero de timina: enlace covalente entre las dos T */}
       {dimeroActivo && <DimeroBond a={[izq[ti]![0], izq[ti]![1] + 0.12, izq[ti]![2]]} b={[izq[tj]![0], izq[tj]![1] - 0.12, izq[tj]![2]]} />}
       {dimeroActivo && (
-        <Etiqueta pos={[HRAD + 1.5, izq[ti]![1], 0]} col="#fbbf24aa">
+        <Etiqueta pos={[HRAD + 1.5, izq[ti]![1], 0]} col="#fbbf24aa" ancha>
           <i className="fa-solid fa-link" style={{ color: "#fde047" }} /> Dímero de timina (T=T)
         </Etiqueta>
       )}
@@ -431,7 +467,7 @@ function MundoMutagenos({ mutageno, dimero, reparar, playing }: { mutageno: Muta
       {mutageno.id === "ionizante" && (
         <>
           <ChispaRotura y={y0 + 3 * HSTEP + HSTEP / 2} playing={playing} />
-          <Etiqueta pos={[HRAD + 1.6, y0 + 3.5 * HSTEP, 0]} col="#f87171aa">
+          <Etiqueta pos={[HRAD + 1.6, y0 + 3.5 * HSTEP, 0]} col="#f87171aa" ancha>
             <i className="fa-solid fa-bolt" style={{ color: "#fca5a5" }} /> Rotura de doble cadena
           </Etiqueta>
         </>
@@ -441,7 +477,7 @@ function MundoMutagenos({ mutageno, dimero, reparar, playing }: { mutageno: Muta
       {mutageno.id === "quimico" && (
         <>
           <Aducto pos={[izq[4]![0] + 0.35, izq[4]![1], izq[4]![2] + 0.2]} playing={playing} />
-          <Etiqueta pos={[HRAD + 1.7, izq[4]![1], 0]} col="#fb923caa">
+          <Etiqueta pos={[HRAD + 1.7, izq[4]![1], 0]} col="#fb923caa" ancha>
             <i className="fa-solid fa-circle-dot" style={{ color: "#fdba74" }} /> Aducto químico en la base
           </Etiqueta>
         </>
@@ -454,7 +490,7 @@ function MundoMutagenos({ mutageno, dimero, reparar, playing }: { mutageno: Muta
             <icosahedronGeometry args={[0.28, 0]} />
             <meshStandardMaterial color="#a855f7" emissive="#7c3aed" emissiveIntensity={0.6} roughness={0.4} />
           </mesh>
-          <Etiqueta pos={[-HRAD - 1.7, der[4]![1], 0]} col="#a855f7aa">
+          <Etiqueta pos={[-HRAD - 1.7, der[4]![1], 0]} col="#a855f7aa" ancha>
             <i className="fa-solid fa-virus" style={{ color: "#c084fc" }} /> ADN viral integrado
           </Etiqueta>
         </>
@@ -462,12 +498,12 @@ function MundoMutagenos({ mutageno, dimero, reparar, playing }: { mutageno: Muta
 
       {/* reparación NER (solo UV): tijeras que escinden el dímero */}
       {esUV && reparar && (
-        <Etiqueta pos={[HRAD + 1.6, izq[ti]![1], 0]} col="#34d399aa">
+        <Etiqueta pos={[HRAD + 1.6, izq[ti]![1], 0]} col="#34d399aa" ancha>
           <i className="fa-solid fa-scissors" style={{ color: "#6ee7b7" }} /> NER repara el dímero
         </Etiqueta>
       )}
 
-      <Etiqueta pos={[0, y0 - 0.8, 0]} col={`${mutageno.color}aa`}>
+      <Etiqueta pos={[0, y0 - 0.8, 0]} col={`${mutageno.color}aa`} ancha>
         <i className={`fa-solid ${mutageno.icono}`} style={{ color: mutageno.color }} /> {mutageno.categoria}: {mutageno.etq}
       </Etiqueta>
     </group>
@@ -523,10 +559,22 @@ function Aducto({ pos, playing }: { pos: Pt; playing: boolean }) {
  * Escena / cámara / post
  * ════════════════════════════════════════════════════════════════════════ */
 
+function cajaDe(props: MutacionesSceneProps): Caja {
+  if (props.modo === "puntuales") {
+    const a = props.analisis;
+    const w = Math.max(a.arnmMutado.length * 0.5, a.arnmOriginal.length * 0.5, Math.max(a.protOriginal.length, a.protMutada.length) * 0.86) + 3.4;
+    return { x0: -w / 2, x1: w / 2, y0: -2.4, y1: 3.6 };
+  }
+  if (props.modo === "cromosomicas") return { x0: -3.6, x1: 3.6, y0: -2.2, y1: 3.4 };
+  return { x0: -4.4, x1: 4.4, y0: -3.2, y1: 2.6 };
+}
+
 function Contenido(props: MutacionesSceneProps) {
   const { modo, analisis, resultadoCromo, cromoDef, mutageno, dimero, reparar, modoColor, resetNonce, playing } = props;
+  const size = useThree((st) => st.size);
+  const plan = planEncuadre(cajaDe(props), size.width, size.height);
   const giro = useRef<THREE.Group>(null);
-  useFrame((s, dt) => {
+  useFrame((_, dt) => {
     if (giro.current && playing && modo !== "puntuales") giro.current.rotation.y += dt * 0.1;
   });
 
@@ -542,16 +590,14 @@ function Contenido(props: MutacionesSceneProps) {
   return (
     <>
       {/* Suelo, luz de tres puntos y entorno que reflejar. */}
-      {/* Sin altura: esta escena no tenía sombra de la que leerla, así
-          que el escenario la MIDE de la propia escena al montarse, en
-          vez de que alguien la adivine. */}
       <Escenario acento={props.accent} mesa={false} niebla={false} />
       <directionalLight position={[-6, 4, -4]} intensity={0.5} color={modoColor} />
-      <Stars radius={70} depth={30} count={900} factor={3} fade speed={0.4} />
 
-      <group ref={giro} key={`${modo}-${resetNonce}`}>{mundo}</group>
+      <group position={[plan.x, plan.y, 0]} scale={plan.s}>
+        <group ref={giro} key={`${modo}-${resetNonce}`}>{mundo}</group>
+      </group>
 
-      <OrbitControls enablePan={false} minDistance={6} maxDistance={28} autoRotate={false} />
+      <OrbitControls enablePan={false} minDistance={7} maxDistance={20} autoRotate={false} />
       <EffectComposer>
         <Bloom intensity={0.55} luminanceThreshold={0.22} mipmapBlur />
         <Vignette eskil={false} offset={0.18} darkness={0.7} />
@@ -561,9 +607,8 @@ function Contenido(props: MutacionesSceneProps) {
 }
 
 export default function MutacionesScene(props: MutacionesSceneProps) {
-  const cam: Pt = props.modo === "puntuales" ? [0, 0.4, 12] : props.modo === "cromosomicas" ? [0, 0.2, 11] : [0, 0.4, 11];
   return (
-    <Canvas key={props.modo} shadows dpr={[1, 2]} camera={{ position: cam, fov: 46 }} gl={{ antialias: true }} style={{ width: "100%", height: "100%" }}>
+    <Canvas key={props.modo} shadows dpr={[1, 2]} camera={{ position: [0, 0, CAM_Z], fov: CAM_FOV }} gl={{ antialias: true }} style={{ width: "100%", height: "100%" }}>
       <Contenido {...props} />
     </Canvas>
   );

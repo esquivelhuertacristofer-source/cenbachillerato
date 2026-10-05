@@ -1,26 +1,30 @@
-﻿"use client";
+"use client";
 
 /**
  * Laboratorio — Fuentes históricas: selección, evaluación y contraste
  * Práctica experimental para CH-III-P01-A4 (Conciencia Histórica III).
  *
- * Interactividad máxima. Cuatro modos: los tres de arrastrar/clasificar y, al
- * final, uno que se escribe («Completa el texto», verbatim de la progresión):
- *  1. «¿Primaria, secundaria o terciaria?» — clasifica ocho fuentes según su
- *     tipo (su relación con los hechos: directa, interpretativa o recopilatoria).
- *  2. «Los cinco criterios» — empareja cada criterio de evaluación (autoría,
- *     fecha, intención, audiencia, contexto) con la pregunta clave que responde.
- *  3. «Escribe el término» — lee la definición verbatim (A5) y escribe
- *     de memoria el término del glosario que la nombra.
- *  + Cuestionario de comprensión (V/F verbatim de A4).
+ * El alumno es historiador en un ARCHIVO FICTICIO («La crecida de Villa
+ * Alameda», simulación) y reconstruye qué pasó con ocho fuentes:
+ *  · examina cada fuente con los CINCO CRITERIOS (autoría, fecha, intención,
+ *    audiencia, contexto), que cuestan «horas de archivo» limitadas, y puede
+ *    contrastarla con otra;
+ *  · la clasifica (primaria, secundaria o terciaria) y juzga su fiabilidad;
+ *  · cada juicio mueve el medidor de solidez y la línea de tiempo del caso:
+ *    confiar en una fuente sesgada abre disputas, confiar en una copia no
+ *    suma pruebas nuevas;
+ *  · cierra el caso y compara su reconstrucción con lo ocurrido.
+ *  + «Escribe el término» (glosario A5) y «Completa el texto» (A6).
+ *  + Cuestionario de comprensión (V/F verbatim de A4), en la pestaña Reto.
  *
- * DOM puro (sin three.js): ligero, accesible (ratón, teclado y táctil mediante
- * clic-para-seleccionar / clic-para-colocar). Contenido VERBATIM de CH-III·P01.
+ * DOM puro (sin three.js). Teoría VERBATIM de CH-III·P01, en la pestaña Teoría.
+ * Modelo en fuentes-historicas-sim.ts. Fuentes, medios y cifras: ficticios.
  */
 
 import { useEffect, useRef, useState } from "react";
 import type { PracticaLabProps } from "../registry";
 import { T, OK, card, Eyebrow } from "./_kit";
+import { LabShell, Bloque, BotonHerramienta } from "./_shell";
 import { LabSfx } from "./lab-audio";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { EscribeTermino } from "./_mecanica-termino";
@@ -35,31 +39,57 @@ import {
   PARES,
   QUIZ,
   DATO_FUENTES,
-  type TipoFuente,
 } from "./fuentes-historicas-data";
+import {
+  ARCHIVO,
+  CRITERIOS_SIM,
+  EVENTOS,
+  ETIQUETA_JUICIO,
+  HORAS,
+  COSTO_PISTA,
+  COSTO_CONTRASTE,
+  MIN_PARA_CERRAR,
+  textoContraste,
+  claveContraste,
+  horasGastadas,
+  lineaDeTiempo,
+  solidez,
+  correctos,
+  valorar,
+  porId,
+  type CriterioId,
+  type FuenteSim,
+  type Juicio,
+  type TipoFuente,
+  type LineaEvento,
+} from "./fuentes-historicas-sim";
 
 const NO = "#FF5E5E";
+const AMBAR = "#FFC75A";
 import { useEstrellas } from "@/lib/hooks/useEstrellas";
-import { FondoTermino, VinetaTermino } from "./_vineta";
 const RETO_KEY = "cen-fuentes-historicas-reto";
+const RUTA_SIM = "/media/labs-sim/fuentes-historicas";
 
-type Modo = "tipos" | "criterios" | "glosario" | "texto";
+type Modo = "caso" | "glosario" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
-  { id: "tipos", label: "¿Primaria, secundaria o terciaria?", icono: "fa-layer-group" },
-  { id: "criterios", label: "Los cinco criterios", icono: "fa-magnifying-glass" },
+  { id: "caso", label: "Archivo del caso", icono: "fa-box-archive" },
   { id: "glosario", label: "Escribe el término", icono: "fa-keyboard" },
   { id: "texto", label: "Completa el texto", icono: "fa-pen-to-square" },
 ];
 
+interface Aviso {
+  tono: "ok" | "casi" | "mal" | "info";
+  texto: string;
+}
+
 export function LabFuentesHistoricas({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
-  const [modo, setModo] = useState<Modo>("tipos");
+  const [modo, setModo] = useState<Modo>("caso");
 
   // ── sonido ────────────────────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   // Modo «Completa el texto». El contador sirve de `key`: subirlo remonta
   // el componente y devuelve todos los huecos en blanco.
   const [textoDone, setTextoDone] = useState(false);
@@ -88,79 +118,61 @@ export function LabFuentesHistoricas({ color }: PracticaLabProps) {
     partida.acierto();
     return sonido && audioRef.current?.blip();
   };
+  const sfxClick = () => sonido && audioRef.current?.blip();
 
-  // ── modo tipos (clasifica por tipo de fuente) ──────────────────────────
-  const [ubicTipo, setUbicTipo] = useState<Record<string, TipoFuente>>({});
-  const [selTipo, setSelTipo] = useState<string | null>(null);
+  // ── estado del caso ───────────────────────────────────────────────────
+  const [sel, setSel] = useState<string>(ARCHIVO[0]!.id);
+  const [pistas, setPistas] = useState<string[]>([]); // `${fuente}:${criterio}`
+  const [contrastes, setContrastes] = useState<string[]>([]); // claves de pareja
+  const [contrastando, setContrastando] = useState(false);
+  const [contrasteVer, setContrasteVer] = useState<string | null>(null);
+  const [tipos, setTipos] = useState<Record<string, TipoFuente>>({});
+  const [juicios, setJuicios] = useState<Record<string, Juicio | undefined>>({});
+  const [cerrado, setCerrado] = useState(false);
+  const [aviso, setAviso] = useState<Aviso | null>(null);
   const [shakeTipo, setShakeTipo] = useState<TipoFuente | null>(null);
-  const tiposLibres = FUENTES.filter((f) => !ubicTipo[f.id]).slice().sort((a, b) => a.texto.localeCompare(b.texto, "es"));
 
-  const intentarTipo = (fuenteId: string, bin: TipoFuente) => {
-    if (ubicTipo[fuenteId]) return;
-    const f = FUENTES.find((x) => x.id === fuenteId);
-    if (f && f.tipo === bin) {
-      setUbicTipo((e) => ({ ...e, [fuenteId]: bin }));
-      setSelTipo(null);
-      sfxPlace();
-      if (Object.keys(ubicTipo).length + 1 >= FUENTES.length) {
-        sfxOk();
-        persistMejor(true, criteriosDone, glosarioDone);
-      }
-    } else {
-      setShakeTipo(bin);
-      sfxNo();
-      window.setTimeout(() => setShakeTipo(null), 420);
-    }
-  };
-  const resetTipos = () => {
-    setUbicTipo({});
-    setSelTipo(null);
+  const resetCaso = () => {
+    setSel(ARCHIVO[0]!.id);
+    setPistas([]);
+    setContrastes([]);
+    setContrastando(false);
+    setContrasteVer(null);
+    setTipos({});
+    setJuicios({});
+    setCerrado(false);
+    setAviso(null);
+    partida.reiniciar();
   };
 
-  // ── modo criterios (empareja criterio → pregunta) ──────────────────────
-  const [empCrit, setEmpCrit] = useState<Record<string, boolean>>({});
-  const [selCrit, setSelCrit] = useState<string | null>(null);
-  const [shakeCrit, setShakeCrit] = useState<string | null>(null);
-  const critLibres = CRITERIOS.filter((c) => !empCrit[c.id]).slice().sort((a, b) => a.criterio.localeCompare(b.criterio, "es"));
-
-  const intentarCrit = (chipId: string, rowId: string) => {
-    if (empCrit[rowId]) return;
-    if (chipId === rowId) {
-      setEmpCrit((e) => ({ ...e, [rowId]: true }));
-      setSelCrit(null);
-      sfxPlace();
-      if (Object.keys(empCrit).length + 1 >= CRITERIOS.length) {
-        sfxOk();
-        persistMejor(tiposDone, true, glosarioDone);
-      }
-    } else {
-      setShakeCrit(rowId);
-      sfxNo();
-      window.setTimeout(() => setShakeCrit(null), 420);
-    }
-  };
-  const resetCriterios = () => {
-    setEmpCrit({});
-    setSelCrit(null);
-  };
-
-  // ── modo glosario (lee la definición y ESCRIBE el término) ─────────────
-  // El contador hace de `key`: subirlo remonta el componente y deja todas
-  // las tarjetas en blanco.
+  // El glosario se escribe: el contador hace de `key` y deja las tarjetas en blanco.
   const [glosarioDone, setGlosarioDone] = useState(false);
   const [glosIntento, setGlosIntento] = useState(0);
   const resetGlosario = () => {
     setGlosarioDone(false);
     setGlosIntento((n) => n + 1);
   };
+  const resetTexto = () => {
+    setTextoDone(false);
+    setTextoIntento((n) => n + 1);
+  };
 
   const [quizAprobado, setQuizAprobado] = useState(false);
 
+  // ── derivados ─────────────────────────────────────────────────────────
+  const horasUsadas = horasGastadas(pistas, contrastes);
+  const horasQuedan = HORAS - horasUsadas;
+  const linea = lineaDeTiempo(juicios);
+  const solidezAhora = solidez(linea);
+  const juzgadas = Object.values(juicios).filter(Boolean).length;
+  const fuente = porId(sel);
+
   // ── progreso / estrellas ──────────────────────────────────────────────
-  const tiposDone = Object.keys(ubicTipo).length >= FUENTES.length;
-  const criteriosDone = Object.keys(empCrit).length >= CRITERIOS.length;
+  const tiposDone = Object.keys(tipos).length >= ARCHIVO.length;
+  const criteriosUsados = new Set(pistas.map((p) => p.split(":")[1]));
+  const criteriosDone = CRITERIOS_SIM.every((c) => criteriosUsados.has(c.id));
   const modosHechos = (tiposDone ? 1 : 0) + (criteriosDone ? 1 : 0) + (glosarioDone ? 1 : 0) + (textoDone ? 1 : 0);
-  // Terminar los 3 modos vale 2★; la tercera se gana con precisión.
+  // Terminar los modos vale 2★; la tercera se gana con precisión.
   const estrellas = partida.estrellasCon(modosHechos, 4);
 
   const { mejorEstrellas: mejor, registraEstrellas } = useEstrellas(RETO_KEY);
@@ -172,460 +184,556 @@ export function LabFuentesHistoricas({ color }: PracticaLabProps) {
   };
 
   const objetivos = [
+    { txt: "Juzga la fiabilidad de 5 fuentes usando las pistas", done: juzgadas >= MIN_PARA_CERRAR },
     { txt: "Clasifica las 8 fuentes por su tipo", done: tiposDone },
     { txt: "Empareja los 5 criterios con su pregunta", done: criteriosDone },
+    { txt: "Cierra el caso con la línea de tiempo bien reconstruida", done: cerrado && correctos(linea) === EVENTOS.length },
     { txt: "Escribe los 6 términos del glosario", done: glosarioDone },
     { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];
 
-  // arrastre nativo
-  const dragProps = (id: string) => ({
-    draggable: true,
-    onDragStart: (e: React.DragEvent) => {
-      e.dataTransfer.setData("text/plain", id);
-      e.dataTransfer.effectAllowed = "move";
-      // El hueco que deja la tarjeta mientras viaja. Por atributo y no por
-      // estado: un render por cada gesto de arrastre se nota con 20 tarjetas.
-      e.currentTarget.setAttribute("data-arrastrando", "true");
-    },
-    onDragEnd: (e: React.DragEvent) => {
-      // También cuando se suelta FUERA de cualquier zona; si no, la tarjeta se
-      // queda medio borrada para siempre.
-      e.currentTarget.removeAttribute("data-arrastrando");
-      document.querySelectorAll('[data-sobre="true"]').forEach((z) => z.removeAttribute("data-sobre"));
-    },
-  });
-  const dropProps = (onDrop: (id: string) => void) => ({
-    onDragOver: (e: React.DragEvent) => {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = "move";
-    },
-    onDragEnter: (e: React.DragEvent) => {
-      e.preventDefault();
-      e.currentTarget.setAttribute("data-sobre", "true");
-    },
-    onDragLeave: (e: React.DragEvent) => {
-      // `dragleave` salta también al pasar sobre un HIJO de la zona. Apagar sin
-      // comprobar deja la zona parpadeando mientras mueves la mano por dentro.
-      const r = e.currentTarget.getBoundingClientRect();
-      const fuera = e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
-      if (fuera) e.currentTarget.removeAttribute("data-sobre");
-    },
-    onDrop: (e: React.DragEvent) => {
-      e.preventDefault();
-      e.currentTarget.removeAttribute("data-sobre");
-      const id = e.dataTransfer.getData("text/plain");
-      if (id) onDrop(id);
-    },
-    "data-zona": "true" as const,
-    role: "button" as const,
-    tabIndex: 0,
-    onKeyDown: (e: React.KeyboardEvent) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        (e.currentTarget as HTMLElement).click();
-      }
-    },
-  });
+  const resetActual = modo === "texto" ? resetTexto : modo === "glosario" ? resetGlosario : resetCaso;
 
-  const resetTexto = () => {
-    setTextoDone(false);
-    setTextoIntento((n) => n + 1);
+  // ── acciones ──────────────────────────────────────────────────────────
+  const usarPista = (c: CriterioId) => {
+    const k = `${sel}:${c}`;
+    if (pistas.includes(k) || cerrado) return;
+    if (horasQuedan < COSTO_PISTA) {
+      setAviso({ tono: "mal", texto: "Se acabaron las horas de archivo: decide con lo que ya sabes." });
+      return;
+    }
+    sfxClick();
+    const nuevas = [...pistas, k];
+    setPistas(nuevas);
+    setAviso(null);
+    if (CRITERIOS_SIM.every((x) => nuevas.some((p) => p.endsWith(`:${x.id}`)))) {
+      sfxOk();
+      persistMejor(tiposDone, true, glosarioDone);
+    }
   };
-  const resetActual = modo === "texto" ? resetTexto : modo === "tipos" ? resetTipos : modo === "criterios" ? resetCriterios : resetGlosario;
+  const contrastarCon = (otraId: string) => {
+    const k = claveContraste(sel, otraId);
+    if (cerrado) return;
+    if (!contrastes.includes(k)) {
+      if (horasQuedan < COSTO_CONTRASTE) {
+        setAviso({ tono: "mal", texto: "Contrastar cuesta 2 horas y ya no te alcanzan." });
+        return;
+      }
+      setContrastes((c) => [...c, k]);
+    }
+    sfxClick();
+    setContrasteVer(otraId);
+    setAviso(null);
+  };
+  const clasificar = (t: TipoFuente) => {
+    if (tipos[sel] || cerrado) return;
+    if (fuente.tipo === t) {
+      sfxPlace();
+      setTipos((x) => ({ ...x, [sel]: t }));
+      setAviso({ tono: "ok", texto: `Correcto: ${fuente.razonTipo}` });
+      if (Object.keys(tipos).length + 1 >= ARCHIVO.length) {
+        sfxOk();
+        persistMejor(true, criteriosDone, glosarioDone);
+      }
+    } else {
+      sfxNo();
+      setShakeTipo(t);
+      window.setTimeout(() => setShakeTipo(null), 420);
+      setAviso({ tono: "mal", texto: `No es ${TIPO_FUENTE_INFO[t].titulo.toLowerCase()}. Pregúntate si se produjo EN la época de los hechos, la interpreta después o solo reúne obras.` });
+    }
+  };
+  const juzgar = (j: Juicio) => {
+    if (juicios[sel] || cerrado) return;
+    const v = valorar(fuente, j);
+    const ciego = !pistas.some((p) => p.startsWith(`${sel}:`));
+    setJuicios((x) => ({ ...x, [sel]: j }));
+    if (v === "exacto") {
+      sfxPlace();
+      setAviso({ tono: "ok", texto: `${ciego ? "Acertaste, aunque a ciegas. " : ""}${fuente.razonFiab}` });
+    } else if (v === "casi") {
+      sfxClick();
+      setAviso({ tono: "casi", texto: `Casi: ${fuente.razonFiab}` });
+    } else {
+      sfxNo();
+      setAviso({ tono: "mal", texto: `Cuidado: ${fuente.razonFiab} Mira cómo cambió la línea de tiempo.` });
+    }
+  };
+  const cerrarCaso = () => {
+    if (juzgadas < MIN_PARA_CERRAR || cerrado) return;
+    sfxOk();
+    setCerrado(true);
+  };
+
+  const escena = (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
+      <style>{ESTILOS(accent, color.rgba)}</style>
+
+      {modo === "caso" && (
+        <>
+          <Cabecera horasQuedan={horasQuedan} solidez={solidezAhora} juzgadas={juzgadas} accent={accent} />
+
+          <div className="fh-fuentes">
+            {ARCHIVO.map((f) => (
+              <TarjetaFuente
+                key={f.id}
+                f={f}
+                activa={sel === f.id}
+                tipo={tipos[f.id]}
+                juicio={juicios[f.id]}
+                pistasN={pistas.filter((p) => p.startsWith(`${f.id}:`)).length}
+                onClick={() => {
+                  setSel(f.id);
+                  setAviso(null);
+                  setContrastando(false);
+                  setContrasteVer(null);
+                }}
+              />
+            ))}
+          </div>
+
+          <DetalleFuente
+            f={fuente}
+            pistas={pistas}
+            contrastes={contrastes}
+            contrastando={contrastando}
+            contrasteVer={contrasteVer}
+            tipo={tipos[sel]}
+            juicio={juicios[sel]}
+            aviso={aviso}
+            shakeTipo={shakeTipo}
+            horasQuedan={horasQuedan}
+            cerrado={cerrado}
+            onPista={usarPista}
+            onToggleContraste={() => setContrastando((c) => !c)}
+            onContrastar={contrastarCon}
+            onClasificar={clasificar}
+            onJuzgar={juzgar}
+          />
+
+          <LineaTiempo linea={linea} accent={accent} cerrado={cerrado} />
+
+          {!cerrado ? (
+            <div className="fh-panel" style={{ alignItems: "flex-start" }}>
+              <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                {juzgadas < MIN_PARA_CERRAR
+                  ? `Juzga al menos ${MIN_PARA_CERRAR} fuentes para poder cerrar el caso (llevas ${juzgadas}).`
+                  : "Cuando tu línea de tiempo te convenza, cierra el caso y compárala con lo que ocurrió."}
+              </div>
+              <button type="button" className="fh-btn fh-btn-main" disabled={juzgadas < MIN_PARA_CERRAR} onClick={cerrarCaso}>
+                <i className="fa-solid fa-gavel" aria-hidden /> Cerrar el caso
+              </button>
+            </div>
+          ) : (
+            <Veredicto linea={linea} solidez={solidezAhora} onReiniciar={resetCaso} />
+          )}
+        </>
+      )}
+
+      {modo === "glosario" && (
+        <EscribeTermino
+          key={glosIntento}
+          pares={PARES}
+          accent={accent}
+          rgba={color.rgba}
+          completado={glosarioDone}
+          instrucciones="Lee la definición y escribe el término del glosario que le corresponde."
+          onCompletado={() => {
+            setGlosarioDone(true);
+            sfxOk();
+            persistMejor(tiposDone, criteriosDone, true);
+          }}
+          onAcierto={sfxPlace}
+          onError={sfxNo}
+        />
+      )}
+
+      {modo === "texto" && (
+        <CompletaTexto
+          key={textoIntento}
+          data={FUENTES_HISTORICAS_HUECOS}
+          accent={accent}
+          rgba={color.rgba}
+          completado={textoDone}
+          onCompletado={() => {
+            setTextoDone(true);
+            sfxOk();
+          }}
+          onAcierto={sfxPlace}
+          onError={sfxNo}
+        />
+      )}
+    </div>
+  );
+
+  const pistaDe: Record<Modo, string> = {
+    caso: "Una fuente sesgada no se descarta: se identifica su sesgo. Y dos fuentes que se copian no cuentan como dos pruebas. Gasta tus horas donde más dudas tengas.",
+    glosario: "Ya no se arrastra: lee la definición y su ejemplo y escribe el término. Si te atoras, la pista te da la inicial y las letras.",
+    texto: "Escribe la palabra que falta en cada hueco del texto.",
+  };
+
+  const lectura = modo === "caso" ? `${juzgadas}/${ARCHIVO.length} juzgadas · ${horasQuedan} h · solidez ${solidezAhora} %` : `${modosHechos}/4 · ${bestEstrellas}★`;
 
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes fhShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
-        @keyframes fhPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
-        .fh-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 16px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .fh-tab:hover { border-color:${T.lineStrong}; color:#fff; }
-        .fh-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-        .fh-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
-          font-size:14px; border:1px solid ${T.line}; background:${T.glass}; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .fh-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
-        .fh-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .fh-chip { cursor:grab; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 16px; border-radius:14px;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:13.5px; font-weight:700; transition:all .14s; user-select:none; max-width:360px; text-align:left; line-height:1.4; }
-        .fh-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); }
-        .fh-chip[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.2); box-shadow:0 0 16px -5px ${accent}; }
-        .fh-chip:active { cursor:grabbing; }
-        .fh-row { border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:14px 16px; transition:all .16s; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
-        .fh-row[data-shake="true"] { animation:fhShake .4s; border-color:${NO}; }
-        .fh-row[data-done="true"] { border-color:${OK}66; background:${OK}0f; }
-        .fh-slot { flex-shrink:0; min-width:170px; min-height:42px; border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset};
-          display:inline-flex; align-items:center; justify-content:center; color:${T.text3}; font-size:12.5px; transition:all .16s; cursor:pointer; padding:4px 10px; }
-        .fh-slot[data-armed="true"] { border-color:${accent}; background:rgba(${color.rgba},0.1); }
-        .fh-bin { border-radius:15px; border:1.5px solid ${T.line}; background:${T.glass}; padding:16px; transition:all .16s; min-height:230px; }
-        .fh-bin[data-shake="true"] { animation:fhShake .4s; border-color:${NO}; }
-        .fh-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
-          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
-        .fh-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
-        .fh-q:disabled{ cursor:default; }
-        .fh-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
-          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .fh-btn:hover { border-color:${T.lineStrong}; }
-        .fh-divider { height:1px; background:${T.line}; margin:18px 0; }
-        @media (prefers-reduced-motion: reduce){ .fh-row[data-shake="true"], .fh-bin[data-shake="true"] { animation:none; } }
-
-        /* Cajón de teoría */
-        .fh-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .fh-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .fh-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .fh-drawer[data-open="true"] { transform:translateX(0); }
-        .fh-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .fh-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .fh-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .fh-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .fh-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .fh-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .fh-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
-
-        /* Identidad del tablero */
-        .fh-bin, .fh-row { --tono:188; position:relative;
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
-        .fh-bin:nth-of-type(6n+1), .fh-row:nth-of-type(6n+1) { --tono:188; }
-        .fh-bin:nth-of-type(6n+2), .fh-row:nth-of-type(6n+2) { --tono:262; }
-        .fh-bin:nth-of-type(6n+3), .fh-row:nth-of-type(6n+3) { --tono:44; }
-        .fh-bin:nth-of-type(6n+4), .fh-row:nth-of-type(6n+4) { --tono:152; }
-        .fh-bin:nth-of-type(6n+5), .fh-row:nth-of-type(6n+5) { --tono:330; }
-        .fh-bin:nth-of-type(6n+6), .fh-row:nth-of-type(6n+6) { --tono:18; }
-        .fh-bin::before, .fh-row::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
-          background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
-        .fh-bin[data-done="true"], .fh-row[data-done="true"] {
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.2) 0%, transparent 68%); }
-        .fh-chip { transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
-        .fh-chip:hover { transform:translateY(-2px); }
-        .fh-chip[data-sel="true"] { transform:translateY(-3px) scale(1.02); }
-        @media (prefers-reduced-motion: reduce){
-          .fh-chip, .fh-chip:hover, .fh-chip[data-sel="true"] { transform:none; transition:none; }
-        }
-      `}</style>
-
-      {/* selector de modo + toolbar */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="fh-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="fh-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="fh-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="fh-icobtn" onClick={resetActual} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <button className="fh-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="fh-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="fh-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="fh-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="fh-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="fh-drawer-body">
-          <FichaTeorica data={FUENTES_HISTORICAS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}>
-        {/* ── Columna principal ─────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
-          {/* MODO 1 — tipos */}
-          {/* MODO — completa el texto (fill_blanks verbatim de la progresión) */}
-          {modo === "texto" && (
-            <CompletaTexto
-              key={textoIntento}
-              data={FUENTES_HISTORICAS_HUECOS}
-              accent={accent}
-              rgba={color.rgba}
-              completado={textoDone}
-              onCompletado={() => {
-                setTextoDone(true);
-                sfxOk();
-              }}
-              onAcierto={sfxPlace}
-              onError={sfxNo}
-            />
-          )}
-
-          {modo === "tipos" && (
+    <LabShell
+      dom
+      accent={accent}
+      rgba={color.rgba}
+      escena={escena}
+      modos={{ opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })), valor: modo, cambiar: (id) => setModo(id as Modo) }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo={modo === "caso" ? "Reiniciar el caso" : "Reiniciar este modo"} onClick={resetActual} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      retoKey={RETO_KEY}
+      pestanas={[
+        {
+          id: "cuaderno",
+          etiqueta: "Cuaderno",
+          icono: "fa-lightbulb",
+          contenido: (
             <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada fuente a su tipo</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: tiposDone ? OK : T.text3 }}>
-                    {Object.keys(ubicTipo).length}/{FUENTES.length}
-                  </span>
-                </div>
-                {tiposLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Clasificaste las {FUENTES.length} fuentes!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {tiposLibres.map((f) => (
-                      <button key={f.id} className="fh-chip" data-sel={selTipo === f.id} onClick={() => setSelTipo((s) => (s === f.id ? null : f.id))} {...dragProps(f.id)}>
-                        {f.texto}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <BinsTipos selTipo={selTipo} shakeTipo={shakeTipo} ubicTipo={ubicTipo} onMatch={intentarTipo} dropProps={dropProps} />
-            </>
-          )}
-
-          {/* MODO 2 — criterios */}
-          {modo === "criterios" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada criterio a la pregunta que responde</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: criteriosDone ? OK : T.text3 }}>
-                    {Object.keys(empCrit).length}/{CRITERIOS.length}
-                  </span>
-                </div>
-                {critLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Emparejaste los 5 criterios!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {critLibres.map((c) => (
-                      <button key={c.id} className="fh-chip" data-sel={selCrit === c.id} onClick={() => setSelCrit((s) => (s === c.id ? null : c.id))} {...dragProps(c.id)}>
-                        <i className="fa-solid fa-magnifying-glass" style={{ fontSize: 11, color: T.text3 }} />
-                        {c.criterio}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <RowsCriterios selCrit={selCrit} shakeCrit={shakeCrit} empCrit={empCrit} onMatch={intentarCrit} dropProps={dropProps} />
-            </>
-          )}
-
-          {/* MODO 3 — glosario */}
-          {modo === "glosario" && (
-            <EscribeTermino
-              key={glosIntento}
-              pares={PARES}
-              accent={accent}
-              rgba={color.rgba}
-              completado={glosarioDone}
-              instrucciones="Lee la definición y escribe el término del glosario que le corresponde."
-              onCompletado={() => {
-                setGlosarioDone(true);
-                sfxOk();
-                persistMejor(tiposDone, criteriosDone, true);
-              }}
-              onAcierto={sfxPlace}
-              onError={sfxNo}
-            />
-          )}
-        </div>
-
-        {/* ── Columna lateral ───────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? OK : T.text2 }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-                  <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="fh-divider" />
-
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", color: T.text3, textTransform: "uppercase" }}>Puntuación</div>
-                <div style={{ display: "flex", gap: 4, marginTop: 5 }}>
+              <Bloque titulo="Tu partida" icono="fa-gauge-high">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+                <div style={{ display: "flex", gap: 4 }}>
                   {[1, 2, 3].map((s) => (
-                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 18, color: s <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
+                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 20, color: s <= bestEstrellas ? AMBAR : "rgba(255,255,255,0.16)" }} />
                   ))}
                 </div>
-              </div>
-              <div style={{ textAlign: "right", maxWidth: 180 }}>
-                <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45 }}>
-                  {bestEstrellas >= 3 ? "¡Evalúas fuentes como un historiador!" : "Termina los tres modos para ganar 2★; la tercera pide 2 errores o menos."}
+                <div style={{ fontSize: 14, color: T.text2 }}>
+                  {bestEstrellas >= 3 ? "¡Evalúas fuentes como un historiador!" : "Termina los modos para ganar 2★; la tercera pide 2 errores o menos."}
                 </div>
-              </div>
-            </div>
-          </div>
-
-          {/* pista del modo actual */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid rgba(${color.rgba},0.3)`, background: `rgba(${color.rgba},0.08)`, fontSize: 13, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              {modo === "tipos" && (
-                <>La fuente <strong style={{ color: T.text }}>primaria</strong> nace en el período estudiado; la <strong style={{ color: T.text }}>secundaria</strong> lo interpreta después; la <strong style={{ color: T.text }}>terciaria</strong> recopila secundarias.</>
-              )}
-              {modo === "criterios" && (
-                <>Para evaluar una fuente pregúntate <strong style={{ color: T.text }}>quién</strong>, <strong style={{ color: T.text }}>cuándo</strong>, <strong style={{ color: T.text }}>para qué</strong>, <strong style={{ color: T.text }}>para quién</strong> y <strong style={{ color: T.text }}>en qué circunstancias</strong> se produjo.</>
-              )}
-              {modo === "glosario" && (
-                <>Ya no se arrastra: lee la definición y su ejemplo y escribe el término. Si te atoras, la pista te da la inicial y las letras.</>
-              )}
-            </span>
-          </div>
-
-          {/* dato verbatim */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid ${T.line}`, background: T.glass, fontSize: 12.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-circle-info" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>{DATO_FUENTES}</span>
-          </div>
-        </div>
-      </div>
-
-      <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />
-    </div>
+              </Bloque>
+              <Bloque titulo="Pista de este modo" icono="fa-lightbulb">
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>{pistaDe[modo]}</div>
+              </Bloque>
+              <Bloque titulo="Las 5 preguntas del historiador" icono="fa-magnifying-glass">
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {CRITERIOS_SIM.map((c) => (
+                    <div key={c.id} style={{ fontSize: 14, color: criteriosUsados.has(c.id) ? OK : T.text2, lineHeight: 1.45 }}>
+                      <i className={`fa-solid ${criteriosUsados.has(c.id) ? "fa-circle-check" : c.icono}`} aria-hidden style={{ marginRight: 8 }} />
+                      <strong style={{ color: criteriosUsados.has(c.id) ? OK : T.text }}>{c.etiqueta}.</strong> {c.pregunta}
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-clipboard-question",
+          contenido: <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />,
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Teoría de la práctica" icono="fa-book-open">
+                <FichaTeorica data={FUENTES_HISTORICAS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <Bloque titulo="Primaria, secundaria o terciaria" icono="fa-layer-group">
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  {(Object.keys(TIPO_FUENTE_INFO) as TipoFuente[]).map((t) => (
+                    <div key={t} style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                      <strong style={{ color: T.text }}>{TIPO_FUENTE_INFO[t].titulo}.</strong> {TIPO_FUENTE_INFO[t].subtitulo}
+                      <ul style={{ margin: "4px 0 0", paddingLeft: 18 }}>
+                        {FUENTES.filter((f) => f.tipo === t).map((f) => (
+                          <li key={f.id}>{f.texto}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+              <Bloque titulo="Los cinco criterios" icono="fa-magnifying-glass">
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {CRITERIOS.map((c) => (
+                    <div key={c.id} style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                      <strong style={{ color: T.text }}>{c.criterio}: {c.pregunta}</strong> {c.ejemplo}
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+              <Bloque titulo="Glosario" icono="fa-link">
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {PARES.map((p) => (
+                    <div key={p.id} style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                      <strong style={{ color: T.text }}>{p.termino}.</strong> {p.definicion}
+                      <div style={{ fontStyle: "italic", color: T.text3, marginTop: 2 }}>{p.ejemplo}</div>
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+              <Bloque titulo="Dato" icono="fa-circle-info">
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55 }}>{DATO_FUENTES}</div>
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
- * Paneles de cada modo (componentes hijos: reciben los manejadores como props,
- * así el linter no rastrea el acceso al ref de audio hasta el render del map).
+ * Estilos
  * ═══════════════════════════════════════════════════════════════════════════ */
-type DropFactory = (onDrop: (id: string) => void) => {
-  onDragOver: (e: React.DragEvent) => void;
-  onDrop: (e: React.DragEvent) => void;
-};
+const ESTILOS = (accent: string, rgba: string) => `
+  @keyframes fhShake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-5px);} 75%{transform:translateX(5px);} }
+  @keyframes fhPop { 0%{transform:scale(.8);opacity:0;} 100%{transform:scale(1);opacity:1;} }
+  .fh-fuentes { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap:10px; }
+  .fh-card { position:relative; display:flex; flex-direction:column; gap:6px; text-align:left; padding:8px; border-radius:14px; min-width:0;
+    border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text}; font-size:14px; line-height:1.35; cursor:pointer; transition:transform .14s, border-color .14s, background .14s; }
+  .fh-card:hover { border-color:${T.lineStrong}; transform:translateY(-2px); }
+  .fh-card[data-on="true"] { border-color:${accent}; background:rgba(${rgba},0.16); box-shadow:0 0 18px -6px ${accent}; }
+  .fh-card strong { font-size:14px; font-weight:800; }
+  .fh-foto { position:relative; overflow:hidden; border-radius:10px; background:linear-gradient(135deg, rgba(${rgba},0.35), rgba(8,19,31,0.9)); display:flex; align-items:center; justify-content:center; }
+  .fh-foto > i { font-size:26px; color:rgba(255,255,255,0.55); }
+  .fh-foto > img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .fh-chip { display:inline-flex; align-items:center; gap:6px; font-size:14px; font-weight:700; padding:2px 8px; border-radius:8px; border:1px solid ${T.line}; background:${T.inset}; color:${T.text2}; }
+  .fh-chip[data-t="ok"] { border-color:${OK}66; color:${OK}; }
+  .fh-chip[data-t="casi"] { border-color:${AMBAR}66; color:${AMBAR}; }
+  .fh-chip[data-t="mal"] { border-color:${NO}66; color:${NO}; }
+  .fh-panel { position:relative; border-radius:16px; border:1px solid ${T.line}; background:${T.glass}; padding:14px 16px; display:flex; flex-direction:column; gap:11px; min-width:0; }
+  .fh-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 16px; border-radius:11px;
+    border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:14px; font-weight:800; transition:all .14s; text-align:left; }
+  .fh-btn:hover:not(:disabled) { border-color:${T.lineStrong}; }
+  .fh-btn:disabled { opacity:.45; cursor:not-allowed; }
+  .fh-btn[data-used="true"] { border-color:${OK}66; background:${OK}12; }
+  .fh-btn[data-shake="true"] { animation:fhShake .4s; border-color:${NO}; }
+  .fh-btn-main { background:${accent}; color:#04121f; border-color:transparent; }
+  .fh-herr { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap:8px; }
+  .fh-pista { font-size:14px; line-height:1.5; color:${T.text2}; padding:9px 12px; border-radius:10px; background:${T.inset}; border:1px solid ${T.line}; animation:fhPop .25s ease; }
+  .fh-pista strong { color:${T.text}; }
+  .fh-aviso { font-size:14px; line-height:1.5; padding:10px 12px; border-radius:11px; border:1px solid ${T.line}; color:#fff; animation:fhPop .25s ease; }
+  .fh-aviso[data-t="ok"] { border-color:${OK}77; background:${OK}14; }
+  .fh-aviso[data-t="casi"] { border-color:${AMBAR}77; background:${AMBAR}14; }
+  .fh-aviso[data-t="mal"] { border-color:${NO}77; background:${NO}12; }
+  .fh-barra { height:12px; border-radius:7px; background:${T.inset}; overflow:hidden; border:1px solid ${T.line}; }
+  .fh-barra > i { display:block; height:100%; border-radius:7px; transition:width .7s cubic-bezier(.2,.8,.2,1); }
+  .fh-linea { position:relative; display:flex; flex-direction:column; gap:12px; padding-left:22px; }
+  .fh-linea::before { content:""; position:absolute; left:7px; top:6px; bottom:6px; width:3px; border-radius:2px; background:${T.lineStrong}; }
+  .fh-ev { position:relative; display:flex; flex-direction:column; gap:3px; }
+  .fh-ev::before { content:""; position:absolute; left:-22px; top:3px; width:17px; height:17px; border-radius:50%; background:var(--pt, ${T.lineStrong}); border:3px solid #0b2233; transition:background .3s; }
+  .fh-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
+    border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
+  .fh-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
+  .fh-q:disabled{ cursor:default; }
+  @media (prefers-reduced-motion: reduce){
+    .fh-card, .fh-card:hover { transform:none; transition:none; }
+    .fh-pista, .fh-aviso, .fh-btn[data-shake="true"] { animation:none; }
+    .fh-barra > i { transition:none; }
+  }
+`;
 
-function BinsTipos({
-  selTipo,
-  shakeTipo,
-  ubicTipo,
-  onMatch,
-  dropProps,
-}: {
-  selTipo: string | null;
-  shakeTipo: TipoFuente | null;
-  ubicTipo: Record<string, TipoFuente>;
-  onMatch: (fuenteId: string, bin: TipoFuente) => void;
-  dropProps: DropFactory;
-}) {
-  const bins: TipoFuente[] = ["primaria", "secundaria", "terciaria"];
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Piezas visuales del caso
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+/** Imagen de una fuente: gradiente + ícono detrás; la foto se oculta si falta. */
+function Foto({ clave, icono, alto }: { clave: string; icono: string; alto: number }) {
+  const [fallo, setFallo] = useState(false);
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
-      {bins.map((bin) => {
-        const info = TIPO_FUENTE_INFO[bin];
-        const dentro = FUENTES.filter((f) => ubicTipo[f.id] === bin);
-        return (
-          <div
-            key={bin}
-            className="fh-bin"
-            data-shake={shakeTipo === bin}
-            onClick={() => selTipo && onMatch(selTipo, bin)}
-            style={{ position: "relative", isolation: "isolate" }}
-            {...dropProps((id) => onMatch(id, bin))}
-          >
-            {/* La ilustración del concepto llenando la caja vacía. */}
-            <FondoTermino termino={info.titulo} />
-            <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
-              <VinetaTermino termino={info.titulo} color={T.text2} icono={info.icono} tam={29} radio={8} />
-              <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
-            </div>
-            <div style={{ fontSize: 11, color: T.text3, marginBottom: 12, lineHeight: 1.4 }}>{info.subtitulo}</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {dentro.length === 0 ? (
-                <div style={{ fontSize: 12, color: T.text3, opacity: 0.6, padding: "8px 0" }}>Arrastra aquí…</div>
-              ) : (
-                dentro.map((f) => (
-                  <span key={f.id} style={{ animation: "fhPop .25s ease", display: "inline-flex", alignItems: "flex-start", gap: 7, padding: "8px 12px", borderRadius: 11, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 12.5, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>
-                    <i className="fa-solid fa-check" style={{ fontSize: 10, color: OK, marginTop: 3 }} />
-                    {f.texto}
-                  </span>
-                ))
-              )}
-            </div>
-          </div>
-        );
-      })}
+    <div className="fh-foto" style={{ height: alto }}>
+      <i className={`fa-solid ${icono}`} aria-hidden />
+      {!fallo && <img src={`${RUTA_SIM}/${clave}.webp`} alt="" loading="lazy" onError={() => setFallo(true)} />}
     </div>
   );
 }
 
-function RowsCriterios({
-  selCrit,
-  shakeCrit,
-  empCrit,
-  onMatch,
-  dropProps,
-}: {
-  selCrit: string | null;
-  shakeCrit: string | null;
-  empCrit: Record<string, boolean>;
-  onMatch: (chipId: string, rowId: string) => void;
-  dropProps: DropFactory;
-}) {
+function Cabecera({ horasQuedan, solidez: s, juzgadas, accent }: { horasQuedan: number; solidez: number; juzgadas: number; accent: string }) {
+  const col = s >= 70 ? OK : s >= 35 ? AMBAR : NO;
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-      {CRITERIOS.map((c) => {
-        const done = empCrit[c.id];
-        return (
-          <div
-            key={c.id}
-            className="fh-row"
-            data-shake={shakeCrit === c.id}
-            data-done={done}
-            onClick={() => !done && selCrit && onMatch(selCrit, c.id)}
-            {...dropProps((id) => onMatch(id, c.id))}
-          >
-            <div className="fh-slot" data-armed={!done && !!selCrit} style={done ? { borderStyle: "solid", borderColor: OK, background: `${OK}1a` } : undefined}>
-              {done ? (
-                <span style={{ animation: "fhPop .25s ease", fontSize: 13, fontWeight: 900, color: "#fff", display: "inline-flex", alignItems: "center", gap: 7 }}>
-                  <i className="fa-solid fa-magnifying-glass" />
-                  {c.criterio}
-                </span>
-              ) : (
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                  <i className="fa-solid fa-arrow-left" style={{ fontSize: 11 }} /> criterio
-                </span>
-              )}
+    <div className="fh-panel">
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
+        <Eyebrow>
+          <i className="fa-solid fa-box-archive" style={{ marginRight: 8, color: accent }} />
+          Caso (simulación): la crecida de Villa Alameda
+        </Eyebrow>
+        <span style={{ fontSize: 14, fontWeight: 800, color: T.text2 }}>{juzgadas}/{ARCHIVO.length} juzgadas</span>
+      </div>
+      <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+        Una noche de 1907 (simulación) el agua inundó el barrio bajo. ¿Qué pasó y de quién te puedes fiar? Examina las fuentes, juzga cada una y mira cómo se arma la línea de tiempo.
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 200px), 1fr))", gap: 12 }}>
+        <div>
+          <div style={{ fontSize: 14, fontWeight: 800, color: T.text2, marginBottom: 5 }}>
+            <i className="fa-solid fa-hourglass-half" aria-hidden style={{ marginRight: 7 }} />
+            Horas de archivo: <strong style={{ color: "#fff" }}>{horasQuedan}</strong> de {HORAS}
+          </div>
+          <div className="fh-barra"><i style={{ width: `${(horasQuedan / HORAS) * 100}%`, background: accent }} /></div>
+        </div>
+        <div>
+          <div style={{ fontSize: 14, fontWeight: 800, color: T.text2, marginBottom: 5 }}>
+            <i className="fa-solid fa-scale-balanced" aria-hidden style={{ marginRight: 7 }} />
+            Solidez del caso: <strong style={{ color: col }}>{s} %</strong>
+          </div>
+          <div className="fh-barra"><i style={{ width: `${s}%`, background: col }} /></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TarjetaFuente({ f, activa, tipo, juicio, pistasN, onClick }: { f: FuenteSim; activa: boolean; tipo?: TipoFuente; juicio?: Juicio; pistasN: number; onClick: () => void }) {
+  return (
+    <button type="button" className="fh-card" data-on={activa} onClick={onClick}>
+      <Foto clave={f.clave} icono={f.icono} alto={72} />
+      <strong>{f.medio}</strong>
+      <span style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+        {pistasN > 0 && <span className="fh-chip"><i className="fa-solid fa-magnifying-glass" aria-hidden />{pistasN}/5</span>}
+        {tipo && <span className="fh-chip" data-t="ok">{tipo}</span>}
+        {juicio && <span className="fh-chip">{ETIQUETA_JUICIO[juicio]}</span>}
+      </span>
+    </button>
+  );
+}
+
+function DetalleFuente({
+  f, pistas, contrastes, contrastando, contrasteVer, tipo, juicio, aviso, shakeTipo, horasQuedan, cerrado,
+  onPista, onToggleContraste, onContrastar, onClasificar, onJuzgar,
+}: {
+  f: FuenteSim; pistas: string[]; contrastes: string[]; contrastando: boolean; contrasteVer: string | null;
+  tipo?: TipoFuente; juicio?: Juicio; aviso: Aviso | null; shakeTipo: TipoFuente | null; horasQuedan: number; cerrado: boolean;
+  onPista: (c: CriterioId) => void; onToggleContraste: () => void; onContrastar: (id: string) => void;
+  onClasificar: (t: TipoFuente) => void; onJuzgar: (j: Juicio) => void;
+}) {
+  const tiposBtn: TipoFuente[] = ["primaria", "secundaria", "terciaria"];
+  const juiciosBtn: Juicio[] = ["confiable", "reservas", "poco"];
+  return (
+    <div className="fh-panel" key={f.id}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 240px), 1fr))", gap: 14, alignItems: "start" }}>
+        <Foto clave={f.clave} icono={f.icono} alto={150} />
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, minWidth: 0 }}>
+          <span className="fh-chip" style={{ alignSelf: "flex-start" }}><i className={`fa-solid ${f.icono}`} aria-hidden />{f.medio}</span>
+          <div style={{ fontSize: 16, fontWeight: 800, color: "#fff", lineHeight: 1.3 }}>{f.titulo}</div>
+          <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>{f.resumen}</div>
+        </div>
+      </div>
+
+      <div>
+        <div style={{ fontSize: 14, fontWeight: 800, color: T.text3, marginBottom: 7 }}>
+          1 · Examínala (cada pista cuesta {COSTO_PISTA} h)
+        </div>
+        <div className="fh-herr">
+          {CRITERIOS_SIM.map((c) => {
+            const usada = pistas.includes(`${f.id}:${c.id}`);
+            return (
+              <button key={c.id} type="button" className="fh-btn" data-used={usada} disabled={cerrado || (!usada && horasQuedan < COSTO_PISTA)} onClick={() => onPista(c.id)}>
+                <i className={`fa-solid ${usada ? "fa-circle-check" : c.icono}`} aria-hidden />
+                <span><strong>{c.etiqueta}</strong> · {c.pregunta}</span>
+              </button>
+            );
+          })}
+          <button type="button" className="fh-btn" data-used={contrastando} disabled={cerrado} onClick={onToggleContraste}>
+            <i className="fa-solid fa-code-compare" aria-hidden />
+            <span><strong>Contrastar</strong> con otra fuente ({COSTO_CONTRASTE} h)</span>
+          </button>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 9 }}>
+          {CRITERIOS_SIM.filter((c) => pistas.includes(`${f.id}:${c.id}`)).map((c) => (
+            <div key={c.id} className="fh-pista"><strong>{c.etiqueta}:</strong> {f.pistas[c.id]}</div>
+          ))}
+        </div>
+        {contrastando && (
+          <div style={{ marginTop: 9, display: "flex", flexDirection: "column", gap: 8 }}>
+            <div style={{ fontSize: 14, color: T.text2 }}>¿Con cuál la contrastas?</div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
+              {ARCHIVO.filter((o) => o.id !== f.id).map((o) => (
+                <button key={o.id} type="button" className="fh-btn" data-used={contrasteVer === o.id} onClick={() => onContrastar(o.id)} style={{ padding: "8px 12px" }}>
+                  {o.medio}{contrastes.includes(claveContraste(f.id, o.id)) ? " ✓" : ""}
+                </button>
+              ))}
             </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 14, fontWeight: 700, color: done ? "#fff" : T.text2, lineHeight: 1.4 }}>{c.pregunta}</div>
-              <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.4, marginTop: 3 }}>{c.ejemplo}</div>
+            {contrasteVer && <div className="fh-pista"><strong>{f.medio} frente a {porId(contrasteVer).medio.toLowerCase()}:</strong> {textoContraste(f.id, contrasteVer)}</div>}
+          </div>
+        )}
+      </div>
+
+      <div>
+        <div style={{ fontSize: 14, fontWeight: 800, color: T.text3, marginBottom: 7 }}>2 · ¿Qué tipo de fuente es?</div>
+        <div className="fh-herr">
+          {tiposBtn.map((t) => (
+            <button key={t} type="button" className="fh-btn" data-used={tipo === t} data-shake={shakeTipo === t} disabled={!!tipo || cerrado} onClick={() => onClasificar(t)}>
+              <i className={`fa-solid ${TIPO_FUENTE_INFO[t].icono}`} aria-hidden />
+              {TIPO_FUENTE_INFO[t].titulo}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <div style={{ fontSize: 14, fontWeight: 800, color: T.text3, marginBottom: 7 }}>3 · ¿Qué tanto te fías de ella? (pesa en la línea de tiempo)</div>
+        <div className="fh-herr">
+          {juiciosBtn.map((j) => (
+            <button key={j} type="button" className="fh-btn" data-used={juicio === j} disabled={!!juicio || cerrado} onClick={() => onJuzgar(j)}>
+              <i className={`fa-solid ${j === "confiable" ? "fa-shield-halved" : j === "reservas" ? "fa-scale-unbalanced" : "fa-triangle-exclamation"}`} aria-hidden />
+              {ETIQUETA_JUICIO[j]}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {aviso && <div className="fh-aviso" data-t={aviso.tono} role="status">{aviso.texto}</div>}
+    </div>
+  );
+}
+
+function LineaTiempo({ linea, accent, cerrado }: { linea: LineaEvento[]; accent: string; cerrado: boolean }) {
+  const colorDe = (l: LineaEvento) => (l.estado === "corroborada" ? OK : l.estado === "una" ? accent : l.estado === "disputa" ? AMBAR : "rgba(255,255,255,0.25)");
+  const etiqueta = (l: LineaEvento) => (l.estado === "corroborada" ? `corroborada por ${l.apoyos} fuentes` : l.estado === "una" ? "apoyada por una sola fuente" : l.estado === "disputa" ? "en disputa" : "sin evidencia todavía");
+  return (
+    <div className="fh-panel">
+      <Eyebrow>
+        <i className="fa-solid fa-timeline" style={{ marginRight: 8, color: accent }} />
+        Línea de tiempo según tus juicios
+      </Eyebrow>
+      <div className="fh-linea">
+        {linea.map((l) => (
+          <div key={l.ev.id} className="fh-ev" style={{ ["--pt" as string]: colorDe(l) }}>
+            <div style={{ fontSize: 14, fontWeight: 800, color: "#fff" }}>{l.ev.titulo}</div>
+            <div style={{ fontSize: 14, color: l.version ? T.text : T.text3, lineHeight: 1.45 }}>
+              {l.version === "a" ? l.ev.a : l.version === "b" ? (l.ev.b ?? l.ev.a) : "Aún no hay fuentes que lo respalden."}
+            </div>
+            <div style={{ fontSize: 14, color: colorDe(l), fontWeight: 700 }}>
+              {etiqueta(l)}
+              {cerrado && (l.correcto ? " · coincide con lo ocurrido" : " · no coincide con lo ocurrido")}
             </div>
           </div>
-        );
-      })}
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Veredicto({ linea, solidez: s, onReiniciar }: { linea: LineaEvento[]; solidez: number; onReiniciar: () => void }) {
+  const n = correctos(linea);
+  const todas = n === linea.length;
+  return (
+    <div className="fh-panel" style={{ borderColor: `${todas ? OK : AMBAR}66` }}>
+      <div style={{ fontSize: 16, fontWeight: 900, color: todas ? OK : AMBAR }}>
+        <i className={`fa-solid ${todas ? "fa-trophy" : "fa-circle-half-stroke"}`} aria-hidden style={{ marginRight: 9 }} />
+        {n} de {linea.length} hechos reconstruidos · solidez {s} %
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {linea.map((l) => (
+          <div key={l.ev.id} style={{ fontSize: 14, lineHeight: 1.5, color: T.text2 }}>
+            <i className={`fa-solid ${l.correcto ? "fa-circle-check" : "fa-circle-xmark"}`} aria-hidden style={{ marginRight: 8, color: l.correcto ? OK : NO }} />
+            <strong style={{ color: T.text }}>{l.ev.titulo}.</strong> {l.ev.porque}
+          </div>
+        ))}
+      </div>
+      <button type="button" className="fh-btn" onClick={onReiniciar}>
+        <i className="fa-solid fa-rotate-left" aria-hidden /> Abrir el caso de nuevo
+      </button>
     </div>
   );
 }
@@ -677,12 +785,12 @@ function QuizCard({
           Comprueba lo aprendido
         </Eyebrow>
         {aprobado && (
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 12, fontWeight: 800, color: OK }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 14, fontWeight: 800, color: OK }}>
             <i className="fa-solid fa-circle-check" /> Aprobado
           </span>
         )}
       </div>
-      <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
         Cinco afirmaciones sobre la selección, evaluación y contraste de fuentes históricas. Decide si son verdaderas o falsas y pulsa «Comprobar».
       </div>
 
@@ -691,7 +799,7 @@ function QuizCard({
           const elegida = resp[qi];
           return (
             <div key={qi}>
-              <div style={{ fontSize: 14.5, fontWeight: 800, color: T.text, marginBottom: 11, display: "flex", gap: 10 }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: T.text, marginBottom: 11, display: "flex", gap: 10 }}>
                 <span style={{ color: accent }}>{qi + 1}.</span>
                 <span>{q.pregunta}</span>
               </div>
@@ -717,7 +825,7 @@ function QuizCard({
                   }
                   return (
                     <button key={oi} className="fh-q" onClick={() => elegir(qi, oi)} disabled={comprobado} style={{ borderColor: borde, background: fondo, color: colorTxt }}>
-                      <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
+                      <span style={{ width: 28, height: 28, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
                         {comprobado && esCorrecta ? <i className="fa-solid fa-check" /> : comprobado && sel ? <i className="fa-solid fa-xmark" /> : String.fromCharCode(65 + oi)}
                       </span>
                       <span style={{ flex: 1, lineHeight: 1.35 }}>{op}</span>
@@ -726,7 +834,7 @@ function QuizCard({
                 })}
               </div>
               {comprobado && (
-                <div style={{ marginTop: 9, fontSize: 12.5, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
+                <div style={{ marginTop: 9, fontSize: 14, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
                   <i className="fa-solid fa-circle-info" style={{ color: accent, marginTop: 2 }} />
                   <span>{q.retro}</span>
                 </div>
@@ -749,7 +857,7 @@ function QuizCard({
           </button>
         )}
         {comprobado && (
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 13.5, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 14, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
             <i className={`fa-solid ${aprobadoAhora ? "fa-trophy" : "fa-circle-half-stroke"}`} />
             {aciertos} / {total} correctas
             {!aprobadoAhora && <span style={{ color: T.text3, fontWeight: 600 }}>· revisa las marcadas e inténtalo de nuevo</span>}

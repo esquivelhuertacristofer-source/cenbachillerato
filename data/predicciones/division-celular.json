@@ -1,0 +1,12 @@
+{
+  "escena": "Una célula con 4 cromosomas (dos pares) lista para dividirse por meiosis, con un deslizador de fases.",
+  "pregunta": "Llevas la meiosis hasta el final. ¿Cuántos cromosomas lleva cada célula hija, comparada con la madre?",
+  "opciones": [
+    { "id": "a", "texto": "Los mismos: 4 cada una", "icono": "fa-equals" },
+    { "id": "b", "texto": "La mitad: 2 cada una", "icono": "fa-divide" },
+    { "id": "c", "texto": "El doble: 8 cada una", "icono": "fa-xmark" }
+  ],
+  "correcta": "b",
+  "porque": "En la meiosis los cromosomas se duplican una sola vez pero la célula se divide dos veces. Primero se separan los homólogos y luego las cromátidas, así que cada gameto queda con la mitad (n).",
+  "comoComprobarlo": "Elige Meiosis, arrastra el deslizador «Fase» hasta Telofase II y lee «Cromosomas por célula»; luego haz lo mismo en Mitosis."
+}

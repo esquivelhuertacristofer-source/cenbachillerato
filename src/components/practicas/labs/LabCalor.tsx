@@ -3,17 +3,22 @@
 /**
  * Laboratorio 3D — "Propagación del calor: conducción, convección y radiación".
  * Práctica experimental anclada a CNEYT-II-P11-A2 (ejercicio; propósito formativo
- * O4, UAC CNEYT-II "El poder de la energía"). Recorre cada mecanismo paso a paso
- * y calcula el flujo de calor con la conductividad térmica k y la energía con la
- * capacidad térmica específica c, con la matemática exacta del módulo de datos.
+ * O4, UAC CNEYT-II "El poder de la energía"). Recorre cada mecanismo y calcula el
+ * flujo de calor con la conductividad térmica k y la energía con la capacidad
+ * térmica específica c, con la matemática exacta del módulo de datos.
+ *
+ * EL experimento: cambias el material de la barra (k) y el frente de calor viaja
+ * más rápido o más lento; subes el calor de la base o la temperatura del cuerpo
+ * y la corriente o el brillo de las ondas cambian (T⁴).
  *
  * Cuatro modos: conducción · convección · radiación · comparar.
  */
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, card, Eyebrow, SceneBoundary } from "./_kit";
+import { T, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { RetoNumericoCard } from "./_reto-numerico";
 import { LabSfx } from "./lab-audio";
@@ -29,6 +34,9 @@ import {
   MATERIALES,
   materialPorNombre,
   conduccion,
+  conveccion,
+  radiacion,
+  cToK,
   calorSensible,
   tiempoCalentar,
   fmtNum,
@@ -44,7 +52,6 @@ import {
   DATOS,
   HECHOS,
 } from "./calor-data";
-import { TableroObjetivos } from "./_objetivos";
 
 /** Clave de la mejor marca de este laboratorio. */
 const RETO_KEY = "cen-propagacion-calor-reto";
@@ -54,7 +61,7 @@ const CalorScene = dynamic(() => import("./CalorScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-fire-flame-curved fa-fade" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Cargando la propagación del calor en 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Cargando la propagación del calor en 3D…</span>
     </div>
   ),
 });
@@ -67,6 +74,9 @@ export function LabCalor({ color }: PracticaLabProps) {
   const [playing, setPlaying] = useState<boolean>(true);
   const [resetNonce, setResetNonce] = useState(0);
 
+  // EL experimento: qué tan fuerte es el calor (base o temperatura) y de qué material es la barra
+  const [nivel, setNivel] = useState<number>(0.6);
+
   // calculadora de la actividad A2
   const [matNombre, setMatNombre] = useState<string>("Cobre");
   const [areaCm2, setAreaCm2] = useState<number>(100);
@@ -74,9 +84,14 @@ export function LabCalor({ color }: PracticaLabProps) {
   const [deltaT, setDeltaT] = useState<number>(80);
   const [masaKg, setMasaKg] = useState<number>(1);
 
-  // reto evaluable, teoría (cajón deslizable) y sonido
+  // banderas de misión (se activan en eventos y ya no se desactivan)
+  const [vistos, setVistos] = useState<Record<string, boolean>>({ conduccion: true });
+  const [siguioCond, setSiguioCond] = useState(false);
+  const [probaAislante, setProbaAislante] = useState(false);
+  const [subioTemp, setSubioTemp] = useState(false);
+
+  // reto evaluable y sonido
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
 
@@ -113,14 +128,18 @@ export function LabCalor({ color }: PracticaLabProps) {
   useEffect(() => {
     if (!playing || esComparar || total === 0) return;
     if (idx >= total) return;
-    const t = setInterval(() => setPaso((p) => Math.min(total, p + 1)), 1600);
+    const t = setInterval(() => {
+      setPaso((p) => Math.min(total, p + 1));
+      if (modo === "conduccion") setSiguioCond(true);
+    }, 1600);
     return () => clearInterval(t);
-  }, [playing, total, idx, esComparar]);
+  }, [playing, total, idx, esComparar, modo]);
 
   const cambiarModo = (m: Modo) => {
     setModo(m);
     setPaso(0);
     setPlaying(m !== "comparar");
+    setVistos((v) => ({ ...v, [m]: true }));
     bump();
     if (sonido) audioRef.current?.blip();
   };
@@ -140,445 +159,327 @@ export function LabCalor({ color }: PracticaLabProps) {
   const energia = calorSensible(m, mat.c, dT); // J
   const tCal = tiempoCalentar(m, mat.c, dT, flujo); // s
 
+  // conductividad relativa (escala log de k) → rapidez del frente de calor en la escena
+  const kMin = Math.log10(0.026);
+  const kMax = Math.log10(401);
+  const kRel = Math.max(0, Math.min(1, (Math.log10(mat.k) - kMin) / (kMax - kMin)));
+  const segCruce = 1 / (0.05 + 0.45 * kRel);
+
+  // radiación: la temperatura del cuerpo sale del mismo control
+  const tempK = Math.round(300 + nivel * 1200);
+  const potRad = radiacion(1, 1, tempK, cToK(20));
+  // convección: ΔT de la base (ejemplo con h = 10 W/m²·K y 1 m²)
+  const dTBase = Math.round(10 + nivel * 70);
+  const potConv = conveccion(10, 1, dTBase);
+
+  const elegirMaterial = (nombre: string) => {
+    setMatNombre(nombre);
+    if (materialPorNombre(nombre).k < 1) setProbaAislante(true);
+    setModo("conduccion");
+    setVistos((v) => ({ ...v, conduccion: true }));
+    setPaso(0);
+    setPlaying(true);
+    bump();
+    if (sonido) audioRef.current?.blip();
+  };
+
+  const cambiarNivel = (v: number) => {
+    setNivel(v);
+    if (modo === "radiacion" && 300 + v * 1200 >= 1200) setSubioTemp(true);
+  };
+
   const sceneFallback = (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 28, textAlign: "center" }}>
       <div style={{ width: 74, height: 74, borderRadius: 20, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30, color: "#04121f", background: accent, boxShadow: `0 10px 30px -6px ${accent}` }}>
         <i className={`fa-solid ${def.icono}`} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{def.etq}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>
         Tu equipo no puede mostrar la escena en 3D, pero la información sigue aquí. {def.subtitulo}.
       </div>
     </div>
   );
 
-  const pie: string = esComparar
-    ? "Compara los tres caminos del calor: por contacto en sólidos (conducción), por corrientes en fluidos (convección) y por ondas en el vacío (radiación)."
-    : `Fase ${idx + 1}/${totalFases} — ${escena.nombre}. ${escena.desc}`;
+  const lectura: React.ReactNode =
+    modo === "conduccion" ? (
+      <>{mat.nombre} (k = {mat.k}): el calor cruza la barra en ~{fmtNum(segCruce)} s</>
+    ) : modo === "conveccion" ? (
+      <>Base +{dTBase} °C: corriente {nivel < 0.35 ? "lenta" : nivel < 0.7 ? "media" : "rápida"}</>
+    ) : modo === "radiacion" ? (
+      <>{tempK} K emite {fmtNum(potRad, 0)} W por m²</>
+    ) : (
+      <>Sólido, fluido y vacío: tres caminos del calor</>
+    );
+
+  const inputStyle: React.CSSProperties = {
+    width: "100%", boxSizing: "border-box", fontFamily: "ui-monospace, monospace", fontSize: 15, fontWeight: 800, color: "#fff",
+    background: "rgba(4,10,22,0.55)", border: `1px solid ${accent}`, borderRadius: 9, padding: "9px 10px", outline: "none", textAlign: "center",
+  };
+  const etqStyle: React.CSSProperties = { fontSize: 14, color: T.text2, fontWeight: 700 };
 
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes clPulse { 0%,100%{ box-shadow:0 0 0 0 var(--cld); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .cl-live-dot { animation: clPulse 1.6s ease-in-out infinite; }
-        .cl-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .cl-grid { grid-template-columns: 1fr; } }
-        .cl-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .cl-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .cl-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .cl-tabs { display:grid; grid-template-columns: repeat(4,1fr); gap:8px; }
-        @media (max-width: 560px){ .cl-tabs { grid-template-columns: repeat(2,1fr); } }
-        .cl-tab { cursor:pointer; border:1px solid var(--clc); border-radius:12px; padding:11px 8px; text-align:center;
-          background:transparent; transition:all .15s; color:#fff; }
-        .cl-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
-        .cl-tab:hover { background:rgba(255,255,255,0.06); }
-        .cl-phases { display:flex; flex-wrap:wrap; gap:6px; }
-        .cl-phase { cursor:pointer; padding:6px 10px; border-radius:9px; border:1px solid; font-size:11px; font-weight:800; transition:all .12s; }
-        .cl-range { width:100%; accent-color: var(--clc); cursor:pointer; }
-        .cl-num { width:90px; box-sizing:border-box; font-family:ui-monospace,monospace; font-size:14px; font-weight:800;
-          color:#fff; background:rgba(4,10,22,0.55); border:1px solid var(--clc); border-radius:9px; padding:8px 10px; outline:none; text-align:center; }
-        .cl-sel { box-sizing:border-box; font-size:13px; font-weight:700; color:#fff; background:rgba(4,10,22,0.55);
-          border:1px solid var(--clc); border-radius:9px; padding:8px 10px; outline:none; cursor:pointer; }
-        .cl-cmp { width:100%; border-collapse:collapse; }
-        .cl-cmp td, .cl-cmp th { padding:8px 9px; font-size:11px; border-bottom:1px solid ${T.line}; vertical-align:top; text-align:left; }
-        .cl-cmp th { font-size:9.5px; letter-spacing:0.08em; text-transform:uppercase; color:${T.text3}; }
-        @media (max-width: 1000px){ .cl-bottom { grid-template-columns: 1fr !important; } }
-
-        /* Cajón de teoría */
-        .ex-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .ex-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .ex-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06121e 0%,#040a16 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .ex-drawer[data-open="true"] { transform:translateX(0); }
-        .ex-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .ex-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .ex-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .ex-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .ex-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
-        .ex-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      {/* Selector de modo */}
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="cl-tabs">
-          {MODOS.map((mm) => {
-            const d = MODOS_DEF[mm];
-            const col = `#${d.color.replace("#", "")}`;
-            const on = mm === modo;
-            return (
-              <button key={mm} className="cl-tab" data-on={on} onClick={() => cambiarModo(mm)} style={{ ["--clc" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? col : "inherit" }}><i className={`fa-solid ${d.icono}`} /></div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{d.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{d.subtitulo}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="cl-grid">
-        {/* ── Columna visor ──────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 58vh, 660px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <CalorScene modo={modo} escena={escena} playing={playing} modoColor={modoCol} resetNonce={resetNonce} />
-            </SceneBoundary>
-
-            {/* Cinta EN VIVO */}
-            <div style={{ position: "absolute", top: 14, left: 16, display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)" }}>
-              <span className="cl-live-dot" style={{ ["--cld" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol }} />
-              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3 }}>EN VIVO</span>
-              <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)" }} />
-              <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{def.etq.toUpperCase()}</span>
-            </div>
-
-            {/* Toolbar siempre visible: teoría + sonido */}
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="cl-icobtn" data-on={drawerOpen} onClick={() => setDrawerOpen(true)} title="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="cl-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-            </div>
-
-            {/* Toolbar de fases (oculta en comparar) */}
-            {!esComparar && (
-              <div style={{ position: "absolute", top: 60, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-                <button className="cl-icobtn" onClick={() => { setPlaying(false); setPaso((p) => Math.max(0, p - 1)); }} title="Fase anterior">
-                  <i className="fa-solid fa-backward-step" />
-                </button>
-                <button className="cl-icobtn" data-on={playing} onClick={() => setPlaying((p) => !p)} title={playing ? "Pausar" : "Reanudar"}>
-                  <i className={`fa-solid ${playing ? "fa-pause" : "fa-play"}`} />
-                </button>
-                <button className="cl-icobtn" onClick={() => { setPlaying(false); setPaso((p) => Math.min(total, p + 1)); }} title="Fase siguiente">
-                  <i className="fa-solid fa-forward-step" />
-                </button>
-                <button className="cl-icobtn" onClick={reiniciar} title="Reiniciar">
-                  <i className="fa-solid fa-rotate-left" />
-                </button>
-              </div>
-            )}
-
-            {/* Pie: lectura en vivo */}
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 18px 14px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                {esComparar ? "Tres mecanismos del calor" : escena.nombre} — <span style={{ color: "#cdd8ec" }}>viaja por {escena.medio}</span>
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6 }}>{pie}</div>
-            </div>
-
-            {/* Botón flotante de Teoría */}
-            <button className="ex-teoria-fab" onClick={() => setDrawerOpen(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-          </div>
-
-          {/* Panel de control */}
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-                Controles — {def.etq}
-              </Eyebrow>
-              <span style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: "#7dd3fc", border: "1px solid #7dd3fc55", borderRadius: 6, padding: "3px 7px" }}>
-                EJERCICIO A2
-              </span>
-            </div>
-
-            {esComparar ? (
-              <div>
-                <Eyebrow><i className="fa-solid fa-table-list" style={{ marginRight: 8, color: modoCol }} />Conducción · Convección · Radiación</Eyebrow>
-                <table className="cl-cmp">
-                  <thead>
-                    <tr><th>Rasgo</th><th style={{ color: "#fb923c" }}>Conducción</th><th style={{ color: "#38bdf8" }}>Convección</th><th style={{ color: "#f472b6" }}>Radiación</th></tr>
-                  </thead>
-                  <tbody>
-                    {COMPARACION.map((f) => (
-                      <tr key={f.rasgo}>
-                        <td style={{ color: T.text2, fontWeight: 700 }}>{f.rasgo}</td>
-                        <td style={{ color: "#fff" }}>{f.conduccion}</td>
-                        <td style={{ color: "#fff" }}>{f.conveccion}</td>
-                        <td style={{ color: "#fff" }}>{f.radiacion}</td>
-                      </tr>
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <CalorScene modo={modo} escena={escena} playing={playing} modoColor={modoCol} resetNonce={resetNonce} nivel={nivel} kRel={kRel} />
+        </SceneBoundary>
+      }
+      modos={{
+        opciones: MODOS.map((mm) => ({ id: mm, etiqueta: MODOS_DEF[mm].etq, icono: MODOS_DEF[mm].icono })),
+        valor: modo,
+        cambiar: (id) => cambiarModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          {!esComparar && (
+            <BotonHerramienta icono={playing ? "fa-pause" : "fa-play"} titulo={playing ? "Pausar" : "Reanudar"} activo={playing} onClick={() => setPlaying((p) => !p)} />
+          )}
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={[
+        { txt: "Prueba un aislante (madera o aire): ¿tarda más el calor en llegar al centro?", done: probaAislante },
+        { txt: "Sigue la conducción: el calor avanza partícula a partícula", done: siguioCond },
+        { txt: "Cambia el material y compara qué tan rápido conduce", done: matNombre !== "Cobre" },
+        { txt: "Observa la convección: el fluido caliente sube y el frío baja", done: !!vistos.conveccion },
+        { txt: "Observa la radiación: viaja sin necesidad de medio", done: !!vistos.radiacion },
+        { txt: "Sube el cuerpo a más de 1 200 K y mira cómo se intensifican las ondas", done: subioTemp },
+        { txt: "Compara los tres mecanismos uno al lado del otro", done: !!vistos.comparar },
+        { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
+      ]}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Controles",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              {modo === "conduccion" && (
+                <Bloque titulo="Material de la barra" icono="fa-cubes">
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 110px), 1fr))", gap: 8 }}>
+                    {MATERIALES.map((mt) => (
+                      <button
+                        key={mt.nombre}
+                        type="button"
+                        onClick={() => elegirMaterial(mt.nombre)}
+                        style={{ cursor: "pointer", padding: "10px 8px", borderRadius: 10, fontSize: 14, fontWeight: 800, color: "#fff", textAlign: "center",
+                          border: `1px solid ${mt.nombre === matNombre ? modoCol : "rgba(255,255,255,0.14)"}`,
+                          background: mt.nombre === matNombre ? `${modoCol}33` : "transparent" }}
+                      >
+                        {mt.nombre}
+                        <div style={{ fontSize: 14, color: T.text3, fontWeight: 600 }}>k = {mt.k}</div>
+                      </button>
                     ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 7 }}>
-                  <span style={{ fontSize: 11, fontWeight: 900, letterSpacing: "0.1em", color: T.text3 }}>FASE</span>
-                  <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{idx + 1} / {totalFases}</span>
-                </div>
-                <input type="range" min={0} max={total} value={idx} onChange={(e) => { setPlaying(false); setPaso(Number(e.target.value)); }} className="cl-range" style={{ ["--clc" as string]: modoCol, marginBottom: 14 }} />
-                <div className="cl-phases" style={{ marginBottom: 4 }}>
-                  {nombresFase.map((nom, i) => {
-                    const on = i === idx;
-                    const visto = i < idx;
-                    return (
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                    <Dato label="conductividad k" value={`${mat.k} W/m·K`} col={modoCol} />
+                    <Dato label="cruza la barra en" value={`~${fmtNum(segCruce)} s`} col="#fbbf24" />
+                  </div>
+                  <p style={{ margin: 0, color: T.text2 }}>Elige otro material: el frente de calor cambia de rapidez y el sensor del punto medio lo muestra.</p>
+                </Bloque>
+              )}
+
+              {modo === "conveccion" && (
+                <Bloque titulo="Calor de la base" icono="fa-fire">
+                  <Deslizador label="Calor de la base" icon="fa-fire" colr={modoCol} valor={`+${dTBase} °C`} min={0} max={1} step={0.05} value={nivel} onChange={cambiarNivel} hintL="tibia" hintR="muy caliente" />
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                    <Dato label="ΔT base–fluido" value={`${dTBase} °C`} col={modoCol} />
+                    <Dato label="Q/t (h=10, A=1 m²)" value={`${fmtNum(potConv, 0)} W`} col="#fbbf24" />
+                  </div>
+                  <p style={{ margin: 0, color: T.text2 }}>Más calor en la base: el fluido sube más rápido y la corriente se acelera.</p>
+                </Bloque>
+              )}
+
+              {modo === "radiacion" && (
+                <Bloque titulo="Temperatura del cuerpo" icono="fa-temperature-high">
+                  <Deslizador label="Temperatura" icon="fa-temperature-high" colr={modoCol} valor={`${tempK} K`} min={0} max={1} step={0.05} value={nivel} onChange={cambiarNivel} hintL="300 K" hintR="1 500 K" />
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                    <Dato label="T del cuerpo" value={`${tempK} K`} col={modoCol} />
+                    <Dato label="potencia (ε=1)" value={`${fmtNum(potRad, 0)} W/m²`} col="#fbbf24" />
+                  </div>
+                  <p style={{ margin: 0, color: T.text2 }}>Si la temperatura se duplica, la potencia radiada se multiplica casi por 16 (T⁴). Fíjate en el brillo de los anillos.</p>
+                </Bloque>
+              )}
+
+              {esComparar && (
+                <Bloque titulo="Comparación rápida" icono="fa-table-list">
+                  <p style={{ margin: 0, color: T.text2 }}>Cada mecanismo funciona en un medio distinto: sólido, fluido o vacío. La tabla completa está en «Teoría».</p>
+                </Bloque>
+              )}
+
+              {!esComparar && (
+                <Bloque titulo="Qué está pasando" icono="fa-circle-info">
+                  <p style={{ margin: 0, color: T.text2 }}>
+                    <strong style={{ color: "#fff" }}>Fase {idx + 1}/{totalFases} — {escena.nombre}.</strong> {escena.desc}
+                  </p>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                    {nombresFase.map((nom, i) => (
                       <button
                         key={nom}
-                        className="cl-phase"
+                        type="button"
                         onClick={() => { setPlaying(false); setPaso(i); }}
-                        style={{
-                          borderColor: on ? modoCol : visto ? `${modoCol}55` : "rgba(255,255,255,0.12)",
-                          background: on ? `${modoCol}22` : "transparent",
-                          color: on ? "#fff" : visto ? "#cdd8ec" : T.text3,
-                        }}
+                        style={{ cursor: "pointer", padding: "8px 11px", borderRadius: 9, fontSize: 14, fontWeight: 800, color: i === idx ? "#fff" : T.text2,
+                          border: `1px solid ${i === idx ? modoCol : "rgba(255,255,255,0.14)"}`, background: i === idx ? `${modoCol}22` : "transparent" }}
                       >
                         {nom}
                       </button>
-                    );
-                  })}
+                    ))}
+                  </div>
+                </Bloque>
+              )}
+
+              <Bloque titulo="Calculadora — flujo y energía (A2)" icono="fa-calculator">
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 10 }}>
+                  <label style={{ display: "grid", gap: 4 }}>
+                    <span style={etqStyle}>Material (k, c)</span>
+                    <select value={matNombre} onChange={(e) => elegirMaterial(e.target.value)} style={{ ...inputStyle, textAlign: "left", cursor: "pointer" }}>
+                      {MATERIALES.map((mt) => (
+                        <option key={mt.nombre} value={mt.nombre}>{mt.nombre} — k={mt.k}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <label style={{ display: "grid", gap: 4 }}>
+                    <span style={etqStyle}>ΔT (°C)</span>
+                    <input type="number" min={0} max={2000} step={5} value={deltaT} onChange={(e) => setDeltaT(Number(e.target.value) || 0)} style={inputStyle} />
+                  </label>
+                  <label style={{ display: "grid", gap: 4 }}>
+                    <span style={etqStyle}>Área (cm²)</span>
+                    <input type="number" min={1} max={100000} step={10} value={areaCm2} onChange={(e) => setAreaCm2(Number(e.target.value) || 1)} style={inputStyle} />
+                  </label>
+                  <label style={{ display: "grid", gap: 4 }}>
+                    <span style={etqStyle}>Largo / grosor (cm)</span>
+                    <input type="number" min={0.1} max={1000} step={1} value={largoCm} onChange={(e) => setLargoCm(Number(e.target.value) || 0.1)} style={inputStyle} />
+                  </label>
+                  <label style={{ display: "grid", gap: 4 }}>
+                    <span style={etqStyle}>Masa a calentar (kg)</span>
+                    <input type="number" min={0.01} max={10000} step={0.5} value={masaKg} onChange={(e) => setMasaKg(Number(e.target.value) || 0.01)} style={inputStyle} />
+                  </label>
                 </div>
-              </>
-            )}
-          </div>
-
-          {/* Calculadora de la actividad A2 */}
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <Eyebrow><i className="fa-solid fa-calculator" style={{ marginRight: 8, color: accent }} />Calculadora — flujo y energía de calor</Eyebrow>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, margin: "10px 0 16px" }}>
-              <label style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                <span style={{ fontSize: 11, color: T.text3, fontWeight: 700 }}>Material (k, c)</span>
-                <select className="cl-sel" value={matNombre} onChange={(e) => setMatNombre(e.target.value)} style={{ ["--clc" as string]: accent }}>
-                  {MATERIALES.map((mt) => (
-                    <option key={mt.nombre} value={mt.nombre}>{mt.nombre} — k={mt.k}</option>
-                  ))}
-                </select>
-              </label>
-              <label style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                <span style={{ fontSize: 11, color: T.text3, fontWeight: 700 }}>ΔT (°C)</span>
-                <input type="number" className="cl-num" min={0} max={2000} step={5} value={deltaT} onChange={(e) => setDeltaT(Number(e.target.value) || 0)} style={{ ["--clc" as string]: accent, width: "100%" }} />
-              </label>
-              <label style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                <span style={{ fontSize: 11, color: T.text3, fontWeight: 700 }}>Área (cm²)</span>
-                <input type="number" className="cl-num" min={1} max={100000} step={10} value={areaCm2} onChange={(e) => setAreaCm2(Number(e.target.value) || 1)} style={{ ["--clc" as string]: accent, width: "100%" }} />
-              </label>
-              <label style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                <span style={{ fontSize: 11, color: T.text3, fontWeight: 700 }}>Largo / grosor (cm)</span>
-                <input type="number" className="cl-num" min={0.1} max={1000} step={1} value={largoCm} onChange={(e) => setLargoCm(Number(e.target.value) || 0.1)} style={{ ["--clc" as string]: accent, width: "100%" }} />
-              </label>
-            </div>
-
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-              <div style={{ padding: "12px 14px", borderRadius: 12, border: "1px solid #fb923c55", background: "rgba(251,146,60,0.08)" }}>
-                <div style={{ fontSize: 11, fontWeight: 900, color: "#fb923c", marginBottom: 6 }}><i className="fa-solid fa-fire-burner" style={{ marginRight: 6 }} />CONDUCCIÓN</div>
-                <div style={{ fontSize: 12.5, color: "#fff", lineHeight: 1.6 }}>
-                  Q/t = <strong>{fmtNum(flujo)}</strong> W<br />
-                  <span style={{ color: T.text3 }}>= k·A·ΔT/L</span>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                  <Dato label="Q/t = k·A·ΔT/L" value={`${fmtNum(flujo)} W`} col="#fb923c" />
+                  <Dato label={`Q = m·c·ΔT (${m} kg)`} value={`${fmtNum(energia)} J`} col="#38bdf8" />
                 </div>
-              </div>
-              <div style={{ padding: "12px 14px", borderRadius: 12, border: "1px solid #38bdf855", background: "rgba(56,189,248,0.08)" }}>
-                <div style={{ fontSize: 11, fontWeight: 900, color: "#38bdf8", marginBottom: 6 }}><i className="fa-solid fa-temperature-half" style={{ marginRight: 6 }} />ENERGÍA</div>
-                <div style={{ fontSize: 12.5, color: "#fff", lineHeight: 1.6 }}>
-                  Q = <strong>{fmtNum(energia)}</strong> J<br />
-                  <span style={{ color: T.text3 }}>= m·c·ΔT ({m} kg)</span>
-                </div>
-              </div>
-            </div>
-
-            <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 12, flexWrap: "wrap" }}>
-              <span style={{ fontSize: 12, color: T.text2 }}>Masa a calentar (kg):</span>
-              <input type="number" className="cl-num" min={0.01} max={10000} step={0.5} value={masaKg} onChange={(e) => setMasaKg(Number(e.target.value) || 0.01)} style={{ ["--clc" as string]: accent }} />
-            </div>
-
-            <div style={{ marginTop: 12, padding: "11px 13px", borderRadius: 11, border: `1px solid ${accent}44`, background: `rgba(${color.rgba},0.08)`, fontSize: 12, color: "#eaf0fb", lineHeight: 1.5 }}>
-              <i className="fa-solid fa-circle-info" style={{ color: accent, marginRight: 8 }} />
-              Con esa potencia de conducción, calentar {m} kg de {mat.nombre.toLowerCase()} (c = {mat.c} J/kg·K) {dT} °C tomaría <strong>{fmtNum(tCal)} s</strong>. El agua, con c muy alta, necesita mucha más energía: por eso modera el clima.
-            </div>
-          </div>
-        </div>
-
-        {/* ── Columna lateral ────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          {/* Descripción del laboratorio */}
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-fire-flame-curved" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>El visor de la propagación del calor</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          {/* Para reflexionar */}
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #7dd3fc55", background: "rgba(125,211,252,0.07)" }}>
-            <Eyebrow><i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: "#7dd3fc" }} />Para reflexionar — {def.etq}</Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {PREGUNTAS[modo].map((q, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>{q}</li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Ejemplo resuelto (A2) */}
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow><i className="fa-solid fa-square-root-variable" style={{ marginRight: 8, color: accent }} />Ejemplo resuelto (A2)</Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55, marginBottom: 10 }}>{EJEMPLO.enunciado}</div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }}>
-              {EJEMPLO.datos.map((d, i) => (
-                <span key={i} style={{ fontSize: 11, fontWeight: 800, color: "#fff", padding: "4px 9px", borderRadius: 8, background: "rgba(4,10,22,0.5)", border: `1px solid ${T.line}` }}>{d}</span>
-              ))}
-            </div>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55, marginBottom: 10 }}>{EJEMPLO.solucion}</div>
-            <div style={{ padding: "10px 12px", borderRadius: 10, border: `1px solid ${accent}44`, background: `rgba(${color.rgba},0.08)`, fontSize: 12, fontWeight: 800, color: "#86efac" }}>
-              <i className="fa-solid fa-flag-checkered" style={{ marginRight: 7, color: accent }} />{EJEMPLO.resultado}
-            </div>
-          </div>
-
-          {/* Cómo usar */}
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow><i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />Cómo usar el laboratorio</Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES[modo].map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Datos + ideas clave ────────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="cl-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow><i className="fa-solid fa-magnifying-glass-chart" style={{ marginRight: 8, color: accent }} />Datos de la propagación del calor</Eyebrow>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
-            {DATOS.map((dd, i) => (
-              <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "10px 12px", borderRadius: 10, background: T.glass, border: `1px solid ${T.line}` }}>
-                <div style={{ width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: accent, background: `rgba(${color.rgba},0.16)`, flexShrink: 0 }}>
-                  <i className={`fa-solid ${dd.icono}`} />
-                </div>
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{dd.valor}</div>
-                  <div style={{ fontSize: 11, color: T.text2, lineHeight: 1.4 }}>{dd.texto}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Contexto mexicano */}
-          <div style={{ marginTop: 16, padding: "14px 16px", borderRadius: 12, border: `1px solid ${accent}33`, background: `rgba(${color.rgba},0.07)` }}>
-            <Eyebrow><i className="fa-solid fa-location-dot" style={{ marginRight: 8, color: accent }} />México: clima y vivienda</Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{CONTEXTO}</div>
-          </div>
-
-          {/* ¿Sabías que? */}
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow><i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />¿Sabías que?</Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {HECHOS.map((h, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{h}</li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Glosario */}
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow><i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />Glosario</Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {GLOSARIO.map((g, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{g.termino}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{g.definicion}</span>
-                  <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.4, marginTop: 4 }}><i className="fa-solid fa-flask" style={{ marginRight: 6, color: accent }} />{g.ejemplo}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow><i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />Ideas clave</Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-            {IDEAS.map((x, i) => (
-              <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>{x}</li>
-            ))}
-          </ul>
-
-          <div style={{ marginTop: 16, paddingTop: 14, borderTop: `1px solid ${T.line}` }}>
-            <Eyebrow><i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />Objetivos</Eyebrow>
-            <TableroObjetivos
-              retoKey={RETO_KEY}
+                <p style={{ margin: 0, color: T.text2 }}>
+                  Con esa potencia, calentar {m} kg de {mat.nombre.toLowerCase()} (c = {mat.c} J/kg·K) {dT} °C tomaría <strong style={{ color: "#fff" }}>{fmtNum(tCal)} s</strong>. El agua, con c muy alta, necesita mucha más energía: por eso modera el clima.
+                </p>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <RetoNumericoCard
+              reto={RETO_A2}
               accent={accent}
-              objetivos={[
-              { txt: "Sigue la conducción: el calor avanza partícula a partícula", done: modo === "conduccion" && paso > 0 },
-              { txt: "Cambia el material y compara qué tan rápido conduce", done: matNombre !== "Cobre" },
-              { txt: "Observa la convección: el fluido caliente sube y el frío baja", done: modo === "conveccion" },
-              { txt: "Observa la radiación: viaja sin necesidad de medio", done: modo === "radiacion" },
-              { txt: "Compara los tres mecanismos uno al lado del otro", done: modo === "comparar" },
-              { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
-              ]}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* nota de honestidad del modelo */}
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          El flujo de conducción (Q/t = k·A·ΔT/L), la energía sensible (Q = m·c·ΔT) y el tiempo de calentamiento que devuelve la calculadora son <strong>exactos</strong> para los valores de k y c reales de cada material. El modelo 3D es <strong>esquemático</strong> (no a escala): el gradiente de color, las corrientes del fluido y los anillos de onda representan el mecanismo de transporte, no medidas físicas. Fuente: {FUENTE}
-        </span>
-      </div>
-
-      {/* ── Reto evaluable: el ejercicio verbatim del ancla A2 ────────── */}
-      <RetoNumericoCard
-        reto={RETO_A2}
-        accent={accent}
-        aprobado={ejercicioAprobado}
-        onAprobado={() => setEjercicioAprobado(true)}
-        playSfx={
-          sonido
-            ? (ok) => {
-                if (ok) audioRef.current?.correcto();
-                else audioRef.current?.incorrecto();
+              aprobado={ejercicioAprobado}
+              onAprobado={() => setEjercicioAprobado(true)}
+              playSfx={
+                sonido
+                  ? (ok) => {
+                      if (ok) audioRef.current?.correcto();
+                      else audioRef.current?.incorrecto();
+                    }
+                  : undefined
               }
-            : undefined
-        }
-      />
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <div className="ex-scrim" data-open={drawerOpen} onClick={() => setDrawerOpen(false)} />
-      <aside className="ex-drawer" data-open={drawerOpen} aria-hidden={!drawerOpen}>
-        <div className="ex-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="ex-close" onClick={() => setDrawerOpen(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="ex-drawer-body">
-          <FichaTeorica data={PROPAGACION_CALOR_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+            />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="El visor de la propagación del calor" icono="fa-fire-flame-curved">
+                <p style={{ margin: 0, color: T.text2 }}>{PROBLEMA}</p>
+              </Bloque>
+              <Bloque titulo={`Para reflexionar — ${def.etq}`} icono="fa-circle-question">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {PREGUNTAS[modo].map((q, i) => <li key={i}>{q}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Cómo usar el laboratorio" icono="fa-list-ol">
+                <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {INSTRUCCIONES[modo].map((p, i) => <li key={i}>{p}</li>)}
+                </ol>
+              </Bloque>
+              <Bloque titulo="Comparación de mecanismos" icono="fa-table-list">
+                <div style={{ display: "grid", gap: 10 }}>
+                  {COMPARACION.map((f) => (
+                    <div key={f.rasgo} style={{ padding: "10px 12px", borderRadius: 10, border: `1px solid ${T.line}`, background: "rgba(4,10,22,0.4)" }}>
+                      <strong style={{ color: "#fff" }}>{f.rasgo}</strong>
+                      <div style={{ color: "#fb923c" }}>Conducción: <span style={{ color: T.text2 }}>{f.conduccion}</span></div>
+                      <div style={{ color: "#38bdf8" }}>Convección: <span style={{ color: T.text2 }}>{f.conveccion}</span></div>
+                      <div style={{ color: "#f472b6" }}>Radiación: <span style={{ color: T.text2 }}>{f.radiacion}</span></div>
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+              <Bloque titulo="Ejemplo resuelto (A2)" icono="fa-square-root-variable">
+                <p style={{ margin: 0, color: T.text2 }}>{EJEMPLO.enunciado}</p>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                  {EJEMPLO.datos.map((d, i) => (
+                    <span key={i} style={{ fontWeight: 800, color: "#fff", padding: "4px 9px", borderRadius: 8, background: "rgba(4,10,22,0.5)", border: `1px solid ${T.line}` }}>{d}</span>
+                  ))}
+                </div>
+                <p style={{ margin: 0, color: T.text2 }}>{EJEMPLO.solucion}</p>
+                <div style={{ padding: "10px 12px", borderRadius: 10, border: `1px solid ${accent}44`, fontWeight: 800, color: "#86efac" }}>
+                  <i className="fa-solid fa-flag-checkered" style={{ marginRight: 7, color: accent }} aria-hidden />{EJEMPLO.resultado}
+                </div>
+              </Bloque>
+              <Bloque titulo="Datos" icono="fa-magnifying-glass-chart">
+                {DATOS.map((dd, i) => (
+                  <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                    <i className={`fa-solid ${dd.icono}`} style={{ color: accent, marginTop: 4 }} aria-hidden />
+                    <div>
+                      <strong style={{ fontFamily: "ui-monospace, monospace" }}>{dd.valor}</strong>
+                      <div style={{ color: T.text2 }}>{dd.texto}</div>
+                    </div>
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="México: clima y vivienda" icono="fa-location-dot">
+                <p style={{ margin: 0, color: T.text2 }}>{CONTEXTO}</p>
+              </Bloque>
+              <Bloque titulo="¿Sabías que?" icono="fa-circle-question">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {HECHOS.map((h, i) => <li key={i}>{h}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Glosario" icono="fa-book">
+                <div style={{ display: "grid", gap: 8 }}>
+                  {GLOSARIO.map((g, i) => (
+                    <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
+                      <span style={{ fontWeight: 900, color: accent }}>{g.termino}. </span>
+                      <span style={{ color: T.text2 }}>{g.definicion}</span>
+                      <div style={{ color: T.text3, marginTop: 4 }}><i className="fa-solid fa-flask" style={{ marginRight: 6, color: accent }} aria-hidden />{g.ejemplo}</div>
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+              <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {IDEAS.map((x, i) => <li key={i}>{x}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={PROPAGACION_CALOR_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ marginTop: 18, fontSize: 14, color: T.text3 }}>
+                El flujo de conducción (Q/t = k·A·ΔT/L), la energía sensible (Q = m·c·ΔT) y el tiempo de calentamiento son <strong>exactos</strong> para los valores de k y c reales de cada material. El modelo 3D es <strong>esquemático</strong> (no a escala): la rapidez del frente de calor sigue la escala logarítmica de k, y las corrientes y anillos representan el mecanismo, no medidas físicas. Fuente: {FUENTE}
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }

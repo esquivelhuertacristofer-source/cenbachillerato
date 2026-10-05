@@ -7,21 +7,24 @@
  * recorre fase por fase cada proceso y deja calcular células hijas, ploidía y
  * combinaciones genéticas con la matemática exacta del módulo de datos.
  *
+ * Experimento central: el alumno MUEVE la fase (deslizador o gráfica de barras)
+ * y ve en vivo cuántas células hay y cuántos cromosomas lleva cada una: la
+ * mitosis los conserva (4 → 4) y la meiosis los reduce a la mitad (4 → 2).
+ *
  * Tres modos:
  *  (1) mitosis  — 1 célula → 2 idénticas (2n): crecer, reparar, regenerar.
  *  (2) meiosis  — 1 célula → 4 diversas (n): gametos y variabilidad genética.
  *  (3) comparar — vista estática lado a lado de ambos resultados + tabla.
  */
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, OK, card, Eyebrow, SceneBoundary } from "./_kit";
+import { T, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { RetoNumericoCard } from "./_reto-numerico";
 import { LabSfx } from "./lab-audio";
-import { useEstrellas } from "@/lib/hooks/useEstrellas";
-import { useLogros } from "./_partida";
 import { DIVISION_CELULAR_FICHA } from "./division-celular-ficha";
 import {
   RETO_A2,
@@ -52,12 +55,39 @@ const DivisionCelularScene = dynamic(() => import("./DivisionCelularScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-dna fa-fade" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Cargando la división celular en 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Cargando la división celular en 3D…</span>
     </div>
   ),
 });
 
 const RETO_KEY = "cen-division-celular-reto";
+
+/** Banderas de misión: una vez ganadas no se pierden al cambiar de modo. */
+interface Hecho { mit: boolean; mitFin: boolean; mei: boolean; meiFin: boolean; cmp: boolean; calc: boolean }
+const HECHO0: Hecho = { mit: false, mitFin: false, mei: false, meiFin: false, cmp: false, calc: false };
+
+/** Actualiza las banderas al llegar a la fase `i` (función pura: sirve en eventos y en el temporizador). */
+function avance(h: Hecho, modo: Modo, i: number, total: number): Hecho {
+  if (modo === "mitosis") {
+    const mit = h.mit || i > 0;
+    const mitFin = h.mitFin || i >= total;
+    return mit === h.mit && mitFin === h.mitFin ? h : { ...h, mit, mitFin };
+  }
+  if (modo === "meiosis") {
+    const mei = h.mei || i > 0;
+    const meiFin = h.meiFin || i >= total;
+    return mei === h.mei && meiFin === h.meiFin ? h : { ...h, mei, meiFin };
+  }
+  return h;
+}
+
+/** Mide lo que se ve en una fase: células en la escena y cromosomas por célula. */
+function medidas(modo: Modo, i: number): { celulas: number; cromosomas: number } {
+  const e = escenaPara(modo, i);
+  const unidades = new Set(e.cromatidas.map((c) => c.pos.join(","))); // 2 hermanas unidas cuentan como 1 cromosoma
+  const celulas = Math.max(1, e.celulas.length);
+  return { celulas, cromosomas: Math.round(unidades.size / celulas) };
+}
 
 export function LabDivisionCelular({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
@@ -68,10 +98,10 @@ export function LabDivisionCelular({ color }: PracticaLabProps) {
   const [resetNonce, setResetNonce] = useState(0);
   // calculadora de la actividad A2
   const [cel2n, setCel2n] = useState<number>(46);
+  const [hecho, setHecho] = useState<Hecho>(HECHO0);
 
-  // reto evaluable, teoría (cajón deslizable) y sonido
+  // reto evaluable y sonido
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
 
@@ -104,19 +134,34 @@ export function LabDivisionCelular({ color }: PracticaLabProps) {
   const escena = escenaPara(modo, idx);
   const esComparar = modo === "comparar";
   const nombresFase = modo === "comparar" ? [] : FASES[modo];
+  const medida = medidas(modo, idx);
+  const perfil = esComparar ? [] : nombresFase.map((_, i) => medidas(modo, i));
+  const maxCromo = Math.max(1, ...perfil.map((p) => p.cromosomas));
 
   // avance automático de fases (más lento que el de bases: cada fase es densa)
   useEffect(() => {
     if (!playing || esComparar || total === 0) return;
     if (idx >= total) return;
-    const t = setInterval(() => setPaso((p) => Math.min(total, p + 1)), 1500);
+    const t = setInterval(() => {
+      const sig = Math.min(total, idx + 1);
+      setPaso(sig);
+      setHecho((h) => avance(h, modo, sig, total));
+    }, 1500);
     return () => clearInterval(t);
-  }, [playing, total, idx, esComparar]);
+  }, [playing, total, idx, esComparar, modo]);
 
+  const irAFase = (i: number) => {
+    const f = Math.max(0, Math.min(total, i));
+    setPlaying(false);
+    setPaso(f);
+    setHecho((h) => avance(h, modo, f, total));
+    if (sonido) audioRef.current?.blip();
+  };
   const cambiarModo = (m: Modo) => {
     setModo(m);
     setPaso(0);
     setPlaying(m !== "comparar");
+    if (m === "comparar") setHecho((h) => (h.cmp ? h : { ...h, cmp: true }));
     if (sonido) audioRef.current?.blip();
     bump();
   };
@@ -124,6 +169,10 @@ export function LabDivisionCelular({ color }: PracticaLabProps) {
     setPaso(0);
     setPlaying(!esComparar);
     bump();
+  };
+  const cambiarCel2n = (v: number) => {
+    setCel2n(v);
+    if (v !== 46) setHecho((h) => (h.calc ? h : { ...h, calc: true }));
   };
 
   // resultados de la calculadora (A2)
@@ -137,424 +186,275 @@ export function LabDivisionCelular({ color }: PracticaLabProps) {
         <i className={`fa-solid ${def.icono}`} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{def.etq}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>
         Tu equipo no puede mostrar la escena en 3D, pero la información sigue aquí. {def.subtitulo}.
       </div>
     </div>
   );
 
-  // pie del visor
-  const pie: string = esComparar
-    ? "Compara los resultados: la mitosis conserva la ploidía (2 células 2n idénticas); la meiosis la reduce a la mitad (4 células n distintas)."
-    : `Fase ${idx + 1}/${totalFases} — ${escena.nombre}. ${escena.desc}`;
+  const lectura: string = esComparar
+    ? "Mitosis: 2 células 2n · Meiosis: 4 células n"
+    : `${escena.nombre}: ${medida.celulas} ${medida.celulas === 1 ? "célula" : "células"}, ${medida.cromosomas} cromosomas c/u`;
 
-  const objetivos = [
-    { txt: "Recorre las fases de la mitosis", done: modo === "mitosis" && paso > 0 },
-    { txt: "Recorre las fases de la meiosis y busca el crossing over", done: modo === "meiosis" && paso > 0 },
-    { txt: "Usa la calculadora con otro número de cromosomas (2n distinto de 46)", done: cel2n !== 46 },
-    { txt: "Abre la teoría y revisa el glosario de la actividad", done: drawer },
-    { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
-  ];
-  // Los objetivos se recuerdan (algunos dependían del modo y se desmarcaban
-  // solos) y se convierten en la marca del laboratorio, que antes no se
-  // guardaba en ninguna parte.
-  const { logros: logrosLab, cumplidos: cumplidosLab, total: totalLab } = useLogros(objetivos.map((o) => o.done));
-  const { registraEstrellas } = useEstrellas(RETO_KEY);
-  useEffect(() => {
-    if (cumplidosLab === 0) return;
-    const est = cumplidosLab >= totalLab ? 3 : cumplidosLab >= Math.ceil((totalLab * 2) / 3) ? 2 : 1;
-    registraEstrellas(est);
-  }, [cumplidosLab, totalLab, registraEstrellas]);
+  const nota = (col: string, children: React.ReactNode) => (
+    <p style={{ margin: 0, padding: "10px 12px", borderRadius: 12, border: `1px solid ${col}44`, background: `${col}14`, color: "#eaf0fb" }}>{children}</p>
+  );
+
+  const celdaTabla: React.CSSProperties = { padding: "8px 8px", fontSize: 14, borderBottom: `1px solid ${T.line}`, verticalAlign: "top", textAlign: "left", overflowWrap: "anywhere" };
+  const tablaComparacion = (
+    <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
+      <thead>
+        <tr>
+          <th style={{ ...celdaTabla, color: T.text3 }}>Rasgo</th>
+          <th style={{ ...celdaTabla, color: "#34d399" }}>Mitosis</th>
+          <th style={{ ...celdaTabla, color: "#a78bfa" }}>Meiosis</th>
+        </tr>
+      </thead>
+      <tbody>
+        {COMPARACION.map((f) => (
+          <tr key={f.rasgo}>
+            <td style={{ ...celdaTabla, color: T.text2, fontWeight: 700 }}>{f.rasgo}</td>
+            <td style={{ ...celdaTabla, color: "#fff" }}>{f.mitosis}</td>
+            <td style={{ ...celdaTabla, color: "#fff" }}>{f.meiosis}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+
+  /* ── Calculadora (A2) con barras: cuántos cromosomas lleva cada hija ──── */
+  const barra = (pct: number, col: string) => (
+    <div style={{ height: 16, borderRadius: 8, background: "rgba(255,255,255,0.08)", overflow: "hidden" }}>
+      <div style={{ width: `${pct}%`, height: "100%", background: col, borderRadius: 8, transition: "width .4s" }} />
+    </div>
+  );
+  const calculadora = (
+    <Bloque titulo="Calculadora: divide una célula 2n" icono="fa-calculator">
+      <Deslizador
+        label="Cromosomas de la célula madre (2n)" icon="fa-list-ol" colr={accent}
+        valor={`${cel2nSafe} · n = ${cel2nSafe / 2}`}
+        min={2} max={100} step={2} value={cel2nSafe}
+        onChange={cambiarCel2n}
+        hintL="2" hintR="100"
+      />
+      <div style={{ display: "grid", gap: 10 }}>
+        <div style={{ display: "grid", gap: 6 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 8, fontWeight: 800, color: "#34d399" }}>
+            <span><i className="fa-solid fa-clone" style={{ marginRight: 6 }} aria-hidden />Mitosis: {rMit.celulasHijas} células</span>
+            <span style={{ fontFamily: "ui-monospace, monospace" }}>{rMit.cromosomasPorHija} c/u</span>
+          </div>
+          {barra(100, "#34d399")}
+          <span style={{ color: T.text3 }}>Hijas idénticas a la madre (2n).</span>
+        </div>
+        <div style={{ display: "grid", gap: 6 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 8, fontWeight: 800, color: "#a78bfa" }}>
+            <span><i className="fa-solid fa-shuffle" style={{ marginRight: 6 }} aria-hidden />Meiosis: {rMei.celulasHijas} células</span>
+            <span style={{ fontFamily: "ui-monospace, monospace" }}>{rMei.cromosomasPorHija} c/u</span>
+          </div>
+          {barra((rMei.cromosomasPorHija / rMit.cromosomasPorHija) * 100, "#a78bfa")}
+          <span style={{ color: T.text3 }}>{fmtEntero(rMei.combinaciones)} combinaciones posibles (2ⁿ).</span>
+        </div>
+      </div>
+      {nota(accent, <>Tras <strong>3 rondas de mitosis</strong> a partir de una sola célula tendrías <strong>{celulasTrasMitosis(3)} células</strong> (2³). La meiosis baja la ploidía: por eso al unirse dos gametos (n + n) se restaura el 2n de la especie.</>)}
+    </Bloque>
+  );
+
+  /* ── Pestaña «Controles» ───────────────────────────────────────────── */
+  const controles = (
+    <>
+      {esComparar ? (
+        <Bloque titulo="Mitosis vs. Meiosis" icono="fa-table-list">
+          {tablaComparacion}
+        </Bloque>
+      ) : (
+        <>
+          <Bloque titulo="Recorre las fases" icono="fa-forward-step">
+            <Deslizador
+              label="Fase" icon="fa-dna" colr={modoCol}
+              valor={`${idx + 1} de ${totalFases} · ${escena.nombre}`}
+              min={0} max={total} step={1} value={idx}
+              onChange={irAFase}
+              hintL={nombresFase[0]} hintR={nombresFase[total]}
+            />
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+              <Dato label="Células" value={String(medida.celulas)} col={medida.celulas > 1 ? modoCol : undefined} />
+              <Dato label="Cromosomas por célula" value={String(medida.cromosomas)} col={modoCol} />
+            </div>
+            <div style={{ display: "grid", gap: 6 }}>
+              <span style={{ fontSize: 14, fontWeight: 800, color: T.text2 }}>Cromosomas por célula en cada fase</span>
+              <div style={{ display: "grid", gridTemplateColumns: `repeat(${perfil.length}, minmax(0,1fr))`, gap: 4, alignItems: "end" }}>
+                {perfil.map((p, i) => {
+                  const on = i === idx;
+                  return (
+                    <button key={nombresFase[i]} type="button" onClick={() => irAFase(i)} title={nombresFase[i]} aria-label={`${nombresFase[i]}: ${p.cromosomas} cromosomas por célula`}
+                      style={{ cursor: "pointer", display: "grid", gap: 4, justifyItems: "center", padding: "4px 0", borderRadius: 8, border: `1px solid ${on ? modoCol : "transparent"}`, background: on ? `${modoCol}22` : "transparent", color: on ? "#fff" : T.text2, fontSize: 14, fontWeight: 800 }}>
+                      <span style={{ fontFamily: "ui-monospace, monospace" }}>{p.cromosomas}</span>
+                      <span style={{ width: "70%", height: Math.max(8, (p.cromosomas / maxCromo) * 64), borderRadius: 4, background: on ? modoCol : i < idx ? `${modoCol}88` : "rgba(255,255,255,0.18)", transition: "height .3s" }} />
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 110px), 1fr))", gap: 6 }}>
+              {nombresFase.map((nom, i) => {
+                const on = i === idx;
+                return (
+                  <button key={nom} type="button" onClick={() => irAFase(i)}
+                    style={{ cursor: "pointer", padding: "8px 10px", borderRadius: 9, border: `1px solid ${on ? modoCol : "rgba(255,255,255,0.14)"}`, background: on ? `${modoCol}22` : "transparent", color: on ? "#fff" : T.text2, fontSize: 14, fontWeight: 800 }}>
+                    {nom}
+                  </button>
+                );
+              })}
+            </div>
+            {nota(modoCol, <><strong>{escena.nombre}.</strong> {escena.desc}</>)}
+            <p style={{ margin: 0, color: T.text3 }}>{escena.ploidia}</p>
+          </Bloque>
+        </>
+      )}
+      {calculadora}
+    </>
+  );
 
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes dcPulse { 0%,100%{ box-shadow:0 0 0 0 var(--dcd); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .dc-live-dot { animation: dcPulse 1.6s ease-in-out infinite; }
-        .dc-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .dc-grid { grid-template-columns: 1fr; } }
-        .dc-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .dc-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .dc-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .dc-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .dc-tab { cursor:pointer; border:1px solid var(--dcc); border-radius:12px; padding:11px 8px; text-align:center;
-          background:transparent; transition:all .15s; color:#fff; }
-        .dc-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
-        .dc-tab:hover { background:rgba(255,255,255,0.06); }
-        .dc-phases { display:flex; flex-wrap:wrap; gap:6px; }
-        .dc-phase { cursor:pointer; padding:6px 10px; border-radius:9px; border:1px solid; font-size:11px; font-weight:800; transition:all .12s; }
-        .dc-range { width:100%; accent-color: var(--dcc); cursor:pointer; }
-        .dc-num { width:84px; box-sizing:border-box; font-family:ui-monospace,monospace; font-size:15px; font-weight:800;
-          color:#fff; background:rgba(4,10,22,0.55); border:1px solid var(--dcc); border-radius:9px; padding:8px 10px; outline:none; text-align:center; }
-        .dc-cmp { width:100%; border-collapse:collapse; }
-        .dc-cmp td, .dc-cmp th { padding:8px 10px; font-size:11.5px; border-bottom:1px solid ${T.line}; vertical-align:top; text-align:left; }
-        .dc-cmp th { font-size:9.5px; letter-spacing:0.08em; text-transform:uppercase; color:${T.text3}; }
-        @media (max-width: 1000px){ .dc-bottom { grid-template-columns: 1fr !important; } }
-
-        /* Cajón de teoría */
-        .dc-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .dc-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .dc-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06121e 0%,#040a16 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .dc-drawer[data-open="true"] { transform:translateX(0); }
-        .dc-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .dc-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .dc-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .dc-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .dc-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
-        .dc-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      {/* Selector de modo */}
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="dc-tabs">
-          {MODOS.map((m) => {
-            const d = MODOS_DEF[m];
-            const col = `#${d.color.replace("#", "")}`;
-            const on = m === modo;
-            return (
-              <button key={m} className="dc-tab" data-on={on} onClick={() => cambiarModo(m)} style={{ ["--dcc" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? col : "inherit" }}><i className={`fa-solid ${d.icono}`} /></div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{d.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{d.subtitulo}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="dc-grid">
-        {/* ── Columna visor ──────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 58vh, 660px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <DivisionCelularScene modo={modo} escena={escena} playing={playing} modoColor={modoCol} resetNonce={resetNonce} />
-            </SceneBoundary>
-
-            {/* Cinta EN VIVO */}
-            <div style={{ position: "absolute", top: 14, left: 16, display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)" }}>
-              <span className="dc-live-dot" style={{ ["--dcd" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol }} />
-              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3 }}>EN VIVO</span>
-              <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)" }} />
-              <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{def.etq.toUpperCase()}</span>
-            </div>
-
-            {/* Toolbar */}
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="dc-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="dc-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              {!esComparar && (
-                <>
-                  <button className="dc-icobtn" onClick={() => { setPlaying(false); setPaso((p) => Math.max(0, p - 1)); }} title="Fase anterior">
-                    <i className="fa-solid fa-backward-step" />
-                  </button>
-                  <button className="dc-icobtn" data-on={playing} onClick={() => setPlaying((p) => !p)} title={playing ? "Pausar" : "Reanudar"}>
-                    <i className={`fa-solid ${playing ? "fa-pause" : "fa-play"}`} />
-                  </button>
-                  <button className="dc-icobtn" onClick={() => { setPlaying(false); setPaso((p) => Math.min(total, p + 1)); }} title="Fase siguiente">
-                    <i className="fa-solid fa-forward-step" />
-                  </button>
-                  <button className="dc-icobtn" onClick={reiniciar} title="Reiniciar">
-                    <i className="fa-solid fa-rotate-left" />
-                  </button>
-                </>
-              )}
-            </div>
-
-            {/* Botón flotante de Teoría */}
-            <button className="dc-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-
-            {/* Pie: lectura en vivo */}
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 18px 14px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                {esComparar ? "Mitosis vs. Meiosis" : escena.nombre} — <span style={{ color: "#cdd8ec" }}>{escena.ploidia}</span>
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6 }}>{pie}</div>
-            </div>
-          </div>
-
-          {/* Panel de control */}
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-                Controles — {def.etq}
-              </Eyebrow>
-              <span style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: "#7dd3fc", border: "1px solid #7dd3fc55", borderRadius: 6, padding: "3px 7px" }}>
-                EJERCICIO A2
-              </span>
-            </div>
-
-            {esComparar ? (
-              <div>
-                <Eyebrow><i className="fa-solid fa-table-list" style={{ marginRight: 8, color: modoCol }} />Mitosis vs. Meiosis</Eyebrow>
-                <table className="dc-cmp">
-                  <thead>
-                    <tr><th>Rasgo</th><th style={{ color: "#34d399" }}>Mitosis</th><th style={{ color: "#a78bfa" }}>Meiosis</th></tr>
-                  </thead>
-                  <tbody>
-                    {COMPARACION.map((f) => (
-                      <tr key={f.rasgo}>
-                        <td style={{ color: T.text2, fontWeight: 700 }}>{f.rasgo}</td>
-                        <td style={{ color: "#fff" }}>{f.mitosis}</td>
-                        <td style={{ color: "#fff" }}>{f.meiosis}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <>
-                {/* fases */}
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 7 }}>
-                  <span style={{ fontSize: 11, fontWeight: 900, letterSpacing: "0.1em", color: T.text3 }}>FASE</span>
-                  <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{idx + 1} / {totalFases}</span>
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <DivisionCelularScene modo={modo} escena={escena} playing={playing} modoColor={modoCol} resetNonce={resetNonce} />
+        </SceneBoundary>
+      }
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m, etiqueta: MODOS_DEF[m].etq, icono: MODOS_DEF[m].icono })),
+        valor: modo,
+        cambiar: (id) => cambiarModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          {!esComparar && (
+            <>
+              <BotonHerramienta icono="fa-backward-step" titulo="Fase anterior" onClick={() => irAFase(idx - 1)} />
+              <BotonHerramienta icono={playing ? "fa-pause" : "fa-play"} titulo={playing ? "Pausar" : "Reanudar"} activo={playing} onClick={() => setPlaying((p) => !p)} />
+              <BotonHerramienta icono="fa-forward-step" titulo="Fase siguiente" onClick={() => irAFase(idx + 1)} />
+              <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+            </>
+          )}
+        </>
+      }
+      lectura={lectura}
+      objetivos={[
+        { txt: "Recorre las fases de la mitosis", done: hecho.mit },
+        { txt: "Lleva la mitosis hasta la citocinesis: ¿cuántos cromosomas tiene cada hija?", done: hecho.mitFin },
+        { txt: "Recorre las fases de la meiosis y busca el crossing over", done: hecho.mei },
+        { txt: "Lleva la meiosis hasta el final: ¿cuántas células y cuántos cromosomas quedan?", done: hecho.meiFin },
+        { txt: "Compara mitosis y meiosis en la vista «Comparar»", done: hecho.cmp },
+        { txt: "Usa la calculadora con otro número de cromosomas (2n distinto de 46)", done: hecho.calc },
+        { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
+      ]}
+      pestanas={[
+        { id: "controles", etiqueta: "Controles", icono: "fa-sliders", contenido: controles },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <RetoNumericoCard
+              reto={RETO_A2}
+              accent={accent}
+              aprobado={ejercicioAprobado}
+              onAprobado={() => setEjercicioAprobado(true)}
+              playSfx={() => { if (sonido) audioRef.current?.correcto(); }}
+            />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="El visor de la división celular" icono="fa-dna">
+                <p style={{ margin: 0, color: T.text2 }}>{PROBLEMA}</p>
+              </Bloque>
+              <Bloque titulo="Mitosis vs. meiosis" icono="fa-table-list">
+                {tablaComparacion}
+              </Bloque>
+              <Bloque titulo="Para reflexionar" icono="fa-circle-question">
+                {MODOS.map((m) => (
+                  <div key={m} style={{ display: "grid", gap: 6 }}>
+                    <strong style={{ color: accent }}>{MODOS_DEF[m].etq}</strong>
+                    <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6, color: T.text2 }}>
+                      {PREGUNTAS[m].map((q, i) => <li key={i}>{q}</li>)}
+                    </ul>
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Ejemplo resuelto (A2)" icono="fa-square-root-variable">
+                <p style={{ margin: 0, color: T.text2 }}>{EJEMPLO.enunciado}</p>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                  {EJEMPLO.datos.map((d, i) => (
+                    <span key={i} style={{ fontWeight: 800, color: "#fff", padding: "4px 9px", borderRadius: 8, background: "rgba(4,10,22,0.5)", border: `1px solid ${T.line}` }}>{d}</span>
+                  ))}
                 </div>
-                <input type="range" min={0} max={total} value={idx} onChange={(e) => { setPlaying(false); setPaso(Number(e.target.value)); }} className="dc-range" style={{ ["--dcc" as string]: modoCol, marginBottom: 14 }} />
-                <div className="dc-phases" style={{ marginBottom: 4 }}>
-                  {nombresFase.map((nom, i) => {
-                    const on = i === idx;
-                    const visto = i < idx;
-                    return (
-                      <button
-                        key={nom}
-                        className="dc-phase"
-                        onClick={() => { setPlaying(false); setPaso(i); }}
-                        style={{
-                          borderColor: on ? modoCol : visto ? `${modoCol}55` : "rgba(255,255,255,0.12)",
-                          background: on ? `${modoCol}22` : "transparent",
-                          color: on ? "#fff" : visto ? "#cdd8ec" : T.text3,
-                        }}
-                      >
-                        {nom}
-                      </button>
-                    );
-                  })}
+                <p style={{ margin: 0, color: T.text2 }}>{EJEMPLO.solucion}</p>
+                <div style={{ padding: "10px 12px", borderRadius: 10, border: `1px solid ${accent}44`, background: `rgba(${color.rgba},0.08)`, fontWeight: 800, color: "#86efac" }}>
+                  <i className="fa-solid fa-flag-checkered" style={{ marginRight: 7, color: accent }} aria-hidden />{EJEMPLO.resultado}
                 </div>
-              </>
-            )}
-          </div>
-
-          {/* Calculadora de la actividad A2 */}
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <Eyebrow><i className="fa-solid fa-calculator" style={{ marginRight: 8, color: accent }} />Calculadora — divide una célula 2n</Eyebrow>
-            <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "10px 0 16px", flexWrap: "wrap" }}>
-              <span style={{ fontSize: 12.5, color: T.text2 }}>Cromosomas de la célula madre (2n):</span>
-              <input type="number" className="dc-num" min={2} max={200} step={2} value={cel2n} onChange={(e) => setCel2n(Number(e.target.value) || 2)} style={{ ["--dcc" as string]: accent }} />
-              <span style={{ fontSize: 11.5, color: T.text3 }}>n = {cel2nSafe / 2}</span>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-              <div style={{ padding: "12px 14px", borderRadius: 12, border: "1px solid #34d39955", background: "rgba(52,211,153,0.08)" }}>
-                <div style={{ fontSize: 11, fontWeight: 900, color: "#34d399", marginBottom: 6 }}><i className="fa-solid fa-clone" style={{ marginRight: 6 }} />MITOSIS</div>
-                <div style={{ fontSize: 12.5, color: "#fff", lineHeight: 1.6 }}>
-                  <strong>{rMit.celulasHijas}</strong> células hijas<br />
-                  <strong>{rMit.cromosomasPorHija}</strong> cromosomas c/u (2n)<br />
-                  <span style={{ color: T.text3 }}>idénticas a la madre</span>
-                </div>
-              </div>
-              <div style={{ padding: "12px 14px", borderRadius: 12, border: "1px solid #a78bfa55", background: "rgba(167,139,250,0.08)" }}>
-                <div style={{ fontSize: 11, fontWeight: 900, color: "#a78bfa", marginBottom: 6 }}><i className="fa-solid fa-shuffle" style={{ marginRight: 6 }} />MEIOSIS</div>
-                <div style={{ fontSize: 12.5, color: "#fff", lineHeight: 1.6 }}>
-                  <strong>{rMei.celulasHijas}</strong> células hijas<br />
-                  <strong>{rMei.cromosomasPorHija}</strong> cromosomas c/u (n)<br />
-                  <span style={{ color: T.text3 }}>{fmtEntero(rMei.combinaciones)} combinaciones (2ⁿ)</span>
-                </div>
-              </div>
-            </div>
-            <div style={{ marginTop: 12, padding: "11px 13px", borderRadius: 11, border: `1px solid ${accent}44`, background: `rgba(${color.rgba},0.08)`, fontSize: 12, color: "#eaf0fb", lineHeight: 1.5 }}>
-              <i className="fa-solid fa-circle-info" style={{ color: accent, marginRight: 8 }} />
-              Tras <strong>3 rondas de mitosis</strong> a partir de una sola célula tendrías <strong>{celulasTrasMitosis(3)} células</strong> (2³). La meiosis, en cambio, baja la ploidía: por eso al unirse dos gametos (n + n) se restaura el 2n de la especie.
-            </div>
-          </div>
-        </div>
-
-        {/* ── Columna lateral ────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          {/* Descripción del laboratorio */}
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-dna" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>El visor de la división celular</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          {/* Para reflexionar */}
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #7dd3fc55", background: "rgba(125,211,252,0.07)" }}>
-            <Eyebrow><i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: "#7dd3fc" }} />Para reflexionar — {def.etq}</Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {PREGUNTAS[modo].map((q, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>{q}</li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Ejemplo resuelto (A2) */}
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow><i className="fa-solid fa-square-root-variable" style={{ marginRight: 8, color: accent }} />Ejemplo resuelto (A2)</Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55, marginBottom: 10 }}>{EJEMPLO.enunciado}</div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }}>
-              {EJEMPLO.datos.map((d, i) => (
-                <span key={i} style={{ fontSize: 11, fontWeight: 800, color: "#fff", padding: "4px 9px", borderRadius: 8, background: "rgba(4,10,22,0.5)", border: `1px solid ${T.line}` }}>{d}</span>
-              ))}
-            </div>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55, marginBottom: 10 }}>{EJEMPLO.solucion}</div>
-            <div style={{ padding: "10px 12px", borderRadius: 10, border: `1px solid ${accent}44`, background: `rgba(${color.rgba},0.08)`, fontSize: 12, fontWeight: 800, color: "#86efac" }}>
-              <i className="fa-solid fa-flag-checkered" style={{ marginRight: 7, color: accent }} />{EJEMPLO.resultado}
-            </div>
-          </div>
-
-          {/* Cómo usar */}
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow><i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />Cómo usar el laboratorio</Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES[modo].map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Datos + ideas clave ────────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="dc-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow><i className="fa-solid fa-magnifying-glass-chart" style={{ marginRight: 8, color: accent }} />Datos de la división celular</Eyebrow>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
-            {DATOS.map((dd, i) => (
-              <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "10px 12px", borderRadius: 10, background: T.glass, border: `1px solid ${T.line}` }}>
-                <div style={{ width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: accent, background: `rgba(${color.rgba},0.16)`, flexShrink: 0 }}>
-                  <i className={`fa-solid ${dd.icono}`} />
-                </div>
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{dd.valor}</div>
-                  <div style={{ fontSize: 11, color: T.text2, lineHeight: 1.4 }}>{dd.texto}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Contexto mexicano */}
-          <div style={{ marginTop: 16, padding: "14px 16px", borderRadius: 12, border: `1px solid ${accent}33`, background: `rgba(${color.rgba},0.07)` }}>
-            <Eyebrow><i className="fa-solid fa-location-dot" style={{ marginRight: 8, color: accent }} />México: salud y biodiversidad</Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{CONTEXTO}</div>
-          </div>
-
-          {/* ¿Sabías que? */}
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow><i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />¿Sabías que?</Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {HECHOS.map((h, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{h}</li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Glosario */}
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow><i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />Glosario</Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {GLOSARIO.map((g, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{g.termino}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{g.definicion}</span>
-                  <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.4, marginTop: 4 }}><i className="fa-solid fa-flask" style={{ marginRight: 6, color: accent }} />{g.ejemplo}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow><i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />Ideas clave</Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-            {IDEAS.map((x, i) => (
-              <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>{x}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      {/* nota de honestidad del modelo */}
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          Los conteos de células hijas, la ploidía resultante (2n→2n en mitosis, 2n→n en meiosis), la separación reduccional de homólogos en Anafase I, la separación de cromátidas hermanas en Anafase II y las combinaciones por distribución independiente (2ⁿ) son <strong>exactos</strong>: la calculadora los obtiene para cualquier 2n que escribas. El modelo 3D usa <strong>2n = 4</strong> (dos pares de homólogos) y es <strong>esquemático</strong> (no a escala): representa el mecanismo del reparto de cromosomas, no estructuras medidas. Fuente: {FUENTE}
-        </span>
-      </div>
-
-      {/* ── Objetivos ────────────────────────────────────────────────── */}
-      <div style={{ ...card, padding: "18px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-          Objetivos
-        </Eyebrow>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "10px 24px" }}>
-          {objetivos.map((o, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: logrosLab[i] ? OK : T.text2 }}>
-              <i className={`fa-solid ${logrosLab[i] ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: logrosLab[i] ? 1 : 0.3 }} />
-              <span style={{ fontWeight: logrosLab[i] ? 700 : 500 }}>{o.txt}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ── Reto evaluable: el ejercicio verbatim del ancla A2 ────────── */}
-      <RetoNumericoCard
-        reto={RETO_A2}
-        accent={accent}
-        aprobado={ejercicioAprobado}
-        onAprobado={() => setEjercicioAprobado(true)}
-        playSfx={() => { if (sonido) audioRef.current?.correcto(); }}
-      />
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <div className="dc-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="dc-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="dc-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="dc-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="dc-drawer-body">
-          <FichaTeorica data={DIVISION_CELULAR_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+              </Bloque>
+              <Bloque titulo="Cómo usar el laboratorio" icono="fa-list-ol">
+                {MODOS.map((m) => (
+                  <div key={m} style={{ display: "grid", gap: 6 }}>
+                    <strong style={{ color: accent }}>{MODOS_DEF[m].etq}</strong>
+                    <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6 }}>
+                      {INSTRUCCIONES[m].map((p, i) => <li key={i}>{p}</li>)}
+                    </ol>
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {IDEAS.map((x, i) => <li key={i}>{x}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Datos de la división celular" icono="fa-magnifying-glass-chart">
+                {DATOS.map((dd, i) => (
+                  <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                    <i className={`fa-solid ${dd.icono}`} style={{ color: accent, marginTop: 4 }} aria-hidden />
+                    <div>
+                      <strong style={{ fontFamily: "ui-monospace, monospace" }}>{dd.valor}</strong>
+                      <div style={{ color: T.text2 }}>{dd.texto}</div>
+                    </div>
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="México: salud y biodiversidad" icono="fa-location-dot">
+                <p style={{ margin: 0, color: T.text2 }}>{CONTEXTO}</p>
+              </Bloque>
+              <Bloque titulo="¿Sabías que?" icono="fa-circle-question">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {HECHOS.map((h, i) => <li key={i}>{h}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Glosario" icono="fa-book">
+                {GLOSARIO.map((g, i) => (
+                  <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}`, color: T.text2 }}>
+                    <strong style={{ color: accent }}>{g.termino}. </strong>{g.definicion}
+                    <div style={{ color: T.text3, marginTop: 4 }}><i className="fa-solid fa-flask" style={{ marginRight: 6, color: accent }} aria-hidden />{g.ejemplo}</div>
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={DIVISION_CELULAR_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ marginTop: 18, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
+                Los conteos de células hijas, la ploidía resultante (2n→2n en mitosis, 2n→n en meiosis), la separación reduccional de homólogos en Anafase I, la separación de cromátidas hermanas en Anafase II y las combinaciones por distribución independiente (2ⁿ) son <strong>exactos</strong>: la calculadora los obtiene para cualquier 2n. El modelo 3D usa <strong>2n = 4</strong> (dos pares de homólogos) y es <strong>esquemático</strong> (no a escala): representa el mecanismo del reparto de cromosomas, no estructuras medidas. Fuente: {FUENTE}
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }

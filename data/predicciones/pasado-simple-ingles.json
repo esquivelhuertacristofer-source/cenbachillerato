@@ -1,0 +1,12 @@
+{
+  "escena": "Es lunes y Dan te pregunta qué hiciste el viernes por la noche",
+  "pregunta": "Contestas «Last Friday, I goed to the cinema». ¿Cómo reacciona Dan?",
+  "opciones": [
+    { "id": "a", "texto": "Entiende y pregunta por la película", "icono": "fa-film" },
+    { "id": "b", "texto": "Se confunde: go es irregular", "icono": "fa-face-frown" },
+    { "id": "c", "texto": "Cree que irás al cine mañana", "icono": "fa-calendar-day" }
+  ],
+  "correcta": "b",
+  "porque": "«Go» es irregular: su pasado es «went», no «goed». Con una forma que no existe, Dan se confunde y la escena no entra en tu fin de semana.",
+  "comoComprobarlo": "En la escena del viernes elige «Ir al cine», marca «Last Friday», toca la ficha «goed» y pulsa «Tell Dan»."
+}

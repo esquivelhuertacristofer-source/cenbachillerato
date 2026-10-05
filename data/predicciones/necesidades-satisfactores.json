@@ -1,0 +1,12 @@
+{
+  "escena": "Una familia ficticia con 12 fichas al mes y cinco medidores de necesidades",
+  "pregunta": "Si gastas 2 fichas en refrescos y botanas, ¿qué pasa con el medidor de salud?",
+  "opciones": [
+    { "id": "a", "texto": "Sube porque la familia come más", "icono": "fa-arrow-up" },
+    { "id": "b", "texto": "Baja aunque la comida llene", "icono": "fa-arrow-down" },
+    { "id": "c", "texto": "Se queda igual que antes", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "Los refrescos y las botanas llenan un rato, pero no nutren ni hidratan bien y dañan la salud. Aparentan satisfacer una necesidad: son un pseudo-satisfactor.",
+  "comoComprobarlo": "En «Presupuesto del mes» toca la tarjeta de refrescos y botanas y mira el medidor de salud."
+}

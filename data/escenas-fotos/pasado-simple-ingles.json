@@ -1,0 +1,13 @@
+{
+  "slug": "pasado-simple-ingles",
+  "items": [
+    { "clave": "viernes-pizza", "formato": "16:9", "estilo": "foto", "escena": "Una mesa de madera vista desde arriba con una pizza grande a medio comer, tres vasos de refresco y manos de varios jóvenes tomando rebanadas, luz cálida de noche" },
+    { "clave": "viernes-cine", "formato": "16:9", "estilo": "ilustracion", "escena": "El interior de una sala de cine oscura con filas de butacas rojas vistas desde atrás, la pantalla encendida iluminando a un grupo de jóvenes sentados con un cubo de palomitas" },
+    { "clave": "sabado-estudio", "formato": "16:9", "estilo": "foto", "escena": "Un escritorio con cuaderno abierto lleno de ejercicios de álgebra dibujados, una calculadora, un lápiz y una lámpara encendida, luz de mañana desde la ventana" },
+    { "clave": "sabado-futbol", "formato": "16:9", "estilo": "foto", "escena": "Un grupo de jóvenes jugando futbol en una cancha de pasto con un balón en el aire y portería al fondo, luz de mañana, sin números ni letras en las camisetas" },
+    { "clave": "sabado-mercado", "formato": "16:9", "estilo": "foto", "escena": "Un puesto de mercado al aire libre con varios pares de zapatos de colores exhibidos sobre una mesa y toldos de colores, personas caminando entre los puestos" },
+    { "clave": "sabado-limpieza", "formato": "16:9", "estilo": "ilustracion", "escena": "Un cuarto de adolescente con una cama recién tendida, una escoba recargada en la pared, una cubeta con jabón y la ventana abierta con luz de tarde" },
+    { "clave": "domingo-abuela", "formato": "16:9", "estilo": "ilustracion", "escena": "Una abuela de cabello blanco sentada en un sillón junto a una joven, tomando café y mirando un álbum de fotos abierto en una sala acogedora" },
+    { "clave": "domingo-descanso", "formato": "16:9", "estilo": "foto", "escena": "Un sofá cómodo con una manta, un gato dormido sobre ella, una taza humeante en una mesita y lluvia ligera visible por la ventana" }
+  ]
+}

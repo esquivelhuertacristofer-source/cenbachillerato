@@ -1,0 +1,13 @@
+{
+  "slug": "movimientos-literarios",
+  "items": [
+    { "clave": "espejo-ceniza", "formato": "16:9", "estilo": "foto", "escena": "Una rosa de cristal sobre un espejo oscuro con velas encendidas y una pequeña calavera de marfil al lado, luz dramática de fuerte contraste" },
+    { "clave": "acantilado", "formato": "16:9", "estilo": "ilustracion", "escena": "Una figura solitaria de espaldas con capa en el borde de un acantilado frente a un mar tormentoso, rayos en el cielo oscuro" },
+    { "clave": "lavandera", "formato": "16:9", "estilo": "ilustracion", "escena": "Una mujer con rebozo lavando ropa en el lavadero de un patio de vecindad con tendederos, un hombre de sombrero hablando con ella al fondo" },
+    { "clave": "cisnes", "formato": "16:9", "estilo": "ilustracion", "escena": "Cisnes blancos en un lago al anochecer con una luna grande y un violín apoyado en una banca de jardín con farolas antiguas" },
+    { "clave": "tranvia", "formato": "16:9", "estilo": "ilustracion", "escena": "Un tranvía visto desde abajo hecho de formas geométricas fragmentadas de colores y escaleras que se cruzan en ángulos imposibles, collage cubista" },
+    { "clave": "mariposas", "formato": "16:9", "estilo": "foto", "escena": "Una cocina de pueblo mexicana con un comal humeante y decenas de mariposas amarillas entrando por la ventana mientras una abuela sigue haciendo tortillas con calma" },
+    { "clave": "boticario", "formato": "16:9", "estilo": "ilustracion", "escena": "Un patio de vecindad de noche con una joven llorando bajo la luna y, sobre una mesa, canastos de maíz y monedas ordenadas en montones" },
+    { "clave": "vitral", "formato": "16:9", "estilo": "foto", "escena": "El interior de una iglesia barroca con un vitral rosa y azul, un órgano dorado y humo de incienso en haces de luz" }
+  ]
+}

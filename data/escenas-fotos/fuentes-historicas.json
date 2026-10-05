@@ -1,0 +1,13 @@
+{
+  "slug": "fuentes-historicas",
+  "items": [
+    { "clave": "carta", "formato": "16:9", "estilo": "ilustracion", "escena": "Hoja doblada y amarillenta junto a un sobre abierto sobre una mesa de madera, luz de ventana de mañana y una taza de barro, sin escritura legible" },
+    { "clave": "foto", "formato": "16:9", "estilo": "foto", "escena": "Fotografía antigua en blanco y negro de una calle de pueblo inundada con una marca de lodo a la altura de las ventanas y vecinos sacando muebles a la calle" },
+    { "clave": "periodico", "formato": "16:9", "estilo": "ilustracion", "escena": "Pila de periódicos viejos doblados sobre un escritorio de imprenta con tipos de plomo y botes de tinta alrededor, sin titulares legibles" },
+    { "clave": "objeto", "formato": "16:9", "estilo": "foto", "escena": "Cadena gruesa de hierro oxidada sobre una mesa de museo con un eslabón cortado limpio, iluminada por la luz de una vitrina" },
+    { "clave": "testimonio", "formato": "16:9", "estilo": "ilustracion", "escena": "Grabadora de carrete antigua sobre una mesa junto a un micrófono, y un señor mayor visto de espaldas mirando por la ventana" },
+    { "clave": "libro", "formato": "16:9", "estilo": "ilustracion", "escena": "Libro grueso de historia cerrado con tapa de tela sobre un escritorio con una lupa, fichas en blanco y una lámpara encendida" },
+    { "clave": "articulo", "formato": "16:9", "estilo": "ilustracion", "escena": "Revista abierta de papel brillante sobre una mesa de café junto a una taza y unos lentes, páginas con fotografías y sin texto legible" },
+    { "clave": "catalogo", "formato": "16:9", "estilo": "ilustracion", "escena": "Gabinete de madera con muchos cajones pequeños de fichas de biblioteca, uno abierto con tarjetas en blanco" }
+  ]
+}

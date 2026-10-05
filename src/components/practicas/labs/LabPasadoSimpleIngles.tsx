@@ -1,74 +1,83 @@
-﻿"use client";
+"use client";
 
 /**
- * Laboratorio — Past Simple: what did you do yesterday?
+ * Laboratorio — Past Simple: el lunes con Dan (diálogo ramificado)
  * Práctica experimental para IN-III-P01-A4 (Inglés III).
  *
- * Interactividad máxima. Cuatro modos: los tres de arrastrar/clasificar (regla · forma · uso) y,
- * al final, uno que se escribe («Completa el texto», verbatim de la progresión):
- *  1. «Regular or irregular?» — clasifica doce verbos en dos columnas según cómo
- *     forman su pasado (-ed vs. forma especial). La REGLA.
- *  2. «Build the past form» — arrastra la forma de pasado correcta a cada verbo
- *     base (go → went, study → studied…) evitando los errores típicos de
- *     sobre-regularización (eated, buyed, goed, maked). La FORMA.
- *  3. «Complete the sentence» — arrastra el verbo en pasado al hueco de cinco
- *     oraciones verbatim con expresiones de tiempo. El USO en contexto.
- *  + Cuestionario de comprensión (V/F verbatim de A4).
+ * Es lunes y Dan (compañero FICTICIO) pregunta qué hiciste el fin de semana.
+ * El alumno no clasifica verbos: CUENTA su fin de semana. En cuatro escenas
+ * elige qué hizo (tarjetas con imagen), el marcador de tiempo (yesterday,
+ * last…, …ago) y el verbo en pasado. Dan reacciona:
+ *  · marcador de futuro («Next Friday») → «¡pero eso aún no pasa!»;
+ *  · forma equivocada (goed, eated, studyed…) → se confunde y se explica por qué;
+ *  · frase correcta → contesta con algo distinto según lo que elegiste y la
+ *    escena se agrega a la línea de tiempo del fin de semana.
+ * Dos escenas más piden lo aprendido: el negativo («I didn't go») sobre la
+ * actividad que descartaste el viernes, y la pregunta («Did you play…?»).
+ * Las consecuencias salen de `pasado-simple-ingles-sim.ts`.
  *
- * DOM puro (sin three.js): ligero, accesible (ratón, teclado y táctil mediante
- * clic-para-seleccionar / clic-para-colocar). Contenido VERBATIM de IN-III·P01.
+ * Modos: «El lunes con Dan» (simulador) y «Complete the text» (se escribe).
+ * La teoría verbatim (verbos regulares/irregulares, formas, oraciones, dato)
+ * vive en la pestaña «Teoría». DOM puro (sin three.js).
  */
 
 import { useEffect, useRef, useState } from "react";
 import type { PracticaLabProps } from "../registry";
-import { T, OK, card, Eyebrow } from "./_kit";
+import { T, OK } from "./_kit";
+import { LabShell, Bloque, BotonHerramienta } from "./_shell";
 import { LabSfx } from "./lab-audio";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { PASADO_SIMPLE_INGLES_HUECOS } from "./pasado-simple-ingles-huecos";
 import { usePartida, MarcadorPartida } from "./_partida";
 import { FichaTeorica } from "./_ficha";
 import { PASADO_SIMPLE_INGLES_FICHA } from "./pasado-simple-ingles-ficha";
+import { VERBOS, TIPO_INFO, FORMAS, ORACIONES, QUIZ, DATO_PASADO, type TipoVerbo } from "./pasado-simple-ingles-data";
 import {
-  VERBOS,
-  TIPO_INFO,
-  FORMAS,
-  DISTRACTORES_FORMA,
-  ORACIONES,
-  QUIZ,
-  DATO_PASADO,
-  type TipoVerbo,
-} from "./pasado-simple-ingles-data";
+  ESCENAS,
+  CONSIGNA_PREGUNTA,
+  OPCIONES_PREGUNTA,
+  RESPUESTA_DAN,
+  evaluarRelato,
+  fichasVerbo,
+  fraseRelato,
+  opcionesNegativo,
+  preguntaNegativo,
+  type Actividad,
+  type OpcionFrase,
+  type ResultadoRelato,
+} from "./pasado-simple-ingles-sim";
+import { useEstrellas } from "@/lib/hooks/useEstrellas";
 
 const NO = "#FF5E5E";
-import { useEstrellas } from "@/lib/hooks/useEstrellas";
-import { FondoTermino, VinetaTermino } from "./_vineta";
+const AMBAR = "#FFC75A";
+const AZUL = "#5BC8FF";
 const RETO_KEY = "cen-pasado-simple-reto";
+const RUTA_SIM = "/media/labs-sim/pasado-simple-ingles";
+const TOTAL_PASOS = ESCENAS.length + 2;
 
-type Modo = "clasificar" | "construir" | "oraciones" | "texto";
+type Modo = "lunes" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
-  { id: "clasificar", label: "Regular or irregular?", icono: "fa-table-columns" },
-  { id: "construir", label: "Build the past form", icono: "fa-screwdriver-wrench" },
-  { id: "oraciones", label: "Complete the sentence", icono: "fa-pen-fancy" },
+  { id: "lunes", label: "El lunes con Dan", icono: "fa-comments" },
   { id: "texto", label: "Complete the text", icono: "fa-pen-to-square" },
 ];
 
-/** Fichas del modo «construir»: formas de pasado correctas + distractores. */
-const FICHAS_CONSTRUIR: { id: string; label: string }[] = [
-  ...FORMAS.map((f) => ({ id: f.id, label: f.pasado })),
-  ...DISTRACTORES_FORMA.map((d, i) => ({ id: `xd-${i}`, label: d })),
-];
+type Tono = "ok" | "mal" | "duda" | "neutro";
+const COLOR_TONO: Record<Tono, string> = { ok: OK, mal: NO, duda: AMBAR, neutro: "rgba(255,255,255,0.7)" };
+const ICONO_TONO: Record<Tono, string> = { ok: "fa-face-smile-beam", mal: "fa-face-frown", duda: "fa-face-meh", neutro: "fa-face-smile" };
+
+interface Linea {
+  actId: string;
+  frase: string;
+}
 
 export function LabPasadoSimpleIngles({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
-  const [modo, setModo] = useState<Modo>("clasificar");
+  const [modo, setModo] = useState<Modo>("lunes");
 
   // ── sonido ────────────────────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
-  // Modo «Completa el texto». El contador sirve de `key`: subirlo remonta
-  // el componente y devuelve todos los huecos en blanco.
   const [textoDone, setTextoDone] = useState(false);
   const [textoIntento, setTextoIntento] = useState(0);
   const audioRef = useRef<LabSfx | null>(null);
@@ -83,9 +92,6 @@ export function LabPasadoSimpleIngles({ color }: PracticaLabProps) {
       setSonido(false);
     }
   };
-  // Los tres ayudantes son el único punto por el que pasan todos los aciertos
-  // y todos los fallos del laboratorio, así que la partida se lleva aquí.
-  // `sfxOk` no cuenta: marca el fin de un modo, no una respuesta suelta.
   const sfxOk = () => sonido && audioRef.current?.correcto();
   const sfxNo = () => {
     partida.error();
@@ -95,636 +101,511 @@ export function LabPasadoSimpleIngles({ color }: PracticaLabProps) {
     partida.acierto();
     return sonido && audioRef.current?.blip();
   };
+  const sfxClick = () => sonido && audioRef.current?.blip();
 
-  // ── modo Regular or irregular? (clasifica por tipo) ────────────────────
-  const [ubicado, setUbicado] = useState<Record<string, TipoVerbo>>({});
-  const [selVerbo, setSelVerbo] = useState<string | null>(null);
-  const [shakeBin, setShakeBin] = useState<TipoVerbo | null>(null);
-  const verbosLibres = VERBOS.filter((v) => !ubicado[v.id]).slice().sort((a, b) => a.base.localeCompare(b.base, "en"));
+  // ── estado del simulador ──────────────────────────────────────────────
+  const [paso, setPaso] = useState(0);
+  const [actSel, setActSel] = useState<string | null>(null);
+  const [marcador, setMarcador] = useState<string | null>(null);
+  const [verbo, setVerbo] = useState<string | null>(null);
+  const [reac, setReac] = useState<ResultadoRelato | null>(null);
+  /** El fin de semana que se va armando: id de escena → lo que contaste. */
+  const [linea, setLinea] = useState<Record<string, Linea>>({});
+  const [tipos, setTipos] = useState<TipoVerbo[]>([]);
+  const [negDone, setNegDone] = useState(false);
+  const [preDone, setPreDone] = useState(false);
+  /** Reacción de Dan en las escenas 5 y 6. */
+  const [reacFrase, setReacFrase] = useState<OpcionFrase | null>(null);
 
-  const intentarClasificar = (verboId: string, bin: TipoVerbo) => {
-    if (ubicado[verboId]) return;
-    const v = VERBOS.find((x) => x.id === verboId);
-    if (v && v.tipo === bin) {
-      setUbicado((e) => ({ ...e, [verboId]: bin }));
-      setSelVerbo(null);
+  const escenasHechas = Object.keys(linea).length;
+  const pasosHechos = [...ESCENAS.map((e) => !!linea[e.id]), negDone, preDone];
+  const simDone = pasosHechos.every(Boolean);
+
+  const actividadElegida = (escId: string): Actividad | undefined => {
+    const esc = ESCENAS.find((e) => e.id === escId);
+    return esc?.opciones.find((o) => o.id === linea[escId]?.actId);
+  };
+
+  const resetSim = () => {
+    setPaso(0);
+    setActSel(null);
+    setMarcador(null);
+    setVerbo(null);
+    setReac(null);
+    setLinea({});
+    setTipos([]);
+    setNegDone(false);
+    setPreDone(false);
+    setReacFrase(null);
+    partida.reiniciar();
+    setModo("lunes");
+  };
+  const resetTexto = () => {
+    setTextoDone(false);
+    setTextoIntento((n) => n + 1);
+  };
+  const resetActual = modo === "texto" ? resetTexto : resetSim;
+
+  const irAPaso = (i: number) => {
+    sfxClick();
+    setPaso(i);
+    setActSel(null);
+    setMarcador(null);
+    setVerbo(null);
+    setReac(null);
+    setReacFrase(null);
+  };
+
+  const esc = paso < ESCENAS.length ? ESCENAS[paso]! : null;
+  const actual: Actividad | null = esc ? (esc.opciones.find((o) => o.id === (linea[esc.id]?.actId ?? actSel)) ?? null) : null;
+
+  const contar = () => {
+    if (!esc || !actual || !marcador || !verbo || linea[esc.id]) return;
+    const res = evaluarRelato(esc, actual, marcador, verbo);
+    setReac(res);
+    if (res.veredicto === "bien") {
       sfxPlace();
-      if (Object.keys(ubicado).length + 1 >= VERBOS.length) {
-        sfxOk();
-        persistMejor(true, construirDone, oracionesDone);
-      }
+      setLinea((l) => ({ ...l, [esc.id]: { actId: actual.id, frase: res.frase ?? fraseRelato(marcador, verbo, actual) } }));
+      setTipos((t) => (t.includes(actual.tipo) ? t : [...t, actual.tipo]));
     } else {
-      setShakeBin(bin);
       sfxNo();
-      window.setTimeout(() => setShakeBin(null), 420);
     }
   };
-  const resetClasificar = () => {
-    setUbicado({});
-    setSelVerbo(null);
-  };
 
-  // ── modo Build the past form (arrastra la forma correcta) ──────────────
-  const [construido, setConstruido] = useState<Record<string, boolean>>({});
-  const [selConstr, setSelConstr] = useState<string | null>(null);
-  const [shakeConstr, setShakeConstr] = useState<string | null>(null);
-  const fichasLibres = FICHAS_CONSTRUIR.filter((f) => !construido[f.id]).slice().sort((a, b) => a.label.localeCompare(b.label, "en"));
-
-  const intentarConstruir = (chipId: string, rowId: string) => {
-    if (construido[rowId]) return;
-    if (chipId === rowId) {
-      setConstruido((e) => ({ ...e, [rowId]: true }));
-      setSelConstr(null);
+  const responderFrase = (op: OpcionFrase) => {
+    if (op.ok) {
       sfxPlace();
-      if (Object.keys(construido).length + 1 >= FORMAS.length) {
-        sfxOk();
-        persistMejor(clasificarDone, true, oracionesDone);
-      }
+      if (paso === ESCENAS.length) setNegDone(true);
+      else setPreDone(true);
     } else {
-      setShakeConstr(rowId);
       sfxNo();
-      window.setTimeout(() => setShakeConstr(null), 420);
     }
-  };
-  const resetConstruir = () => {
-    setConstruido({});
-    setSelConstr(null);
-  };
-
-  // ── modo Complete the sentence (arrastra al hueco) ─────────────────────
-  const [completado, setCompletado] = useState<Record<string, boolean>>({});
-  const [selOra, setSelOra] = useState<string | null>(null);
-  const [shakeOra, setShakeOra] = useState<string | null>(null);
-  const oraLibres = ORACIONES.filter((o) => !completado[o.id]).slice().sort((a, b) => a.resp.localeCompare(b.resp, "en"));
-
-  const intentarOra = (chipId: string, rowId: string) => {
-    if (completado[rowId]) return;
-    if (chipId === rowId) {
-      setCompletado((e) => ({ ...e, [rowId]: true }));
-      setSelOra(null);
-      sfxPlace();
-      if (Object.keys(completado).length + 1 >= ORACIONES.length) {
-        sfxOk();
-        persistMejor(clasificarDone, construirDone, true);
-      }
-    } else {
-      setShakeOra(rowId);
-      sfxNo();
-      window.setTimeout(() => setShakeOra(null), 420);
-    }
-  };
-  const resetOraciones = () => {
-    setCompletado({});
-    setSelOra(null);
+    setReacFrase(op);
   };
 
   const [quizAprobado, setQuizAprobado] = useState(false);
 
   // ── progreso / estrellas ──────────────────────────────────────────────
-  const clasificarDone = Object.keys(ubicado).length >= VERBOS.length;
-  const construirDone = Object.keys(construido).length >= FORMAS.length;
-  const oracionesDone = Object.keys(completado).length >= ORACIONES.length;
-  const modosHechos = (clasificarDone ? 1 : 0) + (construirDone ? 1 : 0) + (oracionesDone ? 1 : 0) + (textoDone ? 1 : 0);
-  // Terminar los 3 modos vale 2★; la tercera se gana con precisión.
-  const estrellas = partida.estrellasCon(modosHechos, 4);
+  const modosHechos = (simDone ? 1 : 0) + (textoDone ? 1 : 0);
+  // Terminar los dos modos vale 2★; la tercera se gana con precisión.
+  const estrellas = partida.estrellasCon(modosHechos, 2);
 
   const { mejorEstrellas: mejor, registraEstrellas } = useEstrellas(RETO_KEY);
   const bestEstrellas = Math.max(estrellas, mejor);
-
-  const persistMejor = (a: boolean, b: boolean, c: boolean) => {
-    const est = (a ? 1 : 0) + (b ? 1 : 0) + (c ? 1 : 0);
-    registraEstrellas(est);
-  };
+  useEffect(() => {
+    if (estrellas > 0) registraEstrellas(estrellas);
+  }, [estrellas, registraEstrellas]);
 
   const objetivos = [
-    { txt: "Clasifica los 12 verbos en regular / irregular", done: clasificarDone },
-    { txt: "Forma los 6 pasados con la palabra correcta", done: construirDone },
-    { txt: "Completa las 5 oraciones en contexto", done: oracionesDone },
-    { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
+    { txt: "Cuéntale a Dan tu fin de semana: 4 escenas con el pasado correcto", done: escenasHechas >= ESCENAS.length },
+    { txt: "Usa un verbo regular y uno irregular", done: tipos.includes("regular") && tipos.includes("irregular") },
+    { txt: "Contesta con didn't y pregunta con Did", done: negDone && preDone },
+    { txt: "Consigue 3★ (simulador y texto, con pocos errores)", done: bestEstrellas >= 3 },
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];
 
-  // arrastre nativo
-  const dragProps = (id: string) => ({
-    draggable: true,
-    onDragStart: (e: React.DragEvent) => {
-      e.dataTransfer.setData("text/plain", id);
-      e.dataTransfer.effectAllowed = "move";
-      // El hueco que deja la tarjeta mientras viaja. Por atributo y no por
-      // estado: un render por cada gesto de arrastre se nota con 20 tarjetas.
-      e.currentTarget.setAttribute("data-arrastrando", "true");
-    },
-    onDragEnd: (e: React.DragEvent) => {
-      // También cuando se suelta FUERA de cualquier zona; si no, la tarjeta se
-      // queda medio borrada para siempre.
-      e.currentTarget.removeAttribute("data-arrastrando");
-      document.querySelectorAll('[data-sobre="true"]').forEach((z) => z.removeAttribute("data-sobre"));
-    },
-  });
-  const dropProps = (onDrop: (id: string) => void) => ({
-    onDragOver: (e: React.DragEvent) => {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = "move";
-    },
-    onDragEnter: (e: React.DragEvent) => {
-      e.preventDefault();
-      e.currentTarget.setAttribute("data-sobre", "true");
-    },
-    onDragLeave: (e: React.DragEvent) => {
-      // `dragleave` salta también al pasar sobre un HIJO de la zona. Apagar sin
-      // comprobar deja la zona parpadeando mientras mueves la mano por dentro.
-      const r = e.currentTarget.getBoundingClientRect();
-      const fuera = e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
-      if (fuera) e.currentTarget.removeAttribute("data-sobre");
-    },
-    onDrop: (e: React.DragEvent) => {
-      e.preventDefault();
-      e.currentTarget.removeAttribute("data-sobre");
-      const id = e.dataTransfer.getData("text/plain");
-      if (id) onDrop(id);
-    },
-    "data-zona": "true" as const,
-    role: "button" as const,
-    tabIndex: 0,
-    onKeyDown: (e: React.KeyboardEvent) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        (e.currentTarget as HTMLElement).click();
-      }
-    },
-  });
+  const lectura =
+    modo === "lunes"
+      ? `${pasosHechos.filter(Boolean).length}/${TOTAL_PASOS} respuestas · ${bestEstrellas}★`
+      : `${textoDone ? "Texto completo" : "Escribe cada hueco"} · ${bestEstrellas}★`;
 
-  const resetTexto = () => {
-    setTextoDone(false);
-    setTextoIntento((n) => n + 1);
+  // ── lo que dice Dan ───────────────────────────────────────────────────
+  const rechazada = (() => {
+    const e1 = ESCENAS[0]!;
+    const hecha = linea[e1.id];
+    return hecha ? e1.opciones.find((o) => o.id !== hecha.actId) : undefined;
+  })();
+  const ecoPrevio = paso > 0 && paso < ESCENAS.length ? actividadElegida(ESCENAS[paso - 1]!.id)?.eco : undefined;
+
+  let danTexto = "";
+  let danEs = "";
+  let tono: Tono = "neutro";
+  if (esc) {
+    if (reac) {
+      danTexto = reac.ingles;
+      danEs = reac.es;
+      tono = reac.veredicto === "bien" ? "ok" : reac.veredicto === "marcador" ? "duda" : "mal";
+    } else {
+      danTexto = `${ecoPrevio ? `${ecoPrevio} ` : ""}${esc.pregunta}`;
+      danEs = `${esc.momento}: elige qué hiciste y cuéntaselo.`;
+    }
+  } else if (paso === ESCENAS.length) {
+    if (reacFrase) {
+      danTexto = reacFrase.ok ? "Oh, I see! Thanks for telling me." : "Sorry? I don't understand.";
+      danEs = reacFrase.porque;
+      tono = reacFrase.ok ? "ok" : "mal";
+    } else {
+      danTexto = rechazada ? preguntaNegativo(rechazada) : "Complete Friday first.";
+      danEs = "Dan pregunta por lo que NO hiciste el viernes. Contéstale que no.";
+    }
+  } else {
+    if (reacFrase) {
+      danTexto = reacFrase.ok ? RESPUESTA_DAN : "Sorry? What do you mean?";
+      danEs = reacFrase.porque;
+      tono = reacFrase.ok ? "ok" : "mal";
+    } else {
+      danTexto = CONSIGNA_PREGUNTA;
+      danEs = "Ahora tú preguntas: arma la pregunta en pasado.";
+    }
+  }
+
+  const nReg = Object.keys(linea).filter((k) => actividadElegida(k)?.tipo === "regular").length;
+  const nIrr = escenasHechas - nReg;
+
+  // ── escena ────────────────────────────────────────────────────────────
+  const escena = (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
+      <style>{ESTILOS(accent, color.rgba)}</style>
+
+      {modo === "lunes" && (
+        <>
+          <div className="pas-pasos" role="tablist" aria-label="Escenas del fin de semana">
+            {ESCENAS.map((e, i) => (
+              <button key={e.id} type="button" role="tab" aria-selected={paso === i} className="pas-paso" data-on={paso === i} data-done={pasosHechos[i]} disabled={i > 0 && !pasosHechos[i - 1]} onClick={() => irAPaso(i)}>
+                <i className={`fa-solid ${pasosHechos[i] ? "fa-circle-check" : e.icono}`} aria-hidden />
+                {e.titulo}
+              </button>
+            ))}
+            <button type="button" role="tab" aria-selected={paso === ESCENAS.length} className="pas-paso" data-on={paso === ESCENAS.length} data-done={negDone} disabled={!pasosHechos[ESCENAS.length - 1]} onClick={() => irAPaso(ESCENAS.length)}>
+              <i className={`fa-solid ${negDone ? "fa-circle-check" : "fa-ban"}`} aria-hidden /> No, I didn&apos;t
+            </button>
+            <button type="button" role="tab" aria-selected={paso === ESCENAS.length + 1} className="pas-paso" data-on={paso === ESCENAS.length + 1} data-done={preDone} disabled={!negDone} onClick={() => irAPaso(ESCENAS.length + 1)}>
+              <i className={`fa-solid ${preDone ? "fa-circle-check" : "fa-circle-question"}`} aria-hidden /> Did you…?
+            </button>
+          </div>
+
+          <div className="pas-dan" role="status">
+            <div className="pas-avatar" style={{ borderColor: COLOR_TONO[tono], color: COLOR_TONO[tono] }}>
+              <i className={`fa-solid ${ICONO_TONO[tono]}`} aria-hidden />
+            </div>
+            <div className="pas-burbuja" style={{ borderColor: tono === "neutro" ? undefined : `${COLOR_TONO[tono]}88` }}>
+              <div className="pas-nombre">Dan</div>
+              <div className="pas-ing">{danTexto}</div>
+              <div className="pas-es">{danEs}</div>
+            </div>
+          </div>
+
+          {esc && (
+            <div className="pas-bloque">
+              <div className="pas-opciones">
+                {esc.opciones.map((o) => {
+                  const hecha = linea[esc.id]?.actId === o.id;
+                  const bloqueada = !!linea[esc.id] && !hecha;
+                  return (
+                    <button key={o.id} type="button" className="pas-op" data-sel={(actSel ?? linea[esc.id]?.actId) === o.id} data-hecha={hecha} disabled={bloqueada} aria-pressed={(actSel ?? linea[esc.id]?.actId) === o.id} onClick={() => {
+                      sfxClick();
+                      setActSel(o.id);
+                      setVerbo(null);
+                      setReac(null);
+                    }}>
+                      <Foto clave={o.clave} icono={o.icono} />
+                      <span className="pas-op-txt">{o.es}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {actual && (
+                <div className="pas-constructor">
+                  <div className="pas-etq">1. ¿Cuándo? Elige el marcador de tiempo</div>
+                  <div className="pas-fichas" role="group" aria-label="Marcador de tiempo">
+                    {esc.marcadores.map((mk) => (
+                      <button key={mk.texto} type="button" className="pas-ficha" data-sel={marcador === mk.texto} disabled={!!linea[esc.id]} onClick={() => {
+                        sfxClick();
+                        setMarcador(mk.texto);
+                      }}>
+                        {mk.texto}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="pas-etq">
+                    2. ¿Qué verbo? Pasado de <em>{actual.base}</em>
+                  </div>
+                  <div className="pas-fichas" role="group" aria-label="Verbo en pasado">
+                    {fichasVerbo(actual).map((f) => (
+                      <button key={f} type="button" className="pas-ficha" data-sel={verbo === f} disabled={!!linea[esc.id]} onClick={() => {
+                        sfxClick();
+                        setVerbo(f);
+                      }}>
+                        {f}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="pas-frase" aria-live="polite">
+                    <strong>{linea[esc.id]?.frase ?? `${marcador ?? "…"}, I ${verbo ?? "____"} ${actual.compl}.`}</strong>
+                  </div>
+                  <div className="pas-acciones">
+                    {!linea[esc.id] && (
+                      <button type="button" className="pas-decir" disabled={!marcador || !verbo} onClick={contar}>
+                        <i className="fa-solid fa-comment-dots" aria-hidden /> Tell Dan
+                      </button>
+                    )}
+                    {linea[esc.id] && (
+                      <button type="button" className="pas-sig" onClick={() => irAPaso(paso + 1)}>
+                        Next question <i className="fa-solid fa-arrow-right" aria-hidden />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {!esc && (
+            <div className="pas-bloque">
+              <div className="pas-etq">{paso === ESCENAS.length ? "Contesta a Dan" : "Haz la pregunta"}</div>
+              <div className="pas-lista">
+                {(paso === ESCENAS.length ? (rechazada ? opcionesNegativo(rechazada) : []) : OPCIONES_PREGUNTA).map((op) => (
+                  <button key={op.texto} type="button" className="pas-resp" data-ok={reacFrase?.texto === op.texto ? op.ok : undefined} disabled={paso === ESCENAS.length ? negDone : preDone} onClick={() => responderFrase(op)}>
+                    {op.texto}
+                  </button>
+                ))}
+              </div>
+              {paso === ESCENAS.length && negDone && (
+                <div className="pas-acciones">
+                  <button type="button" className="pas-sig" onClick={() => irAPaso(paso + 1)}>
+                    Next question <i className="fa-solid fa-arrow-right" aria-hidden />
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className="pas-tiempo" aria-label="Tu fin de semana">
+            <div className="pas-etq">Tu fin de semana</div>
+            <div className="pas-tl">
+              {ESCENAS.map((e) => {
+                const l = linea[e.id];
+                const a = l ? e.opciones.find((o) => o.id === l.actId) : undefined;
+                const col = a?.tipo === "regular" ? AZUL : AMBAR;
+                return (
+                  <div key={e.id} className="pas-tl-item" data-llena={!!l} style={l ? { borderColor: `${col}88` } : undefined}>
+                    <div className="pas-tl-top">
+                      <i className={`fa-solid ${a?.icono ?? e.icono}`} aria-hidden style={{ color: l ? col : undefined }} />
+                      <span>{e.momento}</span>
+                    </div>
+                    <div className="pas-tl-frase">{l ? l.frase : "…"}</div>
+                    {a && <span className="pas-tag" style={{ color: col, borderColor: `${col}66` }}>{a.tipo === "regular" ? `regular · ${a.base} → ${a.pasado}` : `irregular · ${a.base} → ${a.pasado}`}</span>}
+                  </div>
+                );
+              })}
+            </div>
+            {simDone && (
+              <div className="pas-resumen">
+                <i className="fa-solid fa-trophy" aria-hidden /> Dan: «What a weekend!» Usaste {nReg} verbo(s) regular(es) y {nIrr} irregular(es), y supiste negar y preguntar en pasado.
+              </div>
+            )}
+          </div>
+        </>
+      )}
+
+      {modo === "texto" && (
+        <CompletaTexto
+          key={textoIntento}
+          data={PASADO_SIMPLE_INGLES_HUECOS}
+          accent={accent}
+          rgba={color.rgba}
+          completado={textoDone}
+          onCompletado={() => {
+            setTextoDone(true);
+            sfxOk();
+          }}
+          onAcierto={sfxPlace}
+          onError={sfxNo}
+        />
+      )}
+    </div>
+  );
+
+  const pistaDe: Record<Modo, string> = {
+    lunes: "Regular → solo agrega -ed (walk → walked; study → studied). Irregular → forma especial que se memoriza (go → went). Marcadores de pasado: yesterday, last…, …ago. Para negar y preguntar: didn't / Did + verbo base.",
+    texto: "Escribe la palabra que falta en cada hueco del texto.",
   };
-  const resetActual = modo === "texto" ? resetTexto : modo === "clasificar" ? resetClasificar : modo === "construir" ? resetConstruir : resetOraciones;
 
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes pstShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
-        @keyframes pstPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
-        .pst-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 16px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .pst-tab:hover { border-color:${T.lineStrong}; color:#fff; }
-        .pst-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-        .pst-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
-          font-size:14px; border:1px solid ${T.line}; background:${T.glass}; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .pst-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
-        .pst-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .pst-chip { cursor:grab; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 16px; border-radius:999px;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:14px; font-weight:800; transition:all .14s; user-select:none; }
-        .pst-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); }
-        .pst-chip[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.2); box-shadow:0 0 16px -5px ${accent}; }
-        .pst-chip:active { cursor:grabbing; }
-        .pst-row { border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:14px 16px; transition:all .16s; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
-        .pst-row[data-shake="true"] { animation:pstShake .4s; border-color:${NO}; }
-        .pst-row[data-done="true"] { border-color:${OK}66; background:${OK}0f; }
-        .pst-slot { flex-shrink:0; min-width:88px; min-height:42px; border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset};
-          display:inline-flex; align-items:center; justify-content:center; color:${T.text3}; font-size:12.5px; transition:all .16s; cursor:pointer; padding:4px 10px; }
-        .pst-slot[data-armed="true"] { border-color:${accent}; background:rgba(${color.rgba},0.1); }
-        .pst-bin { border-radius:15px; border:1.5px solid ${T.line}; background:${T.glass}; padding:16px; transition:all .16s; min-height:220px; }
-        .pst-bin[data-shake="true"] { animation:pstShake .4s; border-color:${NO}; }
-        .pst-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
-          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
-        .pst-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
-        .pst-q:disabled{ cursor:default; }
-        .pst-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
-          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .pst-btn:hover { border-color:${T.lineStrong}; }
-        .pst-divider { height:1px; background:${T.line}; margin:18px 0; }
-        @media (prefers-reduced-motion: reduce){ .pst-row[data-shake="true"], .pst-bin[data-shake="true"] { animation:none; } }
-
-        /* Cajón de teoría */
-        .pst-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .pst-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .pst-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .pst-drawer[data-open="true"] { transform:translateX(0); }
-        .pst-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .pst-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .pst-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .pst-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .pst-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .pst-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .pst-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
-
-        /* Identidad del tablero */
-        .pst-bin, .pst-row { --tono:188; position:relative;
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
-        .pst-bin:nth-of-type(6n+1), .pst-row:nth-of-type(6n+1) { --tono:188; }
-        .pst-bin:nth-of-type(6n+2), .pst-row:nth-of-type(6n+2) { --tono:262; }
-        .pst-bin:nth-of-type(6n+3), .pst-row:nth-of-type(6n+3) { --tono:44; }
-        .pst-bin:nth-of-type(6n+4), .pst-row:nth-of-type(6n+4) { --tono:152; }
-        .pst-bin:nth-of-type(6n+5), .pst-row:nth-of-type(6n+5) { --tono:330; }
-        .pst-bin:nth-of-type(6n+6), .pst-row:nth-of-type(6n+6) { --tono:18; }
-        .pst-bin::before, .pst-row::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
-          background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
-        .pst-bin[data-done="true"], .pst-row[data-done="true"] {
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.2) 0%, transparent 68%); }
-        .pst-chip { transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
-        .pst-chip:hover { transform:translateY(-2px); }
-        .pst-chip[data-sel="true"] { transform:translateY(-3px) scale(1.02); }
-        @media (prefers-reduced-motion: reduce){
-          .pst-chip, .pst-chip:hover, .pst-chip[data-sel="true"] { transform:none; transition:none; }
-        }
-      `}</style>
-
-      {/* selector de modo + toolbar */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="pst-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="pst-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="pst-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="pst-icobtn" onClick={resetActual} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <button className="pst-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="pst-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="pst-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="pst-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="pst-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="pst-drawer-body">
-          <FichaTeorica data={PASADO_SIMPLE_INGLES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}>
-        {/* ── Columna principal ─────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
-          {/* MODO 1 — Regular or irregular? */}
-          {/* MODO — completa el texto (fill_blanks verbatim de la progresión) */}
-          {modo === "texto" && (
-            <CompletaTexto
-              key={textoIntento}
-              data={PASADO_SIMPLE_INGLES_HUECOS}
-              accent={accent}
-              rgba={color.rgba}
-              completado={textoDone}
-              onCompletado={() => {
-                setTextoDone(true);
-                sfxOk();
-              }}
-              onAcierto={sfxPlace}
-              onError={sfxNo}
-            />
-          )}
-
-          {modo === "clasificar" && (
+    <LabShell
+      dom
+      accent={accent}
+      rgba={color.rgba}
+      escena={escena}
+      modos={{ opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })), valor: modo, cambiar: (id) => setModo(id as Modo) }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo={modo === "texto" ? "Reiniciar este modo" : "Reiniciar la plática"} onClick={resetActual} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      retoKey={RETO_KEY}
+      pestanas={[
+        {
+          id: "pistas",
+          etiqueta: "Pistas",
+          icono: "fa-lightbulb",
+          contenido: (
             <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada verbo a su tipo de pasado</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: clasificarDone ? OK : T.text3 }}>
-                    {Object.keys(ubicado).length}/{VERBOS.length}
-                  </span>
-                </div>
-                {verbosLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Clasificaste los 12 verbos!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {verbosLibres.map((v) => (
-                      <button key={v.id} className="pst-chip" data-sel={selVerbo === v.id} onClick={() => setSelVerbo((s) => (s === v.id ? null : v.id))} {...dragProps(v.id)}>
-                        {v.base}
-                        <span style={{ fontSize: 10.5, fontWeight: 600, color: T.text3 }}>{v.es}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <BinsClasificar selVerbo={selVerbo} shakeBin={shakeBin} ubicado={ubicado} onMatch={intentarClasificar} dropProps={dropProps} />
-            </>
-          )}
-
-          {/* MODO 2 — Build the past form */}
-          {modo === "construir" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra la forma de pasado correcta a cada verbo</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: construirDone ? OK : T.text3 }}>
-                    {Object.keys(construido).length}/{FORMAS.length}
-                  </span>
-                </div>
-                <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 14, lineHeight: 1.5 }}>
-                  Cuidado: hay formas <strong style={{ color: T.text2 }}>incorrectas</strong> (eated, buyed, goed…) que no encajan en ninguna fila.
-                </div>
-                {fichasLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Formaste los 6 pasados!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {fichasLibres.map((f) => (
-                      <button key={f.id} className="pst-chip" data-sel={selConstr === f.id} onClick={() => setSelConstr((s) => (s === f.id ? null : f.id))} {...dragProps(f.id)}>
-                        {f.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <RowsConstruir selConstr={selConstr} shakeConstr={shakeConstr} construido={construido} onMatch={intentarConstruir} dropProps={dropProps} />
-            </>
-          )}
-
-          {/* MODO 3 — Complete the sentence */}
-          {modo === "oraciones" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra el verbo en pasado a cada hueco</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: oracionesDone ? OK : T.text3 }}>
-                    {Object.keys(completado).length}/{ORACIONES.length}
-                  </span>
-                </div>
-                {oraLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Completaste las 5 oraciones!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {oraLibres.map((o) => (
-                      <button key={o.id} className="pst-chip" data-sel={selOra === o.id} onClick={() => setSelOra((s) => (s === o.id ? null : o.id))} {...dragProps(o.id)}>
-                        {o.resp}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <RowsOraciones selOra={selOra} shakeOra={shakeOra} completado={completado} onMatch={intentarOra} dropProps={dropProps} />
-            </>
-          )}
-        </div>
-
-        {/* ── Columna lateral ───────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? OK : T.text2 }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-                  <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="pst-divider" />
-
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", color: T.text3, textTransform: "uppercase" }}>Puntuación</div>
-                <div style={{ display: "flex", gap: 4, marginTop: 5 }}>
+              <Bloque titulo="Tu partida" icono="fa-gauge-high">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+                <div style={{ display: "flex", gap: 4 }}>
                   {[1, 2, 3].map((s) => (
-                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 18, color: s <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
+                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 20, color: s <= bestEstrellas ? AMBAR : "rgba(255,255,255,0.16)" }} />
                   ))}
                 </div>
-              </div>
-              <div style={{ textAlign: "right", maxWidth: 180 }}>
-                <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45 }}>
-                  {bestEstrellas >= 3 ? "You mastered the Past Simple!" : "Termina los tres modos para ganar 2★; la tercera pide 2 errores o menos."}
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                  {bestEstrellas >= 3 ? "You mastered the Past Simple!" : "Termina la plática con Dan y el texto para ganar 2★; la tercera pide 2 errores o menos."}
                 </div>
-              </div>
-            </div>
-          </div>
-
-          {/* pista del modo actual */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid rgba(${color.rgba},0.3)`, background: `rgba(${color.rgba},0.08)`, fontSize: 13, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              {modo === "clasificar" && (
-                <>Regular → solo agrega <strong style={{ color: T.text }}>-ed</strong> (walk → walked). Irregular → forma especial (<strong style={{ color: T.text }}>go → went</strong>): hay que memorizarla.</>
-              )}
-              {modo === "construir" && (
-                <>Nunca agregues <strong style={{ color: T.text }}>-ed</strong> a un irregular: es <strong style={{ color: T.text }}>ate</strong>, no «eated»; <strong style={{ color: T.text }}>went</strong>, no «goed».</>
-              )}
-              {modo === "oraciones" && (
-                <>Las expresiones <strong style={{ color: T.text }}>yesterday, last week, two days ago, in 2020</strong> piden el verbo en pasado.</>
-              )}
-            </span>
-          </div>
-
-          {/* dato verbatim */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid ${T.line}`, background: T.glass, fontSize: 12.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-circle-info" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>{DATO_PASADO}</span>
-          </div>
-        </div>
-      </div>
-
-      <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />
-    </div>
+              </Bloque>
+              <Bloque titulo="Pista de este modo" icono="fa-lightbulb">
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>{pistaDe[modo]}</div>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-clipboard-question",
+          contenido: <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />,
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Teoría de la práctica" icono="fa-book-open">
+                <FichaTeorica data={PASADO_SIMPLE_INGLES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <Bloque titulo="Regular o irregular" icono="fa-table-columns">
+                <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+                  {(["regular", "irregular"] as TipoVerbo[]).map((t) => (
+                    <div key={t} style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                      <strong style={{ color: T.text }}>
+                        {TIPO_INFO[t].titulo} · {TIPO_INFO[t].subtitulo}.
+                      </strong>{" "}
+                      {VERBOS.filter((v) => v.tipo === t)
+                        .map((v) => `${v.base} → ${v.pasado} (${v.es})`)
+                        .join(", ")}
+                      . <em style={{ color: T.text3 }}>{TIPO_INFO[t].ejemplo}</em>
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+              <Bloque titulo="Formas que hay que evitar" icono="fa-screwdriver-wrench">
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {FORMAS.map((f) => (
+                    <div key={f.id} style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                      <strong style={{ color: T.text }}>
+                        {f.base} → {f.pasado}.
+                      </strong>{" "}
+                      {f.nota}
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+              <Bloque titulo="Oraciones con marcadores de tiempo" icono="fa-pen-fancy">
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {ORACIONES.map((o) => (
+                    <div key={o.id} style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                      {o.antes} <strong style={{ color: OK }}>{o.resp}</strong> {o.despues} <em style={{ color: T.text3 }}>({o.nota})</em>
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+              <Bloque titulo="Dato" icono="fa-circle-info">
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55 }}>{DATO_PASADO}</div>
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
- * Paneles de cada modo (componentes hijos: reciben los manejadores como props,
- * así el linter no rastrea el acceso al ref de audio hasta el render del map).
+ * Piezas de la escena
  * ═══════════════════════════════════════════════════════════════════════════ */
-type DropFactory = (onDrop: (id: string) => void) => {
-  onDragOver: (e: React.DragEvent) => void;
-  onDrop: (e: React.DragEvent) => void;
-};
 
-function BinsClasificar({
-  selVerbo,
-  shakeBin,
-  ubicado,
-  onMatch,
-  dropProps,
-}: {
-  selVerbo: string | null;
-  shakeBin: TipoVerbo | null;
-  ubicado: Record<string, TipoVerbo>;
-  onMatch: (verboId: string, bin: TipoVerbo) => void;
-  dropProps: DropFactory;
-}) {
-  const bins: TipoVerbo[] = ["regular", "irregular"];
+function Foto({ clave, icono }: { clave: string; icono: string }) {
+  const [fallo, setFallo] = useState(false);
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-      {bins.map((bin) => {
-        const info = TIPO_INFO[bin];
-        const dentro = VERBOS.filter((v) => ubicado[v.id] === bin);
-        return (
-          <div
-            key={bin}
-            className="pst-bin"
-            data-shake={shakeBin === bin}
-            onClick={() => selVerbo && onMatch(selVerbo, bin)}
-            style={{ position: "relative", isolation: "isolate" }}
-            {...dropProps((id) => onMatch(id, bin))}
-          >
-            {/* La ilustración del concepto llenando la caja vacía. */}
-            <FondoTermino termino={info.titulo} />
-            <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
-              <VinetaTermino termino={info.titulo} color={T.text2} icono={info.icono} tam={29} radio={8} />
-              <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
-            </div>
-            <div style={{ fontSize: 11, color: T.text3, marginBottom: 4 }}>{info.subtitulo}</div>
-            <div style={{ fontSize: 10.5, color: T.text3, fontStyle: "italic", marginBottom: 12 }}>{info.ejemplo}</div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-              {dentro.length === 0 ? (
-                <div style={{ fontSize: 12, color: T.text3, opacity: 0.6, padding: "8px 0" }}>Arrastra aquí…</div>
-              ) : (
-                dentro.map((v) => (
-                  <span key={v.id} style={{ animation: "pstPop .25s ease", display: "inline-flex", alignItems: "center", gap: 7, padding: "8px 13px", borderRadius: 999, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 13.5, fontWeight: 800, color: "#fff" }}>
-                    {v.base}
-                    <i className="fa-solid fa-arrow-right-long" style={{ fontSize: 10, color: T.text3 }} />
-                    {v.pasado}
-                  </span>
-                ))
-              )}
-            </div>
-          </div>
-        );
-      })}
-    </div>
+    <span className="pas-foto">
+      <i className={`fa-solid ${icono}`} aria-hidden />
+      {!fallo && <img src={`${RUTA_SIM}/${clave}.webp`} alt="" loading="lazy" onError={() => setFallo(true)} />}
+    </span>
   );
 }
 
-function RowsConstruir({
-  selConstr,
-  shakeConstr,
-  construido,
-  onMatch,
-  dropProps,
-}: {
-  selConstr: string | null;
-  shakeConstr: string | null;
-  construido: Record<string, boolean>;
-  onMatch: (chipId: string, rowId: string) => void;
-  dropProps: DropFactory;
-}) {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-      {FORMAS.map((f) => {
-        const done = construido[f.id];
-        return (
-          <div
-            key={f.id}
-            className="pst-row"
-            data-shake={shakeConstr === f.id}
-            data-done={done}
-            onClick={() => !done && selConstr && onMatch(selConstr, f.id)}
-            {...dropProps((id) => onMatch(id, f.id))}
-          >
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 15.5, color: done ? "#fff" : T.text2, lineHeight: 1.4, display: "inline-flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                <span style={{ fontWeight: 700 }}>{f.base}</span>
-                <i className="fa-solid fa-arrow-right-long" style={{ fontSize: 12, color: T.text3 }} />
-                {done ? (
-                  <span style={{ animation: "pstPop .25s ease", fontWeight: 900, color: OK }}>{f.pasado}</span>
-                ) : (
-                  <span className="pst-slot" data-armed={!!selConstr}>
-                    <i className="fa-solid fa-arrow-down" style={{ fontSize: 11 }} />
-                  </span>
-                )}
-              </div>
-            </div>
-            <span style={{ fontSize: 10.5, fontWeight: 800, color: T.text3, border: `1px solid ${T.line}`, borderRadius: 6, padding: "2px 8px", textTransform: "uppercase", letterSpacing: "0.04em", flexShrink: 0 }}>
-              {f.tipo}
-            </span>
-            {done && (
-              <div style={{ flexBasis: "100%", fontSize: 12, color: T.text3, lineHeight: 1.45, display: "flex", gap: 8 }}>
-                <i className="fa-solid fa-circle-check" style={{ color: OK, marginTop: 2 }} />
-                <span>{f.nota}</span>
-              </div>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function RowsOraciones({
-  selOra,
-  shakeOra,
-  completado,
-  onMatch,
-  dropProps,
-}: {
-  selOra: string | null;
-  shakeOra: string | null;
-  completado: Record<string, boolean>;
-  onMatch: (chipId: string, rowId: string) => void;
-  dropProps: DropFactory;
-}) {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-      {ORACIONES.map((o) => {
-        const done = completado[o.id];
-        return (
-          <div
-            key={o.id}
-            className="pst-row"
-            data-shake={shakeOra === o.id}
-            data-done={done}
-            onClick={() => !done && selOra && onMatch(selOra, o.id)}
-            {...dropProps((id) => onMatch(id, o.id))}
-          >
-            <div style={{ fontSize: 14.5, color: done ? "#fff" : T.text2, lineHeight: 1.6, display: "inline-flex", alignItems: "center", gap: 7, flexWrap: "wrap", flex: 1, minWidth: 0 }}>
-              <span>{o.antes}</span>
-              {done ? (
-                <span style={{ animation: "pstPop .25s ease", fontWeight: 900, color: OK }}>{o.resp}</span>
-              ) : (
-                <span className="pst-slot" data-armed={!!selOra} style={{ minWidth: 96 }}>
-                  <i className="fa-solid fa-arrow-down" style={{ fontSize: 11 }} />
-                </span>
-              )}
-              <span>{o.despues}</span>
-            </div>
-            {!done && (
-              <span style={{ fontSize: 11, color: T.text3, fontStyle: "italic", flexShrink: 0 }}>{o.nota}</span>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
+const ESTILOS = (accent: string, rgba: string) => `
+  .pas-pasos { display:flex; flex-wrap:wrap; gap:8px; }
+  .pas-paso { cursor:pointer; display:inline-flex; align-items:center; gap:8px; padding:9px 14px; border-radius:11px; font-size:14px; font-weight:800;
+    border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; }
+  .pas-paso:disabled { opacity:.45; cursor:not-allowed; }
+  .pas-paso[data-on="true"] { border-color:${accent}; background:rgba(${rgba},0.18); color:#fff; }
+  .pas-paso[data-done="true"] i { color:${OK}; }
+  .pas-dan { display:flex; gap:12px; align-items:flex-start; }
+  .pas-avatar { flex-shrink:0; width:52px; height:52px; border-radius:50%; border:2px solid; display:flex; align-items:center; justify-content:center;
+    font-size:26px; background:rgba(2,12,28,0.6); transition:all .2s; }
+  .pas-burbuja { flex:1; min-width:0; padding:11px 14px; border-radius:6px 16px 16px 16px; border:1.5px solid ${T.line}; background:${T.glass}; display:grid; gap:4px; }
+  .pas-nombre { font-size:13px; font-weight:900; letter-spacing:.1em; text-transform:uppercase; color:${T.text3}; }
+  .pas-ing { font-size:16px; font-weight:800; color:#fff; line-height:1.35; }
+  .pas-es { font-size:14px; color:${T.text2}; line-height:1.45; }
+  .pas-bloque { display:grid; gap:12px; }
+  .pas-opciones { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap:12px; }
+  .pas-op { cursor:pointer; text-align:left; display:flex; flex-direction:column; border-radius:16px; border:1.5px solid ${T.line}; background:${T.glass}; color:#fff;
+    padding:0; overflow:hidden; font:inherit; min-width:0; transition:border-color .15s, box-shadow .15s; }
+  .pas-op:hover:not(:disabled) { border-color:${T.lineStrong}; }
+  .pas-op:disabled { opacity:.4; cursor:not-allowed; }
+  .pas-op[data-sel="true"] { border-color:${accent}; box-shadow:0 0 0 3px rgba(${rgba},0.22); }
+  .pas-op[data-hecha="true"] { border-color:${OK}; background:${OK}14; }
+  .pas-foto { position:relative; aspect-ratio:16/9; display:flex; align-items:center; justify-content:center; font-size:36px; color:rgba(255,255,255,0.35); overflow:hidden;
+    background:linear-gradient(135deg, rgba(${rgba},0.35), rgba(8,19,31,0.9)); }
+  .pas-foto img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .pas-op-txt { padding:11px 14px 13px; font-size:15px; font-weight:800; line-height:1.3; }
+  .pas-constructor { display:grid; gap:10px; padding:14px; border-radius:16px; border:1.5px solid ${T.line}; background:${T.inset}; }
+  .pas-etq { font-size:13px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; color:${T.text3}; }
+  .pas-etq em { color:#fff; font-style:normal; }
+  .pas-fichas { display:flex; flex-wrap:wrap; gap:8px; }
+  .pas-ficha { cursor:pointer; min-height:44px; padding:10px 16px; border-radius:999px; border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff;
+    font-size:15px; font-weight:800; transition:all .14s; }
+  .pas-ficha:hover:not(:disabled) { border-color:${T.lineStrong}; }
+  .pas-ficha:disabled { opacity:.6; cursor:default; }
+  .pas-ficha[data-sel="true"] { border-color:${accent}; background:rgba(${rgba},0.22); box-shadow:0 0 14px -5px ${accent}; }
+  .pas-frase { font-size:18px; color:#fff; line-height:1.4; padding:10px 12px; border-radius:12px; background:rgba(255,255,255,0.05); }
+  .pas-acciones { display:flex; flex-wrap:wrap; gap:10px; }
+  .pas-decir, .pas-sig { cursor:pointer; min-height:44px; display:inline-flex; align-items:center; gap:9px; padding:10px 18px; border-radius:11px; font-size:15px; font-weight:900; border:none; }
+  .pas-decir { background:${accent}; color:#04121f; }
+  .pas-decir:disabled { opacity:.4; cursor:not-allowed; }
+  .pas-sig { background:${OK}22; color:${OK}; border:1.5px solid ${OK}88; }
+  .pas-lista { display:grid; gap:8px; }
+  .pas-resp { cursor:pointer; text-align:left; min-height:44px; padding:11px 14px; border-radius:12px; border:1.5px solid ${T.line}; background:${T.glass}; color:#fff; font-size:15px; font-weight:700; }
+  .pas-resp:hover:not(:disabled) { border-color:${T.lineStrong}; }
+  .pas-resp[data-ok="true"] { border-color:${OK}; background:${OK}1c; }
+  .pas-resp[data-ok="false"] { border-color:${NO}; background:${NO}1c; }
+  .pas-resp:disabled { cursor:default; }
+  .pas-tiempo { display:grid; gap:10px; }
+  .pas-tl { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap:10px; }
+  .pas-tl-item { display:grid; gap:6px; align-content:start; padding:11px 12px; border-radius:14px; border:1.5px dashed ${T.line}; background:${T.glass}; min-width:0; }
+  .pas-tl-item[data-llena="true"] { border-style:solid; }
+  .pas-tl-top { display:flex; align-items:center; gap:8px; font-size:14px; font-weight:800; color:${T.text2}; }
+  .pas-tl-frase { font-size:15px; color:#fff; line-height:1.4; }
+  .pas-tag { justify-self:start; font-size:13px; font-weight:800; padding:2px 9px; border-radius:999px; border:1px solid; }
+  .pas-resumen { padding:12px 14px; border-radius:14px; background:${OK}14; border:1px solid ${OK}66; font-size:15px; line-height:1.45; color:#fff; }
+  .pas-resumen i { color:${OK}; margin-right:6px; }
+  .pas-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px; border:1.5px solid ${T.line}; background:${T.glass};
+    color:${T.text2}; font-size:14px; font-weight:600; text-align:left; width:100%; }
+  .pas-q:hover:not(:disabled) { border-color:${T.lineStrong}; color:#fff; }
+  .pas-q:disabled { cursor:default; }
+  .pas-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px; border-radius:11px; border:1.5px solid ${T.line};
+    background:${T.inset}; color:${T.text}; font-size:14px; font-weight:800; }
+  .pas-btn:disabled { opacity:.4; cursor:not-allowed; }
+  @media (prefers-reduced-motion: reduce){ .pas-avatar { transition:none; } }
+`;
 
 /* ═══════════════════════════════════════════════════════════════════════════
- * Cuestionario de comprensión
+ * Cuestionario de comprensión (pestaña Reto)
  * ═══════════════════════════════════════════════════════════════════════════ */
 function QuizCard({
   accent,
@@ -763,89 +644,83 @@ function QuizCard({
   };
 
   return (
-    <div style={{ ...card, padding: "20px 24px 24px", marginTop: 22 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4, flexWrap: "wrap" }}>
-        <Eyebrow>
-          <i className="fa-solid fa-clipboard-question" style={{ marginRight: 8, color: accent }} />
-          Comprueba lo aprendido
-        </Eyebrow>
-        {aprobado && (
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 12, fontWeight: 800, color: OK }}>
-            <i className="fa-solid fa-circle-check" /> Aprobado
-          </span>
-        )}
-      </div>
-      <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
-        Cinco afirmaciones sobre el pasado simple. Decide si son verdaderas o falsas y pulsa «Comprobar».
-      </div>
+    <div style={{ display: "grid", gap: 16 }}>
+      <Bloque titulo="Comprueba lo aprendido" icono="fa-clipboard-question">
+        <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+          Cinco afirmaciones sobre el pasado simple. Decide si son verdaderas o falsas y pulsa «Comprobar».
+          {aprobado && (
+            <span style={{ marginLeft: 8, color: OK, fontWeight: 800 }}>
+              <i className="fa-solid fa-circle-check" /> Aprobado
+            </span>
+          )}
+        </div>
+      </Bloque>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
-        {QUIZ.map((q, qi) => {
-          const elegida = resp[qi];
-          return (
-            <div key={qi}>
-              <div style={{ fontSize: 14.5, fontWeight: 800, color: T.text, marginBottom: 11, display: "flex", gap: 10 }}>
-                <span style={{ color: accent }}>{qi + 1}.</span>
-                <span>{q.pregunta}</span>
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
-                {q.opciones.map((op, oi) => {
-                  const sel = elegida === oi;
-                  const esCorrecta = oi === q.correcta;
-                  let borde = T.line;
-                  let fondo = T.glass;
-                  let colorTxt = T.text2;
-                  if (comprobado && esCorrecta) {
-                    borde = OK;
-                    fondo = `${OK}1c`;
-                    colorTxt = "#fff";
-                  } else if (comprobado && sel && !esCorrecta) {
-                    borde = NO;
-                    fondo = `${NO}1c`;
-                    colorTxt = "#fff";
-                  } else if (!comprobado && sel) {
-                    borde = accent;
-                    fondo = `rgba(${rgba},0.16)`;
-                    colorTxt = "#fff";
-                  }
-                  return (
-                    <button key={oi} className="pst-q" onClick={() => elegir(qi, oi)} disabled={comprobado} style={{ borderColor: borde, background: fondo, color: colorTxt }}>
-                      <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
-                        {comprobado && esCorrecta ? <i className="fa-solid fa-check" /> : comprobado && sel ? <i className="fa-solid fa-xmark" /> : String.fromCharCode(65 + oi)}
-                      </span>
-                      <span style={{ flex: 1, lineHeight: 1.35 }}>{op}</span>
-                    </button>
-                  );
-                })}
-              </div>
-              {comprobado && (
-                <div style={{ marginTop: 9, fontSize: 12.5, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
-                  <i className="fa-solid fa-circle-info" style={{ color: accent, marginTop: 2 }} />
-                  <span>{q.retro}</span>
-                </div>
-              )}
+      {QUIZ.map((q, qi) => {
+        const elegida = resp[qi];
+        return (
+          <div key={qi}>
+            <div style={{ fontSize: 15, fontWeight: 800, color: T.text, marginBottom: 10, display: "flex", gap: 10 }}>
+              <span style={{ color: accent }}>{qi + 1}.</span>
+              <span>{q.pregunta}</span>
             </div>
-          );
-        })}
-      </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 140px), 1fr))", gap: 9 }}>
+              {q.opciones.map((op, oi) => {
+                const sel = elegida === oi;
+                const esCorrecta = oi === q.correcta;
+                let borde = T.line;
+                let fondo = T.glass;
+                let colorTxt = T.text2;
+                if (comprobado && esCorrecta) {
+                  borde = OK;
+                  fondo = `${OK}1c`;
+                  colorTxt = "#fff";
+                } else if (comprobado && sel && !esCorrecta) {
+                  borde = NO;
+                  fondo = `${NO}1c`;
+                  colorTxt = "#fff";
+                } else if (!comprobado && sel) {
+                  borde = accent;
+                  fondo = `rgba(${rgba},0.16)`;
+                  colorTxt = "#fff";
+                }
+                return (
+                  <button key={oi} className="pas-q" onClick={() => elegir(qi, oi)} disabled={comprobado} style={{ borderColor: borde, background: fondo, color: colorTxt }}>
+                    <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
+                      {comprobado && esCorrecta ? <i className="fa-solid fa-check" /> : comprobado && sel ? <i className="fa-solid fa-xmark" /> : String.fromCharCode(65 + oi)}
+                    </span>
+                    <span style={{ flex: 1, lineHeight: 1.35 }}>{op}</span>
+                  </button>
+                );
+              })}
+            </div>
+            {comprobado && (
+              <div style={{ marginTop: 9, fontSize: 14, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
+                <i className="fa-solid fa-circle-info" style={{ color: accent, marginTop: 3 }} />
+                <span>{q.retro}</span>
+              </div>
+            )}
+          </div>
+        );
+      })}
 
-      <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 22, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
         {!comprobado ? (
-          <button className="pst-btn" style={{ background: accent, color: "#04121f", border: "none" }} onClick={comprobar} disabled={!todas}>
+          <button className="pas-btn" style={{ background: accent, color: "#04121f", border: "none" }} onClick={comprobar} disabled={!todas}>
             <i className="fa-solid fa-list-check" />
             Comprobar
           </button>
         ) : (
-          <button className="pst-btn" onClick={reintentar}>
+          <button className="pas-btn" onClick={reintentar}>
             <i className="fa-solid fa-rotate-left" />
             Reintentar
           </button>
         )}
         {comprobado && (
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 13.5, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 14px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 14, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
             <i className={`fa-solid ${aprobadoAhora ? "fa-trophy" : "fa-circle-half-stroke"}`} />
             {aciertos} / {total} correctas
-            {!aprobadoAhora && <span style={{ color: T.text3, fontWeight: 600 }}>· revisa las marcadas e inténtalo de nuevo</span>}
+            {!aprobadoAhora && <span style={{ color: T.text3, fontWeight: 600 }}>· revisa las marcadas</span>}
           </div>
         )}
       </div>

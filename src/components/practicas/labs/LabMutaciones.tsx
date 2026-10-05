@@ -9,19 +9,21 @@
  * y los hechos de los quizzes A2/A4.
  *
  * Tres modos:
- *  (1) Puntuales — sobre una secuencia real de la β-globina se aplica una
- *      sustitución / inserción / deleción y se compara en 3D la proteína original
- *      con la mutada (silenciosa, missense, nonsense, frameshift).
+ *  (1) Puntuales — EDITOR: el alumno elige el tipo (sustitución / inserción /
+ *      deleción), la posición (1-24) y la base sobre una secuencia real de la
+ *      β-globina; la proteína mutada se recalcula con el código genético y la
+ *      clase (silenciosa, missense, nonsense, frameshift) sale del resultado.
  *  (2) Cromosómicas — deleción, duplicación, inversión, translocación y
  *      aneuploidía (trisomía 21) sobre un cromosoma "modelo" de bandas.
  *  (3) Mutágenos — UV (dímero de timina), radiación ionizante, químicos y
  *      biológicos, y la reparación del ADN (NER).
  */
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, card, Eyebrow, SceneBoundary } from "./_kit";
+import { T, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { LabSfx } from "./lab-audio";
@@ -31,11 +33,15 @@ import {
   type ClasePuntual,
   type TipoCromo,
   type TipoMutageno,
+  type OpMutacion,
+  type AnalisisPuntual,
   MODOS,
   MODOS_DEF,
   MUTACIONES_PUNTUALES,
   mutPuntualPorId,
-  analizarPuntual,
+  BASE_CODIFICANTE,
+  aplicarMutacion,
+  aminoacidosDe,
   MUTACIONES_CROMO,
   mutCromoPorId,
   resultadoCromo,
@@ -55,7 +61,7 @@ import {
   FUENTE,
   QUIZ_A2,
 } from "./mutaciones-data";
-import { TableroObjetivos } from "./_objetivos";
+import { transcribir } from "./adn-dogma-data";
 
 /** Clave de la mejor marca de este laboratorio. */
 const RETO_KEY = "cen-mutaciones-3d-reto";
@@ -65,16 +71,93 @@ const MutacionesScene = dynamic(() => import("./MutacionesScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-dna fa-fade" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Cargando las mutaciones en 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Cargando las mutaciones en 3D…</span>
     </div>
   ),
 });
+
+const OPS: { id: OpMutacion["op"]; etq: string; icono: string }[] = [
+  { id: "sub", etq: "Sustitución", icono: "fa-right-left" },
+  { id: "ins", etq: "Inserción", icono: "fa-plus" },
+  { id: "del", etq: "Deleción", icono: "fa-minus" },
+];
+const BASES = ["A", "C", "G", "T"] as const;
+
+/**
+ * Analiza CUALQUIER mutación puntual sobre la secuencia base: traduce con el
+ * código genético y deduce la clase a partir del RESULTADO (no de una etiqueta).
+ */
+function analizarEspecifica(spec: OpMutacion | null): AnalisisPuntual {
+  const codMutada = aplicarMutacion(BASE_CODIFICANTE, spec);
+  const protOriginal = aminoacidosDe(BASE_CODIFICANTE);
+  const protMutada = aminoacidosDe(codMutada);
+  const arnmOriginal = transcribir(BASE_CODIFICANTE);
+  const arnmMutado = transcribir(codMutada);
+
+  let cambioIdx = -1;
+  const n = Math.max(protOriginal.length, protMutada.length);
+  for (let i = 0; i < n; i++) {
+    const a = protOriginal[i];
+    const b = protMutada[i];
+    if (!a || !b || a.codon !== b.codon) { cambioIdx = i; break; }
+  }
+
+  const iguales = protOriginal.length === protMutada.length && protOriginal.every((c, i) => c.amino.abr === protMutada[i]!.amino.abr && c.paro === protMutada[i]!.paro);
+  const sinInicio = arnmMutado.indexOf("AUG") !== 0;
+  let id: ClasePuntual;
+  if (!spec || codMutada === BASE_CODIFICANTE) id = "ninguna";
+  else if (sinInicio) id = "nonsense";
+  else if (iguales) id = "silenciosa";
+  else if (spec.op !== "sub") id = "frameshift";
+  else if (protMutada.some((c) => c.paro)) id = "nonsense";
+  else id = "missense";
+
+  let efecto: string;
+  if (id === "nonsense" && sinInicio) efecto = "Se pierde el codón de inicio AUG: no se fabrica la proteína.";
+  else if (id === "silenciosa") efecto = "Proteína idéntica — el cambio no se nota en el fenotipo.";
+  else if (id === "missense") efecto = "Un aminoácido cambia — puede alterar la función de la proteína.";
+  else if (id === "nonsense") efecto = `Parada prematura — proteína truncada (${protMutada.filter((c) => !c.paro).length} aa en vez de ${protOriginal.filter((c) => !c.paro).length}).`;
+  else if (id === "frameshift") efecto = "Se corre el marco — todos los aminoácidos siguientes cambian.";
+  else efecto = spec ? "Esa base ya estaba ahí: el gen no cambia." : "Sin cambios: secuencia de referencia.";
+
+  const def = { ...mutPuntualPorId(id), spec };
+  return { def, codMutada, arnmOriginal, arnmMutado, protOriginal, protMutada, cambioIdx, efecto };
+}
+
+/** Cuántos aminoácidos de la proteína original quedan distintos (o perdidos). */
+function contarDistintos(a: AnalisisPuntual): { distintos: number; total: number } {
+  const total = a.protOriginal.length;
+  let distintos = 0;
+  for (let i = 0; i < total; i++) {
+    const o = a.protOriginal[i]!;
+    const m = a.protMutada[i];
+    if (!m || m.amino.abr !== o.amino.abr || m.paro !== o.paro) distintos++;
+  }
+  return { distintos, total };
+}
+
+/** Botón de opción del panel (tamaño táctil, texto de 14 px). */
+function Opcion({ on, col, icono, etq, onClick, disabled = false }: { on: boolean; col: string; icono: string; etq: string; onClick: () => void; disabled?: boolean }) {
+  return (
+    <button type="button" disabled={disabled} onClick={onClick}
+      style={{ cursor: disabled ? "not-allowed" : "pointer", opacity: disabled ? 0.45 : 1, textAlign: "left", display: "flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 800, color: on ? "#04121f" : "#fff", background: on ? col : `${col}1a`, border: `1px solid ${col}66`, borderRadius: 10, padding: "10px 12px", lineHeight: 1.25 }}>
+      <i className={`fa-solid ${icono}`} style={{ color: on ? "#04121f" : col }} aria-hidden />
+      <span style={{ minWidth: 0 }}>{etq}</span>
+    </button>
+  );
+}
+
+const GENES_REALES = "ABCDE";
 
 export function LabMutaciones({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
 
   const [modo, setModo] = useState<Modo>("puntuales");
-  const [clasePuntual, setClasePuntual] = useState<ClasePuntual>("missense");
+  // editor de mutación puntual (posición 1-based)
+  const [op, setOp] = useState<OpMutacion["op"]>("sub");
+  const [pos, setPos] = useState(19);
+  const [base, setBase] = useState<string>("T");
+  const [aplicada, setAplicada] = useState(false);
   const [tipoCromo, setTipoCromo] = useState<TipoCromo>("delecion");
   const [tipoMutageno, setTipoMutageno] = useState<TipoMutageno>("uv");
   const [dimero, setDimero] = useState<boolean>(true); // UV: daño formado
@@ -82,8 +165,9 @@ export function LabMutaciones({ color }: PracticaLabProps) {
   const [playing, setPlaying] = useState<boolean>(true);
   const [resetNonce, setResetNonce] = useState(0);
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
-  // teoría (cajón deslizable) y sonido
-  const [drawer, setDrawer] = useState(false);
+  // misiones: banderas que, una vez ganadas, no se pierden al cambiar de modo
+  const [hecho, setHecho] = useState({ editor: false, puntual: false, silenciosa: false, frame: false, cromo: false, mutag: false, reparo: false });
+  const marca = (k: keyof typeof hecho) => setHecho((h) => (h[k] ? h : { ...h, [k]: true }));
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
 
@@ -111,38 +195,78 @@ export function LabMutaciones({ color }: PracticaLabProps) {
   const def = MODOS_DEF[modo];
   const modoCol = `#${def.color.replace("#", "")}`;
 
-  const analisis = analizarPuntual(clasePuntual);
-  const puntualDef = mutPuntualPorId(clasePuntual);
+  const spec: OpMutacion | null = aplicada ? { op, pos: pos - 1, base: op === "del" ? undefined : base } : null;
+  const analisis = analizarEspecifica(spec);
+  const puntualDef = analisis.def;
+  const { distintos, total } = contarDistintos(analisis);
   const resCromo = resultadoCromo(tipoCromo);
   const cromoDef = mutCromoPorId(tipoCromo);
   const mutageno = mutagenoPorId(tipoMutageno);
 
-  const cambiarModo = (m: Modo) => {
-    setModo(m);
-    setPlaying(true);
+  // dosis de genes A–E tras la mutación cromosómica (normal = 5)
+  const dosis = [...resCromo.principal, ...(resCromo.secundario ?? [])].filter((b) => GENES_REALES.includes(b.gen)).length * resCromo.copias;
+  const orden = resCromo.principal.map((b) => b.gen).join("–") + (resCromo.secundario ? ` | ${resCromo.secundario.map((b) => b.gen).join("–")}` : "");
+
+  /** Registra en las misiones lo que produjo una mutación puntual. */
+  const registrar = (sp: OpMutacion | null, editor: boolean) => {
+    const id = analizarEspecifica(sp).def.id;
+    if (editor) marca("editor");
+    if (id !== "ninguna") marca("puntual");
+    if (id === "silenciosa") marca("silenciosa");
+    if (id === "frameshift") marca("frame");
+  };
+  const aplicarEditor = (o: OpMutacion["op"], p: number, b: string) => {
+    setOp(o); setPos(p); setBase(b); setAplicada(true); setPlaying(true);
+    registrar({ op: o, pos: p - 1, base: o === "del" ? undefined : b }, true);
     if (sonido) audioRef.current?.blip();
     bump();
   };
+  const elegirCaso = (id: ClasePuntual) => {
+    const m = mutPuntualPorId(id);
+    if (!m.spec) { setAplicada(false); bump(); return; }
+    setOp(m.spec.op); setPos(m.spec.pos + 1); if (m.spec.base) setBase(m.spec.base);
+    setAplicada(true); setPlaying(true);
+    registrar(m.spec, false);
+    if (sonido) audioRef.current?.blip();
+    bump();
+  };
+
+  const cambiarModo = (m: Modo) => {
+    setModo(m);
+    setPlaying(true);
+    if (m === "cromosomicas") marca("cromo");
+    if (sonido) audioRef.current?.blip();
+    bump();
+  };
+  const elegirCromo = (t: TipoCromo) => { setTipoCromo(t); setPlaying(true); bump(); };
+  const elegirMutageno = (t: TipoMutageno) => {
+    setTipoMutageno(t); setReparar(false); setDimero(true); setPlaying(true);
+    if (t !== "uv") marca("mutag");
+    bump();
+  };
+  const alternarDimero = () => { setDimero((d) => !d); setReparar(false); };
+  const alternarReparar = () => {
+    const nuevo = !reparar;
+    setReparar(nuevo);
+    if (nuevo) marca("reparo");
+  };
   const reiniciar = () => {
     setReparar(false);
+    setAplicada(false);
     if (modo === "mutagenos") setDimero(true);
     setPlaying(true);
     bump();
   };
 
-  // pie del visor
-  const pie: string =
+  // lectura breve sobre la escena
+  const lectura: string =
     modo === "puntuales"
-      ? `${puntualDef.etq} (${puntualDef.tipoTec}). ${analisis.efecto}`
+      ? aplicada ? `${puntualDef.etq}: ${distintos} de ${total} aminoácidos cambian` : "Gen sano: aplica una mutación para compararlo"
       : modo === "cromosomicas"
-        ? `${cromoDef.etq} (${cromoDef.clase}). ${cromoDef.descripcion} Ejemplo: ${cromoDef.ejemplo}`
+        ? `${cromoDef.etq}: ${dosis} de 5 genes (A–E)`
         : mutageno.id === "uv"
-          ? reparar
-            ? "La reparación por escisión de nucleótidos (NER) retira el dímero de timina y restaura la doble hélice."
-            : dimero
-              ? mutageno.mecanismo
-              : "Doble hélice intacta. Activa la radiación UV para formar un dímero de timina entre las dos timinas adyacentes."
-          : `${mutageno.categoria} — ${mutageno.mecanismo}`;
+          ? reparar ? "NER retiró el dímero: hélice restaurada" : dimero ? "Dímero de timina: la hélice se deforma" : "Hélice intacta: aplica UV"
+          : `${mutageno.categoria}: ${mutageno.agentes[0]}`;
 
   const sceneFallback = (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 28, textAlign: "center" }}>
@@ -150,448 +274,267 @@ export function LabMutaciones({ color }: PracticaLabProps) {
         <i className={`fa-solid ${def.icono}`} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{def.etq}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>
         Tu equipo no puede mostrar la escena en 3D, pero la información sigue aquí. {DEFINICION}
       </div>
     </div>
   );
 
-  /* ── Panel de control específico del modo ──────────────────────────── */
-  let control: ReactNode = null;
-  if (modo === "puntuales") {
-    control = (
-      <>
-        <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "0 0 8px", textTransform: "uppercase" }}>Aplica una mutación a la β-globina</div>
-        <div className="mu-opts">
-          {MUTACIONES_PUNTUALES.map((m) => {
-            const col = `#${m.color.replace("#", "")}`;
-            const on = m.id === clasePuntual;
-            return (
-              <button key={m.id} className="mu-opt" data-on={on} onClick={() => { setClasePuntual(m.id); setPlaying(true); bump(); }} style={{ ["--muc" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <i className={`fa-solid ${m.icono}`} style={{ marginRight: 8, color: on ? col : T.text3 }} />
-                {m.etq}
-              </button>
-            );
-          })}
-        </div>
-        <div style={{ marginTop: 13, padding: "12px 14px", borderRadius: 12, border: `1px solid ${modoCol}55`, background: `${modoCol}12` }}>
-          <div style={{ fontSize: 12.5, fontWeight: 900, color: "#fff", marginBottom: 5 }}>
-            <i className={`fa-solid ${puntualDef.icono}`} style={{ color: modoCol, marginRight: 8 }} />
-            {puntualDef.etq} <span style={{ fontSize: 11, color: T.text3, fontWeight: 700 }}>· {puntualDef.tipoTec}</span>
-          </div>
-          <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{puntualDef.descripcion}</div>
-          <div style={{ marginTop: 10, fontSize: 11.5, color: "#eaf0fb", lineHeight: 1.5, padding: "9px 11px", borderRadius: 9, background: "rgba(4,10,22,0.4)" }}>
-            <i className="fa-solid fa-arrow-right-long" style={{ color: modoCol, marginRight: 7 }} />{analisis.efecto}
-          </div>
-          <div style={{ marginTop: 9, fontSize: 11, color: T.text3, fontFamily: "ui-monospace, monospace", lineHeight: 1.5 }}>
-            ARNm: {analisis.arnmMutado}
-          </div>
-        </div>
-      </>
-    );
-  } else if (modo === "cromosomicas") {
-    control = (
-      <>
-        <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "0 0 8px", textTransform: "uppercase" }}>Tipo de mutación cromosómica</div>
-        <div className="mu-opts">
-          {MUTACIONES_CROMO.filter((m) => m.id !== "normal").map((m) => {
-            const col = `#${m.color.replace("#", "")}`;
-            const on = m.id === tipoCromo;
-            return (
-              <button key={m.id} className="mu-opt" data-on={on} onClick={() => { setTipoCromo(m.id); setPlaying(true); bump(); }} style={{ ["--muc" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <i className={`fa-solid ${m.icono}`} style={{ marginRight: 8, color: on ? col : T.text3 }} />
-                {m.etq}
-              </button>
-            );
-          })}
-        </div>
-        <div style={{ marginTop: 13, padding: "12px 14px", borderRadius: 12, border: `1px solid ${modoCol}55`, background: `${modoCol}12` }}>
-          <div style={{ fontSize: 12.5, fontWeight: 900, color: "#fff", marginBottom: 5 }}>
-            <i className={`fa-solid ${cromoDef.icono}`} style={{ color: modoCol, marginRight: 8 }} />
-            {cromoDef.etq} <span style={{ fontSize: 11, color: T.text3, fontWeight: 700 }}>· {cromoDef.clase}</span>
-          </div>
-          <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{cromoDef.descripcion}</div>
-          <div style={{ marginTop: 10, fontSize: 11.5, color: "#eaf0fb", lineHeight: 1.5, padding: "9px 11px", borderRadius: 9, background: "rgba(4,10,22,0.4)" }}>
-            <i className="fa-solid fa-flask-vial" style={{ color: modoCol, marginRight: 7 }} />{cromoDef.ejemplo}
-          </div>
-        </div>
-      </>
-    );
-  } else {
-    control = (
-      <>
-        <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "0 0 8px", textTransform: "uppercase" }}>Agente mutágeno</div>
-        <div className="mu-opts">
-          {MUTAGENOS.map((m) => {
-            const col = `#${m.color.replace("#", "")}`;
-            const on = m.id === tipoMutageno;
-            return (
-              <button key={m.id} className="mu-opt" data-on={on} onClick={() => { setTipoMutageno(m.id); setReparar(false); setDimero(true); setPlaying(true); bump(); }} style={{ ["--muc" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <i className={`fa-solid ${m.icono}`} style={{ marginRight: 8, color: on ? col : T.text3 }} />
-                {m.etq}
-              </button>
-            );
-          })}
-        </div>
+  const rejilla = (min: number): React.CSSProperties => ({ display: "grid", gridTemplateColumns: `repeat(auto-fit, minmax(min(100%, ${min}px), 1fr))`, gap: 8 });
+  const nota = (col: string, children: React.ReactNode) => (
+    <p style={{ margin: 0, padding: "10px 12px", borderRadius: 12, border: `1px solid ${col}44`, background: `${col}14`, color: "#eaf0fb" }}>{children}</p>
+  );
 
-        {/* controles del dímero de timina (solo UV) */}
-        {mutageno.id === "uv" && (
-          <div style={{ marginTop: 12, display: "grid", gap: 8 }}>
-            <button className="mu-toggle" data-on={dimero} onClick={() => { setDimero((d) => !d); setReparar(false); }} style={{ ["--muc" as string]: dimero ? "#fbbf24" : "rgba(255,255,255,0.2)" }}>
-              <i className={`fa-solid ${dimero ? "fa-sun" : "fa-ban"}`} style={{ marginRight: 9, color: dimero ? "#fbbf24" : T.text3 }} />
-              {dimero ? "Radiación UV: dímero de timina formado" : "Radiación UV: sin daño"}
-            </button>
-            <button className="mu-toggle" data-on={reparar} disabled={!dimero} onClick={() => setReparar((r) => !r)} style={{ ["--muc" as string]: reparar ? "#34d399" : "rgba(255,255,255,0.2)", opacity: dimero ? 1 : 0.45, cursor: dimero ? "pointer" : "not-allowed" }}>
-              <i className="fa-solid fa-scissors" style={{ marginRight: 9, color: reparar ? "#34d399" : T.text3 }} />
-              {reparar ? "Reparación NER: ACTIVADA" : "Reparar con NER (escisión de nucleótidos)"}
-            </button>
-          </div>
-        )}
+  const codonK = Math.floor((pos - 1) / 3);
+  const codOrig = BASE_CODIFICANTE.slice(codonK * 3, codonK * 3 + 3);
+  const codMut = analisis.codMutada.slice(codonK * 3, codonK * 3 + 3);
 
-        {/* agentes representativos */}
-        <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 7px", textTransform: "uppercase" }}>Agentes representativos</div>
-        <div className="mu-chips">
-          {mutageno.agentes.map((a) => (
-            <span key={a} className="mu-chip" style={{ borderColor: `${modoCol}66`, background: `${modoCol}1e`, color: "#fff" }}>
-              <i className={`fa-solid ${mutageno.icono}`} style={{ color: modoCol }} />{a}
-            </span>
-          ))}
-        </div>
+  /* ── Pestaña «Controles», según el modo ────────────────────────────── */
+  const controles = (
+    <>
+      {modo === "puntuales" && (
+        <>
+          <Bloque titulo="Edita el gen de la β-globina" icono="fa-pen-to-square">
+            <div style={rejilla(120)}>
+              {OPS.map((o) => <Opcion key={o.id} on={aplicada && op === o.id} col={modoCol} icono={o.icono} etq={o.etq} onClick={() => aplicarEditor(o.id, pos, base)} />)}
+            </div>
+            <Deslizador
+              label="Posición en el gen" icon="fa-arrows-left-right" colr={modoCol}
+              valor={`${pos} · ${BASE_CODIFICANTE[pos - 1]} · codón ${codonK + 1}`}
+              min={1} max={24} step={1} value={pos}
+              onChange={(v) => aplicarEditor(op, v, base)}
+              hintL="inicio (ATG)" hintR="final"
+            />
+            {op !== "del" && (
+              <div style={{ display: "grid", gap: 8 }}>
+                <div style={{ fontSize: 14, fontWeight: 800, color: modoCol }}>
+                  {op === "sub" ? "Nueva base" : "Base que se inserta"}
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 6 }}>
+                  {BASES.map((b) => {
+                    const on = aplicada && base === b;
+                    return (
+                      <button key={b} type="button" onClick={() => aplicarEditor(op, pos, b)}
+                        style={{ cursor: "pointer", fontSize: 16, fontWeight: 900, fontFamily: "ui-monospace, monospace", color: on ? "#04121f" : modoCol, background: on ? modoCol : `${modoCol}1f`, border: `1px solid ${modoCol}55`, borderRadius: 9, padding: "10px 4px" }}>
+                        {b}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+            {!aplicada && <p style={{ margin: 0, color: T.text2 }}>Toca un tipo, mueve la posición o elige una base: la proteína de abajo se recalcula al instante.</p>}
+          </Bloque>
 
-        <div style={{ marginTop: 14, padding: "11px 13px", borderRadius: 11, border: `1px solid ${modoCol}44`, background: `${modoCol}12`, fontSize: 12, color: "#eaf0fb", lineHeight: 1.5 }}>
-          <i className="fa-solid fa-circle-info" style={{ color: modoCol, marginRight: 8 }} />
-          {mutageno.ejemplo}
-        </div>
-      </>
-    );
-  }
+          <Bloque titulo="Resultado en la proteína" icono="fa-gauge-high">
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+              <Dato label="Clase" value={aplicada ? puntualDef.etq.split(" (")[0]! : "Original"} col={`#${puntualDef.color.replace("#", "")}`} />
+              <Dato label="Aminoácidos distintos" value={`${distintos} de ${total}`} col={distintos > 0 ? "#fca5a5" : "#86efac"} />
+              <Dato label={op === "sub" ? `Codón ${codonK + 1}` : "Desde el codón"} value={op === "sub" && aplicada ? `${codOrig}→${codMut}` : String(codonK + 1)} />
+              <Dato label="Largo de la proteína" value={`${analisis.protMutada.filter((c) => !c.paro).length} aa`} />
+            </div>
+            {nota(modoCol, <><i className={`fa-solid ${puntualDef.icono}`} style={{ color: modoCol, marginRight: 8 }} aria-hidden />{analisis.efecto}</>)}
+            <p style={{ margin: 0, color: T.text3, fontFamily: "ui-monospace, monospace", wordBreak: "break-all" }}>ARNm: {analisis.arnmMutado}</p>
+          </Bloque>
+
+          <Bloque titulo="Casos reales (un clic)" icono="fa-vial">
+            <div style={rejilla(160)}>
+              {MUTACIONES_PUNTUALES.map((m) => {
+                const c = `#${m.color.replace("#", "")}`;
+                const on = m.id === "ninguna" ? !aplicada : aplicada && puntualDef.id === m.id;
+                return <Opcion key={m.id} on={on} col={c} icono={m.icono} etq={m.etq} onClick={() => elegirCaso(m.id)} />;
+              })}
+            </div>
+            <p style={{ margin: 0, color: T.text2 }}>{puntualDef.descripcion}</p>
+          </Bloque>
+        </>
+      )}
+
+      {modo === "cromosomicas" && (
+        <>
+          <Bloque titulo="Tipo de mutación cromosómica" icono="fa-grip-lines-vertical">
+            <div style={rejilla(150)}>
+              {MUTACIONES_CROMO.filter((m) => m.id !== "normal").map((m) =>
+                <Opcion key={m.id} on={m.id === tipoCromo} col={`#${m.color.replace("#", "")}`} icono={m.icono} etq={m.etq} onClick={() => elegirCromo(m.id)} />)}
+            </div>
+          </Bloque>
+          <Bloque titulo="Qué le pasa a los genes" icono="fa-gauge-high">
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+              <Dato label="Genes A–E" value={`${dosis} de 5`} col={dosis === 5 ? "#86efac" : "#fca5a5"} />
+              <Dato label="Copias" value={String(resCromo.copias)} col={resCromo.copias > 1 ? "#c084fc" : undefined} />
+            </div>
+            <Dato label="Orden de las bandas" value={orden} />
+            {nota(modoCol, <><strong>{cromoDef.etq}</strong> ({cromoDef.clase}). {cromoDef.descripcion}</>)}
+            <p style={{ margin: 0, color: T.text2 }}><i className="fa-solid fa-flask-vial" style={{ marginRight: 8, color: modoCol }} aria-hidden />{cromoDef.ejemplo}</p>
+          </Bloque>
+        </>
+      )}
+
+      {modo === "mutagenos" && (
+        <>
+          <Bloque titulo="Agente mutágeno" icono="fa-radiation">
+            <div style={rejilla(150)}>
+              {MUTAGENOS.map((m) => <Opcion key={m.id} on={m.id === tipoMutageno} col={`#${m.color.replace("#", "")}`} icono={m.icono} etq={m.etq} onClick={() => elegirMutageno(m.id)} />)}
+            </div>
+          </Bloque>
+          {mutageno.id === "uv" && (
+            <Bloque titulo="Daño y reparación" icono="fa-scissors">
+              <div style={rejilla(200)}>
+                <Opcion on={dimero} col="#fbbf24" icono={dimero ? "fa-sun" : "fa-ban"} etq={dimero ? "UV aplicada: dímero formado" : "Sin daño: aplica UV"} onClick={alternarDimero} />
+                <Opcion on={reparar} col="#34d399" icono="fa-scissors" etq={reparar ? "NER activada" : "Reparar con NER"} onClick={alternarReparar} disabled={!dimero} />
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                <Dato label="Timinas T–T" value={dimero && !reparar ? "unidas" : "libres"} col={dimero && !reparar ? "#fbbf24" : "#86efac"} />
+                <Dato label="Hélice" value={dimero && !reparar ? "deformada" : "normal"} col={dimero && !reparar ? "#fca5a5" : "#86efac"} />
+              </div>
+            </Bloque>
+          )}
+          <Bloque titulo="Cómo daña el ADN" icono="fa-circle-info">
+            {nota(modoCol, mutageno.mecanismo)}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {mutageno.agentes.map((a) => (
+                <span key={a} style={{ padding: "6px 10px", borderRadius: 9, border: `1px solid ${modoCol}66`, background: `${modoCol}1e`, color: "#fff", fontSize: 14, fontWeight: 800 }}>{a}</span>
+              ))}
+            </div>
+            <p style={{ margin: 0, color: T.text2 }}>{mutageno.ejemplo}</p>
+          </Bloque>
+        </>
+      )}
+    </>
+  );
 
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes muPulse { 0%,100%{ box-shadow:0 0 0 0 var(--mud); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .mu-live-dot { animation: muPulse 1.6s ease-in-out infinite; }
-        .mu-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .mu-grid { grid-template-columns: 1fr; } }
-        .mu-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .mu-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .mu-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .mu-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .mu-tab { cursor:pointer; border:1px solid var(--muc); border-radius:12px; padding:11px 8px; text-align:center;
-          background:transparent; transition:all .15s; color:#fff; }
-        .mu-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
-        .mu-tab:hover { background:rgba(255,255,255,0.06); }
-        .mu-opts { display:flex; flex-wrap:wrap; gap:7px; }
-        .mu-opt { cursor:pointer; border:1px solid var(--muc); border-radius:10px; padding:9px 12px; font-size:12px;
-          font-weight:800; color:#fff; transition:all .15s; }
-        .mu-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.66); }
-        .mu-opt:hover { background:rgba(255,255,255,0.06); }
-        .mu-chips { display:flex; flex-wrap:wrap; gap:6px; }
-        .mu-chip { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:9px;
-          border:1px solid; font-size:11.5px; font-weight:800; }
-        .mu-toggle { width:100%; cursor:pointer; border:1px solid var(--muc); border-radius:11px; padding:11px 14px;
-          background:rgba(4,10,22,0.4); color:#fff; font-size:12.5px; font-weight:900; text-align:left; transition:all .15s; }
-        .mu-toggle:hover { background:rgba(255,255,255,0.07); }
-        @media (max-width: 1000px){ .mu-bottom { grid-template-columns: 1fr !important; } }
-
-        /* Cajón de teoría */
-        .mu-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .mu-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .mu-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06121e 0%,#040a16 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .mu-drawer[data-open="true"] { transform:translateX(0); }
-        .mu-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .mu-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .mu-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .mu-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .mu-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
-        .mu-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      {/* Selector de modo */}
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="mu-tabs">
-          {MODOS.map((m) => {
-            const d = MODOS_DEF[m];
-            const col = `#${d.color.replace("#", "")}`;
-            const on = m === modo;
-            return (
-              <button key={m} className="mu-tab" data-on={on} onClick={() => cambiarModo(m)} style={{ ["--muc" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? col : "inherit" }}><i className={`fa-solid ${d.icono}`} /></div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{d.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{d.subtitulo}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="mu-grid">
-        {/* ── Columna visor ──────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 58vh, 660px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <MutacionesScene
-                modo={modo}
-                analisis={analisis}
-                resultadoCromo={resCromo}
-                cromoDef={cromoDef}
-                mutageno={mutageno}
-                dimero={dimero}
-                reparar={reparar}
-                playing={playing}
-                accent={accent}
-                modoColor={modoCol}
-                resetNonce={resetNonce}
-              />
-            </SceneBoundary>
-
-            {/* Cinta EN VIVO */}
-            <div style={{ position: "absolute", top: 14, left: 16, display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)" }}>
-              <span className="mu-live-dot" style={{ ["--mud" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol }} />
-              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3 }}>EN VIVO</span>
-              <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)" }} />
-              <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{def.etq.toUpperCase()}</span>
-            </div>
-
-            {/* Toolbar */}
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="mu-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="mu-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              {modo === "mutagenos" && mutageno.id === "uv" && (
-                <button className="mu-icobtn" data-on={dimero} onClick={() => { setDimero((d) => !d); setReparar(false); }} title={dimero ? "Quitar daño UV" : "Aplicar radiación UV"}>
-                  <i className={`fa-solid ${dimero ? "fa-sun" : "fa-ban"}`} />
-                </button>
-              )}
-              <button className="mu-icobtn" data-on={playing} onClick={() => setPlaying((p) => !p)} title={playing ? "Pausar" : "Reanudar"}>
-                <i className={`fa-solid ${playing ? "fa-pause" : "fa-play"}`} />
-              </button>
-              <button className="mu-icobtn" onClick={reiniciar} title="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            {/* Pie: lectura en vivo */}
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 18px 14px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                {def.etq} — {def.subtitulo}
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6 }}>{pie}</div>
-            </div>
-
-            {/* Botón flotante de Teoría */}
-            <button className="mu-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-          </div>
-
-          {/* Panel de control del modo */}
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-                Controles — {def.etq}
-              </Eyebrow>
-              <span style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: "#7dd3fc", border: "1px solid #7dd3fc55", borderRadius: 6, padding: "3px 7px" }}>
-                {def.fuente === "A5" ? "GLOSARIO A5" : "LECTURA A1"}
-              </span>
-            </div>
-            {control}
-          </div>
-        </div>
-
-        {/* ── Columna lateral ────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          {/* Descripción del laboratorio */}
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-dna" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>Mutaciones del ADN</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          {/* Ancla A1 — lectura + reflexión */}
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #7dd3fc55", background: "rgba(125,211,252,0.07)" }}>
-            <Eyebrow><i className="fa-solid fa-book-open" style={{ marginRight: 8, color: "#7dd3fc" }} />Lectura A1 — ¿Qué es una mutación?</Eyebrow>
-            <div style={{ display: "grid", gap: 9, marginBottom: 12 }}>
-              {LECTURA_A1.map((p, i) => (
-                <div key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{p}</div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", marginBottom: 8 }}>PARA REFLEXIONAR</div>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {PREGUNTAS.map((q, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>{q}</li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Reparación del ADN (NER/MMR/NHEJ) */}
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow><i className="fa-solid fa-screwdriver-wrench" style={{ marginRight: 8, color: accent }} />Reparación del ADN (A5)</Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{REPARACION}</div>
-          </div>
-
-          {/* Cómo usar */}
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow><i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />Cómo usar el laboratorio</Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Datos + ideas clave ────────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="mu-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow><i className="fa-solid fa-magnifying-glass-chart" style={{ marginRight: 8, color: accent }} />Datos clave</Eyebrow>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
-            {DATOS.map((dd, i) => (
-              <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "10px 12px", borderRadius: 10, background: T.glass, border: `1px solid ${T.line}` }}>
-                <div style={{ width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: accent, background: `rgba(${color.rgba},0.16)`, flexShrink: 0 }}>
-                  <i className={`fa-solid ${dd.icono}`} />
-                </div>
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{dd.valor}</div>
-                  <div style={{ fontSize: 11, color: T.text2, lineHeight: 1.4 }}>{dd.texto}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Contexto mexicano: INMEGEN */}
-          <div style={{ marginTop: 16, padding: "14px 16px", borderRadius: 12, border: `1px solid ${accent}33`, background: `rgba(${color.rgba},0.07)` }}>
-            <Eyebrow><i className="fa-solid fa-location-dot" style={{ marginRight: 8, color: accent }} />México: medicina genómica (INMEGEN)</Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{CONTEXTO}</div>
-          </div>
-
-          {/* ¿Sabías que? */}
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow><i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />¿Sabías que? (quizzes A2/A4)</Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {HECHOS.map((h, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{h}</li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Glosario */}
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow><i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />Glosario (A5)</Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {GLOSARIO.map((g, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{g.termino}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{g.definicion}</span>
-                  <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.4, marginTop: 4 }}><i className="fa-solid fa-flask" style={{ marginRight: 6, color: accent }} />{g.ejemplo}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow><i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />Ideas clave</Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-            {IDEAS.map((x, i) => (
-              <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>{x}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      {/* nota de honestidad del modelo */}
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          La lectura A1, las preguntas de reflexión, el glosario A5 (con sus ejemplos) y los hechos de «¿sabías que?» (quizzes A2/A4) son <strong>verbatim</strong> del MCCEMS 2025. En el modo de mutaciones puntuales, la secuencia, la traducción a aminoácidos y el efecto de cada mutación se <strong>calculan</strong> sobre el inicio real del gen de la β-globina humana usando el código genético universal estándar. Los cromosomas de bandas, la doble hélice y el dímero de timina son representaciones <strong>esquemáticas</strong> del mecanismo, no modelos a escala molecular. El contexto del INMEGEN es informativo. Fuente: {FUENTE}
-        </span>
-      </div>
-
-      {/* ── Objetivos ─────────────────────────────────────────────── */}
-      <div style={{ ...card, padding: "18px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-          Objetivos
-        </Eyebrow>
-        <TableroObjetivos
-          retoKey={RETO_KEY}
-          accent={accent}
-          objetivos={[
-            { txt: "Aplica una mutación puntual y compara la proteína original con la mutada", done: modo === "puntuales" && clasePuntual !== "ninguna" },
-            { txt: "Provoca un corrimiento del marco de lectura (frameshift)", done: clasePuntual === "frameshift" },
-            { txt: "Explora las mutaciones cromosómicas (deleción, inversión, trisomía…)", done: modo === "cromosomicas" },
-            { txt: "Prueba los mutágenos: UV, radiación ionizante, químico y biológico", done: modo === "mutagenos" && tipoMutageno !== "uv" },
-            { txt: "Repara el daño del ADN con el sistema NER", done: reparar },
-            { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
-          ]}
-        />
-      </div>
-
-      {/* ── Reto evaluable: el quiz verbatim de la actividad A2 ──────── */}
-      <RetoQuizCard
-        quiz={QUIZ_A2}
-        accent={accent}
-        rgba={color.rgba}
-        aprobado={ejercicioAprobado}
-        onAprobado={() => setEjercicioAprobado(true)}
-        playSfx={() => {
-          if (sonido) audioRef.current?.correcto();
-        }}
-        playPick={() => {
-          if (sonido) audioRef.current?.blip();
-        }}
-      />
-
-      {/* ── Cajón de teoría ─────────────────────────────────────────── */}
-      <div className="mu-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="mu-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="mu-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="mu-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="mu-drawer-body">
-          <FichaTeorica data={MUTACIONES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <MutacionesScene
+            modo={modo}
+            analisis={analisis}
+            resultadoCromo={resCromo}
+            cromoDef={cromoDef}
+            mutageno={mutageno}
+            dimero={dimero}
+            reparar={reparar}
+            playing={playing}
+            accent={accent}
+            modoColor={modoCol}
+            resetNonce={resetNonce}
+          />
+        </SceneBoundary>
+      }
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m, etiqueta: MODOS_DEF[m].etq.replace("Mutaciones ", "").replace(" y daño al ADN", ""), icono: MODOS_DEF[m].icono })),
+        valor: modo,
+        cambiar: (id) => cambiarModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          {modo === "mutagenos" && mutageno.id === "uv" && (
+            <BotonHerramienta icono={dimero ? "fa-sun" : "fa-ban"} titulo={dimero ? "Quitar daño UV" : "Aplicar radiación UV"} activo={dimero} onClick={alternarDimero} />
+          )}
+          <BotonHerramienta icono={playing ? "fa-pause" : "fa-play"} titulo={playing ? "Pausar" : "Reanudar"} activo={playing} onClick={() => setPlaying((p) => !p)} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={[
+        { txt: "Mueve la posición o cambia la base de la mutación y mira qué aminoácido se afecta", done: hecho.editor },
+        { txt: "Aplica una mutación puntual y compara la proteína original con la mutada", done: hecho.puntual },
+        { txt: "Encuentra una sustitución silenciosa: la proteína queda idéntica", done: hecho.silenciosa },
+        { txt: "Provoca un corrimiento del marco de lectura (frameshift)", done: hecho.frame },
+        { txt: "Explora las mutaciones cromosómicas (deleción, inversión, trisomía…)", done: hecho.cromo },
+        { txt: "Prueba los mutágenos: UV, radiación ionizante, químico y biológico", done: hecho.mutag },
+        { txt: "Repara el daño del ADN con el sistema NER", done: hecho.reparo },
+        { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
+      ]}
+      pestanas={[
+        { id: "controles", etiqueta: "Controles", icono: "fa-sliders", contenido: controles },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <RetoQuizCard
+              quiz={QUIZ_A2}
+              accent={accent}
+              rgba={color.rgba}
+              aprobado={ejercicioAprobado}
+              onAprobado={() => setEjercicioAprobado(true)}
+              playSfx={() => { if (sonido) audioRef.current?.correcto(); }}
+              playPick={() => { if (sonido) audioRef.current?.blip(); }}
+            />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Mutaciones del ADN" icono="fa-dna">
+                <p style={{ margin: 0, color: T.text2 }}>{PROBLEMA}</p>
+              </Bloque>
+              <Bloque titulo="Lectura A1 — ¿Qué es una mutación?" icono="fa-book-open">
+                {LECTURA_A1.map((p, i) => <p key={i} style={{ margin: 0, color: T.text2 }}>{p}</p>)}
+                <h5 style={{ margin: "6px 0 0", fontSize: 14, color: T.text3, letterSpacing: "0.08em" }}>PARA REFLEXIONAR</h5>
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {PREGUNTAS.map((q, i) => <li key={i}>{q}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Reparación del ADN (A5)" icono="fa-screwdriver-wrench">
+                <p style={{ margin: 0, color: T.text2 }}>{REPARACION}</p>
+              </Bloque>
+              <Bloque titulo="Cómo usar el laboratorio" icono="fa-list-ol">
+                <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8 }}>
+                  {INSTRUCCIONES.map((p, i) => <li key={i}>{p}</li>)}
+                </ol>
+              </Bloque>
+              <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {IDEAS.map((x, i) => <li key={i}>{x}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Datos clave" icono="fa-magnifying-glass-chart">
+                {DATOS.map((dd, i) => (
+                  <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                    <i className={`fa-solid ${dd.icono}`} style={{ color: accent, marginTop: 4 }} aria-hidden />
+                    <div>
+                      <strong style={{ fontFamily: "ui-monospace, monospace" }}>{dd.valor}</strong>
+                      <div style={{ color: T.text2 }}>{dd.texto}</div>
+                    </div>
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="México: medicina genómica (INMEGEN)" icono="fa-location-dot">
+                <p style={{ margin: 0, color: T.text2 }}>{CONTEXTO}</p>
+              </Bloque>
+              <Bloque titulo="¿Sabías que? (quizzes A2/A4)" icono="fa-circle-question">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {HECHOS.map((h, i) => <li key={i}>{h}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Glosario (A5)" icono="fa-book">
+                {GLOSARIO.map((g, i) => (
+                  <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}`, color: T.text2 }}>
+                    <strong style={{ color: accent }}>{g.termino}. </strong>{g.definicion}
+                    <div style={{ color: T.text3, marginTop: 4 }}><i className="fa-solid fa-flask" style={{ marginRight: 6, color: accent }} aria-hidden />{g.ejemplo}</div>
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={MUTACIONES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ marginTop: 18, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
+                La lectura A1, las preguntas de reflexión, el glosario A5 (con sus ejemplos) y los hechos de «¿sabías que?» (quizzes A2/A4) son <strong>verbatim</strong> del MCCEMS 2025. En el modo de mutaciones puntuales, la secuencia, la traducción a aminoácidos y el efecto de cada mutación se <strong>calculan</strong> sobre el inicio real del gen de la β-globina humana usando el código genético universal estándar; la clase (silenciosa, missense, nonsense, frameshift) se deduce del resultado. Los cromosomas de bandas, la doble hélice y el dímero de timina son representaciones <strong>esquemáticas</strong> del mecanismo, no modelos a escala molecular. El contexto del INMEGEN es informativo. Fuente: {FUENTE}
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }

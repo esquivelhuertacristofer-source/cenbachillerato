@@ -1,0 +1,12 @@
+{
+  "escena": "El aparato de Miller-Urey de 1953: un océano que hierve, gases de la atmósfera primitiva y una chispa eléctrica entre dos electrodos.",
+  "pregunta": "Si apagas la chispa y pasa una semana, ¿qué hay en la trampa?",
+  "opciones": [
+    { "id": "a", "texto": "Los mismos aminoácidos, solo que más lentos", "icono": "fa-hourglass-half" },
+    { "id": "b", "texto": "Nada: la trampa sigue vacía", "icono": "fa-vial" },
+    { "id": "c", "texto": "Menos aminoácidos, porque el calor ayuda", "icono": "fa-fire" }
+  ],
+  "correcta": "b",
+  "porque": "Los gases solos no reaccionan: la descarga eléctrica aporta la energía que los rompe y los recombina en aminoácidos. Sin esa energía, aunque pasen los días, no se forman moléculas orgánicas.",
+  "comoComprobarlo": "Apaga la descarga eléctrica, deja correr los 7 días con el deslizador y observa la trampa y el dato «Sin chispa»."
+}

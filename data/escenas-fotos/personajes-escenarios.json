@@ -1,0 +1,11 @@
+{
+  "slug": "personajes-escenarios",
+  "items": [
+    { "clave": "mercado-actual", "formato": "16:9", "estilo": "ilustracion", "escena": "Mercado de un pueblo mexicano de hoy con puestos de frutas y verduras bajo toldos de colores, compradores con bolsas y vendedores atendiendo, luz de media mañana" },
+    { "clave": "bosque-encantado", "formato": "16:9", "estilo": "ilustracion", "escena": "Bosque encantado al atardecer con árboles de troncos retorcidos que tienen rostros en la corteza, luciérnagas brillantes y niebla violeta entre las raíces" },
+    { "clave": "hacienda-siglo-xix", "formato": "16:9", "estilo": "ilustracion", "escena": "Patio de una hacienda mexicana del siglo XIX con arcos de cantera, un caballo atado, peones con sombrero de palma cargando costales y una casa grande al fondo" },
+    { "clave": "retrato-valiente", "formato": "1:1", "estilo": "ilustracion", "escena": "Retrato de una joven mexicana de pie con la barbilla en alto, hombros firmes y mirada decidida de frente, fondo neutro cálido" },
+    { "clave": "retrato-cauteloso", "formato": "1:1", "estilo": "ilustracion", "escena": "Retrato de una joven mexicana con la cabeza ladeada, mirando de reojo hacia un lado y con una mano cerca de la barbilla, gesto atento, fondo neutro cálido" },
+    { "clave": "retrato-ambicioso", "formato": "1:1", "estilo": "ilustracion", "escena": "Retrato de una joven mexicana mirando hacia arriba con una sonrisa segura, una escalera estrecha subiendo detrás de ella, fondo neutro cálido" }
+  ]
+}

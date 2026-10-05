@@ -1,0 +1,12 @@
+{
+  "escena": "Una escena con un personaje cauteloso que decide qué hacer en un mercado actual",
+  "pregunta": "Si el personaje cauteloso pasa de «Observar» a «Enfrentar», ¿qué pasa con la coherencia?",
+  "opciones": [
+    { "id": "a", "texto": "Sube, porque hay más acción", "icono": "fa-arrow-trend-up" },
+    { "id": "b", "texto": "Baja, actúa contra su carácter", "icono": "fa-arrow-trend-down" },
+    { "id": "c", "texto": "Se queda igual", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "La caracterización manda: quien mide cada paso no se lanza al choque sin una razón. El lector deja de creerle y la coherencia cae, aunque la escena gane tensión.",
+  "comoComprobarlo": "Elige «Cauteloso» y cambia la acción entre «Observar» y «Enfrentar» mientras miras el medidor de coherencia."
+}

@@ -18,8 +18,8 @@
  */
 
 import * as THREE from "three";
-import { useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import React, { useRef } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { type Modo, type Escena } from "./redox-data";
@@ -33,6 +33,13 @@ export interface RedoxSceneProps {
   playing: boolean;
   modoColor: string;
   resetNonce: number;
+  /** Potencial de la pila elegida (V): fija la rapidez de los electrones y el brillo del foco. */
+  ePila: number;
+  anodoTxt: string;
+  catodoTxt: string;
+  /** Potencia de la combustión 0..1 (|ΔH|·moles relativo): tamaño de la llama. */
+  potencia: number;
+  combTxt: string;
 }
 
 const ZINC = new THREE.Color("#cbd5e1");
@@ -47,7 +54,7 @@ function clamp01(x: number): number {
 const N_ELEC = 10;
 const N_ION = 14;
 
-function CeldaRedox({ frac, playing }: { frac: number; playing: boolean }) {
+function CeldaRedox({ frac, playing, rotulos = true }: { frac: number; playing: boolean; rotulos?: boolean }) {
   const elecs = useRef<(THREE.Group | null)[]>([]);
   const iones = useRef<(THREE.Mesh | null)[]>([]);
   const ionMats = useRef<(THREE.MeshStandardMaterial | null)[]>([]);
@@ -168,12 +175,16 @@ function CeldaRedox({ frac, playing }: { frac: number; playing: boolean }) {
           </mesh>
         </group>
       ))}
-      <Html position={[-1.1, -2.1, 0]} center distanceFactor={12} style={{ pointerEvents: "none" }}>
-        <div style={pillStyle("#cbd5e1")}>Zn → Zn²⁺ + 2e⁻ (se oxida)</div>
-      </Html>
-      <Html position={[1.0, 2.1, 0]} center distanceFactor={12} style={{ pointerEvents: "none" }}>
-        <div style={pillStyle("#60a5fa")}>Cu²⁺ + 2e⁻ → Cu (se reduce)</div>
-      </Html>
+      {rotulos && (
+        <Html position={[-1.1, -2.1, 0]} center style={{ pointerEvents: "none" }}>
+          <div style={pillStyle("#cbd5e1")}>Zn se oxida</div>
+        </Html>
+      )}
+      {rotulos && (
+        <Html position={[1.0, 2.1, 0]} center style={{ pointerEvents: "none" }}>
+          <div style={pillStyle("#60a5fa")}>Cu²⁺ se reduce</div>
+        </Html>
+      )}
     </group>
   );
 }
@@ -182,7 +193,7 @@ function CeldaRedox({ frac, playing }: { frac: number; playing: boolean }) {
 const N_LLAMA = 24;
 const N_O2 = 8;
 
-function Combustion({ frac, playing, color }: { frac: number; playing: boolean; color: string }) {
+function Combustion({ frac, playing, color, potencia, etiqueta, rotulos = true }: { frac: number; playing: boolean; color: string; potencia: number; etiqueta: string; rotulos?: boolean }) {
   const parts = useRef<(THREE.Group | null)[]>([]);
   const partMats = useRef<(THREE.MeshBasicMaterial | null)[]>([]);
   const o2 = useRef<(THREE.Group | null)[]>([]);
@@ -200,7 +211,7 @@ function Combustion({ frac, playing, color }: { frac: number; playing: boolean; 
 
   useFrame((_, dt) => {
     if (playing) t.current += dt;
-    const intensidad = frac; // 0 sin fuego → 1 llama plena
+    const intensidad = frac * (0.3 + 0.7 * potencia); // 0 sin fuego → 1 llama plena (más ΔH·mol, llama mayor)
     for (let i = 0; i < N_LLAMA; i++) {
       const ph = phase.current[i] ?? 0;
       const s = (t.current * (0.6 + intensidad * 0.8) + ph) % 1;
@@ -290,9 +301,11 @@ function Combustion({ frac, playing, color }: { frac: number; playing: boolean; 
           </mesh>
         </group>
       ))}
-      <Html position={[0, -1.8, 0]} center distanceFactor={12} style={{ pointerEvents: "none" }}>
-        <div style={pillStyle("#fb923c")}>Combustible + O₂ → CO₂ + H₂O + calor</div>
-      </Html>
+      {rotulos && (
+        <Html position={[0, -1.8, 0]} center style={{ pointerEvents: "none" }}>
+          <div style={pillStyle("#fb923c")}>{etiqueta}</div>
+        </Html>
+      )}
     </group>
   );
 }
@@ -300,7 +313,7 @@ function Combustion({ frac, playing, color }: { frac: number; playing: boolean; 
 /* ── PILA: dos semiceldas con cable y foco; electrones por el cable ───────── */
 const N_FLUJO = 12;
 
-function PilaGalvanica({ frac, playing }: { frac: number; playing: boolean }) {
+function PilaGalvanica({ frac, playing, ePila, anodoTxt, catodoTxt, rotulos = true }: { frac: number; playing: boolean; ePila: number; anodoTxt: string; catodoTxt: string; rotulos?: boolean }) {
   const elecs = useRef<(THREE.Group | null)[]>([]);
   const foco = useRef<THREE.MeshStandardMaterial>(null);
   const focoLuz = useRef<THREE.PointLight>(null);
@@ -326,9 +339,11 @@ function PilaGalvanica({ frac, playing }: { frac: number; playing: boolean }) {
     return [a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u, 0];
   }
 
+  const brillo = clamp01(ePila / 3.5); // más E°pila, más brillo y más corriente de electrones
+
   useFrame((_, dt) => {
     const on = frac > 0.3;
-    if (playing && on) t.current += dt;
+    if (playing && on) t.current += dt * (0.35 + brillo * 2.2);
     for (let i = 0; i < N_FLUJO; i++) {
       const ph = phase.current[i] ?? 0;
       const s = (t.current * 0.3 + ph) % 1;
@@ -340,10 +355,10 @@ function PilaGalvanica({ frac, playing }: { frac: number; playing: boolean }) {
       }
     }
     if (foco.current) {
-      foco.current.emissiveIntensity = on ? 1.4 + (playing ? Math.sin(t.current * 10) * 0.3 : 0) : 0.05;
+      foco.current.emissiveIntensity = on ? 0.15 + brillo * 3 : 0.05;
     }
     if (focoLuz.current) {
-      focoLuz.current.intensity = on ? 3 : 0;
+      focoLuz.current.intensity = on ? 0.3 + brillo * 6 : 0;
     }
   });
 
@@ -416,15 +431,21 @@ function PilaGalvanica({ frac, playing }: { frac: number; playing: boolean }) {
           </mesh>
         </group>
       ))}
-      <Html position={[-2.4, -2.0, 0]} center distanceFactor={12} style={{ pointerEvents: "none" }}>
-        <div style={pillStyle("#cbd5e1")}>Ánodo (−): Zn se oxida</div>
-      </Html>
-      <Html position={[2.4, -2.0, 0]} center distanceFactor={12} style={{ pointerEvents: "none" }}>
-        <div style={pillStyle("#d97706")}>Cátodo (+): Cu²⁺ se reduce</div>
-      </Html>
-      <Html position={[0, 3.3, 0]} center distanceFactor={12} style={{ pointerEvents: "none" }}>
-        <div style={pillStyle("#fde047")}>E°pila = +1.10 V</div>
-      </Html>
+      {rotulos && (
+        <Html position={[-2.4, -2.0, 0]} center style={{ pointerEvents: "none" }}>
+          <div style={pillStyle("#cbd5e1")}>Ánodo (−): {anodoTxt}</div>
+        </Html>
+      )}
+      {rotulos && (
+        <Html position={[2.4, -2.0, 0]} center style={{ pointerEvents: "none" }}>
+          <div style={pillStyle("#d97706")}>Cátodo (+): {catodoTxt}</div>
+        </Html>
+      )}
+      {rotulos && (
+        <Html position={[0, 3.4, 0]} center style={{ pointerEvents: "none" }}>
+          <div style={pillStyle("#fde047")}>E°pila = {ePila.toFixed(2)} V</div>
+        </Html>
+      )}
     </group>
   );
 }
@@ -436,7 +457,7 @@ function pillStyle(color: string): React.CSSProperties {
     background: "rgba(4,10,22,0.82)",
     border: `1px solid ${color}`,
     color: "#fff",
-    fontSize: 11,
+    fontSize: 14,
     fontWeight: 800,
     whiteSpace: "nowrap",
     boxShadow: "0 6px 18px -8px #000",
@@ -445,15 +466,24 @@ function pillStyle(color: string): React.CSSProperties {
 
 function Etiqueta({ pos, color, children }: { pos: Pt; color: string; children: React.ReactNode }) {
   return (
-    <Html position={pos} center distanceFactor={16} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div style={pillStyle(color)}>{children}</div>
     </Html>
   );
 }
 
-function Contenido({ modo, escena, playing, modoColor, resetNonce }: RedoxSceneProps) {
+function Contenido({ modo, escena, playing, modoColor, resetNonce, ePila, anodoTxt, catodoTxt, potencia, combTxt }: RedoxSceneProps) {
+  const ancho = useThree((st) => st.size.width);
   const giro = useRef<THREE.Group>(null);
-  useFrame((_, dt) => {
+  const anchoVisto = useRef(0);
+  useFrame(({ camera, size }, dt) => {
+    // En vertical (celular) la cámara se aleja para que quepa la escena.
+    if (anchoVisto.current !== size.width) {
+      anchoVisto.current = size.width;
+      const asp = size.width / Math.max(1, size.height);
+      const base = modo === "comparar" ? 21 : modo === "pila" ? 13 : 10.5;
+      camera.position.setLength(base * Math.max(1, 1.2 / asp));
+    }
     if (giro.current && playing && modo !== "comparar" && modo !== "pila") {
       giro.current.rotation.y += dt * 0.08;
     }
@@ -470,25 +500,25 @@ function Contenido({ modo, escena, playing, modoColor, resetNonce }: RedoxSceneP
 
       <group ref={giro} key={`${modo}-${resetNonce}`}>
         {modo === "redox" && <CeldaRedox frac={escena.frac} playing={playing} />}
-        {modo === "combustion" && <Combustion frac={escena.frac} playing={playing} color={modoColor} />}
-        {modo === "pila" && <PilaGalvanica frac={escena.frac} playing={playing} />}
+        {modo === "combustion" && <Combustion frac={escena.frac} playing={playing} color={modoColor} potencia={potencia} etiqueta={combTxt} />}
+        {modo === "pila" && <PilaGalvanica frac={escena.frac} playing={playing} ePila={ePila} anodoTxt={anodoTxt} catodoTxt={catodoTxt} />}
 
         {modo === "comparar" && (
           <>
             <group position={[-6.0, 0, 0]} scale={0.6}>
-              <CeldaRedox frac={1} playing={playing} />
+              <CeldaRedox frac={1} playing={playing} rotulos={false} />
             </group>
-            <Etiqueta pos={[-6.0, 2.9, 0]} color="#34d399aa">Redox · Zn + Cu²⁺</Etiqueta>
+            {ancho >= 640 && <Etiqueta pos={[-6.0, 2.9, 0]} color="#34d399aa">Redox · Zn + Cu²⁺</Etiqueta>}
 
             <group position={[0, 0, 0]} scale={0.7}>
-              <Combustion frac={1} playing={playing} color="#fb923c" />
+              <Combustion frac={1} playing={playing} color="#fb923c" potencia={0.5} etiqueta="" rotulos={false} />
             </group>
-            <Etiqueta pos={[0, 3.0, 0]} color="#fb923caa">Combustión · CH₄ + O₂</Etiqueta>
+            {ancho >= 640 && <Etiqueta pos={[0, 3.0, 0]} color="#fb923caa">Combustión · CH₄ + O₂</Etiqueta>}
 
             <group position={[6.0, 0, 0]} scale={0.58}>
-              <PilaGalvanica frac={1} playing={playing} />
+              <PilaGalvanica frac={1} playing={playing} ePila={1.1} anodoTxt="" catodoTxt="" rotulos={false} />
             </group>
-            <Etiqueta pos={[6.0, 3.1, 0]} color="#38bdf8aa">Pila · Zn–Cu</Etiqueta>
+            {ancho >= 640 && <Etiqueta pos={[6.0, 3.1, 0]} color="#38bdf8aa">Pila · Zn–Cu</Etiqueta>}
           </>
         )}
       </group>
@@ -505,10 +535,10 @@ function Contenido({ modo, escena, playing, modoColor, resetNonce }: RedoxSceneP
 export default function RedoxScene(props: RedoxSceneProps) {
   const cam: Pt =
     props.modo === "comparar"
-      ? [0, 0.8, 19]
+      ? [0, 0.8, 21]
       : props.modo === "pila"
-        ? [0, 1.0, 12]
-        : [0, 0.6, 10];
+        ? [0, 1.0, 13]
+        : [0, 0.6, 10.5];
   return (
     <Canvas key={props.modo} shadows dpr={[1, 2]} camera={{ position: cam, fov: 50 }} gl={{ antialias: true }} style={{ width: "100%", height: "100%" }}>
       <Contenido {...props} />

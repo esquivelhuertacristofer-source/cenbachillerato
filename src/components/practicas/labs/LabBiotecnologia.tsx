@@ -9,25 +9,24 @@
  * porque es deliberación, no un mecanismo que se pueda «correr».
  *
  * Tres modos:
- *  (1) CRISPR-Cas9 — una ARN guía (sgRNA) localiza la secuencia diana junto al
- *      PAM, Cas9 corta la doble cadena y la célula repara por NHEJ (indel →
- *      knockout) o HDR (inserción precisa). El alumno elige cortar y reparar.
- *  (2) Transgénico / OGM — ADN recombinante: un gen foráneo se inserta en un
- *      plásmido y se transforma un hospedero (insulina humana, maíz Bt, arroz
- *      dorado), que produce la proteína.
- *  (3) Clonación — transferencia nuclear (Dolly): reproductiva (clon completo)
- *      vs terapéutica (células madre, sin fin reproductivo).
+ *  (1) CRISPR-Cas9 — EXPERIMENTO: el alumno DESLIZA la ARN guía sobre el ADN;
+ *      las bases que encajan se ven de su color y las que no, en rojo. Cas9 solo
+ *      corta si todas encajan y hay PAM; después elige NHEJ (knockout) o HDR
+ *      (edición precisa) y ve cuántas bases cambia el sitio.
+ *  (2) Transgénico / OGM — ADN recombinante por etapas: el plásmido se abre, el
+ *      gen entra, se cierra y el hospedero produce la proteína.
+ *  (3) Clonación — transferencia nuclear por etapas: reproductiva (clon) vs
+ *      terapéutica (células madre).
  */
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, card, Eyebrow, SceneBoundary } from "./_kit";
+import { T, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { LabSfx } from "./lab-audio";
-import { useEstrellas } from "@/lib/hooks/useEstrellas";
-import { useLogros } from "./_partida";
 import { BIOTECNOLOGIA_FICHA } from "./biotecnologia-ficha";
 import {
   type Modo,
@@ -45,6 +44,9 @@ import {
   CLONES,
   clonPorId,
   ETAPAS_CLONACION,
+  DESFASE_MAX,
+  HEBRA_TOP,
+  analizarGuia,
   DEFINICION,
   TITULO_A1,
   PUNTOS_CLAVE,
@@ -66,12 +68,23 @@ const BiotecnologiaScene = dynamic(() => import("./BiotecnologiaScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-dna fa-fade" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Cargando la biotecnología en 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Cargando la biotecnología en 3D…</span>
     </div>
   ),
 });
 
 const RETO_KEY = "cen-biotecnologia-crispr-3d-reto";
+
+/** Botón de opción del panel (tamaño táctil, texto de 14 px). */
+function Opcion({ on, col, icono, etq, onClick }: { on: boolean; col: string; icono: string; etq: string; onClick: () => void }) {
+  return (
+    <button type="button" onClick={onClick}
+      style={{ cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 800, color: on ? "#04121f" : "#fff", background: on ? col : `${col}1a`, border: `1px solid ${col}66`, borderRadius: 10, padding: "10px 12px", lineHeight: 1.25 }}>
+      <i className={`fa-solid ${icono}`} style={{ color: on ? "#04121f" : col }} aria-hidden />
+      <span style={{ minWidth: 0 }}>{etq}</span>
+    </button>
+  );
+}
 
 export function LabBiotecnologia({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
@@ -79,13 +92,17 @@ export function LabBiotecnologia({ color }: PracticaLabProps) {
   const [modo, setModo] = useState<Modo>("crispr");
   const [reparacion, setReparacion] = useState<Reparacion>("hdr");
   const [cortar, setCortar] = useState<boolean>(false);
+  const [desfase, setDesfase] = useState(2); // la guía empieza fuera de lugar: hay que alinearla
+  const [etapa, setEtapa] = useState(1);
   const [transgenId, setTransgenId] = useState<string>("insulina");
   const [clonId, setClonId] = useState<TipoClon>("reproductiva");
   const [playing, setPlaying] = useState<boolean>(true);
   const [resetNonce, setResetNonce] = useState(0);
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
-  // teoría (cajón deslizable) y sonido
-  const [drawer, setDrawer] = useState(false);
+  const [aviso, setAviso] = useState<string | null>(null);
+  // misiones: banderas que, una vez ganadas, no se pierden al cambiar de modo
+  const [hecho, setHecho] = useState({ deslizo: false, intento: false, corto: false, transg: false, clon: false });
+  const marca = (k: keyof typeof hecho) => setHecho((h) => (h[k] ? h : { ...h, [k]: true }));
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
 
@@ -117,50 +134,59 @@ export function LabBiotecnologia({ color }: PracticaLabProps) {
   const resCrispr = resultadoCrispr(reparacion);
   const transgen = transgenPorId(transgenId);
   const clon = clonPorId(clonId);
+  const guia = analizarGuia(desfase);
 
-  const etapas =
-    modo === "crispr" ? ETAPAS_CRISPR : modo === "transgenico" ? ETAPAS_TRANSGEN : ETAPAS_CLONACION;
-
-  // ── Objetivos guiados (se marcan en vivo) ──────────────────────────
-  const objetivos = [
-    { txt: "Explora CRISPR-Cas9 (ARN guía, corte y reparación)", done: modo === "crispr" && cortar },
-    { txt: "Revisa un organismo transgénico (OGM)", done: modo === "transgenico" },
-    { txt: "Distingue clonación reproductiva y terapéutica", done: modo === "clonacion" },
-    { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
-  ];
-  // Los objetivos se recuerdan (algunos dependían del modo y se desmarcaban
-  // solos) y se convierten en la marca del laboratorio, que antes no se
-  // guardaba en ninguna parte.
-  const { logros: logrosLab, cumplidos: cumplidosLab, total: totalLab } = useLogros(objetivos.map((o) => o.done));
-  const { registraEstrellas } = useEstrellas(RETO_KEY);
-  useEffect(() => {
-    if (cumplidosLab === 0) return;
-    const est = cumplidosLab >= totalLab ? 3 : cumplidosLab >= Math.ceil((totalLab * 2) / 3) ? 2 : 1;
-    registraEstrellas(est);
-  }, [cumplidosLab, totalLab, registraEstrellas]);
+  const etapas = modo === "crispr" ? ETAPAS_CRISPR : modo === "transgenico" ? ETAPAS_TRANSGEN : ETAPAS_CLONACION;
+  const etapaDef = etapas[Math.min(etapas.length, etapa) - 1]!;
 
   const cambiarModo = (m: Modo) => {
     setModo(m);
+    setEtapa(1);
+    setAviso(null);
     if (m === "crispr") setCortar(false);
+    if (m === "transgenico") marca("transg");
+    if (m === "clonacion") marca("clon");
     setPlaying(true);
     if (sonido) audioRef.current?.blip();
     bump();
   };
   const reiniciar = () => {
-    if (modo === "crispr") setCortar(false);
+    if (modo === "crispr") { setCortar(false); setDesfase(2); }
+    setEtapa(1);
+    setAviso(null);
     setPlaying(true);
     bump();
   };
 
-  // pie del visor (lectura en vivo)
-  const pie: string =
+  const moverGuia = (v: number) => {
+    setDesfase(v);
+    setCortar(false); // al mover la guía, el corte anterior deja de aplicar
+    setAviso(null);
+    marca("deslizo");
+  };
+  const intentarCorte = () => {
+    if (cortar) { setCortar(false); setAviso(null); return; }
+    if (guia.corta) {
+      setCortar(true);
+      setAviso(null);
+      marca("corto");
+      if (sonido) audioRef.current?.correcto();
+    } else {
+      marca("intento");
+      setAviso(`Cas9 no cortó: solo ${guia.encajan} de ${guia.total} bases de la guía encajan con el ADN. Sin coincidencia total no hay corte, y así no se editan lugares equivocados.`);
+    }
+    setPlaying(true);
+  };
+
+  // lectura breve sobre la escena
+  const lectura: string =
     modo === "crispr"
       ? cortar
-        ? `${resCrispr.titulo}. ${repDef.resultado}`
-        : "La ARN guía (sgRNA) se aparea con la secuencia diana junto al PAM (5′-NGG-3′). Pulsa «Cortar con Cas9» para realizar el corte de doble cadena."
+        ? `${resCrispr.rep.etq}: ${resCrispr.titulo}`
+        : guia.corta ? "Guía alineada: Cas9 lista para cortar" : `La guía encaja ${guia.encajan} de ${guia.total}: no corta`
       : modo === "transgenico"
-        ? transgen.ejemplo
-        : clon.ejemplo;
+        ? `${etapaDef.etq} — ${transgen.etq}`
+        : `${etapaDef.etq} — clonación ${clon.etq.toLowerCase()}`;
 
   const sceneFallback = (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 28, textAlign: "center" }}>
@@ -168,471 +194,276 @@ export function LabBiotecnologia({ color }: PracticaLabProps) {
         <i className={`fa-solid ${def.icono}`} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{def.etq}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>
         Tu equipo no puede mostrar la escena en 3D, pero la información sigue aquí. {DEFINICION}
       </div>
     </div>
   );
 
-  /* ── Panel de control específico del modo ──────────────────────────── */
-  let control: ReactNode = null;
-  if (modo === "crispr") {
-    control = (
-      <>
-        <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "0 0 8px", textTransform: "uppercase" }}>Mecanismo de reparación tras el corte</div>
-        <div className="bi-opts">
-          {REPARACIONES.map((r) => {
-            const col = `#${r.color.replace("#", "")}`;
-            const on = r.id === reparacion;
-            return (
-              <button key={r.id} className="bi-opt" data-on={on} onClick={() => { setReparacion(r.id); setPlaying(true); bump(); }} style={{ ["--bic" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <i className={`fa-solid ${r.icono}`} style={{ marginRight: 8, color: on ? col : T.text3 }} />
-                {r.etq} · {r.nombre}
-              </button>
-            );
-          })}
-        </div>
+  const rejilla = (min: number): React.CSSProperties => ({ display: "grid", gridTemplateColumns: `repeat(auto-fit, minmax(min(100%, ${min}px), 1fr))`, gap: 8 });
+  const nota = (col: string, children: React.ReactNode) => (
+    <p style={{ margin: 0, padding: "10px 12px", borderRadius: 12, border: `1px solid ${col}44`, background: `${col}14`, color: "#eaf0fb" }}>{children}</p>
+  );
+  const sliderEtapa = (
+    <Deslizador
+      label="Etapa del proceso" icon="fa-list-ol" colr={modoCol}
+      valor={`${etapa} de ${etapas.length}`}
+      min={1} max={etapas.length} step={1} value={etapa}
+      onChange={(v) => { setEtapa(v); setPlaying(true); }}
+      hintL={etapas[0]!.etq.replace(/^1 · /, "")} hintR={etapas[etapas.length - 1]!.etq.replace(/^\d · /, "")}
+    />
+  );
 
-        <div style={{ marginTop: 12 }}>
-          <button className="bi-toggle" data-on={cortar} onClick={() => { setCortar((c) => !c); setPlaying(true); }} style={{ ["--bic" as string]: cortar ? "#f87171" : "#34d399" }}>
-            <i className={`fa-solid ${cortar ? "fa-rotate-left" : "fa-scissors"}`} style={{ marginRight: 9, color: cortar ? "#fca5a5" : "#34d399" }} />
-            {cortar ? "Cas9 ya cortó — reponer la doble cadena" : "Cortar con Cas9 (corte de doble cadena)"}
-          </button>
-        </div>
+  /* ── Pestaña «Controles», según el modo ────────────────────────────── */
+  const controles = (
+    <>
+      {modo === "crispr" && (
+        <>
+          <Bloque titulo="Desliza la ARN guía" icono="fa-arrows-left-right">
+            <Deslizador
+              label="Posición de la guía" icon="fa-dna" colr={modoCol}
+              valor={desfase === 0 ? "sobre la diana" : `${desfase > 0 ? "+" : ""}${desfase} bases`}
+              min={-DESFASE_MAX} max={DESFASE_MAX} step={1} value={desfase}
+              onChange={moverGuia}
+              hintL="← izquierda" hintR="derecha →"
+            />
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+              <Dato label="Bases que encajan" value={`${guia.encajan} de ${guia.total}`} col={guia.corta ? "#86efac" : "#fca5a5"} />
+              <Dato label="PAM (NGG) detrás" value={guia.pam ? "sí" : "no"} col={guia.pam ? "#86efac" : "#fca5a5"} />
+            </div>
+            {nota(guia.corta ? "#34d399" : "#f87171", guia.corta
+              ? "Todas las bases encajan y hay PAM: Cas9 puede cortar 3 pb antes del PAM."
+              : "Faltan bases por encajar: la ARN guía en rojo no se aparea. Mueve el deslizador hasta alinearla con la diana.")}
+            <button type="button" onClick={intentarCorte}
+              style={{ cursor: "pointer", fontSize: 15, fontWeight: 900, color: "#04121f", background: cortar ? "#fca5a5" : "#34d399", border: "none", borderRadius: 10, padding: "12px 14px" }}>
+              <i className={`fa-solid ${cortar ? "fa-rotate-left" : "fa-scissors"}`} style={{ marginRight: 9 }} aria-hidden />
+              {cortar ? "Reponer la doble cadena" : "Cortar con Cas9"}
+            </button>
+            {aviso && nota("#f87171", <><i className="fa-solid fa-ban" style={{ color: "#fca5a5", marginRight: 8 }} aria-hidden />{aviso}</>)}
+          </Bloque>
 
-        <div style={{ marginTop: 13, padding: "12px 14px", borderRadius: 12, border: `1px solid ${modoCol}55`, background: `${modoCol}12` }}>
-          <div style={{ fontSize: 12.5, fontWeight: 900, color: "#fff", marginBottom: 5 }}>
-            <i className={`fa-solid ${repDef.icono}`} style={{ color: `#${repDef.color.replace("#", "")}`, marginRight: 8 }} />
-            {repDef.nombre} <span style={{ fontSize: 11, color: T.text3, fontWeight: 700 }}>· {repDef.etq}</span>
-          </div>
-          <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{repDef.descripcion}</div>
-          <div style={{ marginTop: 10, fontSize: 11.5, color: "#eaf0fb", lineHeight: 1.5, padding: "9px 11px", borderRadius: 9, background: "rgba(4,10,22,0.4)" }}>
-            <i className="fa-solid fa-arrow-right-long" style={{ color: modoCol, marginRight: 7 }} />{repDef.uso}
-          </div>
-        </div>
-      </>
-    );
-  } else if (modo === "transgenico") {
-    control = (
-      <>
-        <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "0 0 8px", textTransform: "uppercase" }}>Organismo transgénico (ADN recombinante)</div>
-        <div className="bi-opts">
-          {TRANSGENES.map((tg) => {
-            const col = `#${tg.color.replace("#", "")}`;
-            const on = tg.id === transgenId;
-            return (
-              <button key={tg.id} className="bi-opt" data-on={on} onClick={() => { setTransgenId(tg.id); setPlaying(true); bump(); }} style={{ ["--bic" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <i className={`fa-solid ${tg.icono}`} style={{ marginRight: 8, color: on ? col : T.text3 }} />
-                {tg.etq}
-              </button>
-            );
-          })}
-        </div>
-        <div style={{ marginTop: 13, padding: "12px 14px", borderRadius: 12, border: `1px solid ${modoCol}55`, background: `${modoCol}12` }}>
-          <div style={{ fontSize: 12.5, fontWeight: 900, color: "#fff", marginBottom: 5 }}>
-            <i className={`fa-solid ${transgen.icono}`} style={{ color: modoCol, marginRight: 8 }} />
-            {transgen.etq} <span style={{ fontSize: 11, color: T.text3, fontWeight: 700 }}>· {transgen.anio}</span>
-          </div>
-          <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{transgen.descripcion}</div>
-          <div style={{ marginTop: 10, fontSize: 11, color: T.text3, lineHeight: 1.5, display: "grid", gap: 3 }}>
-            <span><strong style={{ color: "#eaf0fb" }}>Gen:</strong> {transgen.gen}</span>
-            <span><strong style={{ color: "#eaf0fb" }}>Hospedero:</strong> {transgen.hospedero}</span>
-            <span><strong style={{ color: "#eaf0fb" }}>Produce:</strong> {transgen.producto}</span>
-          </div>
-          <div style={{ marginTop: 10, fontSize: 11.5, color: "#eaf0fb", lineHeight: 1.5, padding: "9px 11px", borderRadius: 9, background: "rgba(4,10,22,0.4)" }}>
-            <i className="fa-solid fa-flask-vial" style={{ color: modoCol, marginRight: 7 }} />{transgen.ejemplo}
-          </div>
-        </div>
-      </>
-    );
-  } else {
-    control = (
-      <>
-        <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "0 0 8px", textTransform: "uppercase" }}>Tipo de clonación (transferencia nuclear)</div>
-        <div className="bi-opts">
-          {CLONES.map((cl) => {
-            const col = `#${cl.color.replace("#", "")}`;
-            const on = cl.id === clonId;
-            return (
-              <button key={cl.id} className="bi-opt" data-on={on} onClick={() => { setClonId(cl.id); setPlaying(true); bump(); }} style={{ ["--bic" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <i className={`fa-solid ${cl.icono}`} style={{ marginRight: 8, color: on ? col : T.text3 }} />
-                {cl.etq}
-              </button>
-            );
-          })}
-        </div>
-        <div style={{ marginTop: 13, padding: "12px 14px", borderRadius: 12, border: `1px solid ${modoCol}55`, background: `${modoCol}12` }}>
-          <div style={{ fontSize: 12.5, fontWeight: 900, color: "#fff", marginBottom: 5 }}>
-            <i className={`fa-solid ${clon.icono}`} style={{ color: modoCol, marginRight: 8 }} />
-            Clonación {clon.etq.toLowerCase()}
-          </div>
-          <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{clon.descripcion}</div>
-          <div style={{ marginTop: 10, fontSize: 11.5, color: "#eaf0fb", lineHeight: 1.5, padding: "9px 11px", borderRadius: 9, background: "rgba(4,10,22,0.4)" }}>
-            <i className="fa-solid fa-arrow-right-long" style={{ color: modoCol, marginRight: 7 }} />{clon.resultado}
-          </div>
-        </div>
-        {/* edición germinal vs somática (verbatim) */}
-        <div style={{ marginTop: 12, padding: "11px 13px", borderRadius: 11, border: "1px solid #f8717155", background: "rgba(248,113,113,0.08)", fontSize: 11.5, color: "#eaf0fb", lineHeight: 1.5 }}>
-          <i className="fa-solid fa-triangle-exclamation" style={{ color: "#fca5a5", marginRight: 8 }} />
-          {GERMINAL_VS_SOMATICA}
-        </div>
-      </>
-    );
-  }
+          <Bloque titulo="Reparación tras el corte" icono="fa-wrench">
+            <div style={rejilla(150)}>
+              {REPARACIONES.map((r) => (
+                <Opcion key={r.id} on={r.id === reparacion} col={`#${r.color.replace("#", "")}`} icono={r.icono} etq={`${r.etq} · ${r.nombre}`}
+                  onClick={() => { setReparacion(r.id); setPlaying(true); bump(); }} />
+              ))}
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+              <Dato label="Sitio diana" value={cortar ? `${HEBRA_TOP.length} → ${resCrispr.editada.length} pb` : `${HEBRA_TOP.length} pb`} col={cortar ? `#${repDef.color.replace("#", "")}` : undefined} />
+              <Dato label="Resultado" value={cortar ? (reparacion === "nhej" ? "knockout" : "edición") : "sin cortar"} col={cortar ? `#${repDef.color.replace("#", "")}` : undefined} />
+            </div>
+            {nota(modoCol, <><i className={`fa-solid ${repDef.icono}`} style={{ color: `#${repDef.color.replace("#", "")}`, marginRight: 8 }} aria-hidden />{repDef.descripcion}</>)}
+            <p style={{ margin: 0, color: T.text2 }}><i className="fa-solid fa-arrow-right-long" style={{ marginRight: 8, color: modoCol }} aria-hidden />{repDef.uso}</p>
+          </Bloque>
+        </>
+      )}
+
+      {modo === "transgenico" && (
+        <>
+          <Bloque titulo="Recorre el proceso" icono="fa-list-ol">
+            {sliderEtapa}
+            {nota(modoCol, <><strong>{etapaDef.etq}.</strong> {etapaDef.detalle}</>)}
+          </Bloque>
+          <Bloque titulo="Organismo transgénico (ADN recombinante)" icono="fa-seedling">
+            <div style={rejilla(140)}>
+              {TRANSGENES.map((tg) => (
+                <Opcion key={tg.id} on={tg.id === transgenId} col={`#${tg.color.replace("#", "")}`} icono={tg.icono} etq={tg.etq}
+                  onClick={() => { setTransgenId(tg.id); setPlaying(true); bump(); }} />
+              ))}
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+              <Dato label="Año" value={transgen.anio} col={`#${transgen.color.replace("#", "")}`} />
+              <Dato label="Hospedero" value={transgen.hospedero.split(" (")[0]!} />
+            </div>
+            <p style={{ margin: 0, color: T.text2 }}>{transgen.descripcion}</p>
+            <p style={{ margin: 0, color: T.text2 }}><strong style={{ color: "#eaf0fb" }}>Gen:</strong> {transgen.gen}. <strong style={{ color: "#eaf0fb" }}>Produce:</strong> {transgen.producto}.</p>
+            {nota(modoCol, <><i className="fa-solid fa-flask-vial" style={{ color: modoCol, marginRight: 8 }} aria-hidden />{transgen.ejemplo}</>)}
+          </Bloque>
+        </>
+      )}
+
+      {modo === "clonacion" && (
+        <>
+          <Bloque titulo="Recorre el proceso" icono="fa-list-ol">
+            {sliderEtapa}
+            {nota(modoCol, <><strong>{etapaDef.etq}.</strong> {etapaDef.detalle}</>)}
+          </Bloque>
+          <Bloque titulo="Tipo de clonación (transferencia nuclear)" icono="fa-clone">
+            <div style={rejilla(150)}>
+              {CLONES.map((cl) => (
+                <Opcion key={cl.id} on={cl.id === clonId} col={`#${cl.color.replace("#", "")}`} icono={cl.icono} etq={cl.etq}
+                  onClick={() => { setClonId(cl.id); setPlaying(true); bump(); }} />
+              ))}
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+              <Dato label="Se obtiene" value={clon.id === "reproductiva" ? "un clon" : "células madre"} col={`#${clon.color.replace("#", "")}`} />
+              <Dato label="¿Se implanta?" value={clon.id === "reproductiva" ? "sí" : "no"} />
+            </div>
+            <p style={{ margin: 0, color: T.text2 }}>{clon.descripcion}</p>
+            {nota(modoCol, <><i className="fa-solid fa-arrow-right-long" style={{ color: modoCol, marginRight: 8 }} aria-hidden />{clon.resultado}</>)}
+            {nota("#f87171", <><i className="fa-solid fa-triangle-exclamation" style={{ color: "#fca5a5", marginRight: 8 }} aria-hidden />{GERMINAL_VS_SOMATICA}</>)}
+          </Bloque>
+        </>
+      )}
+    </>
+  );
 
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes biPulse { 0%,100%{ box-shadow:0 0 0 0 var(--bid); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .bi-live-dot { animation: biPulse 1.6s ease-in-out infinite; }
-        .bi-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .bi-grid { grid-template-columns: 1fr; } }
-        .bi-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .bi-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .bi-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .bi-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .bi-tab { cursor:pointer; border:1px solid var(--bic); border-radius:12px; padding:11px 8px; text-align:center;
-          background:transparent; transition:all .15s; color:#fff; }
-        .bi-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
-        .bi-tab:hover { background:rgba(255,255,255,0.06); }
-        .bi-opts { display:flex; flex-wrap:wrap; gap:7px; }
-        .bi-opt { cursor:pointer; border:1px solid var(--bic); border-radius:10px; padding:9px 12px; font-size:12px;
-          font-weight:800; color:#fff; transition:all .15s; }
-        .bi-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.66); }
-        .bi-opt:hover { background:rgba(255,255,255,0.06); }
-        .bi-toggle { width:100%; cursor:pointer; border:1px solid var(--bic); border-radius:11px; padding:11px 14px;
-          background:rgba(4,10,22,0.4); color:#fff; font-size:12.5px; font-weight:900; text-align:left; transition:all .15s; }
-        .bi-toggle:hover { background:rgba(255,255,255,0.07); }
-        @media (max-width: 1000px){ .bi-bottom { grid-template-columns: 1fr !important; } }
-
-        /* Cajón de teoría */
-        .bt-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .bt-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .bt-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06121e 0%,#040a16 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .bt-drawer[data-open="true"] { transform:translateX(0); }
-        .bt-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .bt-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .bt-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .bt-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .bt-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:2; }
-        .bt-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      {/* Selector de modo */}
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="bi-tabs">
-          {MODOS.map((m) => {
-            const d = MODOS_DEF[m];
-            const col = `#${d.color.replace("#", "")}`;
-            const on = m === modo;
-            return (
-              <button key={m} className="bi-tab" data-on={on} onClick={() => cambiarModo(m)} style={{ ["--bic" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? col : "inherit" }}><i className={`fa-solid ${d.icono}`} /></div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{d.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{d.subtitulo}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="bi-grid">
-        {/* ── Columna visor ──────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 58vh, 660px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <BiotecnologiaScene
-                modo={modo}
-                resultadoCrispr={resCrispr}
-                reparacion={reparacion}
-                cortar={cortar}
-                transgen={transgen}
-                clon={clon}
-                playing={playing}
-                accent={accent}
-                modoColor={modoCol}
-                resetNonce={resetNonce}
-              />
-            </SceneBoundary>
-
-            {/* Cinta EN VIVO */}
-            <div style={{ position: "absolute", top: 14, left: 16, display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)" }}>
-              <span className="bi-live-dot" style={{ ["--bid" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol }} />
-              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3 }}>EN VIVO</span>
-              <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)" }} />
-              <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{def.etq.toUpperCase()}</span>
-            </div>
-
-            {/* Toolbar */}
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="bi-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="bi-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              {modo === "crispr" && (
-                <button className="bi-icobtn" data-on={cortar} onClick={() => { setCortar((c) => !c); setPlaying(true); }} title={cortar ? "Reponer la doble cadena" : "Cortar con Cas9"}>
-                  <i className="fa-solid fa-scissors" />
-                </button>
-              )}
-              <button className="bi-icobtn" data-on={playing} onClick={() => setPlaying((p) => !p)} title={playing ? "Pausar" : "Reanudar"}>
-                <i className={`fa-solid ${playing ? "fa-pause" : "fa-play"}`} />
-              </button>
-              <button className="bi-icobtn" onClick={reiniciar} title="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            {/* Pie: lectura en vivo */}
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 18px 14px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                {def.etq} — {def.subtitulo}
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6 }}>{pie}</div>
-            </div>
-
-            {/* Botón flotante de Teoría */}
-            <button className="bt-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-          </div>
-
-          {/* Panel de control del modo */}
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-                Controles — {def.etq}
-              </Eyebrow>
-              <span style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: "#7dd3fc", border: "1px solid #7dd3fc55", borderRadius: 6, padding: "3px 7px" }}>
-                {def.fuente === "A5" ? "GLOSARIO A5" : "INFOGRAFÍA A1"}
-              </span>
-            </div>
-            {control}
-
-            {/* Etapas del proceso */}
-            <div style={{ marginTop: 16 }}>
-              <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "0 0 9px", textTransform: "uppercase" }}>Etapas del proceso</div>
-              <div style={{ display: "grid", gap: 8 }}>
-                {etapas.map((e, i) => (
-                  <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${modoCol}22` }}>
-                    <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: modoCol, flexShrink: 0 }}>{i + 1}</div>
-                    <div style={{ minWidth: 0 }}>
-                      <div style={{ fontSize: 12, fontWeight: 900, color: "#fff" }}>{e.etq}</div>
-                      <div style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45, marginTop: 2 }}>{e.detalle}</div>
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <BiotecnologiaScene
+            modo={modo}
+            resultadoCrispr={resCrispr}
+            reparacion={reparacion}
+            cortar={cortar}
+            desfase={desfase}
+            transgen={transgen}
+            clon={clon}
+            etapa={etapa}
+            playing={playing}
+            accent={accent}
+            modoColor={modoCol}
+            resetNonce={resetNonce}
+          />
+        </SceneBoundary>
+      }
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m, etiqueta: MODOS_DEF[m].etq, icono: MODOS_DEF[m].icono })),
+        valor: modo,
+        cambiar: (id) => cambiarModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          {modo === "crispr" && <BotonHerramienta icono="fa-scissors" titulo={cortar ? "Reponer la doble cadena" : "Cortar con Cas9"} activo={cortar} onClick={intentarCorte} />}
+          <BotonHerramienta icono={playing ? "fa-pause" : "fa-play"} titulo={playing ? "Pausar" : "Reanudar"} activo={playing} onClick={() => setPlaying((p) => !p)} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={[
+        { txt: "Desliza la ARN guía y mira cuántas bases encajan con el ADN diana", done: hecho.deslizo },
+        { txt: "Prueba a cortar con la guía fuera de lugar: Cas9 no debe cortar", done: hecho.intento },
+        { txt: "Explora CRISPR-Cas9 (ARN guía, corte y reparación)", done: hecho.corto },
+        { txt: "Revisa un organismo transgénico (OGM)", done: hecho.transg },
+        { txt: "Distingue clonación reproductiva y terapéutica", done: hecho.clon },
+        { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
+      ]}
+      pestanas={[
+        { id: "controles", etiqueta: "Controles", icono: "fa-sliders", contenido: controles },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <RetoQuizCard
+              quiz={QUIZ_A2}
+              accent={accent}
+              rgba={color.rgba}
+              aprobado={ejercicioAprobado}
+              onAprobado={() => setEjercicioAprobado(true)}
+              playSfx={() => { if (sonido) audioRef.current?.correcto(); }}
+              playPick={() => { if (sonido) audioRef.current?.blip(); }}
+            />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Biotecnología moderna" icono="fa-dna">
+                <p style={{ margin: 0, color: T.text2 }}>{DEFINICION}</p>
+              </Bloque>
+              <Bloque titulo={`Infografía A1 — ${TITULO_A1}`} icono="fa-circle-info">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {PUNTOS_CLAVE.map((p, i) => <li key={i}>{p}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Para reflexionar (debate ético)" icono="fa-comments">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {PREGUNTAS.map((q, i) => <li key={i}>{q}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Principios de la bioética (A1)" icono="fa-scale-balanced">
+                {PRINCIPIOS_BIOETICA.map((p, i) => (
+                  <p key={i} style={{ margin: 0, padding: "8px 11px", borderRadius: 9, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}`, color: T.text2 }}>
+                    <strong style={{ color: accent }}>{p.nombre}. </strong>{p.definicion}
+                  </p>
+                ))}
+              </Bloque>
+              <Bloque titulo="Casos críticos en México y el mundo (A1)" icono="fa-gavel">
+                {CASOS_CRITICOS.map((c, i) => (
+                  <div key={i} style={{ padding: "11px 13px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
+                    <div style={{ fontWeight: 900, color: "#fff", marginBottom: 4 }}>
+                      <i className={`fa-solid ${c.icono}`} style={{ color: accent, marginRight: 8 }} aria-hidden />{c.titulo}
+                    </div>
+                    <div style={{ color: T.text2 }}>{c.texto}</div>
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Etapas de cada técnica" icono="fa-list-ol">
+                {[
+                  { t: "CRISPR-Cas9", e: ETAPAS_CRISPR },
+                  { t: "ADN recombinante", e: ETAPAS_TRANSGEN },
+                  { t: "Transferencia nuclear", e: ETAPAS_CLONACION },
+                ].map((g) => (
+                  <div key={g.t} style={{ display: "grid", gap: 6 }}>
+                    <strong style={{ color: accent }}>{g.t}</strong>
+                    <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6, color: T.text2 }}>
+                      {g.e.map((e, i) => <li key={i}><strong style={{ color: "#fff" }}>{e.etq}.</strong> {e.detalle}</li>)}
+                    </ol>
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Línea de tiempo (A1)" icono="fa-timeline">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6, color: T.text2 }}>
+                  {HITOS.map((h, i) => <li key={i}><strong style={{ color: "#fff", fontFamily: "ui-monospace, monospace" }}>{h.anio}</strong> — {h.texto}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Datos clave" icono="fa-magnifying-glass-chart">
+                {DATOS.map((dd, i) => (
+                  <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                    <i className={`fa-solid ${dd.icono}`} style={{ color: accent, marginTop: 4 }} aria-hidden />
+                    <div>
+                      <strong style={{ fontFamily: "ui-monospace, monospace" }}>{dd.valor}</strong>
+                      <div style={{ color: T.text2 }}>{dd.texto}</div>
                     </div>
                   </div>
                 ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* ── Columna lateral ────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          {/* Descripción del laboratorio */}
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-dna" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>Biotecnología moderna</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{DEFINICION}</div>
-          </div>
-
-          {/* Ancla A1 — infografía + reflexión */}
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #7dd3fc55", background: "rgba(125,211,252,0.07)" }}>
-            <Eyebrow><i className="fa-solid fa-circle-info" style={{ marginRight: 8, color: "#7dd3fc" }} />Infografía A1 — {TITULO_A1}</Eyebrow>
-            <ul style={{ margin: "2px 0 12px", paddingLeft: 16, display: "grid", gap: 8 }}>
-              {PUNTOS_CLAVE.map((p, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.5 }}>{p}</li>
-              ))}
-            </ul>
-            <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", marginBottom: 8 }}>PARA REFLEXIONAR (DEBATE ÉTICO)</div>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {PREGUNTAS.map((q, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>{q}</li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Principios de la bioética */}
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow><i className="fa-solid fa-scale-balanced" style={{ marginRight: 8, color: accent }} />Principios de la bioética (A1)</Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {PRINCIPIOS_BIOETICA.map((p, i) => (
-                <div key={i} style={{ padding: "8px 11px", borderRadius: 9, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{p.nombre}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{p.definicion}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Casos críticos (debate) */}
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow><i className="fa-solid fa-gavel" style={{ marginRight: 8, color: accent }} />Casos críticos en México y el mundo (A1)</Eyebrow>
-            <div style={{ display: "grid", gap: 10 }}>
-              {CASOS_CRITICOS.map((c, i) => (
-                <div key={i} style={{ padding: "11px 13px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ fontSize: 12.5, fontWeight: 900, color: "#fff", marginBottom: 4 }}>
-                    <i className={`fa-solid ${c.icono}`} style={{ color: accent, marginRight: 8 }} />{c.titulo}
+              </Bloque>
+              <Bloque titulo="México: la «zona gris» (LANGEBIO, Irapuato)" icono="fa-location-dot">
+                <p style={{ margin: 0, color: T.text2 }}>{CONTEXTO}</p>
+              </Bloque>
+              <Bloque titulo="¿Sabías que? (quizzes A2/A4)" icono="fa-circle-question">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {HECHOS.map((h, i) => <li key={i}>{h}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Glosario (A5)" icono="fa-book">
+                {GLOSARIO.map((g, i) => (
+                  <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}`, color: T.text2 }}>
+                    <strong style={{ color: accent }}>{g.termino}. </strong>{g.definicion}
+                    <div style={{ color: T.text3, marginTop: 4 }}><i className="fa-solid fa-flask" style={{ marginRight: 6, color: accent }} aria-hidden />{g.ejemplo}</div>
                   </div>
-                  <div style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.5 }}>{c.texto}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Datos + línea de tiempo + glosario ─────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="bi-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow><i className="fa-solid fa-magnifying-glass-chart" style={{ marginRight: 8, color: accent }} />Datos clave</Eyebrow>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
-            {DATOS.map((dd, i) => (
-              <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "10px 12px", borderRadius: 10, background: T.glass, border: `1px solid ${T.line}` }}>
-                <div style={{ width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: accent, background: `rgba(${color.rgba},0.16)`, flexShrink: 0 }}>
-                  <i className={`fa-solid ${dd.icono}`} />
-                </div>
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{dd.valor}</div>
-                  <div style={{ fontSize: 11, color: T.text2, lineHeight: 1.4 }}>{dd.texto}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Contexto mexicano: LANGEBIO */}
-          <div style={{ marginTop: 16, padding: "14px 16px", borderRadius: 12, border: `1px solid ${accent}33`, background: `rgba(${color.rgba},0.07)` }}>
-            <Eyebrow><i className="fa-solid fa-location-dot" style={{ marginRight: 8, color: accent }} />México: la «zona gris» (LANGEBIO, Irapuato)</Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{CONTEXTO}</div>
-          </div>
-
-          {/* ¿Sabías que? */}
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow><i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />¿Sabías que? (quizzes A2/A4)</Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {HECHOS.map((h, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{h}</li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Glosario */}
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow><i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />Glosario (A5)</Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {GLOSARIO.map((g, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{g.termino}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{g.definicion}</span>
-                  <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.4, marginTop: 4 }}><i className="fa-solid fa-flask" style={{ marginRight: 6, color: accent }} />{g.ejemplo}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Línea de tiempo */}
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow><i className="fa-solid fa-timeline" style={{ marginRight: 8, color: accent }} />Línea de tiempo (A1)</Eyebrow>
-          <div style={{ display: "grid", gap: 0 }}>
-            {HITOS.map((h, i) => (
-              <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start", paddingBottom: i === HITOS.length - 1 ? 0 : 14 }}>
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0 }}>
-                  <div style={{ width: 11, height: 11, borderRadius: "50%", background: accent, boxShadow: `0 0 10px -1px ${accent}` }} />
-                  {i !== HITOS.length - 1 && <div style={{ width: 2, flex: 1, minHeight: 26, background: `${accent}44`, marginTop: 2 }} />}
-                </div>
-                <div style={{ paddingBottom: 2 }}>
-                  <div style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{h.anio}</div>
-                  <div style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.4 }}>{h.texto}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* nota de honestidad del modelo */}
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          La infografía A1, las preguntas de reflexión, los principios de bioética, los casos críticos, el glosario A5 (con sus ejemplos) y los hechos de «¿sabías que?» (quizzes A2/A4) son <strong>verbatim</strong> del MCCEMS 2025. El mecanismo de CRISPR-Cas9 (ARN guía, PAM 5′-NGG-3′, corte de Cas9 ~3 pb antes del PAM, reparación NHEJ/HDR), el ADN recombinante y la transferencia nuclear son representaciones <strong>esquemáticas</strong> con biología estándar, no modelos a escala molecular. La dimensión ética se conserva como <strong>debate</strong>, no como mecanismo manipulable. Fuente: {FUENTE}
-        </span>
-      </div>
-
-      {/* ── Objetivos guiados ──────────────────────────────────────── */}
-      <div style={{ ...card, padding: "18px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-          Objetivos
-        </Eyebrow>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "10px 24px" }}>
-          {objetivos.map((o, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: logrosLab[i] ? "#34d399" : T.text2 }}>
-              <i className={`fa-solid ${logrosLab[i] ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: logrosLab[i] ? 1 : 0.3 }} />
-              <span style={{ fontWeight: logrosLab[i] ? 700 : 500 }}>{o.txt}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ── Reto evaluable: el quiz verbatim del ancla A2 ────────────── */}
-      <RetoQuizCard
-        quiz={QUIZ_A2}
-        accent={accent}
-        rgba={color.rgba}
-        aprobado={ejercicioAprobado}
-        onAprobado={() => setEjercicioAprobado(true)}
-        playSfx={() => {
-          if (sonido) audioRef.current?.correcto();
-        }}
-        playPick={() => {
-          if (sonido) audioRef.current?.blip();
-        }}
-      />
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <div className="bt-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="bt-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="bt-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="bt-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="bt-drawer-body">
-          <FichaTeorica data={BIOTECNOLOGIA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={BIOTECNOLOGIA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ marginTop: 18, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
+                La infografía A1, las preguntas de reflexión, los principios de bioética, los casos críticos, el glosario A5 (con sus ejemplos) y los hechos de «¿sabías que?» (quizzes A2/A4) son <strong>verbatim</strong> del MCCEMS 2025. El mecanismo de CRISPR-Cas9 (ARN guía, PAM 5′-NGG-3′, corte de Cas9 ~3 pb antes del PAM, reparación NHEJ/HDR), el ADN recombinante y la transferencia nuclear son representaciones <strong>esquemáticas</strong> con biología estándar, no modelos a escala molecular; las bases a cada lado del sitio diana son ilustrativas. La dimensión ética se conserva como <strong>debate</strong>, no como mecanismo manipulable. Fuente: {FUENTE}
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }

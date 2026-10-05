@@ -1,26 +1,30 @@
-﻿"use client";
+"use client";
 
 /**
  * Laboratorio — Movimientos literarios: del Barroco a las Vanguardias
  * Práctica experimental para LC-III-P02-A2 (Lenguaje y Comunicación III).
  *
- * Interactividad máxima. Cuatro modos: los tres de arrastrar/clasificar y, al
- * final, uno que se escribe («Completa el texto», verbatim de la progresión):
- *  1. «¿A qué movimiento pertenece?» — clasifica diez obras y autores
- *     representativos entre los seis movimientos literarios de la fuente.
- *  2. «El rasgo de cada movimiento» — empareja cada movimiento con su rasgo
- *     definitorio (verbatim de las opciones correctas del quiz A2).
- *  3. «Escribe el término» — lee la definición verbatim (A5) y escribe
- *     de memoria el término del glosario que la nombra.
- *  + Cuestionario de comprensión (opción múltiple verbatim de A2).
+ * El alumno es CURADOR de una exposición (simulación): examina piezas
+ * —fragmentos inventados de autores ficticios— y las coloca en la línea del
+ * tiempo de los movimientos. Cada decisión enciende un medidor con los rasgos
+ * del movimiento que sí aparecen en la pieza; si se equivoca, el medidor dice
+ * qué rasgo contradice al movimiento elegido. Hay piezas de frontera con
+ * rasgos de dos movimientos.
  *
- * DOM puro (sin three.js): ligero, accesible (ratón, teclado y táctil mediante
- * clic-para-seleccionar / clic-para-colocar). Contenido VERBATIM de LC-III·P02.
+ * Modos (todos colocan sobre la misma línea del tiempo, salvo el refuerzo):
+ *  1. «Curaduría» — el simulador (modelo en movimientos-literarios-sim.ts).
+ *  2. «Obras y autores» — diez obras representativas (verbatim A5/A1).
+ *  3. «El rasgo de cada movimiento» — rasgos verbatim del quiz A2.
+ *  4. «Escribe el término» y 5. «Completa el texto» — refuerzo verbatim.
+ *  + Cuestionario de comprensión (opción múltiple verbatim de A2) en «Reto».
+ *
+ * DOM + SVG (sin three.js). Contenido VERBATIM de LC-III·P02, movido a «Teoría».
  */
 
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import type { PracticaLabProps } from "../registry";
 import { T, OK, card, Eyebrow } from "./_kit";
+import { LabShell, Bloque, Mesa, BotonHerramienta, Dato } from "./_shell";
 import { LabSfx } from "./lab-audio";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { EscribeTermino } from "./_mecanica-termino";
@@ -37,29 +41,51 @@ import {
   DATO_MOVIMIENTOS,
   type Movimiento,
 } from "./movimientos-literarios-data";
+import {
+  MOVS,
+  BANDAS,
+  FRAGMENTOS,
+  esFrontera,
+  evaluar,
+  rasgosDe,
+  rasgoPorId,
+  type Evaluacion,
+  type Fragmento,
+} from "./movimientos-literarios-sim";
+import { useEstrellas } from "@/lib/hooks/useEstrellas";
 
 const NO = "#FF5E5E";
-import { useEstrellas } from "@/lib/hooks/useEstrellas";
-import { FondoTermino, VinetaTermino } from "./_vineta";
+const AMBAR = "#FFC75A";
 const RETO_KEY = "cen-movimientos-literarios-reto";
+const RUTA_FOTOS = "/media/labs-sim/movimientos-literarios";
 
-type Modo = "obras" | "rasgos" | "glosario" | "texto";
+type Modo = "curaduria" | "obras" | "rasgos" | "glosario" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
-  { id: "obras", label: "¿A qué movimiento pertenece?", icono: "fa-book" },
+  { id: "curaduria", label: "Curaduría", icono: "fa-landmark" },
+  { id: "obras", label: "Obras y autores", icono: "fa-book" },
   { id: "rasgos", label: "El rasgo de cada movimiento", icono: "fa-list-check" },
   { id: "glosario", label: "Escribe el término", icono: "fa-keyboard" },
   { id: "texto", label: "Completa el texto", icono: "fa-pen-to-square" },
 ];
 
+const NOMBRES = Object.fromEntries(MOVS.map((m) => [m, MOVIMIENTO_INFO[m].titulo])) as Record<Movimiento, string>;
+const CLAVE_DE_TITULO = Object.fromEntries(MOVS.map((m) => [MOVIMIENTO_INFO[m].titulo, m])) as Record<string, Movimiento>;
+
+interface Resultado {
+  bin: Movimiento;
+  ok: boolean;
+  mensaje: string;
+  encendidos: string[];
+}
+
 export function LabMovimientosLiterarios({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
-  const [modo, setModo] = useState<Modo>("obras");
+  const [modo, setModo] = useState<Modo>("curaduria");
 
   // ── sonido ────────────────────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   // Modo «Completa el texto». El contador sirve de `key`: subirlo remonta
   // el componente y devuelve todos los huecos en blanco.
   const [textoDone, setTextoDone] = useState(false);
@@ -88,60 +114,91 @@ export function LabMovimientosLiterarios({ color }: PracticaLabProps) {
     partida.acierto();
     return sonido && audioRef.current?.blip();
   };
+  const sfxClick = () => sonido && audioRef.current?.blip();
+
+  // ── modo curaduría (el simulador) ──────────────────────────────────────
+  const [colF, setColF] = useState<Record<string, Movimiento>>({});
+  const [selF, setSelF] = useState<string | null>(null);
+  const [resF, setResF] = useState<Resultado | null>(null);
+  const [vioFrontera, setVioFrontera] = useState(false);
+  const fragSel = FRAGMENTOS.find((f) => f.id === selF) ?? null;
+  const fragLibres = FRAGMENTOS.filter((f) => !colF[f.id]);
+
+  const elegirFrag = (id: string) => {
+    sfxClick();
+    setResF(null);
+    setSelF((v) => (v === id ? null : id));
+  };
+  const colocarFrag = (bin: Movimiento) => {
+    if (!fragSel) return;
+    const ev: Evaluacion = evaluar(fragSel, bin, NOMBRES);
+    setResF({ bin, ok: ev.ok, mensaje: ev.mensaje, encendidos: ev.encendidos });
+    if (ev.ok) {
+      setColF((c) => ({ ...c, [fragSel.id]: bin }));
+      sfxPlace();
+      if (esFrontera(fragSel)) setVioFrontera(true);
+      if (Object.keys(colF).length + 1 >= FRAGMENTOS.length) sfxOk();
+      setSelF(null);
+    } else {
+      sfxNo();
+    }
+  };
+  const resetCuraduria = () => {
+    setColF({});
+    setSelF(null);
+    setResF(null);
+  };
 
   // ── modo obras (clasifica por movimiento) ──────────────────────────────
   const [ubicObra, setUbicObra] = useState<Record<string, Movimiento>>({});
   const [selObra, setSelObra] = useState<string | null>(null);
-  const [shakeObra, setShakeObra] = useState<Movimiento | null>(null);
+  const [resObra, setResObra] = useState<Resultado | null>(null);
   const obrasLibres = OBRAS.filter((o) => !ubicObra[o.id]).slice().sort((a, b) => a.texto.localeCompare(b.texto, "es"));
 
-  const intentarObra = (obraId: string, bin: Movimiento) => {
-    if (ubicObra[obraId]) return;
-    const o = OBRAS.find((x) => x.id === obraId);
+  const colocarObra = (bin: Movimiento) => {
+    if (!selObra || ubicObra[selObra]) return;
+    const o = OBRAS.find((x) => x.id === selObra);
     if (o && o.movimiento === bin) {
-      setUbicObra((e) => ({ ...e, [obraId]: bin }));
+      setUbicObra((e) => ({ ...e, [selObra]: bin }));
       setSelObra(null);
+      setResObra({ bin, ok: true, mensaje: `Correcto: está en ${NOMBRES[bin]}. ${MOVIMIENTO_INFO[bin].subtitulo}`, encendidos: [] });
       sfxPlace();
-      if (Object.keys(ubicObra).length + 1 >= OBRAS.length) {
-        sfxOk();
-        persistMejor(true, rasgosDone, glosarioDone);
-      }
+      if (Object.keys(ubicObra).length + 1 >= OBRAS.length) sfxOk();
     } else {
-      setShakeObra(bin);
+      setResObra({ bin, ok: false, mensaje: `No encaja en ${NOMBRES[bin]}: ${MOVIMIENTO_INFO[bin].subtitulo} Esa descripción no corresponde a esta obra.`, encendidos: [] });
       sfxNo();
-      window.setTimeout(() => setShakeObra(null), 420);
     }
   };
   const resetObras = () => {
     setUbicObra({});
     setSelObra(null);
+    setResObra(null);
   };
 
-  // ── modo rasgos (empareja movimiento → rasgo) ──────────────────────────
-  const [empRasgo, setEmpRasgo] = useState<Record<string, boolean>>({});
+  // ── modo rasgos (empareja rasgo → movimiento) ──────────────────────────
+  const [empRasgo, setEmpRasgo] = useState<Record<string, Movimiento>>({});
   const [selRasgo, setSelRasgo] = useState<string | null>(null);
-  const [shakeRasgo, setShakeRasgo] = useState<string | null>(null);
-  const rasgosLibres = RASGOS.filter((r) => !empRasgo[r.id]).slice().sort((a, b) => a.movimiento.localeCompare(b.movimiento, "es"));
+  const [resRasgo, setResRasgo] = useState<Resultado | null>(null);
+  const rasgosLibres = RASGOS.filter((r) => !empRasgo[r.id]).slice().sort((a, b) => a.rasgo.localeCompare(b.rasgo, "es"));
 
-  const intentarRasgo = (chipId: string, rowId: string) => {
-    if (empRasgo[rowId]) return;
-    if (chipId === rowId) {
-      setEmpRasgo((e) => ({ ...e, [rowId]: true }));
+  const colocarRasgo = (bin: Movimiento) => {
+    if (!selRasgo || empRasgo[selRasgo]) return;
+    const r = RASGOS.find((x) => x.id === selRasgo);
+    if (r && CLAVE_DE_TITULO[r.movimiento] === bin) {
+      setEmpRasgo((e) => ({ ...e, [selRasgo]: bin }));
       setSelRasgo(null);
+      setResRasgo({ bin, ok: true, mensaje: `Correcto. ${r.ejemplo}`, encendidos: [] });
       sfxPlace();
-      if (Object.keys(empRasgo).length + 1 >= RASGOS.length) {
-        sfxOk();
-        persistMejor(obrasDone, true, glosarioDone);
-      }
+      if (Object.keys(empRasgo).length + 1 >= RASGOS.length) sfxOk();
     } else {
-      setShakeRasgo(rowId);
+      setResRasgo({ bin, ok: false, mensaje: `${NOMBRES[bin]} se define por otra cosa: ${MOVIMIENTO_INFO[bin].subtitulo}`, encendidos: [] });
       sfxNo();
-      window.setTimeout(() => setShakeRasgo(null), 420);
     }
   };
   const resetRasgos = () => {
     setEmpRasgo({});
     setSelRasgo(null);
+    setResRasgo(null);
   };
 
   // ── modo glosario (lee la definición y ESCRIBE el término) ─────────────
@@ -157,21 +214,23 @@ export function LabMovimientosLiterarios({ color }: PracticaLabProps) {
   const [quizAprobado, setQuizAprobado] = useState(false);
 
   // ── progreso / estrellas ──────────────────────────────────────────────
+  const curaduriaDone = Object.keys(colF).length >= FRAGMENTOS.length;
   const obrasDone = Object.keys(ubicObra).length >= OBRAS.length;
   const rasgosDone = Object.keys(empRasgo).length >= RASGOS.length;
-  const modosHechos = (obrasDone ? 1 : 0) + (rasgosDone ? 1 : 0) + (glosarioDone ? 1 : 0) + (textoDone ? 1 : 0);
-  // Terminar los 3 modos vale 2★; la tercera se gana con precisión.
-  const estrellas = partida.estrellasCon(modosHechos, 4);
+  const modosHechos =
+    (curaduriaDone ? 1 : 0) + (obrasDone ? 1 : 0) + (rasgosDone ? 1 : 0) + (glosarioDone ? 1 : 0) + (textoDone ? 1 : 0);
+  // Terminar los modos vale 2★; la tercera se gana con precisión.
+  const estrellas = partida.estrellasCon(modosHechos, 5);
 
   const { mejorEstrellas: mejor, registraEstrellas } = useEstrellas(RETO_KEY);
   const bestEstrellas = Math.max(estrellas, mejor);
-
-  const persistMejor = (a: boolean, b: boolean, c: boolean) => {
-    const est = (a ? 1 : 0) + (b ? 1 : 0) + (c ? 1 : 0);
-    registraEstrellas(est);
-  };
+  useEffect(() => {
+    if (estrellas > 0) registraEstrellas(estrellas);
+  }, [estrellas, registraEstrellas]);
 
   const objetivos = [
+    { txt: "Cataloga las 8 piezas de la exposición en su movimiento", done: curaduriaDone },
+    { txt: "Resuelve una pieza de frontera (con rasgos de dos movimientos)", done: vioFrontera },
     { txt: "Clasifica las 10 obras por su movimiento", done: obrasDone },
     { txt: "Empareja los 5 rasgos con su movimiento", done: rasgosDone },
     { txt: "Escribe los 6 términos del glosario", done: glosarioDone },
@@ -179,453 +238,453 @@ export function LabMovimientosLiterarios({ color }: PracticaLabProps) {
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];
 
-  // arrastre nativo
-  const dragProps = (id: string) => ({
-    draggable: true,
-    onDragStart: (e: React.DragEvent) => {
-      e.dataTransfer.setData("text/plain", id);
-      e.dataTransfer.effectAllowed = "move";
-      // El hueco que deja la tarjeta mientras viaja. Por atributo y no por
-      // estado: un render por cada gesto de arrastre se nota con 20 tarjetas.
-      e.currentTarget.setAttribute("data-arrastrando", "true");
-    },
-    onDragEnd: (e: React.DragEvent) => {
-      // También cuando se suelta FUERA de cualquier zona; si no, la tarjeta se
-      // queda medio borrada para siempre.
-      e.currentTarget.removeAttribute("data-arrastrando");
-      document.querySelectorAll('[data-sobre="true"]').forEach((z) => z.removeAttribute("data-sobre"));
-    },
-  });
-  const dropProps = (onDrop: (id: string) => void) => ({
-    onDragOver: (e: React.DragEvent) => {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = "move";
-    },
-    onDragEnter: (e: React.DragEvent) => {
-      e.preventDefault();
-      e.currentTarget.setAttribute("data-sobre", "true");
-    },
-    onDragLeave: (e: React.DragEvent) => {
-      // `dragleave` salta también al pasar sobre un HIJO de la zona. Apagar sin
-      // comprobar deja la zona parpadeando mientras mueves la mano por dentro.
-      const r = e.currentTarget.getBoundingClientRect();
-      const fuera = e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
-      if (fuera) e.currentTarget.removeAttribute("data-sobre");
-    },
-    onDrop: (e: React.DragEvent) => {
-      e.preventDefault();
-      e.currentTarget.removeAttribute("data-sobre");
-      const id = e.dataTransfer.getData("text/plain");
-      if (id) onDrop(id);
-    },
-    "data-zona": "true" as const,
-    role: "button" as const,
-    tabIndex: 0,
-    onKeyDown: (e: React.KeyboardEvent) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        (e.currentTarget as HTMLElement).click();
-      }
-    },
-  });
-
   const resetTexto = () => {
     setTextoDone(false);
     setTextoIntento((n) => n + 1);
   };
-  const resetActual = modo === "texto" ? resetTexto : modo === "obras" ? resetObras : modo === "rasgos" ? resetRasgos : resetGlosario;
+  const resetActual =
+    modo === "texto" ? resetTexto : modo === "curaduria" ? resetCuraduria : modo === "obras" ? resetObras : modo === "rasgos" ? resetRasgos : resetGlosario;
+
+  const lectura =
+    modo === "curaduria"
+      ? `${Object.keys(colF).length} de ${FRAGMENTOS.length} piezas catalogadas`
+      : `${modosHechos}/5 modos · ${bestEstrellas}★`;
+
+  // Cuántas piezas hay ya en cada movimiento, según el modo.
+  const contar = (m: Record<string, Movimiento>) => {
+    const c: Partial<Record<Movimiento, number>> = {};
+    for (const v of Object.values(m)) c[v] = (c[v] ?? 0) + 1;
+    return c;
+  };
+
+  const escena = (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
+      <style>{ESTILOS(accent, color.rgba)}</style>
+
+      {modo === "curaduria" && (
+        <Mesa>
+          <div>
+            <div className="ml-hd">
+              <Eyebrow>Elige una pieza y colócala en su movimiento</Eyebrow>
+              <span style={{ fontSize: 14, fontWeight: 800, color: curaduriaDone ? OK : T.text3 }}>
+                {Object.keys(colF).length}/{FRAGMENTOS.length}
+              </span>
+            </div>
+            {fragLibres.length === 0 ? (
+              <div style={{ fontSize: 15, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+                <i className="fa-solid fa-circle-check" /> ¡Exposición completa! Catalogaste las {FRAGMENTOS.length} piezas.
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {fragLibres.map((f) => (
+                  <PiezaCard key={f.id} f={f} abierta={selF === f.id} onElegir={() => elegirFrag(f.id)} />
+                ))}
+              </div>
+            )}
+          </div>
+          <div style={{ display: "grid", gap: 12, minWidth: 0 }}>
+            <LineaTiempo
+              contados={contar(colF)}
+              armado={!!fragSel}
+              resaltado={resF ? { bin: resF.bin, ok: resF.ok } : null}
+              onElegir={colocarFrag}
+            />
+            {resF && <Medidor res={resF} frag={fragSel} />}
+          </div>
+        </Mesa>
+      )}
+
+      {modo === "obras" && (
+        <Mesa>
+          <div>
+            <div className="ml-hd">
+              <Eyebrow>Selecciona una obra y toca su movimiento</Eyebrow>
+              <span style={{ fontSize: 14, fontWeight: 800, color: obrasDone ? OK : T.text3 }}>
+                {Object.keys(ubicObra).length}/{OBRAS.length}
+              </span>
+            </div>
+            {obrasLibres.length === 0 ? (
+              <div style={{ fontSize: 15, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+                <i className="fa-solid fa-circle-check" /> ¡Clasificaste las {OBRAS.length} obras!
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {obrasLibres.map((o) => (
+                  <button key={o.id} type="button" className="ml-chip" data-sel={selObra === o.id} onClick={() => { setResObra(null); setSelObra((s) => (s === o.id ? null : o.id)); }}>
+                    {o.texto}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <div style={{ display: "grid", gap: 12, minWidth: 0 }}>
+            <LineaTiempo contados={contar(ubicObra)} armado={!!selObra} resaltado={resObra ? { bin: resObra.bin, ok: resObra.ok } : null} onElegir={colocarObra} />
+            {resObra && <Aviso res={resObra} />}
+          </div>
+        </Mesa>
+      )}
+
+      {modo === "rasgos" && (
+        <Mesa>
+          <div>
+            <div className="ml-hd">
+              <Eyebrow>Selecciona un rasgo y toca el movimiento que define</Eyebrow>
+              <span style={{ fontSize: 14, fontWeight: 800, color: rasgosDone ? OK : T.text3 }}>
+                {Object.keys(empRasgo).length}/{RASGOS.length}
+              </span>
+            </div>
+            {rasgosLibres.length === 0 ? (
+              <div style={{ fontSize: 15, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+                <i className="fa-solid fa-circle-check" /> ¡Emparejaste los {RASGOS.length} rasgos!
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {rasgosLibres.map((r) => (
+                  <button key={r.id} type="button" className="ml-chip" data-sel={selRasgo === r.id} onClick={() => { setResRasgo(null); setSelRasgo((s) => (s === r.id ? null : r.id)); }}>
+                    {r.rasgo}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <div style={{ display: "grid", gap: 12, minWidth: 0 }}>
+            <LineaTiempo contados={contar(empRasgo)} armado={!!selRasgo} resaltado={resRasgo ? { bin: resRasgo.bin, ok: resRasgo.ok } : null} onElegir={colocarRasgo} />
+            {resRasgo && <Aviso res={resRasgo} />}
+          </div>
+        </Mesa>
+      )}
+
+      {modo === "glosario" && (
+        <EscribeTermino
+          key={glosIntento}
+          pares={PARES}
+          accent={accent}
+          rgba={color.rgba}
+          completado={glosarioDone}
+          instrucciones="Lee la definición y escribe el término del glosario que le corresponde."
+          onCompletado={() => {
+            setGlosarioDone(true);
+            sfxOk();
+          }}
+          onAcierto={sfxPlace}
+          onError={sfxNo}
+        />
+      )}
+
+      {modo === "texto" && (
+        <CompletaTexto
+          key={textoIntento}
+          data={MOVIMIENTOS_LITERARIOS_HUECOS}
+          accent={accent}
+          rgba={color.rgba}
+          completado={textoDone}
+          onCompletado={() => {
+            setTextoDone(true);
+            sfxOk();
+          }}
+          onAcierto={sfxPlace}
+          onError={sfxNo}
+        />
+      )}
+    </div>
+  );
+
+  const pistaDe: Record<Modo, string> = {
+    curaduria: "Lee la pieza y fíjate en sus tres rasgos. Algunas piezas mezclan rasgos de dos movimientos: gana el movimiento donde se enciendan más.",
+    obras: "Cada autor y obra pertenece a un movimiento. Si dudas, compara con la descripción del movimiento que aparece al equivocarte.",
+    rasgos: "Cada movimiento tiene un rasgo que lo distingue de los demás. Une el rasgo con el movimiento que define.",
+    glosario: "Ya no se arrastra: lee la definición y su ejemplo y escribe el término. Si te atoras, la pista te da la inicial y las letras.",
+    texto: "Escribe la palabra que falta en cada hueco del texto.",
+  };
 
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes mlShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
-        @keyframes mlPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
-        .ml-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 16px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .ml-tab:hover { border-color:${T.lineStrong}; color:#fff; }
-        .ml-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-        .ml-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
-          font-size:14px; border:1px solid ${T.line}; background:${T.glass}; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .ml-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
-        .ml-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .ml-chip { cursor:grab; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 16px; border-radius:14px;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:13.5px; font-weight:700; transition:all .14s; user-select:none; max-width:360px; text-align:left; line-height:1.4; }
-        .ml-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); }
-        .ml-chip[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.2); box-shadow:0 0 16px -5px ${accent}; }
-        .ml-chip:active { cursor:grabbing; }
-        .ml-row { border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:14px 16px; transition:all .16s; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
-        .ml-row[data-shake="true"] { animation:mlShake .4s; border-color:${NO}; }
-        .ml-row[data-done="true"] { border-color:${OK}66; background:${OK}0f; }
-        .ml-slot { flex-shrink:0; min-width:190px; min-height:42px; border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset};
-          display:inline-flex; align-items:center; justify-content:center; color:${T.text3}; font-size:12.5px; transition:all .16s; cursor:pointer; padding:4px 10px; }
-        .ml-slot[data-armed="true"] { border-color:${accent}; background:rgba(${color.rgba},0.1); }
-        .ml-bin { border-radius:15px; border:1.5px solid ${T.line}; background:${T.glass}; padding:16px; transition:all .16s; min-height:180px; }
-        .ml-bin[data-shake="true"] { animation:mlShake .4s; border-color:${NO}; }
-        .ml-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
-          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
-        .ml-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
-        .ml-q:disabled{ cursor:default; }
-        .ml-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
-          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .ml-btn:hover { border-color:${T.lineStrong}; }
-        .ml-divider { height:1px; background:${T.line}; margin:18px 0; }
-        @media (prefers-reduced-motion: reduce){ .ml-row[data-shake="true"], .ml-bin[data-shake="true"] { animation:none; } }
-
-        /* Cajón de teoría */
-        .ml-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .ml-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .ml-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .ml-drawer[data-open="true"] { transform:translateX(0); }
-        .ml-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .ml-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .ml-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .ml-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .ml-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .ml-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .ml-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
-
-        /* Identidad del tablero */
-        .ml-bin, .ml-row { --tono:188; position:relative;
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
-        .ml-bin:nth-of-type(6n+1), .ml-row:nth-of-type(6n+1) { --tono:188; }
-        .ml-bin:nth-of-type(6n+2), .ml-row:nth-of-type(6n+2) { --tono:262; }
-        .ml-bin:nth-of-type(6n+3), .ml-row:nth-of-type(6n+3) { --tono:44; }
-        .ml-bin:nth-of-type(6n+4), .ml-row:nth-of-type(6n+4) { --tono:152; }
-        .ml-bin:nth-of-type(6n+5), .ml-row:nth-of-type(6n+5) { --tono:330; }
-        .ml-bin:nth-of-type(6n+6), .ml-row:nth-of-type(6n+6) { --tono:18; }
-        .ml-bin::before, .ml-row::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
-          background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
-        .ml-bin[data-done="true"], .ml-row[data-done="true"] {
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.2) 0%, transparent 68%); }
-        .ml-chip { transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
-        .ml-chip:hover { transform:translateY(-2px); }
-        .ml-chip[data-sel="true"] { transform:translateY(-3px) scale(1.02); }
-        @media (prefers-reduced-motion: reduce){
-          .ml-chip, .ml-chip:hover, .ml-chip[data-sel="true"] { transform:none; transition:none; }
-        }
-      `}</style>
-
-      {/* selector de modo + toolbar */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="ml-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="ml-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="ml-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="ml-icobtn" onClick={resetActual} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <button className="ml-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="ml-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="ml-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="ml-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="ml-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="ml-drawer-body">
-          <FichaTeorica data={MOVIMIENTOS_LITERARIOS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}>
-        {/* ── Columna principal ─────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
-          {/* MODO 1 — obras */}
-          {/* MODO — completa el texto (fill_blanks verbatim de la progresión) */}
-          {modo === "texto" && (
-            <CompletaTexto
-              key={textoIntento}
-              data={MOVIMIENTOS_LITERARIOS_HUECOS}
-              accent={accent}
-              rgba={color.rgba}
-              completado={textoDone}
-              onCompletado={() => {
-                setTextoDone(true);
-                sfxOk();
-              }}
-              onAcierto={sfxPlace}
-              onError={sfxNo}
-            />
-          )}
-
-          {modo === "obras" && (
+    <LabShell
+      dom
+      accent={accent}
+      rgba={color.rgba}
+      escena={escena}
+      modos={{ opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })), valor: modo, cambiar: (id) => setModo(id as Modo) }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={resetActual} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      retoKey={RETO_KEY}
+      pestanas={[
+        {
+          id: "cuaderno",
+          etiqueta: "Cuaderno",
+          icono: "fa-lightbulb",
+          contenido: (
             <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada obra o autor a su movimiento</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: obrasDone ? OK : T.text3 }}>
-                    {Object.keys(ubicObra).length}/{OBRAS.length}
-                  </span>
+              <Bloque titulo="La exposición (simulación)" icono="fa-landmark">
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                  Eres curador de una sala con ocho piezas. Los autores y los fragmentos son inventados para este ejercicio; los periodos de la línea del tiempo son aproximados.
                 </div>
-                {obrasLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Clasificaste las {OBRAS.length} obras!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {obrasLibres.map((o) => (
-                      <button key={o.id} className="ml-chip" data-sel={selObra === o.id} onClick={() => setSelObra((s) => (s === o.id ? null : o.id))} {...dragProps(o.id)}>
-                        {o.texto}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <BinsObras selObra={selObra} shakeObra={shakeObra} ubicObra={ubicObra} onMatch={intentarObra} dropProps={dropProps} />
-            </>
-          )}
-
-          {/* MODO 2 — rasgos */}
-          {modo === "rasgos" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada movimiento a su rasgo definitorio</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: rasgosDone ? OK : T.text3 }}>
-                    {Object.keys(empRasgo).length}/{RASGOS.length}
-                  </span>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                  <Dato label="Piezas catalogadas" value={`${Object.keys(colF).length}/${FRAGMENTOS.length}`} col={curaduriaDone ? OK : undefined} />
+                  <Dato label="Modos hechos" value={`${modosHechos}/5`} col={modosHechos === 5 ? OK : undefined} />
                 </div>
-                {rasgosLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Emparejaste los {RASGOS.length} movimientos!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {rasgosLibres.map((r) => (
-                      <button key={r.id} className="ml-chip" data-sel={selRasgo === r.id} onClick={() => setSelRasgo((s) => (s === r.id ? null : r.id))} {...dragProps(r.id)}>
-                        <i className="fa-solid fa-feather" style={{ fontSize: 11, color: T.text3 }} />
-                        {r.movimiento}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <RowsRasgos selRasgo={selRasgo} shakeRasgo={shakeRasgo} empRasgo={empRasgo} onMatch={intentarRasgo} dropProps={dropProps} />
-            </>
-          )}
-
-          {/* MODO 3 — glosario */}
-          {modo === "glosario" && (
-            <EscribeTermino
-              key={glosIntento}
-              pares={PARES}
-              accent={accent}
-              rgba={color.rgba}
-              completado={glosarioDone}
-              instrucciones="Lee la definición y escribe el término del glosario que le corresponde."
-              onCompletado={() => {
-                setGlosarioDone(true);
-                sfxOk();
-                persistMejor(obrasDone, rasgosDone, true);
-              }}
-              onAcierto={sfxPlace}
-              onError={sfxNo}
-            />
-          )}
-        </div>
-
-        {/* ── Columna lateral ───────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? OK : T.text2 }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-                  <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="ml-divider" />
-
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", color: T.text3, textTransform: "uppercase" }}>Puntuación</div>
-                <div style={{ display: "flex", gap: 4, marginTop: 5 }}>
+              </Bloque>
+              <Bloque titulo="Tu partida" icono="fa-gauge-high">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+                <div style={{ display: "flex", gap: 4 }}>
                   {[1, 2, 3].map((s) => (
-                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 18, color: s <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
+                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 20, color: s <= bestEstrellas ? AMBAR : "rgba(255,255,255,0.16)" }} />
                   ))}
                 </div>
-              </div>
-              <div style={{ textAlign: "right", maxWidth: 180 }}>
-                <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45 }}>
-                  {bestEstrellas >= 3 ? "¡Reconoces los movimientos literarios como un crítico!" : "Termina los tres modos para ganar 2★; la tercera pide 2 errores o menos."}
+                <div style={{ fontSize: 14, color: T.text2 }}>
+                  {bestEstrellas >= 3 ? "¡Reconoces los movimientos literarios con claridad!" : "Termina todos los modos para ganar 2★; la tercera pide 2 errores o menos."}
                 </div>
-              </div>
-            </div>
-          </div>
-
-          {/* pista del modo actual */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid rgba(${color.rgba},0.3)`, background: `rgba(${color.rgba},0.08)`, fontSize: 13, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              {modo === "obras" && (
-                <>El <strong style={{ color: T.text }}>Barroco</strong> es del s. XVII; <strong style={{ color: T.text }}>Romanticismo</strong> y <strong style={{ color: T.text }}>Realismo</strong> del s. XIX; <strong style={{ color: T.text }}>Modernismo</strong>, <strong style={{ color: T.text }}>Vanguardias</strong> y <strong style={{ color: T.text }}>Realismo mágico</strong> del s. XX.</>
-              )}
-              {modo === "rasgos" && (
-                <>Cada movimiento responde a una pregunta clave: ¿exalta la <strong style={{ color: T.text }}>emoción</strong> o la <strong style={{ color: T.text }}>objetividad</strong>?, ¿busca la <strong style={{ color: T.text }}>musicalidad</strong> o la <strong style={{ color: T.text }}>ruptura</strong>?</>
-              )}
-              {modo === "glosario" && (
-                <>Ya no se arrastra: lee la definición y su ejemplo y escribe el término. Si te atoras, la pista te da la inicial y las letras.</>
-              )}
-            </span>
-          </div>
-
-          {/* dato verbatim */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid ${T.line}`, background: T.glass, fontSize: 12.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-circle-info" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>{DATO_MOVIMIENTOS}</span>
-          </div>
-        </div>
-      </div>
-
-      <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />
-    </div>
+              </Bloque>
+              <Bloque titulo="Pista de este modo" icono="fa-lightbulb">
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>{pistaDe[modo]}</div>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-clipboard-question",
+          contenido: <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />,
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Teoría de la práctica" icono="fa-book-open">
+                <FichaTeorica data={MOVIMIENTOS_LITERARIOS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <Bloque titulo="Los seis movimientos" icono="fa-timeline">
+                <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+                  {MOVS.map((m) => (
+                    <div key={m} style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                      <strong style={{ color: T.text }}>{MOVIMIENTO_INFO[m].titulo}.</strong> {MOVIMIENTO_INFO[m].subtitulo}
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+              <Bloque titulo="Conceptos clave" icono="fa-link">
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {PARES.map((p) => (
+                    <div key={p.id} style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                      <strong style={{ color: T.text }}>{p.termino}.</strong> {p.definicion}
+                      <div style={{ fontStyle: "italic", color: T.text3, marginTop: 2 }}>{p.ejemplo}</div>
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+              <Bloque titulo="Dato" icono="fa-circle-info">
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55 }}>{DATO_MOVIMIENTOS}</div>
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
- * Paneles de cada modo (componentes hijos: reciben los manejadores como props,
- * así el linter no rastrea el acceso al ref de audio hasta el render del map).
+ * Estilos
  * ═══════════════════════════════════════════════════════════════════════════ */
-type DropFactory = (onDrop: (id: string) => void) => {
-  onDragOver: (e: React.DragEvent) => void;
-  onDrop: (e: React.DragEvent) => void;
-};
+const ESTILOS = (accent: string, rgba: string) => `
+  .ml-hd { display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+  .ml-chip { cursor:pointer; display:inline-flex; align-items:center; justify-content:flex-start; gap:8px; padding:11px 14px; border-radius:14px;
+    border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:14px; font-weight:700; user-select:none; text-align:left; line-height:1.4;
+    transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
+  .ml-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); transform:translateY(-2px); }
+  .ml-chip[data-sel="true"] { border-color:${accent}; background:rgba(${rgba},0.2); box-shadow:0 0 16px -5px ${accent}; transform:translateY(-3px) scale(1.02); }
+  .ml-pieza { display:flex; flex-direction:column; text-align:left; border-radius:14px; overflow:hidden; padding:0; cursor:pointer; color:${T.text};
+    border:1.5px solid ${T.line}; background:${T.glass}; transition:border-color .14s, background .14s, box-shadow .14s; min-width:0; }
+  .ml-pieza:hover { border-color:${T.lineStrong}; }
+  .ml-pieza[data-sel="true"] { border-color:${accent}; background:rgba(${rgba},0.16); box-shadow:0 0 18px -6px ${accent}; }
+  .ml-foto { position:relative; aspect-ratio:16/9; display:flex; align-items:center; justify-content:center; font-size:30px;
+    background:linear-gradient(135deg, rgba(${rgba},0.35), rgba(8,19,31,0.9)); color:rgba(255,255,255,0.7); }
+  .ml-foto img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .ml-pieza-cuerpo { display:flex; flex-direction:column; gap:8px; padding:10px 12px 12px; font-size:14px; line-height:1.45; }
+  .ml-rasgos { display:flex; flex-wrap:wrap; gap:6px; }
+  .ml-rasgo { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; font-size:14px; font-weight:800;
+    border:1px solid ${T.line}; background:rgba(255,255,255,0.06); color:${T.text2}; }
+  .ml-rasgo[data-on="true"] { border-color:${OK}; background:${OK}22; color:#fff; }
+  .ml-rasgo[data-mal="true"] { border-color:${NO}88; background:${NO}18; color:#fff; }
+  .ml-linea { border-radius:15px; border:1.5px solid ${T.line}; background:${T.glass}; padding:10px; display:grid; gap:8px; }
+  .ml-linea svg { width:100%; max-width:460px; margin:0 auto; display:block; height:auto; }
+  .ml-banda { cursor:pointer; outline:none; }
+  .ml-banda rect.ml-fondo { transition:fill .15s, stroke .15s; }
+  .ml-banda:hover rect.ml-fondo, .ml-banda:focus-visible rect.ml-fondo { stroke:#fff; }
+  .ml-aviso { border-radius:14px; padding:12px 14px; display:grid; gap:8px; font-size:14px; line-height:1.45; }
+  .ml-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
+    border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
+  .ml-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
+  .ml-q:disabled{ cursor:default; }
+  .ml-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
+    border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:14px; font-weight:800; transition:all .14s; }
+  .ml-btn:hover:not(:disabled) { border-color:${T.lineStrong}; }
+  .ml-btn:disabled { opacity:.45; cursor:not-allowed; }
 
-function BinsObras({
-  selObra,
-  shakeObra,
-  ubicObra,
-  onMatch,
-  dropProps,
-}: {
-  selObra: string | null;
-  shakeObra: Movimiento | null;
-  ubicObra: Record<string, Movimiento>;
-  onMatch: (obraId: string, bin: Movimiento) => void;
-  dropProps: DropFactory;
-}) {
-  const bins: Movimiento[] = ["barroco", "romanticismo", "realismo", "modernismo", "vanguardias", "realismo-magico"];
+  /* Identidad del tablero */
+  .ml-linea { --tono:262; position:relative;
+    background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.13) 0%, transparent 62%); }
+  .ml-linea::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
+    background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
+  .ml-pieza[data-sel="true"] { background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono, 188) 72% 58% / 0.2) 0%, transparent 68%); }
+  @media (prefers-reduced-motion: reduce){
+    .ml-chip, .ml-chip:hover, .ml-chip[data-sel="true"] { transform:none; transition:none; }
+    .ml-banda rect.ml-fondo { transition:none; }
+  }
+`;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Piezas del simulador
+ * ═══════════════════════════════════════════════════════════════════════════ */
+function Foto({ clave }: { clave: string }) {
+  const [falla, setFalla] = useState(false);
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12 }}>
-      {bins.map((bin) => {
-        const info = MOVIMIENTO_INFO[bin];
-        const dentro = OBRAS.filter((o) => ubicObra[o.id] === bin);
-        return (
-          <div
-            key={bin}
-            className="ml-bin"
-            data-shake={shakeObra === bin}
-            onClick={() => selObra && onMatch(selObra, bin)}
-            style={{ position: "relative", isolation: "isolate" }}
-            {...dropProps((id) => onMatch(id, bin))}
-          >
-            {/* La ilustración del concepto llenando la caja vacía. */}
-            <FondoTermino termino={info.titulo} />
-            <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
-              <VinetaTermino termino={info.titulo} color={T.text2} icono={info.icono} tam={29} radio={8} />
-              <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
-            </div>
-            <div style={{ fontSize: 11, color: T.text3, marginBottom: 12, lineHeight: 1.4 }}>{info.subtitulo}</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {dentro.length === 0 ? (
-                <div style={{ fontSize: 12, color: T.text3, opacity: 0.6, padding: "8px 0" }}>Arrastra aquí…</div>
-              ) : (
-                dentro.map((o) => (
-                  <span key={o.id} style={{ animation: "mlPop .25s ease", display: "inline-flex", alignItems: "flex-start", gap: 7, padding: "8px 12px", borderRadius: 11, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 12.5, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>
-                    <i className="fa-solid fa-check" style={{ fontSize: 10, color: OK, marginTop: 3 }} />
-                    {o.texto}
-                  </span>
-                ))
-              )}
-            </div>
-          </div>
-        );
-      })}
+    <div className="ml-foto" aria-hidden>
+      <i className="fa-solid fa-scroll" />
+      {!falla && <img src={`${RUTA_FOTOS}/${clave}.webp`} alt="" loading="lazy" onError={() => setFalla(true)} />}
     </div>
   );
 }
 
-function RowsRasgos({
-  selRasgo,
-  shakeRasgo,
-  empRasgo,
-  onMatch,
-  dropProps,
-}: {
-  selRasgo: string | null;
-  shakeRasgo: string | null;
-  empRasgo: Record<string, boolean>;
-  onMatch: (chipId: string, rowId: string) => void;
-  dropProps: DropFactory;
-}) {
+function PiezaCard({ f, abierta, onElegir }: { f: Fragmento; abierta: boolean; onElegir: () => void }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-      {RASGOS.map((r) => {
-        const done = empRasgo[r.id];
-        return (
-          <div
-            key={r.id}
-            className="ml-row"
-            data-shake={shakeRasgo === r.id}
-            data-done={done}
-            onClick={() => !done && selRasgo && onMatch(selRasgo, r.id)}
-            {...dropProps((id) => onMatch(id, r.id))}
-          >
-            <div className="ml-slot" data-armed={!done && !!selRasgo} style={done ? { borderStyle: "solid", borderColor: OK, background: `${OK}1a` } : undefined}>
-              {done ? (
-                <span style={{ animation: "mlPop .25s ease", fontSize: 13, fontWeight: 900, color: "#fff", display: "inline-flex", alignItems: "center", gap: 7 }}>
-                  <i className="fa-solid fa-feather" />
-                  {r.movimiento}
-                </span>
-              ) : (
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                  <i className="fa-solid fa-arrow-left" style={{ fontSize: 11 }} /> movimiento
-                </span>
-              )}
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 14, fontWeight: 700, color: done ? "#fff" : T.text2, lineHeight: 1.4 }}>{r.rasgo}</div>
-              <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.4, marginTop: 3 }}>{r.ejemplo}</div>
-            </div>
-          </div>
-        );
-      })}
+    <button type="button" className="ml-pieza" data-sel={abierta} aria-pressed={abierta} onClick={onElegir}>
+      <Foto clave={f.clave} />
+      <span className="ml-pieza-cuerpo">
+        <strong style={{ fontSize: 15 }}>{f.titulo}</strong>
+        <span style={{ color: T.text3 }}>{f.autor} · simulación</span>
+        <span style={{ fontStyle: "italic", color: T.text2 }}>«{f.texto}»</span>
+        {abierta && (
+          <span className="ml-rasgos" aria-label="Rasgos que muestra la pieza">
+            {f.rasgos.map((r) => (
+              <span key={r} className="ml-rasgo">
+                <i className="fa-solid fa-magnifying-glass" aria-hidden />
+                {rasgoPorId(r).texto}
+              </span>
+            ))}
+          </span>
+        )}
+      </span>
+    </button>
+  );
+}
+
+const Y0 = 28;
+const ALTO = 470;
+const yDe = (anio: number) => Y0 + ((anio - 1580) / 400) * ALTO;
+
+function LineaTiempo({
+  contados,
+  armado,
+  resaltado,
+  onElegir,
+}: {
+  contados: Partial<Record<Movimiento, number>>;
+  armado: boolean;
+  resaltado: { bin: Movimiento; ok: boolean } | null;
+  onElegir: (m: Movimiento) => void;
+}) {
+  const anios = [1600, 1700, 1800, 1900];
+  return (
+    <div className="ml-linea">
+      <div style={{ fontSize: 14, color: T.text2, display: "flex", gap: 8, alignItems: "center" }}>
+        <i className="fa-solid fa-timeline" aria-hidden style={{ color: "var(--lsa)" }} />
+        {armado ? "Toca el movimiento donde va la selección." : "Línea del tiempo (periodos aproximados)."}
+      </div>
+      <svg viewBox="0 0 360 520" role="group" aria-label="Línea del tiempo de los movimientos literarios">
+        <line x1="62" y1={Y0} x2="62" y2={Y0 + ALTO} stroke="rgba(255,255,255,0.35)" strokeWidth="2" />
+        {anios.map((a) => (
+          <g key={a}>
+            <line x1="56" y1={yDe(a)} x2="68" y2={yDe(a)} stroke="rgba(255,255,255,0.6)" strokeWidth="2" />
+            <text x="50" y={yDe(a) + 5} textAnchor="end" fontSize="15" fill="rgba(255,255,255,0.7)">{a}</text>
+          </g>
+        ))}
+        {MOVS.map((m) => {
+          const b = BANDAS[m];
+          const x = b.col === 0 ? 80 : 222;
+          const w = 134;
+          const y = yDe(b.desde);
+          const h = Math.max(38, yDe(b.hasta) - y);
+          const res = resaltado && resaltado.bin === m ? (resaltado.ok ? OK : NO) : null;
+          const n = contados[m] ?? 0;
+          return (
+            <g
+              key={m}
+              className="ml-banda"
+              role="button"
+              tabIndex={0}
+              aria-label={`${MOVIMIENTO_INFO[m].titulo}, ${b.periodo}. ${n} colocadas`}
+              onClick={() => onElegir(m)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  onElegir(m);
+                }
+              }}
+            >
+              <rect
+                className="ml-fondo"
+                x={x}
+                y={y}
+                width={w}
+                height={h}
+                rx="9"
+                fill={res ? `${res}33` : armado ? "rgba(255,255,255,0.14)" : "rgba(255,255,255,0.08)"}
+                stroke={res ?? "rgba(255,255,255,0.35)"}
+                strokeWidth={res ? 3 : 1.5}
+                strokeDasharray={armado && !res ? "5 4" : undefined}
+              />
+              <text x={x + 8} y={y + 18} fontSize="15" fontWeight="800" fill="#fff">{MOVIMIENTO_INFO[m].titulo}</text>
+              {h >= 56 && <text x={x + 8} y={y + 38} fontSize="14" fill="rgba(255,255,255,0.7)">{b.periodo}</text>}
+              {n > 0 &&
+                Array.from({ length: n }, (_, i) => (
+                  <circle key={i} cx={x + w - 14 - i * 16} cy={y + h - 12} r="6" fill={OK} />
+                ))}
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
+
+/** Medidor de rasgos tras colocar una pieza de la curaduría. */
+function Medidor({ res, frag }: { res: Resultado; frag: Fragmento | null }) {
+  const rasgos = rasgosDe(res.bin);
+  return (
+    <div className="ml-aviso" role="status" style={{ border: `1px solid ${res.ok ? OK : NO}66`, background: `${res.ok ? OK : NO}12` }}>
+      <strong style={{ color: res.ok ? OK : NO }}>
+        <i className={`fa-solid ${res.ok ? "fa-circle-check" : "fa-circle-xmark"}`} aria-hidden /> Rasgos de {NOMBRES[res.bin]}: {res.encendidos.length} de 3
+      </strong>
+      <div className="ml-rasgos">
+        {rasgos.map((r) => (
+          <span key={r.id} className="ml-rasgo" data-on={res.encendidos.includes(r.id)}>
+            <i className={`fa-solid ${res.encendidos.includes(r.id) ? "fa-lightbulb" : "fa-circle"}`} aria-hidden />
+            {r.texto}
+          </span>
+        ))}
+      </div>
+      <span style={{ color: T.text2 }}>{res.mensaje}</span>
+      {!res.ok && frag && <span style={{ color: T.text3 }}>Vuelve a leer la pieza y prueba en otro movimiento.</span>}
+    </div>
+  );
+}
+
+function Aviso({ res }: { res: Resultado }) {
+  return (
+    <div className="ml-aviso" role="status" style={{ border: `1px solid ${res.ok ? OK : NO}66`, background: `${res.ok ? OK : NO}12`, color: T.text2 }}>
+      <strong style={{ color: res.ok ? OK : NO }}>
+        <i className={`fa-solid ${res.ok ? "fa-circle-check" : "fa-circle-xmark"}`} aria-hidden /> {res.ok ? "Correcto" : "Todavía no"}
+      </strong>
+      <span>{res.mensaje}</span>
     </div>
   );
 }
@@ -677,12 +736,12 @@ function QuizCard({
           Comprueba lo aprendido
         </Eyebrow>
         {aprobado && (
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 12, fontWeight: 800, color: OK }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 14, fontWeight: 800, color: OK }}>
             <i className="fa-solid fa-circle-check" /> Aprobado
           </span>
         )}
       </div>
-      <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
         Cinco preguntas sobre los rasgos definitorios de cada movimiento literario. Elige la opción correcta y pulsa «Comprobar».
       </div>
 
@@ -691,7 +750,7 @@ function QuizCard({
           const elegida = resp[qi];
           return (
             <div key={qi}>
-              <div style={{ fontSize: 14.5, fontWeight: 800, color: T.text, marginBottom: 11, display: "flex", gap: 10 }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: T.text, marginBottom: 11, display: "flex", gap: 10 }}>
                 <span style={{ color: accent }}>{qi + 1}.</span>
                 <span>{q.pregunta}</span>
               </div>
@@ -717,7 +776,7 @@ function QuizCard({
                   }
                   return (
                     <button key={oi} className="ml-q" onClick={() => elegir(qi, oi)} disabled={comprobado} style={{ borderColor: borde, background: fondo, color: colorTxt }}>
-                      <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
+                      <span style={{ width: 26, height: 26, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
                         {comprobado && esCorrecta ? <i className="fa-solid fa-check" /> : comprobado && sel ? <i className="fa-solid fa-xmark" /> : String.fromCharCode(65 + oi)}
                       </span>
                       <span style={{ flex: 1, lineHeight: 1.35 }}>{op}</span>
@@ -726,7 +785,7 @@ function QuizCard({
                 })}
               </div>
               {comprobado && (
-                <div style={{ marginTop: 9, fontSize: 12.5, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
+                <div style={{ marginTop: 9, fontSize: 14, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
                   <i className="fa-solid fa-circle-info" style={{ color: accent, marginTop: 2 }} />
                   <span>{q.retro}</span>
                 </div>
@@ -749,7 +808,7 @@ function QuizCard({
           </button>
         )}
         {comprobado && (
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 13.5, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 14, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
             <i className={`fa-solid ${aprobadoAhora ? "fa-trophy" : "fa-circle-half-stroke"}`} />
             {aciertos} / {total} correctas
             {!aprobadoAhora && <span style={{ color: T.text3, fontWeight: 600 }}>· revisa las marcadas e inténtalo de nuevo</span>}

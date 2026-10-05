@@ -1,0 +1,12 @@
+{
+  "escena": "Una explicación de la Revolución Mexicana armada con tres causas estructurales y el Plan de San Luis",
+  "pregunta": "Si quitas el Plan de San Luis de una explicación completa, ¿qué pasa con su fuerza?",
+  "opciones": [
+    { "id": "a", "texto": "Sube, hay menos que explicar", "icono": "fa-arrow-trend-up" },
+    { "id": "b", "texto": "Baja, falta el detonante", "icono": "fa-arrow-trend-down" },
+    { "id": "c", "texto": "No cambia", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "Las causas estructurales preparan el terreno, pero el detonante explica por qué estalló en 1910. Sin la combinación, la explicación deja de ser multicausal y pierde fuerza.",
+  "comoComprobarlo": "Agrega las cuatro causas válidas y luego quita solo el Plan de San Luis mientras miras el medidor."
+}

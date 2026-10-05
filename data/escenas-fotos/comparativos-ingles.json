@@ -1,0 +1,13 @@
+{
+  "slug": "comparativos-ingles",
+  "items": [
+    { "clave": "telefono-zeta", "formato": "16:9", "estilo": "foto", "escena": "Un teléfono celular pequeño de color verde menta recostado sobre una mesa de madera clara junto a una planta, luz de ventana suave, pantalla apagada" },
+    { "clave": "telefono-orbi", "formato": "16:9", "estilo": "foto", "escena": "Un teléfono celular grande de color negro brillante recostado sobre una mesa de madera clara, junto a unos audífonos blancos, luz de ventana suave, pantalla apagada" },
+    { "clave": "autobus-gaviota", "formato": "16:9", "estilo": "ilustracion", "escena": "Un autobús turístico blanco con franja azul clara estacionado en una carretera costera al amanecer, palmeras al fondo y cielo anaranjado, sin letras en el autobús" },
+    { "clave": "autobus-delfin", "formato": "16:9", "estilo": "ilustracion", "escena": "Un autobús moderno aerodinámico de color gris azulado avanzando por una autopista despejada bajo cielo claro, con líneas de movimiento, sin letras en el autobús" },
+    { "clave": "pelicula-luna", "formato": "16:9", "estilo": "ilustracion", "escena": "Un astronauta pequeño caminando sobre la superficie gris de la luna con la Tierra azul enorme al fondo y un cielo lleno de estrellas" },
+    { "clave": "pelicula-chef", "formato": "16:9", "estilo": "ilustracion", "escena": "Una cocina de restaurante de noche con una cocinera de gorro alto salteando verduras en un sartén con llamas, vapor y luces cálidas" },
+    { "clave": "paseo-sierra", "formato": "16:9", "estilo": "foto", "escena": "Un pueblo pequeño de casas de tejado rojo en una ladera cubierta de pinos con montañas verdes y niebla ligera al fondo, luz de mañana" },
+    { "clave": "paseo-playa", "formato": "16:9", "estilo": "foto", "escena": "Una playa de arena clara con sombrillas de colores, mar azul turquesa y un muelle de madera a lo lejos, cielo despejado" }
+  ]
+}

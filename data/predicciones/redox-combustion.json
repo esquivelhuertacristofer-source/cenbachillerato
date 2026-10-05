@@ -1,0 +1,12 @@
+{
+  "escena": "Una pila de zinc y cobre con un foco encendido en el cable. Puedes cambiar el cátodo de cobre por plata.",
+  "pregunta": "Cambias el cátodo de cobre por plata, con el mismo zinc. ¿Qué pasa con el foco?",
+  "opciones": [
+    { "id": "a", "texto": "Se apaga: la plata no reacciona", "icono": "fa-lightbulb" },
+    { "id": "b", "texto": "Brilla igual", "icono": "fa-equals" },
+    { "id": "c", "texto": "Brilla más", "icono": "fa-sun" }
+  ],
+  "correcta": "c",
+  "porque": "La plata se reduce con más facilidad que el cobre (E° = +0.80 V contra +0.34 V). La diferencia con el zinc crece de 1.10 V a 1.56 V y la pila empuja más a los electrones.",
+  "comoComprobarlo": "En Controles de la pila, cambia el cátodo de Cu²⁺/Cu a Ag⁺/Ag y observa el foco y el valor de E°pila."
+}

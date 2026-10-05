@@ -17,8 +17,8 @@
  */
 
 import * as THREE from "three";
-import { useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import React, { useRef } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { type Modo, type Escena } from "./calor-data";
@@ -32,6 +32,10 @@ export interface CalorSceneProps {
   playing: boolean;
   modoColor: string;
   resetNonce: number;
+  /** Intensidad 0..1: calor de la base (convección) o temperatura del cuerpo (radiación). */
+  nivel: number;
+  /** Conductividad relativa 0..1 (escala log de k) del material de la barra. */
+  kRel: number;
 }
 
 const COLD = new THREE.Color("#2563eb");
@@ -52,15 +56,20 @@ function tintByHeat(out: THREE.Color, heat: number) {
 /* ── CONDUCCIÓN: barra segmentada con flama en el extremo izquierdo ───────── */
 const N_SEG = 16;
 
-function BarraConduccion({ frac, playing }: { frac: number; playing: boolean }) {
+function BarraConduccion({ frac, playing, kRel, autonomo, rotulos = true }: { frac: number; playing: boolean; kRel: number; autonomo: boolean; rotulos?: boolean }) {
   const refs = useRef<(THREE.MeshStandardMaterial | null)[]>([]);
+  const avance = useRef(0);
+  const lectura = useRef<HTMLDivElement>(null);
   const flama = useRef<THREE.Mesh>(null);
   const tmp = useRef(new THREE.Color());
   const t = useRef(0);
 
   useFrame((_, dt) => {
     if (playing) t.current += dt;
-    const reach = frac; // qué tan lejos llegó el calor (0..1)
+    // Con material elegido, el frente de calor avanza solo y su rapidez la fija k:
+    // cobre cruza la barra en ~2 s; aire o madera tardan muchísimo más.
+    if (autonomo && playing) avance.current = Math.min(1, avance.current + dt * (0.05 + 0.45 * kRel));
+    const reach = autonomo ? avance.current : frac; // qué tan lejos llegó el calor (0..1)
     for (let i = 0; i < N_SEG; i++) {
       const x = i / (N_SEG - 1); // 0 = extremo caliente, 1 = frío
       // gradiente lineal ya formado (1-x), pero "abierto" sólo hasta donde llegó el calor
@@ -73,6 +82,11 @@ function BarraConduccion({ frac, playing }: { frac: number; playing: boolean }) 
         mat.emissive.copy(mat.color);
         mat.emissiveIntensity = 0.15 + heat * 0.6;
       }
+    }
+    if (lectura.current) {
+      // sensor del punto medio: su temperatura sube conforme llega el frente de calor
+      const heatMedio = 0.5 * clamp01((reach - 0.5) * 3 + 1);
+      lectura.current.textContent = `Punto medio: ${Math.round(20 + 160 * heatMedio)} °C`;
     }
     if (flama.current) {
       const s = 1 + Math.sin(t.current * 12) * 0.12;
@@ -105,12 +119,21 @@ function BarraConduccion({ frac, playing }: { frac: number; playing: boolean }) 
           <meshStandardMaterial color="#fb923c" emissive="#f97316" emissiveIntensity={1.4} roughness={0.5} transparent opacity={0.92} />
         </mesh>
       </group>
-      <Html position={[startX - 0.9, -1.3, 0]} center distanceFactor={12} style={{ pointerEvents: "none" }}>
-        <div style={pillStyle("#fb923c")}>Foco de calor</div>
-      </Html>
-      <Html position={[-startX + 0.9, -1.3, 0]} center distanceFactor={12} style={{ pointerEvents: "none" }}>
-        <div style={pillStyle("#60a5fa")}>Extremo frío</div>
-      </Html>
+      {rotulos && (
+        <Html position={[startX - 0.9, -1.3, 0]} center style={{ pointerEvents: "none" }}>
+          <div style={pillStyle("#fb923c")}>Foco de calor</div>
+        </Html>
+      )}
+      {rotulos && (
+        <Html position={[-startX + 0.9, -1.3, 0]} center style={{ pointerEvents: "none" }}>
+          <div style={pillStyle("#60a5fa")}>Extremo frío</div>
+        </Html>
+      )}
+      {autonomo && rotulos && (
+        <Html position={[0, 1.2, 0]} center style={{ pointerEvents: "none" }}>
+          <div ref={lectura} style={pillStyle("#fbbf24")}>Punto medio: 20 °C</div>
+        </Html>
+      )}
     </group>
   );
 }
@@ -118,7 +141,8 @@ function BarraConduccion({ frac, playing }: { frac: number; playing: boolean }) 
 /* ── CONVECCIÓN: tanque con partículas que circulan ──────────────────────── */
 const N_PART = 26;
 
-function TanqueConveccion({ frac, playing }: { frac: number; playing: boolean }) {
+function TanqueConveccion({ frac, playing, rotulos = true }: { frac: number; playing: boolean; rotulos?: boolean }) {
+  // frac aquí ya es la intensidad efectiva (calor de la base)
   const grp = useRef<(THREE.Group | null)[]>([]);
   const mats = useRef<(THREE.MeshStandardMaterial | null)[]>([]);
   const t = useRef(0);
@@ -129,7 +153,7 @@ function TanqueConveccion({ frac, playing }: { frac: number; playing: boolean })
   const phases = useRef<number[]>(Array.from({ length: N_PART }, (_, i) => i / N_PART));
 
   useFrame((_, dt) => {
-    const speed = 0.12 + frac * 0.32;
+    const speed = 0.03 + frac * 0.5;
     if (playing) t.current += dt * speed;
     for (let i = 0; i < N_PART; i++) {
       const side = i % 2 === 0 ? 1 : -1; // mitad sube por la izquierda del centro, mitad por la derecha
@@ -169,7 +193,7 @@ function TanqueConveccion({ frac, playing }: { frac: number; playing: boolean })
       }
     }
     if (placa.current) {
-      placa.current.emissiveIntensity = 0.6 + 0.4 * Math.abs(Math.sin(t.current * 6));
+      placa.current.emissiveIntensity = 0.1 + frac * 1.1 + 0.2 * Math.abs(Math.sin(t.current * 6)) * frac;
     }
   });
 
@@ -179,10 +203,6 @@ function TanqueConveccion({ frac, playing }: { frac: number; playing: boolean })
       <mesh>
         <boxGeometry args={[3.6, 3.6, 2.0]} />
         <meshStandardMaterial color="#38bdf8" transparent opacity={0.06} roughness={0.1} metalness={0.1} side={THREE.DoubleSide} depthWrite={false} />
-      </mesh>
-      <mesh>
-        <boxGeometry args={[3.62, 3.62, 2.02]} />
-        <meshBasicMaterial color="#38bdf8" wireframe transparent opacity={0.18} />
       </mesh>
       {/* placa caliente abajo */}
       <mesh position={[0, -1.85, 0]} receiveShadow>
@@ -209,9 +229,11 @@ function TanqueConveccion({ frac, playing }: { frac: number; playing: boolean })
           </mesh>
         </group>
       ))}
-      <Html position={[0, -2.3, 0]} center distanceFactor={12} style={{ pointerEvents: "none" }}>
-        <div style={pillStyle("#ef4444")}>Base caliente</div>
-      </Html>
+      {rotulos && (
+        <Html position={[0, -2.3, 0]} center style={{ pointerEvents: "none" }}>
+          <div style={pillStyle("#ef4444")}>Base caliente</div>
+        </Html>
+      )}
     </group>
   );
 }
@@ -219,14 +241,15 @@ function TanqueConveccion({ frac, playing }: { frac: number; playing: boolean })
 /* ── RADIACIÓN: esfera caliente que emite anillos de onda ─────────────────── */
 const N_RING = 5;
 
-function EmisorRadiacion({ frac, playing, color }: { frac: number; playing: boolean; color: string }) {
+function EmisorRadiacion({ frac, playing, color, rotulos = true }: { frac: number; playing: boolean; color: string; rotulos?: boolean }) {
   const rings = useRef<(THREE.Group | null)[]>([]);
   const ringMats = useRef<(THREE.MeshBasicMaterial | null)[]>([]);
   const core = useRef<THREE.MeshStandardMaterial>(null);
   const t = useRef(0);
 
   useFrame((_, dt) => {
-    const rate = 0.25 + frac * 0.6;
+    const rate = 0.3 + frac * 0.5;
+    const pot = Math.pow(0.2 + 0.8 * frac, 4); // ∝ T⁴ (T relativa 0.2..1)
     if (playing) t.current += dt * rate;
     for (let i = 0; i < N_RING; i++) {
       const s = (t.current + i / N_RING) % 1; // 0..1 ciclo de expansión
@@ -236,10 +259,10 @@ function EmisorRadiacion({ frac, playing, color }: { frac: number; playing: bool
         g.scale.set(scale, scale, scale);
       }
       const m = ringMats.current[i];
-      if (m) m.opacity = (1 - s) * 0.5 * (0.3 + frac);
+      if (m) m.opacity = (1 - s) * (0.05 + 0.9 * pot);
     }
     if (core.current) {
-      core.current.emissiveIntensity = 0.6 + frac * 2.2 + Math.sin(t.current * 8) * 0.15;
+      core.current.emissiveIntensity = 0.1 + pot * 2.6 + Math.sin(t.current * 8) * 0.05;
     }
   });
 
@@ -250,7 +273,7 @@ function EmisorRadiacion({ frac, playing, color }: { frac: number; playing: bool
         <sphereGeometry args={[0.85, 32, 32]} />
         <meshStandardMaterial ref={core} color="#ef4444" emissive="#f97316" emissiveIntensity={0.8} roughness={0.4} metalness={0.1} />
       </mesh>
-      <pointLight intensity={2 + frac * 4} distance={12} color="#fb923c" />
+      <pointLight intensity={0.3 + pot4(frac) * 6} distance={12} color="#fb923c" />
       {/* anillos de onda electromagnética */}
       {Array.from({ length: N_RING }).map((_, i) => (
         <group
@@ -276,11 +299,17 @@ function EmisorRadiacion({ frac, playing, color }: { frac: number; playing: bool
           </mesh>
         </group>
       ))}
-      <Html position={[0, -1.7, 0]} center distanceFactor={12} style={{ pointerEvents: "none" }}>
-        <div style={pillStyle("#f472b6")}>Sin medio · viaja en el vacío</div>
-      </Html>
+      {rotulos && (
+        <Html position={[0, -1.7, 0]} center style={{ pointerEvents: "none" }}>
+          <div style={pillStyle("#f472b6")}>Sin medio · viaja en el vacío</div>
+        </Html>
+      )}
     </group>
   );
+}
+
+function pot4(f: number): number {
+  return Math.pow(0.2 + 0.8 * f, 4);
 }
 
 function pillStyle(color: string): React.CSSProperties {
@@ -290,7 +319,7 @@ function pillStyle(color: string): React.CSSProperties {
     background: "rgba(4,10,22,0.82)",
     border: `1px solid ${color}`,
     color: "#fff",
-    fontSize: 11,
+    fontSize: 14,
     fontWeight: 800,
     whiteSpace: "nowrap",
     boxShadow: "0 6px 18px -8px #000",
@@ -299,15 +328,25 @@ function pillStyle(color: string): React.CSSProperties {
 
 function Etiqueta({ pos, color, children }: { pos: Pt; color: string; children: React.ReactNode }) {
   return (
-    <Html position={pos} center distanceFactor={16} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div style={pillStyle(color)}>{children}</div>
     </Html>
   );
 }
 
-function Contenido({ modo, escena, playing, modoColor, resetNonce }: CalorSceneProps) {
+function Contenido({ modo, escena, playing, modoColor, resetNonce, nivel, kRel }: CalorSceneProps) {
+  const ancho = useThree((st) => st.size.width);
+  const efectivo = nivel * (0.25 + 0.75 * escena.frac);
   const giro = useRef<THREE.Group>(null);
-  useFrame((_, dt) => {
+  const anchoVisto = useRef(0);
+  useFrame(({ camera, size }, dt) => {
+    // Encuadre según el aspecto: en vertical (celular) la cámara se aleja para que quepa todo.
+    if (anchoVisto.current !== size.width) {
+      anchoVisto.current = size.width;
+      const asp = size.width / Math.max(1, size.height);
+      const base = modo === "comparar" ? 19 : modo === "conduccion" ? 14 : 11;
+      camera.position.setLength(base * Math.max(1, 1.3 / asp));
+    }
     if (giro.current && playing && modo !== "comparar" && modo !== "conduccion") {
       giro.current.rotation.y += dt * 0.08;
     }
@@ -323,31 +362,31 @@ function Contenido({ modo, escena, playing, modoColor, resetNonce }: CalorSceneP
       <directionalLight position={[-6, 4, -4]} intensity={0.5} color={modoColor} />
 
       <group ref={giro} key={`${modo}-${resetNonce}`}>
-        {modo === "conduccion" && <BarraConduccion frac={escena.frac} playing={playing} />}
-        {modo === "conveccion" && <TanqueConveccion frac={escena.frac} playing={playing} />}
-        {modo === "radiacion" && <EmisorRadiacion frac={escena.frac} playing={playing} color={modoColor} />}
+        {modo === "conduccion" && <BarraConduccion frac={escena.frac} playing={playing} kRel={kRel} autonomo />}
+        {modo === "conveccion" && <TanqueConveccion frac={efectivo} playing={playing} />}
+        {modo === "radiacion" && <EmisorRadiacion frac={efectivo} playing={playing} color={modoColor} />}
 
         {modo === "comparar" && (
           <>
             <group position={[-5.2, 0, 0]} scale={0.62}>
-              <BarraConduccion frac={1} playing={playing} />
+              <BarraConduccion frac={1} playing={playing} kRel={1} autonomo={false} rotulos={false} />
             </group>
-            <Etiqueta pos={[-5.2, 2.6, 0]} color="#fb923caa">Conducción · sólido</Etiqueta>
+            {ancho >= 640 && <Etiqueta pos={[-5.2, 2.6, 0]} color="#fb923caa">Conducción · sólido</Etiqueta>}
 
             <group position={[0, 0, 0]} scale={0.72}>
-              <TanqueConveccion frac={1} playing={playing} />
+              <TanqueConveccion frac={1} playing={playing} rotulos={false} />
             </group>
-            <Etiqueta pos={[0, 2.9, 0]} color="#38bdf8aa">Convección · fluido</Etiqueta>
+            {ancho >= 640 && <Etiqueta pos={[0, 2.9, 0]} color="#38bdf8aa">Convección · fluido</Etiqueta>}
 
             <group position={[5.2, 0, 0]} scale={0.72}>
-              <EmisorRadiacion frac={1} playing={playing} color="#f472b6" />
+              <EmisorRadiacion frac={1} playing={playing} color="#f472b6" rotulos={false} />
             </group>
-            <Etiqueta pos={[5.2, 2.9, 0]} color="#f472b6aa">Radiación · vacío</Etiqueta>
+            {ancho >= 640 && <Etiqueta pos={[5.2, 2.9, 0]} color="#f472b6aa">Radiación · vacío</Etiqueta>}
           </>
         )}
       </group>
 
-      <OrbitControls enablePan={false} minDistance={6} maxDistance={36} autoRotate={false} />
+      <OrbitControls enablePan={false} target={[0, 0, 0]} minDistance={6} maxDistance={36} autoRotate={false} />
       <EffectComposer>
         <Bloom intensity={0.55} luminanceThreshold={0.2} mipmapBlur />
         <Vignette eskil={false} offset={0.2} darkness={0.7} />
@@ -359,10 +398,10 @@ function Contenido({ modo, escena, playing, modoColor, resetNonce }: CalorSceneP
 export default function CalorScene(props: CalorSceneProps) {
   const cam: Pt =
     props.modo === "comparar"
-      ? [0, 0.5, 17]
+      ? [0, 0.5, 19]
       : props.modo === "conduccion"
-        ? [0, 1.2, 12]
-        : [0, 0.5, 9];
+        ? [0, 1.0, 14]
+        : [0, 0.5, 11];
   return (
     <Canvas key={props.modo} shadows dpr={[1, 2]} camera={{ position: cam, fov: 50 }} gl={{ antialias: true }} style={{ width: "100%", height: "100%" }}>
       <Contenido {...props} />

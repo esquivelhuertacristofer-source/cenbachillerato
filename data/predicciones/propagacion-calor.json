@@ -1,0 +1,12 @@
+{
+  "escena": "Una barra con una flama en un extremo y un sensor de temperatura en su punto medio.",
+  "pregunta": "Cambias la barra de cobre por una de madera. ¿Qué pasa con el calor?",
+  "opciones": [
+    { "id": "a", "texto": "Llega igual de rápido, es el mismo calor", "icono": "fa-equals" },
+    { "id": "b", "texto": "Llega mucho más lento", "icono": "fa-hourglass-half" },
+    { "id": "c", "texto": "Llega más rápido", "icono": "fa-bolt" }
+  ],
+  "correcta": "b",
+  "porque": "La madera tiene una conductividad térmica k muy baja (0.15 W/m·K contra 401 del cobre). El flujo Q/t = k·A·ΔT/L es menor, así que el calor avanza muy despacio.",
+  "comoComprobarlo": "En Controles elige Cobre y luego Madera; compara el sensor del punto medio y el tiempo que tarda el calor en cruzar la barra."
+}

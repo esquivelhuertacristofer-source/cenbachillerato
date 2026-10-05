@@ -1,0 +1,12 @@
+{
+  "escena": "Una población de 24 conejos mitad claros y mitad oscuros, en un campo nevado donde vuelan aves que los cazan.",
+  "pregunta": "Después de muchas generaciones en la nieve, ¿qué conejos serán la mayoría?",
+  "opciones": [
+    { "id": "a", "texto": "Los oscuros, porque son más fuertes", "icono": "fa-dumbbell" },
+    { "id": "b", "texto": "Los claros, por camuflarse mejor", "icono": "fa-snowflake" },
+    { "id": "c", "texto": "Quedan mitad y mitad", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "Sobre la nieve los depredadores ven mejor a los oscuros y se los comen más. Los claros sobreviven y se reproducen, así que su pelaje se hace más común generación tras generación.",
+  "comoComprobarlo": "Elige «Campo nevado», deja correr las generaciones (o arrastra el deslizador de generación) y mira la gráfica y los conejos."
+}

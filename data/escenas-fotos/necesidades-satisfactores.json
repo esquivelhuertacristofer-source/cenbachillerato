@@ -1,0 +1,13 @@
+{
+  "slug": "necesidades-satisfactores",
+  "items": [
+    { "clave": "despensa", "formato": "16:9", "estilo": "foto", "escena": "Una mesa de cocina con un canasto de mimbre lleno de jitomates, calabacitas, plátanos y un paquete de tortillas envueltas en tela, luz de mañana por la ventana" },
+    { "clave": "agua-potable", "formato": "16:9", "estilo": "foto", "escena": "Una llave de agua sobre un fregadero sencillo con un filtro de cerámica al lado y un vaso transparente que se llena de agua limpia" },
+    { "clave": "consulta-salud", "formato": "16:9", "estilo": "ilustracion", "escena": "Un consultorio sencillo con una doctora de bata blanca que escucha el pecho de un niño sentado en la camilla, estetoscopio y maletín de medicinas sobre el escritorio" },
+    { "clave": "casa-techo", "formato": "16:9", "estilo": "ilustracion", "escena": "Una casa pequeña de block con un albañil que coloca una losa nueva en el techo, andamio de madera y paredes recién aplanadas, cielo despejado" },
+    { "clave": "utiles-escuela", "formato": "16:9", "estilo": "foto", "escena": "Un escritorio con cuadernos, lápices, una mochila abierta y un camión escolar amarillo visto por la ventana al fondo" },
+    { "clave": "biblioteca", "formato": "16:9", "estilo": "foto", "escena": "Un pasillo de biblioteca pública con estantes llenos de libros y una joven sentada en el suelo leyendo uno abierto sobre las rodillas" },
+    { "clave": "refrescos-botanas", "formato": "16:9", "estilo": "foto", "escena": "Una mesa con botellas de refresco de colores vivos, bolsas de papas fritas abiertas y vasos desechables sin etiquetas" },
+    { "clave": "tonico", "formato": "16:9", "estilo": "ilustracion", "escena": "Un puesto ambulante en la banqueta con frascos de líquidos de colores brillantes alineados sobre una mesa plegable y un vendedor que sonríe con los brazos abiertos" }
+  ]
+}

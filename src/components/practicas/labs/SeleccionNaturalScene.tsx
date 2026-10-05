@@ -19,8 +19,8 @@
 
 import * as THREE from "three";
 import { useRef, type ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Html, Stars } from "@react-three/drei";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { T } from "./_kit";
 import { Escenario } from "./_escenario";
@@ -55,17 +55,20 @@ export interface SeleccionNaturalSceneProps {
 }
 
 /* ── Etiqueta flotante (Html) ─────────────────────────────────────────────── */
-function Etiqueta({ pos, children, df = 12, fuerte = false, col }: { pos: Pt; children: ReactNode; df?: number; fuerte?: boolean; col?: string }) {
+function Etiqueta({ pos, children, fuerte = false, col }: { pos: Pt; children: ReactNode; fuerte?: boolean; col?: string }) {
+  const ancho = useThree((st) => st.size.width);
+  // En pantallas angostas la información ya está en el panel.
+  if (ancho < 640) return null;
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
-          padding: fuerte ? "6px 12px" : "2px 8px",
+          padding: fuerte ? "6px 12px" : "4px 10px",
           borderRadius: 8,
           background: fuerte ? "rgba(5,14,30,0.85)" : "rgba(5,14,30,0.6)",
           border: `1px solid ${col ?? T.lineStrong}`,
           color: col ?? T.text,
-          fontSize: fuerte ? 15 : 12,
+          fontSize: fuerte ? 16 : 14,
           fontWeight: fuerte ? 800 : 700,
           whiteSpace: "nowrap",
           letterSpacing: "0.01em",
@@ -175,7 +178,7 @@ function MundoConejos({ terreno, fClaro, predadores, playing, gen }: { terreno: 
         <Predador key={i} idx={i} total={predadores} />
       ))}
 
-      <Etiqueta pos={[0, 4.6, 0]} df={16} fuerte col="#ffffff">Generación {gen}</Etiqueta>
+      <Etiqueta pos={[0, 4.2, 0]} fuerte col="#ffffff">Generación {gen}</Etiqueta>
     </group>
   );
 }
@@ -215,9 +218,9 @@ function MundoTipos({ barras, fitness, tipoColor }: { barras: number[]; fitness:
         );
       })}
       {/* curva de aptitud (línea de marcadores) etiqueta */}
-      <Etiqueta pos={[-4.7, 3.6, 0.5]} df={16} col={tipoColor}>aptitud</Etiqueta>
-      <Etiqueta pos={[-4.4, -0.5, 0]} df={18} col={T.text2}>rasgo pequeño</Etiqueta>
-      <Etiqueta pos={[4.4, -0.5, 0]} df={18} col={T.text2}>rasgo grande</Etiqueta>
+      <Etiqueta pos={[-4.3, 3.4, 0.5]} col={tipoColor}>aptitud</Etiqueta>
+      <Etiqueta pos={[-3.6, -0.7, 1.4]} col={T.text2}>rasgo pequeño</Etiqueta>
+      <Etiqueta pos={[3.6, -0.7, 1.4]} col={T.text2}>rasgo grande</Etiqueta>
     </group>
   );
 }
@@ -240,7 +243,7 @@ function Bone({ a, b, color, grosor, emis, opacity }: { a: Pt; b: Pt; color: str
   );
 }
 
-function Extremidad({ id, x, etq, icono, seleccionado }: { id: string; x: number; etq: string; icono: string; seleccionado: boolean }) {
+function Extremidad({ id, x, etq, seleccionado }: { id: string; x: number; etq: string; seleccionado: boolean }) {
   const huesos = huesosDe(id);
   const emis = seleccionado ? 0.85 : 0.18;
   const op = seleccionado ? 1 : 0.42;
@@ -249,14 +252,9 @@ function Extremidad({ id, x, etq, icono, seleccionado }: { id: string; x: number
       {huesos.map((h, i) => (
         <Bone key={i} a={h.a} b={h.b} color={h.color} grosor={h.grosor} emis={emis} opacity={op} />
       ))}
-      <Etiqueta pos={[0, 3.0, 0]} df={seleccionado ? 13 : 16} fuerte={seleccionado} col={seleccionado ? "#ffffff" : T.text2}>
+      <Etiqueta pos={[0, 3.0, 0]} fuerte={seleccionado} col={seleccionado ? "#ffffff" : T.text2}>
         {etq}
       </Etiqueta>
-      <Html position={[0, -2.7, 0]} center distanceFactor={18} style={{ pointerEvents: "none" }}>
-        <div style={{ fontSize: 26, color: seleccionado ? "#fff" : "rgba(255,255,255,0.4)" }}>
-          <i className={`fa-solid ${icono}`} />
-        </div>
-      </Html>
     </group>
   );
 }
@@ -271,7 +269,7 @@ function MundoEvidencias({ animalSel, playing }: { animalSel: string; playing: b
   return (
     <group ref={g} position={[0, -0.2, 0]}>
       {ANIMALES.map((a, i) => (
-        <Extremidad key={a.id} id={a.id} x={xs[i] ?? 0} etq={a.etq} icono={a.icono} seleccionado={a.id === animalSel} />
+        <Extremidad key={a.id} id={a.id} x={xs[i] ?? 0} etq={a.etq} seleccionado={a.id === animalSel} />
       ))}
     </group>
   );
@@ -289,7 +287,6 @@ function Contenido(props: SeleccionNaturalSceneProps) {
           vez de que alguien la adivine. */}
       <Escenario acento={accent} fondo={bg} mesa={false} niebla={false} />
       <directionalLight position={[-8, 4, -6]} intensity={0.4} color={accent} />
-      {modo !== "conejos" && <Stars radius={80} depth={40} count={1100} factor={3} saturation={0} fade speed={0.5} />}
 
       <group key={`${modo}-${resetNonce}`}>
         {modo === "conejos" && <MundoConejos terreno={terreno} fClaro={fClaro} predadores={predadores} playing={playing} gen={gen} />}
@@ -301,6 +298,7 @@ function Contenido(props: SeleccionNaturalSceneProps) {
       <OrbitControls
         makeDefault
         enablePan={false}
+        target={modo === "conejos" ? [0, 0.4, 0] : modo === "tipos" ? [0, 0.2, 0] : [0, -0.6, 0]}
         minDistance={7}
         maxDistance={24}
         minPolarAngle={Math.PI / 6}

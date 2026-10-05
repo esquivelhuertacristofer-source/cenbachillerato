@@ -1,0 +1,12 @@
+{
+  "escena": "Un fragmento real del gen de la β-globina, con su proteína de ocho aminoácidos y un editor para mutarlo.",
+  "pregunta": "Quitas una sola base cerca del inicio del gen. ¿Qué pasa con la proteína?",
+  "opciones": [
+    { "id": "a", "texto": "Solo falta un aminoácido", "icono": "fa-minus" },
+    { "id": "b", "texto": "Queda igual: el código es redundante", "icono": "fa-equals" },
+    { "id": "c", "texto": "Cambian los aminoácidos desde ahí", "icono": "fa-arrows-left-right-to-line" }
+  ],
+  "correcta": "c",
+  "porque": "Los codones se leen de tres en tres. Al quitar una base, todas las tripletas siguientes se recorren y casi todos los aminoácidos cambian o aparece un paro prematuro: es un desplazamiento del marco.",
+  "comoComprobarlo": "Elige Deleción, pon la posición en 7 y compara la cadena de arriba con la de abajo; luego prueba una sustitución en la misma posición."
+}
