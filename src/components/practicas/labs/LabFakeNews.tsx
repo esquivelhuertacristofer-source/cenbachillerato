@@ -1,28 +1,30 @@
-﻿﻿"use client";
+﻿"use client";
 
 /**
- * Laboratorio — Detección de fake news y verificación de información
+ * Laboratorio — Simulador de verificación: fake news y desinformación
  * Práctica experimental para CD-II-P03-A2 (Cultura Digital II).
  *
- * Interactividad máxima. Cuatro modos: los tres de arrastrar/clasificar y, al
- * final, uno que se escribe («Completa el texto», verbatim de la progresión):
- *  1. «¿Alerta o verificación?» — clasifica nueve indicios entre señal de alerta
- *     de desinformación y práctica de verificación confiable.
- *  2. «Las técnicas de verificación» — empareja cada técnica (fact-checking,
- *     búsqueda inversa, fuente original, desconfiar de titulares) con lo que hace
- *     (descripción verbatim de la lectura A1).
- *  3. «Escribe el término» — lee la definición verbatim (A5) y escribe
- *     de memoria el término del glosario que la nombra.
- *  + Cuestionario de comprensión (V/F verbatim de A2).
+ * El alumno INVESTIGA, no ordena frases. «Tu feed» trae seis publicaciones
+ * ficticias (foto, cuenta, medio, fecha, compartidos). Con cinco herramientas
+ * de verificación (buscar la imagen, revisar el sitio, buscar en otros medios,
+ * leer completo, revisar fecha y autor) descubre evidencia; cada consulta
+ * cuesta 1 de los 16 «minutos» disponibles, así que hay que elegir. La
+ * evidencia va al Cuaderno; después emite un veredicto (verdadera, falsa,
+ * engañosa o sátira) y marca qué evidencia lo respalda.
  *
- * DOM puro (sin three.js): ligero, accesible (ratón, teclado y táctil mediante
- * clic-para-seleccionar / clic-para-colocar). Contenido VERBATIM de CD-II·P03.
+ * Modos: Feed (simulador) · Repaso de señales (clasificar, verbatim A1) ·
+ * Escribe el término (glosario A5) · Completa el texto (A6). La teoría
+ * (señales y técnicas verbatim de A1) vive en la pestaña «Teoría» y el
+ * cuestionario V/F de A2 en «Reto».
+ *
+ * Todos los medios, personas y dominios son FICTICIOS. Las fotos son
+ * imágenes generadas, sin texto ni marcas.
  */
 
 import { useEffect, useRef, useState } from "react";
 import type { PracticaLabProps } from "../registry";
 import { T, OK } from "./_kit";
-import { LabShell, Bloque, BotonHerramienta, Mesa } from "./_shell";
+import { LabShell, Bloque, BotonHerramienta, Mesa, Dato } from "./_shell";
 import { LabSfx } from "./lab-audio";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { EscribeTermino } from "./_mecanica-termino";
@@ -39,30 +41,51 @@ import {
   DATO_FAKE,
   type Categoria,
 } from "./fake-news-data";
-
-const NO = "#FF5E5E";
+import {
+  PUBLICACIONES,
+  HERRAMIENTAS,
+  VEREDICTOS,
+  PRESUPUESTO,
+  type Herramienta,
+  type Publicacion,
+  type Veredicto,
+} from "./fake-news-feed";
 import { useEstrellas } from "@/lib/hooks/useEstrellas";
 import { FondoTermino, VinetaTermino } from "./_vineta";
-const RETO_KEY = "cen-fake-news-reto";
 
-type Modo = "senales" | "tecnicas" | "glosario" | "texto";
+const NO = "#FF5E5E";
+const AVISO = "#FFC75A";
+const RETO_KEY = "cen-fake-news-reto";
+const RUTA_FOTOS = "/media/labs-fakenews";
+
+type Modo = "feed" | "senales" | "glosario" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
-  { id: "senales", label: "¿Alerta o verificación?", icono: "fa-flag" },
-  { id: "tecnicas", label: "Las técnicas de verificación", icono: "fa-magnifying-glass-chart" },
+  { id: "feed", label: "Tu feed", icono: "fa-magnifying-glass" },
+  { id: "senales", label: "Repaso de señales", icono: "fa-flag" },
   { id: "glosario", label: "Escribe el término", icono: "fa-keyboard" },
   { id: "texto", label: "Completa el texto", icono: "fa-pen-to-square" },
 ];
 
+interface Resultado {
+  veredicto: Veredicto;
+  correcto: boolean;
+  /** Evidencia marcada: cuántas eran clave y cuántas no. */
+  buenas: number;
+  malas: number;
+  puntos: number;
+}
+
+const clave = (p: string, h: Herramienta) => `${p}:${h}`;
+const etiquetaVeredicto = (v: Veredicto) => VEREDICTOS.find((x) => x.id === v)!.etiqueta;
+
 export function LabFakeNews({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
-  const [modo, setModo] = useState<Modo>("senales");
+  const [modo, setModo] = useState<Modo>("feed");
 
   // ── sonido ────────────────────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  // Modo «Completa el texto». El contador sirve de `key`: subirlo remonta
-  // el componente y devuelve todos los huecos en blanco.
   const [textoDone, setTextoDone] = useState(false);
   const [textoIntento, setTextoIntento] = useState(0);
   const audioRef = useRef<LabSfx | null>(null);
@@ -77,9 +100,6 @@ export function LabFakeNews({ color }: PracticaLabProps) {
       setSonido(false);
     }
   };
-  // Los tres ayudantes son el único punto por el que pasan todos los aciertos
-  // y todos los fallos del laboratorio, así que la partida se lleva aquí.
-  // `sfxOk` no cuenta: marca el fin de un modo, no una respuesta suelta.
   const sfxOk = () => sonido && audioRef.current?.correcto();
   const sfxNo = () => {
     partida.error();
@@ -89,12 +109,94 @@ export function LabFakeNews({ color }: PracticaLabProps) {
     partida.acierto();
     return sonido && audioRef.current?.blip();
   };
+  const sfxBlip = () => sonido && audioRef.current?.blip();
+
+  // ── progreso / estrellas ──────────────────────────────────────────────
+  const { mejorEstrellas: mejor, registraEstrellas } = useEstrellas(RETO_KEY);
+
+  // ── simulador: investigación ──────────────────────────────────────────
+  const [actual, setActual] = useState(PUBLICACIONES[0]!.id);
+  const [reveladas, setReveladas] = useState<Record<string, boolean>>({});
+  const [marcadas, setMarcadas] = useState<Record<string, boolean>>({});
+  const [elegido, setElegido] = useState<Record<string, Veredicto | undefined>>({});
+  const [resultados, setResultados] = useState<Record<string, Resultado>>({});
+
+  const minutosUsados = Object.keys(reveladas).length;
+  const minutosQuedan = Math.max(0, PRESUPUESTO - minutosUsados);
+  const post = PUBLICACIONES.find((p) => p.id === actual)!;
+  const resPost = resultados[post.id];
+
+  const investigar = (h: Herramienta) => {
+    const k = clave(post.id, h);
+    if (reveladas[k] || resPost) return;
+    if (minutosQuedan <= 0) return;
+    setReveladas((r) => ({ ...r, [k]: true }));
+    sfxBlip();
+  };
+  const alternarMarca = (h: Herramienta) => {
+    if (resPost) return;
+    const k = clave(post.id, h);
+    setMarcadas((m) => ({ ...m, [k]: !m[k] }));
+  };
+
+  const emitirVeredicto = () => {
+    const v = elegido[post.id];
+    if (!v || resPost) return;
+    let buenas = 0;
+    let malas = 0;
+    for (const h of HERRAMIENTAS) {
+      if (!marcadas[clave(post.id, h.id)]) continue;
+      if (post.evidencias[h.id].clave) buenas++;
+      else malas++;
+    }
+    const correcto = v === post.veredicto;
+    // 2 puntos por el veredicto; 1 si la evidencia marcada lo respalda y no hay ruido.
+    const puntos = (correcto ? 2 : 0) + (buenas > 0 && malas === 0 ? 1 : 0);
+    const todos = { ...resultados, [post.id]: { veredicto: v, correcto, buenas, malas, puntos } };
+    setResultados(todos);
+    if (correcto) sfxPlace();
+    else sfxNo();
+    const hechosN = Object.keys(todos).length;
+    const buenosN = Object.values(todos).filter((r) => r.correcto && r.buenas > 0).length;
+    const perfectos = Object.values(todos).filter((r) => r.puntos === 3).length;
+    // 1★ por verificar las 6; 2★ con 5 aciertos con evidencia; 3★ con las 6 perfectas.
+    if (hechosN >= PUBLICACIONES.length) {
+      registraEstrellas(perfectos >= PUBLICACIONES.length ? 3 : buenosN >= 5 ? 2 : 1);
+      sfxOk();
+    }
+  };
+
+  const reiniciarFeed = () => {
+    setReveladas({});
+    setMarcadas({});
+    setElegido({});
+    setResultados({});
+    setActual(PUBLICACIONES[0]!.id);
+    partida.reiniciar();
+  };
+
+  const verificadas = Object.keys(resultados).length;
+  const buenos = Object.values(resultados).filter((r) => r.correcto && r.buenas > 0).length;
+  const puntosTotal = Object.values(resultados).reduce((n, r) => n + r.puntos, 0);
+  const puntosMax = PUBLICACIONES.length * 3;
+  const feedHecho = verificadas >= PUBLICACIONES.length;
+  const bonoMinutos = feedHecho ? minutosQuedan : 0;
+  const fotoDesmontada = !!reveladas[clave("p1", "imagen")];
+  const estrellasFeed = !feedHecho
+    ? 0
+    : Object.values(resultados).filter((r) => r.puntos === 3).length >= PUBLICACIONES.length
+      ? 3
+      : buenos >= 5
+        ? 2
+        : 1;
+  const bestEstrellas = Math.max(estrellasFeed, mejor);
 
   // ── modo señales (clasifica alerta / fiable) ───────────────────────────
   const [ubicSenal, setUbicSenal] = useState<Record<string, Categoria>>({});
   const [selSenal, setSelSenal] = useState<string | null>(null);
   const [shakeSenal, setShakeSenal] = useState<Categoria | null>(null);
   const senalesLibres = SENALES.filter((s) => !ubicSenal[s.id]).slice().sort((a, b) => a.texto.localeCompare(b.texto, "es"));
+  const senalesDone = Object.keys(ubicSenal).length >= SENALES.length;
 
   const intentarSenal = (senalId: string, bin: Categoria) => {
     if (ubicSenal[senalId]) return;
@@ -103,10 +205,7 @@ export function LabFakeNews({ color }: PracticaLabProps) {
       setUbicSenal((e) => ({ ...e, [senalId]: bin }));
       setSelSenal(null);
       sfxPlace();
-      if (Object.keys(ubicSenal).length + 1 >= SENALES.length) {
-        sfxOk();
-        persistMejor(true, tecnicasDone, glosarioDone);
-      }
+      if (Object.keys(ubicSenal).length + 1 >= SENALES.length) sfxOk();
     } else {
       setShakeSenal(bin);
       sfxNo();
@@ -118,67 +217,46 @@ export function LabFakeNews({ color }: PracticaLabProps) {
     setSelSenal(null);
   };
 
-  // ── modo técnicas (empareja técnica → función) ─────────────────────────
-  const [empTec, setEmpTec] = useState<Record<string, boolean>>({});
-  const [selTec, setSelTec] = useState<string | null>(null);
-  const [shakeTec, setShakeTec] = useState<string | null>(null);
-  const tecLibres = TECNICAS.filter((t) => !empTec[t.id]).slice().sort((a, b) => a.tecnica.localeCompare(b.tecnica, "es"));
-
-  const intentarTec = (chipId: string, rowId: string) => {
-    if (empTec[rowId]) return;
-    if (chipId === rowId) {
-      setEmpTec((e) => ({ ...e, [rowId]: true }));
-      setSelTec(null);
-      sfxPlace();
-      if (Object.keys(empTec).length + 1 >= TECNICAS.length) {
-        sfxOk();
-        persistMejor(senalesDone, true, glosarioDone);
-      }
-    } else {
-      setShakeTec(rowId);
-      sfxNo();
-      window.setTimeout(() => setShakeTec(null), 420);
-    }
-  };
-  const resetTecnicas = () => {
-    setEmpTec({});
-    setSelTec(null);
-  };
-
-  // ── modo glosario (lee la definición y ESCRIBE el término) ─────────────
-  // El contador hace de `key`: subirlo remonta el componente y deja todas
-  // las tarjetas en blanco.
+  // ── modo glosario / texto ──────────────────────────────────────────────
   const [glosarioDone, setGlosarioDone] = useState(false);
   const [glosIntento, setGlosIntento] = useState(0);
   const resetGlosario = () => {
     setGlosarioDone(false);
     setGlosIntento((n) => n + 1);
   };
+  const resetTexto = () => {
+    setTextoDone(false);
+    setTextoIntento((n) => n + 1);
+  };
 
   const [quizAprobado, setQuizAprobado] = useState(false);
 
-  // ── progreso / estrellas ──────────────────────────────────────────────
-  const senalesDone = Object.keys(ubicSenal).length >= SENALES.length;
-  const tecnicasDone = Object.keys(empTec).length >= TECNICAS.length;
-  const modosHechos = (senalesDone ? 1 : 0) + (tecnicasDone ? 1 : 0) + (glosarioDone ? 1 : 0) + (textoDone ? 1 : 0);
-  // Terminar los 3 modos vale 2★; la tercera se gana con precisión.
-  const estrellas = partida.estrellasCon(modosHechos, 4);
-
-  const { mejorEstrellas: mejor, registraEstrellas } = useEstrellas(RETO_KEY);
-  const bestEstrellas = Math.max(estrellas, mejor);
-
-  const persistMejor = (a: boolean, b: boolean, c: boolean) => {
-    const est = (a ? 1 : 0) + (b ? 1 : 0) + (c ? 1 : 0);
-    registraEstrellas(est);
-  };
-
   const objetivos = [
-    { txt: "Clasifica los 9 indicios (alerta / verificación)", done: senalesDone },
-    { txt: "Empareja las 4 técnicas con su función", done: tecnicasDone },
-    { txt: "Escribe los 5 términos del glosario", done: glosarioDone },
-    { txt: "Consigue 3★ (una por cada modo)", done: bestEstrellas >= 3 },
-    { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
+    { txt: "Desmonta la foto reciclada con búsqueda inversa", done: fotoDesmontada },
+    { txt: "Verifica las 6 publicaciones del feed", done: feedHecho },
+    { txt: "Acierta 5 de 6 con evidencia que lo respalde", done: buenos >= 5 },
+    { txt: "Escribe los términos del glosario sin ayuda", done: glosarioDone },
+    { txt: "Resuelve el reto de comprensión", done: quizAprobado },
   ];
+
+  const resetActual =
+    modo === "feed" ? reiniciarFeed : modo === "texto" ? resetTexto : modo === "senales" ? resetSenales : resetGlosario;
+
+  const lectura =
+    modo === "feed" ? (
+      <>Minutos: {minutosQuedan}/{PRESUPUESTO} · Verificadas: {verificadas}/{PUBLICACIONES.length}</>
+    ) : modo === "senales" ? (
+      <>Indicios clasificados: {Object.keys(ubicSenal).length}/{SENALES.length}</>
+    ) : (
+      <>Repaso de los términos de la verificación</>
+    );
+
+  const instruccion = (txt: string, n?: string, ok?: boolean) => (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", fontSize: 15, fontWeight: 800, color: T.text }}>
+      <span>{txt}</span>
+      {n && <span style={{ fontSize: 15, fontWeight: 900, color: ok ? OK : T.text3 }}>{n}</span>}
+    </div>
+  );
 
   // arrastre nativo
   const dragProps = (id: string) => ({
@@ -230,25 +308,7 @@ export function LabFakeNews({ color }: PracticaLabProps) {
     },
   });
 
-  const resetTexto = () => {
-    setTextoDone(false);
-    setTextoIntento((n) => n + 1);
-  };
-  const resetActual = modo === "texto" ? resetTexto : modo === "senales" ? resetSenales : modo === "tecnicas" ? resetTecnicas : resetGlosario;
-
-
-  const hechos = Object.keys(ubicSenal).length;
-  const lectura =
-    modo === "senales" ? <>Indicios clasificados: {hechos}/{SENALES.length}</>
-    : modo === "tecnicas" ? <>Técnicas emparejadas: {Object.keys(empTec).length}/{TECNICAS.length}</>
-    : <>Modos completos: {modosHechos}/4</>;
-
-  const instruccion = (txt: string, n?: string, ok?: boolean) => (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", fontSize: 15, fontWeight: 800, color: T.text }}>
-      <span>{txt}</span>
-      {n && <span style={{ fontSize: 15, fontWeight: 900, color: ok ? OK : T.text3 }}>{n}</span>}
-    </div>
-  );
+  const cuadernoPost = (p: Publicacion) => HERRAMIENTAS.filter((h) => reveladas[clave(p.id, h.id)]);
 
   return (
     <LabShell
@@ -273,6 +333,167 @@ export function LabFakeNews({ color }: PracticaLabProps) {
         <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
           <style>{css(accent, color.rgba)}</style>
 
+          {modo === "feed" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
+              <div className="fn-presu" data-bajo={minutosQuedan <= 3}>
+                <span><i className="fa-solid fa-hourglass-half" /> Minutos de investigación</span>
+                <strong>{minutosQuedan} / {PRESUPUESTO}</strong>
+                <div className="fn-barra"><div style={{ width: `${(minutosQuedan / PRESUPUESTO) * 100}%` }} /></div>
+              </div>
+
+              <div className="fn-feed" role="tablist" aria-label="Tu feed">
+                {PUBLICACIONES.map((p, i) => {
+                  const r = resultados[p.id];
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={p.id === actual}
+                      className="fn-mini"
+                      data-sel={p.id === actual}
+                      onClick={() => setActual(p.id)}
+                    >
+                      <img src={`${RUTA_FOTOS}/${p.foto}.webp`} alt="" loading="lazy" />
+                      <span className="fn-mini-n">{i + 1}</span>
+                      {r && (
+                        <span className="fn-mini-ok" style={{ background: r.correcto ? OK : NO }}>
+                          <i className={`fa-solid ${r.correcto ? "fa-check" : "fa-xmark"}`} />
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <TarjetaPost post={post} />
+
+              <div>
+                {instruccion("Investiga antes de opinar", `${cuadernoPost(post).length}/${HERRAMIENTAS.length} pistas`)}
+                <div className="fn-tools">
+                  {HERRAMIENTAS.map((h) => {
+                    const hecha = !!reveladas[clave(post.id, h.id)];
+                    const sinMinutos = !hecha && minutosQuedan <= 0;
+                    return (
+                      <button
+                        key={h.id}
+                        type="button"
+                        className="fn-tool"
+                        data-hecha={hecha}
+                        disabled={!!resPost || sinMinutos}
+                        onClick={() => investigar(h.id)}
+                      >
+                        <i className={`fa-solid ${hecha ? "fa-check" : h.icono}`} />
+                        <span>{h.etiqueta}</span>
+                        <em>{hecha ? "revisado" : "1 min"}</em>
+                      </button>
+                    );
+                  })}
+                </div>
+                {minutosQuedan <= 0 && !resPost && (
+                  <div className="fn-nota" style={{ color: AVISO }}>
+                    Se acabaron los minutos: decide con la evidencia que reuniste.
+                  </div>
+                )}
+              </div>
+
+              {cuadernoPost(post).length > 0 && (
+                <div className="fn-evid">
+                  <div style={{ fontSize: 15, fontWeight: 800, color: T.text }}>
+                    <i className="fa-solid fa-book-open" style={{ color: accent, marginRight: 8 }} />
+                    Evidencia de esta publicación
+                  </div>
+                  {!resPost && <div className="fn-nota">Marca la evidencia que respalda tu veredicto.</div>}
+                  {cuadernoPost(post).map((h) => {
+                    const ev = post.evidencias[h.id];
+                    const k = clave(post.id, h.id);
+                    const on = !!marcadas[k];
+                    const estado = resPost ? (ev.clave ? "clave" : on ? "ruido" : "") : "";
+                    return (
+                      <label key={h.id} className="fn-ev" data-on={on} data-estado={estado}>
+                        <input type="checkbox" checked={on} disabled={!!resPost} onChange={() => alternarMarca(h.id)} />
+                        <span className="fn-ev-cuerpo">
+                          <strong><i className={`fa-solid ${h.icono}`} /> {h.etiqueta}</strong>
+                          <span>{ev.texto}</span>
+                          {resPost && ev.clave && <em style={{ color: OK }}>Evidencia clave</em>}
+                          {resPost && !ev.clave && on && <em style={{ color: NO }}>No prueba el veredicto</em>}
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
+
+              <div className="fn-veredicto">
+                {instruccion("Tu veredicto", resPost ? "emitido" : undefined, !!resPost)}
+                <div className="fn-vgrid">
+                  {VEREDICTOS.map((v) => {
+                    const sel = (resPost?.veredicto ?? elegido[post.id]) === v.id;
+                    const esReal = !!resPost && v.id === post.veredicto;
+                    return (
+                      <button
+                        key={v.id}
+                        type="button"
+                        className="fn-vbtn"
+                        data-sel={sel}
+                        data-real={esReal}
+                        disabled={!!resPost}
+                        onClick={() => setElegido((e) => ({ ...e, [post.id]: v.id }))}
+                      >
+                        <i className={`fa-solid ${v.icono}`} />
+                        <span>{v.etiqueta}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                {!resPost && (
+                  <button
+                    type="button"
+                    className="fn-btn"
+                    style={{ background: accent, color: "#04121f", border: "none", marginTop: 10, opacity: elegido[post.id] ? 1 : 0.5 }}
+                    disabled={!elegido[post.id]}
+                    onClick={emitirVeredicto}
+                  >
+                    <i className="fa-solid fa-gavel" /> Emitir veredicto
+                  </button>
+                )}
+                {resPost && (
+                  <div className="fn-retro" data-ok={resPost.correcto}>
+                    <strong>
+                      <i className={`fa-solid ${resPost.correcto ? "fa-circle-check" : "fa-circle-xmark"}`} />{" "}
+                      {resPost.correcto ? "Veredicto correcto" : `Era: ${etiquetaVeredicto(post.veredicto)}`} · {resPost.puntos}/3 puntos
+                    </strong>
+                    <span>{post.decisiva}</span>
+                    {resPost.correcto && resPost.buenas === 0 && <span style={{ color: AVISO }}>Acertaste, pero sin marcar evidencia que lo pruebe: un veredicto sin pruebas es una corazonada.</span>}
+                    {resPost.malas > 0 && <span style={{ color: AVISO }}>Marcaste {resPost.malas} evidencia{resPost.malas > 1 ? "s" : ""} que no prueba{resPost.malas > 1 ? "n" : ""} el veredicto.</span>}
+                    {!feedHecho && (
+                      <button
+                        type="button"
+                        className="fn-btn"
+                        onClick={() => {
+                          const sig = PUBLICACIONES.find((p) => !resultados[p.id]);
+                          if (sig) setActual(sig.id);
+                        }}
+                      >
+                        <i className="fa-solid fa-arrow-right" /> Siguiente publicación
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {feedHecho && (
+                <div className="fn-retro" data-ok={buenos >= 5}>
+                  <strong>
+                    <i className="fa-solid fa-flag-checkered" /> Feed verificado: {puntosTotal}/{puntosMax} puntos
+                    {bonoMinutos > 0 ? ` + ${bonoMinutos} por minutos que sobraron` : ""}
+                  </strong>
+                  <span>{buenos >= 5 ? "Verificas con pruebas antes de compartir." : "Repasa qué herramienta daba la evidencia decisiva en cada caso y vuelve a intentarlo."}</span>
+                </div>
+              )}
+            </div>
+          )}
+
           {modo === "texto" && (
             <CompletaTexto
               key={textoIntento}
@@ -292,7 +513,7 @@ export function LabFakeNews({ color }: PracticaLabProps) {
           {modo === "senales" && (
             <Mesa>
               <div>
-              {instruccion("Arrastra cada indicio a su categoría", `${hechos}/${SENALES.length}`, senalesDone)}
+              {instruccion("Arrastra cada indicio a su categoría", `${Object.keys(ubicSenal).length}/${SENALES.length}`, senalesDone)}
               {senalesLibres.length === 0 ? (
                 <div style={{ fontSize: 15, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
                   <i className="fa-solid fa-circle-check" /> ¡Clasificaste los {SENALES.length} indicios!
@@ -311,29 +532,6 @@ export function LabFakeNews({ color }: PracticaLabProps) {
             </Mesa>
           )}
 
-          {modo === "tecnicas" && (
-            <Mesa>
-              <div>
-              {instruccion("Arrastra cada técnica a lo que hace", `${Object.keys(empTec).length}/${TECNICAS.length}`, tecnicasDone)}
-              {tecLibres.length === 0 ? (
-                <div style={{ fontSize: 15, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                  <i className="fa-solid fa-circle-check" /> ¡Emparejaste las 4 técnicas!
-                </div>
-              ) : (
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                  {tecLibres.map((t) => (
-                    <button key={t.id} className="fn-chip" data-sel={selTec === t.id} onClick={() => setSelTec((v) => (v === t.id ? null : t.id))} {...dragProps(t.id)}>
-                      <i className="fa-solid fa-shield-halved" style={{ fontSize: 14, color: T.text3 }} />
-                      {t.tecnica}
-                    </button>
-                  ))}
-                </div>
-              )}
-              </div>
-              <RowsTecnicas selTec={selTec} shakeTec={shakeTec} empTec={empTec} onMatch={intentarTec} dropProps={dropProps} />
-            </Mesa>
-          )}
-
           {modo === "glosario" && (
             <EscribeTermino
               key={glosIntento}
@@ -345,7 +543,6 @@ export function LabFakeNews({ color }: PracticaLabProps) {
               onCompletado={() => {
                 setGlosarioDone(true);
                 sfxOk();
-                persistMejor(senalesDone, tecnicasDone, true);
               }}
               onAcierto={sfxPlace}
               onError={sfxNo}
@@ -355,13 +552,18 @@ export function LabFakeNews({ color }: PracticaLabProps) {
       }
       pestanas={[
         {
-          id: "pistas",
-          etiqueta: "Pistas",
-          icono: "fa-lightbulb",
+          id: "cuaderno",
+          etiqueta: "Cuaderno",
+          icono: "fa-book-open",
           contenido: (
             <>
               <Bloque titulo="Tu partida" icono="fa-star">
                 <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 8 }}>
+                  <Dato label="Minutos" value={`${minutosQuedan}/${PRESUPUESTO}`} col={minutosQuedan <= 3 ? AVISO : undefined} />
+                  <Dato label="Puntos" value={`${puntosTotal}/${puntosMax}`} col={feedHecho ? OK : undefined} />
+                  <Dato label="Con pruebas" value={`${buenos}/${PUBLICACIONES.length}`} />
+                </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
                   <div style={{ display: "flex", gap: 4 }}>
                     {[1, 2, 3].map((s) => (
@@ -369,20 +571,30 @@ export function LabFakeNews({ color }: PracticaLabProps) {
                     ))}
                   </div>
                   <span style={{ fontSize: 14, color: T.text2, lineHeight: 1.45, flex: "1 1 160px" }}>
-                    {bestEstrellas >= 3 ? "¡Verificas antes de compartir como un experto!" : "Termina los tres modos para ganar 2★; la tercera pide 2 errores o menos."}
+                    1★ verificar las 6 · 2★ acertar 5 con evidencia · 3★ las 6 con evidencia y sin ruido.
                   </span>
                 </div>
               </Bloque>
-              <Bloque titulo="Pista de este modo" icono="fa-lightbulb">
+              {PUBLICACIONES.map((p, i) => {
+                const hechas = cuadernoPost(p);
+                const r = resultados[p.id];
+                return (
+                  <Bloque key={p.id} titulo={`${i + 1}. ${p.medio}${r ? ` · ${etiquetaVeredicto(r.veredicto)}` : ""}`} icono={r ? (r.correcto ? "fa-circle-check" : "fa-circle-xmark") : "fa-folder-open"}>
+                    {hechas.length === 0 ? (
+                      <p style={{ margin: 0, color: T.text3 }}>Sin evidencia todavía. Usa las herramientas en «Tu feed».</p>
+                    ) : (
+                      hechas.map((h) => (
+                        <p key={h.id} style={{ margin: 0, color: T.text2 }}>
+                          <strong style={{ color: T.text }}>{h.etiqueta}.</strong> {p.evidencias[h.id].texto}
+                        </p>
+                      ))
+                    )}
+                  </Bloque>
+                );
+              })}
+              <Bloque titulo="Repasos" icono="fa-list-check">
                 <p style={{ margin: 0, color: T.text2 }}>
-                  {modo === "senales" && (
-                    <>Una <strong style={{ color: T.text }}>señal de alerta</strong> invita a desconfiar y verificar; una <strong style={{ color: T.text }}>práctica de verificación</strong> somete la información a comprobación antes de creerla o compartirla.</>
-                  )}
-                  {modo === "tecnicas" && (
-                    <>Antes de compartir, pregúntate: ¿lo verificó un <strong style={{ color: T.text }}>fact-checker</strong>?, ¿la <strong style={{ color: T.text }}>imagen</strong> es real?, ¿hay una <strong style={{ color: T.text }}>fuente original</strong>?, ¿el <strong style={{ color: T.text }}>titular</strong> es sensacionalista?</>
-                  )}
-                  {modo === "glosario" && <>Lee la definición y su ejemplo y escribe el término. Si te atoras, la pista te da la inicial y las letras.</>}
-                  {modo === "texto" && <>Escribe cada palabra que falta en el texto.</>}
+                  Señales: {senalesDone ? "clasificadas" : "pendiente"} · Glosario: {glosarioDone ? "completo" : "pendiente"} · Texto: {textoDone ? "completo" : "pendiente"}
                 </p>
               </Bloque>
             </>
@@ -397,9 +609,16 @@ export function LabFakeNews({ color }: PracticaLabProps) {
         {
           id: "teoria",
           etiqueta: "Teoría",
-          icono: "fa-book-open",
+          icono: "fa-book",
           contenido: (
             <>
+              <Bloque titulo="Cómo decidir un veredicto" icono="fa-gavel">
+                {VEREDICTOS.map((v) => (
+                  <p key={v.id} style={{ margin: 0, color: T.text2 }}>
+                    <strong style={{ color: T.text }}>{v.etiqueta}.</strong> {v.def}
+                  </p>
+                ))}
+              </Bloque>
               <Bloque titulo="Las dos categorías" icono="fa-flag">
                 {(Object.keys(CATEGORIA_INFO) as Categoria[]).map((c) => (
                   <p key={c} style={{ margin: 0, color: T.text2 }}>
@@ -407,10 +626,10 @@ export function LabFakeNews({ color }: PracticaLabProps) {
                   </p>
                 ))}
               </Bloque>
-              <Bloque titulo="Ejemplos de cada técnica" icono="fa-magnifying-glass-chart">
+              <Bloque titulo="Las técnicas de verificación" icono="fa-magnifying-glass-chart">
                 {TECNICAS.map((t) => (
                   <p key={t.id} style={{ margin: 0, color: T.text2 }}>
-                    <strong style={{ color: T.text }}>{t.tecnica}.</strong> {t.ejemplo}
+                    <strong style={{ color: T.text }}>{t.tecnica}.</strong> {t.funcion} <em>{t.ejemplo}</em>
                   </p>
                 ))}
               </Bloque>
@@ -425,6 +644,37 @@ export function LabFakeNews({ color }: PracticaLabProps) {
         },
       ]}
     />
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Tarjeta de publicación (estilo genérico de red social, sin marcas reales)
+ * ═══════════════════════════════════════════════════════════════════════════ */
+function TarjetaPost({ post }: { post: Publicacion }) {
+  const cadena = post.formato === "cadena";
+  return (
+    <article className="fn-post" data-formato={post.formato}>
+      <header className="fn-post-cab">
+        <span className="fn-avatar" aria-hidden>
+          <i className={`fa-solid ${cadena ? "fa-share" : "fa-user"}`} />
+        </span>
+        <span style={{ minWidth: 0, flex: 1 }}>
+          <strong className="fn-post-autor">{post.autor}</strong>
+          <span className="fn-post-meta">{post.medio} · {post.dominio}</span>
+        </span>
+        <span className="fn-post-fecha">{post.fecha}</span>
+      </header>
+      {cadena && <div className="fn-reenv"><i className="fa-solid fa-share" /> Reenviado</div>}
+      <img className="fn-post-foto" src={`${RUTA_FOTOS}/${post.foto}.webp`} alt={post.alt} />
+      <div className="fn-post-cuerpo">
+        <h3>{post.titular}</h3>
+        <p>{post.cuerpo}</p>
+      </div>
+      <footer className="fn-post-pie">
+        <span><i className="fa-solid fa-share-nodes" /> {post.compartidos}</span>
+        <span><i className="fa-regular fa-thumbs-up" /> Me gusta</span>
+      </footer>
+    </article>
   );
 }
 
@@ -467,6 +717,69 @@ const css = (accent: string, rgba: string) => `
   .fn-bin[data-done="true"], .fn-row[data-done="true"] {
     background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.2) 0%, transparent 68%); }
   @media (prefers-reduced-motion: reduce){ .fn-row[data-shake="true"], .fn-bin[data-shake="true"] { animation:none; } .fn-chip, .fn-chip:hover, .fn-chip[data-sel="true"] { transform:none; transition:none; } }
+
+  /* Simulador de verificación */
+  .fn-presu { display:grid; grid-template-columns:1fr auto; gap:4px 12px; align-items:center; padding:11px 14px; border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; font-size:14px; color:${T.text2}; font-weight:700; }
+  .fn-presu strong { color:#fff; font-size:15px; font-variant-numeric:tabular-nums; }
+  .fn-presu[data-bajo="true"] strong { color:${AVISO}; }
+  .fn-barra { grid-column:1 / -1; height:7px; border-radius:6px; background:${T.inset}; overflow:hidden; }
+  .fn-barra > div { height:100%; border-radius:6px; background:${accent}; transition:width .3s; }
+  .fn-presu[data-bajo="true"] .fn-barra > div { background:${AVISO}; }
+  .fn-feed { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:8px; }
+  @media (min-width:640px){ .fn-feed { grid-template-columns:repeat(6, minmax(0, 1fr)); } }
+  .fn-mini { position:relative; padding:0; border-radius:12px; overflow:hidden; border:2px solid ${T.line}; background:${T.inset}; cursor:pointer; aspect-ratio:16/10; transition:border-color .14s, transform .14s; }
+  .fn-mini img { width:100%; height:100%; object-fit:cover; display:block; opacity:.75; }
+  .fn-mini[data-sel="true"] { border-color:${accent}; transform:translateY(-2px); box-shadow:0 0 16px -5px ${accent}; }
+  .fn-mini[data-sel="true"] img { opacity:1; }
+  .fn-mini-n { position:absolute; left:6px; top:6px; min-width:24px; height:24px; border-radius:12px; background:rgba(2,12,28,.82); color:#fff; font-size:14px; font-weight:900; display:flex; align-items:center; justify-content:center; padding:0 6px; }
+  .fn-mini-ok { position:absolute; right:6px; bottom:6px; width:24px; height:24px; border-radius:12px; color:#04121f; font-size:14px; display:flex; align-items:center; justify-content:center; }
+  .fn-post { border-radius:16px; border:1.5px solid ${T.line}; background:${T.glass}; overflow:hidden; width:100%; min-width:0; }
+  .fn-post[data-formato="cadena"] { border-left:5px solid #25D366; }
+  .fn-post[data-formato="flash"] { border-top:4px solid #FFC75A; }
+  .fn-post-cab { display:flex; align-items:center; gap:10px; padding:12px 14px; }
+  .fn-avatar { flex-shrink:0; width:38px; height:38px; border-radius:50%; background:${T.glassSoft}; border:1.5px solid ${T.lineStrong}; display:flex; align-items:center; justify-content:center; color:${T.text2}; font-size:15px; }
+  .fn-post-autor { display:block; font-size:15px; color:#fff; overflow-wrap:anywhere; }
+  .fn-post-meta { display:block; font-size:14px; color:${T.text3}; overflow-wrap:anywhere; }
+  .fn-post-fecha { flex-shrink:0; font-size:14px; color:${T.text3}; }
+  .fn-reenv { padding:0 14px 8px; font-size:14px; color:${T.text3}; font-style:italic; }
+  .fn-post-foto { display:block; width:100%; height:auto; aspect-ratio:16/9; max-height:min(40vh, 380px); object-fit:contain; background:#000; }
+  .fn-post-cuerpo { padding:12px 14px 4px; }
+  .fn-post-cuerpo h3 { margin:0 0 6px; font-size:17px; line-height:1.3; color:#fff; font-weight:800; overflow-wrap:anywhere; }
+  .fn-post-cuerpo p { margin:0; font-size:15px; line-height:1.5; color:${T.text2}; overflow-wrap:anywhere; }
+  .fn-post-pie { display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; padding:10px 14px 12px; font-size:14px; color:${T.text3}; }
+  .fn-tools { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px; margin-top:10px; }
+  @media (min-width:640px){ .fn-tools { grid-template-columns:repeat(5, minmax(0, 1fr)); } }
+  .fn-tool { cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; min-height:78px; padding:10px 8px; border-radius:14px;
+    border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:14px; font-weight:800; text-align:center; line-height:1.25; transition:all .14s; }
+  .fn-tool i { font-size:19px; color:${accent}; }
+  .fn-tool em { font-style:normal; font-size:14px; color:${T.text3}; font-weight:700; }
+  .fn-tool:hover:not(:disabled) { border-color:${accent}; transform:translateY(-2px); }
+  .fn-tool[data-hecha="true"] { border-color:${OK}66; background:${OK}12; }
+  .fn-tool[data-hecha="true"] i { color:${OK}; }
+  .fn-tool:disabled { cursor:default; opacity:.55; }
+  .fn-nota { margin-top:8px; font-size:14px; color:${T.text3}; line-height:1.45; }
+  .fn-evid { display:flex; flex-direction:column; gap:10px; padding:14px; border-radius:14px; border:1.5px solid ${T.line}; background:${T.glass}; }
+  .fn-ev { display:flex; gap:12px; align-items:flex-start; padding:12px; border-radius:12px; border:1.5px solid ${T.line}; background:${T.inset}; cursor:pointer; }
+  .fn-ev input { width:22px; height:22px; flex-shrink:0; margin-top:2px; accent-color:${accent}; }
+  .fn-ev[data-on="true"] { border-color:${accent}; }
+  .fn-ev[data-estado="clave"] { border-color:${OK}; background:${OK}12; }
+  .fn-ev[data-estado="ruido"] { border-color:${NO}; background:${NO}10; }
+  .fn-ev-cuerpo { display:flex; flex-direction:column; gap:4px; min-width:0; font-size:14.5px; line-height:1.5; color:${T.text2}; }
+  .fn-ev-cuerpo strong { color:#fff; font-size:14.5px; }
+  .fn-ev-cuerpo em { font-style:normal; font-weight:800; font-size:14px; }
+  .fn-vgrid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px; margin-top:10px; }
+  @media (min-width:640px){ .fn-vgrid { grid-template-columns:repeat(4, minmax(0, 1fr)); } }
+  .fn-vbtn { cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; min-height:56px; padding:10px; border-radius:13px; border:1.5px solid ${T.line}; background:${T.glassSoft};
+    color:#fff; font-size:14.5px; font-weight:800; text-align:center; line-height:1.25; transition:all .14s; }
+  .fn-vbtn[data-sel="true"] { border-color:${accent}; background:rgba(${rgba},0.2); box-shadow:0 0 16px -6px ${accent}; }
+  .fn-vbtn[data-real="true"] { border-color:${OK}; background:${OK}18; }
+  .fn-vbtn:disabled { cursor:default; }
+  .fn-retro { display:flex; flex-direction:column; gap:8px; align-items:flex-start; margin-top:12px; padding:13px 15px; border-radius:13px; font-size:14.5px; line-height:1.5; color:${T.text2};
+    border:1.5px solid ${NO}66; background:${NO}10; }
+  .fn-retro[data-ok="true"] { border-color:${OK}66; background:${OK}10; }
+  .fn-retro strong { color:#fff; font-size:15px; }
+  .fn-tool:focus-visible, .fn-vbtn:focus-visible, .fn-mini:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
+  @media (prefers-reduced-motion: reduce){ .fn-tool:hover:not(:disabled), .fn-mini[data-sel="true"] { transform:none; } .fn-barra > div { transition:none; } }
 `;
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -525,54 +838,6 @@ function BinsSenales({
                   </span>
                 ))
               )}
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function RowsTecnicas({
-  selTec,
-  shakeTec,
-  empTec,
-  onMatch,
-  dropProps,
-}: {
-  selTec: string | null;
-  shakeTec: string | null;
-  empTec: Record<string, boolean>;
-  onMatch: (chipId: string, rowId: string) => void;
-  dropProps: DropFactory;
-}) {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-      {TECNICAS.map((t) => {
-        const done = empTec[t.id];
-        return (
-          <div
-            key={t.id}
-            className="fn-row"
-            data-shake={shakeTec === t.id}
-            data-done={done}
-            onClick={() => !done && selTec && onMatch(selTec, t.id)}
-            {...dropProps((id) => onMatch(id, t.id))}
-          >
-            <div className="fn-slot" data-armed={!done && !!selTec} style={done ? { borderStyle: "solid", borderColor: OK, background: `${OK}1a` } : undefined}>
-              {done ? (
-                <span style={{ animation: "fnPop .25s ease", fontSize: 14, fontWeight: 900, color: "#fff", display: "inline-flex", alignItems: "center", gap: 7 }}>
-                  <i className="fa-solid fa-shield-halved" />
-                  {t.tecnica}
-                </span>
-              ) : (
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                  <i className="fa-solid fa-arrow-left" style={{ fontSize: 14 }} /> técnica
-                </span>
-              )}
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 15, fontWeight: 700, color: done ? "#fff" : T.text2, lineHeight: 1.4 }}>{t.funcion}</div>
             </div>
           </div>
         );

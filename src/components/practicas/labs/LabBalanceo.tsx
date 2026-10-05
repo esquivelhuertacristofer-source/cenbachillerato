@@ -58,6 +58,9 @@ export function LabBalanceo({ color }: PracticaLabProps) {
   const [resolviendo, setResolviendo] = useState(false);
   const [autoRotate, setAutoRotate] = useState(false);
   const [resetNonce, setResetNonce] = useState(0);
+  const [reaccionando, setReaccionando] = useState(false);
+  const [reactNonce, setReactNonce] = useState(0);
+  const [reaccionOk, setReaccionOk] = useState(false);
 
   // reto evaluable y sonido
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
@@ -91,6 +94,7 @@ export function LabBalanceo({ color }: PracticaLabProps) {
   const elegirReaccion = (i: number) => {
     if (sonido) audioRef.current?.blip();
     setResolviendo(false);
+    setReaccionando(false);
     setIdx(i);
     setCoefR(unos(REACCIONES_BAL[i]!.reactivos.length));
     setCoefP(unos(REACCIONES_BAL[i]!.productos.length));
@@ -99,6 +103,7 @@ export function LabBalanceo({ color }: PracticaLabProps) {
 
   const reiniciar = () => {
     setResolviendo(false);
+    setReaccionando(false);
     setCoefR(unos(r.reactivos.length));
     setCoefP(unos(r.productos.length));
     bump();
@@ -106,8 +111,25 @@ export function LabBalanceo({ color }: PracticaLabProps) {
 
   const resolver = () => {
     if (bal.balanceada && bal.minima) return;
+    setReaccionando(false);
     setResolviendo(true);
   };
+
+  // «Reacciona»: los enlaces se rompen y los átomos se reacomodan en los
+  // productos; si no está balanceada, los que sobran o faltan se marcan en rojo.
+  const reaccionar = () => {
+    setResolviendo(false);
+    setReaccionando(true);
+    setReactNonce((n) => n + 1);
+    if (bal.balanceada) setReaccionOk(true);
+    if (sonido) audioRef.current?.blip();
+  };
+
+  useEffect(() => {
+    if (!reaccionando) return;
+    const id = setTimeout(() => setReaccionando(false), 5600);
+    return () => clearTimeout(id);
+  }, [reaccionando, reactNonce]);
 
   // Animación "Resolver": cada tick acerca un paso cada coeficiente a su valor
   // de la solución (método de tanteo visto en cámara lenta). setInterval dentro
@@ -135,6 +157,7 @@ export function LabBalanceo({ color }: PracticaLabProps) {
 
   const setCoefAbs = (lado: "R" | "P", i: number, valor: number) => {
     setResolviendo(false);
+    setReaccionando(false);
     const v = Math.max(COEF_MIN, Math.min(COEF_MAX, Math.round(valor)));
     if (lado === "R") setCoefR((prev) => prev.map((c, j) => (j === i ? v : c)));
     else setCoefP((prev) => prev.map((c, j) => (j === i ? v : c)));
@@ -180,6 +203,8 @@ export function LabBalanceo({ color }: PracticaLabProps) {
             accent={accent}
             autoRotate={autoRotate}
             resetNonce={resetNonce}
+            reaccionando={reaccionando}
+            reactNonce={reactNonce}
           />
         </SceneBoundary>
       }
@@ -191,6 +216,7 @@ export function LabBalanceo({ color }: PracticaLabProps) {
       herramientas={
         <>
           <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-burst" titulo="Reacciona: ver cómo se reacomodan los átomos" activo={reaccionando} onClick={reaccionar} />
           <BotonHerramienta icono={resolviendo ? "fa-spinner fa-spin" : "fa-wand-magic-sparkles"} titulo="Resolver paso a paso" activo={resolviendo} onClick={resolver} />
           <BotonHerramienta icono="fa-arrows-rotate" titulo="Girar la cámara" activo={autoRotate} onClick={() => setAutoRotate((vv) => !vv)} />
           <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar (todos a 1)" onClick={reiniciar} />
@@ -208,6 +234,7 @@ export function LabBalanceo({ color }: PracticaLabProps) {
         { txt: "Balancea la ecuación de H₂ + O₂ → H₂O", done: bal.balanceada && idx === 0 },
         { txt: "Balancea la combustión CH₄ + O₂ → CO₂ + H₂O", done: bal.balanceada && idx === 1 },
         { txt: "Balancea la herrumbre Fe + O₂ → Fe₂O₃", done: bal.balanceada && idx === 2 },
+        { txt: "Haz reaccionar una ecuación balanceada", done: reaccionOk },
         { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
       ]}
       pestanas={[
@@ -234,6 +261,12 @@ export function LabBalanceo({ color }: PracticaLabProps) {
                     background: bloqueada ? "rgba(255,255,255,0.06)" : accent, color: bloqueada ? T.text3 : "#04121f" }}>
                   <i className={`fa-solid ${resolviendo ? "fa-spinner fa-spin" : "fa-wand-magic-sparkles"}`} aria-hidden />
                   {bloqueada ? "Ya está balanceada" : resolviendo ? "Balanceando…" : "Resolver paso a paso"}
+                </button>
+                <button type="button" onClick={reaccionar}
+                  style={{ cursor: "pointer", padding: "12px 14px", borderRadius: 12, border: `1px solid ${estadoCol}`, fontSize: 15, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                    background: `${estadoCol}1f`, color: "#fff" }}>
+                  <i className="fa-solid fa-burst" aria-hidden />
+                  {reaccionando ? "Reaccionando…" : "Reacciona"}
                 </button>
               </Bloque>
 

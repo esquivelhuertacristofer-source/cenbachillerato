@@ -28,7 +28,7 @@ import {
   resolver, escenario, ESCENARIOS,
   M_MIN, M_MAX, F_MIN, F_MAX, TH_MIN, TH_MAX, MU_MIN, MU_MAX,
   M_DEF, F_DEF, TH_DEF, M1_DEF, M2_DEF, MUS_DEF, MUK_DEF,
-  PASOS, IDEAS, DATOS, REFLEXION, fmt0, fmt1, fmt2,
+  PASOS, IDEAS, DATOS, REFLEXION, fmt0, fmt1, fmt2, anguloCritico,
   type Modo,
 } from "./newton-data";
 
@@ -68,6 +68,10 @@ export function LabNewton({ color }: PracticaLabProps) {
   const [resetNonce, setResetNonce] = useState(0);
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
   const [sonido, setSonido] = useState(false);
+  const [componentes, setComponentes] = useState(false);
+  // Experimento clave: ¿el alumno cruzó el umbral (quieta ↔ desliza) con θ a ±1° de arctan μs?
+  const [umbralHallado, setUmbralHallado] = useState(false);
+  const [prevEstado, setPrevEstado] = useState<{ modo: Modo; mueve: boolean } | null>(null);
   const audioRef = useRef<LabSfx | null>(null);
 
   const toggleSonido = useCallback(async () => {
@@ -145,6 +149,15 @@ export function LabNewton({ color }: PracticaLabProps) {
 
   const info = escenario(modo);
   const d = resolver(modo, { m, F, theta, m1, m2, muS, muK });
+  const thetaC = anguloCritico(muS);
+
+  // Ajuste durante el render (patrón de React): detecta el cambio quieta ↔ desliza.
+  if (!prevEstado || prevEstado.modo !== modo || prevEstado.mueve !== d.mueve) {
+    setPrevEstado({ modo, mueve: d.mueve });
+    if (prevEstado && prevEstado.modo === modo && modo === "inclinado" && Math.abs(theta - thetaC) <= 1) {
+      setUmbralHallado(true);
+    }
+  }
 
   // lectura en vivo según el estado del DCL
   let lectura: string;
@@ -180,7 +193,7 @@ export function LabNewton({ color }: PracticaLabProps) {
       retoKey={RETO_KEY}
       escena={
         <SceneBoundary fallback={sceneFallback}>
-          <NewtonScene modo={modo} m={m} F={F} theta={theta} m1={m1} m2={m2} muS={muS} muK={muK} accent={accent} resetNonce={resetNonce} />
+          <NewtonScene componentes={componentes} modo={modo} m={m} F={F} theta={theta} m1={m1} m2={m2} muS={muS} muK={muK} accent={accent} resetNonce={resetNonce} />
         </SceneBoundary>
       }
       modos={{
@@ -192,6 +205,9 @@ export function LabNewton({ color }: PracticaLabProps) {
         <>
           <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
           <BotonHerramienta icono={playing ? "fa-pause" : "fa-play"} titulo={playing ? "Pausar" : "Barrer la variable del escenario"} activo={playing} onClick={() => setPlaying((p) => !p)} />
+          {modo === "inclinado" && (
+            <BotonHerramienta icono="fa-code-branch" titulo={componentes ? "Ocultar componentes del peso" : "Ver componentes del peso"} activo={componentes} onClick={() => setComponentes((c) => !c)} />
+          )}
           <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reset} />
         </>
       }
@@ -203,10 +219,12 @@ export function LabNewton({ color }: PracticaLabProps) {
           {modo === "horizontal" && <LegItem col={C_APLI} txt="aplicada F" />}
           {modo === "polea" && <LegItem col={C_TENS} txt="tensión T" />}
           <LegItem col={C_NETO} txt="neta ΣF" />
+          <MedidorUmbral d={d} modo={modo} compacto />
         </>
       }
       lectura={lecturaCorta}
       objetivos={[
+        { txt: "Encuentra el ángulo exacto en que la caja empieza a deslizar", done: umbralHallado },
         { txt: "Analiza el plano inclinado: el peso se reparte en dos componentes", done: modo === "inclinado" },
         { txt: "Pasa al plano horizontal y al sistema de polea", done: modo === "horizontal" || modo === "polea" },
         { txt: "Consigue el equilibrio: ΣF = 0 y el cuerpo no acelera", done: !d.mueve },
@@ -243,6 +261,18 @@ export function LabNewton({ color }: PracticaLabProps) {
                 <Deslizador label="fricción cinética μk (≤ μs)" icon="fa-shoe-prints" colr="#fdba74" valor={fmt2(muK)} min={MU_MIN} max={MU_MAX} step={0.01} value={muK} onChange={(v) => { setPlaying(false); setMuKSafe(v); }} />
               </Bloque>
 
+              <Bloque titulo="El umbral: ¿se sostiene o desliza?" icono="fa-scale-unbalanced">
+                <MedidorUmbral d={d} modo={modo} />
+                {modo === "inclinado" && (
+                  <p style={{ margin: 0, color: T.text2 }}>
+                    Sube θ poco a poco y mira cuándo la barra del empuje alcanza a la de la fricción: ahí tan θ = μs.
+                    {umbralHallado
+                      ? <> ¡Lo encontraste! Con μs = {fmt2(muS)} el ángulo crítico es θc = arctan({fmt2(muS)}) = <strong style={{ color: "#fff" }}>{fmt1(thetaC)}°</strong>.</>
+                      : <> Ahora θ = {fmt0(theta)}°.</>}
+                  </p>
+                )}
+              </Bloque>
+
               <Bloque titulo="Las fuerzas ahora" icono="fa-vector-square">
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
                   <Dato label="peso W" value={`${fmt1(d.W)} N`} col={C_PESO} />
@@ -253,6 +283,8 @@ export function LabNewton({ color }: PracticaLabProps) {
                     : modo === "horizontal"
                       ? <Dato label="aplicada F" value={`${fmt1(F)} N`} col={C_APLI} />
                       : <Dato label="mg·senθ" value={`${fmt1(d.Wpar ?? 0)} N`} col={C_APLI} />}
+                  {modo === "inclinado" && <Dato label="mg·cosθ" value={`${fmt1(d.Wperp ?? 0)} N`} col={C_NORM} />}
+                  {modo === "inclinado" && <Dato label="masa m" value={`${fmt1(m)} kg`} col="#38bdf8" />}
                   <Dato label="neta ΣF" value={`${fmt1(d.neto)} N`} col={C_NETO} />
                   <Dato label="aceleración a" value={`${fmt2(d.a)} m/s²`} col={d.mueve ? C_NETO : C_NORM} />
                 </div>
@@ -328,6 +360,32 @@ export function LabNewton({ color }: PracticaLabProps) {
         },
       ]}
     />
+  );
+}
+
+/* ── Medidor del umbral: lo que empuja vs lo máximo que la estática aguanta ─── */
+function MedidorUmbral({ d, modo, compacto = false }: { d: ReturnType<typeof resolver>; modo: Modo; compacto?: boolean }) {
+  const etiquetaEmpuje = modo === "horizontal" ? "F aplicada" : modo === "inclinado" ? "mg·senθ" : "m₂·g";
+  const tope = Math.max(d.aplicada, d.fsMax, 1) * 1.1;
+  const col = d.mueve ? C_NETO : C_NORM;
+  const barra = (txt: string, val: number, c: string) => (
+    <div style={{ display: "grid", gap: 3 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: compacto ? 12 : 13.5, fontWeight: 800, color: "#dce6f5" }}>
+        <span>{txt}</span><span style={{ fontFamily: "ui-monospace, monospace" }}>{fmt1(val)} N</span>
+      </div>
+      <div style={{ height: compacto ? 8 : 12, borderRadius: 6, background: "rgba(255,255,255,0.1)", overflow: "hidden" }}>
+        <div style={{ width: `${Math.min(100, (val / tope) * 100)}%`, height: "100%", background: c, transition: "width 120ms linear, background 120ms linear" }} />
+      </div>
+    </div>
+  );
+  return (
+    <div style={{ display: "grid", gap: compacto ? 6 : 10, width: compacto ? 176 : undefined, marginTop: compacto ? 4 : 0 }}>
+      {barra(etiquetaEmpuje, d.aplicada, d.mueve ? C_NETO : C_APLI)}
+      {barra("f_s,máx = μs·N", d.fsMax, C_FRIC)}
+      <div style={{ fontSize: compacto ? 12 : 13.5, fontWeight: 900, color: col }}>
+        {d.mueve ? "Empuje > f_s,máx: DESLIZA" : "Empuje ≤ f_s,máx: se sostiene"}
+      </div>
+    </div>
   );
 }
 

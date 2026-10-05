@@ -221,3 +221,7 @@ const ES = (n: number, dec: number) =>
 export const fmt0 = (n: number): string => ES(n, 0);
 export const fmt1 = (n: number): string => ES(n, 1);
 export const fmt2 = (n: number): string => ES(n, 2);
+
+/* ── Helpers del umbral (solo se AÑADEN; la física de arriba no cambia) ────── */
+/** Ángulo crítico (°) donde la estática deja de sostener: tanθ = μs. */
+export const anguloCritico = (muS: number): number => (Math.atan(muS) * 180) / Math.PI;

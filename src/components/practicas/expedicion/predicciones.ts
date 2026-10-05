@@ -74,29 +74,29 @@ export const PREDICCIONES: Record<string, Prediccion> = {
     comoComprobarlo: "En «Monohíbrido», pon un progenitor en Aa y el otro en aa (o usa la retrocruza). Lee P(aa).",
   },
   "deteccion-fake-news": {
-    escena: "Te llega por WhatsApp un titular alarmante, con foto y miles de reenvíos.",
-    pregunta: "Antes de compartirlo, ¿cuál es la señal de alerta de que puede ser falso?",
+    escena: "Una foto de una calle inundada se viraliza como «hoy en tu ciudad».",
+    pregunta: "¿Qué herramienta revela más rápido si la foto es engañosa?",
     opciones: [
-      { id: "a", texto: "Que lo hayan reenviado miles de personas", icono: "fa-share-nodes" },
-      { id: "b", texto: "Que ningún medio serio lo publique", icono: "fa-newspaper" },
-      { id: "c", texto: "Que traiga una foto que parece real", icono: "fa-image" },
+      { id: "a", texto: "Ver cuántas veces se compartió", icono: "fa-share-nodes" },
+      { id: "b", texto: "Buscar la imagen (búsqueda inversa)", icono: "fa-magnifying-glass" },
+      { id: "c", texto: "Contar los seguidores de la cuenta", icono: "fa-users" },
     ],
     correcta: "b",
     porque:
-      "Un titular impactante que no aparece en ningún medio serio probablemente es falso. Que se difunda mucho no lo vuelve cierto, y una foto puede ser real pero de otro contexto: por eso se verifica con búsqueda inversa y verificadores.",
-    comoComprobarlo: "En «¿Alerta o verificación?», clasifica los indicios y fíjate dónde caen el titular sensacionalista y lo difundido masivamente.",
+      "La búsqueda inversa muestra dónde y cuándo apareció antes la misma foto. Si es de otro año o de otro lugar, es material real fuera de contexto. Compartidos y seguidores no prueban si una imagen es auténtica ni actual.",
+    comoComprobarlo: "En «Tu feed», abre la publicación 1 y pulsa «Buscar la imagen». Compara con lo que dicen las otras herramientas.",
   },
   "politicas-publicas": {
-    escena: "Un problema social ya entró en la agenda del gobierno y se quiere atender.",
-    pregunta: "En el ciclo de una política pública, ¿qué etapa va justo después de identificar el problema?",
+    escena: "San Isidro del Valle tiene 28 % de abandono escolar y 10 millones (simulados) de presupuesto.",
+    pregunta: "Si gastas casi todo en lo más popular, pantallas y beca para todos, ¿qué pasa con el abandono?",
     opciones: [
-      { id: "a", texto: "Implementar el programa cuanto antes", icono: "fa-person-digging" },
-      { id: "b", texto: "Diseñar y comparar alternativas", icono: "fa-scale-balanced" },
-      { id: "c", texto: "Evaluar si funcionó", icono: "fa-chart-line" },
+      { id: "a", texto: "Baja mucho, más de 10 puntos", icono: "fa-arrow-trend-down" },
+      { id: "b", texto: "Casi no baja, aunque la gente aplaude", icono: "fa-hand-holding-heart" },
+      { id: "c", texto: "Sube porque se acaba el dinero", icono: "fa-arrow-trend-up" },
     ],
     correcta: "b",
     porque:
-      "Antes de actuar hay que imaginar y comparar caminos. El orden es: identificación, diseño de alternativas, adopción, implementación y evaluación. Saltarse el diseño lleva a ejecutar decisiones sin sustento.",
-    comoComprobarlo: "En el modo «Ciclo», arrastra al hueco activo la etapa que crees que sigue y mira si el tablero la acepta.",
+      "Lo popular no ataca las causas de raíz (transporte y falta de seguimiento). Sube la satisfacción, pero el abandono baja apenas unos puntos y la equidad cae.",
+    comoComprobarlo: "En «Diseñar» elige Pantallas y Beca igual para todos; en «Evaluar» compara con un diseño que ataque las causas de raíz.",
   },
 };

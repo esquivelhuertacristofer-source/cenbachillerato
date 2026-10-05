@@ -16,7 +16,7 @@
  * Toda la genética es de conteo cerrado (probabilidad de cada casilla).
  */
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, SceneBoundary } from "./_kit";
@@ -31,6 +31,7 @@ import {
   CASOS_MONO, CASOS_DI, CASOS_LIG,
   PROBLEMA, INSTRUCCIONES, PREGUNTAS, IDEAS, DATOS, GLOSARIO,
   EJEMPLO_A2, EJEMPLO_LIG, fmtPct, RETO_A2,
+  categoriasMono, categoriasDi, categoriasLig, muestrear, type MuestraCruce,
 } from "./genetica-mendel-data";
 
 /** Clave de la mejor marca de este laboratorio. */
@@ -113,7 +114,14 @@ export function LabGeneticaMendel({ color }: PracticaLabProps) {
     };
   }, []);
 
-  const bump = () => setResetNonce((n) => n + 1);
+  // experimento: cruzar (animación) y sembrar descendencia
+  const [cruzarNonce, setCruzarNonce] = useState(0);
+  const [nSiembra, setNSiembra] = useState<20 | 50 | 100>(100);
+  const [siembra, setSiembra] = useState<{ firma: string; n: number; id: number } | null>(null);
+  const [siembras, setSiembras] = useState(0);
+  const [genero100, setGenero100] = useState(false);
+
+  const bump = () => { setResetNonce((n) => n + 1); setCruzarNonce(0); };
   const resetModo = () => {
     if (modo === "monohibrido") { setMonoP1("Aa"); setMonoP2("Aa"); setHerencia("completa"); }
     else if (modo === "dihibrido") { setDiA1("Aa"); setDiB1("Bb"); setDiA2("Aa"); setDiB2("Bb"); }
@@ -128,6 +136,31 @@ export function LabGeneticaMendel({ color }: PracticaLabProps) {
   const lig = resolverLig(madre, padre);
 
   const ratioFeno = mono.fenotipos.map((f) => f.n).join(" : ");
+
+  // firma del cruce vigente: si cambia un genotipo, la siembra anterior ya no aplica
+  const firma = modo === "monohibrido" ? `m|${monoP1}|${monoP2}|${herencia}`
+    : modo === "dihibrido" ? `d|${diA1}${diB1}|${diA2}${diB2}`
+      : `l|${madre}|${padre}`;
+  const cats = useMemo(() => {
+    if (modo === "monohibrido") return categoriasMono(resolverMono(monoP1, monoP2, herencia));
+    if (modo === "dihibrido") return categoriasDi(resolverDi(diA1 + diB1, diA2 + diB2));
+    return categoriasLig(resolverLig(madre, padre));
+  }, [modo, monoP1, monoP2, herencia, diA1, diB1, diA2, diB2, madre, padre]);
+  const muestra: MuestraCruce | null = useMemo(() => {
+    if (!siembra || siembra.firma !== firma) return null;
+    // semilla estable por clic: misma secuencia de clics, misma siembra
+    return muestrear(cats, siembra.n, 1000 + siembra.id * 7919 + (modo === "dihibrido" ? 104729 : modo === "ligado" ? 209459 : 0), siembra.id);
+  }, [siembra, firma, cats, modo]);
+
+  const cruzar = () => { setCruzarNonce((n) => n + 1); if (sonido) audioRef.current?.blip(); };
+  const sembrar = () => {
+    const id = siembras + 1;
+    setSiembras(id);
+    setSiembra({ firma, n: nSiembra, id });
+    if (nSiembra === 100) setGenero100(true);
+    if (sonido) audioRef.current?.blip();
+  };
+  const palabra = modo === "dihibrido" ? "semillas" : modo === "ligado" ? "descendientes" : "plantas";
 
   const modoActual = MODOS.find((x) => x.id === modo)!;
   const modoCol = modoActual.col;
@@ -176,6 +209,7 @@ export function LabGeneticaMendel({ color }: PracticaLabProps) {
             diP1={diA1 + diB1} diP2={diA2 + diB2}
             madre={madre} padre={padre}
             playing={playing} accent={accent} resetNonce={resetNonce}
+            cruzarNonce={cruzarNonce} muestra={muestra}
           />
         </SceneBoundary>
       }
@@ -197,6 +231,7 @@ export function LabGeneticaMendel({ color }: PracticaLabProps) {
         { txt: "Cambia la herencia a incompleta o codominancia y mira cómo cambia el fenotipo", done: herencia !== "completa" },
         { txt: "Pasa al cruce dihíbrido y encuentra la proporción 9:3:3:1", done: modo === "dihibrido" },
         { txt: "Explora la herencia ligada al sexo (daltonismo)", done: modo === "ligado" },
+        { txt: "Genera 100 descendientes y compara lo observado con lo esperado", done: genero100 },
         { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
       ]}
       pestanas={[
@@ -253,6 +288,72 @@ export function LabGeneticaMendel({ color }: PracticaLabProps) {
                       {CASOS_LIG.map((cs) => casoBtn(cs.madre === madre && cs.padre === padre, C_LIG, cs.etq, () => { setMadre(cs.madre); setPadre(cs.padre); }))}
                     </div>
                   </>
+                )}
+              </Bloque>
+
+              <Bloque titulo="Experimento: cruza y siembra" icono="fa-flask">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  El cuadro de Punnett predice; el campo comprueba. Cruza para ver cómo los gametos llenan las casillas y siembra para ver qué sale de verdad cuando el azar decide.
+                </p>
+                <button type="button" onClick={cruzar}
+                  style={{ cursor: "pointer", fontSize: 15, fontWeight: 900, color: "#04121f", background: modoCol, border: "none", borderRadius: 10, padding: "11px 14px" }}>
+                  <i className="fa-solid fa-shuffle" style={{ marginRight: 8 }} aria-hidden />Cruzar
+                </button>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: modoCol, marginBottom: 8 }}>
+                    <i className="fa-solid fa-seedling" style={{ marginRight: 6 }} aria-hidden />Tamaño de la muestra
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0,1fr))", gap: 6 }}>
+                    {([20, 50, 100] as const).map((v) => {
+                      const on = v === nSiembra;
+                      return (
+                        <button key={v} type="button" onClick={() => setNSiembra(v)}
+                          style={{ cursor: "pointer", fontSize: 15, fontWeight: 900, fontFamily: "ui-monospace, monospace", color: on ? "#04121f" : modoCol, background: on ? modoCol : `${modoCol}1f`, border: `1px solid ${modoCol}55`, borderRadius: 9, padding: "10px 4px" }}>
+                          {v}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+                <button type="button" onClick={sembrar}
+                  style={{ cursor: "pointer", fontSize: 15, fontWeight: 900, color: modoCol, background: `${modoCol}1f`, border: `1px solid ${modoCol}77`, borderRadius: 10, padding: "11px 14px" }}>
+                  <i className="fa-solid fa-leaf" style={{ marginRight: 8 }} aria-hidden />
+                  {muestra ? `Sembrar otra vez (${nSiembra} ${palabra})` : `Sembrar ${nSiembra} ${palabra}`}
+                </button>
+                {muestra ? (
+                  <div style={{ display: "grid", gap: 10 }}>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: T.text }}>
+                      Observado vs esperado · {muestra.n} {palabra} · siembra n.º {muestra.id}
+                    </div>
+                    {muestra.cats.map((c, k) => {
+                      const obs = muestra.conteo[k] ?? 0;
+                      const pObs = (obs / muestra.n) * 100;
+                      const esp = (c.pct / 100) * muestra.n;
+                      return (
+                        <div key={k} style={{ display: "grid", gap: 4 }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", gap: 8, fontSize: 14, color: T.text2 }}>
+                            <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                              <span aria-hidden style={{ width: 12, height: 12, borderRadius: 99, background: c.color, border: "1px solid rgba(255,255,255,0.4)", flexShrink: 0 }} />
+                              {c.etq}
+                            </span>
+                            <strong style={{ color: "#fff", fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap" }}>{obs} <span style={{ color: T.text3 }}>/ {fmtEsp(esp)}</span></strong>
+                          </div>
+                          <div style={{ position: "relative", height: 14, borderRadius: 7, background: "rgba(255,255,255,0.08)", overflow: "hidden" }}>
+                            <div style={{ position: "absolute", inset: 0, width: `${pObs}%`, background: c.color, opacity: 0.9, borderRadius: 7, transition: "width .5s" }} />
+                            <div title={`esperado ${fmtPct(c.pct)}`} style={{ position: "absolute", top: 0, bottom: 0, left: `calc(${c.pct}% - 1.5px)`, width: 3, background: "#fff", boxShadow: "0 0 0 1px rgba(0,0,0,0.6)" }} />
+                          </div>
+                          <div style={{ fontSize: 14, color: T.text3 }}>
+                            observado {fmtPct(Math.round(pObs * 10) / 10)} · esperado {fmtPct(c.pct)}
+                          </div>
+                        </div>
+                      );
+                    })}
+                    <p style={{ margin: 0, color: T.text2 }}>
+                      La marca blanca es lo esperado. Vuelve a sembrar: cada siembra sale distinta. Con pocas {palabra} el azar se nota; con 100 el resultado se acerca a lo esperado. Por eso Mendel necesitó muestras grandes.
+                    </p>
+                  </div>
+                ) : (
+                  <p style={{ margin: 0, color: T.text3 }}>Aún no has sembrado: el campo aparecerá junto al cuadro.</p>
                 )}
               </Bloque>
 
@@ -380,6 +481,9 @@ export function LabGeneticaMendel({ color }: PracticaLabProps) {
     />
   );
 }
+
+/** Valor esperado (puede ser decimal, por ejemplo 18,75). */
+const fmtEsp = (x: number) => (Number.isInteger(x) ? String(x) : x.toLocaleString("es-MX", { maximumFractionDigits: 2 }));
 
 /* ── Selector de genotipo (segmentado) ───────────────────────────────────── */
 function SelGeno({ label, icon, colr, opciones, value, onChange }: {

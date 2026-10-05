@@ -432,3 +432,65 @@ export const RETO_A2: RetoNumericoData = {
   ],
   respuestaFinal: "P(aa) = 25 % (1 de 4 casillas del cuadro de Punnett).",
 };
+
+/* ── Experimento: muestreo de descendencia (solo ayudantes, no cambia la genética) ── */
+/** Una clase de descendientes (fenotipo) con su probabilidad esperada en %. */
+export interface CategoriaCruce {
+  etq: string; color: string; color2?: string; rugosa?: boolean;
+  sexo?: "hija" | "hijo"; pct: number;
+}
+export interface MuestraCruce {
+  id: number;
+  cats: CategoriaCruce[];
+  /** clase de cada descendiente, en el orden en que "nace" */
+  idx: number[];
+  /** cuántos descendientes de cada clase */
+  conteo: number[];
+  n: number;
+}
+
+export function categoriasMono(r: ResMono): CategoriaCruce[] {
+  return r.fenotipos.map((f) => ({ etq: f.etq, color: f.color, color2: f.color2, pct: f.pct }));
+}
+export function categoriasDi(r: ResDi): CategoriaCruce[] {
+  return r.fenotipos.map((f) => ({ etq: f.etq, color: f.color, rugosa: f.rugosa, pct: f.pct }));
+}
+export function categoriasLig(r: ResLig): CategoriaCruce[] {
+  const orden: FenoLig[] = ["hijaNormal", "hijaPortadora", "hijaDaltonica", "hijoNormal", "hijoDaltonico"];
+  return orden.filter((k) => r.conteo[k] > 0).map((k) => ({
+    etq: FENO_LIG[k].etq.replace(/\^D/g, "ᴰ").replace(/\^d/g, "ᵈ"),
+    color: FENO_LIG[k].color, sexo: FENO_LIG[k].sexo, pct: (r.conteo[k] / r.celdas.length) * 100,
+  }));
+}
+
+/** Generador pseudoaleatorio con semilla (mulberry32): mismo número → misma siembra. */
+export function mulberry32(semilla: number): () => number {
+  let a = semilla >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/** Muestrea `n` descendientes (máx. 100) con las probabilidades del cuadro de Punnett. */
+export function muestrear(cats: CategoriaCruce[], n: number, semilla: number, id: number): MuestraCruce {
+  const total = Math.max(1, Math.min(100, Math.round(n)));
+  const rnd = mulberry32(semilla);
+  const idx: number[] = [];
+  const conteo = cats.map(() => 0);
+  for (let i = 0; i < total; i++) {
+    const x = rnd() * 100;
+    let acum = 0;
+    let k = cats.length - 1;
+    for (let j = 0; j < cats.length; j++) {
+      acum += cats[j]!.pct;
+      if (x < acum) { k = j; break; }
+    }
+    idx.push(k);
+    conteo[k] = (conteo[k] ?? 0) + 1;
+  }
+  return { id, cats, idx, conteo, n: total };
+}
