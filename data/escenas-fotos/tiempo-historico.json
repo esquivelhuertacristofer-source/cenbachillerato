@@ -1,12 +1,47 @@
 {
   "slug": "tiempo-historico",
   "items": [
-    { "clave": "caida-tenochtitlan", "formato": "1:1", "estilo": "ilustracion", "escena": "Ilustración histórica de una ciudad lacustre con templos escalonados y calzadas sobre un lago al amanecer, canoas en el agua y humo subiendo en la distancia" },
-    { "clave": "epoca-colonial", "formato": "1:1", "estilo": "ilustracion", "escena": "Plaza colonial mexicana con una catedral de piedra, portales con arcos, carretas de madera y gente con ropa del siglo XVIII cruzando el empedrado" },
-    { "clave": "revolucion-francesa", "formato": "1:1", "estilo": "ilustracion", "escena": "Multitud de personas con ropa del siglo XVIII reunida en una plaza europea de piedra frente a un edificio antiguo, una bandera tricolor ondeando sin letras" },
-    { "clave": "guerra-independencia", "formato": "1:1", "estilo": "ilustracion", "escena": "Campesinos y jinetes con sombreros y sarapes avanzando por un camino de tierra entre cerros con una bandera sin letras al frente, luz de amanecer" },
-    { "clave": "porfiriato-tren", "formato": "1:1", "estilo": "ilustracion", "escena": "Estación de ferrocarril de finales del siglo XIX con una locomotora de vapor, pasajeros con sombrero y levita en el andén, humo blanco bajo el techo de hierro" },
-    { "clave": "revolucion-mexicana", "formato": "1:1", "estilo": "ilustracion", "escena": "Soldados revolucionarios con sombrero de palma, cananas cruzadas y rifles caminando junto a un tren de carga en un paisaje de desierto, polvo en el aire" },
-    { "clave": "constitucion-1917", "formato": "1:1", "estilo": "ilustracion", "escena": "Salón de teatro del siglo XX lleno de hombres con traje sentados en butacas y palcos, uno de pie en el estrado con un libro grueso encuadernado en las manos" }
+    {
+      "clave": "caida-tenochtitlan",
+      "formato": "1:1",
+      "estilo": "ilustracion",
+      "escena": "Ilustración histórica de una ciudad lacustre con templos escalonados y calzadas sobre un lago al amanecer, canoas en el agua y humo subiendo en la distancia"
+    },
+    {
+      "clave": "epoca-colonial",
+      "formato": "1:1",
+      "estilo": "ilustracion",
+      "escena": "Plaza colonial mexicana con una catedral de piedra, portales con arcos, carretas de madera y gente con ropa del siglo XVIII cruzando el empedrado"
+    },
+    {
+      "clave": "revolucion-francesa",
+      "formato": "1:1",
+      "estilo": "ilustracion",
+      "escena": "Multitud de personas con ropa del siglo XVIII, sombreros de tres picos y gorros rojos, reunida en una plaza europea de piedra frente a un edificio antiguo con columnas, sin banderas"
+    },
+    {
+      "clave": "guerra-independencia",
+      "formato": "1:1",
+      "estilo": "ilustracion",
+      "escena": "Grupo de hombres adultos de campo, con bigote, sombreros de ala ancha y sarapes, a pie y a caballo, avanzando por un camino de tierra entre cerros al amanecer, vistos de lejos, sin banderas ni armas visibles"
+    },
+    {
+      "clave": "porfiriato-tren",
+      "formato": "1:1",
+      "estilo": "ilustracion",
+      "escena": "Estación de ferrocarril de finales del siglo XIX con una locomotora de vapor, pasajeros con sombrero y levita en el andén, humo blanco bajo el techo de hierro"
+    },
+    {
+      "clave": "revolucion-mexicana",
+      "formato": "1:1",
+      "estilo": "ilustracion",
+      "escena": "Soldados revolucionarios con sombrero de palma, cananas cruzadas y rifles caminando junto a un tren de carga en un paisaje de desierto, polvo en el aire"
+    },
+    {
+      "clave": "constitucion-1917",
+      "formato": "1:1",
+      "estilo": "ilustracion",
+      "escena": "Salón de teatro del siglo XX lleno de hombres con traje sentados en butacas y palcos, uno de pie en el estrado con un libro grueso encuadernado en las manos"
+    }
   ]
 }
