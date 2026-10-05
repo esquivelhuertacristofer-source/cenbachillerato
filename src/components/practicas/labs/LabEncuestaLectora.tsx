@@ -8,8 +8,10 @@
  *
  * El alumno recorre la investigación completa, no una parte: construye el
  * instrumento, codifica lo que la gente contestó y lee la gráfica que sale de
- * sus propias decisiones. Cuatro modos:
+ * sus propias decisiones. Cinco modos:
  *
+ *  0. «Aplica la encuesta» — SIMULADOR: elige muestra, pregunta y tamaño, aplícala a
+ *     una escuela ficticia y mira cuánto se desvían las barras de la verdad.
  *  1. «Arma la encuesta» — decide, una por una, si cada pregunta candidata
  *     entra al cuestionario o se descarta, y recibe el nombre del defecto
  *     (inducida, ambigua, doble, invasiva, supuesto falso).
@@ -32,7 +34,8 @@ import { LabSfx } from "./lab-audio";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { ENCUESTA_LECTORA_HUECOS } from "./encuesta-lectora-huecos";
 import { usePartida, MarcadorPartida } from "./_partida";
-import { TableroObjetivos } from "./_objetivos";
+import { LabShell, Bloque, BotonHerramienta, Dato, Deslizador } from "./_shell";
+import { MUESTRAS, PREGUNTAS, VERDAD, aplicarEncuesta, explicaCorrida, etiquetaVeredicto, type Muestra, type Pregunta, type Corrida } from "./encuesta-lectora-sim";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { ENCUESTA_LECTORA_FICHA } from "./encuesta-lectora-ficha";
@@ -60,13 +63,15 @@ import {
 const NO = "#FF5E5E";
 const ORO = "#FFC75A";
 const RETO_KEY = "cen-encuesta-lectora-reto";
+const RUTA_FOTOS = "/media/labs-sim/encuesta-lectora-comunidad";
 
 /** Tope del eje de la gráfica: con nueve personas ninguna barra pasa de 4. */
 const EJE_MAX = 5;
 
-type Modo = "encuesta" | "campo" | "grafica" | "texto";
+type Modo = "aplica" | "encuesta" | "campo" | "grafica" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
+  { id: "aplica", label: "Aplica la encuesta", icono: "fa-flask" },
   { id: "encuesta", label: "Arma la encuesta", icono: "fa-clipboard-question" },
   { id: "campo", label: "Levanta los datos", icono: "fa-users" },
   { id: "grafica", label: "Lee la gráfica", icono: "fa-chart-simple" },
@@ -82,8 +87,7 @@ interface Codificacion {
 export function LabEncuestaLectora({ color }: PracticaLabProps) {
   const accent = color.hex;
   const rgba = color.rgba;
-  const [modo, setModo] = useState<Modo>("encuesta");
-  const [drawer, setDrawer] = useState(false);
+  const [modo, setModo] = useState<Modo>("aplica");
 
   /* ── sonido ─────────────────────────────────────────────────────────── */
   const partida = usePartida();
@@ -109,6 +113,35 @@ export function LabEncuestaLectora({ color }: PracticaLabProps) {
     partida.error();
     return sonido && audioRef.current?.incorrecto();
   };
+
+  /* ── modo 0 · Aplica la encuesta (simulador) ────────────────────────── */
+  const [muestra, setMuestra] = useState<Muestra>("sorteo");
+  const [pregunta, setPregunta] = useState<Pregunta>("abierta");
+  const [tamano, setTamano] = useState(30);
+  const [corridas, setCorridas] = useState<Corrida[]>([]);
+
+  const ultima = corridas[corridas.length - 1] ?? null;
+  const desactualizada = !ultima || ultima.muestra !== muestra || ultima.pregunta !== pregunta || ultima.n !== tamano;
+
+  const aplicar = () => {
+    const c = aplicarEncuesta(muestra, pregunta, tamano, corridas.length, corridas.length + 1);
+    setCorridas((prev) => [...prev, c]);
+    if (c.veredicto === "confiable") {
+      partida.acierto();
+      if (sonido) audioRef.current?.correcto();
+    } else if (sonido) {
+      audioRef.current?.blip();
+    }
+  };
+  const reiniciarAplica = () => {
+    setCorridas([]);
+    setMuestra("sorteo");
+    setPregunta("abierta");
+    setTamano(30);
+  };
+  const mejorSesgo = corridas.length ? Math.min(...corridas.map((c) => c.sesgo)) : null;
+  const aplicaBiblioteca = corridas.some((c) => c.muestra === "biblioteca");
+  const aplicaConfiable = corridas.some((c) => c.veredicto === "confiable" && c.n >= 60);
 
   /* ── modo 1 · Arma la encuesta ──────────────────────────────────────── */
   // id → decisión acertada ("incluir" | "descartar"). Solo se guarda cuando el
@@ -228,6 +261,8 @@ export function LabEncuestaLectora({ color }: PracticaLabProps) {
   /* ── objetivos ──────────────────────────────────────────────────────── */
   const modosHechos = (encuestaDone ? 1 : 0) + (campoDone ? 1 : 0) + (graficaDone ? 1 : 0) + (textoDone ? 1 : 0);
   const objetivos = [
+    { txt: "Aplica tu encuesta solo en la biblioteca y compara con la escuela", done: aplicaBiblioteca },
+    { txt: "Logra una encuesta confiable: sorteo, pregunta abierta y 60 personas o más", done: aplicaConfiable },
     { txt: `Decide las ${CANDIDATAS.length} preguntas candidatas`, done: encuestaDone },
     { txt: `Arma un cuestionario con las ${CANDIDATAS_UTILES} preguntas útiles`, done: incluidas.length >= CANDIDATAS_UTILES },
     { txt: "Descarta la pregunta inducida y la del supuesto falso", done: decididas["c3"] === "descartar" && decididas["c12"] === "descartar" },
@@ -241,146 +276,103 @@ export function LabEncuestaLectora({ color }: PracticaLabProps) {
   ];
 
   const reiniciarModo =
-    modo === "encuesta" ? reiniciarEncuesta : modo === "campo" ? reiniciarCampo : modo === "grafica" ? reiniciarGrafica : reiniciarTexto;
+    modo === "aplica"
+      ? reiniciarAplica
+      : modo === "encuesta"
+        ? reiniciarEncuesta
+        : modo === "campo"
+          ? reiniciarCampo
+          : modo === "grafica"
+            ? reiniciarGrafica
+            : reiniciarTexto;
+
+  const lectura =
+    modo === "aplica" ? (
+      ultima ? (
+        <>
+          Sesgo {ultima.sesgo} puntos · {etiquetaVeredicto(ultima.veredicto)}
+        </>
+      ) : (
+        <>Diseña tu encuesta y aplícala.</>
+      )
+    ) : modo === "encuesta" ? (
+      <>
+        {Object.keys(decididas).length}/{CANDIDATAS.length} decididas · {incluidas.length} incluidas
+      </>
+    ) : modo === "campo" ? (
+      <>
+        {tabuladas.length} de {PERSONAS.length} personas tabuladas
+      </>
+    ) : modo === "grafica" ? (
+      <>{campoDone ? `${respG.filter((r) => r !== null).length}/${LECTURA_GRAFICA.length} lecturas contestadas` : "Primero levanta los datos."}</>
+    ) : (
+      <>Repasa los tipos de texto.</>
+    );
+
+  const pistaModo =
+    modo === "aplica" ? (
+      <>
+        Una buena encuesta pregunta a una <strong style={{ color: T.text }}>muestra que se parezca</strong> a la escuela, con una pregunta{" "}
+        <strong style={{ color: T.text }}>neutral y medible</strong>, y a suficientes personas.
+      </>
+    ) : modo === "encuesta" ? (
+      <>
+        Una buena pregunta <strong style={{ color: T.text }}>no sugiere la respuesta</strong>, significa lo mismo para todos y pregunta{" "}
+        <strong style={{ color: T.text }}>una sola cosa</strong>.
+      </>
+    ) : modo === "campo" ? (
+      <>
+        El <strong style={{ color: T.text }}>tipo de texto</strong> depende de lo que el texto hace; el <strong style={{ color: T.text }}>soporte</strong>, del medio
+        donde aparece.
+      </>
+    ) : modo === "grafica" ? (
+      <>
+        Antes de concluir, revisa <strong style={{ color: T.text }}>cuántas personas</strong> hay detrás de cada barra.
+      </>
+    ) : (
+      <>
+        Fíjate en <strong style={{ color: T.text }}>qué hace</strong> cada texto: informa, relata o circula en una plataforma.
+      </>
+    );
 
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes enlShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
-        @keyframes enlPop { 0%{transform:scale(.7);opacity:0;} 100%{transform:scale(1);opacity:1;} }
-        .enl-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 16px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .enl-tab:hover { border-color:${T.lineStrong}; color:#fff; }
-        .enl-tab[data-on="true"] { border-color:${accent}; background:rgba(${rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-        .enl-tab[data-done="true"] { color:${OK}; }
-        .enl-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
-          font-size:14px; border:1px solid ${T.line}; background:${T.glass}; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .enl-icobtn[data-on="true"] { background:rgba(${rgba},0.22); color:#fff; border-color:${accent}; }
-        .enl-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .enl-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:10px 16px;
-          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:13px; font-weight:800; transition:all .14s; }
-        .enl-btn:hover:not(:disabled) { border-color:${T.lineStrong}; }
-        .enl-btn:disabled { opacity:.45; cursor:default; }
-        .enl-btn[data-si="true"]:hover { border-color:${OK}; background:${OK}18; }
-        .enl-btn[data-no="true"]:hover { border-color:${ORO}; background:${ORO}18; }
-
-        /* Tarjeta de pregunta candidata / de persona encuestada */
-        .enl-ficha { border-radius:15px; border:1.5px solid ${T.line}; background:${T.glassSoft}; padding:15px 17px; transition:all .16s; }
-        .enl-ficha[data-shake="true"] { animation:enlShake .4s; border-color:${NO}; }
-        .enl-ficha[data-ok="true"] { border-color:${OK}55; background:${OK}10; }
-        .enl-ficha[data-out="true"] { border-color:${ORO}55; background:${ORO}0e; }
-        .enl-ficha[data-done="true"] { animation:enlPop .25s ease; }
-
-        /* Opciones de codificación */
-        .enl-op { cursor:pointer; display:inline-flex; align-items:center; gap:8px; padding:8px 13px; border-radius:999px;
-          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:12.5px; font-weight:800; transition:all .14s; }
-        .enl-op:hover:not(:disabled) { border-color:${T.lineStrong}; color:#fff; transform:translateY(-1px); }
-        .enl-op:disabled { cursor:default; }
-        .enl-op[data-on="true"] { color:#04121f; }
-        .enl-fila[data-shake="true"] { animation:enlShake .4s; }
-
-        /* Gráfica */
-        .enl-graf { position:relative; }
-        .enl-barra { height:26px; border-radius:0 8px 8px 0; transition:width .45s cubic-bezier(.4,0,.2,1); min-width:2px; }
-        .enl-rejilla { position:absolute; top:0; bottom:0; width:1px; background:${T.line}; }
-
-        /* Opciones de lectura de gráfica */
-        .enl-opt { cursor:pointer; display:flex; align-items:center; gap:12px; width:100%; text-align:left;
-          border-radius:12px; border:1px solid ${T.line}; background:${T.glass}; color:${T.text2};
-          font-size:13.5px; font-weight:600; padding:11px 14px; transition:all .14s; }
-        .enl-opt:hover:not(:disabled) { border-color:${T.lineStrong}; background:${T.glassSoft}; color:#fff; }
-        .enl-opt:disabled { cursor:default; }
-        .enl-opt[data-ok="true"] { border-color:${OK}; background:${OK}1c; color:#fff; }
-        .enl-opt[data-bad="true"] { border-color:${NO}; background:${NO}1c; color:#fff; }
-        .enl-bullet { flex-shrink:0; width:26px; height:26px; border-radius:8px; display:flex; align-items:center;
-          justify-content:center; font-size:12px; font-weight:900; border:1px solid ${T.line}; color:${T.text3}; }
-
-        .enl-divider { height:1px; background:${T.line}; margin:16px 0; }
-        .enl-badge { display:inline-flex; align-items:center; gap:7px; padding:4px 10px; border-radius:999px;
-          font-size:11px; font-weight:800; letter-spacing:.02em; }
-
-        /* Cajón de teoría */
-        .enl-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .enl-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .enl-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .enl-drawer[data-open="true"] { transform:translateX(0); }
-        .enl-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .enl-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .enl-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .enl-close:hover { border-color:${accent}; background:rgba(${rgba},0.16); }
-        .enl-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .enl-fab:hover { background:rgba(${rgba},0.28); transform:translateY(-1px); }
-
-        .enl-grid { display:grid; grid-template-columns:minmax(0,1fr) clamp(300px,28vw,400px); gap:22px; align-items:start; }
-        @media (max-width: 900px){ .enl-grid { grid-template-columns:minmax(0,1fr); } }
-        @media (max-width: 640px){ .enl-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
-        @media (prefers-reduced-motion: reduce){
-          .enl-ficha[data-shake="true"], .enl-fila[data-shake="true"], .enl-ficha[data-done="true"] { animation:none; }
-          .enl-op:hover:not(:disabled) { transform:none; }
-          .enl-barra { transition:none; }
-        }
-      `}</style>
-
-      {/* ── barra de modos y herramientas ─────────────────────────────── */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
-        {MODOS.map((m) => {
-          const hecho =
-            (m.id === "encuesta" && encuestaDone) ||
-            (m.id === "campo" && campoDone) ||
-            (m.id === "grafica" && graficaDone) ||
-            (m.id === "texto" && textoDone);
-          return (
-            <button key={m.id} className="enl-tab" data-on={modo === m.id} data-done={hecho} onClick={() => setModo(m.id)}>
-              <i className={`fa-solid ${hecho ? "fa-circle-check" : m.icono}`} />
-              {m.label}
-            </button>
-          );
-        })}
-        <div style={{ flex: 1 }} />
-        <MarcadorPartida partida={partida} accent={accent} rgba={rgba} />
-        <button className="enl-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="enl-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="enl-icobtn" onClick={reiniciarModo} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
-
-      {/* ── cajón de teoría ───────────────────────────────────────────── */}
-      <button className="enl-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="enl-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="enl-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="enl-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="enl-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="enl-drawer-body">
-          <FichaTeorica data={ENCUESTA_LECTORA_FICHA} accent={accent} rgba={rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div className="enl-grid">
-        {/* ── columna principal ──────────────────────────────────────── */}
+    <LabShell
+      accent={accent}
+      rgba={rgba}
+      retoKey={RETO_KEY}
+      dom
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })),
+        valor: modo,
+        cambiar: (id) => setModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={reiniciarModo} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      escena={
         <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
+          <style>{css(accent, rgba)}</style>
+
+          {modo === "aplica" && (
+            <PanelAplica
+              accent={accent}
+              muestra={muestra}
+              setMuestra={setMuestra}
+              pregunta={pregunta}
+              setPregunta={setPregunta}
+              tamano={tamano}
+              setTamano={setTamano}
+              corrida={ultima}
+              desactualizada={desactualizada}
+              onAplicar={aplicar}
+            />
+          )}
+
           {modo === "encuesta" && (
             <PanelEncuesta
               accent={accent}
@@ -437,164 +429,370 @@ export function LabEncuestaLectora({ color }: PracticaLabProps) {
             />
           )}
         </div>
-
-        {/* ── columna lateral ────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos de la sesión
-            </Eyebrow>
-            <TableroObjetivos objetivos={objetivos} retoKey={RETO_KEY} accent={accent} />
-            <div className="enl-divider" />
-            <div style={{ fontSize: 12, color: T.text3, lineHeight: 1.5 }}>
-              <strong style={{ color: modosHechos >= 4 ? OK : T.text2 }}>{modosHechos} de 4 modos</strong> terminados.
-            </div>
-          </div>
-
-          {/* pista del modo actual */}
-          <div
-            style={{
-              borderRadius: 18,
-              padding: "16px 18px",
-              border: `1px solid rgba(${rgba},0.3)`,
-              background: `rgba(${rgba},0.08)`,
-              fontSize: 13,
-              color: T.text2,
-              lineHeight: 1.55,
-              display: "flex",
-              gap: 12,
-            }}
-          >
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              {modo === "encuesta" && (
-                <>
-                  Una buena pregunta <strong style={{ color: T.text }}>no sugiere la respuesta</strong>, significa lo mismo para todos y pregunta{" "}
-                  <strong style={{ color: T.text }}>una sola cosa</strong>. Si la respuesta ya viene dentro de la pregunta, descártala.
-                </>
-              )}
-              {modo === "campo" && (
-                <>
-                  El <strong style={{ color: T.text }}>tipo de texto</strong> depende de lo que el texto hace (informar, relatar, circular en
-                  plataformas); el <strong style={{ color: T.text }}>soporte</strong>, del medio donde aparece. Un mismo tipo puede llegar en papel,
-                  en pantalla o en un cartel.
-                </>
-              )}
-              {modo === "grafica" && (
-                <>
-                  Antes de concluir, revisa <strong style={{ color: T.text }}>cuántas personas</strong> hay detrás de cada barra. Nueve respuestas
-                  describen a esas nueve personas, no a toda la escuela.
-                </>
-              )}
-              {modo === "texto" && (
-                <>
-                  Fíjate en <strong style={{ color: T.text }}>qué hace</strong> cada texto: si da pasos o datos es informativo; si cuenta algo en el
-                  tiempo es narrativo; si vive en una plataforma es digital.
-                </>
-              )}
-            </span>
-          </div>
-
-          {/* pistas de entrevista verbatim (A3) */}
-          <div style={{ ...card, padding: "18px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-microphone-lines" style={{ marginRight: 8, color: accent }} />
-              Tu entrevista (A3)
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
-              {PISTAS_ENTREVISTA.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, fontSize: 12.5, color: T.text2, lineHeight: 1.5 }}>
-                  <i className="fa-solid fa-quote-left" style={{ color: T.text3, fontSize: 11, marginTop: 3 }} />
-                  <span>{p}</span>
+      }
+      pestanas={[
+        {
+          id: "cuaderno",
+          etiqueta: "Cuaderno",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Tu partida" icono="fa-star">
+                <MarcadorPartida partida={partida} accent={accent} rgba={rgba} />
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8 }}>
+                  <Dato label="Encuestas aplicadas" value={String(corridas.length)} />
+                  <Dato label="Mejor sesgo" value={mejorSesgo === null ? "—" : `${mejorSesgo} pts`} col={mejorSesgo !== null && mejorSesgo <= 6 ? OK : undefined} />
+                  <Dato label="Modos terminados" value={`${modosHechos}/4`} col={modosHechos >= 4 ? OK : undefined} />
+                  <Dato label="Muestra" value={`${tamano} pers.`} />
                 </div>
-              ))}
-            </div>
-          </div>
+                <p style={{ margin: 0, color: T.text2 }}>{pistaModo}</p>
+              </Bloque>
+              <Bloque titulo="Tus encuestas aplicadas" icono="fa-clock-rotate-left">
+                {corridas.length === 0 ? (
+                  <p style={{ margin: 0, color: T.text3 }}>Todavía no aplicas ninguna. Ve a «Aplica la encuesta».</p>
+                ) : (
+                  corridas
+                    .slice(-6)
+                    .reverse()
+                    .map((c) => (
+                      <p key={c.id} style={{ margin: 0, color: T.text2 }}>
+                        <strong style={{ color: c.veredicto === "confiable" ? OK : c.veredicto === "sesgada" ? ORO : NO }}>#{c.id} · {c.sesgo} pts.</strong>{" "}
+                        {MUESTRAS.find((m) => m.id === c.muestra)?.etiqueta}, pregunta {PREGUNTAS.find((q) => q.id === c.pregunta)?.etiqueta.toLowerCase()}, {c.n} personas.
+                      </p>
+                    ))
+                )}
+              </Bloque>
+              <Bloque titulo="Tu entrevista (A3)" icono="fa-microphone-lines">
+                {PISTAS_ENTREVISTA.map((p, i) => (
+                  <p key={i} style={{ margin: 0, color: T.text2 }}>
+                    <i className="fa-solid fa-quote-left" style={{ color: T.text3, marginRight: 8 }} />
+                    {p}
+                  </p>
+                ))}
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <RetoQuizCard
+              quiz={QUIZ}
+              accent={accent}
+              rgba={rgba}
+              aprobado={quizAprobado}
+              onAprobado={() => setQuizAprobado(true)}
+              playSfx={(ok) => (ok ? sfxFin() : sonido && audioRef.current?.incorrecto())}
+              playPick={() => sonido && audioRef.current?.blip()}
+              mensajeAprobado="Ya sabes investigar lo que lee tu comunidad."
+            />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book",
+          contenido: (
+            <>
+              <Bloque titulo="Tipos de texto y soportes (A4)" icono="fa-shapes">
+                {[...TIPOS.map((t) => TIPO_INFO[t]), ...SOPORTES.map((s) => SOPORTE_INFO[s])].map((i) => (
+                  <p key={i.label} style={{ margin: 0, color: T.text2 }}>
+                    <strong style={{ color: T.text }}>{i.label}.</strong> {i.definicion} <em>{i.ejemplo}</em>
+                  </p>
+                ))}
+              </Bloque>
+              <Bloque titulo="Hechos de la progresión (A5)" icono="fa-circle-check">
+                {HECHOS.map((h, i) => (
+                  <p key={i} style={{ margin: 0, color: T.text2 }}>
+                    <strong style={{ color: h.respuesta ? OK : ORO }}>{h.respuesta ? "VERDADERO" : "FALSO"}.</strong>{" "}
+                    <span style={{ color: T.text }}>{h.enunciado}</span> {h.retroalimentacion}
+                  </p>
+                ))}
+              </Bloque>
+              <Bloque titulo="Dato nacional" icono="fa-chart-pie">
+                <p style={{ margin: 0, color: T.text2 }}>{DATO_MOLEC}</p>
+              </Bloque>
+              <Bloque titulo="Sobre el español" icono="fa-circle-info">
+                <p style={{ margin: 0, color: T.text2 }}>{CALLOUT_A1}</p>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={ENCUESTA_LECTORA_FICHA} accent={accent} rgba={rgba} defaultOpen />
+              </Bloque>
+              <Bloque titulo="Nota" icono="fa-circle-info">
+                <p style={{ margin: 0, color: T.text3 }}>{NOTA_PIE}</p>
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
+  );
+}
 
-          {/* hechos verbatim (A5) */}
-          <div style={{ ...card, padding: "18px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-circle-check" style={{ marginRight: 8, color: accent }} />
-              Hechos de la progresión (A5)
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              {HECHOS.map((h, i) => (
-                <div key={i} style={{ fontSize: 12.5, lineHeight: 1.5 }}>
-                  <span
-                    className="enl-badge"
-                    style={{
-                      background: h.respuesta ? `${OK}1e` : `${ORO}1e`,
-                      color: h.respuesta ? OK : ORO,
-                      border: `1px solid ${h.respuesta ? OK : ORO}44`,
-                      marginRight: 8,
-                    }}
-                  >
-                    {h.respuesta ? "VERDADERO" : "FALSO"}
-                  </span>
-                  <span style={{ color: T.text }}>{h.enunciado}</span>
-                  <div style={{ color: T.text3, marginTop: 4 }}>{h.retroalimentacion}</div>
-                </div>
-              ))}
-            </div>
-          </div>
+/* ═══════════════════════════════════════════════════════════════════════
+ * Modo 0 — «Aplica la encuesta»: el simulador
+ * ═══════════════════════════════════════════════════════════════════════ */
+function FotoMuestra({ foto, icono }: { foto: string; icono: string }) {
+  const [rota, setRota] = useState(false);
+  return (
+    <span className="enl-foto" aria-hidden>
+      <i className={`fa-solid ${icono}`} />
+      {!rota && <img src={`${RUTA_FOTOS}/${foto}.webp`} alt="" loading="lazy" onError={() => setRota(true)} />}
+    </span>
+  );
+}
 
-          {/* dato nacional real */}
-          <div
-            style={{
-              borderRadius: 18,
-              padding: "16px 18px",
-              border: `1px solid ${T.line}`,
-              background: T.glass,
-              fontSize: 12.5,
-              color: T.text2,
-              lineHeight: 1.55,
-              display: "flex",
-              gap: 12,
-            }}
-          >
-            <i className="fa-solid fa-chart-pie" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>{DATO_MOLEC}</span>
-          </div>
-
-          {/* callout verbatim A1 */}
-          <div
-            style={{
-              borderRadius: 18,
-              padding: "16px 18px",
-              border: `1px solid ${T.line}`,
-              background: T.inset,
-              fontSize: 12,
-              color: T.text3,
-              lineHeight: 1.55,
-              display: "flex",
-              gap: 12,
-            }}
-          >
-            <i className="fa-solid fa-circle-info" style={{ color: T.text3, fontSize: 15, marginTop: 1 }} />
-            <span>{CALLOUT_A1}</span>
-          </div>
+function PanelAplica({
+  accent,
+  muestra,
+  setMuestra,
+  pregunta,
+  setPregunta,
+  tamano,
+  setTamano,
+  corrida,
+  desactualizada,
+  onAplicar,
+}: {
+  accent: string;
+  muestra: Muestra;
+  setMuestra: (m: Muestra) => void;
+  pregunta: Pregunta;
+  setPregunta: (p: Pregunta) => void;
+  tamano: number;
+  setTamano: (n: number) => void;
+  corrida: Corrida | null;
+  desactualizada: boolean;
+  onAplicar: () => void;
+}) {
+  const preguntaActual = PREGUNTAS.find((p) => p.id === pregunta)!;
+  return (
+    <>
+      <div className="enl-paso">
+        <div className="enl-paso-t">
+          <span className="enl-num">1</span> ¿A quién le preguntas? <em>Prepa Valle Claro (escuela ficticia)</em>
+        </div>
+        <div className="enl-opciones" role="radiogroup" aria-label="Muestra">
+          {MUESTRAS.map((m) => (
+            <button key={m.id} type="button" role="radio" aria-checked={muestra === m.id} className="enl-muestra" data-on={muestra === m.id} onClick={() => setMuestra(m.id)}>
+              <FotoMuestra foto={m.foto} icono={m.icono} />
+              <strong>{m.etiqueta}</strong>
+              <span>{m.detalle}</span>
+            </button>
+          ))}
         </div>
       </div>
 
-      <RetoQuizCard
-        quiz={QUIZ}
-        accent={accent}
-        rgba={rgba}
-        aprobado={quizAprobado}
-        onAprobado={() => setQuizAprobado(true)}
-        playSfx={(ok) => (ok ? sfxFin() : sonido && audioRef.current?.incorrecto())}
-        playPick={() => sonido && audioRef.current?.blip()}
-        mensajeAprobado="Ya sabes investigar lo que lee tu comunidad."
-      />
+      <div className="enl-paso">
+        <div className="enl-paso-t">
+          <span className="enl-num">2</span> ¿Cómo preguntas?
+        </div>
+        <div className="enl-chips" role="radiogroup" aria-label="Pregunta">
+          {PREGUNTAS.map((p) => (
+            <button key={p.id} type="button" role="radio" aria-checked={pregunta === p.id} className="enl-op" data-on={pregunta === p.id} onClick={() => setPregunta(p.id)} style={pregunta === p.id ? { background: accent, borderColor: accent, color: "#04121f" } : undefined}>
+              <i className={`fa-solid ${p.icono}`} /> {p.etiqueta}
+            </button>
+          ))}
+        </div>
+        <div className="enl-cita">«{preguntaActual.texto}»</div>
+      </div>
 
-      <p style={{ marginTop: 18, fontSize: 11.5, color: T.text3, lineHeight: 1.6 }}>
-        <i className="fa-solid fa-circle-info" style={{ marginRight: 7 }} />
-        {NOTA_PIE}
-      </p>
+      <div className="enl-paso">
+        <div className="enl-paso-t">
+          <span className="enl-num">3</span> ¿A cuántas personas?
+        </div>
+        <Deslizador label="Tamaño de la muestra" icon="fa-users" colr={accent} valor={`${tamano} personas`} min={10} max={200} step={10} value={tamano} onChange={setTamano} hintL="10" hintR="200" />
+      </div>
+
+      <button type="button" className="enl-aplicar" onClick={onAplicar} style={{ background: accent }}>
+        <i className={`fa-solid ${corrida && !desactualizada ? "fa-dice" : "fa-paper-plane"}`} />
+        {corrida && !desactualizada ? "Aplicar otra vez (les toca a otras personas)" : "Aplicar la encuesta"}
+      </button>
+
+      {corrida && (
+        <div className="enl-resultado" data-viejo={desactualizada}>
+          <div className="enl-paso-t">
+            <i className="fa-solid fa-chart-column" style={{ color: accent }} /> Resultado de la encuesta #{corrida.id} <em>simulación</em>
+          </div>
+          {desactualizada && (
+            <div className="enl-aviso-viejo">
+              <i className="fa-solid fa-rotate" /> Cambiaste el diseño: aplica de nuevo para ver cómo cambian las barras.
+            </div>
+          )}
+          <GraficaSim c={corrida} accent={accent} />
+          <div className="enl-leyenda">
+            <span><i className="enl-sw" style={{ background: accent }} /> Tu encuesta</span>
+            <span><i className="enl-sw enl-sw-real" /> Lo que pasa en la escuela</span>
+          </div>
+          <Medidor sesgo={corrida.sesgo} />
+          <div className="enl-porque">
+            {explicaCorrida(corrida).map((t, i) => (
+              <p key={i}>{t}</p>
+            ))}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+function Medidor({ sesgo }: { sesgo: number }) {
+  const pos = Math.min(100, (sesgo / 30) * 100);
+  const v = sesgo <= 6 ? "confiable" : sesgo <= 14 ? "sesgada" : "enganosa";
+  const col = v === "confiable" ? OK : v === "sesgada" ? ORO : NO;
+  return (
+    <div className="enl-medidor">
+      <div className="enl-med-t">
+        <span>Sesgo: qué tanto se aleja tu encuesta de la escuela</span>
+        <strong style={{ color: col }}>
+          {sesgo} pts · {etiquetaVeredicto(v)}
+        </strong>
+      </div>
+      <div className="enl-med-barra" role="img" aria-label={`Sesgo ${sesgo} puntos`}>
+        <span style={{ width: "20%", background: OK }} />
+        <span style={{ width: "26.7%", background: ORO }} />
+        <span style={{ width: "53.3%", background: NO }} />
+        <i style={{ left: `${pos}%` }} />
+      </div>
     </div>
   );
 }
+
+function GraficaSim({ c, accent }: { c: Corrida; accent: string }) {
+  const grupos: { k: string; label: string; tu: number | null; real: number; col: string }[] = [
+    { k: "gusto", label: "Por gusto", tu: c.gusto, real: VERDAD.gusto, col: accent },
+    ...TIPOS.map((t) => ({ k: t, label: TIPO_INFO[t].corto, tu: c.tipo ? c.tipo[t] : null, real: VERDAD.tipo[t], col: TIPO_INFO[t].color })),
+  ];
+  const BASE = 180;
+  const alto = (v: number) => (v / 100) * 150;
+  return (
+    <svg viewBox="0 0 360 214" role="img" aria-label="Barras: tu encuesta frente a la escuela" className="enl-svg">
+      {[0, 50, 100].map((v) => (
+        <g key={v}>
+          <line x1="0" x2="360" y1={BASE - alto(v)} y2={BASE - alto(v)} stroke="rgba(255,255,255,0.12)" strokeDasharray={v === 0 ? undefined : "3 4"} />
+        </g>
+      ))}
+      {grupos.map((g, i) => {
+        const gx = i * 90;
+        return (
+          <g key={g.k}>
+            {g.tu !== null ? (
+              <>
+                <rect className="enl-rect" x={gx + 8} width={34} y={BASE - alto(g.tu)} height={alto(g.tu)} rx={4} fill={g.col} />
+                <text x={gx + 25} y={BASE - alto(g.tu) - 5} textAnchor="middle" fontSize="14" fontWeight="800" fill="#fff">
+                  {g.tu}%
+                </text>
+              </>
+            ) : (
+              <text x={gx + 25} y={BASE - 8} textAnchor="middle" fontSize="14" fontWeight="800" fill={NO}>
+                sin dato
+              </text>
+            )}
+            <rect className="enl-rect" x={gx + 46} width={34} y={BASE - alto(g.real)} height={alto(g.real)} rx={4} fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.7)" strokeDasharray="4 3" />
+            <text x={gx + 63} y={BASE - alto(g.real) - 5} textAnchor="middle" fontSize="14" fontWeight="700" fill="rgba(255,255,255,0.75)">
+              {g.real}%
+            </text>
+            <text x={gx + 45} y={204} textAnchor="middle" fontSize="14" fontWeight="800" fill="rgba(255,255,255,0.85)">
+              {g.label}
+            </text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+function css(accent: string, rgba: string): string {
+  return `
+  @keyframes enlShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
+  @keyframes enlPop { 0%{transform:scale(.7);opacity:0;} 100%{transform:scale(1);opacity:1;} }
+  .enl-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:10px 16px;
+    border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:14px; font-weight:800; transition:all .14s; }
+  .enl-btn:hover:not(:disabled) { border-color:${T.lineStrong}; }
+  .enl-btn:disabled { opacity:.45; cursor:default; }
+  .enl-btn[data-si="true"]:hover { border-color:${OK}; background:${OK}18; }
+  .enl-btn[data-no="true"]:hover { border-color:${ORO}; background:${ORO}18; }
+
+  .enl-ficha { border-radius:15px; border:1.5px solid ${T.line}; background:${T.glassSoft}; padding:15px 17px; transition:all .16s; }
+  .enl-ficha[data-shake="true"] { animation:enlShake .4s; border-color:${NO}; }
+  .enl-ficha[data-ok="true"] { border-color:${OK}55; background:${OK}10; }
+  .enl-ficha[data-out="true"] { border-color:${ORO}55; background:${ORO}0e; }
+  .enl-ficha[data-done="true"] { animation:enlPop .25s ease; }
+
+  .enl-op { cursor:pointer; display:inline-flex; align-items:center; gap:8px; padding:9px 14px; border-radius:999px;
+    border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; }
+  .enl-op:hover:not(:disabled) { border-color:${T.lineStrong}; color:#fff; transform:translateY(-1px); }
+  .enl-op:disabled { cursor:default; }
+  .enl-op[data-on="true"] { color:#04121f; }
+  .enl-fila[data-shake="true"] { animation:enlShake .4s; }
+
+  .enl-graf { position:relative; }
+  .enl-barra { height:26px; border-radius:0 8px 8px 0; transition:width .45s cubic-bezier(.4,0,.2,1); min-width:2px; }
+  .enl-rejilla { position:absolute; top:0; bottom:0; width:1px; background:${T.line}; }
+
+  .enl-opt { cursor:pointer; display:flex; align-items:center; gap:12px; width:100%; text-align:left;
+    border-radius:12px; border:1px solid ${T.line}; background:${T.glass}; color:${T.text2};
+    font-size:15px; font-weight:600; padding:11px 14px; transition:all .14s; }
+  .enl-opt:hover:not(:disabled) { border-color:${T.lineStrong}; background:${T.glassSoft}; color:#fff; }
+  .enl-opt:disabled { cursor:default; }
+  .enl-opt[data-ok="true"] { border-color:${OK}; background:${OK}1c; color:#fff; }
+  .enl-opt[data-bad="true"] { border-color:${NO}; background:${NO}1c; color:#fff; }
+  .enl-bullet { flex-shrink:0; width:28px; height:28px; border-radius:8px; display:flex; align-items:center;
+    justify-content:center; font-size:14px; font-weight:900; border:1px solid ${T.line}; color:${T.text3}; }
+  .enl-divider { height:1px; background:${T.line}; margin:16px 0; }
+  .enl-badge { display:inline-flex; align-items:center; gap:7px; padding:4px 10px; border-radius:999px;
+    font-size:14px; font-weight:800; letter-spacing:.02em; }
+
+  /* Simulador */
+  .enl-paso { display:grid; gap:10px; padding:14px; border-radius:16px; border:1px solid ${T.line}; background:${T.glassSoft}; min-width:0; }
+  .enl-paso-t { font-size:15px; font-weight:900; color:${T.text}; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .enl-paso-t em { font-style:normal; font-size:14px; font-weight:700; color:${T.text3}; }
+  .enl-num { width:26px; height:26px; border-radius:50%; background:rgba(${rgba},0.25); border:1px solid ${accent}; display:inline-flex;
+    align-items:center; justify-content:center; font-size:14px; font-weight:900; color:#fff; }
+  .enl-opciones { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap:10px; }
+  .enl-muestra { cursor:pointer; display:grid; gap:6px; align-content:start; text-align:left; padding:8px; border-radius:14px;
+    border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; transition:all .14s; min-width:0; }
+  .enl-muestra strong { color:${T.text}; font-size:14px; line-height:1.25; }
+  .enl-muestra span { line-height:1.3; }
+  .enl-muestra:hover { border-color:${T.lineStrong}; }
+  .enl-muestra[data-on="true"] { border-color:${accent}; background:rgba(${rgba},0.16); box-shadow:0 0 16px -6px ${accent}; }
+  .enl-foto { position:relative; display:flex; align-items:center; justify-content:center; aspect-ratio:16/9; border-radius:10px; overflow:hidden;
+    background:linear-gradient(135deg, rgba(${rgba},0.35), rgba(8,19,31,0.9)); color:rgba(255,255,255,0.55); font-size:26px; }
+  .enl-foto img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .enl-chips { display:flex; flex-wrap:wrap; gap:8px; }
+  .enl-cita { padding:10px 14px; border-radius:12px; background:${T.inset}; border:1px dashed ${T.line}; font-size:15px; font-style:italic; color:${T.text}; }
+  .enl-aplicar { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:10px; padding:14px 18px; border-radius:14px;
+    border:none; color:#04121f; font-size:16px; font-weight:900; }
+  .enl-aplicar:hover { filter:brightness(1.08); }
+  .enl-resultado { display:grid; gap:12px; padding:14px; border-radius:16px; border:1px solid rgba(${rgba},0.4); background:rgba(${rgba},0.07); min-width:0; }
+  .enl-resultado[data-viejo="true"] .enl-svg { opacity:.45; }
+  .enl-aviso-viejo { padding:8px 12px; border-radius:10px; background:${ORO}1c; border:1px solid ${ORO}66; color:${ORO}; font-size:14px; font-weight:700; }
+  .enl-svg { width:100%; height:auto; display:block; }
+  .enl-rect { transition:y .45s cubic-bezier(.4,0,.2,1), height .45s cubic-bezier(.4,0,.2,1); }
+  .enl-leyenda { display:flex; flex-wrap:wrap; gap:6px 18px; font-size:14px; color:${T.text2}; }
+  .enl-sw { display:inline-block; width:14px; height:14px; border-radius:4px; margin-right:7px; vertical-align:-2px; }
+  .enl-sw-real { background:rgba(255,255,255,0.12); border:1.5px dashed rgba(255,255,255,0.7); }
+  .enl-medidor { display:grid; gap:8px; }
+  .enl-med-t { display:flex; justify-content:space-between; gap:8px 14px; flex-wrap:wrap; font-size:14px; color:${T.text2}; }
+  .enl-med-t strong { font-size:15px; font-weight:900; }
+  .enl-med-barra { position:relative; display:flex; height:14px; border-radius:999px; overflow:visible; }
+  .enl-med-barra span { height:100%; opacity:.75; }
+  .enl-med-barra span:first-child { border-radius:999px 0 0 999px; }
+  .enl-med-barra span:nth-child(3) { border-radius:0 999px 999px 0; }
+  .enl-med-barra i { position:absolute; top:-5px; width:6px; height:24px; margin-left:-3px; border-radius:3px; background:#fff; box-shadow:0 0 8px rgba(0,0,0,.6);
+    transition:left .45s cubic-bezier(.4,0,.2,1); }
+  .enl-porque p { margin:0 0 6px; font-size:15px; line-height:1.5; color:${T.text2}; }
+
+  @media (prefers-reduced-motion: reduce){
+    .enl-ficha[data-shake="true"], .enl-fila[data-shake="true"], .enl-ficha[data-done="true"] { animation:none; }
+    .enl-op:hover:not(:disabled) { transform:none; }
+    .enl-barra, .enl-rect, .enl-med-barra i { transition:none; }
+  }
+  `;
+}
+
 
 /* ═══════════════════════════════════════════════════════════════════════
  * Modo 1 — «Arma la encuesta»
@@ -624,11 +822,11 @@ function PanelEncuesta({
             <i className="fa-solid fa-clipboard-question" style={{ marginRight: 8, color: accent }} />
             Decide qué preguntas entran a tu cuestionario
           </Eyebrow>
-          <span style={{ fontSize: 12.5, fontWeight: 800, color: listo ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
+          <span style={{ fontSize: 14, fontWeight: 800, color: listo ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
             {resueltas}/{CANDIDATAS.length} decididas · {incluidas}/{CANDIDATAS_UTILES} incluidas
           </span>
         </div>
-        <div style={{ fontSize: 13, color: T.text2, lineHeight: 1.55, marginTop: 4 }}>
+        <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55, marginTop: 4 }}>
           Vas a preguntar a gente de tu escuela qué lee, cuándo y para qué. Estas doce preguntas llegaron al borrador; seis sirven y seis tienen un
           defecto. Decide una por una: si aciertas, la tarjeta se queda con la explicación.
         </div>
@@ -661,7 +859,7 @@ function PanelEncuesta({
                   )}
 
                   {sacude === c.id && (
-                    <div role="status" style={{ marginTop: 10, fontSize: 12.5, color: NO, lineHeight: 1.5 }}>
+                    <div role="status" style={{ marginTop: 10, fontSize: 14, color: NO, lineHeight: 1.5 }}>
                       <i className="fa-solid fa-triangle-exclamation" style={{ marginRight: 7 }} />
                       Todavía no. Vuelve a leerla: ¿le sugiere a la persona qué contestar?, ¿significa lo mismo para todos?, ¿pregunta una sola
                       cosa?, ¿sirve para saber qué lee?
@@ -681,9 +879,9 @@ function PanelEncuesta({
                         <i className={`fa-solid ${dentro ? "fa-check" : "fa-ban"}`} />
                         {dentro ? "Entra al cuestionario" : `Descartada · ${c.defecto ?? "con defecto"}`}
                       </span>
-                      <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55, marginTop: 8 }}>{c.porque}</div>
+                      <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55, marginTop: 8 }}>{c.porque}</div>
                       {c.arreglo && (
-                        <div style={{ fontSize: 12.5, color: accent, lineHeight: 1.55, marginTop: 6 }}>
+                        <div style={{ fontSize: 14, color: accent, lineHeight: 1.55, marginTop: 6 }}>
                           <i className="fa-solid fa-wrench" style={{ marginRight: 7 }} />
                           {c.arreglo}
                         </div>
@@ -704,7 +902,7 @@ function PanelEncuesta({
             border: `1px solid ${OK}55`,
             background: `${OK}12`,
             padding: "16px 18px",
-            fontSize: 13.5,
+            fontSize: 14,
             color: T.text,
             lineHeight: 1.55,
           }}
@@ -745,7 +943,7 @@ function Grafica({
 
   const bloque = (titulo: string, desde: number, hasta: number) => (
     <div>
-      <div style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: "0.1em", color: T.text3, textTransform: "uppercase", marginBottom: 9 }}>
+      <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: "0.1em", color: T.text3, textTransform: "uppercase", marginBottom: 9 }}>
         {titulo}
       </div>
       <div className="enl-graf" style={{ display: "flex", flexDirection: "column", gap: 8, position: "relative" }}>
@@ -763,7 +961,7 @@ function Grafica({
               style={{
                 width: 104,
                 flexShrink: 0,
-                fontSize: 12,
+                fontSize: 14,
                 fontWeight: 700,
                 color: T.text2,
                 display: "flex",
@@ -771,7 +969,7 @@ function Grafica({
                 gap: 7,
               }}
             >
-              <i className={`fa-solid ${f.icono}`} style={{ color: f.color, fontSize: 12 }} />
+              <i className={`fa-solid ${f.icono}`} style={{ color: f.color, fontSize: 14 }} />
               {f.label}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
@@ -791,7 +989,7 @@ function Grafica({
                 width: 25,
                 flexShrink: 0,
                 textAlign: "right",
-                fontSize: 12.5,
+                fontSize: 14,
                 fontWeight: 800,
                 color: f.valor > 0 ? f.color : T.text3,
                 fontVariantNumeric: "tabular-nums",
@@ -812,7 +1010,7 @@ function Grafica({
           <i className="fa-solid fa-chart-simple" style={{ marginRight: 8 }} />
           Resultados de tu encuesta · {tabuladas} de {PERSONAS.length} personas tabuladas
         </Eyebrow>
-        <span style={{ fontSize: 11, color: T.text3 }}>Eje horizontal: número de personas (0 a {EJE_MAX})</span>
+        <span style={{ fontSize: 14, color: T.text3 }}>Eje horizontal: número de personas (0 a {EJE_MAX})</span>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
         {bloque("Tipo de texto que más lee", 0, 3)}
@@ -851,7 +1049,7 @@ function PanelCampo({
           <i className="fa-solid fa-users" style={{ marginRight: 8, color: accent }} />
           Nueve personas de la escuela ya contestaron
         </Eyebrow>
-        <div style={{ fontSize: 13, color: T.text2, lineHeight: 1.55 }}>
+        <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55 }}>
           Contestaron con sus propias palabras, así que todavía no se pueden contar. Tu trabajo es{" "}
           <strong style={{ color: `rgb(${rgba})` }}>codificar</strong> cada respuesta: decidir qué tipo de texto es y en qué soporte lo lee. Cada
           acierto mueve una barra de la gráfica.
@@ -887,18 +1085,18 @@ function PanelCampo({
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: "flex", alignItems: "baseline", gap: 9, flexWrap: "wrap" }}>
                     <span style={{ fontSize: 14, fontWeight: 900, color: T.text }}>{p.nombre}</span>
-                    <span style={{ fontSize: 11.5, color: T.text3, fontWeight: 700 }}>{p.rol}</span>
+                    <span style={{ fontSize: 14, color: T.text3, fontWeight: 700 }}>{p.rol}</span>
                     {listo && (
                       <span className="enl-badge" style={{ background: `${OK}1e`, color: OK, border: `1px solid ${OK}44`, marginLeft: "auto" }}>
                         <i className="fa-solid fa-check" /> Tabulada
                       </span>
                     )}
                   </div>
-                  <div style={{ fontSize: 13, color: T.text2, lineHeight: 1.55, marginTop: 6, fontStyle: "italic" }}>«{p.respuesta}»</div>
+                  <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55, marginTop: 6, fontStyle: "italic" }}>«{p.respuesta}»</div>
 
                   {/* fila tipo */}
                   <div className="enl-fila" data-shake={sacudePersona === `${p.id}-tipo`} style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginTop: 11 }}>
-                    <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: "0.08em", color: T.text3, textTransform: "uppercase", width: 74 }}>
+                    <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: "0.08em", color: T.text3, textTransform: "uppercase", width: 74 }}>
                       Tipo
                     </span>
                     {TIPOS.map((t) => {
@@ -923,7 +1121,7 @@ function PanelCampo({
 
                   {/* fila soporte */}
                   <div className="enl-fila" data-shake={sacudePersona === `${p.id}-soporte`} style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
-                    <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: "0.08em", color: T.text3, textTransform: "uppercase", width: 74 }}>
+                    <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: "0.08em", color: T.text3, textTransform: "uppercase", width: 74 }}>
                       Soporte
                     </span>
                     {SOPORTES.map((s) => {
@@ -946,7 +1144,7 @@ function PanelCampo({
                     })}
                   </div>
 
-                  {listo && <div style={{ fontSize: 12.5, color: T.text3, lineHeight: 1.55, marginTop: 9 }}>{p.porque}</div>}
+                  {listo && <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.55, marginTop: 9 }}>{p.porque}</div>}
                 </div>
               </div>
             </div>
@@ -961,7 +1159,7 @@ function PanelCampo({
             border: `1px solid ${OK}55`,
             background: `${OK}12`,
             padding: "16px 18px",
-            fontSize: 13.5,
+            fontSize: 14,
             color: T.text,
             lineHeight: 1.55,
           }}
@@ -1016,7 +1214,7 @@ function PanelGrafica({
         <div style={{ ...card, padding: "22px 24px", textAlign: "center" }}>
           <i className="fa-solid fa-triangle-exclamation" style={{ color: ORO, fontSize: 22 }} />
           <div style={{ fontSize: 14, color: T.text, fontWeight: 800, marginTop: 10 }}>La gráfica todavía está incompleta</div>
-          <div style={{ fontSize: 13, color: T.text2, lineHeight: 1.55, marginTop: 7, maxWidth: 520, marginInline: "auto" }}>
+          <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55, marginTop: 7, maxWidth: 520, marginInline: "auto" }}>
             Llevas {tabuladas} de {PERSONAS.length} respuestas codificadas. Interpretar una gráfica a medias es justo el error que se busca evitar:
             termina de levantar los datos y regresa.
           </div>
@@ -1031,7 +1229,7 @@ function PanelGrafica({
               <i className="fa-solid fa-magnifying-glass-chart" style={{ marginRight: 8, color: accent }} />
               Interpreta tus resultados
             </Eyebrow>
-            <span style={{ fontSize: 12.5, fontWeight: 800, color: contestadas >= LECTURA_GRAFICA.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
+            <span style={{ fontSize: 14, fontWeight: 800, color: contestadas >= LECTURA_GRAFICA.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
               {contestadas}/{LECTURA_GRAFICA.length} contestadas · {aciertos} correctas
             </span>
           </div>
@@ -1103,7 +1301,7 @@ function PanelGrafica({
                     border: `1px solid ${T.line}`,
                     background: T.inset,
                     padding: "12px 15px",
-                    fontSize: 12.5,
+                    fontSize: 14,
                     color: T.text2,
                     lineHeight: 1.55,
                   }}
@@ -1129,7 +1327,7 @@ function PanelGrafica({
                 border: `1px solid ${OK}55`,
                 background: `${OK}12`,
                 padding: "14px 16px",
-                fontSize: 13,
+                fontSize: 14,
                 color: T.text,
                 lineHeight: 1.55,
               }}

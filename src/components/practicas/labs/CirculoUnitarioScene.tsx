@@ -22,7 +22,7 @@
 
 import * as THREE from "three";
 import { useMemo, useRef, useState } from "react";
-import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
+import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { calcTrig, fmtNum2 } from "./circulo-unitario-data";
@@ -120,18 +120,14 @@ function construir(thetaDeg: number, mostrarTan: boolean): Geo {
   };
 }
 
-/* ── Etiqueta flotante reutilizable ──────────────────────────────────────── */
-function Etiqueta({
-  pos, color, children, size = 12, bg = "rgba(6,16,31,0.8)",
-}: {
-  pos: Pt; color: string; children: React.ReactNode; size?: number; bg?: string;
-}) {
+/* ── Etiqueta flotante: tamaño fijo en píxeles, en la punta de lo que nombra ── */
+function Etiqueta({ pos, color, children }: { pos: Pt; color: string; children: React.ReactNode }) {
   return (
-    <Html position={pos} center distanceFactor={12} pointerEvents="none">
+    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
       <div style={{
-        whiteSpace: "nowrap", padding: "4px 10px", borderRadius: 9, background: bg,
-        border: `1px solid ${color}66`, color: "#fff", fontWeight: 700, fontSize: size,
-        fontFamily: "system-ui, sans-serif", boxShadow: "0 8px 28px rgba(0,0,0,0.4)",
+        whiteSpace: "nowrap", padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.88)",
+        border: `1.5px solid ${color}`, color, fontWeight: 900, fontSize: 15,
+        fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)",
       }}>
         {children}
       </div>
@@ -162,7 +158,7 @@ function Particulas({ pausado }: { pausado: boolean }) {
   return (
     <instancedMesh ref={mesh} args={[undefined, undefined, PART_N]}>
       <sphereGeometry args={[1, 10, 10]} />
-      <meshStandardMaterial color={SIN_COL} emissive={SIN_COL} emissiveIntensity={1.6} toneMapped={false} transparent opacity={0.85} />
+      <meshStandardMaterial color={SIN_COL} emissive={SIN_COL} emissiveIntensity={0.9} transparent opacity={0.85} />
     </instancedMesh>
   );
 }
@@ -176,6 +172,7 @@ function Escena({
   const punto = useRef<THREE.Group>(null);
   const dragRef = useRef(false);
   const [hover, setHover] = useState(false);
+  const angosto = useThree((st) => st.size.width) < 640;
 
   useFrame((state) => {
     if (punto.current && !pausado) {
@@ -216,7 +213,7 @@ function Escena({
       {/* ── Plano del círculo: ejes y anillo (z = 0) ── */}
       <Line points={[[-axL, 0, 0], [axL, 0, 0]]} color="#7c89a8" lineWidth={1.2} />
       <Line points={[[0, -axL, 0], [0, axL, 0]]} color="#7c89a8" lineWidth={1.2} />
-      <Line points={RING} color="#aebbd6" lineWidth={1.6} />
+      <CurvaTubo puntos={RING} color="#aebbd6" grosor={0.04} brillo={0.3} />
       {/* eje del tiempo (ángulo que avanza) */}
       <Line points={[[0, 0, 0], g.zEnd]} color="#5b6a86" lineWidth={1.2} dashed dashSize={0.18} gapSize={0.12} />
 
@@ -232,16 +229,16 @@ function Escena({
       {/* cateto seno (vertical = altura) */}
       <CurvaTubo puntos={[g.foot, g.P]} color={SIN_COL} grosor={0.072} />
       {/* radio = hipotenusa */}
-      <Line points={[[0, 0, 0], g.P]} color="#eaf1ff" lineWidth={2.6} />
+      <CurvaTubo puntos={[[0, 0, 0], g.P]} color="#eaf1ff" grosor={0.05} />
       {/* arco del ángulo θ */}
-      <Line points={g.arcPts} color="#fbbf24" lineWidth={2.4} />
+      <CurvaTubo puntos={g.arcPts} color="#fbbf24" grosor={0.04} />
 
       {/* ── Onda SENO (muro vertical x = 0) ── */}
       <CurvaTubo puntos={g.sinePts} color={SIN_COL} grosor={0.061} />
       <Line points={[g.P, g.sineTip]} color={SIN_COL} lineWidth={1.2} dashed dashSize={0.16} gapSize={0.12} />
       <mesh position={g.sineTip}>
         <sphereGeometry args={[0.12, 16, 16]} />
-        <meshStandardMaterial color={SIN_COL} emissive={SIN_COL} emissiveIntensity={1.3} toneMapped={false} />
+        <meshStandardMaterial color={SIN_COL} emissive={SIN_COL} emissiveIntensity={0.9} />
       </mesh>
 
       {/* ── Onda COSENO (piso y = 0) ── */}
@@ -251,14 +248,14 @@ function Escena({
           <Line points={[g.foot, g.cosTip]} color={COS_COL} lineWidth={1.2} dashed dashSize={0.16} gapSize={0.12} />
           <mesh position={g.cosTip}>
             <sphereGeometry args={[0.12, 16, 16]} />
-            <meshStandardMaterial color={COS_COL} emissive={COS_COL} emissiveIntensity={1.3} toneMapped={false} />
+            <meshStandardMaterial color={COS_COL} emissive={COS_COL} emissiveIntensity={0.9} />
           </mesh>
         </>
       )}
 
       {/* ── Hélice: el punto girando mientras avanza el tiempo ── */}
       {mostrarHelice && (
-        <Line points={g.helixPts} color="#f5d36b" lineWidth={2} dashed dashSize={0.001} gapSize={0} />
+        <CurvaTubo puntos={g.helixPts} color="#f5d36b" grosor={0.035} />
       )}
 
       {/* ── Tangente (prolongación del radio) ── */}
@@ -266,9 +263,6 @@ function Escena({
         <>
           <Line points={[[0, 0, 0], g.tanVis.T]} color={TAN_COL} lineWidth={1.4} dashed dashSize={0.16} gapSize={0.12} />
           <CurvaTubo puntos={[[g.tanVis.side, 0, 0], g.tanVis.T]} color={TAN_COL} grosor={0.061} />
-          <Etiqueta pos={[g.tanVis.side + (g.tanVis.side > 0 ? 0.55 : -0.55), g.tanVis.T[1] * 0.5, 0]} color={TAN_COL} size={11}>
-            tan θ
-          </Etiqueta>
         </>
       )}
 
@@ -286,7 +280,7 @@ function Escena({
         )}
         <mesh castShadow>
           <sphereGeometry args={[0.16, 20, 20]} />
-          <meshStandardMaterial color="#fff7e6" emissive={accent} emissiveIntensity={1.8} toneMapped={false} />
+          <meshStandardMaterial color="#fff7e6" emissive={accent} emissiveIntensity={1.0} />
         </mesh>
         {/* esfera invisible amplia para agarrar con facilidad */}
         {arrastrable && (
@@ -303,30 +297,25 @@ function Escena({
         )}
       </group>
 
-      {/* ── Etiquetas ── */}
-      <Etiqueta pos={[g.P[0] + (g.cos >= 0 ? 0.55 : -0.55), g.P[1] + sinPos * 0.5, 0]} color={accent} size={12.5} bg="rgba(6,16,31,0.86)">
-        P = ({fmtNum2(g.cos)}, {fmtNum2(g.sin)})
+      {/* ── Etiquetas (máx. 4 a la vez, en la punta de lo que nombran) ── */}
+      <Etiqueta pos={[g.P[0] + (g.cos >= 0 ? 0.6 : -0.6), g.P[1] + sinPos * 0.5, 0]} color={accent}>
+        P
       </Etiqueta>
-      <Etiqueta pos={[0.85, 0.28, 0]} color="#fbbf24" size={11.5}>
-        θ = {Math.round(((thetaDeg % 360) + 360) % 360)}°
+      <Etiqueta pos={[g.foot[0] + (g.cos >= 0 ? 0.95 : -0.95), g.P[1] * 0.5, 0]} color={SIN_COL}>
+        sen = {fmtNum2(g.sin)}
       </Etiqueta>
-      {/* altura = seno */}
-      <Etiqueta pos={[g.foot[0] + (g.cos >= 0 ? 0.45 : -0.45), g.P[1] * 0.5, 0]} color={SIN_COL} size={11}>
-        sen θ = {fmtNum2(g.sin)}
+      <Etiqueta pos={[g.foot[0] * 0.5, g.sin >= 0 ? -0.5 : 0.5, 0]} color={COS_COL}>
+        cos = {fmtNum2(g.cos)}
       </Etiqueta>
-      {/* base = coseno */}
-      <Etiqueta pos={[g.foot[0] * 0.5, -0.4, 0]} color={COS_COL} size={11}>
-        cos θ = {fmtNum2(g.cos)}
-      </Etiqueta>
-      {/* nombres de las ondas al fondo */}
-      <Etiqueta pos={[0, R + 0.35, -g.rad * SZ]} color={SIN_COL} size={11.5}>
-        onda seno
-      </Etiqueta>
-      {mostrarCos && (
-        <Etiqueta pos={[R + 0.35, 0, -g.rad * SZ]} color={COS_COL} size={11.5}>
-          onda coseno
+      {g.tanVis ? (
+        <Etiqueta pos={[g.tanVis.side + (g.tanVis.side > 0 ? 0.8 : -0.8), g.tanVis.T[1] * 0.5, 0]} color={TAN_COL}>
+          tan = {fmtNum2(g.tan ?? 0)}
         </Etiqueta>
-      )}
+      ) : !angosto ? (
+        <Etiqueta pos={[1.05, 0.42, 0]} color="#fbbf24">
+          θ = {Math.round(((thetaDeg % 360) + 360) % 360)}°
+        </Etiqueta>
+      ) : null}
     </group>
   );
 }
@@ -360,7 +349,7 @@ function Contenido({ thetaDeg, accent, mostrarCos, mostrarHelice, mostrarTan, au
         maxDistance={28}
         minPolarAngle={Math.PI / 9}
         maxPolarAngle={Math.PI / 1.85}
-        target={[0, 0.2, -3]}
+        target={[0, -0.3, -3]}
         enabled={!dragging}
         autoRotate={autoRotate && !pausado && !dragging}
         autoRotateSpeed={0.4}

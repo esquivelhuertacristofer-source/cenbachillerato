@@ -1,0 +1,12 @@
+{
+  "escena": "Un observador mide con clinómetro la copa de un árbol; el triángulo rectángulo se arma en 3D.",
+  "pregunta": "Con el ángulo fijo, si duplicas la distancia al árbol, ¿qué pasa con el cateto opuesto?",
+  "opciones": [
+    { "id": "a", "texto": "Se reduce a la mitad", "icono": "fa-arrow-down" },
+    { "id": "b", "texto": "Se duplica", "icono": "fa-arrow-up" },
+    { "id": "c", "texto": "No cambia", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "El opuesto es d·tan θ. Si θ no cambia, tan θ es constante y el opuesto crece en la misma proporción que d: los triángulos son semejantes.",
+  "comoComprobarlo": "Fija el ángulo, mueve el deslizador de distancia al doble y compara el valor del opuesto en el medidor."
+}

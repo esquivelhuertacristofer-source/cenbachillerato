@@ -1,0 +1,12 @@
+{
+  "escena": "Un terreno triangular con dos lados conocidos a y b; el ángulo C entre ellos funciona como un compás.",
+  "pregunta": "Con a y b fijos, ¿qué le pasa al lado c al abrir el ángulo C?",
+  "opciones": [
+    { "id": "a", "texto": "Se acorta", "icono": "fa-arrow-down" },
+    { "id": "b", "texto": "Crece, sin pasar de a + b", "icono": "fa-arrow-up" },
+    { "id": "c", "texto": "Se queda igual", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "En c² = a² + b² − 2ab·cos C, al abrir C el coseno baja y deja de restar. Por eso c crece, y nunca supera a + b, que es el máximo.",
+  "comoComprobarlo": "Deja a y b quietos, mueve el deslizador de C de 20° a 160° y vigila la barra del lado c."
+}

@@ -1,0 +1,12 @@
+{
+  "escena": "Una cronista ficticia muestra un borrador de cinco frases y tú puedes comentar cada una al margen.",
+  "pregunta": "Comentas «Está muy bien» sobre una frase vaga. ¿Qué hace la autora con esa frase?",
+  "opciones": [
+    { "id": "a", "texto": "La reescribe con más detalle", "icono": "fa-pen" },
+    { "id": "b", "texto": "La deja igual y pide algo más concreto", "icono": "fa-comment-dots" },
+    { "id": "c", "texto": "La borra del borrador", "icono": "fa-trash" }
+  ],
+  "correcta": "b",
+  "porque": "Un elogio no dice qué le falta a la frase. La autora solo cambia el texto cuando el comentario nombra el problema: confusión, falta de pruebas, de voz o de propósito.",
+  "comoComprobarlo": "En «Dialoga con la autora» toca la primera frase, envía «Está muy bien» y luego «No entiendo esto»; compara la frase y las barras."
+}

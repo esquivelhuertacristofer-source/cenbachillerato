@@ -1,0 +1,12 @@
+{
+  "escena": "Una exposición de tres minutos ante un auditorio ilustrado de doce compañeros ficticios",
+  "pregunta": "Si el expositor lee del papel y llena la diapositiva de párrafos, ¿qué le pasa al público?",
+  "opciones": [
+    { "id": "a", "texto": "Atiende más porque ve todo escrito", "icono": "fa-file-lines" },
+    { "id": "b", "texto": "Se distrae y se duerme", "icono": "fa-bed" },
+    { "id": "c", "texto": "No cambia nada en su atención", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "Si el público lee la pantalla deja de oír, y sin contacto visual siente que le leen. La atención cae en cada momento de la exposición.",
+  "comoComprobarlo": "En «Da la exposición», deja mirada y apoyo como están y mueve el momento de la exposición a 3:00; luego cambia a mirar al grupo y esquema."
+}

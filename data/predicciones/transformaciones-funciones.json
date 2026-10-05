@@ -1,0 +1,12 @@
+{
+  "escena": "Una parábola naranja f(x) = a(x−h)² + k sobre su función padre punteada, con un balón que la recorre.",
+  "pregunta": "Si subes k de 4 a 6 sin tocar a ni h, ¿qué le pasa a la parábola?",
+  "opciones": [
+    { "id": "a", "texto": "Sube 2 unidades sin deformarse", "icono": "fa-arrow-up" },
+    { "id": "b", "texto": "Se hace más angosta", "icono": "fa-compress" },
+    { "id": "c", "texto": "Se desliza 2 unidades a la derecha", "icono": "fa-arrow-right" }
+  ],
+  "correcta": "a",
+  "porque": "k es la traslación vertical: suma a todas las alturas. La forma no cambia porque a sigue igual; solo el vértice sube de (2, 4) a (2, 6).",
+  "comoComprobarlo": "Deja a = −0,5 y h = 2, mueve el deslizador k de 4 a 6 y mira dónde queda el vértice."
+}

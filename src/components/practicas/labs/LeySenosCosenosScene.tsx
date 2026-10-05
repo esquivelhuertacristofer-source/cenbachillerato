@@ -17,12 +17,13 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Html, Line } from "@react-three/drei";
+import { useMemo, useRef, useState } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { calcTri, fmtM, fmtDeg, type Triangulo } from "./ley-senos-cosenos-data";
 import { CurvaTubo } from "./_tablero";
+import { Escenario, calidadEscena } from "./_escenario";
 
 export interface LeySenosCosenosSceneProps {
   a: number;
@@ -117,18 +118,14 @@ function construir(a: number, b: number, angC: number): Geo {
   };
 }
 
-/* ── Etiqueta flotante reutilizable ──────────────────────────────────────── */
-function Etiqueta({
-  pos, color, children, size = 12, bg = "rgba(6,16,31,0.82)",
-}: {
-  pos: Pt; color: string; children: React.ReactNode; size?: number; bg?: string;
-}) {
+/* ── Etiqueta flotante: tamaño fijo en píxeles, en la punta de lo que nombra ── */
+function Etiqueta({ pos, color, children }: { pos: Pt; color: string; children: React.ReactNode }) {
   return (
-    <Html position={pos} center distanceFactor={15} pointerEvents="none">
+    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
       <div style={{
-        whiteSpace: "nowrap", padding: "4px 10px", borderRadius: 9, background: bg,
-        border: `1px solid ${color}66`, color: "#fff", fontWeight: 700, fontSize: size,
-        fontFamily: "system-ui, sans-serif", boxShadow: "0 8px 28px rgba(0,0,0,0.4)",
+        whiteSpace: "nowrap", padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.88)",
+        border: `1.5px solid ${color}`, color, fontWeight: 900, fontSize: 15,
+        fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)",
       }}>
         {children}
       </div>
@@ -137,7 +134,7 @@ function Etiqueta({
 }
 
 /* ── Estaca de topógrafo en un vértice ───────────────────────────────────── */
-function Estaca({ p, color, label }: { p: Pt; color: string; label: string }) {
+function Estaca({ p, color }: { p: Pt; color: string }) {
   return (
     <group position={[p[0], 0, p[2]]}>
       <mesh position={[0, 0.35, 0]} castShadow>
@@ -146,11 +143,8 @@ function Estaca({ p, color, label }: { p: Pt; color: string; label: string }) {
       </mesh>
       <mesh position={[0, 0.74, 0]}>
         <sphereGeometry args={[0.11, 16, 16]} />
-        <meshStandardMaterial color="#fff" emissive={color} emissiveIntensity={1.5} toneMapped={false} />
+        <meshStandardMaterial color="#fff" emissive={color} emissiveIntensity={0.9} />
       </mesh>
-      <Etiqueta pos={[0, 1.05, 0]} color={color} size={12.5} bg="rgba(6,16,31,0.9)">
-        {label}
-      </Etiqueta>
     </group>
   );
 }
@@ -180,6 +174,7 @@ function Terreno({ A, B, C, accent }: { A: Pt; B: Pt; C: Pt; accent: string }) {
 /* ── La construcción completa ────────────────────────────────────────────── */
 function Escena({ g, accent, mostrarAngulos }: { g: Geo; accent: string; mostrarAngulos: boolean }) {
   const { t } = g;
+  const angosto = useThree((st) => st.size.width) < 640;
   // marcador pulsante sobre la incógnita (lado c)
   const marca = useRef<THREE.Group>(null);
   useFrame((s) => {
@@ -191,10 +186,10 @@ function Escena({ g, accent, mostrarAngulos }: { g: Geo; accent: string; mostrar
 
   return (
     <group>
-      {/* piso */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
-        <planeGeometry args={[44, 44]} />
-        <meshStandardMaterial color="#15321e" roughness={1} />
+      {/* terreno: disco de pasto sobre la mesa del escenario */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.015, 0]} receiveShadow>
+        <circleGeometry args={[11, 64]} />
+        <meshStandardMaterial color="#1f4a2c" roughness={1} />
       </mesh>
 
       {/* terreno relleno */}
@@ -210,46 +205,49 @@ function Escena({ g, accent, mostrarAngulos }: { g: Geo; accent: string; mostrar
 
       {/* ── Arcos de ángulos ── */}
       <CurvaTubo puntos={g.arcC} color={ANGC_COL} grosor={0.054} />
-      {mostrarAngulos && <Line points={g.arcA} color={ANG_COL} lineWidth={2.2} />}
-      {mostrarAngulos && <Line points={g.arcB} color={ANG_COL} lineWidth={2.2} />}
+      {mostrarAngulos && <CurvaTubo puntos={g.arcA} color={ANG_COL} grosor={0.05} />}
+      {mostrarAngulos && <CurvaTubo puntos={g.arcB} color={ANG_COL} grosor={0.05} />}
 
       {/* estacas en los vértices */}
-      <Estaca p={g.C} color={ANGC_COL} label="C" />
-      <Estaca p={g.A} color={B_COL} label="A" />
-      <Estaca p={g.B} color={A_COL} label="B" />
+      <Estaca p={g.C} color={ANGC_COL} />
+      <Estaca p={g.A} color={B_COL} />
+      <Estaca p={g.B} color={A_COL} />
 
       {/* marcador pulsante en el centro del lado incógnita */}
       <group ref={marca} position={[g.midC[0], YL + 0.18, g.midC[2]]}>
         <mesh>
           <sphereGeometry args={[0.12, 18, 18]} />
-          <meshStandardMaterial color="#fff7e6" emissive={accent} emissiveIntensity={1.8} toneMapped={false} />
+          <meshStandardMaterial color="#fff7e6" emissive={accent} emissiveIntensity={1.0} />
         </mesh>
       </group>
 
-      {/* ── Etiquetas de lados ── */}
-      <Etiqueta pos={outward(g.midA, 0.5)} color={A_COL} size={12}>
-        a = {fmtM(t.a)}
-      </Etiqueta>
-      <Etiqueta pos={outward(g.midB, 0.5)} color={B_COL} size={12}>
-        b = {fmtM(t.b)}
-      </Etiqueta>
-      <Etiqueta pos={[g.midC[0] + (g.midC[0] / (Math.hypot(g.midC[0], g.midC[2]) || 1)) * 0.55, 0.5, g.midC[2] + (g.midC[2] / (Math.hypot(g.midC[0], g.midC[2]) || 1)) * 0.55]} color={C_COL} size={13} bg="rgba(6,16,31,0.92)">
+      {/* ── Etiquetas (máx. 4): c y C siempre; a y b, o A y B si se piden los ángulos ── */}
+      <Etiqueta pos={[g.midC[0] + (g.midC[0] / (Math.hypot(g.midC[0], g.midC[2]) || 1)) * 0.9, 0.5, g.midC[2] + (g.midC[2] / (Math.hypot(g.midC[0], g.midC[2]) || 1)) * 0.9]} color={C_COL}>
         c = {fmtM(t.c)}
       </Etiqueta>
-
-      {/* ── Etiquetas de ángulos ── */}
-      <Etiqueta pos={g.labC} color={ANGC_COL} size={12.5}>
-        C = {fmtDeg(t.angC)}
-      </Etiqueta>
-      {mostrarAngulos && (
-        <Etiqueta pos={[g.A[0] * 0.78, 0.34, g.A[2] * 0.78]} color={ANG_COL} size={11.5}>
-          A = {fmtDeg(t.angA)}
+      {!angosto && (
+        <Etiqueta pos={g.labC} color={ANGC_COL}>
+          C = {fmtDeg(t.angC)}
         </Etiqueta>
       )}
-      {mostrarAngulos && (
-        <Etiqueta pos={[g.B[0] * 0.78, 0.34, g.B[2] * 0.78]} color={ANG_COL} size={11.5}>
-          B = {fmtDeg(t.angB)}
-        </Etiqueta>
+      {mostrarAngulos ? (
+        <>
+          <Etiqueta pos={[g.A[0] * 0.8, 0.34, g.A[2] * 0.8]} color={ANG_COL}>
+            A = {fmtDeg(t.angA)}
+          </Etiqueta>
+          <Etiqueta pos={[g.B[0] * 0.8, 0.34, g.B[2] * 0.8]} color={ANG_COL}>
+            B = {fmtDeg(t.angB)}
+          </Etiqueta>
+        </>
+      ) : (
+        <>
+          <Etiqueta pos={outward(g.midA, 0.8)} color={A_COL}>
+            a = {fmtM(t.a)}
+          </Etiqueta>
+          <Etiqueta pos={outward(g.midB, 0.8)} color={B_COL}>
+            b = {fmtM(t.b)}
+          </Etiqueta>
+        </>
       )}
     </group>
   );
@@ -258,29 +256,15 @@ function Escena({ g, accent, mostrarAngulos }: { g: Geo; accent: string; mostrar
 /* ── Contenido (descendiente del Canvas) ─────────────────────────────────── */
 function Contenido({ a, b, angC, accent, mostrarAngulos, autoRotate, pausado, resetNonce }: LeySenosCosenosSceneProps) {
   const g = useMemo(() => construir(a, b, angC), [a, b, angC]);
+  const [calidad] = useState(() => calidadEscena());
 
   return (
     <>
-      <color attach="background" args={["#08131f"]} />
-      <fog attach="fog" args={["#08131f", 24, 56]} />
-
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[6, 13, 7]} intensity={1.5} castShadow shadow-mapSize={[1024, 1024]} shadow-camera-far={44} />
-      <pointLight position={[-7, 6, -4]} intensity={0.45} color={accent} />
+      <Escenario acento={accent} suelo={0} calidad={calidad} />
 
       <group key={`${resetNonce}`}>
         <Escena g={g} accent={accent} mostrarAngulos={mostrarAngulos} />
       </group>
-
-      <ContactShadows position={[0, 0.012, 0]} opacity={0.42} scale={28} blur={2.4} far={9} />
-
-      <Environment resolution={128}>
-        <group>
-          <Lightformer intensity={1.4} position={[0, 8, 3]} scale={10} color="#eaf1ff" />
-          <Lightformer intensity={0.8} position={[6, 3, 1]} scale={6} color="#cfe0ff" />
-          <Lightformer intensity={0.5} position={[-6, 2, -3]} scale={6} color="#bfe6c4" />
-        </group>
-      </Environment>
 
       <OrbitControls
         makeDefault
@@ -289,7 +273,7 @@ function Contenido({ a, b, angC, accent, mostrarAngulos, autoRotate, pausado, re
         maxDistance={32}
         minPolarAngle={Math.PI / 12}
         maxPolarAngle={Math.PI / 2.15}
-        target={[0, 0.3, 0]}
+        target={[0, 0.2, 1.4]}
         autoRotate={autoRotate && !pausado}
         autoRotateSpeed={0.4}
       />

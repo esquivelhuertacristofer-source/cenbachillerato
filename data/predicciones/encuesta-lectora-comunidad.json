@@ -1,0 +1,12 @@
+{
+  "escena": "Una escuela ficticia con tres lugares donde puedes encuestar: biblioteca, patio y un sorteo en toda la escuela.",
+  "pregunta": "Si encuestas solo a quien está en la biblioteca, ¿qué pasa con el porcentaje que dice leer por gusto?",
+  "opciones": [
+    { "id": "a", "texto": "Queda muy por encima del real", "icono": "fa-arrow-trend-up" },
+    { "id": "b", "texto": "Coincide con el de la escuela", "icono": "fa-equals" },
+    { "id": "c", "texto": "Queda por debajo del real", "icono": "fa-arrow-trend-down" }
+  ],
+  "correcta": "a",
+  "porque": "La biblioteca reúne a quien ya lee. Esa muestra no se parece a toda la escuela, así que la barra se infla y la encuesta resulta sesgada.",
+  "comoComprobarlo": "En «Aplica la encuesta» elige la biblioteca, deja la pregunta abierta, aplica y compara tu barra con la punteada de la escuela."
+}

@@ -1,0 +1,8 @@
+{
+  "slug": "encuesta-lectora-comunidad",
+  "items": [
+    { "clave": "muestra-sorteo", "formato": "16:9", "estilo": "ilustracion", "escena": "Una urna transparente con papeletas de colores revueltas sobre una mesa del patio de una escuela, estudiantes diversos formando una fila al fondo, luz de la mañana" },
+    { "clave": "muestra-biblioteca", "formato": "16:9", "estilo": "ilustracion", "escena": "Una biblioteca escolar tranquila con estantes llenos de libros y varios estudiantes leyendo sentados en mesas largas, luz cálida de ventana" },
+    { "clave": "muestra-patio", "formato": "16:9", "estilo": "ilustracion", "escena": "El patio de una preparatoria a la hora del receso con grupos de estudiantes platicando, jugando futbol y mirando sus celulares bajo árboles" }
+  ]
+}

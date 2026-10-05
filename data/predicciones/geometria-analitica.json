@@ -1,0 +1,12 @@
+{
+  "escena": "Dos puntos en el plano cartesiano unidos por un segmento, con su triángulo de catetos Δx y Δy.",
+  "pregunta": "Si duplicas Δx y Δy a la vez, ¿qué le pasa a la pendiente?",
+  "opciones": [
+    { "id": "a", "texto": "Se duplica, igual que la distancia", "icono": "fa-arrow-up" },
+    { "id": "b", "texto": "No cambia, solo crece la distancia", "icono": "fa-equals" },
+    { "id": "c", "texto": "Se reduce a la mitad", "icono": "fa-arrow-down" }
+  ],
+  "correcta": "b",
+  "porque": "La pendiente es Δy/Δx: si ambos se duplican, el cociente queda igual. La recta conserva su inclinación; en cambio la hipotenusa, la distancia, sí se duplica.",
+  "comoComprobarlo": "Pon P₁ en (0, 0) y P₂ en (2, 1), anota m y d; luego lleva P₂ a (4, 2) y compara las lecturas."
+}

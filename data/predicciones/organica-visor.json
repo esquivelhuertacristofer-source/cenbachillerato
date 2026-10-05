@@ -1,0 +1,12 @@
+{
+  "escena": "Una molécula de etanol de bolas y barras con su grupo funcional resaltado y un deslizador para separarlo.",
+  "pregunta": "Al separar el grupo funcional del etanol, ¿qué átomos se alejan?",
+  "opciones": [
+    { "id": "a", "texto": "Los dos carbonos de la cadena", "icono": "fa-link" },
+    { "id": "b", "texto": "Un oxígeno y su hidrógeno (–OH)", "icono": "fa-tint" },
+    { "id": "c", "texto": "Todos los hidrógenos de la molécula", "icono": "fa-circle" }
+  ],
+  "correcta": "b",
+  "porque": "El grupo funcional de los alcoholes es el hidroxilo –OH: un oxígeno con su hidrógeno. Esa parte distingue al etanol de un alcano; el resto es la cadena de carbonos.",
+  "comoComprobarlo": "Elige Alcoholes, selecciona etanol y arrastra el deslizador «Separar» hasta el máximo mientras observas qué átomos brillan."
+}

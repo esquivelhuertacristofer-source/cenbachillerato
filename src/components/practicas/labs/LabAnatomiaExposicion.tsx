@@ -27,15 +27,15 @@
  *    mesa de debate (A7) y el reto evaluable (A2).
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { PracticaLabProps } from "../registry";
 import { T, OK, NUM, card, Eyebrow } from "./_kit";
+import { LabShell, Bloque, BotonHerramienta, Mesa, Dato, Deslizador } from "./_shell";
 import { LabSfx } from "./lab-audio";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { EscribeTermino } from "./_mecanica-termino";
 import { ANATOMIA_EXPOSICION_HUECOS } from "./anatomia-exposicion-huecos";
 import { usePartida, MarcadorPartida } from "./_partida";
-import { TableroObjetivos } from "./_objetivos";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { ANATOMIA_EXPOSICION_FICHA } from "./anatomia-exposicion-ficha";
@@ -61,13 +61,29 @@ import {
   type PiezaGuion,
 } from "./anatomia-exposicion-data";
 import { FondoTermino, VinetaTermino } from "./_vineta";
+import { AuditorioEscena, CurvaAtencion, OpcionesSim } from "./AnatomiaAuditorio";
+import {
+  ELECCION_INICIAL,
+  MOMENTOS,
+  OPC_APERTURA,
+  OPC_MIRADA,
+  OPC_APOYO,
+  OPC_CIERRE,
+  PUBLICO,
+  curvaAtencion,
+  estadoPersona,
+  reaccion,
+  recuerdo,
+  type EleccionSim,
+} from "./anatomia-exposicion-sim";
 
 const NO = "#FF5E5E";
 const RETO_KEY = "cen-anatomia-exposicion-oral-reto";
 
-type Modo = "guion" | "reloj" | "apoyos" | "glosario" | "texto";
+type Modo = "auditorio" | "guion" | "reloj" | "apoyos" | "glosario" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
+  { id: "auditorio", label: "Da la exposición", icono: "fa-person-chalkboard" },
   { id: "guion", label: "Mesa de montaje", icono: "fa-clone" },
   { id: "reloj", label: "El reloj", icono: "fa-stopwatch" },
   { id: "apoyos", label: "¿Qué apoyo para este momento?", icono: "fa-image" },
@@ -117,12 +133,11 @@ function repartoValido(r: Reparto, total: number): boolean {
 
 export function LabAnatomiaExposicion({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
-  const [modo, setModo] = useState<Modo>("guion");
+  const [modo, setModo] = useState<Modo>("auditorio");
 
   // ── sonido y partida ──────────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   useEffect(() => () => audioRef.current?.dispose(), []);
   const toggleSonido = async () => {
@@ -350,8 +365,53 @@ export function LabAnatomiaExposicion({ color }: PracticaLabProps) {
   // ── reto evaluable (A2) ───────────────────────────────────────────────
   const [quizAprobado, setQuizAprobado] = useState(false);
 
+  // ── modo 0: da la exposición (simulador del auditorio) ───────────────
+  const [sim, setSim] = useState<EleccionSim>(ELECCION_INICIAL);
+  const [momento, setMomento] = useState(3);
+  const [atencionOk, setAtencionOk] = useState(false);
+  const [rapidoVisto, setRapidoVisto] = useState(false);
+  const [lentoVisto, setLentoVisto] = useState(false);
+  const curva = curvaAtencion(sim);
+  const atencionAhora = curva[Math.min(momento, curva.length - 1)]!;
+  const atencionFin = curva[curva.length - 1]!;
+  const recuerdoPct = recuerdo(sim);
+  const atentos = PUBLICO.filter((p) => estadoPersona(atencionAhora, p) === "atento").length;
+  const notaRitmo = (v: number) =>
+    v > 170
+      ? "Hablas tan rápido que el público no alcanza a procesar: recordará menos aunque te escuche."
+      : v < 100
+        ? "Hablas tan lento que la mente del público se va a otro lado y la atención se cae."
+        : v >= 120 && v <= 150
+          ? "Ritmo cómodo: el público puede seguirte y pensar lo que dices."
+          : "Estás cerca del rango cómodo (120 a 150 ppm); acércate un poco más.";
+
+  const cambiarSim = (parcial: Partial<EleccionSim>, nota?: string) => {
+    const antes = curvaAtencion(sim);
+    const sig: EleccionSim = { ...sim, ...parcial };
+    const despues = curvaAtencion(sig);
+    const a = Math.round(antes[antes.length - 1]! * 100);
+    const d = Math.round(despues[despues.length - 1]! * 100);
+    setSim(sig);
+    if (d >= 70) setAtencionOk(true);
+    if (sig.ritmo >= 180) setRapidoVisto(true);
+    if (sig.ritmo <= 90) setLentoVisto(true);
+    setPie({ ok: d >= a, txt: `${nota ?? ""} La atención al final pasó de ${a} % a ${d} % (simulación).`.trim() });
+    if (d > a && sonido) audioRef.current?.blip();
+  };
+
+  const resetAuditorio = () => {
+    setSim(ELECCION_INICIAL);
+    setMomento(3);
+    setAtencionOk(false);
+    setRapidoVisto(false);
+    setLentoVisto(false);
+    setPie(null);
+  };
+
   // ── objetivos de la sesión ────────────────────────────────────────────
   const objetivos = [
+    { txt: "Logra que al final atienda 70 % del público", done: atencionOk },
+    { txt: "Habla muy rápido y muy lento y mira qué pasa", done: rapidoVisto && lentoVisto },
     { txt: "Arma el guion con las 7 piezas en orden", done: guionDone },
     { txt: "Quita cada pieza y descubre qué se rompe", done: roturasDone },
     { txt: "Reparte el tiempo de los 2 escenarios", done: relojDone },
@@ -366,8 +426,10 @@ export function LabAnatomiaExposicion({ color }: PracticaLabProps) {
   ];
 
   const resetActual =
-    modo === "guion"
-      ? resetGuion
+    modo === "auditorio"
+      ? resetAuditorio
+      : modo === "guion"
+        ? resetGuion
       : modo === "reloj"
         ? resetReloj
         : modo === "apoyos"
@@ -426,14 +488,252 @@ export function LabAnatomiaExposicion({ color }: PracticaLabProps) {
     },
   });
 
+  const lectura =
+    modo === "auditorio"
+      ? `Atención ${Math.round(atencionAhora * 100)} %: ${atentos} de ${PUBLICO.length} te siguen`
+      : modo === "guion"
+        ? `Guion: ${guionPos} de ${PIEZAS.length} piezas`
+        : modo === "reloj"
+          ? sobra === 0
+            ? `Cabe exacto en ${reloj(escenario.segundos)}`
+            : sobra > 0
+              ? `Te pasas ${reloj(sobra)}`
+              : `Te sobran ${reloj(-sobra)}`
+          : modo === "apoyos"
+            ? `Apoyos resueltos: ${Object.keys(apoyoOk).length} de ${APOYOS.length}`
+            : undefined;
+
+  const pieEl = (
+    <div
+      role="status"
+      aria-live="polite"
+      style={{
+        borderRadius: 14,
+        border: `1px solid ${pie ? (pie.ok ? `${OK}55` : `${NO}55`) : T.line}`,
+        background: pie ? (pie.ok ? `${OK}12` : `${NO}12`) : T.glass,
+        padding: "13px 16px",
+        fontSize: 14,
+        lineHeight: 1.55,
+        color: T.text2,
+        display: "flex",
+        gap: 12,
+        alignItems: "flex-start",
+        transition: "all .2s",
+      }}
+    >
+      <i
+        className={`fa-solid ${pie ? (pie.ok ? "fa-circle-check" : "fa-circle-exclamation") : "fa-comment-dots"}`}
+        style={{ color: pie ? (pie.ok ? OK : NO) : T.text3, fontSize: 15, marginTop: 2 }}
+      />
+      <span>
+        {pie ? pie.txt : "Aquí aparece la explicación de cada movimiento: por qué cambia la atención del público, por qué esa pieza va en ese lugar y qué pasa cuando el reloj no alcanza."}
+      </span>
+    </div>
+  );
+
+  const consejo: Record<Modo, ReactNode> = {
+    auditorio: (
+      <>
+        Cambia una decisión a la vez y mira al público: cada una mueve la atención. Los resultados son una <strong style={{ color: T.text }}>simulación</strong> con
+        personas ficticias.
+      </>
+    ),
+    guion: (
+      <>
+        Una exposición no es una lista de temas, es una <strong style={{ color: T.text }}>secuencia</strong>: cada pieza prepara a la siguiente. Colócalas en
+        el orden en que tendrían que ocurrir y después quítalas una por una para ver de qué se hacía cargo cada una.
+      </>
+    ),
+    reloj: (
+      <>
+        El tiempo es lo único que no se puede estirar. Mueve los deslizadores hasta que la suma dé exactamente{" "}
+        <strong style={{ color: T.text }}>{reloj(escenario.segundos)}</strong> y cada parte quede dentro de su banda.
+      </>
+    ),
+    apoyos: (
+      <>
+        El apoyo visual <strong style={{ color: T.text }}>refuerza</strong> el mensaje oral; no lo repite ni lo sustituye. Pregúntate qué forma tiene lo que vas
+        a decir.
+      </>
+    ),
+    glosario: (
+      <>
+        Recordar el término es más difícil —y enseña más— que reconocerlo entre opciones. Si te atoras, usa la pista o abre el{" "}
+        <strong style={{ color: T.text }}>banco de términos</strong>.
+      </>
+    ),
+    texto: (
+      <>
+        Lee el párrafo completo antes de escribir: el contexto decide la palabra. Pulsa <strong style={{ color: T.text }}>Enter</strong> para comprobar cada
+        hueco.
+      </>
+    ),
+  };
+
+  const controles =
+    modo === "auditorio" ? (
+      <>
+        <Bloque titulo="Resultado (simulación)" icono="fa-chart-line">
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 10 }}>
+            <Dato label="Atención al final" value={`${Math.round(atencionFin * 100)} %`} col={atencionFin >= 0.7 ? OK : undefined} />
+            <Dato label="Lo recordarán" value={`${recuerdoPct} %`} />
+          </div>
+        </Bloque>
+        <Bloque titulo="1 · Cómo abres" icono="fa-door-open">
+          <OpcionesSim lista={OPC_APERTURA} actual={sim.apertura} cambiar={(id) => cambiarSim({ apertura: id }, OPC_APERTURA.find((o) => o.id === id)!.nota)} grupo="apertura" />
+        </Bloque>
+        <Bloque titulo="2 · A qué ritmo hablas" icono="fa-gauge-high">
+          <Deslizador
+            label="Palabras por minuto"
+            icon="fa-microphone"
+            colr="#5BC8FF"
+            valor={`${sim.ritmo} ppm`}
+            min={70}
+            max={220}
+            step={5}
+            value={sim.ritmo}
+            onChange={(v) => cambiarSim({ ritmo: v }, notaRitmo(v))}
+            hintL="muy lento"
+            hintR="muy rápido"
+          />
+          <div style={{ fontSize: 14, color: T.text2 }}>El rango cómodo para hablar en público va de 120 a 150 ppm.</div>
+        </Bloque>
+        <Bloque titulo="3 · Hacia dónde miras" icono="fa-eye">
+          <OpcionesSim lista={OPC_MIRADA} actual={sim.mirada} cambiar={(id) => cambiarSim({ mirada: id }, OPC_MIRADA.find((o) => o.id === id)!.nota)} grupo="mirada" />
+        </Bloque>
+        <Bloque titulo="4 · Qué muestras" icono="fa-display">
+          <OpcionesSim lista={OPC_APOYO} actual={sim.apoyo} cambiar={(id) => cambiarSim({ apoyo: id }, OPC_APOYO.find((o) => o.id === id)!.nota)} grupo="apoyo" />
+        </Bloque>
+        <Bloque titulo="5 · Cómo cierras" icono="fa-flag-checkered">
+          <OpcionesSim lista={OPC_CIERRE} actual={sim.cierre} cambiar={(id) => cambiarSim({ cierre: id }, OPC_CIERRE.find((o) => o.id === id)!.nota)} grupo="cierre" />
+        </Bloque>
+      </>
+    ) : (
+      <Bloque titulo="Qué practicas aquí" icono="fa-lightbulb">
+        <div style={{ color: T.text2, lineHeight: 1.55 }}>{consejo[modo]}</div>
+        <div style={{ color: T.text3, fontSize: 14 }}>Para ver el efecto en un público ilustrado, entra a «Da la exposición».</div>
+      </Bloque>
+    );
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      dom
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })),
+        valor: modo,
+        cambiar: (id) => setModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={resetActual} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      pestanas={[
+        { id: "controles", etiqueta: "Controles", icono: "fa-sliders", contenido: controles },
+        {
+          id: "casos",
+          etiqueta: "Casos",
+          icono: "fa-stethoscope",
+          contenido: (
+            <>
+              <ClinicaCard accent={accent} respuestas={clinica} onResponder={responderClinica} />
+              <HechosCard accent={accent} respuestas={hechos} onResponder={responderHecho} />
+              <DebateCard
+                accent={accent}
+                rgba={color.rgba}
+                postura={postura}
+                argumento={argumento}
+                puntoValido={puntoValido}
+                onPostura={(id) => {
+                  setPostura(id);
+                  setPuntoValido(null);
+                }}
+                onArgumento={setArgumento}
+                onPuntoValido={(txt) => {
+                  setPuntoValido(txt);
+                  setPie({ ok: true, txt: "Reconocer un punto válido de la postura contraria no es perder el debate: es la parte de A7 que pide proponer en qué situaciones conviene cada forma." });
+                }}
+              />
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <RetoQuizCard
+              quiz={RETO_QUIZ}
+              accent={accent}
+              rgba={color.rgba}
+              aprobado={quizAprobado}
+              onAprobado={() => setQuizAprobado(true)}
+              playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined}
+              mensajeAprobado="Conoces la anatomía de una exposición: sus fases, sus partes y lo que sostiene cada una."
+            />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Ficha teórica" icono="fa-book-open">
+                <FichaTeorica data={ANATOMIA_EXPOSICION_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <Bloque titulo="La tarea que viene · A3" icono="fa-pen-nib">
+                <p style={{ margin: 0, color: T.text2, lineHeight: 1.6 }}>{CONSIGNA_A3.prompt}</p>
+                {CONSIGNA_A3.pistas.map((p, i) => (
+                  <div key={i} style={{ display: "flex", gap: 9, color: T.text2, lineHeight: 1.5 }}>
+                    <i className="fa-solid fa-angle-right" style={{ color: accent, marginTop: 5 }} />
+                    <span>{p}</span>
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Lectura A1 · para pensar" icono="fa-book-open-reader">
+                {COMPRENSION_A1.map((c, i) => (
+                  <details key={i} style={{ borderRadius: 11, border: `1px solid ${T.line}`, background: T.inset, padding: "10px 13px" }}>
+                    <summary style={{ cursor: "pointer", fontWeight: 700, color: T.text2, lineHeight: 1.45 }}>{c.pregunta}</summary>
+                    <p style={{ margin: "9px 0 0", color: T.text3, lineHeight: 1.5 }}>{c.guia}</p>
+                  </details>
+                ))}
+              </Bloque>
+              <Bloque titulo="¿Sabías?" icono="fa-circle-info">
+                <p style={{ margin: 0, color: T.text2, lineHeight: 1.55 }}>{DATO_FIL}</p>
+              </Bloque>
+              <Bloque titulo="Qué es verbatim y qué es de este laboratorio" icono="fa-quote-right">
+                <p style={{ margin: 0, color: T.text3, lineHeight: 1.6 }}>
+                  <strong style={{ color: T.text2 }}>Verbatim de la progresión LC-I-P08:</strong> la lectura, su callout «¿Sabías?» y sus preguntas de
+                  comprensión (A1), el reto evaluable (A2), la consigna y las pistas de la mini-exposición de tres minutos (A3), los hechos
+                  verdadero/falso (A4), el glosario (A5), el texto con huecos (A6) y el debate con sus posturas y argumentos guía (A7).{" "}
+                  <strong style={{ color: T.text2 }}>Escrito para este laboratorio (ilustrativo):</strong> el auditorio simulado (público ficticio y cifras de
+                  simulación), las siete piezas del guion y su exposición de demostración sobre el cuidado del agua en la colonia, las bandas de tiempo
+                  recomendadas, el escenario de diez minutos, las cinco decisiones de apoyo visual y los cuatro casos de la clínica. Las personas y los
+                  salones son ficticios. El ritmo de {PALABRAS_POR_MINUTO} palabras por minuto es una estimación para calcular cuánto texto cabe en un
+                  tiempo; no es un dato de la progresión. En el debate no hay respuesta correcta: el laboratorio no califica tu postura, solo te pide
+                  sostenerla y reconocer un punto válido de la contraria.
+                </p>
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+      escena={
+        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
+          <style>{`
         @keyframes aexShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
         @keyframes aexPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
         @keyframes aexBarrido { 0%{left:0;} 100%{left:100%;} }
         .aex-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 16px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:800; transition:all .14s; }
+          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; }
         .aex-tab:hover { border-color:${T.lineStrong}; color:#fff; }
         .aex-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
         .aex-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
@@ -441,42 +741,42 @@ export function LabAnatomiaExposicion({ color }: PracticaLabProps) {
         .aex-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
         .aex-icobtn:hover { background:rgba(255,255,255,0.12); }
         .aex-chip { cursor:grab; display:flex; align-items:flex-start; gap:10px; padding:11px 15px; border-radius:14px;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:13px; font-weight:700; transition:all .14s;
+          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:14px; font-weight:700; transition:all .14s;
           user-select:none; text-align:left; line-height:1.45; width:100%; }
         .aex-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); transform:translateY(-2px); }
         .aex-chip[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.2); box-shadow:0 0 16px -5px ${accent}; transform:translateY(-3px) scale(1.02); }
         .aex-chip:active { cursor:grabbing; }
-        .aex-mazo { display:grid; grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); gap:10px; align-items:stretch; }
+        .aex-mazo { display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 230px), 1fr)); gap:10px; align-items:stretch; }
         .aex-bin { border-radius:16px; border:1.5px solid ${T.line}; background:${T.glass}; padding:15px; transition:all .16s; }
         .aex-bin[data-shake="true"] { animation:aexShake .4s; border-color:${NO}; }
         .aex-row { border-radius:15px; border:1.5px solid ${T.line}; background:${T.glass}; padding:15px 17px; transition:all .16s; }
         .aex-row[data-shake="true"] { animation:aexShake .4s; border-color:${NO}; }
         .aex-row[data-done="true"] { border-color:${OK}66; }
         .aex-slot { border-radius:12px; border:1.5px dashed ${T.lineStrong}; background:${T.inset}; min-height:54px; padding:9px 12px;
-          display:flex; align-items:center; gap:10px; color:${T.text3}; font-size:12.5px; transition:all .16s; }
+          display:flex; align-items:center; gap:10px; color:${T.text3}; font-size:14px; transition:all .16s; }
         .aex-slot[data-armed="true"] { border-color:${accent}; background:rgba(${color.rgba},0.1); cursor:pointer; }
         .aex-pieza { cursor:pointer; width:100%; text-align:left; border-radius:12px; border:1.5px solid ${OK}66; background:${OK}14;
-          color:#fff; font-size:13px; font-weight:700; padding:10px 13px; line-height:1.45; transition:all .15s; animation:aexPop .25s ease; }
+          color:#fff; font-size:14px; font-weight:700; padding:10px 13px; line-height:1.45; transition:all .15s; animation:aexPop .25s ease; }
         .aex-pieza:hover { border-color:${OK}; background:${OK}22; }
         .aex-pieza[data-probada="true"] { border-style:dashed; }
         .aex-op { cursor:pointer; display:flex; align-items:flex-start; gap:11px; width:100%; text-align:left; border-radius:12px;
-          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13px; font-weight:600; padding:11px 14px;
+          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:600; padding:11px 14px;
           line-height:1.45; transition:all .14s; }
         .aex-op:hover:not(:disabled) { border-color:${T.lineStrong}; color:#fff; }
         .aex-op:disabled { cursor:default; }
         .aex-op[data-ok="true"] { border-color:${OK}; background:${OK}1c; color:#fff; }
         .aex-op[data-bad="true"] { border-color:${NO}; background:${NO}1c; color:#fff; }
         .aex-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
-          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:13.5px; font-weight:800; transition:all .14s; }
+          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:14px; font-weight:800; transition:all .14s; }
         .aex-btn:hover:not(:disabled) { border-color:${T.lineStrong}; }
         .aex-btn:disabled { opacity:.45; cursor:not-allowed; }
         .aex-prob { cursor:pointer; padding:8px 13px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass};
-          color:${T.text2}; font-size:12.5px; font-weight:800; transition:all .14s; }
+          color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; }
         .aex-prob:hover { border-color:${T.lineStrong}; color:#fff; }
         .aex-prob[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; }
         .aex-prob[data-done="true"] { color:${OK}; border-color:${OK}66; }
         .aex-vf { cursor:pointer; padding:8px 16px; border-radius:10px; border:1.5px solid ${T.line}; background:${T.glass};
-          color:${T.text2}; font-size:12.5px; font-weight:800; transition:all .14s; }
+          color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; }
         .aex-vf:hover:not(:disabled) { border-color:${T.lineStrong}; color:#fff; }
         .aex-vf:disabled { cursor:default; opacity:.85; }
         .aex-vf[data-on="true"] { border-color:${OK}; background:${OK}1f; color:#fff; }
@@ -486,7 +786,7 @@ export function LabAnatomiaExposicion({ color }: PracticaLabProps) {
         .aex-ta:focus { border-color:${accent}; box-shadow:0 0 0 3px rgba(${color.rgba},0.18); }
         .aex-ta::placeholder { color:rgba(255,255,255,0.28); }
         .aex-postura { cursor:pointer; text-align:left; width:100%; border:1.5px solid ${T.line}; background:${T.glass};
-          border-radius:14px; padding:13px 15px; color:${T.text2}; font-size:13.5px; line-height:1.5; transition:all .15s; }
+          border-radius:14px; padding:13px 15px; color:${T.text2}; font-size:14px; line-height:1.5; transition:all .15s; }
         .aex-postura:hover { border-color:${T.lineStrong}; color:#fff; }
         .aex-postura[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 18px -7px ${accent}; }
         .aex-range { width:100%; accent-color:${accent}; cursor:pointer; }
@@ -494,28 +794,21 @@ export function LabAnatomiaExposicion({ color }: PracticaLabProps) {
         .aex-aguja { position:absolute; top:-8px; bottom:-8px; width:3px; background:${accent}; box-shadow:0 0 14px ${accent};
           animation:aexBarrido 6s linear 1; }
         .aex-divider { height:1px; background:${T.line}; margin:16px 0; }
-        @media (max-width: 900px){ .aex-grid { grid-template-columns:minmax(0,1fr) !important; } }
+        @media (max-width: 900px){  }
 
-        /* Cajón de teoría */
-        .aex-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .aex-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .aex-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .aex-drawer[data-open="true"] { transform:translateX(0); }
-        .aex-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .aex-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .aex-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .aex-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .aex-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .aex-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .aex-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
+        /* Simulador del auditorio */
+        .aex-aud { border-radius:16px; overflow:hidden; border:1px solid ${T.line}; background:#0a1524; }
+        .aex-medidor { height:10px; background:rgba(255,255,255,0.1); }
+        .aex-medidor > div { height:100%; transition:width .35s, background .35s; }
+        .aex-sim-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap:14px; align-items:center; }
+        .aex-reaccion { padding:10px 13px; border-radius:12px; background:rgba(255,255,255,0.06); border:1px solid ${T.line};
+          font-size:14px; line-height:1.45; color:#fff; }
+        .aex-opciones { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap:8px; }
+        .aex-opcion { cursor:pointer; display:grid; gap:6px; align-content:start; text-align:left; padding:8px; border-radius:12px;
+          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:700; line-height:1.3; transition:all .14s; }
+        .aex-opcion > i { font-size:20px; color:${accent}; padding:4px 2px; }
+        .aex-opcion:hover { border-color:${T.lineStrong}; color:#fff; }
+        .aex-opcion[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.18); color:#fff; }
 
         /* Identidad del tablero */
         .aex-bin, .aex-row { --tono:200; position:relative;
@@ -542,54 +835,34 @@ export function LabAnatomiaExposicion({ color }: PracticaLabProps) {
         }
       `}</style>
 
-      {/* ── Barra de modos y herramientas ───────────────────────────────── */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 16 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="aex-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="aex-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="aex-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="aex-icobtn" onClick={resetActual} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
+          {modo === "auditorio" && (
+            <>
+              <AuditorioEscena eleccion={sim} atencion={atencionAhora} />
+              <div className="aex-sim-grid">
+                <div style={{ display: "grid", gap: 10 }}>
+                  <Deslizador
+                    label="Momento de la exposición"
+                    icon="fa-clock"
+                    colr="#A78BFA"
+                    valor={reloj(MOMENTOS[momento]!)}
+                    min={0}
+                    max={MOMENTOS.length - 1}
+                    step={1}
+                    value={momento}
+                    onChange={setMomento}
+                    hintL="0:00"
+                    hintR="3:00"
+                  />
+                  <div className="aex-reaccion">
+                    <i className="fa-solid fa-comment" aria-hidden /> {reaccion(sim, atencionAhora)}
+                  </div>
+                </div>
+                <CurvaAtencion eleccion={sim} indice={momento} />
+              </div>
+              <div style={{ fontSize: 14, color: T.text3 }}>Público ficticio y cifras de simulación: sirven para comparar decisiones, no para medir personas reales.</div>
+            </>
+          )}
 
-      {/* ── Cajón de teoría ─────────────────────────────────────────────── */}
-      <button className="aex-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="aex-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="aex-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="aex-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="aex-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="aex-drawer-body">
-          <FichaTeorica data={ANATOMIA_EXPOSICION_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div
-        className="aex-grid"
-        style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}
-      >
-        {/* ── Columna principal ─────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
           {modo === "guion" && (
             <GuionPanel
               accent={accent}
@@ -639,13 +912,7 @@ export function LabAnatomiaExposicion({ color }: PracticaLabProps) {
           )}
 
           {modo === "apoyos" && (
-            <ApoyosPanel
-              accent={accent}
-              seleccion={apoyoSel}
-              resueltos={apoyoOk}
-              shake={shakeApoyo}
-              onElegir={elegirApoyo}
-            />
+            <ApoyosPanel accent={accent} seleccion={apoyoSel} resueltos={apoyoOk} shake={shakeApoyo} onElegir={elegirApoyo} />
           )}
 
           {modo === "glosario" && (
@@ -689,200 +956,10 @@ export function LabAnatomiaExposicion({ color }: PracticaLabProps) {
             />
           )}
 
-          {/* Pie: la última explicación, siempre a la vista */}
-          <div
-            role="status"
-            aria-live="polite"
-            style={{
-              borderRadius: 14,
-              border: `1px solid ${pie ? (pie.ok ? `${OK}55` : `${NO}55`) : T.line}`,
-              background: pie ? (pie.ok ? `${OK}12` : `${NO}12`) : T.glass,
-              padding: "13px 16px",
-              fontSize: 13,
-              lineHeight: 1.55,
-              color: T.text2,
-              display: "flex",
-              gap: 12,
-              alignItems: "flex-start",
-              transition: "all .2s",
-            }}
-          >
-            <i
-              className={`fa-solid ${pie ? (pie.ok ? "fa-circle-check" : "fa-circle-exclamation") : "fa-comment-dots"}`}
-              style={{ color: pie ? (pie.ok ? OK : NO) : T.text3, fontSize: 15, marginTop: 2 }}
-            />
-            <span>
-              {pie ? pie.txt : "Aquí aparece la explicación de cada movimiento: por qué esa pieza va en ese lugar, qué se rompe sin ella y qué pasa cuando el reloj no alcanza."}
-            </span>
-          </div>
+          {pieEl}
         </div>
-
-        {/* ── Columna lateral ───────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos de la sesión
-            </Eyebrow>
-            <TableroObjetivos objetivos={objetivos} retoKey={RETO_KEY} accent={accent} />
-          </div>
-
-          {/* Qué se practica en el modo actual */}
-          <div
-            style={{
-              borderRadius: 18,
-              padding: "16px 18px",
-              border: `1px solid rgba(${color.rgba},0.3)`,
-              background: `rgba(${color.rgba},0.08)`,
-              fontSize: 13,
-              color: T.text2,
-              lineHeight: 1.55,
-              display: "flex",
-              gap: 12,
-            }}
-          >
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              {modo === "guion" && (
-                <>
-                  Una exposición no es una lista de temas, es una <strong style={{ color: T.text }}>secuencia</strong>: cada pieza
-                  prepara a la siguiente. Colócalas en el orden en que tendrían que ocurrir y después quítalas una por una para
-                  ver de qué se hacía cargo cada una.
-                </>
-              )}
-              {modo === "reloj" && (
-                <>
-                  El tiempo es lo único que no se puede estirar. Mueve los deslizadores hasta que la suma dé exactamente{" "}
-                  <strong style={{ color: T.text }}>{reloj(escenario.segundos)}</strong> y cada parte quede dentro de su banda; si
-                  subes el desarrollo por encima de la suya, verás a quién se lo quita.
-                </>
-              )}
-              {modo === "apoyos" && (
-                <>
-                  El apoyo visual <strong style={{ color: T.text }}>refuerza</strong> el mensaje oral; no lo repite ni lo
-                  sustituye. Pregúntate qué forma tiene lo que vas a decir: ¿una secuencia, una comparación, una relación entre
-                  partes?
-                </>
-              )}
-              {modo === "glosario" && (
-                <>
-                  Recordar el término es más difícil —y enseña más— que reconocerlo entre opciones. Si te atoras, usa la pista o
-                  abre el <strong style={{ color: T.text }}>banco de términos</strong>.
-                </>
-              )}
-              {modo === "texto" && (
-                <>
-                  Lee el párrafo completo antes de escribir: el contexto decide la palabra. Pulsa{" "}
-                  <strong style={{ color: T.text }}>Enter</strong> para comprobar cada hueco.
-                </>
-              )}
-            </span>
-          </div>
-
-          {/* Consigna verbatim de A3 */}
-          <div style={{ ...card, padding: "18px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-pen-nib" style={{ marginRight: 8, color: accent }} />
-              La tarea que viene · A3
-            </Eyebrow>
-            <p style={{ margin: "0 0 12px", fontSize: 12.5, color: T.text2, lineHeight: 1.6 }}>{CONSIGNA_A3.prompt}</p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-              {CONSIGNA_A3.pistas.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 9, fontSize: 12, color: T.text3, lineHeight: 1.45 }}>
-                  <i className="fa-solid fa-angle-right" style={{ color: accent, marginTop: 3, fontSize: 10 }} />
-                  <span>{p}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Preguntas de comprensión de la lectura A1 (verbatim) */}
-          <div style={{ ...card, padding: "18px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book-open-reader" style={{ marginRight: 8, color: accent }} />
-              Lectura A1 · para pensar
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {COMPRENSION_A1.map((c, i) => (
-                <details key={i} style={{ borderRadius: 11, border: `1px solid ${T.line}`, background: T.inset, padding: "10px 13px" }}>
-                  <summary style={{ cursor: "pointer", fontSize: 13, fontWeight: 700, color: T.text2, lineHeight: 1.45 }}>
-                    {c.pregunta}
-                  </summary>
-                  <p style={{ margin: "9px 0 0", fontSize: 12.5, color: T.text3, lineHeight: 1.5 }}>{c.guia}</p>
-                </details>
-              ))}
-            </div>
-          </div>
-
-          {/* Dato verbatim del callout de A1 */}
-          <div
-            style={{
-              borderRadius: 18,
-              padding: "16px 18px",
-              border: `1px solid ${T.line}`,
-              background: T.glass,
-              fontSize: 12.5,
-              color: T.text2,
-              lineHeight: 1.55,
-              display: "flex",
-              gap: 12,
-            }}
-          >
-            <i className="fa-solid fa-circle-info" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              <strong style={{ color: T.text }}>¿Sabías?</strong> {DATO_FIL}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <ClinicaCard accent={accent} respuestas={clinica} onResponder={responderClinica} />
-
-      <HechosCard accent={accent} respuestas={hechos} onResponder={responderHecho} />
-
-      <DebateCard
-        accent={accent}
-        rgba={color.rgba}
-        postura={postura}
-        argumento={argumento}
-        puntoValido={puntoValido}
-        onPostura={(id) => {
-          setPostura(id);
-          setPuntoValido(null);
-        }}
-        onArgumento={setArgumento}
-        onPuntoValido={(txt) => {
-          setPuntoValido(txt);
-          setPie({ ok: true, txt: "Reconocer un punto válido de la postura contraria no es perder el debate: es la parte de A7 que pide proponer en qué situaciones conviene cada forma." });
-        }}
-      />
-
-      <RetoQuizCard
-        quiz={RETO_QUIZ}
-        accent={accent}
-        rgba={color.rgba}
-        aprobado={quizAprobado}
-        onAprobado={() => setQuizAprobado(true)}
-        playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined}
-        mensajeAprobado="Conoces la anatomía de una exposición: sus fases, sus partes y lo que sostiene cada una."
-      />
-
-      {/* Nota al pie: qué es verbatim y qué es de este laboratorio */}
-      <p style={{ margin: "20px 2px 0", fontSize: 11.5, lineHeight: 1.6, color: T.text3 }}>
-        <i className="fa-solid fa-quote-right" style={{ marginRight: 7, opacity: 0.7 }} />
-        <strong style={{ color: T.text2 }}>Verbatim de la progresión LC-I-P08:</strong> la lectura, su callout «¿Sabías?» y sus
-        preguntas de comprensión (A1), el reto evaluable (A2), la consigna y las pistas de la mini-exposición de tres minutos
-        (A3), los hechos verdadero/falso (A4), el glosario (A5, los mismos pares que A9 pide relacionar), el texto con huecos
-        (A6) y el debate con sus posturas y argumentos guía (A7).{" "}
-        <strong style={{ color: T.text2 }}>Escrito para este laboratorio (ilustrativo):</strong> las siete piezas del guion y su
-        exposición de demostración sobre el cuidado del agua en la colonia —el tema que el Producto Integrador de la materia
-        propone como ejemplo—, las bandas de tiempo recomendadas, el escenario de diez minutos, las cinco decisiones de apoyo
-        visual y los cuatro casos de la clínica. Las personas y los salones son ficticios. El ritmo de{" "}
-        {PALABRAS_POR_MINUTO} palabras por minuto es una estimación para calcular cuánto texto cabe en un tiempo: al hablar en
-        público el rango cómodo va de 120 a 150, y no es un dato de la progresión. En el debate no hay respuesta correcta: el
-        laboratorio no califica tu postura, solo te pide sostenerla y reconocer un punto válido de la contraria.
-      </p>
-    </div>
+      }
+    />
   );
 }
 
@@ -935,20 +1012,20 @@ function GuionPanel({
   const abierta = PIEZAS.find((p) => p.id === piezaAbierta);
 
   return (
-    <>
+    <Mesa>
       <div style={{ ...card, padding: "18px 22px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6, flexWrap: "wrap", gap: 8 }}>
           <Eyebrow>Piezas sueltas del guion · colócalas en el orden en que ocurren</Eyebrow>
-          <span style={{ fontSize: 12.5, fontWeight: 800, color: completo ? OK : T.text3, ...NUM }}>
+          <span style={{ fontSize: 14, fontWeight: 800, color: completo ? OK : T.text3, ...NUM }}>
             {guionPos}/{PIEZAS.length}
           </span>
         </div>
-        <p style={{ margin: "0 0 14px", fontSize: 12.5, color: T.text3, lineHeight: 1.5 }}>
+        <p style={{ margin: "0 0 14px", fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
           Exposición de demostración: <strong style={{ color: T.text2 }}>«El cuidado del agua en mi colonia»</strong>, tres
           minutos ante el grupo.
         </p>
         {completo ? (
-          <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+          <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
             <i className="fa-solid fa-circle-check" /> Guion completo. Ahora toca cada pieza colocada para quitarla y ver qué se
             rompe sin ella ({Object.keys(probadas).length}/{PIEZAS.length} probadas).
           </div>
@@ -962,10 +1039,10 @@ function GuionPanel({
                 onClick={() => onSelPieza(p.id)}
                 {...dragProps(p.id)}
               >
-                <i className={`fa-solid ${p.icono}`} style={{ color: accent, marginTop: 3, fontSize: 12 }} />
+                <i className={`fa-solid ${p.icono}`} style={{ color: accent, marginTop: 3, fontSize: 14 }} />
                 <span>
                   <span style={{ display: "block", fontWeight: 800 }}>{p.nombre}</span>
-                  <span style={{ display: "block", fontWeight: 500, color: T.text2, fontSize: 12.5, marginTop: 3 }}>{p.funcion}</span>
+                  <span style={{ display: "block", fontWeight: 500, color: T.text2, fontSize: 14, marginTop: 3 }}>{p.funcion}</span>
                 </span>
               </button>
             ))}
@@ -973,7 +1050,8 @@ function GuionPanel({
         )}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: 12 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12, minWidth: 0 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 200px), 1fr))", gap: 12 }}>
         {PARTES_ORDEN.map((parte) => {
           const info = PARTE_INFO[parte];
           const dentro = PIEZAS.filter((p) => p.parte === parte && p.orden < guionPos);
@@ -994,9 +1072,9 @@ function GuionPanel({
             <FondoTermino termino={info.titulo} />
               <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
                 <VinetaTermino termino={info.titulo} color={T.text2} icono={info.icono} tam={29} radio={8} />
-                <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
+                <span style={{ fontSize: 14, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
               </div>
-              <div style={{ fontSize: 11, color: T.text3, marginBottom: 12, lineHeight: 1.45 }}>{info.subtitulo}</div>
+              <div style={{ fontSize: 14, color: T.text3, marginBottom: 12, lineHeight: 1.45 }}>{info.subtitulo}</div>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {dentro.map((p) => (
                   <button
@@ -1010,17 +1088,17 @@ function GuionPanel({
                     }}
                   >
                     <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <i className={`fa-solid ${probadas[p.id] ? "fa-link-slash" : p.icono}`} style={{ color: OK, fontSize: 11 }} />
+                      <i className={`fa-solid ${probadas[p.id] ? "fa-link-slash" : p.icono}`} style={{ color: OK, fontSize: 14 }} />
                       {p.nombre}
                     </span>
-                    <span style={{ display: "block", fontWeight: 500, color: T.text2, fontSize: 12, marginTop: 4, fontStyle: "italic" }}>
+                    <span style={{ display: "block", fontWeight: 500, color: T.text2, fontSize: 14, marginTop: 4, fontStyle: "italic" }}>
                       {p.ejemplo}
                     </span>
                   </button>
                 ))}
                 {faltan.map((p) => (
                   <div key={p.id} className="aex-slot" data-armed={esperaAqui && siguiente?.id === p.id}>
-                    <i className="fa-solid fa-circle-notch" style={{ fontSize: 11 }} />
+                    <i className="fa-solid fa-circle-notch" style={{ fontSize: 14 }} />
                     {esperaAqui && siguiente?.id === p.id ? "Aquí va la siguiente pieza" : "Pieza pendiente"}
                   </div>
                 ))}
@@ -1044,14 +1122,15 @@ function GuionPanel({
         >
           <i className="fa-solid fa-link-slash" style={{ color: NO, fontSize: 17, marginTop: 2 }} />
           <div>
-            <div style={{ fontSize: 13.5, fontWeight: 800, color: "#fff", marginBottom: 5 }}>
+            <div style={{ fontSize: 14, fontWeight: 800, color: "#fff", marginBottom: 5 }}>
               Una exposición sin «{abierta.nombre}»
             </div>
-            <div style={{ fontSize: 13, color: T.text2, lineHeight: 1.6 }}>{abierta.falta}</div>
+            <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.6 }}>{abierta.falta}</div>
           </div>
         </div>
       )}
-    </>
+      </div>
+    </Mesa>
   );
 }
 
@@ -1105,12 +1184,12 @@ function RelojPanel({
         <div style={{ display: "flex", gap: 9, flexWrap: "wrap", marginBottom: 14 }}>
           {ESCENARIOS_TIEMPO.map((e, i) => (
             <button key={e.id} className="aex-prob" data-on={escIdx === i} onClick={() => onEscenario(i)}>
-              <i className="fa-solid fa-stopwatch" style={{ marginRight: 7, fontSize: 11 }} />
+              <i className="fa-solid fa-stopwatch" style={{ marginRight: 7, fontSize: 14 }} />
               {e.nombre}
             </button>
           ))}
         </div>
-        <p style={{ margin: "0 0 16px", fontSize: 12.5, color: T.text3, lineHeight: 1.5 }}>{escenario.nota}</p>
+        <p style={{ margin: "0 0 16px", fontSize: 14, color: T.text3, lineHeight: 1.5 }}>{escenario.nota}</p>
 
         {/* Línea de tiempo */}
         <div style={{ position: "relative", marginBottom: 10 }}>
@@ -1129,7 +1208,7 @@ function RelojPanel({
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: 11,
+                    fontSize: 14,
                     fontWeight: 800,
                     color: "#fff",
                     whiteSpace: "nowrap",
@@ -1148,7 +1227,7 @@ function RelojPanel({
           )}
           {ensayo && <div className="aex-aguja" onAnimationEnd={onFinEnsayo} />}
         </div>
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: T.text3, ...NUM, marginBottom: 6 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, color: T.text3, ...NUM, marginBottom: 6 }}>
           <span>0:00</span>
           {escala > total && (
             <span style={{ color: "#fff", fontWeight: 800 }}>
@@ -1169,11 +1248,11 @@ function RelojPanel({
             return (
               <div key={b.id}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, marginBottom: 5, flexWrap: "wrap" }}>
-                  <span style={{ fontSize: 13, fontWeight: 800, color: dentro ? "#fff" : T.text2, display: "inline-flex", alignItems: "center", gap: 8 }}>
-                    <i className={`fa-solid ${b.icono}`} style={{ color: colores[b.id], fontSize: 12 }} />
+                  <span style={{ fontSize: 14, fontWeight: 800, color: dentro ? "#fff" : T.text2, display: "inline-flex", alignItems: "center", gap: 8 }}>
+                    <i className={`fa-solid ${b.icono}`} style={{ color: colores[b.id], fontSize: 14 }} />
                     {b.nombre}
                   </span>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: dentro ? OK : "#FF8A3C", ...NUM }}>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: dentro ? OK : "#FF8A3C", ...NUM }}>
                     {reloj(v)}
                     <span style={{ color: T.text3, fontWeight: 600 }}>
                       {" "}
@@ -1191,7 +1270,7 @@ function RelojPanel({
                   aria-label={`${b.nombre} (segundos)`}
                   onChange={(e) => onAjustar(b.id, Number(e.target.value))}
                 />
-                <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45, marginTop: 2 }}>{b.porque}</div>
+                <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.45, marginTop: 2 }}>{b.porque}</div>
               </div>
             );
           })}
@@ -1209,7 +1288,7 @@ function RelojPanel({
               padding: "10px 15px",
               border: `1px solid ${sobra === 0 ? `${OK}66` : `${NO}66`}`,
               background: sobra === 0 ? `${OK}14` : `${NO}12`,
-              fontSize: 13,
+              fontSize: 14,
               fontWeight: 800,
               color: sobra === 0 ? OK : NO,
               ...NUM,
@@ -1222,7 +1301,7 @@ function RelojPanel({
                 ? `Te pasas por ${reloj(sobra)}`
                 : `Te sobran ${reloj(-sobra)} sin repartir`}
           </div>
-          <div style={{ fontSize: 12.5, color: T.text2, ...NUM }}>
+          <div style={{ fontSize: 14, color: T.text2, ...NUM }}>
             Hablando caben ≈ <strong style={{ color: T.text }}>{palabras}</strong> palabras
           </div>
           <div style={{ flex: 1 }} />
@@ -1233,7 +1312,7 @@ function RelojPanel({
         </div>
 
         {valido && (
-          <div style={{ marginTop: 13, fontSize: 13, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+          <div style={{ marginTop: 13, fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
             <i className="fa-solid fa-circle-check" /> Reparto viable para {escenario.nombre.toLowerCase()}.
           </div>
         )}
@@ -1245,7 +1324,7 @@ function RelojPanel({
           border: `1px solid rgba(${rgba},0.28)`,
           background: `rgba(${rgba},0.07)`,
           padding: "15px 18px",
-          fontSize: 12.5,
+          fontSize: 14,
           color: T.text2,
           lineHeight: 1.6,
           display: "flex",
@@ -1285,11 +1364,11 @@ function ApoyosPanel({
       <div style={{ ...card, padding: "18px 22px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
           <Eyebrow>Elige el apoyo que sirve en cada momento (y lee por qué los otros no)</Eyebrow>
-          <span style={{ fontSize: 12.5, fontWeight: 800, color: hechos >= APOYOS.length ? OK : T.text3, ...NUM }}>
+          <span style={{ fontSize: 14, fontWeight: 800, color: hechos >= APOYOS.length ? OK : T.text3, ...NUM }}>
             {hechos}/{APOYOS.length}
           </span>
         </div>
-        <p style={{ margin: 0, fontSize: 12.5, color: T.text3, lineHeight: 1.55 }}>
+        <p style={{ margin: 0, fontSize: 14, color: T.text3, lineHeight: 1.55 }}>
           Sigues con la exposición sobre el agua. En cada momento hay tres apoyos posibles y sólo uno hace el trabajo que ese
           momento necesita.
         </p>
@@ -1305,7 +1384,7 @@ function ApoyosPanel({
               <span style={{ fontSize: 14, fontWeight: 800, color: "#fff" }}>{caso.momento}</span>
               {listo && <i className="fa-solid fa-circle-check" style={{ color: OK, marginLeft: "auto" }} />}
             </div>
-            <div style={{ fontSize: 12.5, color: T.text3, lineHeight: 1.5, marginBottom: 12 }}>{caso.detalle}</div>
+            <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.5, marginBottom: 12 }}>{caso.detalle}</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {caso.opciones.map((op, i) => {
                 const esta = probadas.includes(i);
@@ -1328,7 +1407,7 @@ function ApoyosPanel({
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        fontSize: 11,
+                        fontSize: 14,
                         fontWeight: 900,
                         border: `1px solid ${T.line}`,
                       }}
@@ -1349,7 +1428,7 @@ function ApoyosPanel({
                   key={i}
                   style={{
                     marginTop: 10,
-                    fontSize: 12.5,
+                    fontSize: 14,
                     color: T.text2,
                     lineHeight: 1.55,
                     borderRadius: 10,
@@ -1393,11 +1472,11 @@ function ClinicaCard({
           <i className="fa-solid fa-stethoscope" style={{ marginRight: 8, color: accent }} />
           Clínica de exposiciones · ¿qué le pasó a cada una?
         </Eyebrow>
-        <span style={{ fontSize: 12.5, fontWeight: 800, color: aciertos >= CLINICA.length ? OK : T.text3, ...NUM }}>
+        <span style={{ fontSize: 14, fontWeight: 800, color: aciertos >= CLINICA.length ? OK : T.text3, ...NUM }}>
           {aciertos}/{CLINICA.length}
         </span>
       </div>
-      <p style={{ margin: "0 0 18px", fontSize: 12.5, color: T.text3, lineHeight: 1.55 }}>
+      <p style={{ margin: "0 0 18px", fontSize: 14, color: T.text3, lineHeight: 1.55 }}>
         Cuatro exposiciones de un salón de bachillerato, contadas tal como se vieron. Ninguna es un desastre: a cada una le
         falló una sola cosa. Encuéntrala.
       </p>
@@ -1408,11 +1487,11 @@ function ClinicaCard({
           const listo = elegida === caso.correcta;
           return (
             <div key={caso.id} style={{ borderRadius: 14, border: `1px solid ${listo ? `${OK}55` : T.line}`, background: T.glass, padding: "14px 16px" }}>
-              <div style={{ fontSize: 13.5, color: T.text, lineHeight: 1.6, marginBottom: 12, fontStyle: "italic" }}>
-                <i className="fa-solid fa-quote-left" style={{ fontSize: 10, marginRight: 8, color: accent }} />
+              <div style={{ fontSize: 14, color: T.text, lineHeight: 1.6, marginBottom: 12, fontStyle: "italic" }}>
+                <i className="fa-solid fa-quote-left" style={{ fontSize: 14, marginRight: 8, color: accent }} />
                 {caso.relato}
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 8 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 240px), 1fr))", gap: 8 }}>
                 {caso.opciones.map((op, j) => (
                   <button
                     key={j}
@@ -1430,7 +1509,7 @@ function ClinicaCard({
                 <div
                   style={{
                     marginTop: 10,
-                    fontSize: 12.5,
+                    fontSize: 14,
                     color: T.text2,
                     lineHeight: 1.55,
                     borderRadius: 10,
@@ -1471,7 +1550,7 @@ function HechosCard({
           <i className="fa-solid fa-scale-balanced" style={{ marginRight: 8, color: accent }} />
           Hechos · verdadero o falso (A4, verbatim)
         </Eyebrow>
-        <span style={{ fontSize: 12.5, fontWeight: 800, color: aciertos >= HECHOS.length ? OK : T.text3, ...NUM }}>
+        <span style={{ fontSize: 14, fontWeight: 800, color: aciertos >= HECHOS.length ? OK : T.text3, ...NUM }}>
           {aciertos}/{HECHOS.length}
         </span>
       </div>
@@ -1482,7 +1561,7 @@ function HechosCard({
           const listo = dada === h.respuesta;
           return (
             <div key={i} style={{ borderRadius: 13, border: `1px solid ${listo ? `${OK}55` : T.line}`, background: T.glass, padding: "13px 16px" }}>
-              <div style={{ fontSize: 13.5, color: T.text, lineHeight: 1.5, marginBottom: 10 }}>{h.enunciado}</div>
+              <div style={{ fontSize: 14, color: T.text, lineHeight: 1.5, marginBottom: 10 }}>{h.enunciado}</div>
               <div style={{ display: "flex", gap: 9, flexWrap: "wrap", alignItems: "center" }}>
                 {[true, false].map((v) => (
                   <button
@@ -1497,7 +1576,7 @@ function HechosCard({
                   </button>
                 ))}
                 {dada !== null && dada !== undefined && (
-                  <span style={{ fontSize: 12.5, color: listo ? T.text2 : NO, lineHeight: 1.5, flex: 1, minWidth: 200 }}>
+                  <span style={{ fontSize: 14, color: listo ? T.text2 : NO, lineHeight: 1.5, flex: 1, minWidth: 0 }}>
                     {listo ? h.retro : "Todavía no: vuelve a leer el enunciado con calma."}
                   </span>
                 )}
@@ -1542,17 +1621,17 @@ function DebateCard({
         Mesa de debate · A7 (verbatim)
       </Eyebrow>
       <div style={{ fontSize: 14.5, fontWeight: 800, color: T.text, marginBottom: 6 }}>{DEBATE.tema}</div>
-      <div style={{ fontSize: 12.5, color: T.text3, lineHeight: 1.55, marginBottom: 16 }}>
+      <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.55, marginBottom: 16 }}>
         {DEBATE.reglas.join(" · ")} Aquí no hay respuesta correcta: lo que se evalúa es que sostengas tu postura y reconozcas
         algo válido en la contraria.
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 10, marginBottom: 16 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 260px), 1fr))", gap: 10, marginBottom: 16 }}>
         {DEBATE.posturas.map((p) => (
           <button key={p.id} className="aex-postura" data-on={postura === p.id} onClick={() => onPostura(p.id)}>
             <span style={{ display: "block", fontWeight: 800, marginBottom: 6 }}>{p.texto}</span>
             {p.guia.map((g, i) => (
-              <span key={i} style={{ display: "block", fontSize: 12, color: T.text3, lineHeight: 1.45 }}>
+              <span key={i} style={{ display: "block", fontSize: 14, color: T.text3, lineHeight: 1.45 }}>
                 <i className="fa-solid fa-angle-right" style={{ fontSize: 9, marginRight: 6 }} />
                 {g}
               </span>
@@ -1569,15 +1648,15 @@ function DebateCard({
         onChange={(e) => onArgumento(e.target.value)}
       />
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 8, flexWrap: "wrap" }}>
-        <span style={{ fontSize: 12.5, color: palabras >= DEBATE.minimoPalabras ? OK : T.text3, fontWeight: 800, ...NUM }}>
+        <span style={{ fontSize: 14, color: palabras >= DEBATE.minimoPalabras ? OK : T.text3, fontWeight: 800, ...NUM }}>
           {palabras} / {DEBATE.minimoPalabras} palabras
         </span>
-        {postura === null && <span style={{ fontSize: 12.5, color: T.text3 }}>Elige primero una postura.</span>}
+        {postura === null && <span style={{ fontSize: 14, color: T.text3 }}>Elige primero una postura.</span>}
       </div>
 
       {otra && (
         <div style={{ marginTop: 18, borderRadius: 14, border: `1px solid rgba(${rgba},0.3)`, background: `rgba(${rgba},0.07)`, padding: "14px 16px" }}>
-          <div style={{ fontSize: 12.5, fontWeight: 800, color: T.text2, marginBottom: 10 }}>
+          <div style={{ fontSize: 14, fontWeight: 800, color: T.text2, marginBottom: 10 }}>
             Ahora reconoce un punto válido de la postura contraria:
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>

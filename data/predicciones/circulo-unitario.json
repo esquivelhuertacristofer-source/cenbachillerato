@@ -1,0 +1,12 @@
+{
+  "escena": "Un círculo de radio 1 con un punto P que gira; su altura y su base se miden en dos barras.",
+  "pregunta": "Si llevas P a 135°, ¿cómo quedan las barras de seno y coseno?",
+  "opciones": [
+    { "id": "a", "texto": "Seno positivo, coseno negativo", "icono": "fa-arrows-left-right" },
+    { "id": "b", "texto": "Ambos positivos, igual que a 45°", "icono": "fa-plus" },
+    { "id": "c", "texto": "Seno negativo, coseno positivo", "icono": "fa-arrows-up-down" }
+  ],
+  "correcta": "a",
+  "porque": "A 135° el punto está arriba del eje horizontal (seno positivo) pero a la izquierda del eje vertical (coseno negativo). Las alturas son iguales a las de 45°, solo cambia el signo del coseno.",
+  "comoComprobarlo": "Aplica el ángulo clave de 135° o arrastra P hasta el segundo cuadrante y observa hacia qué lado crece cada barra."
+}

@@ -20,12 +20,13 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Lightformer, Html, Line } from "@react-three/drei";
+import { useMemo, useRef, useState } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { calcMed, fmtM, fmtDeg, D_MIN, D_MAX, type Medicion } from "./triangulo-rectangulo-data";
 import { CurvaTubo } from "./_tablero";
+import { Escenario, calidadEscena } from "./_escenario";
 
 export interface TrianguloRectanguloSceneProps {
   d: number;
@@ -99,18 +100,14 @@ function construir(d: number, angDeg: number): Geo {
   };
 }
 
-/* ── Etiqueta flotante reutilizable ──────────────────────────────────────── */
-function Etiqueta({
-  pos, color, children, size = 12, bg = "rgba(6,16,31,0.82)",
-}: {
-  pos: Pt; color: string; children: React.ReactNode; size?: number; bg?: string;
-}) {
+/* ── Etiqueta flotante: tamaño fijo en píxeles, en la punta de lo que nombra ── */
+function Etiqueta({ pos, color, children }: { pos: Pt; color: string; children: React.ReactNode }) {
   return (
-    <Html position={pos} center distanceFactor={14} pointerEvents="none">
+    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
       <div style={{
-        whiteSpace: "nowrap", padding: "4px 10px", borderRadius: 9, background: bg,
-        border: `1px solid ${color}66`, color: "#fff", fontWeight: 700, fontSize: size,
-        fontFamily: "system-ui, sans-serif", boxShadow: "0 8px 28px rgba(0,0,0,0.4)",
+        whiteSpace: "nowrap", padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.88)",
+        border: `1.5px solid ${color}`, color, fontWeight: 900, fontSize: 15,
+        fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)",
       }}>
         {children}
       </div>
@@ -154,7 +151,7 @@ function Arbol({ x, top, accent }: { x: number; top: number; accent: string }) {
       <group ref={copa} position={[0, top, 0]}>
         <mesh>
           <sphereGeometry args={[0.13, 18, 18]} />
-          <meshStandardMaterial color="#fff7e6" emissive={accent} emissiveIntensity={1.8} toneMapped={false} />
+          <meshStandardMaterial color="#fff7e6" emissive={accent} emissiveIntensity={1.0} />
         </mesh>
       </group>
     </group>
@@ -178,7 +175,7 @@ function Observador({ x, accent }: { x: number; accent: string }) {
       {/* ojo / clinómetro */}
       <mesh position={[0.08, EYV, 0]}>
         <sphereGeometry args={[0.05, 12, 12]} />
-        <meshStandardMaterial color="#fff" emissive={accent} emissiveIntensity={1.4} toneMapped={false} />
+        <meshStandardMaterial color="#fff" emissive={accent} emissiveIntensity={0.9} />
       </mesh>
     </group>
   );
@@ -187,15 +184,16 @@ function Observador({ x, accent }: { x: number; accent: string }) {
 /* ── La construcción completa ────────────────────────────────────────────── */
 function Escena({ g, accent, mostrarHip }: { g: Geo; accent: string; mostrarHip: boolean }) {
   const { m } = g;
+  const angosto = useThree((st) => st.size.width) < 640;
   return (
     <group>
-      {/* piso */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
-        <planeGeometry args={[40, 40]} />
-        <meshStandardMaterial color="#16321f" roughness={1} />
+      {/* terreno: disco de pasto sobre la mesa del escenario */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]} receiveShadow>
+        <circleGeometry args={[13, 64]} />
+        <meshStandardMaterial color="#1f4a2c" roughness={1} />
       </mesh>
       {/* línea base de distancia en el piso (referencia) */}
-      <Line points={[g.baseObs, g.baseObj]} color="#3f5d49" lineWidth={1.4} dashed dashSize={0.2} gapSize={0.14} />
+      <Line points={[[g.baseObs[0], 0.05, 0], [g.baseObj[0], 0.05, 0]]} color="#3f5d49" lineWidth={1.4} dashed dashSize={0.2} gapSize={0.14} />
 
       {/* ── Triángulo rectángulo ── */}
       {/* cateto adyacente (distancia) */}
@@ -204,37 +202,31 @@ function Escena({ g, accent, mostrarHip }: { g: Geo; accent: string; mostrarHip:
       <CurvaTubo puntos={[g.Ph, g.Top]} color={OP_COL} grosor={0.072} />
       {/* hipotenusa = línea de visión */}
       {mostrarHip && (
-        <Line points={[g.E, g.Top]} color={HYP_COL} lineWidth={2.6} dashed dashSize={0.001} gapSize={0} />
+        <CurvaTubo puntos={[g.E, g.Top]} color={HYP_COL} grosor={0.05} />
       )}
       {/* arco del ángulo θ */}
-      <Line points={g.arcPts} color={ARC_COL} lineWidth={2.6} />
+      <CurvaTubo puntos={g.arcPts} color={ARC_COL} grosor={0.04} />
       {/* marca de ángulo recto */}
-      <Line points={g.raPts} color="#cbd5e1" lineWidth={1.6} />
+      <CurvaTubo puntos={g.raPts} color="#cbd5e1" grosor={0.025} />
 
       {/* observador y árbol */}
       <Observador x={g.E[0]} accent={accent} />
       <Arbol x={g.halfX} top={g.topY} accent={accent} />
 
-      {/* ── Etiquetas ── */}
-      <Etiqueta pos={[g.E[0] + 1.0, g.E[1] + 0.28, 0]} color={ARC_COL} size={12.5}>
+      {/* ── Etiquetas (máx. 4, en la punta de lo que nombran; la línea de visión va al panel) ── */}
+      <Etiqueta pos={[g.E[0] + 1.25, g.E[1] + 0.45, 0]} color={ARC_COL}>
         θ = {fmtDeg(m.angDeg)}
       </Etiqueta>
-      <Etiqueta pos={[0, EYV - 0.42, 0]} color={ADY_COL} size={11.5}>
-        d = {fmtM(m.d)} (adyacente)
-      </Etiqueta>
-      <Etiqueta pos={[g.halfX + 0.7, (EYV + g.topY) / 2, 0]} color={OP_COL} size={11.5}>
-        opuesto = {fmtM(m.opuesto)}
-      </Etiqueta>
-      {mostrarHip && (
-        <Etiqueta pos={[(g.E[0] + g.Top[0]) / 2 - 0.2, (g.E[1] + g.Top[1]) / 2 + 0.35, 0]} color={HYP_COL} size={11}>
-          línea de visión = {fmtM(m.hip)}
+      {!angosto && (
+        <Etiqueta pos={[0, EYV - 0.5, 0]} color={ADY_COL}>
+          d = {fmtM(m.d)}
         </Etiqueta>
       )}
-      <Etiqueta pos={[g.halfX, g.topY + 0.7, 0]} color={accent} size={13} bg="rgba(6,16,31,0.9)">
-        H = {fmtM(m.H)}
+      <Etiqueta pos={[g.halfX + 1.2, (EYV + g.topY) / 2, 0]} color={OP_COL}>
+        opuesto = {fmtM(m.opuesto)}
       </Etiqueta>
-      <Etiqueta pos={[g.E[0] - 0.55, EYV * 0.5, 0]} color="#cbd5e1" size={10.5}>
-        {fmtM(m.eye)}
+      <Etiqueta pos={[g.halfX, g.topY + 0.95, 0]} color={accent}>
+        H = {fmtM(m.H)}
       </Etiqueta>
     </group>
   );
@@ -243,30 +235,16 @@ function Escena({ g, accent, mostrarHip }: { g: Geo; accent: string; mostrarHip:
 /* ── Contenido (descendiente del Canvas) ─────────────────────────────────── */
 function Contenido({ d, angDeg, accent, mostrarHip, autoRotate, pausado, resetNonce }: TrianguloRectanguloSceneProps) {
   const g = useMemo(() => construir(d, angDeg), [d, angDeg]);
-  const ty = (EYV + g.topY) / 2;
+  const [calidad] = useState(() => calidadEscena());
+  const ty = (EYV + g.topY) / 2 - 0.5;
 
   return (
     <>
-      <color attach="background" args={["#08131f"]} />
-      <fog attach="fog" args={["#08131f", 22, 52]} />
-
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[6, 12, 7]} intensity={1.5} castShadow shadow-mapSize={[1024, 1024]} shadow-camera-far={40} />
-      <pointLight position={[-7, 5, -4]} intensity={0.45} color={accent} />
+      <Escenario acento={accent} suelo={0} calidad={calidad} />
 
       <group key={`${resetNonce}`}>
         <Escena g={g} accent={accent} mostrarHip={mostrarHip} />
       </group>
-
-      <ContactShadows position={[0, 0.01, 0]} opacity={0.4} scale={26} blur={2.4} far={8} />
-
-      <Environment resolution={128}>
-        <group>
-          <Lightformer intensity={1.4} position={[0, 8, 3]} scale={10} color="#eaf1ff" />
-          <Lightformer intensity={0.8} position={[6, 3, 1]} scale={6} color="#cfe0ff" />
-          <Lightformer intensity={0.5} position={[-6, 2, -3]} scale={6} color="#bfe6c4" />
-        </group>
-      </Environment>
 
       <OrbitControls
         makeDefault

@@ -1,0 +1,11 @@
+{
+  "slug": "anatomia-exposicion-oral",
+  "items": [
+    { "clave": "apertura-pregunta", "formato": "16:9", "estilo": "ilustracion", "escena": "Un joven de pie frente a un salón de clases con la mano abierta extendida hacia sus compañeros y varios estudiantes sentados que levantan la vista con curiosidad" },
+    { "clave": "apertura-dato", "formato": "16:9", "estilo": "ilustracion", "escena": "Un estudiante señala una pantalla grande con una gota de agua enorme dibujada mientras los compañeros sentados abren los ojos sorprendidos" },
+    { "clave": "mirada-grupo", "formato": "16:9", "estilo": "ilustracion", "escena": "Un estudiante expositor de pie con las manos libres, mirando de frente a sus compañeros sentados en filas dentro de un salón luminoso" },
+    { "clave": "mirada-papel", "formato": "16:9", "estilo": "ilustracion", "escena": "Un estudiante de pie con la cabeza agachada sosteniendo una hoja de papel frente a su cara, compañeros sentados al fondo con gesto aburrido" },
+    { "clave": "apoyo-esquema", "formato": "16:9", "estilo": "ilustracion", "escena": "Pantalla de proyección en un salón con un esquema de tres círculos de colores unidos por flechas y un pequeño dibujo en cada círculo, sin letras" },
+    { "clave": "apoyo-parrafos", "formato": "16:9", "estilo": "ilustracion", "escena": "Pantalla de proyección en un salón llena de líneas de texto muy pequeñas y apretadas de borde a borde, estudiantes entrecerrando los ojos al frente" }
+  ]
+}

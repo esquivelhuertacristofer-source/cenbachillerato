@@ -17,7 +17,7 @@
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { ELEMS_O, type Elem, type AtomLocal, type BondLocal } from "./organica-data";
 import { Escenario } from "./_escenario";
@@ -32,6 +32,10 @@ export interface OrganicaSceneProps {
   girar: boolean;
   autoRotate: boolean;
   resetNonce: number;
+  /** 0…1: cuánto se aleja el grupo funcional del resto de la molécula. */
+  separacion: number;
+  /** Texto corto del grupo funcional (vacío si la familia no tiene). */
+  etiquetaFG: string;
 }
 
 type Pt = [number, number, number];
@@ -60,7 +64,7 @@ function Atomo({ el, pos, fg, resaltar, fgColor }: { el: Elem; pos: Pt; fg: bool
       {destaca && (
         <mesh>
           <sphereGeometry args={[e.radio + 0.14, 24, 24]} />
-          <meshBasicMaterial color={fgColor} transparent opacity={0.18} depthWrite={false} toneMapped={false} />
+          <meshBasicMaterial color={fgColor} transparent opacity={0.18} depthWrite={false} />
         </mesh>
       )}
     </group>
@@ -102,7 +106,6 @@ function Bond({ start, end, orden, fg, resaltar, fgColor }: { start: Pt; end: Pt
             metalness={0.5}
             transparent={atenua}
             opacity={atenua ? 0.4 : 1}
-            toneMapped={!destaca}
           />
         </mesh>
       ))}
@@ -111,25 +114,61 @@ function Bond({ start, end, orden, fg, resaltar, fgColor }: { start: Pt; end: Pt
 }
 
 /* ── Molécula completa, girando sobre su eje ─────────────────────────────── */
-function Molecula({ atoms, bonds, resaltarFG, fgColor, girar }: { atoms: AtomLocal[]; bonds: BondLocal[]; resaltarFG: boolean; fgColor: string; girar: boolean }) {
+const SEPARA_MAX = 2.4; // distancia máxima a la que se aleja el grupo funcional
+
+function Molecula({ atoms, bonds, resaltarFG, fgColor, girar, separacion, etiquetaFG }: {
+  atoms: AtomLocal[]; bonds: BondLocal[]; resaltarFG: boolean; fgColor: string; girar: boolean; separacion: number; etiquetaFG: string;
+}) {
   const grp = useRef<THREE.Group>(null);
   useFrame((_, dt) => {
     if (grp.current && girar) grp.current.rotation.y += dt * 0.6;
   });
+
+  // El grupo funcional se aleja del resto a lo largo del eje que los une;
+  // los enlaces entre ambos partes se estiran solos porque leen estas posiciones.
+  const { pos, centroFG } = useMemo(() => {
+    const fgs = atoms.filter((x) => x.fg);
+    const resto = atoms.filter((x) => !x.fg);
+    const cen = (l: AtomLocal[]): Pt => {
+      const n = Math.max(1, l.length);
+      return [l.reduce((t, x) => t + x.p[0], 0) / n, l.reduce((t, x) => t + x.p[1], 0) / n, l.reduce((t, x) => t + x.p[2], 0) / n];
+    };
+    const cf = cen(fgs), cr = cen(resto);
+    let d: Pt = [0, 0, 0];
+    if (fgs.length > 0 && resto.length > 0) {
+      const v = new THREE.Vector3(cf[0] - cr[0], cf[1] - cr[1], cf[2] - cr[2]).normalize().multiplyScalar(separacion * SEPARA_MAX);
+      d = [v.x, v.y, v.z];
+    }
+    const pos = atoms.map((x): Pt => (x.fg ? [x.p[0] + d[0], x.p[1] + d[1], x.p[2] + d[2]] : [x.p[0], x.p[1], x.p[2]]));
+    const centroFG: Pt = [cf[0] + d[0], cf[1] + d[1], cf[2] + d[2]];
+    return { pos, centroFG };
+  }, [atoms, separacion]);
+
   return (
     <group ref={grp}>
       {atoms.map((a, i) => (
-        <Atomo key={`a${i}`} el={a.el} pos={a.p} fg={!!a.fg} resaltar={resaltarFG} fgColor={fgColor} />
+        <Atomo key={`a${i}`} el={a.el} pos={pos[i]!} fg={!!a.fg} resaltar={resaltarFG} fgColor={fgColor} />
       ))}
       {bonds.map((b, i) => (
-        <Bond key={`b${i}`} start={atoms[b.a]!.p} end={atoms[b.b]!.p} orden={b.orden} fg={!!b.fg} resaltar={resaltarFG} fgColor={fgColor} />
+        <Bond key={`b${i}`} start={pos[b.a]!} end={pos[b.b]!} orden={b.orden} fg={!!b.fg} resaltar={resaltarFG} fgColor={fgColor} />
       ))}
+      {etiquetaFG && resaltarFG && (
+        <Html position={[centroFG[0], centroFG[1] + 0.85, centroFG[2]]} center pointerEvents="none" zIndexRange={[20, 0]}>
+          <div style={{
+            whiteSpace: "nowrap", padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.88)",
+            border: `1.5px solid ${fgColor}`, color: fgColor, fontWeight: 900, fontSize: 15,
+            fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)",
+          }}>
+            {etiquetaFG}
+          </div>
+        </Html>
+      )}
     </group>
   );
 }
 
 /* ── Contenido (descendiente del Canvas) ─────────────────────────────────── */
-function Contenido({ molId, atoms, bonds, accent, fgColor, resaltarFG, girar, autoRotate, resetNonce }: OrganicaSceneProps) {
+function Contenido({ molId, atoms, bonds, accent, fgColor, resaltarFG, girar, autoRotate, resetNonce, separacion, etiquetaFG }: OrganicaSceneProps) {
   const sig = `${molId}-${resetNonce}`;
   return (
     <>
@@ -140,7 +179,7 @@ function Contenido({ molId, atoms, bonds, accent, fgColor, resaltarFG, girar, au
 
 
       <group key={sig} position={[0, 0.1, 0]}>
-        <Molecula atoms={atoms} bonds={bonds} resaltarFG={resaltarFG} fgColor={fgColor} girar={girar} />
+        <Molecula atoms={atoms} bonds={bonds} resaltarFG={resaltarFG} fgColor={fgColor} girar={girar} separacion={separacion} etiquetaFG={etiquetaFG} />
       </group>
 
 
@@ -151,7 +190,7 @@ function Contenido({ molId, atoms, bonds, accent, fgColor, resaltarFG, girar, au
         maxDistance={14}
         minPolarAngle={Math.PI / 6}
         maxPolarAngle={Math.PI / 1.6}
-        target={[0, 0, 0]}
+        target={[0, -0.45, 0]}
         autoRotate={autoRotate}
         autoRotateSpeed={0.5}
       />
@@ -166,7 +205,7 @@ function Contenido({ molId, atoms, bonds, accent, fgColor, resaltarFG, girar, au
 
 export default function OrganicaScene(props: OrganicaSceneProps) {
   return (
-    <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={{ position: [0, 1.0, 6], fov: 46 }}>
+    <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={{ position: [0, 0.8, 6.6], fov: 46 }}>
       {/* A 8 unidades, una molécula pequeña como el metano ocupaba menos de un
           tercio del alto y la escena parecía vacía. A 6 sigue cabiendo entera
           una cadena larga, y `maxDistance` deja alejarse si hace falta. */}

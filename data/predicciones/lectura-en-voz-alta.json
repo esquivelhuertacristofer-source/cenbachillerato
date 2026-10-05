@@ -1,0 +1,12 @@
+{
+  "escena": "Una oyente ficticia escucha un fragmento mientras ves la onda de la lectura",
+  "pregunta": "Si lees el primer fragmento más rápido de lo recomendado, ¿qué le pasa a la oyente?",
+  "opciones": [
+    { "id": "a", "texto": "Entiende mejor porque termina antes", "icono": "fa-forward" },
+    { "id": "b", "texto": "Se pierde y comprende menos", "icono": "fa-circle-question" },
+    { "id": "c", "texto": "Solo cambia la duración total", "icono": "fa-stopwatch" }
+  ],
+  "correcta": "b",
+  "porque": "Al acelerar, las palabras casi se juntan en la onda y la oyente no alcanza a procesarlas. Leer deprisa ahorra tiempo, pero cuesta comprensión.",
+  "comoComprobarlo": "En «Ajusta el ritmo», mueve la velocidad de lectura hacia el extremo acelerado y observa el medidor y la cara de la oyente."
+}

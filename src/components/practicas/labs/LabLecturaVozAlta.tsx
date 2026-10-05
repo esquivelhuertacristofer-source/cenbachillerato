@@ -34,16 +34,17 @@
  * 3D sería decoración. Contenido verbatim de LC-I·P07 (ver la nota al pie).
  */
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { PracticaLabProps } from "../registry";
 import { T, OK, card, Eyebrow, NUM } from "./_kit";
+import { LabShell, Bloque, BotonHerramienta, Deslizador } from "./_shell";
+import { OyenteEscena, OndaLectura, MelodiaPartitura, FotoLectura } from "./LecturaOyente";
 import { hablarLab, callarLab } from "./lab-voz";
 import { LabSfx } from "./lab-audio";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { EscribeTermino } from "./_mecanica-termino";
 import { LECTURA_VOZ_ALTA_HUECOS } from "./lectura-voz-alta-huecos";
 import { usePartida, MarcadorPartida } from "./_partida";
-import { TableroObjetivos } from "./_objetivos";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { LECTURA_VOZ_ALTA_FICHA } from "./lectura-voz-alta-ficha";
@@ -80,6 +81,7 @@ import {
   type Elemento,
 } from "./lectura-voz-alta-data";
 import { VinetaTermino } from "./_vineta";
+import { oyente } from "./lectura-voz-alta-sim";
 
 const NO = "#FF5E5E";
 const RETO_KEY = "cen-lectura-en-voz-alta-reto";
@@ -124,7 +126,6 @@ export function LabLecturaVozAlta({ color }: PracticaLabProps) {
   /* ── sonido y partida ─────────────────────────────────────────────────── */
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   useEffect(
     () => () => {
@@ -230,9 +231,21 @@ export function LabLecturaVozAlta({ color }: PracticaLabProps) {
     sfxNo();
   };
 
+  const [rapidoVisto, setRapidoVisto] = useState(false);
+  const [lentoVisto, setLentoVisto] = useState(false);
+  const cambiarPpm = (v: number) => {
+    setPpm((prev) => ({ ...prev, [frag.id]: v }));
+    if (v > frag.ppmMax + 20) setRapidoVisto(true);
+    if (v < frag.ppmMin - 20) setLentoVisto(true);
+  };
+  const [oidoCorrido, setOidoCorrido] = useState(false);
+  const [oidoPuntuado, setOidoPuntuado] = useState(false);
+
   const escucharFragmento = () => hablar(frag.texto, ppmActual / PPM_BASE);
 
   const resetRitmo = () => {
+    setRapidoVisto(false);
+    setLentoVisto(false);
     setPpm((prev) => ({ ...prev, [frag.id]: frag.ppmInicial }));
     setPausa((prev) => ({ ...prev, [frag.id]: frag.pausaInicial }));
     setRitmoOk((prev) => Object.fromEntries(Object.entries(prev).filter(([k]) => k !== frag.id)));
@@ -310,6 +323,8 @@ export function LabLecturaVozAlta({ color }: PracticaLabProps) {
   /* ── objetivos de la sesión ───────────────────────────────────────────── */
   const todoHecho = partituraDone && ritmoDone && diagDone && opiDone && glosarioDone && textoDone;
   const objetivos = [
+    { txt: "Escucha la lectura de corrido y con puntuación", done: oidoCorrido && oidoPuntuado },
+    { txt: "Lee muy rápido y muy lento y mira a la oyente", done: rapidoVisto && lentoVisto },
     { txt: `Marca los ${TEXTOS[0]!.puntos.length} puntos de la nota informativa`, done: TEXTOS[0]!.puntos.every((p) => !!puestos[p.id]) },
     { txt: `Marca los ${TEXTOS[1]!.puntos.length} puntos del texto literario`, done: TEXTOS[1]!.puntos.every((p) => !!puestos[p.id]) },
     { txt: `Marca los ${TEXTOS[2]!.puntos.length} puntos del relato con diálogo`, done: TEXTOS[2]!.puntos.every((p) => !!puestos[p.id]) },
@@ -324,15 +339,213 @@ export function LabLecturaVozAlta({ color }: PracticaLabProps) {
 
   const resetActual = modo === "partitura" ? resetPartitura : modo === "ritmo" ? resetRitmo : modo === "juicio" ? resetJuicio : modo === "glosario" ? resetGlosario : resetTexto;
 
+  const consejo: ReactNode =
+    modo === "partitura" ? (
+      <>
+        La puntuación es la partitura: la <strong style={{ color: T.text }}>coma</strong> pide silencio corto, el <strong style={{ color: T.text }}>punto</strong>{" "}
+        y los <strong style={{ color: T.text }}>dos puntos</strong> piden respiración, y los signos de interrogación y exclamación piden que el tono se mueva. El
+        énfasis no lo marca ningún signo: lo decides tú, en la palabra que trae lo nuevo.
+      </>
+    ) : modo === "ritmo" ? (
+      <>
+        No hay una velocidad «correcta» para todo: hay una adecuada <strong style={{ color: T.text }}>para este texto y para quien lo escucha</strong>. Mira
+        qué hace la oyente cuando cambias el ritmo. Los intervalos son orientativos, no una norma.
+      </>
+    ) : modo === "juicio" ? (
+      <>
+        Una opinión fundamentada tiene tres piezas: <strong style={{ color: T.text }}>qué se escuchó</strong>,{" "}
+        <strong style={{ color: T.text }}>qué elemento explica eso</strong> y <strong style={{ color: T.text }}>qué efecto tuvo</strong> en quien escucha. Sin
+        las tres, es un «me gustó» con más palabras.
+      </>
+    ) : modo === "glosario" ? (
+      <>Lee la definición y su ejemplo y escribe el término. Si te atoras, la pista te da la inicial y las letras.</>
+    ) : (
+      <>Aquí se escribe. El botón de pista te da la definición y el banco de palabras te deja tocar el término en vez de teclearlo.</>
+    );
+
+  const lecturaVivo =
+    modo === "ritmo"
+      ? `Oyente: ${oyente(frag, ppmActual, pausaActual).total} % de comprensión`
+      : modo === "partitura"
+        ? `Marcas: ${puestosDelTexto} de ${texto.puntos.length}`
+        : modo === "juicio"
+          ? `Lecturas diagnosticadas: ${Object.keys(diag).length} de ${LECTURAS.length}`
+          : undefined;
+
   const duracion = duracionEstimada(frag, ppmActual, pausaActual);
 
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      dom
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })),
+        valor: modo,
+        cambiar: (id) => setModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={resetActual} />
+        </>
+      }
+      lectura={lecturaVivo}
+      objetivos={objetivos}
+      pestanas={[
+        {
+          id: "cuaderno",
+          etiqueta: "Cuaderno",
+          icono: "fa-pen-ruler",
+          contenido: (
+            <>
+              <Bloque titulo="Qué practicas aquí" icono="fa-lightbulb">
+                <div style={{ color: T.text2, lineHeight: 1.55 }}>{consejo}</div>
+              </Bloque>
+              <Bloque titulo="¿Sabías?" icono="fa-circle-info">
+                <div style={{ color: T.text2, lineHeight: 1.55 }}>{DATO_PAZ}</div>
+              </Bloque>
+              <Bloque titulo="Tarea fuera de la pantalla" icono="fa-microphone-lines">
+                <div style={{ color: T.text2, lineHeight: 1.55 }}>{ACTIVIDAD_FINAL_A5}</div>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <RetoQuizCard
+              quiz={QUIZ}
+              accent={accent}
+              rgba={color.rgba}
+              aprobado={quizAprobado}
+              onAprobado={() => setQuizAprobado(true)}
+              playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined}
+              mensajeAprobado="Sabes qué hace cada elemento de la voz y qué convierte un comentario en una opinión fundamentada."
+            />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Ficha teórica" icono="fa-book-open">
+                <FichaTeorica data={LECTURA_VOZ_ALTA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr)", gap: 16, marginTop: 20 }}>
+                <div style={{ ...card, padding: "20px 22px" }}>
+          <Eyebrow>
+            <i className="fa-solid fa-check-double" style={{ marginRight: 8, color: accent }} />
+            Hechos
+          </Eyebrow>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {HECHOS.map((h, i) => (
+              <div key={i} style={{ display: "flex", gap: 11 }}>
+                <i className={`fa-solid ${h.verdadero ? "fa-circle-check" : "fa-circle-xmark"}`} style={{ color: h.verdadero ? OK : NO, fontSize: 14, marginTop: 3, flexShrink: 0 }} />
+                <div style={{ fontSize: 14, lineHeight: 1.5 }}>
+                  <div style={{ color: T.text }}>{h.enunciado}</div>
+                  <div style={{ color: T.text3, marginTop: 3 }}>{h.retro}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ ...card, padding: "20px 22px" }}>
+          <Eyebrow>
+            <i className="fa-solid fa-comments" style={{ marginRight: 8, color: accent }} />
+            Debate de la progresión
+          </Eyebrow>
+          <div style={{ fontSize: 14, fontWeight: 800, color: T.text, lineHeight: 1.5, marginBottom: 14 }}>{DEBATE_A7.tema}</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
+            {DEBATE_A7.posturas.map((p, i) => (
+              <div key={i} style={{ borderRadius: 13, border: `1px solid ${T.line}`, background: T.inset, padding: "12px 14px" }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: T.text, lineHeight: 1.5 }}>{p.postura}</div>
+                <ul style={{ margin: "8px 0 0", paddingLeft: 17, fontSize: 14, color: T.text3, lineHeight: 1.55 }}>
+                  {p.argumentos.map((a, j) => (
+                    <li key={j}>{a}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <div style={{ fontSize: 14, color: T.text3, marginTop: 12, lineHeight: 1.5 }}>
+            Las dos posturas son defendibles: {DEBATE_A7.reglas.join(" ")}
+          </div>
+        </div>
+
+        <div style={{ ...card, padding: "20px 22px" }}>
+          <Eyebrow>
+            <i className="fa-solid fa-book-open-reader" style={{ marginRight: 8, color: accent }} />
+            Comprensión de la lectura
+          </Eyebrow>
+          <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
+            {PREGUNTAS_A1.map((p, i) => (
+              <div key={i}>
+                <div style={{ fontSize: 14, fontWeight: 800, color: T.text, lineHeight: 1.5 }}>{p.pregunta}</div>
+                <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.55, marginTop: 4 }}>{p.respuesta}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* criterios y preguntas de A3: con qué se juzga una lectura */}
+        <div style={{ ...card, padding: "20px 22px" }}>
+          <Eyebrow>
+            <i className="fa-solid fa-list-check" style={{ marginRight: 8, color: accent }} />
+            Criterios para opinar
+          </Eyebrow>
+          <ul style={{ margin: 0, paddingLeft: 18, fontSize: 14, color: T.text2, lineHeight: 1.6, display: "flex", flexDirection: "column", gap: 7 }}>
+            {CRITERIOS_A3.map((c, i) => (
+              <li key={i}>{c}</li>
+            ))}
+          </ul>
+          <div className="lva-divider" />
+          <Eyebrow>
+            <i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />
+            Preguntas para prepararte
+          </Eyebrow>
+          <ul style={{ margin: 0, paddingLeft: 18, fontSize: 14, color: T.text2, lineHeight: 1.6, display: "flex", flexDirection: "column", gap: 7 }}>
+            {PISTAS_A3.map((p, i) => (
+              <li key={i}>{p}</li>
+            ))}
+          </ul>
+        </div>
+              </div>
+              <Bloque titulo="Qué es verbatim y qué es ilustrativo" icono="fa-quote-right">
+                <div style={{ color: T.text3, lineHeight: 1.6 }}>
+                  <span>
+          Son <strong>verbatim</strong> de la progresión LC-I-P07: la lectura y el «¿sabías que?» de A1 con sus preguntas de comprensión, el quiz evaluable de
+          A2, las pistas y los criterios de A3, los hechos de A4, el glosario de A5 con sus ejemplos, el texto con huecos de A6 y el debate de A7. Los{" "}
+          <strong>tres textos que se marcan</strong>, los <strong>cuatro fragmentos de ritmo</strong> y las <strong>seis lecturas ajenas</strong> los escribí
+          para esta práctica, porque la progresión pide «textos de su elección» y no trae ninguno: son <strong>ilustrativos</strong>, y los nombres de quienes
+          leen son ficticios a propósito, para no atribuir a nadie real una lectura. Los intervalos de velocidad y de pausa son{" "}
+          <strong>orientativos</strong>: parten de que una lectura en voz alta para público suele moverse alrededor de 120–150 palabras por minuto, más despacio
+          que una conversación, y se mueven desde ahí según el texto; no son una norma y se pueden discutir. Sí son verificables los datos externos: la primera
+          línea del Metro de la Ciudad de México se inauguró en 1969 y Octavio Paz recibió el Premio Nobel de Literatura en 1990. La descripción de la
+          entonación —ascendente en las preguntas que se responden con sí o no, descendente en las que empiezan con «qué» o «cuántas»— es la descripción
+          estándar de la prosodia del español. <strong>Este laboratorio no graba ni califica tu voz</strong>: el botón «Escuchar» usa el sintetizador del
+          navegador y sirve para comparar dos maneras de leer. Fuente: {FUENTE}.
+        </span>
+                </div>
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+      escena={
+        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
+          <style>{`
         @keyframes lvaShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-5px);} 40%{transform:translateX(5px);} 60%{transform:translateX(-3px);} 80%{transform:translateX(3px);} }
         @keyframes lvaPop { 0%{transform:scale(.7);opacity:0;} 100%{transform:scale(1);opacity:1;} }
         .lva-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 16px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:800; transition:all .14s; }
+          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; }
         .lva-tab:hover { border-color:${T.lineStrong}; color:#fff; }
         .lva-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
         .lva-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
@@ -342,13 +555,13 @@ export function LabLecturaVozAlta({ color }: PracticaLabProps) {
 
         /* Selector de texto / fragmento / lectura */
         .lva-doc { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:9px 14px; border-radius:10px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:12.5px; font-weight:800; transition:all .14s; }
+          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; }
         .lva-doc:hover { border-color:${T.lineStrong}; color:#fff; }
         .lva-doc[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; }
         .lva-doc[data-done="true"] { color:${OK}; border-color:${OK}66; }
 
         /* Los cuatro marcadores de voz */
-        .lva-marca { cursor:pointer; flex:1; min-width:168px; text-align:left; padding:12px 14px; border-radius:14px;
+        .lva-marca { cursor:pointer; flex:1; min-width:min(100%, 168px); text-align:left; padding:12px 14px; border-radius:14px;
           border:1.5px solid ${T.line}; background:${T.glassSoft}; color:${T.text2}; transition:all .15s; }
         .lva-marca:hover { border-color:${T.lineStrong}; }
         .lva-marca[data-on="true"] { color:#fff; }
@@ -363,7 +576,7 @@ export function LabLecturaVozAlta({ color }: PracticaLabProps) {
         .lva-tok[data-done="true"]:hover { background:inherit; }
         .lva-tok[data-shake="true"] { animation:lvaShake .4s; background:${NO}22; border-bottom-color:${NO}; }
         .lva-sil { display:inline-block; font-weight:900; font-size:17px; margin:0 2px; animation:lvaPop .25s ease; }
-        .lva-flecha { display:inline-block; font-weight:900; font-size:13px; margin-left:2px; vertical-align:super; animation:lvaPop .25s ease; }
+        .lva-flecha { display:inline-block; font-weight:900; font-size:14px; margin-left:2px; vertical-align:super; animation:lvaPop .25s ease; }
 
         /* Controles de ritmo */
         .lva-slider { -webkit-appearance:none; appearance:none; width:100%; height:6px; border-radius:99px;
@@ -377,17 +590,17 @@ export function LabLecturaVozAlta({ color }: PracticaLabProps) {
 
         /* Opciones de opinión y elementos */
         .lva-elem { cursor:pointer; display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:12px;
-          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13px; font-weight:800; transition:all .14s; }
+          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; }
         .lva-elem:hover:not(:disabled) { border-color:${T.lineStrong}; color:#fff; }
         .lva-elem:disabled { cursor:default; }
         .lva-op { cursor:pointer; display:flex; align-items:flex-start; gap:12px; width:100%; text-align:left; padding:13px 15px;
           border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2};
-          font-size:13.5px; font-weight:600; line-height:1.5; transition:all .14s; }
+          font-size:14px; font-weight:600; line-height:1.5; transition:all .14s; }
         .lva-op:hover:not(:disabled) { border-color:${T.lineStrong}; color:#fff; }
         .lva-op:disabled { cursor:default; }
 
         .lva-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
-          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:13.5px; font-weight:800; transition:all .14s; }
+          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:14px; font-weight:800; transition:all .14s; }
         .lva-btn:hover:not(:disabled) { border-color:${T.lineStrong}; }
         .lva-btn:disabled { opacity:.45; cursor:default; }
         .lva-btn[data-primary="true"] { background:${accent}; color:#04121f; border-color:${accent}; }
@@ -397,74 +610,12 @@ export function LabLecturaVozAlta({ color }: PracticaLabProps) {
           .lva-sil, .lva-flecha { animation:none; }
         }
 
-        /* Cajón de teoría */
-        .lva-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .lva-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .lva-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .lva-drawer[data-open="true"] { transform:translateX(0); }
-        .lva-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .lva-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .lva-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .lva-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .lva-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .lva-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .lva-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
-        @media (max-width: 900px){ .lva-grid { grid-template-columns:minmax(0,1fr) !important; } }
+        /* Oyente y onda */
+        .lva-oyente { display:flex; gap:14px; align-items:center; border-radius:14px; border:1px solid ${T.line}; background:${T.glass}; padding:12px; }
+        .lva-medidor { height:12px; border-radius:99px; background:rgba(255,255,255,0.12); overflow:hidden; }
+        .lva-medidor > div { height:100%; transition:width .3s, background .3s; }
+
       `}</style>
-
-      {/* ── barra de modos y herramientas ───────────────────────────────── */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="lva-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="lva-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="lva-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="lva-icobtn" onClick={resetActual} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
-
-      {/* ── cajón de teoría ─────────────────────────────────────────────── */}
-      <button className="lva-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="lva-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="lva-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="lva-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="lva-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="lva-drawer-body">
-          <FichaTeorica data={LECTURA_VOZ_ALTA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div className="lva-grid" style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}>
-        {/* ══ columna principal ═══════════════════════════════════════════ */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
           {/* MODO 1 — marca la partitura */}
           {modo === "partitura" && (
             <>
@@ -504,12 +655,12 @@ export function LabLecturaVozAlta({ color }: PracticaLabProps) {
                       onClick={() => setMarca(m)}
                       style={on ? { borderColor: info.color, background: `${info.color}1f`, boxShadow: `0 0 18px -7px ${info.color}` } : undefined}
                     >
-                      <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13.5, fontWeight: 900, color: on ? "#fff" : info.color }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 900, color: on ? "#fff" : info.color }}>
                         <i className={`fa-solid ${info.icono}`} />
                         {info.titulo}
                         <span style={{ marginLeft: "auto", fontSize: 15, fontWeight: 900, color: info.color }}>{info.simbolo}</span>
                       </div>
-                      <div style={{ fontSize: 11.5, lineHeight: 1.45, marginTop: 5, color: on ? T.text2 : T.text3 }}>{info.descripcion}</div>
+                      <div style={{ fontSize: 14, lineHeight: 1.45, marginTop: 5, color: on ? T.text2 : T.text3 }}>{info.descripcion}</div>
                     </button>
                   );
                 })}
@@ -520,13 +671,13 @@ export function LabLecturaVozAlta({ color }: PracticaLabProps) {
                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     <VinetaTermino termino={texto.titulo} color={accent} icono={texto.icono} tam={33} radio={9} />
                     <span style={{ fontSize: 16, fontWeight: 900 }}>{texto.titulo}</span>
-                    <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: T.text3 }}>{texto.genero}</span>
+                    <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: T.text3 }}>{texto.genero}</span>
                   </div>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: textoListo ? OK : T.text3, ...NUM }}>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: textoListo ? OK : T.text3, ...NUM }}>
                     {puestosDelTexto}/{texto.puntos.length} marcas
                   </span>
                 </div>
-                <div style={{ fontSize: 11.5, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>{texto.intencion}</div>
+                <div style={{ fontSize: 14, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>{texto.intencion}</div>
 
                 <p className="lva-parrafo">
                   {texto.tokens.map((tok, i) => {
@@ -588,7 +739,7 @@ export function LabLecturaVozAlta({ color }: PracticaLabProps) {
                     }}
                   >
                     <i className={`fa-solid ${MARCA_INFO[puntoUltimo.marca].icono}`} style={{ color: MARCA_INFO[puntoUltimo.marca].color, fontSize: 16, marginTop: 2 }} />
-                    <div style={{ fontSize: 13, color: T.text2, lineHeight: 1.6 }}>
+                    <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.6 }}>
                       <strong style={{ color: "#fff" }}>{MARCA_INFO[puntoUltimo.marca].titulo} en «{texto.tokens[puntoUltimo.token]}».</strong> {puntoUltimo.razon}
                     </div>
                   </div>
@@ -597,7 +748,7 @@ export function LabLecturaVozAlta({ color }: PracticaLabProps) {
                 {falloPart && (
                   <div style={{ marginTop: 18, borderRadius: 13, border: `1px solid ${NO}55`, background: `${NO}12`, padding: "13px 16px", display: "flex", gap: 12 }}>
                     <i className="fa-solid fa-circle-xmark" style={{ color: NO, fontSize: 16, marginTop: 2 }} />
-                    <div style={{ fontSize: 13, color: T.text2, lineHeight: 1.6 }}>
+                    <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.6 }}>
                       {falloPart.hayOtro ? (
                         <>
                           <strong style={{ color: "#fff" }}>Aquí sí pasa algo, pero no es «{MARCA_INFO[falloPart.marca].titulo.toLowerCase()}».</strong> Mira el
@@ -620,18 +771,24 @@ export function LabLecturaVozAlta({ color }: PracticaLabProps) {
                 {textoListo && (
                   <div style={{ marginTop: 18, borderRadius: 13, border: `1px solid ${OK}55`, background: `${OK}12`, padding: "13px 16px", display: "flex", gap: 12 }}>
                     <i className="fa-solid fa-circle-check" style={{ color: OK, fontSize: 16, marginTop: 2 }} />
-                    <div style={{ fontSize: 13, color: T.text2, lineHeight: 1.6 }}>
+                    <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.6 }}>
                       Partitura completa. Ahora léela tú en voz alta respetando tus marcas: eso es lo que el laboratorio no puede hacer por ti.
                     </div>
                   </div>
                 )}
 
+                <div style={{ marginTop: 18, display: "grid", gap: 8 }}>
+                  <FotoLectura clave="lectura-publico" icono="fa-book-open-reader" alto={88} />
+                  <div style={{ fontSize: 14, fontWeight: 800, color: T.text2 }}>Cómo suena tu lectura: sin marcas es una línea monótona</div>
+                  <MelodiaPartitura tokens={texto.tokens} puntos={texto.puntos} puestos={puestos} />
+                </div>
+
                 <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 18 }}>
-                  <button className="lva-btn" onClick={() => hablar(lecturaCorridaDe(texto), 1.3)} title="Sin puntuación y deprisa">
+                  <button className="lva-btn" onClick={() => { setOidoCorrido(true); hablar(lecturaCorridaDe(texto), 1.3); }} title="Sin puntuación y deprisa">
                     <i className="fa-solid fa-forward" />
                     Escuchar de corrido
                   </button>
-                  <button className="lva-btn" data-primary onClick={() => hablar(lecturaDe(texto), 0.9)} title="Con su puntuación y a ritmo de lectura">
+                  <button className="lva-btn" data-primary onClick={() => { setOidoPuntuado(true); hablar(lecturaDe(texto), 0.9); }} title="Con su puntuación y a ritmo de lectura">
                     <i className="fa-solid fa-volume-high" />
                     Escuchar con la puntuación
                   </button>
@@ -640,7 +797,7 @@ export function LabLecturaVozAlta({ color }: PracticaLabProps) {
                     Detener
                   </button>
                 </div>
-                <div style={{ fontSize: 11.5, color: T.text3, marginTop: 10, lineHeight: 1.5 }}>
+                <div style={{ fontSize: 14, color: T.text3, marginTop: 10, lineHeight: 1.5 }}>
                   La voz es la del navegador y sirve para comparar, no para calificarte. Si tu equipo no tiene voz en español, los botones no sonarán: el resto
                   del laboratorio funciona igual.
                 </div>
@@ -678,71 +835,46 @@ export function LabLecturaVozAlta({ color }: PracticaLabProps) {
                 <p style={{ margin: "0 0 14px", fontSize: 16, lineHeight: 1.8, color: T.text }}>{frag.texto}</p>
                 <div style={{ borderRadius: 12, border: `1px solid rgba(${color.rgba},0.28)`, background: `rgba(${color.rgba},0.08)`, padding: "11px 14px", display: "flex", gap: 11 }}>
                   <i className="fa-solid fa-user-group" style={{ color: accent, marginTop: 2 }} />
-                  <span style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{frag.proposito}</span>
+                  <span style={{ fontSize: 14, color: T.text2, lineHeight: 1.55 }}>{frag.proposito}</span>
+                </div>
+
+                <div style={{ display: "grid", gap: 12, marginTop: 16 }}>
+                  <FotoLectura clave="oyente-aula" icono="fa-ear-listen" alto={96} />
+                  <OyenteEscena frag={frag} ppm={ppmActual} pausa={pausaActual} />
+                  <OndaLectura frag={frag} ppm={ppmActual} pausa={pausaActual} />
+                  <div style={{ fontSize: 14, color: T.text3 }}>Barras = palabras, huecos dorados = silencios. Oyente ficticia y cifras de simulación.</div>
                 </div>
 
                 <div className="lva-divider" />
 
-                {/* velocidad */}
-                <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
-                  <span style={{ fontSize: 13, fontWeight: 800, color: T.text }}>Velocidad de lectura</span>
-                  <span style={{ fontSize: 14, fontWeight: 900, color: accent, ...NUM }}>
-                    {ppmActual} <span style={{ fontSize: 11, fontWeight: 700, color: T.text3 }}>palabras/min · {zonaDe(ppmActual)}</span>
-                  </span>
-                </div>
-                <input
-                  className="lva-slider"
-                  type="range"
-                  min={PPM_MIN}
-                  max={PPM_MAX}
-                  step={5}
-                  value={ppmActual}
-                  aria-label="Velocidad de lectura (palabras por minuto)"
-                  disabled={fragListo}
-                  onChange={(e) => setPpm((prev) => ({ ...prev, [frag.id]: Number(e.target.value) }))}
-                  style={{ marginTop: 10 }}
-                />
-                <div style={{ position: "relative", marginTop: 14 }}>
-                  <div className="lva-gauge">
-                    {fragListo && (
-                      <div
-                        className="lva-gauge-zona"
-                        style={{
-                          left: `${((frag.ppmMin - PPM_MIN) / (PPM_MAX - PPM_MIN)) * 100}%`,
-                          width: `${((frag.ppmMax - frag.ppmMin) / (PPM_MAX - PPM_MIN)) * 100}%`,
-                        }}
-                      />
-                    )}
-                    <div className="lva-gauge-aguja" style={{ left: `${((ppmActual - PPM_MIN) / (PPM_MAX - PPM_MIN)) * 100}%` }} />
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10.5, color: T.text3, marginTop: 6, ...NUM }}>
-                    <span>{PPM_MIN}</span>
-                    <span>muy pausado · pausado · ágil · acelerado</span>
-                    <span>{PPM_MAX}</span>
-                  </div>
+                <div style={{ display: "grid", gap: 4 }}>
+                  <Deslizador
+                    label="Velocidad de lectura"
+                    icon="fa-gauge-high"
+                    colr="#5BC8FF"
+                    valor={`${ppmActual} ppm · ${zonaDe(ppmActual)}`}
+                    min={PPM_MIN}
+                    max={PPM_MAX}
+                    step={5}
+                    value={ppmActual}
+                    onChange={cambiarPpm}
+                    hintL={`${PPM_MIN} · muy pausado`}
+                    hintR={`acelerado · ${PPM_MAX}`}
+                  />
+                  <Deslizador
+                    label="Duración de cada pausa fuerte"
+                    icon="fa-pause"
+                    colr="#FFC75A"
+                    valor={`${pausaActual.toFixed(1)} s`}
+                    min={PAUSA_MIN}
+                    max={PAUSA_MAX}
+                    step={0.1}
+                    value={pausaActual}
+                    onChange={(v) => setPausa((prev) => ({ ...prev, [frag.id]: v }))}
+                  />
                 </div>
 
-                {/* pausa */}
-                <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginTop: 20 }}>
-                  <span style={{ fontSize: 13, fontWeight: 800, color: T.text }}>Duración de cada pausa fuerte</span>
-                  <span style={{ fontSize: 14, fontWeight: 900, color: accent, ...NUM }}>
-                    {pausaActual.toFixed(1)} <span style={{ fontSize: 11, fontWeight: 700, color: T.text3 }}>segundos</span>
-                  </span>
-                </div>
-                <input
-                  className="lva-slider"
-                  type="range"
-                  min={PAUSA_MIN}
-                  max={PAUSA_MAX}
-                  step={0.1}
-                  value={pausaActual}
-                  aria-label="Duración de cada pausa fuerte (segundos)"
-                  disabled={fragListo}
-                  onChange={(e) => setPausa((prev) => ({ ...prev, [frag.id]: Number(e.target.value) }))}
-                  style={{ marginTop: 10 }}
-                />
-
-                <div style={{ display: "flex", gap: 14, flexWrap: "wrap", marginTop: 18, fontSize: 12.5, color: T.text2 }}>
+                <div style={{ display: "flex", gap: 14, flexWrap: "wrap", marginTop: 18, fontSize: 14, color: T.text2 }}>
                   <span>
                     <strong style={{ color: T.text, ...NUM }}>{palabrasDe(frag.texto)}</strong> palabras
                   </span>
@@ -778,14 +910,14 @@ export function LabLecturaVozAlta({ color }: PracticaLabProps) {
                 {avisoRitmo && !fragListo && (
                   <div style={{ marginTop: 16, borderRadius: 13, border: `1px solid ${NO}55`, background: `${NO}12`, padding: "13px 16px", display: "flex", gap: 12 }}>
                     <i className="fa-solid fa-circle-xmark" style={{ color: NO, fontSize: 16, marginTop: 2 }} />
-                    <div style={{ fontSize: 13, color: T.text2, lineHeight: 1.6 }}>{avisoRitmo}</div>
+                    <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.6 }}>{avisoRitmo}</div>
                   </div>
                 )}
 
                 {fragListo && (
                   <div style={{ marginTop: 16, borderRadius: 13, border: `1px solid ${OK}55`, background: `${OK}12`, padding: "13px 16px", display: "flex", gap: 12 }}>
                     <i className="fa-solid fa-circle-check" style={{ color: OK, fontSize: 16, marginTop: 2 }} />
-                    <div style={{ fontSize: 13, color: T.text2, lineHeight: 1.6 }}>
+                    <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.6 }}>
                       <strong style={{ color: "#fff" }}>
                         Intervalo orientativo: {frag.ppmMin}–{frag.ppmMax} palabras/min y pausas de {frag.pausaMin.toFixed(1)}–{frag.pausaMax.toFixed(1)} s.
                       </strong>{" "}
@@ -826,7 +958,7 @@ export function LabLecturaVozAlta({ color }: PracticaLabProps) {
                   <i className="fa-solid fa-ear-listen" style={{ marginRight: 8, color: accent }} />
                   Paso 1 · ¿Qué elemento falló?
                 </Eyebrow>
-                <div style={{ fontSize: 12, color: T.text3, marginBottom: 12 }}>{lectura.contexto}</div>
+                <div style={{ fontSize: 14, color: T.text3, marginBottom: 12 }}>{lectura.contexto}</div>
                 <p style={{ margin: "0 0 18px", fontSize: 15, lineHeight: 1.75, color: T.text }}>{lectura.descripcion}</p>
 
                 <div style={{ display: "flex", gap: 9, flexWrap: "wrap" }}>
@@ -851,14 +983,14 @@ export function LabLecturaVozAlta({ color }: PracticaLabProps) {
                 {avisoDiag && !diagListo && (
                   <div style={{ marginTop: 16, borderRadius: 13, border: `1px solid ${NO}55`, background: `${NO}12`, padding: "13px 16px", display: "flex", gap: 12 }}>
                     <i className="fa-solid fa-circle-xmark" style={{ color: NO, fontSize: 16, marginTop: 2 }} />
-                    <div style={{ fontSize: 13, color: T.text2, lineHeight: 1.6 }}>{avisoDiag}</div>
+                    <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.6 }}>{avisoDiag}</div>
                   </div>
                 )}
 
                 {diagListo && (
                   <div style={{ marginTop: 16, borderRadius: 13, border: `1px solid ${OK}55`, background: `${OK}12`, padding: "13px 16px", display: "flex", gap: 12 }}>
                     <i className="fa-solid fa-circle-check" style={{ color: OK, fontSize: 16, marginTop: 2 }} />
-                    <div style={{ fontSize: 13, color: T.text2, lineHeight: 1.6 }}>
+                    <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.6 }}>
                       <strong style={{ color: "#fff" }}>{ELEMENTO_INFO[lectura.elemento].titulo}. </strong>
                       {lectura.porQue}
                     </div>
@@ -871,7 +1003,7 @@ export function LabLecturaVozAlta({ color }: PracticaLabProps) {
                   <i className="fa-solid fa-comment-dots" style={{ marginRight: 8, color: accent }} />
                   Paso 2 · ¿Cuál de las tres opiniones está fundamentada?
                 </Eyebrow>
-                {!diagListo && <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 12 }}>Primero diagnostica el elemento: sin eso, la opinión no tiene en qué apoyarse.</div>}
+                {!diagListo && <div style={{ fontSize: 14, color: T.text3, marginBottom: 12 }}>Primero diagnostica el elemento: sin eso, la opinión no tiene en qué apoyarse.</div>}
 
                 <div style={{ display: "flex", flexDirection: "column", gap: 10, opacity: diagListo ? 1 : 0.45 }}>
                   {lectura.opciones.map((op, j) => {
@@ -903,7 +1035,7 @@ export function LabLecturaVozAlta({ color }: PracticaLabProps) {
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
-                              fontSize: 12,
+                              fontSize: 14,
                               fontWeight: 900,
                               border: `1px solid ${T.line}`,
                               color: T.text3,
@@ -918,7 +1050,7 @@ export function LabLecturaVozAlta({ color }: PracticaLabProps) {
                             style={{
                               marginTop: 7,
                               marginLeft: 14,
-                              fontSize: 12.5,
+                              fontSize: 14,
                               color: T.text2,
                               lineHeight: 1.55,
                               borderLeft: `2px solid ${op.ok ? OK : NO}`,
@@ -971,195 +1103,8 @@ export function LabLecturaVozAlta({ color }: PracticaLabProps) {
             />
           )}
         </div>
-
-        {/* ══ columna lateral ═════════════════════════════════════════════ */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos de la sesión
-            </Eyebrow>
-            <TableroObjetivos objetivos={objetivos} retoKey={RETO_KEY} accent={accent} />
-          </div>
-
-          <div
-            style={{
-              borderRadius: 18,
-              padding: "16px 18px",
-              border: `1px solid rgba(${color.rgba},0.3)`,
-              background: `rgba(${color.rgba},0.08)`,
-              fontSize: 13,
-              color: T.text2,
-              lineHeight: 1.55,
-              display: "flex",
-              gap: 12,
-            }}
-          >
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              {modo === "partitura" && (
-                <>
-                  La puntuación es la partitura: la <strong style={{ color: T.text }}>coma</strong> pide silencio corto, el{" "}
-                  <strong style={{ color: T.text }}>punto</strong> y los <strong style={{ color: T.text }}>dos puntos</strong> piden respiración, y los signos de
-                  interrogación y exclamación piden que el tono se mueva. El énfasis no lo marca ningún signo: lo decides tú, en la palabra que trae lo nuevo.
-                </>
-              )}
-              {modo === "ritmo" && (
-                <>
-                  No hay una velocidad «correcta» para todo: hay una adecuada <strong style={{ color: T.text }}>para este texto y para quien lo escucha</strong>.
-                  Pregúntate qué está haciendo el oyente mientras te oye. Los intervalos son orientativos, no una norma.
-                </>
-              )}
-              {modo === "juicio" && (
-                <>
-                  Una opinión fundamentada tiene tres piezas: <strong style={{ color: T.text }}>qué se escuchó</strong>,{" "}
-                  <strong style={{ color: T.text }}>qué elemento explica eso</strong> y <strong style={{ color: T.text }}>qué efecto tuvo</strong> en quien
-                  escucha. Sin las tres, es un «me gustó» con más palabras.
-                </>
-              )}
-              {modo === "glosario" && <>Ya no se arrastra: lee la definición y su ejemplo y escribe el término. Si te atoras, la pista te da la inicial y las letras.</>}
-              {modo === "texto" && <>Aquí se escribe. El botón de pista te da la definición y el banco de palabras te deja tocar el término en vez de teclearlo.</>}
-            </span>
-          </div>
-
-          <div
-            style={{
-              borderRadius: 18,
-              padding: "16px 18px",
-              border: `1px solid ${T.line}`,
-              background: T.glass,
-              fontSize: 12.5,
-              color: T.text2,
-              lineHeight: 1.55,
-              display: "flex",
-              gap: 12,
-            }}
-          >
-            <i className="fa-solid fa-circle-info" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>{DATO_PAZ}</span>
-          </div>
-
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid ${T.line}`, background: T.glass, fontSize: 12.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-microphone-lines" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              <strong style={{ color: T.text }}>Tarea fuera de la pantalla: </strong>
-              {ACTIVIDAD_FINAL_A5}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* ── hechos de A4, debate de A7, comprensión y criterios de A1/A3 ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px,1fr))", gap: 16, marginTop: 22 }}>
-        <div style={{ ...card, padding: "20px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-check-double" style={{ marginRight: 8, color: accent }} />
-            Hechos
-          </Eyebrow>
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {HECHOS.map((h, i) => (
-              <div key={i} style={{ display: "flex", gap: 11 }}>
-                <i className={`fa-solid ${h.verdadero ? "fa-circle-check" : "fa-circle-xmark"}`} style={{ color: h.verdadero ? OK : NO, fontSize: 14, marginTop: 3, flexShrink: 0 }} />
-                <div style={{ fontSize: 12.5, lineHeight: 1.5 }}>
-                  <div style={{ color: T.text }}>{h.enunciado}</div>
-                  <div style={{ color: T.text3, marginTop: 3 }}>{h.retro}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div style={{ ...card, padding: "20px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-comments" style={{ marginRight: 8, color: accent }} />
-            Debate de la progresión
-          </Eyebrow>
-          <div style={{ fontSize: 13.5, fontWeight: 800, color: T.text, lineHeight: 1.5, marginBottom: 14 }}>{DEBATE_A7.tema}</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
-            {DEBATE_A7.posturas.map((p, i) => (
-              <div key={i} style={{ borderRadius: 13, border: `1px solid ${T.line}`, background: T.inset, padding: "12px 14px" }}>
-                <div style={{ fontSize: 12.5, fontWeight: 700, color: T.text, lineHeight: 1.5 }}>{p.postura}</div>
-                <ul style={{ margin: "8px 0 0", paddingLeft: 17, fontSize: 12, color: T.text3, lineHeight: 1.55 }}>
-                  {p.argumentos.map((a, j) => (
-                    <li key={j}>{a}</li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-          <div style={{ fontSize: 11.5, color: T.text3, marginTop: 12, lineHeight: 1.5 }}>
-            Las dos posturas son defendibles: {DEBATE_A7.reglas.join(" ")}
-          </div>
-        </div>
-
-        <div style={{ ...card, padding: "20px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-book-open-reader" style={{ marginRight: 8, color: accent }} />
-            Comprensión de la lectura
-          </Eyebrow>
-          <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
-            {PREGUNTAS_A1.map((p, i) => (
-              <div key={i}>
-                <div style={{ fontSize: 12.5, fontWeight: 800, color: T.text, lineHeight: 1.5 }}>{p.pregunta}</div>
-                <div style={{ fontSize: 12, color: T.text3, lineHeight: 1.55, marginTop: 4 }}>{p.respuesta}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* criterios y preguntas de A3: con qué se juzga una lectura */}
-        <div style={{ ...card, padding: "20px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-list-check" style={{ marginRight: 8, color: accent }} />
-            Criterios para opinar
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12.5, color: T.text2, lineHeight: 1.6, display: "flex", flexDirection: "column", gap: 7 }}>
-            {CRITERIOS_A3.map((c, i) => (
-              <li key={i}>{c}</li>
-            ))}
-          </ul>
-          <div className="lva-divider" />
-          <Eyebrow>
-            <i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />
-            Preguntas para prepararte
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12.5, color: T.text2, lineHeight: 1.6, display: "flex", flexDirection: "column", gap: 7 }}>
-            {PISTAS_A3.map((p, i) => (
-              <li key={i}>{p}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      {/* ── reto evaluable (quiz A2 verbatim) ───────────────────────────── */}
-      <RetoQuizCard
-        quiz={QUIZ}
-        accent={accent}
-        rgba={color.rgba}
-        aprobado={quizAprobado}
-        onAprobado={() => setQuizAprobado(true)}
-        playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined}
-        mensajeAprobado="Sabes qué hace cada elemento de la voz y qué convierte un comentario en una opinión fundamentada."
-      />
-
-      {/* ── nota al pie ─────────────────────────────────────────────────── */}
-      <div style={{ marginTop: 18, display: "flex", gap: 12, fontSize: 11.5, color: T.text3, lineHeight: 1.6 }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          Son <strong>verbatim</strong> de la progresión LC-I-P07: la lectura y el «¿sabías que?» de A1 con sus preguntas de comprensión, el quiz evaluable de
-          A2, las pistas y los criterios de A3, los hechos de A4, el glosario de A5 con sus ejemplos, el texto con huecos de A6 y el debate de A7. Los{" "}
-          <strong>tres textos que se marcan</strong>, los <strong>cuatro fragmentos de ritmo</strong> y las <strong>seis lecturas ajenas</strong> los escribí
-          para esta práctica, porque la progresión pide «textos de su elección» y no trae ninguno: son <strong>ilustrativos</strong>, y los nombres de quienes
-          leen son ficticios a propósito, para no atribuir a nadie real una lectura. Los intervalos de velocidad y de pausa son{" "}
-          <strong>orientativos</strong>: parten de que una lectura en voz alta para público suele moverse alrededor de 120–150 palabras por minuto, más despacio
-          que una conversación, y se mueven desde ahí según el texto; no son una norma y se pueden discutir. Sí son verificables los datos externos: la primera
-          línea del Metro de la Ciudad de México se inauguró en 1969 y Octavio Paz recibió el Premio Nobel de Literatura en 1990. La descripción de la
-          entonación —ascendente en las preguntas que se responden con sí o no, descendente en las que empiezan con «qué» o «cuántas»— es la descripción
-          estándar de la prosodia del español. <strong>Este laboratorio no graba ni califica tu voz</strong>: el botón «Escuchar» usa el sintetizador del
-          navegador y sirve para comparar dos maneras de leer. Fuente: {FUENTE}.
-        </span>
-      </div>
-    </div>
+      }
+    />
   );
 }
 

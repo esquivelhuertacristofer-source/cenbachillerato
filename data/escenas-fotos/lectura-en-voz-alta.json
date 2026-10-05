@@ -1,0 +1,7 @@
+{
+  "slug": "lectura-en-voz-alta",
+  "items": [
+    { "clave": "oyente-aula", "formato": "16:9", "estilo": "ilustracion", "escena": "Una joven sentada en una banca de salón con las manos juntas sobre el pupitre, escuchando atenta a alguien fuera de cuadro, con ventanales de luz suave detrás" },
+    { "clave": "lectura-publico", "formato": "16:9", "estilo": "ilustracion", "escena": "Un estudiante de pie con un libro abierto entre las manos leyendo ante un pequeño grupo de compañeros sentados en círculo en una biblioteca escolar" }
+  ]
+}

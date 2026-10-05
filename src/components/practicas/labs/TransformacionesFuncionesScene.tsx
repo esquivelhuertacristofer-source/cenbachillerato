@@ -32,6 +32,8 @@ export interface TransformacionesFuncionesSceneProps {
   a: number; h: number; k: number;
   accent: string;
   mostrarPadre: boolean;
+  /** Muestra un balón que recorre la gráfica transformada. */
+  balon: boolean;
   autoRotate: boolean;
   pausado: boolean;
   resetNonce: number;
@@ -83,18 +85,18 @@ function construir(modo: Modo, a: number, h: number, k: number): Geo {
   };
 }
 
-/* ── Etiqueta flotante reutilizable ──────────────────────────────────────── */
+/* ── Etiqueta flotante: tamaño fijo en píxeles (≥ 14 px), sin distanceFactor ── */
 function Etiqueta({
-  pos, color, children, size = 12, bg = "rgba(6,16,31,0.82)",
+  pos, color, children, size = 14,
 }: {
-  pos: Pt; color: string; children: React.ReactNode; size?: number; bg?: string;
+  pos: Pt; color: string; children: React.ReactNode; size?: number;
 }) {
   return (
-    <Html position={pos} center distanceFactor={14} pointerEvents="none">
+    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
       <div style={{
-        whiteSpace: "nowrap", padding: "4px 10px", borderRadius: 9, background: bg,
-        border: `1px solid ${color}66`, color: "#fff", fontWeight: 700, fontSize: size,
-        fontFamily: "system-ui, sans-serif", boxShadow: "0 8px 28px rgba(0,0,0,0.4)",
+        whiteSpace: "nowrap", padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.88)",
+        border: `1.5px solid ${color}`, color: "#fff", fontWeight: 800, fontSize: size,
+        fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)",
       }}>
         {children}
       </div>
@@ -122,13 +124,28 @@ function Rejilla() {
 }
 
 /* ── La construcción completa ────────────────────────────────────────────── */
-function Escena({ geo, accent: _accent, mostrarPadre }: { geo: Geo; accent: string; mostrarPadre: boolean }) {
+function Escena({ geo, mostrarPadre, balon }: { geo: Geo; mostrarPadre: boolean; balon: boolean }) {
   const { f } = geo;
   const marca = useRef<THREE.Group>(null);
+  const pelota = useRef<THREE.Mesh>(null);
+  // El balón recorre la parte de la curva que está sobre el suelo (y ≥ 0) si la hay.
+  const trayecto = useMemo(() => {
+    const sobre = geo.transformada.filter((p) => p[1] >= -1e-6);
+    return sobre.length > 1 ? sobre : geo.transformada;
+  }, [geo.transformada]);
   useFrame((s) => {
     if (marca.current) {
       const kk = 1 + Math.sin(s.clock.elapsedTime * 3) * 0.2;
       marca.current.scale.setScalar(kk);
+    }
+    if (pelota.current && trayecto.length > 1) {
+      const fr = (s.clock.elapsedTime * 0.22) % 1;
+      const u = 1 - Math.abs(2 * fr - 1); // va y vuelve
+      const i = Math.min(trayecto.length - 1.001, u * (trayecto.length - 1));
+      const i0 = Math.floor(i);
+      const t = i - i0;
+      const p0 = trayecto[i0]!, p1 = trayecto[i0 + 1]!;
+      pelota.current.position.set(p0[0] + (p1[0] - p0[0]) * t, p0[1] + (p1[1] - p0[1]) * t, 0.12);
     }
   });
 
@@ -148,11 +165,9 @@ function Escena({ geo, accent: _accent, mostrarPadre }: { geo: Geo; accent: stri
       {/* ejes */}
       <Line points={ejeX} color={AXIS_COL} lineWidth={2.4} />
       <Line points={ejeY} color={AXIS_COL} lineWidth={2.4} />
-      <Etiqueta pos={S(G, 0)} color={AXIS_COL} size={11} bg="rgba(6,16,31,0.7)">x</Etiqueta>
-      <Etiqueta pos={S(0, G)} color={AXIS_COL} size={11} bg="rgba(6,16,31,0.7)">y</Etiqueta>
       <mesh position={S(0, 0)}>
         <sphereGeometry args={[0.07, 12, 12]} />
-        <meshStandardMaterial color={AXIS_COL} emissive={AXIS_COL} emissiveIntensity={0.8} toneMapped={false} />
+        <meshStandardMaterial color={AXIS_COL} emissive={AXIS_COL} emissiveIntensity={0.8} />
       </mesh>
 
       {/* función padre (referencia) */}
@@ -164,7 +179,7 @@ function Escena({ geo, accent: _accent, mostrarPadre }: { geo: Geo; accent: stri
       {mostrarPadre && hayH && (
         <>
           <Line points={[origen, codo]} color={DX_COL} lineWidth={3} dashed dashSize={0.16} gapSize={0.1} />
-          <Etiqueta pos={[(origen[0] + codo[0]) / 2, origen[1] - 0.34, 0.04]} color={DX_COL} size={11}>
+          <Etiqueta pos={[(origen[0] + codo[0]) / 2, origen[1] - 0.34, 0.04]} color={DX_COL}>
             h = {f.h.toLocaleString("es-MX", { maximumFractionDigits: 1 }).replace("-", "−")}
           </Etiqueta>
         </>
@@ -172,7 +187,7 @@ function Escena({ geo, accent: _accent, mostrarPadre }: { geo: Geo; accent: stri
       {mostrarPadre && hayK && (
         <>
           <Line points={[codo, geo.vertice]} color={DY_COL} lineWidth={3} dashed dashSize={0.16} gapSize={0.1} />
-          <Etiqueta pos={[codo[0] + 0.42, (codo[1] + geo.vertice[1]) / 2, 0.04]} color={DY_COL} size={11}>
+          <Etiqueta pos={[codo[0] + 0.42, (codo[1] + geo.vertice[1]) / 2, 0.04]} color={DY_COL}>
             k = {f.k.toLocaleString("es-MX", { maximumFractionDigits: 1 }).replace("-", "−")}
           </Etiqueta>
         </>
@@ -189,12 +204,25 @@ function Escena({ geo, accent: _accent, mostrarPadre }: { geo: Geo; accent: stri
           <group ref={marca} position={geo.vertice}>
             <mesh>
               <sphereGeometry args={[0.15, 22, 22]} />
-              <meshStandardMaterial color="#fff" emissive={VERT_COL} emissiveIntensity={1.8} toneMapped={false} />
+              <meshStandardMaterial color="#fff" emissive={VERT_COL} emissiveIntensity={1} />
             </mesh>
           </group>
-          <Etiqueta pos={[geo.vertice[0] + 0.1, geo.vertice[1] + 0.45, 0.05]} color={VERT_COL} size={12.5} bg="rgba(6,16,31,0.92)">
+          <Etiqueta pos={[geo.vertice[0] + 0.1, geo.vertice[1] + 0.6, 0.05]} color={VERT_COL}>
             <strong>{f.modo === "cuadratica" ? "Vértice" : "Punto"}</strong>&nbsp;{fmtPar(f.h, f.k)}
           </Etiqueta>
+        </>
+      )}
+
+      {/* balón que recorre la gráfica + altura máxima */}
+      {balon && (
+        <>
+          <mesh ref={pelota} castShadow>
+            <sphereGeometry args={[0.22, 24, 24]} />
+            <meshStandardMaterial color="#fff" emissive="#f97316" emissiveIntensity={0.35} />
+          </mesh>
+          {geo.verticeEnPlano && f.modo === "cuadratica" && Math.abs(f.k) > 0.05 && (
+            <Line points={[geo.vertice, S(f.h, 0)]} color={VERT_COL} lineWidth={2} dashed dashSize={0.14} gapSize={0.1} />
+          )}
         </>
       )}
     </group>
@@ -202,7 +230,7 @@ function Escena({ geo, accent: _accent, mostrarPadre }: { geo: Geo; accent: stri
 }
 
 /* ── Contenido (descendiente del Canvas) ─────────────────────────────────── */
-function Contenido({ modo, a, h, k, accent, mostrarPadre, autoRotate, pausado, resetNonce }: TransformacionesFuncionesSceneProps) {
+function Contenido({ modo, a, h, k, accent, mostrarPadre, balon, autoRotate, pausado, resetNonce }: TransformacionesFuncionesSceneProps) {
   const geo = useMemo(() => construir(modo, a, h, k), [modo, a, h, k]);
 
   return (
@@ -214,7 +242,7 @@ function Contenido({ modo, a, h, k, accent, mostrarPadre, autoRotate, pausado, r
 
 
       <group key={`${resetNonce}`}>
-        <Escena geo={geo} accent={accent} mostrarPadre={mostrarPadre} />
+        <Escena geo={geo} mostrarPadre={mostrarPadre} balon={balon} />
       </group>
 
 
@@ -222,17 +250,17 @@ function Contenido({ modo, a, h, k, accent, mostrarPadre, autoRotate, pausado, r
       <OrbitControls
         makeDefault
         enablePan={false}
-        minDistance={7}
-        maxDistance={26}
+        minDistance={9}
+        maxDistance={30}
         minPolarAngle={Math.PI / 5}
         maxPolarAngle={Math.PI / 1.55}
-        target={[0, 0, 0]}
+        target={[0, -0.7, 0]}
         autoRotate={autoRotate && !pausado}
         autoRotateSpeed={0.45}
       />
 
       <EffectComposer enableNormalPass={false}>
-        <Bloom intensity={0.5} luminanceThreshold={0.62} luminanceSmoothing={0.3} mipmapBlur />
+        <Bloom intensity={0.4} luminanceThreshold={0.7} luminanceSmoothing={0.3} mipmapBlur />
         <Vignette eskil={false} offset={0.2} darkness={0.4} />
       </EffectComposer>
     </>
@@ -241,7 +269,7 @@ function Contenido({ modo, a, h, k, accent, mostrarPadre, autoRotate, pausado, r
 
 export default function TransformacionesFuncionesScene(props: TransformacionesFuncionesSceneProps) {
   return (
-    <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={{ position: [3.5, 2.5, 12], fov: 45 }}>
+    <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={{ position: [2.5, 0.8, 17.5], fov: 45 }}>
       <Contenido {...props} />
     </Canvas>
   );
