@@ -77,6 +77,24 @@ export function LabShell({ accent, rgba, escena, herramientas, leyenda, modos, l
 
   const [tab, setTab] = useState(pestanas[0]?.id ?? "misiones");
 
+  // Alto: del borde superior del laboratorio al fondo de la ventana, haya o no
+  // cabecera arriba (hub, Expedición o página suelta). Mínimo 560 px; en
+  // pantallas angostas manda el CSS (alto automático).
+  const raiz = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = raiz.current;
+    if (!el) return undefined;
+    const medir = () => {
+      const arriba = el.getBoundingClientRect().top + window.scrollY;
+      const alto = Math.max(560, Math.round(window.innerHeight - arriba - 16));
+      el.style.setProperty("--ls-alto", `${alto}px`);
+    };
+    medir();
+    const t = window.setTimeout(medir, 400);
+    window.addEventListener("resize", medir);
+    return () => { window.clearTimeout(t); window.removeEventListener("resize", medir); };
+  }, []);
+
   // Aviso breve cuando se cumple una misión nueva.
   const [aviso, setAviso] = useState<string | null>(null);
   const previos = useRef(cumplidos);
@@ -107,7 +125,7 @@ export function LabShell({ accent, rgba, escena, herramientas, leyenda, modos, l
   ];
 
   return (
-    <div className="ls" style={{ ["--lsa" as string]: accent, ["--lsr" as string]: rgba }}>
+    <div ref={raiz} className="ls" style={{ ["--lsa" as string]: accent, ["--lsr" as string]: rgba }}>
       <style>{CSS}</style>
 
       {/* ── Escenario ─────────────────────────────────────────── */}
@@ -260,7 +278,7 @@ export function Deslizador({ label, icon, colr, valor, min, max, step, value, on
 
 const CSS = `
 .ls { display:grid; grid-template-columns:minmax(0,1fr) 380px; gap:16px;
-  height:clamp(560px, calc(100dvh - 220px), 880px); color:${T.text}; }
+  height:var(--ls-alto, clamp(560px, calc(100dvh - 220px), 880px)); color:${T.text}; }
 .ls-stage { position:relative; border-radius:20px; overflow:hidden; min-height:0;
   background:radial-gradient(120% 80% at 30% 0%, rgba(var(--lsr),0.12) 0%, transparent 55%), linear-gradient(180deg,#0b2233 0%,#08131f 100%); }
 .ls-escena { position:absolute; inset:0; }
@@ -344,6 +362,9 @@ const CSS = `
   .ls-mesa > :first-child { position:static; max-height:44dvh; overflow-y:auto; padding-right:4px;
     mask-image:linear-gradient(180deg, #000 85%, transparent); }
 }
+/* Fotos de portada de los simuladores: acompañan, no tapan el tablero. */
+.ls-stage[data-dom="true"] .ls-escena :is([class$="-foto"],[class$="-banner"],[class*="-foto "]) { max-height:min(34dvh, 340px); overflow:hidden; }
+.ls-stage[data-dom="true"] .ls-escena :is([class$="-foto"],[class$="-banner"],[class*="-foto "]) > img { width:100%; height:100%; max-height:min(34dvh, 340px); object-fit:cover; }
 .ls-stage[data-dom="true"] .ls-pie { position:static; padding:12px 14px 14px; background:rgba(3,8,18,0.7); border-top:1px solid ${T.line}; }
 
 @media (max-width: 1000px) {

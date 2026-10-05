@@ -1,6 +1,11 @@
 {
   "slug": "estado-mexicano",
   "items": [
-    { "clave": "las-palmas", "formato": "16:9", "estilo": "ilustracion", "escena": "Comunidad rural mexicana con casas sencillas, un pozo comunitario seco al centro, tinacos vacíos en los techos y vecinos formados con cubetas esperando una pipa de agua azul que llega por el camino de tierra" }
+    {
+      "clave": "las-palmas",
+      "formato": "16:9",
+      "estilo": "ilustracion",
+      "escena": "Calle de tierra seca y agrietada en una comunidad rural mexicana con casas sencillas de tabique, plantas marchitas, y una fila de vecinos adultos sosteniendo cubetas vacías esperando bajo el sol, ambiente de sequía"
+    }
   ]
 }
