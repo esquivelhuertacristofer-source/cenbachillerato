@@ -1,0 +1,53 @@
+{
+  "codigo": "CS-II-P04-A1",
+  "conceptos": [
+    { "termino": "Poder (Weber)", "idea": "Imponer la propia voluntad en una relación social, aun contra la resistencia de otros." },
+    { "termino": "Dominación legítima", "idea": "Poder que quienes obedecen aceptan: tradicional, carismática o legal-racional." },
+    { "termino": "Interseccionalidad", "idea": "Clase, género, etnia y edad se combinan para definir tu posición social." },
+    { "termino": "Capital cultural y social", "idea": "Saberes y contactos que se heredan de forma desigual y mantienen la desigualdad." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "¿Qué es el poder?",
+      "idea": "Para Weber, el poder no es solo poder ordenar: es lograr ser obedecido. Y hay tres formas en que se acepta.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Tradicional", "puntos": ["Se obedece por costumbre: «siempre ha sido así»", "Monarquías hereditarias, jerarquías familiares"] },
+        { "titulo": "Carismática", "puntos": ["Se obedece por las cualidades extraordinarias de un líder", "Líderes religiosos, caudillos políticos"] },
+        { "titulo": "Legal-racional", "puntos": ["Se obedece a reglas formales, no a la persona", "Estados modernos, instituciones democráticas"] }
+      ] },
+      "comprueba": { "pregunta": "Un estudiante paga una multa porque lo dice el reglamento, sin importar quién lo firma. ¿Qué tipo de dominación es?", "opciones": ["Tradicional", "Carismática", "Legal-racional"], "correcta": 2, "porque": "Se obedece a una regla formal e impersonal, no a la persona: eso es la dominación legal-racional." }
+    },
+    {
+      "parrafos": [2],
+      "titulo": "Interseccionalidad",
+      "idea": "Tu lugar en la sociedad no depende de una sola característica, sino de cómo se combinan varias.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Variables que se combinan y se potencian", "puntos": ["Clase social", "Género", "Etnia", "Edad", "Orientación sexual"] }
+      ] },
+      "comprueba": { "pregunta": "¿Qué propone la interseccionalidad?", "opciones": ["Que la clase social explica toda la desigualdad", "Que varias características se combinan y se potencian", "Que la desigualdad es solo económica"], "correcta": 1, "porque": "Kimberlé Crenshaw muestra que clase, género, etnia, edad y otras variables se combinan y se potencian mutuamente." }
+    },
+    {
+      "parrafos": [3],
+      "titulo": "La desigualdad en México, en números",
+      "idea": "México tuvo un coeficiente de Gini de 0.41 en 2022: de los más desiguales de América Latina.",
+      "visual": { "tipo": "datos", "fuente": "CONEVAL 2022", "items": [
+        { "valor": "1.7%", "etiqueta": "clase alta", "barra": 1.7 },
+        { "valor": "38%", "etiqueta": "clase media", "barra": 38 },
+        { "valor": "38%", "etiqueta": "población vulnerable por ingresos o carencias", "barra": 38 },
+        { "valor": "22%", "etiqueta": "población en pobreza", "barra": 22 }
+      ] },
+      "comprueba": { "pregunta": "Si un país tuviera un coeficiente de Gini de 0, ¿qué significaría?", "opciones": ["Desigualdad absoluta", "Perfecta igualdad", "Que no hay datos"], "correcta": 1, "porque": "En el coeficiente de Gini, 0 es perfecta igualdad y 1 es desigualdad absoluta." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Bourdieu: cómo se hereda la desigualdad",
+      "idea": "El capital cultural y el capital social se heredan de forma desigual y pasan la desigualdad de generación en generación.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Capital cultural", "puntos": ["Conocimientos, habilidades y títulos educativos", "Facilita llegar a posiciones privilegiadas"] },
+        { "titulo": "Capital social", "puntos": ["Redes de relaciones y contactos", "Dan acceso a recursos e información"] }
+      ] },
+      "comprueba": { "pregunta": "Conseguir trabajo gracias a un conocido de la familia es un ejemplo de…", "opciones": ["capital cultural", "capital social", "dominación carismática"], "correcta": 1, "porque": "Las redes de relaciones y contactos que dan acceso a recursos son el capital social." }
+    }
+  ]
+}

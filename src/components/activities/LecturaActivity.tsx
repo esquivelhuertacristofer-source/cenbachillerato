@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'motion/react';
 import ReactMarkdown from 'react-markdown';
@@ -19,6 +19,8 @@ import {
   useRegistrarSegmentosVoz,
 } from '@/components/activities/NarracionContext';
 import { segmentosDeLectura } from '@/lib/voz/segmentos';
+import { guiaValida, parrafosDe, type LecturaGuia } from '@/lib/contenido/lectura-guia';
+import { LecturaGuiada } from '@/components/activities/LecturaGuiada';
 
 /** Convierte markdown a texto plano legible en voz alta (sin #, *, enlaces, etc.). */
 function markdownAPlano(md: string): string {
@@ -330,7 +332,26 @@ export function LecturaActivity({
   const [entregado, setEntregado] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  /* Lectura guiada: el andamio (partes, ideas clave, esquemas) vive en
+     public/lecturas-guia/<codigo>.json. undefined = cargando, null = no hay. */
+  const codigo = actividad.codigo;
+  const [guia, setGuia] = useState<LecturaGuia | null | undefined>(codigo ? undefined : null);
+  useEffect(() => {
+    if (!codigo) return undefined;
+    let vivo = true;
+    fetch(`/lecturas-guia/${encodeURIComponent(codigo)}.json`)
+      .then((r) => (r.ok ? r.json() : null))
+      .catch(() => null)
+      .then((g: LecturaGuia | null) => { if (vivo) setGuia(guiaValida(g, contenido.texto ?? '') ? g : null); });
+    return () => { vivo = false; };
+  }, [codigo, contenido.texto]);
+  const parrafos = useMemo(() => parrafosDe(contenido.texto ?? ''), [contenido.texto]);
+  const [guiaCompleta, setGuiaCompleta] = useState(false);
+  const marcarGuiaCompleta = useCallback(() => setGuiaCompleta(true), []);
+
   const modoRevision = estado === 'completada';
+  // Con guía, las preguntas finales aparecen al abrir la última parte.
+  const mostrarCierre = !guia || guiaCompleta || modoRevision;
   // Estado neutral de revisión: el intento existe pero las respuestas guardadas
   // no están disponibles (`respuestas` null en BD, datos históricos). Solo
   // aplica cuando la lectura tiene preguntas: una lectura sin preguntas entrega
@@ -585,7 +606,7 @@ export function LecturaActivity({
           style={{
             borderRadius: 20,
             overflow: 'hidden',
-            aspectRatio: '2 / 1',
+            aspectRatio: guia ? '3 / 1' : '2 / 1',
             position: 'relative',
             border: `1px solid rgba(${color.rgba}, 0.15)`,
             boxShadow: `0 24px 60px rgba(${color.rgba}, 0.08)`,
@@ -624,6 +645,27 @@ export function LecturaActivity({
         </motion.div>
 
         {/* ── Cuerpo de la lectura ── */}
+        {guia === undefined && (
+          <div aria-busy="true" style={{ minHeight: 420, borderRadius: 24, background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)' }} />
+        )}
+        {guia && (
+          <>
+            <LecturaGuiada
+              guia={guia}
+              parrafos={parrafos}
+              color={color}
+              todoAbierto={modoRevision}
+              onCompleta={marcarGuiaCompleta}
+              pintar={(md) => (
+                <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>{md}</ReactMarkdown>
+              )}
+            />
+            {mostrarCierre && callouts.map((c, i) => (
+              <Callout key={i} tipo={c.tipo} contenido={c.contenido} />
+            ))}
+          </>
+        )}
+        {guia === null && (
         <motion.div
           ref={bodyRef}
           initial="hidden"
@@ -657,9 +699,10 @@ export function LecturaActivity({
             ))}
           </div>
         </motion.div>
+        )}
 
         {/* ── Preguntas de comprensión ── */}
-        {preguntas.length > 0 && (
+        {mostrarCierre && preguntas.length > 0 && (
           <div className="lec-questions" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {/* Section divider */}
             <div style={{
@@ -702,6 +745,7 @@ export function LecturaActivity({
         )}
 
         {/* ── CTA ── */}
+        {mostrarCierre && (
         <AnimatePresence mode="wait">
           {!entregado ? (
             <motion.div
@@ -797,6 +841,7 @@ export function LecturaActivity({
             </motion.div>
           )}
         </AnimatePresence>
+        )}
 
         {/* Spinner keyframes */}
         <style>{`

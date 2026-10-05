@@ -27,6 +27,13 @@ export function ProgresionHero({
   const norm = (s: string) => s.trim().replace(/\s+/g, ' ').toLowerCase()
   const mostrarDesc =
     !!progresion.descripcion && norm(progresion.descripcion) !== norm(progresion.titulo)
+  /* Propósito largo (la mayoría pasa de 200 caracteres): como titular gigante
+     era un muro. Si hay una descripción corta, ella encabeza y el propósito
+     oficial queda completo debajo, a tamaño de lectura. */
+  const tituloCorto =
+    mostrarDesc && progresion.titulo.length > 110 && progresion.descripcion!.length <= 140
+      ? progresion.descripcion!
+      : null
 
   const itemVariants = reducedMotion
     ? { hidden: { opacity: 1, y: 0 }, visible: { opacity: 1, y: 0 } }
@@ -120,7 +127,7 @@ export function ProgresionHero({
           }}
         >
           <span style={{
-            fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.18em',
+            fontSize: 13, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em',
             color: color.hex,
           }}>
             Propósito formativo {numParsed}
@@ -144,20 +151,30 @@ export function ProgresionHero({
             width: 4, borderRadius: 4, flexShrink: 0,
             background: `linear-gradient(180deg, ${color.hex}, rgba(${color.rgba},0.18))`,
           }} />
-          <h1 style={{
-            fontSize: 'clamp(1.45rem, 2.8vw, 2.3rem)',
-            fontWeight: 800,
-            letterSpacing: '-0.02em',
-            lineHeight: 1.3,
-            color: '#fff',
-            margin: 0,
-          }}>
-            {progresion.titulo}
-          </h1>
+          <div>
+            <h1 style={{
+              fontSize: tituloCorto ? 'clamp(1.6rem, 3vw, 2.4rem)' : 'clamp(1.3rem, 2.2vw, 1.85rem)',
+              fontWeight: 800,
+              letterSpacing: '-0.02em',
+              lineHeight: tituloCorto ? 1.15 : 1.3,
+              color: '#fff',
+              margin: 0,
+            }}>
+              {tituloCorto ?? progresion.titulo}
+            </h1>
+            {tituloCorto && (
+              <p style={{
+                fontSize: 17, lineHeight: 1.6, color: 'rgba(255,255,255,0.72)',
+                margin: '14px 0 0', maxWidth: 760,
+              }}>
+                {progresion.titulo}
+              </p>
+            )}
+          </div>
         </motion.div>
 
-        {/* Descripción: solo si aporta algo distinto al título */}
-        {mostrarDesc && (
+        {/* Descripción: solo si aporta algo distinto al título (y no encabeza ya) */}
+        {mostrarDesc && !tituloCorto && (
           <motion.p
             variants={itemVariants}
             style={{

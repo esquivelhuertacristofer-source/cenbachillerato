@@ -5,6 +5,8 @@ import { motion } from 'motion/react'
 import {
   BookOpen, ListChecks, PenLine, Calculator, TextCursor, MessagesSquare,
   ArrowRight, RotateCcw, Play, CheckCircle2, Star,
+  ToggleLeft, BookA, ClipboardCheck, Video, Link2, LayoutGrid, ListOrdered,
+  Timer, Image as ImageIcon, FlaskConical, Scale,
   type LucideIcon,
 } from 'lucide-react'
 import { springs } from '@/lib/motion/tokens'
@@ -30,6 +32,17 @@ const TIPO_ICONS: Record<string, LucideIcon> = {
   ejercicio_matematico: Calculator,
   fill_blanks:          TextCursor,
   debate_estructurado:  MessagesSquare,
+  quiz_verdadero_falso: ToggleLeft,
+  glosario_interactivo: BookA,
+  autoevaluacion:       ClipboardCheck,
+  video_con_preguntas:  Video,
+  relacionar_columnas:  Link2,
+  clasificar_categorias: LayoutGrid,
+  ordenar_secuencia:    ListOrdered,
+  reto_cronometrado:    Timer,
+  infografia:           ImageIcon,
+  simulacion:           FlaskConical,
+  caso_decision:        Scale,
 }
 
 const TIPO_LABELS: Record<string, string> = {
@@ -40,6 +53,16 @@ const TIPO_LABELS: Record<string, string> = {
   ejercicio_matematico: 'Ejercicio',
   fill_blanks:          'Rellena huecos',
   debate_estructurado:  'Debate',
+  glosario_interactivo: 'Glosario',
+  autoevaluacion:       'Autoevaluación',
+  video_con_preguntas:  'Video',
+  relacionar_columnas:  'Relacionar',
+  clasificar_categorias: 'Clasificar',
+  ordenar_secuencia:    'Ordenar',
+  reto_cronometrado:    'Reto con tiempo',
+  infografia:           'Infografía',
+  simulacion:           'Simulación',
+  caso_decision:        'Caso',
 }
 
 export function ActivityCard({ actividad, visualState, uacCodigo, progresionNum, areaColor, phaseLabel }: Props) {
@@ -152,7 +175,7 @@ export function ActivityCard({ actividad, visualState, uacCodigo, progresionNum,
             <div style={{ position: 'absolute', top: 18, right: 20 }}>
               <span className={isEnProgreso ? 'act-badge-pulse' : undefined} style={{
                 display: 'inline-flex', alignItems: 'center', gap: 5,
-                fontSize: 9, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.14em',
+                fontSize: 12, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.14em',
                 color: areaColor.hex, padding: '4px 10px',
                 background: `rgba(${areaColor.rgba}, ${isEnProgreso ? 0.12 : 0.08})`,
                 border: `1px solid rgba(${areaColor.rgba}, ${isEnProgreso ? 0.28 : 0.20})`,
@@ -192,7 +215,7 @@ export function ActivityCard({ actividad, visualState, uacCodigo, progresionNum,
               {/* Eyebrow: A-N · fase formativa */}
               <div style={{
                 display: 'inline-flex', alignItems: 'center', gap: 8,
-                fontSize: 10, fontWeight: 900, textTransform: 'uppercase',
+                fontSize: 12, fontWeight: 900, textTransform: 'uppercase',
                 letterSpacing: '0.18em', marginBottom: 8,
                 color: isCompletada
                   ? '#4ADE80'
@@ -238,7 +261,7 @@ export function ActivityCard({ actividad, visualState, uacCodigo, progresionNum,
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
               <span style={{
                 display: 'inline-flex', alignItems: 'center', gap: 5,
-                fontSize: 10, fontWeight: 700,
+                fontSize: 12, fontWeight: 700,
                 color: 'rgba(255,255,255,0.50)',
                 padding: '4px 10px', borderRadius: 999,
                 background: 'rgba(255,255,255,0.05)',
@@ -250,7 +273,7 @@ export function ActivityCard({ actividad, visualState, uacCodigo, progresionNum,
               {isCompletada && (
                 <span style={{
                   display: 'inline-flex', alignItems: 'center', gap: 5,
-                  fontSize: 10, fontWeight: 800, color: '#4ADE80',
+                  fontSize: 12, fontWeight: 800, color: '#4ADE80',
                   padding: '4px 10px', borderRadius: 999,
                   background: 'rgba(74,222,128,0.10)',
                   border: '1px solid rgba(74,222,128,0.22)',
@@ -279,7 +302,7 @@ export function ActivityCard({ actividad, visualState, uacCodigo, progresionNum,
                   : isEnProgreso
                     ? 'none'
                     : `1px solid rgba(${areaColor.rgba}, 0.22)`,
-                fontSize: 11, fontWeight: 900,
+                fontSize: 13, fontWeight: 900,
                 textTransform: 'uppercase', letterSpacing: '0.12em',
                 color: isEnProgreso
                   ? '#011126'

@@ -159,7 +159,7 @@ export function ActivityRunner({
     }
   }
 
-  const base = { id: actividadId, titulo, descripcion: descripcion ?? undefined };
+  const base = { id: actividadId, codigo, titulo, descripcion: descripcion ?? undefined };
 
   const shellProps = {
     titulo,

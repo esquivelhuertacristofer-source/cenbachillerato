@@ -1,0 +1,46 @@
+{
+  "codigo": "CNEYT-V-P02-A1",
+  "conceptos": [
+    { "termino": "Cinemática", "idea": "Describe cómo se mueven los cuerpos sin estudiar qué lo causa." },
+    { "termino": "MRU", "idea": "Línea recta a velocidad constante: la aceleración es cero." },
+    { "termino": "MRUA", "idea": "Línea recta con aceleración constante: la velocidad cambia parejo." },
+    { "termino": "Caída libre", "idea": "Un MRUA donde la aceleración es g = 9.8 m/s²." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "El MRU: velocidad constante",
+      "idea": "Si la velocidad no cambia, la aceleración es cero y el cuerpo avanza lo mismo en cada segundo.",
+      "visual": { "tipo": "ejemplo", "titulo": "Tren Suburbano a 80 km/h durante 3 minutos", "lineas": ["x = x₀ + v·t", "v = 80 km/h ≈ 22.2 m/s,  t = 3 min = 180 s", "x = 0 + 22.2 × 180"], "resultado": "x = 3,996 m ≈ 4 km" },
+      "comprueba": { "pregunta": "Un tren va en MRU a 20 m/s. ¿Cuánto vale su aceleración?", "opciones": ["20 m/s²", "0 m/s²", "9.8 m/s²"], "correcta": 1, "porque": "En el MRU la velocidad no cambia, así que la aceleración es cero." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "El MRUA: la velocidad cambia parejo",
+      "idea": "Con aceleración constante, la velocidad cambia lo mismo cada segundo y la posición dibuja una parábola.",
+      "visual": { "tipo": "formulas", "items": [
+        { "nombre": "Velocidad", "expr": "v = v₀ + a·t", "leyenda": "v₀ velocidad inicial · a aceleración · t tiempo" },
+        { "nombre": "Posición", "expr": "x = x₀ + v₀t + ½at²", "leyenda": "Por el t², la gráfica x-t es una parábola" },
+        { "nombre": "Sin tiempo", "expr": "v² = v₀² + 2a(x − x₀)", "leyenda": "Útil cuando no conoces t" }
+      ] },
+      "comprueba": { "pregunta": "En la gráfica posición-tiempo de un MRUA, ¿qué forma tiene la curva?", "opciones": ["Una línea horizontal", "Una línea recta con pendiente v", "Una parábola"], "correcta": 2, "porque": "El desplazamiento crece con t², por eso la curva x-t es una parábola. La línea recta es la gráfica v-t." }
+    },
+    {
+      "parrafos": [4],
+      "titulo": "Caída libre: el MRUA más famoso",
+      "idea": "Sin aire, todos los cuerpos caen con la misma aceleración: g = 9.8 m/s².",
+      "visual": { "tipo": "ejemplo", "titulo": "Un objeto cae desde el Ángel de la Independencia (23 m)", "lineas": ["h = ½gt²  →  t = √(2h/g)", "t = √(2 × 23 / 9.8) = √4.69 ≈ 2.17 s", "v = g·t = 9.8 × 2.17 ≈ 21.3 m/s"], "resultado": "Llega al suelo a ≈ 76.6 km/h: por eso los andamios deben estar asegurados." },
+      "comprueba": { "pregunta": "Sin resistencia del aire, sueltas una piedra y una canica desde la misma altura. ¿Cuál llega primero?", "opciones": ["La piedra, porque pesa más", "Llegan al mismo tiempo", "La canica, porque es más pequeña"], "correcta": 1, "porque": "Sin aire, todos los cuerpos caen con la misma aceleración g = 9.8 m/s²." }
+    },
+    {
+      "parrafos": [5],
+      "titulo": "MRU frente a MRUA",
+      "idea": "La diferencia está en la aceleración: cero en el MRU, constante y distinta de cero en el MRUA.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "MRU", "puntos": ["v = constante", "a = 0", "Recorre la misma distancia en cada intervalo de tiempo"] },
+        { "titulo": "MRUA", "puntos": ["a = constante", "v aumenta o disminuye de forma uniforme", "La distancia por intervalo crece si acelera y baja si frena"] }
+      ] },
+      "comprueba": { "pregunta": "Si un auto pasa de 50 a 100 km/h, su distancia de frenado…", "opciones": ["se duplica", "se multiplica por cuatro", "no cambia"], "correcta": 1, "porque": "d = v₀²/2a depende del cuadrado de la velocidad: al duplicarla, la distancia se multiplica por 4." }
+    }
+  ]
+}

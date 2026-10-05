@@ -1,0 +1,54 @@
+{
+  "codigo": "LC-II-P02-A1",
+  "conceptos": [
+    { "termino": "Estructura narrativa", "idea": "Situación inicial, nudo y desenlace." },
+    { "termino": "Narrador", "idea": "La voz que cuenta: omnisciente, en primera persona o testigo." },
+    { "termino": "Conectores temporales", "idea": "Palabras que ordenan los hechos en el tiempo: después, mientras tanto…" },
+    { "termino": "Plan narrativo", "idea": "Lo que decides antes de escribir: quién narra, dónde, el conflicto y el final." }
+  ],
+  "partes": [
+    {
+      "parrafos": [0, 1],
+      "titulo": "Inicio, nudo y desenlace",
+      "idea": "Narrar es ordenar experiencias en el tiempo: toda historia se presenta, se complica y se resuelve.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "Situación inicial", "texto": "Se presentan los personajes, el tiempo y el espacio." },
+        { "titulo": "Nudo", "texto": "El conflicto que mueve a los personajes y genera tensión." },
+        { "titulo": "Desenlace", "texto": "La resolución: feliz, trágica o abierta." }
+      ] },
+      "comprueba": { "pregunta": "¿En qué momento aparece el conflicto que genera tensión?", "opciones": ["Situación inicial", "Nudo", "Desenlace"], "correcta": 1, "porque": "El nudo es el corazón de la narración: el conflicto que pone en movimiento a los personajes." }
+    },
+    {
+      "parrafos": [2, 3],
+      "titulo": "¿Quién cuenta la historia?",
+      "idea": "Elegir al narrador cambia lo que el lector sabe y lo que siente.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Omnisciente", "puntos": ["Lo sabe todo", "Conoce lo que piensan y sienten todos los personajes"] },
+        { "titulo": "Primera persona", "puntos": ["Un personaje cuenta su propia experiencia", "Cercanía, pero perspectiva limitada"] },
+        { "titulo": "Testigo", "puntos": ["Observa desde fuera, sin participar", "Solo describe lo que ve"] }
+      ] },
+      "comprueba": { "pregunta": "«Yo no sabía que esa noche cambiaría mi vida.» ¿Qué narrador es?", "opciones": ["Omnisciente", "Primera persona", "Testigo"], "correcta": 1, "porque": "Habla un personaje desde su propia experiencia («yo»): es un narrador en primera persona." }
+    },
+    {
+      "parrafos": [4, 5],
+      "titulo": "Personajes creíbles y conectores",
+      "idea": "Un personaje convence si quiere algo y enfrenta obstáculos; los conectores llevan al lector por el tiempo.",
+      "visual": { "tipo": "comparar", "columnas": [
+        { "titulo": "Personaje creíble", "puntos": ["Descripción física", "Rasgos psicológicos", "Quiere algo y enfrenta obstáculos"] },
+        { "titulo": "Conectores temporales", "puntos": ["después", "mientras tanto", "al cabo de", "en ese momento", "al día siguiente"] }
+      ] },
+      "comprueba": { "pregunta": "¿Para qué sirven los conectores temporales?", "opciones": ["Para describir a los personajes", "Para ordenar la secuencia de los hechos", "Para elegir al narrador"], "correcta": 1, "porque": "Son las bisagras del texto: organizan la secuencia de eventos y guían al lector en el tiempo." }
+    },
+    {
+      "parrafos": [6],
+      "titulo": "Tu plan narrativo",
+      "idea": "Antes de escribir, decide quién narra, dónde y cuándo pasa, cuál es el conflicto y cómo termina.",
+      "visual": { "tipo": "pasos", "items": [
+        { "titulo": "¿Quién narra?", "texto": "Omnisciente, primera persona o testigo." },
+        { "titulo": "¿Dónde y cuándo?", "texto": "El tiempo y el espacio de la historia." },
+        { "titulo": "¿Cuál es el conflicto?", "texto": "El problema central que genera tensión." },
+        { "titulo": "¿Cómo se resuelve?", "texto": "Un desenlace feliz, trágico o abierto." }
+      ] }
+    }
+  ]
+}

@@ -158,7 +158,7 @@ export function ActivityShell({
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{
-            fontSize: 9, fontWeight: 800, textTransform: "uppercase",
+            fontSize: 12, fontWeight: 800, textTransform: "uppercase",
             letterSpacing: "0.12em",
             color: isActive ? color.hex : "rgba(255,255,255,0.28)",
             marginBottom: 3,
@@ -166,7 +166,7 @@ export function ActivityShell({
             A{act.orden} · {pl}
           </div>
           <div style={{
-            fontSize: 11, fontWeight: 600, lineHeight: 1.3,
+            fontSize: 13, fontWeight: 600, lineHeight: 1.3,
             color: isActive ? "#fff" : isDone ? "rgba(255,255,255,0.60)" : "rgba(255,255,255,0.48)",
             overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
           }}>
@@ -309,7 +309,7 @@ export function ActivityShell({
               className="ash-back"
               style={{
                 display: "flex", alignItems: "center", gap: 8,
-                fontSize: 11, fontWeight: 800, textTransform: "uppercase",
+                fontSize: 13, fontWeight: 800, textTransform: "uppercase",
                 letterSpacing: "0.15em", color: "rgba(255,255,255,0.45)",
                 textDecoration: "none", whiteSpace: "nowrap",
                 transition: "all 0.25s ease",
@@ -357,7 +357,7 @@ export function ActivityShell({
                 {/* Pills */}
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 20 }}>
                   <span style={{
-                    fontSize: 10, fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.22em",
+                    fontSize: 12, fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.22em",
                     color: color.hex, padding: "5px 14px",
                     background: `rgba(${color.rgba}, 0.10)`,
                     border: `1px solid rgba(${color.rgba}, 0.22)`,
@@ -366,7 +366,7 @@ export function ActivityShell({
                     A{ordenNum} · {phaseLabel}
                   </span>
                   <span style={{
-                    fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em",
+                    fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em",
                     color: "rgba(255,255,255,0.40)", padding: "5px 14px",
                     background: "rgba(255,255,255,0.05)",
                     border: "1px solid rgba(255,255,255,0.08)",
@@ -376,7 +376,7 @@ export function ActivityShell({
                     {tc.label}
                   </span>
                   <span style={{
-                    fontSize: 10, fontWeight: 700, letterSpacing: "0.10em",
+                    fontSize: 12, fontWeight: 700, letterSpacing: "0.10em",
                     color: "rgba(255,255,255,0.40)", padding: "5px 14px",
                     background: "rgba(255,255,255,0.05)",
                     border: "1px solid rgba(255,255,255,0.08)",
@@ -388,7 +388,7 @@ export function ActivityShell({
                   <NarradorControl accentHex={color.hex} />
                   {isCompleta && (
                     <span style={{
-                      fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.14em",
+                      fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.14em",
                       color: "#4ADE80", padding: "5px 14px",
                       background: "rgba(74,222,128,0.10)",
                       border: "1px solid rgba(74,222,128,0.22)",
@@ -400,7 +400,7 @@ export function ActivityShell({
                   )}
                   {isBorrador && (
                     <span style={{
-                      fontSize: 10, fontWeight: 700, letterSpacing: "0.10em",
+                      fontSize: 12, fontWeight: 700, letterSpacing: "0.10em",
                       color: "#CA8A04", padding: "5px 14px",
                       background: "rgba(202,138,4,0.10)",
                       border: "1px solid rgba(202,138,4,0.25)",
@@ -596,7 +596,7 @@ export function ActivityShell({
               }}
             >
               <div style={{
-                fontSize: 9, fontWeight: 900, textTransform: "uppercase",
+                fontSize: 12, fontWeight: 900, textTransform: "uppercase",
                 letterSpacing: "0.35em", color: "rgba(255,255,255,0.25)",
                 marginBottom: 8, paddingLeft: 4,
               }}>
@@ -611,7 +611,7 @@ export function ActivityShell({
                 style={{
                   display: "flex", alignItems: "center", gap: 8,
                   marginTop: 10, padding: "10px 14px",
-                  borderRadius: 12, fontSize: 11, fontWeight: 700,
+                  borderRadius: 12, fontSize: 13, fontWeight: 700,
                   textTransform: "uppercase", letterSpacing: "0.10em",
                   color: "rgba(255,255,255,0.32)", textDecoration: "none",
                   background: "rgba(255,255,255,0.03)",
