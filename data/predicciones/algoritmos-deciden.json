@@ -1,0 +1,12 @@
+{
+  "escena": "Dani usa Rumbo, una plataforma ficticia: ve deportes y videos que la indignan. Tú diseñas el algoritmo que arma su feed.",
+  "pregunta": "Pasas de «Que enganche» a «Diverso y fiable». ¿Qué pasa con el tiempo que Dani se queda?",
+  "opciones": [
+    { "id": "a", "texto": "Sube, porque el contenido es mejor", "icono": "fa-arrow-trend-up" },
+    { "id": "b", "texto": "Baja, aunque el feed sea más sano", "icono": "fa-arrow-trend-down" },
+    { "id": "c", "texto": "No cambia, solo se reordenan los videos", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "Lo emocional y parecido a lo ya visto retiene más. Un feed variado y fiable reduce burbuja y desinformación, pero Dani se engancha menos: por eso muchas plataformas optimizan el tiempo.",
+  "comoComprobarlo": "En «Simula tu algoritmo» pulsa «Que enganche», mira el medidor de tiempo y luego pulsa «Diverso y fiable»."
+}

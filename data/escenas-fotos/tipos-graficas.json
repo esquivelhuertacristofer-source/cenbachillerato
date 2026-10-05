@@ -1,0 +1,11 @@
+{
+  "slug": "tipos-graficas",
+  "items": [
+    { "clave": "hogares-municipios", "formato": "16:9", "estilo": "foto", "escena": "Vista aérea de techos de casas en un valle verde, algunas con antenas pequeñas, calles sin nombre" },
+    { "clave": "cooperativa-ventas", "formato": "16:9", "estilo": "foto", "escena": "Mostrador de una cooperativa de artesanías con canastas tejidas y cajas de madera, luz cálida de tarde" },
+    { "clave": "dia-estudiante", "formato": "16:9", "estilo": "foto", "escena": "Escritorio de estudiante visto desde arriba con reloj de pared al fondo, mochila, cuaderno abierto y taza" },
+    { "clave": "horas-estudio", "formato": "16:9", "estilo": "foto", "escena": "Mesa de biblioteca con libros abiertos, pila de cuadernos y lámpara de escritorio" },
+    { "clave": "club-lectura", "formato": "16:9", "estilo": "foto", "escena": "Círculo de sillas en una sala con personas de distintas edades leyendo libros" },
+    { "clave": "presa-agua", "formato": "16:9", "estilo": "foto", "escena": "Presa de concreto con el embalse a medio llenar, montañas al fondo y cielo despejado" }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "escena": "Estás en un taller de línea del tiempo con la Revolución Mexicana (1910) y la Constitución de 1917 ya colocadas por décadas.",
+  "pregunta": "Si cambias la escala de década a siglo, ¿qué pasa con esos dos sucesos?",
+  "opciones": [
+    { "id": "a", "texto": "Se separan más y se distinguen mejor", "icono": "fa-arrows-left-right" },
+    { "id": "b", "texto": "Quedan en la misma marca, sin orden claro", "icono": "fa-equals" },
+    { "id": "c", "texto": "Desaparecen de la línea por estar muy cerca", "icono": "fa-eye-slash" }
+  ],
+  "correcta": "b",
+  "porque": "Una escala gruesa redondea las fechas: 1910 y 1920 pasan a ser «1900». Se pierde el orden fino y también la coherencia, aunque los dos sucesos ocurrieron en tiempos distintos.",
+  "comoComprobarlo": "Con escala «Década», coloca la Revolución en 1910 y la Constitución en 1920; luego pulsa «Siglo» y mira sus barras y la coherencia."
+}

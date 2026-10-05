@@ -21,7 +21,7 @@
 
 import * as THREE from "three";
 import { useLayoutEffect, useMemo, useRef, type ReactNode, type RefObject } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Environment, Lightformer, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import {
@@ -30,7 +30,6 @@ import {
   type Decision,
   type CasoId,
   CASOS,
-  ORGANOS,
   INTERVENCIONES,
   HABLANTES,
   TEORIA_DEF,
@@ -71,9 +70,12 @@ const NO = "#f87171";
 const GRIS = new THREE.Color("#4b5563");
 const PIEL = "#e8b98f";
 
-function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number }) {
+/** Etiqueta en <Html>: tamaño fijo en píxeles (≥ 14 px). Las `ancha` se ocultan en pantallas angostas. */
+function Etiqueta({ pos, children, col, fs = 14, ancha = false, fondo = "rgba(4,10,22,0.86)" }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number; ancha?: boolean; fondo?: string }) {
+  const { size } = useThree();
+  if (ancha && size.width < 640) return null;
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -81,10 +83,10 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children:
           gap: 6,
           padding: "5px 11px",
           borderRadius: 999,
-          background: "rgba(4,10,22,0.86)",
+          background: fondo,
           border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`,
           color: "#fff",
-          fontSize: fs,
+          fontSize: Math.max(14, fs),
           fontWeight: 800,
           whiteSpace: "nowrap",
           boxShadow: "0 6px 18px -8px #000",
@@ -94,6 +96,18 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children:
       </div>
     </Html>
   );
+}
+
+/** Desplaza la imagen hacia arriba para que el contenido quede entre la barra superior y la misión. */
+function Encuadre() {
+  const { camera, size } = useThree();
+  useLayoutEffect(() => {
+    const c = camera as THREE.PerspectiveCamera;
+    if (!c.isPerspectiveCamera) return undefined;
+    c.setViewOffset(size.width, size.height, 0, Math.round(size.height * 0.07), size.width, size.height);
+    return () => c.clearViewOffset();
+  }, [camera, size.width, size.height]);
+  return null;
 }
 
 /* ── Geometrías compartidas ───────────────────────────────────────────── */
@@ -510,7 +524,7 @@ function EscenaVias({ variante, n, decision, modoColor }: { variante: "palanca" 
             casco={variante === "palanca"}
             mochila={variante === "lazo"}
           />
-          <Etiqueta pos={[uno.p.x, 1.75, uno.p.z - 0.8]} col="rgba(255,255,255,0.3)" fs={12}>
+          <Etiqueta pos={[uno.p.x, 1.75, uno.p.z - 0.8]} col="rgba(255,255,255,0.3)" ancha>
             <i className={`fa-solid ${variante === "lazo" ? "fa-person-hiking" : "fa-helmet-safety"}`} style={{ color: variante === "lazo" ? "#38bdf8" : "#f97316" }} />
             {variante === "lazo" ? "1 persona con mochila" : "1 trabajador"}
           </Etiqueta>
@@ -578,7 +592,7 @@ function EscenaVias({ variante, n, decision, modoColor }: { variante: "palanca" 
               <meshStandardMaterial color="#7c3aed" roughness={0.7} />
             </mesh>
           </group>
-          <Etiqueta pos={[-1.5, 3.25, -2.0]} col="rgba(255,255,255,0.3)" fs={11}>
+          <Etiqueta pos={[-1.5, 3.25, -2.0]} col="rgba(255,255,255,0.3)" ancha>
             <i className="fa-solid fa-person-hiking" style={{ color: "#38bdf8" }} />
             Persona con mochila pesada
           </Etiqueta>
@@ -586,7 +600,7 @@ function EscenaVias({ variante, n, decision, modoColor }: { variante: "palanca" 
       )}
 
       {variante === "lazo" && (
-        <Etiqueta pos={[8.2, 1.2, -1.4]} col={`${modoColor}88`} fs={10.5}>
+        <Etiqueta pos={[8.2, 1.2, -1.4]} col={`${modoColor}88`} ancha>
           <i className="fa-solid fa-rotate" style={{ color: modoColor }} />
           El lazo regresa a la vía principal
         </Etiqueta>
@@ -763,19 +777,15 @@ function EscenaTrasplante({ decision, modoColor }: { decision: Decision | null; 
         <boxGeometry args={[0.04, 2.1, 1.1]} />
         <meshStandardMaterial color="#0f766e" roughness={0.6} />
       </mesh>
-      <Etiqueta pos={[-4.7, 2.4, -2.2]} fs={10} df={8}>
-        <i className="fa-solid fa-door-open" style={{ color: "#5eead4" }} />
-        Salida
+      <Etiqueta pos={[CAMAS[2]![0] + 0.15, 1.9, CAMAS[2]![2] + 0.6]} col="rgba(255,255,255,0.3)" ancha>
+        <i className="fa-solid fa-heart-pulse" style={{ color: "#f87171" }} />
+        5 pacientes esperan un órgano
       </Etiqueta>
 
       {CAMAS.map((c, i) => (
         <group key={i}>
           <Paciente pos={c} color="#fde68a" gris={decision === "no"} reloj={reloj} retraso={2.4 + i * 0.35} />
           <Monitor pos={[c[0] - 0.75, 0, c[2] - 0.6]} vive={decision !== "no"} reloj={reloj} retraso={2.4 + i * 0.35} />
-          <Etiqueta pos={[c[0] + 0.15, 0.95, c[2] + 1.05]} fs={10} df={7} col="rgba(255,255,255,0.28)">
-            <i className="fa-solid fa-heart-pulse" style={{ color: colores[i] }} />
-            Necesita {ORGANOS[i]!.toLowerCase()}
-          </Etiqueta>
           {actuar && <Organo desde={SANO} hasta={c} reloj={reloj} retraso={1.2 + i * 0.3} color={colores[i]!} />}
           <Anillo pos={c} color={OK} on={actuar} radio={2.2} />
         </group>
@@ -790,7 +800,7 @@ function EscenaTrasplante({ decision, modoColor }: { decision: Decision | null; 
         </mesh>
       </group>
       <Anillo pos={SANO} color={OK} on={decision === "no"} radio={1.2} />
-      <Etiqueta pos={[SANO[0], 1.6, SANO[2]]} col="rgba(255,255,255,0.3)" fs={11} df={8}>
+      <Etiqueta pos={[SANO[0], 1.6, SANO[2]]} col="rgba(255,255,255,0.3)" ancha>
         <i className="fa-solid fa-user-check" style={{ color: "#38bdf8" }} />
         Persona sana en revisión
       </Etiqueta>
@@ -814,6 +824,7 @@ function EtqAfectado({ pos, casoId, id, marcados, modoColor }: { pos: Pt; casoId
   const a = caso.afectados.find((x) => x.id === id);
   if (!a) return null;
   const on = marcados.includes(id);
+  if (!on) return null;
   return (
     <Etiqueta pos={pos} col={on ? modoColor : "rgba(255,255,255,0.22)"} fs={11} df={10}>
       <i className={`fa-solid ${on ? "fa-circle-check" : "fa-user"}`} style={{ color: on ? modoColor : "rgba(255,255,255,0.55)" }} />
@@ -1230,10 +1241,6 @@ function EscenaAgua({ marcados, postura, modoColor }: { marcados: string[]; post
           )),
         )}
       </group>
-      <Etiqueta pos={[PIPA[0], 2.0, PIPA[2]]} fs={10.5} df={8}>
-        <i className="fa-solid fa-truck-droplet" style={{ color: "#60a5fa" }} />
-        Una pipa por semana
-      </Etiqueta>
       <instancedMesh ref={gotas} args={[undefined, undefined, N_GOTAS]} frustumCulled={false}>
         <sphereGeometry args={[1, 8, 6]} />
         <meshStandardMaterial color="#38bdf8" emissive="#0ea5e9" emissiveIntensity={0.5} />
@@ -1270,11 +1277,13 @@ function EscenaAgua({ marcados, postura, modoColor }: { marcados: string[]; post
             <cylinderGeometry args={[0.46, 0.44, 1, 28]} />
             <meshStandardMaterial color="#38bdf8" emissive="#0284c7" emissiveIntensity={0.35} transparent opacity={0.85} />
           </mesh>
-          <Etiqueta pos={[t.x, 2.75, -1.2]} fs={10} df={8} col={postura ? `${modoColor}aa` : undefined}>
+          {postura && (
+          <Etiqueta pos={[t.x, 2.75, -1.2]} col={`${modoColor}aa`} ancha>
             <i className={`fa-solid ${t.id === "salud" ? "fa-house-medical" : t.id === "escuela" ? "fa-school" : "fa-house-chimney"}`} style={{ color: modoColor }} />
             {t.etq}
-            {postura ? ` · ${postura === "A" ? t.fA : t.fB}` : ""}
+            {` · ${postura === "A" ? t.fA : t.fB}`}
           </Etiqueta>
+          )}
         </group>
       ))}
       {/* Quienes reciben el agua */}
@@ -1299,10 +1308,10 @@ function EscenaAgua({ marcados, postura, modoColor }: { marcados: string[]; post
           </group>
         );
       })}
-      <EtqAfectado pos={[-0.4, 0.1, 3.45]} casoId="agua" id="asamblea" marcados={marcados} modoColor={modoColor} />
-      <EtqAfectado pos={[-1.1, 0.1, 0.8]} casoId="agua" id="salud" marcados={marcados} modoColor={modoColor} />
-      <EtqAfectado pos={[2.2, 0.1, 1.5]} casoId="agua" id="escuela" marcados={marcados} modoColor={modoColor} />
-      <EtqAfectado pos={[4.2, 0.1, 0.85]} casoId="agua" id="familias" marcados={marcados} modoColor={modoColor} />
+      <EtqAfectado pos={[-0.4, 0.1, 3.45]} casoId="agua" id="asamblea" marcados={postura ? [] : marcados} modoColor={modoColor} />
+      <EtqAfectado pos={[-1.1, 0.1, 0.8]} casoId="agua" id="salud" marcados={postura ? [] : marcados} modoColor={modoColor} />
+      <EtqAfectado pos={[2.2, 0.1, 1.5]} casoId="agua" id="escuela" marcados={postura ? [] : marcados} modoColor={modoColor} />
+      <EtqAfectado pos={[4.2, 0.1, 0.85]} casoId="agua" id="familias" marcados={postura ? [] : marcados} modoColor={modoColor} />
     </group>
   );
 }
@@ -1347,6 +1356,7 @@ function Hablante({ i, activo, modoColor }: { i: number; activo: boolean; modoCo
 }
 
 function EscenaDialogo({ actualId, clasificados, modoColor }: { actualId: string | null; clasificados: string[]; modoColor: string }) {
+  const angosto = useThree((st) => st.size.width) < 640;
   const viga = useRef<THREE.Group>(null);
   const platoF = useRef<THREE.Group>(null);
   const platoL = useRef<THREE.Group>(null);
@@ -1385,8 +1395,8 @@ function EscenaDialogo({ actualId, clasificados, modoColor }: { actualId: string
       {HABLANTES.map((_, i) => (
         <Hablante key={i} i={i} activo={actual?.hablante === i} modoColor={modoColor} />
       ))}
-      {actual && hab && (
-        <Html position={[hab[0] * 0.92, 2.55, hab[2]]} center distanceFactor={10} zIndexRange={[25, 0]} style={{ pointerEvents: "none" }}>
+      {actual && hab && !angosto && (
+        <Html position={[hab[0] * 0.92, 2.55, hab[2]]} center zIndexRange={[25, 0]} style={{ pointerEvents: "none" }}>
           <div
             style={{
               width: 250,
@@ -1394,7 +1404,7 @@ function EscenaDialogo({ actualId, clasificados, modoColor }: { actualId: string
               borderRadius: 12,
               background: "#fff",
               color: "#0f172a",
-              fontSize: 12,
+              fontSize: 14,
               fontWeight: 700,
               lineHeight: 1.35,
               boxShadow: "0 10px 24px -10px #000",
@@ -1402,9 +1412,9 @@ function EscenaDialogo({ actualId, clasificados, modoColor }: { actualId: string
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center", marginBottom: 3 }}>
-              <span style={{ fontSize: 10, fontWeight: 900, color: "#64748b" }}>{HABLANTES[actual.hablante]} dice:</span>
+              <span style={{ fontSize: 12, fontWeight: 900, color: "#64748b" }}>{HABLANTES[actual.hablante]} dice:</span>
               {clasificada && (
-                <span style={{ fontSize: 9.5, fontWeight: 900, color: "#fff", background: colClase, padding: "2px 7px", borderRadius: 999, whiteSpace: "nowrap" }}>
+                <span style={{ fontSize: 12, fontWeight: 900, color: "#fff", background: colClase, padding: "2px 7px", borderRadius: 999, whiteSpace: "nowrap" }}>
                   {esFalacia(actual.clase) ? "Falacia: " : ""}
                   {etiquetaClase(actual.clase)}
                 </span>
@@ -1483,7 +1493,7 @@ function EscenaDialogo({ actualId, clasificados, modoColor }: { actualId: string
             <meshStandardMaterial color={NO} emissive={NO} emissiveIntensity={0.3} />
           </mesh>
         ))}
-        <Etiqueta pos={[0, 1.3, 0]} col={`${NO}aa`} fs={10.5}>
+        <Etiqueta pos={[0, 1.3, 0]} col={`${NO}aa`} ancha>
           <i className="fa-solid fa-trash-can" style={{ color: NO }} />
           Falacias: no pesan · {falacias.length}
         </Etiqueta>
@@ -1550,6 +1560,7 @@ export default function DilemaTranviaScene(p: DilemaSceneProps) {
       )}
       {vista === "dialogo" && <EscenaDialogo actualId={p.actualId} clasificados={p.clasificados} modoColor={modoColor} />}
 
+      <Encuadre />
       <OrbitControls makeDefault enablePan={false} enableZoom minDistance={4} maxDistance={24} maxPolarAngle={Math.PI * 0.46} minPolarAngle={Math.PI * 0.05} target={cam.target} />
       <EffectComposer>
         <Bloom intensity={0.3} luminanceThreshold={0.62} luminanceSmoothing={0.85} mipmapBlur />

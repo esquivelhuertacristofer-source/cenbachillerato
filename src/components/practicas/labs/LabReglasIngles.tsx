@@ -24,6 +24,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { PracticaLabProps } from "../registry";
 import { T, OK, card, Eyebrow } from "./_kit";
+import { LabShell, Bloque, BotonHerramienta, Mesa, Dato } from "./_shell";
 import { LabSfx } from "./lab-audio";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { REGLAS_INGLES_HUECOS } from "./reglas-ingles-huecos";
@@ -40,16 +41,19 @@ import {
   DATO_REGLAS,
   type Modal,
 } from "./reglas-ingles-data";
+import { SITUACIONES, MODALES, resolver, resumenDia, formaModal, fraseCompleta, type Dia, type Veredicto } from "./reglas-ingles-sim";
 
 const NO = "#FF5E5E";
 import { useEstrellas } from "@/lib/hooks/useEstrellas";
 import { FondoTermino, VinetaTermino } from "./_vineta";
 const RETO_KEY = "cen-reglas-ingles-reto";
+const RUTA_SIM = "/media/labs-sim/reglas-ingles";
 
-type Modo = "clasificar" | "completar" | "glosario" | "texto";
+type Modo = "reglas" | "clasificar" | "completar" | "glosario" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
-  { id: "clasificar", label: "Obligation, prohibition or no obligation?", icono: "fa-layer-group" },
+  { id: "reglas", label: "Mia's school day", icono: "fa-school" },
+  { id: "clasificar", label: "Obligation or prohibition?", icono: "fa-layer-group" },
   { id: "completar", label: "Complete the rule", icono: "fa-pen-fancy" },
   { id: "glosario", label: "Match the structure", icono: "fa-book-open" },
   { id: "texto", label: "Complete the text", icono: "fa-pen-to-square" },
@@ -63,12 +67,11 @@ const FICHAS_HUECO: { id: string; label: string }[] = [
 
 export function LabReglasIngles({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
-  const [modo, setModo] = useState<Modo>("clasificar");
+  const [modo, setModo] = useState<Modo>("reglas");
 
   // ── sonido ────────────────────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   // Modo «Completa el texto». El contador sirve de `key`: subirlo remonta
   // el componente y devuelve todos los huecos en blanco.
   const [textoDone, setTextoDone] = useState(false);
@@ -180,6 +183,34 @@ export function LabReglasIngles({ color }: PracticaLabProps) {
     setSelGlos(null);
   };
 
+  // ── simulador «Mia's school day» ───────────────────────────────────────
+  // El estado vive aquí (no en el modo) para que cambiar de modo no borre
+  // lo decidido ni descumpla las misiones.
+  const [elegidas, setElegidas] = useState<Record<string, Modal>>({});
+  const [vistas, setVistas] = useState<Record<string, Modal>>({});
+  const [actualSit, setActualSit] = useState(SITUACIONES[0]!.id);
+  const [comparo, setComparo] = useState(false);
+  const dia = resumenDia(elegidas);
+  const decidir = (sitId: string, m: Modal) => {
+    const sit = SITUACIONES.find((x) => x.id === sitId);
+    if (!sit) return;
+    setVistas((v) => ({ ...v, [sitId]: m }));
+    if (elegidas[sitId]) {
+      // Ya decidió: lo demás es solo mirar qué habría pasado.
+      if (m !== elegidas[sitId]) setComparo(true);
+      return;
+    }
+    setElegidas((e) => ({ ...e, [sitId]: m }));
+    if (resolver(sit, m).puntos > 0) sfxPlace();
+    else sfxNo();
+  };
+  const resetReglas = () => {
+    setElegidas({});
+    setVistas({});
+    setActualSit(SITUACIONES[0]!.id);
+    setComparo(false);
+  };
+
   const [quizAprobado, setQuizAprobado] = useState(false);
 
   // ── progreso / estrellas ──────────────────────────────────────────────
@@ -199,6 +230,8 @@ export function LabReglasIngles({ color }: PracticaLabProps) {
   };
 
   const objetivos = [
+    { txt: "Escribe la regla de las 6 situaciones de Mia y mira qué le pasa", done: dia.decididas >= SITUACIONES.length },
+    { txt: "Prueba otro modal en una situación ya resuelta y compara el resultado", done: comparo },
     { txt: "Clasifica las 10 reglas por su modal (must / mustn't / have to / don't have to)", done: clasificarDone },
     { txt: "Completa los 5 huecos con la forma correcta", done: completarDone },
     { txt: "Empareja las 6 estructuras del glosario", done: glosarioDone },
@@ -260,137 +293,69 @@ export function LabReglasIngles({ color }: PracticaLabProps) {
     setTextoDone(false);
     setTextoIntento((n) => n + 1);
   };
-  const resetActual = modo === "texto" ? resetTexto : modo === "clasificar" ? resetClasificar : modo === "completar" ? resetCompletar : resetGlosario;
+  const resetActual =
+    modo === "reglas" ? resetReglas : modo === "texto" ? resetTexto : modo === "clasificar" ? resetClasificar : modo === "completar" ? resetCompletar : resetGlosario;
+
+  const lectura =
+    modo === "reglas" ? (
+      <>Warnings {dia.avisos}/3 · Minutes wasted {dia.minutos} · Decided {dia.decididas}/{SITUACIONES.length}</>
+    ) : modo === "clasificar" ? (
+      <>Reglas clasificadas: {Object.keys(ubicado).length}/{ORACIONES.length}</>
+    ) : modo === "completar" ? (
+      <>Huecos completos: {Object.keys(completado).length}/{HUECOS.length}</>
+    ) : modo === "glosario" ? (
+      <>Estructuras emparejadas: {Object.keys(empGlos).length}/{PARES.length}</>
+    ) : (
+      <>Completa el texto con las formas modales</>
+    );
+
+  const pista =
+    modo === "reglas" ? (
+      <>Elige el modal que escribe la regla y mira qué hace Mia. Después prueba otro modal: verás qué habría pasado.</>
+    ) : modo === "clasificar" ? (
+      <><strong style={{ color: T.text }}>must</strong> = obligación fuerte; <strong style={{ color: T.text }}>mustn&apos;t</strong> = prohibido; <strong style={{ color: T.text }}>have to</strong> = obligación externa; <strong style={{ color: T.text }}>don&apos;t have to</strong> = no es necesario (es opcional).</>
+    ) : modo === "completar" ? (
+      <>Recuerda: <strong style={{ color: T.text }}>must</strong> y <strong style={{ color: T.text }}>mustn&apos;t</strong> van con el verbo base (sin <strong style={{ color: T.text }}>to</strong> ni <strong style={{ color: T.text }}>-s</strong>); en 3ª persona <strong style={{ color: T.text }}>have to</strong> → <strong style={{ color: T.text }}>has to</strong>.</>
+    ) : modo === "glosario" ? (
+      <>Lee la definición y su ejemplo; luego suelta la estructura que le corresponde (casa, escuela o comunidad).</>
+    ) : (
+      <>Escribe la forma modal que completa cada frase.</>
+    );
 
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes rulShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
-        @keyframes rulPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
-        .rul-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 16px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .rul-tab:hover { border-color:${T.lineStrong}; color:#fff; }
-        .rul-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-        .rul-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
-          font-size:14px; border:1px solid ${T.line}; background:${T.glass}; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .rul-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
-        .rul-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .rul-chip { cursor:grab; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 16px; border-radius:14px;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:13.5px; font-weight:700; transition:all .14s; user-select:none; max-width:360px; text-align:left; line-height:1.4; }
-        .rul-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); }
-        .rul-chip[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.2); box-shadow:0 0 16px -5px ${accent}; }
-        .rul-chip:active { cursor:grabbing; }
-        .rul-chip-sm { cursor:grab; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 16px; border-radius:999px;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:14px; font-weight:800; transition:all .14s; user-select:none; }
-        .rul-chip-sm:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); }
-        .rul-chip-sm[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.2); box-shadow:0 0 16px -5px ${accent}; }
-        .rul-chip-sm:active { cursor:grabbing; }
-        .rul-row { border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:14px 16px; transition:all .16s; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
-        .rul-row[data-shake="true"] { animation:rulShake .4s; border-color:${NO}; }
-        .rul-row[data-done="true"] { border-color:${OK}66; background:${OK}0f; }
-        .rul-slot { flex-shrink:0; min-width:110px; min-height:42px; border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset};
-          display:inline-flex; align-items:center; justify-content:center; color:${T.text3}; font-size:12.5px; transition:all .16s; cursor:pointer; padding:4px 10px; }
-        .rul-slot[data-armed="true"] { border-color:${accent}; background:rgba(${color.rgba},0.1); }
-        .rul-bin { border-radius:15px; border:1.5px solid ${T.line}; background:${T.glass}; padding:16px; transition:all .16s; min-height:240px; }
-        .rul-bin[data-shake="true"] { animation:rulShake .4s; border-color:${NO}; }
-        .rul-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
-          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
-        .rul-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
-        .rul-q:disabled{ cursor:default; }
-        .rul-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
-          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .rul-btn:hover { border-color:${T.lineStrong}; }
-        .rul-divider { height:1px; background:${T.line}; margin:18px 0; }
-        @media (prefers-reduced-motion: reduce){ .rul-row[data-shake="true"], .rul-bin[data-shake="true"] { animation:none; } }
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      dom
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })),
+        valor: modo,
+        cambiar: (id) => setModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={resetActual} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      escena={
+        <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
+          <style>{css(accent, color.rgba)}</style>
 
-        /* Cajón de teoría */
-        .rul-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .rul-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .rul-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .rul-drawer[data-open="true"] { transform:translateX(0); }
-        .rul-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .rul-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .rul-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .rul-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .rul-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .rul-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .rul-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
+          {modo === "reglas" && (
+            <SimReglas
+              elegidas={elegidas}
+              vistas={vistas}
+              actual={actualSit}
+              onActual={setActualSit}
+              onElegir={decidir}
+              dia={dia}
+            />
+          )}
 
-        /* Identidad del tablero */
-        .rul-bin, .rul-row { --tono:188; position:relative;
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
-        .rul-bin:nth-of-type(6n+1), .rul-row:nth-of-type(6n+1) { --tono:188; }
-        .rul-bin:nth-of-type(6n+2), .rul-row:nth-of-type(6n+2) { --tono:262; }
-        .rul-bin:nth-of-type(6n+3), .rul-row:nth-of-type(6n+3) { --tono:44; }
-        .rul-bin:nth-of-type(6n+4), .rul-row:nth-of-type(6n+4) { --tono:152; }
-        .rul-bin:nth-of-type(6n+5), .rul-row:nth-of-type(6n+5) { --tono:330; }
-        .rul-bin:nth-of-type(6n+6), .rul-row:nth-of-type(6n+6) { --tono:18; }
-        .rul-bin::before, .rul-row::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
-          background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
-        .rul-bin[data-done="true"], .rul-row[data-done="true"] {
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.2) 0%, transparent 68%); }
-        .rul-chip { transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
-        .rul-chip:hover { transform:translateY(-2px); }
-        .rul-chip[data-sel="true"] { transform:translateY(-3px) scale(1.02); }
-        @media (prefers-reduced-motion: reduce){
-          .rul-chip, .rul-chip:hover, .rul-chip[data-sel="true"] { transform:none; transition:none; }
-        }
-      `}</style>
-
-      {/* selector de modo + toolbar */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="rul-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="rul-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="rul-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="rul-icobtn" onClick={resetActual} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <button className="rul-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="rul-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="rul-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="rul-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="rul-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="rul-drawer-body">
-          <FichaTeorica data={REGLAS_INGLES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}>
-        {/* ── Columna principal ─────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
-          {/* MODO 1 — Obligation, prohibition or no obligation? */}
           {/* MODO — completa el texto (fill_blanks verbatim de la progresión) */}
           {modo === "texto" && (
             <CompletaTexto
@@ -408,17 +373,18 @@ export function LabReglasIngles({ color }: PracticaLabProps) {
             />
           )}
 
+          {/* MODO — Obligation, prohibition or no obligation? */}
           {modo === "clasificar" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
+            <Mesa>
+              <div style={{ ...card, padding: "16px 18px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
                   <Eyebrow>Arrastra cada regla a su modal</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: clasificarDone ? OK : T.text3 }}>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: clasificarDone ? OK : T.text3 }}>
                     {Object.keys(ubicado).length}/{ORACIONES.length}
                   </span>
                 </div>
                 {oracionesLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+                  <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
                     <i className="fa-solid fa-circle-check" /> ¡Clasificaste las {ORACIONES.length} reglas!
                   </div>
                 ) : (
@@ -431,26 +397,25 @@ export function LabReglasIngles({ color }: PracticaLabProps) {
                   </div>
                 )}
               </div>
-
               <BinsClasificar selOracion={selOracion} shakeBin={shakeBin} ubicado={ubicado} onMatch={intentarClasificar} dropProps={dropProps} />
-            </>
+            </Mesa>
           )}
 
-          {/* MODO 2 — Complete the rule */}
+          {/* MODO — Complete the rule */}
           {modo === "completar" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
+            <Mesa>
+              <div style={{ ...card, padding: "16px 18px" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6, flexWrap: "wrap", gap: 8 }}>
                   <Eyebrow>Arrastra la forma correcta a cada hueco</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: completarDone ? OK : T.text3 }}>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: completarDone ? OK : T.text3 }}>
                     {Object.keys(completado).length}/{HUECOS.length}
                   </span>
                 </div>
-                <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 14, lineHeight: 1.5 }}>
+                <div style={{ fontSize: 14, color: T.text3, marginBottom: 12, lineHeight: 1.5 }}>
                   Cuidado: hay formas <strong style={{ color: T.text2 }}>incorrectas</strong> (musts, must to, have, haves to) que no encajan en ningún hueco.
                 </div>
                 {fichasLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+                  <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
                     <i className="fa-solid fa-circle-check" /> ¡Completaste los {HUECOS.length} huecos!
                   </div>
                 ) : (
@@ -463,23 +428,22 @@ export function LabReglasIngles({ color }: PracticaLabProps) {
                   </div>
                 )}
               </div>
-
               <RowsCompletar selFicha={selFicha} shakeHueco={shakeHueco} completado={completado} onMatch={intentarCompletar} dropProps={dropProps} />
-            </>
+            </Mesa>
           )}
 
-          {/* MODO 3 — Match the structure */}
+          {/* MODO — Match the structure */}
           {modo === "glosario" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
+            <Mesa>
+              <div style={{ ...card, padding: "16px 18px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
                   <Eyebrow>Arrastra cada estructura a su definición</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: glosarioDone ? OK : T.text3 }}>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: glosarioDone ? OK : T.text3 }}>
                     {Object.keys(empGlos).length}/{PARES.length}
                   </span>
                 </div>
                 {glosLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+                  <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
                     <i className="fa-solid fa-circle-check" /> ¡Emparejaste las {PARES.length} estructuras!
                   </div>
                 ) : (
@@ -493,74 +457,348 @@ export function LabReglasIngles({ color }: PracticaLabProps) {
                   </div>
                 )}
               </div>
-
               <RowsGlosario selGlos={selGlos} shakeGlos={shakeGlos} empGlos={empGlos} onMatch={intentarGlos} dropProps={dropProps} />
-            </>
+            </Mesa>
           )}
         </div>
-
-        {/* ── Columna lateral ───────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? OK : T.text2 }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-                  <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
+      }
+      pestanas={[
+        {
+          id: "cuaderno",
+          etiqueta: "Cuaderno",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Tu partida" icono="fa-star">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8 }}>
+                  <Dato label="Warnings" value={`${dia.avisos}/3`} col={dia.avisos >= 3 ? "#FF5E5E" : undefined} />
+                  <Dato label="Minutes wasted" value={`${dia.minutos}`} col={dia.minutos > 0 ? "#FFC75A" : undefined} />
+                  <Dato label="Rules" value={`${dia.puntos}/${dia.puntosMax}`} col={dia.decididas >= SITUACIONES.length ? OK : undefined} />
+                  <Dato label="Decided" value={`${dia.decididas}/${SITUACIONES.length}`} />
                 </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                  <div style={{ display: "flex", gap: 4 }}>
+                    {[1, 2, 3].map((s) => (
+                      <i key={s} className="fa-solid fa-star" style={{ fontSize: 20, color: s <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
+                    ))}
+                  </div>
+                  <span style={{ fontSize: 14, color: T.text2, lineHeight: 1.45, flex: "1 1 160px" }}>
+                    {bestEstrellas >= 3 ? "You know the rules in English!" : "Termina los modos de arrastre para ganar estrellas; la tercera pide 2 errores o menos."}
+                  </span>
+                </div>
+              </Bloque>
+              <Bloque titulo="Pista" icono="fa-lightbulb">
+                <p style={{ margin: 0, color: T.text2 }}>{pista}</p>
+              </Bloque>
+              <Bloque titulo="El día de Mia" icono="fa-calendar-day">
+                {SITUACIONES.map((s) => {
+                  const e = elegidas[s.id];
+                  const r = e ? resolver(s, e) : null;
+                  return (
+                    <p key={s.id} style={{ margin: 0, color: T.text2 }}>
+                      <strong style={{ color: T.text }}>{s.lugar}.</strong>{" "}
+                      {r && e ? `${fraseCompleta(s, e)} → ${VEREDICTO_TXT[r.veredicto]}` : "Sin decidir todavía."}
+                    </p>
+                  );
+                })}
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />,
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book",
+          contenido: (
+            <>
+              {(Object.keys(MODAL_INFO) as Modal[]).map((m) => (
+                <Bloque key={m} titulo={MODAL_INFO[m].titulo} icono={MODAL_INFO[m].icono}>
+                  <p style={{ margin: 0, color: T.text2 }}>{MODAL_INFO[m].subtitulo}</p>
+                  <p style={{ margin: 0, color: T.text3, fontStyle: "italic" }}>{MODAL_INFO[m].ejemplo}</p>
+                </Bloque>
               ))}
-            </div>
+              <Bloque titulo="Dato" icono="fa-circle-info">
+                <p style={{ margin: 0, color: T.text2 }}>{DATO_REGLAS}</p>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={REGLAS_INGLES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
+  );
+}
 
-            <div className="rul-divider" />
+const VEREDICTO_TXT: Record<Veredicto, string> = {
+  seguro: "safe",
+  matiz: "safe, with a nuance",
+  sancion: "warning",
+  esfuerzo: "wasted effort",
+  perdida: "missed out",
+};
 
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", color: T.text3, textTransform: "uppercase" }}>Puntuación</div>
-                <div style={{ display: "flex", gap: 4, marginTop: 5 }}>
-                  {[1, 2, 3].map((s) => (
-                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 18, color: s <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
-                  ))}
-                </div>
-              </div>
-              <div style={{ textAlign: "right", maxWidth: 180 }}>
-                <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45 }}>
-                  {bestEstrellas >= 3 ? "You know the rules in English!" : "Termina los tres modos para ganar 2★; la tercera pide 2 errores o menos."}
-                </div>
-              </div>
-            </div>
-          </div>
+const VEREDICTO_CARA: Record<Veredicto, { icono: string; col: string; titulo: string }> = {
+  seguro: { icono: "fa-face-smile-beam", col: "#34D399", titulo: "Safe day" },
+  matiz: { icono: "fa-face-smile", col: "#8EE3B0", titulo: "Safe, with a nuance" },
+  sancion: { icono: "fa-face-frown", col: "#FF5E5E", titulo: "A warning!" },
+  esfuerzo: { icono: "fa-face-tired", col: "#FFC75A", titulo: "Wasted effort" },
+  perdida: { icono: "fa-face-meh", col: "#FFC75A", titulo: "Missed out" },
+};
 
-          {/* pista del modo actual */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid rgba(${color.rgba},0.3)`, background: `rgba(${color.rgba},0.08)`, fontSize: 13, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              {modo === "clasificar" && (
-                <><strong style={{ color: T.text }}>must</strong> = obligación fuerte; <strong style={{ color: T.text }}>mustn&apos;t</strong> = prohibido; <strong style={{ color: T.text }}>have to</strong> = obligación externa; <strong style={{ color: T.text }}>don&apos;t have to</strong> = no es necesario (es opcional).</>
-              )}
-              {modo === "completar" && (
-                <>Recuerda: <strong style={{ color: T.text }}>must</strong> y <strong style={{ color: T.text }}>mustn&apos;t</strong> van con el verbo base (sin <strong style={{ color: T.text }}>to</strong> ni <strong style={{ color: T.text }}>-s</strong>); en 3ª persona <strong style={{ color: T.text }}>have to</strong> → <strong style={{ color: T.text }}>has to</strong>.</>
-              )}
-              {modo === "glosario" && (
-                <>Lee la definición y su ejemplo; luego suelta la estructura que le corresponde (casa, escuela o comunidad).</>
-              )}
-            </span>
-          </div>
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Simulador — Mia's school day (el alumno escribe la regla; Mia actúa)
+ * ═══════════════════════════════════════════════════════════════════════════ */
+function FotoSim({ clave, icono }: { clave: string; icono: string }) {
+  const [fallo, setFallo] = useState(false);
+  return (
+    <div className="rul-foto" aria-hidden>
+      <i className={`fa-solid ${icono}`} />
+      {!fallo && <img src={`${RUTA_SIM}/${clave}.webp`} alt="" loading="lazy" onError={() => setFallo(true)} />}
+    </div>
+  );
+}
 
-          {/* dato verbatim */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid ${T.line}`, background: T.glass, fontSize: 12.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-circle-info" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>{DATO_REGLAS}</span>
-          </div>
+function SimReglas({
+  elegidas,
+  vistas,
+  actual,
+  onActual,
+  onElegir,
+  dia,
+}: {
+  elegidas: Record<string, Modal>;
+  vistas: Record<string, Modal>;
+  actual: string;
+  onActual: (id: string) => void;
+  onElegir: (id: string, m: Modal) => void;
+  dia: Dia;
+}) {
+  const sit = SITUACIONES.find((s) => s.id === actual) ?? SITUACIONES[0]!;
+  const primera = elegidas[sit.id];
+  const vista = vistas[sit.id];
+  const res = vista ? resolver(sit, vista) : null;
+  const cara = res ? VEREDICTO_CARA[res.veredicto] : null;
+  const idx = SITUACIONES.findIndex((s) => s.id === sit.id);
+  const siguiente = SITUACIONES[(idx + 1) % SITUACIONES.length]!;
+  const finDia = dia.decididas >= SITUACIONES.length;
+
+  return (
+    <div className="rul-sim">
+      <div className="rul-medidores">
+        <div className="rul-med">
+          <span>Warnings</span>
+          <span className="rul-pips" aria-label={`${dia.avisos} de 3 avisos`}>
+            {[0, 1, 2].map((i) => (
+              <i key={i} className="fa-solid fa-triangle-exclamation" data-on={i < dia.avisos} />
+            ))}
+          </span>
+        </div>
+        <div className="rul-med">
+          <span>Minutes wasted</span>
+          <strong>{dia.minutos}</strong>
+        </div>
+        <div className="rul-med">
+          <span>Safe rules</span>
+          <strong>
+            {dia.puntos}/{dia.puntosMax}
+          </strong>
         </div>
       </div>
 
-      <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />
+      <div className="rul-ruta" role="tablist" aria-label="Mia's day">
+        {SITUACIONES.map((s) => {
+          const e = elegidas[s.id];
+          const v = e ? resolver(s, e).veredicto : null;
+          return (
+            <button key={s.id} type="button" role="tab" aria-selected={s.id === sit.id} className="rul-est" data-on={s.id === sit.id} data-v={v ?? "nada"} onClick={() => onActual(s.id)}>
+              <i className={`fa-solid ${s.icono}`} aria-hidden />
+              <span>{s.lugar}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="rul-sit">
+        <FotoSim clave={sit.imagen} icono={sit.icono} />
+        <div className="rul-sit-txt">
+          <div className="rul-sit-ceja">
+            {sit.lugar} · {idx + 1}/{SITUACIONES.length}
+          </div>
+          <h3>{sit.titulo}</h3>
+          <p>{sit.contexto}</p>
+        </div>
+      </div>
+
+      <div className="rul-regla">
+        <div className="rul-regla-t">Write the rule</div>
+        <div className="rul-frase">
+          <span>{sit.antes}</span>
+          <span className="rul-hueco" data-lleno={!!vista}>
+            {vista ? formaModal(sit, vista) : "…"}
+          </span>
+          <span>{sit.despues}</span>
+        </div>
+        <div className="rul-opciones">
+          {MODALES.map((m) => (
+            <button key={m} type="button" className="rul-op" data-on={vista === m} onClick={() => onElegir(sit.id, m)}>
+              {formaModal(sit, m)}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {res && cara && vista ? (
+        <div className="rul-result" data-v={res.veredicto} role="status">
+          <div className="rul-cara" style={{ color: cara.col, borderColor: cara.col }}>
+            <i className={`fa-solid ${cara.icono}`} aria-hidden />
+          </div>
+          <div className="rul-result-txt">
+            <div className="rul-result-ceja" style={{ color: cara.col }}>
+              {cara.titulo}
+              <span>{vista === primera ? "Tu decisión cuenta" : "Vista previa: no cambia tu puntaje"}</span>
+            </div>
+            <p className="rul-narra">{res.texto}</p>
+            <p className="rul-explica">{res.explica}</p>
+            <button type="button" className="rul-btn" onClick={() => onActual(siguiente.id)}>
+              Next situation <i className="fa-solid fa-arrow-right" aria-hidden />
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="rul-vacio">Elige un modal y mira qué hace Mia.</div>
+      )}
+
+      {finDia && (
+        <div className="rul-fin" data-limpio={dia.limpio}>
+          <i className={`fa-solid ${dia.limpio ? "fa-trophy" : "fa-flag-checkered"}`} aria-hidden />
+          <span>
+            {dia.limpio
+              ? "Perfect day: no warnings and no wasted time."
+              : `Day over: ${dia.avisos} warning${dia.avisos === 1 ? "" : "s"}, ${dia.minutos} minutes wasted (simulación). Prueba otros modales para ver qué habría pasado.`}
+          </span>
+        </div>
+      )}
     </div>
   );
+}
+
+function css(accent: string, rgba: string): string {
+  return `
+    .rul-sim { display:flex; flex-direction:column; gap:14px; min-width:0; }
+    .rul-medidores { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 140px), 1fr)); gap:10px; }
+    .rul-med { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 14px; border-radius:12px;
+      border:1px solid ${T.line}; background:${T.glass}; font-size:14px; font-weight:800; color:${T.text2}; }
+    .rul-med strong { font-size:19px; color:#fff; font-variant-numeric:tabular-nums; }
+    .rul-pips { display:inline-flex; gap:6px; }
+    .rul-pips i { font-size:17px; color:rgba(255,255,255,0.2); transition:color .25s, transform .25s; }
+    .rul-pips i[data-on="true"] { color:${NO}; transform:scale(1.2); }
+    .rul-ruta { display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; scrollbar-width:thin; }
+    .rul-est { cursor:pointer; flex:0 0 auto; display:inline-flex; align-items:center; gap:8px; padding:9px 12px; border-radius:12px;
+      border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:800; transition:all .15s; }
+    .rul-est:hover { color:#fff; border-color:${T.lineStrong}; }
+    .rul-est[data-on="true"] { border-color:${accent}; background:rgba(${rgba},0.18); color:#fff; }
+    .rul-est[data-v="seguro"], .rul-est[data-v="matiz"] { box-shadow:inset 0 -3px 0 ${OK}; }
+    .rul-est[data-v="sancion"] { box-shadow:inset 0 -3px 0 ${NO}; }
+    .rul-est[data-v="esfuerzo"], .rul-est[data-v="perdida"] { box-shadow:inset 0 -3px 0 #FFC75A; }
+    .rul-sit { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1.2fr); gap:14px; align-items:stretch; }
+    @container lsescena (max-width: 620px) { .rul-sit { grid-template-columns:1fr; } }
+    .rul-foto { position:relative; min-height:150px; border-radius:16px; overflow:hidden; display:flex; align-items:center; justify-content:center;
+      background:linear-gradient(135deg, rgba(${rgba},0.35), rgba(8,19,31,0.9)); border:1px solid ${T.line}; }
+    .rul-foto > i { font-size:44px; color:rgba(255,255,255,0.35); }
+    .rul-foto img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+    .rul-sit-txt { display:grid; gap:6px; align-content:center; }
+    .rul-sit-ceja { font-size:14px; font-weight:900; letter-spacing:.1em; text-transform:uppercase; color:${accent}; }
+    .rul-sit-txt h3 { margin:0; font-size:20px; font-weight:900; color:#fff; }
+    .rul-sit-txt p { margin:0; font-size:15px; line-height:1.5; color:${T.text2}; }
+    .rul-regla { display:grid; gap:10px; padding:14px 16px; border-radius:16px; border:1px solid rgba(${rgba},0.35); background:rgba(${rgba},0.08); }
+    .rul-regla-t { font-size:14px; font-weight:900; letter-spacing:.1em; text-transform:uppercase; color:${T.text3}; }
+    .rul-frase { display:flex; flex-wrap:wrap; align-items:center; gap:8px; font-size:20px; font-weight:800; color:#fff; line-height:1.4; }
+    .rul-hueco { min-width:70px; text-align:center; padding:2px 12px; border-radius:10px; border:2px dashed ${T.lineStrong}; color:${T.text3}; }
+    .rul-hueco[data-lleno="true"] { border-style:solid; border-color:${accent}; color:${accent}; background:rgba(${rgba},0.14); }
+    .rul-opciones { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 130px), 1fr)); gap:8px; }
+    .rul-op { cursor:pointer; padding:12px 10px; border-radius:12px; border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff;
+      font-size:16px; font-weight:900; transition:all .14s; }
+    .rul-op:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.1); transform:translateY(-1px); }
+    .rul-op[data-on="true"] { border-color:${accent}; background:rgba(${rgba},0.24); }
+    .rul-result { display:flex; gap:14px; align-items:flex-start; padding:14px 16px; border-radius:16px; border:1.5px solid ${T.line}; background:${T.glass};
+      animation:rulPop .3s ease; }
+    .rul-result[data-v="seguro"], .rul-result[data-v="matiz"] { border-color:${OK}77; background:${OK}10; }
+    .rul-result[data-v="sancion"] { border-color:${NO}77; background:${NO}10; }
+    .rul-result[data-v="esfuerzo"], .rul-result[data-v="perdida"] { border-color:#FFC75A77; background:#FFC75A10; }
+    .rul-cara { flex:0 0 auto; width:56px; height:56px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+      font-size:30px; border:2px solid; background:rgba(0,0,0,0.25); }
+    .rul-result-txt { display:grid; gap:8px; min-width:0; }
+    .rul-result-ceja { display:flex; flex-wrap:wrap; gap:4px 12px; align-items:baseline; font-size:16px; font-weight:900; }
+    .rul-result-ceja span { font-size:14px; font-weight:700; color:${T.text3}; }
+    .rul-narra { margin:0; font-size:16px; font-weight:700; color:#fff; line-height:1.45; }
+    .rul-explica { margin:0; font-size:15px; color:${T.text2}; line-height:1.5; }
+    .rul-vacio { padding:14px 16px; border-radius:16px; border:1.5px dashed ${T.line}; font-size:15px; color:${T.text3}; text-align:center; }
+    .rul-fin { display:flex; align-items:center; gap:12px; padding:12px 16px; border-radius:14px; border:1px solid #FFC75A66; background:#FFC75A12;
+      font-size:15px; font-weight:700; color:#fff; line-height:1.45; }
+    .rul-fin[data-limpio="true"] { border-color:${OK}77; background:${OK}14; }
+    .rul-fin i { font-size:22px; color:#FFC75A; }
+    .rul-fin[data-limpio="true"] i { color:${OK}; }
+
+    @keyframes rulShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
+    @keyframes rulPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
+    .rul-chip { cursor:grab; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 16px; border-radius:14px;
+      border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:14px; font-weight:700; transition:all .14s; user-select:none; max-width:min(360px, 100%); text-align:left; line-height:1.4; }
+    .rul-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); }
+    .rul-chip[data-sel="true"] { border-color:${accent}; background:rgba(${rgba},0.2); box-shadow:0 0 16px -5px ${accent}; }
+    .rul-chip:active { cursor:grabbing; }
+    .rul-chip-sm { cursor:grab; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 16px; border-radius:999px;
+      border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:14px; font-weight:800; transition:all .14s; user-select:none; }
+    .rul-chip-sm:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); }
+    .rul-chip-sm[data-sel="true"] { border-color:${accent}; background:rgba(${rgba},0.2); box-shadow:0 0 16px -5px ${accent}; }
+    .rul-chip-sm:active { cursor:grabbing; }
+    .rul-row { border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:14px 16px; transition:all .16s; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+    .rul-row[data-shake="true"] { animation:rulShake .4s; border-color:${NO}; }
+    .rul-row[data-done="true"] { border-color:${OK}66; background:${OK}0f; }
+    .rul-slot { flex-shrink:0; min-width:110px; min-height:42px; border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset};
+      display:inline-flex; align-items:center; justify-content:center; color:${T.text3}; font-size:14px; transition:all .16s; cursor:pointer; padding:4px 10px; }
+    .rul-slot[data-armed="true"] { border-color:${accent}; background:rgba(${rgba},0.1); }
+    .rul-bin { border-radius:15px; border:1.5px solid ${T.line}; background:${T.glass}; padding:16px; transition:all .16s; min-height:200px; }
+    .rul-bin[data-shake="true"] { animation:rulShake .4s; border-color:${NO}; }
+    .rul-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
+      border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
+    .rul-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
+    .rul-q:disabled{ cursor:default; }
+    .rul-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px; justify-self:start;
+      border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:14px; font-weight:800; transition:all .14s; }
+    .rul-btn:hover { border-color:${T.lineStrong}; }
+
+    /* Identidad del tablero */
+    .rul-bin, .rul-row { --tono:188; position:relative;
+      background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
+    .rul-bin:nth-of-type(6n+1), .rul-row:nth-of-type(6n+1) { --tono:188; }
+    .rul-bin:nth-of-type(6n+2), .rul-row:nth-of-type(6n+2) { --tono:262; }
+    .rul-bin:nth-of-type(6n+3), .rul-row:nth-of-type(6n+3) { --tono:44; }
+    .rul-bin:nth-of-type(6n+4), .rul-row:nth-of-type(6n+4) { --tono:152; }
+    .rul-bin:nth-of-type(6n+5), .rul-row:nth-of-type(6n+5) { --tono:330; }
+    .rul-bin:nth-of-type(6n+6), .rul-row:nth-of-type(6n+6) { --tono:18; }
+    .rul-bin::before, .rul-row::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
+      background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
+    .rul-bin[data-done="true"], .rul-row[data-done="true"] {
+      background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.2) 0%, transparent 68%); }
+    .rul-chip { transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
+    .rul-chip:hover { transform:translateY(-2px); }
+    .rul-chip[data-sel="true"] { transform:translateY(-3px) scale(1.02); }
+    @media (prefers-reduced-motion: reduce){
+      .rul-row[data-shake="true"], .rul-bin[data-shake="true"] { animation:none; }
+      .rul-chip, .rul-chip:hover, .rul-chip[data-sel="true"] { transform:none; transition:none; }
+      .rul-op:hover, .rul-result { transform:none; animation:none; }
+      .rul-pips i[data-on="true"] { transform:none; }
+    }
+  `;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -587,7 +825,7 @@ function BinsClasificar({
 }) {
   const bins: Modal[] = ["must", "mustnt", "haveto", "donthaveto"];
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 200px), 1fr))", gap: 12 }}>
       {bins.map((bin) => {
         const info = MODAL_INFO[bin];
         const dentro = ORACIONES.filter((o) => ubicado[o.id] === bin);
@@ -604,16 +842,16 @@ function BinsClasificar({
             <FondoTermino termino={info.titulo} />
             <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
               <VinetaTermino termino={info.titulo} color={T.text2} icono={info.icono} tam={29} radio={8} />
-              <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
+              <span style={{ fontSize: 14, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
             </div>
-            <div style={{ fontSize: 11, color: T.text3, marginBottom: 4, lineHeight: 1.4 }}>{info.subtitulo}</div>
-            <div style={{ fontSize: 10.5, color: T.text3, fontStyle: "italic", marginBottom: 12 }}>{info.ejemplo}</div>
+            <div style={{ fontSize: 14, color: T.text3, marginBottom: 4, lineHeight: 1.4 }}>{info.subtitulo}</div>
+            <div style={{ fontSize: 14, color: T.text3, fontStyle: "italic", marginBottom: 12 }}>{info.ejemplo}</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {dentro.length === 0 ? (
-                <div style={{ fontSize: 12, color: T.text3, opacity: 0.6, padding: "8px 0" }}>Arrastra aquí…</div>
+                <div style={{ fontSize: 14, color: T.text3, opacity: 0.6, padding: "8px 0" }}>Arrastra aquí…</div>
               ) : (
                 dentro.map((o) => (
-                  <span key={o.id} style={{ animation: "rulPop .25s ease", display: "inline-flex", alignItems: "flex-start", gap: 7, padding: "8px 12px", borderRadius: 11, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 12.5, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>
+                  <span key={o.id} style={{ animation: "rulPop .25s ease", display: "inline-flex", alignItems: "flex-start", gap: 7, padding: "8px 12px", borderRadius: 11, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 14, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>
                     <i className="fa-solid fa-check" style={{ fontSize: 10, color: OK, marginTop: 3 }} />
                     {o.texto}
                   </span>
@@ -665,7 +903,7 @@ function RowsCompletar({
               <span>{h.despues}</span>
             </div>
             {!done && (
-              <span style={{ fontSize: 11, color: T.text3, fontStyle: "italic", flexShrink: 0, maxWidth: 220, lineHeight: 1.4 }}>{h.pista}</span>
+              <span style={{ fontSize: 14, color: T.text3, fontStyle: "italic", flexShrink: 0, maxWidth: 220, lineHeight: 1.4 }}>{h.pista}</span>
             )}
           </div>
         );
@@ -702,7 +940,7 @@ function RowsGlosario({
           >
             <div className="rul-slot" data-armed={!done && !!selGlos} style={{ minWidth: 200, ...(done ? { borderStyle: "solid", borderColor: OK, background: `${OK}1a` } : {}) }}>
               {done ? (
-                <span style={{ animation: "rulPop .25s ease", fontSize: 12.5, fontWeight: 900, color: "#fff", display: "inline-flex", alignItems: "center", gap: 7, lineHeight: 1.35 }}>
+                <span style={{ animation: "rulPop .25s ease", fontSize: 14, fontWeight: 900, color: "#fff", display: "inline-flex", alignItems: "center", gap: 7, lineHeight: 1.35 }}>
                   <i className="fa-solid fa-quote-left" />
                   {g.termino}
                 </span>
@@ -713,8 +951,8 @@ function RowsGlosario({
               )}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 13, color: done ? "#fff" : T.text2, lineHeight: 1.45 }}>{g.definicion}</div>
-              <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.4, marginTop: 3, fontStyle: "italic" }}>{g.ejemplo}</div>
+              <div style={{ fontSize: 14, color: done ? "#fff" : T.text2, lineHeight: 1.45 }}>{g.definicion}</div>
+              <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.4, marginTop: 3, fontStyle: "italic" }}>{g.ejemplo}</div>
             </div>
           </div>
         );
@@ -763,19 +1001,19 @@ function QuizCard({
   };
 
   return (
-    <div style={{ ...card, padding: "20px 24px 24px", marginTop: 22 }}>
+    <div style={{ display: "grid", gap: 14 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4, flexWrap: "wrap" }}>
         <Eyebrow>
           <i className="fa-solid fa-clipboard-question" style={{ marginRight: 8, color: accent }} />
           Comprueba lo aprendido
         </Eyebrow>
         {aprobado && (
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 12, fontWeight: 800, color: OK }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 14, fontWeight: 800, color: OK }}>
             <i className="fa-solid fa-circle-check" /> Aprobado
           </span>
         )}
       </div>
-      <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
         Cinco afirmaciones sobre las reglas con must, mustn&apos;t y have to. Decide si son verdaderas o falsas y pulsa «Comprobar».
       </div>
 
@@ -788,7 +1026,7 @@ function QuizCard({
                 <span style={{ color: accent }}>{qi + 1}.</span>
                 <span>{q.pregunta}</span>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 150px), 1fr))", gap: 9 }}>
                 {q.opciones.map((op, oi) => {
                   const sel = elegida === oi;
                   const esCorrecta = oi === q.correcta;
@@ -810,7 +1048,7 @@ function QuizCard({
                   }
                   return (
                     <button key={oi} className="rul-q" onClick={() => elegir(qi, oi)} disabled={comprobado} style={{ borderColor: borde, background: fondo, color: colorTxt }}>
-                      <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
+                      <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
                         {comprobado && esCorrecta ? <i className="fa-solid fa-check" /> : comprobado && sel ? <i className="fa-solid fa-xmark" /> : String.fromCharCode(65 + oi)}
                       </span>
                       <span style={{ flex: 1, lineHeight: 1.35 }}>{op}</span>
@@ -819,7 +1057,7 @@ function QuizCard({
                 })}
               </div>
               {comprobado && (
-                <div style={{ marginTop: 9, fontSize: 12.5, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
+                <div style={{ marginTop: 9, fontSize: 14, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
                   <i className="fa-solid fa-circle-info" style={{ color: accent, marginTop: 2 }} />
                   <span>{q.retro}</span>
                 </div>
@@ -842,7 +1080,7 @@ function QuizCard({
           </button>
         )}
         {comprobado && (
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 13.5, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 14, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
             <i className={`fa-solid ${aprobadoAhora ? "fa-trophy" : "fa-circle-half-stroke"}`} />
             {aciertos} / {total} correctas
             {!aprobadoAhora && <span style={{ color: T.text3, fontWeight: 600 }}>· revisa las marcadas e inténtalo de nuevo</span>}

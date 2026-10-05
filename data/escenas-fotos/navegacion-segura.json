@@ -1,0 +1,12 @@
+{
+  "slug": "navegacion-segura",
+  "items": [
+    { "clave": "estudiante-celular", "formato": "16:9", "estilo": "foto", "escena": "Un adolescente visto de espaldas sentado en una banca de un patio escolar mexicano sosteniendo un teléfono celular con las dos manos, luz de media mañana, cara no visible, pantalla no visible" },
+    { "clave": "salon-prepa", "formato": "16:9", "estilo": "foto", "escena": "Un salón de clases de preparatoria con pupitres en filas y una estudiante sentada de perfil leyendo algo en su teléfono sobre el pupitre, luz de ventana, sin pizarrón con texto, pantalla no visible" },
+    { "clave": "cafe-mesa", "formato": "16:9", "estilo": "foto", "escena": "Mesa de cafetería con un teléfono celular boca arriba junto a una taza de café humeante y una computadora portátil cerrada, ventanal con luz de tarde, sin letreros ni carteles" },
+    { "clave": "fotos-grupo", "formato": "16:9", "estilo": "foto", "escena": "Un grupo de jóvenes con birretes de graduación de espaldas en un patio, abrazados y levantando los brazos, luz dorada de tarde, caras no visibles, sin letreros ni mantas" },
+    { "clave": "linterna-oscuro", "formato": "16:9", "estilo": "foto", "escena": "Una mano sosteniendo un teléfono celular con el flash encendido que ilumina un cuarto oscuro con una mochila en el piso, el haz de luz es el único foco, pantalla no visible" },
+    { "clave": "regalo-caja", "formato": "16:9", "estilo": "foto", "escena": "Una caja de regalo envuelta en papel rojo con un moño dorado sobre una mesa de madera, fondo desenfocado de sala, luz cálida, sin texto ni etiquetas" },
+    { "clave": "candado-llave", "formato": "16:9", "estilo": "foto", "escena": "Un candado metálico cerrado sobre un escritorio de madera junto a un teléfono celular boca abajo, luz lateral suave, sin texto" }
+  ]
+}

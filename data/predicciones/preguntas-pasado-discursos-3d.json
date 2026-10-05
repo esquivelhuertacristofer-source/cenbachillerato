@@ -1,0 +1,24 @@
+{
+  "escena": "Una espiral del tiempo con vueltas de 110 años. Cada evidencia cae sobre ella cuando la ubicas en su siglo correcto.",
+  "pregunta": "El Gran Canal se inauguró en 1900. ¿A qué siglo pertenece ese año?",
+  "opciones": [
+    {
+      "id": "a",
+      "texto": "Siglo XX, porque el año empieza con 19",
+      "icono": "fa-hourglass-start"
+    },
+    {
+      "id": "b",
+      "texto": "Siglo XIX, donde cierra",
+      "icono": "fa-hourglass-end"
+    },
+    {
+      "id": "c",
+      "texto": "Siglo XVIII",
+      "icono": "fa-hourglass-half"
+    }
+  ],
+  "correcta": "b",
+  "porque": "El siglo N va del año (N−1)01 al N00. Por eso el siglo XIX abarca de 1801 a 1900, y 1900 todavía es del XIX. El siglo XX empieza en 1901.",
+  "comoComprobarlo": "En «Categorías en el tiempo», elige la evidencia de 1900 y prueba distintos siglos: solo cuando aciertas la gema cae sobre la espiral."
+}

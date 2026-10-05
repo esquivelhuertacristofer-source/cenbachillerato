@@ -1,0 +1,12 @@
+{
+  "escena": "Te llega un SMS urgente de un banco: tu cuenta se bloqueará en 30 minutos y debes dar tu contraseña en un enlace.",
+  "pregunta": "Si abres ese enlace en lugar de ignorarlo, ¿qué pasa con los medidores de tu teléfono?",
+  "opciones": [
+    { "id": "a", "texto": "Sube la seguridad del dispositivo", "icono": "fa-arrow-up" },
+    { "id": "b", "texto": "Baja la seguridad y salen datos", "icono": "fa-triangle-exclamation" },
+    { "id": "c", "texto": "Nada cambia hasta otro aviso", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "El enlace lleva a una página falsa que copia tu contraseña. La seguridad del dispositivo baja y tus datos quedan expuestos. Un mensaje urgente que pide contraseña es señal clásica de phishing.",
+  "comoComprobarlo": "En «Tu teléfono», en el primer aviso pulsa «Revisar con calma» y luego abre el enlace; después repite el modo y elige ignorar o reportar, y compara los dos medidores."
+}

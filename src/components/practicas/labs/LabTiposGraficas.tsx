@@ -4,7 +4,10 @@
  * Laboratorio — Tipos de gráficas y cuándo usarlas
  * Práctica experimental para CD-II-P04 (Cultura Digital II).
  *
- * Interactividad máxima: el alumno EXPERIMENTA arrastrando. Tres modos:
+ * MESA DE REDACCIÓN (simulador, datos inventados): el alumno elige el tipo de
+ * gráfica para seis casos, la gráfica SVG se dibuja al instante y una lectora de
+ * prueba reacciona (entendió / se confundió); el eje recortado exagera la
+ * diferencia y se mide. Después, los modos de refuerzo:
  *  1. «Tipo de gráfica y su propósito» — empareja cada tipo de gráfica con el
  *     propósito de datos para el que sirve (comparar, tendencia, proporción,
  *     correlación, volumen acumulado).
@@ -28,6 +31,7 @@ import { EscribeTermino } from "./_mecanica-termino";
 import { TIPOS_GRAFICAS_HUECOS } from "./tipos-graficas-huecos";
 import { usePartida, MarcadorPartida } from "./_partida";
 import { FichaTeorica } from "./_ficha";
+import { LabShell, Bloque, Mesa, Dato, BotonHerramienta } from "./_shell";
 import { TIPOS_GRAFICAS_FICHA } from "./tipos-graficas-ficha";
 import {
   GRAFICAS,
@@ -38,14 +42,31 @@ import {
   DATO_GRAFICAS,
   type Glyph,
 } from "./tipos-graficas-data";
+import {
+  CASOS,
+  TIPOS,
+  baseEje,
+  ejeAplica,
+  evaluar,
+  histograma,
+  maximoBonito,
+  rebanadas,
+  rotuloNivel,
+  tipoIdeal,
+  type Caso,
+  type Evaluacion,
+  type Nivel,
+  type Tipo,
+} from "./tipos-graficas-sim";
 
 const NO = "#FF5E5E";
 import { useEstrellas } from "@/lib/hooks/useEstrellas";
 const RETO_KEY = "cen-tipos-graficas-reto";
 
-type Modo = "tipos" | "escenarios" | "glosario" | "texto";
+type Modo = "mesa" | "tipos" | "escenarios" | "glosario" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
+  { id: "mesa", label: "Mesa de redacción", icono: "fa-newspaper" },
   { id: "tipos", label: "Tipo de gráfica y su propósito", icono: "fa-chart-pie" },
   { id: "escenarios", label: "¿Qué gráfica usarías?", icono: "fa-table-list" },
   { id: "glosario", label: "Escribe el término", icono: "fa-keyboard" },
@@ -105,12 +126,11 @@ function ChartGlyph({ glyph, color, size = 46 }: { glyph: Glyph; color: string; 
 
 export function LabTiposGraficas({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
-  const [modo, setModo] = useState<Modo>("tipos");
+  const [modo, setModo] = useState<Modo>("mesa");
 
   // ── sonido ────────────────────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   // Modo «Completa el texto». El contador sirve de `key`: subirlo remonta
   // el componente y devuelve todos los huecos en blanco.
   const [textoDone, setTextoDone] = useState(false);
@@ -138,6 +158,64 @@ export function LabTiposGraficas({ color }: PracticaLabProps) {
   const sfxPlace = () => {
     partida.acierto();
     return sonido && audioRef.current?.blip();
+  };
+
+  // ── modo mesa de redacción (simulador) ─────────────────────────────────
+  // El estado vive aquí, no en el modo: al cambiar de pestaña no se pierde ni
+  // se des-cumple ninguna misión.
+  const [casoId, setCasoId] = useState(CASOS[0]!.id);
+  const [tipoSel, setTipoSel] = useState<Tipo | null>(null);
+  const [recortado, setRecortado] = useState(false);
+  const [probados, setProbados] = useState<Record<string, Tipo[]>>({});
+  const [publicadas, setPublicadas] = useState<Record<string, Nivel>>({});
+  const [mensajePub, setMensajePub] = useState<{ nivel: Nivel; texto: string } | null>(null);
+  const casoActual: Caso = CASOS.find((c) => c.id === casoId) ?? CASOS[0]!;
+  const claras = Object.values(publicadas).filter((n) => n === "claro").length;
+  const mesaProbada = Object.values(probados).some((t) => t.length >= TIPOS.length);
+
+  const cambiarCaso = (id: string) => {
+    setCasoId(id);
+    setTipoSel(null);
+    setRecortado(false);
+    setMensajePub(null);
+  };
+  const elegirTipo = (t: Tipo) => {
+    setTipoSel(t);
+    setMensajePub(null);
+    setProbados((p) => {
+      const ya = p[casoId] ?? [];
+      return ya.includes(t) ? p : { ...p, [casoId]: [...ya, t] };
+    });
+    if (audioRef.current && sonido) audioRef.current.blip();
+  };
+  const publicar = () => {
+    if (!tipoSel) return;
+    const ev = evaluar(casoActual, tipoSel, recortado);
+    setPublicadas((p) => {
+      const previo = p[casoId];
+      return previo && ORDEN_NIVEL[previo] >= ORDEN_NIVEL[ev.nivel] ? p : { ...p, [casoId]: ev.nivel };
+    });
+    const ideal = TIPOS.find((t) => t.id === tipoIdeal(casoActual))?.nombre ?? "";
+    if (ev.nivel === "claro") {
+      setMensajePub({ nivel: "claro", texto: "¡A portada! La lectora entendió el mensaje sin ayuda." });
+      sfxPlace();
+    } else {
+      setMensajePub({
+        nivel: ev.nivel,
+        texto: ev.engano
+          ? "La editora la regresa: el eje recortado exagera la diferencia. Vuelve al eje desde cero."
+          : `La editora la regresa: ${ev.nivel === "regular" ? "se entiende a medias" : "confunde a la lectora"}. Para este caso funciona mejor: ${ideal}.`,
+      });
+      sfxNo();
+    }
+  };
+  const resetMesa = () => {
+    setCasoId(CASOS[0]!.id);
+    setTipoSel(null);
+    setRecortado(false);
+    setProbados({});
+    setPublicadas({});
+    setMensajePub(null);
   };
 
   // ── modo tipos (empareja tipo de gráfica → propósito) ──────────────────
@@ -223,6 +301,8 @@ export function LabTiposGraficas({ color }: PracticaLabProps) {
   };
 
   const objetivos = [
+    { txt: "Prueba los 6 tipos de gráfica con un mismo caso", done: mesaProbada },
+    { txt: "Publica una gráfica clara en 4 de los 6 casos", done: claras >= 4 },
     { txt: "Empareja los 5 tipos de gráfica con su propósito", done: tiposDone },
     { txt: "Clasifica los 7 escenarios por su gráfica", done: escenariosDone },
     { txt: "Escribe los 5 términos del glosario", done: glosarioDone },
@@ -284,25 +364,50 @@ export function LabTiposGraficas({ color }: PracticaLabProps) {
     setTextoDone(false);
     setTextoIntento((n) => n + 1);
   };
-  const resetActual = modo === "texto" ? resetTexto : modo === "tipos" ? resetTipos : modo === "escenarios" ? resetEscenarios : resetGlosario;
+  const resetActual = modo === "texto" ? resetTexto : modo === "mesa" ? resetMesa : modo === "tipos" ? resetTipos : modo === "escenarios" ? resetEscenarios : resetGlosario;
+
+  const evalActual = tipoSel ? evaluar(casoActual, tipoSel, recortado) : null;
+  const probadosCaso = probados[casoActual.id] ?? [];
+
+  const pistaDe: Record<Modo, string> = {
+    mesa: "Pregúntate qué quieres mostrar: comparar categorías, una tendencia, partes de un todo, una relación entre dos variables o cómo se agrupan los datos. Prueba los seis tipos con el mismo caso y mira cómo reacciona la lectora.",
+    tipos: "Las barras comparan categorías; la línea muestra tendencias en el tiempo; la circular reparte un todo; la dispersión relaciona dos variables.",
+    escenarios: "Pregúntate qué quieres comunicar: ¿comparar, ver una tendencia, mostrar proporciones o una relación entre variables?",
+    glosario: "Lee la definición y su ejemplo y escribe el término. Si te atoras, la pista te da la inicial y las letras.",
+    texto: "Completa los huecos del texto con las palabras de la lectura.",
+  };
+
+  const lectura =
+    modo === "mesa" ? (
+      evalActual ? (
+        <>
+          Lectora de prueba: <strong>{rotuloNivel(evalActual.nivel)}</strong>
+        </>
+      ) : (
+        <>Elige un tipo de gráfica para dibujar los datos.</>
+      )
+    ) : modo === "tipos" ? (
+      <>
+        {Object.keys(empTipo).length} de {GRAFICAS.length} tipos emparejados
+      </>
+    ) : modo === "escenarios" ? (
+      <>
+        {Object.keys(ubicEsc).length} de {ESCENARIOS.length} escenarios clasificados
+      </>
+    ) : undefined;
 
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
+    <LabShell
+      dom
+      accent={accent}
+      rgba={color.rgba}
+      escena={
+        <div>
+          <style>{`
         @keyframes tgShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
         @keyframes tgPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
-        .tg-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(300px,28vw,400px); gap:22px; align-items:start; }
-        @media (max-width:1000px){ .tg-grid { grid-template-columns:1fr; } }
-        .tg-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 16px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .tg-tab:hover { border-color:${T.lineStrong}; color:#fff; }
-        .tg-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-        .tg-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
-          font-size:14px; border:1px solid ${T.line}; background:${T.glass}; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .tg-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
-        .tg-icobtn:hover { background:rgba(255,255,255,0.12); }
         .tg-chip { cursor:grab; display:inline-flex; align-items:center; gap:10px; padding:10px 14px; border-radius:14px;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:13.5px; font-weight:700; transition:all .14s; user-select:none; max-width:360px; text-align:left; line-height:1.4; }
+          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:14px; font-weight:700; transition:all .14s; user-select:none; max-width:360px; text-align:left; line-height:1.4; }
         .tg-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); }
         .tg-chip[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.2); box-shadow:0 0 16px -5px ${accent}; }
         .tg-chip:active { cursor:grabbing; }
@@ -310,41 +415,34 @@ export function LabTiposGraficas({ color }: PracticaLabProps) {
         .tg-row[data-shake="true"] { animation:tgShake .4s; border-color:${NO}; }
         .tg-row[data-done="true"] { border-color:${OK}66; background:${OK}0f; }
         .tg-slot { flex-shrink:0; min-width:190px; min-height:54px; border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset};
-          display:inline-flex; align-items:center; justify-content:center; color:${T.text3}; font-size:12.5px; transition:all .16s; cursor:pointer; padding:4px 10px; }
+          display:inline-flex; align-items:center; justify-content:center; color:${T.text3}; font-size:14px; transition:all .16s; cursor:pointer; padding:4px 10px; }
         .tg-slot[data-armed="true"] { border-color:${accent}; background:rgba(${color.rgba},0.1); }
         .tg-bin { border-radius:15px; border:1.5px solid ${T.line}; background:${T.glass}; padding:16px; transition:all .16s; min-height:210px; }
         .tg-bin[data-shake="true"] { animation:tgShake .4s; border-color:${NO}; }
         .tg-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
-          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
+          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
         .tg-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
         .tg-q:disabled{ cursor:default; }
         .tg-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
-          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:13.5px; font-weight:800; transition:all .14s; }
+          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:14px; font-weight:800; transition:all .14s; }
         .tg-btn:hover { border-color:${T.lineStrong}; }
         .tg-divider { height:1px; background:${T.line}; margin:18px 0; }
         @media (prefers-reduced-motion: reduce){ .tg-row[data-shake="true"], .tg-bin[data-shake="true"] { animation:none; } }
-
-        /* Cajón de teoría */
-        .tg-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .tg-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .tg-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .tg-drawer[data-open="true"] { transform:translateX(0); }
-        .tg-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .tg-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .tg-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .tg-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .tg-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .tg-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .tg-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
-
+        /* Mesa de redacción */
+        .tg-op { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:9px 12px; border-radius:10px;
+          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; }
+        .tg-op:hover:not(:disabled) { border-color:${T.lineStrong}; color:#fff; }
+        .tg-op[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.22); color:#fff; }
+        .tg-op:disabled { cursor:default; opacity:.45; }
+        .tg-marco { border-radius:14px; border:1.5px solid ${T.line}; background:#0a1626; padding:10px; }
+        .tg-foto { position:relative; height:112px; border-radius:12px; overflow:hidden; display:flex; align-items:center; justify-content:center;
+          background:linear-gradient(135deg, rgba(${color.rgba},0.35), rgba(8,19,31,0.92)); color:rgba(255,255,255,0.85); font-size:34px; }
+        .tg-foto img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+        .tg-lectora { display:flex; gap:12px; align-items:flex-start; padding:12px 14px; border-radius:14px; border:1.5px solid ${T.line}; background:${T.glass}; font-size:14px; line-height:1.5; }
+        .tg-lectora i.tg-cara { font-size:30px; flex-shrink:0; }
+        .tg-medidor { height:12px; border-radius:99px; background:rgba(255,255,255,0.12); overflow:hidden; }
+        .tg-medidor > span { display:block; height:100%; border-radius:99px; transition:width .5s ease, background .3s; }
+        @media (prefers-reduced-motion: reduce){ .tg-medidor > span { transition:none; } }
         /* Identidad del tablero */
         .tg-bin, .tg-row { --tono:188; position:relative;
           background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
@@ -364,55 +462,9 @@ export function LabTiposGraficas({ color }: PracticaLabProps) {
         @media (prefers-reduced-motion: reduce){
           .tg-chip, .tg-chip:hover, .tg-chip[data-sel="true"] { transform:none; transition:none; }
         }
-      `}</style>
 
-      {/* selector de modo + toolbar */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="tg-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="tg-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="tg-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="tg-icobtn" onClick={resetActual} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
+          `}</style>
 
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <button className="tg-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="tg-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="tg-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="tg-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="tg-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="tg-drawer-body">
-          <FichaTeorica data={TIPOS_GRAFICAS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div className="tg-grid">
-        {/* ── Columna principal ─────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
-          {/* MODO 1 — tipos */}
-          {/* MODO — completa el texto (fill_blanks verbatim de la progresión) */}
           {modo === "texto" && (
             <CompletaTexto
               key={textoIntento}
@@ -429,66 +481,6 @@ export function LabTiposGraficas({ color }: PracticaLabProps) {
             />
           )}
 
-          {modo === "tipos" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada gráfica al propósito que cumple</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: tiposDone ? OK : T.text3 }}>
-                    {Object.keys(empTipo).length}/{GRAFICAS.length}
-                  </span>
-                </div>
-                {tiposLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Emparejaste los {GRAFICAS.length} tipos de gráfica!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {tiposLibres.map((g) => (
-                      <button key={g.id} className="tg-chip" data-sel={selTipo === g.id} onClick={() => setSelTipo((s) => (s === g.id ? null : g.id))} {...dragProps(g.id)}>
-                        <ChartGlyph glyph={g.glyph} color={accent} size={34} />
-                        {g.nombre}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <RowsTipos accent={accent} selTipo={selTipo} shakeTipo={shakeTipo} empTipo={empTipo} onMatch={intentarTipo} dropProps={dropProps} />
-            </>
-          )}
-
-          {/* MODO 2 — escenarios */}
-          {modo === "escenarios" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada escenario a la gráfica apropiada</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: escenariosDone ? OK : T.text3 }}>
-                    {Object.keys(ubicEsc).length}/{ESCENARIOS.length}
-                  </span>
-                </div>
-                {escLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Clasificaste los {ESCENARIOS.length} escenarios!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {escLibres.map((e) => (
-                      <button key={e.id} className="tg-chip" data-sel={selEsc === e.id} onClick={() => setSelEsc((s) => (s === e.id ? null : e.id))} {...dragProps(e.id)}>
-                        <i className="fa-solid fa-database" style={{ fontSize: 11, color: T.text3 }} />
-                        {e.texto}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <BinsEscenarios accent={accent} rgba={color.rgba} selEsc={selEsc} shakeEsc={shakeEsc} ubicEsc={ubicEsc} onMatch={intentarEsc} dropProps={dropProps} />
-            </>
-          )}
-
-          {/* MODO 3 — glosario */}
           {modo === "glosario" && (
             <EscribeTermino
               key={glosIntento}
@@ -506,86 +498,428 @@ export function LabTiposGraficas({ color }: PracticaLabProps) {
               onError={sfxNo}
             />
           )}
-        </div>
 
-        {/* ── Columna lateral ───────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? OK : T.text2 }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-                  <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-                </div>
-              ))}
-            </div>
+          {modo === "mesa" && (
+            <MesaRedaccion
+              accent={accent}
+              caso={casoActual}
+              onCaso={cambiarCaso}
+              tipo={tipoSel}
+              onTipo={elegirTipo}
+              recortado={recortado}
+              onRecorte={() => setRecortado((r) => !r)}
+              probados={probados}
+              publicadas={publicadas}
+              onPublicar={publicar}
+              mensaje={mensajePub}
+              evaluacion={evalActual}
+            />
+          )}
 
-            <div className="tg-divider" />
-
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", color: T.text3, textTransform: "uppercase" }}>Puntuación</div>
-                <div style={{ display: "flex", gap: 4, marginTop: 5 }}>
-                  {[1, 2, 3].map((s) => (
-                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 18, color: s <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
-                  ))}
-                </div>
-              </div>
-              <div style={{ textAlign: "right", maxWidth: 180 }}>
-                <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45 }}>
-                  {bestEstrellas >= 3 ? "¡Eliges la gráfica correcta como un estadístico!" : "Termina los tres modos para ganar 2★; la tercera pide 2 errores o menos."}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* pista del modo actual */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid rgba(${color.rgba},0.3)`, background: `rgba(${color.rgba},0.08)`, fontSize: 13, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              {modo === "tipos" && (
-                <>Las <strong style={{ color: T.text }}>barras</strong> comparan categorías; la <strong style={{ color: T.text }}>línea</strong> muestra tendencias en el tiempo; la <strong style={{ color: T.text }}>circular</strong> reparte un todo; la <strong style={{ color: T.text }}>dispersión</strong> relaciona dos variables.</>
-              )}
-              {modo === "escenarios" && (
-                <>Pregúntate qué quieres comunicar: ¿<strong style={{ color: T.text }}>comparar</strong>, ver una <strong style={{ color: T.text }}>tendencia</strong>, mostrar <strong style={{ color: T.text }}>proporciones</strong> o una <strong style={{ color: T.text }}>relación</strong> entre variables?</>
-              )}
-              {modo === "glosario" && (
-                <>Ya no se arrastra: lee la definición y su ejemplo y escribe el término. Si te atoras, la pista te da la inicial y las letras.</>
-              )}
-            </span>
-          </div>
-
-          {/* trampas visuales verbatim de A1 */}
-          <div style={{ ...card, padding: "16px 18px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-triangle-exclamation" style={{ marginRight: 8, color: NO }} />
-              Trampas visuales
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-              {TRAMPAS.map((t) => (
-                <div key={t.id} style={{ display: "flex", gap: 10, fontSize: 11.8, color: T.text2, lineHeight: 1.45 }}>
-                  <i className={`fa-solid ${t.icono}`} style={{ color: NO, fontSize: 13, marginTop: 2, flexShrink: 0 }} />
-                  <span>
-                    <strong style={{ color: T.text }}>{t.titulo}.</strong> {t.texto}
+          {modo === "tipos" && (
+            <Mesa>
+              <div style={{ ...card, padding: "16px 18px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
+                  <Eyebrow>Arrastra cada gráfica al propósito que cumple</Eyebrow>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: tiposDone ? OK : T.text3 }}>
+                    {Object.keys(empTipo).length}/{GRAFICAS.length}
                   </span>
                 </div>
-              ))}
-            </div>
-          </div>
+                {tiposLibres.length === 0 ? (
+                  <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+                    <i className="fa-solid fa-circle-check" /> ¡Emparejaste los {GRAFICAS.length} tipos de gráfica!
+                  </div>
+                ) : (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+                    {tiposLibres.map((g) => (
+                      <button key={g.id} className="tg-chip" data-sel={selTipo === g.id} onClick={() => setSelTipo((s) => (s === g.id ? null : g.id))} {...dragProps(g.id)}>
+                        <ChartGlyph glyph={g.glyph} color={accent} size={34} />
+                        {g.nombre}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <RowsTipos accent={accent} selTipo={selTipo} shakeTipo={shakeTipo} empTipo={empTipo} onMatch={intentarTipo} dropProps={dropProps} />
+            </Mesa>
+          )}
 
-          {/* dato verbatim */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid ${T.line}`, background: T.glass, fontSize: 12.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-chart-simple" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>{DATO_GRAFICAS}</span>
+          {modo === "escenarios" && (
+            <Mesa>
+              <div style={{ ...card, padding: "16px 18px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
+                  <Eyebrow>Arrastra cada escenario a la gráfica apropiada</Eyebrow>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: escenariosDone ? OK : T.text3 }}>
+                    {Object.keys(ubicEsc).length}/{ESCENARIOS.length}
+                  </span>
+                </div>
+                {escLibres.length === 0 ? (
+                  <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+                    <i className="fa-solid fa-circle-check" /> ¡Clasificaste los {ESCENARIOS.length} escenarios!
+                  </div>
+                ) : (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+                    {escLibres.map((e) => (
+                      <button key={e.id} className="tg-chip" data-sel={selEsc === e.id} onClick={() => setSelEsc((s) => (s === e.id ? null : e.id))} {...dragProps(e.id)}>
+                        <i className="fa-solid fa-database" style={{ fontSize: 14, color: T.text3 }} />
+                        {e.texto}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <BinsEscenarios accent={accent} rgba={color.rgba} selEsc={selEsc} shakeEsc={shakeEsc} ubicEsc={ubicEsc} onMatch={intentarEsc} dropProps={dropProps} />
+            </Mesa>
+          )}
+        </div>
+      }
+      modos={{ opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })), valor: modo, cambiar: (id) => setModo(id as Modo) }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={resetActual} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      retoKey={RETO_KEY}
+      pestanas={[
+        {
+          id: "cuaderno",
+          etiqueta: "Cuaderno",
+          icono: "fa-clipboard-list",
+          contenido: (
+            <>
+              <Bloque titulo="Mesa de redacción" icono="fa-newspaper">
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 10 }}>
+                  <Dato label="Claridad ahora" value={evalActual ? `${evalActual.claridad} %` : "—"} col={evalActual ? colorNivel(evalActual.nivel) : undefined} />
+                  <Dato label="Publicadas claras" value={`${claras}/${CASOS.length}`} col={claras >= 4 ? OK : undefined} />
+                  <Dato label="Tipos probados" value={`${probadosCaso.length}/${TIPOS.length}`} />
+                  <Dato label="Caso" value={`${CASOS.indexOf(casoActual) + 1}/${CASOS.length}`} />
+                </div>
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                  Todos los datos son inventados (simulación). Publica una gráfica clara en al menos 4 de los 6 casos.
+                </div>
+              </Bloque>
+              <Bloque titulo="Tu partida" icono="fa-gauge-high">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+                <div style={{ display: "flex", gap: 4 }}>
+                  {[1, 2, 3].map((s) => (
+                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 20, color: s <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
+                  ))}
+                </div>
+                <div style={{ fontSize: 14, color: T.text2 }}>
+                  {bestEstrellas >= 3 ? "¡Eliges la gráfica correcta como un estadístico!" : "Termina los modos de refuerzo para ganar 2★; la tercera pide 2 errores o menos."}
+                </div>
+              </Bloque>
+              <Bloque titulo="Pista de este modo" icono="fa-lightbulb">
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>{pistaDe[modo]}</div>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-clipboard-question",
+          contenido: <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />,
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Teoría de la práctica" icono="fa-book-open">
+                <FichaTeorica data={TIPOS_GRAFICAS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <Bloque titulo="Tipos de gráfica y su propósito" icono="fa-chart-pie">
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {GRAFICAS.map((g) => (
+                    <div key={g.id} style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                      <strong style={{ color: T.text }}>{g.nombre}.</strong> {g.proposito}.
+                      <div style={{ fontStyle: "italic", color: T.text3, marginTop: 2 }}>{g.detalle}</div>
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+              <Bloque titulo="Trampas visuales" icono="fa-triangle-exclamation">
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {TRAMPAS.map((t) => (
+                    <div key={t.id} style={{ display: "flex", gap: 10, fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                      <i className={`fa-solid ${t.icono}`} style={{ color: NO, fontSize: 14, marginTop: 3, flexShrink: 0 }} />
+                      <span>
+                        <strong style={{ color: T.text }}>{t.titulo}.</strong> {t.texto}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+              <Bloque titulo="Dato" icono="fa-circle-info">
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55 }}>{DATO_GRAFICAS}</div>
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
+  );
+}
+
+function colorNivel(n: Nivel): string {
+  return n === "claro" ? OK : n === "regular" ? "#FFC75A" : NO;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * MESA DE REDACCIÓN (modo «Mesa de redacción»). Todo es simulación: datos y
+ * lugares son inventados. La lógica vive en tipos-graficas-sim.ts.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+const RUTA_FOTOS = "/media/labs-sim/tipos-graficas";
+const PALETA = ["#5BC8FF", "#FFC75A", "#34D399", "#C084FC", "#FB7185", "#F97316"];
+const ORDEN_NIVEL: Record<Nivel, number> = { confunde: 0, regular: 1, claro: 2 };
+
+function MesaRedaccion({
+  accent,
+  caso,
+  onCaso,
+  tipo,
+  onTipo,
+  recortado,
+  onRecorte,
+  probados,
+  publicadas,
+  onPublicar,
+  mensaje,
+  evaluacion,
+}: {
+  accent: string;
+  caso: Caso;
+  onCaso: (id: string) => void;
+  tipo: Tipo | null;
+  onTipo: (t: Tipo) => void;
+  recortado: boolean;
+  onRecorte: () => void;
+  probados: Record<string, Tipo[]>;
+  publicadas: Record<string, Nivel>;
+  onPublicar: () => void;
+  mensaje: { nivel: Nivel; texto: string } | null;
+  evaluacion: Evaluacion | null;
+}) {
+  const hechos = probados[caso.id] ?? [];
+  const col = evaluacion ? colorNivel(evaluacion.nivel) : T.text3;
+  const cara = evaluacion?.nivel === "claro" ? "fa-face-smile" : evaluacion?.nivel === "regular" ? "fa-face-meh" : "fa-face-frown";
+  return (
+    <Mesa>
+      <div style={{ ...card, padding: "16px 18px", display: "grid", gap: 14 }}>
+        <div>
+          <Eyebrow>Caso del día</Eyebrow>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 8 }}>
+            {CASOS.map((c, i) => (
+              <button key={c.id} type="button" className="tg-op" data-on={c.id === caso.id} onClick={() => onCaso(c.id)} title={c.titulo} aria-label={`Caso ${i + 1}: ${c.titulo}`}>
+                {publicadas[c.id] === "claro" && <i className="fa-solid fa-circle-check" style={{ color: OK }} aria-hidden />}
+                {i + 1}
+              </button>
+            ))}
           </div>
+        </div>
+        <div>
+          <Eyebrow>Tipo de gráfica</Eyebrow>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 130px), 1fr))", gap: 8, marginTop: 8 }}>
+            {TIPOS.map((t) => (
+              <button key={t.id} type="button" className="tg-op" data-on={tipo === t.id} onClick={() => onTipo(t.id)} title={t.nombre}>
+                <i className={`fa-solid ${t.icono}`} aria-hidden />
+                {t.corto}
+                {hechos.includes(t.id) && <i className="fa-solid fa-check" style={{ color: OK, fontSize: 14 }} aria-hidden />}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <Eyebrow>Eje vertical</Eyebrow>
+          <button type="button" className="tg-op" style={{ marginTop: 8, width: "100%" }} data-on={recortado} disabled={!tipo || !ejeAplica(tipo)} onClick={onRecorte}>
+            <i className="fa-solid fa-scissors" aria-hidden /> {recortado ? "Eje recortado (no empieza en 0)" : "Eje desde cero"}
+          </button>
+          <div style={{ fontSize: 14, color: T.text3, marginTop: 6, lineHeight: 1.4 }}>Solo cambia barras, líneas y área.</div>
         </div>
       </div>
 
-      <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />
+      <div style={{ display: "grid", gap: 12, minWidth: 0 }}>
+        <div style={{ ...card, padding: "12px", display: "grid", gap: 10 }}>
+          <div className="tg-foto">
+            <i className={`fa-solid ${caso.icono}`} aria-hidden />
+            <img src={`${RUTA_FOTOS}/${caso.imagen}.webp`} alt="" loading="lazy" onError={(e) => { e.currentTarget.style.display = "none"; }} />
+          </div>
+          <div>
+            <div style={{ fontSize: 16, fontWeight: 900, color: "#fff" }}>{caso.titulo} <span style={{ fontSize: 14, fontWeight: 700, color: T.text3 }}>(datos de simulación)</span></div>
+            <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5, marginTop: 4 }}>{caso.encargo}</div>
+          </div>
+        </div>
+
+        <div className="tg-marco">
+          {tipo ? (
+            <GraficaViva caso={caso} tipo={tipo} recortado={recortado} accent={accent} />
+          ) : (
+            <div style={{ minHeight: 220, display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", padding: 16, fontSize: 14, color: T.text3 }}>
+              Elige un tipo de gráfica y los {caso.puntos.length} datos se dibujan aquí.
+            </div>
+          )}
+        </div>
+
+        {evaluacion && (
+          <>
+            <div className="tg-lectora" style={{ borderColor: `${col}88` }} role="status">
+              <i className={`fa-solid ${cara} tg-cara`} style={{ color: col }} aria-hidden />
+              <div>
+                <strong style={{ color: col }}>{rotuloNivel(evaluacion.nivel)}.</strong> <span style={{ color: T.text }}>{evaluacion.lector}</span>
+                <div style={{ color: T.text2, marginTop: 4 }}>{evaluacion.porque}</div>
+              </div>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 10 }}>
+              <Dato label="Claridad para la lectora" value={`${evaluacion.claridad} %`} col={col} />
+              {tipo && ejeAplica(tipo) ? (
+                <Dato label="Diferencia real → que se ve" value={`×${evaluacion.razonReal.toFixed(1)} → ×${evaluacion.razonVisual.toFixed(1)}`} col={evaluacion.engano ? NO : undefined} />
+              ) : (
+                <Dato label="Datos dibujados" value={`${caso.puntos.length}`} />
+              )}
+            </div>
+            <div className="tg-medidor" role="img" aria-label={`Claridad ${evaluacion.claridad} por ciento`}>
+              <span style={{ width: `${evaluacion.claridad}%`, background: col }} />
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
+              <button type="button" className="tg-btn" style={{ background: accent, color: "#04121f", border: "none" }} onClick={onPublicar}>
+                <i className="fa-solid fa-newspaper" aria-hidden /> Publicar en el diario
+              </button>
+              {mensaje && (
+                <div role="status" style={{ flex: 1, minWidth: 0, fontSize: 14, lineHeight: 1.45, color: colorNivel(mensaje.nivel), fontWeight: 700 }}>
+                  {mensaje.texto}
+                </div>
+              )}
+            </div>
+          </>
+        )}
+      </div>
+    </Mesa>
+  );
+}
+
+/** Gráfica SVG que se dibuja con los datos del caso (sin librerías). */
+function GraficaViva({ caso, tipo, recortado, accent }: { caso: Caso; tipo: Tipo; recortado: boolean; accent: string }) {
+  const W = 480;
+  const H = 300;
+  const ml = 54;
+  const mr = 14;
+  const mt = 14;
+  const mb = 56;
+  const pw = W - ml - mr;
+  const ph = H - mt - mb;
+  const pts = caso.puntos;
+  const n = pts.length;
+  const ys = pts.map((p) => p.y);
+  const base = baseEje(caso, tipo, recortado);
+  const bins = tipo === "histograma" ? histograma(ys, 7) : [];
+  const top = tipo === "histograma" ? maximoBonito(Math.max(...bins.map((b) => b.cuenta))) : maximoBonito(Math.max(...ys));
+  const yv = (v: number) => mt + ph - ((v - base) / (top - base)) * ph;
+  const xi = (i: number) => ml + (n === 1 ? pw / 2 : (i + 0.5) * (pw / n));
+  const ticks = [0, 1, 2, 3, 4].map((k) => base + ((top - base) * k) / 4);
+  const fmt = (v: number) => (Number.isInteger(v) ? String(v) : v.toFixed(1));
+  const etiquetasX = (tipo === "barras" || tipo === "linea" || tipo === "area") && n <= 12;
+  const eje = { stroke: "rgba(255,255,255,0.35)", strokeWidth: 1.2 };
+  const txt = { fill: "#c9d6ea", fontSize: 14 } as const;
+
+  const xs = pts.map((p) => p.x);
+  const xmin = Math.min(...xs);
+  const xmax = Math.max(...xs);
+  const xd = (v: number) => ml + 14 + ((v - xmin) / (xmax - xmin || 1)) * (pw - 28);
+
+  const cx = W / 2;
+  const cy = H / 2 - 4;
+  const r = 104;
+  const arco = (a0: number, a1: number) => {
+    const p0 = [cx + r * Math.sin(a0), cy - r * Math.cos(a0)];
+    const p1 = [cx + r * Math.sin(a1), cy - r * Math.cos(a1)];
+    return `M${cx} ${cy} L${p0[0]!.toFixed(2)} ${p0[1]!.toFixed(2)} A${r} ${r} 0 ${a1 - a0 > Math.PI ? 1 : 0} 1 ${p1[0]!.toFixed(2)} ${p1[1]!.toFixed(2)} Z`;
+  };
+
+  return (
+    <div>
+      <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label={`Gráfica ${tipo} de ${caso.titulo} (simulación)`} style={{ display: "block", maxWidth: 640, margin: "0 auto" }}>
+        {tipo !== "circular" && (
+          <>
+            {ticks.map((t) => (
+              <g key={t}>
+                <line x1={ml} x2={W - mr} y1={yv(t)} y2={yv(t)} stroke="rgba(255,255,255,0.1)" />
+                <text x={ml - 6} y={yv(t) + 4} textAnchor="end" {...txt}>{fmt(t)}</text>
+              </g>
+            ))}
+            <line x1={ml} x2={ml} y1={mt} y2={mt + ph} {...eje} />
+            <line x1={ml} x2={W - mr} y1={mt + ph} y2={mt + ph} {...eje} />
+            <text x={ml + pw / 2} y={H - 6} textAnchor="middle" {...txt}>{tipo === "histograma" ? `${caso.ejeY} (rangos)` : caso.ejeX}</text>
+            <text transform={`translate(13 ${mt + ph / 2}) rotate(-90)`} textAnchor="middle" {...txt}>{tipo === "histograma" ? "Cuántos" : "Valor"}</text>
+          </>
+        )}
+
+        {tipo === "barras" &&
+          pts.map((p, i) => {
+            const w = Math.min(46, (pw / n) * 0.7);
+            return <rect key={i} x={xi(i) - w / 2} y={yv(p.y)} width={w} height={Math.max(0, mt + ph - yv(p.y))} fill={accent} rx="2" opacity="0.92" />;
+          })}
+
+        {tipo === "linea" && (
+          <polyline points={pts.map((p, i) => `${xi(i).toFixed(1)},${yv(p.y).toFixed(1)}`).join(" ")} fill="none" stroke={accent} strokeWidth="2.6" strokeLinejoin="round" strokeLinecap="round" />
+        )}
+        {tipo === "linea" && n <= 12 && pts.map((p, i) => <circle key={i} cx={xi(i)} cy={yv(p.y)} r="3.4" fill={accent} />)}
+
+        {tipo === "area" && (
+          <>
+            <polygon points={`${xi(0)},${mt + ph} ${pts.map((p, i) => `${xi(i).toFixed(1)},${yv(p.y).toFixed(1)}`).join(" ")} ${xi(n - 1)},${mt + ph}`} fill={accent} opacity="0.35" />
+            <polyline points={pts.map((p, i) => `${xi(i).toFixed(1)},${yv(p.y).toFixed(1)}`).join(" ")} fill="none" stroke={accent} strokeWidth="2.4" strokeLinejoin="round" />
+          </>
+        )}
+
+        {tipo === "dispersion" && pts.map((p, i) => <circle key={i} cx={xd(p.x)} cy={yv(p.y)} r="5" fill={accent} opacity="0.8" />)}
+        {tipo === "dispersion" && (
+          <>
+            <text x={ml + 14} y={mt + ph + 18} textAnchor="middle" {...txt}>{fmt(xmin)}</text>
+            <text x={W - mr - 14} y={mt + ph + 18} textAnchor="middle" {...txt}>{fmt(xmax)}</text>
+          </>
+        )}
+
+        {tipo === "histograma" &&
+          bins.map((b, i) => {
+            const bw = pw / bins.length;
+            return (
+              <g key={i}>
+                <rect x={ml + i * bw + 1} y={yv(b.cuenta)} width={bw - 2} height={Math.max(0, mt + ph - yv(b.cuenta))} fill={accent} opacity="0.92" />
+                <text x={ml + i * bw + bw / 2} y={mt + ph + 18} textAnchor="middle" {...txt}>{Math.round(b.desde)}</text>
+              </g>
+            );
+          })}
+
+        {tipo === "circular" && rebanadas(pts).map((s, i) => <path key={i} d={arco(s.ini, s.fin)} fill={PALETA[i % PALETA.length]} stroke="#0a1626" strokeWidth="1.5" />)}
+
+        {etiquetasX &&
+          pts.map((p, i) => (
+            <text key={i} transform={`translate(${xi(i)} ${mt + ph + 16}) rotate(${n > 6 ? -28 : 0})`} textAnchor={n > 6 ? "end" : "middle"} {...txt}>
+              {p.e.length > 9 ? `${p.e.slice(0, 8)}…` : p.e}
+            </text>
+          ))}
+
+        {recortado && ejeAplica(tipo) && base > 0 && (
+          <text x={ml + 8} y={mt + 14} fill="#FF8A8A" fontSize="13" fontWeight="800">
+            El eje empieza en {base}, no en 0
+          </text>
+        )}
+      </svg>
+      {tipo === "circular" && n <= 6 && (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 14px", justifyContent: "center", fontSize: 14, color: T.text2 }}>
+          {rebanadas(pts).map((s, i) => (
+            <span key={i}>
+              <i className="fa-solid fa-square" style={{ color: PALETA[i % PALETA.length], marginRight: 6 }} aria-hidden />
+              {s.e} {s.pct.toFixed(0)} %
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -629,19 +963,19 @@ function RowsTipos({
           >
             <div className="tg-slot" data-armed={!done && !!selTipo} style={done ? { borderStyle: "solid", borderColor: OK, background: `${OK}1a` } : undefined}>
               {done ? (
-                <span style={{ animation: "tgPop .25s ease", fontSize: 13, fontWeight: 900, color: "#fff", display: "inline-flex", alignItems: "center", gap: 9 }}>
+                <span style={{ animation: "tgPop .25s ease", fontSize: 14, fontWeight: 900, color: "#fff", display: "inline-flex", alignItems: "center", gap: 9 }}>
                   <ChartGlyph glyph={g.glyph} color={accent} size={30} />
                   {g.nombre}
                 </span>
               ) : (
                 <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                  <i className="fa-solid fa-arrow-left" style={{ fontSize: 11 }} /> gráfica
+                  <i className="fa-solid fa-arrow-left" style={{ fontSize: 14 }} /> gráfica
                 </span>
               )}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 14, fontWeight: 700, color: done ? "#fff" : T.text2, lineHeight: 1.4 }}>{g.proposito}</div>
-              <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.4, marginTop: 3 }}>{g.detalle}</div>
+              <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.4, marginTop: 3 }}>{g.detalle}</div>
             </div>
           </div>
         );
@@ -685,15 +1019,15 @@ function BinsEscenarios({
               <span style={{ width: 38, height: 38, flexShrink: 0, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", background: `rgba(${rgba},0.14)` }}>
                 <ChartGlyph glyph={bin} color={accent} size={30} />
               </span>
-              <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
+              <span style={{ fontSize: 14, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {dentro.length === 0 ? (
-                <div style={{ fontSize: 12, color: T.text3, opacity: 0.6, padding: "8px 0" }}>Arrastra aquí…</div>
+                <div style={{ fontSize: 14, color: T.text3, opacity: 0.6, padding: "8px 0" }}>Arrastra aquí…</div>
               ) : (
                 dentro.map((e) => (
-                  <span key={e.id} style={{ animation: "tgPop .25s ease", display: "inline-flex", alignItems: "flex-start", gap: 7, padding: "8px 12px", borderRadius: 11, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 12, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>
-                    <i className="fa-solid fa-check" style={{ fontSize: 10, color: OK, marginTop: 3 }} />
+                  <span key={e.id} style={{ animation: "tgPop .25s ease", display: "inline-flex", alignItems: "flex-start", gap: 7, padding: "8px 12px", borderRadius: 11, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 14, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>
+                    <i className="fa-solid fa-check" style={{ fontSize: 14, color: OK, marginTop: 3 }} />
                     {e.texto}
                   </span>
                 ))
@@ -753,12 +1087,12 @@ function QuizCard({
           Comprueba lo aprendido
         </Eyebrow>
         {aprobado && (
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 12, fontWeight: 800, color: OK }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 14, fontWeight: 800, color: OK }}>
             <i className="fa-solid fa-circle-check" /> Aprobado
           </span>
         )}
       </div>
-      <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
         Cuatro afirmaciones sobre medidas estadísticas, gráficas y software libre. Decide si son verdaderas o falsas y pulsa «Comprobar».
       </div>
 
@@ -793,7 +1127,7 @@ function QuizCard({
                   }
                   return (
                     <button key={oi} className="tg-q" onClick={() => elegir(qi, oi)} disabled={comprobado} style={{ borderColor: borde, background: fondo, color: colorTxt }}>
-                      <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
+                      <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
                         {comprobado && esCorrecta ? <i className="fa-solid fa-check" /> : comprobado && sel ? <i className="fa-solid fa-xmark" /> : String.fromCharCode(65 + oi)}
                       </span>
                       <span style={{ flex: 1, lineHeight: 1.35 }}>{op}</span>
@@ -802,7 +1136,7 @@ function QuizCard({
                 })}
               </div>
               {comprobado && (
-                <div style={{ marginTop: 9, fontSize: 12.5, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
+                <div style={{ marginTop: 9, fontSize: 14, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
                   <i className="fa-solid fa-circle-info" style={{ color: accent, marginTop: 2 }} />
                   <span>{q.retro}</span>
                 </div>
@@ -825,7 +1159,7 @@ function QuizCard({
           </button>
         )}
         {comprobado && (
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 13.5, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 14, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
             <i className={`fa-solid ${aprobadoAhora ? "fa-trophy" : "fa-circle-half-stroke"}`} />
             {aciertos} / {total} correctas
             {!aprobadoAhora && <span style={{ color: T.text3, fontWeight: 600 }}>· revisa las marcadas e inténtalo de nuevo</span>}

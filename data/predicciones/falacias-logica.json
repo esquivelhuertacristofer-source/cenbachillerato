@@ -1,0 +1,12 @@
+{
+  "escena": "En el debate del consejo estudiantil, Emiliano dice que no le hagan caso a Valeria porque su mamá es maestra.",
+  "pregunta": "Si nombras la falacia de ese mensaje y respondes con razones, ¿qué le pasa al público?",
+  "opciones": [
+    { "id": "a", "texto": "Sube, porque se examinan las razones", "icono": "fa-arrow-up" },
+    { "id": "b", "texto": "Baja, porque contradices a un compañero", "icono": "fa-arrow-down" },
+    { "id": "c", "texto": "No cambia, solo importan los equipos", "icono": "fa-equals" }
+  ],
+  "correcta": "a",
+  "porque": "Nombrar la falacia muestra que el mensaje no prueba nada, y responder a la idea con razones mejora el debate. El público premia eso y deja de premiar el ataque personal.",
+  "comoComprobarlo": "En «El debate», nombra la falacia del primer mensaje y elige la respuesta con razones; luego repite el debate eligiendo contraatacar y compara el medidor del público."
+}

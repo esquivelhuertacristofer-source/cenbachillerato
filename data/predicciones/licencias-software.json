@@ -1,0 +1,12 @@
+{
+  "escena": "La radio escolar ficticia «Voz del Valle» instaló un editor de imágenes de software libre",
+  "pregunta": "Si la radio vende copias de ese programa libre, ¿qué pasa?",
+  "opciones": [
+    { "id": "a", "texto": "Le llega una multa por infracción", "icono": "fa-gavel" },
+    { "id": "b", "texto": "Está permitido", "icono": "fa-circle-check" },
+    { "id": "c", "texto": "Solo puede regalarlo, nunca cobrarlo", "icono": "fa-hand-holding-heart" }
+  ],
+  "correcta": "b",
+  "porque": "Libre no significa gratis: la licencia libre deja usar, estudiar, modificar y redistribuir, y eso incluye cobrar por copias o soporte, siempre que también se entregue el código.",
+  "comoComprobarlo": "En «Software de la radio», instala un programa libre, elígelo y prueba la acción «Vender copias»."
+}

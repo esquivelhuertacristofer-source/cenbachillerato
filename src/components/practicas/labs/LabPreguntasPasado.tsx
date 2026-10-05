@@ -25,6 +25,7 @@ import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, OK, card, Eyebrow, SceneBoundary } from "./_kit";
 import { FichaTeorica } from "./_ficha";
+import { LabShell, Bloque, BotonHerramienta } from "./_shell";
 import { RetoQuizCard } from "./_reto-quiz";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { LabSfx } from "./lab-audio";
@@ -95,7 +96,7 @@ const PreguntasScene = dynamic(() => import("./PreguntasPasadoScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-person-digging fa-fade" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Preparando las capas del tiempo en 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Preparando las capas del tiempo en 3D…</span>
     </div>
   ),
 });
@@ -158,15 +159,15 @@ function CategoriaCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: 
           ¿Qué categoría histórica usa?
         </Eyebrow>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 10.5, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
           {[1, 2, 3].map((k) => (
-            <i key={k} className="fa-solid fa-star" style={{ fontSize: 13, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
+            <i key={k} className="fa-solid fa-star" style={{ fontSize: 14, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
           ))}
         </div>
       </div>
       {resuelto === null ? (
         <>
-          <div style={{ fontSize: 11, color: T.text3, fontWeight: 800, marginBottom: 6 }}>
+          <div style={{ fontSize: 14, color: T.text3, fontWeight: 800, marginBottom: 6 }}>
             Pregunta {pos + 1} de {ronda.length} · ¿qué categoría es la central?
           </div>
           <div className="pp-cat-q" style={{ fontSize: 15, color: "#fff", fontWeight: 800, lineHeight: 1.45, marginBottom: 12 }}>
@@ -180,7 +181,7 @@ function CategoriaCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: 
               </button>
             ))}
           </div>
-          {aviso && <div style={{ marginTop: 10, fontSize: 12, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
+          {aviso && <div style={{ marginTop: 10, fontSize: 14, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
         </>
       ) : (
         <div style={{ padding: "12px 14px", borderRadius: 11, border: `1px solid ${OK}55`, background: "rgba(52,211,153,0.08)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
@@ -188,9 +189,9 @@ function CategoriaCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: 
             {[1, 2, 3].map((k) => (
               <i key={k} className="fa-solid fa-star" style={{ fontSize: 15, color: k <= resuelto ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
             ))}
-            <span style={{ fontSize: 12.5, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
+            <span style={{ fontSize: 14, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
           </span>
-          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 12.5, fontWeight: 900 }}>
+          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 14, fontWeight: 900 }}>
             <i className="fa-solid fa-shuffle" style={{ marginRight: 8 }} />
             Otra ronda
           </button>
@@ -242,7 +243,6 @@ export function LabPreguntasPasado({ color }: PracticaLabProps) {
 
   // ── Comunes
   const [resetNonce, setResetNonce] = useState(0);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   const { mejorEstrellas, registraEstrellas: guardaEstrellas } = useEstrellas(RETO_KEY);
@@ -423,6 +423,7 @@ export function LabPreguntasPasado({ color }: PracticaLabProps) {
   /* ── Objetivos ─────────────────────────────────────────────────────── */
   const problemasCompletos = PROBLEMAS.filter((p) => profundidad[p.id] >= ESTRATOS.length).length;
   const objetivos: { t: string; done: boolean }[] = [
+    { t: "Excava una capa de tiempo y lee la pista que aparece", done: Object.values(profundidad).some((v) => v >= 1) },
     { t: "Excavar las cinco capas de tiempo de una problemática", done: problemasCompletos >= 1 },
     { t: "Excavar las tres problemáticas hasta Mesoamérica", done: problemasCompletos === PROBLEMAS.length },
     { t: "Distinguir preguntas fértiles, cerradas y anacrónicas (6 fichas de una problemática)", done: PROBLEMAS.some((p) => fichasBien(p.id)) },
@@ -462,13 +463,13 @@ export function LabPreguntasPasado({ color }: PracticaLabProps) {
         <i className={`fa-solid ${def.icono}`} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{def.etq}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los resultados siguen aquí. {pie}</div>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los resultados siguen aquí. {pie}</div>
     </div>
   );
 
-  const sub = (txt: string) => <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
+  const sub = (txt: string) => <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
   const nota = (txt: ReactNode, col: string, icono = "fa-circle-info") => (
-    <div style={{ marginTop: 10, fontSize: 12, lineHeight: 1.55, color: col }}>
+    <div style={{ marginTop: 10, fontSize: 14, lineHeight: 1.55, color: col }}>
       <i className={`fa-solid ${icono}`} style={{ marginRight: 7 }} />
       {txt}
     </div>
@@ -490,7 +491,7 @@ export function LabPreguntasPasado({ color }: PracticaLabProps) {
           ))}
         </div>
         {sub("La problemática de hoy")}
-        <div style={{ fontSize: 13, color: "#fff", lineHeight: 1.5 }}>{problema.presente}</div>
+        <div style={{ fontSize: 14, color: "#fff", lineHeight: 1.5 }}>{problema.presente}</div>
 
         {sub(`1 · Excava capas de tiempo (${prof}/${ESTRATOS.length})`)}
         <div className="pp-opts">
@@ -507,7 +508,7 @@ export function LabPreguntasPasado({ color }: PracticaLabProps) {
           {ESTRATOS.map((e, i) => (
             <button key={e.id} className="pp-estrato" data-on={estratoSel === i} disabled={i >= prof} onClick={() => { setEstratoSel(i); blip(); }} style={{ ["--ppc" as string]: e.color }}>
               <span style={{ fontWeight: 900 }}>{e.etq}</span>
-              <span style={{ fontSize: 10, color: T.text3 }}>{i < prof ? problema.pistas[i]!.anio : "sin excavar"}</span>
+              <span style={{ fontSize: 14, color: T.text3 }}>{i < prof ? problema.pistas[i]!.anio : "sin excavar"}</span>
             </button>
           ))}
         </div>
@@ -515,11 +516,11 @@ export function LabPreguntasPasado({ color }: PracticaLabProps) {
           <div style={{ marginTop: 10 }}>
             {recuadro(
               <>
-                <div style={{ fontSize: 11, fontWeight: 900, color: modoCol, marginBottom: 4 }}>
+                <div style={{ fontSize: 14, fontWeight: 900, color: modoCol, marginBottom: 4 }}>
                   {ESTRATOS[estratoSel]!.etq} · {problema.pistas[estratoSel]!.anio}
                 </div>
-                <div style={{ fontSize: 13, fontWeight: 900, color: "#fff", marginBottom: 4 }}>{problema.pistas[estratoSel]!.titulo}</div>
-                <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5 }}>{problema.pistas[estratoSel]!.texto}</div>
+                <div style={{ fontSize: 14, fontWeight: 900, color: "#fff", marginBottom: 4 }}>{problema.pistas[estratoSel]!.titulo}</div>
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>{problema.pistas[estratoSel]!.texto}</div>
               </>,
               `${modoCol}55`,
             )}
@@ -535,13 +536,13 @@ export function LabPreguntasPasado({ color }: PracticaLabProps) {
             const bien = elegida === f.tipo;
             return (
               <div key={k} className="pp-ficha" data-estado={elegida === undefined ? "nueva" : bien ? "bien" : "mal"}>
-                <div style={{ fontSize: 12.5, color: "#fff", fontWeight: 800, lineHeight: 1.45 }}>{f.texto}</div>
+                <div style={{ fontSize: 14, color: "#fff", fontWeight: 800, lineHeight: 1.45 }}>{f.texto}</div>
                 <div className="pp-opts" style={{ marginTop: 8 }}>
                   {TIPOS_PREGUNTA.map((t) => {
                     const on = elegida === t.id;
                     const col = on ? (bien ? OK : WARN) : t.color;
                     return (
-                      <button key={t.id} className="pp-opt pp-tipo" data-on={on} disabled={bien} onClick={() => clasificarFicha(i, t.id)} style={{ ["--ppc" as string]: col, background: on ? `${col}1f` : "transparent", padding: "6px 10px", fontSize: 11.5 }}>
+                      <button key={t.id} className="pp-opt pp-tipo" data-on={on} disabled={bien} onClick={() => clasificarFicha(i, t.id)} style={{ ["--ppc" as string]: col, background: on ? `${col}1f` : "transparent", padding: "6px 10px", fontSize: 14 }}>
                         <i className={`fa-solid ${t.icono}`} style={{ marginRight: 6 }} />
                         {t.etq}
                       </button>
@@ -550,7 +551,7 @@ export function LabPreguntasPasado({ color }: PracticaLabProps) {
                 </div>
                 {elegida !== undefined && !bien && nota(PISTA_TIPO[f.tipo], WARN, "fa-rotate-left")}
                 {bien && (
-                  <div style={{ marginTop: 8, fontSize: 11.5, color: T.text2, lineHeight: 1.5 }}>
+                  <div style={{ marginTop: 8, fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
                     <span style={{ color: OK, fontWeight: 900 }}>
                       <i className="fa-solid fa-circle-check" style={{ marginRight: 6 }} />
                       {f.tipo === "fertil" ? `Fértil · ${CATEGORIA_DEF[f.categoria!].etq}. ` : `${TIPOS_PREGUNTA.find((t) => t.id === f.tipo)!.etq}. `}
@@ -570,7 +571,7 @@ export function LabPreguntasPasado({ color }: PracticaLabProps) {
         </div>
 
         {sub("3 · Escribe tu propia pregunta histórica")}
-        <div style={{ fontSize: 11.5, color: T.text3, marginBottom: 8, lineHeight: 1.45 }}>
+        <div style={{ fontSize: 14, color: T.text3, marginBottom: 8, lineHeight: 1.45 }}>
           Parte de la problemática de hoy y usa las pistas que excavaste. Video A8: «{VIDEO_P01}»
         </div>
         <div className="pp-opts" style={{ marginBottom: 8 }}>
@@ -599,7 +600,7 @@ export function LabPreguntasPasado({ color }: PracticaLabProps) {
           <div style={{ marginTop: 10 }}>
             {recuadro(
               <>
-                <div style={{ fontSize: 13, fontWeight: 900, color: analisis.veredicto === "fertil" ? OK : analisis.veredicto === "casi" ? "#fbbf24" : WARN }}>
+                <div style={{ fontSize: 14, fontWeight: 900, color: analisis.veredicto === "fertil" ? OK : analisis.veredicto === "casi" ? "#fbbf24" : WARN }}>
                   {analisis.veredicto === "fertil"
                     ? "Pregunta fértil: abre el análisis y combina categorías."
                     : analisis.veredicto === "casi"
@@ -623,13 +624,13 @@ export function LabPreguntasPasado({ color }: PracticaLabProps) {
                 {analisis.consejos.length > 0 && (
                   <ul style={{ margin: "8px 0 0", paddingLeft: 16, display: "grid", gap: 4 }}>
                     {analisis.consejos.map((c, i) => (
-                      <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
+                      <li key={i} style={{ fontSize: 14, color: T.text2, lineHeight: 1.45 }}>
                         {c}
                       </li>
                     ))}
                   </ul>
                 )}
-                <div style={{ fontSize: 10.5, color: T.text3, marginTop: 8 }}>Revisión automática orientativa (busca palabras clave): compártela con tu docente para una valoración completa.</div>
+                <div style={{ fontSize: 14, color: T.text3, marginTop: 8 }}>Revisión automática orientativa (busca palabras clave): compártela con tu docente para una valoración completa.</div>
               </>,
               analisis.veredicto === "fertil" ? `${OK}66` : T.line,
             )}
@@ -662,11 +663,11 @@ export function LabPreguntasPasado({ color }: PracticaLabProps) {
             <div style={{ marginTop: 10 }}>
               {recuadro(
                 <>
-                  <div style={{ fontSize: 10.5, fontWeight: 900, color: PROCESO_COLOR[evidencia.proceso], letterSpacing: "0.06em" }}>{PROCESO_ETQ[evidencia.proceso].toUpperCase()}</div>
+                  <div style={{ fontSize: 14, fontWeight: 900, color: PROCESO_COLOR[evidencia.proceso], letterSpacing: "0.06em" }}>{PROCESO_ETQ[evidencia.proceso].toUpperCase()}</div>
                   <div style={{ fontSize: 15, fontWeight: 900, color: "#fff", marginTop: 2 }}>
                     {evidencia.anio} · {evidencia.etq}
                   </div>
-                  <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5, marginTop: 4 }}>{evidencia.texto}</div>
+                  <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5, marginTop: 4 }}>{evidencia.texto}</div>
                 </>,
                 `${PROCESO_COLOR[evidencia.proceso]}55`,
               )}
@@ -696,7 +697,7 @@ export function LabPreguntasPasado({ color }: PracticaLabProps) {
                 </button>
               ))}
             </div>
-            <div style={{ marginTop: 10 }}>{recuadro(<div style={{ fontSize: 13, color: "#fff", lineHeight: 1.5, fontWeight: 700 }}>{vinculo.texto}</div>, `${modoCol}55`)}</div>
+            <div style={{ marginTop: 10 }}>{recuadro(<div style={{ fontSize: 14, color: "#fff", lineHeight: 1.5, fontWeight: 700 }}>{vinculo.texto}</div>, `${modoCol}55`)}</div>
             {sub("¿Qué relación une a estas evidencias?")}
             <div className="pp-opts">
               {RELACIONES.map((r) => {
@@ -740,7 +741,7 @@ export function LabPreguntasPasado({ color }: PracticaLabProps) {
             </button>
           ))}
         </div>
-        <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.5, marginTop: 10 }}>{caso.contexto}</div>
+        <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5, marginTop: 10 }}>{caso.contexto}</div>
         {sub("1 · Escucha cada voz")}
         <div className="pp-voces">
           {caso.voces.map((v) => (
@@ -755,9 +756,9 @@ export function LabPreguntasPasado({ color }: PracticaLabProps) {
           <div style={{ marginTop: 10 }}>
             {recuadro(
               <>
-                <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: "0.08em", color: T.text3 }}>VOZ ILUSTRATIVA · {voz.quien.toUpperCase()}</div>
-                <div style={{ fontSize: 13, color: "#fff", lineHeight: 1.5, marginTop: 4, fontStyle: "italic" }}>«{voz.dice}»</div>
-                <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, margin: "12px 0 6px" }}>¿QUÉ APORTA ESTE DISCURSO?</div>
+                <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: T.text3 }}>VOZ ILUSTRATIVA · {voz.quien.toUpperCase()}</div>
+                <div style={{ fontSize: 14, color: "#fff", lineHeight: 1.5, marginTop: 4, fontStyle: "italic" }}>«{voz.dice}»</div>
+                <div style={{ fontSize: 14, fontWeight: 900, color: T.text3, margin: "12px 0 6px" }}>¿QUÉ APORTA ESTE DISCURSO?</div>
                 <div style={{ display: "grid", gap: 6 }}>
                   {ordenOpciones(voz.id, voz.aporta.length, 17).map((i) => {
                     const on = respAporta[voz.id] === i;
@@ -769,7 +770,7 @@ export function LabPreguntasPasado({ color }: PracticaLabProps) {
                     );
                   })}
                 </div>
-                <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, margin: "12px 0 6px" }}>¿QUÉ OMITE O DEJA FUERA?</div>
+                <div style={{ fontSize: 14, fontWeight: 900, color: T.text3, margin: "12px 0 6px" }}>¿QUÉ OMITE O DEJA FUERA?</div>
                 <div style={{ display: "grid", gap: 6 }}>
                   {ordenOpciones(voz.id, voz.omite.length, 41).map((i) => {
                     const on = respOmite[voz.id] === i;
@@ -791,7 +792,7 @@ export function LabPreguntasPasado({ color }: PracticaLabProps) {
         )}
 
         {sub("2 · Teje una explicación")}
-        <div style={{ fontSize: 11.5, color: T.text3, marginBottom: 6 }}>Elige la pregunta que guía tu explicación:</div>
+        <div style={{ fontSize: 14, color: T.text3, marginBottom: 6 }}>Elige la pregunta que guía tu explicación:</div>
         <div style={{ display: "grid", gap: 6 }}>
           {caso.guias.map((g, i) => (
             <button key={i} className="pp-opt pp-guia" data-on={guia[casoId] === i} onClick={() => { setGuia((x) => ({ ...x, [casoId]: i })); blip(); }} style={{ ["--ppc" as string]: accent, background: guia[casoId] === i ? `rgba(${color.rgba},0.16)` : "transparent", textAlign: "left" }}>
@@ -799,7 +800,7 @@ export function LabPreguntasPasado({ color }: PracticaLabProps) {
             </button>
           ))}
         </div>
-        <div style={{ fontSize: 11.5, color: T.text3, margin: "10px 0 6px" }}>Toca las voces que integras (tiende un hilo hacia la fogata):</div>
+        <div style={{ fontSize: 14, color: T.text3, margin: "10px 0 6px" }}>Toca las voces que integras (tiende un hilo hacia la fogata):</div>
         <div className="pp-opts">
           {caso.voces.map((v) => {
             const on = incl.includes(v.id);
@@ -811,7 +812,7 @@ export function LabPreguntasPasado({ color }: PracticaLabProps) {
             );
           })}
         </div>
-        {incl.length > 0 && <div style={{ marginTop: 10 }}>{recuadro(<div style={{ fontSize: 12.5, color: "#fff", lineHeight: 1.6 }}>{textoExplicacion(caso, incl)}</div>, `${accent}44`)}</div>}
+        {incl.length > 0 && <div style={{ marginTop: 10 }}>{recuadro(<div style={{ fontSize: 14, color: "#fff", lineHeight: 1.6 }}>{textoExplicacion(caso, incl)}</div>, `${accent}44`)}</div>}
         <div style={{ display: "grid", gap: 5, marginTop: 10 }}>
           {(
             [
@@ -824,380 +825,268 @@ export function LabPreguntasPasado({ color }: PracticaLabProps) {
           ).map(([k, t]) => (
             <div key={k} style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
               <i className={`fa-solid ${rubrica[k] ? "fa-square-check" : "fa-square"}`} style={{ marginTop: 2, color: rubrica[k] ? OK : "rgba(255,255,255,0.25)" }} />
-              <span style={{ fontSize: 11.5, color: rubrica[k] ? "#fff" : T.text2, lineHeight: 1.4 }}>{t}</span>
+              <span style={{ fontSize: 14, color: rubrica[k] ? "#fff" : T.text2, lineHeight: 1.4 }}>{t}</span>
             </div>
           ))}
         </div>
         {rubricaOk
           ? nota("Explicación integradora. No existe una única versión correcta: tu explicación es más sólida porque reúne y contrasta discursos que por separado cuentan solo una parte.", OK, "fa-circle-check")
           : nota("Aquí no se califica qué voz tiene la razón, sino si tu explicación incluye, contrasta y fundamenta varias voces.", T.text3)}
-        <div style={{ fontSize: 11.5, color: T.text3, marginTop: 10, lineHeight: 1.45 }}>Video A8 (P04): «{VIDEO_P04}»</div>
+        <div style={{ fontSize: 14, color: T.text3, marginTop: 10, lineHeight: 1.45 }}>Video A8 (P04): «{VIDEO_P04}»</div>
       </>
     );
   }
 
+
+  /* ── Medidor: el experimento central del lab ───────────────────────── */
+  const vivo = modo === "excavar" && pregunta.trim().length > 0 ? analizarPregunta(pregunta, problema) : null;
+  const nCat = vivo ? vivo.categorias.length : 0;
+  const criteriosRubrica = Object.values(rubrica).filter(Boolean).length;
+  let medidores: { etq: string; val: number; max: number; col: string; txt: string }[];
+  if (modo === "excavar") {
+    medidores = [
+      { etq: "Capas de tiempo excavadas", val: prof, max: ESTRATOS.length, col: modoCol, txt: `${prof} de ${ESTRATOS.length}` },
+      { etq: "Categorías en tu pregunta", val: Math.min(nCat, 3), max: 3, col: nCat >= 3 ? OK : "#fbbf24", txt: `${nCat} (fértil: 3 o más)` },
+    ];
+  } else if (modo === "espiral") {
+    medidores = [
+      { etq: "Evidencias en su siglo", val: ubicadas.length, max: EVIDENCIAS.length, col: modoCol, txt: `${ubicadas.length} de ${EVIDENCIAS.length}` },
+      { etq: "Relaciones nombradas", val: vincOk.length, max: VINCULOS.length, col: OK, txt: `${vincOk.length} de ${VINCULOS.length}` },
+    ];
+  } else {
+    medidores = [
+      { etq: "Voces en tu explicación", val: Math.min(incl.length, 3), max: 3, col: modoCol, txt: `${incl.length} (mínimo 3)` },
+      { etq: "Criterios de la rúbrica", val: criteriosRubrica, max: 5, col: criteriosRubrica === 5 ? OK : "#fbbf24", txt: `${criteriosRubrica} de 5` },
+    ];
+  }
+  const consecuencia =
+    modo === "excavar"
+      ? "Escribe tu pregunta: la barra de categorías sube cuando nombras un tiempo, un lugar, un sujeto o una causa."
+      : modo === "espiral"
+        ? "Cada evidencia bien ubicada cae sobre la espiral, en el tramo de su siglo."
+        : "Cada voz que integras tiende un hilo a la fogata y se trenza en tu explicación.";
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes ppPulse { 0%,100%{ box-shadow:0 0 0 0 var(--ppd); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .pp-live-dot { animation: ppPulse 1.6s ease-in-out infinite; }
-        @media (prefers-reduced-motion: reduce){ .pp-live-dot { animation:none; } }
-        .pp-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .pp-grid { grid-template-columns: 1fr; } }
-        .pp-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .pp-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .pp-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .pp-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .pp-tab { cursor:pointer; border:1px solid var(--ppc); border-radius:12px; padding:11px 8px; text-align:center; background:transparent; transition:all .15s; color:#fff; }
-        .pp-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
-        .pp-tab:hover { background:rgba(255,255,255,0.06); }
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <PreguntasScene
+            vista={modo}
+            modoColor={modoCol}
+            resetNonce={resetNonce}
+            problemaId={problemaId}
+            profundidad={prof}
+            estratoSel={estratoSel}
+            ubicadas={ubicadas}
+            evidenciaActual={paso === "ubicar" && ubicadas.length < EVIDENCIAS.length ? evId : null}
+            vinculoId={paso === "relacionar" ? vinculo.id : null}
+            vinculoResuelto={vinculoResuelto}
+            casoId={casoId}
+            vozSel={vozSel}
+            identificadas={identificadasCaso}
+            incluidas={incl}
+          />
+        </SceneBoundary>
+      }
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m, etiqueta: MODOS_DEF[m].etq, icono: MODOS_DEF[m].icono })),
+        valor: modo,
+        cambiar: (id) => cambiarModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+        </>
+      }
+      leyenda={
+        modo === "espiral" ? (
+          <>
+            {PERIODOS_ESPIRAL.map((p) => (
+              <span key={p.etq} style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 800, color: "#fff" }}>
+                <span style={{ width: 14, height: 14, borderRadius: 4, background: p.color }} />
+                {p.etq}
+              </span>
+            ))}
+          </>
+        ) : undefined
+      }
+      lectura={chipVivo}
+      objetivos={objetivos.map((o) => ({ txt: o.t, done: o.done }))}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Cuaderno",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              <style>{`
         .pp-opts { display:flex; flex-wrap:wrap; gap:7px; }
-        .pp-opt { cursor:pointer; border:1px solid var(--ppc); border-radius:10px; padding:9px 12px; font-size:12px; font-weight:800; color:#fff; background:transparent; transition:all .15s; line-height:1.35; }
+        .pp-opt { cursor:pointer; border:1px solid var(--ppc); border-radius:10px; padding:9px 12px; font-size:14px; font-weight:800; color:#fff; background:transparent; transition:all .15s; line-height:1.35; }
         .pp-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.78); }
         .pp-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
         .pp-opt:disabled { cursor:default; }
         .pp-opt:disabled[data-on="false"] { opacity:0.5; }
-        .pp-chip { cursor:pointer; border:1px solid rgba(255,255,255,0.16); border-radius:999px; padding:6px 11px; font-size:11.5px; font-weight:800; color:rgba(255,255,255,0.82); background:rgba(4,10,22,0.35); transition:all .15s; }
+        .pp-chip { cursor:pointer; border:1px solid rgba(255,255,255,0.16); border-radius:999px; padding:6px 11px; font-size:14px; font-weight:800; color:rgba(255,255,255,0.82); background:rgba(4,10,22,0.35); transition:all .15s; }
         .pp-chip[data-on="true"] { border-color:var(--ppc); color:#fff; background:rgba(255,255,255,0.08); }
         .pp-chip:hover { background:rgba(255,255,255,0.08); }
-        .pp-tag { display:inline-flex; align-items:center; border:1px solid var(--ppc); color:#fff; border-radius:999px; padding:4px 10px; font-size:11px; font-weight:800; }
-        .pp-toggle { width:100%; cursor:pointer; border:1px solid var(--ppc); border-radius:11px; padding:11px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:12.5px; font-weight:900; text-align:left; transition:all .15s; }
+        .pp-tag { display:inline-flex; align-items:center; border:1px solid var(--ppc); color:#fff; border-radius:999px; padding:4px 10px; font-size:14px; font-weight:800; }
+        .pp-toggle { width:100%; cursor:pointer; border:1px solid var(--ppc); border-radius:11px; padding:11px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:14px; font-weight:900; text-align:left; transition:all .15s; }
         .pp-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
         .pp-toggle:disabled { cursor:default; opacity:0.6; }
         .pp-estratos { display:grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap:5px; margin-top:10px; }
-        @media (max-width: 520px){ .pp-estratos { grid-template-columns: repeat(2,minmax(0,1fr)); } }
-        .pp-estrato { cursor:pointer; display:flex; flex-direction:column; gap:2px; align-items:flex-start; padding:7px 8px; border-radius:9px; border:1px solid rgba(255,255,255,0.12); border-left:4px solid var(--ppc); background:rgba(4,10,22,0.4); color:#fff; font-size:11px; text-align:left; min-width:0; }
+        .pp-estratos { grid-template-columns: repeat(2,minmax(0,1fr)); }
+        .pp-estrato { cursor:pointer; display:flex; flex-direction:column; gap:2px; align-items:flex-start; padding:7px 8px; border-radius:9px; border:1px solid rgba(255,255,255,0.12); border-left:4px solid var(--ppc); background:rgba(4,10,22,0.4); color:#fff; font-size:14px; text-align:left; min-width:0; }
         .pp-estrato[data-on="true"] { background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.4); border-left-color:var(--ppc); }
         .pp-estrato:disabled { cursor:default; opacity:0.45; }
         .pp-ficha { padding:11px 12px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(4,10,22,0.35); }
         .pp-ficha[data-estado="bien"] { border-color:rgba(52,211,153,0.4); }
         .pp-ficha[data-estado="mal"] { border-color:rgba(255,138,60,0.45); }
-        .pp-texto { width:100%; box-sizing:border-box; resize:vertical; border-radius:11px; border:1px solid rgba(255,255,255,0.18); background:rgba(4,10,22,0.55); color:#fff; font-size:13px; line-height:1.5; padding:10px 12px; font-family:inherit; }
-        .pp-texto:focus { outline:2px solid ${accent}; outline-offset:1px; }
+        .pp-texto { width:100%; box-sizing:border-box; resize:vertical; border-radius:11px; border:1px solid rgba(255,255,255,0.18); background:rgba(4,10,22,0.55); color:#fff; font-size:14px; line-height:1.5; padding:10px 12px; font-family:inherit; }
         .pp-siglos { display:grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap:6px; }
-        .pp-siglo { text-align:center; font-size:13px; }
+        .pp-siglo { text-align:center; font-size:14px; }
         .pp-voces { display:grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap:6px; }
-        .pp-voz { cursor:pointer; display:flex; align-items:center; gap:8px; padding:9px 10px; border-radius:10px; border:1px solid rgba(255,255,255,0.12); background:rgba(4,10,22,0.4); color:#fff; font-size:11.5px; font-weight:800; text-align:left; transition:all .15s; }
+        .pp-voz { cursor:pointer; display:flex; align-items:center; gap:8px; padding:9px 10px; border-radius:10px; border:1px solid rgba(255,255,255,0.12); background:rgba(4,10,22,0.4); color:#fff; font-size:14px; font-weight:800; text-align:left; transition:all .15s; }
         .pp-voz[data-on="true"] { border-color:var(--ppc); background:rgba(255,255,255,0.08); }
         .pp-voz:hover { background:rgba(255,255,255,0.07); }
-        .pp-opt:focus-visible, .pp-tab:focus-visible, .pp-toggle:focus-visible, .pp-icobtn:focus-visible, .pp-chip:focus-visible, .pp-estrato:focus-visible, .pp-voz:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
-        @media (max-width: 1000px){ .pp-bottom { grid-template-columns: 1fr !important; } }
-        .pp-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .pp-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .pp-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61; background:linear-gradient(180deg,#06121e 0%,#040a16 100%);
-          border-left:1px solid rgba(${color.rgba},0.32); box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1); display:flex; flex-direction:column; }
-        .pp-drawer[data-open="true"] { transform:translateX(0); }
-        .pp-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .pp-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .pp-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .pp-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .pp-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:11px 16px; border-radius:999px;
-          border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800; background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
-        .pp-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="pp-tabs">
-          {MODOS.map((m) => {
-            const d = MODOS_DEF[m];
-            const on = m === modo;
-            return (
-              <button key={m} className="pp-tab" data-on={on} onClick={() => cambiarModo(m)} style={{ ["--ppc" as string]: d.color, background: on ? `${d.color}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? d.color : "inherit" }}>
-                  <i className={`fa-solid ${d.icono}`} />
+              `}</style>
+              <Bloque titulo={`Medidor · ${def.etq}`} icono="fa-gauge-high">
+                <div style={{ display: "grid", gap: 10 }}>
+                  {medidores.map((md) => (
+                    <div key={md.etq} style={{ display: "grid", gap: 4 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, fontSize: 14, fontWeight: 800, color: "#fff" }}>
+                        <span>{md.etq}</span>
+                        <span style={{ fontFamily: "ui-monospace, monospace", color: md.col }}>{md.txt}</span>
+                      </div>
+                      <div style={{ height: 12, borderRadius: 6, background: "rgba(255,255,255,0.1)", overflow: "hidden" }}>
+                        <div style={{ width: `${md.max > 0 ? Math.min(100, (md.val / md.max) * 100) : 0}%`, height: "100%", background: md.col, transition: "width 200ms ease" }} />
+                      </div>
+                    </div>
+                  ))}
+                  <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>{consecuencia}</div>
                 </div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{d.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{d.subtitulo}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="pp-grid">
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 58vh, 660px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <PreguntasScene
-                vista={modo}
-                modoColor={modoCol}
-                resetNonce={resetNonce}
-                problemaId={problemaId}
-                profundidad={prof}
-                estratoSel={estratoSel}
-                ubicadas={ubicadas}
-                evidenciaActual={paso === "ubicar" && ubicadas.length < EVIDENCIAS.length ? evId : null}
-                vinculoId={paso === "relacionar" ? vinculo.id : null}
-                vinculoResuelto={vinculoResuelto}
-                casoId={casoId}
-                vozSel={vozSel}
-                identificadas={identificadasCaso}
-                incluidas={incl}
-              />
-            </SceneBoundary>
-
-            <div style={{ position: "absolute", top: 14, left: 16, right: 150, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, pointerEvents: "none" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)", maxWidth: "100%" }}>
-                <span className="pp-live-dot" style={{ ["--ppd" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol, flexShrink: 0 }} />
-                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3, flexShrink: 0 }}>EN VIVO</span>
-                <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)", flexShrink: 0 }} />
-                <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{chipVivo}</span>
+              </Bloque>
+              <Bloque titulo="Lo que ves" icono="fa-eye">
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55 }}>{pie}</div>
+              </Bloque>
+              <Bloque titulo={def.etq} icono={def.icono}>
+                {control}
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <>
+              <CategoriaCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
+              <RetoQuizCard quiz={QUIZ_A2} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Ubicas el pasado en el tiempo y en el espacio." />
+              <div style={{ ...card, padding: "20px 20px 22px", marginTop: 22 }}>
+                <Eyebrow>
+                  <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
+                  Completa el texto (A6 · coordenadas espacio-temporales)
+                </Eyebrow>
+                <div className="pp-huecos-p01" style={{ marginTop: 12 }}>
+                  <CompletaTexto data={HUECOS_P01} accent={accent} rgba={color.rgba} completado={textoP01} onCompletado={() => { setTextoP01(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
+                </div>
               </div>
-              {modo === "espiral" && (
-                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                  {PERIODOS_ESPIRAL.map((p) => (
-                    <span key={p.etq} style={{ padding: "3px 10px", borderRadius: 999, background: `${p.color}dd`, color: "#fff", fontSize: 10.5, fontWeight: 800 }}>
-                      {p.etq}
-                    </span>
+              <div style={{ ...card, padding: "20px 20px 22px", marginTop: 22 }}>
+                <Eyebrow>
+                  <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
+                  Completa el texto (A6 de P04 · fuentes y sesgo)
+                </Eyebrow>
+                <div className="pp-huecos-p04" style={{ marginTop: 12 }}>
+                  <CompletaTexto data={HUECOS_P04} accent={accent} rgba={color.rgba} completado={textoP04} onCompletado={() => { setTextoP04(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
+                </div>
+              </div>
+            </>
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="¿Qué le preguntamos al pasado?" icono="fa-magnifying-glass-location">
+                <div style={{ color: T.text2 }}>{PROBLEMA}</div>
+              </Bloque>
+              <Bloque titulo="Cómo usar el laboratorio" icono="fa-list-ol">
+                <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8 }}>
+                  {INSTRUCCIONES.map((p, i) => <li key={i}>{p}</li>)}
+                </ol>
+              </Bloque>
+              <Bloque titulo="Lectura A1" icono="fa-book-open">
+                <div style={{ fontWeight: 800, color: "#fff" }}>{TITULO_A1}</div>
+                {LECTURA_A1.map((p, i) => (
+                  <div key={i} style={{ color: T.text2 }}>{p}</div>
+                ))}
+                <div style={{ fontSize: 14, fontWeight: 900, color: T.text3, letterSpacing: "0.08em" }}>PARA REFLEXIONAR</div>
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {PREGUNTAS.map((q, i) => <li key={i}>{q}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Preguntas de los videos (A8)" icono="fa-circle-play">
+                <div style={{ color: T.text2 }}>
+                  <strong style={{ color: "#fff" }}>Cómo plantear preguntas históricas:</strong> {VIDEO_P01}
+                </div>
+                <div style={{ color: T.text2 }}>
+                  <strong style={{ color: "#fff" }}>La diversidad de discursos en la historia:</strong> {VIDEO_P04}
+                </div>
+              </Bloque>
+              <Bloque titulo="Hechos (V/F A4 de P01 y de P04)" icono="fa-circle-question">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {HECHOS.map((h, i) => <li key={i}>{h}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Glosario (A5 de P01 y de P04)" icono="fa-book">
+                {GLOSARIO.map((gi, i) => (
+                  <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
+                    <strong style={{ color: accent }}>{gi.termino}. </strong>
+                    <span style={{ color: T.text2 }}>{gi.definicion}</span>
+                    <div style={{ color: T.text3, marginTop: 4 }}>
+                      <i className="fa-solid fa-landmark" style={{ marginRight: 6, color: accent }} aria-hidden />
+                      {gi.ejemplo}
+                    </div>
+                  </div>
+                ))}
+                <div style={{ color: T.text2 }}>
+                  <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A5}
+                </div>
+              </Bloque>
+              <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {IDEAS.map((x, i) => <li key={i}>{x}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Categorías históricas" icono="fa-layer-group">
+                <div style={{ display: "grid", gap: 8 }}>
+                  {CATEGORIAS.map((c) => (
+                    <div key={c} style={{ color: T.text2 }}>
+                      <i className={`fa-solid ${CATEGORIA_DEF[c].icono}`} style={{ marginRight: 7, color: CATEGORIA_DEF[c].color }} aria-hidden />
+                      <strong style={{ color: "#fff" }}>{CATEGORIA_DEF[c].etq}:</strong> {CATEGORIA_DEF[c].pregunta}
+                    </div>
                   ))}
                 </div>
-              )}
-            </div>
-
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="pp-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría" aria-label="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="pp-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"} aria-label={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="pp-icobtn" onClick={reiniciar} title="Reiniciar" aria-label="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 132px 14px 18px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                {def.etq} — {def.subtitulo}
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6 }}>{pie}</div>
-            </div>
-
-            <button className="pp-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-          </div>
-
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-              Controles — {def.etq}
-            </Eyebrow>
-            <div style={{ marginTop: 12 }}>{control}</div>
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-magnifying-glass-location" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>¿Qué le preguntamos al pasado?</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #7dd3fc55", background: "rgba(125,211,252,0.07)" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book-open" style={{ marginRight: 8, color: "#7dd3fc" }} />
-              Lectura A1
-            </Eyebrow>
-            <div style={{ fontSize: 13, color: "#fff", fontWeight: 800, lineHeight: 1.4, marginBottom: 10 }}>{TITULO_A1}</div>
-            <div style={{ display: "grid", gap: 9, marginBottom: 12 }}>
-              {LECTURA_A1.map((p, i) => (
-                <div key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>
-                  {p}
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", marginBottom: 8 }}>PARA REFLEXIONAR</div>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {PREGUNTAS.map((q, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  {q}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />
-              Cómo usar el laboratorio
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-                Objetivos de la sesión
-              </Eyebrow>
-              <span className="pp-objetivos-n" style={{ fontSize: 11, fontWeight: 800, color: objetivos.every((o) => o.done) ? OK : T.text3 }}>
-                {objetivos.filter((o) => o.done).length}/{objetivos.length}
-              </span>
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} className="pp-objetivo" data-done={o.done} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ marginTop: 2, fontSize: 13, color: o.done ? OK : "rgba(255,255,255,0.22)" }} />
-                  <span style={{ fontSize: 12, color: o.done ? "#fff" : T.text2, lineHeight: 1.4 }}>{o.t}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="pp-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <div style={{ padding: "14px 16px", borderRadius: 12, border: `1px solid ${accent}33`, background: `rgba(${color.rgba},0.07)` }}>
-            <Eyebrow>
-              <i className="fa-solid fa-circle-play" style={{ marginRight: 8, color: accent }} />
-              Preguntas de los videos (A8)
-            </Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>
-              <strong style={{ color: "#fff" }}>Cómo plantear preguntas históricas:</strong> {VIDEO_P01}
-            </div>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55, marginTop: 6 }}>
-              <strong style={{ color: "#fff" }}>La diversidad de discursos en la historia:</strong> {VIDEO_P04}
-            </div>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />
-              Hechos (V/F A4 de P01 y de P04)
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {HECHOS.map((h, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
-                  {h}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />
-              Glosario (A5 de P01 y de P04)
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {GLOSARIO.map((gi, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{gi.termino}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
-                  <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.4, marginTop: 4 }}>
-                    <i className="fa-solid fa-landmark" style={{ marginRight: 6, color: accent }} />
-                    {gi.ejemplo}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11.5, color: T.text2, marginTop: 10 }}>
-              <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A5}
-            </div>
-          </div>
-        </div>
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-            Ideas clave
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-            {IDEAS.map((x, i) => (
-              <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                {x}
-              </li>
-            ))}
-          </ul>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-layer-group" style={{ marginRight: 8, color: accent }} />
-              Categorías históricas
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 7 }}>
-              {CATEGORIAS.map((c) => (
-                <div key={c} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.4 }}>
-                  <i className={`fa-solid ${CATEGORIA_DEF[c].icono}`} style={{ marginRight: 7, color: CATEGORIA_DEF[c].color }} />
-                  <strong style={{ color: "#fff" }}>{CATEGORIA_DEF[c].etq}:</strong> {CATEGORIA_DEF[c].pregunta}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          La lectura A1 con sus preguntas, el quiz A2, los hechos, el glosario, los dos textos A6 y las preguntas de los videos A8 son <strong>verbatim</strong> del material de la plataforma
-          (en el glosario se corrigió la errata «prejudicio»). Las pistas de cada capa y las evidencias de la espiral son <strong>hechos históricos verificables</strong>; las fichas de preguntas
-          y los vínculos son ejemplos didácticos. Las <strong>voces del modo «Muchas voces» son ilustrativas</strong>: personajes verosímiles basados en hechos documentados, no citas de
-          personas reales. La revisión automática de tu pregunta es orientativa. Fuente: {FUENTE}
-        </span>
-      </div>
-
-      <CategoriaCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
-
-      <RetoQuizCard quiz={QUIZ_A2} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Ubicas el pasado en el tiempo y en el espacio." />
-
-      <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
-          Completa el texto (A6 · coordenadas espacio-temporales)
-        </Eyebrow>
-        <div className="pp-huecos-p01" style={{ marginTop: 12 }}>
-          <CompletaTexto data={HUECOS_P01} accent={accent} rgba={color.rgba} completado={textoP01} onCompletado={() => { setTextoP01(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
-        </div>
-      </div>
-
-      <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
-          Completa el texto (A6 de P04 · fuentes y sesgo)
-        </Eyebrow>
-        <div className="pp-huecos-p04" style={{ marginTop: 12 }}>
-          <CompletaTexto data={HUECOS_P04} accent={accent} rgba={color.rgba} completado={textoP04} onCompletado={() => { setTextoP04(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
-        </div>
-      </div>
-
-      <div className="pp-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="pp-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="pp-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="pp-close" onClick={() => setDrawer(false)} title="Cerrar" aria-label="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="pp-drawer-body">
-          <FichaTeorica data={PREGUNTAS_PASADO_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={PREGUNTAS_PASADO_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ marginTop: 18, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
+                La lectura A1 con sus preguntas, el quiz A2, los hechos, el glosario, los dos textos A6 y las preguntas de los videos A8 son <strong>verbatim</strong> del material de la plataforma
+                (en el glosario se corrigió la errata «prejudicio»). Las pistas de cada capa y las evidencias de la espiral son <strong>hechos históricos verificables</strong>; las fichas de preguntas
+                y los vínculos son ejemplos didácticos. Las <strong>voces del modo «Muchas voces» son ilustrativas</strong>: personajes verosímiles basados en hechos documentados, no citas de
+                personas reales. La revisión automática de tu pregunta es orientativa. Fuente: {FUENTE}
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }

@@ -1,0 +1,12 @@
+{
+  "escena": "El tranvía sin frenos en la variante de la palanca: puedes cambiar cuántas personas hay en la vía principal y cada corriente ética da su veredicto.",
+  "pregunta": "En la palanca pasas de 1 a 5 personas en la vía. ¿Qué corrientes cambian su veredicto?",
+  "opciones": [
+    { "id": "a", "texto": "Utilitarismo y doble efecto", "icono": "fa-scale-unbalanced" },
+    { "id": "b", "texto": "Todas las corrientes por igual", "icono": "fa-equals" },
+    { "id": "c", "texto": "Solo la deontología", "icono": "fa-gavel" }
+  ],
+  "correcta": "a",
+  "porque": "Con una vida contra una, el utilitarismo no ve ventaja y el doble efecto no halla un bien proporcionado; con cinco, ambos permiten actuar. La deontología razona por dignidad, no por cantidad, y no cambia.",
+  "comoComprobarlo": "Elige «La palanca», mueve el control «En la vía principal» de 1 a 5 personas y compara el veredicto de cada teoría."
+}

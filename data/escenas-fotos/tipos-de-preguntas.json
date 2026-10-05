@@ -1,0 +1,9 @@
+{
+  "slug": "tipos-de-preguntas",
+  "items": [
+    { "clave": "retrato", "formato": "1:1", "estilo": "ilustracion", "escena": "Retrato amable de una mujer mayor de cabello canoso con lentes y un delantal de taller, sonriendo junto a un banco de trabajo con pequeños engranes, personaje ficticio" },
+    { "clave": "mesa-relojes", "formato": "1:1", "estilo": "foto", "escena": "Mesa de relojero con un reloj de pulsera abierto, pinzas, engranes diminutos y una lupa sobre un paño verde" },
+    { "clave": "telescopio", "formato": "1:1", "estilo": "foto", "escena": "Telescopio pequeño sobre un trípode en una azotea al atardecer, cielo anaranjado y azul sin letreros" },
+    { "clave": "reloj-sol", "formato": "1:1", "estilo": "foto", "escena": "Reloj de sol de piedra en un jardín con la sombra de su aguja proyectada sobre el disco, plantas alrededor" }
+  ]
+}

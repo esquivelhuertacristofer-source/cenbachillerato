@@ -1,0 +1,12 @@
+{
+  "escena": "Un carrusel de situaciones: Diego ve nubes negras y truenos en la plaza y su globo de diálogo espera completar «It ___ soon».",
+  "pregunta": "Diego ve nubes negras y truenos. ¿Qué forma del verbo pondrá el globo en verde?",
+  "opciones": [
+    { "id": "a", "texto": "Will, porque se decide en el momento", "icono": "fa-bolt" },
+    { "id": "b", "texto": "Be going to, por la evidencia", "icono": "fa-cloud-showers-heavy" },
+    { "id": "c", "texto": "Presente simple, porque es un hábito", "icono": "fa-rotate" }
+  ],
+  "correcta": "b",
+  "porque": "Las nubes negras son evidencia que se ve ahora, así que la predicción lleva be going to: «It's going to rain soon». Will también es inglés correcto, pero el globo lo marca en ámbar por menos natural.",
+  "comoComprobarlo": "Elige «Predicción con evidencia a la vista» y prueba cada forma del verbo; mira el color y la marca del globo sobre Diego."
+}

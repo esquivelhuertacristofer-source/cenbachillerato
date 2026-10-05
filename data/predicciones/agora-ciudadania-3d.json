@@ -1,0 +1,12 @@
+{
+  "escena": "Una colonia decide el uso de un terreno baldío. Cada grupo de vecinos solo puede asistir si la convocatoria cumple lo que necesita: horario, cuidados, sede accesible, intérprete.",
+  "pregunta": "Con mayoría simple, ¿qué pasa con el resultado al marcar las cinco condiciones de la convocatoria?",
+  "opciones": [
+    { "id": "a", "texto": "Gana la misma, solo hay más asistentes", "icono": "fa-equals" },
+    { "id": "b", "texto": "Cambia la ganadora: llegan ausentes", "icono": "fa-people-group" },
+    { "id": "c", "texto": "Hay empate y se repite la votación", "icono": "fa-rotate" }
+  ],
+  "correcta": "b",
+  "porque": "Sin condiciones solo asisten los comerciantes y gana la opción B con 32 % de participación. Con las cinco, llegan todos los grupos y gana la opción C: quién puede asistir cambia lo que se decide.",
+  "comoComprobarlo": "En «Asamblea vecinal», caso del terreno y mayoría simple, celebra la asamblea sin marcar nada y otra vez con las cinco condiciones. Compara el ganador."
+}

@@ -25,6 +25,7 @@ import { T, NUM, OK, card, Eyebrow, SceneBoundary } from "./_kit";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { CompletaTexto } from "./_mecanica-huecos";
+import { LabShell, Bloque, Dato, BotonHerramienta, Deslizador } from "./_shell";
 import { LabSfx } from "./lab-audio";
 import { useEstrellas } from "@/lib/hooks/useEstrellas";
 import { CAVERNA_CONOCIMIENTO_FICHA } from "./caverna-conocimiento-ficha";
@@ -102,13 +103,14 @@ const CavernaScene = dynamic(() => import("./CavernaConocimientoScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-fire fa-fade" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Encendiendo el fuego de la caverna…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Encendiendo el fuego de la caverna…</span>
     </div>
   ),
 });
 
 const RETO_KEY = "cen-caverna-conocimiento-reto";
 const WARN = "#FF8A3C";
+const NO_COL = "#f87171";
 const RONDA_INICIAL = rondaFuentes(mulberry32(17));
 const POSE_INICIAL: Pose = { solido: "cubo", giro: 30, inclina: 0, objZ: OBJ_Z_INICIAL, fuegoX: 0, fuegoY: CUEVA.objetoY };
 const SIN_HALLAZGOS: Record<Silueta, Solido[]> = { cuadrado: [], circulo: [], triangulo: [] };
@@ -123,16 +125,32 @@ function IconoSilueta({ s, col, size = 22 }: { s: Silueta; col: string; size?: n
   );
 }
 
-function Deslizador({ etq, aria, valor, min, max, paso, texto, onChange, icono, col }: { etq: string; aria: string; valor: number; min: number; max: number; paso: number; texto: string; onChange: (v: number) => void; icono: string; col: string }) {
+/** Las cuatro formas de conocimiento apiladas: la del prisionero se enciende al subir. */
+function LineaDividida({ activa, hechas, etapa }: { activa: Forma; hechas: Set<number>; etapa: number }) {
+  const orden: Forma[] = ["noesis", "dianoia", "pistis", "eikasia"];
+  const etapaDe = (fm: Forma) => ETAPAS.findIndex((e) => e.forma === fm);
   return (
-    <label style={{ display: "grid", gridTemplateColumns: "118px minmax(0,1fr) 66px", alignItems: "center", gap: 10, marginTop: 8 }}>
-      <span style={{ fontSize: 11.5, color: T.text2, fontWeight: 800 }}>
-        <i className={`fa-solid ${icono}`} style={{ marginRight: 7, color: col }} />
-        {etq}
-      </span>
-      <input type="range" aria-label={aria} className="cav-range" min={min} max={max} step={paso} value={valor} onChange={(e) => onChange(Number(e.target.value))} style={{ ["--cavc" as string]: col }} />
-      <span style={{ textAlign: "right", fontSize: 12.5, color: "#fff", fontWeight: 800, ...NUM }}>{texto}</span>
-    </label>
+    <div style={{ display: "grid", gap: 6 }}>
+      {orden.map((id, k) => {
+        const fd = FORMAS.find((x) => x.id === id)!;
+        const inteligible = fd.region === "inteligible";
+        const aqui = id === activa;
+        const col = inteligible ? "#fde68a" : "#94a3b8";
+        return (
+          <div key={id}>
+            {(k === 0 || k === 2) && (
+              <div style={{ fontSize: 14, fontWeight: 900, color: col, margin: k === 0 ? "0 0 4px" : "8px 0 4px" }}>{inteligible ? "Conocimiento de lo inteligible" : "Opinión (dóxa): lo visible"}</div>
+            )}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "9px 12px", borderRadius: 10, border: `1px solid ${aqui ? col : "rgba(255,255,255,0.12)"}`, background: aqui ? `${col}22` : "rgba(4,10,22,0.4)", color: aqui ? "#fff" : "rgba(255,255,255,0.7)", fontSize: 14, fontWeight: 800 }}>
+              <span>{fd.etq}</span>
+              <span style={{ color: aqui ? col : hechas.has(etapaDe(id)) ? OK : "rgba(255,255,255,0.3)", whiteSpace: "nowrap" }}>
+                {aqui ? <><i className="fa-solid fa-person-hiking" style={{ marginRight: 6 }} />aquí · etapa {etapa + 1}</> : hechas.has(etapaDe(id)) ? <i className="fa-solid fa-circle-check" /> : ""}
+              </span>
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
@@ -178,15 +196,15 @@ function FuenteCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: str
           ¿De dónde viene lo que sabes?
         </Eyebrow>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 10.5, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
           {[1, 2, 3].map((k) => (
-            <i key={k} className="fa-solid fa-star" style={{ fontSize: 13, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
+            <i key={k} className="fa-solid fa-star" style={{ fontSize: 14, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
           ))}
         </div>
       </div>
       {resuelto === null ? (
         <>
-          <div style={{ fontSize: 11, color: T.text3, fontWeight: 800, marginBottom: 6 }}>Afirmación {pos + 1} de {ronda.length} · ¿de qué fuente proviene?</div>
+          <div style={{ fontSize: 14, color: T.text3, fontWeight: 800, marginBottom: 6 }}>Afirmación {pos + 1} de {ronda.length} · ¿de qué fuente proviene?</div>
           <div className="cav-afirmacion" style={{ fontSize: 15, color: "#fff", fontWeight: 800, lineHeight: 1.45, marginBottom: 12 }}>
             «{actual.texto}»
           </div>
@@ -198,9 +216,9 @@ function FuenteCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: str
               </button>
             ))}
           </div>
-          {aviso && <div style={{ marginTop: 10, fontSize: 12, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
+          {aviso && <div style={{ marginTop: 10, fontSize: 14, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
           {!aviso && anterior && (
-            <div style={{ marginTop: 10, fontSize: 12, color: OK, lineHeight: 1.5 }}>
+            <div style={{ marginTop: 10, fontSize: 14, color: OK, lineHeight: 1.5 }}>
               <i className="fa-solid fa-circle-check" style={{ marginRight: 7 }} />
               Anterior: {FUENTE_DEF[anterior.fuente].etq}. {anterior.porque}
             </div>
@@ -212,15 +230,15 @@ function FuenteCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: str
             {[1, 2, 3].map((k) => (
               <i key={k} className="fa-solid fa-star" style={{ fontSize: 15, color: k <= resuelto ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
             ))}
-            <span style={{ fontSize: 12.5, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
+            <span style={{ fontSize: 14, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
           </span>
-          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 12.5, fontWeight: 900 }}>
+          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 14, fontWeight: 900 }}>
             <i className="fa-solid fa-shuffle" style={{ marginRight: 8 }} />
             Otra ronda
           </button>
         </div>
       )}
-      <div style={{ marginTop: 12, fontSize: 11, color: T.text3, lineHeight: 1.5 }}>
+      <div style={{ marginTop: 12, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
         Percepción: {FUENTE_DEF.percepcion.que} Razón: {FUENTE_DEF.razon.que} Testimonio: {FUENTE_DEF.testimonio.que} Autoridad: {FUENTE_DEF.autoridad.que}
       </div>
     </div>
@@ -242,6 +260,7 @@ export function LabCavernaConocimiento({ color }: PracticaLabProps) {
   const [ojo, setOjo] = useState(false);
   const [hallazgos, setHallazgos] = useState<Record<Silueta, Solido[]>>(SIN_HALLAZGOS);
   const [duplico, setDuplico] = useState(false);
+  const [movioPose, setMovioPose] = useState(false);
 
   // ── Ascenso
   const [etapa, setEtapa] = useState(0);
@@ -277,7 +296,6 @@ export function LabCavernaConocimiento({ color }: PracticaLabProps) {
 
   // ── Comunes
   const [resetNonce, setResetNonce] = useState(0);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   const { mejorEstrellas, registraEstrellas: guardaEstrellas } = useEstrellas(RETO_KEY);
@@ -340,6 +358,7 @@ export function LabCavernaConocimiento({ color }: PracticaLabProps) {
   const cambiarPose = (parcial: Partial<Pose>) => {
     const nueva = { ...pose, ...parcial };
     setPose(nueva);
+    setMovioPose(true);
     registrar(nueva, silueta);
   };
   const elegirSilueta = (s: Silueta) => {
@@ -442,18 +461,19 @@ export function LabCavernaConocimiento({ color }: PracticaLabProps) {
   };
 
   /* ── Objetivos ─────────────────────────────────────────────────────── */
-  const objetivos: { t: string; done: boolean }[] = [
-    { t: "Encontrar dos objetos distintos que proyecten la misma sombra", done: dosObjetos },
-    { t: "Descubrir dos objetos para cada una de las tres sombras", done: tresSombras },
-    { t: "Hacer una sombra dos veces más grande acercando el objeto al fuego", done: duplico },
-    { t: "Acompañar al prisionero liberado hasta el Sol e identificar las cuatro formas de conocimiento", done: etapasOk.size === ETAPAS.length },
-    { t: "Predecir desde la mirilla y medir a Ana y a Beto con la regla", done: prediccion !== null && regla },
-    { t: "Rodear la habitación de Ames y explicar por qué engaña a la percepción", done: rodeo && explicOk && fuentesComprobadas && fuentesCorrectas },
-    { t: "Llevar una creencia hasta el conocimiento (verdadera y justificada)", done: logroConocimiento },
-    { t: "Analizar el reloj parado: ¿conocimiento o suerte?", done: relojOk },
-    { t: "Clasificar afirmaciones por su fuente y ganar estrellas", done: identifico },
-    { t: "Aprobar el quiz evaluable (A2)", done: quizAprobado },
-    { t: "Completar el texto (A6)", done: textoOk },
+  const objetivos: { txt: string; done: boolean }[] = [
+    { txt: "Gira, inclina o acerca la figura al fuego y mira cómo cambia su sombra en la pared", done: movioPose },
+    { txt: "Encontrar dos objetos distintos que proyecten la misma sombra", done: dosObjetos },
+    { txt: "Descubrir dos objetos para cada una de las tres sombras", done: tresSombras },
+    { txt: "Hacer una sombra dos veces más grande acercando el objeto al fuego", done: duplico },
+    { txt: "Acompañar al prisionero liberado hasta el Sol e identificar las cuatro formas de conocimiento", done: etapasOk.size === ETAPAS.length },
+    { txt: "Predecir desde la mirilla y medir a Ana y a Beto con la regla", done: prediccion !== null && regla },
+    { txt: "Rodear la habitación de Ames y explicar por qué engaña a la percepción", done: rodeo && explicOk && fuentesComprobadas && fuentesCorrectas },
+    { txt: "Llevar una creencia hasta el conocimiento (verdadera y justificada)", done: logroConocimiento },
+    { txt: "Analizar el reloj parado: ¿conocimiento o suerte?", done: relojOk },
+    { txt: "Clasificar afirmaciones por su fuente y ganar estrellas", done: identifico },
+    { txt: "Aprobar el quiz evaluable (A2)", done: quizAprobado },
+    { txt: "Completar el texto (A6)", done: textoOk },
   ];
 
   /* ── Visor ─────────────────────────────────────────────────────────── */
@@ -484,13 +504,13 @@ export function LabCavernaConocimiento({ color }: PracticaLabProps) {
         <i className={`fa-solid ${def.icono}`} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{def.etq}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los resultados siguen aquí. {pie}</div>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los resultados siguen aquí. {pie}</div>
     </div>
   );
 
-  const subt = (txt: string) => <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
+  const subt = (txt: string) => <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
   const nota = (txt: ReactNode, col: string, icono = "fa-circle-info") => (
-    <div style={{ marginTop: 10, fontSize: 12, lineHeight: 1.55, color: col }}>
+    <div style={{ marginTop: 10, fontSize: 14, lineHeight: 1.55, color: col }}>
       <i className={`fa-solid ${icono}`} style={{ marginRight: 7 }} />
       {txt}
     </div>
@@ -527,7 +547,7 @@ export function LabCavernaConocimiento({ color }: PracticaLabProps) {
                 <button key={s.id} className="cav-opt cav-silueta" data-on={on} data-silueta={s.id} onClick={() => elegirSilueta(s.id)} style={{ ["--cavc" as string]: modoCol, background: on ? `${modoCol}1f` : "transparent", display: "inline-flex", alignItems: "center", gap: 8 }}>
                   <IconoSilueta s={s.id} col={on ? "#fef3c7" : "rgba(255,255,255,0.55)"} size={18} />
                   {s.etq}
-                  <span style={{ fontSize: 10.5, color: n >= 2 ? OK : T.text3, ...NUM }}>
+                  <span style={{ fontSize: 14, color: n >= 2 ? OK : T.text3, ...NUM }}>
                     {Math.min(n, 2)}/2{n >= 2 && <i className="fa-solid fa-circle-check" style={{ marginLeft: 5 }} />}
                   </span>
                 </button>
@@ -548,23 +568,23 @@ export function LabCavernaConocimiento({ color }: PracticaLabProps) {
               );
             })}
           </div>
-          <div style={{ fontSize: 11, color: T.text3, marginTop: 6 }}>Figura de madera: {solidoDef.detalle}.</div>
-          <Deslizador etq="Girar" aria="Girar el objeto (°)" valor={pose.giro} min={0} max={180} paso={5} texto={`${pose.giro}°`} onChange={(v) => cambiarPose({ giro: v })} icono="fa-rotate" col={modoCol} />
-          <Deslizador etq="Inclinar" aria="Inclinar hacia el fuego (°)" valor={pose.inclina} min={0} max={90} paso={5} texto={`${pose.inclina}°`} onChange={(v) => cambiarPose({ inclina: v })} icono="fa-arrows-up-down" col={modoCol} />
-          <Deslizador etq="Acercar al fuego" aria="Distancia al tabique (m)" valor={pose.objZ} min={OBJ_Z_MIN} max={OBJ_Z_MAX} paso={0.1} texto={`×${num(aumRel, 2)}`} onChange={(v) => cambiarPose({ objZ: v })} icono="fa-arrows-left-right" col="#fb923c" />
+          <div style={{ fontSize: 14, color: T.text3, marginTop: 6 }}>Figura de madera: {solidoDef.detalle}.</div>
+          <Deslizador label="Girar" icon="fa-rotate" colr={modoCol} valor={`${pose.giro}°`} min={0} max={180} step={5} value={pose.giro} onChange={(v) => cambiarPose({ giro: v })} />
+          <Deslizador label="Inclinar" icon="fa-arrows-up-down" colr={modoCol} valor={`${pose.inclina}°`} min={0} max={90} step={5} value={pose.inclina} onChange={(v) => cambiarPose({ inclina: v })} />
+          <Deslizador label="Acercar al fuego" icon="fa-arrows-left-right" colr={"#fb923c"} valor={`×${num(aumRel, 2)}`} min={OBJ_Z_MIN} max={OBJ_Z_MAX} step={0.1} value={pose.objZ} onChange={(v) => cambiarPose({ objZ: v })} />
           {subt("3 · Mueve el fuego")}
-          <Deslizador etq="Altura" aria="Altura del fuego (m)" valor={pose.fuegoY} min={FUEGO_Y_MIN} max={FUEGO_Y_MAX} paso={0.1} texto={`${num(pose.fuegoY, 1)} m`} onChange={(v) => cambiarPose({ fuegoY: v })} icono="fa-fire" col="#fb923c" />
-          <Deslizador etq="Hacia un lado" aria="Posición lateral del fuego (m)" valor={pose.fuegoX} min={-FUEGO_X_MAX} max={FUEGO_X_MAX} paso={0.1} texto={`${num(pose.fuegoX, 1)} m`} onChange={(v) => cambiarPose({ fuegoX: v })} icono="fa-left-right" col="#fb923c" />
+          <Deslizador label="Altura" icon="fa-fire" colr={"#fb923c"} valor={`${num(pose.fuegoY, 1)} m`} min={FUEGO_Y_MIN} max={FUEGO_Y_MAX} step={0.1} value={pose.fuegoY} onChange={(v) => cambiarPose({ fuegoY: v })} />
+          <Deslizador label="Hacia un lado" icon="fa-left-right" colr={"#fb923c"} valor={`${num(pose.fuegoX, 1)} m`} min={-FUEGO_X_MAX} max={FUEGO_X_MAX} step={0.1} value={pose.fuegoX} onChange={(v) => cambiarPose({ fuegoX: v })} />
           <div style={{ marginTop: 12, padding: "10px 12px", borderRadius: 11, border: `1px solid ${coincide ? OK : T.line}`, background: coincide ? "rgba(52,211,153,0.08)" : "rgba(4,10,22,0.4)" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-              <span style={{ fontSize: 12, color: T.text2, fontWeight: 800 }}>Coincidencia de forma con {sil.etq.toLowerCase()}</span>
+              <span style={{ fontSize: 14, color: T.text2, fontWeight: 800 }}>Coincidencia de forma con {sil.etq.toLowerCase()}</span>
               <span className="cav-coinc" style={{ fontSize: 15, fontWeight: 900, color: coincide ? OK : "#fff", ...NUM }}>{num(coinc * 100)} %</span>
             </div>
             <div style={{ height: 6, borderRadius: 4, background: "rgba(255,255,255,0.08)", marginTop: 7, position: "relative", overflow: "hidden" }}>
               <div style={{ position: "absolute", inset: 0, width: `${Math.max(0, Math.min(100, coinc * 100))}%`, background: coincide ? OK : modoCol, transition: "width .2s" }} />
               <div style={{ position: "absolute", top: 0, bottom: 0, left: `${UMBRAL_MISMA * 100}%`, width: 2, background: "#fff" }} />
             </div>
-            <div style={{ fontSize: 11, color: T.text3, marginTop: 6, lineHeight: 1.45 }}>
+            <div style={{ fontSize: 14, color: T.text3, marginTop: 6, lineHeight: 1.45 }}>
               Se compara la forma sin importar tamaño ni lugar: la sombra y la silueta se llevan a la misma área y se mide qué parte comparten. Desde {num(UMBRAL_MISMA * 100)} % son indistinguibles a simple vista.
             </div>
           </div>
@@ -590,12 +610,12 @@ export function LabCavernaConocimiento({ color }: PracticaLabProps) {
             ))}
           </div>
           <div style={{ marginTop: 10, padding: "12px 14px", borderRadius: 12, border: `1px solid ${modoCol}55`, background: "rgba(4,10,22,0.45)" }}>
-            <div style={{ fontSize: 11, fontWeight: 900, color: modoCol, marginBottom: 4 }}>{et.pasaje}</div>
-            <div style={{ fontSize: 13, color: "#fff", lineHeight: 1.5 }}>{et.narra}</div>
+            <div style={{ fontSize: 14, fontWeight: 900, color: modoCol, marginBottom: 4 }}>{et.pasaje}</div>
+            <div style={{ fontSize: 14, color: "#fff", lineHeight: 1.5 }}>{et.narra}</div>
           </div>
           {et.brillo > 0 && (
             <>
-              <Deslizador etq="Acostumbrar la vista" aria="Acostumbrar la vista (%)" valor={adapta} min={0} max={100} paso={5} texto={`${adapta} %`} onChange={(v) => setAdapta(v)} icono="fa-eye" col="#fde68a" />
+              <Deslizador label="Acostumbrar la vista" icon="fa-eye" colr={"#fde68a"} valor={`${adapta} %`} min={0} max={100} step={5} value={adapta} onChange={(v) => setAdapta(v)} />
               {!puedeVer && nota("La luz lo deslumbra: todavía no distingue nada. Platón insiste en que hace falta tiempo para acostumbrarse (515e–516a).", "#fde68a", "fa-sun")}
             </>
           )}
@@ -609,7 +629,7 @@ export function LabCavernaConocimiento({ color }: PracticaLabProps) {
               return (
                 <button key={f.id} className="cav-opt cav-forma" data-on={on || (hecho && bien)} data-forma={f.id} onClick={() => clasificar(f.id)} disabled={hecho} style={{ ["--cavc" as string]: col, textAlign: "left", background: on || (hecho && bien) ? `${col}1f` : "transparent" }}>
                   <span style={{ fontWeight: 900 }}>{f.etq}</span> <span style={{ color: T.text3, fontWeight: 700 }}>({f.griego})</span>
-                  <div style={{ fontSize: 11, color: T.text2, fontWeight: 600, marginTop: 3 }}>{f.que}</div>
+                  <div style={{ fontSize: 14, color: T.text2, fontWeight: 600, marginTop: 3 }}>{f.que}</div>
                 </button>
               );
             })}
@@ -626,7 +646,7 @@ export function LabCavernaConocimiento({ color }: PracticaLabProps) {
             </button>
           </div>
           {etapasOk.size === ETAPAS.length && nota(<>Las dos primeras formas son opinión (dóxa); las dos últimas, conocimiento de lo inteligible (533e–534a). {REGRESO}</>, OK, "fa-lightbulb")}
-          <div style={{ marginTop: 10, fontSize: 11, color: T.text3, lineHeight: 1.5 }}>
+          <div style={{ marginTop: 10, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
             Platón pide aplicar la imagen de la caverna a lo dicho antes sobre la línea (517b). La correspondencia etapa por etapa es la lectura más difundida entre los comentaristas, no una tabla que él escriba literalmente.
           </div>
         </>
@@ -648,7 +668,7 @@ export function LabCavernaConocimiento({ color }: PracticaLabProps) {
             </button>
           ))}
         </div>
-        <Deslizador etq="Punto de vista" aria="Punto de vista (%)" valor={vistaAmes} min={0} max={100} paso={1} texto={vistaAmes <= 5 ? "mirilla" : `${vistaAmes} %`} onChange={cambiarVistaAmes} icono="fa-camera" col={modoCol} />
+        <Deslizador label="Punto de vista" icon="fa-camera" colr={modoCol} valor={vistaAmes <= 5 ? "mirilla" : `${vistaAmes} %`} min={0} max={100} step={1} value={vistaAmes} onChange={cambiarVistaAmes} />
         {subt("1 · Desde la mirilla, ¿quién es más alto?")}
         <div className="cav-opts">
           {PREDICCIONES.map((pr) => (
@@ -674,7 +694,7 @@ export function LabCavernaConocimiento({ color }: PracticaLabProps) {
         </button>
         {regla && nota(`Miden lo mismo. Por la mirilla Ana ocupa ${num(ana.angulo, 1)}° de tu vista y Beto ${num(beto.angulo, 1)}°: la diferencia está en la distancia, no en la estatura. Rodea la habitación para ver por qué.`, OK, "fa-ruler")}
         {subt("3 · Pide a Beto que camine hacia la derecha (míralo por la mirilla)")}
-        <Deslizador etq="Beto camina" aria="Posición de Beto a lo largo del muro" valor={betoX} min={AMES.xBetoMin} max={AMES.xBetoMax} paso={0.05} texto={`${num(beto.distancia, 1)} m`} onChange={moverBeto} icono="fa-person-walking" col="#60a5fa" />
+        <Deslizador label="Beto camina" icon="fa-person-walking" colr={"#60a5fa"} valor={`${num(beto.distancia, 1)} m`} min={AMES.xBetoMin} max={AMES.xBetoMax} step={0.05} value={betoX} onChange={moverBeto} />
         {nota(`Beto parece medir ${num(beto.aparente, 2)} m ${enMirilla ? "(visto por la mirilla)" : "si el cuarto fuera rectangular"}. ${paseo ? "Viste cómo «crecía» al acercarse a la esquina derecha sin cambiar de estatura." : ""}`, paseo ? OK : T.text2, "fa-person")}
         {subt("4 · ¿Por qué engaña?")}
         <div style={{ display: "grid", gap: 7, opacity: rodeo && regla ? 1 : 0.45, pointerEvents: rodeo && regla ? "auto" : "none" }}>
@@ -732,7 +752,7 @@ export function LabCavernaConocimiento({ color }: PracticaLabProps) {
           ))}
         </div>
         <div style={{ marginTop: 12, padding: "12px 14px", borderRadius: 12, background: "rgba(248,250,252,0.05)", border: `1px solid ${T.line}` }}>
-          <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>{caso.contexto}</div>
+          <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.45 }}>{caso.contexto}</div>
           <div style={{ fontSize: 14.5, color: "#fff", fontWeight: 900, marginTop: 6 }}>«{caso.afirmacion}»</div>
         </div>
         {subt("1 · Tu veredicto (creencia)")}
@@ -756,11 +776,11 @@ export function LabCavernaConocimiento({ color }: PracticaLabProps) {
                   <i className={`fa-solid ${on ? "fa-square-check" : "fa-square"}`} style={{ marginTop: 2, color: on ? fd.color : "rgba(255,255,255,0.35)" }} />
                   <span style={{ minWidth: 0 }}>
                     {e.texto}
-                    <span style={{ display: "block", fontSize: 10.5, color: fd.color, marginTop: 3 }}>
+                    <span style={{ display: "block", fontSize: 14, color: fd.color, marginTop: 3 }}>
                       <i className={`fa-solid ${fd.icono}`} style={{ marginRight: 5 }} />
                       {fd.etq}
                     </span>
-                    {verificado && on && <span style={{ display: "block", fontSize: 11, color: malo ? WARN : T.text2, fontWeight: 600, marginTop: 4 }}>{e.explica}</span>}
+                    {verificado && on && <span style={{ display: "block", fontSize: 14, color: malo ? WARN : T.text2, fontWeight: 600, marginTop: 4 }}>{e.explica}</span>}
                   </span>
                 </span>
               </button>
@@ -776,9 +796,9 @@ export function LabCavernaConocimiento({ color }: PracticaLabProps) {
           </>
         )}
         <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-          <span style={{ fontSize: 12, color: T.text2, fontWeight: 800 }}>Escalón:</span>
+          <span style={{ fontSize: 14, color: T.text2, fontWeight: 800 }}>Escalón:</span>
           {NIVELES.map((n, i) => (
-            <span key={i} style={{ fontSize: 11, fontWeight: 800, padding: "4px 8px", borderRadius: 7, border: `1px solid ${i === just.nivel && veredicto ? modoCol : T.line}`, color: i === just.nivel && veredicto ? "#fff" : T.text3, background: i === just.nivel && veredicto ? `${modoCol}26` : "transparent" }}>
+            <span key={i} style={{ fontSize: 14, fontWeight: 800, padding: "4px 8px", borderRadius: 7, border: `1px solid ${i === just.nivel && veredicto ? modoCol : T.line}`, color: i === just.nivel && veredicto ? "#fff" : T.text3, background: i === just.nivel && veredicto ? `${modoCol}26` : "transparent" }}>
               {i} {n.etq}
             </span>
           ))}
@@ -796,12 +816,12 @@ export function LabCavernaConocimiento({ color }: PracticaLabProps) {
                 <div className="cav-resultado" style={{ fontSize: 14, fontWeight: 900, color: RESULTADO_DEF[res].color }}>
                   {RESULTADO_DEF[res].etq}
                 </div>
-                <div style={{ fontSize: 12.5, color: "#fff", lineHeight: 1.5, marginTop: 4 }}>
+                <div style={{ fontSize: 14, color: "#fff", lineHeight: 1.5, marginTop: 4 }}>
                   {caso.id === "volado" && moneda ? `Cayó ${moneda === "aguila" ? "águila" : "sol"}. ` : ""}
                   {caso.id === "censo" ? "El Censo 2020 contó 126 014 024 habitantes: la afirmación corresponde a los hechos. " : ""}
                   {RESULTADO_DEF[res].explica}
                 </div>
-                {caso.id === "volado" && veredicto === "nosabe" && res === "conocimiento" && <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5, marginTop: 6 }}>Lo que sabías era justamente que el resultado no podía saberse: probabilidad 1/2. Reconocer los límites de lo que sabes también es conocimiento.</div>}
+                {caso.id === "volado" && veredicto === "nosabe" && res === "conocimiento" && <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5, marginTop: 6 }}>Lo que sabías era justamente que el resultado no podía saberse: probabilidad 1/2. Reconocer los límites de lo que sabes también es conocimiento.</div>}
               </div>
               {res === "gettier" && (
                 <>
@@ -833,7 +853,7 @@ export function LabCavernaConocimiento({ color }: PracticaLabProps) {
             </>
           )
         )}
-        <div style={{ marginTop: 12, fontSize: 11, color: T.text3, lineHeight: 1.5 }}>
+        <div style={{ marginTop: 12, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
           Criterio del laboratorio (didáctico): una razón sólida sube a «creencia fundada»; dos sólidas de fuentes distintas y ninguna engañosa, a «creencia justificada». Pregunta del video A8: {PREGUNTA_A8}
         </div>
       </>
@@ -842,346 +862,219 @@ export function LabCavernaConocimiento({ color }: PracticaLabProps) {
 
   const deslumbraVisor = modo === "caverna" && sub === "ascenso" ? deslumbra : 0;
 
+  const verdadVal = res ? (res !== "falsa" && res !== "errorJustificado" ? "sí" : "no") : "?";
+  const extra: ReactNode =
+    modo === "caverna" && sub === "ascenso" ? (
+      <Bloque titulo="Línea dividida: dónde está el prisionero" icono="fa-layer-group">
+        <LineaDividida activa={et.forma} hechas={etapasOk} etapa={etapa} />
+      </Bloque>
+    ) : modo === "escalera" ? (
+      <Bloque titulo="Las tres condiciones del conocimiento" icono="fa-stairs">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+          <Dato label="Creencia" value={veredicto ? "sí" : "aún no"} col={veredicto ? OK : "#94a3b8"} />
+          <Dato label="Justificación" value={veredicto ? `escalón ${just.nivel} de 3` : "—"} col={veredicto && just.nivel === 3 ? OK : "#94a3b8"} />
+          <Dato label="Verdad" value={verdadVal} col={verdadVal === "sí" ? OK : verdadVal === "no" ? NO_COL : "#94a3b8"} />
+          <Dato label="Resultado" value={res ? RESULTADO_DEF[res].etq : "sin verificar"} col={res ? RESULTADO_DEF[res].color : "#94a3b8"} />
+        </div>
+      </Bloque>
+    ) : null;
+
+  const css = `
+    .cav-opts { display:flex; flex-wrap:wrap; gap:8px; }
+    .cav-opt { cursor:pointer; border:1px solid var(--cavc); border-radius:10px; padding:10px 12px; font-size:14px; font-weight:800; color:#fff; background:transparent; transition:all .15s; line-height:1.4; }
+    .cav-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.78); }
+    .cav-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
+    .cav-opt:disabled { cursor:default; }
+    .cav-opt:disabled[data-on="false"] { opacity:0.55; }
+    .cav-toggle { width:100%; cursor:pointer; border:1px solid var(--cavc); border-radius:11px; padding:12px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:14px; font-weight:900; text-align:left; transition:all .15s; }
+    .cav-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
+    .cav-toggle:disabled { cursor:default; opacity:0.7; }
+    .cav-linea { display:flex; align-items:center; gap:0; }
+    .cav-punto { cursor:pointer; flex:1; height:16px; border:none; background:transparent; position:relative; padding:0; }
+    .cav-punto::before { content:""; position:absolute; left:0; right:0; top:7px; height:2px; background:rgba(255,255,255,0.14); }
+    .cav-punto::after { content:""; position:absolute; left:50%; top:1px; width:14px; height:14px; margin-left:-7px; border-radius:50%; border:2px solid var(--cavc); background:#06121e; transition:all .2s; }
+    .cav-punto[data-estado="hecho"]::after { background:var(--cavc); }
+    .cav-punto[data-estado="actual"]::after { background:var(--cavc); box-shadow:0 0 0 4px rgba(255,255,255,0.12); transform:scale(1.25); }
+    .cav-opt:focus-visible, .cav-toggle:focus-visible, .cav-punto:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
+    .cav-glare { position:absolute; inset:0; pointer-events:none; transition:opacity .35s ease; background:radial-gradient(90% 80% at 55% 38%, #fffef5 0%, #fff7d6 45%, rgba(255,240,200,0.92) 100%); }
+    .cav-guia summary { cursor:pointer; color:${accent}; font-weight:800; }
+  `;
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes cavPulse { 0%,100%{ box-shadow:0 0 0 0 var(--cavd); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .cav-live-dot { animation: cavPulse 1.6s ease-in-out infinite; }
-        @media (prefers-reduced-motion: reduce){ .cav-live-dot { animation:none; } }
-        .cav-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .cav-grid { grid-template-columns: 1fr; } }
-        .cav-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .cav-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .cav-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .cav-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .cav-tab { cursor:pointer; border:1px solid var(--cavc); border-radius:12px; padding:11px 8px; text-align:center; background:transparent; transition:all .15s; color:#fff; }
-        .cav-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
-        .cav-tab:hover { background:rgba(255,255,255,0.06); }
-        .cav-opts { display:flex; flex-wrap:wrap; gap:7px; }
-        .cav-opt { cursor:pointer; border:1px solid var(--cavc); border-radius:10px; padding:9px 12px; font-size:12px; font-weight:800; color:#fff; background:transparent; transition:all .15s; line-height:1.4; }
-        .cav-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.78); }
-        .cav-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
-        .cav-opt:disabled { cursor:default; }
-        .cav-opt:disabled[data-on="false"] { opacity:0.55; }
-        .cav-toggle { width:100%; cursor:pointer; border:1px solid var(--cavc); border-radius:11px; padding:11px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:12.5px; font-weight:900; text-align:left; transition:all .15s; }
-        .cav-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
-        .cav-toggle:disabled { cursor:default; opacity:0.7; }
-        .cav-range { width:100%; accent-color: var(--cavc); }
-        .cav-linea { display:flex; align-items:center; gap:0; }
-        .cav-punto { cursor:pointer; flex:1; height:12px; border:none; background:transparent; position:relative; padding:0; }
-        .cav-punto::before { content:""; position:absolute; left:0; right:0; top:5px; height:2px; background:rgba(255,255,255,0.14); }
-        .cav-punto::after { content:""; position:absolute; left:50%; top:0; width:12px; height:12px; margin-left:-6px; border-radius:50%; border:2px solid var(--cavc); background:#06121e; transition:all .2s; }
-        .cav-punto[data-estado="hecho"]::after { background:var(--cavc); }
-        .cav-punto[data-estado="actual"]::after { background:var(--cavc); box-shadow:0 0 0 4px rgba(255,255,255,0.12); transform:scale(1.25); }
-        .cav-opt:focus-visible, .cav-tab:focus-visible, .cav-toggle:focus-visible, .cav-icobtn:focus-visible, .cav-range:focus-visible, .cav-punto:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
-        @media (max-width: 1000px){ .cav-bottom { grid-template-columns: 1fr !important; } }
-        .cav-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .cav-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .cav-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61; background:linear-gradient(180deg,#06121e 0%,#040a16 100%);
-          border-left:1px solid rgba(${color.rgba},0.32); box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1); display:flex; flex-direction:column; }
-        .cav-drawer[data-open="true"] { transform:translateX(0); }
-        .cav-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .cav-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .cav-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .cav-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .cav-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:11px 16px; border-radius:999px;
-          border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800; background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
-        .cav-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        .cav-glare { position:absolute; inset:0; pointer-events:none; transition:opacity .35s ease; background:radial-gradient(90% 80% at 55% 38%, #fffef5 0%, #fff7d6 45%, rgba(255,240,200,0.92) 100%); }
-        .cav-guia summary { cursor:pointer; color:${accent}; font-weight:800; }
-      `}</style>
-
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="cav-tabs">
-          {MODOS.map((m) => {
-            const d = MODOS_DEF[m];
-            const col = `#${d.color.replace("#", "")}`;
-            const on = m === modo;
-            return (
-              <button key={m} className="cav-tab" data-on={on} onClick={() => cambiarModo(m)} style={{ ["--cavc" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? col : "inherit" }}>
-                  <i className={`fa-solid ${d.icono}`} />
-                </div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{d.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{d.subtitulo}</div>
-              </button>
-            );
-          })}
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <div style={{ position: "relative", height: "100%" }}>
+          <style>{css}</style>
+          <SceneBoundary fallback={sceneFallback}>
+            <CavernaScene
+              vista={vista}
+              modoColor={modoCol}
+              resetNonce={resetNonce}
+              pose={pose}
+              silueta={silueta}
+              coincide={coincide}
+              ojoPrisionero={ojo}
+              etapa={etapa}
+              vistaAmes={vistaAmes / 100}
+              betoX={betoX}
+              regla={regla}
+              casoId={caso.id}
+              veredicto={veredicto}
+              elegidas={elegidas}
+              nivel={veredicto ? just.nivel : 0}
+              verificado={verificado}
+              moneda={moneda}
+              resultado={res}
+            />
+          </SceneBoundary>
+          <div className="cav-glare" style={{ opacity: deslumbraVisor }} />
         </div>
-      </div>
-
-      <div className="cav-grid">
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 58vh, 660px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <CavernaScene
-                vista={vista}
-                modoColor={modoCol}
-                resetNonce={resetNonce}
-                pose={pose}
-                silueta={silueta}
-                coincide={coincide}
-                ojoPrisionero={ojo}
-                etapa={etapa}
-                vistaAmes={vistaAmes / 100}
-                betoX={betoX}
-                regla={regla}
-                casoId={caso.id}
-                veredicto={veredicto}
-                elegidas={elegidas}
-                nivel={veredicto ? just.nivel : 0}
-                verificado={verificado}
-                moneda={moneda}
-                resultado={res}
-              />
-            </SceneBoundary>
-
-            <div className="cav-glare" style={{ opacity: deslumbraVisor }} />
-
-            <div style={{ position: "absolute", top: 14, left: 16, right: 150, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, pointerEvents: "none" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)", maxWidth: "100%" }}>
-                <span className="cav-live-dot" style={{ ["--cavd" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol, flexShrink: 0 }} />
-                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3, flexShrink: 0 }}>EN VIVO</span>
-                <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)", flexShrink: 0 }} />
-                <span className="cav-chip" style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", ...NUM }}>
-                  {chipVivo}
-                </span>
-              </div>
-            </div>
-
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="cav-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría" aria-label="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="cav-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"} aria-label={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="cav-icobtn" onClick={reiniciar} title="Reiniciar" aria-label="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 132px 14px 18px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                {def.etq} — {def.subtitulo}
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6, ...NUM }}>{pie}</div>
-            </div>
-
-            <button className="cav-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-          </div>
-
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-              Controles — {def.etq}
-            </Eyebrow>
-            <div style={{ marginTop: 12 }}>{control}</div>
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-fire" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>¿Lo sé o lo creo?</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #7dd3fc55", background: "rgba(125,211,252,0.07)" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book-open" style={{ marginRight: 8, color: "#7dd3fc" }} />
-              Lectura A1
-            </Eyebrow>
-            <div style={{ fontSize: 13, color: "#fff", fontWeight: 800, lineHeight: 1.4, marginBottom: 10 }}>{TITULO_A1}</div>
-            <div style={{ display: "grid", gap: 9, marginBottom: 12 }}>
-              {LECTURA_A1.map((p, i) => (
-                <div key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>
-                  {p}
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", marginBottom: 8 }}>PARA REFLEXIONAR</div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {PREGUNTAS_A1.map((q, i) => (
-                <details key={i} className="cav-guia" style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  <summary>{q.pregunta}</summary>
-                  <div style={{ marginTop: 5, paddingLeft: 12 }}>{q.guia}</div>
-                </details>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />
-              Cómo usar el laboratorio
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-                Objetivos de la sesión
-              </Eyebrow>
-              <span className="cav-objetivos" style={{ fontSize: 11, fontWeight: 800, color: objetivos.every((o) => o.done) ? OK : T.text3 }}>
-                {objetivos.filter((o) => o.done).length}/{objetivos.length}
-              </span>
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ marginTop: 2, fontSize: 13, color: o.done ? OK : "rgba(255,255,255,0.22)" }} />
-                  <span style={{ fontSize: 12, color: o.done ? "#fff" : T.text2, lineHeight: 1.4 }}>{o.t}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="cav-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />
-            Hechos (quiz A4)
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-            {HECHOS.map((h, i) => (
-              <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
-                <strong style={{ color: h.respuesta ? OK : WARN }}>{h.respuesta ? "Verdadero" : "Falso"}:</strong> «{h.enunciado}» {h.retro}
-              </li>
-            ))}
-          </ul>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />
-              Glosario (A5)
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {GLOSARIO.map((gi, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{gi.termino}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
-                  <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.4, marginTop: 4 }}>
-                    <i className="fa-solid fa-quote-left" style={{ marginRight: 6, color: accent }} />
-                    {gi.ejemplo}
+      }
+      modos={{ opciones: MODOS.map((m) => ({ id: m, etiqueta: MODOS_DEF[m].etq, icono: MODOS_DEF[m].icono })), valor: modo, cambiar: (id) => cambiarModo(id as Modo) }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+        </>
+      }
+      lectura={chipVivo}
+      objetivos={objetivos}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Controles",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              <Bloque titulo={`Qué pasa · ${def.etq}`} icono="fa-eye">
+                <div style={{ padding: "10px 12px", borderRadius: 12, border: `1px solid ${modoCol}44`, background: `${modoCol}12`, color: "#fff", lineHeight: 1.5 }}>
+                  <div style={{ fontWeight: 900, color: modoCol, marginBottom: 4 }}>
+                    <i className={`fa-solid ${def.icono}`} style={{ marginRight: 8 }} />
+                    {chipVivo}
                   </div>
+                  {pie}
                 </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11.5, color: T.text2, marginTop: 10 }}>
-              <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A5}
-            </div>
-          </div>
-          <div style={{ marginTop: 16, padding: "14px 16px", borderRadius: 12, border: `1px solid ${accent}33`, background: `rgba(${color.rgba},0.07)` }}>
-            <Eyebrow>
-              <i className="fa-solid fa-pen-nib" style={{ marginRight: 8, color: accent }} />
-              Para escribir (reflexión A3)
-            </Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{REFLEXION_A3}</div>
-          </div>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
-          <div style={{ ...card, padding: "18px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-              Ideas clave
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-              {IDEAS.map((x, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  {x}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div style={{ ...card, padding: "18px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-clipboard-check" style={{ marginRight: 8, color: accent }} />
-              Autoevaluación (A7)
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {AUTOEVALUACION_A7.map((x, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  {x}
-                </li>
-              ))}
-            </ul>
-            <div style={{ fontSize: 11.5, color: T.text2, marginTop: 10 }}>
-              <strong style={{ color: "#fff" }}>Para cerrar:</strong> {REFLEXION_FINAL_A7}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          La lectura A1 y sus preguntas, el quiz A2, la reflexión A3, los hechos del quiz A4, el glosario A5, el texto A6, la autoevaluación A7 y la pregunta del video A8 son <strong>verbatim</strong> del
-          material de la plataforma. Las sombras se <strong>calculan</strong> proyectando desde el fuego cada punto de la figura sobre la pared; la coincidencia de forma es un criterio del laboratorio. La
-          alegoría se resume, no se cita literalmente (Platón, <em>República</em> VII, 514a–517c; línea dividida en VI, 509d–511e). La habitación de Ames (Adelbert Ames Jr., 1946) se construye con una
-          transformación proyectiva exacta; sus medidas son <strong>ilustrativas</strong>. Los casos de la escalera son <strong>ejemplos didácticos</strong>, salvo el dato del Censo de Población y Vivienda
-          2020 del INEGI (126 014 024 habitantes) y el reloj parado de Bertrand Russell (<em>Human Knowledge</em>, 1948). Fuente: {FUENTE}
-        </span>
-      </div>
-
-      <FuenteCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
-
-      <RetoQuizCard quiz={QUIZ_A2} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Sabes distinguir las fuentes y el problema de la verdad." />
-
-      <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
-          Completa el texto (A6)
-        </Eyebrow>
-        <div style={{ marginTop: 12 }}>
-          <CompletaTexto data={HUECOS_A6} accent={accent} rgba={color.rgba} completado={textoOk} onCompletado={() => { setTextoOk(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
-        </div>
-      </div>
-
-      <div className="cav-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="cav-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="cav-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="cav-close" onClick={() => setDrawer(false)} title="Cerrar" aria-label="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="cav-drawer-body">
-          <FichaTeorica data={CAVERNA_CONOCIMIENTO_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+              </Bloque>
+              {extra}
+              <Bloque titulo="Controles" icono="fa-sliders">
+                {control}
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <>
+              <FuenteCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
+              <RetoQuizCard quiz={QUIZ_A2} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Sabes distinguir las fuentes y el problema de la verdad." />
+              <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
+                <Eyebrow>
+                  <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
+                  Completa el texto (A6)
+                </Eyebrow>
+                <div style={{ marginTop: 12 }}>
+                  <CompletaTexto data={HUECOS_A6} accent={accent} rgba={color.rgba} completado={textoOk} onCompletado={() => { setTextoOk(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
+                </div>
+              </div>
+            </>
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="¿Lo sé o lo creo?" icono="fa-fire">
+                <p style={{ margin: 0, color: T.text2 }}>{PROBLEMA}</p>
+              </Bloque>
+              <Bloque titulo="Lectura A1" icono="fa-book-open">
+                <div style={{ fontWeight: 800, color: "#fff" }}>{TITULO_A1}</div>
+                {LECTURA_A1.map((p, i) => (
+                  <p key={i} style={{ margin: 0, color: T.text2 }}>
+                    {p}
+                  </p>
+                ))}
+              </Bloque>
+              <Bloque titulo="Para reflexionar" icono="fa-circle-question">
+                {PREGUNTAS_A1.map((q, i) => (
+                  <details key={i} className="cav-guia" style={{ color: T.text2 }}>
+                    <summary>{q.pregunta}</summary>
+                    <div style={{ marginTop: 5, paddingLeft: 12 }}>{q.guia}</div>
+                  </details>
+                ))}
+              </Bloque>
+              <Bloque titulo="Cómo usar el laboratorio" icono="fa-list-ol">
+                <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8 }}>
+                  {INSTRUCCIONES.map((p, i) => (
+                    <li key={i}>{p}</li>
+                  ))}
+                </ol>
+              </Bloque>
+              <Bloque titulo="Hechos (quiz A4)" icono="fa-circle-question">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {HECHOS.map((h, i) => (
+                    <li key={i}>
+                      <strong style={{ color: h.respuesta ? OK : WARN }}>{h.respuesta ? "Verdadero" : "Falso"}:</strong> «{h.enunciado}» {h.retro}
+                    </li>
+                  ))}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Glosario (A5)" icono="fa-book">
+                {GLOSARIO.map((gi, i) => (
+                  <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
+                    <strong style={{ color: accent }}>{gi.termino}. </strong>
+                    <span style={{ color: T.text2 }}>{gi.definicion}</span>
+                    <div style={{ color: T.text3, marginTop: 4 }}>
+                      <i className="fa-solid fa-quote-left" style={{ marginRight: 6, color: accent }} />
+                      {gi.ejemplo}
+                    </div>
+                  </div>
+                ))}
+                <div style={{ color: T.text2 }}>
+                  <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A5}
+                </div>
+              </Bloque>
+              <Bloque titulo="Para escribir (reflexión A3)" icono="fa-pen-nib">
+                <p style={{ margin: 0, color: T.text2 }}>{REFLEXION_A3}</p>
+              </Bloque>
+              <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {IDEAS.map((x, i) => (
+                    <li key={i}>{x}</li>
+                  ))}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Autoevaluación (A7)" icono="fa-clipboard-check">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {AUTOEVALUACION_A7.map((x, i) => (
+                    <li key={i}>{x}</li>
+                  ))}
+                </ul>
+                <div style={{ color: T.text2 }}>
+                  <strong style={{ color: "#fff" }}>Para cerrar:</strong> {REFLEXION_FINAL_A7}
+                </div>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={CAVERNA_CONOCIMIENTO_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ marginTop: 18, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
+                La lectura A1 y sus preguntas, el quiz A2, la reflexión A3, los hechos del quiz A4, el glosario A5, el texto A6, la autoevaluación A7 y la pregunta del video A8 son <strong>verbatim</strong> del
+                material de la plataforma. Las sombras se <strong>calculan</strong> proyectando desde el fuego cada punto de la figura sobre la pared; la coincidencia de forma es un criterio del laboratorio. La
+                alegoría se resume, no se cita literalmente (Platón, <em>República</em> VII, 514a–517c; línea dividida en VI, 509d–511e). La habitación de Ames (Adelbert Ames Jr., 1946) se construye con una
+                transformación proyectiva exacta; sus medidas son <strong>ilustrativas</strong>. Los casos de la escalera son <strong>ejemplos didácticos</strong>, salvo el dato del Censo de Población y Vivienda
+                2020 del INEGI (126 014 024 habitantes) y el reloj parado de Bertrand Russell (<em>Human Knowledge</em>, 1948). Fuente: {FUENTE}
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }

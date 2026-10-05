@@ -1,0 +1,13 @@
+{
+  "slug": "algoritmos-deciden",
+  "items": [
+    { "clave": "gol-barrio", "formato": "16:9", "estilo": "foto", "escena": "Jóvenes jugando futbol en una cancha de cemento de barrio al atardecer, un jugador en pleno remate con el balón en el aire, porterías improvisadas y edificios bajos al fondo" },
+    { "clave": "agua-llave", "formato": "16:9", "estilo": "foto", "escena": "Primer plano de una mano llenando un vaso de vidrio con agua de una llave de lavabo, luz natural de cocina, gotas cayendo" },
+    { "clave": "lluvia-tarde", "formato": "16:9", "estilo": "foto", "escena": "Cielo de tarde con nubes grandes y oscuras acumulándose sobre las casas de un valle, lluvia cayendo a lo lejos en cortinas grises" },
+    { "clave": "tamales", "formato": "16:9", "estilo": "foto", "escena": "Mesa de cocina con tamales envueltos en hojas de maíz humeando en una vaporera de metal, manos preparando masa, ingredientes en cuencos de barro" },
+    { "clave": "consejo-vecinal", "formato": "16:9", "estilo": "foto", "escena": "Vecinos adultos sentados en sillas plegables en un patio comunitario escuchando a una mujer de pie que señala un parque dibujado en un rotafolio sin letras, tarde soleada" },
+    { "clave": "pelea-partido", "formato": "16:9", "estilo": "foto", "escena": "Dos jugadores con uniformes distintos discutiendo cara a cara en una cancha mientras un árbitro con camiseta negra se interpone con los brazos abiertos, gradas de cemento al fondo" },
+    { "clave": "banda-escolar", "formato": "16:9", "estilo": "foto", "escena": "Banda de estudiantes de secundaria con uniforme escolar ensayando en un salón con instrumentos de viento, tambores y una guitarra, sonrisas y luz de ventana" },
+    { "clave": "barrio-rivalidad", "formato": "16:9", "estilo": "ilustracion", "escena": "Dos grupos de vecinos de pie a ambos lados de una calle angosta de casas de colores, de brazos cruzados y mirándose de lejos, un perro entre ellos" }
+  ]
+}

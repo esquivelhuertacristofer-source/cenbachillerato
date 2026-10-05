@@ -21,7 +21,7 @@
  */
 
 import * as THREE from "three";
-import { useEffect, useMemo, useRef, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, type ReactNode } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
@@ -86,9 +86,12 @@ const suave = (dt: number, porCuadro: number) => 1 - Math.pow(1 - porCuadro, Mat
 const OK = "#34d399";
 const NO = "#f87171";
 
-function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: P3; children: ReactNode; df?: number; col?: string; fs?: number }) {
+/** Etiqueta en <Html>: tamaño fijo en píxeles (≥ 14 px). Las `ancha` se ocultan en pantallas angostas. */
+function Etiqueta({ pos, children, col, fs = 14, ancha = false, fondo = "rgba(4,10,22,0.86)" }: { pos: P3; children: ReactNode; df?: number; col?: string; fs?: number; ancha?: boolean; fondo?: string }) {
+  const { size } = useThree();
+  if (ancha && size.width < 640) return null;
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -96,10 +99,10 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: P3; children:
           gap: 6,
           padding: "5px 11px",
           borderRadius: 999,
-          background: "rgba(4,10,22,0.86)",
+          background: fondo,
           border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`,
           color: "#fff",
-          fontSize: fs,
+          fontSize: Math.max(14, fs),
           fontWeight: 800,
           whiteSpace: "nowrap",
           boxShadow: "0 6px 18px -8px #000",
@@ -111,7 +114,19 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: P3; children:
   );
 }
 
-/** Persona de pie de estatura `alto` (pies en el origen). */
+/** Desplaza la imagen hacia arriba para que el contenido quede entre la barra superior y la misión. */
+function Encuadre() {
+  const { camera, size } = useThree();
+  useLayoutEffect(() => {
+    const c = camera as THREE.PerspectiveCamera;
+    if (!c.isPerspectiveCamera) return undefined;
+    c.setViewOffset(size.width, size.height, 0, Math.round(size.height * 0.07), size.width, size.height);
+    return () => c.clearViewOffset();
+  }, [camera, size.width, size.height]);
+  return null;
+}
+
+
 function Persona({ pos, color, alto = 1.6, pelo = "#1f2937" }: { pos: P3; color: string; alto?: number; pelo?: string }) {
   const k = alto / 1.6;
   return (
@@ -419,7 +434,7 @@ function Caverna({ pose, silueta, coincide, etiquetas, modoColor, exterior }: { 
       )}
       {etiquetas && contorno.length > 3 && <Line points={contorno} color={coincide ? OK : "#fef3c7"} lineWidth={2.2} dashed={!coincide} dashSize={0.18} gapSize={0.12} />}
       {etiquetas && (
-        <Etiqueta pos={[cS.x, Math.min(Hc - 0.4, cS.y + alto / 2 + 0.55), zSombra + 0.1]} df={14} col={coincide ? `${OK}cc` : `${modoColor}aa`} fs={12}>
+        <Etiqueta pos={[cS.x, Math.min(Hc - 0.4, cS.y + alto / 2 + 0.55), zSombra + 0.1]} ancha col={coincide ? `${OK}cc` : `${modoColor}aa`} fs={12}>
           <i className={`fa-solid ${coincide ? "fa-circle-check" : "fa-cloud"}`} style={{ color: coincide ? OK : modoColor }} />
           Sombra · {num(alto, 2)} m de alto
         </Etiqueta>
@@ -470,14 +485,7 @@ function Caverna({ pose, silueta, coincide, etiquetas, modoColor, exterior }: { 
 
       {etiquetas && (
         <>
-          <Etiqueta pos={[-4.6, 5.4, CUEVA.muroZ + 0.2]} df={14} fs={11}>
-            <i className="fa-solid fa-image" style={{ color: modoColor }} />
-            Pared de la caverna
-          </Etiqueta>
-          <Etiqueta pos={[-4.8, CUEVA.tabiqueAlto + 0.4, CUEVA.tabiqueZ]} df={14} fs={11}>
-            Tabique (muro bajo)
-          </Etiqueta>
-          <Etiqueta pos={[1.8, 1.85, CUEVA.prisioneroZ - 0.3]} df={14} fs={11}>
+          <Etiqueta pos={[1.8, 1.85, CUEVA.prisioneroZ - 0.3]} ancha>
             <i className="fa-solid fa-link" style={{ color: "#cbd5e1" }} />
             Prisioneros encadenados
           </Etiqueta>
@@ -848,7 +856,7 @@ function Regla({ pies, color, lado }: { pies: P3; color: string; lado: -1 | 1 })
         <boxGeometry args={[0.46, 0.02, 0.02]} />
         <meshBasicMaterial color={color} toneMapped={false} />
       </mesh>
-      <Etiqueta pos={[lado * 0.36, AMES.estatura + 0.12, 0]} df={7} fs={11} col={`${color}cc`}>
+      <Etiqueta pos={[lado * 0.36, AMES.estatura + 0.12, 0]} col={`${color}cc`}>
         <i className="fa-solid fa-ruler-vertical" style={{ color }} />
         1.60 m
       </Etiqueta>
@@ -917,12 +925,16 @@ function HabitacionAmes({ p, betoX, regla, modoColor }: { p: number; betoX: numb
           <Regla pies={beto.pies} color="#60a5fa" lado={-1} />
         </>
       )}
-      <Etiqueta pos={[ana.pies[0], ana.pies[1] + AMES.estatura + 0.28, ana.pies[2]]} df={8} fs={11} col="#f472b6aa">
-        Ana
-      </Etiqueta>
-      <Etiqueta pos={[beto.pies[0], beto.pies[1] + AMES.estatura + 0.28, beto.pies[2]]} df={8} fs={11} col="#60a5faaa">
-        Beto
-      </Etiqueta>
+      {p <= 0.12 && (
+        <>
+          <Etiqueta pos={[ana.pies[0], ana.pies[1] + AMES.estatura + 0.28, ana.pies[2]]} col="#f472b6aa">
+            Ana
+          </Etiqueta>
+          <Etiqueta pos={[beto.pies[0], beto.pies[1] + AMES.estatura + 0.28, beto.pies[2]]} col="#60a5faaa">
+            Beto
+          </Etiqueta>
+        </>
+      )}
 
       <group ref={extras}>
         {/* Mirilla */}
@@ -930,30 +942,19 @@ function HabitacionAmes({ p, betoX, regla, modoColor }: { p: number; betoX: numb
           <cylinderGeometry args={[0.12, 0.12, 0.3, 20]} />
           <meshStandardMaterial color="#111827" metalness={0.5} roughness={0.4} />
         </mesh>
-        {p > 0.12 && (
-          <Etiqueta pos={[0, 0.55, 0.1]} df={10} fs={12} col={`${modoColor}cc`}>
-            <i className="fa-solid fa-eye" style={{ color: modoColor }} />
-            Mirilla
-          </Etiqueta>
-        )}
         {/* Lo que crees ver: el cuarto rectangular */}
         <Line points={plano} color={modoColor} lineWidth={2} dashed dashSize={0.25} gapSize={0.15} />
-        {p > 0.12 && (
-          <Etiqueta pos={[-AW + 0.3, -AH, Z1 + 0.6]} df={13} fs={10.5} col={`${modoColor}aa`}>
-            Cuarto que crees ver (rectangular)
-          </Etiqueta>
-        )}
         {/* Rayos de visión a las cabezas */}
         <Line points={[[0, 0, 0], cabezaAna]} color="#f472b6" lineWidth={1.5} transparent opacity={0.8} />
         <Line points={[[0, 0, 0], cabezaBeto]} color="#60a5fa" lineWidth={1.5} transparent opacity={0.8} />
         {p > 0.12 && (
-          <Etiqueta pos={[cabezaAna[0] * 0.5 + 0.25, cabezaAna[1] * 0.5, cabezaAna[2] * 0.5]} df={13} fs={10.5} col="#f472b6aa">
-            a {num(ana.distancia, 1)} m de la mirilla
+          <Etiqueta pos={[cabezaAna[0] * 0.5 + 0.25, cabezaAna[1] * 0.5, cabezaAna[2] * 0.5]} ancha col="#f472b6aa">
+            Ana a {num(ana.distancia, 1)} m
           </Etiqueta>
         )}
         {p > 0.12 && (
-          <Etiqueta pos={[cabezaBeto[0] * 0.62 - 0.25, cabezaBeto[1] * 0.62, cabezaBeto[2] * 0.62]} df={13} fs={10.5} col="#60a5faaa">
-            a {num(beto.distancia, 1)} m de la mirilla
+          <Etiqueta pos={[cabezaBeto[0] * 0.62 - 0.25, cabezaBeto[1] * 0.62, cabezaBeto[2] * 0.62]} ancha col="#60a5faaa">
+            Beto a {num(beto.distancia, 1)} m
           </Etiqueta>
         )}
       </group>
@@ -1004,6 +1005,7 @@ function Moneda({ verificado, moneda }: { verificado: boolean; moneda: "aguila" 
 
 function PropCaso({ casoId, verificado, moneda, elegidas, modoColor }: { casoId: CasoId; verificado: boolean; moneda: "aguila" | "sol" | null; elegidas: string[]; modoColor: string }) {
   const segundero = useRef<THREE.Group>(null);
+  const angosto = useThree((st) => st.size.width) < 640;
   const tel = useRef<HTMLSpanElement>(null);
   const tiempo = useRef(0);
   useFrame((_, dt) => {
@@ -1041,13 +1043,13 @@ function PropCaso({ casoId, verificado, moneda, elegidas, modoColor }: { casoId:
           </group>
         ))}
         {elegidas.includes("inegi") && (
-          <Etiqueta pos={[0, 1.55, 0]} df={10} fs={11} col="#34d399aa">
+          <Etiqueta pos={[0, 1.55, 0]} ancha col="#34d399aa">
             <i className="fa-solid fa-building-columns" style={{ color: "#34d399" }} />
             INEGI 2020: 126 014 024 · cada figura ≈ 2.1 millones
           </Etiqueta>
         )}
         {elegidas.includes("meme") && (
-          <Etiqueta pos={[0, 2.15, 0]} df={10} fs={11} col={`${NO}aa`}>
+          <Etiqueta pos={[0, 2.15, 0]} ancha col={`${NO}aa`}>
             <i className="fa-solid fa-triangle-exclamation" style={{ color: NO }} />
             Meme: «200 millones» (sin fuente)
           </Etiqueta>
@@ -1115,13 +1117,13 @@ function PropCaso({ casoId, verificado, moneda, elegidas, modoColor }: { casoId:
           </mesh>
         </group>
       </group>
-      {verificado && (
+      {verificado && !angosto && (
         <>
-          <Etiqueta pos={[0, 4.35, 0.9]} df={10} fs={11} col={`${NO}cc`}>
+          <Etiqueta pos={[0, 4.35, 0.9]} ancha col={`${NO}cc`}>
             <i className="fa-solid fa-pause" style={{ color: NO }} />
             Detenido desde ayer a las 8:15
           </Etiqueta>
-          <Html position={[2.25, 2.5, 0.9]} center distanceFactor={10} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+          <Html position={[2.25, 2.5, 0.9]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
             <div style={{ width: 118, padding: "16px 8px 14px", borderRadius: 18, background: "#0b1220", border: "3px solid #334155", boxShadow: "0 10px 26px -8px #000", textAlign: "center", color: "#fff" }}>
               <div style={{ width: 34, height: 4, borderRadius: 4, background: "#334155", margin: "0 auto 12px" }} />
               <div style={{ fontFamily: "ui-monospace, monospace", fontWeight: 800, fontSize: 21 }}>
@@ -1187,9 +1189,11 @@ function Escalera({ casoId, veredicto, elegidas, nivel, verificado, moneda, resu
               <boxGeometry args={[1.3, 0.025, 1.8]} />
               <meshStandardMaterial color={on ? modoColor : "#3b4663"} emissive={on ? modoColor : "#000"} emissiveIntensity={on ? 0.5 : 0} />
             </mesh>
-            <Etiqueta pos={[0, Math.max(0.2, h - 0.2), 0.95]} df={9} fs={10.5} col={on ? `${modoColor}aa` : undefined}>
-              {i} · {n.etq}
-            </Etiqueta>
+            {i === nivel && (
+              <Etiqueta pos={[0, Math.max(0.2, h - 0.2), 0.95]} ancha col={on ? `${modoColor}aa` : undefined}>
+                {i} · {n.etq}
+              </Etiqueta>
+            )}
           </group>
         );
       })}
@@ -1222,10 +1226,6 @@ function Escalera({ casoId, veredicto, elegidas, nivel, verificado, moneda, resu
                 <sphereGeometry args={[0.17, 20, 16]} />
                 <meshStandardMaterial color={col} emissive={col} emissiveIntensity={l.on ? 1.4 : 0.25} />
               </mesh>
-              <Etiqueta pos={[0, -0.42, 0]} df={9} fs={10}>
-                {l.etq}
-                {l.on === null ? " ?" : ""}
-              </Etiqueta>
             </group>
           );
         })}
@@ -1273,9 +1273,6 @@ function Escalera({ casoId, veredicto, elegidas, nivel, verificado, moneda, resu
       </group>
 
       <PropCaso casoId={casoId} verificado={verificado} moneda={moneda} elegidas={elegidas} modoColor={modoColor} />
-      <Etiqueta pos={[-4.5, casoId === "reloj" ? 5.05 : 2.9, 0.4]} df={10} fs={12} col={`${modoColor}aa`}>
-        <i className="fa-solid fa-magnifying-glass" style={{ color: modoColor }} />«{caso.afirmacion}»
-      </Etiqueta>
     </group>
   );
 }
@@ -1318,6 +1315,7 @@ export default function CavernaConocimientoScene(p: CavernaSceneProps) {
       )}
       {vista === "escalera" && <Escalera casoId={p.casoId} veredicto={p.veredicto} elegidas={p.elegidas} nivel={p.nivel} verificado={p.verificado} moneda={p.moneda} resultado={p.resultado} modoColor={modoColor} />}
 
+      {orbita && <Encuadre />}
       {orbita && (
         <OrbitControls
           makeDefault

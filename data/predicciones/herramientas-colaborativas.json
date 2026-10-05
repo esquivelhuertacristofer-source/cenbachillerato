@@ -1,0 +1,12 @@
+{
+  "escena": "Una semana de proyecto de cuatro estudiantes que escriben juntos un informe en un documento compartido en línea.",
+  "pregunta": "Si todos pueden editar y el historial de versiones está apagado, ¿qué pasa el martes?",
+  "opciones": [
+    { "id": "a", "texto": "Se pisan ediciones y se pierde trabajo", "icono": "fa-triangle-exclamation" },
+    { "id": "b", "texto": "El documento se protege solo contra borrados accidentales", "icono": "fa-shield-halved" },
+    { "id": "c", "texto": "Nadie puede escribir hasta que el docente autorice", "icono": "fa-lock" }
+  ],
+  "correcta": "a",
+  "porque": "Con edición simultánea y sin historial, dos personas cambian el mismo párrafo y lo borrado no se recupera. Los roles y el historial de versiones evitan ese problema.",
+  "comoComprobarlo": "Elige documento compartido para escribir y compara los conflictos con «Todos editan» sin historial, y luego con «Redactan y comentan» y el historial activado."
+}

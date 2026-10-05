@@ -19,8 +19,8 @@
  */
 
 import * as THREE from "three";
-import { useEffect, useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useEffect, useLayoutEffect, useMemo, useRef, type ReactNode } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Environment, Lightformer } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import {
@@ -63,14 +63,20 @@ export interface HabilidadesSceneProps {
   insignias: Record<string, string[]>;
   misionIdx: number;
   onElegir: (id: string) => void;
+  /** La pregunta escrita no es correcta: la persona no entiende y se encoge de hombros. */
+  preguntaMala?: boolean;
   // Permiso
   sitIdx: number;
   pasoP: number;
   registro: Registro | null;
   peticionTxt: string | null;
+  /** La petición armada no es correcta: el interlocutor no la entiende. */
+  peticionMala?: boolean;
   // Letreros
   casoIdx: number;
-  estadoCaso: "leer" | "decidido";
+  estadoCaso: "leer" | "decidido" | "mal";
+  /** Lo que el alumno supuso en el letrero cuando se equivocó. */
+  suposicion?: boolean | null;
 }
 
 type Pt = [number, number, number];
@@ -83,9 +89,9 @@ const NO = "#f87171";
  * Texto en escena
  * ════════════════════════════════════════════════════════════════════════ */
 
-function Etiqueta({ pos, children, df = 10, col, fs = 12, fondo = "rgba(4,10,22,0.86)" }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number; fondo?: string }) {
+function Etiqueta({ pos, children, col, fs = 14, fondo = "rgba(4,10,22,0.86)" }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number; fondo?: string }) {
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -96,7 +102,7 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12, fondo = "rgba(4,10,22,
           background: fondo,
           border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`,
           color: "#fff",
-          fontSize: fs,
+          fontSize: Math.max(14, fs),
           fontWeight: 800,
           whiteSpace: "nowrap",
           boxShadow: "0 6px 18px -8px #000",
@@ -108,13 +114,15 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12, fondo = "rgba(4,10,22,
   );
 }
 
-function Burbuja({ pos, texto, col, df = 8, lado = "centro" }: { pos: Pt; texto: string; col: string; df?: number; lado?: "izq" | "der" | "centro" }) {
+function Burbuja({ pos, texto, col, lado = "centro" }: { pos: Pt; texto: string; col: string; df?: number; lado?: "izq" | "der" | "centro" }) {
+  const angosta = useThree((st) => st.size.width) < 640;
+  if (angosta && texto.length > 34) return null;
   const dx = lado === "izq" ? "-78%" : lado === "der" ? "-22%" : "-50%";
   const cola = lado === "izq" ? "78%" : lado === "der" ? "22%" : "50%";
   return (
-    <Html position={pos} distanceFactor={df} zIndexRange={[24, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} zIndexRange={[24, 0]} style={{ pointerEvents: "none" }}>
       <div style={{ transform: `translate(${dx}, -100%)` }}>
-        <div style={{ position: "relative", padding: "8px 14px", borderRadius: 14, background: "#fff", color: "#0f172a", fontSize: 15, fontWeight: 900, maxWidth: 300, width: "max-content", lineHeight: 1.3, border: `3px solid ${col}`, boxShadow: "0 10px 24px -10px #000", fontFamily: "ui-rounded, system-ui, sans-serif" }}>
+        <div style={{ position: "relative", padding: "8px 14px", borderRadius: 14, background: "#fff", color: "#0f172a", fontSize: 15, fontWeight: 900, maxWidth: "min(300px, 60vw)", width: "max-content", lineHeight: 1.3, border: `3px solid ${col}`, boxShadow: "0 10px 24px -10px #000", fontFamily: "ui-rounded, system-ui, sans-serif" }}>
           {texto}
           <div style={{ position: "absolute", left: cola, bottom: -9, width: 14, height: 14, marginLeft: -7, background: "#fff", borderRight: `3px solid ${col}`, borderBottom: `3px solid ${col}`, transform: "rotate(45deg)" }} />
         </div>
@@ -124,12 +132,14 @@ function Burbuja({ pos, texto, col, df = 8, lado = "centro" }: { pos: Pt; texto:
 }
 
 /** Letrero en inglés: prohibiciones en rojo, permisos en verde, información en gris. */
-function LetreroHtml({ pos, lugar, df = 8, resalta }: { pos: Pt; lugar: LugarId; df?: number; resalta?: string | null }) {
+function LetreroHtml({ pos, lugar, resalta }: { pos: Pt; lugar: LugarId; df?: number; resalta?: string | null }) {
   const d = LUGAR_DEF[lugar];
+  const angosta = useThree((st) => st.size.width) < 640;
+  if (angosta) return null;
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
       <div style={{ minWidth: 190, padding: "8px 12px 9px", borderRadius: 10, background: "#fffdf5", border: "3px solid #1f2937", boxShadow: "0 10px 26px -10px #000", fontFamily: "ui-rounded, system-ui, sans-serif" }}>
-        <div style={{ fontSize: 11, fontWeight: 900, letterSpacing: "0.12em", color: "#475569", textTransform: "uppercase", marginBottom: 4 }}>
+        <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.12em", color: "#475569", textTransform: "uppercase", marginBottom: 4 }}>
           <i className={`fa-solid ${d.icono}`} style={{ marginRight: 6, color: d.color }} />
           {d.en}
         </div>
@@ -198,12 +208,13 @@ const mira = (de: [number, number], a: [number, number]) => Math.atan2(a[0] - de
 
 /** Encuadre de cámara para un lugar. */
 function foco(l: LugarId): { pos: Pt; target: Pt } {
-  if (l === "patio") return { pos: [-3.4, 4.4, 5.4], target: [-9.0, 1.0, -0.3] };
+  // El objetivo queda por debajo del contenido: la escena sube y queda entre la barra y la misión.
+  if (l === "patio") return { pos: [-3.4, 4.4, 5.4], target: [-9.0, 0.2, -0.3] };
   const [x, z] = CEL[l];
-  if (z < 0) return { target: [x, 0.9, z + 0.2], pos: [x * 0.9, 7.0, z + 7.0] };
-  return { target: [x, 0.8, z], pos: [x * 0.9, 6.4, z + 7.4] };
+  if (z < 0) return { target: [x, 0.1, z + 0.2], pos: [x * 0.9, 7.0, z + 7.0] };
+  return { target: [x, 0.0, z], pos: [x * 0.9, 6.4, z + 7.4] };
 }
-const GENERAL = { pos: [0, 14.2, 16.6] as Pt, target: [0, 0, -0.2] as Pt };
+const GENERAL = { pos: [0, 14.2, 16.6] as Pt, target: [0, 0, 0.9] as Pt };
 
 /* ════════════════════════════════════════════════════════════════════════
  * Personas
@@ -630,7 +641,7 @@ function PersonaFig({
         </mesh>
       )}
       {etiqueta && (
-        <Etiqueta pos={[0, 2.05, 0]} df={9} fs={12} col={etiquetaCol}>
+        <Etiqueta pos={[0, 2.05, 0]} col={etiquetaCol}>
           {etiqueta}
         </Etiqueta>
       )}
@@ -913,9 +924,9 @@ function Centro({ relojMin, cerrada, focoLugar, destacados, sinNombre }: { sinNo
         const d = LUGAR_DEF[e];
         const atras = z < 0;
         const on = focoLugar === e || destacados.includes(e);
-        if ((focoLugar && !on) || sinNombre === e) return null;
+        if (!on || sinNombre === e) return null;
         return (
-          <Etiqueta key={e} pos={atras ? [x, 3.0, -6.0] : [x, 0.55, 5.95]} df={focoLugar ? 6 : 12} fs={13} col={on ? d.color : `${d.color}88`}>
+          <Etiqueta key={e} pos={atras ? [x, 3.0, -6.0] : [x, 0.55, 5.95]} fs={14} col={on ? d.color : `${d.color}88`}>
             <i className={`fa-solid ${d.icono}`} style={{ color: d.color }} />
             {d.en}
           </Etiqueta>
@@ -1043,7 +1054,7 @@ function Centro({ relojMin, cerrada, focoLugar, destacados, sinNombre }: { sinNo
       <PosteLetrero pos={[4.1, 0, 1.55]} col={LUGAR_DEF.pool.color} />
       <Reloj pos={[4.1, 2.05, 1.6]} min={relojMin} />
       {(!focoLugar || focoLugar === "pool") && (
-      <Etiqueta pos={[4.1, 2.75, 1.6]} df={focoLugar ? 7 : 9} fs={11} col={albercaAbierta(relojMin) ? `${OK}aa` : `${NO}aa`}>
+      <Etiqueta pos={[4.1, 2.75, 1.6]} col={albercaAbierta(relojMin) ? `${OK}aa` : `${NO}aa`}>
         <i className="fa-solid fa-clock" style={{ color: albercaAbierta(relojMin) ? OK : NO }} />
         {horaCorta(relojMin)} · {albercaAbierta(relojMin) ? "open" : "closed"}
       </Etiqueta>
@@ -1058,7 +1069,7 @@ function Centro({ relojMin, cerrada, focoLugar, destacados, sinNombre }: { sinNo
         <Caja p={[0, 2.7, 0]} s={[0.3, 0.3, 2.6]} c="#c2410c" />
       </group>
       {!focoLugar && (
-        <Etiqueta pos={[-9.2, 3.15, CORR_Z]} df={12} fs={13} col="#fdba74aa">
+        <Etiqueta pos={[-9.2, 3.15, CORR_Z]} col="#fdba74aa">
           <i className="fa-solid fa-people-roof" style={{ color: "#fdba74" }} />
           Centro Comunitario Los Fresnos
         </Etiqueta>
@@ -1105,7 +1116,7 @@ const PUESTO_HAB: Record<HabilidadId, Puesto> = {
 
 const LINEA = (k: number): Pt => [-6.25 + k * 2.5, 0, CORR_Z];
 
-function VistaClub({ seleccion, intento, burbuja, insignias, misionIdx, onElegir, modoColor }: { seleccion: string | null; intento: IntentoClub | null; burbuja: string | null; insignias: Record<string, string[]>; misionIdx: number; onElegir: (id: string) => void; modoColor: string }) {
+function VistaClub({ seleccion, intento, burbuja, insignias, misionIdx, onElegir, modoColor, preguntaMala }: { seleccion: string | null; intento: IntentoClub | null; burbuja: string | null; insignias: Record<string, string[]>; misionIdx: number; onElegir: (id: string) => void; modoColor: string; preguntaMala: boolean }) {
   const lupe = personaPorId("lupe");
   const salas = personaPorId("salas");
   const h = intento && intento.persona === seleccion ? intento.habilidad : null;
@@ -1117,40 +1128,42 @@ function VistaClub({ seleccion, intento, burbuja, insignias, misionIdx, onElegir
     <group>
       {CANDIDATOS.map((id, k) => {
         const p = personaPorId(id);
-        const intentando = enfoque && intento?.persona === id;
-        const puesto = intentando && h ? PUESTO_HAB[h] : null;
         const sel = seleccion === id;
+        const dudando = preguntaMala && sel;
+        const intentando = enfoque && intento?.persona === id && !dudando;
+        const puesto = intentando && h ? PUESTO_HAB[h] : null;
         return (
           <PersonaFig
             key={id}
             p={p}
             destino={puesto ? puesto.pos : LINEA(k)}
             rotY={puesto ? puesto.rot : 0}
-            pose={puesto ? (puede ? puesto.si : puesto.no) : sel ? "saluda" : "parado"}
+            pose={puesto ? (puede ? puesto.si : puesto.no) : dudando ? "encoger" : sel ? "saluda" : "parado"}
             accesorio={puesto && h === "cook" ? "espatula" : null}
             fase={k * 0.8}
             onClick={() => onElegir(id)}
             anillo={sel ? modoColor : null}
             etiquetaCol={sel ? modoColor : "rgba(255,255,255,0.28)"}
             etiqueta={
-              enfoque && !sel ? undefined : (
+              !sel ? undefined : (
               <>
                 {p.nombre}
                 {(insignias[id] ?? []).map((c, i) => (
-                  <i key={i} className="fa-solid fa-star" style={{ color: c, fontSize: 11 }} />
+                  <i key={i} className="fa-solid fa-star" style={{ color: c, fontSize: 14 }} />
                 ))}
               </>
               )
             }
           >
-            {intentando && burbuja && <Burbuja pos={[0, 2.45, 0]} texto={burbuja} col={puede ? OK : "#fb923c"} df={8} />}
+            {intentando && burbuja && <Burbuja pos={[0, 2.45, 0]} texto={burbuja} col={puede ? OK : "#fb923c"} />}
+            {dudando && <Burbuja pos={[0, 2.45, 0]} texto="Sorry? I don't understand." col="#fb923c" />}
           </PersonaFig>
         );
       })}
       {/* Doña Lupe escucha en la biblioteca; la entrenadora cuida la alberca. */}
       <PersonaFig p={lupe} destino={[-6.55, 0, -3.0]} rotY={-Math.PI / 2} pose="parado">
         {h === "nahuatl" && intento && (
-          <Etiqueta pos={[0, 2.25, 0]} df={8} fs={13} col={puede ? `${OK}cc` : "#fb923ccc"}>
+          <Etiqueta pos={[0, 2.25, 0]} col={puede ? `${OK}cc` : "#fb923ccc"}>
             <i className={`fa-solid ${puede ? "fa-heart" : "fa-circle-question"}`} style={{ color: puede ? OK : "#fb923c" }} />
             {puede ? "Niltze! (hola)" : "…?"}
           </Etiqueta>
@@ -1163,7 +1176,7 @@ function VistaClub({ seleccion, intento, burbuja, insignias, misionIdx, onElegir
       <Particulas tipo="humo" origen={[-6.95, 1.1, 3.3]} activo={h === "cook" && !puede} col="#6b7280" />
       <Quesadilla activo={h === "cook"} exito={puede} />
       {h === "video" && (
-        <Etiqueta pos={[2.3, 1.3, -4.95]} df={7} fs={12} col={puede ? `${OK}cc` : "#fb923ccc"}>
+        <Etiqueta pos={[2.3, 1.3, -4.95]} col={puede ? `${OK}cc` : "#fb923ccc"}>
           <i className={`fa-solid ${puede ? "fa-circle-check" : "fa-triangle-exclamation"}`} style={{ color: puede ? OK : "#fb923c" }} />
           {puede ? "Export 100%" : "Error"}
         </Etiqueta>
@@ -1177,8 +1190,8 @@ function VistaClub({ seleccion, intento, burbuja, insignias, misionIdx, onElegir
         ))}
         <Caja p={[0, 1.45, 0]} s={[0.08, 0.9, 1.6]} c="#92400e" />
       </group>
-      {!enfoque && (
-        <Etiqueta pos={[9.75, 2.3, CORR_Z]} df={10} fs={12} col={`${m.color}cc`}>
+      {!enfoque && !preguntaMala && (
+        <Etiqueta pos={[9.75, 2.3, CORR_Z]} col={`${m.color}cc`}>
           <i className={`fa-solid ${m.icono}`} style={{ color: m.color }} />
           {m.club}
         </Etiqueta>
@@ -1210,9 +1223,11 @@ const GUIONES: Record<string, Guion> = {
 
 function Medidor({ pos, registro }: { pos: Pt; registro: Registro }) {
   const d = REGISTRO_DEF[registro];
+  const angosta = useThree((st) => st.size.width) < 640;
+  if (angosta) return null;
   return (
-    <Html position={pos} center distanceFactor={8} zIndexRange={[22, 0]} style={{ pointerEvents: "none" }}>
-      <div style={{ padding: "6px 10px", borderRadius: 10, background: "rgba(4,10,22,0.9)", border: "1px solid rgba(255,255,255,0.25)", color: "#fff", fontSize: 11, fontWeight: 800, whiteSpace: "nowrap" }}>
+    <Html position={pos} center zIndexRange={[22, 0]} style={{ pointerEvents: "none" }}>
+      <div style={{ padding: "6px 10px", borderRadius: 10, background: "rgba(4,10,22,0.9)", border: "1px solid rgba(255,255,255,0.25)", color: "#fff", fontSize: 14, fontWeight: 800, whiteSpace: "nowrap" }}>
         <div style={{ marginBottom: 4, letterSpacing: "0.08em", color: "rgba(255,255,255,0.65)" }}>CORTESÍA · {d.es.toUpperCase()}</div>
         <div style={{ display: "flex", gap: 3 }}>
           {[1, 2, 3].map((k) => (
@@ -1224,7 +1239,7 @@ function Medidor({ pos, registro }: { pos: Pt; registro: Registro }) {
   );
 }
 
-function VistaPermiso({ sitIdx, pasoP, registro, peticionTxt }: { sitIdx: number; pasoP: number; registro: Registro | null; peticionTxt: string | null }) {
+function VistaPermiso({ sitIdx, pasoP, registro, peticionTxt, peticionMala }: { sitIdx: number; pasoP: number; registro: Registro | null; peticionTxt: string | null; peticionMala: boolean }) {
   const s = SITUACIONES[sitIdx] ?? SITUACIONES[0]!;
   const g = GUIONES[s.id]!;
   const npc = personaPorId(s.quien);
@@ -1236,8 +1251,9 @@ function VistaPermiso({ sitIdx, pasoP, registro, peticionTxt }: { sitIdx: number
   const npcIzq = g.npc[0] > g.tu[0];
   return (
     <group>
-      <PersonaFig key={`npc-${s.id}`} p={npc} destino={g.npc} rotY={npcRot} pose={pasoP >= 1 && !hecho ? "hablar" : "parado"} etiqueta={<>{npc.nombre}{npc.rol ? <span style={{ fontWeight: 600, opacity: 0.7 }}> · {npc.rol.en}</span> : <span style={{ fontWeight: 600, opacity: 0.7 }}> · friend</span>}</>} etiquetaCol={npc.adulto ? "#c4b5fdaa" : "#fde68aaa"}>
-        {pasoP >= 1 && !hecho && <Burbuja pos={[0, 2.45, 0]} texto={s.respuesta} col={s.permitido ? OK : "#fb923c"} df={8} lado={npcIzq ? "izq" : "der"} />}
+      <PersonaFig key={`npc-${s.id}`} p={npc} destino={g.npc} rotY={npcRot} pose={pasoP >= 1 && !hecho ? "hablar" : peticionMala && pasoP === 0 ? "encoger" : "parado"} etiqueta={pasoP >= 1 && !hecho ? undefined : <>{npc.nombre}{npc.rol ? <span style={{ fontWeight: 600, opacity: 0.7 }}> · {npc.rol.en}</span> : <span style={{ fontWeight: 600, opacity: 0.7 }}> · friend</span>}</>} etiquetaCol={npc.adulto ? "#c4b5fdaa" : "#fde68aaa"}>
+        {pasoP >= 1 && !hecho && <Burbuja pos={[0, 2.45, 0]} texto={s.respuesta} col={s.permitido ? OK : "#fb923c"} lado={npcIzq ? "izq" : "der"} />}
+        {pasoP === 0 && peticionMala && <Burbuja pos={[0, 2.45, 0]} texto="Sorry? I didn't understand." col="#fb923c" lado={npcIzq ? "izq" : "der"} />}
         {pasoP >= 1 && registro && !hecho && <Medidor pos={[0, 0.35, 0.6]} registro={registro} />}
       </PersonaFig>
       <PersonaFig
@@ -1247,16 +1263,14 @@ function VistaPermiso({ sitIdx, pasoP, registro, peticionTxt }: { sitIdx: number
         rotY={hecho ? g.accion.rot : tuRot}
         pose={hecho ? g.accion.pose : "parado"}
         accesorio={hecho ? g.accion.acc : g.accTu}
-        etiqueta={<>You</>}
-        etiquetaCol="#facc15cc"
         anillo={hecho ? OK : "#facc15"}
       >
-        {peticionTxt && pasoP === 0 && <Burbuja pos={[0, 2.45, 0]} texto={peticionTxt} col="#facc15" df={8} lado={npcIzq ? "der" : "izq"} />}
+        {peticionTxt && pasoP === 0 && !peticionMala && <Burbuja pos={[0, 2.45, 0]} texto={peticionTxt} col="#facc15" lado={npcIzq ? "der" : "izq"} />}
       </PersonaFig>
       <Balon activo={tiro} exito />
       <Particulas tipo="notas" origen={[7.0, 1.5, -2.9]} activo={hecho && g.accion.pose === "guitarra"} col="#fde047" />
       {hecho && s.id === "computer" && (
-        <Etiqueta pos={[2.3, 1.3, -4.95]} df={7} fs={12} col={`${OK}cc`}>
+        <Etiqueta pos={[2.3, 1.3, -4.95]} col={`${OK}cc`}>
           <i className="fa-solid fa-circle-check" style={{ color: OK }} />
           Computer 3 · homework
         </Etiqueta>
@@ -1264,7 +1278,7 @@ function VistaPermiso({ sitIdx, pasoP, registro, peticionTxt }: { sitIdx: number
       {s.id === "computer" &&
         !hecho &&
         [-1.6, 0, 1.6].map((x, k) => (
-          <Etiqueta key={x} pos={[x, 1.55, -5.3]} df={8} fs={11} col={k === 2 ? `${OK}cc` : undefined}>
+          <Etiqueta key={x} pos={[x, 1.55, -5.3]} col={k === 2 ? `${OK}cc` : undefined}>
             {k + 1}
           </Etiqueta>
         ))}
@@ -1287,13 +1301,14 @@ const ESCENA_CASO: Record<string, { pos: Pt; rot: number; antes: Pose; acc: Acce
   lunch: { pos: [-8.3, 0, 4.05], rot: 0, antes: "parado", acc: "almuerzo", si: { pos: [-8.3, 0, 4.05], rot: 0, pose: "comer", acc: "torta" }, icono: "fa-bowl-food" },
 };
 
-function VistaLetreros({ casoIdx, estado, modoColor }: { casoIdx: number; estado: "leer" | "decidido"; modoColor: string }) {
+function VistaLetreros({ casoIdx, estado, modoColor, suposicion }: { casoIdx: number; estado: "leer" | "decidido" | "mal"; modoColor: string; suposicion: boolean | null }) {
   const c = CASOS[casoIdx] ?? CASOS[0]!;
   const e = ESCENA_CASO[c.id]!;
   const p = personaPorId(c.quien);
   const decidido = estado === "decidido";
   const hace = decidido && c.puede && e.si;
-  const col = decidido ? (c.puede ? OK : NO) : modoColor;
+  const mal = estado === "mal";
+  const col = decidido ? (c.puede ? OK : NO) : mal ? "#fb923c" : modoColor;
   return (
     <group>
       <PersonaFig
@@ -1301,7 +1316,7 @@ function VistaLetreros({ casoIdx, estado, modoColor }: { casoIdx: number; estado
         p={p}
         destino={hace ? e.si!.pos : e.pos}
         rotY={hace ? e.si!.rot : e.rot}
-        pose={hace ? e.si!.pose : decidido && !c.puede ? "no" : e.antes}
+        pose={hace ? e.si!.pose : decidido && !c.puede ? "no" : mal ? "encoger" : e.antes}
         accesorio={hace ? e.si!.acc : decidido && !c.puede ? null : e.acc}
         conBici={!!e.bici}
         anillo={col}
@@ -1309,8 +1324,8 @@ function VistaLetreros({ casoIdx, estado, modoColor }: { casoIdx: number; estado
         etiqueta={
           <>
             {p.nombre}
-            {decidido ? <i className={`fa-solid ${c.puede ? "fa-circle-check" : "fa-ban"}`} style={{ color: col }} /> : <i className={`fa-solid ${e.icono}`} style={{ color: modoColor }} />}
-            {decidido ? (c.puede ? "can" : "can't") : "?"}
+            {decidido ? <i className={`fa-solid ${c.puede ? "fa-circle-check" : "fa-ban"}`} style={{ color: col }} /> : mal ? <i className="fa-solid fa-circle-xmark" style={{ color: col }} /> : <i className={`fa-solid ${e.icono}`} style={{ color: modoColor }} />}
+            {decidido ? (c.puede ? "can" : "can't") : mal ? `${suposicion ? "can" : "can't"} ✗` : "?"}
           </>
         }
       />
@@ -1342,6 +1357,18 @@ function CamaraGuiada({ pos, target, clave }: { pos: Pt; target: Pt; clave: stri
       controls.update?.();
     } else camera.lookAt(target[0], target[1], target[2]);
   });
+  return null;
+}
+
+/** En pantallas angostas se aleja la cámara (zoom) para que quepa todo el ancho. */
+function AjusteAngosto({ zoom }: { zoom: number }) {
+  const leer = useThree((st) => st.get);
+  const ancho = useThree((st) => st.size.width);
+  useLayoutEffect(() => {
+    const c = leer().camera as THREE.PerspectiveCamera;
+    c.zoom = ancho < 640 ? zoom : 1;
+    c.updateProjectionMatrix();
+  }, [leer, ancho, zoom]);
   return null;
 }
 
@@ -1389,12 +1416,13 @@ export default function HabilidadesPermisosInglesScene(p: HabilidadesSceneProps)
       </Environment>
 
       <Centro sinNombre={letrero?.lugar ?? null} relojMin={relojMin} cerrada={cerrada} focoLugar={focoLugar} destacados={destacados} />
-      {letrero && <LetreroHtml pos={POS_LETRERO[letrero.lugar]} lugar={letrero.lugar} resalta={letrero.resalta} df={vista === "letreros" ? 6.5 : 7.5} />}
+      {letrero && <LetreroHtml pos={POS_LETRERO[letrero.lugar]} lugar={letrero.lugar} resalta={letrero.resalta} />}
 
-      {vista === "club" && <VistaClub seleccion={p.seleccion} intento={p.intento} burbuja={p.burbujaClub} insignias={p.insignias} misionIdx={p.misionIdx} onElegir={p.onElegir} modoColor={modoColor} />}
-      {vista === "permiso" && <VistaPermiso sitIdx={p.sitIdx} pasoP={p.pasoP} registro={p.registro} peticionTxt={p.peticionTxt} />}
-      {vista === "letreros" && <VistaLetreros casoIdx={p.casoIdx} estado={p.estadoCaso} modoColor={modoColor} />}
+      {vista === "club" && <VistaClub seleccion={p.seleccion} intento={p.intento} burbuja={p.burbujaClub} insignias={p.insignias} misionIdx={p.misionIdx} onElegir={p.onElegir} modoColor={modoColor} preguntaMala={!!p.preguntaMala} />}
+      {vista === "permiso" && <VistaPermiso sitIdx={p.sitIdx} pasoP={p.pasoP} registro={p.registro} peticionTxt={p.peticionTxt} peticionMala={!!p.peticionMala} />}
+      {vista === "letreros" && <VistaLetreros casoIdx={p.casoIdx} estado={p.estadoCaso} modoColor={modoColor} suposicion={p.suposicion ?? null} />}
 
+      <AjusteAngosto zoom={0.7} />
       <CamaraGuiada pos={cam.pos} target={cam.target} clave={clave} />
       <OrbitControls makeDefault enablePan={false} enableZoom minDistance={4} maxDistance={30} maxPolarAngle={Math.PI * 0.46} minPolarAngle={Math.PI * 0.1} minAzimuthAngle={-Math.PI * 0.45} maxAzimuthAngle={Math.PI * 0.45} />
       <EffectComposer>

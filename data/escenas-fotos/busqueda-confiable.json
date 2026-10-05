@@ -1,0 +1,13 @@
+{
+  "slug": "busqueda-confiable",
+  "items": [
+    { "clave": "laboratorio-sueno", "formato": "1:1", "estilo": "foto", "escena": "Cuarto de investigación con una cama de estudio, sensores en la almohada y una computadora con curvas en pantalla, luz fría de laboratorio" },
+    { "clave": "adolescente-durmiendo", "formato": "1:1", "estilo": "foto", "escena": "Adolescente dormido en su cama con luz suave de la mañana entrando por la ventana, cobija azul" },
+    { "clave": "cafe-laptop-noche", "formato": "1:1", "estilo": "foto", "escena": "Escritorio de noche con una laptop abierta, taza de café y una lámpara cálida, ventana oscura al fondo" },
+    { "clave": "mochila-libros", "formato": "1:1", "estilo": "foto", "escena": "Mochila abierta sobre un escritorio escolar con cuadernos, lápices y libros apilados" },
+    { "clave": "reloj-despertador", "formato": "1:1", "estilo": "foto", "escena": "Reloj despertador analógico sobre un buró junto a una cama, luz tenue de la madrugada" },
+    { "clave": "frasco-pastillas", "formato": "1:1", "estilo": "foto", "escena": "Frasco de plástico liso sin etiqueta con cápsulas derramadas sobre una mesa de madera" },
+    { "clave": "celular-cama-oscuro", "formato": "1:1", "estilo": "foto", "escena": "Mano sosteniendo un teléfono encendido en una habitación oscura, la luz azul ilumina la cobija" },
+    { "clave": "salon-somnoliento", "formato": "1:1", "estilo": "foto", "escena": "Salón de bachillerato con estudiantes sentados en sus pupitres, uno recargando la cabeza sobre los brazos" }
+  ]
+}

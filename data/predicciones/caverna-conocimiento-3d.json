@@ -1,0 +1,12 @@
+{
+  "escena": "Una caverna con un fuego detrás de los prisioneros. Entre el fuego y la pared llevan una figura de madera: puedes girarla, inclinarla y acercarla al fuego.",
+  "pregunta": "Un cono de pie da sombra triangular. ¿Qué sombra da si lo inclinas 90° hacia el fuego?",
+  "opciones": [
+    { "id": "a", "texto": "Un círculo", "icono": "fa-circle" },
+    { "id": "b", "texto": "Un triángulo más grande", "icono": "fa-caret-up" },
+    { "id": "c", "texto": "Un cuadrado", "icono": "fa-square" }
+  ],
+  "correcta": "a",
+  "porque": "Visto desde el fuego, el cono inclinado muestra su base redonda y la punta cae dentro de ella. Objetos distintos pueden dar la misma sombra: por eso los prisioneros no pueden saber qué la produce.",
+  "comoComprobarlo": "Escoge Cono, pon Girar en 0° y mueve Inclinar de 0° a 90° mirando la sombra en la pared."
+}

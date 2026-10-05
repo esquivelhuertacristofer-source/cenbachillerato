@@ -21,8 +21,8 @@
  */
 
 import * as THREE from "three";
-import { useEffect, useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useEffect, useLayoutEffect, useMemo, useRef, type ReactNode } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Environment, Lightformer } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import {
@@ -84,23 +84,12 @@ const OK = "#34d399";
  * Texto en escena
  * ════════════════════════════════════════════════════════════════════════ */
 
-function Etiqueta({
-  pos,
-  children,
-  df = 10,
-  col,
-  fs = 12,
-  fondo = "rgba(4,10,22,0.86)",
-}: {
-  pos: Pt;
-  children: ReactNode;
-  df?: number;
-  col?: string;
-  fs?: number;
-  fondo?: string;
-}) {
+/** Etiqueta en <Html>: tamaño fijo en píxeles (≥ 14 px). Las `ancha` se ocultan en pantallas angostas. */
+function Etiqueta({ pos, children, col, fs = 14, ancha = false, fondo = "rgba(4,10,22,0.86)" }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number; ancha?: boolean; fondo?: string }) {
+  const { size } = useThree();
+  if (ancha && size.width < 640) return null;
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -111,7 +100,7 @@ function Etiqueta({
           background: fondo,
           border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`,
           color: "#fff",
-          fontSize: fs,
+          fontSize: Math.max(14, fs),
           fontWeight: 800,
           whiteSpace: "nowrap",
           boxShadow: "0 6px 18px -8px #000",
@@ -123,11 +112,25 @@ function Etiqueta({
   );
 }
 
-function Burbuja({ pos, texto, col, df = 8, lado = "centro", ancho = 300 }: { pos: Pt; texto: string; col: string; df?: number; lado?: "izq" | "der" | "centro"; ancho?: number }) {
+/** Desplaza la imagen hacia arriba para que el contenido quede entre la barra superior y la misión. */
+function Encuadre() {
+  const { camera, size } = useThree();
+  useLayoutEffect(() => {
+    const c = camera as THREE.PerspectiveCamera;
+    if (!c.isPerspectiveCamera) return undefined;
+    c.setViewOffset(size.width, size.height, 0, Math.round(size.height * 0.07), size.width, size.height);
+    return () => c.clearViewOffset();
+  }, [camera, size.width, size.height]);
+  return null;
+}
+
+function Burbuja({ pos, texto, col, lado = "centro", ancho = 300 }: { pos: Pt; texto: string; col: string; df?: number; lado?: "izq" | "der" | "centro"; ancho?: number }) {
+  const { size } = useThree();
+  if (size.width < 640) return null;
   const dx = lado === "izq" ? "-80%" : lado === "der" ? "-20%" : "-50%";
   const cola = lado === "izq" ? "80%" : lado === "der" ? "20%" : "50%";
   return (
-    <Html position={pos} distanceFactor={df} zIndexRange={[24, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} zIndexRange={[24, 0]} style={{ pointerEvents: "none" }}>
       <div style={{ transform: `translate(${dx}, -100%)` }}>
         <div
           lang="en"
@@ -986,7 +989,7 @@ function Patio({ foco, sinNombres }: { foco: TemaId | null; sinNombres: boolean 
           const { x, z, dir } = PUESTO[tm];
           if (foco && foco !== tm) return null;
           return (
-            <Etiqueta key={tm} pos={[x - dir * 0.85, 3.12, z]} df={foco ? 7 : 12} fs={13} col={`${d.color}cc`}>
+            <Etiqueta key={tm} pos={[x - dir * 0.85, 3.12, z]} col={`${d.color}cc`}>
               <i className={`fa-solid ${d.icono}`} style={{ color: d.color }} />
               <span lang="en">{d.puesto}</span>
             </Etiqueta>
@@ -1058,24 +1061,19 @@ function Grafica({ grafica, temaSel }: { grafica: GustosSceneProps["grafica"]; t
             <Barra x={x - 0.4} z={z} n={g.like} col={COL_LIKE} />
             <Barra x={x} z={z} n={g.mind} col={COL_MIND} />
             <Barra x={x + 0.4} z={z} n={g.dislike} col={COL_DISLIKE} />
-            <Etiqueta pos={[x, 0.2, z + 1.25]} df={11} fs={12} col={on ? d.color : `${d.color}66`} fondo={on ? "rgba(4,10,22,0.92)" : "rgba(4,10,22,0.7)"}>
-              <i className={`fa-solid ${d.icono}`} style={{ color: d.color }} />
-              {g.n > 0 && (
-                <span style={{ fontFamily: "ui-monospace, monospace" }}>
-                  <span style={{ color: COL_LIKE }}>{g.like}</span>·<span style={{ color: COL_MIND }}>{g.mind}</span>·<span style={{ color: COL_DISLIKE }}>{g.dislike}</span>
-                </span>
-              )}
-            </Etiqueta>
+            {on && (
+              <Etiqueta pos={[x, 0.2, z + 1.25]} col={d.color} fondo="rgba(4,10,22,0.92)">
+                <i className={`fa-solid ${d.icono}`} style={{ color: d.color }} />
+                {g.n > 0 && (
+                  <span style={{ fontFamily: "ui-monospace, monospace" }}>
+                    <span style={{ color: COL_LIKE }}>{g.like}</span>·<span style={{ color: COL_MIND }}>{g.mind}</span>·<span style={{ color: COL_DISLIKE }}>{g.dislike}</span>
+                  </span>
+                )}
+              </Etiqueta>
+            )}
           </group>
         );
       })}
-      <Etiqueta pos={[0, 4.35, z - 1.0]} df={12} fs={13} col="#94a3b8aa">
-        <i className="fa-solid fa-square-poll-vertical" style={{ color: COL_LIKE }} />
-        <span lang="en">Likes survey</span>
-        <span style={{ color: COL_LIKE }}>■ like</span>
-        <span style={{ color: COL_MIND }}>■ don&apos;t mind</span>
-        <span style={{ color: COL_DISLIKE }}>■ don&apos;t like</span>
-      </Etiqueta>
     </group>
   );
 }
@@ -1129,7 +1127,7 @@ function VistaEncuesta({
             anillo={sel ? modoColor : null}
             etiquetaCol={sel ? modoColor : resp ? `${GRADO_DEF[g].col}aa` : "rgba(255,255,255,0.28)"}
             etiqueta={
-              !resp || sel || esUltima ? (
+              sel ? (
                 <>
                   {p.nombre}
                   {resp && <i className={`fa-solid ${GRADO_DEF[g].icono}`} style={{ color: GRADO_DEF[g].col }} />}
@@ -1360,7 +1358,7 @@ function VistaMesas({
             onClick={() => onElegirMesa(id)}
             anillo={sel ? modoColor : null}
             etiquetaCol={sel ? modoColor : emo !== null ? `${GRADO_DEF[emo as Grado].col}aa` : "rgba(255,255,255,0.28)"}
-            etiqueta={<>{p.nombre}</>}
+            etiqueta={sel ? <>{p.nombre}</> : undefined}
             emocion={emo}
             claveEmocion={`${escIdx}-${id}-${tm ?? ""}-${revisado ? 1 : 0}`}
           />
@@ -1504,7 +1502,7 @@ export default function GustosOpinionesInglesScene(p: GustosSceneProps) {
         <Lightformer form="rect" intensity={0.6} position={[-8, 2, 7]} scale={[6, 6, 1]} color={modoColor} />
       </Environment>
 
-      <Patio foco={vista === "opinion" ? foco : null} sinNombres={false} />
+      <Patio foco={foco} sinNombres={vista === "mesas"} />
       {vista === "encuesta" && (
         <VistaEncuesta
           temaSel={p.temaSel}
@@ -1523,21 +1521,9 @@ export default function GustosOpinionesInglesScene(p: GustosSceneProps) {
         <group>
           <Caja p={[0, 0.2, ESCENARIO_Z]} s={[9.2, 0.4, 2.2]} c="#334155" r={0.6} />
           <Caja p={[0, 2.2, ESCENARIO_Z - 1.05]} s={[9.2, 3.6, 0.12]} c="#0f172a" r={0.5} />
-          {vista === "mesas" && (
-            <Etiqueta pos={[0, 3.2, ESCENARIO_Z - 0.9]} df={12} fs={14} col="#fbbf24aa">
-              <i className="fa-solid fa-people-group" style={{ color: "#fbbf24" }} />
-              <span lang="en">{(ESCENARIOS[p.escIdx] ?? ESCENARIOS[0]!).titulo}</span>
-            </Etiqueta>
-          )}
         </group>
       )}
-      {vista !== "opinion" && (
-        <Etiqueta pos={[0, 4.95, -8.4]} df={14} fs={13} col="#c4b5fdaa">
-          <i className="fa-solid fa-school" style={{ color: "#c4b5fd" }} />
-          Feria de Gustos · Preparatoria Las Jacarandas
-        </Etiqueta>
-      )}
-
+      <Encuadre />
       <CamaraGuiada pos={cam.pos} target={cam.target} clave={clave} />
       <OrbitControls
         makeDefault

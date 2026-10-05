@@ -23,10 +23,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, NUM, OK, card, Eyebrow, SceneBoundary } from "./_kit";
+import { T, OK, card, Eyebrow, SceneBoundary } from "./_kit";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { CompletaTexto } from "./_mecanica-huecos";
+import { LabShell, Bloque, BotonHerramienta, Deslizador } from "./_shell";
 import { LabSfx } from "./lab-audio";
 import { useEstrellas } from "@/lib/hooks/useEstrellas";
 import { DILEMA_TRANVIA_FICHA } from "./dilema-tranvia-ficha";
@@ -99,7 +100,7 @@ const DilemaScene = dynamic(() => import("./DilemaTranviaScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-train-tram fa-fade" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Preparando las vías del dilema en 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Preparando las vías del dilema en 3D…</span>
     </div>
   ),
 });
@@ -162,15 +163,15 @@ function TeoriaCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: str
           ¿Qué teoría habla?
         </Eyebrow>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 10.5, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
           {[1, 2, 3].map((k) => (
-            <i key={k} className="fa-solid fa-star" style={{ fontSize: 13, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
+            <i key={k} className="fa-solid fa-star" style={{ fontSize: 14, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
           ))}
         </div>
       </div>
       {resuelto === null ? (
         <>
-          <div style={{ fontSize: 11, color: T.text3, fontWeight: 800, marginBottom: 6 }}>
+          <div style={{ fontSize: 14, color: T.text3, fontWeight: 800, marginBottom: 6 }}>
             Razón {pos + 1} de {ronda.length} · ¿desde qué corriente ética se razona?
           </div>
           <div style={{ fontSize: 15, color: "#fff", fontWeight: 800, lineHeight: 1.45, marginBottom: 12 }}>«{actual.texto}»</div>
@@ -182,7 +183,7 @@ function TeoriaCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: str
               </button>
             ))}
           </div>
-          {aviso && <div style={{ marginTop: 10, fontSize: 12, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
+          {aviso && <div style={{ marginTop: 10, fontSize: 14, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
         </>
       ) : (
         <div style={{ padding: "12px 14px", borderRadius: 11, border: `1px solid ${OK}55`, background: "rgba(52,211,153,0.08)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
@@ -190,9 +191,9 @@ function TeoriaCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: str
             {[1, 2, 3].map((k) => (
               <i key={k} className="fa-solid fa-star" style={{ fontSize: 15, color: k <= resuelto ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
             ))}
-            <span style={{ fontSize: 12.5, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
+            <span style={{ fontSize: 14, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
           </span>
-          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 12.5, fontWeight: 900 }}>
+          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 14, fontWeight: 900 }}>
             <i className="fa-solid fa-shuffle" style={{ marginRight: 8 }} />
             Otra ronda
           </button>
@@ -221,6 +222,7 @@ export function LabDilemaTranvia({ color }: PracticaLabProps) {
   const [vioN1, setVioN1] = useState(false);
   const [vioN10, setVioN10] = useState(false);
   const [analizo, setAnalizo] = useState(false);
+  const [movioN, setMovioN] = useState(false);
 
   // ── Cotidiano
   const [casoId, setCasoId] = useState<CasoId>("examen");
@@ -251,7 +253,6 @@ export function LabDilemaTranvia({ color }: PracticaLabProps) {
 
   // ── Comunes
   const [resetNonce, setResetNonce] = useState(0);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   const { mejorEstrellas, registraEstrellas: guardaEstrellas } = useEstrellas(RETO_KEY);
@@ -316,7 +317,8 @@ export function LabDilemaTranvia({ color }: PracticaLabProps) {
   };
   const cambiarN = (k: number) => {
     setN(k);
-    if (elecciones[variante] && vdef.numeroLibre) {
+    if (vdef.numeroLibre) {
+      setMovioN(true);
       if (k === N_MIN) setVioN1(true);
       if (k === N_MAX) setVioN10(true);
     }
@@ -459,18 +461,19 @@ export function LabDilemaTranvia({ color }: PracticaLabProps) {
   };
 
   /* ── Objetivos ─────────────────────────────────────────────────────── */
-  const objetivos: { t: string; done: boolean }[] = [
-    { t: "Decidir las cuatro variantes del tranvía con una razón coherente", done: coherentes.length === VARIANTES.length },
-    { t: "Poner 1 y 10 personas en la vía y ver qué teorías cambian su veredicto", done: vioN1 && vioN10 },
-    { t: "Analizar tu consistencia entre prever un daño y usar a alguien", done: analizo },
-    { t: "Identificar a los afectados y separar hechos de valores en un dilema cotidiano", done: casosAnalizados.size > 0 },
-    { t: "Construir argumentos bien formados en dos dilemas distintos", done: Object.keys(logros).length >= 2 },
-    { t: "Construir un argumento para cada postura en un mismo dilema", done: Object.values(logros).some((l) => (l?.length ?? 0) >= 2) },
-    { t: "Clasificar las 14 intervenciones del debate y detectar sus tres falacias", done: todasClasificadas },
-    { t: "Armar tu intervención: tres argumentos y una refutación (A3)", done: intervencionOk },
-    { t: "Clasificar razones por teoría y ganar estrellas", done: identifico },
-    { t: "Aprobar el quiz evaluable (A2)", done: quizAprobado },
-    { t: "Completar el texto (A6)", done: textoOk },
+  const objetivos: { txt: string; done: boolean }[] = [
+    { txt: "Mueve el número de personas en la vía y mira cómo cambian los veredictos de cada teoría", done: movioN },
+    { txt: "Decidir las cuatro variantes del tranvía con una razón coherente", done: coherentes.length === VARIANTES.length },
+    { txt: "Poner 1 y 10 personas en la vía y ver qué teorías cambian su veredicto", done: vioN1 && vioN10 },
+    { txt: "Analizar tu consistencia entre prever un daño y usar a alguien", done: analizo },
+    { txt: "Identificar a los afectados y separar hechos de valores en un dilema cotidiano", done: casosAnalizados.size > 0 },
+    { txt: "Construir argumentos bien formados en dos dilemas distintos", done: Object.keys(logros).length >= 2 },
+    { txt: "Construir un argumento para cada postura en un mismo dilema", done: Object.values(logros).some((l) => (l?.length ?? 0) >= 2) },
+    { txt: "Clasificar las 14 intervenciones del debate y detectar sus tres falacias", done: todasClasificadas },
+    { txt: "Armar tu intervención: tres argumentos y una refutación (A3)", done: intervencionOk },
+    { txt: "Clasificar razones por teoría y ganar estrellas", done: identifico },
+    { txt: "Aprobar el quiz evaluable (A2)", done: quizAprobado },
+    { txt: "Completar el texto (A6)", done: textoOk },
   ];
 
   /* ── Visor ─────────────────────────────────────────────────────────── */
@@ -488,19 +491,33 @@ export function LabDilemaTranvia({ color }: PracticaLabProps) {
     pie = todasClasificadas ? "La balanza no decide quién tiene razón: muestra cuántas razones bien fundadas hay de cada lado. Las falacias no pesan, y un solo argumento sólido puede valer más que varios débiles." : `${HABLANTES[actual.hablante]}: «${actual.texto}»`;
   }
 
+  const vUtil = veredictoTeoria("utilitarismo", variante, n);
+  const lectura =
+    modo === "tranvia"
+      ? eleccion
+        ? coherente
+          ? "Tu razón sostiene tu decisión"
+          : "Tu razón no sostiene tu decisión"
+        : `${plural(enRiesgo(variante, n), "persona", "personas")} · utilitarismo: ${VEREDICTO_DEF[vUtil.v].etq.toLowerCase()}`
+      : modo === "cotidiano"
+        ? postura
+          ? `Argumento válido · postura ${postura}`
+          : `${marcados.length} afectados marcados`
+        : `${clasificados.length}/${INTERVENCIONES.length} clasificadas · ${peso.fines} contra ${peso.limites}`;
+
   const sceneFallback = (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 28, textAlign: "center" }}>
       <div style={{ width: 74, height: 74, borderRadius: 20, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30, color: "#04121f", background: accent, boxShadow: `0 10px 30px -6px ${accent}` }}>
         <i className={`fa-solid ${def.icono}`} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{def.etq}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los resultados siguen aquí. {pie}</div>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los resultados siguen aquí. {pie}</div>
     </div>
   );
 
-  const sub = (txt: string) => <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
+  const sub = (txt: string) => <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
   const nota = (txt: ReactNode, col: string, icono = "fa-circle-info") => (
-    <div style={{ marginTop: 10, fontSize: 12, lineHeight: 1.55, color: col }}>
+    <div style={{ marginTop: 10, fontSize: 14, lineHeight: 1.55, color: col }}>
       <i className={`fa-solid ${icono}`} style={{ marginRight: 7 }} />
       {txt}
     </div>
@@ -527,19 +544,46 @@ export function LabDilemaTranvia({ color }: PracticaLabProps) {
           })}
         </div>
         {sub("El caso")}
-        <div style={{ fontSize: 13.5, color: "#fff", fontWeight: 800, lineHeight: 1.5 }}>{vdef.texto}</div>
-        <div style={{ fontSize: 11, color: T.text3, marginTop: 5, lineHeight: 1.45 }}>{vdef.origen}</div>
+        <div style={{ fontSize: 14, color: "#fff", fontWeight: 800, lineHeight: 1.5 }}>{vdef.texto}</div>
+        <div style={{ fontSize: 14, color: T.text3, marginTop: 5, lineHeight: 1.45 }}>{vdef.origen}</div>
 
         {vdef.numeroLibre ? (
-          <label style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 12 }}>
-            <i className="fa-solid fa-helmet-safety" style={{ color: "#f97316" }} />
-            <span style={{ fontSize: 11.5, color: T.text2, fontWeight: 800, whiteSpace: "nowrap" }}>En la vía principal</span>
-            <input type="range" aria-label="Personas en la vía principal" className="dt-range" min={N_MIN} max={N_MAX} step={1} value={n} onChange={(e) => cambiarN(Number(e.target.value))} style={{ ["--dtc" as string]: "#f97316" }} />
-            <span style={{ width: 92, textAlign: "right", fontSize: 13, color: "#fff", fontWeight: 800, ...NUM }}>{plural(n, "persona", "personas")}</span>
-          </label>
+          <div style={{ marginTop: 14 }}>
+            <Deslizador label="En la vía principal" icon="fa-helmet-safety" colr="#f97316" valor={plural(n, "persona", "personas")} min={N_MIN} max={N_MAX} step={1} value={n} onChange={cambiarN} hintL="1" hintR="10" />
+          </div>
         ) : (
-          <div style={{ fontSize: 11.5, color: T.text3, marginTop: 10 }}>En el hospital siempre son cinco pacientes, como en el caso de Thomson.</div>
+          <div style={{ fontSize: 14, color: T.text3, marginTop: 10 }}>En el hospital siempre son cinco pacientes, como en el caso de Thomson.</div>
         )}
+
+        {sub(`Cómo razonaría cada teoría · ${plural(enRiesgo(variante, n), "persona", "personas")} en riesgo`)}
+        <div style={{ display: "grid", gap: 7 }}>
+          {(["utilitarismo", "deontologia", "dobleEfecto", "virtudes", "cuidado"] as const).map((t) => {
+            const vt = veredictoTeoria(t, variante, n);
+            const vd = VEREDICTO_DEF[vt.v];
+            const sensible = vdef.numeroLibre && veredictoTeoria(t, variante, N_MIN).v !== veredictoTeoria(t, variante, N_MAX).v;
+            return (
+              <div key={t} className="dt-teoria" style={{ padding: "9px 12px", borderRadius: 11, border: `1px solid ${TEORIA_DEF[t].color}40`, background: "rgba(4,10,22,0.4)" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+                  <span style={{ fontSize: 14, fontWeight: 900, color: "#fff" }}>
+                    <i className={`fa-solid ${TEORIA_DEF[t].icono}`} style={{ marginRight: 8, color: TEORIA_DEF[t].color }} />
+                    {TEORIA_DEF[t].etq}
+                  </span>
+                  <span className="dt-veredicto" style={{ fontSize: 14, fontWeight: 900, padding: "3px 8px", borderRadius: 999, color: vd.color, border: `1px solid ${vd.color}66` }}>
+                    {vd.etq}
+                  </span>
+                </div>
+                {vdef.numeroLibre && (
+                  <div style={{ fontSize: 14, color: sensible ? "#fbbf24" : T.text3, fontWeight: 800, marginTop: 4 }}>
+                    <i className={`fa-solid ${sensible ? "fa-arrows-up-down" : "fa-equals"}`} style={{ marginRight: 6 }} />
+                    {sensible ? "Su veredicto depende del número de personas" : "Su veredicto no depende del número"}
+                  </div>
+                )}
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.45, marginTop: 4 }}>{vt.txt}</div>
+              </div>
+            );
+          })}
+        </div>
+        <div style={{ fontSize: 14, color: T.text3, marginTop: 8, lineHeight: 1.45 }}>Son lecturas típicas de cada corriente; dentro de cada una hay autores que discrepan.{vdef.numeroLibre && " Mueve el número de personas: ¿qué teorías cambian su veredicto y cuáles no?"}</div>
 
         {!eleccion ? (
           <>
@@ -572,11 +616,11 @@ export function LabDilemaTranvia({ color }: PracticaLabProps) {
             {sub("Tu decisión y tu razón")}
             {caja(
               <>
-                <div style={{ fontSize: 13, color: "#fff", fontWeight: 900 }}>
+                <div style={{ fontSize: 14, color: "#fff", fontWeight: 900 }}>
                   {eleccion.decision === "actuar" ? vdef.actuar : vdef.noActuar} · con {plural(eleccion.n, "persona", "personas")} en riesgo
                 </div>
-                <div style={{ fontSize: 12, color: T.text2, marginTop: 4, lineHeight: 1.45 }}>«{razonElegida?.texto}»</div>
-                {eleccion.texto && <div style={{ fontSize: 12, color: T.text2, marginTop: 6, lineHeight: 1.45, fontStyle: "italic" }}>Con tus palabras: «{eleccion.texto}»</div>}
+                <div style={{ fontSize: 14, color: T.text2, marginTop: 4, lineHeight: 1.45 }}>«{razonElegida?.texto}»</div>
+                {eleccion.texto && <div style={{ fontSize: 14, color: T.text2, marginTop: 6, lineHeight: 1.45, fontStyle: "italic" }}>Con tus palabras: «{eleccion.texto}»</div>}
               </>,
               `${modoCol}55`,
             )}
@@ -601,28 +645,6 @@ export function LabDilemaTranvia({ color }: PracticaLabProps) {
               </button>
             </div>
 
-            {sub(`Cómo razonaría cada teoría · ${plural(enRiesgo(variante, n), "persona", "personas")} en riesgo`)}
-            <div style={{ display: "grid", gap: 7 }}>
-              {(["utilitarismo", "deontologia", "dobleEfecto", "virtudes", "cuidado"] as const).map((t) => {
-                const vt = veredictoTeoria(t, variante, n);
-                const vd = VEREDICTO_DEF[vt.v];
-                return (
-                  <div key={t} className="dt-teoria" style={{ padding: "9px 12px", borderRadius: 11, border: `1px solid ${TEORIA_DEF[t].color}40`, background: "rgba(4,10,22,0.4)" }}>
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
-                      <span style={{ fontSize: 12.5, fontWeight: 900, color: "#fff" }}>
-                        <i className={`fa-solid ${TEORIA_DEF[t].icono}`} style={{ marginRight: 8, color: TEORIA_DEF[t].color }} />
-                        {TEORIA_DEF[t].etq}
-                      </span>
-                      <span className="dt-veredicto" style={{ fontSize: 10.5, fontWeight: 900, padding: "3px 8px", borderRadius: 999, color: vd.color, border: `1px solid ${vd.color}66` }}>
-                        {vd.etq}
-                      </span>
-                    </div>
-                    <div style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45, marginTop: 4 }}>{vt.txt}</div>
-                  </div>
-                );
-              })}
-            </div>
-            <div style={{ fontSize: 11, color: T.text3, marginTop: 8, lineHeight: 1.45 }}>Son lecturas típicas de cada corriente; dentro de cada una hay autores que discrepan. {vdef.numeroLibre && "Mueve el número de personas: ¿qué teorías cambian su veredicto y cuáles no?"}</div>
           </>
         )}
 
@@ -634,16 +656,16 @@ export function LabDilemaTranvia({ color }: PracticaLabProps) {
         {analizo && consistencia.length > 0 && (
           <div style={{ display: "grid", gap: 7, marginTop: 10 }}>
             {consistencia.map((o, i) => (
-              <div key={i} style={{ fontSize: 12, color: "#fff", lineHeight: 1.5, padding: "9px 12px", borderRadius: 10, background: `${modoCol}14`, border: `1px solid ${modoCol}44` }}>
+              <div key={i} style={{ fontSize: 14, color: "#fff", lineHeight: 1.5, padding: "9px 12px", borderRadius: 10, background: `${modoCol}14`, border: `1px solid ${modoCol}44` }}>
                 <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: modoCol }} />
                 {o}
               </div>
             ))}
-            <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.5 }}>
+            <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
               <i className="fa-solid fa-users" style={{ marginRight: 7 }} />
               {TENDENCIA_ENCUESTAS}
             </div>
-            <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.5 }}>
+            <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
               <i className="fa-solid fa-earth-americas" style={{ marginRight: 7 }} />
               {MORAL_MACHINE}
             </div>
@@ -664,7 +686,7 @@ export function LabDilemaTranvia({ color }: PracticaLabProps) {
           ))}
         </div>
         {sub("La situación")}
-        <div style={{ fontSize: 13.5, color: "#fff", fontWeight: 800, lineHeight: 1.5 }}>{caso.situacion}</div>
+        <div style={{ fontSize: 14, color: "#fff", fontWeight: 800, lineHeight: 1.5 }}>{caso.situacion}</div>
 
         {sub("1 · ¿A quiénes afecta la decisión? (marca todos)")}
         <div className="dt-opts">
@@ -707,7 +729,7 @@ export function LabDilemaTranvia({ color }: PracticaLabProps) {
             return (
               <div key={i} style={{ padding: "9px 12px", borderRadius: 11, border: `1px solid ${r ? (bien ? `${OK}55` : `${WARN}66`) : T.line}`, background: "rgba(4,10,22,0.4)" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
-                  <span style={{ fontSize: 12.5, color: "#fff", fontWeight: 700, lineHeight: 1.4, flex: "1 1 220px" }}>«{e.texto}»</span>
+                  <span style={{ fontSize: 14, color: "#fff", fontWeight: 700, lineHeight: 1.4, flex: "1 1 220px" }}>«{e.texto}»</span>
                   <span style={{ display: "flex", gap: 5 }}>
                     {(["hecho", "valor"] as const).map((tp) => (
                       <button key={tp} className="dt-opt dt-hv" data-on={r === tp} onClick={() => clasificarHV(i, tp)} style={{ padding: "6px 10px", ["--dtc" as string]: r === tp ? (bien ? OK : WARN) : modoCol, background: r === tp ? `${bien ? OK : WARN}1f` : "transparent" }}>
@@ -716,7 +738,7 @@ export function LabDilemaTranvia({ color }: PracticaLabProps) {
                     ))}
                   </span>
                 </div>
-                {r && <div style={{ fontSize: 11.5, color: bien ? OK : WARN, marginTop: 5, lineHeight: 1.4 }}>{bien ? e.porque : `Revisa: ${e.tipo === "hecho" ? "se puede comprobar, así que es un hecho." : "expresa lo que debería ser, así que es un valor."}`}</div>}
+                {r && <div style={{ fontSize: 14, color: bien ? OK : WARN, marginTop: 5, lineHeight: 1.4 }}>{bien ? e.porque : `Revisa: ${e.tipo === "hecho" ? "se puede comprobar, así que es un hecho." : "expresa lo que debería ser, así que es un valor."}`}</div>}
               </div>
             );
           })}
@@ -730,16 +752,16 @@ export function LabDilemaTranvia({ color }: PracticaLabProps) {
             const col = m ? (m.ok ? OK : WARN) : slotActivo === s.id ? modoCol : "rgba(255,255,255,0.18)";
             return (
               <button key={s.id} className="dt-slot" data-activo={slotActivo === s.id} onClick={() => { setSlotActivo(s.id); blip(); }} style={{ ["--dtc" as string]: col }}>
-                <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: "0.06em", color: col, textTransform: "uppercase" }}>
+                <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.06em", color: col, textTransform: "uppercase" }}>
                   {k + 1} · {s.etq}
                 </div>
-                <div style={{ fontSize: 12, color: f ? "#fff" : T.text3, fontWeight: f ? 700 : 600, marginTop: 4, lineHeight: 1.4 }}>{f ? f.texto : s.ayuda}</div>
-                {m && <div style={{ fontSize: 11, color: col, marginTop: 5, lineHeight: 1.4 }}>{m.txt}</div>}
+                <div style={{ fontSize: 14, color: f ? "#fff" : T.text3, fontWeight: f ? 700 : 600, marginTop: 4, lineHeight: 1.4 }}>{f ? f.texto : s.ayuda}</div>
+                {m && <div style={{ fontSize: 14, color: col, marginTop: 5, lineHeight: 1.4 }}>{m.txt}</div>}
               </button>
             );
           })}
         </div>
-        <div style={{ fontSize: 11, color: T.text3, margin: "10px 0 6px" }}>Toca un espacio y después una ficha. Hay hechos, principios, conclusiones… y falacias.</div>
+        <div style={{ fontSize: 14, color: T.text3, margin: "10px 0 6px" }}>Toca un espacio y después una ficha. Hay hechos, principios, conclusiones… y falacias.</div>
         <div style={{ display: "grid", gap: 6 }}>
           {fichasOrden.map((f) => {
             const usada = (Object.values(slots) as (string | null)[]).includes(f.id);
@@ -769,8 +791,8 @@ export function LabDilemaTranvia({ color }: PracticaLabProps) {
             revision.ok ? OK : WARN,
             revision.ok ? "fa-circle-check" : "fa-rotate-left",
           )}
-        {caso.nota && <div style={{ fontSize: 11.5, color: T.text3, marginTop: 10, lineHeight: 1.5 }}><i className="fa-solid fa-earth-americas" style={{ marginRight: 7 }} />{caso.nota}</div>}
-        <div style={{ fontSize: 11, color: T.text3, marginTop: 10, lineHeight: 1.5 }}>El caso y las fichas son ilustrativos, escritos para el laboratorio.</div>
+        {caso.nota && <div style={{ fontSize: 14, color: T.text3, marginTop: 10, lineHeight: 1.5 }}><i className="fa-solid fa-earth-americas" style={{ marginRight: 7 }} />{caso.nota}</div>}
+        <div style={{ fontSize: 14, color: T.text3, marginTop: 10, lineHeight: 1.5 }}>El caso y las fichas son ilustrativos, escritos para el laboratorio.</div>
       </>
     );
   } else {
@@ -779,11 +801,11 @@ export function LabDilemaTranvia({ color }: PracticaLabProps) {
       <>
         {caja(
           <>
-            <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: "0.08em", color: modoCol }}>DEBATE A3</div>
-            <div style={{ fontSize: 13.5, color: "#fff", fontWeight: 900, lineHeight: 1.4, marginTop: 3 }}>{DEBATE_A3.tema}</div>
+            <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: modoCol }}>DEBATE A3</div>
+            <div style={{ fontSize: 14, color: "#fff", fontWeight: 900, lineHeight: 1.4, marginTop: 3 }}>{DEBATE_A3.tema}</div>
             <ul style={{ margin: "8px 0 0", paddingLeft: 16, display: "grid", gap: 4 }}>
               {DEBATE_A3.reglas.map((r, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.4 }}>
+                <li key={i} style={{ fontSize: 14, color: T.text2, lineHeight: 1.4 }}>
                   {r}
                 </li>
               ))}
@@ -793,7 +815,7 @@ export function LabDilemaTranvia({ color }: PracticaLabProps) {
         )}
         {sub(`Intervención ${idx + 1} de ${INTERVENCIONES.length} · ${HABLANTES[actual.hablante]}`)}
         <div style={{ fontSize: 14, color: "#fff", fontWeight: 800, lineHeight: 1.5 }}>«{actual.texto}»</div>
-        <div style={{ fontSize: 11, color: T.text3, marginTop: 4 }}>{actual.verbatim ? "Argumento guía del debate A3 (verbatim)" : "Intervención escrita para el laboratorio"}</div>
+        <div style={{ fontSize: 14, color: T.text3, marginTop: 4 }}>{actual.verbatim ? "Argumento guía del debate A3 (verbatim)" : "Intervención escrita para el laboratorio"}</div>
         {sub("¿Desde qué teoría argumenta… o es una falacia?")}
         <div className="dt-opts">
           {CLASES.map((c) => {
@@ -841,7 +863,7 @@ export function LabDilemaTranvia({ color }: PracticaLabProps) {
             </div>
             {ladoInt && otroLado && (
               <>
-                <div style={{ fontSize: 11.5, color: T.text2, margin: "10px 0 6px", fontWeight: 800 }}>Elige tres argumentos sólidos de tu postura ({propias.length}/3):</div>
+                <div style={{ fontSize: 14, color: T.text2, margin: "10px 0 6px", fontWeight: 800 }}>Elige tres argumentos sólidos de tu postura ({propias.length}/3):</div>
                 <div style={{ display: "grid", gap: 6 }}>
                   {INTERVENCIONES.map((x) => (
                     <button key={x.id} className="dt-opt dt-propia" data-on={propias.includes(x.id)} onClick={() => togglePropia(x.id)} style={{ ["--dtc" as string]: modoCol, background: propias.includes(x.id) ? `${modoCol}1f` : "transparent", textAlign: "left", fontWeight: 700 }}>
@@ -850,7 +872,7 @@ export function LabDilemaTranvia({ color }: PracticaLabProps) {
                     </button>
                   ))}
                 </div>
-                <div style={{ fontSize: 11.5, color: T.text2, margin: "12px 0 6px", fontWeight: 800 }}>Elige un argumento de la postura contraria para refutarlo:</div>
+                <div style={{ fontSize: 14, color: T.text2, margin: "12px 0 6px", fontWeight: 800 }}>Elige un argumento de la postura contraria para refutarlo:</div>
                 <div style={{ display: "grid", gap: 6 }}>
                   {INTERVENCIONES.filter((x) => !propias.includes(x.id)).map((x) => (
                     <button key={x.id} className="dt-opt dt-refutada" data-on={refutada === x.id} onClick={() => { setRefutada(x.id); setRevInt(null); blip(); }} style={{ ["--dtc" as string]: "#f472b6", background: refutada === x.id ? "#f472b61f" : "transparent", textAlign: "left", fontWeight: 700 }}>
@@ -865,10 +887,10 @@ export function LabDilemaTranvia({ color }: PracticaLabProps) {
                   Revisar mi intervención
                 </button>
                 {revInt && nota(revInt.txt, revInt.ok ? OK : WARN, revInt.ok ? "fa-circle-check" : "fa-rotate-left")}
-                <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", margin: "12px 0 6px" }}>CRITERIOS DE EVALUACIÓN (A3)</div>
+                <div style={{ fontSize: 14, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", margin: "12px 0 6px" }}>CRITERIOS DE EVALUACIÓN (A3)</div>
                 <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 4 }}>
                   {DEBATE_A3.criterios.map((c, i) => (
-                    <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.4 }}>
+                    <li key={i} style={{ fontSize: 14, color: T.text2, lineHeight: 1.4 }}>
                       {c}
                     </li>
                   ))}
@@ -881,339 +903,194 @@ export function LabDilemaTranvia({ color }: PracticaLabProps) {
     );
   }
 
-  return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes dtPulse { 0%,100%{ box-shadow:0 0 0 0 var(--dtd); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .dt-live-dot { animation: dtPulse 1.6s ease-in-out infinite; }
-        @media (prefers-reduced-motion: reduce){ .dt-live-dot { animation:none; } }
-        .dt-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .dt-grid { grid-template-columns: 1fr; } }
-        .dt-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .dt-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .dt-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .dt-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .dt-tab { cursor:pointer; border:1px solid var(--dtc); border-radius:12px; padding:11px 8px; text-align:center; background:transparent; transition:all .15s; color:#fff; }
-        .dt-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
-        .dt-tab:hover { background:rgba(255,255,255,0.06); }
-        .dt-opts { display:flex; flex-wrap:wrap; gap:7px; }
-        .dt-opt { cursor:pointer; border:1px solid var(--dtc); border-radius:10px; padding:9px 12px; font-size:12px; font-weight:800; color:#fff; background:transparent; transition:all .15s; line-height:1.4; }
-        .dt-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.72); }
-        .dt-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
-        .dt-opt:disabled { cursor:default; }
-        .dt-opt:disabled[data-on="false"] { opacity:0.55; }
-        .dt-toggle { width:100%; cursor:pointer; border:1px solid var(--dtc); border-radius:11px; padding:11px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:12.5px; font-weight:900; text-align:left; transition:all .15s; }
-        .dt-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
-        .dt-toggle:disabled { cursor:default; opacity:0.6; }
-        .dt-range { flex:1; min-width:0; accent-color: var(--dtc); }
-        .dt-texto { width:100%; box-sizing:border-box; margin-top:10px; resize:vertical; border-radius:10px; border:1px solid rgba(255,255,255,0.16); background:rgba(4,10,22,0.55);
-          color:#fff; font:inherit; font-size:12.5px; line-height:1.5; padding:9px 12px; }
-        .dt-texto::placeholder { color:rgba(255,255,255,0.38); }
-        .dt-texto:focus { outline:2px solid ${accent}; outline-offset:1px; }
-        .dt-slots { display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:8px; }
-        @media (max-width: 700px){ .dt-slots { grid-template-columns: 1fr; } }
-        .dt-slot { cursor:pointer; text-align:left; border:1px dashed var(--dtc); border-radius:11px; padding:10px 11px; background:rgba(4,10,22,0.45); transition:all .15s; min-height:74px; }
-        .dt-slot[data-activo="true"] { border-style:solid; box-shadow:0 0 0 3px rgba(255,255,255,0.05); }
-        .dt-progreso { display:flex; gap:5px; flex-wrap:wrap; }
-        .dt-punto { cursor:pointer; width:18px; height:18px; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:var(--dtc); padding:0; }
-        .dt-punto[data-actual="true"] { outline:2px solid #fff; outline-offset:1px; }
-        .dt-opt:focus-visible, .dt-tab:focus-visible, .dt-toggle:focus-visible, .dt-icobtn:focus-visible, .dt-range:focus-visible, .dt-slot:focus-visible, .dt-punto:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
-        @media (max-width: 1000px){ .dt-bottom { grid-template-columns: 1fr !important; } }
-        .dt-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .dt-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .dt-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61; background:linear-gradient(180deg,#06121e 0%,#040a16 100%);
-          border-left:1px solid rgba(${color.rgba},0.32); box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1); display:flex; flex-direction:column; }
-        .dt-drawer[data-open="true"] { transform:translateX(0); }
-        .dt-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .dt-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .dt-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .dt-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .dt-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:11px 16px; border-radius:999px;
-          border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800; background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
-        .dt-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
+  const css = `
+    .dt-opts { display:flex; flex-wrap:wrap; gap:8px; }
+    .dt-opt { cursor:pointer; border:1px solid var(--dtc); border-radius:10px; padding:10px 12px; font-size:14px; font-weight:800; color:#fff; background:transparent; transition:all .15s; line-height:1.4; }
+    .dt-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.78); }
+    .dt-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
+    .dt-opt:disabled { cursor:default; }
+    .dt-opt:disabled[data-on="false"] { opacity:0.55; }
+    .dt-toggle { width:100%; cursor:pointer; border:1px solid var(--dtc); border-radius:11px; padding:12px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:14px; font-weight:900; text-align:left; transition:all .15s; }
+    .dt-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
+    .dt-toggle:disabled { cursor:default; opacity:0.6; }
+    .dt-texto { width:100%; box-sizing:border-box; margin-top:10px; resize:vertical; border-radius:10px; border:1px solid rgba(255,255,255,0.16); background:rgba(4,10,22,0.55);
+      color:#fff; font:inherit; font-size:14px; line-height:1.5; padding:9px 12px; }
+    .dt-texto::placeholder { color:rgba(255,255,255,0.38); }
+    .dt-texto:focus { outline:2px solid ${accent}; outline-offset:1px; }
+    .dt-slots { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap:8px; }
+    .dt-slot { cursor:pointer; text-align:left; border:1px dashed var(--dtc); border-radius:11px; padding:10px 11px; background:rgba(4,10,22,0.45); transition:all .15s; min-height:74px; }
+    .dt-slot[data-activo="true"] { border-style:solid; box-shadow:0 0 0 3px rgba(255,255,255,0.05); }
+    .dt-progreso { display:flex; gap:6px; flex-wrap:wrap; }
+    .dt-punto { cursor:pointer; width:22px; height:22px; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:var(--dtc); padding:0; }
+    .dt-punto[data-actual="true"] { outline:2px solid #fff; outline-offset:1px; }
+    .dt-opt:focus-visible, .dt-toggle:focus-visible, .dt-slot:focus-visible, .dt-punto:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
+  `;
 
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="dt-tabs">
-          {MODOS.map((m) => {
-            const d = MODOS_DEF[m];
-            const on = m === modo;
-            return (
-              <button key={m} className="dt-tab" data-on={on} onClick={() => cambiarModo(m)} style={{ ["--dtc" as string]: d.color, background: on ? `${d.color}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? d.color : "inherit" }}>
-                  <i className={`fa-solid ${d.icono}`} />
-                </div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{d.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{d.subtitulo}</div>
-              </button>
-            );
-          })}
-        </div>
+  const queSePasa = (
+    <div style={{ padding: "10px 12px", borderRadius: 12, border: `1px solid ${modoCol}44`, background: `${modoCol}12`, fontSize: 14, color: "#fff", lineHeight: 1.5 }}>
+      <div style={{ fontWeight: 900, color: modoCol, marginBottom: 4 }}>
+        <i className={`fa-solid ${def.icono}`} style={{ marginRight: 8 }} />
+        {chipVivo}
       </div>
-
-      <div className="dt-grid">
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 58vh, 660px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <DilemaScene
-                vista={vista}
-                modoColor={modoCol}
-                resetNonce={resetNonce}
-                variante={variante}
-                n={n}
-                decision={eleccion?.decision ?? null}
-                animNonce={animNonce}
-                casoId={casoId}
-                marcados={marcados}
-                postura={postura}
-                actualId={actual.id}
-                clasificados={clasificados}
-              />
-            </SceneBoundary>
-
-            <div style={{ position: "absolute", top: 14, left: 16, right: 150, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, pointerEvents: "none" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)", maxWidth: "100%" }}>
-                <span className="dt-live-dot" style={{ ["--dtd" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol, flexShrink: 0 }} />
-                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3, flexShrink: 0 }}>EN VIVO</span>
-                <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)", flexShrink: 0 }} />
-                <span className="dt-chip" style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", ...NUM }}>
-                  {chipVivo}
-                </span>
-              </div>
-            </div>
-
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="dt-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría" aria-label="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="dt-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"} aria-label={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="dt-icobtn" onClick={reiniciar} title="Reiniciar" aria-label="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 132px 14px 18px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                {def.etq} — {def.subtitulo}
-              </div>
-              <div className="dt-pie" style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6, ...NUM }}>
-                {pie}
-              </div>
-            </div>
-
-            <button className="dt-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-          </div>
-
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-              Controles — {def.etq}
-            </Eyebrow>
-            <div style={{ marginTop: 12 }}>{control}</div>
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-scale-balanced" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>¿Cómo decidir cuando los valores chocan?</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #7dd3fc55", background: "rgba(125,211,252,0.07)" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book-open" style={{ marginRight: 8, color: "#7dd3fc" }} />
-              Lectura A1
-            </Eyebrow>
-            <div style={{ fontSize: 13, color: "#fff", fontWeight: 800, lineHeight: 1.4, marginBottom: 10 }}>{TITULO_A1}</div>
-            <div style={{ display: "grid", gap: 9, marginBottom: 12 }}>
-              {LECTURA_A1.map((p, i) => (
-                <div key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>
-                  {p}
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", marginBottom: 8 }}>PARA REFLEXIONAR</div>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {PREGUNTAS.map((q, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  {q}
-                </li>
-              ))}
-              {REFLEXION.map((q) => (
-                <li key={q.ancla} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  {q.texto} <span style={{ color: T.text3, fontSize: 10.5 }}>({q.ancla})</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />
-              Cómo usar el laboratorio
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-                Objetivos de la sesión
-              </Eyebrow>
-              <span className="dt-objetivos" style={{ fontSize: 11, fontWeight: 800, color: objetivos.every((o) => o.done) ? OK : T.text3 }}>
-                {objetivos.filter((o) => o.done).length}/{objetivos.length}
-              </span>
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ marginTop: 2, fontSize: 13, color: o.done ? OK : "rgba(255,255,255,0.22)" }} />
-                  <span style={{ fontSize: 12, color: o.done ? "#fff" : T.text2, lineHeight: 1.4 }}>{o.t}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="dt-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <div style={{ padding: "14px 16px", borderRadius: 12, border: `1px solid ${accent}33`, background: `rgba(${color.rgba},0.07)` }}>
-            <Eyebrow>
-              <i className="fa-solid fa-train-tram" style={{ marginRight: 8, color: accent }} />
-              Importante (lectura A1)
-            </Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{RECUADRO_A1}</div>
-            <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.45, marginTop: 6, fontStyle: "italic" }}>{NOTA_RECUADRO}</div>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />
-              Hechos (quiz A4)
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {HECHOS.map((h, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
-                  {h}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />
-              Glosario (A5)
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {GLOSARIO.map((gi, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{gi.termino}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
-                  <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.4, marginTop: 4 }}>
-                    <i className="fa-solid fa-quote-left" style={{ marginRight: 6, color: accent }} />
-                    {gi.ejemplo}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-            Ideas clave
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-            {IDEAS.map((x, i) => (
-              <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                {x}
-              </li>
-            ))}
-          </ul>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-ban" style={{ marginRight: 8, color: accent }} />
-              Falacias frecuentes
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 7 }}>
-              {(Object.keys(FALACIA_DEF) as (keyof typeof FALACIA_DEF)[]).map((f) => (
-                <div key={f} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
-                  <strong style={{ color: "#fff" }}>{FALACIA_DEF[f].etq}.</strong> {FALACIA_DEF[f].define}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          La lectura A1 con sus preguntas y su recuadro, el quiz A2, el tema, las reglas, los criterios y los nueve argumentos guía del debate A3, los hechos del quiz A4, el glosario A5, el texto A6 y las preguntas de reflexión de A5, A7 y A8 son{" "}
-          <strong>verbatim</strong> del material de la plataforma. Las variantes del tranvía son las de la literatura filosófica (Philippa Foot, 1967; Judith Jarvis Thomson, 1976 y 1985); cómo razonaría cada teoría es una{" "}
-          <strong>lectura típica</strong>, no la única posible. Los dilemas cotidianos, las fichas, los personajes, las cinco intervenciones que no vienen de A3 y el reparto del agua son <strong>ilustrativos</strong>, escritos para el laboratorio. La tendencia de las encuestas se describe sin cifras; el experimento Moral Machine es Awad y colaboradores, <em>Nature</em> 563, 2018. En ningún modo se califica tu postura moral. Fuente: {FUENTE}
-        </span>
-      </div>
-
-      <TeoriaCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
-
-      <RetoQuizCard quiz={QUIZ_A2} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Distingues las grandes corrientes éticas." />
-
-      <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
-          Completa el texto (A6)
-        </Eyebrow>
-        <div style={{ marginTop: 12 }}>
-          <CompletaTexto data={HUECOS_A6} accent={accent} rgba={color.rgba} completado={textoOk} onCompletado={() => { setTextoOk(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
-        </div>
-      </div>
-
-      <div className="dt-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="dt-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="dt-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="dt-close" onClick={() => setDrawer(false)} title="Cerrar" aria-label="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="dt-drawer-body">
-          <FichaTeorica data={DILEMA_TRANVIA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
+      {pie}
     </div>
+  );
+
+  return (
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <DilemaScene
+            vista={vista}
+            modoColor={modoCol}
+            resetNonce={resetNonce}
+            variante={variante}
+            n={n}
+            decision={eleccion?.decision ?? null}
+            animNonce={animNonce}
+            casoId={casoId}
+            marcados={marcados}
+            postura={postura}
+            actualId={actual.id}
+            clasificados={clasificados}
+          />
+        </SceneBoundary>
+      }
+      modos={{ opciones: MODOS.map((m) => ({ id: m, etiqueta: MODOS_DEF[m].etq, icono: MODOS_DEF[m].icono })), valor: modo, cambiar: (id) => cambiarModo(id as Modo) }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Controles",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              <style>{css}</style>
+              <Bloque titulo={`Qué pasa · ${def.etq}`} icono="fa-eye">
+                {queSePasa}
+              </Bloque>
+              <Bloque titulo="Controles" icono="fa-sliders">
+                {control}
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <>
+              <TeoriaCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
+              <RetoQuizCard quiz={QUIZ_A2} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Distingues las grandes corrientes éticas." />
+              <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
+                <Eyebrow>
+                  <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
+                  Completa el texto (A6)
+                </Eyebrow>
+                <div style={{ marginTop: 12 }}>
+                  <CompletaTexto data={HUECOS_A6} accent={accent} rgba={color.rgba} completado={textoOk} onCompletado={() => { setTextoOk(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
+                </div>
+              </div>
+            </>
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="¿Cómo decidir cuando los valores chocan?" icono="fa-scale-balanced">
+                <p style={{ margin: 0, color: T.text2 }}>{PROBLEMA}</p>
+              </Bloque>
+              <Bloque titulo="Lectura A1" icono="fa-book-open">
+                <div style={{ fontWeight: 800, color: "#fff" }}>{TITULO_A1}</div>
+                {LECTURA_A1.map((p, i) => (
+                  <p key={i} style={{ margin: 0, color: T.text2 }}>
+                    {p}
+                  </p>
+                ))}
+                <div style={{ padding: "12px 14px", borderRadius: 12, border: `1px solid ${accent}33`, background: `rgba(${color.rgba},0.07)` }}>
+                  <strong style={{ color: "#fff" }}>Importante (lectura A1). </strong>
+                  <span style={{ color: T.text2 }}>{RECUADRO_A1}</span>
+                  <div style={{ fontSize: 14, color: T.text3, marginTop: 6, fontStyle: "italic" }}>{NOTA_RECUADRO}</div>
+                </div>
+              </Bloque>
+              <Bloque titulo="Para reflexionar" icono="fa-circle-question">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {PREGUNTAS.map((q, i) => (
+                    <li key={i}>{q}</li>
+                  ))}
+                  {REFLEXION.map((q) => (
+                    <li key={q.ancla}>
+                      {q.texto} <span style={{ color: T.text3 }}>({q.ancla})</span>
+                    </li>
+                  ))}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Cómo usar el laboratorio" icono="fa-list-ol">
+                <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8 }}>
+                  {INSTRUCCIONES.map((p, i) => (
+                    <li key={i}>{p}</li>
+                  ))}
+                </ol>
+              </Bloque>
+              <Bloque titulo="Hechos (quiz A4)" icono="fa-circle-question">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {HECHOS.map((h, i) => (
+                    <li key={i}>{h}</li>
+                  ))}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Glosario (A5)" icono="fa-book">
+                {GLOSARIO.map((gi, i) => (
+                  <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
+                    <strong style={{ color: accent }}>{gi.termino}. </strong>
+                    <span style={{ color: T.text2 }}>{gi.definicion}</span>
+                    <div style={{ color: T.text3, marginTop: 4 }}>
+                      <i className="fa-solid fa-quote-left" style={{ marginRight: 6, color: accent }} />
+                      {gi.ejemplo}
+                    </div>
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {IDEAS.map((x, i) => (
+                    <li key={i}>{x}</li>
+                  ))}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Falacias frecuentes" icono="fa-ban">
+                {(Object.keys(FALACIA_DEF) as (keyof typeof FALACIA_DEF)[]).map((fk) => (
+                  <div key={fk} style={{ color: T.text2 }}>
+                    <strong style={{ color: "#fff" }}>{FALACIA_DEF[fk].etq}.</strong> {FALACIA_DEF[fk].define}
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={DILEMA_TRANVIA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ marginTop: 18, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
+                La lectura A1 con sus preguntas y su recuadro, el quiz A2, el tema, las reglas, los criterios y los nueve argumentos guía del debate A3, los hechos del quiz A4, el glosario A5, el texto A6 y las preguntas de reflexión de A5, A7 y A8 son{" "}
+                <strong>verbatim</strong> del material de la plataforma. Las variantes del tranvía son las de la literatura filosófica (Philippa Foot, 1967; Judith Jarvis Thomson, 1976 y 1985); cómo razonaría cada teoría es una{" "}
+                <strong>lectura típica</strong>, no la única posible. Los dilemas cotidianos, las fichas, los personajes, las cinco intervenciones que no vienen de A3 y el reparto del agua son <strong>ilustrativos</strong>, escritos para el laboratorio. La tendencia de las encuestas se describe sin cifras; el experimento Moral Machine es Awad y colaboradores, <em>Nature</em> 563, 2018. En ningún modo se califica tu postura moral. Fuente: {FUENTE}
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }

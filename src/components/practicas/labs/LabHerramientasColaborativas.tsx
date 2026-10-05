@@ -1,28 +1,30 @@
-﻿"use client";
+"use client";
 
 /**
  * Laboratorio — Trabajar juntos en la nube: herramientas colaborativas
  * Práctica interactiva para CD-II-P02 (Ciudadanía Digital II).
  *
- * Interactividad máxima. Cuatro modos: los tres de arrastrar/clasificar y, al
- * final, uno que se escribe («Completa el texto», verbatim de la progresión):
- *  1. «¿Qué herramienta uso?» — arrastra cada tarea escolar a la categoría de
- *     herramienta colaborativa adecuada (documento, presentación, hoja de
- *     cálculo, pizarrón visual, gestión de tareas, comunicación).
- *  2. «Funciones de la nube» — empareja cada función (edición simultánea,
- *     historial de versiones, comentarios, sincronización) con su descripción
- *     verbatim de la lectura.
- *  3. «Buenas prácticas vs. errores» — clasifica cada acción en una de las dos
- *     cestas según sea una buena práctica o un error.
- *  + Cuestionario de comprensión (V/F verbatim de A4).
+ * El alumno no solo clasifica herramientas: organiza UNA SEMANA de proyecto de
+ * un equipo FICTICIO de 4 estudiantes (Ana, Beto, Carla y Diego, cada uno con
+ * un horario y una necesidad distinta). Elige la herramienta para cada
+ * necesidad, define permisos e historial de versiones del documento, y una
+ * línea de tiempo (lunes a viernes) muestra qué pasa cada día mientras tres
+ * medidores (avance, conflictos, participación; valores de simulación) reaccionan.
+ * El modelo vive en `herramientas-colaborativas-sim.ts`.
  *
- * DOM puro (sin three.js): ligero, accesible (ratón, teclado y táctil mediante
- * clic-para-seleccionar / clic-para-colocar). Contenido VERBATIM de CD-II·P02.
+ * Modos extra (verbatim de CD-II·P02):
+ *  · «¿Qué herramienta uso?», «Funciones de la nube», «Buenas prácticas vs.
+ *    errores» (arrastrar/clasificar, dentro de <Mesa>) y «Completa el texto».
+ *  + Cuestionario V/F (A4) en la pestaña Reto.
+ *
+ * DOM + SVG (sin three.js): accesible por ratón, teclado y táctil
+ * (clic-para-seleccionar / clic-para-colocar).
  */
 
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import type { PracticaLabProps } from "../registry";
-import { T, OK, card, Eyebrow } from "./_kit";
+import { T, OK, Eyebrow } from "./_kit";
+import { LabShell, Bloque, Mesa, Dato, BotonHerramienta } from "./_shell";
 import { LabSfx } from "./lab-audio";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { HERRAMIENTAS_COLABORATIVAS_HUECOS } from "./herramientas-colaborativas-huecos";
@@ -40,29 +42,46 @@ import {
   type Categoria,
   type Juicio,
 } from "./herramientas-colaborativas-data";
-
-const NO = "#FF5E5E";
+import {
+  EQUIPO,
+  NECESIDADES,
+  PERMISOS_INFO,
+  DIAS,
+  DIAS_CORTOS,
+  META,
+  simular,
+  type Decisiones,
+  type NecesidadId,
+  type Permisos,
+  type EventoDia,
+} from "./herramientas-colaborativas-sim";
 import { useEstrellas } from "@/lib/hooks/useEstrellas";
 import { FondoTermino, VinetaTermino } from "./_vineta";
-const RETO_KEY = "cen-herramientas-colaborativas-reto";
 
-type Modo = "herramienta" | "funciones" | "practicas" | "texto";
+const NO = "#FF5E5E";
+const AMBAR = "#FFC75A";
+const RETO_KEY = "cen-herramientas-colaborativas-reto";
+const FOTOS = "/media/labs-sim/herramientas-colaborativas";
+
+type Modo = "semana" | "herramienta" | "funciones" | "practicas" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
+  { id: "semana", label: "Semana de proyecto", icono: "fa-calendar-week" },
   { id: "herramienta", label: "¿Qué herramienta uso?", icono: "fa-cloud" },
   { id: "funciones", label: "Funciones de la nube", icono: "fa-arrows-rotate" },
   { id: "practicas", label: "Buenas prácticas vs. errores", icono: "fa-scale-balanced" },
   { id: "texto", label: "Completa el texto", icono: "fa-pen-to-square" },
 ];
 
+const DECISIONES_INICIO: Decisiones = { eleccion: {}, permisos: "todos", historial: false };
+
 export function LabHerramientasColaborativas({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
-  const [modo, setModo] = useState<Modo>("herramienta");
+  const [modo, setModo] = useState<Modo>("semana");
 
   // ── sonido ────────────────────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   // Modo «Completa el texto». El contador sirve de `key`: subirlo remonta
   // el componente y devuelve todos los huecos en blanco.
   const [textoDone, setTextoDone] = useState(false);
@@ -80,7 +99,7 @@ export function LabHerramientasColaborativas({ color }: PracticaLabProps) {
     }
   };
   // Los tres ayudantes son el único punto por el que pasan todos los aciertos
-  // y todos los fallos del laboratorio, así que la partida se lleva aquí.
+  // y todos los fallos de los modos de clasificar, así que la partida se lleva aquí.
   // `sfxOk` no cuenta: marca el fin de un modo, no una respuesta suelta.
   const sfxOk = () => sonido && audioRef.current?.correcto();
   const sfxNo = () => {
@@ -90,6 +109,35 @@ export function LabHerramientasColaborativas({ color }: PracticaLabProps) {
   const sfxPlace = () => {
     partida.acierto();
     return sonido && audioRef.current?.blip();
+  };
+  // El simulador explora: sus decisiones suenan pero no restan estrellas.
+  const sfxSim = (ok: boolean) => sonido && (ok ? audioRef.current?.blip() : audioRef.current?.incorrecto());
+
+  // ── simulador de la semana ─────────────────────────────────────────────
+  const [dec, setDec] = useState<Decisiones>(DECISIONES_INICIO);
+  const [metaLograda, setMetaLograda] = useState(false);
+  const resultado = simular(dec);
+  const todasDecididas = resultado.decididas === NECESIDADES.length;
+
+  const aplicarDecisiones = (nueva: Decisiones) => {
+    setDec(nueva);
+    if (simular(nueva).meta) setMetaLograda(true);
+  };
+  const elegir = (necesidad: NecesidadId, opcion: string) => {
+    const n = NECESIDADES.find((x) => x.id === necesidad);
+    sfxSim(!!n?.opciones.find((o) => o.id === opcion)?.ok);
+    aplicarDecisiones({ ...dec, eleccion: { ...dec.eleccion, [necesidad]: opcion } });
+  };
+  const cambiarPermisos = (p: Permisos) => {
+    sfxSim(p === "roles");
+    aplicarDecisiones({ ...dec, permisos: p });
+  };
+  const cambiarHistorial = (h: boolean) => {
+    sfxSim(h);
+    aplicarDecisiones({ ...dec, historial: h });
+  };
+  const resetSemana = () => {
+    setDec(DECISIONES_INICIO);
   };
 
   // ── modo herramienta (clasifica cada tarea por categoría) ───────────────
@@ -194,6 +242,8 @@ export function LabHerramientasColaborativas({ color }: PracticaLabProps) {
   };
 
   const objetivos = [
+    { txt: "Elige una herramienta para cada una de las 6 necesidades del equipo", done: todasDecididas },
+    { txt: "Logra la entrega del viernes: avance 70 o más, máximo 2 conflictos y participación 60 o más", done: metaLograda },
     { txt: "Clasifica las 8 tareas por herramienta", done: herramientaDone },
     { txt: "Empareja las 4 funciones de la nube", done: funcionesDone },
     { txt: "Clasifica las 8 acciones: buena práctica o error", done: practicasDone },
@@ -255,304 +305,510 @@ export function LabHerramientasColaborativas({ color }: PracticaLabProps) {
     setTextoDone(false);
     setTextoIntento((n) => n + 1);
   };
-  const resetActual = modo === "texto" ? resetTexto : modo === "herramienta" ? resetTareas : modo === "funciones" ? resetFunciones : resetAcciones;
+  const resetActual =
+    modo === "texto" ? resetTexto : modo === "herramienta" ? resetTareas : modo === "funciones" ? resetFunciones : modo === "practicas" ? resetAcciones : resetSemana;
+
+  const lectura =
+    modo === "semana"
+      ? `${resultado.decididas}/${NECESIDADES.length} · avance ${resultado.avance} · conflictos ${resultado.conflictos}`
+      : `${modosHechos}/4 · ${bestEstrellas}★`;
+
+  const pistaDe: Record<Modo, string> = {
+    semana: "Cada necesidad tiene tres herramientas. Piensa en quién la usa y desde dónde: no todos tienen computadora ni el mismo horario.",
+    herramienta: "Para escribir juntos usa un documento; para lluvia de ideas un pizarrón; para organizar tareas un tablero kanban.",
+    funciones: "La nube ofrece edición simultánea, historial de versiones, comentarios y sincronización entre dispositivos.",
+    practicas: "Define roles, nombra bien los archivos y comenta para sugerir: así el trabajo en equipo fluye sin perder información.",
+    texto: "Escribe la palabra que falta en cada hueco del texto.",
+  };
+
+  const escena = (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
+      <style>{ESTILOS(accent, color.rgba)}</style>
+
+      {modo === "semana" && (
+        <Semana
+          accent={accent}
+          dec={dec}
+          resultado={resultado}
+          onElegir={elegir}
+          onPermisos={cambiarPermisos}
+          onHistorial={cambiarHistorial}
+          onReiniciar={resetSemana}
+        />
+      )}
+
+      {modo === "texto" && (
+        <CompletaTexto
+          key={textoIntento}
+          data={HERRAMIENTAS_COLABORATIVAS_HUECOS}
+          accent={accent}
+          rgba={color.rgba}
+          completado={textoDone}
+          onCompletado={() => {
+            setTextoDone(true);
+            sfxOk();
+          }}
+          onAcierto={sfxPlace}
+          onError={sfxNo}
+        />
+      )}
+
+      {modo === "herramienta" && (
+        <Mesa>
+          <div className="hcol-panel">
+            <Banco titulo="Arrastra cada tarea a la herramienta adecuada" hechas={Object.keys(ubicTarea).length} total={TAREAS.length} done={herramientaDone} fin={`¡Clasificaste las ${TAREAS.length} tareas!`}>
+              {tareasLibres.map((t) => (
+                <button key={t.id} className="hcol-chip" data-sel={selTarea === t.id} onClick={() => setSelTarea((s) => (s === t.id ? null : t.id))} {...dragProps(t.id)}>
+                  {t.texto}
+                </button>
+              ))}
+            </Banco>
+          </div>
+          <BinsTareas selTarea={selTarea} shakeCat={shakeCat} ubicTarea={ubicTarea} onMatch={intentarTarea} dropProps={dropProps} />
+        </Mesa>
+      )}
+
+      {modo === "funciones" && (
+        <Mesa>
+          <div className="hcol-panel">
+            <Banco titulo="Arrastra cada función a su descripción" hechas={Object.keys(empFunc).length} total={FUNCIONES.length} done={funcionesDone} fin={`¡Emparejaste las ${FUNCIONES.length} funciones!`}>
+              {funcLibres.map((f) => (
+                <button key={f.id} className="hcol-chip" data-sel={selFunc === f.id} onClick={() => setSelFunc((s) => (s === f.id ? null : f.id))} {...dragProps(f.id)}>
+                  <i className="fa-solid fa-cloud" style={{ fontSize: 14, color: T.text3 }} />
+                  {f.funcion}
+                </button>
+              ))}
+            </Banco>
+          </div>
+          <RowsFunciones selFunc={selFunc} shakeFunc={shakeFunc} empFunc={empFunc} onMatch={intentarFunc} dropProps={dropProps} />
+        </Mesa>
+      )}
+
+      {modo === "practicas" && (
+        <Mesa>
+          <div className="hcol-panel">
+            <Banco titulo="Arrastra cada acción a su cesta" hechas={Object.keys(ubicAccion).length} total={ACCIONES.length} done={practicasDone} fin={`¡Clasificaste las ${ACCIONES.length} acciones!`}>
+              {accionesLibres.map((a) => (
+                <button key={a.id} className="hcol-chip" data-sel={selAccion === a.id} onClick={() => setSelAccion((s) => (s === a.id ? null : a.id))} {...dragProps(a.id)}>
+                  {a.texto}
+                </button>
+              ))}
+            </Banco>
+          </div>
+          <BinsAcciones selAccion={selAccion} shakeJuicio={shakeJuicio} ubicAccion={ubicAccion} onMatch={intentarAccion} dropProps={dropProps} />
+        </Mesa>
+      )}
+    </div>
+  );
 
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes hcolShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
-        @keyframes hcolPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
-        .hcol-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 16px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .hcol-tab:hover { border-color:${T.lineStrong}; color:#fff; }
-        .hcol-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-        .hcol-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
-          font-size:14px; border:1px solid ${T.line}; background:${T.glass}; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .hcol-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
-        .hcol-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .hcol-chip { cursor:grab; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 16px; border-radius:14px;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:13.5px; font-weight:700; transition:all .14s; user-select:none; max-width:360px; text-align:left; line-height:1.4; }
-        .hcol-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); }
-        .hcol-chip[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.2); box-shadow:0 0 16px -5px ${accent}; }
-        .hcol-chip:active { cursor:grabbing; }
-        .hcol-row { border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:14px 16px; transition:all .16s; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
-        .hcol-row[data-shake="true"] { animation:hcolShake .4s; border-color:${NO}; }
-        .hcol-row[data-done="true"] { border-color:${OK}66; background:${OK}0f; }
-        .hcol-slot { flex-shrink:0; min-width:170px; min-height:42px; border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset};
-          display:inline-flex; align-items:center; justify-content:center; color:${T.text3}; font-size:12.5px; transition:all .16s; cursor:pointer; padding:4px 10px; }
-        .hcol-slot[data-armed="true"] { border-color:${accent}; background:rgba(${color.rgba},0.1); }
-        .hcol-bin { border-radius:15px; border:1.5px solid ${T.line}; background:${T.glass}; padding:16px; transition:all .16s; min-height:230px; }
-        .hcol-bin[data-shake="true"] { animation:hcolShake .4s; border-color:${NO}; }
-        .hcol-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
-          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
-        .hcol-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
-        .hcol-q:disabled{ cursor:default; }
-        .hcol-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
-          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .hcol-btn:hover { border-color:${T.lineStrong}; }
-        .hcol-divider { height:1px; background:${T.line}; margin:18px 0; }
-        @media (prefers-reduced-motion: reduce){ .hcol-row[data-shake="true"], .hcol-bin[data-shake="true"] { animation:none; } }
-
-        /* Cajón de teoría */
-        .hcol-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .hcol-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .hcol-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .hcol-drawer[data-open="true"] { transform:translateX(0); }
-        .hcol-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .hcol-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .hcol-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .hcol-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .hcol-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .hcol-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .hcol-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
-
-        /* Identidad del tablero */
-        .hcol-bin, .hcol-row { --tono:188; position:relative;
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
-        .hcol-bin:nth-of-type(6n+1), .hcol-row:nth-of-type(6n+1) { --tono:188; }
-        .hcol-bin:nth-of-type(6n+2), .hcol-row:nth-of-type(6n+2) { --tono:262; }
-        .hcol-bin:nth-of-type(6n+3), .hcol-row:nth-of-type(6n+3) { --tono:44; }
-        .hcol-bin:nth-of-type(6n+4), .hcol-row:nth-of-type(6n+4) { --tono:152; }
-        .hcol-bin:nth-of-type(6n+5), .hcol-row:nth-of-type(6n+5) { --tono:330; }
-        .hcol-bin:nth-of-type(6n+6), .hcol-row:nth-of-type(6n+6) { --tono:18; }
-        .hcol-bin::before, .hcol-row::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
-          background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
-        .hcol-bin[data-done="true"], .hcol-row[data-done="true"] {
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.2) 0%, transparent 68%); }
-        .hcol-chip { transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
-        .hcol-chip:hover { transform:translateY(-2px); }
-        .hcol-chip[data-sel="true"] { transform:translateY(-3px) scale(1.02); }
-        @media (prefers-reduced-motion: reduce){
-          .hcol-chip, .hcol-chip:hover, .hcol-chip[data-sel="true"] { transform:none; transition:none; }
-        }
-      `}</style>
-
-      {/* selector de modo + toolbar */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="hcol-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="hcol-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="hcol-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="hcol-icobtn" onClick={resetActual} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <button className="hcol-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="hcol-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="hcol-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="hcol-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="hcol-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="hcol-drawer-body">
-          <FichaTeorica data={HERRAMIENTAS_COLABORATIVAS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}>
-        {/* ── Columna principal ─────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
-          {/* MODO 1 — herramienta */}
-          {/* MODO — completa el texto (fill_blanks verbatim de la progresión) */}
-          {modo === "texto" && (
-            <CompletaTexto
-              key={textoIntento}
-              data={HERRAMIENTAS_COLABORATIVAS_HUECOS}
-              accent={accent}
-              rgba={color.rgba}
-              completado={textoDone}
-              onCompletado={() => {
-                setTextoDone(true);
-                sfxOk();
-              }}
-              onAcierto={sfxPlace}
-              onError={sfxNo}
-            />
-          )}
-
-          {modo === "herramienta" && (
+    <LabShell
+      dom
+      accent={accent}
+      rgba={color.rgba}
+      escena={escena}
+      modos={{ opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })), valor: modo, cambiar: (id) => setModo(id as Modo) }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={resetActual} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      retoKey={RETO_KEY}
+      pestanas={[
+        {
+          id: "cuaderno",
+          etiqueta: "Cuaderno",
+          icono: "fa-lightbulb",
+          contenido: (
             <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada tarea a la herramienta adecuada</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: herramientaDone ? OK : T.text3 }}>
-                    {Object.keys(ubicTarea).length}/{TAREAS.length}
-                  </span>
+              <Bloque titulo="La semana (simulación)" icono="fa-gauge-high">
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8 }}>
+                  <Dato label="Avance" value={`${resultado.avance} / 100`} col={resultado.avance >= META.avance ? OK : undefined} />
+                  <Dato label="Conflictos" value={`${resultado.conflictos}`} col={resultado.conflictos <= META.conflictos ? OK : NO} />
+                  <Dato label="Participación" value={`${resultado.participacion} / 100`} col={resultado.participacion >= META.participacion ? OK : undefined} />
+                  <Dato label="Necesidades" value={`${resultado.decididas} / ${NECESIDADES.length}`} />
                 </div>
-                {tareasLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Clasificaste las {TAREAS.length} tareas!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {tareasLibres.map((t) => (
-                      <button key={t.id} className="hcol-chip" data-sel={selTarea === t.id} onClick={() => setSelTarea((s) => (s === t.id ? null : t.id))} {...dragProps(t.id)}>
-                        {t.texto}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <BinsTareas selTarea={selTarea} shakeCat={shakeCat} ubicTarea={ubicTarea} onMatch={intentarTarea} dropProps={dropProps} />
-            </>
-          )}
-
-          {/* MODO 2 — funciones */}
-          {modo === "funciones" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada función a su descripción</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: funcionesDone ? OK : T.text3 }}>
-                    {Object.keys(empFunc).length}/{FUNCIONES.length}
-                  </span>
-                </div>
-                {funcLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Emparejaste las {FUNCIONES.length} funciones!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {funcLibres.map((f) => (
-                      <button key={f.id} className="hcol-chip" data-sel={selFunc === f.id} onClick={() => setSelFunc((s) => (s === f.id ? null : f.id))} {...dragProps(f.id)}>
-                        <i className="fa-solid fa-cloud" style={{ fontSize: 11, color: T.text3 }} />
-                        {f.funcion}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <RowsFunciones selFunc={selFunc} shakeFunc={shakeFunc} empFunc={empFunc} onMatch={intentarFunc} dropProps={dropProps} />
-            </>
-          )}
-
-          {/* MODO 3 — prácticas */}
-          {modo === "practicas" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada acción a su cesta</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: practicasDone ? OK : T.text3 }}>
-                    {Object.keys(ubicAccion).length}/{ACCIONES.length}
-                  </span>
-                </div>
-                {accionesLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Clasificaste las {ACCIONES.length} acciones!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {accionesLibres.map((a) => (
-                      <button key={a.id} className="hcol-chip" data-sel={selAccion === a.id} onClick={() => setSelAccion((s) => (s === a.id ? null : a.id))} {...dragProps(a.id)}>
-                        {a.texto}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <BinsAcciones selAccion={selAccion} shakeJuicio={shakeJuicio} ubicAccion={ubicAccion} onMatch={intentarAccion} dropProps={dropProps} />
-            </>
-          )}
-        </div>
-
-        {/* ── Columna lateral ───────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? OK : T.text2 }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-                  <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="hcol-divider" />
-
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", color: T.text3, textTransform: "uppercase" }}>Puntuación</div>
-                <div style={{ display: "flex", gap: 4, marginTop: 5 }}>
+              </Bloque>
+              <Bloque titulo="Tu partida" icono="fa-star">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+                <div style={{ display: "flex", gap: 4 }}>
                   {[1, 2, 3].map((s) => (
-                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 18, color: s <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
+                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 20, color: s <= bestEstrellas ? AMBAR : "rgba(255,255,255,0.16)" }} />
                   ))}
                 </div>
-              </div>
-              <div style={{ textAlign: "right", maxWidth: 180 }}>
-                <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45 }}>
-                  {bestEstrellas >= 3 ? "¡Colaboras en la nube como un profesional!" : "Termina los tres modos para ganar 2★; la tercera pide 2 errores o menos."}
+                <div style={{ fontSize: 14, color: T.text2 }}>
+                  {bestEstrellas >= 3 ? "¡Colaboras en la nube como un profesional!" : "Termina los tres modos de clasificar para ganar 2★; la tercera pide 2 errores o menos."}
                 </div>
-              </div>
-            </div>
-          </div>
-
-          {/* pista del modo actual */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid rgba(${color.rgba},0.3)`, background: `rgba(${color.rgba},0.08)`, fontSize: 13, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              {modo === "herramienta" && (
-                <>Para <strong style={{ color: T.text }}>escribir juntos</strong> usa un documento; para <strong style={{ color: T.text }}>lluvia de ideas</strong> un pizarrón; para <strong style={{ color: T.text }}>organizar tareas</strong> un tablero kanban.</>
-              )}
-              {modo === "funciones" && (
-                <>La nube ofrece <strong style={{ color: T.text }}>edición simultánea</strong>, <strong style={{ color: T.text }}>historial de versiones</strong>, <strong style={{ color: T.text }}>comentarios</strong> y <strong style={{ color: T.text }}>sincronización</strong> entre dispositivos.</>
-              )}
-              {modo === "practicas" && (
-                <>Define roles, nombra bien los archivos y comenta para sugerir: así el trabajo en equipo fluye sin perder información.</>
-              )}
-            </span>
-          </div>
-
-          {/* dato verbatim */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid ${T.line}`, background: T.glass, fontSize: 12.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-circle-info" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>{DATO_NUBE}</span>
-          </div>
-        </div>
-      </div>
-
-      <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />
-    </div>
+              </Bloque>
+              <Bloque titulo="Pista de este modo" icono="fa-lightbulb">
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>{pistaDe[modo]}</div>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-clipboard-question",
+          contenido: <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />,
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Teoría de la práctica" icono="fa-book-open">
+                <FichaTeorica data={HERRAMIENTAS_COLABORATIVAS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <Bloque titulo="Tipos de herramienta colaborativa" icono="fa-cloud">
+                <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+                  {(Object.keys(CATEGORIA_INFO) as Categoria[]).map((c) => (
+                    <div key={c} style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                      <strong style={{ color: T.text }}>{CATEGORIA_INFO[c].titulo}.</strong> {CATEGORIA_INFO[c].subtitulo}
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+              <Bloque titulo="Funciones de la nube" icono="fa-arrows-rotate">
+                <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+                  {FUNCIONES.map((f) => (
+                    <div key={f.id} style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                      <strong style={{ color: T.text }}>{f.funcion}.</strong> {f.descripcion}
+                      <div style={{ fontStyle: "italic", color: T.text3, marginTop: 2 }}>{f.ejemplo}</div>
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+              <Bloque titulo="Buenas prácticas y errores" icono="fa-scale-balanced">
+                <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+                  {ACCIONES.map((a) => (
+                    <div key={a.id} style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                      <strong style={{ color: a.juicio === "buena" ? OK : NO }}>{JUICIO_INFO[a.juicio].titulo}:</strong> {a.texto}
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+              <Bloque titulo="Dato" icono="fa-circle-info">
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55 }}>{DATO_NUBE}</div>
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
- * Paneles de cada modo (componentes hijos: reciben los manejadores como props,
- * así el linter no rastrea el acceso al ref de audio hasta el render del map).
+ * Estilos
+ * ═══════════════════════════════════════════════════════════════════════════ */
+const ESTILOS = (accent: string, rgba: string) => `
+  @keyframes hcolShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
+  @keyframes hcolPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
+  .hcol-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap:11px; }
+  .hcol-grid-s { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 140px), 1fr)); gap:10px; }
+  .hcol-panel { position:relative; border-radius:16px; border:1px solid ${T.line}; background:${T.glass}; padding:14px 16px;
+    display:flex; flex-direction:column; gap:11px; min-width:0; }
+  .hcol-panel[data-done="true"] { border-color:${OK}66; }
+  .hcol-card { position:relative; display:flex; flex-direction:column; gap:7px; text-align:left; padding:12px 13px; border-radius:14px;
+    border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text}; font-size:14px; line-height:1.45; cursor:pointer;
+    transition:transform .14s, border-color .14s, background .14s; min-width:0; }
+  .hcol-card:hover { border-color:${T.lineStrong}; transform:translateY(-2px); }
+  .hcol-card[data-sel="true"] { border-color:${accent}; background:rgba(${rgba},0.16); box-shadow:0 0 18px -6px ${accent}; }
+  .hcol-card[data-tono="ok"] { border-color:${OK}88; background:${OK}14; }
+  .hcol-card[data-tono="mal"] { border-color:${NO}88; background:${NO}12; }
+  .hcol-card[data-tono="medio"] { border-color:${AMBAR}88; background:${AMBAR}12; }
+  .hcol-card h5 { margin:0; font-size:15px; font-weight:800; }
+  .hcol-tag { display:inline-flex; align-items:center; gap:6px; font-size:14px; font-weight:700; padding:3px 9px; border-radius:8px;
+    border:1px solid ${T.line}; background:${T.inset}; color:${T.text2}; }
+  .hcol-foto { position:relative; width:100%; aspect-ratio:1/1; border-radius:12px; overflow:hidden; display:flex; align-items:center;
+    justify-content:center; background:linear-gradient(135deg, rgba(${rgba},0.35), rgba(8,19,31,0.9)); color:rgba(255,255,255,0.55); font-size:34px; }
+  .hcol-foto img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .hcol-banner { position:relative; width:100%; aspect-ratio:16/6; border-radius:14px; overflow:hidden; display:flex; align-items:center;
+    justify-content:center; background:linear-gradient(135deg, rgba(${rgba},0.3), rgba(8,19,31,0.9)); color:rgba(255,255,255,0.5); font-size:40px; }
+  .hcol-banner img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .hcol-chip { cursor:grab; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 14px; border-radius:14px;
+    border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:14px; font-weight:700; user-select:none; max-width:100%;
+    text-align:left; line-height:1.4; transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
+  .hcol-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); transform:translateY(-2px); }
+  .hcol-chip[data-sel="true"] { border-color:${accent}; background:rgba(${rgba},0.2); box-shadow:0 0 16px -5px ${accent}; transform:translateY(-3px) scale(1.02); }
+  .hcol-chip:active { cursor:grabbing; }
+  .hcol-row { border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:14px 16px; transition:all .16s; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .hcol-row[data-shake="true"] { animation:hcolShake .4s; border-color:${NO}; }
+  .hcol-row[data-done="true"] { border-color:${OK}66; background:${OK}0f; }
+  .hcol-slot { flex-shrink:0; min-width:min(100%, 170px); min-height:42px; border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset};
+    display:inline-flex; align-items:center; justify-content:center; color:${T.text3}; font-size:14px; transition:all .16s; cursor:pointer; padding:4px 10px; }
+  .hcol-slot[data-armed="true"] { border-color:${accent}; background:rgba(${rgba},0.1); }
+  .hcol-bin { border-radius:15px; border:1.5px solid ${T.line}; background:${T.glass}; padding:16px; transition:all .16s; min-height:150px; }
+  .hcol-bin[data-shake="true"] { animation:hcolShake .4s; border-color:${NO}; }
+  .hcol-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
+    border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
+  .hcol-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
+  .hcol-q:disabled{ cursor:default; }
+  .hcol-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:12px 18px;
+    border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:14px; font-weight:800; transition:all .14s; }
+  .hcol-btn:hover:not(:disabled) { border-color:${T.lineStrong}; }
+  .hcol-btn:disabled { opacity:.45; cursor:not-allowed; }
+  .hcol-barra { height:12px; border-radius:7px; background:${T.inset}; overflow:hidden; border:1px solid ${T.line}; }
+  .hcol-barra > i { display:block; height:100%; border-radius:7px; transition:width .7s cubic-bezier(.2,.8,.2,1), background .7s; }
+  .hcol-pop { animation:hcolPop .28s ease; }
+  @media (prefers-reduced-motion: reduce){
+    .hcol-row[data-shake="true"], .hcol-bin[data-shake="true"], .hcol-pop { animation:none; }
+    .hcol-chip, .hcol-chip:hover, .hcol-chip[data-sel="true"], .hcol-card, .hcol-card:hover { transform:none; transition:none; }
+    .hcol-barra > i { transition:none; }
+  }
+`;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Piezas visuales
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+/** Foto con respaldo: gradiente + ícono detrás; si la imagen no existe se oculta. */
+function Foto({ clave, icono, banner }: { clave: string; icono: string; banner?: boolean }) {
+  const [falla, setFalla] = useState(false);
+  return (
+    <div className={banner ? "hcol-banner" : "hcol-foto"} aria-hidden>
+      <i className={`fa-solid ${icono}`} />
+      {!falla && (
+        <img src={`${FOTOS}/${clave}.webp`} alt="" loading="lazy" onError={() => setFalla(true)} />
+      )}
+    </div>
+  );
+}
+
+function Banco({ titulo, hechas, total, done, fin, children }: { titulo: string; hechas: number; total: number; done: boolean; fin: string; children: React.ReactNode }) {
+  return (
+    <>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
+        <Eyebrow>{titulo}</Eyebrow>
+        <span style={{ fontSize: 14, fontWeight: 800, color: done ? OK : T.text3 }}>
+          {hechas}/{total}
+        </span>
+      </div>
+      {done ? (
+        <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+          <i className="fa-solid fa-circle-check" /> {fin}
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>{children}</div>
+      )}
+    </>
+  );
+}
+
+function colorMedidor(frac: number, buenoAlto: boolean) {
+  const bueno = buenoAlto ? frac : 1 - frac;
+  return bueno >= 0.6 ? OK : bueno >= 0.35 ? AMBAR : NO;
+}
+
+function Medidor({ etiqueta, valor, max, buenoAlto, icono, meta }: { etiqueta: string; valor: number; max: number; buenoAlto: boolean; icono: string; meta: string }) {
+  const frac = Math.max(0, Math.min(1, valor / max));
+  const col = colorMedidor(frac, buenoAlto);
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 8, fontSize: 14, color: T.text2, flexWrap: "wrap" }}>
+        <span style={{ fontWeight: 800, color: T.text }}>
+          <i className={`fa-solid ${icono}`} aria-hidden style={{ color: col, marginRight: 7 }} />
+          {etiqueta}
+        </span>
+        <span>
+          <strong style={{ color: col }}>{valor}</strong> · {meta}
+        </span>
+      </div>
+      <div className="hcol-barra" role="img" aria-label={`${etiqueta}: ${valor}`}>
+        <i style={{ width: `${Math.max(2, frac * 100)}%`, background: col }} />
+      </div>
+    </div>
+  );
+}
+
+const COLOR_TONO: Record<EventoDia["tono"], string> = { ok: OK, medio: AMBAR, mal: NO };
+const ICONO_TONO: Record<EventoDia["tono"], string> = { ok: "fa-circle-check", medio: "fa-triangle-exclamation", mal: "fa-circle-xmark" };
+
+/** Línea de tiempo SVG: avance acumulado de lunes a viernes. */
+function LineaSemana({ dias }: { dias: ReturnType<typeof simular>["dias"] }) {
+  const x = (i: number) => 50 + i * 100;
+  const y = (v: number) => 130 - (v / 100) * 110;
+  const puntos = dias.map((d, i) => `${x(i)},${y(d.avance)}`).join(" ");
+  const yMeta = y(META.avance);
+  return (
+    <svg viewBox="0 0 500 170" role="img" aria-label="Avance del proyecto de lunes a viernes (simulación)" style={{ width: "100%", height: "auto", borderRadius: 12, background: "rgba(2,12,28,0.55)", border: `1px solid ${T.line}` }}>
+      <line x1="20" x2="480" y1={yMeta} y2={yMeta} stroke={OK} strokeOpacity="0.6" strokeDasharray="6 6" />
+      <polyline points={puntos} fill="none" stroke="rgba(255,255,255,0.45)" strokeWidth="3" strokeLinejoin="round" />
+      {dias.map((d, i) => {
+        const peor = d.eventos.reduce<EventoDia["tono"] | null>((acc, e) => (acc === "mal" || e.tono === "mal" ? "mal" : acc === "medio" || e.tono === "medio" ? "medio" : "ok"), null);
+        const col = peor ? COLOR_TONO[peor] : "rgba(255,255,255,0.25)";
+        return (
+          <g key={d.dia}>
+            <circle cx={x(i)} cy={y(d.avance)} r="11" fill={col} stroke="#fff" strokeOpacity="0.6" strokeWidth="2" />
+            <text x={x(i)} y="162" textAnchor="middle" fontSize="22" fontWeight="800" fill="rgba(255,255,255,0.85)">
+              {DIAS_CORTOS[i]}
+            </text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Modo 1 · Semana de proyecto (simulador)
+ * ═══════════════════════════════════════════════════════════════════════════ */
+function Semana({
+  accent,
+  dec,
+  resultado,
+  onElegir,
+  onPermisos,
+  onHistorial,
+  onReiniciar,
+}: {
+  accent: string;
+  dec: Decisiones;
+  resultado: ReturnType<typeof simular>;
+  onElegir: (n: NecesidadId, o: string) => void;
+  onPermisos: (p: Permisos) => void;
+  onHistorial: (h: boolean) => void;
+  onReiniciar: () => void;
+}) {
+  const completa = resultado.decididas === NECESIDADES.length;
+  const eligioDocumento = dec.eleccion.escribir === "documento";
+  return (
+    <>
+      <div className="hcol-panel">
+        <Eyebrow>Una semana de proyecto · equipo ficticio</Eyebrow>
+        <Foto clave="equipo-mesa" icono="fa-people-group" banner />
+        <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55 }}>
+          Cuatro estudiantes deben entregar un informe el viernes. Elige la herramienta que resuelve cada necesidad; la línea de tiempo muestra qué pasa cada día.
+        </div>
+        <div className="hcol-grid-s">
+          {EQUIPO.map((p) => (
+            <div key={p.id} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <Foto clave={p.foto} icono={p.icono} />
+              <strong style={{ fontSize: 15, color: T.text }}>{p.nombre}</strong>
+              <span style={{ fontSize: 14, color: T.text2, lineHeight: 1.4 }}>{p.rasgo}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="hcol-panel">
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
+          <Eyebrow>Tablero del proyecto</Eyebrow>
+          <span className="hcol-tag">
+            <i className="fa-solid fa-flask" aria-hidden /> Simulación: cifras de juego
+          </span>
+        </div>
+        <Medidor etiqueta="Avance" valor={resultado.avance} max={100} buenoAlto icono="fa-bars-progress" meta={`meta ${META.avance}+`} />
+        <Medidor etiqueta="Conflictos" valor={resultado.conflictos} max={8} buenoAlto={false} icono="fa-burst" meta={`máx. ${META.conflictos}`} />
+        <Medidor etiqueta="Participación" valor={resultado.participacion} max={100} buenoAlto icono="fa-hands-holding-circle" meta={`meta ${META.participacion}+`} />
+        <LineaSemana dias={resultado.dias} />
+      </div>
+
+      {NECESIDADES.map((n) => {
+        const elegida = dec.eleccion[n.id];
+        return (
+          <div key={n.id} className="hcol-panel" data-done={!!elegida}>
+            <div style={{ fontSize: 15, fontWeight: 800, color: T.text }}>
+              <i className={`fa-solid ${n.icono}`} aria-hidden style={{ marginRight: 8, color: accent }} />
+              {DIAS[n.dia]}: {n.titulo}
+            </div>
+            <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>{n.situacion}</div>
+            <div className="hcol-grid">
+              {n.opciones.map((o) => {
+                const sel = elegida === o.id;
+                return (
+                  <button key={o.id} className="hcol-card" data-sel={sel} aria-pressed={sel} onClick={() => onElegir(n.id, o.id)}>
+                    <span style={{ fontWeight: 700 }}>
+                      <i className={`fa-solid ${o.icono}`} aria-hidden style={{ marginRight: 8, color: accent }} />
+                      {o.titulo}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            {dec.eleccion[n.id] &&
+              resultado.dias[n.dia]!.eventos
+                .filter((e) => e.necesidad === n.id)
+                .map((e) => (
+                  <div key={e.necesidad} className="hcol-pop" style={{ fontSize: 14, lineHeight: 1.5, color: COLOR_TONO[e.tono], display: "flex", gap: 9 }}>
+                    <i className={`fa-solid ${ICONO_TONO[e.tono]}`} aria-hidden style={{ marginTop: 3 }} />
+                    <span style={{ color: T.text2 }}>
+                      {e.texto}{" "}
+                      <strong style={{ color: COLOR_TONO[e.tono] }}>
+                        (avance {e.av >= 0 ? "+" : ""}
+                        {e.av} · conflictos +{e.co} · participación {e.pa >= 0 ? "+" : ""}
+                        {e.pa})
+                      </strong>
+                    </span>
+                  </div>
+                ))}
+            {n.id === "escribir" && eligioDocumento && (
+              <div className="hcol-panel hcol-pop" style={{ background: T.inset }}>
+                <Eyebrow>Permisos y versiones del documento</Eyebrow>
+                <div className="hcol-grid">
+                  {PERMISOS_INFO.map((p) => (
+                    <button key={p.id} className="hcol-card" data-sel={dec.permisos === p.id} aria-pressed={dec.permisos === p.id} onClick={() => onPermisos(p.id)}>
+                      <span style={{ fontWeight: 700 }}>
+                        <i className={`fa-solid ${p.icono}`} aria-hidden style={{ marginRight: 8, color: accent }} />
+                        {p.titulo}
+                      </span>
+                      <span style={{ color: T.text2 }}>{p.detalle}</span>
+                    </button>
+                  ))}
+                </div>
+                <button className="hcol-card" data-sel={dec.historial} aria-pressed={dec.historial} onClick={() => onHistorial(!dec.historial)}>
+                  <span style={{ fontWeight: 700 }}>
+                    <i className={`fa-solid ${dec.historial ? "fa-clock-rotate-left" : "fa-ban"}`} aria-hidden style={{ marginRight: 8, color: accent }} />
+                    Historial de versiones: {dec.historial ? "activado" : "apagado"}
+                  </span>
+                  <span style={{ color: T.text2 }}>Permite recuperar cualquier versión anterior del archivo.</span>
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      })}
+
+      <div className="hcol-panel" data-done={resultado.meta}>
+        <Eyebrow>Viernes · resultado de la semana</Eyebrow>
+        {!completa ? (
+          <div style={{ fontSize: 14, color: AMBAR }}>
+            <i className="fa-solid fa-lock" aria-hidden /> Elige una herramienta para las {NECESIDADES.length} necesidades y verás cómo terminó la semana.
+          </div>
+        ) : (
+          <div className="hcol-pop" style={{ fontSize: 15, fontWeight: 800, color: resultado.meta ? OK : AMBAR }}>
+            <i className={`fa-solid ${resultado.meta ? "fa-trophy" : "fa-circle-half-stroke"}`} aria-hidden style={{ marginRight: 8 }} />
+            {resultado.meta
+              ? "Entrega lograda: el equipo trabajó junto y sin perder información."
+              : `Entrega con problemas: busca avance ${META.avance}+, máximo ${META.conflictos} conflictos y participación ${META.participacion}+. Cambia una herramienta o los permisos y compara.`}
+          </div>
+        )}
+        <div className="hcol-grid">
+          {resultado.dias.map((d) =>
+            d.eventos.length > 0 ? (
+              <div key={d.dia} style={{ fontSize: 14, color: T.text2, lineHeight: 1.45 }}>
+                <strong style={{ color: T.text }}>{d.dia}</strong> · avance {d.avance}, conflictos {d.conflictos}
+              </div>
+            ) : null
+          )}
+        </div>
+        <button className="hcol-btn" onClick={onReiniciar}>
+          <i className="fa-solid fa-rotate-left" aria-hidden /> Probar otra combinación
+        </button>
+      </div>
+    </>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Paneles de los modos de clasificar (componentes hijos: reciben los manejadores
+ * como props, así el linter no rastrea el acceso al ref de audio hasta el render
+ * del map).
  * ═══════════════════════════════════════════════════════════════════════════ */
 type DropFactory = (onDrop: (id: string) => void) => {
   onDragOver: (e: React.DragEvent) => void;
@@ -574,7 +830,7 @@ function BinsTareas({
 }) {
   const bins: Categoria[] = ["documento", "presentacion", "hoja", "pizarron", "gestion", "comunicacion"];
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 12 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 190px), 1fr))", gap: 12 }}>
       {bins.map((bin) => {
         const info = CATEGORIA_INFO[bin];
         const dentro = TAREAS.filter((t) => ubicTarea[t.id] === bin);
@@ -591,16 +847,16 @@ function BinsTareas({
             <FondoTermino termino={info.titulo} />
             <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
               <VinetaTermino termino={info.titulo} color={T.text2} icono={info.icono} tam={29} radio={8} />
-              <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
+              <span style={{ fontSize: 14, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
             </div>
-            <div style={{ fontSize: 11, color: T.text3, marginBottom: 12, lineHeight: 1.4 }}>{info.subtitulo}</div>
+            <div style={{ fontSize: 14, color: T.text3, marginBottom: 12, lineHeight: 1.4 }}>{info.subtitulo}</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {dentro.length === 0 ? (
-                <div style={{ fontSize: 12, color: T.text3, opacity: 0.6, padding: "8px 0" }}>Arrastra aquí…</div>
+                <div style={{ fontSize: 14, color: T.text3, opacity: 0.7, padding: "8px 0" }}>Arrastra aquí…</div>
               ) : (
                 dentro.map((t) => (
-                  <span key={t.id} style={{ animation: "hcolPop .25s ease", display: "inline-flex", alignItems: "flex-start", gap: 7, padding: "8px 12px", borderRadius: 11, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 12.5, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>
-                    <i className="fa-solid fa-check" style={{ fontSize: 10, color: OK, marginTop: 3 }} />
+                  <span key={t.id} style={{ animation: "hcolPop .25s ease", display: "inline-flex", alignItems: "flex-start", gap: 7, padding: "8px 12px", borderRadius: 11, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 14, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>
+                    <i className="fa-solid fa-check" style={{ fontSize: 12, color: OK, marginTop: 3 }} />
                     {t.texto}
                   </span>
                 ))
@@ -641,19 +897,19 @@ function RowsFunciones({
           >
             <div className="hcol-slot" data-armed={!done && !!selFunc} style={done ? { borderStyle: "solid", borderColor: OK, background: `${OK}1a` } : undefined}>
               {done ? (
-                <span style={{ animation: "hcolPop .25s ease", fontSize: 13, fontWeight: 900, color: "#fff", display: "inline-flex", alignItems: "center", gap: 7 }}>
+                <span style={{ animation: "hcolPop .25s ease", fontSize: 14, fontWeight: 900, color: "#fff", display: "inline-flex", alignItems: "center", gap: 7 }}>
                   <i className="fa-solid fa-cloud" />
                   {f.funcion}
                 </span>
               ) : (
                 <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                  <i className="fa-solid fa-arrow-left" style={{ fontSize: 11 }} /> función
+                  <i className="fa-solid fa-arrow-left" style={{ fontSize: 12 }} /> función
                 </span>
               )}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 14, fontWeight: 700, color: done ? "#fff" : T.text2, lineHeight: 1.4 }}>{f.descripcion}</div>
-              <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.4, marginTop: 3 }}>{f.ejemplo}</div>
+              <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.4, marginTop: 3 }}>{f.ejemplo}</div>
             </div>
           </div>
         );
@@ -677,7 +933,7 @@ function BinsAcciones({
 }) {
   const bins: Juicio[] = ["buena", "error"];
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 220px), 1fr))", gap: 12 }}>
       {bins.map((bin) => {
         const info = JUICIO_INFO[bin];
         const dentro = ACCIONES.filter((a) => ubicAccion[a.id] === bin);
@@ -694,16 +950,16 @@ function BinsAcciones({
             <FondoTermino termino={info.titulo} />
             <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
               <VinetaTermino termino={info.titulo} color={bin === "buena" ? OK : NO} icono={info.icono} tam={29} radio={8} />
-              <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
+              <span style={{ fontSize: 14, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
             </div>
-            <div style={{ fontSize: 11, color: T.text3, marginBottom: 12, lineHeight: 1.4 }}>{info.subtitulo}</div>
+            <div style={{ fontSize: 14, color: T.text3, marginBottom: 12, lineHeight: 1.4 }}>{info.subtitulo}</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {dentro.length === 0 ? (
-                <div style={{ fontSize: 12, color: T.text3, opacity: 0.6, padding: "8px 0" }}>Arrastra aquí…</div>
+                <div style={{ fontSize: 14, color: T.text3, opacity: 0.7, padding: "8px 0" }}>Arrastra aquí…</div>
               ) : (
                 dentro.map((a) => (
-                  <span key={a.id} style={{ animation: "hcolPop .25s ease", display: "inline-flex", alignItems: "flex-start", gap: 7, padding: "8px 12px", borderRadius: 11, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 12.5, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>
-                    <i className="fa-solid fa-check" style={{ fontSize: 10, color: OK, marginTop: 3 }} />
+                  <span key={a.id} style={{ animation: "hcolPop .25s ease", display: "inline-flex", alignItems: "flex-start", gap: 7, padding: "8px 12px", borderRadius: 11, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 14, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>
+                    <i className="fa-solid fa-check" style={{ fontSize: 12, color: OK, marginTop: 3 }} />
                     {a.texto}
                   </span>
                 ))
@@ -756,19 +1012,19 @@ function QuizCard({
   };
 
   return (
-    <div style={{ ...card, padding: "20px 24px 24px", marginTop: 22 }}>
+    <div>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4, flexWrap: "wrap" }}>
         <Eyebrow>
           <i className="fa-solid fa-clipboard-question" style={{ marginRight: 8, color: accent }} />
           Comprueba lo aprendido
         </Eyebrow>
         {aprobado && (
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 12, fontWeight: 800, color: OK }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 14, fontWeight: 800, color: OK }}>
             <i className="fa-solid fa-circle-check" /> Aprobado
           </span>
         )}
       </div>
-      <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
         Cuatro afirmaciones sobre la nube y las herramientas colaborativas. Decide si son verdaderas o falsas y pulsa «Comprobar».
       </div>
 
@@ -777,17 +1033,17 @@ function QuizCard({
           const elegida = resp[qi];
           return (
             <div key={qi}>
-              <div style={{ fontSize: 14.5, fontWeight: 800, color: T.text, marginBottom: 11, display: "flex", gap: 10 }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: T.text, marginBottom: 11, display: "flex", gap: 10 }}>
                 <span style={{ color: accent }}>{qi + 1}.</span>
                 <span>{q.pregunta}</span>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 150px), 1fr))", gap: 9 }}>
                 {q.opciones.map((op, oi) => {
                   const sel = elegida === oi;
                   const esCorrecta = oi === q.correcta;
-                  let borde = T.line;
-                  let fondo = T.glass;
-                  let colorTxt = T.text2;
+                  let borde: string = T.line;
+                  let fondo: string = T.glass;
+                  let colorTxt: string = T.text2;
                   if (comprobado && esCorrecta) {
                     borde = OK;
                     fondo = `${OK}1c`;
@@ -803,7 +1059,7 @@ function QuizCard({
                   }
                   return (
                     <button key={oi} className="hcol-q" onClick={() => elegir(qi, oi)} disabled={comprobado} style={{ borderColor: borde, background: fondo, color: colorTxt }}>
-                      <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
+                      <span style={{ width: 26, height: 26, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
                         {comprobado && esCorrecta ? <i className="fa-solid fa-check" /> : comprobado && sel ? <i className="fa-solid fa-xmark" /> : String.fromCharCode(65 + oi)}
                       </span>
                       <span style={{ flex: 1, lineHeight: 1.35 }}>{op}</span>
@@ -812,7 +1068,7 @@ function QuizCard({
                 })}
               </div>
               {comprobado && (
-                <div style={{ marginTop: 9, fontSize: 12.5, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
+                <div style={{ marginTop: 9, fontSize: 14, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
                   <i className="fa-solid fa-circle-info" style={{ color: accent, marginTop: 2 }} />
                   <span>{q.retro}</span>
                 </div>
@@ -835,7 +1091,7 @@ function QuizCard({
           </button>
         )}
         {comprobado && (
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 13.5, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 14, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
             <i className={`fa-solid ${aprobadoAhora ? "fa-trophy" : "fa-circle-half-stroke"}`} />
             {aciertos} / {total} correctas
             {!aprobadoAhora && <span style={{ color: T.text3, fontWeight: 600 }}>· revisa las marcadas e inténtalo de nuevo</span>}

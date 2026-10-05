@@ -1,0 +1,12 @@
+{
+  "escena": "Entrevistas a Doña Elena, una relojera ficticia, para un reporte sobre el tiempo. Tienes cinco preguntas y ves cómo contesta cada tipo.",
+  "pregunta": "Si le preguntas «¿Qué es el tiempo?», ¿cómo te responde Doña Elena?",
+  "opciones": [
+    { "id": "a", "texto": "Con una cifra y la hora exacta de ahora", "icono": "fa-clock" },
+    { "id": "b", "texto": "Reflexiona, sin respuesta única", "icono": "fa-brain" },
+    { "id": "c", "texto": "Con un experimento que lo comprueba y sus datos", "icono": "fa-flask" }
+  ],
+  "correcta": "b",
+  "porque": "Es una pregunta filosófica: ningún dato ni experimento la cierra. Obliga a aclarar conceptos, así que la respuesta es una reflexión que abre más preguntas.",
+  "comoComprobarlo": "En «La entrevista», pulsa «¿Qué es el tiempo?» y luego «¿Qué hora es?». Compara cuántas palabras tiene cada respuesta."
+}

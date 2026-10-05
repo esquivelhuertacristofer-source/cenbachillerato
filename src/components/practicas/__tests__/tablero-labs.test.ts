@@ -66,7 +66,9 @@ describe("identidad visual del tablero", () => {
     // No todos lo llevan, y está bien: los laboratorios cuyas columnas tienen
     // color PROPIO (el de la categoría que representan, puesto desde el JSX)
     // no deben además ciclar tonos decorativos, porque ahí el tono significa.
-    expect(CON_TABLERO.length).toBeGreaterThanOrEqual(46);
+    // 2026-10: bajó de 46 a 31 porque varios labs de arrastre se volvieron
+    // simuladores (docs/ESTANDAR-LABS.md §4) y su banco ya no existe.
+    expect(CON_TABLERO.length).toBeGreaterThanOrEqual(31);
   });
 
   it.each(CON_TABLERO)("%s: el navegador acepta todas las reglas", (archivo) => {

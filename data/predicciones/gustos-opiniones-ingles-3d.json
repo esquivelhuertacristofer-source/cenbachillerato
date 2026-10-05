@@ -1,0 +1,12 @@
+{
+  "escena": "La Feria de Gustos: seis compañeros esperan en fila y tú les preguntas «Do you like playing video games?». Según su respuesta se acercan al puesto o se alejan, y la gráfica de barras se llena.",
+  "pregunta": "Preguntas «Do you like playing video games?» a los seis. ¿Cuántos suben la barra verde de like?",
+  "opciones": [
+    { "id": "a", "texto": "Cuatro", "icono": "fa-thumbs-up" },
+    { "id": "b", "texto": "Cinco, porque «I don't mind» también es gusto", "icono": "fa-face-meh" },
+    { "id": "c", "texto": "Seis, a todos les gusta algo", "icono": "fa-people-group" }
+  ],
+  "correcta": "a",
+  "porque": "Luis, Jorge, Daniela y Emiliano dicen like, really like o love. Paola responde «I don't mind», que es neutro (barra amarilla), y Ana «I don't like» (barra roja).",
+  "comoComprobarlo": "Elige el puesto Video games, pregúntale a cada compañero «Do you like playing video games?» y cuenta la barra verde."
+}

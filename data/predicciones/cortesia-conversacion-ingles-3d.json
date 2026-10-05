@@ -1,0 +1,12 @@
+{
+  "escena": "En la cafetería ves a Carlos, un compañero al que no ves hace dos semanas. Tú abres la conversación y eliges qué decirle.",
+  "pregunta": "Abres con «Move. I'm next.», una orden sin saludo. ¿Cómo reacciona Carlos?",
+  "opciones": [
+    { "id": "a", "texto": "Sonríe y la cortesía sube al 100 %", "icono": "fa-face-smile" },
+    { "id": "b", "texto": "Se incomoda y la cortesía cae a 0 %", "icono": "fa-face-frown" },
+    { "id": "c", "texto": "Se confunde y la conversación se corta", "icono": "fa-circle-question" }
+  ],
+  "correcta": "b",
+  "porque": "Una orden sin saludo suena agresiva: se califica como descortés, con cortesía 0 %. Carlos se incomoda y contesta «Wow. Hi to you too…». La conversación sigue, pero con el tubo de cortesía vacío.",
+  "comoComprobarlo": "En «Carlos en la cafetería», elige la respuesta que empieza con «Move.» y observa el rostro de Carlos y el tubo de cortesía."
+}

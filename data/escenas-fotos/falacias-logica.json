@@ -1,0 +1,12 @@
+{
+  "slug": "falacias-logica",
+  "items": [
+    { "clave": "debate-aula", "formato": "16:9", "estilo": "ilustracion", "escena": "Ilustración de un salón de clases de preparatoria con dos grupos de estudiantes sentados en pupitres a cada lado de un pasillo central, mirándose, y un estudiante de pie al frente con una mano levantada, luz cálida de ventana, colores suaves, sin pizarrón con texto" },
+    { "clave": "emiliano", "formato": "1:1", "estilo": "ilustracion", "escena": "Ilustración de retrato de un adolescente mexicano de 16 años, cabello corto negro, sudadera azul marino, expresión neutra mirando al frente, fondo liso color verde azulado" },
+    { "clave": "joaquin", "formato": "1:1", "estilo": "ilustracion", "escena": "Ilustración de retrato de un adolescente mexicano de 17 años, cabello rizado castaño y lentes redondos, playera gris, expresión neutra mirando al frente, fondo liso color naranja suave" },
+    { "clave": "renata", "formato": "1:1", "estilo": "ilustracion", "escena": "Ilustración de retrato de una adolescente mexicana de 16 años, cabello largo y lacio con una diadema, chamarra de mezclilla, expresión neutra mirando al frente, fondo liso color lila" },
+    { "clave": "marisol", "formato": "1:1", "estilo": "ilustracion", "escena": "Ilustración de retrato de una adolescente mexicana de 17 años, cabello recogido en una trenza, suéter amarillo mostaza, expresión neutra mirando al frente, fondo liso color verde menta" },
+    { "clave": "dani", "formato": "1:1", "estilo": "ilustracion", "escena": "Ilustración de retrato de un adolescente mexicano de 16 años, cabello despeinado castaño claro, camisa de cuadros roja, expresión neutra mirando al frente, fondo liso color azul cielo" },
+    { "clave": "valeria", "formato": "1:1", "estilo": "ilustracion", "escena": "Ilustración de retrato de una adolescente mexicana de 17 años, cabello negro a los hombros con fleco, blusa blanca, expresión neutra mirando al frente, fondo liso color durazno" }
+  ]
+}

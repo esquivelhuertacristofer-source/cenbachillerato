@@ -4,7 +4,10 @@
  * Laboratorio — Estrategias para buscar información confiable en internet
  * Práctica experimental para CD-II-P01 (Cultura Digital II).
  *
- * Interactividad máxima. Cuatro modos: los tres de arrastrar/clasificar y, al
+ * BUSCADOR SIMULADO (sitios y cifras inventados): el alumno arma una consulta con
+ * palabras y operadores, la página de resultados cambia, revisa cada fuente con
+ * los cinco criterios (cuesta tiempo) y su tarea recibe nota según la calidad.
+ * Después, los modos de refuerzo. Cuatro modos: los tres de arrastrar/clasificar y, al
  * final, uno que se escribe («Completa el texto», verbatim de la progresión):
  *  1. «¿Estrategia o señal de alerta?» — clasifica nueve indicios entre
  *     estrategia de búsqueda confiable y señal de alerta de desinformación.
@@ -28,6 +31,7 @@ import { EscribeTermino } from "./_mecanica-termino";
 import { BUSQUEDA_CONFIABLE_HUECOS } from "./busqueda-confiable-huecos";
 import { usePartida, MarcadorPartida } from "./_partida";
 import { FichaTeorica } from "./_ficha";
+import { LabShell, Bloque, Mesa, Dato, BotonHerramienta } from "./_shell";
 import { BUSQUEDA_CONFIABLE_FICHA } from "./busqueda-confiable-ficha";
 import {
   SENALES,
@@ -38,15 +42,38 @@ import {
   DATO_BUSQUEDA,
   type Categoria,
 } from "./busqueda-confiable-data";
+import {
+  CRITERIOS_REVISION,
+  FUENTES,
+  MIN_FUENTES,
+  NOTA_META,
+  PALABRAS,
+  TIEMPO_TOTAL,
+  UMBRAL_CONFIABLE,
+  buscar,
+  consultaTexto,
+  CONSULTA_VACIA,
+  datoCriterio,
+  evaluarTarea,
+  operadoresActivos,
+  retroVeredicto,
+  veredictoCorrecto,
+  type Consulta,
+  type Criterio,
+  type Fuente,
+  type Veredicto,
+} from "./busqueda-confiable-sim";
 
 const NO = "#FF5E5E";
+const FUENTES_POR_ID = (id: string): Fuente | undefined => FUENTES.find((f) => f.id === id);
 import { useEstrellas } from "@/lib/hooks/useEstrellas";
 import { FondoTermino, VinetaTermino } from "./_vineta";
 const RETO_KEY = "cen-busqueda-confiable-reto";
 
-type Modo = "senales" | "estrategias" | "glosario" | "texto";
+type Modo = "buscador" | "senales" | "estrategias" | "glosario" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
+  { id: "buscador", label: "Buscador", icono: "fa-magnifying-glass-chart" },
   { id: "senales", label: "¿Estrategia o señal de alerta?", icono: "fa-flag" },
   { id: "estrategias", label: "Las cinco estrategias", icono: "fa-magnifying-glass" },
   { id: "glosario", label: "Escribe el término", icono: "fa-keyboard" },
@@ -55,12 +82,11 @@ const MODOS: { id: Modo; label: string; icono: string }[] = [
 
 export function LabBusquedaConfiable({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
-  const [modo, setModo] = useState<Modo>("senales");
+  const [modo, setModo] = useState<Modo>("buscador");
 
   // ── sonido ────────────────────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   // Modo «Completa el texto». El contador sirve de `key`: subirlo remonta
   // el componente y devuelve todos los huecos en blanco.
   const [textoDone, setTextoDone] = useState(false);
@@ -88,6 +114,52 @@ export function LabBusquedaConfiable({ color }: PracticaLabProps) {
   const sfxPlace = () => {
     partida.acierto();
     return sonido && audioRef.current?.blip();
+  };
+
+  // ── modo buscador (simulador) ──────────────────────────────────────────
+  // El estado vive aquí, no en el modo: al cambiar de pestaña no se pierde ni
+  // se des-cumple ninguna misión.
+  const [consulta, setConsulta] = useState<Consulta>(CONSULTA_VACIA);
+  const [abierto, setAbierto] = useState<string | null>(null);
+  const [revisados, setRevisados] = useState<Record<string, Criterio[]>>({});
+  const [veredictos, setVeredictos] = useState<Record<string, Veredicto>>({});
+  const [usoOperador, setUsoOperador] = useState(false);
+  const [lograNota, setLograNota] = useState(false);
+  const tiempoUsado = Object.values(revisados)
+    .flat()
+    .reduce((s, c) => s + (CRITERIOS_REVISION.find((x) => x.id === c)?.costo ?? 0), 0);
+  const tarea = evaluarTarea(Object.keys(veredictos).filter((id) => veredictos[id] === "usar"));
+
+  const actualizarConsulta = (c: Consulta) => {
+    setConsulta(c);
+    if (operadoresActivos(c) > 0) setUsoOperador(true);
+    if (audioRef.current && sonido) audioRef.current.blip();
+  };
+  const revisar = (fid: string, c: Criterio) => {
+    const costo = CRITERIOS_REVISION.find((x) => x.id === c)?.costo ?? 0;
+    const ya = revisados[fid] ?? [];
+    if (ya.includes(c) || tiempoUsado + costo > TIEMPO_TOTAL) return;
+    setRevisados({ ...revisados, [fid]: [...ya, c] });
+    if (audioRef.current && sonido) audioRef.current.blip();
+  };
+  const decidir = (fid: string, v: Veredicto) => {
+    if (veredictos[fid]) return;
+    const f = FUENTES_POR_ID(fid);
+    if (!f) return;
+    if (veredictoCorrecto(f, v)) sfxPlace();
+    else sfxNo();
+    const sig = { ...veredictos, [fid]: v };
+    setVeredictos(sig);
+    const t = evaluarTarea(Object.keys(sig).filter((id) => sig[id] === "usar"));
+    if (t.usadas.length >= MIN_FUENTES && t.nota >= NOTA_META) setLograNota(true);
+  };
+  const resetBuscador = () => {
+    setConsulta(CONSULTA_VACIA);
+    setAbierto(null);
+    setRevisados({});
+    setVeredictos({});
+    setUsoOperador(false);
+    setLograNota(false);
   };
 
   // ── modo señales (clasifica estrategia / alerta) ───────────────────────
@@ -173,6 +245,8 @@ export function LabBusquedaConfiable({ color }: PracticaLabProps) {
   };
 
   const objetivos = [
+    { txt: "Busca con al menos un operador (comillas, site:, − o after:)", done: usoOperador },
+    { txt: "Elige 3 fuentes confiables y saca 8 o más en tu tarea", done: lograNota },
     { txt: "Clasifica los 9 indicios (estrategia / alerta)", done: senalesDone },
     { txt: "Empareja las 5 estrategias con su pregunta", done: estrategiasDone },
     { txt: "Escribe los 5 términos del glosario", done: glosarioDone },
@@ -234,23 +308,47 @@ export function LabBusquedaConfiable({ color }: PracticaLabProps) {
     setTextoDone(false);
     setTextoIntento((n) => n + 1);
   };
-  const resetActual = modo === "texto" ? resetTexto : modo === "senales" ? resetSenales : modo === "estrategias" ? resetEstrategias : resetGlosario;
+  const resetActual = modo === "texto" ? resetTexto : modo === "buscador" ? resetBuscador : modo === "senales" ? resetSenales : modo === "estrategias" ? resetEstrategias : resetGlosario;
+
+  const pistaDe: Record<Modo, string> = {
+    buscador: "Las comillas piden TODAS las palabras; site: limita el dominio; el signo menos quita lo que no quieres. Revisar cuesta minutos: decide qué revisar primero.",
+    senales: "Una estrategia confiable ayuda a evaluar la fuente antes de creerla; una señal de alerta (lenguaje alarmista, titular sensacionalista) invita a desconfiar y verificar.",
+    estrategias: "Para evaluar una fuente pregúntate quién la publicó, cuándo, si cita sus fuentes, qué dicen otros sitios sobre ella y si su tono es alarmista.",
+    glosario: "Lee la definición y su ejemplo y escribe el término. Si te atoras, la pista te da la inicial y las letras.",
+    texto: "Completa los huecos del texto con las palabras de la lectura.",
+  };
+
+  const lectura =
+    modo === "buscador" ? (
+      tarea.usadas.length === 0 ? (
+        <>Busca, revisa y elige al menos {MIN_FUENTES} fuentes para tu tarea.</>
+      ) : (
+        <>
+          Nota de tu tarea: <strong>{tarea.nota.toFixed(1)}</strong> · calidad {tarea.calidad}/100
+        </>
+      )
+    ) : modo === "senales" ? (
+      <>
+        {Object.keys(ubicSenal).length} de {SENALES.length} indicios clasificados
+      </>
+    ) : modo === "estrategias" ? (
+      <>
+        {Object.keys(empEstr).length} de {CRITERIOS.length} estrategias emparejadas
+      </>
+    ) : undefined;
 
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
+    <LabShell
+      dom
+      accent={accent}
+      rgba={color.rgba}
+      escena={
+        <div>
+          <style>{`
         @keyframes bcShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
         @keyframes bcPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
-        .bc-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 16px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .bc-tab:hover { border-color:${T.lineStrong}; color:#fff; }
-        .bc-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-        .bc-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
-          font-size:14px; border:1px solid ${T.line}; background:${T.glass}; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .bc-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
-        .bc-icobtn:hover { background:rgba(255,255,255,0.12); }
         .bc-chip { cursor:grab; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 16px; border-radius:14px;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:13.5px; font-weight:700; transition:all .14s; user-select:none; max-width:360px; text-align:left; line-height:1.4; }
+          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:14px; font-weight:700; transition:all .14s; user-select:none; max-width:360px; text-align:left; line-height:1.4; }
         .bc-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); }
         .bc-chip[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.2); box-shadow:0 0 16px -5px ${accent}; }
         .bc-chip:active { cursor:grabbing; }
@@ -258,41 +356,46 @@ export function LabBusquedaConfiable({ color }: PracticaLabProps) {
         .bc-row[data-shake="true"] { animation:bcShake .4s; border-color:${NO}; }
         .bc-row[data-done="true"] { border-color:${OK}66; background:${OK}0f; }
         .bc-slot { flex-shrink:0; min-width:210px; min-height:42px; border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset};
-          display:inline-flex; align-items:center; justify-content:center; color:${T.text3}; font-size:12.5px; transition:all .16s; cursor:pointer; padding:4px 10px; }
+          display:inline-flex; align-items:center; justify-content:center; color:${T.text3}; font-size:14px; transition:all .16s; cursor:pointer; padding:4px 10px; }
         .bc-slot[data-armed="true"] { border-color:${accent}; background:rgba(${color.rgba},0.1); }
         .bc-bin { border-radius:15px; border:1.5px solid ${T.line}; background:${T.glass}; padding:16px; transition:all .16s; min-height:260px; }
         .bc-bin[data-shake="true"] { animation:bcShake .4s; border-color:${NO}; }
         .bc-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
-          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
+          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
         .bc-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
         .bc-q:disabled{ cursor:default; }
         .bc-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
-          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:13.5px; font-weight:800; transition:all .14s; }
+          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:14px; font-weight:800; transition:all .14s; }
         .bc-btn:hover { border-color:${T.lineStrong}; }
         .bc-divider { height:1px; background:${T.line}; margin:18px 0; }
         @media (prefers-reduced-motion: reduce){ .bc-row[data-shake="true"], .bc-bin[data-shake="true"] { animation:none; } }
-
-        /* Cajón de teoría */
-        .bc-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .bc-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .bc-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .bc-drawer[data-open="true"] { transform:translateX(0); }
-        .bc-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .bc-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .bc-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .bc-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .bc-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .bc-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .bc-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
-
+        /* Buscador simulado */
+        .bs-barra { display:flex; align-items:center; gap:10px; padding:12px 14px; border-radius:14px; background:#f4f7fb; color:#14233a;
+          font-size:15px; font-weight:700; min-height:48px; word-break:break-word; }
+        .bs-barra i { color:#5b6b85; }
+        .bs-vacia { color:#6b7a92; font-weight:500; }
+        .bs-op { cursor:pointer; padding:9px 12px; border-radius:10px; border:1.5px solid ${T.line}; background:${T.glassSoft}; color:${T.text2};
+          font-size:14px; font-weight:800; transition:all .14s; }
+        .bs-op:hover { border-color:${T.lineStrong}; color:#fff; }
+        .bs-op[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.22); color:#fff; }
+        .bs-res { border-radius:14px; border:1.5px solid ${T.line}; background:${T.glass}; overflow:hidden; transition:border-color .16s; }
+        .bs-res[data-open="true"] { border-color:${accent}; }
+        .bs-res[data-v="usar"] { border-color:${OK}88; }
+        .bs-res[data-v="descartar"] { opacity:.7; }
+        .bs-cab { cursor:pointer; display:grid; grid-template-columns:76px minmax(0,1fr); gap:12px; width:100%; padding:12px; text-align:left;
+          background:transparent; border:none; color:${T.text}; }
+        .bs-mini { position:relative; width:76px; height:76px; border-radius:11px; overflow:hidden; display:flex; align-items:center; justify-content:center;
+          background:linear-gradient(135deg, rgba(${color.rgba},0.35), rgba(8,19,31,0.9)); color:rgba(255,255,255,0.85); font-size:24px; }
+        .bs-mini img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+        .bs-url { font-size:14px; color:#7fd6a8; font-weight:700; word-break:break-all; }
+        .bs-tit { font-size:16px; font-weight:800; color:#9cc4ff; line-height:1.3; margin:2px 0; }
+        .bs-frag { font-size:14px; color:${T.text2}; line-height:1.45; }
+        .bs-det { padding:4px 14px 14px; display:grid; gap:10px; border-top:1px solid ${T.line}; }
+        .bs-crit { display:flex; flex-wrap:wrap; gap:8px; }
+        .bs-dato { display:flex; gap:9px; align-items:flex-start; font-size:14px; line-height:1.45; padding:9px 11px; border-radius:10px; background:${T.inset}; border:1px solid ${T.line}; }
+        .bs-medidor { height:12px; border-radius:99px; background:rgba(255,255,255,0.12); overflow:hidden; }
+        .bs-medidor > span { display:block; height:100%; border-radius:99px; transition:width .5s ease, background .3s; }
+        @media (prefers-reduced-motion: reduce){ .bs-medidor > span { transition:none; } }
         /* Identidad del tablero */
         .bc-bin, .bc-row { --tono:188; position:relative;
           background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
@@ -312,55 +415,9 @@ export function LabBusquedaConfiable({ color }: PracticaLabProps) {
         @media (prefers-reduced-motion: reduce){
           .bc-chip, .bc-chip:hover, .bc-chip[data-sel="true"] { transform:none; transition:none; }
         }
-      `}</style>
 
-      {/* selector de modo + toolbar */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="bc-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="bc-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="bc-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="bc-icobtn" onClick={resetActual} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
+          `}</style>
 
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <button className="bc-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="bc-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="bc-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="bc-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="bc-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="bc-drawer-body">
-          <FichaTeorica data={BUSQUEDA_CONFIABLE_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}>
-        {/* ── Columna principal ─────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
-          {/* MODO 1 — señales */}
-          {/* MODO — completa el texto (fill_blanks verbatim de la progresión) */}
           {modo === "texto" && (
             <CompletaTexto
               key={textoIntento}
@@ -377,65 +434,6 @@ export function LabBusquedaConfiable({ color }: PracticaLabProps) {
             />
           )}
 
-          {modo === "senales" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada indicio a su categoría</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: senalesDone ? OK : T.text3 }}>
-                    {Object.keys(ubicSenal).length}/{SENALES.length}
-                  </span>
-                </div>
-                {senalesLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Clasificaste los {SENALES.length} indicios!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {senalesLibres.map((s) => (
-                      <button key={s.id} className="bc-chip" data-sel={selSenal === s.id} onClick={() => setSelSenal((v) => (v === s.id ? null : s.id))} {...dragProps(s.id)}>
-                        {s.texto}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <BinsSenales selSenal={selSenal} shakeSenal={shakeSenal} ubicSenal={ubicSenal} onMatch={intentarSenal} dropProps={dropProps} />
-            </>
-          )}
-
-          {/* MODO 2 — estrategias */}
-          {modo === "estrategias" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada estrategia a la pregunta que responde</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: estrategiasDone ? OK : T.text3 }}>
-                    {Object.keys(empEstr).length}/{CRITERIOS.length}
-                  </span>
-                </div>
-                {estrLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Emparejaste las {CRITERIOS.length} estrategias!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {estrLibres.map((c) => (
-                      <button key={c.id} className="bc-chip" data-sel={selEstr === c.id} onClick={() => setSelEstr((v) => (v === c.id ? null : c.id))} {...dragProps(c.id)}>
-                        <i className="fa-solid fa-magnifying-glass" style={{ fontSize: 11, color: T.text3 }} />
-                        {c.criterio}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <RowsEstrategias selEstr={selEstr} shakeEstr={shakeEstr} empEstr={empEstr} onMatch={intentarEstr} dropProps={dropProps} />
-            </>
-          )}
-
-          {/* MODO 3 — glosario */}
           {modo === "glosario" && (
             <EscribeTermino
               key={glosIntento}
@@ -453,68 +451,375 @@ export function LabBusquedaConfiable({ color }: PracticaLabProps) {
               onError={sfxNo}
             />
           )}
-        </div>
 
-        {/* ── Columna lateral ───────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? OK : T.text2 }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-                  <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
+          {modo === "buscador" && (
+            <BuscadorSim
+              accent={accent}
+              consulta={consulta}
+              onConsulta={actualizarConsulta}
+              abierto={abierto}
+              onAbrir={(id) => setAbierto((a) => (a === id ? null : id))}
+              revisados={revisados}
+              onRevisar={revisar}
+              veredictos={veredictos}
+              onDecidir={decidir}
+              tiempoUsado={tiempoUsado}
+            />
+          )}
+
+          {modo === "senales" && (
+            <Mesa>
+              <div style={{ ...card, padding: "16px 18px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
+                  <Eyebrow>Arrastra cada indicio a su categoría</Eyebrow>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: senalesDone ? OK : T.text3 }}>
+                    {Object.keys(ubicSenal).length}/{SENALES.length}
+                  </span>
                 </div>
-              ))}
-            </div>
+                {senalesLibres.length === 0 ? (
+                  <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+                    <i className="fa-solid fa-circle-check" /> ¡Clasificaste los {SENALES.length} indicios!
+                  </div>
+                ) : (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+                    {senalesLibres.map((s) => (
+                      <button key={s.id} className="bc-chip" data-sel={selSenal === s.id} onClick={() => setSelSenal((v) => (v === s.id ? null : s.id))} {...dragProps(s.id)}>
+                        {s.texto}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <BinsSenales selSenal={selSenal} shakeSenal={shakeSenal} ubicSenal={ubicSenal} onMatch={intentarSenal} dropProps={dropProps} />
+            </Mesa>
+          )}
 
-            <div className="bc-divider" />
-
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", color: T.text3, textTransform: "uppercase" }}>Puntuación</div>
-                <div style={{ display: "flex", gap: 4, marginTop: 5 }}>
+          {modo === "estrategias" && (
+            <Mesa>
+              <div style={{ ...card, padding: "16px 18px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
+                  <Eyebrow>Arrastra cada estrategia a la pregunta que responde</Eyebrow>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: estrategiasDone ? OK : T.text3 }}>
+                    {Object.keys(empEstr).length}/{CRITERIOS.length}
+                  </span>
+                </div>
+                {estrLibres.length === 0 ? (
+                  <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+                    <i className="fa-solid fa-circle-check" /> ¡Emparejaste las {CRITERIOS.length} estrategias!
+                  </div>
+                ) : (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+                    {estrLibres.map((c) => (
+                      <button key={c.id} className="bc-chip" data-sel={selEstr === c.id} onClick={() => setSelEstr((v) => (v === c.id ? null : c.id))} {...dragProps(c.id)}>
+                        <i className="fa-solid fa-magnifying-glass" style={{ fontSize: 14, color: T.text3 }} />
+                        {c.criterio}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <RowsEstrategias selEstr={selEstr} shakeEstr={shakeEstr} empEstr={empEstr} onMatch={intentarEstr} dropProps={dropProps} />
+            </Mesa>
+          )}
+        </div>
+      }
+      modos={{ opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })), valor: modo, cambiar: (id) => setModo(id as Modo) }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={resetActual} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      retoKey={RETO_KEY}
+      pestanas={[
+        {
+          id: "cuaderno",
+          etiqueta: "Cuaderno",
+          icono: "fa-clipboard-list",
+          contenido: (
+            <>
+              <Bloque titulo="Tu tarea" icono="fa-file-pen">
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 10 }}>
+                  <Dato label="Calidad de mis fuentes" value={tarea.usadas.length ? `${tarea.calidad}/100` : "—"} col={tarea.usadas.length ? colorCalidad(tarea.calidad) : undefined} />
+                  <Dato label="Nota de la tarea" value={tarea.usadas.length ? tarea.nota.toFixed(1) : "—"} col={tarea.usadas.length ? colorCalidad(tarea.nota * 10) : undefined} />
+                  <Dato label="Tiempo usado" value={`${tiempoUsado}/${TIEMPO_TOTAL} min`} col={tiempoUsado >= TIEMPO_TOTAL ? NO : undefined} />
+                  <Dato label="Fuentes elegidas" value={`${tarea.usadas.length}/${MIN_FUENTES}+`} />
+                </div>
+                <div className="bs-medidor" role="img" aria-label={`Calidad de mis fuentes: ${tarea.calidad} de 100`}>
+                  <span style={{ width: `${tarea.calidad}%`, background: colorCalidad(tarea.calidad) }} />
+                </div>
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>{tarea.comentario}</div>
+                {tarea.usadas.length > 0 && (
+                  <ul style={{ margin: 0, paddingLeft: 18, fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                    {tarea.usadas.map((f) => (
+                      <li key={f.id}>
+                        {f.sitio} <span style={{ color: T.text3 }}>(simulación)</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </Bloque>
+              <Bloque titulo="Tu partida" icono="fa-gauge-high">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+                <div style={{ display: "flex", gap: 4 }}>
                   {[1, 2, 3].map((s) => (
-                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 18, color: s <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
+                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 20, color: s <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
                   ))}
                 </div>
-              </div>
-              <div style={{ textAlign: "right", maxWidth: 180 }}>
-                <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45 }}>
-                  {bestEstrellas >= 3 ? "¡Evalúas fuentes en internet con criterio!" : "Termina los tres modos para ganar 2★; la tercera pide 2 errores o menos."}
+                <div style={{ fontSize: 14, color: T.text2 }}>
+                  {bestEstrellas >= 3 ? "¡Evalúas fuentes en internet con criterio!" : "Termina los modos de refuerzo para ganar 2★; la tercera pide 2 errores o menos."}
                 </div>
-              </div>
-            </div>
-          </div>
+              </Bloque>
+              <Bloque titulo="Pista de este modo" icono="fa-lightbulb">
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>{pistaDe[modo]}</div>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-clipboard-question",
+          contenido: <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />,
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Teoría de la práctica" icono="fa-book-open">
+                <FichaTeorica data={BUSQUEDA_CONFIABLE_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <Bloque titulo="Las cinco estrategias" icono="fa-magnifying-glass">
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {CRITERIOS.map((c) => (
+                    <div key={c.id} style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                      <strong style={{ color: T.text }}>{c.criterio}.</strong> {c.pregunta}
+                      <div style={{ fontStyle: "italic", color: T.text3, marginTop: 2 }}>{c.ejemplo}</div>
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+              <Bloque titulo="Dato" icono="fa-circle-info">
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55 }}>{DATO_BUSQUEDA}</div>
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
+  );
+}
 
-          {/* pista del modo actual */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid rgba(${color.rgba},0.3)`, background: `rgba(${color.rgba},0.08)`, fontSize: 13, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
+function colorCalidad(c: number): string {
+  return c >= UMBRAL_CONFIABLE ? OK : c >= 45 ? "#FFC75A" : NO;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * SIMULADOR DEL BUSCADOR (modo «Buscador»). Todo es simulación: sitios,
+ * autores y cifras son inventados. La lógica vive en busqueda-confiable-sim.ts.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+const RUTA_FOTOS = "/media/labs-sim/busqueda-confiable";
+
+function BuscadorSim({
+  accent,
+  consulta,
+  onConsulta,
+  abierto,
+  onAbrir,
+  revisados,
+  onRevisar,
+  veredictos,
+  onDecidir,
+  tiempoUsado,
+}: {
+  accent: string;
+  consulta: Consulta;
+  onConsulta: (c: Consulta) => void;
+  abierto: string | null;
+  onAbrir: (id: string) => void;
+  revisados: Record<string, Criterio[]>;
+  onRevisar: (fid: string, c: Criterio) => void;
+  veredictos: Record<string, Veredicto>;
+  onDecidir: (fid: string, v: Veredicto) => void;
+  tiempoUsado: number;
+}) {
+  const resultados = buscar(consulta);
+  const texto = consultaTexto(consulta);
+  const quedan = TIEMPO_TOTAL - tiempoUsado;
+  const quitar = (id: string) => consulta.palabras.filter((p) => p !== id);
+  const togglePalabra = (id: string) => {
+    if (consulta.palabras.includes(id)) onConsulta({ ...consulta, palabras: quitar(id) });
+    else if (consulta.palabras.length < 4) onConsulta({ ...consulta, palabras: [...consulta.palabras, id] });
+  };
+
+  return (
+    <Mesa>
+      <div style={{ ...card, padding: "16px 18px", display: "grid", gap: 12 }}>
+        <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+          <strong style={{ color: T.text }}>Tu tarea (simulación):</strong> «¿Cuántas horas debe dormir un adolescente y cómo afecta su rendimiento escolar?» Elige 3 fuentes confiables.
+        </div>
+        <div className="bs-barra" role="status">
+          <i className="fa-solid fa-magnifying-glass" aria-hidden />
+          {texto ? <span>{texto}</span> : <span className="bs-vacia">Escribe tu consulta con las palabras de abajo…</span>}
+        </div>
+        <div>
+          <Eyebrow>Palabras clave (máx. 4)</Eyebrow>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 8 }}>
+            {PALABRAS.map((p) => (
+              <button key={p.id} type="button" className="bs-op" data-on={consulta.palabras.includes(p.id)} onClick={() => togglePalabra(p.id)}>
+                {p.txt}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <Eyebrow>Operadores</Eyebrow>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 8 }}>
+            <button type="button" className="bs-op" data-on={consulta.comillas} onClick={() => onConsulta({ ...consulta, comillas: !consulta.comillas })} title="Pide que aparezcan TODAS las palabras">
+              “ ” comillas
+            </button>
+            {(["edu", "gob", "org"] as const).map((d) => (
+              <button key={d} type="button" className="bs-op" data-on={consulta.dominio === d} onClick={() => onConsulta({ ...consulta, dominio: consulta.dominio === d ? "" : d })}>
+                site:.{d}
+              </button>
+            ))}
+            <button type="button" className="bs-op" data-on={consulta.excluirMilagro} onClick={() => onConsulta({ ...consulta, excluirMilagro: !consulta.excluirMilagro })} title="Quita los resultados que prometen un «milagro»">
+              −milagro
+            </button>
+            <button type="button" className="bs-op" data-on={consulta.reciente} onClick={() => onConsulta({ ...consulta, reciente: !consulta.reciente })} title="Solo resultados de 2022 en adelante">
+              after:2022
+            </button>
+          </div>
+        </div>
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, fontWeight: 800, color: quedan <= 3 ? NO : T.text2, marginBottom: 6 }}>
             <span>
-              {modo === "senales" && (
-                <>Una <strong style={{ color: T.text }}>estrategia confiable</strong> ayuda a evaluar la fuente antes de creerla; una <strong style={{ color: T.text }}>señal de alerta</strong> (lenguaje alarmista, titular sensacionalista) invita a desconfiar y verificar.</>
-              )}
-              {modo === "estrategias" && (
-                <>Para evaluar una fuente pregúntate <strong style={{ color: T.text }}>quién</strong> la publicó, <strong style={{ color: T.text }}>cuándo</strong>, si <strong style={{ color: T.text }}>cita</strong> sus fuentes, qué dicen <strong style={{ color: T.text }}>otros sitios</strong> sobre ella y si su <strong style={{ color: T.text }}>tono</strong> es alarmista.</>
-              )}
-              {modo === "glosario" && (
-                <>Ya no se arrastra: lee la definición y su ejemplo y escribe el término. Si te atoras, la pista te da la inicial y las letras.</>
-              )}
+              <i className="fa-solid fa-hourglass-half" aria-hidden /> Tiempo para revisar
             </span>
+            <span>{quedan} min</span>
           </div>
-
-          {/* dato verbatim */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid ${T.line}`, background: T.glass, fontSize: 12.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-circle-info" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>{DATO_BUSQUEDA}</span>
+          <div className="bs-medidor">
+            <span style={{ width: `${(quedan / TIEMPO_TOTAL) * 100}%`, background: quedan <= 3 ? NO : accent }} />
           </div>
         </div>
       </div>
 
-      <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />
+      <div style={{ display: "grid", gap: 12, minWidth: 0 }}>
+        <div style={{ fontSize: 14, fontWeight: 800, color: T.text3 }}>
+          {consulta.palabras.length === 0
+            ? "Elige palabras clave para ver resultados."
+            : `${resultados.length} resultado${resultados.length === 1 ? "" : "s"} (buscador de simulación)`}
+        </div>
+        {consulta.palabras.length > 0 && resultados.length === 0 && (
+          <div style={{ ...card, padding: "16px 18px", fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+            Tu consulta es demasiado estricta: ningún resultado cumple todo a la vez. Quita un operador o una palabra.
+          </div>
+        )}
+        {resultados.map((f) => (
+          <ResultadoCard
+            key={f.id}
+            accent={accent}
+            f={f}
+            abierto={abierto === f.id}
+            onAbrir={() => onAbrir(f.id)}
+            hechos={revisados[f.id] ?? []}
+            onRevisar={(c) => onRevisar(f.id, c)}
+            veredicto={veredictos[f.id]}
+            onDecidir={(v) => onDecidir(f.id, v)}
+            quedan={quedan}
+          />
+        ))}
+      </div>
+    </Mesa>
+  );
+}
+
+function ResultadoCard({
+  accent,
+  f,
+  abierto,
+  onAbrir,
+  hechos,
+  onRevisar,
+  veredicto,
+  onDecidir,
+  quedan,
+}: {
+  accent: string;
+  f: Fuente;
+  abierto: boolean;
+  onAbrir: () => void;
+  hechos: Criterio[];
+  onRevisar: (c: Criterio) => void;
+  veredicto: Veredicto | undefined;
+  onDecidir: (v: Veredicto) => void;
+  quedan: number;
+}) {
+  return (
+    <div className="bs-res" data-open={abierto} data-v={veredicto}>
+      <button type="button" className="bs-cab" onClick={onAbrir} aria-expanded={abierto}>
+        <span className="bs-mini">
+          <i className={`fa-solid ${f.icono}`} aria-hidden />
+          <img src={`${RUTA_FOTOS}/${f.imagen}.webp`} alt="" loading="lazy" onError={(e) => { e.currentTarget.style.display = "none"; }} />
+        </span>
+        <span style={{ minWidth: 0 }}>
+          <span className="bs-url" style={{ display: "block" }}>{f.sitio}</span>
+          <span className="bs-tit" style={{ display: "block" }}>{f.titulo}</span>
+          <span className="bs-frag" style={{ display: "block" }}>{f.fragmento}</span>
+          {veredicto && (
+            <span style={{ display: "inline-block", marginTop: 6, fontSize: 14, fontWeight: 800, color: veredicto === "usar" ? OK : T.text3 }}>
+              <i className={`fa-solid ${veredicto === "usar" ? "fa-bookmark" : "fa-ban"}`} aria-hidden /> {veredicto === "usar" ? "Usada en tu tarea" : "Descartada"}
+            </span>
+          )}
+        </span>
+      </button>
+      {abierto && (
+        <div className="bs-det">
+          <div style={{ fontSize: 14, color: T.text3 }}>
+            {f.tipoSitio} · Revisar cuesta tiempo ({quedan} min disponibles).
+          </div>
+          <div className="bs-crit">
+            {CRITERIOS_REVISION.map((c) => {
+              const hecho = hechos.includes(c.id);
+              return (
+                <button key={c.id} type="button" className="bs-op" data-on={hecho} disabled={hecho || c.costo > quedan} onClick={() => onRevisar(c.id)}>
+                  <i className={`fa-solid ${c.icono}`} aria-hidden /> {c.txt} · {c.costo} min
+                </button>
+              );
+            })}
+          </div>
+          {hechos.map((c) => {
+            const d = datoCriterio(f, c);
+            return (
+              <div key={c} className="bs-dato" style={{ borderColor: d.bueno ? `${OK}66` : `${NO}66` }}>
+                <i className={`fa-solid ${d.bueno ? "fa-circle-check" : "fa-triangle-exclamation"}`} style={{ color: d.bueno ? OK : NO, marginTop: 3 }} aria-hidden />
+                <span>
+                  <strong>{d.etiqueta}:</strong> {d.texto}
+                </span>
+              </div>
+            );
+          })}
+          {!veredicto ? (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              <button type="button" className="bc-btn" style={{ background: accent, color: "#04121f", border: "none" }} onClick={() => onDecidir("usar")}>
+                <i className="fa-solid fa-bookmark" aria-hidden /> Usar en mi tarea
+              </button>
+              <button type="button" className="bc-btn" onClick={() => onDecidir("descartar")}>
+                <i className="fa-solid fa-ban" aria-hidden /> Descartar
+              </button>
+            </div>
+          ) : (
+            <div className="bs-dato" style={{ borderColor: veredictoCorrecto(f, veredicto) ? `${OK}66` : `${NO}66` }} role="status">
+              <i className={`fa-solid ${veredictoCorrecto(f, veredicto) ? "fa-circle-check" : "fa-circle-xmark"}`} style={{ color: veredictoCorrecto(f, veredicto) ? OK : NO, marginTop: 3 }} aria-hidden />
+              <span>{retroVeredicto(f, veredicto, hechos)}</span>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -561,16 +866,16 @@ function BinsSenales({
             <FondoTermino termino={info.titulo} />
             <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
               <VinetaTermino termino={info.titulo} color={tint} icono={info.icono} tam={29} radio={8} />
-              <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
+              <span style={{ fontSize: 14, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
             </div>
-            <div style={{ fontSize: 11, color: T.text3, marginBottom: 12, lineHeight: 1.4 }}>{info.subtitulo}</div>
+            <div style={{ fontSize: 14, color: T.text3, marginBottom: 12, lineHeight: 1.4 }}>{info.subtitulo}</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {dentro.length === 0 ? (
-                <div style={{ fontSize: 12, color: T.text3, opacity: 0.6, padding: "8px 0" }}>Arrastra aquí…</div>
+                <div style={{ fontSize: 14, color: T.text3, opacity: 0.6, padding: "8px 0" }}>Arrastra aquí…</div>
               ) : (
                 dentro.map((s) => (
-                  <span key={s.id} style={{ animation: "bcPop .25s ease", display: "inline-flex", alignItems: "flex-start", gap: 7, padding: "8px 12px", borderRadius: 11, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 12.5, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>
-                    <i className="fa-solid fa-check" style={{ fontSize: 10, color: OK, marginTop: 3 }} />
+                  <span key={s.id} style={{ animation: "bcPop .25s ease", display: "inline-flex", alignItems: "flex-start", gap: 7, padding: "8px 12px", borderRadius: 11, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 14, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>
+                    <i className="fa-solid fa-check" style={{ fontSize: 14, color: OK, marginTop: 3 }} />
                     {s.texto}
                   </span>
                 ))
@@ -611,19 +916,19 @@ function RowsEstrategias({
           >
             <div className="bc-slot" data-armed={!done && !!selEstr} style={done ? { borderStyle: "solid", borderColor: OK, background: `${OK}1a` } : undefined}>
               {done ? (
-                <span style={{ animation: "bcPop .25s ease", fontSize: 13, fontWeight: 900, color: "#fff", display: "inline-flex", alignItems: "center", gap: 7 }}>
+                <span style={{ animation: "bcPop .25s ease", fontSize: 14, fontWeight: 900, color: "#fff", display: "inline-flex", alignItems: "center", gap: 7 }}>
                   <i className="fa-solid fa-magnifying-glass" />
                   {c.criterio}
                 </span>
               ) : (
                 <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                  <i className="fa-solid fa-arrow-left" style={{ fontSize: 11 }} /> estrategia
+                  <i className="fa-solid fa-arrow-left" style={{ fontSize: 14 }} /> estrategia
                 </span>
               )}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 14, fontWeight: 700, color: done ? "#fff" : T.text2, lineHeight: 1.4 }}>{c.pregunta}</div>
-              <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.4, marginTop: 3 }}>{c.ejemplo}</div>
+              <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.4, marginTop: 3 }}>{c.ejemplo}</div>
             </div>
           </div>
         );
@@ -679,12 +984,12 @@ function QuizCard({
           Comprueba lo aprendido
         </Eyebrow>
         {aprobado && (
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 12, fontWeight: 800, color: OK }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 14, fontWeight: 800, color: OK }}>
             <i className="fa-solid fa-circle-check" /> Aprobado
           </span>
         )}
       </div>
-      <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
         Cinco preguntas sobre cómo buscar y evaluar información confiable en internet. Elige la opción correcta de cada una y pulsa «Comprobar».
       </div>
 
@@ -719,7 +1024,7 @@ function QuizCard({
                   }
                   return (
                     <button key={oi} className="bc-q" onClick={() => elegir(qi, oi)} disabled={comprobado} style={{ borderColor: borde, background: fondo, color: colorTxt }}>
-                      <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
+                      <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
                         {comprobado && esCorrecta ? <i className="fa-solid fa-check" /> : comprobado && sel ? <i className="fa-solid fa-xmark" /> : String.fromCharCode(65 + oi)}
                       </span>
                       <span style={{ flex: 1, lineHeight: 1.35 }}>{op}</span>
@@ -728,7 +1033,7 @@ function QuizCard({
                 })}
               </div>
               {comprobado && (
-                <div style={{ marginTop: 9, fontSize: 12.5, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
+                <div style={{ marginTop: 9, fontSize: 14, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
                   <i className="fa-solid fa-circle-info" style={{ color: accent, marginTop: 2 }} />
                   <span>{q.retro}</span>
                 </div>
@@ -751,7 +1056,7 @@ function QuizCard({
           </button>
         )}
         {comprobado && (
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 13.5, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 14, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
             <i className={`fa-solid ${aprobadoAhora ? "fa-trophy" : "fa-circle-half-stroke"}`} />
             {aciertos} / {total} correctas
             {!aprobadoAhora && <span style={{ color: T.text3, fontWeight: 600 }}>· revisa las marcadas e inténtalo de nuevo</span>}

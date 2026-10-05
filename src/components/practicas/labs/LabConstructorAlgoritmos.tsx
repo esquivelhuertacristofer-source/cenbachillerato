@@ -410,6 +410,7 @@ export function LabConstructorAlgoritmos({ color }: PracticaLabProps) {
   // casillas de emparejar sí, y se activan con Enter o espacio.
   const dropProps = (onDrop: (id: string) => void) => ({
     ...dropBase(onDrop),
+    "data-zona": "true" as const,
     role: "button" as const,
     tabIndex: 0,
     onKeyDown: (e: React.KeyboardEvent) => {

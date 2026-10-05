@@ -23,10 +23,11 @@
 
 import * as THREE from "three";
 import { useEffect, useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Environment, Lightformer, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { PanelGrafica } from "./_tablero";
+import { Encuadre } from "./_encuadre-historia";
 import {
   type SoporteId,
   type ZonaId,
@@ -898,9 +899,11 @@ function dibujarFalsa(examinados: number[]): { canvas: HTMLCanvasElement; rects:
 
 /* ── Piezas comunes ───────────────────────────────────────────────────── */
 
-function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number }) {
+function Etiqueta({ pos, children, col }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number }) {
+  const ancho = useThree((s) => s.size.width);
+  if (ancho < 640) return null; // en pantallas angostas la info ya está en el panel
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -911,7 +914,7 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children:
           background: "rgba(12,8,4,0.86)",
           border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`,
           color: "#fff",
-          fontSize: fs,
+          fontSize: 14,
           fontWeight: 800,
           whiteSpace: "nowrap",
           boxShadow: "0 6px 18px -8px #000",
@@ -1619,10 +1622,6 @@ function EscenaBalanza({ tesisOk, sostienen, matiz, peso, lista, modoColor }: { 
         <i className="fa-solid fa-folder-open" style={{ color: modoColor }} />
         {validas.length ? validas.map((f) => FUENTE_DEF[f].corta).join(" + ") : "Evidencias que sostienen"} · peso {peso}
       </Etiqueta>
-      <Etiqueta pos={[BRAZO, 3.4, 0]} df={10} fs={11}>
-        <i className="fa-solid fa-weight-hanging" style={{ color: "#d4a73c" }} />
-        Carga de la prueba · {PESO_MINIMO}
-      </Etiqueta>
       {/* Matiz y descartadas */}
       <group position={[-2.55, 0.02, 2.0]}>
         {matiz && ficha(matiz, [0, 0.05, 0], 0.3, `m-${matiz}`)}
@@ -1687,6 +1686,7 @@ export default function ArchivoFuentesScene(p: ArchivoSceneProps) {
       {vista === "foto" && <EscenaFoto sinRecorte={p.sinRecorte} fotoVolteada={p.fotoVolteada} publicado={p.publicado} modoColor={modoColor} />}
       {vista === "balanza" && <EscenaBalanza tesisOk={p.tesisOk} sostienen={p.sostienen} matiz={p.matiz} peso={p.peso} lista={p.lista} modoColor={modoColor} />}
 
+      <Encuadre pos={cam.pos} target={cam.target} />
       <OrbitControls
         makeDefault
         enablePan={false}

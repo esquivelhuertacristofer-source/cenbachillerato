@@ -1,28 +1,28 @@
-﻿"use client";
+"use client";
 
 /**
  * Laboratorio — Lógica: del silogismo a las falacias
  * Práctica experimental para PFH-III-P01 (Pensamiento Filosófico III).
  *
- * Interactividad máxima. Cuatro modos: los tres de arrastrar/clasificar y, al
- * final, uno que se escribe («Completa el texto», verbatim de la progresión):
- *  1. «¿Qué falacia comete?» — clasifica ocho argumentos de ejemplo según la
- *     falacia que cometen (ad hominem, hombre de paja, pendiente resbaladiza,
- *     apelación a la autoridad, falsa dicotomía). Nombres y definiciones
- *     verbatim del glosario A1.
- *  2. «¿Argumento válido o falacia?» — clasifica seis razonamientos según su
- *     validez lógica (deducción/silogismo válido vs. falacia).
- *  3. «Escribe el término» — lee la definición verbatim (A5) y escribe
- *     de memoria el término del glosario que la nombra.
- *  + Cuestionario de comprensión (V/F verbatim de A4).
+ * Cinco modos:
+ *  1. «El debate» (SIMULADOR) — el Consejo Estudiantil de una prepa ficticia
+ *     discute si guardar el celular en clase. Seis mensajes de compañeros
+ *     ficticios: el alumno nombra la falacia (o reconoce el argumento sólido),
+ *     elige cómo responder y ve moverse la fuerza de cada equipo y la reacción
+ *     del público. Modelo en `falacias-logica-sim.ts`.
+ *  2. «¿Qué falacia comete?» — clasifica ocho argumentos de ejemplo (verbatim A1).
+ *  3. «¿Argumento válido o falacia?» — clasifica seis razonamientos.
+ *  4. «Escribe el término» — definición verbatim (A5) → término del glosario.
+ *  5. «Completa el texto» — fill_blanks verbatim de la progresión.
+ *  + Reto: cuestionario de comprensión (V/F verbatim de A4).
  *
- * DOM puro (sin three.js): ligero, accesible (ratón, teclado y táctil mediante
- * clic-para-seleccionar / clic-para-colocar). Contenido VERBATIM de PFH-III·P01.
+ * DOM puro (sin three.js). Contenido curricular VERBATIM de PFH-III·P01 en «Teoría».
  */
 
 import { useEffect, useRef, useState } from "react";
 import type { PracticaLabProps } from "../registry";
-import { T, OK, card, Eyebrow } from "./_kit";
+import { T, OK } from "./_kit";
+import { LabShell, Bloque, BotonHerramienta, Mesa, Dato } from "./_shell";
 import { LabSfx } from "./lab-audio";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { EscribeTermino } from "./_mecanica-termino";
@@ -41,15 +41,34 @@ import {
   type Falacia,
   type Validez,
 } from "./falacias-logica-data";
+import {
+  MENSAJES,
+  LADOS,
+  TEMA,
+  ETIQUETAS,
+  aplicarEtiqueta,
+  aplicarRespuesta,
+  calcular,
+  humor,
+  nombreEtiqueta,
+  type Delta,
+  type Etiqueta,
+  type Mensaje,
+  type TipoResp,
+  type Turno,
+} from "./falacias-logica-sim";
 
 const NO = "#FF5E5E";
+const AVISO = "#FFC75A";
 import { useEstrellas } from "@/lib/hooks/useEstrellas";
 import { FondoTermino, VinetaTermino } from "./_vineta";
 const RETO_KEY = "cen-falacias-logica-reto";
+const RUTA_FOTOS = "/media/labs-sim/falacias-logica";
 
-type Modo = "falacias" | "validez" | "glosario" | "texto";
+type Modo = "debate" | "falacias" | "validez" | "glosario" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
+  { id: "debate", label: "El debate", icono: "fa-comments" },
   { id: "falacias", label: "¿Qué falacia comete?", icono: "fa-layer-group" },
   { id: "validez", label: "¿Argumento válido o falacia?", icono: "fa-scale-balanced" },
   { id: "glosario", label: "Escribe el término", icono: "fa-keyboard" },
@@ -58,12 +77,11 @@ const MODOS: { id: Modo; label: string; icono: string }[] = [
 
 export function LabFalaciasLogica({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
-  const [modo, setModo] = useState<Modo>("falacias");
+  const [modo, setModo] = useState<Modo>("debate");
 
   // ── sonido ────────────────────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   // Modo «Completa el texto». El contador sirve de `key`: subirlo remonta
   // el componente y devuelve todos los huecos en blanco.
   const [textoDone, setTextoDone] = useState(false);
@@ -91,6 +109,32 @@ export function LabFalaciasLogica({ color }: PracticaLabProps) {
   const sfxPlace = () => {
     partida.acierto();
     return sonido && audioRef.current?.blip();
+  };
+
+  // ── modo debate (simulador) ────────────────────────────────────────────
+  const [turnos, setTurnos] = useState<Turno[]>([]);
+  const [ronda, setRonda] = useState(0);
+  const debate = calcular(turnos);
+  const msg = ronda < MENSAJES.length ? MENSAJES[ronda]! : null;
+  const turnoActual = msg ? turnos.find((t) => t.id === msg.id) : undefined;
+
+  const etiquetar = (etq: Etiqueta) => {
+    if (!msg || turnoActual) return;
+    setTurnos((t) => [...t, { id: msg.id, etiqueta: etq }]);
+    if (aplicarEtiqueta(msg, etq).acierto) sfxPlace();
+    else sfxNo();
+  };
+  const responder = (tipo: TipoResp) => {
+    if (!msg || !turnoActual || turnoActual.resp) return;
+    setTurnos((t) => t.map((x) => (x.id === msg.id ? { ...x, resp: tipo } : x)));
+    if (tipo === "razon") sfxPlace();
+    else sfxNo();
+    if (turnos.filter((x) => x.resp).length + 1 >= MENSAJES.length) sfxOk();
+  };
+  const reiniciarDebate = () => {
+    setTurnos([]);
+    setRonda(0);
+    partida.reiniciar();
   };
 
   // ── modo falacias (clasifica argumento por falacia) ────────────────────
@@ -177,6 +221,8 @@ export function LabFalaciasLogica({ color }: PracticaLabProps) {
   };
 
   const objetivos = [
+    { txt: "Analiza los 6 mensajes del debate y responde a cada uno", done: debate.cerrado },
+    { txt: "Detecta la falacia (o su ausencia) en 5 de los 6 mensajes", done: debate.aciertos >= 5 },
     { txt: "Clasifica los 8 argumentos por su falacia", done: falaciasDone },
     { txt: "Separa los 6 razonamientos en válidos y falacias", done: validezDone },
     { txt: "Escribe los 6 términos del glosario", done: glosarioDone },
@@ -238,133 +284,68 @@ export function LabFalaciasLogica({ color }: PracticaLabProps) {
     setTextoDone(false);
     setTextoIntento((n) => n + 1);
   };
-  const resetActual = modo === "texto" ? resetTexto : modo === "falacias" ? resetFalacias : modo === "validez" ? resetValidez : resetGlosario;
+  const resetActual =
+    modo === "texto" ? resetTexto : modo === "falacias" ? resetFalacias : modo === "validez" ? resetValidez : modo === "debate" ? reiniciarDebate : resetGlosario;
+
+  const instruccion = (txt: string, n?: string, ok?: boolean) => (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", fontSize: 15, fontWeight: 800, color: T.text }}>
+      <span>{txt}</span>
+      {n && <span style={{ fontSize: 15, fontWeight: 900, color: ok ? OK : T.text3 }}>{n}</span>}
+    </div>
+  );
+
+  const hm = humor(debate.estado.publico);
+  const lectura =
+    modo === "debate" ? (
+      <>
+        {msg ? `Mensaje ${ronda + 1} de ${MENSAJES.length}` : "Debate terminado"} · Público: {hm.texto} ({debate.estado.publico})
+      </>
+    ) : modo === "falacias" ? (
+      <>Argumentos clasificados: {Object.keys(ubicFal).length}/{EJEMPLOS.length}</>
+    ) : modo === "validez" ? (
+      <>Razonamientos clasificados: {Object.keys(ubicVal).length}/{ARGUMENTOS.length}</>
+    ) : (
+      <>Repaso de los términos de la lógica</>
+    );
 
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes falShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
-        @keyframes falPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
-        .fal-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 16px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .fal-tab:hover { border-color:${T.lineStrong}; color:#fff; }
-        .fal-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-        .fal-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
-          font-size:14px; border:1px solid ${T.line}; background:${T.glass}; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .fal-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
-        .fal-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .fal-chip { cursor:grab; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 16px; border-radius:14px;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:13.5px; font-weight:700; transition:all .14s; user-select:none; max-width:420px; text-align:left; line-height:1.4; }
-        .fal-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); }
-        .fal-chip[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.2); box-shadow:0 0 16px -5px ${accent}; }
-        .fal-chip:active { cursor:grabbing; }
-        .fal-row { border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:14px 16px; transition:all .16s; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
-        .fal-row[data-shake="true"] { animation:falShake .4s; border-color:${NO}; }
-        .fal-row[data-done="true"] { border-color:${OK}66; background:${OK}0f; }
-        .fal-slot { flex-shrink:0; min-width:170px; min-height:42px; border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset};
-          display:inline-flex; align-items:center; justify-content:center; color:${T.text3}; font-size:12.5px; transition:all .16s; cursor:pointer; padding:4px 10px; }
-        .fal-slot[data-armed="true"] { border-color:${accent}; background:rgba(${color.rgba},0.1); }
-        .fal-bin { border-radius:15px; border:1.5px solid ${T.line}; background:${T.glass}; padding:16px; transition:all .16s; min-height:230px; }
-        .fal-bin[data-shake="true"] { animation:falShake .4s; border-color:${NO}; }
-        .fal-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
-          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
-        .fal-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
-        .fal-q:disabled{ cursor:default; }
-        .fal-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
-          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .fal-btn:hover { border-color:${T.lineStrong}; }
-        .fal-divider { height:1px; background:${T.line}; margin:18px 0; }
-        @media (prefers-reduced-motion: reduce){ .fal-row[data-shake="true"], .fal-bin[data-shake="true"] { animation:none; } }
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      dom
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })),
+        valor: modo,
+        cambiar: (id) => setModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={resetActual} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      escena={
+        <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
+          <style>{css(accent, color.rgba)}</style>
 
-        /* Cajón de teoría */
-        .fal-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .fal-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .fal-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .fal-drawer[data-open="true"] { transform:translateX(0); }
-        .fal-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .fal-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .fal-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .fal-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .fal-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .fal-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .fal-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
+          {modo === "debate" && (
+            <Debate
+              ronda={ronda}
+              msg={msg}
+              turnos={turnos}
+              turnoActual={turnoActual}
+              resumen={debate}
+              onEtiquetar={etiquetar}
+              onResponder={responder}
+              onSiguiente={() => setRonda((r) => r + 1)}
+              onReiniciar={reiniciarDebate}
+              onVer={(i) => setRonda(i)}
+            />
+          )}
 
-        /* Identidad del tablero */
-        .fal-bin, .fal-row { --tono:188; position:relative;
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
-        .fal-bin:nth-of-type(6n+1), .fal-row:nth-of-type(6n+1) { --tono:188; }
-        .fal-bin:nth-of-type(6n+2), .fal-row:nth-of-type(6n+2) { --tono:262; }
-        .fal-bin:nth-of-type(6n+3), .fal-row:nth-of-type(6n+3) { --tono:44; }
-        .fal-bin:nth-of-type(6n+4), .fal-row:nth-of-type(6n+4) { --tono:152; }
-        .fal-bin:nth-of-type(6n+5), .fal-row:nth-of-type(6n+5) { --tono:330; }
-        .fal-bin:nth-of-type(6n+6), .fal-row:nth-of-type(6n+6) { --tono:18; }
-        .fal-bin::before, .fal-row::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
-          background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
-        .fal-bin[data-done="true"], .fal-row[data-done="true"] {
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.2) 0%, transparent 68%); }
-        .fal-chip { transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
-        .fal-chip:hover { transform:translateY(-2px); }
-        .fal-chip[data-sel="true"] { transform:translateY(-3px) scale(1.02); }
-        @media (prefers-reduced-motion: reduce){
-          .fal-chip, .fal-chip:hover, .fal-chip[data-sel="true"] { transform:none; transition:none; }
-        }
-      `}</style>
-
-      {/* selector de modo + toolbar */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="fal-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="fal-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="fal-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="fal-icobtn" onClick={resetActual} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <button className="fal-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="fal-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="fal-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="fal-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="fal-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="fal-drawer-body">
-          <FichaTeorica data={FALACIAS_LOGICA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}>
-        {/* ── Columna principal ─────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
-          {/* MODO 1 — falacias */}
-          {/* MODO — completa el texto (fill_blanks verbatim de la progresión) */}
           {modo === "texto" && (
             <CompletaTexto
               key={textoIntento}
@@ -382,16 +363,11 @@ export function LabFalaciasLogica({ color }: PracticaLabProps) {
           )}
 
           {modo === "falacias" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada argumento a la falacia que comete</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: falaciasDone ? OK : T.text3 }}>
-                    {Object.keys(ubicFal).length}/{EJEMPLOS.length}
-                  </span>
-                </div>
+            <Mesa>
+              <div>
+                {instruccion("Arrastra cada argumento a la falacia que comete", `${Object.keys(ubicFal).length}/${EJEMPLOS.length}`, falaciasDone)}
                 {falLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+                  <div style={{ fontSize: 15, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
                     <i className="fa-solid fa-circle-check" /> ¡Clasificaste los {EJEMPLOS.length} argumentos!
                   </div>
                 ) : (
@@ -404,23 +380,16 @@ export function LabFalaciasLogica({ color }: PracticaLabProps) {
                   </div>
                 )}
               </div>
-
               <BinsFalacias selFal={selFal} shakeFal={shakeFal} ubicFal={ubicFal} onMatch={intentarFal} dropProps={dropProps} />
-            </>
+            </Mesa>
           )}
 
-          {/* MODO 2 — validez */}
           {modo === "validez" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada razonamiento a su tipo de validez</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: validezDone ? OK : T.text3 }}>
-                    {Object.keys(ubicVal).length}/{ARGUMENTOS.length}
-                  </span>
-                </div>
+            <Mesa>
+              <div>
+                {instruccion("Arrastra cada razonamiento a su tipo de validez", `${Object.keys(ubicVal).length}/${ARGUMENTOS.length}`, validezDone)}
                 {valLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+                  <div style={{ fontSize: 15, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
                     <i className="fa-solid fa-circle-check" /> ¡Clasificaste los {ARGUMENTOS.length} razonamientos!
                   </div>
                 ) : (
@@ -433,12 +402,10 @@ export function LabFalaciasLogica({ color }: PracticaLabProps) {
                   </div>
                 )}
               </div>
-
               <BinsValidez selVal={selVal} shakeVal={shakeVal} ubicVal={ubicVal} onMatch={intentarVal} dropProps={dropProps} />
-            </>
+            </Mesa>
           )}
 
-          {/* MODO 3 — glosario */}
           {modo === "glosario" && (
             <EscribeTermino
               key={glosIntento}
@@ -457,70 +424,395 @@ export function LabFalaciasLogica({ color }: PracticaLabProps) {
             />
           )}
         </div>
-
-        {/* ── Columna lateral ───────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? OK : T.text2 }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-                  <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
+      }
+      pestanas={[
+        {
+          id: "cuaderno",
+          etiqueta: "Cuaderno",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Tu partida" icono="fa-star">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8 }}>
+                  <Dato label="Falacias detectadas" value={`${debate.aciertos}/${MENSAJES.length}`} col={debate.aciertos >= 5 ? OK : undefined} />
+                  <Dato label="Público (simulación)" value={`${debate.estado.publico}/100`} col={hm.color} />
+                  <Dato label={LADOS.a.corto} value={`${debate.estado.a}`} col={LADOS.a.color} />
+                  <Dato label={LADOS.b.corto} value={`${debate.estado.b}`} col={LADOS.b.color} />
                 </div>
-              ))}
-            </div>
-
-            <div className="fal-divider" />
-
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", color: T.text3, textTransform: "uppercase" }}>Puntuación</div>
-                <div style={{ display: "flex", gap: 4, marginTop: 5 }}>
-                  {[1, 2, 3].map((s) => (
-                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 18, color: s <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
-                  ))}
+                <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                  <div style={{ display: "flex", gap: 4 }}>
+                    {[1, 2, 3].map((s) => (
+                      <i key={s} className="fa-solid fa-star" style={{ fontSize: 20, color: s <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
+                    ))}
+                  </div>
+                  <span style={{ fontSize: 14, color: T.text2, lineHeight: 1.45, flex: "1 1 160px" }}>
+                    {bestEstrellas >= 3 ? "¡Detectas falacias y razonas como un filósofo!" : "Termina los tres modos de clasificar y escribir para ganar 2★; la tercera pide 2 errores o menos."}
+                  </span>
                 </div>
-              </div>
-              <div style={{ textAlign: "right", maxWidth: 180 }}>
-                <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45 }}>
-                  {bestEstrellas >= 3 ? "¡Detectas falacias y razonas como un filósofo!" : "Termina los tres modos para ganar 2★; la tercera pide 2 errores o menos."}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* pista del modo actual */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid rgba(${color.rgba},0.3)`, background: `rgba(${color.rgba},0.08)`, fontSize: 13, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              {modo === "falacias" && (
-                <>El <strong style={{ color: T.text }}>ad hominem</strong> ataca a la persona; el <strong style={{ color: T.text }}>hombre de paja</strong> distorsiona su postura; la <strong style={{ color: T.text }}>pendiente resbaladiza</strong> supone consecuencias extremas inevitables; la <strong style={{ color: T.text }}>apelación a la autoridad</strong> sustituye la evidencia por el prestigio; la <strong style={{ color: T.text }}>falsa dicotomía</strong> reduce todo a dos opciones.</>
+              </Bloque>
+              {turnos.length === 0 ? (
+                <Bloque titulo="Tus decisiones en el debate" icono="fa-comments">
+                  <p style={{ margin: 0, color: T.text3 }}>Aún no hay decisiones. Nombra la falacia del primer mensaje en «El debate».</p>
+                </Bloque>
+              ) : (
+                turnos.map((t, i) => {
+                  const m = MENSAJES.find((x) => x.id === t.id)!;
+                  const ok = aplicarEtiqueta(m, t.etiqueta).acierto;
+                  return (
+                    <Bloque key={t.id} titulo={`${i + 1}. ${m.autor} · ${nombreEtiqueta(m.falacia)}`} icono={ok ? "fa-circle-check" : "fa-circle-xmark"}>
+                      <p style={{ margin: 0, color: T.text2 }}>
+                        <strong style={{ color: T.text }}>Tú dijiste:</strong> {nombreEtiqueta(t.etiqueta)}.
+                      </p>
+                      <p style={{ margin: 0, color: T.text2 }}>{m.porque}</p>
+                    </Bloque>
+                  );
+                })
               )}
-              {modo === "validez" && (
-                <>Un <strong style={{ color: T.text }}>argumento válido</strong> (deducción, silogismo) garantiza la conclusión si las premisas son verdaderas; una <strong style={{ color: T.text }}>falacia</strong> solo parece válida sin serlo.</>
-              )}
-              {modo === "glosario" && (
-                <>Ya no se arrastra: lee la definición y su ejemplo y escribe el término. Si te atoras, la pista te da la inicial y las letras.</>
-              )}
-            </span>
-          </div>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />,
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book",
+          contenido: (
+            <>
+              <Bloque titulo="Las cinco falacias" icono="fa-layer-group">
+                {(Object.keys(FALACIA_INFO) as Falacia[]).map((f) => (
+                  <p key={f} style={{ margin: 0, color: T.text2 }}>
+                    <strong style={{ color: T.text }}>{FALACIA_INFO[f].titulo}.</strong> {FALACIA_INFO[f].subtitulo}
+                  </p>
+                ))}
+              </Bloque>
+              <Bloque titulo="Argumento válido y falacia" icono="fa-scale-balanced">
+                {(Object.keys(VALIDEZ_INFO) as Validez[]).map((v) => (
+                  <p key={v} style={{ margin: 0, color: T.text2 }}>
+                    <strong style={{ color: T.text }}>{VALIDEZ_INFO[v].titulo}.</strong> {VALIDEZ_INFO[v].subtitulo}
+                  </p>
+                ))}
+              </Bloque>
+              <Bloque titulo="Dato" icono="fa-circle-info">
+                <p style={{ margin: 0, color: T.text2 }}>{DATO_FALACIAS}</p>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={FALACIAS_LOGICA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
+  );
+}
 
-          {/* dato verbatim */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid ${T.line}`, background: T.glass, fontSize: 12.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-circle-info" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>{DATO_FALACIAS}</span>
-          </div>
-        </div>
-      </div>
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Imagen con respaldo: degradado + ícono detrás; si la imagen no existe, se oculta.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+function Foto({ clave, icono, alt, clase }: { clave: string; icono: string; alt: string; clase?: string }) {
+  const [falla, setFalla] = useState(false);
+  return (
+    <span className={`fal-foto ${clase ?? ""}`}>
+      <i className={`fa-solid ${icono}`} aria-hidden />
+      {!falla && <img src={`${RUTA_FOTOS}/${clave}.webp`} alt={alt} loading="lazy" onError={() => setFalla(true)} />}
+    </span>
+  );
+}
 
-      <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />
+function Medidor({ label, valor, color, icono }: { label: string; valor: number; color: string; icono: string }) {
+  return (
+    <div className="fal-med" role="group" aria-label={`${label}: ${valor} de 100`}>
+      <span className="fal-med-top">
+        <span>
+          <i className={`fa-solid ${icono}`} style={{ color, marginRight: 7 }} aria-hidden />
+          {label}
+        </span>
+        <strong style={{ color }}>{valor}</strong>
+      </span>
+      <span className="fal-med-barra">
+        <span style={{ width: `${valor}%`, background: color }} />
+      </span>
     </div>
   );
 }
+
+function Deltas({ d }: { d: Delta }) {
+  const filas: { k: string; n: number; col: string }[] = [
+    { k: LADOS.a.corto, n: d.a, col: LADOS.a.color },
+    { k: LADOS.b.corto, n: d.b, col: LADOS.b.color },
+    { k: "Público", n: d.publico, col: d.publico >= 0 ? OK : NO },
+  ];
+  return (
+    <div className="fal-deltas">
+      {filas
+        .filter((f) => f.n !== 0)
+        .map((f) => (
+          <span key={f.k} className="fal-delta" style={{ borderColor: `${f.col}88` }}>
+            {f.k} <strong style={{ color: f.n > 0 ? OK : NO }}>{f.n > 0 ? `+${f.n}` : f.n}</strong>
+          </span>
+        ))}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Simulador: el debate del Consejo Estudiantil
+ * ═══════════════════════════════════════════════════════════════════════════ */
+function Debate({
+  ronda,
+  msg,
+  turnos,
+  turnoActual,
+  resumen,
+  onEtiquetar,
+  onResponder,
+  onSiguiente,
+  onReiniciar,
+  onVer,
+}: {
+  ronda: number;
+  msg: Mensaje | null;
+  turnos: Turno[];
+  turnoActual: Turno | undefined;
+  resumen: ReturnType<typeof calcular>;
+  onEtiquetar: (e: Etiqueta) => void;
+  onResponder: (t: TipoResp) => void;
+  onSiguiente: () => void;
+  onReiniciar: () => void;
+  onVer: (i: number) => void;
+}) {
+  const hm = humor(resumen.estado.publico);
+  const resEtq = msg && turnoActual ? aplicarEtiqueta(msg, turnoActual.etiqueta) : null;
+  const resResp = msg && turnoActual?.resp ? aplicarRespuesta(msg, turnoActual.resp) : null;
+  const ultima = ronda >= MENSAJES.length - 1;
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
+      <div className="fal-cab">
+        <Foto clave="debate-aula" icono="fa-people-group" alt="Salón de clases durante un debate" clase="fal-cab-foto" />
+        <div style={{ minWidth: 0 }}>
+          <strong className="fal-cab-t">{TEMA.titulo}</strong>
+          <span className="fal-cab-p">{TEMA.propuesta}</span>
+          <span className="fal-cab-n">{TEMA.nota}</span>
+        </div>
+      </div>
+
+      <div className="fal-meds">
+        <Medidor label={LADOS.a.nombre} valor={resumen.estado.a} color={LADOS.a.color} icono={LADOS.a.icono} />
+        <Medidor label={LADOS.b.nombre} valor={resumen.estado.b} color={LADOS.b.color} icono={LADOS.b.icono} />
+        <Medidor label={`Público: ${hm.texto}`} valor={resumen.estado.publico} color={hm.color} icono={hm.icono} />
+      </div>
+
+      <div className="fal-ronda" role="tablist" aria-label="Mensajes del debate">
+        {MENSAJES.map((m, i) => {
+          const t = turnos.find((x) => x.id === m.id);
+          const ok = t ? aplicarEtiqueta(m, t.etiqueta).acierto : null;
+          const accesible = i <= turnos.filter((x) => x.resp).length;
+          return (
+            <button
+              key={m.id}
+              type="button"
+              role="tab"
+              aria-selected={i === ronda}
+              className="fal-pto"
+              data-sel={i === ronda}
+              disabled={!accesible}
+              onClick={() => onVer(i)}
+              style={ok === null ? undefined : { borderColor: ok ? OK : NO }}
+            >
+              {i + 1}
+              {ok !== null && <i className={`fa-solid ${ok ? "fa-check" : "fa-xmark"}`} aria-hidden style={{ color: ok ? OK : NO }} />}
+            </button>
+          );
+        })}
+      </div>
+
+      {msg ? (
+        <>
+          <article className="fal-msg" data-lado={msg.lado} style={{ borderColor: `${LADOS[msg.lado].color}77` }}>
+            <Foto clave={msg.foto} icono="fa-user" alt={`Retrato de ${msg.autor}`} clase="fal-retrato" />
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div className="fal-msg-cab">
+                <strong>{msg.autor}</strong>
+                <span style={{ color: LADOS[msg.lado].color }}>
+                  <i className={`fa-solid ${LADOS[msg.lado].icono}`} aria-hidden /> {LADOS[msg.lado].nombre}
+                </span>
+              </div>
+              <p className="fal-msg-txt">{msg.texto}</p>
+            </div>
+          </article>
+
+          <div>
+            {instruccion2("1. ¿Qué falacia comete este mensaje?", turnoActual ? "respondido" : undefined)}
+            <div className="fal-opc">
+              {ETIQUETAS.map((e) => {
+                const sel = turnoActual?.etiqueta === e.id;
+                const real = !!turnoActual && e.id === msg.falacia;
+                return (
+                  <button key={e.id} type="button" className="fal-op" data-sel={sel} data-real={real} disabled={!!turnoActual} onClick={() => onEtiquetar(e.id)}>
+                    <i className={`fa-solid ${e.icono}`} aria-hidden />
+                    <span>{e.texto}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {turnoActual && resEtq && (
+            <div className="fal-retro" data-ok={resEtq.acierto}>
+              <strong>
+                <i className={`fa-solid ${resEtq.acierto ? "fa-circle-check" : "fa-circle-xmark"}`} aria-hidden />{" "}
+                {resEtq.acierto ? "Bien visto" : `Era: ${nombreEtiqueta(msg.falacia)}`}
+              </strong>
+              <span>{resEtq.texto}</span>
+              <span>
+                <strong style={{ color: "#fff" }}>Por qué:</strong> {msg.porque}
+              </span>
+              <Deltas d={resEtq.delta} />
+              <span className="fal-sim">Medidores de simulación</span>
+            </div>
+          )}
+
+          {turnoActual && (
+            <div>
+              {instruccion2("2. ¿Cómo respondes en el debate?", turnoActual.resp ? "respondido" : undefined)}
+              <div className="fal-resp">
+                {msg.respuestas.map((r) => (
+                  <button key={r.id} type="button" className="fal-op fal-r" data-sel={turnoActual.resp === r.tipo} disabled={!!turnoActual.resp} onClick={() => onResponder(r.tipo)}>
+                    <i className={`fa-solid ${r.tipo === "razon" ? "fa-lightbulb" : r.tipo === "contraataque" ? "fa-bolt" : "fa-face-meh-blank"}`} aria-hidden />
+                    <span>{r.texto}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {resResp && turnoActual?.resp && (
+            <div className="fal-retro" data-ok={turnoActual.resp === "razon"}>
+              <strong>
+                <i className={`fa-solid ${hm.icono}`} aria-hidden style={{ color: hm.color }} /> El público: {hm.texto}
+              </strong>
+              <span>{resResp.texto}</span>
+              <Deltas d={resResp.delta} />
+              <button type="button" className="fal-btn" style={{ background: "var(--lsa)", color: "#04121f", border: "none" }} onClick={onSiguiente}>
+                <i className={`fa-solid ${ultima ? "fa-flag-checkered" : "fa-arrow-right"}`} aria-hidden /> {ultima ? "Ver el resultado" : "Siguiente mensaje"}
+              </button>
+            </div>
+          )}
+        </>
+      ) : (
+        <div className="fal-retro" data-ok={resumen.estado.publico >= 60}>
+          <strong>
+            <i className="fa-solid fa-flag-checkered" aria-hidden /> Debate terminado: {resumen.aciertos}/{MENSAJES.length} detectadas · público {hm.texto.toLowerCase()} ({resumen.estado.publico}/100)
+          </strong>
+          <span>
+            {resumen.aciertos >= 5
+              ? "Nombras la falacia sin acusar de más y distingues el argumento sólido."
+              : "Repasa en el Cuaderno por qué cada mensaje no probaba lo que decía y vuelve a intentarlo."}{" "}
+            {resumen.conRazones >= 4
+              ? "Además respondiste con razones y el debate salió ganando."
+              : "Responder a la idea con razones, en vez de atacar a la persona o callar, es lo que sube al público."}
+          </span>
+          <span className="fal-sim">Equipos, personas y cifras de simulación.</span>
+          <button type="button" className="fal-btn" onClick={onReiniciar}>
+            <i className="fa-solid fa-rotate-left" aria-hidden /> Repetir el debate
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+const instruccion2 = (txt: string, n?: string) => (
+  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", fontSize: 15, fontWeight: 800, color: T.text, marginBottom: 8 }}>
+    <span>{txt}</span>
+    {n && <span style={{ fontSize: 14, fontWeight: 900, color: T.text3 }}>{n}</span>}
+  </div>
+);
+
+const css = (accent: string, rgba: string) => `
+  @keyframes falShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
+  @keyframes falPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
+  .fal-chip { cursor:grab; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 16px; border-radius:14px;
+    border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:14.5px; font-weight:700; user-select:none; max-width:100%; text-align:left; line-height:1.4;
+    transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
+  .fal-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); transform:translateY(-2px); }
+  .fal-chip[data-sel="true"] { border-color:${accent}; background:rgba(${rgba},0.2); box-shadow:0 0 16px -5px ${accent}; transform:translateY(-3px) scale(1.02); }
+  .fal-chip:active { cursor:grabbing; }
+  .fal-bin { border-radius:15px; border:1.5px solid ${T.line}; background:${T.glass}; padding:16px; transition:all .16s; min-height:200px; }
+  .fal-bin[data-shake="true"] { animation:falShake .4s; border-color:${NO}; }
+  .fal-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
+    border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14.5px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
+  .fal-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
+  .fal-q:disabled{ cursor:default; }
+  .fal-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
+    border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:14.5px; font-weight:800; transition:all .14s; }
+  .fal-btn:hover { border-color:${T.lineStrong}; }
+
+  /* Simulador del debate */
+  .fal-foto { position:relative; display:block; overflow:hidden; background:linear-gradient(135deg, rgba(${rgba},0.35), rgba(8,19,31,0.9)); }
+  .fal-foto > i { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:26px; color:rgba(255,255,255,0.55); }
+  .fal-foto > img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
+  .fal-cab { display:grid; grid-template-columns:minmax(0,120px) minmax(0,1fr); gap:12px; align-items:center; padding:10px; border-radius:14px; border:1.5px solid ${T.line}; background:${T.glass}; }
+  .fal-cab-foto { aspect-ratio:16/10; border-radius:10px; }
+  .fal-cab-t { display:block; font-size:15px; color:#fff; }
+  .fal-cab-p { display:block; font-size:14.5px; color:${T.text2}; line-height:1.4; margin-top:2px; }
+  .fal-cab-n { display:block; font-size:14px; color:${T.text3}; margin-top:2px; }
+  .fal-meds { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 170px), 1fr)); gap:10px; }
+  .fal-med { display:grid; gap:6px; padding:10px 12px; border-radius:12px; border:1.5px solid ${T.line}; background:${T.glass}; min-width:0; }
+  .fal-med-top { display:flex; justify-content:space-between; gap:8px; font-size:14px; font-weight:800; color:${T.text2}; }
+  .fal-med-top strong { font-size:16px; font-variant-numeric:tabular-nums; }
+  .fal-med-barra { display:block; height:8px; border-radius:6px; background:${T.inset}; overflow:hidden; }
+  .fal-med-barra > span { display:block; height:100%; border-radius:6px; transition:width .4s; }
+  .fal-ronda { display:flex; gap:8px; flex-wrap:wrap; }
+  .fal-pto { cursor:pointer; display:inline-flex; align-items:center; gap:5px; min-width:44px; height:40px; justify-content:center; border-radius:12px; border:2px solid ${T.line};
+    background:${T.glassSoft}; color:#fff; font-size:14.5px; font-weight:900; }
+  .fal-pto[data-sel="true"] { border-color:${accent}; box-shadow:0 0 14px -5px ${accent}; }
+  .fal-pto:disabled { opacity:.45; cursor:default; }
+  .fal-msg { display:flex; gap:12px; align-items:flex-start; padding:12px; border-radius:16px; border:2px solid ${T.line}; background:${T.glass}; min-width:0; }
+  .fal-retrato { flex-shrink:0; width:72px; height:72px; border-radius:50%; border:2px solid ${T.lineStrong}; }
+  .fal-msg-cab { display:flex; flex-wrap:wrap; gap:4px 12px; align-items:baseline; font-size:14.5px; }
+  .fal-msg-cab strong { color:#fff; font-size:16px; }
+  .fal-msg-txt { margin:6px 0 0; font-size:16px; line-height:1.5; color:#fff; overflow-wrap:anywhere; }
+  .fal-opc { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap:10px; }
+  .fal-resp { display:grid; grid-template-columns:minmax(0,1fr); gap:10px; }
+  .fal-op { cursor:pointer; display:flex; align-items:center; gap:10px; min-height:52px; padding:10px 12px; border-radius:13px; border:1.5px solid ${T.line};
+    background:${T.glassSoft}; color:#fff; font-size:14.5px; font-weight:700; text-align:left; line-height:1.35; transition:all .14s; }
+  .fal-op i { flex-shrink:0; font-size:17px; color:${accent}; width:22px; text-align:center; }
+  .fal-op:hover:not(:disabled) { border-color:${accent}; transform:translateY(-2px); }
+  .fal-op[data-sel="true"] { border-color:${accent}; background:rgba(${rgba},0.2); }
+  .fal-op[data-real="true"] { border-color:${OK}; background:${OK}18; }
+  .fal-op:disabled { cursor:default; }
+  .fal-op:focus-visible, .fal-pto:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
+  .fal-r span { overflow-wrap:anywhere; }
+  .fal-retro { display:flex; flex-direction:column; gap:8px; align-items:flex-start; padding:13px 15px; border-radius:13px; font-size:14.5px; line-height:1.5; color:${T.text2};
+    border:1.5px solid ${NO}66; background:${NO}10; }
+  .fal-retro[data-ok="true"] { border-color:${OK}66; background:${OK}10; }
+  .fal-retro strong { color:#fff; font-size:15px; }
+  .fal-deltas { display:flex; flex-wrap:wrap; gap:8px; }
+  .fal-delta { padding:4px 10px; border-radius:999px; border:1.5px solid ${T.line}; font-size:14px; font-weight:700; color:${T.text2}; background:${T.inset}; }
+  .fal-sim { font-size:14px; color:${AVISO}; font-weight:700; }
+
+  /* Identidad del tablero */
+  .fal-bin { --tono:188; position:relative;
+    background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
+  .fal-bin:nth-of-type(6n+1) { --tono:188; }
+  .fal-bin:nth-of-type(6n+2) { --tono:262; }
+  .fal-bin:nth-of-type(6n+3) { --tono:44; }
+  .fal-bin:nth-of-type(6n+4) { --tono:152; }
+  .fal-bin:nth-of-type(6n+5) { --tono:330; }
+  .fal-bin:nth-of-type(6n+6) { --tono:18; }
+  .fal-bin::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
+    background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
+  .fal-bin[data-done="true"] { background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.2) 0%, transparent 68%); }
+  @media (prefers-reduced-motion: reduce){ .fal-bin[data-shake="true"] { animation:none; } .fal-chip, .fal-chip:hover, .fal-chip[data-sel="true"], .fal-op:hover:not(:disabled) { transform:none; transition:none; } .fal-med-barra > span { transition:none; } }
+`;
 
 /* ═══════════════════════════════════════════════════════════════════════════
  * Paneles de cada modo (componentes hijos: reciben los manejadores como props,
@@ -546,7 +838,7 @@ function BinsFalacias({
 }) {
   const bins: Falacia[] = ["ad-hominem", "hombre-paja", "pendiente", "autoridad", "dicotomia"];
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 200px), 1fr))", gap: 12 }}>
       {bins.map((bin) => {
         const info = FALACIA_INFO[bin];
         const dentro = EJEMPLOS.filter((e) => ubicFal[e.id] === bin);
@@ -561,18 +853,17 @@ function BinsFalacias({
           >
             {/* La ilustración del concepto llenando la caja vacía. */}
             <FondoTermino termino={info.titulo} />
-            <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 10 }}>
               <VinetaTermino termino={info.titulo} color={T.text2} icono={info.icono} tam={29} radio={8} />
-              <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
+              <span style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
             </div>
-            <div style={{ fontSize: 11, color: T.text3, marginBottom: 12, lineHeight: 1.4 }}>{info.subtitulo}</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {dentro.length === 0 ? (
-                <div style={{ fontSize: 12, color: T.text3, opacity: 0.6, padding: "8px 0" }}>Arrastra aquí…</div>
+                <div style={{ fontSize: 14, color: T.text3, opacity: 0.7, padding: "8px 0" }}>Arrastra aquí…</div>
               ) : (
                 dentro.map((e) => (
-                  <span key={e.id} style={{ animation: "falPop .25s ease", display: "inline-flex", alignItems: "flex-start", gap: 7, padding: "8px 12px", borderRadius: 11, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 12.5, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>
-                    <i className="fa-solid fa-check" style={{ fontSize: 10, color: OK, marginTop: 3 }} />
+                  <span key={e.id} style={{ animation: "falPop .25s ease", display: "inline-flex", alignItems: "flex-start", gap: 7, padding: "8px 12px", borderRadius: 11, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 14, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>
+                    <i className="fa-solid fa-check" style={{ fontSize: 14, color: OK, marginTop: 2 }} />
                     {e.texto}
                   </span>
                 ))
@@ -600,7 +891,7 @@ function BinsValidez({
 }) {
   const bins: Validez[] = ["valido", "invalido"];
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 220px), 1fr))", gap: 12 }}>
       {bins.map((bin) => {
         const info = VALIDEZ_INFO[bin];
         const dentro = ARGUMENTOS.filter((a) => ubicVal[a.id] === bin);
@@ -615,18 +906,17 @@ function BinsValidez({
           >
             {/* La ilustración del concepto llenando la caja vacía. */}
             <FondoTermino termino={info.titulo} />
-            <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
-              <VinetaTermino termino={info.titulo} color={bin === "valido" ? OK : "#FF5E5E"} icono={info.icono} tam={29} radio={8} />
-              <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 10 }}>
+              <VinetaTermino termino={info.titulo} color={bin === "valido" ? OK : NO} icono={info.icono} tam={29} radio={8} />
+              <span style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
             </div>
-            <div style={{ fontSize: 11, color: T.text3, marginBottom: 12, lineHeight: 1.4 }}>{info.subtitulo}</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {dentro.length === 0 ? (
-                <div style={{ fontSize: 12, color: T.text3, opacity: 0.6, padding: "8px 0" }}>Arrastra aquí…</div>
+                <div style={{ fontSize: 14, color: T.text3, opacity: 0.7, padding: "8px 0" }}>Arrastra aquí…</div>
               ) : (
                 dentro.map((a) => (
-                  <span key={a.id} style={{ animation: "falPop .25s ease", display: "inline-flex", alignItems: "flex-start", gap: 7, padding: "8px 12px", borderRadius: 11, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 12.5, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>
-                    <i className="fa-solid fa-check" style={{ fontSize: 10, color: OK, marginTop: 3 }} />
+                  <span key={a.id} style={{ animation: "falPop .25s ease", display: "inline-flex", alignItems: "flex-start", gap: 7, padding: "8px 12px", borderRadius: 11, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 14, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>
+                    <i className="fa-solid fa-check" style={{ fontSize: 14, color: OK, marginTop: 2 }} />
                     {a.texto}
                   </span>
                 ))
@@ -679,19 +969,19 @@ function QuizCard({
   };
 
   return (
-    <div style={{ ...card, padding: "20px 24px 24px", marginTop: 22 }}>
+    <div>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4, flexWrap: "wrap" }}>
-        <Eyebrow>
+        <strong style={{ fontSize: 15, color: T.text }}>
           <i className="fa-solid fa-clipboard-question" style={{ marginRight: 8, color: accent }} />
           Comprueba lo aprendido
-        </Eyebrow>
+        </strong>
         {aprobado && (
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 12, fontWeight: 800, color: OK }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 14, fontWeight: 800, color: OK }}>
             <i className="fa-solid fa-circle-check" /> Aprobado
           </span>
         )}
       </div>
-      <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
         Cinco afirmaciones sobre deducción, inducción, silogismos, tablas de verdad y falacias. Decide si son verdaderas o falsas y pulsa «Comprobar».
       </div>
 
@@ -700,11 +990,11 @@ function QuizCard({
           const elegida = resp[qi];
           return (
             <div key={qi}>
-              <div style={{ fontSize: 14.5, fontWeight: 800, color: T.text, marginBottom: 11, display: "flex", gap: 10 }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: T.text, marginBottom: 11, display: "flex", gap: 10 }}>
                 <span style={{ color: accent }}>{qi + 1}.</span>
                 <span>{q.pregunta}</span>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 160px), 1fr))", gap: 9 }}>
                 {q.opciones.map((op, oi) => {
                   const sel = elegida === oi;
                   const esCorrecta = oi === q.correcta;
@@ -726,7 +1016,7 @@ function QuizCard({
                   }
                   return (
                     <button key={oi} className="fal-q" onClick={() => elegir(qi, oi)} disabled={comprobado} style={{ borderColor: borde, background: fondo, color: colorTxt }}>
-                      <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
+                      <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
                         {comprobado && esCorrecta ? <i className="fa-solid fa-check" /> : comprobado && sel ? <i className="fa-solid fa-xmark" /> : String.fromCharCode(65 + oi)}
                       </span>
                       <span style={{ flex: 1, lineHeight: 1.35 }}>{op}</span>
@@ -735,7 +1025,7 @@ function QuizCard({
                 })}
               </div>
               {comprobado && (
-                <div style={{ marginTop: 9, fontSize: 12.5, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
+                <div style={{ marginTop: 9, fontSize: 14, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
                   <i className="fa-solid fa-circle-info" style={{ color: accent, marginTop: 2 }} />
                   <span>{q.retro}</span>
                 </div>
@@ -758,7 +1048,7 @@ function QuizCard({
           </button>
         )}
         {comprobado && (
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 13.5, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 14.5, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
             <i className={`fa-solid ${aprobadoAhora ? "fa-trophy" : "fa-circle-half-stroke"}`} />
             {aciertos} / {total} correctas
             {!aprobadoAhora && <span style={{ color: T.text3, fontWeight: 600 }}>· revisa las marcadas e inténtalo de nuevo</span>}

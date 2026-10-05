@@ -1,0 +1,12 @@
+{
+  "escena": "Un buscador de simulación con una tarea sobre el sueño de los adolescentes: palabras clave, operadores y una página de resultados con fuentes inventadas.",
+  "pregunta": "Pones tres palabras clave y activas las comillas. ¿Qué pasa con los resultados?",
+  "opciones": [
+    { "id": "a", "texto": "Salen más resultados porque se amplía la búsqueda", "icono": "fa-arrow-up-right-dots" },
+    { "id": "b", "texto": "Solo quedan las que traen todas", "icono": "fa-filter" },
+    { "id": "c", "texto": "Se ordenan del más nuevo al más viejo", "icono": "fa-calendar" }
+  ],
+  "correcta": "b",
+  "porque": "Las comillas piden que aparezcan todas las palabras juntas, así que el buscador descarta lo que solo coincide con una. Menos ruido, pero también menos opciones para comparar.",
+  "comoComprobarlo": "Elige «sueño», «adolescentes» y «horas», cuenta los resultados, activa y desactiva las comillas y compara el número."
+}

@@ -21,6 +21,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { PracticaLabProps } from "../registry";
 import { T, OK, card, Eyebrow } from "./_kit";
+import { LabShell, Bloque, BotonHerramienta, Mesa, Dato } from "./_shell";
 import { LabSfx } from "./lab-audio";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { TIPOS_DE_PREGUNTAS_HUECOS } from "./tipos-de-preguntas-huecos";
@@ -38,15 +39,18 @@ import {
   type TipoPregunta,
   type RamaFilosofica,
 } from "./tipos-de-preguntas-data";
+import { PREGUNTAS_ENTREVISTA, PRESUPUESTO, SECCIONES, palabras, resumenEntrevista, type ResumenEntrevista } from "./tipos-de-preguntas-sim";
 
 const NO = "#FF5E5E";
 import { useEstrellas } from "@/lib/hooks/useEstrellas";
 import { FondoTermino, VinetaTermino } from "./_vineta";
 const RETO_KEY = "cen-tipos-de-preguntas-reto";
+const RUTA_SIM = "/media/labs-sim/tipos-de-preguntas";
 
-type Modo = "tipos" | "ramas" | "profundizar" | "texto";
+type Modo = "entrevista" | "tipos" | "ramas" | "profundizar" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
+  { id: "entrevista", label: "La entrevista", icono: "fa-microphone-lines" },
   { id: "tipos", label: "3 tipos de preguntas", icono: "fa-layer-group" },
   { id: "ramas", label: "Ramas filosóficas", icono: "fa-code-branch" },
   { id: "profundizar", label: "De cotidiana a filosófica", icono: "fa-arrow-up-right-dots" },
@@ -55,12 +59,11 @@ const MODOS: { id: Modo; label: string; icono: string }[] = [
 
 export function LabTiposDePreguntas({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
-  const [modo, setModo] = useState<Modo>("tipos");
+  const [modo, setModo] = useState<Modo>("entrevista");
 
   // ── sonido ────────────────────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   // Modo «Completa el texto». El contador sirve de `key`: subirlo remonta
   // el componente y devuelve todos los huecos en blanco.
   const [textoDone, setTextoDone] = useState(false);
@@ -85,6 +88,7 @@ export function LabTiposDePreguntas({ color }: PracticaLabProps) {
     partida.error();
     return sonido && audioRef.current?.incorrecto();
   };
+  const sfxBlip = () => sonido && audioRef.current?.blip();
   const sfxPlace = () => {
     partida.acierto();
     return sonido && audioRef.current?.blip();
@@ -173,6 +177,25 @@ export function LabTiposDePreguntas({ color }: PracticaLabProps) {
     setSelPar(null);
   };
 
+  // ── simulador «La entrevista» ──────────────────────────────────────────
+  // El estado vive aquí (no en el modo) para que cambiar de modo no borre la
+  // entrevista ni descumpla las misiones.
+  const [hechas, setHechas] = useState<string[]>([]);
+  const ent = resumenEntrevista(hechas);
+  const preguntar = (id: string) => {
+    if (hechas.includes(id) || hechas.length >= PRESUPUESTO) return;
+    const p = PREGUNTAS_ENTREVISTA.find((x) => x.id === id);
+    if (!p) return;
+    const sigue = [...hechas, id];
+    const antes = resumenEntrevista(hechas);
+    const despues = resumenEntrevista(sigue);
+    setHechas(sigue);
+    if (despues.completo && !antes.completo) sfxOk();
+    else if (antes.porTipo[p.tipo] === 0) sfxPlace();
+    else sfxBlip();
+  };
+  const resetEntrevista = () => setHechas([]);
+
   const [quizAprobado, setQuizAprobado] = useState(false);
 
   // ── progreso / estrellas ──────────────────────────────────────────────
@@ -192,6 +215,8 @@ export function LabTiposDePreguntas({ color }: PracticaLabProps) {
   };
 
   const objetivos = [
+    { txt: "Usa tus 5 preguntas para entrevistar a Doña Elena y mira cómo cambia cada respuesta", done: ent.usadas >= PRESUPUESTO },
+    { txt: "Arma un reporte con datos, explicaciones y reflexiones", done: ent.completo },
     { txt: "Clasifica las 12 preguntas por su tipo", done: tiposDone },
     { txt: "Clasifica las preguntas en sus 5 ramas", done: ramasDone },
     { txt: "Empareja cada pregunta cotidiana con su versión filosófica", done: profundizarDone },
@@ -253,132 +278,60 @@ export function LabTiposDePreguntas({ color }: PracticaLabProps) {
     setTextoDone(false);
     setTextoIntento((n) => n + 1);
   };
-  const resetActual = modo === "texto" ? resetTexto : modo === "tipos" ? resetTipos : modo === "ramas" ? resetRamas : resetProfundizar;
+  const resetActual =
+    modo === "entrevista" ? resetEntrevista : modo === "texto" ? resetTexto : modo === "tipos" ? resetTipos : modo === "ramas" ? resetRamas : resetProfundizar;
+
+  const lectura =
+    modo === "entrevista" ? (
+      <>Preguntas: {ent.restantes}/{PRESUPUESTO} · Información: {ent.info}/{ent.infoMax}</>
+    ) : modo === "tipos" ? (
+      <>Preguntas clasificadas: {Object.keys(ubicTipo).length}/{PREGUNTAS.length}</>
+    ) : modo === "ramas" ? (
+      <>Preguntas en su rama: {Object.keys(ubicRama).length}/{PREGUNTAS_RAMA.length}</>
+    ) : modo === "profundizar" ? (
+      <>Pares emparejados: {Object.keys(empPar).length}/{PARES.length}</>
+    ) : (
+      <>Completa el texto sobre los tipos de preguntas</>
+    );
+
+  const pista =
+    modo === "entrevista" ? (
+      <>Cada tipo de pregunta trae un tipo de respuesta. Elige con cuidado: solo tienes {PRESUPUESTO} preguntas y el reporte necesita datos, explicaciones y reflexiones.</>
+    ) : modo === "tipos" ? (
+      <>La pregunta <strong style={{ color: T.text }}>cotidiana</strong> tiene respuesta inmediata; la <strong style={{ color: T.text }}>científica</strong> se responde con evidencia empírica; la <strong style={{ color: T.text }}>filosófica</strong> exige reflexión conceptual.</>
+    ) : modo === "ramas" ? (
+      <>Cada rama pregunta por algo distinto: la <strong style={{ color: T.text }}>ontología</strong> por el ser, la <strong style={{ color: T.text }}>epistemología</strong> por el conocer, la <strong style={{ color: T.text }}>ética</strong> por el bien, la <strong style={{ color: T.text }}>estética</strong> por lo bello y la <strong style={{ color: T.text }}>política</strong> por el poder y la justicia.</>
+    ) : modo === "profundizar" ? (
+      <>Muchas preguntas cotidianas se vuelven filosóficas cuando profundizamos en ellas: lleva cada pregunta práctica a su versión de fondo.</>
+    ) : (
+      <>Escribe la palabra que completa cada frase.</>
+    );
 
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes tdpShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
-        @keyframes tdpPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
-        .tdp-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 16px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .tdp-tab:hover { border-color:${T.lineStrong}; color:#fff; }
-        .tdp-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-        .tdp-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
-          font-size:14px; border:1px solid ${T.line}; background:${T.glass}; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .tdp-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
-        .tdp-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .tdp-chip { cursor:grab; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 16px; border-radius:14px;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:13.5px; font-weight:700; transition:all .14s; user-select:none; max-width:360px; text-align:left; line-height:1.4; }
-        .tdp-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); }
-        .tdp-chip[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.2); box-shadow:0 0 16px -5px ${accent}; }
-        .tdp-chip:active { cursor:grabbing; }
-        .tdp-row { border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:14px 16px; transition:all .16s; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
-        .tdp-row[data-shake="true"] { animation:tdpShake .4s; border-color:${NO}; }
-        .tdp-row[data-done="true"] { border-color:${OK}66; background:${OK}0f; }
-        .tdp-slot { flex-shrink:0; min-width:200px; min-height:42px; border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset};
-          display:inline-flex; align-items:center; justify-content:center; color:${T.text3}; font-size:12.5px; transition:all .16s; cursor:pointer; padding:4px 10px; }
-        .tdp-slot[data-armed="true"] { border-color:${accent}; background:rgba(${color.rgba},0.1); }
-        .tdp-bin { border-radius:15px; border:1.5px solid ${T.line}; background:${T.glass}; padding:16px; transition:all .16s; min-height:200px; }
-        .tdp-bin[data-shake="true"] { animation:tdpShake .4s; border-color:${NO}; }
-        .tdp-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
-          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
-        .tdp-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
-        .tdp-q:disabled{ cursor:default; }
-        .tdp-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
-          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .tdp-btn:hover { border-color:${T.lineStrong}; }
-        .tdp-divider { height:1px; background:${T.line}; margin:18px 0; }
-        @media (prefers-reduced-motion: reduce){ .tdp-row[data-shake="true"], .tdp-bin[data-shake="true"] { animation:none; } }
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      dom
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })),
+        valor: modo,
+        cambiar: (id) => setModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={resetActual} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      escena={
+        <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
+          <style>{css(accent, color.rgba)}</style>
 
-        /* Cajón de teoría */
-        .tdp-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .tdp-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .tdp-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .tdp-drawer[data-open="true"] { transform:translateX(0); }
-        .tdp-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .tdp-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .tdp-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .tdp-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .tdp-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .tdp-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .tdp-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
+          {modo === "entrevista" && <SimEntrevista hechas={hechas} onPreguntar={preguntar} ent={ent} />}
 
-        /* Identidad del tablero */
-        .tdp-bin, .tdp-row { --tono:188; position:relative;
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
-        .tdp-bin:nth-of-type(6n+1), .tdp-row:nth-of-type(6n+1) { --tono:188; }
-        .tdp-bin:nth-of-type(6n+2), .tdp-row:nth-of-type(6n+2) { --tono:262; }
-        .tdp-bin:nth-of-type(6n+3), .tdp-row:nth-of-type(6n+3) { --tono:44; }
-        .tdp-bin:nth-of-type(6n+4), .tdp-row:nth-of-type(6n+4) { --tono:152; }
-        .tdp-bin:nth-of-type(6n+5), .tdp-row:nth-of-type(6n+5) { --tono:330; }
-        .tdp-bin:nth-of-type(6n+6), .tdp-row:nth-of-type(6n+6) { --tono:18; }
-        .tdp-bin::before, .tdp-row::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
-          background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
-        .tdp-bin[data-done="true"], .tdp-row[data-done="true"] {
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.2) 0%, transparent 68%); }
-        .tdp-chip { transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
-        .tdp-chip:hover { transform:translateY(-2px); }
-        .tdp-chip[data-sel="true"] { transform:translateY(-3px) scale(1.02); }
-        @media (prefers-reduced-motion: reduce){
-          .tdp-chip, .tdp-chip:hover, .tdp-chip[data-sel="true"] { transform:none; transition:none; }
-        }
-      `}</style>
-
-      {/* selector de modo + toolbar */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="tdp-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="tdp-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="tdp-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="tdp-icobtn" onClick={resetActual} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <button className="tdp-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="tdp-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="tdp-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="tdp-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="tdp-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="tdp-drawer-body">
-          <FichaTeorica data={TIPOS_DE_PREGUNTAS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}>
-        {/* ── Columna principal ─────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
-          {/* MODO 1 — tipos */}
           {/* MODO — completa el texto (fill_blanks verbatim de la progresión) */}
           {modo === "texto" && (
             <CompletaTexto
@@ -396,17 +349,18 @@ export function LabTiposDePreguntas({ color }: PracticaLabProps) {
             />
           )}
 
+          {/* MODO — tipos */}
           {modo === "tipos" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
+            <Mesa>
+              <div style={{ ...card, padding: "16px 18px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
                   <Eyebrow>Arrastra cada pregunta a su tipo</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: tiposDone ? OK : T.text3 }}>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: tiposDone ? OK : T.text3 }}>
                     {Object.keys(ubicTipo).length}/{PREGUNTAS.length}
                   </span>
                 </div>
                 {tiposLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+                  <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
                     <i className="fa-solid fa-circle-check" /> ¡Clasificaste las {PREGUNTAS.length} preguntas!
                   </div>
                 ) : (
@@ -419,23 +373,22 @@ export function LabTiposDePreguntas({ color }: PracticaLabProps) {
                   </div>
                 )}
               </div>
-
               <BinsTipos selTipo={selTipo} shakeTipo={shakeTipo} ubicTipo={ubicTipo} onMatch={intentarTipo} dropProps={dropProps} />
-            </>
+            </Mesa>
           )}
 
-          {/* MODO 2 — ramas */}
+          {/* MODO — ramas */}
           {modo === "ramas" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
+            <Mesa>
+              <div style={{ ...card, padding: "16px 18px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
                   <Eyebrow>Arrastra cada pregunta filosófica a su rama</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: ramasDone ? OK : T.text3 }}>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: ramasDone ? OK : T.text3 }}>
                     {Object.keys(ubicRama).length}/{PREGUNTAS_RAMA.length}
                   </span>
                 </div>
                 {ramasLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+                  <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
                     <i className="fa-solid fa-circle-check" /> ¡Clasificaste las {PREGUNTAS_RAMA.length} preguntas!
                   </div>
                 ) : (
@@ -449,23 +402,22 @@ export function LabTiposDePreguntas({ color }: PracticaLabProps) {
                   </div>
                 )}
               </div>
-
               <BinsRamas selRama={selRama} shakeRama={shakeRama} ubicRama={ubicRama} onMatch={intentarRama} dropProps={dropProps} />
-            </>
+            </Mesa>
           )}
 
-          {/* MODO 3 — profundizar */}
+          {/* MODO — profundizar */}
           {modo === "profundizar" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
+            <Mesa>
+              <div style={{ ...card, padding: "16px 18px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
                   <Eyebrow>Arrastra cada pregunta cotidiana a su versión filosófica</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: profundizarDone ? OK : T.text3 }}>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: profundizarDone ? OK : T.text3 }}>
                     {Object.keys(empPar).length}/{PARES.length}
                   </span>
                 </div>
                 {paresLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+                  <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
                     <i className="fa-solid fa-circle-check" /> ¡Emparejaste las {PARES.length} preguntas!
                   </div>
                 ) : (
@@ -479,74 +431,337 @@ export function LabTiposDePreguntas({ color }: PracticaLabProps) {
                   </div>
                 )}
               </div>
-
               <RowsProfundizar selPar={selPar} shakePar={shakePar} empPar={empPar} onMatch={intentarPar} dropProps={dropProps} />
-            </>
+            </Mesa>
           )}
         </div>
-
-        {/* ── Columna lateral ───────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? OK : T.text2 }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-                  <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
+      }
+      pestanas={[
+        {
+          id: "cuaderno",
+          etiqueta: "Cuaderno",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Tu partida" icono="fa-star">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8 }}>
+                  <Dato label="Preguntas" value={`${ent.restantes}/${PRESUPUESTO}`} col={ent.restantes === 0 ? "#FFC75A" : undefined} />
+                  <Dato label="Información" value={`${ent.info}/${ent.infoMax}`} col={ent.completo ? OK : undefined} />
+                  <Dato label="Datos" value={`${ent.porTipo.cotidiana}`} />
+                  <Dato label="Reflexiones" value={`${ent.porTipo.filosofica}`} />
                 </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                  <div style={{ display: "flex", gap: 4 }}>
+                    {[1, 2, 3].map((s) => (
+                      <i key={s} className="fa-solid fa-star" style={{ fontSize: 20, color: s <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
+                    ))}
+                  </div>
+                  <span style={{ fontSize: 14, color: T.text2, lineHeight: 1.45, flex: "1 1 160px" }}>
+                    {bestEstrellas >= 3 ? "¡Distingues los tipos de preguntas como un filósofo!" : "Termina los modos de arrastre para ganar estrellas; la tercera pide 2 errores o menos."}
+                  </span>
+                </div>
+              </Bloque>
+              <Bloque titulo="Pista" icono="fa-lightbulb">
+                <p style={{ margin: 0, color: T.text2 }}>{pista}</p>
+              </Bloque>
+              <Bloque titulo="Tu entrevista" icono="fa-microphone">
+                {hechas.length === 0 ? (
+                  <p style={{ margin: 0, color: T.text3 }}>Sin preguntas todavía.</p>
+                ) : (
+                  hechas.map((id) => {
+                    const p = PREGUNTAS_ENTREVISTA.find((x) => x.id === id)!;
+                    return (
+                      <p key={id} style={{ margin: 0, color: T.text2 }}>
+                        <strong style={{ color: T.text }}>{p.texto}</strong> · {TIPO_INFO[p.tipo].titulo}, {palabras(p.respuesta)} palabras.
+                      </p>
+                    );
+                  })
+                )}
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />,
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book",
+          contenido: (
+            <>
+              {(Object.keys(TIPO_INFO) as TipoPregunta[]).map((t) => (
+                <Bloque key={t} titulo={`Pregunta ${TIPO_INFO[t].titulo.toLowerCase()}`} icono={TIPO_INFO[t].icono}>
+                  <p style={{ margin: 0, color: T.text2 }}>{TIPO_INFO[t].subtitulo}</p>
+                </Bloque>
               ))}
-            </div>
+              {(Object.keys(RAMA_INFO) as RamaFilosofica[]).map((r) => (
+                <Bloque key={r} titulo={RAMA_INFO[r].titulo} icono={RAMA_INFO[r].icono}>
+                  <p style={{ margin: 0, color: T.text2 }}>{RAMA_INFO[r].subtitulo}</p>
+                </Bloque>
+              ))}
+              <Bloque titulo="De cotidiana a filosófica" icono="fa-arrow-up-right-dots">
+                {PARES.map((g) => (
+                  <p key={g.id} style={{ margin: 0, color: T.text2 }}>
+                    <strong style={{ color: T.text }}>{g.cotidiana}</strong> → {g.filosofica}. <em>{g.pista}</em>
+                  </p>
+                ))}
+              </Bloque>
+              <Bloque titulo="Dato" icono="fa-circle-info">
+                <p style={{ margin: 0, color: T.text2 }}>{DATO_PREGUNTAS}</p>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={TIPOS_DE_PREGUNTAS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
+  );
+}
 
-            <div className="tdp-divider" />
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Simulador — La entrevista (el tipo de pregunta decide el tipo de respuesta)
+ * ═══════════════════════════════════════════════════════════════════════════ */
+function FotoSim({ clave, icono, clase }: { clave: string; icono: string; clase: string }) {
+  const [fallo, setFallo] = useState(false);
+  return (
+    <div className={clase} aria-hidden>
+      <i className={`fa-solid ${icono}`} />
+      {!fallo && <img src={`${RUTA_SIM}/${clave}.webp`} alt="" loading="lazy" onError={() => setFallo(true)} />}
+    </div>
+  );
+}
 
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", color: T.text3, textTransform: "uppercase" }}>Puntuación</div>
-                <div style={{ display: "flex", gap: 4, marginTop: 5 }}>
-                  {[1, 2, 3].map((s) => (
-                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 18, color: s <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
-                  ))}
-                </div>
-              </div>
-              <div style={{ textAlign: "right", maxWidth: 180 }}>
-                <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45 }}>
-                  {bestEstrellas >= 3 ? "¡Distingues los tipos de preguntas como un filósofo!" : "Termina los tres modos para ganar 2★; la tercera pide 2 errores o menos."}
-                </div>
-              </div>
-            </div>
-          </div>
+const IMG_SECCION: Record<TipoPregunta, string> = {
+  cotidiana: "mesa-relojes",
+  cientifica: "telescopio",
+  filosofica: "reloj-sol",
+};
 
-          {/* pista del modo actual */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid rgba(${color.rgba},0.3)`, background: `rgba(${color.rgba},0.08)`, fontSize: 13, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              {modo === "tipos" && (
-                <>La pregunta <strong style={{ color: T.text }}>cotidiana</strong> tiene respuesta inmediata; la <strong style={{ color: T.text }}>científica</strong> se responde con evidencia empírica; la <strong style={{ color: T.text }}>filosófica</strong> exige reflexión conceptual.</>
-              )}
-              {modo === "ramas" && (
-                <>Cada rama pregunta por algo distinto: la <strong style={{ color: T.text }}>ontología</strong> por el ser, la <strong style={{ color: T.text }}>epistemología</strong> por el conocer, la <strong style={{ color: T.text }}>ética</strong> por el bien, la <strong style={{ color: T.text }}>estética</strong> por lo bello y la <strong style={{ color: T.text }}>política</strong> por el poder y la justicia.</>
-              )}
-              {modo === "profundizar" && (
-                <>Muchas preguntas cotidianas se vuelven filosóficas cuando profundizamos en ellas: lleva cada pregunta práctica a su versión de fondo.</>
-              )}
-            </span>
-          </div>
+function SimEntrevista({
+  hechas,
+  onPreguntar,
+  ent,
+}: {
+  hechas: string[];
+  onPreguntar: (id: string) => void;
+  ent: ResumenEntrevista;
+}) {
+  const ultima = hechas.length ? PREGUNTAS_ENTREVISTA.find((p) => p.id === hechas[hechas.length - 1]) : undefined;
+  const pct = Math.round((ent.info / ent.infoMax) * 100);
 
-          {/* dato verbatim */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid ${T.line}`, background: T.glass, fontSize: 12.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-circle-info" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>{DATO_PREGUNTAS}</span>
-          </div>
+  return (
+    <div className="tdp-sim">
+      <div className="tdp-ent">
+        <FotoSim clave="retrato" icono="fa-user-clock" clase="tdp-retrato" />
+        <div className="tdp-ent-txt">
+          <div className="tdp-ceja">Entrevista para tu reporte · «El tiempo»</div>
+          <h3>Doña Elena Duarte, relojera retirada</h3>
+          <p>Personaje ficticio de Valle Claro. Tienes {PRESUPUESTO} preguntas: elige bien.</p>
+        </div>
+        <div className="tdp-pips" aria-label={`${ent.restantes} preguntas restantes`}>
+          {Array.from({ length: PRESUPUESTO }, (_, i) => (
+            <i key={i} className="fa-solid fa-microphone" data-on={i < ent.restantes} />
+          ))}
         </div>
       </div>
 
-      <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />
+      <div className="tdp-medidor" aria-label={`Información reunida ${ent.info} de ${ent.infoMax}`}>
+        <div className="tdp-medidor-top">
+          <span>Información reunida</span>
+          <strong>
+            {ent.info}/{ent.infoMax}
+          </strong>
+        </div>
+        <div className="tdp-barra">
+          <div style={{ width: `${pct}%` }} data-ok={ent.completo} />
+        </div>
+      </div>
+
+      <div className="tdp-banco" role="group" aria-label="Preguntas posibles">
+        {PREGUNTAS_ENTREVISTA.map((p) => {
+          const hecha = hechas.includes(p.id);
+          return (
+            <button key={p.id} type="button" className="tdp-pregunta" data-hecha={hecha} disabled={hecha || ent.terminada} onClick={() => onPreguntar(p.id)}>
+              <i className={`fa-solid ${hecha ? "fa-check" : "fa-comment-dots"}`} aria-hidden />
+              <span>{p.texto}</span>
+              {hecha && <em>{TIPO_INFO[p.tipo].titulo}</em>}
+            </button>
+          );
+        })}
+      </div>
+
+      {hechas.length > 0 && (
+        <div className="tdp-charla" aria-live="polite">
+          {hechas.map((id) => {
+            const p = PREGUNTAS_ENTREVISTA.find((x) => x.id === id)!;
+            const n = palabras(p.respuesta);
+            return (
+              <div key={id} className="tdp-turno" data-tipo={p.tipo} data-ultima={ultima?.id === id}>
+                <div className="tdp-q">{p.texto}</div>
+                <div className="tdp-a">
+                  <p>{p.respuesta}</p>
+                  <div className="tdp-largo">
+                    <span>{n} palabras</span>
+                    <span className="tdp-largo-barra">
+                      <span style={{ width: `${Math.min(100, (n / 40) * 100)}%` }} />
+                    </span>
+                  </div>
+                  {ultima?.id === id && (
+                    <p className="tdp-porque">
+                      <i className={`fa-solid ${TIPO_INFO[p.tipo].icono}`} aria-hidden /> <strong>Pregunta {TIPO_INFO[p.tipo].titulo.toLowerCase()}.</strong> {p.porque}
+                    </p>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      <div className="tdp-reporte">
+        <div className="tdp-reporte-t">
+          <i className="fa-solid fa-file-pen" aria-hidden /> Borrador de tu reporte
+        </div>
+        <div className="tdp-secciones">
+          {SECCIONES.map((s) => {
+            const citas = hechas.map((id) => PREGUNTAS_ENTREVISTA.find((x) => x.id === id)!).filter((p) => p.tipo === s.tipo);
+            return (
+              <div key={s.tipo} className="tdp-seccion" data-lleno={citas.length > 0}>
+                <div className="tdp-seccion-cab">
+                  <FotoSim clave={IMG_SECCION[s.tipo]} icono={s.icono} clase="tdp-mini" />
+                  <strong>{s.titulo}</strong>
+                </div>
+                {citas.length === 0 ? <p className="tdp-vacia">{s.vacia}</p> : citas.map((c) => <p key={c.id}>{c.cita}</p>)}
+              </div>
+            );
+          })}
+        </div>
+        <div className="tdp-dictamen" data-ok={ent.completo} role="status">
+          <i className={`fa-solid ${ent.completo ? "fa-circle-check" : "fa-circle-info"}`} aria-hidden /> {ent.dictamen}
+        </div>
+      </div>
     </div>
   );
+}
+
+function css(accent: string, rgba: string): string {
+  return `
+    .tdp-sim { display:flex; flex-direction:column; gap:14px; min-width:0; }
+    .tdp-ent { display:flex; align-items:center; gap:14px; flex-wrap:wrap; padding:12px 14px; border-radius:16px;
+      border:1px solid rgba(${rgba},0.35); background:rgba(${rgba},0.08); }
+    .tdp-retrato { position:relative; flex:0 0 auto; width:76px; height:76px; border-radius:50%; overflow:hidden; display:flex; align-items:center; justify-content:center;
+      background:linear-gradient(135deg, rgba(${rgba},0.4), rgba(8,19,31,0.9)); border:2px solid ${accent}; }
+    .tdp-retrato > i { font-size:30px; color:rgba(255,255,255,0.4); }
+    .tdp-retrato img, .tdp-mini img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+    .tdp-ent-txt { flex:1 1 200px; min-width:0; display:grid; gap:3px; }
+    .tdp-ceja { font-size:14px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; color:${accent}; }
+    .tdp-ent-txt h3 { margin:0; font-size:19px; font-weight:900; color:#fff; }
+    .tdp-ent-txt p { margin:0; font-size:15px; color:${T.text2}; line-height:1.4; }
+    .tdp-pips { display:inline-flex; gap:8px; }
+    .tdp-pips i { font-size:20px; color:rgba(255,255,255,0.18); transition:color .25s, transform .25s; }
+    .tdp-pips i[data-on="true"] { color:${accent}; }
+    .tdp-medidor { display:grid; gap:6px; }
+    .tdp-medidor-top { display:flex; justify-content:space-between; align-items:baseline; font-size:15px; font-weight:800; color:${T.text2}; }
+    .tdp-medidor-top strong { font-size:18px; color:#fff; font-variant-numeric:tabular-nums; }
+    .tdp-barra { height:14px; border-radius:999px; background:rgba(255,255,255,0.1); overflow:hidden; }
+    .tdp-barra > div { height:100%; border-radius:999px; background:linear-gradient(90deg, ${accent}, #8EE3FF); transition:width .5s ease; }
+    .tdp-barra > div[data-ok="true"] { background:linear-gradient(90deg, ${OK}, #8EE3B0); }
+    .tdp-banco { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap:8px; }
+    .tdp-pregunta { cursor:pointer; display:flex; align-items:center; gap:10px; padding:11px 14px; border-radius:12px; text-align:left;
+      border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:15px; font-weight:700; line-height:1.35; transition:all .14s; }
+    .tdp-pregunta:hover:not(:disabled) { border-color:${accent}; background:rgba(${rgba},0.16); transform:translateY(-1px); }
+    .tdp-pregunta:disabled { cursor:default; }
+    .tdp-pregunta[data-hecha="true"] { border-color:${OK}66; background:${OK}10; color:${T.text2}; }
+    .tdp-pregunta:disabled:not([data-hecha="true"]) { opacity:.45; }
+    .tdp-pregunta i { color:${accent}; }
+    .tdp-pregunta[data-hecha="true"] i { color:${OK}; }
+    .tdp-pregunta span { flex:1; min-width:0; }
+    .tdp-pregunta em { font-style:normal; font-size:14px; font-weight:900; color:${OK}; }
+    .tdp-charla { display:grid; gap:12px; }
+    .tdp-turno { display:grid; gap:6px; animation:tdpPop .3s ease; }
+    .tdp-q { justify-self:end; max-width:88%; padding:9px 14px; border-radius:16px 16px 4px 16px; background:rgba(${rgba},0.28);
+      color:#fff; font-size:15px; font-weight:700; }
+    .tdp-a { justify-self:start; max-width:94%; display:grid; gap:8px; padding:10px 14px; border-radius:16px 16px 16px 4px;
+      border:1px solid ${T.line}; background:${T.glass}; }
+    .tdp-turno[data-tipo="cientifica"] .tdp-a { border-color:#5BC8FF66; }
+    .tdp-turno[data-tipo="filosofica"] .tdp-a { border-color:#C79BFF66; }
+    .tdp-a p { margin:0; font-size:15px; line-height:1.5; color:#fff; }
+    .tdp-largo { display:flex; align-items:center; gap:10px; font-size:14px; color:${T.text3}; font-weight:700; }
+    .tdp-largo-barra { flex:1; min-width:40px; height:6px; border-radius:99px; background:rgba(255,255,255,0.1); overflow:hidden; }
+    .tdp-largo-barra > span { display:block; height:100%; background:${accent}; border-radius:99px; }
+    .tdp-a p.tdp-porque { font-size:14px; color:${T.text2}; padding-top:6px; border-top:1px solid ${T.line}; }
+    .tdp-porque i { color:${accent}; }
+    .tdp-reporte { display:grid; gap:10px; padding:14px 16px; border-radius:16px; border:1px solid ${T.line}; background:${T.glass}; }
+    .tdp-reporte-t { font-size:14px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; color:${T.text3}; display:flex; gap:8px; align-items:center; }
+    .tdp-secciones { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap:10px; }
+    .tdp-seccion { display:grid; gap:6px; align-content:start; padding:10px 12px; border-radius:12px; border:1.5px dashed ${T.lineStrong}; background:${T.inset}; }
+    .tdp-seccion[data-lleno="true"] { border-style:solid; border-color:${OK}66; background:${OK}0c; }
+    .tdp-seccion p { margin:0; font-size:14px; line-height:1.45; color:#fff; }
+    .tdp-seccion p.tdp-vacia { color:${T.text3}; font-style:italic; }
+    .tdp-seccion-cab { display:flex; align-items:center; gap:8px; font-size:15px; color:#fff; }
+    .tdp-mini { position:relative; flex:0 0 auto; width:34px; height:34px; border-radius:9px; overflow:hidden; display:flex; align-items:center; justify-content:center;
+      background:linear-gradient(135deg, rgba(${rgba},0.35), rgba(8,19,31,0.9)); }
+    .tdp-mini > i { font-size:15px; color:rgba(255,255,255,0.55); }
+    .tdp-dictamen { display:flex; gap:10px; align-items:flex-start; padding:10px 14px; border-radius:12px; border:1px solid #FFC75A66; background:#FFC75A12;
+      font-size:15px; font-weight:700; color:#fff; line-height:1.45; }
+    .tdp-dictamen[data-ok="true"] { border-color:${OK}77; background:${OK}14; }
+    .tdp-dictamen i { margin-top:3px; color:#FFC75A; }
+    .tdp-dictamen[data-ok="true"] i { color:${OK}; }
+
+    @keyframes tdpShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
+    @keyframes tdpPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
+    .tdp-chip { cursor:grab; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 16px; border-radius:14px;
+      border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:14px; font-weight:700; transition:all .14s; user-select:none; max-width:min(360px, 100%); text-align:left; line-height:1.4; }
+    .tdp-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); }
+    .tdp-chip[data-sel="true"] { border-color:${accent}; background:rgba(${rgba},0.2); box-shadow:0 0 16px -5px ${accent}; }
+    .tdp-chip:active { cursor:grabbing; }
+    .tdp-row { border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:14px 16px; transition:all .16s; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+    .tdp-row[data-shake="true"] { animation:tdpShake .4s; border-color:${NO}; }
+    .tdp-row[data-done="true"] { border-color:${OK}66; background:${OK}0f; }
+    .tdp-slot { flex-shrink:0; min-width:160px; min-height:42px; border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset};
+      display:inline-flex; align-items:center; justify-content:center; color:${T.text3}; font-size:14px; transition:all .16s; cursor:pointer; padding:4px 10px; }
+    .tdp-slot[data-armed="true"] { border-color:${accent}; background:rgba(${rgba},0.1); }
+    .tdp-bin { border-radius:15px; border:1.5px solid ${T.line}; background:${T.glass}; padding:16px; transition:all .16s; min-height:160px; }
+    .tdp-bin[data-shake="true"] { animation:tdpShake .4s; border-color:${NO}; }
+    .tdp-q-op { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
+      border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
+    .tdp-q-op:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
+    .tdp-q-op:disabled{ cursor:default; }
+    .tdp-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
+      border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:14px; font-weight:800; transition:all .14s; }
+    .tdp-btn:hover { border-color:${T.lineStrong}; }
+
+    /* Identidad del tablero */
+    .tdp-bin, .tdp-row { --tono:188; position:relative;
+      background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
+    .tdp-bin:nth-of-type(6n+1), .tdp-row:nth-of-type(6n+1) { --tono:188; }
+    .tdp-bin:nth-of-type(6n+2), .tdp-row:nth-of-type(6n+2) { --tono:262; }
+    .tdp-bin:nth-of-type(6n+3), .tdp-row:nth-of-type(6n+3) { --tono:44; }
+    .tdp-bin:nth-of-type(6n+4), .tdp-row:nth-of-type(6n+4) { --tono:152; }
+    .tdp-bin:nth-of-type(6n+5), .tdp-row:nth-of-type(6n+5) { --tono:330; }
+    .tdp-bin:nth-of-type(6n+6), .tdp-row:nth-of-type(6n+6) { --tono:18; }
+    .tdp-bin::before, .tdp-row::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
+      background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
+    .tdp-bin[data-done="true"], .tdp-row[data-done="true"] {
+      background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.2) 0%, transparent 68%); }
+    .tdp-chip { transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
+    .tdp-chip:hover { transform:translateY(-2px); }
+    .tdp-chip[data-sel="true"] { transform:translateY(-3px) scale(1.02); }
+    @media (prefers-reduced-motion: reduce){
+      .tdp-row[data-shake="true"], .tdp-bin[data-shake="true"] { animation:none; }
+      .tdp-chip, .tdp-chip:hover, .tdp-chip[data-sel="true"] { transform:none; transition:none; }
+      .tdp-pregunta:hover:not(:disabled) { transform:none; }
+      .tdp-turno { animation:none; }
+      .tdp-barra > div { transition:none; }
+    }
+  `;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -573,7 +788,7 @@ function BinsTipos({
 }) {
   const bins: TipoPregunta[] = ["cotidiana", "cientifica", "filosofica"];
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 180px), 1fr))", gap: 12 }}>
       {bins.map((bin) => {
         const info = TIPO_INFO[bin];
         const dentro = PREGUNTAS.filter((p) => ubicTipo[p.id] === bin);
@@ -590,15 +805,15 @@ function BinsTipos({
             <FondoTermino termino={info.titulo} />
             <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
               <VinetaTermino termino={info.titulo} color={T.text2} icono={info.icono} tam={29} radio={8} />
-              <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
+              <span style={{ fontSize: 14, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
             </div>
-            <div style={{ fontSize: 11, color: T.text3, marginBottom: 12, lineHeight: 1.4 }}>{info.subtitulo}</div>
+            <div style={{ fontSize: 14, color: T.text3, marginBottom: 12, lineHeight: 1.4 }}>{info.subtitulo}</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {dentro.length === 0 ? (
-                <div style={{ fontSize: 12, color: T.text3, opacity: 0.6, padding: "8px 0" }}>Arrastra aquí…</div>
+                <div style={{ fontSize: 14, color: T.text3, opacity: 0.6, padding: "8px 0" }}>Arrastra aquí…</div>
               ) : (
                 dentro.map((p) => (
-                  <span key={p.id} style={{ animation: "tdpPop .25s ease", display: "inline-flex", alignItems: "flex-start", gap: 7, padding: "8px 12px", borderRadius: 11, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 12.5, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>
+                  <span key={p.id} style={{ animation: "tdpPop .25s ease", display: "inline-flex", alignItems: "flex-start", gap: 7, padding: "8px 12px", borderRadius: 11, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 14, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>
                     <i className="fa-solid fa-check" style={{ fontSize: 10, color: OK, marginTop: 3 }} />
                     {p.texto}
                   </span>
@@ -627,7 +842,7 @@ function BinsRamas({
 }) {
   const bins: RamaFilosofica[] = ["ontologia", "epistemologia", "etica", "estetica", "politica"];
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 180px), 1fr))", gap: 12 }}>
       {bins.map((bin) => {
         const info = RAMA_INFO[bin];
         const dentro = PREGUNTAS_RAMA.filter((p) => ubicRama[p.id] === bin);
@@ -644,15 +859,15 @@ function BinsRamas({
             <FondoTermino termino={info.titulo} />
             <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
               <VinetaTermino termino={info.titulo} color={T.text2} icono={info.icono} tam={29} radio={8} />
-              <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
+              <span style={{ fontSize: 14, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
             </div>
-            <div style={{ fontSize: 11, color: T.text3, marginBottom: 12, lineHeight: 1.4 }}>{info.subtitulo}</div>
+            <div style={{ fontSize: 14, color: T.text3, marginBottom: 12, lineHeight: 1.4 }}>{info.subtitulo}</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {dentro.length === 0 ? (
-                <div style={{ fontSize: 12, color: T.text3, opacity: 0.6, padding: "8px 0" }}>Arrastra aquí…</div>
+                <div style={{ fontSize: 14, color: T.text3, opacity: 0.6, padding: "8px 0" }}>Arrastra aquí…</div>
               ) : (
                 dentro.map((p) => (
-                  <span key={p.id} style={{ animation: "tdpPop .25s ease", display: "inline-flex", alignItems: "flex-start", gap: 7, padding: "8px 12px", borderRadius: 11, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 12.5, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>
+                  <span key={p.id} style={{ animation: "tdpPop .25s ease", display: "inline-flex", alignItems: "flex-start", gap: 7, padding: "8px 12px", borderRadius: 11, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 14, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>
                     <i className="fa-solid fa-check" style={{ fontSize: 10, color: OK, marginTop: 3 }} />
                     {p.texto}
                   </span>
@@ -694,7 +909,7 @@ function RowsProfundizar({
           >
             <div className="tdp-slot" data-armed={!done && !!selPar} style={done ? { borderStyle: "solid", borderColor: OK, background: `${OK}1a` } : undefined}>
               {done ? (
-                <span style={{ animation: "tdpPop .25s ease", fontSize: 12.5, fontWeight: 900, color: "#fff", display: "inline-flex", alignItems: "center", gap: 7 }}>
+                <span style={{ animation: "tdpPop .25s ease", fontSize: 14, fontWeight: 900, color: "#fff", display: "inline-flex", alignItems: "center", gap: 7 }}>
                   <i className="fa-solid fa-mug-hot" />
                   {g.cotidiana}
                 </span>
@@ -709,7 +924,7 @@ function RowsProfundizar({
                 <i className="fa-solid fa-brain" style={{ fontSize: 12, color: T.text3 }} />
                 {g.filosofica}
               </div>
-              <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.4, marginTop: 3 }}>{g.pista}</div>
+              <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.4, marginTop: 3 }}>{g.pista}</div>
             </div>
           </div>
         );
@@ -758,19 +973,19 @@ function QuizCard({
   };
 
   return (
-    <div style={{ ...card, padding: "20px 24px 24px", marginTop: 22 }}>
+    <div style={{ display: "grid", gap: 14 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4, flexWrap: "wrap" }}>
         <Eyebrow>
           <i className="fa-solid fa-clipboard-question" style={{ marginRight: 8, color: accent }} />
           Comprueba lo aprendido
         </Eyebrow>
         {aprobado && (
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 12, fontWeight: 800, color: OK }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 14, fontWeight: 800, color: OK }}>
             <i className="fa-solid fa-circle-check" /> Aprobado
           </span>
         )}
       </div>
-      <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
         Cinco preguntas sobre los tipos de preguntas y las ramas de la filosofía. Elige la respuesta correcta y pulsa «Comprobar».
       </div>
 
@@ -783,7 +998,7 @@ function QuizCard({
                 <span style={{ color: accent }}>{qi + 1}.</span>
                 <span>{q.pregunta}</span>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: q.opciones.length === 2 ? "1fr 1fr" : "repeat(auto-fit, minmax(150px, 1fr))", gap: 9 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 150px), 1fr))", gap: 9 }}>
                 {q.opciones.map((op, oi) => {
                   const sel = elegida === oi;
                   const esCorrecta = oi === q.correcta;
@@ -804,8 +1019,8 @@ function QuizCard({
                     colorTxt = "#fff";
                   }
                   return (
-                    <button key={oi} className="tdp-q" onClick={() => elegir(qi, oi)} disabled={comprobado} style={{ borderColor: borde, background: fondo, color: colorTxt }}>
-                      <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
+                    <button key={oi} className="tdp-q-op" onClick={() => elegir(qi, oi)} disabled={comprobado} style={{ borderColor: borde, background: fondo, color: colorTxt }}>
+                      <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
                         {comprobado && esCorrecta ? <i className="fa-solid fa-check" /> : comprobado && sel ? <i className="fa-solid fa-xmark" /> : String.fromCharCode(65 + oi)}
                       </span>
                       <span style={{ flex: 1, lineHeight: 1.35 }}>{op}</span>
@@ -814,7 +1029,7 @@ function QuizCard({
                 })}
               </div>
               {comprobado && (
-                <div style={{ marginTop: 9, fontSize: 12.5, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
+                <div style={{ marginTop: 9, fontSize: 14, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
                   <i className="fa-solid fa-circle-info" style={{ color: accent, marginTop: 2 }} />
                   <span>{q.retro}</span>
                 </div>
@@ -837,7 +1052,7 @@ function QuizCard({
           </button>
         )}
         {comprobado && (
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 13.5, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 14, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
             <i className={`fa-solid ${aprobadoAhora ? "fa-trophy" : "fa-circle-half-stroke"}`} />
             {aciertos} / {total} correctas
             {!aprobadoAhora && <span style={{ color: T.text3, fontWeight: 600 }}>· revisa las marcadas e inténtalo de nuevo</span>}

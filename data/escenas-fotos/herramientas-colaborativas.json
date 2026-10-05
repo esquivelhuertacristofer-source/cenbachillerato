@@ -1,0 +1,10 @@
+{
+  "slug": "herramientas-colaborativas",
+  "items": [
+    { "clave": "ana-celular", "formato": "1:1", "estilo": "ilustracion", "escena": "Una joven estudiante sentada en el transporte público sosteniendo un celular con las dos manos, mochila en el regazo, luz de tarde por la ventana" },
+    { "clave": "beto-pueblo", "formato": "1:1", "estilo": "ilustracion", "escena": "Un joven estudiante con mochila caminando por un camino de terracería entre milpas al atardecer, un pueblo pequeño al fondo" },
+    { "clave": "carla-biblioteca", "formato": "1:1", "estilo": "ilustracion", "escena": "Una joven estudiante organizada en una mesa de biblioteca con una libreta abierta, lápices de colores y una computadora de escritorio" },
+    { "clave": "diego-noche", "formato": "1:1", "estilo": "ilustracion", "escena": "Un joven estudiante en su cuarto de noche con una lámpara de escritorio encendida y una laptop abierta, taza de café junto a él" },
+    { "clave": "equipo-mesa", "formato": "16:9", "estilo": "ilustracion", "escena": "Cuatro estudiantes de bachillerato alrededor de una mesa en un salón luminoso, cada uno con un dispositivo distinto, conversando animados" }
+  ]
+}

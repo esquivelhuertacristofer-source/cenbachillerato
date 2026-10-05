@@ -1,0 +1,12 @@
+{
+  "escena": "Seis personas esperan en el pasillo de un centro comunitario; Ximena está elegida y tú escribes una pregunta con «Can you…?» sobre una habilidad.",
+  "pregunta": "A Ximena le preguntas «Can you play basketball?». ¿Qué verás en la cancha?",
+  "opciones": [
+    { "id": "a", "texto": "Encesta la canasta y dice «Yes, I can»", "icono": "fa-basketball" },
+    { "id": "b", "texto": "Falla y dice «No, I can't»", "icono": "fa-circle-xmark" },
+    { "id": "c", "texto": "Se encoge de hombros sin entender", "icono": "fa-circle-question" }
+  ],
+  "correcta": "b",
+  "porque": "La pregunta está bien formada, así que Ximena la entiende y responde según lo que sabe hacer. Ella nada, pero no juega basquetbol: lo intenta, el balón no entra y contesta que no puede.",
+  "comoComprobarlo": "Deja a Ximena elegida, escribe la pregunta tal cual y pulsa Preguntar; luego repítela con otra persona y compara qué pasa en la cancha."
+}

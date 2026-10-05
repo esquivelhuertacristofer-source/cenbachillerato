@@ -1,0 +1,12 @@
+{
+  "escena": "Una balanza de brazos largos con un expediente de 1938: telegrama, fotografía, testimonio oral, cartas y diarios. Cada fuente pesa distinto como evidencia.",
+  "pregunta": "¿Qué tres fuentes bastan para que la balanza supere el peso mínimo y sostenga la tesis?",
+  "opciones": [
+    { "id": "a", "texto": "Diario oficialista, carta del obrero y fotografía", "icono": "fa-newspaper" },
+    { "id": "b", "texto": "Telegrama, fotografía y testimonio oral", "icono": "fa-scale-balanced" },
+    { "id": "c", "texto": "Carta del ingeniero, telegrama y fotografía", "icono": "fa-envelope" }
+  ],
+  "correcta": "b",
+  "porque": "Telegrama (3), fotografía (2) y testimonio oral (2) suman 7, más que el mínimo de 6, y son de tres tipos distintos. El diario pesa poco por su sesgo y la carta del ingeniero tiene anacronismos: no cuenta.",
+  "comoComprobarlo": "En «Uso ético e interpretación», paso «Tu interpretación», elige la tesis y marca «Sostiene» en cada combinación; observa el medidor de peso y la balanza."
+}

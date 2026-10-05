@@ -22,9 +22,10 @@
 
 import * as THREE from "three";
 import { useMemo, useRef, useState, type ReactNode, type Ref } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Environment, Lightformer, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
+import { Encuadre, Sello } from "./_encuadre-historia";
 import {
   type Condicion,
   type Escenario,
@@ -95,9 +96,12 @@ const GEO_ASIENTO = new THREE.BoxGeometry(0.34, 0.24, 0.34);
 const GEO_SOBRE = new THREE.BoxGeometry(0.22, 0.02, 0.15);
 const GEO_DISCO = new THREE.CircleGeometry(0.28, 20);
 
-function Etiqueta({ pos, children, df = 10, col, fs = 12, ancho }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number; ancho?: number }) {
+/** Etiqueta HTML de tamaño fijo (≥ 14 px). En pantallas angostas se oculta: la info ya está en el panel. */
+function Etiqueta({ pos, children, col, ancho }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number; ancho?: number }) {
+  const anchoVista = useThree((st) => st.size.width);
+  if (anchoVista < 640) return null;
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -109,7 +113,7 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12, ancho }: { pos: Pt; ch
           background: "rgba(4,10,22,0.86)",
           border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`,
           color: "#fff",
-          fontSize: fs,
+          fontSize: 14,
           fontWeight: 800,
           whiteSpace: ancho ? "normal" : "nowrap",
           width: ancho,
@@ -585,12 +589,7 @@ function EscenaAgora({ epocaIdx, revelada, prediccion, modoColor }: { epocaIdx: 
       {/* Etiquetas de grupos: todas antes de abrir; después, solo las de quienes quedan fuera */}
       {grupos.map((g, i) =>
         !revelada || !g.entra || g.lejos ? (
-          <Etiqueta key={g.id} pos={[g.centro[0], g.lejos ? 1.9 : 1.7 + (i % 3) * 0.62, g.centro[2]]} col={`${g.color}aa`} fs={10} ancho={112}>
-            {revelada && <i className={`fa-solid ${g.entra ? "fa-check" : "fa-xmark"}`} style={{ color: g.entra ? OK : NO }} />}
-            <span>
-              {g.etq} · {g.n}
-            </span>
-          </Etiqueta>
+          <Sello key={g.id} pos={[g.centro[0], g.lejos ? 1.9 : 1.7 + (i % 3) * 0.62, g.centro[2]]} col={`${g.color}`} texto={`${revelada ? (g.entra ? "✓ " : "✗ ") : ""}${g.etq} · ${g.n}`} />
         ) : null,
       )}
 
@@ -909,9 +908,7 @@ function Zona({ casoId, ganador, mostrar }: { casoId: string; ganador: Ganador |
             {[-1.1, 0, 1.1].map((fz) => (
               <Farol key={fz} pos={[0.7, 0.06, fz]} prendido={prende(i)} />
             ))}
-            <Etiqueta pos={[0, 0.3, 1.95]} fs={10} df={10}>
-              {z.etq}
-            </Etiqueta>
+            <Sello pos={[0, 0.5, 1.95]} col="rgba(255,255,255,0.4)" texto={z.etq} />
           </group>
         ))}
       </>
@@ -994,13 +991,7 @@ function EscenaAsamblea({ casoId, condiciones, celebrada, resultado, modoColor }
         return (
           <group key={g.id}>
             <Casa pos={c} color={g.color} />
-            <Etiqueta pos={[c[0], 2.55, c[2]]} col={`${g.color}bb`} fs={10} ancho={118}>
-              {resultado && <i className={`fa-solid ${falta ? "fa-user-slash" : "fa-check"}`} style={{ color: falta ? NO : OK }} />}
-              <span>
-                {g.etq} · {g.n}
-                {g.soloVoz ? " (voz)" : ""}
-              </span>
-            </Etiqueta>
+            <Sello pos={[c[0], 2.7, c[2]]} col={resultado ? (falta ? NO : OK) : g.color} texto={`${resultado ? (falta ? "✗ " : "✓ ") : ""}${g.etq} · ${g.n}${g.soloVoz ? " (voz)" : ""}`} resalta={!!resultado} />
           </group>
         );
       })}
@@ -1090,9 +1081,11 @@ const URNA_Z = 1.6;
 const CARTA_POS: Pt = [0, 2.05, 0.9];
 
 function Tarjeta({ texto, col, ancho = 250, divRef }: { texto: string; col: string; ancho?: number; divRef?: Ref<HTMLDivElement> }) {
+  const anchoVista = useThree((st) => st.size.width);
+  if (anchoVista < 640) return null;
   return (
-    <Html center distanceFactor={8} zIndexRange={[30, 0]} style={{ pointerEvents: "none" }}>
-      <div ref={divRef} style={{ transition: "opacity .15s", width: ancho, padding: "10px 13px", borderRadius: 12, background: "rgba(248,250,252,0.97)", color: "#0f172a", fontSize: 12.5, fontWeight: 700, lineHeight: 1.35, borderLeft: `6px solid ${col}`, boxShadow: "0 12px 30px -10px #000" }}>
+    <Html center zIndexRange={[30, 0]} style={{ pointerEvents: "none" }}>
+      <div ref={divRef} style={{ transition: "opacity .15s", width: ancho, padding: "10px 13px", borderRadius: 12, background: "rgba(248,250,252,0.97)", color: "#0f172a", fontSize: 14, fontWeight: 700, lineHeight: 1.35, borderLeft: `6px solid ${col}`, boxShadow: "0 12px 30px -10px #000" }}>
         {texto}
       </div>
     </Html>
@@ -1132,10 +1125,7 @@ function Urna({ tipo, lanzamiento }: { tipo: TipoAfirmacion; lanzamiento: Lanzam
         <torusGeometry args={[0.55, 0.05, 10, 36]} />
         <meshStandardMaterial ref={aro} color={flash} emissive={flash} emissiveIntensity={0.35} toneMapped={false} />
       </mesh>
-      <Etiqueta pos={[0, 1.38, 0]} col={`${def.color}cc`} fs={12} df={9}>
-        <i className={`fa-solid ${def.icono}`} style={{ color: def.color }} />
-        {def.etq}
-      </Etiqueta>
+      <Sello pos={[0, 1.5, 0]} col={def.color} texto={def.etq} />
     </group>
   );
 }
@@ -1325,6 +1315,7 @@ function textoHueco(iv: Intervencion, h: (typeof HUECOS_DEBATE)[number]["id"]): 
 }
 
 function Pizarron({ intervencion, revisionOk, modoColor }: { intervencion: Intervencion; revisionOk: boolean[] | null; modoColor: string }) {
+  const anchoVista = useThree((st) => st.size.width);
   const p: Postura | null = intervencion.postura;
   return (
     <group position={[0, 3.5, -3.05]}>
@@ -1342,6 +1333,7 @@ function Pizarron({ intervencion, revisionOk, modoColor }: { intervencion: Inter
           <meshStandardMaterial color={revisionOk ? (revisionOk[k] ? OK : NO) : "#334155"} emissive={revisionOk ? (revisionOk[k] ? OK : NO) : "#000"} emissiveIntensity={revisionOk ? 1.4 : 0} toneMapped={!revisionOk} />
         </mesh>
       ))}
+      {anchoVista >= 640 && (
       <Html position={[0, 0.45, 0.08]} transform center distanceFactor={4} zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
         <div style={{ width: 640, color: "#e2e8f0", fontSize: 16, lineHeight: 1.3 }}>
           <div style={{ fontSize: 14, letterSpacing: "0.12em", color: modoColor, fontWeight: 900, marginBottom: 8 }}>MI INTERVENCIÓN · {p === "si" ? "SÍ ES POSIBLE" : p === "no" ? "NO ES POSIBLE" : "ELIGE TU POSTURA"}</div>
@@ -1356,6 +1348,7 @@ function Pizarron({ intervencion, revisionOk, modoColor }: { intervencion: Inter
           })}
         </div>
       </Html>
+      )}
     </group>
   );
 }
@@ -1373,11 +1366,7 @@ function EscenaDebate({ paso, afirmacionId, lanzamiento, intervencion, pronuncia
         <meshStandardMaterial color={lado === "si" ? "#2dd4bf" : "#fb923c"} roughness={0.4} emissive={lado === "si" ? "#2dd4bf" : "#fb923c"} emissiveIntensity={p === lado ? 0.6 : 0.1} />
       </mesh>
       <Persona pos={[0, 0, -0.62]} color={p === lado ? modoColor : "#64748b"} piel={PIELES[lado === "si" ? 1 : 3]} escala={1.3} />
-      <Etiqueta pos={[0, 0.62, 0.42]} col={lado === "si" ? "#2dd4bfaa" : "#fb923caa"} fs={11}>
-        {p === lado && <i className="fa-solid fa-user" style={{ color: modoColor }} />}
-        {lado === "si" ? "Sí es posible" : "No es posible"}
-        {p === lado ? " · tú" : ""}
-      </Etiqueta>
+      <Sello pos={[0, 0.75, 0.42]} col={lado === "si" ? "#2dd4bf" : "#fb923c"} texto={`${lado === "si" ? "Sí es posible" : "No es posible"}${p === lado ? " · tú" : ""}`} resalta={p === lado} />
     </group>
   );
   return (
@@ -1442,6 +1431,7 @@ export default function AgoraCiudadaniaScene(p: AgoraSceneProps) {
         <EscenaDebate paso={p.paso} afirmacionId={p.afirmacionId} lanzamiento={p.lanzamiento} intervencion={p.intervencion} pronunciada={p.pronunciada} revisionOk={p.revisionOk} modoColor={modoColor} />
       )}
 
+      <Encuadre pos={cam.pos} target={cam.target} />
       <OrbitControls makeDefault enablePan={false} enableZoom minDistance={5} maxDistance={24} maxPolarAngle={Math.PI * 0.46} minPolarAngle={Math.PI * 0.08} target={cam.target} />
       <EffectComposer>
         <Bloom intensity={0.3} luminanceThreshold={0.7} luminanceSmoothing={0.85} mipmapBlur />

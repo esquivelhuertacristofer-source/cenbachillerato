@@ -20,8 +20,8 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef, type ReactNode, type RefObject } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useLayoutEffect, useMemo, useRef, type ReactNode, type RefObject } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Environment, Lightformer, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { SITUACIONES, PROYECTOS, HITOS, ESTRUCTURAS, mulberry32, type ZonaId } from "./planes-futuro-ingles-data";
@@ -41,6 +41,8 @@ export interface PlanesSceneProps {
   /** valida = inglés correcto, pero no la forma más natural (ámbar). */
   fraseEstado: "pendiente" | "tipo" | "ok" | "valida" | "mal";
   hablante: string;
+  /** Regla en español cuando la forma elegida no encaja (se ve en el globo). */
+  regla?: string | null;
   // Community project
   zonaIdx: number;
   propuestas: string[];
@@ -51,6 +53,8 @@ export interface PlanesSceneProps {
   hitoIdx: number;
   metas: (string | null)[];
   estadoMeta: "ok" | "mal" | null;
+  /** Regla en español de la última meta equivocada. */
+  reglaMeta?: string | null;
 }
 
 type Pt = [number, number, number];
@@ -73,9 +77,9 @@ function Caja({ p, s, c, rough = 0.75, metal = 0, sombra = true, rotY = 0, emis,
   );
 }
 
-function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number }) {
+function Etiqueta({ pos, children, col, fs = 14 }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number }) {
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -86,7 +90,7 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12 }: { pos: Pt; children:
           background: "rgba(4,10,22,0.86)",
           border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`,
           color: "#fff",
-          fontSize: fs,
+          fontSize: Math.max(14, fs),
           fontWeight: 800,
           whiteSpace: "nowrap",
           boxShadow: "0 6px 18px -8px #000",
@@ -620,8 +624,8 @@ function EstCurso({ activa, resuelta }: EstacionProps) {
         ))}
       </group>
       {activa && (
-        <Html position={[-0.75, 2.45, 1.05]} center distanceFactor={9} zIndexRange={[25, 0]} style={{ pointerEvents: "none" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#4c1d95", fontSize: 13, fontWeight: 900, whiteSpace: "nowrap" }}>
+        <Html position={[-0.75, 2.45, 1.05]} center zIndexRange={[25, 0]} style={{ pointerEvents: "none" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#4c1d95", fontSize: 14, fontWeight: 900, whiteSpace: "nowrap" }}>
             {resuelta ? (
               <>
                 <i className="fa-solid fa-laptop" />
@@ -804,7 +808,8 @@ const EDIFICIOS_FONDO: [number, number, number, string][] = (() => {
   });
 })();
 
-function EscenaSituaciones({ sitIdx, sitResueltas, frase, fraseEstado, hablante, errorNonce, modoColor }: Pick<PlanesSceneProps, "sitIdx" | "sitResueltas" | "frase" | "fraseEstado" | "hablante" | "errorNonce" | "modoColor">) {
+function EscenaSituaciones({ sitIdx, sitResueltas, frase, fraseEstado, hablante, regla, errorNonce, modoColor }: Pick<PlanesSceneProps, "sitIdx" | "sitResueltas" | "frase" | "fraseEstado" | "hablante" | "regla" | "errorNonce" | "modoColor">) {
+  const angosta = useThree((st) => st.size.width) < 640;
   const plato = useRef<THREE.Group>(null);
   const ang = useRef(-sitIdx * PASO);
   const aro = useRef<THREE.Mesh>(null);
@@ -870,33 +875,42 @@ function EscenaSituaciones({ sitIdx, sitResueltas, frase, fraseEstado, hablante,
         <ringGeometry args={[1.95, 2.08, 64]} />
         <meshStandardMaterial color={modoColor} emissive={modoColor} emissiveIntensity={0.6} side={THREE.DoubleSide} />
       </mesh>
-      <Html position={[0, 4.0, R_CAR - 0.2]} center distanceFactor={8} zIndexRange={[30, 0]} style={{ pointerEvents: "none" }}>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-          <div style={{ padding: "3px 11px", borderRadius: 999, background: colFrase, color: "#04121f", fontSize: 12, fontWeight: 900, whiteSpace: "nowrap" }}>
-            <i className="fa-solid fa-comment" style={{ marginRight: 6 }} />
-            {hablante}
+      {!angosta && (
+        <Html position={[0, 4.0, R_CAR - 0.2]} center zIndexRange={[30, 0]} style={{ pointerEvents: "none" }}>
+          <style>{`@keyframes pfSacude { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-5px);} 75%{transform:translateX(5px);} }`}</style>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, animation: fraseEstado === "mal" ? "pfSacude .4s 2" : undefined }}>
+            <div style={{ padding: "3px 11px", borderRadius: 999, background: colFrase, color: "#04121f", fontSize: 14, fontWeight: 900, whiteSpace: "nowrap" }}>
+              <i className="fa-solid fa-comment" style={{ marginRight: 6 }} />
+              {hablante}
+            </div>
+            <div
+              style={{
+                maxWidth: "min(440px, 70vw)",
+                width: "max-content",
+                padding: "10px 18px",
+                borderRadius: 14,
+                background: fraseEstado === "mal" ? "rgba(254,226,226,0.97)" : "rgba(255,255,255,0.97)",
+                border: `3px solid ${colFrase}`,
+                color: "#0f172a",
+                fontSize: 18,
+                fontWeight: 900,
+                lineHeight: 1.3,
+                textAlign: "center",
+                boxShadow: `0 0 30px -8px ${colFrase}`,
+              }}
+            >
+              {(fraseEstado === "ok" || fraseEstado === "valida") && <i className="fa-solid fa-circle-check" style={{ color: fraseEstado === "ok" ? "#059669" : "#d97706", marginRight: 8 }} />}
+              {fraseEstado === "mal" && <i className="fa-solid fa-circle-xmark" style={{ color: "#dc2626", marginRight: 8 }} />}
+              {frase}
+            </div>
+            {fraseEstado === "mal" && regla && (
+              <div style={{ maxWidth: "min(440px, 70vw)", width: "max-content", padding: "8px 12px", borderRadius: 12, background: "rgba(4,10,22,0.92)", border: `2px solid ${WARN}`, color: "#fff", fontSize: 14, fontWeight: 700, lineHeight: 1.35, textAlign: "center" }}>
+                {regla}
+              </div>
+            )}
           </div>
-          <div
-            style={{
-              maxWidth: 520,
-              width: "max-content",
-              padding: "10px 18px",
-              borderRadius: 14,
-              background: "rgba(255,255,255,0.97)",
-              border: `3px solid ${colFrase}`,
-              color: "#0f172a",
-              fontSize: 18,
-              fontWeight: 900,
-              lineHeight: 1.3,
-              textAlign: "center",
-              boxShadow: `0 0 30px -8px ${colFrase}`,
-            }}
-          >
-            {(fraseEstado === "ok" || fraseEstado === "valida") && <i className="fa-solid fa-circle-check" style={{ color: fraseEstado === "ok" ? "#059669" : "#d97706", marginRight: 8 }} />}
-            {frase}
-          </div>
-        </div>
-      </Html>
+        </Html>
+      )}
     </group>
   );
 }
@@ -1361,6 +1375,7 @@ function Vecinos({ zonaIdx, propuesto }: { zonaIdx: number; propuesto: boolean }
 }
 
 function EscenaComunidad({ zonaIdx, propuestas, planeados, oracionPlan, estadoPlan, errorNonce, modoColor }: Pick<PlanesSceneProps, "zonaIdx" | "propuestas" | "planeados" | "oracionPlan" | "estadoPlan" | "errorNonce" | "modoColor">) {
+  const angosta = useThree((st) => st.size.width) < 640;
   const pr = PROYECTOS[zonaIdx] ?? PROYECTOS[0]!;
   const aro = useRef<THREE.Mesh>(null);
   const ultimo = useRef(errorNonce);
@@ -1403,10 +1418,12 @@ function EscenaComunidad({ zonaIdx, propuestas, planeados, oracionPlan, estadoPl
         return (
           <group key={x.id} position={[cx, 0, cz]}>
             <Z planeado={planeados.includes(x.id)} propuesto={propuestas.includes(x.id)} activa={i === zonaIdx} color={x.color} />
-            <Etiqueta pos={x.id === "huerto" ? [-2.55, 0.9, 0.2] : [0, x.id === "plaza" ? 2.7 : 2.35, x.id === "biblioteca" ? -0.4 : 0]} df={13} fs={i === zonaIdx ? 13 : 11} col={`${planeados.includes(x.id) ? OK : x.color}aa`}>
-              <i className={`fa-solid ${planeados.includes(x.id) ? "fa-circle-check" : x.icono}`} style={{ color: planeados.includes(x.id) ? OK : x.color }} />
-              {x.lugar}
-            </Etiqueta>
+            {i === zonaIdx && (
+              <Etiqueta pos={x.id === "huerto" ? [-2.55, 0.9, 0.2] : [0, x.id === "plaza" ? 2.7 : 2.35, x.id === "biblioteca" ? -0.4 : 0]} col={`${planeados.includes(x.id) ? OK : x.color}aa`}>
+                <i className={`fa-solid ${planeados.includes(x.id) ? "fa-circle-check" : x.icono}`} style={{ color: planeados.includes(x.id) ? OK : x.color }} />
+                {x.lugar}
+              </Etiqueta>
+            )}
           </group>
         );
       })}
@@ -1415,10 +1432,11 @@ function EscenaComunidad({ zonaIdx, propuestas, planeados, oracionPlan, estadoPl
         <meshStandardMaterial color={modoColor} emissive={modoColor} emissiveIntensity={0.6} side={THREE.DoubleSide} />
       </mesh>
       <Vecinos zonaIdx={zonaIdx} propuesto={propuestas.includes(pr.id) && !planeados.includes(pr.id)} />
-      <Html position={[0, 1.6, -6.6]} center distanceFactor={13} zIndexRange={[30, 0]} style={{ pointerEvents: "none" }}>
+      {!angosta && (
+      <Html position={[0, 1.6, -6.6]} center zIndexRange={[30, 0]} style={{ pointerEvents: "none" }}>
         <div
           style={{
-            maxWidth: 640,
+            maxWidth: "min(520px, 70vw)",
             width: "max-content",
             padding: "10px 18px",
             borderRadius: 14,
@@ -1436,6 +1454,7 @@ function EscenaComunidad({ zonaIdx, propuestas, planeados, oracionPlan, estadoPl
           {texto}
         </div>
       </Html>
+      )}
     </group>
   );
 }
@@ -1467,7 +1486,8 @@ const PIEDRAS = (() => {
   return xs;
 })();
 
-function Hito3D({ i, meta, actual, estadoMeta, modoColor }: { i: number; meta: string | null; actual: boolean; estadoMeta: "ok" | "mal" | null; modoColor: string }) {
+function Hito3D({ i, meta, actual, estadoMeta, modoColor, reglaMeta }: { i: number; meta: string | null; actual: boolean; estadoMeta: "ok" | "mal" | null; modoColor: string; reglaMeta?: string | null }) {
+  const angosta = useThree((st) => st.size.width) < 640;
   const h = HITOS[i]!;
   const [x, z, alto] = PLATAFORMAS[i + 1]!;
   const bandera = useRef<THREE.Group>(null);
@@ -1499,12 +1519,7 @@ function Hito3D({ i, meta, actual, estadoMeta, modoColor }: { i: number; meta: s
         <Caja p={[0, 0.72, 0]} s={[1.4, 1.3, 0.08]} c="#f8fafc" />
         <Caja p={[0, 1.3, 0.01]} s={[1.4, 0.2, 0.1]} c={h.color} />
       </group>
-      <Html position={[x - 0.25, alto + 0.66, z - 0.26]} center distanceFactor={10} zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
-        <div style={{ width: 66, textAlign: "center", color: "#0f172a", fontWeight: 900, lineHeight: 1.05 }}>
-          <i className={`fa-solid ${meta ? "fa-circle-check" : h.icono}`} style={{ fontSize: 15, color: meta ? "#059669" : h.color }} />
-          <div style={{ fontSize: 10, marginTop: 3 }}>{h.tiempo}</div>
-        </div>
-      </Html>
+
       {/* Mástil y bandera */}
       <Caja p={[x + 0.55, alto + 0.9, z - 0.2]} s={[0.05, 1.8, 0.05]} c="#cbd5e1" metal={0.7} rough={0.3} />
       <group ref={bandera} position={[x + 0.55, alto + 0.35, z - 0.2]}>
@@ -1518,18 +1533,18 @@ function Hito3D({ i, meta, actual, estadoMeta, modoColor }: { i: number; meta: s
           <meshStandardMaterial color={modoColor} emissive={modoColor} emissiveIntensity={0.9} />
         </mesh>
       </group>
-      {actual && (
-        <Html position={[x, alto + 2.45, z]} center distanceFactor={10} zIndexRange={[30, 0]} style={{ pointerEvents: "none" }}>
+      {actual && !angosta && (
+        <Html position={[x, alto + 2.45, z]} center zIndexRange={[30, 0]} style={{ pointerEvents: "none" }}>
           <div
             style={{
-              width: meta ? 250 : "max-content",
-              maxWidth: 250,
+              width: "max-content",
+              maxWidth: "min(280px, 60vw)",
               padding: "8px 12px",
               borderRadius: 12,
               background: "rgba(4,10,22,0.92)",
               border: `2px solid ${colBorde}`,
               color: "#fff",
-              fontSize: 13,
+              fontSize: 14,
               fontWeight: 800,
               lineHeight: 1.35,
               textAlign: "center",
@@ -1542,9 +1557,9 @@ function Hito3D({ i, meta, actual, estadoMeta, modoColor }: { i: number; meta: s
                 {meta}
               </>
             ) : (
-              <span style={{ whiteSpace: "nowrap" }}>
-                <i className="fa-solid fa-pen" style={{ color: colBorde, marginRight: 6 }} />
-                {h.tiempo} · {ESTRUCTURAS[h.estructura].molde}
+              <span style={{ whiteSpace: estadoMeta === "mal" && reglaMeta ? "normal" : "nowrap" }}>
+                <i className={`fa-solid ${estadoMeta === "mal" ? "fa-circle-xmark" : "fa-pen"}`} style={{ color: colBorde, marginRight: 6 }} />
+                {estadoMeta === "mal" && reglaMeta ? reglaMeta : `${h.tiempo} · ${ESTRUCTURAS[h.estructura].molde}`}
               </span>
             )}
           </div>
@@ -1588,7 +1603,7 @@ function Caminante({ metas }: { metas: (string | null)[] }) {
   );
 }
 
-function EscenaMetas({ hitoIdx, metas, estadoMeta, errorNonce, modoColor }: Pick<PlanesSceneProps, "hitoIdx" | "metas" | "estadoMeta" | "errorNonce" | "modoColor">) {
+function EscenaMetas({ hitoIdx, metas, estadoMeta, reglaMeta, errorNonce, modoColor }: Pick<PlanesSceneProps, "hitoIdx" | "metas" | "estadoMeta" | "reglaMeta" | "errorNonce" | "modoColor">) {
   const piedras = useRef<THREE.InstancedMesh>(null);
   const estrella = useRef<THREE.Mesh>(null);
   const luz = useRef<THREE.PointLight>(null);
@@ -1657,7 +1672,7 @@ function EscenaMetas({ hitoIdx, metas, estadoMeta, errorNonce, modoColor }: Pick
         <meshStandardMaterial color="#d6d3d1" roughness={0.9} />
       </instancedMesh>
       {HITOS.map((h, i) => (
-        <Hito3D key={h.id} i={i} meta={metas[i] ?? null} actual={i === hitoIdx} estadoMeta={estadoMeta} modoColor={modoColor} />
+        <Hito3D key={h.id} i={i} meta={metas[i] ?? null} actual={i === hitoIdx} estadoMeta={estadoMeta} modoColor={modoColor} reglaMeta={reglaMeta} />
       ))}
       {/* Cima con estrella */}
       <mesh position={[sx + 1.6, sh + 1.3, sz - 1.8]} scale={[1.6, 2.6, 1.6]} castShadow>
@@ -1674,18 +1689,33 @@ function EscenaMetas({ hitoIdx, metas, estadoMeta, errorNonce, modoColor }: Pick
   );
 }
 
+/** En pantallas angostas se aleja la cámara (zoom) para que quepa todo el ancho. */
+function AjusteAngosto({ zoom }: { zoom: number }) {
+  const leer = useThree((st) => st.get);
+  const ancho = useThree((st) => st.size.width);
+  useLayoutEffect(() => {
+    const c = leer().camera as THREE.PerspectiveCamera;
+    c.zoom = ancho < 640 ? zoom : 1;
+    c.updateProjectionMatrix();
+  }, [leer, ancho, zoom]);
+  return null;
+}
+
 /* ── Escena ───────────────────────────────────────────────────────────── */
 
 export default function PlanesFuturoInglesScene(p: PlanesSceneProps) {
   const { vista, modoColor, resetNonce } = p;
   const cam = useMemo((): { pos: Pt; target: Pt; fondo: string } => {
-    if (vista === "situaciones") return { pos: [0, 3.7, 12.9], target: [0, 0.8, 4.6], fondo: "#0b1b2e" };
-    if (vista === "comunidad") return { pos: [0, 12.6, 13.2], target: [0, -0.6, 0.4], fondo: "#07142a" };
-    return { pos: [0, 5.2, 15.4], target: [0, 1.2, 0.2], fondo: "#1a1433" };
+    // El objetivo queda por debajo del centro del contenido: la escena sube
+    // y queda entre la barra de arriba y la misión de abajo.
+    if (vista === "situaciones") return { pos: [0, 3.7, 12.9], target: [0, 0.2, 4.6], fondo: "#0b1b2e" };
+    if (vista === "comunidad") return { pos: [0, 12.6, 13.2], target: [0, -1.4, 0.4], fondo: "#07142a" };
+    return { pos: [0, 5.2, 15.4], target: [0, 0.4, 0.2], fondo: "#1a1433" };
   }, [vista]);
 
   return (
     <Canvas key={`${vista}-${resetNonce}`} shadows dpr={[1, 1.75]} camera={{ position: cam.pos, fov: 42 }} gl={{ antialias: true }}>
+      <AjusteAngosto zoom={0.68} />
       <color attach="background" args={[cam.fondo]} />
       <fog attach="fog" args={[cam.fondo, 26, 52]} />
       <hemisphereLight args={["#bfdbfe", "#1f2937", 0.45]} />
@@ -1698,12 +1728,12 @@ export default function PlanesFuturoInglesScene(p: PlanesSceneProps) {
       </Environment>
 
       {vista === "situaciones" && (
-        <EscenaSituaciones sitIdx={p.sitIdx} sitResueltas={p.sitResueltas} frase={p.frase} fraseEstado={p.fraseEstado} hablante={p.hablante} errorNonce={p.errorNonce} modoColor={modoColor} />
+        <EscenaSituaciones sitIdx={p.sitIdx} sitResueltas={p.sitResueltas} frase={p.frase} fraseEstado={p.fraseEstado} hablante={p.hablante} regla={p.regla} errorNonce={p.errorNonce} modoColor={modoColor} />
       )}
       {vista === "comunidad" && (
         <EscenaComunidad zonaIdx={p.zonaIdx} propuestas={p.propuestas} planeados={p.planeados} oracionPlan={p.oracionPlan} estadoPlan={p.estadoPlan} errorNonce={p.errorNonce} modoColor={modoColor} />
       )}
-      {vista === "metas" && <EscenaMetas hitoIdx={p.hitoIdx} metas={p.metas} estadoMeta={p.estadoMeta} errorNonce={p.errorNonce} modoColor={modoColor} />}
+      {vista === "metas" && <EscenaMetas hitoIdx={p.hitoIdx} metas={p.metas} estadoMeta={p.estadoMeta} reglaMeta={p.reglaMeta} errorNonce={p.errorNonce} modoColor={modoColor} />}
 
       <OrbitControls
         makeDefault

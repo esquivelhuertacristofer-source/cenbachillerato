@@ -529,7 +529,7 @@ const ESTILOS = (accent: string, rgba: string) => `
   .ml-btn:hover:not(:disabled) { border-color:${T.lineStrong}; }
   .ml-btn:disabled { opacity:.45; cursor:not-allowed; }
 
-  /* Identidad del tablero */
+  /* Acentos del simulador (línea de tiempo y piezas) */
   .ml-linea { --tono:262; position:relative;
     background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.13) 0%, transparent 62%); }
   .ml-linea::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;

@@ -1,26 +1,28 @@
-﻿"use client";
+"use client";
 
 /**
  * Laboratorio — Navegar seguro en internet
  * Práctica experimental para CD-I-P06-A1 (Cultura Digital I).
  *
- * Interactividad máxima. Cuatro modos: los tres de arrastrar/clasificar y, al
- * final, uno que se escribe («Completa el texto», verbatim de la progresión):
- *  1. «¿Práctica segura o riesgosa?» — clasifica doce hábitos de navegación
- *     entre prácticas seguras de higiene digital y prácticas riesgosas.
- *  2. «Amenaza y defensa» — empareja cada riesgo principal (phishing,
- *     desinformación, vigilancia digital) con cómo protegerte de él (verbatim A1).
- *  3. «Escribe el término» — lee la definición verbatim (A5) y escribe
- *     de memoria el término del glosario que la nombra.
- *  + Cuestionario de comprensión (V/F verbatim de A4 + A2).
+ * Cinco modos:
+ *  1. «Tu teléfono» (SIMULADOR) — llegan ocho avisos a un teléfono simulado
+ *     (mensajes, enlaces, descargas, permisos y redes Wi-Fi ficticios). El
+ *     alumno puede revisar las señales y decide: abrir, ignorar o reportar. Los
+ *     medidores de seguridad del dispositivo y de datos expuestos reaccionan, y
+ *     las consecuencias se marcan como simulación. Modelo en `navegacion-segura-sim.ts`.
+ *  2. «¿Práctica segura o riesgosa?» — clasifica doce hábitos de navegación.
+ *  3. «Amenaza y defensa» — empareja cada riesgo con su defensa (verbatim A1).
+ *  4. «Escribe el término» — definición verbatim (A5) → término del glosario.
+ *  5. «Completa el texto» — fill_blanks verbatim de la progresión.
+ *  + Reto: cuestionario de comprensión (V/F verbatim de A4 + A2).
  *
- * DOM puro (sin three.js): ligero, accesible (ratón, teclado y táctil mediante
- * clic-para-seleccionar / clic-para-colocar). Contenido VERBATIM de CD-I·P06.
+ * DOM puro (sin three.js). Contenido curricular VERBATIM de CD-I·P06 en «Teoría».
  */
 
 import { useEffect, useRef, useState } from "react";
 import type { PracticaLabProps } from "../registry";
-import { T, OK, card, Eyebrow } from "./_kit";
+import { T, OK } from "./_kit";
+import { LabShell, Bloque, BotonHerramienta, Mesa, Dato } from "./_shell";
 import { LabSfx } from "./lab-audio";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { EscribeTermino } from "./_mecanica-termino";
@@ -37,15 +39,28 @@ import {
   DATO_SEGURIDAD,
   type Categoria,
 } from "./navegacion-segura-data";
+import {
+  AVISOS,
+  calcular,
+  efectoDe,
+  nivelDatos,
+  nivelSeguridad,
+  type Accion,
+  type Aviso,
+  type Decision,
+} from "./navegacion-segura-sim";
 
 const NO = "#FF5E5E";
+const AVISO = "#FFC75A";
 import { useEstrellas } from "@/lib/hooks/useEstrellas";
 import { FondoTermino, VinetaTermino } from "./_vineta";
 const RETO_KEY = "cen-navegacion-segura-reto";
+const RUTA_FOTOS = "/media/labs-sim/navegacion-segura";
 
-type Modo = "practicas" | "amenazas" | "glosario" | "texto";
+type Modo = "telefono" | "practicas" | "amenazas" | "glosario" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
+  { id: "telefono", label: "Tu teléfono", icono: "fa-mobile-screen-button" },
   { id: "practicas", label: "¿Práctica segura o riesgosa?", icono: "fa-shield-halved" },
   { id: "amenazas", label: "Amenaza y defensa", icono: "fa-user-shield" },
   { id: "glosario", label: "Escribe el término", icono: "fa-keyboard" },
@@ -54,12 +69,11 @@ const MODOS: { id: Modo; label: string; icono: string }[] = [
 
 export function LabNavegacionSegura({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
-  const [modo, setModo] = useState<Modo>("practicas");
+  const [modo, setModo] = useState<Modo>("telefono");
 
   // ── sonido ────────────────────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   // Modo «Completa el texto». El contador sirve de `key`: subirlo remonta
   // el componente y devuelve todos los huecos en blanco.
   const [textoDone, setTextoDone] = useState(false);
@@ -87,6 +101,33 @@ export function LabNavegacionSegura({ color }: PracticaLabProps) {
   const sfxPlace = () => {
     partida.acierto();
     return sonido && audioRef.current?.blip();
+  };
+
+  // ── modo teléfono (simulador) ──────────────────────────────────────────
+  const [decisiones, setDecisiones] = useState<Decision[]>([]);
+  const [revisados, setRevisados] = useState<Record<string, boolean>>({});
+  const [indice, setIndice] = useState(0);
+  const sim = calcular(decisiones);
+  const aviso = indice < AVISOS.length ? AVISOS[indice]! : null;
+  const decidido = aviso ? decisiones.find((d) => d.id === aviso.id) : undefined;
+
+  const revisar = () => {
+    if (!aviso || decidido) return;
+    setRevisados((r) => ({ ...r, [aviso.id]: true }));
+  };
+  const decidir = (accion: Accion) => {
+    if (!aviso || decidido) return;
+    setDecisiones((d) => [...d, { id: aviso.id, accion, revisado: !!revisados[aviso.id] }]);
+    const e = efectoDe(aviso, accion);
+    if (e.val === "bien") sfxPlace();
+    else sfxNo();
+    if (decisiones.length + 1 >= AVISOS.length) sfxOk();
+  };
+  const reiniciarTelefono = () => {
+    setDecisiones([]);
+    setRevisados({});
+    setIndice(0);
+    partida.reiniciar();
   };
 
   // ── modo practicas (clasifica por categoría) ───────────────────────────
@@ -172,6 +213,8 @@ export function LabNavegacionSegura({ color }: PracticaLabProps) {
   };
 
   const objetivos = [
+    { txt: "Decide qué hacer con los 8 avisos de tu teléfono", done: sim.cerrado },
+    { txt: "Termina con el dispositivo protegido y pocos datos expuestos", done: sim.cerrado && sim.seguridad >= 60 && sim.datos <= 20 },
     { txt: "Clasifica las 12 prácticas como seguras o riesgosas", done: practicasDone },
     { txt: "Empareja las 3 amenazas con su defensa", done: amenazasDone },
     { txt: "Escribe los 5 términos del glosario", done: glosarioDone },
@@ -233,133 +276,70 @@ export function LabNavegacionSegura({ color }: PracticaLabProps) {
     setTextoDone(false);
     setTextoIntento((n) => n + 1);
   };
-  const resetActual = modo === "texto" ? resetTexto : modo === "practicas" ? resetPracticas : modo === "amenazas" ? resetAmenazas : resetGlosario;
+  const resetActual =
+    modo === "texto" ? resetTexto : modo === "practicas" ? resetPracticas : modo === "amenazas" ? resetAmenazas : modo === "telefono" ? reiniciarTelefono : resetGlosario;
+
+  const instruccion = (txt: string, n?: string, ok?: boolean) => (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", fontSize: 15, fontWeight: 800, color: T.text }}>
+      <span>{txt}</span>
+      {n && <span style={{ fontSize: 15, fontWeight: 900, color: ok ? OK : T.text3 }}>{n}</span>}
+    </div>
+  );
+
+  const nSeg = nivelSeguridad(sim.seguridad);
+  const nDat = nivelDatos(sim.datos);
+  const lectura =
+    modo === "telefono" ? (
+      <>
+        {aviso ? `Aviso ${indice + 1} de ${AVISOS.length}` : "Bandeja vacía"} · Dispositivo: {nSeg.texto} ({sim.seguridad})
+      </>
+    ) : modo === "practicas" ? (
+      <>Prácticas clasificadas: {Object.keys(ubicPract).length}/{PRACTICAS.length}</>
+    ) : modo === "amenazas" ? (
+      <>Amenazas emparejadas: {Object.keys(empAmen).length}/{AMENAZAS.length}</>
+    ) : (
+      <>Repaso de los términos de seguridad digital</>
+    );
 
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes segShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
-        @keyframes segPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
-        .seg-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 16px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .seg-tab:hover { border-color:${T.lineStrong}; color:#fff; }
-        .seg-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-        .seg-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
-          font-size:14px; border:1px solid ${T.line}; background:${T.glass}; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .seg-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
-        .seg-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .seg-chip { cursor:grab; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 16px; border-radius:14px;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:13.5px; font-weight:700; transition:all .14s; user-select:none; max-width:360px; text-align:left; line-height:1.4; }
-        .seg-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); }
-        .seg-chip[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.2); box-shadow:0 0 16px -5px ${accent}; }
-        .seg-chip:active { cursor:grabbing; }
-        .seg-row { border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:14px 16px; transition:all .16s; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
-        .seg-row[data-shake="true"] { animation:segShake .4s; border-color:${NO}; }
-        .seg-row[data-done="true"] { border-color:${OK}66; background:${OK}0f; }
-        .seg-slot { flex-shrink:0; min-width:170px; min-height:42px; border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset};
-          display:inline-flex; align-items:center; justify-content:center; color:${T.text3}; font-size:12.5px; transition:all .16s; cursor:pointer; padding:4px 10px; }
-        .seg-slot[data-armed="true"] { border-color:${accent}; background:rgba(${color.rgba},0.1); }
-        .seg-bin { border-radius:15px; border:1.5px solid ${T.line}; background:${T.glass}; padding:16px; transition:all .16s; min-height:230px; }
-        .seg-bin[data-shake="true"] { animation:segShake .4s; border-color:${NO}; }
-        .seg-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
-          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
-        .seg-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
-        .seg-q:disabled{ cursor:default; }
-        .seg-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
-          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .seg-btn:hover { border-color:${T.lineStrong}; }
-        .seg-divider { height:1px; background:${T.line}; margin:18px 0; }
-        @media (prefers-reduced-motion: reduce){ .seg-row[data-shake="true"], .seg-bin[data-shake="true"] { animation:none; } }
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      dom
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })),
+        valor: modo,
+        cambiar: (id) => setModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={resetActual} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      escena={
+        <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
+          <style>{css(accent, color.rgba)}</style>
 
-        /* Cajón de teoría */
-        .seg-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .seg-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .seg-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .seg-drawer[data-open="true"] { transform:translateX(0); }
-        .seg-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .seg-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .seg-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .seg-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .seg-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .seg-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .seg-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
+          {modo === "telefono" && (
+            <Telefono
+              indice={indice}
+              aviso={aviso}
+              decisiones={decisiones}
+              decidido={decidido}
+              revisado={!!(aviso && revisados[aviso.id])}
+              resumen={sim}
+              onRevisar={revisar}
+              onDecidir={decidir}
+              onSiguiente={() => setIndice((i) => i + 1)}
+              onReiniciar={reiniciarTelefono}
+              onVer={(i) => setIndice(i)}
+            />
+          )}
 
-        /* Identidad del tablero */
-        .seg-bin, .seg-row { --tono:188; position:relative;
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
-        .seg-bin:nth-of-type(6n+1), .seg-row:nth-of-type(6n+1) { --tono:188; }
-        .seg-bin:nth-of-type(6n+2), .seg-row:nth-of-type(6n+2) { --tono:262; }
-        .seg-bin:nth-of-type(6n+3), .seg-row:nth-of-type(6n+3) { --tono:44; }
-        .seg-bin:nth-of-type(6n+4), .seg-row:nth-of-type(6n+4) { --tono:152; }
-        .seg-bin:nth-of-type(6n+5), .seg-row:nth-of-type(6n+5) { --tono:330; }
-        .seg-bin:nth-of-type(6n+6), .seg-row:nth-of-type(6n+6) { --tono:18; }
-        .seg-bin::before, .seg-row::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
-          background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
-        .seg-bin[data-done="true"], .seg-row[data-done="true"] {
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.2) 0%, transparent 68%); }
-        .seg-chip { transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
-        .seg-chip:hover { transform:translateY(-2px); }
-        .seg-chip[data-sel="true"] { transform:translateY(-3px) scale(1.02); }
-        @media (prefers-reduced-motion: reduce){
-          .seg-chip, .seg-chip:hover, .seg-chip[data-sel="true"] { transform:none; transition:none; }
-        }
-      `}</style>
-
-      {/* selector de modo + toolbar */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="seg-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="seg-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="seg-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="seg-icobtn" onClick={resetActual} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <button className="seg-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="seg-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="seg-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="seg-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="seg-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="seg-drawer-body">
-          <FichaTeorica data={NAVEGACION_SEGURA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}>
-        {/* ── Columna principal ─────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
-          {/* MODO 1 — practicas */}
-          {/* MODO — completa el texto (fill_blanks verbatim de la progresión) */}
           {modo === "texto" && (
             <CompletaTexto
               key={textoIntento}
@@ -377,16 +357,11 @@ export function LabNavegacionSegura({ color }: PracticaLabProps) {
           )}
 
           {modo === "practicas" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada hábito a su categoría</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: practicasDone ? OK : T.text3 }}>
-                    {Object.keys(ubicPract).length}/{PRACTICAS.length}
-                  </span>
-                </div>
+            <Mesa>
+              <div>
+                {instruccion("Arrastra cada hábito a su categoría", `${Object.keys(ubicPract).length}/${PRACTICAS.length}`, practicasDone)}
                 {practLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+                  <div style={{ fontSize: 15, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
                     <i className="fa-solid fa-circle-check" /> ¡Clasificaste las {PRACTICAS.length} prácticas!
                   </div>
                 ) : (
@@ -399,42 +374,33 @@ export function LabNavegacionSegura({ color }: PracticaLabProps) {
                   </div>
                 )}
               </div>
-
               <BinsPracticas selPract={selPract} shakePract={shakePract} ubicPract={ubicPract} onMatch={intentarPract} dropProps={dropProps} />
-            </>
+            </Mesa>
           )}
 
-          {/* MODO 2 — amenazas */}
           {modo === "amenazas" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada amenaza a la defensa que la neutraliza</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: amenazasDone ? OK : T.text3 }}>
-                    {Object.keys(empAmen).length}/{AMENAZAS.length}
-                  </span>
-                </div>
+            <Mesa>
+              <div>
+                {instruccion("Arrastra cada amenaza a la defensa que la neutraliza", `${Object.keys(empAmen).length}/${AMENAZAS.length}`, amenazasDone)}
                 {amenLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+                  <div style={{ fontSize: 15, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
                     <i className="fa-solid fa-circle-check" /> ¡Emparejaste las {AMENAZAS.length} amenazas!
                   </div>
                 ) : (
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
                     {amenLibres.map((a) => (
                       <button key={a.id} className="seg-chip" data-sel={selAmen === a.id} onClick={() => setSelAmen((s) => (s === a.id ? null : a.id))} {...dragProps(a.id)}>
-                        <i className="fa-solid fa-triangle-exclamation" style={{ fontSize: 11, color: T.text3 }} />
+                        <i className="fa-solid fa-triangle-exclamation" style={{ fontSize: 14, color: T.text3 }} />
                         {a.amenaza}
                       </button>
                     ))}
                   </div>
                 )}
               </div>
-
               <RowsAmenazas selAmen={selAmen} shakeAmen={shakeAmen} empAmen={empAmen} onMatch={intentarAmen} dropProps={dropProps} />
-            </>
+            </Mesa>
           )}
 
-          {/* MODO 3 — glosario */}
           {modo === "glosario" && (
             <EscribeTermino
               key={glosIntento}
@@ -453,70 +419,397 @@ export function LabNavegacionSegura({ color }: PracticaLabProps) {
             />
           )}
         </div>
-
-        {/* ── Columna lateral ───────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? OK : T.text2 }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-                  <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
+      }
+      pestanas={[
+        {
+          id: "cuaderno",
+          etiqueta: "Cuaderno",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Tu partida" icono="fa-star">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8 }}>
+                  <Dato label="Dispositivo (simulación)" value={`${sim.seguridad}/100`} col={nSeg.color} />
+                  <Dato label="Datos expuestos (simulación)" value={`${sim.datos}/100`} col={nDat.color} />
+                  <Dato label="Decisiones acertadas" value={`${sim.bien}/${AVISOS.length}`} col={sim.bien >= 6 ? OK : undefined} />
+                  <Dato label="Revisó antes de decidir" value={`${sim.informadas}/${sim.procesados}`} />
                 </div>
-              ))}
-            </div>
-
-            <div className="seg-divider" />
-
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", color: T.text3, textTransform: "uppercase" }}>Puntuación</div>
-                <div style={{ display: "flex", gap: 4, marginTop: 5 }}>
-                  {[1, 2, 3].map((s) => (
-                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 18, color: s <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
-                  ))}
+                <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                  <div style={{ display: "flex", gap: 4 }}>
+                    {[1, 2, 3].map((s) => (
+                      <i key={s} className="fa-solid fa-star" style={{ fontSize: 20, color: s <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
+                    ))}
+                  </div>
+                  <span style={{ fontSize: 14, color: T.text2, lineHeight: 1.45, flex: "1 1 160px" }}>
+                    {bestEstrellas >= 3 ? "¡Navegas con higiene digital!" : "Termina los tres modos de clasificar y escribir para ganar 2★; la tercera pide 2 errores o menos."}
+                  </span>
                 </div>
-              </div>
-              <div style={{ textAlign: "right", maxWidth: 180 }}>
-                <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45 }}>
-                  {bestEstrellas >= 3 ? "¡Navegas con higiene digital!" : "Termina los tres modos para ganar 2★; la tercera pide 2 errores o menos."}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* pista del modo actual */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid rgba(${color.rgba},0.3)`, background: `rgba(${color.rgba},0.08)`, fontSize: 13, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              {modo === "practicas" && (
-                <>La <strong style={{ color: T.text }}>seguridad digital</strong> es higiene básica: contraseñas fuertes y únicas, <strong style={{ color: T.text }}>2FA</strong>, VPN en redes públicas y desconfiar de mensajes urgentes que piden tus datos.</>
+              </Bloque>
+              <Bloque titulo="Datos expuestos (simulación)" icono="fa-user-secret">
+                {sim.expuestos.length === 0 ? (
+                  <p style={{ margin: 0, color: T.text3 }}>Por ahora no se ha expuesto ningún dato.</p>
+                ) : (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                    {sim.expuestos.map((x) => (
+                      <span key={x} className="seg-dato">{x}</span>
+                    ))}
+                  </div>
+                )}
+              </Bloque>
+              {decisiones.map((d, i) => {
+                const a = AVISOS.find((x) => x.id === d.id)!;
+                const e = efectoDe(a, d.accion);
+                return (
+                  <Bloque key={d.id} titulo={`${i + 1}. ${a.remitente}`} icono={e.val === "bien" ? "fa-circle-check" : e.val === "mal" ? "fa-circle-xmark" : "fa-circle-minus"}>
+                    <p style={{ margin: 0, color: T.text2 }}>
+                      <strong style={{ color: T.text }}>Elegiste:</strong> {a.botones[d.accion === "abrir" ? 0 : d.accion === "ignorar" ? 1 : 2]}.
+                    </p>
+                    <p style={{ margin: 0, color: T.text2 }}>{e.texto}</p>
+                  </Bloque>
+                );
+              })}
+              {decisiones.length === 0 && (
+                <Bloque titulo="Tus decisiones" icono="fa-mobile-screen-button">
+                  <p style={{ margin: 0, color: T.text3 }}>Aún no hay decisiones. Decide qué hacer con el primer aviso en «Tu teléfono».</p>
+                </Bloque>
               )}
-              {modo === "amenazas" && (
-                <>Los tres riesgos principales son el <strong style={{ color: T.text }}>phishing</strong>, la <strong style={{ color: T.text }}>desinformación</strong> y la <strong style={{ color: T.text }}>vigilancia digital</strong>; cada uno tiene su propia defensa.</>
-              )}
-              {modo === "glosario" && (
-                <>Ya no se arrastra: lee la definición y su ejemplo y escribe el término. Si te atoras, la pista te da la inicial y las letras.</>
-              )}
-            </span>
-          </div>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />,
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book",
+          contenido: (
+            <>
+              <Bloque titulo="Práctica segura y riesgosa" icono="fa-shield-halved">
+                {(Object.keys(CATEGORIA_INFO) as Categoria[]).map((c) => (
+                  <p key={c} style={{ margin: 0, color: T.text2 }}>
+                    <strong style={{ color: T.text }}>{CATEGORIA_INFO[c].titulo}.</strong> {CATEGORIA_INFO[c].subtitulo}
+                  </p>
+                ))}
+              </Bloque>
+              <Bloque titulo="Amenazas y defensas" icono="fa-user-shield">
+                {AMENAZAS.map((a) => (
+                  <p key={a.id} style={{ margin: 0, color: T.text2 }}>
+                    <strong style={{ color: T.text }}>{a.amenaza}.</strong> {a.descripcion} <em>Defensa: {a.defensa}</em>
+                  </p>
+                ))}
+              </Bloque>
+              <Bloque titulo="Dato" icono="fa-circle-info">
+                <p style={{ margin: 0, color: T.text2 }}>{DATO_SEGURIDAD}</p>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={NAVEGACION_SEGURA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
+  );
+}
 
-          {/* dato verbatim */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid ${T.line}`, background: T.glass, fontSize: 12.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-circle-info" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>{DATO_SEGURIDAD}</span>
-          </div>
-        </div>
-      </div>
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Imagen con respaldo: degradado + ícono detrás; si la imagen no existe, se oculta.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+function Foto({ clave, icono, alt }: { clave: string; icono: string; alt: string }) {
+  const [falla, setFalla] = useState(false);
+  return (
+    <span className="seg-foto">
+      <i className={`fa-solid ${icono}`} aria-hidden />
+      {!falla && <img src={`${RUTA_FOTOS}/${clave}.webp`} alt={alt} loading="lazy" onError={() => setFalla(true)} />}
+    </span>
+  );
+}
 
-      <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />
+function Medidor({ label, valor, texto, color, icono }: { label: string; valor: number; texto: string; color: string; icono: string }) {
+  return (
+    <div className="seg-med" role="group" aria-label={`${label}: ${valor} de 100`}>
+      <span className="seg-med-top">
+        <span>
+          <i className={`fa-solid ${icono}`} style={{ color, marginRight: 7 }} aria-hidden />
+          {label}
+        </span>
+        <strong style={{ color }}>{texto}</strong>
+      </span>
+      <span className="seg-med-barra">
+        <span style={{ width: `${valor}%`, background: color }} />
+      </span>
     </div>
   );
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Simulador: tu teléfono
+ * ═══════════════════════════════════════════════════════════════════════════ */
+function Telefono({
+  indice,
+  aviso,
+  decisiones,
+  decidido,
+  revisado,
+  resumen,
+  onRevisar,
+  onDecidir,
+  onSiguiente,
+  onReiniciar,
+  onVer,
+}: {
+  indice: number;
+  aviso: Aviso | null;
+  decisiones: Decision[];
+  decidido: Decision | undefined;
+  revisado: boolean;
+  resumen: ReturnType<typeof calcular>;
+  onRevisar: () => void;
+  onDecidir: (a: Accion) => void;
+  onSiguiente: () => void;
+  onReiniciar: () => void;
+  onVer: (i: number) => void;
+}) {
+  const nSeg = nivelSeguridad(resumen.seguridad);
+  const nDat = nivelDatos(resumen.datos);
+  const efecto = aviso && decidido ? efectoDe(aviso, decidido.accion) : null;
+  const ultimo = indice >= AVISOS.length - 1;
+  const redAbierta = decisiones.some((d) => d.id === "a3" && d.accion === "abrir");
+  const mostrarSenales = !!aviso && (revisado || !!decidido);
+  const acciones: Accion[] = ["abrir", "ignorar", "reportar"];
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
+      <div className="seg-meds">
+        <Medidor label="Seguridad del dispositivo" valor={resumen.seguridad} texto={`${nSeg.texto} · ${resumen.seguridad}`} color={nSeg.color} icono="fa-shield-halved" />
+        <Medidor label="Datos personales expuestos" valor={resumen.datos} texto={`${nDat.texto} · ${resumen.datos}`} color={nDat.color} icono="fa-user-secret" />
+      </div>
+      <div className="seg-sim">Medidores y consecuencias de simulación: nada de esto ocurre de verdad.</div>
+
+      <div className="seg-ronda" role="tablist" aria-label="Avisos del teléfono">
+        {AVISOS.map((a, i) => {
+          const d = decisiones.find((x) => x.id === a.id);
+          const val = d ? efectoDe(a, d.accion).val : null;
+          const col = val === "bien" ? OK : val === "mal" ? NO : AVISO;
+          return (
+            <button
+              key={a.id}
+              type="button"
+              role="tab"
+              aria-selected={i === indice}
+              className="seg-pto"
+              data-sel={i === indice}
+              disabled={i > decisiones.length}
+              onClick={() => onVer(i)}
+              style={val ? { borderColor: col } : undefined}
+            >
+              {i + 1}
+              {val && <i className={`fa-solid ${val === "bien" ? "fa-check" : val === "mal" ? "fa-xmark" : "fa-minus"}`} aria-hidden style={{ color: col }} />}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="seg-tel">
+        <div className="seg-barra">
+          <span>9:41</span>
+          <span className="seg-barra-ico">
+            <i className="fa-solid fa-wifi" aria-hidden style={{ color: redAbierta ? NO : undefined }} />
+            {redAbierta && <em>red abierta</em>}
+            <i className="fa-solid fa-signal" aria-hidden />
+            <i className="fa-solid fa-battery-three-quarters" aria-hidden />
+          </span>
+        </div>
+
+        {aviso ? (
+          <div className="seg-cuerpo">
+            {aviso.foto && <Foto clave={aviso.foto} icono={aviso.icono} alt="Escena relacionada con el aviso" />}
+            <article className="seg-aviso">
+              <header>
+                <span className="seg-aviso-ico"><i className={`fa-solid ${aviso.icono}`} aria-hidden /></span>
+                <strong>{aviso.remitente}</strong>
+                <span className="seg-aviso-ahora">ahora</span>
+              </header>
+              <p>{aviso.texto}</p>
+            </article>
+
+            {mostrarSenales && (
+              <div className="seg-senales">
+                <strong>Señales que se ven al revisar</strong>
+                {aviso.senales.map((s) => (
+                  <div key={s.id} className="seg-senal" data-alerta={s.alerta}>
+                    <i className={`fa-solid ${s.icono}`} aria-hidden />
+                    <span>
+                      <strong>{s.titulo}.</strong> {s.texto}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {!decidido && (
+              <>
+                {!revisado && (
+                  <button type="button" className="seg-btn" onClick={onRevisar}>
+                    <i className="fa-solid fa-magnifying-glass" aria-hidden /> Revisar con calma (dominio, https, urgencia, permisos)
+                  </button>
+                )}
+                <div className="seg-acc">
+                  {acciones.map((ac, i) => (
+                    <button key={ac} type="button" className="seg-ac" onClick={() => onDecidir(ac)}>
+                      <i className={`fa-solid ${ac === "abrir" ? "fa-hand-pointer" : ac === "ignorar" ? "fa-eye-slash" : "fa-flag"}`} aria-hidden />
+                      <span>{aviso.botones[i]}</span>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        ) : (
+          <div className="seg-cuerpo">
+            <p className="seg-vacio">
+              <i className="fa-solid fa-inbox" aria-hidden /> Bandeja vacía. Procesaste los {AVISOS.length} avisos.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {aviso && decidido && efecto && (
+        <div className="seg-retro" data-val={efecto.val}>
+          <strong>
+            <i className={`fa-solid ${efecto.val === "bien" ? "fa-circle-check" : efecto.val === "mal" ? "fa-triangle-exclamation" : "fa-circle-minus"}`} aria-hidden />{" "}
+            {efecto.val === "bien" ? "Buena decisión" : efecto.val === "mal" ? "Mala decisión" : "Resultado regular"} · {aviso.trampa ? "Era un engaño o un riesgo" : "Era legítimo"}
+          </strong>
+          {decidido.accion === "abrir" && aviso.trampa && aviso.incidente && (
+            <span className="seg-incidente">
+              <i className="fa-solid fa-skull-crossbones" aria-hidden /> {aviso.incidente} (simulación)
+            </span>
+          )}
+          <span>{efecto.texto}</span>
+          <span className="seg-cambios">
+            Dispositivo <strong style={{ color: efecto.seg >= 0 ? OK : NO }}>{efecto.seg > 0 ? `+${efecto.seg}` : efecto.seg}</strong> · Datos expuestos{" "}
+            <strong style={{ color: efecto.datos <= 0 ? OK : NO }}>{efecto.datos > 0 ? `+${efecto.datos}` : efecto.datos}</strong>
+          </span>
+          <button type="button" className="seg-btn" style={{ background: "var(--lsa)", color: "#04121f", border: "none" }} onClick={onSiguiente}>
+            <i className={`fa-solid ${ultimo ? "fa-flag-checkered" : "fa-arrow-right"}`} aria-hidden /> {ultimo ? "Ver el resultado" : "Siguiente aviso"}
+          </button>
+        </div>
+      )}
+
+      {!aviso && (
+        <div className="seg-retro" data-val={resumen.seguridad >= 60 && resumen.datos <= 20 ? "bien" : "mal"}>
+          <strong>
+            <i className="fa-solid fa-flag-checkered" aria-hidden /> Resultado: dispositivo {nSeg.texto.toLowerCase()} ({resumen.seguridad}/100) · datos {nDat.texto.toLowerCase()} ({resumen.datos}/100)
+          </strong>
+          <span>
+            Acertaste {resumen.bien} de {AVISOS.length} decisiones; revisaste las señales antes de decidir en {resumen.informadas}.{" "}
+            {resumen.incidentes.length > 0 ? `Incidentes (simulación): ${resumen.incidentes.join(", ")}.` : "No hubo ningún incidente."}
+          </span>
+          <span className="seg-sim">Todo es simulación: dominios, apps y cifras ficticios.</span>
+          <button type="button" className="seg-btn" onClick={onReiniciar}>
+            <i className="fa-solid fa-rotate-left" aria-hidden /> Repetir con otra estrategia
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+const css = (accent: string, rgba: string) => `
+  @keyframes segShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
+  @keyframes segPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
+  .seg-chip { cursor:grab; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 16px; border-radius:14px;
+    border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:14.5px; font-weight:700; user-select:none; max-width:100%; text-align:left; line-height:1.4;
+    transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
+  .seg-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); transform:translateY(-2px); }
+  .seg-chip[data-sel="true"] { border-color:${accent}; background:rgba(${rgba},0.2); box-shadow:0 0 16px -5px ${accent}; transform:translateY(-3px) scale(1.02); }
+  .seg-chip:active { cursor:grabbing; }
+  .seg-row { border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:14px 16px; transition:all .16s; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .seg-row[data-shake="true"] { animation:segShake .4s; border-color:${NO}; }
+  .seg-row[data-done="true"] { border-color:${OK}66; background:${OK}0f; }
+  .seg-slot { flex-shrink:0; min-width:min(100%, 170px); min-height:42px; border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset};
+    display:inline-flex; align-items:center; justify-content:center; color:${T.text3}; font-size:14px; transition:all .16s; cursor:pointer; padding:4px 10px; }
+  .seg-slot[data-armed="true"] { border-color:${accent}; background:rgba(${rgba},0.1); }
+  .seg-bin { border-radius:15px; border:1.5px solid ${T.line}; background:${T.glass}; padding:16px; transition:all .16s; min-height:200px; }
+  .seg-bin[data-shake="true"] { animation:segShake .4s; border-color:${NO}; }
+  .seg-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
+    border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14.5px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
+  .seg-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
+  .seg-q:disabled{ cursor:default; }
+  .seg-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px; text-align:left;
+    border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:14.5px; font-weight:800; transition:all .14s; }
+  .seg-btn:hover { border-color:${T.lineStrong}; }
+
+  /* Simulador del teléfono */
+  .seg-meds { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap:10px; }
+  .seg-med { display:grid; gap:6px; padding:10px 12px; border-radius:12px; border:1.5px solid ${T.line}; background:${T.glass}; min-width:0; }
+  .seg-med-top { display:flex; justify-content:space-between; flex-wrap:wrap; gap:4px 8px; font-size:14px; font-weight:800; color:${T.text2}; }
+  .seg-med-top strong { font-size:14.5px; font-variant-numeric:tabular-nums; }
+  .seg-med-barra { display:block; height:8px; border-radius:6px; background:${T.inset}; overflow:hidden; }
+  .seg-med-barra > span { display:block; height:100%; border-radius:6px; transition:width .4s; }
+  .seg-sim { font-size:14px; color:${AVISO}; font-weight:700; }
+  .seg-ronda { display:flex; gap:8px; flex-wrap:wrap; }
+  .seg-pto { cursor:pointer; display:inline-flex; align-items:center; gap:5px; min-width:44px; height:40px; justify-content:center; border-radius:12px; border:2px solid ${T.line};
+    background:${T.glassSoft}; color:#fff; font-size:14.5px; font-weight:900; }
+  .seg-pto[data-sel="true"] { border-color:${accent}; box-shadow:0 0 14px -5px ${accent}; }
+  .seg-pto:disabled { opacity:.45; cursor:default; }
+  .seg-tel { width:100%; max-width:520px; margin:0 auto; border-radius:26px; border:3px solid ${T.lineStrong}; background:#060d18; overflow:hidden; min-width:0; }
+  .seg-barra { display:flex; justify-content:space-between; align-items:center; padding:8px 16px; font-size:14px; font-weight:800; color:${T.text2}; background:rgba(255,255,255,0.04); }
+  .seg-barra-ico { display:inline-flex; gap:8px; align-items:center; }
+  .seg-barra-ico em { font-style:normal; font-size:14px; color:${NO}; font-weight:800; }
+  .seg-cuerpo { display:flex; flex-direction:column; gap:12px; padding:12px; }
+  .seg-foto { position:relative; display:block; overflow:hidden; border-radius:14px; aspect-ratio:16/8; max-height:min(26vh, 200px); width:100%;
+    background:linear-gradient(135deg, rgba(${rgba},0.35), rgba(8,19,31,0.9)); }
+  .seg-foto > i { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:30px; color:rgba(255,255,255,0.5); }
+  .seg-foto > img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
+  .seg-aviso { border-radius:16px; border:1.5px solid ${T.line}; background:${T.glass}; padding:12px 14px; min-width:0; }
+  .seg-aviso header { display:flex; align-items:center; gap:10px; }
+  .seg-aviso header strong { flex:1; min-width:0; font-size:15px; color:#fff; overflow-wrap:anywhere; }
+  .seg-aviso-ico { flex-shrink:0; width:34px; height:34px; border-radius:10px; background:rgba(${rgba},0.25); display:flex; align-items:center; justify-content:center; color:#fff; font-size:15px; }
+  .seg-aviso-ahora { font-size:14px; color:${T.text3}; }
+  .seg-aviso p { margin:8px 0 0; font-size:15.5px; line-height:1.5; color:#fff; overflow-wrap:anywhere; }
+  .seg-senales { display:grid; gap:8px; padding:12px; border-radius:14px; border:1.5px solid ${T.line}; background:${T.inset}; }
+  .seg-senales > strong { font-size:14px; color:${T.text3}; letter-spacing:.04em; }
+  .seg-senal { display:flex; gap:10px; align-items:flex-start; font-size:14.5px; line-height:1.45; color:${T.text2}; }
+  .seg-senal i { flex-shrink:0; width:20px; text-align:center; margin-top:3px; color:${OK}; }
+  .seg-senal[data-alerta="true"] i { color:${NO}; }
+  .seg-senal strong { color:#fff; }
+  .seg-acc { display:grid; grid-template-columns:minmax(0,1fr); gap:10px; }
+  .seg-ac { cursor:pointer; display:flex; align-items:center; gap:10px; min-height:52px; padding:10px 12px; border-radius:13px; border:1.5px solid ${T.line};
+    background:${T.glassSoft}; color:#fff; font-size:14.5px; font-weight:800; text-align:left; line-height:1.3; transition:all .14s; }
+  .seg-ac i { flex-shrink:0; font-size:17px; color:${accent}; width:22px; text-align:center; }
+  .seg-ac:hover { border-color:${accent}; transform:translateY(-2px); }
+  .seg-ac:focus-visible, .seg-pto:focus-visible, .seg-btn:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
+  .seg-vacio { margin:0; padding:18px 8px; text-align:center; font-size:15px; color:${T.text2}; }
+  .seg-retro { display:flex; flex-direction:column; gap:8px; align-items:flex-start; padding:13px 15px; border-radius:13px; font-size:14.5px; line-height:1.5; color:${T.text2};
+    border:1.5px solid ${NO}66; background:${NO}10; }
+  .seg-retro[data-val="bien"] { border-color:${OK}66; background:${OK}10; }
+  .seg-retro[data-val="regular"] { border-color:${AVISO}66; background:${AVISO}10; }
+  .seg-retro strong { color:#fff; font-size:15px; }
+  .seg-incidente { padding:6px 10px; border-radius:10px; background:${NO}22; border:1.5px solid ${NO}88; color:#fff; font-weight:800; font-size:14.5px; }
+  .seg-cambios { font-size:14px; color:${T.text2}; }
+  .seg-dato { padding:6px 12px; border-radius:999px; border:1.5px solid ${NO}88; background:${NO}18; color:#fff; font-size:14px; font-weight:700; }
+
+  /* Identidad del tablero */
+  .seg-bin, .seg-row { --tono:188; position:relative;
+    background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
+  .seg-bin:nth-of-type(6n+1), .seg-row:nth-of-type(6n+1) { --tono:188; }
+  .seg-bin:nth-of-type(6n+2), .seg-row:nth-of-type(6n+2) { --tono:262; }
+  .seg-bin:nth-of-type(6n+3), .seg-row:nth-of-type(6n+3) { --tono:44; }
+  .seg-bin:nth-of-type(6n+4), .seg-row:nth-of-type(6n+4) { --tono:152; }
+  .seg-bin:nth-of-type(6n+5), .seg-row:nth-of-type(6n+5) { --tono:330; }
+  .seg-bin:nth-of-type(6n+6), .seg-row:nth-of-type(6n+6) { --tono:18; }
+  .seg-bin::before, .seg-row::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
+    background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
+  .seg-bin[data-done="true"], .seg-row[data-done="true"] {
+    background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.2) 0%, transparent 68%); }
+  @media (prefers-reduced-motion: reduce){ .seg-row[data-shake="true"], .seg-bin[data-shake="true"] { animation:none; } .seg-chip, .seg-chip:hover, .seg-chip[data-sel="true"], .seg-ac:hover { transform:none; transition:none; } .seg-med-barra > span { transition:none; } }
+`;
 
 /* ═══════════════════════════════════════════════════════════════════════════
  * Paneles de cada modo (componentes hijos: reciben los manejadores como props,
@@ -542,7 +835,7 @@ function BinsPracticas({
 }) {
   const bins: Categoria[] = ["segura", "riesgosa"];
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 200px), 1fr))", gap: 12 }}>
       {bins.map((bin) => {
         const info = CATEGORIA_INFO[bin];
         const dentro = PRACTICAS.filter((p) => ubicPract[p.id] === bin);
@@ -557,18 +850,17 @@ function BinsPracticas({
           >
             {/* La ilustración del concepto llenando la caja vacía. */}
             <FondoTermino termino={info.titulo} />
-            <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 10 }}>
               <VinetaTermino termino={info.titulo} color={bin === "segura" ? OK : NO} icono={info.icono} tam={29} radio={8} />
-              <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
+              <span style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
             </div>
-            <div style={{ fontSize: 11, color: T.text3, marginBottom: 12, lineHeight: 1.4 }}>{info.subtitulo}</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {dentro.length === 0 ? (
-                <div style={{ fontSize: 12, color: T.text3, opacity: 0.6, padding: "8px 0" }}>Arrastra aquí…</div>
+                <div style={{ fontSize: 14, color: T.text3, opacity: 0.7, padding: "8px 0" }}>Arrastra aquí…</div>
               ) : (
                 dentro.map((p) => (
-                  <span key={p.id} style={{ animation: "segPop .25s ease", display: "inline-flex", alignItems: "flex-start", gap: 7, padding: "8px 12px", borderRadius: 11, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 12.5, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>
-                    <i className="fa-solid fa-check" style={{ fontSize: 10, color: OK, marginTop: 3 }} />
+                  <span key={p.id} style={{ animation: "segPop .25s ease", display: "inline-flex", alignItems: "flex-start", gap: 7, padding: "8px 12px", borderRadius: 11, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 14, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>
+                    <i className="fa-solid fa-check" style={{ fontSize: 14, color: OK, marginTop: 2 }} />
                     {p.texto}
                   </span>
                 ))
@@ -609,20 +901,20 @@ function RowsAmenazas({
           >
             <div className="seg-slot" data-armed={!done && !!selAmen} style={done ? { borderStyle: "solid", borderColor: OK, background: `${OK}1a` } : undefined}>
               {done ? (
-                <span style={{ animation: "segPop .25s ease", fontSize: 13, fontWeight: 900, color: "#fff", display: "inline-flex", alignItems: "center", gap: 7 }}>
+                <span style={{ animation: "segPop .25s ease", fontSize: 14.5, fontWeight: 900, color: "#fff", display: "inline-flex", alignItems: "center", gap: 7 }}>
                   <i className="fa-solid fa-triangle-exclamation" />
                   {a.amenaza}
                 </span>
               ) : (
                 <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                  <i className="fa-solid fa-arrow-left" style={{ fontSize: 11 }} /> amenaza
+                  <i className="fa-solid fa-arrow-left" style={{ fontSize: 14 }} /> amenaza
                 </span>
               )}
             </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: done ? "#fff" : T.text2, lineHeight: 1.4 }}>{a.descripcion}</div>
-              <div style={{ fontSize: 12, color: done ? OK : T.text3, lineHeight: 1.45, marginTop: 5, display: "flex", gap: 7 }}>
-                <i className="fa-solid fa-shield-halved" style={{ fontSize: 11, marginTop: 2 }} />
+            <div style={{ flex: "1 1 200px", minWidth: 0 }}>
+              <div style={{ fontSize: 14.5, fontWeight: 700, color: done ? "#fff" : T.text2, lineHeight: 1.4 }}>{a.descripcion}</div>
+              <div style={{ fontSize: 14, color: done ? OK : T.text3, lineHeight: 1.45, marginTop: 5, display: "flex", gap: 7 }}>
+                <i className="fa-solid fa-shield-halved" style={{ fontSize: 14, marginTop: 3 }} />
                 <span>{a.defensa}</span>
               </div>
             </div>
@@ -673,19 +965,19 @@ function QuizCard({
   };
 
   return (
-    <div style={{ ...card, padding: "20px 24px 24px", marginTop: 22 }}>
+    <div>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4, flexWrap: "wrap" }}>
-        <Eyebrow>
+        <strong style={{ fontSize: 15, color: T.text }}>
           <i className="fa-solid fa-clipboard-question" style={{ marginRight: 8, color: accent }} />
           Comprueba lo aprendido
-        </Eyebrow>
+        </strong>
         {aprobado && (
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 12, fontWeight: 800, color: OK }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 14, fontWeight: 800, color: OK }}>
             <i className="fa-solid fa-circle-check" /> Aprobado
           </span>
         )}
       </div>
-      <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
         Seis afirmaciones sobre seguridad, normatividad y privacidad al navegar en internet. Decide si son verdaderas o falsas y pulsa «Comprobar».
       </div>
 
@@ -694,11 +986,11 @@ function QuizCard({
           const elegida = resp[qi];
           return (
             <div key={qi}>
-              <div style={{ fontSize: 14.5, fontWeight: 800, color: T.text, marginBottom: 11, display: "flex", gap: 10 }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: T.text, marginBottom: 11, display: "flex", gap: 10 }}>
                 <span style={{ color: accent }}>{qi + 1}.</span>
                 <span>{q.pregunta}</span>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 160px), 1fr))", gap: 9 }}>
                 {q.opciones.map((op, oi) => {
                   const sel = elegida === oi;
                   const esCorrecta = oi === q.correcta;
@@ -720,7 +1012,7 @@ function QuizCard({
                   }
                   return (
                     <button key={oi} className="seg-q" onClick={() => elegir(qi, oi)} disabled={comprobado} style={{ borderColor: borde, background: fondo, color: colorTxt }}>
-                      <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
+                      <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
                         {comprobado && esCorrecta ? <i className="fa-solid fa-check" /> : comprobado && sel ? <i className="fa-solid fa-xmark" /> : String.fromCharCode(65 + oi)}
                       </span>
                       <span style={{ flex: 1, lineHeight: 1.35 }}>{op}</span>
@@ -729,7 +1021,7 @@ function QuizCard({
                 })}
               </div>
               {comprobado && (
-                <div style={{ marginTop: 9, fontSize: 12.5, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
+                <div style={{ marginTop: 9, fontSize: 14, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
                   <i className="fa-solid fa-circle-info" style={{ color: accent, marginTop: 2 }} />
                   <span>{q.retro}</span>
                 </div>
@@ -752,7 +1044,7 @@ function QuizCard({
           </button>
         )}
         {comprobado && (
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 13.5, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 14.5, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
             <i className={`fa-solid ${aprobadoAhora ? "fa-trophy" : "fa-circle-half-stroke"}`} />
             {aciertos} / {total} correctas
             {!aprobadoAhora && <span style={{ color: T.text3, fontWeight: 600 }}>· revisa las marcadas e inténtalo de nuevo</span>}

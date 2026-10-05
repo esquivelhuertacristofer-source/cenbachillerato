@@ -1,0 +1,12 @@
+{
+  "escena": "Una mesa de redacción con seis conjuntos de datos inventados: tú eliges el tipo de gráfica y una lectora de prueba reacciona.",
+  "pregunta": "Dibujas con un gráfico de líneas los hogares con internet de 8 municipios sin orden. ¿Qué entiende la lectora?",
+  "opciones": [
+    { "id": "a", "texto": "Una tendencia inventada entre municipios", "icono": "fa-chart-line" },
+    { "id": "b", "texto": "Con claridad, qué municipio va atrás", "icono": "fa-circle-check" },
+    { "id": "c", "texto": "El porcentaje total de hogares conectados en la zona", "icono": "fa-percent" }
+  ],
+  "correcta": "a",
+  "porque": "La línea une puntos como si hubiera un orden o un paso del tiempo. Con categorías sueltas inventa una tendencia que no existe; las barras comparan sin sugerirla.",
+  "comoComprobarlo": "En el caso 1 elige «Líneas», lee la reacción de la lectora y luego cambia a «Barras» para comparar su respuesta."
+}

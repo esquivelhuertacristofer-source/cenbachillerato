@@ -1,0 +1,11 @@
+{
+  "slug": "reglas-ingles",
+  "items": [
+    { "clave": "biblioteca", "formato": "16:9", "estilo": "ilustracion", "escena": "Biblioteca escolar luminosa con estantes altos de libros antiguos, una mesa de lectura de madera y una mochila abierta sobre una silla, sin personas en primer plano" },
+    { "clave": "alberca", "formato": "16:9", "estilo": "ilustracion", "escena": "Alberca techada con carriles de agua azul, un trampolín al fondo y un salvavidas en una silla alta, varias gorras de natación apiladas en una banca al borde" },
+    { "clave": "salon-diccionario", "formato": "16:9", "estilo": "ilustracion", "escena": "Salón de clases con una mesa compartida por dos estudiantes, un diccionario grueso abierto en el centro y cuadernos alrededor, luz de ventana" },
+    { "clave": "laboratorio", "formato": "16:9", "estilo": "ilustracion", "escena": "Laboratorio de química con mesas de trabajo, matraces con líquidos de colores, un par de gafas de seguridad transparentes sobre la mesa y una regadera de emergencia al fondo" },
+    { "clave": "rio", "formato": "16:9", "estilo": "ilustracion", "escena": "Orilla de un río limpio rodeado de árboles, un grupo de estudiantes a lo lejos con mochilas y un bote de basura de metal al lado del sendero" },
+    { "clave": "viernes-salon", "formato": "16:9", "estilo": "ilustracion", "escena": "Pasillo de una escuela con estudiantes de espaldas con camisetas y camisas de colores casuales, mochilas al hombro, una corbata de uniforme colgada de un gancho en un casillero" }
+  ]
+}

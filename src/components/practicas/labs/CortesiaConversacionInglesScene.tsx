@@ -24,11 +24,11 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useLayoutEffect, useMemo, useRef, type ReactNode } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
-import { type Modo, type Escenario, type PersonajeId, type Emocion, type Etapa, type Aspecto, PERSONAJES, EMOCION_DEF, ETAPA_DEF, BANDA_DEF } from "./cortesia-conversacion-ingles-data";
+import { type Modo, type Escenario, type PersonajeId, type Emocion, type Etapa, type Aspecto, PERSONAJES, EMOCION_DEF, ETAPA_DEF, BANDA_DEF, bandaDe } from "./cortesia-conversacion-ingles-data";
 import { Escenario as EscenarioLab } from "./_escenario";
 
 type Pt = [number, number, number];
@@ -72,7 +72,7 @@ const WARN = "#fb923c";
  * Texto en escena (Html)
  * ════════════════════════════════════════════════════════════════════════ */
 
-function Etiqueta({ pos, children, col, fs = 11 }: { pos: Pt; children: ReactNode; col?: string; fs?: number }) {
+function Etiqueta({ pos, children, col, fs = 14 }: { pos: Pt; children: ReactNode; col?: string; fs?: number }) {
   return (
     <Html position={pos} center zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
       <div
@@ -85,7 +85,7 @@ function Etiqueta({ pos, children, col, fs = 11 }: { pos: Pt; children: ReactNod
           background: "rgba(4,10,22,0.84)",
           border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`,
           color: "#fff",
-          fontSize: fs,
+          fontSize: Math.max(14, fs),
           fontWeight: 800,
           whiteSpace: "nowrap",
           boxShadow: "0 6px 18px -8px #000",
@@ -97,7 +97,11 @@ function Etiqueta({ pos, children, col, fs = 11 }: { pos: Pt; children: ReactNod
   );
 }
 
-function Burbuja({ pos, quien, texto, col, lado, accion = false }: { pos: Pt; quien: string; texto: string; col: string; lado: "izq" | "der"; accion?: boolean }) {
+function Burbuja({ pos, quien, texto, col, lado, accion = false, emo }: { pos: Pt; quien: string; texto: string; col: string; lado: "izq" | "der"; accion?: boolean; emo?: Emocion }) {
+  const angosta = useThree((st) => st.size.width) < 640;
+  // En pantallas angostas las líneas largas viven en el panel (el diálogo ya está ahí).
+  if (angosta && texto.length > 44) return null;
+  const ed = emo && emo !== "neutral" ? EMOCION_DEF[emo] : null;
   return (
     <Html position={pos} zIndexRange={[40, 0]} style={{ pointerEvents: "none" }}>
       <div style={{ transform: `translate(${lado === "izq" ? "-78%" : "-22%"}, -100%)`, display: "flex", flexDirection: "column", alignItems: lado === "izq" ? "flex-end" : "flex-start" }}>
@@ -105,12 +109,12 @@ function Burbuja({ pos, quien, texto, col, lado, accion = false }: { pos: Pt; qu
           className="cc-burbuja"
           style={{
             width: "max-content",
-            maxWidth: 250,
+            maxWidth: "min(250px, 60vw)",
             padding: "7px 12px 8px",
             borderRadius: 13,
             background: "#fff",
             color: "#0f172a",
-            fontSize: 13,
+            fontSize: 14,
             fontWeight: 800,
             lineHeight: 1.35,
             boxShadow: "0 10px 26px -10px #000",
@@ -118,22 +122,18 @@ function Burbuja({ pos, quien, texto, col, lado, accion = false }: { pos: Pt; qu
             fontStyle: accion ? "italic" : "normal",
           }}
         >
-          <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: col, textTransform: "uppercase", marginBottom: 2, fontStyle: "normal" }}>{quien}</div>
+          <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.02em", color: col, marginBottom: 2, fontStyle: "normal" }}>
+            {quien}
+            {ed && (
+              <span style={{ color: "#334155", fontWeight: 800 }}>
+                {" · "}
+                <i className={`fa-solid ${ed.icono}`} style={{ color: ed.col }} /> {ed.es}
+              </span>
+            )}
+          </div>
           {texto}
         </div>
         <div style={{ width: 0, height: 0, margin: lado === "izq" ? "0 22% 0 0" : "0 0 0 22%", borderLeft: "7px solid transparent", borderRight: "7px solid transparent", borderTop: "9px solid #fff" }} />
-      </div>
-    </Html>
-  );
-}
-
-function EmoBadge({ pos, emo }: { pos: Pt; emo: Emocion }) {
-  const d = EMOCION_DEF[emo];
-  return (
-    <Html position={pos} center zIndexRange={[30, 0]} style={{ pointerEvents: "none" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "3px 8px 3px 5px", borderRadius: 999, background: "rgba(4,10,22,0.86)", border: `1px solid ${d.col}`, color: "#fff", fontSize: 10.5, fontWeight: 800, whiteSpace: "nowrap" }}>
-        <i className={`fa-solid ${d.icono}`} style={{ color: d.col, fontSize: 13 }} />
-        {d.es}
       </div>
     </Html>
   );
@@ -587,10 +587,6 @@ function Cafeteria({ mostrador }: { mostrador: boolean }) {
         {[0, 1, 2].map((k) => (
           <Caja key={k} p={[0.85, 2.55 - k * 0.2, -0.29]} s={[0.4, 0.05, 0.01]} c="#fcd34d" sombra={false} />
         ))}
-        <Etiqueta pos={[0, 2.9, -0.2]} col="#fcd34d">
-          <i className="fa-solid fa-utensils" style={{ color: "#fcd34d" }} />
-          Cafetería
-        </Etiqueta>
       </group>
       <Mesa p={[-3.1, 0, -0.9]} />
       <Mesa p={[3.9, 0, 0.6]} w={1.4} />
@@ -742,9 +738,6 @@ function Clinica() {
       <group position={[-1.9, 2.35, -2.63]}>
         <Caja p={[0, 0, 0]} s={[0.36, 0.1, 0.04]} c="#16a34a" e="#16a34a" ei={0.3} sombra={false} />
         <Caja p={[0, 0, 0]} s={[0.1, 0.36, 0.04]} c="#16a34a" e="#16a34a" ei={0.3} sombra={false} />
-        <Etiqueta pos={[0, -0.36, 0.05]} col="#34d399">
-          Clínica Los Pinos · Reception
-        </Etiqueta>
       </group>
       {/* Reloj */}
       <group position={[2.2, 2.45, -2.62]}>
@@ -884,12 +877,6 @@ function Videollamada() {
           </mesh>
           <Caja p={[0, -0.13, 0.02]} s={[0.22, 0.1, 0.01]} c="#2563eb" sombra={false} />
         </group>
-        <Html position={[-W / 2 + 0.34, H / 2 - 0.1, 0.03]} center zIndexRange={[12, 0]} style={{ pointerEvents: "none" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "2px 8px", borderRadius: 6, background: "rgba(0,0,0,0.6)", color: "#fff", fontSize: 10, fontWeight: 800, whiteSpace: "nowrap" }}>
-            <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#ef4444" }} />
-            Emily · Ohio
-          </div>
-        </Html>
       </group>
       {/* Escritorio, silla y objetos */}
       <group position={[0, 0, -0.25]}>
@@ -973,10 +960,12 @@ function PlacasEtapa({ centro, etapa, hechas }: { centro: Pt; etapa: Etapa | nul
                 <Mat c="#e2e8f0" />
               </mesh>
             )}
-            <Etiqueta pos={[0, 0.16, 0.32]} col={e === etapa ? d.col : hecha ? OK : undefined} fs={10}>
-              {hecha && <i className="fa-solid fa-check" style={{ color: OK }} />}
-              {d.en.toUpperCase()}
-            </Etiqueta>
+            {e === etapa && (
+              <Etiqueta pos={[0, 0.16, 0.32]} col={d.col}>
+                {hecha && <i className="fa-solid fa-check" style={{ color: OK }} />}
+                {d.en.toUpperCase()}
+              </Etiqueta>
+            )}
           </group>
         );
       })}
@@ -1036,10 +1025,15 @@ function Medidores({ pos, escala = 1, cortesia, fluidez }: { pos: Pt; escala?: n
               <meshStandardMaterial color="#e0f2fe" transparent opacity={0.18} roughness={0.05} metalness={0.1} side={THREE.DoubleSide} />
             </mesh>
             <Cil p={[0, 0.13 + ALTO, 0]} s={[0.11, 0.03, 0.11]} c="#94a3b8" m={0.7} r={0.3} />
-            <Etiqueta pos={[0, 1.4 + i * 0.26, 0]} fs={10}>
-              <i className={`fa-solid ${icono as string}`} style={{ color: "#7dd3fc" }} />
-              {nombre as string} {v === null ? "—" : `${v as number}%`}
-            </Etiqueta>
+            {i === 0 && (
+              <Etiqueta pos={[0.19, 1.45, 0]}>
+                <i className={`fa-solid ${icono as string}`} style={{ color: "#7dd3fc" }} />
+                {nombre as string} {v === null ? "—" : `${v as number}%`}
+                <span style={{ opacity: 0.5 }}>·</span>
+                <i className="fa-solid fa-water" style={{ color: "#7dd3fc" }} />
+                Fluidez {fluidez === null ? "—" : `${fluidez}%`}
+              </Etiqueta>
+            )}
           </group>
         );
       })}
@@ -1095,15 +1089,10 @@ function Indicador({ pos, aguja, objetivo, poste = true }: { pos: Pt; aguja: num
       <mesh geometry={G.esfera} position={[0, 0, 0.07]} scale={0.05}>
         <Mat c="#f8fafc" m={0.6} r={0.3} />
       </mesh>
-      {BANDAS.map((b, i) => {
-        const ang = Math.PI - (i + 0.5) * (Math.PI / 3);
-        return (
-          <Etiqueta key={b} pos={[Math.cos(ang) * 0.72, Math.sin(ang) * 0.72 + 0.04, 0.02]} col={BANDA_DEF[b].col} fs={10}>
-            {b}
-          </Etiqueta>
-        );
-      })}
-      <Etiqueta pos={[0, -0.24, 0.05]} fs={10} col="#fbbf24">
+      <Etiqueta pos={[0, -0.24, 0.05]} col={aguja === null ? "#fbbf24" : BANDA_DEF[bandaDe(aguja)].col}>
+        <i className="fa-solid fa-gauge-high" style={{ color: "#fbbf24" }} />
+        {aguja === null ? "…" : bandaDe(aguja)}
+        <span style={{ opacity: 0.5 }}>·</span>
         <i className="fa-solid fa-bullseye" style={{ color: "#fbbf24" }} />
         espera: {objetivo === "informal" ? "informal o neutral" : "formal"}
       </Etiqueta>
@@ -1155,11 +1144,13 @@ function TorreTurnos({ pos, escala = 1, lineas, nombreNpc, onTocar }: { pos: Pt;
             >
               <meshStandardMaterial color={col} emissive={col} emissiveIntensity={0.12} roughness={0.35} />
             </mesh>
-            <Etiqueta pos={[l.quien === "tu" ? -0.12 : 0.12, y, 0.16]} fs={9.5} col={l.estado !== "normal" ? col : undefined}>
-              {l.estado === "mal" && <i className="fa-solid fa-triangle-exclamation" style={{ color: WARN }} />}
-              {l.estado === "arreglada" && <i className="fa-solid fa-check" style={{ color: OK }} />}
-              {i + 1} · {l.quien === "tu" ? "Alex" : nombreNpc}
-            </Etiqueta>
+            {(l.activa || l.estado === "mal" || l.estado === "arreglada") && (
+              <Etiqueta pos={[l.quien === "tu" ? -0.12 : 0.12, y, 0.16]} col={l.estado !== "normal" ? col : undefined}>
+                {l.estado === "mal" && <i className="fa-solid fa-triangle-exclamation" style={{ color: WARN }} />}
+                {l.estado === "arreglada" && <i className="fa-solid fa-check" style={{ color: OK }} />}
+                {i + 1} · {l.quien === "tu" ? "Alex" : nombreNpc}
+              </Etiqueta>
+            )}
           </group>
         );
       })}
@@ -1182,13 +1173,25 @@ interface Distribucion {
 
 function distribucion(escenario: Escenario, npc: PersonajeId): Distribucion {
   if (escenario === "videollamada") {
-    return { tu: { pos: [-0.35, 0, 0.72], rotY: Math.PI, sentado: true }, npc: { pos: [0.05, 0, -1.95], rotY: 0 }, cam: [1.05, 2.05, 3.9], target: [0.1, 1.3, -0.6], instrumento: [-1.0, 0.77, -0.3], placas: [0.75, 0, 1.25] };
+    return { tu: { pos: [-0.35, 0, 0.72], rotY: Math.PI, sentado: true }, npc: { pos: [0.05, 0, -1.95], rotY: 0 }, cam: [1.05, 2.05, 3.9], target: [0.1, 0.95, -0.6], instrumento: [-1.0, 0.77, -0.3], placas: [0.75, 0, 1.25] };
   }
   const detras = escenario === "clinica" || npc === "lupita";
   if (detras) {
-    return { tu: { pos: [-0.75, 0, 0.62], rotY: 0.65 }, npc: { pos: [0.8, 0, -0.72], rotY: -0.55 }, cam: [0.15, 2.25, 4.9], target: [0.1, 1.05, 0], instrumento: [1.95, 0, 0.3], placas: [-0.15, 0, 0.9] };
+    return { tu: { pos: [-0.75, 0, 0.62], rotY: 0.65 }, npc: { pos: [0.8, 0, -0.72], rotY: -0.55 }, cam: [0.15, 2.25, 4.9], target: [0.1, 0.7, 0], instrumento: [1.95, 0, 0.3], placas: [-0.15, 0, 0.9] };
   }
-  return { tu: { pos: [-0.95, 0, 0.35], rotY: 0.8 }, npc: { pos: [0.72, 0, -0.1], rotY: -0.75 }, cam: [0.15, 2.25, 4.9], target: [0.0, 1.05, 0], instrumento: [1.95, 0, 0.3], placas: [-0.15, 0, 0.85] };
+  return { tu: { pos: [-0.95, 0, 0.35], rotY: 0.8 }, npc: { pos: [0.72, 0, -0.1], rotY: -0.75 }, cam: [0.15, 2.25, 4.9], target: [0.0, 0.7, 0], instrumento: [1.95, 0, 0.3], placas: [-0.15, 0, 0.85] };
+}
+
+/** En pantallas angostas se aleja la cámara (zoom) para que quepa todo el ancho. */
+function AjusteAngosto({ zoom }: { zoom: number }) {
+  const leer = useThree((st) => st.get);
+  const ancho = useThree((st) => st.size.width);
+  useLayoutEffect(() => {
+    const c = leer().camera as THREE.PerspectiveCamera;
+    c.zoom = ancho < 640 ? zoom : 1;
+    c.updateProjectionMatrix();
+  }, [leer, ancho, zoom]);
+  return null;
 }
 
 /* ── Escena ───────────────────────────────────────────────────────────── */
@@ -1214,6 +1217,7 @@ export default function CortesiaConversacionInglesScene(p: CortesiaSceneProps) {
           que el escenario la MIDE de la propia escena al montarse, en
           vez de que alguien la adivine. */}
       <EscenarioLab acento="#38bdf8" />
+      <AjusteAngosto zoom={0.7} />
       <hemisphereLight args={["#fff7ed", "#334155", 0.35]} />
       <pointLight position={[-3, 2.6, 2.5]} intensity={0.18} color={modoColor} />
 
@@ -1233,9 +1237,18 @@ export default function CortesiaConversacionInglesScene(p: CortesiaSceneProps) {
       <OrbeTurno a={orbeTu} b={orbeNpc} habla={p.habla} color={p.orbeColor} />
 
       {p.tuDice && <Burbuja pos={[cabezaTu[0], cabezaTu[1] + 0.08, cabezaTu[2]]} quien="Alex (tú)" texto={p.tuDice} col="#3b82f6" lado="izq" accion={p.tuAccion} />}
-      {p.npcDice && <Burbuja pos={[cabezaNpc[0], cabezaNpc[1] + (video ? 0.02 : 0.3), cabezaNpc[2]]} quien={npcDef.nombre} texto={p.npcDice} col={npc === "recepcionista" ? "#0f766e" : npcDef.aspecto.camisa} lado="der" />}
-      {!p.npcDice && <Etiqueta pos={[cabezaNpc[0], cabezaNpc[1] + 0.12, cabezaNpc[2]]}>{npcDef.nombre}</Etiqueta>}
-      <EmoBadge pos={[cabezaNpc[0] + 0.42, cabezaNpc[1] - 0.3, cabezaNpc[2]]} emo={p.npcEmo} />
+      {p.npcDice && <Burbuja pos={[cabezaNpc[0], cabezaNpc[1] + (video ? 0.02 : 0.3), cabezaNpc[2]]} quien={npcDef.nombre} texto={p.npcDice} col={npc === "recepcionista" ? "#0f766e" : npcDef.aspecto.camisa} lado="der" emo={p.npcEmo} />}
+      {!p.npcDice && (
+        <Etiqueta pos={[cabezaNpc[0], cabezaNpc[1] + 0.12, cabezaNpc[2]]}>
+          {npcDef.nombre}
+          {p.npcEmo !== "neutral" && (
+            <>
+              <i className={`fa-solid ${EMOCION_DEF[p.npcEmo].icono}`} style={{ color: EMOCION_DEF[p.npcEmo].col }} />
+              {EMOCION_DEF[p.npcEmo].es}
+            </>
+          )}
+        </Etiqueta>
+      )}
 
       {vista === "conversar" && (
         <>

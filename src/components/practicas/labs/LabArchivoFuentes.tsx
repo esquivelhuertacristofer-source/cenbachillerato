@@ -25,6 +25,7 @@ import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, OK, card, Eyebrow, SceneBoundary } from "./_kit";
 import { FichaTeorica } from "./_ficha";
+import { LabShell, Bloque, BotonHerramienta } from "./_shell";
 import { RetoQuizCard } from "./_reto-quiz";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { LabSfx } from "./lab-audio";
@@ -92,7 +93,7 @@ const ArchivoScene = dynamic(() => import("./ArchivoFuentesScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-box-archive fa-fade" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Abriendo el archivo en 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Abriendo el archivo en 3D…</span>
     </div>
   ),
 });
@@ -144,19 +145,19 @@ function ConfiableCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: 
           ¿Sirve para esta pregunta?
         </Eyebrow>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 10.5, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
           {[1, 2, 3].map((k) => (
-            <i key={k} className="fa-solid fa-star" style={{ fontSize: 13, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
+            <i key={k} className="fa-solid fa-star" style={{ fontSize: 14, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
           ))}
         </div>
       </div>
       {resuelto === null ? (
         <>
-          <div style={{ fontSize: 11, color: T.text3, fontWeight: 800, marginBottom: 8 }}>
+          <div style={{ fontSize: 14, color: T.text3, fontWeight: 800, marginBottom: 8 }}>
             Caso {pos + 1} de {ronda.length} · la misma fuente puede servir para una pregunta y no para otra
           </div>
           <div style={{ display: "grid", gap: 6, marginBottom: 12 }}>
-            <div style={{ fontSize: 12, color: T.text2 }}>
+            <div style={{ fontSize: 14, color: T.text2 }}>
               <i className="fa-solid fa-file-lines" style={{ marginRight: 7, color: accent }} />
               Fuente: <strong style={{ color: "#fff" }}>{actual.fuente}</strong>
             </div>
@@ -175,7 +176,7 @@ function ConfiableCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: 
               No es buena evidencia para esto
             </button>
           </div>
-          {aviso && <div style={{ marginTop: 10, fontSize: 12, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
+          {aviso && <div style={{ marginTop: 10, fontSize: 14, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
         </>
       ) : (
         <div style={{ padding: "12px 14px", borderRadius: 11, border: `1px solid ${OK}55`, background: "rgba(52,211,153,0.08)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
@@ -183,9 +184,9 @@ function ConfiableCard({ accent, rgba, mejor, onResultado, playSfx }: { accent: 
             {[1, 2, 3].map((k) => (
               <i key={k} className="fa-solid fa-star" style={{ fontSize: 15, color: k <= resuelto ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
             ))}
-            <span style={{ fontSize: 12.5, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
+            <span style={{ fontSize: 14, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
           </span>
-          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 12.5, fontWeight: 900 }}>
+          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 14, fontWeight: 900 }}>
             <i className="fa-solid fa-shuffle" style={{ marginRight: 8 }} />
             Otra ronda
           </button>
@@ -248,7 +249,6 @@ export function LabArchivoFuentes({ color }: PracticaLabProps) {
 
   // ── Comunes
   const [resetNonce, setResetNonce] = useState(0);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   const { mejorEstrellas, registraEstrellas: guardaEstrellas } = useEstrellas(RETO_KEY);
@@ -463,6 +463,7 @@ export function LabArchivoFuentes({ color }: PracticaLabProps) {
 
   /* ── Objetivos ─────────────────────────────────────────────────────── */
   const objetivos: { t: string; done: boolean }[] = [
+    { t: "Examina tres zonas de un documento y mira qué campos de la ficha se desbloquean", done: Object.values(vistas).some((z) => (z?.length ?? 0) >= 3) },
     { t: "Examinar con la lupa las seis zonas de un documento, incluido el reverso", done: docExaminado },
     { t: "Llenar correctamente la ficha de procedencia de los cuatro documentos", done: fichados.length === DOCUMENTOS.length },
     { t: "Tender bien los hilos y dictaminar las tres afirmaciones del tablero", done: resueltas.length === AFIRMACIONES.length },
@@ -505,13 +506,13 @@ export function LabArchivoFuentes({ color }: PracticaLabProps) {
         <i className={`fa-solid ${def.icono}`} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{def.etq}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los resultados siguen aquí. {pie}</div>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los resultados siguen aquí. {pie}</div>
     </div>
   );
 
-  const sub = (txt: string) => <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
+  const sub = (txt: string) => <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
   const nota = (txt: ReactNode, col: string, icono = "fa-circle-info") => (
-    <div style={{ marginTop: 10, fontSize: 12, lineHeight: 1.55, color: col }}>
+    <div style={{ marginTop: 10, fontSize: 14, lineHeight: 1.55, color: col }}>
       <i className={`fa-solid ${icono}`} style={{ marginRight: 7 }} />
       {txt}
     </div>
@@ -546,12 +547,12 @@ export function LabArchivoFuentes({ color }: PracticaLabProps) {
         </div>
         {zona && (
           <div style={{ marginTop: 10, padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.45)", border: `1px solid ${modoCol}44` }}>
-            <div style={{ fontSize: 11, fontWeight: 900, color: modoCol, marginBottom: 4 }}>
+            <div style={{ fontSize: 14, fontWeight: 900, color: modoCol, marginBottom: 4 }}>
               <i className={`fa-solid ${ZONA_DEF[zona].icono}`} style={{ marginRight: 6 }} />
               {ZONA_DEF[zona].etq} — lo que dice
             </div>
-            <div style={{ fontSize: 12.5, color: "#fff", lineHeight: 1.5 }}>{doc.zonas[zona]}</div>
-            <div style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.5, marginTop: 6 }}>
+            <div style={{ fontSize: 14, color: "#fff", lineHeight: 1.5 }}>{doc.zonas[zona]}</div>
+            <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5, marginTop: 6 }}>
               <i className="fa-solid fa-magnifying-glass" style={{ marginRight: 6, color: modoCol }} />
               {doc.pistas[zona]}
             </div>
@@ -565,7 +566,7 @@ export function LabArchivoFuentes({ color }: PracticaLabProps) {
             const elegido = resp[c];
             return (
               <div key={c} style={{ opacity: desbloqueado ? 1 : 0.5 }}>
-                <div style={{ fontSize: 11.5, fontWeight: 900, color: "#fff", marginBottom: 5 }}>
+                <div style={{ fontSize: 14, fontWeight: 900, color: "#fff", marginBottom: 5 }}>
                   {cd.etq} <span style={{ color: T.text3, fontWeight: 700 }}>· {cd.pregunta}</span>
                   {!desbloqueado && (
                     <span style={{ color: T.text3, fontWeight: 700 }}>
@@ -607,14 +608,14 @@ export function LabArchivoFuentes({ color }: PracticaLabProps) {
         {comprobada && !fichaCompleta && erroresFicha.length > 0 && nota(`${erroresFicha.length} ${erroresFicha.length === 1 ? "campo no coincide" : "campos no coinciden"} con lo que muestra el documento. Vuelve a examinar la zona y corrige.`, WARN)}
         {fichaCompleta && (
           <div style={{ marginTop: 10, padding: "10px 12px", borderRadius: 11, border: `1px solid ${OK}55`, background: "rgba(52,211,153,0.07)" }}>
-            <div style={{ fontSize: 12, color: OK, fontWeight: 900, marginBottom: 4 }}>
+            <div style={{ fontSize: 14, color: OK, fontWeight: 900, marginBottom: 4 }}>
               <i className="fa-solid fa-scale-balanced" style={{ marginRight: 6 }} />
               Valoración de la fuente
             </div>
-            <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.5 }}>
+            <div style={{ fontSize: 14, color: "#fff", lineHeight: 1.5 }}>
               <strong>Útil para:</strong> {doc.util}
             </div>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5, marginTop: 3 }}>
+            <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5, marginTop: 3 }}>
               <strong style={{ color: "#fbbf24" }}>Cuidado:</strong> {doc.cuidado}
             </div>
             {fichados.length < DOCUMENTOS.length && (
@@ -647,7 +648,7 @@ export function LabArchivoFuentes({ color }: PracticaLabProps) {
         {lupaFalsa ? (
           <>
             {sub("Revisa cada fragmento con la lupa")}
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5, marginBottom: 8 }}>
+            <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5, marginBottom: 8 }}>
               La carta dice haberse escrito en Tampico el 19 de marzo de 1938, al día siguiente del anuncio. Para cada fragmento decide: ¿era posible en esa fecha?
             </div>
             <div style={{ display: "grid", gap: 8 }}>
@@ -655,7 +656,7 @@ export function LabArchivoFuentes({ color }: PracticaLabProps) {
                 const hecho = examinados.includes(i);
                 return (
                   <div key={i} className="af-frag" data-on={fragSel === i} style={{ ["--afc" as string]: hecho ? (fr.anacronismo ? "#f87171" : OK) : modoCol }}>
-                    <div style={{ fontSize: 12.5, color: "#fff", fontWeight: 700, lineHeight: 1.45, marginBottom: 6 }}>
+                    <div style={{ fontSize: 14, color: "#fff", fontWeight: 700, lineHeight: 1.45, marginBottom: 6 }}>
                       «{fr.texto}»
                       {hecho && <i className={`fa-solid ${fr.anacronismo ? "fa-triangle-exclamation" : "fa-check"}`} style={{ marginLeft: 7, color: fr.anacronismo ? "#f87171" : OK }} />}
                     </div>
@@ -681,7 +682,7 @@ export function LabArchivoFuentes({ color }: PracticaLabProps) {
             {sub("La afirmación")}
             <div style={{ fontSize: 14.5, color: "#fff", fontWeight: 900, lineHeight: 1.45 }}>«{af.texto}»</div>
             {sub("1 · Tiende un hilo desde cada fuente")}
-            <div style={{ display: "flex", gap: 14, flexWrap: "wrap", fontSize: 11, color: T.text3, marginBottom: 8 }}>
+            <div style={{ display: "flex", gap: 14, flexWrap: "wrap", fontSize: 14, color: T.text3, marginBottom: 8 }}>
               <span>
                 <i className="fa-solid fa-link" style={{ marginRight: 6, color: "#22c55e" }} />
                 hilo verde: la corrobora
@@ -702,7 +703,7 @@ export function LabArchivoFuentes({ color }: PracticaLabProps) {
                     <button className="af-fuente" onClick={() => { setFuenteSel(f); blip(); }} title={FUENTE_DEF[f].resumen}>
                       <i className={`fa-solid ${FUENTE_DEF[f].icono}`} style={{ marginRight: 7, color: modoCol }} />
                       {FUENTE_DEF[f].corta}
-                      <span style={{ display: "block", fontSize: 10.5, color: T.text3, fontWeight: 700, marginTop: 2 }}>{FUENTE_DEF[f].tipo}</span>
+                      <span style={{ display: "block", fontSize: 14, color: T.text3, fontWeight: 700, marginTop: 2 }}>{FUENTE_DEF[f].tipo}</span>
                     </button>
                     <div style={{ display: "flex", gap: 5 }}>
                       <button className="af-hilo" data-rel="corrobora" data-f={f} data-on={rel === "corrobora"} onClick={() => tender(f, rel === "corrobora" ? null : "corrobora")} title="Corrobora" aria-label={`${FUENTE_DEF[f].corta}: corrobora`}>
@@ -712,13 +713,13 @@ export function LabArchivoFuentes({ color }: PracticaLabProps) {
                         <i className="fa-solid fa-link-slash" />
                       </button>
                     </div>
-                    {mal && <div style={{ gridColumn: "1 / -1", fontSize: 11.5, color: WARN, lineHeight: 1.45 }}>{af.nota[f] ?? "Esta fuente no dice nada sobre la afirmación."}</div>}
+                    {mal && <div style={{ gridColumn: "1 / -1", fontSize: 14, color: WARN, lineHeight: 1.45 }}>{af.nota[f] ?? "Esta fuente no dice nada sobre la afirmación."}</div>}
                   </div>
                 );
               })}
             </div>
             {fuenteSel && (
-              <div style={{ marginTop: 8, fontSize: 11.5, color: T.text2, lineHeight: 1.5 }}>
+              <div style={{ marginTop: 8, fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
                 <i className="fa-solid fa-quote-left" style={{ marginRight: 6, color: modoCol }} />
                 {FUENTE_DEF[fuenteSel].etq}: {FUENTE_DEF[fuenteSel].resumen}
               </div>
@@ -777,10 +778,10 @@ export function LabArchivoFuentes({ color }: PracticaLabProps) {
           <>
             {sub("La publicación")}
             <div style={{ padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.45)", border: `1px solid ${T.line}` }}>
-              <div style={{ fontSize: 11, color: T.text3, fontWeight: 800 }}>
+              <div style={{ fontSize: 14, color: T.text3, fontWeight: 800 }}>
                 {POST.cuenta} · {POST.aviso}
               </div>
-              <div style={{ fontSize: 13, color: "#fff", fontWeight: 700, lineHeight: 1.45, marginTop: 4 }}>{POST.texto}</div>
+              <div style={{ fontSize: 14, color: "#fff", fontWeight: 700, lineHeight: 1.45, marginTop: 4 }}>{POST.texto}</div>
             </div>
             {sub("1 · ¿Qué está mal? Marca todo lo que aplique")}
             <div style={{ display: "grid", gap: 6 }}>
@@ -794,7 +795,7 @@ export function LabArchivoFuentes({ color }: PracticaLabProps) {
                       <i className={`fa-${on ? "solid" : "regular"} fa-square${on ? "-check" : ""}`} style={{ marginRight: 8 }} />
                       {p.texto}
                     </button>
-                    {problemasRevisados && !bien && <div style={{ fontSize: 11.5, color: WARN, margin: "4px 2px 0", lineHeight: 1.45 }}>{p.explica}</div>}
+                    {problemasRevisados && !bien && <div style={{ fontSize: 14, color: WARN, margin: "4px 2px 0", lineHeight: 1.45 }}>{p.explica}</div>}
                   </div>
                 );
               })}
@@ -811,7 +812,7 @@ export function LabArchivoFuentes({ color }: PracticaLabProps) {
             <label style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <i className="fa-solid fa-crop-simple" style={{ color: modoCol }} />
               <input type="range" aria-label="Recuperar la foto completa (%)" className="af-range" min={0} max={100} step={5} value={sinRecorte} onChange={(e) => { setSinRecorte(Number(e.target.value)); if (fotoVolteada) setFotoVolteada(false); }} style={{ ["--afc" as string]: modoCol }} />
-              <span style={{ width: 46, textAlign: "right", fontSize: 13, color: "#fff", fontWeight: 800 }}>{sinRecorte} %</span>
+              <span style={{ width: 46, textAlign: "right", fontSize: 14, color: "#fff", fontWeight: 800 }}>{sinRecorte} %</span>
             </label>
             <div className="af-opts" style={{ marginTop: 8 }}>
               <button className="af-opt af-voltear-foto" data-on={fotoVolteada} onClick={voltearFoto} style={{ ["--afc" as string]: modoCol }}>
@@ -827,8 +828,8 @@ export function LabArchivoFuentes({ color }: PracticaLabProps) {
             <textarea className="af-texto" aria-label="Tu publicación corregida" rows={5} value={borrador} disabled={publicado !== null} onChange={(e) => setBorrador(e.target.value)} placeholder="Ejemplo de inicio: Esta foto no es de 2017…" />
             <div style={{ display: "grid", gap: 4, marginTop: 8 }}>
               {criterios.map(({ c, ok }) => (
-                <div key={c.id} className="af-crit" data-ok={ok} style={{ fontSize: 11.5, color: ok ? OK : T.text2, lineHeight: 1.4 }}>
-                  <i className={`fa-solid ${ok ? "fa-circle-check" : "fa-circle"}`} style={{ marginRight: 7, fontSize: 10, color: ok ? OK : "rgba(255,255,255,0.25)" }} />
+                <div key={c.id} className="af-crit" data-ok={ok} style={{ fontSize: 14, color: ok ? OK : T.text2, lineHeight: 1.4 }}>
+                  <i className={`fa-solid ${ok ? "fa-circle-check" : "fa-circle"}`} style={{ marginRight: 7, fontSize: 14, color: ok ? OK : "rgba(255,255,255,0.25)" }} />
                   {c.etq}
                   {!ok && <span style={{ color: T.text3 }}> — {c.ayuda}</span>}
                 </div>
@@ -872,10 +873,10 @@ export function LabArchivoFuentes({ color }: PracticaLabProps) {
                 const m = matiz === f;
                 return (
                   <div key={f} className="af-fila" data-on={s || m} style={{ ["--afc" as string]: s ? modoCol : m ? "#fbbf24" : "rgba(255,255,255,0.12)" }}>
-                    <div style={{ fontSize: 12, fontWeight: 800, color: "#fff", minWidth: 0 }}>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: "#fff", minWidth: 0 }}>
                       <i className={`fa-solid ${FUENTE_DEF[f].icono}`} style={{ marginRight: 7, color: modoCol }} />
                       {FUENTE_DEF[f].corta}
-                      <span style={{ display: "block", fontSize: 10.5, color: T.text3, fontWeight: 700, marginTop: 2 }}>
+                      <span style={{ display: "block", fontSize: 14, color: T.text3, fontWeight: 700, marginTop: 2 }}>
                         {FUENTE_DEF[f].tipo}
                         {interpRevisada && ` · peso para esta pregunta: ${PESO_INTERP[f]}`}
                       </span>
@@ -913,11 +914,11 @@ export function LabArchivoFuentes({ color }: PracticaLabProps) {
             {interpRevisada && !evalInterp.lista && nota(evalInterp.mensajes.join(" ") || "Revisa tus elecciones.", WARN, "fa-rotate-left")}
             {interpRevisada && evalInterp.lista && (
               <div style={{ marginTop: 10, padding: "12px 14px", borderRadius: 12, border: `1px solid ${OK}55`, background: "rgba(52,211,153,0.07)" }}>
-                <div style={{ fontSize: 11, fontWeight: 900, color: OK, letterSpacing: "0.06em", marginBottom: 6 }}>TU INTERPRETACIÓN ARGUMENTADA</div>
-                <div style={{ fontSize: 12.5, color: "#fff", lineHeight: 1.6 }}>
+                <div style={{ fontSize: 14, fontWeight: 900, color: OK, letterSpacing: "0.06em", marginBottom: 6 }}>TU INTERPRETACIÓN ARGUMENTADA</div>
+                <div style={{ fontSize: 14, color: "#fff", lineHeight: 1.6 }}>
                   {TESIS.find((t) => t.id === tesis)!.texto} Lo sostienen {sostienen.map((f) => `${FUENTE_DEF[f].corta.toLowerCase()} (${FUENTE_DEF[f].tipo.toLowerCase()})`).join(", ")}: fuentes independientes de {evalInterp.tipos} tipos distintos. Como matiz, {matiz === "boletin" ? "el boletín de la compañía sostiene que las manifestaciones fueron organizadas" : "el diario oficialista exagera la unanimidad"}. {CONCLUSIONES.find((c) => c.id === conclusion)!.texto}
                 </div>
-                {evalInterp.mensajes.length > 0 && <div style={{ fontSize: 11.5, color: T.text2, marginTop: 6 }}>{evalInterp.mensajes.join(" ")}</div>}
+                {evalInterp.mensajes.length > 0 && <div style={{ fontSize: 14, color: T.text2, marginTop: 6 }}>{evalInterp.mensajes.join(" ")}</div>}
               </div>
             )}
           </>
@@ -928,359 +929,251 @@ export function LabArchivoFuentes({ color }: PracticaLabProps) {
 
   const tesisSel = TESIS.find((t) => t.id === tesis);
 
+  /* ── Medidor: el experimento central del lab ───────────────────────── */
+  const camposAbiertos = CAMPOS.filter((c) => vistasDoc.includes(CAMPO_DEF[c].zona)).length;
+  const aFavor = FUENTES_TABLERO.filter((f) => hilos[f] === "corrobora");
+  const enContra = FUENTES_TABLERO.filter((f) => hilos[f] === "contradice");
+  const tiposFavor = new Set(aFavor.map((f) => FUENTE_DEF[f].tipo)).size;
+  let medidores: { etq: string; val: number; max: number; col: string; txt: string }[];
+  if (modo === "ficha") {
+    medidores = [
+      { etq: "Zonas examinadas", val: vistasDoc.length, max: ZONAS.length, col: modoCol, txt: `${vistasDoc.length} de ${ZONAS.length}` },
+      { etq: "Campos de la ficha que ya puedes llenar", val: camposAbiertos, max: CAMPOS.length, col: OK, txt: `${camposAbiertos} de ${CAMPOS.length}` },
+    ];
+  } else if (modo === "corroborar" && !lupaFalsa) {
+    medidores = [
+      { etq: "Fuentes que la corroboran", val: aFavor.length, max: 4, col: "#22c55e", txt: `${aFavor.length} (${tiposFavor} ${tiposFavor === 1 ? "tipo" : "tipos"})` },
+      { etq: "Fuentes que la contradicen", val: enContra.length, max: 4, col: "#ef4444", txt: `${enContra.length}` },
+    ];
+  } else if (modo === "corroborar") {
+    medidores = [{ etq: "Anacronismos descubiertos", val: hallados, max: anacronismos.length, col: "#f87171", txt: `${hallados} de ${anacronismos.length}` }];
+  } else if (paso === "post") {
+    medidores = [{ etq: "Foto completa recuperada", val: sinRecorte, max: 100, col: modoCol, txt: `${sinRecorte} %` }];
+  } else {
+    medidores = [
+      { etq: "Peso de tus evidencias", val: Math.min(evalInterp.peso, PESO_MINIMO), max: PESO_MINIMO, col: evalInterp.peso >= PESO_MINIMO ? OK : "#fbbf24", txt: `${evalInterp.peso} de ${PESO_MINIMO}` },
+      { etq: "Tipos de fuente distintos", val: Math.min(evalInterp.tipos, 2), max: 2, col: evalInterp.tipos >= 2 ? OK : "#fbbf24", txt: `${evalInterp.tipos} (mínimo 2)` },
+    ];
+  }
+  const consecuencia =
+    modo === "ficha"
+      ? "Examina más zonas: cada una abre el campo de la ficha donde está la respuesta."
+      : modo === "corroborar" && !lupaFalsa
+        ? "Una sola fuente no corrobora: mira si tus hilos verdes vienen de tipos de fuente distintos."
+        : modo === "corroborar"
+          ? "Con dos anacronismos la carta deja de servir como evidencia de 1938."
+          : paso === "post"
+            ? "Al recuperar la foto completa cambia lo que la imagen dice."
+            : "Una conclusión es más sólida cuando el peso sube con fuentes independientes de varios tipos.";
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes afPulse { 0%,100%{ box-shadow:0 0 0 0 var(--afd); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .af-live-dot { animation: afPulse 1.6s ease-in-out infinite; }
-        @media (prefers-reduced-motion: reduce){ .af-live-dot { animation:none; } }
-        .af-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .af-grid { grid-template-columns: 1fr; } }
-        .af-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .af-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .af-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .af-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .af-tab { cursor:pointer; border:1px solid var(--afc); border-radius:12px; padding:11px 8px; text-align:center; background:transparent; transition:all .15s; color:#fff; }
-        .af-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
-        .af-tab:hover { background:rgba(255,255,255,0.06); }
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <ArchivoScene
+            vista={vista}
+            modoColor={modoCol}
+            resetNonce={resetNonce}
+            docId={doc.id}
+            volteado={volteado}
+            zona={zona}
+            zonasVistas={vistasDoc}
+            fichaCompleta={fichaCompleta}
+            afirmacionId={af.id}
+            hilos={hilos}
+            fuenteSel={fuenteSel}
+            veredicto={veredicto}
+            lupaFalsa={lupaFalsa}
+            fragSel={fragSel}
+            examinados={examinados}
+            sinRecorte={sinRecorte}
+            fotoVolteada={fotoVolteada}
+            publicado={publicado}
+            tesisOk={tesisSel ? tesisSel.correcta : null}
+            sostienen={sostienen}
+            matiz={matiz}
+            peso={evalInterp.peso}
+            lista={interpLista && evalInterp.lista}
+          />
+        </SceneBoundary>
+      }
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m, etiqueta: MODOS_DEF[m].etq, icono: MODOS_DEF[m].icono })),
+        valor: modo,
+        cambiar: (id) => cambiarModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar vista" onClick={reiniciar} />
+        </>
+      }
+      lectura={chipVivo}
+      objetivos={objetivos.map((o) => ({ txt: o.t, done: o.done }))}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Cuaderno",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              <style>{`
         .af-opts { display:flex; flex-wrap:wrap; gap:7px; }
-        .af-opt { cursor:pointer; border:1px solid var(--afc); border-radius:10px; padding:9px 12px; font-size:12px; font-weight:800; color:#fff; background:transparent; transition:all .15s; line-height:1.35; }
+        .af-opt { cursor:pointer; border:1px solid var(--afc); border-radius:10px; padding:9px 12px; font-size:14px; font-weight:800; color:#fff; background:transparent; transition:all .15s; line-height:1.35; }
         .af-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.78); }
         .af-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
         .af-opt:disabled { cursor:default; }
         .af-opt:disabled[data-on="false"] { opacity:0.55; }
-        .af-toggle { width:100%; cursor:pointer; border:1px solid var(--afc); border-radius:11px; padding:11px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:12.5px; font-weight:900; text-align:left; transition:all .15s; }
+        .af-toggle { width:100%; cursor:pointer; border:1px solid var(--afc); border-radius:11px; padding:11px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:14px; font-weight:900; text-align:left; transition:all .15s; }
         .af-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
         .af-toggle:disabled { cursor:default; opacity:0.7; }
         .af-range { flex:1; accent-color: var(--afc); }
         .af-fila { display:grid; grid-template-columns: minmax(0,1fr) auto; gap:8px; align-items:center; padding:7px 9px; border-radius:11px; border:1px solid var(--afc); background:rgba(4,10,22,0.35); transition:all .15s; }
         .af-fila[data-on="true"] { background:rgba(255,255,255,0.05); }
-        .af-fuente { cursor:pointer; border:none; background:transparent; color:#fff; font-size:12px; font-weight:800; text-align:left; padding:2px; min-width:0; }
-        .af-hilo { cursor:pointer; width:34px; height:30px; border-radius:8px; border:1px solid rgba(255,255,255,0.16); background:transparent; color:rgba(255,255,255,0.6); font-size:12px; transition:all .15s; }
+        .af-fuente { cursor:pointer; border:none; background:transparent; color:#fff; font-size:14px; font-weight:800; text-align:left; padding:2px; min-width:0; }
+        .af-hilo { cursor:pointer; width:34px; height:30px; border-radius:8px; border:1px solid rgba(255,255,255,0.16); background:transparent; color:rgba(255,255,255,0.6); font-size:14px; transition:all .15s; }
         .af-hilo[data-rel="corrobora"][data-on="true"] { background:#22c55e; border-color:#22c55e; color:#04121f; }
         .af-hilo[data-rel="contradice"][data-on="true"] { background:#ef4444; border-color:#ef4444; color:#fff; }
         .af-hilo:hover { border-color:rgba(255,255,255,0.4); }
-        .af-mini { cursor:pointer; border:1px solid rgba(255,255,255,0.16); border-radius:8px; padding:6px 9px; font-size:11px; font-weight:800; color:rgba(255,255,255,0.75); background:transparent; transition:all .15s; }
+        .af-mini { cursor:pointer; border:1px solid rgba(255,255,255,0.16); border-radius:8px; padding:6px 9px; font-size:14px; font-weight:800; color:rgba(255,255,255,0.75); background:transparent; transition:all .15s; }
         .af-mini[data-on="true"] { border-color:var(--afc); background:var(--afc); color:#04121f; }
         .af-mini:disabled { opacity:0.4; cursor:default; }
         .af-frag { padding:9px 11px; border-radius:11px; border:1px solid var(--afc); background:rgba(4,10,22,0.35); }
         .af-frag[data-on="true"] { background:rgba(255,255,255,0.05); }
-        .af-texto { width:100%; box-sizing:border-box; border-radius:11px; border:1.5px solid rgba(255,255,255,0.18); background:rgba(2,12,28,0.55); color:#fff; font-size:13px; line-height:1.5; padding:10px 12px; font-family:inherit; resize:vertical; outline:none; }
-        .af-texto:focus { border-color:${accent}; box-shadow:0 0 0 3px rgba(${color.rgba},0.18); }
-        .af-opt:focus-visible, .af-tab:focus-visible, .af-toggle:focus-visible, .af-icobtn:focus-visible, .af-range:focus-visible, .af-hilo:focus-visible, .af-mini:focus-visible, .af-fuente:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
-        @media (max-width: 1000px){ .af-bottom { grid-template-columns: 1fr !important; } }
-        .af-lectura { max-height: 380px; overflow-y:auto; padding-right:6px; }
-        .af-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .af-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .af-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61; background:linear-gradient(180deg,#06121e 0%,#040a16 100%);
-          border-left:1px solid rgba(${color.rgba},0.32); box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1); display:flex; flex-direction:column; }
-        .af-drawer[data-open="true"] { transform:translateX(0); }
-        .af-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .af-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .af-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .af-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .af-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:11px 16px; border-radius:999px;
-          border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800; background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
-        .af-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        .af-debate summary { cursor:pointer; font-size:12.5px; font-weight:800; color:#fff; }
-      `}</style>
-
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="af-tabs">
-          {MODOS.map((m) => {
-            const d = MODOS_DEF[m];
-            const col = `#${d.color.replace("#", "")}`;
-            const on = m === modo;
-            return (
-              <button key={m} className="af-tab" data-on={on} onClick={() => cambiarModo(m)} style={{ ["--afc" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? col : "inherit" }}>
-                  <i className={`fa-solid ${d.icono}`} />
+        .af-texto { width:100%; box-sizing:border-box; border-radius:11px; border:1.5px solid rgba(255,255,255,0.18); background:rgba(2,12,28,0.55); color:#fff; font-size:14px; line-height:1.5; padding:10px 12px; font-family:inherit; resize:vertical; outline:none; }
+        .af-debate summary { cursor:pointer; font-size:14px; font-weight:800; color:#fff; }
+              `}</style>
+              <Bloque titulo={`Medidor · ${def.etq}`} icono="fa-gauge-high">
+                <div style={{ display: "grid", gap: 10 }}>
+                  {medidores.map((md) => (
+                    <div key={md.etq} style={{ display: "grid", gap: 4 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, fontSize: 14, fontWeight: 800, color: "#fff" }}>
+                        <span>{md.etq}</span>
+                        <span style={{ fontFamily: "ui-monospace, monospace", color: md.col }}>{md.txt}</span>
+                      </div>
+                      <div style={{ height: 12, borderRadius: 6, background: "rgba(255,255,255,0.1)", overflow: "hidden" }}>
+                        <div style={{ width: `${md.max > 0 ? Math.min(100, (md.val / md.max) * 100) : 0}%`, height: "100%", background: md.col, transition: "width 200ms ease" }} />
+                      </div>
+                    </div>
+                  ))}
+                  <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>{consecuencia}</div>
                 </div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{d.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{d.subtitulo}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="af-grid">
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(460px, 62vh, 700px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.10) 0%, transparent 55%), linear-gradient(180deg,#120d08 0%,#0c0906 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <ArchivoScene
-                vista={vista}
-                modoColor={modoCol}
-                resetNonce={resetNonce}
-                docId={doc.id}
-                volteado={volteado}
-                zona={zona}
-                zonasVistas={vistasDoc}
-                fichaCompleta={fichaCompleta}
-                afirmacionId={af.id}
-                hilos={hilos}
-                fuenteSel={fuenteSel}
-                veredicto={veredicto}
-                lupaFalsa={lupaFalsa}
-                fragSel={fragSel}
-                examinados={examinados}
-                sinRecorte={sinRecorte}
-                fotoVolteada={fotoVolteada}
-                publicado={publicado}
-                tesisOk={tesisSel ? tesisSel.correcta : null}
-                sostienen={sostienen}
-                matiz={matiz}
-                peso={evalInterp.peso}
-                lista={interpLista && evalInterp.lista}
-              />
-            </SceneBoundary>
-
-            <div style={{ position: "absolute", top: 14, left: 16, right: 150, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, pointerEvents: "none" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)", maxWidth: "100%" }}>
-                <span className="af-live-dot" style={{ ["--afd" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol, flexShrink: 0 }} />
-                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3, flexShrink: 0 }}>EN VIVO</span>
-                <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)", flexShrink: 0 }} />
-                <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{chipVivo}</span>
+              </Bloque>
+              <Bloque titulo="Lo que ves" icono="fa-eye">
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55 }}>{pie}</div>
+              </Bloque>
+              <Bloque titulo={def.etq} icono={def.icono}>
+                {control}
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <>
+              <ConfiableCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
+              <RetoQuizCard quiz={QUIZ} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Sabes corroborar y validar evidencias." />
+              <div style={{ ...card, padding: "20px 20px 22px", marginTop: 22 }}>
+                <Eyebrow>
+                  <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
+                  Completa el texto (A6)
+                </Eyebrow>
+                <div style={{ marginTop: 12 }}>
+                  <CompletaTexto data={HUECOS_A6} accent={accent} rgba={color.rgba} completado={textoOk} onCompletado={() => { setTextoOk(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
+                </div>
               </div>
-            </div>
-
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="af-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría" aria-label="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="af-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"} aria-label={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="af-icobtn" onClick={reiniciar} title="Reiniciar vista" aria-label="Reiniciar vista">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 132px 14px 18px", background: "linear-gradient(0deg, rgba(8,5,2,0.94) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#f5ede0", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                {def.etq} — {def.subtitulo}
-              </div>
-              <div style={{ fontSize: 12, color: "#e3d8c6", lineHeight: 1.5, marginTop: 6 }}>{pie}</div>
-            </div>
-
-            <button className="af-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-          </div>
-
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-              Controles — {def.etq}
-            </Eyebrow>
-            <div style={{ marginTop: 12 }}>{control}</div>
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-box-archive" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>Expediente: {CASO_TITULO.toLowerCase()}</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-            <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.5, marginTop: 10, fontStyle: "italic" }}>Progresión 2: «{PROGRESION}»</div>
-          </div>
-
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #fcd34d55", background: "rgba(252,211,77,0.06)" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book-open" style={{ marginRight: 8, color: "#fcd34d" }} />
-              Lectura de la progresión
-            </Eyebrow>
-            <div style={{ fontSize: 13, color: "#fff", fontWeight: 800, lineHeight: 1.4, marginBottom: 10 }}>{TITULO_LECTURA}</div>
-            <div className="af-lectura" style={{ display: "grid", gap: 10, marginBottom: 12 }}>
-              {LECTURA.map((p, i) => (
-                <div key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>
-                  {p.texto}
-                  <span style={{ display: "block", fontSize: 10.5, color: T.text3, marginTop: 2 }}>— {p.fuente}</span>
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", marginBottom: 6 }}>PARA REFLEXIONAR (A7)</div>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5 }}>{REFLEXION_A7}</div>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />
-              Cómo usar el laboratorio
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-                Objetivos de la sesión
-              </Eyebrow>
-              <span className="af-conteo" style={{ fontSize: 11, fontWeight: 800, color: objetivos.every((o) => o.done) ? OK : T.text3 }}>
-                {objetivos.filter((o) => o.done).length}/{objetivos.length}
-              </span>
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} className="af-objetivo" data-done={o.done} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ marginTop: 2, fontSize: 13, color: o.done ? OK : "rgba(255,255,255,0.22)" }} />
-                  <span style={{ fontSize: 12, color: o.done ? "#fff" : T.text2, lineHeight: 1.4 }}>{o.t}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="af-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <div style={{ padding: "14px 16px", borderRadius: 12, border: `1px solid ${accent}33`, background: `rgba(${color.rgba},0.07)` }}>
-            <Eyebrow>
-              <i className="fa-solid fa-landmark" style={{ marginRight: 8, color: accent }} />
-              Contexto histórico (hechos verificables)
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 7 }}>
-              {CONTEXTO.map((c, i) => (
-                <div key={i} style={{ display: "grid", gridTemplateColumns: "118px minmax(0,1fr)", gap: 10, fontSize: 11.5, lineHeight: 1.45 }}>
-                  <span style={{ color: accent, fontWeight: 900 }}>{c.anio}</span>
-                  <span style={{ color: T.text2 }}>{c.texto}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />
-              Hechos (quiz A2)
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {HECHOS.map((h, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
-                  {h}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />
-              Glosario (A5)
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {GLOSARIO.map((gi, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{gi.termino}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
-                  <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.4, marginTop: 4 }}>
-                    <i className="fa-solid fa-feather-pointed" style={{ marginRight: 6, color: accent }} />
-                    {gi.ejemplo}
+            </>
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo={`Expediente: ${CASO_TITULO.toLowerCase()}`} icono="fa-box-archive">
+                <div style={{ color: T.text2 }}>{PROBLEMA}</div>
+                <div style={{ color: T.text3, fontStyle: "italic" }}>Progresión 2: «{PROGRESION}»</div>
+              </Bloque>
+              <Bloque titulo="Cómo usar el laboratorio" icono="fa-list-ol">
+                <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8 }}>
+                  {INSTRUCCIONES.map((p, i) => <li key={i}>{p}</li>)}
+                </ol>
+              </Bloque>
+              <Bloque titulo="Lectura de la progresión" icono="fa-book-open">
+                <div style={{ fontWeight: 800, color: "#fff" }}>{TITULO_LECTURA}</div>
+                {LECTURA.map((p, i) => (
+                  <div key={i} style={{ color: T.text2 }}>
+                    {p.texto}
+                    <span style={{ display: "block", fontSize: 14, color: T.text3, marginTop: 2 }}>— {p.fuente}</span>
                   </div>
+                ))}
+                <div style={{ fontSize: 14, fontWeight: 900, color: T.text3, letterSpacing: "0.08em" }}>PARA REFLEXIONAR (A7)</div>
+                <div style={{ color: T.text2 }}>{REFLEXION_A7}</div>
+              </Bloque>
+              <Bloque titulo="Contexto histórico (hechos verificables)" icono="fa-landmark">
+                <div style={{ display: "grid", gap: 8 }}>
+                  {CONTEXTO.map((c, i) => (
+                    <div key={i}>
+                      <strong style={{ color: accent }}>{c.anio}</strong>
+                      <div style={{ color: T.text2 }}>{c.texto}</div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11.5, color: T.text2, marginTop: 10 }}>
-              <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A5}
-            </div>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-comments" style={{ marginRight: 8, color: accent }} />
-              Debate (A3)
-            </Eyebrow>
-            <div style={{ fontSize: 12.5, color: "#fff", fontWeight: 800, lineHeight: 1.45, marginBottom: 8 }}>{DEBATE_A3.tema}</div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {DEBATE_A3.posturas.map((p, i) => (
-                <details key={i} className="af-debate" style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <summary>{p.postura}</summary>
-                  <ul style={{ margin: "8px 0 0", paddingLeft: 16, display: "grid", gap: 6 }}>
-                    {p.argumentos.map((a, k) => (
-                      <li key={k} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
-                        {a}
-                      </li>
-                    ))}
-                  </ul>
-                </details>
-              ))}
-            </div>
-            <div style={{ fontSize: 11, color: T.text3, marginTop: 8, lineHeight: 1.45 }}>En el expediente conviven un testimonio oral de 1988 y documentos escritos de 1938: pruébalos en la tarjeta de estrellas y en el tablero.</div>
-          </div>
-        </div>
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-            Ideas clave
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-            {IDEAS.map((x, i) => (
-              <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                {x}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          La progresión, los reactivos del video A1, los hechos del quiz A2, el debate A3, el quiz A4, el glosario A5, el texto A6, la pregunta de reflexión A7 y los párrafos de la lectura son <strong>verbatim</strong> del material de la plataforma (la lectura toma textos de A2 y A5 y de CH-III-P03-A1 y CH-III-P04-A1; A1 no trae retroalimentación, así que se usa la del reactivo equivalente de A2 o la definición de A5). El caso de la expropiación petrolera y la línea de contexto son <strong>históricos</strong>. La carta, la nota del diario «El Pueblo en Marcha», el boletín de la «Compañía Petrolera del Golfo», el telegrama, la fotografía recreada, su pie, el testimonio oral, la carta del ingeniero y la publicación de redes son <strong>ilustrativos</strong>: personas, medios, compañía y archivos ficticios, verosímiles para 1938. Los pesos de la balanza son un criterio didáctico. Fuente: {FUENTE}
-        </span>
-      </div>
-
-      <ConfiableCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
-
-      <RetoQuizCard quiz={QUIZ} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Sabes corroborar y validar evidencias." />
-
-      <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
-          Completa el texto (A6)
-        </Eyebrow>
-        <div style={{ marginTop: 12 }}>
-          <CompletaTexto data={HUECOS_A6} accent={accent} rgba={color.rgba} completado={textoOk} onCompletado={() => { setTextoOk(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
-        </div>
-      </div>
-
-      <div className="af-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="af-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="af-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="af-close" onClick={() => setDrawer(false)} title="Cerrar" aria-label="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="af-drawer-body">
-          <FichaTeorica data={ARCHIVO_FUENTES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+              </Bloque>
+              <Bloque titulo="Hechos (quiz A2)" icono="fa-circle-question">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {HECHOS.map((h, i) => <li key={i}>{h}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Glosario (A5)" icono="fa-book">
+                {GLOSARIO.map((gi, i) => (
+                  <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
+                    <strong style={{ color: accent }}>{gi.termino}. </strong>
+                    <span style={{ color: T.text2 }}>{gi.definicion}</span>
+                    <div style={{ color: T.text3, marginTop: 4 }}>
+                      <i className="fa-solid fa-feather-pointed" style={{ marginRight: 6, color: accent }} aria-hidden />
+                      {gi.ejemplo}
+                    </div>
+                  </div>
+                ))}
+                <div style={{ color: T.text2 }}>
+                  <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A5}
+                </div>
+              </Bloque>
+              <Bloque titulo="Debate (A3)" icono="fa-comments">
+                <div style={{ fontWeight: 800, color: "#fff" }}>{DEBATE_A3.tema}</div>
+                {DEBATE_A3.posturas.map((p, i) => (
+                  <details key={i} className="af-debate" style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
+                    <summary>{p.postura}</summary>
+                    <ul style={{ margin: "8px 0 0", paddingLeft: 18, display: "grid", gap: 6, color: T.text2 }}>
+                      {p.argumentos.map((a, k) => <li key={k}>{a}</li>)}
+                    </ul>
+                  </details>
+                ))}
+                <div style={{ color: T.text3 }}>En el expediente conviven un testimonio oral de 1988 y documentos escritos de 1938: pruébalos en la tarjeta de estrellas y en el tablero.</div>
+              </Bloque>
+              <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {IDEAS.map((x, i) => <li key={i}>{x}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={ARCHIVO_FUENTES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ marginTop: 18, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
+                La progresión, los reactivos del video A1, los hechos del quiz A2, el debate A3, el quiz A4, el glosario A5, el texto A6, la pregunta de reflexión A7 y los párrafos de la lectura son <strong>verbatim</strong> del material de la plataforma (la lectura toma textos de A2 y A5 y de CH-III-P03-A1 y CH-III-P04-A1; A1 no trae retroalimentación, así que se usa la del reactivo equivalente de A2 o la definición de A5). El caso de la expropiación petrolera y la línea de contexto son <strong>históricos</strong>. La carta, la nota del diario «El Pueblo en Marcha», el boletín de la «Compañía Petrolera del Golfo», el telegrama, la fotografía recreada, su pie, el testimonio oral, la carta del ingeniero y la publicación de redes son <strong>ilustrativos</strong>: personas, medios, compañía y archivos ficticios, verosímiles para 1938. Los pesos de la balanza son un criterio didáctico. Fuente: {FUENTE}
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }

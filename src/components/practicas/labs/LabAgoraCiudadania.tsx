@@ -25,6 +25,7 @@ import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, NUM, OK, card, Eyebrow, SceneBoundary } from "./_kit";
 import { FichaTeorica } from "./_ficha";
+import { LabShell, Bloque, BotonHerramienta } from "./_shell";
 import { RetoQuizCard } from "./_reto-quiz";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { LabSfx } from "./lab-audio";
@@ -90,7 +91,7 @@ const AgoraScene = dynamic(() => import("./AgoraCiudadaniaScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-landmark-dome fa-fade" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Construyendo el ágora en 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Construyendo el ágora en 3D…</span>
     </div>
   ),
 });
@@ -142,18 +143,18 @@ function CiudadaniaCard({ accent, rgba, mejor, onResultado, playSfx }: { accent:
           ¿Tenía ciudadanía?
         </Eyebrow>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 10.5, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
           {[1, 2, 3].map((k) => (
-            <i key={k} className="fa-solid fa-star" style={{ fontSize: 13, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
+            <i key={k} className="fa-solid fa-star" style={{ fontSize: 14, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
           ))}
         </div>
       </div>
       {resuelto === null ? (
         <>
-          <div style={{ fontSize: 11, color: T.text3, fontWeight: 800, marginBottom: 6 }}>
+          <div style={{ fontSize: 14, color: T.text3, fontWeight: 800, marginBottom: 6 }}>
             Caso {pos + 1} de {ronda.length} · ¿podía votar o participar en las decisiones políticas?
           </div>
-          <div style={{ fontSize: 13, color: accent, fontWeight: 900, marginBottom: 2 }}>{epoca.titulo}</div>
+          <div style={{ fontSize: 14, color: accent, fontWeight: 900, marginBottom: 2 }}>{epoca.titulo}</div>
           <div style={{ fontSize: 15.5, color: "#fff", fontWeight: 800, lineHeight: 1.45, marginBottom: 12 }}>{grupo.etq}</div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             <button className="ag-opt ag-est" data-v="si" data-on="true" onClick={() => responder(true)} style={{ ["--agc" as string]: OK }}>
@@ -165,7 +166,7 @@ function CiudadaniaCard({ accent, rgba, mejor, onResultado, playSfx }: { accent:
               No, quedaba fuera
             </button>
           </div>
-          {aviso && <div style={{ marginTop: 10, fontSize: 12, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
+          {aviso && <div style={{ marginTop: 10, fontSize: 14, color: WARN, lineHeight: 1.5 }}>{aviso} Inténtalo de nuevo.</div>}
         </>
       ) : (
         <div style={{ padding: "12px 14px", borderRadius: 11, border: `1px solid ${OK}55`, background: "rgba(52,211,153,0.08)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
@@ -173,9 +174,9 @@ function CiudadaniaCard({ accent, rgba, mejor, onResultado, playSfx }: { accent:
             {[1, 2, 3].map((k) => (
               <i key={k} className="fa-solid fa-star" style={{ fontSize: 15, color: k <= resuelto ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
             ))}
-            <span style={{ fontSize: 12.5, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
+            <span style={{ fontSize: 14, fontWeight: 900, color: OK, marginLeft: 4 }}>Ronda con {errores === 0 ? "cero errores" : `${errores} ${errores === 1 ? "error" : "errores"}`}</span>
           </span>
-          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 12.5, fontWeight: 900 }}>
+          <button onClick={otra} style={{ cursor: "pointer", padding: "9px 14px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 14, fontWeight: 900 }}>
             <i className="fa-solid fa-shuffle" style={{ marginRight: 8 }} />
             Otra ronda
           </button>
@@ -238,7 +239,6 @@ export function LabAgoraCiudadania({ color }: PracticaLabProps) {
 
   // ── Comunes
   const [resetNonce, setResetNonce] = useState(0);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   const { mejorEstrellas, registraEstrellas: guardaEstrellas } = useEstrellas(RETO_KEY);
@@ -451,6 +451,7 @@ export function LabAgoraCiudadania({ color }: PracticaLabProps) {
 
   /* ── Objetivos ─────────────────────────────────────────────────────── */
   const objetivos: { t: string; done: boolean }[] = [
+    { t: "Marca una condición de la convocatoria y mira cómo cambia la vista previa de la asamblea", done: condiciones.length > 0 },
     { t: "Abrir el ágora en las ocho épocas, de Atenas a la paridad", done: reveladas.size === EPOCAS.length },
     { t: "Predecir sin errores quién entra en al menos tres épocas", done: sinErrores.size >= 3 },
     { t: "Descubrir qué cambió en 1917 y en 2014–2019, aunque la multitud no cambie", done: preguntasOk },
@@ -489,13 +490,13 @@ export function LabAgoraCiudadania({ color }: PracticaLabProps) {
         <i className={`fa-solid ${def.icono}`} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{def.etq}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los resultados siguen aquí. {pie}</div>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los controles y los resultados siguen aquí. {pie}</div>
     </div>
   );
 
-  const sub = (txt: string) => <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
+  const sub = (txt: string) => <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
   const nota = (txt: ReactNode, col: string, icono = "fa-circle-info") => (
-    <div style={{ marginTop: 10, fontSize: 12, lineHeight: 1.55, color: col }}>
+    <div style={{ marginTop: 10, fontSize: 14, lineHeight: 1.55, color: col }}>
       <i className={`fa-solid ${icono}`} style={{ marginRight: 7 }} />
       {txt}
     </div>
@@ -511,13 +512,13 @@ export function LabAgoraCiudadania({ color }: PracticaLabProps) {
           {EPOCAS.map((e, i) => (
             <button key={e.id} className="ag-epoca" data-on={i === epocaIdx} data-hecha={reveladas.has(e.id)} onClick={() => elegirEpoca(i)} style={{ ["--agc" as string]: modoCol }}>
               <span className="ag-punto" />
-              <span style={{ fontSize: 11, fontWeight: 900 }}>{e.etq}</span>
-              {reveladas.has(e.id) && <span style={{ fontSize: 10, color: sinErrores.has(e.id) ? OK : T.text3, ...NUM }}>{pct(porcentajeEntra(e))}</span>}
+              <span style={{ fontSize: 14, fontWeight: 900 }}>{e.etq}</span>
+              {reveladas.has(e.id) && <span style={{ fontSize: 14, color: sinErrores.has(e.id) ? OK : T.text3, ...NUM }}>{pct(porcentajeEntra(e))}</span>}
             </button>
           ))}
         </div>
         {sub(`${epoca.titulo} · la norma`)}
-        {caja(<div style={{ fontSize: 12.5, color: "#fff", lineHeight: 1.5 }}>{epoca.norma}</div>, `${modoCol}44`)}
+        {caja(<div style={{ fontSize: 14, color: "#fff", lineHeight: 1.5 }}>{epoca.norma}</div>, `${modoCol}44`)}
         {sub(revelada ? "Resultado de tu predicción" : "1 · Predice: ¿quién podía votar o participar?")}
         <div style={{ display: "grid", gap: 7 }}>
           {epoca.grupos.map((g) => {
@@ -527,7 +528,7 @@ export function LabAgoraCiudadania({ color }: PracticaLabProps) {
               <div key={g.id} className="ag-grupo" style={{ borderColor: revelada ? (bien ? `${OK}66` : `${WARN}88`) : T.line }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 9, flexWrap: "wrap" }}>
                   <span style={{ width: 11, height: 11, borderRadius: 4, background: g.color, flexShrink: 0 }} />
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: "#fff", flex: 1, minWidth: 140 }}>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: "#fff", flex: 1, minWidth: 140 }}>
                     {g.etq} <span style={{ color: T.text3, fontWeight: 700, ...NUM }}>· {g.n}</span>
                   </span>
                   {[true, false].map((entra) => {
@@ -542,7 +543,7 @@ export function LabAgoraCiudadania({ color }: PracticaLabProps) {
                   })}
                 </div>
                 {revelada && (
-                  <div style={{ marginTop: 6, fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
+                  <div style={{ marginTop: 6, fontSize: 14, color: T.text2, lineHeight: 1.45 }}>
                     <i className={`fa-solid ${bien ? "fa-circle-check" : "fa-circle-xmark"}`} style={{ marginRight: 6, color: bien ? OK : WARN }} />
                     {g.porque}
                   </div>
@@ -566,14 +567,14 @@ export function LabAgoraCiudadania({ color }: PracticaLabProps) {
               erroresEpoca === 0 ? OK : WARN,
               erroresEpoca === 0 ? "fa-circle-check" : "fa-rotate-left",
             )}
-            <div style={{ marginTop: 10, fontSize: 11.5, color: T.text3 }}>
+            <div style={{ marginTop: 10, fontSize: 14, color: T.text3 }}>
               <i className="fa-solid fa-chair" style={{ marginRight: 6, color: "#f472b6" }} />
               Tribuna: {epoca.notaTribuna}
             </div>
             {epoca.pregunta && (
               <>
                 {sub("2 · ¿Qué cambió?")}
-                <div style={{ fontSize: 12.5, color: "#fff", fontWeight: 800, marginBottom: 8 }}>{epoca.pregunta.texto}</div>
+                <div style={{ fontSize: 14, color: "#fff", fontWeight: 800, marginBottom: 8 }}>{epoca.pregunta.texto}</div>
                 <div style={{ display: "grid", gap: 6 }}>
                   {epoca.pregunta.opciones.map((o, k) => {
                     const on = respuesta === k;
@@ -611,19 +612,19 @@ export function LabAgoraCiudadania({ color }: PracticaLabProps) {
                 const p = porcentajeEntra(e);
                 return (
                   <div key={e.id} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, flex: 1, minWidth: 0 }}>
-                    <span style={{ fontSize: 9.5, color: on ? "#fff" : T.text3, fontWeight: 800, ...NUM }}>{on ? pct(p) : "?"}</span>
+                    <span style={{ fontSize: 14, color: on ? "#fff" : T.text3, fontWeight: 800, ...NUM }}>{on ? pct(p) : "?"}</span>
                     <div style={{ width: "100%", height: 64, display: "flex", alignItems: "flex-end" }}>
                       <div style={{ width: "100%", height: on ? `${p * 100}%` : "6%", borderRadius: "4px 4px 0 0", background: on ? (e.id === epoca.id ? modoCol : `${modoCol}88`) : "rgba(255,255,255,0.08)", transition: "height .5s" }} />
                     </div>
-                    <span style={{ fontSize: 9, color: T.text3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "100%" }}>{e.etq}</span>
+                    <span style={{ fontSize: 14, color: T.text3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "100%" }}>{e.etq}</span>
                   </div>
                 );
               })}
             </div>
           </>
         )}
-        {epoca.id === "paridad" && revelada && <div style={{ marginTop: 12, fontSize: 11.5, color: T.text2, lineHeight: 1.5, fontStyle: "italic" }}>{ART_34_VIGENTE}</div>}
-        <div style={{ marginTop: 10, fontSize: 11, color: T.text3, lineHeight: 1.5 }}>Normas, fechas y artículos son históricos (las citas marcadas como paráfrasis no son textuales). La composición de la multitud y la tribuna es ilustrativa y aproximada, no censal.</div>
+        {epoca.id === "paridad" && revelada && <div style={{ marginTop: 12, fontSize: 14, color: T.text2, lineHeight: 1.5, fontStyle: "italic" }}>{ART_34_VIGENTE}</div>}
+        <div style={{ marginTop: 10, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>Normas, fechas y artículos son históricos (las citas marcadas como paráfrasis no son textuales). La composición de la multitud y la tribuna es ilustrativa y aproximada, no censal.</div>
       </>
     );
   } else if (modo === "asamblea") {
@@ -643,11 +644,11 @@ export function LabAgoraCiudadania({ color }: PracticaLabProps) {
         {sub("El problema")}
         {caja(
           <>
-            <div style={{ fontSize: 12.5, color: "#fff", lineHeight: 1.5, marginBottom: 8 }}>{caso.problema}</div>
+            <div style={{ fontSize: 14, color: "#fff", lineHeight: 1.5, marginBottom: 8 }}>{caso.problema}</div>
             <div style={{ display: "grid", gap: 4 }}>
               {OPCIONES.map((o) => (
-                <div key={o} style={{ fontSize: 12, color: T.text2 }}>
-                  <span style={{ display: "inline-block", width: 18, height: 18, borderRadius: 5, marginRight: 8, textAlign: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: COLOR_OPCION[o] }}>{o}</span>
+                <div key={o} style={{ fontSize: 14, color: T.text2 }}>
+                  <span style={{ display: "inline-block", width: 18, height: 18, borderRadius: 5, marginRight: 8, textAlign: "center", fontSize: 14, fontWeight: 900, color: "#04121f", background: COLOR_OPCION[o] }}>{o}</span>
                   {caso.opciones[o]}
                 </div>
               ))}
@@ -656,12 +657,12 @@ export function LabAgoraCiudadania({ color }: PracticaLabProps) {
           `${modoCol}44`,
         )}
         <details style={{ marginTop: 10 }}>
-          <summary style={{ cursor: "pointer", fontSize: 12, fontWeight: 800, color: T.text2 }}>Los vecinos: qué necesita cada grupo</summary>
+          <summary style={{ cursor: "pointer", fontSize: 14, fontWeight: 800, color: T.text2 }}>Los vecinos: qué necesita cada grupo</summary>
           <div style={{ display: "grid", gap: 6, marginTop: 8 }}>
             {caso.grupos.map((g) => {
               const cond = CONDICIONES.find((c) => c.id === g.barrera);
               return (
-                <div key={g.id} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45, paddingLeft: 10, borderLeft: `3px solid ${g.color}` }}>
+                <div key={g.id} style={{ fontSize: 14, color: T.text2, lineHeight: 1.45, paddingLeft: 10, borderLeft: `3px solid ${g.color}` }}>
                   <strong style={{ color: "#fff" }}>
                     {g.etq} ({g.n}
                     {g.soloVoz ? ", menores: voz sin voto" : ""})
@@ -701,7 +702,7 @@ export function LabAgoraCiudadania({ color }: PracticaLabProps) {
             </button>
           ))}
         </div>
-        <div style={{ marginTop: 8, fontSize: 11.5, color: T.text2, lineHeight: 1.5 }}>
+        <div style={{ marginTop: 8, fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
           <strong style={{ color: "#fff" }}>{PROCEDIMIENTOS.find((p) => p.id === proc)!.etq}:</strong> {PROCEDIMIENTOS.find((p) => p.id === proc)!.regla} ({PROCEDIMIENTOS.find((p) => p.id === proc)!.sesiones})
         </div>
         <button className="ag-toggle ag-celebrar" onClick={celebrar} style={{ marginTop: 12, ["--agc" as string]: modoCol }}>
@@ -713,13 +714,13 @@ export function LabAgoraCiudadania({ color }: PracticaLabProps) {
             {sub("3 · Resultado")}
             {caja(
               <>
-                <div style={{ fontSize: 13.5, fontWeight: 900, color: COLOR_OPCION[res.ganador], marginBottom: 8 }}>
+                <div style={{ fontSize: 14, fontWeight: 900, color: COLOR_OPCION[res.ganador], marginBottom: 8 }}>
                   <i className="fa-solid fa-flag-checkered" style={{ marginRight: 8 }} />
                   {etiquetaGanador(casoIdx, res.ganador)}
                 </div>
                 <div style={{ display: "grid", gap: 5 }}>
                   {OPCIONES.map((o) => (
-                    <div key={o} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 11.5, ...NUM }}>
+                    <div key={o} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, ...NUM }}>
                       <span style={{ width: 14, fontWeight: 900, color: COLOR_OPCION[o] }}>{o}</span>
                       <div style={{ flex: 1, height: 9, borderRadius: 5, background: "rgba(255,255,255,0.06)", overflow: "hidden" }}>
                         <div style={{ width: `${(res.votos[o] / maxVotos) * 100}%`, height: "100%", background: res.descartadas.includes(o) && proc === "consulta" ? "#475569" : COLOR_OPCION[o] }} />
@@ -730,7 +731,7 @@ export function LabAgoraCiudadania({ color }: PracticaLabProps) {
                     </div>
                   ))}
                 </div>
-                <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5, marginTop: 9 }}>{res.explica}</div>
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5, marginTop: 9 }}>{res.explica}</div>
               </>,
               `${COLOR_OPCION[res.ganador]}55`,
             )}
@@ -742,9 +743,9 @@ export function LabAgoraCiudadania({ color }: PracticaLabProps) {
                 { etq: "Apoyo en la colonia", v: pct(res.apoyo), sub: "1.ª o 2.ª opción de los adultos", ok: res.apoyo >= 0.5 },
               ].map((m) => (
                 <div key={m.etq} className="ag-metrica" style={{ borderColor: m.ok ? `${OK}44` : `${WARN}55` }}>
-                  <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.06em", color: T.text3, textTransform: "uppercase" }}>{m.etq}</div>
+                  <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.06em", color: T.text3, textTransform: "uppercase" }}>{m.etq}</div>
                   <div style={{ fontSize: 15, fontWeight: 900, color: m.ok ? OK : WARN, marginTop: 3, ...NUM }}>{m.v}</div>
-                  <div style={{ fontSize: 10.5, color: T.text3 }}>{m.sub}</div>
+                  <div style={{ fontSize: 14, color: T.text3 }}>{m.sub}</div>
                 </div>
               ))}
             </div>
@@ -772,7 +773,7 @@ export function LabAgoraCiudadania({ color }: PracticaLabProps) {
               {PROCEDIMIENTOS.filter((p) => hist[p.id]).map((p) => {
                 const h = hist[p.id]!;
                 return (
-                  <div key={p.id} style={{ display: "flex", gap: 8, fontSize: 11.5, color: T.text2, alignItems: "center", flexWrap: "wrap", ...NUM }}>
+                  <div key={p.id} style={{ display: "flex", gap: 8, fontSize: 14, color: T.text2, alignItems: "center", flexWrap: "wrap", ...NUM }}>
                     <span style={{ width: 150, fontWeight: 800, color: "#fff" }}>{p.etq}</span>
                     <span style={{ flex: 1, minWidth: 120, color: COLOR_OPCION[h.ganador] }}>{h.ganador === "nada" ? "sin acuerdo" : h.ganador === "mixta" ? "propuesta mixta" : `${h.ganador} · ${caso.opciones[h.ganador]}`}</span>
                     <span>{pct(h.participacion)} participa</span>
@@ -782,7 +783,7 @@ export function LabAgoraCiudadania({ color }: PracticaLabProps) {
             </div>
           </>
         )}
-        <div style={{ marginTop: 10, fontSize: 11, color: T.text3, lineHeight: 1.5 }}>No hay un procedimiento «correcto»: cada uno equilibra rapidez, participación y protección de minorías de forma distinta. La colonia, sus vecinos y sus preferencias son ilustrativos.</div>
+        <div style={{ marginTop: 10, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>No hay un procedimiento «correcto»: cada uno equilibra rapidez, participación y protección de minorías de forma distinta. La colonia, sus vecinos y sus preferencias son ilustrativos.</div>
       </>
     );
   } else {
@@ -799,8 +800,8 @@ export function LabAgoraCiudadania({ color }: PracticaLabProps) {
         {sub("Debate A2")}
         {caja(
           <>
-            <div style={{ fontSize: 13, color: "#fff", fontWeight: 900, lineHeight: 1.45 }}>«{DEBATE_A2.tema}»</div>
-            <div style={{ fontSize: 11, color: T.text3, marginTop: 4 }}>Tiempo de argumentación sugerido: {DEBATE_A2.tiempoMinutos} minutos · modalidad escrita</div>
+            <div style={{ fontSize: 14, color: "#fff", fontWeight: 900, lineHeight: 1.45 }}>«{DEBATE_A2.tema}»</div>
+            <div style={{ fontSize: 14, color: T.text3, marginTop: 4 }}>Tiempo de argumentación sugerido: {DEBATE_A2.tiempoMinutos} minutos · modalidad escrita</div>
           </>,
           `${modoCol}44`,
         )}
@@ -833,7 +834,7 @@ export function LabAgoraCiudadania({ color }: PracticaLabProps) {
                 )}
                 <div style={{ marginTop: 10, display: "grid", gap: 3 }}>
                   {TIPOS.map((t) => (
-                    <div key={t.id} style={{ fontSize: 11, color: T.text3 }}>
+                    <div key={t.id} style={{ fontSize: 14, color: T.text3 }}>
                       <strong style={{ color: t.color }}>{t.etq}:</strong> {t.explica}
                     </div>
                   ))}
@@ -867,7 +868,7 @@ export function LabAgoraCiudadania({ color }: PracticaLabProps) {
             {sub("Reglas del debate (A2)")}
             <ol style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 4 }}>
               {DEBATE_A2.reglas.map((r, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: revision ? (revision.reglas[i] ? OK : WARN) : T.text2, lineHeight: 1.4 }}>
+                <li key={i} style={{ fontSize: 14, color: revision ? (revision.reglas[i] ? OK : WARN) : T.text2, lineHeight: 1.4 }}>
                   {r}
                   {revision && <i className={`fa-solid ${revision.reglas[i] ? "fa-check" : "fa-xmark"}`} style={{ marginLeft: 6 }} />}
                 </li>
@@ -897,14 +898,14 @@ export function LabAgoraCiudadania({ color }: PracticaLabProps) {
                 return (
                   <div key={h.id}>
                     {sub(`${hi + 2} · ${h.etq}`)}
-                    <div style={{ fontSize: 11, color: T.text3, marginBottom: 6 }}>{h.ayuda}</div>
+                    <div style={{ fontSize: 14, color: T.text3, marginBottom: 6 }}>{h.ayuda}</div>
                     <div style={{ display: "grid", gap: 5 }}>
                       {fichas.map((f) => {
                         const on = intervencion[h.id] === f.id;
                         const col = on && rev ? (rev.ok ? OK : WARN) : modoCol;
                         return (
                           <button key={f.id} className="ag-ficha" data-h={h.id} data-id={f.id} data-on={on} onClick={() => ponerFicha(h.id, f.id)} style={{ ["--agc" as string]: col, background: on ? `${col}1c` : "transparent" }}>
-                            <i className={`fa-solid ${on ? "fa-circle-dot" : "fa-circle"}`} style={{ marginRight: 8, color: on ? col : T.text3, fontSize: 10 }} />
+                            <i className={`fa-solid ${on ? "fa-circle-dot" : "fa-circle"}`} style={{ marginRight: 8, color: on ? col : T.text3, fontSize: 14 }} />
                             {f.texto}
                           </button>
                         );
@@ -923,7 +924,7 @@ export function LabAgoraCiudadania({ color }: PracticaLabProps) {
                 {sub("Criterios de evaluación (A2)")}
                 <div style={{ display: "grid", gap: 5 }}>
                   {DEBATE_A2.criterios.map((c, i) => (
-                    <div key={i} style={{ fontSize: 12, color: revision.criterios[i] ? OK : WARN, lineHeight: 1.4 }}>
+                    <div key={i} style={{ fontSize: 14, color: revision.criterios[i] ? OK : WARN, lineHeight: 1.4 }}>
                       <i className={`fa-solid ${revision.criterios[i] ? "fa-circle-check" : "fa-circle-xmark"}`} style={{ marginRight: 7 }} />
                       {c}
                     </div>
@@ -941,41 +942,108 @@ export function LabAgoraCiudadania({ color }: PracticaLabProps) {
             )}
           </>
         )}
-        <div style={{ marginTop: 10, fontSize: 11, color: T.text3, lineHeight: 1.5 }}>Tema, posturas, reglas, argumentos guía y criterios son verbatim de A2. Las réplicas, las propuestas y las afirmaciones a clasificar son del laboratorio (salvo la cifra del CONEVAL, del recuadro de A1).</div>
+        <div style={{ marginTop: 10, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>Tema, posturas, reglas, argumentos guía y criterios son verbatim de A2. Las réplicas, las propuestas y las afirmaciones a clasificar son del laboratorio (salvo la cifra del CONEVAL, del recuadro de A1).</div>
       </>
     );
   }
 
+  /* ── Medidor: el experimento central del lab ───────────────────────── */
+  // Vista previa en vivo de la asamblea: se recalcula con cada condición y cada procedimiento.
+  const previa = modo === "asamblea" ? resolverAsamblea(caso, condiciones, proc) : null;
+  const llenosDebate = HUECOS_DEBATE.filter((h) => !!intervencion[h.id]).length + (intervencion.postura ? 1 : 0);
+  let medidores: { etq: string; val: number; max: number; col: string; txt: string }[];
+  let consecuencia: string;
+  if (modo === "agora") {
+    medidores = [
+      { etq: "Grupos que ya predijiste", val: Object.keys(pred).length, max: epoca.grupos.length, col: modoCol, txt: `${Object.keys(pred).length} de ${epoca.grupos.length}` },
+      { etq: "Población con derechos políticos", val: revelada ? porcentajeEntra(epoca) * 100 : 0, max: 100, col: OK, txt: revelada ? pct(porcentajeEntra(epoca)) : "se revela al abrir" },
+      { etq: "Épocas abiertas", val: reveladas.size, max: EPOCAS.length, col: "#7dd3fc", txt: `${reveladas.size} de ${EPOCAS.length}` },
+    ];
+    consecuencia = "Predice quién entra y abre el ágora: la multitud cruza la puerta o se queda fuera, y la barra muestra qué parte del pueblo tenía voz.";
+  } else if (modo === "asamblea" && previa) {
+    medidores = [
+      { etq: "Participación adulta (vista previa)", val: previa.participacion * 100, max: 100, col: previa.participacion >= 0.8 ? OK : "#fbbf24", txt: pct(previa.participacion) },
+      { etq: "Grupos con voz", val: previa.voces.length, max: caso.grupos.length, col: previa.excluidos.length === 0 ? OK : "#fbbf24", txt: `${previa.voces.length} de ${caso.grupos.length}` },
+      { etq: "Apoyo en la colonia", val: previa.apoyo * 100, max: 100, col: previa.apoyo >= 0.5 ? OK : "#fbbf24", txt: pct(previa.apoyo) },
+    ];
+    consecuencia = `Si celebraras ahora con estas condiciones y «${PROCEDIMIENTOS.find((p) => p.id === proc)!.etq.toLowerCase()}»: ${previa.ganador === "nada" ? "sin acuerdo" : previa.ganador === "mixta" ? "propuesta mixta" : `gana la opción ${previa.ganador}`}${previa.excluidos.length ? `, y ${previa.excluidos.length} ${previa.excluidos.length === 1 ? "grupo queda" : "grupos quedan"} fuera` : ""}. Cambia una condición y mira qué se mueve.`;
+  } else if (paso === "clasificar") {
+    medidores = [
+      { etq: "Afirmaciones clasificadas", val: Math.min(clasIdx, AFIRMACIONES.length), max: AFIRMACIONES.length, col: modoCol, txt: `${Math.min(clasIdx, AFIRMACIONES.length)} de ${AFIRMACIONES.length}` },
+      { etq: "Errores", val: clasErrores, max: Math.max(clasErrores, 3), col: clasErrores > 2 ? WARN : OK, txt: `${clasErrores}` },
+    ];
+    consecuencia = "Cada tarjeta que lanzas cae en su urna: la urna se ilumina en verde si acertaste y en rojo si no.";
+  } else {
+    const reglasOk = revision ? revision.reglas.filter(Boolean).length : 0;
+    medidores = [
+      { etq: "Fichas colocadas (postura + 5 huecos)", val: llenosDebate, max: 6, col: modoCol, txt: `${llenosDebate} de 6` },
+      { etq: "Reglas del debate cumplidas", val: reglasOk, max: 4, col: reglasOk === 4 ? OK : "#fbbf24", txt: revision ? `${reglasOk} de 4` : "al tomar la palabra" },
+    ];
+    consecuencia = "Al tomar la palabra, el público reacciona y cada regla se enciende en verde o rojo.";
+  }
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes agPulse { 0%,100%{ box-shadow:0 0 0 0 var(--agd); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .ag-live-dot { animation: agPulse 1.6s ease-in-out infinite; }
-        @media (prefers-reduced-motion: reduce){ .ag-live-dot { animation:none; } }
-        .ag-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .ag-grid { grid-template-columns: 1fr; } }
-        .ag-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .ag-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .ag-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .ag-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .ag-tab { cursor:pointer; border:1px solid var(--agc); border-radius:12px; padding:11px 8px; text-align:center; background:transparent; transition:all .15s; color:#fff; }
-        .ag-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
-        .ag-tab:hover { background:rgba(255,255,255,0.06); }
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <AgoraScene
+            vista={vista}
+            modoColor={modoCol}
+            resetNonce={resetNonce}
+            epocaIdx={epocaIdx}
+            revelada={revelada}
+            prediccion={pred}
+            casoId={caso.id}
+            condiciones={condiciones}
+            celebrada={celebrada}
+            resultado={resultado}
+            paso={paso}
+            afirmacionId={pendienteFalacia ?? afirmacion?.id ?? null}
+            lanzamiento={lanz}
+            intervencion={intervencion}
+            pronunciada={pronunciada}
+            revisionOk={revision ? revision.reglas : null}
+          />
+        </SceneBoundary>
+      }
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m, etiqueta: MODOS_DEF[m].etq, icono: MODOS_DEF[m].icono })),
+        valor: modo,
+        cambiar: (id) => cambiarModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+        </>
+      }
+      lectura={chipVivo}
+      objetivos={objetivos.map((o) => ({ txt: o.t, done: o.done }))}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Cuaderno",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              <style>{`
         .ag-opts { display:flex; flex-wrap:wrap; gap:7px; }
-        .ag-opt { cursor:pointer; border:1px solid var(--agc); border-radius:10px; padding:9px 12px; font-size:12px; font-weight:800; color:#fff; background:transparent; transition:all .15s; line-height:1.4; }
+        .ag-opt { cursor:pointer; border:1px solid var(--agc); border-radius:10px; padding:9px 12px; font-size:14px; font-weight:800; color:#fff; background:transparent; transition:all .15s; line-height:1.4; }
         .ag-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.72); }
         .ag-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
         .ag-opt:disabled { cursor:default; }
         .ag-opt:disabled[data-on="false"] { opacity:0.5; }
-        .ag-ficha { cursor:pointer; width:100%; text-align:left; border:1px solid var(--agc); border-radius:10px; padding:8px 11px; font-size:11.5px; font-weight:600; color:#fff; background:transparent; transition:all .15s; line-height:1.4; }
+        .ag-ficha { cursor:pointer; width:100%; text-align:left; border:1px solid var(--agc); border-radius:10px; padding:8px 11px; font-size:14px; font-weight:600; color:#fff; background:transparent; transition:all .15s; line-height:1.4; }
         .ag-ficha[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.72); }
         .ag-ficha:hover { background:rgba(255,255,255,0.06); }
-        .ag-toggle { width:100%; cursor:pointer; border:1px solid var(--agc); border-radius:11px; padding:11px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:12.5px; font-weight:900; text-align:left; transition:all .15s; }
+        .ag-toggle { width:100%; cursor:pointer; border:1px solid var(--agc); border-radius:11px; padding:11px 14px; background:rgba(4,10,22,0.4); color:#fff; font-size:14px; font-weight:900; text-align:left; transition:all .15s; }
         .ag-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
         .ag-toggle:disabled { cursor:default; opacity:0.6; }
         .ag-grupo { padding:9px 11px; border-radius:11px; border:1px solid; background:rgba(4,10,22,0.35); }
-        .ag-linea { display:grid; grid-template-columns: repeat(8, minmax(0,1fr)); gap:4px; }
+        .ag-linea { display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:4px; }
         .ag-epoca { cursor:pointer; position:relative; display:flex; flex-direction:column; align-items:center; gap:3px; padding:18px 2px 6px; border:none; border-radius:9px; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
         .ag-epoca:hover { background:rgba(255,255,255,0.05); }
         .ag-epoca[data-on="true"] { background:rgba(255,255,255,0.07); color:#fff; }
@@ -983,309 +1051,129 @@ export function LabAgoraCiudadania({ color }: PracticaLabProps) {
         .ag-punto { position:absolute; top:4px; left:50%; width:14px; height:14px; margin-left:-7px; border-radius:50%; border:2px solid var(--agc); background:#06121e; transition:all .2s; }
         .ag-epoca[data-hecha="true"] .ag-punto { background:var(--agc); }
         .ag-epoca[data-on="true"] .ag-punto { box-shadow:0 0 0 4px rgba(255,255,255,0.14); transform:scale(1.2); }
-        .ag-barras { display:flex; gap:5px; align-items:flex-end; padding:8px 8px 6px; border-radius:11px; background:rgba(4,10,22,0.4); border:1px solid ${T.line}; }
         .ag-metricas { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:7px; margin-top:10px; }
         .ag-metrica { padding:9px 11px; border-radius:11px; border:1px solid; background:rgba(4,10,22,0.4); }
-        .ag-opt:focus-visible, .ag-tab:focus-visible, .ag-toggle:focus-visible, .ag-icobtn:focus-visible, .ag-epoca:focus-visible, .ag-ficha:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
-        @media (max-width: 1000px){ .ag-bottom { grid-template-columns: 1fr !important; } }
-        .ag-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .ag-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .ag-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61; background:linear-gradient(180deg,#06121e 0%,#040a16 100%);
-          border-left:1px solid rgba(${color.rgba},0.32); box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1); display:flex; flex-direction:column; }
-        .ag-drawer[data-open="true"] { transform:translateX(0); }
-        .ag-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .ag-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .ag-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .ag-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .ag-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:11px 16px; border-radius:999px;
-          border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800; background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
-        .ag-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="ag-tabs">
-          {MODOS.map((m) => {
-            const d = MODOS_DEF[m];
-            const col = `#${d.color.replace("#", "")}`;
-            const on = m === modo;
-            return (
-              <button key={m} className="ag-tab" data-on={on} onClick={() => cambiarModo(m)} style={{ ["--agc" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? col : "inherit" }}>
-                  <i className={`fa-solid ${d.icono}`} />
+              `}</style>
+              <Bloque titulo={`Medidor · ${def.etq}`} icono="fa-gauge-high">
+                <div style={{ display: "grid", gap: 10 }}>
+                  {medidores.map((md) => (
+                    <div key={md.etq} style={{ display: "grid", gap: 4 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, fontSize: 14, fontWeight: 800, color: "#fff" }}>
+                        <span>{md.etq}</span>
+                        <span style={{ fontFamily: "ui-monospace, monospace", color: md.col }}>{md.txt}</span>
+                      </div>
+                      <div style={{ height: 12, borderRadius: 6, background: "rgba(255,255,255,0.1)", overflow: "hidden" }}>
+                        <div style={{ width: `${md.max > 0 ? Math.min(100, (md.val / md.max) * 100) : 0}%`, height: "100%", background: md.col, transition: "width 200ms ease" }} />
+                      </div>
+                    </div>
+                  ))}
+                  <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>{consecuencia}</div>
                 </div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{d.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{d.subtitulo}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="ag-grid">
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(460px, 60vh, 680px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <AgoraScene
-                vista={vista}
-                modoColor={modoCol}
-                resetNonce={resetNonce}
-                epocaIdx={epocaIdx}
-                revelada={revelada}
-                prediccion={pred}
-                casoId={caso.id}
-                condiciones={condiciones}
-                celebrada={celebrada}
-                resultado={resultado}
-                paso={paso}
-                afirmacionId={pendienteFalacia ?? afirmacion?.id ?? null}
-                lanzamiento={lanz}
-                intervencion={intervencion}
-                pronunciada={pronunciada}
-                revisionOk={revision ? revision.reglas : null}
-              />
-            </SceneBoundary>
-
-            <div style={{ position: "absolute", top: 14, left: 16, right: 150, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, pointerEvents: "none" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)", maxWidth: "100%" }}>
-                <span className="ag-live-dot" style={{ ["--agd" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol, flexShrink: 0 }} />
-                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3, flexShrink: 0 }}>EN VIVO</span>
-                <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)", flexShrink: 0 }} />
-                <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", ...NUM }}>{chipVivo}</span>
+              </Bloque>
+              <Bloque titulo="Lo que ves" icono="fa-eye">
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55 }}>{pie}</div>
+              </Bloque>
+              <Bloque titulo={def.etq} icono={def.icono}>
+                {control}
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <>
+              <CiudadaniaCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
+              <RetoQuizCard quiz={QUIZ_A4} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Entiendes el devenir de la ciudadanía." />
+              <div style={{ ...card, padding: "20px 20px 22px", marginTop: 22 }}>
+                <Eyebrow>
+                  <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
+                  Completa el texto (lectura A1)
+                </Eyebrow>
+                <div style={{ marginTop: 12 }}>
+                  <CompletaTexto data={HUECOS_A1} accent={accent} rgba={color.rgba} completado={textoOk} onCompletado={() => { setTextoOk(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
+                </div>
               </div>
-            </div>
-
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="ag-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría" aria-label="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="ag-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"} aria-label={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="ag-icobtn" onClick={reiniciar} title="Reiniciar" aria-label="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 132px 14px 18px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                {def.etq} — {def.subtitulo}
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6, ...NUM }}>{pie}</div>
-            </div>
-
-            <button className="ag-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-          </div>
-
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-              Controles — {def.etq}
-            </Eyebrow>
-            <div style={{ marginTop: 12 }}>{control}</div>
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-landmark-dome" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>¿Quién es «el pueblo»?</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #7dd3fc55", background: "rgba(125,211,252,0.07)" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book-open" style={{ marginRight: 8, color: "#7dd3fc" }} />
-              Lectura A1
-            </Eyebrow>
-            <div style={{ fontSize: 13, color: "#fff", fontWeight: 800, lineHeight: 1.4, marginBottom: 10 }}>{TITULO_A1}</div>
-            <div style={{ display: "grid", gap: 9, marginBottom: 12 }}>
-              {LECTURA_A1.map((p, i) => (
-                <div key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>
-                  {p}
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", marginBottom: 8 }}>PARA REFLEXIONAR</div>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {PREGUNTAS.map((q, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  {q}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />
-              Cómo usar el laboratorio
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-                Objetivos de la sesión
-              </Eyebrow>
-              <span className="ag-objetivos" style={{ fontSize: 11, fontWeight: 800, color: objetivos.every((o) => o.done) ? OK : T.text3 }}>
-                {objetivos.filter((o) => o.done).length}/{objetivos.length}
-              </span>
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ marginTop: 2, fontSize: 13, color: o.done ? OK : "rgba(255,255,255,0.22)" }} />
-                  <span style={{ fontSize: 12, color: o.done ? "#fff" : T.text2, lineHeight: 1.4 }}>{o.t}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="ag-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <div style={{ padding: "14px 16px", borderRadius: 12, border: `1px solid ${accent}33`, background: `rgba(${color.rgba},0.07)` }}>
-            <Eyebrow>
-              <i className="fa-solid fa-chart-column" style={{ marginRight: 8, color: accent }} />
-              Recuadro (lectura A1)
-            </Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{RECUADRO_A1}</div>
-            <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.45, marginTop: 6, fontStyle: "italic" }}>{NOTA_RECUADRO}</div>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />
-              Hechos (verdadero o falso, A5)
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {HECHOS.map((h, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
-                  {h}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />
-              Glosario (A6)
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {GLOSARIO.map((gi, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{gi.termino}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
-                  <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.4, marginTop: 4 }}>
-                    <i className="fa-solid fa-landmark" style={{ marginRight: 6, color: accent }} />
-                    {gi.ejemplo}
+            </>
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="¿Quién es «el pueblo»?" icono="fa-landmark-dome">
+                <div style={{ color: T.text2 }}>{PROBLEMA}</div>
+              </Bloque>
+              <Bloque titulo="Cómo usar el laboratorio" icono="fa-list-ol">
+                <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8 }}>
+                  {INSTRUCCIONES.map((p, i) => <li key={i}>{p}</li>)}
+                </ol>
+              </Bloque>
+              <Bloque titulo="Lectura A1" icono="fa-book-open">
+                <div style={{ fontWeight: 800, color: "#fff" }}>{TITULO_A1}</div>
+                {LECTURA_A1.map((p, i) => (
+                  <div key={i} style={{ color: T.text2 }}>{p}</div>
+                ))}
+                <div style={{ fontSize: 14, fontWeight: 900, color: T.text3, letterSpacing: "0.08em" }}>PARA REFLEXIONAR</div>
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {PREGUNTAS.map((q, i) => <li key={i}>{q}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Recuadro (lectura A1)" icono="fa-chart-column">
+                <div style={{ color: T.text2 }}>{RECUADRO_A1}</div>
+                <div style={{ color: T.text3, fontStyle: "italic" }}>{NOTA_RECUADRO}</div>
+              </Bloque>
+              <Bloque titulo="Hechos (verdadero o falso, A5)" icono="fa-circle-question">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {HECHOS.map((h, i) => <li key={i}>{h}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Glosario (A6)" icono="fa-book">
+                {GLOSARIO.map((gi, i) => (
+                  <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
+                    <strong style={{ color: accent }}>{gi.termino}. </strong>
+                    <span style={{ color: T.text2 }}>{gi.definicion}</span>
+                    <div style={{ color: T.text3, marginTop: 4 }}>
+                      <i className="fa-solid fa-landmark" style={{ marginRight: 6, color: accent }} aria-hidden />
+                      {gi.ejemplo}
+                    </div>
                   </div>
+                ))}
+                <div style={{ color: T.text2 }}>
+                  <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A6}
                 </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11.5, color: T.text2, marginTop: 10 }}>
-              <strong style={{ color: "#fff" }}>Actividad:</strong> {ACTIVIDAD_A6}
-            </div>
-          </div>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
-          <div style={{ ...card, padding: "18px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-              Ideas clave
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-              {IDEAS.map((x, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  {x}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div style={{ ...card, padding: "18px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-pen-to-square" style={{ marginRight: 8, color: accent }} />
-              Para escribir después
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {REFLEXION.map((r) => (
-                <div key={r.ancla} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  <strong style={{ color: accent }}>{r.ancla}.</strong> {r.texto}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          La lectura A1 con sus preguntas y su recuadro, el tema, las posturas, las reglas, los argumentos guía y los criterios del debate A2, las preguntas de A3, A7 y A8, el quiz A4, los hechos A5 y el
-          glosario A6 son <strong>verbatim</strong> del material de la plataforma; el texto con huecos usa frases verbatim de A1. Las normas, artículos y fechas del ágora son <strong>históricos</strong>: ley de
-          Pericles (451 a. C.), Constitución de Cádiz (1812, arts. 18, 22 y 25, parafraseados), Constitución de 1857 (arts. 2 y 34), Constitución de 1917, reforma municipal de 1947, reforma al art. 34 del 17 de
-          octubre de 1953 y primer voto federal de las mujeres el 3 de julio de 1955, reforma al art. 34 del 22 de diciembre de 1969, reforma al COFIPE del 30 de junio de 2005, reformas de paridad del 10 de
-          febrero de 2014 y del 6 de junio de 2019, y Cámara de Diputados 2021–2024 con 250 mujeres y 250 hombres. Son <strong>ilustrativos</strong>: la composición de la multitud de 40 personas y de la tribuna
-          (aproximadas, no censales), la colonia, sus vecinos y los tres casos de asamblea, y las réplicas, propuestas y afirmaciones del debate. Fuente: {FUENTE}
-        </span>
-      </div>
-
-      <CiudadaniaCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sfx} />
-
-      <RetoQuizCard quiz={QUIZ_A4} accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sfx} playPick={blip} mensajeAprobado="¡Aprobado! Entiendes el devenir de la ciudadanía." />
-
-      <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-keyboard" style={{ marginRight: 8, color: accent }} />
-          Completa el texto (lectura A1)
-        </Eyebrow>
-        <div style={{ marginTop: 12 }}>
-          <CompletaTexto data={HUECOS_A1} accent={accent} rgba={color.rgba} completado={textoOk} onCompletado={() => { setTextoOk(true); sfx(true); }} onAcierto={blip} onError={() => sfx(false)} />
-        </div>
-      </div>
-
-      <div className="ag-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="ag-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="ag-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="ag-close" onClick={() => setDrawer(false)} title="Cerrar" aria-label="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="ag-drawer-body">
-          <FichaTeorica data={AGORA_CIUDADANIA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+              </Bloque>
+              <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {IDEAS.map((x, i) => <li key={i}>{x}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Para escribir después" icono="fa-pen-to-square">
+                {REFLEXION.map((r) => (
+                  <div key={r.ancla} style={{ color: T.text2 }}>
+                    <strong style={{ color: accent }}>{r.ancla}.</strong> {r.texto}
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={AGORA_CIUDADANIA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ marginTop: 18, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
+                La lectura A1 con sus preguntas y su recuadro, el tema, las posturas, las reglas, los argumentos guía y los criterios del debate A2, las preguntas de A3, A7 y A8, el quiz A4, los hechos A5 y el
+                glosario A6 son <strong>verbatim</strong> del material de la plataforma; el texto con huecos usa frases verbatim de A1. Las normas, artículos y fechas del ágora son <strong>históricos</strong>: ley de
+                Pericles (451 a. C.), Constitución de Cádiz (1812, arts. 18, 22 y 25, parafraseados), Constitución de 1857 (arts. 2 y 34), Constitución de 1917, reforma municipal de 1947, reforma al art. 34 del 17 de
+                octubre de 1953 y primer voto federal de las mujeres el 3 de julio de 1955, reforma al art. 34 del 22 de diciembre de 1969, reforma al COFIPE del 30 de junio de 2005, reformas de paridad del 10 de
+                febrero de 2014 y del 6 de junio de 2019, y Cámara de Diputados 2021–2024 con 250 mujeres y 250 hombres. Son <strong>ilustrativos</strong>: la composición de la multitud de 40 personas y de la tribuna
+                (aproximadas, no censales), la colonia, sus vecinos y los tres casos de asamblea, y las réplicas, propuestas y afirmaciones del debate. Fuente: {FUENTE}
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }

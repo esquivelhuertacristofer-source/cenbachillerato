@@ -19,10 +19,11 @@
 
 import * as THREE from "three";
 import { useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
+import { Encuadre, Sello } from "./_encuadre-historia";
 import {
   type Modo,
   type ProblemaId,
@@ -64,9 +65,12 @@ type Pt = [number, number, number];
 
 const suave = (dt: number, porCuadro: number) => 1 - Math.pow(1 - porCuadro, Math.min(dt, 0.25) * 60);
 
-function Etiqueta({ pos, children, df = 10, col, fs = 12, bg = "rgba(4,10,22,0.86)" }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number; bg?: string }) {
+/** Etiqueta HTML: tamaño fijo (≥ 14 px); en pantallas angostas se oculta (la info vive en el panel). */
+function Etiqueta({ pos, children, col, bg = "rgba(4,10,22,0.86)" }: { pos: Pt; children: ReactNode; df?: number; col?: string; fs?: number; bg?: string }) {
+  const ancho = useThree((s) => s.size.width);
+  if (ancho < 640) return null;
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -77,7 +81,7 @@ function Etiqueta({ pos, children, df = 10, col, fs = 12, bg = "rgba(4,10,22,0.8
           background: bg,
           border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`,
           color: "#fff",
-          fontSize: fs,
+          fontSize: 14,
           fontWeight: 800,
           whiteSpace: "nowrap",
           boxShadow: "0 6px 18px -8px #000",
@@ -543,6 +547,7 @@ function Superficie({ problemaId }: { problemaId: ProblemaId }) {
 }
 
 function EscenaExcavar({ problemaId, profundidad, estratoSel, modoColor }: { problemaId: ProblemaId; profundidad: number; estratoSel: number | null; modoColor: string }) {
+  const anchoVista = useThree((s) => s.size.width);
   const problema = PROBLEMAS.find((p) => p.id === problemaId) ?? PROBLEMAS[0]!;
   const capas = useRef<(THREE.Mesh | null)[]>([]);
   const piezas = useRef<(THREE.Group | null)[]>([]);
@@ -616,7 +621,8 @@ function EscenaExcavar({ problemaId, profundidad, estratoSel, modoColor }: { pro
                 <meshBasicMaterial color="#000" transparent opacity={0.18} />
               </mesh>
             ))}
-            <Html position={[-W / 2 - 0.12, 0, D / 2 - recesos(profundidad)[i]!]} distanceFactor={9.5} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+            {anchoVista >= 640 && (sel || i === profundidad) && (
+            <Html position={[-W / 2 - 0.12, 0, D / 2 - recesos(profundidad)[i]!]} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
               <div
                 style={{
                   transform: "translate(-100%, -50%)",
@@ -632,10 +638,11 @@ function EscenaExcavar({ problemaId, profundidad, estratoSel, modoColor }: { pro
                   opacity: excavado ? 1 : 0.6,
                 }}
               >
-                <span style={{ fontSize: 11, fontWeight: 900 }}>{e.etq}</span>
-                <span style={{ fontSize: 9.5, fontWeight: 600, color: "#cbd5e1" }}>{e.rango}</span>
+                <span style={{ fontSize: 14, fontWeight: 900 }}>{e.etq}</span>
+                <span style={{ fontSize: 14, fontWeight: 600, color: "#cbd5e1" }}>{e.rango}</span>
               </div>
             </Html>
+            )}
           </group>
         );
       })}
@@ -655,7 +662,7 @@ function EscenaExcavar({ problemaId, profundidad, estratoSel, modoColor }: { pro
           visible={false}
         >
           <PiezaArtefacto tipo={p.artefacto} />
-          {i < profundidad && (
+          {i < profundidad && estratoSel === i && (
             <Etiqueta pos={[0, 0.72, 0]} df={10} fs={10} col={estratoSel === i ? modoColor : "rgba(255,255,255,0.3)"}>
               <i className="fa-solid fa-magnifying-glass" style={{ color: modoColor }} />
               {p.anio}
@@ -748,9 +755,11 @@ function Gema({ anio, color, resaltada }: { anio: number; color: string; resalta
         <cylinderGeometry args={[0.008, 0.008, 0.24, 6]} />
         <meshBasicMaterial color={color} transparent opacity={0.6} />
       </mesh>
-      <Etiqueta pos={[0, 0.62, 0]} df={12} fs={resaltada ? 10.5 : 9.5} col={resaltada ? color : `${color}88`}>
-        {anio}
-      </Etiqueta>
+      {resaltada && (
+        <Etiqueta pos={[0, 0.62, 0]} col={color}>
+          {anio}
+        </Etiqueta>
+      )}
     </group>
   );
 }
@@ -801,16 +810,10 @@ function EscenaEspiral({ ubicadas, evidenciaActual, vinculoId, vinculoResuelto, 
               <sphereGeometry args={[0.08, 14, 10]} />
               <meshStandardMaterial color="#f8fafc" emissive="#f8fafc" emissiveIntensity={0.5} />
             </mesh>
-            <Etiqueta pos={[q.x, q.y + 0.08, q.z]} df={13} fs={9.5} col={n === 21 ? `${modoColor}aa` : "rgba(255,255,255,0.2)"} bg="rgba(4,10,22,0.78)">
-              s. {romano(n)}
-              {n === 21 ? " · hoy" : ""}
-            </Etiqueta>
+            <Sello pos={[q.x, q.y + 0.2, q.z]} texto={`s. ${romano(n)}${n === 21 ? " · hoy" : ""}`} col={n === 21 ? modoColor : "rgba(255,255,255,0.35)"} resalta={n === 21} />
           </group>
         );
       })}
-      <Etiqueta pos={[posAnio(ANIO_INICIO).x, 0.5, posAnio(ANIO_INICIO).z]} df={13} fs={9.5}>
-        1300
-      </Etiqueta>
 
       {EVIDENCIAS.filter((e) => ubicadas.includes(e.id)).map((e) => (
         <Gema key={e.id} anio={e.anio} color={PROCESO_COLOR[e.proceso]} resaltada={!!vinculo && vinculo.puntos.includes(e.anio)} />
@@ -957,7 +960,8 @@ function Fogata() {
   );
 }
 
-function FiguraVoz({ pos, color, activa, identificada, quien, icono, dice, alto, dx }: { pos: Pt; color: string; activa: boolean; identificada: boolean; quien: string; icono: string; dice: string; alto: boolean; dx: number }) {
+function FiguraVoz({ pos, color, activa, identificada, quien, dice, alto, dx }: { pos: Pt; color: string; activa: boolean; identificada: boolean; quien: string; icono: string; dice: string; alto: boolean; dx: number }) {
+  const anchoVista = useThree((s) => s.size.width);
   const ref = useRef<THREE.Group>(null);
   const aro = useRef<THREE.Mesh>(null);
   useFrame(({ clock }, dt) => {
@@ -986,15 +990,11 @@ function FiguraVoz({ pos, color, activa, identificada, quien, icono, dice, alto,
           <meshBasicMaterial color={color} transparent opacity={0.85} side={THREE.DoubleSide} />
         </mesh>
       )}
-      <Etiqueta pos={[dx, alto ? 1.98 : 1.5, 0]} df={8} fs={11} col={activa ? color : `${color}88`}>
-        <i className={`fa-solid ${icono}`} style={{ color }} />
-        {quien}
-        {identificada && <i className="fa-solid fa-circle-check" style={{ color: "#34d399" }} />}
-      </Etiqueta>
-      {activa && (
-        <Html position={[0, alto ? 3.15 : 2.7, 0]} center distanceFactor={8} zIndexRange={[30, 0]} style={{ pointerEvents: "none" }}>
-          <div style={{ width: 240, padding: "9px 12px", borderRadius: 13, background: "#fffbeb", color: "#1c1917", fontSize: 11.5, fontWeight: 700, lineHeight: 1.4, boxShadow: "0 10px 26px -10px #000", border: `2px solid ${color}` }}>
-            <div style={{ fontSize: 9, fontWeight: 900, letterSpacing: "0.08em", color: "#78716c", marginBottom: 3 }}>VOZ ILUSTRATIVA</div>«{dice}»
+      <Sello pos={[dx, alto ? 1.98 : 1.5, 0]} texto={`${quien}${identificada ? " ✓" : ""}`} col={activa ? color : `${color}aa`} resalta={activa} />
+      {activa && anchoVista >= 640 && (
+        <Html position={[0, alto ? 3.15 : 2.7, 0]} center zIndexRange={[30, 0]} style={{ pointerEvents: "none" }}>
+          <div style={{ width: 260, padding: "9px 12px", borderRadius: 13, background: "#fffbeb", color: "#1c1917", fontSize: 14, fontWeight: 700, lineHeight: 1.4, boxShadow: "0 10px 26px -10px #000", border: `2px solid ${color}` }}>
+            <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: "#78716c", marginBottom: 3 }}>VOZ ILUSTRATIVA</div>«{dice}»
           </div>
         </Html>
       )}
@@ -1069,6 +1069,7 @@ export default function PreguntasPasadoScene(p: PreguntasPasadoSceneProps) {
       {vista === "espiral" && <EscenaEspiral ubicadas={p.ubicadas} evidenciaActual={p.evidenciaActual} vinculoId={p.vinculoId} vinculoResuelto={p.vinculoResuelto} modoColor={modoColor} />}
       {vista === "voces" && <EscenaVoces casoId={p.casoId} vozSel={p.vozSel} identificadas={p.identificadas} incluidas={p.incluidas} modoColor={modoColor} />}
 
+      <Encuadre pos={cam.pos} target={cam.target} />
       <OrbitControls makeDefault enablePan={false} enableZoom minDistance={4} maxDistance={20} maxPolarAngle={Math.PI * 0.49} minPolarAngle={Math.PI * 0.08} target={cam.target} />
       <EffectComposer>
         <Bloom intensity={0.3} luminanceThreshold={0.62} luminanceSmoothing={0.85} mipmapBlur />

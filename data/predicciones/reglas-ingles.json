@@ -1,0 +1,12 @@
+{
+  "escena": "Mia, una estudiante de intercambio ficticia, vive seis situaciones escolares. Tú escribes la regla con un modal y ves lo que hace.",
+  "pregunta": "En la biblioteca, comer está prohibido. Si eliges «don't have to», ¿qué hace Mia?",
+  "opciones": [
+    { "id": "a", "texto": "Se lo guarda y evita el problema", "icono": "fa-bag-shopping" },
+    { "id": "b", "texto": "Come y recibe una advertencia", "icono": "fa-triangle-exclamation" },
+    { "id": "c", "texto": "Come y nadie dice nada", "icono": "fa-face-smile" }
+  ],
+  "correcta": "b",
+  "porque": "«Don't have to» dice que algo no es necesario, pero se puede hacer. Mia lo entiende como permiso, come y rompe la regla. «Mustn't» es el modal que prohíbe.",
+  "comoComprobarlo": "Abre la situación «Library», elige «don't have to» y observa a Mia. Luego prueba «mustn't» y compara."
+}
