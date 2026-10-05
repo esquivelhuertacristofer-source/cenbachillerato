@@ -1,0 +1,12 @@
+{
+  "escena": "Tu cuenta de una app trae tu teléfono compartido con anunciantes, aunque lo diste solo para verificarte.",
+  "pregunta": "Si ejerces cancelación sobre el teléfono, ¿qué pasa con tu cuenta?",
+  "opciones": [
+    { "id": "a", "texto": "Solo dejan de compartirlo y todo sigue igual", "icono": "fa-check" },
+    { "id": "b", "texto": "Deja de compartirse, pero pierdes verificación en dos pasos", "icono": "fa-lock-open" },
+    { "id": "c", "texto": "Corrigen el número y lo vuelven a guardar", "icono": "fa-pen" }
+  ],
+  "correcta": "b",
+  "porque": "Cancelar saca el dato de sus archivos, también el que la app necesita. Para frenar solo un uso y conservar el dato existe la oposición.",
+  "comoComprobarlo": "En «Tu cuenta en la app», aplica la letra C al teléfono y observa el medidor de cuenta; luego prueba la O."
+}

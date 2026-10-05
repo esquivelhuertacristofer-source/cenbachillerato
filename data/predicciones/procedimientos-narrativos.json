@@ -1,0 +1,12 @@
+{
+  "escena": "Un cuento corto sobre un pan que aparece cada madrugada en un local vacío, con siete escenas que puedes reordenar.",
+  "pregunta": "¿Cuándo sorprende más el giro del panadero escondido?",
+  "opciones": [
+    { "id": "a", "texto": "Si cuento su despedida al principio", "icono": "fa-hand" },
+    { "id": "b", "texto": "Si cuento su despedida después del giro", "icono": "fa-rotate-left" },
+    { "id": "c", "texto": "Si cuento el giro en primer lugar", "icono": "fa-forward-fast" }
+  ],
+  "correcta": "b",
+  "porque": "Contar la despedida antes delata al panadero. Si la historia retrocede después del giro, el lector llega a él con todas las pistas y sin sospechas.",
+  "comoComprobarlo": "Con cualquier narrador, mueve la escena «La despedida» con los botones Antes y Después y mira el medidor de sorpresa."
+}

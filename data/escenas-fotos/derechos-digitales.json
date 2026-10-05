@@ -1,0 +1,8 @@
+{
+  "slug": "derechos-digitales",
+  "items": [
+    { "clave": "tareas-expres", "formato": "1:1", "estilo": "ilustracion", "escena": "Ilustración de un teléfono celular que muestra una aplicación con iconos de libreta, lápiz y reloj sobre un fondo azul suave, estilo plano" },
+    { "clave": "mapa-ubicacion", "formato": "1:1", "estilo": "ilustracion", "escena": "Ilustración de un mapa de calles de una ciudad vista desde arriba con una línea punteada y varios pines de ubicación sobre las calles, colores suaves" },
+    { "clave": "escritorio-laptop", "formato": "1:1", "estilo": "foto", "escena": "Un escritorio de oficina con una laptop abierta, una taza de café y papeles, luz natural de ventana, sin personas ni pantalla legible" }
+  ]
+}

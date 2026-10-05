@@ -1,0 +1,12 @@
+{
+  "slug": "procedimientos-narrativos",
+  "items": [
+    { "clave": "escena-antecedente", "formato": "16:9", "estilo": "ilustracion", "escena": "Fachada de una panadería de pueblo mexicano con la cortina metálica a medio bajar, un anciano de espaldas con delantal blanco cargando una caja y una mujer joven despidiéndolo con la mano, luz de atardecer" },
+    { "clave": "escena-pan-tibio", "formato": "16:9", "estilo": "ilustracion", "escena": "Un pan de anís dorado sobre el escalón de piedra de un local vacío con vitrina polvorienta, vapor suave saliendo del pan y luz azul de madrugada" },
+    { "clave": "escena-huella-harina", "formato": "16:9", "estilo": "ilustracion", "escena": "Puerta de madera de un local con una huella de zapato marcada en harina blanca en el piso y una ventanita baja iluminada de amarillo que da a un sótano" },
+    { "clave": "escena-mara-escondida", "formato": "16:9", "estilo": "ilustracion", "escena": "Chica adolescente agachada detrás de un poste de luz en una calle empedrada de madrugada, mirando con los ojos muy abiertos hacia un local oscuro" },
+    { "clave": "escena-sotano-amasando", "formato": "16:9", "estilo": "ilustracion", "escena": "Sótano de panadería con un anciano de bigote blanco amasando solo sobre una mesa enharinada, un horno de ladrillo encendido al fondo y una radio vieja apagada" },
+    { "clave": "escena-descubrimiento", "formato": "16:9", "estilo": "ilustracion", "escena": "Puerta de sótano que se abre dejando salir luz cálida, una chica en el umbral y un anciano sorprendido con las manos llenas de masa" },
+    { "clave": "escena-hornean-juntos", "formato": "16:9", "estilo": "ilustracion", "escena": "Un anciano y una chica joven con delantales sacando charolas de pan del horno en una panadería luminosa al amanecer, canastas de pan listas para repartir" }
+  ]
+}

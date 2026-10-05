@@ -1,0 +1,12 @@
+{
+  "escena": "Una barra de átomos tiene un extremo pegado a una fuente de calor",
+  "pregunta": "Cambias la barra de cobre por una de madera. ¿Qué pasa con el extremo lejano?",
+  "opciones": [
+    { "id": "a", "texto": "Se calienta igual de rápido", "icono": "fa-equals" },
+    { "id": "b", "texto": "Casi no se calienta", "icono": "fa-snowflake" },
+    { "id": "c", "texto": "Se calienta más rápido", "icono": "fa-fire" }
+  ],
+  "correcta": "b",
+  "porque": "La madera es aislante: sus partículas se pasan poco la vibración al vecino. El cobre es conductor y la transmite rápido. Por eso los mangos de las ollas son de madera.",
+  "comoComprobarlo": "En Conducción elige Cobre y mira el termómetro del extremo lejano; luego reinicia y repite con Madera."
+}

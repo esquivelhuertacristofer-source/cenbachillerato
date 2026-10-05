@@ -63,6 +63,41 @@ const GAUGE_W = 0.42;
 const COLD = new THREE.Color("#3aa0ff");
 const HOT = new THREE.Color("#ff5a1f");
 
+/* Etiqueta de tamaño fijo en píxeles (≥ 14 px). `desp` la separa de lo que nombra. */
+function Etiqueta({ pos, color, children, desp = "none" }: {
+  pos: [number, number, number]; color: string; children: React.ReactNode; desp?: string;
+}) {
+  return (
+    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
+      <div style={{ transform: desp }}>
+        <div style={{
+          whiteSpace: "nowrap", padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.88)",
+          border: `1.5px solid ${color}`, color, fontWeight: 900, fontSize: 14, textAlign: "center",
+          fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)",
+        }}>
+          {children}
+        </div>
+      </div>
+    </Html>
+  );
+}
+
+const OBJETIVO: [number, number, number] = [0.4, 0.3, 0];
+
+/** Ajusta la distancia de la cámara al ancho disponible (el celular es angosto). */
+function Encuadre() {
+  const camera = useThree((st) => st.camera);
+  const size = useThree((st) => st.size);
+  const aspect = size.width / Math.max(1, size.height);
+  const k = Math.max(1, 1.1 / Math.min(1.1, aspect));
+  useEffect(() => {
+    camera.position.set(OBJETIVO[0] + 4.4 * k, OBJETIVO[1] + 2.9 * k, 6.9 * k);
+    camera.lookAt(OBJETIVO[0], OBJETIVO[1], OBJETIVO[2]);
+    camera.updateProjectionMatrix();
+  }, [camera, k]);
+  return null;
+}
+
 /** Altura de la columna de gas para un volumen dado. */
 const alturaDeV = (V: number) => H_MIN + ((V - V_MIN) / (V_MAX - V_MIN)) * (H_MAX - H_MIN);
 
@@ -334,12 +369,10 @@ function Piston({
       </mesh>
       {/* Pista de "arrástrame" cuando es interactivo y el cursor pasa por encima */}
       {interactivo && hover && (
-        <Html center position={[0, H_MAX + 0.6 - h + 0.45, 0]} distanceFactor={14} pointerEvents="none">
-          <div style={{ whiteSpace: "nowrap", fontSize: 11, fontWeight: 800, color: "#bfe8ff", textShadow: "0 2px 10px rgba(0,0,0,0.95)" }}>
-            <i className="fa-solid fa-up-down" style={{ marginRight: 6 }} />
-            arrastra el pistón
-          </div>
-        </Html>
+        <Etiqueta pos={[0, H_MAX + 0.6 - h + 0.6, 0]} color="#bfe8ff">
+          <i className="fa-solid fa-up-down" style={{ marginRight: 6 }} />
+          arrastra el pistón
+        </Etiqueta>
       )}
     </group>
   );
@@ -372,8 +405,9 @@ export default function GasIdealScene(props: GasIdealSceneProps) {
       shadows
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
-      camera={{ position: [3.6, 2.4, 5.2], fov: 44 }}
+      camera={{ position: [4.8, 3.2, 6.9], fov: 44 }}
     >
+      <Encuadre />
       <Contenido {...props} />
     </Canvas>
   );
@@ -383,6 +417,7 @@ export default function GasIdealScene(props: GasIdealSceneProps) {
 function Contenido(props: GasIdealSceneProps) {
   const { temp, volumen, moles, accent, pausado, autoRotate, resetNonce, arrastrable, onVolumenChange } = props;
   const [dragging, setDragging] = useState(false);
+  const estrecho = useThree((st) => st.size.width) < 640;
 
   const h = useMemo(() => alturaDeV(volumen), [volumen]);
   const P = useMemo(() => presion(moles, temp, volumen), [moles, temp, volumen]);
@@ -414,19 +449,13 @@ function Contenido(props: GasIdealSceneProps) {
         <GasParticulas temp={temp} volumen={volumen} moles={moles} accent={accent} pausado={pausado} resetNonce={resetNonce} />
         <Manometro P={P} accent={accent} />
 
-        {/* Etiquetas */}
-        <Html center position={[0, h + 0.95, 0]} distanceFactor={14} pointerEvents="none">
-          <div style={{ textAlign: "center", whiteSpace: "nowrap", textShadow: "0 2px 10px rgba(0,0,0,0.95)" }}>
-            <div style={{ fontWeight: 900, fontSize: 12, color: "#bfe8ff" }}>Pistón</div>
-            <div style={{ fontWeight: 800, fontSize: 13, color: "#fff" }}>V = {fmtNum(volumen, 1)} L</div>
-          </div>
-        </Html>
-        <Html center position={[GAUGE_X, GAUGE_H + 0.4, 0]} distanceFactor={14} pointerEvents="none">
-          <div style={{ textAlign: "center", whiteSpace: "nowrap", textShadow: "0 2px 10px rgba(0,0,0,0.95)" }}>
-            <div style={{ fontWeight: 900, fontSize: 12, color: accent }}>Presión</div>
-            <div style={{ fontWeight: 800, fontSize: 13, color: "#fff" }}>{fmtNum(P, 0)} kPa</div>
-          </div>
-        </Html>
+        {/* Etiquetas: pistón a la izquierda de la tapa, presión sobre el manómetro */}
+        <Etiqueta pos={[-BOX.hx, h, 0]} color="#bfe8ff" desp="translate(-62%,0)">
+          {estrecho ? `${fmtNum(volumen, 1)} L` : `Pistón · V = ${fmtNum(volumen, 1)} L`}
+        </Etiqueta>
+        <Etiqueta pos={[GAUGE_X, GAUGE_H + 0.45, 0]} color={accent}>
+          {estrecho ? `${fmtNum(P, 0)} kPa` : `Presión · ${fmtNum(P, 0)} kPa`}
+        </Etiqueta>
 
       </group>
 
@@ -434,11 +463,11 @@ function Contenido(props: GasIdealSceneProps) {
       <OrbitControls
         enabled={!dragging}
         enablePan={false}
-        minDistance={4}
-        maxDistance={12}
+        minDistance={5}
+        maxDistance={16}
         minPolarAngle={Math.PI / 7}
         maxPolarAngle={Math.PI / 2.05}
-        target={[0.3, 0.2, 0]}
+        target={OBJETIVO}
         autoRotate={autoRotate && !dragging}
         autoRotateSpeed={0.4}
       />

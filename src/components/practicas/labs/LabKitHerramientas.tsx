@@ -38,12 +38,12 @@
 import { useEffect, useRef, useState } from "react";
 import type { PracticaLabProps } from "../registry";
 import { T, OK, NUM, card, Eyebrow } from "./_kit";
+import { LabShell, Bloque, BotonHerramienta, Mesa, Dato } from "./_shell";
 import { LabSfx } from "./lab-audio";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { EscribeTermino } from "./_mecanica-termino";
 import { KIT_HERRAMIENTAS_HUECOS } from "./kit-herramientas-huecos";
 import { usePartida, MarcadorPartida } from "./_partida";
-import { TableroObjetivos } from "./_objetivos";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { KIT_HERRAMIENTAS_FICHA } from "./kit-herramientas-ficha";
@@ -71,13 +71,24 @@ import {
   type Ronda,
   type Pareja,
 } from "./kit-herramientas-data";
+import {
+  ETAPAS,
+  EQUIPO,
+  HORAS_INICIO,
+  medidores,
+  resultadoFinal,
+  type Aplicada,
+  type OpcionEtapa,
+} from "./kit-herramientas-entrega";
 
 const NO = "#FF5E5E";
 const RETO_KEY = "cen-kit-herramientas-digitales-reto";
+const RUTA_SIM = "/media/labs-sim/kit-herramientas-digitales";
 
-type Modo = "encargo" | "duelo" | "escritorio" | "flujo" | "glosario" | "texto";
+type Modo = "entrega" | "encargo" | "duelo" | "escritorio" | "flujo" | "glosario" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
+  { id: "entrega", label: "La entrega del viernes", icono: "fa-flag-checkered" },
   { id: "encargo", label: "El encargo del día", icono: "fa-clipboard-list" },
   { id: "duelo", label: "Elegir entre dos", icono: "fa-scale-balanced" },
   { id: "escritorio", label: "Arregla el escritorio", icono: "fa-folder-tree" },
@@ -95,7 +106,6 @@ export function LabKitHerramientas({ color }: PracticaLabProps) {
   // ── sonido y partida ──────────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   useEffect(() => () => audioRef.current?.dispose(), []);
   const toggleSonido = async () => {
@@ -344,8 +354,42 @@ export function LabKitHerramientas({ color }: PracticaLabProps) {
   // ── reto evaluable (A2) ───────────────────────────────────────────────
   const [quizAprobado, setQuizAprobado] = useState(false);
 
+  // ── modo 0: la entrega del viernes (simulador) ────────────────────────
+  const [aplicadas, setAplicadas] = useState<Aplicada[]>([]);
+  const [prueba, setPrueba] = useState<Aplicada | null>(null);
+  const [deshechas, setDeshechas] = useState(0);
+  const etapaIdx = aplicadas.length;
+  const etapa = ETAPAS[etapaIdx] ?? null;
+  const entregaDone = aplicadas.length >= ETAPAS.length;
+  const med = medidores(prueba ? [...aplicadas, prueba] : aplicadas);
+  const fin = resultadoFinal(med);
+
+  const elegirOpcion = (op: OpcionEtapa) => {
+    if (!etapa || prueba) return;
+    const ap = { etapa: etapa.id, opcion: op.id };
+    if (op.mejor) {
+      setAplicadas((a) => [...a, ap]);
+      sfxPlace();
+      if (aplicadas.length + 1 >= ETAPAS.length) sfxOk();
+    } else {
+      setPrueba(ap);
+      sfxNo();
+    }
+  };
+  const deshacerPrueba = () => {
+    setPrueba(null);
+    setDeshechas((n) => n + 1);
+  };
+  const resetEntrega = () => {
+    setAplicadas([]);
+    setPrueba(null);
+    setDeshechas(0);
+  };
+
   // ── objetivos de la sesión ────────────────────────────────────────────
   const objetivos = [
+    { txt: "Lleva el informe del equipo hasta la entrega", done: entregaDone },
+    { txt: "Entrega sin deshacer ninguna elección", done: entregaDone && deshechas === 0 },
     { txt: "Resuelve los 8 encargos con la categoría correcta", done: encargosDone },
     { txt: "Lee por qué no servían las otras en los 8", done: descartesDone },
     { txt: "Gana las 7 rondas de «Elegir entre dos»", done: dueloDone },
@@ -360,7 +404,9 @@ export function LabKitHerramientas({ color }: PracticaLabProps) {
   ];
 
   const resetActual =
-    modo === "encargo"
+    modo === "entrega"
+      ? resetEntrega
+      : modo === "encargo"
       ? resetEncargo
       : modo === "duelo"
         ? resetDuelo
@@ -422,13 +468,47 @@ export function LabKitHerramientas({ color }: PracticaLabProps) {
     },
   });
 
+  const lectura =
+    modo === "entrega" ? (
+      <>Horas: {med.horas} · Calidad: {med.calidad} % · Colaboración: {med.colab} %</>
+    ) : modo === "encargo" ? (
+      <>Encargos resueltos: {Object.keys(encargoOk).length}/{ENCARGOS.length}</>
+    ) : modo === "duelo" ? (
+      <>Rondas ganadas: {Object.keys(rondaOk).length}/{RONDAS.length}</>
+    ) : modo === "escritorio" ? (
+      <>Archivos renombrados: {Object.keys(renombrado).length}/{ARCHIVOS.length}</>
+    ) : modo === "flujo" ? (
+      <>Pasos ordenados: {flujoPos}/{PASOS.length}</>
+    ) : (
+      <>Repaso de los términos de las herramientas</>
+    );
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      dom
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })),
+        valor: modo,
+        cambiar: (id) => setModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={resetActual} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      escena={
+        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
+          <style>{`
         @keyframes kitShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
         @keyframes kitPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
         .kit-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 16px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:800; transition:all .14s; }
+          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; }
         .kit-tab:hover { border-color:${T.lineStrong}; color:#fff; }
         .kit-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
         .kit-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
@@ -438,7 +518,7 @@ export function LabKitHerramientas({ color }: PracticaLabProps) {
 
         .kit-cat { cursor:pointer; display:flex; flex-direction:column; align-items:flex-start; gap:5px; text-align:left;
           padding:12px 14px; border-radius:14px; border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff;
-          font-size:13px; font-weight:700; transition:all .14s; line-height:1.4; width:100%; }
+          font-size:14px; font-weight:700; transition:all .14s; line-height:1.4; width:100%; }
         .kit-cat:hover:not(:disabled) { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); transform:translateY(-2px); }
         .kit-cat:disabled { cursor:default; opacity:.55; }
         .kit-cat[data-shake="true"] { animation:kitShake .4s; border-color:${NO}; }
@@ -457,7 +537,7 @@ export function LabKitHerramientas({ color }: PracticaLabProps) {
         .kit-tool[data-win="true"] { border-color:${OK}; background:${OK}14; color:#fff; }
 
         .kit-chip { cursor:grab; display:flex; align-items:flex-start; gap:10px; padding:11px 14px; border-radius:13px;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:13px; font-weight:700;
+          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:14px; font-weight:700;
           transition:all .14s; user-select:none; text-align:left; line-height:1.45; width:100%; }
         .kit-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); transform:translateY(-2px); }
         .kit-chip[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.2); box-shadow:0 0 16px -5px ${accent}; transform:translateY(-3px) scale(1.01); }
@@ -468,7 +548,7 @@ export function LabKitHerramientas({ color }: PracticaLabProps) {
         .kit-bin[data-done="true"] { border-color:${OK}55; }
 
         .kit-op { cursor:pointer; display:flex; align-items:flex-start; gap:11px; width:100%; text-align:left; border-radius:12px;
-          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13px; font-weight:600; padding:10px 13px;
+          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:600; padding:10px 13px;
           line-height:1.45; transition:all .14s; font-family:inherit; }
         .kit-op:hover:not(:disabled) { border-color:${T.lineStrong}; color:#fff; }
         .kit-op:disabled { cursor:default; }
@@ -476,56 +556,25 @@ export function LabKitHerramientas({ color }: PracticaLabProps) {
         .kit-op[data-bad="true"] { border-color:${NO}; background:${NO}1c; color:#fff; }
 
         .kit-mini { cursor:pointer; padding:7px 13px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass};
-          color:${T.text2}; font-size:12.5px; font-weight:800; transition:all .14s; font-family:inherit; }
+          color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; font-family:inherit; }
         .kit-mini:hover:not(:disabled) { border-color:${T.lineStrong}; color:#fff; }
         .kit-mini:disabled { opacity:.45; cursor:not-allowed; }
         .kit-mini[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; }
         .kit-mini[data-done="true"] { color:${OK}; border-color:${OK}66; }
 
         .kit-vf { cursor:pointer; padding:8px 16px; border-radius:10px; border:1.5px solid ${T.line}; background:${T.glass};
-          color:${T.text2}; font-size:12.5px; font-weight:800; transition:all .14s; font-family:inherit; }
+          color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; font-family:inherit; }
         .kit-vf:hover:not(:disabled) { border-color:${T.lineStrong}; color:#fff; }
         .kit-vf:disabled { cursor:default; opacity:.85; }
         .kit-vf[data-on="true"] { border-color:${OK}; background:${OK}1f; color:#fff; }
         .kit-vf[data-bad="true"] { border-color:${NO}; background:${NO}1f; color:#fff; }
 
         .kit-slot { border-radius:12px; border:1.5px dashed ${T.lineStrong}; background:${T.inset}; min-height:46px; padding:9px 12px;
-          display:flex; align-items:center; gap:10px; color:${T.text3}; font-size:12.5px; transition:all .16s; }
+          display:flex; align-items:center; gap:10px; color:${T.text3}; font-size:14px; transition:all .16s; }
         .kit-slot[data-armed="true"] { border-color:${accent}; background:rgba(${color.rgba},0.1); cursor:pointer; }
         .kit-linea[data-shake="true"] { animation:kitShake .4s; }
-        .kit-nombre { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12.5px; letter-spacing:-0.01em; }
+        .kit-nombre { font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:14px; letter-spacing:-0.01em; }
         .kit-divider { height:1px; background:${T.line}; margin:16px 0; }
-        /* La columna de objetivos acompaña al alumno en los modos largos
-           (el escritorio y el trabajo completo miden el doble que la ventana). */
-        .kit-side { position:sticky; top:10px; }
-        .kit-apoyo { display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));
-          gap:16px; align-items:start; margin-top:18px; }
-        @media (max-width: 900px){
-          .kit-grid { grid-template-columns:minmax(0,1fr) !important; }
-          .kit-side { position:static; }
-          .kit-tab { padding:9px 12px; font-size:12.5px; gap:7px; }
-        }
-
-        /* Cajón de teoría */
-        .kit-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .kit-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .kit-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .kit-drawer[data-open="true"] { transform:translateX(0); }
-        .kit-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .kit-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .kit-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .kit-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .kit-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .kit-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .kit-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
 
         /* Identidad del tablero */
         .kit-bin, .kit-card { --tono:196; position:relative;
@@ -544,60 +593,139 @@ export function LabKitHerramientas({ color }: PracticaLabProps) {
           .kit-bin[data-shake="true"], .kit-card[data-shake="true"], .kit-tool[data-shake="true"], .kit-cat[data-shake="true"] { animation:none; }
           .kit-chip, .kit-chip:hover, .kit-chip[data-sel="true"], .kit-cat:hover, .kit-tool:hover { transform:none; transition:none; }
         }
+        .kit-foto { position:relative; width:100%; aspect-ratio:16/9; max-height:200px; border-radius:12px; overflow:hidden; margin-bottom:12px;
+          background:linear-gradient(135deg, rgba(${color.rgba},0.28), rgba(255,255,255,0.04)); display:flex; align-items:center; justify-content:center; }
+        .kit-foto > i { font-size:38px; color:rgba(255,255,255,0.35); }
+        .kit-foto > img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+        .kit-medidores { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 170px), 1fr)); gap:10px; padding:12px 14px; border-radius:16px;
+          border:1.5px solid ${T.line}; background:${T.glass}; }
+        .kit-medidor-cab { display:flex; justify-content:space-between; gap:8px; font-size:14px; font-weight:800; color:${T.text}; margin-bottom:6px; }
+        .kit-medidor-barra { height:12px; border-radius:8px; background:${T.inset}; overflow:hidden; }
+        .kit-medidor-barra > div { height:100%; border-radius:8px; transition:width .5s ease, background .3s; }
+        .kit-etapas { display:flex; gap:8px; flex-wrap:wrap; }
+        .kit-etapa { display:inline-flex; align-items:center; gap:7px; padding:7px 12px; border-radius:999px; border:1.5px solid ${T.line}; background:${T.glass};
+          font-size:14px; font-weight:800; color:${T.text3}; }
+        .kit-etapa[data-on="true"] { border-color:${accent}; color:#fff; background:rgba(${color.rgba},0.16); }
+        .kit-etapa[data-done="true"] { border-color:${OK}66; color:${OK}; }
+        .kit-bitacora { display:flex; flex-direction:column; gap:8px; }
+        .kit-bit { display:flex; gap:10px; font-size:14px; line-height:1.5; color:${T.text2}; padding:10px 12px; border-radius:12px; border:1px solid ${T.line}; background:${T.glass}; }
+        .kit-eleccion { cursor:pointer; display:flex; gap:12px; align-items:flex-start; width:100%; text-align:left; padding:13px 15px; border-radius:14px;
+          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-family:inherit; transition:all .14s; }
+        .kit-eleccion > i { font-size:18px; color:${accent}; margin-top:3px; width:22px; text-align:center; }
+        .kit-eleccion strong { display:block; font-size:15px; margin-bottom:3px; }
+        .kit-eleccion span > span { display:block; font-size:14px; line-height:1.45; color:${T.text2}; font-weight:500; }
+        .kit-eleccion:hover:not(:disabled) { border-color:${accent}; transform:translateY(-2px); }
+        .kit-eleccion:disabled { cursor:default; opacity:.6; }
+        .kit-eleccion[data-bad="true"] { border-color:${NO}; background:${NO}18; opacity:1; }
+        .kit-consecuencia { margin-top:8px; padding:12px 14px; border-radius:12px; border:1px solid ${NO}55; background:${NO}10; display:flex; flex-direction:column;
+          gap:8px; align-items:flex-start; font-size:14px; line-height:1.5; color:${T.text2}; }
+        .kit-deltas { display:inline-flex; flex-wrap:wrap; gap:6px; margin-left:4px; }
+        .kit-deltas em { font-style:normal; font-size:14px; font-weight:800; padding:2px 8px; border-radius:8px; background:${NO}1f; color:${NO}; }
+        .kit-deltas em[data-bueno="true"] { background:${OK}1f; color:${OK}; }
+        @media (prefers-reduced-motion: reduce){ .kit-medidor-barra > div { transition:none; } .kit-eleccion:hover { transform:none; } }
       `}</style>
 
-      {/* ── Barra de modos y herramientas ─────────────────────────────────
-          Dos filas a propósito: son seis modos, y el marcador crece cuando
-          aparece la precisión. En una sola fila, la barra se partía sola en
-          cuanto el alumno respondía lo primero. */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="kit-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-      </div>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 10, flexWrap: "wrap", marginBottom: 16 }}>
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="kit-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="kit-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="kit-icobtn" onClick={resetActual} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
+          {modo === "entrega" && (
+            <>
+              <MedidoresEntrega med={med} />
 
-      {/* ── Cajón de teoría ─────────────────────────────────────────────── */}
-      <button className="kit-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="kit-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="kit-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="kit-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="kit-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="kit-drawer-body">
-          <FichaTeorica data={KIT_HERRAMIENTAS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
+              <div className="kit-etapas" role="list" aria-label="Etapas del trabajo">
+                {ETAPAS.map((e, i) => (
+                  <span key={e.id} role="listitem" className="kit-etapa" data-on={i === etapaIdx && !entregaDone} data-done={i < etapaIdx}>
+                    <i className={`fa-solid ${i < etapaIdx ? "fa-check" : e.icono}`} />
+                    <span>{i + 1}</span>
+                  </span>
+                ))}
+              </div>
 
-      <div
-        className="kit-grid"
-        style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}
-      >
-        {/* ── Columna principal ─────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
+              {etapaIdx === 0 && !prueba && (
+                <div className="kit-card" style={{ padding: "16px 18px" }}>
+                  <div className="kit-foto">
+                    <i className="fa-solid fa-people-group" aria-hidden />
+                    <img
+                      src={`${RUTA_SIM}/${EQUIPO.imagen}.webp`}
+                      alt={EQUIPO.imagenAlt}
+                      loading="lazy"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
+                    />
+                  </div>
+                  <div style={{ fontSize: 17, fontWeight: 900, marginBottom: 6 }}>{EQUIPO.titulo}</div>
+                  <p style={{ margin: 0, fontSize: 15, lineHeight: 1.55, color: T.text2 }}>{EQUIPO.intro}</p>
+                </div>
+              )}
+
+              {aplicadas.length > 0 && (
+                <div className="kit-bitacora">
+                  {aplicadas.map((a) => {
+                    const e = ETAPAS.find((x) => x.id === a.etapa)!;
+                    const op = e.opciones.find((x) => x.id === a.opcion)!;
+                    return (
+                      <div key={a.etapa} className="kit-bit">
+                        <i className="fa-solid fa-circle-check" style={{ color: OK, marginTop: 3 }} />
+                        <span>
+                          <strong style={{ color: "#fff" }}>{e.titulo}: {op.titulo}.</strong> {op.pasa} <DeltasOpcion op={op} />
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {etapa && (
+                <div className="kit-card" style={{ padding: "18px 20px" }}>
+                  <Eyebrow>
+                    <i className={`fa-solid ${etapa.icono}`} style={{ marginRight: 8, color: accent }} />
+                    Etapa {etapaIdx + 1} de {ETAPAS.length} · {etapa.titulo}
+                  </Eyebrow>
+                  <p style={{ margin: "0 0 12px", fontSize: 15, lineHeight: 1.55, color: "#fff", fontWeight: 600 }}>{etapa.situacion}</p>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    {etapa.opciones.map((op) => {
+                      const elegida = prueba?.opcion === op.id;
+                      return (
+                        <div key={op.id}>
+                          <button className="kit-eleccion" data-bad={elegida} disabled={!!prueba} onClick={() => elegirOpcion(op)}>
+                            <i className={`fa-solid ${op.icono}`} />
+                            <span>
+                              <strong>{op.titulo}</strong>
+                              <span>{op.hace}</span>
+                            </span>
+                          </button>
+                          {elegida && (
+                            <div className="kit-consecuencia" role="alert">
+                              <span>{op.pasa}</span>
+                              <DeltasOpcion op={op} />
+                              <span>Mira cómo se movieron los medidores. Deshaz la elección y prueba otra.</span>
+                              <button className="kit-mini" onClick={deshacerPrueba}>
+                                <i className="fa-solid fa-rotate-left" style={{ marginRight: 7 }} />
+                                Deshacer y elegir otra
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {entregaDone && (
+                <div className="kit-card" data-done="true" style={{ padding: "18px 20px" }}>
+                  <Eyebrow>
+                    <i className="fa-solid fa-flag-checkered" style={{ marginRight: 8, color: OK }} />
+                    Entrega: calificación simulada {fin.nota.toFixed(1)}
+                  </Eyebrow>
+                  <p style={{ margin: 0, fontSize: 15, lineHeight: 1.6, color: T.text2 }}>
+                    {fin.aTiempo ? `Entregan a tiempo y sobran ${med.horas} horas.` : "Entregan tarde: se acabaron las horas."} Calidad {med.calidad} %, colaboración{" "}
+                    {med.colab} %. Cada herramienta se eligió por lo que tenía que hacer en esa etapa, no por su nombre.
+                    {deshechas > 0 ? ` Deshiciste ${deshechas} ${deshechas === 1 ? "elección" : "elecciones"} en el camino.` : " Sin deshacer ninguna elección."}
+                  </p>
+                </div>
+              )}
+            </>
+          )}
+
           {modo === "encargo" && (
             <EncargoPanel
               accent={accent}
@@ -712,7 +840,7 @@ export function LabKitHerramientas({ color }: PracticaLabProps) {
               border: `1px solid ${pie ? (pie.ok ? `${OK}55` : `${NO}55`) : T.line}`,
               background: pie ? (pie.ok ? `${OK}12` : `${NO}12`) : T.glass,
               padding: "13px 16px",
-              fontSize: 13,
+              fontSize: 14,
               lineHeight: 1.55,
               color: T.text2,
               display: "flex",
@@ -732,38 +860,29 @@ export function LabKitHerramientas({ color }: PracticaLabProps) {
             </span>
           </div>
         </div>
-
-        {/* ── Columna lateral ─────────────────────────────────────────────
-            Solo lo que acompaña al modo en curso: los objetivos y qué se
-            practica aquí. El material de consulta (A3, A1, el «¿Sabías?»)
-            bajó a una banda a todo lo ancho: en el lateral hacía la columna
-            derecha el doble de alta que modos cortos como «Completa el texto»
-            y dejaba media pantalla de vacío a la izquierda. */}
-        <div className="kit-side" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos de la sesión
-            </Eyebrow>
-            <TableroObjetivos objetivos={objetivos} retoKey={RETO_KEY} accent={accent} />
-          </div>
-
-          {/* Qué se practica en el modo actual */}
-          <div
-            style={{
-              borderRadius: 18,
-              padding: "16px 18px",
-              border: `1px solid rgba(${color.rgba},0.3)`,
-              background: `rgba(${color.rgba},0.08)`,
-              fontSize: 13,
-              color: T.text2,
-              lineHeight: 1.55,
-              display: "flex",
-              gap: 12,
-            }}
-          >
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
+      }
+      pestanas={[
+        {
+          id: "pistas",
+          etiqueta: "Pistas",
+          icono: "fa-lightbulb",
+          contenido: (
+            <>
+              <Bloque titulo="Tu partida" icono="fa-star">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8 }}>
+                  <Dato label="Horas libres" value={`${med.horas} h`} />
+                  <Dato label="Errores" value={String(partida.errores)} />
+                </div>
+              </Bloque>
+              <Bloque titulo="Cómo elegir" icono="fa-lightbulb">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  {modo === "entrega" && (
+                <>
+                  Elige por <strong style={{ color: T.text }}>lo que la herramienta tiene que hacer</strong> en esa etapa. Si algo sale mal, mira qué medidor
+                  se movió y por qué.
+                </>
+              )}
               {modo === "encargo" && (
                 <>
                   No preguntes «¿qué app uso?», pregunta{" "}
@@ -803,98 +922,119 @@ export function LabKitHerramientas({ color }: PracticaLabProps) {
                   <strong style={{ color: T.text }}>Enter</strong> para comprobar cada hueco.
                 </>
               )}
-            </span>
-          </div>
+                </p>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <>
+              <HechosCard accent={accent} respuestas={hechos} onResponder={responderHecho} />
+              <RetoQuizCard
+                quiz={RETO_QUIZ}
+                accent={accent}
+                rgba={color.rgba}
+                aprobado={quizAprobado}
+                onAprobado={() => setQuizAprobado(true)}
+                playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined}
+                mensajeAprobado="Eliges la herramienta por lo que tiene que hacer, no por su marca."
+              />
+            </>
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book",
+          contenido: (
+            <>
+              <Bloque titulo="La tarea que viene · A3" icono="fa-pen-nib">
+                <p style={{ margin: 0, color: T.text2 }}>{CONSIGNA_A3.prompt}</p>
+                {CONSIGNA_A3.pistas.map((pista, i) => (
+                  <p key={i} style={{ margin: 0, color: T.text2 }}>
+                    <i className="fa-solid fa-angle-right" style={{ color: accent, marginRight: 8 }} />
+                    {pista}
+                  </p>
+                ))}
+              </Bloque>
+              <Bloque titulo="Lectura A1 · para pensar" icono="fa-book-open-reader">
+                {COMPRENSION_A1.map((c, i) => (
+                  <p key={i} style={{ margin: 0, color: T.text2 }}>
+                    <strong style={{ color: T.text }}>{c.pregunta}</strong> {c.guia}
+                  </p>
+                ))}
+              </Bloque>
+              <Bloque titulo="¿Sabías?" icono="fa-circle-info">
+                <p style={{ margin: 0, color: T.text2 }}>{DATO_SABIAS}</p>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={KIT_HERRAMIENTAS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <Bloque titulo="Sobre el contenido" icono="fa-quote-right">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  Verbatim de CD-I-P08: la lectura A1 con su «¿Sabías?» y sus preguntas, el reto evaluable (A2), la consigna y las pistas (A3), los cuatro
+                  enunciados verdadero/falso (A4), el glosario y su actividad final —«{CONSIGNA_A5}»— (A5) y el texto con huecos (A6). Escrito para este
+                  laboratorio (ilustrativo): la entrega del viernes, los ocho encargos, las parejas de herramientas, los seis archivos y los ocho pasos. Las
+                  personas, los salones y las fechas son ficticios y las cifras son simulación. Aquí no se afirma ningún precio ni función de ninguna marca: lo
+                  evaluable es la categoría y el criterio.
+                </p>
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
+  );
+}
 
-        </div>
-      </div>
-
-      {/* ── Banda de consulta, a todo lo ancho ────────────────────────────
-          Material verbatim de la progresión que no depende del modo. */}
-      <div className="kit-apoyo">
-          {/* Consigna verbatim de A3 */}
-          <div style={{ ...card, padding: "18px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-pen-nib" style={{ marginRight: 8, color: accent }} />
-              La tarea que viene · A3
-            </Eyebrow>
-            <p style={{ margin: "0 0 12px", fontSize: 12.5, color: T.text2, lineHeight: 1.6 }}>{CONSIGNA_A3.prompt}</p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-              {CONSIGNA_A3.pistas.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 9, fontSize: 12, color: T.text3, lineHeight: 1.45 }}>
-                  <i className="fa-solid fa-angle-right" style={{ color: accent, marginTop: 3, fontSize: 10 }} />
-                  <span>{p}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Preguntas de comprensión de la lectura A1 (verbatim) */}
-          <div style={{ ...card, padding: "18px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book-open-reader" style={{ marginRight: 8, color: accent }} />
-              Lectura A1 · para pensar
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {COMPRENSION_A1.map((c, i) => (
-                <details key={i} style={{ borderRadius: 11, border: `1px solid ${T.line}`, background: T.inset, padding: "10px 13px" }}>
-                  <summary style={{ cursor: "pointer", fontSize: 13, fontWeight: 700, color: T.text2, lineHeight: 1.45 }}>
-                    {c.pregunta}
-                  </summary>
-                  <p style={{ margin: "9px 0 0", fontSize: 12.5, color: T.text3, lineHeight: 1.5 }}>{c.guia}</p>
-                </details>
-              ))}
-            </div>
-          </div>
-
-          {/* Dato verbatim del callout de A1 */}
-          <div
-            style={{
-              borderRadius: 18,
-              padding: "16px 18px",
-              border: `1px solid ${T.line}`,
-              background: T.glass,
-              fontSize: 12.5,
-              color: T.text2,
-              lineHeight: 1.55,
-              display: "flex",
-              gap: 12,
-            }}
-          >
-            <i className="fa-solid fa-circle-info" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Simulador «La entrega del viernes»: medidores y consecuencias
+ * ═══════════════════════════════════════════════════════════════════════════ */
+function MedidoresEntrega({ med }: { med: { horas: number; calidad: number; colab: number } }) {
+  const filas = [
+    { id: "horas", label: "Horas libres", icono: "fa-hourglass-half", valor: med.horas, max: HORAS_INICIO, txt: `${med.horas} h`, col: med.horas <= 2 ? "#FF8A5E" : "#5BC8FF" },
+    { id: "calidad", label: "Calidad", icono: "fa-medal", valor: med.calidad, max: 100, txt: `${med.calidad} %`, col: med.calidad >= 70 ? OK : med.calidad >= 40 ? "#FFC75A" : "#FF8A5E" },
+    { id: "colab", label: "Colaboración", icono: "fa-people-group", valor: med.colab, max: 100, txt: `${med.colab} %`, col: med.colab >= 70 ? OK : med.colab >= 40 ? "#FFC75A" : "#FF8A5E" },
+  ];
+  return (
+    <div className="kit-medidores" aria-live="polite">
+      {filas.map((f) => (
+        <div key={f.id} className="kit-medidor">
+          <div className="kit-medidor-cab">
             <span>
-              <strong style={{ color: T.text }}>¿Sabías?</strong> {DATO_SABIAS}
+              <i className={`fa-solid ${f.icono}`} style={{ color: f.col, marginRight: 7 }} />
+              {f.label}
             </span>
+            <strong style={{ color: f.col }}>{f.txt}</strong>
           </div>
-      </div>
-
-      <HechosCard accent={accent} respuestas={hechos} onResponder={responderHecho} />
-
-      <RetoQuizCard
-        quiz={RETO_QUIZ}
-        accent={accent}
-        rgba={color.rgba}
-        aprobado={quizAprobado}
-        onAprobado={() => setQuizAprobado(true)}
-        playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined}
-        mensajeAprobado="Eliges la herramienta por lo que tiene que hacer, no por su marca."
-      />
-
-      {/* Nota al pie: qué es verbatim y qué es de este laboratorio */}
-      <p style={{ margin: "20px 2px 0", fontSize: 11.5, lineHeight: 1.6, color: T.text3 }}>
-        <i className="fa-solid fa-quote-right" style={{ marginRight: 7, opacity: 0.7 }} />
-        <strong style={{ color: T.text2 }}>Verbatim de la progresión CD-I-P08:</strong> la lectura A1 con su callout «¿Sabías?»
-        y sus preguntas de comprensión, el reto evaluable (A2), la consigna y las pistas del kit (A3), los cuatro enunciados
-        verdadero/falso (A4), el glosario y su actividad final —«{CONSIGNA_A5}»— (A5) y el texto con huecos (A6). Los productos
-        que la progresión nombra se conservan tal cual aparecen ahí.{" "}
-        <strong style={{ color: T.text2 }}>Escrito para este laboratorio (ilustrativo):</strong> los ocho encargos, las tres
-        parejas de herramientas con sus siete necesidades, los seis archivos del escritorio y los ocho pasos del trabajo. Las
-        personas, los salones y las fechas son ficticios. Las herramientas de «Elegir entre dos» se describen por lo que hacen y
-        no corresponden a ningún producto concreto: aquí no se afirma ningún precio, límite de almacenamiento ni función de
-        ninguna marca. Lo evaluable es la categoría y el criterio, porque son lo que sigue siendo cierto cuando las marcas
-        cambian.
-      </p>
+          <div className="kit-medidor-barra">
+            <div style={{ width: `${(f.valor / f.max) * 100}%`, background: f.col }} />
+          </div>
+        </div>
+      ))}
     </div>
+  );
+}
+
+/** Cuánto movió una elección cada medidor (para que el cambio se lea con número). */
+function DeltasOpcion({ op }: { op: OpcionEtapa }) {
+  const items: { txt: string; bueno: boolean }[] = [
+    { txt: op.horas === 0 ? "0 h" : `-${op.horas} h`, bueno: op.horas <= 1 },
+    { txt: `${op.calidad > 0 ? "+" : ""}${op.calidad} calidad`, bueno: op.calidad >= 0 },
+    { txt: `${op.colab > 0 ? "+" : ""}${op.colab} colaboración`, bueno: op.colab >= 0 },
+  ];
+  return (
+    <span className="kit-deltas">
+      {items.map((d) => (
+        <em key={d.txt} data-bueno={d.bueno}>
+          {d.txt}
+        </em>
+      ))}
+    </span>
   );
 }
 
@@ -945,7 +1085,7 @@ function EncargoPanel({
       <div className="kit-card" data-done={resuelto} style={{ padding: "18px 22px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
           <Eyebrow>Encargo {indice + 1} de {ENCARGOS.length} · {encargo.materia}</Eyebrow>
-          <span style={{ fontSize: 12.5, fontWeight: 800, color: hechos >= ENCARGOS.length ? OK : T.text3, ...NUM }}>
+          <span style={{ fontSize: 14, fontWeight: 800, color: hechos >= ENCARGOS.length ? OK : T.text3, ...NUM }}>
             {hechos}/{ENCARGOS.length} resueltos
           </span>
         </div>
@@ -960,7 +1100,7 @@ function EncargoPanel({
                 border: `1px solid ${OK}55`,
                 background: `${OK}12`,
                 padding: "12px 15px",
-                fontSize: 13,
+                fontSize: 14,
                 lineHeight: 1.55,
                 color: T.text2,
               }}
@@ -982,7 +1122,7 @@ function EncargoPanel({
                       border: `1px solid ${T.line}`,
                       background: T.inset,
                       padding: "11px 14px",
-                      fontSize: 12.5,
+                      fontSize: 14,
                       lineHeight: 1.55,
                       color: T.text2,
                       display: "flex",
@@ -1006,7 +1146,7 @@ function EncargoPanel({
             )}
           </div>
         ) : (
-          <p style={{ margin: 0, fontSize: 12.5, color: T.text3, lineHeight: 1.5 }}>
+          <p style={{ margin: 0, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
             Elige abajo la categoría de herramienta que resuelve este encargo. Si te equivocas, el laboratorio te dice para qué
             sirve en realidad la que elegiste.
           </p>
@@ -1041,7 +1181,7 @@ function EncargoPanel({
 
       <div style={{ ...card, padding: "18px 22px" }}>
         <Eyebrow>Las ocho categorías · elige una</Eyebrow>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(255px, 1fr))", gap: 10, marginTop: 12 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 255px), 1fr))", gap: 10, marginTop: 12 }}>
           {CATEGORIAS_ORDEN.map((cat) => {
             const info = CATEGORIA_INFO[cat];
             const esCorrecta = resuelto && cat === encargo.correcta;
@@ -1055,11 +1195,11 @@ function EncargoPanel({
                 onClick={() => onElegir(cat)}
                 title={info.subtitulo}
               >
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 9, fontSize: 13.5, fontWeight: 800 }}>
-                  <i className={`fa-solid ${info.icono}`} style={{ color: esCorrecta ? OK : accent, fontSize: 13 }} />
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 9, fontSize: 14, fontWeight: 800 }}>
+                  <i className={`fa-solid ${info.icono}`} style={{ color: esCorrecta ? OK : accent, fontSize: 14 }} />
                   {info.titulo}
                 </span>
-                <span style={{ fontWeight: 500, color: T.text3, fontSize: 11.5, lineHeight: 1.45 }}>{info.subtitulo}</span>
+                <span style={{ fontWeight: 500, color: T.text3, fontSize: 14, lineHeight: 1.45 }}>{info.subtitulo}</span>
               </button>
             );
           })}
@@ -1102,7 +1242,7 @@ function DueloPanel({
           <Eyebrow>
             Ronda {indice + 1} de {RONDAS.length} · {pareja.categoria}
           </Eyebrow>
-          <span style={{ fontSize: 12.5, fontWeight: 800, color: hechas >= RONDAS.length ? OK : T.text3, ...NUM }}>
+          <span style={{ fontSize: 14, fontWeight: 800, color: hechas >= RONDAS.length ? OK : T.text3, ...NUM }}>
             {hechas}/{RONDAS.length}
           </span>
         </div>
@@ -1116,7 +1256,7 @@ function DueloPanel({
               borderRadius: 999,
               border: `1px solid rgba(255,255,255,0.14)`,
               padding: "5px 13px",
-              fontSize: 11.5,
+              fontSize: 14,
               fontWeight: 800,
               color: accent,
               marginBottom: 12,
@@ -1127,7 +1267,7 @@ function DueloPanel({
           </div>
         )}
 
-        <div style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: T.text3, marginBottom: 6 }}>
+        <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: T.text3, marginBottom: 6 }}>
           Necesidad declarada
         </div>
         <p style={{ margin: "0 0 6px", fontSize: 15.5, lineHeight: 1.6, color: "#fff", fontWeight: 600 }}>{ronda.necesidad}</p>
@@ -1140,7 +1280,7 @@ function DueloPanel({
               border: `1px solid ${OK}55`,
               background: `${OK}12`,
               padding: "12px 15px",
-              fontSize: 13,
+              fontSize: 14,
               lineHeight: 1.55,
               color: T.text2,
             }}
@@ -1151,7 +1291,7 @@ function DueloPanel({
         )}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 12 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 260px), 1fr))", gap: 12 }}>
         {lados.map((lado) => {
           const h = lado === "a" ? pareja.a : pareja.b;
           const gana = resuelta && lado === ronda.gana;
@@ -1184,14 +1324,14 @@ function DueloPanel({
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
                 {h.aFavor.map((x) => (
-                  <span key={x} style={{ display: "flex", gap: 9, fontSize: 12.5, lineHeight: 1.45, color: T.text2 }}>
-                    <i className="fa-solid fa-circle-check" style={{ color: OK, fontSize: 11, marginTop: 3 }} />
+                  <span key={x} style={{ display: "flex", gap: 9, fontSize: 14, lineHeight: 1.45, color: T.text2 }}>
+                    <i className="fa-solid fa-circle-check" style={{ color: OK, fontSize: 14, marginTop: 3 }} />
                     {x}
                   </span>
                 ))}
                 {h.enContra.map((x) => (
-                  <span key={x} style={{ display: "flex", gap: 9, fontSize: 12.5, lineHeight: 1.45, color: T.text3 }}>
-                    <i className="fa-solid fa-circle-minus" style={{ color: NO, fontSize: 11, marginTop: 3 }} />
+                  <span key={x} style={{ display: "flex", gap: 9, fontSize: 14, lineHeight: 1.45, color: T.text3 }}>
+                    <i className="fa-solid fa-circle-minus" style={{ color: NO, fontSize: 14, marginTop: 3 }} />
                     {x}
                   </span>
                 ))}
@@ -1269,23 +1409,24 @@ function EscritorioPanel({
       <div style={{ ...card, padding: "18px 22px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
           <Eyebrow>Escritorio · seis archivos que no vas a encontrar en tres semanas</Eyebrow>
-          <span style={{ fontSize: 12.5, fontWeight: 800, color: nRenombrados >= ARCHIVOS.length ? OK : T.text3, ...NUM }}>
+          <span style={{ fontSize: 14, fontWeight: 800, color: nRenombrados >= ARCHIVOS.length ? OK : T.text3, ...NUM }}>
             {nRenombrados}/{ARCHIVOS.length} con nombre · {nArchivados}/{ARCHIVOS.length} archivados
           </span>
         </div>
-        <p style={{ margin: "10px 0 0", fontSize: 12.5, color: T.text3, lineHeight: 1.55 }}>
+        <p style={{ margin: "10px 0 0", fontSize: 14, color: T.text3, lineHeight: 1.55 }}>
           Primero ponle a cada uno un nombre que sirva; después arrástralo a la carpeta de su materia. La consigna es de A5:
           «{CONSIGNA_A5}»
         </p>
       </div>
 
+      <Mesa>
       <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
         {enEscritorio.length === 0 ? (
           <div
             style={{
               ...card,
               padding: "20px 22px",
-              fontSize: 13.5,
+              fontSize: 14,
               fontWeight: 700,
               color: OK,
               display: "flex",
@@ -1304,7 +1445,7 @@ function EscritorioPanel({
               <div key={a.id} className="kit-card" data-done={listo} data-sel={selArchivo === a.id} style={{ padding: "14px 17px" }}>
                 <div style={{ display: "flex", alignItems: "flex-start", gap: 13, flexWrap: "wrap" }}>
                   <i className={`fa-solid ${a.icono}`} style={{ color: listo ? OK : T.text3, fontSize: 21, marginTop: 3 }} />
-                  <div style={{ flex: 1, minWidth: 210 }}>
+                  <div style={{ flex: 1, minWidth: "min(100%, 210px)" }}>
                     <div
                       className="kit-nombre"
                       style={{
@@ -1321,7 +1462,7 @@ function EscritorioPanel({
                         {a.nombreMalo}
                       </div>
                     )}
-                    <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5, marginTop: 6 }}>{a.contexto}</div>
+                    <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5, marginTop: 6 }}>{a.contexto}</div>
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "stretch" }}>
                     {!listo ? (
@@ -1338,7 +1479,7 @@ function EscritorioPanel({
                         title="Selecciónalo y toca su carpeta, o arrástralo"
                         {...dragProps(a.id)}
                       >
-                        <i className="fa-solid fa-hand-pointer" style={{ fontSize: 11, marginTop: 2 }} />
+                        <i className="fa-solid fa-hand-pointer" style={{ fontSize: 14, marginTop: 2 }} />
                         Archivar
                       </button>
                     )}
@@ -1347,10 +1488,10 @@ function EscritorioPanel({
 
                 {!listo && abiertoAqui && (
                   <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 13 }}>
-                    <span style={{ fontSize: 12, color: T.text3, fontWeight: 700 }}>¿Con cuál de estos tres lo vas a encontrar?</span>
+                    <span style={{ fontSize: 14, color: T.text3, fontWeight: 700 }}>¿Con cuál de estos tres lo vas a encontrar?</span>
                     {a.opciones.map((op, i) => (
                       <button key={op} className="kit-op" onClick={() => onElegirNombre(a.id, i)}>
-                        <i className="fa-regular fa-file" style={{ color: accent, marginTop: 2, fontSize: 12 }} />
+                        <i className="fa-regular fa-file" style={{ color: accent, marginTop: 2, fontSize: 14 }} />
                         <span className="kit-nombre" style={{ flex: 1, wordBreak: "break-word" }}>
                           {op}
                         </span>
@@ -1364,7 +1505,7 @@ function EscritorioPanel({
         )}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 12 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 210px), 1fr))", gap: 12 }}>
         {MATERIAS_ORDEN.map((m) => {
           const info = MATERIA_INFO[m];
           const dentro = ARCHIVOS.filter((a) => archivado[a.id] === m);
@@ -1380,17 +1521,17 @@ function EscritorioPanel({
             >
               <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
                 <i className={`fa-solid ${info.icono}`} style={{ color: dentro.length >= esperados ? OK : accent }} />
-                <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
-                <span style={{ marginLeft: "auto", fontSize: 11.5, color: T.text3, ...NUM }}>
+                <span style={{ fontSize: 14, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
+                <span style={{ marginLeft: "auto", fontSize: 14, color: T.text3, ...NUM }}>
                   {dentro.length}/{esperados}
                 </span>
               </div>
-              <div style={{ fontSize: 11, color: T.text3, marginBottom: 11, lineHeight: 1.4 }}>
+              <div style={{ fontSize: 14, color: T.text3, marginBottom: 11, lineHeight: 1.4 }}>
                 Una carpeta por materia del semestre.
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
                 {dentro.length === 0 ? (
-                  <div style={{ fontSize: 12, color: T.text3, opacity: 0.6, padding: "6px 0" }}>Arrastra aquí…</div>
+                  <div style={{ fontSize: 14, color: T.text3, opacity: 0.6, padding: "6px 0" }}>Arrastra aquí…</div>
                 ) : (
                   dentro.map((a) => (
                     <span
@@ -1410,7 +1551,7 @@ function EscritorioPanel({
                         wordBreak: "break-word",
                       }}
                     >
-                      <i className="fa-solid fa-check" style={{ fontSize: 10, color: OK, marginTop: 3 }} />
+                      <i className="fa-solid fa-check" style={{ fontSize: 14, color: OK, marginTop: 3 }} />
                       {a.opciones[a.correcta] ?? a.nombreMalo}
                     </span>
                   ))
@@ -1421,16 +1562,18 @@ function EscritorioPanel({
         })}
       </div>
 
+      </Mesa>
+
       <div style={{ ...card, padding: "18px 22px" }}>
         <Eyebrow>
           <i className="fa-solid fa-ruler" style={{ marginRight: 8, color: accent }} />
           La convención, en cinco reglas
         </Eyebrow>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(330px, 1fr))", gap: 11, marginTop: 12 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 330px), 1fr))", gap: 11, marginTop: 12 }}>
           {REGLAS_NOMBRE.map((r) => (
             <div key={r.regla} style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
-              <i className={`fa-solid ${r.icono}`} style={{ color: accent, fontSize: 13, marginTop: 3 }} />
-              <span style={{ fontSize: 12.5, lineHeight: 1.5, color: T.text2 }}>
+              <i className={`fa-solid ${r.icono}`} style={{ color: accent, fontSize: 14, marginTop: 3 }} />
+              <span style={{ fontSize: 14, lineHeight: 1.5, color: T.text2 }}>
                 <strong style={{ color: T.text }}>{r.regla}. </strong>
                 {r.porque}
               </span>
@@ -1477,30 +1620,31 @@ function FlujoPanel({
 
   return (
     <>
+      <Mesa>
       <div style={{ ...card, padding: "18px 22px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 6 }}>
           <Eyebrow>Pasos sueltos · colócalos en el orden en que ocurren</Eyebrow>
-          <span style={{ fontSize: 12.5, fontWeight: 800, color: completo ? OK : T.text3, ...NUM }}>
+          <span style={{ fontSize: 14, fontWeight: 800, color: completo ? OK : T.text3, ...NUM }}>
             {flujoPos}/{PASOS.length}
           </span>
         </div>
-        <p style={{ margin: "0 0 14px", fontSize: 12.5, color: T.text3, lineHeight: 1.5 }}>
+        <p style={{ margin: "0 0 14px", fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
           Trabajo de demostración: <strong style={{ color: T.text2 }}>«El agua que se pierde en la colonia»</strong>, en equipo de
           tres, con encuesta y exposición.
         </p>
         {completo ? (
-          <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+          <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
             <i className="fa-solid fa-circle-check" />
             Los ocho pasos en orden. Ahora asigna la herramienta de cada uno ({conHerramienta}/{PASOS.length}).
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(235px, 1fr))", gap: 10 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 235px), 1fr))", gap: 10 }}>
             {sueltos.map((p) => (
               <button key={p.id} className="kit-chip" data-sel={selPaso === p.id} onClick={() => onSelPaso(p.id)} {...dragProps(p.id)}>
-                <i className="fa-solid fa-grip-vertical" style={{ color: T.text3, marginTop: 3, fontSize: 11 }} />
+                <i className="fa-solid fa-grip-vertical" style={{ color: T.text3, marginTop: 3, fontSize: 14 }} />
                 <span>
                   <span style={{ display: "block", fontWeight: 800 }}>{p.titulo}</span>
-                  <span style={{ display: "block", fontWeight: 500, color: T.text2, fontSize: 12, marginTop: 3 }}>{p.detalle}</span>
+                  <span style={{ display: "block", fontWeight: 500, color: T.text2, fontSize: 14, marginTop: 3 }}>{p.detalle}</span>
                 </span>
               </button>
             ))}
@@ -1532,7 +1676,7 @@ function FlujoPanel({
                     alignItems: "center",
                     justifyContent: "center",
                     border: `1px solid ${T.line}`,
-                    fontSize: 12,
+                    fontSize: 14,
                     fontWeight: 900,
                     color: T.text3,
                     ...NUM,
@@ -1559,7 +1703,7 @@ function FlujoPanel({
                     justifyContent: "center",
                     background: resuelto ? `${OK}26` : "rgba(255,255,255,0.07)",
                     color: resuelto ? OK : accent,
-                    fontSize: 12,
+                    fontSize: 14,
                     fontWeight: 900,
                     ...NUM,
                   }}
@@ -1568,10 +1712,10 @@ function FlujoPanel({
                 </span>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 14, fontWeight: 800, color: "#fff", lineHeight: 1.4 }}>{colocado.titulo}</div>
-                  <div style={{ fontSize: 12, color: T.text3, lineHeight: 1.45, marginTop: 3 }}>{colocado.detalle}</div>
+                  <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.45, marginTop: 3 }}>{colocado.detalle}</div>
 
                   {resuelto ? (
-                    <div style={{ marginTop: 10, fontSize: 12.5, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9 }}>
+                    <div style={{ marginTop: 10, fontSize: 14, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9 }}>
                       <i className={`fa-solid ${CATEGORIA_INFO[colocado.correcta].icono}`} style={{ color: OK, marginTop: 2 }} />
                       <span>
                         <strong style={{ color: OK }}>{CATEGORIA_INFO[colocado.correcta].titulo}. </strong>
@@ -1594,6 +1738,7 @@ function FlujoPanel({
           );
         })}
       </div>
+      </Mesa>
     </>
   );
 }
@@ -1619,7 +1764,7 @@ function HechosCard({
           <i className="fa-solid fa-scale-unbalanced" style={{ marginRight: 8, color: accent }} />
           Hechos · verdadero o falso (A4, verbatim)
         </Eyebrow>
-        <span style={{ fontSize: 12.5, fontWeight: 800, color: aciertos >= HECHOS.length ? OK : T.text3, ...NUM }}>
+        <span style={{ fontSize: 14, fontWeight: 800, color: aciertos >= HECHOS.length ? OK : T.text3, ...NUM }}>
           {aciertos}/{HECHOS.length}
         </span>
       </div>
@@ -1643,10 +1788,10 @@ function HechosCard({
                 flexWrap: "wrap",
               }}
             >
-              <div style={{ flex: 1, minWidth: 240 }}>
-                <div style={{ fontSize: 13.5, fontWeight: 700, color: T.text, lineHeight: 1.5 }}>{h.enunciado}</div>
+              <div style={{ flex: 1, minWidth: "min(100%, 240px)" }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: T.text, lineHeight: 1.5 }}>{h.enunciado}</div>
                 {r !== null && (
-                  <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.5, marginTop: 7 }}>
+                  <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5, marginTop: 7 }}>
                     <i
                       className={`fa-solid ${resuelto ? "fa-circle-check" : "fa-circle-exclamation"}`}
                       style={{ color: resuelto ? OK : NO, marginRight: 8 }}

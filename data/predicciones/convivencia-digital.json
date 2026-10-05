@@ -1,0 +1,12 @@
+{
+  "escena": "En el chat del grupo del salón, Beto sube una foto burlona de Mauri y el grupo se ríe.",
+  "pregunta": "Si reaccionas con 😂 a la foto para no quedar mal, ¿qué le pasa al clima del grupo?",
+  "opciones": [
+    { "id": "a", "texto": "Sube, porque el grupo se relaja", "icono": "fa-arrow-up" },
+    { "id": "b", "texto": "Baja y la foto la ve más gente", "icono": "fa-arrow-down" },
+    { "id": "c", "texto": "No cambia, es solo un emoji", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "Cada reacción da más vida a la publicación: llega a más personas, el afectado se siente peor y hasta puede salirse del grupo. Reír también cuenta como participar.",
+  "comoComprobarlo": "En «El grupo del salón», elige reaccionar con 😂 en la primera escena y mira los dos medidores; luego prueba hablarle a Beto en privado."
+}

@@ -36,11 +36,24 @@ import { LabSfx } from "./lab-audio";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { EscribeTermino } from "./_mecanica-termino";
 import { usePartida, MarcadorPartida } from "./_partida";
-import { TableroObjetivos } from "./_objetivos";
+import { LabShell, Bloque, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { PROCEDIMIENTOS_NARRATIVOS_FICHA } from "./procedimientos-narrativos-ficha";
 import { PROCEDIMIENTOS_NARRATIVOS_HUECOS } from "./procedimientos-narrativos-huecos";
+import {
+  CUENTO,
+  CUENTO_TITULO,
+  NARRADORES,
+  ORDEN_CRONOLOGICO,
+  RUTA_FOTOS_NARRATIVA,
+  evaluar,
+  mover,
+  narradorDe,
+  puedeContar,
+  reaccionLectora,
+  type Resultado,
+} from "./procedimientos-narrativos-sim";
 import {
   RELATOS,
   MARCA_INFO,
@@ -70,9 +83,10 @@ import {
 const NO = "#FF5E5E";
 const RETO_KEY = "cen-procedimientos-narrativos-reto";
 
-type Modo = "orden" | "voz" | "ritmo" | "dialogo" | "glosario" | "texto";
+type Modo = "taller" | "orden" | "voz" | "ritmo" | "dialogo" | "glosario" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
+  { id: "taller", label: "Taller del relato", icono: "fa-clapperboard" },
   { id: "orden", label: "Historia y discurso", icono: "fa-timeline" },
   { id: "voz", label: "Quién cuenta", icono: "fa-masks-theater" },
   { id: "ritmo", label: "El ritmo del relato", icono: "fa-gauge-high" },
@@ -93,12 +107,11 @@ interface Aviso {
 
 export function LabProcedimientosNarrativos({ color }: PracticaLabProps) {
   const accent = color.hex;
-  const [modo, setModo] = useState<Modo>("orden");
+  const [modo, setModo] = useState<Modo>("taller");
 
   // ── sonido y partida ──────────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   useEffect(() => () => audioRef.current?.dispose(), []);
   const toggleSonido = async () => {
@@ -122,6 +135,33 @@ export function LabProcedimientosNarrativos({ color }: PracticaLabProps) {
   const sfxPlace = () => {
     partida.acierto();
     return sonido && audioRef.current?.blip();
+  };
+
+  /* ── MODO 0 — taller del relato (simulador) ─────────────────────────── */
+  const [orden, setOrden] = useState<string[]>(ORDEN_CRONOLOGICO);
+  const [narr, setNarr] = useState<Voz>("primera");
+  const [narrProbados, setNarrProbados] = useState<Record<string, boolean>>({ primera: true });
+  const [mejorSorpresa, setMejorSorpresa] = useState(0);
+  const resTaller = evaluar(orden, narr);
+  const tallerRegistra = (r: Resultado) => {
+    if (r.sorpresa >= 7 && mejorSorpresa < 7) sfxPlace();
+    else if (sonido) void audioRef.current?.blip();
+    setMejorSorpresa((m) => Math.max(m, r.sorpresa));
+  };
+  const cambiarNarr = (v: Voz) => {
+    setNarr(v);
+    setNarrProbados((prev) => ({ ...prev, [v]: true }));
+    tallerRegistra(evaluar(orden, v));
+  };
+  const moverEscena = (id: string, delta: -1 | 1) => {
+    const nuevo = mover(orden, id, delta);
+    if (nuevo === orden) return;
+    setOrden(nuevo);
+    tallerRegistra(evaluar(nuevo, narr));
+  };
+  const resetTaller = () => {
+    setOrden(ORDEN_CRONOLOGICO);
+    setNarr("primera");
   };
 
   /* ── MODO 1 — historia contra discurso ──────────────────────────────── */
@@ -316,12 +356,14 @@ export function LabProcedimientosNarrativos({ color }: PracticaLabProps) {
   const [quizAprobado, setQuizAprobado] = useState(false);
 
   const resetActual =
-    modo === "texto" ? resetTexto : modo === "glosario" ? resetGlosario : modo === "orden" ? resetOrden : modo === "voz" ? resetVoz : modo === "ritmo" ? resetRitmo : resetDialogo;
+    modo === "texto" ? resetTexto : modo === "taller" ? resetTaller : modo === "glosario" ? resetGlosario : modo === "orden" ? resetOrden : modo === "voz" ? resetVoz : modo === "ritmo" ? resetRitmo : resetDialogo;
 
   /* ── progreso ───────────────────────────────────────────────────────── */
   const r0 = RELATOS[0]!;
   const r1 = RELATOS[1]!;
   const objetivos = [
+    { txt: `Cuenta «${CUENTO_TITULO}» con los tres narradores y compara qué escenas puede contar cada uno`, done: NARRADORES.every((n) => narrProbados[n.id] === true) },
+    { txt: "Reordena las escenas hasta lograr una sorpresa de 7 o más en el giro", done: mejorSorpresa >= 7 },
     { txt: `Reconstruye el orden de los hechos de «${r0.titulo}»`, done: ordenListo(r0) },
     { txt: `Nombra el procedimiento de cada párrafo de «${r0.titulo}»`, done: marcasListas(r0) },
     { txt: `Reconstruye el orden de los hechos de «${r1.titulo}»`, done: ordenListo(r1) },
@@ -379,21 +421,42 @@ export function LabProcedimientosNarrativos({ color }: PracticaLabProps) {
 
   const aviso = modo === "orden" ? avisoOrden : modo === "voz" ? avisoVoz : modo === "ritmo" ? avisoRitmo : modo === "dialogo" ? avisoDlg : null;
 
+  const lecturas: Record<Modo, string> = {
+    taller: `Sorpresa ${resTaller.sorpresa}/10 con ${narradorDe(narr).corto.toLowerCase()}.`,
+    orden: "Historia es cuándo pasó; discurso, cuándo se cuenta.",
+    voz: "Elegir narrador es elegir qué ignora el lector.",
+    ritmo: "Compara el reloj de la historia con el del texto.",
+    dialogo: "Cambia conector, deícticos, pronombres y tiempo verbal.",
+    glosario: "Lee la definición y escribe el término.",
+    texto: "Completa los huecos con la palabra que corresponde.",
+  };
+
   return (
-    <div style={{ color: T.text }}>
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      dom
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })),
+        valor: modo,
+        cambiar: (id) => setModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={resetActual} />
+        </>
+      }
+      lectura={lecturas[modo]}
+      objetivos={objetivos}
+      escena={
+        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
       <style>{`
         @keyframes prnShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
         @keyframes prnPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
-        .prn-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 16px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .prn-tab:hover { border-color:${T.lineStrong}; color:#fff; }
-        .prn-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-        .prn-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
-          font-size:14px; border:1px solid ${T.line}; background:${T.glass}; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .prn-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
-        .prn-icobtn:hover { background:rgba(255,255,255,0.12); }
         .prn-chip { cursor:grab; display:flex; align-items:flex-start; gap:10px; padding:12px 15px; border-radius:13px; text-align:left;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:13px; font-weight:600; transition:all .14s; user-select:none; width:100%; line-height:1.55; }
+          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:14px; font-weight:600; transition:all .14s; user-select:none; width:100%; line-height:1.55; }
         .prn-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); }
         .prn-chip[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.2); box-shadow:0 0 16px -5px ${accent}; }
         .prn-chip:active { cursor:grabbing; }
@@ -401,29 +464,29 @@ export function LabProcedimientosNarrativos({ color }: PracticaLabProps) {
         .prn-row[data-shake="true"] { animation:prnShake .4s; border-color:${NO}; }
         .prn-row[data-done="true"] { border-color:${OK}66; background:${OK}0f; }
         .prn-slot { border-radius:12px; border:1.5px dashed ${T.lineStrong}; background:${T.inset}; padding:12px 14px;
-          display:flex; align-items:center; gap:10px; color:${T.text3}; font-size:12.5px; transition:all .16s; min-height:52px; text-align:left; width:100%; }
+          display:flex; align-items:center; gap:10px; color:${T.text3}; font-size:14px; transition:all .16s; min-height:52px; text-align:left; width:100%; }
         .prn-slot[data-armed="true"] { border-color:${accent}; background:rgba(${color.rgba},0.1); color:#fff; cursor:pointer; }
         .prn-slot[data-shake="true"] { animation:prnShake .4s; border-color:${NO}; }
         .prn-bin { border-radius:15px; border:1.5px solid ${T.line}; background:${T.glass}; padding:16px; transition:all .16s; min-height:190px; text-align:left; width:100%; }
         .prn-bin[data-shake="true"] { animation:prnShake .4s; border-color:${NO}; }
         .prn-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
-          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:13.5px; font-weight:800; transition:all .14s; }
+          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:14px; font-weight:800; transition:all .14s; }
         .prn-btn:hover { border-color:${T.lineStrong}; }
         .prn-btn:disabled { opacity:.45; cursor:default; }
         .prn-seg { cursor:pointer; flex:1; padding:11px 12px; border-radius:11px; border:1.5px solid ${T.line}; background:${T.glass};
-          color:${T.text2}; font-size:12.5px; font-weight:800; transition:all .14s; text-align:center; min-width:130px; }
+          color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; text-align:center; min-width:130px; }
         .prn-seg:hover { border-color:${T.lineStrong}; color:#fff; }
         .prn-seg[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.18); color:#fff; }
         .prn-mini { cursor:pointer; border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; border-radius:9px;
-          padding:6px 12px; font-size:12px; font-weight:800; transition:all .14s; }
+          padding:6px 12px; font-size:14px; font-weight:800; transition:all .14s; }
         .prn-mini[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.18); color:#fff; }
         .prn-mini:hover { border-color:${T.lineStrong}; color:#fff; }
         .prn-marca { cursor:pointer; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text2}; border-radius:10px;
-          padding:6px 11px; font-size:11.5px; font-weight:800; transition:all .14s; white-space:nowrap; }
+          padding:6px 11px; font-size:14px; font-weight:800; transition:all .14s; white-space:nowrap; }
         .prn-marca:hover { border-color:${T.lineStrong}; color:#fff; }
         .prn-marca:disabled { cursor:default; }
         .prn-opt { cursor:pointer; border:1.5px solid ${T.lineStrong}; background:${T.inset}; color:#fff; border-radius:10px;
-          padding:7px 12px; font-size:13px; font-weight:700; font-family:inherit; transition:all .14s; }
+          padding:7px 12px; font-size:14px; font-weight:700; font-family:inherit; transition:all .14s; }
         .prn-opt:hover { border-color:${accent}; background:rgba(${color.rgba},0.14); }
         .prn-opt:disabled { cursor:default; opacity:.4; }
         .prn-hueco { display:inline-flex; align-items:center; gap:7px; border-radius:9px; padding:2px 10px; font-weight:800;
@@ -434,27 +497,6 @@ export function LabProcedimientosNarrativos({ color }: PracticaLabProps) {
         @media (max-width: 1100px){ .prn-banda { grid-template-columns:minmax(0,1fr) !important; } }
         @media (max-width: 980px){ .prn-grid { grid-template-columns:minmax(0,1fr) !important; } .prn-dos { grid-template-columns:minmax(0,1fr) !important; } }
         @media (prefers-reduced-motion: reduce){ .prn-row[data-shake="true"], .prn-bin[data-shake="true"], .prn-slot[data-shake="true"], .prn-hueco[data-shake="true"] { animation:none; } }
-
-        /* Cajón de teoría */
-        .prn-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .prn-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .prn-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .prn-drawer[data-open="true"] { transform:translateX(0); }
-        .prn-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .prn-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .prn-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .prn-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .prn-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .prn-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .prn-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
 
         /* Identidad del tablero */
         .prn-bin, .prn-row { --tono:188; position:relative;
@@ -475,53 +517,51 @@ export function LabProcedimientosNarrativos({ color }: PracticaLabProps) {
         @media (prefers-reduced-motion: reduce){
           .prn-chip, .prn-chip:hover, .prn-chip[data-sel="true"] { transform:none; transition:none; }
         }
+
+        /* Taller del relato */
+        .prn-medidores { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap:10px; }
+        .prn-med { display:grid; gap:6px; padding:10px 12px; border-radius:12px; border:1.5px solid ${T.line}; background:${T.glass}; min-width:0; }
+        .prn-med > span { font-size:14px; font-weight:800; color:${T.text2}; display:flex; justify-content:space-between; gap:8px; }
+        .prn-med > span strong { color:#fff; font-variant-numeric:tabular-nums; }
+        .prn-med-barra { height:9px; border-radius:6px; background:${T.inset}; overflow:hidden; }
+        .prn-med-barra > div { height:100%; border-radius:6px; transition:width .35s ease; }
+        .prn-curva { border-radius:14px; border:1.5px solid ${T.line}; background:${T.glass}; padding:10px 12px 8px; }
+        .prn-curva svg { display:block; width:100%; height:auto; }
+        .prn-curva-eje { display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:2px; text-align:center; font-size:14px; font-weight:800; color:${T.text2}; }
+        .prn-reaccion { display:flex; align-items:flex-start; gap:12px; padding:12px 14px; border-radius:14px; border:1.5px solid ${T.line}; background:${T.glass}; font-size:15px; line-height:1.5; color:${T.text2}; }
+        .prn-reaccion > i { font-size:30px; flex-shrink:0; }
+        .prn-reaccion strong { display:block; color:#fff; font-size:16px; }
+        .prn-guion { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap:12px; }
+        .prn-esc { display:flex; flex-direction:column; border-radius:14px; border:1.5px solid ${T.line}; background:${T.glass}; overflow:hidden; min-width:0; }
+        .prn-esc[data-fuera="true"] { opacity:.72; border-style:dashed; }
+        .prn-foto { position:relative; aspect-ratio:16/9; display:flex; align-items:center; justify-content:center; font-size:34px; color:rgba(255,255,255,0.55);
+          background:linear-gradient(135deg, rgba(${color.rgba},0.35), rgba(8,19,31,0.95)); overflow:hidden; }
+        .prn-foto img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
+        .prn-esc[data-fuera="true"] .prn-foto img { filter:grayscale(1) brightness(.5); }
+        .prn-num { position:absolute; left:8px; top:8px; min-width:28px; height:28px; border-radius:14px; background:rgba(2,12,28,.85); color:#fff; font-size:14px; font-weight:900; display:flex; align-items:center; justify-content:center; padding:0 8px; z-index:1; }
+        .prn-esc-cuerpo { padding:10px 12px; display:flex; flex-direction:column; gap:8px; flex:1; }
+        .prn-esc-cuerpo h5 { margin:0; font-size:15px; color:#fff; font-weight:800; }
+        .prn-esc-cuerpo p { margin:0; font-size:14px; line-height:1.5; color:${T.text2}; }
+        .prn-marcaje { align-self:flex-start; display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border-radius:9px; font-size:14px; font-weight:800; }
+        .prn-esc-mov { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; padding:0 12px 12px; }
+        .prn-esc-mov button { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:7px; min-height:40px; border-radius:10px; border:1.5px solid ${T.line}; background:${T.inset}; color:#fff; font-size:14px; font-weight:800; }
+        .prn-esc-mov button:hover:not(:disabled) { border-color:${accent}; }
+        .prn-esc-mov button:disabled { opacity:.35; cursor:default; }
+        @media (prefers-reduced-motion: reduce){ .prn-med-barra > div { transition:none; } }
       `}</style>
 
-      {/* selector de modo + barra */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="prn-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="prn-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="prn-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="prn-icobtn" onClick={resetActual} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
+          {/* MODO — taller del relato (simulador) */}
+          {modo === "taller" && (
+            <TallerRelato
+              orden={orden}
+              narrador={narr}
+              resultado={resTaller}
+              probados={narrProbados}
+              onNarrador={cambiarNarr}
+              onMover={moverEscena}
+            />
+          )}
 
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <button className="prn-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="prn-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="prn-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="prn-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="prn-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="prn-drawer-body">
-          <FichaTeorica data={PROCEDIMIENTOS_NARRATIVOS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div className="prn-grid" style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}>
-        {/* ── Columna principal ─────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
           {/* MODO — completa el texto (fill_blanks verbatim de A6) */}
           {modo === "texto" && (
             <CompletaTexto
@@ -579,13 +619,13 @@ export function LabProcedimientosNarrativos({ color }: PracticaLabProps) {
                     </button>
                   ))}
                   <div style={{ flex: 1 }} />
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: fase === "fin" ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: fase === "fin" ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
                     {fase === "orden"
                       ? `${colocados}/${relato.parrafos.length} hechos colocados`
                       : `${relato.parrafos.filter((p) => marcasRelato[p.id] === p.marca).length}/${relato.parrafos.length} procedimientos nombrados`}
                   </span>
                 </div>
-                <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.5 }}>
+                <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
                   <i className="fa-solid fa-circle-info" style={{ marginRight: 7, color: accent }} />
                   {relato.ficha}
                 </div>
@@ -639,19 +679,19 @@ export function LabProcedimientosNarrativos({ color }: PracticaLabProps) {
               <div style={{ ...card, padding: "18px 22px" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
                   <Eyebrow>Lleva cada fragmento al ritmo que lo explica</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: ritmoDone ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: ritmoDone ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
                     {FRAGMENTOS_RITMO.length - fragsLibres.length}/{FRAGMENTOS_RITMO.length}
                   </span>
                 </div>
                 {fragsLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+                  <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
                     <i className="fa-solid fa-circle-check" /> ¡Los {FRAGMENTOS_RITMO.length} fragmentos medidos! Ya distingues comprimir, omitir y detener.
                   </div>
                 ) : (
                   <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
                     {fragsLibres.map((f) => (
                       <button key={f.id} className="prn-chip" data-sel={selFragR === f.id} onClick={() => setSelFragR((s) => (s === f.id ? null : f.id))} {...dragProps(f.id)}>
-                        <i className="fa-solid fa-quote-left" style={{ fontSize: 11, color: T.text3, marginTop: 4 }} />
+                        <i className="fa-solid fa-quote-left" style={{ fontSize: 14, color: T.text3, marginTop: 4 }} />
                         <span>{f.texto}</span>
                       </button>
                     ))}
@@ -701,7 +741,7 @@ export function LabProcedimientosNarrativos({ color }: PracticaLabProps) {
                 border: `1px solid ${aviso.ok ? OK : NO}55`,
                 background: `${aviso.ok ? OK : NO}12`,
                 padding: "13px 16px",
-                fontSize: 13,
+                fontSize: 14,
                 color: T.text2,
                 lineHeight: 1.6,
                 display: "flex",
@@ -713,33 +753,26 @@ export function LabProcedimientosNarrativos({ color }: PracticaLabProps) {
             </div>
           )}
         </div>
-
-        {/* ── Columna lateral ───────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos de la sesión
-            </Eyebrow>
-            <TableroObjetivos objetivos={objetivos} retoKey={RETO_KEY} accent={accent} />
-          </div>
-
-          {/* pista del modo actual */}
-          <div
-            style={{
-              borderRadius: 18,
-              padding: "16px 18px",
-              border: `1px solid rgba(${color.rgba},0.3)`,
-              background: `rgba(${color.rgba},0.08)`,
-              fontSize: 13,
-              color: T.text2,
-              lineHeight: 1.55,
-              display: "flex",
-              gap: 12,
-            }}
-          >
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
+      }
+      pestanas={[
+        {
+          id: "pistas",
+          etiqueta: "Pistas",
+          icono: "fa-lightbulb",
+          contenido: (
+            <>
+              <Bloque titulo="Tu partida" icono="fa-star">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+              </Bloque>
+              <Bloque titulo="Qué mirar en este modo" icono="fa-lightbulb">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  {modo === "taller" && (
+                    <>
+                      El <strong style={{ color: T.text }}>narrador</strong> decide qué escenas puede contar; el <strong style={{ color: T.text }}>orden</strong>{" "}
+                      decide cuándo se revela el giro. Mueve las escenas con «Antes» y «Después» y observa la curva de suspenso: el giro rinde más cuando llega
+                      con las pistas ya acumuladas, y la despedida de don Celso, contada antes, delata al panadero. Las cifras son una simulación.
+                    </>
+                  )}
               {modo === "orden" && (
                 <>
                   Un relato tiene dos órdenes. La <strong style={{ color: T.text }}>historia</strong> es el orden en que pasaron los hechos; el{" "}
@@ -770,13 +803,39 @@ export function LabProcedimientosNarrativos({ color }: PracticaLabProps) {
               )}
               {modo === "glosario" && <>Aquí no se arrastra: lee la definición y su ejemplo y escribe el término. La pista te da la inicial y las letras.</>}
               {modo === "texto" && <>El texto es el de la actividad de la progresión. Si te atoras, abre el banco de palabras o pide la pista del hueco.</>}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Los textos de la progresión, verbatim ──────────────────── */}
-      <div className="prn-banda" style={{ display: "grid", gridTemplateColumns: "minmax(0,1.35fr) minmax(0,1fr) minmax(0,0.9fr)", gap: 16, marginTop: 22, alignItems: "start" }}>
+                </p>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <RetoQuizCard
+              quiz={QUIZ}
+              accent={accent}
+              rgba={color.rgba}
+              aprobado={quizAprobado}
+              onAprobado={() => setQuizAprobado(true)}
+              mensajeAprobado="Reconoces los procedimientos con los que está hecho un relato."
+              playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined}
+              playPick={sonido ? () => void audioRef.current?.blip() : undefined}
+            />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book",
+          contenido: (
+            <>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={PROCEDIMIENTOS_NARRATIVOS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <Bloque titulo="Los textos de la progresión" icono="fa-book-open-reader">
+                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
         {/* lectura verbatim A1 */}
         <div style={{ ...card, padding: "18px 20px" }}>
           <Eyebrow>
@@ -785,7 +844,7 @@ export function LabProcedimientosNarrativos({ color }: PracticaLabProps) {
           </Eyebrow>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {LECTURA_A1.map((p, i) => (
-              <p key={i} style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: T.text2 }}>
+              <p key={i} style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: T.text2 }}>
                 {p}
               </p>
             ))}
@@ -807,7 +866,7 @@ export function LabProcedimientosNarrativos({ color }: PracticaLabProps) {
                     marginTop: 1,
                     borderRadius: 7,
                     padding: "2px 8px",
-                    fontSize: 10.5,
+                    fontSize: 14,
                     fontWeight: 900,
                     letterSpacing: "0.05em",
                     color: h.respuesta ? OK : NO,
@@ -817,7 +876,7 @@ export function LabProcedimientosNarrativos({ color }: PracticaLabProps) {
                 >
                   {h.respuesta ? "V" : "F"}
                 </span>
-                <span style={{ fontSize: 12.5, lineHeight: 1.55, color: T.text2 }}>
+                <span style={{ fontSize: 14, lineHeight: 1.55, color: T.text2 }}>
                   {h.enunciado} <em style={{ color: T.text3 }}>{h.retroalimentacion}</em>
                 </span>
               </div>
@@ -832,7 +891,7 @@ export function LabProcedimientosNarrativos({ color }: PracticaLabProps) {
             padding: "16px 18px",
             border: `1px solid ${T.line}`,
             background: T.glass,
-            fontSize: 12.5,
+            fontSize: 14,
             color: T.text2,
             lineHeight: 1.55,
             display: "flex",
@@ -845,25 +904,17 @@ export function LabProcedimientosNarrativos({ color }: PracticaLabProps) {
             {DATO_DEM}
           </span>
         </div>
-      </div>
-
-      <RetoQuizCard
-        quiz={QUIZ}
-        accent={accent}
-        rgba={color.rgba}
-        aprobado={quizAprobado}
-        onAprobado={() => setQuizAprobado(true)}
-        mensajeAprobado="Reconoces los procedimientos con los que está hecho un relato."
-        playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined}
-        playPick={sonido ? () => void audioRef.current?.blip() : undefined}
-      />
-
-      {/* nota al pie */}
-      <p style={{ marginTop: 20, fontSize: 11.5, color: T.text3, lineHeight: 1.6 }}>
-        <i className="fa-solid fa-circle-info" style={{ marginRight: 7 }} />
-        {NOTA_PIE}
-      </p>
-    </div>
+                </div>
+              </Bloque>
+              <p style={{ margin: 0, color: T.text3, lineHeight: 1.6 }}>
+                <i className="fa-solid fa-circle-info" style={{ marginRight: 7 }} />
+                {NOTA_PIE}
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }
 
@@ -903,7 +954,7 @@ function ColumnaDiscurso({
         <i className="fa-solid fa-align-left" style={{ marginRight: 8 }} />
         El discurso · el orden en que se cuenta
       </Eyebrow>
-      <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.5, marginBottom: 13 }}>
+      <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.5, marginBottom: 13 }}>
         {fase === "orden"
           ? "Este es el texto, en su orden. Toca un párrafo y llévalo al lugar que le toca en la historia."
           : "Ahora nombra qué hace cada párrafo con el tiempo de la historia."}
@@ -926,7 +977,7 @@ function ColumnaDiscurso({
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: 11.5,
+                    fontSize: 14,
                     fontWeight: 900,
                     color: "#fff",
                     background: "rgba(255,255,255,0.09)",
@@ -956,7 +1007,7 @@ function ColumnaDiscurso({
               </div>
 
               {fase === "orden" && colocado && (
-                <div style={{ fontSize: 11.5, color: OK, fontWeight: 700, paddingLeft: 46, animation: "prnPop .25s ease" }}>
+                <div style={{ fontSize: 14, color: OK, fontWeight: 700, paddingLeft: 46, animation: "prnPop .25s ease" }}>
                   <i className="fa-solid fa-circle-check" style={{ marginRight: 6 }} />
                   Colocado: {p.hecho}
                 </div>
@@ -972,7 +1023,7 @@ function ColumnaDiscurso({
                         gap: 7,
                         borderRadius: 10,
                         padding: "6px 11px",
-                        fontSize: 11.5,
+                        fontSize: 14,
                         fontWeight: 900,
                         color: info.color,
                         background: `${info.color}1c`,
@@ -1029,7 +1080,7 @@ function ColumnaHistoria({
         <i className="fa-solid fa-timeline" style={{ marginRight: 8 }} />
         La historia · el orden en que pasó
       </Eyebrow>
-      <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.5, marginBottom: 13 }}>
+      <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.5, marginBottom: 13 }}>
         {fase === "orden" ? "Del hecho más antiguo al más reciente. Un párrafo por casilla." : "Esta es la cronología real. Compárala con el orden del texto: ahí están los saltos."}
       </div>
 
@@ -1057,7 +1108,7 @@ function ColumnaHistoria({
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: 11,
+                    fontSize: 14,
                     fontWeight: 900,
                     color: T.text3,
                     background: "rgba(255,255,255,0.06)",
@@ -1094,7 +1145,7 @@ function ColumnaHistoria({
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: 11,
+                  fontSize: 14,
                   fontWeight: 900,
                   color: "#04121f",
                   background: OK,
@@ -1103,8 +1154,8 @@ function ColumnaHistoria({
                 {i + 1}
               </span>
               <div style={{ minWidth: 0 }}>
-                <div style={{ fontSize: 12.5, lineHeight: 1.5, color: "#fff" }}>{p.hecho}</div>
-                <div style={{ fontSize: 11, color: T.text3, marginTop: 5, display: "flex", alignItems: "center", gap: 7, flexWrap: "wrap" }}>
+                <div style={{ fontSize: 14, lineHeight: 1.5, color: "#fff" }}>{p.hecho}</div>
+                <div style={{ fontSize: 14, color: T.text3, marginTop: 5, display: "flex", alignItems: "center", gap: 7, flexWrap: "wrap" }}>
                   <span>
                     se cuenta en <strong style={{ color: T.text2 }}>D{orden}</strong>
                   </span>
@@ -1154,7 +1205,7 @@ function PanelVoces({
       <div style={{ ...card, padding: "18px 22px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
           <Eyebrow>La misma escena, tres narradores</Eyebrow>
-          <span style={{ fontSize: 12.5, fontWeight: 800, color: VOCES.every((v) => leidas[v]) ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
+          <span style={{ fontSize: 14, fontWeight: 800, color: VOCES.every((v) => leidas[v]) ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
             {VOCES.filter((v) => leidas[v] === true).length}/3 voces leídas
           </span>
         </div>
@@ -1163,7 +1214,7 @@ function PanelVoces({
             <button key={v} className="prn-seg" data-on={vozSel === v} onClick={() => onVoz(v)}>
               <i className={`fa-solid ${VOZ_INFO[v].icono}`} style={{ marginRight: 7, color: VOZ_INFO[v].color }} />
               {VOZ_INFO[v].titulo}
-              {leidas[v] === true && <i className="fa-solid fa-check" style={{ marginLeft: 7, fontSize: 10, color: OK }} />}
+              {leidas[v] === true && <i className="fa-solid fa-check" style={{ marginLeft: 7, fontSize: 14, color: OK }} />}
             </button>
           ))}
         </div>
@@ -1195,21 +1246,21 @@ function PanelVoces({
           </span>
           <div>
             <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff" }}>{info.titulo}</div>
-            <div style={{ fontSize: 11.5, color: T.text3 }}>{info.subtitulo}</div>
+            <div style={{ fontSize: 14, color: T.text3 }}>{info.subtitulo}</div>
           </div>
         </div>
         <p role="status" aria-live="polite" style={{ margin: 0, fontSize: 15, lineHeight: 1.8, color: "#fff" }}>
           {ESCENA_VOCES[vozSel]}
         </p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px,1fr))", gap: 12, marginTop: 16, paddingTop: 14, borderTop: `1px solid ${T.line}` }}>
-          <div style={{ display: "flex", gap: 10, fontSize: 12.5, color: T.text2, lineHeight: 1.6 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 220px), 1fr))", gap: 12, marginTop: 16, paddingTop: 14, borderTop: `1px solid ${T.line}` }}>
+          <div style={{ display: "flex", gap: 10, fontSize: 14, color: T.text2, lineHeight: 1.6 }}>
             <i className="fa-solid fa-circle-plus" style={{ color: OK, marginTop: 3 }} />
             <span>
               <strong style={{ color: T.text }}>Gana: </strong>
               {info.gana}
             </span>
           </div>
-          <div style={{ display: "flex", gap: 10, fontSize: 12.5, color: T.text2, lineHeight: 1.6 }}>
+          <div style={{ display: "flex", gap: 10, fontSize: 14, color: T.text2, lineHeight: 1.6 }}>
             <i className="fa-solid fa-circle-minus" style={{ color: NO, marginTop: 3 }} />
             <span>
               <strong style={{ color: T.text }}>Pierde: </strong>
@@ -1225,11 +1276,11 @@ function PanelVoces({
             <i className="fa-solid fa-scale-unbalanced" style={{ marginRight: 8, color: accent }} />
             ¿Quién puede contarlo?
           </Eyebrow>
-          <span style={{ fontSize: 12.5, fontWeight: 800, color: resueltas >= INFORMACIONES.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
+          <span style={{ fontSize: 14, fontWeight: 800, color: resueltas >= INFORMACIONES.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
             {resueltas}/{INFORMACIONES.length}
           </span>
         </div>
-        <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.5, marginBottom: 14 }}>
+        <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.5, marginBottom: 14 }}>
           El omnisciente puede contarlo todo; la pregunta es a qué otra voz le alcanza. Lee las tres versiones antes de decidir.
         </div>
 
@@ -1239,7 +1290,7 @@ function PanelVoces({
             const qi = QUIEN_INFO[inf.quien];
             return (
               <div key={inf.id} className="prn-row" data-done={bien} data-shake={shakeInfo === inf.id} style={{ flexDirection: "column", gap: 10 }}>
-                <div style={{ fontSize: 13.5, lineHeight: 1.55, color: "#fff", fontWeight: 600 }}>{inf.texto}</div>
+                <div style={{ fontSize: 14, lineHeight: 1.55, color: "#fff", fontWeight: 600 }}>{inf.texto}</div>
                 {bien ? (
                   <span
                     style={{
@@ -1249,7 +1300,7 @@ function PanelVoces({
                       gap: 8,
                       borderRadius: 10,
                       padding: "6px 12px",
-                      fontSize: 12,
+                      fontSize: 14,
                       fontWeight: 900,
                       color: qi.color,
                       background: `${qi.color}1c`,
@@ -1298,7 +1349,7 @@ function MesaRitmo({
   dropProps: DropFactory;
 }) {
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(235px, 1fr))", gap: 12 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 235px), 1fr))", gap: 12 }}>
       {RITMOS.map((r) => {
         const info = RITMO_INFO[r];
         const dentro = FRAGMENTOS_RITMO.filter((f) => ubicRitmo[f.id] === r);
@@ -1329,20 +1380,20 @@ function MesaRitmo({
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: 13,
+                  fontSize: 14,
                   color: "#fff",
                   background: `${info.color}33`,
                 }}
               >
                 <i className={`fa-solid ${info.icono}`} />
               </span>
-              <span style={{ fontSize: 13.5, fontWeight: 900, color: "#fff" }}>{info.titulo}</span>
+              <span style={{ fontSize: 14, fontWeight: 900, color: "#fff" }}>{info.titulo}</span>
             </div>
-            <div style={{ fontSize: 11, color: info.color, lineHeight: 1.45, marginBottom: 5, fontWeight: 800 }}>{info.formula}</div>
-            <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45, marginBottom: 12 }}>{info.subtitulo}</div>
+            <div style={{ fontSize: 14, color: info.color, lineHeight: 1.45, marginBottom: 5, fontWeight: 800 }}>{info.formula}</div>
+            <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.45, marginBottom: 12 }}>{info.subtitulo}</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {dentro.length === 0 ? (
-                <span style={{ fontSize: 12, color: T.text3, opacity: 0.6 }}>Arrastra aquí…</span>
+                <span style={{ fontSize: 14, color: T.text3, opacity: 0.6 }}>Arrastra aquí…</span>
               ) : (
                 dentro.map((f) => (
                   <span
@@ -1356,13 +1407,13 @@ function MesaRitmo({
                       borderRadius: 10,
                       background: `${info.color}1c`,
                       border: `1px solid ${info.color}55`,
-                      fontSize: 12,
+                      fontSize: 14,
                       color: "#fff",
                       lineHeight: 1.5,
                     }}
                   >
                     <span style={{ fontWeight: 600 }}>{f.texto}</span>
-                    <span style={{ fontSize: 10.5, color: T.text3, fontWeight: 700 }}>
+                    <span style={{ fontSize: 14, color: T.text3, fontWeight: 700 }}>
                       <i className="fa-solid fa-clock" style={{ marginRight: 5, color: info.color }} />
                       historia: {f.tiempoHistoria} · texto: {f.tiempoRelato}
                     </span>
@@ -1420,11 +1471,11 @@ function MesaConversion({
             </button>
           ))}
           <div style={{ flex: 1 }} />
-          <span style={{ fontSize: 12.5, fontWeight: 800, color: convsHechas >= CONVERSIONES.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
+          <span style={{ fontSize: 14, fontWeight: 800, color: convsHechas >= CONVERSIONES.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
             {convsHechas}/{CONVERSIONES.length}
           </span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", fontSize: 12, fontWeight: 800 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", fontSize: 14, fontWeight: 800 }}>
           <span style={{ color: de.color }}>
             <i className={`fa-solid ${de.icono}`} style={{ marginRight: 6 }} />
             {de.titulo}
@@ -1472,7 +1523,7 @@ function MesaConversion({
           })}
         </p>
         {completa && (
-          <div style={{ marginTop: 16, paddingTop: 13, borderTop: `1px solid ${T.line}`, fontSize: 12.5, color: T.text2, lineHeight: 1.6, display: "flex", gap: 10 }}>
+          <div style={{ marginTop: 16, paddingTop: 13, borderTop: `1px solid ${T.line}`, fontSize: 14, color: T.text2, lineHeight: 1.6, display: "flex", gap: 10 }}>
             <i className="fa-solid fa-wand-magic-sparkles" style={{ color: accent, marginTop: 2 }} />
             <span>{conv.nota}</span>
           </div>
@@ -1493,7 +1544,7 @@ function MesaConversion({
           </div>
         </div>
       ) : (
-        <div style={{ ...card, padding: "18px 22px", display: "flex", alignItems: "center", gap: 10, fontSize: 13.5, fontWeight: 700, color: OK }}>
+        <div style={{ ...card, padding: "18px 22px", display: "flex", alignItems: "center", gap: 10, fontSize: 14, fontWeight: 700, color: OK }}>
           <i className="fa-solid fa-circle-check" />
           Conversión terminada. Cambia de diálogo arriba para hacer el siguiente.
         </div>
@@ -1501,22 +1552,167 @@ function MesaConversion({
 
       <div style={{ ...card, padding: "18px 22px" }}>
         <Eyebrow>Los tres estilos, de un vistazo</Eyebrow>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px,1fr))", gap: 12 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 230px), 1fr))", gap: 12 }}>
           {(["directo", "indirecto", "libre"] as const).map((e) => {
             const est = ESTILO_INFO[e];
             return (
               <div key={e} style={{ borderRadius: 13, border: `1px solid ${est.color}44`, background: `${est.color}0d`, padding: "13px 15px" }}>
-                <div style={{ fontSize: 12.5, fontWeight: 900, color: est.color, marginBottom: 6 }}>
+                <div style={{ fontSize: 14, fontWeight: 900, color: est.color, marginBottom: 6 }}>
                   <i className={`fa-solid ${est.icono}`} style={{ marginRight: 7 }} />
                   {est.titulo}
                 </div>
-                <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.5, marginBottom: 7 }}>{est.marca}</div>
-                <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.5, fontStyle: "italic" }}>{est.ejemplo}</div>
+                <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.5, marginBottom: 7 }}>{est.marca}</div>
+                <div style={{ fontSize: 14, color: "#fff", lineHeight: 1.5, fontStyle: "italic" }}>{est.ejemplo}</div>
               </div>
             );
           })}
         </div>
       </div>
     </>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * MODO 0 — el taller del relato (simulador)
+ *
+ * El alumno elige narrador y reordena las escenas de un cuento original.
+ * Cambia la curva de suspenso, los medidores, las marcas de salto de tiempo y
+ * la reacción de una lectora ficticia. Las cifras son una simulación.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+function TallerRelato({
+  orden,
+  narrador,
+  resultado,
+  probados,
+  onNarrador,
+  onMover,
+}: {
+  orden: string[];
+  narrador: Voz;
+  resultado: Resultado;
+  probados: Record<string, boolean>;
+  onNarrador: (v: Voz) => void;
+  onMover: (id: string, delta: -1 | 1) => void;
+}) {
+  const info = narradorDe(narrador);
+  const reaccion = reaccionLectora(resultado);
+  const escenas = orden.map((id) => CUENTO.find((e) => e.id === id)!);
+  const n = escenas.length;
+  const W = 700;
+  const H = 170;
+  const x = (i: number) => 30 + (i * (W - 60)) / Math.max(1, n - 1);
+  const y = (v: number) => H - 14 - (v / 10) * (H - 34);
+  const puntos = resultado.curva.map((c, i) => `${x(i)},${y(c.nivel)}`).join(" ");
+  const saltoDe = (id: string) => resultado.saltos.find((s) => s.id === id)?.marca;
+  const medidores: { label: string; valor: number; texto: string; color: string }[] = [
+    { label: "Sorpresa en el giro", valor: resultado.sorpresa, texto: `${resultado.sorpresa}/10`, color: reaccion.color },
+    { label: "Cercanía con Mara", valor: resultado.cercania, texto: `${resultado.cercania}/10`, color: info.color },
+    { label: "Escenas que conoce el lector", valor: resultado.informacion / 10, texto: `${resultado.informacion} %`, color: "#5BC8FF" },
+  ];
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
+      <div style={{ display: "flex", gap: 9, flexWrap: "wrap" }}>
+        {NARRADORES.map((nr) => (
+          <button key={nr.id} className="prn-seg" data-on={narrador === nr.id} onClick={() => onNarrador(nr.id)}>
+            <i className={`fa-solid ${nr.icono}`} style={{ marginRight: 7, color: nr.color }} />
+            {nr.corto}
+            {probados[nr.id] === true && <i className="fa-solid fa-check" style={{ marginLeft: 7, color: OK }} />}
+          </button>
+        ))}
+      </div>
+      <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+        <strong style={{ color: T.text }}>«{CUENTO_TITULO}» · {info.titulo}:</strong> {info.quedaFuera}.
+      </div>
+
+      <div className="prn-medidores">
+        {medidores.map((m) => (
+          <div key={m.label} className="prn-med">
+            <span>
+              {m.label}
+              <strong>{m.texto}</strong>
+            </span>
+            <div className="prn-med-barra">
+              <div style={{ width: `${Math.min(100, m.valor * 10)}%`, background: m.color }} />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="prn-curva" aria-label="Curva de suspenso">
+        <div style={{ fontSize: 14, fontWeight: 800, color: T.text2, marginBottom: 4 }}>
+          <i className="fa-solid fa-chart-line" style={{ marginRight: 8, color: info.color }} />
+          Curva de suspenso (simulación)
+        </div>
+        <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Nivel de suspenso después de cada escena">
+          <line x1="20" y1={y(0)} x2={W - 20} y2={y(0)} stroke="rgba(255,255,255,0.18)" strokeWidth="2" />
+          <line x1="20" y1={y(7)} x2={W - 20} y2={y(7)} stroke="rgba(52,211,153,0.35)" strokeWidth="2" strokeDasharray="8 8" />
+          <polyline points={puntos} fill="none" stroke={info.color} strokeWidth="5" strokeLinejoin="round" strokeLinecap="round" />
+          {resultado.curva.map((c, i) => {
+            const e = escenas[i]!;
+            const giro = e.tipo === "giro";
+            return <circle key={c.id} cx={x(i)} cy={y(c.nivel)} r={giro ? 11 : 7} fill={giro ? "#FFC75A" : c.contada ? info.color : "#2a3a4d"} stroke="#04121f" strokeWidth="3" />;
+          })}
+        </svg>
+        <div className="prn-curva-eje">
+          {escenas.map((e, i) => (
+            <span key={e.id} style={{ color: e.tipo === "giro" ? "#FFC75A" : undefined }} title={e.titulo}>
+              {i + 1}
+              <i className={`fa-solid ${e.icono}`} style={{ marginLeft: 4, fontSize: 14 }} />
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div className="prn-reaccion" role="status" aria-live="polite" style={{ borderColor: `${reaccion.color}66` }}>
+        <i className={`fa-solid ${reaccion.icono}`} style={{ color: reaccion.color }} aria-hidden />
+        <span>
+          <strong>Ximena, lectora ficticia: {reaccion.frase}</strong>
+          {reaccion.porque}
+        </span>
+      </div>
+
+      <div className="prn-guion">
+        {escenas.map((e, i) => {
+          const fuera = !puedeContar(e, narrador);
+          const marca = saltoDe(e.id);
+          const mi = marca ? MARCA_INFO[marca] : null;
+          return (
+            <div key={e.id} className="prn-esc" data-fuera={fuera}>
+              <div className="prn-foto">
+                <i className={`fa-solid ${e.icono}`} aria-hidden />
+                <img src={`${RUTA_FOTOS_NARRATIVA}/${e.foto}.webp`} alt="" loading="lazy" onError={(ev) => (ev.currentTarget.style.display = "none")} />
+                <span className="prn-num">{i + 1}</span>
+              </div>
+              <div className="prn-esc-cuerpo">
+                <h5>{e.titulo}</h5>
+                {fuera ? (
+                  <p>
+                    <i className="fa-solid fa-eye-slash" style={{ marginRight: 7 }} />
+                    {info.corto} no puede contar esta escena: el lector se queda sin ella.
+                  </p>
+                ) : (
+                  <p>{e.texto}</p>
+                )}
+                {mi && marca !== "sigue" && (
+                  <span className="prn-marcaje" style={{ color: mi.color, background: `${mi.color}1c`, border: `1px solid ${mi.color}66` }}>
+                    <i className={`fa-solid ${mi.icono}`} aria-hidden />
+                    {mi.titulo}
+                  </span>
+                )}
+              </div>
+              <div className="prn-esc-mov">
+                <button type="button" disabled={i === 0} onClick={() => onMover(e.id, -1)} aria-label={`Contar «${e.titulo}» antes`}>
+                  <i className="fa-solid fa-arrow-left" aria-hidden /> Antes
+                </button>
+                <button type="button" disabled={i === n - 1} onClick={() => onMover(e.id, 1)} aria-label={`Contar «${e.titulo}» después`}>
+                  Después <i className="fa-solid fa-arrow-right" aria-hidden />
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }

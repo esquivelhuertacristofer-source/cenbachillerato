@@ -1,0 +1,12 @@
+{
+  "escena": "Seis personas esperan en una parada bajo la lluvia y tu amigo no sabe cuál es Mariana",
+  "pregunta": "Describes a Mariana con una frase bien armada en inglés. ¿Qué pasa con las seis personas?",
+  "opciones": [
+    { "id": "a", "texto": "Aparecen personas nuevas en la parada", "icono": "fa-user-plus" },
+    { "id": "b", "texto": "Se apagan las que no coinciden", "icono": "fa-user-slash" },
+    { "id": "c", "texto": "Todas se quedan igual hasta el final", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "Una frase correcta le da a tu amigo datos que entiende: estatura, cabello, lentes o ropa. Con cada dato descarta a quienes no encajan, y si la gramática falla no entiende y nadie se descarta.",
+  "comoComprobarlo": "En «Find the person» elige primero la frase con is/has bien usados y luego la que mezcla has tall; compara cuántas personas siguen encendidas."
+}

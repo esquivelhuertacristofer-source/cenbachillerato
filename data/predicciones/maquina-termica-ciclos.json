@@ -1,0 +1,12 @@
+{
+  "escena": "Un motor de calor entre un foco caliente a la izquierda y uno frío a la derecha, con chorros de partículas y un medidor de eficiencia.",
+  "pregunta": "Si bajas la temperatura del foco frío, ¿qué pasa con el trabajo útil?",
+  "opciones": [
+    { "id": "a", "texto": "Aumenta", "icono": "fa-arrow-up" },
+    { "id": "b", "texto": "No cambia", "icono": "fa-equals" },
+    { "id": "c", "texto": "Disminuye", "icono": "fa-arrow-down" }
+  ],
+  "correcta": "a",
+  "porque": "La eficiencia máxima es η = 1 − T_f/T_c. Con un foco frío más frío, el cociente T_f/T_c baja, η sube y de cada joule que entra se aprovecha más como trabajo.",
+  "comoComprobarlo": "En «Motor de calor» baja el deslizador del foco frío y compara el chorro verde y el medidor η."
+}

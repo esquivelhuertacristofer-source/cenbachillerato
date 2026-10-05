@@ -20,8 +20,8 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef, type RefObject } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef, type ReactNode, type RefObject } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, ContactShadows, Edges, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
@@ -53,6 +53,18 @@ const HOT = new THREE.Color("#ffd24a");
 function rng(n: number): number {
   const s = Math.sin(n * 127.1 + 311.7) * 43758.5453;
   return s - Math.floor(s);
+}
+
+
+/* Etiqueta legible: tamaño fijo en píxeles (≥14 px), en la punta de lo que nombra. */
+function Etq({ at, color, children }: { at: [number, number, number]; color: string; children: ReactNode }) {
+  return (
+    <Html center position={at} pointerEvents="none" zIndexRange={[20, 0]}>
+      <div style={{ whiteSpace: "nowrap", padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.88)", border: `1.5px solid ${color}`, color, fontWeight: 900, fontSize: 15, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)", textAlign: "center" }}>
+        {children}
+      </div>
+    </Html>
+  );
 }
 
 const colorCalor = (out: THREE.Color, t: number) => {
@@ -103,14 +115,9 @@ function BarraEntropia({ sRef, accent }: { sRef: SRef; accent: string }) {
         <boxGeometry args={[BAR_W, 1, BAR_W]} />
         <meshStandardMaterial ref={matRef} color={accent} emissive={accent} emissiveIntensity={0.5} roughness={0.3} />
       </mesh>
-      <Html center position={[0, BAR_H + 0.55, 0]} distanceFactor={13} pointerEvents="none">
-        <div style={{ textAlign: "center", whiteSpace: "nowrap", textShadow: "0 2px 10px rgba(0,0,0,0.95)" }}>
-          <div style={{ fontWeight: 900, fontSize: 12, color: accent }}>Entropía (S)</div>
-          <div style={{ fontWeight: 800, fontSize: 14, color: "#fff" }}>
-            <span ref={label}>0%</span>
-          </div>
-        </div>
-      </Html>
+      <Etq at={[0, BAR_H + 0.5, 0]} color={accent}>
+        Entropía <span ref={label}>0%</span>
+      </Etq>
     </group>
   );
 }
@@ -235,11 +242,9 @@ function Mezcla({ activo, accent, pausado, sRef }: {
         <meshPhysicalMaterial transparent opacity={activo ? 0 : 0.32} roughness={0.05} metalness={0.2} color="#cfe6ff" />
       </mesh>
 
-      <Html center position={[0, M_CY + M_HY + 0.45, 0]} distanceFactor={13} pointerEvents="none">
-        <div style={{ whiteSpace: "nowrap", fontWeight: 800, fontSize: 12, color: activo ? accent : "#cfe6ff", textShadow: "0 2px 10px rgba(0,0,0,0.95)" }}>
-          {activo ? "se mezclan solos →" : "pared puesta"}
-        </div>
-      </Html>
+      <Etq at={[0, M_CY + M_HY + 0.45, 0]} color={activo ? accent : "#cfe6ff"}>
+        {activo ? "se mezclan solos" : "pared puesta"}
+      </Etq>
 
     </group>
   );
@@ -337,17 +342,8 @@ function Calor({ activo, accent, pausado, sRef }: {
         <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.6} roughness={0.4} />
       </mesh>
 
-      <Html center position={[-Q_GAPX, Q_CY + 0.95, 0]} distanceFactor={13} pointerEvents="none">
-        <div style={{ whiteSpace: "nowrap", fontWeight: 800, fontSize: 12, color: "#ff8a5a", textShadow: "0 2px 10px rgba(0,0,0,0.95)" }}>caliente 🔥</div>
-      </Html>
-      <Html center position={[Q_GAPX, Q_CY + 0.95, 0]} distanceFactor={13} pointerEvents="none">
-        <div style={{ whiteSpace: "nowrap", fontWeight: 800, fontSize: 12, color: "#7fb8ff", textShadow: "0 2px 10px rgba(0,0,0,0.95)" }}>frío ❄️</div>
-      </Html>
-      <Html center position={[0, Q_CY - 0.95, 0]} distanceFactor={13} pointerEvents="none">
-        <div style={{ whiteSpace: "nowrap", fontWeight: 700, fontSize: 11.5, color: activo ? accent : "#9fb6d6", textShadow: "0 2px 10px rgba(0,0,0,0.95)" }}>
-          {activo ? "el calor fluye → equilibrio" : "separados"}
-        </div>
-      </Html>
+      <Etq at={[-Q_GAPX, Q_CY + 0.95, 0]} color="#ff8a5a">caliente</Etq>
+      <Etq at={[Q_GAPX, Q_CY + 0.95, 0]} color="#7fb8ff">frío</Etq>
 
       <ContactShadows position={[0, Q_CY - 0.7, 0]} opacity={0.28} scale={9} blur={2.6} far={5} color="#020c1c" />
     </group>
@@ -428,15 +424,9 @@ function Cristal({ tempCristal, pausado, sRef }: {
         <Edges threshold={15} color={ordenado ? "#9fdcff" : "#5b7fa6"} />
       </mesh>
 
-      <Html center position={[0, X_CY + 1.15, 0]} distanceFactor={13} pointerEvents="none">
-        <div style={{ textAlign: "center", whiteSpace: "nowrap", textShadow: "0 2px 10px rgba(0,0,0,0.95)" }}>
-          <div style={{ fontWeight: 900, fontSize: 12, color: ordenado ? "#9fdcff" : "#ff8a5a" }}>{ordenado ? "cristal ordenado" : "vibrando"}</div>
-          <div style={{ fontWeight: 800, fontSize: 13, color: "#fff" }}>{fmtNum(tempCristal, 0)} K</div>
-        </div>
-      </Html>
-      <Html center position={[0, X_CY - 1.2, 0]} distanceFactor={13} pointerEvents="none">
-        <div style={{ whiteSpace: "nowrap", fontWeight: 700, fontSize: 11, color: "#9fb6d6", textShadow: "0 2px 10px rgba(0,0,0,0.95)" }}>0 K es inalcanzable</div>
-      </Html>
+      <Etq at={[0, X_CY + 1.05, 0]} color={ordenado ? "#9fdcff" : "#ff8a5a"}>
+        {ordenado ? "ordenado" : "vibrando"} · {fmtNum(tempCristal, 0)} K
+      </Etq>
 
       <ContactShadows position={[0, X_CY - 0.9, 0]} opacity={0.28} scale={9} blur={2.6} far={5} color="#020c1c" />
     </group>
@@ -463,6 +453,14 @@ function Contenido(props: EntropiaSceneProps) {
 
   // ref compartido: el proceso escribe la entropía, la barra la lee.
   const sRef = useRef<{ value: number }>({ value: 0 });
+
+  // Encuadre: el contenido (≈ 8 unidades de ancho) cabe entre la barra de arriba y la misión de abajo.
+  const { size, camera } = useThree();
+  const aspecto = size.width / Math.max(1, size.height);
+  const camZ = 8.8 * Math.max(1, 1.45 / aspecto);
+  useEffect(() => {
+    camera.position.set(0.3, 1.8, camZ);
+  }, [camera, camZ]);
 
   const heat = useMemo(() => COLD.clone().lerp(WARM, 0.4), []);
 
@@ -492,10 +490,10 @@ function Contenido(props: EntropiaSceneProps) {
       <OrbitControls
         enablePan={false}
         minDistance={5}
-        maxDistance={14}
+        maxDistance={16}
         minPolarAngle={Math.PI / 7}
         maxPolarAngle={Math.PI / 1.9}
-        target={[0.4, 0.4, 0]}
+        target={[0.4, 0.05, 0]}
         autoRotate={autoRotate}
         autoRotateSpeed={0.4}
       />

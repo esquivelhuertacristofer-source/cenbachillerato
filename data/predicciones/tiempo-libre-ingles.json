@@ -1,0 +1,12 @@
+{
+  "escena": "Una radio escolar entrevista a Ana y su agenda de fin de semana empieza vacía",
+  "pregunta": "En la entrevista de Ana, ¿qué pasa si eliges «She play soccer» sin la -s?",
+  "opciones": [
+    { "id": "a", "texto": "La casilla se llena de futbol igual", "icono": "fa-futbol" },
+    { "id": "b", "texto": "Sale ruido y baja la señal", "icono": "fa-wave-square" },
+    { "id": "c", "texto": "Cambia el día de la actividad", "icono": "fa-calendar-days" }
+  ],
+  "correcta": "b",
+  "porque": "Con she el verbo en presente simple necesita -s. Sin ella el público no entiende la frase: la casilla queda con estática y la señal de la radio pierde una barra.",
+  "comoComprobarlo": "En «Radio Prepa» elige primero la frase sin -s y luego la que sí la lleva; compara la casilla de la agenda y las barras de señal."
+}

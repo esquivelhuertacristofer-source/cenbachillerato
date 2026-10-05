@@ -1,0 +1,8 @@
+{
+  "slug": "convivencia-digital",
+  "items": [
+    { "clave": "festival-baile", "formato": "1:1", "estilo": "foto", "escena": "Un adolescente visto de espaldas bailando con los brazos en alto en el patio de una escuela mexicana durante un festival, con serpentinas de papel picado al fondo, luz de tarde, cara no visible" },
+    { "clave": "grupo-salon", "formato": "16:9", "estilo": "ilustracion", "escena": "Ilustración de un salón de clases con pupitres en filas y varios teléfonos celulares sobre las mesas con la pantalla encendida, luz cálida de ventana, colores suaves" },
+    { "clave": "cuenta-falsa", "formato": "1:1", "estilo": "ilustracion", "escena": "Ilustración de un teléfono celular que muestra dos siluetas de perfil idénticas una junto a la otra, una con un contorno rojo, fondo azul oscuro liso" }
+  ]
+}

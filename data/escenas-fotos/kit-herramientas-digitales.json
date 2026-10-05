@@ -1,0 +1,7 @@
+{
+  "slug": "kit-herramientas-digitales",
+  "items": [
+    { "clave": "equipo-mesa", "formato": "16:9", "estilo": "ilustracion", "escena": "Tres estudiantes de bachillerato sentados alrededor de una mesa en la biblioteca con laptops abiertas, un cuaderno y vasos de agua, luz cálida de tarde, sin pantallas legibles" },
+    { "clave": "mochila-laptops", "formato": "16:9", "estilo": "ilustracion", "escena": "Mochilas y tres laptops cerradas sobre una banca de jardín de una escuela al atardecer, con hojas de árbol en el suelo" }
+  ]
+}

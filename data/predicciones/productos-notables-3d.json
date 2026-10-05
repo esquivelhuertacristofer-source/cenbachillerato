@@ -1,0 +1,12 @@
+{
+  "escena": "Un cuadrado de lado a + b, con a = 3 y b = 1, hecho de cuatro piezas.",
+  "pregunta": "¿(a + b)² vale lo mismo que a² + b² cuando a = 3 y b = 1?",
+  "opciones": [
+    { "id": "a", "texto": "Sí, los dos valen 10", "icono": "fa-equals" },
+    { "id": "b", "texto": "No, (a + b)² vale 16", "icono": "fa-square" },
+    { "id": "c", "texto": "No, (a + b)² vale 13", "icono": "fa-square-minus" }
+  ],
+  "correcta": "b",
+  "porque": "El cuadrado de lado 4 tiene área 16. Los cuadrados a² = 9 y b² = 1 suman solo 10; los 6 que faltan son los dos rectángulos ab: 2 · 3 · 1.",
+  "comoComprobarlo": "En «Binomio al cuadrado» pon a = 3 y b = 1, y mueve la separación para despiezar el cuadrado."
+}

@@ -21,8 +21,8 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef, type ReactNode } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, ContactShadows, Edges, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
@@ -158,12 +158,9 @@ function Foco({ center, color, intensidad, titulo, tempLabel, accent: _accent }:
         <Edges threshold={15} color="#ffffff" />
       </mesh>
       <pointLight position={[0, 0, 0.9]} intensity={2 + intensidad * 8} color={hex} distance={6} />
-      <Html center position={[0, 1.35, 0]} distanceFactor={13} pointerEvents="none">
-        <div style={{ textAlign: "center", whiteSpace: "nowrap", textShadow: "0 2px 10px rgba(0,0,0,0.95)" }}>
-          <div style={{ fontWeight: 900, fontSize: 12, color: hex }}>{titulo}</div>
-          <div style={{ fontWeight: 800, fontSize: 13, color: "#fff" }}>{tempLabel}</div>
-        </div>
-      </Html>
+      <Etq at={[0, 1.35, 0]} color={hex}>
+        {titulo} · {tempLabel}
+      </Etq>
     </group>
   );
 }
@@ -210,12 +207,44 @@ function Maquina({ spin, accent, esMotor }: { spin: number; accent: string; esMo
   );
 }
 
-/* ── Etiqueta flotante para un chorro ────────────────────────────────── */
-function Etiqueta({ at, text, color }: { at: [number, number, number]; text: string; color: string }) {
+/* ── Etiqueta legible: tamaño fijo en píxeles (≥14 px), en la punta de lo que nombra ── */
+function Etq({ at, text, color, children }: { at: [number, number, number]; text?: string; color: string; children?: ReactNode }) {
   return (
-    <Html center position={at} distanceFactor={13} pointerEvents="none">
-      <div style={{ whiteSpace: "nowrap", fontWeight: 800, fontSize: 11.5, color, textShadow: "0 2px 10px rgba(0,0,0,0.95)" }}>{text}</div>
+    <Html center position={at} pointerEvents="none" zIndexRange={[20, 0]}>
+      <div style={{ whiteSpace: "nowrap", padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.88)", border: `1.5px solid ${color}`, color, fontWeight: 900, fontSize: 15, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)", textAlign: "center" }}>
+        {text}{children}
+      </div>
     </Html>
+  );
+}
+
+/* ── Medidor: la barra se llena con η (motor) o COP/6 (refrigerador) ── */
+const MED_W = 3;
+function Medidor({ valor, color, texto }: { valor: number; color: string; texto: string }) {
+  const fill = useRef<THREE.Mesh>(null);
+  const cur = useRef(0);
+  useFrame((_s, raw) => {
+    const delta = Math.min(raw, 0.05);
+    cur.current += (THREE.MathUtils.clamp(valor, 0, 1) - cur.current) * Math.min(1, delta * 5);
+    const f = fill.current;
+    if (f) {
+      const w = Math.max(0.001, cur.current * MED_W);
+      f.scale.x = w;
+      f.position.x = -MED_W / 2 + w / 2;
+    }
+  });
+  return (
+    <group position={[0, -0.2, 1.5]}>
+      <mesh>
+        <boxGeometry args={[MED_W + 0.08, 0.24, 0.24]} />
+        <meshStandardMaterial color="#0d1c30" roughness={0.6} metalness={0.2} transparent opacity={0.55} />
+      </mesh>
+      <mesh ref={fill}>
+        <boxGeometry args={[1, 0.18, 0.2]} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.6} roughness={0.35} />
+      </mesh>
+      <Etq at={[0, -0.5, 0]} color={color} text={texto} />
+    </group>
   );
 }
 
@@ -239,17 +268,15 @@ function Motor({ tCal, tFrio, accent, pausado }: {
 
       {/* Q_c entra del caliente */}
       <Flujo from={HOT_EDGE} to={M_INLEFT} color={HOT} cap={CAP} shown={CAP} speed={0.55} pausado={pausado} />
-      <Etiqueta at={[-1.85, 1.05, 0]} text="Q caliente" color="#ff8a6a" />
 
       {/* Trabajo útil sube */}
       <Flujo from={M_TOP} to={TOP_OUT} color={WORK} cap={CAP} shown={workShown} speed={0.8} pausado={pausado} />
-      <Etiqueta at={[0.62, 2.4, 0]} text="W (trabajo)" color="#5ce0b0" />
+      <Etq at={[0.9, 2.55, 0]} color="#5ce0b0" text="W (trabajo)" />
 
       {/* Q_f de desecho al frío */}
       <Flujo from={M_INRIGHT} to={COLD_EDGE} color={WASTE} cap={CAP} shown={wasteShown} speed={0.5} pausado={pausado} />
-      <Etiqueta at={[1.85, 1.05, 0]} text="Q frío (desecho)" color="#ffb07a" />
 
-      <Etiqueta at={[0, -0.55, 0]} text={`η = ${fmtNum(eta * 100, 0)} %`} color={accent} />
+      <Medidor valor={eta} color={accent} texto={`η = ${fmtNum(eta * 100, 0)} %`} />
     </group>
   );
 }
@@ -276,17 +303,15 @@ function Refrigerador({ tCal, tFrio, accent, pausado }: {
 
       {/* Trabajo eléctrico entra por arriba */}
       <Flujo from={TOP_OUT} to={M_TOP} color={ELEC} cap={6} shown={wShown} speed={0.8} pausado={pausado} />
-      <Etiqueta at={[0.78, 2.4, 0]} text="W eléctrico" color="#ffe07a" />
+      <Etq at={[0.95, 2.55, 0]} color="#ffe07a" text="W eléctrico" />
 
       {/* Q_f se bombea desde el interior frío (der → máquina) */}
       <Flujo from={COLD_EDGE} to={M_INRIGHT} color={COLD} cap={22} shown={qfShown} speed={0.5} pausado={pausado} />
-      <Etiqueta at={[1.85, 1.05, 0]} text="Q frío (se extrae)" color="#7fb8ff" />
 
       {/* Q_c se expulsa al exterior caliente (máquina → izq) */}
       <Flujo from={M_INLEFT} to={HOT_EDGE} color={WASTE} cap={28} shown={qcShown} speed={0.5} pausado={pausado} />
-      <Etiqueta at={[-1.85, 1.05, 0]} text="Q caliente (se expulsa)" color="#ffb07a" />
 
-      <Etiqueta at={[0, -0.55, 0]} text={`COP = ${fmtNum(cop, 1)}`} color={accent} />
+      <Medidor valor={copVis / 6} color={accent} texto={`COP = ${fmtNum(cop, 1)}`} />
       <ContactShadows position={[0, -0.35, 0]} opacity={0.3} scale={12} blur={2.6} far={6} color="#020c1c" />
     </group>
   );
@@ -310,6 +335,14 @@ export default function MaquinaTermicaScene(props: MaquinaTermicaSceneProps) {
 function Contenido(props: MaquinaTermicaSceneProps) {
   const { modo, tCal, tFrio, accent, pausado, autoRotate, resetNonce } = props;
 
+  // Encuadre: los dos focos (≈ 8.5 unidades de ancho) caben entre la barra de arriba y la misión de abajo.
+  const { size, camera } = useThree();
+  const aspecto = size.width / Math.max(1, size.height);
+  const camZ = 9.6 * Math.max(1, 1.9 / aspecto);
+  useEffect(() => {
+    camera.position.set(0.2, 1.9, camZ);
+  }, [camera, camZ]);
+
   return (
     <>
       {/* Suelo, luz de tres puntos y entorno que reflejar. */}
@@ -330,10 +363,10 @@ function Contenido(props: MaquinaTermicaSceneProps) {
       <OrbitControls
         enablePan={false}
         minDistance={6}
-        maxDistance={15}
+        maxDistance={18}
         minPolarAngle={Math.PI / 7}
         maxPolarAngle={Math.PI / 1.9}
-        target={[0, 0.6, 0]}
+        target={[0, 0.35, 0]}
         autoRotate={autoRotate}
         autoRotateSpeed={0.4}
       />

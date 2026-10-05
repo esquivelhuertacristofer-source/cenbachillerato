@@ -1,0 +1,12 @@
+{
+  "escena": "Una caja naranja empujada sobre el piso por una flecha de fuerza inclinada, con una barra vertical de trabajo a un lado.",
+  "pregunta": "Si empujas la caja con la fuerza apuntando a 90° del movimiento, ¿cuánto trabajo haces?",
+  "opciones": [
+    { "id": "a", "texto": "Cero joules", "icono": "fa-0" },
+    { "id": "b", "texto": "La mitad del máximo", "icono": "fa-divide" },
+    { "id": "c", "texto": "El máximo posible", "icono": "fa-arrow-up" }
+  ],
+  "correcta": "a",
+  "porque": "Solo la parte de la fuerza alineada con el desplazamiento hace trabajo: F·cos θ. A 90° el coseno vale cero, así que no se transfiere energía aunque la caja siga avanzando.",
+  "comoComprobarlo": "En «Trabajo» sube el ángulo θ de 0° a 90° y observa la barra de trabajo y la flecha verde."
+}

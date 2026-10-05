@@ -1,0 +1,12 @@
+{
+  "escena": "Un gas encerrado en un cilindro con pistón y un manómetro a un lado",
+  "pregunta": "Si bajas el pistón y el volumen queda a la mitad, ¿qué pasa con la presión?",
+  "opciones": [
+    { "id": "a", "texto": "Se reduce a la mitad", "icono": "fa-arrow-down" },
+    { "id": "b", "texto": "Se duplica", "icono": "fa-arrow-up" },
+    { "id": "c", "texto": "Casi no cambia", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "Las mismas partículas quedan en la mitad del espacio y golpean las paredes el doble de seguido. Si la temperatura y la cantidad no cambian, P por V se mantiene constante.",
+  "comoComprobarlo": "Con Temperatura y Cantidad sin tocar, arrastra el pistón hasta 5 L y mira el manómetro."
+}

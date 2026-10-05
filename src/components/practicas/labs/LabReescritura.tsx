@@ -38,7 +38,7 @@ import { CompletaTexto } from "./_mecanica-huecos";
 import { EscribeTermino } from "./_mecanica-termino";
 import { REESCRITURA_HUECOS } from "./reescritura-taller-huecos";
 import { usePartida, MarcadorPartida } from "./_partida";
-import { TableroObjetivos } from "./_objetivos";
+import { LabShell, Bloque, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { REESCRITURA_FICHA } from "./reescritura-taller-ficha";
@@ -104,6 +104,34 @@ function medidas(b: Borrador, cortes: Record<string, true>) {
 
 const limpioYa = (b: Borrador, cortes: Record<string, true>) => b.trozos.every((t) => t.estorbo === null || cortes[t.id]);
 
+const RUTA_FOTOS_REESCRITURA = "/media/labs-sim/reescritura-taller";
+const FOTO_BORRADOR: Record<string, { clave: string; icono: string }> = {
+  "bo-aviso": { clave: "borrador-aviso", icono: "fa-thumbtack" },
+  "bo-terminal": { clave: "borrador-diario", icono: "fa-book-open" },
+  "bo-reporte": { clave: "borrador-reporte", icono: "fa-flask" },
+};
+const LECTURA_PPM = 200;
+
+/** Cómo lo recibe una lectora ficticia: todas las cifras son una simulación. */
+function lecturaDe(b: Borrador, cortes: Record<string, true>) {
+  let senal = 0;
+  let ruido = 0;
+  let ruidoTotal = 0;
+  for (const t of b.trozos) {
+    const n = palabrasDe(t);
+    if (t.estorbo === null) senal += n;
+    else {
+      ruidoTotal += n;
+      if (!cortes[t.id]) ruido += n;
+    }
+  }
+  const claridad = senal + ruido > 0 ? Math.round((senal / (senal + ruido)) * 100) : 100;
+  const total = senal + ruidoTotal;
+  const segundos = Math.round(((senal + ruido) / LECTURA_PPM) * 60);
+  const segundosAntes = Math.round((total / LECTURA_PPM) * 60);
+  return { claridad, segundos, segundosAntes, senal, ruido };
+}
+
 export function LabReescritura({ color }: PracticaLabProps) {
   const accent = color.hex.startsWith("#") ? color.hex : `#${color.hex}`;
   const [modo, setModo] = useState<Modo>("cirugia");
@@ -111,7 +139,6 @@ export function LabReescritura({ color }: PracticaLabProps) {
   // ── sonido y partida ──────────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   useEffect(() => () => audioRef.current?.dispose(), []);
   const toggleSonido = async () => {
@@ -309,7 +336,10 @@ export function LabReescritura({ color }: PracticaLabProps) {
   /* ── objetivos ─────────────────────────────────────────────────────── */
   const versionesHechas = VERSIONES.filter((v) => veRazon[v.id] !== undefined).length;
   const gemelosHechos = GEMELOS.every((v) => veRazon[v.id] !== undefined);
+  const claridadActual = lecturaDe(borrador, cortes).claridad;
+  const alguno = BORRADORES.some((b) => limpioYa(b, cortes));
   const objetivos = [
+    { txt: "Corta lo que sobra hasta que la lectora entienda todo a la primera (claridad 100 %)", done: alguno },
     { txt: "Limpia el borrador «Aviso vecinal»", done: limpioYa(BORRADORES[0]!, cortes) },
     { txt: "Limpia el borrador «Diario de viaje»", done: limpioYa(BORRADORES[1]!, cortes) },
     { txt: "Limpia el borrador «Reporte escolar»", done: limpioYa(BORRADORES[2]!, cortes) },
@@ -378,25 +408,44 @@ export function LabReescritura({ color }: PracticaLabProps) {
               ? resetGlosario
               : resetHuecos;
 
+  const lecturas: Record<Modo, string> = {
+    cirugia: `Claridad ${claridadActual} %: ${claridadActual >= 100 ? "la lectora entiende todo." : "aún sobran palabras."}`,
+    operacion: "Lee el diagnóstico y elige la herramienta que lo repara.",
+    marcas: "Aplica la marca tal cual: ni de más ni de menos.",
+    versiones: "Manda el propósito, no lo que suena mejor.",
+    glosario: "Lee la definición y escribe el término.",
+    texto: "Escribe las palabras que faltan en el texto.",
+  };
+
   return (
-    <div style={{ color: T.text }}>
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      dom
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })),
+        valor: modo,
+        cambiar: (id) => setModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={reiniciarModo} />
+        </>
+      }
+      lectura={lecturas[modo]}
+      objetivos={objetivos}
+      escena={
+        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
       <style>{`
         @keyframes rewShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
         @keyframes rewPop { 0%{transform:scale(.7);opacity:0;} 100%{transform:scale(1);opacity:1;} }
         @keyframes rewTacha { from{background-size:0% 2px;} to{background-size:100% 2px;} }
 
-        .rew-tab { cursor:pointer; display:inline-flex; align-items:center; gap:8px; padding:9px 13px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13px; font-weight:800; transition:all .14s; }
-        .rew-tab:hover { border-color:${T.lineStrong}; color:#fff; }
-        .rew-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-
-        .rew-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
-          font-size:14px; border:1px solid ${T.line}; background:${T.glass}; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .rew-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
-        .rew-icobtn:hover { background:rgba(255,255,255,0.12); }
 
         .rew-prob { cursor:pointer; padding:8px 13px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass};
-          color:${T.text2}; font-size:12.5px; font-weight:800; transition:all .14s; }
+          color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; }
         .rew-prob:hover { border-color:${T.lineStrong}; color:#fff; }
         .rew-prob[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; }
         .rew-prob[data-done="true"] { color:${OK}; border-color:${OK}66; }
@@ -414,7 +463,7 @@ export function LabReescritura({ color }: PracticaLabProps) {
         .rew-trozo[data-shake="true"] { animation:rewShake .4s; background-color:${NO}26; }
 
         .rew-card { cursor:grab; display:block; padding:12px 15px; border-radius:13px; border:1.5px solid ${T.line};
-          background:${T.glassSoft}; color:${T.text}; font-size:13px; line-height:1.5; text-align:left; transition:all .14s; user-select:none; width:100%; }
+          background:${T.glassSoft}; color:${T.text}; font-size:14px; line-height:1.5; text-align:left; transition:all .14s; user-select:none; width:100%; }
         .rew-card:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.07); }
         .rew-card[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); box-shadow:0 0 16px -5px ${accent}; }
         .rew-card:active { cursor:grabbing; }
@@ -423,7 +472,7 @@ export function LabReescritura({ color }: PracticaLabProps) {
         .rew-bin[data-shake="true"] { animation:rewShake .4s; }
 
         .rew-opt { cursor:pointer; display:block; width:100%; text-align:left; padding:13px 16px; border-radius:13px;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:${T.text}; font-size:13.5px; line-height:1.55; transition:all .14s; }
+          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:${T.text}; font-size:14px; line-height:1.55; transition:all .14s; }
         .rew-opt:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.07); }
         .rew-opt[data-e="bien"] { border-color:${OK}; background:${OK}14; color:#fff; cursor:default; animation:rewPop .25s ease; }
         .rew-opt[data-e="mal"] { border-color:${NO}66; background:${NO}10; color:${T.text3}; cursor:default; text-decoration:line-through; }
@@ -437,7 +486,7 @@ export function LabReescritura({ color }: PracticaLabProps) {
         .rew-ver[disabled] { cursor:default; transform:none; }
 
         .rew-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:10px 16px;
-          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:13px; font-weight:800; transition:all .14s; }
+          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:14px; font-weight:800; transition:all .14s; }
         .rew-btn:hover { border-color:${accent}; }
         .rew-btn[disabled] { opacity:.4; cursor:default; }
 
@@ -447,80 +496,28 @@ export function LabReescritura({ color }: PracticaLabProps) {
         .rew-bins { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:13px; }
         @media (max-width: 980px){ .rew-grid { grid-template-columns:minmax(0,1fr); } .rew-bins { grid-template-columns:minmax(0,1fr); } }
 
-        /* Cajón de teoría */
-        .rew-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .rew-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .rew-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .rew-drawer[data-open="true"] { transform:translateX(0); }
-        .rew-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .rew-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .rew-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .rew-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .rew-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .rew-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .rew-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
-
         @media (prefers-reduced-motion: reduce){
           .rew-trozo, .rew-bin, .rew-opt, .rew-ver { animation:none !important; transition:none; }
           .rew-ver:hover, .rew-teoria-fab:hover { transform:none; }
         }
+
+        /* La lectora del borrador */
+        .rew-lectora { display:grid; gap:12px; padding:14px 16px; border-radius:16px; border:1.5px solid ${T.line}; background:${T.glass}; }
+        .rew-meds { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap:10px; }
+        .rew-med { display:grid; gap:6px; min-width:0; }
+        .rew-med > span { font-size:14px; font-weight:800; color:${T.text2}; display:flex; justify-content:space-between; gap:8px; }
+        .rew-med > span strong { color:#fff; font-variant-numeric:tabular-nums; }
+        .rew-med-barra { height:9px; border-radius:6px; background:${T.inset}; overflow:hidden; }
+        .rew-med-barra > div { height:100%; border-radius:6px; transition:width .35s ease, background-color .35s; }
+        .rew-reac { display:flex; align-items:flex-start; gap:12px; font-size:15px; line-height:1.5; color:${T.text2}; }
+        .rew-reac > i { font-size:30px; flex-shrink:0; }
+        .rew-reac strong { display:block; color:#fff; font-size:16px; }
+        .rew-foto { position:relative; aspect-ratio:16/5; border-radius:12px; overflow:hidden; display:flex; align-items:center; justify-content:center; font-size:32px; color:rgba(255,255,255,0.5);
+          background:linear-gradient(135deg, rgba(${color.rgba},0.35), rgba(8,19,31,0.95)); margin-bottom:12px; }
+        .rew-foto img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
+        @media (prefers-reduced-motion: reduce){ .rew-med-barra > div { transition:none; } }
       `}</style>
 
-      {/* barra de modos + herramientas */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="rew-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
-          <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-          <button className="rew-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-            <i className="fa-solid fa-book-open" />
-          </button>
-          <button className="rew-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-            <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-          </button>
-          <button className="rew-icobtn" onClick={reiniciarModo} title="Reiniciar este modo">
-            <i className="fa-solid fa-rotate-left" />
-          </button>
-        </div>
-      </div>
-
-      {/* cajón de teoría */}
-      <button className="rew-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="rew-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="rew-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="rew-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="rew-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="rew-drawer-body">
-          <FichaTeorica data={REESCRITURA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div className="rew-grid">
-        {/* ── Columna principal ───────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
           {modo === "cirugia" && (
             <CirugiaPanel
               accent={accent}
@@ -638,7 +635,7 @@ export function LabReescritura({ color }: PracticaLabProps) {
               <div style={{ minWidth: 0 }}>
                 <div
                   style={{
-                    fontSize: 11,
+                    fontSize: 14,
                     fontWeight: 900,
                     letterSpacing: "0.1em",
                     textTransform: "uppercase",
@@ -647,7 +644,7 @@ export function LabReescritura({ color }: PracticaLabProps) {
                 >
                   {nota ? nota.titulo : "¿Por qué?"}
                 </div>
-                <div style={{ marginTop: 4, fontSize: 13.5, lineHeight: 1.55, color: T.text2 }}>
+                <div style={{ marginTop: 4, fontSize: 14, lineHeight: 1.55, color: T.text2 }}>
                   {nota
                     ? nota.texto
                     : "Cada vez que cortes, clasifiques o elijas, aquí aparece la razón: qué se gana y qué se pierde con esa decisión."}
@@ -656,32 +653,19 @@ export function LabReescritura({ color }: PracticaLabProps) {
             </div>
           )}
         </div>
-
-        {/* ── Columna lateral ─────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos de la sesión
-            </Eyebrow>
-            <TableroObjetivos objetivos={objetivos} retoKey={RETO_KEY} accent={accent} />
-          </div>
-
-          <div
-            style={{
-              borderRadius: 18,
-              padding: "16px 18px",
-              border: `1px solid rgba(${color.rgba},0.3)`,
-              background: `rgba(${color.rgba},0.08)`,
-              fontSize: 13,
-              color: T.text2,
-              lineHeight: 1.55,
-              display: "flex",
-              gap: 12,
-            }}
-          >
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
+      }
+      pestanas={[
+        {
+          id: "pistas",
+          etiqueta: "Pistas",
+          icono: "fa-lightbulb",
+          contenido: (
+            <>
+              <Bloque titulo="Tu partida" icono="fa-star">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+              </Bloque>
+              <Bloque titulo="Qué mirar en este modo" icono="fa-lightbulb">
+                <p style={{ margin: 0, color: T.text2 }}>
               {modo === "cirugia" && (
                 <>
                   Toca lo que sobra y míralo tacharse. Caen las <strong style={{ color: T.text }}>muletillas</strong>, las{" "}
@@ -720,31 +704,59 @@ export function LabReescritura({ color }: PracticaLabProps) {
                   palabras.
                 </>
               )}
-            </span>
-          </div>
-
+                </p>
+              </Bloque>
           {/* Consigna verbatim de la reflexión A3 */}
           <div style={{ ...card, padding: "18px 20px" }}>
             <Eyebrow>
               <i className="fa-solid fa-feather-pointed" style={{ marginRight: 8, color: accent }} />
               Tu taller (A3)
             </Eyebrow>
-            <p style={{ margin: "0 0 11px", fontSize: 12.8, lineHeight: 1.6, color: T.text2 }}>{TALLER_A3.prompt}</p>
+            <p style={{ margin: "0 0 11px", fontSize: 14, lineHeight: 1.6, color: T.text2 }}>{TALLER_A3.prompt}</p>
             <ul style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 7 }}>
               {TALLER_A3.pistas.map((p, i) => (
-                <li key={i} style={{ fontSize: 12.5, lineHeight: 1.5, color: T.text2 }}>
+                <li key={i} style={{ fontSize: 14, lineHeight: 1.5, color: T.text2 }}>
                   {p}
                 </li>
               ))}
             </ul>
             <div className="rew-divider" />
-            <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.5 }}>
+            <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
               Se evalúa con cuatro criterios: {TALLER_A3.criterios.join("; ").toLowerCase()}. Extensión: {TALLER_A3.minimo}–{TALLER_A3.maximo}{" "}
               palabras.
             </div>
-            <div style={{ marginTop: 10, fontSize: 11, color: T.text3, fontStyle: "italic" }}>Consigna, pistas y criterios verbatim de LC-II-P06-A3.</div>
+            <div style={{ marginTop: 10, fontSize: 14, color: T.text3, fontStyle: "italic" }}>Consigna, pistas y criterios verbatim de LC-II-P06-A3.</div>
           </div>
-
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <RetoQuizCard
+              quiz={RETO_QUIZ}
+              accent={accent}
+              rgba={color.rgba}
+              aprobado={quizAprobado}
+              onAprobado={() => setQuizAprobado(true)}
+              playSfx={(ok) => (ok ? sfxOk() : sfxNo())}
+              playPick={sfxPick}
+              mensajeAprobado="Sabes qué operar en un borrador y para qué."
+            />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book",
+          contenido: (
+            <>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={REESCRITURA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <Bloque titulo="Lectura A1" icono="fa-book-open-reader">
           {/* Lectura A1 verbatim */}
           <div style={{ ...card, padding: "18px 20px" }}>
             <Eyebrow>
@@ -753,17 +765,16 @@ export function LabReescritura({ color }: PracticaLabProps) {
             </Eyebrow>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {LECTURA_A1.map((p, i) => (
-                <p key={i} style={{ margin: 0, fontSize: 12.8, lineHeight: 1.6, color: T.text2 }}>
+                <p key={i} style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: T.text2 }}>
                   {p}
                 </p>
               ))}
             </div>
           </div>
-        </div>
-      </div>
-
+              </Bloque>
+              <Bloque titulo="Comprensión y glosario" icono="fa-circle-question">
       {/* ── Comprensión A1 + glosario A5 ───────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 16, marginTop: 22 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))", gap: 16, marginTop: 22 }}>
         <div style={{ ...card, padding: "20px 22px" }}>
           <Eyebrow>
             <i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />
@@ -772,15 +783,15 @@ export function LabReescritura({ color }: PracticaLabProps) {
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {COMPRENSION_A1.map((c, i) => (
               <div key={i} style={{ borderRadius: 12, border: `1px solid ${T.line}`, background: T.inset, padding: "11px 14px" }}>
-                <div style={{ fontSize: 13, lineHeight: 1.45, color: T.text, fontWeight: 700 }}>{c.pregunta}</div>
-                <div style={{ marginTop: 7, fontSize: 12.3, lineHeight: 1.5, color: T.text3 }}>
+                <div style={{ fontSize: 14, lineHeight: 1.45, color: T.text, fontWeight: 700 }}>{c.pregunta}</div>
+                <div style={{ marginTop: 7, fontSize: 14, lineHeight: 1.5, color: T.text3 }}>
                   <i className="fa-solid fa-arrow-turn-up fa-rotate-90" style={{ marginRight: 7, opacity: 0.6 }} />
                   {c.guia}
                 </div>
               </div>
             ))}
           </div>
-          <div style={{ marginTop: 12, fontSize: 11, color: T.text3, fontStyle: "italic" }}>Verbatim de LC-II-P06-A1.</div>
+          <div style={{ marginTop: 12, fontSize: 14, color: T.text3, fontStyle: "italic" }}>Verbatim de LC-II-P06-A1.</div>
         </div>
 
         <div style={{ ...card, padding: "20px 22px" }}>
@@ -791,16 +802,16 @@ export function LabReescritura({ color }: PracticaLabProps) {
           <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
             {PARES.map((g) => (
               <div key={g.id} style={{ borderRadius: 12, border: `1px solid ${T.line}`, background: T.inset, padding: "11px 14px" }}>
-                <div style={{ fontSize: 13.5, fontWeight: 900, color: accent }}>{g.termino}</div>
-                <div style={{ marginTop: 3, fontSize: 12.8, lineHeight: 1.5, color: T.text2 }}>{g.definicion}</div>
-                <div style={{ marginTop: 5, fontSize: 12, color: T.text3, fontStyle: "italic" }}>
+                <div style={{ fontSize: 14, fontWeight: 900, color: accent }}>{g.termino}</div>
+                <div style={{ marginTop: 3, fontSize: 14, lineHeight: 1.5, color: T.text2 }}>{g.definicion}</div>
+                <div style={{ marginTop: 5, fontSize: 14, color: T.text3, fontStyle: "italic" }}>
                   <i className="fa-solid fa-arrow-turn-up fa-rotate-90" style={{ marginRight: 7, opacity: 0.6 }} />
                   {g.ejemplo}
                 </div>
               </div>
             ))}
           </div>
-          <div style={{ marginTop: 12, fontSize: 11, color: T.text3, fontStyle: "italic" }}>Verbatim de LC-II-P06-A5.</div>
+          <div style={{ marginTop: 12, fontSize: 14, color: T.text3, fontStyle: "italic" }}>Verbatim de LC-II-P06-A5.</div>
         </div>
       </div>
 
@@ -812,7 +823,7 @@ export function LabReescritura({ color }: PracticaLabProps) {
           padding: "16px 20px",
           border: `1px solid rgba(${color.rgba},0.28)`,
           background: `rgba(${color.rgba},0.07)`,
-          fontSize: 13,
+          fontSize: 14,
           color: T.text2,
           lineHeight: 1.6,
           display: "flex",
@@ -822,23 +833,16 @@ export function LabReescritura({ color }: PracticaLabProps) {
         <i className="fa-solid fa-triangle-exclamation" style={{ color: accent, fontSize: 17, marginTop: 2 }} />
         <span>{CALLOUT_A1}</span>
       </div>
-
-      <RetoQuizCard
-        quiz={RETO_QUIZ}
-        accent={accent}
-        rgba={color.rgba}
-        aprobado={quizAprobado}
-        onAprobado={() => setQuizAprobado(true)}
-        playSfx={(ok) => (ok ? sfxOk() : sfxNo())}
-        playPick={sfxPick}
-        mensajeAprobado="Sabes qué operar en un borrador y para qué."
-      />
-
-      <p style={{ margin: "18px 0 0", paddingBottom: 60, fontSize: 11.5, lineHeight: 1.6, color: T.text3, fontStyle: "italic" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginRight: 7, opacity: 0.7 }} />
-        {NOTA_PIE}
-      </p>
-    </div>
+              </Bloque>
+              <p style={{ margin: 0, color: T.text3, lineHeight: 1.6 }}>
+                <i className="fa-solid fa-circle-info" style={{ marginRight: 7 }} />
+                {NOTA_PIE}
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }
 
@@ -865,6 +869,7 @@ function CirugiaPanel({
   onTrozo: (id: string) => void;
 }) {
   const { total, meta, actual } = medidas(borrador, cortes);
+  const foto = FOTO_BORRADOR[borrador.id];
   const listo = limpioYa(borrador, cortes);
   const recorte = total > 0 ? Math.round(((total - actual) / total) * 100) : 0;
   const porTipo = (e: Estorbo) => {
@@ -884,15 +889,23 @@ function CirugiaPanel({
         ))}
       </div>
 
+      <LectoraPanel borrador={borrador} cortes={cortes} />
+
       <div style={{ ...card, padding: "22px 26px 24px" }}>
+        {foto && (
+          <div className="rew-foto">
+            <i className={`fa-solid ${foto.icono}`} aria-hidden />
+            <img src={`${RUTA_FOTOS_REESCRITURA}/${foto.clave}.webp`} alt="" loading="lazy" onError={(ev) => (ev.currentTarget.style.display = "none")} />
+          </div>
+        )}
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 6 }}>
           <div style={{ minWidth: 0, flex: 1 }}>
-            <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase", color: accent }}>
+            <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase", color: accent }}>
               <i className="fa-solid fa-file-pen" style={{ marginRight: 7 }} />
               Borrador por operar
             </div>
             <h3 style={{ margin: "7px 0 3px", fontSize: 21, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>{borrador.titulo}</h3>
-            <div style={{ fontSize: 12.8, color: T.text2, lineHeight: 1.5, maxWidth: 560 }}>{borrador.contexto}</div>
+            <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5, maxWidth: 560 }}>{borrador.contexto}</div>
           </div>
           <span
             style={{
@@ -902,7 +915,7 @@ function CirugiaPanel({
               gap: 9,
               padding: "8px 14px",
               borderRadius: 999,
-              fontSize: 12.5,
+              fontSize: 14,
               fontWeight: 900,
               color: listo ? OK : "#fff",
               border: `1px solid ${listo ? `${OK}66` : `rgba(${rgba},0.4)`}`,
@@ -930,7 +943,7 @@ function CirugiaPanel({
               }}
             />
           </div>
-          <div style={{ marginTop: 6, fontSize: 11.5, color: T.text3 }}>
+          <div style={{ marginTop: 6, fontSize: 14, color: T.text3 }}>
             {listo ? `Borrador limpio: ${recorte} % menos palabras, la misma información.` : `Llevas ${recorte} % de recorte. Falta lo que no informa.`}
           </div>
         </div>
@@ -975,7 +988,7 @@ function CirugiaPanel({
               <span
                 key={e}
                 title={info.descripcion}
-                style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 12, fontWeight: 800, color: hechos >= tot ? info.color : T.text3 }}
+                style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 800, color: hechos >= tot ? info.color : T.text3 }}
               >
                 <span style={{ width: 11, height: 11, borderRadius: 3, background: info.color, opacity: hechos >= tot ? 1 : 0.45 }} />
                 {info.corto}{" "}
@@ -1003,13 +1016,54 @@ function CirugiaPanel({
             Versión final (recompuesta: mayúsculas y puntuación ajustadas)
           </Eyebrow>
           <p style={{ margin: 0, fontSize: 15, lineHeight: 1.75, color: "#fff" }}>{borrador.limpio}</p>
-          <div style={{ marginTop: 12, fontSize: 12, color: T.text3 }}>
+          <div style={{ marginTop: 12, fontSize: 14, color: T.text3 }}>
             De {total} a {meta} palabras ({recorte} % menos) sin perder un solo dato. Eso es la <strong style={{ color: T.text2 }}>condensación</strong> de
             la lectura A1.
           </div>
         </div>
       )}
     </>
+  );
+}
+
+/** La lectora ficticia (Ximena): su claridad y su tiempo cambian con cada corte. */
+function LectoraPanel({ borrador, cortes }: { borrador: Borrador; cortes: Record<string, true> }) {
+  const l = lecturaDe(borrador, cortes);
+  const color = l.claridad >= 100 ? OK : l.claridad >= 80 ? "#FFC75A" : "#FF8A3C";
+  const reac =
+    l.claridad >= 100
+      ? { icono: "fa-face-smile-beam", frase: "«Lo leí de un tirón y lo entendí todo.»", porque: "Quedó solo lo que informa: cada palabra cumple una tarea." }
+      : l.claridad >= 80
+        ? { icono: "fa-face-meh", frase: "«Ya entiendo, pero todavía me estorba algo.»", porque: `Aún quedan ${l.ruido} palabras que no dicen nada nuevo.` }
+        : { icono: "fa-face-frown", frase: "«Me perdí entre tantas palabras.»", porque: `${l.ruido} palabras de relleno o repetición tapan lo importante.` };
+  const meds = [
+    { label: "Claridad para la lectora", pct: l.claridad, texto: `${l.claridad} %`, color },
+    { label: "Tiempo de lectura", pct: l.segundosAntes > 0 ? (l.segundos / l.segundosAntes) * 100 : 0, texto: `${l.segundos} s de ${l.segundosAntes} s`, color: "#5BC8FF" },
+    { label: "Datos que le llegan", pct: 100, texto: "todos", color: OK },
+  ];
+  return (
+    <div className="rew-lectora">
+      <div className="rew-meds">
+        {meds.map((m) => (
+          <div key={m.label} className="rew-med">
+            <span>
+              {m.label}
+              <strong>{m.texto}</strong>
+            </span>
+            <div className="rew-med-barra">
+              <div style={{ width: `${Math.min(100, m.pct)}%`, background: m.color }} />
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="rew-reac" role="status" aria-live="polite">
+        <i className={`fa-solid ${reac.icono}`} style={{ color }} aria-hidden />
+        <span>
+          <strong>Ximena, lectora ficticia: {reac.frase}</strong>
+          {reac.porque} Simulación a {LECTURA_PPM} palabras por minuto.
+        </span>
+      </div>
+    </div>
   );
 }
 
@@ -1048,12 +1102,12 @@ function OperacionPanel({
             <i className="fa-solid fa-stethoscope" style={{ marginRight: 8, color: accent }} />
             Lee el defecto y elige la operación que lo repara
           </Eyebrow>
-          <span style={{ fontSize: 12.5, fontWeight: 800, color: colocados >= DEFECTOS.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
+          <span style={{ fontSize: 14, fontWeight: 800, color: colocados >= DEFECTOS.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
             {colocados}/{DEFECTOS.length}
           </span>
         </div>
         {defLibres.length === 0 ? (
-          <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+          <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
             <i className="fa-solid fa-circle-check" /> ¡Las {DEFECTOS.length} oraciones están en su operación!
           </div>
         ) : (
@@ -1061,11 +1115,11 @@ function OperacionPanel({
             {defLibres.map((d) => (
               <button key={d.id} className="rew-card" data-sel={selDef === d.id} onClick={() => onSelDef(d.id)} {...dragProps(d.id)}>
                 <span style={{ display: "block", fontSize: 14.5, lineHeight: 1.5, color: "#fff" }}>«{d.texto}»</span>
-                <span style={{ display: "block", marginTop: 6, fontSize: 12, color: T.text3, lineHeight: 1.45 }}>
+                <span style={{ display: "block", marginTop: 6, fontSize: 14, color: T.text3, lineHeight: 1.45 }}>
                   <i className="fa-solid fa-magnifying-glass" style={{ marginRight: 7, opacity: 0.7 }} />
                   {d.defecto}
                   {d.deA1 && (
-                    <span style={{ marginLeft: 8, padding: "1px 7px", borderRadius: 999, fontSize: 10, fontWeight: 900, color: accent, border: `1px solid ${accent}55` }}>
+                    <span style={{ marginLeft: 8, padding: "1px 7px", borderRadius: 999, fontSize: 14, fontWeight: 900, color: accent, border: `1px solid ${accent}55` }}>
                       A1
                     </span>
                   )}
@@ -1107,7 +1161,7 @@ function OperacionPanel({
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: 13,
+                    fontSize: 14,
                     color: "#fff",
                     background: `${info.color}33`,
                   }}
@@ -1115,8 +1169,8 @@ function OperacionPanel({
                   <i className={`fa-solid ${info.icono}`} />
                 </span>
                 <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: 13, fontWeight: 900, color: "#fff" }}>{info.label}</div>
-                  <div style={{ fontSize: 10.5, color: T.text3, lineHeight: 1.35 }}>{info.descripcion}</div>
+                  <div style={{ fontSize: 14, fontWeight: 900, color: "#fff" }}>{info.label}</div>
+                  <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.35 }}>{info.descripcion}</div>
                 </div>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
@@ -1125,7 +1179,7 @@ function OperacionPanel({
                     key={d.id}
                     style={{
                       animation: "rewPop .25s ease",
-                      fontSize: 11.5,
+                      fontSize: 14,
                       lineHeight: 1.45,
                       color: "#fff",
                       padding: "8px 10px",
@@ -1140,7 +1194,7 @@ function OperacionPanel({
                     {d.arreglo.length > 118 ? d.arreglo.slice(0, 116) + "…" : d.arreglo}
                   </span>
                 ))}
-                {dentro.length === 0 && <span style={{ fontSize: 11.5, color: T.text3, fontStyle: "italic" }}>Vacío</span>}
+                {dentro.length === 0 && <span style={{ fontSize: 14, color: T.text3, fontStyle: "italic" }}>Vacío</span>}
               </div>
             </div>
           );
@@ -1186,7 +1240,7 @@ function MarcasPanel({
           </button>
         ))}
         <div style={{ flex: 1 }} />
-        <span style={{ fontSize: 12, fontWeight: 800, color: total >= MARCAS.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
+        <span style={{ fontSize: 14, fontWeight: 800, color: total >= MARCAS.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
           {total}/{MARCAS.length} marcas aplicadas
         </span>
       </div>
@@ -1211,8 +1265,8 @@ function MarcasPanel({
             }}
           >
             <div style={{ fontSize: 30, lineHeight: 1, color: accent, fontWeight: 700 }}>{info.simbolo}</div>
-            <div style={{ marginTop: 7, fontSize: 12, fontWeight: 900, color: "#fff" }}>{info.label}</div>
-            <div style={{ marginTop: 4, fontSize: 10.8, color: T.text3, lineHeight: 1.35 }}>{info.significa}</div>
+            <div style={{ marginTop: 7, fontSize: 14, fontWeight: 900, color: "#fff" }}>{info.label}</div>
+            <div style={{ marginTop: 4, fontSize: 14, color: T.text3, lineHeight: 1.35 }}>{info.significa}</div>
           </div>
 
           <div style={{ flex: 1, minWidth: 260 }}>
@@ -1238,7 +1292,7 @@ function MarcasPanel({
                 display: "inline-flex",
                 gap: 9,
                 alignItems: "center",
-                fontSize: 12.5,
+                fontSize: 14,
                 color: T.text2,
                 borderLeft: `3px solid ${accent}`,
                 paddingLeft: 11,
@@ -1257,7 +1311,7 @@ function MarcasPanel({
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 13 }}>
           <Eyebrow>¿Cuál aplica la marca, exactamente?</Eyebrow>
           {hecho && (
-            <span style={{ fontSize: 12.5, fontWeight: 800, color: OK, display: "inline-flex", alignItems: "center", gap: 8 }}>
+            <span style={{ fontSize: 14, fontWeight: 800, color: OK, display: "inline-flex", alignItems: "center", gap: 8 }}>
               <i className="fa-solid fa-circle-check" /> Marca aplicada
             </span>
           )}
@@ -1284,7 +1338,7 @@ function MarcasPanel({
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      fontSize: 11,
+                      fontSize: 14,
                       fontWeight: 900,
                       color: bien ? "#04121f" : mal ? NO : T.text3,
                       background: bien ? OK : "transparent",
@@ -1365,7 +1419,7 @@ function VersionesPanel({
               display: "inline-flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: 12,
+              fontSize: 14,
               fontWeight: 900,
               color: elegida ? "#04121f" : T.text2,
               background: elegida ? OK : `rgba(${rgba},0.16)`,
@@ -1374,11 +1428,11 @@ function VersionesPanel({
           >
             {cual.toUpperCase()}
           </span>
-          <span style={{ fontSize: 11, fontWeight: 900, letterSpacing: "0.1em", textTransform: "uppercase", color: T.text3 }}>
+          <span style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.1em", textTransform: "uppercase", color: T.text3 }}>
             {cual === "a" ? "Versión A" : "Versión B"}
           </span>
           <span style={{ flex: 1 }} />
-          <span style={{ fontSize: 11, color: T.text3, fontVariantNumeric: "tabular-nums" }}>{cuentaPalabras(texto)} palabras</span>
+          <span style={{ fontSize: 14, color: T.text3, fontVariantNumeric: "tabular-nums" }}>{cuentaPalabras(texto)} palabras</span>
         </span>
         {texto}
       </button>
@@ -1391,12 +1445,12 @@ function VersionesPanel({
         {VERSIONES.map((v, i) => (
           <button key={v.id} className="rew-prob" data-on={veIdx === i} data-done={resueltas[v.id] !== undefined} onClick={() => onSelItem(i)}>
             {resueltas[v.id] !== undefined && <i className="fa-solid fa-circle-check" style={{ marginRight: 6 }} />}
-            {v.gemelo && <i className="fa-solid fa-link" style={{ marginRight: 6, opacity: 0.6, fontSize: 10 }} />}
+            {v.gemelo && <i className="fa-solid fa-link" style={{ marginRight: 6, opacity: 0.6, fontSize: 14 }} />}
             Par {i + 1}
           </button>
         ))}
         <div style={{ flex: 1 }} />
-        <span style={{ fontSize: 12, fontWeight: 800, color: hechas >= VERSIONES.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
+        <span style={{ fontSize: 14, fontWeight: 800, color: hechas >= VERSIONES.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
           {hechas}/{VERSIONES.length} resueltos
         </span>
       </div>
@@ -1415,11 +1469,11 @@ function VersionesPanel({
       >
         <i className="fa-solid fa-bullseye" style={{ color: accent, fontSize: 18, marginTop: 3 }} />
         <div style={{ minWidth: 0 }}>
-          <div style={{ fontSize: 10.5, fontWeight: 900, letterSpacing: "0.13em", textTransform: "uppercase", color: accent }}>Propósito declarado</div>
+          <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.13em", textTransform: "uppercase", color: accent }}>Propósito declarado</div>
           <div style={{ marginTop: 5, fontSize: 15, fontWeight: 700, color: "#fff", lineHeight: 1.5 }}>{item.proposito}</div>
-          <div style={{ marginTop: 6, fontSize: 12.5, color: T.text2, lineHeight: 1.5 }}>{item.contexto}</div>
+          <div style={{ marginTop: 6, fontSize: 14, color: T.text2, lineHeight: 1.5 }}>{item.contexto}</div>
           {gemelo && (
-            <div style={{ marginTop: 9, fontSize: 12, color: gemeloHecho ? OK : T.text3, display: "flex", gap: 8, alignItems: "center" }}>
+            <div style={{ marginTop: 9, fontSize: 14, color: gemeloHecho ? OK : T.text3, display: "flex", gap: 8, alignItems: "center" }}>
               <i className="fa-solid fa-link" />
               Este par usa las MISMAS dos versiones que otro par de la lista, con el propósito volteado.
               {gemeloHecho ? " Ya resolviste el otro: compara." : " Resuélvelos los dos y compara."}
@@ -1428,7 +1482,7 @@ function VersionesPanel({
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px,1fr))", gap: 13 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: 13 }}>
         {botonVersion("a")}
         {botonVersion("b")}
       </div>
@@ -1441,13 +1495,13 @@ function VersionesPanel({
             ¿Y por qué? (no vale «suena mejor»)
           </Eyebrow>
           {razon !== undefined && (
-            <span style={{ fontSize: 12.5, fontWeight: 800, color: OK, display: "inline-flex", alignItems: "center", gap: 8 }}>
+            <span style={{ fontSize: 14, fontWeight: 800, color: OK, display: "inline-flex", alignItems: "center", gap: 8 }}>
               <i className="fa-solid fa-circle-check" /> Par resuelto
             </span>
           )}
         </div>
         {!version ? (
-          <div style={{ fontSize: 13, color: T.text3, fontStyle: "italic" }}>Primero elige arriba la versión que cumple el propósito.</div>
+          <div style={{ fontSize: 14, color: T.text3, fontStyle: "italic" }}>Primero elige arriba la versión que cumple el propósito.</div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {item.razones.map((r, i) => {
@@ -1468,7 +1522,7 @@ function VersionesPanel({
           </div>
         )}
         {razon !== undefined && (
-          <div style={{ marginTop: 14, borderRadius: 12, border: `1px solid ${OK}44`, background: `${OK}0d`, padding: "12px 15px", fontSize: 13, lineHeight: 1.55, color: T.text2 }}>
+          <div style={{ marginTop: 14, borderRadius: 12, border: `1px solid ${OK}44`, background: `${OK}0d`, padding: "12px 15px", fontSize: 14, lineHeight: 1.55, color: T.text2 }}>
             <i className="fa-solid fa-lightbulb" style={{ marginRight: 9, color: OK }} />
             {item.porque}
           </div>

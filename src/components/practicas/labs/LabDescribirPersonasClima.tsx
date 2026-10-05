@@ -39,7 +39,8 @@ import { LabSfx } from "./lab-audio";
 import { CompletaTexto, normaliza } from "./_mecanica-huecos";
 import { DESCRIBIR_PERSONAS_CLIMA_HUECOS } from "./describir-personas-clima-huecos";
 import { usePartida, MarcadorPartida } from "./_partida";
-import { TableroObjetivos } from "./_objetivos";
+import { LabShell, Bloque, BotonHerramienta, Mesa } from "./_shell";
+import { BuscaPersona, CASOS_BUSCA, TOTAL_CASOS_BUSCA } from "./describir-personas-clima-sim";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { DESCRIBIR_PERSONAS_CLIMA_FICHA } from "./describir-personas-clima-ficha";
@@ -79,9 +80,10 @@ import {
 const NO = "#FF5E5E";
 const RETO_KEY = "cen-describir-personas-clima-reto";
 
-type Modo = "orden" | "behave" | "clima" | "ahora" | "texto";
+type Modo = "busca" | "orden" | "behave" | "clima" | "ahora" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
+  { id: "busca", label: "Find the person", icono: "fa-magnifying-glass" },
   { id: "orden", label: "Adjective order", icono: "fa-arrow-down-1-9" },
   { id: "behave", label: "Be or have?", icono: "fa-code-compare" },
   { id: "clima", label: "Dress for the weather", icono: "fa-shirt" },
@@ -91,12 +93,11 @@ const MODOS: { id: Modo; label: string; icono: string }[] = [
 
 export function LabDescribirPersonasClima({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
-  const [modo, setModo] = useState<Modo>("orden");
+  const [modo, setModo] = useState<Modo>("busca");
 
   /* ── sonido y partida ─────────────────────────────────────────────── */
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   useEffect(() => () => audioRef.current?.dispose(), []);
   // `callarLab()` ya se traga sus propios fallos: no hace falta envolverlo.
@@ -119,6 +120,16 @@ export function LabDescribirPersonasClima({ color }: PracticaLabProps) {
   const sfxPlace = () => {
     partida.acierto();
     return sonido && audioRef.current?.blip();
+  };
+
+  /* ── MODO 0 · Find the person (simulador) ─────────────────────────── */
+  const [buscaRes, setBuscaRes] = useState<Record<string, boolean>>({});
+  const [buscaIntento, setBuscaIntento] = useState(0);
+  const buscaN = CASOS_BUSCA.filter((c) => buscaRes[c.id]).length;
+  const buscaDone = buscaN >= TOTAL_CASOS_BUSCA;
+  const resetBusca = () => {
+    setBuscaRes({});
+    setBuscaIntento((n) => n + 1);
   };
 
   /* ── MODO 1 · Adjective order ─────────────────────────────────────── */
@@ -363,8 +374,10 @@ export function LabDescribirPersonasClima({ color }: PracticaLabProps) {
   const [quizAprobado, setQuizAprobado] = useState(false);
 
   /* ── objetivos ────────────────────────────────────────────────────── */
-  const todoHecho = ordenDone && juiciosDone && behaveDone && atuendosDone && oracionesDone && ahoraDone && textoDone;
+  const todoHecho = buscaDone && ordenDone && juiciosDone && behaveDone && atuendosDone && oracionesDone && ahoraDone && textoDone;
   const objetivos = [
+    { txt: "Describe a Mariana en inglés para que su amigo la encuentre", done: buscaRes["lluvia"] === true },
+    { txt: `Encuentra a las ${TOTAL_CASOS_BUSCA} personas con frases bien armadas`, done: buscaDone },
     { txt: `Arma las ${FRASES.length} frases con el orden del adjetivo`, done: ordenDone },
     { txt: `Juzga las ${JUICIOS.length} frases: cuál se dice y cuál suena imposible`, done: juiciosDone },
     { txt: `Elige be o have en las ${BE_HAVE.length} descripciones`, done: behaveDone },
@@ -418,10 +431,45 @@ export function LabDescribirPersonasClima({ color }: PracticaLabProps) {
     },
   });
 
-  const resetActual = modo === "orden" ? resetOrden : modo === "behave" ? resetBeHave : modo === "clima" ? resetClima : modo === "ahora" ? resetAhora : resetTexto;
+  const resetActual = modo === "busca" ? resetBusca : modo === "orden" ? resetOrden : modo === "behave" ? resetBeHave : modo === "clima" ? resetClima : modo === "ahora" ? resetAhora : resetTexto;
+
+
+  const lectura =
+    modo === "busca" ? (
+      <>Casos resueltos: {buscaN}/{TOTAL_CASOS_BUSCA}</>
+    ) : modo === "orden" ? (
+      <>Adjetivos colocados: {colocadosTotal}/{TOTAL_ADJETIVOS}</>
+    ) : modo === "behave" ? (
+      <>Be o have: {Object.keys(bhOk).length}/{BE_HAVE.length}</>
+    ) : modo === "clima" ? (
+      <>Atuendos listos: {PRONOSTICOS.filter((p) => (atuendos[p.id]?.length ?? 0) >= PRENDAS_POR_ATUENDO).length}/{PRONOSTICOS.length}</>
+    ) : modo === "ahora" ? (
+      <>Formas escritas: {AHORA.filter((i) => ahoraEstado[i.id] === "bien").length}/{AHORA.length}</>
+    ) : (
+      <>Completa el texto de la progresión</>
+    );
 
   return (
-    <div style={{ color: T.text }}>
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      dom
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })),
+        valor: modo,
+        cambiar: (id) => setModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={resetActual} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      escena={
+        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
       <style>{`
         @keyframes dpcShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-5px);} 40%{transform:translateX(5px);} 60%{transform:translateX(-3px);} 80%{transform:translateX(3px);} }
         @keyframes dpcPop { 0%{transform:scale(.7);opacity:0;} 100%{transform:scale(1);opacity:1;} }
@@ -431,7 +479,7 @@ export function LabDescribirPersonasClima({ color }: PracticaLabProps) {
         @keyframes dpcViento { 0%{transform:translateX(-30px);opacity:0;} 20%{opacity:.8;} 100%{transform:translateX(150px);opacity:0;} }
 
         .dpc-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 15px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:800; transition:all .14s; }
+          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; }
         .dpc-tab:hover { border-color:${T.lineStrong}; color:#fff; }
         .dpc-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
         .dpc-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
@@ -446,7 +494,7 @@ export function LabDescribirPersonasClima({ color }: PracticaLabProps) {
         .dpc-chip:active { cursor:grabbing; }
 
         .dpc-slot { cursor:pointer; min-width:104px; min-height:46px; border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset};
-          display:inline-flex; flex-direction:column; align-items:center; justify-content:center; color:${T.text3}; font-size:12px; transition:all .16s; padding:4px 10px; }
+          display:inline-flex; flex-direction:column; align-items:center; justify-content:center; color:${T.text3}; font-size:14px; transition:all .16s; padding:4px 10px; }
         .dpc-slot[data-armed="true"] { border-color:${accent}; background:rgba(${color.rgba},0.1); }
         .dpc-slot[data-shake="true"] { animation:dpcShake .4s; border-color:${NO}; }
         .dpc-slot[data-done="true"] { cursor:default; border-style:solid; }
@@ -456,14 +504,14 @@ export function LabDescribirPersonasClima({ color }: PracticaLabProps) {
         .dpc-row[data-mal="true"] { border-color:${NO}66; }
 
         .dpc-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 16px;
-          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:13.5px; font-weight:800; transition:all .14s; }
+          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:14px; font-weight:800; transition:all .14s; }
         .dpc-btn:hover:not(:disabled) { border-color:${T.lineStrong}; }
         .dpc-btn:disabled { opacity:.42; cursor:default; }
         .dpc-btn[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.18); color:#fff; }
         .dpc-btn[data-done="true"] { border-color:${OK}77; background:${OK}18; color:#fff; }
 
         .dpc-pill { cursor:pointer; display:inline-flex; align-items:center; gap:7px; padding:8px 13px; border-radius:10px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:12.5px; font-weight:800; transition:all .14s; }
+          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; }
         .dpc-pill:hover { border-color:${T.lineStrong}; color:#fff; }
         .dpc-pill[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; }
         .dpc-pill[data-done="true"] { color:${OK}; border-color:${OK}66; }
@@ -474,7 +522,7 @@ export function LabDescribirPersonasClima({ color }: PracticaLabProps) {
         .dpc-verbo:disabled { cursor:default; }
 
         .dpc-prenda { cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:6px; padding:11px 8px; border-radius:13px;
-          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:11.5px; font-weight:700; text-align:center; transition:all .14s; }
+          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:700; text-align:center; transition:all .14s; }
         .dpc-prenda:hover { border-color:${T.lineStrong}; color:#fff; transform:translateY(-2px); }
         .dpc-prenda[data-on="true"] { border-color:${OK}; background:${OK}1a; color:#fff; }
 
@@ -496,82 +544,29 @@ export function LabDescribirPersonasClima({ color }: PracticaLabProps) {
           .dpc-chip, .dpc-chip:hover, .dpc-chip[data-sel="true"], .dpc-prenda:hover { transform:none; }
           .dpc-gota, .dpc-copo, .dpc-rafaga, .dpc-sol { animation:none; }
         }
-
-        /* Cajón de teoría */
-        .dpc-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .dpc-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .dpc-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .dpc-drawer[data-open="true"] { transform:translateX(0); }
-        .dpc-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .dpc-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .dpc-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .dpc-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .dpc-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .dpc-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .dpc-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
-        @media (max-width: 980px){ .dpc-grid { grid-template-columns:minmax(0,1fr) !important; } .dpc-escenario { grid-template-columns:minmax(0,1fr) !important; } }
       `}</style>
 
-      {/* ── barra de modos y herramientas ───────────────────────────── */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="dpc-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="dpc-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="dpc-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="dpc-icobtn" onClick={resetActual} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
+          {modo === "busca" && (
+            <BuscaPersona
+              key={buscaIntento}
+              accent={accent}
+              rgba={color.rgba}
+              resueltos={buscaRes}
+              onResuelto={(id) => setBuscaRes((m) => ({ ...m, [id]: true }))}
+              onAcierto={sfxPlace}
+              onError={sfxNo}
+              onGanar={sfxOk}
+            />
+          )}
 
-      {/* ── cajón de teoría ─────────────────────────────────────────── */}
-      <button className="dpc-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="dpc-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="dpc-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="dpc-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="dpc-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="dpc-drawer-body">
-          <FichaTeorica data={DESCRIBIR_PERSONAS_CLIMA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div className="dpc-grid" style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}>
-        {/* ── columna principal ─────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
           {/* MODO 1 — Adjective order */}
           {modo === "orden" && (
             <>
-              <div style={{ ...card, padding: "18px 22px" }}>
+              <Mesa>
+              <div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
                   <Eyebrow>Arma la frase: cada adjetivo tiene su casilla</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: ordenDone ? OK : T.text3 }}>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: ordenDone ? OK : T.text3 }}>
                     {colocadosTotal}/{TOTAL_ADJETIVOS}
                   </span>
                 </div>
@@ -598,19 +593,11 @@ export function LabDescribirPersonasClima({ color }: PracticaLabProps) {
                   })}
                 </div>
 
-                <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 14, lineHeight: 1.55 }}>
-                  En español dirías <strong style={{ color: T.text2 }}>«{frase.es}»</strong>. En inglés los adjetivos van <strong style={{ color: T.text2 }}>antes</strong> del
-                  sustantivo y en un orden fijo. Coloca cada uno en su casilla.
-                </div>
-
-                {/* la frase en construcción */}
-                <FilaSlots frase={frase} slots={slotsFrase} selAdj={selAdj} shakeSlot={shakeSlot} onPoner={ponerAdj} dropProps={dropProps} />
-
                 {/* adjetivos sueltos */}
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 18 }}>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 4 }}>
                   {adjLibres.length === 0 ? (
                     <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-                      <span style={{ fontSize: 13.5, color: OK, fontWeight: 800, display: "inline-flex", alignItems: "center", gap: 9 }}>
+                      <span style={{ fontSize: 14, color: OK, fontWeight: 800, display: "inline-flex", alignItems: "center", gap: 9 }}>
                         <i className="fa-solid fa-circle-check" /> {frase.articulo ? `${frase.articulo} ` : ""}
                         {frase.adjetivos.map((a) => a.palabra).join(" ")} {frase.sustantivo}
                       </span>
@@ -629,17 +616,26 @@ export function LabDescribirPersonasClima({ color }: PracticaLabProps) {
                         {...dragProps(a.palabra)}
                       >
                         {a.palabra}
-                        <span style={{ fontSize: 10.5, fontWeight: 600, color: T.text3 }}>{a.es}</span>
+                        <span style={{ fontSize: 14, fontWeight: 600, color: T.text3 }}>{a.es}</span>
                       </button>
                     ))
                   )}
                 </div>
+              </div>
+              <div style={{ ...card, padding: "18px 22px" }}>
+                <div style={{ fontSize: 14, color: T.text3, marginBottom: 14, lineHeight: 1.55 }}>
+                  En español dirías <strong style={{ color: T.text2 }}>«{frase.es}»</strong>. En inglés los adjetivos van <strong style={{ color: T.text2 }}>antes</strong> del
+                  sustantivo y en un orden fijo. Coloca cada uno en su casilla.
+                </div>
+
+                {/* la frase en construcción */}
+                <FilaSlots frase={frase} slots={slotsFrase} selAdj={selAdj} shakeSlot={shakeSlot} onPoner={ponerAdj} dropProps={dropProps} />
 
                 {/* la versión imposible, una vez armada */}
                 {fraseLista && (
                   <div style={{ marginTop: 16, borderRadius: 13, border: `1px solid ${NO}44`, background: `${NO}10`, padding: "12px 15px", display: "flex", gap: 12 }}>
                     <i className="fa-solid fa-ban" style={{ color: NO, fontSize: 15, marginTop: 2 }} />
-                    <div style={{ fontSize: 13, color: T.text2, lineHeight: 1.55 }}>
+                    <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55 }}>
                       Un hablante de inglés no diría <span style={{ textDecoration: "line-through", color: NO, fontWeight: 800 }}>{frase.malSuena}</span>. {frase.porque}
                     </div>
                   </div>
@@ -658,10 +654,11 @@ export function LabDescribirPersonasClima({ color }: PracticaLabProps) {
                     }}
                   >
                     <i className={`fa-solid ${msgOrden.mal ? "fa-circle-xmark" : "fa-circle-check"}`} style={{ color: msgOrden.mal ? NO : accent, fontSize: 15, marginTop: 2 }} />
-                    <span style={{ fontSize: 13, color: T.text2, lineHeight: 1.55 }}>{msgOrden.txt}</span>
+                    <span style={{ fontSize: 14, color: T.text2, lineHeight: 1.55 }}>{msgOrden.txt}</span>
                   </div>
                 )}
               </div>
+              </Mesa>
 
               {/* detector de frases imposibles */}
               <div style={{ ...card, padding: "18px 22px" }}>
@@ -670,11 +667,11 @@ export function LabDescribirPersonasClima({ color }: PracticaLabProps) {
                     <i className="fa-solid fa-ear-listen" style={{ marginRight: 8, color: accent }} />
                     ¿Esta frase se dice o suena imposible?
                   </Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: juiciosDone ? OK : T.text3 }}>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: juiciosDone ? OK : T.text3 }}>
                     {Object.keys(juicios).length}/{JUICIOS.length}
                   </span>
                 </div>
-                <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 14, lineHeight: 1.5 }}>
+                <div style={{ fontSize: 14, color: T.text3, marginBottom: 14, lineHeight: 1.5 }}>
                   Tres de las seis las diría cualquier hablante de inglés; las otras tres tienen un adjetivo adelantado.
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -686,7 +683,7 @@ export function LabDescribirPersonasClima({ color }: PracticaLabProps) {
                         <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
                           <span style={{ flex: 1, minWidth: 180, fontSize: 15.5, fontWeight: 700, color: done ? "#fff" : T.text2 }}>{j.frase}</span>
                           {done ? (
-                            <span style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 12.5, fontWeight: 900, color: j.posible ? OK : NO }}>
+                            <span style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 900, color: j.posible ? OK : NO }}>
                               <i className={`fa-solid ${j.posible ? "fa-circle-check" : "fa-ban"}`} />
                               {j.posible ? "Se dice" : "Imposible"}
                             </span>
@@ -704,7 +701,7 @@ export function LabDescribirPersonasClima({ color }: PracticaLabProps) {
                           )}
                         </div>
                         {msg && (
-                          <div style={{ marginTop: 10, fontSize: 12.5, color: msg.mal ? NO : T.text3, lineHeight: 1.5, display: "flex", gap: 9 }}>
+                          <div style={{ marginTop: 10, fontSize: 14, color: msg.mal ? NO : T.text3, lineHeight: 1.5, display: "flex", gap: 9 }}>
                             <i className={`fa-solid ${msg.mal ? "fa-circle-xmark" : "fa-circle-info"}`} style={{ marginTop: 2 }} />
                             <span>{msg.txt}</span>
                           </div>
@@ -722,11 +719,11 @@ export function LabDescribirPersonasClima({ color }: PracticaLabProps) {
             <div style={{ ...card, padding: "18px 22px" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 6 }}>
                 <Eyebrow>Elige el verbo que va en cada descripción</Eyebrow>
-                <span style={{ fontSize: 12.5, fontWeight: 800, color: behaveDone ? OK : T.text3 }}>
+                <span style={{ fontSize: 14, fontWeight: 800, color: behaveDone ? OK : T.text3 }}>
                   {Object.keys(bhOk).length}/{BE_HAVE.length}
                 </span>
               </div>
-              <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 16, lineHeight: 1.55 }}>
+              <div style={{ fontSize: 14, color: T.text3, marginBottom: 16, lineHeight: 1.55 }}>
                 La regla es la clase de palabra que sigue: si es un <strong style={{ color: "#38BDF8" }}>adjetivo</strong> (tall, young) va{" "}
                 <strong style={{ color: "#38BDF8" }}>be</strong>; si es un <strong style={{ color: "#FBBF24" }}>sustantivo</strong> (hair, eyes, glasses) va{" "}
                 <strong style={{ color: "#FBBF24" }}>have / has</strong>. Y con he / she / it, have se convierte en <strong>has</strong>.
@@ -745,7 +742,7 @@ export function LabDescribirPersonasClima({ color }: PracticaLabProps) {
                             <span style={{ animation: "dpcPop .25s ease", fontWeight: 900, color: OK }}>{item.correcta}</span>
                           ) : (
                             <span className="dpc-slot" style={{ minWidth: 76, minHeight: 36 }}>
-                              <i className="fa-solid fa-question" style={{ fontSize: 12 }} />
+                              <i className="fa-solid fa-question" style={{ fontSize: 14 }} />
                             </span>
                           )}
                           <span>{item.resto}</span>
@@ -766,7 +763,7 @@ export function LabDescribirPersonasClima({ color }: PracticaLabProps) {
                         )}
                       </div>
                       {done && (
-                        <div style={{ marginTop: 9, fontSize: 12.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9 }}>
+                        <div style={{ marginTop: 9, fontSize: 14, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9 }}>
                           <i className="fa-solid fa-circle-check" style={{ color: OK, marginTop: 2 }} />
                           <span>
                             {item.es} · «{item.clave}» es un {item.sigue}, por eso va {item.correcta === "is" || item.correcta === "are" ? "be" : "have"}.
@@ -774,7 +771,7 @@ export function LabDescribirPersonasClima({ color }: PracticaLabProps) {
                         </div>
                       )}
                       {fallo && (
-                        <div style={{ marginTop: 9, fontSize: 12.5, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9 }}>
+                        <div style={{ marginTop: 9, fontSize: 14, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9 }}>
                           <i className="fa-solid fa-circle-xmark" style={{ color: NO, marginTop: 2 }} />
                           <span>{fallo.txt}</span>
                         </div>
@@ -811,22 +808,22 @@ export function LabDescribirPersonasClima({ color }: PracticaLabProps) {
                 })}
               </div>
 
-              <div className="dpc-escenario" style={{ display: "grid", gridTemplateColumns: "minmax(0,300px) minmax(0,1fr)", gap: 16, alignItems: "start" }}>
+              <div className="dpc-escenario" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 240px), 1fr))", gap: 16, alignItems: "start" }}>
                 <Escenario pron={pron} prendas={atuendo} />
 
                 <div style={{ ...card, padding: "18px 20px" }}>
                   <Eyebrow>Weather report · {pron.lugar}</Eyebrow>
                   <div style={{ fontSize: 15, fontWeight: 800, color: "#fff", lineHeight: 1.5, marginBottom: 6 }}>{pron.texto}</div>
-                  <div style={{ fontSize: 12, color: T.text3, marginBottom: 4 }}>{pron.es}</div>
-                  <div style={{ fontSize: 12, color: T.text3, marginBottom: 14 }}>
+                  <div style={{ fontSize: 14, color: T.text3, marginBottom: 4 }}>{pron.es}</div>
+                  <div style={{ fontSize: 14, color: T.text3, marginBottom: 14 }}>
                     {pron.cuando} · {pron.persona_desc}
                   </div>
 
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
-                    <span style={{ fontSize: 12.5, fontWeight: 800, color: T.text2 }}>
+                    <span style={{ fontSize: 14, fontWeight: 800, color: T.text2 }}>
                       Elige {PRENDAS_POR_ATUENDO} prendas para {pron.persona}
                     </span>
-                    <span style={{ fontSize: 12.5, fontWeight: 800, color: atuendoListo ? OK : T.text3 }}>
+                    <span style={{ fontSize: 14, fontWeight: 800, color: atuendoListo ? OK : T.text3 }}>
                       {atuendo.length}/{PRENDAS_POR_ATUENDO}
                     </span>
                   </div>
@@ -853,7 +850,7 @@ export function LabDescribirPersonasClima({ color }: PracticaLabProps) {
                       }}
                     >
                       <i className={`fa-solid ${msgClima.mal ? "fa-triangle-exclamation" : "fa-circle-info"}`} style={{ color: msgClima.mal ? NO : accent, fontSize: 14, marginTop: 2 }} />
-                      <span style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.5 }}>{msgClima.txt}</span>
+                      <span style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>{msgClima.txt}</span>
                     </div>
                   )}
                 </div>
@@ -866,13 +863,13 @@ export function LabDescribirPersonasClima({ color }: PracticaLabProps) {
                   Justifica el atuendo en inglés
                 </Eyebrow>
                 {!atuendoListo ? (
-                  <div style={{ fontSize: 13, color: T.text3, display: "flex", gap: 10, alignItems: "center" }}>
+                  <div style={{ fontSize: 14, color: T.text3, display: "flex", gap: 10, alignItems: "center" }}>
                     <i className="fa-solid fa-lock" />
                     Viste primero a {pron.persona} con {PRENDAS_POR_ATUENDO} prendas adecuadas.
                   </div>
                 ) : (
                   <>
-                    <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 12, lineHeight: 1.5 }}>
+                    <div style={{ fontSize: 14, color: T.text3, marginBottom: 12, lineHeight: 1.5 }}>
                       Solo una de las tres está bien escrita <em>y</em> dice la razón correcta.
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
@@ -896,7 +893,7 @@ export function LabDescribirPersonasClima({ color }: PracticaLabProps) {
                                 display: "inline-flex",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                fontSize: 11,
+                                fontSize: 14,
                                 fontWeight: 900,
                                 border: `1.5px solid ${resuelto && op.correcta ? OK : T.line}`,
                                 color: resuelto && op.correcta ? OK : T.text3,
@@ -928,7 +925,7 @@ export function LabDescribirPersonasClima({ color }: PracticaLabProps) {
                         }}
                       >
                         <i className={`fa-solid ${msgOracion.mal ? "fa-circle-xmark" : "fa-circle-check"}`} style={{ color: msgOracion.mal ? NO : OK, fontSize: 14, marginTop: 2 }} />
-                        <span style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.5 }}>{msgOracion.txt}</span>
+                        <span style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>{msgOracion.txt}</span>
                       </div>
                     )}
                   </>
@@ -942,23 +939,23 @@ export function LabDescribirPersonasClima({ color }: PracticaLabProps) {
             <div style={{ ...card, padding: "18px 22px" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 6 }}>
                 <Eyebrow>Escribe la forma del verbo: ahora mismo o normalmente</Eyebrow>
-                <span style={{ fontSize: 12.5, fontWeight: 800, color: ahoraDone ? OK : T.text3 }}>
+                <span style={{ fontSize: 14, fontWeight: 800, color: ahoraDone ? OK : T.text3 }}>
                   {AHORA.filter((i) => ahoraEstado[i.id] === "bien").length}/{AHORA.length}
                 </span>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px,1fr))", gap: 11, marginBottom: 18 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%,240px),1fr))", gap: 11, marginBottom: 18 }}>
                 {(["continuous", "simple"] as const).map((k) => {
                   const info = MARCADORES_INFO[k];
                   return (
                     <div key={k} style={{ borderRadius: 13, border: `1px solid ${info.color}44`, background: `${info.color}10`, padding: "12px 15px" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 9, fontSize: 13, fontWeight: 900, color: info.color }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 9, fontSize: 14, fontWeight: 900, color: info.color }}>
                         <i className={`fa-solid ${info.icono}`} />
                         {info.titulo}
                       </div>
-                      <div style={{ fontSize: 12.5, color: "#fff", fontWeight: 700, marginTop: 6 }}>{info.forma}</div>
-                      <div style={{ fontSize: 11.5, color: T.text3, marginTop: 5, lineHeight: 1.5 }}>Marcas: {info.marcas.join(" · ")}</div>
-                      <div style={{ fontSize: 11.5, color: T.text3, marginTop: 4, fontStyle: "italic" }}>{info.ejemplo}</div>
+                      <div style={{ fontSize: 14, color: "#fff", fontWeight: 700, marginTop: 6 }}>{info.forma}</div>
+                      <div style={{ fontSize: 14, color: T.text3, marginTop: 5, lineHeight: 1.5 }}>Marcas: {info.marcas.join(" · ")}</div>
+                      <div style={{ fontSize: 14, color: T.text3, marginTop: 4, fontStyle: "italic" }}>{info.ejemplo}</div>
                     </div>
                   );
                 })}
@@ -998,18 +995,18 @@ export function LabDescribirPersonasClima({ color }: PracticaLabProps) {
                         {item.despues}
                       </div>
                       <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginTop: 6 }}>
-                        <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".05em", textTransform: "uppercase", color: T.text3, border: `1px solid ${T.line}`, borderRadius: 6, padding: "2px 8px" }}>
+                        <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: ".05em", textTransform: "uppercase", color: T.text3, border: `1px solid ${T.line}`, borderRadius: 6, padding: "2px 8px" }}>
                           {item.marcador}
                         </span>
                         {done && (
-                          <button className="dpc-btn" style={{ padding: "6px 11px", fontSize: 12 }} onClick={() => hablarLab(`${item.antes}${item.respuesta}${item.despues}`)}>
+                          <button className="dpc-btn" style={{ padding: "6px 11px", fontSize: 14 }} onClick={() => hablarLab(`${item.antes}${item.respuesta}${item.despues}`)}>
                             <i className="fa-solid fa-volume-high" />
                           </button>
                         )}
-                        {done && <span style={{ fontSize: 12, color: T.text3 }}>{item.es}</span>}
+                        {done && <span style={{ fontSize: 14, color: T.text3 }}>{item.es}</span>}
                       </div>
                       {ahoraMsg[item.id] && (
-                        <div style={{ marginTop: 8, fontSize: 12.5, color: est === "mal" ? T.text2 : T.text3, lineHeight: 1.5, display: "flex", gap: 9 }}>
+                        <div style={{ marginTop: 8, fontSize: 14, color: est === "mal" ? T.text2 : T.text3, lineHeight: 1.5, display: "flex", gap: 9 }}>
                           <i className={`fa-solid ${est === "mal" ? "fa-circle-xmark" : "fa-circle-info"}`} style={{ color: est === "mal" ? NO : OK, marginTop: 2 }} />
                           <span>
                             {ahoraMsg[item.id]}
@@ -1041,21 +1038,19 @@ export function LabDescribirPersonasClima({ color }: PracticaLabProps) {
             />
           )}
         </div>
-
-        {/* ── columna lateral ───────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos de la sesión
-            </Eyebrow>
-            <TableroObjetivos objetivos={objetivos} retoKey={RETO_KEY} accent={accent} />
-          </div>
-
-          {/* pista del modo actual */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid rgba(${color.rgba},0.3)`, background: `rgba(${color.rgba},0.08)`, fontSize: 13, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
+      }
+      pestanas={[
+        {
+          id: "cuaderno",
+          etiqueta: "Cuaderno",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Tu partida" icono="fa-star">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+              </Bloque>
+              <Bloque titulo="Pista de este modo" icono="fa-lightbulb">
+                <p style={{ margin: 0, color: T.text2 }}>
               {modo === "orden" && (
                 <>
                   El orden nunca cambia: <strong style={{ color: T.text }}>opinión → tamaño → edad → color → material → sustantivo</strong>. No hace falta usarlos todos, pero
@@ -1081,155 +1076,113 @@ export function LabDescribirPersonasClima({ color }: PracticaLabProps) {
                 </>
               )}
               {modo === "texto" && <>Aquí ya no se toca: se escribe. El botón de pista y el banco de palabras están ahí si te atoras.</>}
-            </span>
-          </div>
-
-          {/* la regla, tal como la enuncia A1 */}
-          <div style={{ ...card, padding: "18px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-ruler" style={{ marginRight: 8, color: accent }} />
-              El orden del adjetivo
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {ORDEN_ADJ.map((c, i) => {
-                const info = CAT_INFO[c];
-                return (
-                  <div key={c} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 12.5 }}>
-                    <span style={{ width: 20, height: 20, borderRadius: 6, background: `${info.color}22`, color: info.color, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 900, flexShrink: 0 }}>
-                      {i + 1}
-                    </span>
-                    <span style={{ fontWeight: 800, color: "#fff", minWidth: 62 }}>{info.titulo}</span>
-                    <span style={{ color: T.text3 }}>{info.ejemplo}</span>
-                  </div>
-                );
-              })}
-              <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 12.5, marginTop: 2 }}>
-                <span style={{ width: 20, height: 20, borderRadius: 6, background: T.glassSoft, color: T.text3, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 900, flexShrink: 0 }}>
-                  <i className="fa-solid fa-flag-checkered" />
-                </span>
-                <span style={{ fontWeight: 800, color: "#fff" }}>Sustantivo</span>
-                <span style={{ color: T.text3 }}>jacket, dress, backpack</span>
-              </div>
-            </div>
-            <div className="dpc-divider" />
-            <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.55 }}>{REGLA_ADJETIVO_A1}</div>
-          </div>
-
-          {/* glosario verbatim A5 */}
-          <div style={{ ...card, padding: "18px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-spell-check" style={{ marginRight: 8, color: accent }} />
-              Glosario de la progresión
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {GLOSARIO_A5.map((g) => (
-                <div key={g.termino} style={{ fontSize: 12.5, lineHeight: 1.5 }}>
-                  <div style={{ fontWeight: 800, color: "#fff" }}>{g.termino}</div>
-                  <div style={{ color: T.text3 }}>{g.definicion}</div>
-                  <div style={{ color: T.text3, fontStyle: "italic" }}>{g.ejemplo}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* dato verbatim */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid ${T.line}`, background: T.glass, fontSize: 12.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-circle-info" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>{DATO_BILINGUE}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* ── paneles verbatim ─────────────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px,1fr))", gap: 16, marginTop: 22 }}>
-        <div style={{ ...card, padding: "20px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-            Puntos clave de la infografía
-          </Eyebrow>
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {PUNTOS_CLAVE.map((p, i) => (
-              <div key={i} style={{ display: "flex", gap: 11, fontSize: 12.5, lineHeight: 1.55, color: T.text2 }}>
-                <i className="fa-solid fa-angle-right" style={{ color: accent, marginTop: 3, flexShrink: 0 }} />
-                <span>{p}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div style={{ ...card, padding: "20px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-pen-nib" style={{ marginRight: 8, color: accent }} />
-            Tu turno
-          </Eyebrow>
-          <div style={{ fontSize: 13.5, color: T.text, lineHeight: 1.55, marginBottom: 12 }}>{TU_TURNO_A3.prompt}</div>
-          <ul style={{ margin: "0 0 12px", paddingLeft: 18, fontSize: 12.5, color: T.text2, lineHeight: 1.6, display: "flex", flexDirection: "column", gap: 5 }}>
-            {TU_TURNO_A3.pistas.map((p, i) => (
-              <li key={i}>{p}</li>
-            ))}
-          </ul>
-          <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.55 }}>
-            De {TU_TURNO_A3.minimo} a {TU_TURNO_A3.maximo} palabras. Se evalúa: {TU_TURNO_A3.criterios.join(" · ")}.
-          </div>
-        </div>
-
-        <div style={{ ...card, padding: "20px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-film" style={{ marginRight: 8, color: accent }} />
-            Del video de la progresión
-          </Eyebrow>
-          <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 12 }}>{VIDEO_A8.titulo}</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-            {VIDEO_A8.preguntas.map((q, i) => (
-              <div key={i} style={{ fontSize: 12.5, lineHeight: 1.5 }}>
-                <div style={{ color: "#fff", fontWeight: 700 }}>{q.pregunta}</div>
-                <div style={{ color: T.text3, marginTop: 3 }}>{q.respuesta}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div style={{ ...card, padding: "20px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-comments" style={{ marginRight: 8, color: accent }} />
-            Preguntas de reflexión
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12.5, color: T.text2, lineHeight: 1.6, display: "flex", flexDirection: "column", gap: 9 }}>
-            {REFLEXION_A1.map((p, i) => (
-              <li key={i}>{p}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      {/* ── reto evaluable (A4 verbatim) ─────────────────────────────── */}
-      <RetoQuizCard
-        quiz={QUIZ}
-        accent={accent}
-        rgba={color.rgba}
-        aprobado={quizAprobado}
-        onAprobado={() => setQuizAprobado(true)}
-        playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined}
-        mensajeAprobado="Describes en inglés con el orden, el verbo y el tiempo correctos."
-      />
-
-      {/* ── nota al pie ──────────────────────────────────────────────── */}
-      <div style={{ marginTop: 18, display: "flex", gap: 12, fontSize: 11.5, color: T.text3, lineHeight: 1.6 }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          Son <strong>verbatim</strong> de la progresión IN-II-P04: el marco teórico, los puntos clave, la regla del adjetivo y las preguntas de reflexión de la
-          infografía A1; el texto con huecos de A2 con sus pistas y alternativas; el encargo de escritura y sus criterios de A3; el reto evaluable de A4; el
-          glosario de A5; y las preguntas del video de A8. La oración 7 del modo «Now or usually?» está <strong>adaptada</strong> del texto de A6. Lo que escribí
-          para esta práctica y hay que leer como <strong>ilustrativo</strong>: las seis frases del modo «Adjective order», las seis del detector de frases
-          imposibles, las ocho descripciones de «Be or have?» y las cuatro personas de los pronósticos (Paola, Bruno, Renata e Iker son{" "}
-          <strong>ficticias</strong>, y se describen solo por estatura, cabello, lentes y ropa: describir sin juzgar el cuerpo es un criterio explícito de A3).
-          La regla del orden del adjetivo y las formas verbales son las de cualquier gramática descriptiva del inglés estadounidense estándar. Los lugares son
-          reales y su clima es el que se describe —en Creel, Sierra Tarahumara, nieva en invierno; La Ventosa, en el Istmo de Tehuantepec, es de las zonas más
-          ventosas del país y por eso concentra parques eólicos; Mérida es calurosa todo el año; Xalapa es lluviosa y templada—, pero las{" "}
-          <strong>temperaturas son valores típicos ilustrativos</strong>, no mediciones de un día concreto. Fuente: {FUENTE}
-        </span>
-      </div>
-    </div>
+                </p>
+              </Bloque>
+              <Bloque titulo="El orden del adjetivo" icono="fa-ruler">
+                {ORDEN_ADJ.map((c, i) => {
+                  const info = CAT_INFO[c];
+                  return (
+                    <p key={c} style={{ margin: 0, color: T.text2 }}>
+                      <strong style={{ color: info.color }}>
+                        {i + 1}. {info.titulo}.
+                      </strong>{" "}
+                      {info.ejemplo}
+                    </p>
+                  );
+                })}
+                <p style={{ margin: 0, color: T.text2 }}>
+                  <strong style={{ color: T.text }}>Sustantivo.</strong> jacket, dress, backpack
+                </p>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <RetoQuizCard
+              quiz={QUIZ}
+              accent={accent}
+              rgba={color.rgba}
+              aprobado={quizAprobado}
+              onAprobado={() => setQuizAprobado(true)}
+              playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined}
+              mensajeAprobado="Describes en inglés con el orden, el verbo y el tiempo correctos."
+            />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book",
+          contenido: (
+            <>
+              <Bloque titulo="La regla, tal como la enuncia A1" icono="fa-ruler">
+                <p style={{ margin: 0, color: T.text2 }}>{REGLA_ADJETIVO_A1}</p>
+              </Bloque>
+              <Bloque titulo="Puntos clave de la infografía" icono="fa-lightbulb">
+                {PUNTOS_CLAVE.map((p, i) => (
+                  <p key={i} style={{ margin: 0, color: T.text2 }}>
+                    {p}
+                  </p>
+                ))}
+              </Bloque>
+              <Bloque titulo="Tu turno" icono="fa-pen-nib">
+                <p style={{ margin: 0, color: T.text }}>{TU_TURNO_A3.prompt}</p>
+                <ul style={{ margin: 0, paddingLeft: 18, color: T.text2 }}>
+                  {TU_TURNO_A3.pistas.map((p, i) => (
+                    <li key={i}>{p}</li>
+                  ))}
+                </ul>
+                <p style={{ margin: 0, color: T.text3 }}>
+                  De {TU_TURNO_A3.minimo} a {TU_TURNO_A3.maximo} palabras. Se evalúa: {TU_TURNO_A3.criterios.join(" · ")}.
+                </p>
+              </Bloque>
+              <Bloque titulo="Del video de la progresión" icono="fa-film">
+                <p style={{ margin: 0, color: T.text3 }}>{VIDEO_A8.titulo}</p>
+                {VIDEO_A8.preguntas.map((q, i) => (
+                  <p key={i} style={{ margin: 0, color: T.text2 }}>
+                    <strong style={{ color: T.text }}>{q.pregunta}</strong> {q.respuesta}
+                  </p>
+                ))}
+              </Bloque>
+              <Bloque titulo="Preguntas de reflexión" icono="fa-comments">
+                <ul style={{ margin: 0, paddingLeft: 18, color: T.text2 }}>
+                  {REFLEXION_A1.map((p, i) => (
+                    <li key={i}>{p}</li>
+                  ))}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Glosario de la progresión" icono="fa-spell-check">
+                {GLOSARIO_A5.map((g) => (
+                  <p key={g.termino} style={{ margin: 0, color: T.text2 }}>
+                    <strong style={{ color: T.text }}>{g.termino}.</strong> {g.definicion} <em>{g.ejemplo}</em>
+                  </p>
+                ))}
+              </Bloque>
+              <Bloque titulo="Dato" icono="fa-circle-info">
+                <p style={{ margin: 0, color: T.text2 }}>{DATO_BILINGUE}</p>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={DESCRIBIR_PERSONAS_CLIMA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <Bloque titulo="Nota sobre el contenido" icono="fa-circle-info">
+                <p style={{ margin: 0, color: T.text3 }}>
+                  Son <strong>verbatim</strong> de la progresión IN-II-P04: el marco teórico, los puntos clave, la regla del adjetivo y las preguntas de reflexión de la
+                  infografía A1; el texto con huecos de A2; el encargo de escritura de A3; el reto evaluable de A4; el glosario de A5; y las preguntas del video de A8. La
+                  oración 7 de «Now or usually?» está <strong>adaptada</strong> de A6. Lo que se escribió para esta práctica es <strong>ilustrativo</strong>: las frases de
+                  los modos, los tres casos de «Find the person» y las cuatro personas de los pronósticos. Todas las personas (Mariana, Marco, Valeria, Bruno, Renata,
+                  Iker, Paola…) son <strong>ficticias</strong> y se describen solo por estatura, cabello, lentes y ropa. Los lugares del clima son ambientación y las{" "}
+                  <strong>temperaturas son valores típicos ilustrativos</strong>. Fuente: {FUENTE}
+                </p>
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }
 
@@ -1266,7 +1219,7 @@ function FilaSlots({
         const info = CAT_INFO[a.cat];
         return (
           <div key={a.palabra} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-            <span style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: ".08em", textTransform: "uppercase", color: info.color }}>
+            <span style={{ fontSize: 14, fontWeight: 900, letterSpacing: ".08em", textTransform: "uppercase", color: info.color }}>
               {i + 1}. {info.titulo}
             </span>
             <span
@@ -1290,7 +1243,7 @@ function FilaSlots({
               {puesto ? (
                 <span style={{ animation: "dpcPop .25s ease", fontSize: 16, fontWeight: 900 }}>{puesto}</span>
               ) : (
-                <i className="fa-solid fa-arrow-down" style={{ fontSize: 12 }} />
+                <i className="fa-solid fa-arrow-down" style={{ fontSize: 14 }} />
               )}
             </span>
           </div>
@@ -1473,7 +1426,7 @@ function Escenario({ pron, prendas }: { pron: Pronostico; prendas: string[] }) {
           borderRadius: 999,
           background: "rgba(2,12,28,0.7)",
           border: "1px solid rgba(255,255,255,0.18)",
-          fontSize: 12,
+          fontSize: 14,
           fontWeight: 900,
           color: "#fff",
           backdropFilter: "blur(6px)",
@@ -1486,7 +1439,7 @@ function Escenario({ pron, prendas }: { pron: Pronostico; prendas: string[] }) {
           position: "absolute",
           right: 14,
           bottom: 12,
-          fontSize: 12,
+          fontSize: 14,
           fontWeight: 800,
           color: "rgba(255,255,255,0.85)",
           textShadow: "0 1px 6px rgba(0,0,0,0.6)",

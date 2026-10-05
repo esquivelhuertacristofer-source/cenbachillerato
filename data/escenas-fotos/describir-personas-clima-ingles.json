@@ -1,0 +1,8 @@
+{
+  "slug": "describir-personas-clima-ingles",
+  "items": [
+    { "clave": "parada-lluvia", "formato": "16:9", "estilo": "ilustracion", "escena": "Parada de camión con techo de lámina bajo una lluvia fuerte, banca vacía, charcos en la banqueta y árboles verdes al fondo, cielo gris" },
+    { "clave": "plaza-calor", "formato": "16:9", "estilo": "ilustracion", "escena": "Plaza colonial al mediodía con sol intenso, kiosco, bancas vacías, laureles y sombras cortas sobre el piso de piedra, cielo azul brillante" },
+    { "clave": "viento-eolico", "formato": "16:9", "estilo": "ilustracion", "escena": "Mirador en una llanura seca con aerogeneradores blancos girando al fondo, pasto y arbustos inclinados por el viento, cielo azul con nubes alargadas" }
+  ]
+}

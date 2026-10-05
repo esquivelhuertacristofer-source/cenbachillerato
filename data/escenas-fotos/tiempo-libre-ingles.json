@@ -1,0 +1,8 @@
+{
+  "slug": "tiempo-libre-ingles",
+  "items": [
+    { "clave": "estudio-radio", "formato": "16:9", "estilo": "ilustracion", "escena": "Cabina de radio escolar con micrófono sobre brazo articulado, audífonos colgados, consola de sonido y un letrero luminoso rojo apagado, paredes con espuma acústica de colores" },
+    { "clave": "tianguis-domingo", "formato": "16:9", "estilo": "ilustracion", "escena": "Calle de tianguis mexicano con puestos de toldos de colores, bicicletas recargadas en un puesto, frutas en cajas y papel picado, luz de media mañana, sin gente en primer plano" },
+    { "clave": "taller-arte", "formato": "16:9", "estilo": "ilustracion", "escena": "Taller de arte con ventanal luminoso, caballetes con lienzos en blanco, botes de pintura abiertos, una bocina pequeña y una mesa con pinceles" }
+  ]
+}

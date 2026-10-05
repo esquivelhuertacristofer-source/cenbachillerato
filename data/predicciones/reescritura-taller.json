@@ -1,0 +1,12 @@
+{
+  "escena": "Un borrador de aviso vecinal lleno de muletillas y repeticiones, y una lectora ficticia que lo lee con un medidor de claridad.",
+  "pregunta": "Al tachar las muletillas y repeticiones, ¿qué le pasa a la lectora?",
+  "opciones": [
+    { "id": "a", "texto": "Pierde datos y entiende menos", "icono": "fa-arrow-down" },
+    { "id": "b", "texto": "Entiende igual pero tarda más", "icono": "fa-hourglass-half" },
+    { "id": "c", "texto": "Entiende mejor y lee en menos tiempo", "icono": "fa-bolt" }
+  ],
+  "correcta": "c",
+  "porque": "Las muletillas y repeticiones no aportan datos nuevos. Al quitarlas, la información queda igual, sube la claridad y baja el tiempo de lectura.",
+  "comoComprobarlo": "En «Cirugía de párrafo» toca varias palabras que sobran y observa los medidores de claridad y tiempo de la lectora."
+}

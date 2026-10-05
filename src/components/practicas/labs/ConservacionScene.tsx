@@ -13,9 +13,9 @@
  * Nada de Math.random ni Date.now: la animación usa state.clock y delta.
  */
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import type { ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, ContactShadows, Environment, Lightformer, Line, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
@@ -58,7 +58,37 @@ const PIVOT: [number, number, number] = [-1.4, 3.7, 0];
 const BAR_BASE_Y = 0.0;
 const BAR_H = 2.8; // altura de la barra a energía completa
 const BAR_W = 0.5;
-const BAR_XS = { ep: 2.0, ec: 2.85, heat: 3.7 };
+const BAR_XS = { ep: 1.9, ec: 3.0, heat: 4.1 };
+const OBJETIVO: [number, number, number] = [0.9, 1.6, 0];
+
+/* Etiqueta de tamaño fijo en píxeles (≥ 14 px), centrada sobre su punto. */
+function Etiqueta({ pos, color, children, borde = true }: { pos: [number, number, number]; color: string; children: React.ReactNode; borde?: boolean }) {
+  return (
+    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
+      <div style={{
+        whiteSpace: "nowrap", padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.88)",
+        border: borde ? `1.5px solid ${color}` : "none", color, fontWeight: 900, fontSize: 14, textAlign: "center",
+        fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)",
+      }}>
+        {children}
+      </div>
+    </Html>
+  );
+}
+
+/** Ajusta la distancia de la cámara al ancho disponible (el celular es angosto). */
+function Encuadre() {
+  const camera = useThree((st) => st.camera);
+  const size = useThree((st) => st.size);
+  const aspect = size.width / Math.max(1, size.height);
+  const k = Math.max(1, 1.15 / Math.min(1.15, aspect));
+  useEffect(() => {
+    camera.position.set(0.9, 2.7 + (k - 1) * 0.8, 9 * k);
+    camera.lookAt(OBJETIVO[0], OBJETIVO[1], OBJETIVO[2]);
+    camera.updateProjectionMatrix();
+  }, [camera, k]);
+  return null;
+}
 
 export default function ConservacionScene(props: ConservacionSceneProps) {
   return (
@@ -66,8 +96,9 @@ export default function ConservacionScene(props: ConservacionSceneProps) {
       shadows
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
-      camera={{ position: [0.7, 2.6, 9], fov: 44 }}
+      camera={{ position: [0.9, 2.7, 9], fov: 44 }}
     >
+      <Encuadre />
       <Contenido {...props} />
     </Canvas>
   );
@@ -79,6 +110,7 @@ export default function ConservacionScene(props: ConservacionSceneProps) {
  */
 function Contenido(props: ConservacionSceneProps) {
   const { anguloDeg, largo: L, masa: m, g, friccion, pausado, accent, arrastrable, onAnguloChange } = props;
+  const estrecho = useThree((st) => st.size.width) < 640;
 
   // estado de la simulación en refs (no dispara renders)
   const thetaRef = useRef(grados2rad(anguloDeg));
@@ -287,18 +319,16 @@ function Contenido(props: ConservacionSceneProps) {
           )}
 
           {arrastrable && (hover || dragging) && (
-            <Html center position={[0, -L - bobR - 0.45, 0]} distanceFactor={16} pointerEvents="none">
-              <div style={{ whiteSpace: "nowrap", textShadow: "0 2px 10px rgba(0,0,0,0.95)", fontWeight: 800, fontSize: 12, color: accent, background: "rgba(2,12,28,0.7)", padding: "3px 8px", borderRadius: 8 }}>
-                <i className="fa-solid fa-hand-pointer" style={{ marginRight: 6 }} />
-                {dragging ? `suelta a ${dragDeg}°` : "arrastra la masa"}
-              </div>
-            </Html>
+            <Etiqueta pos={[0, -L - bobR - 0.5, 0]} color={accent}>
+              <i className="fa-solid fa-hand-pointer" style={{ marginRight: 6 }} />
+              {dragging ? `suelta a ${dragDeg}°` : "arrastra la masa"}
+            </Etiqueta>
           )}
         </group>
 
         {/* Plataforma de las barras */}
         <mesh position={[(BAR_XS.ep + BAR_XS.heat) / 2, -0.04, 0]} receiveShadow>
-          <boxGeometry args={[2.5, 0.08, 1.0]} />
+          <boxGeometry args={[3.2, 0.08, 1.0]} />
           <meshStandardMaterial color="#0a2138" roughness={0.8} metalness={0.1} />
         </mesh>
 
@@ -328,36 +358,23 @@ function Contenido(props: ConservacionSceneProps) {
           dashSize={0.14}
           gapSize={0.1}
         />
-        <Html center position={[BAR_XS.heat + 1.05, BAR_BASE_Y + BAR_H, 0]} distanceFactor={15} pointerEvents="none">
-          <div style={{ fontWeight: 800, fontSize: 12, color: META, whiteSpace: "nowrap", textShadow: "0 2px 10px rgba(0,0,0,0.9)" }}>E₀ total</div>
-        </Html>
+        {/* Etiquetas de las barras (texto vivo por ref); en celular solo el nombre, escalonado */}
+        <Etiqueta pos={[BAR_XS.ep, BAR_BASE_Y + BAR_H + 0.5, 0]} color={EP_COL}>
+          Ep{!estrecho && <> <span ref={epTxt}>0 J</span></>}
+        </Etiqueta>
+        <Etiqueta pos={[BAR_XS.ec, BAR_BASE_Y + BAR_H + (estrecho ? 1.05 : 0.5), 0]} color={EC_COL}>
+          Ec{!estrecho && <> <span ref={ecTxt}>0 J</span></>}
+        </Etiqueta>
+        <Etiqueta pos={[BAR_XS.heat, BAR_BASE_Y + BAR_H + 0.5, 0]} color={HEAT_COL}>
+          Calor{!estrecho && <> <span ref={heatTxt}>0 J</span></>}
+        </Etiqueta>
 
-        {/* Etiquetas de las barras (texto vivo por ref) */}
-        <Html center position={[BAR_XS.ep, BAR_BASE_Y + BAR_H + 0.45, 0]} distanceFactor={16} pointerEvents="none">
-          <div style={{ textAlign: "center", whiteSpace: "nowrap", textShadow: "0 2px 10px rgba(0,0,0,0.95)" }}>
-            <div style={{ fontWeight: 900, fontSize: 13, color: EP_COL }}>Ep</div>
-            <div style={{ fontWeight: 800, fontSize: 12, color: EP_COL }}><span ref={epTxt}>0 J</span></div>
-          </div>
-        </Html>
-        <Html center position={[BAR_XS.ec, BAR_BASE_Y + BAR_H + 0.45, 0]} distanceFactor={16} pointerEvents="none">
-          <div style={{ textAlign: "center", whiteSpace: "nowrap", textShadow: "0 2px 10px rgba(0,0,0,0.95)" }}>
-            <div style={{ fontWeight: 900, fontSize: 13, color: EC_COL }}>Ec</div>
-            <div style={{ fontWeight: 800, fontSize: 12, color: EC_COL }}><span ref={ecTxt}>0 J</span></div>
-          </div>
-        </Html>
-        <Html center position={[BAR_XS.heat, BAR_BASE_Y + BAR_H + 0.45, 0]} distanceFactor={16} pointerEvents="none">
-          <div style={{ textAlign: "center", whiteSpace: "nowrap", textShadow: "0 2px 10px rgba(0,0,0,0.95)" }}>
-            <div style={{ fontWeight: 900, fontSize: 13, color: HEAT_COL }}>Calor</div>
-            <div style={{ fontWeight: 800, fontSize: 12, color: HEAT_COL }}><span ref={heatTxt}>0 J</span></div>
-          </div>
-        </Html>
-
-        {/* Velocidad viva junto a la masa */}
-        <Html center position={[PIVOT[0], 0.45, 0]} distanceFactor={17} pointerEvents="none">
-          <div style={{ whiteSpace: "nowrap", textShadow: "0 2px 10px rgba(0,0,0,0.95)", fontWeight: 800, fontSize: 12, color: accent }}>
+        {/* Velocidad viva (se oculta mientras se arrastra, para no pasar de 4 etiquetas) */}
+        {!(hover || dragging) && (
+          <Etiqueta pos={[PIVOT[0], 0.5, 0]} color={accent}>
             v = <span ref={vTxt}>0 m/s</span>
-          </div>
-        </Html>
+          </Etiqueta>
+        )}
 
         <ContactShadows position={[0, -0.02, 0]} opacity={0.32} scale={26} blur={3} far={11} color="#020c1c" />
       </group>
@@ -374,7 +391,7 @@ function Contenido(props: ConservacionSceneProps) {
         maxDistance={32}
         minPolarAngle={Math.PI / 9}
         maxPolarAngle={Math.PI / 2.05}
-        target={[0.8, 1.9, 0]}
+        target={OBJETIVO}
         enabled={!dragging}
         autoRotate={props.autoRotate && !dragging}
         autoRotateSpeed={0.35}

@@ -283,3 +283,15 @@ export const HECHOS = [
   "Una recta es a la vez la función más simple y la única cuya razón de cambio (pendiente) es constante.",
   "Los máximos y mínimos de una función son la base de los problemas de optimización del cálculo diferencial.",
 ];
+
+/* ── Sonda de simetría: compara f(x) con f(−x) en un punto ─────────────── */
+export type RelacionSonda = "igual" | "opuesto" | "distinto";
+
+/** Compara f(x) con f(−x): iguales (par), opuestos (impar) o distintos. */
+export function relacionSonda(fn: Funcion, x: number): RelacionSonda {
+  const a = fn.f(x);
+  const c = fn.f(-x);
+  if (Math.abs(a - c) < 1e-6) return "igual";
+  if (Math.abs(a + c) < 1e-6) return "opuesto";
+  return "distinto";
+}

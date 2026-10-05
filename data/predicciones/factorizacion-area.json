@@ -1,0 +1,12 @@
+{
+  "escena": "Tienes 1 pieza x², 7 piezas x y 12 unidades para armar un rectángulo.",
+  "pregunta": "¿Qué valores de p y q arman el rectángulo de x² + 7x + 12?",
+  "opciones": [
+    { "id": "a", "texto": "p = 2 y q = 6", "icono": "fa-table-cells" },
+    { "id": "b", "texto": "p = 3 y q = 4", "icono": "fa-table-cells-large" },
+    { "id": "c", "texto": "p = 1 y q = 7", "icono": "fa-ruler-combined" }
+  ],
+  "correcta": "b",
+  "porque": "Los lados (x + p) y (x + q) piden p + q piezas x y p·q unidades. Solo 3 y 4 suman 7 y multiplican 12, así que no sobra ni falta ninguna pieza.",
+  "comoComprobarlo": "En «Armar», elige x² + 7x + 12 y mueve p y q hasta que el contorno se ponga verde."
+}

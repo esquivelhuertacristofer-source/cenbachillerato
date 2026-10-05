@@ -32,11 +32,11 @@
 import { useEffect, useRef, useState } from "react";
 import type { PracticaLabProps } from "../registry";
 import { T, OK, card, Eyebrow } from "./_kit";
+import { LabShell, Bloque, BotonHerramienta, Dato } from "./_shell";
 import { LabSfx } from "./lab-audio";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { EscribeTermino } from "./_mecanica-termino";
 import { usePartida, MarcadorPartida } from "./_partida";
-import { TableroObjetivos } from "./_objetivos";
 import { RetoQuizCard } from "./_reto-quiz";
 import { FichaTeorica } from "./_ficha";
 import { DERECHOS_DIGITALES_FICHA } from "./derechos-digitales-ficha";
@@ -62,13 +62,16 @@ import {
   type Letra,
 } from "./derechos-digitales-data";
 import { VinetaTermino } from "./_vineta";
+import { DATOS_CUENTA, ETIQUETAS, APP_NOMBRE, estadoDato } from "./derechos-digitales-sim";
 
 const NO = "#FF5E5E";
 const RETO_KEY = "cen-derechos-digitales-reto";
+const RUTA_SIM = "/media/labs-sim/derechos-digitales";
 
-type Modo = "caso" | "arco" | "aviso" | "glosario" | "texto";
+type Modo = "cuenta" | "caso" | "arco" | "aviso" | "glosario" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
+  { id: "cuenta", label: "Tu cuenta en la app", icono: "fa-user-shield" },
   { id: "caso", label: "El expediente", icono: "fa-folder-open" },
   { id: "arco", label: "Buzón ARCO", icono: "fa-inbox" },
   { id: "aviso", label: "Audita el aviso", icono: "fa-file-contract" },
@@ -80,12 +83,11 @@ const claveDe = (casoId: string, paso: number) => `${casoId}:${paso}`;
 
 export function LabDerechosDigitales({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
-  const [modo, setModo] = useState<Modo>("caso");
+  const [modo, setModo] = useState<Modo>("cuenta");
 
   // ── sonido, partida y pie ─────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   useEffect(() => () => audioRef.current?.dispose(), []);
   const toggleSonido = async () => {
@@ -112,6 +114,34 @@ export function LabDerechosDigitales({ color }: PracticaLabProps) {
     partida.acierto();
     if (txt) setPie({ ok: true, txt });
     return sonido && audioRef.current?.blip();
+  };
+
+  // ── modo 0: tu cuenta en la app (simulador) ───────────────────────────
+  const [cuentaElec, setCuentaElec] = useState<Record<string, Letra>>({});
+  const [cuentaProbadas, setCuentaProbadas] = useState<Record<string, Letra[]>>({});
+  const estadosCuenta = DATOS_CUENTA.map((d) => estadoDato(d, cuentaElec[d.id]));
+  const usosMalos = estadosCuenta.filter((e) => e.etiquetas.includes("uso")).length;
+  const erroresN = estadosCuenta.filter((e) => e.etiquetas.includes("error")).length;
+  const opacosN = estadosCuenta.filter((e) => e.etiquetas.includes("opaco")).length;
+  const cuentaPct = Math.max(0, 100 + estadosCuenta.reduce((n, e) => n + e.cuenta, 0));
+  const cuentaDone = DATOS_CUENTA.every((d) => cuentaElec[d.id] !== undefined && estadoDato(d, cuentaElec[d.id]).ok);
+  const cuentaExplorada = DATOS_CUENTA.some((d) => (cuentaProbadas[d.id] ?? []).length >= 4);
+  const ejercerLetra = (d: (typeof DATOS_CUENTA)[number], letra: Letra) => {
+    setCuentaElec((m) => ({ ...m, [d.id]: letra }));
+    setCuentaProbadas((m) => {
+      const previas = m[d.id] ?? [];
+      return previas.includes(letra) ? m : { ...m, [d.id]: [...previas, letra] };
+    });
+    const r = d.letras[letra];
+    if (r.ok) {
+      sfxPlace(r.nota);
+      if (DATOS_CUENTA.every((x) => x.id === d.id || (cuentaElec[x.id] !== undefined && estadoDato(x, cuentaElec[x.id]).ok))) sfxOk();
+    } else sfxNo(r.nota);
+  };
+  const resetCuenta = () => {
+    setCuentaElec({});
+    setCuentaProbadas({});
+    setPie(null);
   };
 
   // ── modo 1: el expediente ─────────────────────────────────────────────
@@ -246,6 +276,8 @@ export function LabDerechosDigitales({ color }: PracticaLabProps) {
   const excesosDone = CLAUSULAS.filter((c) => c.exceso && veredictos[c.id]).length >= EXCESOS_TOTALES;
 
   const objetivos = [
+    { txt: "Deja tu cuenta sin usos indebidos, errores ni datos ocultos", done: cuentaDone },
+    { txt: "Prueba las cuatro letras en un mismo dato y compara", done: cuentaExplorada },
     { txt: `Identifica el derecho en juego en los ${CASOS.length} casos`, done: derechosDone },
     { txt: `Elige el mecanismo que procede en los ${CASOS.length} casos`, done: mecanismosDone },
     { txt: "Nombra el deber que acompaña a cada derecho", done: deberesDone },
@@ -259,7 +291,9 @@ export function LabDerechosDigitales({ color }: PracticaLabProps) {
   ];
 
   const resetActual =
-    modo === "caso"
+    modo === "cuenta"
+      ? resetCuenta
+      : modo === "caso"
       ? resetCasos
       : modo === "arco"
         ? resetArco
@@ -268,6 +302,17 @@ export function LabDerechosDigitales({ color }: PracticaLabProps) {
           : modo === "glosario"
             ? resetGlosario
             : resetTexto;
+
+  const lecturaVivo =
+    modo === "cuenta"
+      ? `Usos indebidos ${usosMalos} · errores ${erroresN} · cuenta ${cuentaPct} %`
+      : modo === "caso"
+        ? `Decisiones resueltas ${Object.keys(resueltos).length}/${TOTAL_DECISIONES}`
+        : modo === "arco"
+          ? `Solicitudes colocadas ${Object.keys(ubic).length}/${SOLICITUDES.length}`
+          : modo === "aviso"
+            ? `Cláusulas auditadas ${Object.keys(veredictos).length}/${CLAUSULAS.length}`
+            : "Repaso de la progresión";
 
   const solicitudesLibres = SOLICITUDES.filter((s) => !ubic[s.id]);
 
@@ -314,42 +359,51 @@ export function LabDerechosDigitales({ color }: PracticaLabProps) {
   });
 
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      dom
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })),
+        valor: modo,
+        cambiar: (id) => setModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={resetActual} />
+        </>
+      }
+      lectura={lecturaVivo}
+      objetivos={objetivos}
+      escena={
+        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
+          <style>{`
         @keyframes derShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
         @keyframes derPop { 0%{transform:scale(.72);opacity:0;} 100%{transform:scale(1);opacity:1;} }
-        .der-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(300px,28vw,400px); gap:22px; align-items:start; }
-        @media (max-width:1000px){ .der-grid { grid-template-columns:minmax(0,1fr); } }
-        .der-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 15px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13px; font-weight:800; transition:all .14s; }
-        .der-tab:hover { border-color:${T.lineStrong}; color:#fff; }
-        .der-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-        .der-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
-          font-size:14px; border:1px solid ${T.line}; background:${T.glass}; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .der-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
-        .der-icobtn:hover { background:rgba(255,255,255,0.12); }
 
         /* Expediente */
         .der-exp { cursor:pointer; display:flex; align-items:center; gap:10px; padding:9px 13px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:12.5px; font-weight:800; transition:all .14s; text-align:left; }
+          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; text-align:left; }
         .der-exp:hover { border-color:${T.lineStrong}; color:#fff; }
         .der-exp[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; }
         .der-exp[data-done="true"] { color:${OK}; border-color:${OK}66; }
         .der-opt { cursor:pointer; display:flex; align-items:flex-start; gap:12px; width:100%; text-align:left;
           border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2};
-          font-size:13.5px; line-height:1.5; font-weight:600; padding:13px 16px; transition:all .14s; }
+          font-size:14px; line-height:1.5; font-weight:600; padding:13px 16px; transition:all .14s; }
         .der-opt:hover:not(:disabled) { border-color:${T.lineStrong}; background:${T.glassSoft}; color:#fff; }
         .der-opt:disabled { cursor:default; }
         .der-opt[data-ok="true"] { border-color:${OK}; background:${OK}16; color:#fff; }
         .der-opt[data-bad="true"] { border-color:${NO}; background:${NO}14; color:${T.text2}; opacity:.75; }
         .der-bullet { flex-shrink:0; width:25px; height:25px; border-radius:8px; display:flex; align-items:center;
-          justify-content:center; font-size:11.5px; font-weight:900; border:1px solid ${T.line}; color:${T.text3}; }
+          justify-content:center; font-size:14px; font-weight:900; border:1px solid ${T.line}; color:${T.text3}; }
         .der-opt[data-ok="true"] .der-bullet { background:${OK}; color:#04121f; border-color:${OK}; }
         .der-opt[data-bad="true"] .der-bullet { background:${NO}; color:#04121f; border-color:${NO}; }
 
         /* Buzón ARCO */
         .der-sol { cursor:grab; display:flex; align-items:flex-start; gap:11px; padding:12px 14px; border-radius:13px;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:${T.text}; font-size:13px; line-height:1.5;
+          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:${T.text}; font-size:14px; line-height:1.5;
           font-weight:600; text-align:left; transition:all .14s; user-select:none; width:100%; }
         .der-sol:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.08); transform:translateY(-2px); }
         .der-sol[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.18); box-shadow:0 0 16px -5px ${accent}; transform:translateY(-3px); }
@@ -369,93 +423,129 @@ export function LabDerechosDigitales({ color }: PracticaLabProps) {
         .der-cl[data-v="ok"] { border-color:${OK}66; background:${OK}0e; }
         .der-cl[data-v="exceso"] { border-color:${NO}66; background:${NO}0e; }
         .der-vbtn { cursor:pointer; padding:8px 14px; border-radius:10px; border:1.5px solid ${T.line}; background:${T.glass};
-          color:${T.text2}; font-size:12.5px; font-weight:800; transition:all .14s; }
+          color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; }
         .der-vbtn:hover:not(:disabled) { border-color:${T.lineStrong}; color:#fff; }
         .der-vbtn:disabled { cursor:default; opacity:.6; }
         .der-vbtn[data-on="ok"] { border-color:${OK}; background:${OK}22; color:#fff; opacity:1; }
         .der-vbtn[data-on="exceso"] { border-color:${NO}; background:${NO}22; color:#fff; opacity:1; }
 
         .der-vf { cursor:pointer; padding:8px 16px; border-radius:10px; border:1.5px solid ${T.line}; background:${T.glass};
-          color:${T.text2}; font-size:12.5px; font-weight:800; transition:all .14s; }
+          color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; }
         .der-vf:hover:not(:disabled) { border-color:${T.lineStrong}; color:#fff; }
         .der-vf:disabled { cursor:default; opacity:.85; }
         .der-vf[data-on="true"] { border-color:${OK}; background:${OK}1f; color:#fff; }
         .der-vf[data-bad="true"] { border-color:${NO}; background:${NO}1f; color:#fff; }
         .der-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:10px 17px;
-          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:13px; font-weight:800; transition:all .14s; }
+          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:14px; font-weight:800; transition:all .14s; }
         .der-btn:hover { border-color:${accent}; background:rgba(${color.rgba},0.14); }
         @media (prefers-reduced-motion: reduce){
           .der-bin[data-shake="true"], .der-cl[data-shake="true"] { animation:none; }
           .der-sol, .der-sol:hover, .der-sol[data-sel="true"] { transform:none; }
         }
-
-        /* Cajón de teoría */
-        .der-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .der-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .der-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .der-drawer[data-open="true"] { transform:translateX(0); }
-        .der-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .der-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .der-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .der-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .der-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .der-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .der-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
+        .der-app { border-radius:16px; border:1px solid ${T.lineStrong}; background:${T.inset}; overflow:hidden; }
+        .der-app-cab { display:flex; align-items:center; gap:12px; padding:10px 14px; border-bottom:1px solid ${T.line}; background:${T.glass}; }
+        .der-app-logo { width:56px; height:40px; border-radius:10px; flex-shrink:0; }
+        .der-medidores { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; padding:12px; }
+        .der-datos { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%,340px), 1fr)); gap:12px; }
+        .der-dato { display:flex; flex-direction:column; padding:14px; border-radius:15px; border:1.5px solid ${T.line}; background:${T.glass}; transition:border-color .2s, background .2s; }
+        .der-dato[data-ok="true"] { border-color:${OK}77; background:${OK}0d; }
+        .der-dato[data-mal="true"] { border-color:${NO}55; }
+        .der-dato-ico { width:44px; height:44px; border-radius:12px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:19px; color:${accent}; background:rgba(${color.rgba},0.14); }
+        .der-dato-foto { width:44px; height:44px; border-radius:12px; flex-shrink:0; }
+        .der-foto { position:relative; display:flex; align-items:center; justify-content:center; overflow:hidden; color:rgba(255,255,255,0.4); font-size:19px; background:linear-gradient(135deg,#1e3a5f,#312e81); }
+        .der-foto img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+        .der-chip { display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border-radius:999px; border:1px solid ${T.line}; font-size:14px; font-weight:800; }
+        .der-letras { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:7px; margin-top:10px; }
+        .der-letra { cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:2px; padding:8px 4px; border-radius:11px; border:1.5px solid ${T.line}; background:${T.glassSoft}; color:${T.text2}; font-size:14px; font-weight:700; transition:all .14s; }
+        .der-letra strong { font-size:16px; color:hsl(var(--tono) 78% 62%); }
+        .der-letra:hover { border-color:hsl(var(--tono) 78% 62%); color:#fff; }
+        .der-letra[data-on="true"] { border-color:hsl(var(--tono) 78% 62%); background:hsl(var(--tono) 72% 58% / 0.2); color:#fff; }
+        .der-nota { display:flex; gap:10px; margin-top:10px; padding:10px 12px; border-radius:11px; background:${T.inset}; border:1px solid ${T.line}; font-size:14px; color:${T.text2}; line-height:1.5; }
+        @media (max-width:420px){ .der-letras { grid-template-columns:repeat(2, minmax(0,1fr)); } }
+        @media (prefers-reduced-motion: reduce){ .der-dato { transition:none; } }
       `}</style>
+          {/* MODO 0 — tu cuenta en la app (simulador) */}
+          {modo === "cuenta" && (
+            <>
+              <div className="der-app">
+                <div className="der-app-cab">
+                  <Foto clave="tareas-expres" icono="fa-mobile-screen" alt="Un teléfono con una aplicación de tareas escolares" className="der-app-logo" />
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: 15, fontWeight: 900, color: "#fff" }}>Mi cuenta · {APP_NOMBRE}</div>
+                    <div style={{ fontSize: 14, color: T.text3 }}>App ficticia · elige una letra de ARCO por cada dato</div>
+                  </div>
+                </div>
+                <div className="der-medidores">
+                  <Dato label="Usos que te perjudican" value={`${usosMalos}`} col={usosMalos === 0 ? OK : NO} />
+                  <Dato label="Datos con error" value={`${erroresN}`} col={erroresN === 0 ? OK : "#FBBF24"} />
+                  <Dato label="Sin saber qué hay" value={`${opacosN}`} col={opacosN === 0 ? OK : "#A78BFA"} />
+                  <Dato label="Cuenta funcionando" value={`${cuentaPct} %`} col={cuentaPct === 100 ? OK : NO} />
+                </div>
+              </div>
 
-      {/* ── Barra de modos y herramientas ───────────────────────────────── */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 16 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="der-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="der-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="der-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="der-icobtn" onClick={resetActual} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
-
-      {/* ── Cajón de teoría ─────────────────────────────────────────────── */}
-      <button className="der-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="der-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="der-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="der-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="der-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="der-drawer-body">
-          <FichaTeorica data={DERECHOS_DIGITALES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div className="der-grid">
-        {/* ── Columna principal ───────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
+              <div className="der-datos">
+                {DATOS_CUENTA.map((d) => {
+                  const letra = cuentaElec[d.id];
+                  const est = estadoDato(d, letra);
+                  const probadas = cuentaProbadas[d.id] ?? [];
+                  return (
+                    <div key={d.id} className="der-dato" data-ok={letra !== undefined && est.ok} data-mal={letra !== undefined && !est.ok}>
+                      <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                        {d.foto ? (
+                          <Foto clave={d.foto} icono={d.icono} alt="" className="der-dato-foto" />
+                        ) : (
+                          <span className="der-dato-ico" aria-hidden>
+                            <i className={`fa-solid ${d.icono}`} />
+                          </span>
+                        )}
+                        <div style={{ minWidth: 0, flex: 1 }}>
+                          <div style={{ fontSize: 15, fontWeight: 900, color: "#fff" }}>{d.titulo}</div>
+                          <div style={{ fontSize: 15, color: T.text, marginTop: 4, overflowWrap: "anywhere", fontFamily: "ui-monospace, monospace" }}>{est.valor}</div>
+                          <div style={{ display: "flex", gap: 7, flexWrap: "wrap", marginTop: 7 }}>
+                            {est.etiquetas.length === 0 && (
+                              <span className="der-chip" style={{ color: OK, borderColor: `${OK}66` }}>
+                                <i className="fa-solid fa-circle-check" /> En orden
+                              </span>
+                            )}
+                            {est.etiquetas.map((e) => (
+                              <span key={e} className="der-chip" style={{ color: ETIQUETAS[e].color, borderColor: `${ETIQUETAS[e].color}66` }}>
+                                <i className={`fa-solid ${ETIQUETAS[e].icono}`} /> {ETIQUETAS[e].texto}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                      <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.5, marginTop: 9 }}>
+                        {letra === undefined ? d.inicial.problema : null}
+                      </div>
+                      <div className="der-letras" role="group" aria-label={`Derecho ARCO para ${d.titulo}`}>
+                        {LETRAS.map((l) => (
+                          <button key={l.id} type="button" className="der-letra" data-on={letra === l.id} style={{ ["--tono" as string]: l.tono }} onClick={() => ejercerLetra(d, l.id)}>
+                            <strong>{l.id}</strong>
+                            <span>{l.nombre}</span>
+                          </button>
+                        ))}
+                      </div>
+                      {letra !== undefined && (
+                        <div className="der-nota" data-ok={est.ok}>
+                          <i className={`fa-solid ${est.ok ? "fa-circle-check" : "fa-circle-xmark"}`} style={{ color: est.ok ? OK : NO, marginTop: 3 }} />
+                          <span>
+                            <strong style={{ color: "#fff" }}>{LETRAS.find((l) => l.id === letra)?.nombre}. </strong>
+                            {est.nota}
+                            {probadas.length >= 4 && <em style={{ color: T.text3 }}> · ya probaste las cuatro letras</em>}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
+                Simulación: aquí puedes cambiar de letra y deshacer. En la vida real una cancelación es definitiva (con bloqueo previo y después supresión), así que
+                conviene elegir con cuidado.
+              </div>
+            </>
+          )}
           {modo === "caso" && (
             <ExpedientePanel
               accent={accent}
@@ -556,7 +646,7 @@ export function LabDerechosDigitales({ color }: PracticaLabProps) {
               border: `1px solid ${pie ? (pie.ok ? `${OK}55` : `${NO}55`) : T.line}`,
               background: pie ? (pie.ok ? `${OK}12` : `${NO}12`) : T.glass,
               padding: "13px 16px",
-              fontSize: 13,
+              fontSize: 14,
               lineHeight: 1.55,
               color: T.text2,
               display: "flex",
@@ -575,88 +665,59 @@ export function LabDerechosDigitales({ color }: PracticaLabProps) {
                 : "Aquí aparecerá la explicación de cada decisión, con el artículo de la ley en el que se apoya. Ninguna respuesta se da por buena sin decirte por qué."}
             </span>
           </div>
-
-          {/* Preguntas de comprensión de la lectura A1 (verbatim) */}
-          <div style={{ ...card, padding: "18px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book-open-reader" style={{ marginRight: 8, color: accent }} />
-              Lectura A1 · para pensar
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              {COMPRENSION_A1.map((c, i) => (
-                <details key={i} style={{ borderRadius: 11, border: `1px solid ${T.line}`, background: T.inset, padding: "10px 13px" }}>
-                  <summary style={{ cursor: "pointer", fontSize: 13, fontWeight: 700, color: T.text2, lineHeight: 1.45 }}>
-                    {c.pregunta}
-                  </summary>
-                  <p style={{ margin: "9px 0 0", fontSize: 12.5, color: T.text3, lineHeight: 1.5 }}>{c.guia}</p>
-                </details>
-              ))}
-            </div>
-          </div>
         </div>
-
-        {/* ── Columna lateral ─────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos de la sesión
-            </Eyebrow>
-            <TableroObjetivos objetivos={objetivos} retoKey={RETO_KEY} accent={accent} />
-          </div>
-
-          {/* Qué se practica en el modo actual */}
-          <div
-            style={{
-              borderRadius: 18,
-              padding: "16px 18px",
-              border: `1px solid rgba(${color.rgba},0.3)`,
-              background: `rgba(${color.rgba},0.08)`,
-              fontSize: 13,
-              color: T.text2,
-              lineHeight: 1.55,
-              display: "flex",
-              gap: 12,
-            }}
-          >
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              {modo === "caso" && (
-                <>
-                  Un derecho que no sabes <strong style={{ color: T.text }}>cómo ejercer</strong> no te sirve de nada. En cada
-                  caso hay tres decisiones: qué está en juego, qué se puede hacer y qué deber te toca a ti cuando el que decide
-                  sobre datos ajenos eres tú.
-                </>
-              )}
-              {modo === "arco" && (
-                <>
-                  Las cuatro letras no son sinónimos: <strong style={{ color: T.text }}>acceso</strong> es ver,{" "}
-                  <strong style={{ color: T.text }}>rectificación</strong> es corregir, <strong style={{ color: T.text }}>cancelación</strong> es
-                  retirar y <strong style={{ color: T.text }}>oposición</strong> es que cese un uso. Pide el trámite equivocado y
-                  te contestan que no procede.
-                </>
-              )}
-              {modo === "aviso" && (
-                <>
-                  Un aviso de privacidad no se lee entero: se <strong style={{ color: T.text }}>audita</strong>. Ante cada
-                  cláusula pregúntate si ese dato hace falta para lo que la app promete hacer. Si no hace falta, se está pasando.
-                </>
-              )}
-              {modo === "glosario" && (
-                <>
-                  Recordar el término es más difícil —y enseña más— que reconocerlo entre opciones. Si te atoras, usa la pista o
-                  abre el <strong style={{ color: T.text }}>banco de términos</strong>.
-                </>
-              )}
-              {modo === "texto" && (
-                <>
-                  Lee el párrafo completo antes de escribir: el contexto decide la palabra. Pulsa{" "}
-                  <strong style={{ color: T.text }}>Enter</strong> para comprobar cada hueco.
-                </>
-              )}
-            </span>
-          </div>
-
+      }
+      pestanas={[
+        {
+          id: "pistas",
+          etiqueta: "Pistas",
+          icono: "fa-lightbulb",
+          contenido: (
+            <>
+              <Bloque titulo="Tu partida" icono="fa-star">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+              </Bloque>
+              <Bloque titulo="Qué practicar aquí" icono="fa-lightbulb">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  {modo === "cuenta" && (
+                    <>
+                      Cada letra hace <strong style={{ color: T.text }}>una cosa distinta</strong>: ver, corregir, retirar o frenar un uso. Prueba las cuatro en
+                      el mismo dato y mira qué cambia en el panel y en los medidores.
+                    </>
+                  )}
+                  {modo === "caso" && (
+                    <>
+                      Un derecho que no sabes <strong style={{ color: T.text }}>cómo ejercer</strong> no te sirve de nada. En cada caso hay tres decisiones: qué
+                      está en juego, qué se puede hacer y qué deber te toca a ti cuando el que decide sobre datos ajenos eres tú.
+                    </>
+                  )}
+                  {modo === "arco" && (
+                    <>
+                      Las cuatro letras no son sinónimos: <strong style={{ color: T.text }}>acceso</strong> es ver,{" "}
+                      <strong style={{ color: T.text }}>rectificación</strong> es corregir, <strong style={{ color: T.text }}>cancelación</strong> es retirar y{" "}
+                      <strong style={{ color: T.text }}>oposición</strong> es que cese un uso. Pide el trámite equivocado y te contestan que no procede.
+                    </>
+                  )}
+                  {modo === "aviso" && (
+                    <>
+                      Un aviso de privacidad no se lee entero: se <strong style={{ color: T.text }}>audita</strong>. Ante cada cláusula pregúntate si ese dato
+                      hace falta para lo que la app promete hacer. Si no hace falta, se está pasando.
+                    </>
+                  )}
+                  {modo === "glosario" && (
+                    <>
+                      Recordar el término es más difícil —y enseña más— que reconocerlo entre opciones. Si te atoras, usa la pista o abre el{" "}
+                      <strong style={{ color: T.text }}>banco de términos</strong>.
+                    </>
+                  )}
+                  {modo === "texto" && (
+                    <>
+                      Lee el párrafo completo antes de escribir: el contexto decide la palabra. Pulsa <strong style={{ color: T.text }}>Enter</strong> para
+                      comprobar cada hueco.
+                    </>
+                  )}
+                </p>
+              </Bloque>
           {/* Chuleta permanente: las cuatro letras y las reglas del trámite */}
           <div style={{ ...card, padding: "18px 20px" }}>
             <Eyebrow>
@@ -686,7 +747,7 @@ export function LabDerechosDigitales({ color }: PracticaLabProps) {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      fontSize: 13,
+                      fontSize: 14,
                       fontWeight: 900,
                       color: "#04121f",
                       background: `hsl(${l.tono} 78% 62%)`,
@@ -695,35 +756,65 @@ export function LabDerechosDigitales({ color }: PracticaLabProps) {
                     {l.id}
                   </span>
                   <span style={{ minWidth: 0 }}>
-                    <span style={{ display: "block", fontSize: 13, fontWeight: 800, color: T.text }}>
+                    <span style={{ display: "block", fontSize: 14, fontWeight: 800, color: T.text }}>
                       {l.nombre} <span style={{ color: T.text3, fontWeight: 600 }}>· {l.clave}</span>
                     </span>
-                    <span style={{ display: "block", fontSize: 12, color: T.text2, lineHeight: 1.45, marginTop: 3 }}>{l.resumen}</span>
-                    <span style={{ display: "block", fontSize: 11, color: T.text3, marginTop: 3, fontStyle: "italic" }}>{l.articulo}</span>
+                    <span style={{ display: "block", fontSize: 14, color: T.text2, lineHeight: 1.45, marginTop: 3 }}>{l.resumen}</span>
+                    <span style={{ display: "block", fontSize: 14, color: T.text3, marginTop: 3, fontStyle: "italic" }}>{l.articulo}</span>
                   </span>
                 </div>
               ))}
             </div>
           </div>
-        </div>
-      </div>
-
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <RetoQuizCard
+              quiz={RETO_QUIZ}
+              accent={accent}
+              rgba={color.rgba}
+              aprobado={quizAprobado}
+              onAprobado={() => setQuizAprobado(true)}
+              playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined}
+              mensajeAprobado="Sabes qué derecho está en juego y por dónde se ejerce, que es lo que separa conocer un derecho de tenerlo."
+            />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book",
+          contenido: (
+            <>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={DERECHOS_DIGITALES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+          {/* Preguntas de comprensión de la lectura A1 (verbatim) */}
+          <div style={{ ...card, padding: "18px 20px" }}>
+            <Eyebrow>
+              <i className="fa-solid fa-book-open-reader" style={{ marginRight: 8, color: accent }} />
+              Lectura A1 · para pensar
+            </Eyebrow>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {COMPRENSION_A1.map((c, i) => (
+                <details key={i} style={{ borderRadius: 11, border: `1px solid ${T.line}`, background: T.inset, padding: "10px 13px" }}>
+                  <summary style={{ cursor: "pointer", fontSize: 14, fontWeight: 700, color: T.text2, lineHeight: 1.45 }}>
+                    {c.pregunta}
+                  </summary>
+                  <p style={{ margin: "9px 0 0", fontSize: 14, color: T.text3, lineHeight: 1.5 }}>{c.guia}</p>
+                </details>
+              ))}
+            </div>
+          </div>
       <HechosCard accent={accent} respuestas={hechos} onResponder={responderHecho} />
-
-      <RetoQuizCard
-        quiz={RETO_QUIZ}
-        accent={accent}
-        rgba={color.rgba}
-        aprobado={quizAprobado}
-        onAprobado={() => setQuizAprobado(true)}
-        playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined}
-        mensajeAprobado="Sabes qué derecho está en juego y por dónde se ejerce, que es lo que separa conocer un derecho de tenerlo."
-      />
-
-      <ReflexionCard accent={accent} rgba={color.rgba} />
-
+              <ReflexionCard accent={accent} rgba={color.rgba} />
       {/* Nota al pie: qué es verbatim, qué es ilustrativo y de dónde sale la ley */}
-      <p style={{ margin: "20px 2px 0", fontSize: 11.5, lineHeight: 1.6, color: T.text3 }}>
+      <p style={{ margin: "20px 2px 0", fontSize: 14, lineHeight: 1.6, color: T.text3 }}>
         <i className="fa-solid fa-quote-right" style={{ marginRight: 7, opacity: 0.7 }} />
         <strong style={{ color: T.text2 }}>Verbatim de la progresión CD-I-P05:</strong> la lectura A1 (marco teórico de la ficha
         y sus preguntas de comprensión), el reto evaluable A2, la consigna, las pistas y los criterios de la reflexión A3, los
@@ -740,9 +831,25 @@ export function LabDerechosDigitales({ color }: PracticaLabProps) {
         <strong style={{ color: T.text2 }}>Lo que este laboratorio NO califica:</strong> la reflexión escrita A3. Un texto
         propio no se evalúa con honestidad desde el navegador, así que aquí solo se te recuerda la consigna y sus criterios.
       </p>
+            </>
+          ),
+        },
+      ]}
+    />
+  );
+}
+
+/** Imagen con respaldo: fondo de gradiente + ícono detrás; si el archivo no existe se oculta. */
+function Foto({ clave, icono, alt, className }: { clave: string; icono: string; alt: string; className: string }) {
+  const [ok, setOk] = useState(true);
+  return (
+    <div className={`der-foto ${className}`}>
+      <i className={`fa-solid ${icono}`} aria-hidden />
+      {ok && <img src={`${RUTA_SIM}/${clave}.webp`} alt={alt} loading="lazy" onError={() => setOk(false)} />}
     </div>
   );
 }
+
 
 /* ═══════════════════════════════════════════════════════════════════════════
  * Panel «El expediente»
@@ -804,7 +911,7 @@ function ExpedientePanel({
           </Eyebrow>
           <span
             style={{
-              fontSize: 10.5,
+              fontSize: 14,
               fontWeight: 800,
               letterSpacing: "0.07em",
               textTransform: "uppercase",
@@ -835,7 +942,7 @@ function ExpedientePanel({
                 border: `1px dashed ${T.line}`,
                 background: T.inset,
                 padding: "16px 20px",
-                fontSize: 13,
+                fontSize: 14,
                 color: T.text3,
                 display: "flex",
                 alignItems: "center",
@@ -852,7 +959,7 @@ function ExpedientePanel({
         return (
           <div key={clave} style={{ ...card, padding: "20px 22px" }}>
             <Eyebrow>
-              <i className="fa-solid fa-diamond" style={{ marginRight: 8, color: accent, fontSize: 9 }} />
+              <i className="fa-solid fa-diamond" style={{ marginRight: 8, color: accent, fontSize: 14 }} />
               Paso {i + 1} · {paso.rotulo}
             </Eyebrow>
             <div style={{ fontSize: 14.5, fontWeight: 800, color: T.text, lineHeight: 1.45, margin: "2px 0 13px" }}>{paso.pregunta}</div>
@@ -885,7 +992,7 @@ function ExpedientePanel({
                   border: `1px solid ${OK}44`,
                   background: `${OK}10`,
                   padding: "11px 14px",
-                  fontSize: 12.5,
+                  fontSize: 14,
                   color: T.text2,
                   lineHeight: 1.55,
                   animation: "derPop .25s ease",
@@ -913,7 +1020,7 @@ function ExpedientePanel({
           }}
         >
           <i className="fa-solid fa-folder-closed" style={{ color: OK, fontSize: 19 }} />
-          <span style={{ flex: 1, minWidth: 200, fontSize: 13.5, color: T.text, lineHeight: 1.5 }}>
+          <span style={{ flex: 1, minWidth: 0, fontSize: 14, color: T.text, lineHeight: 1.5 }}>
             Caso cerrado: nombraste el derecho, elegiste la vía y dijiste qué deber te toca a ti.
           </span>
           {casoIdx < CASOS.length - 1 && (
@@ -962,16 +1069,16 @@ function ArcoPanel({
             <i className="fa-solid fa-inbox" style={{ marginRight: 8, color: accent }} />
             Solicitudes por clasificar
           </Eyebrow>
-          <span style={{ fontSize: 12.5, fontWeight: 800, color: colocadas >= SOLICITUDES.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
+          <span style={{ fontSize: 14, fontWeight: 800, color: colocadas >= SOLICITUDES.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
             {colocadas}/{SOLICITUDES.length}
           </span>
         </div>
         {libres.length === 0 ? (
-          <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+          <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
             <i className="fa-solid fa-circle-check" /> Buzón vacío: las ocho solicitudes están en su letra.
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(260px,1fr))", gap: 10 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(min(100%,260px),1fr))", gap: 10 }}>
             {libres.map((s) => (
               <button key={s.id} className="der-sol" data-sel={selSol === s.id} onClick={() => onSel(s.id)} {...dragProps(s.id)}>
                 <i className="fa-solid fa-envelope-open-text" style={{ color: accent, marginTop: 2, flexShrink: 0 }} />
@@ -980,13 +1087,13 @@ function ArcoPanel({
             ))}
           </div>
         )}
-        <p style={{ margin: "13px 0 0", fontSize: 12, color: T.text3, lineHeight: 1.5 }}>
+        <p style={{ margin: "13px 0 0", fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
           Arrastra cada solicitud a su letra, o tócala y después toca la letra. Se presentan ante quien trata tus datos, no ante
           una autoridad.
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(215px,1fr))", gap: 13 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,215px),1fr))", gap: 13 }}>
         {LETRAS.map((l) => {
           const dentro = SOLICITUDES.filter((s) => ubic[s.id] === l.id);
           const total = SOLICITUDES.filter((s) => s.letra === l.id).length;
@@ -1019,14 +1126,14 @@ function ArcoPanel({
                   {l.id}
                 </span>
                 <span style={{ minWidth: 0, flex: 1 }}>
-                  <span style={{ display: "block", fontSize: 13.5, fontWeight: 900, color: T.text }}>{l.nombre}</span>
-                  <span style={{ display: "block", fontSize: 11, color: T.text3 }}>{l.articulo}</span>
+                  <span style={{ display: "block", fontSize: 14, fontWeight: 900, color: T.text }}>{l.nombre}</span>
+                  <span style={{ display: "block", fontSize: 14, color: T.text3 }}>{l.articulo}</span>
                 </span>
-                <span style={{ fontSize: 12, fontWeight: 800, color: dentro.length >= total ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
+                <span style={{ fontSize: 14, fontWeight: 800, color: dentro.length >= total ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
                   {dentro.length}/{total}
                 </span>
               </div>
-              <div style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45, marginBottom: 9 }}>{l.clave}</div>
+              <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.45, marginBottom: 9 }}>{l.clave}</div>
               <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
                 {dentro.map((s) => (
                   <div
@@ -1037,7 +1144,7 @@ function ArcoPanel({
                       border: `1px solid ${OK}55`,
                       background: `${OK}12`,
                       padding: "8px 11px",
-                      fontSize: 11.5,
+                      fontSize: 14,
                       color: T.text2,
                       lineHeight: 1.45,
                     }}
@@ -1047,7 +1154,7 @@ function ArcoPanel({
                   </div>
                 ))}
                 {dentro.length === 0 && (
-                  <div style={{ fontSize: 11.5, color: T.text3, display: "flex", alignItems: "center", gap: 8, padding: "6px 0" }}>
+                  <div style={{ fontSize: 14, color: T.text3, display: "flex", alignItems: "center", gap: 8, padding: "6px 0" }}>
                     <i className="fa-solid fa-arrow-down-to-bracket" /> Suelta aquí
                   </div>
                 )}
@@ -1063,18 +1170,18 @@ function ArcoPanel({
           <i className="fa-solid fa-file-signature" style={{ marginRight: 8, color: accent }} />
           Cómo funciona el trámite
         </Eyebrow>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 11 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,240px),1fr))", gap: 11 }}>
           {REGLAS_SOLICITUD.map((r) => (
             <div key={r.titulo} style={{ borderRadius: 12, border: `1px solid ${T.line}`, background: T.inset, padding: "12px 14px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 6 }}>
                 <VinetaTermino termino={r.titulo} color={accent} icono={r.icono} tam={29} radio={8} />
-                <span style={{ fontSize: 12.5, fontWeight: 800, color: T.text }}>{r.titulo}</span>
+                <span style={{ fontSize: 14, fontWeight: 800, color: T.text }}>{r.titulo}</span>
               </div>
-              <p style={{ margin: 0, fontSize: 12, color: T.text2, lineHeight: 1.5 }}>{r.detalle}</p>
+              <p style={{ margin: 0, fontSize: 14, color: T.text2, lineHeight: 1.5 }}>{r.detalle}</p>
             </div>
           ))}
         </div>
-        <p style={{ margin: "12px 0 0", fontSize: 11.5, color: T.text3, lineHeight: 1.5, fontStyle: "italic" }}>
+        <p style={{ margin: "12px 0 0", fontSize: 14, color: T.text3, lineHeight: 1.5, fontStyle: "italic" }}>
           Ley Federal de Protección de Datos Personales en Posesión de los Particulares, DOF 20/03/2025 (última reforma DOF
           14/11/2025). «Días» significa días hábiles (art. 2, fr. VIII).
         </p>
@@ -1117,12 +1224,12 @@ function AvisoPanel({
           <i className="fa-solid fa-file-contract" style={{ marginRight: 8, color: accent }} />
           {AVISO_TITULO}
         </Eyebrow>
-        <span style={{ fontSize: 12.5, fontWeight: 800, color: hechas >= CLAUSULAS.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
+        <span style={{ fontSize: 14, fontWeight: 800, color: hechas >= CLAUSULAS.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
           {hechas}/{CLAUSULAS.length} · {excesosHallados}/{EXCESOS_TOTALES} excesos
         </span>
       </div>
 
-      <p style={{ margin: "0 0 16px", fontSize: 12.5, color: T.text2, lineHeight: 1.6 }}>{AVISO_ENTRADA}</p>
+      <p style={{ margin: "0 0 16px", fontSize: 14, color: T.text2, lineHeight: 1.6 }}>{AVISO_ENTRADA}</p>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
         {CLAUSULAS.map((cl, i) => {
@@ -1140,7 +1247,7 @@ function AvisoPanel({
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: 11.5,
+                    fontSize: 14,
                     fontWeight: 900,
                     color: "#04121f",
                     background: accent,
@@ -1149,7 +1256,7 @@ function AvisoPanel({
                   {i + 1}
                 </span>
                 <span style={{ minWidth: 0 }}>
-                  <span style={{ display: "block", fontSize: 10.5, fontWeight: 800, letterSpacing: "0.09em", textTransform: "uppercase", color: T.text3 }}>
+                  <span style={{ display: "block", fontSize: 14, fontWeight: 800, letterSpacing: "0.09em", textTransform: "uppercase", color: T.text3 }}>
                     {cl.rotulo}
                   </span>
                   <span style={{ display: "block", fontSize: 14, color: T.text, lineHeight: 1.55, marginTop: 4 }}>{cl.texto}</span>
@@ -1175,7 +1282,7 @@ function AvisoPanel({
                   <i className="fa-solid fa-triangle-exclamation" style={{ marginRight: 7 }} />
                   Se está pasando
                 </button>
-                {fallo && !resuelta && <span style={{ fontSize: 12, color: NO, fontWeight: 700 }}>Vuelve a leerla</span>}
+                {fallo && !resuelta && <span style={{ fontSize: 14, color: NO, fontWeight: 700 }}>Vuelve a leerla</span>}
               </div>
 
               {resuelta && (
@@ -1185,7 +1292,7 @@ function AvisoPanel({
                     border: `1px solid ${T.line}`,
                     background: T.glass,
                     padding: "10px 13px",
-                    fontSize: 12.5,
+                    fontSize: 14,
                     color: T.text2,
                     lineHeight: 1.55,
                     animation: "derPop .25s ease",
@@ -1208,7 +1315,7 @@ function AvisoPanel({
             border: `1px solid ${OK}55`,
             background: `${OK}12`,
             padding: "14px 17px",
-            fontSize: 13.5,
+            fontSize: 14,
             color: T.text,
             lineHeight: 1.55,
             display: "flex",
@@ -1251,7 +1358,7 @@ function HechosCard({
           const fallado = r !== null && r !== undefined && r !== h.respuesta;
           return (
             <div key={i} style={{ borderRadius: 13, border: `1px solid ${T.line}`, background: T.inset, padding: "13px 16px" }}>
-              <div style={{ fontSize: 13.5, color: T.text, lineHeight: 1.5, marginBottom: 10 }}>{h.enunciado}</div>
+              <div style={{ fontSize: 14, color: T.text, lineHeight: 1.5, marginBottom: 10 }}>{h.enunciado}</div>
               <div style={{ display: "flex", gap: 9, alignItems: "center", flexWrap: "wrap" }}>
                 <button
                   className="der-vf"
@@ -1272,7 +1379,7 @@ function HechosCard({
                   Falso
                 </button>
                 {(acertado || fallado) && (
-                  <span style={{ fontSize: 12.5, color: acertado ? OK : NO, lineHeight: 1.5, flex: 1, minWidth: 200 }}>{h.retro}</span>
+                  <span style={{ fontSize: 14, color: acertado ? OK : NO, lineHeight: 1.5, flex: 1, minWidth: 0 }}>{h.retro}</span>
                 )}
               </div>
             </div>
@@ -1295,26 +1402,26 @@ function ReflexionCard({ accent, rgba }: { accent: string; rgba: string }) {
       </Eyebrow>
       <p style={{ margin: "2px 0 14px", fontSize: 14.5, color: T.text, lineHeight: 1.65 }}>{REFLEXION_A3.prompt}</p>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 13 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,260px),1fr))", gap: 13 }}>
         <div style={{ borderRadius: 13, border: `1px solid rgba(${rgba},0.28)`, background: `rgba(${rgba},0.07)`, padding: "13px 16px" }}>
-          <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: accent, marginBottom: 8 }}>
+          <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: accent, marginBottom: 8 }}>
             Criterios de evaluación
           </div>
           <ul style={{ margin: 0, paddingLeft: 17, display: "flex", flexDirection: "column", gap: 6 }}>
             {REFLEXION_A3.criterios.map((c, i) => (
-              <li key={i} style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.5 }}>
+              <li key={i} style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
                 {c}
               </li>
             ))}
           </ul>
         </div>
         <div style={{ borderRadius: 13, border: `1px solid ${T.line}`, background: T.inset, padding: "13px 16px" }}>
-          <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: T.text3, marginBottom: 8 }}>
+          <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: T.text3, marginBottom: 8 }}>
             Pistas de la actividad
           </div>
           <ul style={{ margin: 0, paddingLeft: 17, display: "flex", flexDirection: "column", gap: 6 }}>
             {REFLEXION_A3.pistas.map((p, i) => (
-              <li key={i} style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.5 }}>
+              <li key={i} style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
                 {p}
               </li>
             ))}
@@ -1322,7 +1429,7 @@ function ReflexionCard({ accent, rgba }: { accent: string; rgba: string }) {
         </div>
       </div>
 
-      <p style={{ margin: "13px 0 0", fontSize: 11.5, color: T.text3, lineHeight: 1.55 }}>
+      <p style={{ margin: "13px 0 0", fontSize: 14, color: T.text3, lineHeight: 1.55 }}>
         <i className="fa-solid fa-circle-info" style={{ marginRight: 7 }} />
         La cuarta pista y el cuarto criterio mencionan el INAI porque así están redactados en la actividad. Si escribes tu
         reflexión, nombra la autoridad vigente: la Secretaría Anticorrupción y Buen Gobierno (LFPDPPP, art. 2, fr. XV).

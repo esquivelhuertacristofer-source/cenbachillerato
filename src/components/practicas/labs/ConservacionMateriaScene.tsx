@@ -13,9 +13,9 @@
  */
 
 import * as THREE from "three";
-import { useMemo } from "react";
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { useMemo, useRef } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { ELEMS_R, type MovAtom, type MovBond, type Elem } from "./reacciones-data";
 import { Escenario } from "./_escenario";
@@ -30,6 +30,13 @@ export interface ConservacionSceneProps {
   accent: string;
   autoRotate: boolean;
   resetNonce: number;
+  /** Masa total (u) de reactivos y productos: lo que pesa la balanza. */
+  masaReact: number;
+  masaProd: number;
+  /** Sistema abierto: la fracción gaseosa de los productos escapa y no se pesa. */
+  abierto: boolean;
+  /** Fracción de la masa de los productos que es gas (0..1). */
+  fraccionGas: number;
 }
 
 const BOND_COLOR = "#C4CDD8";
@@ -122,6 +129,86 @@ function Reaccion({ atoms, reactBonds, prodBonds, progreso }: { atoms: MovAtom[]
   );
 }
 
+/* ── Balanza: pesa reactivos (izq.) y productos (der.) ───────────────────
+ * Con el sistema cerrado se queda nivelada: la masa se conserva. Con el
+ * sistema abierto, el gas escapa del plato derecho y la balanza se inclina. */
+const BEAM_L = 2.7;       // semialcance del brazo
+const PIVOTE_Y = -2.55;
+const MAX_INCL = 0.2;     // rad
+const fmtU = (n: number) => n.toLocaleString("es-MX", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+
+function Plato({ lado, texto, color, extra, estrecho }: { lado: -1 | 1; texto: string; color: string; extra?: string; estrecho: boolean }) {
+  return (
+    <group position={[lado * BEAM_L, 0, 0]}>
+      <mesh position={[0, -0.35, 0]} castShadow>
+        <cylinderGeometry args={[0.03, 0.03, 0.7, 8]} />
+        <meshStandardMaterial color="#9fb2c8" metalness={0.7} roughness={0.3} />
+      </mesh>
+      <mesh position={[0, -0.72, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[1.0, 0.85, 0.12, 36]} />
+        <meshStandardMaterial color="#c4cdd8" metalness={0.6} roughness={0.3} />
+      </mesh>
+      <mesh position={[0, -0.65, 0]}>
+        <cylinderGeometry args={[0.9, 0.9, 0.03, 36]} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.25} />
+      </mesh>
+      <Html position={[0, -0.32, 0]} center pointerEvents="none" zIndexRange={[20, 0]}>
+        <div style={{ whiteSpace: "nowrap", padding: "4px 10px", borderRadius: 9, background: "rgba(4,10,22,0.88)", border: `1.5px solid ${color}`, color, fontWeight: 900, fontSize: estrecho ? 14 : 15, fontFamily: "system-ui, sans-serif", textAlign: "center", lineHeight: 1.25 }}>
+          {texto}
+          {extra && <div style={{ fontSize: 14, color: "#fbbf24" }}>{extra}</div>}
+        </div>
+      </Html>
+    </group>
+  );
+}
+
+function Balanza({ masaReact, masaProd, abierto, fraccionGas, progreso }: { masaReact: number; masaProd: number; abierto: boolean; fraccionGas: number; progreso: number }) {
+  const { size } = useThree();
+  const viga = useRef<THREE.Group>(null);
+  const aguja = useRef<THREE.Mesh>(null);
+  const ang = useRef(0);
+  const escapado = abierto ? masaProd * fraccionGas * clamp01((progreso - 0.5) / 0.5) : 0;
+  const pesoProd = masaProd - escapado;
+  const objetivo = masaReact > 0 ? ((masaReact - pesoProd) / masaReact) * MAX_INCL * 5 : 0;
+  const tope = Math.max(-MAX_INCL, Math.min(MAX_INCL, objetivo));
+
+  useFrame((_, dt) => {
+    ang.current += (tope - ang.current) * Math.min(1, dt * 5);
+    if (viga.current) viga.current.rotation.z = ang.current;
+    if (aguja.current) aguja.current.rotation.z = -ang.current * 2.2;
+  });
+
+  const nivelada = Math.abs(tope) < 0.004;
+  const estrecho = size.width < 640;
+  return (
+    <group position={[0, PIVOTE_Y, 0]}>
+      {/* columna y base */}
+      <mesh position={[0, -0.6, 0]} castShadow>
+        <cylinderGeometry args={[0.12, 0.2, 1.2, 20]} />
+        <meshStandardMaterial color="#8da2b8" metalness={0.6} roughness={0.35} />
+      </mesh>
+      <mesh position={[0, -1.2, 0]} receiveShadow>
+        <cylinderGeometry args={[0.9, 1.0, 0.14, 32]} />
+        <meshStandardMaterial color="#6f8399" metalness={0.5} roughness={0.4} />
+      </mesh>
+      {/* aguja indicadora (verde = nivelada) */}
+      <mesh ref={aguja} position={[0, 0.25, 0]}>
+        <coneGeometry args={[0.07, 0.5, 12]} />
+        <meshStandardMaterial color={nivelada ? "#34D399" : "#fbbf24"} emissive={nivelada ? "#34D399" : "#fbbf24"} emissiveIntensity={0.5} />
+      </mesh>
+      {/* brazo + platos (giran juntos) */}
+      <group ref={viga}>
+        <mesh castShadow>
+          <boxGeometry args={[BEAM_L * 2, 0.1, 0.14]} />
+          <meshStandardMaterial color="#c4cdd8" metalness={0.7} roughness={0.3} />
+        </mesh>
+        <Plato lado={-1} texto={`Reactivos ${fmtU(masaReact)} u`} color="#8AB4FF" estrecho={estrecho} />
+        <Plato lado={1} texto={`Productos ${fmtU(pesoProd)} u`} color="#34D399" estrecho={estrecho} extra={escapado > 0.05 ? `escapó ${fmtU(escapado)} u de gas` : undefined} />
+      </group>
+    </group>
+  );
+}
+
 /* ── Escena completa ─────────────────────────────────────────────────── */
 export default function ConservacionMateriaScene(props: ConservacionSceneProps) {
   return (
@@ -129,26 +216,28 @@ export default function ConservacionMateriaScene(props: ConservacionSceneProps) 
       shadows
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
-      camera={{ position: [0, 1, 11.5], fov: 45 }}
+      camera={{ position: [0, 0.4, 14.5], fov: 45 }}
     >
       {/* Suelo, luz de tres puntos y entorno que reflejar. */}
       {/* La altura sale de donde esta escena ya ponía su sombra de
           contacto: es donde su autor decidió que estaba el piso. */}
-      <Escenario acento={props.accent} suelo={-4.4} />
+      <Escenario acento={props.accent} suelo={-3.85} />
 
 
-      <group position={[0, 0.3, 0]} key={`${props.reaccionKey}-${props.resetNonce}`}>
+      {/* Átomos a 72 %: dejan sitio a la balanza debajo y caben entre la barra y la misión. */}
+      <group position={[0, 0.8, 0]} scale={0.72} key={`${props.reaccionKey}-${props.resetNonce}`}>
         <Reaccion atoms={props.atoms} reactBonds={props.reactBonds} prodBonds={props.prodBonds} progreso={props.progreso} />
       </group>
+      <Balanza masaReact={props.masaReact} masaProd={props.masaProd} abierto={props.abierto} fraccionGas={props.fraccionGas} progreso={props.progreso} />
 
 
       <OrbitControls
         enablePan={false}
-        minDistance={7}
+        minDistance={9}
         maxDistance={20}
         minPolarAngle={Math.PI / 7}
         maxPolarAngle={Math.PI / 1.9}
-        target={[0, 0, 0]}
+        target={[0, -0.6, 0]}
         autoRotate={props.autoRotate}
         autoRotateSpeed={0.4}
       />

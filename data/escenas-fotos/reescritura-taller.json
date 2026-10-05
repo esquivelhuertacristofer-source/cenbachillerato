@@ -1,0 +1,8 @@
+{
+  "slug": "reescritura-taller",
+  "items": [
+    { "clave": "borrador-aviso", "formato": "16:9", "estilo": "foto", "escena": "Tablón de corcho en la entrada de una tienda de barrio con hojas de papel sin texto legible sujetas con chinchetas, luz de mañana" },
+    { "clave": "borrador-diario", "formato": "16:9", "estilo": "foto", "escena": "Cuaderno abierto con una pluma sobre una banca de terminal de autobuses de noche, maleta al lado y luces cálidas al fondo" },
+    { "clave": "borrador-reporte", "formato": "16:9", "estilo": "foto", "escena": "Mesa de laboratorio escolar con vasos de precipitados, plantas en macetas pequeñas y una libreta de apuntes abierta, equipo de estudiantes al fondo desenfocado" }
+  ]
+}

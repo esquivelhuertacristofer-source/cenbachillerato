@@ -20,8 +20,8 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, ContactShadows, Edges, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
@@ -40,6 +40,8 @@ export interface TransferenciaCalorSceneProps {
   pausado: boolean;
   autoRotate: boolean;
   resetNonce: number;
+  /** Se avisa una vez cuando el calor llega al extremo lejano de la barra (true = material conductor). */
+  onLlego?: (conductor: boolean) => void;
 }
 
 const COLD = new THREE.Color("#2a5cd0");
@@ -52,6 +54,44 @@ function rng(n: number): number {
   return s - Math.floor(s);
 }
 
+/* Etiqueta de tamaño fijo en píxeles (≥ 14 px), centrada sobre su punto. */
+function Etiqueta({ pos, color, children }: { pos: [number, number, number]; color: string; children: React.ReactNode }) {
+  return (
+    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
+      <div style={{
+        whiteSpace: "nowrap", padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.88)",
+        border: `1.5px solid ${color}`, color, fontWeight: 900, fontSize: 14, textAlign: "center",
+        fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)",
+      }}>
+        {children}
+      </div>
+    </Html>
+  );
+}
+
+/* Encuadre por mecanismo: ancho que debe caber, distancia mínima y punto de mira.
+   El contenido llena ~60 % del alto y queda entre la barra de arriba y la misión. */
+const ENCUADRE: Record<MecanismoKey, { ancho: number; dist: number; objetivo: [number, number, number] }> = {
+  conduccion: { ancho: 7.6, dist: 6.4, objetivo: [0.2, 0.55, 0] },
+  conveccion: { ancho: 6.4, dist: 8.6, objetivo: [0, 0.2, 0] },
+  radiacion: { ancho: 8.0, dist: 7.6, objetivo: [0, 0.35, 0] },
+};
+
+function Encuadre({ mecanismo }: { mecanismo: MecanismoKey }) {
+  const camera = useThree((st) => st.camera);
+  const size = useThree((st) => st.size);
+  const aspect = size.width / Math.max(1, size.height);
+  const e = ENCUADRE[mecanismo];
+  const dist = Math.max(e.dist, (e.ancho / (0.808 * Math.max(0.4, aspect))) * 1.05);
+  useEffect(() => {
+    const v = new THREE.Vector3(0.18, 0.2, 1).normalize().multiplyScalar(dist);
+    camera.position.set(e.objetivo[0] + v.x, e.objetivo[1] + v.y, e.objetivo[2] + v.z);
+    camera.lookAt(e.objetivo[0], e.objetivo[1], e.objetivo[2]);
+    camera.updateProjectionMatrix();
+  }, [camera, dist, e]);
+  return null;
+}
+
 /* ════════════════════════════════════════════════════════════════════════
    CONDUCCIÓN — barra de átomos; el calor avanza partícula a partícula
    ════════════════════════════════════════════════════════════════════════ */
@@ -62,13 +102,19 @@ const C_X0 = -2.25; // x del extremo caliente
 const C_X1 = 2.25; // x del extremo frío
 const C_AR = 0.12; // radio de átomo
 const C_Y = 0.7; // altura del centro de la barra
+const TH_H = 1.3; // altura de la columna del termómetro
+const TH_X = C_X1 + 0.85; // x del termómetro del extremo lejano
 
-function Conduccion({ materialKey, tFuente, accent, pausado }: {
+function Conduccion({ materialKey, tFuente, accent, pausado, onLlego }: {
   materialKey: string;
   tFuente: number;
   accent: string;
   pausado: boolean;
+  onLlego?: (conductor: boolean) => void;
 }) {
+  const colRef = useRef<THREE.Mesh>(null);
+  const tempTxt = useRef<HTMLSpanElement>(null);
+  const avisado = useRef(false);
   const mesh = useRef<THREE.InstancedMesh>(null);
   const dummy = useRef(new THREE.Object3D());
   const scratch = useRef(new THREE.Color());
@@ -91,7 +137,7 @@ function Conduccion({ materialKey, tFuente, accent, pausado }: {
       // El extremo en contacto con la fuente se mantiene caliente.
       t[0] = inten;
       // Difusión 1D (ecuación del calor discreta). El extremo frío está aislado.
-      const alpha = mat.rate * 2.6 * delta;
+      const alpha = mat.rate * 7.5 * delta; // ritmo de la animación (explícito estable: ≤ 0.375)
       const prev = Float32Array.from(t);
       for (let c = 1; c < C_COLS; c++) {
         const left = prev[c - 1]!;
@@ -99,6 +145,19 @@ function Conduccion({ materialKey, tFuente, accent, pausado }: {
         const right = c < C_COLS - 1 ? prev[c + 1]! : prev[c]!; // aislado a la derecha
         t[c] = here + alpha * (left + right - 2 * here);
       }
+    }
+
+    // Termómetro del extremo lejano: la columna crece con la temperatura de la última fila.
+    const lejos = t[C_COLS - 1]!;
+    if (colRef.current) {
+      const hh = Math.max(0.02, TH_H * Math.min(1, lejos));
+      colRef.current.scale.y = hh;
+      colRef.current.position.y = hh / 2;
+    }
+    if (tempTxt.current) tempTxt.current.textContent = `${fmtNum(20 + lejos * (tFuente - 20), 0)} °C`;
+    if (!avisado.current && lejos > 0.1) {
+      avisado.current = true;
+      onLlego?.(mat.conductor);
     }
 
     const time = state.clock.elapsedTime;
@@ -154,18 +213,28 @@ function Conduccion({ materialKey, tFuente, accent, pausado }: {
       </mesh>
       <pointLight position={[C_X0 - 0.7, C_Y, 0.6]} intensity={4 + inten * 22} color="#ff5a1f" distance={7} />
 
-      <Html center position={[C_X0 - 0.55, C_Y + 1.15, 0]} distanceFactor={13} pointerEvents="none">
-        <div style={{ textAlign: "center", whiteSpace: "nowrap", textShadow: "0 2px 10px rgba(0,0,0,0.95)" }}>
-          <div style={{ fontWeight: 900, fontSize: 12, color: "#ff8a5a" }}>Fuente de calor</div>
-          <div style={{ fontWeight: 800, fontSize: 13, color: "#fff" }}>{fmtNum(tFuente, 0)} °C</div>
-        </div>
-      </Html>
-      <Html center position={[C_X1 + 0.45, C_Y + 1.15, 0]} distanceFactor={13} pointerEvents="none">
-        <div style={{ textAlign: "center", whiteSpace: "nowrap", textShadow: "0 2px 10px rgba(0,0,0,0.95)" }}>
-          <div style={{ fontWeight: 900, fontSize: 12, color: accent }}>Extremo lejano</div>
-          <div style={{ fontWeight: 700, fontSize: 12, color: "#bcd6f2" }}>¿llega el calor?</div>
-        </div>
-      </Html>
+      <Etiqueta pos={[C_X0 - 0.55, C_Y + 1.05, 0]} color="#ff8a5a">
+        Fuente · {fmtNum(tFuente, 0)} °C
+      </Etiqueta>
+
+      {/* Termómetro del extremo lejano: ¿llega el calor? */}
+      <group position={[TH_X, C_Y - 0.65, 0]}>
+        <mesh position={[0, TH_H / 2, 0]}>
+          <cylinderGeometry args={[0.09, 0.09, TH_H + 0.1, 16]} />
+          <meshPhysicalMaterial transparent opacity={0.22} roughness={0.05} clearcoat={1} color="#dff1ff" depthWrite={false} />
+        </mesh>
+        <mesh ref={colRef} position={[0, 0.01, 0]}>
+          <cylinderGeometry args={[0.05, 0.05, 1, 12]} />
+          <meshStandardMaterial color="#ff4a2a" emissive="#ff3b14" emissiveIntensity={0.6} roughness={0.4} />
+        </mesh>
+        <mesh position={[0, -0.05, 0]}>
+          <sphereGeometry args={[0.16, 20, 20]} />
+          <meshStandardMaterial color="#ff4a2a" emissive="#ff3b14" emissiveIntensity={0.6} roughness={0.4} />
+        </mesh>
+      </group>
+      <Etiqueta pos={[TH_X, C_Y + 1.05, 0]} color={accent}>
+        Extremo lejano · <span ref={tempTxt}>20 °C</span>
+      </Etiqueta>
 
     </group>
   );
@@ -294,18 +363,15 @@ function Conveccion({ tFuente, accent, pausado }: {
       </mesh>
       <pointLight position={[0, 0.3, 0]} intensity={3 + inten * 16} color="#ff5a1f" distance={6} />
 
-      <Html center position={[0, -0.55, 0]} distanceFactor={13} pointerEvents="none">
-        <div style={{ textAlign: "center", whiteSpace: "nowrap", textShadow: "0 2px 10px rgba(0,0,0,0.95)" }}>
-          <div style={{ fontWeight: 900, fontSize: 12, color: "#ff8a5a" }}>Fuente de calor</div>
-          <div style={{ fontWeight: 800, fontSize: 13, color: "#fff" }}>{fmtNum(tFuente, 0)} °C</div>
-        </div>
-      </Html>
-      <Html center position={[V_HX + 0.5, V_HY * 0.75, 0]} distanceFactor={13} pointerEvents="none">
-        <div style={{ whiteSpace: "nowrap", fontWeight: 800, fontSize: 12, color: "#9fc6ff", textShadow: "0 2px 10px rgba(0,0,0,0.95)" }}>↓ frío baja</div>
-      </Html>
-      <Html center position={[0, V_HY + 0.35, 0]} distanceFactor={13} pointerEvents="none">
-        <div style={{ whiteSpace: "nowrap", fontWeight: 800, fontSize: 12, color: accent, textShadow: "0 2px 10px rgba(0,0,0,0.95)" }}>↑ caliente sube</div>
-      </Html>
+      <Etiqueta pos={[0, -0.6, 0]} color="#ff8a5a">
+        Fuente · {fmtNum(tFuente, 0)} °C
+      </Etiqueta>
+      <Etiqueta pos={[V_HX + 0.2, V_HY * 0.72, 0]} color="#9fc6ff">
+        ↓ frío baja
+      </Etiqueta>
+      <Etiqueta pos={[0, V_HY + 0.4, 0]} color={accent}>
+        ↑ caliente sube
+      </Etiqueta>
 
       <ContactShadows position={[0, -0.12, 0]} opacity={0.3} scale={9} blur={2.6} far={5} color="#020c1c" />
     </group>
@@ -395,24 +461,18 @@ function Radiacion({ tFuente, accent, pausado }: {
       {/* Fotones / ondas que cruzan el vacío */}
       <instancedMesh ref={mesh} args={[undefined, undefined, R_NPH]} frustumCulled={false}>
         <sphereGeometry args={[R_PR, 10, 10]} />
-        <meshBasicMaterial color="#ffd76a" toneMapped={false} />
+        <meshBasicMaterial color="#ffd76a" />
       </instancedMesh>
 
-      <Html center position={[R_SUN_X, R_Y + 1.4, 0]} distanceFactor={13} pointerEvents="none">
-        <div style={{ textAlign: "center", whiteSpace: "nowrap", textShadow: "0 2px 10px rgba(0,0,0,0.95)" }}>
-          <div style={{ fontWeight: 900, fontSize: 13, color: "#ffc04a" }}>Sol</div>
-          <div style={{ fontWeight: 700, fontSize: 12, color: "#ffd9a0" }}>{fmtNum(tFuente, 0)} °C (fuente)</div>
-        </div>
-      </Html>
-      <Html center position={[R_EARTH_X, R_Y + 1.1, 0]} distanceFactor={13} pointerEvents="none">
-        <div style={{ fontWeight: 900, fontSize: 13, color: "#7fb8ff", whiteSpace: "nowrap", textShadow: "0 2px 10px rgba(0,0,0,0.95)" }}>Tierra</div>
-      </Html>
-      <Html center position={[(R_SUN_X + R_EARTH_X) / 2, R_Y - 1.25, 0]} distanceFactor={13} pointerEvents="none">
-        <div style={{ textAlign: "center", whiteSpace: "nowrap", textShadow: "0 2px 10px rgba(0,0,0,0.95)" }}>
-          <div style={{ fontWeight: 800, fontSize: 12, color: accent }}>vacío del espacio</div>
-          <div style={{ fontWeight: 700, fontSize: 11, color: "#9fb6d6" }}>sin materia · ~150 millones de km</div>
-        </div>
-      </Html>
+      <Etiqueta pos={[R_SUN_X, R_Y + 1.4, 0]} color="#ffc04a">
+        Sol · {fmtNum(tFuente, 0)} °C
+      </Etiqueta>
+      <Etiqueta pos={[R_EARTH_X, R_Y + 1.1, 0]} color="#7fb8ff">
+        Tierra
+      </Etiqueta>
+      <Etiqueta pos={[(R_SUN_X + R_EARTH_X) / 2, R_Y - 1.25, 0]} color={accent}>
+        vacío del espacio
+      </Etiqueta>
     </group>
   );
 }
@@ -426,6 +486,7 @@ export default function TransferenciaCalorScene(props: TransferenciaCalorScenePr
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
       camera={{ position: [0.2, 1.6, 8.4], fov: 44 }}
     >
+      <Encuadre mecanismo={props.mecanismo} />
       <Contenido {...props} />
     </Canvas>
   );
@@ -433,7 +494,7 @@ export default function TransferenciaCalorScene(props: TransferenciaCalorScenePr
 
 /** Contenido: DEBE vivir dentro de <Canvas> (useFrame solo funciona ahí). */
 function Contenido(props: TransferenciaCalorSceneProps) {
-  const { mecanismo, materialKey, tFuente, accent, pausado, autoRotate, resetNonce } = props;
+  const { mecanismo, materialKey, tFuente, accent, pausado, autoRotate, resetNonce, onLlego } = props;
 
   const inten = useMemo(() => intensidadFuente(tFuente), [tFuente]);
   const heat = useMemo(() => COLD.clone().lerp(WARM, inten), [inten]);
@@ -450,7 +511,7 @@ function Contenido(props: TransferenciaCalorSceneProps) {
       {/* Solo se monta el mecanismo activo; key con resetNonce reinicia su simulación. */}
       <group key={`${mecanismo}-${resetNonce}`}>
         {mecanismo === "conduccion" && (
-          <Conduccion materialKey={materialKey} tFuente={tFuente} accent={accent} pausado={pausado} />
+          <Conduccion materialKey={materialKey} tFuente={tFuente} accent={accent} pausado={pausado} onLlego={onLlego} />
         )}
         {mecanismo === "conveccion" && (
           <Conveccion tFuente={tFuente} accent={accent} pausado={pausado} />
@@ -464,10 +525,10 @@ function Contenido(props: TransferenciaCalorSceneProps) {
       <OrbitControls
         enablePan={false}
         minDistance={5}
-        maxDistance={14}
+        maxDistance={18}
         minPolarAngle={Math.PI / 7}
         maxPolarAngle={Math.PI / 1.9}
-        target={[0, 0.5, 0]}
+        target={ENCUADRE[mecanismo].objetivo}
         autoRotate={autoRotate}
         autoRotateSpeed={0.4}
       />

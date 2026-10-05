@@ -1,0 +1,12 @@
+{
+  "escena": "Tres compañeros redactan el mismo informe y tienen que decidir cómo escribirlo juntos",
+  "pregunta": "Si cada quien escribe en su archivo y los mandan por correo, ¿qué medidor baja más?",
+  "opciones": [
+    { "id": "a", "texto": "Las horas libres", "icono": "fa-hourglass-half" },
+    { "id": "b", "texto": "La colaboración del equipo", "icono": "fa-people-group" },
+    { "id": "c", "texto": "La calidad de las fuentes", "icono": "fa-medal" }
+  ],
+  "correcta": "b",
+  "porque": "Las versiones sueltas se cruzan: nadie sabe cuál es la última y se pisan los cambios. Un documento compartido evita justo eso.",
+  "comoComprobarlo": "En «La entrega del viernes» avanza hasta la etapa de redactar y elige archivos por correo; compara los tres medidores antes y después."
+}

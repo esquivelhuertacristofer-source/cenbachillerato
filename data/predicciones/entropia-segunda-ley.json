@@ -1,0 +1,12 @@
+{
+  "escena": "Una caja de vidrio dividida por una pared: gas azul a la izquierda, gas rojo a la derecha, y una barra de entropía al lado.",
+  "pregunta": "Si quitas la pared, ¿qué le pasa a la barra de entropía?",
+  "opciones": [
+    { "id": "a", "texto": "Sube y se queda arriba", "icono": "fa-arrow-trend-up" },
+    { "id": "b", "texto": "Baja porque se ordenan", "icono": "fa-arrow-trend-down" },
+    { "id": "c", "texto": "Sube y luego vuelve a bajar", "icono": "fa-wave-square" }
+  ],
+  "correcta": "a",
+  "porque": "Mezclarse es mucho más probable que separarse solos. La energía y las partículas se dispersan, y la entropía total solo aumenta en un proceso espontáneo.",
+  "comoComprobarlo": "En «Mezcla de gases» pulsa «Quitar la pared» y observa la barra; después espera unos segundos más."
+}

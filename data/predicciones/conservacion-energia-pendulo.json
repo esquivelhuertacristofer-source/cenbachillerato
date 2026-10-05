@@ -1,0 +1,12 @@
+{
+  "escena": "Un péndulo se suelta desde 45° y sus barras de energía suben y bajan",
+  "pregunta": "Si cambias la masa a otra del doble, ¿qué pasa con la rapidez máxima?",
+  "opciones": [
+    { "id": "a", "texto": "Se duplica", "icono": "fa-arrow-up" },
+    { "id": "b", "texto": "Se reduce a la mitad", "icono": "fa-arrow-down" },
+    { "id": "c", "texto": "Queda igual", "icono": "fa-equals" }
+  ],
+  "correcta": "c",
+  "porque": "La masa multiplica a la energía potencial y también a la cinética, así que se cancela. La rapidez abajo depende solo de la gravedad y de la altura de la que sueltas.",
+  "comoComprobarlo": "Mueve el deslizador de Masa en Controles y compara la rapidez máxima y la energía E₀ en Lecturas."
+}

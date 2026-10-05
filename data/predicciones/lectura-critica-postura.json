@@ -1,0 +1,12 @@
+{
+  "escena": "Una columna de opinión cita a «todos los especialistas» y a un sobrino que reprobó",
+  "pregunta": "Al marcar sus frases sin fuente, ¿qué le pasa al medidor de solidez?",
+  "opciones": [
+    { "id": "a", "texto": "Sube, porque suenan convincentes", "icono": "fa-arrow-trend-up" },
+    { "id": "b", "texto": "Baja, porque no se pueden comprobar", "icono": "fa-arrow-trend-down" },
+    { "id": "c", "texto": "No cambia, solo importan las opiniones", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "Lo que pesa en un argumento es lo que se puede comprobar. Las frases sin fuente se agrietan y el techo de la conclusión se hunde.",
+  "comoComprobarlo": "En «Lee la columna» marca la frase de la encuesta como dato con fuente y luego la de «todos los especialistas» como afirmación sin fuente; mira el medidor."
+}

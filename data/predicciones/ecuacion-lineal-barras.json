@@ -1,0 +1,12 @@
+{
+  "escena": "Una barra de bloques cuyo largo es 2x + 7 y una meta marcada en 23.",
+  "pregunta": "Subes x de 5 a 10. ¿Qué pasa con la barra respecto a la meta?",
+  "opciones": [
+    { "id": "a", "texto": "Queda justo en la meta", "icono": "fa-bullseye" },
+    { "id": "b", "texto": "Se pasa de la meta", "icono": "fa-arrow-right-long" },
+    { "id": "c", "texto": "Sigue quedándose corta", "icono": "fa-arrow-left-long" }
+  ],
+  "correcta": "b",
+  "porque": "Con x = 5 la barra mide 17, corta. Con x = 10 mide 2·10 + 7 = 27, que pasa de 23 por 4. La solución está entre ambos valores: x = 8.",
+  "comoComprobarlo": "En «El número misterioso» mueve el deslizador de x a 5 y luego a 10, y mira el medidor y la barra."
+}

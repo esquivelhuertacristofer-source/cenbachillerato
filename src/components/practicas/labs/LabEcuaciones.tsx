@@ -5,25 +5,24 @@
  * Práctica experimental para PM-II-P04-A2 ("Planteo y resuelvo ecuaciones lineales").
  *
  * El reto de esta actividad es PLANTEAR un problema en palabras como una ecuación
- * a·x + b = c y luego resolverlo. El modelo de barras lo hace visible: cada
- * cantidad de la historia es un segmento; mover la incógnita alarga la barra y
- * resolver es hacerla llegar a la meta c. Se complementa con el despeje
- * x = (c − b) / a. Es un enfoque distinto al laboratorio de la balanza
- * (PM-II-P09-A8), que enfatiza el equilibrio al despejar.
+ * a·x + b = c y luego resolverlo. EXPERIMENTO CENTRAL: el alumno mueve la incógnita
+ * x y VE crecer la barra a·x + b hasta tocar la meta c; si se pasa, el exceso se
+ * pone rojo y el medidor dice cuánto sobra; si se queda corto, dice cuánto falta.
+ * Se complementa con el despeje x = (c − b) / a. Es un enfoque distinto al
+ * laboratorio de la balanza (PM-II-P09-A8), que enfatiza el equilibrio al despejar.
  * Pensamiento Matemático II — Ecuaciones lineales en una variable (MCCEMS 2025).
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, NUM, OK, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { T, NUM, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { ECUACION_LINEAL_FICHA } from "./ecuacion-lineal-barras-ficha";
 import { RetoNumericoCard } from "./_reto-numerico";
 import { RETO_A2 } from "./ecuacion-lineal-barras-data";
 import { LabSfx } from "./lab-audio";
-import { useEstrellas } from "@/lib/hooks/useEstrellas";
-import { useLogros } from "./_partida";
 import {
   ESCENARIOS,
   solucion,
@@ -38,14 +37,22 @@ const EcuacionesScene = dynamic(() => import("./EcuacionesScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-ruler-horizontal fa-bounce" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Preparando el laboratorio 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Preparando el laboratorio 3D…</span>
     </div>
   ),
 });
 
 const AMBER = "#FFD166";
+const OKC = "#34D399";
+const ROJO = "#FF6B6B";
+const META = "#9fc0e0";
 
 const RETO_KEY = "cen-ecuacion-lineal-barras-reto";
+
+const BTN = (accent: string, rgba: string): CSSProperties => ({
+  cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 8, padding: "10px 14px", borderRadius: 11,
+  border: `1px solid ${accent}66`, background: `rgba(${rgba},0.14)`, color: "#fff", fontSize: 14, fontWeight: 800,
+});
 
 export function LabEcuaciones({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
@@ -53,13 +60,12 @@ export function LabEcuaciones({ color }: PracticaLabProps) {
   const esc = useMemo<Escenario>(() => ESCENARIOS.find((e) => e.key === escKey) ?? ESCENARIOS[0]!, [escKey]);
 
   const [x, setX] = useState(0);
-  const [autoRotate, setAutoRotate] = useState(true);
+  const [autoRotate, setAutoRotate] = useState(false);
   const [resetNonce, setResetNonce] = useState(0);
   const [verDespeje, setVerDespeje] = useState(false);
 
-  // reto evaluable, teoría (cajón deslizable) y sonido
+  // reto evaluable y sonido
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
 
@@ -84,22 +90,30 @@ export function LabEcuaciones({ color }: PracticaLabProps) {
 
   // seguimiento de objetivos
   const [movioX, setMovioX] = useState(false);
+  const [sePaso, setSePaso] = useState(false);
   const [resueltos, setResueltos] = useState<Set<string>>(() => new Set<string>());
 
   const sol = useMemo(() => solucion(esc), [esc]);
   const totalActual = total(esc.a, esc.b, x);
   const resuelto = totalActual === esc.c;
-  const dif = esc.c - totalActual;
+  const dif = esc.c - totalActual; // >0 falta, <0 sobra
 
   const cambiarX = (nx: number) => {
     setX(nx);
     setMovioX(true);
-    if (esc.a * nx + esc.b === esc.c) {
+    const t = esc.a * nx + esc.b;
+    if (t > esc.c) setSePaso(true);
+    if (t === esc.c) {
       setResueltos((prev) => (prev.has(esc.key) ? prev : new Set(prev).add(esc.key)));
+      if (sonido) audioRef.current?.correcto();
+    } else if (sonido) {
+      audioRef.current?.blip();
     }
   };
 
-  const cargar = (e: Escenario) => {
+  const cargar = (id: string) => {
+    const e = ESCENARIOS.find((s) => s.key === id);
+    if (!e) return;
     if (sonido) audioRef.current?.blip();
     setEscKey(e.key);
     setX(0);
@@ -119,22 +133,13 @@ export function LabEcuaciones({ color }: PracticaLabProps) {
   };
 
   const objetivos = [
+    { txt: "Pásate de la meta a propósito: la barra se pone roja y marca cuánto sobra", done: sePaso },
     { txt: "Mueve la incógnita y observa cómo crece la barra", done: movioX },
     { txt: "Haz que la barra llegue justo a la meta (resuelve uno)", done: resueltos.size >= 1 },
     { txt: "Resuelve los 3 problemas planteados", done: resueltos.size >= ESCENARIOS.length },
     { txt: "Descubre el despeje x = (c − b) / a", done: verDespeje },
     { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
   ];
-  // Los objetivos se recuerdan (algunos dependían del modo y se desmarcaban
-  // solos) y se convierten en la marca del laboratorio, que antes no se
-  // guardaba en ninguna parte.
-  const { logros: logrosLab, cumplidos: cumplidosLab, total: totalLab } = useLogros(objetivos.map((o) => o.done));
-  const { registraEstrellas } = useEstrellas(RETO_KEY);
-  useEffect(() => {
-    if (cumplidosLab === 0) return;
-    const est = cumplidosLab >= totalLab ? 3 : cumplidosLab >= Math.ceil((totalLab * 2) / 3) ? 2 : 1;
-    registraEstrellas(est);
-  }, [cumplidosLab, totalLab, registraEstrellas]);
 
   const sceneFallback = (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 28, textAlign: "center" }}>
@@ -142,282 +147,171 @@ export function LabEcuaciones({ color }: PracticaLabProps) {
         <i className={`fa-solid ${esc.icono}`} />
       </div>
       <div style={{ fontSize: 20, fontWeight: 900, color: T.text, ...NUM }}>{ecuacionStr(esc)}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 380, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 380, lineHeight: 1.5 }}>
         Tu equipo no puede mostrar la vista 3D, pero la idea sigue: despeja{" "}
         <strong>{esc.xNombre} = (c − b) / a = {fmtNum(sol, 2)} {esc.unidad}</strong>.
       </div>
     </div>
   );
 
+  const colEstado = resuelto ? OKC : dif < 0 ? ROJO : accent;
+  const lectura = resuelto
+    ? <>¡Resuelto! {esc.xNombre} = {fmtNum(x)} {esc.unidad}</>
+    : dif < 0
+      ? <>Te pasas {fmtNum(-dif)}: baja {esc.xNombre}</>
+      : <>Faltan {fmtNum(dif)} para la meta: sube {esc.xNombre}</>;
+
+  const porque = resuelto
+    ? `${ecuacionStr(esc)} se cumple: ${esc.a === 1 ? "" : `${fmtNum(esc.a)}·`}${fmtNum(x)} + ${fmtNum(esc.b)} = ${fmtNum(esc.c)}. Esa es la solución.`
+    : dif < 0
+      ? `La barra mide ${fmtNum(totalActual)} y la meta es ${fmtNum(esc.c)}: sobran ${fmtNum(-dif)}. Cada unidad que bajas ${esc.xNombre} acorta la barra ${fmtNum(esc.a)}.`
+      : `La barra mide ${fmtNum(totalActual)} y la meta es ${fmtNum(esc.c)}: faltan ${fmtNum(dif)}. Cada unidad que subes ${esc.xNombre} alarga la barra ${fmtNum(esc.a)}.`;
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes exPulse { 0%,100%{ box-shadow:0 0 0 0 var(--exc); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .ex-live-dot { animation: exPulse 1.6s ease-in-out infinite; }
-        .ex-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(300px,26vw,380px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .ex-grid { grid-template-columns: 1fr; } }
-        .ex-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .ex-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .ex-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .ex-divider { height:1px; background:${T.line}; margin:18px 0; }
-        .ex-esc { cursor:pointer; text-align:left; border-radius:12px; border:1px solid ${T.line}; background:${T.glass}; color:${T.text2};
-          padding:11px 13px; transition:all .14s ease; display:flex; align-items:center; gap:11px; width:100%; }
-        .ex-esc:hover { border-color:${T.lineStrong}; background:${T.glassSoft}; color:#fff; }
-        .ex-esc[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-        .ex-range { -webkit-appearance:none; appearance:none; width:100%; height:6px; border-radius:999px; outline:none;
-          background:linear-gradient(90deg, var(--exc) 0%, var(--exc) var(--exfill), rgba(255,255,255,0.12) var(--exfill), rgba(255,255,255,0.12) 100%); }
-        .ex-range::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:20px; height:20px; border-radius:50%;
-          background:#fff; border:3px solid var(--exc); cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.4); }
-        .ex-range::-moz-range-thumb { width:20px; height:20px; border-radius:50%; background:#fff; border:3px solid var(--exc); cursor:pointer; }
-        .ex-btn { cursor:pointer; border-radius:11px; border:1px solid ${accent}66; background:rgba(${color.rgba},0.14); color:#fff;
-          padding:10px 14px; font-size:13px; font-weight:800; transition:all .14s; display:inline-flex; align-items:center; gap:8px; }
-        .ex-btn:hover { background:rgba(${color.rgba},0.26); border-color:${accent}; }
-        @media (max-width: 1000px){ .ex-bottom { grid-template-columns: 1fr !important; } }
-
-        /* Cajón de teoría */
-        .ex-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .ex-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .ex-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .ex-drawer[data-open="true"] { transform:translateX(0); }
-        .ex-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .ex-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .ex-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .ex-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .ex-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .ex-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      <div className="ex-grid">
-        {/* ── Columna visor ──────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(460px, 66vh, 780px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 50% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06182f 0%,#020d1d 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <EcuacionesScene a={esc.a} b={esc.b} c={esc.c} x={x} xNombre={esc.xNombre} accent={accent} autoRotate={autoRotate} resetNonce={resetNonce} />
-            </SceneBoundary>
-
-            {/* Cinta EN VIVO */}
-            <div style={{ position: "absolute", top: 14, left: 16, display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(2,12,28,0.74)", border: `1px solid ${resuelto ? OK : accent}66`, backdropFilter: "blur(10px)" }}>
-              <span className="ex-live-dot" style={{ ["--exc" as string]: `${resuelto ? OK : accent}aa`, width: 9, height: 9, borderRadius: "50%", background: resuelto ? OK : accent }} />
-              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3 }}>EN VIVO</span>
-              <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)" }} />
-              <span style={{ fontSize: 13.5, fontWeight: 900, color: resuelto ? OK : accent, ...NUM }}>
-                {resuelto ? "¡Resuelto!" : `${fmtNum(totalActual)} / ${fmtNum(esc.c)}`}
-              </span>
-            </div>
-
-            {/* Ecuación actual */}
-            <div style={{ position: "absolute", bottom: 16, left: 18, display: "flex", gap: 8, alignItems: "baseline", fontSize: 17, fontWeight: 900, pointerEvents: "none", ...NUM }}>
-              <span style={{ color: T.text3, fontWeight: 700 }}>{esc.a === 1 ? "" : esc.a}{esc.xNombre}{esc.b ? ` + ${esc.b}` : ""} =</span>
-              <span style={{ color: resuelto ? OK : accent }}>{fmtNum(totalActual)}</span>
-              <span style={{ color: T.text3, fontSize: 14, fontWeight: 700 }}>(meta {fmtNum(esc.c)})</span>
-            </div>
-
-            {/* Toolbar */}
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(2,12,28,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="ex-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="ex-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="ex-icobtn" data-on={autoRotate} onClick={() => setAutoRotate((v) => !v)} title="Girar automáticamente">
-                <i className="fa-solid fa-arrows-rotate" />
-              </button>
-              <button className="ex-icobtn" onClick={reset} title="Reiniciar la incógnita a 0">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            {/* Botón flotante de Teoría */}
-            <button className="ex-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <EcuacionesScene a={esc.a} b={esc.b} c={esc.c} x={x} xMax={esc.xMax} xNombre={esc.xNombre} accent={accent} autoRotate={autoRotate} resetNonce={resetNonce} />
+        </SceneBoundary>
+      }
+      modos={{
+        opciones: ESCENARIOS.map((e) => ({ id: e.key, etiqueta: e.titulo, icono: e.icono })),
+        valor: escKey,
+        cambiar: cargar,
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-arrows-rotate" titulo="Girar automáticamente" activo={autoRotate} onClick={() => setAutoRotate((v) => !v)} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar la incógnita a 0" onClick={reset} />
+        </>
+      }
+      leyenda={
+        <div style={{ display: "grid", gap: 6, width: 190 }}>
+          <div style={{ fontSize: 14, fontWeight: 900, color: "#fff", ...NUM }}>{ecuacionStr(esc)}</div>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, fontWeight: 800, color: "#dce6f5" }}>
+            <span>barra</span>
+            <span style={{ fontFamily: "ui-monospace, monospace" }}>{fmtNum(totalActual)} / {fmtNum(esc.c)}</span>
           </div>
-
-          {/* Planteamiento + deslizador */}
-          <div style={{ ...card, padding: "18px 22px 20px" }}>
-            <Eyebrow>
-              <i className={`fa-solid ${esc.icono}`} style={{ marginRight: 8, color: accent }} />
-              {esc.titulo}
-            </Eyebrow>
-            <div style={{ fontSize: 14, color: T.text, lineHeight: 1.5, marginBottom: 12, fontWeight: 600 }}>{esc.historia}</div>
-
-            <div style={{ borderRadius: 12, border: `1px solid ${accent}44`, background: `rgba(${color.rgba},0.08)`, padding: "11px 14px", marginBottom: 18 }}>
-              <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.1em", color: T.text3, marginBottom: 5 }}>CÓMO PLANTEARLO</div>
-              <div style={{ fontSize: 13, color: T.text2, lineHeight: 1.5 }}>{esc.comoPlantear}</div>
-              <div style={{ marginTop: 9, fontSize: 17, fontWeight: 900, color: accent, ...NUM }}>{ecuacionStr(esc)}</div>
-            </div>
-
-            <div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 9 }}>
-                <span style={{ fontSize: 13, fontWeight: 700, color: accent }}>Incógnita · {esc.xNombre}{esc.unidad ? ` (${esc.unidad})` : ""}</span>
-                <span style={{ fontSize: 15, fontWeight: 900, color: accent, ...NUM }}>{esc.xNombre} = {fmtNum(x)}</span>
-              </div>
-              <input type="range" className="ex-range" min={esc.xMin} max={esc.xMax} step={esc.xStep} value={x}
-                onChange={(e) => cambiarX(Number(e.target.value))}
-                style={{ ["--exc" as string]: accent, ["--exfill" as string]: `${((x - esc.xMin) / (esc.xMax - esc.xMin)) * 100}%` }} />
-            </div>
-
-            <div style={{ display: "flex", borderRadius: 13, background: T.inset, border: `1px solid ${T.line}`, marginTop: 18 }}>
-              <Readout label={`${esc.a === 1 ? "" : esc.a + "·"}${esc.xNombre}`} value={fmtNum(esc.a * x)} col={accent} size={15} />
-              <div style={{ width: 1, background: T.line }} />
-              <Readout label="+ constante" value={`+ ${fmtNum(esc.b)}`} col={AMBER} size={15} />
-              <div style={{ width: 1, background: T.line }} />
-              <Readout label="Total barra" value={fmtNum(totalActual)} col={resuelto ? OK : T.text} size={15} />
-              <div style={{ width: 1, background: T.line }} />
-              <Readout label={resuelto ? "Diferencia" : "Falta"} value={fmtNum(dif)} col={resuelto ? OK : T.text2} size={15} />
-            </div>
-
-            <div style={{ marginTop: 14, display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
-              <button className="ex-btn" onClick={resolver}>
-                <i className="fa-solid fa-wand-magic-sparkles" /> Resolver
-              </button>
-              <button className="ex-btn" onClick={() => setVerDespeje((v) => !v)}>
-                <i className="fa-solid fa-square-root-variable" /> {verDespeje ? "Ocultar" : "Ver"} despeje
-              </button>
-            </div>
-
-            {verDespeje && (
-              <div style={{ marginTop: 14, borderRadius: 13, border: `1px solid ${accent}55`, background: `rgba(${color.rgba},0.10)`, padding: "13px 16px", fontSize: 14, color: T.text, lineHeight: 1.7, ...NUM }}>
-                <div>{ecuacionStr(esc)}</div>
-                <div style={{ color: T.text2 }}>{esc.a === 1 ? "" : esc.a + esc.xNombre} {esc.b ? `= ${fmtNum(esc.c)} − ${fmtNum(esc.b)} = ${fmtNum(esc.c - esc.b)}` : `= ${fmtNum(esc.c)}`}</div>
-                <div style={{ color: accent, fontWeight: 900 }}>{esc.xNombre} = {esc.a === 1 ? "" : `${fmtNum(esc.c - esc.b)} / ${esc.a} = `}{fmtNum(sol, 2)} {esc.unidad}</div>
-                {esc.key === "hermanos" && (
-                  <div style={{ color: T.text2, marginTop: 4 }}>menor = {fmtNum(sol)} años · mayor = {fmtNum(sol + 9)} años</div>
+          <div style={{ position: "relative", height: 10, borderRadius: 6, background: "rgba(255,255,255,0.1)", overflow: "hidden" }}>
+            <div style={{ width: `${Math.min(100, (totalActual / Math.max(esc.c, totalActual)) * 100)}%`, height: "100%", background: colEstado, transition: "width 140ms linear, background 140ms linear" }} />
+            {totalActual > esc.c && <div style={{ position: "absolute", left: `${(esc.c / totalActual) * 100}%`, top: 0, bottom: 0, width: 2, background: "#fff" }} />}
+          </div>
+          <div style={{ fontSize: 14, fontWeight: 900, color: colEstado }}>
+            {resuelto ? "Justo en la meta" : dif < 0 ? `Sobran ${fmtNum(-dif)}` : `Faltan ${fmtNum(dif)}`}
+          </div>
+        </div>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Controles",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              <Bloque titulo={esc.titulo} icono={esc.icono}>
+                <p style={{ margin: 0, color: T.text, fontWeight: 600 }}>{esc.historia}</p>
+                <Deslizador
+                  label={`incógnita · ${esc.xNombre}${esc.unidad ? ` (${esc.unidad})` : ""}`}
+                  icon="fa-ruler-horizontal"
+                  colr={accent}
+                  valor={`${esc.xNombre} = ${fmtNum(x)}`}
+                  min={esc.xMin}
+                  max={esc.xMax}
+                  step={esc.xStep}
+                  value={x}
+                  onChange={cambiarX}
+                />
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                  <Dato label={`${esc.a === 1 ? "" : `${fmtNum(esc.a)}·`}${esc.xNombre}`} value={fmtNum(esc.a * x)} col={accent} />
+                  <Dato label="+ constante" value={`+ ${fmtNum(esc.b)}`} col={AMBER} />
+                  <Dato label="total de la barra" value={fmtNum(totalActual)} col={resuelto ? OKC : "#fff"} />
+                  <Dato label={resuelto ? "diferencia" : dif < 0 ? "sobra" : "falta"} value={fmtNum(Math.abs(dif))} col={colEstado} />
+                </div>
+                <p style={{ margin: 0, padding: "10px 12px", borderRadius: 12, border: `1px solid ${colEstado}55`, background: `${colEstado}12` }}>
+                  {porque}
+                </p>
+                <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                  <button type="button" style={BTN(accent, color.rgba)} onClick={resolver}>
+                    <i className="fa-solid fa-wand-magic-sparkles" aria-hidden /> Resolver
+                  </button>
+                  <button type="button" style={BTN(accent, color.rgba)} onClick={() => setVerDespeje((v) => !v)}>
+                    <i className="fa-solid fa-square-root-variable" aria-hidden /> {verDespeje ? "Ocultar" : "Ver"} despeje
+                  </button>
+                </div>
+                {verDespeje && (
+                  <div style={{ borderRadius: 13, border: `1px solid ${accent}55`, background: `rgba(${color.rgba},0.10)`, padding: "12px 14px", lineHeight: 1.7, ...NUM }}>
+                    <div>{ecuacionStr(esc)}</div>
+                    <div style={{ color: T.text2 }}>{esc.a === 1 ? "" : esc.a + esc.xNombre} {esc.b ? `= ${fmtNum(esc.c)} − ${fmtNum(esc.b)} = ${fmtNum(esc.c - esc.b)}` : `= ${fmtNum(esc.c)}`}</div>
+                    <div style={{ color: accent, fontWeight: 900 }}>{esc.xNombre} = {esc.a === 1 ? "" : `${fmtNum(esc.c - esc.b)} / ${esc.a} = `}{fmtNum(sol, 2)} {esc.unidad}</div>
+                    {esc.key === "hermanos" && (
+                      <div style={{ color: T.text2, marginTop: 4 }}>menor = {fmtNum(sol)} años · mayor = {fmtNum(sol + 9)} años</div>
+                    )}
+                  </div>
                 )}
-              </div>
-            )}
-          </div>
-
-          {/* Por qué */}
-          <div style={{ ...card, padding: "18px 22px 20px" }}>
-            <Eyebrow>Por qué funciona</Eyebrow>
-            <div style={{ fontSize: 13.5, color: T.text2, lineHeight: 1.55 }}>
-              Plantear una ecuación es <strong style={{ color: T.text }}>traducir la historia a una barra</strong>: la parte que depende de la incógnita es <strong style={{ color: accent }}>a·{esc.xNombre}</strong>, lo que se suma siempre es la <strong style={{ color: AMBER }}>constante b</strong>, y el total conocido es la <strong style={{ color: "#9fc0e0" }}>meta c</strong>. Resolver es encontrar el valor de {esc.xNombre} que hace que la barra mida justo c. Despejando: primero quitas la constante (c − b) y luego repartes entre a, es decir <strong style={{ color: T.text }}>{esc.xNombre} = (c − b) / a</strong>.
-            </div>
-          </div>
-        </div>
-
-        {/* ── Columna controles ──────────────────────────────────── */}
-        <div style={{ ...card, padding: "22px 22px 24px" }}>
-          <Eyebrow>Problemas para plantear</Eyebrow>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {ESCENARIOS.map((e) => {
-              const on = e.key === escKey;
-              const hecho = resueltos.has(e.key);
-              return (
-                <button key={e.key} className="ex-esc" data-on={on} onClick={() => cargar(e)}>
-                  <i className={`fa-solid ${e.icono}`} style={{ fontSize: 16, width: 20, textAlign: "center", color: on ? accent : T.text3 }} />
-                  <span style={{ fontSize: 13, fontWeight: 700, flex: 1, lineHeight: 1.3 }}>{e.titulo}</span>
-                  {hecho && <i className="fa-solid fa-circle-check" style={{ color: OK, fontSize: 13 }} />}
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="ex-divider" />
-
-          <Eyebrow>Cómo plantear y resolver</Eyebrow>
-          <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.5, display: "flex", flexDirection: "column", gap: 9 }}>
-            <div><strong style={{ color: T.text }}>1.</strong> Nombra la incógnita: «sea {esc.xNombre} …».</div>
-            <div><strong style={{ color: T.text }}>2.</strong> Traduce cada dato a un segmento: <strong>a·{esc.xNombre}</strong> y la constante <strong>b</strong>.</div>
-            <div><strong style={{ color: T.text }}>3.</strong> Iguala a la meta: <strong>a·{esc.xNombre} + b = c</strong>.</div>
-            <div><strong style={{ color: T.text }}>4.</strong> Despeja: <strong>{esc.xNombre} = (c − b) / a</strong>.</div>
-          </div>
-
-          <div className="ex-divider" />
-
-          <Eyebrow>Marcador</Eyebrow>
-          <div style={{ display: "flex", borderRadius: 13, background: T.inset, border: `1px solid ${T.line}` }}>
-            <Readout label="Resueltos" value={`${resueltos.size}/${ESCENARIOS.length}`} col={accent} size={15} />
-            <div style={{ width: 1, background: T.line }} />
-            <Readout label="Solución" value={`${esc.xNombre} = ${fmtNum(sol, 2)}`} col={OK} size={14} />
-          </div>
-
-          <div style={{ marginTop: 14, fontSize: 12.5, color: T.text2, lineHeight: 1.5 }}>
-            <i className="fa-solid fa-circle-info" style={{ marginRight: 7, color: accent }} />
-            Este lab va de <strong style={{ color: T.text }}>plantear</strong> el problema. Para profundizar en el <strong style={{ color: T.text }}>despeje</strong> con equilibrio, está el laboratorio de la balanza.
-          </div>
-        </div>
-      </div>
-
-      {/* ── Objetivos + pista ──────────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="ex-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-            Objetivos
-          </Eyebrow>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-            {objetivos.map((o, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: logrosLab[i] ? OK : T.text2 }}>
-                <i className={`fa-solid ${logrosLab[i] ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: logrosLab[i] ? 1 : 0.3 }} />
-                <span style={{ fontWeight: logrosLab[i] ? 700 : 500 }}>{o.txt}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div style={{ borderRadius: 18, padding: "18px 20px", border: `1px solid rgba(${color.rgba},0.3)`, background: `rgba(${color.rgba},0.08)`, fontSize: 13.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 13 }}>
-          <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 17, marginTop: 1 }} />
-          <span>
-            La clave de un problema con palabras es <strong style={{ color: T.text }}>nombrar la incógnita</strong> y traducir cada frase a un segmento de la barra. Una vez que ves <strong style={{ color: accent }}>a·{esc.xNombre} + b = c</strong>, resolver es solo aritmética: <strong style={{ color: T.text }}>{esc.xNombre} = (c − b) / a</strong>.
-          </span>
-        </div>
-      </div>
-
-      {/* ── Reto evaluable: el ejercicio verbatim del ancla A2 ────────── */}
-      <RetoNumericoCard
-        reto={RETO_A2}
-        accent={accent}
-        aprobado={ejercicioAprobado}
-        onAprobado={() => setEjercicioAprobado(true)}
-        playSfx={
-          sonido
-            ? (ok) => {
-                if (ok) audioRef.current?.correcto();
-                else audioRef.current?.incorrecto();
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <RetoNumericoCard
+              reto={RETO_A2}
+              accent={accent}
+              aprobado={ejercicioAprobado}
+              onAprobado={() => setEjercicioAprobado(true)}
+              playSfx={
+                sonido
+                  ? (ok) => {
+                      if (ok) audioRef.current?.correcto();
+                      else audioRef.current?.incorrecto();
+                    }
+                  : undefined
               }
-            : undefined
-        }
-      />
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <div className="ex-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="ex-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="ex-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="ex-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="ex-drawer-body">
-          <FichaTeorica data={ECUACION_LINEAL_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+            />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Cómo plantearlo" icono="fa-pen">
+                <p style={{ margin: 0, color: T.text2 }}>{esc.comoPlantear}</p>
+                <div style={{ fontSize: 18, fontWeight: 900, color: accent, ...NUM }}>{ecuacionStr(esc)}</div>
+              </Bloque>
+              <Bloque titulo="Por qué funciona" icono="fa-lightbulb">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  Plantear una ecuación es <strong style={{ color: T.text }}>traducir la historia a una barra</strong>: la parte que depende de la incógnita es <strong style={{ color: accent }}>a·{esc.xNombre}</strong>, lo que se suma siempre es la <strong style={{ color: AMBER }}>constante b</strong>, y el total conocido es la <strong style={{ color: META }}>meta c</strong>. Resolver es encontrar el valor de {esc.xNombre} que hace que la barra mida justo c. Despejando: primero quitas la constante (c − b) y luego repartes entre a, es decir <strong style={{ color: T.text }}>{esc.xNombre} = (c − b) / a</strong>.
+                </p>
+              </Bloque>
+              <Bloque titulo="Cómo plantear y resolver" icono="fa-list-ol">
+                <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  <li>Nombra la incógnita: «sea {esc.xNombre} …».</li>
+                  <li>Traduce cada dato a un segmento: <strong>a·{esc.xNombre}</strong> y la constante <strong>b</strong>.</li>
+                  <li>Iguala a la meta: <strong>a·{esc.xNombre} + b = c</strong>.</li>
+                  <li>Despeja: <strong>{esc.xNombre} = (c − b) / a</strong>.</li>
+                </ol>
+                <p style={{ margin: 0, color: T.text2 }}>
+                  La clave de un problema con palabras es nombrar la incógnita y traducir cada frase a un segmento de la barra. Este lab va de <strong style={{ color: T.text }}>plantear</strong>; para profundizar en el <strong style={{ color: T.text }}>despeje</strong> con equilibrio, está el laboratorio de la balanza.
+                </p>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={ECUACION_LINEAL_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }
