@@ -1,0 +1,12 @@
+{
+  "escena": "Recorres siete escenas de una secundaria ficticia y decides qué ves y qué haces. Un medidor de convivencia sube o baja con cada decisión.",
+  "pregunta": "Si ante una burla racista te ríes «una sola vez», ¿qué pasa con la convivencia?",
+  "opciones": [
+    { "id": "a", "texto": "Casi nada: fue solo una vez", "icono": "fa-equals" },
+    { "id": "b", "texto": "Baja mucho: se normaliza", "icono": "fa-arrow-trend-down" },
+    { "id": "c", "texto": "Sube: evitas un conflicto", "icono": "fa-arrow-trend-up" }
+  ],
+  "correcta": "b",
+  "porque": "Sumarse a la burla la normaliza y refuerza el racismo: la persona afectada queda más sola. Evitar el conflicto no repara el daño; acompañar y pedir apoyo adulto sí.",
+  "comoComprobarlo": "En la escena 3 («Apodos en el pasillo»), elige la tercera respuesta y observa el medidor de convivencia y la cara de Dani."
+}

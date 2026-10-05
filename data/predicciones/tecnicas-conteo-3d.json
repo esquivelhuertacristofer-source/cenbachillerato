@@ -1,0 +1,12 @@
+{
+  "escena": "Un árbol de decisiones de izquierda a derecha: 3 playeras y 2 pantalones dan una hoja por cada conjunto posible.",
+  "pregunta": "Agregas una tercera etapa: zapatos, con 2 opciones. ¿Cuántas hojas tendrá el árbol?",
+  "opciones": [
+    { "id": "a", "texto": "8: se suma la nueva etapa", "icono": "fa-plus" },
+    { "id": "b", "texto": "12: el total se duplica", "icono": "fa-xmark" },
+    { "id": "c", "texto": "7: se agrega una sola rama", "icono": "fa-code-branch" }
+  ],
+  "correcta": "b",
+  "porque": "Cada etapa se multiplica, no se suma: a cada una de las 6 combinaciones de ropa se le puede poner cualquiera de los 2 zapatos, así que 3 × 2 × 2 = 12 resultados.",
+  "comoComprobarlo": "En el modo «Principio multiplicativo» deja 3 y 2 opciones, pulsa «Agregar una tercera etapa: zapatos» y observa cuántas hojas aparecen."
+}

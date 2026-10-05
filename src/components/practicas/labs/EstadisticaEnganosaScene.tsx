@@ -22,11 +22,12 @@
 
 import * as THREE from "three";
 import { useEffect, useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Environment, Lightformer, Html, Line } from "@react-three/drei";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import type { Line2 } from "three-stdlib";
 import { CurvaTubo } from "./_tablero";
+import { Escenario } from "./_escenario";
 import {
   type Vista,
   type CasoBarras,
@@ -92,9 +93,17 @@ function useSuave(objetivo: number, inicial: number, rapidez = 0.12) {
   return v;
 }
 
-function Etiqueta({ pos, children, df = 10, col, izq, der }: { pos: Pt; children: ReactNode; df?: number; col?: string; izq?: boolean; der?: boolean }) {
+/** Pantalla angosta: los carteles <Html> anchos se ocultan (la info ya está en el panel). */
+function useAngosto() {
+  return useThree((st) => st.size.width) < 640;
+}
+
+/** Cartel de punta de objeto: 14 px fijos, sin distanceFactor. `df` se ignora (compatibilidad). */
+function Etiqueta({ pos, children, col, izq, der }: { pos: Pt; children: ReactNode; df?: number; col?: string; izq?: boolean; der?: boolean }) {
+  const angosto = useAngosto();
+  if (angosto) return null;
   return (
-    <Html position={pos} center={!izq && !der} distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center={!izq && !der} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -105,7 +114,7 @@ function Etiqueta({ pos, children, df = 10, col, izq, der }: { pos: Pt; children
           background: "rgba(4,10,22,0.84)",
           border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`,
           color: "#fff",
-          fontSize: 12,
+          fontSize: 14,
           fontWeight: 800,
           whiteSpace: "nowrap",
           boxShadow: "0 6px 18px -8px #000",
@@ -118,12 +127,24 @@ function Etiqueta({ pos, children, df = 10, col, izq, der }: { pos: Pt; children
   );
 }
 
-function Letra({ pos, children, df = 8, col = GRIS, size = 12, der }: { pos: Pt; children: ReactNode; df?: number; col?: string; size?: number; der?: boolean }) {
+function Letra({ pos, children, col = GRIS, size = 14, der }: { pos: Pt; children: ReactNode; df?: number; col?: string; size?: number; der?: boolean }) {
   return (
-    <Html position={pos} center={!der} distanceFactor={df} zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
-      <div style={{ color: col, fontSize: size, fontWeight: 800, whiteSpace: "nowrap", textShadow: "0 2px 6px #000", transform: der ? "translate(-100%, -50%)" : undefined }}>{children}</div>
+    <Html position={pos} center={!der} zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
+      <div style={{ color: col, fontSize: Math.max(14, size), fontWeight: 800, whiteSpace: "nowrap", textShadow: "0 2px 6px #000", transform: der ? "translate(-100%, -50%)" : undefined }}>{children}</div>
     </Html>
   );
+}
+
+/** En pantallas angostas se aleja la cámara (zoom) para que el contenido quepa entre la barra y la misión. */
+function AjusteVista() {
+  useFrame((st) => {
+    const z = st.size.width < 640 ? 0.72 : 1;
+    if (st.camera.zoom !== z) {
+      st.camera.zoom = z;
+      st.camera.updateProjectionMatrix();
+    }
+  });
+  return null;
 }
 
 function Piso({ w, d, y = -0.06 }: { w: number; d: number; y?: number }) {
@@ -691,6 +712,29 @@ function posBloque(i: number): Pt {
   return [(j % 5) * (BW + 0.04) - 2 * (BW + 0.04), capa * (BH + 0.03) + BH / 2, (Math.floor(j / 5) - 0.5) * (BD + 0.05)];
 }
 
+/** La base de la pila (hasta 40 bloques iguales) en una sola malla instanciada. */
+function BloquesBase({ n, color }: { n: number; color: string }) {
+  const ref = useRef<THREE.InstancedMesh>(null);
+  useEffect(() => {
+    const mesh = ref.current;
+    if (!mesh) return;
+    const dummy = new THREE.Object3D();
+    for (let i = 0; i < n; i++) {
+      const [px, py, pz] = posBloque(i);
+      dummy.position.set(px, py, pz);
+      dummy.updateMatrix();
+      mesh.setMatrixAt(i, dummy.matrix);
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+  }, [n]);
+  return (
+    <instancedMesh key={n} ref={ref} args={[undefined, undefined, n]} castShadow>
+      <boxGeometry args={[BW, BH, BD]} />
+      <meshStandardMaterial color={color} roughness={0.55} />
+    </instancedMesh>
+  );
+}
+
 function Pila({ x, base, extra, color, nuevo }: { x: number; base: number; extra: number; color: string; nuevo: string }) {
   const mat = useRef<THREE.MeshStandardMaterial>(null);
   useFrame(({ clock }) => {
@@ -701,12 +745,7 @@ function Pila({ x, base, extra, color, nuevo }: { x: number; base: number; extra
   const bloquesNuevos = Array.from({ length: completos + (parcial > 0.01 ? 1 : 0) }, (_, k) => ({ i: base + k, f: k < completos ? 1 : parcial }));
   return (
     <group position={[x, 0, 0]}>
-      {Array.from({ length: base }, (_, i) => (
-        <mesh key={i} position={posBloque(i)} castShadow>
-          <boxGeometry args={[BW, BH, BD]} />
-          <meshStandardMaterial color={color} roughness={0.55} />
-        </mesh>
-      ))}
+      <BloquesBase n={base} color={color} />
       {bloquesNuevos.map(({ i, f }) => {
         const [px, py, pz] = posBloque(i);
         return (
@@ -978,15 +1017,18 @@ function EscenaMargen({ n, modoColor }: { n: number; modoColor: string }) {
 
 /* ── Escena ───────────────────────────────────────────────────────────── */
 
+/* El contenido queda entre la barra de arriba y la misión de abajo: todas las
+ * vistas miran ~0.5 más abajo (la de riesgo, que se ve desde arriba, ~0.6 más
+ * cerca) para que la escena suba en pantalla. */
 const CAMARAS: Record<Vista, { pos: Pt; target: Pt }> = {
-  truncado: { pos: [2.2, 1.6, 8.2], target: [0, 0, 0] },
-  volumen: { pos: [3.4, 2.8, 8.2], target: [0, -0.2, 0] },
-  log: { pos: [0, 0.4, 9.6], target: [0, 0, 0] },
-  puntos: { pos: [0.4, 1.8, 9.4], target: [0, -0.1, 0] },
-  riesgo: { pos: [0, 5.4, 5.2], target: [0, -0.6, 0] },
-  bases: { pos: [2.6, 3.4, 8.2], target: [0, -0.2, 0] },
-  mediana: { pos: [0, 1.9, 12], target: [0, 0.4, 0] },
-  margen: { pos: [0, 1.2, 9], target: [0, 0, 0] },
+  truncado: { pos: [2.2, 1.1, 8.2], target: [0, -0.5, 0] },
+  volumen: { pos: [3.4, 2.3, 8.2], target: [0, -0.7, 0] },
+  log: { pos: [0, -0.1, 9.6], target: [0, -0.5, 0] },
+  puntos: { pos: [0.4, 1.3, 9.4], target: [0, -0.6, 0] },
+  riesgo: { pos: [0, 5.4, 5.8], target: [0, -0.6, 0.6] },
+  bases: { pos: [2.6, 2.9, 8.2], target: [0, -0.7, 0] },
+  mediana: { pos: [0, 1.4, 12], target: [0, -0.1, 0] },
+  margen: { pos: [0, 0.7, 9], target: [0, -0.5, 0] },
 };
 
 export default function EstadisticaEnganosaScene(p: EnganosaSceneProps) {
@@ -1005,19 +1047,14 @@ export default function EstadisticaEnganosaScene(p: EnganosaSceneProps) {
 
   return (
     <Canvas key={`${vista}-${resetNonce}`} shadows dpr={[1, 1.75]} camera={{ position: cam.pos, fov: 42 }} gl={{ antialias: true }}>
-      <color attach="background" args={["#040a16"]} />
-      <fog attach="fog" args={["#040a16", 18, 40]} />
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[4, 9, 6]} intensity={1.1} castShadow shadow-mapSize={[1024, 1024]} />
+      {/* Suelo, luz de tres puntos y entorno: el escenario compartido. */}
+      <Escenario acento={accent} />
       <pointLight position={[-6, 2, 5]} intensity={0.4} color={modoColor} />
-      <Environment resolution={128}>
-        <Lightformer form="rect" intensity={1.5} position={[0, 5, -6]} scale={[10, 6, 1]} color="#93c5fd" />
-        <Lightformer form="rect" intensity={0.8} position={[-6, 0, 4]} scale={[6, 6, 1]} color={modoColor} />
-      </Environment>
 
       {contenido}
 
       <OrbitControls makeDefault enablePan={false} enableZoom minDistance={4} maxDistance={20} maxPolarAngle={Math.PI * 0.49} minPolarAngle={Math.PI * 0.05} target={cam.target} />
+      <AjusteVista />
       <EffectComposer>
         <Bloom intensity={0.3} luminanceThreshold={0.6} luminanceSmoothing={0.85} mipmapBlur />
         <Vignette eskil={false} offset={0.18} darkness={0.7} />

@@ -1,0 +1,12 @@
+{
+  "escena": "Armas una publicación para una jornada de reciclaje y eliges texto, imagen, audio, color y diseño. Tres medidores cambian en vivo.",
+  "pregunta": "Para el cartel de papel del mercado, ¿qué audio sube más el alcance?",
+  "opciones": [
+    { "id": "a", "texto": "Música de fondo muy animada", "icono": "fa-music" },
+    { "id": "b", "texto": "Ninguno, el papel es mudo", "icono": "fa-volume-xmark" },
+    { "id": "c", "texto": "Una locución clara y pausada", "icono": "fa-microphone" }
+  ],
+  "correcta": "b",
+  "porque": "Un cartel impreso no reproduce sonido: el audio se pierde y baja el alcance. El canal decide qué modos sirven; la mejor combinación para papel es titular, imagen y contraste.",
+  "comoComprobarlo": "Elige «Cartel del mercado», deja audio en «Sin audio» y luego prueba música y locución mientras miras el medidor de Alcance."
+}

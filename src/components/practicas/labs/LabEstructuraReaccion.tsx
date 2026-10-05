@@ -8,18 +8,25 @@
  * recorre la simbología, todo con reacciones reales del módulo de datos.
  *
  * Tres modos: anatomía de la ecuación · conservación (conteo de átomos) · simbología.
+ *
+ * EXPERIMENTO CENTRAL: el alumno cambia el COEFICIENTE de una sustancia y ve
+ * aparecer o desaparecer moléculas completas; en «Conservación», las barras de
+ * átomos de cada elemento dejan de coincidir (naranja) y la ecuación deja de
+ * estar balanceada. Los subíndices nunca se tocan.
  */
 
-import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, card, Eyebrow, SceneBoundary } from "./_kit";
+import { T, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { ESTRUCTURA_REACCION_FICHA } from "./estructura-reaccion-ficha";
 import { RetoNumericoCard } from "./_reto-numerico";
 import { LabSfx } from "./lab-audio";
 import {
   type Modo,
+  type Reaccion,
   MODOS,
   MODOS_DEF,
   FASES,
@@ -43,20 +50,35 @@ import {
   RETO_A2,
 } from "./estructura-reaccion-data";
 
-import { TableroObjetivos } from "./_objetivos";
-
 /** Clave de la mejor marca de este laboratorio. */
 const RETO_KEY = "cen-estructura-reaccion-reto";
+
+const OK_COL = "#34D399";
+const NO_COL = "#FB923C";
 
 const EstructuraReaccionScene = dynamic(() => import("./EstructuraReaccionScene"), {
   ssr: false,
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-arrows-rotate fa-spin" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Cargando la reacción química en 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Cargando la reacción química en 3D…</span>
     </div>
   ),
 });
+
+const COLORES_ELEM: Record<string, string> = { H: "#e2e8f0", C: "#475569", O: "#ef4444", N: "#3b82f6", Cl: "#22c55e", Na: "#a855f7" };
+
+const th: React.CSSProperties = { padding: "8px 9px", fontSize: 13, letterSpacing: "0.06em", textTransform: "uppercase", color: T.text3, textAlign: "left", borderBottom: `1px solid ${T.line}` };
+const td: React.CSSProperties = { padding: "8px 9px", fontSize: 14, borderBottom: `1px solid ${T.line}`, verticalAlign: "top", textAlign: "left" };
+
+const COEF_MIN = 1;
+const COEF_MAX = 6;
+
+/** Ecuación escrita con los coeficientes actuales. */
+function ecuacionTexto(r: Reaccion): string {
+  const lado = (l: Reaccion["reactivos"]) => l.map((e) => `${e.coef > 1 ? `${e.coef} ` : ""}${e.formula} (${e.estado})`).join(" + ");
+  return `${lado(r.reactivos)} ${r.reversible ? "⇌" : "→"} ${lado(r.productos)}`;
+}
 
 export function LabEstructuraReaccion({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
@@ -65,10 +87,10 @@ export function LabEstructuraReaccion({ color }: PracticaLabProps) {
   const [paso, setPaso] = useState<number>(0);
   const [playing, setPlaying] = useState<boolean>(true);
   const [resetNonce, setResetNonce] = useState(0);
+  const [simbolo, setSimbolo] = useState(0);
 
-  // reto evaluable, teoría (cajón deslizable) y sonido
+  // reto evaluable y sonido
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
 
@@ -91,8 +113,19 @@ export function LabEstructuraReaccion({ color }: PracticaLabProps) {
     };
   }, []);
 
-  // reacción seleccionada (compartida por el visor y la calculadora A2)
+  // reacción seleccionada y coeficientes que el alumno ha cambiado
   const [reaccionId, setReaccionId] = useState<string>("combustion-metano");
+  const [delta, setDelta] = useState<Record<string, number>>({});
+  const base = reaccionPorId(reaccionId);
+  const reaccion = useMemo<Reaccion>(
+    () => ({
+      ...base,
+      reactivos: base.reactivos.map((e, i) => ({ ...e, coef: delta[`R${i}`] ?? e.coef })),
+      productos: base.productos.map((e, i) => ({ ...e, coef: delta[`P${i}`] ?? e.coef })),
+    }),
+    [base, delta],
+  );
+  const libre = Object.keys(delta).length > 0;
 
   const bump = () => setResetNonce((n) => n + 1);
 
@@ -104,8 +137,6 @@ export function LabEstructuraReaccion({ color }: PracticaLabProps) {
   const escena = escenaPara(modo, idx);
   const esGaleria = modo === "simbologia";
   const nombresFase = esGaleria ? [] : FASES[modo as Exclude<Modo, "simbologia">];
-
-  const reaccion = reaccionPorId(reaccionId);
 
   useEffect(() => {
     if (!playing || esGaleria || total === 0) return;
@@ -126,10 +157,21 @@ export function LabEstructuraReaccion({ color }: PracticaLabProps) {
     setPlaying(!esGaleria);
     bump();
   };
+  const elegirReaccion = (id: string) => {
+    setReaccionId(id);
+    setDelta({});
+    setPaso(0);
+    bump();
+  };
+  const setCoef = (clave: string, v: number) => {
+    setDelta((d) => ({ ...d, [clave]: Math.max(COEF_MIN, Math.min(COEF_MAX, Math.round(v))) }));
+    if (sonido) audioRef.current?.blip();
+  };
 
-  // ── Calculadora A2: conteo de átomos y balance ───────────────────────────
+  // ── Conteo de átomos y balance (con los coeficientes actuales) ─────────────
   const conteo = useMemo(() => contarAtomos(reaccion), [reaccion]);
   const moles = useMemo(() => moleculasPorLado(reaccion), [reaccion]);
+  const estadoCol = conteo.balanceada ? OK_COL : NO_COL;
 
   const sceneFallback = (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 28, textAlign: "center" }}>
@@ -137,461 +179,344 @@ export function LabEstructuraReaccion({ color }: PracticaLabProps) {
         <i className={`fa-solid ${def.icono}`} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{def.etq}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>
-        Tu equipo no puede mostrar la escena en 3D, pero la información sigue aquí. {def.subtitulo}.
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>
+        Tu equipo no puede mostrar la escena en 3D, pero la información sigue aquí. {ecuacionTexto(reaccion)}.
       </div>
     </div>
   );
 
-  const pie: string = esGaleria
-    ? "Recorre los símbolos de una ecuación química: la flecha →, la doble flecha ⇌, el signo +, el coeficiente, el subíndice y los estados de agregación (s, l, g, ac)."
-    : `Fase ${idx + 1}/${totalFases} — ${escena.nombre}. ${escena.desc}`;
+  const sim = SIMBOLOS[Math.min(simbolo, SIMBOLOS.length - 1)]!;
+  const lecturasAnatomia: Record<string, string> = {
+    reactivos: "Reactivos: lo que hay antes de reaccionar",
+    flecha: "La flecha → significa «se transforma en»",
+    productos: "Productos: las sustancias nuevas",
+    coeficientes: "Coeficiente: cuántas moléculas (número grande)",
+    subindices: "Subíndice: cuántos átomos por molécula",
+  };
+  const lectura =
+    modo === "simbologia"
+      ? <>{sim.simbolo} — {sim.nombre}</>
+      : modo === "conservacion"
+        ? (conteo.balanceada ? <>Balanceada: cada elemento coincide</> : <>No coinciden: faltan o sobran átomos</>)
+        : <>{lecturasAnatomia[escena.foco] ?? escena.nombre}</>;
 
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes eqPulse { 0%,100%{ box-shadow:0 0 0 0 var(--eqd); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .eq-live-dot { animation: eqPulse 1.6s ease-in-out infinite; }
-        .eq-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .eq-grid { grid-template-columns: 1fr; } }
-        .eq-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .eq-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .eq-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .eq-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        @media (max-width: 560px){ .eq-tabs { grid-template-columns: 1fr; } }
-        .eq-tab { cursor:pointer; border:1px solid var(--eqc); border-radius:12px; padding:11px 8px; text-align:center;
-          background:transparent; transition:all .15s; color:#fff; }
-        .eq-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
-        .eq-tab:hover { background:rgba(255,255,255,0.06); }
-        .eq-phases { display:flex; flex-wrap:wrap; gap:6px; }
-        .eq-phase { cursor:pointer; padding:6px 10px; border-radius:9px; border:1px solid; font-size:11px; font-weight:800; transition:all .12s; }
-        .eq-range { width:100%; accent-color: var(--eqc); cursor:pointer; }
-        .eq-sel { box-sizing:border-box; width:100%; font-size:13px; font-weight:700; color:#fff; background:rgba(4,10,22,0.55);
-          border:1px solid var(--eqc); border-radius:9px; padding:8px 10px; outline:none; cursor:pointer; }
-        .eq-cmp { width:100%; border-collapse:collapse; }
-        .eq-cmp td, .eq-cmp th { padding:8px 9px; font-size:11px; border-bottom:1px solid ${T.line}; vertical-align:top; text-align:left; }
-        .eq-cmp th { font-size:9.5px; letter-spacing:0.08em; text-transform:uppercase; color:${T.text3}; }
-        @media (max-width: 1000px){ .eq-bottom { grid-template-columns: 1fr !important; } }
-
-        /* Cajón de teoría */
-        .eq-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .eq-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .eq-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .eq-drawer[data-open="true"] { transform:translateX(0); }
-        .eq-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .eq-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .eq-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .eq-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .eq-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .eq-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      {/* Selector de modo */}
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="eq-tabs">
-          {MODOS.map((mm) => {
-            const d = MODOS_DEF[mm];
-            const col = `#${d.color.replace("#", "")}`;
-            const on = mm === modo;
-            return (
-              <button key={mm} className="eq-tab" data-on={on} onClick={() => cambiarModo(mm)} style={{ ["--eqc" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? col : "inherit" }}><i className={`fa-solid ${d.icono}`} /></div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{d.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{d.subtitulo}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="eq-grid">
-        {/* ── Columna visor ──────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 58vh, 660px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <EstructuraReaccionScene modo={modo} escena={escena} reaccion={reaccion} playing={playing} modoColor={modoCol} resetNonce={resetNonce} />
-            </SceneBoundary>
-
-            {/* Cinta EN VIVO */}
-            <div style={{ position: "absolute", top: 14, left: 16, display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)" }}>
-              <span className="eq-live-dot" style={{ ["--eqd" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol }} />
-              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3 }}>EN VIVO</span>
-              <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)" }} />
-              <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{def.etq.toUpperCase()}</span>
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <EstructuraReaccionScene
+            modo={modo}
+            escena={escena}
+            reaccion={reaccion}
+            playing={playing}
+            modoColor={modoCol}
+            resetNonce={resetNonce}
+            libre={libre}
+            simbolo={simbolo}
+          />
+        </SceneBoundary>
+      }
+      modos={{
+        opciones: MODOS.map((mm) => ({ id: mm, etiqueta: MODOS_DEF[mm].etq, icono: MODOS_DEF[mm].icono })),
+        valor: modo,
+        cambiar: (id) => cambiarModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          {!esGaleria && (
+            <>
+              <BotonHerramienta icono="fa-backward-step" titulo="Fase anterior" onClick={() => { setPlaying(false); setPaso((p) => Math.max(0, p - 1)); }} />
+              <BotonHerramienta icono={playing ? "fa-pause" : "fa-play"} titulo={playing ? "Pausar" : "Reanudar"} activo={playing} onClick={() => setPlaying((p) => !p)} />
+              <BotonHerramienta icono="fa-forward-step" titulo="Fase siguiente" onClick={() => { setPlaying(false); setPaso((p) => Math.min(total, p + 1)); }} />
+              <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+            </>
+          )}
+        </>
+      }
+      leyenda={
+        <>
+          {!esGaleria && conteo.elementos.map((el) => (
+            <div key={el} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 800, color: "#dce6f5" }}>
+              <span style={{ width: 12, height: 12, borderRadius: "50%", background: COLORES_ELEM[el] ?? "#fbbf24", border: "1px solid rgba(255,255,255,0.35)", flexShrink: 0 }} />
+              {el}
             </div>
+          ))}
+        </>
+      }
+      lectura={lectura}
+      objetivos={[
+        { txt: "Identifica reactivos, flecha y productos en la anatomía de la ecuación", done: modo === "anatomia" && idx >= 2 },
+        { txt: "Verifica la conservación de la materia contando átomos a ambos lados", done: modo === "conservacion" },
+        { txt: "En Conservación, sube un coeficiente y mira qué barras se descuadran", done: !conteo.balanceada },
+        { txt: "Distingue coeficiente (número grande) de subíndice (número pequeño)", done: modo === "simbologia" },
+        { txt: "Recorre la reacción paso a paso", done: paso > 0 },
+        { txt: "Compara con otra reacción además de la combustión del metano", done: reaccionId !== "combustion-metano" },
+        { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
+      ]}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Controles",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              <Bloque titulo="Reacción" icono="fa-flask-vial">
+                <select
+                  value={reaccionId}
+                  onChange={(e) => elegirReaccion(e.target.value)}
+                  aria-label="Reacción química"
+                  style={{ boxSizing: "border-box", width: "100%", fontSize: 16, fontWeight: 700, color: "#fff", background: "rgba(4,10,22,0.55)", border: `1px solid ${accent}`, borderRadius: 10, padding: "10px 12px" }}
+                >
+                  {REACCIONES.map((r) => (
+                    <option key={r.id} value={r.id}>{r.nombre}</option>
+                  ))}
+                </select>
+                <div style={{ padding: "10px 12px", borderRadius: 12, border: `1px solid ${estadoCol}55`, background: `${estadoCol}12`, fontFamily: "ui-monospace, monospace", fontWeight: 900, color: "#fff", overflowWrap: "anywhere" }}>
+                  {ecuacionTexto(reaccion)}
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                  <Dato label="tipo" value={base.tipo.split(" (")[0] ?? base.tipo} col={accent} />
+                  <Dato label="flecha" value={base.reversible ? "⇌ reversible" : "→ irreversible"} col="#a78bfa" />
+                </div>
+              </Bloque>
 
-            {/* Toolbar */}
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="eq-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="eq-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              {!esGaleria && (
-                <>
-                  <button className="eq-icobtn" onClick={() => { setPlaying(false); setPaso((p) => Math.max(0, p - 1)); }} title="Fase anterior">
-                    <i className="fa-solid fa-backward-step" />
-                  </button>
-                  <button className="eq-icobtn" data-on={playing} onClick={() => setPlaying((p) => !p)} title={playing ? "Pausar" : "Reanudar"}>
-                    <i className={`fa-solid ${playing ? "fa-pause" : "fa-play"}`} />
-                  </button>
-                  <button className="eq-icobtn" onClick={() => { setPlaying(false); setPaso((p) => Math.min(total, p + 1)); }} title="Fase siguiente">
-                    <i className="fa-solid fa-forward-step" />
-                  </button>
-                  <button className="eq-icobtn" onClick={reiniciar} title="Reiniciar">
-                    <i className="fa-solid fa-rotate-left" />
-                  </button>
-                </>
-              )}
-            </div>
+              <Bloque titulo="Experimenta: cambia los coeficientes" icono="fa-hand-pointer">
+                {reaccion.reactivos.map((e, i) => (
+                  <Deslizador key={`R${i}`} label={`${e.formula} (${e.nombre})`} icon="fa-circle-dot" colr="#38bdf8" valor={String(e.coef)}
+                    min={COEF_MIN} max={COEF_MAX} step={1} value={e.coef} onChange={(v) => setCoef(`R${i}`, v)} />
+                ))}
+                {reaccion.productos.map((e, i) => (
+                  <Deslizador key={`P${i}`} label={`${e.formula} (${e.nombre})`} icon="fa-circle-dot" colr="#34d399" valor={String(e.coef)}
+                    min={COEF_MIN} max={COEF_MAX} step={1} value={e.coef} onChange={(v) => setCoef(`P${i}`, v)} />
+                ))}
+                <button
+                  type="button"
+                  onClick={() => setDelta({})}
+                  disabled={!libre}
+                  style={{ cursor: libre ? "pointer" : "default", padding: "12px 14px", borderRadius: 12, border: "none", fontSize: 15, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                    background: libre ? accent : "rgba(255,255,255,0.06)", color: libre ? "#04121f" : T.text3 }}
+                >
+                  <i className="fa-solid fa-rotate-left" aria-hidden />
+                  Volver a la ecuación original
+                </button>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                  <Dato label="átomos reactivos" value={String(conteo.totalReactivos)} col="#38bdf8" />
+                  <Dato label="átomos productos" value={String(conteo.totalProductos)} col={estadoCol} />
+                  <Dato label="moléculas" value={`${moles.reactivos} → ${moles.productos}`} col="#bfe8ff" />
+                  <Dato label="estado" value={conteo.balanceada ? "balanceada ✓" : "no coincide ✗"} col={estadoCol} />
+                </div>
+                <p style={{ margin: 0, color: T.text2 }}>
+                  {conteo.balanceada
+                    ? <>Cada elemento tiene <strong style={{ color: OK_COL }}>los mismos átomos</strong> a ambos lados: la materia se conserva ({moles.reactivos} moléculas de reactivo → {moles.productos} de producto).</>
+                    : <>Los átomos <strong style={{ color: NO_COL }}>no coinciden</strong>: cambiar un coeficiente multiplica TODOS los átomos de esa sustancia. Los subíndices no se tocan.</>}
+                </p>
+              </Bloque>
 
-            {/* Botón flotante de Teoría */}
-            <button className="eq-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-
-            {/* Pie: lectura en vivo */}
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 18px 14px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                {esGaleria ? "Simbología química" : escena.nombre} — <span style={{ color: "#cdd8ec" }}>{esGaleria ? "los símbolos de la ecuación" : reaccion.nombre}</span>
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6 }}>{pie}</div>
-            </div>
-          </div>
-
-          {/* Panel de control */}
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-                Controles — {def.etq}
-              </Eyebrow>
-              <span style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: "#7dd3fc", border: "1px solid #7dd3fc55", borderRadius: 6, padding: "3px 7px" }}>
-                EJERCICIO A2
-              </span>
-            </div>
-
-            {esGaleria ? (
-              <div>
-                <Eyebrow><i className="fa-solid fa-icons" style={{ marginRight: 8, color: modoCol }} />Qué dice cada símbolo</Eyebrow>
-                <table className="eq-cmp">
+              <Bloque titulo="Átomos por elemento (coef × subíndice)" icono="fa-scale-balanced">
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
                   <thead>
-                    <tr><th>Símbolo</th><th>Nombre</th><th>Significado</th></tr>
+                    <tr>
+                      <th style={th}>Elem.</th>
+                      <th style={{ ...th, color: "#38bdf8", textAlign: "right" }}>Reactivos</th>
+                      <th style={{ ...th, color: "#34d399", textAlign: "right" }}>Productos</th>
+                      <th style={{ ...th, textAlign: "center" }}>¿Igual?</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {conteo.elementos.map((el) => {
+                      const nr = conteo.reactivos[el] ?? 0;
+                      const np = conteo.productos[el] ?? 0;
+                      const ok = nr === np;
+                      return (
+                        <tr key={el}>
+                          <td style={{ ...td, color: "#fff", fontWeight: 900 }}>{el}</td>
+                          <td style={{ ...td, color: "#fff", textAlign: "right", fontFamily: "ui-monospace, monospace" }}>{nr}</td>
+                          <td style={{ ...td, color: ok ? "#fff" : NO_COL, textAlign: "right", fontFamily: "ui-monospace, monospace" }}>{np}</td>
+                          <td style={{ ...td, textAlign: "center", color: ok ? OK_COL : NO_COL, fontWeight: 900 }}>{ok ? "✓" : "✗"}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </Bloque>
+
+              {esGaleria ? (
+                <Bloque titulo="Símbolos de la ecuación" icono="fa-icons">
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                    {SIMBOLOS.map((s, i) => (
+                      <button
+                        key={s.nombre}
+                        type="button"
+                        onClick={() => setSimbolo(i)}
+                        style={{ cursor: "pointer", padding: "8px 12px", borderRadius: 10, border: "1px solid", fontSize: 15, fontWeight: 900, fontFamily: "ui-monospace, monospace",
+                          borderColor: i === simbolo ? s.color : "rgba(255,255,255,0.14)", background: i === simbolo ? `${s.color}26` : "transparent", color: "#fff" }}
+                      >
+                        {s.simbolo}
+                      </button>
+                    ))}
+                  </div>
+                  <p style={{ margin: 0, color: T.text2 }}><strong style={{ color: sim.color }}>{sim.nombre}.</strong> {sim.significado}</p>
+                  <p style={{ margin: 0, color: T.text3 }}>Ejemplo: <span style={{ fontFamily: "ui-monospace, monospace", color: "#fff" }}>{sim.ejemplo}</span></p>
+                </Bloque>
+              ) : (
+                <Bloque titulo={`Fases — ${def.etq}`} icono="fa-list-ol">
+                  <Deslizador
+                    label="Fase"
+                    icon="fa-forward-step"
+                    colr={modoCol}
+                    valor={`${idx + 1} / ${totalFases}`}
+                    min={0}
+                    max={total}
+                    step={1}
+                    value={idx}
+                    onChange={(v) => { setPlaying(false); setPaso(v); }}
+                  />
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                    {nombresFase.map((nom, i) => {
+                      const on = i === idx;
+                      const visto = i < idx;
+                      return (
+                        <button
+                          key={nom}
+                          type="button"
+                          onClick={() => { setPlaying(false); setPaso(i); }}
+                          style={{
+                            cursor: "pointer", padding: "8px 11px", borderRadius: 10, border: "1px solid", fontSize: 14, fontWeight: 800,
+                            borderColor: on ? modoCol : visto ? `${modoCol}55` : "rgba(255,255,255,0.12)",
+                            background: on ? `${modoCol}22` : "transparent",
+                            color: on ? "#fff" : visto ? "#cdd8ec" : T.text2,
+                          }}
+                        >
+                          {nom}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p style={{ margin: 0, color: T.text2 }}>{escena.desc}</p>
+                </Bloque>
+              )}
+
+              <Bloque titulo="Dónde ocurre esta reacción" icono="fa-location-dot">
+                <p style={{ margin: 0, color: T.text2 }}>{base.contexto}</p>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <RetoNumericoCard
+              reto={RETO_A2}
+              accent={accent}
+              aprobado={ejercicioAprobado}
+              onAprobado={() => setEjercicioAprobado(true)}
+              playSfx={
+                sonido
+                  ? (ok) => {
+                      if (ok) audioRef.current?.correcto();
+                      else audioRef.current?.incorrecto();
+                    }
+                  : undefined
+              }
+            />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="El visor de la reacción química" icono="fa-flask-vial">
+                <p style={{ margin: 0, color: T.text2 }}>{PROBLEMA}</p>
+              </Bloque>
+              <Bloque titulo={`Cómo usar — ${def.etq}`} icono="fa-list-ol">
+                <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {INSTRUCCIONES[modo].map((p, i) => <li key={i}>{p}</li>)}
+                </ol>
+              </Bloque>
+              <Bloque titulo={`Para reflexionar — ${def.etq}`} icono="fa-circle-question">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {PREGUNTAS[modo].map((q, i) => <li key={i}>{q}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Ejemplo resuelto (A2)" icono="fa-square-root-variable">
+                <p style={{ margin: 0, color: T.text2 }}>{EJEMPLO.enunciado}</p>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                  {EJEMPLO.datos.map((d, i) => (
+                    <span key={i} style={{ fontSize: 14, fontWeight: 800, color: "#fff", padding: "4px 9px", borderRadius: 8, background: "rgba(4,10,22,0.5)", border: `1px solid ${T.line}` }}>{d}</span>
+                  ))}
+                </div>
+                <p style={{ margin: 0, color: T.text2 }}>{EJEMPLO.solucion}</p>
+                <div style={{ padding: "10px 12px", borderRadius: 10, border: `1px solid ${accent}44`, background: `rgba(${color.rgba},0.08)`, fontWeight: 800, color: "#86efac" }}>
+                  <i className="fa-solid fa-flag-checkered" style={{ marginRight: 7, color: accent }} aria-hidden />{EJEMPLO.resultado}
+                </div>
+              </Bloque>
+              <Bloque titulo="Simbología química" icono="fa-icons">
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr><th style={th}>Símbolo</th><th style={th}>Nombre</th><th style={th}>Significado</th></tr>
                   </thead>
                   <tbody>
                     {SIMBOLOS.map((s) => (
                       <tr key={s.nombre}>
-                        <td style={{ color: s.color, fontWeight: 900, fontFamily: "ui-monospace, monospace" }}>{s.simbolo}</td>
-                        <td style={{ color: "#fff", fontWeight: 700 }}>{s.nombre}</td>
-                        <td style={{ color: T.text2 }}>{s.significado}</td>
+                        <td style={{ ...td, color: s.color, fontWeight: 900, fontFamily: "ui-monospace, monospace" }}>{s.simbolo}</td>
+                        <td style={{ ...td, color: "#fff", fontWeight: 700 }}>{s.nombre}</td>
+                        <td style={{ ...td, color: T.text2 }}>{s.significado}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
-              </div>
-            ) : (
-              <>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 7 }}>
-                  <span style={{ fontSize: 11, fontWeight: 900, letterSpacing: "0.1em", color: T.text3 }}>FASE</span>
-                  <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{idx + 1} / {totalFases}</span>
-                </div>
-                <input type="range" min={0} max={total} value={idx} onChange={(e) => { setPlaying(false); setPaso(Number(e.target.value)); }} className="eq-range" style={{ ["--eqc" as string]: modoCol, marginBottom: 14 }} />
-                <div className="eq-phases" style={{ marginBottom: 4 }}>
-                  {nombresFase.map((nom, i) => {
-                    const on = i === idx;
-                    const visto = i < idx;
-                    return (
-                      <button
-                        key={nom}
-                        className="eq-phase"
-                        onClick={() => { setPlaying(false); setPaso(i); }}
-                        style={{
-                          borderColor: on ? modoCol : visto ? `${modoCol}55` : "rgba(255,255,255,0.12)",
-                          background: on ? `${modoCol}22` : "transparent",
-                          color: on ? "#fff" : visto ? "#cdd8ec" : T.text3,
-                        }}
-                      >
-                        {nom}
-                      </button>
-                    );
-                  })}
-                </div>
-              </>
-            )}
-          </div>
-
-          {/* Calculadora de la actividad A2 */}
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <Eyebrow><i className="fa-solid fa-calculator" style={{ marginRight: 8, color: accent }} />Calculadora — conteo de átomos y balance</Eyebrow>
-
-            <label style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 14 }}>
-              <span style={{ fontSize: 11, color: T.text3, fontWeight: 700 }}>Reacción química</span>
-              <select className="eq-sel" value={reaccionId} onChange={(e) => { setReaccionId(e.target.value); setPaso(0); bump(); }} style={{ ["--eqc" as string]: accent }}>
-                {REACCIONES.map((r) => (
-                  <option key={r.id} value={r.id}>{r.nombre}</option>
+              </Bloque>
+              <Bloque titulo="Datos de las reacciones químicas" icono="fa-magnifying-glass-chart">
+                {DATOS.map((dd, i) => (
+                  <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                    <i className={`fa-solid ${dd.icono}`} style={{ color: accent, marginTop: 4 }} aria-hidden />
+                    <div>
+                      <strong style={{ fontFamily: "ui-monospace, monospace" }}>{dd.valor}</strong>
+                      <div style={{ color: T.text2 }}>{dd.texto}</div>
+                    </div>
+                  </div>
                 ))}
-              </select>
-            </label>
-
-            <div style={{ padding: "9px 12px", borderRadius: 10, border: `1px solid ${accent}44`, background: `rgba(${color.rgba},0.08)`, fontSize: 12.5, color: "#eaf0fb", lineHeight: 1.45, marginBottom: 14, fontFamily: "ui-monospace, monospace", fontWeight: 800 }}>
-              <i className="fa-solid fa-flask" style={{ marginRight: 7, color: accent }} />{reaccion.ecuacion}
-            </div>
-
-            {/* Tipo / reversibilidad / moléculas */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
-              <div style={{ padding: "10px 13px", borderRadius: 10, border: `1px solid ${accent}44`, background: `rgba(${color.rgba},0.07)` }}>
-                <div style={{ fontSize: 10.5, fontWeight: 900, color: accent, marginBottom: 4 }}><i className="fa-solid fa-tag" style={{ marginRight: 6 }} />TIPO</div>
-                <div style={{ fontSize: 12, color: "#fff", fontWeight: 800 }}>{reaccion.tipo}</div>
-              </div>
-              <div style={{ padding: "10px 13px", borderRadius: 10, border: "1px solid #a78bfa44", background: "rgba(167,139,250,0.08)" }}>
-                <div style={{ fontSize: 10.5, fontWeight: 900, color: "#a78bfa", marginBottom: 4 }}><i className="fa-solid fa-arrows-left-right" style={{ marginRight: 6 }} />FLECHA</div>
-                <div style={{ fontSize: 12, color: "#fff", fontWeight: 800 }}>{reaccion.reversible ? "⇌ reversible" : "→ irreversible"}</div>
-              </div>
-            </div>
-
-            {/* Tabla de conteo de átomos */}
-            <div style={{ fontSize: 11, fontWeight: 900, letterSpacing: "0.06em", color: accent, margin: "4px 0 8px" }}>
-              <i className="fa-solid fa-scale-balanced" style={{ marginRight: 7 }} />ÁTOMOS POR ELEMENTO (coef × subíndice)
-            </div>
-            <table className="eq-cmp">
-              <thead>
-                <tr>
-                  <th>Elemento</th>
-                  <th style={{ color: "#38bdf8", textAlign: "right" }}>Reactivos</th>
-                  <th style={{ color: "#34d399", textAlign: "right" }}>Productos</th>
-                  <th style={{ textAlign: "center" }}>¿Igual?</th>
-                </tr>
-              </thead>
-              <tbody>
-                {conteo.elementos.map((el) => {
-                  const nr = conteo.reactivos[el] ?? 0;
-                  const np = conteo.productos[el] ?? 0;
-                  const ok = nr === np;
-                  return (
-                    <tr key={el}>
-                      <td style={{ color: "#fff", fontWeight: 900 }}>{el}</td>
-                      <td style={{ color: "#fff", textAlign: "right", fontFamily: "ui-monospace, monospace" }}>{nr}</td>
-                      <td style={{ color: "#fff", textAlign: "right", fontFamily: "ui-monospace, monospace" }}>{np}</td>
-                      <td style={{ textAlign: "center", color: ok ? "#34d399" : "#ef4444", fontWeight: 900 }}>{ok ? "✓" : "✗"}</td>
-                    </tr>
-                  );
-                })}
-                <tr>
-                  <td style={{ color: T.text2, fontWeight: 900 }}>Total átomos</td>
-                  <td style={{ color: "#38bdf8", textAlign: "right", fontWeight: 900, fontFamily: "ui-monospace, monospace" }}>{conteo.totalReactivos}</td>
-                  <td style={{ color: "#34d399", textAlign: "right", fontWeight: 900, fontFamily: "ui-monospace, monospace" }}>{conteo.totalProductos}</td>
-                  <td style={{ textAlign: "center", color: conteo.balanceada ? "#34d399" : "#ef4444", fontWeight: 900 }}>{conteo.balanceada ? "✓" : "✗"}</td>
-                </tr>
-              </tbody>
-            </table>
-
-            <div style={{ marginTop: 12, padding: "10px 12px", borderRadius: 10, border: `1px solid ${conteo.balanceada ? "#34d399" : "#ef4444"}55`, background: conteo.balanceada ? "rgba(52,211,153,0.08)" : "rgba(239,68,68,0.08)", fontSize: 12, color: "#fff", lineHeight: 1.5, fontWeight: 700 }}>
-              <i className={`fa-solid ${conteo.balanceada ? "fa-circle-check" : "fa-circle-xmark"}`} style={{ marginRight: 7, color: conteo.balanceada ? "#34d399" : "#ef4444" }} />
-              {conteo.balanceada
-                ? `La materia se conserva: cada elemento tiene los mismos átomos en ambos lados. La ecuación está balanceada (${moles.reactivos} moléculas de reactivo → ${moles.productos} de producto).`
-                : "Los átomos no coinciden en ambos lados: la ecuación aún no está balanceada."}
-            </div>
-
-            <div style={{ marginTop: 10, padding: "9px 12px", borderRadius: 10, border: `1px solid ${accent}44`, background: `rgba(${color.rgba},0.08)`, fontSize: 11.5, color: "#eaf0fb", lineHeight: 1.45 }}>
-              <i className="fa-solid fa-location-dot" style={{ marginRight: 7, color: accent }} />{reaccion.contexto}
-            </div>
-          </div>
-        </div>
-
-        {/* ── Columna lateral ────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          {/* Descripción del laboratorio */}
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-flask-vial" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>El visor de la reacción química</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          {/* Para reflexionar */}
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #7dd3fc55", background: "rgba(125,211,252,0.07)" }}>
-            <Eyebrow><i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: "#7dd3fc" }} />Para reflexionar — {def.etq}</Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {PREGUNTAS[modo].map((q, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>{q}</li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Ejemplo resuelto (A2) */}
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow><i className="fa-solid fa-square-root-variable" style={{ marginRight: 8, color: accent }} />Ejemplo resuelto (A2)</Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55, marginBottom: 10 }}>{EJEMPLO.enunciado}</div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }}>
-              {EJEMPLO.datos.map((d, i) => (
-                <span key={i} style={{ fontSize: 11, fontWeight: 800, color: "#fff", padding: "4px 9px", borderRadius: 8, background: "rgba(4,10,22,0.5)", border: `1px solid ${T.line}` }}>{d}</span>
-              ))}
-            </div>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55, marginBottom: 10 }}>{EJEMPLO.solucion}</div>
-            <div style={{ padding: "10px 12px", borderRadius: 10, border: `1px solid ${accent}44`, background: `rgba(${color.rgba},0.08)`, fontSize: 12, fontWeight: 800, color: "#86efac" }}>
-              <i className="fa-solid fa-flag-checkered" style={{ marginRight: 7, color: accent }} />{EJEMPLO.resultado}
-            </div>
-          </div>
-
-          {/* Cómo usar */}
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow><i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />Cómo usar el laboratorio</Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES[modo].map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Datos + ideas clave ────────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="eq-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow><i className="fa-solid fa-magnifying-glass-chart" style={{ marginRight: 8, color: accent }} />Datos de las reacciones químicas</Eyebrow>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
-            {DATOS.map((dd, i) => (
-              <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "10px 12px", borderRadius: 10, background: T.glass, border: `1px solid ${T.line}` }}>
-                <div style={{ width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: accent, background: `rgba(${color.rgba},0.16)`, flexShrink: 0 }}>
-                  <i className={`fa-solid ${dd.icono}`} />
-                </div>
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{dd.valor}</div>
-                  <div style={{ fontSize: 11, color: T.text2, lineHeight: 1.4 }}>{dd.texto}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Contexto mexicano */}
-          <div style={{ marginTop: 16, padding: "14px 16px", borderRadius: 12, border: `1px solid ${accent}33`, background: `rgba(${color.rgba},0.07)` }}>
-            <Eyebrow><i className="fa-solid fa-location-dot" style={{ marginRight: 8, color: accent }} />México: estufas, maíz, fertilizantes y antiácidos</Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{CONTEXTO}</div>
-          </div>
-
-          {/* ¿Sabías que? */}
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow><i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />¿Sabías que?</Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {HECHOS.map((h, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{h}</li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Glosario */}
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow><i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />Glosario</Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {GLOSARIO.map((g, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{g.termino}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{g.definicion}</span>
-                  <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.4, marginTop: 4 }}><i className="fa-solid fa-flask" style={{ marginRight: 6, color: accent }} />{g.ejemplo}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow><i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />Ideas clave</Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-            {IDEAS.map((x, i) => (
-              <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>{x}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      {/* nota de honestidad del modelo */}
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          Las fórmulas, los coeficientes y el conteo de átomos por elemento que muestra la calculadora son <strong>exactos</strong> (todas las reacciones del catálogo están balanceadas). El modelo 3D es <strong>esquemático</strong> (no a escala): cada esfera representa un átomo y cada molécula es un grupo de esferas, sin reflejar los ángulos ni las distancias reales de enlace. Fuente: {FUENTE}
-        </span>
-      </div>
-
-      {/* ── Objetivos ──────────────────────────────────────────────── */}
-      <div style={{ ...card, padding: "18px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-          Objetivos
-        </Eyebrow>
-        <TableroObjetivos
-          retoKey={RETO_KEY}
-          accent={accent}
-          objetivos={[
-            { txt: "Identifica reactivos, flecha y productos en la anatomía de la ecuación", done: modo === "anatomia" },
-            { txt: "Verifica la conservación de la materia contando átomos a ambos lados", done: modo === "conservacion" },
-            { txt: "Distingue coeficiente (número grande) de subíndice (número pequeño)", done: modo === "simbologia" },
-            { txt: "Recorre la reacción paso a paso", done: paso > 0 },
-            { txt: "Compara con otra reacción además de la combustión del metano", done: reaccionId !== "combustion-metano" },
-            { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
-          ]}
-        />
-      </div>
-
-      {/* ── Reto evaluable: el ejercicio verbatim del ancla A2 ─────── */}
-      <RetoNumericoCard
-        reto={RETO_A2}
-        accent={accent}
-        aprobado={ejercicioAprobado}
-        onAprobado={() => setEjercicioAprobado(true)}
-        playSfx={
-          sonido
-            ? (ok) => {
-                if (ok) audioRef.current?.correcto();
-                else audioRef.current?.incorrecto();
-              }
-            : undefined
-        }
-      />
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <div className="eq-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="eq-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="eq-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="eq-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="eq-drawer-body">
-          <FichaTeorica data={ESTRUCTURA_REACCION_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+              </Bloque>
+              <Bloque titulo="México: estufas, maíz, fertilizantes y antiácidos" icono="fa-location-dot">
+                <p style={{ margin: 0, color: T.text2 }}>{CONTEXTO}</p>
+              </Bloque>
+              <Bloque titulo="¿Sabías que?" icono="fa-circle-question">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {HECHOS.map((h, i) => <li key={i}>{h}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {IDEAS.map((x, i) => <li key={i}>{x}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Glosario" icono="fa-book">
+                {GLOSARIO.map((g, i) => (
+                  <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
+                    <span style={{ fontWeight: 900, color: accent }}>{g.termino}. </span>
+                    <span style={{ color: T.text2 }}>{g.definicion}</span>
+                    <div style={{ color: T.text3, marginTop: 4 }}><i className="fa-solid fa-flask" style={{ marginRight: 6, color: accent }} aria-hidden />{g.ejemplo}</div>
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book-open">
+                <FichaTeorica data={ESTRUCTURA_REACCION_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ marginTop: 18, fontSize: 14, color: T.text3 }}>
+                Las fórmulas, los coeficientes originales y el conteo de átomos por elemento son <strong>exactos</strong> (todas las reacciones del catálogo vienen balanceadas). Al mover un coeficiente la ecuación puede dejar de estarlo: es justo lo que se quiere ver. El modelo 3D es <strong>esquemático</strong> (no a escala): cada esfera representa un átomo y cada molécula es un grupo de esferas, sin reflejar los ángulos ni las distancias reales de enlace. Fuente: {FUENTE}
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }

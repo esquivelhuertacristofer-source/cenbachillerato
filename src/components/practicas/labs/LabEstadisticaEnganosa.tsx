@@ -19,7 +19,8 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, NUM, OK, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { T, NUM, OK, card, Eyebrow, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { LabSfx } from "./lab-audio";
@@ -86,7 +87,7 @@ const EnganosaScene = dynamic(() => import("./EstadisticaEnganosaScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-magnifying-glass-chart fa-fade" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Cargando las gráficas en 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Cargando las gráficas en 3D…</span>
     </div>
   ),
 });
@@ -164,8 +165,8 @@ function CambiosCard({
   };
 
   const campo = (etq: string, val: string, set: (v: string) => void, unidad: string) => (
-    <label style={{ display: "flex", flexDirection: "column", gap: 6, flex: "1 1 180px" }}>
-      <span style={{ fontSize: 11, fontWeight: 800, color: T.text3, letterSpacing: "0.04em" }}>{etq}</span>
+    <label style={{ display: "flex", flexDirection: "column", gap: 6, flex: "1 1 160px", minWidth: 0 }}>
+      <span style={{ fontSize: 14, fontWeight: 800, color: T.text3, letterSpacing: "0.04em" }}>{etq}</span>
       <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <input
           aria-label={etq}
@@ -178,22 +179,22 @@ function CambiosCard({
           }}
           style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: `1px solid ${T.lineStrong}`, background: "rgba(4,10,22,0.6)", color: "#fff", fontSize: 15, fontWeight: 800, ...NUM }}
         />
-        <span style={{ fontSize: 12, color: T.text2, fontWeight: 800, whiteSpace: "nowrap" }}>{unidad}</span>
+        <span style={{ fontSize: 14, color: T.text2, fontWeight: 800, whiteSpace: "nowrap" }}>{unidad}</span>
       </span>
     </label>
   );
 
   return (
-    <div style={{ ...card, padding: "20px 24px 22px", marginTop: 22 }}>
+    <div style={{ ...card, padding: "14px", marginTop: 0 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 12, flexWrap: "wrap" }}>
         <Eyebrow>
           <i className="fa-solid fa-star" style={{ marginRight: 8, color: accent }} />
           Calcula los dos cambios del titular
         </Eyebrow>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 10.5, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
           {[1, 2, 3].map((k) => (
-            <i key={k} className="fa-solid fa-star" style={{ fontSize: 13, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
+            <i key={k} className="fa-solid fa-star" style={{ fontSize: 14, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
           ))}
         </div>
       </div>
@@ -206,19 +207,19 @@ function CambiosCard({
       </div>
       <div style={{ display: "flex", gap: 10, marginTop: 12, flexWrap: "wrap" }}>
         {resuelto === null ? (
-          <button onClick={comprobar} style={{ cursor: "pointer", padding: "10px 16px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 12.5, fontWeight: 900 }}>
+          <button onClick={comprobar} style={{ cursor: "pointer", padding: "10px 16px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 14, fontWeight: 900 }}>
             <i className="fa-solid fa-check" style={{ marginRight: 8 }} />
             Comprobar cambios
           </button>
         ) : (
-          <button onClick={otro} style={{ cursor: "pointer", padding: "10px 16px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 12.5, fontWeight: 900 }}>
+          <button onClick={otro} style={{ cursor: "pointer", padding: "10px 16px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.16)`, color: "#fff", fontSize: 14, fontWeight: 900 }}>
             <i className="fa-solid fa-forward" style={{ marginRight: 8 }} />
             Otro titular
           </button>
         )}
       </div>
       {aviso && (
-        <div style={{ marginTop: 12, fontSize: 12, color: "#FF8A3C", lineHeight: 1.5 }}>
+        <div style={{ marginTop: 12, fontSize: 14, color: "#FF8A3C", lineHeight: 1.5 }}>
           <i className="fa-solid fa-rotate-left" style={{ marginRight: 7 }} />
           {aviso} {intentos > 0 ? `Intento ${intentos}.` : ""}
         </div>
@@ -229,9 +230,9 @@ function CambiosCard({
             {[1, 2, 3].map((k) => (
               <i key={k} className="fa-solid fa-star" style={{ fontSize: 15, color: k <= resuelto ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
             ))}
-            <span style={{ fontSize: 12.5, fontWeight: 900, color: OK, marginLeft: 4 }}>{intentos === 1 ? "Al primer intento" : `En ${intentos} intentos`}</span>
+            <span style={{ fontSize: 14, fontWeight: 900, color: OK, marginLeft: 4 }}>{intentos === 1 ? "Al primer intento" : `En ${intentos} intentos`}</span>
           </div>
-          <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.6, fontFamily: "ui-monospace, monospace", ...NUM }}>
+          <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.6, fontFamily: "ui-monospace, monospace", ...NUM }}>
             {num(caso.b, 1)} − {num(caso.a, 1)} = {conSigno(real.puntos, 1)} puntos · {conSigno(real.puntos, 1)} ÷ {num(caso.a, 1)} = {conSigno(real.porcentaje, 1)} %
           </div>
         </div>
@@ -272,11 +273,11 @@ export function LabEstadisticaEnganosa({ color }: PracticaLabProps) {
   // Comunes
   const [resetNonce, setResetNonce] = useState(0);
   const [quizAprobado, setQuizAprobado] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
 
   // Logros pegajosos
+  const [movioEje, setMovioEje] = useState(false);
   const [ejeACero, setEjeACero] = useState(false);
   const [vioVolumen, setVioVolumen] = useState(false);
   const [vioLog, setVioLog] = useState(false);
@@ -338,6 +339,7 @@ export function LabEstadisticaEnganosa({ color }: PracticaLabProps) {
     blip();
   };
   const ponerEje = (v: number) => {
+    if (v !== ejeMin) setMovioEje(true);
     setEjeMin(v);
     if (v === 0) setEjeACero(true);
   };
@@ -386,6 +388,7 @@ export function LabEstadisticaEnganosa({ color }: PracticaLabProps) {
 
   /* ── Objetivos ─────────────────────────────────────────────────────── */
   const objetivos: { t: string; done: boolean }[] = [
+    { t: "Arrastra el deslizador del eje y mira cómo cambia la altura de las barras", done: movioEje },
     { t: "Llevar el eje de una gráfica truncada a cero", done: ejeACero },
     { t: "Escalar un ícono en sus tres dimensiones", done: vioVolumen },
     { t: "Pasar las curvas a escala logarítmica", done: vioLog },
@@ -504,14 +507,14 @@ export function LabEstadisticaEnganosa({ color }: PracticaLabProps) {
         <i className={`fa-solid ${VISTAS_DEF[vista].icono}`} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{VISTAS_DEF[vista].etq}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los cálculos siguen aquí. {pie}</div>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>Tu equipo no puede mostrar la escena en 3D, pero los cálculos siguen aquí. {pie}</div>
     </div>
   );
 
-  const sub = (txt: string) => <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
+  const sub = (txt: string) => <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>{txt}</div>;
 
   const chip = (col: string, txt: ReactNode) => (
-    <span key={String(txt)} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 9px", borderRadius: 999, background: "rgba(4,10,22,0.72)", border: `1px solid ${T.line}`, fontSize: 11, fontWeight: 800, color: "#e2e8f0", whiteSpace: "nowrap" }}>
+    <span key={String(txt)} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 9px", borderRadius: 999, background: "rgba(4,10,22,0.72)", border: `1px solid ${T.line}`, fontSize: 14, fontWeight: 800, color: "#e2e8f0", whiteSpace: "nowrap" }}>
       <span style={{ width: 9, height: 9, borderRadius: 3, background: col }} />
       {txt}
     </span>
@@ -555,26 +558,22 @@ export function LabEstadisticaEnganosa({ color }: PracticaLabProps) {
       <i className="fa-solid fa-newspaper" style={{ color: modoCol, marginTop: 3 }} />
       <div style={{ minWidth: 0 }}>
         <div style={{ fontSize: 14, color: "#fff", fontWeight: 900, fontStyle: "italic" }}>{txt}</div>
-        <div style={{ fontSize: 10.5, color: T.text3, marginTop: 3 }}>Titular de ejemplo · datos: {fuente}</div>
+        <div style={{ fontSize: 14, color: T.text3, marginTop: 3 }}>Titular de ejemplo · datos: {fuente}</div>
       </div>
     </div>
   );
 
   const lecturas = (children: ReactNode, nota?: ReactNode) => (
     <div style={{ marginTop: 14, padding: "10px 12px", borderRadius: 12, border: `1px solid ${modoCol}55`, background: `${modoCol}12` }}>
-      <div style={{ display: "flex", flexWrap: "wrap" }}>{children}</div>
-      {nota && <div style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.55, textAlign: "center" }}>{nota}</div>}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>{children}</div>
+      {nota && <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55, textAlign: "center" }}>{nota}</div>}
     </div>
   );
 
   const deslizador = (etq: string, valor: number, min: number, max: number, paso: number, onCambio: (v: number) => void, fmt: string) => (
-    <label style={{ display: "block", marginTop: 12 }}>
-      <span style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: T.text2, fontWeight: 800, marginBottom: 6 }}>
-        <span>{etq}</span>
-        <span style={{ color: "#fff", ...NUM }}>{fmt}</span>
-      </span>
-      <input type="range" aria-label={etq} className="ee-range" min={min} max={max} step={paso} value={valor} onChange={(e) => onCambio(Number(e.target.value))} style={{ ["--eec" as string]: modoCol }} />
-    </label>
+    <div style={{ marginTop: 12 }}>
+      <Deslizador label={etq} colr={modoCol} valor={fmt} min={min} max={max} step={paso} value={valor} onChange={onCambio} />
+    </div>
   );
 
   /* ── Panel de la vista ─────────────────────────────────────────────── */
@@ -609,16 +608,16 @@ export function LabEstadisticaEnganosa({ color }: PracticaLabProps) {
           </div>
           {lecturas(
             <>
-              <Readout label="Cambio real" value={`${conSigno(lb.cambioReal, 1)} %`} col={accent} size={17} />
-              <Readout label="Altura B ÷ A" value={`×${num(lb.razonVisual, 2)}`} size={17} />
-              <Readout label="Exageración" value={`×${num(lb.exageracion, 1)}`} size={17} col={lb.exageracion > 1.5 ? BAJA : SUBE} />
+              <Dato label="Cambio real" value={`${conSigno(lb.cambioReal, 1)} %`} col={accent} />
+              <Dato label="Altura B ÷ A" value={`×${num(lb.razonVisual, 2)}`} />
+              <Dato label="Exageración" value={`×${num(lb.exageracion, 1)}`} col={lb.exageracion > 1.5 ? BAJA : SUBE} />
             </>,
             <>
               Cambio real = ({num(casoBarras.b.v, casoBarras.dec)} − {num(casoBarras.a.v, casoBarras.dec)}) ÷ {num(casoBarras.a.v, casoBarras.dec)}. La altura solo cuenta la verdad si el eje empieza en cero.
             </>,
           )}
           {casoBarras.id === "pib" && ejeMin === casoBarras.ejeTruncado && (
-            <div style={{ marginTop: 10, fontSize: 11.5, color: T.text3, lineHeight: 1.5 }}>
+            <div style={{ marginTop: 10, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
               <i className="fa-solid fa-ruler" style={{ marginRight: 6, color: modoCol }} />
               La infografía dice que la barra final «parece el doble de alta»; medida con el eje desde $9,700 mide 5 veces la inicial.
             </div>
@@ -642,8 +641,8 @@ export function LabEstadisticaEnganosa({ color }: PracticaLabProps) {
           )}
           {lecturas(
             <>
-              <Readout label="El dato creció" value={`×${num(iv.razonDato, 2)}`} col={accent} size={17} />
-              <Readout label="Lo que se ve" value={`×${num(iv.razonVisible, iv.razonVisible < 10 ? 2 : 0)}`} size={17} col={escalado === "tres" && iv.razonDato > 1.2 ? BAJA : undefined} />
+              <Dato label="El dato creció" value={`×${num(iv.razonDato, 2)}`} col={accent} />
+              <Dato label="Lo que se ve" value={`×${num(iv.razonVisible, iv.razonVisible < 10 ? 2 : 0)}`} col={escalado === "tres" && iv.razonDato > 1.2 ? BAJA : undefined} />
             </>,
             escalado === "tres" ? `Lado ×${num(iv.razonDato, 2)} → volumen ×${num(iv.razonDato, 2)}³ = ×${num(iv.razonVisible, iv.razonVisible < 10 ? 2 : 0)}.` : "Crecer solo a lo alto conserva la proporción del dato.",
           )}
@@ -664,12 +663,12 @@ export function LabEstadisticaEnganosa({ color }: PracticaLabProps) {
           {lecturas(
             <>
               {CURVAS.map((c) => (
-                <Readout key={c.id} label={`${c.etq.split(":")[0]} · día ${DIAS}`} value={num(casos(c, DIAS))} col={c.color} size={17} />
+                <Dato key={c.id} label={`${c.etq.split(":")[0]} · día ${DIAS}`} value={num(casos(c, DIAS))} col={c.color} />
               ))}
             </>,
             log ? "Cada marca vale 10 veces la anterior. Una recta en escala logarítmica es crecimiento exponencial, no lineal." : "Cada marca suma 50 000. Aquí no se distingue qué país crecía más rápido en las primeras semanas.",
           )}
-          <div style={{ marginTop: 10, fontSize: 11.5, color: T.text3, lineHeight: 1.5 }}>
+          <div style={{ marginTop: 10, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
             <i className="fa-solid fa-tag" style={{ marginRight: 6, color: modoCol }} />
             La escala logarítmica no engaña por sí misma: engaña cuando no se etiqueta.
           </div>
@@ -684,15 +683,15 @@ export function LabEstadisticaEnganosa({ color }: PracticaLabProps) {
           {titular(casoPuntos.titular, casoPuntos.fuente)}
           {lecturas(
             <>
-              <Readout label="Diferencia" value={`${conSigno(cp.puntos, decP)}`} unit={casoPuntos.unidad === "%" ? "pts" : ""} col={accent} size={17} />
-              <Readout label="Porcentaje de cambio" value={`${conSigno(cp.porcentaje, 1)} %`} size={17} />
+              <Dato label="Diferencia" value={`${conSigno(cp.puntos, decP)}${casoPuntos.unidad === "%" ? " pts" : ""}`} col={accent} />
+              <Dato label="Porcentaje de cambio" value={`${conSigno(cp.porcentaje, 1)} %`} />
             </>,
             <span style={{ fontFamily: "ui-monospace, monospace" }}>
               {num(casoPuntos.b, decP)} − {num(casoPuntos.a, decP)} = {conSigno(cp.puntos, decP)} · {conSigno(cp.puntos, decP)} ÷ {num(casoPuntos.a, decP)} = {conSigno(cp.porcentaje, 1)} %
             </span>,
           )}
           {casoPuntos.id === "homicidios" && (
-            <div style={{ marginTop: 10, fontSize: 11.5, color: T.text3, lineHeight: 1.5 }}>
+            <div style={{ marginTop: 10, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
               <i className="fa-solid fa-circle-info" style={{ marginRight: 6, color: modoCol }} />
               Esta tasa no es un porcentaje: la diferencia se mide en homicidios por cada 100 000 habitantes. Es el caso de la actividad de la infografía A1.
             </div>
@@ -708,9 +707,9 @@ export function LabEstadisticaEnganosa({ color }: PracticaLabProps) {
           {titular(casoRiesgo.titular, casoRiesgo.fuente)}
           {lecturas(
             <>
-              <Readout label="Riesgo relativo" value={`${conSigno(lr.relativo, 0)} %`} col={accent} size={17} />
-              <Readout label="Antes" value={pctFino(casoRiesgo.antes)} size={15} />
-              <Readout label="Después" value={pctFino(casoRiesgo.despues)} size={15} />
+              <Dato label="Riesgo relativo" value={`${conSigno(lr.relativo, 0)} %`} col={accent} />
+              <Dato label="Antes" value={pctFino(casoRiesgo.antes)} />
+              <Dato label="Después" value={pctFino(casoRiesgo.despues)} />
             </>,
             `Riesgo absoluto: ${pctFino(casoRiesgo.antes)} → ${pctFino(casoRiesgo.despues)}, una diferencia de ${num(Math.abs(lr.casosDespues - lr.casosAntes))} ${Math.abs(lr.casosDespues - lr.casosAntes) === 1 ? "caso" : "casos"} por cada ${num(lr.personas)} personas.`,
           )}
@@ -724,14 +723,14 @@ export function LabEstadisticaEnganosa({ color }: PracticaLabProps) {
           {deslizador("Aumento del presupuesto de seguridad", pctSeguridad, 0, PCT_SEGURIDAD_MAX, 0.5, moverSeguridad, `${num(pctSeguridad, 1)} %`)}
           {lecturas(
             <>
-              <Readout label="Salud +20 %" value={`$${num(aSalud)} M`} col={BASES.salud.color} size={16} />
-              <Readout label={`Seguridad +${num(pctSeguridad, 1)} %`} value={`$${num(aSeg)} M`} col={BASES.seguridad.color} size={16} />
+              <Dato label="Salud +20 %" value={`$${num(aSalud)} M`} col={BASES.salud.color} />
+              <Dato label={`Seguridad +${num(pctSeguridad, 1)} %`} value={`$${num(aSeg)} M`} col={BASES.seguridad.color} />
             </>,
             <span style={{ fontFamily: "ui-monospace, monospace" }}>
               100 000 × 0.20 = 20 000 · 400 000 × {num(pctSeguridad / 100, 3)} = {num(aSeg)}
             </span>,
           )}
-          <div style={{ marginTop: 12, padding: "10px 12px", borderRadius: 11, border: "1px solid #fbbf2455", background: "rgba(251,191,36,0.07)", fontSize: 11.5, color: T.text2, lineHeight: 1.55 }}>
+          <div style={{ marginTop: 12, padding: "10px 12px", borderRadius: 11, border: "1px solid #fbbf2455", background: "rgba(251,191,36,0.07)", fontSize: 14, color: T.text2, lineHeight: 1.55 }}>
             <i className="fa-solid fa-pen-ruler" style={{ marginRight: 7, color: "#fbbf24" }} />
             <strong style={{ color: "#fff" }}>Nota del laboratorio. </strong>
             {NOTA_BASES}
@@ -745,13 +744,13 @@ export function LabEstadisticaEnganosa({ color }: PracticaLabProps) {
           {deslizador("Ingreso mensual del hogar más rico", ricoMayor, RICO_MIN, RICO_MAX, 1000, moverRico, `$${num(ricoMayor)}`)}
           {lecturas(
             <>
-              <Readout label="Media" value={`$${num(med)}`} col={accent} size={16} />
-              <Readout label="Mediana" value={`$${num(mdn)}`} col={modoCol} size={16} />
-              <Readout label="10 % más rico" value={`${num(top10 * 100, 1)} %`} size={16} />
+              <Dato label="Media" value={`$${num(med)}`} col={accent} />
+              <Dato label="Mediana" value={`$${num(mdn)}`} col={modoCol} />
+              <Dato label="10 % más rico" value={`${num(top10 * 100, 1)} %`} />
             </>,
             `Media = suma de los 20 ingresos ÷ 20. Mediana = promedio de los hogares 10.º y 11.º al ordenarlos. ${bajoMedia} hogares quedan bajo la media.`,
           )}
-          <div style={{ marginTop: 10, fontSize: 11.5, color: T.text3, lineHeight: 1.5 }}>
+          <div style={{ marginTop: 10, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
             <i className="fa-solid fa-circle-info" style={{ marginRight: 6, color: modoCol }} />
             Con el valor inicial, los dos hogares más ricos concentran el 36.5 % del ingreso, la cifra de la ENIGH 2022 que cita la infografía A1.
           </div>
@@ -772,12 +771,12 @@ export function LabEstadisticaEnganosa({ color }: PracticaLabProps) {
           </div>
           {lecturas(
             <>
-              <Readout label="Margen de error" value={`±${num(me, 1)}`} unit="pts" col={accent} size={17} />
-              <Readout label="Veredicto" value={empate ? "Empate" : "A adelante"} col={empate ? BAJA : SUBE} size={17} />
+              <Dato label="Margen de error" value={`±${num(me, 1)} pts`} col={accent} />
+              <Dato label="Veredicto" value={empate ? "Empate" : "A adelante"} col={empate ? BAJA : SUBE} />
             </>,
             <span style={{ fontFamily: "ui-monospace, monospace" }}>ME = 1.96 · √(0.25 / {num(nEncuesta)}) × 100 = ±{num(me, 2)}</span>,
           )}
-          <div style={{ marginTop: 10, fontSize: 11.5, color: T.text3, lineHeight: 1.5, ...NUM }}>
+          <div style={{ marginTop: 10, fontSize: 14, color: T.text3, lineHeight: 1.5, ...NUM }}>
             <i className="fa-solid fa-circle-info" style={{ marginRight: 6, color: modoCol }} />
             Con n ≈ 1 000 el margen es de ±3 puntos, como en las encuestas de la infografía. Para que 2 puntos de ventaja no se toquen hacen falta al menos {num(N_ROMPE_EMPATE)} personas.
           </div>
@@ -786,363 +785,207 @@ export function LabEstadisticaEnganosa({ color }: PracticaLabProps) {
       break;
   }
 
-  return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes eePulse { 0%,100%{ box-shadow:0 0 0 0 var(--eed); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .ee-live-dot { animation: eePulse 1.6s ease-in-out infinite; }
-        @media (prefers-reduced-motion: reduce){ .ee-live-dot { animation:none; } }
-        .ee-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .ee-grid { grid-template-columns: 1fr; } }
-        .ee-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .ee-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .ee-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .ee-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .ee-tab { cursor:pointer; border:1px solid var(--eec); border-radius:12px; padding:11px 8px; text-align:center;
-          background:transparent; transition:all .15s; color:#fff; }
-        .ee-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
-        .ee-tab:hover { background:rgba(255,255,255,0.06); }
-        .ee-vtabs { display:flex; flex-wrap:wrap; gap:6px; padding:4px; border-radius:12px; background:rgba(4,10,22,0.5); border:1px solid ${T.line}; }
-        .ee-vtab { cursor:pointer; flex:1 1 120px; border:none; border-radius:9px; padding:9px 10px; font-size:12px; font-weight:900;
-          color:rgba(255,255,255,0.62); background:transparent; transition:all .15s; }
-        .ee-vtab[data-on="true"] { color:#fff; background:var(--eec); color:#04121f; }
+  const CSS_EE = `
+        .ee-vtabs { display:flex; flex-wrap:wrap; gap:6px; padding:4px; border-radius:12px; background:rgba(4,10,22,0.5); border:1px solid ${T.line}; margin-bottom:6px; }
+        .ee-vtab { cursor:pointer; flex:1 1 130px; border:none; border-radius:9px; padding:10px; font-size:14px; font-weight:900;
+          color:rgba(255,255,255,0.7); background:transparent; transition:all .15s; }
+        .ee-vtab[data-on="true"] { background:var(--eec); color:#04121f; }
         .ee-vtab:hover:not([data-on="true"]) { background:rgba(255,255,255,0.07); }
-        .ee-opts { display:flex; flex-wrap:wrap; gap:7px; }
-        .ee-opt { cursor:pointer; border:1px solid var(--eec); border-radius:10px; padding:9px 12px; font-size:12px;
-          font-weight:800; color:#fff; background:transparent; transition:all .15s; }
-        .ee-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.66); }
+        .ee-opts { display:flex; flex-wrap:wrap; gap:8px; }
+        .ee-opt { cursor:pointer; border:1px solid var(--eec); border-radius:10px; padding:10px 12px; font-size:14px;
+          font-weight:800; color:#fff; background:transparent; transition:all .15s; text-align:left; }
+        .ee-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.7); }
         .ee-opt:hover { background:rgba(255,255,255,0.06); }
-        .ee-opt:focus-visible, .ee-tab:focus-visible, .ee-vtab:focus-visible, .ee-icobtn:focus-visible, .ee-range:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
-        .ee-range { width:100%; accent-color: var(--eec); }
-        @media (max-width: 1000px){ .ee-bottom { grid-template-columns: 1fr !important; } }
+        .ee-opt:focus-visible, .ee-vtab:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
+`;
 
-        .ee-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .ee-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .ee-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06121e 0%,#040a16 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .ee-drawer[data-open="true"] { transform:translateX(0); }
-        .ee-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .ee-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .ee-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .ee-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .ee-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
-        .ee-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
+  const leyendaEscena: ReactNode = leyenda.length ? <>{leyenda.map(([c, t]) => chip(c, t))}</> : undefined;
 
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="ee-tabs">
-          {MODOS.map((m) => {
-            const d = MODOS_DEF[m];
-            const col = `#${d.color.replace("#", "")}`;
-            const on = m === modo;
-            return (
-              <button key={m} className="ee-tab" data-on={on} onClick={() => cambiarModo(m)} style={{ ["--eec" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? col : "inherit" }}>
-                  <i className={`fa-solid ${d.icono}`} />
+  return (
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <EnganosaScene
+            vista={vista}
+            casoBarras={casoBarras}
+            ejeMin={ejeMin}
+            casoVolumen={casoVolumen}
+            escalado={escalado}
+            log={log}
+            casoPuntos={casoPuntos}
+            casoRiesgo={casoRiesgo}
+            pctSeguridad={pctSeguridad}
+            ricoMayor={ricoMayor}
+            nEncuesta={nEncuesta}
+            accent={accent}
+            modoColor={modoCol}
+            resetNonce={resetNonce}
+          />
+        </SceneBoundary>
+      }
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m, etiqueta: MODOS_DEF[m].etq, icono: MODOS_DEF[m].icono })),
+        valor: modo,
+        cambiar: (id) => cambiarModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+        </>
+      }
+      leyenda={leyendaEscena}
+      lectura={chipVivo}
+      objetivos={objetivos.map((o) => ({ txt: o.t, done: o.done }))}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Controles",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              <style>{`${CSS_EE}`}</style>
+              <Bloque titulo={def.etq} icono={def.icono}>
+                <div className="ee-vtabs" role="tablist">
+                  {def.vistas.map((v) => (
+                    <button key={v} type="button" role="tab" aria-selected={v === vista} className="ee-vtab" data-on={v === vista} onClick={() => cambiarVista(v)} style={{ ["--eec" as string]: modoCol }}>
+                      <i className={`fa-solid ${VISTAS_DEF[v].icono}`} style={{ marginRight: 7 }} aria-hidden />
+                      {VISTAS_DEF[v].etq}
+                    </button>
+                  ))}
                 </div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{d.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{d.subtitulo}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="ee-grid">
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 58vh, 660px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <EnganosaScene
-                vista={vista}
-                casoBarras={casoBarras}
-                ejeMin={ejeMin}
-                casoVolumen={casoVolumen}
-                escalado={escalado}
-                log={log}
-                casoPuntos={casoPuntos}
-                casoRiesgo={casoRiesgo}
-                pctSeguridad={pctSeguridad}
-                ricoMayor={ricoMayor}
-                nEncuesta={nEncuesta}
+                {control}
+              </Bloque>
+              <Bloque titulo="Qué estás viendo" icono="fa-eye">
+                <div style={{ color: T.text2, ...NUM }}>{pie}</div>
+                <div style={{ fontSize: 14, color: T.text3 }}>
+                  {def.etq} — {VISTAS_DEF[vista].etq}
+                </div>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <div style={{ display: "grid", gap: 16 }}>
+              <CambiosCard
                 accent={accent}
-                modoColor={modoCol}
-                resetNonce={resetNonce}
+                rgba={color.rgba}
+                mejor={mejorEstrellas}
+                onResultado={registraEstrellas}
+                playSfx={(ok) => {
+                  if (!sonido) return;
+                  if (ok) audioRef.current?.correcto();
+                  else audioRef.current?.incorrecto();
+                }}
               />
-            </SceneBoundary>
-
-            <div style={{ position: "absolute", top: 14, left: 16, right: 150, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, pointerEvents: "none" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)", maxWidth: "100%" }}>
-                <span className="ee-live-dot" style={{ ["--eed" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol, flexShrink: 0 }} />
-                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3, flexShrink: 0 }}>EN VIVO</span>
-                <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)", flexShrink: 0 }} />
-                <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", ...NUM }}>{chipVivo}</span>
-              </div>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>{leyenda.map(([c, t]) => chip(c, t))}</div>
+              <RetoQuizCard
+                quiz={QUIZ_A2}
+                accent={accent}
+                rgba={color.rgba}
+                aprobado={quizAprobado}
+                onAprobado={() => setQuizAprobado(true)}
+                playSfx={(ok) => {
+                  if (!sonido) return;
+                  if (ok) audioRef.current?.correcto();
+                  else audioRef.current?.incorrecto();
+                }}
+                playPick={() => {
+                  if (sonido) audioRef.current?.blip();
+                }}
+                mensajeAprobado="¡Aprobado! Ya detectas cuándo una estadística engaña."
+              />
             </div>
-
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="ee-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría" aria-label="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="ee-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"} aria-label={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="ee-icobtn" onClick={reiniciar} title="Reiniciar" aria-label="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 132px 14px 18px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${VISTAS_DEF[vista].icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                {def.etq} — {VISTAS_DEF[vista].etq}
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6, ...NUM }}>{pie}</div>
-            </div>
-
-            <button className="ee-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-          </div>
-
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, gap: 10, flexWrap: "wrap" }}>
-              <Eyebrow>
-                <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-                Controles — {def.etq}
-              </Eyebrow>
-            </div>
-            <div className="ee-vtabs" role="tablist">
-              {def.vistas.map((v) => (
-                <button key={v} role="tab" aria-selected={v === vista} className="ee-vtab" data-on={v === vista} onClick={() => cambiarVista(v)} style={{ ["--eec" as string]: modoCol }}>
-                  <i className={`fa-solid ${VISTAS_DEF[v].icono}`} style={{ marginRight: 7 }} />
-                  {VISTAS_DEF[v].etq}
-                </button>
-              ))}
-            </div>
-            {control}
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-magnifying-glass-chart" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>Leer una estadística con ojo crítico</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #7dd3fc55", background: "rgba(125,211,252,0.07)" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book-open" style={{ marginRight: 8, color: "#7dd3fc" }} />
-              Infografía A1
-            </Eyebrow>
-            <div style={{ fontSize: 13, color: "#fff", fontWeight: 800, lineHeight: 1.4, marginBottom: 10 }}>{TITULO_A1}</div>
-            <div style={{ display: "grid", gap: 9, marginBottom: 12, maxHeight: 440, overflowY: "auto", paddingRight: 6 }}>
-              {PUNTOS_CLAVE.map((p, i) => (
-                <div key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>
-                  {p}
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", marginBottom: 8 }}>PARA REFLEXIONAR</div>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {PREGUNTAS.map((q, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  {q}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />
-              Cómo usar el laboratorio
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-                Objetivos de la sesión
-              </Eyebrow>
-              <span style={{ fontSize: 11, fontWeight: 800, color: objetivos.every((o) => o.done) ? OK : T.text3 }}>
-                {objetivos.filter((o) => o.done).length}/{objetivos.length}
-              </span>
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ marginTop: 2, fontSize: 13, color: o.done ? OK : "rgba(255,255,255,0.22)" }} />
-                  <span style={{ fontSize: 12, color: o.done ? "#fff" : T.text2, lineHeight: 1.4 }}>{o.t}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="ee-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-flag" style={{ marginRight: 8, color: accent }} />
-            Contexto mexicano (infografía A1)
-          </Eyebrow>
-          <div style={{ display: "grid", gap: 9 }}>
-            {CONTEXTO_A1.map((p, i) => (
-              <div key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>
-                {p}
-              </div>
-            ))}
-          </div>
-
-          <div style={{ marginTop: 16, padding: "14px 16px", borderRadius: 12, border: `1px solid ${accent}33`, background: `rgba(${color.rgba},0.07)` }}>
-            <Eyebrow>
-              <i className="fa-solid fa-pen-to-square" style={{ marginRight: 8, color: accent }} />
-              Actividad de la infografía
-            </Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{ACTIVIDAD_A1}</div>
-            <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.5, marginTop: 8 }}>
-              <i className="fa-solid fa-flask" style={{ marginRight: 6, color: accent }} />
-              El inciso (b) está en «¿Cuánto cambió?» → «Puntos o %» → «Homicidios de 28 a 21».
-            </div>
-          </div>
-
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />
-              ¿Sabías que? (quiz A4)
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {HECHOS.map((h, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
-                  {h}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />
-              Glosario (A5)
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {GLOSARIO.map((gi, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{gi.termino}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
-                  <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.4, marginTop: 4 }}>
-                    <i className="fa-solid fa-flask" style={{ marginRight: 6, color: accent }} />
-                    {gi.ejemplo}
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Leer una estadística con ojo crítico" icono="fa-magnifying-glass-chart">
+                <div style={{ color: T.text2 }}>{PROBLEMA}</div>
+              </Bloque>
+              <Bloque titulo="Infografía A1" icono="fa-book-open">
+                <div style={{ fontWeight: 800, color: "#fff" }}>{TITULO_A1}</div>
+                {PUNTOS_CLAVE.map((p, i) => (
+                  <div key={i} style={{ color: T.text2 }}>
+                    {p}
                   </div>
+                ))}
+                <div style={{ fontSize: 14, fontWeight: 900, color: T.text3, letterSpacing: "0.08em" }}>PARA REFLEXIONAR</div>
+                <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 8, color: T.text2 }}>
+                  {PREGUNTAS.map((q, i) => (
+                    <li key={i}>{q}</li>
+                  ))}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Cómo usar el laboratorio" icono="fa-list-ol">
+                <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {INSTRUCCIONES.map((p, i) => (
+                    <li key={i}>{p}</li>
+                  ))}
+                </ol>
+              </Bloque>
+              <Bloque titulo="Contexto mexicano (infografía A1)" icono="fa-flag">
+                {CONTEXTO_A1.map((p, i) => (
+                  <div key={i} style={{ color: T.text2 }}>
+                    {p}
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Actividad de la infografía" icono="fa-pen-to-square">
+                <div style={{ color: T.text2 }}>{ACTIVIDAD_A1}</div>
+                <div style={{ color: T.text3 }}>
+                  <i className="fa-solid fa-flask" style={{ marginRight: 6, color: accent }} aria-hidden />
+                  El inciso (b) está en «¿Cuánto cambió?» → «Puntos o %» → «Homicidios de 28 a 21».
                 </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-            Ideas clave
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-            {IDEAS.map((x, i) => (
-              <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                {x}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          Los puntos clave, el contexto, las preguntas y la actividad de la infografía A1, los hechos del quiz A4, el glosario A5 y el quiz A2 son <strong>verbatim</strong> del
-          material de la plataforma. Los valores de las barras, los tanques, los riesgos, los presupuestos y la encuesta son los de esas actividades. Las dos curvas de
-          contagios, los 20 hogares (calibrados para que el 10 % más rico concentre el 36.5 %) y la ubicación de los casos entre las figuras son{" "}
-          <strong>datos ilustrativos</strong>. Fuente: {FUENTE}
-        </span>
-      </div>
-
-      <CambiosCard
-        accent={accent}
-        rgba={color.rgba}
-        mejor={mejorEstrellas}
-        onResultado={registraEstrellas}
-        playSfx={(ok) => {
-          if (!sonido) return;
-          if (ok) audioRef.current?.correcto();
-          else audioRef.current?.incorrecto();
-        }}
-      />
-
-      <RetoQuizCard
-        quiz={QUIZ_A2}
-        accent={accent}
-        rgba={color.rgba}
-        aprobado={quizAprobado}
-        onAprobado={() => setQuizAprobado(true)}
-        playSfx={(ok) => {
-          if (!sonido) return;
-          if (ok) audioRef.current?.correcto();
-          else audioRef.current?.incorrecto();
-        }}
-        playPick={() => {
-          if (sonido) audioRef.current?.blip();
-        }}
-        mensajeAprobado="¡Aprobado! Ya detectas cuándo una estadística engaña."
-      />
-
-      <div className="ee-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="ee-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="ee-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="ee-close" onClick={() => setDrawer(false)} title="Cerrar" aria-label="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="ee-drawer-body">
-          <FichaTeorica data={ESTADISTICA_ENGANOSA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+              </Bloque>
+              <Bloque titulo="¿Sabías que? (quiz A4)" icono="fa-circle-question">
+                <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 8, color: T.text2 }}>
+                  {HECHOS.map((h, i) => (
+                    <li key={i}>{h}</li>
+                  ))}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Glosario (A5)" icono="fa-book">
+                {GLOSARIO.map((gi, i) => (
+                  <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
+                    <span style={{ fontWeight: 900, color: accent }}>{gi.termino}. </span>
+                    <span style={{ color: T.text2 }}>{gi.definicion}</span>
+                    <div style={{ color: T.text3, marginTop: 4 }}>
+                      <i className="fa-solid fa-flask" style={{ marginRight: 6, color: accent }} aria-hidden />
+                      {gi.ejemplo}
+                    </div>
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 8, color: T.text2 }}>
+                  {IDEAS.map((x, i) => (
+                    <li key={i}>{x}</li>
+                  ))}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={ESTADISTICA_ENGANOSA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ marginTop: 18, fontSize: 14, color: T.text3 }}>
+                Los puntos clave, el contexto, las preguntas y la actividad de la infografía A1, los hechos del quiz A4, el glosario A5 y el quiz A2 son <strong>verbatim</strong> del material de la plataforma. Los valores de las barras,
+                los tanques, los riesgos, los presupuestos y la encuesta son los de esas actividades. Las dos curvas de contagios, los 20 hogares (calibrados para que el 10 % más rico concentre el 36.5 %) y la ubicación de los casos
+                entre las figuras son <strong>datos ilustrativos</strong>. Fuente: {FUENTE}
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }

@@ -5,16 +5,18 @@
  * Galton" (PM-VI-P05). Tres modos:
  *
  *  - laplace:      el espacio muestral Ω se enumera objeto por objeto (las 6
- *                  caras del dado, los 4 resultados de dos monedas, las 52
- *                  cartas). Los que pertenecen al evento se elevan y se
- *                  encienden; los del complemento se apagan. La fracción que
- *                  el alumno ve en el panel es el conteo de lo que está
- *                  mirando, no un número escrito a mano.
+ *                  caras del dado con sus puntos, los 4 resultados de dos
+ *                  monedas, las 52 cartas). Los que pertenecen al evento se
+ *                  elevan y se encienden; los del complemento se apagan. La
+ *                  fracción que el alumno ve en el panel es el conteo de lo que
+ *                  está mirando, no un número escrito a mano.
  *  - galton:       filas de clavos y cajones acumuladores. Cada bola baja
  *                  desviándose a derecha o izquierda; el cajón donde cae es el
  *                  número de desvíos a la derecha. La curva binomial teórica
  *                  se dibuja encima de las barras para comparar lo que pasó
- *                  con lo que la teoría predice.
+ *                  con lo que la teoría predice, y dos marcas señalan la media
+ *                  teórica (banda rosa) y la observada (cono) para ver cómo se
+ *                  corre el montón al cargar el tablero.
  *  - convergencia: la frecuencia relativa del evento frente al número de
  *                  repeticiones, en escala logarítmica, contra la recta de la
  *                  probabilidad teórica. El embudo que se cierra ES la ley de
@@ -22,13 +24,14 @@
  *
  * La simulación NO vive aquí: el shell decide qué bolas caen y cuántas
  * repeticiones van, y esta escena solo interpola posiciones en useFrame
- * mutando refs (nunca estado), conforme al React Compiler. NO se usa <Text> de
- * drei (cuelga el chunk con Turbopack): el texto del lienzo va en <Html>.
+ * mutando refs (nunca estado), conforme al React Compiler. Los clavos y las
+ * bolas en vuelo son mallas instanciadas. NO se usa <Text> de drei (cuelga el
+ * chunk con Turbopack): el texto del lienzo va en <Html>, máx. 4 a la vez.
  */
 
 import * as THREE from "three";
-import { useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useLayoutEffect, useMemo, useRef, type ReactNode } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
@@ -76,21 +79,23 @@ export interface GaltonSceneProps {
 
 type Pt = [number, number, number];
 
-/* ── Etiqueta flotante ────────────────────────────────────────────────── */
-function Etiqueta({ pos, children, df = 10, col }: { pos: Pt; children: ReactNode; df?: number; col?: string }) {
+/* ── Etiquetas: tamaño fijo en píxeles, sin distanceFactor ─────────────── */
+function Etiqueta({ pos, children, col, ancho = false }: { pos: Pt; children: ReactNode; col?: string; ancho?: boolean }) {
+  const w = useThree((s) => s.size.width);
+  if (ancho && w < 640) return null;
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
           alignItems: "center",
           gap: 6,
-          padding: "5px 11px",
+          padding: "5px 12px",
           borderRadius: 999,
-          background: "rgba(4,10,22,0.82)",
+          background: "rgba(4,10,22,0.86)",
           border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`,
           color: "#fff",
-          fontSize: 12,
+          fontSize: 14,
           fontWeight: 800,
           whiteSpace: "nowrap",
           boxShadow: "0 6px 18px -8px #000",
@@ -103,9 +108,9 @@ function Etiqueta({ pos, children, df = 10, col }: { pos: Pt; children: ReactNod
 }
 
 /** Texto pequeño anclado a un punto, sin fondo. */
-function Letra({ pos, children, df = 8, col = "#e2e8f0", size = 14 }: { pos: Pt; children: ReactNode; df?: number; col?: string; size?: number }) {
+function Letra({ pos, children, col = "#e2e8f0", size = 14 }: { pos: Pt; children: ReactNode; col?: string; size?: number }) {
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
       <div style={{ color: col, fontSize: size, fontWeight: 900, whiteSpace: "nowrap", textShadow: "0 2px 6px #000" }}>{children}</div>
     </Html>
   );
@@ -114,6 +119,16 @@ function Letra({ pos, children, df = 8, col = "#e2e8f0", size = 14 }: { pos: Pt;
 /* ════════════════════════════════════════════════════════════════════════
  * MODO 1 · PROBABILIDAD CLÁSICA — el espacio muestral, objeto por objeto
  * ════════════════════════════════════════════════════════════════════════ */
+
+/** Posiciones de los puntos de un dado (cara frontal), en una rejilla 3×3. */
+const PUNTOS_DADO: Record<number, [number, number][]> = {
+  1: [[0, 0]],
+  2: [[-1, 1], [1, -1]],
+  3: [[-1, 1], [0, 0], [1, -1]],
+  4: [[-1, 1], [1, 1], [-1, -1], [1, -1]],
+  5: [[-1, 1], [1, 1], [0, 0], [-1, -1], [1, -1]],
+  6: [[-1, 1], [1, 1], [-1, 0], [1, 0], [-1, -1], [1, -1]],
+};
 
 /** Un resultado de Ω. Si pertenece al evento, flota y brilla. */
 function Resultado({
@@ -124,6 +139,7 @@ function Resultado({
   colApagado,
   playing,
   fase,
+  puntos = 0,
 }: {
   pos: Pt;
   dentro: boolean;
@@ -132,6 +148,8 @@ function Resultado({
   colApagado: string;
   playing: boolean;
   fase: number;
+  /** Número de puntos de la cara (solo para el dado). */
+  puntos?: number;
 }) {
   const ref = useRef<THREE.Group>(null);
   useFrame((s) => {
@@ -150,15 +168,23 @@ function Resultado({
   return (
     <group ref={ref} position={pos}>
       {forma === "cubo" && (
-        <mesh castShadow>
-          <boxGeometry args={[0.72, 0.72, 0.72]} />
-          <meshStandardMaterial color={color} emissive={emissive} emissiveIntensity={dentro ? 0.55 : 0} roughness={0.35} metalness={0.25} transparent opacity={dentro ? 1 : 0.55} />
-        </mesh>
+        <>
+          <mesh castShadow>
+            <boxGeometry args={[0.9, 0.9, 0.9]} />
+            <meshStandardMaterial color={color} emissive={emissive} emissiveIntensity={dentro ? 0.45 : 0} roughness={0.35} metalness={0.25} transparent opacity={dentro ? 1 : 0.6} />
+          </mesh>
+          {(PUNTOS_DADO[puntos] ?? []).map(([px, py], i) => (
+            <mesh key={i} position={[px * 0.24, py * 0.24, 0.46]}>
+              <sphereGeometry args={[0.075, 12, 12]} />
+              <meshStandardMaterial color={dentro ? "#04121f" : "#0f172a"} roughness={0.4} />
+            </mesh>
+          ))}
+        </>
       )}
       {forma === "disco" && (
         <mesh castShadow rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[0.42, 0.42, 0.12, 32]} />
-          <meshStandardMaterial color={color} emissive={emissive} emissiveIntensity={dentro ? 0.55 : 0} roughness={0.3} metalness={0.5} transparent opacity={dentro ? 1 : 0.55} />
+          <cylinderGeometry args={[0.48, 0.48, 0.14, 32]} />
+          <meshStandardMaterial color={color} emissive={emissive} emissiveIntensity={dentro ? 0.5 : 0} roughness={0.3} metalness={0.5} transparent opacity={dentro ? 1 : 0.55} />
         </mesh>
       )}
       {forma === "carta" && (
@@ -177,10 +203,12 @@ function EscenaLaplace({ exp, evento, accent, playing }: { exp: ExperimentoDef; 
   const paso = exp.id === "baraja" ? 0.52 : 1.45;
   const pasoY = exp.id === "baraja" ? 0.78 : 2.05;
   const filas = Math.ceil(exp.omega.length / cols);
-  const conEtiquetas = exp.omega.length <= 12;
+  // El dado se lee por sus puntos; las 52 cartas, por color. Solo las 4
+  // combinaciones de las monedas llevan letrero (4 rótulos como máximo).
+  const conEtiquetas = exp.id === "dosmonedas";
 
   return (
-    <group position={[0, 0.3, 0]}>
+    <group position={[0, 0, 0]}>
       {exp.omega.map((r, i) => {
         const c = i % cols;
         const f = Math.floor(i / cols);
@@ -190,25 +218,24 @@ function EscenaLaplace({ exp, evento, accent, playing }: { exp: ExperimentoDef; 
         const col = exp.id === "baraja" ? (r.rojo ? "#f87171" : "#e2e8f0") : dentro ? accent : "#94a3b8";
         return (
           <group key={`${r.etq}-${i}`}>
-            <Resultado pos={[x, y, 0]} dentro={dentro} forma={forma} col={dentro ? (exp.id === "baraja" ? accent : col) : col} colApagado="#64748b" playing={playing} fase={i * 0.6} />
+            <Resultado
+              pos={[x, y, 0]}
+              dentro={dentro}
+              forma={forma}
+              col={dentro ? (exp.id === "baraja" ? accent : col) : col}
+              colApagado="#64748b"
+              playing={playing}
+              fase={i * 0.6}
+              puntos={exp.id === "dado" ? r.valor : 0}
+            />
             {conEtiquetas && (
-              <Letra pos={[x, y + (forma === "cubo" ? 0.95 : 0.8), 0]} col={dentro ? "#ffffff" : "rgba(255,255,255,0.45)"} size={16} df={9}>
+              <Letra pos={[x, y + 1.0, 0]} col={dentro ? "#ffffff" : "rgba(255,255,255,0.55)"} size={16}>
                 {r.etq}
               </Letra>
             )}
           </group>
         );
       })}
-
-      {/* Rótulo del espacio muestral */}
-      <Etiqueta pos={[0, ((filas - 1) / 2) * pasoY + (exp.id === "baraja" ? 1.3 : 1.9), 0]} col={`${accent}88`} df={13}>
-        <i className="fa-solid fa-layer-group" style={{ color: accent }} />
-        {exp.omegaTexto}
-      </Etiqueta>
-      <Etiqueta pos={[0, -((filas - 1) / 2) * pasoY - (exp.id === "baraja" ? 1.1 : 1.5), 0]} col="rgba(255,255,255,0.24)" df={13}>
-        <i className="fa-solid fa-circle-check" style={{ color: accent }} />
-        {evento.notacion}
-      </Etiqueta>
     </group>
   );
 }
@@ -221,6 +248,8 @@ const DX = 0.62;
 const DY = 0.55;
 /** Altura máxima que puede alcanzar una barra de cajón. */
 const ALTO_BARRA = 2.5;
+/** Cuántas bolas caben en la malla instanciada (el shell suelta ≤ 12). */
+const CAP_BOLAS = 16;
 
 /** Geometría del tablero para un número de filas dado. */
 function geometria(filas: number) {
@@ -230,8 +259,8 @@ function geometria(filas: number) {
   const ySuelta = yPegTop + DY * 1.6;
   const altoTotal = ySuelta - yFloor;
   // El tablero crece con el número de filas; lo re-escalamos para que siempre
-  // quepa en el mismo encuadre (si no, con 12 filas se sale de cámara).
-  const escala = 6.1 / altoTotal;
+  // ocupe ~60 % del alto del visor (entre la barra superior y la misión).
+  const escala = 5.0 / altoTotal;
   const centroY = (ySuelta + yFloor) / 2;
   return { yPegTop, yPegBottom, yFloor, ySuelta, escala, centroY };
 }
@@ -264,24 +293,73 @@ function posicionVuelo(pasos: number[], u: number, g: ReturnType<typeof geometri
   return [x, g.yFloor];
 }
 
-function BolaEnVuelo({ vuelo, filas, duracion, accent, playing }: { vuelo: Vuelo; filas: number; duracion: number; accent: string; playing: boolean }) {
-  const ref = useRef<THREE.Mesh>(null);
+const _o = new THREE.Object3D();
+
+/** Todos los clavos del tablero en UNA malla instanciada (hasta 78). */
+function Clavos({ filas, g }: { filas: number; g: ReturnType<typeof geometria> }) {
+  const mesh = useRef<THREE.InstancedMesh>(null);
+  const pos = useMemo(() => {
+    const out: Pt[] = [];
+    for (let i = 0; i < filas; i++) {
+      for (let j = 0; j <= i; j++) out.push([(j - i / 2) * DX, g.yPegTop - i * DY, 0]);
+    }
+    return out;
+  }, [filas, g.yPegTop]);
+  useLayoutEffect(() => {
+    const m = mesh.current;
+    if (!m) return;
+    pos.forEach((p, i) => {
+      _o.position.set(p[0], p[1], p[2]);
+      _o.scale.setScalar(1);
+      _o.updateMatrix();
+      m.setMatrixAt(i, _o.matrix);
+    });
+    m.instanceMatrix.needsUpdate = true;
+  }, [pos]);
+  return (
+    <instancedMesh key={pos.length} ref={mesh} args={[undefined, undefined, pos.length]} castShadow frustumCulled={false}>
+      <sphereGeometry args={[0.075, 10, 10]} />
+      <meshStandardMaterial color="#cbd5e1" emissive="#94a3b8" emissiveIntensity={0.25} roughness={0.3} metalness={0.6} />
+    </instancedMesh>
+  );
+}
+
+/** Las bolas en vuelo, en UNA malla instanciada. */
+function BolasEnVuelo({ vuelos, filas, duracion, accent, playing }: { vuelos: Vuelo[]; filas: number; duracion: number; accent: string; playing: boolean }) {
+  const mesh = useRef<THREE.InstancedMesh>(null);
   const g = useMemo(() => geometria(filas), [filas]);
-  const pausaU = useRef(0);
+  // Avance de cada bola; al pausar se queda donde iba.
+  const avance = useRef<Map<number, number>>(new Map());
 
   useFrame(() => {
-    const m = ref.current;
+    const m = mesh.current;
     if (!m) return;
-    if (playing) pausaU.current = (performance.now() - vuelo.t0) / duracion;
-    const [x, y] = posicionVuelo(vuelo.pasos, pausaU.current, g);
-    m.position.set(x, y, 0);
+    const mapa = avance.current;
+    if (mapa.size > 64) mapa.clear();
+    const ahora = performance.now();
+    for (let i = 0; i < CAP_BOLAS; i++) {
+      const v = vuelos[i];
+      if (!v) {
+        _o.scale.setScalar(0.0001);
+        _o.position.set(0, 0, 0);
+      } else {
+        const u = playing ? (ahora - v.t0) / duracion : (mapa.get(v.id) ?? (ahora - v.t0) / duracion);
+        mapa.set(v.id, u);
+        const [x, y] = posicionVuelo(v.pasos, u, g);
+        _o.position.set(x, y, 0);
+        _o.scale.setScalar(1);
+      }
+      _o.updateMatrix();
+      m.setMatrixAt(i, _o.matrix);
+    }
+    m.instanceMatrix.needsUpdate = true;
   });
 
   return (
-    <mesh ref={ref} castShadow>
+    <instancedMesh ref={mesh} args={[undefined, undefined, CAP_BOLAS]} castShadow frustumCulled={false}>
       <sphereGeometry args={[0.15, 16, 16]} />
-      <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.85} roughness={0.2} metalness={0.3} />
-    </mesh>
+      <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.55} roughness={0.2} metalness={0.3} />
+    </instancedMesh>
   );
 }
 
@@ -298,13 +376,14 @@ function BarraCajon({ x, alturaObjetivo, yFloor, col, resaltada }: { x: number; 
   return (
     <mesh ref={ref} castShadow>
       <boxGeometry args={[DX * 0.78, 1, 0.42]} />
-      <meshStandardMaterial color={col} emissive={col} emissiveIntensity={resaltada ? 0.5 : 0.22} roughness={0.4} metalness={0.15} transparent opacity={0.92} />
+      <meshStandardMaterial color={col} emissive={col} emissiveIntensity={resaltada ? 0.4 : 0.18} roughness={0.4} metalness={0.15} transparent opacity={0.92} />
     </mesh>
   );
 }
 
 function EscenaGalton({
   filas,
+  p,
   conteos,
   teorica,
   vuelos,
@@ -314,6 +393,7 @@ function EscenaGalton({
   playing,
 }: {
   filas: number;
+  p: number;
   conteos: number[];
   teorica: number[];
   vuelos: Vuelo[];
@@ -331,31 +411,22 @@ function EscenaGalton({
   const refMax = Math.max(...teorica, 0.0001) * 1.35;
   const cajonModal = total > 0 ? conteos.indexOf(Math.max(...conteos)) : -1;
 
-  // Clavos
-  const clavos: Pt[] = [];
-  for (let i = 0; i < filas; i++) {
-    for (let j = 0; j <= i; j++) {
-      clavos.push([(j - i / 2) * DX, g.yPegTop - i * DY, 0]);
-    }
-  }
-
   // Curva teórica, dibujada sobre los cajones.
   const puntosTeorica: Pt[] = teorica.map((pk, k) => [(k - filas / 2) * DX, g.yFloor + (pk / refMax) * ALTO_BARRA, 0.32]);
 
+  // Medias: la teórica (n·p) y la observada, para ver cómo se corre el montón.
+  const mediaTeo = filas * p;
+  const mediaObs = total > 0 ? conteos.reduce((a, c, k) => a + c * k, 0) / total : null;
+  const xTeo = (mediaTeo - filas / 2) * DX;
+
   return (
-    <group position={[0, -g.centroY * g.escala + 0.45, 0]} scale={g.escala}>
-      {/* Clavos */}
-      {clavos.map((pos, i) => (
-        <mesh key={i} position={pos} castShadow>
-          <sphereGeometry args={[0.075, 10, 10]} />
-          <meshStandardMaterial color="#cbd5e1" emissive="#94a3b8" emissiveIntensity={0.25} roughness={0.3} metalness={0.6} />
-        </mesh>
-      ))}
+    <group position={[0, -g.centroY * g.escala, 0]} scale={g.escala}>
+      <Clavos filas={filas} g={g} />
 
       {/* Boca de entrada */}
       <mesh position={[0, g.ySuelta + 0.18, 0]}>
         <torusGeometry args={[0.3, 0.055, 10, 28]} />
-        <meshStandardMaterial color={modoColor} emissive={modoColor} emissiveIntensity={0.6} roughness={0.3} metalness={0.4} />
+        <meshStandardMaterial color={modoColor} emissive={modoColor} emissiveIntensity={0.5} roughness={0.3} metalness={0.4} />
       </mesh>
 
       {/* Separadores de los cajones */}
@@ -388,34 +459,41 @@ function EscenaGalton({
       })}
 
       {/* Curva binomial teórica */}
-      <Line points={puntosTeorica} color="#f472b6" lineWidth={2.4} dashed={false} />
+      <CurvaTubo puntos={puntosTeorica} color="#f472b6" grosor={0.045} brillo={0.7} />
       {puntosTeorica.map((pt, k) => (
         <mesh key={`pt-${k}`} position={pt}>
           <sphereGeometry args={[0.07, 10, 10]} />
-          <meshStandardMaterial color="#f472b6" emissive="#f472b6" emissiveIntensity={0.8} />
+          <meshStandardMaterial color="#f472b6" emissive="#f472b6" emissiveIntensity={0.6} />
         </mesh>
       ))}
 
+      {/* Media teórica: banda rosa vertical */}
+      <mesh position={[xTeo, g.yFloor + ALTO_BARRA / 2, -0.1]}>
+        <boxGeometry args={[0.05, ALTO_BARRA + 0.4, 0.04]} />
+        <meshStandardMaterial color="#f472b6" transparent opacity={0.45} emissive="#f472b6" emissiveIntensity={0.3} depthWrite={false} />
+      </mesh>
+      {/* Media observada: cono amarillo sobre el cajón donde cae el promedio */}
+      {mediaObs !== null && (
+        <mesh position={[(mediaObs - filas / 2) * DX, g.yFloor + ALTO_BARRA + 0.38, 0.1]} rotation={[Math.PI, 0, 0]}>
+          <coneGeometry args={[0.16, 0.34, 14]} />
+          <meshStandardMaterial color="#fde047" emissive="#fde047" emissiveIntensity={0.6} roughness={0.3} />
+        </mesh>
+      )}
+
       {/* Bolas en vuelo */}
-      {vuelos.map((v) => (
-        <BolaEnVuelo key={v.id} vuelo={v} filas={filas} duracion={duracionVuelo} accent={accent} playing={playing} />
-      ))}
+      <BolasEnVuelo vuelos={vuelos} filas={filas} duracion={duracionVuelo} accent={accent} playing={playing} />
 
-      {/* Número de cajón */}
-      {conteos.map((c, k) => (
-        <Letra key={`lbl-${k}`} pos={[(k - filas / 2) * DX, g.yFloor - 0.42, 0]} col={k === cajonModal ? "#fff" : "rgba(255,255,255,0.5)"} size={13} df={7 / g.escala}>
-          {k}
-        </Letra>
-      ))}
-
-      <Etiqueta pos={[0, g.ySuelta + 0.85, 0]} col={`${modoColor}88`} df={11 / g.escala}>
-        <i className="fa-solid fa-arrow-down" style={{ color: modoColor }} />
-        {filas} filas de clavos · {filas + 1} cajones
-      </Etiqueta>
-      <Etiqueta pos={[((filas / 2) + 1.1) * DX, g.yFloor + ALTO_BARRA * 0.85, 0]} col="#f472b688" df={11 / g.escala}>
-        <span style={{ width: 16, height: 3, background: "#f472b6", borderRadius: 2, display: "inline-block" }} />
-        Teoría: C(n,k)·p^k·q^(n−k)
-      </Etiqueta>
+      {/* Rótulos: máx. 4. Extremos, cajón modal y media observada. */}
+      <Letra pos={[(0 - filas / 2) * DX, g.yFloor - 0.42, 0]} col="rgba(255,255,255,0.7)" size={14}>0</Letra>
+      <Letra pos={[(filas - filas / 2) * DX, g.yFloor - 0.42, 0]} col="rgba(255,255,255,0.7)" size={14}>{filas}</Letra>
+      {cajonModal > 0 && cajonModal < filas && (
+        <Letra pos={[(cajonModal - filas / 2) * DX, g.yFloor - 0.42, 0]} col="#fff" size={14}>{cajonModal}</Letra>
+      )}
+      {mediaObs !== null && (
+        <Etiqueta pos={[(mediaObs - filas / 2) * DX, g.yFloor + ALTO_BARRA + 1.0, 0.1]} col="#fde047aa">
+          x̄ = {mediaObs.toFixed(2)}
+        </Etiqueta>
+      )}
     </group>
   );
 }
@@ -437,7 +515,7 @@ function yDeF(f: number): number {
   return -CONV_H / 2 + Math.min(Math.max(f, 0), 1) * CONV_H;
 }
 
-function EscenaConvergencia({ traza, probTeorica, accent, modoColor }: { traza: PuntoConvergencia[]; probTeorica: number; accent: string; modoColor: string }) {
+function EscenaConvergencia({ traza, probTeorica, accent }: { traza: PuntoConvergencia[]; probTeorica: number; accent: string }) {
   const puntos: Pt[] = traza.length >= 2 ? traza.map((p) => [xDeN(p.n), yDeF(p.frecuencia), 0.05]) : [];
   const yTeorica = yDeF(probTeorica);
   const ultimo = traza.length > 0 ? traza[traza.length - 1]! : null;
@@ -446,8 +524,8 @@ function EscenaConvergencia({ traza, probTeorica, accent, modoColor }: { traza: 
   const marcasF = [0, 0.25, 0.5, 0.75, 1];
 
   return (
-    <group position={[0.35, 0.35, 0]} scale={0.86}>
-      {/* Rejilla horizontal */}
+    <group position={[0, 0, 0]} scale={0.86}>
+      {/* Rejilla horizontal (fondo) */}
       {marcasF.map((f) => (
         <Line
           key={`h-${f}`}
@@ -459,12 +537,6 @@ function EscenaConvergencia({ traza, probTeorica, accent, modoColor }: { traza: 
           lineWidth={1}
         />
       ))}
-      {marcasF.map((f) => (
-        <Letra key={`hl-${f}`} pos={[-CONV_W / 2 - 0.55, yDeF(f), 0]} col="rgba(255,255,255,0.5)" size={12} df={9}>
-          {f.toFixed(2)}
-        </Letra>
-      ))}
-
       {/* Rejilla vertical (escala logarítmica) */}
       {marcasN.map((n) => (
         <Line
@@ -477,59 +549,46 @@ function EscenaConvergencia({ traza, probTeorica, accent, modoColor }: { traza: 
           lineWidth={1}
         />
       ))}
-      {marcasN.map((n) => (
-        <Letra key={`vl-${n}`} pos={[xDeN(n), -CONV_H / 2 - 0.42, 0]} col="rgba(255,255,255,0.5)" size={12} df={9}>
-          {n.toLocaleString("es-MX")}
-        </Letra>
-      ))}
 
       {/* Recta de la probabilidad teórica */}
-      <Line
-        points={[
+      <CurvaTubo
+        puntos={[
           [-CONV_W / 2, yTeorica, 0.02] as Pt,
           [CONV_W / 2, yTeorica, 0.02] as Pt,
         ]}
         color="#f472b6"
-        lineWidth={2.6}
+        grosor={0.05}
+        brillo={0.7}
       />
-      <Etiqueta pos={[-CONV_W / 2 + 1.7, yTeorica + (probTeorica > 0.8 ? -0.42 : 0.42), 0.1]} col="#f472b688" df={11}>
-        <span style={{ width: 16, height: 3, background: "#f472b6", borderRadius: 2, display: "inline-block" }} />
-        P(A) teórica = {probTeorica.toFixed(4)}
-      </Etiqueta>
 
       {/* Traza de la frecuencia relativa */}
       {puntos.length >= 2 && <CurvaTubo puntos={puntos} color={accent} grosor={0.054} />}
 
       {/* Punto actual */}
       {ultimo && (
-        <>
-          <mesh position={[xDeN(ultimo.n), yDeF(ultimo.frecuencia), 0.12]}>
-            <sphereGeometry args={[0.13, 16, 16]} />
-            <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={1} />
-          </mesh>
-          <Etiqueta pos={[xDeN(ultimo.n), yDeF(ultimo.frecuencia) + 0.5, 0.12]} col={`${accent}88`} df={10}>
-            <i className="fa-solid fa-location-crosshairs" style={{ color: accent }} />
-            n = {ultimo.n.toLocaleString("es-MX")} · {ultimo.frecuencia.toFixed(4)}
-          </Etiqueta>
-        </>
+        <mesh position={[xDeN(ultimo.n), yDeF(ultimo.frecuencia), 0.12]}>
+          <sphereGeometry args={[0.13, 16, 16]} />
+          <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.8} />
+        </mesh>
       )}
 
-      {/* Rótulos de ejes */}
-      <Etiqueta pos={[0, -CONV_H / 2 - 1.05, 0]} col={`${modoColor}66`} df={12}>
-        <i className="fa-solid fa-repeat" style={{ color: modoColor }} />
-        Repeticiones del experimento (escala logarítmica)
+      {/* Rótulos: máx. 4. */}
+      <Etiqueta pos={[-CONV_W / 2 + 1.9, yTeorica + (probTeorica > 0.8 ? -0.5 : 0.5), 0.1]} col="#f472b688" ancho>
+        <span style={{ width: 16, height: 3, background: "#f472b6", borderRadius: 2, display: "inline-block" }} />
+        P(A) = {probTeorica.toFixed(4)}
       </Etiqueta>
-      <Etiqueta pos={[-CONV_W / 2 + 2.2, CONV_H / 2 + 0.55, 0]} col={`${modoColor}66`} df={12}>
-        <i className="fa-solid fa-percent" style={{ color: modoColor }} />
-        Frecuencia relativa del evento
-      </Etiqueta>
-
-      {traza.length === 0 && (
-        <Etiqueta pos={[0, 0, 0.3]} col={`${accent}aa`} df={14}>
+      {ultimo ? (
+        <Etiqueta pos={[xDeN(ultimo.n), yDeF(ultimo.frecuencia) + (ultimo.frecuencia > probTeorica ? 0.55 : -0.55), 0.12]} col={`${accent}88`} ancho>
+          n = {ultimo.n.toLocaleString("es-MX")} · {ultimo.frecuencia.toFixed(3)}
+        </Etiqueta>
+      ) : (
+        <Etiqueta pos={[0, 0, 0.3]} col={`${accent}aa`} ancho>
           <i className="fa-solid fa-play" style={{ color: accent }} />
-          Pulsa «Repetir el experimento» para ver la convergencia
+          Pulsa «Repetir el experimento»
         </Etiqueta>
       )}
+      <Letra pos={[xDeN(1), -CONV_H / 2 - 0.45, 0]} col="rgba(255,255,255,0.7)" size={14}>1</Letra>
+      <Letra pos={[xDeN(CONV_MAX_REPS), -CONV_H / 2 - 0.45, 0]} col="rgba(255,255,255,0.7)" size={14}>{CONV_MAX_REPS.toLocaleString("es-MX")}</Letra>
     </group>
   );
 }
@@ -537,14 +596,14 @@ function EscenaConvergencia({ traza, probTeorica, accent, modoColor }: { traza: 
 /* ── Cámara por modo ──────────────────────────────────────────────────── */
 function camaraDe(modo: Modo, exp: ExperimentoDef): { position: Pt; fov: number } {
   if (modo === "laplace") {
-    return exp.id === "baraja" ? { position: [0, 0.5, 10.5], fov: 42 } : { position: [0, 0.8, 9], fov: 42 };
+    return exp.id === "baraja" ? { position: [0, 0, 8.8], fov: 42 } : { position: [0, 0, 8.4], fov: 42 };
   }
-  if (modo === "galton") return { position: [0, 0.2, 11.5], fov: 40 };
-  return { position: [0, 0.2, 10.5], fov: 42 };
+  if (modo === "galton") return { position: [0, 0, 11.5], fov: 40 };
+  return { position: [0, 0, 11], fov: 42 };
 }
 
 export default function GaltonProbabilidadScene(props: GaltonSceneProps) {
-  const { modo, exp, evento, filas, conteos, teorica, vuelos, duracionVuelo, traza, probTeorica, playing, accent, modoColor, resetNonce } = props;
+  const { modo, exp, evento, filas, p, conteos, teorica, vuelos, duracionVuelo, traza, probTeorica, playing, accent, modoColor, resetNonce } = props;
   const cam = camaraDe(modo, exp);
 
   return (
@@ -557,11 +616,11 @@ export default function GaltonProbabilidadScene(props: GaltonSceneProps) {
 
       <pointLight position={[-6, -3, 4]} intensity={0.5} color={modoColor} />
 
-
       {modo === "laplace" && <EscenaLaplace exp={exp} evento={evento} accent={accent} playing={playing} />}
       {modo === "galton" && (
         <EscenaGalton
           filas={filas}
+          p={p}
           conteos={conteos}
           teorica={teorica}
           vuelos={vuelos}
@@ -571,7 +630,7 @@ export default function GaltonProbabilidadScene(props: GaltonSceneProps) {
           playing={playing}
         />
       )}
-      {modo === "convergencia" && <EscenaConvergencia traza={traza} probTeorica={probTeorica} accent={accent} modoColor={modoColor} />}
+      {modo === "convergencia" && <EscenaConvergencia traza={traza} probTeorica={probTeorica} accent={accent} />}
 
       <OrbitControls
         enablePan={false}
@@ -581,6 +640,7 @@ export default function GaltonProbabilidadScene(props: GaltonSceneProps) {
         maxPolarAngle={Math.PI * 0.86}
         minPolarAngle={Math.PI * 0.14}
         autoRotate={false}
+        target={[0, -0.6, 0]}
       />
 
       <EffectComposer>

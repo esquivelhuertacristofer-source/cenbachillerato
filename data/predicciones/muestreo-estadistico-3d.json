@@ -1,0 +1,12 @@
+{
+  "escena": "La escuela de 800 estudiantes vista desde arriba; al tomar muestras se levantan quienes quedan elegidos y, en otro modo, se apilan 300 muestras repetidas",
+  "pregunta": "Con muestras de 320 en vez de 20, ¿cómo cambia el histograma de 300 estimaciones?",
+  "opciones": [
+    { "id": "a", "texto": "Se angosta alrededor del valor real", "icono": "fa-compress" },
+    { "id": "b", "texto": "Se ensancha y se vuelve más plano", "icono": "fa-expand" },
+    { "id": "c", "texto": "Se desplaza entero hacia la derecha", "icono": "fa-arrow-right" }
+  ],
+  "correcta": "a",
+  "porque": "El error de una muestra aleatoria baja con la raíz de n: con 320 estudiantes las estimaciones se pegan más al valor real que con 20. El azar se reduce; el sesgo, solo si cambias la técnica.",
+  "comoComprobarlo": "En «Error muestral» deja la técnica aleatoria simple, toma 300 muestras con n = 20, luego con n = 320, y compara el ancho."
+}

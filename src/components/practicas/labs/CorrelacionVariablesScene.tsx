@@ -22,7 +22,7 @@
 
 import * as THREE from "three";
 import { useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
+import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
@@ -69,9 +69,17 @@ export interface CorrelacionSceneProps {
 type Pt = [number, number, number];
 
 /* ── Piezas comunes ───────────────────────────────────────────────────── */
-function Etiqueta({ pos, children, df = 10, col, izq }: { pos: Pt; children: ReactNode; df?: number; col?: string; izq?: boolean }) {
+/** Pantalla angosta: los paneles <Html> anchos se ocultan (la info ya está en el panel). */
+function useAngosto() {
+  return useThree((st) => st.size.width) < 640;
+}
+
+/** Cartel de punta de objeto: 14 px fijos, sin distanceFactor. `df` se ignora (compatibilidad). */
+function Etiqueta({ pos, children, col, izq }: { pos: Pt; children: ReactNode; df?: number; col?: string; izq?: boolean }) {
+  const angosto = useAngosto();
+  if (angosto) return null;
   return (
-    <Html position={pos} center={!izq} distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center={!izq} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -82,7 +90,7 @@ function Etiqueta({ pos, children, df = 10, col, izq }: { pos: Pt; children: Rea
           background: "rgba(4,10,22,0.84)",
           border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`,
           color: "#fff",
-          fontSize: 12,
+          fontSize: 14,
           fontWeight: 800,
           whiteSpace: "nowrap",
           boxShadow: "0 6px 18px -8px #000",
@@ -95,12 +103,24 @@ function Etiqueta({ pos, children, df = 10, col, izq }: { pos: Pt; children: Rea
   );
 }
 
-function Letra({ pos, children, df = 8, col = "#94a3b8", size = 12 }: { pos: Pt; children: ReactNode; df?: number; col?: string; size?: number }) {
+function Letra({ pos, children, col = "#94a3b8", size = 14 }: { pos: Pt; children: ReactNode; df?: number; col?: string; size?: number }) {
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
-      <div style={{ color: col, fontSize: size, fontWeight: 800, whiteSpace: "nowrap", textShadow: "0 2px 6px #000" }}>{children}</div>
+    <Html position={pos} center zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
+      <div style={{ color: col, fontSize: Math.max(14, size), fontWeight: 800, whiteSpace: "nowrap", textShadow: "0 2px 6px #000" }}>{children}</div>
     </Html>
   );
+}
+
+/** En pantallas angostas se aleja la cámara (zoom) para que el contenido quepa entre la barra y la misión. */
+function AjusteVista() {
+  useFrame((st) => {
+    const z = st.size.width < 640 ? 0.74 : 1;
+    if (st.camera.zoom !== z) {
+      st.camera.zoom = z;
+      st.camera.updateProjectionMatrix();
+    }
+  });
+  return null;
 }
 
 /** Suavizado por tiempo: la misma trayectoria a cualquier cuadro por segundo. */
@@ -126,6 +146,59 @@ function Movil({ objetivo, children, vel = 0.12, escala = 1 }: { objetivo: Pt; c
   return <group ref={ref}>{children}</group>;
 }
 
+/**
+ * Muchas esferas iguales en UNA sola malla instanciada (50 por torre, 52
+ * semanas). Cada una persigue su destino con suavizado por tiempo y, si cambia
+ * de color, «salta» de nuevo (como el Movil que se remontaba antes).
+ */
+function Esferas({ objetivos, colores, radio, vel = 0.12 }: { objetivos: Pt[]; colores: string[]; radio: number; vel?: number }) {
+  const n = objetivos.length;
+  const ref = useRef<THREE.InstancedMesh>(null);
+  const est = useRef<{ pos: Float32Array; esc: Float32Array; col: string[] } | null>(null);
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+  const tmp = useMemo(() => new THREE.Color(), []);
+  useFrame((_, dt) => {
+    const mesh = ref.current;
+    if (!mesh) return;
+    if (!est.current) {
+      est.current = { pos: new Float32Array(n * 3), esc: new Float32Array(n).fill(0.001), col: new Array<string>(n).fill("") };
+      for (let i = 0; i < n; i++) {
+        est.current.pos[i * 3] = objetivos[i]![0];
+        est.current.pos[i * 3 + 1] = objetivos[i]![1];
+        est.current.pos[i * 3 + 2] = objetivos[i]![2];
+      }
+    }
+    const e = est.current;
+    const k = suave(dt, vel);
+    const ke = suave(dt, 0.16);
+    let colorCambio = false;
+    for (let i = 0; i < n; i++) {
+      const o = objetivos[i]!;
+      for (let d = 0; d < 3; d++) e.pos[i * 3 + d] = e.pos[i * 3 + d]! + (o[d]! - e.pos[i * 3 + d]!) * k;
+      e.esc[i] = e.esc[i]! + (1 - e.esc[i]!) * ke;
+      const c = colores[i]!;
+      if (e.col[i] !== c) {
+        if (e.col[i] !== "") e.esc[i] = 0.3;
+        e.col[i] = c;
+        mesh.setColorAt(i, tmp.set(c));
+        colorCambio = true;
+      }
+      dummy.position.set(e.pos[i * 3]!, e.pos[i * 3 + 1]!, e.pos[i * 3 + 2]!);
+      dummy.scale.setScalar(e.esc[i]!);
+      dummy.updateMatrix();
+      mesh.setMatrixAt(i, dummy.matrix);
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+    if (colorCambio && mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+  });
+  return (
+    <instancedMesh key={n} ref={ref} args={[undefined, undefined, n]} castShadow frustumCulled={false}>
+      <sphereGeometry args={[radio, 14, 14]} />
+      <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.16} roughness={0.4} />
+    </instancedMesh>
+  );
+}
+
 /* ════════════════════════════════════════════════════════════════════════
  * MODO 1 · TABLA DE CONTINGENCIA EN TORRES
  * ════════════════════════════════════════════════════════════════════════ */
@@ -141,20 +214,14 @@ function Torre({ x, futbol, nombre, color, modoColor }: { x: number; futbol: num
   const alto = filas * SP;
   const frontera = Y0 + (futbol / COLS) * SP;
   const pct = Math.round((futbol / GRUPO) * 100);
+  const objetivos = useMemo<Pt[]>(
+    () => Array.from({ length: GRUPO }, (_, i) => [x + ((i % COLS) - (COLS - 1) / 2) * SP, Y0 + SP / 2 + Math.floor(i / COLS) * SP, 0] as Pt),
+    [x],
+  );
+  const colores = useMemo(() => Array.from({ length: GRUPO }, (_, i) => (i < futbol ? COL_FUTBOL : COL_BASQUET)), [futbol]);
   return (
     <group>
-      {Array.from({ length: GRUPO }, (_, i) => {
-        const esF = i < futbol;
-        const pos: Pt = [x + ((i % COLS) - (COLS - 1) / 2) * SP, Y0 + SP / 2 + Math.floor(i / COLS) * SP, 0];
-        return (
-          <Movil key={`${nombre}-${i}-${esF ? "f" : "b"}`} objetivo={pos}>
-            <mesh castShadow>
-              <sphereGeometry args={[0.145, 18, 18]} />
-              <meshStandardMaterial color={esF ? COL_FUTBOL : COL_BASQUET} emissive={esF ? "#94a3b8" : COL_BASQUET} emissiveIntensity={esF ? 0.12 : 0.28} roughness={0.4} />
-            </mesh>
-          </Movil>
-        );
-      })}
+      <Esferas objetivos={objetivos} colores={colores} radio={0.145} />
       {/* Vitrina */}
       <mesh position={[x, Y0 + alto / 2, 0]}>
         <boxGeometry args={[COLS * SP + 0.14, alto + 0.1, 0.52]} />
@@ -169,12 +236,9 @@ function Torre({ x, futbol, nombre, color, modoColor }: { x: number; futbol: num
         <boxGeometry args={[COLS * SP + 0.2, 0.035, 0.035]} />
         <meshBasicMaterial color={color} />
       </mesh>
-      <Letra pos={[x, Y0 - 0.42, 0.3]} col="#e2e8f0" size={14} df={9}>
-        {nombre}
-      </Letra>
-      <Etiqueta pos={[x, Y0 + alto + 0.45, 0]} col={`${modoColor}88`} df={10}>
+      <Etiqueta pos={[x, Y0 + alto + 0.45, 0]} col={`${modoColor}88`}>
         <span style={{ width: 9, height: 9, borderRadius: "50%", background: COL_FUTBOL }} />
-        fútbol {futbol}/{GRUPO} = {pct} %
+        {nombre} · fútbol {futbol}/{GRUPO} = {pct} %
       </Etiqueta>
     </group>
   );
@@ -207,7 +271,7 @@ function EscenaContingencia({ hF, mF, modoColor, accent }: { hF: number; mF: num
           gapSize={0.08}
         />
       </Movil>
-      <Etiqueta pos={[3.05, yEsp, 0.5]} col={`${accent}aa`} df={9} izq>
+      <Etiqueta pos={[0, yEsp + 0.32, 0.6]} col={`${accent}aa`}>
         Esperado: {fmt(esperado, esperado % 1 === 0 ? 0 : 1)}/{GRUPO}
       </Etiqueta>
     </group>
@@ -275,6 +339,7 @@ function EscenaDispersion({
 }) {
   const wx = (x: number) => -TW / 2 + ((x - rangoX.min) / (rangoX.max - rangoX.min)) * TW;
   const wy = (y: number) => -TH / 2 + ((y - rangoY.min) / (rangoY.max - rangoY.min)) * TH;
+  const angosto = useAngosto();
   const est = useMemo(() => estadisticos(puntos), [puntos]);
   const segmento = est.recta ? recortarRecta(est.recta.a, est.recta.b, rangoX, rangoY) : null;
 
@@ -318,12 +383,12 @@ function EscenaDispersion({
         color="#3b5275"
         lineWidth={1.5}
       />
-      {ticks(rangoX).map((t) => (
+      {ticks(rangoX).filter((_, i) => !angosto || i % 2 === 0).map((t) => (
         <Letra key={`tx-${t}`} pos={[wx(t), -TH / 2 - 0.22, 0]} size={11} df={8}>
           {fmt(t, 0)}
         </Letra>
       ))}
-      {ticks(rangoY).map((t) => (
+      {ticks(rangoY).filter((_, i) => !angosto || i % 2 === 0).map((t) => (
         <Letra key={`ty-${t}`} pos={[-TW / 2 - 0.3, wy(t), 0]} size={11} df={8}>
           {fmt(t, 0)}
         </Letra>
@@ -331,8 +396,8 @@ function EscenaDispersion({
       <Letra pos={[0, -TH / 2 - 0.55, 0]} col="#e2e8f0" size={13} df={9}>
         {ejeX}
       </Letra>
-      <Html position={[-TW / 2 - 0.72, 0, 0]} center distanceFactor={9} zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
-        <div style={{ color: "#e2e8f0", fontSize: 13, fontWeight: 800, whiteSpace: "nowrap", transform: "rotate(-90deg)", textShadow: "0 2px 6px #000" }}>{ejeY}</div>
+      <Html position={[-TW / 2 - 0.72, 0, 0]} center zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
+        <div style={{ color: "#e2e8f0", fontSize: 14, fontWeight: 800, whiteSpace: "nowrap", transform: "rotate(-90deg)", textShadow: "0 2px 6px #000" }}>{ejeY}</div>
       </Html>
 
       {/* Rectángulos de productos y centro de la nube */}
@@ -425,6 +490,8 @@ const CX = 5.4;
 const CY = 3.6;
 const CZ = 4.6;
 
+const MIRA_Y = -0.4;
+
 /** Lleva la cámara a una posición durante un momento y después la suelta. */
 function CamaraGuiada({ destino, clave }: { destino: Pt; clave: string }) {
   const desde = useRef<{ clave: string; t: number } | null>(null);
@@ -438,7 +505,7 @@ function CamaraGuiada({ destino, clave }: { destino: Pt; clave: string }) {
     camera.position.x += (destino[0] - camera.position.x) * k;
     camera.position.y += (destino[1] - camera.position.y) * k;
     camera.position.z += (destino[2] - camera.position.z) * k;
-    camera.lookAt(0, 0, 0);
+    camera.lookAt(0, MIRA_Y, 0);
     (controls as unknown as { update?: () => void } | null)?.update?.();
   });
   return null;
@@ -510,33 +577,34 @@ function EscenaCausal({ semanas, vista, accent }: { semanas: Semana[]; vista: Vi
         <meshStandardMaterial color="#0b1628" roughness={0.9} transparent opacity={conProfundidad ? 0.9 : 0.35} />
       </mesh>
 
-      <Letra pos={[0, -CY / 2 - 0.35, CZ / 2 + 0.2]} col="#e2e8f0" size={12} df={7.5}>
-        Helado vendido (miles de litros por semana)
-      </Letra>
-      {conProfundidad ? (
-        <Letra pos={[-CX / 2, CY / 2 + 0.3, CZ / 2]} col="#e2e8f0" size={12} df={7.5}>
-          Ahogamientos por semana
+      {vista !== "controlada" && (
+        <Letra pos={[0, -CY / 2 - 0.35, CZ / 2 + 0.2]} col="#e2e8f0">
+          Helado vendido (miles de litros por semana)
         </Letra>
-      ) : (
-        <Html position={[-CX / 2 - 0.45, 0, CZ / 2]} center distanceFactor={7.5} zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
-          <div style={{ color: "#e2e8f0", fontSize: 12, fontWeight: 800, whiteSpace: "nowrap", transform: "rotate(-90deg)", textShadow: "0 2px 6px #000" }}>Ahogamientos por semana</div>
-        </Html>
       )}
-      {conProfundidad && (
+      {vista !== "controlada" &&
+        (conProfundidad ? (
+          <Letra pos={[-CX / 2, CY / 2 + 0.3, CZ / 2]} col="#e2e8f0">
+            Ahogamientos por semana
+          </Letra>
+        ) : (
+          <Html position={[-CX / 2 - 0.45, 0, CZ / 2]} center zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
+            <div style={{ color: "#e2e8f0", fontSize: 14, fontWeight: 800, whiteSpace: "nowrap", transform: "rotate(-90deg)", textShadow: "0 2px 6px #000" }}>Ahogamientos por semana</div>
+          </Html>
+        ))}
+      {vista === "oculta" && (
         <>
-          <Letra pos={[-CX / 2 - 0.35, -CY / 2, tz(SEMANAS_T.min)]} col={accent} size={11} df={7.5}>
+          <Letra pos={[-CX / 2 - 0.35, -CY / 2, tz(SEMANAS_T.min)]} col={accent}>
             {SEMANAS_T.min} °C
           </Letra>
-          <Letra pos={[-CX / 2 - 0.35, -CY / 2, tz(SEMANAS_T.max)]} col={accent} size={11} df={7.5}>
+          <Letra pos={[-CX / 2 - 0.35, -CY / 2, tz(SEMANAS_T.max)]} col={accent}>
             {SEMANAS_T.max} °C
           </Letra>
+          <Etiqueta pos={[-CX / 2 - 0.2, -CY / 2 + 0.35, -CZ / 2 - 0.3]} col={`${accent}aa`}>
+            <i className="fa-solid fa-temperature-high" style={{ color: accent }} />
+            Temperatura (°C): la variable oculta
+          </Etiqueta>
         </>
-      )}
-      {conProfundidad && (
-        <Etiqueta pos={[-CX / 2 - 0.2, -CY / 2 + 0.35, -CZ / 2 - 0.3]} col={`${accent}aa`} df={7.5}>
-          <i className="fa-solid fa-temperature-high" style={{ color: accent }} />
-          Temperatura (°C): la variable oculta
-        </Etiqueta>
       )}
 
       {/* Rebanadas de temperatura */}
@@ -561,17 +629,12 @@ function EscenaCausal({ semanas, vista, accent }: { semanas: Semana[]; vista: Vi
         <Line points={recta(global.recta.a, global.recta.b, HELADO_R.min + 0.5, HELADO_R.max - 0.8, CZ / 2)} color={accent} lineWidth={2.6} transparent opacity={vista === "aparente" ? 1 : 0.35} />
       )}
 
-      {semanas.map((s, i) => {
-        const col = vista === "aparente" ? "#e0f2fe" : vista === "oculta" ? colorTemperatura(s.temperatura) : bandaDe(s.temperatura).color;
-        return (
-          <Movil key={i} objetivo={[hx(s.helado), ay(s.ahogamientos), conProfundidad ? tz(s.temperatura) : CZ / 2]} vel={0.08}>
-            <mesh castShadow>
-              <sphereGeometry args={[0.1, 16, 16]} />
-              <meshStandardMaterial color={col} emissive={col} emissiveIntensity={0.45} roughness={0.35} />
-            </mesh>
-          </Movil>
-        );
-      })}
+      <Esferas
+        objetivos={semanas.map((s) => [hx(s.helado), ay(s.ahogamientos), conProfundidad ? tz(s.temperatura) : CZ / 2] as Pt)}
+        colores={semanas.map((s) => (vista === "aparente" ? "#e0f2fe" : vista === "oculta" ? colorTemperatura(s.temperatura) : bandaDe(s.temperatura).color))}
+        radio={0.1}
+        vel={0.08}
+      />
     </group>
   );
 }
@@ -579,8 +642,8 @@ function EscenaCausal({ semanas, vista, accent }: { semanas: Semana[]; vista: Vi
 /* ── Escena ───────────────────────────────────────────────────────────── */
 export default function CorrelacionVariablesScene(props: CorrelacionSceneProps) {
   const { modo, hombresFutbol, mujeresFutbol, puntos, rangoX, rangoY, ejeX, ejeY, mostrarRecta, mostrarProductos, onAgregar, onQuitar, semanas, vistaCausal, accent, modoColor, resetNonce } = props;
-  const camara: Pt = modo === "contingencia" ? [0, 0.6, 9.2] : modo === "dispersion" ? [0, 0.2, 9.6] : [0, 0.3, 11.6];
-  const destinoCausal: Pt = vistaCausal === "aparente" ? [0, 0.3, 11.6] : [-4.8, 3.6, 10.4];
+  const camara: Pt = modo === "contingencia" ? [0, 0.2, 9.2] : modo === "dispersion" ? [0, -0.2, 9.6] : [0, -0.1, 11.6];
+  const destinoCausal: Pt = vistaCausal === "aparente" ? [0, -0.1, 11.6] : [-4.8, 3.2, 10.4];
 
   return (
     <Canvas key={`${modo}-${resetNonce}`} shadows dpr={[1, 1.75]} camera={{ position: camara, fov: 42 }} gl={{ antialias: true }}>
@@ -602,7 +665,8 @@ export default function CorrelacionVariablesScene(props: CorrelacionSceneProps) 
         </>
       )}
 
-      <OrbitControls makeDefault enablePan={false} enableZoom minDistance={5} maxDistance={18} maxPolarAngle={Math.PI * 0.62} minPolarAngle={Math.PI * 0.15} enableRotate={modo !== "dispersion"} target={[0, 0, 0]} />
+      <OrbitControls makeDefault enablePan={false} enableZoom minDistance={5} maxDistance={18} maxPolarAngle={Math.PI * 0.62} minPolarAngle={Math.PI * 0.15} enableRotate={modo !== "dispersion"} target={[0, MIRA_Y, 0]} />
+      <AjusteVista />
       <EffectComposer>
         <Bloom intensity={0.34} luminanceThreshold={0.5} luminanceSmoothing={0.85} mipmapBlur />
         <Vignette eskil={false} offset={0.18} darkness={0.7} />

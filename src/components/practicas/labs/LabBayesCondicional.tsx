@@ -22,6 +22,8 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, NUM, OK, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, BotonHerramienta, Deslizador } from "./_shell";
+import type { ObjetivoLab } from "./_objetivos";
 import { FichaTeorica } from "./_ficha";
 import { RetoNumericoCard } from "./_reto-numerico";
 import { LabSfx } from "./lab-audio";
@@ -79,7 +81,7 @@ const BayesScene = dynamic(() => import("./BayesCondicionalScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-vial-virus fa-fade" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Cargando el laboratorio de probabilidad condicional en 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Cargando el laboratorio de probabilidad condicional en 3D…</span>
     </div>
   ),
 });
@@ -130,7 +132,7 @@ function EstimaVppCard({
 
   const dato = (etq: string, v: string) => (
     <div style={{ flex: "1 1 120px", padding: "10px 12px", borderRadius: 10, background: "rgba(4,10,22,0.45)", border: `1px solid ${T.line}` }}>
-      <div style={{ fontSize: 10, fontWeight: 900, color: T.text3, letterSpacing: "0.07em", textTransform: "uppercase" }}>{etq}</div>
+      <div style={{ fontSize: 14, fontWeight: 900, color: T.text3, letterSpacing: "0.07em", textTransform: "uppercase" }}>{etq}</div>
       <div style={{ fontSize: 18, fontWeight: 900, color: "#fff", ...NUM }}>{v}</div>
     </div>
   );
@@ -143,14 +145,14 @@ function EstimaVppCard({
           Estima el VPP antes de calcularlo
         </Eyebrow>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 10.5, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
+          <span style={{ fontSize: 14.5, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
           {[1, 2, 3].map((k) => (
-            <i key={k} className="fa-solid fa-star" style={{ fontSize: 13, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
+            <i key={k} className="fa-solid fa-star" style={{ fontSize: 14, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
           ))}
         </div>
       </div>
 
-      <div style={{ fontSize: 13, color: T.text2, lineHeight: 1.55, marginBottom: 12 }}>
+      <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55, marginBottom: 12 }}>
         Una persona sale positiva en esta prueba. ¿Qué probabilidad hay de que de verdad esté enferma? Estima con la intuición o haciendo cuentas: 3 estrellas si te
         equivocas por 2 puntos o menos, 2 hasta 5 puntos y 1 hasta 12.
       </div>
@@ -178,13 +180,13 @@ function EstimaVppCard({
           <button
             onClick={revelar}
             disabled={valorTxt.trim() === ""}
-            style={{ cursor: "pointer", padding: "12px 18px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.18)`, color: "#fff", fontSize: 13, fontWeight: 900, opacity: valorTxt.trim() === "" ? 0.45 : 1 }}
+            style={{ cursor: "pointer", padding: "12px 18px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.18)`, color: "#fff", fontSize: 14, fontWeight: 900, opacity: valorTxt.trim() === "" ? 0.45 : 1 }}
           >
             <i className="fa-solid fa-eye" style={{ marginRight: 8 }} />
             Revelar
           </button>
         ) : (
-          <button onClick={otro} style={{ cursor: "pointer", padding: "12px 18px", borderRadius: 10, border: `1px solid ${T.lineStrong}`, background: "transparent", color: "#fff", fontSize: 13, fontWeight: 900 }}>
+          <button onClick={otro} style={{ cursor: "pointer", padding: "12px 18px", borderRadius: 10, border: `1px solid ${T.lineStrong}`, background: "transparent", color: "#fff", fontSize: 14, fontWeight: 900 }}>
             <i className="fa-solid fa-shuffle" style={{ marginRight: 8 }} />
             Otro caso
           </button>
@@ -197,11 +199,11 @@ function EstimaVppCard({
             {[1, 2, 3].map((k) => (
               <i key={k} className="fa-solid fa-star" style={{ fontSize: 15, color: k <= revelado.estrellas ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
             ))}
-            <span style={{ fontSize: 12.5, fontWeight: 900, color: revelado.estrellas > 0 ? OK : "#FF8A3C", marginLeft: 4, ...NUM }}>
+            <span style={{ fontSize: 14.5, fontWeight: 900, color: revelado.estrellas > 0 ? OK : "#FF8A3C", marginLeft: 4, ...NUM }}>
               VPP real: {fmtPct(b.vpp)} · tu estimación: {revelado.estimado} % · diferencia {Math.abs(revelado.estimado - b.vpp * 100).toFixed(1)} puntos
             </span>
           </div>
-          <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.6, ...NUM }}>
+          <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.6, ...NUM }}>
             En 10 000 personas hay {miles(c.enfermos)} enfermas; la prueba detecta a {miles(c.vp)}. De las {miles(c.sanos)} sanas, {miles(c.fp)} salen positivas por error. Entre los{" "}
             {miles(c.vp + c.fp)} positivos, {miles(c.vp)} están enfermos: VPP = {miles(c.vp)} / {miles(c.vp + c.fp)} = <strong style={{ color: "#fff" }}>{fmtPct(b.vpp)}</strong>.
           </div>
@@ -241,7 +243,6 @@ export function LabBayesCondicional({ color }: PracticaLabProps) {
   // ── Comunes
   const [resetNonce, setResetNonce] = useState(0);
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
 
@@ -254,6 +255,7 @@ export function LabBayesCondicional({ color }: PracticaLabProps) {
   const [prevalenciaBaja, setPrevalenciaBaja] = useState(false);
   const [segundaPrueba, setSegundaPrueba] = useState(false);
   const [estimo, setEstimo] = useState(false);
+  const [movioPrev, setMovioPrev] = useState(false);
 
   const { mejorEstrellas, registraEstrellas: guardaEstrellas } = useEstrellas(RETO_KEY);
   const registraEstrellas = useCallback(
@@ -375,6 +377,7 @@ export function LabBayesCondicional({ color }: PracticaLabProps) {
   };
   const cambiarParametro = (cual: "prev" | "sens" | "esp", x: number) => {
     const v = { prev, sens, esp, vista: vistaDx, ronda: 1 as const, [cual]: x };
+    if (cual === "prev") setMovioPrev(true);
     if (cual === "prev") setPrev(x);
     else if (cual === "sens") setSens(x);
     else setEsp(x);
@@ -430,17 +433,18 @@ export function LabBayesCondicional({ color }: PracticaLabProps) {
   };
 
   /* ── Objetivos ─────────────────────────────────────────────────────── */
-  const objetivos: { t: string; done: boolean }[] = [
-    { t: "Condicionar a un grupo y ver cómo se reduce el espacio muestral", done: condicionesVistas.has("B") || condicionesVistas.has("Bc") },
-    { t: "Comparar P(A|B) con la condición invertida P(B|A)", done: (condicionesVistas.has("B") || condicionesVistas.has("Bc")) && condicionesVistas.has("A") },
-    { t: "Encontrar cuántas mujeres deben fumar para que fumar sea independiente de ser hombre", done: hallaIndependencia },
-    { t: "Simular al menos 1 000 repeticiones de un árbol", done: simuloArbol },
-    { t: "Invertir un árbol con el teorema de Bayes", done: invirtioArbol },
-    { t: "Separar los positivos con los datos del ejercicio A2", done: positivosA2 },
-    { t: "Ver los positivos con una prevalencia de 1 % o menos", done: prevalenciaBaja },
-    { t: "Aplicar una segunda prueba a los positivos", done: segundaPrueba },
-    { t: "Estimar un VPP y ganar al menos una estrella", done: estimo },
-    { t: "Resolver el reto evaluable (ejercicio A2)", done: ejercicioAprobado },
+  const objetivos: ObjetivoLab[] = [
+    { txt: "Condicionar a un grupo y ver cómo se reduce el espacio muestral", done: condicionesVistas.has("B") || condicionesVistas.has("Bc") },
+    { txt: "Comparar P(A|B) con la condición invertida P(B|A)", done: (condicionesVistas.has("B") || condicionesVistas.has("Bc")) && condicionesVistas.has("A") },
+    { txt: "Encontrar cuántas mujeres deben fumar para que fumar sea independiente de ser hombre", done: hallaIndependencia },
+    { txt: "Simular al menos 1 000 repeticiones de un árbol", done: simuloArbol },
+    { txt: "Invertir un árbol con el teorema de Bayes", done: invirtioArbol },
+    { txt: "En la prueba diagnóstica, mueve la prevalencia y mira cómo cambian los falsos positivos", done: movioPrev },
+    { txt: "Separar los positivos con los datos del ejercicio A2", done: positivosA2 },
+    { txt: "Ver los positivos con una prevalencia de 1 % o menos", done: prevalenciaBaja },
+    { txt: "Aplicar una segunda prueba a los positivos", done: segundaPrueba },
+    { txt: "Estimar un VPP y ganar al menos una estrella", done: estimo },
+    { txt: "Resolver el reto evaluable (ejercicio A2)", done: ejercicioAprobado },
   ];
 
   /* ── Textos del visor ──────────────────────────────────────────────── */
@@ -479,21 +483,21 @@ export function LabBayesCondicional({ color }: PracticaLabProps) {
         <i className={`fa-solid ${def.icono}`} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{def.etq}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>
         Tu equipo no puede mostrar la escena en 3D, pero la información sigue aquí. {DEFINICION}
       </div>
     </div>
   );
 
   const sub = (txt: string, extra?: ReactNode) => (
-    <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>
+    <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>
       {txt}
       {extra}
     </div>
   );
 
   const chip = (col: string, txt: ReactNode, forma: "cuadro" | "bola" = "cuadro") => (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 9px", borderRadius: 999, background: "rgba(4,10,22,0.72)", border: `1px solid ${T.line}`, fontSize: 11, fontWeight: 800, color: "#e2e8f0", whiteSpace: "nowrap" }}>
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 9px", borderRadius: 999, background: "rgba(4,10,22,0.72)", border: `1px solid ${T.line}`, fontSize: 14, fontWeight: 800, color: "#e2e8f0", whiteSpace: "nowrap" }}>
       <span style={{ width: 9, height: 9, borderRadius: forma === "bola" ? "50%" : 3, background: col }} />
       {txt}
     </span>
@@ -549,7 +553,7 @@ export function LabBayesCondicional({ color }: PracticaLabProps) {
             );
           })}
         </div>
-        <div style={{ marginTop: 8, fontSize: 11.5, color: T.text3, lineHeight: 1.5 }}>{poblacion.nota}</div>
+        <div style={{ marginTop: 8, fontSize: 14.5, color: T.text3, lineHeight: 1.5 }}>{poblacion.nota}</div>
 
         {sub("¿Qué sabemos de la persona elegida?")}
         <div className="bc-opts">
@@ -565,16 +569,15 @@ export function LabBayesCondicional({ color }: PracticaLabProps) {
 
         {poblacion.abcAjustable && (
           <>
-            {sub(`${poblacion.nombreBc} que cumplen «${poblacion.nombreA.toLowerCase()}»`, <span style={{ color: "#fff", ...NUM }}> — {nABc} de {nBc}</span>)}
-            <input type="range" min={0} max={nBc} step={1} value={nABc} onChange={(e) => cambiarNABc(Number(e.target.value))} aria-label={`${poblacion.nombreBc} que cumplen ${poblacion.nombreA}`} className="bc-range" style={{ ["--bcc" as string]: modoCol }} />
+            <Deslizador label={`${poblacion.nombreBc} que cumplen «${poblacion.nombreA.toLowerCase()}»`} colr={modoCol} valor={`${nABc} de ${nBc}`} min={0} max={nBc} step={1} value={nABc} onChange={cambiarNABc} />
           </>
         )}
 
         {sub("Tabla de doble entrada")}
         <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 3, fontSize: 13 }}>
+          <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 3, fontSize: 14 }}>
             <thead>
-              <tr style={{ color: T.text3, fontSize: 11 }}>
+              <tr style={{ color: T.text3, fontSize: 14 }}>
                 <th />
                 <th style={{ padding: 4 }}>{poblacion.nombreA}</th>
                 <th style={{ padding: 4 }}>No</th>
@@ -583,19 +586,19 @@ export function LabBayesCondicional({ color }: PracticaLabProps) {
             </thead>
             <tbody>
               <tr>
-                <th style={{ textAlign: "left", fontSize: 11.5, color: "#38bdf8", padding: 4 }}>{poblacion.nombreB}</th>
+                <th style={{ textAlign: "left", fontSize: 14.5, color: "#38bdf8", padding: 4 }}>{poblacion.nombreB}</th>
                 {celda(poblacion.nAB, esNum("B", "A"), esDen("B", "A"))}
                 {celda(poblacion.nB - poblacion.nAB, false, false)}
                 {celda(poblacion.nB, false, esDen("B", "T"), true)}
               </tr>
               <tr>
-                <th style={{ textAlign: "left", fontSize: 11.5, color: "#a78bfa", padding: 4 }}>{poblacion.nombreBc}</th>
+                <th style={{ textAlign: "left", fontSize: 14.5, color: "#a78bfa", padding: 4 }}>{poblacion.nombreBc}</th>
                 {celda(nABc, esNum("Bc", "A"), esDen("Bc", "A"))}
                 {celda(nBc - nABc, false, false)}
                 {celda(nBc, false, esDen("Bc", "T"), true)}
               </tr>
               <tr>
-                <th style={{ textAlign: "left", fontSize: 11.5, color: T.text3, padding: 4 }}>Total</th>
+                <th style={{ textAlign: "left", fontSize: 14.5, color: T.text3, padding: 4 }}>Total</th>
                 {celda(nA, esNum("T", "A"), esDen("T", "A"), true)}
                 {celda(poblacion.total - nA, false, false, true)}
                 {celda(poblacion.total, false, esDen("T", "T"), true)}
@@ -603,7 +606,7 @@ export function LabBayesCondicional({ color }: PracticaLabProps) {
             </tbody>
           </table>
         </div>
-        <div style={{ marginTop: 6, fontSize: 11, color: T.text3, lineHeight: 1.5 }}>
+        <div style={{ marginTop: 6, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
           <span style={{ display: "inline-block", width: 10, height: 10, borderRadius: 3, background: `rgba(${color.rgba},0.5)`, marginRight: 6, verticalAlign: "middle" }} />
           casos favorables
           <span style={{ display: "inline-block", width: 10, height: 10, borderRadius: 3, border: `2px solid ${modoCol}`, margin: "0 6px 0 14px", verticalAlign: "middle" }} />
@@ -611,7 +614,7 @@ export function LabBayesCondicional({ color }: PracticaLabProps) {
         </div>
 
         <div style={{ marginTop: 14, padding: "12px 14px", borderRadius: 12, border: `1px solid ${modoCol}55`, background: `${modoCol}12` }}>
-          <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 12.5, lineHeight: 1.8, color: "#eaf0fb", textAlign: "center", ...NUM }}>
+          <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 14.5, lineHeight: 1.8, color: "#eaf0fb", textAlign: "center", ...NUM }}>
             {condicion === "ninguna" ? (
               <div>
                 {lectura.notacion} = {nA}/{poblacion.total} = <span style={{ color: accent, fontWeight: 900 }}>{sig(valorLectura)}</span>
@@ -629,7 +632,7 @@ export function LabBayesCondicional({ color }: PracticaLabProps) {
               </>
             )}
           </div>
-          <div style={{ marginTop: 6, fontSize: 11.5, color: T.text2, lineHeight: 1.5, textAlign: "center" }}>
+          <div style={{ marginTop: 6, fontSize: 14.5, color: T.text2, lineHeight: 1.5, textAlign: "center" }}>
             El {poblacion.total} se cancela: dividir probabilidades es lo mismo que contar dentro del grupo que queda.
           </div>
         </div>
@@ -640,7 +643,7 @@ export function LabBayesCondicional({ color }: PracticaLabProps) {
             <Readout label={`P(${poblacion.cortoA}|${poblacion.cortoBc})`} value={sig(pABc)} size={16} />
             <Readout label={`P(${poblacion.cortoA})`} value={sig(pA)} size={16} col={indep ? OK : undefined} />
           </div>
-          <div style={{ fontSize: 11.5, color: indep ? OK : T.text2, lineHeight: 1.5, textAlign: "center", fontWeight: indep ? 800 : 500 }}>
+          <div style={{ fontSize: 14.5, color: indep ? OK : T.text2, lineHeight: 1.5, textAlign: "center", fontWeight: indep ? 800 : 500 }}>
             {indep
               ? `Independientes: saber si es ${poblacion.cortoB} o ${poblacion.cortoBc} no cambia la probabilidad, P(${poblacion.cortoA}|${poblacion.cortoB}) = P(${poblacion.cortoA}).`
               : poblacion.abcAjustable && nIndep !== null
@@ -664,7 +667,7 @@ export function LabBayesCondicional({ color }: PracticaLabProps) {
             );
           })}
         </div>
-        <div style={{ marginTop: 8, fontSize: 11.5, color: T.text3, lineHeight: 1.5 }}>{e.nota}</div>
+        <div style={{ marginTop: 8, fontSize: 14.5, color: T.text3, lineHeight: 1.5 }}>{e.nota}</div>
 
         <button className="bc-toggle" data-on={invertido} onClick={alternarInvertido} style={{ marginTop: 12, ["--bcc" as string]: invertido ? accent : "rgba(255,255,255,0.2)" }}>
           <i className={`fa-solid ${invertido ? "fa-eye" : "fa-arrow-right-arrow-left"}`} style={{ marginRight: 9, color: accent }} />
@@ -673,9 +676,9 @@ export function LabBayesCondicional({ color }: PracticaLabProps) {
 
         {sub("Caminos del árbol (regla del producto)")}
         <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
             <thead>
-              <tr style={{ color: T.text3, fontSize: 10.5, textAlign: "left" }}>
+              <tr style={{ color: T.text3, fontSize: 14.5, textAlign: "left" }}>
                 <th style={{ padding: "4px 6px" }}>Camino</th>
                 <th style={{ padding: "4px 6px" }}>Producto</th>
                 <th style={{ padding: "4px 6px", textAlign: "right" }}>P</th>
@@ -704,7 +707,7 @@ export function LabBayesCondicional({ color }: PracticaLabProps) {
           </table>
         </div>
 
-        <div style={{ marginTop: 12, padding: "12px 14px", borderRadius: 12, border: `1px solid ${modoCol}55`, background: `${modoCol}12`, fontFamily: "ui-monospace, monospace", fontSize: 12, lineHeight: 1.8, color: "#eaf0fb", ...NUM }}>
+        <div style={{ marginTop: 12, padding: "12px 14px", borderRadius: 12, border: `1px solid ${modoCol}55`, background: `${modoCol}12`, fontFamily: "ui-monospace, monospace", fontSize: 14, lineHeight: 1.8, color: "#eaf0fb", ...NUM }}>
           <div>
             <span style={{ color: T.text3 }}>Probabilidad total · </span>P({notacionA(e.a)}) = {txtP(e, arbol.hojas[0]!.p)} + {txtP(e, arbol.hojas[2]!.p)} ={" "}
             <span style={{ color: "#fbbf24", fontWeight: 900 }}>{txtP(e, arbol.pA)}</span>
@@ -713,11 +716,11 @@ export function LabBayesCondicional({ color }: PracticaLabProps) {
             <span style={{ color: T.text3 }}>Bayes · </span>P({notacionB(e.b)} | {notacionA(e.a)}) = {txtP(e, arbol.hojas[0]!.p)} / {txtP(e, arbol.pA)} ={" "}
             <span style={{ color: accent, fontWeight: 900 }}>{txtP(e, arbol.pBdadoA)}</span>
           </div>
-          <div style={{ color: T.text3, fontSize: 11.5 }}>
+          <div style={{ color: T.text3, fontSize: 14.5 }}>
             Antes de saber nada: P({notacionB(e.b)}) = {txtP(e, e.pB)}
           </div>
         </div>
-        <div style={{ marginTop: 8, fontSize: 11.5, color: arbol.independientes ? OK : T.text2, lineHeight: 1.5, fontWeight: arbol.independientes ? 800 : 500 }}>
+        <div style={{ marginTop: 8, fontSize: 14.5, color: arbol.independientes ? OK : T.text2, lineHeight: 1.5, fontWeight: arbol.independientes ? 800 : 500 }}>
           {arbol.independientes
             ? `Las dos ramas de la 2.ª etapa valen ${txtP(e, e.pAdadoB)}: el resultado de la 1.ª no cambia nada. Eventos independientes, y por eso Bayes devuelve P(${e.b}) sin cambios.`
             : `P(${e.a} | ${e.b}) = ${txtP(e, e.pAdadoB)} y P(${e.a} | ${e.bc}) = ${txtP(e, e.pAdadoBc)} son distintas: los eventos son dependientes.`}
@@ -733,7 +736,7 @@ export function LabBayesCondicional({ color }: PracticaLabProps) {
             Simular 10 000
           </button>
           {simHojas && (
-            <span style={{ alignSelf: "center", fontSize: 12, color: T.text2, ...NUM }}>
+            <span style={{ alignSelf: "center", fontSize: 14, color: T.text2, ...NUM }}>
               {miles(totalSim)} repeticiones · P({e.a}) simulada ≈ {((simHojas[0]! + simHojas[2]!) / totalSim).toFixed(4)}
             </span>
           )}
@@ -742,15 +745,8 @@ export function LabBayesCondicional({ color }: PracticaLabProps) {
     );
   } else {
     const idxDe = (arr: number[], v: number) => Math.max(0, arr.indexOf(v));
-    const deslizador = (etq: string, arr: number[], v: number, cual: "prev" | "sens" | "esp", ayuda: string) => (
-      <div>
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, fontWeight: 800, color: T.text2, marginBottom: 4 }}>
-          <span>{etq}</span>
-          <span style={{ color: "#fff", ...NUM }}>{pctCorto(v)}</span>
-        </div>
-        <input type="range" min={0} max={arr.length - 1} step={1} value={idxDe(arr, v)} onChange={(e) => cambiarParametro(cual, arr[Number(e.target.value)]!)} aria-label={etq} className="bc-range" style={{ ["--bcc" as string]: modoCol }} />
-        <div style={{ fontSize: 10.5, color: T.text3 }}>{ayuda}</div>
-      </div>
+    const deslizador = (etq: string, arr: number[], v: number, cual: "prev" | "sens" | "esp", ayuda: string, colr: string) => (
+      <Deslizador label={etq} colr={colr} valor={pctCorto(v)} min={0} max={arr.length - 1} step={1} value={idxDe(arr, v)} onChange={(i) => cambiarParametro(cual, arr[i]!)} hintL={ayuda} />
     );
     const pasos: { etq: string; vista: VistaDx; icono: string }[] = [
       { etq: "Población", vista: "poblacion", icono: "fa-people-group" },
@@ -769,16 +765,16 @@ export function LabBayesCondicional({ color }: PracticaLabProps) {
             );
           })}
         </div>
-        <div style={{ marginTop: 8, fontSize: 11.5, color: T.text3, lineHeight: 1.5 }}>{escenarioActivo ? escenarioActivo.nota : "Valores elegidos con los controles."}</div>
+        <div style={{ marginTop: 8, fontSize: 14.5, color: T.text3, lineHeight: 1.5 }}>{escenarioActivo ? escenarioActivo.nota : "Valores elegidos con los controles."}</div>
 
-        <div style={{ display: "grid", gap: 12, marginTop: 14 }}>
-          {deslizador("Prevalencia", PREVALENCIAS, prev, "prev", "Qué tan común es la enfermedad en la población.")}
-          {deslizador("Sensibilidad · P(positivo | enfermo)", SENSIBILIDADES, sens, "sens", "Qué tan bien detecta la prueba a los enfermos.")}
-          {deslizador("Especificidad · P(negativo | sano)", ESPECIFICIDADES, esp, "esp", "Qué tan bien descarta a los sanos.")}
+        <div style={{ display: "grid", gap: 4, marginTop: 14 }}>
+          {deslizador("Prevalencia", PREVALENCIAS, prev, "prev", "Qué tan común es la enfermedad en la población.", "#f472b6")}
+          {deslizador("Sensibilidad · P(positivo | enfermo)", SENSIBILIDADES, sens, "sens", "Qué tan bien detecta la prueba a los enfermos.", "#34d399")}
+          {deslizador("Especificidad · P(negativo | sano)", ESPECIFICIDADES, esp, "esp", "Qué tan bien descarta a los sanos.", "#60a5fa")}
         </div>
 
         <div className="bc-opts" style={{ marginTop: 12, alignItems: "center" }}>
-          <span style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.06em", marginRight: 4 }}>PERSONAS</span>
+          <span style={{ fontSize: 14, fontWeight: 900, color: T.text3, letterSpacing: "0.06em", marginRight: 4 }}>PERSONAS</span>
           {([1000, 10000] as const).map((n) => (
             <button key={n} className="bc-opt" data-on={tamano === n} onClick={() => cambiarTamano(n)} style={{ ["--bcc" as string]: accent, background: tamano === n ? `rgba(${color.rgba},0.16)` : "transparent", ...NUM }}>
               {miles(n)}
@@ -809,11 +805,22 @@ export function LabBayesCondicional({ color }: PracticaLabProps) {
           )}
         </div>
 
+        <div style={{ marginTop: 14, display: "grid", gap: 6 }}>
+          <div style={{ fontSize: 14, fontWeight: 800, color: "#fff" }}>De los {miles(positivosActual)} positivos, ¿cuántos están enfermos?</div>
+          <div style={{ display: "flex", height: 18, borderRadius: 9, overflow: "hidden", background: "rgba(255,255,255,0.1)" }}>
+            <div style={{ width: `${positivosActual === 0 ? 0 : (conteos.vp / positivosActual) * 100}%`, background: COL_DX.vp, transition: "width 160ms linear" }} />
+            <div style={{ flex: 1, background: COL_DX.fp, transition: "width 160ms linear" }} />
+          </div>
+          <div style={{ fontSize: 14, color: T.text2 }}>
+            <span style={{ color: COL_DX.vp, fontWeight: 800 }}>{miles(conteos.vp)} enfermos</span> · <span style={{ color: COL_DX.fp, fontWeight: 800 }}>{miles(conteos.fp)} sanos (falsos positivos)</span> · VPP = {fmtPct(bActual.vpp)}
+          </div>
+        </div>
+
         {sub("Conteo de personas", <span style={{ color: "#fff", ...NUM }}> — {miles(conteos.total)}</span>)}
         <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 3, fontSize: 12.5, ...NUM }}>
+          <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 3, fontSize: 14.5, ...NUM }}>
             <thead>
-              <tr style={{ color: T.text3, fontSize: 10.5 }}>
+              <tr style={{ color: T.text3, fontSize: 14.5 }}>
                 <th />
                 <th style={{ padding: 4 }}>Positivo</th>
                 <th style={{ padding: 4 }}>Negativo</th>
@@ -822,19 +829,19 @@ export function LabBayesCondicional({ color }: PracticaLabProps) {
             </thead>
             <tbody>
               <tr>
-                <th style={{ textAlign: "left", color: COL_DX.vp, fontSize: 11.5, padding: 4 }}>Enfermos</th>
+                <th style={{ textAlign: "left", color: COL_DX.vp, fontSize: 14.5, padding: 4 }}>Enfermos</th>
                 <td className="bc-td" style={{ background: `${COL_DX.vp}33`, color: "#fff" }}>{miles(conteos.vp)}</td>
                 <td className="bc-td">{miles(conteos.fn)}</td>
                 <td className="bc-td" style={{ fontWeight: 900 }}>{miles(conteos.enfermos)}</td>
               </tr>
               <tr>
-                <th style={{ textAlign: "left", color: COL_DX.fp, fontSize: 11.5, padding: 4 }}>Sanos</th>
+                <th style={{ textAlign: "left", color: COL_DX.fp, fontSize: 14.5, padding: 4 }}>Sanos</th>
                 <td className="bc-td" style={{ background: `${COL_DX.fp}2a`, color: "#fff" }}>{miles(conteos.fp)}</td>
                 <td className="bc-td">{miles(conteos.vn)}</td>
                 <td className="bc-td" style={{ fontWeight: 900 }}>{miles(conteos.sanos)}</td>
               </tr>
               <tr>
-                <th style={{ textAlign: "left", color: T.text3, fontSize: 11.5, padding: 4 }}>Total</th>
+                <th style={{ textAlign: "left", color: T.text3, fontSize: 14.5, padding: 4 }}>Total</th>
                 <td className="bc-td" style={{ fontWeight: 900, outline: `2px solid ${accent}`, outlineOffset: -2 }}>{miles(positivosActual)}</td>
                 <td className="bc-td" style={{ fontWeight: 900 }}>{miles(conteos.fn + conteos.vn)}</td>
                 <td className="bc-td" style={{ fontWeight: 900 }}>{miles(conteos.total)}</td>
@@ -843,7 +850,7 @@ export function LabBayesCondicional({ color }: PracticaLabProps) {
           </table>
         </div>
 
-        <div style={{ marginTop: 12, padding: "12px 14px", borderRadius: 12, border: `1px solid ${modoCol}55`, background: `${modoCol}12`, fontFamily: "ui-monospace, monospace", fontSize: 11.8, lineHeight: 1.85, color: "#eaf0fb", ...NUM }}>
+        <div style={{ marginTop: 12, padding: "12px 14px", borderRadius: 12, border: `1px solid ${modoCol}55`, background: `${modoCol}12`, fontFamily: "ui-monospace, monospace", fontSize: 14.8, lineHeight: 1.85, color: "#eaf0fb", ...NUM }}>
           {ronda === 2 && <div style={{ color: T.text3, fontFamily: "inherit" }}>La prevalencia de la 2.ª prueba es el VPP de la 1.ª: {fmtPct(b1.vpp)}</div>}
           <div>
             P(+ ∩ enfermo) = {sig(prevActual)} × {sig(sens)} = {sig(bActual.pVP)}
@@ -857,7 +864,7 @@ export function LabBayesCondicional({ color }: PracticaLabProps) {
           <div style={{ marginTop: 4, paddingTop: 6, borderTop: `1px solid ${T.line}`, fontWeight: 900, color: "#fff" }}>
             VPP = {sig(bActual.pVP)} / {sig(bActual.pPos)} = <span style={{ color: accent }}>{fmtPct(bActual.vpp)}</span>
           </div>
-          <div style={{ color: T.text3, fontSize: 11 }}>
+          <div style={{ color: T.text3, fontSize: 14 }}>
             Con personas enteras: {miles(conteos.vp)} / {miles(positivosActual)} = {positivosActual === 0 ? "—" : fmtPct(conteos.vp / positivosActual)}
           </div>
         </div>
@@ -865,384 +872,187 @@ export function LabBayesCondicional({ color }: PracticaLabProps) {
     );
   }
 
+  const leyenda: ReactNode =
+    modo === "reducido" ? (
+      <>
+        {chip("#38bdf8", poblacion.nombreB)}
+        {chip("#a78bfa", poblacion.nombreBc)}
+        {chip("#fb923c", `Cabeza encendida: ${poblacion.nombreA.toLowerCase()}`, "bola")}
+      </>
+    ) : modo === "arbol" ? (
+      <>
+        {chip("#fbbf24", `Termina en «${experimento.a}»`, "bola")}
+        {simHojas && chip(modoCol, "Barra delgada: frecuencia simulada")}
+      </>
+    ) : vistaDx === "poblacion" ? (
+      <>
+        {chip(COL_DX.enfermo, "Enferma")}
+        {chip(COL_DX.sano, "Sana")}
+      </>
+    ) : (
+      <>
+        {chip(COL_DX.vp, "Enferma y positiva")}
+        {chip(COL_DX.fn, "Enferma y negativa")}
+        {chip(COL_DX.fp, "Sana y positiva")}
+        {chip(COL_DX.vn, "Sana y negativa")}
+      </>
+    );
+
+  const sonidoOk = (ok: boolean) => {
+    if (!sonido) return;
+    if (ok) audioRef.current?.correcto();
+    else audioRef.current?.incorrecto();
+  };
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes bcPulse { 0%,100%{ box-shadow:0 0 0 0 var(--bcd); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .bc-live-dot { animation: bcPulse 1.6s ease-in-out infinite; }
-        @media (prefers-reduced-motion: reduce){ .bc-live-dot { animation:none; } }
-        .bc-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .bc-grid { grid-template-columns: 1fr; } }
-        .bc-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .bc-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .bc-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .bc-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .bc-tab { cursor:pointer; border:1px solid var(--bcc); border-radius:12px; padding:11px 8px; text-align:center;
-          background:transparent; transition:all .15s; color:#fff; }
-        .bc-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
-        .bc-tab:hover { background:rgba(255,255,255,0.06); }
-        .bc-opts { display:flex; flex-wrap:wrap; gap:7px; }
-        .bc-pasos { display:grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap:7px; }
-        @media (max-width: 520px){ .bc-pasos { grid-template-columns: 1fr; } }
-        .bc-opt { cursor:pointer; border:1px solid var(--bcc); border-radius:10px; padding:9px 12px; font-size:12px;
-          font-weight:800; color:#fff; background:transparent; transition:all .15s; }
-        .bc-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.66); }
-        .bc-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
-        .bc-opt:focus-visible, .bc-tab:focus-visible, .bc-toggle:focus-visible, .bc-icobtn:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
-        .bc-toggle { width:100%; cursor:pointer; border:1px solid var(--bcc); border-radius:11px; padding:11px 14px;
-          background:rgba(4,10,22,0.4); color:#fff; font-size:12.5px; font-weight:900; text-align:left; transition:all .15s; }
-        .bc-toggle:hover { background:rgba(255,255,255,0.07); }
-        .bc-range { width:100%; accent-color: var(--bcc); }
-        .bc-td { padding:7px 6px; text-align:center; font-weight:800; color:${T.text2}; border-radius:6px; }
-        @media (max-width: 1000px){ .bc-bottom { grid-template-columns: 1fr !important; } }
-
-        .bc-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .bc-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .bc-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06121e 0%,#040a16 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .bc-drawer[data-open="true"] { transform:translateX(0); }
-        .bc-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .bc-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .bc-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .bc-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .bc-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
-        .bc-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="bc-tabs">
-          {MODOS.map((m) => {
-            const d = MODOS_DEF[m];
-            const col = `#${d.color.replace("#", "")}`;
-            const on = m === modo;
-            return (
-              <button key={m} className="bc-tab" data-on={on} onClick={() => cambiarModo(m)} style={{ ["--bcc" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? col : "inherit" }}>
-                  <i className={`fa-solid ${d.icono}`} />
-                </div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{d.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{d.subtitulo}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="bc-grid">
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 58vh, 660px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <BayesScene
-                modo={modo}
-                poblacion={poblacion}
-                nABc={nABc}
-                condicion={condicion}
-                experimento={experimento}
-                invertido={invertido}
-                simHojas={simHojas}
-                categorias={categorias}
-                vistaDx={vistaDx}
-                conteos={conteos}
-                ronda={ronda}
-                accent={accent}
-                modoColor={modoCol}
-                resetNonce={resetNonce}
-              />
-            </SceneBoundary>
-
-            <div style={{ position: "absolute", top: 14, left: 16, right: 150, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, pointerEvents: "none" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)", maxWidth: "100%" }}>
-                <span className="bc-live-dot" style={{ ["--bcd" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol, flexShrink: 0 }} />
-                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3, flexShrink: 0 }}>EN VIVO</span>
-                <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)", flexShrink: 0 }} />
-                <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", ...NUM }}>{chipVivo}</span>
-              </div>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                {modo === "reducido" && (
-                  <>
-                    {chip("#38bdf8", poblacion.nombreB)}
-                    {chip("#a78bfa", poblacion.nombreBc)}
-                    {chip("#fb923c", `Cabeza encendida: ${poblacion.nombreA.toLowerCase()}`, "bola")}
-                  </>
-                )}
-                {modo === "arbol" && (
-                  <>
-                    {chip("#fbbf24", `Termina en «${experimento.a}»`, "bola")}
-                    {simHojas && chip(modoCol, "Barra delgada: frecuencia simulada")}
-                  </>
-                )}
-                {modo === "diagnostico" &&
-                  (vistaDx === "poblacion" ? (
-                    <>
-                      {chip(COL_DX.enfermo, "Enferma")}
-                      {chip(COL_DX.sano, "Sana")}
-                    </>
-                  ) : (
-                    <>
-                      {chip(COL_DX.vp, "Enferma y positiva")}
-                      {chip(COL_DX.fn, "Enferma y negativa")}
-                      {chip(COL_DX.fp, "Sana y positiva")}
-                      {chip(COL_DX.vn, "Sana y negativa")}
-                    </>
-                  ))}
-              </div>
-            </div>
-
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="bc-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría" aria-label="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="bc-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"} aria-label={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="bc-icobtn" onClick={reiniciar} title="Reiniciar" aria-label="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 132px 14px 18px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                {def.etq} — {def.subtitulo}
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6 }}>{pie}</div>
-            </div>
-
-            <button className="bc-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-          </div>
-
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, gap: 10, flexWrap: "wrap" }}>
-              <Eyebrow>
-                <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-                Controles — {def.etq}
-              </Eyebrow>
-              <span style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: "#7dd3fc", border: "1px solid #7dd3fc55", borderRadius: 6, padding: "3px 7px" }}>
-                {def.fuente === "A2" ? "EJERCICIO A2" : def.fuente === "A4" ? "QUIZ A4 · GLOSARIO A5" : "LECTURA A1"}
-              </span>
-            </div>
-            {control}
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-vial-virus" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>Actualizar creencias</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #7dd3fc55", background: "rgba(125,211,252,0.07)" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book-open" style={{ marginRight: 8, color: "#7dd3fc" }} />
-              Lectura A1 — Probabilidad condicional y Bayes
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9, marginBottom: 12 }}>
-              {LECTURA_A1.map((p, i) => (
-                <div key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>
-                  {p}
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", marginBottom: 8 }}>PARA REFLEXIONAR</div>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {PREGUNTAS.map((q, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  {q}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />
-              Cómo usar el laboratorio
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-                Objetivos de la sesión
-              </Eyebrow>
-              <span style={{ fontSize: 11, fontWeight: 800, color: objetivos.every((o) => o.done) ? OK : T.text3 }}>
-                {objetivos.filter((o) => o.done).length}/{objetivos.length}
-              </span>
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ marginTop: 2, fontSize: 13, color: o.done ? OK : "rgba(255,255,255,0.22)" }} />
-                  <span style={{ fontSize: 12, color: o.done ? "#fff" : T.text2, lineHeight: 1.4 }}>{o.t}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="bc-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-magnifying-glass-chart" style={{ marginRight: 8, color: accent }} />
-            Datos clave
-          </Eyebrow>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
-            {DATOS.map((dd, i) => (
-              <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "10px 12px", borderRadius: 10, background: T.glass, border: `1px solid ${T.line}` }}>
-                <div style={{ width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: accent, background: `rgba(${color.rgba},0.16)`, flexShrink: 0 }}>
-                  <i className={`fa-solid ${dd.icono}`} />
-                </div>
-                <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace", overflowWrap: "anywhere", ...NUM }}>{dd.valor}</div>
-                  <div style={{ fontSize: 11, color: T.text2, lineHeight: 1.4 }}>{dd.texto}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div style={{ marginTop: 16, padding: "14px 16px", borderRadius: 12, border: `1px solid ${accent}33`, background: `rgba(${color.rgba},0.07)` }}>
-            <Eyebrow>
-              <i className="fa-solid fa-hospital" style={{ marginRight: 8, color: accent }} />
-              Un positivo no es una sentencia
-            </Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{CONTEXTO}</div>
-          </div>
-
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />
-              ¿Sabías que? (quiz A4)
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {HECHOS.map((h, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
-                  {h}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />
-              Glosario (A5)
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {GLOSARIO.map((gi, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{gi.termino}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
-                  <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.4, marginTop: 4 }}>
-                    <i className="fa-solid fa-flask" style={{ marginRight: 6, color: accent }} />
-                    {gi.ejemplo}
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <BayesScene
+            modo={modo}
+            poblacion={poblacion}
+            nABc={nABc}
+            condicion={condicion}
+            experimento={experimento}
+            invertido={invertido}
+            simHojas={simHojas}
+            categorias={categorias}
+            vistaDx={vistaDx}
+            conteos={conteos}
+            ronda={ronda}
+            accent={accent}
+            modoColor={modoCol}
+            resetNonce={resetNonce}
+          />
+        </SceneBoundary>
+      }
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m, etiqueta: MODOS_DEF[m].etq, icono: MODOS_DEF[m].icono })),
+        valor: modo,
+        cambiar: (id) => cambiarModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+        </>
+      }
+      leyenda={leyenda}
+      lectura={chipVivo}
+      objetivos={objetivos}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Controles",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              <style>{`
+                .bc-opts { display:flex; flex-wrap:wrap; gap:7px; }
+                .bc-pasos { display:grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,130px),1fr)); gap:7px; }
+                .bc-opt { cursor:pointer; border:1px solid var(--bcc); border-radius:10px; padding:9px 12px; font-size:14px;
+                  font-weight:800; color:#fff; background:transparent; transition:all .15s; }
+                .bc-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.66); }
+                .bc-opt:hover:not(:disabled) { background:rgba(255,255,255,0.06); }
+                .bc-opt:focus-visible, .bc-toggle:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
+                .bc-toggle { width:100%; cursor:pointer; border:1px solid var(--bcc); border-radius:11px; padding:11px 14px;
+                  background:rgba(4,10,22,0.4); color:#fff; font-size:14px; font-weight:900; text-align:left; transition:all .15s; }
+                .bc-toggle:hover { background:rgba(255,255,255,0.07); }
+                .bc-td { padding:7px 6px; text-align:center; font-weight:800; color:${T.text2}; border-radius:6px; }
+              `}</style>
+              <Bloque titulo={def.etq} icono={def.icono}>
+                {control}
+              </Bloque>
+              <Bloque titulo="Lo que se lee en la escena" icono="fa-eye">
+                <p style={{ margin: 0, color: T.text2 }}>{pie}</p>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <>
+              <EstimaVppCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sonidoOk} />
+              <RetoNumericoCard reto={RETO_A2} accent={accent} aprobado={ejercicioAprobado} onAprobado={() => setEjercicioAprobado(true)} playSfx={sonidoOk} />
+            </>
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Actualizar creencias" icono="fa-vial-virus">
+                <p style={{ margin: 0, color: T.text2 }}>{PROBLEMA}</p>
+              </Bloque>
+              <Bloque titulo="Lectura A1 — Probabilidad condicional y Bayes" icono="fa-book-open">
+                {LECTURA_A1.map((p, i) => (
+                  <p key={i} style={{ margin: 0, color: T.text2 }}>{p}</p>
+                ))}
+              </Bloque>
+              <Bloque titulo="Para reflexionar" icono="fa-circle-question">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {PREGUNTAS.map((q, i) => <li key={i}>{q}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Cómo usar el laboratorio" icono="fa-list-ol">
+                <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8 }}>
+                  {INSTRUCCIONES.map((p, i) => <li key={i}>{p}</li>)}
+                </ol>
+              </Bloque>
+              <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {IDEAS.map((x, i) => <li key={i}>{x}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Datos clave" icono="fa-magnifying-glass-chart">
+                {DATOS.map((dd, i) => (
+                  <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                    <i className={`fa-solid ${dd.icono}`} style={{ color: accent, marginTop: 4 }} aria-hidden />
+                    <div style={{ minWidth: 0 }}>
+                      <strong style={{ fontFamily: "ui-monospace, monospace", overflowWrap: "anywhere" }}>{dd.valor}</strong>
+                      <div style={{ color: T.text2 }}>{dd.texto}</div>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-            Ideas clave
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-            {IDEAS.map((x, i) => (
-              <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                {x}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          La lectura A1, las preguntas de reflexión, los hechos del quiz A4, el glosario A5 y el ejercicio A2 son <strong>verbatim</strong> del material de la
-          plataforma. Las probabilidades del árbol son fracciones exactas y las de la prueba diagnóstica salen de la fórmula de Bayes; los conteos de personas son
-          esas mismas probabilidades redondeadas a personas enteras. El número de mujeres que fuman y los escenarios «enfermedad rara» y «prueba excelente» son
-          valores del laboratorio, no del material oficial; la segunda prueba supone que las dos pruebas fallan de forma independiente. La simulación usa el
-          generador aleatorio del navegador. Fuente: {FUENTE}
-        </span>
-      </div>
-
-      <EstimaVppCard
-        accent={accent}
-        rgba={color.rgba}
-        mejor={mejorEstrellas}
-        onResultado={registraEstrellas}
-        playSfx={(ok) => {
-          if (!sonido) return;
-          if (ok) audioRef.current?.correcto();
-          else audioRef.current?.incorrecto();
-        }}
-      />
-
-      <RetoNumericoCard
-        reto={RETO_A2}
-        accent={accent}
-        aprobado={ejercicioAprobado}
-        onAprobado={() => setEjercicioAprobado(true)}
-        playSfx={(ok) => {
-          if (!sonido) return;
-          if (ok) audioRef.current?.correcto();
-          else audioRef.current?.incorrecto();
-        }}
-      />
-
-      <div className="bc-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="bc-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="bc-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="bc-close" onClick={() => setDrawer(false)} title="Cerrar" aria-label="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="bc-drawer-body">
-          <FichaTeorica data={BAYES_CONDICIONAL_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Un positivo no es una sentencia" icono="fa-hospital">
+                <p style={{ margin: 0, color: T.text2 }}>{CONTEXTO}</p>
+              </Bloque>
+              <Bloque titulo="¿Sabías que? (quiz A4)" icono="fa-circle-question">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {HECHOS.map((h, i) => <li key={i}>{h}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Glosario (A5)" icono="fa-book">
+                {GLOSARIO.map((gi, i) => (
+                  <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
+                    <span style={{ fontWeight: 900, color: accent }}>{gi.termino}. </span>
+                    <span style={{ color: T.text2 }}>{gi.definicion}</span>
+                    <div style={{ fontSize: 14, color: T.text3, marginTop: 4 }}>
+                      <i className="fa-solid fa-flask" style={{ marginRight: 6, color: accent }} aria-hidden />
+                      {gi.ejemplo}
+                    </div>
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={BAYES_CONDICIONAL_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ marginTop: 18, fontSize: 14, color: T.text3 }}>
+                La lectura A1, las preguntas de reflexión, los hechos del quiz A4, el glosario A5 y el ejercicio A2 son verbatim del material de la plataforma. Las probabilidades del árbol son fracciones exactas y las de la prueba diagnóstica salen de la fórmula de Bayes; los conteos de personas son esas mismas probabilidades redondeadas a personas enteras. El número de mujeres que fuman y los escenarios «enfermedad rara» y «prueba excelente» son valores del laboratorio, no del material oficial; la segunda prueba supone que las dos pruebas fallan de forma independiente. La simulación usa el generador aleatorio del navegador. Fuente: {FUENTE}
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }

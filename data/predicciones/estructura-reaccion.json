@@ -1,0 +1,12 @@
+{
+  "escena": "La combustión del metano dibujada con moléculas y barras de átomos por elemento, con un control por coeficiente",
+  "pregunta": "Si subes el coeficiente del O₂ de 2 a 3, ¿qué pasa con las barras de oxígeno?",
+  "opciones": [
+    { "id": "a", "texto": "Siguen iguales porque el subíndice no cambió", "icono": "fa-equals" },
+    { "id": "b", "texto": "Quedan 6 O contra 4: se descuadran", "icono": "fa-scale-unbalanced" },
+    { "id": "c", "texto": "Los productos se ajustan solos para igualar", "icono": "fa-wand-magic-sparkles" }
+  ],
+  "correcta": "b",
+  "porque": "El coeficiente multiplica todos los átomos de la sustancia: 3 × 2 = 6 átomos de O en los reactivos. Los productos siguen con 2 + 2 = 4, así que la materia ya no se conserva.",
+  "comoComprobarlo": "En «Conservación», con Combustión del metano, mueve el deslizador de O₂ de 2 a 3 en «Experimenta» y compara las barras de oxígeno."
+}

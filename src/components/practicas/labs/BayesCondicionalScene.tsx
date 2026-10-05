@@ -21,8 +21,8 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useLayoutEffect, useMemo, useRef, type ReactNode } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Environment, Lightformer, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import {
@@ -65,10 +65,15 @@ export interface BayesSceneProps {
 
 type Pt = [number, number, number];
 
+const CAM_FOV = 42;
+
 /* ── Etiquetas ────────────────────────────────────────────────────────── */
-function Etiqueta({ pos, children, df = 10, col, apagada, izq }: { pos: Pt; children: ReactNode; df?: number; col?: string; apagada?: boolean; izq?: boolean }) {
+function Etiqueta({ pos, children, col, apagada, izq }: { pos: Pt; children: ReactNode; col?: string; apagada?: boolean; izq?: boolean }) {
+  const { size } = useThree();
+  // En pantallas angostas la información ya está en el panel: no se tapa la escena.
+  if (size.width < 640) return null;
   return (
-    <Html position={pos} center={!izq} distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center={!izq} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -79,7 +84,7 @@ function Etiqueta({ pos, children, df = 10, col, apagada, izq }: { pos: Pt; chil
           background: "rgba(4,10,22,0.84)",
           border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`,
           color: "#fff",
-          fontSize: 12,
+          fontSize: 14,
           fontWeight: 800,
           whiteSpace: "nowrap",
           boxShadow: "0 6px 18px -8px #000",
@@ -94,27 +99,22 @@ function Etiqueta({ pos, children, df = 10, col, apagada, izq }: { pos: Pt; chil
   );
 }
 
-/** Un grupo que se acerca suavemente a su posición y escala objetivo. */
-function Movil({ objetivo, children, vel = 0.12, escala = 1 }: { objetivo: Pt; children: ReactNode; vel?: number; escala?: number }) {
-  const ref = useRef<THREE.Group>(null);
-  const primera = useRef(true);
-  useFrame((_, dt) => {
-    const g = ref.current;
-    if (!g) return;
-    if (primera.current) {
-      g.position.set(objetivo[0], objetivo[1], objetivo[2]);
-      g.scale.setScalar(0.001);
-      primera.current = false;
-    }
-    // Suavizado por tiempo: el mismo recorrido a 144 o a 10 cuadros por segundo.
-    const k = 1 - Math.pow(1 - vel, Math.min(dt, 0.25) * 60);
-    const ks = 1 - Math.pow(0.86, Math.min(dt, 0.25) * 60);
-    g.position.x += (objetivo[0] - g.position.x) * k;
-    g.position.y += (objetivo[1] - g.position.y) * k;
-    g.position.z += (objetivo[2] - g.position.z) * k;
-    g.scale.setScalar(g.scale.x + (escala - g.scale.x) * ks);
-  });
-  return <group ref={ref}>{children}</group>;
+/**
+ * Encuadre: el contenido llena ~60 % del alto, entre la barra de arriba (~64 px)
+ * y la misión de abajo (~150 px), y cabe a lo ancho aunque la pantalla sea angosta.
+ */
+function Ajuste({ dist, ancho, alto, children }: { dist: number; ancho: number; alto: number; children: ReactNode }) {
+  const { size } = useThree();
+  const visH = 2 * dist * Math.tan((CAM_FOV * Math.PI) / 360);
+  const visW = (visH * size.width) / Math.max(1, size.height);
+  const libre = Math.max(0.3, (size.height - 214) / Math.max(1, size.height));
+  const k = Math.min(1, visW / ancho, (visH * libre) / alto);
+  const dy = (visH * 43) / Math.max(1, size.height);
+  return (
+    <group position={[0, dy, 0]} scale={k}>
+      {children}
+    </group>
+  );
 }
 
 /* ════════════════════════════════════════════════════════════════════════
@@ -181,10 +181,77 @@ function acomodarPoblacion(p: PoblacionDef, nABc: number) {
   };
 }
 
+/**
+ * Las personas que comparten (B, A) comparten también estado (de pie o hundidas),
+ * así que cada grupo es UN dibujo para los cuerpos, otro para las cabezas y otro
+ * para los anillos: 100 personas = 12 dibujos, no 200.
+ */
+function GrupoPersonas({ pts, on, cuerpo, cabeza, brilla, anillo, modoColor }: { pts: Pt[]; on: boolean; cuerpo: string; cabeza: string; brilla: boolean; anillo: boolean; modoColor: string }) {
+  const grupo = useRef<THREE.Group>(null);
+  const cuerpos = useRef<THREE.InstancedMesh>(null);
+  const cabezas = useRef<THREE.InstancedMesh>(null);
+  const anillos = useRef<THREE.InstancedMesh>(null);
+
+  useLayoutEffect(() => {
+    const o = new THREE.Object3D();
+    const poner = (m: THREE.InstancedMesh | null, dy: number, rotX: number) => {
+      if (!m) return;
+      pts.forEach((q, i) => {
+        o.position.set(q[0], dy, q[2]);
+        o.rotation.set(rotX, 0, 0);
+        o.updateMatrix();
+        m.setMatrixAt(i, o.matrix);
+      });
+      m.instanceMatrix.needsUpdate = true;
+    };
+    poner(cuerpos.current, 0.02, 0);
+    poner(cabezas.current, 0.34, 0);
+    poner(anillos.current, -0.27, -Math.PI / 2);
+  }, [pts, anillo]);
+
+  useFrame((_, dt) => {
+    const g = grupo.current;
+    if (!g) return;
+    const k = 1 - Math.pow(0.9, Math.min(dt, 0.25) * 60);
+    g.position.y += ((on ? 0 : -0.3) - g.position.y) * k;
+  });
+
+  if (pts.length === 0) return null;
+  return (
+    <group ref={grupo}>
+      <instancedMesh key={`c${pts.length}`} ref={cuerpos} args={[undefined, undefined, pts.length]} castShadow>
+        <capsuleGeometry args={[0.12, 0.22, 4, 10]} />
+        <meshStandardMaterial color={cuerpo} roughness={0.45} metalness={0.1} />
+      </instancedMesh>
+      <instancedMesh key={`h${pts.length}`} ref={cabezas} args={[undefined, undefined, pts.length]} castShadow>
+        <sphereGeometry args={[0.1, 14, 14]} />
+        <meshStandardMaterial color={cabeza} emissive={brilla ? COL_A : "#000000"} emissiveIntensity={brilla ? 0.75 : 0} roughness={0.4} />
+      </instancedMesh>
+      {anillo && (
+        <instancedMesh key={`r${pts.length}`} ref={anillos} args={[undefined, undefined, pts.length]}>
+          <ringGeometry args={[0.17, 0.23, 24]} />
+          <meshBasicMaterial color={modoColor} />
+        </instancedMesh>
+      )}
+    </group>
+  );
+}
+
 function EscenaPoblacion({ poblacion, nABc, condicion, modoColor }: { poblacion: PoblacionDef; nABc: number; condicion: Condicion; modoColor: string }) {
   const lay = useMemo(() => acomodarPoblacion(poblacion, nABc), [poblacion, nABc]);
-  const activa = (q: PersonaPos) => (condicion === "ninguna" ? true : condicion === "B" ? q.enB : condicion === "Bc" ? !q.enB : q.enA);
   const nBc = poblacion.total - poblacion.nB;
+  const grupos = useMemo(() => {
+    const g = { BA: [] as Pt[], BnA: [] as Pt[], CA: [] as Pt[], CnA: [] as Pt[] };
+    for (const q of lay.personas) (q.enB ? (q.enA ? g.BA : g.BnA) : q.enA ? g.CA : g.CnA).push(q.pos);
+    return g;
+  }, [lay]);
+  const activa = (enB: boolean, enA: boolean) => (condicion === "ninguna" ? true : condicion === "B" ? enB : condicion === "Bc" ? !enB : enA);
+  const definicion: { clave: keyof typeof grupos; enB: boolean; enA: boolean }[] = [
+    { clave: "BA", enB: true, enA: true },
+    { clave: "BnA", enB: true, enA: false },
+    { clave: "CA", enB: false, enA: true },
+    { clave: "CnA", enB: false, enA: false },
+  ];
 
   return (
     <group position={[0, -0.2, 0.2]}>
@@ -197,27 +264,19 @@ function EscenaPoblacion({ poblacion, nABc, condicion, modoColor }: { poblacion:
       {condicion === "B" && <Line points={lay.marcoB} color={modoColor} lineWidth={2.4} />}
       {condicion === "Bc" && <Line points={lay.marcoBc} color={modoColor} lineWidth={2.4} />}
 
-      {lay.personas.map((q, i) => {
-        const on = activa(q);
-        const cuerpo = on ? (q.enB ? COL_B : COL_BC) : COL_APAGADO;
-        const cabeza = on ? (q.enA ? COL_A : COL_CABEZA) : "#334155";
+      {definicion.map((d) => {
+        const on = activa(d.enB, d.enA);
         return (
-          <Movil key={`${poblacion.id}-${i}`} objetivo={[q.pos[0], on ? 0 : -0.3, q.pos[2]]} escala={on ? 1 : 0.72} vel={0.1}>
-            <mesh position={[0, 0.02, 0]} castShadow>
-              <capsuleGeometry args={[0.12, 0.22, 4, 10]} />
-              <meshStandardMaterial color={cuerpo} roughness={0.45} metalness={0.1} />
-            </mesh>
-            <mesh position={[0, 0.34, 0]} castShadow>
-              <sphereGeometry args={[0.1, 14, 14]} />
-              <meshStandardMaterial color={cabeza} emissive={on && q.enA ? COL_A : "#000000"} emissiveIntensity={on && q.enA ? 0.75 : 0} roughness={0.4} />
-            </mesh>
-            {condicion === "A" && q.enA && (
-              <mesh position={[0, -0.27, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-                <ringGeometry args={[0.17, 0.23, 24]} />
-                <meshBasicMaterial color={modoColor} />
-              </mesh>
-            )}
-          </Movil>
+          <GrupoPersonas
+            key={`${poblacion.id}-${d.clave}`}
+            pts={grupos[d.clave]}
+            on={on}
+            cuerpo={on ? (d.enB ? COL_B : COL_BC) : COL_APAGADO}
+            cabeza={on ? (d.enA ? COL_A : COL_CABEZA) : "#334155"}
+            brilla={on && d.enA}
+            anillo={condicion === "A" && d.enA}
+            modoColor={modoColor}
+          />
         );
       })}
 
@@ -289,14 +348,17 @@ interface Particula {
 }
 
 function Particulas({ experimento, invertido }: { experimento: ExperimentoArbol; invertido: boolean }) {
-  const refs = useRef<(THREE.Mesh | null)[]>([]);
+  const malla = useRef<THREE.InstancedMesh>(null);
   const estado = useRef<Particula[] | null>(null);
   const pB = valor(experimento.pB);
   const pAB = valor(experimento.pAdadoB);
   const pABc = valor(experimento.pAdadoBc);
-  const tmp = useMemo(() => new THREE.Vector3(), []);
+  const tmp = useMemo(() => new THREE.Object3D(), []);
+  const col = useMemo(() => new THREE.Color(), []);
 
   useFrame((_, dt) => {
+    const mesh = malla.current;
+    if (!mesh) return;
     const nuevo = (t: number): Particula => {
       const b = Math.random() < pB;
       return { t, vel: 0.22 + Math.random() * 0.12, b, a: Math.random() < (b ? pAB : pABc) };
@@ -307,44 +369,33 @@ function Particulas({ experimento, invertido }: { experimento: ExperimentoArbol;
       p.t += paso * p.vel;
       if (p.t >= 1.15) estado.current![i] = nuevo(0);
       const q = estado.current![i]!;
-      const mesh = refs.current[i];
-      if (!mesh) return;
       const nodo = q.b ? NODO_B : NODO_BC;
       const hoja = HOJAS[q.b ? (q.a ? 0 : 1) : q.a ? 2 : 3]!;
       const t = Math.max(0, Math.min(1, q.t));
       if (t < 0.5) {
         const u = t / 0.5;
-        tmp.set(RAIZ[0] + (nodo[0] - RAIZ[0]) * u, RAIZ[1] + (nodo[1] - RAIZ[1]) * u, 0.02);
+        tmp.position.set(RAIZ[0] + (nodo[0] - RAIZ[0]) * u, RAIZ[1] + (nodo[1] - RAIZ[1]) * u, 0.02);
       } else {
         const u = (t - 0.5) / 0.5;
-        tmp.set(nodo[0] + (hoja[0] - nodo[0]) * u, nodo[1] + (hoja[1] - nodo[1]) * u, 0.02);
+        tmp.position.set(nodo[0] + (hoja[0] - nodo[0]) * u, nodo[1] + (hoja[1] - nodo[1]) * u, 0.02);
       }
-      mesh.position.copy(tmp);
       const visible = q.t >= 0 && q.t <= 1.05;
       const apagada = invertido && t >= 0.5 && !q.a;
-      mesh.scale.setScalar(visible ? (q.t > 1 ? 1.6 : 1) : 0.001);
-      const mat = mesh.material as THREE.MeshStandardMaterial;
-      const col = t < 0.5 ? (q.b ? COL_RAMA_B : COL_RAMA_BC) : q.a ? COL_RAMA_A : COL_RAMA_AC;
-      mat.color.set(col);
-      mat.emissive.set(col);
-      mat.opacity = apagada ? 0.15 : 1;
+      tmp.scale.setScalar(visible ? (q.t > 1 ? 1.6 : 1) : 0.001);
+      tmp.updateMatrix();
+      mesh.setMatrixAt(i, tmp.matrix);
+      col.set(apagada ? "#1e293b" : t < 0.5 ? (q.b ? COL_RAMA_B : COL_RAMA_BC) : q.a ? COL_RAMA_A : COL_RAMA_AC);
+      mesh.setColorAt(i, col);
     });
+    mesh.instanceMatrix.needsUpdate = true;
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
   });
 
   return (
-    <>
-      {Array.from({ length: N_PARTICULAS }, (_, i) => (
-        <mesh
-          key={i}
-          ref={(m) => {
-            refs.current[i] = m;
-          }}
-        >
-          <sphereGeometry args={[0.07, 12, 12]} />
-          <meshStandardMaterial color="#fff" emissive="#fff" emissiveIntensity={0.9} transparent />
-        </mesh>
-      ))}
-    </>
+    <instancedMesh ref={malla} args={[undefined, undefined, N_PARTICULAS]} frustumCulled={false}>
+      <sphereGeometry args={[0.07, 12, 12]} />
+      <meshBasicMaterial color="#ffffff" />
+    </instancedMesh>
   );
 }
 
@@ -366,25 +417,16 @@ function EscenaArbol({ experimento, invertido, simHojas, accent, modoColor }: { 
       {/* Etapa 1 */}
       <Tubo a={RAIZ} b={NODO_B} radio={radio(pB)} color={COL_RAMA_B} />
       <Tubo a={RAIZ} b={NODO_BC} radio={radio(1 - pB)} color={COL_RAMA_BC} />
-      <Etiqueta pos={[(RAIZ[0] + NODO_B[0]) / 2 - 0.35, (RAIZ[1] + NODO_B[1]) / 2 + 0.38, 0]} col={`${COL_RAMA_B}88`} df={9}>
-        {txtP(e, e.pB)}
-      </Etiqueta>
-      <Etiqueta pos={[(RAIZ[0] + NODO_BC[0]) / 2 - 0.35, (RAIZ[1] + NODO_BC[1]) / 2 - 0.38, 0]} col={`${COL_RAMA_BC}88`} df={9}>
-        {txtP(e, arbol.pBc)}
-      </Etiqueta>
-
       {/* Etapa 2 */}
       {ramas2.map((r) => (
         <group key={r.k}>
           <Tubo a={r.de} b={HOJAS[r.k]!} radio={radio(r.p)} color={r.enA ? COL_RAMA_A : COL_RAMA_AC} opacidad={invertido && !r.enA ? 0.18 : 1} />
-          <Etiqueta
-            pos={[(r.de[0] + HOJAS[r.k]![0]) / 2, (r.de[1] + HOJAS[r.k]![1]) / 2 + (r.k % 2 === 0 ? 0.3 : -0.3), 0]}
-            col={`${r.enA ? COL_RAMA_A : COL_RAMA_AC}88`}
-            df={9}
-            apagada={invertido && !r.enA}
-          >
-            {r.condicional}
-          </Etiqueta>
+          {/* Solo las ramas que terminan en «A» llevan número en la escena; las otras están en la tabla del panel. */}
+          {r.enA && (
+            <Etiqueta pos={[(r.de[0] + HOJAS[r.k]![0]) / 2, (r.de[1] + HOJAS[r.k]![1]) / 2 + (r.k % 2 === 0 ? 0.3 : -0.3), 0]} col={`${COL_RAMA_A}88`}>
+              {r.condicional}
+            </Etiqueta>
+          )}
         </group>
       ))}
 
@@ -394,16 +436,16 @@ function EscenaArbol({ experimento, invertido, simHojas, accent, modoColor }: { 
         <meshStandardMaterial color="#e2e8f0" emissive="#e2e8f0" emissiveIntensity={0.3} />
       </mesh>
       {[
-        { p: NODO_B, col: COL_RAMA_B, txt: e.b },
-        { p: NODO_BC, col: COL_RAMA_BC, txt: e.bc },
+        { p: NODO_B, col: COL_RAMA_B, txt: e.b, pTxt: txtP(e, e.pB) },
+        { p: NODO_BC, col: COL_RAMA_BC, txt: e.bc, pTxt: txtP(e, arbol.pBc) },
       ].map((n) => (
         <group key={n.txt}>
           <mesh position={n.p}>
             <sphereGeometry args={[0.17, 20, 20]} />
             <meshStandardMaterial color={n.col} emissive={n.col} emissiveIntensity={0.45} />
           </mesh>
-          <Etiqueta pos={[n.p[0] - 0.1, n.p[1] + (n.p[1] > 0 ? 0.48 : -0.48), 0]} col={`${n.col}aa`} df={9}>
-            {n.txt}
+          <Etiqueta pos={[n.p[0] - 0.1, n.p[1] + (n.p[1] > 0 ? 0.48 : -0.48), 0]} col={`${n.col}aa`}>
+            {n.txt} · {n.pTxt}
           </Etiqueta>
         </group>
       ))}
@@ -431,26 +473,9 @@ function EscenaArbol({ experimento, invertido, simHojas, accent, modoColor }: { 
                 <meshStandardMaterial color={modoColor} emissive={modoColor} emissiveIntensity={0.5} transparent opacity={apagada ? 0.25 : 0.95} />
               </mesh>
             )}
-            <Etiqueta pos={[BARRA_X + Math.max(largo, frec !== null ? frec * BARRA_LARGO : 0) + 0.18, pos[1] + 0.02, 0]} col={`${col}88`} df={9} apagada={apagada} izq>
-              <span style={{ color: "#cbd5e1", fontWeight: 700 }}>{h.etq}</span>
-              {txtP(e, h.p)}
-            </Etiqueta>
           </group>
         );
       })}
-
-      <Etiqueta pos={[-1.5, 2.9, 0]} col="rgba(255,255,255,0.25)" df={10}>
-        {e.etapa1}
-      </Etiqueta>
-      <Etiqueta pos={[1.25, 2.9, 0]} col="rgba(255,255,255,0.25)" df={10}>
-        {e.etapa2}
-      </Etiqueta>
-      {invertido && (
-        <Etiqueta pos={[BARRA_X + 0.2, -3.0, 0]} col={`${accent}aa`} df={9} izq>
-          <i className="fa-solid fa-eye" style={{ color: accent }} />
-          Sabemos: {e.etapa2.toLowerCase()} = {e.a}
-        </Etiqueta>
-      )}
 
       <Particulas experimento={e} invertido={invertido} />
     </group>
@@ -603,7 +628,7 @@ function EscenaDiagnostico({ categorias, vistaDx, conteos, ronda, accent }: { ca
       <Personas key={`${categorias.length}-${ronda}`} categorias={categorias} destinos={destinos} />
 
       {vistaDx === "poblacion" && (
-        <Etiqueta pos={[0, 0.95, zAtras - 0.3]} col="rgba(255,255,255,0.25)" df={7.5}>
+        <Etiqueta pos={[0, 0.95, zAtras - 0.3]} col="rgba(255,255,255,0.25)">
           {prefijo}
           <span style={{ width: 9, height: 9, borderRadius: 3, background: COL_DX.enfermo }} />
           Enfermos: {miles(conteos.enfermos)}
@@ -612,7 +637,7 @@ function EscenaDiagnostico({ categorias, vistaDx, conteos, ronda, accent }: { ca
         </Etiqueta>
       )}
       {vistaDx === "prueba" && (
-        <Etiqueta pos={[0, 0.95, zAtras - 0.3]} col={`${accent}88`} df={7.5}>
+        <Etiqueta pos={[0, 0.95, zAtras - 0.3]} col={`${accent}88`}>
           {prefijo}
           <i className="fa-solid fa-arrow-up" style={{ color: accent }} />
           Salieron positivos: {miles(positivos)} de {miles(conteos.total)}
@@ -620,15 +645,15 @@ function EscenaDiagnostico({ categorias, vistaDx, conteos, ronda, accent }: { ca
       )}
       {vistaDx === "positivos" && destinos.muros && (
         <>
-          <Etiqueta pos={[destinos.muros.xVP, -0.05, 2.15]} col={`${COL_DX.vp}aa`} df={6.5}>
+          <Etiqueta pos={[destinos.muros.xVP, -0.05, 2.15]} col={`${COL_DX.vp}aa`}>
             <span style={{ width: 9, height: 9, borderRadius: 3, background: COL_DX.vp }} />
             Verdaderos positivos · {miles(conteos.vp)}
           </Etiqueta>
-          <Etiqueta pos={[destinos.muros.xFP, -0.05, 2.15]} col={`${COL_DX.fp}aa`} df={6.5}>
+          <Etiqueta pos={[destinos.muros.xFP, -0.05, 2.15]} col={`${COL_DX.fp}aa`}>
             <span style={{ width: 9, height: 9, borderRadius: 3, background: COL_DX.fp }} />
             Falsos positivos · {miles(conteos.fp)}
           </Etiqueta>
-          <Etiqueta pos={[0, destinos.muros.alto + 0.5, 1.4]} col={`${accent}cc`} df={7}>
+          <Etiqueta pos={[0, destinos.muros.alto + 0.5, 1.4]} col={`${accent}cc`}>
             {prefijo}VPP = {miles(conteos.vp)} / {miles(positivos)} = {(vpp * 100).toFixed(1)} %
           </Etiqueta>
         </>
@@ -644,7 +669,7 @@ export default function BayesCondicionalScene(props: BayesSceneProps) {
   const objetivo: Pt = modo === "reducido" ? [0, -0.4, 0.2] : modo === "arbol" ? [0, 0, 0] : [0, 0.4, 0];
 
   return (
-    <Canvas key={`${modo}-${resetNonce}`} shadows dpr={[1, 1.75]} camera={{ position: camara, fov: 42 }} gl={{ antialias: true }}>
+    <Canvas key={`${modo}-${resetNonce}`} shadows dpr={[1, 1.75]} camera={{ position: camara, fov: CAM_FOV }} gl={{ antialias: true }}>
       <color attach="background" args={["#040a16"]} />
       <fog attach="fog" args={["#040a16", 16, 36]} />
       <ambientLight intensity={0.55} />
@@ -655,9 +680,21 @@ export default function BayesCondicionalScene(props: BayesSceneProps) {
         <Lightformer form="rect" intensity={0.8} position={[-6, 0, 4]} scale={[6, 6, 1]} color={modoColor} />
       </Environment>
 
-      {modo === "reducido" && <EscenaPoblacion poblacion={poblacion} nABc={nABc} condicion={condicion} modoColor={modoColor} />}
-      {modo === "arbol" && <EscenaArbol experimento={experimento} invertido={invertido} simHojas={simHojas} accent={accent} modoColor={modoColor} />}
-      {modo === "diagnostico" && <EscenaDiagnostico categorias={categorias} vistaDx={vistaDx} conteos={conteos} ronda={ronda} accent={accent} />}
+      {modo === "reducido" && (
+        <Ajuste dist={9.2} ancho={9} alto={5.4}>
+          <EscenaPoblacion poblacion={poblacion} nABc={nABc} condicion={condicion} modoColor={modoColor} />
+        </Ajuste>
+      )}
+      {modo === "arbol" && (
+        <Ajuste dist={11.2} ancho={11.6} alto={5.6}>
+          <EscenaArbol experimento={experimento} invertido={invertido} simHojas={simHojas} accent={accent} modoColor={modoColor} />
+        </Ajuste>
+      )}
+      {modo === "diagnostico" && (
+        <Ajuste dist={9.3} ancho={9} alto={5.4}>
+          <EscenaDiagnostico categorias={categorias} vistaDx={vistaDx} conteos={conteos} ronda={ronda} accent={accent} />
+        </Ajuste>
+      )}
 
       <OrbitControls enablePan={false} enableZoom minDistance={5} maxDistance={18} maxPolarAngle={Math.PI * 0.62} minPolarAngle={Math.PI * 0.12} target={objetivo} />
       <EffectComposer>

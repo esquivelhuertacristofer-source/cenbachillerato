@@ -1,28 +1,28 @@
-﻿"use client";
+"use client";
 
 /**
- * Laboratorio — Comunicación digital multimodal: texto, imagen, audio y video;
- * identidad digital y algoritmos.
+ * Laboratorio — Comunicación digital multimodal: SIMULADOR de una publicación.
  * Práctica experimental para CD-III-P01-A2 (Cultura Digital III).
  *
- * Interactividad máxima. Cuatro modos: los tres de arrastrar/clasificar y, al
- * final, uno que se escribe («Completa el texto», verbatim de la progresión):
- *  1. «¿Texto, imagen, audio o video?» — clasifica ocho elementos digitales
- *     según el modo semiótico al que pertenecen (texto / imagen / audio / video).
- *  2. «Identidad digital y algoritmos» — empareja cada concepto (identidad
- *     digital, burbuja de filtro, deepfake, algoritmo, análisis crítico) con su
- *     definición verbatim del glosario A5 / quiz A2.
- *  3. «Escribe el término» — lee la definición verbatim (A5) y escribe
- *     de memoria el término del glosario que la nombra.
- *  + Cuestionario de comprensión (V/F verbatim de A4).
+ * El alumno no solo clasifica modos semióticos: COMPONE una publicación para
+ * una campaña FICTICIA (jornada de reciclaje en la colonia «Los Pinos»). Elige
+ * un canal y un público, combina texto, imagen, audio, color y diseño espacial
+ * y una tarjeta de vista previa cambia en vivo mientras tres medidores
+ * (claridad, alcance, accesibilidad; valores de simulación) responden. La
+ * retroalimentación dice cómo cada modo suma o contradice el significado de
+ * los demás: la idea de la comunicación multimodal.
  *
- * DOM puro (sin three.js): ligero, accesible (ratón, teclado y táctil mediante
- * clic-para-seleccionar / clic-para-colocar). Contenido VERBATIM de CD-III·P01.
+ * Modos extra (conservados): «¿Texto, imagen, audio o video?» (clasificar, en
+ * Mesa), «Identidad digital y algoritmos» (emparejar, en Mesa),
+ * «Escribe el término» y «Completa el texto» (verbatim de la progresión), y el
+ * cuestionario V/F (A4) en la pestaña Reto. La teoría verbatim vive en la
+ * pestaña Teoría. Lógica pura en `comunicacion-multimodal-sim.ts`.
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type DragEvent, type KeyboardEvent } from "react";
 import type { PracticaLabProps } from "../registry";
-import { T, OK, card, Eyebrow } from "./_kit";
+import { T, OK, Eyebrow } from "./_kit";
+import { LabShell, Bloque, Mesa, BotonHerramienta } from "./_shell";
 import { LabSfx } from "./lab-audio";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { EscribeTermino } from "./_mecanica-termino";
@@ -30,6 +30,7 @@ import { COMUNICACION_MULTIMODAL_HUECOS } from "./comunicacion-multimodal-huecos
 import { usePartida, MarcadorPartida } from "./_partida";
 import { FichaTeorica } from "./_ficha";
 import { COMUNICACION_MULTIMODAL_FICHA } from "./comunicacion-multimodal-ficha";
+import { FondoTermino, VinetaTermino } from "./_vineta";
 import {
   ELEMENTOS,
   MODALIDAD_INFO,
@@ -39,15 +40,29 @@ import {
   DATO_MULTIMODAL,
   type Modalidad,
 } from "./comunicacion-multimodal-data";
+import {
+  ESCENARIOS,
+  MIN_MODOS_PUBLICAR,
+  SELECCION_INICIAL,
+  SLOTS,
+  UMBRAL,
+  evaluar,
+  type Escenario,
+  type Resultado,
+  type Seleccion,
+  type SlotId,
+} from "./comunicacion-multimodal-sim";
 
 const NO = "#FF5E5E";
+const AMBAR = "#FFC75A";
 import { useEstrellas } from "@/lib/hooks/useEstrellas";
-import { FondoTermino, VinetaTermino } from "./_vineta";
 const RETO_KEY = "cen-comunicacion-multimodal-reto";
+const RUTA_FOTOS = "/media/labs-sim/comunicacion-multimodal";
 
-type Modo = "modalidad" | "conceptos" | "glosario" | "texto";
+type Modo = "campana" | "modalidad" | "conceptos" | "glosario" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
+  { id: "campana", label: "Compón la campaña", icono: "fa-bullhorn" },
   { id: "modalidad", label: "¿Texto, imagen, audio o video?", icono: "fa-shapes" },
   { id: "conceptos", label: "Identidad digital y algoritmos", icono: "fa-user-shield" },
   { id: "glosario", label: "Escribe el término", icono: "fa-keyboard" },
@@ -56,12 +71,11 @@ const MODOS: { id: Modo; label: string; icono: string }[] = [
 
 export function LabComunicacionMultimodal({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
-  const [modo, setModo] = useState<Modo>("modalidad");
+  const [modo, setModo] = useState<Modo>("campana");
 
   // ── sonido ────────────────────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   // Modo «Completa el texto». El contador sirve de `key`: subirlo remonta
   // el componente y devuelve todos los huecos en blanco.
   const [textoDone, setTextoDone] = useState(false);
@@ -90,6 +104,93 @@ export function LabComunicacionMultimodal({ color }: PracticaLabProps) {
     partida.acierto();
     return sonido && audioRef.current?.blip();
   };
+  const sfxClick = () => sonido && audioRef.current?.blip();
+
+  // ── modo campaña (simulador) ──────────────────────────────────────────
+  const [escId, setEscId] = useState(ESCENARIOS[0]!.id);
+  const [sel, setSel] = useState<Seleccion>(SELECCION_INICIAL);
+  const [publicados, setPublicados] = useState(0);
+  const [eficazDone, setEficazDone] = useState(false);
+  const [ultima, setUltima] = useState<{ ok: boolean; r: Resultado } | null>(null);
+  const escenario = ESCENARIOS.find((e) => e.id === escId)!;
+  const resultado = evaluar(sel, escenario);
+
+  const elegir = (slot: SlotId, id: string) => {
+    sfxClick();
+    setSel((s) => ({ ...s, [slot]: id }));
+    setUltima(null);
+  };
+  const cambiarEscenario = (id: string) => {
+    sfxClick();
+    setEscId(id);
+    setUltima(null);
+  };
+  const publicar = () => {
+    if (resultado.modos < MIN_MODOS_PUBLICAR) return;
+    setPublicados((n) => n + 1);
+    setUltima({ ok: resultado.eficaz, r: resultado });
+    if (resultado.eficaz) {
+      partida.acierto();
+      setEficazDone(true);
+      if (sonido) audioRef.current?.correcto();
+    } else {
+      sfxNo();
+    }
+  };
+  const resetCampana = () => {
+    setSel(SELECCION_INICIAL);
+    setUltima(null);
+  };
+
+  // arrastre nativo
+  const dragProps = (id: string) => ({
+    draggable: true,
+    onDragStart: (e: DragEvent) => {
+      e.dataTransfer.setData("text/plain", id);
+      e.dataTransfer.effectAllowed = "move";
+      // El hueco que deja la tarjeta mientras viaja. Por atributo y no por
+      // estado: un render por cada gesto de arrastre se nota con 20 tarjetas.
+      e.currentTarget.setAttribute("data-arrastrando", "true");
+    },
+    onDragEnd: (e: DragEvent) => {
+      // También cuando se suelta FUERA de cualquier zona; si no, la tarjeta se
+      // queda medio borrada para siempre.
+      e.currentTarget.removeAttribute("data-arrastrando");
+      document.querySelectorAll('[data-sobre="true"]').forEach((z) => z.removeAttribute("data-sobre"));
+    },
+  });
+  const dropProps = (onDrop: (id: string) => void) => ({
+    onDragOver: (e: DragEvent) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+    },
+    onDragEnter: (e: DragEvent) => {
+      e.preventDefault();
+      e.currentTarget.setAttribute("data-sobre", "true");
+    },
+    onDragLeave: (e: DragEvent) => {
+      // `dragleave` salta también al pasar sobre un HIJO de la zona. Apagar sin
+      // comprobar deja la zona parpadeando mientras mueves la mano por dentro.
+      const r = e.currentTarget.getBoundingClientRect();
+      const fuera = e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+      if (fuera) e.currentTarget.removeAttribute("data-sobre");
+    },
+    onDrop: (e: DragEvent) => {
+      e.preventDefault();
+      e.currentTarget.removeAttribute("data-sobre");
+      const id = e.dataTransfer.getData("text/plain");
+      if (id) onDrop(id);
+    },
+    "data-zona": "true" as const,
+    role: "button" as const,
+    tabIndex: 0,
+    onKeyDown: (e: KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        (e.currentTarget as HTMLElement).click();
+      }
+    },
+  });
 
   // ── modo modalidad (clasifica por modo semiótico) ──────────────────────
   const [ubicMod, setUbicMod] = useState<Record<string, Modalidad>>({});
@@ -104,10 +205,7 @@ export function LabComunicacionMultimodal({ color }: PracticaLabProps) {
       setUbicMod((e) => ({ ...e, [elemId]: bin }));
       setSelMod(null);
       sfxPlace();
-      if (Object.keys(ubicMod).length + 1 >= ELEMENTOS.length) {
-        sfxOk();
-        persistMejor(true, conceptosDone, glosarioDone);
-      }
+      if (Object.keys(ubicMod).length + 1 >= ELEMENTOS.length) sfxOk();
     } else {
       setShakeMod(bin);
       sfxNo();
@@ -131,10 +229,7 @@ export function LabComunicacionMultimodal({ color }: PracticaLabProps) {
       setEmpCon((e) => ({ ...e, [rowId]: true }));
       setSelCon(null);
       sfxPlace();
-      if (Object.keys(empCon).length + 1 >= CONCEPTOS.length) {
-        sfxOk();
-        persistMejor(modalidadDone, true, glosarioDone);
-      }
+      if (Object.keys(empCon).length + 1 >= CONCEPTOS.length) sfxOk();
     } else {
       setShakeCon(rowId);
       sfxNo();
@@ -155,25 +250,29 @@ export function LabComunicacionMultimodal({ color }: PracticaLabProps) {
     setGlosarioDone(false);
     setGlosIntento((n) => n + 1);
   };
+  const resetTexto = () => {
+    setTextoDone(false);
+    setTextoIntento((n) => n + 1);
+  };
 
   const [quizAprobado, setQuizAprobado] = useState(false);
 
   // ── progreso / estrellas ──────────────────────────────────────────────
   const modalidadDone = Object.keys(ubicMod).length >= ELEMENTOS.length;
   const conceptosDone = Object.keys(empCon).length >= CONCEPTOS.length;
-  const modosHechos = (modalidadDone ? 1 : 0) + (conceptosDone ? 1 : 0) + (glosarioDone ? 1 : 0) + (textoDone ? 1 : 0);
-  // Terminar los 3 modos vale 2★; la tercera se gana con precisión.
-  const estrellas = partida.estrellasCon(modosHechos, 4);
+  const modosHechos = (eficazDone ? 1 : 0) + (modalidadDone ? 1 : 0) + (conceptosDone ? 1 : 0) + (glosarioDone ? 1 : 0) + (textoDone ? 1 : 0);
+  // Terminar todos los modos vale 2★; la tercera se gana con precisión.
+  const estrellas = Math.min(3, partida.estrellasCon(modosHechos, 5));
 
   const { mejorEstrellas: mejor, registraEstrellas } = useEstrellas(RETO_KEY);
   const bestEstrellas = Math.max(estrellas, mejor);
-
-  const persistMejor = (a: boolean, b: boolean, c: boolean) => {
-    const est = (a ? 1 : 0) + (b ? 1 : 0) + (c ? 1 : 0);
-    registraEstrellas(est);
-  };
+  useEffect(() => {
+    if (estrellas > 0) registraEstrellas(estrellas);
+  }, [estrellas, registraEstrellas]);
 
   const objetivos = [
+    { txt: "Publica una pieza con al menos 4 modos (texto, imagen, audio, color, diseño)", done: publicados > 0 },
+    { txt: `Logra claridad, alcance y accesibilidad de ${UMBRAL} o más`, done: eficazDone },
     { txt: "Clasifica los 8 elementos por modo semiótico", done: modalidadDone },
     { txt: "Empareja los 5 conceptos con su definición", done: conceptosDone },
     { txt: "Escribe los 6 términos del glosario", done: glosarioDone },
@@ -181,352 +280,550 @@ export function LabComunicacionMultimodal({ color }: PracticaLabProps) {
     { txt: "Aprueba el cuestionario de comprensión", done: quizAprobado },
   ];
 
-  // arrastre nativo
-  const dragProps = (id: string) => ({
-    draggable: true,
-    onDragStart: (e: React.DragEvent) => {
-      e.dataTransfer.setData("text/plain", id);
-      e.dataTransfer.effectAllowed = "move";
-      // El hueco que deja la tarjeta mientras viaja. Por atributo y no por
-      // estado: un render por cada gesto de arrastre se nota con 20 tarjetas.
-      e.currentTarget.setAttribute("data-arrastrando", "true");
-    },
-    onDragEnd: (e: React.DragEvent) => {
-      // También cuando se suelta FUERA de cualquier zona; si no, la tarjeta se
-      // queda medio borrada para siempre.
-      e.currentTarget.removeAttribute("data-arrastrando");
-      document.querySelectorAll('[data-sobre="true"]').forEach((z) => z.removeAttribute("data-sobre"));
-    },
-  });
-  const dropProps = (onDrop: (id: string) => void) => ({
-    onDragOver: (e: React.DragEvent) => {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = "move";
-    },
-    onDragEnter: (e: React.DragEvent) => {
-      e.preventDefault();
-      e.currentTarget.setAttribute("data-sobre", "true");
-    },
-    onDragLeave: (e: React.DragEvent) => {
-      // `dragleave` salta también al pasar sobre un HIJO de la zona. Apagar sin
-      // comprobar deja la zona parpadeando mientras mueves la mano por dentro.
-      const r = e.currentTarget.getBoundingClientRect();
-      const fuera = e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
-      if (fuera) e.currentTarget.removeAttribute("data-sobre");
-    },
-    onDrop: (e: React.DragEvent) => {
-      e.preventDefault();
-      e.currentTarget.removeAttribute("data-sobre");
-      const id = e.dataTransfer.getData("text/plain");
-      if (id) onDrop(id);
-    },
-    "data-zona": "true" as const,
-    role: "button" as const,
-    tabIndex: 0,
-    onKeyDown: (e: React.KeyboardEvent) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        (e.currentTarget as HTMLElement).click();
-      }
-    },
-  });
+  const resetActual = modo === "texto" ? resetTexto : modo === "modalidad" ? resetModalidad : modo === "conceptos" ? resetConceptos : modo === "campana" ? resetCampana : resetGlosario;
 
-  const resetTexto = () => {
-    setTextoDone(false);
-    setTextoIntento((n) => n + 1);
+  const lectura =
+    modo === "campana"
+      ? `Claridad ${resultado.claridad} · Alcance ${resultado.alcance} · Acceso ${resultado.acc}`
+      : `${modosHechos}/5 modos · ${bestEstrellas}★`;
+
+  const escena = (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
+      <style>{ESTILOS(accent, color.rgba)}</style>
+
+      {modo === "campana" && (
+        <Campana
+          accent={accent}
+          escenario={escenario}
+          onEscenario={cambiarEscenario}
+          sel={sel}
+          onElegir={elegir}
+          resultado={resultado}
+          ultima={ultima}
+          onPublicar={publicar}
+        />
+      )}
+
+      {modo === "texto" && (
+        <CompletaTexto
+          key={textoIntento}
+          data={COMUNICACION_MULTIMODAL_HUECOS}
+          accent={accent}
+          rgba={color.rgba}
+          completado={textoDone}
+          onCompletado={() => {
+            setTextoDone(true);
+            sfxOk();
+          }}
+          onAcierto={sfxPlace}
+          onError={sfxNo}
+        />
+      )}
+
+      {modo === "modalidad" && (
+        <Mesa>
+          <div className="cm-banco">
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+              <Eyebrow>Arrastra cada elemento a su modo</Eyebrow>
+              <span style={{ fontSize: 14, fontWeight: 800, color: modalidadDone ? OK : T.text3 }}>
+                {Object.keys(ubicMod).length}/{ELEMENTOS.length}
+              </span>
+            </div>
+            {modLibres.length === 0 ? (
+              <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+                <i className="fa-solid fa-circle-check" /> ¡Clasificaste los {ELEMENTOS.length} elementos!
+              </div>
+            ) : (
+              modLibres.map((el) => (
+                <button key={el.id} className="cm-chip" data-sel={selMod === el.id} onClick={() => setSelMod((s) => (s === el.id ? null : el.id))} {...dragProps(el.id)}>
+                  {el.texto}
+                </button>
+              ))
+            )}
+          </div>
+          <BinsModalidad selMod={selMod} shakeMod={shakeMod} ubicMod={ubicMod} onMatch={intentarMod} dropProps={dropProps} />
+        </Mesa>
+      )}
+
+      {modo === "conceptos" && (
+        <Mesa>
+          <div className="cm-banco">
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+              <Eyebrow>Arrastra cada concepto a su definición</Eyebrow>
+              <span style={{ fontSize: 14, fontWeight: 800, color: conceptosDone ? OK : T.text3 }}>
+                {Object.keys(empCon).length}/{CONCEPTOS.length}
+              </span>
+            </div>
+            {conLibres.length === 0 ? (
+              <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+                <i className="fa-solid fa-circle-check" /> ¡Emparejaste los {CONCEPTOS.length} conceptos!
+              </div>
+            ) : (
+              conLibres.map((c) => (
+                <button key={c.id} className="cm-chip" data-sel={selCon === c.id} onClick={() => setSelCon((s) => (s === c.id ? null : c.id))} {...dragProps(c.id)}>
+                  <i className="fa-solid fa-user-shield" style={{ fontSize: 14, color: T.text3 }} />
+                  {c.concepto}
+                </button>
+              ))
+            )}
+          </div>
+          <RowsConceptos selCon={selCon} shakeCon={shakeCon} empCon={empCon} onMatch={intentarCon} dropProps={dropProps} />
+        </Mesa>
+      )}
+
+      {modo === "glosario" && (
+        <EscribeTermino
+          key={glosIntento}
+          pares={PARES}
+          accent={accent}
+          rgba={color.rgba}
+          completado={glosarioDone}
+          instrucciones="Lee la definición y escribe el término del glosario que le corresponde."
+          onCompletado={() => {
+            setGlosarioDone(true);
+            sfxOk();
+          }}
+          onAcierto={sfxPlace}
+          onError={sfxNo}
+        />
+      )}
+    </div>
+  );
+
+  const pista: Record<Modo, string> = {
+    campana: "Cada modo aporta algo distinto, pero el significado nace de cómo se combinan. Prueba un cambio a la vez y mira qué medidor se mueve y qué dice la retroalimentación.",
+    modalidad: "El significado emerge de la interacción entre modos: texto, imagen, audio e imagen en movimiento (video).",
+    conceptos: "Ante un contenido digital pregúntate quién lo produjo, con qué objetivo y qué algoritmos deciden que lo veas.",
+    glosario: "Lee la definición y su ejemplo y escribe el término. Si te atoras, la pista te da la inicial y las letras.",
+    texto: "Escribe la palabra que falta en cada hueco del texto.",
   };
-  const resetActual = modo === "texto" ? resetTexto : modo === "modalidad" ? resetModalidad : modo === "conceptos" ? resetConceptos : resetGlosario;
 
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes cmShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
-        @keyframes cmPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
-        .cm-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 16px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .cm-tab:hover { border-color:${T.lineStrong}; color:#fff; }
-        .cm-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-        .cm-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
-          font-size:14px; border:1px solid ${T.line}; background:${T.glass}; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .cm-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
-        .cm-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .cm-chip { cursor:grab; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 16px; border-radius:14px;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:13.5px; font-weight:700; transition:all .14s; user-select:none; max-width:360px; text-align:left; line-height:1.4; }
-        .cm-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); }
-        .cm-chip[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.2); box-shadow:0 0 16px -5px ${accent}; }
-        .cm-chip:active { cursor:grabbing; }
-        .cm-row { border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:14px 16px; transition:all .16s; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
-        .cm-row[data-shake="true"] { animation:cmShake .4s; border-color:${NO}; }
-        .cm-row[data-done="true"] { border-color:${OK}66; background:${OK}0f; }
-        .cm-slot { flex-shrink:0; min-width:210px; min-height:42px; border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset};
-          display:inline-flex; align-items:center; justify-content:center; color:${T.text3}; font-size:12.5px; transition:all .16s; cursor:pointer; padding:4px 10px; }
-        .cm-slot[data-armed="true"] { border-color:${accent}; background:rgba(${color.rgba},0.1); }
-        .cm-bin { border-radius:15px; border:1.5px solid ${T.line}; background:${T.glass}; padding:16px; transition:all .16s; min-height:230px; }
-        .cm-bin[data-shake="true"] { animation:cmShake .4s; border-color:${NO}; }
-        .cm-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
-          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
-        .cm-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
-        .cm-q:disabled{ cursor:default; }
-        .cm-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
-          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .cm-btn:hover { border-color:${T.lineStrong}; }
-        .cm-divider { height:1px; background:${T.line}; margin:18px 0; }
-        @media (prefers-reduced-motion: reduce){ .cm-row[data-shake="true"], .cm-bin[data-shake="true"] { animation:none; } }
-
-        /* Cajón de teoría */
-        .cm-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .cm-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .cm-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .cm-drawer[data-open="true"] { transform:translateX(0); }
-        .cm-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .cm-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .cm-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .cm-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .cm-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .cm-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .cm-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
-
-        /* Identidad del tablero */
-        .cm-bin, .cm-row { --tono:188; position:relative;
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
-        .cm-bin:nth-of-type(6n+1), .cm-row:nth-of-type(6n+1) { --tono:188; }
-        .cm-bin:nth-of-type(6n+2), .cm-row:nth-of-type(6n+2) { --tono:262; }
-        .cm-bin:nth-of-type(6n+3), .cm-row:nth-of-type(6n+3) { --tono:44; }
-        .cm-bin:nth-of-type(6n+4), .cm-row:nth-of-type(6n+4) { --tono:152; }
-        .cm-bin:nth-of-type(6n+5), .cm-row:nth-of-type(6n+5) { --tono:330; }
-        .cm-bin:nth-of-type(6n+6), .cm-row:nth-of-type(6n+6) { --tono:18; }
-        .cm-bin::before, .cm-row::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
-          background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
-        .cm-bin[data-done="true"], .cm-row[data-done="true"] {
-          background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.2) 0%, transparent 68%); }
-        .cm-chip { transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
-        .cm-chip:hover { transform:translateY(-2px); }
-        .cm-chip[data-sel="true"] { transform:translateY(-3px) scale(1.02); }
-        @media (prefers-reduced-motion: reduce){
-          .cm-chip, .cm-chip:hover, .cm-chip[data-sel="true"] { transform:none; transition:none; }
-        }
-      `}</style>
-
-      {/* selector de modo + toolbar */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="cm-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="cm-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="cm-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="cm-icobtn" onClick={resetActual} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <button className="cm-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="cm-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="cm-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="cm-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="cm-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="cm-drawer-body">
-          <FichaTeorica data={COMUNICACION_MULTIMODAL_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}>
-        {/* ── Columna principal ─────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
-          {/* MODO 1 — modalidad */}
-          {/* MODO — completa el texto (fill_blanks verbatim de la progresión) */}
-          {modo === "texto" && (
-            <CompletaTexto
-              key={textoIntento}
-              data={COMUNICACION_MULTIMODAL_HUECOS}
-              accent={accent}
-              rgba={color.rgba}
-              completado={textoDone}
-              onCompletado={() => {
-                setTextoDone(true);
-                sfxOk();
-              }}
-              onAcierto={sfxPlace}
-              onError={sfxNo}
-            />
-          )}
-
-          {modo === "modalidad" && (
+    <LabShell
+      dom
+      accent={accent}
+      rgba={color.rgba}
+      escena={escena}
+      modos={{ opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })), valor: modo, cambiar: (id) => setModo(id as Modo) }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={resetActual} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      retoKey={RETO_KEY}
+      pestanas={[
+        {
+          id: "cuaderno",
+          etiqueta: "Cuaderno",
+          icono: "fa-lightbulb",
+          contenido: (
             <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada elemento a su modo semiótico</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: modalidadDone ? OK : T.text3 }}>
-                    {Object.keys(ubicMod).length}/{ELEMENTOS.length}
-                  </span>
-                </div>
-                {modLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Clasificaste los {ELEMENTOS.length} elementos!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {modLibres.map((el) => (
-                      <button key={el.id} className="cm-chip" data-sel={selMod === el.id} onClick={() => setSelMod((s) => (s === el.id ? null : el.id))} {...dragProps(el.id)}>
-                        {el.texto}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <BinsModalidad selMod={selMod} shakeMod={shakeMod} ubicMod={ubicMod} onMatch={intentarMod} dropProps={dropProps} />
-            </>
-          )}
-
-          {/* MODO 2 — conceptos */}
-          {modo === "conceptos" && (
-            <>
-              <div style={{ ...card, padding: "18px 22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                  <Eyebrow>Arrastra cada concepto a su definición</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: conceptosDone ? OK : T.text3 }}>
-                    {Object.keys(empCon).length}/{CONCEPTOS.length}
-                  </span>
-                </div>
-                {conLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-                    <i className="fa-solid fa-circle-check" /> ¡Emparejaste los {CONCEPTOS.length} conceptos!
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    {conLibres.map((c) => (
-                      <button key={c.id} className="cm-chip" data-sel={selCon === c.id} onClick={() => setSelCon((s) => (s === c.id ? null : c.id))} {...dragProps(c.id)}>
-                        <i className="fa-solid fa-user-shield" style={{ fontSize: 11, color: T.text3 }} />
-                        {c.concepto}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <RowsConceptos selCon={selCon} shakeCon={shakeCon} empCon={empCon} onMatch={intentarCon} dropProps={dropProps} />
-            </>
-          )}
-
-          {/* MODO 3 — glosario */}
-          {modo === "glosario" && (
-            <EscribeTermino
-              key={glosIntento}
-              pares={PARES}
-              accent={accent}
-              rgba={color.rgba}
-              completado={glosarioDone}
-              instrucciones="Lee la definición y escribe el término del glosario que le corresponde."
-              onCompletado={() => {
-                setGlosarioDone(true);
-                sfxOk();
-                persistMejor(modalidadDone, conceptosDone, true);
-              }}
-              onAcierto={sfxPlace}
-              onError={sfxNo}
-            />
-          )}
-        </div>
-
-        {/* ── Columna lateral ───────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? OK : T.text2 }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-                  <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="cm-divider" />
-
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", color: T.text3, textTransform: "uppercase" }}>Puntuación</div>
-                <div style={{ display: "flex", gap: 4, marginTop: 5 }}>
+              <Bloque titulo="Tu partida" icono="fa-gauge-high">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+                <div style={{ display: "flex", gap: 4 }}>
                   {[1, 2, 3].map((s) => (
-                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 18, color: s <= bestEstrellas ? "#FFC75A" : "rgba(255,255,255,0.16)" }} />
+                    <i key={s} className="fa-solid fa-star" style={{ fontSize: 20, color: s <= bestEstrellas ? AMBAR : "rgba(255,255,255,0.16)" }} />
                   ))}
                 </div>
-              </div>
-              <div style={{ textAlign: "right", maxWidth: 180 }}>
-                <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45 }}>
-                  {bestEstrellas >= 3 ? "¡Lees los medios digitales con mirada crítica!" : "Termina los tres modos para ganar 2★; la tercera pide 2 errores o menos."}
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                  {bestEstrellas >= 3 ? "¡Lees los medios digitales con mirada crítica!" : "Termina los cinco modos para ganar 2★; la tercera pide 2 errores o menos."}
                 </div>
-              </div>
-            </div>
-          </div>
-
-          {/* pista del modo actual */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid rgba(${color.rgba},0.3)`, background: `rgba(${color.rgba},0.08)`, fontSize: 13, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              {modo === "modalidad" && (
-                <>El significado emerge de la interacción entre modos: <strong style={{ color: T.text }}>texto</strong>, <strong style={{ color: T.text }}>imagen</strong>, <strong style={{ color: T.text }}>audio</strong> e <strong style={{ color: T.text }}>imagen en movimiento (video)</strong>.</>
+              </Bloque>
+              <Bloque titulo="Pista de este modo" icono="fa-lightbulb">
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>{pista[modo]}</div>
+              </Bloque>
+              {modo === "campana" && (
+                <Bloque titulo="Cómo leer los medidores" icono="fa-chart-simple">
+                  <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                    <strong style={{ color: T.text }}>Claridad:</strong> si el mensaje se entiende. <strong style={{ color: T.text }}>Alcance:</strong> a cuánta gente llega en este canal. <strong style={{ color: T.text }}>Accesibilidad:</strong> si lo perciben personas con distintas capacidades. Todas las cifras son de simulación.
+                  </div>
+                </Bloque>
               )}
-              {modo === "conceptos" && (
-                <>Ante un contenido digital pregúntate <strong style={{ color: T.text }}>quién</strong> lo produjo, <strong style={{ color: T.text }}>con qué objetivo</strong> y qué <strong style={{ color: T.text }}>algoritmos</strong> deciden que lo veas.</>
-              )}
-              {modo === "glosario" && (
-                <>Ya no se arrastra: lee la definición y su ejemplo y escribe el término. Si te atoras, la pista te da la inicial y las letras.</>
-              )}
-            </span>
-          </div>
-
-          {/* dato verbatim */}
-          <div style={{ borderRadius: 18, padding: "16px 18px", border: `1px solid ${T.line}`, background: T.glass, fontSize: 12.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 12 }}>
-            <i className="fa-solid fa-circle-info" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>{DATO_MULTIMODAL}</span>
-          </div>
-        </div>
-      </div>
-
-      <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />
-    </div>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-clipboard-question",
+          contenido: <QuizCard accent={accent} rgba={color.rgba} aprobado={quizAprobado} onAprobado={() => setQuizAprobado(true)} playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined} />,
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Teoría de la práctica" icono="fa-book-open">
+                <FichaTeorica data={COMUNICACION_MULTIMODAL_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <Bloque titulo="Modos semióticos" icono="fa-shapes">
+                <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+                  {(Object.keys(MODALIDAD_INFO) as Modalidad[]).map((k) => (
+                    <div key={k} style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                      <strong style={{ color: T.text }}>{MODALIDAD_INFO[k].titulo}.</strong> {MODALIDAD_INFO[k].subtitulo}
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+              <Bloque titulo="Identidad digital y algoritmos" icono="fa-user-shield">
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {CONCEPTOS.map((c) => (
+                    <div key={c.id} style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                      <strong style={{ color: T.text }}>{c.concepto}.</strong> {c.definicion}
+                      <div style={{ fontStyle: "italic", color: T.text3, marginTop: 2 }}>{c.ejemplo}</div>
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+              <Bloque titulo="Glosario" icono="fa-spell-check">
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {PARES.map((p) => (
+                    <div key={p.id} style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+                      <strong style={{ color: T.text }}>{p.termino}.</strong> {p.definicion}
+                      <div style={{ fontStyle: "italic", color: T.text3, marginTop: 2 }}>{p.ejemplo}</div>
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+              <Bloque titulo="Dato" icono="fa-circle-info">
+                <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55 }}>{DATO_MULTIMODAL}</div>
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
- * Paneles de cada modo (componentes hijos: reciben los manejadores como props,
- * así el linter no rastrea el acceso al ref de audio hasta el render del map).
+ * Estilos
+ * ═══════════════════════════════════════════════════════════════════════════ */
+const ESTILOS = (accent: string, rgba: string) => `
+  @keyframes cmShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
+  @keyframes cmPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
+  @keyframes cmBar { 0%,100%{transform:scaleY(.35);} 50%{transform:scaleY(1);} }
+  .cm-banco { display:flex; flex-direction:column; gap:10px; padding:14px; border-radius:16px; border:1px solid ${T.line}; background:${T.glass}; min-width:0; }
+  .cm-chip { cursor:grab; display:inline-flex; align-items:center; justify-content:flex-start; gap:8px; padding:11px 14px; border-radius:14px;
+    border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:14px; font-weight:700; user-select:none; max-width:100%; text-align:left; line-height:1.4;
+    transition:transform .14s, box-shadow .14s, border-color .14s, background .14s; }
+  .cm-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); transform:translateY(-2px); }
+  .cm-chip[data-sel="true"] { border-color:${accent}; background:rgba(${rgba},0.2); box-shadow:0 0 16px -5px ${accent}; transform:translateY(-3px) scale(1.02); }
+  .cm-chip[data-arrastrando="true"] { opacity:.4; }
+  .cm-chip:active { cursor:grabbing; }
+  .cm-row { position:relative; border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; padding:14px 16px; transition:all .16s; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .cm-row[data-shake="true"] { animation:cmShake .4s; border-color:${NO}; }
+  .cm-row[data-done="true"] { border-color:${OK}66; background:${OK}0f; }
+  .cm-row[data-sobre="true"], .cm-bin[data-sobre="true"] { border-color:${accent}; background:rgba(${rgba},0.12); }
+  .cm-slot { flex-shrink:0; min-width:min(100%, 200px); min-height:42px; border-radius:11px; border:1.5px dashed ${T.lineStrong}; background:${T.inset};
+    display:inline-flex; align-items:center; justify-content:center; color:${T.text3}; font-size:14px; transition:all .16s; cursor:pointer; padding:4px 10px; }
+  .cm-slot[data-armed="true"] { border-color:${accent}; background:rgba(${rgba},0.1); }
+  .cm-bin { position:relative; border-radius:15px; border:1.5px solid ${T.line}; background:${T.glass}; padding:16px; transition:all .16s; min-height:140px; }
+  .cm-bin[data-shake="true"] { animation:cmShake .4s; border-color:${NO}; }
+  .cm-q { cursor:pointer; display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:11px;
+    border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:600; text-align:left; width:100%; transition:all .14s; }
+  .cm-q:hover:not(:disabled){ border-color:${T.lineStrong}; color:#fff; }
+  .cm-q:disabled{ cursor:default; }
+  .cm-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:12px 18px;
+    border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:14px; font-weight:800; transition:all .14s; }
+  .cm-btn:hover:not(:disabled) { border-color:${T.lineStrong}; }
+  .cm-btn:disabled { opacity:.45; cursor:not-allowed; }
+  .cm-btn-main { background:${accent}; color:#04121f; border-color:transparent; }
+
+  /* Simulador */
+  .cm-esc { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 170px), 1fr)); gap:10px; }
+  .cm-esc-b { cursor:pointer; display:flex; flex-direction:column; gap:8px; text-align:left; padding:8px; border-radius:14px; border:1.5px solid ${T.line};
+    background:${T.glass}; color:${T.text}; font-size:14px; font-weight:800; min-width:0; transition:border-color .14s, background .14s; }
+  .cm-esc-b[data-on="true"] { border-color:${accent}; background:rgba(${rgba},0.16); }
+  .cm-esc-b span { padding:0 4px 4px; line-height:1.3; }
+  .cm-sim { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap:14px; align-items:start; }
+  .cm-panel { display:flex; flex-direction:column; gap:10px; padding:14px; border-radius:16px; border:1px solid ${T.line}; background:${T.glass}; min-width:0; }
+  .cm-slotrow { display:grid; gap:7px; }
+  .cm-slotrow h5 { margin:0; font-size:14px; font-weight:900; color:${T.text}; display:flex; align-items:center; gap:8px; }
+  .cm-opts { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 120px), 1fr)); gap:7px; }
+  .cm-opt { cursor:pointer; display:flex; flex-direction:column; align-items:flex-start; gap:3px; padding:9px 10px; border-radius:11px; border:1.5px solid ${T.line};
+    background:${T.inset}; color:${T.text2}; font-size:14px; font-weight:700; text-align:left; line-height:1.3; min-width:0; transition:border-color .14s, background .14s; }
+  .cm-opt:hover { border-color:${T.lineStrong}; color:#fff; }
+  .cm-opt[data-on="true"] { border-color:${accent}; background:rgba(${rgba},0.2); color:#fff; }
+  .cm-opt i { color:${accent}; }
+  .cm-foto { position:relative; overflow:hidden; border-radius:12px; display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(135deg, rgba(${rgba},0.35) 0%, rgba(8,19,31,0.9) 100%); }
+  .cm-foto > i { font-size:30px; color:rgba(255,255,255,0.5); }
+  .cm-foto > img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .cm-barra { height:12px; border-radius:7px; background:${T.inset}; border:1px solid ${T.line}; position:relative; overflow:hidden; }
+  .cm-barra > i { display:block; height:100%; border-radius:7px; transition:width .5s cubic-bezier(.2,.8,.2,1), background .5s; }
+  .cm-barra > b { position:absolute; top:0; bottom:0; width:2px; background:#fff; opacity:.7; }
+  .cm-ondas { display:inline-flex; align-items:flex-end; gap:3px; height:18px; }
+  .cm-ondas i { width:4px; height:100%; border-radius:2px; background:currentColor; transform-origin:bottom; animation:cmBar .9s ease-in-out infinite; }
+  .cm-ondas i:nth-child(2) { animation-delay:.15s; } .cm-ondas i:nth-child(3) { animation-delay:.3s; } .cm-ondas i:nth-child(4) { animation-delay:.45s; }
+  .cm-nota { display:flex; gap:9px; align-items:flex-start; font-size:14px; line-height:1.45; padding:9px 11px; border-radius:10px; border:1px solid ${T.line}; background:${T.inset}; color:${T.text2}; }
+  .cm-nota[data-t="suma"] { border-color:${OK}55; }
+  .cm-nota[data-t="resta"] { border-color:${NO}55; }
+  .cm-pop { animation:cmPop .28s ease; }
+  @media (prefers-reduced-motion: reduce){
+    .cm-row[data-shake="true"], .cm-bin[data-shake="true"], .cm-pop, .cm-ondas i { animation:none; }
+    .cm-chip, .cm-chip:hover, .cm-chip[data-sel="true"] { transform:none; transition:none; }
+    .cm-barra > i { transition:none; }
+  }
+`;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Simulador: componer la publicación
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+/** Foto de la escena con respaldo (gradiente + ícono) si el archivo aún no existe. */
+function FotoSim({ clave, icono, ratio = "16 / 9", alt = "" }: { clave: string; icono: string; ratio?: string; alt?: string }) {
+  const [ok, setOk] = useState(true);
+  return (
+    <div className="cm-foto" style={{ aspectRatio: ratio }}>
+      <i className={`fa-solid ${icono}`} aria-hidden />
+      {ok && <img src={`${RUTA_FOTOS}/${clave}.webp`} alt={alt} loading="lazy" onError={() => setOk(false)} />}
+    </div>
+  );
+}
+
+const PALETA: Record<string, { bg: string; fg: string; sub: string }> = {
+  pastel: { bg: "#F1E9FB", fg: "#D8C8F0", sub: "#E4D8F5" },
+  contraste: { bg: "#FFD60A", fg: "#111111", sub: "#1F1F1F" },
+  neon: { bg: "#FF1FBF", fg: "#00FF9C", sub: "#B6FF00" },
+};
+
+const TITULAR = "Limpiemos juntos el parque";
+const PARRAFO =
+  "El sábado, vecinas y vecinos de la colonia Los Pinos (ficticia) se reunirán en el parque para recoger residuos, separar materiales reciclables y sembrar árboles. Se pide traer guantes, bolsas y agua; habrá herramientas para quien no pueda llevarlas. La jornada empieza a las diez de la mañana y termina al mediodía.";
+
+function Vista({ sel }: { sel: Seleccion }) {
+  const p = PALETA[sel.color]!;
+  const d = sel.diseno;
+  const apretado = d === "apretado";
+  const jerarquia = d === "jerarquia";
+  const centrado = d === "centrado";
+
+  const texto =
+    sel.texto === "sin" ? (
+      <div style={{ fontSize: 14, fontStyle: "italic", opacity: 0.45 }}>(sin texto)</div>
+    ) : sel.texto === "titular" ? (
+      <div style={{ fontSize: jerarquia ? 26 : centrado ? 17 : 16, fontWeight: 900, lineHeight: apretado ? 1 : 1.15, color: p.fg }}>{TITULAR}</div>
+    ) : (
+      <div style={{ fontSize: 14, lineHeight: apretado ? 1.05 : 1.45, color: p.sub }}>{PARRAFO}</div>
+    );
+
+  const imagen =
+    sel.imagen === "sin" ? (
+      <div style={{ fontSize: 14, fontStyle: "italic", opacity: 0.45 }}>(sin imagen)</div>
+    ) : sel.imagen === "foto" ? (
+      <div style={{ width: apretado ? "70%" : "100%", marginTop: apretado ? -6 : 0 }}>
+        <FotoSim clave="foto-jornada" icono="fa-people-group" ratio={jerarquia ? "16 / 9" : "2 / 1"} />
+      </div>
+    ) : (
+      <div style={{ fontSize: jerarquia ? 64 : 40, color: p.fg, lineHeight: 1, marginTop: apretado ? -6 : 0 }}>
+        <i className="fa-solid fa-recycle" aria-hidden />
+      </div>
+    );
+
+  const audio =
+    sel.audio === "sin" ? null : (
+      <div style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 800, color: p.fg, padding: "4px 10px", borderRadius: 99, border: `1.5px solid ${p.fg}` }}>
+        <span className="cm-ondas" aria-hidden>
+          <i /><i /><i /><i />
+        </span>
+        {sel.audio === "locucion" ? "Locución" : "Música"}
+      </div>
+    );
+
+  return (
+    <div
+      role="img"
+      aria-label="Vista previa de la publicación"
+      style={{
+        background: p.bg,
+        borderRadius: 16,
+        padding: apretado ? 6 : jerarquia ? 16 : 14,
+        display: "flex",
+        flexDirection: "column",
+        gap: apretado ? 0 : jerarquia ? 12 : 9,
+        alignItems: centrado ? "center" : "stretch",
+        textAlign: centrado ? "center" : "left",
+        minHeight: 230,
+        justifyContent: centrado ? "center" : "flex-start",
+        transition: "background .3s",
+        border: "1px solid rgba(255,255,255,0.18)",
+      }}
+    >
+      {jerarquia ? (
+        <>
+          {texto}
+          {imagen}
+          {audio}
+        </>
+      ) : (
+        <>
+          {imagen}
+          {texto}
+          {audio}
+        </>
+      )}
+    </div>
+  );
+}
+
+function Medidor({ etiqueta, valor, icono }: { etiqueta: string; valor: number; icono: string }) {
+  const col = valor >= UMBRAL ? OK : valor >= 45 ? AMBAR : NO;
+  return (
+    <div style={{ display: "grid", gap: 4 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, fontWeight: 800, color: T.text }}>
+        <span>
+          <i className={`fa-solid ${icono}`} aria-hidden style={{ color: col, marginRight: 7 }} />
+          {etiqueta}
+        </span>
+        <span style={{ color: col, fontVariantNumeric: "tabular-nums" }}>{valor}</span>
+      </div>
+      <div className="cm-barra" role="img" aria-label={`${etiqueta}: ${valor} de 100`}>
+        <i style={{ width: `${valor}%`, background: col }} />
+        <b style={{ left: `${UMBRAL}%` }} />
+      </div>
+    </div>
+  );
+}
+
+function deltaTxt(e: { claridad?: number; alcance?: number; acc?: number }): string {
+  const partes: string[] = [];
+  const f = (n: number | undefined, nombre: string) => {
+    if (n) partes.push(`${nombre} ${n > 0 ? "+" : ""}${n}`);
+  };
+  f(e.claridad, "claridad");
+  f(e.alcance, "alcance");
+  f(e.acc, "accesib.");
+  return partes.join(" · ");
+}
+
+function Campana({
+  accent,
+  escenario,
+  onEscenario,
+  sel,
+  onElegir,
+  resultado,
+  ultima,
+  onPublicar,
+}: {
+  accent: string;
+  escenario: Escenario;
+  onEscenario: (id: string) => void;
+  sel: Seleccion;
+  onElegir: (slot: SlotId, id: string) => void;
+  resultado: Resultado;
+  ultima: { ok: boolean; r: Resultado } | null;
+  onPublicar: () => void;
+}) {
+  const faltan = MIN_MODOS_PUBLICAR - resultado.modos;
+  const masBajo = (
+    [
+      ["claridad", resultado.claridad],
+      ["alcance", resultado.alcance],
+      ["accesibilidad", resultado.acc],
+    ] as [string, number][]
+  ).sort((a, b) => a[1] - b[1])[0]!;
+  return (
+    <>
+      <div className="cm-panel">
+        <Eyebrow>Campaña ficticia · «Jornada de reciclaje, colonia Los Pinos» (simulación)</Eyebrow>
+        <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+          Elige dónde se va a publicar y combina los modos. La tarjeta cambia en vivo y los medidores te dicen cómo le va a la publicación (valores de simulación).
+        </div>
+        <div className="cm-esc" role="tablist" aria-label="Canal y público">
+          {ESCENARIOS.map((e) => (
+            <button key={e.id} type="button" role="tab" aria-selected={e.id === escenario.id} className="cm-esc-b" data-on={e.id === escenario.id} onClick={() => onEscenario(e.id)}>
+              <FotoSim clave={e.foto} icono={e.icono} ratio="16 / 9" />
+              <span>{e.titulo}</span>
+            </button>
+          ))}
+        </div>
+        <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
+          <strong style={{ color: T.text }}>Canal:</strong> {escenario.canal}. <strong style={{ color: T.text }}>Público:</strong> {escenario.publico}. <strong style={{ color: accent }}>{escenario.necesidad}</strong>
+        </div>
+      </div>
+
+      <div className="cm-sim">
+        <div className="cm-panel">
+          <Eyebrow>Tus decisiones</Eyebrow>
+          {SLOTS.map((s) => (
+            <div key={s.id} className="cm-slotrow">
+              <h5>
+                <i className={`fa-solid ${s.icono}`} aria-hidden style={{ color: accent }} /> {s.titulo}
+              </h5>
+              <div className="cm-opts">
+                {s.opciones.map((o) => (
+                  <button key={o.id} type="button" className="cm-opt" data-on={sel[s.id] === o.id} aria-pressed={sel[s.id] === o.id} onClick={() => onElegir(s.id, o.id)}>
+                    <i className={`fa-solid ${o.icono}`} aria-hidden />
+                    {o.nombre}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="cm-panel">
+          <Eyebrow>Vista previa · simulación</Eyebrow>
+          <Vista sel={sel} />
+          <Medidor etiqueta="Claridad" valor={resultado.claridad} icono="fa-eye" />
+          <Medidor etiqueta="Alcance" valor={resultado.alcance} icono="fa-bullhorn" />
+          <Medidor etiqueta="Accesibilidad" valor={resultado.acc} icono="fa-universal-access" />
+          <div style={{ fontSize: 14, color: T.text3 }}>La raya blanca marca {UMBRAL}: una publicación eficaz llega ahí en los tres.</div>
+        </div>
+      </div>
+
+      <div className="cm-panel">
+        <Eyebrow>Cómo se combinan tus modos</Eyebrow>
+        <div style={{ display: "grid", gap: 7 }}>
+          {SLOTS.map((s) => {
+            const o = s.opciones.find((x) => x.id === sel[s.id])!;
+            return (
+              <div key={s.id} className="cm-nota" data-t="neutro">
+                <i className={`fa-solid ${o.icono}`} aria-hidden style={{ color: accent, marginTop: 3 }} />
+                <span>
+                  <strong style={{ color: T.text }}>{s.titulo}: {o.nombre}.</strong> {o.detalle} <span style={{ color: T.text3 }}>({deltaTxt(o.efecto) || "sin efecto"})</span>
+                </span>
+              </div>
+            );
+          })}
+          {resultado.notas.map((n) => (
+            <div key={n.clave} className="cm-nota cm-pop" data-t={n.tono}>
+              <i className={`fa-solid ${n.tono === "suma" ? "fa-circle-plus" : "fa-circle-minus"}`} aria-hidden style={{ color: n.tono === "suma" ? OK : NO, marginTop: 3 }} />
+              <span>
+                {n.texto} <span style={{ color: T.text3 }}>({deltaTxt(n.delta)})</span>
+              </span>
+            </div>
+          ))}
+        </div>
+        <button type="button" className="cm-btn cm-btn-main" disabled={faltan > 0} onClick={onPublicar}>
+          <i className="fa-solid fa-paper-plane" aria-hidden /> Publicar la pieza
+        </button>
+        {faltan > 0 && <div style={{ fontSize: 14, color: AMBAR }}>Una pieza multimodal combina al menos {MIN_MODOS_PUBLICAR} modos: agrega texto, imagen o audio.</div>}
+        {ultima && (
+          <div className="cm-pop" style={{ fontSize: 14, lineHeight: 1.5, fontWeight: 700, color: ultima.ok ? OK : AMBAR }}>
+            <i className={`fa-solid ${ultima.ok ? "fa-trophy" : "fa-circle-half-stroke"}`} aria-hidden style={{ marginRight: 8 }} />
+            {ultima.ok
+              ? "Publicación eficaz: los modos se complementan y el mensaje llega claro a este público."
+              : `Todavía no llega: lo más débil es la ${masBajo[0]} (${masBajo[1]}). Cambia un modo y compara.`}
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Paneles de los modos de arrastre (reciben los manejadores como props)
  * ═══════════════════════════════════════════════════════════════════════════ */
 type DropFactory = (onDrop: (id: string) => void) => {
-  onDragOver: (e: React.DragEvent) => void;
-  onDrop: (e: React.DragEvent) => void;
+  onDragOver: (e: DragEvent) => void;
+  onDrop: (e: DragEvent) => void;
 };
 
 function BinsModalidad({
@@ -544,7 +841,7 @@ function BinsModalidad({
 }) {
   const bins: Modalidad[] = ["texto", "imagen", "audio", "video"];
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 180px), 1fr))", gap: 12 }}>
       {bins.map((bin) => {
         const info = MODALIDAD_INFO[bin];
         const dentro = ELEMENTOS.filter((el) => ubicMod[el.id] === bin);
@@ -554,23 +851,22 @@ function BinsModalidad({
             className="cm-bin"
             data-shake={shakeMod === bin}
             onClick={() => selMod && onMatch(selMod, bin)}
-            style={{ position: "relative", isolation: "isolate" }}
+            style={{ isolation: "isolate" }}
             {...dropProps((id) => onMatch(id, bin))}
           >
             {/* La ilustración del concepto llenando la caja vacía. */}
             <FondoTermino termino={info.titulo} />
-            <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 12 }}>
               <VinetaTermino termino={info.titulo} color={T.text2} icono={info.icono} tam={29} radio={8} />
-              <span style={{ fontSize: 13.5, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
+              <span style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>{info.titulo}</span>
             </div>
-            <div style={{ fontSize: 11, color: T.text3, marginBottom: 12, lineHeight: 1.4 }}>{info.subtitulo}</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {dentro.length === 0 ? (
-                <div style={{ fontSize: 12, color: T.text3, opacity: 0.6, padding: "8px 0" }}>Arrastra aquí…</div>
+                <div style={{ fontSize: 14, color: T.text3, opacity: 0.7, padding: "8px 0" }}>Arrastra aquí…</div>
               ) : (
                 dentro.map((el) => (
-                  <span key={el.id} style={{ animation: "cmPop .25s ease", display: "inline-flex", alignItems: "flex-start", gap: 7, padding: "8px 12px", borderRadius: 11, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 12.5, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>
-                    <i className="fa-solid fa-check" style={{ fontSize: 10, color: OK, marginTop: 3 }} />
+                  <span key={el.id} style={{ animation: "cmPop .25s ease", display: "inline-flex", alignItems: "flex-start", gap: 7, padding: "8px 12px", borderRadius: 11, background: `${OK}1a`, border: `1px solid ${OK}55`, fontSize: 14, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>
+                    <i className="fa-solid fa-check" style={{ fontSize: 14, color: OK, marginTop: 2 }} />
                     {el.texto}
                   </span>
                 ))
@@ -611,19 +907,19 @@ function RowsConceptos({
           >
             <div className="cm-slot" data-armed={!done && !!selCon} style={done ? { borderStyle: "solid", borderColor: OK, background: `${OK}1a` } : undefined}>
               {done ? (
-                <span style={{ animation: "cmPop .25s ease", fontSize: 13, fontWeight: 900, color: "#fff", display: "inline-flex", alignItems: "center", gap: 7 }}>
+                <span style={{ animation: "cmPop .25s ease", fontSize: 14, fontWeight: 900, color: "#fff", display: "inline-flex", alignItems: "center", gap: 7 }}>
                   <i className="fa-solid fa-user-shield" />
                   {c.concepto}
                 </span>
               ) : (
                 <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                  <i className="fa-solid fa-arrow-left" style={{ fontSize: 11 }} /> concepto
+                  <i className="fa-solid fa-arrow-left" style={{ fontSize: 14 }} /> concepto
                 </span>
               )}
             </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 13, color: done ? "#fff" : T.text2, lineHeight: 1.45 }}>{c.definicion}</div>
-              <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.4, marginTop: 3, fontStyle: "italic" }}>{c.ejemplo}</div>
+            <div style={{ flex: "1 1 220px", minWidth: 0 }}>
+              <div style={{ fontSize: 14, color: done ? "#fff" : T.text2, lineHeight: 1.45 }}>{c.definicion}</div>
+              <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.4, marginTop: 3, fontStyle: "italic" }}>{c.ejemplo}</div>
             </div>
           </div>
         );
@@ -672,19 +968,19 @@ function QuizCard({
   };
 
   return (
-    <div style={{ ...card, padding: "20px 24px 24px", marginTop: 22 }}>
+    <div>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4, flexWrap: "wrap" }}>
         <Eyebrow>
           <i className="fa-solid fa-clipboard-question" style={{ marginRight: 8, color: accent }} />
           Comprueba lo aprendido
         </Eyebrow>
         {aprobado && (
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 12, fontWeight: 800, color: OK }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 14, fontWeight: 800, color: OK }}>
             <i className="fa-solid fa-circle-check" /> Aprobado
           </span>
         )}
       </div>
-      <div style={{ fontSize: 12.5, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text3, marginBottom: 18, lineHeight: 1.5 }}>
         Cinco afirmaciones sobre la comunicación multimodal, la identidad digital y los algoritmos. Decide si son verdaderas o falsas y pulsa «Comprobar».
       </div>
 
@@ -693,11 +989,11 @@ function QuizCard({
           const elegida = resp[qi];
           return (
             <div key={qi}>
-              <div style={{ fontSize: 14.5, fontWeight: 800, color: T.text, marginBottom: 11, display: "flex", gap: 10 }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: T.text, marginBottom: 11, display: "flex", gap: 10 }}>
                 <span style={{ color: accent }}>{qi + 1}.</span>
                 <span>{q.pregunta}</span>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 140px), 1fr))", gap: 9 }}>
                 {q.opciones.map((op, oi) => {
                   const sel = elegida === oi;
                   const esCorrecta = oi === q.correcta;
@@ -719,7 +1015,7 @@ function QuizCard({
                   }
                   return (
                     <button key={oi} className="cm-q" onClick={() => elegir(qi, oi)} disabled={comprobado} style={{ borderColor: borde, background: fondo, color: colorTxt }}>
-                      <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
+                      <span style={{ width: 26, height: 26, flexShrink: 0, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, border: `1.5px solid ${sel || (comprobado && esCorrecta) ? "currentColor" : T.line}` }}>
                         {comprobado && esCorrecta ? <i className="fa-solid fa-check" /> : comprobado && sel ? <i className="fa-solid fa-xmark" /> : String.fromCharCode(65 + oi)}
                       </span>
                       <span style={{ flex: 1, lineHeight: 1.35 }}>{op}</span>
@@ -728,7 +1024,7 @@ function QuizCard({
                 })}
               </div>
               {comprobado && (
-                <div style={{ marginTop: 9, fontSize: 12.5, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
+                <div style={{ marginTop: 9, fontSize: 14, color: T.text2, lineHeight: 1.5, display: "flex", gap: 9, padding: "9px 12px", borderRadius: 10, background: T.inset, border: `1px solid ${T.line}` }}>
                   <i className="fa-solid fa-circle-info" style={{ color: accent, marginTop: 2 }} />
                   <span>{q.retro}</span>
                 </div>
@@ -740,7 +1036,7 @@ function QuizCard({
 
       <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 22, flexWrap: "wrap" }}>
         {!comprobado ? (
-          <button className="cm-btn" style={{ background: accent, color: "#04121f", border: "none" }} onClick={comprobar} disabled={!todas}>
+          <button className="cm-btn cm-btn-main" onClick={comprobar} disabled={!todas}>
             <i className="fa-solid fa-list-check" />
             Comprobar
           </button>
@@ -751,7 +1047,7 @@ function QuizCard({
           </button>
         )}
         {comprobado && (
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 13.5, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", border: `1px solid ${aprobadoAhora ? OK : NO}55`, background: `${aprobadoAhora ? OK : NO}14`, fontSize: 14, fontWeight: 800, color: aprobadoAhora ? OK : NO }}>
             <i className={`fa-solid ${aprobadoAhora ? "fa-trophy" : "fa-circle-half-stroke"}`} />
             {aciertos} / {total} correctas
             {!aprobadoAhora && <span style={{ color: T.text3, fontWeight: 600 }}>· revisa las marcadas e inténtalo de nuevo</span>}

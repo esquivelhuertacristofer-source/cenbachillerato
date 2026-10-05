@@ -1,0 +1,9 @@
+{
+  "slug": "comunicacion-multimodal",
+  "items": [
+    { "clave": "foto-jornada", "formato": "16:9", "estilo": "foto", "escena": "Fotografía de un grupo de vecinas y vecinos de distintas edades con guantes y bolsas recogiendo basura entre los árboles de un parque, con sol de mañana" },
+    { "clave": "escenario-mercado", "formato": "16:9", "estilo": "foto", "escena": "Fotografía de la entrada de un mercado mexicano con puestos de frutas y una pared de ladrillo con papeles pegados, personas mayores caminando con bolsas de mandado" },
+    { "clave": "escenario-jovenes", "formato": "16:9", "estilo": "foto", "escena": "Fotografía de tres adolescentes sentados en una banca de un patio mirando la pantalla de un celular que sostiene uno de ellos, con auriculares puestos" },
+    { "clave": "escenario-vecinal", "formato": "16:9", "estilo": "foto", "escena": "Fotografía de varias personas de una colonia reunidas en una banqueta; una señora mayor con lentes gruesos sostiene un celular muy cerca de su cara y a su lado una persona usa lenguaje de señas" }
+  ]
+}

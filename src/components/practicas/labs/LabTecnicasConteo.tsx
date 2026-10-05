@@ -20,6 +20,8 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
 import { T, NUM, OK, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, BotonHerramienta } from "./_shell";
+import type { ObjetivoLab } from "./_objetivos";
 import { FichaTeorica } from "./_ficha";
 import { RetoNumericoCard } from "./_reto-numerico";
 import { LabSfx } from "./lab-audio";
@@ -64,7 +66,7 @@ const ConteoScene = dynamic(() => import("./TecnicasConteoScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-sitemap fa-fade" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Cargando el laboratorio de conteo en 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Cargando el laboratorio de conteo en 3D…</span>
     </div>
   ),
 });
@@ -140,7 +142,7 @@ function SituacionesCard({
         border: `1px solid ${on ? accent : T.lineStrong}`,
         background: on ? `rgba(${rgba},0.2)` : "transparent",
         color: on ? "#fff" : T.text2,
-        fontSize: 12.5,
+        fontSize: 14.5,
         fontWeight: 800,
       }}
     >
@@ -156,9 +158,9 @@ function SituacionesCard({
           ¿Permutación o combinación?
         </Eyebrow>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 10.5, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
+          <span style={{ fontSize: 14.5, fontWeight: 800, color: T.text3, letterSpacing: "0.06em" }}>MEJOR MARCA</span>
           {[1, 2, 3].map((k) => (
-            <i key={k} className="fa-solid fa-star" style={{ fontSize: 13, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
+            <i key={k} className="fa-solid fa-star" style={{ fontSize: 14, color: k <= mejor ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
           ))}
         </div>
       </div>
@@ -167,7 +169,7 @@ function SituacionesCard({
 
       <div style={{ display: "grid", gap: 12 }}>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-          <span style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.06em", marginRight: 4 }}>¿IMPORTA EL ORDEN?</span>
+          <span style={{ fontSize: 14, fontWeight: 900, color: T.text3, letterSpacing: "0.06em", marginRight: 4 }}>¿IMPORTA EL ORDEN?</span>
           {boton(orden === true, "Sí — permutación", () => setOrden(true))}
           {boton(orden === false, "No — combinación", () => setOrden(false))}
         </div>
@@ -188,13 +190,13 @@ function SituacionesCard({
             <button
               onClick={comprobar}
               disabled={orden === null || valor.trim() === ""}
-              style={{ cursor: "pointer", padding: "12px 18px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.18)`, color: "#fff", fontSize: 13, fontWeight: 900, opacity: orden === null || valor.trim() === "" ? 0.45 : 1 }}
+              style={{ cursor: "pointer", padding: "12px 18px", borderRadius: 10, border: `1px solid ${accent}`, background: `rgba(${rgba},0.18)`, color: "#fff", fontSize: 14, fontWeight: 900, opacity: orden === null || valor.trim() === "" ? 0.45 : 1 }}
             >
               <i className="fa-solid fa-check" style={{ marginRight: 8 }} />
               Comprobar
             </button>
           ) : (
-            <button onClick={otra} style={{ cursor: "pointer", padding: "12px 18px", borderRadius: 10, border: `1px solid ${T.lineStrong}`, background: "transparent", color: "#fff", fontSize: 13, fontWeight: 900 }}>
+            <button onClick={otra} style={{ cursor: "pointer", padding: "12px 18px", borderRadius: 10, border: `1px solid ${T.lineStrong}`, background: "transparent", color: "#fff", fontSize: 14, fontWeight: 900 }}>
               <i className="fa-solid fa-shuffle" style={{ marginRight: 8 }} />
               Otra situación
             </button>
@@ -203,7 +205,7 @@ function SituacionesCard({
       </div>
 
       {aviso && resuelto === null && (
-        <div style={{ marginTop: 12, fontSize: 12, color: "#FF8A3C", lineHeight: 1.5 }}>
+        <div style={{ marginTop: 12, fontSize: 14, color: "#FF8A3C", lineHeight: 1.5 }}>
           <i className="fa-solid fa-rotate-left" style={{ marginRight: 7 }} />
           {aviso} Intento {intentos}.
         </div>
@@ -214,9 +216,9 @@ function SituacionesCard({
             {[1, 2, 3].map((k) => (
               <i key={k} className="fa-solid fa-star" style={{ fontSize: 15, color: k <= resuelto ? "#fbbf24" : "rgba(255,255,255,0.16)" }} />
             ))}
-            <span style={{ fontSize: 12.5, fontWeight: 900, color: OK, marginLeft: 4 }}>{intentos === 1 ? "Al primer intento" : `En ${intentos} intentos`}</span>
+            <span style={{ fontSize: 14.5, fontWeight: 900, color: OK, marginLeft: 4 }}>{intentos === 1 ? "Al primer intento" : `En ${intentos} intentos`}</span>
           </div>
-          <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>
+          <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55 }}>
             {s.porque}{" "}
             <strong style={{ color: "#fff", ...NUM }}>
               {s.importaOrden ? `P(${s.n},${s.r})` : `C(${s.n},${s.r})`} = {correcta}
@@ -258,12 +260,12 @@ export function LabTecnicasConteo({ color }: PracticaLabProps) {
   // ── Comunes
   const [resetNonce, setResetNonce] = useState(0);
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
 
   // Logros pegajosos
   const [agregoEtapa, setAgregoEtapa] = useState(false);
+  const [movioOpciones, setMovioOpciones] = useState(false);
   /** Cuántos podios ha visto pasar el alumno, a mano o en reproducción. */
   const [podiosRecorridos, setPodiosRecorridos] = useState(0);
   const [vioComite, setVioComite] = useState(false);
@@ -351,6 +353,7 @@ export function LabTecnicasConteo({ color }: PracticaLabProps) {
   };
 
   const cambiarOpcion = (k: number, v: number) => {
+    setMovioOpciones(true);
     setOpciones((prev) => prev.map((x, i) => (i === k ? v : x)));
     blip();
   };
@@ -472,15 +475,16 @@ export function LabTecnicasConteo({ color }: PracticaLabProps) {
   };
 
   /* ── Objetivos ─────────────────────────────────────────────────────── */
-  const objetivos: { t: string; done: boolean }[] = [
-    { t: "Agregar una tercera etapa al árbol y ver cómo se multiplican las hojas", done: agregoEtapa },
-    { t: "Recorrer al menos 5 podios distintos", done: podiosRecorridos >= 5 },
-    { t: "Pasar del podio al comité con las mismas personas", done: vioComite },
-    { t: "Contar solo los arreglos que incluyen a Ana (inciso c)", done: filtroAna },
-    { t: "Extraer dos veces con reemplazo y dos veces sin reemplazo", done: extraccionesPor.size === 2 },
-    { t: "Simular al menos 1000 pares de extracciones", done: simulo },
-    { t: "Resolver una situación de conteo y ganar estrellas", done: predicho },
-    { t: "Resolver el reto evaluable (ejercicio A2)", done: ejercicioAprobado },
+  const objetivos: ObjetivoLab[] = [
+    { txt: "Cambia las opciones de una etapa y mira cómo se multiplican las hojas", done: movioOpciones },
+    { txt: "Agregar una tercera etapa al árbol y ver cómo se multiplican las hojas", done: agregoEtapa },
+    { txt: "Recorrer al menos 5 podios distintos", done: podiosRecorridos >= 5 },
+    { txt: "Pasar del podio al comité con las mismas personas", done: vioComite },
+    { txt: "Contar solo los arreglos que incluyen a Ana (inciso c)", done: filtroAna },
+    { txt: "Extraer dos veces con reemplazo y dos veces sin reemplazo", done: extraccionesPor.size === 2 },
+    { txt: "Simular al menos 1000 pares de extracciones", done: simulo },
+    { txt: "Resolver una situación de conteo y ganar estrellas", done: predicho },
+    { txt: "Resolver el reto evaluable (ejercicio A2)", done: ejercicioAprobado },
   ];
 
   /* ── Pie del visor ─────────────────────────────────────────────────── */
@@ -503,14 +507,14 @@ export function LabTecnicasConteo({ color }: PracticaLabProps) {
         <i className={`fa-solid ${def.icono}`} />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>{def.etq}</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14.5, color: T.text2, maxWidth: 440, lineHeight: 1.5 }}>
         Tu equipo no puede mostrar la escena en 3D, pero la información sigue aquí. {DEFINICION}
       </div>
     </div>
   );
 
   const sub = (txt: string, extra?: ReactNode) => (
-    <div style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>
+    <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", color: T.text3, margin: "16px 0 8px", textTransform: "uppercase" }}>
       {txt}
       {extra}
     </div>
@@ -524,7 +528,7 @@ export function LabTecnicasConteo({ color }: PracticaLabProps) {
         <div style={{ display: "grid", gap: 12 }}>
           {opciones.map((n, k) => (
             <div key={k}>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, fontWeight: 800, color: T.text2, marginBottom: 6 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14.5, fontWeight: 800, color: T.text2, marginBottom: 6 }}>
                 <span>
                   <i className={`fa-solid ${ETAPAS[k]!.icono}`} style={{ color: ETAPAS[k]!.color, marginRight: 7 }} />
                   Etapa {k + 1}: {ETAPAS[k]!.nombre}
@@ -557,7 +561,7 @@ export function LabTecnicasConteo({ color }: PracticaLabProps) {
             <span style={{ color: T.text3 }}> = </span>
             <span style={{ color: accent }}>{hojas}</span>
           </div>
-          <div style={{ marginTop: 6, fontSize: 12, color: T.text2, lineHeight: 1.55, textAlign: "center" }}>
+          <div style={{ marginTop: 6, fontSize: 14, color: T.text2, lineHeight: 1.55, textAlign: "center" }}>
             Cada etapa multiplica a todas las ramas que ya había, por eso agregar una etapa de 2 opciones duplica el total.
           </div>
         </div>
@@ -597,11 +601,11 @@ export function LabTecnicasConteo({ color }: PracticaLabProps) {
             <Readout label={`C(5,${r})`} value={String(C)} col={!importaOrden ? accent : undefined} />
             <Readout label={`${r}!`} value={String(rFact)} />
           </div>
-          <div style={{ marginTop: 4, fontSize: 12.5, color: "#fff", lineHeight: 1.6, fontFamily: "ui-monospace, monospace", textAlign: "center", ...NUM }}>
+          <div style={{ marginTop: 4, fontSize: 14.5, color: "#fff", lineHeight: 1.6, fontFamily: "ui-monospace, monospace", textAlign: "center", ...NUM }}>
             P(5,{r}) = C(5,{r}) × {r}! → {P} = {C} × {rFact}
           </div>
           {soloConAna && (
-            <div style={{ marginTop: 6, fontSize: 12, color: T.text2, lineHeight: 1.55, textAlign: "center", ...NUM }}>
+            <div style={{ marginTop: 6, fontSize: 14, color: T.text2, lineHeight: 1.55, textAlign: "center", ...NUM }}>
               P(Ana incluida) = {conAnaCuenta}/{todos.length} = {fraccion(conAnaCuenta, todos.length)} = {(conAnaCuenta / todos.length).toFixed(2)}
             </div>
           )}
@@ -618,7 +622,7 @@ export function LabTecnicasConteo({ color }: PracticaLabProps) {
           <button className="tc-icon" onClick={() => moverIdx(1)} title="Siguiente" aria-label="Siguiente">
             <i className="fa-solid fa-forward-step" />
           </button>
-          <span style={{ fontSize: 13, fontWeight: 900, color: "#fff" }}>{nombresDe(arreglo)}</span>
+          <span style={{ fontSize: 14, fontWeight: 900, color: "#fff" }}>{nombresDe(arreglo)}</span>
         </div>
 
         {sub(importaOrden ? `Todos los podios · resaltados: los ${rFact} órdenes de este mismo grupo` : "Todos los comités")}
@@ -662,7 +666,7 @@ export function LabTecnicasConteo({ color }: PracticaLabProps) {
             );
           })}
         </div>
-        <div style={{ marginTop: 8, fontSize: 11.5, color: T.text3, lineHeight: 1.5 }}>{urna.nota}</div>
+        <div style={{ marginTop: 8, fontSize: 14.5, color: T.text3, lineHeight: 1.5 }}>{urna.nota}</div>
 
         <button
           className="tc-toggle"
@@ -687,11 +691,11 @@ export function LabTecnicasConteo({ color }: PracticaLabProps) {
         </div>
 
         <div style={{ marginTop: 14, padding: "12px 14px", borderRadius: 12, border: `1px solid ${modoCol}55`, background: `${modoCol}12` }}>
-          <div style={{ fontSize: 12, fontWeight: 900, color: "#fff", marginBottom: 8 }}>
+          <div style={{ fontSize: 14, fontWeight: 900, color: "#fff", marginBottom: 8 }}>
             <i className="fa-solid fa-code-branch" style={{ color: modoCol, marginRight: 8 }} />
             Árbol de probabilidades
           </div>
-          <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 12, lineHeight: 1.8, color: "#eaf0fb", ...NUM }}>
+          <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 14, lineHeight: 1.8, color: "#eaf0fb", ...NUM }}>
             <div>
               P(1.ª {urna.especial}) = <span style={{ color: "#fbbf24" }}>{fr(arbol.p1)}</span>
             </div>
@@ -705,12 +709,12 @@ export function LabTecnicasConteo({ color }: PracticaLabProps) {
               P(las dos) = {fr(arbol.p1)} × {fr(arbol.p2dado1)} = <span style={{ color: accent }}>{fraccion(arbol.ambas.num, arbol.ambas.den)}</span> ≈ {pAmbas.toFixed(4)}
             </div>
             {!urna.soloConReemplazo && (
-              <div style={{ color: T.text3, fontSize: 11.5 }}>
+              <div style={{ color: T.text3, fontSize: 14.5 }}>
                 {conReemplazo ? "Sin" : "Con"} reemplazo sería {fraccion(arbolOtro.ambas.num, arbolOtro.ambas.den)} ≈ {(arbolOtro.ambas.num / arbolOtro.ambas.den).toFixed(4)}
               </div>
             )}
           </div>
-          <div style={{ marginTop: 6, fontSize: 11.5, color: T.text2, lineHeight: 1.5 }}>
+          <div style={{ marginTop: 6, fontSize: 14.5, color: T.text2, lineHeight: 1.5 }}>
             {conReemplazo
               ? "Las dos ramas de la 2.ª extracción valen lo mismo: lo que salió primero no cambia nada. Eventos independientes."
               : "Las ramas de la 2.ª extracción son distintas: dependen de lo que salió primero. Eventos dependientes."}
@@ -731,364 +735,173 @@ export function LabTecnicasConteo({ color }: PracticaLabProps) {
     );
   }
 
+  const lectura: ReactNode =
+    modo === "multiplicativo"
+      ? `${opciones.join(" × ")} = ${hojas} resultados`
+      : modo === "orden"
+        ? importaOrden
+          ? `P(5,${r}) = ${P} podios distintos`
+          : `C(5,${r}) = ${C} comités distintos`
+        : `P(las dos) = ${fraccion(arbol.ambas.num, arbol.ambas.den)} ≈ ${pAmbas.toFixed(4)}`;
+
+  const sonidoOk = (ok: boolean) => {
+    if (!sonido) return;
+    if (ok) audioRef.current?.correcto();
+    else audioRef.current?.incorrecto();
+  };
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes tcPulse { 0%,100%{ box-shadow:0 0 0 0 var(--tcd); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .tc-live-dot { animation: tcPulse 1.6s ease-in-out infinite; }
-        .tc-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(310px,28vw,410px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .tc-grid { grid-template-columns: 1fr; } }
-        .tc-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .tc-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .tc-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .tc-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-        .tc-tab { cursor:pointer; border:1px solid var(--tcc); border-radius:12px; padding:11px 8px; text-align:center;
-          background:transparent; transition:all .15s; color:#fff; }
-        .tc-tab[data-on="false"] { border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.62); }
-        .tc-tab:hover { background:rgba(255,255,255,0.06); }
-        .tc-opts { display:flex; flex-wrap:wrap; gap:7px; }
-        .tc-opt { cursor:pointer; border:1px solid var(--tcc); border-radius:10px; padding:9px 12px; font-size:12px;
-          font-weight:800; color:#fff; background:transparent; transition:all .15s; }
-        .tc-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.66); }
-        .tc-opt:hover { background:rgba(255,255,255,0.06); }
-        .tc-toggle { width:100%; cursor:pointer; border:1px solid var(--tcc); border-radius:11px; padding:11px 14px;
-          background:rgba(4,10,22,0.4); color:#fff; font-size:12.5px; font-weight:900; text-align:left; transition:all .15s; }
-        .tc-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
-        .tc-icon { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.lineStrong}; background:rgba(4,10,22,0.4);
-          color:#fff; font-size:13px; display:flex; align-items:center; justify-content:center; }
-        .tc-icon[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.2); }
-        .tc-lista { display:flex; flex-wrap:wrap; gap:5px; max-height:190px; overflow-y:auto; padding-right:4px; }
-        .tc-item { cursor:pointer; border:1px solid; border-radius:8px; padding:5px 8px; font-size:12px; font-weight:900;
-          font-family:ui-monospace, monospace; transition:transform .1s; }
-        .tc-item:hover { transform:translateY(-1px); }
-        @media (max-width: 1000px){ .tc-bottom { grid-template-columns: 1fr !important; } }
-
-        .tc-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .tc-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .tc-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06121e 0%,#040a16 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .tc-drawer[data-open="true"] { transform:translateX(0); }
-        .tc-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .tc-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .tc-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .tc-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .tc-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(4,10,22,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; z-index:5; }
-        .tc-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 18 }}>
-        <div className="tc-tabs">
-          {MODOS.map((m) => {
-            const d = MODOS_DEF[m];
-            const col = `#${d.color.replace("#", "")}`;
-            const on = m === modo;
-            return (
-              <button key={m} className="tc-tab" data-on={on} onClick={() => cambiarModo(m)} style={{ ["--tcc" as string]: col, background: on ? `${col}1f` : "transparent" }}>
-                <div style={{ fontSize: 18, marginBottom: 4, color: on ? col : "inherit" }}>
-                  <i className={`fa-solid ${d.icono}`} />
-                </div>
-                <div style={{ fontSize: 12.5, fontWeight: 900 }}>{d.etq}</div>
-                <div style={{ fontSize: 10, color: T.text3, marginTop: 3, lineHeight: 1.25 }}>{d.subtitulo}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="tc-grid">
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 58vh, 660px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06121e 0%,#040a16 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <ConteoScene
-                modo={modo}
-                opciones={opciones}
-                r={r}
-                importaOrden={importaOrden}
-                arreglo={arreglo}
-                urna={urna}
-                conReemplazo={conReemplazo}
-                primera={primera}
-                segunda={segunda}
-                accent={accent}
-                modoColor={modoCol}
-                resetNonce={resetNonce}
-              />
-            </SceneBoundary>
-
-            <div style={{ position: "absolute", top: 14, left: 16, display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(4,10,22,0.74)", border: `1px solid ${modoCol}66`, backdropFilter: "blur(10px)" }}>
-              <span className="tc-live-dot" style={{ ["--tcd" as string]: `${modoCol}aa`, width: 9, height: 9, borderRadius: "50%", background: modoCol }} />
-              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3 }}>EN VIVO</span>
-              <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)" }} />
-              <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace", ...NUM }}>
-                {modo === "multiplicativo" ? `${opciones.join(" × ")} = ${hojas}` : modo === "orden" ? (importaOrden ? `P(5,${r}) = ${P}` : `C(5,${r}) = ${C}`) : `P = ${fraccion(arbol.ambas.num, arbol.ambas.den)}`}
-              </span>
-            </div>
-
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(4,10,22,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="tc-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="tc-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              {modo === "orden" && (
-                <button className="tc-icobtn" data-on={reproduciendo} onClick={() => setReproduciendo((p) => !p)} title={reproduciendo ? "Pausar" : "Reproducir arreglos"}>
-                  <i className={`fa-solid ${reproduciendo ? "fa-pause" : "fa-play"}`} />
-                </button>
-              )}
-              {modo === "reemplazo" && (
-                <button className="tc-icobtn" onClick={extraer} title="Extraer">
-                  <i className="fa-solid fa-hand" />
-                </button>
-              )}
-              <button className="tc-icobtn" onClick={reiniciar} title="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 132px 14px 18px", background: "linear-gradient(0deg, rgba(3,8,18,0.92) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#eaf0fb", fontWeight: 800 }}>
-                <i className={`fa-solid ${def.icono}`} style={{ color: modoCol, marginRight: 7 }} />
-                {def.etq} — {def.subtitulo}
-              </div>
-              <div style={{ fontSize: 12, color: "#cdd8ec", lineHeight: 1.5, marginTop: 6 }}>{pie}</div>
-            </div>
-
-            <button className="tc-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-          </div>
-
-          <div style={{ ...card, padding: "18px 22px 22px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, gap: 10, flexWrap: "wrap" }}>
-              <Eyebrow>
-                <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: modoCol }} />
-                Controles — {def.etq}
-              </Eyebrow>
-              <span style={{ fontSize: 9.5, fontWeight: 900, letterSpacing: "0.08em", color: "#7dd3fc", border: "1px solid #7dd3fc55", borderRadius: 6, padding: "3px 7px" }}>
-                {def.fuente === "A2" ? "EJERCICIO A2" : def.fuente === "A5" ? "GLOSARIO A5" : "LECTURA A1"}
-              </span>
-            </div>
-            {control}
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid ${accent}66`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#04121f", background: accent }}>
-                <i className="fa-solid fa-sitemap" />
-              </div>
-              <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>Contar para decidir</div>
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{PROBLEMA}</div>
-          </div>
-
-          <div style={{ borderRadius: 18, padding: "18px 20px 20px", border: "1px solid #7dd3fc55", background: "rgba(125,211,252,0.07)" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book-open" style={{ marginRight: 8, color: "#7dd3fc" }} />
-              Lectura A1 — Técnicas de conteo
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9, marginBottom: 12 }}>
-              {LECTURA_A1.map((p, i) => (
-                <div key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>
-                  {p}
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 11, fontWeight: 900, color: T.text3, letterSpacing: "0.08em", marginBottom: 8 }}>PARA REFLEXIONAR</div>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {PREGUNTAS.map((q, i) => (
-                <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  {q}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-list-ol" style={{ marginRight: 8, color: accent }} />
-              Cómo usar el laboratorio
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 9 }}>
-              {INSTRUCCIONES.map((p, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 12px", borderRadius: 11, background: "rgba(4,10,22,0.4)", border: `1px solid ${accent}25` }}>
-                  <div style={{ width: 22, height: 22, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#04121f", background: accent, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.45, minWidth: 0 }}>{p}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ ...card, padding: "18px 20px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <Eyebrow>
-                <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-                Objetivos de la sesión
-              </Eyebrow>
-              <span style={{ fontSize: 11, fontWeight: 800, color: objetivos.every((o) => o.done) ? OK : T.text3 }}>
-                {objetivos.filter((o) => o.done).length}/{objetivos.length}
-              </span>
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              {objetivos.map((o, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ marginTop: 2, fontSize: 13, color: o.done ? OK : "rgba(255,255,255,0.22)" }} />
-                  <span style={{ fontSize: 12, color: o.done ? "#fff" : T.text2, lineHeight: 1.4 }}>{o.t}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="tc-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-magnifying-glass-chart" style={{ marginRight: 8, color: accent }} />
-            Datos clave
-          </Eyebrow>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
-            {DATOS.map((dd, i) => (
-              <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "10px 12px", borderRadius: 10, background: T.glass, border: `1px solid ${T.line}` }}>
-                <div style={{ width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: accent, background: `rgba(${color.rgba},0.16)`, flexShrink: 0 }}>
-                  <i className={`fa-solid ${dd.icono}`} />
-                </div>
-                <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: 13, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace", overflowWrap: "anywhere", ...NUM }}>{dd.valor}</div>
-                  <div style={{ fontSize: 11, color: T.text2, lineHeight: 1.4 }}>{dd.texto}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div style={{ marginTop: 16, padding: "14px 16px", borderRadius: 12, border: `1px solid ${accent}33`, background: `rgba(${color.rgba},0.07)` }}>
-            <Eyebrow>
-              <i className="fa-solid fa-ticket" style={{ marginRight: 8, color: accent }} />
-              Contar antes de apostar
-            </Eyebrow>
-            <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.55 }}>{CONTEXTO}</div>
-          </div>
-
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-circle-question" style={{ marginRight: 8, color: accent }} />
-              ¿Sabías que? (quiz A4)
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 8 }}>
-              {HECHOS.map((h, i) => (
-                <li key={i} style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>
-                  {h}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div style={{ marginTop: 16 }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />
-              Glosario (A5)
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {GLOSARIO.map((gi, i) => (
-                <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: accent }}>{gi.termino}. </span>
-                  <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{gi.definicion}</span>
-                  <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.4, marginTop: 4 }}>
-                    <i className="fa-solid fa-flask" style={{ marginRight: 6, color: accent }} />
-                    {gi.ejemplo}
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <ConteoScene
+            modo={modo}
+            opciones={opciones}
+            r={r}
+            importaOrden={importaOrden}
+            arreglo={arreglo}
+            urna={urna}
+            conReemplazo={conReemplazo}
+            primera={primera}
+            segunda={segunda}
+            accent={accent}
+            modoColor={modoCol}
+            resetNonce={resetNonce}
+          />
+        </SceneBoundary>
+      }
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m, etiqueta: MODOS_DEF[m].etq, icono: MODOS_DEF[m].icono })),
+        valor: modo,
+        cambiar: (id) => cambiarModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          {modo === "orden" && <BotonHerramienta icono={reproduciendo ? "fa-pause" : "fa-play"} titulo={reproduciendo ? "Pausar" : "Reproducir arreglos"} activo={reproduciendo} onClick={() => setReproduciendo((p) => !p)} />}
+          {modo === "reemplazo" && <BotonHerramienta icono="fa-hand" titulo="Extraer" onClick={extraer} />}
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reiniciar} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Controles",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              <style>{`
+                .tc-opts { display:flex; flex-wrap:wrap; gap:7px; }
+                .tc-opt { cursor:pointer; border:1px solid var(--tcc); border-radius:10px; padding:9px 12px; font-size:14px;
+                  font-weight:800; color:#fff; background:transparent; transition:all .15s; }
+                .tc-opt[data-on="false"] { border-color:rgba(255,255,255,0.14); color:rgba(255,255,255,0.66); }
+                .tc-opt:hover { background:rgba(255,255,255,0.06); }
+                .tc-toggle { width:100%; cursor:pointer; border:1px solid var(--tcc); border-radius:11px; padding:11px 14px;
+                  background:rgba(4,10,22,0.4); color:#fff; font-size:14px; font-weight:900; text-align:left; transition:all .15s; }
+                .tc-toggle:hover:not(:disabled) { background:rgba(255,255,255,0.07); }
+                .tc-icon { cursor:pointer; width:40px; height:40px; border-radius:10px; border:1px solid ${T.lineStrong}; background:rgba(4,10,22,0.4);
+                  color:#fff; font-size:14px; display:flex; align-items:center; justify-content:center; }
+                .tc-icon[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.2); }
+                .tc-lista { display:flex; flex-wrap:wrap; gap:5px; max-height:190px; overflow-y:auto; padding-right:4px; }
+                .tc-item { cursor:pointer; border:1px solid; border-radius:8px; padding:5px 8px; font-size:14px; font-weight:900;
+                  font-family:ui-monospace, monospace; transition:transform .1s; }
+                .tc-item:hover { transform:translateY(-1px); }
+              `}</style>
+              <Bloque titulo={def.etq} icono={def.icono}>
+                {control}
+              </Bloque>
+              <Bloque titulo="Lo que se lee en la escena" icono="fa-eye">
+                <p style={{ margin: 0, color: T.text2 }}>{pie}</p>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <>
+              <SituacionesCard accent={accent} rgba={color.rgba} mejor={mejorEstrellas} onResultado={registraEstrellas} playSfx={sonidoOk} />
+              <RetoNumericoCard reto={RETO_A2} accent={accent} aprobado={ejercicioAprobado} onAprobado={() => setEjercicioAprobado(true)} playSfx={sonidoOk} />
+            </>
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Contar para decidir" icono="fa-sitemap">
+                <p style={{ margin: 0, color: T.text2 }}>{PROBLEMA}</p>
+              </Bloque>
+              <Bloque titulo="Lectura A1 — Técnicas de conteo" icono="fa-book-open">
+                {LECTURA_A1.map((p, i) => (
+                  <p key={i} style={{ margin: 0, color: T.text2 }}>{p}</p>
+                ))}
+              </Bloque>
+              <Bloque titulo="Para reflexionar" icono="fa-circle-question">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {PREGUNTAS.map((q, i) => <li key={i}>{q}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Cómo usar el laboratorio" icono="fa-list-ol">
+                <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8 }}>
+                  {INSTRUCCIONES.map((p, i) => <li key={i}>{p}</li>)}
+                </ol>
+              </Bloque>
+              <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {IDEAS.map((x, i) => <li key={i}>{x}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Datos clave" icono="fa-magnifying-glass-chart">
+                {DATOS.map((dd, i) => (
+                  <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                    <i className={`fa-solid ${dd.icono}`} style={{ color: accent, marginTop: 4 }} aria-hidden />
+                    <div style={{ minWidth: 0 }}>
+                      <strong style={{ fontFamily: "ui-monospace, monospace", overflowWrap: "anywhere" }}>{dd.valor}</strong>
+                      <div style={{ color: T.text2 }}>{dd.texto}</div>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-            Ideas clave
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-            {IDEAS.map((x, i) => (
-              <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                {x}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          La lectura A1, las preguntas de reflexión, el glosario A5, los hechos del quiz A4 y el ejercicio A2 son <strong>verbatim</strong> del MCCEMS
-          2025. Los podios y comités se <strong>enumeran</strong> uno por uno y los totales de pantalla son el tamaño de esas listas; las probabilidades
-          del árbol son fracciones exactas. Las extracciones y la simulación usan el generador aleatorio del navegador, así que cambian en cada
-          corrida. Las situaciones de la tarjeta de estrellas son ejercicios de práctica del laboratorio, no parte del material oficial. Fuente: {FUENTE}
-        </span>
-      </div>
-
-      <SituacionesCard
-        accent={accent}
-        rgba={color.rgba}
-        mejor={mejorEstrellas}
-        onResultado={registraEstrellas}
-        playSfx={(ok) => {
-          if (!sonido) return;
-          if (ok) audioRef.current?.correcto();
-          else audioRef.current?.incorrecto();
-        }}
-      />
-
-      <RetoNumericoCard
-        reto={RETO_A2}
-        accent={accent}
-        aprobado={ejercicioAprobado}
-        onAprobado={() => setEjercicioAprobado(true)}
-        playSfx={(ok) => {
-          if (!sonido) return;
-          if (ok) audioRef.current?.correcto();
-          else audioRef.current?.incorrecto();
-        }}
-      />
-
-      <div className="tc-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="tc-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="tc-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="tc-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="tc-drawer-body">
-          <FichaTeorica data={TECNICAS_CONTEO_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Contar antes de apostar" icono="fa-ticket">
+                <p style={{ margin: 0, color: T.text2 }}>{CONTEXTO}</p>
+              </Bloque>
+              <Bloque titulo="¿Sabías que? (quiz A4)" icono="fa-circle-question">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {HECHOS.map((h, i) => <li key={i}>{h}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Glosario (A5)" icono="fa-book">
+                {GLOSARIO.map((gi, i) => (
+                  <div key={i} style={{ padding: "9px 12px", borderRadius: 10, background: "rgba(4,10,22,0.4)", border: `1px solid ${T.line}` }}>
+                    <span style={{ fontWeight: 900, color: accent }}>{gi.termino}. </span>
+                    <span style={{ color: T.text2 }}>{gi.definicion}</span>
+                    <div style={{ fontSize: 14, color: T.text3, marginTop: 4 }}>
+                      <i className="fa-solid fa-flask" style={{ marginRight: 6, color: accent }} aria-hidden />
+                      {gi.ejemplo}
+                    </div>
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={TECNICAS_CONTEO_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ marginTop: 18, fontSize: 14, color: T.text3 }}>
+                La lectura A1, las preguntas de reflexión, el glosario A5, los hechos del quiz A4 y el ejercicio A2 son verbatim del MCCEMS 2025. Los podios y comités se enumeran uno por uno y los totales son el tamaño de esas listas; las probabilidades del árbol son fracciones exactas. Las extracciones y la simulación usan el generador aleatorio del navegador. Las situaciones de la tarjeta de estrellas son ejercicios de práctica del laboratorio, no material oficial. Fuente: {FUENTE}
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }
-

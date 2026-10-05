@@ -1,0 +1,12 @@
+{
+  "escena": "Dos barras del PIB per cápita sobre un eje que no empieza en cero; la segunda parece mucho más alta que la primera",
+  "pregunta": "Si llevas el inicio del eje de la gráfica hasta cero, ¿qué pasa con la diferencia entre las barras?",
+  "opciones": [
+    { "id": "a", "texto": "La diferencia se ve mucho más pequeña", "icono": "fa-compress" },
+    { "id": "b", "texto": "La diferencia se vuelve todavía mayor", "icono": "fa-expand" },
+    { "id": "c", "texto": "Las dos barras quedan exactamente iguales", "icono": "fa-equals" }
+  ],
+  "correcta": "a",
+  "porque": "Con el eje cortado, la barra mide solo lo que sobresale del corte y la diferencia se exagera. Desde cero, la altura es proporcional al valor y el cambio real, que es pequeño, se ve como es.",
+  "comoComprobarlo": "Arrastra el deslizador «Dónde empieza el eje» desde el valor del titular hasta cero y compara la altura de las dos barras."
+}

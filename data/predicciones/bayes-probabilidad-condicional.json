@@ -1,0 +1,12 @@
+{
+  "escena": "Una prueba de diabetes con 90 % de sensibilidad y 95 % de especificidad se aplica a 1 000 personas; los positivos se separan en enfermos y sanos.",
+  "pregunta": "La prueba no cambia, pero la enfermedad pasa de 10 % a 1 % de la población. ¿Qué pasa con los positivos?",
+  "opciones": [
+    { "id": "a", "texto": "Casi todos siguen siendo personas enfermas", "icono": "fa-virus" },
+    { "id": "b", "texto": "La mayoría resulta falso positivo", "icono": "fa-user-xmark" },
+    { "id": "c", "texto": "Quedan igual, la prueba es la misma", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "Con 1 % de prevalencia hay pocos enfermos y muchos sanos, y el 5 % de error de la prueba cae sobre esos muchos sanos. El VPP baja de 66.7 % a 15.4 %: la mayoría de los positivos son falsos.",
+  "comoComprobarlo": "En «Prueba diagnóstica» elige el escenario del ejercicio A2, pulsa «Solo positivos» y baja la prevalencia a 1 % comparando los dos muros."
+}

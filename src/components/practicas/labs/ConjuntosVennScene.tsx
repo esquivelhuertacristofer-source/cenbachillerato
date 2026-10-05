@@ -24,7 +24,7 @@
 
 import * as THREE from "three";
 import { useEffect, useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
+import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { type Modo, type Zona, type Elemento, type RepartoEncuesta, zonaDe } from "./conjuntos-venn-data";
@@ -71,6 +71,9 @@ const H = 5.2;
 const R = 1.9;
 const CA: [number, number] = [-1.1, 0];
 const CB: [number, number] = [1.1, 0];
+
+const CAM_Z = 9.2;
+const CAM_FOV = 42;
 
 const COL_A = "#60a5fa";
 const COL_B = "#f472b6";
@@ -193,9 +196,12 @@ function Tablero({ capas, claveCapas }: { capas: CapaVenn[]; claveCapas: string 
 }
 
 /* ── Etiquetas ────────────────────────────────────────────────────────── */
-function Etiqueta({ pos, children, df = 10, col }: { pos: Pt; children: ReactNode; df?: number; col?: string }) {
+function Etiqueta({ pos, children, col }: { pos: Pt; children: ReactNode; col?: string }) {
+  const { size } = useThree();
+  // En pantallas angostas la información ya está en el panel: no se tapan los tableros.
+  if (size.width < 640) return null;
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -206,7 +212,7 @@ function Etiqueta({ pos, children, df = 10, col }: { pos: Pt; children: ReactNod
           background: "rgba(4,10,22,0.84)",
           border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`,
           color: "#fff",
-          fontSize: 12,
+          fontSize: 14,
           fontWeight: 800,
           whiteSpace: "nowrap",
           boxShadow: "0 6px 18px -8px #000",
@@ -218,11 +224,29 @@ function Etiqueta({ pos, children, df = 10, col }: { pos: Pt; children: ReactNod
   );
 }
 
-function Letra({ pos, children, df = 8, col = "#e2e8f0", size = 14 }: { pos: Pt; children: ReactNode; df?: number; col?: string; size?: number }) {
+function Letra({ pos, children, col = "#e2e8f0", size = 14 }: { pos: Pt; children: ReactNode; col?: string; size?: number }) {
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
       <div style={{ color: col, fontSize: size, fontWeight: 900, whiteSpace: "nowrap", textShadow: "0 2px 6px #000" }}>{children}</div>
     </Html>
+  );
+}
+
+/**
+ * Encuadre: el contenido llena ~60 % del alto, entre la barra de arriba (~64 px)
+ * y la misión de abajo (~150 px), y cabe a lo ancho aunque la pantalla sea angosta.
+ */
+function Ajuste({ ancho, alto, children }: { ancho: number; alto: number; children: ReactNode }) {
+  const { size } = useThree();
+  const visH = 2 * CAM_Z * Math.tan((CAM_FOV * Math.PI) / 360);
+  const visW = (visH * size.width) / Math.max(1, size.height);
+  const libre = Math.max(0.3, (size.height - 214) / Math.max(1, size.height));
+  const k = Math.min(1, visW / ancho, (visH * libre) / alto);
+  const dy = (visH * 43) / Math.max(1, size.height);
+  return (
+    <group position={[0, dy, 0]} scale={k}>
+      {children}
+    </group>
   );
 }
 
@@ -334,7 +358,7 @@ function Ficha({
         <cylinderGeometry args={[0.27, 0.27, 0.16, 32]} />
         <meshStandardMaterial color={col} emissive={col} emissiveIntensity={enResultado ? 0.75 : 0.18} roughness={0.35} metalness={0.25} />
       </mesh>
-      <Letra pos={[0, 0, 0.14]} col={enResultado ? "#04121f" : "#ffffff"} size={15} df={7}>
+      <Letra pos={[0, 0, 0.14]} col={enResultado ? "#04121f" : "#ffffff"} size={15}>
         {etq}
       </Letra>
     </group>
@@ -378,13 +402,13 @@ function EscenaOperaciones({
           onTocar={() => onTocarElemento(i)}
         />
       ))}
-      <Letra pos={[-W / 2 - 0.05, H / 2 + 0.32, 0.1]} col="rgba(226,232,240,0.85)" size={20} df={9}>
+      <Letra pos={[-W / 2 - 0.05, H / 2 + 0.32, 0.1]} col="rgba(226,232,240,0.85)" size={20}>
         U
       </Letra>
-      <Letra pos={[CA[0] - 1.25, R + 0.02, 0.1]} col={COL_A} size={22} df={9}>
+      <Letra pos={[CA[0] - 1.25, R + 0.02, 0.1]} col={COL_A} size={22}>
         A
       </Letra>
-      <Letra pos={[CB[0] + 1.25, R + 0.02, 0.1]} col={COL_B} size={22} df={9}>
+      <Letra pos={[CB[0] + 1.25, R + 0.02, 0.1]} col={COL_B} size={22}>
         B
       </Letra>
     </group>
@@ -421,36 +445,36 @@ function EscenaDeMorgan({
     <group rotation={[-0.3, 0, 0]} position={[0, 0.2, 0]}>
       <group position={[-2.35, 0, 0]} scale={esc}>
         <Tablero capas={capasIzq} claveCapas={claveDeCapas(capasIzq)} />
-        <Letra pos={[CA[0] - 1.25, R + 0.02, 0.1]} col={COL_A} size={18} df={11}>
+        <Letra pos={[CA[0] - 1.25, R + 0.02, 0.1]} col={COL_A} size={18}>
           A
         </Letra>
-        <Letra pos={[CB[0] + 1.25, R + 0.02, 0.1]} col={COL_B} size={18} df={11}>
+        <Letra pos={[CB[0] + 1.25, R + 0.02, 0.1]} col={COL_B} size={18}>
           B
         </Letra>
-        <Etiqueta pos={[0, H / 2 + 0.75, 0.1]} col={`${modoColor}88`} df={16}>
+        <Etiqueta pos={[0, H / 2 + 0.75, 0.1]} col={`${modoColor}88`}>
           {notacionIzq}
         </Etiqueta>
       </group>
 
-      <Letra pos={[0, 0, 0.1]} col={coinciden ? "#34d399" : "rgba(255,255,255,0.6)"} size={30} df={9}>
+      <Letra pos={[0, 0, 0.1]} col={coinciden ? "#34d399" : "rgba(255,255,255,0.6)"} size={30}>
         {coinciden === null ? "?" : coinciden ? "=" : "≠"}
       </Letra>
 
       <group position={[2.35, 0, 0]} scale={esc}>
         <Tablero capas={capasDer} claveCapas={claveDeCapas(capasDer)} />
-        <Letra pos={[CA[0] - 1.25, R + 0.02, 0.1]} col={COL_A} size={18} df={11}>
+        <Letra pos={[CA[0] - 1.25, R + 0.02, 0.1]} col={COL_A} size={18}>
           A
         </Letra>
-        <Letra pos={[CB[0] + 1.25, R + 0.02, 0.1]} col={COL_B} size={18} df={11}>
+        <Letra pos={[CB[0] + 1.25, R + 0.02, 0.1]} col={COL_B} size={18}>
           B
         </Letra>
-        <Etiqueta pos={[0, H / 2 + 0.75, 0.1]} col={`${modoColor}88`} df={16}>
+        <Etiqueta pos={[0, H / 2 + 0.75, 0.1]} col={`${modoColor}88`}>
           {notacionDer}
         </Etiqueta>
       </group>
 
       {coinciden !== null && (
-        <Etiqueta pos={[0, -H * esc / 2 - 0.7, 0.1]} col={coinciden ? "#34d39988" : "#f8717188"} df={11}>
+        <Etiqueta pos={[0, -H * esc / 2 - 0.7, 0.1]} col={coinciden ? "#34d39988" : "#f8717188"}>
           <i className={`fa-solid ${coinciden ? "fa-circle-check" : "fa-circle-xmark"}`} style={{ color: coinciden ? "#34d399" : "#f87171" }} />
           {coinciden ? "Las dos construcciones marcan exactamente las mismas zonas" : "Las zonas no coinciden"}
         </Etiqueta>
@@ -530,33 +554,33 @@ function EscenaEncuesta({ reparto, total, fase, modoColor }: { reparto: RepartoE
         return <Estudiante key={i} objetivo={objetivo} color={color} visible={existe} />;
       })}
 
-      <Letra pos={[-W / 2 - 0.05, H / 2 + 0.32, 0.1]} col="rgba(226,232,240,0.85)" size={18} df={9}>
+      <Letra pos={[-W / 2 - 0.05, H / 2 + 0.32, 0.1]} col="rgba(226,232,240,0.85)" size={18}>
         U
       </Letra>
-      <Etiqueta pos={[CA[0] - 0.9, R + 0.35, 0.1]} col={`${COL_A}88`} df={10}>
-        <span style={{ color: COL_A }}>F</span> Fútbol
-      </Etiqueta>
-      <Etiqueta pos={[CB[0] + 0.9, R + 0.35, 0.1]} col={`${COL_B}88`} df={10}>
-        <span style={{ color: COL_B }}>B</span> Básquetbol
-      </Etiqueta>
+      <Letra pos={[CA[0] - 0.9, R + 0.35, 0.1]} col={COL_A} size={20}>
+        F
+      </Letra>
+      <Letra pos={[CB[0] + 0.9, R + 0.35, 0.1]} col={COL_B} size={20}>
+        B
+      </Letra>
 
       {fase >= 1 && (
-        <Etiqueta pos={[0, -R - 0.05, 0.5]} col={`${COL_AMBOS}aa`} df={10}>
+        <Etiqueta pos={[0, -R - 0.05, 0.5]} col={`${COL_AMBOS}aa`}>
           ambos {reparto.ambos}
         </Etiqueta>
       )}
       {fase >= 2 && (
-        <Etiqueta pos={[-2.2, -R + 0.25, 0.5]} col={`${COL_A}aa`} df={10}>
+        <Etiqueta pos={[-2.2, -R + 0.25, 0.5]} col={`${COL_A}aa`}>
           solo F {reparto.soloF}
         </Etiqueta>
       )}
       {fase >= 3 && (
-        <Etiqueta pos={[2.2, -R + 0.25, 0.5]} col={`${COL_B}aa`} df={10}>
+        <Etiqueta pos={[2.2, -R + 0.25, 0.5]} col={`${COL_B}aa`}>
           solo B {reparto.soloB}
         </Etiqueta>
       )}
       {fase >= 4 && (
-        <Etiqueta pos={[W / 2 - 1.1, -H / 2 + 0.35, 0.5]} col={`${modoColor}aa`} df={10}>
+        <Etiqueta pos={[W / 2 - 1.1, -H / 2 + 0.35, 0.5]} col={`${modoColor}aa`}>
           ninguno {reparto.ninguno}
         </Etiqueta>
       )}
@@ -568,14 +592,14 @@ function EscenaEncuesta({ reparto, total, fase, modoColor }: { reparto: RepartoE
 export default function ConjuntosVennScene(props: ConjuntosSceneProps) {
   const { modo, elementos, operacion, onTocarElemento, capasIzq, capasDer, notacionIzq, notacionDer, coinciden, reparto, total, fase, accent, modoColor, resetNonce } = props;
 
-  const camara: Pt = modo === "demorgan" ? [0, 0.6, 9.2] : modo === "encuesta" ? [0, 0.4, 9.4] : [0, 0.4, 9];
+  const camara: Pt = [0, 0.4, CAM_Z];
 
   return (
     <Canvas
       key={`${modo}-${resetNonce}`}
       shadows
       dpr={[1, 1.75]}
-      camera={{ position: camara, fov: 42 }}
+      camera={{ position: camara, fov: CAM_FOV }}
       gl={{ antialias: true }}
       onPointerMissed={() => {
         document.body.style.cursor = "";
@@ -588,11 +612,21 @@ export default function ConjuntosVennScene(props: ConjuntosSceneProps) {
       <Escenario acento={accent} />
       <pointLight position={[-6, -3, 5]} intensity={0.45} color={modoColor} />
 
-      {modo === "operaciones" && <EscenaOperaciones elementos={elementos} operacion={operacion} onTocarElemento={onTocarElemento} accent={accent} />}
-      {modo === "demorgan" && (
-        <EscenaDeMorgan capasIzq={capasIzq} capasDer={capasDer} notacionIzq={notacionIzq} notacionDer={notacionDer} coinciden={coinciden} modoColor={modoColor} />
+      {modo === "operaciones" && (
+        <Ajuste ancho={9.6} alto={6.4}>
+          <EscenaOperaciones elementos={elementos} operacion={operacion} onTocarElemento={onTocarElemento} accent={accent} />
+        </Ajuste>
       )}
-      {modo === "encuesta" && <EscenaEncuesta reparto={reparto} total={total} fase={fase} modoColor={modoColor} />}
+      {modo === "demorgan" && (
+        <Ajuste ancho={9.6} alto={4.6}>
+          <EscenaDeMorgan capasIzq={capasIzq} capasDer={capasDer} notacionIzq={notacionIzq} notacionDer={notacionDer} coinciden={coinciden} modoColor={modoColor} />
+        </Ajuste>
+      )}
+      {modo === "encuesta" && (
+        <Ajuste ancho={9.6} alto={6.6}>
+          <EscenaEncuesta reparto={reparto} total={total} fase={fase} modoColor={modoColor} />
+        </Ajuste>
+      )}
 
       <OrbitControls enablePan={false} enableZoom minDistance={5} maxDistance={18} maxPolarAngle={Math.PI * 0.8} minPolarAngle={Math.PI * 0.2} />
       <EffectComposer>

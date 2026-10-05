@@ -1,0 +1,12 @@
+{
+  "escena": "Estás investigando la Revolución de 1910 y consultas una fuente muy antigua",
+  "pregunta": "Si consultas el Códice Mendoza (siglo XVI) para explicar la Revolución de 1910, ¿qué hace el medidor?",
+  "opciones": [
+    { "id": "a", "texto": "Sube mucho a favor", "icono": "fa-arrow-trend-up" },
+    { "id": "b", "texto": "No se mueve", "icono": "fa-minus" },
+    { "id": "c", "texto": "Baja en contra", "icono": "fa-arrow-trend-down" }
+  ],
+  "correcta": "b",
+  "porque": "El códice es de otro período y otro tema: no dice nada sobre la hipótesis. La fuente es valiosa, pero fuera de contexto solo gasta una consulta.",
+  "comoComprobarlo": "En el «Tablero de investigación», caso de la Revolución, elige una hipótesis y consulta la tarjeta del Códice Mendoza; mira el medidor."
+}

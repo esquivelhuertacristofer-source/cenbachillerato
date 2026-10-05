@@ -1,0 +1,12 @@
+{
+  "escena": "Un tablero de Galton: cada bola rebota en filas de clavos y cae en un cajón; las barras crecen con cada bola",
+  "pregunta": "Si cada clavo manda la bola a la derecha 65 de cada 100 veces, ¿dónde se junta el montón?",
+  "opciones": [
+    { "id": "a", "texto": "En el centro, igual que siempre", "icono": "fa-align-center" },
+    { "id": "b", "texto": "Corrido hacia la derecha", "icono": "fa-arrow-right" },
+    { "id": "c", "texto": "Repartido parejo en todos los cajones", "icono": "fa-grip-lines" }
+  ],
+  "correcta": "b",
+  "porque": "El cajón donde cae una bola depende de cuántas veces fue a la derecha. Con p = 0.65 eso pasa más seguido, así que la media n·p crece y el montón (y la curva teórica) se recorre a la derecha.",
+  "comoComprobarlo": "En el tablero de Galton elige p = 0.65, suelta muchas bolas y compara dónde quedan la banda rosa y el cono amarillo."
+}

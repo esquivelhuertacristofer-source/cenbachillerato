@@ -1,0 +1,12 @@
+{
+  "escena": "Un cartel de jugo para estudiantes de secundaria necesita más impacto",
+  "pregunta": "En la campaña del jugo, ¿qué figura da más impacto que las demás?",
+  "opciones": [
+    { "id": "a", "texto": "Hipérbole", "icono": "fa-up-right-and-down-left-from-center" },
+    { "id": "b", "texto": "Hipérbaton", "icono": "fa-shuffle" },
+    { "id": "c", "texto": "Ironía", "icono": "fa-masks-theater" }
+  ],
+  "correcta": "a",
+  "porque": "A ese público le pesa más la emoción que la claridad. La hipérbole exagera y provoca emoción intensa; el hipérbaton aporta poca emoción y la ironía se entiende peor.",
+  "comoComprobarlo": "En el «Estudio de carteles», elige la campaña del jugo y prueba las versiones una por una; compara la barra de impacto contra la meta."
+}

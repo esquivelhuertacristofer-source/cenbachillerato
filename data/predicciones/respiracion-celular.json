@@ -1,0 +1,12 @@
+{
+  "escena": "Una célula muscular con glucosa y una mitocondria, con un control para el oxígeno disponible",
+  "pregunta": "Si bajas el oxígeno disponible a cero, ¿qué pasa con el ATP que saca de cada glucosa?",
+  "opciones": [
+    { "id": "a", "texto": "Se mantiene igual, la glucosa es la misma", "icono": "fa-equals" },
+    { "id": "b", "texto": "Cae de unos 38 a solo 2", "icono": "fa-arrow-trend-down" },
+    { "id": "c", "texto": "Sube, porque la célula trabaja más rápido", "icono": "fa-arrow-trend-up" }
+  ],
+  "correcta": "b",
+  "porque": "Sin O₂ la cadena transportadora se detiene y solo queda la glucólisis, que rinde 2 ATP netos. La fermentación regenera NAD⁺ y deja lactato, pero no suma ATP.",
+  "comoComprobarlo": "En «Comparar», arrastra el control «Oxígeno disponible» de 100 % a 0 % y cuenta las monedas de ATP y el lactato de la célula aerobia."
+}

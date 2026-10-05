@@ -1,0 +1,8 @@
+{
+  "slug": "figuras-retoricas",
+  "items": [
+    { "clave": "cartel-jugo", "formato": "16:9", "estilo": "ilustracion", "escena": "Un vaso grande de jugo de naranja con hielos y gotas de agua sobre una mesa soleada, rodajas de naranja alrededor y un fondo cálido naranja brillante, sin personas, sin texto ni letras" },
+    { "clave": "cartel-biblioteca", "formato": "16:9", "estilo": "ilustracion", "escena": "Un pasillo de biblioteca con estantes altos llenos de libros de colores, una puerta entreabierta al fondo que deja pasar luz dorada y un sillón de lectura, ambiente violeta y azul, sin personas, sin texto ni letras" },
+    { "clave": "cartel-feria", "formato": "16:9", "estilo": "ilustracion", "escena": "Mesas de una feria escolar de ciencias con matraces de colores, un volcán de papel maché, un modelo del sistema solar colgado y una maqueta de molino de viento, luz brillante verde y azul, sin personas, sin texto ni letras" }
+  ]
+}

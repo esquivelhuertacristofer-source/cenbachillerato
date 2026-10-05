@@ -18,7 +18,7 @@
 
 import * as THREE from "three";
 import { useMemo, useRef, type ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { type Modo, type Metodo, GRADOS, SALONES, ESTUDIANTES, N_POBLACION, P_REAL, margenError } from "./muestreo-estadistico-data";
@@ -47,9 +47,17 @@ const COL_APAGADO = new THREE.Color("#0b1220");
 
 const suave = (dt: number, porCuadro: number) => 1 - Math.pow(1 - porCuadro, Math.min(dt, 0.25) * 60);
 
-function Etiqueta({ pos, children, df = 10, col, izq }: { pos: Pt; children: ReactNode; df?: number; col?: string; izq?: boolean }) {
+/** Pantalla angosta: los carteles <Html> anchos se ocultan (la info ya está en el panel). */
+function useAngosto() {
+  return useThree((st) => st.size.width) < 640;
+}
+
+/** Cartel de punta de objeto: 14 px fijos, sin distanceFactor. `df` se ignora (compatibilidad). */
+function Etiqueta({ pos, children, col, izq }: { pos: Pt; children: ReactNode; df?: number; col?: string; izq?: boolean }) {
+  const angosto = useAngosto();
+  if (angosto) return null;
   return (
-    <Html position={pos} center={!izq} distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center={!izq} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div
         style={{
           display: "flex",
@@ -60,7 +68,7 @@ function Etiqueta({ pos, children, df = 10, col, izq }: { pos: Pt; children: Rea
           background: "rgba(4,10,22,0.84)",
           border: `1px solid ${col ?? "rgba(255,255,255,0.22)"}`,
           color: "#fff",
-          fontSize: 12,
+          fontSize: 14,
           fontWeight: 800,
           whiteSpace: "nowrap",
           boxShadow: "0 6px 18px -8px #000",
@@ -73,12 +81,24 @@ function Etiqueta({ pos, children, df = 10, col, izq }: { pos: Pt; children: Rea
   );
 }
 
-function Letra({ pos, children, df = 8, col = "#94a3b8", size = 12 }: { pos: Pt; children: ReactNode; df?: number; col?: string; size?: number }) {
+function Letra({ pos, children, col = "#94a3b8", size = 14 }: { pos: Pt; children: ReactNode; df?: number; col?: string; size?: number }) {
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
-      <div style={{ color: col, fontSize: size, fontWeight: 800, whiteSpace: "nowrap", textShadow: "0 2px 6px #000" }}>{children}</div>
+    <Html position={pos} center zIndexRange={[15, 0]} style={{ pointerEvents: "none" }}>
+      <div style={{ color: col, fontSize: Math.max(14, size), fontWeight: 800, whiteSpace: "nowrap", textShadow: "0 2px 6px #000" }}>{children}</div>
     </Html>
   );
+}
+
+/** En pantallas angostas se aleja la cámara (zoom) para que el contenido quepa entre la barra y la misión. */
+function AjusteVista() {
+  useFrame((st) => {
+    const z = st.size.width < 640 ? 0.72 : 1;
+    if (st.camera.zoom !== z) {
+      st.camera.zoom = z;
+      st.camera.updateProjectionMatrix();
+    }
+  });
+  return null;
 }
 
 /* ════════════════════════════════════════════════════════════════════════
@@ -258,10 +278,12 @@ function EscenaPatio({ modo, metodo, seleccion, salonesElegidos, porGrado, accen
           <boxGeometry args={[0.6, 0.7, 0.08]} />
           <meshStandardMaterial color={modo === "sesgo" && metodo === "conveniencia" ? modoColor : "#475569"} emissive={modo === "sesgo" && metodo === "conveniencia" ? modoColor : "#000"} emissiveIntensity={0.5} />
         </mesh>
-        <Letra pos={[0, 0.9, 0]} col={modo === "sesgo" && metodo === "conveniencia" ? modoColor : "#94a3b8"} size={12} df={8}>
-          <i className="fa-solid fa-door-open" style={{ marginRight: 5 }} />
-          Entrada
-        </Letra>
+        {modo === "sesgo" && metodo === "conveniencia" && (
+          <Letra pos={[0, 0.9, 0]} col={modoColor}>
+            <i className="fa-solid fa-door-open" style={{ marginRight: 5 }} />
+            Entrada
+          </Letra>
+        )}
       </group>
     </group>
   );
@@ -336,6 +358,7 @@ function Fichas({ estimaciones, color }: { estimaciones: number[]; color: string
 }
 
 function EscenaHistograma({ estimaciones, n, accent, modoColor }: { estimaciones: number[]; n: number; accent: string; modoColor: string }) {
+  const angosto = useAngosto();
   const xDe = (p: number) => -HW / 2 + p * HW;
   const me = margenError(P_REAL, n);
   const media = estimaciones.length ? estimaciones.reduce((a, b) => a + b, 0) / estimaciones.length : null;
@@ -355,9 +378,11 @@ function EscenaHistograma({ estimaciones, n, accent, modoColor }: { estimaciones
             color="#64748b"
             lineWidth={1.4}
           />
-          <Letra pos={[xDe(t), -0.3, 0.7]} size={11} df={8}>
-            {Math.round(t * 100)} %
-          </Letra>
+          {(angosto ? Math.round(t * 10) % 5 === 0 : Math.round(t * 10) % 2 === 0) && (
+            <Letra pos={[xDe(t), -0.3, 0.7]}>
+              {Math.round(t * 100)} %
+            </Letra>
+          )}
         </group>
       ))}
 
@@ -389,7 +414,7 @@ function EscenaHistograma({ estimaciones, n, accent, modoColor }: { estimaciones
           )}
         </>
       )}
-      <Letra pos={[0, -0.72, 0.7]} col="#e2e8f0" size={13} df={9}>
+      <Letra pos={[0, -0.72, 0.7]} col="#e2e8f0">
         Proporción estimada en cada muestra (n = {n})
       </Letra>
     </group>
@@ -400,7 +425,8 @@ function EscenaHistograma({ estimaciones, n, accent, modoColor }: { estimaciones
 export default function MuestreoEstadisticoScene(props: MuestreoSceneProps) {
   const { modo, metodo, seleccion, salonesElegidos, porGrado, estimaciones, n, accent, modoColor, resetNonce } = props;
   const patio = modo !== "error";
-  const camara: Pt = patio ? [0, 7.2, 7.6] : [0, 1.2, 9.6];
+  const camara: Pt = patio ? [0, 6.7, 7.6] : [0, 0.8, 9.6];
+  const mira: Pt = patio ? [0, -1.3, 0] : [0, -0.2, 0];
 
   return (
     <Canvas key={`${patio ? "patio" : "hist"}-${resetNonce}`} shadows dpr={[1, 1.75]} camera={{ position: camara, fov: 42 }} gl={{ antialias: true }}>
@@ -417,7 +443,8 @@ export default function MuestreoEstadisticoScene(props: MuestreoSceneProps) {
         <EscenaHistograma estimaciones={estimaciones} n={n} accent={accent} modoColor={modoColor} />
       )}
 
-      <OrbitControls makeDefault enablePan={false} enableZoom minDistance={5} maxDistance={20} maxPolarAngle={Math.PI * 0.46} minPolarAngle={Math.PI * 0.08} target={[0, patio ? -0.8 : 0, 0]} />
+      <OrbitControls makeDefault enablePan={false} enableZoom minDistance={5} maxDistance={20} maxPolarAngle={Math.PI * 0.46} minPolarAngle={Math.PI * 0.08} target={mira} />
+      <AjusteVista />
       <EffectComposer>
         <Bloom intensity={0.32} luminanceThreshold={0.55} luminanceSmoothing={0.85} mipmapBlur />
         <Vignette eskil={false} offset={0.18} darkness={0.7} />

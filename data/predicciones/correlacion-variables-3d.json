@@ -1,0 +1,12 @@
+{
+  "escena": "Dos torres de 50 estudiantes (hombres y mujeres) con fútbol y básquetbol, y un plano que marca la altura esperada si fueran independientes",
+  "pregunta": "Subes de 30 a 45 los hombres que eligen fútbol y dejas a las mujeres en 30. ¿Qué verás?",
+  "opciones": [
+    { "id": "a", "texto": "Las fronteras se separan del plano esperado", "icono": "fa-arrows-up-down" },
+    { "id": "b", "texto": "Ambas fronteras se quedan sobre el plano esperado", "icono": "fa-equals" },
+    { "id": "c", "texto": "El plano sube por encima de los hombres", "icono": "fa-arrow-up" }
+  ],
+  "correcta": "a",
+  "porque": "Con 45 de 50 hombres y 30 de 50 mujeres, lo esperado es 37.5. La torre de hombres rebasa el plano y la de mujeres queda debajo: la preferencia depende del sexo, hay asociación.",
+  "comoComprobarlo": "Mueve el deslizador de Hombres hasta 45, deja el de Mujeres en 30 y compara cada frontera con el plano."
+}

@@ -1,0 +1,13 @@
+{
+  "slug": "hipotesis-historicas",
+  "items": [
+    { "clave": "caso-revolucion", "formato": "16:9", "estilo": "ilustracion", "escena": "Un paisaje rural mexicano de principios del siglo XX con campos de cultivo extensos, una hacienda de muros blancos a lo lejos y campesinos con sombrero de palma caminando por un camino de tierra al amanecer, sin texto ni letras" },
+    { "clave": "caso-imperio", "formato": "16:9", "estilo": "ilustracion", "escena": "Una ciudad lacustre prehispánica con templos escalonados, calzadas sobre el agua y canoas con cargamentos de mercancías bajo un cielo claro, sin texto ni letras" },
+    { "clave": "ev-manifiesto", "formato": "16:9", "estilo": "foto", "escena": "Un pliego de papel antiguo amarillento con bordes desgastados sobre una mesa de madera rústica junto a un sombrero de palma y una vela, texto ilegible representado solo como manchas de tinta, sin letras legibles" },
+    { "clave": "ev-fotografia", "formato": "16:9", "estilo": "foto", "escena": "Una fotografía antigua en tonos sepia de un grupo de personas con sombreros y cobijas cruzadas sobre el pecho junto a un tren de vapor en un paisaje árido, grano de película, sin letras" },
+    { "clave": "ev-libro", "formato": "16:9", "estilo": "foto", "escena": "Una pila de libros de historia de tapa dura de distintos tamaños sobre un escritorio con una lámpara de lectura y unas gafas, luz cálida, lomos sin texto legible" },
+    { "clave": "ev-codice", "formato": "16:9", "estilo": "ilustracion", "escena": "Un códice pictórico prehispánico abierto, con figuras estilizadas de personas, mantas, plumas y vasijas pintadas en rojo, azul y ocre sobre papel de amate, glifos como dibujos sin letras" },
+    { "clave": "ev-testimonio", "formato": "16:9", "estilo": "foto", "escena": "Un anciano de cabello blanco sentado en una sala sencilla hablando frente a una grabadora de audio sobre la mesa, con las manos gesticulando, luz suave de ventana" },
+    { "clave": "ev-cronica", "formato": "16:9", "estilo": "ilustracion", "escena": "Un manuscrito antiguo de páginas amarillentas escritas a mano con pluma, junto a un tintero y una pluma de ave sobre un escritorio de madera, caligrafía representada como trazos ilegibles" }
+  ]
+}

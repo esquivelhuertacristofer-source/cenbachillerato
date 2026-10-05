@@ -1,0 +1,12 @@
+{
+  "escena": "Un grupo de 40 estudiantes: 22 practican fútbol y 18 básquetbol. Un muñeco por estudiante se acomoda en dos círculos que se traslapan.",
+  "pregunta": "Subes cuántos practican ambos deportes, sin cambiar F ni B. ¿Qué pasa con los que practican al menos uno?",
+  "opciones": [
+    { "id": "a", "texto": "Aumentan, porque hay más estudiantes activos", "icono": "fa-arrow-up" },
+    { "id": "b", "texto": "Disminuyen: se cuentan una sola vez", "icono": "fa-arrow-down" },
+    { "id": "c", "texto": "No cambian, F y B siguen igual", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "|F ∪ B| = |F| + |B| − |F ∩ B|. Al sumar F y B, los que practican ambos se cuentan dos veces; mientras más hay en la intersección, más se descuentan y la unión se achica.",
+  "comoComprobarlo": "Abre el modo Encuesta, deja F en 22 y B en 18, y sube el deslizador «ambos» mirando la barra roja y el valor de F ∪ B."
+}

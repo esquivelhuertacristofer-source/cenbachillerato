@@ -18,9 +18,9 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Html, Stars } from "@react-three/drei";
+import React, { useMemo, useRef } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { type Modo, type Escena } from "./respiracion-data";
 import { Escenario } from "./_escenario";
@@ -34,6 +34,8 @@ export interface RespiracionSceneProps {
   playing: boolean;
   modoColor: string;
   resetNonce: number;
+  /** Oxígeno disponible 0 → 1 (solo se ve en «Comparar»). */
+  o2: number;
 }
 
 const C_GLUCOSA = "#4ade80";
@@ -52,21 +54,25 @@ function clamp01(x: number): number {
 
 function pillStyle(color: string): React.CSSProperties {
   return {
-    padding: "4px 11px",
+    padding: "5px 12px",
     borderRadius: 999,
-    background: "rgba(4,10,22,0.82)",
+    background: "rgba(4,10,22,0.86)",
     border: `1px solid ${color}`,
     color: "#fff",
-    fontSize: 11,
+    fontSize: 14,
     fontWeight: 800,
     whiteSpace: "nowrap",
     boxShadow: "0 6px 18px -8px #000",
   };
 }
 
-function Etiqueta({ pos, color, children, df = 14 }: { pos: Pt; color: string; children: React.ReactNode; df?: number }) {
+/* Etiqueta de tamaño fijo en píxeles (sin distanceFactor). Las `ancho` se
+ * ocultan en pantallas angostas: su información ya está en el panel. */
+function Etiqueta({ pos, color, children, ancho = false }: { pos: Pt; color: string; children: React.ReactNode; ancho?: boolean }) {
+  const w = useThree((st) => st.size.width);
+  if (ancho && w < 640) return null;
   return (
-    <Html position={pos} center distanceFactor={df} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={pos} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
       <div style={pillStyle(color)}>{children}</div>
     </Html>
   );
@@ -83,6 +89,9 @@ function Mol({ r = 0.4, color, refMesh }: { r?: number; color: string; refMesh?:
 }
 
 /* ── Cosecha de monedas de ATP: aparecen conforme `vis` (0→1) ──────────────── */
+// Una sola malla instanciada (hasta 38 monedas) en vez de 38 grupos.
+const _o = new THREE.Object3D();
+
 function ATPStack({
   count,
   vis,
@@ -90,6 +99,7 @@ function ATPStack({
   base = [0, 0, 0],
   cols = 4,
   color = C_ATP,
+  tam = 1,
 }: {
   count: number;
   vis: number;
@@ -97,42 +107,40 @@ function ATPStack({
   base?: Pt;
   cols?: number;
   color?: string;
+  tam?: number;
 }) {
-  const refs = useRef<(THREE.Group | null)[]>([]);
+  const mesh = useRef<THREE.InstancedMesh>(null);
+  const esc = useRef<Float32Array | null>(null);
   const t = useRef(0);
   useFrame((_, dt) => {
+    const m = mesh.current;
+    if (!m) return;
+    if (!esc.current || esc.current.length !== count) esc.current = new Float32Array(count);
+    const e = esc.current;
     if (playing) t.current += dt;
+    const paso = 0.62 * tam;
     for (let i = 0; i < count; i++) {
-      const g = refs.current[i];
-      if (!g) continue;
       const target = clamp01(count * vis - i);
-      g.scale.setScalar(g.scale.x + (target - g.scale.x) * 0.18);
+      e[i] = (e[i] ?? 0) + (target - (e[i] ?? 0)) * 0.18;
       const row = Math.floor(i / cols);
       const col = i % cols;
-      g.position.set(
-        (base[0] ?? 0) + (col - (cols - 1) / 2) * 0.62,
-        (base[1] ?? 0) + row * 0.62 + Math.sin(t.current * 2 + i) * 0.05 * target,
+      _o.position.set(
+        (base[0] ?? 0) + (col - (cols - 1) / 2) * paso,
+        (base[1] ?? 0) + row * paso + Math.sin(t.current * 2 + i) * 0.05 * target * tam,
         base[2] ?? 0,
       );
+      _o.rotation.set(Math.PI / 2, 0, 0);
+      _o.scale.setScalar(Math.max(0.0001, (e[i] ?? 0) * tam));
+      _o.updateMatrix();
+      m.setMatrixAt(i, _o.matrix);
     }
+    m.instanceMatrix.needsUpdate = true;
   });
   return (
-    <group>
-      {Array.from({ length: count }).map((_, i) => (
-        <group
-          key={i}
-          scale={0}
-          ref={(g) => {
-            refs.current[i] = g;
-          }}
-        >
-          <mesh rotation={[Math.PI / 2, 0, 0]}>
-            <cylinderGeometry args={[0.26, 0.26, 0.1, 18]} />
-            <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.8} roughness={0.25} metalness={0.4} />
-          </mesh>
-        </group>
-      ))}
-    </group>
+    <instancedMesh ref={mesh} args={[undefined, undefined, count]} frustumCulled={false}>
+      <cylinderGeometry args={[0.26, 0.26, 0.1, 18]} />
+      <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.8} roughness={0.25} metalness={0.4} />
+    </instancedMesh>
   );
 }
 
@@ -167,7 +175,7 @@ function Glucolisis({ frac, playing }: { frac: number; playing: boolean }) {
       <Membrana label="Citoplasma" color="#38bdf8" rx={5.2} ry={3.4} />
       <group ref={gluc}>
         <Mol r={0.85} color={C_GLUCOSA} />
-        <Etiqueta pos={[0, 1.35, 0]} color={`${C_GLUCOSA}cc`}>Glucosa · C₆H₁₂O₆</Etiqueta>
+        {sep < 0.5 && <Etiqueta pos={[0, 1.35, 0]} color={`${C_GLUCOSA}cc`}>Glucosa · C₆H₁₂O₆</Etiqueta>}
       </group>
       <group ref={pirA}>
         <Mol r={0.5} color={C_PIRUVATO} />
@@ -175,11 +183,11 @@ function Glucolisis({ frac, playing }: { frac: number; playing: boolean }) {
       <group ref={pirB}>
         <Mol r={0.5} color={C_PIRUVATO} />
       </group>
-      {sep > 0.5 && <Etiqueta pos={[0, -1.6, 0]} color={`${C_PIRUVATO}cc`}>2 piruvato (3 C)</Etiqueta>}
+      {sep > 0.5 && <Etiqueta pos={[0, -1.3, 0]} color={`${C_PIRUVATO}cc`}>2 piruvato (3 C)</Etiqueta>}
       <ATPStack count={2} vis={atpVis} playing={playing} base={[-2.6, 1.6, 0]} cols={2} />
-      {atpVis > 0.5 && <Etiqueta pos={[-2.6, 2.6, 0]} color={`${C_ATP}cc`}>+2 ATP netos</Etiqueta>}
+      {atpVis > 0.5 && <Etiqueta pos={[-2.6, 2.7, 0]} color={`${C_ATP}cc`}>+2 ATP netos</Etiqueta>}
       <ATPStack count={2} vis={nadhVis} playing={playing} base={[2.6, 1.6, 0]} cols={2} color={C_NADH} />
-      {nadhVis > 0.5 && <Etiqueta pos={[2.6, 2.6, 0]} color={`${C_NADH}cc`}>+2 NADH</Etiqueta>}
+      {nadhVis > 0.5 && <Etiqueta pos={[2.6, 2.7, 0]} color={`${C_NADH}cc`}>+2 NADH</Etiqueta>}
     </group>
   );
 }
@@ -211,9 +219,11 @@ function Membrana({ label, color, rx, ry }: { label: string; color: string; rx: 
         <meshBasicMaterial color={color} transparent opacity={0.07} depthWrite={false} />
       </mesh>
       <CurvaTubo puntos={pts} color={color} grosor={0.055} brillo={0.55} />
-      <Etiqueta pos={[0, ry + 0.45, 0]} color={`${color}aa`} df={16}>
-        {label}
-      </Etiqueta>
+      {label && (
+        <Etiqueta pos={[0, ry + 0.45, 0]} color={`${color}aa`}>
+          {label}
+        </Etiqueta>
+      )}
     </group>
   );
 }
@@ -253,7 +263,7 @@ function Aerobia({ frac, playing }: { frac: number; playing: boolean }) {
       {/* piruvato entrando */}
       <group ref={piruvato} position={[-4.5, 0, 0]}>
         <Mol r={0.45} color={C_PIRUVATO} />
-        <Etiqueta pos={[0, 0.95, 0]} color={`${C_PIRUVATO}cc`}>piruvato</Etiqueta>
+        {giraKrebs < 0.3 && <Etiqueta pos={[0, 0.95, 0]} color={`${C_PIRUVATO}cc`}>piruvato</Etiqueta>}
       </group>
 
       {/* ciclo de Krebs: anillo de moléculas */}
@@ -280,7 +290,6 @@ function Aerobia({ frac, playing }: { frac: number; playing: boolean }) {
           <group position={[-1.6, -1.7, 0]}>
             <Mol r={0.22} color={C_CO2} />
           </group>
-          <Etiqueta pos={[-1.6, -2.3, 0]} color={`${C_CO2}cc`}>CO₂</Etiqueta>
         </>
       )}
 
@@ -295,49 +304,44 @@ function Aerobia({ frac, playing }: { frac: number; playing: boolean }) {
             </mesh>
           );
         })}
-        {cadena > 0.2 && <Etiqueta pos={[1.3, 1.1, 0]} color={`${C_O2}cc`}>Cadena transportadora</Etiqueta>}
+        {cadena > 0.2 && <Etiqueta pos={[1.3, 1.1, 0]} color={`${C_O2}cc`} ancho>Cadena transportadora</Etiqueta>}
       </group>
 
       {/* O2 + H2O */}
       {cadena > 0.5 && (
         <group position={[4.4, -0.2, 0]}>
           <Mol r={0.28} color={C_O2} />
-          <Etiqueta pos={[0, 0.8, 0]} color={`${C_O2}cc`}>O₂</Etiqueta>
         </group>
       )}
       <group ref={agua} position={[4.4, -1.6, 0]}>
         <Mol r={0.3} color={C_H2O} />
-        <Etiqueta pos={[0, 0.75, 0]} color={`${C_H2O}cc`}>H₂O</Etiqueta>
       </group>
 
       {/* cosecha de ATP */}
-      <ATPStack count={12} vis={atpVis} playing={playing} base={[-0.9, 2.0, 0]} cols={6} />
-      {atpVis > 0.4 && <Etiqueta pos={[0, 3.4, 0]} color={`${C_ATP}cc`}>≈ 38 ATP</Etiqueta>}
+      <ATPStack count={38} vis={atpVis} playing={playing} base={[0, 2.1, 0]} cols={10} tam={0.6} />
+      {atpVis > 0.4 && <Etiqueta pos={[0, 4.1, 0]} color={`${C_ATP}cc`}>≈ 38 ATP</Etiqueta>}
     </group>
   );
 }
 
-/* Cápsula (estadio) para la mitocondria: dos semicírculos + lados */
+/* Cápsula (estadio) para la mitocondria: dos semicírculos + lados.
+ * Contorno con cuerpo (tubo), no un pelo de 1 px. */
 function Capsula({ color, w, h, op, wire = false }: { color: string; w: number; h: number; op: number; wire?: boolean }) {
-  const pts: Pt[] = [];
-  const N = 80;
-  const r = h / 2;
-  const sx = w / 2 - r;
-  for (let i = 0; i <= N; i++) {
-    const a = (i / N) * Math.PI * 2;
-    const cx = a < Math.PI ? sx : -sx;
-    // construir un estadio (rectángulo con extremos redondeados)
-    const x = Math.cos(a) * r + cx;
-    const y = Math.sin(a) * r;
-    pts.push([x, y, 0]);
-  }
-  const geo = new THREE.BufferGeometry().setFromPoints(pts.map((p) => new THREE.Vector3(...p)));
+  const pts = useMemo<Pt[]>(() => {
+    const out: Pt[] = [];
+    const N = 80;
+    const r = h / 2;
+    const sx = w / 2 - r;
+    for (let i = 0; i <= N; i++) {
+      const a = (i / N) * Math.PI * 2;
+      const cx = a < Math.PI ? sx : -sx;
+      out.push([Math.cos(a) * r + cx, Math.sin(a) * r, 0]);
+    }
+    return out;
+  }, [w, h]);
   return (
     <group>
-      <lineLoop>
-        <primitive object={geo} attach="geometry" />
-        <lineBasicMaterial color={color} transparent opacity={wire ? 0.35 : 0.6} />
-      </lineLoop>
+      <CurvaTubo puntos={pts} color={color} grosor={wire ? 0.03 : 0.06} brillo={wire ? 0.3 : 0.5} />
       {!wire && op > 0 && (
         <mesh>
           <boxGeometry args={[w, h, 0.02]} />
@@ -368,7 +372,7 @@ function Fermentacion({ frac, playing }: { frac: number; playing: boolean }) {
   });
   return (
     <group>
-      <Membrana label="Citoplasma (sin O₂)" color="#a78bfa" rx={5.2} ry={3.4} />
+      <Membrana label="Citoplasma sin O₂" color="#a78bfa" rx={5.2} ry={3.4} />
       {/* piruvato origen */}
       <group position={[-1.6, 0.4, 0]}>
         <Mol r={0.45} color={C_PIRUVATO} />
@@ -378,7 +382,7 @@ function Fermentacion({ frac, playing }: { frac: number; playing: boolean }) {
       <group ref={nadh}>
         <Mol r={0.26} color={C_NADH} />
       </group>
-      <Etiqueta pos={[0, 1.7, 0]} color={`${C_NADH}cc`}>NADH → NAD⁺ (se regenera)</Etiqueta>
+      <Etiqueta pos={[0, 1.9, 0]} color={`${C_NADH}cc`} ancho>NADH → NAD⁺ (se regenera)</Etiqueta>
       {/* productos */}
       <group ref={prod} position={[1.8, -1.4, 0]}>
         <Mol r={0.42} color={C_LACTATO} />
@@ -389,34 +393,68 @@ function Fermentacion({ frac, playing }: { frac: number; playing: boolean }) {
           <Mol r={0.2} color={C_CO2} />
         </group>
       </group>
-      {conv > 0.4 && <Etiqueta pos={[2.4, -2.4, 0]} color={`${C_LACTATO}cc`}>lactato · etanol + CO₂</Etiqueta>}
+      {conv > 0.4 && <Etiqueta pos={[2.4, -2.4, 0]} color={`${C_LACTATO}cc`} ancho>lactato · etanol + CO₂</Etiqueta>}
       {/* solo 2 ATP */}
       <ATPStack count={2} vis={1} playing={playing} base={[-3.2, 1.7, 0]} cols={2} />
-      <Etiqueta pos={[-3.2, 2.6, 0]} color={`${C_ATP}cc`}>solo 2 ATP</Etiqueta>
+      <Etiqueta pos={[-3.2, 2.7, 0]} color={`${C_ATP}cc`}>solo 2 ATP</Etiqueta>
     </group>
   );
 }
 
-/* ── COMPARAR: aerobia (≈38) vs anaerobia (2) ─────────────────────────────── */
-function ComparaLado({ aerobia, playing }: { aerobia: boolean; playing: boolean }) {
-  const t = useRef(0);
+/* ── COMPARAR: la variable es el oxígeno disponible ───────────────────────────
+ * Aerobia: con O₂ = 100 % → 38 ATP; con 0 % → 2 ATP y se acumula lactato.
+ * Modelo simplificado: la fracción f de la glucosa que se oxida con O₂ rinde
+ * 38 ATP y el resto 2 ATP. Anaerobia (derecha): siempre 2 ATP. */
+function ComparaLado({ aerobia, playing, o2 }: { aerobia: boolean; playing: boolean; o2: number }) {
   const giro = useRef<THREE.Group>(null);
-  useFrame((_, dt) => {
-    if (playing) t.current += dt;
-    if (giro.current) giro.current.rotation.z += dt * (aerobia ? 0.5 : 0.2);
+  const lac = useRef<THREE.Group>(null);
+  const oxi = useRef<THREE.Group>(null);
+  useFrame((st, dt) => {
+    if (giro.current && playing) giro.current.rotation.z += dt * (aerobia ? 0.5 : 0.2);
+    if (aerobia && lac.current) lac.current.scale.setScalar(0.0001 + (1 - o2));
+    if (aerobia && oxi.current) {
+      oxi.current.scale.setScalar(0.0001 + o2);
+      oxi.current.rotation.z = st.clock.elapsedTime * 0.3;
+    }
   });
+  const atp = aerobia ? 2 + 36 * o2 : 2;
   return (
     <group>
       {aerobia ? <Capsula color="#34d399" w={4.6} h={3.0} op={0.05} /> : <Membrana label="" color="#a78bfa" rx={2.3} ry={1.6} />}
       <group ref={giro}>
         <Mol r={0.5} color={aerobia ? C_GLUCOSA : C_PIRUVATO} />
       </group>
-      <ATPStack count={aerobia ? 12 : 2} vis={1} playing={playing} base={[0, -2.6, 0]} cols={aerobia ? 6 : 2} />
+      {aerobia && (
+        <>
+          {/* O₂ disponible: esferas azules que se encogen al bajar el oxígeno */}
+          <group ref={oxi}>
+            {Array.from({ length: 6 }).map((_, i) => {
+              const a = (i / 6) * Math.PI * 2;
+              return (
+                <mesh key={i} position={[Math.cos(a) * 1.5, Math.sin(a) * 0.95, 0.2]}>
+                  <sphereGeometry args={[0.2, 14, 14]} />
+                  <meshStandardMaterial color={C_O2} emissive={C_O2} emissiveIntensity={0.5} roughness={0.3} />
+                </mesh>
+              );
+            })}
+          </group>
+          {/* lactato que se acumula cuando falta O₂ */}
+          <group ref={lac} position={[0, -1.15, 0.3]}>
+            {[-0.5, 0, 0.5].map((x) => (
+              <mesh key={x} position={[x, 0, 0]}>
+                <sphereGeometry args={[0.2, 14, 14]} />
+                <meshStandardMaterial color={C_LACTATO} emissive={C_LACTATO} emissiveIntensity={0.5} roughness={0.3} />
+              </mesh>
+            ))}
+          </group>
+        </>
+      )}
+      <ATPStack count={aerobia ? 38 : 2} vis={atp / (aerobia ? 38 : 2)} playing={playing} base={[0, -3.5, 0]} cols={aerobia ? 10 : 2} tam={0.6} />
     </group>
   );
 }
 
-function Contenido({ modo, escena, playing, modoColor, resetNonce }: RespiracionSceneProps) {
+function Contenido({ modo, escena, playing, modoColor, resetNonce, o2 }: RespiracionSceneProps) {
   return (
     <>
       {/* Suelo, luz de tres puntos y entorno que reflejar. */}
@@ -425,7 +463,6 @@ function Contenido({ modo, escena, playing, modoColor, resetNonce }: Respiracion
           vez de que alguien la adivine. */}
       <Escenario acento="#38bdf8" mesa={false} niebla={false} />
       <directionalLight position={[-6, 4, -4]} intensity={0.5} color={modoColor} />
-      <Stars radius={80} depth={40} count={1000} factor={3} fade speed={0.4} />
 
       <group key={`${modo}-${resetNonce}`}>
         {modo === "glucolisis" && <Glucolisis frac={escena.frac} playing={playing} />}
@@ -435,18 +472,18 @@ function Contenido({ modo, escena, playing, modoColor, resetNonce }: Respiracion
         {modo === "comparar" && (
           <>
             <group position={[-4.2, 0.4, 0]}>
-              <ComparaLado aerobia playing={playing} />
+              <ComparaLado aerobia playing={playing} o2={o2} />
             </group>
-            <Etiqueta pos={[-4.2, 3.0, 0]} color="#34d399cc">Aerobia ≈ 38 ATP</Etiqueta>
+            <Etiqueta pos={[-4.2, 2.7, 0]} color="#34d399cc">Aerobia · {Math.round(2 + 36 * o2)} ATP</Etiqueta>
             <group position={[4.2, 0.4, 0]}>
-              <ComparaLado aerobia={false} playing={playing} />
+              <ComparaLado aerobia={false} playing={playing} o2={o2} />
             </group>
-            <Etiqueta pos={[4.2, 3.0, 0]} color="#a78bfacc">Anaerobia · 2 ATP</Etiqueta>
+            <Etiqueta pos={[4.2, 2.7, 0]} color="#a78bfacc">Anaerobia · 2 ATP</Etiqueta>
           </>
         )}
       </group>
 
-      <OrbitControls enablePan={false} minDistance={7} maxDistance={44} autoRotate={false} />
+      <OrbitControls enablePan={false} minDistance={7} maxDistance={44} autoRotate={false} target={[0, -0.8, 0]} />
       <EffectComposer>
         <Bloom intensity={0.55} luminanceThreshold={0.25} mipmapBlur />
         <Vignette eskil={false} offset={0.2} darkness={0.7} />
@@ -457,7 +494,7 @@ function Contenido({ modo, escena, playing, modoColor, resetNonce }: Respiracion
 
 export default function RespiracionScene(props: RespiracionSceneProps) {
   const cam: Pt =
-    props.modo === "comparar" ? [0, 0.6, 16] : props.modo === "aerobia" ? [0, 0.8, 15] : [0, 0.6, 13];
+    props.modo === "comparar" ? [0, 0, 14.5] : props.modo === "aerobia" ? [0, 0, 13.5] : [0, 0, 13];
   return (
     <Canvas key={props.modo} shadows dpr={[1, 2]} camera={{ position: cam, fov: 50 }} gl={{ antialias: true }} style={{ width: "100%", height: "100%" }}>
       <Contenido {...props} />

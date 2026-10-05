@@ -1,0 +1,12 @@
+{
+  "slug": "diversidad-discriminacion",
+  "items": [
+    { "clave": "tequio-salon", "formato": "16:9", "estilo": "foto", "escena": "Fotografía de adolescentes de rasgos diversos con rodillos y brochas pintando juntos la pared de un salón de clases, con latas de pintura y periódicos en el piso" },
+    { "clave": "patio-futbol", "formato": "16:9", "estilo": "foto", "escena": "Fotografía de un patio de secundaria donde un grupo de adolescentes juega futbol y, a un lado, una adolescente con trenzas y mochila los observa de pie" },
+    { "clave": "pasillo-grupo", "formato": "16:9", "estilo": "foto", "escena": "Fotografía de un pasillo de secundaria con un grupo de adolescentes de varios tonos de piel reunidos junto a los casilleros y, unos pasos más allá, un adolescente solo con mochila mirando al piso" },
+    { "clave": "salon-limpieza", "formato": "16:9", "estilo": "foto", "escena": "Fotografía de un salón de clases con escobas y trapeadores donde varias alumnas barren y ordenan bancas mientras por la ventana se ve a otros alumnos en el patio" },
+    { "clave": "asamblea-grupo", "formato": "16:9", "estilo": "foto", "escena": "Fotografía de una asamblea de estudiantes sentados en círculo en un salón; cinco al frente hablan con las manos y otros al fondo levantan la mano sin que los miren" },
+    { "clave": "biblioteca-escaleras", "formato": "16:9", "estilo": "foto", "escena": "Fotografía de la fachada de una biblioteca escolar con una escalera de varios escalones en la entrada y, al pie, un adolescente en silla de ruedas con un libro en el regazo" },
+    { "clave": "comite-firmas", "formato": "16:9", "estilo": "foto", "escena": "Fotografía de estudiantes con tablas de apoyo reuniendo firmas en el patio de una secundaria, junto a una llave de agua sencilla en la pared" }
+  ]
+}
