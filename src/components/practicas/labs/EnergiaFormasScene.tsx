@@ -16,9 +16,9 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Edges, Html } from "@react-three/drei";
+import { useEffect, useMemo, useRef } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
 import {
@@ -26,8 +26,8 @@ import {
   getForma,
   getTransformador,
   calcularBalance,
+  E_MAX,
   fmtNum,
-  fmtPct,
 } from "./energia-formas-data";
 
 export interface EnergiaFormasSceneProps {
@@ -47,11 +47,35 @@ const HEAT_PER_NODE = 12;
 const SIZE_MIN = 0.055;
 const SIZE_MAX = 0.24;
 const RISE = 3.1;
+const COL_H = 2.7; // alto de la columna de conservación con la entrada máxima
+
+/** Extensión horizontal de la cadena (más la columna de la derecha). */
+const extension = (nEtapas: number) => {
+  const len = (nEtapas + 1) * SEG_W;
+  const l = -len / 2 - 0.7;
+  const r = len / 2 + 2.4;
+  return { cx: (l + r) / 2, w: r - l };
+};
 
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
 
+/* Etiqueta de tamaño fijo en píxeles, desplazada para no encimarse. */
+function Etiqueta({ pos, color, desplaza, children }: {
+  pos: [number, number, number]; color: string; desplaza: string; children: React.ReactNode;
+}) {
+  return (
+    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
+      <div style={{ transform: desplaza }}>
+        <div style={{ whiteSpace: "nowrap", padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.88)", border: `1.5px solid ${color}`, color, fontWeight: 900, fontSize: 14, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)" }}>
+          {children}
+        </div>
+      </div>
+    </Html>
+  );
+}
+
 /* ════════════════════ CONTENIDO DE LA CADENA ═════════════════════════ */
-function Cadena({ transformadorKey, entrada, accent, pausado }: {
+function Cadena({ transformadorKey, entrada, accent: _accent, pausado }: {
   transformadorKey: string; entrada: number; accent: string; pausado: boolean;
 }) {
   const t = useMemo(() => getTransformador(transformadorKey), [transformadorKey]);
@@ -157,6 +181,7 @@ function Cadena({ transformadorKey, entrada, accent, pausado }: {
 
   const formaEntrada = getForma(balance.formaEntrada);
   const formaFinal = getForma(balance.formaFinal);
+  const colH = COL_H * (entrada / E_MAX);
 
   return (
     <group position={[0, 0, 0]}>
@@ -164,23 +189,17 @@ function Cadena({ transformadorKey, entrada, accent, pausado }: {
       <mesh position={[0, TRACK_Y - 0.14, 0]} receiveShadow>
         <boxGeometry args={[trackLen + 0.6, 0.08, 0.7]} />
         <meshStandardMaterial color="#0c2138" metalness={0.3} roughness={0.7} />
-        <Edges threshold={15} color="#1d4060" />
       </mesh>
 
       {/* fuente de entrada */}
       <group position={[startX - 0.1, TRACK_Y, 0]}>
         <mesh castShadow>
           <sphereGeometry args={[0.34, 28, 28]} />
-          <meshStandardMaterial color={formaEntrada.color} emissive={formaEntrada.color} emissiveIntensity={0.7} toneMapped={false} />
+          <meshStandardMaterial color={formaEntrada.color} emissive={formaEntrada.color} emissiveIntensity={0.5} />
         </mesh>
-        <Html position={[0, 0.78, 0]} center distanceFactor={13} pointerEvents="none">
-          <div style={{ textAlign: "center", whiteSpace: "nowrap" }}>
-            <div style={{ color: formaEntrada.color, fontSize: 13, fontWeight: 900, textShadow: "0 2px 8px #000" }}>
-              <i className={`fa-solid ${formaEntrada.icono}`} style={{ marginRight: 5 }} />Entrada
-            </div>
-            <div style={{ color: "#cfe0f2", fontSize: 11, fontWeight: 700 }}>{formaEntrada.nombre} · {fmtNum(balance.entrada)} J</div>
-          </div>
-        </Html>
+        <Etiqueta pos={[0, 0.34, 0]} color={formaEntrada.color} desplaza="translate(0,-120%)">
+          Entra {fmtNum(balance.entrada)} J
+        </Etiqueta>
       </group>
 
       {/* dispositivos de conversión */}
@@ -192,26 +211,17 @@ function Cadena({ transformadorKey, entrada, accent, pausado }: {
             <mesh castShadow>
               <cylinderGeometry args={[0.36, 0.42, 0.7, 6]} />
               <meshStandardMaterial color="#16344f" metalness={0.5} roughness={0.4} />
-              <Edges threshold={15} color={accent} />
             </mesh>
             {/* anillo de la nueva forma */}
             <mesh position={[0, 0.42, 0]} rotation={[Math.PI / 2, 0, 0]}>
               <torusGeometry args={[0.3, 0.06, 16, 32]} />
-              <meshStandardMaterial color={fa.color} emissive={fa.color} emissiveIntensity={0.7} toneMapped={false} />
+              <meshStandardMaterial color={fa.color} emissive={fa.color} emissiveIntensity={0.5} />
             </mesh>
-            <Html position={[0, 1.02, 0]} center distanceFactor={13} pointerEvents="none">
-              <div style={{ textAlign: "center", whiteSpace: "nowrap" }}>
-                <div style={{ fontSize: 12.5, fontWeight: 900, textShadow: "0 2px 8px #000" }}>
-                  <span style={{ color: fde.color }}>{fde.nombre}</span>
-                  <span style={{ color: "#9fb2c8", margin: "0 5px" }}>→</span>
-                  <span style={{ color: fa.color }}>{fa.nombre}</span>
-                </div>
-                <div style={{ color: "#9fb2c8", fontSize: 10.5, fontWeight: 700 }}>{nd.dispositivo}</div>
-                <div style={{ color: TERMICA_COL.getStyle(), fontSize: 10.5, fontWeight: 800 }}>
-                  <i className="fa-solid fa-fire" style={{ marginRight: 4 }} />{fmtPct(nd.calorFrac)} a calor
-                </div>
-              </div>
-            </Html>
+            <Etiqueta pos={[0, 0.5, 0]} color={fa.color} desplaza="translate(0,-115%)">
+              <span style={{ color: fde.color }}>{fde.nombre}</span>
+              <span style={{ color: "#9fb2c8", margin: "0 5px" }}>→</span>
+              <span style={{ color: fa.color }}>{fa.nombre}</span>
+            </Etiqueta>
           </group>
         );
       })}
@@ -220,29 +230,36 @@ function Cadena({ transformadorKey, entrada, accent, pausado }: {
       <group position={[startX + trackLen + 0.1, TRACK_Y, 0]}>
         <mesh castShadow>
           <boxGeometry args={[0.5, 0.5, 0.5]} />
-          <meshStandardMaterial color={formaFinal.color} emissive={formaFinal.color} emissiveIntensity={0.7} toneMapped={false} />
+          <meshStandardMaterial color={formaFinal.color} emissive={formaFinal.color} emissiveIntensity={0.5} />
         </mesh>
-        <Html position={[0, 0.85, 0]} center distanceFactor={13} pointerEvents="none">
-          <div style={{ textAlign: "center", whiteSpace: "nowrap" }}>
-            <div style={{ color: formaFinal.color, fontSize: 13, fontWeight: 900, textShadow: "0 2px 8px #000" }}>
-              <i className={`fa-solid ${formaFinal.icono}`} style={{ marginRight: 5 }} />Salida útil
-            </div>
-            <div style={{ color: "#cfe0f2", fontSize: 11, fontWeight: 700 }}>{formaFinal.nombre} · {fmtNum(balance.util)} J</div>
-          </div>
-        </Html>
+      </group>
+
+      {/* columna de conservación: verde = útil, naranja = calor; juntas miden lo que entró */}
+      <group position={[startX + trackLen + 1.5, TRACK_Y - 0.1, 0]}>
+        <mesh position={[0, colH * balance.eficienciaGlobal / 2, 0]} castShadow>
+          <boxGeometry args={[0.7, Math.max(0.02, colH * balance.eficienciaGlobal), 0.7]} />
+          <meshStandardMaterial color="#34d399" emissive="#34d399" emissiveIntensity={0.35} roughness={0.4} />
+        </mesh>
+        <mesh position={[0, colH * balance.eficienciaGlobal + (colH * (1 - balance.eficienciaGlobal)) / 2, 0]} castShadow>
+          <boxGeometry args={[0.7, Math.max(0.02, colH * (1 - balance.eficienciaGlobal)), 0.7]} />
+          <meshStandardMaterial color="#ff7a4a" emissive="#ff7a4a" emissiveIntensity={0.35} roughness={0.4} />
+        </mesh>
+        <Etiqueta pos={[0, colH + 0.1, 0]} color="#34d399" desplaza="translate(0,-110%)">
+          Útil {fmtNum(balance.util)} J · calor {fmtNum(balance.calorTotal)} J
+        </Etiqueta>
       </group>
 
       {/* río de energía */}
       <instancedMesh ref={flowRef} args={[undefined, undefined, FLOW_COUNT]}>
         <sphereGeometry args={[1, 14, 14]} />
-        <meshStandardMaterial emissiveIntensity={0.85} toneMapped={false} metalness={0.1} roughness={0.4}
+        <meshStandardMaterial emissiveIntensity={0.5} metalness={0.1} roughness={0.4}
           emissive={"#ffffff"} vertexColors={false} />
       </instancedMesh>
 
       {/* penachos de calor */}
       <instancedMesh ref={heatRef} args={[undefined, undefined, Math.max(1, heatCount)]}>
         <sphereGeometry args={[1, 10, 10]} />
-        <meshStandardMaterial color={TERMICA_COL} emissive={TERMICA_COL} emissiveIntensity={0.9} transparent opacity={0.8} toneMapped={false} />
+        <meshStandardMaterial color={TERMICA_COL} emissive={TERMICA_COL} emissiveIntensity={0.9} transparent opacity={0.8} />
       </instancedMesh>
 
     </group>
@@ -256,7 +273,7 @@ export default function EnergiaFormasScene(props: EnergiaFormasSceneProps) {
       shadows
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
-      camera={{ position: [0.4, 3.2, 9.8], fov: 46 }}
+      camera={{ position: [0.8, 3.2, 11], fov: 46 }}
     >
       <Contenido {...props} />
     </Canvas>
@@ -265,6 +282,20 @@ export default function EnergiaFormasScene(props: EnergiaFormasSceneProps) {
 
 function Contenido(props: EnergiaFormasSceneProps) {
   const { transformadorKey, entrada, accent, pausado, autoRotate, resetNonce } = props;
+
+  // Encuadre: toda la cadena + la columna, un poco por encima del centro.
+  const camera = useThree((st) => st.camera);
+  const size = useThree((st) => st.size);
+  const aspect = size.width / Math.max(1, size.height);
+  const nEt = getTransformador(transformadorKey).etapas.length;
+  const ext = extension(nEt);
+  const dist = Math.max(7.5, (ext.w / 2 + 0.6) / (0.424 * Math.min(aspect, 1.7)));
+  const cx = ext.cx;
+  useEffect(() => {
+    camera.position.set(cx + 0.4, 2.9 + dist * 0.12, dist);
+    camera.lookAt(cx, 1.15, 0);
+  }, [camera, cx, dist]);
+
   return (
     <>
       {/* Suelo, luz de tres puntos y entorno que reflejar. */}
@@ -279,12 +310,13 @@ function Contenido(props: EnergiaFormasSceneProps) {
 
 
       <OrbitControls
+        makeDefault
         enablePan={false}
         minDistance={5}
-        maxDistance={18}
+        maxDistance={22}
         minPolarAngle={Math.PI / 8}
         maxPolarAngle={Math.PI / 2.05}
-        target={[0, 0.7, 0]}
+        target={[cx, 1.15, 0]}
         autoRotate={autoRotate}
         autoRotateSpeed={0.4}
       />

@@ -1,0 +1,12 @@
+{
+  "escena": "Una cadena de aparatos transforma la energía y al final una columna mide la parte útil y el calor",
+  "pregunta": "Si cambias de la planta hidroeléctrica al foco incandescente, ¿qué le pasa a la parte útil?",
+  "opciones": [
+    { "id": "a", "texto": "Casi toda se vuelve calor", "icono": "fa-fire" },
+    { "id": "b", "texto": "Sube, porque el foco da luz", "icono": "fa-lightbulb" },
+    { "id": "c", "texto": "Queda igual en ambos", "icono": "fa-equals" }
+  ],
+  "correcta": "a",
+  "porque": "El foco convierte en luz solo el 5% de la electricidad; el otro 95% se disipa como calor. La hidroeléctrica aprovecha cerca del 90%. La suma útil más calor siempre es la entrada.",
+  "comoComprobarlo": "Usa la barra superior para elegir cada aparato y compara el tamaño de la parte verde y la naranja en la columna final."
+}

@@ -1,0 +1,12 @@
+{
+  "escena": "Una persona y una torre proyectan sombras bajo el mismo Sol, que está alto en el cielo.",
+  "pregunta": "Si bajas el Sol y las sombras se alargan, ¿qué pasa con la razón k torre/persona?",
+  "opciones": [
+    { "id": "a", "texto": "Aumenta junto con las sombras", "icono": "fa-arrow-up" },
+    { "id": "b", "texto": "Se queda igual", "icono": "fa-equals" },
+    { "id": "c", "texto": "Disminuye porque la torre es más alta", "icono": "fa-arrow-down" }
+  ],
+  "correcta": "b",
+  "porque": "Los rayos son paralelos, así que ambos triángulos tienen el mismo ángulo y son semejantes. Las dos sombras crecen en la misma proporción: la razón y la altura calculada no cambian.",
+  "comoComprobarlo": "Arrastra el control de elevación del Sol de arriba a abajo y observa el valor de k y la altura calculada."
+}

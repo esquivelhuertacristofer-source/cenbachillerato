@@ -18,7 +18,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, NUM, OK, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { T, NUM, OK, card, Eyebrow, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { CICLO_CARBONO_FICHA } from "./ciclo-carbono-ficha";
 import { RetoQuizCard } from "./_reto-quiz";
@@ -42,7 +43,7 @@ const CicloCarbonoScene = dynamic(() => import("./CicloCarbonoScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-arrows-spin fa-spin" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Preparando el laboratorio 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Preparando el laboratorio 3D…</span>
     </div>
   ),
 });
@@ -76,10 +77,10 @@ export function LabCicloCarbono({ color }: PracticaLabProps) {
   // compuerta de equipamiento (pilar: equiparse)
   const [eppListo, setEppListo] = useState(false);
 
-  // objetivos / pasos
-  const [vioCiclo] = useState(true);
+  // objetivos
   const [bajoEquilibrio, setBajoEquilibrio] = useState(false);
   const [subioEmisiones, setSubioEmisiones] = useState(false);
+  const [llegoAlto, setLlegoAlto] = useState(false); // llevó las emisiones a 50 Gt/año o más
   const [vioMexico, setVioMexico] = useState(false);
   const [arrastro, setArrastro] = useState(false); // arrastró la palanca de emisiones en 3D
   const [predicho, setPredicho] = useState(false); // resolvió el cálculo del carbono al aire
@@ -88,7 +89,6 @@ export function LabCicloCarbono({ color }: PracticaLabProps) {
   const { mejorEstrellas, registraEstrellas: guardaEstrellas } = useEstrellas(RETO_KEY);
 
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
 
@@ -112,11 +112,15 @@ export function LabCicloCarbono({ color }: PracticaLabProps) {
   }, []);
 
   const bump = () => setResetNonce((n) => n + 1);
+  const marcaNivel = (v: number) => {
+    if (v === 0) setBajoEquilibrio(true);
+    if (v > EMIS_DEFAULT) setSubioEmisiones(true);
+    if (v >= 50) setLlegoAlto(true);
+  };
   const cambiarEmis = (v: number) => {
     setEmisiones(v);
     if (sonido) audioRef.current?.blip();
-    if (v === 0) setBajoEquilibrio(true);
-    if (v > EMIS_DEFAULT) setSubioEmisiones(true);
+    marcaNivel(v);
   };
   // la palanca de emisiones arrastrada en 3D entra por aquí (pilar: arrastrar)
   const onEmisionesArrastre = useCallback((v: number) => {
@@ -125,6 +129,7 @@ export function LabCicloCarbono({ color }: PracticaLabProps) {
     setEmisiones(nv);
     if (nv === 0) setBajoEquilibrio(true);
     if (nv > EMIS_DEFAULT) setSubioEmisiones(true);
+    if (nv >= 50) setLlegoAlto(true);
   }, []);
   const onGrabPalanca = useCallback(() => {
     if (sonido) audioRef.current?.blip();
@@ -141,386 +146,215 @@ export function LabCicloCarbono({ color }: PracticaLabProps) {
   const ppm = useMemo(() => ppmAnual(emisiones), [emisiones]);
   const equilibrio = emisiones === 0;
 
-  // pasos guiados (pilar: seguir pasos)
-  const pasos = [
-    { t: "Equípate", icon: "fa-gauge-high", done: eppListo },
-    { t: "Arrastra la palanca de emisiones", icon: "fa-hand-pointer", done: arrastro },
-    { t: "Lee el caso de México", icon: "fa-earth-americas", done: vioMexico },
-    { t: "Calcula el CO₂ que queda al aire", icon: "fa-calculator", done: predicho },
-  ];
-  const pasoActivo = pasos.findIndex((p) => !p.done);
-
-  const objetivos = [
-    { txt: "Observa el ciclo en equilibrio", done: vioCiclo },
-    { txt: "Arrastra la palanca de emisiones en 3D", done: arrastro },
-    { txt: "Baja las emisiones a cero", done: bajoEquilibrio },
-    { txt: "Sube las emisiones (mira la atmósfera)", done: subioEmisiones },
-    { txt: "Lee el caso de México", done: vioMexico },
-    { txt: "Calcula el CO₂ que queda al aire", done: predicho },
-    { txt: "Resuelve el reto evaluable de la actividad A3", done: ejercicioAprobado },
-  ];
-
   const sceneFallback = (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 28, textAlign: "center" }}>
       <div style={{ width: 74, height: 74, borderRadius: 20, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30, color: "#fff", background: VERDE, boxShadow: `0 10px 30px -6px ${VERDE}` }}>
         <i className="fa-solid fa-arrows-spin" />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>El carbono no se gasta: circula</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 410, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 410, lineHeight: 1.5 }}>
         Tu equipo no puede mostrar la vista 3D, pero la idea sigue: el carbono pasa entre atmósfera, plantas, animales, suelo, océano y fósiles. Quemar fósiles añade carbono más rápido de lo que océano y bosques pueden reabsorber.
       </div>
     </div>
   );
 
+  const lectura = equilibrio
+    ? <>Equilibrio: el carbono solo circula</>
+    : <>{fmtGt(acum)} Gt/año se quedan al aire: +{fmtPpm(ppm)} ppm</>;
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes exPulse { 0%,100%{ box-shadow:0 0 0 0 var(--exc); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .ex-live-dot { animation: exPulse 1.6s ease-in-out infinite; }
-        .ex-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(300px,26vw,380px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .ex-grid { grid-template-columns: 1fr; } }
-        .ex-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .ex-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .ex-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .ex-divider { height:1px; background:${T.line}; margin:18px 0; }
-        .ex-range { -webkit-appearance:none; appearance:none; width:100%; height:6px; border-radius:999px; outline:none;
-          background:linear-gradient(90deg, var(--exc) 0%, var(--exc) var(--exfill), rgba(255,255,255,0.12) var(--exfill), rgba(255,255,255,0.12) 100%); }
-        .ex-range::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:20px; height:20px; border-radius:50%;
-          background:#fff; border:3px solid var(--exc); cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.4); }
-        .ex-range::-moz-range-thumb { width:20px; height:20px; border-radius:50%; background:#fff; border:3px solid var(--exc); cursor:pointer; }
-        .ex-chip { cursor:pointer; padding:8px 14px; border-radius:999px; border:1px solid ${T.line}; background:${T.inset};
-          color:${T.text2}; font-size:12.5px; font-weight:800; transition:all .15s; }
-        .ex-chip:hover { border-color:rgba(${color.rgba},0.5); color:#fff; }
-        @media (max-width: 1000px){ .ex-bottom { grid-template-columns: 1fr !important; } }
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <>
+          <SceneBoundary fallback={sceneFallback}>
+            <CicloCarbonoScene
+              emisiones={emisiones}
+              accent={accent}
+              pausado={pausado}
+              autoRotate={autoRotate}
+              resetNonce={resetNonce}
+              arrastrable={eppListo}
+              onEmisionesChange={onEmisionesArrastre}
+              onGrab={onGrabPalanca}
+            />
+          </SceneBoundary>
+          {!eppListo && (
+            <EppGate
+              accent={accent}
+              rgba={color.rgba}
+              items={INSTRUMENTOS}
+              titulo="Antes de medir: equípate"
+              subtitulo="Identifica tus instrumentos de medición"
+              verbo="instrumentos de medición"
+              intro="Para estudiar el carbono hay que medirlo. Entre el material de abajo, selecciona solo los 3 instrumentos de medición (no la pala, la planta ni la regadera) para entrar."
+              onEntrar={() => setEppListo(true)}
+            />
+          )}
+        </>
+      }
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono={pausado ? "fa-play" : "fa-pause"} titulo={pausado ? "Reanudar los flujos" : "Pausar los flujos"} activo={!pausado} onClick={() => setPausado((p) => !p)} />
+          <BotonHerramienta icono="fa-arrows-rotate" titulo="Girar la cámara" activo={autoRotate} onClick={() => setAutoRotate((v) => !v)} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reset} />
+        </>
+      }
+      leyenda={<MedidorBalance emisiones={emisiones} abs={abs} acum={acum} ppm={ppm} />}
+      lectura={lectura}
+      objetivos={[
+        { txt: "Equípate: elige los 3 instrumentos de medición", done: eppListo },
+        { txt: "Arrastra la palanca de emisiones en 3D", done: arrastro },
+        { txt: "Baja las emisiones a cero", done: bajoEquilibrio },
+        { txt: "Sube las emisiones (mira la atmósfera)", done: subioEmisiones },
+        { txt: "Llévalas a 50 Gt/año o más y mira cuántos ppm sube el CO₂ al año", done: llegoAlto },
+        { txt: "Lee el caso de México", done: vioMexico },
+        { txt: "Calcula el CO₂ que queda al aire", done: predicho },
+        { txt: "Resuelve el reto evaluable de la actividad A3", done: ejercicioAprobado },
+      ]}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Controles",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              <Bloque titulo="Emisiones humanas de CO₂" icono="fa-industry">
+                <Deslizador label="Quema de fósiles + cambio de uso de suelo" icon="fa-industry" colr={ROJO}
+                  valor={`${emisiones} Gt/año`} min={EMIS_MIN} max={EMIS_MAX} step={EMIS_STEP} value={emisiones} onChange={cambiarEmis}
+                  hintL="0: equilibrio natural" hintR={`${EMIS_MAX} Gt/año`} />
+                <p style={{ margin: 0, color: T.text2 }}>
+                  Hoy el mundo emite <strong style={{ color: T.text }}>~37 Gt de CO₂ al año</strong> (INECC 2022). Llévalo a 0 para ver el ciclo natural en equilibrio, o arrastra la palanca a la izquierda de la Tierra.
+                </p>
+              </Bloque>
 
-        /* Pasos guiados */
-        .ex-steps { display:flex; gap:8px; flex-wrap:wrap; }
-        .ex-step { flex:1 1 0; min-width:130px; display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:12px;
-          border:1px solid ${T.line}; background:${T.inset}; transition:all .18s; }
-        .ex-step[data-state="done"] { border-color:${OK}66; background:${OK}12; }
-        .ex-step[data-state="active"] { border-color:${accent}; background:rgba(${color.rgba},0.14); box-shadow:0 0 0 1px ${accent}55; }
-        .ex-step-n { width:26px; height:26px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0; }
+              <Bloque titulo="¿Adónde va el carbono que emitimos?" icono="fa-chart-simple">
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                  <Dato label="Emitido" value={`${fmtGt(emisiones)} Gt`} col={ROJO} />
+                  <Dato label="Reabsorbido" value={`${fmtGt(abs)} Gt`} col={AZUL} />
+                  <Dato label="Queda al aire" value={`${fmtGt(acum)} Gt`} col={NARANJA} />
+                  <Dato label="CO₂ sube" value={`${fmtPpm(ppm)} ppm`} col={ROJO} />
+                </div>
+                <p style={{ margin: 0, color: T.text2 }}>
+                  El océano y los bosques son <strong style={{ color: AZUL }}>sumideros</strong>: reabsorben un poco más de la mitad de lo que emitimos. El resto se <strong style={{ color: NARANJA }}>acumula</strong> en la atmósfera año tras año. Si un sumidero se destruye (talar un bosque, calentar el océano), reabsorbe menos y deja de ser sumidero para volverse <strong style={{ color: ROJO }}>fuente</strong>. La fracción aérea (~{Math.round(FRAC_AEREA * 100)} %) es aproximada (IPCC).
+                </p>
+              </Bloque>
 
-        /* Entrada de cálculo */
-        .calc-in { width:100%; box-sizing:border-box; border-radius:12px; border:1px solid ${T.line}; background:${T.inset};
-          color:#fff; font-size:18px; font-weight:900; text-align:center; padding:12px; outline:none; transition:border-color .15s; -moz-appearance:textfield; }
-        .calc-in:focus { border-color:${accent}; }
-        .calc-in::-webkit-outer-spin-button, .calc-in::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
-        .calc-btn { cursor:pointer; border:none; border-radius:12px; font-size:14px; font-weight:800; padding:12px 18px; transition:all .15s; }
-        .calc-btn-primary { background:${accent}; color:#04121f; }
-        .calc-btn-primary:hover:not(:disabled) { filter:brightness(1.08); }
-        .calc-btn-primary:disabled { opacity:0.4; cursor:not-allowed; }
-        .calc-btn-ghost { background:${T.glass}; border:1px solid ${T.line}; color:#fff; }
-        .calc-btn-ghost:hover { border-color:${accent}; }
-
-        /* Cajón de teoría */
-        .ex-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .ex-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .ex-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .ex-drawer[data-open="true"] { transform:translateX(0); }
-        .ex-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .ex-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .ex-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .ex-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .ex-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .ex-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      {/* ── Pasos guiados ──────────────────────────────────────────── */}
-      <div style={{ ...card, padding: "14px 16px", marginBottom: 16 }}>
-        <div className="ex-steps">
-          {pasos.map((p, i) => {
-            const state = p.done ? "done" : i === pasoActivo ? "active" : "pending";
-            return (
-              <div key={i} className="ex-step" data-state={state}>
-                <span className="ex-step-n" style={{ background: p.done ? OK : i === pasoActivo ? accent : T.glass, color: p.done || i === pasoActivo ? "#04121f" : T.text3 }}>
-                  {p.done ? <i className="fa-solid fa-check" /> : <i className={`fa-solid ${p.icon}`} />}
-                </span>
-                <span style={{ fontSize: 12.5, fontWeight: 700, color: p.done ? OK : i === pasoActivo ? "#fff" : T.text2, lineHeight: 1.2 }}>{p.t}</span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="ex-grid">
-        {/* ── Columna visor ──────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(460px, 66vh, 780px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06182c 0%,#03101f 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <CicloCarbonoScene
-                emisiones={emisiones}
+              <Bloque titulo="El carbono en México" icono="fa-earth-americas">
+                <div
+                  style={{ display: "grid", gap: 12 }}
+                  onPointerEnter={() => setVioMexico(true)}
+                  onTouchStart={() => setVioMexico(true)}
+                  onClick={() => setVioMexico(true)}
+                >
+                  {DATOS_MX.map((d) => (
+                    <div key={d.titulo} style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
+                      <div style={{ flexShrink: 0, width: 32, height: 32, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: accent, background: `rgba(${color.rgba},0.16)` }}>
+                        <i className={`fa-solid ${d.icono}`} />
+                      </div>
+                      <div style={{ fontSize: 14.5, color: T.text2, lineHeight: 1.45 }}>
+                        <strong style={{ color: T.text }}>{d.titulo}</strong> — {d.texto}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <>
+              <PrediccionCarbonoCard
                 accent={accent}
-                pausado={pausado}
-                autoRotate={autoRotate}
-                resetNonce={resetNonce}
-                arrastrable={eppListo}
-                onEmisionesChange={onEmisionesArrastre}
-                onGrab={onGrabPalanca}
+                emisLive={emisiones}
+                mejor={mejorEstrellas}
+                onResultado={registraEstrellas}
+                playSfx={sonido ? (ok) => (ok ? audioRef.current?.correcto() : audioRef.current?.incorrecto()) : undefined}
               />
-            </SceneBoundary>
-
-            {/* Compuerta de equipamiento */}
-            {!eppListo && (
-              <EppGate
+              <div style={{ height: 16 }} />
+              <RetoQuizCard
+                quiz={QUIZ_A2}
                 accent={accent}
                 rgba={color.rgba}
-                items={INSTRUMENTOS}
-                titulo="Antes de medir: equípate"
-                subtitulo="Identifica tus instrumentos de medición"
-                verbo="instrumentos de medición"
-                intro="Para estudiar el carbono hay que medirlo. Entre el material de abajo, selecciona solo los 3 instrumentos de medición (no la pala, la planta ni la regadera) para entrar."
-                onEntrar={() => setEppListo(true)}
+                aprobado={ejercicioAprobado}
+                onAprobado={() => setEjercicioAprobado(true)}
+                playSfx={sonido ? (ok) => { if (ok) audioRef.current?.correcto(); else audioRef.current?.incorrecto(); } : undefined}
+                playPick={sonido ? () => audioRef.current?.blip() : undefined}
               />
-            )}
-
-            {/* Cinta EN VIVO — estado del balance */}
-            <div style={{ position: "absolute", top: 14, left: 16, display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(2,12,28,0.74)", border: `1px solid ${equilibrio ? VERDE : ROJO}66`, backdropFilter: "blur(10px)" }}>
-              <span className="ex-live-dot" style={{ ["--exc" as string]: `${equilibrio ? VERDE : ROJO}aa`, width: 9, height: 9, borderRadius: "50%", background: equilibrio ? VERDE : ROJO }} />
-              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3 }}>EN VIVO</span>
-              <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)" }} />
-              <span style={{ fontSize: 15, fontWeight: 900, color: equilibrio ? VERDE : ROJO, fontFamily: "ui-monospace, monospace" }}>
-                <i className={`fa-solid ${equilibrio ? "fa-scale-balanced" : "fa-temperature-arrow-up"}`} style={{ marginRight: 8 }} />
-                {equilibrio ? "ciclo en equilibrio" : `+${fmtGt(acum)} Gt/año al aire`}
-              </span>
-            </div>
-
-            {/* Toolbar */}
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(2,12,28,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="ex-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="ex-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="ex-icobtn" data-on={!pausado} onClick={() => setPausado((p) => !p)} title={pausado ? "Reanudar" : "Pausar"}>
-                <i className={`fa-solid ${pausado ? "fa-play" : "fa-pause"}`} />
-              </button>
-              <button className="ex-icobtn" data-on={autoRotate} onClick={() => setAutoRotate((v) => !v)} title="Girar la cámara">
-                <i className="fa-solid fa-arrows-rotate" />
-              </button>
-              <button className="ex-icobtn" onClick={reset} title="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            {/* Botón flotante de Teoría */}
-            <button className="ex-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-
-            {/* Pie: lectura del balance */}
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 18px 14px", background: "linear-gradient(0deg, rgba(2,10,24,0.9) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 14, color: "#eaf6ee", fontFamily: "ui-monospace, monospace", fontWeight: 800, letterSpacing: "0.01em" }}>
-                <span style={{ color: ROJO }}>{fmtGt(emisiones)} Gt CO₂</span> emitidas → <span style={{ color: AZUL }}>{fmtGt(abs)}</span> reabsorbidas, <span style={{ color: NARANJA }}>{fmtGt(acum)}</span> al aire
-              </div>
-              <div style={{ fontSize: 12.5, color: "#cfe0d6", lineHeight: 1.5, marginTop: 6 }}>
-                {equilibrio
-                  ? "Sin combustión humana, lo que las plantas fijan iguala a lo que sale por respiración: el carbono solo circula."
-                  : <>Cerca del <strong style={{ color: NARANJA }}>{Math.round(FRAC_AEREA * 100)} %</strong> de lo que emitimos se queda en la atmósfera: el CO₂ sube ~<strong style={{ color: ROJO }}>{fmtPpm(ppm)} ppm</strong> al año y atrapa más calor.</>}
-              </div>
-            </div>
-          </div>
-
-          {/* Control de emisiones */}
-          <div style={{ ...card, padding: "18px 22px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: accent }} />
-              Emisiones humanas de CO₂
-            </Eyebrow>
-            <Deslizador label="Quema de fósiles + cambio de uso de suelo" icon="fa-industry" colr={ROJO}
-              valor={`${emisiones} Gt/año`} min={EMIS_MIN} max={EMIS_MAX} step={EMIS_STEP} value={emisiones} onChange={cambiarEmis}
-              hintL="0 (equilibrio natural)" hintR={`${EMIS_MAX} Gt/año`} />
-            <div style={{ fontSize: 12, color: T.text3, marginTop: 10, lineHeight: 1.45 }}>
-              Hoy el mundo emite <strong style={{ color: T.text2 }}>~37 Gt de CO₂ al año</strong> (INECC 2022). Llévalo a 0 para ver el ciclo natural en equilibrio.
-            </div>
-            <div style={{ marginTop: 10, fontSize: 11.5, color: T.text3, textAlign: "center", lineHeight: 1.4 }}>
-              <i className="fa-solid fa-hand-pointer" style={{ marginRight: 6, color: accent }} />
-              o <strong style={{ color: T.text2 }}>arrastra la palanca</strong> (el botón a la izquierda de la Tierra) directamente en la escena.
-            </div>
-          </div>
-
-          {/* Reto de cálculo: el CO₂ que queda al aire (pilar: hacer cálculos) */}
-          <PrediccionCarbonoCard
-            accent={accent}
-            emisLive={emisiones}
-            mejor={mejorEstrellas}
-            onResultado={registraEstrellas}
-            playSfx={sonido ? (ok) => (ok ? audioRef.current?.correcto() : audioRef.current?.incorrecto()) : undefined}
-          />
-
-          {/* Resultado en vivo — balance del carbono */}
-          <div style={{ ...card, padding: "18px 22px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-chart-simple" style={{ marginRight: 8, color: accent }} />
-              ¿Adónde va el carbono que emitimos?
-            </Eyebrow>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 14 }}>
-              <Readout label="Emitido" value={`${fmtGt(emisiones)} Gt`} col={ROJO} size={15} />
-              <Readout label="Reabsorbido" value={`${fmtGt(abs)} Gt`} col={AZUL} size={15} />
-              <Readout label="Queda al aire" value={`${fmtGt(acum)} Gt`} col={NARANJA} size={15} />
-              <Readout label="CO₂ sube" value={`${fmtPpm(ppm)} ppm`} col={ROJO} size={16} />
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>
-              El océano y los bosques son <strong style={{ color: AZUL }}>sumideros</strong>: reabsorben un poco más de la mitad de lo que emitimos. El resto se <strong style={{ color: NARANJA }}>acumula</strong> en la atmósfera año tras año —por eso el CO₂ sube de forma sostenida—. Si un sumidero se destruye (talar un bosque, calentar el océano), reabsorbe menos y deja de ser sumidero para volverse <strong style={{ color: ROJO }}>fuente</strong>. La fracción aérea (~{Math.round(FRAC_AEREA * 100)} %) es aproximada (IPCC).
-            </div>
-          </div>
-        </div>
-
-        {/* ── Columna lateral ────────────────────────────────────── */}
-        <div style={{ ...card, padding: "22px 22px 24px" }}>
-          <Eyebrow>Los reservorios de carbono</Eyebrow>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {RESERVORIOS.map((r) => (
-              <div key={r.key} style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
-                <div style={{ flexShrink: 0, width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: r.color, background: `${r.color}1f` }}>
-                  <i className={`fa-solid ${r.icono}`} />
-                </div>
-                <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  <strong style={{ color: r.color }}>{r.nombre}</strong> <span style={{ color: T.text3, fontFamily: "ui-monospace, monospace" }}>(~{r.gtC.toLocaleString("es-MX")} GtC)</span> — {r.resumen}
-                </div>
-              </div>
-            ))}
-          </div>
-          <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45, marginTop: 10 }}>
-            Tamaños globales aproximados, en gigatoneladas de carbono (GtC). 1 GtC = mil millones de toneladas.
-          </div>
-
-          <div className="ex-divider" />
-
-          <Eyebrow>El carbono en México</Eyebrow>
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }} onMouseEnter={() => setVioMexico(true)}>
-            {DATOS_MX.map((d) => (
-              <div key={d.titulo} style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
-                <div style={{ flexShrink: 0, width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: accent, background: `rgba(${color.rgba},0.16)` }}>
-                  <i className={`fa-solid ${d.icono}`} />
-                </div>
-                <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  <strong style={{ color: T.text }}>{d.titulo}</strong> — {d.texto}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="ex-divider" />
-
-          <Eyebrow>Cada ciclo a su ritmo</Eyebrow>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {TIEMPOS.map((t) => (
-              <div key={t.ciclo} style={{ fontSize: 12, color: T.text2, lineHeight: 1.4 }}>
-                <strong style={{ color: t.color }}>{t.ciclo}:</strong> {t.tiempo}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* ── Objetivos + pista ──────────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="ex-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-            Objetivos
-          </Eyebrow>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-            {objetivos.map((o, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: o.done ? OK : T.text2 }}>
-                <i className={`fa-solid ${o.done ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: o.done ? 1 : 0.3 }} />
-                <span style={{ fontWeight: o.done ? 700 : 500 }}>{o.txt}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div style={{ borderRadius: 18, padding: "18px 20px", border: `1px solid rgba(${color.rgba},0.3)`, background: `rgba(${color.rgba},0.08)`, fontSize: 13.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 13 }}>
-          <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 17, marginTop: 1 }} />
-          <span>
-            Pon las emisiones en <strong style={{ color: VERDE }}>0</strong>: los átomos siguen circulando, pero la atmósfera se mantiene azul (equilibrio). Sube el control: el flujo rojo de <strong style={{ color: ROJO }}>combustión</strong> se dispara y la capa de aire se vuelve naranja. El carbono no desaparece: solo cambia de reservorio.
-          </span>
-        </div>
-      </div>
-      {/* ── Reto evaluable: el quiz verbatim del ancla ───────────────── */}
-      <RetoQuizCard
-        quiz={QUIZ_A2}
-        accent={accent}
-        rgba={color.rgba}
-        aprobado={ejercicioAprobado}
-        onAprobado={() => setEjercicioAprobado(true)}
-        playSfx={
-          sonido
-            ? (ok) => {
-                if (ok) audioRef.current?.correcto();
-                else audioRef.current?.incorrecto();
-              }
-            : undefined
-        }
-        playPick={sonido ? () => audioRef.current?.blip() : undefined}
-      />
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <div className="ex-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="ex-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="ex-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="ex-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="ex-drawer-body">
-          <FichaTeorica data={CICLO_CARBONO_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+            </>
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Los reservorios de carbono" icono="fa-layer-group">
+                {RESERVORIOS.map((r) => (
+                  <div key={r.key} style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
+                    <div style={{ flexShrink: 0, width: 32, height: 32, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: r.color, background: `${r.color}1f` }}>
+                      <i className={`fa-solid ${r.icono}`} />
+                    </div>
+                    <div style={{ fontSize: 14.5, color: T.text2, lineHeight: 1.45 }}>
+                      <strong style={{ color: r.color }}>{r.nombre}</strong> <span style={{ color: T.text3, fontFamily: "ui-monospace, monospace" }}>(~{r.gtC.toLocaleString("es-MX")} GtC)</span> — {r.resumen}
+                    </div>
+                  </div>
+                ))}
+                <p style={{ margin: 0, fontSize: 14, color: T.text3 }}>
+                  Tamaños globales aproximados, en gigatoneladas de carbono (GtC). 1 GtC = mil millones de toneladas.
+                </p>
+              </Bloque>
+              <Bloque titulo="Cada ciclo a su ritmo" icono="fa-hourglass-half">
+                {TIEMPOS.map((t) => (
+                  <div key={t.ciclo} style={{ fontSize: 14.5, color: T.text2, lineHeight: 1.4 }}>
+                    <strong style={{ color: t.color }}>{t.ciclo}:</strong> {t.tiempo}
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Idea clave" icono="fa-lightbulb">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  Con las emisiones en <strong style={{ color: VERDE }}>0</strong> los átomos siguen circulando y la atmósfera se mantiene azul (equilibrio). Al subirlas, el flujo rojo de <strong style={{ color: ROJO }}>combustión</strong> se dispara y la capa de aire se vuelve naranja. El carbono no desaparece: solo cambia de reservorio.
+                </p>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={CICLO_CARBONO_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }
 
-/* ── Deslizador reutilizable ─────────────────────────────────────────── */
-function Deslizador({ label, icon, colr, valor, min, max, step, value, onChange, hintL, hintR }: {
-  label: string; icon: string; colr: string; valor: string;
-  min: number; max: number; step: number; value: number; onChange: (v: number) => void;
-  hintL?: string; hintR?: string;
-}) {
-  return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
-        <span style={{ fontSize: 12.5, fontWeight: 700, color: colr }}>
-          <i className={`fa-solid ${icon}`} style={{ marginRight: 6 }} />
-          {label}
-        </span>
-        <span style={{ fontSize: 14, fontWeight: 900, color: colr, fontFamily: "ui-monospace, monospace" }}>{valor}</span>
+/* ── Medidor: emitido → reabsorbido + queda al aire ───────────────────── */
+function MedidorBalance({ emisiones, abs, acum, ppm }: { emisiones: number; abs: number; acum: number; ppm: number }) {
+  const barra = (txt: string, val: number, c: string) => (
+    <div style={{ display: "grid", gap: 3 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, fontSize: 14, fontWeight: 800, color: "#dce6f5" }}>
+        <span>{txt}</span><span style={{ fontFamily: "ui-monospace, monospace" }}>{fmtGt(val)} Gt</span>
       </div>
-      <input type="range" className="ex-range" min={min} max={max} step={step} value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        style={{ ["--exc" as string]: colr, ["--exfill" as string]: `${((value - min) / (max - min)) * 100}%` }} />
-      {(hintL || hintR) && (
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, fontSize: 11, color: "rgba(255,255,255,0.45)" }}>
-          <span>{hintL}</span>
-          <span>{hintR}</span>
-        </div>
-      )}
+      <div style={{ height: 8, borderRadius: 6, background: "rgba(255,255,255,0.1)", overflow: "hidden" }}>
+        <div style={{ width: `${Math.min(100, (val / EMIS_MAX) * 100)}%`, height: "100%", background: c, transition: "width 120ms linear" }} />
+      </div>
+    </div>
+  );
+  return (
+    <div style={{ display: "grid", gap: 6, minWidth: 190 }}>
+      {barra("emitido", emisiones, ROJO)}
+      {barra("reabsorbido", abs, AZUL)}
+      {barra("queda al aire", acum, NARANJA)}
+      <div style={{ fontSize: 14, fontWeight: 900, color: acum > 0 ? ROJO : VERDE }}>
+        {acum > 0 ? `CO₂ sube ${fmtPpm(ppm)} ppm/año` : "Equilibrio natural"}
+      </div>
     </div>
   );
 }
@@ -571,13 +405,14 @@ function PrediccionCarbonoCard({
   };
 
   return (
-    <div style={{ ...card, padding: "22px 24px 24px" }}>
+    <div style={{ ...card, padding: "16px" }}>
+      <style>{CALC_CSS(accent)}</style>
       <Eyebrow>
         <i className="fa-solid fa-calculator" style={{ marginRight: 8, color: accent }} />
         Reto de cálculo · El CO₂ que queda al aire
       </Eyebrow>
 
-      <div style={{ fontSize: 13.5, color: T.text2, lineHeight: 1.55, marginBottom: 14 }}>
+      <div style={{ fontSize: 14.5, color: T.text2, lineHeight: 1.55, marginBottom: 14 }}>
         Toma una lectura de las emisiones actuales y calcula cuánto CO₂ se queda en la atmósfera: cerca del{" "}
         <strong style={{ color: NARANJA }}>{Math.round(FRAC_AEREA * 100)} %</strong> de lo emitido, con{" "}
         <strong style={{ color: accent, ...NUM }}>queda al aire = emisiones × {FRAC_AEREA}</strong>. Compruébalo contra la lectura de la escena.
@@ -591,18 +426,18 @@ function PrediccionCarbonoCard({
       ) : (
         <>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 16 }}>
-            <div style={{ flex: "1 1 0", minWidth: 120, borderRadius: 11, border: `1px solid ${T.line}`, background: T.inset, padding: "9px 10px", textAlign: "center" }}>
-              <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.08em", color: T.text3 }}>EMISIONES</div>
+            <div style={{ flex: "1 1 0", minWidth: 100, borderRadius: 11, border: `1px solid ${T.line}`, background: T.inset, padding: "9px 10px", textAlign: "center" }}>
+              <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: "0.08em", color: T.text3 }}>EMISIONES</div>
               <div style={{ marginTop: 4, fontSize: 14, fontWeight: 900, color: ROJO, ...NUM }}>{fmtGt(snap)} Gt/año</div>
             </div>
-            <div style={{ flex: "1 1 0", minWidth: 120, borderRadius: 11, border: `1px solid ${T.line}`, background: T.inset, padding: "9px 10px", textAlign: "center" }}>
-              <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.08em", color: T.text3 }}>FRACCIÓN AÉREA</div>
+            <div style={{ flex: "1 1 0", minWidth: 100, borderRadius: 11, border: `1px solid ${T.line}`, background: T.inset, padding: "9px 10px", textAlign: "center" }}>
+              <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: "0.08em", color: T.text3 }}>FRACCIÓN AÉREA</div>
               <div style={{ marginTop: 4, fontSize: 14, fontWeight: 900, color: NARANJA, ...NUM }}>{FRAC_AEREA}</div>
             </div>
           </div>
 
-          <div style={{ fontSize: 12, fontWeight: 800, color: T.text2, marginBottom: 7 }}>¿Cuánto CO₂ queda al aire? (Gt/año)</div>
-          <div style={{ display: "flex", gap: 9, alignItems: "center", maxWidth: 320 }}>
+          <div style={{ fontSize: 14, fontWeight: 800, color: T.text2, marginBottom: 7 }}>¿Cuánto CO₂ queda al aire? (Gt/año)</div>
+          <div style={{ display: "flex", gap: 9, alignItems: "center", maxWidth: "100%" }}>
             <input
               className="calc-in"
               type="number"
@@ -634,13 +469,13 @@ function PrediccionCarbonoCard({
                     <i key={s} className="fa-solid fa-star" style={{ fontSize: 16, color: s <= estrellas ? "#FBBF24" : "rgba(255,255,255,0.18)" }} />
                   ))}
                 </div>
-                <span style={{ fontSize: 11.5, color: T.text3 }}>Mejor: <strong style={{ color: mejor >= 3 ? OK : T.text2 }}>{mejor}★</strong></span>
+                <span style={{ fontSize: 14, color: T.text3 }}>Mejor: <strong style={{ color: mejor >= 3 ? OK : T.text2 }}>{mejor}★</strong></span>
               </div>
             )}
           </div>
 
           {check && (
-            <div style={{ marginTop: 14, borderRadius: 13, border: `1px solid ${okActual ? OK : WARN}66`, background: `${okActual ? OK : WARN}14`, padding: "14px 16px", fontSize: 13, color: T.text, lineHeight: 1.5 }}>
+            <div style={{ marginTop: 14, borderRadius: 13, border: `1px solid ${okActual ? OK : WARN}66`, background: `${okActual ? OK : WARN}14`, padding: "14px 16px", fontSize: 14, color: T.text, lineHeight: 1.5 }}>
               {okActual ? (
                 <>
                   <div style={{ fontWeight: 900, color: OK, marginBottom: 6 }}>
@@ -664,3 +499,16 @@ function PrediccionCarbonoCard({
     </div>
   );
 }
+
+const CALC_CSS = (accent: string) => `
+  .calc-in { width:100%; box-sizing:border-box; border-radius:12px; border:1px solid ${T.line}; background:${T.inset};
+    color:#fff; font-size:18px; font-weight:900; text-align:center; padding:12px; outline:none; transition:border-color .15s; -moz-appearance:textfield; }
+  .calc-in:focus { border-color:${accent}; }
+  .calc-in::-webkit-outer-spin-button, .calc-in::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
+  .calc-btn { cursor:pointer; border:none; border-radius:12px; font-size:14px; font-weight:800; padding:12px 18px; transition:all .15s; }
+  .calc-btn-primary { background:${accent}; color:#04121f; }
+  .calc-btn-primary:hover:not(:disabled) { filter:brightness(1.08); }
+  .calc-btn-primary:disabled { opacity:0.4; cursor:not-allowed; }
+  .calc-btn-ghost { background:${T.glass}; border:1px solid ${T.line}; color:#fff; }
+  .calc-btn-ghost:hover { border-color:${accent}; }
+`;

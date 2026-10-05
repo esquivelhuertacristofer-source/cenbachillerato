@@ -1,0 +1,12 @@
+{
+  "escena": "Armas un relato de tres escenas sobre la crecida de un río y escoges de qué debe tratar.",
+  "pregunta": "Si tus tres escenas cuentan el miedo y eliges el tema «solidaridad», ¿qué pasa con la coherencia?",
+  "opciones": [
+    { "id": "a", "texto": "Baja: las escenas no lo sostienen", "icono": "fa-arrow-down" },
+    { "id": "b", "texto": "Sube, porque aparece todo el pueblo", "icono": "fa-arrow-up" },
+    { "id": "c", "texto": "Igual, el tema es cuestión de opinión", "icono": "fa-equals" }
+  ],
+  "correcta": "a",
+  "porque": "El tema no se decreta: sale de lo que las escenas repiten. Si las tres cuentan miedo, el motivo que vuelve es otro y el relato no sostiene la solidaridad.",
+  "comoComprobarlo": "En «Taller del tema», elige las tres escenas del miedo con ese tema activo; luego cambia el tema a «solidaridad» y mira el medidor."
+}

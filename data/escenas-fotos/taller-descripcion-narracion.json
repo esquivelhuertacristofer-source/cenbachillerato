@@ -1,0 +1,11 @@
+{
+  "slug": "taller-descripcion-narracion",
+  "items": [
+    { "clave": "casa-adobe", "formato": "1:1", "estilo": "ilustracion", "escena": "Casa de adobe encalado con un limonero frondoso que tapa una ventana pequeña, luz de media tarde" },
+    { "clave": "mercado-pasillo", "formato": "1:1", "estilo": "ilustracion", "escena": "Pasillo de un mercado mexicano con un puesto de manojos de cilantro y junto a él un asador de carbón con humo, piso mojado" },
+    { "clave": "manos-cal", "formato": "1:1", "estilo": "ilustracion", "escena": "Primer plano de las manos de un albañil mayor con yemas agrietadas y cal blanca bajo las uñas, sobre una cubeta" },
+    { "clave": "camion-lleno", "formato": "1:1", "estilo": "ilustracion", "escena": "Interior de un camión urbano muy lleno de pasajeros de pie, la puerta trasera atada con un mecate, luz de amanecer" },
+    { "clave": "lluvia-lamina", "formato": "1:1", "estilo": "ilustracion", "escena": "Techo de lámina galvanizada bajo una lluvia fuerte con gotas grandes rebotando como granos de arroz" },
+    { "clave": "sobre-abierto", "formato": "1:1", "estilo": "ilustracion", "escena": "Una joven con un sobre a medio abrir en las manos, mirando hacia quien tiene enfrente, sala de casa sencilla" }
+  ]
+}

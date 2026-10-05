@@ -21,8 +21,8 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Line, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
@@ -52,6 +52,8 @@ export interface EstadisticaSceneProps {
   verMedia: boolean;
   verMediana: boolean;
   verModa: boolean;
+  /** Dominio fijo del eje (para que el atípico se mueva sin reescalar). */
+  dominio?: [number, number];
 }
 
 const ORO = "#ffd24a"; // media
@@ -106,13 +108,14 @@ function DotPlot({ insts, wx, OY, r, stackUnit, accent, pausado }: {
   return (
     <instancedMesh ref={ref} args={[undefined, undefined, Math.max(1, n)]} castShadow>
       <sphereGeometry args={[r, 18, 18]} />
-      <meshStandardMaterial metalness={0.15} roughness={0.4} toneMapped={false} />
+      <meshStandardMaterial metalness={0.15} roughness={0.4} />
     </instancedMesh>
   );
 }
 
 /* ════════════════════ CONTENIDO DEL PLANO ═══════════════════════════════ */
-function Plano({ valores, accent, modo, unidad, dec, pausado, verMedia, verMediana, verModa }: {
+function Plano({ angosto, dominio, valores, accent, modo, dec, pausado, verMedia, verMediana, verModa }: {
+  angosto: boolean; dominio?: [number, number];
   valores: number[]; accent: string; modo: Variante; unidad: string; dec: number; pausado: boolean;
   verMedia: boolean; verMediana: boolean; verModa: boolean;
 }) {
@@ -131,11 +134,11 @@ function Plano({ valores, accent, modo, unidad, dec, pausado, verMedia, verMedia
 
   // Dominio matemático → mundo (con un margen del 8 % a cada lado).
   const { xMin, xMax } = useMemo(() => {
-    const lo = stats.min;
-    const hi = stats.max;
+    const lo = dominio ? Math.min(dominio[0], stats.min) : stats.min;
+    const hi = dominio ? Math.max(dominio[1], stats.max) : stats.max;
     const span = hi - lo || 1;
     return { xMin: lo - span * 0.08, xMax: hi + span * 0.08 };
-  }, [stats.min, stats.max]);
+  }, [stats.min, stats.max, dominio]);
 
   const SX = BOARD_W / (xMax - xMin);
   const OX = -BOARD_W / 2;
@@ -190,17 +193,11 @@ function Plano({ valores, accent, modo, unidad, dec, pausado, verMedia, verMedia
         <coneGeometry args={[0.13, 0.34, 16]} />
         <meshStandardMaterial color={EJE} />
       </mesh>
-      <Html position={[wx(xMax) + 0.95, OY + 0.05, 0]} center distanceFactor={15} pointerEvents="none">
-        <div style={{ color: EJE, fontSize: 11, fontWeight: 900, whiteSpace: "nowrap" }}>{unidad}</div>
-      </Html>
 
       {/* marcas de mín y máx */}
       {ticks.map((tk, i) => (
         <group key={`tk${i}`}>
           <Line points={[[wx(tk.x), OY - 0.14, 0], [wx(tk.x), OY + 0.14, 0]]} color={tk.color} lineWidth={1.4} />
-          <Html position={[wx(tk.x), OY - 0.45, 0]} center distanceFactor={16} pointerEvents="none">
-            <div style={{ color: tk.color, fontSize: 9.5, fontWeight: 800, whiteSpace: "nowrap" }}>{tk.label}</div>
-          </Html>
         </group>
       ))}
 
@@ -220,16 +217,13 @@ function Plano({ valores, accent, modo, unidad, dec, pausado, verMedia, verMedia
           <group key={`hb${i}`}>
             <mesh position={[cx, OY + h / 2, 0]} castShadow>
               <boxGeometry args={[ancho, Math.max(0.001, h), 0.6]} />
-              <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.28} metalness={0.2} roughness={0.45} toneMapped={false} transparent opacity={0.92} />
+              <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.2} metalness={0.2} roughness={0.45} transparent opacity={0.92} />
             </mesh>
-            {b.conteo > 0 && (
-              <Html position={[cx, OY + h + 0.32, 0]} center distanceFactor={15} pointerEvents="none">
-                <div style={{ color: "#fff", fontSize: 11, fontWeight: 900, textShadow: "0 2px 8px #000" }}>{b.conteo}</div>
+            {b.conteo > 0 && b.conteo === histo.maxConteo && i === histo.barras.findIndex((q) => q.conteo === histo.maxConteo) && (
+              <Html position={[cx, OY + h + 0.4, 0]} center pointerEvents="none">
+                <div style={{ color: "#fff", fontSize: 14, fontWeight: 900, textShadow: "0 2px 8px #000", whiteSpace: "nowrap" }}>{b.conteo} datos · {b.etiqueta}</div>
               </Html>
             )}
-            <Html position={[cx, OY - 0.78, 0]} center distanceFactor={17} pointerEvents="none">
-              <div style={{ color: "#6b8199", fontSize: 8, fontWeight: 700, whiteSpace: "nowrap" }}>{b.etiqueta}</div>
-            </Html>
           </group>
         );
       })}
@@ -241,8 +235,8 @@ function Plano({ valores, accent, modo, unidad, dec, pausado, verMedia, verMedia
             <planeGeometry args={[0.06, topBoard]} />
             <meshBasicMaterial color={VERDE} transparent opacity={0.85} toneMapped={false} side={THREE.DoubleSide} />
           </mesh>
-          <Html position={[wx(stats.mediana), OY + topBoard + 0.25, 0]} center distanceFactor={14} pointerEvents="none">
-            <div style={{ color: VERDE, fontSize: 11, fontWeight: 900, textShadow: "0 2px 8px #000", whiteSpace: "nowrap" }}>
+          <Html position={[wx(stats.mediana), OY + topBoard + 0.3, 0]} center pointerEvents="none">
+            <div style={{ color: VERDE, fontSize: 14, fontWeight: 900, textShadow: "0 2px 8px #000", whiteSpace: "nowrap" }}>
               mediana = {fmt(stats.mediana, dec)}
             </div>
           </Html>
@@ -256,10 +250,10 @@ function Plano({ valores, accent, modo, unidad, dec, pausado, verMedia, verMedia
           {/* triángulo-fulcro */}
           <mesh position={[wx(stats.media), OY - 0.34, 0]}>
             <coneGeometry args={[0.34, 0.6, 4]} />
-            <meshStandardMaterial color={ORO} emissive={ORO} emissiveIntensity={0.5} metalness={0.3} roughness={0.4} toneMapped={false} />
+            <meshStandardMaterial color={ORO} emissive={ORO} emissiveIntensity={0.5} metalness={0.3} roughness={0.4} />
           </mesh>
-          <Html position={[wx(stats.media), OY + topBoard + (modo === "tendencia" && verMediana ? 0.62 : 0.25), 0]} center distanceFactor={14} pointerEvents="none">
-            <div style={{ color: ORO, fontSize: 11, fontWeight: 900, textShadow: "0 2px 8px #000", whiteSpace: "nowrap" }}>
+          <Html position={[wx(stats.media), OY + topBoard + (modo === "tendencia" && verMediana ? 0.85 : 0.3), 0]} center pointerEvents="none">
+            <div style={{ color: ORO, fontSize: 14, fontWeight: 900, textShadow: "0 2px 8px #000", whiteSpace: "nowrap" }}>
               media = {fmt(stats.media, dec)}
             </div>
           </Html>
@@ -271,10 +265,10 @@ function Plano({ valores, accent, modo, unidad, dec, pausado, verMedia, verMedia
         <group key={`moda${mv}`}>
           <mesh position={[wx(mv), OY + stats.moda.frecuencia * stackUnit + 0.45, 0]} rotation={[Math.PI, 0, 0]}>
             <coneGeometry args={[0.22, 0.4, 14]} />
-            <meshStandardMaterial color={MAGENTA} emissive={MAGENTA} emissiveIntensity={0.6} toneMapped={false} />
+            <meshStandardMaterial color={MAGENTA} emissive={MAGENTA} emissiveIntensity={0.6} />
           </mesh>
-          <Html position={[wx(mv), OY + stats.moda.frecuencia * stackUnit + 0.95, 0]} center distanceFactor={15} pointerEvents="none">
-            <div style={{ color: MAGENTA, fontSize: 10, fontWeight: 900, textShadow: "0 2px 8px #000", whiteSpace: "nowrap" }}>
+          <Html position={[wx(mv), OY + stats.moda.frecuencia * stackUnit + 0.95, 0]} center pointerEvents="none">
+            <div style={{ color: MAGENTA, fontSize: 14, fontWeight: 900, textShadow: "0 2px 8px #000", whiteSpace: "nowrap" }}>
               moda = {fmt(mv, dec)}
             </div>
           </Html>
@@ -292,8 +286,8 @@ function Plano({ valores, accent, modo, unidad, dec, pausado, verMedia, verMedia
           {[stats.media - stats.sigma, stats.media + stats.sigma].map((xb, i) => (
             <Line key={`sb${i}`} points={[w3(xb, 0.02, 0.02), w3(xb, topBoard, 0.02)]} color={AZUL} lineWidth={1.4} dashed dashSize={0.12} gapSize={0.1} />
           ))}
-          <Html position={[wx(stats.media + stats.sigma), OY + topBoard * 0.78, 0]} center distanceFactor={14} pointerEvents="none">
-            <div style={{ color: AZUL, fontSize: 10.5, fontWeight: 900, textShadow: "0 2px 8px #000", whiteSpace: "nowrap" }}>
+          <Html position={[wx(stats.media + stats.sigma) + 0.7, OY + topBoard * 0.78, 0]} center pointerEvents="none">
+            <div style={{ color: AZUL, fontSize: 14, fontWeight: 900, textShadow: "0 2px 8px #000", whiteSpace: "nowrap" }}>
               σ = {fmt(stats.sigma, dec)}
             </div>
           </Html>
@@ -302,11 +296,13 @@ function Plano({ valores, accent, modo, unidad, dec, pausado, verMedia, verMedia
           {[stats.min, stats.max].map((xb, i) => (
             <Line key={`rc${i}`} points={[[wx(xb), OY - 1.12, 0], [wx(xb), OY - 0.78, 0]]} color={AZUL} lineWidth={2} />
           ))}
-          <Html position={[(wx(stats.min) + wx(stats.max)) / 2, OY - 1.5, 0]} center distanceFactor={14} pointerEvents="none">
-            <div style={{ color: AZUL, fontSize: 10.5, fontWeight: 900, textShadow: "0 2px 8px #000", whiteSpace: "nowrap" }}>
+          {!angosto && (
+            <Html position={[(wx(stats.min) + wx(stats.max)) / 2, OY - 1.5, 0]} center pointerEvents="none">
+            <div style={{ color: AZUL, fontSize: 14, fontWeight: 900, textShadow: "0 2px 8px #000", whiteSpace: "nowrap" }}>
               rango = {fmt(stats.max - stats.min, dec)}
             </div>
           </Html>
+          )}
         </>
       )}
 
@@ -330,16 +326,28 @@ export default function EstadisticaScene(props: EstadisticaSceneProps) {
 
 function Contenido(props: EstadisticaSceneProps) {
   const { accent, autoRotate, resetNonce } = props;
+  const { size, camera } = useThree();
+  const angosto = size.width < 640;
+  // Encuadre: todo el tablero cabe a lo ancho aunque la pantalla sea angosta.
+  useEffect(() => {
+    const aspecto = size.width / Math.max(1, size.height);
+    const z = Math.max(16, (BOARD_W + 2.6) / (2 * Math.tan((46 / 2) * Math.PI / 180) * aspecto));
+    camera.position.set(0, 0, z);
+    camera.updateProjectionMatrix();
+  }, [size.width, size.height, camera]);
   return (
     <>
       {/* Suelo, luz de tres puntos y entorno que reflejar. */}
       {/* La altura sale de donde esta escena ya ponía su sombra de
           contacto: es donde su autor decidió que estaba el piso. */}
+      {/* Todo sube un poco: queda entre la barra de arriba y la misión de abajo. */}
+      <group position={[0, 0.6, 0]}>
       <Escenario acento={accent} suelo={-BOARD_H / 2 - 0.42} />
-
 
       <group key={`${resetNonce}`}>
         <Plano
+          angosto={angosto}
+          dominio={props.dominio}
           valores={props.valores}
           accent={accent}
           modo={props.modo}
@@ -351,15 +359,15 @@ function Contenido(props: EstadisticaSceneProps) {
           verModa={props.verModa}
         />
       </group>
-
+      </group>
 
       <OrbitControls
         enablePan={false}
         minDistance={9}
-        maxDistance={24}
+        maxDistance={38}
         minPolarAngle={Math.PI / 6}
         maxPolarAngle={Math.PI / 1.9}
-        target={[0, 0, 0]}
+        target={[0, 0.6, 0]}
         autoRotate={autoRotate}
         autoRotateSpeed={0.4}
       />

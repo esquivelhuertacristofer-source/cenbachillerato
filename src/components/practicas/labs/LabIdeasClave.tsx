@@ -6,33 +6,29 @@
  * «Identifica información de un texto que lee para resaltar los elementos
  * significativos».
  *
- * El corazón es SUBRAYAR DE VERDAD sobre el texto. Cuatro modos:
- *  1. «Subraya el texto» — el alumno toma uno de tres marcadores (idea
- *     principal / detalle de apoyo / relleno) y marca cada oración del texto.
- *     El laboratorio le dice si acertó y POR QUÉ esa oración es lo que es.
- *  2. «Arma el esquema» — con las mismas oraciones construye la jerarquía del
- *     texto: tema general arriba, la idea principal de cada párrafo debajo y el
- *     detalle que la sostiene colgando de ella. El relleno no entra.
- *  3. «Diagnostica el resumen» — nueve resúmenes ajenos, cuatro veredictos:
- *     buen resumen, copia literal, se quedó en un detalle, dice lo que el texto
- *     no dice.
- *  4. «Completa el texto» — los huecos verbatim de LC-I-P05-A4.
- *  + Reto evaluable con el quiz verbatim de LC-I-P05-A2.
+ * EXPERIMENTO CENTRAL: el alumno subraya un artículo y VE qué resumen sale de
+ * lo que subrayó. A la derecha del artículo se arman, en vivo:
+ *  · el RESUMEN (lo subrayado, párrafo por párrafo),
+ *  · el MAPA de ideas (título → idea principal de cada párrafo → detalle),
+ *  · un MEDIDOR de longitud con la marca del resumen ideal.
+ * Si subraya de más (relleno), el resumen se infla y el medidor se pone rojo;
+ * si subraya de menos, el resumen y el mapa muestran HUECOS punteados.
  *
- * DOM puro (sin three.js): el fenómeno que se estudia ES el texto, así que la
- * escena correcta es el texto mismo. Además funciona con ratón, teclado y
- * pantalla táctil (clic-para-seleccionar y clic-para-colocar) y no infla el
- * bundle del Worker.
+ * Modos: «Subraya y mira el resumen» (simulador) · «Arma el esquema» ·
+ * «Diagnostica el resumen» · «Completa el texto» (huecos verbatim A4).
+ * La teoría verbatim vive en la pestaña «Teoría» y el quiz de A2 en «Reto».
+ *
+ * DOM puro (sin three.js): el fenómeno que se estudia ES el texto.
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { PracticaLabProps } from "../registry";
-import { T, OK, card, Eyebrow } from "./_kit";
+import { T, OK } from "./_kit";
+import { LabShell, Bloque, BotonHerramienta, Mesa, Dato } from "./_shell";
 import { LabSfx } from "./lab-audio";
 import { CompletaTexto } from "./_mecanica-huecos";
 import { IDEAS_CLAVE_HUECOS } from "./ideas-clave-huecos";
 import { usePartida, MarcadorPartida } from "./_partida";
-import { TableroObjetivos } from "./_objetivos";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { IDEAS_CLAVE_FICHA } from "./ideas-clave-ficha";
@@ -55,12 +51,21 @@ import {
 } from "./ideas-clave-data";
 
 const NO = "#FF5E5E";
+const AVISO = "#FFC75A";
 const RETO_KEY = "cen-ideas-clave-subrayado-reto";
+const RUTA_FOTOS = "/media/labs-sim/ideas-clave-subrayado";
+
+/** Foto de cabecera de cada artículo (clave del archivo + ícono de respaldo). */
+const FOTO_TEXTO: Record<string, { clave: string; icono: string }> = {
+  maiz: { clave: "milpa-mazorcas", icono: "fa-wheat-awn" },
+  metro: { clave: "anden-metro", icono: "fa-train-subway" },
+  alerta: { clave: "poste-alerta", icono: "fa-bell" },
+};
 
 type Modo = "subrayar" | "esquema" | "resumen" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
-  { id: "subrayar", label: "Subraya el texto", icono: "fa-highlighter" },
+  { id: "subrayar", label: "Subraya y mira el resumen", icono: "fa-highlighter" },
   { id: "esquema", label: "Arma el esquema", icono: "fa-sitemap" },
   { id: "resumen", label: "Diagnostica el resumen", icono: "fa-clipboard-check" },
   { id: "texto", label: "Completa el texto", icono: "fa-pen-to-square" },
@@ -69,9 +74,6 @@ const MODOS: { id: Modo; label: string; icono: string }[] = [
 const ROLES: Rol[] = ["principal", "apoyo", "relleno"];
 const VEREDICTOS: Veredicto[] = ["bueno", "copia", "detalle", "agrega"];
 
-/** Cuántas oraciones tiene cada texto (3 párrafos × 3 oraciones). */
-const FRASES_POR_TEXTO = TEXTOS[0]!.parrafos.reduce((n, p) => n + p.frases.length, 0);
-const TOTAL_FRASES = TODAS_LAS_FRASES.length;
 const TOTAL_RELLENO = TODAS_LAS_FRASES.filter((f) => f.rol === "relleno").length;
 const COPIAS = RESUMENES.filter((r) => r.veredicto === "copia");
 
@@ -90,6 +92,55 @@ const PISTA_ROL: Record<Rol, string> = {
   apoyo: "Un detalle de apoyo respalda a la idea principal con un ejemplo, una cifra o una explicación. ¿Esta oración respalda algo?",
   relleno: "El relleno no aporta información sobre el tema. Si la oración sí dice algo del tema, entonces sirve para algo.",
 };
+
+const palabras = (s: string) => s.trim().split(/\s+/).length;
+const recorta = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
+
+/* ── Simulador: lo que sale de lo subrayado ───────────────────────────── */
+interface Analisis {
+  totalPal: number;
+  /** Palabras que el alumno metió al resumen (principal o apoyo). */
+  resumenPal: number;
+  /** De ellas, palabras de oraciones que en realidad son relleno. */
+  ruidoPal: number;
+  ruidoN: number;
+  /** Ideas que faltan: principales sin subrayar + detalles sin subrayar. */
+  huecosPrincipal: number;
+  huecosApoyo: number;
+  /** Oraciones marcadas con un marcador que no les toca. */
+  malas: number;
+  /** Palabras del resumen ideal (todo lo que no es relleno). */
+  idealPal: number;
+  perfecto: boolean;
+}
+
+function analiza(t: TextoLectura, marcas: Record<string, Rol>): Analisis {
+  const a: Analisis = {
+    totalPal: 0, resumenPal: 0, ruidoPal: 0, ruidoN: 0, huecosPrincipal: 0, huecosApoyo: 0, malas: 0, idealPal: 0, perfecto: true,
+  };
+  for (const p of t.parrafos) {
+    for (const f of p.frases) {
+      const w = palabras(f.texto);
+      const m = marcas[f.id];
+      a.totalPal += w;
+      if (f.rol !== "relleno") a.idealPal += w;
+      if (m && m !== "relleno") {
+        a.resumenPal += w;
+        if (f.rol === "relleno") {
+          a.ruidoPal += w;
+          a.ruidoN++;
+        }
+      }
+      if (m && m !== f.rol) a.malas++;
+      if (m !== f.rol) a.perfecto = false;
+      if (f.rol === "principal" && m !== "principal") a.huecosPrincipal++;
+      if (f.rol === "apoyo" && !(m === "apoyo" || m === "principal")) a.huecosApoyo++;
+    }
+  }
+  return a;
+}
+
+const correctoDe = (t: TextoLectura, marcas: Record<string, Rol>) => t.parrafos.every((p) => p.frases.every((f) => marcas[f.id] === f.rol));
 
 /* ── Esquema: los espacios que hay que llenar ─────────────────────────── */
 type TipoSlot = "tema" | "principal" | "apoyo";
@@ -154,7 +205,6 @@ export function LabIdeasClave({ color }: PracticaLabProps) {
   // ── sonido y partida ──────────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   useEffect(() => () => audioRef.current?.dispose(), []);
   const toggleSonido = async () => {
@@ -179,32 +229,50 @@ export function LabIdeasClave({ color }: PracticaLabProps) {
   /** Clic sin veredicto (elegir una opción del reto): sólo suena, no puntúa. */
   const sfxPick = () => sonido && audioRef.current?.blip();
 
-  // ── retroalimentación viva (el «pie del visor» de este laboratorio) ───
+  // ── retroalimentación viva ────────────────────────────────────────────
   const [nota, setNota] = useState<{ tono: "ok" | "no"; titulo: string; texto: string } | null>(null);
 
-  // ── modo 1 · subrayar ─────────────────────────────────────────────────
+  // ── modo 1 · subrayar y ver el resumen ────────────────────────────────
   const [txtIdx, setTxtIdx] = useState(0);
   const [marcador, setMarcador] = useState<Rol>("principal");
   const [marcas, setMarcas] = useState<Record<string, Rol>>({});
   const [shakeFrase, setShakeFrase] = useState<string | null>(null);
+  /** ¿Ya provocó alguna vez un resumen inflado con relleno? (experimento) */
+  const [inflo, setInflo] = useState(false);
   const texto = TEXTOS[txtIdx]!;
+  const an = useMemo(() => analiza(texto, marcas), [texto, marcas]);
 
-  const marcadasDe = (t: TextoLectura) => t.parrafos.reduce((n, p) => n + p.frases.filter((f) => marcas[f.id]).length, 0);
+  const rellenoMarcado = TODAS_LAS_FRASES.filter((f) => f.rol === "relleno" && marcas[f.id] === "relleno").length;
   const totalMarcadas = Object.keys(marcas).length;
-  const rellenoMarcado = Object.values(marcas).filter((r) => r === "relleno").length;
+  const principalesOk = (i: number) => TEXTOS[i]!.parrafos.every((p) => p.frases.filter((f) => f.rol === "principal").every((f) => marcas[f.id] === "principal"));
 
   const intentarMarcar = (fraseId: string) => {
-    if (marcas[fraseId]) return;
     const f = TODAS_LAS_FRASES.find((x) => x.id === fraseId);
     if (!f) return;
+    if (marcas[fraseId] === marcador) {
+      // Segundo toque con el mismo marcador: borra el subrayado.
+      setMarcas((m) => {
+        const n = { ...m };
+        delete n[fraseId];
+        return n;
+      });
+      setNota(null);
+      return;
+    }
+    setMarcas((m) => ({ ...m, [fraseId]: marcador }));
     if (f.rol === marcador) {
-      setMarcas((m) => ({ ...m, [fraseId]: f.rol }));
       sfxPlace();
       setNota({ tono: "ok", titulo: ROL_INFO[f.rol].label, texto: f.porque });
     } else {
       setShakeFrase(fraseId);
       sfxNo();
-      setNota({ tono: "no", titulo: `No es «${ROL_INFO[marcador].label}»`, texto: PISTA_ROL[marcador] });
+      const entra = marcador !== "relleno" && f.rol === "relleno";
+      if (entra) setInflo(true);
+      setNota({
+        tono: "no",
+        titulo: `No es «${ROL_INFO[marcador].label}»`,
+        texto: `${entra ? "Esa oración es relleno y ya se coló en tu resumen. " : ""}${PISTA_ROL[marcador]}`,
+      });
       window.setTimeout(() => setShakeFrase(null), 420);
     }
   };
@@ -307,8 +375,10 @@ export function LabIdeasClave({ color }: PracticaLabProps) {
   const [quizAprobado, setQuizAprobado] = useState(false);
 
   // ── objetivos ─────────────────────────────────────────────────────────
-  const subrayadoDe = (i: number) => marcadasDe(TEXTOS[i]!) >= FRASES_POR_TEXTO;
+  const subrayadoDe = (i: number) => correctoDe(TEXTOS[i]!, marcas);
   const objetivos = [
+    { txt: "Subraya sólo la idea principal de cada párrafo de «El maíz que nos hizo» y mira cómo se arma el resumen", done: principalesOk(0) },
+    { txt: "Marca una oración de relleno como idea y observa cómo se infla el resumen", done: inflo },
     { txt: "Subraya «El maíz que nos hizo»", done: subrayadoDe(0) },
     { txt: "Subraya «El Metro que mueve a la ciudad»", done: subrayadoDe(1) },
     { txt: "Subraya «Sesenta segundos de aviso»", done: subrayadoDe(2) },
@@ -366,174 +436,53 @@ export function LabIdeasClave({ color }: PracticaLabProps) {
   const reiniciarModo =
     modo === "subrayar" ? resetSubrayar : modo === "esquema" ? resetEsquema : modo === "resumen" ? resetResumen : resetHuecos;
 
+  const pctResumen = an.totalPal ? Math.round((an.resumenPal / an.totalPal) * 100) : 0;
+  const lectura =
+    modo === "subrayar" ? (
+      <>Resumen: {pctResumen}% del texto · ruido {an.ruidoN} · huecos {an.huecosPrincipal + an.huecosApoyo}</>
+    ) : modo === "esquema" ? (
+      <>Espacios: {slots.filter((s) => puestos[s.id]).length}/{slots.length}</>
+    ) : modo === "resumen" ? (
+      <>Resúmenes diagnosticados: {Object.keys(ubicRes).length}/{RESUMENES.length}</>
+    ) : (
+      <>Completa las palabras que faltan</>
+    );
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes idcShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
-        @keyframes idcPop { 0%{transform:scale(.7);opacity:0;} 100%{transform:scale(1);opacity:1;} }
-        @keyframes idcTrazo { from{background-size:0% 100%;} to{background-size:100% 100%;} }
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      dom
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })),
+        valor: modo,
+        cambiar: (id) => setModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={reiniciarModo} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      escena={
+        <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
+          <style>{css(accent, color.rgba)}</style>
 
-        .idc-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 16px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .idc-tab:hover { border-color:${T.lineStrong}; color:#fff; }
-        .idc-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-
-        .idc-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
-          font-size:14px; border:1px solid ${T.line}; background:${T.glass}; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .idc-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
-        .idc-icobtn:hover { background:rgba(255,255,255,0.12); }
-
-        .idc-prob { cursor:pointer; padding:8px 13px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass};
-          color:${T.text2}; font-size:12.5px; font-weight:800; transition:all .14s; }
-        .idc-prob:hover { border-color:${T.lineStrong}; color:#fff; }
-        .idc-prob[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; }
-        .idc-prob[data-done="true"] { color:${OK}; border-color:${OK}66; }
-
-        /* El marcador: la herramienta con la que se subraya */
-        .idc-pen { cursor:pointer; display:inline-flex; align-items:center; gap:10px; padding:11px 15px; border-radius:12px;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:${T.text2}; font-size:13px; font-weight:800;
-          transition:all .15s; text-align:left; }
-        .idc-pen:hover { border-color:${T.lineStrong}; color:#fff; transform:translateY(-1px); }
-        .idc-pen[data-on="true"] { color:#fff; transform:translateY(-2px); }
-
-        /* La oración dentro del texto: es un botón, pero se lee como texto */
-        .idc-frase { display:inline; box-decoration-break:clone; -webkit-box-decoration-break:clone;
-          padding:1px 2px; border-radius:4px; cursor:default; transition:background-color .14s, color .14s;
-          background-repeat:no-repeat; }
-        .idc-frase[data-armado="true"] { cursor:pointer; }
-        .idc-frase[data-armado="true"]:hover { background-color:rgba(255,255,255,0.10); }
-        .idc-frase:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
-        .idc-frase[data-rol="principal"] { color:#fff; font-weight:600;
-          background-image:linear-gradient(transparent 56%, ${ROLES_BG.principal} 56%, ${ROLES_BG.principal} 94%, transparent 94%);
-          animation:idcTrazo .32s ease-out; }
-        .idc-frase[data-rol="apoyo"] { color:#fff;
-          background-image:linear-gradient(transparent 60%, ${ROLES_BG.apoyo} 60%, ${ROLES_BG.apoyo} 92%, transparent 92%);
-          animation:idcTrazo .32s ease-out; }
-        .idc-frase[data-rol="relleno"] { color:${T.text3}; text-decoration:line-through; text-decoration-thickness:1.5px; }
-        .idc-frase[data-shake="true"] { animation:idcShake .4s; background-color:${NO}26; }
-
-        .idc-marca { display:inline-flex; vertical-align:baseline; font-size:10px; margin-left:5px; }
-
-        .idc-card { cursor:grab; display:block; padding:12px 15px; border-radius:13px; border:1.5px solid ${T.line};
-          background:${T.glassSoft}; color:${T.text}; font-size:13px; line-height:1.5; text-align:left; transition:all .14s; user-select:none; width:100%; }
-        .idc-card:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.07); }
-        .idc-card[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); box-shadow:0 0 16px -5px ${accent}; }
-        .idc-card:active { cursor:grabbing; }
-
-        .idc-slot { border-radius:12px; border:1.5px dashed ${T.lineStrong}; background:${T.inset}; min-height:52px;
-          display:flex; align-items:center; gap:10px; padding:10px 13px; color:${T.text3}; font-size:12.5px; transition:all .16s; width:100%; text-align:left; }
-        .idc-slot[data-libre="true"] { cursor:pointer; }
-        .idc-slot[data-libre="true"]:hover { border-color:${accent}; background:rgba(${color.rgba},0.1); }
-        .idc-slot[data-shake="true"] { animation:idcShake .4s; border-color:${NO}; }
-        .idc-slot[data-lleno="true"] { border-style:solid; animation:idcPop .25s ease; }
-
-        .idc-bin { border-radius:16px; border:2px dashed ${T.lineStrong}; padding:15px; min-height:120px; transition:all .16s;
-          --tono:188; position:relative; background-image:radial-gradient(120% 90% at 0% 0%, hsl(var(--tono) 72% 58% / 0.11) 0%, transparent 62%); }
-        .idc-bin[data-shake="true"] { animation:idcShake .4s; }
-        .idc-bin::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px;
-          background:linear-gradient(90deg, hsl(var(--tono) 78% 62%) 0%, hsl(var(--tono) 78% 62% / 0.15) 100%); }
-        .idc-bin:nth-of-type(4n+1) { --tono:152; }
-        .idc-bin:nth-of-type(4n+2) { --tono:214; }
-        .idc-bin:nth-of-type(4n+3) { --tono:44; }
-        .idc-bin:nth-of-type(4n+4) { --tono:22; }
-
-        .idc-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
-          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:13.5px; font-weight:800; transition:all .14s; }
-        .idc-btn:hover { border-color:${T.lineStrong}; }
-
-        .idc-divider { height:1px; background:${T.line}; margin:16px 0; }
-
-        .idc-grid { display:grid; grid-template-columns:minmax(0,1fr) clamp(300px,28vw,400px); gap:22px; align-items:start; }
-        .idc-bins { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:13px; }
-        @media (max-width: 980px){ .idc-grid { grid-template-columns:minmax(0,1fr); } .idc-bins { grid-template-columns:minmax(0,1fr); } }
-
-        /* Cajón de teoría */
-        .idc-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .idc-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .idc-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .idc-drawer[data-open="true"] { transform:translateX(0); }
-        .idc-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .idc-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .idc-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .idc-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .idc-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .idc-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .idc-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
-
-        @media (prefers-reduced-motion: reduce){
-          .idc-frase, .idc-slot, .idc-bin, .idc-pen { animation:none !important; transition:none; }
-          .idc-pen:hover, .idc-pen[data-on="true"] { transform:none; }
-        }
-      `}</style>
-
-      {/* barra de modos + herramientas */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="idc-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="idc-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="idc-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="idc-icobtn" onClick={reiniciarModo} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
-
-      {/* cajón de teoría */}
-      <button className="idc-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="idc-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="idc-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="idc-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="idc-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="idc-drawer-body">
-          <FichaTeorica data={IDEAS_CLAVE_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div className="idc-grid">
-        {/* ── Columna principal ───────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
           {modo === "subrayar" && (
             <SubrayarPanel
-              accent={accent}
-              rgba={color.rgba}
               texto={texto}
               txtIdx={txtIdx}
               marcador={marcador}
               marcas={marcas}
+              analisis={an}
               shakeFrase={shakeFrase}
-              marcadasEnTexto={marcadasDe(texto)}
-              totalMarcadas={totalMarcadas}
               onSelTexto={setTxtIdx}
               onSelMarcador={setMarcador}
               onFrase={intentarMarcar}
-              listo={(i) => subrayadoDe(i)}
+              listo={subrayadoDe}
             />
           )}
 
@@ -599,425 +548,481 @@ export function LabIdeasClave({ color }: PracticaLabProps) {
 
           {/* retroalimentación: el porqué de la última marca */}
           {modo !== "texto" && (
-            <div
-              role="status"
-              aria-live="polite"
-              style={{
-                borderRadius: 16,
-                padding: "14px 18px",
-                border: `1px solid ${nota ? (nota.tono === "ok" ? `${OK}55` : `${NO}55`) : T.line}`,
-                background: nota ? (nota.tono === "ok" ? `${OK}12` : `${NO}12`) : T.glass,
-                display: "flex",
-                gap: 13,
-                alignItems: "flex-start",
-                minHeight: 62,
-                transition: "all .18s",
-              }}
-            >
-              <i
-                className={`fa-solid ${nota ? (nota.tono === "ok" ? "fa-circle-check" : "fa-circle-question") : "fa-comment-dots"}`}
-                style={{ color: nota ? (nota.tono === "ok" ? OK : NO) : T.text3, fontSize: 17, marginTop: 2 }}
-              />
+            <div className="idc-nota" role="status" aria-live="polite" data-tono={nota?.tono ?? "vacio"}>
+              <i className={`fa-solid ${nota ? (nota.tono === "ok" ? "fa-circle-check" : "fa-circle-question") : "fa-comment-dots"}`} />
               <div style={{ minWidth: 0 }}>
-                <div style={{ fontSize: 11, fontWeight: 900, letterSpacing: "0.1em", textTransform: "uppercase", color: nota ? (nota.tono === "ok" ? OK : NO) : T.text3 }}>
-                  {nota ? nota.titulo : "¿Por qué?"}
-                </div>
-                <div style={{ marginTop: 4, fontSize: 13.5, lineHeight: 1.55, color: T.text2 }}>
-                  {nota ? nota.texto : "Cada vez que marques algo, aquí aparece la razón por la que esa oración es idea principal, detalle de apoyo o relleno."}
-                </div>
+                <strong>{nota ? nota.titulo : "¿Por qué?"}</strong>
+                <span>{nota ? nota.texto : "Cada vez que marques algo, aquí aparece la razón por la que esa oración es idea principal, detalle de apoyo o relleno."}</span>
               </div>
             </div>
           )}
         </div>
-
-        {/* ── Columna lateral ─────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos de la sesión
-            </Eyebrow>
-            <TableroObjetivos objetivos={objetivos} retoKey={RETO_KEY} accent={accent} />
-          </div>
-
-          <div
-            style={{
-              borderRadius: 18,
-              padding: "16px 18px",
-              border: `1px solid rgba(${color.rgba},0.3)`,
-              background: `rgba(${color.rgba},0.08)`,
-              fontSize: 13,
-              color: T.text2,
-              lineHeight: 1.55,
-              display: "flex",
-              gap: 12,
-            }}
-          >
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              {modo === "subrayar" && (
-                <>
-                  Elige un marcador y toca las oraciones. La <strong style={{ color: T.text }}>idea principal</strong> engloba al párrafo, el{" "}
-                  <strong style={{ color: T.text }}>detalle de apoyo</strong> la respalda y el <strong style={{ color: T.text }}>relleno</strong> no se subraya.
-                </>
-              )}
-              {modo === "esquema" && (
-                <>
-                  Arriba va el <strong style={{ color: T.text }}>tema del texto completo</strong>; debajo, la idea principal de cada párrafo, y colgando de ella el detalle que
-                  la sostiene. El relleno se queda fuera.
-                </>
-              )}
-              {modo === "resumen" && (
-                <>
-                  Un resumen bueno <strong style={{ color: T.text }}>reescribe las ideas principales con palabras propias</strong>. Los demás copian, se quedan en un detalle o
-                  añaden lo que el texto nunca dijo.
-                </>
-              )}
-              {modo === "texto" && (
-                <>
-                  Escribe las palabras que faltan. Si te atoras, usa la <strong style={{ color: T.text }}>pista</strong> de cada hueco o abre el banco de palabras.
-                </>
-              )}
-            </span>
-          </div>
-
-          {/* Pistas verbatim de la reflexión A3 */}
-          <div style={{ ...card, padding: "18px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-compass" style={{ marginRight: 8, color: accent }} />
-              Cómo encontrar lo esencial
-            </Eyebrow>
-            <ul style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 8 }}>
-              {PISTAS_A3.map((p, i) => (
-                <li key={i} style={{ fontSize: 13, lineHeight: 1.5, color: T.text2 }}>
-                  {p}
-                </li>
-              ))}
-            </ul>
-            <div style={{ marginTop: 12, fontSize: 11, color: T.text3, fontStyle: "italic" }}>Pistas verbatim de LC-I-P05-A3.</div>
-          </div>
-
-          {/* Lectura A1 verbatim */}
-          <div style={{ ...card, padding: "18px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book-open-reader" style={{ marginRight: 8, color: accent }} />
-              Lectura A1
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {LECTURA_A1.map((p, i) => (
-                <p key={i} style={{ margin: 0, fontSize: 12.8, lineHeight: 1.6, color: T.text2 }}>
-                  {p}
-                </p>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Hechos (V/F verbatim A5) + Glosario (A6) ───────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 16, marginTop: 22 }}>
-        <div style={{ ...card, padding: "20px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-scale-balanced" style={{ marginRight: 8, color: accent }} />
-            Hechos: verdadero o falso
-          </Eyebrow>
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {HECHOS.map((h, i) => (
-              <div key={i} style={{ borderRadius: 12, border: `1px solid ${T.line}`, background: T.inset, padding: "11px 14px" }}>
-                <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <span
-                    style={{
-                      flexShrink: 0,
-                      padding: "2px 9px",
-                      borderRadius: 999,
-                      fontSize: 10.5,
-                      fontWeight: 900,
-                      letterSpacing: "0.06em",
-                      color: h.respuesta ? OK : NO,
-                      border: `1px solid ${h.respuesta ? OK : NO}66`,
-                      background: `${h.respuesta ? OK : NO}14`,
-                    }}
-                  >
-                    {h.respuesta ? "VERDADERO" : "FALSO"}
-                  </span>
-                  <span style={{ fontSize: 13, lineHeight: 1.45, color: T.text }}>{h.enunciado}</span>
+      }
+      pestanas={[
+        {
+          id: "cuaderno",
+          etiqueta: "Cuaderno",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Tu partida" icono="fa-star">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8 }}>
+                  <Dato label="Oraciones marcadas" value={`${totalMarcadas}`} />
+                  <Dato label="Resúmenes" value={`${Object.keys(ubicRes).length}/${RESUMENES.length}`} />
                 </div>
-                <div style={{ marginTop: 7, fontSize: 12.3, lineHeight: 1.5, color: T.text3 }}>{h.retroalimentacion}</div>
-              </div>
-            ))}
-          </div>
-          <div style={{ marginTop: 12, fontSize: 11, color: T.text3, fontStyle: "italic" }}>Verbatim de LC-I-P05-A5.</div>
-        </div>
+              </Bloque>
+              <Bloque titulo="Los tres marcadores" icono="fa-highlighter">
+                {ROLES.map((r) => (
+                  <p key={r} style={{ margin: 0, color: T.text2 }}>
+                    <strong style={{ color: ROL_INFO[r].color }}>{ROL_INFO[r].label}.</strong> {ROL_INFO[r].descripcion}
+                  </p>
+                ))}
+              </Bloque>
+              <Bloque titulo="Cómo encontrar lo esencial" icono="fa-compass">
+                <ul style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 8 }}>
+                  {PISTAS_A3.map((p, i) => (
+                    <li key={i} style={{ color: T.text2 }}>
+                      {p}
+                    </li>
+                  ))}
+                </ul>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <RetoQuizCard
+              quiz={QUIZ}
+              accent={accent}
+              rgba={color.rgba}
+              aprobado={quizAprobado}
+              onAprobado={() => setQuizAprobado(true)}
+              playSfx={(ok) => (ok ? sfxOk() : sfxNo())}
+              playPick={sfxPick}
+              mensajeAprobado="Sabes distinguir lo esencial de lo accesorio."
+            />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book",
+          contenido: (
+            <>
+              <Bloque titulo="Lectura A1" icono="fa-book-open-reader">
+                {LECTURA_A1.map((p, i) => (
+                  <p key={i} style={{ margin: 0, color: T.text2 }}>
+                    {p}
+                  </p>
+                ))}
+              </Bloque>
+              <Bloque titulo="Dato" icono="fa-feather-pointed">
+                <p style={{ margin: 0, color: T.text2 }}>{DATO_IDEAS}</p>
+              </Bloque>
+              <Bloque titulo="Hechos: verdadero o falso" icono="fa-scale-balanced">
+                {HECHOS.map((h, i) => (
+                  <div key={i} className="idc-hecho">
+                    <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                      <span className="idc-chip" style={{ color: h.respuesta ? OK : NO, borderColor: `${h.respuesta ? OK : NO}66`, background: `${h.respuesta ? OK : NO}14` }}>
+                        {h.respuesta ? "VERDADERO" : "FALSO"}
+                      </span>
+                      <span style={{ color: T.text }}>{h.enunciado}</span>
+                    </div>
+                    <div style={{ marginTop: 6, color: T.text3 }}>{h.retroalimentacion}</div>
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Glosario de la progresión" icono="fa-spell-check">
+                {GLOSARIO.map((g) => (
+                  <div key={g.termino} className="idc-hecho">
+                    <div style={{ fontWeight: 900, color: accent }}>{g.termino}</div>
+                    <div style={{ marginTop: 3, color: T.text2 }}>{g.definicion}</div>
+                    <div style={{ marginTop: 4, color: T.text3, fontStyle: "italic" }}>{g.ejemplo}</div>
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={IDEAS_CLAVE_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ margin: "16px 0 0", color: T.text3, fontStyle: "italic" }}>{NOTA_PIE}</p>
+            </>
+          ),
+        },
+      ]}
+    />
+  );
+}
 
-        <div style={{ ...card, padding: "20px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-spell-check" style={{ marginRight: 8, color: accent }} />
-            Glosario de la progresión
-          </Eyebrow>
-          <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-            {GLOSARIO.map((g) => (
-              <div key={g.termino} style={{ borderRadius: 12, border: `1px solid ${T.line}`, background: T.inset, padding: "11px 14px" }}>
-                <div style={{ fontSize: 13.5, fontWeight: 900, color: accent }}>{g.termino}</div>
-                <div style={{ marginTop: 3, fontSize: 12.8, lineHeight: 1.5, color: T.text2 }}>{g.definicion}</div>
-                <div style={{ marginTop: 5, fontSize: 12, color: T.text3, fontStyle: "italic" }}>
-                  <i className="fa-solid fa-arrow-turn-up fa-rotate-90" style={{ marginRight: 7, opacity: 0.6 }} />
-                  {g.ejemplo}
-                </div>
-              </div>
-            ))}
-          </div>
-          <div style={{ marginTop: 12, fontSize: 11, color: T.text3, fontStyle: "italic" }}>Verbatim de LC-I-P05-A6.</div>
-        </div>
-      </div>
-
-      {/* Dato verbatim del recuadro de A1 */}
-      <div
-        style={{
-          marginTop: 16,
-          borderRadius: 18,
-          padding: "16px 20px",
-          border: `1px solid rgba(${color.rgba},0.28)`,
-          background: `rgba(${color.rgba},0.07)`,
-          fontSize: 13,
-          color: T.text2,
-          lineHeight: 1.6,
-          display: "flex",
-          gap: 13,
-        }}
-      >
-        <i className="fa-solid fa-feather-pointed" style={{ color: accent, fontSize: 17, marginTop: 2 }} />
-        <span>{DATO_IDEAS}</span>
-      </div>
-
-      <RetoQuizCard
-        quiz={QUIZ}
-        accent={accent}
-        rgba={color.rgba}
-        aprobado={quizAprobado}
-        onAprobado={() => setQuizAprobado(true)}
-        playSfx={(ok) => (ok ? sfxOk() : sfxNo())}
-        playPick={sfxPick}
-        mensajeAprobado="Sabes distinguir lo esencial de lo accesorio."
-      />
-
-      <p style={{ margin: "18px 0 0", paddingBottom: 60, fontSize: 11.5, lineHeight: 1.6, color: T.text3, fontStyle: "italic" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginRight: 7, opacity: 0.7 }} />
-        {NOTA_PIE}
-      </p>
+/** Foto de cabecera: se ve bien aunque el archivo aún no exista. */
+function Foto({ clave, icono }: { clave: string; icono: string }) {
+  const [ok, setOk] = useState(true);
+  return (
+    <div className="idc-foto">
+      <i className={`fa-solid ${icono}`} aria-hidden />
+      {ok && <img src={`${RUTA_FOTOS}/${clave}.webp`} alt="" loading="lazy" onError={() => setOk(false)} />}
     </div>
   );
 }
 
+const css = (accent: string, rgba: string) => `
+  @keyframes idcShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
+  @keyframes idcPop { 0%{transform:scale(.7);opacity:0;} 100%{transform:scale(1);opacity:1;} }
+  @keyframes idcTrazo { from{background-size:0% 100%;} to{background-size:100% 100%;} }
+
+  .idc-prob { cursor:pointer; padding:9px 14px; border-radius:11px; border:1px solid ${T.line}; background:${T.glass};
+    color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; text-align:left; }
+  .idc-prob:hover { border-color:${T.lineStrong}; color:#fff; }
+  .idc-prob[data-on="true"] { border-color:${accent}; background:rgba(${rgba},0.16); color:#fff; }
+  .idc-prob[data-done="true"] { color:${OK}; border-color:${OK}66; }
+
+  .idc-pens { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap:8px; }
+  .idc-pen { cursor:pointer; display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:12px;
+    border:1.5px solid ${T.line}; background:${T.glassSoft}; color:${T.text2}; font-size:14px; font-weight:800; transition:all .15s; text-align:left; }
+  .idc-pen:hover { border-color:${T.lineStrong}; color:#fff; }
+  .idc-pen[data-on="true"] { color:#fff; transform:translateY(-2px); }
+  .idc-pen-ico { width:30px; height:30px; flex-shrink:0; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:14px; color:#04121f; }
+
+  .idc-sim { display:grid; grid-template-columns:minmax(0,1fr); gap:14px; align-items:start; }
+  @container lsescena (min-width: 820px) { .idc-sim { grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); } }
+
+  .idc-art { border-radius:16px; border:1.5px solid ${T.line}; background:${T.glass}; overflow:hidden; min-width:0; }
+  .idc-foto { position:relative; width:100%; aspect-ratio:16/7; background:linear-gradient(135deg, rgba(${rgba},0.35), rgba(8,19,31,0.9)); display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,0.35); font-size:44px; }
+  .idc-foto img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .idc-art-cuerpo { padding:14px 16px 16px; }
+  .idc-art h3 { margin:0; font-size:21px; font-weight:900; color:#fff; line-height:1.2; }
+  .idc-art-sub { margin-top:3px; font-size:14.5px; color:${T.text2}; font-style:italic; }
+  .idc-parr { display:flex; gap:11px; margin-top:12px; }
+  .idc-parr-n { flex-shrink:0; width:26px; height:26px; margin-top:3px; border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:900; color:${T.text3}; border:1px solid ${T.line}; background:${T.inset}; }
+  .idc-parr p { margin:0; font-size:16px; line-height:1.9; color:${T.text2}; min-width:0; overflow-wrap:anywhere; }
+
+  .idc-frase { display:inline; box-decoration-break:clone; -webkit-box-decoration-break:clone; padding:1px 2px; border-radius:4px; cursor:pointer;
+    transition:background-color .14s, color .14s; background-repeat:no-repeat; }
+  .idc-frase:hover { background-color:rgba(255,255,255,0.10); }
+  .idc-frase:focus-visible { outline:2px solid ${accent}; outline-offset:2px; }
+  .idc-frase[data-rol="principal"] { color:#fff; font-weight:600;
+    background-image:linear-gradient(transparent 56%, ${ROLES_BG.principal} 56%, ${ROLES_BG.principal} 94%, transparent 94%); animation:idcTrazo .32s ease-out; }
+  .idc-frase[data-rol="apoyo"] { color:#fff;
+    background-image:linear-gradient(transparent 60%, ${ROLES_BG.apoyo} 60%, ${ROLES_BG.apoyo} 92%, transparent 92%); animation:idcTrazo .32s ease-out; }
+  .idc-frase[data-rol="relleno"] { color:${T.text3}; text-decoration:line-through; text-decoration-thickness:1.5px; }
+  .idc-frase[data-mal="true"] { text-decoration:underline wavy ${NO}; text-underline-offset:4px; }
+  .idc-frase[data-rol="relleno"][data-mal="true"] { text-decoration:line-through; text-decoration-color:${NO}; }
+  .idc-frase[data-shake="true"] { animation:idcShake .4s; background-color:${NO}26; }
+  .idc-marca { display:inline-flex; vertical-align:baseline; font-size:14px; margin-left:5px; }
+
+  .idc-vivo { display:flex; flex-direction:column; gap:12px; min-width:0; }
+  .idc-caja { border-radius:16px; border:1.5px solid ${T.line}; background:${T.glass}; padding:14px 16px; min-width:0; }
+  .idc-caja-t { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; font-size:14px; font-weight:900; letter-spacing:.06em; text-transform:uppercase; color:${T.text2}; margin-bottom:10px; }
+  .idc-caja-t i { color:${accent}; margin-right:8px; }
+
+  .idc-medidor { position:relative; height:18px; border-radius:10px; background:${T.inset}; overflow:hidden; border:1px solid ${T.line}; }
+  .idc-medidor > span { position:absolute; top:0; bottom:0; left:0; transition:width .3s; }
+  .idc-ideal { position:absolute; top:-3px; bottom:-3px; width:3px; background:#fff; border-radius:2px; }
+  .idc-med-pie { margin-top:7px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; font-size:14px; color:${T.text2}; }
+  .idc-veredicto { margin-top:10px; padding:10px 12px; border-radius:12px; font-size:14.5px; line-height:1.45; color:${T.text2}; border:1.5px solid ${T.line}; background:${T.inset}; }
+  .idc-veredicto[data-tono="ok"] { border-color:${OK}77; background:${OK}12; color:#fff; }
+  .idc-veredicto[data-tono="mal"] { border-color:${NO}77; background:${NO}10; }
+  .idc-veredicto[data-tono="aviso"] { border-color:${AVISO}77; background:${AVISO}10; }
+
+  .idc-res { display:flex; flex-direction:column; gap:8px; margin:0; padding:0; list-style:none; }
+  .idc-res li { padding:9px 11px; border-radius:11px; font-size:14.5px; line-height:1.45; color:${T.text2}; border:1.5px solid ${T.line}; background:${T.inset}; overflow-wrap:anywhere; animation:idcPop .25s ease; }
+  .idc-res li[data-rol="principal"] { border-color:${ROL_INFO.principal.color}88; color:#fff; font-weight:700; }
+  .idc-res li[data-rol="apoyo"] { border-color:${ROL_INFO.apoyo.color}88; margin-left:16px; }
+  .idc-res li[data-mal="true"] { border-color:${NO}; background:${NO}12; }
+  .idc-res li[data-hueco="true"] { border-style:dashed; border-color:${T.lineStrong}; background:transparent; color:${T.text3}; font-style:italic; animation:none; }
+  .idc-res small { display:block; font-size:14px; font-weight:800; color:${NO}; }
+
+  .idc-mapa { display:flex; flex-direction:column; gap:10px; }
+  .idc-nodo { padding:9px 12px; border-radius:12px; border:1.5px solid ${T.lineStrong}; background:${T.glassSoft}; font-size:14.5px; line-height:1.4; color:#fff; overflow-wrap:anywhere; }
+  .idc-nodo[data-centro="true"] { text-align:center; font-weight:900; background:rgba(${rgba},0.22); border-color:${accent}; }
+  .idc-nodo[data-rol="principal"] { border-color:${ROL_INFO.principal.color}99; }
+  .idc-nodo[data-rol="apoyo"] { border-color:${ROL_INFO.apoyo.color}99; font-size:14px; color:${T.text2}; }
+  .idc-nodo[data-mal="true"] { border-color:${NO}; background:${NO}12; }
+  .idc-nodo[data-hueco="true"] { border-style:dashed; border-color:${T.lineStrong}; background:transparent; color:${T.text3}; font-style:italic; }
+  .idc-rama { margin-left:14px; padding-left:14px; border-left:2px solid ${T.lineStrong}; display:flex; flex-direction:column; gap:8px; }
+  .idc-rama .idc-rama { margin-left:10px; }
+
+  .idc-nota { border-radius:14px; padding:12px 16px; border:1.5px solid ${T.line}; background:${T.glass}; display:flex; gap:12px; align-items:flex-start; min-height:60px; transition:all .18s; }
+  .idc-nota > i { font-size:17px; margin-top:2px; color:${T.text3}; }
+  .idc-nota strong { display:block; font-size:14px; font-weight:900; letter-spacing:.06em; text-transform:uppercase; color:${T.text3}; }
+  .idc-nota span { display:block; margin-top:4px; font-size:14.5px; line-height:1.5; color:${T.text2}; }
+  .idc-nota[data-tono="ok"] { border-color:${OK}55; background:${OK}12; }
+  .idc-nota[data-tono="ok"] > i, .idc-nota[data-tono="ok"] strong { color:${OK}; }
+  .idc-nota[data-tono="no"] { border-color:${NO}55; background:${NO}12; }
+  .idc-nota[data-tono="no"] > i, .idc-nota[data-tono="no"] strong { color:${NO}; }
+
+  .idc-card { cursor:grab; display:block; padding:11px 14px; border-radius:13px; border:1.5px solid ${T.line};
+    background:${T.glassSoft}; color:${T.text}; font-size:14.5px; line-height:1.5; text-align:left; transition:all .14s; user-select:none; width:100%; overflow-wrap:anywhere; }
+  .idc-card:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.07); }
+  .idc-card[data-sel="true"] { border-color:${accent}; background:rgba(${rgba},0.16); box-shadow:0 0 16px -5px ${accent}; }
+  .idc-card:active { cursor:grabbing; }
+  .idc-etq { display:inline-block; margin-right:9px; padding:1px 8px; border-radius:999px; font-size:14px; font-weight:900; border:1px solid ${T.line}; background:${T.inset}; color:${T.text3}; }
+
+  .idc-slot { border-radius:12px; border:1.5px dashed ${T.lineStrong}; background:${T.inset}; min-height:52px;
+    display:flex; align-items:center; gap:10px; padding:10px 12px; color:${T.text3}; font-size:14.5px; transition:all .16s; width:100%; text-align:left; min-width:0; }
+  .idc-slot[data-libre="true"] { cursor:pointer; }
+  .idc-slot[data-libre="true"]:hover { border-color:${accent}; background:rgba(${rgba},0.1); }
+  .idc-slot[data-shake="true"] { animation:idcShake .4s; border-color:${NO}; }
+  .idc-slot[data-lleno="true"] { border-style:solid; animation:idcPop .25s ease; }
+
+  .idc-bins { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap:12px; }
+  .idc-bin { border-radius:16px; border:2px dashed ${T.lineStrong}; padding:13px; min-height:110px; transition:all .16s; }
+  .idc-bin[data-shake="true"] { animation:idcShake .4s; }
+  .idc-bin-hit { font-size:14px; line-height:1.4; color:#fff; padding:8px 10px; border-radius:9px; animation:idcPop .25s ease; overflow-wrap:anywhere; }
+
+  .idc-chip { flex-shrink:0; padding:2px 9px; border-radius:999px; font-size:14px; font-weight:900; border:1px solid ${T.line}; }
+  .idc-hecho { padding:10px 12px; border-radius:12px; border:1px solid ${T.line}; background:${T.inset}; font-size:14.5px; line-height:1.5; }
+  .idc-hecho + .idc-hecho { margin-top:8px; }
+
+  @media (prefers-reduced-motion: reduce){
+    .idc-frase, .idc-slot, .idc-bin, .idc-pen, .idc-res li, .idc-medidor > span { animation:none !important; transition:none; }
+    .idc-pen:hover, .idc-pen[data-on="true"] { transform:none; }
+  }
+`;
+
 /* ═══════════════════════════════════════════════════════════════════════════
- * Modo 1 — «Subraya el texto»
+ * Modo 1 — «Subraya y mira el resumen» (el simulador)
  * ═══════════════════════════════════════════════════════════════════════════ */
 function SubrayarPanel({
-  accent,
-  rgba,
   texto,
   txtIdx,
   marcador,
   marcas,
+  analisis,
   shakeFrase,
-  marcadasEnTexto,
-  totalMarcadas,
   onSelTexto,
   onSelMarcador,
   onFrase,
   listo,
 }: {
-  accent: string;
-  rgba: string;
   texto: TextoLectura;
   txtIdx: number;
   marcador: Rol;
   marcas: Record<string, Rol>;
+  analisis: Analisis;
   shakeFrase: string | null;
-  marcadasEnTexto: number;
-  totalMarcadas: number;
   onSelTexto: (i: number) => void;
   onSelMarcador: (r: Rol) => void;
   onFrase: (id: string) => void;
   listo: (i: number) => boolean;
 }) {
-  const completo = marcadasEnTexto >= FRASES_POR_TEXTO;
+  const a = analisis;
+  const huecos = a.huecosPrincipal + a.huecosApoyo;
+  const nada = a.resumenPal === 0;
+  const tono = nada ? "vacio" : a.perfecto ? "ok" : a.ruidoN > 0 || a.malas > 0 ? "mal" : "aviso";
+  const mensaje = nada
+    ? "Todavía no hay resumen: subraya las ideas del artículo y mira cómo se arma aquí."
+    : a.perfecto
+      ? "Resumen limpio: tiene todas las ideas y nada de relleno."
+      : [
+          a.ruidoN > 0 ? `Inflado: ${a.ruidoPal} palabras de relleno se colaron en tu resumen.` : "",
+          huecos > 0 ? `Con huecos: faltan ${huecos} idea${huecos > 1 ? "s" : ""} del texto.` : "",
+          a.malas > 0 && a.ruidoN === 0 ? "Hay oraciones con el marcador equivocado (subrayado rojo)." : "",
+        ]
+          .filter(Boolean)
+          .join(" ");
+  const pctRes = a.totalPal ? (a.resumenPal / a.totalPal) * 100 : 0;
+  const pctRuido = a.totalPal ? (a.ruidoPal / a.totalPal) * 100 : 0;
+  const pctIdeal = a.totalPal ? (a.idealPal / a.totalPal) * 100 : 0;
+  const foto = FOTO_TEXTO[texto.id] ?? { clave: texto.id, icono: "fa-newspaper" };
+
   return (
     <>
-      <div style={{ display: "flex", alignItems: "center", gap: 9, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         {TEXTOS.map((t, i) => (
-          <button key={t.id} className="idc-prob" data-on={txtIdx === i} data-done={listo(i)} onClick={() => onSelTexto(i)}>
+          <button key={t.id} type="button" className="idc-prob" data-on={txtIdx === i} data-done={listo(i)} onClick={() => onSelTexto(i)}>
             {listo(i) && <i className="fa-solid fa-circle-check" style={{ marginRight: 6 }} />}
             {t.titulo}
           </button>
         ))}
-        <div style={{ flex: 1 }} />
-        <span style={{ fontSize: 12, fontWeight: 800, color: T.text3, fontVariantNumeric: "tabular-nums" }}>
-          {totalMarcadas}/{TOTAL_FRASES} oraciones en total
-        </span>
       </div>
 
-      {/* La caja de marcadores */}
-      <div style={{ ...card, padding: "16px 20px" }}>
-        <Eyebrow>
-          <i className="fa-solid fa-pen-ruler" style={{ marginRight: 8, color: accent }} />
-          Toma un marcador y toca las oraciones
-        </Eyebrow>
-        <div style={{ display: "flex", gap: 11, flexWrap: "wrap" }}>
-          {ROLES.map((r) => {
-            const info = ROL_INFO[r];
-            const on = marcador === r;
-            return (
-              <button
-                key={r}
-                className="idc-pen"
-                data-on={on}
-                onClick={() => onSelMarcador(r)}
-                aria-pressed={on}
-                style={{
-                  borderColor: on ? info.color : undefined,
-                  background: on ? `${info.color}26` : undefined,
-                  boxShadow: on ? `0 8px 22px -12px ${info.color}` : undefined,
-                }}
-              >
-                <span
-                  style={{
-                    width: 30,
-                    height: 30,
-                    flexShrink: 0,
-                    borderRadius: 9,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 13,
-                    color: "#04121f",
-                    background: info.color,
-                  }}
-                >
-                  <i className={`fa-solid ${info.icono}`} />
-                </span>
-                <span>
-                  <span style={{ display: "block", fontSize: 13, fontWeight: 900, color: on ? "#fff" : T.text2 }}>{info.label}</span>
-                  <span style={{ display: "block", fontSize: 11, color: T.text3, marginTop: 2, maxWidth: 230, lineHeight: 1.35 }}>{info.descripcion}</span>
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* El texto */}
-      <div style={{ ...card, padding: "22px 26px 24px" }}>
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 6 }}>
-          <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase", color: accent }}>
-              <i className="fa-solid fa-tag" style={{ marginRight: 7 }} />
-              Paratextos
-            </div>
-            <h3 style={{ margin: "7px 0 2px", fontSize: 22, fontWeight: 900, color: "#fff", lineHeight: 1.15 }}>{texto.titulo}</h3>
-            <div style={{ fontSize: 13.5, color: T.text2, fontStyle: "italic" }}>{texto.subtitulo}</div>
-          </div>
-          <span
-            style={{
-              flexShrink: 0,
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              padding: "6px 12px",
-              borderRadius: 999,
-              fontSize: 11.5,
-              fontWeight: 900,
-              color: completo ? OK : "#fff",
-              border: `1px solid ${completo ? `${OK}66` : `rgba(${rgba},0.4)`}`,
-              background: completo ? `${OK}14` : `rgba(${rgba},0.14)`,
-              fontVariantNumeric: "tabular-nums",
-            }}
-          >
-            <i className={`fa-solid ${completo ? "fa-circle-check" : "fa-highlighter"}`} />
-            {completo ? "Texto subrayado" : `${marcadasEnTexto}/${FRASES_POR_TEXTO} oraciones`}
-          </span>
-        </div>
-
-        <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 15 }}>
-          {texto.parrafos.map((p, i) => (
-            <div key={p.id} style={{ display: "flex", gap: 13 }}>
-              <span
-                style={{
-                  flexShrink: 0,
-                  width: 24,
-                  height: 24,
-                  borderRadius: 7,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 11,
-                  fontWeight: 900,
-                  color: T.text3,
-                  border: `1px solid ${T.line}`,
-                  background: T.inset,
-                  marginTop: 3,
-                }}
-              >
-                {i + 1}
+      <div className="idc-pens" role="group" aria-label="Marcadores">
+        {ROLES.map((r) => {
+          const info = ROL_INFO[r];
+          const on = marcador === r;
+          return (
+            <button
+              key={r}
+              type="button"
+              className="idc-pen"
+              data-on={on}
+              aria-pressed={on}
+              onClick={() => onSelMarcador(r)}
+              style={{ borderColor: on ? info.color : undefined, background: on ? `${info.color}26` : undefined }}
+            >
+              <span className="idc-pen-ico" style={{ background: info.color }}>
+                <i className={`fa-solid ${info.icono}`} />
               </span>
-              <p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.95, color: T.text2, minWidth: 0 }}>
-                {p.frases.map((f, j) => {
-                  const rol = marcas[f.id];
-                  return (
-                    <span key={f.id}>
-                      {/* Un <span> y no un <button>: el botón es un bloque atómico y
-                          partiría el párrafo en una oración por renglón. Aquí el
-                          texto tiene que fluir como un texto de verdad. */}
-                      <span
-                        className="idc-frase"
-                        role="button"
-                        tabIndex={rol ? -1 : 0}
-                        aria-disabled={!!rol}
-                        data-rol={rol ?? undefined}
-                        data-armado={!rol}
-                        data-shake={shakeFrase === f.id}
-                        data-frase={f.id}
-                        onClick={() => onFrase(f.id)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") {
-                            e.preventDefault();
-                            onFrase(f.id);
-                          }
-                        }}
-                        aria-label={rol ? `${f.texto} — marcada como ${ROL_INFO[rol].label}` : `Marcar: ${f.texto}`}
-                      >
-                        {f.texto}
-                        {rol && (
-                          <span className="idc-marca" style={{ color: ROL_INFO[rol].color }}>
-                            <i className={`fa-solid ${ROL_INFO[rol].icono}`} />
-                          </span>
-                        )}
+              {info.label}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="idc-sim">
+        <article className="idc-art">
+          <Foto key={texto.id} clave={foto.clave} icono={foto.icono} />
+          <div className="idc-art-cuerpo">
+            <h3>{texto.titulo}</h3>
+            <div className="idc-art-sub">{texto.subtitulo}</div>
+            {texto.parrafos.map((p, i) => (
+              <div key={p.id} className="idc-parr">
+                <span className="idc-parr-n">{i + 1}</span>
+                <p>
+                  {p.frases.map((f, j) => {
+                    const rol = marcas[f.id];
+                    return (
+                      <span key={f.id}>
+                        {/* Un <span> y no un <button>: el botón partiría el párrafo
+                            en una oración por renglón; aquí el texto fluye. */}
+                        <span
+                          className="idc-frase"
+                          role="button"
+                          tabIndex={0}
+                          data-rol={rol ?? undefined}
+                          data-mal={!!rol && rol !== f.rol}
+                          data-shake={shakeFrase === f.id}
+                          data-frase={f.id}
+                          onClick={() => onFrase(f.id)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              onFrase(f.id);
+                            }
+                          }}
+                          aria-label={rol ? `${f.texto} — marcada como ${ROL_INFO[rol].label}` : `Marcar: ${f.texto}`}
+                        >
+                          {f.texto}
+                          {rol && (
+                            <span className="idc-marca" style={{ color: ROL_INFO[rol].color }}>
+                              <i className={`fa-solid ${ROL_INFO[rol].icono}`} />
+                            </span>
+                          )}
+                        </span>
+                        {j < p.frases.length - 1 ? " " : ""}
                       </span>
-                      {j < p.frases.length - 1 ? " " : ""}
-                    </span>
+                    );
+                  })}
+                </p>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <div className="idc-vivo">
+          <div className="idc-caja">
+            <div className="idc-caja-t">
+              <span>
+                <i className="fa-solid fa-ruler-horizontal" />
+                Largo del resumen
+              </span>
+              <span style={{ color: T.text }}>
+                {a.resumenPal} de {a.totalPal} palabras
+              </span>
+            </div>
+            <div className="idc-medidor" role="img" aria-label={`El resumen usa ${Math.round(pctRes)} por ciento del texto`}>
+              <span style={{ width: `${pctRes - pctRuido}%`, background: OK }} />
+              <span style={{ left: `${pctRes - pctRuido}%`, width: `${pctRuido}%`, background: NO }} />
+              <span className="idc-ideal" style={{ left: `calc(${pctIdeal}% - 1px)`, width: 3, background: "#fff" }} />
+            </div>
+            <div className="idc-med-pie">
+              <span>
+                <i className="fa-solid fa-square" style={{ color: OK, marginRight: 6 }} />
+                ideas
+              </span>
+              <span>
+                <i className="fa-solid fa-square" style={{ color: NO, marginRight: 6 }} />
+                relleno
+              </span>
+              <span>
+                <i className="fa-solid fa-grip-lines-vertical" style={{ marginRight: 6 }} />
+                tope sin relleno
+              </span>
+            </div>
+            <div className="idc-veredicto" data-tono={tono} role="status">
+              {mensaje}
+            </div>
+          </div>
+
+          <div className="idc-caja">
+            <div className="idc-caja-t">
+              <span>
+                <i className="fa-solid fa-align-left" />
+                Tu resumen en vivo
+              </span>
+            </div>
+            <ul className="idc-res">
+              {texto.parrafos.map((p, i) => {
+                const subrayadas = p.frases.filter((f) => marcas[f.id] === "principal" || marcas[f.id] === "apoyo");
+                const faltaP = !p.frases.some((f) => f.rol === "principal" && marcas[f.id] === "principal");
+                const faltaA = !p.frases.some((f) => f.rol === "apoyo" && (marcas[f.id] === "apoyo" || marcas[f.id] === "principal"));
+                return [
+                  ...subrayadas.map((f) => (
+                    <li key={f.id} data-rol={marcas[f.id]} data-mal={marcas[f.id] !== f.rol && f.rol === "relleno"}>
+                      {f.rol === "relleno" && <small>Relleno: no informa sobre el tema</small>}
+                      {f.texto}
+                    </li>
+                  )),
+                  faltaP && (
+                    <li key={`${p.id}-hp`} data-hueco="true">
+                      Párrafo {i + 1}: falta su idea principal
+                    </li>
+                  ),
+                  faltaA && (
+                    <li key={`${p.id}-ha`} data-hueco="true" style={{ marginLeft: 16 }}>
+                      Párrafo {i + 1}: falta el detalle que la respalda
+                    </li>
+                  ),
+                ];
+              })}
+            </ul>
+          </div>
+
+          <div className="idc-caja">
+            <div className="idc-caja-t">
+              <span>
+                <i className="fa-solid fa-sitemap" />
+                Mapa de ideas
+              </span>
+            </div>
+            <div className="idc-mapa">
+              <div className="idc-nodo" data-centro="true">
+                {texto.titulo}
+              </div>
+              <div className="idc-rama">
+                {texto.parrafos.map((p, i) => {
+                  const princ = p.frases.find((f) => marcas[f.id] === "principal");
+                  const apoyos = p.frases.filter((f) => marcas[f.id] === "apoyo");
+                  return (
+                    <div key={p.id} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                      <div className="idc-nodo" data-rol={princ ? "principal" : undefined} data-hueco={!princ} data-mal={!!princ && princ.rol !== "principal"}>
+                        {princ ? recorta(princ.texto, 96) : `Párrafo ${i + 1}: idea principal pendiente`}
+                      </div>
+                      {apoyos.length > 0 && (
+                        <div className="idc-rama">
+                          {apoyos.map((f) => (
+                            <div key={f.id} className="idc-nodo" data-rol="apoyo" data-mal={f.rol !== "apoyo"}>
+                              {recorta(f.texto, 80)}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   );
                 })}
-              </p>
+              </div>
             </div>
-          ))}
-        </div>
-
-        <div className="idc-divider" />
-        <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center" }}>
-          {ROLES.map((r) => {
-            const info = ROL_INFO[r];
-            const n = texto.parrafos.reduce((acc, p) => acc + p.frases.filter((f) => marcas[f.id] === r).length, 0);
-            const tot = texto.parrafos.reduce((acc, p) => acc + p.frases.filter((f) => f.rol === r).length, 0);
-            return (
-              <span key={r} style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 12, fontWeight: 800, color: n >= tot ? info.color : T.text3 }}>
-                <span style={{ width: 11, height: 11, borderRadius: 3, background: info.color, opacity: n >= tot ? 1 : 0.45 }} />
-                {info.corto} <span style={{ fontVariantNumeric: "tabular-nums" }}>{n}/{tot}</span>
-              </span>
-            );
-          })}
-          <span style={{ flex: 1 }} />
-          <span style={{ fontSize: 11.5, color: T.text3, fontStyle: "italic" }}>{texto.fuente}</span>
+          </div>
         </div>
       </div>
+      <span style={{ fontSize: 14, color: T.text3, fontStyle: "italic" }}>
+        {texto.fuente}
+      </span>
     </>
   );
 }
@@ -1072,36 +1077,48 @@ function EsquemaPanel({
 
   return (
     <>
-      <div style={{ display: "flex", alignItems: "center", gap: 9, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
         {TEXTOS.map((t, i) => (
-          <button key={t.id} className="idc-prob" data-on={esqIdx === i} data-done={completo(t)} onClick={() => onSelTexto(i)}>
+          <button key={t.id} type="button" className="idc-prob" data-on={esqIdx === i} data-done={completo(t)} onClick={() => onSelTexto(i)}>
             {completo(t) && <i className="fa-solid fa-circle-check" style={{ marginRight: 6 }} />}
             {t.titulo}
           </button>
         ))}
-        <div style={{ flex: 1 }} />
-        <span style={{ fontSize: 12.5, fontWeight: 800, color: llenos >= slots.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
+        <span style={{ fontSize: 14, fontWeight: 800, color: llenos >= slots.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
           {llenos}/{slots.length} espacios
         </span>
       </div>
 
-      <div style={{ ...card, padding: "20px 24px" }}>
-        <Eyebrow>
-          <i className="fa-solid fa-sitemap" style={{ marginRight: 8, color: accent }} />
-          Esquema de «{texto.titulo}»
-        </Eyebrow>
+      <Mesa>
+        <div>
+          <div style={{ fontSize: 15, fontWeight: 800, color: T.text }}>Piezas del texto: arrástralas a su lugar</div>
+          <div style={{ fontSize: 14, color: T.text3 }}>Sobran cinco: los dos temas mal medidos y el relleno de los tres párrafos.</div>
+          {libres.length === 0 ? (
+            <div style={{ fontSize: 14.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+              <i className="fa-solid fa-circle-check" /> ¡Esquema armado! Cambia de texto para armar el siguiente.
+            </div>
+          ) : (
+            libres.map((p) => (
+              <button key={p.id} type="button" className="idc-card" data-sel={selPieza === p.id} onClick={() => onSelPieza(p.id)} {...dragProps(p.id)}>
+                <span className="idc-etq" style={p.kind === "tema" ? { color: accent, borderColor: `rgba(${rgba},0.45)` } : undefined}>
+                  {p.kind === "tema" ? "Tema" : `Párrafo ${p.parrafo}`}
+                </span>
+                {p.texto}
+              </button>
+            ))
+          )}
+        </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <div style={{ fontSize: 15, fontWeight: 800, color: T.text }}>Esquema de «{texto.titulo}»</div>
           {slots.map((s) => {
             const piezaId = puestos[s.id];
             const col = tipoColor[s.tipo];
-            const sangria = s.tipo === "tema" ? 0 : s.tipo === "principal" ? 22 : 46;
+            const sangria = s.tipo === "tema" ? 0 : s.tipo === "principal" ? 14 : 28;
             return (
-              <div key={s.id} style={{ marginLeft: sangria, display: "flex", gap: 10, alignItems: "stretch" }}>
-                {s.tipo !== "tema" && (
-                  <span aria-hidden style={{ width: 14, flexShrink: 0, borderLeft: `2px solid ${T.line}`, borderBottom: `2px solid ${T.line}`, borderBottomLeftRadius: 8, marginBottom: 20 }} />
-                )}
+              <div key={s.id} style={{ marginLeft: sangria, display: "flex", gap: 8, alignItems: "stretch", minWidth: 0 }}>
                 <button
+                  type="button"
                   className="idc-slot"
                   data-libre={!piezaId && !!selPieza}
                   data-lleno={!!piezaId}
@@ -1120,7 +1137,7 @@ function EsquemaPanel({
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      fontSize: 12,
+                      fontSize: 14,
                       color: piezaId ? "#04121f" : col,
                       background: piezaId ? col : `${col}22`,
                     }}
@@ -1128,9 +1145,9 @@ function EsquemaPanel({
                     <i className={`fa-solid ${s.tipo === "tema" ? "fa-diagram-project" : s.tipo === "principal" ? "fa-highlighter" : "fa-pen-nib"}`} />
                   </span>
                   <span style={{ minWidth: 0, flex: 1 }}>
-                    <span style={{ display: "block", fontSize: 10, fontWeight: 900, letterSpacing: "0.09em", textTransform: "uppercase", color: col }}>{s.label}</span>
-                    <span style={{ display: "block", marginTop: 3, fontSize: 13, lineHeight: 1.45, color: piezaId ? "#fff" : T.text3 }}>
-                      {piezaId ? textoDePieza(texto, piezaId) : selPieza ? "Toca aquí para colocar lo seleccionado" : "Vacío — elige una pieza abajo"}
+                    <span style={{ display: "block", fontSize: 14, fontWeight: 900, color: col }}>{s.label}</span>
+                    <span style={{ display: "block", marginTop: 3, fontSize: 14.5, lineHeight: 1.45, color: piezaId ? "#fff" : T.text3 }}>
+                      {piezaId ? textoDePieza(texto, piezaId) : selPieza ? "Toca aquí para colocar lo seleccionado" : "Vacío: elige una pieza"}
                     </span>
                   </span>
                 </button>
@@ -1138,44 +1155,7 @@ function EsquemaPanel({
             );
           })}
         </div>
-      </div>
-
-      <div style={{ ...card, padding: "18px 22px" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 13 }}>
-          <Eyebrow>Piezas del texto — arrástralas a su lugar</Eyebrow>
-          <span style={{ fontSize: 11.5, color: T.text3 }}>Sobran cinco: los dos temas mal medidos y el relleno de los tres párrafos.</span>
-        </div>
-        {libres.length === 0 ? (
-          <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
-            <i className="fa-solid fa-circle-check" /> ¡Esquema armado! Cambia de texto arriba para armar el siguiente.
-          </div>
-        ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
-            {libres.map((p) => (
-              <button key={p.id} className="idc-card" data-sel={selPieza === p.id} onClick={() => onSelPieza(p.id)} {...dragProps(p.id)}>
-                <span
-                  style={{
-                    display: "inline-block",
-                    marginRight: 9,
-                    padding: "2px 8px",
-                    borderRadius: 999,
-                    fontSize: 10,
-                    fontWeight: 900,
-                    letterSpacing: "0.05em",
-                    textTransform: "uppercase",
-                    color: p.kind === "tema" ? accent : T.text3,
-                    border: `1px solid ${p.kind === "tema" ? `rgba(${rgba},0.45)` : T.line}`,
-                    background: p.kind === "tema" ? `rgba(${rgba},0.12)` : T.inset,
-                  }}
-                >
-                  {p.kind === "tema" ? "Tema" : `Párrafo ${p.parrafo}`}
-                </span>
-                {p.texto}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+      </Mesa>
     </>
   );
 }
@@ -1208,33 +1188,31 @@ function ResumenPanel({
 }) {
   const colocados = Object.keys(ubicRes).length;
   return (
-    <>
-      <div style={{ ...card, padding: "18px 22px" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 13, flexWrap: "wrap", gap: 8 }}>
-          <Eyebrow>
+    <Mesa>
+      <div>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap", fontSize: 15, fontWeight: 800, color: T.text }}>
+          <span>
             <i className="fa-solid fa-clipboard-check" style={{ marginRight: 8, color: accent }} />
             Lee cada resumen y dictamina qué le pasa
-          </Eyebrow>
-          <span style={{ fontSize: 12.5, fontWeight: 800, color: colocados >= RESUMENES.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
+          </span>
+          <span style={{ color: colocados >= RESUMENES.length ? OK : T.text3 }}>
             {colocados}/{RESUMENES.length}
           </span>
         </div>
         {resLibres.length === 0 ? (
-          <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+          <div style={{ fontSize: 14.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
             <i className="fa-solid fa-circle-check" /> ¡Diagnosticaste los {RESUMENES.length} resúmenes!
           </div>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {resLibres.map((r) => (
-              <button key={r.id} className="idc-card" data-sel={selRes === r.id} onClick={() => onSelRes(r.id)} {...dragProps(r.id)}>
-                <span style={{ display: "block", fontSize: 10, fontWeight: 900, letterSpacing: "0.07em", textTransform: "uppercase", color: T.text3, marginBottom: 5 }}>
-                  <i className="fa-solid fa-book-bookmark" style={{ marginRight: 7 }} />
-                  Resumen de «{r.deTexto}»
-                </span>
-                {r.texto}
-              </button>
-            ))}
-          </div>
+          resLibres.map((r) => (
+            <button key={r.id} type="button" className="idc-card" data-sel={selRes === r.id} onClick={() => onSelRes(r.id)} {...dragProps(r.id)}>
+              <span style={{ display: "block", fontSize: 14, fontWeight: 900, color: T.text3, marginBottom: 5 }}>
+                <i className="fa-solid fa-book-bookmark" style={{ marginRight: 7 }} />
+                Resumen de «{r.deTexto}»
+              </span>
+              {r.texto}
+            </button>
+          ))
         )}
       </div>
 
@@ -1260,38 +1238,26 @@ function ResumenPanel({
               style={{ borderColor: `${info.color}66`, background: `${info.color}0d`, cursor: selRes ? "pointer" : "default" }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-                <span style={{ width: 30, height: 30, flexShrink: 0, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "#fff", background: `${info.color}33` }}>
+                <span style={{ width: 30, height: 30, flexShrink: 0, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "#fff", background: `${info.color}33` }}>
                   <i className={`fa-solid ${info.icono}`} />
                 </span>
                 <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: 13, fontWeight: 900, color: "#fff" }}>{info.label}</div>
-                  <div style={{ fontSize: 10.5, color: T.text3, lineHeight: 1.35 }}>{info.descripcion}</div>
+                  <div style={{ fontSize: 14.5, fontWeight: 900, color: "#fff" }}>{info.label}</div>
+                  <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.35 }}>{info.descripcion}</div>
                 </div>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
                 {dentro.map((r) => (
-                  <span
-                    key={r.id}
-                    style={{
-                      animation: "idcPop .25s ease",
-                      fontSize: 11.5,
-                      lineHeight: 1.4,
-                      color: "#fff",
-                      padding: "8px 10px",
-                      borderRadius: 9,
-                      background: `${info.color}1f`,
-                      border: `1px solid ${info.color}55`,
-                    }}
-                  >
-                    {r.texto.length > 96 ? r.texto.slice(0, 94) + "…" : r.texto}
+                  <span key={r.id} className="idc-bin-hit" style={{ background: `${info.color}1f`, border: `1px solid ${info.color}55` }}>
+                    {recorta(r.texto, 96)}
                   </span>
                 ))}
-                {dentro.length === 0 && <span style={{ fontSize: 11.5, color: T.text3, fontStyle: "italic" }}>Vacío</span>}
+                {dentro.length === 0 && <span style={{ fontSize: 14, color: T.text3, fontStyle: "italic" }}>Vacío</span>}
               </div>
             </div>
           );
         })}
       </div>
-    </>
+    </Mesa>
   );
 }

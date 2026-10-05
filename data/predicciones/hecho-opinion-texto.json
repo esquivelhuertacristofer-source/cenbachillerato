@@ -1,0 +1,12 @@
+{
+  "escena": "Un anuncio de cuadernos mezcla precio, material y frases como «el cuaderno que todo estudiante merece». A un lado se mide qué hay en el texto.",
+  "pregunta": "Si etiquetas «es el cuaderno que todo estudiante merece» como información, ¿qué pasa con la lectura del anuncio?",
+  "opciones": [
+    { "id": "a", "texto": "Parece más confiable de lo que es", "icono": "fa-arrow-up" },
+    { "id": "b", "texto": "Se vuelve más persuasivo", "icono": "fa-bullhorn" },
+    { "id": "c", "texto": "No cambia, es una frase más", "icono": "fa-equals" }
+  ],
+  "correcta": "a",
+  "porque": "Una opinión no se puede comprobar. Al llamarla información, sube la parte comprobable del texto y el veredicto sugiere decidir con datos cuando en realidad te están empujando.",
+  "comoComprobarlo": "En «Etiqueta el texto», abre el anuncio, etiqueta esa frase como Información y observa la barra de composición y el veredicto; luego etiquétala como Opinión."
+}

@@ -20,8 +20,8 @@
 
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Html, Stars } from "@react-three/drei";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { OrbitControls, Html, Stars, PerspectiveCamera } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { calcularEstado, CO2_MAX, CO2_REF } from "./subsistemas-data";
 import { Escenario } from "./_escenario";
@@ -144,26 +144,68 @@ function Pluma({ origen, dir, n, color, vel, pausado, ancho }: {
   );
 }
 
-/* ─── Etiqueta de un subsistema ─────────────────────────────────────────── */
-function Etiqueta({ pos, color, icono, nombre, dato }: {
-  pos: [number, number, number]; color: string; icono: string; nombre: string; dato: string;
+/* ─── Etiqueta de un subsistema ─────────────────────────────────────────────
+ * Tamaño fijo en píxeles (sin distanceFactor), ≥ 14 px, desplazada hacia afuera
+ * del planeta para no taparlo. El dato corto solo se muestra en pantallas anchas. */
+function Etiqueta({ pos, color, icono, nombre, dato, ancho }: {
+  pos: [number, number, number]; color: string; icono: string; nombre: string; dato?: string; ancho: boolean;
 }) {
   return (
-    <Html position={pos} center distanceFactor={15} pointerEvents="none">
-      <div style={{ display: "flex", flexDirection: "column", gap: 2, padding: "5px 11px", borderRadius: 12, background: "rgba(2,12,28,0.82)", border: `1px solid ${color}88`, whiteSpace: "nowrap", backdropFilter: "blur(6px)" }}>
+    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 1, padding: "4px 10px", borderRadius: 10, background: "rgba(4,10,22,0.88)", border: `1.5px solid ${color}`, whiteSpace: "nowrap", boxShadow: "0 4px 16px rgba(0,0,0,0.5)", fontFamily: "system-ui, sans-serif" }}>
         <span style={{ display: "flex", alignItems: "center", gap: 7 }}>
-          <i className={`fa-solid ${icono}`} style={{ color, fontSize: 12 }} />
-          <span style={{ color: "#eaf2fb", fontSize: 11.5, fontWeight: 800 }}>{nombre}</span>
+          <i className={`fa-solid ${icono}`} style={{ color, fontSize: 14 }} />
+          <span style={{ color: "#eaf2fb", fontSize: 14, fontWeight: 900 }}>{nombre}</span>
         </span>
-        <span style={{ color, fontSize: 10.5, fontWeight: 700, fontFamily: "ui-monospace, monospace" }}>{dato}</span>
+        {ancho && dato && <span style={{ color, fontSize: 14, fontWeight: 800, fontFamily: "ui-monospace, monospace" }}>{dato}</span>}
       </div>
     </Html>
+  );
+}
+
+/* ─── Termómetro: EL medidor del experimento ───────────────────────────────
+ * Sube y se tiñe de azul a rojo con ΔT. La marca blanca es el límite de +1,5 °C. */
+const T_MIN = -0.5, T_MAX = 4.5, T_ALTO = 3.4, T_BASE_Y = -1.9;
+function Termometro({ deltaT, x }: { deltaT: number; x: number }) {
+  const f = Math.min(1, Math.max(0.02, (deltaT - T_MIN) / (T_MAX - T_MIN)));
+  const col = useMemo(() => new THREE.Color("#4aa8ff").lerp(new THREE.Color("#ff4d2e"), Math.min(1, Math.max(0, deltaT / 3))), [deltaT]);
+  const yMarca = T_BASE_Y + ((1.5 - T_MIN) / (T_MAX - T_MIN)) * T_ALTO;
+  const yCero = T_BASE_Y + ((0 - T_MIN) / (T_MAX - T_MIN)) * T_ALTO;
+  return (
+    <group position={[x, 0, 0]}>
+      {/* tubo de vidrio */}
+      <mesh position={[0, T_BASE_Y + T_ALTO / 2, 0]}>
+        <boxGeometry args={[0.34, T_ALTO, 0.34]} />
+        <meshStandardMaterial color="#cfe6ff" transparent opacity={0.22} roughness={0.2} />
+      </mesh>
+      {/* bulbo */}
+      <mesh position={[0, T_BASE_Y - 0.1, 0]}>
+        <sphereGeometry args={[0.34, 20, 20]} />
+        <meshStandardMaterial color={col} emissive={col} emissiveIntensity={0.5} roughness={0.35} />
+      </mesh>
+      {/* columna de líquido */}
+      <mesh position={[0, T_BASE_Y + (T_ALTO * f) / 2, 0]} scale={[1, f, 1]}>
+        <boxGeometry args={[0.2, T_ALTO, 0.2]} />
+        <meshStandardMaterial color={col} emissive={col} emissiveIntensity={0.5} roughness={0.35} />
+      </mesh>
+      {/* marca de 0 °C (1850) */}
+      <mesh position={[0, yCero, 0.2]}>
+        <boxGeometry args={[0.56, 0.05, 0.05]} />
+        <meshStandardMaterial color="#9fe3b5" emissive="#9fe3b5" emissiveIntensity={0.4} />
+      </mesh>
+      {/* marca del límite +1,5 °C */}
+      <mesh position={[0, yMarca, 0.2]}>
+        <boxGeometry args={[0.7, 0.07, 0.07]} />
+        <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.5} />
+      </mesh>
+    </group>
   );
 }
 
 /* ─── El planeta y sus subsistemas ──────────────────────────────────────── */
 function Planeta(props: SubsistemasSceneProps) {
   const { co2, veg, volc, permafrost, pausado } = props;
+  const ancho = useThree((st) => st.size.width) >= 640;
   const est = useMemo(() => calcularEstado(co2, veg, volc, permafrost), [co2, veg, volc, permafrost]);
 
   const planeta = useRef<THREE.Group>(null);
@@ -247,33 +289,21 @@ function Planeta(props: SubsistemasSceneProps) {
         <meshStandardMaterial color={tintAtmos} emissive={tintAtmos} emissiveIntensity={0.35} transparent opacity={opAtmos * 0.5} side={THREE.FrontSide} depthWrite={false} />
       </mesh>
 
-      {/* etiquetas de los cuatro subsistemas */}
-      <Etiqueta pos={[0, 3.0, 0]} color="#7cc4ff" icono="fa-wind" nombre="Atmósfera" dato={`${Math.round(co2)} ppm CO₂`} />
-      <Etiqueta pos={[3.0, 0.4, 0.6]} color="#3aa0ff" icono="fa-water" nombre="Hidrosfera" dato={`pH ${est.ph.toFixed(2)}`} />
-      {/* LAS CUATRO, SEPARADAS EN PANTALLA Y NO SOLO EN EL MUNDO.
-       *
-       * «Biosfera» estaba en [0.4, −0.3, 3.0]: casi centrada y muy adelantada
-       * hacia la cámara, así que se proyectaba justo encima de «Litosfera» y le
-       * tapaba el dato —se leía «Litosfera» y debajo media palabra—. Dos puntos
-       * separados en 3D pueden caer pegados en la imagen; lo que hay que
-       * separar es donde ATERRIZAN. Litosfera baja a la izquierda y Biosfera al
-       * frente-derecha, cada una en su cuadrante. */}
-      <Etiqueta pos={[-3.3, -1.7, 0.6]} color="#c2895a" icono="fa-mountain" nombre="Litosfera" dato={volc > 0 ? "volcán activo" : "estable"} />
-      <Etiqueta pos={[2.1, -2.4, 2.2]} color="#34D399" icono="fa-leaf" nombre="Biosfera" dato={`${Math.round(veg)}% cobertura`} />
+      {/* termómetro de ΔT (el medidor del experimento) */}
+      <Termometro deltaT={est.deltaT} x={-3.5} />
 
-      {/* Sol como motor energético */}
-      <group position={[-5.0, 4.0, 2.4]}>
-        <mesh>
-          <sphereGeometry args={[0.5, 20, 20]} />
-          <meshStandardMaterial color="#ffd24a" emissive="#ffd24a" emissiveIntensity={2.2} toneMapped={false} />
-        </mesh>
-        <Html center distanceFactor={16} pointerEvents="none">
-          <div style={{ transform: "translateY(28px)", display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap" }}>
-            <i className="fa-solid fa-sun" style={{ color: "#ffd24a", fontSize: 13 }} />
-            <span style={{ color: "#ffe08a", fontSize: 11, fontWeight: 800 }}>energía solar</span>
-          </div>
-        </Html>
-      </group>
+      {/* Cuatro etiquetas, una por subsistema, cada una en su cuadrante.
+       * La atmósfera lleva la lectura del termómetro. */}
+      <Etiqueta ancho={ancho} pos={[0, 3.05, 0]} color="#7cc4ff" icono="fa-wind" nombre="Atmósfera" dato={`${est.deltaT >= 0 ? "+" : ""}${est.deltaT.toFixed(1)} °C`} />
+      <Etiqueta ancho={ancho} pos={[3.3, 0.5, 0.6]} color="#3aa0ff" icono="fa-water" nombre="Hidrosfera" dato={`pH ${est.ph.toFixed(2)}`} />
+      <Etiqueta ancho={ancho} pos={[-1.6, -2.9, 1.8]} color="#c2895a" icono="fa-mountain" nombre="Litosfera" dato={volc > 0 ? "volcán activo" : "estable"} />
+      <Etiqueta ancho={ancho} pos={[2.0, -2.9, 1.8]} color="#34D399" icono="fa-leaf" nombre="Biosfera" dato={`${Math.round(veg)}% cobertura`} />
+
+      {/* Sol como motor energético (sin rótulo: la info va al panel) */}
+      <mesh position={[5.0, 3.6, -3.0]}>
+        <sphereGeometry args={[0.45, 20, 20]} />
+        <meshStandardMaterial color="#ffd24a" emissive="#ffd24a" emissiveIntensity={1.6} />
+      </mesh>
     </group>
   );
 }
@@ -285,7 +315,6 @@ export default function SubsistemasScene(props: SubsistemasSceneProps) {
       shadows
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
-      camera={{ position: [8.5, 4, 10.5], fov: 44 }}
     >
       <Contenido {...props} />
     </Canvas>
@@ -294,8 +323,12 @@ export default function SubsistemasScene(props: SubsistemasSceneProps) {
 
 function Contenido(props: SubsistemasSceneProps) {
   const { accent, autoRotate, resetNonce } = props;
+  const angosto = useThree((st) => st.size.width) < 640;
+  // contenido ~60 % del alto, entre la barra de arriba y la misión de abajo
+  const cam: [number, number, number] = angosto ? [9, 3.6, 12] : [7.4, 3.2, 9.4];
   return (
     <>
+      <PerspectiveCamera makeDefault position={cam} fov={44} />
       {/* AQUÍ NO HAY SUELO: ESTO ES EL ESPACIO.
        *
        * La campaña de calidad 3D le puso mesa a 112 escenas porque la falta de
@@ -321,11 +354,11 @@ function Contenido(props: SubsistemasSceneProps) {
 
       <OrbitControls
         enablePan={false}
-        minDistance={7}
+        minDistance={6}
         maxDistance={28}
         minPolarAngle={Math.PI / 8}
         maxPolarAngle={Math.PI / 1.9}
-        target={[0, 0, 0]}
+        target={[0, -0.7, 0]}
         autoRotate={autoRotate}
         autoRotateSpeed={0.4}
       />

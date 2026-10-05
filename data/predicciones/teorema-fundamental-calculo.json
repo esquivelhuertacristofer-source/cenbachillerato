@@ -1,0 +1,12 @@
+{
+  "escena": "El área bajo f(x) = 2x hasta b = 3, cubierta con 6 rectángulos amarillos de Riemann.",
+  "pregunta": "Subes de 6 a 40 rectángulos. ¿Qué le pasa al error de la suma de Riemann?",
+  "opciones": [
+    { "id": "a", "texto": "Aumenta, hay más piezas", "icono": "fa-arrow-up" },
+    { "id": "b", "texto": "Casi desaparece", "icono": "fa-arrow-down" },
+    { "id": "c", "texto": "Se queda igual", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "Cada rectángulo más delgado deja menos hueco entre su borde y la curva. Con más piezas la suma se pega al área exacta, y ese límite es justo la integral definida.",
+  "comoComprobarlo": "Mueve el deslizador de rectángulos n y mira el porcentaje de error en el medidor."
+}

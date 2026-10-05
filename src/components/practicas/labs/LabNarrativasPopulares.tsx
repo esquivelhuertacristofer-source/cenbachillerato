@@ -41,7 +41,14 @@ import { CompletaTexto } from "./_mecanica-huecos";
 import { EscribeTermino } from "./_mecanica-termino";
 import { NARRATIVAS_POPULARES_HUECOS } from "./narrativas-populares-huecos";
 import { usePartida, MarcadorPartida } from "./_partida";
-import { TableroObjetivos } from "./_objetivos";
+import { LabShell, Bloque, BotonHerramienta, Mesa, Dato } from "./_shell";
+import {
+  PARTES_FOGON,
+  VERSIONES_FOGON,
+  versionPorId,
+  evaluarFogon,
+  type EligeFogon,
+} from "./narrativas-populares-fogon";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { NARRATIVAS_POPULARES_FICHA } from "./narrativas-populares-ficha";
@@ -67,10 +74,12 @@ import {
 
 const NO = "#FF5E5E";
 const RETO_KEY = "cen-narrativas-populares-lengua-reto";
+const RUTA_FOTOS = "/media/labs-sim/narrativas-populares-lengua";
 
-type Modo = "rasgos" | "registro" | "voces" | "glosario" | "texto";
+type Modo = "fogon" | "rasgos" | "registro" | "voces" | "glosario" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
+  { id: "fogon", label: "El fogón", icono: "fa-fire" },
   { id: "rasgos", label: "Marca los rasgos", icono: "fa-highlighter" },
   { id: "registro", label: "De la voz al papel", icono: "fa-right-left" },
   { id: "voces", label: "¿De dónde viene esa voz?", icono: "fa-language" },
@@ -89,12 +98,11 @@ const IDS_CIERRE = MARCAS.filter((m) => m.rasgo === "cierre").map((m) => m.id);
 
 export function LabNarrativasPopulares({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
-  const [modo, setModo] = useState<Modo>("rasgos");
+  const [modo, setModo] = useState<Modo>("fogon");
 
   // ── sonido y partida ──────────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   useEffect(() => () => audioRef.current?.dispose(), []);
   const toggleSonido = async () => {
@@ -121,6 +129,33 @@ export function LabNarrativasPopulares({ color }: PracticaLabProps) {
     partida.acierto();
     if (txt) setPie({ ok: true, txt });
     return sonido && audioRef.current?.blip();
+  };
+
+  // ── modo 0: el fogón (simulador) ──────────────────────────────────────
+  const [eligeFogon, setEligeFogon] = useState<EligeFogon>([null, null, null, null]);
+  const [parteActiva, setParteActiva] = useState(0);
+  const [fogonLleno, setFogonLleno] = useState(false);
+  const lecFogon = evaluarFogon(eligeFogon);
+
+  const elegirVersionFogon = (id: string) => {
+    const v = versionPorId(id);
+    if (!v) return;
+    const nuevo = eligeFogon.map((x, i) => (i === v.parte ? id : x));
+    setEligeFogon(nuevo);
+    const lec = evaluarFogon(nuevo);
+    if (lec.oyentes === 4) setFogonLleno(true);
+    if (v.rasgo) {
+      sfxPlace(`${RASGO_INFO[v.rasgo].label}: ${v.porque}`);
+      if (lec.oyentes === 4) sfxOk();
+    } else {
+      sfxNo(`Registro neutro: ${v.porque}`);
+    }
+    if (parteActiva < 3) setParteActiva(parteActiva + 1);
+  };
+  const resetFogon = () => {
+    setEligeFogon([null, null, null, null]);
+    setParteActiva(0);
+    setPie(null);
   };
 
   // ── modo 1: marca los rasgos ──────────────────────────────────────────
@@ -263,6 +298,8 @@ export function LabNarrativasPopulares({ color }: PracticaLabProps) {
   const vocesDone = Object.keys(ubicVoz).length >= VOCES.length;
 
   const objetivos = [
+    { txt: "Cuenta la leyenda: elige una versión en cada una de las 4 partes", done: lecFogon.llenas >= 4 },
+    { txt: "Llena el fogón: usa 4 rasgos orales distintos", done: fogonLleno },
     { txt: `Marca los ${TOTAL_MARCAS} rasgos de los tres relatos`, done: rasgosDone },
     { txt: "Distingue la fórmula de apertura de la de cierre", done: formulasDone },
     { txt: `Reescribe las ${CASOS_REGISTRO.length} frases en registro escrito`, done: versionesDone },
@@ -275,8 +312,10 @@ export function LabNarrativasPopulares({ color }: PracticaLabProps) {
   ];
 
   const resetActual =
-    modo === "rasgos"
-      ? resetRasgos
+    modo === "fogon"
+      ? resetFogon
+      : modo === "rasgos"
+        ? resetRasgos
       : modo === "registro"
         ? resetRegistro
         : modo === "voces"
@@ -284,6 +323,15 @@ export function LabNarrativasPopulares({ color }: PracticaLabProps) {
           : modo === "glosario"
             ? resetGlosario
             : resetTexto;
+
+  const lectura =
+    modo === "fogon"
+      ? `Oyentes en el fogón: ${lecFogon.oyentes} de 4.`
+      : pie
+        ? pie.ok
+          ? "Bien visto: lee la explicación."
+          : "Revisa la explicación abajo."
+        : "Cada decisión trae su explicación.";
 
   // arrastre nativo (ratón) + clic para seleccionar y clic para colocar (táctil)
   const dragProps = (id: string) => ({
@@ -335,143 +383,125 @@ export function LabNarrativasPopulares({ color }: PracticaLabProps) {
     },
   });
 
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes napShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
-        @keyframes napPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
-        .nap-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 15px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13px; font-weight:800; transition:all .14s; }
-        .nap-tab:hover { border-color:${T.lineStrong}; color:#fff; }
-        .nap-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-        .nap-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
-          font-size:14px; border:1px solid ${T.line}; background:${T.glass}; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .nap-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
-        .nap-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .nap-prob { cursor:pointer; padding:8px 13px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass};
-          color:${T.text2}; font-size:12.5px; font-weight:800; transition:all .14s; }
-        .nap-prob:hover { border-color:${T.lineStrong}; color:#fff; }
-        .nap-prob[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; }
-        .nap-prob[data-done="true"] { color:${OK}; border-color:${OK}66; }
-
-        /* Fragmento marcable dentro del relato */
-        .nap-marca { cursor:pointer; display:inline; font:inherit; color:#fff; padding:2px 5px; margin:0 1px;
-          border:none; border-bottom:2px dashed ${T.lineStrong}; background:rgba(255,255,255,0.05);
-          border-radius:5px 5px 0 0; transition:background .14s, border-color .14s, box-shadow .14s; }
-        .nap-marca:hover:not(:disabled) { background:rgba(255,255,255,0.13); border-bottom-color:${accent}; }
-        .nap-marca[data-sel="true"] { background:rgba(${color.rgba},0.26); border-bottom-color:${accent};
-          box-shadow:0 0 0 2px rgba(${color.rgba},0.35); }
-        .nap-marca[data-shake="true"] { animation:napShake .4s; border-bottom-color:${NO}; background:${NO}22; }
-        .nap-marca:disabled { cursor:default; border-bottom-style:solid; }
-
-        /* Chips de la paleta de rasgos */
-        .nap-rasgo { cursor:pointer; display:inline-flex; align-items:center; gap:8px; padding:9px 14px; border-radius:999px;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:12.5px; font-weight:800; transition:all .14s; }
-        .nap-rasgo:hover:not(:disabled) { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); transform:translateY(-2px); }
-        .nap-rasgo:disabled { cursor:default; opacity:.45; }
-
-        .nap-opt { cursor:pointer; display:flex; align-items:flex-start; gap:12px; width:100%; text-align:left;
-          border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2};
-          font-size:13.5px; line-height:1.55; font-weight:600; padding:13px 16px; transition:all .14s; }
-        .nap-opt:hover:not(:disabled) { border-color:${T.lineStrong}; background:${T.glassSoft}; color:#fff; }
-        .nap-opt:disabled { cursor:default; }
-        .nap-opt[data-ok="true"] { border-color:${OK}; background:${OK}16; color:#fff; }
-        .nap-opt[data-bad="true"] { border-color:${NO}; background:${NO}14; color:#fff; animation:napShake .4s; }
-
-        .nap-chip { cursor:grab; display:inline-flex; align-items:center; gap:8px; padding:10px 16px; border-radius:999px;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:14px; font-weight:800; transition:all .14s; user-select:none; }
-        .nap-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); transform:translateY(-2px); }
-        .nap-chip[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.2); box-shadow:0 0 16px -5px ${accent}; transform:translateY(-3px); }
-        .nap-chip:active { cursor:grabbing; }
-
-        .nap-bin { border-radius:16px; border:1.5px solid ${T.line}; background:${T.glass}; padding:16px; min-height:210px; transition:all .16s; position:relative; }
-        .nap-bin[data-shake="true"] { animation:napShake .4s; border-color:${NO}; }
-        .nap-bin::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px; background:var(--tono); }
-
-        .nap-vf { cursor:pointer; padding:8px 16px; border-radius:10px; border:1.5px solid ${T.line}; background:${T.glass};
-          color:${T.text2}; font-size:12.5px; font-weight:800; transition:all .14s; }
-        .nap-vf:hover:not(:disabled) { border-color:${T.lineStrong}; color:#fff; }
-        .nap-vf:disabled { cursor:default; opacity:.85; }
-        .nap-vf[data-on="true"] { border-color:${OK}; background:${OK}1f; color:#fff; }
-        .nap-vf[data-bad="true"] { border-color:${NO}; background:${NO}1f; color:#fff; }
-
-        @media (prefers-reduced-motion: reduce){
-          .nap-marca[data-shake="true"], .nap-bin[data-shake="true"], .nap-opt[data-bad="true"] { animation:none; }
-          .nap-chip, .nap-chip:hover, .nap-chip[data-sel="true"], .nap-rasgo:hover { transform:none; }
-        }
-
-        /* Cajón de teoría */
-        .nap-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .nap-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .nap-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .nap-drawer[data-open="true"] { transform:translateX(0); }
-        .nap-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .nap-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .nap-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .nap-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .nap-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .nap-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .nap-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
-
-        @media (max-width: 900px){ .nap-grid { grid-template-columns:minmax(0,1fr) !important; } }
-      `}</style>
-
-      {/* ── Barra de modos y herramientas ───────────────────────────────── */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 16 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="nap-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="nap-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="nap-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="nap-icobtn" onClick={resetActual} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
-
-      {/* ── Cajón de teoría ─────────────────────────────────────────────── */}
-      <button className="nap-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="nap-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="nap-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="nap-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="nap-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="nap-drawer-body">
-          <FichaTeorica data={NARRATIVAS_POPULARES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div
-        className="nap-grid"
-        style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}
-      >
-        {/* ── Columna principal ─────────────────────────────────────────── */}
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      dom
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })),
+        valor: modo,
+        cambiar: (id) => setModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={resetActual} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      escena={
         <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
+          <style>{cssNap(accent, color.rgba)}</style>
+          {modo === "fogon" && (
+            <Mesa>
+              <div className="nap-banco">
+                <div className="nap-instr">
+                  Parte {parteActiva + 1}: <strong>{PARTES_FOGON[parteActiva]!.etiqueta}</strong>. ¿Cómo la cuentas?
+                </div>
+                {VERSIONES_FOGON.filter((v) => v.parte === parteActiva).map((v) => (
+                  <button
+                    key={v.id}
+                    type="button"
+                    className="nap-version"
+                    data-sel={eligeFogon[parteActiva] === v.id}
+                    onClick={() => elegirVersionFogon(v.id)}
+                  >
+                    {v.texto}
+                  </button>
+                ))}
+                <p className="nap-nota">Una versión suena a voz de fogón; otra, a informe. Tú decides qué se oye.</p>
+              </div>
+              <div className="nap-dest">
+                <div className="nap-fogon" data-lleno={lecFogon.oyentes === 4}>
+                  <FogonSvg oyentes={lecFogon.oyentes} voz={lecFogon.voz} />
+                  <img
+                    className="nap-fogon-foto"
+                    src={`${RUTA_FOTOS}/fogon-noche.webp`}
+                    alt=""
+                    loading="lazy"
+                    style={{ opacity: 0.18 + lecFogon.voz * 0.4 }}
+                    onError={(ev) => {
+                      ev.currentTarget.style.display = "none";
+                    }}
+                  />
+                </div>
+                <div className="nap-medidor" role="meter" aria-valuemin={0} aria-valuemax={4} aria-valuenow={lecFogon.oyentes} aria-label="Oralidad">
+                  <div className="nap-medidor-t">
+                    <span>Rasgos orales distintos</span>
+                    <strong style={{ color: lecFogon.oyentes === 4 ? OK : lecFogon.oyentes === 0 ? T.text3 : "#FFC75A" }}>{lecFogon.oyentes}/4</strong>
+                  </div>
+                  <div className="nap-barra">
+                    {[0, 1, 2, 3].map((i) => (
+                      <span key={i} data-on={i < lecFogon.oyentes} />
+                    ))}
+                  </div>
+                  <div className="nap-escala">
+                    <span>Informe escrito</span>
+                    <span>Voz de fogón</span>
+                  </div>
+                </div>
+                <div className="nap-partes">
+                  {PARTES_FOGON.map((pt) => {
+                    const v = versionPorId(eligeFogon[pt.id] ?? null);
+                    const info = v?.rasgo ? RASGO_INFO[v.rasgo] : null;
+                    return (
+                      <button
+                        key={pt.id}
+                        type="button"
+                        className="nap-parte"
+                        data-act={parteActiva === pt.id}
+                        data-estado={!v ? "vacio" : v.rasgo ? "voz" : "neutro"}
+                        onClick={() => setParteActiva(pt.id)}
+                        aria-label={`Parte ${pt.id + 1}: ${pt.etiqueta}`}
+                      >
+                        <span className="nap-parte-foto">
+                          <i className={`fa-solid ${pt.icono}`} aria-hidden />
+                          {v && (
+                            <img
+                              src={`${RUTA_FOTOS}/${pt.foto}.webp`}
+                              alt=""
+                              loading="lazy"
+                              onError={(ev) => {
+                                ev.currentTarget.style.display = "none";
+                              }}
+                            />
+                          )}
+                        </span>
+                        <span className="nap-parte-t">{pt.etiqueta}</span>
+                        <span className="nap-chip-r" style={{ color: info ? info.color : T.text3, borderColor: info ? `${info.color}88` : T.line }}>
+                          {!v ? "Vacía" : info ? info.corto : "Registro neutro"}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="nap-veredicto">{lecFogon.veredicto}</div>
+                {lecFogon.llenas > 0 && (
+                  <div className="nap-papel">
+                    {eligeFogon.map((id, i) => {
+                      const v = versionPorId(id);
+                      return v ? <p key={i}>{v.texto}</p> : null;
+                    })}
+                  </div>
+                )}
+              </div>
+            </Mesa>
+          )}
+
           {modo === "rasgos" && (
             <RasgosPanel
               accent={accent}
@@ -580,7 +610,7 @@ export function LabNarrativasPopulares({ color }: PracticaLabProps) {
               border: `1px solid ${pie ? (pie.ok ? `${OK}55` : `${NO}55`) : T.line}`,
               background: pie ? (pie.ok ? `${OK}12` : `${NO}12`) : T.glass,
               padding: "13px 16px",
-              fontSize: 13,
+              fontSize: 14,
               lineHeight: 1.55,
               color: T.text2,
               display: "flex",
@@ -599,36 +629,22 @@ export function LabNarrativasPopulares({ color }: PracticaLabProps) {
                 : "Aquí aparecerá la explicación de cada decisión: qué hace en el relato el fragmento que marcaste y qué se pierde al llevarlo al papel."}
             </span>
           </div>
-
-          <ChuletaCard modo={modo} accent={accent} />
         </div>
-
-        {/* ── Columna lateral ───────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos de la sesión
-            </Eyebrow>
-            <TableroObjetivos objetivos={objetivos} retoKey={RETO_KEY} accent={accent} />
-          </div>
-
-          {/* Qué se practica en el modo actual */}
-          <div
-            style={{
-              borderRadius: 18,
-              padding: "16px 18px",
-              border: `1px solid rgba(${color.rgba},0.3)`,
-              background: `rgba(${color.rgba},0.08)`,
-              fontSize: 13,
-              color: T.text2,
-              lineHeight: 1.55,
-              display: "flex",
-              gap: 12,
-            }}
-          >
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
+      }
+      pestanas={[
+        {
+          id: "pistas",
+          etiqueta: "Pistas",
+          icono: "fa-compass",
+          contenido: (
+            <>
+              <Bloque titulo="Cómo se usa" icono="fa-lightbulb">
+                <div style={{ color: T.text2 }}>
+                  {modo === "fogon" && (
+                    <>
+                      Cuenta una leyenda en cuatro partes. En cada una, una versión conserva la <strong style={{ color: T.text }}>huella de la voz</strong> y otra suena a informe. Mira cómo el fogón se llena de oyentes.
+                    </>
+                  )}
               {modo === "rasgos" && (
                 <>
                   Un relato popular deja <strong style={{ color: T.text }}>huellas de la voz</strong> en el papel. Toca un
@@ -660,9 +676,42 @@ export function LabNarrativasPopulares({ color }: PracticaLabProps) {
                   <strong style={{ color: T.text }}>Enter</strong> para comprobar cada hueco.
                 </>
               )}
-            </span>
-          </div>
-
+                </div>
+              </Bloque>
+              <Bloque titulo="Tu partida" icono="fa-star">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8 }}>
+                  <Dato label="Oyentes" value={`${lecFogon.oyentes}/4`} col={lecFogon.oyentes === 4 ? OK : undefined} />
+                  <Dato label="Rasgos marcados" value={`${Object.keys(marcadas).length}/${TOTAL_MARCAS}`} />
+                </div>
+              </Bloque>
+              <ChuletaCard modo={modo} accent={accent} />
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+      <RetoQuizCard
+        quiz={RETO_QUIZ}
+        accent={accent}
+        rgba={color.rgba}
+        aprobado={quizAprobado}
+        onAprobado={() => setQuizAprobado(true)}
+        playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined}
+        mensajeAprobado="Ya no lees la narrativa popular sólo por lo que cuenta, sino por cómo está hecha su lengua."
+      />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <FichaTeorica data={NARRATIVAS_POPULARES_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
           {/* Dato verbatim del callout de A1 */}
           <div
             style={{
@@ -670,7 +719,7 @@ export function LabNarrativasPopulares({ color }: PracticaLabProps) {
               padding: "16px 18px",
               border: `1px solid ${T.line}`,
               background: T.glass,
-              fontSize: 12.5,
+              fontSize: 14,
               color: T.text2,
               lineHeight: 1.55,
               display: "flex",
@@ -682,7 +731,6 @@ export function LabNarrativasPopulares({ color }: PracticaLabProps) {
               <strong style={{ color: T.text }}>¿Sabías?</strong> {DATO_RULFO}
             </span>
           </div>
-
           {/* Preguntas de comprensión de la lectura A1 (verbatim) */}
           <div style={{ ...card, padding: "18px 20px" }}>
             <Eyebrow>
@@ -692,35 +740,154 @@ export function LabNarrativasPopulares({ color }: PracticaLabProps) {
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {COMPRENSION_A1.map((c, i) => (
                 <details key={i} style={{ borderRadius: 11, border: `1px solid ${T.line}`, background: T.inset, padding: "10px 13px" }}>
-                  <summary style={{ cursor: "pointer", fontSize: 13, fontWeight: 700, color: T.text2, lineHeight: 1.45 }}>
+                  <summary style={{ cursor: "pointer", fontSize: 14, fontWeight: 700, color: T.text2, lineHeight: 1.45 }}>
                     {c.pregunta}
                   </summary>
-                  <p style={{ margin: "9px 0 0", fontSize: 12.5, color: T.text3, lineHeight: 1.5 }}>{c.guia}</p>
+                  <p style={{ margin: "9px 0 0", fontSize: 14, color: T.text3, lineHeight: 1.5 }}>{c.guia}</p>
                 </details>
               ))}
             </div>
           </div>
-        </div>
-      </div>
-
-      <HechosCard accent={accent} respuestas={hechos} onResponder={responderHecho} />
-
-      <RetoQuizCard
-        quiz={RETO_QUIZ}
-        accent={accent}
-        rgba={color.rgba}
-        aprobado={quizAprobado}
-        onAprobado={() => setQuizAprobado(true)}
-        playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined}
-        mensajeAprobado="Ya no lees la narrativa popular sólo por lo que cuenta, sino por cómo está hecha su lengua."
-      />
-
+              <HechosCard accent={accent} respuestas={hechos} onResponder={responderHecho} />
       {/* Nota al pie: qué es verbatim y qué es de este laboratorio */}
-      <p style={{ margin: "20px 2px 0", fontSize: 11.5, lineHeight: 1.6, color: T.text3 }}>
+      <p style={{ margin: "20px 2px 0", fontSize: 14, lineHeight: 1.6, color: T.text3 }}>
         <i className="fa-solid fa-quote-right" style={{ marginRight: 7, opacity: 0.7 }} />
         {NOTA_PIE}
       </p>
-    </div>
+            </>
+          ),
+        },
+      ]}
+    />
+  );
+}
+
+
+const cssNap = (accent: string, rgba: string) => `
+        @keyframes napShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
+        @keyframes napPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
+        .nap-prob { cursor:pointer; padding:8px 13px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass};
+          color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; }
+        .nap-prob:hover { border-color:${T.lineStrong}; color:#fff; }
+        .nap-prob[data-on="true"] { border-color:${accent}; background:rgba(${rgba},0.16); color:#fff; }
+        .nap-prob[data-done="true"] { color:${OK}; border-color:${OK}66; }
+
+        /* Fragmento marcable dentro del relato */
+        .nap-marca { cursor:pointer; display:inline; font:inherit; color:#fff; padding:2px 5px; margin:0 1px;
+          border:none; border-bottom:2px dashed ${T.lineStrong}; background:rgba(255,255,255,0.05);
+          border-radius:5px 5px 0 0; transition:background .14s, border-color .14s, box-shadow .14s; }
+        .nap-marca:hover:not(:disabled) { background:rgba(255,255,255,0.13); border-bottom-color:${accent}; }
+        .nap-marca[data-sel="true"] { background:rgba(${rgba},0.26); border-bottom-color:${accent};
+          box-shadow:0 0 0 2px rgba(${rgba},0.35); }
+        .nap-marca[data-shake="true"] { animation:napShake .4s; border-bottom-color:${NO}; background:${NO}22; }
+        .nap-marca:disabled { cursor:default; border-bottom-style:solid; }
+
+        /* Chips de la paleta de rasgos */
+        .nap-rasgo { cursor:pointer; display:inline-flex; align-items:center; gap:8px; padding:9px 14px; border-radius:999px;
+          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:14px; font-weight:800; transition:all .14s; }
+        .nap-rasgo:hover:not(:disabled) { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); transform:translateY(-2px); }
+        .nap-rasgo:disabled { cursor:default; opacity:.45; }
+
+        .nap-opt { cursor:pointer; display:flex; align-items:flex-start; gap:12px; width:100%; text-align:left;
+          border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2};
+          font-size:14px; line-height:1.55; font-weight:600; padding:13px 16px; transition:all .14s; }
+        .nap-opt:hover:not(:disabled) { border-color:${T.lineStrong}; background:${T.glassSoft}; color:#fff; }
+        .nap-opt:disabled { cursor:default; }
+        .nap-opt[data-ok="true"] { border-color:${OK}; background:${OK}16; color:#fff; }
+        .nap-opt[data-bad="true"] { border-color:${NO}; background:${NO}14; color:#fff; animation:napShake .4s; }
+
+        .nap-chip { cursor:grab; display:inline-flex; align-items:center; gap:8px; padding:10px 16px; border-radius:999px;
+          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:14px; font-weight:800; transition:all .14s; user-select:none; }
+        .nap-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); transform:translateY(-2px); }
+        .nap-chip[data-sel="true"] { border-color:${accent}; background:rgba(${rgba},0.2); box-shadow:0 0 16px -5px ${accent}; transform:translateY(-3px); }
+        .nap-chip:active { cursor:grabbing; }
+
+        .nap-bin { border-radius:16px; border:1.5px solid ${T.line}; background:${T.glass}; padding:16px; min-height:210px; transition:all .16s; position:relative; }
+        .nap-bin[data-shake="true"] { animation:napShake .4s; border-color:${NO}; }
+        .nap-bin::before { content:""; position:absolute; top:0; left:10px; right:10px; height:3px; border-radius:0 0 3px 3px; background:var(--tono); }
+
+        .nap-vf { cursor:pointer; padding:8px 16px; border-radius:10px; border:1.5px solid ${T.line}; background:${T.glass};
+          color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; }
+        .nap-vf:hover:not(:disabled) { border-color:${T.lineStrong}; color:#fff; }
+        .nap-vf:disabled { cursor:default; opacity:.85; }
+        .nap-vf[data-on="true"] { border-color:${OK}; background:${OK}1f; color:#fff; }
+        .nap-vf[data-bad="true"] { border-color:${NO}; background:${NO}1f; color:#fff; }
+
+        @media (prefers-reduced-motion: reduce){
+          .nap-marca[data-shake="true"], .nap-bin[data-shake="true"], .nap-opt[data-bad="true"] { animation:none; }
+          .nap-chip, .nap-chip:hover, .nap-chip[data-sel="true"], .nap-rasgo:hover { transform:none; }
+        }
+
+        .nap-banco, .nap-dest { display:flex; flex-direction:column; gap:10px; min-width:0; }
+        .nap-instr { font-size:14px; color:${T.text2}; }
+        .nap-instr strong { color:#fff; }
+        .nap-nota { margin:0; font-size:14px; color:${T.text3}; line-height:1.4; }
+        .nap-version { cursor:pointer; text-align:left; padding:12px 14px; border-radius:12px; border:1.5px solid ${T.line};
+          background:${T.glassSoft}; color:${T.text}; font-size:15px; line-height:1.5; transition:all .14s; }
+        .nap-version:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.07); }
+        .nap-version[data-sel="true"] { border-color:${accent}; background:rgba(${rgba},0.16); }
+        .nap-fogon { position:relative; border-radius:14px; overflow:hidden; border:1px solid ${T.line}; background:linear-gradient(180deg,#0a1626,#050b14); }
+        .nap-fogon svg { position:relative; z-index:1; display:block; width:100%; height:auto; }
+        .nap-fogon-foto { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:opacity .5s; }
+        .nap-medidor { display:grid; gap:6px; padding:10px 12px; border-radius:12px; border:1px solid ${T.line}; background:${T.inset}; }
+        .nap-medidor-t { display:flex; justify-content:space-between; align-items:baseline; gap:8px; font-size:14px; font-weight:800; color:${T.text2}; }
+        .nap-medidor-t strong { font-size:19px; font-variant-numeric:tabular-nums; }
+        .nap-barra { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:6px; }
+        .nap-barra span { height:14px; border-radius:99px; background:rgba(255,255,255,0.12); transition:background .3s; }
+        .nap-barra span[data-on="true"] { background:linear-gradient(90deg,#FFC75A,#FF8A3C); }
+        .nap-escala { display:flex; justify-content:space-between; font-size:14px; color:${T.text3}; }
+        .nap-partes { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; }
+        .nap-parte { cursor:pointer; display:grid; grid-template-columns:56px minmax(0,1fr); grid-template-areas:"f t" "f c"; gap:2px 10px; align-items:center;
+          text-align:left; padding:8px; border-radius:12px; border:2px dashed ${T.line}; background:${T.inset}; color:${T.text2}; transition:all .2s; min-width:0; }
+        .nap-parte[data-act="true"] { box-shadow:0 0 0 2px rgba(${rgba},0.5); }
+        .nap-parte[data-estado="voz"] { border:2px solid ${OK}; background:${OK}10; }
+        .nap-parte[data-estado="neutro"] { border:2px solid ${T.lineStrong}; }
+        .nap-parte-foto { grid-area:f; position:relative; width:56px; height:56px; border-radius:9px; overflow:hidden; display:flex; align-items:center; justify-content:center;
+          background:linear-gradient(135deg, rgba(${rgba},0.35), rgba(8,19,31,0.9)); color:rgba(255,255,255,0.55); font-size:20px; }
+        .nap-parte-foto img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+        .nap-parte-t { grid-area:t; font-size:14px; font-weight:900; color:#fff; }
+        .nap-chip-r { grid-area:c; justify-self:start; font-size:14px; font-weight:800; padding:1px 8px; border-radius:99px; border:1px solid ${T.line}; }
+        .nap-veredicto { font-size:15px; font-weight:700; color:#fff; line-height:1.4; }
+        .nap-papel { display:grid; gap:6px; padding:12px 14px; border-radius:12px; background:rgba(245,236,214,0.08); border:1px solid ${T.line}; }
+        .nap-papel p { margin:0; font-size:15px; line-height:1.5; color:${T.text}; font-style:italic; }
+        @media (prefers-reduced-motion: reduce){
+          .nap-parte, .nap-fogon-foto, .nap-barra span { transition:none; }
+          .nap-llama { animation:none !important; }
+        }
+        @keyframes napLlama { 0%,100% { transform:scaleY(1); } 50% { transform:scaleY(1.08) scaleX(.96); } }
+        .nap-llama { transform-box:fill-box; transform-origin:50% 100%; animation:napLlama 1.1s ease-in-out infinite; }
+`;
+
+/** El fogón: una llama que crece y oyentes que se sientan según los rasgos orales. */
+function FogonSvg({ oyentes, voz }: { oyentes: number; voz: number }) {
+  const esc = 0.45 + 0.22 * oyentes;
+  const sitios = [45, 105, 195, 255];
+  return (
+    <svg viewBox="0 0 300 150" role="img" aria-label={`Fogón con ${oyentes} oyentes`}>
+      <defs>
+        <radialGradient id="napBrillo" cx="50%" cy="75%" r="60%">
+          <stop offset="0%" stopColor="#FFB347" stopOpacity={0.15 + voz * 0.55} />
+          <stop offset="100%" stopColor="#FFB347" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      <rect width="300" height="150" fill="url(#napBrillo)" />
+      <ellipse cx="150" cy="128" rx="120" ry="12" fill="rgba(255,255,255,0.05)" />
+      <g transform={`translate(150 126) scale(${esc}) translate(-150 -126)`}>
+        <path className="nap-llama" d="M150 40 C170 70 182 82 176 104 C172 120 162 126 150 126 C138 126 128 120 124 104 C118 82 134 72 150 40 Z" fill="#FF8A3C" />
+        <path className="nap-llama" d="M150 70 C160 88 166 96 162 110 C159 120 154 124 150 124 C146 124 141 120 138 110 C134 96 142 88 150 70 Z" fill="#FFD36B" />
+      </g>
+      <rect x="128" y="124" width="44" height="7" rx="3" fill="#6b4423" transform="rotate(-8 150 127)" />
+      <rect x="128" y="124" width="44" height="7" rx="3" fill="#7a5230" transform="rotate(8 150 127)" />
+      {sitios.map((x, i) => {
+        const on = i < oyentes;
+        return (
+          <g key={x} opacity={on ? 1 : 0.28} style={{ transition: "opacity .4s" }}>
+            <circle cx={x} cy="96" r="10" fill={on ? "#F4C7A1" : "none"} stroke="#F4C7A1" strokeWidth="2" strokeDasharray={on ? undefined : "4 3"} />
+            <path d={`M${x - 15} 134 Q${x} 104 ${x + 15} 134 Z`} fill={on ? "#5BC0EB" : "none"} stroke="#5BC0EB" strokeWidth="2" strokeDasharray={on ? undefined : "4 3"} />
+          </g>
+        );
+      })}
+    </svg>
   );
 }
 
@@ -784,7 +951,7 @@ function ChuletaCard({ modo, accent }: { modo: Modo; accent: string }) {
         <i className="fa-solid fa-table-list" style={{ marginRight: 8, color: accent }} />
         {titulo}
       </Eyebrow>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px,1fr))", gap: 10 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 250px),1fr))", gap: 10 }}>
         {filas.map((f) => (
           <div
             key={f.titulo}
@@ -798,10 +965,10 @@ function ChuletaCard({ modo, accent }: { modo: Modo; accent: string }) {
               alignItems: "flex-start",
             }}
           >
-            <i className={`fa-solid ${f.icono}`} style={{ color: f.color, fontSize: 13, marginTop: 3 }} />
+            <i className={`fa-solid ${f.icono}`} style={{ color: f.color, fontSize: 14, marginTop: 3 }} />
             <span>
-              <strong style={{ display: "block", fontSize: 13, color: "#fff", marginBottom: 3 }}>{f.titulo}</strong>
-              <span style={{ fontSize: 12, lineHeight: 1.5, color: T.text3 }}>{f.nota}</span>
+              <strong style={{ display: "block", fontSize: 14, color: "#fff", marginBottom: 3 }}>{f.titulo}</strong>
+              <span style={{ fontSize: 14, lineHeight: 1.5, color: T.text3 }}>{f.nota}</span>
             </span>
           </div>
         ))}
@@ -856,7 +1023,7 @@ function RasgosPanel({
         <span
           style={{
             marginLeft: "auto",
-            fontSize: 12.5,
+            fontSize: 14,
             fontWeight: 800,
             color: hechasTodas >= totales ? OK : T.text3,
             fontVariantNumeric: "tabular-nums",
@@ -872,7 +1039,7 @@ function RasgosPanel({
             <i className="fa-solid fa-highlighter" style={{ marginRight: 8, color: accent }} />
             «{relato.titulo}» · {relato.tipo}
           </Eyebrow>
-          <span style={{ fontSize: 12.5, fontWeight: 800, color: hechasAqui >= delRelato.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
+          <span style={{ fontSize: 14, fontWeight: 800, color: hechasAqui >= delRelato.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
             {hechasAqui}/{delRelato.length} en este relato
           </span>
         </div>
@@ -910,7 +1077,7 @@ function RasgosPanel({
                       margin: "0 4px",
                       padding: "2px 9px",
                       borderRadius: 999,
-                      fontSize: 10.5,
+                      fontSize: 14,
                       fontWeight: 900,
                       letterSpacing: "0.03em",
                       textTransform: "uppercase",
@@ -920,7 +1087,7 @@ function RasgosPanel({
                       verticalAlign: "middle",
                     }}
                   >
-                    <i className={`fa-solid ${info.icono}`} style={{ fontSize: 9 }} />
+                    <i className={`fa-solid ${info.icono}`} style={{ fontSize: 14 }} />
                     {info.corto}
                   </span>
                 )}
@@ -937,7 +1104,7 @@ function RasgosPanel({
               border: `1px solid ${OK}55`,
               background: `${OK}0f`,
               padding: "12px 15px",
-              fontSize: 13,
+              fontSize: 14,
               lineHeight: 1.55,
               color: T.text2,
               display: "flex",
@@ -959,7 +1126,7 @@ function RasgosPanel({
             {seleccionado ? "¿Qué rasgo es ese fragmento?" : "Toca un fragmento subrayado del relato"}
           </Eyebrow>
           {seleccionado && (
-            <span style={{ fontSize: 13, fontWeight: 800, color: accent, fontStyle: "italic" }}>«{seleccionado.texto}»</span>
+            <span style={{ fontSize: 14, fontWeight: 800, color: accent, fontStyle: "italic" }}>«{seleccionado.texto}»</span>
           )}
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 9 }}>
@@ -974,7 +1141,7 @@ function RasgosPanel({
                 onClick={() => onRasgo(r)}
                 style={seleccionado ? { borderColor: `${info.color}66`, background: `${info.color}14` } : undefined}
               >
-                <i className={`fa-solid ${info.icono}`} style={{ fontSize: 11, color: info.color }} />
+                <i className={`fa-solid ${info.icono}`} style={{ fontSize: 14, color: info.color }} />
                 {info.label}
               </button>
             );
@@ -1023,7 +1190,7 @@ function RegistroPanel({
         <span
           style={{
             marginLeft: "auto",
-            fontSize: 12.5,
+            fontSize: 14,
             fontWeight: 800,
             color: Object.keys(perdidas).length >= CASOS_REGISTRO.length ? OK : T.text3,
             fontVariantNumeric: "tabular-nums",
@@ -1053,7 +1220,7 @@ function RegistroPanel({
         >
           «{caso.oral}»
         </blockquote>
-        <div style={{ marginTop: 11, display: "inline-flex", alignItems: "center", gap: 8, fontSize: 12, color: T.text3 }}>
+        <div style={{ marginTop: 11, display: "inline-flex", alignItems: "center", gap: 8, fontSize: 14, color: T.text3 }}>
           <i className={`fa-solid ${info.icono}`} style={{ color: info.color }} />
           Rasgo en juego: <strong style={{ color: info.color }}>{info.label}</strong>
         </div>
@@ -1066,7 +1233,7 @@ function RegistroPanel({
             ¿Cuál de estas tres es la versión en registro escrito?
           </Eyebrow>
           {versionOk && (
-            <span style={{ fontSize: 12, fontWeight: 800, color: OK, display: "inline-flex", alignItems: "center", gap: 7 }}>
+            <span style={{ fontSize: 14, fontWeight: 800, color: OK, display: "inline-flex", alignItems: "center", gap: 7 }}>
               <i className="fa-solid fa-circle-check" /> Resuelto
             </span>
           )}
@@ -1096,7 +1263,7 @@ function RegistroPanel({
             <i className="fa-solid fa-2" style={{ marginRight: 8, color: accent }} />
             Y en ese traslado, ¿qué se pierde?
           </Eyebrow>
-          {!versionOk && <span style={{ fontSize: 12, color: T.text3 }}>Resuelve antes la reescritura.</span>}
+          {!versionOk && <span style={{ fontSize: 14, color: T.text3 }}>Resuelve antes la reescritura.</span>}
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {caso.perdidas.map((p) => (
@@ -1150,12 +1317,12 @@ function VocesPanel({
       <div style={{ ...card, padding: "18px 22px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
           <Eyebrow>Arrastra cada palabra a la lengua de la que viene</Eyebrow>
-          <span style={{ fontSize: 12.5, fontWeight: 800, color: colocadas >= VOCES.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
+          <span style={{ fontSize: 14, fontWeight: 800, color: colocadas >= VOCES.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
             {colocadas}/{VOCES.length}
           </span>
         </div>
         {vocesLibres.length === 0 ? (
-          <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+          <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
             <i className="fa-solid fa-circle-check" /> ¡Clasificaste las {VOCES.length} voces! Ninguna es un préstamo exótico:
             las once están en el diccionario del español y las usamos todos los días.
           </div>
@@ -1170,7 +1337,7 @@ function VocesPanel({
         )}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px,1fr))", gap: 14 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 230px),1fr))", gap: 14 }}>
         {LENGUAS.map((l) => {
           const info = LENGUA_INFO[l];
           const dentro = VOCES.filter((v) => ubicVoz[v.id] === l);
@@ -1206,10 +1373,10 @@ function VocesPanel({
                 </span>
                 <span style={{ fontSize: 14, fontWeight: 900, color: "#fff" }}>{info.titulo}</span>
               </div>
-              <div style={{ fontSize: 11, color: T.text3, marginBottom: 12, lineHeight: 1.45 }}>{info.subtitulo}</div>
+              <div style={{ fontSize: 14, color: T.text3, marginBottom: 12, lineHeight: 1.45 }}>{info.subtitulo}</div>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {dentro.length === 0 ? (
-                  <span style={{ fontSize: 11.5, color: T.text3, fontStyle: "italic" }}>Suelta aquí…</span>
+                  <span style={{ fontSize: 14, color: T.text3, fontStyle: "italic" }}>Suelta aquí…</span>
                 ) : (
                   dentro.map((v) => (
                     <span
@@ -1224,8 +1391,8 @@ function VocesPanel({
                         lineHeight: 1.45,
                       }}
                     >
-                      <strong style={{ display: "block", fontSize: 13.5, fontWeight: 900, color: "#fff" }}>{v.palabra}</strong>
-                      <span style={{ fontSize: 11, color: T.text3 }}>{v.origen}</span>
+                      <strong style={{ display: "block", fontSize: 14, fontWeight: 900, color: "#fff" }}>{v.palabra}</strong>
+                      <span style={{ fontSize: 14, color: T.text3 }}>{v.origen}</span>
                     </span>
                   ))
                 )}
@@ -1261,7 +1428,7 @@ function HechosCard({
         <span
           style={{
             marginLeft: "auto",
-            fontSize: 12.5,
+            fontSize: 14,
             fontWeight: 800,
             color: aciertos >= HECHOS.length ? OK : T.text3,
             fontVariantNumeric: "tabular-nums",
@@ -1287,7 +1454,7 @@ function HechosCard({
                 transition: "all .18s",
               }}
             >
-              <div style={{ fontSize: 13.5, lineHeight: 1.5, color: T.text, marginBottom: 10, display: "flex", gap: 10 }}>
+              <div style={{ fontSize: 14, lineHeight: 1.5, color: T.text, marginBottom: 10, display: "flex", gap: 10 }}>
                 <span style={{ color: accent, fontWeight: 900 }}>{i + 1}.</span>
                 <span>{h.enunciado}</span>
               </div>
@@ -1305,9 +1472,9 @@ function HechosCard({
                     {v ? "Verdadero" : "Falso"}
                   </button>
                 ))}
-                {resuelto && <span style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.45, flex: 1, minWidth: 220 }}>{h.retro}</span>}
+                {resuelto && <span style={{ fontSize: 14, color: T.text2, lineHeight: 1.45, flex: 1, minWidth: 0 }}>{h.retro}</span>}
                 {fallado && (
-                  <span style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.45, flex: 1, minWidth: 220 }}>
+                  <span style={{ fontSize: 14, color: T.text2, lineHeight: 1.45, flex: 1, minWidth: 0 }}>
                     {h.retro} <em style={{ color: T.text3 }}>Inténtalo de nuevo.</em>
                   </span>
                 )}

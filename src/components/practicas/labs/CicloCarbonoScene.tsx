@@ -17,7 +17,7 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
@@ -62,6 +62,9 @@ const NODOS: Record<string, [number, number, number]> = {
   oceano: [-3.7, 0.3, 0.3],
   fosiles: [0, -3.3, -1.7],
 };
+
+/* Solo 3 reservorios rotulados a la vez: la fuente del experimento y sus dos sumideros. */
+const ETIQUETADOS = ["atmosfera", "oceano", "vegetacion"];
 
 const NPTS = 50; // puntos por curva
 const radioNodo = (gtC: number): number => 0.2 + (0.34 * Math.log10(gtC)) / Math.log10(40000);
@@ -181,13 +184,6 @@ function PalancaEmisiones({ emisiones, arrastrable, onEmisionesChange, onGrab, o
         <sphereGeometry args={[0.07, 12, 12]} />
         <meshBasicMaterial color="#5ab0ff" />
       </mesh>
-      <Html position={[0, Y_TOP + 0.35, 0]} center distanceFactor={15} pointerEvents="none">
-        <div style={{ color: "#ff8a6a", fontSize: 10.5, fontWeight: 800, whiteSpace: "nowrap" }}>más emisiones</div>
-      </Html>
-      <Html position={[0, Y_BOT - 0.35, 0]} center distanceFactor={15} pointerEvents="none">
-        <div style={{ color: "#7fc4ff", fontSize: 10.5, fontWeight: 800, whiteSpace: "nowrap" }}>equilibrio (0)</div>
-      </Html>
-
       {/* halo de agarre */}
       {arrastrable && (hover || dragging) && (
         <mesh position={[0, y, 0]}>
@@ -208,30 +204,23 @@ function PalancaEmisiones({ emisiones, arrastrable, onEmisionesChange, onGrab, o
         onPointerOut={() => setHover(false)}
       >
         <sphereGeometry args={[0.3, 24, 24]} />
-        <meshStandardMaterial color={knobCol} emissive={knobCol} emissiveIntensity={0.7} roughness={0.35} toneMapped={false} />
+        <meshStandardMaterial color={knobCol} emissive={knobCol} emissiveIntensity={0.7} roughness={0.35} />
       </mesh>
 
-      {/* valor */}
-      <Html position={[0, y, 0]} center distanceFactor={13} pointerEvents="none">
-        <div style={{ transform: "translateX(46px)", display: "flex", alignItems: "center", gap: 6, padding: "3px 9px", borderRadius: 999, background: "rgba(2,12,28,0.82)", border: `1px solid ${knobCol.getStyle()}aa`, whiteSpace: "nowrap" }}>
-          <i className="fa-solid fa-industry" style={{ color: knobCol.getStyle(), fontSize: 10 }} />
-          <span style={{ color: "#eaf2fb", fontSize: 11, fontWeight: 900, fontFamily: "ui-monospace, monospace" }}>{emisiones} Gt/año</span>
+      {/* valor: único rótulo de la palanca, a la izquierda para no tapar la Tierra */}
+      <Html position={[0, y, 0]} center pointerEvents="none" zIndexRange={[20, 0]}>
+        <div style={{ transform: "translate(-62%,0)", display: "flex", alignItems: "center", gap: 7, padding: "3px 10px", borderRadius: 8, background: "rgba(4,10,22,0.88)", border: `1.5px solid ${knobCol.getStyle()}`, whiteSpace: "nowrap", boxShadow: "0 4px 16px rgba(0,0,0,0.5)" }}>
+          <i className="fa-solid fa-industry" style={{ color: knobCol.getStyle(), fontSize: 14 }} />
+          <span style={{ color: "#fff", fontSize: 15, fontWeight: 900, fontFamily: "system-ui, sans-serif" }}>{emisiones} Gt/año</span>
         </div>
       </Html>
-      {arrastrable && (
-        <Html position={[0, y, 0]} center distanceFactor={14} pointerEvents="none">
-          <div style={{ transform: "translateY(34px)", color: dragging ? "#fff" : "#9fb2c8", fontSize: 10, fontWeight: 700, whiteSpace: "nowrap", textShadow: "0 2px 6px #000" }}>
-            {dragging ? "moviendo las emisiones" : "arrastra ↑↓"}
-          </div>
-        </Html>
-      )}
     </group>
   );
 }
 
 /* ─── Nodo reservorio: esfera + etiqueta ───────────────────────────────── */
-function Nodo({ pos, color, icono, nombre, gtC }: {
-  pos: [number, number, number]; color: string; icono: string; nombre: string; gtC: number;
+function Nodo({ pos, color, icono, nombre, gtC, etiquetar, lado }: {
+  pos: [number, number, number]; color: string; icono: string; nombre: string; gtC: number; etiquetar: boolean; lado: "up" | "down";
 }) {
   const r = radioNodo(gtC);
   return (
@@ -240,22 +229,39 @@ function Nodo({ pos, color, icono, nombre, gtC }: {
         <sphereGeometry args={[r, 24, 24]} />
         <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.4} roughness={0.4} metalness={0.15} />
       </mesh>
-      <Html center distanceFactor={14} pointerEvents="none">
-        <div style={{ transform: `translateY(${-(r * 26 + 18)}px)`, display: "flex", alignItems: "center", gap: 7, padding: "4px 10px", borderRadius: 999, background: "rgba(2,12,28,0.82)", border: `1px solid ${color}77`, whiteSpace: "nowrap", backdropFilter: "blur(6px)" }}>
-          <i className={`fa-solid ${icono}`} style={{ color, fontSize: 12 }} />
-          <span style={{ color: "#eaf2fb", fontSize: 11.5, fontWeight: 800 }}>{nombre}</span>
-          <span style={{ color, fontSize: 11, fontWeight: 900, fontFamily: "ui-monospace, monospace" }}>~{gtC.toLocaleString("es-MX")} GtC</span>
-        </div>
-      </Html>
+      {etiquetar && (
+        <Html center pointerEvents="none" zIndexRange={[20, 0]}>
+          <div style={{ transform: lado === "up" ? "translate(0,-150%)" : "translate(0,150%)", display: "flex", alignItems: "center", gap: 7, padding: "3px 10px", borderRadius: 8, background: "rgba(4,10,22,0.88)", border: `1.5px solid ${color}`, whiteSpace: "nowrap", boxShadow: "0 4px 16px rgba(0,0,0,0.5)" }}>
+            <i className={`fa-solid ${icono}`} style={{ color, fontSize: 14 }} />
+            <span style={{ color: "#fff", fontSize: 14, fontWeight: 800, fontFamily: "system-ui, sans-serif" }}>{nombre}</span>
+          </div>
+        </Html>
+      )}
     </group>
   );
 }
 
 /* ─── Tierra ───────────────────────────────────────────────────────────── */
-function Tierra({ tint }: { tint: THREE.Color }) {
-  const aire = useRef<THREE.Mesh>(null);
+const CONTINENTES: { dir: [number, number, number]; esc: [number, number, number] }[] = [
+  { dir: [0.5, 0.55, 0.67], esc: [0.8, 0.55, 0.12] },
+  { dir: [-0.6, 0.2, 0.77], esc: [0.55, 0.7, 0.12] },
+  { dir: [0.85, -0.2, -0.48], esc: [0.7, 0.5, 0.12] },
+  { dir: [-0.3, -0.7, 0.65], esc: [0.6, 0.4, 0.12] },
+  { dir: [-0.2, 0.8, -0.56], esc: [0.65, 0.45, 0.12] },
+];
+
+function Tierra({ tint, calor }: { tint: THREE.Color; calor: number }) {
+  const giro = useRef<THREE.Group>(null);
+  const cont = useMemo(
+    () => CONTINENTES.map((c) => {
+      const d = new THREE.Vector3(...c.dir).normalize();
+      const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), d);
+      return { pos: d.clone().multiplyScalar(1.68).toArray() as [number, number, number], q, esc: c.esc };
+    }),
+    [],
+  );
   useFrame((_, delta) => {
-    if (aire.current) aire.current.rotation.y += delta * 0.04;
+    if (giro.current) giro.current.rotation.y += delta * 0.04;
   });
   return (
     <group>
@@ -264,15 +270,19 @@ function Tierra({ tint }: { tint: THREE.Color }) {
         <sphereGeometry args={[1.7, 48, 48]} />
         <meshStandardMaterial color="#0e5a8a" emissive="#06304a" emissiveIntensity={0.3} roughness={0.65} metalness={0.1} />
       </mesh>
-      {/* continentes (icosaedro verde como relieve) */}
-      <mesh ref={aire} scale={1.005}>
-        <icosahedronGeometry args={[1.7, 2]} />
-        <meshStandardMaterial color="#1f7a4d" emissive="#0c3d26" emissiveIntensity={0.25} roughness={0.8} flatShading wireframe transparent opacity={0.45} />
-      </mesh>
-      {/* capa de atmósfera (se tiñe con las emisiones) */}
-      <mesh scale={1.18}>
+      {/* continentes: manchas verdes sólidas sobre el océano */}
+      <group ref={giro}>
+        {cont.map((c, i) => (
+          <mesh key={i} position={c.pos} quaternion={c.q} scale={c.esc}>
+            <sphereGeometry args={[1, 20, 14]} />
+            <meshStandardMaterial color="#2a8a57" roughness={0.85} />
+          </mesh>
+        ))}
+      </group>
+      {/* capa de atmósfera: se tiñe y se ensancha con las emisiones */}
+      <mesh scale={1.16 + calor * 0.14}>
         <sphereGeometry args={[1.7, 32, 32]} />
-        <meshStandardMaterial color={tint} emissive={tint} emissiveIntensity={0.5} transparent opacity={0.14} side={THREE.BackSide} depthWrite={false} />
+        <meshStandardMaterial color={tint} emissive={tint} emissiveIntensity={0.5} transparent opacity={0.12 + calor * 0.2} side={THREE.BackSide} depthWrite={false} />
       </mesh>
     </group>
   );
@@ -296,11 +306,11 @@ function Mundo({ emisiones, pausado, arrastrable, onEmisionesChange, onGrab, onD
     <group>
       {/* suelo de apoyo (sombra) */}
 
-      <Tierra tint={tint} />
+      <Tierra tint={tint} calor={Math.min(1, combRapidez)} />
 
       {/* reservorios */}
       {RESERVORIOS.map((r) => (
-        <Nodo key={r.key} pos={NODOS[r.key]!} color={r.color} icono={r.icono} nombre={r.nombre} gtC={r.gtC} />
+        <Nodo key={r.key} pos={NODOS[r.key]!} color={r.color} icono={r.icono} nombre={r.nombre} gtC={r.gtC} etiquetar={ETIQUETADOS.includes(r.key)} lado={r.key === "oceano" ? "down" : "up"} />
       ))}
 
       {/* flujos */}
@@ -320,19 +330,11 @@ function Mundo({ emisiones, pausado, arrastrable, onEmisionesChange, onGrab, onD
         onDraggingChange={onDraggingChange}
       />
 
-      {/* etiqueta del Sol/energía como motor del ciclo */}
-      <group position={[-5.2, 4.4, 2.2]}>
-        <mesh>
-          <sphereGeometry args={[0.55, 20, 20]} />
-          <meshStandardMaterial color="#ffd24a" emissive="#ffd24a" emissiveIntensity={2.2} toneMapped={false} />
-        </mesh>
-        <Html center distanceFactor={16} pointerEvents="none">
-          <div style={{ transform: "translateY(30px)", display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap" }}>
-            <i className="fa-solid fa-sun" style={{ color: "#ffd24a", fontSize: 13 }} />
-            <span style={{ color: "#ffe08a", fontSize: 11, fontWeight: 800 }}>energía solar (motor)</span>
-          </div>
-        </Html>
-      </group>
+      {/* el Sol: motor del ciclo (sin rótulo; la idea está en la Teoría) */}
+      <mesh position={[-5.2, 4.4, 2.2]}>
+        <sphereGeometry args={[0.55, 20, 20]} />
+        <meshStandardMaterial color="#ffd24a" emissive="#ffd24a" emissiveIntensity={1.6} />
+      </mesh>
     </group>
   );
 }
@@ -344,7 +346,7 @@ export default function CicloCarbonoScene(props: CicloCarbonoSceneProps) {
       shadows
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
-      camera={{ position: [8.5, 4.5, 11], fov: 44 }}
+      camera={{ position: [8.5, 4.2, 12.5], fov: 44 }}
     >
       <Contenido {...props} />
     </Canvas>
@@ -354,6 +356,12 @@ export default function CicloCarbonoScene(props: CicloCarbonoSceneProps) {
 function Contenido(props: CicloCarbonoSceneProps) {
   const { emisiones, accent, pausado, autoRotate, resetNonce, arrastrable, onEmisionesChange, onGrab } = props;
   const [dragging, setDragging] = useState(false);
+  const { camera, size } = useThree();
+  const angosto = size.width < 640;
+  // Pantalla angosta: la cámara se aleja una sola vez para que quepan la palanca y la Tierra.
+  useEffect(() => {
+    if (angosto) camera.position.multiplyScalar(1.4);
+  }, [angosto, camera]);
   return (
     <>
       {/* Suelo, luz de tres puntos y entorno que reflejar. */}
@@ -377,10 +385,10 @@ function Contenido(props: CicloCarbonoSceneProps) {
       <OrbitControls
         enablePan={false}
         minDistance={8}
-        maxDistance={32}
+        maxDistance={36}
         minPolarAngle={Math.PI / 8}
         maxPolarAngle={Math.PI / 1.9}
-        target={[0, 0, 0]}
+        target={[-1, -0.7, 0]}
         enabled={!dragging}
         autoRotate={autoRotate && !dragging}
         autoRotateSpeed={0.4}

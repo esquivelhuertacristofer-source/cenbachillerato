@@ -41,7 +41,17 @@ import { CompletaTexto } from "./_mecanica-huecos";
 import { EscribeTermino } from "./_mecanica-termino";
 import { TEMAS_IDEAS_HUECOS } from "./temas-ideas-huecos";
 import { usePartida, MarcadorPartida } from "./_partida";
-import { TableroObjetivos } from "./_objetivos";
+import { LabShell, Bloque, BotonHerramienta, Mesa, Dato } from "./_shell";
+import {
+  TEMAS_TALLER,
+  PANELES_TALLER,
+  ESCENAS_TALLER,
+  ASUNTO_VS_TEMA,
+  escenaPorId,
+  evaluarTaller,
+  type TemaTaller,
+  type Elegidas,
+} from "./temas-ideas-taller";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { TEMAS_IDEAS_FICHA } from "./temas-ideas-ficha";
@@ -76,10 +86,12 @@ import {
 
 const NO = "#FF5E5E";
 const RETO_KEY = "cen-temas-ideas-narrativa-reto";
+const RUTA_FOTOS = "/media/labs-sim/temas-ideas-narrativa";
 
-type Modo = "asunto" | "tema" | "medida" | "parejas" | "glosario" | "texto";
+type Modo = "taller" | "asunto" | "tema" | "medida" | "parejas" | "glosario" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
+  { id: "taller", label: "Taller del tema", icono: "fa-clapperboard" },
   { id: "asunto", label: "¿Qué pasa? ¿De qué trata?", icono: "fa-boxes-stacked" },
   { id: "tema", label: "El tema y sus hilos", icono: "fa-diagram-project" },
   { id: "medida", label: "Ni tan ancho ni tan angosto", icono: "fa-ruler-horizontal" },
@@ -111,12 +123,11 @@ const TOTAL_EXTREMOS = CASOS_MEDIDA.reduce((n, c) => n + c.formulaciones.filter(
 
 export function LabTemasIdeas({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
-  const [modo, setModo] = useState<Modo>("asunto");
+  const [modo, setModo] = useState<Modo>("taller");
 
   // ── sonido y partida ──────────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   useEffect(() => () => audioRef.current?.dispose(), []);
   const toggleSonido = async () => {
@@ -143,6 +154,52 @@ export function LabTemasIdeas({ color }: PracticaLabProps) {
 
   // ── el pie: la última explicación, siempre a la vista ─────────────────
   const [pie, setPie] = useState<{ ok: boolean; titulo: string; txt: string } | null>(null);
+
+  /* ── modo 0 · taller del tema (simulador) ───────────────────────────── */
+  const [elegidas, setElegidas] = useState<Elegidas>([null, null, null]);
+  const [temaTaller, setTemaTaller] = useState<TemaTaller>("solidaridad");
+  const [panelActivo, setPanelActivo] = useState(0);
+  const [vistoCaida, setVistoCaida] = useState(false);
+  const lecTaller = evaluarTaller(elegidas, temaTaller);
+  const temaInfo = TEMAS_TALLER.find((t) => t.id === temaTaller)!;
+
+  const elegirEscena = (id: string) => {
+    const e = escenaPorId(id);
+    if (!e) return;
+    setElegidas((prev) => prev.map((x, i) => (i === e.panel ? id : x)));
+    sfxPick();
+    const sigue = e.apoya === temaTaller;
+    setPie({
+      ok: sigue,
+      titulo: sigue ? `Sostiene «${temaInfo.corto}»` : "Esta escena cuenta otra cosa",
+      txt: sigue
+        ? `Aquí pasa: ${e.hecho}. Repite el motivo «${e.motivo}», que es lo que ata las escenas entre sí.`
+        : `Aquí pasa: ${e.hecho}. Eso apunta a «${TEMAS_TALLER.find((t) => t.id === e.apoya)!.corto}», no a «${temaInfo.corto}»: el tema sale de lo que las escenas repiten, no de lo que tú declares.`,
+    });
+    if (panelActivo < 2) setPanelActivo(panelActivo + 1);
+  };
+  const cambiarTemaTaller = (t: TemaTaller) => {
+    if (t === temaTaller) return;
+    const antes = lecTaller.coherencia;
+    const despues = evaluarTaller(elegidas, t);
+    if (antes === 3 && despues.coherencia < 3) {
+      setVistoCaida(true);
+      sfxNo();
+      setPie({
+        ok: false,
+        titulo: "El mismo relato, otro tema: la coherencia cae",
+        txt: `Las escenas no cambiaron, solo lo que dices que tratan. Ahora sostienen ${despues.coherencia} de 3: un tema no se decreta, se demuestra con lo que el relato repite.`,
+      });
+    } else {
+      sfxPick();
+    }
+    setTemaTaller(t);
+  };
+  const resetTaller = () => {
+    setElegidas([null, null, null]);
+    setPanelActivo(0);
+    setPie(null);
+  };
 
   /* ── modo 1 · ¿qué pasa? ¿de qué trata? ─────────────────────────────── */
   const [atIdx, setAtIdx] = useState(0);
@@ -377,6 +434,8 @@ export function LabTemasIdeas({ color }: PracticaLabProps) {
 
   /* ── objetivos ──────────────────────────────────────────────────────── */
   const objetivos = [
+    { txt: "Arma un relato: elige una escena en cada recuadro", done: lecTaller.llenas >= 3 },
+    { txt: "Logra coherencia 3/3 y luego cambia el tema: mira cómo cae", done: vistoCaida },
     { txt: `Reparte las ${TOTAL_TARJETAS} tarjetas entre asunto y tema`, done: repartidas >= TOTAL_TARJETAS },
     { txt: `Elige el tema que sostienen los ${CASOS_TEMA.length} relatos`, done: temasAcertados >= CASOS_TEMA.length },
     { txt: `Señala los ${TOTAL_HILOS} hilos que sostienen esos temas`, done: hilosAcertados >= TOTAL_HILOS },
@@ -389,6 +448,13 @@ export function LabTemasIdeas({ color }: PracticaLabProps) {
     { txt: `Acierta los ${HECHOS.length} hechos verdadero o falso`, done: hechosDone },
     { txt: "Aprueba el reto evaluable (70 %)", done: quizAprobado },
   ];
+
+  const lectura =
+    modo === "taller"
+      ? `Coherencia ${lecTaller.coherencia}/3 con «${temaInfo.corto}».`
+      : pie
+        ? pie.titulo
+        : "Cada decisión trae su explicación.";
 
   /* ── arrastre nativo + clic para seleccionar y clic para colocar ────── */
   const dragProps = (id: string) => ({
@@ -433,8 +499,10 @@ export function LabTemasIdeas({ color }: PracticaLabProps) {
   });
 
   const resetActual =
-    modo === "asunto"
-      ? resetAsunto
+    modo === "taller"
+      ? resetTaller
+      : modo === "asunto"
+        ? resetAsunto
       : modo === "tema"
         ? resetTema
         : modo === "medida"
@@ -445,139 +513,134 @@ export function LabTemasIdeas({ color }: PracticaLabProps) {
               ? resetGlosario
               : resetTexto;
 
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes tinShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
-        @keyframes tinPop { 0%{transform:scale(.72);opacity:0;} 100%{transform:scale(1);opacity:1;} }
-
-        .tin-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 15px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13px; font-weight:800; transition:all .14s; }
-        .tin-tab:hover { border-color:${T.lineStrong}; color:#fff; }
-        .tin-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
-
-        .tin-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
-          font-size:14px; border:1px solid ${T.line}; background:${T.glass}; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .tin-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
-        .tin-icobtn:hover { background:rgba(255,255,255,0.12); }
-
-        .tin-prob { cursor:pointer; padding:8px 13px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass};
-          color:${T.text2}; font-size:12.5px; font-weight:800; transition:all .14s; }
-        .tin-prob:hover { border-color:${T.lineStrong}; color:#fff; }
-        .tin-prob[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; }
-        .tin-prob[data-done="true"] { color:${OK}; border-color:${OK}66; }
-
-        .tin-card { cursor:pointer; display:block; width:100%; text-align:left; padding:13px 16px; border-radius:13px;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:${T.text}; font-size:13.5px; line-height:1.55;
-          transition:all .14s; user-select:none; }
-        .tin-card:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.07); }
-        .tin-card[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); box-shadow:0 0 18px -5px ${accent}; }
-        .tin-card[data-shake="true"] { animation:tinShake .4s; border-color:${NO}; }
-        .tin-card[data-done="true"] { cursor:default; border-color:${OK}66; background:${OK}10; }
-        .tin-card[data-drag="true"] { cursor:grab; }
-        .tin-card[data-drag="true"]:active { cursor:grabbing; }
-
-        .tin-bin { border-radius:16px; border:2px dashed ${T.lineStrong}; padding:16px; min-height:150px; transition:all .16s; }
-        .tin-bin[data-shake="true"] { animation:tinShake .4s; }
-
-        .tin-pill { cursor:pointer; display:inline-flex; align-items:center; gap:7px; padding:7px 12px; border-radius:999px;
-          border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text2}; font-size:12px; font-weight:800; transition:all .14s; white-space:nowrap; }
-        .tin-pill:hover { color:#fff; border-color:${T.lineStrong}; }
-        .tin-pill:disabled { cursor:default; opacity:.9; }
-
-        .tin-vf { cursor:pointer; padding:5px 12px; border-radius:9px; border:1px solid ${T.line}; background:${T.glass};
-          color:${T.text2}; font-size:11.5px; font-weight:900; letter-spacing:.04em; transition:all .14s; }
-        .tin-vf:hover { color:#fff; border-color:${T.lineStrong}; }
-        .tin-vf[data-on="true"] { color:#04121f; }
-
-        .tin-hilo { cursor:pointer; display:flex; gap:12px; align-items:flex-start; width:100%; text-align:left;
-          padding:12px 15px; border-radius:12px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text2};
-          font-size:13.5px; line-height:1.55; transition:all .14s; }
-        .tin-hilo:hover:not(:disabled) { border-color:${T.lineStrong}; color:#fff; }
-        .tin-hilo:disabled { cursor:default; }
-        .tin-hilo[data-ok="true"] { border-color:${OK}; background:${OK}14; color:#fff; animation:tinPop .25s ease; }
-        .tin-hilo[data-shake="true"] { animation:tinShake .4s; border-color:${NO}; }
-
-        .tin-grid { display:grid; grid-template-columns:minmax(0,1fr) clamp(300px,27vw,392px); gap:22px; align-items:start; }
-        .tin-bins { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:14px; }
-        .tin-fichas { display:grid; grid-template-columns:repeat(auto-fit, minmax(230px,1fr)); gap:12px; }
-        @media (max-width: 980px){ .tin-grid { grid-template-columns:minmax(0,1fr); } .tin-bins { grid-template-columns:minmax(0,1fr); } }
-
-        .tin-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .tin-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .tin-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .tin-drawer[data-open="true"] { transform:translateX(0); }
-        .tin-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .tin-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .tin-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .tin-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .tin-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .tin-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .tin-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
-
-        @media (prefers-reduced-motion: reduce){
-          .tin-card, .tin-bin, .tin-hilo { animation:none !important; transition:none; }
-          .tin-fab:hover { transform:none; }
-        }
-      `}</style>
-
-      {/* barra de modos + herramientas */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="tin-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        {/* El marcador y las herramientas viajan juntos: si la barra se parte,
-            se parte por aquí y no deja los iconos huérfanos en otro renglón. */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "nowrap" }}>
-          <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-          <button className="tin-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-            <i className="fa-solid fa-book-open" />
-          </button>
-          <button className="tin-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-            <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-          </button>
-          <button className="tin-icobtn" onClick={resetActual} title="Reiniciar este modo">
-            <i className="fa-solid fa-rotate-left" />
-          </button>
-        </div>
-      </div>
-
-      {/* cajón de teoría */}
-      <button className="tin-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="tin-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="tin-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="tin-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="tin-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="tin-drawer-body">
-          <FichaTeorica data={TEMAS_IDEAS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div className="tin-grid">
-        {/* ── Columna principal ───────────────────────────────────────── */}
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      dom
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })),
+        valor: modo,
+        cambiar: (id) => setModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={resetActual} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      escena={
         <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
+          <style>{cssTin(accent, color.rgba)}</style>
+          {modo === "taller" && (
+            <Mesa>
+              <div className="tin-banco">
+                <div className="tin-temas" role="radiogroup" aria-label="Tema de tu relato">
+                  {TEMAS_TALLER.map((t) => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      role="radio"
+                      aria-checked={temaTaller === t.id}
+                      className="tin-tema"
+                      data-on={temaTaller === t.id}
+                      style={{ ["--tc" as string]: t.color }}
+                      onClick={() => cambiarTemaTaller(t.id)}
+                    >
+                      <i className={`fa-solid ${t.icono}`} aria-hidden />
+                      <span>{t.frase}</span>
+                    </button>
+                  ))}
+                </div>
+                <div className="tin-instr">
+                  Recuadro {panelActivo + 1}: <strong>{PANELES_TALLER[panelActivo]!.etiqueta}</strong>. Elige una escena.
+                </div>
+                {ESCENAS_TALLER.filter((e) => e.panel === panelActivo).map((e) => (
+                  <button
+                    key={e.id}
+                    type="button"
+                    className="tin-escena"
+                    data-sel={elegidas[panelActivo] === e.id}
+                    onClick={() => elegirEscena(e.id)}
+                  >
+                    <FotoEscena foto={e.foto} icono={e.icono} />
+                    <span>{e.texto}</span>
+                  </button>
+                ))}
+              </div>
+              <div className="tin-dest">
+                <div className="tin-tira">
+                  {PANELES_TALLER.map((pn) => {
+                    const e = escenaPorId(elegidas[pn.id] ?? null);
+                    const buena = e ? e.apoya === temaTaller : null;
+                    return (
+                      <button
+                        key={pn.id}
+                        type="button"
+                        className="tin-marco"
+                        data-act={panelActivo === pn.id}
+                        data-estado={buena === null ? "vacio" : buena ? "ok" : "no"}
+                        onClick={() => setPanelActivo(pn.id)}
+                        aria-label={`Recuadro ${pn.id + 1}: ${pn.etiqueta}`}
+                      >
+                        <span className="tin-marco-t">
+                          <i className={`fa-solid ${pn.icono}`} aria-hidden /> {pn.etiqueta}
+                        </span>
+                        {e ? <FotoEscena foto={e.foto} icono={e.icono} grande /> : <span className="tin-vacio">Vacío</span>}
+                        {e && <span className="tin-motivo">{e.motivo}</span>}
+                      </button>
+                    );
+                  })}
+                </div>
+                <svg className="tin-hilo-svg" viewBox="0 0 300 30" preserveAspectRatio="none" aria-hidden>
+                  {lecTaller.hilos.map(([a, b], i) => (
+                    <path
+                      key={`${a}-${b}`}
+                      d={`M ${50 + a * 100} 4 Q ${50 + ((a + b) / 2) * 100} ${28 - i * 4} ${50 + b * 100} 4`}
+                      fill="none"
+                      stroke={temaInfo.color}
+                      strokeWidth="3"
+                      strokeDasharray="6 4"
+                      className="tin-hilo-path"
+                    />
+                  ))}
+                </svg>
+                <div className="tin-medidor" role="meter" aria-valuemin={0} aria-valuemax={3} aria-valuenow={lecTaller.coherencia} aria-label="Coherencia con el tema">
+                  <div className="tin-medidor-t">
+                    <span>Coherencia con «{temaInfo.corto}»</span>
+                    <strong style={{ color: lecTaller.coherencia === 3 ? OK : lecTaller.coherencia === 0 ? NO : "#FFC75A" }}>{lecTaller.coherencia}/3</strong>
+                  </div>
+                  <div className="tin-barra">
+                    {[0, 1, 2].map((i) => (
+                      <span key={i} style={{ background: i < lecTaller.coherencia ? temaInfo.color : undefined }} />
+                    ))}
+                  </div>
+                </div>
+                <div className="tin-veredicto">{lecTaller.veredicto}</div>
+                {lecTaller.llenas === 3 && (
+                  <div className="tin-par">
+                    <div>
+                      <b>Lo que pasa</b>
+                      <span>{elegidas.map((id) => escenaPorId(id)!.hecho).join("; ")}.</span>
+                    </div>
+                    <div>
+                      <b>De qué trata</b>
+                      <span>
+                        {lecTaller.dominante
+                          ? TEMAS_TALLER.find((t) => t.id === lecTaller.dominante)!.frase
+                          : "No hay un tema dominante: las escenas se contradicen."}
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </Mesa>
+          )}
+
           {modo === "asunto" && (
             <AsuntoPanel
               accent={accent}
@@ -714,7 +777,7 @@ export function LabTemasIdeas({ color }: PracticaLabProps) {
             <div style={{ minWidth: 0 }}>
               <div
                 style={{
-                  fontSize: 11,
+                  fontSize: 14,
                   fontWeight: 900,
                   letterSpacing: "0.1em",
                   textTransform: "uppercase",
@@ -723,7 +786,7 @@ export function LabTemasIdeas({ color }: PracticaLabProps) {
               >
                 {pie ? pie.titulo : "¿Por qué?"}
               </div>
-              <div style={{ marginTop: 4, fontSize: 13.5, lineHeight: 1.55, color: T.text2 }}>
+              <div style={{ marginTop: 4, fontSize: 14, lineHeight: 1.55, color: T.text2 }}>
                 {pie
                   ? pie.txt
                   : "Cada vez que decidas algo, aquí aparece la razón: por qué eso es el asunto y no el tema, por qué ese hilo sostiene la idea o por qué el tema le queda grande al relato."}
@@ -731,68 +794,32 @@ export function LabTemasIdeas({ color }: PracticaLabProps) {
             </div>
           </div>
         </div>
-
-        {/* ── Columna lateral ─────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos de la sesión
-            </Eyebrow>
-            <TableroObjetivos objetivos={objetivos} retoKey={RETO_KEY} accent={accent} />
-          </div>
-
-          <div
-            style={{
-              borderRadius: 18,
-              padding: "16px 18px",
-              border: `1px solid rgba(${color.rgba},0.3)`,
-              background: `rgba(${color.rgba},0.08)`,
-              fontSize: 13,
-              color: T.text2,
-              lineHeight: 1.55,
-              display: "flex",
-              gap: 12,
-            }}
-          >
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              {modo === "asunto" && (
-                <>
-                  Lee el relato y reparte sus cuatro tarjetas. <strong style={{ color: T.text }}>Lo que pasa</strong> se podría filmar;{" "}
-                  <strong style={{ color: T.text }}>de qué trata</strong> casi nunca está escrito en el texto: se deduce.
-                </>
-              )}
-              {modo === "tema" && (
-                <>
-                  Primero elige el <strong style={{ color: T.text }}>único tema que el relato sostiene</strong>. Después señala los{" "}
-                  <strong style={{ color: T.text }}>dos hilos</strong> que lo sostienen: el motivo que se repite, el objeto que vuelve o lo que dice un personaje.
-                </>
-              )}
-              {modo === "medida" && (
-                <>
-                  Un tema <strong style={{ color: T.text }}>demasiado amplio</strong> cabe en cualquier relato; uno{" "}
-                  <strong style={{ color: T.text }}>demasiado estrecho</strong> se queda en un objeto. El que sirve abarca el relato entero y nada más.
-                </>
-              )}
-              {modo === "parejas" && (
-                <>
-                  Toca dos fichas que <strong style={{ color: T.text }}>compartan tema</strong>. No se parecen en escenario, época ni personajes: lo único que comparten es la idea.
-                </>
-              )}
-              {modo === "glosario" && (
-                <>
-                  Lee la definición y su ejemplo y <strong style={{ color: T.text }}>escribe el término</strong>. Si te atoras, usa la pista o abre el banco de términos.
-                </>
-              )}
-              {modo === "texto" && (
-                <>
-                  Escribe las palabras que faltan. Si te atoras, usa la <strong style={{ color: T.text }}>pista</strong> de cada hueco o abre el banco de palabras.
-                </>
-              )}
-            </span>
-          </div>
-
+      }
+      pestanas={[
+        {
+          id: "pistas",
+          etiqueta: "Pistas",
+          icono: "fa-compass",
+          contenido: (
+            <>
+              <Bloque titulo="Cómo se usa" icono="fa-lightbulb">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  {modo === "taller" && <>Elige un tema y arma tres escenas. {ASUNTO_VS_TEMA} Después cambia el tema y mira qué pasa con la coherencia.</>}
+                  {modo === "asunto" && <>Lee el relato y reparte sus tarjetas: lo que pasa se podría filmar; de qué trata se deduce.</>}
+                  {modo === "tema" && <>Elige el único tema que el relato sostiene y señala los dos hilos que lo sostienen.</>}
+                  {modo === "medida" && <>Un tema demasiado amplio cabe en cualquier relato; uno demasiado estrecho se queda en un objeto.</>}
+                  {modo === "parejas" && <>Toca dos fichas que compartan tema, aunque no se parezcan en escenario ni personajes.</>}
+                  {modo === "glosario" && <>Lee la definición y su ejemplo y escribe el término. Si te atoras, usa la pista.</>}
+                  {modo === "texto" && <>Escribe las palabras que faltan; cada hueco tiene su pista.</>}
+                </p>
+              </Bloque>
+              <Bloque titulo="Tu partida" icono="fa-star">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8 }}>
+                  <Dato label="Coherencia" value={`${lecTaller.coherencia}/3`} col={lecTaller.coherencia === 3 ? OK : undefined} />
+                  <Dato label="Hilos" value={`${lecTaller.hilos.length}`} />
+                </div>
+              </Bloque>
           {/* Pistas verbatim de la reflexión A3 */}
           <div style={{ ...card, padding: "18px 20px" }}>
             <Eyebrow>
@@ -801,18 +828,44 @@ export function LabTemasIdeas({ color }: PracticaLabProps) {
             </Eyebrow>
             <ul style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 8 }}>
               {PISTAS_A3.map((p, i) => (
-                <li key={i} style={{ fontSize: 13, lineHeight: 1.5, color: T.text2 }}>
+                <li key={i} style={{ fontSize: 14, lineHeight: 1.5, color: T.text2 }}>
                   {p}
                 </li>
               ))}
             </ul>
-            <div style={{ marginTop: 12, paddingTop: 11, borderTop: `1px solid ${T.line}`, fontSize: 12.5, lineHeight: 1.55, color: T.text3 }}>
+            <div style={{ marginTop: 12, paddingTop: 11, borderTop: `1px solid ${T.line}`, fontSize: 14, lineHeight: 1.55, color: T.text3 }}>
               <strong style={{ color: T.text2 }}>Después de esta práctica (A3): </strong>
               {CONSIGNA_A3}
             </div>
-            <div style={{ marginTop: 10, fontSize: 11, color: T.text3, fontStyle: "italic" }}>Verbatim de LC-II-P05-A3.</div>
+            <div style={{ marginTop: 10, fontSize: 14, color: T.text3, fontStyle: "italic" }}>Verbatim de LC-II-P05-A3.</div>
           </div>
-
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+      <RetoQuizCard
+        quiz={QUIZ}
+        accent={accent}
+        rgba={color.rgba}
+        aprobado={quizAprobado}
+        onAprobado={() => setQuizAprobado(true)}
+        playSfx={(ok) => (ok ? sfxOk() : sfxNo())}
+        playPick={sfxPick}
+        mensajeAprobado="Distingues el tema de la trama y sabes qué ideas lo sostienen."
+      />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <FichaTeorica data={TEMAS_IDEAS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
           {/* Lectura A1 verbatim */}
           <div style={{ ...card, padding: "18px 20px" }}>
             <Eyebrow>
@@ -821,13 +874,12 @@ export function LabTemasIdeas({ color }: PracticaLabProps) {
             </Eyebrow>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {LECTURA_A1.map((p, i) => (
-                <p key={i} style={{ margin: 0, fontSize: 12.8, lineHeight: 1.6, color: T.text2 }}>
+                <p key={i} style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: T.text2 }}>
                   {p}
                 </p>
               ))}
             </div>
           </div>
-
           {/* Preguntas de comprensión A1 verbatim */}
           <div style={{ ...card, padding: "18px 20px" }}>
             <Eyebrow>
@@ -837,25 +889,21 @@ export function LabTemasIdeas({ color }: PracticaLabProps) {
             <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
               {COMPRENSION_A1.map((c, i) => (
                 <div key={i} style={{ borderRadius: 12, border: `1px solid ${T.line}`, background: T.inset, padding: "11px 14px" }}>
-                  <div style={{ fontSize: 12.8, fontWeight: 800, color: T.text }}>{c.pregunta}</div>
-                  <div style={{ marginTop: 4, fontSize: 12.3, lineHeight: 1.5, color: T.text3 }}>{c.respuesta}</div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: T.text }}>{c.pregunta}</div>
+                  <div style={{ marginTop: 4, fontSize: 14, lineHeight: 1.5, color: T.text3 }}>{c.respuesta}</div>
                 </div>
               ))}
             </div>
-            <div style={{ marginTop: 11, fontSize: 11, color: T.text3, fontStyle: "italic" }}>Verbatim de LC-II-P05-A1.</div>
+            <div style={{ marginTop: 11, fontSize: 14, color: T.text3, fontStyle: "italic" }}>Verbatim de LC-II-P05-A1.</div>
           </div>
-        </div>
-      </div>
-
-      {/* ── Hechos (V/F verbatim A4) + Glosario (A5) ───────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 16, marginTop: 22 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))", gap: 16, marginTop: 22 }}>
         <div style={{ ...card, padding: "20px 22px" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
             <Eyebrow>
               <i className="fa-solid fa-scale-balanced" style={{ marginRight: 8, color: accent }} />
               Hechos: ¿verdadero o falso?
             </Eyebrow>
-            <span style={{ fontSize: 12.5, fontWeight: 800, color: hechosDone ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
+            <span style={{ fontSize: 14, fontWeight: 800, color: hechosDone ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
               {hechosResueltos}/{HECHOS.length}
             </span>
           </div>
@@ -875,7 +923,7 @@ export function LabTemasIdeas({ color }: PracticaLabProps) {
                     transition: "all .16s",
                   }}
                 >
-                  <div style={{ fontSize: 13, lineHeight: 1.45, color: T.text }}>{h.enunciado}</div>
+                  <div style={{ fontSize: 14, lineHeight: 1.45, color: T.text }}>{h.enunciado}</div>
                   <div style={{ marginTop: 9, display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
                     {[true, false].map((v) => (
                       <button
@@ -894,17 +942,17 @@ export function LabTemasIdeas({ color }: PracticaLabProps) {
                       </button>
                     ))}
                     {acertado && (
-                      <span style={{ fontSize: 12, fontWeight: 800, color: OK, display: "inline-flex", alignItems: "center", gap: 6 }}>
+                      <span style={{ fontSize: 14, fontWeight: 800, color: OK, display: "inline-flex", alignItems: "center", gap: 6 }}>
                         <i className="fa-solid fa-circle-check" /> Correcto
                       </span>
                     )}
                   </div>
-                  {resp !== null && <div style={{ marginTop: 8, fontSize: 12.3, lineHeight: 1.5, color: T.text3 }}>{h.retro}</div>}
+                  {resp !== null && <div style={{ marginTop: 8, fontSize: 14, lineHeight: 1.5, color: T.text3 }}>{h.retro}</div>}
                 </div>
               );
             })}
           </div>
-          <div style={{ marginTop: 12, fontSize: 11, color: T.text3, fontStyle: "italic" }}>Verbatim de LC-II-P05-A4.</div>
+          <div style={{ marginTop: 12, fontSize: 14, color: T.text3, fontStyle: "italic" }}>Verbatim de LC-II-P05-A4.</div>
         </div>
 
         <div style={{ ...card, padding: "20px 22px" }}>
@@ -915,16 +963,16 @@ export function LabTemasIdeas({ color }: PracticaLabProps) {
           <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
             {GLOSARIO.map((g) => (
               <div key={g.id} style={{ borderRadius: 12, border: `1px solid ${T.line}`, background: T.inset, padding: "11px 14px" }}>
-                <div style={{ fontSize: 13.5, fontWeight: 900, color: accent }}>{g.termino}</div>
-                <div style={{ marginTop: 3, fontSize: 12.8, lineHeight: 1.5, color: T.text2 }}>{g.definicion}</div>
-                <div style={{ marginTop: 5, fontSize: 12, color: T.text3, fontStyle: "italic" }}>
+                <div style={{ fontSize: 14, fontWeight: 900, color: accent }}>{g.termino}</div>
+                <div style={{ marginTop: 3, fontSize: 14, lineHeight: 1.5, color: T.text2 }}>{g.definicion}</div>
+                <div style={{ marginTop: 5, fontSize: 14, color: T.text3, fontStyle: "italic" }}>
                   <i className="fa-solid fa-arrow-turn-up fa-rotate-90" style={{ marginRight: 7, opacity: 0.6 }} />
                   {g.ejemplo}
                 </div>
               </div>
             ))}
           </div>
-          <div style={{ marginTop: 12, fontSize: 11, color: T.text3, fontStyle: "italic" }}>
+          <div style={{ marginTop: 12, fontSize: 14, color: T.text3, fontStyle: "italic" }}>
             Los cuatro primeros, verbatim de LC-II-P05-A5; «Asunto» y «Motivo recurrente» se añadieron para esta práctica.
           </div>
 
@@ -935,16 +983,15 @@ export function LabTemasIdeas({ color }: PracticaLabProps) {
             </Eyebrow>
             <ul style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 7 }}>
               {CRITERIOS_A7.map((c, i) => (
-                <li key={i} style={{ fontSize: 12.8, lineHeight: 1.5, color: T.text2 }}>
+                <li key={i} style={{ fontSize: 14, lineHeight: 1.5, color: T.text2 }}>
                   {c}
                 </li>
               ))}
             </ul>
-            <div style={{ marginTop: 10, fontSize: 11, color: T.text3, fontStyle: "italic" }}>Criterios verbatim de LC-II-P05-A7.</div>
+            <div style={{ marginTop: 10, fontSize: 14, color: T.text3, fontStyle: "italic" }}>Criterios verbatim de LC-II-P05-A7.</div>
           </div>
         </div>
       </div>
-
       {/* Dato verbatim del recuadro de A1 */}
       <div
         style={{
@@ -953,7 +1000,7 @@ export function LabTemasIdeas({ color }: PracticaLabProps) {
           padding: "16px 20px",
           border: `1px solid rgba(${color.rgba},0.28)`,
           background: `rgba(${color.rgba},0.07)`,
-          fontSize: 13,
+          fontSize: 14,
           color: T.text2,
           lineHeight: 1.6,
           display: "flex",
@@ -966,25 +1013,117 @@ export function LabTemasIdeas({ color }: PracticaLabProps) {
           {DATO_A1}
         </span>
       </div>
-
-      <RetoQuizCard
-        quiz={QUIZ}
-        accent={accent}
-        rgba={color.rgba}
-        aprobado={quizAprobado}
-        onAprobado={() => setQuizAprobado(true)}
-        playSfx={(ok) => (ok ? sfxOk() : sfxNo())}
-        playPick={sfxPick}
-        mensajeAprobado="Distingues el tema de la trama y sabes qué ideas lo sostienen."
-      />
-
-      <p style={{ margin: "18px 0 0", paddingBottom: 60, fontSize: 11.5, lineHeight: 1.6, color: T.text3, fontStyle: "italic" }}>
+      <p style={{ margin: "18px 0 0", paddingBottom: 60, fontSize: 14, lineHeight: 1.6, color: T.text3, fontStyle: "italic" }}>
         <i className="fa-solid fa-circle-info" style={{ marginRight: 7, opacity: 0.7 }} />
         {NOTA_PIE}
       </p>
-    </div>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }
+
+
+const cssTin = (accent: string, rgba: string) => `
+        @keyframes tinShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
+        @keyframes tinPop { 0%{transform:scale(.72);opacity:0;} 100%{transform:scale(1);opacity:1;} }
+        .tin-prob { cursor:pointer; padding:8px 13px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass};
+          color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; }
+        .tin-prob:hover { border-color:${T.lineStrong}; color:#fff; }
+        .tin-prob[data-on="true"] { border-color:${accent}; background:rgba(${rgba},0.16); color:#fff; }
+        .tin-prob[data-done="true"] { color:${OK}; border-color:${OK}66; }
+
+        .tin-card { cursor:pointer; display:block; width:100%; text-align:left; padding:13px 16px; border-radius:13px;
+          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:${T.text}; font-size:14px; line-height:1.55;
+          transition:all .14s; user-select:none; }
+        .tin-card:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.07); }
+        .tin-card[data-sel="true"] { border-color:${accent}; background:rgba(${rgba},0.16); box-shadow:0 0 18px -5px ${accent}; }
+        .tin-card[data-shake="true"] { animation:tinShake .4s; border-color:${NO}; }
+        .tin-card[data-done="true"] { cursor:default; border-color:${OK}66; background:${OK}10; }
+        .tin-card[data-drag="true"] { cursor:grab; }
+        .tin-card[data-drag="true"]:active { cursor:grabbing; }
+
+        .tin-bin { border-radius:16px; border:2px dashed ${T.lineStrong}; padding:16px; min-height:150px; transition:all .16s; }
+        .tin-bin[data-shake="true"] { animation:tinShake .4s; }
+
+        .tin-pill { cursor:pointer; display:inline-flex; align-items:center; gap:7px; padding:7px 12px; border-radius:999px;
+          border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; white-space:nowrap; }
+        .tin-pill:hover { color:#fff; border-color:${T.lineStrong}; }
+        .tin-pill:disabled { cursor:default; opacity:.9; }
+
+        .tin-vf { cursor:pointer; padding:5px 12px; border-radius:9px; border:1px solid ${T.line}; background:${T.glass};
+          color:${T.text2}; font-size:14px; font-weight:900; letter-spacing:.04em; transition:all .14s; }
+        .tin-vf:hover { color:#fff; border-color:${T.lineStrong}; }
+        .tin-vf[data-on="true"] { color:#04121f; }
+
+        .tin-hilo { cursor:pointer; display:flex; gap:12px; align-items:flex-start; width:100%; text-align:left;
+          padding:12px 15px; border-radius:12px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text2};
+          font-size:14px; line-height:1.55; transition:all .14s; }
+        .tin-hilo:hover:not(:disabled) { border-color:${T.lineStrong}; color:#fff; }
+        .tin-hilo:disabled { cursor:default; }
+        .tin-hilo[data-ok="true"] { border-color:${OK}; background:${OK}14; color:#fff; animation:tinPop .25s ease; }
+        .tin-hilo[data-shake="true"] { animation:tinShake .4s; border-color:${NO}; }
+        .tin-fichas { display:grid; grid-template-columns:repeat(auto-fit, minmax(230px,1fr)); gap:12px; }
+        .tin-fichas { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 230px),1fr)); gap:12px; }
+        .tin-bins { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:14px; }
+        @media (max-width: 700px){ .tin-bins { grid-template-columns:minmax(0,1fr); } }
+
+        .tin-banco, .tin-dest { display:flex; flex-direction:column; gap:10px; min-width:0; }
+        .tin-temas { display:grid; gap:6px; }
+        .tin-tema { cursor:pointer; display:flex; align-items:center; gap:10px; text-align:left; padding:10px 12px; border-radius:12px;
+          border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; }
+        .tin-tema i { color:var(--tc); width:20px; text-align:center; }
+        .tin-tema:hover { color:#fff; border-color:${T.lineStrong}; }
+        .tin-tema[data-on="true"] { color:#fff; border-color:var(--tc); background:color-mix(in srgb, var(--tc) 18%, transparent); }
+        .tin-instr { font-size:14px; color:${T.text2}; }
+        .tin-instr strong { color:#fff; }
+        .tin-escena { cursor:pointer; display:grid; grid-template-columns:84px minmax(0,1fr); gap:10px; align-items:center; text-align:left;
+          padding:8px; border-radius:12px; border:1.5px solid ${T.line}; background:${T.glassSoft}; color:${T.text}; font-size:14px; line-height:1.4; transition:all .14s; }
+        .tin-escena:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.07); }
+        .tin-escena[data-sel="true"] { border-color:${accent}; background:rgba(${rgba},0.16); }
+        .tin-foto { position:relative; aspect-ratio:1/1; border-radius:9px; overflow:hidden; display:flex; align-items:center; justify-content:center;
+          background:linear-gradient(135deg, rgba(${rgba},0.35), rgba(8,19,31,0.9)); color:rgba(255,255,255,0.55); font-size:24px; }
+        .tin-foto img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+        .tin-foto[data-grande="true"] { aspect-ratio:16/10; width:100%; font-size:30px; }
+        .tin-tira { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:8px; }
+        .tin-marco { cursor:pointer; display:flex; flex-direction:column; gap:6px; padding:8px; border-radius:12px; min-width:0;
+          border:2px dashed ${T.line}; background:${T.inset}; color:${T.text2}; font-size:14px; transition:all .2s; }
+        .tin-marco[data-act="true"] { box-shadow:0 0 0 2px rgba(${rgba},0.5); }
+        .tin-marco[data-estado="ok"] { border:2px solid ${OK}; background:${OK}10; }
+        .tin-marco[data-estado="no"] { border:2px solid ${NO}; background:${NO}10; }
+        .tin-marco-t { font-size:14px; font-weight:900; color:#fff; }
+        .tin-vacio { display:flex; align-items:center; justify-content:center; aspect-ratio:16/10; border-radius:9px; background:rgba(255,255,255,0.04); color:${T.text3}; }
+        .tin-motivo { font-size:14px; font-weight:800; color:${accent}; text-align:center; }
+        .tin-hilo-svg { width:100%; height:30px; margin-top:-4px; }
+        .tin-hilo-path { animation:tinPop .4s ease; }
+        .tin-medidor { display:grid; gap:6px; padding:10px 12px; border-radius:12px; border:1px solid ${T.line}; background:${T.inset}; }
+        .tin-medidor-t { display:flex; justify-content:space-between; align-items:baseline; gap:8px; font-size:14px; font-weight:800; color:${T.text2}; }
+        .tin-medidor-t strong { font-size:19px; font-variant-numeric:tabular-nums; }
+        .tin-barra { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:6px; }
+        .tin-barra span { height:14px; border-radius:99px; background:rgba(255,255,255,0.12); transition:background .3s; }
+        .tin-veredicto { font-size:15px; font-weight:700; color:#fff; line-height:1.4; }
+        .tin-par { display:grid; gap:8px; }
+        .tin-par > div { display:grid; gap:2px; padding:10px 12px; border-radius:12px; border:1px solid ${T.line}; background:${T.glassSoft}; font-size:14px; line-height:1.4; color:${T.text2}; }
+        .tin-par b { font-size:14px; text-transform:uppercase; letter-spacing:.1em; color:${accent}; }
+
+        @media (prefers-reduced-motion: reduce){
+          .tin-card, .tin-bin, .tin-hilo, .tin-hilo-path, .tin-marco { animation:none !important; transition:none; }
+        }
+`;
+
+function FotoEscena({ foto, icono, grande }: { foto: string | null; icono: string; grande?: boolean }) {
+  return (
+    <span className="tin-foto" data-grande={grande ?? false}>
+      <i className={`fa-solid ${icono}`} aria-hidden />
+      {foto && (
+        <img src={`${RUTA_FOTOS}/${foto}.webp`} alt="" loading="lazy" onError={(ev) => { ev.currentTarget.style.display = "none"; }} />
+      )}
+    </span>
+  );
+}
+
 
 /* ═══════════════════════════════════════════════════════════════════════════
  * El relato, tal como se lee
@@ -994,7 +1133,7 @@ function RelatoCard({ relato, accent, rgba, extra }: { relato: Relato; accent: s
     <div style={{ ...card, padding: "20px 24px 22px" }}>
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
         <div style={{ minWidth: 0 }}>
-          <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase", color: accent }}>
+          <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase", color: accent }}>
             <i className="fa-solid fa-feather" style={{ marginRight: 7 }} />
             {relato.forma}
           </div>
@@ -1006,7 +1145,7 @@ function RelatoCard({ relato, accent, rgba, extra }: { relato: Relato; accent: s
               flexShrink: 0,
               padding: "6px 12px",
               borderRadius: 999,
-              fontSize: 11.5,
+              fontSize: 14,
               fontWeight: 900,
               color: "#fff",
               border: `1px solid rgba(${rgba},0.4)`,
@@ -1031,7 +1170,7 @@ function RelatoCard({ relato, accent, rgba, extra }: { relato: Relato; accent: s
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: 11,
+                fontSize: 14,
                 fontWeight: 900,
                 color: T.text3,
                 border: `1px solid ${T.line}`,
@@ -1046,7 +1185,7 @@ function RelatoCard({ relato, accent, rgba, extra }: { relato: Relato; accent: s
         ))}
       </div>
 
-      <div style={{ marginTop: 14, paddingTop: 11, borderTop: `1px solid ${T.line}`, fontSize: 11.5, color: T.text3, fontStyle: "italic" }}>
+      <div style={{ marginTop: 14, paddingTop: 11, borderTop: `1px solid ${T.line}`, fontSize: 14, color: T.text3, fontStyle: "italic" }}>
         {relato.procedencia}
       </div>
     </div>
@@ -1101,7 +1240,7 @@ function AsuntoPanel({
           </button>
         ))}
         <div style={{ flex: 1 }} />
-        <span style={{ fontSize: 12, fontWeight: 800, color: repartidas >= TOTAL_TARJETAS ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
+        <span style={{ fontSize: 14, fontWeight: 800, color: repartidas >= TOTAL_TARJETAS ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
           {repartidas}/{TOTAL_TARJETAS} tarjetas
         </span>
       </div>
@@ -1114,10 +1253,10 @@ function AsuntoPanel({
             <i className="fa-solid fa-layer-group" style={{ marginRight: 8, color: accent }} />
             Cuatro tarjetas sobre este relato
           </Eyebrow>
-          <span style={{ fontSize: 11.5, color: T.text3 }}>Tócala y después toca su caja, o arrástrala.</span>
+          <span style={{ fontSize: 14, color: T.text3 }}>Tócala y después toca su caja, o arrástrala.</span>
         </div>
         {libres.length === 0 ? (
-          <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+          <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
             <i className="fa-solid fa-circle-check" /> ¡Relato repartido! Cambia de relato arriba para seguir.
           </div>
         ) : (
@@ -1170,8 +1309,8 @@ function AsuntoPanel({
                   <i className={`fa-solid ${info.icono}`} />
                 </span>
                 <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: 13.5, fontWeight: 900, color: "#fff" }}>{info.label}</div>
-                  <div style={{ fontSize: 11, color: T.text3, lineHeight: 1.4 }}>{info.descripcion}</div>
+                  <div style={{ fontSize: 14, fontWeight: 900, color: "#fff" }}>{info.label}</div>
+                  <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.4 }}>{info.descripcion}</div>
                 </div>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -1180,7 +1319,7 @@ function AsuntoPanel({
                     key={t.id}
                     style={{
                       animation: "tinPop .25s ease",
-                      fontSize: 12.5,
+                      fontSize: 14,
                       lineHeight: 1.45,
                       color: "#fff",
                       padding: "9px 11px",
@@ -1192,7 +1331,7 @@ function AsuntoPanel({
                     {t.texto}
                   </span>
                 ))}
-                {dentro.length === 0 && <span style={{ fontSize: 11.5, color: T.text3, fontStyle: "italic" }}>Vacía</span>}
+                {dentro.length === 0 && <span style={{ fontSize: 14, color: T.text3, fontStyle: "italic" }}>Vacía</span>}
               </div>
             </div>
           );
@@ -1289,12 +1428,12 @@ function TemaPanel({
             <i className="fa-solid fa-diagram-project" style={{ marginRight: 8, color: accent }} />
             Paso 2 · ¿Qué dos líneas sostienen ese tema?
           </Eyebrow>
-          <span style={{ fontSize: 12.5, fontWeight: 800, color: marcados >= sostienen.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
+          <span style={{ fontSize: 14, fontWeight: 800, color: marcados >= sostienen.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
             {marcados}/{sostienen.length}
           </span>
         </div>
         {!elegido ? (
-          <div style={{ fontSize: 13, color: T.text3, display: "flex", alignItems: "center", gap: 9 }}>
+          <div style={{ fontSize: 14, color: T.text3, display: "flex", alignItems: "center", gap: 9 }}>
             <i className="fa-solid fa-lock" /> Primero elige el tema que el relato sostiene.
           </div>
         ) : (
@@ -1321,7 +1460,7 @@ function TemaPanel({
                   <span style={{ minWidth: 0 }}>
                     <span style={{ display: "block" }}>{h.texto}</span>
                     {ok && (
-                      <span style={{ display: "block", marginTop: 5, fontSize: 11, fontWeight: 900, letterSpacing: "0.07em", textTransform: "uppercase", color: OK }}>
+                      <span style={{ display: "block", marginTop: 5, fontSize: 14, fontWeight: 900, letterSpacing: "0.07em", textTransform: "uppercase", color: OK }}>
                         {h.clase}
                       </span>
                     )}
@@ -1373,7 +1512,7 @@ function MedidaPanel({
           );
         })}
         <div style={{ flex: 1 }} />
-        <span style={{ fontSize: 12, fontWeight: 800, color: hechas >= caso.formulaciones.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
+        <span style={{ fontSize: 14, fontWeight: 800, color: hechas >= caso.formulaciones.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
           {hechas}/{caso.formulaciones.length}
         </span>
       </div>
@@ -1411,7 +1550,7 @@ function MedidaPanel({
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: 12,
+                    fontSize: 14,
                     color: "#04121f",
                     background: info.color,
                   }}
@@ -1419,8 +1558,8 @@ function MedidaPanel({
                   <i className={`fa-solid ${info.icono}`} />
                 </span>
                 <span style={{ minWidth: 0 }}>
-                  <span style={{ display: "block", fontSize: 12.5, fontWeight: 900, color: "#fff" }}>{info.label}</span>
-                  <span style={{ display: "block", fontSize: 11.5, color: T.text3, lineHeight: 1.4, marginTop: 2 }}>{info.descripcion}</span>
+                  <span style={{ display: "block", fontSize: 14, fontWeight: 900, color: "#fff" }}>{info.label}</span>
+                  <span style={{ display: "block", fontSize: 14, color: T.text3, lineHeight: 1.4, marginTop: 2 }}>{info.descripcion}</span>
                 </span>
               </div>
             );
@@ -1435,7 +1574,7 @@ function MedidaPanel({
             Tres formulaciones del tema de «{relato.titulo}»
           </Eyebrow>
         </div>
-        <div style={{ fontSize: 12.8, color: T.text3, lineHeight: 1.5, marginBottom: 15 }}>
+        <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.5, marginBottom: 15 }}>
           Recuerda de qué va: {relato.asunto}. Ponle a cada formulación la medida que le corresponde.
         </div>
 
@@ -1465,7 +1604,7 @@ function MedidaPanel({
                         gap: 8,
                         padding: "6px 13px",
                         borderRadius: 999,
-                        fontSize: 12,
+                        fontSize: 14,
                         fontWeight: 900,
                         color: "#04121f",
                         background: info.color,
@@ -1495,7 +1634,7 @@ function MedidaPanel({
                     </span>
                   )}
                 </div>
-                {puesta && <div style={{ marginTop: 9, fontSize: 12.8, lineHeight: 1.55, color: T.text2 }}>{f.porque}</div>}
+                {puesta && <div style={{ marginTop: 9, fontSize: 14, lineHeight: 1.55, color: T.text2 }}>{f.porque}</div>}
               </div>
             );
           })}
@@ -1537,12 +1676,12 @@ function ParejasPanel({
             <i className="fa-solid fa-clone" style={{ marginRight: 8, color: accent }} />
             Seis narrativas populares · toca dos que compartan tema
           </Eyebrow>
-          <span style={{ fontSize: 12.5, fontWeight: 800, color: parejasHechas.length >= PAREJAS.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
+          <span style={{ fontSize: 14, fontWeight: 800, color: parejasHechas.length >= PAREJAS.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
             {parejasHechas.length}/{PAREJAS.length} parejas
           </span>
         </div>
         {libres.length === 0 ? (
-          <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+          <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
             <i className="fa-solid fa-circle-check" /> ¡Las tres parejas están armadas!
           </div>
         ) : (
@@ -1560,7 +1699,7 @@ function ParejasPanel({
                   style={{
                     padding: "2px 9px",
                     borderRadius: 999,
-                    fontSize: 10,
+                    fontSize: 14,
                     fontWeight: 900,
                     letterSpacing: "0.05em",
                     textTransform: "uppercase",
@@ -1572,7 +1711,7 @@ function ParejasPanel({
                   {f.forma}
                 </span>
                 <span style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.25 }}>{f.titulo}</span>
-                <span style={{ fontSize: 12.5, lineHeight: 1.5, color: T.text3 }}>{f.asunto}</span>
+                <span style={{ fontSize: 14, lineHeight: 1.5, color: T.text3 }}>{f.asunto}</span>
               </button>
             ))}
           </div>
@@ -1602,20 +1741,20 @@ function ParejasPanel({
                     padding: "11px 14px",
                   }}
                 >
-                  <span style={{ display: "block", fontSize: 10, fontWeight: 900, letterSpacing: "0.06em", textTransform: "uppercase", color: T.text3 }}>{f.forma}</span>
+                  <span style={{ display: "block", fontSize: 14, fontWeight: 900, letterSpacing: "0.06em", textTransform: "uppercase", color: T.text3 }}>{f.forma}</span>
                   <span style={{ display: "block", marginTop: 4, fontSize: 14, fontWeight: 900, color: "#fff" }}>{f.titulo}</span>
-                  <span style={{ display: "block", marginTop: 3, fontSize: 12, lineHeight: 1.45, color: T.text3 }}>{f.asunto}</span>
+                  <span style={{ display: "block", marginTop: 3, fontSize: 14, lineHeight: 1.45, color: T.text3 }}>{f.asunto}</span>
                 </span>
               ))}
             </div>
 
-            <div style={{ fontSize: 13, lineHeight: 1.6, color: T.text2, marginBottom: 14 }}>
+            <div style={{ fontSize: 14, lineHeight: 1.6, color: T.text2, marginBottom: 14 }}>
               <i className="fa-solid fa-code-compare" style={{ marginRight: 9, color: accent }} />
               {pareja.contraste}
             </div>
 
             <div style={{ borderTop: `1px solid ${T.line}`, paddingTop: 14 }}>
-              <div style={{ fontSize: 12.5, fontWeight: 800, color: T.text2, marginBottom: 10 }}>
+              <div style={{ fontSize: 14, fontWeight: 800, color: T.text2, marginBottom: 10 }}>
                 {elegida ? "Tema compartido:" : "¿Cuál es el tema que comparten?"}
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>

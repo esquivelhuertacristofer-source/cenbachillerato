@@ -18,8 +18,8 @@
  */
 
 import * as THREE from "three";
-import { useCallback, useMemo, useRef, useState } from "react";
-import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, Line, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
@@ -117,14 +117,14 @@ function LluviaMuestras({ mu, sigma, xMin, xMax, OX, SX, OY, SY, yMax, accent, p
   return (
     <instancedMesh ref={ref} args={[undefined, undefined, MUESTRAS_N]}>
       <sphereGeometry args={[1, 8, 8]} />
-      <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.6} transparent opacity={0.72} toneMapped={false} />
+      <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.6} transparent opacity={0.72} />
     </instancedMesh>
   );
 }
 
 /* ── Tirador arrastrable (μ / σ / extremo a / extremo b) ───────────────── */
-function Tirador({ px, py, color, label, invX, toValue, lo, hi, onSet, onGrab, setDragging }: {
-  px: number; py: number; color: string; label: string;
+function Tirador({ px, py, color, invX, toValue, lo, hi, onSet, onGrab, setDragging }: {
+  px: number; py: number; color: string;
   invX: (worldX: number) => number; toValue: (mathX: number) => number;
   lo: number; hi: number;
   onSet: (v: number) => void; onGrab?: () => void; setDragging: (v: boolean) => void;
@@ -146,7 +146,7 @@ function Tirador({ px, py, color, label, invX, toValue, lo, hi, onSet, onGrab, s
     <group position={[px, py, 0.16]}>
       <mesh ref={knob}>
         <sphereGeometry args={[0.2, 20, 20]} />
-        <meshStandardMaterial color="#ffffff" emissive={color} emissiveIntensity={0.9} toneMapped={false} />
+        <meshStandardMaterial color="#ffffff" emissive={color} emissiveIntensity={0.9} />
       </mesh>
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[0.36, 0.04, 12, 28]} />
@@ -177,18 +177,13 @@ function Tirador({ px, py, color, label, invX, toValue, lo, hi, onSet, onGrab, s
         <sphereGeometry args={[0.6, 14, 14]} />
         <meshBasicMaterial transparent opacity={0} depthWrite={false} />
       </mesh>
-      <Html position={[0, 0.55, 0]} center distanceFactor={14} zIndexRange={[30, 0]} style={{ pointerEvents: "none" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "3px 8px", borderRadius: 999, background: "rgba(4,10,22,0.82)", border: `1px solid ${color}`, color: "#fff", fontSize: 10, fontWeight: 800, whiteSpace: "nowrap" }}>
-          <i className="fa-solid fa-hand-pointer" /> {label}
-        </div>
-      </Html>
     </group>
   );
 }
 
 /* ════════════════════ CONTENIDO DEL PLANO ═══════════════════════════════ */
-function Plano({ presetId, accent, modo, mu, sigma, a, b, pausado, arrastrable, onDragMu, onDragSigma, onDragA, onDragB, onGrab, setDragging }: {
-  presetId: string; accent: string; modo: Modo; mu: number; sigma: number; a: number; b: number; pausado: boolean;
+function Plano({ angosto, presetId, accent, modo, mu, sigma, a, b, pausado, arrastrable, onDragMu, onDragSigma, onDragA, onDragB, onGrab, setDragging }: {
+  angosto: boolean; presetId: string; accent: string; modo: Modo; mu: number; sigma: number; a: number; b: number; pausado: boolean;
   arrastrable?: boolean;
   onDragMu?: (mu: number) => void;
   onDragSigma?: (sigma: number) => void;
@@ -293,9 +288,6 @@ function Plano({ presetId, accent, modo, mu, sigma, a, b, pausado, arrastrable, 
         <coneGeometry args={[0.13, 0.34, 16]} />
         <meshStandardMaterial color={EJE} />
       </mesh>
-      <Html position={[wx(xMax) + 0.95, wy(0) + 0.05, 0]} center distanceFactor={15} pointerEvents="none">
-        <div style={{ color: EJE, fontSize: 11, fontWeight: 900, whiteSpace: "nowrap" }}>{unidad}</div>
-      </Html>
 
       {/* eje Y (densidad) */}
       <Line points={[[wx(xMin), wy(0), 0], [wx(xMin), wy(yMax) + 0.5, 0]]} color={EJE} lineWidth={2} />
@@ -303,24 +295,12 @@ function Plano({ presetId, accent, modo, mu, sigma, a, b, pausado, arrastrable, 
         <coneGeometry args={[0.13, 0.34, 16]} />
         <meshStandardMaterial color={EJE} />
       </mesh>
-      <Html position={[wx(xMin) - 0.2, wy(yMax) + 0.95, 0]} center distanceFactor={15} pointerEvents="none">
-        <div style={{ color: EJE, fontSize: 10, fontWeight: 800, whiteSpace: "nowrap" }}>densidad</div>
-      </Html>
 
       {/* marcas numéricas */}
       {xticks.map((x, i) => {
-        const k = Math.round((x - mu) / sigma);
-        return (
+                return (
           <group key={`tx${i}`}>
             <Line points={[[wx(x), wy(0) - 0.12, 0], [wx(x), wy(0) + 0.12, 0]]} color={EJE} lineWidth={1} />
-            <Html position={[wx(x), wy(0) - 0.4, 0]} center distanceFactor={16} pointerEvents="none">
-              <div style={{ color: k === 0 ? ORO : EJE, fontSize: 9.5, fontWeight: 700, whiteSpace: "nowrap" }}>{fmtNum(x, 0)}</div>
-            </Html>
-            {k !== 0 && (
-              <Html position={[wx(x), wy(0) - 0.78, 0]} center distanceFactor={16} pointerEvents="none">
-                <div style={{ color: "#6b8199", fontSize: 8.5, fontWeight: 700, whiteSpace: "nowrap" }}>{k > 0 ? `+${k}σ` : `${k}σ`}</div>
-              </Html>
-            )}
           </group>
         );
       })}
@@ -335,8 +315,8 @@ function Plano({ presetId, accent, modo, mu, sigma, a, b, pausado, arrastrable, 
         ))}
       {modo === "empirica" &&
         REGLA_EMPIRICA.map((r) => (
-          <Html key={`pe${r.k}`} position={w3(mu, yMax * (0.16 + (r.k - 1) * 0.2), 0.1)} center distanceFactor={15} pointerEvents="none">
-            <div style={{ color: BANDAS[r.k - 1], fontSize: 10, fontWeight: 900, textShadow: "0 2px 8px #000", whiteSpace: "nowrap" }}>
+          <Html key={`pe${r.k}`} position={w3(mu, yMax * (0.14 + (r.k - 1) * 0.15), 0.1)} center pointerEvents="none">
+            <div style={{ color: BANDAS[r.k - 1], fontSize: 14, fontWeight: 900, textShadow: "0 2px 8px #000", whiteSpace: "nowrap" }}>
               μ±{r.k}σ → {fmtNum(r.pct, r.k === 1 ? 0 : 1)}%
             </div>
           </Html>
@@ -352,25 +332,27 @@ function Plano({ presetId, accent, modo, mu, sigma, a, b, pausado, arrastrable, 
           {[{ x: a, z: za, col: VERDE, lbl: "a" }, { x: b, z: zb, col: MAGENTA, lbl: "b" }].map((m) => (
             <group key={m.lbl}>
               <Line points={[w3(m.x, 0, 0.05), w3(m.x, pdf(m.x, mu, sigma) * 1.04, 0.05)]} color={m.col} lineWidth={2} dashed dashSize={0.14} gapSize={0.1} />
-              <Html position={[wx(m.x), wy(0) - 1.18, 0]} center distanceFactor={15} pointerEvents="none">
-                <div style={{ color: m.col, fontSize: 10, fontWeight: 900, textShadow: "0 2px 8px #000", whiteSpace: "nowrap" }}>
+              <Html position={[wx(m.x), wy(0) - 0.45, 0]} center pointerEvents="none">
+                <div style={{ color: m.col, fontSize: 14, fontWeight: 900, textShadow: "0 2px 8px #000", whiteSpace: "nowrap" }}>
                   {m.lbl}={fmtNum(m.x, 1)} · z={fmtNum(m.z, 2)}
                 </div>
               </Html>
             </group>
           ))}
-          <Html position={w3(mu, yMax * 0.45, 0.1)} center distanceFactor={14} pointerEvents="none">
-            <div style={{ background: "rgba(2,12,28,0.85)", border: `1px solid ${accent}66`, borderRadius: 8, padding: "4px 9px", whiteSpace: "nowrap", textAlign: "center" }}>
-              <span style={{ color: accent, fontSize: 11, fontWeight: 900 }}>P(a ≤ X ≤ b) = {fmtPct(prob, 1)}</span>
-            </div>
-          </Html>
+          {!angosto && (
+            <Html position={w3(mu, yMax * 0.4, 0.1)} center pointerEvents="none">
+              <div style={{ background: "rgba(2,12,28,0.85)", border: `1px solid ${accent}66`, borderRadius: 8, padding: "4px 9px", whiteSpace: "nowrap", textAlign: "center" }}>
+                <span style={{ color: accent, fontSize: 14, fontWeight: 900 }}>P = {fmtPct(prob, 1)}</span>
+              </div>
+            </Html>
+          )}
         </>
       )}
 
       {/* línea de la media μ */}
       <Line points={[w3(mu, 0, 0.04), w3(mu, pdf(mu, mu, sigma) * 1.02, 0.04)]} color={ORO} lineWidth={2} />
-      <Html position={[wx(mu), wy(pdf(mu, mu, sigma)) + 0.45, 0]} center distanceFactor={14} pointerEvents="none">
-        <div style={{ color: ORO, fontSize: 11, fontWeight: 900, textShadow: "0 2px 8px #000", whiteSpace: "nowrap" }}>
+      <Html position={[wx(mu), wy(pdf(mu, mu, sigma)) + 0.55, 0]} center pointerEvents="none">
+        <div style={{ color: ORO, fontSize: 14, fontWeight: 900, textShadow: "0 2px 8px #000", whiteSpace: "nowrap" }}>
           μ = {fmtNum(mu, 0)} {unidad}
         </div>
       </Html>
@@ -393,8 +375,8 @@ function Plano({ presetId, accent, modo, mu, sigma, a, b, pausado, arrastrable, 
           );
         })}
       {modo === "campana" && (
-        <Html position={w3(mu + sigma, pdf(mu + sigma, mu, sigma) + 0.0006, 0.05)} center distanceFactor={14} pointerEvents="none">
-          <div style={{ color: AZUL, fontSize: 10, fontWeight: 900, textShadow: "0 2px 8px #000", whiteSpace: "nowrap" }}>
+        <Html position={[wx(mu + sigma) + 0.55, wy(pdf(mu + sigma, mu, sigma)) + 0.3, 0.05]} center pointerEvents="none">
+          <div style={{ color: AZUL, fontSize: 14, fontWeight: 900, textShadow: "0 2px 8px #000", whiteSpace: "nowrap" }}>
             σ = {fmtNum(sigma, 1)}
           </div>
         </Html>
@@ -418,24 +400,24 @@ function Plano({ presetId, accent, modo, mu, sigma, a, b, pausado, arrastrable, 
       {arrastrable && (
         <>
           <Tirador
-            px={wx(mu)} py={wy(pdf(mu, mu, sigma))} color={ORO} label="μ"
+            px={wx(mu)} py={wy(pdf(mu, mu, sigma))} color={ORO}
             invX={invX} toValue={(mx) => mx} lo={muMin} hi={muMax}
             onSet={(v) => onDragMu?.(v)} onGrab={onGrab} setDragging={setDragging}
           />
           <Tirador
-            px={wx(Math.min(mu + sigma, xMax))} py={wy(pdf(mu + sigma, mu, sigma))} color={AZUL} label="σ"
+            px={wx(Math.min(mu + sigma, xMax))} py={wy(pdf(mu + sigma, mu, sigma))} color={AZUL}
             invX={invX} toValue={(mx) => mx - mu} lo={sigmaMin} hi={sigmaMax}
             onSet={(v) => onDragSigma?.(v)} onGrab={onGrab} setDragging={setDragging}
           />
           {modo === "probabilidad" && (
             <>
               <Tirador
-                px={wx(a)} py={wy(pdf(a, mu, sigma))} color={VERDE} label="a"
+                px={wx(a)} py={wy(pdf(a, mu, sigma))} color={VERDE}
                 invX={invX} toValue={(mx) => mx} lo={xMin} hi={xMax}
                 onSet={(v) => onDragA?.(v)} onGrab={onGrab} setDragging={setDragging}
               />
               <Tirador
-                px={wx(b)} py={wy(pdf(b, mu, sigma))} color={MAGENTA} label="b"
+                px={wx(b)} py={wy(pdf(b, mu, sigma))} color={MAGENTA}
                 invX={invX} toValue={(mx) => mx} lo={xMin} hi={xMax}
                 onSet={(v) => onDragB?.(v)} onGrab={onGrab} setDragging={setDragging}
               />
@@ -465,31 +447,41 @@ export default function NormalScene(props: NormalSceneProps) {
 function Contenido(props: NormalSceneProps) {
   const { presetId, accent, modo, mu, sigma, a, b, pausado, autoRotate, resetNonce, arrastrable, onDragMu, onDragSigma, onDragA, onDragB, onGrab } = props;
   const [dragging, setDragging] = useState(false);
+  const { size, camera } = useThree();
+  const angosto = size.width < 640;
+  // Encuadre: toda la campana cabe a lo ancho aunque la pantalla sea angosta.
+  useEffect(() => {
+    const aspecto = size.width / Math.max(1, size.height);
+    const z = Math.max(16, (BOARD_W + 1.6) / (2 * Math.tan((46 / 2) * Math.PI / 180) * aspecto));
+    camera.position.set(0, 0, z);
+    camera.updateProjectionMatrix();
+  }, [size.width, size.height, camera]);
   return (
     <>
       {/* Suelo, luz de tres puntos y entorno que reflejar. */}
       {/* La altura sale de donde esta escena ya ponía su sombra de
           contacto: es donde su autor decidió que estaba el piso. */}
+      {/* Todo sube un poco: queda entre la barra de arriba y la misión de abajo. */}
+      <group position={[0, 0.7, 0]}>
       <Escenario acento={accent} suelo={-BOARD_H / 2 - 0.4} />
-
 
       <group key={`${resetNonce}`}>
         <Plano
-          presetId={presetId} accent={accent} modo={modo} mu={mu} sigma={sigma} a={a} b={b} pausado={pausado}
+          angosto={angosto} presetId={presetId} accent={accent} modo={modo} mu={mu} sigma={sigma} a={a} b={b} pausado={pausado}
           arrastrable={arrastrable} onDragMu={onDragMu} onDragSigma={onDragSigma} onDragA={onDragA} onDragB={onDragB}
           onGrab={onGrab} setDragging={setDragging}
         />
       </group>
-
+      </group>
 
       <OrbitControls
         enablePan={false}
         enabled={!dragging}
         minDistance={9}
-        maxDistance={24}
+        maxDistance={36}
         minPolarAngle={Math.PI / 6}
         maxPolarAngle={Math.PI / 1.9}
-        target={[0, 0, 0]}
+        target={[0, 0.7, 0]}
         autoRotate={autoRotate && !dragging}
         autoRotateSpeed={0.4}
       />

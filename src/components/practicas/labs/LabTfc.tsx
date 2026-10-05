@@ -12,19 +12,22 @@
  * CONEXIÓN comprueba el Teorema Fundamental del Cálculo: la pendiente de F en b
  * es justo la altura f(b), es decir F′(x) = f(x). Pensamiento Matemático V —
  * «Cálculo diferencial», propósito formativo 8 (MCCEMS 2025).
+ *
+ * Experimento central: arrastrar (o barrer) el límite b y VER cómo el área
+ * sombreada se llena; un medidor compara, según el modo, la suma de Riemann con
+ * la integral, el área con la altura de F, o la pendiente de F con f(b).
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, OK, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { T, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { TFC_FICHA } from "./teorema-fundamental-calculo-ficha";
 import { RetoNumericoCard } from "./_reto-numerico";
 import { RETO_A2 } from "./teorema-fundamental-calculo-data";
 import { LabSfx } from "./lab-audio";
-import { useEstrellas } from "@/lib/hooks/useEstrellas";
-import { useLogros } from "./_partida";
 import {
   FUNCIONES,
   FUNCION_DEFAULT,
@@ -48,7 +51,7 @@ const TfcScene = dynamic(() => import("./TfcScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-chart-area fa-spin" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Preparando el laboratorio 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Preparando el laboratorio 3D…</span>
     </div>
   ),
 });
@@ -60,6 +63,9 @@ const MAGENTA = "#f0a6ff";
 
 const RETO_KEY = "cen-teorema-fundamental-calculo-reto";
 
+const B_MIN = 0.5;
+const NOMBRE_CORTO: Record<Modo, string> = { area: "Área", acumulacion: "Acumulación", conexion: "Conexión" };
+
 export function LabTfc({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
 
@@ -67,13 +73,11 @@ export function LabTfc({ color }: PracticaLabProps) {
   const [modo, setModo] = useState<Modo>("area");
   const [b, setB] = useState(B_DEFAULT);
   const [n, setN] = useState(N_DEFAULT);
-  const [pausado, setPausado] = useState(false);
-  const [autoRotate, setAutoRotate] = useState(false);
+  const [barriendo, setBarriendo] = useState(false);
   const [resetNonce, setResetNonce] = useState(0);
 
-  // reto evaluable, teoría (cajón deslizable) y sonido
+  // reto evaluable y sonido
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
 
@@ -96,7 +100,30 @@ export function LabTfc({ color }: PracticaLabProps) {
     };
   }, []);
 
+  // Barrido: el límite b va y viene y el área se llena y se vacía.
+  useEffect(() => {
+    if (!barriendo) return;
+    let raf = 0;
+    let last = 0;
+    let dir = 1;
+    const tick = (ts: number) => {
+      if (last === 0) last = ts;
+      const dt = Math.min((ts - last) / 1000, 0.05);
+      last = ts;
+      setB((prev) => {
+        let next = prev + dir * dt * (XMAX - B_MIN) * 0.25;
+        if (next <= B_MIN) { next = B_MIN; dir = 1; }
+        else if (next >= XMAX) { next = XMAX; dir = -1; }
+        return next;
+      });
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [barriendo]);
+
   // objetivos
+  const [movioB, setMovioB] = useState(false);
   const [cambioFuncion, setCambioFuncion] = useState(false);
   const [refinoRiemann, setRefinoRiemann] = useState(false);
   const [vioAcumulacion, setVioAcumulacion] = useState(false);
@@ -111,9 +138,12 @@ export function LabTfc({ color }: PracticaLabProps) {
     if (m === "acumulacion") setVioAcumulacion(true);
     if (m === "conexion") setVioConexion(true);
   };
+  const cambiarB = (v: number) => { setBarriendo(false); setB(v); setMovioB(true); };
   const cambiarN = (v: number) => { setN(v); if (v >= 16) setRefinoRiemann(true); };
+  const toggleBarrido = () => { setBarriendo((p) => !p); setMovioB(true); };
 
   const reset = () => {
+    setBarriendo(false);
     setFuncionId(FUNCION_DEFAULT);
     setModo("area"); setB(B_DEFAULT); setN(N_DEFAULT);
     bump();
@@ -129,22 +159,13 @@ export function LabTfc({ color }: PracticaLabProps) {
   const modoActual = MODOS.find((m) => m.id === modo) ?? MODOS[0]!;
 
   const objetivos = [
+    { txt: "Mueve el límite b y mira cómo se llena el área bajo la curva", done: movioB },
     { txt: "Integra una función del catálogo", done: cambioFuncion },
     { txt: "Refina la suma de Riemann (≥16 rect.)", done: refinoRiemann },
     { txt: "Observa la función de acumulación", done: vioAcumulacion },
     { txt: "Verifica F′(x) = f(x) (el TFC)", done: vioConexion },
     { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
   ];
-  // Los objetivos se recuerdan (algunos dependían del modo y se desmarcaban
-  // solos) y se convierten en la marca del laboratorio, que antes no se
-  // guardaba en ninguna parte.
-  const { logros: logrosLab, cumplidos: cumplidosLab, total: totalLab } = useLogros(objetivos.map((o) => o.done));
-  const { registraEstrellas } = useEstrellas(RETO_KEY);
-  useEffect(() => {
-    if (cumplidosLab === 0) return;
-    const est = cumplidosLab >= totalLab ? 3 : cumplidosLab >= Math.ceil((totalLab * 2) / 3) ? 2 : 1;
-    registraEstrellas(est);
-  }, [cumplidosLab, totalLab, registraEstrellas]);
 
   const sceneFallback = (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 28, textAlign: "center" }}>
@@ -152,362 +173,237 @@ export function LabTfc({ color }: PracticaLabProps) {
         <i className="fa-solid fa-chart-area" />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>La integral es el área bajo la curva</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 380, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 380, lineHeight: 1.5 }}>
         Tu equipo no puede mostrar la vista 3D, pero la idea sigue: ∫ₐᵇ f es el área entre la curva y el eje X. Si F es una antiderivada de f, ese área vale F(b) − F(a), y derivar la acumulación devuelve f: ese es el Teorema Fundamental del Cálculo.
       </div>
     </div>
   );
 
+  // Medidor: dos barras que se comparan según el modo.
+  const medidor = (compacto: boolean) => {
+    const filas: Array<{ txt: string; val: number; col: string }> =
+      modo === "area"
+        ? [{ txt: `Σ Riemann (n = ${n})`, val: suma, col: ORO }, { txt: "∫₀ᵇ f exacta", val: exacta, col: VERDE }]
+        : modo === "acumulacion"
+          ? [{ txt: "área sombreada bajo f", val: exacta, col: accent }, { txt: "altura de F(b)", val: exacta, col: VERDE }]
+          : [{ txt: "pendiente de F en b", val: fb, col: ORO }, { txt: "altura f(b)", val: fb, col: accent }];
+    const tope = Math.max(...filas.map((f) => Math.abs(f.val)), 1) * 1.1;
+    const veredicto =
+      modo === "area"
+        ? `error ${fmtNum(err, 1)} %${err < 5 ? " · casi exacta" : " · sube n"}`
+        : modo === "acumulacion"
+          ? "área acumulada = altura de F"
+          : "F′(b) = f(b): el TFC";
+    return (
+      <div style={{ display: "grid", gap: compacto ? 6 : 10, width: compacto ? 200 : undefined }}>
+        {filas.map((f) => (
+          <div key={f.txt} style={{ display: "grid", gap: 3 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, fontSize: 14, fontWeight: 800, color: "#dce6f5" }}>
+              <span>{f.txt}</span><span style={{ fontFamily: "ui-monospace, monospace" }}>{fmtNum(f.val, 2)}</span>
+            </div>
+            <div style={{ height: compacto ? 9 : 12, borderRadius: 6, background: "rgba(255,255,255,0.12)", overflow: "hidden" }}>
+              <div style={{ width: `${Math.min(100, (Math.abs(f.val) / tope) * 100)}%`, height: "100%", background: f.col, transition: "width 120ms linear" }} />
+            </div>
+          </div>
+        ))}
+        <div style={{ fontSize: 14, fontWeight: 900, color: modo === "area" ? MAGENTA : VERDE }}>{veredicto}</div>
+      </div>
+    );
+  };
+
+  const lectura =
+    modo === "area" ? <>∫₀^{fmtNum(b, 2)} f ≈ {fmtNum(suma, 2)} (exacta {fmtNum(exacta, 2)})</>
+    : modo === "acumulacion" ? <>F({fmtNum(b, 2)}) = área = {fmtNum(exacta, 2)}</>
+    : <>F′({fmtNum(b, 2)}) = f({fmtNum(b, 2)}) = {fmtNum(fb, 2)}</>;
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes tfcPulse { 0%,100%{ box-shadow:0 0 0 0 var(--tfc); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .tfc-live-dot { animation: tfcPulse 1.6s ease-in-out infinite; }
-        .tfc-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(300px,26vw,380px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .tfc-grid { grid-template-columns: 1fr; } }
-        .tfc-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .tfc-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .tfc-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .tfc-divider { height:1px; background:${T.line}; margin:18px 0; }
-        .tfc-catgrid { display:grid; grid-template-columns: 1fr 1fr; gap:8px; }
-        .tfc-catbtn { cursor:pointer; text-align:left; display:flex; flex-direction:column; gap:2px;
-          padding:9px 11px; border-radius:11px; border:1px solid ${T.line}; background:${T.inset};
-          color:${T.text2}; transition:all .15s; }
-        .tfc-catbtn:hover { border-color:rgba(${color.rgba},0.5); color:#fff; }
-        .tfc-catbtn[data-on="true"] { border-color:var(--tfc); background:rgba(${color.rgba},0.14); color:#fff; box-shadow:0 4px 16px -8px var(--tfc); }
-        .tfc-modgrid { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px; }
-        @media (max-width: 560px){ .tfc-modgrid { grid-template-columns: 1fr; } }
-        .tfc-modbtn { cursor:pointer; text-align:center; display:flex; flex-direction:column; align-items:center; gap:5px;
-          padding:11px 8px; border-radius:12px; border:1px solid ${T.line}; background:${T.inset}; color:${T.text2}; transition:all .15s; }
-        .tfc-modbtn:hover { border-color:rgba(${color.rgba},0.5); color:#fff; }
-        .tfc-modbtn[data-on="true"] { border-color:var(--tfc); background:rgba(${color.rgba},0.14); color:#fff; box-shadow:0 4px 16px -8px var(--tfc); }
-        .tfc-slider { -webkit-appearance:none; appearance:none; width:100%; height:6px; border-radius:999px;
-          background:${T.inset}; outline:none; cursor:pointer; }
-        .tfc-slider::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:18px; height:18px; border-radius:50%;
-          background:var(--tfc); border:2px solid #061528; box-shadow:0 2px 8px -2px var(--tfc); cursor:pointer; }
-        .tfc-slider::-moz-range-thumb { width:18px; height:18px; border-radius:50%; background:var(--tfc); border:2px solid #061528; cursor:pointer; }
-        @media (max-width: 1000px){ .tfc-bottom { grid-template-columns: 1fr !important; } }
-
-        /* Cajón de teoría */
-        .tfc-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .tfc-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .tfc-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .tfc-drawer[data-open="true"] { transform:translateX(0); }
-        .tfc-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .tfc-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .tfc-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .tfc-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .tfc-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .tfc-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      <div className="tfc-grid">
-        {/* ── Columna visor ──────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(460px, 66vh, 780px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 50% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06182f 0%,#020d1d 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <TfcScene
-                funcionId={funcionId}
-                accent={accent}
-                modo={modo}
-                b={b}
-                n={n}
-                pausado={pausado}
-                autoRotate={autoRotate}
-                resetNonce={resetNonce}
-              />
-            </SceneBoundary>
-
-            {/* Cinta EN VIVO */}
-            <div style={{ position: "absolute", top: 14, left: 16, display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(2,12,28,0.74)", border: `1px solid ${accent}66`, backdropFilter: "blur(10px)" }}>
-              <span className="tfc-live-dot" style={{ ["--tfc" as string]: `${accent}aa`, width: 9, height: 9, borderRadius: "50%", background: accent }} />
-              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3 }}>EN VIVO</span>
-              <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)" }} />
-              <span style={{ fontSize: 15, fontWeight: 900, color: accent, fontFamily: "ui-monospace, monospace" }}>
-                <i className="fa-solid fa-chart-area" style={{ marginRight: 8 }} />
-                ∫₀ᵇ {fn.formula.replace("f(x) = ", "")} dx
-              </span>
-            </div>
-
-            {/* Toolbar */}
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(2,12,28,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="tfc-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="tfc-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="tfc-icobtn" data-on={!pausado} onClick={() => setPausado((p) => !p)} title={pausado ? "Reanudar" : "Pausar"}>
-                <i className={`fa-solid ${pausado ? "fa-play" : "fa-pause"}`} />
-              </button>
-              <button className="tfc-icobtn" data-on={autoRotate} onClick={() => setAutoRotate((v) => !v)} title="Girar la cámara">
-                <i className="fa-solid fa-arrows-rotate" />
-              </button>
-              <button className="tfc-icobtn" onClick={reset} title="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            {/* Botón flotante de Teoría */}
-            <button className="tfc-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-
-            {/* Pie: lectura del modo actual */}
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 18px 14px", background: "linear-gradient(0deg, rgba(2,10,24,0.88) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#dCE8F6", lineHeight: 1.5, maxWidth: 640 }}>
-                <strong style={{ color: ORO }}>Σ Riemann</strong> {fmtNum(suma, 2)} · <strong style={{ color: VERDE }}>∫₀ᵇf = F(b)</strong> {fmtNum(exacta, 2)} · <strong style={{ color: MAGENTA }}>error</strong> {fmtNum(err, 1)} %
-              </div>
-            </div>
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <TfcScene
+            funcionId={funcionId}
+            accent={accent}
+            modo={modo}
+            b={b}
+            n={n}
+            resetNonce={resetNonce}
+          />
+        </SceneBoundary>
+      }
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m.id, etiqueta: NOMBRE_CORTO[m.id], icono: m.icon })),
+        valor: modo,
+        cambiar: (id) => elegirModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono={barriendo ? "fa-pause" : "fa-play"} titulo={barriendo ? "Pausar el barrido de b" : "Barrer el límite b"} activo={barriendo} onClick={toggleBarrido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reset} />
+        </>
+      }
+      leyenda={
+        <>
+          <div style={{ fontSize: 15, fontWeight: 900, color: accent, fontFamily: "ui-monospace, monospace" }}>
+            ∫₀ᵇ {fn.formula.replace("f(x) = ", "")} dx
           </div>
+          {medidor(true)}
+          <div style={{ fontSize: 14, color: T.text3 }}>ejes: x de 0 a {XMAX}, y de 0 a 8</div>
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Controles",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              <Bloque titulo={modoActual.nombre} icono={modoActual.icon}>
+                <p style={{ margin: 0, color: T.text2 }}>{modoActual.desc}</p>
+                <Deslizador label="Límite superior b" icon="fa-arrows-left-right" colr={MAGENTA}
+                  valor={fmtNum(b, 2)} min={B_MIN} max={XMAX} step={0.25} value={b} onChange={cambiarB} />
+                {modo === "area" && (
+                  <Deslizador label="Rectángulos de Riemann n" icon="fa-grip-lines-vertical" colr={ORO}
+                    valor={`${n}`} min={N_MIN} max={N_MAX} step={1} value={n} onChange={cambiarN}
+                    hintL="pocos: sobra o falta" hintR="muchos: se pega" />
+                )}
+              </Bloque>
 
-          {/* Controles: modo + sliders */}
-          <div style={{ ...card, padding: "18px 22px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: accent }} />
-              ¿Qué quieres explorar?
-            </Eyebrow>
-            <div className="tfc-modgrid">
-              {MODOS.map((m) => (
-                <button
-                  key={m.id}
-                  className="tfc-modbtn"
-                  data-on={modo === m.id}
-                  onClick={() => elegirModo(m.id)}
-                  style={{ ["--tfc" as string]: accent }}
-                >
-                  <i className={`fa-solid ${m.icon}`} style={{ fontSize: 17, color: modo === m.id ? accent : T.text3 }} />
-                  <span style={{ fontSize: 12, fontWeight: 800, color: modo === m.id ? accent : T.text }}>{m.nombre}</span>
-                </button>
-              ))}
-            </div>
-            <div style={{ fontSize: 12, color: T.text3, lineHeight: 1.5, marginTop: 10 }}>{modoActual.desc}</div>
+              <Bloque titulo="El medidor" icono="fa-gauge-high">
+                {medidor(false)}
+              </Bloque>
 
-            {/* Slider del límite b */}
-            <div style={{ marginTop: 18 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 7 }}>
-                <span style={{ fontSize: 12, fontWeight: 700, color: T.text2 }}>
-                  <i className="fa-solid fa-arrows-left-right" style={{ marginRight: 7, color: MAGENTA }} />
-                  Límite superior b
-                </span>
-                <span style={{ fontSize: 12.5, fontWeight: 900, color: MAGENTA, fontFamily: "ui-monospace, monospace" }}>{fmtNum(b, 2)}</span>
-              </div>
-              <input
-                className="tfc-slider"
-                type="range"
-                min={0.5}
-                max={XMAX}
-                step={0.25}
-                value={b}
-                onChange={(e) => setB(Number(e.target.value))}
-                style={{ ["--tfc" as string]: MAGENTA }}
-              />
-            </div>
+              <Bloque titulo={`Integral de ${fn.formula} en [0, ${fmtNum(b, 2)}]`} icono="fa-magnifying-glass-chart">
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                  <Dato label={`suma de Riemann (n=${n})`} value={fmtNum(suma, 2)} col={ORO} />
+                  <Dato label="integral exacta F(b)−F(a)" value={fmtNum(exacta, 2)} col={VERDE} />
+                  <Dato label="error de aproximación" value={`${fmtNum(err, 1)} %`} col={MAGENTA} />
+                  <Dato label="pendiente de F = f(b)" value={fmtNum(fb, 2)} col={ORO} />
+                  <Dato label="antiderivada usada" value={fn.antiderivada} col={CIAN} />
+                </div>
+                <p style={{ margin: 0, color: T.text2 }}>{fn.significado}</p>
+              </Bloque>
 
-            {/* Slider del nº de rectángulos */}
-            <div style={{ marginTop: 16, opacity: modo === "area" ? 1 : 0.45 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 7 }}>
-                <span style={{ fontSize: 12, fontWeight: 700, color: T.text2 }}>
-                  <i className="fa-solid fa-grip-lines-vertical" style={{ marginRight: 7, color: ORO }} />
-                  Rectángulos de Riemann n
-                </span>
-                <span style={{ fontSize: 12.5, fontWeight: 900, color: ORO, fontFamily: "ui-monospace, monospace" }}>{n}</span>
-              </div>
-              <input
-                className="tfc-slider"
-                type="range"
-                min={N_MIN}
-                max={N_MAX}
-                step={1}
-                value={n}
-                onChange={(e) => cambiarN(Number(e.target.value))}
-                disabled={modo !== "area"}
-                style={{ ["--tfc" as string]: ORO }}
-              />
-            </div>
-          </div>
-
-          {/* Resultado en vivo */}
-          <div style={{ ...card, padding: "18px 22px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-magnifying-glass-chart" style={{ marginRight: 8, color: accent }} />
-              Integral de {fn.formula} en [0, {fmtNum(b, 2)}]
-            </Eyebrow>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 12 }}>
-              <Readout label={`Suma de Riemann (n=${n})`} value={fmtNum(suma, 2)} col={ORO} size={15} />
-              <Readout label="Integral exacta F(b)−F(a)" value={fmtNum(exacta, 2)} col={VERDE} size={15} />
-              <Readout label="Error de aproximación" value={`${fmtNum(err, 1)} %`} col={MAGENTA} size={15} />
-            </div>
-            <div style={{ marginBottom: 14 }}>
-              <Readout label="Antiderivada usada" value={fn.antiderivada} col={CIAN} size={13} />
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>{fn.significado}</div>
-
-            {/* Bloque del TFC — el corazón del propósito O8 */}
-            <div style={{ marginTop: 14, padding: "12px 14px", borderRadius: 12, background: `rgba(${color.rgba},0.08)`, border: `1px solid rgba(${color.rgba},0.28)` }}>
-              <div style={{ fontSize: 12.5, fontWeight: 800, color: T.text, marginBottom: 7 }}>
-                <i className="fa-solid fa-link" style={{ marginRight: 7, color: accent }} />
-                El Teorema Fundamental del Cálculo
-              </div>
-              <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.5 }}>
-                La función de acumulación <strong style={{ color: VERDE }}>F(x) = ∫₀ˣ f</strong> mide el área bajo f hasta x. Su altura aquí en b vale <strong style={{ color: VERDE }}>{fmtNum(exacta, 2)}</strong>, justo el área sombreada. Y su <strong style={{ color: ORO }}>pendiente</strong> en b es <strong style={{ color: ORO }}>{fmtNum(fb, 2)}</strong> = f(b): derivar la acumulación devuelve la función original, <strong style={{ color: accent }}>F′(x) = f(x)</strong>. Esa es la conexión entre derivar e integrar.
-              </div>
-            </div>
-          </div>
-
-          {/* Catálogo de funciones */}
-          <div style={{ ...card, padding: "18px 22px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-shapes" style={{ marginRight: 8, color: accent }} />
-              Elige una función para integrar
-            </Eyebrow>
-            <div className="tfc-catgrid">
-              {FUNCIONES.map((f) => (
-                <button
-                  key={f.id}
-                  className="tfc-catbtn"
-                  data-on={funcionId === f.id}
-                  onClick={() => elegir(f.id)}
-                  style={{ ["--tfc" as string]: accent }}
-                >
-                  <span style={{ fontSize: 13.5, fontWeight: 900, color: funcionId === f.id ? accent : T.text, fontFamily: "ui-monospace, monospace" }}>{f.formula}</span>
-                  <span style={{ fontSize: 11, color: T.text3 }}>{f.nombre}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* ── Columna lateral ────────────────────────────────────── */}
-        <div style={{ ...card, padding: "22px 22px 24px" }}>
-          <Eyebrow>Qué es integrar</Eyebrow>
-          <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>
-            <strong style={{ color: T.text }}>Integrar</strong> una función es medir el <strong style={{ color: accent }}>área bajo su curva</strong>. La integral definida <strong>∫ₐᵇ f(x) dx</strong> es esa área entre x = a y x = b. Si f es un ritmo de cambio (velocidad, caudal, potencia), su área es el total acumulado (distancia, volumen, energía).
-          </div>
-
-          <div className="tfc-divider" />
-
-          <Eyebrow>Las ideas a leer</Eyebrow>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            <Parte col={ORO} icon="fa-grip-lines-vertical" titulo="Sumas de Riemann">
-              Partimos [a, b] en n rectángulos; su suma aproxima el área. Sube n y mira cómo el error se acerca a cero.
-            </Parte>
-            <Parte col={VERDE} icon="fa-layer-group" titulo="Función de acumulación">
-              F(x) = ∫₀ˣ f acumula el área desde 0 hasta x: dice cuánto cambio se ha sumado hasta ese punto.
-            </Parte>
-            <Parte col={ORO} icon="fa-link" titulo="El Teorema Fundamental">
-              Derivar la acumulación devuelve la función: F′(x) = f(x). Y por eso ∫ₐᵇ f = F(b) − F(a).
-            </Parte>
-            <Parte col={CIAN} icon="fa-rotate" titulo="Operaciones inversas">
-              Integrar y derivar se deshacen mutuamente, como sumar y restar o elevar al cuadrado y la raíz.
-            </Parte>
-          </div>
-
-          <div className="tfc-divider" />
-
-          <Eyebrow>De Riemann a la integral</Eyebrow>
-          <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>
-            Con pocos rectángulos la suma <strong style={{ color: ORO }}>sobra o falta</strong> respecto al área real. Al usar cada vez más rectángulos —más delgados— la suma de Riemann se <strong style={{ color: T.text }}>pega</strong> al valor exacto: ese límite es la integral definida. El TFC nos da un atajo: en vez de sumar infinitos rectángulos, basta evaluar la antiderivada en los extremos.
-          </div>
-
-          <div className="tfc-divider" />
-
-          <Eyebrow>En la vida real (México)</Eyebrow>
-          <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>
-            El área bajo una gráfica <strong>velocidad–tiempo</strong> es la distancia de un viaje Puebla–CDMX; bajo el <strong>caudal</strong> del Cutzamala, el volumen de agua que llega a la CDMX; bajo la <strong>potencia eléctrica</strong>, la energía en kWh que cobra la CFE; bajo la <strong>tasa de lluvia</strong>, el agua acumulada en una presa. Integrar es sumar un cambio continuo, y el TFC garantiza que derivar esa suma devuelve el ritmo original.
-          </div>
-        </div>
-      </div>
-
-      {/* ── Objetivos + pista ──────────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="tfc-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-            Objetivos
-          </Eyebrow>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-            {objetivos.map((o, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: logrosLab[i] ? OK : T.text2 }}>
-                <i className={`fa-solid ${logrosLab[i] ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: logrosLab[i] ? 1 : 0.3 }} />
-                <span style={{ fontWeight: logrosLab[i] ? 700 : 500 }}>{o.txt}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div style={{ borderRadius: 18, padding: "18px 20px", border: `1px solid rgba(${color.rgba},0.3)`, background: `rgba(${color.rgba},0.08)`, fontSize: 13.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 13 }}>
-          <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 17, marginTop: 1 }} />
-          <span>
-            Para el ejercicio de A2 elige <strong style={{ color: accent }}>f(x) = 2x</strong> (la velocidad v = 2t) y lleva <strong>b = 4</strong>: el área es <strong style={{ color: VERDE }}>16</strong> (∫₀⁴ 2t dt = [t²]₀⁴ = 16). En modo «conexión» verás que la pendiente de F en b vale 2b = f(b): el TFC en acción.
-          </span>
-        </div>
-      </div>
-
-      {/* ── Reto evaluable: el ejercicio verbatim del ancla A2 ────────── */}
-      <RetoNumericoCard
-        reto={RETO_A2}
-        accent={accent}
-        aprobado={ejercicioAprobado}
-        onAprobado={() => setEjercicioAprobado(true)}
-        playSfx={
-          sonido
-            ? (ok) => {
-                if (ok) audioRef.current?.correcto();
-                else audioRef.current?.incorrecto();
+              <Bloque titulo="Elige una función para integrar" icono="fa-shapes">
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 150px), 1fr))", gap: 8 }}>
+                  {FUNCIONES.map((f) => (
+                    <button
+                      key={f.id}
+                      type="button"
+                      onClick={() => elegir(f.id)}
+                      aria-pressed={funcionId === f.id}
+                      style={{
+                        cursor: "pointer", textAlign: "left", display: "flex", flexDirection: "column", gap: 2, padding: "10px 12px", borderRadius: 11,
+                        border: `1px solid ${funcionId === f.id ? accent : T.line}`,
+                        background: funcionId === f.id ? `rgba(${color.rgba},0.16)` : T.inset,
+                        color: funcionId === f.id ? "#fff" : T.text2,
+                      }}
+                    >
+                      <span style={{ fontSize: 15, fontWeight: 900, color: funcionId === f.id ? accent : T.text, fontFamily: "ui-monospace, monospace" }}>{f.formula}</span>
+                      <span style={{ fontSize: 14, color: T.text3 }}>{f.nombre}</span>
+                    </button>
+                  ))}
+                </div>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <RetoNumericoCard
+              reto={RETO_A2}
+              accent={accent}
+              aprobado={ejercicioAprobado}
+              onAprobado={() => setEjercicioAprobado(true)}
+              playSfx={
+                sonido
+                  ? (ok) => {
+                      if (ok) audioRef.current?.correcto();
+                      else audioRef.current?.incorrecto();
+                    }
+                  : undefined
               }
-            : undefined
-        }
-      />
+            />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="El Teorema Fundamental del Cálculo" icono="fa-link">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  La función de acumulación <strong style={{ color: VERDE }}>F(x) = ∫₀ˣ f</strong> mide el área bajo f hasta x. Su altura aquí en b vale <strong style={{ color: VERDE }}>{fmtNum(exacta, 2)}</strong>, justo el área sombreada. Y su <strong style={{ color: ORO }}>pendiente</strong> en b es <strong style={{ color: ORO }}>{fmtNum(fb, 2)}</strong> = f(b): derivar la acumulación devuelve la función original, <strong style={{ color: accent }}>F′(x) = f(x)</strong>. Esa es la conexión entre derivar e integrar.
+                </p>
+              </Bloque>
 
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <div className="tfc-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="tfc-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="tfc-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="tfc-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="tfc-drawer-body">
-          <FichaTeorica data={TFC_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+              <Bloque titulo="Qué es integrar" icono="fa-chart-area">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  <strong style={{ color: T.text }}>Integrar</strong> una función es medir el <strong style={{ color: accent }}>área bajo su curva</strong>. La integral definida <strong>∫ₐᵇ f(x) dx</strong> es esa área entre x = a y x = b. Si f es un ritmo de cambio (velocidad, caudal, potencia), su área es el total acumulado (distancia, volumen, energía).
+                </p>
+              </Bloque>
+
+              <Bloque titulo="Las ideas a leer" icono="fa-list-check">
+                <Parte col={ORO} icon="fa-grip-lines-vertical" titulo="Sumas de Riemann">
+                  Partimos [a, b] en n rectángulos; su suma aproxima el área. Sube n y mira cómo el error se acerca a cero.
+                </Parte>
+                <Parte col={VERDE} icon="fa-layer-group" titulo="Función de acumulación">
+                  F(x) = ∫₀ˣ f acumula el área desde 0 hasta x: dice cuánto cambio se ha sumado hasta ese punto.
+                </Parte>
+                <Parte col={ORO} icon="fa-link" titulo="El Teorema Fundamental">
+                  Derivar la acumulación devuelve la función: F′(x) = f(x). Y por eso ∫ₐᵇ f = F(b) − F(a).
+                </Parte>
+                <Parte col={CIAN} icon="fa-rotate" titulo="Operaciones inversas">
+                  Integrar y derivar se deshacen mutuamente, como sumar y restar o elevar al cuadrado y la raíz.
+                </Parte>
+              </Bloque>
+
+              <Bloque titulo="De Riemann a la integral" icono="fa-grip-lines-vertical">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  Con pocos rectángulos la suma <strong style={{ color: ORO }}>sobra o falta</strong> respecto al área real. Al usar cada vez más rectángulos —más delgados— la suma de Riemann se <strong style={{ color: T.text }}>pega</strong> al valor exacto: ese límite es la integral definida. El TFC nos da un atajo: en vez de sumar infinitos rectángulos, basta evaluar la antiderivada en los extremos.
+                </p>
+              </Bloque>
+
+              <Bloque titulo="En la vida real (México)" icono="fa-location-dot">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  El área bajo una gráfica <strong>velocidad–tiempo</strong> es la distancia de un viaje Puebla–CDMX; bajo el <strong>caudal</strong> del Cutzamala, el volumen de agua que llega a la CDMX; bajo la <strong>potencia eléctrica</strong>, la energía en kWh que cobra la CFE; bajo la <strong>tasa de lluvia</strong>, el agua acumulada en una presa. Integrar es sumar un cambio continuo, y el TFC garantiza que derivar esa suma devuelve el ritmo original.
+                </p>
+              </Bloque>
+
+              <Bloque titulo="Pista para el reto" icono="fa-lightbulb">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  Para el ejercicio de A2 elige <strong style={{ color: accent }}>f(x) = 2x</strong> (la velocidad v = 2t) y lleva <strong>b = 4</strong>: el área es <strong style={{ color: VERDE }}>16</strong> (∫₀⁴ 2t dt = [t²]₀⁴ = 16). En modo «Conexión» verás que la pendiente de F en b vale 2b = f(b): el TFC en acción.
+                </p>
+              </Bloque>
+
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={TFC_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }
 
-/* ── Tarjeta de "parte" en el panel lateral ──────────────────────────── */
+/* ── Tarjeta de "parte" en la teoría ─────────────────────────────────── */
 function Parte({ col, icon, titulo, children }: { col: string; icon: string; titulo: string; children: React.ReactNode }) {
   return (
     <div style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
-      <div style={{ flexShrink: 0, width: 30, height: 30, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: col, background: `${col}1f` }}>
+      <div style={{ flexShrink: 0, width: 32, height: 32, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: col, background: `${col}1f` }}>
         <i className={`fa-solid ${icon}`} />
       </div>
-      <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.5 }}>
         <strong style={{ color: T.text, display: "block", marginBottom: 2 }}>{titulo}</strong>
         {children}
       </div>

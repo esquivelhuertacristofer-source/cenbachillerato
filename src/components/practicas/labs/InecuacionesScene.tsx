@@ -20,9 +20,9 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Edges, Html, Line } from "@react-three/drei";
+import { useEffect, useMemo, useRef } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { OrbitControls, ContactShadows, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
 import {
@@ -51,6 +51,8 @@ export interface InecuacionesSceneProps {
   pausado: boolean;
   autoRotate: boolean;
   resetNonce: number;
+  /** x de prueba elegida por el alumno (null = la cuenta barre sola). */
+  sonda?: number | null;
 }
 
 const VERDE = new THREE.Color("#34d399");
@@ -60,6 +62,10 @@ const ORO = "#ffd24a";
 
 const U_R = 0.42; // unidad de mundo por unidad matemática (recta)
 const U_P = 0.58; // unidad de mundo por unidad matemática (plano)
+
+/** Altura en mundo por unidad del lado izquierdo a·x+b (la «báscula»). */
+const K_H = 0.045;
+const H_MAX = 2.1;
 
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
 
@@ -74,12 +80,11 @@ function PuntaX({ color, x, size = 0.16 }: { color: string; x: number; size?: nu
 }
 
 /* ════════════════════ MODO 1 — RECTA NUMÉRICA ════════════════════════ */
-function RectaNumerica({ a, b, c, op, accent: _accent, pausado }: {
-  a: number; b: number; c: number; op: Op; accent: string; pausado: boolean;
+function RectaNumerica({ a, b, c, op, accent: _accent, pausado, sonda }: {
+  a: number; b: number; c: number; op: Op; accent: string; pausado: boolean; sonda: number | null;
 }) {
   const sol = useMemo(() => resolverRecta(a, b, c, op), [a, b, c, op]);
   const ticks = useMemo(() => Array.from({ length: RECTA_MAX - RECTA_MIN + 1 }, (_, i) => RECTA_MIN + i), []);
-  const etiquetas = useMemo(() => [-12, -8, -4, 0, 4, 8, 12], []);
 
   const halfW = (RECTA_MAX - RECTA_MIN) / 2 * U_R;
   const kClamp = clamp(sol.k, RECTA_MIN, RECTA_MAX);
@@ -94,17 +99,30 @@ function RectaNumerica({ a, b, c, op, accent: _accent, pausado }: {
   const beadRef = useRef<THREE.Mesh>(null);
   const matRef = useRef<THREE.MeshStandardMaterial>(null);
   const htmlRef = useRef<HTMLDivElement>(null);
+  const colRef = useRef<THREE.Mesh>(null);
+  const colMat = useRef<THREE.MeshStandardMaterial>(null);
+  const yC = clamp(c * K_H, -H_MAX, H_MAX);
 
   useFrame((_, delta) => {
     if (!pausado) beadPhase.current = (beadPhase.current + delta * 0.16) % 2;
     const tri = beadPhase.current < 1 ? beadPhase.current : 2 - beadPhase.current; // 0..1..0
-    const v = RECTA_MIN + tri * (RECTA_MAX - RECTA_MIN);
+    const v = sonda ?? RECTA_MIN + tri * (RECTA_MAX - RECTA_MIN);
     const ok = satisfaceRecta(v, a, b, c, op);
     if (beadRef.current) beadRef.current.position.x = v * U_R;
     if (matRef.current) {
       const col = ok ? VERDE : ROJO;
       matRef.current.color.copy(col);
       matRef.current.emissive.copy(col);
+    }
+    if (colRef.current) {
+      const h = clamp((a * v + b) * K_H, -H_MAX, H_MAX);
+      colRef.current.position.set(v * U_R, h / 2, 0);
+      colRef.current.scale.set(1, Math.max(0.02, Math.abs(h)), 1);
+    }
+    if (colMat.current) {
+      const col = ok ? VERDE : ROJO;
+      colMat.current.color.copy(col);
+      colMat.current.emissive.copy(col);
     }
     if (htmlRef.current) {
       htmlRef.current.textContent = `x = ${fmtNum(v, 1)}  ${ok ? "✓ cumple" : "✗ no"}`;
@@ -132,11 +150,9 @@ function RectaNumerica({ a, b, c, op, accent: _accent, pausado }: {
           <meshStandardMaterial color="#5b7088" />
         </mesh>
       ))}
-      {etiquetas.map((t) => (
-        <Html key={t} position={[t * U_R, -0.42, 0]} center distanceFactor={11} pointerEvents="none">
-          <div style={{ color: "#9fb2c8", fontSize: 13, fontWeight: 700, fontFamily: "ui-monospace, monospace" }}>{t}</div>
-        </Html>
-      ))}
+      <Html position={[0, -0.5, 0]} center pointerEvents="none" zIndexRange={[20, 0]}>
+        <div style={{ color: "#c9d6e6", fontSize: 14, fontWeight: 800, fontFamily: "ui-monospace, monospace" }}>0</div>
+      </Html>
 
       {/* rayo solución */}
       <mesh position={[rayMid, 0.16, 0]}>
@@ -157,22 +173,29 @@ function RectaNumerica({ a, b, c, op, accent: _accent, pausado }: {
           <meshStandardMaterial color={ORO} emissive={ORO} emissiveIntensity={0.6} />
         </mesh>
       )}
-      <Html position={[xk, 0.62, 0]} center distanceFactor={10} pointerEvents="none">
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-          <div style={{ color: ORO, fontSize: 17, fontWeight: 900, fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", textShadow: "0 2px 8px #000" }}>
-            x {getOp(sol.opFinal).sim} {fmtNum(sol.k, 2)}
-          </div>
-          <div style={{ color: "#cfe0f2", fontSize: 10.5, fontWeight: 700 }}>{sol.incluye ? "● incluido" : "○ no incluido"}</div>
+      <Html position={[xk, 0.2, 0]} center pointerEvents="none" zIndexRange={[20, 0]}>
+        <div style={{ transform: "translate(0,-150%)", whiteSpace: "nowrap", padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.88)", border: `1.5px solid ${ORO}`, color: ORO, fontSize: 15, fontWeight: 900, fontFamily: "ui-monospace, monospace" }}>
+          x {getOp(sol.opFinal).sim} {fmtNum(sol.k, 2)}
         </div>
       </Html>
+
+      {/* báscula: la columna mide a·x+b de la x de prueba; la barra dorada es c */}
+      <mesh position={[0, yC, -0.5]}>
+        <boxGeometry args={[halfW * 2 + 0.4, 0.05, 0.05]} />
+        <meshStandardMaterial color={ORO} emissive={ORO} emissiveIntensity={0.5} />
+      </mesh>
+      <mesh ref={colRef}>
+        <boxGeometry args={[0.34, 1, 0.34]} />
+        <meshStandardMaterial ref={colMat} color={VERDE} emissive={VERDE} emissiveIntensity={0.35} transparent opacity={0.85} />
+      </mesh>
 
       {/* cuenta de prueba */}
       <mesh ref={beadRef} position={[0, 0.16, 0]}>
         <sphereGeometry args={[0.16, 20, 20]} />
         <meshStandardMaterial ref={matRef} color={VERDE} emissive={VERDE} emissiveIntensity={0.7} />
       </mesh>
-      <Html position={[0, 0.16, 0]} center distanceFactor={11} pointerEvents="none">
-        <div ref={htmlRef} style={{ marginTop: -46, fontSize: 12.5, fontWeight: 800, fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", textShadow: "0 2px 8px #000" }} />
+      <Html position={[0, -0.2, 0]} center pointerEvents="none" zIndexRange={[20, 0]}>
+        <div ref={htmlRef} style={{ transform: "translate(0,120%)", padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.88)", fontSize: 15, fontWeight: 900, fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap" }} />
       </Html>
 
     </group>
@@ -268,7 +291,6 @@ function Semiplano({ a, b, c, op, accent, pausado }: {
       <mesh position={[0, -0.02, 0]} receiveShadow>
         <boxGeometry args={[half * 2 + 0.5, 0.04, half * 2 + 0.5]} />
         <meshStandardMaterial color="#081a2c" metalness={0.2} roughness={0.85} />
-        <Edges threshold={15} color="#1d4060" />
       </mesh>
       <gridHelper args={[half * 2, PLANO_MAX - PLANO_MIN, "#2a4f72", "#1a3550"]} position={[0, 0.01, 0]} />
 
@@ -281,17 +303,17 @@ function Semiplano({ a, b, c, op, accent, pausado }: {
         <boxGeometry args={[0.04, 0.04, half * 2 + 0.3]} />
         <meshStandardMaterial color="#7fb0e0" emissive="#7fb0e0" emissiveIntensity={0.3} />
       </mesh>
-      <Html position={[half + 0.32, 0.18, 0]} center distanceFactor={12} pointerEvents="none">
-        <div style={{ color: accent, fontSize: 15, fontWeight: 900 }}>x</div>
+      <Html position={[half + 0.32, 0.18, 0]} center pointerEvents="none" zIndexRange={[20, 0]}>
+        <div style={{ color: accent, fontSize: 16, fontWeight: 900 }}>x</div>
       </Html>
-      <Html position={[0, 0.18, half + 0.32]} center distanceFactor={12} pointerEvents="none">
-        <div style={{ color: "#7fb0e0", fontSize: 15, fontWeight: 900 }}>y</div>
+      <Html position={[0, 0.18, half + 0.32]} center pointerEvents="none" zIndexRange={[20, 0]}>
+        <div style={{ color: "#7fb0e0", fontSize: 16, fontWeight: 900 }}>y</div>
       </Html>
 
       {/* fichas (región solución) */}
       <instancedMesh ref={meshRef} args={[undefined, undefined, count]} castShadow>
         <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial metalness={0.1} roughness={0.55} toneMapped={false} />
+        <meshStandardMaterial metalness={0.1} roughness={0.55} />
       </instancedMesh>
 
       {/* frontera */}
@@ -311,8 +333,8 @@ function Semiplano({ a, b, c, op, accent, pausado }: {
         <sphereGeometry args={[0.17, 22, 22]} />
         <meshStandardMaterial ref={probeMat} color={VERDE} emissive={VERDE} emissiveIntensity={0.7} />
       </mesh>
-      <Html position={[0, 0, 0]} center distanceFactor={12} pointerEvents="none">
-        <div ref={probeHtml} style={{ marginTop: -52, fontSize: 12.5, fontWeight: 800, fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap", textShadow: "0 2px 8px #000" }} />
+      <Html position={[0, 0, 0]} center pointerEvents="none" zIndexRange={[20, 0]}>
+        <div ref={probeHtml} style={{ marginTop: -52, padding: "3px 9px", borderRadius: 8, background: "rgba(4,10,22,0.88)", fontSize: 15, fontWeight: 900, fontFamily: "ui-monospace, monospace", whiteSpace: "nowrap" }} />
       </Html>
 
       <ContactShadows position={[0, -0.05, 0]} opacity={0.35} scale={12} blur={2.2} far={5} />
@@ -327,7 +349,7 @@ export default function InecuacionesScene(props: InecuacionesSceneProps) {
       shadows
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
-      camera={{ position: [0.2, 3.4, 9.4], fov: 44 }}
+      camera={{ position: [0.2, 3.2, 11], fov: 44 }}
     >
       <Contenido {...props} />
     </Canvas>
@@ -336,12 +358,19 @@ export default function InecuacionesScene(props: InecuacionesSceneProps) {
 
 /** Contenido: DEBE vivir dentro de <Canvas> (useFrame solo funciona ahí). */
 function Contenido(props: InecuacionesSceneProps) {
-  const { modo, a, b, c, op, accent, pausado, autoRotate, resetNonce } = props;
+  const { modo, a, b, c, op, accent, pausado, autoRotate, resetNonce, sonda = null } = props;
 
-  const target = useMemo<[number, number, number]>(
-    () => (modo === "plano" ? [0, 0.2, 0] : [0, 0.2, 0]),
-    [modo]
-  );
+  // Encuadre por modo: la recta es ancha (se aleja en pantallas angostas) y el
+  // contenido queda un poco por encima del centro (abajo tapa la misión).
+  const camera = useThree((s) => s.camera);
+  const size = useThree((s) => s.size);
+  const aspect = size.width / Math.max(1, size.height);
+  const dist = modo === "plano" ? Math.max(9, 7.2 / (0.404 * Math.min(aspect, 1.4))) : Math.max(9.5, 6.6 / (0.404 * Math.min(aspect, 1.6)));
+  const target = useMemo<[number, number, number]>(() => (modo === "plano" ? [0, -0.6, 0] : [0, 0.5, 0]), [modo]);
+  useEffect(() => {
+    camera.position.set(0.2, dist * (modo === "plano" ? 0.5 : 0.28), dist);
+    camera.lookAt(target[0], target[1], target[2]);
+  }, [camera, dist, modo, target]);
 
   return (
     <>
@@ -353,7 +382,7 @@ function Contenido(props: InecuacionesSceneProps) {
 
       <group key={`${modo}-${resetNonce}`}>
         {modo === "recta" ? (
-          <RectaNumerica a={a} b={b} c={c} op={op} accent={accent} pausado={pausado} />
+          <RectaNumerica a={a} b={b} c={c} op={op} accent={accent} pausado={pausado} sonda={sonda} />
         ) : (
           <Semiplano a={a} b={b} c={c} op={op} accent={accent} pausado={pausado} />
         )}
@@ -362,8 +391,9 @@ function Contenido(props: InecuacionesSceneProps) {
 
       <OrbitControls
         enablePan={false}
+        makeDefault
         minDistance={5}
-        maxDistance={16}
+        maxDistance={22}
         minPolarAngle={Math.PI / 8}
         maxPolarAngle={Math.PI / 2.05}
         target={target}

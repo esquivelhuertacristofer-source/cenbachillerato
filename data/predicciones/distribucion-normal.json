@@ -1,0 +1,12 @@
+{
+  "escena": "Una campana de estaturas con su media y su desviación, y un sombreado entre la media menos σ y la media más σ",
+  "pregunta": "Si ensanchas σ al doble, ¿qué pasa con el área sombreada entre μ − σ y μ + σ?",
+  "opciones": [
+    { "id": "a", "texto": "Se queda en 68 %, aunque la campana cambie", "icono": "fa-equals" },
+    { "id": "b", "texto": "Se reduce a la mitad", "icono": "fa-arrow-down" },
+    { "id": "c", "texto": "Sube hasta casi 100 %", "icono": "fa-arrow-up" }
+  ],
+  "correcta": "a",
+  "porque": "Al ensanchar σ, la campana se aplana y el intervalo μ ± σ crece en la misma proporción. La fracción de datos que encierra sigue siendo la misma: 68 % en cualquier normal.",
+  "comoComprobarlo": "En el modo Regla o Campana, mueve el deslizador de σ de un extremo a otro y mira la barra del área de μ ± σ."
+}

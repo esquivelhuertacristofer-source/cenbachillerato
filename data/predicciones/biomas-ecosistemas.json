@@ -1,0 +1,12 @@
+{
+  "escena": "Un diorama con selva seca a 22 °C y 800 mm de lluvia al año",
+  "pregunta": "Si el lugar se enfría a 0 °C con la misma lluvia, ¿qué bioma aparece?",
+  "opciones": [
+    { "id": "a", "texto": "Desierto con cactus", "icono": "fa-sun-plant-wilt" },
+    { "id": "b", "texto": "Tundra de alta montaña", "icono": "fa-snowflake" },
+    { "id": "c", "texto": "Selva húmeda más densa", "icono": "fa-tree" }
+  ],
+  "correcta": "b",
+  "porque": "El frío extremo limita la vida: bajo ~2 °C no crecen árboles y solo resisten pastos duros, musgos y líquenes. La lluvia cae como nieve.",
+  "comoComprobarlo": "Baja la temperatura con el deslizador sin tocar la lluvia y observa el diorama y el termómetro."
+}

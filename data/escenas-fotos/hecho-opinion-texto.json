@@ -1,0 +1,8 @@
+{
+  "slug": "hecho-opinion-texto",
+  "items": [
+    { "clave": "biblioteca-plaza", "formato": "16:9", "estilo": "foto", "escena": "Una pequeña biblioteca comunitaria de barrio con estantes de madera llenos de libros, una mesa baja con sillas infantiles de colores y luz natural de una ventana grande, vecinos hojeando libros, sin letreros legibles" },
+    { "clave": "libros-pupitre", "formato": "16:9", "estilo": "foto", "escena": "Dos libros de pasta blanda desgastados abiertos sobre un pupitre de madera de un salón de bachillerato, con un lápiz y un cuaderno, luz suave de la mañana, fondo desenfocado de pizarrón verde" },
+    { "clave": "cuadernos-mostrador", "formato": "16:9", "estilo": "foto", "escena": "Una pila de cuadernos de pasta color verde y naranja sobre el mostrador de una papelería mexicana, con lápices en un vaso y estantes al fondo, luz cálida, sin texto ni logotipos en las portadas" }
+  ]
+}

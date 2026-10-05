@@ -1,0 +1,12 @@
+{
+  "escena": "Una Tierra con termómetro junto a ella, con CO₂ de 1850 (280 ppm) y bosque intacto",
+  "pregunta": "Si el CO₂ sube de 280 a 420 ppm, ¿cuánto sube la temperatura media?",
+  "opciones": [
+    { "id": "a", "texto": "Casi nada, menos de 0.3 °C", "icono": "fa-temperature-low" },
+    { "id": "b", "texto": "Cerca de 1.8 °C", "icono": "fa-temperature-half" },
+    { "id": "c", "texto": "Más de 5 °C", "icono": "fa-temperature-full" }
+  ],
+  "correcta": "b",
+  "porque": "Subir 50 % el CO₂ refuerza el efecto invernadero. Con sensibilidad de ~3 °C por duplicación, 280 a 420 ppm da cerca de +1.8 °C, más que el límite de 1.5 °C.",
+  "comoComprobarlo": "Mueve el deslizador de CO₂ hasta 420 ppm y compara el nivel del termómetro con la marca blanca."
+}

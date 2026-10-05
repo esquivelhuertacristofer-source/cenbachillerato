@@ -1,0 +1,8 @@
+{
+  "slug": "ideas-clave-subrayado",
+  "items": [
+    { "clave": "milpa-mazorcas", "formato": "16:9", "estilo": "foto", "escena": "Una milpa mexicana al amanecer con mazorcas de maíz de varios colores, amarillo, azul y rojo, sobre una mesa de madera en primer plano y matas de maíz al fondo, luz dorada" },
+    { "clave": "anden-metro", "formato": "16:9", "estilo": "foto", "escena": "Un andén de metro subterráneo casi vacío con un tren naranja detenido con las puertas abiertas, pasillo amplio, luz fluorescente cálida, personas pequeñas y lejanas de espaldas" },
+    { "clave": "poste-alerta", "formato": "16:9", "estilo": "foto", "escena": "Un poste alto de acero en una esquina de una ciudad mexicana con bocinas blancas en la punta, edificios bajos y cielo crepuscular, sin texto ni letreros" }
+  ]
+}

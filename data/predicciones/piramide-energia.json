@@ -1,0 +1,12 @@
+{
+  "escena": "Una pirámide de cuatro plataformas con energía en kcal en cada una y un hilo delgado que sube entre ellas",
+  "pregunta": "Si la eficiencia por salto sube de 10 % a 20 %, ¿qué pasa con la energía que llega a la cima?",
+  "opciones": [
+    { "id": "a", "texto": "Se duplica, de 10 a 20 kcal", "icono": "fa-arrow-up" },
+    { "id": "b", "texto": "Se multiplica por 8", "icono": "fa-arrow-trend-up" },
+    { "id": "c", "texto": "Casi no cambia", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "La energía se multiplica por la eficiencia en cada uno de los tres saltos. Duplicar la eficiencia duplica tres veces: 2 × 2 × 2 = 8. Con 10,000 kcal pasa de 10 a 80 kcal.",
+  "comoComprobarlo": "Con 10,000 kcal, mueve la eficiencia de 10 % a 20 % y compara la cifra de la plataforma más alta."
+}

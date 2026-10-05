@@ -1,0 +1,11 @@
+{
+  "slug": "historia-de-vida-relato",
+  "items": [
+    { "clave": "abuela-retrato", "formato": "1:1", "estilo": "ilustracion", "escena": "Retrato de una mujer mayor de pelo canoso trenzado y rebozo, sentada en una silla de madera junto a una ventana, con las manos sobre el regazo y una sonrisa serena" },
+    { "clave": "pozo-seco", "formato": "16:9", "estilo": "ilustracion", "escena": "Pozo de piedra seco en un rancho de la sierra, la cubeta de lámina caída en el suelo agrietado y una casa de adobe al fondo" },
+    { "clave": "camino-burro", "formato": "16:9", "estilo": "ilustracion", "escena": "Camino de terracería polvoso entre cerros con un burro cargado con un comal grande y bultos, y una mujer caminando a su lado" },
+    { "clave": "vaca-corral", "formato": "16:9", "estilo": "ilustracion", "escena": "Una vaca flaca atada a la cerca de un corral de palos, una niña abrazada a su cuello al amanecer" },
+    { "clave": "cocina-lena", "formato": "16:9", "estilo": "ilustracion", "escena": "Cocina rústica de paredes ahumadas con un metate de piedra, un fogón de leña con brasas y ollas de barro colgadas" },
+    { "clave": "comal-tortillas", "formato": "16:9", "estilo": "ilustracion", "escena": "Mujer mayor haciendo tortillas a mano sobre un comal grande de barro en una banqueta de pueblo, canasta cubierta con servilleta a un lado" }
+  ]
+}

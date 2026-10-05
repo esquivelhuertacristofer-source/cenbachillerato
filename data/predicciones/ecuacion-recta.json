@@ -1,0 +1,12 @@
+{
+  "escena": "Una recta y = 0.5x + 1 en el plano cartesiano que cruza el eje Y en (0, 1).",
+  "pregunta": "Subes la pendiente m de 0.5 a 2 sin tocar b. ¿Qué pasa con el cruce en el eje Y?",
+  "opciones": [
+    { "id": "a", "texto": "Sube hasta y = 2", "icono": "fa-arrow-up" },
+    { "id": "b", "texto": "Se queda en (0, 1)", "icono": "fa-equals" },
+    { "id": "c", "texto": "Se corre hacia la derecha", "icono": "fa-arrow-right" }
+  ],
+  "correcta": "b",
+  "porque": "La ordenada b es el valor de y cuando x = 0, y ahí m no pesa porque m·0 = 0. Cambiar m gira la recta alrededor de ese punto; solo b la desliza hacia arriba o abajo.",
+  "comoComprobarlo": "Mueve el deslizador de pendiente m y observa la esfera dorada sobre el eje Y."
+}

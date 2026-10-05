@@ -10,17 +10,23 @@
  * respecto al eje Y (si es PAR) o respecto al origen (si es IMPAR); cuando no
  * hay simetría, el reflejo respecto al eje Y NO coincide con la curva.
  *
- * Patrón R3F: useFrame solo dentro de <Canvas>; toda pieza animada vive en un
- * hijo del Canvas y muta REFS (nada de setState ni Math.random en el render).
+ * Experimento central: la SONDA. El alumno elige un x; la escena pone el punto
+ * P = (x, f(x)) y su gemelo Q = (−x, f(−x)) con guías hasta el eje X. Si los
+ * dos están a la misma altura la función es par en ese punto; si están a
+ * alturas opuestas, impar; si no, ninguna.
+ *
+ * Etiquetas: solo <Html>, 14 px, máx. 4 a la vez (P, Q y las letras de los
+ * ejes); los valores de los rasgos viven en el panel.
  */
 
 import * as THREE from "three";
-import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useMemo } from "react";
+import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Line, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
 import { PanelGrafica, CurvaTubo, EjeVarilla, MarcasEje } from "./_tablero";
+import { EncuadreMate } from "./EncuadreMate";
 import {
   funcionPorId,
   segmentosCurva,
@@ -28,6 +34,7 @@ import {
   interseccionY,
   extremos,
   simetria,
+  relacionSonda,
   RANGO,
   fmtNum,
   type Simetria,
@@ -38,8 +45,8 @@ export interface FuncionesSceneProps {
   accent: string;
   showSimetria: boolean;
   showRasgos: boolean;
-  pausado: boolean;
-  autoRotate: boolean;
+  /** Abscisa de la sonda (positiva); su gemelo está en −x. */
+  x0: number;
   resetNonce: number;
 }
 
@@ -47,6 +54,7 @@ const ORO = "#ffd24a";
 const VERDE = "#34D399";
 const CIAN = "#7fd4ff";
 const MAGENTA = "#f0a6ff";
+const ROJO = "#ff7a7a";
 const EJE = "#9fb2c8";
 const H = RANGO; // medio-ancho del plano (mundo: −H..H)
 
@@ -61,8 +69,8 @@ function reflejar(
 }
 
 /* ════════════════════ CONTENIDO DEL PLANO ═══════════════════════════════ */
-function Plano({ funcionId, accent, showSimetria, showRasgos, pausado }: {
-  funcionId: string; accent: string; showSimetria: boolean; showRasgos: boolean; pausado: boolean;
+function Plano({ funcionId, accent, showSimetria, showRasgos, x0 }: {
+  funcionId: string; accent: string; showSimetria: boolean; showRasgos: boolean; x0: number;
 }) {
   const fn = useMemo(() => funcionPorId(funcionId), [funcionId]);
   const segs = useMemo(() => segmentosCurva(fn), [fn]);
@@ -76,35 +84,21 @@ function Plano({ funcionId, accent, showSimetria, showRasgos, pausado }: {
     if (sim === "impar") return reflejar(segs, "origen");
     return reflejar(segs, "ejeY"); // par → coincide; ninguna → NO coincide (lo evidencia)
   }, [segs, sim]);
-  const reflejoColor = sim === "impar" ? CIAN : sim === "par" ? ORO : "#ff7a7a";
+  const reflejoColor = sim === "impar" ? CIAN : sim === "par" ? ORO : ROJO;
 
-  // todos los puntos de la curva, en orden, para el punto viajero
-  const ruta = useMemo<[number, number][]>(() => segs.flat(), [segs]);
-
-  // punto que viaja sobre la curva
-  const punto = useRef<THREE.Mesh>(null);
-  const fase = useRef(0);
-  useFrame((_, delta) => {
-    const d = pausado ? 0 : delta;
-    if (ruta.length < 2) return;
-    fase.current = (fase.current + d * 0.08) % 1;
-    const mesh = punto.current;
-    if (mesh) {
-      const idx = Math.min(ruta.length - 1, Math.floor(fase.current * (ruta.length - 1)));
-      const p = ruta[idx]!;
-      mesh.position.set(p[0], p[1], 0.04);
-    }
-  });
+  // sonda: P = (x, f(x)) y su gemelo Q = (−x, f(−x))
+  const yP = fn.f(x0);
+  const yQ = fn.f(-x0);
+  const rel = relacionSonda(fn, x0);
+  const colQ = rel === "igual" ? ORO : rel === "opuesto" ? CIAN : ROJO;
+  const pVisible = Number.isFinite(yP) && Math.abs(yP) <= H;
+  const qVisible = Number.isFinite(yQ) && Math.abs(yQ) <= H;
 
   const iyVisible = Math.abs(iy) <= H;
 
   return (
     <group>
-      {/* El tablero, con grosor y marco.
-          Era un `planeGeometry`: sin canto, al girar la cámara desaparecía, y
-          mientras tanto nada decía dónde acababa el plano cartesiano. Con
-          borde iluminado y sombra sobre la mesa se lee como un instrumento y
-          no como un fondo que se corta sin avisar. */}
+      {/* El tablero, con grosor y marco. */}
       <PanelGrafica ancho={2 * H + 1.4} alto={2 * H + 1.4} />
 
       {/* rejilla del plano cartesiano */}
@@ -116,22 +110,19 @@ function Plano({ funcionId, accent, showSimetria, showRasgos, pausado }: {
 
       {/* eje X: varilla con punta, una sola pieza que recibe luz */}
       <EjeVarilla desde={[-H - 0.4, 0, 0]} hasta={[H + 0.5, 0, 0]} color={EJE} />
-      <Html position={[H + 0.95, 0.05, 0]} center distanceFactor={15} pointerEvents="none">
-        <div style={{ color: EJE, fontSize: 12, fontWeight: 900 }}>X</div>
+      <Html position={[H + 0.95, 0.05, 0]} center pointerEvents="none" zIndexRange={[20, 0]}>
+        <div style={{ color: EJE, fontSize: 14, fontWeight: 900 }}>X</div>
       </Html>
 
       {/* eje Y */}
       <EjeVarilla desde={[0, -H - 0.4, 0]} hasta={[0, H + 0.5, 0]} color={EJE} />
-      <Html position={[0.05, H + 0.95, 0]} center distanceFactor={15} pointerEvents="none">
-        <div style={{ color: EJE, fontSize: 12, fontWeight: 900 }}>Y</div>
+      <Html position={[0.05, H + 0.95, 0]} center pointerEvents="none" zIndexRange={[20, 0]}>
+        <div style={{ color: EJE, fontSize: 14, fontWeight: 900 }}>Y</div>
       </Html>
 
       {/* marcas de unidad, como geometria y no como rayitas pintadas */}
       <MarcasEje desde={-H} hasta={H} eje="x" color={EJE} />
       <MarcasEje desde={-H} hasta={H} eje="y" color={EJE} />
-      <Html position={[-0.32, -0.34, 0]} center distanceFactor={16} pointerEvents="none">
-        <div style={{ color: EJE, fontSize: 10, fontWeight: 700 }}>0</div>
-      </Html>
 
       {/* curva reflejada (simetría) */}
       {showSimetria &&
@@ -147,87 +138,85 @@ function Plano({ funcionId, accent, showSimetria, showRasgos, pausado }: {
           />
         ))}
 
-      {/* La curva y = f(x), con cuerpo.
-          `<Line lineWidth>` es grosor EN PÍXELES: mide lo mismo de cerca que
-          de lejos, no recibe luz ni proyecta sombra, y por eso una parábola
-          bien calculada se veía pegada al fondo como una calcomanía. El tubo
-          ocupa espacio: tiene lado iluminado y lado en sombra, y se acerca
-          cuando la cámara se acerca. Las matemáticas no cambian. */}
+      {/* La curva y = f(x), con cuerpo. */}
       {segs.map((seg, i) => (
         <CurvaTubo key={`cur${i}`} puntos={seg} color={accent} grosor={0.075} brillo={0.55} z={0.06} />
       ))}
 
       {/* eje de simetría / centro */}
       {showSimetria && sim === "par" && (
-        <Line points={[[0, -H, 0.01], [0, H, 0.01]]} color={ORO} lineWidth={1.5} dashed dashSize={0.1} gapSize={0.1} />
+        <CurvaTubo puntos={[[0, -H, 0.02], [0, H, 0.02]]} color={ORO} grosor={0.025} brillo={0.6} />
       )}
       {showSimetria && sim === "impar" && (
         <mesh position={[0, 0, 0.03]}>
           <ringGeometry args={[0.12, 0.2, 24]} />
-          <meshStandardMaterial color={CIAN} emissive={CIAN} emissiveIntensity={0.7} toneMapped={false} side={THREE.DoubleSide} />
+          <meshStandardMaterial color={CIAN} emissive={CIAN} emissiveIntensity={0.6} side={THREE.DoubleSide} />
         </mesh>
       )}
 
-      {/* rasgos: raíces */}
+      {/* rasgos: raíces (sin texto; los valores están en el panel) */}
       {showRasgos &&
         rs.map((x, i) => (
-          <group key={`r${i}`} position={[x, 0, 0.03]}>
-            <mesh>
-              <ringGeometry args={[0.1, 0.17, 22]} />
-              <meshStandardMaterial color={VERDE} emissive={VERDE} emissiveIntensity={0.6} toneMapped={false} side={THREE.DoubleSide} />
-            </mesh>
-            <Html position={[0, -0.42, 0]} center distanceFactor={13} pointerEvents="none">
-              <div style={{ color: VERDE, fontSize: 10.5, fontWeight: 800, whiteSpace: "nowrap", textShadow: "0 2px 8px #000" }}>
-                raíz {fmtNum(x, 2)}
-              </div>
-            </Html>
-          </group>
+          <mesh key={`r${i}`} position={[x, 0, 0.05]}>
+            <ringGeometry args={[0.1, 0.17, 22]} />
+            <meshStandardMaterial color={VERDE} emissive={VERDE} emissiveIntensity={0.6} side={THREE.DoubleSide} />
+          </mesh>
         ))}
 
       {/* rasgos: intersección con Y */}
       {showRasgos && iyVisible && (
-        <group position={[0, iy, 0.04]}>
-          <mesh castShadow>
-            <sphereGeometry args={[0.15, 24, 24]} />
-            <meshStandardMaterial color={ORO} emissive={ORO} emissiveIntensity={0.8} toneMapped={false} />
-          </mesh>
-          <Html position={[0.55, 0.18, 0]} center distanceFactor={13} pointerEvents="none">
-            <div style={{ background: "rgba(2,12,28,0.85)", border: `1px solid ${ORO}66`, borderRadius: 8, padding: "3px 7px", whiteSpace: "nowrap" }}>
-              <span style={{ color: ORO, fontSize: 10.5, fontWeight: 900 }}>(0, {fmtNum(iy, 1)})</span>
-            </div>
-          </Html>
-        </group>
+        <mesh position={[0, iy, 0.06]} castShadow>
+          <sphereGeometry args={[0.15, 24, 24]} />
+          <meshStandardMaterial color={ORO} emissive={ORO} emissiveIntensity={0.6} />
+        </mesh>
       )}
 
       {/* rasgos: máximos y mínimos locales */}
       {showRasgos &&
         exs.map((e, i) => (
-          <group key={`e${i}`} position={[e.x, e.y, 0.04]}>
+          <mesh key={`e${i}`} position={[e.x, e.y, 0.06]} castShadow>
+            <sphereGeometry args={[0.14, 22, 22]} />
+            <meshStandardMaterial
+              color={e.tipo === "max" ? MAGENTA : CIAN}
+              emissive={e.tipo === "max" ? MAGENTA : CIAN}
+              emissiveIntensity={0.6}
+            />
+          </mesh>
+        ))}
+
+      {/* sonda: P = (x, f(x)) y su gemelo Q = (−x, f(−x)) */}
+      {pVisible && (
+        <>
+          <CurvaTubo puntos={[[x0, 0, 0.03], [x0, yP, 0.03]]} color="#ffffff" grosor={0.026} brillo={0.3} />
+          <group position={[x0, yP, 0.1]}>
             <mesh castShadow>
-              <sphereGeometry args={[0.14, 22, 22]} />
-              <meshStandardMaterial
-                color={e.tipo === "max" ? MAGENTA : CIAN}
-                emissive={e.tipo === "max" ? MAGENTA : CIAN}
-                emissiveIntensity={0.7}
-                toneMapped={false}
-              />
+              <sphereGeometry args={[0.2, 24, 24]} />
+              <meshStandardMaterial color="#ffffff" emissive={accent} emissiveIntensity={0.5} roughness={0.4} />
             </mesh>
-            <Html position={[0, e.tipo === "max" ? 0.46 : -0.46, 0]} center distanceFactor={13} pointerEvents="none">
-              <div style={{ color: e.tipo === "max" ? MAGENTA : CIAN, fontSize: 10.5, fontWeight: 800, whiteSpace: "nowrap", textShadow: "0 2px 8px #000" }}>
-                {e.tipo === "max" ? "máx" : "mín"} ({fmtNum(e.x, 1)}, {fmtNum(e.y, 1)})
+            <Html position={[0.3, yP >= 0 ? 0.75 : -0.75, 0]} center pointerEvents="none" zIndexRange={[20, 0]}>
+              <div style={{ background: "rgba(2,12,28,0.88)", border: `1px solid ${accent}99`, borderRadius: 8, padding: "3px 8px", whiteSpace: "nowrap" }}>
+                <span style={{ color: "#fff", fontSize: 14, fontWeight: 900 }}>f({fmtNum(x0, 2)}) = {fmtNum(yP, 2)}</span>
               </div>
             </Html>
           </group>
-        ))}
-
-      {/* punto viajero sobre la curva */}
-      {ruta.length >= 2 && (
-        <mesh ref={punto} castShadow>
-          <sphereGeometry args={[0.15, 24, 24]} />
-          <meshStandardMaterial color="#ffffff" emissive={accent} emissiveIntensity={0.5} metalness={0.1} roughness={0.4} />
-        </mesh>
+        </>
       )}
-
+      {qVisible && (
+        <>
+          <CurvaTubo puntos={[[-x0, 0, 0.03], [-x0, yQ, 0.03]]} color={colQ} grosor={0.026} brillo={0.5} />
+          <group position={[-x0, yQ, 0.1]}>
+            <mesh castShadow>
+              <sphereGeometry args={[0.2, 24, 24]} />
+              <meshStandardMaterial color={colQ} emissive={colQ} emissiveIntensity={0.5} roughness={0.4} />
+            </mesh>
+            <Html position={[-0.3, yQ >= 0 ? 0.75 : -0.75, 0]} center pointerEvents="none" zIndexRange={[20, 0]}>
+              <div style={{ background: "rgba(2,12,28,0.88)", border: `1px solid ${colQ}99`, borderRadius: 8, padding: "3px 8px", whiteSpace: "nowrap" }}>
+                <span style={{ color: colQ, fontSize: 14, fontWeight: 900 }}>f({fmtNum(-x0, 2)}) = {fmtNum(yQ, 2)}</span>
+              </div>
+            </Html>
+          </group>
+        </>
+      )}
     </group>
   );
 }
@@ -239,7 +228,7 @@ export default function FuncionesScene(props: FuncionesSceneProps) {
       shadows
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
-      camera={{ position: [0, 0, 16], fov: 46 }}
+      camera={{ position: [0, 0, 20], fov: 46 }}
     >
       <Contenido {...props} />
     </Canvas>
@@ -247,29 +236,25 @@ export default function FuncionesScene(props: FuncionesSceneProps) {
 }
 
 function Contenido(props: FuncionesSceneProps) {
-  const { funcionId, accent, showSimetria, showRasgos, pausado, autoRotate, resetNonce } = props;
+  const { funcionId, accent, showSimetria, showRasgos, x0, resetNonce } = props;
   return (
     <>
-      {/* Suelo, luz de tres puntos y entorno que reflejar. La altura sale
-          de donde esta escena ya ponía su sombra de contacto, que es donde
-          su autor decidió que estaba el piso. */}
+      {/* Suelo, luz de tres puntos y entorno que reflejar. */}
       <Escenario acento={accent} suelo={0} />
 
+      <EncuadreMate ancho={2 * H + 2} alto={2 * H + 2} nonce={resetNonce} />
 
       <group key={`${resetNonce}`}>
-        <Plano funcionId={funcionId} accent={accent} showSimetria={showSimetria} showRasgos={showRasgos} pausado={pausado} />
+        <Plano funcionId={funcionId} accent={accent} showSimetria={showSimetria} showRasgos={showRasgos} x0={x0} />
       </group>
-
 
       <OrbitControls
         enablePan={false}
-        minDistance={9}
-        maxDistance={24}
+        minDistance={8}
+        maxDistance={40}
         minPolarAngle={Math.PI / 6}
         maxPolarAngle={Math.PI / 1.9}
         target={[0, 0, 0]}
-        autoRotate={autoRotate}
-        autoRotateSpeed={0.4}
       />
 
       <EffectComposer enableNormalPass={false}>

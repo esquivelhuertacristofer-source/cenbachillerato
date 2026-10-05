@@ -1,0 +1,12 @@
+{
+  "escena": "Un artículo de tres párrafos trae, mezcladas, oraciones que sostienen la idea, ejemplos y comentarios sueltos. A un lado se arma tu resumen.",
+  "pregunta": "Si además de las ideas subrayas una opinión personal del autor, ¿qué le pasa a tu resumen?",
+  "opciones": [
+    { "id": "a", "texto": "Queda más completo y más preciso", "icono": "fa-circle-plus" },
+    { "id": "b", "texto": "Se infla con palabras que no informan", "icono": "fa-maximize" },
+    { "id": "c", "texto": "Se queda igual, el relleno no cuenta", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "El relleno no informa sobre el tema, pero si lo subrayas entra al resumen: se alarga, se acerca al texto original y el medidor marca palabras de ruido.",
+  "comoComprobarlo": "En «Subraya y mira el resumen», toma el marcador de idea principal y toca la oración de gusto personal de un párrafo; observa el medidor de largo."
+}

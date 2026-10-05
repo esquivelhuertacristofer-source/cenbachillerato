@@ -1,0 +1,10 @@
+{
+  "slug": "narrativas-populares-lengua",
+  "items": [
+    { "clave": "fogon-noche", "formato": "16:9", "estilo": "ilustracion", "escena": "Ilustración de una fogata encendida en la noche junto a un rancho, con el cielo estrellado y cerros oscuros al fondo, colores cálidos naranja y azul profundo, sin personas" },
+    { "clave": "rancho-viejos", "formato": "1:1", "estilo": "foto", "escena": "Dos personas mayores sentadas en bancas de madera frente a una casa de adobe de rancho mexicano al atardecer, vistas de espaldas, luz dorada" },
+    { "clave": "arriero-camino", "formato": "1:1", "estilo": "foto", "escena": "Un hombre de espaldas caminando con una mula cargada por un camino de tierra entre milpas secas, cielo del atardecer, polvo en el aire" },
+    { "clave": "cerro-lumbre", "formato": "1:1", "estilo": "ilustracion", "escena": "Ilustración nocturna de un cerro oscuro con una lumbre pequeña y brillante en lo alto, un camino de tierra que sube hacia ella, estrellas" },
+    { "clave": "regreso-casa", "formato": "1:1", "estilo": "foto", "escena": "Una casa de adobe con la puerta abierta y luz cálida adentro al amanecer, un camino de tierra que llega hasta ella, nadie a la vista" }
+  ]
+}

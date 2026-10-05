@@ -1,0 +1,12 @@
+{
+  "escena": "Un rayo verde sobre la recta numérica muestra la solución de 3x − 5 > 7",
+  "pregunta": "Si cambias el coeficiente a de 3 a −3, ¿hacia dónde apunta el rayo verde?",
+  "opciones": [
+    { "id": "a", "texto": "Sigue hacia la derecha", "icono": "fa-arrow-right" },
+    { "id": "b", "texto": "Se voltea hacia la izquierda", "icono": "fa-arrow-left" },
+    { "id": "c", "texto": "Desaparece de la recta", "icono": "fa-eye-slash" }
+  ],
+  "correcta": "b",
+  "porque": "Al dividir entre un número negativo el signo de la desigualdad se invierte: −3x − 5 > 7 se resuelve como x < −4, y el rayo va hacia los valores menores.",
+  "comoComprobarlo": "En Controles baja el deslizador de a por debajo de cero y observa el rayo verde y el símbolo de la solución."
+}

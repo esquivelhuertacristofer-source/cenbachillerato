@@ -1,0 +1,12 @@
+{
+  "escena": "Una parábola con a positivo, como un valle que corta el agua en dos puntos (dos raíces).",
+  "pregunta": "Si subes c poco a poco, ¿qué les pasa a las dos raíces?",
+  "opciones": [
+    { "id": "a", "texto": "Se alejan una de la otra", "icono": "fa-arrows-left-right" },
+    { "id": "b", "texto": "Se acercan, se juntan y desaparecen", "icono": "fa-down-left-and-up-right-to-center" },
+    { "id": "c", "texto": "No cambian, solo sube el vértice", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "Subir c eleva todo el valle. El discriminante b² − 4ac baja: con Δ = 0 el vértice apenas toca el agua (raíz doble) y con Δ < 0 el valle ya no la alcanza.",
+  "comoComprobarlo": "Arrastra el deslizador de c hacia arriba y vigila la aguja del discriminante cuando cruza el cero."
+}

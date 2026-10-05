@@ -18,10 +18,10 @@
 
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Html } from "@react-three/drei";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { OrbitControls, Html, PerspectiveCamera } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
-import { biomaDe, BIOMAS, TEMP_MIN, TEMP_MAX, PRECIP_MAX, type Bioma } from "./biomas-data";
+import { biomaDe, BIOMAS, TEMP_MIN, TEMP_MAX, PRECIP_MIN, PRECIP_MAX, type Bioma } from "./biomas-data";
 import { Escenario } from "./_escenario";
 
 export interface BiomasSceneProps {
@@ -243,6 +243,7 @@ function Precipitacion({ precip, temp, pausado }: { precip: number; temp: number
 /* ─── El diorama ─────────────────────────────────────────────────────────── */
 function Diorama(props: BiomasSceneProps) {
   const { temp, precip, pausado } = props;
+  const ancho = useThree((st) => st.size.width) >= 640;
   const bioma = useMemo(() => BIOMAS[biomaDe(temp, precip)], [temp, precip]);
 
   const disco = useRef<THREE.Group>(null);
@@ -306,16 +307,55 @@ function Diorama(props: BiomasSceneProps) {
         </mesh>
       </group>
 
-      {/* etiqueta del bioma */}
-      <Html position={[0, 2.7, 0]} center distanceFactor={11} pointerEvents="none">
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "7px 14px", borderRadius: 13, background: "rgba(2,12,28,0.82)", border: `1px solid ${bioma.colorVeg}aa`, whiteSpace: "nowrap", backdropFilter: "blur(6px)" }}>
-          <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <i className={`fa-solid ${bioma.icono}`} style={{ color: bioma.colorVeg, fontSize: 13 }} />
-            <span style={{ color: "#eaf2fb", fontSize: 12.5, fontWeight: 900 }}>{bioma.nombre}</span>
-          </span>
-          <span style={{ color: bioma.colorVeg, fontSize: 10.5, fontWeight: 700 }}>{bioma.ejemploMx}</span>
-        </div>
-      </Html>
+      {/* Medidores del clima: lo que mueve el alumno, a la vista junto al diorama */}
+      <Medidor x={-4.4} frac={(temp - TEMP_MIN) / (TEMP_MAX - TEMP_MIN)} marcas={[(2 - TEMP_MIN) / (TEMP_MAX - TEMP_MIN), (13 - TEMP_MIN) / (TEMP_MAX - TEMP_MIN)]}
+        colA="#4aa8ff" colB="#ff7a3a" mezcla={fTemp} />
+      <Medidor x={4.4} frac={(precip - PRECIP_MIN) / (PRECIP_MAX - PRECIP_MIN)} marcas={[250 / PRECIP_MAX, 600 / PRECIP_MAX, 1000 / PRECIP_MAX, 3500 / PRECIP_MAX]}
+        colA="#7cc4ff" colB="#2f7dff" mezcla={precip / PRECIP_MAX} />
+
+      {/* Etiquetas: el bioma (siempre) y la lectura de cada medidor (solo en pantalla ancha) */}
+      <Rotulo pos={[0, 2.9, 0]} color={bioma.colorVeg} icono={bioma.icono} texto={bioma.nombre.split(" (")[0]!.split(" / ")[0]!} />
+      {ancho && <Rotulo pos={[-4.4, 3.5, 0]} color="#ff9a5a" icono="fa-temperature-half" texto={`${Math.round(temp)} °C`} />}
+      {ancho && <Rotulo pos={[4.4, 3.5, 0]} color="#7cc4ff" icono="fa-cloud-showers-heavy" texto={`${Math.round(precip)} mm`} />}
+    </group>
+  );
+}
+
+/* ─── Rótulo: tamaño fijo en píxeles, ≥ 14 px ──────────────────────────── */
+function Rotulo({ pos, color, icono, texto }: { pos: [number, number, number]; color: string; icono: string; texto: string }) {
+  return (
+    <Html position={pos} center pointerEvents="none" zIndexRange={[20, 0]}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 11px", borderRadius: 10, background: "rgba(4,10,22,0.88)", border: `1.5px solid ${color}`, whiteSpace: "nowrap", boxShadow: "0 4px 16px rgba(0,0,0,0.5)", fontFamily: "system-ui, sans-serif" }}>
+        <i className={`fa-solid ${icono}`} style={{ color, fontSize: 14 }} />
+        <span style={{ color: "#eaf2fb", fontSize: 14, fontWeight: 900 }}>{texto}</span>
+      </div>
+    </Html>
+  );
+}
+
+/* ─── Medidor vertical (termómetro / pluviómetro) ──────────────────────────
+ * La columna sube con la variable; las marcas blancas son los umbrales donde
+ * el bioma cambia. */
+const M_ALTO = 3.2;
+function Medidor({ x, frac, marcas, colA, colB, mezcla }: { x: number; frac: number; marcas: number[]; colA: string; colB: string; mezcla: number }) {
+  const f = Math.min(1, Math.max(0.03, frac));
+  const col = useMemo(() => new THREE.Color(colA).lerp(new THREE.Color(colB), Math.min(1, Math.max(0, mezcla))), [colA, colB, mezcla]);
+  return (
+    <group position={[x, 0, 0]}>
+      <mesh position={[0, M_ALTO / 2 - 0.2, 0]}>
+        <boxGeometry args={[0.36, M_ALTO, 0.36]} />
+        <meshStandardMaterial color="#cfe6ff" transparent opacity={0.22} roughness={0.2} />
+      </mesh>
+      <mesh position={[0, -0.2 + (M_ALTO * f) / 2, 0]} scale={[1, f, 1]}>
+        <boxGeometry args={[0.22, M_ALTO, 0.22]} />
+        <meshStandardMaterial color={col} emissive={col} emissiveIntensity={0.45} roughness={0.35} />
+      </mesh>
+      {marcas.map((m, i) => (
+        <mesh key={i} position={[0, -0.2 + M_ALTO * m, 0.2]}>
+          <boxGeometry args={[0.6, 0.05, 0.05]} />
+          <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.4} />
+        </mesh>
+      ))}
     </group>
   );
 }
@@ -327,7 +367,6 @@ export default function BiomasScene(props: BiomasSceneProps) {
       shadows
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
-      camera={{ position: [6.5, 4.8, 7.5], fov: 45 }}
     >
       <Contenido {...props} />
     </Canvas>
@@ -336,8 +375,12 @@ export default function BiomasScene(props: BiomasSceneProps) {
 
 function Contenido(props: BiomasSceneProps) {
   const { accent, autoRotate, resetNonce } = props;
+  const angosto = useThree((st) => st.size.width) < 640;
+  // contenido ~60 % del alto, entre la barra de arriba y la misión de abajo
+  const cam: [number, number, number] = angosto ? [8.5, 6.2, 11.5] : [6.2, 4.6, 7.2];
   return (
     <>
+      <PerspectiveCamera makeDefault position={cam} fov={45} />
       {/* Suelo, luz de tres puntos y entorno que reflejar. */}
       {/* La altura sale de donde esta escena ya ponía su sombra de
           contacto: es donde su autor decidió que estaba el piso. */}
@@ -355,7 +398,7 @@ function Contenido(props: BiomasSceneProps) {
         maxDistance={20}
         minPolarAngle={Math.PI / 9}
         maxPolarAngle={Math.PI / 2.15}
-        target={[0, 0.3, 0]}
+        target={[0, 0.2, 0]}
         autoRotate={autoRotate}
         autoRotateSpeed={0.4}
       />

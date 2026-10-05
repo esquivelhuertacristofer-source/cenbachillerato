@@ -1,0 +1,12 @@
+{
+  "escena": "La parábola f(x) = x² − 4 con una sonda blanca en x = 1.5 y otra en x = −1.5.",
+  "pregunta": "En f(x) = x² − 4, ¿a qué altura queda el punto gemelo en x = −1.5 respecto al de x = 1.5?",
+  "opciones": [
+    { "id": "a", "texto": "A la misma altura", "icono": "fa-equals" },
+    { "id": "b", "texto": "A la altura contraria, debajo del eje", "icono": "fa-arrow-down" },
+    { "id": "c", "texto": "Sobre el eje X, en y = 0", "icono": "fa-minus" }
+  ],
+  "correcta": "a",
+  "porque": "Como (−x)² = x², elevar al cuadrado borra el signo y los dos puntos tienen el mismo valor. Eso hace la gráfica un espejo respecto al eje Y: una función par.",
+  "comoComprobarlo": "Mueve la sonda x y compara las barras f(x) y f(−x) del medidor."
+}

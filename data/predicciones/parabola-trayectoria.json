@@ -1,0 +1,12 @@
+{
+  "escena": "Un balón describe una parábola de 30 m de alcance y se compara con el travesaño de un arco a 25 m",
+  "pregunta": "Si haces la apertura a más negativa, de −0.04 a −0.08, ¿qué le pasa al arco del balón?",
+  "opciones": [
+    { "id": "a", "texto": "Se cierra: llega menos lejos y menos alto", "icono": "fa-compress" },
+    { "id": "b", "texto": "Se abre: llega más lejos", "icono": "fa-expand" },
+    { "id": "c", "texto": "No cambia, solo depende de b", "icono": "fa-equals" }
+  ],
+  "correcta": "a",
+  "porque": "Cuanto mayor es |a|, más cerrada la parábola. Con b igual, el vértice x = −b/2a se acerca al origen y la altura máxima baja: el balón cae antes.",
+  "comoComprobarlo": "En Controles baja el deslizador de a hasta −0.08 y observa dónde cae el balón y qué tan alto llega el vértice dorado."
+}

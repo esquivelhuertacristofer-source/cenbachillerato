@@ -9,20 +9,22 @@
  *   • la ORDENADA AL ORIGEN (0, b): punto donde cruza el eje Y;
  *   • la RAÍZ (x, 0): punto donde cruza el eje X;
  *   • el TRIÁNGULO DE PENDIENTE: avance de 1 en X y subida de m en Y (m = subida/avance);
- *   • las SOLUCIONES enteras: cada punto de la recta es una solución de la ecuación.
+ *   • las SOLUCIONES enteras: cada punto de la recta es una solución de la ecuación;
+ *   • la SONDA: un punto (x, y) que el alumno desliza por la recta con una guía
+ *     hasta cada eje, para LEER una solución de la ecuación.
  *
- * Patrón R3F: useFrame solo dentro de <Canvas>; toda pieza animada vive en un
- * hijo del Canvas y muta REFS (nada de setState ni Math.random en el render).
+ * Etiquetas: solo <Html> (nunca <Text>), 14 px, máx. 4 a la vez.
  */
 
 import * as THREE from "three";
-import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Line, Html } from "@react-three/drei";
+import { useMemo } from "react";
+import { Canvas, useThree } from "@react-three/fiber";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
-import { raizX, solucionesEnteras, RANGO, fmtNum } from "./ecuacion-recta-data";
+import { raizX, solucionesEnteras, evalY, RANGO, fmtNum } from "./ecuacion-recta-data";
 import { Escenario } from "./_escenario";
-import { CurvaTubo } from "./_tablero";
+import { CurvaTubo, PanelGrafica, EjeVarilla, MarcasEje } from "./_tablero";
+import { EncuadreMate } from "./EncuadreMate";
 
 export interface EcuacionRectaSceneProps {
   m: number;
@@ -30,8 +32,8 @@ export interface EcuacionRectaSceneProps {
   accent: string;
   showTriangulo: boolean;
   showSoluciones: boolean;
-  pausado: boolean;
-  autoRotate: boolean;
+  /** Abscisa de la sonda: el alumno la mueve y lee la solución (x, y). */
+  x0: number;
   resetNonce: number;
 }
 
@@ -65,52 +67,32 @@ function clipLinea(m: number, b: number): [number, number][] {
 }
 
 /* ════════════════════ CONTENIDO DEL PLANO ═══════════════════════════════ */
-function Plano({ m, b, accent, showTriangulo, showSoluciones, pausado }: {
-  m: number; b: number; accent: string; showTriangulo: boolean; showSoluciones: boolean; pausado: boolean;
+function Plano({ m, b, accent, showTriangulo, showSoluciones, x0 }: {
+  m: number; b: number; accent: string; showTriangulo: boolean; showSoluciones: boolean; x0: number;
 }) {
+  const angosto = useThree((s) => s.size.width) < 640;
   const seg = useMemo(() => clipLinea(m, b), [m, b]);
   const xr = useMemo(() => raizX(m, b), [m, b]);
   const soluciones = useMemo(() => solucionesEnteras(m, b), [m, b]);
 
-  // puntos de la recta (mundo, z=0)
+  // puntos de la recta (mundo)
   const linea = useMemo<[number, number, number][]>(
-    () => (seg.length === 2 ? [[seg[0]![0], seg[0]![1], 0], [seg[1]![0], seg[1]![1], 0]] : []),
+    () => (seg.length === 2 ? [[seg[0]![0], seg[0]![1], 0.05], [seg[1]![0], seg[1]![1], 0.05]] : []),
     [seg]
   );
 
-  // punto que viaja sobre la recta
-  const punto = useRef<THREE.Mesh>(null);
-  const fase = useRef(0);
-  useFrame((_, delta) => {
-    const d = pausado ? 0 : delta;
-    fase.current = (fase.current + d * 0.18) % 1;
-    const mesh = punto.current;
-    if (mesh && seg.length === 2) {
-      const t = fase.current;
-      const x = seg[0]![0] + (seg[1]![0] - seg[0]![0]) * t;
-      const y = seg[0]![1] + (seg[1]![1] - seg[0]![1]) * t;
-      mesh.position.set(x, y, 0.02);
-    }
-  });
+  // sonda: el punto (x0, y0) que el alumno coloca sobre la recta
+  const y0 = evalY(m, b, x0);
+  const sondaVisible = Math.abs(y0) <= H;
 
   const bVisible = Math.abs(b) <= H;
   const triPunta = b + m; // (1, b+m)
   const triDentro = showTriangulo && Math.abs(b) <= H && Math.abs(triPunta) <= H && m !== 0;
 
-  // marcas de unidades sobre los ejes (−H..H)
-  const ticks = useMemo(() => {
-    const t: number[] = [];
-    for (let i = -H; i <= H; i++) if (i !== 0) t.push(i);
-    return t;
-  }, []);
-
   return (
     <group>
-      {/* tablero del plano */}
-      <mesh position={[0, 0, -0.06]} receiveShadow>
-        <planeGeometry args={[2 * H + 1.4, 2 * H + 1.4]} />
-        <meshStandardMaterial color="#07182c" metalness={0.05} roughness={0.95} />
-      </mesh>
+      {/* tablero con grosor y marco */}
+      <PanelGrafica ancho={2 * H + 1.4} alto={2 * H + 1.4} />
 
       {/* rejilla del plano cartesiano */}
       <gridHelper
@@ -119,102 +101,89 @@ function Plano({ m, b, accent, showTriangulo, showSoluciones, pausado }: {
         position={[0, 0, -0.04]}
       />
 
-      {/* eje X */}
-      <Line points={[[-H - 0.4, 0, 0], [H + 0.5, 0, 0]]} color={EJE} lineWidth={2} />
-      <mesh position={[H + 0.6, 0, 0]} rotation={[0, 0, -Math.PI / 2]}>
-        <coneGeometry args={[0.13, 0.34, 16]} />
-        <meshStandardMaterial color={EJE} />
-      </mesh>
-      <Html position={[H + 0.95, 0.05, 0]} center distanceFactor={15} pointerEvents="none">
-        <div style={{ color: EJE, fontSize: 12, fontWeight: 900 }}>X</div>
+      {/* ejes: varillas con punta */}
+      <EjeVarilla desde={[-H - 0.4, 0, 0]} hasta={[H + 0.5, 0, 0]} color={EJE} />
+      <Html position={[H + 0.95, 0.05, 0]} center pointerEvents="none" zIndexRange={[20, 0]}>
+        <div style={{ color: EJE, fontSize: 14, fontWeight: 900 }}>X</div>
       </Html>
-
-      {/* eje Y */}
-      <Line points={[[0, -H - 0.4, 0], [0, H + 0.5, 0]]} color={EJE} lineWidth={2} />
-      <mesh position={[0, H + 0.6, 0]}>
-        <coneGeometry args={[0.13, 0.34, 16]} />
-        <meshStandardMaterial color={EJE} />
-      </mesh>
-      <Html position={[0.05, H + 0.95, 0]} center distanceFactor={15} pointerEvents="none">
-        <div style={{ color: EJE, fontSize: 12, fontWeight: 900 }}>Y</div>
+      <EjeVarilla desde={[0, -H - 0.4, 0]} hasta={[0, H + 0.5, 0]} color={EJE} />
+      <Html position={[0.05, H + 0.95, 0]} center pointerEvents="none" zIndexRange={[20, 0]}>
+        <div style={{ color: EJE, fontSize: 14, fontWeight: 900 }}>Y</div>
       </Html>
-
-      {/* marcas de unidad */}
-      {ticks.map((i) => (
-        <group key={`tx${i}`}>
-          <Line points={[[i, -0.1, 0], [i, 0.1, 0]]} color={EJE} lineWidth={1} />
-          <Line points={[[-0.1, i, 0], [0.1, i, 0]]} color={EJE} lineWidth={1} />
-        </group>
-      ))}
-      <Html position={[-0.32, -0.34, 0]} center distanceFactor={16} pointerEvents="none">
-        <div style={{ color: EJE, fontSize: 10, fontWeight: 700 }}>0</div>
-      </Html>
+      <MarcasEje desde={-H} hasta={H} eje="x" color={EJE} />
+      <MarcasEje desde={-H} hasta={H} eje="y" color={EJE} />
 
       {/* soluciones de coordenadas enteras (cada punto = una solución) */}
       {showSoluciones && soluciones.map((p, i) => (
-        <mesh key={`sol${i}`} position={[p.x, p.y, 0.01]}>
+        <mesh key={`sol${i}`} position={[p.x, p.y, 0.02]}>
           <ringGeometry args={[0.1, 0.17, 22]} />
-          <meshStandardMaterial color={VERDE} emissive={VERDE} emissiveIntensity={0.6} toneMapped={false} side={THREE.DoubleSide} />
+          <meshStandardMaterial color={VERDE} emissive={VERDE} emissiveIntensity={0.6} side={THREE.DoubleSide} />
         </mesh>
       ))}
 
       {/* la recta */}
       {linea.length === 2 && <CurvaTubo puntos={linea} color={accent} grosor={0.072} />}
 
-      {/* triángulo de pendiente desde (0, b) */}
+      {/* triángulo de pendiente desde (0, b): avance 1 (cian) y subida m (oro) */}
       {triDentro && (
         <>
-          <Line points={[[0, b, 0], [1, b, 0]]} color={CIAN} lineWidth={2} dashed dashSize={0.12} gapSize={0.08} />
-          <Line points={[[1, b, 0], [1, b + m, 0]]} color={ORO} lineWidth={2} dashed dashSize={0.12} gapSize={0.08} />
-          <Html position={[0.5, b - 0.32, 0]} center distanceFactor={14} pointerEvents="none">
-            <div style={{ color: CIAN, fontSize: 10.5, fontWeight: 800, whiteSpace: "nowrap", textShadow: "0 2px 8px #000" }}>avance 1</div>
-          </Html>
-          <Html position={[1.42, b + m / 2, 0]} center distanceFactor={14} pointerEvents="none">
-            <div style={{ color: ORO, fontSize: 10.5, fontWeight: 800, whiteSpace: "nowrap", textShadow: "0 2px 8px #000" }}>
-              subida {fmtNum(m, 2)}
-            </div>
-          </Html>
+          <CurvaTubo puntos={[[0, b, 0.03], [1, b, 0.03]]} color={CIAN} grosor={0.032} brillo={0.6} />
+          <CurvaTubo puntos={[[1, b, 0.03], [1, b + m, 0.03]]} color={ORO} grosor={0.032} brillo={0.6} />
         </>
       )}
 
       {/* ordenada al origen (0, b) */}
       {bVisible && (
-        <group position={[0, b, 0.02]}>
+        <group position={[0, b, 0.05]}>
           <mesh castShadow>
             <sphereGeometry args={[0.16, 24, 24]} />
-            <meshStandardMaterial color={ORO} emissive={ORO} emissiveIntensity={0.8} toneMapped={false} />
+            <meshStandardMaterial color={ORO} emissive={ORO} emissiveIntensity={0.6} />
           </mesh>
-          <Html position={[0.1, 0.48, 0]} center distanceFactor={13} pointerEvents="none">
-            <div style={{ background: "rgba(2,12,28,0.85)", border: `1px solid ${ORO}66`, borderRadius: 8, padding: "4px 8px", whiteSpace: "nowrap" }}>
-              <span style={{ color: ORO, fontSize: 11, fontWeight: 900 }}>ordenada (0, {fmtNum(b, 1)})</span>
-            </div>
-          </Html>
+          {!angosto && (
+            <Html position={[-1.6, 0.55, 0]} center pointerEvents="none" zIndexRange={[20, 0]}>
+              <div style={{ background: "rgba(2,12,28,0.85)", border: `1px solid ${ORO}66`, borderRadius: 8, padding: "3px 8px", whiteSpace: "nowrap" }}>
+                <span style={{ color: ORO, fontSize: 14, fontWeight: 900 }}>ordenada (0, {fmtNum(b, 1)})</span>
+              </div>
+            </Html>
+          )}
         </group>
       )}
 
       {/* raíz / cruce con el eje X (x, 0) */}
       {xr !== null && Math.abs(xr) <= H && (
-        <group position={[xr, 0, 0.02]}>
-          <mesh rotation={[0, 0, 0]}>
+        <group position={[xr, 0, 0.05]}>
+          <mesh>
             <ringGeometry args={[0.12, 0.2, 24]} />
-            <meshStandardMaterial color={CIAN} emissive={CIAN} emissiveIntensity={0.7} toneMapped={false} side={THREE.DoubleSide} />
+            <meshStandardMaterial color={CIAN} emissive={CIAN} emissiveIntensity={0.6} side={THREE.DoubleSide} />
           </mesh>
-          <Html position={[0, -0.42, 0]} center distanceFactor={13} pointerEvents="none">
-            <div style={{ color: CIAN, fontSize: 11, fontWeight: 900, whiteSpace: "nowrap", textShadow: "0 2px 8px #000" }}>
-              raíz ({fmtNum(xr, 1)}, 0)
-            </div>
-          </Html>
+          {!angosto && (
+            <Html position={[0, -0.75, 0]} center pointerEvents="none" zIndexRange={[20, 0]}>
+              <div style={{ color: CIAN, fontSize: 14, fontWeight: 900, whiteSpace: "nowrap", textShadow: "0 2px 8px #000" }}>
+                raíz ({fmtNum(xr, 1)}, 0)
+              </div>
+            </Html>
+          )}
         </group>
       )}
 
-      {/* punto viajero */}
-      {linea.length === 2 && (
-        <mesh ref={punto} castShadow>
-          <sphereGeometry args={[0.15, 24, 24]} />
-          <meshStandardMaterial color="#ffffff" emissive={accent} emissiveIntensity={0.5} metalness={0.1} roughness={0.4} />
-        </mesh>
+      {/* la sonda: guías hasta los ejes y el punto (x, y) que el alumno mueve */}
+      {sondaVisible && (
+        <>
+          <CurvaTubo puntos={[[x0, 0, 0.03], [x0, y0, 0.03]]} color="#ffffff" grosor={0.026} brillo={0.3} />
+          <CurvaTubo puntos={[[0, y0, 0.03], [x0, y0, 0.03]]} color="#ffffff" grosor={0.026} brillo={0.3} />
+          <group position={[x0, y0, 0.08]}>
+            <mesh castShadow>
+              <sphereGeometry args={[0.2, 24, 24]} />
+              <meshStandardMaterial color="#ffffff" emissive={accent} emissiveIntensity={0.5} metalness={0.1} roughness={0.4} />
+            </mesh>
+            <Html position={[0.2, 0.75, 0]} center pointerEvents="none" zIndexRange={[20, 0]}>
+              <div style={{ background: "rgba(2,12,28,0.88)", border: `1px solid ${accent}99`, borderRadius: 8, padding: "3px 8px", whiteSpace: "nowrap" }}>
+                <span style={{ color: "#fff", fontSize: 14, fontWeight: 900 }}>({fmtNum(x0, 1)}, {fmtNum(y0, 2)})</span>
+              </div>
+            </Html>
+          </group>
+        </>
       )}
-
     </group>
   );
 }
@@ -226,7 +195,7 @@ export default function EcuacionRectaScene(props: EcuacionRectaSceneProps) {
       shadows
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
-      camera={{ position: [0, 0, 16], fov: 46 }}
+      camera={{ position: [0, 0, 22], fov: 46 }}
     >
       <Contenido {...props} />
     </Canvas>
@@ -234,29 +203,25 @@ export default function EcuacionRectaScene(props: EcuacionRectaSceneProps) {
 }
 
 function Contenido(props: EcuacionRectaSceneProps) {
-  const { m, b, accent, showTriangulo, showSoluciones, pausado, autoRotate, resetNonce } = props;
+  const { m, b, accent, showTriangulo, showSoluciones, x0, resetNonce } = props;
   return (
     <>
       {/* Suelo, luz de tres puntos y entorno que reflejar. */}
-      {/* La altura sale de donde esta escena ya ponía su sombra de
-          contacto: es donde su autor decidió que estaba el piso. */}
       <Escenario acento={accent} suelo={0} />
 
+      <EncuadreMate ancho={2 * H + 2} alto={2 * H + 2} nonce={resetNonce} />
 
       <group key={`${resetNonce}`}>
-        <Plano m={m} b={b} accent={accent} showTriangulo={showTriangulo} showSoluciones={showSoluciones} pausado={pausado} />
+        <Plano m={m} b={b} accent={accent} showTriangulo={showTriangulo} showSoluciones={showSoluciones} x0={x0} />
       </group>
-
 
       <OrbitControls
         enablePan={false}
         minDistance={9}
-        maxDistance={24}
+        maxDistance={42}
         minPolarAngle={Math.PI / 6}
         maxPolarAngle={Math.PI / 1.9}
         target={[0, 0, 0]}
-        autoRotate={autoRotate}
-        autoRotateSpeed={0.4}
       />
 
       <EffectComposer enableNormalPass={false}>

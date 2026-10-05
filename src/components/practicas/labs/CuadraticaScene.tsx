@@ -18,8 +18,8 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { evalY, resolver, vertice, discriminante, fmt } from "./cuadratica-data";
@@ -42,6 +42,12 @@ const H = 6.6;     // alto del encuadre (mundo)
 const D = 2.6;     // profundidad del valle (mundo, eje z)
 const AGUA = "#3aa0ff";
 const RAIZ = "#ffd24a";
+
+/* Rótulo común: ≥ 14 px, tamaño fijo en píxeles. */
+const ETIQ: React.CSSProperties = {
+  whiteSpace: "nowrap", padding: "3px 10px", borderRadius: 8, background: "rgba(4,10,22,0.88)",
+  fontWeight: 900, fontSize: 14, fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)",
+};
 
 /* ─── Geometría + mapeo, derivados de a,b,c ────────────────────────────── */
 function useModelo(a: number, b: number, c: number) {
@@ -125,7 +131,7 @@ function Pulso({ pos, color, escala = 1, pausado }: {
   return (
     <mesh ref={ref} position={pos}>
       <sphereGeometry args={[0.17, 20, 20]} />
-      <meshStandardMaterial color={color} emissive={color} emissiveIntensity={1.6} toneMapped={false} />
+      <meshStandardMaterial color={color} emissive={color} emissiveIntensity={1.6} />
     </mesh>
   );
 }
@@ -149,8 +155,8 @@ function Mundo({ a, b, c, accent, pausado }: {
       </mesh>
       {/* línea del eje x (la "orilla") */}
       <Line points={ejeX} color={AGUA} lineWidth={2} transparent opacity={0.8} />
-      <Html position={[W / 2, y0w, D / 2]} center distanceFactor={13} pointerEvents="none">
-        <div style={{ transform: "translate(22px,0)", color: AGUA, fontSize: 12, fontWeight: 900, fontFamily: "ui-monospace, monospace" }}>y = 0</div>
+      <Html position={[W / 2, y0w, D / 2]} center pointerEvents="none" zIndexRange={[20, 0]}>
+        <div style={{ transform: "translate(-60%,-120%)", ...ETIQ, border: `1.5px solid ${AGUA}`, color: AGUA }}>y = 0 (agua)</div>
       </Html>
 
       {/* eje y (vertical, si x=0 está en cuadro) */}
@@ -170,10 +176,10 @@ function Mundo({ a, b, c, accent, pausado }: {
         <group key={i}>
           <Pulso pos={[rt.xw, y0w, D / 2]} color={RAIZ} escala={1.15} pausado={pausado} />
           <Line points={[[rt.xw, y0w, D / 2], [rt.xw, y0w - 0.9, D / 2]]} color={RAIZ} lineWidth={2} transparent opacity={0.7} />
-          <Html position={[rt.xw, y0w, D / 2]} center distanceFactor={13} pointerEvents="none">
-            <div style={{ transform: "translateY(26px)", display: "flex", alignItems: "center", gap: 6, padding: "3px 9px", borderRadius: 999, background: "rgba(2,12,28,0.82)", border: `1px solid ${RAIZ}88`, whiteSpace: "nowrap", backdropFilter: "blur(6px)" }}>
-              <i className="fa-solid fa-location-dot" style={{ color: RAIZ, fontSize: 11 }} />
-              <span style={{ color: "#fff", fontSize: 11.5, fontWeight: 900, fontFamily: "ui-monospace, monospace" }}>x = {fmt(rt.valor)}</span>
+          <Html position={[rt.xw, y0w, D / 2]} center pointerEvents="none" zIndexRange={[20, 0]}>
+            <div style={{ transform: "translate(0,95%)", ...ETIQ, border: `1.5px solid ${RAIZ}`, color: "#fff", display: "flex", alignItems: "center", gap: 6 }}>
+              <i className="fa-solid fa-location-dot" style={{ color: RAIZ, fontSize: 14 }} />
+              x = {fmt(rt.valor)}
             </div>
           </Html>
         </group>
@@ -181,19 +187,16 @@ function Mundo({ a, b, c, accent, pausado }: {
 
       {/* Vértice */}
       <Pulso pos={vtx} color="#ff7ad9" escala={0.95} pausado={pausado} />
-      <Html position={vtx} center distanceFactor={13} pointerEvents="none">
-        <div style={{ transform: "translateY(-30px)", display: "flex", alignItems: "center", gap: 6, padding: "3px 9px", borderRadius: 999, background: "rgba(2,12,28,0.82)", border: "1px solid #ff7ad988", whiteSpace: "nowrap", backdropFilter: "blur(6px)" }}>
-          <i className="fa-solid fa-down-long" style={{ color: "#ff7ad9", fontSize: 11 }} />
-          <span style={{ color: "#fff", fontSize: 11, fontWeight: 800, fontFamily: "ui-monospace, monospace" }}>
-            vértice ({fmt(vinfo.x)}, {fmt(vinfo.y)})
-          </span>
+      <Html position={vtx} center pointerEvents="none" zIndexRange={[20, 0]}>
+        <div style={{ transform: `translate(0,${vtx[1] >= y0w ? "-135%" : "135%"})`, ...ETIQ, border: "1.5px solid #ff7ad9", color: "#fff" }}>
+          vértice ({fmt(vinfo.x)}, {fmt(vinfo.y)})
         </div>
       </Html>
 
       {/* Mensaje cuando no hay raíces reales */}
       {tipo === "ninguna" && (
-        <Html position={[0, y0w + (vtx[1] > y0w ? 1.4 : -1.4), D / 2]} center distanceFactor={15} pointerEvents="none">
-          <div style={{ padding: "4px 12px", borderRadius: 999, background: "rgba(2,12,28,0.82)", border: "1px solid rgba(255,255,255,0.25)", whiteSpace: "nowrap", color: "#cfe0ff", fontSize: 11.5, fontWeight: 800 }}>
+        <Html position={[0, y0w + (vtx[1] > y0w ? 1.4 : -1.4), D / 2]} center pointerEvents="none" zIndexRange={[20, 0]}>
+          <div style={{ ...ETIQ, border: "1.5px solid rgba(255,255,255,0.35)", color: "#cfe0ff" }}>
             el valle no toca el agua · Δ &lt; 0
           </div>
         </Html>
@@ -209,7 +212,7 @@ export default function CuadraticaScene(props: CuadraticaSceneProps) {
       shadows
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
-      camera={{ position: [8.5, 5, 11], fov: 45 }}
+      camera={{ position: [7.5, 4, 12.5], fov: 45 }}
     >
       <Contenido {...props} />
     </Canvas>
@@ -218,6 +221,12 @@ export default function CuadraticaScene(props: CuadraticaSceneProps) {
 
 function Contenido(props: CuadraticaSceneProps) {
   const { a, b, c, accent, pausado, autoRotate, resetNonce } = props;
+  const { camera, size } = useThree();
+  const angosto = size.width < 640;
+  // Pantalla angosta: la cámara se aleja una sola vez para que quepa todo el valle.
+  useEffect(() => {
+    if (angosto) camera.position.multiplyScalar(1.35);
+  }, [angosto, camera]);
   return (
     <>
       {/* Suelo, luz de tres puntos y entorno que reflejar. */}
@@ -234,10 +243,10 @@ function Contenido(props: CuadraticaSceneProps) {
       <OrbitControls
         enablePan={false}
         minDistance={8}
-        maxDistance={32}
+        maxDistance={36}
         minPolarAngle={Math.PI / 8}
         maxPolarAngle={Math.PI / 1.9}
-        target={[0, 0, 0]}
+        target={[0, -0.7, 0]}
         autoRotate={autoRotate}
         autoRotateSpeed={0.4}
       />

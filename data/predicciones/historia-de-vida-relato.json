@@ -1,0 +1,12 @@
+{
+  "escena": "Entrevistas a una abuela ficticia y solo puedes hacer cuatro preguntas",
+  "pregunta": "¿Qué combinación de preguntas deja un relato con hecho, imagen y sentido?",
+  "opciones": [
+    { "id": "a", "texto": "Edad, nietos y su opinión de los jóvenes", "icono": "fa-hashtag" },
+    { "id": "b", "texto": "Un suceso, un detalle y su significado", "icono": "fa-heart-pulse" },
+    { "id": "c", "texto": "Solo detalles: la cocina y el camino", "icono": "fa-house" }
+  ],
+  "correcta": "b",
+  "porque": "Un relato necesita las tres capas: lo que pasó, cómo se veía y qué cambió en quien lo vivió. Solo datos, opiniones o solo descripción dejan un medidor vacío.",
+  "comoComprobarlo": "En «Entrevista» haz primero preguntas de datos y mira los tres medidores; luego reinicia y combina una pregunta de cada tipo."
+}

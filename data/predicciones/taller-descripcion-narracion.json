@@ -1,0 +1,12 @@
+{
+  "escena": "Describes la casa de tu abuela y el lector la dibuja en su cabeza",
+  "pregunta": "¿Qué hace que el lector vea TU casa y no una cualquiera?",
+  "opciones": [
+    { "id": "a", "texto": "Un adjetivo superlativo, como «preciosísima»", "icono": "fa-star" },
+    { "id": "b", "texto": "Un dato exacto, como el material", "icono": "fa-eye" },
+    { "id": "c", "texto": "Una conclusión, como «inolvidable»", "icono": "fa-scale-unbalanced" }
+  ],
+  "correcta": "b",
+  "porque": "Un dato verificable obliga al lector a imaginar algo concreto. Los adjetivos y los juicios solo cuentan lo que tú sentiste, y cada lector rellena con su propia casa.",
+  "comoComprobarlo": "En «Pinta con detalles» prueba los tres rellenos de «La casa de la abuela» uno por uno y mira el cuadro del lector."
+}

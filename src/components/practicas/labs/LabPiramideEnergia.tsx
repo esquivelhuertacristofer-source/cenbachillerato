@@ -17,7 +17,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, OK, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { T, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { PIRAMIDE_ENERGIA_FICHA } from "./piramide-energia-ficha";
 import { RetoNumericoCard } from "./_reto-numerico";
@@ -63,7 +64,6 @@ export function LabPiramideEnergia({ color }: PracticaLabProps) {
 
   // reto evaluable, teoría (cajón deslizable) y sonido
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
 
@@ -91,6 +91,8 @@ export function LabPiramideEnergia({ color }: PracticaLabProps) {
   const [movioE0, setMovioE0] = useState(false);
   const [movioEfic, setMovioEfic] = useState(false);
   const [esVerbatim, setEsVerbatim] = useState(true);
+  const [vio5, setVio5] = useState(false);
+  const [vio20, setVio20] = useState(false);
 
   const bump = () => setResetNonce((n) => n + 1);
 
@@ -102,6 +104,8 @@ export function LabPiramideEnergia({ color }: PracticaLabProps) {
   };
   const cambiarEfic = (v: number) => {
     setEfic(v);
+    if (v <= EFIC_MIN) setVio5(true);
+    if (v >= EFIC_MAX) setVio20(true);
     setMovioEfic(true);
     setEsVerbatim(e0 === E0_DEFAULT && v === EFIC_DEFAULT);
     if (sonido) audioRef.current?.blip();
@@ -114,6 +118,7 @@ export function LabPiramideEnergia({ color }: PracticaLabProps) {
   const calor = useMemo(() => calorTotal(e0, efic), [e0, efic]);
 
   const objetivos = [
+    { txt: "Lleva la eficiencia a 5 % y luego a 20 %: compara la energía que llega a la cima", done: vio5 && vio20 },
     { txt: "Observa la pirámide de energía", done: vioPiramide },
     { txt: "Cambia la energía de los productores", done: movioE0 },
     { txt: "Mueve la eficiencia (5–20%)", done: movioEfic },
@@ -123,7 +128,7 @@ export function LabPiramideEnergia({ color }: PracticaLabProps) {
   // Los objetivos se recuerdan (algunos dependían del modo y se desmarcaban
   // solos) y se convierten en la marca del laboratorio, que antes no se
   // guardaba en ninguna parte.
-  const { logros: logrosLab, cumplidos: cumplidosLab, total: totalLab } = useLogros(objetivos.map((o) => o.done));
+  const { cumplidos: cumplidosLab, total: totalLab } = useLogros(objetivos.map((o) => o.done));
   const { registraEstrellas } = useEstrellas(RETO_KEY);
   useEffect(() => {
     if (cumplidosLab === 0) return;
@@ -143,305 +148,188 @@ export function LabPiramideEnergia({ color }: PracticaLabProps) {
     </div>
   );
 
+  const ultimo = datos[N_NIVELES - 1]!;
+  const lecturaCorta = <>A las águilas llegan {fmtKcal(ultimo.energia)} kcal ({fmtPct(tope)})</>;
+
   return (
-    <div style={{ color: T.text }}>
+    <>
       <style>{`
-        @keyframes exPulse { 0%,100%{ box-shadow:0 0 0 0 var(--exc); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .ex-live-dot { animation: exPulse 1.6s ease-in-out infinite; }
-        .ex-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(300px,26vw,380px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .ex-grid { grid-template-columns: 1fr; } }
-        .ex-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .ex-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .ex-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .ex-divider { height:1px; background:${T.line}; margin:18px 0; }
-        .ex-range { -webkit-appearance:none; appearance:none; width:100%; height:6px; border-radius:999px; outline:none;
-          background:linear-gradient(90deg, var(--exc) 0%, var(--exc) var(--exfill), rgba(255,255,255,0.12) var(--exfill), rgba(255,255,255,0.12) 100%); }
-        .ex-range::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:20px; height:20px; border-radius:50%;
-          background:#fff; border:3px solid var(--exc); cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.4); }
-        .ex-range::-moz-range-thumb { width:20px; height:20px; border-radius:50%; background:#fff; border:3px solid var(--exc); cursor:pointer; }
-        .ex-chip { cursor:pointer; padding:8px 14px; border-radius:999px; border:1px solid ${T.line}; background:${T.inset};
-          color:${T.text2}; font-size:12.5px; font-weight:800; transition:all .15s; }
+        .ex-chip { cursor:pointer; padding:10px 14px; border-radius:999px; border:1px solid ${T.line}; background:${T.inset};
+          color:${T.text2}; font-size:14px; font-weight:800; transition:all .15s; text-align:left; }
         .ex-chip:hover { border-color:rgba(${color.rgba},0.5); color:#fff; }
-        .ex-chip[data-on="true"] { border-color:var(--exc); background:rgba(${color.rgba},0.16); color:#fff; }
-        @media (max-width: 1000px){ .ex-bottom { grid-template-columns: 1fr !important; } }
-
-        /* Cajón de teoría */
-        .ex-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .ex-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .ex-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .ex-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .ex-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .ex-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .ex-drawer[data-open="true"] { transform:translateX(0); }
-        .ex-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .ex-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .ex-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .ex-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .ex-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .ex-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
+        .ex-chip[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; }
+        .ex-cols { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; }
       `}</style>
-
-      <div className="ex-grid">
-        {/* ── Columna visor ──────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(460px, 66vh, 780px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 50% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06182f 0%,#020d1d 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <PiramideEnergiaScene
-                e0={e0}
-                eficPct={efic}
-                accent={accent}
-                pausado={pausado}
-                autoRotate={autoRotate}
-                resetNonce={resetNonce}
-              />
-            </SceneBoundary>
-
-            {/* Cinta EN VIVO */}
-            <div style={{ position: "absolute", top: 14, left: 16, display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(2,12,28,0.74)", border: `1px solid ${accent}66`, backdropFilter: "blur(10px)" }}>
-              <span className="ex-live-dot" style={{ ["--exc" as string]: `${accent}aa`, width: 9, height: 9, borderRadius: "50%", background: accent }} />
-              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3 }}>EN VIVO</span>
-              <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)" }} />
-              <span style={{ fontSize: 15, fontWeight: 900, color: accent, fontFamily: "ui-monospace, monospace" }}>
-                <i className="fa-solid fa-arrow-up-right-dots" style={{ marginRight: 8 }} />
-                eficiencia {efic}%
-              </span>
-            </div>
-
-            {/* Toolbar */}
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(2,12,28,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="ex-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="ex-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="ex-icobtn" data-on={!pausado} onClick={() => setPausado((p) => !p)} title={pausado ? "Reanudar" : "Pausar"}>
-                <i className={`fa-solid ${pausado ? "fa-play" : "fa-pause"}`} />
-              </button>
-              <button className="ex-icobtn" data-on={autoRotate} onClick={() => setAutoRotate((v) => !v)} title="Girar la cámara">
-                <i className="fa-solid fa-arrows-rotate" />
-              </button>
-              <button className="ex-icobtn" onClick={reset} title="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            {/* Botón flotante de Teoría */}
-            <button className="ex-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-
-            {/* Pie: lectura del tope */}
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 18px 14px", background: "linear-gradient(0deg, rgba(2,10,24,0.88) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 12.5, color: "#dCE8F6", lineHeight: 1.5, maxWidth: 600 }}>
-                Al nivel de las <strong style={{ color: CALOR }}>águilas</strong> solo llega <strong style={{ color: accent }}>{fmtKcal(datos[N_NIVELES - 1]!.energia)} kcal</strong> ({fmtPct(tope)} de la energía inicial). El resto se disipó como <strong style={{ color: CALOR }}>calor</strong>.
-              </div>
-            </div>
-          </div>
-
-          {/* Controles */}
-          <div style={{ ...card, padding: "18px 22px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: accent }} />
-              Ajusta el flujo de energía
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              <Deslizador label="Energía de los productores (fotosíntesis)" icon="fa-seedling" colr={VERDE}
-                valor={`${fmtKcal(e0)} kcal`} min={E0_MIN} max={E0_MAX} step={E0_STEP} value={e0} onChange={cambiarE0}
-                hintL="lo que el Sol fija en las plantas" />
-              <Deslizador label="Eficiencia ecológica por salto" icon="fa-percent" colr={accent}
-                valor={`${efic}%`} min={EFIC_MIN} max={EFIC_MAX} step={EFIC_STEP} value={efic} onChange={cambiarEfic}
-                hintL="real: 5–20%" hintR="regla del 10%" />
-            </div>
-            <div style={{ display: "flex", gap: 8, marginTop: 16, flexWrap: "wrap" }}>
-              <button className="ex-chip" data-on={esVerbatim} onClick={reset} style={{ ["--exc" as string]: accent }}>
-                <i className="fa-solid fa-rotate-left" style={{ marginRight: 6 }} />
-                Caso de la actividad (10,000 kcal · 10%)
-              </button>
-            </div>
-          </div>
-
-          {/* Resultado en vivo — energía por nivel */}
-          <div style={{ ...card, padding: "18px 22px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-table-cells" style={{ marginRight: 8, color: accent }} />
-              Energía disponible por nivel
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 14 }}>
-              {NIVELES.map((nv, i) => {
-                const dn = datos[i]!;
-                return (
-                  <div key={nv.key} style={{ display: "flex", alignItems: "center", gap: 12, padding: "9px 12px", borderRadius: 11, background: T.inset, border: `1px solid ${nv.color}33` }}>
-                    <div style={{ flexShrink: 0, width: 30, height: 30, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: nv.color, background: `${nv.color}1f` }}>
-                      <i className={`fa-solid ${nv.icono}`} />
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 12.5, fontWeight: 800, color: T.text }}>{nv.nombre}</div>
-                      <div style={{ fontSize: 11, color: T.text3 }}>{nv.ejemplo}</div>
-                    </div>
-                    <div style={{ textAlign: "right" }}>
-                      <div style={{ fontSize: 14, fontWeight: 900, color: nv.color, fontFamily: "ui-monospace, monospace" }}>{fmtKcal(dn.energia)} kcal</div>
-                      <div style={{ fontSize: 10.5, color: T.text3 }}>{fmtPct(dn.pctDelOriginal)} del total</div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12, marginBottom: 12 }}>
-              <Readout label="Llega al nivel tope" value={fmtPct(tope)} col={CALOR} size={16} />
-              <Readout label="Perdido como calor" value={fmtKcal(calor)} unit="kcal" col={CALOR} size={15} />
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>
-              Con eficiencia del <strong style={{ color: accent }}>{efic}%</strong>, cada nivel conserva solo esa fracción del anterior: por eso al tope llega apenas <strong style={{ color: CALOR }}>{fmtPct(tope)}</strong> de la energía original. La pérdida no desaparece: se transforma en <strong style={{ color: CALOR }}>calor</strong> (respiración, movimiento, calor corporal) — la energía se conserva, pero deja de estar disponible para comer.
-            </div>
-          </div>
-        </div>
-
-        {/* ── Columna lateral ────────────────────────────────────── */}
-        <div style={{ ...card, padding: "22px 22px 24px" }}>
-          <Eyebrow>La regla del 10%</Eyebrow>
-          <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>
-            Al pasar de un nivel trófico al siguiente, solo se transfiere alrededor del <strong style={{ color: accent }}>10%</strong> de la energía; el otro <strong style={{ color: CALOR }}>90%</strong> se pierde como calor. Es una <strong>simplificación didáctica</strong>: en ecosistemas reales la eficiencia va del <strong>5% al 20%</strong> (por eso el deslizador la deja mover).
-          </div>
-
-          <div className="ex-divider" />
-
-          <Eyebrow>Los niveles tróficos</Eyebrow>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {NIVELES.map((nv) => (
-              <div key={nv.key} style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
-                <div style={{ flexShrink: 0, width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: nv.color, background: `${nv.color}1f` }}>
-                  <i className={`fa-solid ${nv.icono}`} />
-                </div>
-                <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>
-                  <strong style={{ color: T.text }}>{nv.nombre}</strong> — {nv.ejemplo}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="ex-divider" />
-
-          <Eyebrow>¿Por qué es una pirámide?</Eyebrow>
-          <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>
-            Como la energía cae a una décima parte en cada salto, hace falta una base enorme de productores para sostener unos pocos depredadores tope. Por eso siempre hay <strong>muchísimo más pasto que águilas</strong>. Y por eso comer del primer nivel (plantas) es más eficiente para el planeta: evita las pérdidas de los niveles intermedios.
-          </div>
-
-          <div className="ex-divider" />
-
-          <Eyebrow>En la vida real (México)</Eyebrow>
-          <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>
-            El <strong style={{ color: accent }}>Mar de Cortés</strong> —«el acuario del mundo»— sostiene cadenas enormes: el fitoplancton (productor) alimenta peces pequeños, que alimentan atunes y, en la cúspide, a tiburones y orcas. Por la regla del 10%, los depredadores tope son escasos y muy vulnerables: si desaparece la base, toda la pirámide se cae.
-          </div>
-        </div>
-      </div>
-
-      {/* ── Objetivos + pista ──────────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="ex-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-            Objetivos
-          </Eyebrow>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-            {objetivos.map((o, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: logrosLab[i] ? OK : T.text2 }}>
-                <i className={`fa-solid ${logrosLab[i] ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: logrosLab[i] ? 1 : 0.3 }} />
-                <span style={{ fontWeight: logrosLab[i] ? 700 : 500 }}>{o.txt}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div style={{ borderRadius: 18, padding: "18px 20px", border: `1px solid rgba(${color.rgba},0.3)`, background: `rgba(${color.rgba},0.08)`, fontSize: 13.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 13 }}>
-          <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 17, marginTop: 1 }} />
-          <span>
-            Empieza con el caso de la actividad: <strong style={{ color: VERDE }}>10,000 kcal</strong> y eficiencia <strong style={{ color: accent }}>10%</strong>. Sigue el hilo de energía hacia arriba (cada vez más delgado) y el calor que escapa (enorme en la base). Luego sube la eficiencia al 20% y mira cómo la pirámide se vuelve menos empinada.
-          </span>
-        </div>
-      </div>
-
-      {/* ── Reto evaluable: el ejercicio verbatim del ancla A2 ────────── */}
-      <RetoNumericoCard
-        reto={RETO_A2}
+      <LabShell
         accent={accent}
-        aprobado={ejercicioAprobado}
-        onAprobado={() => setEjercicioAprobado(true)}
-        playSfx={
-          sonido
-            ? (ok) => {
-                if (ok) audioRef.current?.correcto();
-                else audioRef.current?.incorrecto();
-              }
-            : undefined
+        rgba={color.rgba}
+        retoKey={RETO_KEY}
+        escena={
+          <SceneBoundary fallback={sceneFallback}>
+            <PiramideEnergiaScene
+              e0={e0}
+              eficPct={efic}
+              accent={accent}
+              pausado={pausado}
+              autoRotate={autoRotate}
+              resetNonce={resetNonce}
+            />
+          </SceneBoundary>
         }
+        herramientas={
+          <>
+            <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+            <BotonHerramienta icono={pausado ? "fa-play" : "fa-pause"} titulo={pausado ? "Reanudar el flujo" : "Pausar el flujo"} activo={!pausado} onClick={() => setPausado((p) => !p)} />
+            <BotonHerramienta icono="fa-arrows-rotate" titulo="Girar la cámara" activo={autoRotate} onClick={() => setAutoRotate((v) => !v)} />
+            <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reset} />
+          </>
+        }
+        leyenda={<MedidorFlujo tope={tope} calor={calor} e0={e0} efic={efic} compacto />}
+        lectura={lecturaCorta}
+        objetivos={objetivos}
+        pestanas={[
+          {
+            id: "controles",
+            etiqueta: "Controles",
+            icono: "fa-sliders",
+            contenido: (
+              <>
+                <Bloque titulo="Ajusta el flujo de energía" icono="fa-sliders">
+                  <Deslizador label="Eficiencia ecológica por salto" icon="fa-percent" colr={accent}
+                    valor={`${efic}%`} min={EFIC_MIN} max={EFIC_MAX} step={EFIC_STEP} value={efic} onChange={cambiarEfic}
+                    hintL="real: 5–20%" hintR="regla del 10%" />
+                  <Deslizador label="Energía de los productores" icon="fa-seedling" colr={VERDE}
+                    valor={`${fmtKcal(e0)} kcal`} min={E0_MIN} max={E0_MAX} step={E0_STEP} value={e0} onChange={cambiarE0}
+                    hintL="lo que el Sol fija en las plantas" />
+                  <button type="button" className="ex-chip" data-on={esVerbatim} onClick={reset}>
+                    <i className="fa-solid fa-rotate-left" style={{ marginRight: 6 }} />
+                    Caso de la actividad (10,000 kcal · 10%)
+                  </button>
+                </Bloque>
+
+                <Bloque titulo="¿Cuánto llega a la cima?" icono="fa-gauge-high">
+                  <MedidorFlujo tope={tope} calor={calor} e0={e0} efic={efic} />
+                  <p style={{ margin: 0, color: T.text2 }}>
+                    Con eficiencia del <strong style={{ color: accent }}>{efic}%</strong>, cada nivel conserva solo esa fracción del anterior: al tope llega apenas <strong style={{ color: CALOR }}>{fmtPct(tope)}</strong>. La pérdida no desaparece: se transforma en <strong style={{ color: CALOR }}>calor</strong> (respiración, movimiento, calor corporal); la energía se conserva, pero deja de estar disponible para comer.
+                  </p>
+                </Bloque>
+
+                <Bloque titulo="Energía disponible por nivel" icono="fa-table-cells">
+                  {NIVELES.map((nv, i) => {
+                    const dn = datos[i]!;
+                    return (
+                      <div key={nv.key} style={{ display: "flex", alignItems: "center", gap: 12, padding: "9px 12px", borderRadius: 11, background: T.inset, border: `1px solid ${nv.color}33` }}>
+                        <div style={{ flexShrink: 0, width: 32, height: 32, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, color: nv.color, background: `${nv.color}1f` }}>
+                          <i className={`fa-solid ${nv.icono}`} />
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontWeight: 800, color: T.text }}>{nv.nombre}</div>
+                          <div style={{ color: T.text3 }}>{nv.ejemplo}</div>
+                        </div>
+                        <div style={{ textAlign: "right" }}>
+                          <div style={{ fontWeight: 900, color: nv.color, fontFamily: "ui-monospace, monospace" }}>{fmtKcal(dn.energia)} kcal</div>
+                          <div style={{ color: T.text3 }}>{fmtPct(dn.pctDelOriginal)} del total</div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  <div className="ex-cols">
+                    <Dato label="Llega al nivel tope" value={fmtPct(tope)} col={CALOR} />
+                    <Dato label="Perdido como calor" value={`${fmtKcal(calor)} kcal`} col={CALOR} />
+                  </div>
+                </Bloque>
+              </>
+            ),
+          },
+          {
+            id: "reto",
+            etiqueta: "Reto",
+            icono: "fa-trophy",
+            contenido: (
+              <RetoNumericoCard
+                reto={RETO_A2}
+                accent={accent}
+                aprobado={ejercicioAprobado}
+                onAprobado={() => setEjercicioAprobado(true)}
+                playSfx={
+                  sonido
+                    ? (ok) => {
+                        if (ok) audioRef.current?.correcto();
+                        else audioRef.current?.incorrecto();
+                      }
+                    : undefined
+                }
+              />
+            ),
+          },
+          {
+            id: "teoria",
+            etiqueta: "Teoría",
+            icono: "fa-book-open",
+            contenido: (
+              <>
+                <Bloque titulo="La regla del 10%" icono="fa-percent">
+                  <p style={{ margin: 0, color: T.text2 }}>
+                    Al pasar de un nivel trófico al siguiente, solo se transfiere alrededor del <strong style={{ color: accent }}>10%</strong> de la energía; el otro <strong style={{ color: CALOR }}>90%</strong> se pierde como calor. Es una <strong>simplificación didáctica</strong>: en ecosistemas reales la eficiencia va del <strong>5% al 20%</strong> (por eso el deslizador la deja mover).
+                  </p>
+                </Bloque>
+                <Bloque titulo="Los niveles tróficos" icono="fa-layer-group">
+                  {NIVELES.map((nv) => (
+                    <div key={nv.key} style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
+                      <div style={{ flexShrink: 0, width: 30, height: 30, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", color: nv.color, background: `${nv.color}1f` }}>
+                        <i className={`fa-solid ${nv.icono}`} />
+                      </div>
+                      <div style={{ color: T.text2 }}>
+                        <strong style={{ color: T.text }}>{nv.nombre}</strong> — {nv.ejemplo}
+                      </div>
+                    </div>
+                  ))}
+                </Bloque>
+                <Bloque titulo="¿Por qué es una pirámide?" icono="fa-triangle-exclamation">
+                  <p style={{ margin: 0, color: T.text2 }}>
+                    Como la energía cae a una décima parte en cada salto, hace falta una base enorme de productores para sostener unos pocos depredadores tope. Por eso siempre hay <strong>muchísimo más pasto que águilas</strong>. Y por eso comer del primer nivel (plantas) es más eficiente para el planeta: evita las pérdidas de los niveles intermedios.
+                  </p>
+                </Bloque>
+                <Bloque titulo="En la vida real (México)" icono="fa-location-dot">
+                  <p style={{ margin: 0, color: T.text2 }}>
+                    El <strong style={{ color: accent }}>Mar de Cortés</strong> —«el acuario del mundo»— sostiene cadenas enormes: el fitoplancton (productor) alimenta peces pequeños, que alimentan atunes y, en la cúspide, a tiburones y orcas. Por la regla del 10%, los depredadores tope son escasos y muy vulnerables: si desaparece la base, toda la pirámide se cae.
+                  </p>
+                </Bloque>
+                <Bloque titulo="Cómo usar el laboratorio" icono="fa-lightbulb">
+                  <p style={{ margin: 0, color: T.text2 }}>
+                    Empieza con el caso de la actividad: <strong style={{ color: VERDE }}>10,000 kcal</strong> y eficiencia <strong style={{ color: accent }}>10%</strong>. Sigue el hilo de energía hacia arriba (cada vez más delgado) y el calor que escapa (enorme en la base). Luego sube la eficiencia al 20% y mira cómo la pirámide se vuelve menos empinada.
+                  </p>
+                </Bloque>
+                <Bloque titulo="Ficha teórica" icono="fa-book">
+                  <FichaTeorica data={PIRAMIDE_ENERGIA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+                </Bloque>
+              </>
+            ),
+          },
+        ]}
       />
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <div className="ex-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="ex-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="ex-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="ex-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="ex-drawer-body">
-          <FichaTeorica data={PIRAMIDE_ENERGIA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
+    </>
   );
 }
 
-/* ── Deslizador reutilizable ─────────────────────────────────────────── */
-function Deslizador({ label, icon, colr, valor, min, max, step, value, onChange, hintL, hintR }: {
-  label: string; icon: string; colr: string; valor: string;
-  min: number; max: number; step: number; value: number; onChange: (v: number) => void;
-  hintL?: string; hintR?: string;
-}) {
+/* ── Medidor: de la energía que entra, cuánta llega a la cima y cuánta se va ── */
+function MedidorFlujo({ tope, calor, e0, efic, compacto = false }: { tope: number; calor: number; e0: number; efic: number; compacto?: boolean }) {
+  const fs = compacto ? 14 : 15;
+  const pctCalor = 100 - tope;
   return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
-        <span style={{ fontSize: 12.5, fontWeight: 700, color: colr }}>
-          <i className={`fa-solid ${icon}`} style={{ marginRight: 6 }} />
-          {label}
-        </span>
-        <span style={{ fontSize: 14, fontWeight: 900, color: colr, fontFamily: "ui-monospace, monospace" }}>{valor}</span>
+    <div style={{ display: "grid", gap: 6, width: compacto ? 210 : undefined }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 8, fontSize: fs, fontWeight: 800, color: "#dce6f5" }}>
+        <span>Eficiencia {efic}%</span>
+        <span style={{ fontFamily: "ui-monospace, monospace", color: VERDE }}>cima {fmtPct(tope)}</span>
       </div>
-      <input type="range" className="ex-range" min={min} max={max} step={step} value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        style={{ ["--exc" as string]: colr, ["--exfill" as string]: `${((value - min) / (max - min)) * 100}%` }} />
-      {(hintL || hintR) && (
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, fontSize: 11, color: "rgba(255,255,255,0.45)" }}>
-          <span>{hintL}</span>
-          <span>{hintR}</span>
-        </div>
-      )}
+      <div style={{ display: "flex", height: compacto ? 12 : 16, borderRadius: 8, overflow: "hidden", background: "rgba(255,255,255,0.1)" }}>
+        <div style={{ width: `${Math.max(tope, 0.8)}%`, background: VERDE, transition: "width 120ms linear" }} />
+        <div style={{ width: `${Math.min(100 - Math.max(tope, 0.8), pctCalor)}%`, background: CALOR, transition: "width 120ms linear" }} />
+      </div>
+      <div style={{ fontSize: fs, color: "#9fb2c8" }}>
+        de {fmtKcal(e0)} kcal, {fmtKcal(calor)} se vuelven calor
+      </div>
     </div>
   );
 }
+

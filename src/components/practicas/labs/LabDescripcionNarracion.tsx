@@ -42,7 +42,7 @@ import { CompletaTexto, normaliza } from "./_mecanica-huecos";
 import { EscribeTermino } from "./_mecanica-termino";
 import { DESCRIPCION_NARRACION_HUECOS } from "./descripcion-narracion-huecos";
 import { usePartida, MarcadorPartida } from "./_partida";
-import { TableroObjetivos } from "./_objetivos";
+import { LabShell, Bloque, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { DESCRIPCION_NARRACION_FICHA } from "./descripcion-narracion-ficha";
@@ -71,10 +71,21 @@ import {
 const NO = "#FF5E5E";
 const RETO_KEY = "cen-taller-descripcion-narracion-reto";
 
+const RUTA_FOTOS = "/media/labs-sim/taller-descripcion-narracion";
+/** Imagen que se «pinta» en el lienzo cuando el alumno elige el detalle concreto. */
+const FOTO_FICHA: Record<string, { clave: string; icono: string }> = {
+  casa: { clave: "casa-adobe", icono: "fa-house" },
+  mercado: { clave: "mercado-pasillo", icono: "fa-basket-shopping" },
+  manos: { clave: "manos-cal", icono: "fa-hand" },
+  camion: { clave: "camion-lleno", icono: "fa-bus" },
+  lluvia: { clave: "lluvia-lamina", icono: "fa-cloud-rain" },
+  sobre: { clave: "sobre-abierto", icono: "fa-envelope-open" },
+};
+
 type Modo = "detalle" | "mirada" | "accion" | "verbos" | "glosario" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
-  { id: "detalle", label: "Del adjetivo al detalle", icono: "fa-eye" },
+  { id: "detalle", label: "Pinta con detalles", icono: "fa-eye" },
   { id: "mirada", label: "El orden de la mirada", icono: "fa-arrow-down-wide-short" },
   { id: "accion", label: "De la foto al suceso", icono: "fa-play" },
   { id: "verbos", label: "El verbo que hunde", icono: "fa-anchor" },
@@ -101,7 +112,6 @@ export function LabDescripcionNarracion({ color }: PracticaLabProps) {
   // ── sonido y partida ──────────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   useEffect(() => () => audioRef.current?.dispose(), []);
   const toggleSonido = async () => {
@@ -432,13 +442,117 @@ export function LabDescripcionNarracion({ color }: PracticaLabProps) {
     },
   });
 
+  const nitidezMedia = Math.round(
+    FICHAS.reduce((a, f) => a + (f.opciones.find((o) => o.id === probado[f.id])?.nitidez ?? 0), 0) / FICHAS.length
+  );
+  const lectura =
+    modo === "detalle"
+      ? `Nitidez de la imagen del lector: ${nitidezMedia} %`
+      : modo === "mirada"
+        ? `Escenas armadas: ${armadas.length}/${ESCENAS.length}`
+        : modo === "accion"
+          ? `Sucesos hallados: ${Object.keys(sucesos).length}/${CASOS.length}`
+          : modo === "verbos"
+            ? `Verbos sustituidos: ${Object.keys(reemplazos).length}/${ITEMS_VERBO.length}`
+            : modo === "glosario"
+              ? glosarioDone ? "Glosario completo" : "Escribe cada término"
+              : textoDone ? "Texto completo" : "Completa cada hueco";
+
+  const cuaderno = (
+    <>
+      <Bloque titulo="Tu partida" icono="fa-star">
+        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+      </Bloque>
+      <Bloque titulo="Qué se practica" icono="fa-lightbulb">
+          {/* Qué se practica en el modo actual */}
+          <div
+            style={{
+              borderRadius: 18,
+              padding: "16px 18px",
+              border: `1px solid rgba(${color.rgba},0.3)`,
+              background: `rgba(${color.rgba},0.08)`,
+              fontSize: 14,
+              color: T.text2,
+              lineHeight: 1.55,
+              display: "flex",
+              gap: 12,
+            }}
+          >
+            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
+            <span>
+              {modo === "detalle" && (
+                <>
+                  Un adjetivo dice lo que tú sentiste; un <strong style={{ color: T.text }}>detalle concreto</strong> deja que el
+                  lector lo sienta solo. Prueba los tres rellenos y mira el visor: la imagen cambia de verdad.
+                </>
+              )}
+              {modo === "mirada" && (
+                <>
+                  Describir es decidir el <strong style={{ color: T.text }}>orden</strong> en que se revela lo que ves. Elige tu
+                  ruta —ninguna es incorrecta— y sé coherente con ella: lo último que se lee es lo que queda.
+                </>
+              )}
+              {modo === "accion" && (
+                <>
+                  Describir muestra un <strong style={{ color: T.text }}>estado</strong>; narrar cuenta un{" "}
+                  <strong style={{ color: T.text }}>cambio</strong>. Busca qué rompe la quietud y colócalo en el tiempo con el
+                  conector que corresponde.
+                </>
+              )}
+              {modo === "verbos" && (
+                <>
+                  En una narración el <strong style={{ color: T.text }}>verbo carga la acción</strong>. Cuando es un comodín
+                  —hacer, haber, estar, poner, tener— la escena se apaga aunque todo lo demás esté bien escrito.
+                </>
+              )}
+              {modo === "glosario" && (
+                <>
+                  Recordar el término es más difícil —y enseña más— que reconocerlo entre opciones. Si te atoras, usa la pista o
+                  abre el <strong style={{ color: T.text }}>banco de términos</strong>.
+                </>
+              )}
+              {modo === "texto" && (
+                <>
+                  Lee el párrafo completo antes de escribir: el contexto decide la palabra. Pulsa{" "}
+                  <strong style={{ color: T.text }}>Enter</strong> para comprobar cada hueco.
+                </>
+              )}
+            </span>
+          </div>
+
+      </Bloque>
+      <Bloque titulo="Chuleta del modo" icono="fa-list-check">
+        <ChuletaCard modo={modo} accent={accent} />
+      </Bloque>
+    </>
+  );
+
   return (
-    <div style={{ color: T.text }}>
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      dom
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })),
+        valor: modo,
+        cambiar: (id) => setModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={resetActual} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      escena={
+        <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
       <style>{`
         @keyframes tdnShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
         @keyframes tdnPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
         .tdn-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 15px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13px; font-weight:800; transition:all .14s; }
+          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; }
         .tdn-tab:hover { border-color:${T.lineStrong}; color:#fff; }
         .tdn-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
         .tdn-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
@@ -446,24 +560,24 @@ export function LabDescripcionNarracion({ color }: PracticaLabProps) {
         .tdn-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
         .tdn-icobtn:hover { background:rgba(255,255,255,0.12); }
         .tdn-prob { cursor:pointer; padding:8px 13px; border-radius:10px; border:1px solid ${T.line}; background:${T.glass};
-          color:${T.text2}; font-size:12.5px; font-weight:800; transition:all .14s; }
+          color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; }
         .tdn-prob:hover { border-color:${T.lineStrong}; color:#fff; }
         .tdn-prob[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; }
         .tdn-prob[data-done="true"] { color:${OK}; border-color:${OK}66; }
         .tdn-opt { cursor:pointer; display:flex; align-items:flex-start; gap:12px; width:100%; text-align:left;
           border-radius:13px; border:1.5px solid ${T.line}; background:${T.glass}; color:${T.text2};
-          font-size:13.5px; line-height:1.5; font-weight:600; padding:13px 16px; transition:all .14s; }
+          font-size:14px; line-height:1.5; font-weight:600; padding:13px 16px; transition:all .14s; }
         .tdn-opt:hover:not(:disabled) { border-color:${T.lineStrong}; background:${T.glassSoft}; color:#fff; }
         .tdn-opt:disabled { cursor:default; }
         .tdn-opt[data-ok="true"] { border-color:${OK}; background:${OK}16; color:#fff; }
         .tdn-opt[data-bad="true"] { border-color:${NO}; background:${NO}14; color:#fff; animation:tdnShake .4s; }
         .tdn-card { cursor:grab; display:block; padding:12px 15px; border-radius:13px; border:1.5px solid ${T.line};
-          background:${T.glassSoft}; color:${T.text}; font-size:13px; line-height:1.5; text-align:left; transition:all .14s; user-select:none; width:100%; }
+          background:${T.glassSoft}; color:${T.text}; font-size:14px; line-height:1.5; text-align:left; transition:all .14s; user-select:none; width:100%; }
         .tdn-card:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.07); transform:translateY(-2px); }
         .tdn-card[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); box-shadow:0 0 16px -5px ${accent}; transform:translateY(-3px); }
         .tdn-card:active { cursor:grabbing; }
         .tdn-slot { border-radius:12px; border:1.5px dashed ${T.lineStrong}; background:${T.inset}; min-height:56px;
-          display:flex; align-items:center; justify-content:center; color:${T.text3}; font-size:12.5px; gap:8px; transition:all .16s; padding:8px 12px; }
+          display:flex; align-items:center; justify-content:center; color:${T.text3}; font-size:14px; gap:8px; transition:all .16s; padding:8px 12px; }
         .tdn-slot[data-active="true"] { border-color:${accent}; background:rgba(${color.rgba},0.1); cursor:pointer; }
         .tdn-slot[data-shake="true"] { animation:tdnShake .4s; border-color:${NO}; }
         .tdn-verbo { cursor:pointer; border:1.5px dashed ${T.lineStrong}; background:${T.inset}; color:#fff;
@@ -472,16 +586,16 @@ export function LabDescripcionNarracion({ color }: PracticaLabProps) {
         .tdn-verbo:disabled { cursor:default; }
         .tdn-verbo[data-hunde="true"] { border-style:solid; border-color:${NO}; background:${NO}22; }
         .tdn-chip { cursor:pointer; display:inline-flex; align-items:center; gap:8px; padding:10px 15px; border-radius:999px;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:13px; font-weight:800; transition:all .14s; }
+          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:14px; font-weight:800; transition:all .14s; }
         .tdn-chip:hover:not(:disabled) { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); transform:translateY(-2px); }
         .tdn-chip:disabled { cursor:default; opacity:.55; }
         .tdn-chip[data-on="true"] { border-color:${OK}; background:${OK}1f; color:#fff; opacity:1; }
         .tdn-ruta { cursor:pointer; text-align:left; width:100%; border:1.5px solid ${T.line}; background:${T.glass};
-          border-radius:14px; padding:14px 16px; color:${T.text2}; font-size:13.5px; line-height:1.5; transition:all .15s; }
+          border-radius:14px; padding:14px 16px; color:${T.text2}; font-size:14px; line-height:1.5; transition:all .15s; }
         .tdn-ruta:hover { border-color:${T.lineStrong}; color:#fff; }
         .tdn-ruta[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 18px -7px ${accent}; }
         .tdn-vf { cursor:pointer; padding:8px 16px; border-radius:10px; border:1.5px solid ${T.line}; background:${T.glass};
-          color:${T.text2}; font-size:12.5px; font-weight:800; transition:all .14s; }
+          color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; }
         .tdn-vf:hover:not(:disabled) { border-color:${T.lineStrong}; color:#fff; }
         .tdn-vf:disabled { cursor:default; opacity:.85; }
         .tdn-vf[data-on="true"] { border-color:${OK}; background:${OK}1f; color:#fff; }
@@ -499,78 +613,8 @@ export function LabDescripcionNarracion({ color }: PracticaLabProps) {
           .tdn-barra > span { transition:none; }
         }
 
-        /* Cajón de teoría */
-        .tdn-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .tdn-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .tdn-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .tdn-drawer[data-open="true"] { transform:translateX(0); }
-        .tdn-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .tdn-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .tdn-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .tdn-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .tdn-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .tdn-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .tdn-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
-
-        @media (max-width: 900px){ .tdn-grid { grid-template-columns:minmax(0,1fr) !important; } }
       `}</style>
 
-      {/* ── Barra de modos y herramientas ───────────────────────────────── */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 16 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="tdn-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="tdn-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="tdn-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="tdn-icobtn" onClick={resetActual} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
-
-      {/* ── Cajón de teoría ─────────────────────────────────────────────── */}
-      <button className="tdn-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="tdn-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="tdn-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="tdn-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="tdn-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="tdn-drawer-body">
-          <FichaTeorica data={DESCRIPCION_NARRACION_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div
-        className="tdn-grid"
-        style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}
-      >
-        {/* ── Columna principal ─────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
           {modo === "detalle" && (
             <DetallePanel
               accent={accent}
@@ -703,7 +747,7 @@ export function LabDescripcionNarracion({ color }: PracticaLabProps) {
               border: `1px solid ${pie ? (pie.ok ? `${OK}55` : `${NO}55`) : T.line}`,
               background: pie ? (pie.ok ? `${OK}12` : `${NO}12`) : T.glass,
               padding: "13px 16px",
-              fontSize: 13,
+              fontSize: 14,
               lineHeight: 1.55,
               color: T.text2,
               display: "flex",
@@ -722,154 +766,74 @@ export function LabDescripcionNarracion({ color }: PracticaLabProps) {
                 : "Aquí aparecerá la explicación de cada decisión: por qué un detalle hace imagen y un adjetivo no, y por qué ese verbo hunde la frase."}
             </span>
           </div>
-
-          <ChuletaCard modo={modo} accent={accent} />
         </div>
-
-        {/* ── Columna lateral ───────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos de la sesión
-            </Eyebrow>
-            <TableroObjetivos objetivos={objetivos} retoKey={RETO_KEY} accent={accent} />
-          </div>
-
-          {/* Qué se practica en el modo actual */}
-          <div
-            style={{
-              borderRadius: 18,
-              padding: "16px 18px",
-              border: `1px solid rgba(${color.rgba},0.3)`,
-              background: `rgba(${color.rgba},0.08)`,
-              fontSize: 13,
-              color: T.text2,
-              lineHeight: 1.55,
-              display: "flex",
-              gap: 12,
-            }}
-          >
-            <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              {modo === "detalle" && (
-                <>
-                  Un adjetivo dice lo que tú sentiste; un <strong style={{ color: T.text }}>detalle concreto</strong> deja que el
-                  lector lo sienta solo. Prueba los tres rellenos y mira el visor: la imagen cambia de verdad.
-                </>
-              )}
-              {modo === "mirada" && (
-                <>
-                  Describir es decidir el <strong style={{ color: T.text }}>orden</strong> en que se revela lo que ves. Elige tu
-                  ruta —ninguna es incorrecta— y sé coherente con ella: lo último que se lee es lo que queda.
-                </>
-              )}
-              {modo === "accion" && (
-                <>
-                  Describir muestra un <strong style={{ color: T.text }}>estado</strong>; narrar cuenta un{" "}
-                  <strong style={{ color: T.text }}>cambio</strong>. Busca qué rompe la quietud y colócalo en el tiempo con el
-                  conector que corresponde.
-                </>
-              )}
-              {modo === "verbos" && (
-                <>
-                  En una narración el <strong style={{ color: T.text }}>verbo carga la acción</strong>. Cuando es un comodín
-                  —hacer, haber, estar, poner, tener— la escena se apaga aunque todo lo demás esté bien escrito.
-                </>
-              )}
-              {modo === "glosario" && (
-                <>
-                  Recordar el término es más difícil —y enseña más— que reconocerlo entre opciones. Si te atoras, usa la pista o
-                  abre el <strong style={{ color: T.text }}>banco de términos</strong>.
-                </>
-              )}
-              {modo === "texto" && (
-                <>
-                  Lee el párrafo completo antes de escribir: el contexto decide la palabra. Pulsa{" "}
-                  <strong style={{ color: T.text }}>Enter</strong> para comprobar cada hueco.
-                </>
-              )}
-            </span>
-          </div>
-
-          {/* Dato verbatim del callout de A1 */}
-          <div
-            style={{
-              borderRadius: 18,
-              padding: "16px 18px",
-              border: `1px solid ${T.line}`,
-              background: T.glass,
-              fontSize: 12.5,
-              color: T.text2,
-              lineHeight: 1.55,
-              display: "flex",
-              gap: 12,
-            }}
-          >
-            <i className="fa-solid fa-circle-info" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              <strong style={{ color: T.text }}>¿Sabías?</strong> {DATO_RULFO}
-            </span>
-          </div>
-
-          {/* Preguntas de comprensión de la lectura A1 (verbatim) */}
-          <div style={{ ...card, padding: "18px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book-open-reader" style={{ marginRight: 8, color: accent }} />
-              Lectura A1 · para pensar
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              {COMPRENSION_A1.map((c, i) => (
-                <details key={i} style={{ borderRadius: 11, border: `1px solid ${T.line}`, background: T.inset, padding: "10px 13px" }}>
-                  <summary style={{ cursor: "pointer", fontSize: 13, fontWeight: 700, color: T.text2, lineHeight: 1.45 }}>
-                    {c.pregunta}
-                  </summary>
-                  <p style={{ margin: "9px 0 0", fontSize: 12.5, color: T.text3, lineHeight: 1.5 }}>{c.guia}</p>
-                </details>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <HechosCard accent={accent} respuestas={hechos} onResponder={responderHecho} />
-
-      <RetoQuizCard
-        quiz={RETO_QUIZ}
-        accent={accent}
-        rgba={color.rgba}
-        aprobado={quizAprobado}
-        onAprobado={() => setQuizAprobado(true)}
-        playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined}
-        mensajeAprobado="Distingues describir de narrar, que es la decisión de la que cuelga todo lo demás."
-      />
-
-      <TallerCard
-        accent={accent}
-        rgba={color.rgba}
-        valor={borrador}
-        palabras={palabrasBorrador}
-        comodines={comodinesBorrador}
-        onEscribir={setBorrador}
-      />
-
-      {/* Nota al pie: qué es verbatim y qué es de este laboratorio */}
-      <p style={{ margin: "20px 2px 0", fontSize: 11.5, lineHeight: 1.6, color: T.text3 }}>
-        <i className="fa-solid fa-quote-right" style={{ marginRight: 7, opacity: 0.7 }} />
-        <strong style={{ color: T.text2 }}>Verbatim de la progresión LC-II-P02:</strong> la lectura A1 (marco teórico de la
-        ficha, sus preguntas de comprensión, el callout sobre Rulfo y los cinco conectores temporales), el reto evaluable A2, la
-        consigna, las pistas y los criterios del taller A3, los hechos verdadero/falso A4, el glosario A5 y el texto con huecos
-        A6.{" "}
-        <strong style={{ color: T.text2 }}>Escrito para este laboratorio (ilustrativo):</strong> todas las frases, escenas y
-        casos de los cuatro modos de oficio. Son situaciones verosímiles de un entorno mexicano cotidiano; ninguna persona,
-        comercio ni institución es real y no se cita textualmente a ningún autor. El cuento de Juan Rulfo se menciona porque la
-        lectura A1 lo comenta, pero no se reproduce aquí ninguna de sus líneas: citar de memoria a un autor real es la forma más
-        fácil de atribuirle algo que no escribió.{" "}
-        <strong style={{ color: T.text2 }}>Lo que este laboratorio NO califica:</strong> el texto que escribas en el taller
-        final. Un texto propio no se puede evaluar con honestidad desde el navegador, así que no se intenta; lo evaluable son
-        las decisiones de oficio de los seis modos, el reto A2 y los hechos A4.
-      </p>
-    </div>
+      }
+      pestanas={[
+        { id: "cuaderno", etiqueta: "Cuaderno", icono: "fa-book-open", contenido: cuaderno },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <>
+              <HechosCard accent={accent} respuestas={hechos} onResponder={responderHecho} />
+              <RetoQuizCard
+                quiz={RETO_QUIZ}
+                accent={accent}
+                rgba={color.rgba}
+                aprobado={quizAprobado}
+                onAprobado={() => setQuizAprobado(true)}
+                playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined}
+                mensajeAprobado="Distingues describir de narrar, que es la decisión de la que cuelga todo lo demás."
+              />
+            </>
+          ),
+        },
+        {
+          id: "taller",
+          etiqueta: "Taller",
+          icono: "fa-pen-nib",
+          contenido: (
+            <TallerCard
+              accent={accent}
+              rgba={color.rgba}
+              valor={borrador}
+              palabras={palabrasBorrador}
+              comodines={comodinesBorrador}
+              onEscribir={setBorrador}
+            />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book",
+          contenido: (
+            <>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={DESCRIPCION_NARRACION_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <Bloque titulo="¿Sabías?" icono="fa-circle-info">
+                <p style={{ margin: 0, color: T.text2 }}>{DATO_RULFO}</p>
+              </Bloque>
+              <Bloque titulo="Lectura A1 · para pensar" icono="fa-book-open-reader">
+                {COMPRENSION_A1.map((c, i) => (
+                  <details key={i} style={{ borderRadius: 11, border: `1px solid ${T.line}`, background: T.inset, padding: "10px 13px" }}>
+                    <summary style={{ cursor: "pointer", fontSize: 14, fontWeight: 700, color: T.text2, lineHeight: 1.45 }}>{c.pregunta}</summary>
+                    <p style={{ margin: "9px 0 0", fontSize: 14, color: T.text3, lineHeight: 1.5 }}>{c.guia}</p>
+                  </details>
+                ))}
+              </Bloque>
+              <Bloque titulo="Qué es verbatim" icono="fa-quote-right">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  Verbatim de LC-II-P02: la lectura A1, el reto A2, la consigna y criterios del taller A3, los hechos A4, el glosario A5 y el texto con huecos A6. Escrito para este laboratorio (ilustrativo): frases, escenas y casos de los modos de oficio; ninguna persona ni lugar es real y no se cita a ningún autor. El texto que escribas en el taller no se califica.
+                </p>
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }
 
@@ -945,10 +909,10 @@ function ChuletaCard({ modo, accent }: { modo: Modo; accent: string }) {
               alignItems: "flex-start",
             }}
           >
-            <i className={`fa-solid ${f.icono}`} style={{ color: f.color, fontSize: 13, marginTop: 3 }} />
+            <i className={`fa-solid ${f.icono}`} style={{ color: f.color, fontSize: 14, marginTop: 3 }} />
             <span>
-              <strong style={{ display: "block", fontSize: 13, color: "#fff", marginBottom: 3 }}>{f.titulo}</strong>
-              <span style={{ fontSize: 12, lineHeight: 1.5, color: T.text3 }}>{f.nota}</span>
+              <strong style={{ display: "block", fontSize: 14, color: "#fff", marginBottom: 3 }}>{f.titulo}</strong>
+              <span style={{ fontSize: 14, lineHeight: 1.5, color: T.text3 }}>{f.nota}</span>
             </span>
           </div>
         ))}
@@ -983,6 +947,9 @@ function DetallePanel({
   const elegido = elegidoId ? (ficha.opciones.find((o) => o.id === elegidoId) ?? null) : null;
   const resuelta = resueltas.includes(ficha.id);
   const nitidez = elegido ? elegido.nitidez : 0;
+  const nitidezMedia = Math.round(
+    FICHAS.reduce((a, f) => a + (f.opciones.find((o) => o.id === probado[f.id])?.nitidez ?? 0), 0) / FICHAS.length
+  );
   const colorNitidez = nitidez >= 80 ? OK : nitidez >= 40 ? "#FF8A3C" : T.lineStrong;
 
   return (
@@ -994,9 +961,53 @@ function DetallePanel({
             {f.titulo}
           </button>
         ))}
-        <span style={{ marginLeft: "auto", fontSize: 12.5, fontWeight: 800, color: resueltas.length >= FICHAS.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
+        <span style={{ marginLeft: "auto", fontSize: 14, fontWeight: 800, color: resueltas.length >= FICHAS.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
           {resueltas.length}/{FICHAS.length}
         </span>
+      </div>
+
+      {/* Lienzo del lector: cada frase que escribes pinta (o no) su rincón */}
+      <div style={{ ...card, padding: "16px 18px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
+          <Eyebrow>
+            <i className="fa-solid fa-palette" style={{ marginRight: 8, color: accent }} />
+            El lienzo del lector · simulación
+          </Eyebrow>
+          <span style={{ fontSize: 14, fontWeight: 800, color: nitidezMedia >= 80 ? OK : T.text2, fontVariantNumeric: "tabular-nums" }}>
+            <i className={`fa-solid ${nitidezMedia >= 80 ? "fa-face-smile-beam" : nitidezMedia >= 35 ? "fa-face-meh" : "fa-face-frown"}`} style={{ marginRight: 7 }} />
+            {nitidezMedia >= 80 ? "El lector ve tu mundo" : nitidezMedia >= 35 ? "El lector adivina a medias" : "El lector no ve nada"}
+          </span>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 150px), 1fr))", gap: 10 }}>
+          {FICHAS.map((f, i) => {
+            const op = f.opciones.find((o) => o.id === probado[f.id]);
+            const info = FOTO_FICHA[f.id]!;
+            const nit = op ? op.nitidez : 0;
+            const col = op ? RELLENO_INFO[op.tipo].color : T.lineStrong;
+            return (
+              <button
+                key={f.id}
+                type="button"
+                onClick={() => onSelFicha(i)}
+                aria-label={`${f.titulo}: nitidez ${nit} %`}
+                style={{
+                  position: "relative", aspectRatio: "1 / 1", borderRadius: 14, overflow: "hidden", cursor: "pointer", padding: 0,
+                  border: `2px solid ${fichaIdx === i ? accent : col}`,
+                  background: `linear-gradient(150deg, rgba(${rgba},0.22), ${T.inset})`,
+                }}
+              >
+                <i className={`fa-solid ${info.icono}`} aria-hidden style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 44, color: col, opacity: op ? 0.25 + nit / 160 : 0.18, filter: `blur(${(100 - nit) / 12}px)`, transition: "all .5s" }} />
+                {op?.tipo === "detalle" && (
+                  <img src={`${RUTA_FOTOS}/${info.clave}.webp`} alt="" loading="lazy" onError={(e) => { e.currentTarget.style.display = "none"; }} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+                )}
+                <span style={{ position: "absolute", left: 0, right: 0, bottom: 0, padding: "6px 8px", fontSize: 14, fontWeight: 800, color: "#fff", background: "rgba(2,8,20,0.72)", textAlign: "left" }}>
+                  {f.titulo}
+                  <span style={{ display: "block", fontSize: 14, color: op ? col : T.text3 }}>{op ? `${nit} % nítida` : "sin pintar"}</span>
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Visor: la frase con el relleno que se está probando */}
@@ -1015,7 +1026,7 @@ function DetallePanel({
           {elegido && (
             <span
               style={{
-                fontSize: 11,
+                fontSize: 14,
                 fontWeight: 800,
                 letterSpacing: "0.06em",
                 textTransform: "uppercase",
@@ -1050,15 +1061,15 @@ function DetallePanel({
         </p>
 
         <div style={{ marginTop: 18 }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 11, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", color: T.text3, marginBottom: 7 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 14, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", color: T.text3, marginBottom: 7 }}>
             <span>Nitidez de la imagen</span>
             <span style={{ fontVariantNumeric: "tabular-nums", color: colorNitidez }}>{nitidez}%</span>
           </div>
           <div className="tdn-barra">
             <span style={{ width: `${nitidez}%`, background: colorNitidez }} />
           </div>
-          <div style={{ marginTop: 11, fontSize: 13.5, lineHeight: 1.55, color: T.text2, display: "flex", gap: 10, alignItems: "flex-start", minHeight: 42 }}>
-            <i className="fa-solid fa-eye" style={{ color: elegido ? colorNitidez : T.text3, marginTop: 3, fontSize: 13 }} />
+          <div style={{ marginTop: 11, fontSize: 14, lineHeight: 1.55, color: T.text2, display: "flex", gap: 10, alignItems: "flex-start", minHeight: 42 }}>
+            <i className="fa-solid fa-eye" style={{ color: elegido ? colorNitidez : T.text3, marginTop: 3, fontSize: 14 }} />
             <span>{elegido ? elegido.imagen : "Elige un relleno abajo y aquí verás qué imagen produce en la cabeza de quien lee."}</span>
           </div>
         </div>
@@ -1089,7 +1100,7 @@ function DetallePanel({
           })}
         </div>
         {resuelta && (
-          <div style={{ marginTop: 14, fontSize: 12.5, color: T.text3, lineHeight: 1.55, borderTop: `1px solid ${T.line}`, paddingTop: 12 }}>
+          <div style={{ marginTop: 14, fontSize: 14, color: T.text3, lineHeight: 1.55, borderTop: `1px solid ${T.line}`, paddingTop: 12 }}>
             <i className="fa-solid fa-arrow-right" style={{ marginRight: 8, color: accent }} />
             {fichaIdx < FICHAS.length - 1 ? "Pasa a la siguiente frase con los botones de arriba." : "Terminaste las seis frases: cambia de modo para seguir."}
           </div>
@@ -1147,7 +1158,7 @@ function MiradaPanel({
             {e.titulo}
           </button>
         ))}
-        <span style={{ marginLeft: "auto", fontSize: 12.5, fontWeight: 800, color: armadas.length >= ESCENAS.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
+        <span style={{ marginLeft: "auto", fontSize: 14, fontWeight: 800, color: armadas.length >= ESCENAS.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
           {armadas.length}/{ESCENAS.length}
         </span>
       </div>
@@ -1158,7 +1169,7 @@ function MiradaPanel({
           <i className="fa-solid fa-route" style={{ marginRight: 8, color: accent }} />
           Paso 1 · elige tu ruta (ninguna es incorrecta)
         </Eyebrow>
-        <p style={{ margin: "0 0 14px", fontSize: 13, lineHeight: 1.55, color: T.text2 }}>{escena.contexto}</p>
+        <p style={{ margin: "0 0 14px", fontSize: 14, lineHeight: 1.55, color: T.text2 }}>{escena.contexto}</p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px,1fr))", gap: 12 }}>
           {(["general", "detalle"] as Ruta[]).map((r) => {
             const info = RUTA_INFO[r];
@@ -1186,7 +1197,7 @@ function MiradaPanel({
                 <i className="fa-solid fa-arrow-down-wide-short" style={{ marginRight: 8, color: accent }} />
                 Paso 2 · «{escena.titulo}» en la ruta «{RUTA_INFO[ruta].label}»
               </Eyebrow>
-              <span style={{ fontSize: 12.5, fontWeight: 800, color: completa ? OK : T.text3 }}>
+              <span style={{ fontSize: 14, fontWeight: 800, color: completa ? OK : T.text3 }}>
                 {completa ? "Escena montada ✓" : `${ordenEscena.length}/${escena.fragmentos.length} fragmentos`}
               </span>
             </div>
@@ -1201,7 +1212,7 @@ function MiradaPanel({
                   <div key={i}>
                     {i > 0 && (
                       <div style={{ textAlign: "center", color: T.text3, lineHeight: 0.6, margin: "1px 0" }}>
-                        <i className="fa-solid fa-arrow-down" style={{ fontSize: 11, opacity: frag || i <= ordenEscena.length ? 0.7 : 0.2 }} />
+                        <i className="fa-solid fa-arrow-down" style={{ fontSize: 14, opacity: frag || i <= ordenEscena.length ? 0.7 : 0.2 }} />
                       </div>
                     )}
                     {frag ? (
@@ -1224,7 +1235,7 @@ function MiradaPanel({
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
-                              fontSize: 11,
+                              fontSize: 14,
                               fontWeight: 900,
                               background: `${RUTA_INFO[ruta].color}33`,
                               color: "#fff",
@@ -1233,13 +1244,13 @@ function MiradaPanel({
                             {i + 1}
                           </span>
                           {esUltimo && (
-                            <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase", color: accent }}>
+                            <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase", color: accent }}>
                               <i className="fa-solid fa-flag-checkered" style={{ marginRight: 6 }} />
                               Lo que se lleva el lector
                             </span>
                           )}
                         </div>
-                        <div style={{ fontSize: 13.5, lineHeight: 1.55, color: "#fff" }}>{frag.texto}</div>
+                        <div style={{ fontSize: 14, lineHeight: 1.55, color: "#fff" }}>{frag.texto}</div>
                       </div>
                     ) : (
                       <div
@@ -1267,7 +1278,7 @@ function MiradaPanel({
           <div style={{ ...card, padding: "18px 22px" }}>
             <Eyebrow>Fragmentos disponibles — arrástralos en tu orden</Eyebrow>
             {fragmentosLibres.length === 0 ? (
-              <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+              <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
                 <i className="fa-solid fa-circle-check" /> ¡Escena montada! Cambia de escena arriba, o vuelve a montar esta con la otra ruta.
               </div>
             ) : (
@@ -1326,7 +1337,7 @@ function AccionPanel({
             </button>
           );
         })}
-        <span style={{ marginLeft: "auto", fontSize: 12.5, fontWeight: 800, color: hechos >= CASOS.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
+        <span style={{ marginLeft: "auto", fontSize: 14, fontWeight: 800, color: hechos >= CASOS.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
           {hechos}/{CASOS.length}
         </span>
       </div>
@@ -1375,7 +1386,7 @@ function AccionPanel({
               border: `1px solid rgba(${rgba},0.3)`,
               background: `rgba(${rgba},0.08)`,
               padding: "11px 14px",
-              fontSize: 13,
+              fontSize: 14,
               color: T.text2,
               lineHeight: 1.5,
               marginBottom: 14,
@@ -1396,7 +1407,7 @@ function AccionPanel({
                 title={k.uso}
                 onClick={() => onConector(k.id)}
               >
-                {conectorId === k.id && <i className="fa-solid fa-check" style={{ fontSize: 11 }} />}
+                {conectorId === k.id && <i className="fa-solid fa-check" style={{ fontSize: 14 }} />}
                 {k.texto}
               </button>
             ))}
@@ -1420,7 +1431,7 @@ function AccionPanel({
             Ya no es una foto: es un suceso
           </Eyebrow>
           <p style={{ margin: 0, fontSize: 17, lineHeight: 1.6, color: "#fff", fontWeight: 600 }}>{caso.resultado}</p>
-          <p style={{ margin: "12px 0 0", fontSize: 12.5, lineHeight: 1.55, color: T.text3 }}>
+          <p style={{ margin: "12px 0 0", fontSize: 14, lineHeight: 1.55, color: T.text3 }}>
             La descripción sigue ahí —sin ella el suceso no significaría nada—, pero ahora el reloj de la historia avanza.
           </p>
         </div>
@@ -1465,7 +1476,7 @@ function VerbosPanel({
             {it.titulo}
           </button>
         ))}
-        <span style={{ marginLeft: "auto", fontSize: 12.5, fontWeight: 800, color: listos >= ITEMS_VERBO.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
+        <span style={{ marginLeft: "auto", fontSize: 14, fontWeight: 800, color: listos >= ITEMS_VERBO.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
           {listos}/{ITEMS_VERBO.length}
         </span>
       </div>
@@ -1498,7 +1509,7 @@ function VerbosPanel({
           )}
         </p>
         {!senalado && (
-          <p style={{ margin: "14px 0 0", fontSize: 12.5, color: T.text3, lineHeight: 1.55 }}>
+          <p style={{ margin: "14px 0 0", fontSize: 14, color: T.text3, lineHeight: 1.55 }}>
             <i className="fa-solid fa-hand-pointer" style={{ marginRight: 8, color: accent }} />
             Los verbos de la frase están enmarcados. Toca el que no muestra nada de lo que ocurre.
           </p>
@@ -1566,7 +1577,7 @@ function HechosCard({
           <i className="fa-solid fa-scale-balanced" style={{ marginRight: 8, color: accent }} />
           Hechos · verdadero o falso (LC-II-P02-A4)
         </Eyebrow>
-        <span style={{ marginLeft: "auto", fontSize: 12.5, fontWeight: 800, color: aciertos >= HECHOS.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
+        <span style={{ marginLeft: "auto", fontSize: 14, fontWeight: 800, color: aciertos >= HECHOS.length ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>
           {aciertos}/{HECHOS.length}
         </span>
       </div>
@@ -1587,7 +1598,7 @@ function HechosCard({
                 transition: "all .18s",
               }}
             >
-              <div style={{ fontSize: 13.5, lineHeight: 1.5, color: T.text, marginBottom: 10, display: "flex", gap: 10 }}>
+              <div style={{ fontSize: 14, lineHeight: 1.5, color: T.text, marginBottom: 10, display: "flex", gap: 10 }}>
                 <span style={{ color: accent, fontWeight: 900 }}>{i + 1}.</span>
                 <span>{h.enunciado}</span>
               </div>
@@ -1605,9 +1616,9 @@ function HechosCard({
                     {v ? "Verdadero" : "Falso"}
                   </button>
                 ))}
-                {resuelto && <span style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.45, flex: 1, minWidth: 220 }}>{h.retro}</span>}
+                {resuelto && <span style={{ fontSize: 14, color: T.text2, lineHeight: 1.45, flex: 1, minWidth: 220 }}>{h.retro}</span>}
                 {fallado && (
-                  <span style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.45, flex: 1, minWidth: 220 }}>
+                  <span style={{ fontSize: 14, color: T.text2, lineHeight: 1.45, flex: 1, minWidth: 220 }}>
                     {h.retro} <em style={{ color: T.text3 }}>Inténtalo de nuevo.</em>
                   </span>
                 )}
@@ -1654,7 +1665,7 @@ function TallerCard({
         <span
           style={{
             marginLeft: "auto",
-            fontSize: 11,
+            fontSize: 14,
             fontWeight: 800,
             letterSpacing: "0.08em",
             textTransform: "uppercase",
@@ -1673,8 +1684,8 @@ function TallerCard({
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 14 }}>
         {TALLER.pistas.map((p, i) => (
-          <span key={i} style={{ fontSize: 11.5, lineHeight: 1.4, color: T.text3, border: `1px solid ${T.line}`, background: T.inset, borderRadius: 999, padding: "6px 12px" }}>
-            <i className="fa-solid fa-lightbulb" style={{ marginRight: 7, color: accent, fontSize: 10 }} />
+          <span key={i} style={{ fontSize: 14, lineHeight: 1.4, color: T.text3, border: `1px solid ${T.line}`, background: T.inset, borderRadius: 999, padding: "6px 12px" }}>
+            <i className="fa-solid fa-lightbulb" style={{ marginRight: 7, color: accent, fontSize: 14 }} />
             {p}
           </span>
         ))}
@@ -1689,12 +1700,12 @@ function TallerCard({
       />
 
       <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", marginTop: 12 }}>
-        <span style={{ fontSize: 12.5, fontWeight: 800, fontVariantNumeric: "tabular-nums", color: dentroDeRango ? OK : T.text3 }}>
+        <span style={{ fontSize: 14, fontWeight: 800, fontVariantNumeric: "tabular-nums", color: dentroDeRango ? OK : T.text3 }}>
           <i className={`fa-solid ${dentroDeRango ? "fa-circle-check" : "fa-pen"}`} style={{ marginRight: 7 }} />
           {palabras} palabra{palabras === 1 ? "" : "s"} · la actividad pide de {TALLER.minimo} a {TALLER.maximo}
         </span>
         {palabras > 0 && (
-          <span style={{ fontSize: 12.5, color: comodines.length > 0 ? "#FF8A3C" : OK, fontWeight: 700 }}>
+          <span style={{ fontSize: 14, color: comodines.length > 0 ? "#FF8A3C" : OK, fontWeight: 700 }}>
             <i className={`fa-solid ${comodines.length > 0 ? "fa-anchor" : "fa-feather"}`} style={{ marginRight: 7 }} />
             {comodines.length > 0
               ? `Verbos comodín detectados: ${comodines.join(", ")}. Míralos otra vez: ¿alguno podría mostrar más?`
@@ -1708,13 +1719,13 @@ function TallerCard({
       <Eyebrow>Criterios de la actividad — los valoras tú al releerte</Eyebrow>
       <ul style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 7 }}>
         {TALLER.criterios.map((c) => (
-          <li key={c} style={{ fontSize: 13, lineHeight: 1.5, color: T.text2 }}>
+          <li key={c} style={{ fontSize: 14, lineHeight: 1.5, color: T.text2 }}>
             {c}
           </li>
         ))}
       </ul>
 
-      <p style={{ margin: "14px 0 0", fontSize: 11.5, color: T.text3, lineHeight: 1.55, borderTop: `1px solid ${T.line}`, paddingTop: 12 }}>
+      <p style={{ margin: "14px 0 0", fontSize: 14, color: T.text3, lineHeight: 1.55, borderTop: `1px solid ${T.line}`, paddingTop: 12 }}>
         <i className="fa-solid fa-circle-info" style={{ marginRight: 7, color: `rgba(${rgba},0.9)` }} />
         Este espacio <strong style={{ color: T.text2 }}>no cuenta para los objetivos ni para las estrellas</strong>: un texto
         propio no se puede calificar con honestidad desde el navegador y este laboratorio no lo finge. Lo que escribas se queda

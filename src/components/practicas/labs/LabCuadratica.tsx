@@ -6,24 +6,25 @@
  *
  * El alumno mueve los coeficientes a, b, c y ve la parábola y = ax²+bx+c como
  * un "valle" sobre el "agua" (y = 0): las raíces de ax²+bx+c=0 son donde el
- * valle toca el agua. En vivo se calculan el discriminante Δ = b²−4ac, el número
- * de soluciones reales, el vértice y las tres formas de resolver (factorización,
- * completar el cuadrado y fórmula general). Incluye el caso verbatim del terreno
- * del agricultor (2w²+5w−133=0 → w=7 m, l=19 m).
+ * valle toca el agua. Experimento central: subir c con a>0 hace que el valle se
+ * despegue del agua; las dos raíces se juntan, se vuelven una (Δ=0) y desaparecen
+ * (Δ<0), con un medidor del discriminante que cruza el umbral Δ=0. En vivo se
+ * calculan Δ = b²−4ac, el número de soluciones reales, el vértice y las tres
+ * formas de resolver (factorización, completar el cuadrado y fórmula general).
+ * Incluye el caso verbatim del terreno del agricultor (2w²+5w−133=0 → w=7 m, l=19 m).
  * Pensamiento Matemático III — ecuaciones cuadráticas (MCCEMS 2025).
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, OK, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { T, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { CUADRATICA_FICHA } from "./ecuacion-cuadratica-ficha";
 import { RetoNumericoCard } from "./_reto-numerico";
 import { RETO_A2 } from "./ecuacion-cuadratica-data";
 import { LabSfx } from "./lab-audio";
-import { useEstrellas } from "@/lib/hooks/useEstrellas";
-import { useLogros } from "./_partida";
 import {
   EJEMPLOS, METODOS, CASO_AGRICULTOR,
   discriminante, resolver, vertice, polinomio, fmt, fmtCoef,
@@ -37,7 +38,7 @@ const CuadraticaScene = dynamic(() => import("./CuadraticaScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-superscript fa-spin" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Preparando el laboratorio 3D…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Preparando el laboratorio 3D…</span>
     </div>
   ),
 });
@@ -49,6 +50,10 @@ const VERDE = "#34D399";
 
 const RETO_KEY = "cen-ecuacion-cuadratica-reto";
 
+/** Rango del discriminante con los coeficientes del laboratorio (para el medidor). */
+const DISC_MIN = -(4 * Math.max(Math.abs(A_MIN), A_MAX) * Math.max(Math.abs(C_MIN), C_MAX));
+const DISC_MAX = Math.max(Math.abs(B_MIN), B_MAX) ** 2 + 4 * Math.max(Math.abs(A_MIN), A_MAX) * Math.max(Math.abs(C_MIN), C_MAX);
+
 export function LabCuadratica({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
 
@@ -57,11 +62,10 @@ export function LabCuadratica({ color }: PracticaLabProps) {
   const [c, setC] = useState(C_DEFAULT);
   const [pausado, setPausado] = useState(false);
   const [autoRotate, setAutoRotate] = useState(false);
+  const [barriendo, setBarriendo] = useState(false);
   const [resetNonce, setResetNonce] = useState(0);
 
-  // reto evaluable, teoría (cajón deslizable) y sonido
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
 
@@ -89,6 +93,7 @@ export function LabCuadratica({ color }: PracticaLabProps) {
   const [vioUna, setVioUna] = useState(false);
   const [vioNinguna, setVioNinguna] = useState(false);
   const [vioCaso, setVioCaso] = useState(false);
+  const [cruzoUmbral, setCruzoUmbral] = useState(false); // movió c y cambió el número de raíces
 
   const bump = () => setResetNonce((n) => n + 1);
 
@@ -104,7 +109,45 @@ export function LabCuadratica({ color }: PracticaLabProps) {
   if (raices.tipo === "una" && !vioUna) setVioUna(true);
   if (raices.tipo === "ninguna" && !vioNinguna) setVioNinguna(true);
 
+  // c mueve el valle: si al moverla cambia el número de raíces, el alumno cruzó el umbral Δ = 0
+  const cambiarC = useCallback((nc: number) => {
+    const antes = resolver(a, b, c).tipo;
+    const despues = resolver(a, b, nc).tipo;
+    if (antes !== despues && antes !== "no_cuadratica") setCruzoUmbral(true);
+    setC(nc);
+  }, [a, b, c]);
+
+  // Barrido: c recorre su rango de ida y vuelta para ver nacer y morir las raíces.
+  const dirRef = useRef(1);
+  useEffect(() => {
+    if (!barriendo) return;
+    let raf = 0;
+    let last = 0;
+    const tick = (ts: number) => {
+      if (last === 0) last = ts;
+      const dt = Math.min((ts - last) / 1000, 0.05);
+      last = ts;
+      setC((prev) => {
+        let next = prev + dirRef.current * dt * (C_MAX - C_MIN) * 0.12;
+        if (next <= C_MIN) { next = C_MIN; dirRef.current = 1; }
+        else if (next >= C_MAX) { next = C_MAX; dirRef.current = -1; }
+        return next;
+      });
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [barriendo]);
+
+  // durante el barrido el número de raíces cambia solo: cuenta como cruce del umbral
+  const [tipoPrevio, setTipoPrevio] = useState(raices.tipo);
+  if (tipoPrevio !== raices.tipo) {
+    setTipoPrevio(raices.tipo);
+    if (barriendo && tipoPrevio !== "no_cuadratica" && raices.tipo !== "no_cuadratica") setCruzoUmbral(true);
+  }
+
   const cargar = (na: number, nb: number, nc: number) => {
+    setBarriendo(false);
     setA(aSeguro(na)); setB(nb); setC(nc); bump();
   };
   const cargarCaso = () => {
@@ -143,284 +186,166 @@ export function LabCuadratica({ color }: PracticaLabProps) {
     return `${coef}(x ${h <= 0 ? "+" : "−"} ${fmt(Math.abs(h))})² ${k >= 0 ? "+" : "−"} ${fmt(Math.abs(k))}`;
   }, [a, v]);
 
-  const objetivos = [
-    { txt: "Mira una ecuación con 2 raíces", done: vioDos },
-    { txt: "Encuentra una raíz doble (Δ=0)", done: vioUna },
-    { txt: "Halla un caso sin raíces (Δ<0)", done: vioNinguna },
-    { txt: "Resuelve el caso del agricultor", done: vioCaso },
-    { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
-  ];
-  // Los objetivos se recuerdan (algunos dependían del modo y se desmarcaban
-  // solos) y se convierten en la marca del laboratorio, que antes no se
-  // guardaba en ninguna parte.
-  const { logros: logrosLab, cumplidos: cumplidosLab, total: totalLab } = useLogros(objetivos.map((o) => o.done));
-  const { registraEstrellas } = useEstrellas(RETO_KEY);
-  useEffect(() => {
-    if (cumplidosLab === 0) return;
-    const est = cumplidosLab >= totalLab ? 3 : cumplidosLab >= Math.ceil((totalLab * 2) / 3) ? 2 : 1;
-    registraEstrellas(est);
-  }, [cumplidosLab, totalLab, registraEstrellas]);
-
   const sceneFallback = (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 28, textAlign: "center" }}>
       <div style={{ width: 74, height: 74, borderRadius: 20, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30, color: "#fff", background: accent, boxShadow: `0 10px 30px -6px ${accent}` }}>
         <i className="fa-solid fa-superscript" />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>Las raíces tocan el eje</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 410, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 410, lineHeight: 1.5 }}>
         Tu equipo no puede mostrar la vista 3D, pero la idea sigue: las soluciones de {poli} son los puntos donde la parábola corta el eje x. El discriminante Δ = b²−4ac dice cuántos cortes hay.
       </div>
     </div>
   );
 
+  const lectura = raices.tipo === "no_cuadratica"
+    ? <>a = 0: ya no hay parábola</>
+    : <>Δ = {fmtCoef(disc)} → {estado.txt}</>;
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes exPulse2 { 0%,100%{ box-shadow:0 0 0 0 var(--exc); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .ex-live-dot { animation: exPulse2 1.6s ease-in-out infinite; }
-        .ex-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(300px,26vw,380px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .ex-grid { grid-template-columns: 1fr; } }
-        .ex-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .ex-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .ex-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .ex-divider { height:1px; background:${T.line}; margin:18px 0; }
-        .ex-range { -webkit-appearance:none; appearance:none; width:100%; height:6px; border-radius:999px; outline:none;
-          background:linear-gradient(90deg, var(--exc) 0%, var(--exc) var(--exfill), rgba(255,255,255,0.12) var(--exfill), rgba(255,255,255,0.12) 100%); }
-        .ex-range::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:20px; height:20px; border-radius:50%;
-          background:#fff; border:3px solid var(--exc); cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.4); }
-        .ex-range::-moz-range-thumb { width:20px; height:20px; border-radius:50%; background:#fff; border:3px solid var(--exc); cursor:pointer; }
-        .ex-chip { cursor:pointer; padding:8px 12px; border-radius:12px; border:1px solid ${T.line}; background:${T.inset};
-          color:${T.text2}; font-size:12px; font-weight:800; transition:all .15s; text-align:left; }
-        .ex-chip:hover { border-color:rgba(${color.rgba},0.5); color:#fff; }
-        @media (max-width: 1000px){ .ex-bottom { grid-template-columns: 1fr !important; } }
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <CuadraticaScene a={a} b={b} c={c} accent={accent} pausado={pausado} autoRotate={autoRotate} resetNonce={resetNonce} />
+        </SceneBoundary>
+      }
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono={barriendo ? "fa-stop" : "fa-play"} titulo={barriendo ? "Detener el barrido de c" : "Barrer c y ver nacer y morir las raíces"} activo={barriendo} onClick={() => setBarriendo((x) => !x)} />
+          <BotonHerramienta icono={pausado ? "fa-play" : "fa-pause"} titulo={pausado ? "Reanudar los marcadores" : "Pausar los marcadores"} activo={!pausado} onClick={() => setPausado((p) => !p)} />
+          <BotonHerramienta icono="fa-arrows-rotate" titulo="Girar la cámara" activo={autoRotate} onClick={() => setAutoRotate((x) => !x)} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reset} />
+        </>
+      }
+      leyenda={<MedidorDiscriminante disc={disc} col={estado.col} txt={estado.txt} compacto />}
+      lectura={lectura}
+      objetivos={[
+        { txt: "Sube c poco a poco con a > 0: las raíces se juntan y desaparecen", done: cruzoUmbral },
+        { txt: "Mira una ecuación con 2 raíces", done: vioDos },
+        { txt: "Encuentra una raíz doble (Δ=0)", done: vioUna },
+        { txt: "Halla un caso sin raíces (Δ<0)", done: vioNinguna },
+        { txt: "Resuelve el caso del agricultor", done: vioCaso },
+        { txt: "Resuelve el reto evaluable de la actividad A2", done: ejercicioAprobado },
+      ]}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Controles",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              <Bloque titulo="Coeficientes de ax² + bx + c" icono="fa-sliders">
+                <Deslizador label="c: sube o baja el valle" icon="fa-c" colr={AMBAR}
+                  valor={fmtCoef(c)} min={C_MIN} max={C_MAX} step={C_STEP} value={c}
+                  onChange={(val) => { setBarriendo(false); cambiarC(val); }} hintL={`${C_MIN}`} hintR={`${C_MAX}`} />
+                <Deslizador label="a: abre, cierra y orienta" icon="fa-a" colr={accent}
+                  valor={fmtCoef(a)} min={A_MIN} max={A_MAX} step={A_STEP} value={a}
+                  onChange={(val) => { setBarriendo(false); setA(aSeguro(val)); }} hintL="a ≠ 0" hintR={`${A_MAX}`} />
+                <Deslizador label="b: desplaza el vértice" icon="fa-b" colr={ROSA}
+                  valor={fmtCoef(b)} min={B_MIN} max={B_MAX} step={B_STEP} value={b}
+                  onChange={(val) => { setBarriendo(false); setB(val); }} hintL={`${B_MIN}`} hintR={`${B_MAX}`} />
+              </Bloque>
 
-        /* Cajón de teoría */
-        .ex-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .ex-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .ex-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .ex-drawer[data-open="true"] { transform:translateX(0); }
-        .ex-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .ex-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .ex-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .ex-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .ex-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .ex-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
+              <Bloque titulo="El umbral: ¿toca el agua?" icono="fa-water">
+                <MedidorDiscriminante disc={disc} col={estado.col} txt={estado.txt} />
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                  <Dato label="Discriminante Δ" value={fmtCoef(disc)} col={estado.col} />
+                  <Dato label="Soluciones reales" value={estado.n} col={estado.col} />
+                  <Dato label="Raíces (x)" value={raices.reales.length ? raices.reales.map((r) => fmt(r)).join(", ") : "—"} col={AMBAR} />
+                  <Dato label="Vértice" value={`(${fmt(v.x)}, ${fmt(v.y)})`} col={ROSA} />
+                </div>
+                <p style={{ margin: 0, color: T.text2 }}>
+                  El <strong style={{ color: estado.col }}>discriminante</strong> Δ = b² − 4ac decide todo: si es positivo hay dos raíces, si es cero una raíz doble (el vértice toca el agua) y si es negativo ninguna real. El signo de <strong style={{ color: accent }}>a</strong> dice si la parábola abre hacia arriba (a&gt;0) o hacia abajo (a&lt;0).
+                </p>
+              </Bloque>
 
-      <div className="ex-grid">
-        {/* ── Columna visor ──────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(460px, 66vh, 780px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#06182c 0%,#03101f 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <CuadraticaScene
-                a={a} b={b} c={c}
-                accent={accent}
-                pausado={pausado}
-                autoRotate={autoRotate}
-                resetNonce={resetNonce}
-              />
-            </SceneBoundary>
+              <Bloque titulo="Ejemplos para cargar" icono="fa-wand-magic-sparkles">
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 150px), 1fr))", gap: 8 }}>
+                  {EJEMPLOS.map((e) => (
+                    <button key={e.label} type="button" onClick={() => cargar(e.a, e.b, e.c)}
+                      style={{ cursor: "pointer", display: "flex", flexDirection: "column", gap: 2, minWidth: 0, textAlign: "left", padding: "9px 12px", borderRadius: 12, border: `1px solid ${T.line}`, background: T.inset, color: "#fff" }}>
+                      <span style={{ fontFamily: "ui-monospace, monospace", fontSize: 14, fontWeight: 800 }}>{e.label}</span>
+                      <span style={{ fontSize: 14, color: T.text3, fontWeight: 600 }}>{e.metodo}</span>
+                    </button>
+                  ))}
+                </div>
+              </Bloque>
 
-            {/* Cinta EN VIVO — la ecuación */}
-            <div style={{ position: "absolute", top: 14, left: 16, display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(2,12,28,0.74)", border: `1px solid ${estado.col}66`, backdropFilter: "blur(10px)" }}>
-              <span className="ex-live-dot" style={{ ["--exc" as string]: `${estado.col}aa`, width: 9, height: 9, borderRadius: "50%", background: estado.col }} />
-              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3 }}>EN VIVO</span>
-              <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)" }} />
-              <span style={{ fontSize: 14.5, fontWeight: 900, color: "#eaf2fb", fontFamily: "ui-monospace, monospace" }}>{poli}</span>
-            </div>
-
-            {/* Toolbar */}
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(2,12,28,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="ex-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="ex-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="ex-icobtn" data-on={!pausado} onClick={() => setPausado((p) => !p)} title={pausado ? "Reanudar" : "Pausar"}>
-                <i className={`fa-solid ${pausado ? "fa-play" : "fa-pause"}`} />
-              </button>
-              <button className="ex-icobtn" data-on={autoRotate} onClick={() => setAutoRotate((vv) => !vv)} title="Girar la cámara">
-                <i className="fa-solid fa-arrows-rotate" />
-              </button>
-              <button className="ex-icobtn" onClick={reset} title="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            {/* Pie: lectura del discriminante */}
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 18px 14px", background: "linear-gradient(0deg, rgba(2,10,24,0.9) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 14, color: "#eaf6ee", fontFamily: "ui-monospace, monospace", fontWeight: 800 }}>
-                Δ = b² − 4ac = <span style={{ color: estado.col }}>{fmtCoef(disc)}</span> → <span style={{ color: estado.col }}>{estado.txt}</span>
-              </div>
-              <div style={{ fontSize: 12.5, color: "#cfe0d6", lineHeight: 1.5, marginTop: 6 }}>
-                {raices.tipo === "dos" && <>La parábola corta el agua (eje x) en dos puntos: <strong style={{ color: AMBAR }}>x = {raices.reales.map((r) => fmt(r)).join(" y ")}</strong>.</>}
-                {raices.tipo === "una" && <>El vértice toca justo el agua: una <strong style={{ color: AMBAR }}>raíz doble x = {fmt(raices.reales[0]!)}</strong>.</>}
-                {raices.tipo === "ninguna" && <>El valle no alcanza el agua: <strong style={{ color: "#94a3b8" }}>no hay soluciones reales</strong> (sí complejas).</>}
-                {raices.tipo === "no_cuadratica" && <>Con a = 0 deja de ser cuadrática: ya no hay parábola.</>}
-              </div>
-            </div>
-
-            {/* Botón flotante de Teoría */}
-            <button className="ex-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
-          </div>
-
-          {/* Controles: coeficientes */}
-          <div style={{ ...card, padding: "18px 22px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: accent }} />
-              Coeficientes de ax² + bx + c
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 16 }}>
-              <Deslizador label="a (abre/cierra y orienta la parábola)" icon="fa-a" colr={accent}
-                valor={fmtCoef(a)} min={A_MIN} max={A_MAX} step={A_STEP} value={a}
-                onChange={(val) => { setA(aSeguro(val)); }} hintL="a ≠ 0" hintR={`${A_MAX}`} />
-              <Deslizador label="b (desplaza el vértice)" icon="fa-b" colr={ROSA}
-                valor={fmtCoef(b)} min={B_MIN} max={B_MAX} step={B_STEP} value={b}
-                onChange={setB} hintL={`${B_MIN}`} hintR={`${B_MAX}`} />
-              <Deslizador label="c (sube/baja la curva = corte con y)" icon="fa-c" colr={AMBAR}
-                valor={fmtCoef(c)} min={C_MIN} max={C_MAX} step={C_STEP} value={c}
-                onChange={setC} hintL={`${C_MIN}`} hintR={`${C_MAX}`} />
-            </div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 16 }}>
-              {EJEMPLOS.map((e) => (
-                <button key={e.label} className="ex-chip" onClick={() => cargar(e.a, e.b, e.c)}
-                  style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0 }}>
-                  <span style={{ fontFamily: "ui-monospace, monospace", color: "#fff" }}>{e.label}</span>
-                  <span style={{ fontSize: 10.5, color: T.text3, fontWeight: 600 }}>{e.metodo}</span>
+              <Bloque titulo="Caso real: el terreno" icono="fa-ruler-combined">
+                <p style={{ margin: 0, color: T.text2 }}>{CASO_AGRICULTOR.resumen}</p>
+                <button type="button" onClick={cargarCaso}
+                  style={{ width: "100%", cursor: "pointer", padding: "12px 14px", borderRadius: 12, border: `1px solid rgba(${color.rgba},0.5)`, background: `rgba(${color.rgba},0.16)`, color: "#fff", fontSize: 14.5, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", gap: 9 }}>
+                  <i className="fa-solid fa-ruler-combined" aria-hidden />
+                  Cargar {CASO_AGRICULTOR.ecuacion}
                 </button>
-              ))}
-            </div>
-          </div>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <RetoNumericoCard
+              reto={RETO_A2}
+              accent={accent}
+              aprobado={ejercicioAprobado}
+              onAprobado={() => setEjercicioAprobado(true)}
+              playSfx={sonido ? (ok) => { if (ok) audioRef.current?.correcto(); else audioRef.current?.incorrecto(); } : undefined}
+            />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Los tres métodos, en vivo" icono="fa-list-check">
+                <Metodo icono={METODOS[0]!.icono} nombre={METODOS[0]!.nombre} color={accent} desc={METODOS[0]!.desc} formula={formaFactor} />
+                <Metodo icono={METODOS[1]!.icono} nombre={METODOS[1]!.nombre} color={ROSA} desc={METODOS[1]!.desc} formula={`${formaCuadrado} = 0`} />
+                <Metodo icono={METODOS[2]!.icono} nombre={METODOS[2]!.nombre} color={AMBAR} desc={METODOS[2]!.desc} formula={`x = (−(${fmtCoef(b)}) ± √${fmtCoef(disc)}) / (2·${fmtCoef(a)})`} />
+              </Bloque>
+              <Bloque titulo="Idea clave" icono="fa-lightbulb">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  Sube <strong style={{ color: AMBAR }}>c</strong> poco a poco con <strong style={{ color: accent }}>a&gt;0</strong>: el valle sube hasta despegarse del <strong style={{ color: AZUL }}>agua</strong> y las dos raíces se juntan, se vuelven una (Δ=0) y desaparecen (Δ&lt;0). Eso es el discriminante hecho imagen.
+                </p>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={CUADRATICA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
+  );
+}
 
-          {/* Soluciones + vértice */}
-          <div style={{ ...card, padding: "18px 22px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-chart-simple" style={{ marginRight: 8, color: accent }} />
-              Soluciones
-            </Eyebrow>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 14 }}>
-              <Readout label="Discriminante Δ" value={fmtCoef(disc)} col={estado.col} size={16} />
-              <Readout label="Soluciones reales" value={estado.n} col={estado.col} size={18} />
-              <Readout label="Raíces (x)" value={raices.reales.length ? raices.reales.map((r) => fmt(r)).join(", ") : "—"} col={AMBAR} size={15} />
-              <Readout label="Vértice" value={`(${fmt(v.x)}, ${fmt(v.y)})`} col={ROSA} size={14} />
-            </div>
-            <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55 }}>
-              El <strong style={{ color: estado.col }}>discriminante</strong> Δ = b² − 4ac decide todo: si es positivo hay dos raíces, si es cero una raíz doble (el vértice toca el eje) y si es negativo ninguna real. El signo de <strong style={{ color: accent }}>a</strong> dice si la parábola abre hacia arriba (a&gt;0) o hacia abajo (a&lt;0).
-            </div>
-          </div>
-        </div>
-
-        {/* ── Columna lateral ────────────────────────────────────── */}
-        <div style={{ ...card, padding: "22px 22px 24px" }}>
-          <Eyebrow>Los tres métodos, en vivo</Eyebrow>
-
-          {/* Factorización */}
-          <Metodo icono={METODOS[0]!.icono} nombre={METODOS[0]!.nombre} color={accent} desc={METODOS[0]!.desc}
-            formula={formaFactor} />
-          <div className="ex-divider" />
-          {/* Completar el cuadrado */}
-          <Metodo icono={METODOS[1]!.icono} nombre={METODOS[1]!.nombre} color={ROSA} desc={METODOS[1]!.desc}
-            formula={`${formaCuadrado} = 0`} />
-          <div className="ex-divider" />
-          {/* Fórmula general */}
-          <Metodo icono={METODOS[2]!.icono} nombre={METODOS[2]!.nombre} color={AMBAR} desc={METODOS[2]!.desc}
-            formula={`x = (−(${fmtCoef(b)}) ± √${fmtCoef(disc)}) / (2·${fmtCoef(a)})`} />
-
-          <div className="ex-divider" />
-
-          {/* Caso del agricultor */}
-          <Eyebrow>Caso real: el terreno</Eyebrow>
-          <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.55, marginBottom: 12 }}>
-            {CASO_AGRICULTOR.resumen}
-          </div>
-          <button onClick={cargarCaso}
-            style={{ width: "100%", cursor: "pointer", padding: "11px 14px", borderRadius: 12, border: `1px solid rgba(${color.rgba},0.5)`, background: `rgba(${color.rgba},0.16)`, color: "#fff", fontSize: 13, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", gap: 9 }}>
-            <i className="fa-solid fa-ruler-combined" />
-            Cargar {CASO_AGRICULTOR.ecuacion}
-          </button>
-        </div>
+/* ── Medidor del discriminante: la aguja cruza Δ = 0 ───────────────────── */
+function MedidorDiscriminante({ disc, col, txt, compacto = false }: { disc: number; col: string; txt: string; compacto?: boolean }) {
+  const pos = Math.min(100, Math.max(0, ((disc - DISC_MIN) / (DISC_MAX - DISC_MIN)) * 100));
+  const cero = ((0 - DISC_MIN) / (DISC_MAX - DISC_MIN)) * 100;
+  return (
+    <div style={{ display: "grid", gap: compacto ? 6 : 8, minWidth: compacto ? 190 : undefined }}>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, fontWeight: 800, color: "#dce6f5" }}>
+        <span>Δ = b² − 4ac</span>
+        <span style={{ fontFamily: "ui-monospace, monospace", color: col }}>{fmtCoef(disc)}</span>
       </div>
-
-      {/* ── Objetivos + pista ──────────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="ex-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-            Objetivos
-          </Eyebrow>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
-            {objetivos.map((o, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 13.5, color: logrosLab[i] ? OK : T.text2 }}>
-                <i className={`fa-solid ${logrosLab[i] ? "fa-circle-check" : "fa-circle"}`} style={{ fontSize: 15, opacity: logrosLab[i] ? 1 : 0.3 }} />
-                <span style={{ fontWeight: logrosLab[i] ? 700 : 500 }}>{o.txt}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div style={{ borderRadius: 18, padding: "18px 20px", border: `1px solid rgba(${color.rgba},0.3)`, background: `rgba(${color.rgba},0.08)`, fontSize: 13.5, color: T.text2, lineHeight: 1.55, display: "flex", gap: 13 }}>
-          <i className="fa-solid fa-lightbulb" style={{ color: accent, fontSize: 17, marginTop: 1 }} />
-          <span>
-            Sube <strong style={{ color: AMBAR }}>c</strong> poco a poco con <strong style={{ color: accent }}>a&gt;0</strong>: el valle sube hasta despegarse del <strong style={{ color: AZUL }}>agua</strong> y las dos raíces se juntan, se vuelven una (Δ=0) y desaparecen (Δ&lt;0). Eso es el discriminante hecho imagen.
-          </span>
-        </div>
+      <div style={{ position: "relative", height: compacto ? 12 : 16, borderRadius: 8, overflow: "hidden", background: "linear-gradient(90deg, #64748b 0%, #64748b " + cero + "%, #34D399 " + cero + "%, #34D399 100%)", opacity: 0.85 }}>
+        <div style={{ position: "absolute", left: `${cero}%`, top: 0, bottom: 0, width: 3, background: "#ffd24a", transform: "translateX(-50%)" }} />
+        <div style={{ position: "absolute", left: `${pos}%`, top: -2, bottom: -2, width: 6, borderRadius: 3, background: "#fff", transform: "translateX(-50%)", boxShadow: "0 0 8px rgba(0,0,0,0.6)", transition: "left 120ms linear" }} />
       </div>
-
-      {/* ── Reto evaluable: el ejercicio verbatim del ancla A2 ────────── */}
-      <RetoNumericoCard
-        reto={RETO_A2}
-        accent={accent}
-        aprobado={ejercicioAprobado}
-        onAprobado={() => setEjercicioAprobado(true)}
-        playSfx={
-          sonido
-            ? (ok) => {
-                if (ok) audioRef.current?.correcto();
-                else audioRef.current?.incorrecto();
-              }
-            : undefined
-        }
-      />
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <div className="ex-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="ex-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="ex-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="ex-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="ex-drawer-body">
-          <FichaTeorica data={CUADRATICA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, color: "#9fb2c8", fontWeight: 700 }}>
+        <span>Δ &lt; 0: sin raíces</span>
+        <span>Δ &gt; 0: dos</span>
+      </div>
+      <div style={{ fontSize: 14, fontWeight: 900, color: col }}>{txt}</div>
     </div>
   );
 }
@@ -432,44 +357,15 @@ function Metodo({ icono, nombre, color, desc, formula }: {
   return (
     <div>
       <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 7 }}>
-        <div style={{ width: 26, height: 26, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color, background: `${color}22` }}>
+        <div style={{ width: 30, height: 30, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color, background: `${color}22` }}>
           <i className={`fa-solid ${icono}`} />
         </div>
-        <span style={{ fontSize: 13, fontWeight: 800, color: "#fff" }}>{nombre}</span>
+        <span style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>{nombre}</span>
       </div>
-      <div style={{ fontSize: 12, color: T.text2, lineHeight: 1.45, marginBottom: 8 }}>{desc}</div>
-      <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 12.5, fontWeight: 800, color, padding: "8px 11px", borderRadius: 9, background: "rgba(255,255,255,0.04)", border: `1px solid ${color}33`, wordBreak: "break-word" }}>
+      <div style={{ fontSize: 14.5, color: T.text2, lineHeight: 1.45, marginBottom: 8 }}>{desc}</div>
+      <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 14.5, fontWeight: 800, color, padding: "8px 11px", borderRadius: 9, background: "rgba(255,255,255,0.04)", border: `1px solid ${color}33`, wordBreak: "break-word" }}>
         {formula}
       </div>
-    </div>
-  );
-}
-
-/* ── Deslizador reutilizable ─────────────────────────────────────────── */
-function Deslizador({ label, icon, colr, valor, min, max, step, value, onChange, hintL, hintR }: {
-  label: string; icon: string; colr: string; valor: string;
-  min: number; max: number; step: number; value: number; onChange: (v: number) => void;
-  hintL?: string; hintR?: string;
-}) {
-  const fill = `${((Math.min(max, Math.max(min, value)) - min) / (max - min)) * 100}%`;
-  return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
-        <span style={{ fontSize: 12.5, fontWeight: 700, color: colr }}>
-          <i className={`fa-solid ${icon}`} style={{ marginRight: 6 }} />
-          {label}
-        </span>
-        <span style={{ fontSize: 14, fontWeight: 900, color: colr, fontFamily: "ui-monospace, monospace" }}>{valor}</span>
-      </div>
-      <input type="range" className="ex-range" min={min} max={max} step={step} value={Math.min(max, Math.max(min, value))}
-        onChange={(e) => onChange(Number(e.target.value))}
-        style={{ ["--exc" as string]: colr, ["--exfill" as string]: fill }} />
-      {(hintL || hintR) && (
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, fontSize: 11, color: "rgba(255,255,255,0.45)" }}>
-          <span>{hintL}</span>
-          <span>{hintR}</span>
-        </div>
-      )}
     </div>
   );
 }

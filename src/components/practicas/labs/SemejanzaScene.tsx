@@ -19,7 +19,8 @@
 
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { OrbitControls, ContactShadows, Environment, Lightformer, Edges, Html, Line } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { sombra, fmtM } from "./semejanza-data";
@@ -83,9 +84,9 @@ function Rayo({ apex, tip, color: _color, pausado }: { apex: [number, number, nu
 
 /* ─── Un triángulo: objeto + sombra + hipotenusa + ángulo ──────────────── */
 function Triangulo({
-  z, hReal, sombraReal, angDeg, color, children, etiqueta, pausado,
+  z, hReal, sombraReal, color, children, etiqueta, pausado,
 }: {
-  z: number; hReal: number; sombraReal: number; angDeg: number; color: string;
+  z: number; hReal: number; sombraReal: number; color: string;
   children: React.ReactNode; etiqueta: string; pausado: boolean;
 }) {
   const h = hReal * SCALE;
@@ -112,26 +113,19 @@ function Triangulo({
       {/* hipotenusa = rayo del Sol con fotones */}
       <Rayo apex={apex} tip={tip} color={color} pausado={pausado} />
 
-      {/* marca del ángulo (igual en ambos triángulos) en la punta de la sombra */}
-      <Html position={tip} center distanceFactor={16} pointerEvents="none">
-        <div style={{ transform: "translate(26px,-6px)", display: "flex", alignItems: "center", gap: 5, whiteSpace: "nowrap" }}>
-          <span style={{ color: SOL, fontSize: 12, fontWeight: 900 }}>θ = {Math.round(angDeg)}°</span>
+      {/* etiqueta de la altura: en la punta del objeto, desplazada a la izquierda */}
+      <Html position={[BASE_X, h + 0.1, z]} center pointerEvents="none" zIndexRange={[20, 0]}>
+        <div style={{ transform: "translate(-62%,-60%)", background: "rgba(4,10,22,0.88)", border: `1.5px solid ${color}`, borderRadius: 8, padding: "3px 9px", whiteSpace: "nowrap", fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)" }}>
+          <span style={{ color: "#eaf2fb", fontSize: 14, fontWeight: 800 }}>{etiqueta} </span>
+          <span style={{ color, fontSize: 15, fontWeight: 900 }}>{fmtM(hReal)}</span>
         </div>
       </Html>
 
-      {/* etiqueta de la altura */}
-      <Html position={[BASE_X - 0.25, h + 0.15, z]} center distanceFactor={15} pointerEvents="none">
-        <div style={{ background: "rgba(2,12,28,0.82)", border: `1px solid ${color}66`, borderRadius: 9, padding: "4px 9px", whiteSpace: "nowrap" }}>
-          <span style={{ color: "#eaf2fb", fontSize: 11, fontWeight: 800 }}>{etiqueta} </span>
-          <span style={{ color, fontSize: 12, fontWeight: 900, fontFamily: "ui-monospace, monospace" }}>{fmtM(hReal)}</span>
-        </div>
-      </Html>
-
-      {/* etiqueta de la sombra */}
-      <Html position={[BASE_X + s / 2, 0.02, z + 0.55]} center distanceFactor={15} pointerEvents="none">
-        <div style={{ whiteSpace: "nowrap" }}>
-          <span style={{ color: "#9fb2c8", fontSize: 10.5, fontWeight: 700 }}>sombra </span>
-          <span style={{ color: "#cfe0d6", fontSize: 11.5, fontWeight: 900, fontFamily: "ui-monospace, monospace" }}>{fmtM(sombraReal)}</span>
+      {/* etiqueta de la sombra: en la punta de la sombra, hacia afuera */}
+      <Html position={tip} center pointerEvents="none" zIndexRange={[20, 0]}>
+        <div style={{ transform: "translate(0,90%)", background: "rgba(4,10,22,0.88)", border: "1.5px solid #9fb2c8", borderRadius: 8, padding: "3px 9px", whiteSpace: "nowrap", fontFamily: "system-ui, sans-serif", boxShadow: "0 4px 16px rgba(0,0,0,0.5)" }}>
+          <span style={{ color: "#cfe0d6", fontSize: 14, fontWeight: 800 }}>sombra </span>
+          <span style={{ color: "#fff", fontSize: 15, fontWeight: 900 }}>{fmtM(sombraReal)}</span>
         </div>
       </Html>
     </group>
@@ -238,25 +232,19 @@ function Mundo({ ang, hRef, hObj, accent, pausado }: { ang: number; hRef: number
       <group position={[BASE_X - 4.5, 6.2, 3.0]}>
         <mesh>
           <sphereGeometry args={[0.7, 24, 24]} />
-          <meshStandardMaterial color={SOL} emissive={SOL} emissiveIntensity={2.2} toneMapped={false} />
+          <meshStandardMaterial color={SOL} emissive={SOL} emissiveIntensity={1.6} />
         </mesh>
-        <Html center distanceFactor={16} pointerEvents="none">
-          <div style={{ transform: "translateY(34px)", display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap" }}>
-            <i className="fa-solid fa-sun" style={{ color: SOL, fontSize: 14 }} />
-            <span style={{ color: "#ffe08a", fontSize: 11, fontWeight: 800 }}>rayos paralelos</span>
-          </div>
-        </Html>
       </group>
 
       <RayosParalelos angDeg={ang} />
 
       {/* Triángulo de la referencia (persona) */}
-      <Triangulo z={Z_PERSONA} hReal={hRef} sombraReal={sombraRef} angDeg={ang} color={accent} etiqueta="persona" pausado={pausado}>
+      <Triangulo z={Z_PERSONA} hReal={hRef} sombraReal={sombraRef} color={accent} etiqueta="persona" pausado={pausado}>
         <Persona h={hRef * SCALE} color={accent} />
       </Triangulo>
 
       {/* Triángulo del objeto inalcanzable (torre) */}
-      <Triangulo z={Z_TORRE} hReal={hObj} sombraReal={sombraObj} angDeg={ang} color="#34D399" etiqueta="torre" pausado={pausado}>
+      <Triangulo z={Z_TORRE} hReal={hObj} sombraReal={sombraObj} color="#34D399" etiqueta="torre" pausado={pausado}>
         <Torre h={hObj * SCALE} />
       </Triangulo>
 
@@ -272,15 +260,45 @@ export default function SemejanzaScene(props: SemejanzaSceneProps) {
       shadows
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
-      camera={{ position: [7.5, 5.5, 11.5], fov: 44 }}
+      camera={{ position: [6, 5.2, 15.5], fov: 44 }}
     >
       <Contenido {...props} />
     </Canvas>
   );
 }
 
+/* Encuadre: el objeto + su sombra llenan ~60 % del alto, entre la barra y la misión. */
+function Encuadre({ ang, hObj, autoRotate }: { ang: number; hObj: number; autoRotate: boolean }) {
+  const controls = useRef<OrbitControlsImpl>(null);
+  const objetivo = useMemo(() => new THREE.Vector3(), []);
+  const { size } = useThree();
+  const angosto = size.width < 640;
+  useFrame(() => {
+    const c = controls.current;
+    if (!c) return;
+    const s = Math.min(sombra(hObj, ang) * SCALE, 9);
+    const h = Math.min(hObj * SCALE, 9);
+    objetivo.set(BASE_X + s * 0.42, h * 0.32, 0);
+    c.target.lerp(objetivo, 0.08);
+    c.update();
+  });
+  return (
+    <OrbitControls
+      ref={controls}
+      autoRotate={autoRotate}
+      autoRotateSpeed={0.4}
+      makeDefault
+      enablePan={false}
+      minDistance={7}
+      maxDistance={angosto ? 40 : 34}
+      minPolarAngle={Math.PI / 8}
+      maxPolarAngle={Math.PI / 2.05}
+    />
+  );
+}
+
 function Contenido(props: SemejanzaSceneProps) {
-  const { ang, hRef, hObj, accent, pausado, autoRotate, resetNonce } = props;
+  const { ang, hRef, hObj, accent, pausado, resetNonce } = props;
   return (
     <>
       <color attach="background" args={["#03101f"]} />
@@ -309,16 +327,7 @@ function Contenido(props: SemejanzaSceneProps) {
         <Lightformer intensity={0.9} position={[8, 2, 5]} scale={[5, 5, 1]} color="#bfe8ff" />
       </Environment>
 
-      <OrbitControls
-        enablePan={false}
-        minDistance={7}
-        maxDistance={30}
-        minPolarAngle={Math.PI / 8}
-        maxPolarAngle={Math.PI / 2.05}
-        target={[0, 1.6, 0]}
-        autoRotate={autoRotate}
-        autoRotateSpeed={0.4}
-      />
+      <Encuadre ang={ang} hObj={hObj} autoRotate={props.autoRotate} />
 
       <EffectComposer enableNormalPass={false}>
         <Bloom intensity={0.55} luminanceThreshold={0.55} luminanceSmoothing={0.3} mipmapBlur radius={0.7} />

@@ -1,0 +1,12 @@
+{
+  "escena": "La Tierra con sus reservorios de carbono y una palanca de emisiones humanas de CO₂ puesta en 37 Gt al año.",
+  "pregunta": "Si subes las emisiones al máximo, ¿qué pasa con el CO₂ que se queda en el aire?",
+  "opciones": [
+    { "id": "a", "texto": "Océano y bosques lo reabsorben todo", "icono": "fa-tree" },
+    { "id": "b", "texto": "Se queda sin cambios", "icono": "fa-equals" },
+    { "id": "c", "texto": "Aumenta: los sumideros no alcanzan", "icono": "fa-temperature-arrow-up" }
+  ],
+  "correcta": "c",
+  "porque": "Océano y bosques reabsorben solo un poco más de la mitad de lo que emitimos. El resto, cerca del 45 %, se acumula en la atmósfera y el CO₂ sube cada año.",
+  "comoComprobarlo": "Arrastra la palanca de emisiones o usa el deslizador hacia arriba y mira el medidor «queda al aire» y el color de la atmósfera."
+}

@@ -35,7 +35,16 @@ import { CompletaTexto } from "./_mecanica-huecos";
 import { EscribeTermino } from "./_mecanica-termino";
 import { HISTORIA_DE_VIDA_HUECOS } from "./historia-de-vida-huecos";
 import { usePartida, MarcadorPartida } from "./_partida";
-import { TableroObjetivos } from "./_objetivos";
+import { LabShell, Bloque, BotonHerramienta } from "./_shell";
+import {
+  PREGUNTAS_ENTREVISTA,
+  PRESUPUESTO_PREGUNTAS,
+  UMBRAL_RELATO,
+  ENTREVISTADA,
+  lecturaRelato,
+  clampMedidor,
+  type PreguntaEntrevista,
+} from "./historia-de-vida-entrevista";
 import { FichaTeorica } from "./_ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { HISTORIA_DE_VIDA_FICHA } from "./historia-de-vida-ficha";
@@ -67,9 +76,10 @@ import {
 const NO = "#FF5E5E";
 const RETO_KEY = "cen-historia-de-vida-reto";
 
-type Modo = "linea" | "capas" | "voz" | "glosario" | "texto";
+type Modo = "entrevista" | "linea" | "capas" | "voz" | "glosario" | "texto";
 
 const MODOS: { id: Modo; label: string; icono: string }[] = [
+  { id: "entrevista", label: "Entrevista a doña Remedios", icono: "fa-microphone-lines" },
   { id: "linea", label: "Ordena la anécdota", icono: "fa-timeline" },
   { id: "capas", label: "¿Suceso, detalle o huella?", icono: "fa-layer-group" },
   { id: "voz", label: "¿Desde dónde se cuenta?", icono: "fa-sliders" },
@@ -79,12 +89,11 @@ const MODOS: { id: Modo; label: string; icono: string }[] = [
 
 export function LabHistoriaDeVida({ color }: PracticaLabProps) {
   const accent = `#${color.hex.replace("#", "")}`;
-  const [modo, setModo] = useState<Modo>("linea");
+  const [modo, setModo] = useState<Modo>("entrevista");
 
   // ── sonido ────────────────────────────────────────────────────────────
   const partida = usePartida();
   const [sonido, setSonido] = useState(false);
-  const [drawer, setDrawer] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
   useEffect(() => () => audioRef.current?.dispose(), []);
   const toggleSonido = async () => {
@@ -109,6 +118,23 @@ export function LabHistoriaDeVida({ color }: PracticaLabProps) {
     partida.acierto();
     return sonido && audioRef.current?.blip();
   };
+
+  // ── MODO 0 — entrevista a una abuela ficticia ──────────────────────────
+  const [preguntasHechas, setPreguntasHechas] = useState<string[]>([]);
+  const sumaMedidor = (k: "suceso" | "detalle" | "huella") =>
+    clampMedidor(preguntasHechas.reduce((a, id) => a + (PREGUNTAS_ENTREVISTA.find((q) => q.id === id)?.[k] ?? 0), 0));
+  const medidores = { suceso: sumaMedidor("suceso"), detalle: sumaMedidor("detalle"), huella: sumaMedidor("huella") };
+  const preguntar = (id: string) => {
+    if (preguntasHechas.includes(id) || preguntasHechas.length >= PRESUPUESTO_PREGUNTAS) return;
+    const q = PREGUNTAS_ENTREVISTA.find((x) => x.id === id);
+    if (!q) return;
+    setPreguntasHechas((h) => [...h, id]);
+    if (q.capa === "desvio" || q.capa === "dato") sfxNo();
+    else sfxPlace();
+  };
+  const resetEntrevista = () => setPreguntasHechas([]);
+  const relatoCompleto =
+    preguntasHechas.length > 0 && Math.min(medidores.suceso, medidores.detalle, medidores.huella) >= UMBRAL_RELATO;
 
   // ── MODO 1 — línea del tiempo + giro y huella ─────────────────────────
   const [anecIdx, setAnecIdx] = useState(0);
@@ -255,7 +281,7 @@ export function LabHistoriaDeVida({ color }: PracticaLabProps) {
   const [cuaderno, setCuaderno] = useState("");
 
   const resetActual =
-    modo === "texto" ? resetTexto : modo === "glosario" ? resetGlosario : modo === "linea" ? resetLinea : modo === "capas" ? resetCapas : resetVoz;
+    modo === "entrevista" ? resetEntrevista : modo === "texto" ? resetTexto : modo === "glosario" ? resetGlosario : modo === "linea" ? resetLinea : modo === "capas" ? resetCapas : resetVoz;
 
   // ── progreso ──────────────────────────────────────────────────────────
   const a0 = ANECDOTAS[0]!;
@@ -266,6 +292,8 @@ export function LabHistoriaDeVida({ color }: PracticaLabProps) {
   const vozDone = Object.keys(encargosOk).length >= ENCARGOS.length;
 
   const objetivos = [
+    { txt: `Haz tus ${PRESUPUESTO_PREGUNTAS} preguntas a doña Remedios`, done: preguntasHechas.length >= PRESUPUESTO_PREGUNTAS },
+    { txt: `Logra un relato con suceso, detalle y huella en ${UMBRAL_RELATO} %`, done: relatoCompleto },
     { txt: `Ordena la línea del tiempo de «${a0.titulo}»`, done: ordenListo(a0.id) },
     { txt: `Señala el giro y la huella de «${a0.titulo}»`, done: marcasListas(a0.id) },
     { txt: `Ordena la línea del tiempo de «${a1.titulo}»`, done: ordenListo(a1.id) },
@@ -319,13 +347,45 @@ export function LabHistoriaDeVida({ color }: PracticaLabProps) {
     },
   });
 
+  const lectura =
+    modo === "entrevista"
+      ? lecturaRelato(medidores.suceso, medidores.detalle, medidores.huella, preguntasHechas.length).etiqueta.split(":")[0]!
+      : modo === "linea"
+        ? `Momentos colocados: ${orden.length}/${anec.tarjetas.length}`
+        : modo === "capas"
+          ? `Fragmentos clasificados: ${Object.keys(ubicFrag).length}/${FRAGMENTOS.length}`
+          : modo === "voz"
+            ? `Encargos entregados: ${Object.keys(encargosOk).length}/${ENCARGOS.length}`
+            : modo === "glosario"
+              ? glosarioDone ? "Glosario completo" : "Escribe cada término"
+              : textoDone ? "Texto completo" : "Completa cada hueco";
+
   return (
-    <div style={{ color: T.text }}>
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      dom
+      modos={{
+        opciones: MODOS.map((m) => ({ id: m.id, etiqueta: m.label, icono: m.icono })),
+        valor: modo,
+        cambiar: (id) => setModo(id as Modo),
+      }}
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar este modo" onClick={resetActual} />
+        </>
+      }
+      lectura={lectura}
+      objetivos={objetivos}
+      escena={
+        <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
       <style>{`
         @keyframes hdvShake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
         @keyframes hdvPop { 0%{transform:scale(.6);opacity:0;} 100%{transform:scale(1);opacity:1;} }
         .hdv-tab { cursor:pointer; display:inline-flex; align-items:center; gap:9px; padding:10px 16px; border-radius:11px;
-          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:13.5px; font-weight:800; transition:all .14s; }
+          border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; }
         .hdv-tab:hover { border-color:${T.lineStrong}; color:#fff; }
         .hdv-tab[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.16); color:#fff; box-shadow:0 0 16px -6px ${accent}; }
         .hdv-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center;
@@ -333,7 +393,7 @@ export function LabHistoriaDeVida({ color }: PracticaLabProps) {
         .hdv-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; border-color:${accent}; }
         .hdv-icobtn:hover { background:rgba(255,255,255,0.12); }
         .hdv-chip { cursor:grab; display:flex; align-items:flex-start; gap:10px; padding:12px 15px; border-radius:13px; text-align:left;
-          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:13px; font-weight:600; transition:all .14s; user-select:none; line-height:1.5; width:100%; }
+          border:1.5px solid ${T.line}; background:${T.glassSoft}; color:#fff; font-size:14px; font-weight:600; transition:all .14s; user-select:none; line-height:1.5; width:100%; }
         .hdv-chip:hover { border-color:${T.lineStrong}; background:rgba(255,255,255,0.09); }
         .hdv-chip[data-sel="true"] { border-color:${accent}; background:rgba(${color.rgba},0.2); box-shadow:0 0 16px -5px ${accent}; }
         .hdv-chip:active { cursor:grabbing; }
@@ -341,21 +401,21 @@ export function LabHistoriaDeVida({ color }: PracticaLabProps) {
         .hdv-row[data-shake="true"] { animation:hdvShake .4s; border-color:${NO}; }
         .hdv-row[data-done="true"] { border-color:${OK}66; background:${OK}0f; }
         .hdv-slot { border-radius:12px; border:1.5px dashed ${T.lineStrong}; background:${T.inset}; padding:13px 15px;
-          display:flex; align-items:center; justify-content:center; gap:9px; color:${T.text3}; font-size:12.5px; transition:all .16s; min-height:52px; }
+          display:flex; align-items:center; justify-content:center; gap:9px; color:${T.text3}; font-size:14px; transition:all .16s; min-height:52px; }
         .hdv-slot[data-armed="true"] { border-color:${accent}; background:rgba(${color.rgba},0.1); color:#fff; cursor:pointer; }
         .hdv-slot[data-shake="true"] { animation:hdvShake .4s; border-color:${NO}; }
         .hdv-bin { border-radius:15px; border:1.5px solid ${T.line}; background:${T.glass}; padding:16px; transition:all .16s; min-height:210px; }
         .hdv-bin[data-shake="true"] { animation:hdvShake .4s; border-color:${NO}; }
         .hdv-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:11px 18px;
-          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:13.5px; font-weight:800; transition:all .14s; }
+          border-radius:11px; border:1.5px solid ${T.line}; background:${T.inset}; color:${T.text}; font-size:14px; font-weight:800; transition:all .14s; }
         .hdv-btn:hover { border-color:${T.lineStrong}; }
         .hdv-btn:disabled { opacity:.45; cursor:default; }
         .hdv-seg { cursor:pointer; flex:1; padding:11px 12px; border-radius:11px; border:1.5px solid ${T.line}; background:${T.glass};
-          color:${T.text2}; font-size:12.5px; font-weight:800; transition:all .14s; text-align:center; }
+          color:${T.text2}; font-size:14px; font-weight:800; transition:all .14s; text-align:center; }
         .hdv-seg:hover { border-color:${T.lineStrong}; color:#fff; }
         .hdv-seg[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.18); color:#fff; }
         .hdv-mini { cursor:pointer; border:1px solid ${T.line}; background:${T.glass}; color:${T.text2}; border-radius:9px;
-          padding:6px 12px; font-size:12px; font-weight:800; transition:all .14s; }
+          padding:6px 12px; font-size:14px; font-weight:800; transition:all .14s; }
         .hdv-mini[data-on="true"] { border-color:${accent}; background:rgba(${color.rgba},0.18); color:#fff; }
         .hdv-mini:hover { border-color:${T.lineStrong}; color:#fff; }
         .hdv-area { width:100%; min-height:170px; border-radius:13px; border:1.5px solid ${T.line}; background:${T.inset}; color:#fff;
@@ -381,10 +441,10 @@ export function LabHistoriaDeVida({ color }: PracticaLabProps) {
           background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
         .hdv-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
         .hdv-teoria-fab { position:fixed; right:20px; bottom:20px; z-index:58; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
+          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:14px; font-weight:800;
           background:rgba(2,12,28,0.86); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
         .hdv-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-        @media (max-width: 640px){ .hdv-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:12px; } }
+        @media (max-width: 640px){ .hdv-teoria-fab { right:12px; bottom:12px; padding:10px 13px; font-size:14px; } }
 
         /* Identidad del tablero */
         .hdv-bin, .hdv-row { --tono:188; position:relative;
@@ -407,75 +467,15 @@ export function LabHistoriaDeVida({ color }: PracticaLabProps) {
         }
       `}</style>
 
-      {/* selector de modo + barra */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
-        {MODOS.map((m) => (
-          <button key={m.id} className="hdv-tab" data-on={modo === m.id} onClick={() => setModo(m.id)}>
-            <i className={`fa-solid ${m.icono}`} />
-            {m.label}
-          </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
-        <button className="hdv-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría de la práctica">
-          <i className="fa-solid fa-book-open" />
-        </button>
-        <button className="hdv-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-          <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-        </button>
-        <button className="hdv-icobtn" onClick={resetActual} title="Reiniciar este modo">
-          <i className="fa-solid fa-rotate-left" />
-        </button>
-      </div>
-
-      {/* aviso de privacidad: se ve antes que nada */}
-      <div
-        style={{
-          display: "flex",
-          gap: 12,
-          alignItems: "flex-start",
-          borderRadius: 14,
-          border: `1px solid rgba(${color.rgba},0.28)`,
-          background: `rgba(${color.rgba},0.07)`,
-          padding: "12px 16px",
-          marginBottom: 18,
-          fontSize: 12.5,
-          color: T.text2,
-          lineHeight: 1.55,
-        }}
-      >
-        <i className="fa-solid fa-shield-halved" style={{ color: accent, fontSize: 15, marginTop: 2 }} />
-        <span>
-          Aquí <strong style={{ color: T.text }}>no se te pide contar nada tuyo</strong>. Vas a practicar el oficio de narrar sobre dos anécdotas
-          ajenas, escritas para esta práctica con personajes ficticios. Si quieres escribir lo propio, abajo tienes un cuaderno opcional que{" "}
-          <strong style={{ color: T.text }}>no se guarda, no se envía y no se califica</strong>.
-        </span>
-      </div>
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <button className="hdv-teoria-fab" onClick={() => setDrawer(true)}>
-        <i className="fa-solid fa-book-open" />
-        Teoría
-      </button>
-      <div className="hdv-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="hdv-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="hdv-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="hdv-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="hdv-drawer-body">
-          <FichaTeorica data={HISTORIA_DE_VIDA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-
-      <div className="hdv-grid" style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,28vw,400px)", gap: 22, alignItems: "start" }}>
-        {/* ── Columna principal ─────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
+          {modo === "entrevista" && (
+            <Entrevista
+              accent={accent}
+              rgba={color.rgba}
+              hechas={preguntasHechas}
+              medidores={medidores}
+              onPreguntar={preguntar}
+            />
+          )}
           {/* MODO — completa el texto (fill_blanks verbatim de A2) */}
           {modo === "texto" && (
             <CompletaTexto
@@ -532,11 +532,11 @@ export function LabHistoriaDeVida({ color }: PracticaLabProps) {
                     </button>
                   ))}
                   <div style={{ flex: 1 }} />
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: lineaLista ? OK : T.text3 }}>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: lineaLista ? OK : T.text3 }}>
                     {orden.length}/{anec.tarjetas.length}
                   </span>
                 </div>
-                <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.5 }}>
+                <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.5 }}>
                   <i className="fa-solid fa-circle-info" style={{ marginRight: 7, color: accent }} />
                   {anec.ficha}
                 </div>
@@ -561,7 +561,7 @@ export function LabHistoriaDeVida({ color }: PracticaLabProps) {
               <div style={{ ...card, padding: "18px 22px" }}>
                 <Eyebrow>Momentos sueltos — colócalos en orden cronológico</Eyebrow>
                 {sueltas.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+                  <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
                     <i className="fa-solid fa-circle-check" /> ¡Línea del tiempo armada! Ahora señala el giro y la huella arriba.
                   </div>
                 ) : (
@@ -574,7 +574,7 @@ export function LabHistoriaDeVida({ color }: PracticaLabProps) {
                         onClick={() => setSelTarjeta((s) => (s === t.id ? null : t.id))}
                         {...dragProps(t.id)}
                       >
-                        <i className="fa-solid fa-grip-vertical" style={{ fontSize: 12, color: T.text3, marginTop: 3 }} />
+                        <i className="fa-solid fa-grip-vertical" style={{ fontSize: 14, color: T.text3, marginTop: 3 }} />
                         <span>{t.texto}</span>
                       </button>
                     ))}
@@ -590,12 +590,12 @@ export function LabHistoriaDeVida({ color }: PracticaLabProps) {
               <div style={{ ...card, padding: "18px 22px" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
                   <Eyebrow>Arrastra cada frase a su capa</Eyebrow>
-                  <span style={{ fontSize: 12.5, fontWeight: 800, color: capasDone ? OK : T.text3 }}>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: capasDone ? OK : T.text3 }}>
                     {Object.keys(ubicFrag).length}/{FRAGMENTOS.length}
                   </span>
                 </div>
                 {fragLibres.length === 0 ? (
-                  <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+                  <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
                     <i className="fa-solid fa-circle-check" /> ¡Separaste las {FRAGMENTOS.length} frases!
                   </div>
                 ) : (
@@ -608,7 +608,7 @@ export function LabHistoriaDeVida({ color }: PracticaLabProps) {
                         onClick={() => setSelFrag((s) => (s === f.id ? null : f.id))}
                         {...dragProps(f.id)}
                       >
-                        <i className="fa-solid fa-quote-left" style={{ fontSize: 11, color: T.text3, marginTop: 3 }} />
+                        <i className="fa-solid fa-quote-left" style={{ fontSize: 14, color: T.text3, marginTop: 3 }} />
                         <span>{f.texto}</span>
                       </button>
                     ))}
@@ -622,7 +622,7 @@ export function LabHistoriaDeVida({ color }: PracticaLabProps) {
                       border: `1px solid ${OK}55`,
                       background: `${OK}12`,
                       padding: "10px 14px",
-                      fontSize: 12.5,
+                      fontSize: 14,
                       color: T.text2,
                       lineHeight: 1.55,
                       display: "flex",
@@ -667,18 +667,25 @@ export function LabHistoriaDeVida({ color }: PracticaLabProps) {
               onEntregar={entregar}
             />
           )}
+
         </div>
-
-        {/* ── Columna lateral ───────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ ...card, padding: "20px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-              Objetivos de la sesión
-            </Eyebrow>
-            <TableroObjetivos objetivos={objetivos} retoKey={RETO_KEY} accent={accent} />
-          </div>
-
+      }
+      pestanas={[
+        {
+          id: "cuaderno",
+          etiqueta: "Cuaderno",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Tu partida" icono="fa-star">
+                <MarcadorPartida partida={partida} accent={accent} rgba={color.rgba} />
+              </Bloque>
+              <Bloque titulo="Privacidad" icono="fa-shield-halved">
+                <p style={{ margin: 0, color: T.text2 }}>
+                  Aquí no se te pide contar nada tuyo. Practicas el oficio de narrar sobre personajes ficticios. Si quieres escribir lo propio, la pestaña «Taller» es un cuaderno opcional que no se guarda, no se envía y no se califica.
+                </p>
+              </Bloque>
+              <Bloque titulo="Qué se practica" icono="fa-lightbulb">
           {/* pista del modo actual */}
           <div
             style={{
@@ -686,7 +693,7 @@ export function LabHistoriaDeVida({ color }: PracticaLabProps) {
               padding: "16px 18px",
               border: `1px solid rgba(${color.rgba},0.3)`,
               background: `rgba(${color.rgba},0.08)`,
-              fontSize: 13,
+              fontSize: 14,
               color: T.text2,
               lineHeight: 1.55,
               display: "flex",
@@ -721,46 +728,38 @@ export function LabHistoriaDeVida({ color }: PracticaLabProps) {
             </span>
           </div>
 
-          {/* lectura verbatim A1 */}
-          <div style={{ ...card, padding: "18px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-book-open-reader" style={{ marginRight: 8, color: accent }} />
-              Lectura A1 · verbatim
-            </Eyebrow>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {LECTURA_A1.map((p, i) => (
-                <p key={i} style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: T.text2 }}>
-                  {p}
-                </p>
-              ))}
-            </div>
-          </div>
 
-          {/* dato verbatim */}
-          <div
-            style={{
-              borderRadius: 18,
-              padding: "16px 18px",
-              border: `1px solid ${T.line}`,
-              background: T.glass,
-              fontSize: 12.5,
-              color: T.text2,
-              lineHeight: 1.55,
-              display: "flex",
-              gap: 12,
-            }}
-          >
-            <i className="fa-solid fa-circle-info" style={{ color: accent, fontSize: 16, marginTop: 1 }} />
-            <span>
-              <strong style={{ color: T.text }}>¿Sabías? </strong>
-              {DATO_HISTORIA}
-            </span>
-          </div>
-        </div>
-      </div>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+      <RetoQuizCard
+        quiz={QUIZ}
+        accent={accent}
+        rgba={color.rgba}
+        aprobado={quizAprobado}
+        onAprobado={() => setQuizAprobado(true)}
+        mensajeAprobado="Distingues narración, descripción e idea prioritaria."
+        playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined}
+        playPick={sonido ? () => void audioRef.current?.blip() : undefined}
+      />
 
+
+          ),
+        },
+        {
+          id: "taller",
+          etiqueta: "Taller",
+          icono: "fa-pen-nib",
+          contenido: (
+      <>
       {/* ── Cuaderno opcional ─────────────────────────────────────────── */}
-      <div style={{ ...card, padding: "20px 24px", marginTop: 22 }}>
+      <div style={{ ...card, padding: "20px 24px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
           <Eyebrow>
             <i className="fa-solid fa-book" style={{ marginRight: 8, color: accent }} />
@@ -772,7 +771,7 @@ export function LabHistoriaDeVida({ color }: PracticaLabProps) {
             {cuadernoAbierto ? "Cerrar el cuaderno" : "Abrir el cuaderno"}
           </button>
         </div>
-        <div style={{ fontSize: 12.5, color: T.text2, lineHeight: 1.6, marginTop: -4 }}>
+        <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.6, marginTop: -4 }}>
           Si te dan ganas de escribir lo tuyo, este es el espacio. <strong style={{ color: T.text }}>No se guarda en ninguna parte, no se envía a
           nadie y el laboratorio no lo lee ni lo califica</strong>: lo que escribas vive solo en esta pantalla y se borra al recargar. No cuenta para
           los objetivos ni para las estrellas.
@@ -780,10 +779,10 @@ export function LabHistoriaDeVida({ color }: PracticaLabProps) {
 
         {cuadernoAbierto && (
           <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 12 }}>
-            <div style={{ fontSize: 13.5, color: T.text, lineHeight: 1.6, fontWeight: 600 }}>{CUADERNO.prompt}</div>
+            <div style={{ fontSize: 14, color: T.text, lineHeight: 1.6, fontWeight: 600 }}>{CUADERNO.prompt}</div>
             <ul style={{ margin: 0, paddingLeft: 20, display: "flex", flexDirection: "column", gap: 6 }}>
               {CUADERNO.pistas.map((p, i) => (
-                <li key={i} style={{ fontSize: 12.5, color: T.text3, lineHeight: 1.55 }}>
+                <li key={i} style={{ fontSize: 14, color: T.text3, lineHeight: 1.55 }}>
                   {p}
                 </li>
               ))}
@@ -796,7 +795,7 @@ export function LabHistoriaDeVida({ color }: PracticaLabProps) {
               aria-label="Cuaderno opcional y privado (no se guarda ni se califica)"
             />
             <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-              <span style={{ fontSize: 12, color: T.text3, fontVariantNumeric: "tabular-nums" }}>
+              <span style={{ fontSize: 14, color: T.text3, fontVariantNumeric: "tabular-nums" }}>
                 {cuaderno.trim() === "" ? 0 : cuaderno.trim().split(/\s+/).length} palabras · sin calificación
               </span>
               <button className="hdv-btn" onClick={() => setCuaderno("")} disabled={cuaderno === ""}>
@@ -808,23 +807,168 @@ export function LabHistoriaDeVida({ color }: PracticaLabProps) {
         )}
       </div>
 
-      <RetoQuizCard
-        quiz={QUIZ}
-        accent={accent}
-        rgba={color.rgba}
-        aprobado={quizAprobado}
-        onAprobado={() => setQuizAprobado(true)}
-        mensajeAprobado="Distingues narración, descripción e idea prioritaria."
-        playSfx={sonido ? (ok) => (ok ? sfxOk() : sfxNo()) : undefined}
-        playPick={sonido ? () => void audioRef.current?.blip() : undefined}
-      />
 
-      {/* nota al pie */}
-      <p style={{ marginTop: 20, fontSize: 11.5, color: T.text3, lineHeight: 1.6 }}>
-        <i className="fa-solid fa-circle-info" style={{ marginRight: 7 }} />
-        {NOTA_PIE}
-      </p>
+      </>
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book",
+          contenido: (
+            <>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={HISTORIA_DE_VIDA_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <Bloque titulo="Lectura A1" icono="fa-book-open-reader">
+                {LECTURA_A1.map((p, i) => (
+                  <p key={i} style={{ margin: 0, color: T.text2 }}>{p}</p>
+                ))}
+              </Bloque>
+              <Bloque titulo="¿Sabías?" icono="fa-circle-info">
+                <p style={{ margin: 0, color: T.text2 }}>{DATO_HISTORIA}</p>
+              </Bloque>
+              <Bloque titulo="Nota" icono="fa-circle-info">
+                <p style={{ margin: 0, color: T.text2 }}>{NOTA_PIE}</p>
+              </Bloque>
+            </>
+          ),
+        },
+      ]}
+    />
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Panel «Entrevista a doña Remedios» — el simulador del laboratorio
+ *
+ * El alumno solo tiene unas cuantas preguntas. Cada respuesta se suma al relato
+ * (línea del tiempo con imagen) y mueve tres medidores: suceso, detalle y huella.
+ * Se ve al instante qué le falta al relato: una crónica sin sentido, un
+ * resumen sin imagen o un retrato sin historia.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+const RUTA_FOTOS = "/media/labs-sim/historia-de-vida-relato";
+
+function Medidor({ label, valor, col, icono }: { label: string; valor: number; col: string; icono: string }) {
+  return (
+    <div style={{ minWidth: 0 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, fontWeight: 800, color: T.text2, marginBottom: 5 }}>
+        <span><i className={`fa-solid ${icono}`} style={{ marginRight: 7, color: col }} />{label}</span>
+        <span style={{ color: valor >= UMBRAL_RELATO ? OK : T.text3, fontVariantNumeric: "tabular-nums" }}>{valor} %</span>
+      </div>
+      <div style={{ height: 10, borderRadius: 999, background: T.inset, border: `1px solid ${T.line}`, overflow: "hidden", position: "relative" }}>
+        <span style={{ display: "block", height: "100%", width: `${valor}%`, background: col, borderRadius: 999, transition: "width .5s" }} />
+        <span aria-hidden style={{ position: "absolute", left: `${UMBRAL_RELATO}%`, top: 0, bottom: 0, width: 2, background: "rgba(255,255,255,0.5)" }} />
+      </div>
     </div>
+  );
+}
+
+function Entrevista({
+  accent,
+  rgba,
+  hechas,
+  medidores,
+  onPreguntar,
+}: {
+  accent: string;
+  rgba: string;
+  hechas: string[];
+  medidores: { suceso: number; detalle: number; huella: number };
+  onPreguntar: (id: string) => void;
+}) {
+  const restantes = PRESUPUESTO_PREGUNTAS - hechas.length;
+  const respondidas: PreguntaEntrevista[] = hechas
+    .map((id) => PREGUNTAS_ENTREVISTA.find((q) => q.id === id))
+    .filter((q): q is PreguntaEntrevista => !!q)
+    .sort((a, b) => a.orden - b.orden);
+  const lect = lecturaRelato(medidores.suceso, medidores.detalle, medidores.huella, hechas.length);
+  const ultima = hechas.length > 0 ? PREGUNTAS_ENTREVISTA.find((q) => q.id === hechas[hechas.length - 1]) : undefined;
+
+  return (
+    <>
+      <div style={{ ...card, padding: "16px 18px", display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
+        <div style={{ position: "relative", width: 72, height: 72, borderRadius: 16, overflow: "hidden", flex: "0 0 auto", background: `linear-gradient(150deg, rgba(${rgba},0.3), ${T.inset})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <i className="fa-solid fa-user" aria-hidden style={{ fontSize: 30, color: accent, opacity: 0.6 }} />
+          <img src={`${RUTA_FOTOS}/abuela-retrato.webp`} alt="" loading="lazy" onError={(e) => { e.currentTarget.style.display = "none"; }} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+        </div>
+        <div style={{ flex: "1 1 200px", minWidth: 0 }}>
+          <div style={{ fontSize: 16, fontWeight: 900, color: T.text }}>{ENTREVISTADA.nombre}</div>
+          <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.45 }}>{ENTREVISTADA.ficha}</div>
+        </div>
+        <div style={{ fontSize: 14, fontWeight: 800, color: restantes > 0 ? accent : OK, border: `1px solid ${T.line}`, borderRadius: 999, padding: "6px 12px" }}>
+          <i className="fa-solid fa-hourglass-half" style={{ marginRight: 7 }} />
+          {restantes > 0 ? `${restantes} pregunta${restantes === 1 ? "" : "s"} por hacer` : "Entrevista terminada"}
+        </div>
+      </div>
+
+      <div style={{ ...card, padding: "16px 18px", display: "flex", flexDirection: "column", gap: 12 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 170px), 1fr))", gap: 12 }}>
+          <Medidor label="Suceso" valor={medidores.suceso} col="#FF8A3C" icono="fa-bolt" />
+          <Medidor label="Detalle" valor={medidores.detalle} col="#38BDF8" icono="fa-eye" />
+          <Medidor label="Huella" valor={medidores.huella} col="#C084FC" icono="fa-heart-pulse" />
+        </div>
+        <div style={{ fontSize: 15, fontWeight: 800, color: lect.color, lineHeight: 1.45 }}>
+          <i className="fa-solid fa-feather-pointed" style={{ marginRight: 8 }} />
+          {lect.etiqueta}
+        </div>
+        {ultima && (
+          <div style={{ fontSize: 14, color: T.text2, lineHeight: 1.55, borderTop: `1px solid ${T.line}`, paddingTop: 10 }}>
+            <strong style={{ color: T.text }}>Por qué:</strong> {ultima.porque} <em>(Cifras y personaje: simulación.)</em>
+          </div>
+        )}
+      </div>
+
+      <div style={{ ...card, padding: "16px 18px" }}>
+        <div style={{ fontSize: 14, fontWeight: 800, color: T.text3, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 10 }}>
+          Elige qué le preguntas
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 220px), 1fr))", gap: 10 }}>
+          {PREGUNTAS_ENTREVISTA.map((q) => {
+            const hecha = hechas.includes(q.id);
+            return (
+              <button
+                key={q.id}
+                type="button"
+                className="hdv-btn"
+                disabled={hecha || restantes <= 0}
+                onClick={() => onPreguntar(q.id)}
+                style={{ textAlign: "left", justifyContent: "flex-start", opacity: hecha ? 0.55 : 1 }}
+              >
+                <i className={`fa-solid ${hecha ? "fa-check" : q.icono}`} aria-hidden />
+                <span style={{ fontSize: 14, lineHeight: 1.4 }}>{q.pregunta}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div style={{ ...card, padding: "16px 18px" }}>
+        <div style={{ fontSize: 14, fontWeight: 800, color: T.text3, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 10 }}>
+          <i className="fa-solid fa-timeline" style={{ marginRight: 8, color: accent }} />
+          El relato que va saliendo
+        </div>
+        {respondidas.length === 0 ? (
+          <p style={{ margin: 0, fontSize: 14, color: T.text3, lineHeight: 1.5 }}>Todavía no hay nada. Pregunta y la línea del tiempo se llena con lo que ella conteste.</p>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {respondidas.map((q) => (
+              <div key={q.id} style={{ display: "flex", gap: 12, alignItems: "stretch", borderLeft: `3px solid ${accent}`, paddingLeft: 12, flexWrap: "wrap" }}>
+                {q.foto && (
+                  <div style={{ position: "relative", flex: "0 0 auto", width: "min(100%, 140px)", aspectRatio: "16 / 9", borderRadius: 10, overflow: "hidden", background: `linear-gradient(150deg, rgba(${rgba},0.25), ${T.inset})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <i className={`fa-solid ${q.icono}`} aria-hidden style={{ fontSize: 26, color: accent, opacity: 0.5 }} />
+                    <img src={`${RUTA_FOTOS}/${q.foto}.webp`} alt="" loading="lazy" onError={(e) => { e.currentTarget.style.display = "none"; }} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+                  </div>
+                )}
+                <p style={{ margin: 0, flex: "1 1 200px", minWidth: 0, fontSize: 15, lineHeight: 1.55, color: q.capa === "desvio" ? T.text3 : T.text, fontStyle: q.capa === "desvio" ? "italic" : "normal" }}>
+                  «{q.respuesta}»
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </>
   );
 }
 
@@ -871,7 +1015,7 @@ function LineaDelTiempo({
           {completa ? "Señala dónde está el giro y dónde la huella" : `Línea del tiempo de «${anec.titulo}»`}
         </Eyebrow>
         {completa && (
-          <span style={{ fontSize: 12.5, fontWeight: 800, color: giroOk && huellaOk ? OK : T.text3 }}>
+          <span style={{ fontSize: 14, fontWeight: 800, color: giroOk && huellaOk ? OK : T.text3 }}>
             {(giroOk ? 1 : 0) + (huellaOk ? 1 : 0)}/2
           </span>
         )}
@@ -885,7 +1029,7 @@ function LineaDelTiempo({
             border: `1px solid ${T.lineStrong}`,
             background: T.inset,
             padding: "11px 14px",
-            fontSize: 13,
+            fontSize: 14,
             color: T.text,
             lineHeight: 1.55,
             display: "flex",
@@ -968,7 +1112,7 @@ function LineaDelTiempo({
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: 12,
+                  fontSize: 14,
                   fontWeight: 900,
                   color: "#fff",
                   background: "rgba(255,255,255,0.09)",
@@ -979,19 +1123,19 @@ function LineaDelTiempo({
               </span>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4, flexWrap: "wrap" }}>
-                  <i className={`fa-solid ${info.icono}`} style={{ fontSize: 11, color: T.text3 }} />
-                  <span style={{ fontSize: 11.5, fontWeight: 900, letterSpacing: "0.06em", textTransform: "uppercase", color: revelado ? OK : T.text3 }}>
+                  <i className={`fa-solid ${info.icono}`} style={{ fontSize: 14, color: T.text3 }} />
+                  <span style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.06em", textTransform: "uppercase", color: revelado ? OK : T.text3 }}>
                     {completa ? info.titulo : "Momento"}
                   </span>
                   {revelado && (
-                    <span style={{ animation: "hdvPop .25s ease", fontSize: 11, fontWeight: 800, color: OK }}>
+                    <span style={{ animation: "hdvPop .25s ease", fontSize: 14, fontWeight: 800, color: OK }}>
                       <i className="fa-solid fa-circle-check" style={{ marginRight: 5 }} />
                       {esGiro ? "el giro" : "la huella"}
                     </span>
                   )}
                 </div>
-                <div style={{ fontSize: 13, lineHeight: 1.55, color: "#fff" }}>{puesta.texto}</div>
-                {completa && <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45, marginTop: 5 }}>{info.descripcion}</div>}
+                <div style={{ fontSize: 14, lineHeight: 1.55, color: "#fff" }}>{puesta.texto}</div>
+                {completa && <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.45, marginTop: 5 }}>{info.descripcion}</div>}
               </div>
             </div>
           );
@@ -999,7 +1143,7 @@ function LineaDelTiempo({
       </div>
 
       {completa && giroOk && huellaOk && (
-        <div style={{ marginTop: 14, fontSize: 13, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+        <div style={{ marginTop: 14, fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
           <i className="fa-solid fa-circle-check" /> Anécdota resuelta: orden, giro y huella. Cambia de anécdota arriba para hacer la otra.
         </div>
       )}
@@ -1058,20 +1202,20 @@ function MesaCapas({
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: 13,
+                  fontSize: 14,
                   color: "#fff",
                   background: `${info.color}33`,
                 }}
               >
                 <i className={`fa-solid ${info.icono}`} />
               </span>
-              <span style={{ fontSize: 13.5, fontWeight: 900, color: "#fff" }}>{info.titulo}</span>
+              <span style={{ fontSize: 14, fontWeight: 900, color: "#fff" }}>{info.titulo}</span>
             </div>
-            <div style={{ fontSize: 11.5, color: T.text3, lineHeight: 1.45, marginBottom: 6 }}>{info.subtitulo}</div>
-            <div style={{ fontSize: 11, color: info.color, lineHeight: 1.45, marginBottom: 12 }}>{info.prueba}</div>
+            <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.45, marginBottom: 6 }}>{info.subtitulo}</div>
+            <div style={{ fontSize: 14, color: info.color, lineHeight: 1.45, marginBottom: 12 }}>{info.prueba}</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {dentro.length === 0 ? (
-                <span style={{ fontSize: 12, color: T.text3, opacity: 0.6 }}>Arrastra aquí…</span>
+                <span style={{ fontSize: 14, color: T.text3, opacity: 0.6 }}>Arrastra aquí…</span>
               ) : (
                 dentro.map((f) => (
                   <span
@@ -1085,13 +1229,13 @@ function MesaCapas({
                       borderRadius: 10,
                       background: `${info.color}1c`,
                       border: `1px solid ${info.color}55`,
-                      fontSize: 12,
+                      fontSize: 14,
                       fontWeight: 600,
                       color: "#fff",
                       lineHeight: 1.45,
                     }}
                   >
-                    <i className="fa-solid fa-check" style={{ fontSize: 10, color: info.color, marginTop: 3 }} />
+                    <i className="fa-solid fa-check" style={{ fontSize: 14, color: info.color, marginTop: 3 }} />
                     {f.texto}
                   </span>
                 ))
@@ -1147,14 +1291,14 @@ function ConsolaVoz({
       <div style={{ ...card, padding: "18px 22px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 6 }}>
           <Eyebrow>Encargo de la revista escolar</Eyebrow>
-          <span style={{ fontSize: 12.5, fontWeight: 800, color: hechos >= ENCARGOS.length ? OK : T.text3 }}>
+          <span style={{ fontSize: 14, fontWeight: 800, color: hechos >= ENCARGOS.length ? OK : T.text3 }}>
             {hechos}/{ENCARGOS.length}
           </span>
         </div>
         {encargo ? (
           <div style={{ fontSize: 14, color: "#fff", lineHeight: 1.6, fontStyle: "italic" }}>{encargo.pedido}</div>
         ) : (
-          <div style={{ fontSize: 13.5, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
+          <div style={{ fontSize: 14, color: OK, fontWeight: 700, display: "flex", alignItems: "center", gap: 9 }}>
             <i className="fa-solid fa-circle-check" /> ¡Entregaste los {ENCARGOS.length} encargos! Sigue moviendo los controles para ver las ocho versiones.
           </div>
         )}
@@ -1164,7 +1308,7 @@ function ConsolaVoz({
         <Eyebrow>Los tres controles de la voz</Eyebrow>
 
         <div>
-          <div style={{ fontSize: 11.5, fontWeight: 900, letterSpacing: "0.08em", textTransform: "uppercase", color: T.text3, marginBottom: 8 }}>
+          <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", textTransform: "uppercase", color: T.text3, marginBottom: 8 }}>
             ¿Quién narra?
           </div>
           <div style={{ display: "flex", gap: 9 }}>
@@ -1174,11 +1318,11 @@ function ConsolaVoz({
               </button>
             ))}
           </div>
-          <div style={{ fontSize: 12, color: T.text3, lineHeight: 1.5, marginTop: 7 }}>{PERSONA_INFO[persona].pista}</div>
+          <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.5, marginTop: 7 }}>{PERSONA_INFO[persona].pista}</div>
         </div>
 
         <div>
-          <div style={{ fontSize: 11.5, fontWeight: 900, letterSpacing: "0.08em", textTransform: "uppercase", color: T.text3, marginBottom: 8 }}>
+          <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", textTransform: "uppercase", color: T.text3, marginBottom: 8 }}>
             ¿En qué tiempo verbal?
           </div>
           <div style={{ display: "flex", gap: 9 }}>
@@ -1188,11 +1332,11 @@ function ConsolaVoz({
               </button>
             ))}
           </div>
-          <div style={{ fontSize: 12, color: T.text3, lineHeight: 1.5, marginTop: 7 }}>{TIEMPO_INFO[tiempoV].pista}</div>
+          <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.5, marginTop: 7 }}>{TIEMPO_INFO[tiempoV].pista}</div>
         </div>
 
         <div>
-          <div style={{ fontSize: 11.5, fontWeight: 900, letterSpacing: "0.08em", textTransform: "uppercase", color: T.text3, marginBottom: 8 }}>
+          <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: "0.08em", textTransform: "uppercase", color: T.text3, marginBottom: 8 }}>
             ¿Desde qué distancia?
           </div>
           <div style={{ display: "flex", gap: 9 }}>
@@ -1202,7 +1346,7 @@ function ConsolaVoz({
               </button>
             ))}
           </div>
-          <div style={{ fontSize: 12, color: T.text3, lineHeight: 1.5, marginTop: 7 }}>{DISTANCIA_INFO[distancia].pista}</div>
+          <div style={{ fontSize: 14, color: T.text3, lineHeight: 1.5, marginTop: 7 }}>{DISTANCIA_INFO[distancia].pista}</div>
         </div>
       </div>
 
@@ -1226,7 +1370,7 @@ function ConsolaVoz({
             marginTop: 14,
             paddingTop: 12,
             borderTop: `1px solid ${T.line}`,
-            fontSize: 12.5,
+            fontSize: 14,
             color: T.text2,
             lineHeight: 1.6,
             display: "flex",
@@ -1253,7 +1397,7 @@ function ConsolaVoz({
               padding: "10px 15px",
               border: `1px solid ${aviso.ok ? OK : NO}55`,
               background: `${aviso.ok ? OK : NO}14`,
-              fontSize: 12.5,
+              fontSize: 14,
               fontWeight: 700,
               color: aviso.ok ? OK : NO,
               lineHeight: 1.5,

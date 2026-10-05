@@ -1,0 +1,13 @@
+{
+  "slug": "temas-ideas-narrativa",
+  "items": [
+    { "clave": "campana-pueblo", "formato": "1:1", "estilo": "ilustracion", "escena": "Ilustración de una campana de bronce en la torre de un templo de pueblo mexicano al atardecer, cielo nublado, vecinos pequeños acercándose por la calle de piedra" },
+    { "clave": "casa-piedra", "formato": "1:1", "estilo": "ilustracion", "escena": "Ilustración de una casa grande de piedra con portón de madera en lo alto de una loma, con un río crecido y lluvia a lo lejos, colores sobrios" },
+    { "clave": "luces-orilla", "formato": "1:1", "estilo": "ilustracion", "escena": "Ilustración nocturna de varias luces pequeñas y tenues flotando sobre la orilla de un río, siluetas de niños mirando desde lejos, azules oscuros" },
+    { "clave": "cadena-costales", "formato": "1:1", "estilo": "foto", "escena": "Vecinos de un pueblo de espaldas formando una fila y pasándose costales de arena de mano en mano para levantar un muro junto a un río, luz de tormenta" },
+    { "clave": "porton-cerrado", "formato": "1:1", "estilo": "foto", "escena": "Un portón grande de madera oscura bien cerrado con una aldaba de hierro, en un muro de piedra, lluvia cayendo, nadie a la vista" },
+    { "clave": "ventanas-atrancadas", "formato": "1:1", "estilo": "foto", "escena": "Fachada de casas de pueblo con ventanas y puertas atrancadas con tablas de madera, calle de tierra mojada vacía, luz gris" },
+    { "clave": "amanecer-pueblo", "formato": "1:1", "estilo": "foto", "escena": "Amanecer dorado sobre un pueblo de casas de adobe junto a un río que ya bajó, personas pequeñas descansando juntas en la plaza" },
+    { "clave": "casa-inundada", "formato": "1:1", "estilo": "foto", "escena": "Una casa grande de piedra rodeada de agua turbia del río hasta la altura de las ventanas, cielo encapotado, nadie a la vista" }
+  ]
+}

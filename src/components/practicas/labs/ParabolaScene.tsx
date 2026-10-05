@@ -22,8 +22,8 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import type { ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, Line, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
@@ -77,6 +77,7 @@ function Trayectoria({ a, b, c, showGol, accent, pausado, arrastrable, onVertice
   onDraggingChange?: (d: boolean) => void;
 }) {
   // Magnitudes matemáticas (deterministas).
+  const estrecho = useThree((st) => st.size.width) < 640;
   const vert = useMemo(() => vertice(a, b, c), [a, b, c]);
   const rs = useMemo(() => raices(a, b, c), [a, b, c]);
   const xLand = useMemo(() => aterrizaje(a, b, c), [a, b, c]);
@@ -230,22 +231,11 @@ function Trayectoria({ a, b, c, showGol, accent, pausado, arrastrable, onVertice
       <Line points={[[-SCENE_W / 2, 0, 0], [-SCENE_W / 2, SCENE_H + 0.4, 0]]} color="#9fb2c8" lineWidth={1.5} />
       {/* eje X (distancia) */}
       <Line points={[[-SCENE_W / 2, 0, 0], [SCENE_W / 2 + 0.3, 0, 0]]} color="#9fb2c8" lineWidth={1.5} />
-      <Html position={[SCENE_W / 2 + 0.5, 0.05, 0]} center distanceFactor={13} pointerEvents="none">
-        <div style={{ color: "#9fb2c8", fontSize: 11, fontWeight: 800, whiteSpace: "nowrap" }}>distancia x (m)</div>
-      </Html>
-      <Html position={[-SCENE_W / 2, SCENE_H + 0.7, 0]} center distanceFactor={13} pointerEvents="none">
-        <div style={{ color: "#9fb2c8", fontSize: 11, fontWeight: 800, whiteSpace: "nowrap" }}>altura h (m)</div>
-      </Html>
 
       {/* eje de simetría */}
       {vertVisible && (
         <>
           <Line points={[[ejeX, 0, 0], [ejeX, sy(vert.h) + 0.5, 0]]} color={EJE_COL} lineWidth={1.5} dashed dashSize={0.16} gapSize={0.12} />
-          <Html position={[ejeX, sy(vert.h) + 0.85, 0]} center distanceFactor={13} pointerEvents="none">
-            <div style={{ color: EJE_COL, fontSize: 11, fontWeight: 900, whiteSpace: "nowrap", textShadow: "0 2px 8px #000" }}>
-              eje x = {fmtNum(vert.x, 1)}
-            </div>
-          </Html>
         </>
       )}
 
@@ -264,7 +254,7 @@ function Trayectoria({ a, b, c, showGol, accent, pausado, arrastrable, onVertice
           <Line points={[[-SCENE_W / 2, sy(vert.h), 0], [ejeX, sy(vert.h), 0]]} color={ORO} lineWidth={1.2} dashed dashSize={0.14} gapSize={0.1} />
           <mesh position={[ejeX, sy(vert.h), 0]} castShadow>
             <sphereGeometry args={[0.16, 24, 24]} />
-            <meshStandardMaterial color={ORO} emissive={ORO} emissiveIntensity={0.8} toneMapped={false} />
+            <meshStandardMaterial color={ORO} emissive={ORO} emissiveIntensity={0.5} />
           </mesh>
 
           {/* halo + zona de agarre del vértice (arrastrable) */}
@@ -288,23 +278,19 @@ function Trayectoria({ a, b, c, showGol, accent, pausado, arrastrable, onVertice
             </mesh>
           )}
 
-          <Html position={[ejeX, sy(vert.h) + 0.45, 0]} center distanceFactor={12} pointerEvents="none">
-            <div style={{ background: "rgba(2,12,28,0.82)", border: `1px solid ${ORO}66`, borderRadius: 8, padding: "4px 8px", whiteSpace: "nowrap" }}>
-              <span style={{ color: ORO, fontSize: 11.5, fontWeight: 900 }}>Vértice ({fmtNum(vert.x, 1)}, {fmtNum(vert.h, 1)})</span>
+          <Html position={[ejeX, sy(vert.h) + 0.2, 0]} center pointerEvents="none" zIndexRange={[20, 0]}>
+            <div style={{ transform: "translate(0,-130%)", background: "rgba(4,10,22,0.88)", border: `1.5px solid ${ORO}`, borderRadius: 8, padding: "3px 9px", whiteSpace: "nowrap" }}>
+              <span style={{ color: ORO, fontSize: 14, fontWeight: 900 }}>Vértice ({fmtNum(vert.x, 1)}, {fmtNum(vert.h, 1)})</span>
             </div>
           </Html>
           {arrastrable && (hover || dragging) && (
-            <Html position={[ejeX, sy(vert.h) - 0.55, 0]} center distanceFactor={13} pointerEvents="none">
-              <div style={{ background: `${accent}`, color: "#04121f", fontSize: 10.5, fontWeight: 900, borderRadius: 7, padding: "3px 8px", whiteSpace: "nowrap", boxShadow: "0 3px 10px rgba(0,0,0,0.4)" }}>
+            <Html position={[ejeX, sy(vert.h) - 0.3, 0]} center pointerEvents="none" zIndexRange={[20, 0]}>
+              <div style={{ transform: "translate(0,90%)", background: `${accent}`, color: "#04121f", fontSize: 14, fontWeight: 900, borderRadius: 7, padding: "3px 9px", whiteSpace: "nowrap", boxShadow: "0 3px 10px rgba(0,0,0,0.4)" }}>
                 <i className="fa-solid fa-hand-pointer" style={{ marginRight: 5 }} />
                 {dragging ? "moviendo el vértice" : "arrastra el vértice"}
               </div>
             </Html>
           )}
-          {/* altura máxima sobre el eje Y */}
-          <Html position={[-SCENE_W / 2 - 0.15, sy(vert.h), 0]} center distanceFactor={13} pointerEvents="none">
-            <div style={{ color: ORO, fontSize: 10.5, fontWeight: 800, whiteSpace: "nowrap" }}>{fmtNum(vert.h, 1)}</div>
-          </Html>
         </>
       )}
 
@@ -313,11 +299,13 @@ function Trayectoria({ a, b, c, showGol, accent, pausado, arrastrable, onVertice
         <group key={i} position={[sx(r), 0, 0]}>
           <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
             <ringGeometry args={[0.12, 0.2, 24]} />
-            <meshStandardMaterial color={VERDE} emissive={VERDE} emissiveIntensity={0.7} toneMapped={false} side={THREE.DoubleSide} />
+            <meshStandardMaterial color={VERDE} emissive={VERDE} emissiveIntensity={0.7} side={THREE.DoubleSide} />
           </mesh>
-          <Html position={[0, -0.05, 0]} center distanceFactor={13} pointerEvents="none">
-            <div style={{ color: VERDE, fontSize: 11, fontWeight: 900, whiteSpace: "nowrap", textShadow: "0 2px 8px #000" }}>x = {fmtNum(r, 1)}</div>
-          </Html>
+          {r > 1 && (
+            <Html position={[0, -0.05, 0]} center pointerEvents="none" zIndexRange={[20, 0]}>
+              <div style={{ transform: "translate(0,90%)", background: "rgba(4,10,22,0.88)", border: `1.5px solid ${VERDE}`, borderRadius: 8, padding: "3px 9px", color: VERDE, fontSize: 14, fontWeight: 900, whiteSpace: "nowrap" }}>cae en x = {fmtNum(r, 1)}</div>
+            </Html>
+          )}
         </group>
       ))}
 
@@ -342,19 +330,23 @@ function Trayectoria({ a, b, c, showGol, accent, pausado, arrastrable, onVertice
               <cylinderGeometry args={[0.05, 0.05, 1.2, 12]} />
               <meshStandardMaterial color="#e8eef6" metalness={0.3} roughness={0.5} />
             </mesh>
+            {/* zona de gol: el hueco entre postes y travesaño */}
+            <mesh position={[gx, gy / 2, 0]} rotation={[0, Math.PI / 2, 0]}>
+              <planeGeometry args={[1.2, gy]} />
+              <meshStandardMaterial color="#34D399" transparent opacity={0.16} side={THREE.DoubleSide} depthWrite={false} />
+            </mesh>
             {/* marca de la altura del balón al pasar por x=25 */}
             <mesh position={[gx, byBall, 0]}>
               <sphereGeometry args={[0.12, 16, 16]} />
-              <meshStandardMaterial color={pasaPorEncima ? ROJO : VERDE} emissive={pasaPorEncima ? ROJO : VERDE} emissiveIntensity={0.8} toneMapped={false} />
+              <meshStandardMaterial color={pasaPorEncima ? ROJO : VERDE} emissive={pasaPorEncima ? ROJO : VERDE} emissiveIntensity={0.6} />
             </mesh>
-            <Html position={[gx, Math.max(byBall, gy) + 0.5, 0]} center distanceFactor={12} pointerEvents="none">
-              <div style={{ background: "rgba(2,12,28,0.85)", border: `1px solid ${(pasaPorEncima ? ROJO : VERDE)}66`, borderRadius: 8, padding: "5px 9px", whiteSpace: "nowrap", textAlign: "center" }}>
-                <div style={{ color: "#cfe0f2", fontSize: 10.5, fontWeight: 700 }}>Portería · x = {GOL.porteriaX} m</div>
-                <div style={{ color: pasaPorEncima ? ROJO : VERDE, fontSize: 11.5, fontWeight: 900 }}>
-                  balón a {fmtNum(hPorteria, 1)} m vs travesaño {GOL.travesano} m
+            {!estrecho && (
+              <Html position={[gx, Math.max(byBall, gy) + 0.3, 0]} center pointerEvents="none" zIndexRange={[20, 0]}>
+                <div style={{ transform: "translate(0,-110%)", background: "rgba(4,10,22,0.88)", border: `1.5px solid ${pasaPorEncima ? ROJO : VERDE}`, borderRadius: 8, padding: "3px 9px", whiteSpace: "nowrap", color: pasaPorEncima ? ROJO : VERDE, fontSize: 14, fontWeight: 900 }}>
+                  {pasaPorEncima ? "pasa por encima" : hPorteria > 0 ? "entra al arco" : "no llega"} · {fmtNum(hPorteria, 1)} m
                 </div>
-              </div>
-            </Html>
+              </Html>
+            )}
           </group>
         );
       })()}
@@ -376,7 +368,7 @@ export default function ParabolaScene(props: ParabolaSceneProps) {
       shadows
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
-      camera={{ position: [0.4, 3.6, 11.5], fov: 44 }}
+      camera={{ position: [0.4, 3.4, 12], fov: 44 }}
     >
       <Contenido {...props} />
     </Canvas>
@@ -386,6 +378,17 @@ export default function ParabolaScene(props: ParabolaSceneProps) {
 function Contenido(props: ParabolaSceneProps) {
   const { a, b, c, showGol, accent, pausado, autoRotate, resetNonce, arrastrable, onVerticeChange, onGrab } = props;
   const [dragging, setDragging] = useState(false);
+
+  // Encuadre: el campo (ancho 15) y el arco, un poco por encima del centro.
+  const camera = useThree((st) => st.camera);
+  const size = useThree((st) => st.size);
+  const aspect = size.width / Math.max(1, size.height);
+  const dist = Math.max(10, (SCENE_W / 2 + 1.3) / (0.404 * Math.min(aspect, 1.8)));
+  useEffect(() => {
+    camera.position.set(0.4, 2.6 + dist * 0.1, dist);
+    camera.lookAt(0, 2.1, 0);
+  }, [camera, dist]);
+
   return (
     <>
       {/* Suelo, luz de tres puntos y entorno que reflejar. */}
@@ -404,13 +407,14 @@ function Contenido(props: ParabolaSceneProps) {
 
 
       <OrbitControls
+        makeDefault
         enabled={!dragging}
         enablePan={false}
         minDistance={6}
-        maxDistance={20}
+        maxDistance={26}
         minPolarAngle={Math.PI / 8}
         maxPolarAngle={Math.PI / 2.05}
-        target={[0, 1.6, 0]}
+        target={[0, 2.1, 0]}
         autoRotate={autoRotate && !dragging}
         autoRotateSpeed={0.4}
       />

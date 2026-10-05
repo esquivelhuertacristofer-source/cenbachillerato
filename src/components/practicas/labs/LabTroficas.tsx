@@ -9,26 +9,28 @@
  * verdes, mientras el ~90% se escapa como calor (naranja) en cada nivel: la
  * "regla del 10%". Anclado a ecosistemas de México (Mar de Cortés, bosque
  * templado, selva húmeda) y a su megadiversidad marina.
+ * EXPERIMENTO CENTRAL (causa → efecto): «quita una especie». Al quitar un nivel,
+ * los de arriba se quedan sin alimento y los de abajo cambian de población
+ * (cascada trófica): se ve en la cantidad de esferas de biomasa de la pirámide.
  * Ecosistemas, interacciones y energía — flujo de energía (MCCEMS 2025).
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { PracticaLabProps } from "../registry";
-import { T, OK, card, Eyebrow, Readout, SceneBoundary } from "./_kit";
+import { T, SceneBoundary } from "./_kit";
+import { LabShell, Bloque, Dato, Deslizador, BotonHerramienta } from "./_shell";
 import { FichaTeorica } from "./_ficha";
 import { REDES_TROFICAS_FICHA } from "./redes-troficas-ficha";
 import { RetoQuizCard } from "./_reto-quiz";
 import { QUIZ_A2 } from "./redes-troficas-data";
 import { LabSfx } from "./lab-audio";
 import {
-  NIVELES, DESCOMPONEDORES, ECOSISTEMAS, DATOS_MX, IDEAS, calcularNiveles,
+  NIVELES, DESCOMPONEDORES, ECOSISTEMAS, DATOS_MX, IDEAS, calcularNiveles, cascada,
   ENERGIA_MIN, ENERGIA_MAX, ENERGIA_STEP, ENERGIA_DEFAULT,
   EF_MIN, EF_MAX, EF_STEP, EF_DEFAULT,
   fmt0, fmtKcal, type NivelKey,
 } from "./troficas-data";
-
-import { TableroObjetivos } from "./_objetivos";
 
 /** Clave de la mejor marca de este laboratorio. */
 const RETO_KEY = "cen-redes-troficas-reto";
@@ -38,7 +40,7 @@ const TroficasScene = dynamic(() => import("./TroficasScene"), {
   loading: () => (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, color: "rgba(255,255,255,0.55)" }}>
       <i className="fa-solid fa-seedling fa-bounce" style={{ fontSize: 28 }} />
-      <span style={{ fontSize: 13, fontWeight: 600 }}>Encendiendo el flujo de energía…</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Encendiendo el flujo de energía…</span>
     </div>
   ),
 });
@@ -55,10 +57,13 @@ export function LabTroficas({ color }: PracticaLabProps) {
   const [autoRotate, setAutoRotate] = useState(false);
   const [resetNonce, setResetNonce] = useState(0);
   const [ejercicioAprobado, setEjercicioAprobado] = useState(false);
-  // teoría (cajón deslizable) y sonido
-  const [drawer, setDrawer] = useState(false);
   const [sonido, setSonido] = useState(false);
   const audioRef = useRef<LabSfx | null>(null);
+
+  // experimento «quita una especie»
+  const [quitado, setQuitado] = useState<number | null>(null);
+  const [quitoHerbivoros, setQuitoHerbivoros] = useState(false);
+  const [quitoTope, setQuitoTope] = useState(false);
 
   const toggleSonido = useCallback(async () => {
     if (!audioRef.current) audioRef.current = new LabSfx();
@@ -83,10 +88,20 @@ export function LabTroficas({ color }: PracticaLabProps) {
 
   const eco = ECOSISTEMAS[ecoIdx]!;
   const niveles = useMemo(() => calcularNiveles(energia, eficiencia), [energia, eficiencia]);
+  const organismos = useMemo(() => NIVELES.map((nv) => eco.organismos[nv.key as NivelKey][0]!), [eco]);
+  const casc = useMemo(() => cascada(quitado), [quitado]);
+
+  const quitar = (i: number | null) => {
+    setQuitado(i);
+    if (i === 1) setQuitoHerbivoros(true);
+    if (i === 3) setQuitoTope(true);
+    if (sonido) audioRef.current?.blip();
+  };
 
   const reset = () => {
     setEnergia(ENERGIA_DEFAULT);
     setEficiencia(EF_DEFAULT);
+    setQuitado(null);
     if (sonido) audioRef.current?.blip();
     bump();
   };
@@ -97,387 +112,231 @@ export function LabTroficas({ color }: PracticaLabProps) {
         <i className="fa-solid fa-seedling" />
       </div>
       <div style={{ fontSize: 18, fontWeight: 900, color: T.text }}>La energía fluye y se pierde</div>
-      <div style={{ fontSize: 13.5, color: T.text2, maxWidth: 410, lineHeight: 1.5 }}>
+      <div style={{ fontSize: 14, color: T.text2, maxWidth: 410, lineHeight: 1.5 }}>
         Tu equipo no puede mostrar la pirámide en 3D, pero la idea sigue: la energía del Sol entra por los productores y al subir de un nivel al siguiente solo pasa ~10% —el resto se escapa como calor—. Por eso hay muchos más herbívoros que depredadores. Usa los controles y las lecturas para explorarlo.
       </div>
     </div>
   );
 
+  const lectura = quitado === null
+    ? <>{fmtKcal(energia)} kcal abajo → {fmtKcal(niveles[3]!.energia)} kcal arriba</>
+    : quitado === 0
+      ? <>Sin {organismos[0]}, toda la red colapsa</>
+      : <>Sin {organismos[quitado]}: {organismos[quitado - 1]} se multiplica</>;
+
+  const textoCascada = (() => {
+    if (quitado === null) return "Quita un nivel y mira cómo cambia la población de los demás.";
+    if (quitado === 0) return `Sin ${organismos[0]} no entra energía al ecosistema: todos los niveles se quedan sin alimento.`;
+    const arriba = quitado < 3 ? ` Los de arriba (${organismos.slice(quitado + 1).join(", ")}) se quedan sin alimento.` : "";
+    return `Sin ${organismos[quitado]}, ${organismos[quitado - 1]} ya no es comido y crece (+60 %).${arriba}${quitado >= 2 ? ` Y ${organismos[quitado - 2]} sufre por ese exceso (−30 %).` : ""}`;
+  })();
+
   return (
-    <div style={{ color: T.text }}>
-      <style>{`
-        @keyframes exPulseT { 0%,100%{ box-shadow:0 0 0 0 var(--exc); } 50%{ box-shadow:0 0 0 6px transparent; } }
-        .ex-live-dot { animation: exPulseT 1.6s ease-in-out infinite; }
-        .ex-grid { display:grid; grid-template-columns: minmax(0,1fr) clamp(300px,26vw,380px); gap:22px; align-items:start; }
-        @media (max-width: 1000px){ .ex-grid { grid-template-columns: 1fr; } }
-        .ex-icobtn { cursor:pointer; width:36px; height:36px; border-radius:9px; display:flex; align-items:center;
-          justify-content:center; font-size:14px; border:none; background:transparent; color:rgba(255,255,255,0.7); transition:all .15s; }
-        .ex-icobtn[data-on="true"] { background:rgba(${color.rgba},0.22); color:#fff; }
-        .ex-icobtn:hover { background:rgba(255,255,255,0.12); }
-        .ex-range { -webkit-appearance:none; appearance:none; width:100%; height:6px; border-radius:999px; outline:none;
-          background:linear-gradient(90deg, var(--exc) 0%, var(--exc) var(--exfill), rgba(255,255,255,0.12) var(--exfill), rgba(255,255,255,0.12) 100%); }
-        .ex-range::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:20px; height:20px; border-radius:50%;
-          background:#fff; border:3px solid var(--exc); cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.4); }
-        .ex-range::-moz-range-thumb { width:20px; height:20px; border-radius:50%; background:#fff; border:3px solid var(--exc); cursor:pointer; }
-        .ex-chip { cursor:pointer; padding:8px 12px; border-radius:12px; border:1px solid ${T.line}; background:${T.inset};
-          color:${T.text2}; font-size:12px; font-weight:800; transition:all .15s; text-align:left; }
-        .ex-chip:hover { border-color:rgba(${color.rgba},0.5); color:#fff; }
-        .ex-chip[data-on="true"] { border-color:rgba(${color.rgba},0.7); background:rgba(${color.rgba},0.18); color:#fff; }
-        @media (max-width: 1000px){ .ex-bottom { grid-template-columns: 1fr !important; } }
-
-        /* Cajón de teoría */
-        .ex-scrim { position:fixed; inset:0; background:rgba(2,8,20,0.55); backdrop-filter:blur(2px);
-          opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:60; }
-        .ex-scrim[data-open="true"] { opacity:1; pointer-events:auto; }
-        .ex-drawer { position:fixed; top:0; right:0; height:100dvh; width:min(560px,94vw); z-index:61;
-          background:linear-gradient(180deg,#06182f 0%,#020d1d 100%); border-left:1px solid rgba(${color.rgba},0.32);
-          box-shadow:-24px 0 60px -20px rgba(0,0,0,0.7); transform:translateX(102%); transition:transform .34s cubic-bezier(.4,0,.2,1);
-          display:flex; flex-direction:column; }
-        .ex-drawer[data-open="true"] { transform:translateX(0); }
-        .ex-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:12px;
-          padding:18px 20px; border-bottom:1px solid ${T.line}; }
-        .ex-drawer-body { overflow-y:auto; padding:20px; flex:1; }
-        .ex-close { cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid ${T.line};
-          background:${T.glass}; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
-        .ex-close:hover { border-color:${accent}; background:rgba(${color.rgba},0.16); }
-        .ex-teoria-fab { position:absolute; bottom:16px; right:16px; cursor:pointer; display:inline-flex; align-items:center; gap:9px;
-          padding:11px 16px; border-radius:999px; border:1px solid ${accent}88; color:#fff; font-size:13px; font-weight:800;
-          background:rgba(2,12,28,0.82); backdrop-filter:blur(10px); box-shadow:0 8px 28px -8px ${accent}; transition:all .16s; }
-        .ex-teoria-fab:hover { background:rgba(${color.rgba},0.28); transform:translateY(-1px); }
-      `}</style>
-
-      <div className="ex-grid">
-        {/* ── Columna visor ──────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              height: "clamp(440px, 62vh, 720px)",
-              borderRadius: 20,
-              overflow: "hidden",
-              border: `1px solid rgba(${color.rgba},0.22)`,
-              background: `radial-gradient(120% 80% at 30% 0%, rgba(${color.rgba},0.12) 0%, transparent 55%), linear-gradient(180deg,#0a2236 0%,#06182c 100%)`,
-              boxShadow: `0 0 50px -18px rgba(${color.rgba},0.4), ${T.shadow}`,
-            }}
-          >
-            <SceneBoundary fallback={sceneFallback}>
-              <TroficasScene
-                energia={energia} eficiencia={eficiencia}
-                accent={accent}
-                pausado={pausado}
-                autoRotate={autoRotate}
-                resetNonce={resetNonce}
-              />
-            </SceneBoundary>
-
-            {/* Cinta EN VIVO — eficiencia actual */}
-            <div style={{ position: "absolute", top: 14, left: 16, display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 14px 8px 12px", borderRadius: 999, background: "rgba(2,12,28,0.74)", border: `1px solid ${accent}66`, backdropFilter: "blur(10px)" }}>
-              <span className="ex-live-dot" style={{ ["--exc" as string]: `${accent}aa`, width: 9, height: 9, borderRadius: "50%", background: accent }} />
-              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", color: T.text3 }}>EN VIVO</span>
-              <span style={{ width: 1, height: 13, background: "rgba(255,255,255,0.18)" }} />
-              <span style={{ fontSize: 13.5, fontWeight: 900, color: accent }}>
-                <i className="fa-solid fa-gauge-high" style={{ marginRight: 7 }} />
-                Eficiencia {fmt0(eficiencia)}%
-              </span>
-            </div>
-
-            {/* Toolbar */}
-            <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 2, padding: 4, borderRadius: 12, background: "rgba(2,12,28,0.74)", border: `1px solid ${T.line}`, backdropFilter: "blur(10px)" }}>
-              <button className="ex-icobtn" data-on={drawer} onClick={() => setDrawer(true)} title="Teoría">
-                <i className="fa-solid fa-book-open" />
-              </button>
-              <button className="ex-icobtn" data-on={sonido} onClick={toggleSonido} title={sonido ? "Silenciar" : "Activar sonido"}>
-                <i className={`fa-solid ${sonido ? "fa-volume-high" : "fa-volume-xmark"}`} />
-              </button>
-              <button className="ex-icobtn" data-on={!pausado} onClick={() => setPausado((p) => !p)} title={pausado ? "Reanudar" : "Pausar"}>
-                <i className={`fa-solid ${pausado ? "fa-play" : "fa-pause"}`} />
-              </button>
-              <button className="ex-icobtn" data-on={autoRotate} onClick={() => setAutoRotate((vv) => !vv)} title="Girar la cámara">
-                <i className="fa-solid fa-arrows-rotate" />
-              </button>
-              <button className="ex-icobtn" onClick={reset} title="Reiniciar">
-                <i className="fa-solid fa-rotate-left" />
-              </button>
-            </div>
-
-            {/* Pie: regla del 10% */}
-            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "30px 18px 14px", background: "linear-gradient(0deg, rgba(2,10,24,0.9) 0%, transparent 100%)", pointerEvents: "none" }}>
-              <div style={{ fontSize: 13.5, color: "#eaf6ee", fontWeight: 800 }}>
-                <i className="fa-solid fa-bolt" style={{ color: accent, marginRight: 6 }} />
-                {fmtKcal(energia)} kcal en la base ·
-                <i className="fa-solid fa-fire" style={{ color: NARANJA, margin: "0 6px 0 10px" }} />
-                {fmt0(100 - eficiencia)}% perdido como calor por nivel
-              </div>
-              <div style={{ fontSize: 12.5, color: "#cfe0d6", lineHeight: 1.5, marginTop: 6 }}>
-                De los {fmtKcal(energia)} kcal de los productores solo llegan ~{fmtKcal(niveles[3]!.energia)} kcal a los depredadores tope: por eso son pocos.
-              </div>
-            </div>
-
-            {/* Botón flotante de Teoría */}
-            <button className="ex-teoria-fab" onClick={() => setDrawer(true)}>
-              <i className="fa-solid fa-book-open" />
-              Teoría
-            </button>
+    <LabShell
+      accent={accent}
+      rgba={color.rgba}
+      retoKey={RETO_KEY}
+      escena={
+        <SceneBoundary fallback={sceneFallback}>
+          <TroficasScene
+            energia={energia} eficiencia={eficiencia}
+            quitado={quitado} organismos={organismos}
+            accent={accent}
+            pausado={pausado}
+            autoRotate={autoRotate}
+            resetNonce={resetNonce}
+          />
+        </SceneBoundary>
+      }
+      herramientas={
+        <>
+          <BotonHerramienta icono={sonido ? "fa-volume-high" : "fa-volume-xmark"} titulo={sonido ? "Silenciar" : "Activar sonido"} activo={sonido} onClick={toggleSonido} />
+          <BotonHerramienta icono={pausado ? "fa-play" : "fa-pause"} titulo={pausado ? "Reanudar" : "Pausar"} activo={!pausado} onClick={() => setPausado((p) => !p)} />
+          <BotonHerramienta icono="fa-arrows-rotate" titulo="Girar la cámara" activo={autoRotate} onClick={() => setAutoRotate((v) => !v)} />
+          <BotonHerramienta icono="fa-rotate-left" titulo="Reiniciar" onClick={reset} />
+        </>
+      }
+      leyenda={
+        <>
+          <div style={{ fontWeight: 900, color: accent }}>
+            <i className="fa-solid fa-gauge-high" style={{ marginRight: 7 }} />
+            Eficiencia {fmt0(eficiencia)}%
           </div>
-
-          {/* Controles */}
-          <div style={{ ...card, padding: "18px 22px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-sliders" style={{ marginRight: 8, color: accent }} />
-              El flujo de energía
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 16 }}>
-              <Deslizador label="Energía de los productores" icon="fa-bolt" colr={accent}
-                valor={`${fmtKcal(energia)} kcal`} min={ENERGIA_MIN} max={ENERGIA_MAX} step={ENERGIA_STEP} value={energia}
-                onChange={setEnergia} hintL={`${fmtKcal(ENERGIA_MIN)} kcal`} hintR={`${fmtKcal(ENERGIA_MAX)} kcal`} />
-              <Deslizador label="Eficiencia ecológica" icon="fa-gauge-high" colr={NARANJA}
-                valor={`${fmt0(eficiencia)} %`} min={EF_MIN} max={EF_MAX} step={EF_STEP} value={eficiencia}
-                onChange={setEficiencia} hintL={`${EF_MIN}% (poco eficiente)`} hintR={`${EF_MAX}% (muy eficiente)`} />
-            </div>
-
-            {/* selector de ecosistema */}
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 16 }}>
-              {ECOSISTEMAS.map((e, i) => (
-                <button key={e.key} className="ex-chip" data-on={i === ecoIdx} title={e.dato}
-                  onClick={() => setEcoIdx(i)}
-                  style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                  <i className={`fa-solid ${e.icono}`} style={{ color: accent }} />
-                  {e.nombre}
+          <div style={{ color: T.text2 }}>Verde: energía que sube</div>
+          <div style={{ color: NARANJA }}>Naranja: calor perdido</div>
+        </>
+      }
+      lectura={lectura}
+      objetivos={[
+        { txt: "Ajusta la energía inicial y observa el flujo en la pirámide", done: energia !== ENERGIA_DEFAULT },
+        { txt: "Modifica la eficiencia ecológica y compara niveles", done: eficiencia !== EF_DEFAULT },
+        { txt: "Quita a los herbívoros y mira qué pasa con las plantas y los carnívoros", done: quitoHerbivoros },
+        { txt: "Quita al depredador tope y mira cómo se desordena la red", done: quitoTope },
+        { txt: "Explora al menos dos ecosistemas mexicanos", done: ecoIdx > 0 },
+        { txt: "Resuelve el reto evaluable de la actividad A4", done: ejercicioAprobado },
+      ]}
+      pestanas={[
+        {
+          id: "controles",
+          etiqueta: "Controles",
+          icono: "fa-sliders",
+          contenido: (
+            <>
+              <Bloque titulo="Quita una especie" icono="fa-circle-minus">
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 150px), 1fr))", gap: 8 }}>
+                  {NIVELES.map((nv) => (
+                    <button key={nv.key} onClick={() => quitar(quitado === nv.orden ? null : nv.orden)}
+                      style={{ cursor: "pointer", padding: "10px 12px", borderRadius: 12, border: `1px solid ${quitado === nv.orden ? nv.color : T.line}`, background: quitado === nv.orden ? `${nv.color}22` : T.inset, color: quitado === nv.orden ? "#fff" : T.text2, fontSize: 14, fontWeight: 800, textAlign: "left", display: "flex", alignItems: "center", gap: 8 }}>
+                      <i className={`fa-solid ${nv.icono}`} style={{ color: nv.color }} />
+                      Quitar: {organismos[nv.orden]}
+                    </button>
+                  ))}
+                </div>
+                <button onClick={() => quitar(null)}
+                  style={{ cursor: "pointer", padding: "10px 12px", borderRadius: 12, border: `1px solid ${T.line}`, background: T.inset, color: T.text2, fontSize: 14, fontWeight: 800 }}>
+                  <i className="fa-solid fa-rotate-left" style={{ marginRight: 8 }} />
+                  Devolver todas las especies
                 </button>
-              ))}
-            </div>
-          </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                  {NIVELES.map((nv) => {
+                    const m = casc.mult[nv.orden]!;
+                    const est = casc.estado[nv.orden]!;
+                    return (
+                      <Dato key={nv.key} label={organismos[nv.orden]!}
+                        value={est === "quitado" ? "quitado" : est === "hambre" ? "sin alimento" : m === 1 ? "normal" : `${m > 1 ? "+" : "−"}${Math.abs(Math.round((m - 1) * 100))} %`}
+                        col={est !== "normal" ? "#9aa7b4" : nv.color} />
+                    );
+                  })}
+                </div>
+                <p style={{ margin: 0, color: T.text2 }}>{textoCascada}</p>
+                <p style={{ margin: 0, fontSize: 14, color: T.text3 }}>Simulación cualitativa de una cascada trófica; los porcentajes son de ejemplo.</p>
+              </Bloque>
 
-          {/* Pirámide de energía — niveles del ecosistema elegido */}
-          <div style={{ ...card, padding: "18px 22px 20px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-chart-simple" style={{ marginRight: 8, color: accent }} />
-              Pirámide trófica — {eco.nombre}
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 8 }}>
-              {[...NIVELES].reverse().map((nv) => {
-                const calc = niveles[nv.orden]!;
-                const ancho = Math.max(8, Math.pow(eficiencia / 100, nv.orden) * 100);
-                const orgs = eco.organismos[nv.key as NivelKey];
-                return (
-                  <div key={nv.key} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                    <div style={{ width: 132, flexShrink: 0, textAlign: "right" }}>
-                      <div style={{ fontSize: 12, fontWeight: 800, color: nv.color }}>
-                        <i className={`fa-solid ${nv.icono}`} style={{ marginRight: 6 }} />{nv.nombre.replace("Consumidores ", "Cons. ")}
+              <Bloque titulo="El flujo de energía" icono="fa-sliders">
+                <Deslizador label="Energía de los productores" icon="fa-bolt" colr={accent}
+                  valor={`${fmtKcal(energia)} kcal`} min={ENERGIA_MIN} max={ENERGIA_MAX} step={ENERGIA_STEP} value={energia}
+                  onChange={setEnergia} hintL={`${fmtKcal(ENERGIA_MIN)} kcal`} hintR={`${fmtKcal(ENERGIA_MAX)} kcal`} />
+                <Deslizador label="Eficiencia ecológica" icon="fa-gauge-high" colr={NARANJA}
+                  valor={`${fmt0(eficiencia)} %`} min={EF_MIN} max={EF_MAX} step={EF_STEP} value={eficiencia}
+                  onChange={setEficiencia} hintL={`${EF_MIN}% (poco eficiente)`} hintR={`${EF_MAX}% (muy eficiente)`} />
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 150px), 1fr))", gap: 8 }}>
+                  {ECOSISTEMAS.map((e, i) => (
+                    <button key={e.key} title={e.dato} onClick={() => setEcoIdx(i)}
+                      style={{ cursor: "pointer", padding: "10px 12px", borderRadius: 12, border: `1px solid ${i === ecoIdx ? accent : T.line}`, background: i === ecoIdx ? `rgba(${color.rgba},0.18)` : T.inset, color: i === ecoIdx ? "#fff" : T.text2, fontSize: 14, fontWeight: 800, textAlign: "left", display: "flex", alignItems: "center", gap: 8 }}>
+                      <i className={`fa-solid ${e.icono}`} style={{ color: accent }} />
+                      {e.nombre}
+                    </button>
+                  ))}
+                </div>
+              </Bloque>
+
+              <Bloque titulo={`Pirámide de energía — ${eco.nombre}`} icono="fa-chart-simple">
+                <div style={{ display: "grid", gap: 8 }}>
+                  {[...NIVELES].reverse().map((nv) => {
+                    const calc = niveles[nv.orden]!;
+                    const ancho = Math.max(8, Math.pow(eficiencia / 100, nv.orden) * 100);
+                    return (
+                      <div key={nv.key} style={{ display: "grid", gridTemplateColumns: "minmax(0,110px) minmax(0,1fr)", alignItems: "center", gap: 10 }}>
+                        <div style={{ textAlign: "right", fontSize: 14, fontWeight: 800, color: nv.color }}>
+                          {organismos[nv.orden]}
+                        </div>
+                        <div style={{ height: 28, borderRadius: 7, display: "flex", alignItems: "center", paddingLeft: 10, color: "#04121f", fontWeight: 900, fontSize: 14, fontFamily: "ui-monospace, monospace", width: `${ancho}%`, minWidth: 84, background: `linear-gradient(90deg, ${nv.color}, ${nv.color}bb)` }}>
+                          {fmtKcal(calc.energia)}
+                        </div>
                       </div>
-                      <div style={{ fontSize: 10.5, color: T.text3 }}>{orgs.join(" · ")}</div>
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ height: 26, borderRadius: 7, display: "flex", alignItems: "center", paddingLeft: 10, color: "#04121f", fontWeight: 900, fontSize: 11.5, fontFamily: "ui-monospace, monospace", width: `${ancho}%`, minWidth: 64, background: `linear-gradient(90deg, ${nv.color}, ${nv.color}bb)`, boxShadow: `0 0 14px -4px ${nv.color}` }}>
-                        {fmtKcal(calc.energia)} kcal
-                      </div>
+                    );
+                  })}
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 8 }}>
+                  <Dato label="Llega a la cima" value={`${fmtKcal(niveles[3]!.porcentaje)} %`} col={NARANJA} />
+                  <Dato label="Perdido por nivel" value={`${fmt0(100 - eficiencia)} % calor`} col={NARANJA} />
+                </div>
+              </Bloque>
+            </>
+          ),
+        },
+        {
+          id: "reto",
+          etiqueta: "Reto",
+          icono: "fa-trophy",
+          contenido: (
+            <RetoQuizCard
+              quiz={QUIZ_A2}
+              accent={accent}
+              rgba={color.rgba}
+              aprobado={ejercicioAprobado}
+              onAprobado={() => setEjercicioAprobado(true)}
+              playSfx={sonido ? (ok) => { if (ok) audioRef.current?.correcto(); else audioRef.current?.incorrecto(); } : undefined}
+              playPick={sonido ? () => audioRef.current?.blip() : undefined}
+            />
+          ),
+        },
+        {
+          id: "teoria",
+          etiqueta: "Teoría",
+          icono: "fa-book-open",
+          contenido: (
+            <>
+              <Bloque titulo="Niveles tróficos" icono="fa-layer-group">
+                {NIVELES.map((nv) => (
+                  <div key={nv.key} style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
+                    <i className={`fa-solid ${nv.icono}`} style={{ color: nv.color, marginTop: 4 }} aria-hidden />
+                    <div>
+                      <div style={{ fontWeight: 900, color: "#fff" }}>{nv.nombre} <span style={{ color: nv.color, fontWeight: 700 }}>· {nv.rol}</span></div>
+                      <div style={{ color: T.text2 }}>{nv.descripcion}</div>
                     </div>
                   </div>
-                );
-              })}
-            </div>
-            {/* descomponedores */}
-            <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, border: `1px dashed ${DESCOMPONEDORES.color}66`, background: `${DESCOMPONEDORES.color}10` }}>
-              <i className={`fa-solid ${DESCOMPONEDORES.icono}`} style={{ color: DESCOMPONEDORES.color, fontSize: 14 }} />
-              <span style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.4 }}>
-                <strong style={{ color: DESCOMPONEDORES.color }}>{DESCOMPONEDORES.nombre}</strong> ({eco.descomponedor}) cierran el ciclo de la materia: devuelven nutrientes al suelo para que los productores vuelvan a empezar.
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* ── Columna lateral ────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          {/* Niveles tróficos */}
-          <div style={{ ...card, padding: "20px 22px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-layer-group" style={{ marginRight: 8, color: accent }} />
-              Niveles tróficos
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 12 }}>
-              {NIVELES.map((nv) => (
-                <div key={nv.key} style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
-                  <div style={{ width: 30, height: 30, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: nv.color, background: `${nv.color}22`, flexShrink: 0 }}>
-                    <i className={`fa-solid ${nv.icono}`} />
-                  </div>
+                ))}
+                <div style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
+                  <i className={`fa-solid ${DESCOMPONEDORES.icono}`} style={{ color: DESCOMPONEDORES.color, marginTop: 4 }} aria-hidden />
                   <div>
-                    <div style={{ fontSize: 12.5, fontWeight: 900, color: "#fff" }}>{nv.nombre} <span style={{ color: nv.color, fontWeight: 700 }}>· {nv.rol}</span></div>
-                    <div style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.45 }}>{nv.descripcion}</div>
+                    <div style={{ fontWeight: 900, color: "#fff" }}>{DESCOMPONEDORES.nombre} <span style={{ color: DESCOMPONEDORES.color, fontWeight: 700 }}>· {DESCOMPONEDORES.rol}</span></div>
+                    <div style={{ color: T.text2 }}>{eco.descomponedor}: {DESCOMPONEDORES.descripcion}</div>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Ecosistema actual */}
-          <div style={{ borderRadius: 18, padding: "20px 22px 22px", border: `1px solid rgba(${color.rgba},0.4)`, background: `rgba(${color.rgba},0.10)` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-              <div style={{ width: 34, height: 34, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: "#fff", background: accent }}>
-                <i className={`fa-solid ${eco.icono}`} />
-              </div>
-              <span style={{ fontSize: 14.5, fontWeight: 900, color: "#fff", lineHeight: 1.2 }}>{eco.nombre}</span>
-            </div>
-            <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.08em", color: accent, marginBottom: 6 }}>CADENA TRÓFICA</div>
-            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 6, marginBottom: 12 }}>
-              {NIVELES.map((nv, i) => (
-                <span key={nv.key} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "#eaf2fb", padding: "4px 9px", borderRadius: 999, background: `${nv.color}22`, border: `1px solid ${nv.color}55` }}>
-                    {eco.organismos[nv.key as NivelKey][0]}
-                  </span>
-                  {i < NIVELES.length - 1 && <i className="fa-solid fa-arrow-right" style={{ fontSize: 9, color: T.text3 }} />}
-                </span>
-              ))}
-            </div>
-            <div style={{ fontSize: 12, color: T.text, lineHeight: 1.5, padding: "10px 12px", borderRadius: 10, background: "rgba(2,12,28,0.4)", border: `1px solid ${T.line}` }}>
-              <i className="fa-solid fa-circle-info" style={{ color: accent, marginRight: 7 }} />
-              {eco.dato}
-            </div>
-          </div>
-
-          {/* México megadiverso (marino) */}
-          <div style={{ ...card, padding: "20px 22px 22px" }}>
-            <Eyebrow>
-              <i className="fa-solid fa-earth-americas" style={{ marginRight: 8, color: accent }} />
-              México megadiverso
-            </Eyebrow>
-            <div style={{ display: "grid", gap: 12 }}>
-              {DATOS_MX.map((cf, i) => (
-                <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
-                  <div style={{ width: 30, height: 30, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: accent, background: `rgba(${color.rgba},0.16)`, flexShrink: 0 }}>
-                    <i className={`fa-solid ${cf.icono}`} />
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 16, fontWeight: 900, color: "#fff", fontFamily: "ui-monospace, monospace" }}>{cf.valor}</div>
-                    <div style={{ fontSize: 11.5, color: T.text2, lineHeight: 1.4 }}>{cf.texto}</div>
-                  </div>
+              </Bloque>
+              <Bloque titulo={eco.nombre} icono={eco.icono}>
+                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 6 }}>
+                  {NIVELES.map((nv, i) => (
+                    <span key={nv.key} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                      <span style={{ fontSize: 14, fontWeight: 700, color: "#eaf2fb", padding: "4px 10px", borderRadius: 999, background: `${nv.color}22`, border: `1px solid ${nv.color}55` }}>
+                        {eco.organismos[nv.key as NivelKey].join(" · ")}
+                      </span>
+                      {i < NIVELES.length - 1 && <i className="fa-solid fa-arrow-right" style={{ color: T.text3 }} />}
+                    </span>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Lecturas + ideas clave ─────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) clamp(300px,26vw,380px)", gap: 22, marginTop: 22 }} className="ex-bottom">
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-gauge-high" style={{ marginRight: 8, color: accent }} />
-            Energía por nivel
-          </Eyebrow>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
-            {niveles.map((nv) => (
-              <Readout key={nv.key} label={nv.nombre.replace("Consumidores ", "C. ")} value={fmtKcal(nv.energia)} unit="kcal" col={nv.color} size={16} />
-            ))}
-          </div>
-          <div style={{ marginTop: 14, display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
-            <Readout label="Llega a la cima" value={fmtKcal(niveles[3]!.porcentaje)} unit="%" col={NARANJA} size={18} />
-            <Readout label="Perdido por nivel" value={fmt0(100 - eficiencia)} unit="% calor" col={NARANJA} size={18} />
-            <Readout label="Niveles tróficos" value={`${NIVELES.length}`} unit="+ descomp." col={OK} size={18} />
-          </div>
-        </div>
-
-        <div style={{ ...card, padding: "18px 22px" }}>
-          <Eyebrow>
-            <i className="fa-solid fa-lightbulb" style={{ marginRight: 8, color: accent }} />
-            Ideas clave
-          </Eyebrow>
-          <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 9 }}>
-            {IDEAS.map((d, i) => (
-              <li key={i} style={{ fontSize: 12, color: T.text2, lineHeight: 1.45 }}>{d}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      {/* ── Objetivos guiados ──────────────────────────────────────── */}
-      <div style={{ ...card, padding: "18px 22px", marginTop: 22 }}>
-        <Eyebrow>
-          <i className="fa-solid fa-bullseye" style={{ marginRight: 8, color: accent }} />
-          Objetivos
-        </Eyebrow>
-        <TableroObjetivos
-          retoKey={RETO_KEY}
-          accent={accent}
-          objetivos={[
-            { txt: "Ajusta la energía inicial y observa el flujo en la pirámide", done: energia !== ENERGIA_DEFAULT },
-            { txt: "Modifica la eficiencia ecológica y compara niveles", done: eficiencia !== EF_DEFAULT },
-            { txt: "Explora al menos dos ecosistemas mexicanos", done: ecoIdx > 0 },
-            { txt: "Resuelve el reto evaluable de la actividad A4", done: ejercicioAprobado },
-          ]}
-        />
-      </div>
-
-      {/* nota de honestidad del modelo */}
-      <div style={{ marginTop: 16, fontSize: 11.5, color: T.text3, lineHeight: 1.5, display: "flex", gap: 9, alignItems: "flex-start" }}>
-        <i className="fa-solid fa-circle-info" style={{ marginTop: 2 }} />
-        <span>
-          Modelo didáctico: la <strong>«regla del 10%»</strong> es una simplificación reconocida; la eficiencia ecológica real varía entre <strong>5% y 20%</strong> según el ecosistema. Las kcal son valores de referencia para mostrar la <strong>proporción</strong> entre niveles, no medidas de un sitio concreto. Datos de México verbatim sobre megadiversidad marina (Mar de Cortés, Cousteau).
-        </span>
-      </div>
-
-      {/* ── Reto evaluable: quiz A4 verbatim ─────────────────────────── */}
-      <RetoQuizCard
-        quiz={QUIZ_A2}
-        accent={accent}
-        rgba={color.rgba}
-        aprobado={ejercicioAprobado}
-        onAprobado={() => setEjercicioAprobado(true)}
-        playSfx={
-          sonido
-            ? (ok) => {
-                if (ok) audioRef.current?.correcto();
-                else audioRef.current?.incorrecto();
-              }
-            : undefined
-        }
-        playPick={sonido ? () => audioRef.current?.blip() : undefined}
-      />
-
-      {/* ── Cajón de teoría ──────────────────────────────────────────── */}
-      <div className="ex-scrim" data-open={drawer} onClick={() => setDrawer(false)} />
-      <aside className="ex-drawer" data-open={drawer} aria-hidden={!drawer}>
-        <div className="ex-drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <i className="fa-solid fa-book-open" style={{ color: accent, fontSize: 17 }} />
-            <span style={{ fontSize: 15, fontWeight: 900, color: T.text }}>Teoría de la práctica</span>
-          </div>
-          <button className="ex-close" onClick={() => setDrawer(false)} title="Cerrar">
-            <i className="fa-solid fa-xmark" />
-          </button>
-        </div>
-        <div className="ex-drawer-body">
-          <FichaTeorica data={REDES_TROFICAS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
-        </div>
-      </aside>
-    </div>
-  );
-}
-
-/* ── Deslizador reutilizable ─────────────────────────────────────────────── */
-function Deslizador({ label, icon, colr, valor, min, max, step, value, onChange, hintL, hintR }: {
-  label: string; icon: string; colr: string; valor: string;
-  min: number; max: number; step: number; value: number; onChange: (v: number) => void;
-  hintL?: string; hintR?: string;
-}) {
-  const fill = `${((Math.min(max, Math.max(min, value)) - min) / (max - min)) * 100}%`;
-  return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
-        <span style={{ fontSize: 12.5, fontWeight: 700, color: colr }}>
-          <i className={`fa-solid ${icon}`} style={{ marginRight: 6 }} />
-          {label}
-        </span>
-        <span style={{ fontSize: 14, fontWeight: 900, color: colr, fontFamily: "ui-monospace, monospace" }}>{valor}</span>
-      </div>
-      <input type="range" className="ex-range" min={min} max={max} step={step} value={Math.min(max, Math.max(min, value))}
-        onChange={(e) => onChange(Number(e.target.value))}
-        style={{ ["--exc" as string]: colr, ["--exfill" as string]: fill }} />
-      {(hintL || hintR) && (
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, fontSize: 11, color: "rgba(255,255,255,0.45)" }}>
-          <span>{hintL}</span>
-          <span>{hintR}</span>
-        </div>
-      )}
-    </div>
+                <p style={{ margin: 0, color: T.text2 }}>
+                  <i className="fa-solid fa-circle-info" style={{ color: accent, marginRight: 7 }} />
+                  {eco.dato}
+                </p>
+              </Bloque>
+              <Bloque titulo="México megadiverso" icono="fa-earth-americas">
+                {DATOS_MX.map((cf, i) => (
+                  <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
+                    <i className={`fa-solid ${cf.icono}`} style={{ color: accent, marginTop: 4 }} aria-hidden />
+                    <div>
+                      <strong style={{ fontFamily: "ui-monospace, monospace" }}>{cf.valor}</strong>
+                      <div style={{ color: T.text2 }}>{cf.texto}</div>
+                    </div>
+                  </div>
+                ))}
+              </Bloque>
+              <Bloque titulo="Ideas clave" icono="fa-lightbulb">
+                <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8, color: T.text2 }}>
+                  {IDEAS.map((d, i) => <li key={i}>{d}</li>)}
+                </ul>
+              </Bloque>
+              <Bloque titulo="Ficha teórica" icono="fa-book">
+                <FichaTeorica data={REDES_TROFICAS_FICHA} accent={accent} rgba={color.rgba} defaultOpen />
+              </Bloque>
+              <p style={{ marginTop: 18, fontSize: 14, color: T.text3 }}>
+                Modelo didáctico: la «regla del 10%» es una simplificación reconocida; la eficiencia ecológica real varía entre 5% y 20% según el ecosistema. Las kcal son valores de referencia para mostrar la proporción entre niveles, no medidas de un sitio concreto. Datos de México verbatim sobre megadiversidad marina (Mar de Cortés, Cousteau).
+              </p>
+            </>
+          ),
+        },
+      ]}
+    />
   );
 }

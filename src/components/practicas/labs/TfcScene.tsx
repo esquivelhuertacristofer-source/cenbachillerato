@@ -13,17 +13,18 @@
  *  • "conexion": el TFC — la PENDIENTE de F en x=b (recta tangente) es justo la
  *    ALTURA f(b). Derivar la acumulación devuelve la función original.
  *
- * Patrón R3F: useFrame solo dentro de <Canvas>; toda pieza animada vive en un
- * hijo del Canvas y muta REFS (nada de setState ni Math.random en el render).
+ * Etiquetas: solo <Html>, 14 px, máx. 4 a la vez; las escalas de los ejes se
+ * leen en la leyenda del shell y los valores en el panel.
  */
 
 import * as THREE from "three";
-import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useLayoutEffect, useMemo, useRef } from "react";
+import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls, Line, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Escenario } from "./_escenario";
-import { CurvaTubo } from "./_tablero";
+import { CurvaTubo, EjeVarilla, PanelGrafica } from "./_tablero";
+import { EncuadreMate } from "./EncuadreMate";
 import {
   funcionPorId,
   curvaF,
@@ -35,6 +36,7 @@ import {
   A_FIJO,
   XMAX,
   YMAX,
+  N_MAX,
   fmtNum,
   type Modo,
 } from "./tfc-data";
@@ -45,8 +47,6 @@ export interface TfcSceneProps {
   modo: Modo;
   b: number;
   n: number;
-  pausado: boolean;
-  autoRotate: boolean;
   resetNonce: number;
 }
 
@@ -67,10 +67,36 @@ const wx = (x: number): number => OX + x * SX;
 const wy = (y: number): number => OY + y * SY;
 const w3 = (x: number, y: number, z = 0): [number, number, number] => [wx(x), wy(y), z];
 
+/** Rectángulos de Riemann como UNA malla instanciada (hasta 40 piezas). */
+function Rectangulos({ rects }: { rects: Array<{ x0: number; w: number; h: number }> }) {
+  const ref = useRef<THREE.InstancedMesh>(null);
+  useLayoutEffect(() => {
+    const mesh = ref.current;
+    if (!mesh) return;
+    const o = new THREE.Object3D();
+    rects.forEach((r, i) => {
+      const h = Math.max(0.001, r.h * SY);
+      o.position.set(wx(r.x0 + r.w / 2), wy(0) + h / 2, 0.03);
+      o.scale.set(r.w * SX * 0.95, h, 1);
+      o.updateMatrix();
+      mesh.setMatrixAt(i, o.matrix);
+    });
+    mesh.count = rects.length;
+    mesh.instanceMatrix.needsUpdate = true;
+  }, [rects]);
+  return (
+    <instancedMesh ref={ref} args={[undefined, undefined, N_MAX]} castShadow>
+      <boxGeometry args={[1, 1, 0.06]} />
+      <meshStandardMaterial color={ORO} emissive={ORO} emissiveIntensity={0.25} transparent opacity={0.55} roughness={0.5} />
+    </instancedMesh>
+  );
+}
+
 /* ════════════════════ CONTENIDO DEL PLANO ═══════════════════════════════ */
-function Plano({ funcionId, accent, modo, b, n, pausado }: {
-  funcionId: string; accent: string; modo: Modo; b: number; n: number; pausado: boolean;
+function Plano({ funcionId, accent, modo, b, n }: {
+  funcionId: string; accent: string; modo: Modo; b: number; n: number;
 }) {
+  const angosto = useThree((s) => s.size.width) < 640;
   const fn = useMemo(() => funcionPorId(funcionId), [funcionId]);
   const curva = useMemo(() => curvaF(fn, A_FIJO, XMAX), [fn]);
   const acum = useMemo(() => curvaAcumulada(fn, A_FIJO, XMAX), [fn]);
@@ -103,35 +129,13 @@ function Plano({ funcionId, accent, modo, b, n, pausado }: {
     return [w3(x0, Fb - fb * (b - x0), 0.06), w3(x1, Fb + fb * (x1 - b), 0.06)];
   }, [b, Fb, fb]);
 
-  // punto viajero sobre la curva relevante (f en "area", F en los otros modos)
-  const ruta = useMemo<[number, number][]>(
-    () => (mostrarAcum ? acum : curva).map(([x, y]) => [x, y] as [number, number]),
-    [mostrarAcum, acum, curva]
-  );
-  const punto = useRef<THREE.Mesh>(null);
-  const fase = useRef(0);
-  useFrame((_, delta) => {
-    const d = pausado ? 0 : delta;
-    if (ruta.length < 2) return;
-    fase.current = (fase.current + d * 0.06) % 1;
-    const mesh = punto.current;
-    if (mesh) {
-      const idx = Math.min(ruta.length - 1, Math.floor(fase.current * (ruta.length - 1)));
-      const p = ruta[idx]!;
-      mesh.position.set(wx(p[0]), wy(p[1]), 0.08);
-    }
-  });
-
-  const xticks = useMemo(() => [1, 2, 3, 4].filter((x) => x <= XMAX), []);
-  const yticks = useMemo(() => [2, 4, 6, 8].filter((y) => y <= YMAX), []);
+  const marcasX = [1, 2, 3, 4];
+  const marcasY = [2, 4, 6, 8];
 
   return (
     <group position={[0, 0, 0]}>
-      {/* tablero del plano */}
-      <mesh position={[0, 0, -0.06]} receiveShadow>
-        <planeGeometry args={[BOARD_W + 1.8, BOARD_H + 1.8]} />
-        <meshStandardMaterial color="#07182c" metalness={0.05} roughness={0.95} />
-      </mesh>
+      {/* tablero con grosor y marco */}
+      <PanelGrafica ancho={BOARD_W + 1.8} alto={BOARD_H + 1.8} frente={-0.06} />
 
       {/* rejilla: verticales y horizontales en coordenadas matemáticas */}
       {[0, 1, 2, 3, 4].filter((x) => x <= XMAX).map((x) => (
@@ -141,133 +145,72 @@ function Plano({ funcionId, accent, modo, b, n, pausado }: {
         <Line key={`gy${y}`} points={[w3(0, y, -0.03), w3(XMAX, y, -0.03)]} color="#173453" lineWidth={1} />
       ))}
 
-      {/* eje X */}
-      <Line points={[w3(0, 0, 0), [wx(XMAX) + 0.5, wy(0), 0]]} color={EJE} lineWidth={2} />
-      <mesh position={[wx(XMAX) + 0.6, wy(0), 0]} rotation={[0, 0, -Math.PI / 2]}>
-        <coneGeometry args={[0.13, 0.34, 16]} />
-        <meshStandardMaterial color={EJE} />
-      </mesh>
-      <Html position={[wx(XMAX) + 0.95, wy(0) + 0.05, 0]} center distanceFactor={15} pointerEvents="none">
-        <div style={{ color: EJE, fontSize: 12, fontWeight: 900 }}>x</div>
-      </Html>
+      {/* ejes: varillas con punta */}
+      <EjeVarilla desde={w3(0, 0, 0)} hasta={[wx(XMAX) + 0.6, wy(0), 0]} color={EJE} />
+      <EjeVarilla desde={w3(0, 0, 0)} hasta={[wx(0), wy(YMAX) + 0.6, 0]} color={EJE} />
 
-      {/* eje Y */}
-      <Line points={[w3(0, 0, 0), [wx(0), wy(YMAX) + 0.5, 0]]} color={EJE} lineWidth={2} />
-      <mesh position={[wx(0), wy(YMAX) + 0.6, 0]}>
-        <coneGeometry args={[0.13, 0.34, 16]} />
-        <meshStandardMaterial color={EJE} />
-      </mesh>
-      <Html position={[wx(0) + 0.05, wy(YMAX) + 0.95, 0]} center distanceFactor={15} pointerEvents="none">
-        <div style={{ color: EJE, fontSize: 12, fontWeight: 900 }}>y</div>
-      </Html>
-
-      {/* marcas + números de unidad */}
-      {xticks.map((x) => (
-        <group key={`tx${x}`}>
-          <Line points={[[wx(x), wy(0) - 0.12, 0], [wx(x), wy(0) + 0.12, 0]]} color={EJE} lineWidth={1} />
-          <Html position={[wx(x), wy(0) - 0.45, 0]} center distanceFactor={16} pointerEvents="none">
-            <div style={{ color: EJE, fontSize: 10, fontWeight: 700 }}>{x}</div>
-          </Html>
-        </group>
+      {/* marcas de unidad como geometría */}
+      {marcasX.map((x) => (
+        <mesh key={`tx${x}`} position={[wx(x), wy(0), 0]}>
+          <boxGeometry args={[0.04, 0.26, 0.04]} />
+          <meshStandardMaterial color={EJE} roughness={0.4} metalness={0.6} />
+        </mesh>
       ))}
-      {yticks.map((y) => (
-        <group key={`ty${y}`}>
-          <Line points={[[wx(0) - 0.12, wy(y), 0], [wx(0) + 0.12, wy(y), 0]]} color={EJE} lineWidth={1} />
-          <Html position={[wx(0) - 0.42, wy(y), 0]} center distanceFactor={16} pointerEvents="none">
-            <div style={{ color: EJE, fontSize: 10, fontWeight: 700 }}>{y}</div>
-          </Html>
-        </group>
+      {marcasY.map((y) => (
+        <mesh key={`ty${y}`} position={[wx(0), wy(y), 0]}>
+          <boxGeometry args={[0.26, 0.04, 0.04]} />
+          <meshStandardMaterial color={EJE} roughness={0.4} metalness={0.6} />
+        </mesh>
       ))}
-      <Html position={[wx(0) - 0.38, wy(0) - 0.38, 0]} center distanceFactor={16} pointerEvents="none">
-        <div style={{ color: EJE, fontSize: 10, fontWeight: 700 }}>0</div>
-      </Html>
 
       {/* área exacta sombreada bajo f en [0,b] */}
       {mostrarArea && b > A_FIJO + 1e-6 && (
-        <mesh position={[0, 0, -0.01]}>
+        <mesh position={[0, 0, 0.0]}>
           <shapeGeometry args={[areaShape]} />
-          <meshBasicMaterial color={accent} transparent opacity={0.16} side={THREE.DoubleSide} toneMapped={false} />
+          <meshBasicMaterial color={accent} transparent opacity={0.22} side={THREE.DoubleSide} />
         </mesh>
       )}
 
       {/* rectángulos de Riemann (modo área) */}
-      {mostrarRects &&
-        rects.map((r, i) => {
-          const cx = wx(r.x0 + r.w / 2);
-          const cy = wy(r.h / 2);
-          const w = r.w * SX;
-          const h = Math.max(0.001, r.h * SY);
-          return (
-            <group key={`rc${i}`}>
-              <mesh position={[cx, cy, 0.015]}>
-                <planeGeometry args={[w * 0.97, h]} />
-                <meshBasicMaterial color={ORO} transparent opacity={0.22} side={THREE.DoubleSide} toneMapped={false} />
-              </mesh>
-              <Line
-                points={[
-                  [cx - w * 0.485, wy(0) + 0.001, 0.02],
-                  [cx - w * 0.485, wy(r.h), 0.02],
-                  [cx + w * 0.485, wy(r.h), 0.02],
-                  [cx + w * 0.485, wy(0) + 0.001, 0.02],
-                ]}
-                color={ORO}
-                lineWidth={1.5}
-              />
-            </group>
-          );
-        })}
+      {mostrarRects && <Rectangulos rects={rects} />}
 
       {/* la curva y = f(x) */}
-      <CurvaTubo puntos={curva.map(([x, y]) => w3(x, y, 0.03))} color={accent} grosor={0.072} />
-      <Html position={w3(XMAX, fn.f(XMAX), 0.03)} center distanceFactor={14} pointerEvents="none">
-        <div style={{ color: accent, fontSize: 11, fontWeight: 900, textShadow: "0 2px 8px #000", whiteSpace: "nowrap" }}>
-          f(x)
-        </div>
-      </Html>
+      <CurvaTubo puntos={curva.map(([x, y]) => w3(x, y, 0.05))} color={accent} grosor={0.072} />
 
       {/* la función de acumulación F(x) = ∫₀ˣ f */}
-      {mostrarAcum && (
-        <>
-          <CurvaTubo puntos={acum.map(([x, y]) => w3(x, y, 0.04))} color={VERDE} grosor={0.063} />
-          <Html position={w3(XMAX, integralExacta(fn, A_FIJO, XMAX), 0.04)} center distanceFactor={14} pointerEvents="none">
-            <div style={{ color: VERDE, fontSize: 11, fontWeight: 900, textShadow: "0 2px 8px #000", whiteSpace: "nowrap" }}>
-              F(x)=∫₀ˣf
-            </div>
-          </Html>
-        </>
-      )}
+      {mostrarAcum && <CurvaTubo puntos={acum.map(([x, y]) => w3(x, y, 0.06))} color={VERDE} grosor={0.063} />}
 
-      {/* límite móvil b: línea vertical guía */}
-      <Line points={[w3(b, 0, 0.05), w3(b, YMAX, 0.05)]} color={MAGENTA} lineWidth={1.5} dashed dashSize={0.16} gapSize={0.12} />
-      <Html position={[wx(b), wy(0) - 0.78, 0]} center distanceFactor={15} pointerEvents="none">
-        <div style={{ color: MAGENTA, fontSize: 11, fontWeight: 900, textShadow: "0 2px 8px #000", whiteSpace: "nowrap" }}>
+      {/* límite móvil b: guía vertical y su etiqueta */}
+      <CurvaTubo puntos={[w3(b, 0, 0.05), w3(b, YMAX, 0.05)]} color={MAGENTA} grosor={0.025} brillo={0.6} />
+      <Html position={[wx(b), wy(0) - 0.75, 0]} center pointerEvents="none" zIndexRange={[20, 0]}>
+        <div style={{ color: MAGENTA, fontSize: 14, fontWeight: 900, textShadow: "0 2px 8px #000", whiteSpace: "nowrap" }}>
           b = {fmtNum(b, 2)}
         </div>
       </Html>
 
       {/* punto sobre f en x=b (altura f(b)) */}
-      <group position={w3(b, fb, 0.07)}>
+      <group position={w3(b, fb, 0.1)}>
         <mesh castShadow>
-          <sphereGeometry args={[0.14, 24, 24]} />
-          <meshStandardMaterial color="#ffffff" emissive={accent} emissiveIntensity={0.6} />
+          <sphereGeometry args={[0.16, 24, 24]} />
+          <meshStandardMaterial color="#ffffff" emissive={accent} emissiveIntensity={0.5} />
         </mesh>
-        <Html position={[0.5, 0.2, 0]} center distanceFactor={13} pointerEvents="none">
-          <div style={{ background: "rgba(2,12,28,0.85)", border: `1px solid ${accent}66`, borderRadius: 8, padding: "3px 7px", whiteSpace: "nowrap" }}>
-            <span style={{ color: accent, fontSize: 10.5, fontWeight: 900 }}>f(b) = {fmtNum(fb, 2)}</span>
+        <Html position={[0.95, 0.35, 0]} center pointerEvents="none" zIndexRange={[20, 0]}>
+          <div style={{ background: "rgba(2,12,28,0.88)", border: `1px solid ${accent}99`, borderRadius: 8, padding: "3px 8px", whiteSpace: "nowrap" }}>
+            <span style={{ color: accent, fontSize: 14, fontWeight: 900 }}>f(b) = {fmtNum(fb, 2)}</span>
           </div>
         </Html>
       </group>
 
       {/* punto sobre F en x=b (altura = área acumulada) */}
       {mostrarAcum && (
-        <group position={w3(b, Fb, 0.08)}>
+        <group position={w3(b, Fb, 0.11)}>
           <mesh castShadow>
-            <sphereGeometry args={[0.15, 24, 24]} />
-            <meshStandardMaterial color="#ffffff" emissive={VERDE} emissiveIntensity={0.7} />
+            <sphereGeometry args={[0.17, 24, 24]} />
+            <meshStandardMaterial color="#ffffff" emissive={VERDE} emissiveIntensity={0.6} />
           </mesh>
-          <Html position={[0.55, -0.05, 0]} center distanceFactor={13} pointerEvents="none">
-            <div style={{ background: "rgba(2,12,28,0.85)", border: `1px solid ${VERDE}66`, borderRadius: 8, padding: "3px 7px", whiteSpace: "nowrap" }}>
-              <span style={{ color: VERDE, fontSize: 10.5, fontWeight: 900 }}>F(b) = {fmtNum(Fb, 2)}</span>
+          <Html position={[0.95, -0.4, 0]} center pointerEvents="none" zIndexRange={[20, 0]}>
+            <div style={{ background: "rgba(2,12,28,0.88)", border: `1px solid ${VERDE}99`, borderRadius: 8, padding: "3px 8px", whiteSpace: "nowrap" }}>
+              <span style={{ color: VERDE, fontSize: 14, fontWeight: 900 }}>F(b) = {fmtNum(Fb, 2)}</span>
             </div>
           </Html>
         </group>
@@ -277,31 +220,24 @@ function Plano({ funcionId, accent, modo, b, n, pausado }: {
       {modo === "conexion" && (
         <>
           <CurvaTubo puntos={tangente} color={ORO} grosor={0.054} />
-          <Html position={w3(b, Fb, 0.09)} center distanceFactor={13} pointerEvents="none">
-            <div style={{ background: "rgba(2,12,28,0.88)", border: `1px solid ${ORO}77`, borderRadius: 8, padding: "3px 8px", whiteSpace: "nowrap", marginTop: -34 }}>
-              <span style={{ color: ORO, fontSize: 10.5, fontWeight: 900 }}>F′(b) = {fmtNum(fb, 2)} = f(b)</span>
-            </div>
-          </Html>
+          {!angosto && (
+            <Html position={w3(b, Fb, 0.12)} center pointerEvents="none" zIndexRange={[20, 0]}>
+              <div style={{ background: "rgba(2,12,28,0.9)", border: `1px solid ${ORO}88`, borderRadius: 8, padding: "3px 8px", whiteSpace: "nowrap", marginTop: -48 }}>
+                <span style={{ color: ORO, fontSize: 14, fontWeight: 900 }}>F′(b) = {fmtNum(fb, 2)} = f(b)</span>
+              </div>
+            </Html>
+          )}
         </>
       )}
 
       {/* etiqueta de la suma vs integral (modo área) */}
-      {modo === "area" && (
-        <Html position={[wx(b / 2), wy(YMAX) - 0.2, 0]} center distanceFactor={15} pointerEvents="none">
-          <div style={{ background: "rgba(2,12,28,0.82)", border: `1px solid ${ORO}55`, borderRadius: 8, padding: "4px 9px", whiteSpace: "nowrap", textAlign: "center" }}>
-            <span style={{ color: ORO, fontSize: 10.5, fontWeight: 900 }}>Σ Riemann ≈ {fmtNum(sumaRiemann(fn, A_FIJO, b, n), 2)}</span>
+      {modo === "area" && !angosto && (
+        <Html position={[wx(b / 2), wy(YMAX) - 0.3, 0]} center pointerEvents="none" zIndexRange={[20, 0]}>
+          <div style={{ background: "rgba(2,12,28,0.88)", border: `1px solid ${ORO}77`, borderRadius: 8, padding: "3px 9px", whiteSpace: "nowrap", textAlign: "center" }}>
+            <span style={{ color: ORO, fontSize: 14, fontWeight: 900 }}>Σ Riemann ≈ {fmtNum(sumaRiemann(fn, A_FIJO, b, n), 2)}</span>
           </div>
         </Html>
       )}
-
-      {/* punto viajero */}
-      {ruta.length >= 2 && (
-        <mesh ref={punto} castShadow>
-          <sphereGeometry args={[0.1, 20, 20]} />
-          <meshStandardMaterial color="#ffffff" emissive={mostrarAcum ? VERDE : accent} emissiveIntensity={0.5} metalness={0.1} roughness={0.4} />
-        </mesh>
-      )}
-
     </group>
   );
 }
@@ -313,7 +249,7 @@ export default function TfcScene(props: TfcSceneProps) {
       shadows
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
-      camera={{ position: [0, 0, 16], fov: 46 }}
+      camera={{ position: [0, 0, 20], fov: 46 }}
     >
       <Contenido {...props} />
     </Canvas>
@@ -321,29 +257,25 @@ export default function TfcScene(props: TfcSceneProps) {
 }
 
 function Contenido(props: TfcSceneProps) {
-  const { funcionId, accent, modo, b, n, pausado, autoRotate, resetNonce } = props;
+  const { funcionId, accent, modo, b, n, resetNonce } = props;
   return (
     <>
       {/* Suelo, luz de tres puntos y entorno que reflejar. */}
-      {/* La altura sale de donde esta escena ya ponía su sombra de
-          contacto: es donde su autor decidió que estaba el piso. */}
       <Escenario acento={accent} suelo={OY - 0.4} />
 
+      <EncuadreMate ancho={BOARD_W + 2.6} alto={BOARD_H + 2.4} nonce={resetNonce} />
 
       <group key={`${resetNonce}`}>
-        <Plano funcionId={funcionId} accent={accent} modo={modo} b={b} n={n} pausado={pausado} />
+        <Plano funcionId={funcionId} accent={accent} modo={modo} b={b} n={n} />
       </group>
-
 
       <OrbitControls
         enablePan={false}
-        minDistance={9}
-        maxDistance={24}
+        minDistance={8}
+        maxDistance={40}
         minPolarAngle={Math.PI / 6}
         maxPolarAngle={Math.PI / 1.9}
         target={[0, 0, 0]}
-        autoRotate={autoRotate}
-        autoRotateSpeed={0.4}
       />
 
       <EffectComposer enableNormalPass={false}>

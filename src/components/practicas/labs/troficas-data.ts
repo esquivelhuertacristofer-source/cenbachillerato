@@ -178,3 +178,25 @@ export const fmtKcal = (n: number): string => {
   if (n >= 1) return ES(n, 1);
   return ES(n, 2);
 };
+
+/* ── Experimento: «quita una especie» (cascada trófica, SIMULACIÓN) ──────────
+ * Cuando un nivel desaparece: (1) los niveles de arriba se quedan sin alimento;
+ * (2) el nivel de abajo ya no es comido y se multiplica (×1.6); (3) el siguiente
+ * hacia abajo sufre por ese exceso (×0.7) y (4) el que sigue se recupera (×1.3).
+ * Es una cascada trófica cualitativa, no una medición de un ecosistema real. */
+export type EstadoNivel = "normal" | "quitado" | "hambre";
+export interface Cascada { mult: number[]; estado: EstadoNivel[] }
+
+const FACTORES_CASCADA = [1.6, 0.7, 1.3];
+
+export function cascada(quitado: number | null): Cascada {
+  const mult: number[] = NIVELES.map(() => 1);
+  const estado: EstadoNivel[] = NIVELES.map(() => "normal" as EstadoNivel);
+  if (quitado === null) return { mult, estado };
+  NIVELES.forEach((_, i) => {
+    if (i === quitado) { mult[i] = 0; estado[i] = "quitado"; }
+    else if (i > quitado) { mult[i] = 0; estado[i] = "hambre"; }
+    else mult[i] = FACTORES_CASCADA[quitado - 1 - i] ?? 1;
+  });
+  return { mult, estado };
+}

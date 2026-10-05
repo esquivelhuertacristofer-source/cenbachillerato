@@ -1,0 +1,12 @@
+{
+  "escena": "Cuentas una leyenda en cuatro partes frente a un fogón; en cada parte eliges cómo decirla.",
+  "pregunta": "Si cambias una parte con «Cuentan que…» por «En 1890, en una localidad…», ¿qué le pasa al fogón?",
+  "opciones": [
+    { "id": "a", "texto": "Gana un oyente, por ser más preciso", "icono": "fa-user-plus" },
+    { "id": "b", "texto": "Pierde un oyente: suena a informe", "icono": "fa-user-minus" },
+    { "id": "c", "texto": "Nada, dicen lo mismo", "icono": "fa-equals" }
+  ],
+  "correcta": "b",
+  "porque": "«Cuentan que…» es una fórmula de apertura de la lengua oral: llama a quien escucha. Una fecha y un lugar exactos suenan a acta y quitan la huella de la voz.",
+  "comoComprobarlo": "En «El fogón», elige «Cuentan los viejitos…» en la primera parte y mira los oyentes; luego elige la versión con la fecha."
+}

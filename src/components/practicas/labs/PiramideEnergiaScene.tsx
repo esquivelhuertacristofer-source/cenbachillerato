@@ -16,11 +16,11 @@
  */
 
 import * as THREE from "three";
-import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Edges, Html } from "@react-three/drei";
+import { useEffect, useMemo, useRef } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { OrbitControls, Html } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
-import { NIVELES, N_NIVELES, flujo, fmtKcal, fmtPct } from "./piramide-energia-data";
+import { NIVELES, N_NIVELES, flujo, fmtKcal } from "./piramide-energia-data";
 import { Escenario } from "./_escenario";
 
 export interface PiramideEnergiaSceneProps {
@@ -106,13 +106,13 @@ function Subida({ yFrom, yTo, intensidad, accent, pausado }: { yFrom: number; yT
   return (
     <instancedMesh ref={ref} args={[undefined, undefined, UP_N]}>
       <sphereGeometry args={[1, 12, 12]} />
-      <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={1.1} toneMapped={false} />
+      <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={1.1} />
     </instancedMesh>
   );
 }
 
 /* ─── Contenido de la pirámide ─────────────────────────────────────────── */
-function Piramide({ e0, eficPct, accent, pausado }: { e0: number; eficPct: number; accent: string; pausado: boolean }) {
+function Piramide({ e0, eficPct, accent, pausado, angosto }: { e0: number; eficPct: number; accent: string; pausado: boolean; angosto: boolean }) {
   const datos = useMemo(() => flujo(e0, eficPct), [e0, eficPct]);
 
   // Ancho de cada plataforma según log10(energía), normalizado a la base.
@@ -138,13 +138,6 @@ function Piramide({ e0, eficPct, accent, pausado }: { e0: number; eficPct: numbe
         <meshStandardMaterial color="#0b2a1c" metalness={0.05} roughness={0.95} />
       </mesh>
 
-      {/* sol que alimenta a los productores */}
-      <Html position={[-(W_BASE / 2) - 1.7, yCentro(0) + 0.2, 0]} center distanceFactor={13} pointerEvents="none">
-        <div style={{ display: "flex", alignItems: "center", gap: 7, whiteSpace: "nowrap" }}>
-          <i className="fa-solid fa-sun" style={{ color: "#ffd24a", fontSize: 18 }} />
-          <span style={{ color: "#ffe08a", fontSize: 11, fontWeight: 800 }}>energía solar</span>
-        </div>
-      </Html>
 
       {NIVELES.map((nv, i) => {
         const w = anchos[i]!;
@@ -155,20 +148,13 @@ function Piramide({ e0, eficPct, accent, pausado }: { e0: number; eficPct: numbe
             <mesh castShadow receiveShadow>
               <boxGeometry args={[w, TIER_H, w]} />
               <meshStandardMaterial color={nv.color} emissive={nv.color} emissiveIntensity={0.18} metalness={0.2} roughness={0.55} />
-              <Edges threshold={15} color={"#ffffff"} />
             </mesh>
-            {/* etiqueta del nivel */}
-            <Html position={[w / 2 + 0.25, 0, 0]} center={false} distanceFactor={12} pointerEvents="none">
-              <div style={{ background: "rgba(2,12,28,0.82)", border: `1px solid ${nv.color}66`, borderRadius: 10, padding: "6px 10px", whiteSpace: "nowrap", transform: "translateY(-50%)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                  <i className={`fa-solid ${nv.icono}`} style={{ color: nv.color, fontSize: 13 }} />
-                  <span style={{ color: "#eaf2fb", fontSize: 11.5, fontWeight: 800 }}>{nv.nombre}</span>
-                </div>
-                <div style={{ color: nv.color, fontSize: 13, fontWeight: 900, fontFamily: "ui-monospace, monospace", marginTop: 2 }}>
+            {/* etiqueta del nivel: nombre y energía (el resto vive en el panel) */}
+            <Html position={[w / 2 + 0.3, 0, 0]} center={false} pointerEvents="none">
+              <div style={{ background: "rgba(2,12,28,0.82)", border: `1px solid ${nv.color}66`, borderRadius: 10, padding: "5px 10px", whiteSpace: "nowrap", transform: "translateY(-50%)" }}>
+                {!angosto && <div style={{ color: "#eaf2fb", fontSize: 14, fontWeight: 800 }}>{nv.nombre}</div>}
+                <div style={{ color: nv.color, fontSize: 14, fontWeight: 900, fontFamily: "ui-monospace, monospace" }}>
                   {fmtKcal(dn.energia)} kcal
-                </div>
-                <div style={{ color: "#9fb2c8", fontSize: 10, marginTop: 1 }}>
-                  {nv.ejemplo} · {fmtPct(dn.pctDelOriginal)} del total
                 </div>
               </div>
             </Html>
@@ -196,13 +182,6 @@ function Piramide({ e0, eficPct, accent, pausado }: { e0: number; eficPct: numbe
         );
       })}
 
-      {/* etiqueta de calor disipado en la base (la mayor pérdida) */}
-      <Html position={[W_BASE / 2 + 1.4, yCentro(0) + 1.0, 0]} center distanceFactor={13} pointerEvents="none">
-        <div style={{ display: "flex", alignItems: "center", gap: 7, whiteSpace: "nowrap" }}>
-          <i className="fa-solid fa-fire-flame-simple" style={{ color: CALOR, fontSize: 15 }} />
-          <span style={{ color: "#ffb38a", fontSize: 11, fontWeight: 800 }}>~{100 - eficPct}% se va como calor</span>
-        </div>
-      </Html>
 
     </group>
   );
@@ -224,6 +203,16 @@ export default function PiramideEnergiaScene(props: PiramideEnergiaSceneProps) {
 
 function Contenido(props: PiramideEnergiaSceneProps) {
   const { e0, eficPct, accent, pausado, autoRotate, resetNonce } = props;
+  const { size, camera } = useThree();
+  const angosto = size.width < 640;
+  // Encuadre: la pirámide y sus etiquetas caben a lo ancho aunque la pantalla sea angosta.
+  useEffect(() => {
+    const aspecto = size.width / Math.max(1, size.height);
+    const dist = Math.max(14, 11 / (2 * Math.tan((44 / 2) * Math.PI / 180) * aspecto));
+    const dir = new THREE.Vector3(6.5, 2.2, 9.5).normalize(); // dirección cámara → objetivo
+    camera.position.set(dir.x * dist, 2.0 + dir.y * dist, dir.z * dist);
+    camera.updateProjectionMatrix();
+  }, [size.width, size.height, camera]);
   return (
     <>
       {/* Suelo, luz de tres puntos y entorno que reflejar. */}
@@ -233,17 +222,17 @@ function Contenido(props: PiramideEnergiaSceneProps) {
 
 
       <group key={`${resetNonce}`}>
-        <Piramide e0={e0} eficPct={eficPct} accent={accent} pausado={pausado} />
+        <Piramide e0={e0} eficPct={eficPct} accent={accent} pausado={pausado} angosto={angosto} />
       </group>
 
 
       <OrbitControls
         enablePan={false}
         minDistance={6}
-        maxDistance={22}
+        maxDistance={34}
         minPolarAngle={Math.PI / 8}
         maxPolarAngle={Math.PI / 2.05}
-        target={[0, 2.4, 0]}
+        target={[0, 2.0, 0]}
         autoRotate={autoRotate}
         autoRotateSpeed={0.4}
       />

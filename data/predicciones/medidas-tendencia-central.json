@@ -1,0 +1,12 @@
+{
+  "escena": "Una fila de sueldos con un solo sueldo altísimo al final, y marcas de media y mediana sobre la recta",
+  "pregunta": "Si ese sueldo altísimo sube aún más, ¿qué marca se mueve?",
+  "opciones": [
+    { "id": "a", "texto": "Las dos marcas se mueven igual", "icono": "fa-arrows-left-right" },
+    { "id": "b", "texto": "Solo la media se desplaza", "icono": "fa-scale-unbalanced" },
+    { "id": "c", "texto": "Solo la mediana se desplaza", "icono": "fa-scissors" }
+  ],
+  "correcta": "b",
+  "porque": "La media suma todos los valores, así que un extremo la jala. La mediana solo depende del lugar que ocupan los datos ordenados, y el sueldo alto sigue siendo el último.",
+  "comoComprobarlo": "Con el conjunto Salarios, arrastra el deslizador «Valor más alto» y vigila las barras de media y mediana."
+}

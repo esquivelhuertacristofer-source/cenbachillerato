@@ -1,0 +1,12 @@
+{
+  "escena": "Una pirámide trófica de bosque con productores, herbívoros, carnívoros y un depredador tope",
+  "pregunta": "Si desaparecen todos los herbívoros, ¿qué les pasa a las plantas?",
+  "opciones": [
+    { "id": "a", "texto": "Se multiplican, nadie las come", "icono": "fa-seedling" },
+    { "id": "b", "texto": "Se mueren por falta de animales", "icono": "fa-skull" },
+    { "id": "c", "texto": "No cambia nada en ellas", "icono": "fa-equals" }
+  ],
+  "correcta": "a",
+  "porque": "Sin herbívoros, las plantas ya no son comidas y su población crece. Pero los carnívoros de arriba se quedan sin alimento: quitar un nivel desordena toda la red.",
+  "comoComprobarlo": "En Controles, quita a los herbívoros y mira cuántas esferas de biomasa hay sobre la base de la pirámide."
+}
